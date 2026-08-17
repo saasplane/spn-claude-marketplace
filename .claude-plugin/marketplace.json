@@ -1,0 +1,33 @@
+{
+  "name": "saasplane",
+  "owner": {
+    "name": "SaaS Plane"
+  },
+  "description": "The SaaS Plane agent plugin marketplace — the stack-agnostic core plugin (persona, contract rules, command vocabulary, cross-repo protocol, generated-file guard) and one plugin per provider instance, named spn-<domain>-<instance>.",
+  "plugins": [
+    {
+      "name": "spn-core",
+      "source": "./plugins/spn-core",
+      "description": "SaaS Plane core, stack-agnostic: the DevEx stage skills (scm, ideate, plan, develop, test, provision, deliver, operate) plus two that serve any stage — check, which proves a claim against the code and runs nothing, and report, which writes any of the eight report templates into a node's artifacts pocket — including ideate, the interactive loop that decides a boundary and shape into the repo-root CONCEPT.md before anything is planned; the SPN engineer persona; the spn-panel reviewer and the ten lens files it convenes (lead, business, product, architect, server-dev, web-dev, qa, infra, trust, partner); contract review rules; the command vocabulary; the doc-set rules every node's docs are built to; the cross-repo working protocol; the getting-started digest; the new-platform intake worksheet; and a hook that denies hand-edits to generated files.",
+      "author": {
+        "name": "SaaS Plane"
+      }
+    },
+    {
+      "name": "spn-apps-ts",
+      "source": "./plugins/spn-apps-ts",
+      "description": "SaaS Plane apps domain, TypeScript instance: the six verb skills — plan, new, implement, review, run, verify — carrying the TS standards digest and the golden-path step files.",
+      "author": {
+        "name": "SaaS Plane"
+      }
+    },
+    {
+      "name": "spn-infra",
+      "source": "./plugins/spn-infra",
+      "description": "SaaS Plane infra domain — one plugin for every estate repo, not one per instance (a provider's mechanics ride its blueprint library, which the command surface consumes): the estate verb skills — declare, plan-review, module-author, release — the manifest and locator quick reference, the layer-noun and door card, the name and DNS grammar with the published vocabulary, the estate laws, and a hook that denies secrets, ARNs, account ids, provider strings outside a cloud entry, and hand edits to dist/.",
+      "author": {
+        "name": "SaaS Plane"
+      }
+    }
+  ]
+}

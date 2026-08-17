@@ -1,0 +1,8 @@
+{
+  "name": "spn-core",
+  "version": "0.1.0",
+  "description": "SaaS Plane core, stack-agnostic: the DevEx stage skills (check, scm, ideate, plan, develop, test, provision, deliver, operate, report) \u2014 including ideate, the interactive loop that decides a boundary and shape into the repo-root CONCEPT.md before anything is planned; the SPN engineer persona; the spn-panel reviewer and the ten lens files it convenes (lead, business, product, architect, server-dev, web-dev, qa, infra, trust, partner); contract review rules; the command vocabulary; the doc-set rules every node's docs are built to; the cross-repo working protocol; the getting-started digest; the new-platform intake worksheet; and a hook that denies hand-edits to generated files.",
+  "author": {
+    "name": "SaaS Plane"
+  }
+}

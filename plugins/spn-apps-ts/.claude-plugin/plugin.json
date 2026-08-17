@@ -1,0 +1,8 @@
+{
+  "name": "spn-apps-ts",
+  "version": "0.1.0",
+  "description": "SaaS Plane apps domain, TypeScript instance: the six verb skills \u2014 plan, new, implement, review, run, verify \u2014 carrying the TS standards digest and the golden-path step files.",
+  "author": {
+    "name": "SaaS Plane"
+  }
+}
