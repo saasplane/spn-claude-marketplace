@@ -5,7 +5,7 @@ description: Decide what a node IS before anything is planned - its boundary, it
 
 # ideate — decide the shape, one agreed section at a time
 
-**Every project that goes wrong slowly went wrong here** — in the twenty minutes nobody spent deciding what the thing is and, harder, what it deliberately is not. The boundary then gets drawn implicitly by the first three features, and moving it later means moving everything built inside it.
+A boundary nobody decides still gets drawn: the first three features draw it, implicitly, and by the time anyone notices, moving it means moving everything built inside it. **That is how projects go wrong slowly** — in the twenty minutes nobody spent deciding what the thing is and, harder, what it deliberately is not.
 
 Your output is exactly one file: **`CONCEPT.md` at the repository root**, beside `sprepo.json` (decision RD.DOCS.012 — a concept belongs to a repo root, never to a node; nodes carry `README.md` alone, so ideating a node lands as sections of its repo's concept). Never `docs/`. Never code.
 

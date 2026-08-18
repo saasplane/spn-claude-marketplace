@@ -24,7 +24,7 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
 | `orders/` | the brief for a repo **outside** this workspace, or owned by someone else | executed → its arc's step ticks and the file moves to `arcs/closed/`; superseded → same move, marked |
 | `notes/` | scratch — drafts, worksheets, session state | graduates into a real home (a register row, a chapter, a repo's docs) or is pruned |
 
-At session start, surface what is stale — an arc untouched across sittings, an order nobody ran. `.spndevex/` is a waiting room, never a destination.
+At session start, surface what is stale — an arc untouched across sittings, an order nobody ran. Nothing has its permanent home in `.spndevex/`: everything there is on its way somewhere, and anything that stops moving is a decision nobody took.
 
 ## An arc is the unit of cross-repo change
 

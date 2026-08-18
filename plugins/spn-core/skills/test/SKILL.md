@@ -35,7 +35,7 @@ description: What proves a behaviour, at which tier, and what a passing suite do
 
 Format, lint, and generated-file protection run **pre-commit**; codegen freshness, structure, and type checking run pre-commit where fast and otherwise on the **pull request**; unit and component suites gate the **merge**; integration and contract tiers run on the **affected projects**; journeys run **after deployment to a rung**, on a quiesced stack; release gates run **inside the release**, before anything is versioned.
 
-Two rules: a gate runs at **exactly one placement**, and a pre-commit gate **never reaches the network or a resource** — a commit has to work on a plane.
+Two rules: a gate runs at **exactly one placement**, and a pre-commit gate **never reaches the network or a resource** — a commit must work offline.
 
 **Credentials for a journey come from the environment** — never hardcoded, never defaulted. A suite missing one fails loudly rather than signing in as the wrong actor.
 
