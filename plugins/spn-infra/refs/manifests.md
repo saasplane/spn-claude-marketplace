@@ -29,7 +29,7 @@ Every estate node is a package. Its **root is found by `spinfrapkg.json`; its ty
 | --- | --- | --- | --- |
 | `SUPPORT` | `@saasplane/infra-<group>` — `infra-blueprints` first | `null` — it builds estates and declares none | `spestate.json` + renderings, **category-first, provider innermost** (`src/cloud/<step>/<provider>/…`) |
 | `ORGANIZATION` | `@{org}/infra-organization` — at most one per repo | `org` · `blueprint` pin · `packages` · `emailDomain` · `regions` · `providers` · `modules` | the manifest alone |
-| `PLATFORM` | `@{org}/infra-platform-{spc}` | `spc` · `domain` (`{spd}`, never the marketing domain) · `networkIndex` · `providers` (environments · apps · local) · `resources` · `modules` | the manifest alone |
+| `PLATFORM` | `@{org}/infra-platform-{spc}` | `spc` · `domain` (`{spd}`, never the marketing domain) · `networkIndex` · **declaration**: `resources` (`platform` + `spaces[]`) · `apps` · `modules` · **realization**: `providers` (scm · cloud environments · local) — RD.INFRA.051 | the manifest alone |
 | `MODULE` | `@{org}/infra-module-{code}` — **purpose code, never a product** (`idp`, not a vendor name) | `null` — identity only; usage stays on the referencing `modules[]` row | `spestate.json` + `aws/` + `local/` renderings — a rendering ships iff its folder exists |
 
 `docs/`, `tests/`, `README.md` are repo-internal, always; `tests/` exists only where a render harness does. `infra validate` holds every tree to its type's shape.
@@ -54,7 +54,7 @@ Organization config, the essentials:
 }
 ```
 
-Platform config, the moving parts: `environments[]` rows (`setup` free text — nothing derives from it · `region` · `networkIndex` append-only 0–7 · `workload` `PROD|NP` · `size` · `hosting` — `CLUSTER` refused under `PROD` · `deploy` trigger); `apps[]` rows (`kindCode` — claim ∧ grant · `repo` · `deployments[]` one per mtype); `local` (domain + the four resource ports); `resources` (the total four: database · cache · queue · storage — secrets never declared, every environment has one).
+Platform config, the moving parts (manifest grammar laws — RD.INFRA.050/051): **declaration vs realization** — `resources` · `apps` · `modules` say what the platform *is*; `providers` say where it *runs*. `resources.platform` (the total four: database · cache · queue · storage — secrets never declared, every environment has one) beside `resources.spaces[]` (per-need data worlds: `code` = published prefix · families each optional · db declares `schemas` `{name, dedicated}` rows and `users` `[{group, purposes, schemas}]` grants); `apps[]` rows at config level (`kindCode` — claim ∧ grant · `repo` · optional **`space`** binding, absent = platform resources · `deployments[]` one per mtype); `environments[]` rows under `providers.cloud` (`setup` free text — nothing derives from it · `region` · `networkIndex` append-only 0–7 · `workload` `PROD|NP` · `size` · `hosting` — `CLUSTER` refused under `PROD` · `deploy` trigger); `providers.local` mirrors the declaration **thing-first** (`resources.platform` ports · `resources.spaces` and `modules` as **maps keyed by declared code** — declare in arrays, realize in maps; an orphan key is a validate ERROR; absent = derived). **One fact once**: realizations carry no `mtype` — the declared engine selects the realization schema.
 
 A module row:
 

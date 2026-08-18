@@ -109,9 +109,24 @@ Every document opens with an invisible block holding **strict JSON**, marked `sp
 ```
 
 - `stages` is the one optional field — only where a document belongs to one DevEx stage, such as a guide.
-- **There is no `part` and no `altitude`.** Everything else is derived: the **seat** from the path, the **voice** from the seat, the **kind** from the node's manifest.
+- **There is no `part` and no `altitude`.** Everything else is derived: the **seat** from the path and the **kind** from the node's manifest — the voice is one (RD.DOCS.031); the seat decides what a document carries, never its temperature.
 - `id` is identity and **never changes**, however the path does. The path is only its current address.
 - **Status is the state of what the document governs, never of the prose**: `IMPLEMENTED` ✅ · `IN_PROGRESS` 🚧 · `PLANNED` 🔮.
+
+## One voice — the warm learning register
+
+The corpus speaks one voice (decision RD.DOCS.031, superseding the two-voice split): **every document is written for someone learning, while law keeps its force in every rule.** Writing or reviewing any doc, apply:
+
+1. **Teach in build-up order** — show the thing, name it, then state its rule; the rule lands as the conclusion of something the reader now understands.
+2. **Talk to the reader** — second person, present tense, active voice; momentum over ceremony.
+3. **Every rule keeps its teeth** — exact terms, exact constraints, MUST-grammar wherever a statement is normative. Precision is part of the kindness.
+4. **The plain substrate** — one idea per sentence; the rule stated literally before any story; no load-bearing metaphors, parables, aphorism-led paragraphs, or personification; bold marks rules and terms, never emphasis; house terms glossed on first use per chapter.
+5. **The warmth budget** — at most one light aside per section, never inside a rule's own sentence; *conversational and friendly without being frivolous*.
+6. **Personas choose content, never temperature** — capabilities speak to engineers, behaviors to product personas; the lens picks the examples.
+7. **The register governs prose, never records** — behavior rows, decision/glossary rows, every table and diagram, contract blocks, and code samples keep their form untouched. A warmed record is a defect.
+8. **The depth guarantee** — a rewrite changes how sentences are written, never what the corpus contains: every fact, constraint, edge case, table, and diagram survives; rewrites may add examples, never remove substance.
+
+The labeled on-ramp form (`**What this is about:**` blocks) is retired — its content folds into a natural opening paragraph. Rollout is progressive by tranches; existing prose is compliant until its tranche; new text complies from day one.
 
 ## Documents lead code
 

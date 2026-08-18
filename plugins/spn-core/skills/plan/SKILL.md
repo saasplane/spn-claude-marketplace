@@ -42,7 +42,7 @@ A duplicate capability costs more than a missing one: it splits behaviour across
 
 ## The approach document
 
-**Source of truth:** the foundation book's document standard (`docs/03-capabilities/05-docs/02-document.md`, "The approach document" section). This section digests it for use at the moment of writing and adds no rule of its own; where the two disagree, the book wins and this file is regenerated.
+**Source of truth:** the foundation book's artifacts standard (`docs/03-capabilities/05-docs/05-artifacts.md`, "The approach document" section). This section digests it for use at the moment of writing and adds no rule of its own; where the two disagree, the book wins and this file is regenerated.
 
 When a design is big enough that someone will read it more than once — a new artifact, a contract that other teams build against, a standard the tooling will enforce — the plan becomes a document with a fixed shape. **Why → What → How → Open → Deferred.** Nothing else, and in that order.
 
@@ -116,13 +116,16 @@ Preview     when the decision is a shape — an outline, a file tree, a sample r
 - **The recommendation carries its reason on the same line.** A reader agreeing with the reason can approve without reading further; a reader disagreeing knows exactly where they diverge.
 - **Length is not the variable.** A long description does not make a decision easier and a short one does not make it faster — *description, why, options, recommendation* is what does. Write each part as short as it can be while staying decidable.
 
-The same layout governs **how pending work is reported back to a developer at any time** — in an approach document, a status summary, or an answer to *"what's left?"* A list of pending items without options is work handed back rather than a decision offered.
+- **More than one item → numbered, and stable within the exchange.** A multi-item sheet closes by showing how to answer by number — *"1A, 2 confirm, 5–9 yes"* — so a developer settles the whole sheet in one line. An answer that cannot be given by number is a sheet that was not numbered.
+- **A card is self-contained across sittings.** Developers decide days after the work that raised the question; a card assumes no conversation context and no memory of the session that wrote it. Carry what deciding cold needs: the provenance (what raised it, in a line or two), the current state (what is true today, and the cost of not deciding), and where the decision lands once made. Leaving the card for conversation history is leaving the card.
+
+The same layout governs **how pending work is reported back to a developer at any time** — in an approach document, a status summary, a chat reply, or an answer to *"what's left?"* A list of pending items without options is work handed back rather than a decision offered.
 
 ### Open blocks; Deferred does not
 
 The distinction is what lets a design finish. **A question is `Open` while answering it could still change the shape.** Once the answer is understood and the choice is simply *not yet* — the cost is known, the design does not depend on it — it moves to `Deferred` and stops holding the document up.
 
-Moving something to `Deferred` is a decision and is written as one: *why not now*, and *what would bring it back*. A deferred item with neither is a backlog entry wearing a design document's clothes, and it will be re-litigated by whoever reads it next.
+Moving something to `Deferred` is a decision and is written as one: *why not now*, and *what would bring it back*. A deferred item with neither is only a backlog entry, and will be re-litigated by whoever reads it next.
 
 Nothing is deferred while it still changes what gets built. That is the whole test.
 

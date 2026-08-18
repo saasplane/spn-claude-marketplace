@@ -11,7 +11,7 @@
 - **The platform patterns apply, not approximations of them**: authorization and audit on the service method, transactions at the service layer, cache with purge on write, idempotent queue producers, the method families (read levels, search, active-toggle) as the surface template defines them.
 - **Never wire onto a method you have not read.** Installed modules are called through their contract services, read on demand — in-process when composed, through the API client when remote.
 - **Errors are contracts too**: namespaced codes declared in the contract, category mapped to status once, retryability classified, nothing internal disclosed outward.
-- **Generated files are never edited** — validators, barrels, manifests regenerate; an edited generated file is drift with a fuse on it.
+- **Generated files are never edited** — validators, barrels, manifests regenerate; an edited generated file is overwritten by the next regeneration.
 
 ## What it never does
 

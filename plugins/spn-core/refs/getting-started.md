@@ -9,12 +9,13 @@ The walk from nothing to a first feature in flight. Every step names the command
 | 1 | Install the CLI | `spnutils` | ✅ |
 | 2 | Create the repository and converge it — branches, protections, team access | `spnutils repo create` | ✅ |
 | 3 | Wire the agent — plugins, managed instructions, version-matched rules | `spnutils repo agent-init` | ✅ |
-| 4 | Settle the platform's coordinates with the intake worksheet | the `plan` skill | ✅ |
-| 5 | Create the monorepo and its `sprepo.json` — the stack claim and the infra couplings | the `new` skill, for a platform | 🚧 |
-| 6 | Bring the platform up locally | `infra organization up` · `infra platform up` | ✅ |
-| 7 | Create the first app and register it | the `new` skill · `infra app up` | 🚧 |
-| 8 | First feature — plan, then build | the `plan` skill → the `implement` skill | 🚧 |
-| 9 | Refresh the wiring after upgrades | `spnutils repo agent-sync` | ✅ |
+| 4 | Settle the platform's coordinates — the intake worksheet, landing as the concept's coordinates section | the `ideate` skill | ✅ |
+| 5 | Decide what the platform is — `CONCEPT.md`: boundary, domains, surfaces; the scaffold at the next step reads it | the `ideate` skill | 🚧 |
+| 6 | Create the monorepo and its `sprepo.json` — the stack claim and the infra couplings | the `new` skill, for a platform | 🚧 |
+| 7 | Bring the platform up locally | `infra organization up` · `infra platform up` | ✅ |
+| 8 | Create the first app and register it | the `new` skill · `infra app up` | 🚧 |
+| 9 | First feature — plan, then build | the `plan` skill → the `implement` skill | 🚧 |
+| 10 | Refresh the wiring after upgrades | `spnutils repo agent-sync` | ✅ |
 
 Three things worth knowing on day one:
 

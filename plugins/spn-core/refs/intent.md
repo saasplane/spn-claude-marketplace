@@ -68,7 +68,7 @@ Elaboration is welcome — it simply must not be the opening sentence, because t
 - Put the reasoning **after a blank line**. It stays in the file and never reaches a generated surface.
 - **No long prose where the code already shows it.** A comment that narrates the next three lines is a maintenance cost with no reader.
 - **The only comments worth keeping state a constraint the code cannot show** — an ordering that matters, a bound that is not obvious, a deliberate deviation.
-- **No changelog.** Not *"previously"*, not *"changed to"*. History is in the history.
+- **No changelog.** Not *"previously"*, not *"changed to"*.
 
 ## What each surface takes
 
@@ -136,7 +136,7 @@ A missing description in the required set is a symbol an agent cannot select. A 
 
 The other half of the standard. An **intent** comment leaves the file; a **rationale** comment never does. It is written for one reader: whoever edits this code next.
 
-**The syntax is the signal.** Doc-comment syntax is harvested into published surfaces; a line comment is not — so a rationale goes in a line comment, and a note in a doc comment above a published declaration will be published whether or not that was intended.
+Doc-comment syntax is harvested into published surfaces; a line comment is not — so **a rationale goes in a line comment**, and a note in a doc comment above a published declaration will be published whether or not that was intended.
 
 ## When a line is worth it
 

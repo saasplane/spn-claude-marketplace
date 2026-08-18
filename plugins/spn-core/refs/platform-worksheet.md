@@ -1,6 +1,6 @@
 # New-Platform Intake Worksheet
 
-The one-page artifact every new SaaS Plane platform starts from. Fill every row **before** any repository, manifest, or scaffold exists — adoption types these values into manifests, and a manifest is the wrong place to discover a decision was never made. Source of truth: the foundation book (`spn-foundation`), `docs/03-capabilities/01-saas/` and `docs/02-behaviors/01-decide.md` / `02-design.md`. SPN Demo (org `spn`, platform `dmo`, domain `spndemo.app`) is the book's sample platform, shown as the example column.
+The one-page artifact every new SaaS Plane platform starts from. Fill every row **before** any repository, manifest, or scaffold exists — adoption types these values into manifests, and a manifest is the wrong place to discover a decision was never made. The completed worksheet lands as the **coordinates section of the repository's `CONCEPT.md`**, produced by the `ideate` skill — coordinates settle here; the boundary, domains and surfaces are the concept's own job. Source of truth: the foundation book (`spn-foundation`), `docs/03-capabilities/01-saas/` and `docs/02-behaviors/01-decide.md` / `02-design.md`. SPN Demo (org `spn`, platform `dmo`, domain `spndemo.app`) is the book's sample platform, shown as the example column.
 
 Every row is consumed verbatim by a later step; nothing here is a throwaway answer.
 

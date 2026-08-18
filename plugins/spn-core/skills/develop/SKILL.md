@@ -36,7 +36,7 @@ Steps 1–3 are ordered by dependency and cannot be reordered. Steps 4–6 can i
 
 **Regenerate before committing**, and before restarting anything that loads the code. A repo whose generated artifacts disagree with their source fails at runtime rather than at review, which is the most expensive place to find it.
 
-If a generated file needs to be different, the generator or its source is what changes. An edited generated file is drift with a fuse on it.
+If a generated file needs to be different, the generator or its source is what changes. An edited generated file is overwritten by the next regeneration.
 
 ## The lines that hold
 
