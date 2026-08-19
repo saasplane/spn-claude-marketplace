@@ -79,10 +79,14 @@ Which makes the seat checkable in both directions:
 | `README.md` | identity and orientation | what this node is, and the map of what sits under it |
 | `01-purpose` | why the node exists | explains and persuades. Carries **no rules** — normative language here is a defect |
 | `02-behaviors` | what its consumer can do | stories: a persona reaching an outcome, in the consumer's own words. `personas.md` where the node has more than one; `01-<area>.md` for depth |
-| `03-capabilities` | what it carries | normative and engineering-voiced — the sequence, the guard, the reason a rule exists |
+| `03-capabilities` | what it carries | engineering-voiced, and **normative wherever a consumer can violate the statement** — the sequence, the guard, the reason a rule exists (RD.DOCS.034; see the altitude note below) |
 | `04-guides` | how to use it | task-shaped — install, mount, configure, run. The face **is** the getting-started, for a reader with no checkout |
 | `registers/` | the node's own rules and decisions | lookup material, consulted rather than read start to end |
 | `artifacts/` | `schema.sql`, reports, approach documents | authored source of truth. Nested folders allowed here and nowhere else; sub-folders carry no README |
+
+**A code-mirror capability page is the spec its code realizes** (decision RD.DOCS.034). The per-group page mirroring one published source group — `cache.md`, `contract.md`, `app.md`, `entry.md`, `ui-*.md` and siblings — **binds two parties**: the implementation, which is what a `Guarantee` row states, and the consumer, which is what `Placement` and `Does not do` state. **Both directions are normative.** The test, one statement at a time: **does it bind someone — the implementation or the consumer?** If yes it takes `MUST`/`MUST NOT`/`MAY`; if it binds nobody it is commentary — advice, rationale, a trade-off note — and stays prose. **A capability page is normatively dense by design**, and the seam table's sections are the spec's shape, unchanged.
+
+**The spec treatment reaches those pages only.** A repo root's `03-capabilities` is a **map** of what the repository contains — *where does what live*, not *what must this code do* — and so is a node's `03-capabilities/README.md` face, which routes, and `data-model.md`, which is a dictionary. The seat's job differs by what the node publishes: source groups yield specs, indexes and orientation yield maps. **Seat tables are in scope for modality; record tables are not** — dictionaries, behavior-row tables, data models, registries and proof-gap tables keep their form. Modality comes from the page, never from a sweeper.
 
 **`group` is the source axis; `area` is the story axis** (decision RD.DOCS.016). A group is a published top-level source folder — shared vocabulary between the symbol index and the capabilities seat. An area divides the behaviours seat and names an outcome, never a folder.
 
@@ -93,7 +97,6 @@ Every document opens with an invisible block holding **strict JSON**, marked `sp
 ```markdown
 <!-- spn:doc
 {
-  "version": 1,
   "id": "kebab-case-unique-id",
   "title": "Human Title",
   "lenses": ["ARCHITECT", "SERVER_DEV"],
@@ -110,6 +113,7 @@ Every document opens with an invisible block holding **strict JSON**, marked `sp
 
 - `stages` is the one optional field — only where a document belongs to one DevEx stage, such as a guide.
 - **There is no `part` and no `altitude`.** Everything else is derived: the **seat** from the path and the **kind** from the node's manifest — the voice is one (RD.DOCS.031); the seat decides what a document carries, never its temperature.
+- **`lenses` are derived from the kind, not authored per page** (decision RD.DOCS.037) — one derivation, two clauses, because runtime says *where code runs* and `lenses` says *who reads it*. A kind you **build on** (support, module, app, client) derives from its declared runtime: `SERVER` → `SERVER_DEV`, `WEB` → `WEB_DEV`, `UNIVERSAL` → both. A kind that **serves building** — `TOOLCHAIN` and `APP_UTILITY`, and only those two — carries both whatever its runtime, because every builder uses it. Read the declared runtime, never parse the name. `ARCHITECT` is added by **seat**, never by kind: a node's doc face (`docs/README.md`) is the orientation page and carries it for every kind, leaf nodes included; the seat faces beneath it (purpose, behaviors, capabilities, guides, artifacts) carry the derived developer lenses alone, and `ARCHITECT` there is authorship a scaffold never emits. The other six lenses are authored, never derived. A page MAY narrow the derived set where its subject genuinely serves one runtime, and MUST NOT widen it. **A scaffold template emits the derived set**, which is what makes generated pages compliant by construction.
 - `id` is identity and **never changes**, however the path does. The path is only its current address.
 - **Status is the state of what the document governs, never of the prose**: `IMPLEMENTED` ✅ · `IN_PROGRESS` 🚧 · `PLANNED` 🔮.
 

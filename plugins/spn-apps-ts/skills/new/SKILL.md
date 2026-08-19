@@ -5,7 +5,7 @@ description: Scaffold SaaS Plane TS artifacts. Use when the user wants to create
 
 # new — scaffold by target
 
-Every node declares exactly **one kind**, in `spkind.json` at its root — `{ "version": 1, "kind": "<kind>", "config": null }`, with `config` carrying the mnemonic for module kinds and the app code for app kinds — and everything derivable from the kind (runtime, toolchain profile, structure profile) is never declared again. Scaffolds write the key automatically; a project without it is unfinished.
+Every node declares exactly **one kind**, in `spkind.json` at its root — `{ "kind": "<kind>", "config": null }`, with `config` carrying the mnemonic for module kinds and the app code for app kinds — and everything derivable from the kind (runtime, toolchain profile, structure profile) is never declared again. Scaffolds write the kind automatically; a project without it is unfinished.
 
 **Never invent layout.** `spnutils apps scaffold` writes the structure the kind requires, and `spnutils apps validate` reports where a project disagrees with its own kind — run the scaffold, then the validator, rather than hand-building a folder tree (the stack is never typed: it comes from the repo's claim in `sprepo.json`). Where a workspace already holds a project of the same kind, match it; where it does not, the kind registry's structure profile is the authority. Tests always live under `tests/`, never in `src/`.
 

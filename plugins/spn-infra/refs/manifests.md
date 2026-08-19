@@ -8,19 +8,24 @@ Every estate node is a package. Its **root is found by `spinfrapkg.json`; its ty
 
 ```jsonc
 // spinfrapkg.json — infra's own package file, at the node root
-{ "version": 1, "name": "@spn/infra-platform-dmo", "release": "0.3.0" }
+{ "name": "@spn/infra-platform-dmo",
+  "version": "0.1.0",
+  "description": "The SPN Demo platform node — its environments, resource spaces, modules and apps.",
+  "author": "SPN Demo",
+  "license": "UNLICENSED" }
 ```
 
 - `name` is authoritative; the folder is validated against it. Its scope, matched against the org's `packages` lists, routes the publish.
-- `release` is the package's semver, bumped only by a reviewed edit — the bump commit is the reviewed act (see the `release` skill).
+- **`version` is the artifact's semver.** This is the manifest naming a *publishable artifact*, and the bump is a reviewed edit — the bump commit is the reviewed act (see the `release` skill).
+- `description` · `author` · `license` are the descriptive fields, optional in the tree. With them this file fills a package manifest's slot completely, so **an infra repository carries no `package.json` at all** (RD.INFRA.066) — one appearing in an estate tree is a defect, not metadata.
 - Read by the packaging machinery alone — release and ref-resolution — never by a layer.
 
 ```jsonc
-// src/spestate.json — the envelope, mirroring the kind manifest's shape
-{ "version": 1, "type": "PLATFORM", "config": { "mtype": "PLATFORM", … } }
+// src/spestate.json — declares a node, publishes nothing; mirrors the kind manifest's shape
+{ "type": "PLATFORM", "config": { "mtype": "PLATFORM", … } }
 ```
 
-- **`version` is the integer `1`.** The retired `"v"` key must not appear anywhere — a manifest still carrying it is unmigrated.
+- **`type` opens the file; `config` is discriminated by its `mtype`.** `sprepo.json` (`type` · `config`) and `spkind.json` (`kind` · `config`) carry the same two-key shape, one naming what it declares and one carrying that declaration's own fields; the `spn:doc` block opens on `id`.
 - The declaration lives under `src/` because **what publishes is source**; a declaration node's `src/` is the manifest alone.
 
 ## The four types
@@ -72,7 +77,7 @@ A module row:
 - **`@`-prefixed = published; semver required.** Anything else is a **path** (a sibling in the estate repo, while iterating) — `version` is ignored and written `null`.
 - References verify by type on fetch: the org's `blueprint` against `SUPPORT`, a `modules[].source` against `MODULE`. A fetched type contradicting its role key refuses before anything renders.
 - **Cloud verbs refuse path-resolved declarations by name** — that refusal is the correct gate until pins publish, never something to work around.
-- Scoped refs resolve **cloud pair when bound → the machine store (`~/.spnutils/registry`) → refused by name**.
+- Scoped refs resolve **the org's registry pair → the machine store (`~/.spnutils/registry`), the resolve-side cache → refused by name**. The store answers a resolve, and `infra release --local` stages into it — a staged artifact is not a published one.
 
 ## The artifact
 

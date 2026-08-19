@@ -1,15 +1,15 @@
 ---
 name: release
-description: Publishing an estate package - bump the release field in spinfrapkg.json by reviewed edit, run spnutils infra release, the target derives. Use when a package version must publish, when a consumer pin should flip to a published version, or when a bespoke build script or workflow needs repointing at infra release.
+description: Publishing an estate package - bump the version field in spinfrapkg.json by reviewed edit, run spnutils infra release, publish to the organization's registry pair or stage into the machine store with --local. Use when a package version must publish, when a consumer pin should flip to a published version, or when a bespoke build script or workflow needs repointing at infra release.
 ---
 
-# release — bump by review, publish whole, target derives
+# release — bump by review, publish whole, to the org's registry pair
 
 **A version is published once, then promoted.** The declaration gets the discipline an image already has: built once, promoted by name, recorded in resolved state.
 
 ## 1 · The bump is the reviewed act
 
-Edit `release` in the node's `spinfrapkg.json` — semver, typed by a human, in a pull request. **Never a git tag, never a stack file's version** — a `package.json`, where one exists, is inert metadata the release neither bumps nor reads.
+Edit **`version`** in the node's `spinfrapkg.json` — semver, typed by a human, in a pull request. **Never a git tag.** An infra tree holds **no `package.json`** — nothing in one is a JavaScript package (RD.INFRA.066). `spinfrapkg.json` carries the name, the semver and the descriptive fields, and it is the only file a bump touches.
 
 ## 2 · Dry-run
 
@@ -19,15 +19,17 @@ spnutils infra release -p <package> --dry-run
 
 Validate, test, stage `dist/` = **`spinfrapkg.json` + `src/**`, whole — nothing else, nothing stamped**. `docs/`, `tests/` and `README.md` never ship — an artifact carries source alone. Confirm the staged set before approving.
 
-## 3 · Publish — the target is THE REGISTRY, never a flag
+## 3 · Publish — the target is chosen, never derived
 
 ```text
-spnutils infra release -p <package> -y
+spnutils infra release -p <package> -y            # → the org's registry pair
+spnutils infra release -p <package> --local -y    # → the machine store, staged only
 ```
 
-- The target **derives**: the org's `-public`/`-private` pair by the name's scope once the pairs stand; the machine store (`~/.spnutils/registry`) — the pair's local rendering — until then. Same verb, same dist.
+- **The release target is the organization's `-public`/`-private` pair**, routed by the name's scope. Same as `apps release`. **`--local` stages into the machine store (`~/.spnutils/registry`) instead** — the target is a choice on the command, never derived from what happens to be bound.
+- **A `--local` stage is not a publish.** The store is the resolve-side cache — where a fetched artifact is kept, and where an unbound workspace may stage its own. Never report a stage as a release, and never tell a consumer to pin against one.
 - An **unlisted scope refuses by name** — `scopes` routes everything.
-- A version **already present refuses, locally too** — immutability is the store's rule, not the provider's. A fix is a new version, never a re-publish.
+- A version **already present refuses** — immutability holds in the pair and in the cache alike. A fix is a new version, never a re-publish.
 - From a laptop while the estate is being built; **CI-only once the pipelines stand** — reached by grant withdrawal, not by rule.
 
 ## 4 · After — pins flip at their own pace

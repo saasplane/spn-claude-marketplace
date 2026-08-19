@@ -42,7 +42,7 @@ Beside the layers: `logs [service]` · `show` (resolution per layer, incl. **PIN
 | a whole-estate verb | "all layers" of an unstated subject is a context nothing can resolve |
 | `down` on stateful resources | teardown removes network and compute and **refuses its data** — destroying data is a separate act, named and confirmed separately; `--clean` runs only on an explicit instruction against a named target |
 | `config set` of a credential pinned in a manifest | credentials never live in files — see `refs/laws.md` |
-| a release version already present in a store | immutability is the store's rule — bump instead |
+| a release version already present in the registry pair | a published version is immutable — bump instead, never re-publish |
 | an unlisted scope on release | `scopes` routes everything; refused by name |
 | a silent default | everything contextual derives — stack from the repo's claim, estate from pins or tree, registry from the organization, project from the cwd; a flag may override, absence of both refuses by name |
 | `CLUSTER` hosting under the `PROD` workload | the platform's four engines are managed in production; a module's own workload is pods everywhere |

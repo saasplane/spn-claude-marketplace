@@ -17,7 +17,7 @@ The node root is found by `spinfrapkg.json`; the type is read from `src/spestate
 | --- | --- |
 | codes, regions, `networkIndex` values, environments, sizes, hosting, deploy triggers, schema rows, module rows, app grant rows, package refs, ports | derived names or addresses · discovered identifiers · secrets, ARNs, account ids · provider strings outside a cloud entry |
 
-- The envelope is `"version": 1` (integer) — the retired `"v"` key never returns.
+- **`src/spestate.json` opens on `type`**, with `config` discriminated by its `mtype`. **`spinfrapkg.json` names the publishable artifact** — `name` · `version` (the semver) · `description` · `author` · `license` — and an infra tree holds no `package.json` (RD.INFRA.066).
 - **`networkIndex` is append-only, forever** — a freed index is never reused.
 - A module row's `source` is a locator: a path while iterating (`version: null`), a scoped package + semver once published. `hosting` stays `null` unless there is a real pin to make.
 - **The `apps[]` rows are the cloud grant list** — deploy requires claim (`spkind.config.code`) ∧ grant (`kindCode`). Granting an app is a declaration change here, never anything in the app's own repo.

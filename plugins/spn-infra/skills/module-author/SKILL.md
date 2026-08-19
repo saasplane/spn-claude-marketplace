@@ -17,7 +17,7 @@ spnutils infra scaffold module --code <code>
 
 ## 2 · The identity-only manifest
 
-`src/spestate.json` is `{ "version": 1, "type": "MODULE", "config": null }`; `spinfrapkg.json` names `@{org}/infra-module-{code}`. **Usage stays on the referencing `modules[]` row** — the module defines its variables; the declaring row values them. Nothing about a consumer ever enters the module.
+`src/spestate.json` is `{ "type": "MODULE", "config": null }`; `spinfrapkg.json` gives `name: "@{org}/infra-module-{code}"` with `version` the module's **semver**, plus `description` · `author` · `license` — and no `package.json` beside it (RD.INFRA.066). **Usage stays on the referencing `modules[]` row** — the module defines its variables; the declaring row values them. Nothing about a consumer ever enters the module.
 
 ## 3 · Renderings derive from the tree
 
@@ -46,4 +46,4 @@ On the consuming platform's `modules[]`: `code` · `layer` · `after` (a named s
 
 ## 7 · Release, then flip the pin
 
-Hand to the `release` skill (bump `spinfrapkg.json` → `infra release`, target derives). Then flip the consuming row: `source: "@{org}/infra-module-<code>"`, `version` a semver — and run `infra platform plan --cloud` to see the gate open. Refs flip at each consumer's own pace.
+Hand to the `release` skill (bump `version` in `spinfrapkg.json` → `infra release`, to the org's registry pair). Then flip the consuming row: `source: "@{org}/infra-module-<code>"`, `version` a semver — and run `infra platform plan --cloud` to see the gate open. Refs flip at each consumer's own pace.

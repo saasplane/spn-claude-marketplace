@@ -56,7 +56,7 @@ The layers are **nouns** — `organization` · `platform` · `environment` — a
 | `infra config set\|get\|list\|export\|import\|diff\|render` | the seven config verbs against the app plane, addressed by `--scope organization\|platform\|environment [--env <env>] [--app <kindcode>]` — never the ledger, which no person opens |
 | `infra scaffold repo\|organization\|platform\|module` | an estate node with the tree its type prescribes — the one authored fact per type stated, everything else derived |
 | `infra validate [-p] [--json]` · `infra test [-p]` | structure against the type, manifest against the contract; the render harness |
-| `infra release [-p] [--dry-run] [-y --approved] [--json]` | build then publish an estate package — the release read from `spinfrapkg.json`, bumped by the reviewed edit |
+| `infra release [-p] [--local] [--dry-run] [-y --approved] [--json]` | build then publish an estate package to the org's `-public`/`-private` pair by the name's scope — `--local` stages into the machine store (`~/.spnutils/registry`) instead, and the target is chosen, never derived; the semver read from `spinfrapkg.json`'s `version`, bumped by the reviewed edit |
 
 Hosted vendors are **modules** (`infra-module-{code}`) — their local rendering rides the platform layer's container group; there is no separate vendor verb. Cloud mutation runs only where the declaration is authored, plus CI; in the cloud a missing layer below is a named refusal, never an implicit apply.
 

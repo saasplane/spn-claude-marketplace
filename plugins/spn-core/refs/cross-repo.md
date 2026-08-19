@@ -53,6 +53,8 @@ This is the constraint that decides where every common rule lives. **A product r
 
 **Common rules are carried by the plugin, never by a link into a peer repo.** Where a document must be cited across repos, cite it by name and let the plugin carry the substance.
 
+**The rule reaches every file that ships inside a repository, agent instruments included** (decision RD.DOCS.035). A `CLAUDE.md` is walked by no validator, but it travels with its repo and is read where the siblings may be absent — so it cites by name too. **The workspace's own `CLAUDE.md` is the one exception**: the sibling checkouts are its subject, and it ships nowhere. And a repository's instruction file states what is true of that repository, never what other repositories may do.
+
 ## Skills are what a consumer acts on; the book is why
 
 Guidance lives in three instrument layers, and they are not interchangeable: the deterministic CLI (installed), the plugin (installed), and the documentation corpus (not installed). **Anything a reader must act on lives in the first two.** A skill that says *"the authority for this is chapter N of the book"* has pushed its reader onto a layer they do not have — the skill carries the actionable substance itself and cites the book only as provenance, by name. For a consumer, the digest *is* the standard.
