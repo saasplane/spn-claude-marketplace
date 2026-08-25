@@ -13,6 +13,11 @@
 - **Structural additions are flagged.** A new chapter, module, or kind hits a documented ceiling: the plan produces a decision entry draft, never a fait accompli.
 - **The dictionary's capability column is complete.** Every construct the design adds appears in the owning `data-model.md`, joined to the consumer word it realizes.
 
+- **Blast radius is read as a design signal, not a work estimate.** A repair that breaks many call sites, changes GENERATED output, or crosses a package or repository boundary is a design decision that arrived wearing a compiler error. The scope of the damage is not the scope of the fix: the question is which LAYER owns the concern, asked before any mechanism is proposed.
+- **Prior art outranks invention.** Before designing a new mechanism, the system is searched for how it already handles that concern. A capability the codebase already has, reimplemented beside itself, is a defect even when both copies work.
+- **Options are checked for frame diversity.** If every option shares one noun — `marker`, `flag`, `param`, `config` — they are one idea in several hats, not a choice. At least one option must move the concern to a different layer; otherwise the frame itself has not been questioned.
+- **Reachability decides what a declaration may assert.** Where one state is reached from more than one direction — an input command and a read model, a hand-authored document and a service response — no annotation on that declaration can be correct for every path, and the difference belongs at the entries instead (RD.APPS.071).
+
 ## What it never does
 
 - Block work — it flags the missing decision entry and drafts it; a person decides.
