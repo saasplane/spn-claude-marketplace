@@ -89,4 +89,4 @@ A product module owned by one app — a scaffold target rather than a workspace 
 
 ## Depth
 
-The kind registry, structure profiles, and toolchain rules live in the foundation provider set: `spn-foundation/providers/apps/ts/` (`kinds.md`, chapters 02-structure, 08-toolchain) — a cross-repo pointer; consult it when the checkout is available. The node grammar in full is `refs/doc-sets.md` in the **spn-core** plugin. After scaffolding, hand off to the `implement` skill.
+The kind registry, structure profiles, and toolchain rules are digested into this plugin and are the authority at the seat. Their owning chapters are the foundation provider set (`providers/apps/ts`: `kinds.md`, 02-structure, 08-toolchain) — cited for provenance, **not as a lookup**: the book is not delivered, so never send anyone there to finish a task. If something you need is missing from the digest, that is a regeneration owed, not a checkout to go find. The node grammar in full is `refs/doc-sets.md` in the **spn-core** plugin. After scaffolding, hand off to the `implement` skill.

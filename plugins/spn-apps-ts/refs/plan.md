@@ -1,9 +1,13 @@
----
-name: plan
-description: The plan verb for SaaS Plane TS repos - a requirement becomes a design the doc seats carry, before any code exists. Use when someone describes a feature, change, or fix they want built and no design has been agreed; when they ask to audit or repair a package's documentation; or when a choice needs recording. Not for deciding what a node IS - a new domain, a moved boundary, or a split module is the ideate skill. Modes by argument - design (requirement becomes 🔮 rows in the owning doc seats, later consumed by the implement skill), docs (audit doc sets against the node grammar, fix statuses), decision (draft a decision-register entry).
----
+# Planning in an APPS · TS node — the layer the `plan` skill loads
 
-# plan — spec-first design, docs upkeep, decisions
+**This is reference material, not a skill.** The verb is `DEVEX_PLAN`, and it lives once, in
+`spn-core`. There is no `APPS_PLAN` — the book's `SPSkillType` is closed and does not carry one
+(devex README § Skills and plugins). The `plan` skill resolves the node's world and stack claim
+from the nearest `sprepo.json`, then loads this file for the APPS · TS specifics below.
+
+**Source of truth:** the foundation book's docs domain and the apps provider set. This card
+digests; the book governs.
+
 
 Pick the mode from the argument (`design` | `docs` | `decision`); if none was given, infer it from the request and say which you picked.
 

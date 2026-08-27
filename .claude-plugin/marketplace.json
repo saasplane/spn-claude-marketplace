@@ -3,12 +3,12 @@
   "owner": {
     "name": "SaaS Plane"
   },
-  "description": "The SaaS Plane agent plugin marketplace — the stack-agnostic core plugin (persona, contract rules, command vocabulary, cross-repo protocol, generated-file guard) and one plugin per provider instance, named spn-<domain>-<instance>.",
+  "description": "The SaaS Plane agent plugin marketplace \u2014 the stack-agnostic core plugin (persona, contract rules, command vocabulary, cross-repo protocol, generated-file guard) and one plugin per provider instance, named spn-<domain>-<instance>.",
   "plugins": [
     {
       "name": "spn-core",
       "source": "./plugins/spn-core",
-      "description": "SaaS Plane core, stack-agnostic: the DevEx stage skills (scm, ideate, plan, develop, test, provision, deliver, operate) plus two that serve any stage — check, which proves a claim against the code and runs nothing, and report, which writes any of the eight report templates into a node's artifacts pocket — including ideate, the interactive loop that decides a boundary and shape into the repo-root CONCEPT.md before anything is planned; the SPN engineer persona; the spn-panel reviewer and the ten lens files it convenes (lead, business, product, architect, server-dev, web-dev, qa, infra, trust, partner); contract review rules; the command vocabulary; the doc-set rules every node's docs are built to; the cross-repo working protocol; the getting-started digest; the new-platform intake worksheet; and a hook that denies hand-edits to generated files.",
+      "description": "SaaS Plane core, stack-agnostic: the DevEx stage skills (check, scm, ideate, plan, develop, test, provision, deliver, operate, report) \u2014 including ideate, the interactive loop that decides a boundary and shape into the repo-root CONCEPT.md before anything is planned; the SPN engineer persona; the spn-panel reviewer and the ten lens files it convenes (lead, business, product, architect, server-dev, web-dev, qa, infra, trust, partner); contract review rules; the command vocabulary; the doc-set rules every node's docs are built to; the cross-repo working protocol; the getting-started digest; the new-platform intake worksheet; a hook that denies hand-edits to generated files; and a hook that checks an approach document against the bars the book states mechanically \u2014 audience in the masthead, the Terms bound, no cardinality in prose, and the one voice.",
       "author": {
         "name": "SaaS Plane"
       }
@@ -16,7 +16,7 @@
     {
       "name": "spn-apps-ts",
       "source": "./plugins/spn-apps-ts",
-      "description": "SaaS Plane apps domain, TypeScript instance: the six verb skills — plan, new, implement, review, run, verify — carrying the TS standards digest and the golden-path step files.",
+      "description": "SaaS Plane apps domain, TypeScript instance: the five APPS verb skills \u2014 new, implement, review, run, verify \u2014 the golden-path step files, and the TS standards digest. Planning is not here: the verb is DEVEX_PLAN and lives once in spn-core, which loads refs/plan.md from this plugin for the APPS \u00b7 TS layer. The book's SPSkillType is closed and carries no APPS_PLAN.",
       "author": {
         "name": "SaaS Plane"
       }
@@ -24,7 +24,7 @@
     {
       "name": "spn-infra",
       "source": "./plugins/spn-infra",
-      "description": "SaaS Plane infra domain — one plugin for every estate repo, not one per instance (a provider's mechanics ride its blueprint library, which the command surface consumes): the estate verb skills — declare, plan-review, module-author, release — the manifest and locator quick reference, the layer-noun and door card, the name and DNS grammar with the published vocabulary, the estate laws, and a hook that denies secrets, ARNs, account ids, provider strings outside a cloud entry, and hand edits to dist/.",
+      "description": "SaaS Plane infra domain \u2014 one plugin for every estate repo: the estate verb skills (declare, plan-review, module-author, release); the manifest and locator quick reference; the layer-noun and door card; the name and DNS grammar with the published vocabulary; the estate laws; and a hook that denies secrets, ARNs, account ids, provider strings outside a cloud entry, and hand edits to dist/.",
       "author": {
         "name": "SaaS Plane"
       }

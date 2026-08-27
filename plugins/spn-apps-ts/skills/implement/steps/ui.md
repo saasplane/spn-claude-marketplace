@@ -2,7 +2,7 @@
 
 Frontend modules are plain packages composed by each app's router — no runtime module registry. Layering: `web-*-ts` app (route table, nav, vite build) → `module-web-<mod>-ts` (pages/components/hooks/URL helpers for ONE module) → the shared FE kernel package (app manager, session, auth gates, shell, nav builder) → the web runtime + design system + **API client**. Where a workspace documents its own frontend architecture, that document governs its app composition; this layering is the rule in every case.
 
-**The component standard is `providers/apps/ts/10-web-patterns.md`** — the wrapper as the public API, the four-step component recipe, the density hook (never a `size` destructure default), naming, and the token tiers a component may consume. Read it before writing a component; this step covers where UI code *lives* and how it plugs in, not how a component is written.
+**The component standard** — the wrapper as the public API, the four-step component recipe, the density hook (never a `size` destructure default), naming, and the token tiers a component may consume — is owned by the provider chapter `providers/apps/ts/10-web-patterns.md` and digested into this plugin. Apply the digest; the chapter is provenance, not a file to open, because the book is not delivered to every seat. This step covers where UI code *lives* and how it plugs in, not how a component is written.
 
 > **A client service is not a server service in a browser.** No transaction, no authorization decorator, no cache-build decorator — the server gates every call and owns atomicity. Client-side services belong to the web module's **full form**, which is 🔮 planned and unrealized; today a ui package's data access is hooks over the API client.
 

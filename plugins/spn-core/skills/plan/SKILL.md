@@ -7,6 +7,28 @@ description: Turn a requirement into a design the platform's own vocabulary can 
 
 **Exit criterion: the work can be described entirely in platform vocabulary, and one module owns it.** Until both hold, planning is not finished and implementation must not start.
 
+## First, resolve the layer — before anything below
+
+Planning is one verb (`DEVEX_PLAN`) and it lives only here. What changes by node is *reference
+material*, never the verb, so resolve the node and load its layers before applying a single rule:
+
+1. **Find the node's law** — the nearest `sprepo.json` above the file names the **world**
+   (`FOUNDATION` · `APPS` · `INFRA`) and the **stack claim**; the node's own manifest
+   (`spkind.json`, or `spinfrapkg.json` + `src/spestate.json`) names the node.
+2. **Load, in order, whichever exist:**
+
+   | Layer | File | Carries |
+   | --- | --- | --- |
+   | voice + doc grammar | `refs/doc-sets.md` in **spn-core** | the seats, and **the one voice** (below) — load this whenever the output is a document |
+   | domain | `refs/plan.md` in the matching **`spn-<domain>`** plugin | which seats take the rows, what "breaking" means there |
+   | instance | `refs/plan.md` in **`spn-<domain>-<stack>`** | how the stack spells a contract, a service, a migration |
+
+3. **Where a layer disagrees with this file, the more specific layer wins** — it is closer to the
+   node. Where a layer disagrees with the book, the book wins and the layer is regenerated.
+
+**There is no per-domain `plan` skill, and adding one is a defect** — the book's `SPSkillType` is
+closed, and a folder whose derived value (`{DOMAIN}_{SKILL}`) is not in it fails conformance.
+
 ## Classify before you design
 
 Most architecture pain is a component that never said what kind of thing it was. Before shaping anything, settle:
@@ -41,6 +63,23 @@ A duplicate capability costs more than a missing one: it splits behaviour across
 - **Do not plan the implementation.** Naming files, choosing loop structures, or writing pseudo-code here is wasted — the standards decide most of it, and the plan should say *what* and *where*, never *how*.
 
 ## The approach document
+
+**Write it in the corpus voice — this is where documents get it wrong.** The corpus speaks
+**one voice, the warm learning register** (decision RD.DOCS.031): second person, present tense,
+active; around fifteen words a sentence, one idea each; momentum over ceremony. Two rules decide
+most edits:
+
+- **The register governs prose, never records.** Chapter bodies, section narrative and an Open
+  card's argument take the voice. Tables, diagrams, behavior rows, glossary and decision rows,
+  contract blocks and code samples keep their form untouched — **a warmed record is a defect**.
+- **Never write a set's cardinality into prose** (decision RD.GOV.008) — *"the five nouns"*,
+  *"the twenty decisions"*. Name the set by its rule instead. A count in prose goes stale silently
+  the day the set grows, and the prose that lied is never the prose anyone re-reads. The exception
+  is a closed set whose count carries a ruling.
+
+The masthead **names its audience** — an artifact has no seat, so its content is decided by who
+reads it, and an artifact written for everyone is read carefully by nobody. `refs/doc-sets.md`
+carries the register in full; load it before writing.
 
 **Source of truth:** the foundation book's artifacts standard (`docs/03-capabilities/05-docs/05-artifacts.md`, "The approach document" section). This section digests it for use at the moment of writing and adds no rule of its own; where the two disagree, the book wins and this file is regenerated.
 
