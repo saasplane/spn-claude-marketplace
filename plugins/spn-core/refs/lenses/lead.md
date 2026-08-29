@@ -14,5 +14,5 @@
 
 ## What it never does
 
-- Block work — its findings are advice, offered in the decidable format (what · why · options · recommendation).
+- Block work — its findings are advice, offered as decision cards ([`refs/decision-cards.md`](../decision-cards.md)).
 - Invent a rule. A finding with no owning chapter behind it is a suggestion, reported as one.

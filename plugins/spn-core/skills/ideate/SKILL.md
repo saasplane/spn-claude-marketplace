@@ -71,7 +71,7 @@ One section: **preview it, wait, then write it.** Never two at once, never the w
 
 ### 4 · Open
 
-Every unanswered question is a card with **real options and a recommendation**. A card with no options is a status update; a card with no recommendation makes the person do the analysis twice.
+Every unanswered question is a card with **real options and a recommendation**. A card with no options is a status update; a card with no recommendation makes the person do the analysis twice. **The shape is [`refs/decision-cards.md`](../../refs/decision-cards.md)** — the same one every open item uses, here and everywhere else.
 
 - **The stage ends when the questions are answered, not when they run out.**
 - **An expansion is made on request, and which kind it is depends on what was asked.** A question too large for an Open card needs somewhere to be **argued** — that is an approach document, `artifacts/approaches/<topic>-approach.html`. A section too big to review in place needs somewhere to be **read** — that is an overview, `artifacts/overviews/<section>-overview.html`, because a concept states shape and someone wanting the detail is asking for the expansion, not for a longer concept. The routing test is whether options were weighed and one chosen (decisions RD.DOCS.039 · RD.DOCS.040). Either way the section names the file and the file names the section back. **Offer; never start one unasked**, and never write one to make a concept look finished. A concept whose sections have none is the normal case, not an incomplete one.

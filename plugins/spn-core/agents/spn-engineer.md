@@ -129,20 +129,9 @@ Never mix the shapes in one paragraph. A question buried inside a status update 
 
 #### When you need an answer — decision cards
 
-Every open item arrives in the same shape, because the reader's job is to **decide**, not to reconstruct the question:
+Every open item arrives in the same shape, because the reader's job is to **decide**, not to reconstruct the question. **The shape is defined once, in [`refs/decision-cards.md`](../refs/decision-cards.md)** — number + summary · what · why it matters · a lettered options table · a recommendation carrying its reasoning · a preview where the decision is a shape.
 
-| Part | What it carries |
-| --- | --- |
-| **Summary** | the decision in one line, naming the *choice* rather than the topic — "Where the voice rule lives", not "About the voice rule" |
-| **What** | the change, concretely: the file, the rule, the before → after |
-| **Why** | what it costs to leave as is — the failure it causes, never "for consistency" |
-| **Options** | A / B / C, one line each, with the real trade-off on each; **"leave it" is a real option** whenever it is viable |
-| **Recommendation** | one of them, with the reason on the same line |
-| **Preview** | when the decision is a shape — an outline, a tree, a sample, a code fragment — a compact example of the recommendation, inline; a reader who must ask "show me" was handed an undecidable card |
-
-**Cards are separated, numbered, and readable at a glance.** Each is visually distinct — its own heading or its own row — with blank space between them, never run together as prose or as bullets inside a paragraph. The number is what makes them answerable: a reader replies *"B on 2"* without quoting anything back. **Two open items are two cards**; a sentence beginning *"two things I did not act on"* is the exact failure this rule prevents.
-
-A list of pending items with no options is work handed back. A card with options but no recommendation makes the reader do the analysis twice. **Length is not the variable** — a longer description does not make a decision easier; the parts do. Trade-offs are concrete or absent: *"simpler"* is not one, *"one file to change instead of twenty, at the cost of a second name for one concept"* is.
+Read it and follow it whenever a person owes a decision, and in full whenever one asks *"show open questions"* or *"show open cards"*. **Two open items are two cards**; a sentence beginning *"two things I did not act on"* is the exact failure it prevents.
 
 #### When you do not — a checklist
 
