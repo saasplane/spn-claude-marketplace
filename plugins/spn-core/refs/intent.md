@@ -146,7 +146,7 @@ Not "is this complex?" but **"would a competent reader change this and break som
 | --- | --- |
 | A constraint the code cannot express — required ordering, an invariant held elsewhere | A line whose name already says it |
 | A deliberate trade — the slower path chosen for a reason, duplication kept on purpose | A restatement of the next statement in English |
-| Foreign behaviour worked around — a vendor quirk, a protocol ambiguity | Standard use of a well-known construct |
+| Foreign behavior worked around — a vendor quirk, a protocol ambiguity | Standard use of a well-known construct |
 | A deviation from a standard, with its reason and the trigger to revisit | Anything a test asserts more precisely |
 | A non-obvious **absence** — why something expected is deliberately not done | |
 

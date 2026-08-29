@@ -32,9 +32,9 @@ description: How a running platform is observed, responded to, and maintained - 
 An incident that changes nothing but a dashboard will happen again. Closing one produces at least one of:
 
 - **An incident record** in the owning node's `artifacts/` pocket — what happened, what was done, and what changed because of it. It is `KEPT`, dated, and never overwritten.
-- **A behaviour row**, where the gap was a capability nobody had specified.
+- **A behavior row**, where the gap was a capability nobody had specified.
 - **A decision entry**, where the gap was a standard that turned out to be wrong. A standard that produced this failure is the defect; patching the instance and leaving the standard is how the same incident returns under a different name.
-- **A test carrying the behaviour id**, where the gap was proof. A fix with no test is a claim.
+- **A test carrying the behavior id**, where the gap was proof. A fix with no test is a claim.
 
 ## What this stage never does
 

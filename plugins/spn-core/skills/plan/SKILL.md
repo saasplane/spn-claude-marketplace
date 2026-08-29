@@ -46,11 +46,11 @@ Most architecture pain is a component that never said what kind of thing it was.
 2. **The owning module's contract** — an existing command or a new optional field frequently covers a requirement that looked new.
 3. **Shared contract primitives** — a get, a bulk get, a key lookup, an active toggle. Minting a bespoke command for a single id is the most common avoidable addition.
 
-A duplicate capability costs more than a missing one: it splits behaviour across two implementations that drift.
+A duplicate capability costs more than a missing one: it splits behavior across two implementations that drift.
 
 ## Shape the design
 
-- **Behaviours first.** State what an actor can do, in one line each, in language the person asking would recognise. Each becomes something provable later; a behaviour nobody can prove is a wish.
+- **Behaviors first.** State what an actor can do, in one line each, in language the person asking would recognize. Each becomes something provable later; a behavior nobody can prove is a wish.
 - **Contract second.** One method, one command in, one state out. Sketch the names, not the fields — the shape is settled when the contract is written, not in the plan.
 - **Say what changes at each layer.** Contract, implementation, entry, storage, and what a caller must do differently. A design that touches storage without saying so is incomplete.
 - **Name the failure cases** as error codes, not prose. Which are the caller's fault, which are the system's — that distinction decides the response class and cannot be retrofitted cheaply.
@@ -87,6 +87,22 @@ When a design is big enough that someone will read it more than once — a new a
 
 **Open with a Terms block when the document needs one.** A design that coins or leans on concepts a reader may not already hold — a *lens*, a *panel*, a name the book has not settled yet — defines them in a small block **before Why**: one line per term, five to eight terms at most, so the reader has the vocabulary before the argument. A document that introduces nothing new skips the block entirely — it exists to give context, never to pad.
 
+**Route before you write — an argument or an expansion?** The pocket holds both, the suffix names which, and the set is closed (decisions RD.DOCS.039 · RD.DOCS.040). One question decides it: **were options weighed and one chosen?**
+
+| Answer | Kind | Path | Shape |
+| --- | --- | --- | --- |
+| **yes** — a design was argued, a cost accepted | approach | `artifacts/approaches/<topic>-approach.html` | `Terms? → Why → What → How → Open → Deferred` |
+| **no** — a concept section expanded so it can be read | overview | `artifacts/overviews/<section>-overview.html` | the section's own shape, at reading depth |
+
+A document with no options, no recommendation and no accepted cost is an **overview** whichever folder holds it, and filing it as an argument costs a reader the signal that says whether anything is still open.
+
+Two rules separate them once you are writing:
+
+- **The outline is fixed for an argument and borrowed for an explanation.** An approach takes the sections below, always, in order. An overview takes **the headings of what it expands, in that thing's order**, and invents none the source does not have. It carries **no `Open` and no `Deferred`** — those are an argument's organs, and a question found while writing one is an approach waiting to be offered, or a register row.
+- **Depth follows from where else the detail lives.** An overview compresses everything, because the source holds the depth. An approach compresses the **mechanics** — concepts and boundaries, never an inventory of rules the owning chapters carry — and expands the **reasoning**, because a register row records what was decided and never the options that lost.
+
+`concept-overview.html` is the concept's readable HTML face, one per repo; a `<section>-overview.html` expands one section and the section names it back. Everything below in this section governs the **approach** document.
+
 It is **one self-contained HTML page named `<topic>-approach.html`** — one file per topic, replaced in place as it iterates, never a second copy in another format. HTML because these documents carry tables, samples and comparisons that a reader scans rather than reads, and because a single file travels: it opens anywhere, needs nothing installed, and cannot drift from a companion version of itself.
 
 | Section | Answers | Written as |
@@ -103,7 +119,7 @@ Planning lands as rows and terms in the owning node's seats, so **resolve the no
 
 ### Draw the shape in What and How
 
-Where a section's subject **is** a shape — a boundary, a nesting set, a pipeline, a lifecycle, a set of arrangements — draw it; `What` and `How` are where those subjects live. Skip it where the subject is a judgment rather than a structure. Three rules: **draw the argument, not the chapter** (the owning chapter's diagrams are reference; yours makes a claim visible — a restatement is a diagram that could be copied unchanged); **inline SVG using the page's own colour variables**, so it works in light and dark and the page still travels as one file; and **never draw what does not exist** — every box is something the book names, because a shape invented to balance a picture becomes a claim the reader believes.
+Where a section's subject **is** a shape — a boundary, a nesting set, a pipeline, a lifecycle, a set of arrangements — draw it; `What` and `How` are where those subjects live. Skip it where the subject is a judgment rather than a structure. Three rules: **draw the argument, not the chapter** (the owning chapter's diagrams are reference; yours makes a claim visible — a restatement is a diagram that could be copied unchanged); **inline SVG using the page's own color variables**, so it works in light and dark and the page still travels as one file; and **never draw what does not exist** — every box is something the book names, because a shape invented to balance a picture becomes a claim the reader believes.
 
 **Compose from the grammar, never by eye** — four primitives on one grid, so every diagram in the corpus reads as one system:
 
@@ -128,7 +144,7 @@ Grid       canvas 760 · margin 24 · content 712
            type: title 13/650 · label 12 · sub and note 11 — no fourth size
 ```
 
-Colour carries role, not decoration — neutral `--card`/`--rule` · emphasis `--accent-soft`/`--accent` · derived or async `--ok-soft`/`--ok` · terminal `--gap-soft`/`--gap` · inactive `fill:none` + dashed `--rule`. **One emphasis per diagram**: if everything is highlighted, the highlight teaches nothing.
+Color carries role, not decoration — neutral `--card`/`--rule` · emphasis `--accent-soft`/`--accent` · derived or async `--ok-soft`/`--ok` · terminal `--gap-soft`/`--gap` · inactive `fill:none` + dashed `--rule`. **One emphasis per diagram**: if everything is highlighted, the highlight teaches nothing.
 
 **A flow runs one way** — pick left-to-right or top-to-bottom and hold it for the whole diagram, so the reader never works out which way time moves. Left-to-right for pipelines with short stages; top-to-bottom for layers, where each row is a stratum. Only a **flowchart** may branch (a decision fanning into cases, or parallel arrangements side by side), and its branches still leave and rejoin along the one axis. Arrows pointing three directions describe a system nobody has finished thinking about.
 
@@ -196,6 +212,6 @@ Wear `refs/lenses/architect.md` and `refs/lenses/product.md` while drafting — 
 
 ## Report
 
-The design, in this order: the classification, what already covers part of it, the behaviours, the contract sketch, what changes per layer, the failure cases, and anything that needs a decision recorded. Close with what you are **unsure** about — an unstated assumption is the thing that gets discovered after the code is written.
+The design, in this order: the classification, what already covers part of it, the behaviors, the contract sketch, what changes per layer, the failure cases, and anything that needs a decision recorded. Close with what you are **unsure** about — an unstated assumption is the thing that gets discovered after the code is written.
 
 Then hand to the stack's scaffolding skill, which supplies the commands.

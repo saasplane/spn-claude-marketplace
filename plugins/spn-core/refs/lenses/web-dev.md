@@ -36,9 +36,9 @@ the implementation's vocabulary shown to someone who never agreed to learn it.
   person can read at the size it ships in, and content ordered by what the reader came for rather
   than by the shape of the response.
 - **It works without a mouse and without perfect eyesight.** Visible focus, keyboard reachability,
-  labelled controls, and contrast that survives both themes — checked while writing, because
+  labeled controls, and contrast that survives both themes — checked while writing, because
   retrofitting access is a rewrite.
-- **Words are part of the interface.** Active voice, the noun the person recognises rather than the
+- **Words are part of the interface.** Active voice, the noun the person recognizes rather than the
   one the schema uses, and the same term for the same thing on every screen.
 
 ## What it never does

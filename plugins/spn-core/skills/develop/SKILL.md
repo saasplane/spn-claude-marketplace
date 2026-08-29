@@ -13,7 +13,7 @@ description: The contract-first build loop - the order work is done in, what eac
 2. **Regenerate** — the validators derive from the contract states. They are never hand-written and never hand-edited.
 3. **Implementation** — the service behind the contract, plus its storage access. Policy, authorization, and transactional integrity live at this boundary and nowhere else.
 4. **Entry** — the transport adapter. Parse input into the command, invoke the service, render the state.
-5. **Tests** — at the tier that proves the behaviour, not the tier that is easiest to write.
+5. **Tests** — at the tier that proves the behavior, not the tier that is easiest to write.
 6. **Docs and generated surfaces** — update the seat the change touches in the same change, and regenerate everything derived.
 
 Steps 1–3 are ordered by dependency and cannot be reordered. Steps 4–6 can interleave.
@@ -23,7 +23,7 @@ Steps 1–3 are ordered by dependency and cannot be reordered. Steps 4–6 can i
 | Layer | Owns | Must never |
 | --- | --- | --- |
 | **contract** | the public surface — commands, states, events, enums, the service interface | contain logic, or reference the implementation |
-| **app** | the behaviour — services, storage access, internal helpers | be reached by another module, directly or through its storage |
+| **app** | the behavior — services, storage access, internal helpers | be reached by another module, directly or through its storage |
 | **entry** | adapting one transport | hold business logic of any kind |
 
 **An entry that cannot be rewritten for a different transport without touching a service is a defect.** That is the test — not whether the code looks thin.
@@ -44,7 +44,7 @@ If a generated file needs to be different, the generator or its source is what c
 - **Errors are contracts too.** Namespaced codes, each mapped once to a response class, retryability classified rather than guessed. A failure never discloses the existence of something the caller could not otherwise see.
 - **Reuse the shared primitives** — get, bulk get, key lookup, active toggle — before minting a bespoke command for a single identifier.
 - **Read the interface before using it.** Exact values, exact parameter order, optional versus required, nullable versus absent. Never invent an API; if unsure a symbol exists, look it up in the symbol index or the source.
-- **Match the code beside you.** New code is written by pattern-matching its neighbours — same layering, same ordering, same naming, same comment density. A one-off that reads better in isolation reads worse in the codebase.
+- **Match the code beside you.** New code is written by pattern-matching its neighbors — same layering, same ordering, same naming, same comment density. A one-off that reads better in isolation reads worse in the codebase.
 - **Name things so they need no explanation.** A name that requires a comment saying *what* it is, is the wrong name. Rename before annotating; the only comments worth keeping state a constraint the code cannot show.
 - **A doc comment on a published declaration is an interface.** It is harvested into the symbol index, the interface document, the API client and the tool definitions an agent calls — one comment, several surfaces, none written by hand. The full rules are in this plugin's `refs/intent.md`; the four that matter every day: **one sentence** as the opening line, **written once on the contract** so implementations and transport adapters inherit rather than restate, **never naming what the package does not depend on** (no table names, no codes from other packages), and **constraints as tags** in the same comment, never re-described in prose.
 
@@ -54,4 +54,4 @@ Wear per layer: `refs/lenses/server-dev.md` on contract, service, and entry; `re
 
 ## Finish
 
-A change is not done when it compiles. It is done when the derived artifacts are fresh, the behaviour is proven at a tier that means something, and the doc seat the change touched says what is now true. Hand to the test and verify skills for the proving.
+A change is not done when it compiles. It is done when the derived artifacts are fresh, the behavior is proven at a tier that means something, and the doc seat the change touched says what is now true. Hand to the test and verify skills for the proving.

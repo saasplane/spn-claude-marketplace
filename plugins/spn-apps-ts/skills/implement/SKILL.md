@@ -56,7 +56,7 @@ The step files are the `server-dev` and `web-dev` lenses worn — they carry the
 
 ## Write code the capability generator can read
 
-`spnutils apps gen-symbols` describes a package from its **barrel**, and classifies each symbol by its **shape** and the estate's **naming grammar** — never by the folder it sits in. So the conventions below are not style: code that ignores them is generated correctly and then published as the wrong thing, or as nothing at all. This is the seam where the stack's skills and the stack's `spnutils` adapter meet — the skill writes what the adapter is built to recognise.
+`spnutils apps gen-symbols` describes a package from its **barrel**, and classifies each symbol by its **shape** and the estate's **naming grammar** — never by the folder it sits in. So the conventions below are not style: code that ignores them is generated correctly and then published as the wrong thing, or as nothing at all. This is the seam where the stack's skills and the stack's `spnutils` adapter meet — the skill writes what the adapter is built to recognize.
 
 | Write it this way | So it publishes as | Ignore it and you get |
 | --- | --- | --- |

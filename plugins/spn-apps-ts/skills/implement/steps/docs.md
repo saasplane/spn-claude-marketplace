@@ -2,7 +2,7 @@
 
 Docs are the contract; code is the implementation; tests are the proof. The change is not done until the owning module's doc set reflects it — and most of that happens **during** the earlier steps, not here. This step is the closing sweep: flip statuses, verify nothing was skipped.
 
-**Before writing behaviour rows or dictionary terms**, apply the **spn-core** plugin's `refs/doc-sets.md`: it carries the node grammar in full, and the node's declared kind fixes its consumer — which in turn fixes the actor voice, how areas group, and which test tier proves a row. For a `MODULE_SERVER` the consumer is the composing app — rows read *"a composing app can…"*, areas are named for capability, and proof is contract-tier with the id in the test title.
+**Before writing behavior rows or dictionary terms**, apply the **spn-core** plugin's `refs/doc-sets.md`: it carries the node grammar in full, and the node's declared kind fixes its consumer — which in turn fixes the actor voice, how areas group, and which test tier proves a row. For a `MODULE_SERVER` the consumer is the composing app — rows read *"a composing app can…"*, areas are named for capability, and proof is contract-tier with the id in the test title.
 
 **The seats are folders, numbered, at every altitude** (foundation decision RD.DOCS.008): `docs/01-purpose/` · `docs/02-behaviors/` · `docs/03-capabilities/` · `docs/04-guides/`, each opening with the `README.md` that is its face, plus the unnumbered pockets `docs/registers/` and `docs/artifacts/`. A seat is absent only where the node cannot answer its question at all — a generated API client has no `02-behaviors/`, an app-owned module has no `04-guides/`. Never write into a `docs/capabilities.md` or a `docs/guides/getting-started.md` — if you find one, it is drift; hand it to the `plan` skill in its `docs` mode.
 
@@ -21,7 +21,7 @@ The tables below close a *change*. Writing a seat that does not exist yet is a d
 | May name | contract states, enums, permission codes, error codes, the service methods a consumer calls | anything in the code |
 | **Never** names | a table, a column, SQL, an error helper, an internal method, any realization | — |
 
-A realization detail in a behaviours area file is a **defect**, not a stylistic slip: the flow it belongs to is a capabilities area file. The dictionary (`data-model.md`) is what binds the two — one table, `Consumer` · `Capability` · `Description`, one line per term, bilingual where consumer-facing. A blank `Capability` is a defect, because a product word with nothing behind it is a promise nothing keeps.
+A realization detail in a behaviors area file is a **defect**, not a stylistic slip: the flow it belongs to is a capabilities area file. The dictionary (`data-model.md`) is what binds the two — one table, `Consumer` · `Capability` · `Description`, one line per term, bilingual where consumer-facing. A blank `Capability` is a defect, because a product word with nothing behind it is a promise nothing keeps.
 
 ### A capabilities mirror is named for the folder it governs
 
@@ -42,7 +42,7 @@ Each mirror explains its symbols **by role**: a service method as pseudologic �
 
 When you touch a node's docs at all, re-derive its statuses rather than trusting them:
 
-1. For each `✅` row, find the test whose **title** carries its id (`<MOD>.<CAP>.<NN>`). Foundation decision RD.DEVEX.008: every `✅` behaviour cites at least one test.
+1. For each `✅` row, find the test whose **title** carries its id (`<MOD>.<CAP>.<NN>`). Foundation decision RD.DEVEX.008: every `✅` behavior cites at least one test.
 2. No such test → the row is `🚧`. Demote it, and say in the face's proof paragraph what is unproven and why.
 3. Name what the passing rows are proven **against**, where that is narrower than the row reads — a stubbed decorator, a single actor, an assertion that cannot distinguish two outcomes.
 

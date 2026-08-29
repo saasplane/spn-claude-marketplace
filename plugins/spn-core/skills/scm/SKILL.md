@@ -14,7 +14,7 @@ description: The repository and project standard - what a project must declare, 
 | **Runtime** — server, web, or universal | where the artifact runs |
 | **Structure profile** — the folders the kind requires | the layout |
 | **Toolchain profile** — build, lint, test configuration | the tool wiring |
-| **Publishing** — whether it ships to a registry at all | the release behaviour |
+| **Publishing** — whether it ships to a registry at all | the release behavior |
 
 Apps are deployed, not installed, so they publish nothing. A generated API client publishes nothing about itself either — its types are its index. Both absences are deliberate: an empty artifact would claim a surface that does not exist.
 
@@ -36,7 +36,7 @@ The layer model is the same in every stack and every kind:
 - **app** — the implementation behind it. Invisible across modules, reachable only through the contract.
 - **entry** — transport adapters over the contract. One folder per transport, each parsing input into a command, invoking the same service, rendering the returned state.
 
-A package organised by feature rather than by layer — a support library — has no contract layer to implement behind, because its exports *are* its contract. That is a property of what it is for, not an exemption from the model.
+A package organized by feature rather than by layer — a support library — has no contract layer to implement behind, because its exports *are* its contract. That is a property of what it is for, not an exemption from the model.
 
 **Tests live in their own tree, never beside the code they test.** A test co-located with an implementation ships with it, or gets excluded by a rule that then has to be maintained.
 

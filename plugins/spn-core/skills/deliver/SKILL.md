@@ -12,7 +12,7 @@ description: How a change reaches a running setup - what must be true before a r
 1. **Derived artifacts are fresh.** Regenerate everything a generator owns, then prove nothing changed. **A diff here is the finding** — it means either generated output was hand-edited or a generator was never re-run, and both mean the artifact about to ship disagrees with its source.
 2. **Structural conformance passes.** Every project still is what its manifest says it is.
 3. **Build, lint, and format are green** for what is being released, at the scope that is being released.
-4. **Tests pass at the tier that proves the change** — with the count reported, not the colour.
+4. **Tests pass at the tier that proves the change** — with the count reported, not the color.
 5. **The doc seat the change touched says what is now true.** A status that reads *implemented* for something in progress is the failure this gate exists to catch.
 
 Gates run cheapest-first so a failure stops the run early. **Never report a gate you did not run**, and never infer one from another.
@@ -37,7 +37,7 @@ A published package carries the artifacts that describe it — generated at buil
 
 ## Promotion
 
-A change reaches a running setup by moving through setups, not by being rebuilt for each one. The artifact promoted is the artifact tested; configuration differs per setup, the build does not. Where a setup needs different behaviour, that is configuration read at runtime — never a separate build.
+A change reaches a running setup by moving through setups, not by being rebuilt for each one. The artifact promoted is the artifact tested; configuration differs per setup, the build does not. Where a setup needs different behavior, that is configuration read at runtime — never a separate build.
 
 ## Lenses
 

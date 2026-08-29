@@ -4,6 +4,29 @@
 
 **Every node carries the same shape at every kind** — four seats and two pockets. Only the capabilities seat has a file set that varies, and it varies because it is *derived* rather than chosen.
 
+## Every surface, one map
+
+Documentation is not one place. Resolve which surface a change belongs to **before writing a word** — the commonest documentation defect is correct content on the wrong surface, and editing cannot repair it.
+
+| Surface | Sits at | Says | Written by | Moves when |
+| --- | --- | --- | --- | --- |
+| `CONCEPT.md` | **repository root**, beside `sprepo.json` | what the repo **is** — boundary, domains, surfaces, refusals | `ideate`, one agreed block at a time | the shape moves |
+| `README.md` | repository root | how to get in — identity, children map, doc map | scaffold, then by hand | the children change |
+| `README.md` | **node** root — package, app, module | this node in a paragraph, and where its docs are | scaffold, then by hand | the node's identity moves |
+| `docs/README.md` | node doc tree | the **node doc** — children with statuses, the doc map | generated map, hand-written identity | the file set changes |
+| seat face | `01-purpose` · `02-behaviors` · `03-capabilities` · `04-guides` | the fixed answer, distilled, plus the map below it | `FRAME`, then `develop` | the answer moves |
+| area file | beneath a seat, flat and named for the group it governs | the depth the face distils | `plan` lands rows, `develop` proves them | rows land or change |
+| child node | beneath a seat, answering a narrower question | its own README and seats | scaffold | a node is added |
+| `registers/` | pocket, **governing nodes only** | the node's own rules and decision log | on a decision | a rule is decided |
+| `artifacts/` | pocket, **authoring nodes only** | what the node authors — a moment captured | on request, never on initiative | someone asks |
+| **intent comment** | every contract method and exported component | why this exists, in one line, harvested into the symbol index | `develop` (decision RD.APPS.006) | the symbol's intent moves |
+
+**Three rules resolve almost every case.**
+
+- **Altitude decides, not topic.** The same subject is legitimately stated at several altitudes — a concept states the module's boundary, a seat face states what it does, an area file states how. Repeating one altitude at another is the defect; carrying a subject up and down the altitudes is the design.
+- **A repo has one concept; a node has none.** However many packages a repo grows, ideating one of them lands as sections of the repo's concept. A `CONCEPT.md` beside a package manifest is always wrong.
+- **Structure is fixed, depth is earned.** Seats exist from day one and a seat holding only its face is the compact state. Everything below a seat — a second file, a folder, a child node — exists only when there is content a reader would otherwise wade past.
+
 ## Before the shape — `CONCEPT.md`
 
 **A concept belongs to a repo root, never to a node** (decision RD.DOCS.012) — nodes carry `README.md` alone. The repo's `CONCEPT.md` sits at the repository root and states what the repo *is* — its boundary, the sections its shape calls for, the shape drawn, and the open questions.
@@ -12,6 +35,7 @@
 - **It links only to the repo's `artifacts/` and to external sources — nothing else.** A concept sits above what realizes it, so it never links to a seat, a chapter, or a `README`. Cite a decision by id, never by link.
 - **Sections carry status inline** — `DRAFT` · `AGREED` · `REALIZED`. **`FRAME` reads only `AGREED` sections**, which is the gate that stops undecided scope reaching the seats.
 - It is produced by the **`ideate` skill** and never deleted once realized: the concept stays the standing one-page view, and the seats hold the depth. Ideating a node lands as sections of its repo's concept, never as a file at the node.
+- **Scaffolding a node never creates a concept.** When a package, app or module is added, ask whether the repo's concept needs a section or an edited boundary — never offer the node a concept of its own. This is the most likely wrong turn on a growing repo, because the node feels like the thing being decided.
 
 ## The shape
 
@@ -88,7 +112,56 @@ Which makes the seat checkable in both directions:
 
 **The spec treatment reaches those pages only.** A repo root's `03-capabilities` is a **map** of what the repository contains — *where does what live*, not *what must this code do* — and so is a node's `03-capabilities/README.md` face, which routes, and `data-model.md`, which is a dictionary. The seat's job differs by what the node publishes: source groups yield specs, indexes and orientation yield maps. **Seat tables are in scope for modality; record tables are not** — dictionaries, behavior-row tables, data models, registries and proof-gap tables keep their form. Modality comes from the page, never from a sweeper.
 
-**`group` is the source axis; `area` is the story axis** (decision RD.DOCS.016). A group is a published top-level source folder — shared vocabulary between the symbol index and the capabilities seat. An area divides the behaviours seat and names an outcome, never a folder.
+**`group` is the source axis; `area` is the story axis** (decision RD.DOCS.016). A group is a published top-level source folder — shared vocabulary between the symbol index and the capabilities seat. An area divides the behaviors seat and names an outcome, never a folder.
+
+## The artifacts pocket — concept, overview, approach
+
+The pocket holds what the node **authors** rather than derives, and its three authored kinds sit at three altitudes of one progression (decision RD.DOCS.039). **Each is earned separately, and none generates the next.**
+
+| Kind | Path | Holds | Earned when |
+| --- | --- | --- | --- |
+| **Concept** | `CONCEPT.md`, the repository root | the whole model, once — shape, never depth | the repo exists |
+| **Overview** | `artifacts/overviews/<section>-overview.html` | one concept section at reading depth | the section is too big to review where it stands |
+| **Approach** | `artifacts/approaches/<topic>-approach.html` | one argument — options weighed, one chosen | a design was actually argued |
+
+**The outline is fixed for an argument and borrowed for an explanation.**
+
+| | Outline | Carries `Open` / `Deferred`? |
+| --- | --- | --- |
+| **Approach** | **fixed** — `Terms?` → `Why` → `What` → `How` → `Open` → `Deferred` | yes — they are the argument's organs |
+| **Overview** | **borrowed** — the headings of what it expands, in that thing's order | **no** — a question found while writing one is an approach waiting to be offered, or a register row |
+
+**An overview never invents a heading its source does not have.** Lining the two outlines up is what proves it expanded rather than restated. **A settled approach legitimately lacks `Open`** — the design closed — so a missing `Open` is not a routing signal. The skeleton is: **`Why` + `What` + `How` present means it argues.**
+
+**Depth is decided by where else the detail lives** — the kinds are not *more* and *less* detailed, they are detailed in different places.
+
+| | Compresses | Expands |
+| --- | --- | --- |
+| **Overview** | everything — the source carries the depth | nothing; reaching the source's depth makes it the second copy the pocket forbids |
+| **Approach** | the **mechanics** — concepts and boundaries, never an inventory of rules the chapters own | the **reasoning** — options weighed, costs accepted, the preview that made a choice judgeable |
+
+A register row records *what* was decided, never the options that lost or what they would have cost — which is why an approach carries its reasoning in full, and why `Open` cards run deeper than the body around them.
+
+**The suffix names the kind, and the set is closed** (decision RD.DOCS.040). The routing test is one question: *were options weighed and one chosen?* Yes → `-approach`. No → `-overview`. A document with no options, no recommendation and no accepted cost is an overview whichever folder holds it.
+
+- **An overview comes at two sizes.** `concept-overview.html` is the concept's readable HTML face — the whole model, less depth, with the diagrams the root marker cannot carry; a repo has at most one. A `<section>-overview.html` expands **one** section that is too big to review where it stands, and the section names it back. Forbidden is the third copy: an overview restating another overview, or a section expanded twice under two names.
+- **Reports keep their own name** in `reports/`, and `resources/` holds what a seat cites — `schema.sql` among them.
+- **Nothing here is validated against current state.** An artifact records a moment, so a checker that flags one for disagreeing with today's tree has misread what it is looking at.
+
+**An approach document is never kept in step with code.** It argues at a moment, so three relations are all legitimate: **ahead** (arguing something not built yet — early iteration, leading the code as a concept does), **level**, and **behind** (a correct record of what was argued then). A design can reach an empty `Open` long before a line exists, and is complete at that point. **The defect is a silent rewrite** — editing one to read as though it always argued the current shape destroys the only record of what was weighed and rejected. Flag the contradiction; leave the artifact as the moment it was.
+
+### Steward, never manufacture
+
+**Coverage never forces an artifact into existence** (decision RD.DOCS.041). A concept section with no overview and no approach document has not needed one yet — a fact worth reading, not a gap worth filling. Four obligations, none of which generate content:
+
+| Obligation | Fires when | Do |
+| --- | --- | --- |
+| **Offer** | options were weighed and one chosen — in conversation or in a commit | name the reasoning and offer to record it; never write one unasked |
+| **Suggest** | overviews and approaches begin citing each other | offer the concept a section-by-section expansion |
+| **Steward** | any artifact lands or moves | the index row, the status chip, the home link, the pointer up from the owning node |
+| **Flag** | `CONCEPT.md` moves under a document that argued the old shape | report the contradiction, and stop |
+
+**A contradiction is a decision entry naming which one is wrong, never a silent edit in either direction.** The offer trigger stays tight on purpose: *a design was discussed* is too loose and rebuilds slot-filling in a softer form. **Options weighed, one chosen** is the bar.
 
 ## Metadata
 
@@ -138,10 +211,10 @@ Work runs `FRAME` → `DESIGN` → `BUILD` → `PROVE`, and each pass is the nex
 
 | Pass | Convened | Produces | Leaves |
 | --- | --- | --- | --- |
-| **Frame** | `PRODUCT` · `BUSINESS` · `ARCHITECT` · devs · `QA` | purpose, behaviour rows and stories, personas, the consumer half of the data model | rows at 🔮 |
+| **Frame** | `PRODUCT` · `BUSINESS` · `ARCHITECT` · devs · `QA` | purpose, behavior rows and stories, personas, the consumer half of the data model | rows at 🔮 |
 | **Design** | `ARCHITECT` · devs · `QA` — product steps out | the capability documents, `schema.sql`, the capability half of the data model | documents at 🔮/🚧 |
 | **Build** | devs | the code those documents describe, and the guides face once it runs | rows at 🚧 |
-| **Prove** | `QA` | tests whose titles carry the behaviour ids | rows flip to ✅ |
+| **Prove** | `QA` | tests whose titles carry the behavior ids | rows flip to ✅ |
 
 So a document routinely exists **before** the thing it describes, carrying 🔮 and reading as a design note rather than a fact. Iteration re-enters at **Frame** and reads the existing documents and code back, so a revision revises rather than re-derives.
 

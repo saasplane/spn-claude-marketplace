@@ -51,7 +51,7 @@ No running stack required. Cheapest gate first, so a failure stops the run early
 | `CLIENT_API` | regenerate from the live OpenAPI and diff — **a diff is the finding**, never a fix-up |
 | `APP_UTILITY` | build, lint, tests |
 
-Report per gate: the command run and its **actual output**. Report the test count, not just the colour — a suite that silently stopped collecting is green. **Never report a gate you did not run**, and never infer one gate from another: a passing build says nothing about kind conformance.
+Report per gate: the command run and its **actual output**. Report the test count, not just the color — a suite that silently stopped collecting is green. **Never report a gate you did not run**, and never infer one gate from another: a passing build says nothing about kind conformance.
 
 > Every gate here is static. Passing all five means the code is *well-formed*, not that the feature *works* — that is mode `app`, and for anything user-visible it is the real exit criterion.
 

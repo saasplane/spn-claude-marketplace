@@ -1,6 +1,6 @@
 # Cross-Repo Work — Stack-Agnostic
 
-How an agent works across more than one repository on a SaaS Plane estate, and where a rule belongs so every agent sees it. Applies in any stack and to any repo pair. Source of truth: the foundation's `CONCEPT.md` (`#### DevEx Workspace`) and decision RD.DEVEX.020 — where this digest and those disagree, they win and this file is regenerated.
+How an agent works across more than one repository on a SaaS Plane estate, and where a rule belongs so every agent sees it. Applies in any stack and to any repo pair. Source of truth: the foundation's `CONCEPT.md` (`#### DevEx Workspace`) and decision RD.DEVEX.020 — where this digest and those disagree, the sources win and this file is regenerated.
 
 ## One window, laws by declaration
 

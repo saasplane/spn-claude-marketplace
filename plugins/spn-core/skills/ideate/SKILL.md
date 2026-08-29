@@ -34,6 +34,8 @@ Your output is exactly one file: **`CONCEPT.md` at the repository root**, beside
 
 ## The loop — four gates, in order
 
+**A repo has one concept, however many nodes it grows.** Adding a package, app or module changes *sections* of the repo's concept — a `CONCEPT.md` beside a node manifest is always wrong (decision RD.DOCS.012). When a node is scaffolded, ask whether the concept needs a new section or a moved boundary; never offer the node a concept of its own. This is the likeliest wrong turn on a growing repo, because the node feels like the thing being decided.
+
 **You do not draft the whole document and present it.** Each step is a gate: you produce one thing, the person reviews it, and only then do you move on. This is the entire mechanism — a concept produced in one pass is a concept nobody agreed to.
 
 ### 1 · Boundary
@@ -72,12 +74,12 @@ One section: **preview it, wait, then write it.** Never two at once, never the w
 Every unanswered question is a card with **real options and a recommendation**. A card with no options is a status update; a card with no recommendation makes the person do the analysis twice.
 
 - **The stage ends when the questions are answered, not when they run out.**
-- **An approach document is made on request, and there are two reasons to ask.** A question too large for an Open card needs somewhere to be argued. A section too big to review in place needs somewhere to be *read* — a concept states shape, so someone wanting the detail behind it is asking for the expansion, not for a longer concept. Either way it lands in the node's `artifacts/approaches/` and the section names it. **Offer; never start one unasked**, and never write one to make a concept look finished. A concept whose sections have none is the normal case, not an incomplete one.
+- **An expansion is made on request, and which kind it is depends on what was asked.** A question too large for an Open card needs somewhere to be **argued** — that is an approach document, `artifacts/approaches/<topic>-approach.html`. A section too big to review in place needs somewhere to be **read** — that is an overview, `artifacts/overviews/<section>-overview.html`, because a concept states shape and someone wanting the detail is asking for the expansion, not for a longer concept. The routing test is whether options were weighed and one chosen (decisions RD.DOCS.039 · RD.DOCS.040). Either way the section names the file and the file names the section back. **Offer; never start one unasked**, and never write one to make a concept look finished. A concept whose sections have none is the normal case, not an incomplete one.
 - A question deliberately not answered is **deferred with a trigger** — what would bring it back.
 
 ## The lenses you convene
 
-Ideation is where the wrong people in the room costs most: a boundary drawn without the business is renegotiated commercially later.
+Ideation is where having the wrong people in the room costs most: a boundary drawn without the business is renegotiated commercially later.
 
 | Section | Convene |
 | --- | --- |
@@ -95,7 +97,7 @@ Ideation is where the wrong people in the room costs most: a boundary drawn with
 
 ## What you hand over, and what you never do
 
-`FRAME` reads **only `AGREED` sections** and writes the seats: `Why` → `01-purpose`, `Who` → `personas.md`, the outcomes → behaviour rows with ids. Those sections then flip to `REALIZED`.
+`FRAME` reads **only `AGREED` sections** and writes the seats: `Why` → `01-purpose`, `Who` → `personas.md`, the outcomes → behavior rows with ids. Those sections then flip to `REALIZED`.
 
 - **Never write into `docs/`.** One file, at the repository root.
 - **Never design.** Fields, tables, signatures are `plan` and later.

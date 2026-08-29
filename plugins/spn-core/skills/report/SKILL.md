@@ -14,7 +14,7 @@ description: Produce a report or an approach document into a node's artifacts po
 | `REPO_AUDIT` | what this repository looks like against the standards, today | superseded |
 | `CHANGE_PLAN` | what a proposed change would touch, and in what order | superseded |
 | `SURFACE_DIFF` | what changed in a published surface between two versions | superseded |
-| `TRACEABILITY_MATRIX` | which behaviour rows have proof, and where | superseded |
+| `TRACEABILITY_MATRIX` | which behavior rows have proof, and where | superseded |
 | `ESTATE_PLAN` | what a change needs provisioned, configured, or promoted | superseded |
 | `RELEASE_NOTE` | what shipped in one release | **kept** |
 | `INCIDENT_RECORD` | what happened, what was done, what changed because of it | **kept** |
@@ -29,7 +29,7 @@ description: Produce a report or an approach document into a node's artifacts po
 
 - **The artifacts pocket is earned.** A node that has never authored anything has no pocket; creating one is part of writing the first report into it.
 - **Nested folders are allowed here and nowhere else in a pocket**, and sub-folders carry **no `README.md`** — the pocket's own README says what the pocket holds.
-- **An approach document is not a report.** It records the reasoning behind a design, lands at `docs/artifacts/approaches/<topic>-approach.html`, and is replaced in place as it iterates until the design lands.
+- **A report is not the pocket's only authored kind, and the neighbours are easy to confuse.** A report answers a question **at a moment** and carries an as-of; an **approach document** argues a design — options weighed, one chosen — at `docs/artifacts/approaches/<topic>-approach.html`, replaced in place while `Open` holds a card; an **overview** expands one `CONCEPT.md` section to reading depth at `docs/artifacts/overviews/<section>-overview.html`. The suffix set is closed (decisions RD.DOCS.039 · RD.DOCS.040). If what you are writing has no as-of, it is not a report — route it before writing.
 
 ## Format
 
@@ -45,7 +45,7 @@ Then the body, and it obeys the corpus rules that apply everywhere: no changelog
 
 ## How to produce one
 
-1. **Confirm the template and the node.** Which of the eight, and whose pocket it lands in. If the request does not name a node and the repository holds more than one, ask — never infer from the last file touched.
+1. **Confirm the template and the node.** Which of the templates, and whose pocket it lands in. If the request does not name a node and the repository holds more than one, ask — never infer from the last file touched.
 2. **Read the sources, not summaries of them.** An audit that reports what the docs claim rather than what the tree contains is worthless; the point of the report is the difference between the two.
 3. **Run what can be run.** Where a template's answer is derivable from a command — validation, codegen freshness, test results — run it and report what it returned, including its failures. A number you did not obtain is stated as *not measured*, never estimated.
 4. **Say what you did not look at.** Every report closes with its own coverage boundary, so a clean result is never mistaken for a scope it did not have.

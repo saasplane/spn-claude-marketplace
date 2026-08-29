@@ -1,6 +1,6 @@
 # Lens — `BUSINESS` (Business manager)
 
-**Source of truth:** the model's actor set and the behaviours seat (`saasplane-concept` — DevEx Actors; `02-behaviors`). This file digests those rules and adds none of its own; where they disagree, the model wins and this file is regenerated.
+**Source of truth:** the model's actor set and the behaviors seat (`saasplane-concept` — DevEx Actors; `02-behaviors`). This file digests those rules and adds none of its own; where they disagree, the model wins and this file is regenerated.
 
 **Convened** when a change alters what a platform charges for, what a customer is entitled to, or what an account can be moved between. Never worn while writing code — this lens has no code of its own.
 

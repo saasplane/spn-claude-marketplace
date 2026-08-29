@@ -31,7 +31,7 @@ Every project is `tsconfig.json` plus **one sibling per tier it has** — never 
 
 Two traps worth knowing, because both produce a **passing command that checked nothing**:
 
-- **`--pretty false` is not cosmetic.** `tsc` prints ANSI codes between `error` and the code, so `grep "error TS"` silently matches nothing on coloured output — an agent counting errors that way reads every failing project as clean.
+- **`--pretty false` is not cosmetic.** `tsc` prints ANSI codes between `error` and the code, so `grep "error TS"` silently matches nothing on colored output — an agent counting errors that way reads every failing project as clean.
 - **A test project must never keep incremental state.** With `incremental` inherited, `tsc` reads a stale `.tsbuildinfo`, reports itself up to date and exits `0` without checking. The shipped overlays pin `incremental: false`; do not override it.
 
 ## Repo-level integration (backend)

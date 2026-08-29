@@ -19,7 +19,7 @@ Developers say *verify* for both, so decide by the **object of the sentence**, n
 | a thing to run gates against | **verify** | *"verify this package"* · *"clean reset and verify"* |
 | both, or neither clearly | **ask** | *"verify the auth work"* — the change, or a claim about it? |
 
-A claim usually names a behaviour, a rule, a state of the data, or a past decision. A target names a package, an app, or nothing at all. When it is genuinely ambiguous, ask which is wanted rather than guessing — the two produce completely different work.
+A claim usually names a behavior, a rule, a state of the data, or a past decision. A target names a package, an app, or nothing at all. When it is genuinely ambiguous, ask which is wanted rather than guessing — the two produce completely different work.
 
 ## Where the evidence lives
 
@@ -29,7 +29,7 @@ Search by **layer**, in the order that decides the answer fastest. The layer mod
 2. **Migrations and schema** — claims about *stored state, defaults, and constraints* are settled here and nowhere else. A default written in application code is not the same fact as a column default, and a seeded row is not the same fact as a constraint.
 3. **Service layer** — the rule itself: the authorization gate, the branch, the validation, the ordering. This is where "is it enforced" is answered.
 4. **Entry layer** — whether it is reachable, and under what route, verb, or listener.
-5. **Tests** — a passing test naming the behaviour is the strongest single piece of evidence, because it is executable and maintained. Its absence is not disproof, but it is worth reporting.
+5. **Tests** — a passing test naming the behavior is the strongest single piece of evidence, because it is executable and maintained. Its absence is not disproof, but it is worth reporting.
 6. **The symbol index and generated surfaces** — the fastest way to learn whether a symbol exists at all before hunting for its implementation.
 
 Not every claim touches every layer. Read the claim and go where it actually lives.
@@ -39,7 +39,7 @@ Not every claim touches every layer. Read the claim and go where it actually liv
 - **A name is not proof.** A function called `enforceMfa`, a flag called `mfaEnabled`, a constant called `RATE_LIMIT` — each tells you someone intended something. Follow it to the code that acts on it. Naming is the single most common way a check produces a confident wrong answer.
 - **A default is not the same as a guarantee.** "Enabled by default" and "cannot be disabled" are different claims; say which one you proved.
 - **Configuration is not enforcement.** A value that is read but never branched on is dead, and a gate that exists but is never applied to the path in question does not cover it.
-- **Prefer the authority for the kind of claim.** Stored state → the migration. Enforcement → the service. Reachability → the entry. Behaviour → the test. Do not settle a schema claim from application code.
+- **Prefer the authority for the kind of claim.** Stored state → the migration. Enforcement → the service. Reachability → the entry. Behavior → the test. Do not settle a schema claim from application code.
 - **Absence of evidence is a finding, not a verdict.** Report where you looked and did not find it — that is what lets the reader judge whether you looked in the right place.
 
 ## Report

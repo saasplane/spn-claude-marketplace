@@ -5,7 +5,7 @@ description: What proves a behaviour, at which tier, and what a passing suite do
 
 # test — proof, at the tier that means something
 
-**A behaviour is a claim that someone can do something. A test is what makes the claim checkable.** A behaviour nobody can prove is a wish, and a claim marked done without a test citing it is a status nobody verified.
+**A behavior is a claim that someone can do something. A test is what makes the claim checkable.** A behavior nobody can prove is a wish, and a claim marked done without a test citing it is a status nobody verified.
 
 ## The tiers, and what each actually proves
 
@@ -24,7 +24,7 @@ description: What proves a behaviour, at which tier, and what a passing suite do
 | A support package | Modules and apps | Unit — plus integration wherever it fronts a real resource, and **component** where it owns web components |
 | A domain module | The composing application | Unit · integration · contract — a UI module owes **component** instead of integration |
 | An application | People and other systems | Contract through its entries · journeys for the flows it owns |
-| A API client | Other systems | Integration against a running service — this **is** that service's contract tier |
+| An API client | Other systems | Integration against a running service — this **is** that service's contract tier |
 | A command-line tool | Operators and pipelines | Unit · integration of the invoked command |
 
 **Pick the tier by what would break.** A validation rule breaks in a unit; an authorization gate breaks against the real service; a journey breaks end to end. Writing a unit test for something that only fails when wired is a green that proves nothing.
@@ -41,13 +41,13 @@ Two rules: a gate runs at **exactly one placement**, and a pre-commit gate **nev
 
 ## Static gates are not tests
 
-Codegen freshness, structural conformance, type checking, lint — these prove the code is **well-formed**, not that it **works**. They are cheap and they run first, but passing all of them says nothing about behaviour. For anything user-visible, the running system is the exit criterion.
+Codegen freshness, structural conformance, type checking, lint — these prove the code is **well-formed**, not that it **works**. They are cheap and they run first, but passing all of them says nothing about behavior. For anything user-visible, the running system is the exit criterion.
 
 Equally: **never infer one gate from another.** A passing build says nothing about structural conformance; a passing lint says nothing about tests.
 
 ## Reading a result honestly
 
-- **Report the count, not the colour.** A suite that silently stopped collecting tests is green. The number is what tells you it ran.
+- **Report the count, not the color.** A suite that silently stopped collecting tests is green. The number is what tells you it ran.
 - **Never report a gate or a check you did not run.** An assumed pass is worse than an unknown, because it stops anyone looking.
 - **A flake is a finding until proven environmental.** Confirm from evidence — the observed failure mode, not the inconvenience of the timing. A consistent failure is a regression no matter how much it looks like the last flake.
 - **Say what you did not cover.** The gap a reader does not know about is the one that ships.
@@ -72,7 +72,7 @@ A **double** stands in for a collaborator and belongs to the unit tier only; a *
 
 **In their own tree, never beside the code they test.** Co-located tests ship with the implementation or need an exclusion rule that then has to be maintained forever.
 
-A test that proves a stated behaviour should be traceable to it — where the platform records behaviours with identifiers, the test title carries the identifier so the claim and its proof can be matched mechanically rather than by reading.
+A test that proves a stated behavior should be traceable to it — where the platform records behaviors with identifiers, the test title carries the identifier so the claim and its proof can be matched mechanically rather than by reading.
 
 ## Data and isolation
 
@@ -87,4 +87,4 @@ Wear `refs/lenses/qa.md` while writing tests. On every build's close, convene th
 
 ## Finish
 
-Report per tier: what ran, the count, and what failed with its actual output. Then state the honest coverage — which behaviours are now proven, which are asserted but unproven, and what tier would settle the difference.
+Report per tier: what ran, the count, and what failed with its actual output. Then state the honest coverage — which behaviors are now proven, which are asserted but unproven, and what tier would settle the difference.
