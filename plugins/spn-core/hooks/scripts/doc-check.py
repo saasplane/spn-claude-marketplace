@@ -73,6 +73,57 @@ def approach_shape(text):
     return []
 
 
+def _section(text, name):
+    """The body of one <h2> section, to the next <h2>."""
+    m = re.search(r'<h2\b[^>]*>\s*(?:<[^>]+>\s*)*' + name + r'\b.*?</h2>(.*?)(?=<h2\b|\Z)',
+                  text, re.S | re.I)
+    return m.group(1) if m else None
+
+
+def _cards(body):
+    """Cards are h3 OR h4 — the corpus uses h4, and both read as a card to a person."""
+    out = []
+    for chunk in re.split(r'(?=<h[34]\b)', body):
+        t = re.search(r'<h[34]\b[^>]*>(.*?)</h[34]>', chunk, re.S | re.I)
+        if t:
+            out.append((re.sub(r'<[^>]+>', '', t.group(1)).strip()[:60], chunk[t.end():]))
+    return out
+
+
+def open_cards(text):
+    """Open and Deferred carry cards in the agreed shape (refs/decision-cards.md).
+
+    A card with no options is a status update; one with no recommendation makes the reader do
+    the analysis twice; a deferred one with no trigger is a question nobody will bring back.
+    All three read as progress, which is why they need a checker rather than a convention —
+    the failure is invisible to whoever wrote it.
+
+    The card TITLE is excluded from every scan: a card called "options but no recommendation"
+    otherwise satisfies the recommendation check by naming it.
+    """
+    out = []
+    body = _section(text, 'Open')
+    if body:
+        for name, rest in _cards(body):
+            if '<table' not in rest:
+                out.append(('RULE', f'Open card "{name}" carries no options table — a card with '
+                                    f'no options is a status update (refs/decision-cards.md)'))
+            elif not re.search(r'recommend|(?:\u2192|&rarr;|&#8594;)\s*(?:<[^>]+>)*\s*\**[A-D]\b',
+                               rest, re.I):
+                out.append(('RULE', f'Open card "{name}" carries no recommendation — the reader '
+                                    f'does the analysis twice (refs/decision-cards.md)'))
+    body = _section(text, 'Deferred')
+    if body:
+        for name, rest in _cards(body):
+            # A deferred card keeps its parts AND names what brings it back. "Later" is not a
+            # trigger; an event somebody will notice happening is.
+            if not re.search(r'\btrigger|\buntil\b|\bonce\b|\bwhen\b|\bbrings? it back\b',
+                             rest, re.I):
+                out.append(('RULE', f'Deferred card "{name}" names no trigger — what would bring '
+                                    f'it back (refs/decision-cards.md)'))
+    return out
+
+
 def overview_shape(text):
     """An overview borrows its outline and carries no argument organs (05-artifacts)."""
     heads = [re.sub(r'<[^>]+>', '', h).strip().split()[0].rstrip(':—-').lower()
@@ -115,6 +166,7 @@ def check(path, text):
                 out.append(('BLOCK', f'Terms carries {n} rows; the bar is five to eight'))
     if is_approach:
         out += approach_shape(text)
+        out += open_cards(text)
     elif path.endswith('-overview.html'):
         out += overview_shape(text)
 

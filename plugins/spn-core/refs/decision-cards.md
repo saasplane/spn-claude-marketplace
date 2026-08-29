@@ -1,76 +1,66 @@
-# Decision cards — the one shape for anything a person must decide
+# Decision cards — the shape, and where it is defined
 
-A decision card exists so someone can **decide without re-doing the analysis**. It is not a
-status update, not a summary, and not a list of things you did not get to.
+**The book owns this grammar.** It is stated in the foundation's
+`docs/03-capabilities/05-docs/05-artifacts.md`, under *The approach document* → `Open`, and
+several of its clauses are **MUST**. This file exists because the plugins ship without the
+book beside them — it restates the grammar for an agent that cannot open that chapter, and it
+must be kept in step with it. **When the two disagree, the book wins.**
 
-**This file is the single home for the shape.** It is cited by `agents/spn-engineer.md`,
-`skills/ideate/SKILL.md` and `refs/lenses/lead.md` rather than restated in any of them — a
-rule with two homes is a rule where the copy nobody updates is the one an agent reads.
+## It governs conversation, not just documents
 
-## When this applies
+The chapter is explicit, and this is the clause most often missed:
 
-Any time a person owes a decision, and always in full when they ask for one:
+> *Open items put to a person in chat — a status reply, an answer to "what's left?", a
+> pending-work report at any moment — follow this layout exactly as a document's Open section
+> does.* **MUST**
 
-> *"show open questions"* · *"show open cards"* · *"what's open"* · *"what needs deciding"*
+So *"show open questions"*, *"show open cards"*, *"what's open"* get the full shape, every
+part, for every item — the same as the `Open` section of an approach document, and the same
+as `Deferred`.
 
-Also: an `ideate` Open section, an arc's open cards, an approach document's `Open`, a review
-that surfaced a choice, and the end of any piece of work that leaves something undecided.
-
-**Two open items are two cards.** A sentence beginning *"two things I did not act on"* is the
-exact failure this shape prevents.
-
-## The parts
+## The card
 
 | Part | What it carries |
 | --- | --- |
-| **Number + summary** | Numbered so a reply can say *"B on 3"* without quoting anything back. The summary names the **choice**, not the topic — *"Where the voice rule lives"*, never *"About the voice rule"* |
-| **What** | The change, concretely: the file, the rule, the before → after. Written so someone who was not in the session can pick it up cold — what it is, what state it is in now, what was already tried and rejected |
-| **Why it matters** | What it costs to leave as is: the failure it causes, who hits it, and when. Never *"for consistency"* |
-| **Options** | A markdown **table**. A / B / C, each with its real trade-off. **"Leave it" is a real option** whenever it is viable |
-| **→ Recommendation** | One option named, with **the reasoning that picked it** — not just the letter. Say what argues against it where something real does |
-| **Preview** | When the decision is a shape — an outline, a tree, a sample, a code fragment — a compact example inline. A reader who must ask *"show me"* was handed an undecidable card |
+| **Number + summary** | Numbered, and the numbering is **stable across the whole exchange** — item 3 is item 3 in the question, the discussion and the answer. The summary names the **choice**, not the topic |
+| **What** | The change concretely — the file, the rule, the before → after |
+| **Why** | What it costs to leave as is: the failure it causes. Never *"for consistency"* |
+| **Options** | A **table**: lettered, trade-off in its own column. *"Leave it"* is a real option wherever viable, with its cost stated |
+| **→ Recommendation** | One option, carrying the reason it wins |
+| **Preview** | Where the decision is a shape — an outline, a tree, a sample row, a code fragment — inline. A reader who must ask *"show me"* was handed an undecidable card |
 
-## The options table
+**Options are a table.** Lettered, one row each, the trade-off in its own column. Prose
+alternatives cannot be scanned and cannot be answered by reference — and in markdown the
+`| --- |` separator row is required, or the block renders as literal text.
 
-Always a table. Always lettered. The trade-off in its own column. A prose paragraph of
-alternatives cannot be scanned, and cannot be answered by reference.
+**Trade-offs are concrete or absent.** *"Simpler"* is not one; *"one file to change instead of
+twenty, at the cost of a second name for one concept"* is.
 
-```markdown
-| | Option | Trade-off |
-| --- | --- | --- |
-| **A** | What would be done | What it costs and what it buys |
-| **B** | The real alternative | Why somebody would pick this instead |
-```
+## Self-contained across sittings
 
-**The `| --- |` separator row is required.** Without it the block renders as literal text
-rather than a table — the most common way this shape is got wrong.
+A card assumes **no conversation context and no memory of the session that wrote it** — people
+decide days later. Each one carries: what led to the question (the change, the finding, the
+realization that surfaced it), what is true today and what happens if nothing is decided, and
+where the decision lands once made — the row, the chapter, the repo.
 
-- **Every option must be one somebody would actually pick.** A padded option that exists to
-  make the preferred one look obvious is dishonest, and a reader who spots it stops trusting
-  the rest of the card.
-- **Trade-offs are concrete or absent.** *"Simpler"* is not a trade-off; *"one file to change
-  instead of twenty, at the cost of a second name for one concept"* is.
-- **State the trade-off, not the verdict.** *"Costs a release"* is a trade-off; *"worse"* is
-  the recommendation leaking upward into the table.
+Leaving that to conversation history is leaving it out.
 
-## Deferral
+## Closing a sheet
 
-A card deliberately not answered is **deferred with a trigger** — the event that brings it
-back. *"Later"* is not a trigger. *"The first consumer outside this repo"*, *"the next time
-anyone touches the emitter"*, *"when a partner has hundreds of domains"* are: somebody will
-notice them happening.
+More than one card closes by showing how to answer by number — *"1A, 2 confirm, 5–9 yes"* —
+so the whole sheet settles in one line. An answer that cannot be given by number means the
+sheet was not numbered.
 
-A deferred card keeps **all** its parts. It is deferred, not abbreviated — the person who
-meets the trigger reads it cold, months later, and must not have to reconstruct it.
+## Deferred
+
+A deferred card keeps every part and adds its **trigger** — what brings it back. *"Later"* is
+not a trigger; an event somebody will notice happening is: *the first consumer outside this
+repo*, *the next time anyone touches the emitter*.
 
 ## Tone
 
-**Write to a colleague, not as a system.** Full sentences in **What** and **Why**; tables only
-where things are genuinely being compared. Plain words beat impressive ones. Name the cost in
-the same breath as the recommendation rather than burying it in a caveat.
+Write to a colleague. Full sentences in **What** and **Why**; tables where things are compared.
+A wall of clipped fragments is not dense, it is unreadable — it makes the reader rebuild the
+sentences the writer declined to write.
 
-A wall of clipped fragments and nested tables is not dense, it is unreadable — it makes the
-reader reconstruct the sentences you declined to write. **Length is not the variable**: a
-longer description does not make a decision easier, the parts do.
-
-**Never close your own question.** You draft options and recommend; a person decides.
+**Never close your own question.** Draft options and recommend; a person decides.
