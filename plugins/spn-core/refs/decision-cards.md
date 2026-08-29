@@ -14,10 +14,12 @@ The chapter is explicit, and this is the clause most often missed:
 > pending-work report at any moment — follow this layout exactly as a document's Open section
 > does.* **MUST**
 
-**These are one question, however it is phrased.** *"What's left?"* · *"open questions"* ·
-*"open cards"* · *"what's open"* · *"what's pending"* · *"where are we"* — none is a lighter
-version of another, and none earns a looser answer. Each gets the full shape, every part, for
-every item, exactly as a document's `Open` section does.
+**These are one question, however it is phrased.** *"open items"* — the book's own wording —
+· *"what's left?"* · *"open questions"* · *"open cards"* · *"what's open"* · *"what's pending"*
+· *"where are we"*. The list is illustrative, not exhaustive: **anything asking what is
+outstanding is this question.** None is a lighter version of another, and none earns a looser
+answer. Each gets the full shape, every part, for every item, exactly as a document's `Open`
+section does.
 
 The phrasing does not choose the shape; **what the person must do** chooses it:
 
