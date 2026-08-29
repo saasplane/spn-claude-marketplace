@@ -14,9 +14,23 @@ The chapter is explicit, and this is the clause most often missed:
 > pending-work report at any moment — follow this layout exactly as a document's Open section
 > does.* **MUST**
 
-So *"show open questions"*, *"show open cards"*, *"what's open"* get the full shape, every
-part, for every item — the same as the `Open` section of an approach document, and the same
-as `Deferred`.
+**These are one question, however it is phrased.** *"What's left?"* · *"open questions"* ·
+*"open cards"* · *"what's open"* · *"what's pending"* · *"where are we"* — none is a lighter
+version of another, and none earns a looser answer. Each gets the full shape, every part, for
+every item, exactly as a document's `Open` section does.
+
+The phrasing does not choose the shape; **what the person must do** chooses it:
+
+| They must… | Answer with |
+| --- | --- |
+| **decide** something before work continues | decision cards — one per open item, full shape |
+| **know what is still coming** — agreed, merely unfinished | a checklist — one line per item, in the order they will be done |
+| **do nothing** — finished, nothing open | a plain confirmation. Say what changed and stop |
+
+A reply to *"what's left?"* often carries both. Then it carries both, **separated** — never
+mixed into one paragraph, because a question buried in a status update is a question nobody
+answers. And never invent a card to look thorough: a manufactured question costs real
+attention and teaches the reader to skim the ones that matter.
 
 ## The card
 
