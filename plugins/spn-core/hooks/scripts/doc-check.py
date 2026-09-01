@@ -409,8 +409,43 @@ def check(path, text, fragment=False):
     return out
 
 
-TEMPLATE_SUFFIX = '.tmpl'
-DOTFILE_PREFIX = 'dot-'
+# How a stack spells a scaffold template. A stack DERIVES from the repo's own claim —
+# `sprepo.json` `config.stack` — which is the derivation every estate-aware verb already uses,
+# so adding a stack here is adding a row rather than a branch in shared code. Nothing in this
+# file may assume one stack: `.tmpl` and `dot-` are TypeScript's, and the `dot-` reason is
+# npm's alone (npm strips a literal `.gitignore` from a published tarball). A stack publishing
+# to PyPI has no such problem (the arc docs-voice, finding 42).
+STACK_TEMPLATES = {
+    'TS': {'suffixes': ('.tmpl',), 'dot_prefix': 'dot-'},
+}
+# The fallback for a stack with no row yet. It fails OPEN — checking a little more than it
+# must — because every defect this checker has had was a gate that measured nothing and read
+# as a pass. A new stack's templates are watched imprecisely rather than not at all.
+GENERIC_TEMPLATE = {'suffixes': ('.tmpl', '.template', '.j2', '.jinja', '.mustache', '.erb'),
+                    'dot_prefix': None}
+_stack_cache = {}
+
+
+def stack_of(path):
+    """The stack a file's repository claims, or None. Walks up to the nearest `sprepo.json`,
+    the same two-step every estate verb uses to resolve a node."""
+    d = os.path.dirname(os.path.abspath(path))
+    while True:
+        if d in _stack_cache:
+            return _stack_cache[d]
+        manifest = os.path.join(d, 'sprepo.json')
+        if os.path.exists(manifest):
+            try:
+                claim = (json.load(open(manifest, encoding='utf-8'))
+                         .get('config', {}) or {}).get('stack')
+            except Exception:
+                claim = None
+            _stack_cache[d] = claim
+            return claim
+        parent = os.path.dirname(d)
+        if parent == d:
+            return None
+        d = parent
 
 
 def as_written(path):
@@ -424,10 +459,14 @@ def as_written(path):
     no amount of sweeping the corpus catches it.
     """
     d, base = os.path.split(path)
-    if base.endswith(TEMPLATE_SUFFIX):
-        base = base[:-len(TEMPLATE_SUFFIX)]
-    if base.startswith(DOTFILE_PREFIX):
-        base = '.' + base[len(DOTFILE_PREFIX):]
+    conv = STACK_TEMPLATES.get(stack_of(path) or '', GENERIC_TEMPLATE)
+    for suffix in conv['suffixes']:
+        if base.endswith(suffix):
+            base = base[:-len(suffix)]
+            break
+    prefix = conv['dot_prefix']
+    if prefix and base.startswith(prefix):
+        base = '.' + base[len(prefix):]
     return os.path.join(d, base)
 
 
