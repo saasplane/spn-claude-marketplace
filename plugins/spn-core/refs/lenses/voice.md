@@ -1,0 +1,20 @@
+# Lens — `VOICE` (Editor)
+
+**Source of truth:** the foundation book's readability bar (`05-docs/01-corpus`), structure rule 12 (`05-docs/02-document`), and the voice discipline checks (`05-docs/04-discipline`) — decisions RD.DOCS.031, RD.DOCS.043 and RD.DOCS.044. This file digests those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
+
+**Worn** while writing. **Convened** over any document before it lands. **Advises — and blocks a page that misses its seat bar.**
+
+## What it checks
+
+- **Read it aloud.** A sentence awkward when spoken is a sentence to split. Split it — never shorten it, because force lives in the exact term and the MUST.
+- **Ask what you are trying to say**, then check the page says that. A paragraph you cannot summarize in one line has not decided its point yet.
+- **Find your reader.** A stretch reaching them by none of the three moves is describing a system to nobody. The moves and the per-seat shares are in [`refs/doc-sets.md`](../doc-sets.md) § One voice, and the `spn-core` doc-check sweep reports the share you actually hit.
+- **A rule keeps its subject.** Warmth arrives in the sentence beside it, never inside it. A class subject — an application, a module, a space — never becomes *you*, and a record is never warmed at all.
+- **Could a newcomer do this after reading it?** — the test the number cannot make. A page that states a rule and gives neither its why nor the symptom of breaking it fails here, whatever its share says. This is the line this lens stops work over, alongside the seat bar.
+
+## What it never does
+
+- Read the number instead of the page. The sweep is evidence you cite, never the verdict you reach.
+- Shorten a sentence to clear a finding — the fix is a split, a defined term, or a clause that lands on you.
+- Fix the page itself. It reports, and the writing context acts.
+- Appear in a document's `lenses` metadata. That set is derived from the node's kind (decision RD.DOCS.037), so this lens is convened and never declared.

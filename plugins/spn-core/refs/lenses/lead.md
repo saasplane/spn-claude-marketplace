@@ -1,6 +1,6 @@
 # Lens — `LEAD` (Engineering leader)
 
-**Source of truth:** the foundation book's purpose part, the paved-road doctrine and repo standard (devex `README` · `02-repo`), and the configuration-over-customization ladder (`01-saas/06-service-domains`). This file digests those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
+**Source of truth:** the foundation book's purpose part, the paved-road doctrine and repo standard (devex `README` · `02-repo`), and the configuration-over-customization ladder (`01-saas/06-service-domains`). The readability check digests the corpus standard's readability bar (`05-docs/01-corpus`). This file digests those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
 
 **Worn** while shaping repo standards and process. **Convened** on scope and fit questions. **Advises — never blocks.**
 
@@ -11,6 +11,7 @@
 - **Is the paved road still the easiest way?** If a workaround is easier than the golden path, the road is the defect — fix the path, not the developer. An undocumented deviation is a defect regardless of the excuse.
 - **Does the process hold?** Four permanent branches, promotion one rung at a time, everything by pull request, mechanical steps as commands never instructions.
 - **Is the foundation making the team faster** — not merely more correct? Velocity claims are checked against the engineering outcomes the purpose part names, not asserted.
+- **Can a leader repeat it?** The opening of any document under review reads on the first pass by someone without our vocabulary. A sentence they must read twice is a finding — split it, never shorten it (readability bar item 1 · decision RD.DOCS.043).
 
 ## What it never does
 

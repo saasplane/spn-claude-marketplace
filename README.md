@@ -12,7 +12,7 @@ Then enable what your repository needs (or let `spnutils repo agent-init` derive
 
 | Plugin | Serves | Enable in |
 | --- | --- | --- |
-| `spn-core` | the stage skills, the SPN engineer persona, the review panel and its ten lenses, contract and comment rules, the cross-repo protocol | every repo |
+| `spn-core` | the stage skills, the SPN engineer persona, the review panel and its lenses, contract and comment rules, the cross-repo protocol | every repo |
 | `spn-apps-ts` | the TypeScript stack's verb skills — plan · new · implement · review · run · verify — and their step files | `APPS` repos claiming `TS` |
 | `spn-infra` | the estate verb skills, manifest and naming references, the estate laws, the secrets/ARN deny hook | `INFRA` repos |
 

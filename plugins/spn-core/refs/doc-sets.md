@@ -103,7 +103,7 @@ Which makes the seat checkable in both directions:
 | `README.md` | identity and orientation | what this node is, and the map of what sits under it |
 | `01-purpose` | why the node exists | explains and persuades. Carries **no rules** — normative language here is a defect |
 | `02-behaviors` | what its consumer can do | stories: a persona reaching an outcome, in the consumer's own words. `personas.md` where the node has more than one; `01-<area>.md` for depth |
-| `03-capabilities` | what it carries | engineering-voiced, and **normative wherever a consumer can violate the statement** — the sequence, the guard, the reason a rule exists (RD.DOCS.034; see the altitude note below) |
+| `03-capabilities` | what it carries | engineering content in the one voice (RD.DOCS.043), and **normative wherever a consumer can violate the statement** — the sequence, the guard, the reason a rule exists (RD.DOCS.034; see the altitude note below) |
 | `04-guides` | how to use it | task-shaped — install, mount, configure, run. The face **is** the getting-started, for a reader with no checkout |
 | `registers/` | the node's own rules and decisions | lookup material, consulted rather than read start to end |
 | `artifacts/` | `schema.sql`, reports, approach documents | authored source of truth. Nested folders allowed here and nowhere else; sub-folders carry no README |
@@ -192,18 +192,49 @@ Every document opens with an invisible block holding **strict JSON**, marked `sp
 
 ## One voice — the warm learning register
 
-The corpus speaks one voice (decision RD.DOCS.031, superseding the two-voice split): **every document is written for someone learning, while law keeps its force in every rule.** Writing or reviewing any doc, apply:
+The corpus speaks one voice (decision RD.DOCS.031, sharpened by RD.DOCS.043 and RD.DOCS.044): **every document is written for someone learning, while law keeps its force in every rule.** Writing or reviewing any doc, apply:
 
-1. **Teach in build-up order** — show the thing, name it, then state its rule; the rule lands as the conclusion of something the reader now understands.
-2. **Talk to the reader** — second person, present tense, active voice; momentum over ceremony.
-3. **Every rule keeps its teeth** — exact terms, exact constraints, MUST-grammar wherever a statement is normative. Precision is part of the kindness.
+1. **Teach in build-up order** — show the thing, name it, then state its rule; the rule lands as the conclusion of something your reader now understands.
+2. **Talk to your reader** — second person, present tense, active voice; momentum over ceremony. Three moves get you there, and the sentence decides which one fits (below).
+3. **Every rule keeps its teeth** — exact terms, exact constraints, MUST-grammar wherever a statement is normative. Precision is part of the kindness. Force lives in the exact term and the MUST, never in a dense sentence: splitting a normative sentence changes neither (RD.DOCS.043).
 4. **The plain substrate** — one idea per sentence; the rule stated literally before any story; no load-bearing metaphors, parables, aphorism-led paragraphs, or personification; bold marks rules and terms, never emphasis; house terms glossed on first use per chapter.
 5. **The warmth budget** — at most one light aside per section, never inside a rule's own sentence; *conversational and friendly without being frivolous*.
 6. **Personas choose content, never temperature** — capabilities speak to engineers, behaviors to product personas; the lens picks the examples.
 7. **The register governs prose, never records** — behavior rows, decision/glossary rows, every table and diagram, contract blocks, and code samples keep their form untouched. A warmed record is a defect.
 8. **The depth guarantee** — a rewrite changes how sentences are written, never what the corpus contains: every fact, constraint, edge case, table, and diagram survives; rewrites may add examples, never remove substance.
+9. **Artifacts take the voice** (decision RD.DOCS.043) — an approach, an overview and a report take the voice exactly as a seat does. The audience decides the examples and the depth, never the temperature. An HTML page is no exemption.
+10. **Register rows take the plain substrate** (decision RD.DOCS.043) — the bold headline first, then one clause a sentence, none past twenty-five words. A decision or glossary row keeps its exact terms and its MUST. No *you* and no aside: a row is still a record.
 
-The labeled on-ramp form (`**What this is about:**` blocks) is retired — its content folds into a natural opening paragraph. Rollout is progressive by tranches; existing prose is compliant until its tranche; new text complies from day one.
+### Reaching your reader — three moves
+
+**RD.DOCS.031 asked you to talk to your reader and named no mechanism, so RD.DOCS.044 names three.** Third person is not the fault. A third-person sentence carrying nothing for you is.
+
+| Move | Where it belongs | Reads like |
+| --- | --- | --- |
+| **The beneficiary clause** | the default, and it works in every seat | *A module MUST NOT read `process.env`. That way your config stays in one owning layer.* |
+| **The imperative** | guides and procedures, where you are the one acting | *Run the plan before you approve it.* |
+| **Second person as the subject** | where the actor really is you | *You never hand-run an apply against the estate.* |
+
+- **Keep the system as the subject, then add the clause.** Say what the fact buys you, in the sentence beside it. The subject never moves, so a rule keeps the party it binds.
+- **Never write an imperative on a sentence that names a bound party.** An imperative rebinds the rule from that party to you, which is a different rule. Most of the capabilities seat names a bound party, which is why the clause is the default.
+- **A rule is taught, not only stated.** Beside the rule, give the why — or the symptom that shows the rule was broken. A rule with neither is a line you memorize.
+
+**The bar is a share, and your seat sets it** (decision RD.DOCS.044). Count the prose sentences landing on you by any of the three moves, then divide by the sentences counted.
+
+| Seat | Sentences that reach you |
+| --- | --- |
+| overview · approach · report | 30 in a hundred |
+| README face | 25 in a hundred |
+| chapter · concept | 15 in a hundred, with normative sentences outside the count |
+| register row | none — a record is never warmed |
+
+**Watch a share, never a count of occurrences.** Splitting a long sentence is what this standard asks of you, and splitting dilutes a count. So the number to compare before and after is the share.
+
+**No external style guide becomes a rule** (decision RD.DOCS.044). The construct is the corpus's own. Keep the reference measurements in the workspace as evidence, and never cite one as authority.
+
+**The measure** (decisions RD.DOCS.043 · RD.DOCS.044). The check reads the rule's numbers, never the corpus's own average. Over prose only: around fifteen words a sentence, few past twenty-five, none past thirty, *you* present, and your seat's share of reach. A sentence past thirty words is a finding. Prose that never says *you* is a finding, and that clause is the floor against silence — the share above is what you aim at. The fix is one of four moves — **split it · say *you* · define the term · land it on your reader** — never a shorter sentence. The `spn-core` doc-check hook measures every watched document, and its sweep prints the rates a tranche moves. Reach is reported SOFT for now: the corpus is swept for length, not yet for reach.
+
+**No document is exempt by age** (decision RD.DOCS.043). The corpus is swept in the row's order: pilot first, then the argued pages, the book, the stack docs, the register rows. Every diff is reviewed and nothing is removed. The labeled on-ramp form (`**What this is about:**` blocks) is retired; its content folds into a natural opening paragraph.
 
 ## Documents lead code
 
