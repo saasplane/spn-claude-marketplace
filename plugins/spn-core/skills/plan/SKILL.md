@@ -29,9 +29,54 @@ material*, never the verb, so resolve the node and load its layers before applyi
 **There is no per-domain `plan` skill, and adding one is a defect** — the book's `SPSkillType` is
 closed, and a folder whose derived value (`{DOMAIN}_{SKILL}`) is not in it fails conformance.
 
+## Step 0 — classify the nature of the work
+
+**Design nothing until you have named where this work enters.** The nature of the work decides the altitude, and the altitude decides which document must change first. Skip this and you patch at the lowest rung, then discover the construct three rounds later.
+
+| Nature of the work | Enter at | Highest thing that must re-align |
+| --- | --- | --- |
+| A new project or platform | the concept | nothing above it — the concept **is** the top |
+| A new capability inside a module | the module's construct | the module's own seats |
+| A **new concept** inside a module | where it fits in the construct, before any mechanics | the module's construct section |
+| A concept spanning modules | the repo's `CONCEPT.md`, and the book where it states a rule | `CONCEPT.md` **and** a register row |
+
+**The answer is a path, not a category: if you cannot name the highest document that must change, you have not classified yet.** Everything below that document is implementation. Everything above it is untouched by what you build.
+
+### Both ends, and the ladder between them
+
+Ask both directions together, because they cost different things. **Upward** is what governs the concept. **Downward** is what it is built on, and every rung down buys a release.
+
+| Direction | The question | The ladder | What it costs |
+| --- | --- | --- | --- |
+| **Upward** | what is the **highest document** that must change? | the module's seats → the module's construct → the repo's `CONCEPT.md` → the owning foundation chapter, plus a register row | rows, a chapter, a handover. No release |
+| **Downward** | what is the **lowest shared package** it reaches? | the module → the stack's shared packages, in dependency order → the shared contract package | a release and a pin bump in every consumer — and every other platform on the stack inherits it, asked for or not |
+
+**A design is not classified until both ends are named**, and the span between them is the real blast radius. The downward question is your modularity check: the lower a change reaches, the more products it commits.
+
+**The altitude is discovered, so escalate rather than absorb.** Work you entered at module level often turns out to need the rung above. Settle the higher document first — documents lead code, and a row written against a construct that is about to move is written twice.
+
+**The foundation rung holds constructs, never internals** — a promise, a boundary, a vocabulary. The repo that builds it holds the realization. One test separates them while you write: would this sentence still be true on a second stack and a second platform? Name a table, a package or a code, and it is not foundation material.
+
+**The top rung is not one document.** The foundation holds a construct per subject, so say *which* construct owns the concept. Escalate without asking, and you write into the wrong chapter.
+
+### The questions, in the order you ask them
+
+| # | Question | What a good answer looks like |
+| --- | --- | --- |
+| 1 | What is the nature of this work? | a row of the table above, not a feeling |
+| 2 | What is the highest document that must change? | a path, and the reason it is the highest |
+| 3 | What is the lowest shared package it reaches? | a package name, and what its release obliges |
+| 4 | What is this concept's twin, and does its mechanism transfer? | an existing construct, named |
+| 5 | Which layer promise does this test? | the promise stated, then kept or deliberately changed |
+| 6 | What varies later? | the change you can already foresee, and whether the shape survives it |
+
+Question four is not a search for prior art. **Prior art asks whether a thing exists; the twin asks what your concept most resembles**, and whether that thing's mechanism carries over.
+
+**A plan naming no altitude and no highest document is incomplete**, and you say so rather than designing anyway.
+
 ## Classify before you design
 
-Most architecture pain is a component that never said what kind of thing it was. Before shaping anything, settle:
+**This runs inside the altitude you named, never instead of it.** Most architecture pain is a component that never said what kind of thing it was. Before shaping anything, settle:
 
 - **What is being added** — a new capability, a change to an existing one, or a correction. A correction rarely needs a design; a new capability always does.
 - **Where it runs** — server, web, or universal. This decides the kind, and the kind decides structure, toolchain, and packaging. It is not a later detail.
@@ -65,9 +110,12 @@ A duplicate capability costs more than a missing one: it splits behavior across 
 ## The approach document
 
 **Write it in the corpus voice — this is where documents get it wrong.** The corpus speaks
-**one voice, the warm learning register** (decision RD.DOCS.031): second person, present tense,
-active; around fifteen words a sentence, one idea each; momentum over ceremony. Two rules decide
-most edits:
+**one voice, the warm learning register** (decisions RD.DOCS.031 · RD.DOCS.043). Second person,
+present tense, active; around fifteen words a sentence, one idea each; momentum over ceremony.
+The numbers are the rule: few sentences past twenty-five words, none past thirty, and *you*
+present. **HTML is not an exemption** — an approach page takes the voice exactly as a seat does,
+and the `spn-core` doc-check hook measures it. When a sentence fails, make one of three moves —
+**split it · say *you* · define the term** — and never shorten it. Two rules decide most edits:
 
 - **The register governs prose, never records.** Chapter bodies, section narrative and an Open
   card's argument take the voice. Tables, diagrams, behavior rows, glossary and decision rows,
@@ -109,9 +157,26 @@ It is **one self-contained HTML page named `<topic>-approach.html`** — one fil
 | --- | --- | --- |
 | **Why** | what problem this solves, and the bar the answer must clear | the bar as one sentence a reader can hold; the cost of the current situation, in specifics |
 | **What** | the decision — the shape, the fields, the vocabulary | **real values, never invented ones** — sampled from the actual codebase, so the reader is checking a description against reality rather than judging a sketch |
-| **How** | how it is produced and how it stays true | including **how an agent is configured to follow it** — a standard that lives only in a document is one nobody applies at the moment of writing |
+| **How** | how it is produced and how it stays true — **in code and in documents** | two tables. **What is built**, including **how an agent is configured to follow it** — a standard that lives only in a document is one nobody applies at the moment of writing. Then **what re-aligns** — every document the reasoning obliges, with its owner and state |
 | **Open** | the questions that **block** — the design is not settled until each is answered | **one card each, in the decidable layout below** — never a paragraph the reader has to mine for the question answer first |
 | **Deferred** | what was consciously **parked** — understood, decided against doing now | each with *why not now* and *what would bring it back*, so it is a decision rather than a backlog |
+
+#### `How` names what re-aligns
+
+`How` tracks code by habit: what gets built, and what keeps it true. That is half an answer, and the document half is the one you forget. So `How` carries a second table.
+
+| The table | Answers | One row is |
+| --- | --- | --- |
+| **What is built** | how the thing is produced, and how it stays true | a piece, where it lands, how you would know it works, and its state |
+| **What re-aligns** | which documents this reasoning obliges | a document, what re-aligns inside it, who owns it, and its state |
+
+The owner column names what changes each document — the book, the repo that builds it, the plugins, the workspace. A document with no owner is a row nobody picks up.
+
+**A contradicted artifact is a row that says so, never an edit.** Where your reasoning collides with a page arguing the old shape, the row reads *a register row names which side is wrong*. The page stays the correct record of what it argued then.
+
+**An empty `What re-aligns` table means one of two things.** Either the design obliges no document, which is rare and worth saying out loud. Or you stopped early, which is the ordinary case.
+
+**Source of truth:** the book's artifacts standard, `05-artifacts.md` — *`How` has two halves*. This digests it and adds no rule of its own.
 
 ### Writing into a doc set
 
@@ -208,10 +273,12 @@ A document still carrying **open** questions lives with the work, not in the art
 
 ## Lenses
 
-Wear `refs/lenses/architect.md` and `refs/lenses/product.md` while drafting — decomposition and data model from one, consumer outcomes and vocabulary from the other. **Before any 🔮 row lands in the owning docs**, convene the `spn-panel` subagent once per lens with `lead`, `product`, `trust`, and `qa` over the draft; fold findings in, then land the rows.
+Wear `refs/lenses/architect.md` and `refs/lenses/product.md` while drafting — decomposition and data model from one, consumer outcomes and vocabulary from the other. **Before any 🔮 row lands in the owning docs**, convene the `spn-panel` subagent once per lens with `architect`, `lead`, `product`, `trust`, and `qa` over the draft; fold findings in, then land the rows.
+
+**Wearing a lens is not reviewing through it.** The context that drafted a design always agrees with it. So `architect` is convened over the result, not only worn while writing it. A design is reviewed by a reader that did not write it, and that reader is the one who can still block. `architect` blocks on a new mechanism reachable from more than one module. The block clears when a decision entry names what it was weighed against.
 
 ## Report
 
-The design, in this order: the classification, what already covers part of it, the behaviors, the contract sketch, what changes per layer, the failure cases, and anything that needs a decision recorded. Close with what you are **unsure** about — an unstated assumption is the thing that gets discovered after the code is written.
+The design, in this order: **the altitude, the highest document and the lowest shared package**, then the classification, what already covers part of it, the behaviors, the contract sketch, what changes per layer, the failure cases, and anything that needs a decision recorded. The first three are paths, and a report that omits them hands back an unclassified design. Close with what you are **unsure** about — an unstated assumption is the thing that gets discovered after the code is written.
 
 Then hand to the stack's scaffolding skill, which supplies the commands.

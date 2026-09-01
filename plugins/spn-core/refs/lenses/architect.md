@@ -2,7 +2,7 @@
 
 **Source of truth:** the foundation book's saas model (`01-saas`), the shape and module groups (`02-apps/01-shape` · `03-module`), the contract states standard including its evolution classification, and the dictionary grammar (`data-model.md`, capability column). This file digests those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
 
-**Worn** while designing. **Convened** when a module boundary moves. **Advises — and flags anything that needs a decision entry.**
+**Worn** while designing. **Convened** when a module boundary moves, and over any design before its rows land. **Blocks:** a new mechanism reachable from more than one module, with no decision entry naming what it was weighed against. Below that threshold it advises, and flags anything that needs a decision entry.
 
 ## What it checks
 
@@ -16,9 +16,23 @@
 - **Blast radius is read as a design signal, not a work estimate.** A repair that breaks many call sites, changes GENERATED output, or crosses a package or repository boundary is a design decision that arrived wearing a compiler error. The scope of the damage is not the scope of the fix: the question is which LAYER owns the concern, asked before any mechanism is proposed.
 - **Prior art outranks invention.** Before designing a new mechanism, the system is searched for how it already handles that concern. A capability the codebase already has, reimplemented beside itself, is a defect even when both copies work.
 - **Options are checked for frame diversity.** If every option shares one noun — `marker`, `flag`, `param`, `config` — they are one idea in several hats, not a choice. At least one option must move the concern to a different layer; otherwise the frame itself has not been questioned.
+- **The twin is located before a mechanism is designed.** Ask what this concept is most like, then ask whether that thing's mechanism transfers. This is not the prior-art check above it: prior art asks whether a thing already exists, the twin asks what a *new* thing resembles. Skip it and you invent a third way to do what the system already does twice.
+- **A layer promise is not broken quietly.** Name the promise a layer already keeps before you add to it — utilities stay pure, the framework imports no module, a contract state imports one leaf. Changing a promise is a decision entry. Breaking one silently is the defect, and you find it as one file doing what every other file in the folder refuses to.
+- **Costs are verified before they are asserted.** Read a release, a break, a migration or a call-site count from the manifest, the dependency graph or the grep that settles it. An asserted cost decides the design, and being wrong costs you nothing at the moment you assert it. That is why the reading comes first.
+
 - **Reachability decides what a declaration may assert.** Where one state is reached from more than one direction — an input command and a read model, a hand-authored document and a service response — no annotation on that declaration can be correct for every path, and the difference belongs at the entries instead (RD.APPS.071).
+
+## The one thing it blocks
+
+A new **cross-cutting mechanism** blocks where it is **reachable from more than one module** and no decision entry names what it was weighed against. A registry, a resolver, a base-class seam, a new table family — each is one.
+
+- **Reachability is the threshold, never novelty.** A helper private to one module does not trip it. The moment a second module can reach the mechanism it is a construct, and a construct owes a decision entry.
+- **The block is cheap to clear: you write the row.** It names the mechanism, what it was weighed against, and why those did not carry.
+- **A person still decides.** The lens does not choose the mechanism. It refuses to let one arrive unweighed.
+
+This is the failure mode that costs most later — a third way to do what the system already does twice, found after you have written the code.
 
 ## What it never does
 
-- Block work — it flags the missing decision entry and drafts it; a person decides.
+- **Block anything but the condition above.** Everywhere else it flags the missing decision entry and drafts it; a person decides.
 - Plan the implementation. Files, loops, and pseudo-code are the standards' job; the design says *what* and *where*, never *how*.

@@ -30,6 +30,7 @@ description: Produce a report or an approach document into a node's artifacts po
 - **The artifacts pocket is earned.** A node that has never authored anything has no pocket; creating one is part of writing the first report into it.
 - **Nested folders are allowed here and nowhere else in a pocket**, and sub-folders carry **no `README.md`** — the pocket's own README says what the pocket holds.
 - **A report is not the pocket's only authored kind, and the neighbours are easy to confuse.** A report answers a question **at a moment** and carries an as-of; an **approach document** argues a design — options weighed, one chosen — at `docs/artifacts/approaches/<topic>-approach.html`, replaced in place while `Open` holds a card; an **overview** expands one `CONCEPT.md` section to reading depth at `docs/artifacts/overviews/<section>-overview.html`. The suffix set is closed (decisions RD.DOCS.039 · RD.DOCS.040). If what you are writing has no as-of, it is not a report — route it before writing.
+- **An approach document's `How` has two halves.** It says what is built and how it stays true, then names **what re-aligns** — every document the reasoning obliges, with its owner and state. A contradicted artifact appears there as *a register row names which side is wrong*, never as an edit. An empty table means the design obliges no document, which is rare, or that you stopped early.
 
 ## Format
 
@@ -42,6 +43,10 @@ Every report opens with the same three things, in this order:
 3. **When and against what** — the commit, the version, or the date the answer is true of. A report with no as-of is a report that cannot be superseded, because nobody can tell which is newer.
 
 Then the body, and it obeys the corpus rules that apply everywhere: no changelog prose, no live counts outside a table that *is* the count, and no claim of a status the underlying documents deny.
+
+## Voice
+
+**A report is prose, and it takes the one voice** (decisions RD.DOCS.031 · RD.DOCS.043). Write it to the person who asked: second person, present tense, around fifteen words a sentence. Define each house term where it first appears. Keep MUST wherever a sentence is normative; force lives in the exact term, never in a dense sentence. The tables stay records — a finding row, a count, a matrix keep their form and are never warmed. HTML is no exemption. Load `refs/doc-sets.md` § One voice before writing. The `spn-core` doc-check hook measures the page as you write it. A sentence past thirty words is a finding, and so is a page that never says *you*.
 
 ## How to produce one
 
