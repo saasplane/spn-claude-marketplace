@@ -1,2 +1,6 @@
 .DS_Store
 __pycache__/
+
+# ── registry credentials: an .npmrc carries an auth token, and distribution here is
+#    identity-gated end to end — one `git add -A` would put it in history forever ──
+.npmrc
