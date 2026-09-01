@@ -7,7 +7,7 @@ description: Decide what a node IS before anything is planned - its boundary, it
 
 A boundary nobody decides still gets drawn: the first three features draw it, implicitly, and by the time anyone notices, moving it means moving everything built inside it. **That is how projects go wrong slowly** — in the twenty minutes nobody spent deciding what the thing is and, harder, what it deliberately is not.
 
-Your output is exactly one file: **`CONCEPT.md` at the repository root**, beside `sprepo.json` (decision RD.DOCS.012 — a concept belongs to a repo root, never to a node; nodes carry `README.md` alone, so ideating a node lands as sections of its repo's concept). Never `docs/`. Never code.
+Your output is exactly one file: **`CONCEPT.md` at the repository root**, beside `sprepo.json`. A concept belongs to a repo root, never to a node (decision RD.DOCS.012). Nodes carry `README.md` alone, so ideating a node lands as sections of its repo's concept. Never `docs/`. Never code.
 
 ## Ideate decides the shape; plan works inside it
 
@@ -64,7 +64,7 @@ Every concept opens with what it is, who it serves, and what it will not do. The
 
 One section: **preview it, wait, then write it.** Never two at once, never the whole thing.
 
-- **Ask; do not fill** — when ideating. A section the person has not decided stays `DRAFT` with three lines. **Inventing plausible detail is the failure mode**, because it reads as agreement and gets built on. When *harvesting*, the seats are the source and filling from them is the job; what stays banned in both directions is writing a sentence no person and no seat has said.
+- **Ask; do not fill** — when ideating. A section the person has not decided stays `DRAFT` with three lines. **Inventing plausible detail is the failure mode**, because it reads as agreement and gets built on. When *harvesting*, the seats are the source and filling from them is the job. What stays banned in both directions is writing a sentence no person and no seat has said.
 - **Status is theirs to set.** `DRAFT` while being ideated · `AGREED` once reviewed and safe to build against · `REALIZED` once the seats and code carry it. Nothing becomes `AGREED` because it reads well.
 - **Draw the shape where the section is a shape.** A repository's projects and their dependencies; a module's seams. Use the approach-document diagram grammar so a concept diagram and an approach diagram read as one system.
 - **Stay at concept altitude.** A field list, a table schema, a method signature — all of these mean you have left ideation. Say so and stop.
@@ -74,7 +74,7 @@ One section: **preview it, wait, then write it.** Never two at once, never the w
 Every unanswered question is a card with **real options and a recommendation**. A card with no options is a status update; a card with no recommendation makes the person do the analysis twice. **The shape is [`refs/decision-cards.md`](../../refs/decision-cards.md)** — the same one every open item uses, here and everywhere else.
 
 - **The stage ends when the questions are answered, not when they run out.**
-- **An expansion is made on request, and which kind it is depends on what was asked.** A question too large for an Open card needs somewhere to be **argued** — that is an approach document, `artifacts/approaches/<topic>-approach.html`. A section too big to review in place needs somewhere to be **read** — that is an overview, `artifacts/overviews/<section>-overview.html`, because a concept states shape and someone wanting the detail is asking for the expansion, not for a longer concept. The routing test is whether options were weighed and one chosen (decisions RD.DOCS.039 · RD.DOCS.040). Either way the section names the file and the file names the section back. **Offer; never start one unasked**, and never write one to make a concept look finished. A concept whose sections have none is the normal case, not an incomplete one.
+- **An expansion is made on request, and which kind it is depends on what was asked.** A question too large for an Open card needs somewhere to be **argued** — that is an approach document, `artifacts/approaches/<topic>-approach.html`. A section too big to review in place needs somewhere to be **read** — that is an overview, `artifacts/overviews/<section>-overview.html`. A concept states shape, so someone wanting the detail is asking for the expansion, not for a longer concept. The routing test is whether options were weighed and one chosen (decisions RD.DOCS.039 · RD.DOCS.040). Either way the section names the file and the file names the section back. **Offer; never start one unasked**, and never write one to make a concept look finished. A concept whose sections have none is the normal case, not an incomplete one.
 - A question deliberately not answered is **deferred with a trigger** — what would bring it back.
 
 ## The lenses you convene

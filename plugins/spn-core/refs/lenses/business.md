@@ -6,12 +6,12 @@
 
 ## What it checks
 
-- **Someone can be billed for this, or it is deliberately free.** A capability that consumes real resources and belongs to no plan, tier, or entitlement is a cost with no revenue attached to it — which is a decision, and must be a recorded one rather than an omission.
-- **An entitlement is data, never a code path.** What a tier includes is configuration read at runtime; a capability gated by a build flag, an environment check, or a hardcoded account list cannot be sold, changed, or granted without a deploy.
-- **The account is the unit that pays.** Anything metered, limited, or invoiced resolves to an account — never to a user, a session, or an organization node that may be reorganized underneath it.
+- **Someone can be billed for this, or it is deliberately free.** A capability that consumes real resources and belongs to no plan, tier, or entitlement is a cost with no revenue attached to it. That is a decision, and must be a recorded one rather than an omission.
+- **An entitlement is data, never a code path.** What a tier includes is configuration read at runtime. A capability gated by a build flag, an environment check, or a hardcoded account list cannot be sold, changed, or granted without a deploy.
+- **The account is the unit that pays.** Resolve anything metered, limited, or invoiced to an account — never to a user, a session, or an organization node that may be reorganized underneath it.
 - **A limit that exists is enforced and observable.** A documented quota with no enforcement is a promise the platform will break silently; an enforced quota with no counter is one nobody can support a customer through.
-- **Nothing traps a customer.** A capability that produces data must have a way for its owner to get that data out, and a subscription that can be started must have a stated path to being stopped.
-- **The commercial vocabulary matches the product's.** What the interface calls a plan, an add-on, or a seat is what the invoice, the documentation, and the support article call it — a second name for one thing is a support cost forever.
+- **Nothing traps a customer.** Give a capability that produces data a way for its owner to get that data out, and a subscription that can be started a stated path to being stopped.
+- **The commercial vocabulary matches the product's.** What the interface calls a plan, an add-on, or a seat is what the invoice, the documentation, and the support article call it. A second name for one thing is a support cost forever.
 
 ## What it never does
 

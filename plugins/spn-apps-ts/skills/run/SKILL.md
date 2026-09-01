@@ -18,7 +18,7 @@ Pick the mode (`local` | `tests`). pnpm only — never npm/yarn. All infra goes 
 
 Stop here — this mode starts things; it does not test or verify them. Hand off to the `verify` skill for health checks. Report what is up and on which ports/hosts.
 
-Notes: `spnutils infra platform down --clean` **wipes the shared local DB** — never run it in this mode (that belongs to the reset macro in the `verify` skill, on explicit command only). Logs: `spnutils infra logs [service]`.
+Notes: `spnutils infra platform down --clean` **wipes the shared local DB**. Never run it in this mode — that belongs to the reset macro in the `verify` skill, on explicit command only. Logs: `spnutils infra logs [service]`.
 
 ## Mode: tests
 
@@ -37,6 +37,6 @@ pnpm test:all                 # every unit suite        pnpm test:dev   # affect
 
 **FE E2E**: `pnpm test:e2e` (root Playwright) — after the BE suite, on a quiesced stack (no concurrent resets/builds), with the stack seeded.
 
-Codegen freshness before any suite: `spnutils apps gen-validators -p <pkg>` for packages with edited `contract/states/**`, `spnutils apps gen-barrel -p <pkg>` for lib packages that gained/lost files (never apps, never the API client).
+Codegen freshness comes before any suite. Run `spnutils apps gen-validators -p <pkg>` for packages with edited `contract/states/**`. Run `spnutils apps gen-barrel -p <pkg>` for lib packages that gained/lost files — never apps, never the API client.
 
 Report per-suite results honestly — a suite you did not run is "not run", never assumed green. Test-state hygiene rules: the `implement` skill steps/test.md.

@@ -5,7 +5,7 @@ description: Produce a report or an approach document into a node's artifacts po
 
 # report — an answer to a question at a moment
 
-**A report is written on request and never on initiative.** A report produced to fill a slot is an answer to a question nobody had, and it costs the reader the time to work out that they did not need it. If nobody asked, do not write one.
+**A report is written on request and never on initiative.** A report produced to fill a slot is an answer to a question nobody had. It costs the reader the time to work out that they did not need it. If nobody asked, do not write one.
 
 ## The templates
 
@@ -29,12 +29,12 @@ description: Produce a report or an approach document into a node's artifacts po
 
 - **The artifacts pocket is earned.** A node that has never authored anything has no pocket; creating one is part of writing the first report into it.
 - **Nested folders are allowed here and nowhere else in a pocket**, and sub-folders carry **no `README.md`** — the pocket's own README says what the pocket holds.
-- **A report is not the pocket's only authored kind, and the neighbours are easy to confuse.** A report answers a question **at a moment** and carries an as-of; an **approach document** argues a design — options weighed, one chosen — at `docs/artifacts/approaches/<topic>-approach.html`, replaced in place while `Open` holds a card; an **overview** expands one `CONCEPT.md` section to reading depth at `docs/artifacts/overviews/<section>-overview.html`. The suffix set is closed (decisions RD.DOCS.039 · RD.DOCS.040). If what you are writing has no as-of, it is not a report — route it before writing.
+- **A report is not the pocket's only authored kind, and the neighbours are easy to confuse.** A report answers a question **at a moment** and carries an as-of. An **approach document** argues a design — options weighed, one chosen — at `docs/artifacts/approaches/<topic>-approach.html`, replaced in place while `Open` holds a card. An **overview** expands one `CONCEPT.md` section to reading depth at `docs/artifacts/overviews/<section>-overview.html`. The suffix set is closed (decisions RD.DOCS.039 · RD.DOCS.040). If what you are writing has no as-of, it is not a report — route it before writing.
 - **An approach document's `How` has two halves.** It says what is built and how it stays true, then names **what re-aligns** — every document the reasoning obliges, with its owner and state. A contradicted artifact appears there as *a register row names which side is wrong*, never as an edit. An empty table means the design obliges no document, which is rare, or that you stopped early.
 
 ## Format
 
-**Reports and approach documents are HTML; everything in a seat is Markdown.** The split is by reader. A seat is read by a person *and* parsed by tooling, so it stays in the format both handle. An artifact here is read by a person only — often someone outside the repository, often on a screen where a wide table needs to scroll on its own — so it gets a format that can carry a diagram, a stepper, and a sticky outline.
+**Reports and approach documents are HTML; everything in a seat is Markdown.** The split is by reader. A seat is read by a person *and* parsed by tooling, so it stays in the format both handle. An artifact here is read by a person only — often someone outside the repository, often on a screen where a wide table needs to scroll on its own. So it gets a format that can carry a diagram, a stepper, and a sticky outline.
 
 Every report opens with the same three things, in this order:
 
@@ -42,7 +42,7 @@ Every report opens with the same three things, in this order:
 2. **The answer**, in one paragraph — the finding a reader who stops here should leave with.
 3. **When and against what** — the commit, the version, or the date the answer is true of. A report with no as-of is a report that cannot be superseded, because nobody can tell which is newer.
 
-Then the body, and it obeys the corpus rules that apply everywhere: no changelog prose, no live counts outside a table that *is* the count, and no claim of a status the underlying documents deny.
+Then the body, and it obeys the corpus rules that apply everywhere. No changelog prose, no live counts outside a table that *is* the count, and no claim of a status the underlying documents deny.
 
 ## Voice
 
@@ -54,7 +54,7 @@ Then the body, and it obeys the corpus rules that apply everywhere: no changelog
 2. **Read the sources, not summaries of them.** An audit that reports what the docs claim rather than what the tree contains is worthless; the point of the report is the difference between the two.
 3. **Run what can be run.** Where a template's answer is derivable from a command — validation, codegen freshness, test results — run it and report what it returned, including its failures. A number you did not obtain is stated as *not measured*, never estimated.
 4. **Say what you did not look at.** Every report closes with its own coverage boundary, so a clean result is never mistaken for a scope it did not have.
-5. **Offer the follow-up, do not take it.** A report that finds problems ends by naming what would fix them; it does not fix them, and it does not create tasks or decision entries — it drafts one and a person decides.
+5. **Offer the follow-up, do not take it.** A report that finds problems ends by naming what would fix them. It does not fix them, and it does not create tasks or decision entries — it drafts one and a person decides.
 
 ## What this skill never does
 

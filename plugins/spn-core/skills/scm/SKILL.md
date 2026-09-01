@@ -38,7 +38,7 @@ The layer model is the same in every stack and every kind:
 
 A package organized by feature rather than by layer — a support library — has no contract layer to implement behind, because its exports *are* its contract. That is a property of what it is for, not an exemption from the model.
 
-**Tests live in their own tree, never beside the code they test.** A test co-located with an implementation ships with it, or gets excluded by a rule that then has to be maintained.
+**Keep tests in their own tree, never beside the code they test.** A test co-located with an implementation ships with it, or gets excluded by a rule that then has to be maintained.
 
 ## Wiring a repo for agents
 
@@ -55,7 +55,7 @@ A package organized by feature rather than by layer — a support library — ha
 
 ## Repo tasks — invoke, never reconstruct
 
-A repository's own operations live in `tasks/`: one file per task, reached through a declared `task:<name>` entry point, opening with what it does, what it gates on, and what it mutates.
+A repository's own operations live in `tasks/` — one file per task, reached through a declared `task:<name>` entry point. Each file opens with what it does, what it gates on, and what it mutates.
 
 - **Read the header and run the task.** Reassembling its steps by hand bypasses every gate inside it — the build, the test, the confirmation before anything is published or provisioned.
 - **The repo's own instructions name its tasks.** A task that is not listed there is invisible; if one exists and is unlisted, say so rather than inventing an invocation.

@@ -30,7 +30,7 @@ spnutils infra release -p <package> --local -y    # → the machine store, stage
 - **A `--local` stage is not a publish.** The store is the resolve-side cache — where a fetched artifact is kept, and where an unbound workspace may stage its own. Never report a stage as a release, and never tell a consumer to pin against one.
 - An **unlisted scope refuses by name** — `scopes` routes everything.
 - A version **already present refuses** — immutability holds in the pair and in the cache alike. A fix is a new version, never a re-publish.
-- From a laptop while the estate is being built; **CI-only once the pipelines stand** — reached by grant withdrawal, not by rule.
+- Run it from a laptop while the estate is being built; **CI-only once the pipelines stand** — reached by grant withdrawal, not by rule.
 
 ## 4 · After — pins flip at their own pace
 
@@ -38,4 +38,4 @@ Consumers cite `{ package, version }` — the org's `blueprint` pin, a platform'
 
 ## The line that holds
 
-**Two builders never coexist.** The moment `infra release` serves a repo, any bespoke build script or hand-rolled publish workflow is deleted and the workflow repointed **in the same change** — an interim builder left standing is a second source of dist truth.
+**Two builders never coexist.** Delete any bespoke build script or hand-rolled publish workflow the moment `infra release` serves a repo, and repoint the workflow **in the same change**. An interim builder left standing is a second source of dist truth.

@@ -8,8 +8,8 @@ That makes the comment an **interface**, and it earns the same discipline as one
 
 **The first sentence of a declaration's doc comment is its published description.** Everything after it stays where it is.
 
-- **One sentence.** Present tense, ends with a period.
-- **What a caller achieves**, never how the implementation works. *"Renews a certificate approaching expiry"* — not *"loops the provider API until the status flips"*.
+- **One sentence.** Write it in the present tense, ending with a period.
+- **Say what a caller achieves**, never how the implementation works. *"Renews a certificate approaching expiry"* — not *"loops the provider API until the status flips"*.
 - **Never restates the signature.** A reader already has the name and the types; a line that says *"Creates a group"* above `createGroup` has spent a line saying nothing.
 - **No preamble.** Not *"This function…"*, not *"Helper that…"*.
 
@@ -45,7 +45,7 @@ Out, always:
 - **Enum values from a package this one does not depend on.**
 - **Anything from a repository the reader has no access to.**
 
-If the fact genuinely matters, restate it in the package's own terms: *"the platform's currency reference data"* rather than a table name, *"the value the server persists"* rather than a column.
+Write the fact in the package's own terms when it genuinely matters. Say *"the platform's currency reference data"* rather than a table name, and *"the value the server persists"* rather than a column.
 
 ## Constraints live in the same comment, as tags
 
@@ -56,14 +56,14 @@ A contract member's doc comment carries two things, and they do different jobs. 
 displayName: CDTString;
 ```
 
-- **A tag is not a comment about validation — it IS the validation.** The generated validator is derived from it, so the constraint is declared once and enforced automatically. Never restate it as a hand-written check in the implementation, and never describe it in prose: *"must be at least one character"* is a second copy that drifts the moment the tag changes.
-- **Tags never reach the description.** The harvester stops at the first tag, whether it opens a line or trails the prose, so a member can carry both without the constraint leaking into what a reader sees.
-- **Prose first, tags after.** They may share the line; the order is what keeps both readable.
+- **A tag is not a comment about validation — it IS the validation.** The generated validator is derived from it, so the constraint is declared once and enforced automatically. Never restate it as a hand-written check in the implementation, and never describe it in prose. A prose line like *"must be at least one character"* is a second copy that drifts the moment the tag changes.
+- **Tags never reach the description.** The harvester stops at the first tag, whether it opens a line or trails the prose. So a member can carry both without the constraint leaking into what a reader sees.
+- **Put prose first, tags after.** They may share the line; the order is what keeps both readable.
 - A member with only a constraint needs no prose at all — `/** @minLength(1) */` is a complete comment when the name already says what the value is.
 
 ## Keep the rest out of the first sentence
 
-Elaboration is welcome — it simply must not be the opening sentence, because that is the part that travels.
+Elaborate as much as you like — it simply must not be the opening sentence, because that is the part that travels.
 
 - Put the reasoning **after a blank line**. It stays in the file and never reaches a generated surface.
 - **No long prose where the code already shows it.** A comment that narrates the next three lines is a maintenance cost with no reader.
@@ -72,7 +72,7 @@ Elaboration is welcome — it simply must not be the opening sentence, because t
 
 ## What each surface takes
 
-One comment, four readers. Knowing which reader takes what is what stops a description being written in the wrong place:
+One comment, four readers. Knowing which reader takes what stops you writing a description in the wrong place:
 
 | Surface | Takes | From |
 | --- | --- | --- |
@@ -81,9 +81,9 @@ One comment, four readers. Knowing which reader takes what is what stops a descr
 | **Generated client** | the doc comment on each generated function | whatever the interface document carried |
 | **Agent tools** | the tool description · each input field's description | whatever the interface document carried — so, the Command and **its members** |
 
-The last row is the one people miss. An agent calling a tool is shown the **input fields**, so a Command's member comments are what tell it *what to put in them*. A perfectly described operation with undescribed Command members is a tool an agent can find and cannot fill.
+Look again at the last row — it is the one people miss. An agent calling a tool is shown the **input fields**, so a Command's member comments are what tell it *what to put in them*. A perfectly described operation with undescribed Command members is a tool an agent can find and cannot fill.
 
-**The path is a state's comment, not an operation's.** A description reaches the interface document by riding the schema the validator generator builds — so what an operation says about itself in the document is what its **Command state** said, and each property description is what that member's comment said. A comment above the contract method still becomes the capability `intent`, and it is still the sentence someone reads in the source; it simply is not the one a caller sees in the document. **Write the Command and its members as if a stranger will read them, because that is exactly who does.**
+**The path is a state's comment, not an operation's.** A description reaches the interface document by riding the schema the validator generator builds. So what an operation says about itself in the document is what its **Command state** said. Each property description is what that member's comment said. A comment above the contract method still becomes the capability `intent`, and it is still the sentence someone reads in the source. It simply is not the one a caller sees in the document. **Write the Command and its members as if a stranger will read them, because that is exactly who does.**
 
 ## Per symbol — where the line goes and what it says
 
@@ -126,17 +126,17 @@ A blanket requirement would contradict the rule above it: forced to describe eve
 | every **error code** and **permission code** member | | |
 | every **Command member** — these become an agent's tool input fields | | |
 
-The required column is exactly the set something else has to choose from or fill in. The optional column is where a name already carries the meaning, and a sentence would only repeat it.
+Read the required column as exactly the set something else has to choose from or fill in. The optional column is where a name already carries the meaning, and a sentence would only repeat it.
 
-A missing description in the required set is a symbol an agent cannot select. A wrong one anywhere is worse — it will be acted on. Where the purpose is genuinely unclear from the code, **leave it blank and say so**, rather than writing something plausible.
+A missing description in the required set is a symbol an agent cannot select. A wrong one anywhere is worse — it will be acted on. **Leave it blank and say so** where the purpose is genuinely unclear from the code, rather than writing something plausible.
 
 ---
 
 # Rationale — the Comment That Stays
 
-The other half of the standard. An **intent** comment leaves the file; a **rationale** comment never does. It is written for one reader: whoever edits this code next.
+The other half of the standard. An **intent** comment leaves the file; a **rationale** comment never does. Write it for one reader: whoever edits this code next.
 
-Doc-comment syntax is harvested into published surfaces; a line comment is not — so **a rationale goes in a line comment**, and a note in a doc comment above a published declaration will be published whether or not that was intended.
+Doc-comment syntax is harvested into published surfaces; a line comment is not. **Put a rationale in a line comment** — a note in a doc comment above a published declaration will be published whether or not that was intended.
 
 ## When a line is worth it
 
@@ -154,7 +154,7 @@ State the **consequence**, not the observation: *"reordering these loses the loc
 
 ## Where it goes
 
-Immediately above the surprising thing, in the smallest scope that contains it — never collected in a file header, where it is read by everyone and applies to nobody.
+Put it immediately above the surprising thing, in the smallest scope that contains it — never collected in a file header, where it is read by everyone and applies to nobody.
 
 ## Always wrong
 
@@ -169,7 +169,7 @@ Immediately above the surprising thing, in the smallest scope that contains it �
 
 ## Maintenance, and the two promotions
 
-A rationale is **changed in the same edit as the line it explains, and deleted the moment its reason dies** — a stale *why* is a false statement in a place readers trust. A change that invalidates a comment and leaves it standing is an incomplete change.
+A rationale is **changed in the same edit as the line it explains, and deleted the moment its reason dies**. A stale *why* is a false statement in a place readers trust. A change that invalidates a comment and leaves it standing is an incomplete change.
 
 - A reason a **consumer** needs is not a rationale — promote it to the intent line, where they will actually see it.
 - A reason that **recurs** across files is one choice nobody recorded — write it once in the decision register and let the comments cite it.

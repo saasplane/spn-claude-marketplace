@@ -49,6 +49,12 @@ ABOUT = r'\b(the reader|one must|one should|the user is expected|it is recommend
 # RD.DOCS.043 — the measure. Second person is whole-word and case-insensitive. Longest form
 # first, or `your` claims the front of `yours` and the rest never matches. `yours` and
 # `yourselves` were missed until D60-A, where a swept sentence read as reaching nobody.
+# A sentence that reaches ONLY because a bare `… <prep> you` was appended to it satisfies
+# the counter and gives the reader nothing (RD.DOCS.046). Detection is exact: strip the
+# phrase and ask whether what remains still reaches. `The estate stands them up for you.`
+# is legitimate and cannot be told apart by pattern, which is why this is RULE, not BLOCK.
+BOLT = re.compile(r"(?:,\s*)?\s(?:for|to|on|with|around|before|beneath)\s+you\b\s*(?=[.!?;]|$)", re.I)
+
 YOU = re.compile(r"\b(?:you['’](?:re|ll|ve)|yourselves|yourself|yours|your|you)\b", re.I)
 # A row may MENTION the word as a term — *you* in italics, or in backticks — and that is not
 # warming. RD.DOCS.031 and RD.DOCS.043 both do.
@@ -63,11 +69,38 @@ AVG_SOFT, AVG_RULE, LONG, ROW_LONG, YOU_MIN_N, YOU_PER = 18, 24, 30, 25, 8, 12
 # `list` are absent. A negative imperative (*never write a live count*) opens with an adverb
 # rather than a verb and is not counted, which lowers the floor again.
 IMPERATIVE_VERBS = ('add|apply|ask|avoid|choose|cite|configure|convene|copy|create|declare|'
-                    'define|delete|edit|find|fix|follow|generate|give|install|keep|leave|load|'
+                    'define|delete|edit|find|fix|follow|generate|give|keep|leave|load|'
                     'look|make|open|pass|prefer|prove|put|read|regenerate|remove|resolve|run|'
                     'say|scaffold|see|send|set|skip|split|start|stop|take|treat|use|verify|'
-                    'wear|write')
-IMPERATIVE = re.compile(r'^[^A-Za-z]*(?:' + IMPERATIVE_VERBS + r')\b', re.I)
+                    'wear|write|pick|hold|derive|conflate|scatter|compose|mount|expect|assume|refuse|'
+                    'enable|purge|validate|authorize|perform|expose|convert|reuse|'
+                    'hoist|attach|throw|modify|exercise|stub|serve|invoke|reload|ensure|'
+                    'replace|exclude|deregister|unregister|retire|converge|begin|nest|consider|'
+                    'include|deploy|recreate|confirm|adopt|bind|populate|realize|aim|scan')
+# Many real imperatives open with a word that is also a common noun, so a closed list either
+# misses them or scores a noun subject as reaching. Neither is acceptable: missing them made a
+# sweep rewrite prose that was already an instruction, and scoring them would give false credit.
+# The discriminator is what FOLLOWS: an imperative takes an object straight away, while a noun
+# subject carries its own verb. "State the consequence" instructs; "State machines are declared"
+# does not.
+IMPERATIVE_AMBIGUOUS = (
+    'review|report|state|name|list|present|check|flag|draft|audit|record|number|register|'
+    'close|promote|group|branch|embed|plan|mark|design|order|process|test|log|link|reference|'
+    'access|address|comment|display|format|handle|label|model|place|question|release|request|'
+    'result|return|route|scope|search|section|service|source|stage|store|structure|support|'
+    'surface|target|trigger|type|value|version|view|watch|classify|restate|typecheck|'
+    'file|cache|match|batch|document|stack|build|return|point|join|seed|pin|let|split|'
+    'update|require|note|monitor|query|provision|install|export|sign')
+IMPERATIVE_OBJECT = (r'(?:the|this|that|these|those|each|every|any|all|a|an|your|its|their|it|'
+                     r'them|what|how|when|where|one|two|both)\b')
+IMPERATIVE_NEGATIVE = r"(?:never|always|do\s+not|don't|don\u2019t|avoid|prefer)\s+[a-z]+"
+IMPERATIVE_LABEL = r'(?:\*\*[^*\n]{1,48}\*\*\s*[:\u2014-]\s*)?'
+IMPERATIVE = re.compile(r'^[^A-Za-z]*' + IMPERATIVE_LABEL + r'[^A-Za-z]*'
+                        r'(?:(?:' + IMPERATIVE_VERBS + r')\b'
+                        r'|' + IMPERATIVE_NEGATIVE +
+                        r'|(?:' + IMPERATIVE_AMBIGUOUS + r')\s+' + IMPERATIVE_OBJECT
+                        + r'|(?:' + IMPERATIVE_AMBIGUOUS + r')\s*,\s*(?:and\s+)?(?:'
+                        + IMPERATIVE_VERBS + r')\b)', re.I)
 # MUST-grammar is uppercase by rule, so the match is case-sensitive: a lowercase *may* is
 # ordinary prose and excluding it would empty the denominator.
 NORMATIVE = re.compile(r'\b(?:MUST NOT|MUST|SHOULD NOT|SHOULD|MAY)\b')
@@ -217,7 +250,8 @@ def prose_of(text, is_html):
         t = re.sub(r'<(table|svg|pre|script|style|nav|h[1-6])\b.*?</\1>', ' ', t, flags=re.S | re.I)
         t = HTML_BLOCK_END.sub('\n\n', t)
         return _html.unescape(re.sub(r'<[^>]+>', ' ', t))
-    t = re.sub(r'<!--.*?-->', ' ', text, flags=re.S)
+    t = re.sub(r'\A---\r?\n.*?\r?\n---\r?\n', ' ', text, flags=re.S)
+    t = re.sub(r'<!--.*?-->', ' ', t, flags=re.S)
     t = re.sub(r'```.*?```', ' ', t, flags=re.S)
     lines = []
     for l in t.split('\n'):
@@ -309,6 +343,14 @@ def voice(prose, sents, kind='chapter'):
         eg = ' · '.join(f'"{opening(s)}" ({w})' for s, w in long[:3])
         out.append(('RULE', f'{len(long)} sentence(s) past thirty words — none may be '
                             f'(RD.DOCS.043): {eg} · split it, never shorten it'))
+    bolted = [s for s, _ in sents if BOLT.search(s)
+              and not (YOU.search(BOLT.sub('', s)) or IMPERATIVE.match(BOLT.sub('', s)))]
+    if bolted:
+        eg = ' · '.join(f'"{opening(s)}"' for s in bolted[:3])
+        out.append(('RULE', f'{len(bolted)} sentence(s) reach only by a tacked-on "… for you" '
+                            f'— RD.DOCS.046: the measure serves personalization, so a sentence '
+                            f'that reaches only by its last two words reached nobody: {eg} · '
+                            f'rewrite it to address the reader, or leave it under the share'))
     you = sum(len(YOU.findall(s)) for s, _ in sents)
     if n >= YOU_MIN_N and you == 0:
         out.append(('RULE', f'prose that never says *you* — {n} sentences with no second person '
@@ -493,7 +535,21 @@ def watched(path):
                 or '/artifacts/' in p or '/.spndevex/notes/' in p)
     if base in ('README.md', 'CONCEPT.md'):
         return True
-    return base.endswith('.md') and '/docs/' in p
+    if not base.endswith('.md'):
+        return False
+    if '/docs/' in p:
+        return True
+    # The foundation's provider set. Matched by its three domains rather than by a bare
+    # `providers/`, which is an ordinary folder name a consuming repo may use for its own code.
+    # A partner holds the plugins without the foundation, so this simply matches nothing there.
+    if any(d in p for d in ('/providers/apps/', '/providers/infra/', '/providers/devex/')):
+        return True
+    # The plugins' own instruction surface. An agent reads these every session and acts on them,
+    # so a passive instruction is a defect here in a way it is not in a narrative chapter. The
+    # scripts beside them are code, never corpus.
+    if '/plugins/' in p and any(f'/{d}/' in p for d in ('agents', 'skills', 'refs', 'commands')):
+        return True
+    return False
 
 
 def walk(roots):

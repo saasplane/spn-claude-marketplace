@@ -5,7 +5,7 @@ description: The contract-first build loop - the order work is done in, what eac
 
 # develop — contract first, every time
 
-**The contract is written before the thing that implements it.** Not as ceremony: the contract is what generates the validators, the specification, the client, and the tool definitions, so writing it first is what makes those derivations possible at all. Code written before its contract has to be retrofitted into one, and the retrofit is where shapes go wrong.
+**Write the contract before the thing that implements it.** Not as ceremony: the contract is what generates the validators, the specification, the client, and the tool definitions, so writing it first is what makes those derivations possible at all. Code written before its contract has to be retrofitted into one, and the retrofit is where shapes go wrong.
 
 ## The loop
 
@@ -36,7 +36,7 @@ Steps 1–3 are ordered by dependency and cannot be reordered. Steps 4–6 can i
 
 **Regenerate before committing**, and before restarting anything that loads the code. A repo whose generated artifacts disagree with their source fails at runtime rather than at review, which is the most expensive place to find it.
 
-If a generated file needs to be different, the generator or its source is what changes. An edited generated file is overwritten by the next regeneration.
+Edit the generator or its source when a generated file needs to be different. An edited generated file is overwritten by the next regeneration.
 
 ## The lines that hold
 
@@ -46,7 +46,7 @@ If a generated file needs to be different, the generator or its source is what c
 - **Read the interface before using it.** Exact values, exact parameter order, optional versus required, nullable versus absent. Never invent an API; if unsure a symbol exists, look it up in the symbol index or the source.
 - **Match the code beside you.** New code is written by pattern-matching its neighbors — same layering, same ordering, same naming, same comment density. A one-off that reads better in isolation reads worse in the codebase.
 - **Name things so they need no explanation.** A name that requires a comment saying *what* it is, is the wrong name. Rename before annotating; the only comments worth keeping state a constraint the code cannot show.
-- **A doc comment on a published declaration is an interface.** It is harvested into the symbol index, the interface document, the API client and the tool definitions an agent calls — one comment, several surfaces, none written by hand. The full rules are in this plugin's `refs/intent.md`; the four that matter every day: **one sentence** as the opening line, **written once on the contract** so implementations and transport adapters inherit rather than restate, **never naming what the package does not depend on** (no table names, no codes from other packages), and **constraints as tags** in the same comment, never re-described in prose.
+- **A doc comment on a published declaration is an interface.** It is harvested into the symbol index, the interface document, the API client and the tool definitions an agent calls — one comment, several surfaces, none written by hand. The full rules are in this plugin's `refs/intent.md`. Four of them matter every day. Write **one sentence** as the opening line. Write it **once on the contract**, so implementations and transport adapters inherit rather than restate. **Never name what the package does not depend on** — no table names, no codes from other packages. And write **constraints as tags** in the same comment, never re-described in prose.
 
 ## Lenses
 
@@ -54,4 +54,4 @@ Wear per layer: `refs/lenses/server-dev.md` on contract, service, and entry; `re
 
 ## Finish
 
-A change is not done when it compiles. It is done when the derived artifacts are fresh, the behavior is proven at a tier that means something, and the doc seat the change touched says what is now true. Hand to the test and verify skills for the proving.
+A change is not done when it compiles. It is done when three things hold. The derived artifacts are fresh, the behavior is proven at a tier that means something, and the doc seat the change touched says what is now true. Hand to the test and verify skills for the proving.

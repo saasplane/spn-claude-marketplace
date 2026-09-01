@@ -5,7 +5,7 @@ description: Reviewing an estate plan (spnutils infra <layer> plan [--cloud]) be
 
 # plan-review — the plan is the review
 
-**Review plans from the checkout — unpublished changes must plan; merge publishes; an apply fetches the published version and applies that, never a checkout.** The plan is therefore the one artifact a human judges. Hold it to both lists below and give a named verdict.
+**Review plans from the checkout — unpublished changes must plan; merge publishes; an apply fetches the published version and applies that, never a checkout.** Treat the plan, therefore, as the one artifact a human judges. Hold it to both lists below and give a named verdict.
 
 ## What a plan MUST name
 
@@ -26,11 +26,11 @@ description: Reviewing an estate plan (spnutils infra <layer> plan [--cloud]) be
 
 ## Refusals are the gate working
 
-A cloud plan refusing a **path-resolved declaration by name**, or a **missing layer below by name**, is correct behavior — the fix is to publish and pin, or to stand the layer below, never to work around the refusal.
+A cloud plan refusing a **path-resolved declaration by name**, or a **missing layer below by name**, is correct behavior. Fix it by publishing and pinning, or by standing the layer below — never by working around the refusal.
 
 ## The verdict
 
-Close with one of two forms, each row citing the plan line and the rule:
+Use one of two closing forms, each row citing the plan line and the rule:
 
 ```text
 APPROVE — every resource composed and tagged; scope exact; resolution pinned per layer.

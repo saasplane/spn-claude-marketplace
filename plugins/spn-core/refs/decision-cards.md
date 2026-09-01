@@ -3,16 +3,16 @@
 **The book owns this grammar.** It is stated in the foundation's
 `docs/03-capabilities/05-docs/05-artifacts.md`, under *The approach document* → `Open`, and
 several of its clauses are **MUST**. This file exists because the plugins ship without the
-book beside them — it restates the grammar for an agent that cannot open that chapter, and it
+book beside them. It restates the grammar for an agent that cannot open that chapter, and it
 must be kept in step with it. **When the two disagree, the book wins.**
 
 ## It governs conversation, not just documents
 
 The chapter is explicit, and this is the clause most often missed:
 
-> *Open items put to a person in chat — a status reply, an answer to "what's left?", a
-> pending-work report at any moment — follow this layout exactly as a document's Open section
-> does.* **MUST**
+> *Open items put to a person in chat follow this layout exactly as a document's Open section
+> does — **MUST**. That covers a status reply, an answer to "what's left?", and a pending-work
+> report at any moment.*
 
 **These are one question, however it is phrased.** *"open items"* — the book's own wording —
 · *"what's left?"* · *"open questions"* · *"open cards"* · *"what's open"* · *"what's pending"*
@@ -55,9 +55,9 @@ twenty, at the cost of a second name for one concept"* is.
 ## Self-contained across sittings
 
 A card assumes **no conversation context and no memory of the session that wrote it** — people
-decide days later. Each one carries: what led to the question (the change, the finding, the
-realization that surfaced it), what is true today and what happens if nothing is decided, and
-where the decision lands once made — the row, the chapter, the repo.
+decide days later. Each one carries what led to the question — the change, the finding, the
+realization that surfaced it. State what is true today, and what happens if nothing is
+decided. Name where the decision lands once made: the row, the chapter, the repo.
 
 Leaving that to conversation history is leaving it out.
 

@@ -13,7 +13,7 @@ Planning is one verb (`DEVEX_PLAN`) and it lives only here. What changes by node
 material*, never the verb, so resolve the node and load its layers before applying a single rule:
 
 1. **Find the node's law** — the nearest `sprepo.json` above the file names the **world**
-   (`FOUNDATION` · `APPS` · `INFRA`) and the **stack claim**; the node's own manifest
+   (`FOUNDATION` · `APPS` · `INFRA`) and the **stack claim**. The node's own manifest
    (`spkind.json`, or `spinfrapkg.json` + `src/spestate.json`) names the node.
 2. **Load, in order, whichever exist:**
 
@@ -131,9 +131,9 @@ carries the register in full; load it before writing.
 
 **Source of truth:** the foundation book's artifacts standard (`docs/03-capabilities/05-docs/05-artifacts.md`, "The approach document" section). This section digests it for use at the moment of writing and adds no rule of its own; where the two disagree, the book wins and this file is regenerated.
 
-When a design is big enough that someone will read it more than once — a new artifact, a contract that other teams build against, a standard the tooling will enforce — the plan becomes a document with a fixed shape. **Why → What → How → Open → Deferred.** Nothing else, and in that order.
+When a design is big enough that someone will read it more than once, the plan becomes a document with a fixed shape. Such a design is a new artifact, a contract that other teams build against, or a standard the tooling will enforce. **Why → What → How → Open → Deferred.** Nothing else, and in that order.
 
-**Open with a Terms block when the document needs one.** A design that coins or leans on concepts a reader may not already hold — a *lens*, a *panel*, a name the book has not settled yet — defines them in a small block **before Why**: one line per term, five to eight terms at most, so the reader has the vocabulary before the argument. A document that introduces nothing new skips the block entirely — it exists to give context, never to pad.
+**Open with a Terms block when the document needs one.** A design sometimes coins or leans on concepts a reader may not already hold — a *lens*, a *panel*, a name the book has not settled yet. Define them in a small block **before Why**: one line per term, five to eight terms at most. The reader then has the vocabulary before the argument. A document that introduces nothing new skips the block entirely — it exists to give context, never to pad.
 
 **Route before you write — an argument or an expansion?** The pocket holds both, the suffix names which, and the set is closed (decisions RD.DOCS.039 · RD.DOCS.040). One question decides it: **were options weighed and one chosen?**
 
@@ -142,16 +142,16 @@ When a design is big enough that someone will read it more than once — a new a
 | **yes** — a design was argued, a cost accepted | approach | `artifacts/approaches/<topic>-approach.html` | `Terms? → Why → What → How → Open → Deferred` |
 | **no** — a concept section expanded so it can be read | overview | `artifacts/overviews/<section>-overview.html` | the section's own shape, at reading depth |
 
-A document with no options, no recommendation and no accepted cost is an **overview** whichever folder holds it, and filing it as an argument costs a reader the signal that says whether anything is still open.
+A document with no options, no recommendation and no accepted cost is an **overview** whichever folder holds it. Filing it as an argument costs a reader the signal that says whether anything is still open.
 
 Two rules separate them once you are writing:
 
 - **The outline is fixed for an argument and borrowed for an explanation.** An approach takes the sections below, always, in order. An overview takes **the headings of what it expands, in that thing's order**, and invents none the source does not have. It carries **no `Open` and no `Deferred`** — those are an argument's organs, and a question found while writing one is an approach waiting to be offered, or a register row.
-- **Depth follows from where else the detail lives.** An overview compresses everything, because the source holds the depth. An approach compresses the **mechanics** — concepts and boundaries, never an inventory of rules the owning chapters carry — and expands the **reasoning**, because a register row records what was decided and never the options that lost.
+- **Depth follows from where else the detail lives.** An overview compresses everything, because the source holds the depth. An approach compresses the **mechanics** and expands the **reasoning**. The mechanics are concepts and boundaries, never an inventory of rules the owning chapters carry. The reasoning expands because a register row records what was decided and never the options that lost.
 
 `concept-overview.html` is the concept's readable HTML face, one per repo; a `<section>-overview.html` expands one section and the section names it back. Everything below in this section governs the **approach** document.
 
-It is **one self-contained HTML page named `<topic>-approach.html`** — one file per topic, replaced in place as it iterates, never a second copy in another format. HTML because these documents carry tables, samples and comparisons that a reader scans rather than reads, and because a single file travels: it opens anywhere, needs nothing installed, and cannot drift from a companion version of itself.
+It is **one self-contained HTML page named `<topic>-approach.html`** — one file per topic, replaced in place as it iterates, never a second copy in another format. HTML because these documents carry tables, samples and comparisons that a reader scans rather than reads. HTML also because a single file travels: it opens anywhere, needs nothing installed, and cannot drift from a companion version of itself.
 
 | Section | Answers | Written as |
 | --- | --- | --- |
@@ -184,7 +184,7 @@ Planning lands as rows and terms in the owning node's seats, so **resolve the no
 
 ### Draw the shape in What and How
 
-Where a section's subject **is** a shape — a boundary, a nesting set, a pipeline, a lifecycle, a set of arrangements — draw it; `What` and `How` are where those subjects live. Skip it where the subject is a judgment rather than a structure. Three rules: **draw the argument, not the chapter** (the owning chapter's diagrams are reference; yours makes a claim visible — a restatement is a diagram that could be copied unchanged); **inline SVG using the page's own color variables**, so it works in light and dark and the page still travels as one file; and **never draw what does not exist** — every box is something the book names, because a shape invented to balance a picture becomes a claim the reader believes.
+Where a section's subject **is** a shape — a boundary, a nesting set, a pipeline, a lifecycle, a set of arrangements — draw it; `What` and `How` are where those subjects live. Skip it where the subject is a judgment rather than a structure. Three rules. First, **draw the argument, not the chapter**: the owning chapter's diagrams are reference, and yours makes a claim visible. A restatement is a diagram that could be copied unchanged. Second, **inline SVG using the page's own color variables**, so it works in light and dark and the page still travels as one file. Third, **never draw what does not exist** — every box is something the book names, because a shape invented to balance a picture becomes a claim the reader believes.
 
 **Compose from the grammar, never by eye** — four primitives on one grid, so every diagram in the corpus reads as one system:
 
@@ -228,22 +228,22 @@ Preview     when the decision is a shape — an outline, a file tree, a sample r
             fragment — a compact preview of the recommendation, inline in the card
 ```
 
-- **Open is the exception to the document's high-level altitude.** The body compresses because its detail lives in owning chapters; an open item's detail lives nowhere else, and a decision hangs on it — a card carries whatever depth the decision needs, and a reader who must leave the card to decide was handed an incomplete one.
+- **Open is the exception to the document's high-level altitude.** The body compresses because its detail lives in owning chapters. An open item's detail lives nowhere else, and a decision hangs on it. So a card carries whatever depth the decision needs, and a reader who must leave the card to decide was handed an incomplete one.
 - **Options are mandatory, and so is a recommendation.** A card with no options is a report, not a decision; a card with options but no recommendation makes the reader do the analysis twice. Two options is the normal case — *do it this way* versus *leave it*, with what each costs.
-- **Show, don't summarize, when the decision is a shape.** If judging the options requires seeing what one would produce — an outline, a tree, a table layout, a sample row — the card carries a compact preview of the recommendation (and of a rival, where the difference between them is the point). A reviewer who has to ask *"show me what A looks like"* was given a card that was not decidable, and the iteration that follows is the cost of the missing preview.
+- **Show, don't summarize, when the decision is a shape.** Judging the options sometimes requires seeing what one would produce — an outline, a tree, a table layout, a sample row. Then the card carries a compact preview of the recommendation, and of a rival where the difference between them is the point. A reviewer who has to ask *"show me what A looks like"* was given a card that was not decidable. The iteration that follows is the cost of the missing preview.
 - **"Do nothing" is a real option** and MUST appear whenever it is genuinely viable, with its cost stated. Half the time it wins.
 - **Trade-offs are concrete or absent.** *"Simpler"* is not a trade-off; *"one file to change instead of twenty, at the cost of a second name for one concept"* is.
 - **The recommendation carries its reason on the same line.** A reader agreeing with the reason can approve without reading further; a reader disagreeing knows exactly where they diverge.
 - **Length is not the variable.** A long description does not make a decision easier and a short one does not make it faster — *description, why, options, recommendation* is what does. Write each part as short as it can be while staying decidable.
 
 - **More than one item → numbered, and stable within the exchange.** A multi-item sheet closes by showing how to answer by number — *"1A, 2 confirm, 5–9 yes"* — so a developer settles the whole sheet in one line. An answer that cannot be given by number is a sheet that was not numbered.
-- **A card is self-contained across sittings.** Developers decide days after the work that raised the question; a card assumes no conversation context and no memory of the session that wrote it. Carry what deciding cold needs: the provenance (what raised it, in a line or two), the current state (what is true today, and the cost of not deciding), and where the decision lands once made. Leaving the card for conversation history is leaving the card.
+- **A card is self-contained across sittings.** Developers decide days after the work that raised the question; a card assumes no conversation context and no memory of the session that wrote it. Carry what deciding cold needs. That is the provenance (what raised it, in a line or two) and the current state (what is true today, and the cost of not deciding). Name where the decision lands once made. Leaving the card for conversation history is leaving the card.
 
-The same layout governs **how pending work is reported back to a developer at any time** — in an approach document, a status summary, a chat reply, or an answer to *"what's left?"* A list of pending items without options is work handed back rather than a decision offered.
+The same layout governs **how pending work is reported back to a developer at any time**. That covers an approach document, a status summary, a chat reply, or an answer to *"what's left?"* A list of pending items without options is work handed back rather than a decision offered.
 
 ### Open blocks; Deferred does not
 
-The distinction is what lets a design finish. **A question is `Open` while answering it could still change the shape.** Once the answer is understood and the choice is simply *not yet* — the cost is known, the design does not depend on it — it moves to `Deferred` and stops holding the document up.
+The distinction is what lets a design finish. **A question is `Open` while answering it could still change the shape.** Once the answer is understood and the choice is simply *not yet*, the item moves to `Deferred` and stops holding the document up. By then the cost is known and the design does not depend on it.
 
 Moving something to `Deferred` is a decision and is written as one: *why not now*, and *what would bring it back*. A deferred item with neither is only a backlog entry, and will be re-litigated by whoever reads it next.
 
@@ -267,18 +267,18 @@ The document is the working surface, not a record of the work:
 
 A document still carrying **open** questions lives with the work, not in the artifacts pocket. Deferred items travel with it, and are the first thing the next person reads when the topic comes back.
 
-**The document closes with a footer naming its sources** — the chapters and register rows it reasons over — **and the iteration contract**, so a future session can reopen and continue it: new questions land as Open cards, resolutions fold in, the status chip follows the shape.
+**The document closes with a footer naming its sources** — the chapters and register rows it reasons over — **and the iteration contract**. A future session can then reopen and continue it: new questions land as Open cards, resolutions fold in, the status chip follows the shape.
 
-**The document is the only artifact the design produces.** Not a summary alongside it, not a second copy in another format, not a companion note — those drift, and a reader who finds the stale one has no way to tell. When a rule needs to be *applied* rather than understood, its enforceable form belongs where the work happens: a skill or a reference file the agent already loads. The approach document explains why that rule exists; it never becomes a second place to look it up.
+**The document is the only artifact the design produces.** Not a summary alongside it, not a second copy in another format, not a companion note. Those drift, and a reader who finds the stale one has no way to tell. When a rule needs to be *applied* rather than understood, its enforceable form belongs where the work happens: a skill or a reference file the agent already loads. The approach document explains why that rule exists; it never becomes a second place to look it up.
 
 ## Lenses
 
-Wear `refs/lenses/architect.md` and `refs/lenses/product.md` while drafting — decomposition and data model from one, consumer outcomes and vocabulary from the other. **Before any 🔮 row lands in the owning docs**, convene the `spn-panel` subagent once per lens with `architect`, `lead`, `product`, `trust`, and `qa` over the draft; fold findings in, then land the rows.
+Wear `refs/lenses/architect.md` and `refs/lenses/product.md` while drafting — decomposition and data model from one, consumer outcomes and vocabulary from the other. **Before any 🔮 row lands in the owning docs**, convene the `spn-panel` subagent once per lens with `architect`, `lead`, `product`, `trust`, and `qa` over the draft. Fold findings in, then land the rows.
 
 **Wearing a lens is not reviewing through it.** The context that drafted a design always agrees with it. So `architect` is convened over the result, not only worn while writing it. A design is reviewed by a reader that did not write it, and that reader is the one who can still block. `architect` blocks on a new mechanism reachable from more than one module. The block clears when a decision entry names what it was weighed against.
 
 ## Report
 
-The design, in this order: **the altitude, the highest document and the lowest shared package**, then the classification, what already covers part of it, the behaviors, the contract sketch, what changes per layer, the failure cases, and anything that needs a decision recorded. The first three are paths, and a report that omits them hands back an unclassified design. Close with what you are **unsure** about — an unstated assumption is the thing that gets discovered after the code is written.
+The design, in this order: **the altitude, the highest document and the lowest shared package**. Then the classification, what already covers part of it, the behaviors, and the contract sketch. Then what changes per layer, the failure cases, and anything that needs a decision recorded. The first three are paths, and a report that omits them hands back an unclassified design. Close with what you are **unsure** about — an unstated assumption is the thing that gets discovered after the code is written.
 
 Then hand to the stack's scaffolding skill, which supplies the commands.

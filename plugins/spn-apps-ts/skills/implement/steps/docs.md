@@ -2,13 +2,13 @@
 
 Docs are the contract; code is the implementation; tests are the proof. The change is not done until the owning module's doc set reflects it — and most of that happens **during** the earlier steps, not here. This step is the closing sweep: flip statuses, verify nothing was skipped.
 
-**Before writing behavior rows or dictionary terms**, apply the **spn-core** plugin's `refs/doc-sets.md`: it carries the node grammar in full, and the node's declared kind fixes its consumer — which in turn fixes the actor voice, how areas group, and which test tier proves a row. For a `MODULE_SERVER` the consumer is the composing app — rows read *"a composing app can…"*, areas are named for capability, and proof is contract-tier with the id in the test title.
+**Before writing behavior rows or dictionary terms**, apply the **spn-core** plugin's `refs/doc-sets.md`. It carries the node grammar in full, and the node's declared kind fixes its consumer. That consumer in turn fixes the actor voice, how areas group, and which test tier proves a row. For a `MODULE_SERVER` the consumer is the composing app. Rows read *"a composing app can…"*, areas are named for capability, and proof is contract-tier with the id in the test title.
 
-**The seats are folders, numbered, at every altitude** (foundation decision RD.DOCS.008): `docs/01-purpose/` · `docs/02-behaviors/` · `docs/03-capabilities/` · `docs/04-guides/`, each opening with the `README.md` that is its face, plus the unnumbered pockets `docs/registers/` and `docs/artifacts/`. A seat is absent only where the node cannot answer its question at all — a generated API client has no `02-behaviors/`, an app-owned module has no `04-guides/`. Never write into a `docs/capabilities.md` or a `docs/guides/getting-started.md` — if you find one, it is drift; hand it to the `plan` skill in its `docs` mode.
+**The seats are folders, numbered, at every altitude** (foundation decision RD.DOCS.008): `docs/01-purpose/` · `docs/02-behaviors/` · `docs/03-capabilities/` · `docs/04-guides/`. Each opens with the `README.md` that is its face, and the unnumbered pockets are `docs/registers/` and `docs/artifacts/`. A seat is absent only where the node cannot answer its question at all — a generated API client has no `02-behaviors/`, an app-owned module has no `04-guides/`. Never write into a `docs/capabilities.md` or a `docs/guides/getting-started.md` — if you find one, it is drift; hand it to the `plan` skill in its `docs` mode.
 
 ## Writing a seat from scratch
 
-The tables below close a *change*. Writing a seat that does not exist yet is a different job, and it is where doc sets go wrong — the shape gets copied and the substance does not.
+Use the tables below to close a *change*. Writing a seat that does not exist yet is a different job, and it is where doc sets go wrong — the shape gets copied and the substance does not.
 
 **Copy a worked node rather than re-deriving.** Open one whose seats are complete and follow it exactly: the metadata block, the face's shape, the depth of an area file. Re-deriving the format from the standard produces something that passes a reading and fails a diff.
 
@@ -27,14 +27,14 @@ A realization detail in a behaviors area file is a **defect**, not a stylistic s
 
 Its path joined by `-`, flat inside the seat, **never numbered**: `contract/` → `contract.md`, `ui/pages/` → `ui-pages.md`, `ui/components/auth/` → `ui-components-auth.md`. Underscore-prefixed folders (`_shadcn`, `_internal`) are private and earn no mirror. Which folders are mirrored is decided by the node's **kind**, not by preference.
 
-Each mirror explains its symbols **by role**: a service method as pseudologic — the guard, the order, what it refuses; a contract state by its boundary and relations, **never its attribute list**; a component by its capability, primary props and pseudo-logic; a hook by the seam it owns; a route by what it exposes and returns. Pseudologic borrows the vocabulary of what the node depends on, so the chain reads foundation standard → support capability → module capability.
+Each mirror explains its symbols **by role**. Explain a service method as pseudologic — the guard, the order, what it refuses. Explain a contract state by its boundary and relations, **never its attribute list**. Explain a component by its capability, primary props and pseudo-logic; a hook by the seam it owns; a route by what it exposes and returns. Pseudologic borrows the vocabulary of what the node depends on, so the chain reads foundation standard → support capability → module capability.
 
 ### The seam entry — six parts, the last two load-bearing
 
 `Guarantee` · `Placement` · `From context` · `Does not do` · **`The phrase`** · **`Proven by`**
 
 - **A refusal is a form.** Where a node departs from a seam's published phrase, name the phrase it is **not** using and why. These are often the most useful entries in a mirror.
-- **`Proven by` names a real test path you have opened, or says plainly that none exists.** Never a plausible-looking one. Partial proof is written as partial — *what* runs and *what* does not. This single rule is what earns the format; without it the other five are decoration.
+- **`Proven by` names a real test path you have opened, or says plainly that none exists.** Never a plausible-looking one. Write partial proof as partial — *what* runs and *what* does not. This single rule is what earns the format; without it the other five are decoration.
 
 ## Re-auditing a seat you did not write
 
@@ -86,7 +86,7 @@ Rules:
 
 ## Env documentation
 
-A new module env variable (`{CODE}_{MOD}_*`) is documented where it lives: the module's `docs/03-capabilities/data-model.md` env terms (depth in `docs/04-guides/README.md`), plus the app's `envs/local.env` under the module's banner comment (committed env files carry **no secret values** — secrets appear empty with a required-in-shell annotation). Keep the env file's header key list in sync with what migrations actually read.
+A new module env variable (`{CODE}_{MOD}_*`) is documented where it lives: the module's `docs/03-capabilities/data-model.md` env terms (depth in `docs/04-guides/README.md`). It is also documented in the app's `envs/local.env`, under the module's banner comment. Committed env files carry **no secret values** — secrets appear empty with a required-in-shell annotation. Keep the env file's header key list in sync with what migrations actually read.
 
 ## Status honesty
 
@@ -94,4 +94,4 @@ Anything the docs claim must match what runs: ✅ implemented = running reality,
 
 ## Contract-visible changes
 
-If the public contract surface changed, the generated artifacts already carry the truth (validators, OpenAPI, API client) — the contract-surface rows in `docs/03-capabilities/` are the human projection of the same change; update them in the same PR (the version-coupling rule: the spec changes in the same PR as the API it describes). **Do not hand-write a sample of the new call anywhere** (foundation decision RD.DOCS.011): the generated client and the contract tests are the worked example, and a prose copy of a payload is stale the first time a field moves.
+If the public contract surface changed, the generated artifacts already carry the truth (validators, OpenAPI, API client). The contract-surface rows in `docs/03-capabilities/` are the human projection of the same change. Update them in the same PR — the version-coupling rule: the spec changes in the same PR as the API it describes. **Do not hand-write a sample of the new call anywhere** (foundation decision RD.DOCS.011). The generated client and the contract tests are the worked example, and a prose copy of a payload is stale the first time a field moves.

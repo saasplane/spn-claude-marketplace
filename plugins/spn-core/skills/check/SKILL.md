@@ -53,6 +53,6 @@ Lead with the verdict, then the evidence, then the gaps:
 | **not proven** | searched the deciding layers, found nothing. Say where you searched |
 | **contradicted** | the code does something different from the claim — the most valuable outcome, so state it plainly |
 
-Cite as `path:line` for every load-bearing piece of evidence, quote the few lines that carry the fact, and close with **what you did not check** and what would settle it — frequently "running the suite", which is `verify`'s job, not this one.
+Cite as `path:line` for every load-bearing piece of evidence, and quote the few lines that carry the fact. Close with **what you did not check** and what would settle it — frequently "running the suite", which is `verify`'s job, not this one.
 
 Never soften a *contradicted* into a *partial*. A claim that turns out to be false is the finding the developer most needs.

@@ -6,9 +6,9 @@
 
 ## What it checks
 
-- **Every resource is declared once, in a manifest.** A logical resource lives in an estate node's `spestate.json` declaration (organization or platform) or the platform declaration's `apps[]` row; local containers and cloud resources are two realizations of the same declaration. A resource that exists only in a tool invocation or a hand-run command is a defect.
-- **Nothing is named by hand.** Every name, address, and identifier derives from the declared variables and composition rules; a hand-typed value that could be derived is already wrong or about to be.
-- **The change runs locally first.** A full platform runs on a developer's machine — the same manifests, not a mock; a capability that cannot come up under `infra` is not done.
+- **Every resource is declared once, in a manifest.** Declare a logical resource in an estate node's `spestate.json` (organization or platform) or the platform declaration's `apps[]` row; local containers and cloud resources are two realizations of the same declaration. A resource that exists only in a tool invocation or a hand-run command is a defect.
+- **Nothing is named by hand.** Derive every name, address, and identifier from the declared variables and composition rules; a hand-typed value that could be derived is already wrong or about to be.
+- **The change runs locally first.** Run a full platform on a developer's machine — the same manifests, not a mock; a capability that cannot come up under `infra` is not done.
 - **Configuration follows the config plane**: logical keys per namespace and app, local env files and cloud paths as two realizations of one list — never a value pasted into code.
 - **Promotion is the branch map's.** Where a change deploys is manifest data (`branchMap`), one rung at a time, by pull request — never a manual push to a setup.
 - **Destructive operations are named and gated** — teardown, reset, and migration steps confirm before they mutate and report what they did.

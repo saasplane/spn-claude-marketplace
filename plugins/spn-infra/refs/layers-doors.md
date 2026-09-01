@@ -1,10 +1,10 @@
 # Layers and doors — the estate verb card
 
-**Source of truth:** the foundation's `CONCEPT.md` (DevEx Utils · Estate Blueprints). This card digests; the book governs. The realization is `spnutils infra …`.
+**Source of truth:** the foundation's `CONCEPT.md` (DevEx Utils · Estate Blueprints). Use this card as the digest; the book governs. The realization is `spnutils infra …`.
 
 ## Layer nouns × verbs
 
-The layers are nouns; each takes `plan · up · down · status`. They come up in order, and a lower layer missing is the usual reason a higher one will not start.
+The layers are nouns; each takes `plan · up · down · status`. Start them in order, and a lower layer missing is the usual reason a higher one will not start.
 
 | Noun | Verbs | Locally | In the cloud |
 | --- | --- | --- | --- |
@@ -29,7 +29,7 @@ Beside the layers: `logs [service]` · `show` (resolution per layer, incl. **PIN
 ## Local is the default; cloud is asked for by name
 
 - `--cloud` is never implicit — the target that provisions real accounts must be named; mutation adds `--approve`.
-- Locally an organization's accounts and a platform's guardrails have **no counterpart — absent, not stubbed**; what local realizes fully is everything stateful: same engines, same versions, same schemas, roles and key list.
+- Locally an organization's accounts and a platform's guardrails have **no counterpart — absent, not stubbed**. What local realizes fully is everything stateful: same engines, same versions, same schemas, roles and key list.
 - Nothing downstream of a declaration learns which target produced it.
 
 ## The refusals — every one is a gate, not a bug

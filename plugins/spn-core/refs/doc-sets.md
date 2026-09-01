@@ -1,6 +1,6 @@
 # Doc sets — the shape every node carries
 
-**Source of truth:** the corpus standard (`03-capabilities/05-docs/`), with the concept's Node Docs section (`CONCEPT.md`, at the repository root) as the standing one-page view. This file digests those rules and adds none of its own. **The book governs**; the concept holds the last agreed idea and is updated on request, so where the three disagree the standard wins and this file is regenerated.
+**Source of truth:** the corpus standard (`03-capabilities/05-docs/`), with the concept's Node Docs section (`CONCEPT.md`, at the repository root) as the standing one-page view. Read this file as a digest of those rules, adding none of its own. **The book governs**; the concept holds the last agreed idea and is updated on request, so where the three disagree the standard wins and this file is regenerated.
 
 **Every node carries the same shape at every kind** — four seats and two pockets. Only the capabilities seat has a file set that varies, and it varies because it is *derived* rather than chosen.
 
@@ -35,7 +35,7 @@ Documentation is not one place. Resolve which surface a change belongs to **befo
 - **It links only to the repo's `artifacts/` and to external sources — nothing else.** A concept sits above what realizes it, so it never links to a seat, a chapter, or a `README`. Cite a decision by id, never by link.
 - **Sections carry status inline** — `DRAFT` · `AGREED` · `REALIZED`. **`FRAME` reads only `AGREED` sections**, which is the gate that stops undecided scope reaching the seats.
 - It is produced by the **`ideate` skill** and never deleted once realized: the concept stays the standing one-page view, and the seats hold the depth. Ideating a node lands as sections of its repo's concept, never as a file at the node.
-- **Scaffolding a node never creates a concept.** When a package, app or module is added, ask whether the repo's concept needs a section or an edited boundary — never offer the node a concept of its own. This is the most likely wrong turn on a growing repo, because the node feels like the thing being decided.
+- **Scaffolding a node never creates a concept.** Ask whether the repo's concept needs a section or an edited boundary when a package, app or module is added — never offer the node a concept of its own. This is the most likely wrong turn on a growing repo, because the node feels like the thing being decided.
 
 ## The shape
 
@@ -51,13 +51,13 @@ Documentation is not one place. Resolve which surface a change belongs to **befo
 ```
 
 - **Seats are numbered** because they are read in order; **pockets are never numbered** because they are consulted.
-- **Every folder opens with `README.md`** — never `INDEX.md`. A seat's README is its **face**: the complete distilled answer plus the map of what sits below it, never a bare table of contents.
+- **Open every folder with `README.md`** — never `INDEX.md`. A seat's README is its **face**: the complete distilled answer plus the map of what sits below it, never a bare table of contents.
 - **A seat holding nothing but its face is the compact state, not a defect.**
 - **Pockets are earned**: `registers/` on governing nodes only, `artifacts/` only where the node authors something.
 
 ## A seat is never absent
 
-Where a node has nothing of its own to say in a seat, the face **states what the seat would hold and cites the node that owns the answer** — and that face is *generated*, because a citation is derivable (decision RD.DOCS.017).
+Where a node has nothing of its own to say in a seat, the face **states what the seat would hold**. It also **cites the node that owns the answer**. And that face is *generated*, because a citation is derivable (decision RD.DOCS.017).
 
 | Kind | Seat | Cites |
 | --- | --- | --- |
@@ -82,9 +82,9 @@ A missing seat and an empty seat read identically from outside. Making the seat 
 | `APP_SERVER` · `APP_WEB` | `composition` |
 | `CLIENT_API` | none — a generated surface, documented by its service |
 
-- **Named for the group it governs**, path joined by `-`, flat inside the seat, never numbered — and it is the same key the symbol index carries, so a symbol resolves to the document that explains it.
+- **Named for the group it governs**, path joined by `-`, flat inside the seat, never numbered. That name is the same key the symbol index carries, so a symbol resolves to the document that explains it.
 - **Depth is earned by size and named by the code**: `app.md` becomes `app-services.md` only when it outgrows a section *and* `app/services/` exists. A document never splits by class, entity or feature.
-- **Excluded by construction**: a private segment (anything under a `_`-prefixed path), a generated folder, build output, and `migrations/` — whose useful content is seeding and ordering, which is vocabulary and belongs to the data model (decision RD.DOCS.018).
+- **Excluded by construction**: a private segment (anything under a `_`-prefixed path), a generated folder, build output, and `migrations/`. A migration's useful content is seeding and ordering, which is vocabulary and belongs to the data model (decision RD.DOCS.018).
 - **The face and `data-model.md` are always present**, at every kind, including where the rule produces no capability documents at all.
 
 Which makes the seat checkable in both directions:
@@ -108,9 +108,9 @@ Which makes the seat checkable in both directions:
 | `registers/` | the node's own rules and decisions | lookup material, consulted rather than read start to end |
 | `artifacts/` | `schema.sql`, reports, approach documents | authored source of truth. Nested folders allowed here and nowhere else; sub-folders carry no README |
 
-**A code-mirror capability page is the spec its code realizes** (decision RD.DOCS.034). The per-group page mirroring one published source group — `cache.md`, `contract.md`, `app.md`, `entry.md`, `ui-*.md` and siblings — **binds two parties**: the implementation, which is what a `Guarantee` row states, and the consumer, which is what `Placement` and `Does not do` state. **Both directions are normative.** The test, one statement at a time: **does it bind someone — the implementation or the consumer?** If yes it takes `MUST`/`MUST NOT`/`MAY`; if it binds nobody it is commentary — advice, rationale, a trade-off note — and stays prose. **A capability page is normatively dense by design**, and the seam table's sections are the spec's shape, unchanged.
+**A code-mirror capability page is the spec its code realizes** (decision RD.DOCS.034). The per-group page mirrors one published source group — `cache.md`, `contract.md`, `app.md`, `entry.md`, `ui-*.md` and siblings. It **binds two parties**. The implementation is bound by what a `Guarantee` row states, and the consumer by what `Placement` and `Does not do` state. **Both directions are normative.** The test, one statement at a time: **does it bind someone — the implementation or the consumer?** If yes it takes `MUST`/`MUST NOT`/`MAY`; if it binds nobody it is commentary — advice, rationale, a trade-off note — and stays prose. **A capability page is normatively dense by design**, and the seam table's sections are the spec's shape, unchanged.
 
-**The spec treatment reaches those pages only.** A repo root's `03-capabilities` is a **map** of what the repository contains — *where does what live*, not *what must this code do* — and so is a node's `03-capabilities/README.md` face, which routes, and `data-model.md`, which is a dictionary. The seat's job differs by what the node publishes: source groups yield specs, indexes and orientation yield maps. **Seat tables are in scope for modality; record tables are not** — dictionaries, behavior-row tables, data models, registries and proof-gap tables keep their form. Modality comes from the page, never from a sweeper.
+**The spec treatment reaches those pages only.** A repo root's `03-capabilities` is a **map** of what the repository contains — *where does what live*, not *what must this code do*. So is a node's `03-capabilities/README.md` face, which routes, and so is `data-model.md`, which is a dictionary. The seat's job differs by what the node publishes: source groups yield specs, indexes and orientation yield maps. **Seat tables are in scope for modality; record tables are not** — dictionaries, behavior-row tables, data models, registries and proof-gap tables keep their form. Modality comes from the page, never from a sweeper.
 
 **`group` is the source axis; `area` is the story axis** (decision RD.DOCS.016). A group is a published top-level source folder — shared vocabulary between the symbol index and the capabilities seat. An area divides the behaviors seat and names an outcome, never a folder.
 
@@ -140,15 +140,15 @@ The pocket holds what the node **authors** rather than derives, and its three au
 | **Overview** | everything — the source carries the depth | nothing; reaching the source's depth makes it the second copy the pocket forbids |
 | **Approach** | the **mechanics** — concepts and boundaries, never an inventory of rules the chapters own | the **reasoning** — options weighed, costs accepted, the preview that made a choice judgeable |
 
-A register row records *what* was decided, never the options that lost or what they would have cost — which is why an approach carries its reasoning in full, and why `Open` cards run deeper than the body around them.
+A register row records *what* was decided, never the options that lost or what they would have cost. That is why an approach carries its reasoning in full, and why `Open` cards run deeper than the body around them.
 
 **The suffix names the kind, and the set is closed** (decision RD.DOCS.040). The routing test is one question: *were options weighed and one chosen?* Yes → `-approach`. No → `-overview`. A document with no options, no recommendation and no accepted cost is an overview whichever folder holds it.
 
 - **An overview comes at two sizes.** `concept-overview.html` is the concept's readable HTML face — the whole model, less depth, with the diagrams the root marker cannot carry; a repo has at most one. A `<section>-overview.html` expands **one** section that is too big to review where it stands, and the section names it back. Forbidden is the third copy: an overview restating another overview, or a section expanded twice under two names.
-- **Reports keep their own name** in `reports/`, and `resources/` holds what a seat cites — `schema.sql` among them.
+- **Keep reports under their own name** in `reports/`; `resources/` holds what a seat cites — `schema.sql` among them.
 - **Nothing here is validated against current state.** An artifact records a moment, so a checker that flags one for disagreeing with today's tree has misread what it is looking at.
 
-**An approach document is never kept in step with code.** It argues at a moment, so three relations are all legitimate: **ahead** (arguing something not built yet — early iteration, leading the code as a concept does), **level**, and **behind** (a correct record of what was argued then). A design can reach an empty `Open` long before a line exists, and is complete at that point. **The defect is a silent rewrite** — editing one to read as though it always argued the current shape destroys the only record of what was weighed and rejected. Flag the contradiction; leave the artifact as the moment it was.
+**An approach document is never kept in step with code.** It argues at a moment, so three relations are all legitimate: **ahead**, **level**, and **behind**. **Ahead** is arguing something not built yet — early iteration, leading the code as a concept does. **Behind** is a correct record of what was argued then. A design can reach an empty `Open` long before a line exists, and is complete at that point. **The defect is a silent rewrite** — editing one to read as though it always argued the current shape destroys the only record of what was weighed and rejected. Flag the contradiction; leave the artifact as the moment it was.
 
 ### Steward, never manufacture
 
@@ -185,8 +185,8 @@ Every document opens with an invisible block holding **strict JSON**, marked `sp
 ```
 
 - `stages` is the one optional field — only where a document belongs to one DevEx stage, such as a guide.
-- **There is no `part` and no `altitude`.** Everything else is derived: the **seat** from the path and the **kind** from the node's manifest — the voice is one (RD.DOCS.031); the seat decides what a document carries, never its temperature.
-- **`lenses` are derived from the kind, not authored per page** (decision RD.DOCS.037) — one derivation, two clauses, because runtime says *where code runs* and `lenses` says *who reads it*. A kind you **build on** (support, module, app, client) derives from its declared runtime: `SERVER` → `SERVER_DEV`, `WEB` → `WEB_DEV`, `UNIVERSAL` → both. A kind that **serves building** — `TOOLCHAIN` and `APP_UTILITY`, and only those two — carries both whatever its runtime, because every builder uses it. Read the declared runtime, never parse the name. `ARCHITECT` is added by **seat**, never by kind: a node's doc face (`docs/README.md`) is the orientation page and carries it for every kind, leaf nodes included; the seat faces beneath it (purpose, behaviors, capabilities, guides, artifacts) carry the derived developer lenses alone, and `ARCHITECT` there is authorship a scaffold never emits. The other six lenses are authored, never derived. A page MAY narrow the derived set where its subject genuinely serves one runtime, and MUST NOT widen it. **A scaffold template emits the derived set**, which is what makes generated pages compliant by construction.
+- **There is no `part` and no `altitude`.** Everything else is derived: the **seat** from the path and the **kind** from the node's manifest. The voice is one (RD.DOCS.031). The seat decides what a document carries, never its temperature.
+- **`lenses` are derived from the kind, not authored per page** (decision RD.DOCS.037) — one derivation, two clauses, because runtime says *where code runs* and `lenses` says *who reads it*. A kind you **build on** (support, module, app, client) derives from its declared runtime: `SERVER` → `SERVER_DEV`, `WEB` → `WEB_DEV`, `UNIVERSAL` → both. A kind that **serves building** — `TOOLCHAIN` and `APP_UTILITY`, and only those two — carries both whatever its runtime, because every builder uses it. Read the declared runtime, never parse the name. `ARCHITECT` is added by **seat**, never by kind. A node's doc face (`docs/README.md`) is the orientation page and carries it for every kind, leaf nodes included. The seat faces beneath it (purpose, behaviors, capabilities, guides, artifacts) carry the derived developer lenses alone. `ARCHITECT` there is authorship a scaffold never emits. The other six lenses are authored, never derived. A page MAY narrow the derived set where its subject genuinely serves one runtime, and MUST NOT widen it. **A scaffold template emits the derived set**, which is what makes generated pages compliant by construction.
 - `id` is identity and **never changes**, however the path does. The path is only its current address.
 - **Status is the state of what the document governs, never of the prose**: `IMPLEMENTED` ✅ · `IN_PROGRESS` 🚧 · `PLANNED` 🔮.
 
@@ -197,11 +197,11 @@ The corpus speaks one voice (decision RD.DOCS.031, sharpened by RD.DOCS.043 and 
 1. **Teach in build-up order** — show the thing, name it, then state its rule; the rule lands as the conclusion of something your reader now understands.
 2. **Talk to your reader** — second person, present tense, active voice; momentum over ceremony. Three moves get you there, and the sentence decides which one fits (below).
 3. **Every rule keeps its teeth** — exact terms, exact constraints, MUST-grammar wherever a statement is normative. Precision is part of the kindness. Force lives in the exact term and the MUST, never in a dense sentence: splitting a normative sentence changes neither (RD.DOCS.043).
-4. **The plain substrate** — one idea per sentence; the rule stated literally before any story; no load-bearing metaphors, parables, aphorism-led paragraphs, or personification; bold marks rules and terms, never emphasis; house terms glossed on first use per chapter.
+4. **The plain substrate** — one idea per sentence, and the rule stated literally before any story. No load-bearing metaphors, parables, aphorism-led paragraphs, or personification. Bold marks rules and terms, never emphasis; house terms glossed on first use per chapter.
 5. **The warmth budget** — at most one light aside per section, never inside a rule's own sentence; *conversational and friendly without being frivolous*.
 6. **Personas choose content, never temperature** — capabilities speak to engineers, behaviors to product personas; the lens picks the examples.
 7. **The register governs prose, never records** — behavior rows, decision/glossary rows, every table and diagram, contract blocks, and code samples keep their form untouched. A warmed record is a defect.
-8. **The depth guarantee** — a rewrite changes how sentences are written, never what the corpus contains: every fact, constraint, edge case, table, and diagram survives; rewrites may add examples, never remove substance.
+8. **The depth guarantee** — a rewrite changes how sentences are written, never what the corpus contains. Every fact, constraint, edge case, table, and diagram survives; rewrites may add examples, never remove substance.
 9. **Artifacts take the voice** (decision RD.DOCS.043) — an approach, an overview and a report take the voice exactly as a seat does. The audience decides the examples and the depth, never the temperature. An HTML page is no exemption.
 10. **Register rows take the plain substrate** (decision RD.DOCS.043) — the bold headline first, then one clause a sentence, none past twenty-five words. A decision or glossary row keeps its exact terms and its MUST. No *you* and no aside: a row is still a record.
 
@@ -230,6 +230,8 @@ The corpus speaks one voice (decision RD.DOCS.031, sharpened by RD.DOCS.043 and 
 
 **Watch a share, never a count of occurrences.** Splitting a long sentence is what this standard asks of you, and splitting dilutes a count. So the number to compare before and after is the share.
 
+**The share is met honestly or not at all** (decision RD.DOCS.046). Appending a bare `for you` · `to you` · `on you` to a sentence you have otherwise left alone games the counter — it does not meet the share. The check strips the trailing phrase and asks whether what remains still reaches. If it does not, that phrase was carrying the sentence's whole claim on your reader, and it is a finding. It is graded RULE rather than BLOCK. A sentence like `stands them up for you` is real writing that ends the same way. Only you can tell the two apart. **Where a sentence cannot address your reader honestly, leave it as written and let the page sit under its share.** A page at its bar in mechanical prose is worse than one under it in good prose (decision RD.DEVEX.032).
+
 **No external style guide becomes a rule** (decision RD.DOCS.044). The construct is the corpus's own. Keep the reference measurements in the workspace as evidence, and never cite one as authority.
 
 **The measure** (decisions RD.DOCS.043 · RD.DOCS.044). The check reads the rule's numbers, never the corpus's own average. Over prose only: around fifteen words a sentence, few past twenty-five, none past thirty, *you* present, and your seat's share of reach. A sentence past thirty words is a finding. Prose that never says *you* is a finding, and that clause is the floor against silence — the share above is what you aim at. The fix is one of four moves — **split it · say *you* · define the term · land it on your reader** — never a shorter sentence. The `spn-core` doc-check hook measures every watched document, and its sweep prints the rates a tranche moves. Reach is reported SOFT for now: the corpus is swept for length, not yet for reach.
@@ -249,7 +251,7 @@ Work runs `FRAME` → `DESIGN` → `BUILD` → `PROVE`, and each pass is the nex
 
 So a document routinely exists **before** the thing it describes, carrying 🔮 and reading as a design note rather than a fact. Iteration re-enters at **Frame** and reads the existing documents and code back, so a revision revises rather than re-derives.
 
-**Drift runs both ways.** Where implementation exists, read it and validate against it — but do not assume it wins. A conflict between a document and running code is a **decision entry naming which one is wrong**, never a silent edit in either direction.
+**Drift runs both ways.** Read the implementation where it exists and validate against it — but do not assume it wins. A conflict between a document and running code is a **decision entry naming which one is wrong**, never a silent edit in either direction.
 
 ## The decision register
 
@@ -276,7 +278,7 @@ RD.DOCS    the corpus standard — seats, metadata, derivation, artifacts
 2. **The Why column carries the reason it was needed** — the failure the old position caused, or the cost it imposed. Not a restatement of the choice.
 3. **Never write a tally.** *Closed at nineteen* is a count that rots; name a set by its rule.
 
-**What lands here:** a document conflicting with running code — **drift runs both ways**, so the entry names which side is wrong before either is touched; a recorded deviation from a paved path; a proposed new chapter, because the outline is frozen. **Never a silent edit in either direction.**
+**What lands here:** a document conflicting with running code; a recorded deviation from a paved path; a proposed new chapter, because the outline is frozen. On the first, **drift runs both ways**, so the entry names which side is wrong before either is touched. **Never a silent edit in either direction.**
 
 **You draft a row; a person decides it.** The Agent never resolves a decision on its own initiative.
 

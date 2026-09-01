@@ -2,11 +2,11 @@
 
 **Which tier a project owes is derived from its kind** — the `test` skill carries the ladder and the derivation; this step is how TypeScript runs each one. The service harness (test app, principal factory, substitutable providers, capturing log provider) ships in `@saasplane/support-service-ts` under `testing/` — never assemble a boot in a suite.
 
-Tests are **never co-located with source**: every project keeps `tests/{unit, integration, helpers, setup}` at its root; the repo root `tests/` holds only cross-app E2E suites (Playwright).
+Keep `tests/{unit, integration, helpers, setup}` at every project's root, **never co-located with source**; the repo root `tests/` holds only cross-app E2E suites (Playwright).
 
 ## Unit tests
 
-- `tests/unit/*.spec.ts` in the owning project (jest for node projects, vitest for web). Cover the service rules you just wrote: guards (`_assert*` throwing), null-skip update behavior, mapper ladders, error codes/categories.
+- Put `tests/unit/*.spec.ts` in the owning project (jest for node projects, vitest for web). Cover the service rules you just wrote: guards (`_assert*` throwing), null-skip update behavior, mapper ladders, error codes/categories.
 - Typecheck first: `pnpm nx build <nx-name>` for every touched project — a stale barrel/validator or type error invalidates everything after it.
 
 ## Typechecking the tests themselves
@@ -31,7 +31,7 @@ Every project is `tsconfig.json` plus **one sibling per tier it has** — never 
 
 Two traps worth knowing, because both produce a **passing command that checked nothing**:
 
-- **`--pretty false` is not cosmetic.** `tsc` prints ANSI codes between `error` and the code, so `grep "error TS"` silently matches nothing on colored output — an agent counting errors that way reads every failing project as clean.
+- **`--pretty false` is not cosmetic.** `tsc` prints ANSI codes between `error` and the code, so `grep "error TS"` silently matches nothing on colored output. An agent counting errors that way reads every failing project as clean.
 - **A test project must never keep incremental state.** With `incremental` inherited, `tsc` reads a stale `.tsbuildinfo`, reports itself up to date and exits `0` without checking. The shipped overlays pin `incremental: false`; do not override it.
 
 ## Repo-level integration (backend)
@@ -66,4 +66,4 @@ pnpm test:all        # everything            pnpm test:dev   # affected
 pnpm nx build <p>    # typecheck a project   pnpm test:e2e   # root Playwright (stack up + seeded)
 ```
 
-pnpm only — never npm/yarn. Full local orchestration (bring-up, seeding, ports): the `run` skill and the `verify` skill.
+Use pnpm only — never npm/yarn. See the `run` skill and the `verify` skill for full local orchestration (bring-up, seeding, ports).

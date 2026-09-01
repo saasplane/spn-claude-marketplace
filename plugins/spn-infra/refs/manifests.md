@@ -1,10 +1,10 @@
 # Estate manifests — quick reference
 
-**Source of truth:** the foundation book's infra domain and the repo-root `CONCEPT.md` (Estate Manifest · Estate Packages) in `spn-foundation`. This card digests; the book governs.
+**Source of truth:** the foundation book's infra domain and the repo-root `CONCEPT.md` (Estate Manifest · Estate Packages) in `spn-foundation`. Use this card as the digest; the book governs.
 
 ## Two files per node
 
-Every estate node is a package. Its **root is found by `spinfrapkg.json`; its type is read from `src/spestate.json`** — never inferred from the folder name (the family-first name is *checked against* the manifest).
+Every estate node is a package. **Find its root by `spinfrapkg.json`; read its type from `src/spestate.json`** — never infer either from the folder name (the family-first name is *checked against* the manifest).
 
 ```jsonc
 // spinfrapkg.json — infra's own package file, at the node root
@@ -17,7 +17,7 @@ Every estate node is a package. Its **root is found by `spinfrapkg.json`; its ty
 
 - `name` is authoritative; the folder is validated against it. Its scope, matched against the org's `packages` lists, routes the publish.
 - **`version` is the artifact's semver.** This is the manifest naming a *publishable artifact*, and the bump is a reviewed edit — the bump commit is the reviewed act (see the `release` skill).
-- `description` · `author` · `license` are the descriptive fields, optional in the tree. With them this file fills a package manifest's slot completely, so **an infra repository carries no `package.json` at all** (RD.INFRA.066) — one appearing in an estate tree is a defect, not metadata.
+- `description` · `author` · `license` are the descriptive fields, optional in the tree. With them this file fills a package manifest's slot completely, so **an infra repository carries no `package.json` at all** (RD.INFRA.066). One appearing in an estate tree is a defect, not metadata.
 - Read by the packaging machinery alone — release and ref-resolution — never by a layer.
 
 ```jsonc
@@ -26,7 +26,7 @@ Every estate node is a package. Its **root is found by `spinfrapkg.json`; its ty
 ```
 
 - **`type` opens the file; `config` is discriminated by its `mtype`.** `sprepo.json` (`type` · `config`) and `spkind.json` (`kind` · `config`) carry the same two-key shape, one naming what it declares and one carrying that declaration's own fields; the `spn:doc` block opens on `id`.
-- The declaration lives under `src/` because **what publishes is source**; a declaration node's `src/` is the manifest alone.
+- Keep the declaration under `src/` because **what publishes is source**; a declaration node's `src/` is the manifest alone.
 
 ## The four types
 
@@ -37,7 +37,7 @@ Every estate node is a package. Its **root is found by `spinfrapkg.json`; its ty
 | `PLATFORM` | `@{org}/infra-platform-{spc}` | `spc` · `domain` (`{spd}`, never the marketing domain) · `networkIndex` · **declaration**: `resources` (`platform` + `spaces[]`) · `apps` · `modules` · **realization**: `providers` (scm · cloud environments · local) — RD.INFRA.051 | the manifest alone |
 | `MODULE` | `@{org}/infra-module-{code}` — **purpose code, never a product** (`idp`, not a vendor name) | `null` — identity only; usage stays on the referencing `modules[]` row | `spestate.json` + `aws/` + `local/` renderings — a rendering ships iff its folder exists |
 
-`docs/`, `tests/`, `README.md` are repo-internal, always; `tests/` exists only where a render harness does. `infra validate` holds every tree to its type's shape.
+Keep `docs/`, `tests/`, `README.md` repo-internal, always; `tests/` exists only where a render harness does. `infra validate` holds every tree to its type's shape.
 
 ## The shapes that get edited
 
@@ -59,7 +59,7 @@ Organization config, the essentials:
 }
 ```
 
-Platform config, the moving parts (manifest grammar laws — RD.INFRA.050/051): **declaration vs realization** — `resources` · `apps` · `modules` say what the platform *is*; `providers` say where it *runs*. `resources.platform` (the total four: database · cache · queue · storage — secrets never declared, every environment has one) beside `resources.spaces[]` (per-need data worlds: `code` = published prefix · families each optional · db declares `schemas` `{name, dedicated}` rows and `users` `[{group, purposes, schemas}]` grants); `apps[]` rows at config level (`kindCode` — claim ∧ grant · `repo` · optional **`space`** binding, absent = platform resources · `deployments[]` one per mtype); `environments[]` rows under `providers.cloud` (`setup` free text — nothing derives from it · `region` · `networkIndex` append-only 0–7 · `workload` `PROD|NP` · `size` · `hosting` — `CLUSTER` refused under `PROD` · `deploy` trigger); `providers.local` mirrors the declaration **thing-first** (`resources.platform` ports · `resources.spaces` and `modules` as **maps keyed by declared code** — declare in arrays, realize in maps; an orphan key is a validate ERROR; absent = derived). **One fact once**: realizations carry no `mtype` — the declared engine selects the realization schema.
+Platform config, the moving parts (manifest grammar laws — RD.INFRA.050/051): **declaration vs realization** — `resources` · `apps` · `modules` say what the platform *is*; `providers` say where it *runs*. `resources.platform` names the total four: database · cache · queue · storage — secrets never declared, every environment has one. Beside it `resources.spaces[]` holds per-need data worlds: `code` = published prefix · families each optional · db declares `schemas` `{name, dedicated}` rows and `users` `[{group, purposes, schemas}]` grants. `apps[]` rows sit at config level (`kindCode` — claim ∧ grant · `repo` · optional **`space`** binding, absent = platform resources · `deployments[]` one per mtype). `environments[]` rows sit under `providers.cloud` (`setup` free text — nothing derives from it · `region` · `networkIndex` append-only 0–7 · `workload` `PROD|NP` · `size` · `hosting` — `CLUSTER` refused under `PROD` · `deploy` trigger). `providers.local` mirrors the declaration **thing-first**: `resources.platform` ports · `resources.spaces` and `modules` as **maps keyed by declared code**. Declare in arrays, realize in maps; an orphan key is a validate ERROR, and absent = derived. **One fact once**: realizations carry no `mtype` — the declared engine selects the realization schema.
 
 A module row:
 

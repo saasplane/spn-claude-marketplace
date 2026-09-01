@@ -5,7 +5,7 @@ description: Authoring an estate module (infra-module-{code}) end to end - scaff
 
 # module-author — the estate's one extension point
 
-**A module is a package attached to the layer lifecycle**: it consumes only the outputs published at its named step, runs under that scope's credentials, and publishes into `/environments/{env}/modules/{code}/*` and the config plane. Its supply reaches apps as configured values, never as new vocabulary. The tri-law binds everything below (`refs/laws.md` §6).
+**A module is a package attached to the layer lifecycle.** It consumes only the outputs published at its named step, runs under that scope's credentials, and publishes into `/environments/{env}/modules/{code}/*` and the config plane. Its supply reaches apps as configured values, never as new vocabulary. The tri-law binds everything below (`refs/laws.md` §6).
 
 ## 1 · Name by purpose, scaffold
 
@@ -42,8 +42,8 @@ On the consuming platform's `modules[]`: `code` · `layer` · `after` (a named s
 
 ## 6 · Prove
 
-`spnutils infra validate -p` (tree to type, manifest to contract) → `infra test -p` (the render harness — templates plan against fixtures) → `infra platform plan` locally. **`--cloud` refuses the path-resolved ref by name — that is the correct gate**, not a failure to fix around; it opens when the pin exists.
+Run `spnutils infra validate -p` (tree to type, manifest to contract) → `infra test -p` (the render harness — templates plan against fixtures) → `infra platform plan` locally. **`--cloud` refuses the path-resolved ref by name — that is the correct gate**, not a failure to fix around; it opens when the pin exists.
 
 ## 7 · Release, then flip the pin
 
-Hand to the `release` skill (bump `version` in `spinfrapkg.json` → `infra release`, to the org's registry pair). Then flip the consuming row: `source: "@{org}/infra-module-<code>"`, `version` a semver — and run `infra platform plan --cloud` to see the gate open. Refs flip at each consumer's own pace.
+Use the `release` skill (bump `version` in `spinfrapkg.json` → `infra release`, to the org's registry pair). Then flip the consuming row: `source: "@{org}/infra-module-<code>"`, `version` a semver — and run `infra platform plan --cloud` to see the gate open. Refs flip at each consumer's own pace.

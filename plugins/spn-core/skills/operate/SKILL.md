@@ -16,8 +16,8 @@ description: How a running platform is observed, responded to, and maintained - 
 | **A health signal** the orchestrator can read | a broken instance is replaced rather than served from | traffic keeps arriving at something that cannot answer |
 | **The version it is running** | an incident can be tied to a release | the first question of every incident takes an hour |
 
-- **Correlation is carried, never reconstructed.** An identifier enters at the entry and travels through every call, log line, and queued message the work produces. Work that starts a new identity mid-flight has broken the only thread an operator has.
-- **A log line is for whoever is reading it at 3am.** It states what was being attempted, on what, and what happened — never a bare stack trace, never an internal detail that leaks outward, and never a secret, a token, or a customer's data.
+- **Correlation is carried, never reconstructed.** Pass an identifier from the entry through every call, log line, and queued message the work produces. Work that starts a new identity mid-flight has broken the only thread an operator has.
+- **A log line is for whoever is reading it at 3am.** Say what was being attempted, on what, and what happened. Never a bare stack trace, never an internal detail that leaks outward, and never a secret, a token, or a customer's data.
 - **What is measured is what a customer feels** — latency at the entry, failure rate by code, queue depth and age. A dashboard of resource graphs with no customer-facing signal on it explains nothing when the thing that is wrong is the product.
 
 ## During an incident
@@ -33,7 +33,7 @@ An incident that changes nothing but a dashboard will happen again. Closing one 
 
 - **An incident record** in the owning node's `artifacts/` pocket — what happened, what was done, and what changed because of it. It is `KEPT`, dated, and never overwritten.
 - **A behavior row**, where the gap was a capability nobody had specified.
-- **A decision entry**, where the gap was a standard that turned out to be wrong. A standard that produced this failure is the defect; patching the instance and leaving the standard is how the same incident returns under a different name.
+- **A decision entry**, where the gap was a standard that turned out to be wrong. Treat a standard that produced this failure as the defect; patching the instance and leaving the standard is how the same incident returns under a different name.
 - **A test carrying the behavior id**, where the gap was proof. A fix with no test is a claim.
 
 ## What this stage never does

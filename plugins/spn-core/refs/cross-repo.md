@@ -1,18 +1,18 @@
 # Cross-Repo Work — Stack-Agnostic
 
-How an agent works across more than one repository on a SaaS Plane estate, and where a rule belongs so every agent sees it. Applies in any stack and to any repo pair. Source of truth: the foundation's `CONCEPT.md` (`#### DevEx Workspace`) and decision RD.DEVEX.020 — where this digest and those disagree, the sources win and this file is regenerated.
+How an agent works across more than one repository on a SaaS Plane estate, and where a rule belongs so every agent sees it. Apply it in any stack and to any repo pair. Source of truth: the foundation's `CONCEPT.md` (`#### DevEx Workspace`) and decision RD.DEVEX.020 — where this digest and those disagree, the sources win and this file is regenerated.
 
 ## One window, laws by declaration
 
-A session opens on the **workspace folder** — the discovered set of sibling checkouts — and works across every repo in it. **The rule set binding a file derives from the governing manifests above it, never from where the session started**: `sprepo.json` names the world and, for an `APPS` repo, the stack claim; `spkind.json` names an apps node; an estate node is found by its `spinfrapkg.json` with the type at `src/spestate.json`.
+A session opens on the **workspace folder** — the discovered set of sibling checkouts — and works across every repo in it. **The rule set binding a file derives from the governing manifests above it, never from where the session started.** `sprepo.json` names the world and, for an `APPS` repo, the stack claim. `spkind.json` names an apps node. An estate node is found by its `spinfrapkg.json`, with the type at `src/spestate.json`.
 
-So the discipline, per file touched:
+Follow this discipline, per file touched:
 
 1. **Resolve the law first.** Before editing a file, know which repo governs it — load that repo's `CLAUDE.md` and its generated `.claude/saasplane/rules.md` if you have not already this session, and follow those for those files.
 2. **Never carry one repo's conventions into another's files.** A convention right in one repo is frequently wrong in the next: one repo bans implementation identifiers, another is built from them. The manifest decides, not the file you edited last.
 3. **Doors hold everywhere.** A skill, rule or hook that declares a repo type or stack claim activates only where its declaration matches. An infra skill in a web repo refuses by name.
 
-Reading across is free and needs no ceremony, in every direction.
+Read across freely, in every direction — it needs no ceremony.
 
 ## The workspace's working state — `.spndevex/`
 
@@ -36,7 +36,7 @@ Plan one change across repos as an **arc**: ordered steps, each naming its targe
 | **deep** — needs the repo's full context | **delegate** to a child session rooted in the target repo, the step file as its brief; fold the result back. The developer keeps one window |
 | **absent** — the repo is not in this workspace | the step itself is the deliverable: an order in `orders/`, handed to whoever holds that repo |
 
-**The return path is unchanged**: where work in any repo uncovers something contradicting the foundation, that comes home as a decision-register row — a convention corrected quietly in a sibling is a fork nobody declared.
+**The return path is unchanged.** Where work in any repo uncovers something contradicting the foundation, that comes home as a decision-register row. A convention corrected quietly in a sibling is a fork nobody declared.
 
 **The partner boundary crosses upward only as an ask, never as work.** No level takes orders from the level below.
 
@@ -51,13 +51,13 @@ This is the constraint that decides where every common rule lives. **A product r
 | The **generated inventory** beside it | yes, written locally | what this repo currently *contains*, never a rule |
 | A relative path into a sibling checkout | **no** | nothing a consumer can rely on |
 
-**Common rules are carried by the plugin, never by a link into a peer repo.** Where a document must be cited across repos, cite it by name and let the plugin carry the substance.
+**Common rules are carried by the plugin, never by a link into a peer repo.** Cite by name any document that must be cited across repos, and let the plugin carry the substance.
 
 **The rule reaches every file that ships inside a repository, agent instruments included** (decision RD.DOCS.035). A `CLAUDE.md` is walked by no validator, but it travels with its repo and is read where the siblings may be absent — so it cites by name too. **The workspace's own `CLAUDE.md` is the one exception**: the sibling checkouts are its subject, and it ships nowhere. And a repository's instruction file states what is true of that repository, never what other repositories may do.
 
 ## Skills are what a consumer acts on; the book is why
 
-Guidance lives in three instrument layers, and they are not interchangeable: the deterministic CLI (installed), the plugin (installed), and the documentation corpus (not installed). **Anything a reader must act on lives in the first two.** A skill that says *"the authority for this is chapter N of the book"* has pushed its reader onto a layer they do not have — the skill carries the actionable substance itself and cites the book only as provenance, by name. For a consumer, the digest *is* the standard.
+Guidance lives in three instrument layers, and they are not interchangeable: the deterministic CLI (installed), the plugin (installed), and the documentation corpus (not installed). **Anything a reader must act on lives in the first two.** A skill that says *"the authority for this is chapter N of the book"* has pushed its reader onto a layer they do not have. The skill carries the actionable substance itself, and cites the book only as provenance, by name. For a consumer, the digest *is* the standard.
 
 ## Where a rule belongs
 

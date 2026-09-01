@@ -29,11 +29,11 @@ description: What proves a behaviour, at which tier, and what a passing suite do
 
 **Pick the tier by what would break.** A validation rule breaks in a unit; an authorization gate breaks against the real service; a journey breaks end to end. Writing a unit test for something that only fails when wired is a green that proves nothing.
 
-**Neither substitutes for the other.** A passing unit suite with a broken wiring is a passing build of a broken product; a passing journey with untested rules is a change nobody checked at the level where it is decided.
+**Neither substitutes for the other.** A passing unit suite with a broken wiring is a passing build of a broken product. A passing journey with untested rules is a change nobody checked at the level where it is decided.
 
 ## Where a gate belongs
 
-Format, lint, and generated-file protection run **pre-commit**; codegen freshness, structure, and type checking run pre-commit where fast and otherwise on the **pull request**; unit and component suites gate the **merge**; integration and contract tiers run on the **affected projects**; journeys run **after deployment to a rung**, on a quiesced stack; release gates run **inside the release**, before anything is versioned.
+Format, lint, and generated-file protection run **pre-commit**. Codegen freshness, structure, and type checking run pre-commit where fast and otherwise on the **pull request**. Unit and component suites gate the **merge**, and integration and contract tiers run on the **affected projects**. Journeys run **after deployment to a rung**, on a quiesced stack, and release gates run **inside the release**, before anything is versioned.
 
 Two rules: a gate runs at **exactly one placement**, and a pre-commit gate **never reaches the network or a resource** — a commit must work offline.
 
@@ -72,7 +72,7 @@ A **double** stands in for a collaborator and belongs to the unit tier only; a *
 
 **In their own tree, never beside the code they test.** Co-located tests ship with the implementation or need an exclusion rule that then has to be maintained forever.
 
-A test that proves a stated behavior should be traceable to it — where the platform records behaviors with identifiers, the test title carries the identifier so the claim and its proof can be matched mechanically rather than by reading.
+A test that proves a stated behavior should be traceable to it. Where the platform records behaviors with identifiers, the test title carries the identifier. The claim and its proof can then be matched mechanically rather than by reading.
 
 ## Data and isolation
 

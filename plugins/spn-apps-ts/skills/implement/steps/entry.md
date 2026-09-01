@@ -1,11 +1,11 @@
 # Step: entry — thin adapters, one grammar
 
-Entries parse transport input into a Command, execute the contract service method, render the State. **Zero business logic** — an entry that cannot be rewritten for a new transport without touching a service is a defect. The route grammar below is the standard; its provenance is the foundation book's information-architecture chapter. Controllers and queue listeners are **classes**, thin and delegating — never free functions.
+Entries parse transport input into a Command, execute the contract service method, render the State. **Zero business logic** — an entry that cannot be rewritten for a new transport without touching a service is a defect. Follow the route grammar below as the standard; its provenance is the foundation book's information-architecture chapter. Controllers and queue listeners are **classes**, thin and delegating — never free functions.
 
 ## Controllers
 
-- One controller per entity (`entry/api/controllers/<MOD><Entity>Controller.ts`), one method per exposed service method, **same name**, every handler a one-liner: `return <mod>Module.services.contract.<x>Service.<method>(command);`. Controllers reach services through the module singleton's **contract** registry — never by importing the impl class. Auth, validation, transactions, caching all live below.
-- Routes declare themselves via the command-shaped route decorator (method, path, commandSchema, resultSchema). The raw-route escape hatch exists **only** for payloads that cannot be command-shaped (provider-posted SSO assertions, webhook callbacks) — raw routes bypass command validation, must do their own verification, and are the only place path parameters may appear.
+- Write one controller per entity (`entry/api/controllers/<MOD><Entity>Controller.ts`), one method per exposed service method, **same name**, every handler a one-liner: `return <mod>Module.services.contract.<x>Service.<method>(command);`. Controllers reach services through the module singleton's **contract** registry — never by importing the impl class. Auth, validation, transactions, caching all live below.
+- Routes declare themselves via the command-shaped route decorator (method, path, commandSchema, resultSchema). The raw-route escape hatch exists **only** for payloads that cannot be command-shaped (provider-posted SSO assertions, webhook callbacks). Raw routes bypass command validation, must do their own verification, and are the only place path parameters may appear.
 
 ## Route grammar (mechanical — no debates per endpoint)
 
@@ -26,9 +26,9 @@ Command binding follows the verb: **GET binds from the querystring, POST from th
 ## Queue listeners
 
 - `entry/queue/listeners/<MOD><Event>Listener.ts`, handler `handle<Event>`, delegating to the service's queue handler — no logic in the listener.
-- Actor-carrying events rehydrate the originating actor via the authenticated listener base (so authz, context, and `created_by` stamping behave like the online request); system topics use the plain listener base and establish their own context.
+- Actor-carrying events rehydrate the originating actor via the authenticated listener base, so authz, context, and `created_by` stamping behave like the online request. System topics use the plain listener base and establish their own context.
 - Register in `getQueueListeners` with a stable `subscriberId` (consumer-group name) — renaming it re-delivers the retained backlog. Topics are pre-created by `*-queue-topics` migrations; an undeclared topic is a boot/write-time error.
 
 ## After wiring
 
-If routes or contract changed and a frontend consumes them, regenerate the API client from the **running** service (`pnpm --filter <app> gen:client` with the service up) before the ui step — a stopped or stale service silently produces a stale API client.
+If routes or contract changed and a frontend consumes them, regenerate the API client from the **running** service before the ui step. Run `pnpm --filter <app> gen:client` with the service up — a stopped or stale service silently produces a stale API client.

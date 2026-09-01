@@ -5,11 +5,11 @@ description: The declare verb for SaaS Plane estate repos - a change to what the
 
 # declare — edit the manifest, validate, review the choices
 
-**The estate declares; it never implements.** A change to what exists is an edit to a `src/spestate.json` (or a `spinfrapkg.json`), and the whole change is reviewable as the small set of choices it makes. `refs/manifests.md` carries the shapes; `refs/laws.md` the lines no edit may cross.
+**The estate declares; it never implements.** A change to what exists is an edit to a `src/spestate.json` (or a `spinfrapkg.json`), and the whole change is reviewable as the small set of choices it makes. Read `refs/manifests.md` for the shapes and `refs/laws.md` for the lines no edit may cross.
 
 ## 1 · Locate the node
 
-The node root is found by `spinfrapkg.json`; the type is read from `src/spestate.json` — never inferred from the folder name. Organization-scoped choices (regions, packages, blueprint pin, org modules) belong to the `ORGANIZATION` node; platform-scoped ones (environments, apps, resources, platform modules) to the `PLATFORM` node. An edit landing in the wrong scope is the first finding.
+Find the node root by `spinfrapkg.json` and read the type from `src/spestate.json` — never infer it from the folder name. Organization-scoped choices (regions, packages, blueprint pin, org modules) belong to the `ORGANIZATION` node; platform-scoped ones (environments, apps, resources, platform modules) to the `PLATFORM` node. An edit landing in the wrong scope is the first finding.
 
 ## 2 · Edit — a person writes choices, and nothing else
 
@@ -19,7 +19,7 @@ The node root is found by `spinfrapkg.json`; the type is read from `src/spestate
 
 - **`src/spestate.json` opens on `type`**, with `config` discriminated by its `mtype`. **`spinfrapkg.json` names the publishable artifact** — `name` · `version` (the semver) · `description` · `author` · `license` — and an infra tree holds no `package.json` (RD.INFRA.066).
 - **`networkIndex` is append-only, forever** — a freed index is never reused.
-- A module row's `source` is a locator: a path while iterating (`version: null`), a scoped package + semver once published. `hosting` stays `null` unless there is a real pin to make.
+- A module row's `source` is a locator: a path while iterating (`version: null`), a scoped package + semver once published. Keep `hosting` `null` unless there is a real pin to make.
 - **The `apps[]` rows are the cloud grant list** — deploy requires claim (`spkind.config.code`) ∧ grant (`kindCode`). Granting an app is a declaration change here, never anything in the app's own repo.
 - `setup` is free text and **nothing derives from it** — never encode posture in a name; posture is `workload`.
 
