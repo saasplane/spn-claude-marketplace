@@ -230,6 +230,16 @@ The corpus speaks one voice (decision RD.DOCS.031, sharpened by RD.DOCS.043 and 
 
 **Watch a share, never a count of occurrences.** Splitting a long sentence is what this standard asks of you, and splitting dilutes a count. So the number to compare before and after is the share.
 
+**Your own instruction surface is in scope** (decision RD.DOCS.031 · RD.DOCS.043 · RD.DOCS.044, stated
+at depth in the book's `05-docs/01-corpus.md` § What the pattern binds). The voice reaches this book,
+the foundation's provider set, and these plugins — your skills, lenses, agent briefs and reference
+digests. Layout is what those trees are free of, never how they read. The bars are identical
+everywhere; only the move differs. Say *you* on a page someone reads to learn. Use the **imperative**
+on a page you act from, because a passive instruction leaves you working out who acts. And where a
+warmer sentence would be less exact about what you must do, keep the sentence and let the page sit
+under its share. A repo that merely consumes SaaS Plane keeps its own `providers/` folder out of
+scope.
+
 **The share is met honestly or not at all** (decision RD.DOCS.046). Appending a bare `for you` · `to you` · `on you` to a sentence you have otherwise left alone games the counter — it does not meet the share. The check strips the trailing phrase and asks whether what remains still reaches. If it does not, that phrase was carrying the sentence's whole claim on your reader, and it is a finding. It is graded RULE rather than BLOCK. A sentence like `stands them up for you` is real writing that ends the same way. Only you can tell the two apart. **Where a sentence cannot address your reader honestly, leave it as written and let the page sit under its share.** A page at its bar in mechanical prose is worse than one under it in good prose (decision RD.DEVEX.032).
 
 **No external style guide becomes a rule** (decision RD.DOCS.044). The construct is the corpus's own. Keep the reference measurements in the workspace as evidence, and never cite one as authority.
