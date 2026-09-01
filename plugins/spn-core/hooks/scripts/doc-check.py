@@ -72,8 +72,13 @@ IMPERATIVE = re.compile(r'^[^A-Za-z]*(?:' + IMPERATIVE_VERBS + r')\b', re.I)
 # ordinary prose and excluding it would empty the denominator.
 NORMATIVE = re.compile(r'\b(?:MUST NOT|MUST|SHOULD NOT|SHOULD|MAY)\b')
 # The bar per seat, as a percentage. A register row has none — it is a record (RD.DOCS.043).
-REACH_BAR = {'artifact-html': 30, 'readme': 25, 'chapter': 15, 'concept': 15}
+REACH_BAR = {'artifact-html': 15, 'readme': 25, 'chapter': 15, 'concept': 15}
 REACH_MIN_N = 8
+# RD.DOCS.045 — an artifact is read by the same developers who read a chapter, so it carries a
+# chapter's share and not a higher one. RD.DOCS.044 set 30 % for an artifact without evidence;
+# the sweep supplied it. At 30 % a settled argument cannot meet the share without being
+# rewritten, which 05-artifacts names as the defect. At a chapter's share it meets it by
+# warming the prose around the argument, which is what the voice asked for in the first place.
 
 # RD.DOCS.040 — the suffix names the kind, and the set is closed.
 POCKET_KIND = {'approaches': '-approach.html', 'overviews': '-overview.html'}
