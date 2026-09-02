@@ -51,6 +51,25 @@ createGroup(command: CreateGroupCommand): Promise<Group>;
 - Wrappers: `<X>s` / `<X>Metas` / `<X>Infos` wrap `Record<key, X>` under a **named field** (`{ roles: {...} }`, never a bare Record — OpenAPI needs the named shape); `<X>List` wraps `X[]`. Search results: `{ records: X[], total: CDTInt | null }`.
 - **Nest a display dependency's Meta instead of its raw id** (`PrincipalMeta.identity: IdentityMeta`); scope ids stay ids (`orgId` is never nested). Commands still carry raw ids.
 
+## Files in the states seat, and `core.ts`
+
+One file per entity, kebab-case, named for what it states. **A state may import a sibling** —
+`role.ts` citing `AppPermissionMeta` from `app.ts` is correct, and `app.ts` is that type's home.
+Do not move a type out of its domain file just because a second file cites it.
+
+**What cannot be supported is a cycle.** The generated validators import in the same shape as the
+states, so a bidirectional dependency between two state files resolves to `undefined` at boot
+rather than failing at build — the worst kind of failure, because the app starts.
+
+`core.ts` is the release valve. When a shared state would close a loop, it moves there and the
+loop opens. That is its only job: it is **not** a destination for anything merely shared, and a
+seat that has never hit a cycle correctly has no `core.ts` at all.
+
+- Reach sideways freely, one way.
+- The moment a reach would close a loop, move the shared state into `core.ts` and cite it from both.
+- `spnutils apps validate` names the whole loop when one exists, so you fix the cycle rather than
+  guess at which import caused it.
+
 ## Enums, discriminators, polymorphism
 
 - Give enums a PascalCase name with a `Type` suffix; contract enum keys are `UPPER_SNAKE` matching their string values.
