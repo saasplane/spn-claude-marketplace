@@ -17,10 +17,13 @@ derived chrome are not prose — the numbers are:
                                     fewer than one *you* in twelve sentences is SOFT
   a register row stays a record     a cell sentence past 25 words is RULE, and so is a bare
                                     *you* inside a row — a record is never warmed
-  the seat's share of reach         a share under the bar is SOFT: 30 % on an overview, an
-                                    approach or a report, 25 % on a README face, 15 % on a
-                                    chapter or a concept — where normative sentences sit
-                                    outside the count (RD.DOCS.044). A row carries no bar
+  the seat's share of reach         a share under the bar is SOFT: 25 % on a README face and
+                                    15 % on every other seat — a chapter, a concept, and every
+                                    artifact (an overview, an approach, a report). RD.DOCS.044
+                                    set 30 % for an artifact; RD.DOCS.045 lowered it to a
+                                    chapter's share, and RD.DOCS.047 confirms it. A chapter and
+                                    a concept keep normative sentences out of the denominator;
+                                    every other seat counts them. A row carries no bar
 
 Reach is the share of prose sentences that reach the reader by any of the three moves, and a
 share is what you measure — an occurrence count falls every time a long sentence is split.

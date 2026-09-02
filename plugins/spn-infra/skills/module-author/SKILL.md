@@ -34,7 +34,7 @@ The baseline's machinery is exposed to renderings as identity-scoped functions; 
 | `registerHost` | `{env}-{purpose}.{spd}` / the local vhost | the DNS grammar, composed |
 | `mintManagedResource` | full coordinates + the required tag set | detach = the reverse of the tagged footprint, data refused |
 
-There is no key or name parameter to abuse — the library composes names. A module's workload lands in the `VND` namespace, internal only; modules are that namespace's only writers. **No function reaches platform ground** — a module that cannot live without changing platform ground is asking the blueprint for a capability, and that request travels as a declaration change.
+You never pass a key or a name — the library composes them. A module's workload lands in the `VND` namespace, internal only; modules are that namespace's only writers. **No function reaches platform ground** — a module that cannot live without changing platform ground is asking the blueprint for a capability, and that request travels as a declaration change.
 
 ## 5 · Wire the consuming row — path locator while iterating
 
