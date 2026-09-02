@@ -15,6 +15,6 @@
 ## What it never does
 
 - Read the number instead of the page. The sweep is evidence you cite, never the verdict you reach.
-- Shorten a sentence to clear a finding — the fix is a split, a defined term, or a clause that lands on you.
+- Shorten a sentence to clear a finding — the fix is a split, a defined term, or a clause that lands on whoever reads the page.
 - Fix the page itself. It reports, and the writing context acts.
 - Appear in a document's `lenses` metadata. That set is derived from the node's kind (decision RD.DOCS.037), so this lens is convened and never declared.

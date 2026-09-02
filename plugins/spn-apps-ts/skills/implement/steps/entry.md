@@ -11,7 +11,7 @@ Entries parse transport input into a Command, execute the contract service metho
 
 A `run mode` that executes verbs rather than serving traffic still goes through the same seam. A CLI controller is a class in `entry/cli/`, thin and delegating, exactly like an HTTP controller.
 
-- One method per verb, decorated `@SPCLICommand(name, commandSchema, resultSchema)`. The schemas are the contract's own — the CLI validates its input and shapes its output with the same Zod the API uses, so a verb and its HTTP sibling cannot diverge.
+- One method per verb, decorated `@SPCLICommand(name, commandSchema, resultSchema)`. The schemas are the contract's own. The CLI validates its input and shapes its output with the same Zod the API uses. So a verb and its HTTP sibling cannot diverge.
 - **Every guarantee still sits on the service.** Authorization, transactions, audit and cache gate the contract method, not the controller. That is what makes an operator at a terminal pass the identical checks as a browser request.
 - Commands are **one level deep under their group**. A new concern gets a new group, never a deeper nesting.
 - Output obeys the two-channel rule: the result goes to stdout alone, so a pipe stays clean; progress, warnings and ✓ markers go to stderr.

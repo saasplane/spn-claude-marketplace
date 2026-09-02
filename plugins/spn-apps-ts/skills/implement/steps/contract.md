@@ -58,8 +58,8 @@ One file per entity, kebab-case, named for what it states. **A state may import 
 Do not move a type out of its domain file just because a second file cites it.
 
 **What cannot be supported is a cycle.** The generated validators import in the same shape as the
-states, so a bidirectional dependency between two state files resolves to `undefined` at boot
-rather than failing at build — the worst kind of failure, because the app starts.
+states. So a bidirectional dependency between two state files resolves to `undefined` at boot
+rather than failing at build. That is the worst kind of failure, because the app starts.
 
 `core.ts` is the release valve. When a shared state would close a loop, it moves there and the
 loop opens. That is its only job: it is **not** a destination for anything merely shared, and a
