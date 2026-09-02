@@ -7,6 +7,15 @@ Entries parse transport input into a Command, execute the contract service metho
 - Write one controller per entity (`entry/api/controllers/<MOD><Entity>Controller.ts`), one method per exposed service method, **same name**, every handler a one-liner: `return <mod>Module.services.contract.<x>Service.<method>(command);`. Controllers reach services through the module singleton's **contract** registry — never by importing the impl class. Auth, validation, transactions, caching all live below.
 - Routes declare themselves via the command-shaped route decorator (method, path, commandSchema, resultSchema). The raw-route escape hatch exists **only** for payloads that cannot be command-shaped (provider-posted SSO assertions, webhook callbacks). Raw routes bypass command validation, must do their own verification, and are the only place path parameters may appear.
 
+## CLI controllers
+
+A `run mode` that executes verbs rather than serving traffic still goes through the same seam. A CLI controller is a class in `entry/cli/`, thin and delegating, exactly like an HTTP controller.
+
+- One method per verb, decorated `@SPCLICommand(name, commandSchema, resultSchema)`. The schemas are the contract's own — the CLI validates its input and shapes its output with the same Zod the API uses, so a verb and its HTTP sibling cannot diverge.
+- **Every guarantee still sits on the service.** Authorization, transactions, audit and cache gate the contract method, not the controller. That is what makes an operator at a terminal pass the identical checks as a browser request.
+- Commands are **one level deep under their group**. A new concern gets a new group, never a deeper nesting.
+- Output obeys the two-channel rule: the result goes to stdout alone, so a pipe stays clean; progress, warnings and ✓ markers go to stderr.
+
 ## Route grammar (mechanical — no debates per endpoint)
 
 ```

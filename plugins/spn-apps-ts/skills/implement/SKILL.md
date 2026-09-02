@@ -36,10 +36,11 @@ Each step has a reference file in `steps/` — read the step file **before** wri
 
 1. [`steps/contract.md`](steps/contract.md) — states, commands, events, validators (`spnutils apps gen-validators`)
 2. [`steps/service.md`](steps/service.md) — the canonical service shape: authz, transactions, cache, queues, audit, repository, migrations
-3. [`steps/entry.md`](steps/entry.md) — thin controllers, route grammar, queue listeners
-4. [`steps/ui.md`](steps/ui.md) — `MODULE_WEB` plug-in points, hooks, permission gating (full-stack / FE-only)
-5. [`steps/test.md`](steps/test.md) — unit + repo-level integration, state hygiene
-6. [`steps/docs.md`](steps/docs.md) — the doc set closes the change
+3. [`steps/entry.md`](steps/entry.md) — thin controllers, the route grammar, CLI controllers
+4. [`steps/queue.md`](steps/queue.md) — listeners, `subscriberId` as a consumption contract, why the handler is ungated, consumer-side idempotency
+5. [`steps/ui.md`](steps/ui.md) — `MODULE_WEB` plug-in points, hooks, permission gating (full-stack / FE-only)
+6. [`steps/test.md`](steps/test.md) — unit + repo-level integration, state hygiene
+7. [`steps/docs.md`](steps/docs.md) — the doc set closes the change
 
 Order never changes; skip only what the classification skips. **Docs move with the steps, not after them.** The contract step updates `docs/03-capabilities/` rows and writes intent comments as it writes the surface. The test step embeds behavior ids in contract-tier test titles, and the docs step is the closing sweep that flips statuses. Regenerate at the marked points. Run `gen-validators` after any `contract/states/**` edit. Run `gen-barrel` after adding files to a lib package — never on apps or the API client. Regenerate the API client from the **running** service if routes or contracts changed before the FE consumes them.
 
