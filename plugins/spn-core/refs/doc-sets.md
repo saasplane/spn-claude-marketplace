@@ -240,6 +240,19 @@ warmer sentence would be less exact about what you must do, keep the sentence an
 under its share. A repo that merely consumes SaaS Plane keeps its own `providers/` folder out of
 scope.
 
+**On that surface, reach is the whole measure** (decision RD.DOCS.048). Two checks count only the
+typed word — one fires when a page never says *you*, the other when it says it fewer than once in
+twelve sentences. Neither can see an imperative, which is this surface's own move, so both read your
+instruction file as silent when it is anything but. On a provider chapter or a plugin instruction
+file, neither applies. Your reach share is what the checker measures, and it still binds — a page
+that truly reaches nobody is still caught.
+
+**A check reads how a phrase is used, never that it appeared** (decision RD.DOCS.049). You have to
+quote the mistake a rule bans, and a domain term is sometimes spelled like an everyday word — *the
+reader tier* is a read facade, not your reader. Neither is a breach. Mark a counter-example as one,
+in italics or backticks, and the checker reads it as quotation. That is the same courtesy a register
+row already gets when it names *you* as a term.
+
 **The share is met honestly or not at all** (decision RD.DOCS.046). Appending a bare `for you` · `to you` · `on you` to a sentence you have otherwise left alone games the counter — it does not meet the share. The check strips the trailing phrase and asks whether what remains still reaches. If it does not, that phrase was carrying the sentence's whole claim on your reader, and it is a finding. It is graded RULE rather than BLOCK. A sentence like `stands them up for you` is real writing that ends the same way. Only you can tell the two apart. **Where a sentence cannot address your reader honestly, leave it as written and let the page sit under its share.** A page at its bar in mechanical prose is worse than one under it in good prose (decision RD.DEVEX.032).
 
 **No external style guide becomes a rule** (decision RD.DOCS.044). The construct is the corpus's own. Keep the reference measurements in the workspace as evidence, and never cite one as authority.

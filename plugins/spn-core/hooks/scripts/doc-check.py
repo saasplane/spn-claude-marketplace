@@ -47,7 +47,18 @@ import json, os, re, shlex, sys
 CARD = (r'\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|'
         r'fifteen|sixteen|seventeen|eighteen|nineteen|twenty)\s+'
         r'(decisions|items|questions|findings|blockers|gaps|defects|open items|todos|tasks)\b')
-ABOUT = r'\b(the reader|one must|one should|the user is expected|it is recommended that)\b'
+# RD.DOCS.049 — a check reads how a phrase is used, never that it appeared. The four idioms here
+# are impersonal obligation and have no innocent use. `the reader` is different in kind: it is an
+# ordinary noun phrase, and every one of the ten occurrences this corpus carried was legitimate —
+# a read facade (`the reader tier`), a locale (`the reader's language`), or a writing standard
+# naming the person it teaches you to write for. So it counts only in the obligation form, which
+# is the construction the rule is actually named after.
+ABOUT = (r'\b(the reader\s+(?:must|should|needs?\s+to|is\s+expected)|one must|one should|'
+         r'the user is expected|it is recommended that)\b')
+# A rule has to be able to quote the mistake it bans. The corpus marks a quoted counter-example
+# the way it marks any term — italics or backticks — so both are blanked before CARD and ABOUT
+# run. This is the precedent YOU_AS_TERM already sets for a register row (RD.DOCS.049).
+MARKED = re.compile(r'\*[^*\n]{1,120}\*|`[^`\n]*`|“[^”\n]{1,120}”|"[^"\n]{1,120}"')
 
 # RD.DOCS.043 — the measure. Second person is whole-word and case-insensitive. Longest form
 # first, or `your` claims the front of `yours` and the rest never matches. `yours` and
@@ -318,15 +329,21 @@ def opening(s, n=6):
     return ' '.join(s.split()[:n]) + '…'
 
 
-def voice(prose, sents, kind='chapter'):
-    """RD.DOCS.043 § Measure, over prose only. Every check here holds on every file."""
+def voice(prose, sents, kind='chapter', operative=False):
+    """RD.DOCS.043 § Measure, over prose only.
+
+    Every check holds on every file, with one exception the book states. On an operative surface
+    the two second-person counts do not apply, and the reach share is the whole measure
+    (RD.DOCS.048). CARD and ABOUT read marked text as quotation, never as prose (RD.DOCS.049).
+    """
     out = []
-    hits = re.findall(CARD, prose, re.I)
+    unmarked = MARKED.sub(' ', prose)
+    hits = re.findall(CARD, unmarked, re.I)
     if hits:
         eg = ', '.join(f'{a} {b}' for a, b in hits[:4])
         out.append(('RULE', f'{len(hits)} cardinality-in-prose ({eg}) — RD.GOV.008: name a set '
                             f'by its rule, not its count'))
-    n_about = len(re.findall(ABOUT, prose, re.I))
+    n_about = len(re.findall(ABOUT, unmarked, re.I))
     if n_about:
         out.append(('RULE', f'{n_about} construction(s) written about the reader, not to them '
                             f'— RD.DOCS.031 talks to the reader · say *you*'))
@@ -355,7 +372,11 @@ def voice(prose, sents, kind='chapter'):
                             f'that reaches only by its last two words reached nobody: {eg} · '
                             f'rewrite it to address the reader, or leave it under the share'))
     you = sum(len(YOU.findall(s)) for s, _ in sents)
-    if n >= YOU_MIN_N and you == 0:
+    if operative:
+        # RD.DOCS.048 — neither count can see an imperative, which is this surface's move. The
+        # reach share below still binds, so a genuinely cold instruction file is still caught.
+        pass
+    elif n >= YOU_MIN_N and you == 0:
         out.append(('RULE', f'prose that never says *you* — {n} sentences with no second person '
                             f'(RD.DOCS.043; RD.DOCS.031 talks to the reader) · say *you*'))
     elif n >= 5 and you * YOU_PER < n:
@@ -453,7 +474,7 @@ def check(path, text, fragment=False):
 
     sents = sentences(prose)
     if not fragment or len(sents) >= 5:
-        out += voice(prose, sents, kind_of(path))
+        out += voice(prose, sents, kind_of(path), is_operative(path))
     if is_register(path):
         out += rows(text)[0]
     return out
@@ -464,7 +485,12 @@ def check(path, text, fragment=False):
 # so adding a stack here is adding a row rather than a branch in shared code. Nothing in this
 # file may assume one stack: `.tmpl` and `dot-` are TypeScript's, and the `dot-` reason is
 # npm's alone (npm strips a literal `.gitignore` from a published tarball). A stack publishing
-# to PyPI has no such problem (the arc docs-voice, finding 42).
+# to PyPI has no such problem.
+#
+# This table READS the declaration and never authors it (RD.APPS.077). Each stack declares its
+# own template spelling in its provider set — TypeScript's is `providers/apps/ts/kinds.md`,
+# beside the coverage line deciding which kinds it has templates for at all. A row here is a
+# transcription; change the provider set first, then this table.
 STACK_TEMPLATES = {
     'TS': {'suffixes': ('.tmpl',), 'dot_prefix': 'dot-'},
 }
@@ -520,6 +546,24 @@ def as_written(path):
     return os.path.join(d, base)
 
 
+def is_operative(path):
+    """A surface an agent acts from, rather than one a person reads to learn (RD.DOCS.047).
+
+    Two members. The foundation's provider set, matched by its three domains rather than by a
+    bare `providers/`, which is an ordinary folder name a consuming repo may use for its own
+    code — a partner holds the plugins without the foundation, where this matches nothing. And
+    the plugins' own instruction surface, which an agent loads every session and acts on, so a
+    passive instruction is a defect here in a way it is not in a narrative chapter. The scripts
+    beside them are code, never corpus.
+
+    RD.DOCS.048 exempts this surface from the two second-person counts. Reach still binds.
+    """
+    p = os.path.abspath(path).replace(os.sep, '/')
+    if any(d in p for d in ('/providers/apps/', '/providers/infra/', '/providers/devex/')):
+        return True
+    return '/plugins/' in p and any(f'/{d}/' in p for d in ('agents', 'skills', 'refs', 'commands'))
+
+
 def watched(path):
     """What the hook and the sweep read (RD.DOCS.043 § Reach): every .md under docs/, every
     README.md, CONCEPT.md, every .html under artifacts/, an approach or overview page anywhere,
@@ -542,15 +586,9 @@ def watched(path):
         return False
     if '/docs/' in p:
         return True
-    # The foundation's provider set. Matched by its three domains rather than by a bare
-    # `providers/`, which is an ordinary folder name a consuming repo may use for its own code.
-    # A partner holds the plugins without the foundation, so this simply matches nothing there.
-    if any(d in p for d in ('/providers/apps/', '/providers/infra/', '/providers/devex/')):
-        return True
-    # The plugins' own instruction surface. An agent reads these every session and acts on them,
-    # so a passive instruction is a defect here in a way it is not in a narrative chapter. The
-    # scripts beside them are code, never corpus.
-    if '/plugins/' in p and any(f'/{d}/' in p for d in ('agents', 'skills', 'refs', 'commands')):
+    # The operative surface — the provider set and the plugins' instruction files. One predicate,
+    # because RD.DOCS.048 measures that surface differently and must name the same set.
+    if is_operative(p):
         return True
     return False
 
