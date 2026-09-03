@@ -40,6 +40,7 @@ Edit the generator or its source when a generated file needs to be different. An
 
 ## The lines that hold
 
+- **A gate carries a permission and an enablement, so classify before you declare one.** A permission says which person may act. An enablement says what the caller's organization type is offered at all. Read `refs/permission-vs-enablement.md` before you write the gate. It settles the code's grammar, whether the term sits on the gate or in the service body, and why you never gate a read.
 - **Contracts are additive.** A published field is never removed, retyped, or repurposed; new optional fields may be added at any time. A breaking change is a planned, versioned event with a migration path.
 - **Errors are contracts too.** Namespaced codes, each mapped once to a response class, retryability classified rather than guessed. A failure never discloses the existence of something the caller could not otherwise see.
 - **Reuse the shared primitives** — get, bulk get, key lookup, active toggle — before minting a bespoke command for a single identifier.

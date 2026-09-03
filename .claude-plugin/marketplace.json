@@ -8,7 +8,7 @@
     {
       "name": "spn-core",
       "source": "./plugins/spn-core",
-      "description": "SaaS Plane core, stack-agnostic: the DevEx stage skills (check, scm, ideate, plan, develop, test, provision, deliver, operate, report) \u2014 including ideate, the interactive loop that decides a boundary and shape into the repo-root CONCEPT.md before anything is planned; the SPN engineer persona; the spn-panel reviewer and the lens files it convenes (lead, business, product, architect, server-dev, web-dev, qa, infra, trust, partner, voice); contract review rules; the command vocabulary; the doc-set rules every node's docs are built to; the cross-repo working protocol; the getting-started digest; the new-platform intake worksheet; a hook that denies hand-edits to generated files; and a hook that checks every document \u2014 seats, READMEs, the concept, the artifacts \u2014 against the bars the book states mechanically: audience in the masthead, the Terms bound, no cardinality in prose, and the one voice measured (around fifteen words a sentence, you present; RD.DOCS.043).",
+      "description": "SaaS Plane core, stack-agnostic: the DevEx stage skills (check, scm, ideate, plan, develop, test, provision, deliver, operate, report) \u2014 including ideate, the interactive loop that decides a boundary and shape into the repo-root CONCEPT.md before anything is planned; the SPN engineer persona; the spn-panel reviewer and the lens files it convenes (lead, business, product, architect, server-dev, web-dev, qa, infra, trust, partner, voice); contract review rules; the command vocabulary; the doc-set rules every node's docs are built to; the cross-repo working protocol; the getting-started digest; the new-platform intake worksheet; a hook that denies hand-edits to generated files; and a hook that checks every document \u2014 seats, READMEs, the concept, the artifacts \u2014 against the bars the book states mechanically: audience in the masthead, the Terms bound, no cardinality in prose, and the one voice measured (around fifteen words a sentence, you present; RD.DOCS.043). It also carries refs/permission-vs-enablement.md \u2014 the first question an agent asks before declaring a gate: does the answer vary per person, per organization type, or per plan.",
       "author": {
         "name": "SaaS Plane"
       }
@@ -16,7 +16,7 @@
     {
       "name": "spn-apps-ts",
       "source": "./plugins/spn-apps-ts",
-      "description": "SaaS Plane apps domain, TypeScript instance: the five APPS verb skills \u2014 new, implement, review, run, verify \u2014 the golden-path step files, and the TS standards digest. Planning is not here: the verb is DEVEX_PLAN and lives once in spn-core, which loads refs/plan.md from this plugin for the APPS \u00b7 TS layer. The book's SPSkillType is closed and carries no APPS_PLAN.",
+      "description": "SaaS Plane apps domain, TypeScript instance: the five APPS verb skills \u2014 new, implement, review, run, verify \u2014 the golden-path step files, and the TS standards digest. Planning is not here: the verb is DEVEX_PLAN and lives once in spn-core, which loads refs/plan.md from this plugin for the APPS \u00b7 TS layer. The book's SPSkillType is closed and carries no APPS_PLAN. A hook denies a write that breaks the enablement grammar \u2014 an enablement code not prefixed by its own module, a code whose second segment is not MANAGE, a multi-value definition named after its area, and a hardcoded set of organization types in a service (RD.SAAS.033).",
       "author": {
         "name": "SaaS Plane"
       }

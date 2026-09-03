@@ -82,6 +82,7 @@ Question four is not a search for prior art. **Prior art asks whether a thing ex
 - **Where it runs** — server, web, or universal. This decides the kind, and the kind decides structure, toolchain, and packaging. It is not a later detail.
 - **Who owns it** — the module whose contract will carry it. A requirement that names no owning module is not yet a design.
 - **How it is entered** — request, queue message, command line, scheduled, or agent tool call. Each is an entry over the same contract, never a separate implementation.
+- **What varies the answer** — whether the rule changes per person, per organization type, or per plan. Those are a permission, an enablement and billing, and none substitutes for another. Settle it here and the gate writes itself later; leave it and you bake a product decision into code. `refs/permission-vs-enablement.md` carries the question and the traps this estate actually hit.
 
 ## Find what already covers it
 

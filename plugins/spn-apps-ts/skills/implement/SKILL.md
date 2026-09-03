@@ -15,8 +15,9 @@ If the `plan` skill ran, the design is already in the owning module's docs as `�
 | **FE-only** | Surface change against an **unchanged** contract (page, component, nav, gating) | ui → test → docs |
 | **Full-stack** | Contract surface changes and a surface consumes it | contract → service → entry → ui → test → docs |
 
-Two gates before starting:
+Gates before starting:
 
+- **Gate check.** Where the change adds or moves an authorization gate, settle what varies the answer before you write it. A rule that changes per person is a permission; per organization type, an enablement; per plan, billing. None substitutes for another, and an enablement never gates a read. `refs/permission-vs-enablement.md` in the **spn-core** plugin carries the question, the grammar and the traps; this plugin's `hooks/scripts/enablement-grammar.py` refuses the checkable ones at write time.
 - **Additive check.** If the change removes/renames/retypes a published field, changes a meaning, or tightens validation on an existing command field, it is **breaking**. Stop and reroute through the `plan` skill (decision + versioning path). Additive by default is the rule, not a preference.
 - **Ownership check.** The change lands in the module that owns the capability (its package, or the app-owned module). Cross-module needs go through the other module's **contract** services — or a request queue for writes — never its internals.
 
