@@ -72,6 +72,19 @@ seat that has never hit a cycle correctly has no `core.ts` at all.
 
 ## Enums, discriminators, polymorphism
 
+**A polymorphic type is a BASE carrying `mtype`, extended by variants — never a union alias.** `export type X = XA | XB` is wrong in a contract and always was: a contract is JSON crossing languages, a TypeScript union has no equivalent in the next stack, and the generator has nothing to name. The base declares `mtype` as the open enum and nothing else; each variant `extends` it and narrows `mtype` to one member. Every reference names the base.
+
+```ts
+export interface OrgAuthProviderConfig { mtype: OrgAuthProviderType; }
+export interface OrgAuthProviderConfigSocial extends OrgAuthProviderConfig {
+  mtype: OrgAuthProviderType.SOCIAL;
+  socialConfig: OrgAuthProviderConfigSocialProvider;
+}
+```
+
+A base living OUTSIDE the contract layer — a framework marker a module implements — types `mtype` as `CDTString` instead, because a framework cannot name values it does not own (`ISPIntegration.integrationType` is a plain `string` for the same reason). And a contract variant never `extends` across into that framework base: no contract state imports from a server package, and `gen-validators` cannot resolve a base it cannot see. It does not need to — a string enum is structurally assignable, so the assignment compiles with no declared relationship.
+
+
 - Give enums a PascalCase name with a `Type` suffix; contract enum keys are `UPPER_SNAKE` matching their string values.
 - Polymorphism = base interface + **`mtype`** discriminator + `extends` variants — never a multi-type union (`T | null` is fine).
 - An entity-level discriminator is named for its host noun — `<noun>Type` (state) / `<noun>_type` (column) — **never a bare `type`**.
