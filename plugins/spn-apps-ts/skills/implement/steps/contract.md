@@ -35,7 +35,7 @@ createGroup(command: CreateGroupCommand): Promise<Group>;
 
 ## Command-in / state-out
 
-- Every contract method takes exactly **one** `<Method>Command` and returns a state or wrapper. Reuse the `SP*` primitives before minting a bespoke command: `SPNoCommand`, `SPGetCommand`, `SPGetBulkCommand`, `SPGetCodeCommand`, `SPGetCodeBulkCommand`, `SPUpdateActiveCommand`, `SPResultBoolean`.
+- Every contract method takes exactly **one** `<Method>Command` and returns a state or wrapper. **No second argument, and never a bare primitive** — a method that wants `(orgId: string, command: X)` is telling you it does not belong on the contract. Move it to the impl, where a plain signature is correct: an ungated `provision*(accountId, command)` shared by a gated create and a public registration is the shape, not a violation. The contract carries what the API and other modules call; everything else is impl-only. Reuse the `SP*` primitives before minting a bespoke command: `SPNoCommand`, `SPGetCommand`, `SPGetBulkCommand`, `SPGetCodeCommand`, `SPGetCodeBulkCommand`, `SPUpdateActiveCommand`, `SPResultBoolean`.
 - **Commands carry CHAR(26) ids, never codes** (code lookups are read-only `get*ByCode`). `orgId` and the self `identityId` come from the auth context — drop them from post-auth commands.
 - **A write command carries only the caller's inputs — never the entity's stored `Config` carrier.** Variant-shaped input discriminates the command itself: base `<Method><Entity>Command` + `mtype`, variants `<Method><Entity>Command<Variant>` carrying only that operation's fields (`CreatePrincipalFactorCommandSMSOTP` = `countryCode` + E.164 `phoneNumber`). Server-derived data (masked displays, provider selection, minted secrets/parameters) never rides on a command — if the client is stubbing `maskedX: ''` or `provider: ''`, the command shape is wrong. Pure write-input shapes (`*Input` types, authored configs with secrets under `internal`) may embed.
 - Update commands carry every mutable field as `T | null` — null means "leave unchanged" (null-skip partial update).
@@ -110,11 +110,38 @@ Ask **one question first: is this surface published?** — released as a package
 
 Two traps: a field is published even when **no known consumer calls it** — publishing puts the surface outside the estate's knowledge, so "nothing imports it" is not evidence. And the dangerous class is the **semantic** change — same shape, moved meaning — which no diff catches. A meaning that must change gets a **new name**, with the old one `@deprecated`, never a quiet rewrite.
 
-## Generate
+## Generate — part of the edit, not a step at the end
 
 ```bash
-spnutils apps gen-validators -p <nx-name>   # after ANY contract/states/** edit — validators are generated, never hand-edited
-spnutils apps gen-barrel -p <nx-name>   # lib packages that gained/lost files — NEVER apps, NEVER the API client, NEVER the CLI package
+spnutils apps gen-validators -p <folder-name>   # after ANY contract/states/** edit — validators are generated, never hand-edited
+spnutils apps gen-barrel -p <folder-name>       # lib packages that gained/lost files — NEVER apps, NEVER the API client, NEVER the CLI package
 ```
 
-Validators and states must not drift — the Zod schema is what the API enforces and what the API client sees; a state-only change is invisible at runtime. Keep `export const <Name>Schema` discipline: a validator not exported from its module file never becomes a named schema in the client.
+**Run these in the same step as the edit, for every package you touched** — not batched before a
+reset or a review. Between the edit and the regeneration the tree disagrees with itself, and
+everything built in that window is built against the disagreement.
+
+**A stale validator takes the server down.** The generated Zod schema is what the API enforces at
+runtime, so one left behind still names the old shape: boot fails, or the first command that touches
+it does, and the error names the schema rather than the edit that outdated it. This has bitten twice
+— once with seven modules a rename behind, caught only because the reset runbook regenerates before
+its destructive step. A stale **barrel** fails quieter: the symbol is simply absent from the client,
+surfacing later as a value typed as a string literal "because the client doesn't have it yet".
+
+**Pass the FOLDER name** (`module-server-iam-ts`), never the scoped package name
+(`@saasplane/module-server-iam-ts`) — the scoped form crashes with `Cannot read properties of
+undefined (reading 'path')`, which reads like a tool bug and is an argument mistake.
+
+Keep `export const <Name>Schema` discipline: a validator not exported from its module file never
+becomes a named schema in the client.
+
+Two sweeps prove no drift anywhere, and an empty result is the proof:
+
+```bash
+for d in packages/module-server-*-ts; do spnutils apps gen-validators -p $(basename $d); done
+for d in packages/module-{server,web}-*-ts; do spnutils apps gen-barrel -p $(basename $d); done
+git status --short packages/*/src/contract/validators/ packages/*/src/index.ts
+```
+
+The barrel generator re-sorts, so a hand-added export moves — expect a diff even when nothing was
+missing.
