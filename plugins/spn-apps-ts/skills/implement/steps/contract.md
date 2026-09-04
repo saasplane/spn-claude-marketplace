@@ -82,7 +82,9 @@ export interface OrgAuthProviderConfigSocial extends OrgAuthProviderConfig {
 }
 ```
 
-A base living OUTSIDE the contract layer — a framework marker a module implements — types `mtype` as `CDTString` instead, because a framework cannot name values it does not own (`ISPIntegration.integrationType` is a plain `string` for the same reason). And a contract variant never `extends` across into that framework base: no contract state imports from a server package, and `gen-validators` cannot resolve a base it cannot see. It does not need to — a string enum is structurally assignable, so the assignment compiles with no declared relationship.
+A base a FRAMEWORK owns — one a module implements — types `mtype` as `CDTString` instead, because a framework cannot name values it does not own (`ISPIntegration.integrationType` is a plain `string` for the same reason).
+
+**A base may live in another package, and extending it across works.** `support-server-service-ts` has its own `contract/states/` beside the shared one, and `SPIAMAuthUser extends SPAuthUser` already reaches across — the generator imports the base's schema and merges (`SPAuthUserSchema.merge(z.object({…}))`). What governs is DIRECTION: extend a base in a package you already depend on. "No state does this today" is an observation, not a rule.
 
 
 - Give enums a PascalCase name with a `Type` suffix; contract enum keys are `UPPER_SNAKE` matching their string values.
