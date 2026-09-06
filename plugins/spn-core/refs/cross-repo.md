@@ -18,6 +18,18 @@ Read across freely, in every direction — it needs no ceremony.
 
 **One file on the machine holds every SaaS Plane value, and that file is `~/.spnenv`** (decision RD.DEVEX.044, and the getting-started walk's phase 07). `spnutils` reads it **directly**. Nothing has to be exported, and no value passes through a shell you can see.
 
+### Three hands, and only one of them is yours
+
+| | Owns |
+| --- | --- |
+| **`spnutils`** | provisioning and the default setup — the CA block, the module facts, and the keys a declaration already implies. **It is the only writer.** |
+| **you, the agent** | the sections, and asking for a key when an app gains config |
+| **the developer** | every value |
+
+**You add a key through the verb, never by editing the file.** Editing means reading, and reading puts the developer's credentials in your context — which is the one thing this file exists to prevent. You know *which* key an app needs; `spnutils` performs the write. The same division as everywhere else here: you propose, the tool writes.
+
+`spnutils` **provisions and validates its own defaults**. It does not police the rest of the file, and a file somebody hand-edited never blocks a sync — the run reports what it could not read and carries on.
+
 ### Never print a value
 
 **Never `echo`, `cat`, `printf`, log, or expand a value from this file.** Test **presence**, never content:
