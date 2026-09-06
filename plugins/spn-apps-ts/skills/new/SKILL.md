@@ -17,7 +17,7 @@ Then:
 
 1. **Create the repository**: `spnutils repo create <name>` — creates it in the bound SCM if absent, then converges it to the standard (branches, protections, team access). Idempotent.
 2. **Mint the workspace**: `spnutils apps scaffold repo --stack ts --organization <package[@version]> [--platform <package[@version]>]`. It writes `sprepo.json` with the stack claim and couplings — the organization coupling is never optional, and `platform: null` means nothing deploys. Then it writes the workspace skeleton: `apps/` · `packages/` · `docs/` (the workspace doc set — same shape as every other node, below) · `tests/` + `package.json`, `pnpm-workspace.yaml`, `nx.json`. No `tasks/` tree — designs live in the docs as 🔮 rows (foundation decision RD.DEVEX.007). pnpm only, never npm/yarn; Nx discovers projects from each `package.json`'s `nx` block.
-3. **Agent wiring**: `spnutils repo agent-init` (alias `ai`; `--local [path]` targets a local marketplace checkout and writes `.claude/settings.local.json` instead). It registers the `saasplane` marketplace, enables `spn-core@saasplane` + `spn-apps-ts@saasplane`, maintains the managed `CLAUDE.md` block, and generates `.claude/saasplane/rules.md`.
+3. **Agent wiring**: `spnutils repo agent-init` (alias `ai`; `--local [path]` is **producer-only** — it targets a marketplace checkout a partner does not hold, and writes `.claude/settings.local.json` instead). It registers the `saasplane` marketplace, enables `spn-core@saasplane` + `spn-apps-ts@saasplane`, maintains the managed `CLAUDE.md` block, and generates `.claude/saasplane/rules.md`.
 4. **Local infra**: `spnutils infra organization up` (once per machine) → `spnutils infra platform up` — see the `run` skill local mode.
 
 ## Target: one of the supported kinds

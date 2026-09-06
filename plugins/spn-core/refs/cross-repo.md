@@ -14,6 +14,59 @@ Follow this discipline, per file touched:
 
 Read across freely, in every direction — it needs no ceremony.
 
+## The machine seat — `~/.spnenv`
+
+**One file on the machine holds every SaaS Plane value, and that file is `~/.spnenv`** (decision RD.DEVEX.044, and the getting-started walk's phase 07). `spnutils` reads it **directly**. Nothing has to be exported, and no value passes through a shell you can see.
+
+### Never print a value
+
+**Never `echo`, `cat`, `printf`, log, or expand a value from this file.** Test **presence**, never content:
+
+```bash
+# wrong — expands to the value when set
+printf '%s\n' "${v:-MISSING}"
+# right — reports presence only
+if [[ -n ${(P)k} ]]; then echo "set"; else echo "MISSING"; fi
+```
+
+**Opening the file is printing it.** Read it only when the developer asks, and never to check whether a key is set.
+
+Here is why the rule is absolute. A transcript outlives the session that wrote it. A printed credential is exposed from that moment, even where the file itself was never touched, and rotation is the only repair. This has already happened here. A session wrote a presence test that expanded its values, and an access key and an address landed in a transcript. Write the test so the value has nowhere to go.
+
+### The regions, and who owns each
+
+| Region | Owner | What a run does |
+| --- | --- | --- |
+| `# spnutils:managed:begin` … `# spnutils:managed:end` | the tool | rewritten on every `workspace init` and `workspace sync` — nothing typed inside survives |
+| `# spnutils:keep:begin` … `# spnutils:keep:end` | the developer | the tool adds keys, and **never** edits or removes a value |
+
+### How the keep region reads
+
+Order runs global → workspace → platform → app, so a key sits beside the keys it works with.
+
+1. **Provider credentials first** — the ones carrying no platform prefix.
+2. **A group per workspace**, which is a reading header and nothing more.
+3. **A section per platform** inside it, headed by the platform code.
+4. **A subsection per app or module**, so same-prefix keys sit together.
+5. **A `kept` group last**, holding the platforms no workspace declares.
+
+Two keys there are **producer-only**: `SPN_DEVEX_MARKETPLACE_PATH` and `SPN_DEVEX_BLUEPRINT_PATH`. A run writes each one only where the matching checkout is in the workspace, so a partner never sees either. Their own common section is vendor accounts and nothing else.
+
+### Namespace by platform code, never by workspace
+
+Keys carry the platform code as their prefix — `DMO_`, `LPD_`, `SAS_` — and a module fact reads `{SPC}_{MODULE}_{FACT}`. **That prefix is the whole anti-overlap mechanism**, and it is why one machine-wide file is the right shape.
+
+**So you answer a collision with the prefix, never with a file or a region per workspace.** Segmenting by workspace is the obvious fix and it is the wrong one — two people reached for it in a single day. A workspace is a reading header, and the same platform turns up under more than one of them.
+
+### Two cautions before you run a workspace verb
+
+- **The tool never writes a shell profile.** `~/.zshenv` and its siblings stay the developer's. Sourcing `~/.spnenv` from a profile is their line to add, never the tool's, and **you never edit a shell profile yourself**.
+- **`workspace init` in a scratch folder rewrites the real `~/.spnenv`.** It derives producer keys from what it can see, so a folder holding no marketplace checkout drops keys. Point `HOME` at a temp directory before you run `init` or `sync` for a demo.
+
+### A run manages only what it can observe
+
+A run writes keys for what it can see, and it stops there. **It never deletes a key because it failed to see the thing that key describes.** Staleness is reported by `workspace status`, and never repaired by deletion.
+
 ## The workspace's working state — `.spndevex/`
 
 The workspace folder carries two dot-homes: `.claude/` (settings — the marketplace, the plugin union, the permission floor) and `.spndevex/` — the agent's working state. **State and settings, never rules**: a rule filed there has two homes, and the copy nobody updates is the one an agent reads.
@@ -126,6 +179,20 @@ Plan one change across repos as an **arc**: ordered steps, each naming its targe
 **The return path is unchanged.** Where work in any repo uncovers something contradicting the foundation, that comes home as a decision-register row. A convention corrected quietly in a sibling is a fork nobody declared.
 
 **The partner boundary crosses upward only as an ask, never as work.** No level takes orders from the level below.
+
+## Producer and partner — two shapes of workspace
+
+**A producer workspace holds the marketplace, the blueprint library and the book as checkouts. A partner's holds none of them.** They consume all three as published artifacts. The plugins arrive from `github:saasplane/spn-claude-marketplace`, blueprints from the machine store by pin, and the book as a published rendering. Their workspace is an estate repo plus any number of `APPS` repos, and that is the whole of it.
+
+**Write for the partner, and mark anything only a producer can act on.** An instruction they cannot follow is worse than a missing one, because it reads as a step they somehow skipped.
+
+| Never | Instead |
+| --- | --- |
+| point at a path inside a sibling checkout — the book's repo included | **cite the book by name**, because a path resolves only for someone holding both checkouts |
+| offer `repo agent-init --local`, which registers a marketplace checkout | let the marketplace resolve from GitHub, which is what a partner has |
+| name `SPN_DEVEX_MARKETPLACE_PATH` or `SPN_DEVEX_BLUEPRINT_PATH` as a value to set | mark both **producer-only** wherever they appear |
+
+**Not every `--local` is producer-only.** `infra release --local` stages a package into the machine store, and that is an ordinary partner act. The flag to mark is the one on `repo agent-init`.
 
 ## A consumer repo needs no peer checkout
 

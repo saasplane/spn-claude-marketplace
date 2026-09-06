@@ -36,9 +36,10 @@ Work down the layers, not across the symptoms:
 
 1. Is the layer below up, and does its own status verb report healthy?
 2. Does the declaration actually carry what you expect — the port, the schema, the host?
-3. Was the app layer ever registered for this app?
-4. Is something already holding the port — a stale watch process or a previous run?
-5. Only then look at the application's own logs.
+3. Is the value it needs set at all — a provider credential or a module fact in the machine seat, `~/.spnenv`? Test that the key is **set**, and never print or expand it (`refs/cross-repo.md` § The machine seat).
+4. Was the app layer ever registered for this app?
+5. Is something already holding the port — a stale watch process or a previous run?
+6. Only then look at the application's own logs.
 
 Most failures that look like application errors are a layer that is not up or an app that was never registered.
 

@@ -60,6 +60,8 @@ A repo is wired by `repo`; the folder the repos sit in is minted by `workspace`.
 | `workspace sync` | brings the floor back to what the members imply | the workspace root |
 | `workspace status` | the orientation — members, world, wiring, every workstream, and any split-plan row still unlanded | reads only |
 
+**The machine seat sits one level above again: `~/.spnenv`, one file for every SaaS Plane value.** `init` and `sync` rewrite its managed region and add keys to the keep region, writing keys and never values. The tool writes no shell profile, and you never edit one either. **Never print or expand a value from that file** — test that a key is set, and nothing more. Run `init` inside a scratch folder and it rewrites the real seat, so point `HOME` at a temp directory for a demo. Read `refs/cross-repo.md` § The machine seat for the regions, the layout and the namespacing rule.
+
 **There is no workstream verb, and adding one is a defect.** Opening a subject is `mkdir`, listing what is open is what `status` already reports, and the close is a gate rather than a command.
 
 ### When work earns a workstream

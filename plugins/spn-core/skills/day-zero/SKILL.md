@@ -23,7 +23,7 @@ Get these wrong and you rename accounts, package scopes and every code prefix af
 
 - **Ask one question and stop.** A numbered list of all of them arrives as a form, and a form gets one careless pass.
 - **Never fill an answer in for them.** A code you invented becomes the account address, the scope and the prefix, and it is expensive to take back.
-- **Question 5 is the one people skip, and it earns the most.** A closest twin tells you which mechanisms transfer wholesale.
+- **Question 5 is the one people skip, and it earns the most.** A closest twin tells you which mechanisms transfer wholesale. Where this is the first platform they have built, there is no twin, and saying so beats inventing one.
 - **Record the answers where the walk can find them again** — the intake worksheet in `refs/platform-worksheet.md` is that seat, and it lands as the concept's coordinates section.
 
 ## Then the repositories, and their order is forced rather than chosen
@@ -51,6 +51,8 @@ Two repositories, and the estate one comes first. It carries a package for the o
 | 7 | Its concept, then its projects | the `ideate` skill, then `apps scaffold <kind>` | The concept decides which kinds exist. Scaffolding first is deciding by accident |
 
 - **Act 3 is where day zero used to stop.** A partner's first repository is an estate repo, it carries no `package.json`, and that is precisely the case the wiring verb refused. If you meet that refusal, say so plainly and name it as the known blocker rather than working around it by hand.
+- **A partner holds no marketplace checkout, so never offer `repo agent-init --local`.** Their plugins resolve from the published marketplace, and the book reaches them as a published rendering rather than a path they can open.
+- **Act 1 also writes the machine seat, `~/.spnenv`.** The verb writes the keys, and the values are theirs to fill in inside the `spnutils:keep` region. Point them there for every vendor account value, and never print one back — `refs/cross-repo.md` § The machine seat carries the rule.
 - **Act 7 is a conversation, not a generation.** Hand it to `ideate`, which agrees one block at a time. A concept you drafted whole is a concept nobody agreed to.
 - **Stop at the end of each act and say what it produced.** The developer is watching a workspace appear out of nothing, and a silent run of the whole walk gives them nothing to correct.
 
