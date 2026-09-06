@@ -162,6 +162,58 @@ It is **one self-contained HTML page named `<topic>-approach.html`** — one fil
 | **Open** | the questions that **block** — the design is not settled until each is answered | **one card each, in the decidable layout below** — never a paragraph the reader has to mine for the question answer first |
 | **Deferred** | what was consciously **parked** — understood, decided against doing now | each with *why not now* and *what would bring it back*, so it is a decision rather than a backlog |
 
+#### Where the argument lives while you argue it
+
+**A page in a repo's artifacts pocket is a landing, never a drafting table.** The pocket holds
+finished reference material, so an argument still being corrected does not belong there yet.
+While a subject is open, its page lives in the workspace's own workstream folder:
+`.spndevex/workstreams/open/{NNN}-{subject}/{subject}-approach.html`. You iterate it there, and
+it moves into the pocket by scope once the argument is settled. Writing it into a repo early is
+how a design ends up committed into a seat while its author is still changing their mind.
+
+**A workstream is a scope of work, never a Claude Code session** — Claude Code owns the window,
+and `SessionStart` is its hook. Its state is the folder it sits in: `backlog/` is parked,
+`open/` is being worked, and `closed/` is accounted for. The number is assigned once in creation
+order, and nothing reuses or renumbers it.
+
+**Work earns a workstream on three tells, and any one is enough.** The work needs an argument
+before it can be built, or it crosses more than one repo, or it outlives one sitting. Everything
+else is just work you do, and one minted for a one-file change is overhead nobody reads. A new
+workstream takes the next free number across all three states.
+
+**Propose the starting state and say why — never pick silently.** Propose `open/` where nothing
+blocks it, and `backlog/` where you can name what it waits on: a trigger, another workstream, or
+questions nobody answered. **Name the blocker, or the proposal is `open/`** — a backlog nobody
+can explain is where work goes to be forgotten. The developer confirms or overrides in one word,
+because scope is theirs. `refs/cross-repo.md` carries the worked examples.
+
+**A workspace-level page spans repos, and a seat's page never does.** That is the one difference
+between them, and it is one column:
+
+| The page argues | Where it lives | The `How` tables |
+| --- | --- | --- |
+| one node's design | that node's `docs/artifacts/approaches/` | Piece · Lands as · How you would know · State |
+| a change across repos | the open workstream in `.spndevex/` | the same, **plus a `Scope` column** |
+
+**Scope names a node, not a repository.** A row reading `spn-platform-ts` has picked a building
+and left the reader looking for a door — that repo holds many apps and packages, each with its own
+seats. Write the path.
+
+**That column is the split plan.** You do not write a separate one: filter by scope, and each
+repo's rows are what that repo's documents must say. Splitting becomes division rather than
+rewriting, which is the whole point of the column.
+
+**Sorted highest scope first, the table is also the order you write in.** The foundation before
+the repo, the repo before the seat — and all of it before the code. Approval opens the documents
+pass, never the code pass.
+
+Two gates read that column, and `refs/cross-repo.md` states them in full. The **documents-first**
+gate warns when you write an approach page into a repo's pocket while an open workstream still
+has rows that have not landed. The **close** gate refuses a move into `workstreams/closed/`
+while any row is one nobody decided. Moving `backlog/` to `open/` is not a close, so no gate
+fires on it. `landed`, `carried` and `deferred` all pass, because the check is *accounted for*
+and never *finished*.
+
 #### `How` names what re-aligns
 
 `How` tracks code by habit: what gets built, and what keeps it true. That is half an answer, and the document half is the one you forget. So `How` carries a second table.

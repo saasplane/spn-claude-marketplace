@@ -18,13 +18,100 @@ Read across freely, in every direction — it needs no ceremony.
 
 The workspace folder carries two dot-homes: `.claude/` (settings — the marketplace, the plugin union, the permission floor) and `.spndevex/` — the agent's working state. **State and settings, never rules**: a rule filed there has two homes, and the copy nobody updates is the one an agent reads.
 
-| Folder | Holds | Retires by |
-| --- | --- | --- |
-| `arcs/` | one file per cross-repo change: ordered steps, each with target repo, outcome, acceptance, depth | the **close sweep** — contradictions become register rows, discovered conventions go to their owning chapters — then the file moves to `arcs/closed/` |
-| `orders/` | the brief for a repo **outside** this workspace, or owned by someone else | executed → its arc's step ticks and the file moves to `arcs/closed/`; superseded → same move, marked |
-| `notes/` | scratch — drafts, worksheets, session state | graduates into a real home (a register row, a chapter, a repo's docs) or is pruned |
+**The container is a workstream, and it is named for its subject.** One folder holds everything a subject needs: the argument you read, the arcs the agent executes, and the brief behind every delegated run. Its name is a number and the subject; its parent folder is its state.
 
-At session start, surface what is stale — an arc untouched across sittings, an order nobody ran. Nothing has its permanent home in `.spndevex/`: everything there is on its way somewhere, and anything that stops moving is a decision nobody took.
+```
+.spndevex/
+  workstreams/
+    backlog/
+      003-cloud-day-0/                    prepared, blocked, or not picked up yet
+    open/
+      007-release-confidence/             being worked now
+        release-confidence-approach.html  yours: the argument, iterated while you read it
+        arcs/                             the agent's: steps, target, acceptance, depth
+        orders/                           one brief per delegated execution, and its report
+        notes/                            scratch, scoped to this subject
+    closed/
+      005-devex-agent/                    the whole folder, once its plan is accounted for
+  orders/
+  README.md
+```
+
+**A workstream is never a Claude Code session.** Claude Code owns the window, and `SessionStart` is its hook. A workstream is a scope of work, and it outlives every window you open on it.
+
+**The number is an identity, never a priority.** You assign it once, in creation order, and nothing reuses or renumbers it. It rides along when the folder moves state, so `007` reads as `007` wherever it sits. **A workstream holds one or more arcs** — `007` holds two today.
+
+| The state | Holds | You arrive by |
+| --- | --- | --- |
+| `backlog/` | prepared, blocked, or not picked up yet | opening it there, which is where most work starts |
+| `open/` | what is being worked now | `mv` from `backlog/` — no ceremony, and no gate fires |
+| `closed/` | a subject whose split plan is accounted for | `mv` from `open/`, and the close gate below decides it |
+
+| Inside a workstream | Written for | Lives | Ends as |
+| --- | --- | --- | --- |
+| the approach page | **you** — argued, corrected, re-read | while the subject is open | split by scope into repo documents, then kept as a receipt |
+| an arc | the agent — steps, target repo, acceptance, depth | until its steps tick | closed through the sweep |
+| an order | the agent — one delegated execution | until the child reports back | the report is appended, and it stays as the audit trail |
+
+**There is no workstream file, and adding one is a defect.** The folder name is the subject, its parent is the state, and the approach page already tracks the arcs. Anything a status file would hold is expressed by the tree, so a second copy only gives it somewhere to go stale. **The window is not tracked either** — Claude Code owns window identity, and a subject outlives any window.
+
+**A subject with an arc and no approach page is a valid shape**, not a gap. Nobody has argued it yet.
+
+- **Scope belongs to the developer, and you only ever propose.** A workstream holds as much as they want it to hold. Widening is the default; splitting is the exception you raise, and never a folder you open on your own initiative.
+- **One release train at a time.** That is mechanical and it holds. Any number of arcs in one workstream is their judgement, and you do not overrule it.
+- **Closing a window costs nothing. Closing a scope is a check.** Moving `open/x` to `closed/x` is the one deliberate act in the loop, and the close gate below decides whether it may happen.
+
+When a window opens, surface what is stale — a subject untouched across sittings, an order nobody ran. Nothing has its permanent home in `.spndevex/`: everything there is on its way somewhere, and anything that stops moving is a decision nobody took.
+
+### When work earns a workstream
+
+**Three tells, and any one is enough.** Work earns a workstream when it needs an argument before it can be built, when it crosses more than one repo, or when it outlives one sitting. Everything else is just work you do, and a workstream minted for a one-file change is overhead nobody reads.
+
+| It earns one when the work… | Because |
+| --- | --- |
+| needs an **argument before it is built** | the reasoning needs a page, and that page needs a home while you correct it |
+| **crosses more than one repo** | the split plan is the only thing holding the halves in order |
+| **outlives one sitting** | the next window finds it by reading, never by remembering |
+
+**A new workstream takes the next free number across all three states.** Read `backlog/`, `open/` and `closed/` together, take the number after the highest, and never reuse one.
+
+### Which state a new workstream starts in
+
+**The starting state is a conversation, never a default.** The developer may simply say *backlog* or *open*. When they do not, **you propose one and say why**. You never pick silently, and you never leave it as an open question either. Scope belongs to the developer and you only ever propose — decision RD.DEVEX.038 — so they confirm or override your reason in one word.
+
+| Propose | When | The tell |
+| --- | --- | --- |
+| **`open/`** | it can be started now | nothing blocks it — no unanswered card, no trigger, no workstream it waits on |
+| **`backlog/`** | it cannot be started yet | it waits on a trigger, on another workstream, or on questions nobody answered — **and you can name the blocker** |
+
+**Name the blocker, or the proposal is `open/`.** *Feels like later* is not a blocker. Where you cannot say what would unblock it, the work is available and belongs in `open/`. That rule matters more than the split itself: a backlog nobody can explain is where work goes to be forgotten.
+
+Both of today's live workstreams read that way:
+
+- **`003-cloud-day-0` → `backlog/`.** Cards nobody has answered block it, and its rehearsal step wants accounts that do not exist yet. The simulator in `007` is what makes that step rehearsable. Both blockers have names, so parking it is right and reversible.
+- **`007-release-confidence` → `open/`.** Nothing blocks it. The developer sequenced it after `devex-agent`, and that one has closed.
+
+**`backlog/` → `open/` is how work starts.** It needs no ceremony, it is not a close, and no gate fires on it.
+
+## The two gates a workstream carries
+
+Both read one thing: the **split plan**, which is the approach page's `How` tables read by their **scope** column. You never write a separate plan — you filter by scope, and each repo's rows are what that repo's documents must say.
+
+| Gate | Fires when | Verdict |
+| --- | --- | --- |
+| **documents first** | you write an approach page into a repo's own pocket while an open workstream's plan still has rows that have not landed | a **warning** naming the workstream. Getting ahead of the plan is sometimes right, so it never refuses |
+| **close** | a subject moves into `workstreams/closed/` | a **refusal** while any row is one nobody decided |
+
+**The close gate checks that work is accounted for, never that it is finished.** Every row reaches one of three states, and all three pass:
+
+| State | Means | Reads as |
+| --- | --- | --- |
+| `landed` | the content is in the node that owns it | `landed → spn-platform-ts/packages/module-server-iam-ts/docs/…` |
+| `carried` | it moves to a named successor scope, which is now open | `carried → captcha-foundation-concept` |
+| `deferred` | consciously parked, with an event somebody will notice | `deferred → the first consumer outside this repo` |
+| ⬜ | nobody decided. **This is the one the gate refuses** | — |
+
+**There is no override, and none is needed.** If you want to close and defer, say so and the row becomes `deferred` with its trigger. Recording the deferral is how you get through, and a flag would leave no trace where a recorded deferral is exactly what a later scope needs to find.
 
 ## An arc is the unit of cross-repo change
 

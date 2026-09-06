@@ -1,0 +1,448 @@
+#!/usr/bin/env python3
+"""The two gates a workstream's split plan carries, and the parser both read it with.
+
+Source of truth: the foundation book's artifacts standard (`05-docs/05-artifacts.md` — the
+approach document, and the scope column a workspace-level page adds) and the devex chapter
+(`04-devex/11-workspace.md` — the workstream, the documents-first gate and the close gate).
+This script checks only what a script CAN check; whether a row was the right row is judgement.
+
+A workstream lives at `.spndevex/workstreams/{open,backlog,closed}/{NNN}-{subject}/`, and its
+state is the folder it sits in. Only the move into `closed/` is a close. Moving `backlog/` into
+`open/` is how work starts, so neither gate fires on it.
+
+**The split plan** is not a section somebody writes. It is the `How` tables of an approach page
+read by their **scope** column — one row per piece or per document, each naming the node that
+owns it and the state it has reached. Filter by scope and each repo's rows are what that repo's
+documents must say. A seat's page leaves the column out, so it carries no split plan and neither
+gate has anything to hold it to.
+
+  documents-first :  split-plan.py --gate documents-first --stdin   (PreToolUse — a WARNING)
+  close           :  split-plan.py --gate close --stdin             (PreToolUse — a REFUSAL)
+  sweep           :  split-plan.py [path ...]                       (every open workstream's rows)
+
+Pass the gate. Without `--gate` the script reads the event and decides nothing, which looks
+exactly like a pass.
+
+**The two gates read the same column and ask different questions of it.**
+
+  documents-first   You are writing an approach page into a repo's own pocket while the open
+                    workstream that argues it still has rows that have not landed. That is how
+                    a design ends up committed into a seat while it is still being corrected.
+                    It warns and names the workstream, because getting ahead of the plan is
+                    sometimes right. A parked workstream never fires it.
+
+  close             You are moving a subject into `closed/`. Every row must be ACCOUNTED FOR,
+                    which is not the same as finished: **landed, carried and deferred all pass**,
+                    and only a row nobody decided refuses. Closing a scope with work pending is
+                    a normal act — you defer it, with its trigger, and the record is what a
+                    later scope needs to find. There is no override, and none is needed:
+                    recording the deferral is the way through.
+
+Exit code is always 0. A refusal is the documented PreToolUse decision on stdout, never a
+non-zero exit, and anything unexpected — no path, no page, an unparsable event — allows.
+"""
+import html as _html
+import json, os, re, shlex, sys
+
+DEVEX = '.spndevex'
+# The state a row reaches. `landed` is the only one that satisfies the documents pass; all three
+# named states satisfy the close. A mark nobody wrote is what the close refuses.
+UNDECIDED = {'', '-', '--', '?', '⬜', '☐', '[ ]', 'tbd', 'todo', 'open', 'unknown'}
+LANDED = ('landed', '✅', 'done', 'shipped')
+ACCOUNTED = ('landed', 'carried', 'deferred')
+SEGMENT = re.compile(r'\|\||&&|\||;|\n')
+MOVERS = ('mv', 'cp', 'rsync', 'install')
+SKIP = {'node_modules', '.git', 'dist', 'build', '.nx', 'coverage', '__pycache__'}
+# The lifecycle. `open` is being worked, `backlog` is parked behind a named blocker, `closed` is
+# accounted for. The container is `workstreams/`; `sessions/` is the name it replaces, and a bare
+# `arcs/` is the shape before that. All three are read so a half-migrated workspace still parses.
+STATES = ('open', 'backlog', 'closed')
+CONTAINERS = ('workstreams', 'sessions', 'arcs')
+# What a close looks like as a path: a closed folder of one of those containers, under the
+# workspace's own state. `backlog/` moving to `open/` matches nothing here, which is the point.
+CLOSED = re.compile(r'/' + re.escape(DEVEX) + r'/(?:' + '|'.join(CONTAINERS) + r')/closed(?:/|$)')
+# Every path part that is a container or a state rather than a subject — so a destination alone
+# still yields the subject when no source names it.
+STRUCTURE = set(CONTAINERS) | set(STATES) | {''}
+
+
+def flat(cell):
+    """A cell as a person reads it — tags gone, entities resolved, whitespace collapsed."""
+    return re.sub(r'\s+', ' ', _html.unescape(re.sub(r'<[^>]+>', ' ', cell))).strip()
+
+
+def html_tables(text):
+    for table in re.findall(r'<table\b.*?</table>', text, re.S | re.I):
+        rows = re.findall(r'<tr\b[^>]*>(.*?)</tr>', table, re.S | re.I)
+        parsed = []
+        for row in rows:
+            cells = re.findall(r'<t[dh]\b[^>]*>(.*?)</t[dh]>', row, re.S | re.I)
+            parsed.append([flat(c) for c in cells])
+        if parsed:
+            yield parsed
+
+
+def md_tables(text):
+    """A pipe table, for a plan written in markdown. The separator row decides where one
+    starts, so a line of pipes inside prose is never mistaken for a header."""
+    lines = text.split('\n')
+    table, header = [], None
+    for index, line in enumerate(lines):
+        stripped = line.strip()
+        if not stripped.startswith('|'):
+            if table:
+                yield table
+                table, header = [], None
+            continue
+        cells = [c.strip() for c in stripped.strip('|').split('|')]
+        if re.match(r'^:?-{3,}', cells[0]) and header:
+            table = [header]
+            header = None
+            continue
+        if table:
+            table.append(cells)
+        else:
+            header = cells
+    if table:
+        yield table
+
+
+def rows_of(text, markdown):
+    """Every split-plan row in one document.
+
+    A split-plan table is one carrying BOTH a `scope` header and a `state` header. Requiring
+    both is what keeps an arc's own step table — which has a state and no scope — out of a
+    check it was never written for.
+    """
+    out = []
+    for table in (md_tables(text) if markdown else html_tables(text)):
+        head = [c.lower() for c in table[0]]
+        if 'scope' not in head or 'state' not in head:
+            continue
+        scope_at, state_at = head.index('scope'), head.index('state')
+        for cells in table[1:]:
+            if len(cells) <= max(scope_at, state_at):
+                continue
+            out.append({'label': cells[0], 'scope': cells[scope_at], 'state': cells[state_at]})
+    return out
+
+
+def state_of(row):
+    """`empty` · `landed` · `pending`. A mark that is neither blank nor a landing is somebody's
+    decision, so it passes the close and still owes the documents pass."""
+    state = row['state'].strip().lower()
+    if state in UNDECIDED:
+        return 'empty'
+    if state.startswith(LANDED):
+        return 'landed'
+    return 'pending'
+
+
+def read(path):
+    try:
+        with open(path, encoding='utf-8', errors='replace') as fh:
+            return fh.read()
+    except Exception:
+        return ''
+
+
+def plan_of(page):
+    return rows_of(read(page), page.endswith('.md'))
+
+
+def workspace_root(start):
+    path = os.path.abspath(start)
+    while True:
+        if os.path.isdir(os.path.join(path, DEVEX)):
+            return path
+        parent = os.path.dirname(path)
+        if parent == path:
+            return None
+        path = parent
+
+
+def listdir(path):
+    try:
+        return sorted(d for d in os.listdir(path) if not d.startswith('.'))
+    except Exception:
+        return []
+
+
+def pages_in(folder):
+    out = []
+    for dirpath, dirnames, files in os.walk(folder):
+        dirnames[:] = [d for d in dirnames if d not in SKIP]
+        out += [os.path.join(dirpath, f) for f in sorted(files) if f.endswith('-approach.html')]
+    return out
+
+
+def state_folders(root, state):
+    """Where one state's workstreams sit, in every shape the workspace may be in."""
+    devex = os.path.join(root, DEVEX)
+    return [os.path.join(devex, 'workstreams', state), os.path.join(devex, 'sessions', state)]
+
+
+def open_workstreams(root):
+    """Every OPEN subject and the pages that argue it — the shape, and the shapes it replaces.
+
+    `workstreams/open/{NNN}-{subject}/` is where a workstream being worked lives. A workspace
+    whose state has not been restructured yet keeps `sessions/open/{subject}/`, or its arcs in
+    `arcs/` with its pages in `notes/`, and all of them read the same way. Only `open/` is read
+    here: `backlog/` is parked, and warning about parked work teaches nobody anything.
+    """
+    devex = os.path.join(root, DEVEX)
+    found = {}
+    for open_dir in state_folders(root, 'open'):
+        for subject in listdir(open_dir):
+            folder = os.path.join(open_dir, subject)
+            if os.path.isdir(folder) and subject not in found:
+                found[subject] = pages_in(folder)
+    for name in listdir(os.path.join(devex, 'arcs')):
+        if name.startswith('arc-') and name.endswith('.md'):
+            subject = name[len('arc-'):-len('.md')]
+            found.setdefault(subject, [])
+            page = os.path.join(devex, 'notes', f'{subject}-approach.html')
+            if os.path.isfile(page) and page not in found[subject]:
+                found[subject].append(page)
+    return found
+
+
+def subject_pages(root, subject, source):
+    """The pages that argue one subject, in any state and whichever shape the workspace is in.
+
+    All three states are searched, because a subject reaches `closed/` from `open/` and may be
+    closed straight out of `backlog/` when it turns out never to have been needed.
+    """
+    devex = os.path.join(root, DEVEX)
+    out = []
+    if source and os.path.isdir(source):
+        out += pages_in(source)
+    for state in STATES:
+        for base in state_folders(root, state):
+            candidate = os.path.join(base, subject)
+            if os.path.isdir(candidate):
+                out += [p for p in pages_in(candidate) if p not in out]
+    legacy = os.path.join(devex, 'notes', f'{subject}-approach.html')
+    if os.path.isfile(legacy) and legacy not in out:
+        out.append(legacy)
+    return out
+
+
+def home(root, subject):
+    """Where this subject's workstream actually sits, so the warning names a folder you can
+    open. The shape is `workstreams/open/{NNN}-{subject}/`; a workspace whose state has not
+    moved yet keeps `sessions/open/` or a bare arc in `arcs/`, and naming the shape it does not
+    have yet helps nobody."""
+    for container in ('workstreams', 'sessions'):
+        folder = os.path.join(DEVEX, container, 'open', subject)
+        if os.path.isdir(os.path.join(root, folder)):
+            return folder + '/'
+    legacy = os.path.join(DEVEX, 'arcs', f'arc-{subject}.md')
+    if os.path.isfile(os.path.join(root, legacy)):
+        return legacy
+    return os.path.join(DEVEX, 'workstreams', 'open', subject) + '/'
+
+
+def is_repo_seat(path):
+    """An approach page in a repository's own artifacts pocket — the seat a design lands in
+    once it is settled. A workstream's own page is not a seat: arguing it there is the point."""
+    normalized = os.path.abspath(path).replace(os.sep, '/')
+    if f'/{DEVEX}/' in normalized:
+        return False
+    return '/artifacts/' in normalized and normalized.endswith('-approach.html')
+
+
+def repo_of(root, path):
+    """The member repo a path sits in — the first segment under the workspace root."""
+    relative = os.path.relpath(os.path.abspath(path), root)
+    if relative.startswith('..'):
+        return None
+    return relative.split(os.sep)[0]
+
+
+def names_repo(scope, repo):
+    return re.search(r'(?<![\w-])' + re.escape(repo) + r'(?![\w-])', scope) is not None
+
+
+def emit(message, deny=None):
+    """One shape for both gates. `additionalContext` is what the agent reads; `systemMessage`
+    is the developer's pane — a PreToolUse hook that emits only the latter is silent to the
+    agent. A refusal adds the documented decision, and the exit code stays 0 either way."""
+    out = {'systemMessage': message,
+           'hookSpecificOutput': {'hookEventName': 'PreToolUse', 'additionalContext': message}}
+    if deny:
+        out['hookSpecificOutput']['permissionDecision'] = 'deny'
+        out['hookSpecificOutput']['permissionDecisionReason'] = deny
+    print(json.dumps(out))
+
+
+def moves(command):
+    """Every (source, destination) a shell command moves or copies. Tokens decide it, never a
+    pattern: `git mv` hides the verb behind `git`, and a flag is never an operand."""
+    out = []
+    for segment in SEGMENT.split(command):
+        try:
+            tokens = shlex.split(segment)
+        except ValueError:
+            continue                                    # an unbalanced quote — allow, never guess
+        while tokens and (tokens[0] in ('sudo', 'env', 'command', 'nohup', 'time')
+                          or re.match(r'^\w+=', tokens[0])):
+            tokens = tokens[1:]
+        if not tokens:
+            continue
+        verb = os.path.basename(tokens[0])
+        args = tokens[1:]
+        if verb == 'git' and args and args[0] == 'mv':
+            args = args[1:]
+        elif verb not in MOVERS:
+            continue
+        operands = [a for a in args if not a.startswith('-')]
+        if len(operands) >= 2:
+            for source in operands[:-1]:
+                out.append((source.rstrip('/'), operands[-1]))
+    return out
+
+
+def closing(destination):
+    """A path landing inside a closed folder of the workspace's own state.
+
+    Named containers rather than a bare `/closed/`, so the gate says which act it is watching.
+    A move from `backlog/` into `open/` is how work starts and matches nothing here — it is not
+    a close, and no gate fires on it.
+    """
+    normalized = os.path.abspath(destination).replace(os.sep, '/')
+    return CLOSED.search(normalized) is not None
+
+
+def gate_documents_first(payload):
+    tool_input = payload.get('tool_input') or {}
+    cwd = payload.get('cwd') or os.getcwd()
+    targets = [tool_input['file_path']] if tool_input.get('file_path') else \
+              [destination for _, destination in moves(tool_input.get('command') or '')]
+    for target in targets:
+        target = os.path.join(cwd, target)
+        if not is_repo_seat(target):
+            continue
+        root = workspace_root(target) or workspace_root(cwd)
+        if not root:
+            continue
+        repo = repo_of(root, target)
+        if not repo:
+            continue
+        for subject, pages in sorted(open_workstreams(root).items()):
+            rows = [row for page in pages for row in plan_of(page)]
+            if not any(names_repo(row['scope'], repo) for row in rows):
+                continue
+            pending = [row for row in rows if state_of(row) != 'landed']
+            if not pending:
+                continue
+            # This repo's own rows first — they are why the gate fired, and a plan this wide
+            # otherwise shows you six rows belonging to somebody else.
+            pending.sort(key=lambda r: not names_repo(r['scope'], repo))
+            listed = '\n'.join(f"  - [{state_of(r).upper():<7}] {r['scope']} — {r['label'][:90]}"
+                               for r in pending[:6])
+            more = f'\n  … and {len(pending) - 6} more' if len(pending) > 6 else ''
+            emit(f'Documents-first — workstream `{subject}` still has rows that have not '
+                 f'landed, and its split plan names {repo}:\n' + listed + more +
+                 f'\n  You are writing {os.path.basename(target)} into that repo\'s own pocket. '
+                 f'While a subject is open the argument lives in the workstream — '
+                 f'`{home(root, subject)}` — and lands in a seat once it is settled. '
+                 f'Write the documents in scope order, highest scope first: the foundation '
+                 f'before the repo, the repo before the seat, all of it before the code. If this '
+                 f'page IS the landing, say so and land the row.')
+            return 0
+    return 0
+
+
+def gate_close(payload):
+    tool_input = payload.get('tool_input') or {}
+    cwd = payload.get('cwd') or os.getcwd()
+    candidates = []
+    for source, destination in moves(tool_input.get('command') or ''):
+        destination = os.path.join(cwd, destination)
+        if closing(destination):
+            candidates.append((os.path.join(cwd, source), destination))
+    written = tool_input.get('file_path')
+    if written:
+        written = os.path.join(cwd, written)
+        # A move is the act the gate is written for. A write straight into `closed/` is the same
+        # act by another route — except on the page itself, which must stay editable so a row
+        # nobody decided can be decided.
+        if closing(written) and not written.endswith('-approach.html'):
+            candidates.append((None, written))
+    for source, destination in candidates:
+        root = workspace_root(destination) or workspace_root(cwd)
+        if not root:
+            continue
+        subject = os.path.basename(source.rstrip('/')) if source else ''
+        if subject.startswith('arc-') and subject.endswith('.md'):
+            subject = subject[len('arc-'):-len('.md')]   # the shape `workstreams/` replaces
+        if not subject or subject in STRUCTURE:
+            after = os.path.relpath(destination, os.path.join(root, DEVEX)).split(os.sep)
+            subject = next((part for part in after if part not in STRUCTURE), '')
+        if not subject:
+            continue
+        pages = subject_pages(root, subject, source if source and os.path.isdir(source) else None)
+        rows = [row for page in pages for row in plan_of(page)]
+        empty = [row for row in rows if state_of(row) == 'empty']
+        if not empty:
+            continue                                    # no plan, or every row accounted for
+        listed = '\n'.join(f"  - {r['scope']} — {r['label'][:90]}" for r in empty[:10])
+        more = f'\n  … and {len(empty) - 10} more' if len(empty) > 10 else ''
+        emit(f'Close gate — `{subject}` has rows nobody decided.',
+             deny=(f'Denied: `{subject}` cannot close while its split plan holds a row nobody '
+                   f'decided. The check is ACCOUNTED FOR, never finished — landed, carried and '
+                   f'deferred all pass, and closing a scope with work pending is a normal act.\n'
+                   f'Undecided rows:\n' + listed + more +
+                   f'\n\nGive each row one of three states, in the plan\'s State column:\n'
+                   f'  landed   → the node that now holds the content, as a path\n'
+                   f'  carried  → the successor scope, which is now open\n'
+                   f'  deferred → the event that brings it back\n'
+                   f'There is no override. Recording the deferral is the way through, and it is '
+                   f'exactly what a later scope needs to find.'))
+        return 0
+    return 0
+
+
+def sweep(roots):
+    for start in roots:
+        root = workspace_root(start) or os.path.abspath(start)
+        streams = open_workstreams(root)
+        print(f'{root}   {len(streams)} open')
+        for subject, pages in sorted(streams.items()):
+            rows = [row for page in pages for row in plan_of(page)]
+            if not pages:
+                print(f'  {subject}: no approach page — no split plan, and that is a valid shape')
+                continue
+            tally = {'landed': 0, 'pending': 0, 'empty': 0}
+            for row in rows:
+                tally[state_of(row)] += 1
+            print(f"  {subject}: {len(rows)} rows · landed {tally['landed']} · "
+                  f"pending {tally['pending']} · undecided {tally['empty']} "
+                  f"· {len(pages)} page(s)")
+            for row in rows:
+                if state_of(row) == 'empty':
+                    print(f"      undecided  {row['scope']} — {row['label'][:70]}")
+    return 0
+
+
+def main():
+    if '--stdin' in sys.argv:
+        try:
+            payload = json.load(sys.stdin)
+        except Exception:
+            return 0
+        gate = sys.argv[sys.argv.index('--gate') + 1] if '--gate' in sys.argv else ''
+        try:
+            if gate == 'documents-first':
+                return gate_documents_first(payload)
+            if gate == 'close':
+                return gate_close(payload)
+        except Exception:
+            return 0                                    # when unsure, allow
+        return 0
+    return sweep([a for a in sys.argv[1:] if not a.startswith('-')] or ['.'])
+
+
+if __name__ == '__main__':
+    sys.exit(main())

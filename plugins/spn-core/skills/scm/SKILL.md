@@ -44,7 +44,42 @@ A package organized by feature rather than by layer — a support library — ha
 
 `agent-init` registers the plugin marketplace, enables the plugins, writes a managed block in the repo's instruction file, and generates the local inventory. `agent-sync` refreshes that wiring afterwards. Neither parses code — both are pure reference refreshes from the manifests and workspace state.
 
+**A stack-agnostic verb reads SPN manifests and nothing else.** `sprepo.json` gives the world and the stack claim, `spkind.json` names an apps node, and `spinfrapkg.json` with `src/spestate.json` names an estate node. Everything a stack invents sits **behind the claim** — a package manifest, a lockfile, an installed-dependency tree. A verb that reaches for one unasked refuses the first repo that does not carry it. The node inventory is a **per-world** question rather than a per-stack one: an estate repo declares its packages too, and it must open with them listed.
+
+**The plugin set is derived from the manifest, never typed.** `FOUNDATION` takes the core plugin, `INFRA` takes core plus the estate plugin, and an `APPS` repo takes core plus the plugin matching its stack claim. A repo with no claim at all falls back to the core plugin alone.
+
 **Do not hand-edit inside the managed markers**, and do not restate a plugin's rules in a repo's instruction file. A repo's own file carries only what is true of that repo alone.
+
+## The workspace, one level above the repo
+
+A repo is wired by `repo`; the folder the repos sit in is minted by `workspace`. They are different levels with different writers, and the workspace level is the one people forget exists.
+
+| Verb | Does | Touches |
+| --- | --- | --- |
+| `workspace init` | mints the folder — the permission floor, the marketplace, the state directory, the engine check | the workspace root |
+| `workspace sync` | brings the floor back to what the members imply | the workspace root |
+| `workspace status` | the orientation — members, world, wiring, every workstream, and any split-plan row still unlanded | reads only |
+
+**There is no workstream verb, and adding one is a defect.** Opening a subject is `mkdir`, listing what is open is what `status` already reports, and the close is a gate rather than a command.
+
+### When work earns a workstream
+
+A workstream is `.spndevex/workstreams/{state}/{NNN}-{subject}/`, and its state is the folder it sits in — `backlog/` parked, `open/` being worked, `closed/` accounted for. **It is never a Claude Code session**: Claude Code owns the window, and `SessionStart` is its hook.
+
+**Three tells, and any one is enough.** Work earns a workstream when it needs an argument before it can be built, when it crosses more than one repo, or when it outlives one sitting. Everything else is just work you do, and a workstream minted for a one-file change is overhead nobody reads.
+
+**A new one takes the next free number across all three states.** The number is assigned once in creation order, and nothing reuses or renumbers it.
+
+**The starting state is a conversation, never a default.** The developer may simply say *backlog* or *open*. When they do not, propose one and say why — never silently, and never as an open question.
+
+| Propose | When | The tell |
+| --- | --- | --- |
+| **`open/`** | it can be started now | nothing blocks it — no unanswered card, no trigger, no workstream it waits on |
+| **`backlog/`** | it cannot be started yet | it waits on a trigger, on another workstream, or on questions nobody answered — **and you can name the blocker** |
+
+**Name the blocker, or the proposal is `open/`.** *Feels like later* is not a blocker, and a backlog nobody can explain is where work goes to be forgotten. The developer confirms or overrides in one word, because scope is theirs.
+
+**Moving `backlog/` to `open/` is how work starts.** It needs no ceremony, it is not a close, and no gate fires on it. Read `refs/cross-repo.md` for the full shape, the worked examples, and the two gates a workstream carries.
 
 ## The lines that hold
 
