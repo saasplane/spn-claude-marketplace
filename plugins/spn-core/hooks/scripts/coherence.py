@@ -25,6 +25,9 @@ SOURCES = sorted(
      ROOT / "CONCEPT.md", ROOT / "README.md", ROOT / "CLAUDE.md"}
 )
 REGISTER = ROOT / "docs/registers/decisions.md"
+# Heading words too common to identify a section on their own.
+SKIP_WORDS = {"what", "this", "that", "with", "from", "they", "them", "then",
+              "never", "every", "which", "where", "their", "there", "once"}
 
 # Prose that is deliberately historical: a superseded ruling keeps its old words on
 # purpose, and an artifact describes the moment it was produced (RD.DOCS.021).
@@ -176,8 +179,37 @@ def cardinality():
     return out
 
 
+def hub():
+    """Every concept section owes a section in its readable face.
+
+    A face renders a live seat, so unlike an argument or a measurement it CAN be checked
+    against current state (RD.DOCS.021). `concept-overview.html` is the concept's readable
+    face rather than a record of a moment: a workstream that changes the model owes the face
+    with it, and a section the face never expands is a model somebody added and stopped.
+
+    Only the concept's own `##` and `###` headings are compared. A face carries fewer words
+    per section by design — what it may not carry is fewer sections.
+    """
+    concept, face = ROOT / "CONCEPT.md", ROOT / "docs/artifacts/overviews/concept-overview.html"
+    if not concept.is_file() or not face.is_file():
+        return []                                  # a repo earns a face; absence is not drift
+    rendered = re.sub(r"<[^>]+>", " ", face.read_text()).lower()
+    missing = []
+    for heading in re.findall(r"^#{2,3} +(.+?)\s*$", concept.read_text(), re.M):
+        words = [w for w in re.findall(r"[a-z]{4,}", heading.lower()) if w not in SKIP_WORDS]
+        if words and not any(w in rendered for w in words):
+            missing.append(heading.strip())
+    if not missing:
+        return []
+    out = f"HUB         {len(missing)} concept section(s) the readable face never expands."
+    out += "\n            A face tracks its seat; a section it drops is a model nobody rendered:"
+    for h in missing[:8]:
+        out += f"\n              {h[:76]}"
+    return [out]
+
+
 def main():
-    findings = vocabulary() + rulings() + ownership() + cardinality()
+    findings = vocabulary() + rulings() + ownership() + cardinality() + hub()
     for f in findings:
         print(f)
         print()

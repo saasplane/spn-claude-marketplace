@@ -124,6 +124,18 @@ The pocket holds what the node **authors** rather than derives, and its three au
 | **Overview** | `artifacts/overviews/<section>-overview.html` | one concept section at reading depth | the section is too big to review where it stands |
 | **Approach** | `artifacts/approaches/<topic>-approach.html` | one argument — options weighed, one chosen | a design was actually argued |
 
+**They do not share a lifecycle** (decision RD.DOCS.021). Two describe a moment; one renders something live.
+
+| Kind | Produced | Its relation to today |
+| --- | --- | --- |
+| **Report** — a measurement | on demand | none. A report of last month is a correct report of last month, and the next run supersedes it |
+| **Approach** — an argument | on demand, when a design is argued | none is a defect. **Ahead** leads the code as a concept does, **level** means it landed, **behind** is a correct record of then |
+| **Overview** — a face | **maintained.** A workstream changing the model owes it | it **tracks its seat**. Drift from `CONCEPT.md` is a defect, and `coherence.py` reads it |
+
+**Carry the face and the arguments inside the workstream that changes them**, rather than tidying them afterwards. A workstream runs concept → docs → code, so the model moves first and the face moves with it. Leave the face to a later pass and the hub states a model the code has already left. Expansion is earned the same way. Where implementing a workstream shows a section is too big to review in place, the face gains one then — that is when somebody has read it at depth.
+
+**Never rewrite an argument to read as though it had always argued the current shape.** That destroys the only record of what was weighed. A face is the opposite — drifting from its seat is exactly how it goes wrong.
+
 **The outline is fixed for an argument and borrowed for an explanation.**
 
 | | Outline | Carries `Open` / `Deferred`? |
