@@ -132,6 +132,18 @@ The pocket holds what the node **authors** rather than derives, and its three au
 | **Approach** — an argument | on demand, when a design is argued | none is a defect. **Ahead** leads the code as a concept does, **level** means it landed, **behind** is a correct record of then |
 | **Overview** — a face | **maintained.** A workstream changing the model owes it | it **tracks its seat**. Drift from `CONCEPT.md` is a defect, and `coherence.py` reads it |
 
+**A suggestion is recorded before it is executed — MUST.** The developer instructs and corrects while the work runs, and each one is written down before it is acted on. An instruction becomes an arc step or a row on the approach page. A correction becomes a log line and a rewrite of the row it corrects. A question nobody can answer alone becomes an `Open` card, argued in the page rather than in chat. A session's context ends with the session, so anything held only there is work nobody can pick up.
+
+**A row carries its state while the work runs**, so the developer can see what they asked for that has not happened yet:
+
+| State | Means |
+| --- | --- |
+| ⬜ **raised** | it is written down. Nothing has been built |
+| 🚧 **agreed** | the approach is settled and the work is running |
+| ✅ **landed** | the content is in the node that owns it |
+
+Those are for work in flight. `landed` · `carried` · `deferred` are what the close sweep asks of every row, and only the first is shared between them.
+
 **Carry the face and the arguments inside the workstream that changes them**, rather than tidying them afterwards. A workstream runs concept → docs → code, so the model moves first and the face moves with it. Leave the face to a later pass and the hub states a model the code has already left. Expansion is earned the same way. Where implementing a workstream shows a section is too big to review in place, the face gains one then — that is when somebody has read it at depth.
 
 **Never rewrite an argument to read as though it had always argued the current shape.** That destroys the only record of what was weighed. A face is the opposite — drifting from its seat is exactly how it goes wrong.

@@ -12,7 +12,12 @@ This asks four questions that only have answers across documents:
   OWNERSHIP    is one subject ruled on by two documents that do not cite each other
   CARDINALITY  does prose write a count into a set that is free to grow
 
-Run from the repo root. Exit code is the number of findings.
+Run from the repo root, in ANY repo. **Every question degrades to silence where its input is
+absent** — a partner holds the plugins and neither the foundation book nor its registers, so a
+missing register, concept or overview is a fact about that repo rather than a finding about it.
+A check that crashes on a repo it was not written for takes the whole hook down with it.
+
+Exit code is the number of findings.
 """
 import re
 import sys
@@ -20,9 +25,12 @@ import pathlib
 from collections import defaultdict
 
 ROOT = pathlib.Path(".")
+# Filtered to what EXISTS, because this runs in any repo. A glob returns only real files, but the
+# three named roots do not — and a partner repo commonly has no `providers/` and no `CLAUDE.md`.
 SOURCES = sorted(
-    {*ROOT.glob("docs/**/*.md"), *ROOT.glob("providers/**/*.md"),
-     ROOT / "CONCEPT.md", ROOT / "README.md", ROOT / "CLAUDE.md"}
+    p for p in {*ROOT.glob("docs/**/*.md"), *ROOT.glob("providers/**/*.md"),
+                ROOT / "CONCEPT.md", ROOT / "README.md", ROOT / "CLAUDE.md"}
+    if p.is_file()
 )
 REGISTER = ROOT / "docs/registers/decisions.md"
 # Heading words too common to identify a section on their own.
@@ -83,6 +91,8 @@ def rulings():
     What is checked is a bolded complete SENTENCE after the opening one, which is what a
     buried ruling looks like every time it has appeared.
     """
+    if not REGISTER.is_file():
+        return []                                  # a repo earns a register; absence is not drift
     split, long = [], []
     for row in re.findall(r"^\| (RD\.[A-Z]+\.\d+) \| (.+?) \| .+? \| .+? \|$",
                           REGISTER.read_text(), re.M):
