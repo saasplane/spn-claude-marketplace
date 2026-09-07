@@ -5,12 +5,18 @@ Every other validator in this repo asks whether a document is well-formed: links
 resolve, metadata parses, statuses are legal. All of them pass while two documents
 state opposite rules, because nothing compares one rule to another.
 
-This asks four questions that only have answers across documents:
+This asks five questions that only have answers across documents:
 
   VOCABULARY   does every closed vocabulary say the same thing everywhere it appears
-  RULING       does a register ruling survive contact with the documents it governs
+  RULING       does each row carry exactly one ruling, and nothing but ruling
   OWNERSHIP    is one subject ruled on by two documents that do not cite each other
   CARDINALITY  does prose write a count into a set that is free to grow
+  HUB          does the readable face expand every section its concept states
+
+**None of them asks whether a row's ruling is TRUE of the documents it governs**, and that is the
+question worth most. It needs a row to name the surfaces stating it, which `06-registers.md` now
+requires and no row yet carries. Until a row carries that list, the comparison is an inference
+problem rather than a check, and an inference that guesses wrong is worse than silence.
 
 Run from the repo root, in ANY repo. **Every question degrades to silence where its input is
 absent** — a partner holds the plugins and neither the foundation book nor its registers, so a
