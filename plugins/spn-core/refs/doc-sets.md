@@ -203,7 +203,8 @@ The corpus speaks one voice (decision RD.DOCS.031, sharpened by RD.DOCS.043 and 
 7. **The register governs prose, never records** — behavior rows, decision/glossary rows, every table and diagram, contract blocks, and code samples keep their form untouched. A warmed record is a defect.
 8. **The depth guarantee** — a rewrite changes how sentences are written, never what the corpus contains. Every fact, constraint, edge case, table, and diagram survives; rewrites may add examples, never remove substance.
 9. **Artifacts take the voice** (decision RD.DOCS.043) — an approach, an overview and a report take the voice exactly as a seat does. The audience decides the examples and the depth, never the temperature. An HTML page is no exemption.
-10. **Register rows take the plain substrate** (decision RD.DOCS.043) — the bold headline first, then one clause a sentence, none past twenty-five words. A decision or glossary row keeps its exact terms and its MUST. No *you* and no aside: a row is still a record.
+10. **Register rows take the plain substrate** (decision RD.DOCS.043) — one clause a sentence, none past twenty-five words, and the decision column is the ruling and nothing else. A decision or glossary row keeps its exact terms and its MUST. No *you* and no aside: a row is still a record.
+11. **No idioms** (decision RD.DOCS.052) — an idiom means something its words do not say, so a reader whose first language is not English cannot guess it. Write the plain phrase instead: *ask me to continue*, never *say the word*. A house term the book defines is not an idiom, and `owes`, `carries`, `seat` and `rung` all stay. The fix is the plain phrase, never a shorter sentence. **Plain is not simplified** — a term can be looked up and an idiom cannot, so terms are not the target. One sentence may carry four of them. What must be plain is the language around them, and the exact term, the constraint and the MUST all survive the rewrite untouched.
 
 ### Reaching your reader — three moves
 
@@ -233,7 +234,9 @@ The corpus speaks one voice (decision RD.DOCS.031, sharpened by RD.DOCS.043 and 
 **Your own instruction surface is in scope** (decision RD.DOCS.031 · RD.DOCS.043 · RD.DOCS.044, stated
 at depth in the book's `05-docs/01-corpus.md` § What the pattern binds). The voice reaches this book,
 the foundation's provider set, and these plugins — your skills, lenses, agent briefs and reference
-digests. Layout is what those trees are free of, never how they read. The bars are identical
+digests. **It also reaches what you say and print at runtime** (decision RD.DOCS.052). A session
+banner, a hook's output and your own chat reply are all held to it. Nothing you write escapes
+the bar by not being a file. Layout is what those trees are free of, never how they read. The bars are identical
 everywhere; only the move differs. Say *you* on a page someone reads to learn. Use the **imperative**
 on a page you act from, because a passive instruction leaves you working out who acts. And where a
 warmer sentence would be less exact about what you must do, keep the sentence and let the page sit

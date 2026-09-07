@@ -38,7 +38,7 @@ attention and teaches the reader to skim the ones that matter.
 
 | Part | What it carries |
 | --- | --- |
-| **Number + summary** | Numbered, and the numbering is **stable across the whole exchange** — item 3 is item 3 in the question, the discussion and the answer. The summary names the **choice**, not the topic |
+| **Number + summary** | Numbered **`Q<n>`**, and the numbering is **stable across the whole exchange** — Q3 is Q3 in the question, the discussion, the answer and the page that later states it. One prefix, because a corpus that has used `O1`, `D1`, bare `1` and a trailing `card D58` costs the reader a guess before they can reply. The summary names the **choice**, not the topic |
 | **What** | The change concretely — the file, the rule, the before → after |
 | **Why** | What it costs to leave as is: the failure it causes. Never *"for consistency"* |
 | **Options** | A **table**: lettered, trade-off in its own column. *"Leave it"* is a real option wherever viable, with its cost stated |
@@ -63,9 +63,20 @@ Leaving that to conversation history is leaving it out.
 
 ## Closing a sheet
 
-More than one card closes by showing how to answer by number — *"1A, 2 confirm, 5–9 yes"* —
+More than one card closes by showing how to answer by number — *"Q1A, Q2 confirm, Q5–Q9 yes"* —
 so the whole sheet settles in one line. An answer that cannot be given by number means the
 sheet was not numbered.
+
+**A number is never reused and never restarts.** A card answered earlier in the exchange leaves a
+gap, and the gap is the record that it was settled. Renumbering what is left makes the answer you
+already gave point at a different question. A reopened card keeps its number and gains a letter —
+`Q6` becomes `Q6A`, then `Q6B` — so a log reading *reopened twice, then settled* still resolves.
+
+**A card raised in conversation keeps the number it was given there.** The person has been reading
+those numbers, so the page uses them rather than starting a second run.
+
+> Digested from `05-docs/05-artifacts.md` — *The approach document* → `Open`. Where the two
+> disagree, the chapter wins.
 
 ## Deferred
 

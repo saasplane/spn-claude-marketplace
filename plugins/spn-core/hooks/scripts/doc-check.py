@@ -58,7 +58,32 @@ ABOUT = (r'\b(the reader\s+(?:must|should|needs?\s+to|is\s+expected)|one must|on
 # A rule has to be able to quote the mistake it bans. The corpus marks a quoted counter-example
 # the way it marks any term — italics or backticks — so both are blanked before CARD and ABOUT
 # run. This is the precedent YOU_AS_TERM already sets for a register row (RD.DOCS.049).
-MARKED = re.compile(r'\*[^*\n]{1,120}\*|`[^`\n]*`|“[^”\n]{1,120}”|"[^"\n]{1,120}"')
+# RD.DOCS.052 — an idiom means something its words do not say, so a reader whose first language
+# is not English cannot guess it. Length limits do not catch one, because an idiom is usually
+# short. The house-term rule does not catch one either, because nobody defines an idiom. Listed
+# rather than inferred: a phrase earns its place here only when its meaning is not its words.
+# A defined house term is deliberately absent — `owes`, `carries`, `seat` and `rung` all stay.
+# Ruled out by the developer 2026-09-07 and deliberately absent: `by hand`, `baked in`,
+# `day one`, `from scratch`, `sanity check`. All are ordinary engineering English — close
+# enough to their literal sense that a reader works them out, and common enough that
+# flagging them would train everyone to ignore the finding.
+# `paved road` and `front door` were both listed here and both removed: CONCEPT.md § THE PAVED
+# ROAD and 02-packaging.md § The front door define them, so they are vocabulary a reader is
+# taught, not a phrase they must already know. Check for a definition before adding a phrase.
+IDIOMS = ('say the word', 'earns its keep', 'earn its keep', 'at first glance', 'boils down to',
+          'boil down to', 'out of the box', 'under the hood', 'hand in hand', 'on the hook',
+          'low-hanging fruit', 'rule of thumb', 'in the wild', 'cuts both ways',
+          'cut both ways', 'a far cry', 'the whole point', 'goes stale', 'go stale', 'went stale',
+          'falls over', 'fall over', 'moving parts', 'off the shelf', 'the elephant in', 'moving the needle', 'across the board',
+          'on the fly', 'hard and fast', 'grey area', 'gray area', 'chicken and egg',
+          'bells and whistles', 'in the weeds', 'the lay of the land', 'more often than not',
+          'by and large', 'for good measure', 'the jury is out', 'reads like', 'read like',
+          'a build log', 'nail down', 'nails down', 'pin down', 'pins down', 'hold water',
+          'holds water', 'rings true', 'ring true', 'as it stands', 'give or take')
+IDIOM = re.compile(r'(?<![a-z])(' + '|'.join(re.escape(i) for i in IDIOMS) + r')(?![a-z])', re.I)
+
+QUOTE_L, QUOTE_R = '\x02', '\x03'
+MARKED = re.compile(r'\x02[^\x03\n]{0,200}\x03|\*[^*\n]{1,120}\*|`[^`\n]*`|“[^”\n]{1,120}”|"[^"\n]{1,120}"')
 
 # RD.DOCS.043 — the measure. Second person is whole-word and case-insensitive. Longest form
 # first, or `your` claims the front of `yours` and the rest never matches. `yours` and
@@ -280,6 +305,21 @@ def prose_of(text, is_html):
         lines.append(l)
     t = MD_LINK.sub(r'\1', '\n'.join(lines))
     t = re.sub(r'\[!(?:NOTE|IMPORTANT|WARNING|TIP|CAUTION)\]', ' ', t)
+    # RD.DOCS.049 lets a rule quote the mistake it bans, and the marking is how a check tells
+    # quotation from breach. That marking used to die on the line below, which strips every `*`
+    # and backtick — so `MARKED` was matching a string no longer carrying a marker, and a rule
+    # was flagged by itself. Bold is emphasis rather than quotation, so its markers just go.
+    # Italic and code spans become sentinel-wrapped, which survives the strip and is what
+    # `MARKED` now looks for. The sentinels carry no word character, so no count moves.
+    # Every marker still becomes a space, exactly as the strip below always did — otherwise two
+    # words join, the token count moves, and a share the corpus is measured against shifts under
+    # a change that was only ever about quotation.
+    # One delimiter in, one sentinel out — never a space, and never two. `sentences()` turns each
+    # sentinel back into the space the strip below used to leave, so segmentation is unchanged to
+    # the character. Bold is emphasis rather than quotation, so it is left for that same strip.
+    t = re.sub(r'`([^`\n]*)`', lambda m: QUOTE_L + m.group(1) + QUOTE_R, t)
+    t = re.sub(r'(?<!\*)\*([^*\n]{1,200})\*(?!\*)',
+               lambda m: QUOTE_L + m.group(1) + QUOTE_R, t)
     return re.sub(r'[*`#>\[\]]', ' ', t)
 
 
@@ -290,7 +330,13 @@ def words(s):
 
 def sentences(prose):
     """A prose sentence: split on . ! ? plus whitespace and on block boundaries; more than
-    three words. Returns (text, word count) pairs."""
+    three words. Returns (text, word count) pairs.
+
+    A quotation sentinel becomes the space its delimiter used to leave, so what counts as a
+    sentence here does not move when a rule quotes the mistake it bans. Only `voice()` reads the
+    sentinels, and only to tell a quotation from a breach.
+    """
+    prose = prose.replace(QUOTE_L, ' ').replace(QUOTE_R, ' ')
     out = []
     for block in BLOCK_BREAK.split(prose):
         for s in SENT_END.split(block):
@@ -343,6 +389,13 @@ def voice(prose, sents, kind='chapter', operative=False):
         eg = ', '.join(f'{a} {b}' for a, b in hits[:4])
         out.append(('RULE', f'{len(hits)} cardinality-in-prose ({eg}) — RD.GOV.008: name a set '
                             f'by its rule, not its count'))
+    idioms = IDIOM.findall(unmarked)
+    if idioms:
+        eg = ' · '.join(f'"{i}"' for i in sorted(set(idioms))[:4])
+        out.append(('SOFT', f'{len(idioms)} idiom(s) — RD.DOCS.052: an idiom means something its '
+                            f'words do not say, so a second-language reader cannot guess it: '
+                            f'{eg} · write the plain phrase. Reported SOFT until workstream 008 '
+                            f'retrofits the corpus'))
     n_about = len(re.findall(ABOUT, unmarked, re.I))
     if n_about:
         out.append(('RULE', f'{n_about} construction(s) written about the reader, not to them '

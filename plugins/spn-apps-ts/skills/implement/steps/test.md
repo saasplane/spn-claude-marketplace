@@ -56,7 +56,7 @@ Never leave mutated: the platform org and its policies, org-TYPE/GLOBAL auth/dat
 ## Fixture rules
 
 - **PII is allowed ONLY in `tests/` fixtures, never in `src/`.** Test personas must stay env-overridable; passwords are never hardcoded anywhere — always the env variable.
-- **Behavior ids in titles**: a contract-tier test proving a behavior row embeds its id (`<MOD>.<CAP>.<NN>`) in the test title, so docs↔tests coupling is greppable (foundation decision RD.DEVEX.008). Internals-only tests are exempt. Flip the row to ✅ only once its test exists.
+- **Behavior ids in titles**: a contract-tier test proving a behavior row embeds its id (`<MOD>.<CAP>.<NN>`) in the test title, so docs↔tests coupling is greppable (foundation decision RD.DEVEX.008). Internals-only tests are exempt. **Flip the row to ✅ only once its test has run and passed** — a case the runner merely collected proves nothing, and a case that skips itself is collected too.
 - Fixtures that construct jsonb-persisted contract objects must be updated in the same change as any required-field addition to those types.
 
 ## Commands

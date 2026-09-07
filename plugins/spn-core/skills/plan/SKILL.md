@@ -152,6 +152,56 @@ Two rules separate them once you are writing:
 
 `concept-overview.html` is the concept's readable HTML face, one per repo; a `<section>-overview.html` expands one section and the section names it back. Everything below in this section governs the **approach** document.
 
+**Where the page lives decides whether it may be published** (decision RD.DOCS.054). An open page
+sits in `.spndevex/`, which is in no repository, so it reaches one machine and nobody else. A
+settled page sits in a repository pocket, where the git host already shares it.
+
+| The page is | Reaches | So |
+| --- | --- | --- |
+| open, still argued | one machine | it **may be published** for review, on the developer's say-so |
+| settled, in a repository | anyone who pulls | **never publish it** |
+
+- **Ask before publishing, every time.** The page leaves the machine, and what it carries is the
+  developer's to judge. Never publish one unasked.
+- **Never publish a page that is already in a repository.** Every relative link would have to
+  become absolute, and the foundation's pocket alone carries 122 of them with 39 pointing at a
+  sibling page. That is a second corpus disagreeing with the first.
+- **The file is the source.** A published page is a rendering, so read the file rather than the
+  page — which is also what keeps it cheap.
+- **Retire the published copy when the page settles** into a repository.
+- **Never publish a credential, real personal data, or a private repository name.**
+
+**Hand the page over as something clickable, and name the file rather than the path.** Which form
+works depends on where the developer reads it:
+
+| Give | Reads as | Works |
+| --- | --- | --- |
+| the **published artifact's** https URL | `https://claude.ai/code/artifact/<id>` | wherever the developer reads, and it renders the page rather than its markup |
+| a markdown link on the **workspace-relative** path | `[release-confidence-approach.html](.spndevex/workstreams/open/007-.../release-confidence-approach.html)` | in an IDE chat, where it is clickable |
+| `file://` plus the absolute path | the session banner prints this under each open workstream | in a terminal, and when pasted into any browser |
+
+**Where the page has been published, the artifact URL is the one that reads.** An editor shows an
+HTML file as markup, so a path link hands over source rather than a page. Give the path forms
+alongside it, and let the developer pick — asking which they want costs a turn.
+
+**Publishing produces that URL, so give it in the same message.** The publish is what the developer
+said yes to; handing back a path afterwards wastes the permission they just gave. Republish the same
+file path to keep the URL stable, and give the URL again every time the page changes.
+
+- **Name the file, never the path.** The link text is the file name; the path is the target.
+- **Never assume an editor extension, and never configure one.** How a page gets rendered is the
+  developer's own setup, and no two are alike. An editor shows an HTML file as markup, and what
+  fixes that is theirs to install. **Add no `.vscode/` folder and no editor setting**: a workspace
+  that ships one decides for every person who opens it, on a machine you cannot see. Write no
+  instruction that only works with an extension present, and never report a link as broken because
+  a preview did not appear.
+- **Give the link every time the page changes**, in the same message that says what changed. A
+  page nobody can reach is a page nobody reads, and the developer is who it was written for. Where
+  they say a live preview is open, say what changed and drop the link — it reloads itself.
+- **Never open it yourself, and never start a server for it.** `open -a` spawns a window on each
+  call. A hand-started server dies with its shell and leaves a dead link, which reads as a missing
+  page rather than a stopped process.
+
 It is **one self-contained HTML page named `<topic>-approach.html`** — one file per topic, replaced in place as it iterates, never a second copy in another format. HTML because these documents carry tables, samples and comparisons that a reader scans rather than reads. HTML also because a single file travels: it opens anywhere, needs nothing installed, and cannot drift from a companion version of itself.
 
 | Section | Answers | Written as |
@@ -186,6 +236,21 @@ blocks it, and `backlog/` where you can name what it waits on: a trigger, anothe
 questions nobody answered. **Name the blocker, or the proposal is `open/`** — a backlog nobody
 can explain is where work goes to be forgotten. The developer confirms or overrides in one word,
 because scope is theirs. `refs/cross-repo.md` carries the worked examples.
+
+**Implementation reopens a workstream, and that is the loop working rather than failing.**
+Approval is not a freeze. Building against a settled argument surfaces facts the cards assumed
+away, and a fact that changes a **decision** owes a new card before the work continues. A fact
+that only changes the **amount of work** does not — it is a row, not a card.
+
+- **Reopen for a decision, never for a surprise.** Discovering the job is bigger is a row moving
+  from ⬜ to 🚧. Discovering the model was wrong is a card.
+- **Write the card when the fact is found**, not when somebody notices later. A page marked ✅
+  while its author keeps arguing is the failure this rule prevents, and the amendment trail is
+  what a later reader needs.
+- **Record what was withdrawn, and why.** A superseded model that leaves no trace gets
+  re-derived by the next person, who has the same reasons for it that you did.
+- **The masthead follows the Open section.** Cards outstanding means the page is not ✅, whatever
+  it said an hour ago.
 
 **A workspace-level page spans repos, and a seat's page never does.** That is the one difference
 between them, and it is one column:
@@ -268,31 +333,23 @@ Color carries role, not decoration — neutral `--card`/`--rule` · emphasis `--
 
 ### Every open item is decidable in one read
 
-An open item exists to be **decided**, so it is written for the person deciding — not as narrative they must extract a question from. **One card per item, always these four parts, always this order:**
+An open item exists to be **decided**, so it is written for the person deciding — not as narrative
+they must extract a question from.
 
-```text
-<Item> — one line naming the decision, not the topic
+**The card grammar is owned by `refs/decision-cards.md`. Read it there and do not learn it from
+here.** That file carries the four parts and their order, the `Q<n>` numbering, what makes an
+option a real option, and how a sheet closes. This skill adds nothing to it. A rule stated in two
+places drifts: a summary here once omitted the number, and a session then concluded there was no
+numbering rule.
 
-What        the change, concretely: the file, the rule, the before → after
-Why         what it costs to leave as is — the failure it causes, not "for consistency"
-Options     A / B / C, one line each, with the real trade-off on each
-            → Recommendation: <one>, because <the reason it wins>
-Preview     when the decision is a shape — an outline, a file tree, a sample row, a code
-            fragment — a compact preview of the recommendation, inline in the card
-```
+Two things are this skill's own, because they are about where a card sits rather than how it reads:
 
-- **Open is the exception to the document's high-level altitude.** The body compresses because its detail lives in owning chapters. An open item's detail lives nowhere else, and a decision hangs on it. So a card carries whatever depth the decision needs, and a reader who must leave the card to decide was handed an incomplete one.
-- **Options are mandatory, and so is a recommendation.** A card with no options is a report, not a decision; a card with options but no recommendation makes the reader do the analysis twice. Two options is the normal case — *do it this way* versus *leave it*, with what each costs.
-- **Show, don't summarize, when the decision is a shape.** Judging the options sometimes requires seeing what one would produce — an outline, a tree, a table layout, a sample row. Then the card carries a compact preview of the recommendation, and of a rival where the difference between them is the point. A reviewer who has to ask *"show me what A looks like"* was given a card that was not decidable. The iteration that follows is the cost of the missing preview.
-- **"Do nothing" is a real option** and MUST appear whenever it is genuinely viable, with its cost stated. Half the time it wins.
-- **Trade-offs are concrete or absent.** *"Simpler"* is not a trade-off; *"one file to change instead of twenty, at the cost of a second name for one concept"* is.
-- **The recommendation carries its reason on the same line.** A reader agreeing with the reason can approve without reading further; a reader disagreeing knows exactly where they diverge.
-- **Length is not the variable.** A long description does not make a decision easier and a short one does not make it faster — *description, why, options, recommendation* is what does. Write each part as short as it can be while staying decidable.
+- **A card belongs in `Open`, and `Open` is what blocks.** The document is not settled while it
+  holds one. The status chip reads 🚧 until the section is empty.
+- **The same grammar governs how pending work is reported at any time** — a status summary, a chat
+  reply, an answer to *"what's left?"* A list of pending items with no options is work handed back
+  rather than a decision offered.
 
-- **More than one item → numbered, and stable within the exchange.** A multi-item sheet closes by showing how to answer by number — *"1A, 2 confirm, 5–9 yes"* — so a developer settles the whole sheet in one line. An answer that cannot be given by number is a sheet that was not numbered.
-- **A card is self-contained across sittings.** Developers decide days after the work that raised the question; a card assumes no conversation context and no memory of the session that wrote it. Carry what deciding cold needs. That is the provenance (what raised it, in a line or two) and the current state (what is true today, and the cost of not deciding). Name where the decision lands once made. Leaving the card for conversation history is leaving the card.
-
-The same layout governs **how pending work is reported back to a developer at any time**. That covers an approach document, a status summary, a chat reply, or an answer to *"what's left?"* A list of pending items without options is work handed back rather than a decision offered.
 
 ### Open blocks; Deferred does not
 

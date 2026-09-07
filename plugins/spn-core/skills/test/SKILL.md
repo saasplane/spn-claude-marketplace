@@ -13,19 +13,25 @@ description: What proves a behaviour, at which tier, and what a passing suite do
 | --- | --- | --- |
 | **Unit** | a rule, transformation, or rendering decision behaves as specified, in isolation | that it is wired to anything |
 | **Component** | what a rendering harness cannot compute — styles, mode flips, layout at real breakpoints, hover and portals, visual change | that anything is wired to anything |
+| | **A browser is a runner, not a tier.** A case that mounts one piece with no fakes is unit tier whichever runner shows it. Only a package owning its own components owes this tier by name | |
 | **Integration** | the code against its **real backing resources** — scoping, isolation, invalidation, delivery | that a caller can reach it, or may |
 | **Contract** | the **published surface** under a real principal — gates, error shapes, read levels, compatibility | why a person gave up halfway through |
 | **Journey** | a person completing an outcome through a real entry | which rule failed when it fails |
+
+**A node may double a seam it owns, and nothing else.** That one rule decides where a case lives, and everything below follows from it. A case reaching for a fake of something its node does not own belongs in another repository, however green it runs.
 
 **The tier is derived, not debated: a project's KIND fixes its consumer, and the consumer fixes what proof means.** A package consumed by other code is proven where that code meets it; an application consumed by people is proven where people meet it.
 
 | The project is | Its consumer is | It owes |
 | --- | --- | --- |
-| A support package | Modules and apps | Unit — plus integration wherever it fronts a real resource, and **component** where it owns web components |
-| A domain module | The composing application | Unit · integration · contract — a UI module owes **component** instead of integration |
-| An application | People and other systems | Contract through its entries · journeys for the flows it owns |
+| A support package | Modules and apps | Every tier it reaches — unit, integration wherever it fronts a real resource, component where it owns web components. It invented its own seam, so it may double there |
+| A domain module | The composing application | **Unit alone.** It ships no shell, so a server module **cites** the composing application's contract and a web module **cites** its journey |
+| An application | People and other systems | **Both faces of what it composes** — contract through its entries, and journeys over its own surfaces |
 | An API client | Other systems | Integration against a running service — this **is** that service's contract tier |
 | A command-line tool | Operators and pipelines | Unit · integration of the invoked command |
+| The workspace | — | **Only what no single application can resolve** — a hand-off between two deployables, and nothing else |
+
+**A module ships no shell on either face.** Its services need an application's configuration, resources and entries; its components need an application's providers, session and routing. So a module cannot stand either one up alone, and a suite that appears to is faking the application around it.
 
 **Pick the tier by what would break.** A validation rule breaks in a unit; an authorization gate breaks against the real service; a journey breaks end to end. Writing a unit test for something that only fails when wired is a green that proves nothing.
 

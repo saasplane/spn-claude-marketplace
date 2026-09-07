@@ -99,10 +99,68 @@ def test_text(root):
     return _TEST_TEXT[root]
 
 
-def covered(root, route):
-    """Whether any file under a test tree names this route. The proxy, and the line to replace
-    when the coverage model lands."""
-    return route in test_text(root)
+def node_root(path, root):
+    """The node that owns this file — the nearest `spkind.json` above it, inside the repo."""
+    here = os.path.dirname(os.path.abspath(path))
+    while here.startswith(root):
+        if os.path.isfile(os.path.join(here, 'spkind.json')):
+            return here
+        parent = os.path.dirname(here)
+        if parent == here:
+            break
+        here = parent
+    return None
+
+
+def owning_app(path, root):
+    """The application this file is deployed inside, or `None` for a published package.
+
+    An app-owned module sits under its host, so the host is found by continuing up past the
+    module's own `spkind.json` to the outermost `APP_*` node still inside the repo.
+    """
+    here, found = os.path.dirname(os.path.abspath(path)), None
+    while here.startswith(root):
+        manifest = os.path.join(here, 'spkind.json')
+        if os.path.isfile(manifest):
+            try:
+                with open(manifest, encoding='utf8') as fh:
+                    if ((json.load(fh) or {}).get('kind') or '').startswith('APP_'):
+                        found = here
+            except Exception:
+                pass
+        parent = os.path.dirname(here)
+        if parent == here:
+            break
+        here = parent
+    return found
+
+
+def covered(root, route, path=None):
+    """Where this route is proven, under the rule the coverage model settled.
+
+    **An application owns the journeys of the surfaces it deploys** (RD.APPS.087, RD.APPS.088), so
+    a route is covered by a case in its OWN node's test tree. A case at the workspace root used to
+    count and no longer does: the workspace owns only what no single application can resolve, and
+    one route resolving is not that.
+
+    Returns `None` when covered correctly, otherwise a phrase naming what is wrong. Covered
+    elsewhere in the repo is reported differently from covered nowhere, because the two need
+    different fixes — a move, or a new case.
+    """
+    # Only an application owns the proof of a route it deploys, so the question is which
+    # application. An app-owned module ships inside its host and has no delivery of its own, so
+    # its host is the answer and `owning_app` walks up to it. A published module has no host to
+    # find, and cannot know which application composes it — there the repo is the honest scope.
+    # Judging a published module against its own tree reported 399 findings that were all correct
+    # behaviour, which is a check nobody reads twice.
+    app = owning_app(path, root) if path else None
+    scope = app or root
+    if route in test_text(scope):
+        return None
+    if app and route in test_text(root):
+        return ('is named only outside its own node — the application owns the journeys of the '
+                'surfaces it deploys, so move the case under this project\'s test tree')
+    return 'is named by no file under a test tree'
 
 
 # Anchored to the start of a line, because prose says `it (` too: the second live scan read
@@ -144,14 +202,33 @@ def check_route_e2e(path, source, added):
             continue                               # already there — this write did not add it
         if added is not None and route not in added:
             continue
-        if not covered(root, route):
-            found.append(f'{method} {route} — no file under a test tree in '
-                         f'{os.path.basename(root)} names it')
+        why = covered(root, route, path)
+        if why:
+            found.append(f'{method} {route} — {why}')
     return found
+
+
+def kind_of(path, root):
+    """The declared kind of the node holding this file, from its own `spkind.json`."""
+    node = node_root(path, root) if root else None
+    if not node:
+        return None
+    try:
+        with open(os.path.join(node, 'spkind.json'), encoding='utf8') as fh:
+            return (json.load(fh) or {}).get('kind')
+    except Exception:
+        return None
 
 
 def check_spec_restore(path, source, added):
     if not is_spec(path, source):
+        return []
+    # Shared state is an application's problem and the workspace's. A module ships no shell, so it
+    # stands nothing up and doubles only a seam it owns (RD.APPS.088) — there is no shared baseline
+    # beneath it to leave moved. Asking a module spec for a restore reports a mutation that cannot
+    # exist, and a finding that cannot be true is one a reader learns to ignore.
+    root = repo_root(path)
+    if (kind_of(path, root) or '').startswith('MODULE_'):
         return []
     if RESTORE.search(source):
         return []
@@ -170,6 +247,41 @@ def check_spec_restore(path, source, added):
     return found
 
 
+# A double, as this stack writes one. The target is the first string argument.
+DOUBLE = re.compile(r'\b(?:vi|jest)\s*\.\s*(?:mock|doMock)\s*\(\s*["\']([^"\']+)["\']')
+
+
+def check_foreign_double(path, source, added):
+    """A module test doubling a seam its node does not own.
+
+    **A node may double a seam it owns, and nothing else** (RD.APPS.088). A module ships no shell,
+    so faking the generated client, the design system or a sibling module is faking the application
+    around it — and the case then proves the fake rather than the product. The fix is a move, not a
+    better fake: the composing application owns that proof.
+
+    Only `@saasplane/*` targets are judged. A third-party module and a relative path are the node's
+    own business, and a relative path cannot reach outside the node anyway.
+    """
+    root = repo_root(path)
+    if not root or not is_spec(path, source):
+        return []
+    kind = kind_of(path, root) or ''
+    if not kind.startswith('MODULE_'):
+        return []
+    node = node_root(path, root)
+    own = os.path.basename(node) if node else ''
+    found = []
+    for target in DOUBLE.findall(source):
+        if added is not None and target not in added:
+            continue
+        if not target.startswith('@saasplane/'):
+            continue
+        if target.split('/')[-1] == own:
+            continue                               # its own package — a seam it owns
+        found.append(f'{target} — a {kind} node does not own this seam')
+    return found
+
+
 CHECKS = {
     'route-e2e': (check_route_e2e,
                   'A route with no case naming it',
@@ -184,6 +296,12 @@ CHECKS = {
                      'when the test above it throws. A trailing statement at the end of the body '
                      'is skipped by exactly the failure that makes the mutation matter — and an '
                      'un-restored mutation makes every later red lie, because the baseline moved.'),
+    'foreign-double': (check_foreign_double,
+                       'A module test doubling a seam its node does not own',
+                       'Move the case to the application that composes this module. A module ships '
+                       'no shell, so a case that fakes the client, the design system or a sibling '
+                       'module is standing up an application this node does not own — and it then '
+                       'proves the fake rather than the product. A better fake does not fix it.'),
 }
 
 

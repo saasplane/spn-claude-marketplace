@@ -63,22 +63,45 @@ def vocabulary():
     return out
 
 
-def rulings():
-    """A register ruling that the documents contradict is a live conflict.
+# A bolded COMPLETE sentence — long enough to be a claim, and punctuated like one. Emphasis on a
+# phrase is not this; a second ruling hiding in a long cell is.
+BURIED = re.compile(r"\*\*([^*]{25,}?[.!?])\*\*")
 
-    Only the bolded claim of a row is checked — the rest is reasoning, which is
-    allowed to describe what was rejected.
+
+def rulings():
+    """One ruling per row, and the whole decision column is that ruling.
+
+    The register has a `Why` column, so the decision column carries no reasoning and no
+    second answer. A row that holds two rulings is two rows: the one a reader meets first
+    is the one they act on, and the other is invisible until somebody reads the whole cell.
+    `RD.SAAS.035` carried a MUST two hundred words in, which is the case this was written for.
+
+    **Bold is ordinary emphasis in a row**, so its absence proves nothing and is not checked.
+    What is checked is a bolded complete SENTENCE after the opening one, which is what a
+    buried ruling looks like every time it has appeared.
     """
-    out = []
+    split, long = [], []
     for row in re.findall(r"^\| (RD\.[A-Z]+\.\d+) \| (.+?) \| .+? \| .+? \|$",
                           REGISTER.read_text(), re.M):
         rid, text = row
-        if HISTORICAL.search(text):
-            continue  # the row itself says it was superseded
-        claim = re.match(r"\*\*(.+?)\*\*", text)
-        if not claim:
-            out.append(f"RULING      {rid} states no bolded claim — a row a reader "
-                       f"cannot quote is reasoning, not a ruling")
+        body = re.sub(r"^\*\*.+?\*\*", "", text, count=1)   # the opening claim is the ruling
+        buried = BURIED.findall(body)
+        if buried:
+            split.append((len(buried), rid, " ".join(buried[0].split())[:80]))
+        elif len(text.split()) > 150:
+            long.append((len(text.split()), rid, ""))
+    if not split and not long:
+        return []
+    # ONE finding, not one per row. A third of the register predates this rule, and printing a
+    # line each buries every other question this script asks. The counts are the backlog, and
+    # the worst ten are what somebody can pick up today — nothing is dropped silently.
+    out = [f"RULING      {len(split)} row(s) hold more than one ruling, and {len(long)} run past "
+           f"150 words in one decision cell.\n"
+           f"            One ruling per row; reasoning belongs in `Why`. Worst first:"]
+    for count, rid, sample in sorted(split, reverse=True)[:6]:
+        out[0] += f"\n              {rid:<16} +{count} buried · {sample}…"
+    for words, rid, _ in sorted(long, reverse=True)[:4]:
+        out[0] += f"\n              {rid:<16} {words} words"
     return out
 
 

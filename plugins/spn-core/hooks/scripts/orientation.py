@@ -15,8 +15,10 @@ Three parts, in this order — a session that opens with a status dump reads lik
 
   1. a welcome
   2. the ground — the members, the law each carries, the wiring, and every workstream
-  3. ONE question, and never a typed list of options. You arrive with something in mind, and
-     a leading question picks your subject for you.
+  3. ONE open question, and never a typed list of options — you arrive with something in mind,
+     and a leading question picks your subject for you. Beside it, and only when exactly one
+     workstream is open and no second session is live under this root, a standing offer to
+     carry that one on. Two offers is not a menu; three would be.
 
 A workstream carries its state in its parent folder, so the three are read and shown together:
 `open/` is available now, `backlog/` is parked, and `closed/` is the receipt. The number in the
@@ -28,7 +30,7 @@ agent asks instead of reading and the rung points at the `day-zero` skill.
 
 Exit code is always 0 and every read is wrapped: a broken orientation must never cost a window.
 """
-import json, os, re, sys, textwrap, time
+import io, json, os, re, subprocess, sys, textwrap, time
 
 MARKETPLACE = 'saasplane'
 CORE = 'spn-core'
@@ -194,7 +196,8 @@ def workstreams(root):
                 number, subject = numbered(folder)
                 found[folder] = {
                     'folder': folder, 'number': number, 'subject': subject, 'state': state,
-                    'page': any(f.endswith('-approach.html') for f in files),
+                    'page': next((f for f in sorted(files)
+                                  if f.endswith('-approach.html')), ''),
                     'arcs': len([f for f in files if os.path.basename(f).startswith('arc-')]),
                     'when': newest(files) or newest([path]),
                     'legacy': legacy,
@@ -208,7 +211,7 @@ def workstreams(root):
         arc = os.path.join(devex, 'arcs', name)
         page = os.path.join(devex, 'notes', f'{subject}-approach.html')
         found[subject] = {'folder': subject, 'number': '', 'subject': subject, 'state': 'open',
-                          'page': os.path.isfile(page), 'arcs': 1,
+                          'page': page if os.path.isfile(page) else '', 'arcs': 1,
                           'when': newest([arc, page]), 'legacy': 'arcs/'}
     return sorted(found.values(), key=lambda w: (w['number'] or 'zzz', w['subject']))
 
@@ -220,11 +223,27 @@ def cache_state(root, plugin_names):
     globbed rather than named, and a directory carrying `.orphaned_at` is skipped — it is a
     previous install nothing loads. Any surprise reads as unknown rather than as current.
     """
-    settings = read_json(os.path.join(root, '.claude', 'settings.json')) or {}
-    sources = settings.get('extraKnownMarketplaces') or {}
+    # The marketplace is registered in `settings.local.json` on this machine and could be in
+    # either file, so both are read and the local one wins — it is the per-developer override.
+    sources = {}
+    for name in ('settings.json', 'settings.local.json'):
+        sources.update((read_json(os.path.join(root, '.claude', name)) or {})
+                       .get('extraKnownMarketplaces') or {})
+    pairs = [(market, ((entry or {}).get('source') or {}).get('path'))
+             for market, entry in sources.items()]
+    if not pairs:
+        # A marketplace registered at user scope is invisible to this file, and an empty loop
+        # below would return `cache current` having compared nothing. The workspace still holds
+        # the source as a member, so find the repo carrying these plugins and use that. Failing
+        # that, say so — a green nobody earned is worse than an unknown.
+        holds = [os.path.join(root, name) for name in listdir(root)
+                 if all(os.path.isdir(os.path.join(root, name, 'plugins', plugin))
+                        for plugin in plugin_names)]
+        pairs = [(MARKETPLACE, holds[0])] if holds else []
+    if not pairs:
+        return 'cache unknown — no marketplace source'
     stale = []
-    for market, entry in sources.items():
-        source = ((entry or {}).get('source') or {}).get('path')
+    for market, source in pairs:
         if not source or not os.path.isdir(source):
             return 'cache unknown'
         for plugin in plugin_names:
@@ -235,11 +254,20 @@ def cache_state(root, plugin_names):
                         if not os.path.exists(os.path.join(cached, v, '.orphaned_at'))]
             if not os.path.isdir(live) or not versions:
                 return 'cache unknown'
-            if any(digest(os.path.join(cached, v)) != digest(live) for v in versions):
+            # Only the newest cache directory is the one a window loads. Comparing every retained
+            # version reported stale forever, because an older version differs from source by
+            # definition — which is the same useless answer as always reporting current.
+            newest = max(versions, key=version_key)
+            if digest(os.path.join(cached, newest)) != digest(live):
                 stale.append(plugin)
     if stale:
         return 'cache stale — ' + ' '.join(sorted(set(stale)))
     return 'cache current'
+
+
+def version_key(name):
+    """`0.10.0` sorts above `0.2.0`, which a string comparison gets backwards."""
+    return tuple(int(part) if part.isdigit() else -1 for part in name.split('.'))
 
 
 def digest(path):
@@ -285,22 +313,54 @@ def orient(root, cwd):
         repos.append({'name': name, 'path': path, 'world': world, 'stack': stack, 'pins': pins,
                       'want': want, 'have': have, 'wired': set(want) <= have,
                       'nodes': count_nodes(path, world)})
+    who = developer_name()
     governed = [r for r in repos if r['world']]
     streams = workstreams(root)
     level, why = rung(root, governed)
 
     if not governed:
-        text = ('Welcome to SaaS Plane — this folder is minted and completely empty. A clean '
-                'start.\n\n'
-                'Nothing to read yet, so the shape comes first. When you are ready there are '
-                'five\nquestions, and your answers name every account, package and prefix that '
-                'follows.\n\nHow can I help?\n')
+        text = (f'Good to see you{", " + who if who else ""}. Welcome to SaaS Plane — build the '
+                'product, not the platform.\nIt is the AI-native, DevEx-first foundation for '
+                'building and launching secure,\nscalable, compliance-ready SaaS platforms.\n\n'
+                'I am the DevEx agent, and I work on it with you.\n\n'
+                'This folder is empty, which is a good place to start. There is nothing to read '
+                'yet, so\nwe begin with the shape. When you are ready, I have five questions. '
+                'Your answers name\nevery account, package and prefix that comes after.\n\n'
+                'So — what are we building?\n')
         note = ('\n---\nDay-0 mode: no sprepo.json under ' + root + '. You have no code to read, '
                 'so do not orient — load the `day-zero` skill and walk it. Ask the five estate '
                 'questions first, in order, and let the developer answer before any act.\n')
         return text, note
 
-    lines = ['Good to see you.', '']
+    # A partner's first session opens here, and a table of repos tells them nothing about what
+    # this is or what the agent is for. Three short paragraphs, then the ground — never a fourth,
+    # because the header's own rule is that a session opening with a status dump reads like a
+    # build log.
+    #
+    # THE WELCOME IS THE AGENT'S OWN, AND IT IS TYPED HERE ON PURPOSE. Do not read it from a
+    # repo. This plugin runs in a partner's workspace, where the foundation book is not a member
+    # and absence is how access control works — so a banner sourced from that book would render
+    # empty for the reader who needs it most. Everything below the welcome is discovered, and
+    # the welcome alone is declared. Change the copy here when the positioning changes.
+    lines = [
+        f'Good to see you{", " + who if who else ""}.',
+        '',
+        'Welcome to SaaS Plane — build the product, not the platform. It is the AI-native,',
+        'DevEx-first foundation for building and launching secure, scalable, compliance-ready',
+        'SaaS platforms.',
+        '',
+        'I am the DevEx agent, and I work on it with you.',
+        '',
+        'Tell me what you want to build. Your idea can be rough. We shape it together first,',
+        'then build it in four steps: the idea, the docs, the code, and the tests that prove',
+        'it works.',
+        '',
+        *textwrap.wrap(
+            f'You have {spell(len(repos))} repo{"" if len(repos) == 1 else "s"} here and one '
+            'window. Every file follows its own rules, and finding them is my job. You just '
+            'build.', 84),
+        '',
+    ]
     settings = read_json(os.path.join(root, '.claude', 'settings.json')) or {}
     floor = [k for k, on in (settings.get('enabledPlugins') or {}).items() if on]
     plugins = sorted({k.split('@')[0] for k in floor})
@@ -329,12 +389,15 @@ def orient(root, cwd):
     lines.append('')
 
     lines += workstream_lines(streams)
-    lines += ['', 'How can I help?', '']
+    lines += closing_lines(root, streams)
     note = (f'\n---\nGround, read at load — the members, their law, and every workstream in all '
             f'three states. `open/` is available now, `backlog/` is parked behind a named '
             f'blocker, and `closed/` is the receipt. The number is an identity, never a '
             f'priority. Rung {level}: {why}. Say hello with the welcome above, then this ground, '
-            f'then one open question. Never turn the rung into a menu.\n')
+            f'then the closing question. Never turn the rung into a menu. The standing offer '
+            f'under that question appears only when exactly one workstream is open and no other '
+            f'session is live here — so where you cannot see one, do not propose resuming '
+            f'anything.\n')
     return '\n'.join(line.rstrip() for line in lines), note
 
 
@@ -358,12 +421,113 @@ def workstream_lines(streams):
                 marks.append('still in ' + w['legacy'])
             out.append(f"  {state:<9}{w['number'] or '—':<5}{w['subject']:<{width}}"
                        + ' · '.join(marks))
+            # A page nobody can open is a page nobody reads. VS Code shows an .html file as
+            # source, so the row offers the URL a browser takes rather than the path an editor
+            # opens. Only an open workstream gets one: a parked page is not being read.
+            if state == 'open' and w['page']:
+                out.append(' ' * 16 + 'file://' + w['page'])
     if by_state['closed']:
         done = ' · '.join(w['folder'] for w in by_state['closed'])
         wrapped = textwrap.wrap(done, 84) or ['']
         out.append(f"  {'closed':<9}{wrapped[0]}")
         out += [' ' * 11 + line for line in wrapped[1:]]
     return out
+
+
+def developer_name():
+    """Your Claude registration, so the session greets you rather than an empty chair.
+
+    A greeting is chat, and this is the one place the name belongs — it is never written into a
+    document, a workstream page or any file the repo keeps. Read-only, one field, and a failure
+    of any kind just means the session says hello without it."""
+    try:
+        with io.open(os.path.expanduser('~/.claude.json'), encoding='utf-8') as handle:
+            name = ((json.load(handle) or {}).get('oauthAccount') or {}).get('displayName') or ''
+        first = name.strip().split()[0]
+        return first if 1 < len(first) <= 20 and first.replace('-', '').isalpha() else None
+    except Exception:
+        return None
+
+
+def spell(n):
+    """Small numbers spelled out, because a numeral mid-sentence reads like a status line and
+    this paragraph is the one place the session is talking to you rather than reporting."""
+    words = ('no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten',
+             'eleven', 'twelve')
+    return words[n] if n < len(words) else str(n)
+
+
+def own_chain():
+    """Every ancestor of this process. The hook runs *under* a session, so without this the
+    session asking the question counts itself as somebody else working here."""
+    chain, pid = set(), os.getpid()
+    for _ in range(12):
+        chain.add(pid)
+        try:
+            out = subprocess.run(['ps', '-o', 'ppid=', '-p', str(pid)], capture_output=True,
+                                 text=True, timeout=2).stdout.strip()
+        except Exception:
+            break
+        if not out.isdigit() or int(out) <= 1:
+            break
+        pid = int(out)
+    return chain
+
+
+def sessions_here(root):
+    """How many other Claude sessions are live under this workspace right now.
+
+    A session announces itself nowhere on disk, so the honest check is the running one: which
+    `claude` processes are alive, and which of those are working below this root. It answers
+    for the workspace rather than for one workstream — the conservative direction, since it
+    withholds the offer to resume more often than it should and never less."""
+    try:
+        mine = own_chain()
+        listing = subprocess.run(['ps', '-eo', 'pid=,comm='], capture_output=True, text=True,
+                                 timeout=3).stdout
+        others = 0
+        for line in listing.splitlines():
+            parts = line.split(None, 1)
+            if len(parts) != 2 or not parts[0].isdigit():
+                continue
+            pid = int(parts[0])
+            if pid in mine or os.path.basename(parts[1].strip()) != 'claude':
+                continue
+            cwd = subprocess.run(['lsof', '-a', '-p', str(pid), '-d', 'cwd', '-Fn'],
+                                 capture_output=True, text=True, timeout=3).stdout
+            for entry in cwd.splitlines():
+                if entry.startswith('n') and os.path.realpath(entry[1:]).startswith(root):
+                    others += 1
+                    break
+        return others
+    except Exception:                                   # never cost a window
+        return 0
+
+
+def closing_lines(root, streams):
+    """The last thing a session says before you type.
+
+    Two offers and no menu: the open question you arrived with, and — only when exactly one
+    workstream is open — the standing one, by name. Two open workstreams would make naming one
+    a choice on your behalf, which is the thing this script refuses to do.
+
+    The standing offer is withheld the moment another session is live under this root. Two
+    windows on one workstream is how an approach page grows two authors, and a cheap check is
+    worth more than the convenience it costs."""
+    ask = 'So — what are we building?'
+    open_now = [w for w in streams if w['state'] == 'open']
+    if len(open_now) != 1:
+        return ['', ask, '']
+    only = open_now[0]
+    name = ' '.join(part for part in (only['number'], only['subject']) if part)
+    others = sessions_here(root)
+    if others:
+        plural = 's are' if others > 1 else ' is'
+        offer = (f'{name} is open, but {others} other session{plural} open in this workspace. '
+                 f'I will not touch it unless you ask me to.')
+    else:
+        offer = f'Or ask me to continue {name}, and I will start where we stopped.'
+    return ['', ask, ''] + textwrap.wrap(offer, 84) + ['']
 
 
 def claim(repo):
