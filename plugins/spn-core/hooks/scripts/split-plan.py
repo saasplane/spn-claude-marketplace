@@ -369,8 +369,18 @@ ANSWERED_RUN = re.compile(r'\bQ(\d+)\s*(?:to|through|–|—|-)\s*Q(\d+)\b[^.\n]
                           re.I)
 
 
+# A card number inside a code span or a fenced block is an EXAMPLE, not a record. An arc that
+# explains the convention — "a log saying `Q7 answered` names one card" — was read as a log entry
+# answering Q7, and the gate then demanded a card be folded that nobody had answered. Three false
+# alarms in one session, and a gate that cries wolf is one people learn to work around.
+CODE_SPAN = re.compile(r'```.*?```|`[^`\n]*`', re.S)
+
+
 def answered_numbers(folder):
-    """Every `Q<n>` an arc in this workstream records as answered."""
+    """Every `Q<n>` an arc in this workstream records as answered.
+
+    Examples are stripped first: what a document says ABOUT the convention is not an instance of it.
+    """
     out = set()
     arcs = os.path.join(folder, 'arcs')
     if not os.path.isdir(arcs):
@@ -378,7 +388,7 @@ def answered_numbers(folder):
     for name in sorted(os.listdir(arcs)):
         if not name.endswith('.md'):
             continue
-        text = read(os.path.join(arcs, name))
+        text = CODE_SPAN.sub(' ', read(os.path.join(arcs, name)))
         for match in ANSWERED.finditer(text):
             out.add((match.group(1) or match.group(2)).upper())
         for match in ANSWERED_RUN.finditer(text):
@@ -499,6 +509,22 @@ def gate_documents_first(payload):
     return 0
 
 
+# The masthead line a reader meets first. A folder in `closed/` whose page still says it is running
+# tells everyone who opens the page — rather than the folder — that the work is live. `010` sat that
+# way until the developer noticed it, and this gate passed it: it read rows, and nobody reads rows
+# first.
+EYEBROW = re.compile(r'class="eyebrow"[^>]*>(.*?)</div>', re.S | re.I)
+CLOSED_WORDS = ('closed', 'landed', 'complete')
+
+
+def says_it_is_closed(page):
+    """Whether the page's own masthead says the work is finished."""
+    found = EYEBROW.search(read(page))
+    if found is None:
+        return True                                 # no masthead to read is not a finding
+    return any(word in flat(found.group(1)).lower() for word in CLOSED_WORDS)
+
+
 def gate_close(payload):
     tool_input = payload.get('tool_input') or {}
     cwd = payload.get('cwd') or os.getcwd()
@@ -528,6 +554,20 @@ def gate_close(payload):
         if not subject:
             continue
         pages = subject_pages(root, subject, source if source and os.path.isdir(source) else None)
+        # **The stamp, before the rows.** Closing moves a folder; a page that still says it is
+        # running keeps telling every reader the work is live. It is one line to fix and invisible
+        # to a gate that only counts rows.
+        unstamped = [page for page in pages if not says_it_is_closed(page)]
+        if unstamped:
+            emit(
+                f"`{subject}` is closing while its page still says it is running. Stamp the masthead "
+                f"first — {' · '.join(os.path.basename(page) for page in unstamped)} — because a "
+                f"reader opens the page, not the folder, and the folder is the only thing this move "
+                f"changes (05-artifacts.md, The approach document).",
+                deny=f"Denied: {subject}'s page does not say it is closed. The masthead is what a "
+                     f"reader meets first, and closing must change it as well as the folder.",
+            )
+            return 0
         rows = [row for page in pages for row in plan_of(page)]
         empty = [row for row in rows if state_of(row) == 'empty']
         # A GATE MUST SAY WHAT IT DID NOT CHECK. These two states used to leave here together, and

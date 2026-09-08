@@ -7,7 +7,7 @@
     },
     {
       "path": "docs/registers/conformance.md",
-      "seen": "152f9092"
+      "seen": "9d7358ac"
     },
     {
       "path": "docs/03-capabilities/02-apps/03-module/01-server/01-contract/01-states.md",

@@ -3,11 +3,11 @@
   "chapters": [
     {
       "path": "CONCEPT.md",
-      "seen": "ddc8bfaa"
+      "seen": "13ee3812"
     },
     {
       "path": "docs/03-capabilities/04-devex/09-utils.md",
-      "seen": "a5138715"
+      "seen": "d6b0d363"
     },
     {
       "path": "docs/03-capabilities/04-devex/11-workspace.md",
@@ -330,6 +330,11 @@ Plan one change across repos as an **arc**: ordered steps, each naming its targe
 | point at a path inside a sibling checkout — the book's repo included | **cite the book by name**, because a path resolves only for someone holding both checkouts |
 | offer `repo agent-init --local`, which registers a marketplace checkout | let the marketplace resolve from GitHub, which is what a partner has |
 | name `SPN_DEVEX_MARKETPLACE_PATH` as a value to set | mark it **producer-only** wherever it appears. It is the whole of the `spnutils:producer` region, which a partner's file does not have. `SPN_DEVEX_BLUEPRINT_PATH` is **retired** — a working tree is reached by an `@path` pin, declared per layer in a manifest |
+
+**No variable asks for a rehearsal, and none ever should.** A provisioning run names its own mode on
+the command — `--plan` or `--apply`, exactly one, with no default (`RD.INFRA.094`). `--plan` reaches
+no account, so the cloud walk is rehearsable before any account exists. `SPN_POSTURE` is **retired**:
+it asked for a rehearsal through the environment, and a rehearsal is now a mode you type.
 
 **Not every `--local` is producer-only.** `infra release --local` stages a package into the machine store, and that is an ordinary partner act. The flag to mark is the one on `repo agent-init`.
 

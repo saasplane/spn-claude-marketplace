@@ -237,6 +237,27 @@ def how_halves(text):
              'means somebody stopped early')]
 
 
+def page_furniture(text):
+    """The chrome an approach page owes its reader, and the one part nothing checked.
+
+    `05-artifacts.md` § *A page carries its own subsections* rules the rail: the current section
+    marked, `Open` carrying its count, and **each section folding under a disclosure**. The fold
+    arrives as a verbatim block appended after the page's own rail builder, and it is copy-pasted
+    into every page — which is the shape the corpus refuses for a rule, and it drifted exactly as
+    that shape always does. On 2026-09-08 it stood at 22 of 22 pages in the artifacts pocket and
+    **2 of 7** in the workspace's own workstreams, with nothing able to tell.
+    """
+    if 'id="rail"' not in text and 'id="rail-list"' not in text:
+        return []                                   # no rail is a short page's right
+    if 'rail-fold' in text or 'sub-group' in text:
+        return []
+    return [(TWO_HALVES,
+             'The outline does not fold. A rail listing every heading of every section is a wall '
+             'in the shape of an outline (05-artifacts.md, A page carries its own subsections) · '
+             'append the rail-fold block, verbatim, after this page\'s own rail builder — take it '
+             'from any approach page in the foundation\'s artifacts pocket')]
+
+
 def approach_shape(text):
     """Why -> What -> How -> Open -> Deferred, Terms optional first (05-artifacts)."""
     heads = [re.sub(r'<[^>]+>', '', h).strip().split()[0].rstrip(':—-').lower()
@@ -658,6 +679,7 @@ def check(path, text, fragment=False):
         if not fragment:
             out += approach_shape(text)
             out += how_halves(text)
+            out += page_furniture(text)
         out += open_cards(text)
     elif is_overview:
         out += overview_shape(text)

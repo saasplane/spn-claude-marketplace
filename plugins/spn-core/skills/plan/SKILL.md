@@ -6,7 +6,7 @@ description: Turn a requirement into a design the platform's own vocabulary can 
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/03-capabilities/05-docs/05-artifacts.md", "section": "The approach document", "seen": "7d54b9d0" }
+    { "path": "docs/03-capabilities/05-docs/05-artifacts.md", "section": "The approach document", "seen": "083227ee" }
   ]
 }
 -->
@@ -214,7 +214,7 @@ file path to keep the URL stable, and give the URL again every time the page cha
 
 An approach document is **one self-contained HTML page named `<topic>-approach.html`** — one file per topic, replaced in place as it iterates, never a second copy in another format. HTML because these documents carry tables, samples and comparisons that a reader scans rather than reads. HTML also because a single file travels: it opens anywhere, needs nothing installed, and cannot drift from a companion version of itself.
 
-**The page carries its own outline, and the rail folds.** A sticky rail on the left lists one entry per section, generated from the headings and never typed a second time. **A section's second-level entries sit under a disclosure**, with a caret at the far right of the section's own row and only where that section has a second level. The section you are reading is the one held open, and a section you open yourself stays open — you decided, so the scroll stops overriding you. It degrades to the full index when no script runs.
+**A page carries its own subsections, and the rail folds.** A sticky rail on the left lists one entry per section, generated from the headings and never typed a second time. **A section's second-level entries sit under a disclosure**, with a caret at the far right of the section's own row and only where that section has a second level. The section you are reading is the one held open, and a section you open yourself stays open — you decided, so the scroll stops overriding you. It degrades to the full index when no script runs.
 
 | Section | Answers | Written as |
 | --- | --- | --- |

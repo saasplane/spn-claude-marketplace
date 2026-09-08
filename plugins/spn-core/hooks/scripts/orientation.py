@@ -32,6 +32,13 @@ Exit code is always 0 and every read is wrapped: a broken orientation must never
 """
 import io, json, os, re, subprocess, sys, textwrap, time
 
+try:                                            # silent unless this workspace opened a window
+    import timing
+except Exception:                               # noqa: BLE001 — a missing recorder is not a failed gate
+    timing = None
+
+_SELF = 'orientation'
+
 MARKETPLACE = 'saasplane'
 CORE = 'spn-core'
 # The derivation `repo agent-init` already performs, from the manifest and nothing else. A repo
@@ -547,14 +554,18 @@ def claim(repo):
 def main():
     stdin_mode = '--stdin' in sys.argv
     cwd = os.getcwd()
+    payload = {}
     if stdin_mode:
         try:
-            cwd = (json.load(sys.stdin) or {}).get('cwd') or cwd
+            payload = json.load(sys.stdin) or {}
+            cwd = payload.get('cwd') or cwd
         except Exception:
             pass
     else:
         args = [a for a in sys.argv[1:] if not a.startswith('-')]
         cwd = args[0] if args else cwd
+    if timing is not None:                          # opens only where the window file exists
+        timing.begin(payload)
     try:
         text, note = orient(workspace_root(cwd), cwd)
     except Exception as err:                            # never cost a window
@@ -573,4 +584,12 @@ def main():
 
 
 if __name__ == '__main__':
-    sys.exit(main())
+    _started = time.perf_counter()
+    try:
+        _code = main()
+    finally:
+        # `SessionStart` runs once, so its whole run is the useful number. `PreToolUse` is the hot
+        # path and times per check instead.
+        if timing is not None:
+            timing.span(_SELF, (time.perf_counter() - _started) * 1000)
+    sys.exit(_code)
