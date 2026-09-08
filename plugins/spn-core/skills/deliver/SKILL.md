@@ -26,7 +26,7 @@ Run the gates cheapest-first so a failure stops the run early. **Never report a 
 
 ## What travels with the package
 
-A published package carries the artifacts that describe it. Generate them at build, so they sit inside the same archive as the code they describe, and therefore cannot drift from their own version. That property is the whole point: an artifact that shipped separately would be a claim about a version rather than a fact of it.
+A published package carries the artifacts that describe it. Generate them at build, so they sit inside the same archive as the code they describe, and therefore cannot drift from their own version. That property is what the rule exists for: an artifact that shipped separately would be a claim about a version rather than a fact of it.
 
 ## What is never part of it
 

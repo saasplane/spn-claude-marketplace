@@ -1,6 +1,16 @@
+<!-- spn:restates
+{
+  "chapters": [
+    { "path": "docs/03-capabilities/01-saas/08-trust.md", "seen": "bfef426b" },
+    { "path": "docs/03-capabilities/02-apps/08-devex-agent/README.md", "seen": "9ec45f06" },
+    { "path": "docs/03-capabilities/01-saas/03-people-access.md", "seen": "77fcc2c7" }
+  ]
+}
+-->
+
 # Lens — `TRUST` (DevSecOps / Security)
 
-**Source of truth:** the foundation book's trust chapter (`01-saas/08-trust`), the four build invariants (`02-apps/08-devex-agent`), the authorization and step-up model (`01-saas/03-people-access`), and the secrets and error disciplines (`02-apps/03-module/01-server/contract/01-states`). This file digests those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
+**Source of truth:** the foundation book's trust chapter (`01-saas/08-trust`), the four build invariants (`02-apps/08-devex-agent`), the authorization and step-up model (`01-saas/03-people-access`), and the secrets and error disciplines (`02-apps/03-module/01-server/contract/01-states`). This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
 
 **Worn** while writing any mutation. **Convened** on every build. **Blocks:** a mutation with no authorization or no audit.
 

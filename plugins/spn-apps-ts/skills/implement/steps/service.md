@@ -46,7 +46,7 @@ Repo returns `{ total, entityIds }` (mode-split TOTAL/RECORDS/BOTH, ids-only sel
 - A discriminator is `<noun>_type` as a real column, never a bare `type` and never read out of a JSON document. Keep it in sync with the config's `mtype`, and index the column.
 - Purpose-named `jsonb` columns hold structured config. Adding a required field to one means updating every migration literal, the runtime builder and the fixtures in the same change — prefer `| null` and avoid the sweep.
 
-## Repository + schema digest
+## Repository + schema summary
 
 - Repos: thin `EntityManager` classes; entities in/out (never CDT states); **never call services or read context**; tenant-scope param **first** on every method — the by-id read filters by it too. Bulk `get<E>sByIds` **throws** EntityNotFound on any missing id; the single delegates. `search<E>s` returns `{ total, entityIds }` only. Parameter-bind everything; enum sorts via exhaustive switch. Use nullable reads only for genuinely-optional lookups (`getByRequestKey`).
 - Schema: `CHAR(26)` ulid PKs; `snake_case` module-prefixed tables (`iam_org`). Columns ordered id → org_id → entity refs/parents (grandparent before parent) → business → jsonb → lifecycle → audit tail; `org_id` leads every index. `active BOOLEAN` — **no `deleted_at`**, no soft-delete columns; discriminator `<noun>_type` column kept in sync with `config.mtype` (index the column, never the JSON); prefer NOT NULL; no views/stored functions.

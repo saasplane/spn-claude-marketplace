@@ -1,6 +1,32 @@
+<!-- spn:restates
+{
+  "chapters": [
+    {
+      "path": "CONCEPT.md",
+      "seen": "5dbfee5b"
+    },
+    {
+      "path": "docs/03-capabilities/04-devex/09-utils.md",
+      "seen": "d5a618e6"
+    },
+    {
+      "path": "docs/03-capabilities/04-devex/11-workspace.md",
+      "section": "The agent is updated first, and reloaded before anything runs",
+      "seen": "ba41b93f"
+    }
+  ],
+  "rows": [
+    "RD.DEVEX.020",
+    "RD.DEVEX.044",
+    "RD.DEVEX.048",
+    "RD.DEVEX.049"
+  ]
+}
+-->
+
 # Cross-Repo Work — Stack-Agnostic
 
-How an agent works across more than one repository on a SaaS Plane estate, and where a rule belongs so every agent sees it. Apply it in any stack and to any repo pair. Source of truth: the foundation's `CONCEPT.md` (`#### DevEx Workspace`) and decision RD.DEVEX.020 — where this digest and those disagree, the sources win and this file is regenerated.
+How an agent works across more than one repository on a SaaS Plane estate, and where a rule belongs so every agent sees it. Apply it in any stack and to any repo pair. Source of truth: the foundation's `CONCEPT.md` — `#### DevEx Workspace`, and **THE MACHINE'S OWN LAYOUT** for the env seat. Also `03-capabilities/04-devex/09-utils.md` **§ The env seat**, `03-capabilities/04-devex/11-workspace.md` **§ The agent is updated first, and reloaded before anything runs**, and decisions RD.DEVEX.020, RD.DEVEX.044, RD.DEVEX.048 and RD.DEVEX.049. Where this restatement and those disagree, the sources win and this file is regenerated.
 
 ## One window, laws by declaration
 
@@ -16,68 +42,107 @@ Read across freely, in every direction — it needs no ceremony.
 
 ## The machine seat — `~/.spnenv`
 
-**One file on the machine holds every SaaS Plane value, and that file is `~/.spnenv`** (decision RD.DEVEX.044, and the getting-started walk's phase 07). `spnutils` reads it **directly**. Nothing has to be exported, and no value passes through a shell you can see.
+**One file on the machine holds every SaaS Plane value, and that file is `~/.spnenv`** (decision RD.DEVEX.048, amending RD.DEVEX.044; the chapter is DevEx Utils § *The env seat*). It sits **outside `~/.spnutils`** on purpose. `rm -rf ~/.spnutils/*` is an allowed reset, and the developer's typed credentials are the one thing on the machine nobody can regenerate.
 
-### Three hands, and only one of them is yours
+`spnutils` reads it **directly**, so nothing has to be exported to reach a process.
 
-| | Owns |
+### Four regions, one writer each
+
+The order is not a preference. Read a file top to bottom and this is what you find:
+
+| # | Region | Writer | What you may do |
+| --- | --- | --- | --- |
+| 1 | `spnutils:producer` | derived | read it. **A partner's file does not have it** |
+| 2 | `spnutils:managed` | derived | read it. A run rewrites it whole, so nothing typed inside survives |
+| 3 | `spnutils:dev` | **the developer, entirely** | **nothing.** Never read between these markers, never write, never reorder |
+| 4 | `spnutils:keep` | you write the key; the developer writes the value | add a key here |
+
+**`producer` leads so a partner's file is a truncation.** Theirs starts at `managed` and runs `managed` → `dev` → `keep`. A missing `producer` region in a partner's file is correct, never a fault to repair.
+
+**`dev` sits above `keep` because the file is plain shell.** It runs top to bottom, so a key the developer defines once resolves in the values below it. That is why a `keep` value may reference a `dev` key and never the reverse.
+
+### You add the key. You never invent the value
+
+**`spnutils` derives no key.** It provisions the file's shape — the markers, the producer region, the managed region's default setup — and lays the keep region out. Which keys the keep region holds is yours.
+
+So the loop is:
+
+1. You build what needs the key — an app gains config, a module publishes a fact.
+2. You add the key to `spnutils:keep`, in the right subsection, with an empty value.
+3. **You ask the developer for the value.** You never write one, never guess one, and never copy one from another key.
+
+**A key nobody needed is worse than a missing one.** It leaves a prompt for a value nobody will supply, and an empty key reads as a gap somebody has to investigate.
+
+### Where a key goes, and what its heading is
+
+Group by the key's own shape: the segments between the platform code and the trailing role name. A subsection is a `# Heading`, its keys, then a blank line.
+
+```text
+# Resource DB App Postgresql
+DMO_RESOURCE_DB_APP_POSTGRESQL_PASSWORD_MIGRATION=
+DMO_RESOURCE_DB_APP_POSTGRESQL_PASSWORD_RO=
+DMO_RESOURCE_DB_APP_POSTGRESQL_PASSWORD_RW=
+
+# Platform Owner
+DMO_PLATFORM_OWNER_EMAIL=
+```
+
+**A note about a key goes on the line above it, never beside it.** A trailing comment is part of the value's line, and a parser reading the value has to strip it. A comment above travels with the key when the region is re-rendered.
+
+**You group only what you wrote.** A key the developer typed keeps its place, its order and its own comments. Never sort it into a heading you derived — the name you invent is a guess, and it ages badly the day the key stops meaning what its prefix suggested.
+
+### A reference is `${VAR}`, and nothing executes
+
+A value may reference another by name. The grammar is **shared with the cloud secret store**, so read one and you know both:
+
+| Rule | |
 | --- | --- |
-| **`spnutils`** | provisioning and the default setup — the CA block, the module facts, and the keys a declaration already implies. **It is the only writer.** |
-| **you, the agent** | the sections, and asking for a key when an app gains config |
-| **the developer** | every value |
+| **braces are required** | `${VAR}`, never `$VAR` |
+| lookup only | no command substitution, no shell. A hostile line in a hand-edited file executes nothing |
+| resolved **upward** | values parsed above the line, then the process environment |
+| every occurrence | a value may hold more than one reference |
+| shell quoting holds | `"${VAR}"` expands; `'${VAR}'` stays literal |
+| `$(...)`, backticks and `${VAR:-x}` | left literal |
+| an unresolvable reference | **reported**, never left in the value as text |
 
-**You add a key through the verb, never by editing the file.** Editing means reading, and reading puts the developer's credentials in your context — which is the one thing this file exists to prevent. You know *which* key an app needs; `spnutils` performs the write. The same division as everywhere else here: you propose, the tool writes.
+### Never render a region
 
-`spnutils` **provisions and validates its own defaults**. It does not police the rest of the file, and a file somebody hand-edited never blocks a sync — the run reports what it could not read and carries on.
+**You may read this file. You may not print one.**
 
-### Never print a value
+That distinction is the whole rule, and it is narrower than the one this reference used to state. The tool's own verb reads every value in the file on every `sync`, because preserving the developer's regions requires reading them. So *do not read it* was never true, and stating it did not stop the thing it was written to stop.
 
-**Never `echo`, `cat`, `printf`, log, or expand a value from this file.** Test **presence**, never content:
+**What actually protects the developer is the output.** Render **key names and set-state**, or a diff of key names. A value reaches a terminal only when the developer asks for that one value by name.
 
 ```bash
 # wrong — expands to the value when set
 printf '%s\n' "${v:-MISSING}"
+# wrong — renders a region, values and all
+sed -n '72,89p' ~/.spnenv
 # right — reports presence only
 if [[ -n ${(P)k} ]]; then echo "set"; else echo "MISSING"; fi
 ```
 
-**Opening the file is printing it.** Read it only when the developer asks, and never to check whether a key is set.
-
-Here is why the rule is absolute. A transcript outlives the session that wrote it. A printed credential is exposed from that moment, even where the file itself was never touched, and rotation is the only repair. This has already happened here. A session wrote a presence test that expanded its values, and an access key and an address landed in a transcript. Write the test so the value has nowhere to go.
-
-### The regions, and who owns each
-
-| Region | Owner | What a run does |
-| --- | --- | --- |
-| `# spnutils:managed:begin` … `# spnutils:managed:end` | the tool | rewritten on every `workspace init` and `workspace sync` — nothing typed inside survives |
-| `# spnutils:keep:begin` … `# spnutils:keep:end` | the developer | the tool adds keys, and **never** edits or removes a value |
-
-### How the keep region reads
-
-Order runs global → workspace → platform → app, so a key sits beside the keys it works with.
-
-1. **Provider credentials first** — the ones carrying no platform prefix.
-2. **A group per workspace**, which is a reading header and nothing more.
-3. **A section per platform** inside it, headed by the platform code.
-4. **A subsection per app or module**, so same-prefix keys sit together.
-5. **A `kept` group last**, holding the platforms no workspace declares.
-
-Two keys there are **producer-only**: `SPN_DEVEX_MARKETPLACE_PATH` and `SPN_DEVEX_BLUEPRINT_PATH`. A run writes each one only where the matching checkout is in the workspace, so a partner never sees either. Their own common section is vendor accounts and nothing else.
+Here is why it is absolute. A transcript outlives the session that wrote it. A printed credential is exposed from that moment, and rotation is the only repair. **This has happened here twice.** Once a presence test expanded its own values. Once a session printed a region of the real file to check a migration, and five live credentials went into a transcript — hours after arguing the rule at length. Write the command so the value has nowhere to go.
 
 ### Namespace by platform code, never by workspace
 
 Keys carry the platform code as their prefix — `DMO_`, `LPD_`, `SAS_` — and a module fact reads `{SPC}_{MODULE}_{FACT}`. **That prefix is the whole anti-overlap mechanism**, and it is why one machine-wide file is the right shape.
 
-**So you answer a collision with the prefix, never with a file or a region per workspace.** Segmenting by workspace is the obvious fix and it is the wrong one — two people reached for it in a single day. A workspace is a reading header, and the same platform turns up under more than one of them.
+**So you answer a collision with the prefix, never with a file or a region per workspace.** Segmenting by workspace is the obvious fix and it is the wrong one — two people reached for it in a single day. The same platform turns up under more than one workspace.
+
+A developer's own key keeps its prefix too. `DMO_MY_THING` belongs to DMO because of its name, never because of where it sits — which is why living in `spnutils:dev` costs it nothing.
 
 ### Two cautions before you run a workspace verb
 
-- **The tool never writes a shell profile.** `~/.zshenv` and its siblings stay the developer's. Sourcing `~/.spnenv` from a profile is their line to add, never the tool's, and **you never edit a shell profile yourself**.
-- **`workspace init` in a scratch folder rewrites the real `~/.spnenv`.** It derives producer keys from what it can see, so a folder holding no marketplace checkout drops keys. Point `HOME` at a temp directory before you run `init` or `sync` for a demo.
+- **The tool never writes a shell profile.** `~/.zshenv` and its siblings stay the developer's. Sourcing `~/.spnenv` from a profile is their line to add, and it trades away the exposure this file avoids: every value exported to every process. **You never edit a shell profile yourself.**
+- **`workspace init` in a scratch folder rewrites the real `~/.spnenv`.** Point `HOME` at a temp directory before you run `init` or `sync` for a demo.
 
 ### A run manages only what it can observe
 
-A run writes keys for what it can see, and it stops there. **It never deletes a key because it failed to see the thing that key describes.** Staleness is reported by `workspace status`, and never repaired by deletion.
+A run writes what it can see, and it stops there. **It never deletes a key because it failed to see what that key describes.** Staleness is reported by `workspace status`, and never repaired by deletion.
+
+**Retiring a key is not deleting it.** A value in the keep region may be the only copy on the machine, so a run carries what it finds and stops writing it back.
+
 
 ## The workspace's working state — `.spndevex/`
 
@@ -89,22 +154,22 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
 .spndevex/
   workstreams/
     backlog/
-      003-cloud-day-0/                    prepared, blocked, or not picked up yet
+      {NNN}-{subject}/                    prepared, blocked, or not picked up yet
     open/
-      007-release-confidence/             being worked now
-        release-confidence-approach.html  yours: the argument, iterated while you read it
+      {NNN}-{subject}/                    being worked now
+        {subject}-approach.html           yours: the argument, iterated while you read it
         arcs/                             the agent's: steps, target, acceptance, depth
         orders/                           one brief per delegated execution, and its report
         notes/                            scratch, scoped to this subject
     closed/
-      005-devex-agent/                    the whole folder, once its plan is accounted for
+      {NNN}-{subject}/                    the whole folder, once its plan is accounted for
   orders/
   README.md
 ```
 
 **A workstream is never a Claude Code session.** Claude Code owns the window, and `SessionStart` is its hook. A workstream is a scope of work, and it outlives every window you open on it.
 
-**The number is an identity, never a priority.** You assign it once, in creation order, and nothing reuses or renumbers it. It rides along when the folder moves state, so `007` reads as `007` wherever it sits. **A workstream holds one or more arcs** — `007` holds two today.
+**The number is an identity, never a priority.** You assign it once, in creation order, and nothing reuses or renumbers it. It rides along when the folder moves state, so a number reads the same wherever it sits. **A workstream holds one or more arcs**, and how many is the subject's business rather than a rule.
 
 | The state | Holds | You arrive by |
 | --- | --- | --- |
@@ -118,7 +183,7 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
 | an arc | the agent — steps, target repo, acceptance, depth | until its steps tick | closed through the sweep |
 | an order | the agent — one delegated execution | until the child reports back | the report is appended, and it stays as the audit trail |
 
-**There is no workstream file, and adding one is a defect.** The folder name is the subject, its parent is the state, and the approach page already tracks the arcs. Anything a status file would hold is expressed by the tree, so a second copy only gives it somewhere to go stale. **The window is not tracked either** — Claude Code owns window identity, and a subject outlives any window.
+**There is no workstream file, and adding one is a defect.** The folder name is the subject, its parent is the state, and the approach page already tracks the arcs. Anything a status file would hold is expressed by the tree, so a second copy only gives it somewhere to fall out of date. **The window is not tracked either** — Claude Code owns window identity, and a subject outlives any window.
 
 **A subject with an arc and no approach page is a valid shape**, not a gap. Nobody has argued it yet.
 
@@ -151,12 +216,62 @@ When a window opens, surface what is stale — a subject untouched across sittin
 
 **Name the blocker, or the proposal is `open/`.** *Feels like later* is not a blocker. Where you cannot say what would unblock it, the work is available and belongs in `open/`. That rule matters more than the split itself: a backlog nobody can explain is where work goes to be forgotten.
 
-Both of today's live workstreams read that way:
+**Two shapes tell you how the rule reads in practice**, and neither names a workstream:
 
-- **`003-cloud-day-0` → `backlog/`.** Cards nobody has answered block it, and its rehearsal step wants accounts that do not exist yet. The simulator in `007` is what makes that step rehearsable. Both blockers have names, so parking it is right and reversible.
-- **`007-release-confidence` → `open/`.** Nothing blocks it. The developer sequenced it after `devex-agent`, and that one has closed.
+- **A blocker you can name sends it to `backlog/`.** Cards nobody has answered, or a step wanting something that does not exist yet — an account, a released package, another workstream's output. Name it, and parking is right and reversible.
+- **A sequencing preference does not.** *After the other one* is an order you chose, not a thing standing in the way, so the work is available and belongs in `open/`.
+
+**Never name a live workstream in a file like this one.** The workspace is discovered rather than declared, so a list here becomes a second answer competing with the folders. Your session's orientation prints the real one at start, read from `.spndevex/` itself.
 
 **`backlog/` → `open/` is how work starts.** It needs no ceremony, it is not a close, and no gate fires on it.
+
+## Open a workstream with the agent update, and execute after
+
+**A workstream opens with the agent update and the reload — MUST** (RD.DEVEX.049). Your own surfaces improve as the work does, so the update is never the closing act. A workstream that executes first spends its whole scope acting on the surfaces the last one left behind.
+
+**Agent setup is three repositories, never one.** The foundation states the rule, `spnutils` realizes the floor and the verbs, and the marketplace restates it. A pass that edits the plugins and stops has changed a restatement and left its source standing. That is how a rule ends up somewhere a partner can never read it.
+
+**Nothing you edit is live before the install.** You read the installed plugin cache, so changing the concept, the chapters, the registers, the providers and the plugins leaves changed files and unchanged behaviour. Skills, agent briefs, reference files and `hooks.json` need a fresh window on top of the install. A hook **script** is the one exception, and it reloads on its next run.
+
+### The producer sweep — steps 1 to 4 are ours, and a partner performs none of them
+
+**Producer only.** These four edit the foundation, the deterministic tool and the plugin source. A partner holds none of the three, and extends by adding rather than by editing what they installed.
+
+| Step | What it covers | Live yet? |
+| --- | --- | --- |
+| 1 | the concept, then the chapters that carry it | no |
+| 2 | the registers — the decision row, and the instrument that reaches it | no |
+| 3 | the provider seats, then the deterministic tool where a verb or the floor changes | no |
+| 4 | the plugins, which restate all of it | no |
+
+### The reload — both modes run these, and the order is load-bearing
+
+| Step | What it covers | Live yet? |
+| --- | --- | --- |
+| 5 | **install** — uninstall and install at project scope, sequentially, from the workspace root | scripts only |
+| 6 | the **per-repo refresh and the workspace sync**, which re-mint what a session start reads | no |
+| 7 | a **fresh window** | yes |
+
+**Step 6 comes before step 7, and reversing them costs you a second reload.** The per-repo refresh writes each repo's generated rule file and its managed `CLAUDE.md` block; the workspace sync re-mints the floor's permission tiers. **All three are read at session start**, so a window opened before them loads the previous generation.
+
+**Reloading in the middle means reloading twice**, and a half-reloaded session is one where you cannot tell which surface answered. Do every edit, then install once, then sync, then take one fresh window.
+
+### A partner's form of this rule, which is shorter
+
+**The MUST is the same and the procedure is not.** A partner receives the agent setup as a published plugin version, so there is nothing for them to edit and nothing to restate.
+
+| Step | What a partner does |
+| --- | --- |
+| 1 | check whether a newer plugin version has been published |
+| 2 | **install** it — uninstall and install at project scope, sequentially, from the workspace root |
+| 3 | the **per-repo refresh and the workspace sync** |
+| 4 | a **fresh window** |
+
+**Where the update you need does not exist yet, the ask crosses upward as an order.** A rule you cannot get from a plugin or a package is a gap in what the Foundation publishes, and naming it is how it gets closed. It is never something to work around locally, because a local fix is a rule that exists for one workspace.
+
+**On a partner workspace the install fetches over the network.** Your marketplace source is a repository rather than a folder on this machine, so step 2 downloads and installs executable content — hooks and their scripts — into your session. **The floor allows it without asking**, because it writes the plugin cache and your own settings rather than publishing anything. Stated here so the behaviour is one you chose rather than one you met.
+
+**Run the hook harness after any hook edit**, and read what it says rather than its exit code.
 
 ## The two gates a workstream carries
 
@@ -202,13 +317,13 @@ Plan one change across repos as an **arc**: ordered steps, each naming its targe
 | --- | --- |
 | point at a path inside a sibling checkout — the book's repo included | **cite the book by name**, because a path resolves only for someone holding both checkouts |
 | offer `repo agent-init --local`, which registers a marketplace checkout | let the marketplace resolve from GitHub, which is what a partner has |
-| name `SPN_DEVEX_MARKETPLACE_PATH` or `SPN_DEVEX_BLUEPRINT_PATH` as a value to set | mark both **producer-only** wherever they appear |
+| name `SPN_DEVEX_MARKETPLACE_PATH` as a value to set | mark it **producer-only** wherever it appears. It is the whole of the `spnutils:producer` region, which a partner's file does not have. `SPN_DEVEX_BLUEPRINT_PATH` is **retired** — a working tree is reached by an `@path` pin, declared per layer in a manifest |
 
 **Not every `--local` is producer-only.** `infra release --local` stages a package into the machine store, and that is an ordinary partner act. The flag to mark is the one on `repo agent-init`.
 
 ## A consumer repo needs no peer checkout
 
-This is the constraint that decides where every common rule lives. **A product repo built on the platform has exactly one thing: its own checkout, and the packages it installed.** A rule an agent needs there must arrive through a channel that travels:
+One constraint decides where every common rule lives. **A product repo built on the platform has exactly one thing: its own checkout, and the packages it installed.** A rule an agent needs there must arrive through a channel that travels:
 
 | Channel | Travels to a consumer? | Carries |
 | --- | --- | --- |
@@ -223,7 +338,7 @@ This is the constraint that decides where every common rule lives. **A product r
 
 ## Skills are what a consumer acts on; the book is why
 
-Guidance lives in three instrument layers, and they are not interchangeable: the deterministic CLI (installed), the plugin (installed), and the documentation corpus (not installed). **Anything a reader must act on lives in the first two.** A skill that says *"the authority for this is chapter N of the book"* has pushed its reader onto a layer they do not have. The skill carries the actionable substance itself, and cites the book only as provenance, by name. For a consumer, the digest *is* the standard.
+Guidance lives in three instrument layers, and they are not interchangeable: the deterministic CLI (installed), the plugin (installed), and the documentation corpus (not installed). **Anything a reader must act on lives in the first two.** A skill that says *"the authority for this is chapter N of the book"* has pushed its reader onto a layer they do not have. The skill carries the actionable substance itself, and cites the book only as provenance, by name. For a consumer, the restatement *is* the standard.
 
 ## Where a rule belongs
 

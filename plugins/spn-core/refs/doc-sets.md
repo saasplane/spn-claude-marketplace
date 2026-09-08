@@ -1,6 +1,21 @@
+<!-- spn:restates
+{
+  "chapters": [
+    {
+      "path": "docs/03-capabilities/05-docs/README.md",
+      "seen": "8decb467"
+    },
+    {
+      "path": "CONCEPT.md",
+      "seen": "5dbfee5b"
+    }
+  ]
+}
+-->
+
 # Doc sets — the shape every node carries
 
-**Source of truth:** the corpus standard (`03-capabilities/05-docs/`), with the concept's Node Docs section (`CONCEPT.md`, at the repository root) as the standing one-page view. Read this file as a digest of those rules, adding none of its own. **The book governs**; the concept holds the last agreed idea and is updated on request, so where the three disagree the standard wins and this file is regenerated.
+**Source of truth:** the corpus standard (`03-capabilities/05-docs/`), with the concept's Node Docs section (`CONCEPT.md`, at the repository root) as the standing one-page view. Read this file as a restatement of those rules, adding none of its own. **The book governs**; the concept holds the last agreed idea and is updated on request, so where the three disagree the standard wins and this file is regenerated.
 
 **Every node carries the same shape at every kind** — four seats and two pockets. Only the capabilities seat has a file set that varies, and it varies because it is *derived* rather than chosen.
 
@@ -142,7 +157,7 @@ The pocket holds what the node **authors** rather than derives, and its three au
 | 🚧 **agreed** | the approach is settled and the work is running |
 | ✅ **landed** | the content is in the node that owns it |
 
-Those are for work in flight. `landed` · `carried` · `deferred` are what the close sweep asks of every row, and only the first is shared between them.
+The three marks above are for work in flight. `landed` · `carried` · `deferred` are what the close sweep asks of every row, and only the first is shared between them.
 
 **Carry the face and the arguments inside the workstream that changes them**, rather than tidying them afterwards. A workstream runs concept → docs → code, so the model moves first and the face moves with it. Leave the face to a later pass and the hub states a model the code has already left. Expansion is earned the same way. Where implementing a workstream shows a section is too big to review in place, the face gains one then — that is when somebody has read it at depth.
 
@@ -258,7 +273,7 @@ The corpus speaks one voice (decision RD.DOCS.031, sharpened by RD.DOCS.043 and 
 **Your own instruction surface is in scope** (decision RD.DOCS.031 · RD.DOCS.043 · RD.DOCS.044, stated
 at depth in the book's `05-docs/01-corpus.md` § What the pattern binds). The voice reaches this book,
 the foundation's provider set, and these plugins — your skills, lenses, agent briefs and reference
-digests. **It also reaches what you say and print at runtime** (decision RD.DOCS.052). A session
+restatements. **It also reaches what you say and print at runtime** (decision RD.DOCS.052). A session
 banner, a hook's output and your own chat reply are all held to it. Nothing you write escapes
 the bar by not being a file. Layout is what those trees are free of, never how they read. The bars are identical
 everywhere; only the move differs. Say *you* on a page someone reads to learn. Use the **imperative**
@@ -335,7 +350,7 @@ RD.DOCS    the corpus standard — seats, metadata, derivation, artifacts
 ## What you never do
 
 - **Never invent structure the grammar does not grant.** A new chapter, part, or domain is a decision recorded in a register (see above); anything smaller becomes a section in a document that already exists. Seats and pockets are not chapters — they appear whenever the grammar calls for them.
-- **Never restate another document's rule.** Introduce it in a sentence and link. A copy is the thing that will still say the old rule a year from now.
+- **Never restate another document's rule.** Introduce it in a sentence and link. A copy still says the old rule a year from now.
 - **Never write a changelog.** Documents state present truth — no *previously*, no *we used to*. Git history is the history.
 - **Never write a live count.** A document states a status, never a tally; a number in prose is correct until the next addition and then silently wrong.
 - **Never hand-write a generated face**, or edit inside a generated region. The source plus a regeneration is the only edit path.

@@ -1,6 +1,6 @@
 ---
 name: review
-description: Review SaaS Plane TS changes against the standards. Use when the user asks for a code review, a PR review, or when the `implement` skill closes with a contract change. Modes by argument - code (the TS standards digest across naming, structure, patterns, service, database, codegen) and contract (the stack-agnostic contract compatibility and secrets gate).
+description: Review SaaS Plane TS changes against the standards. Use when the user asks for a code review, a PR review, or when the `implement` skill closes with a contract change. Modes by argument - code (the TS standards restated across naming, structure, patterns, service, database, codegen) and contract (the stack-agnostic contract compatibility and secrets gate).
 ---
 
 # review — code and contract gates
@@ -20,7 +20,7 @@ Apply the **spn-core** plugin's `refs/contract-rules.md` (cross-plugin pointer �
 
 ## Mode: code
 
-The TypeScript standards, as this skill carries them. **Treat this digest as the standard, whoever reads it** — it is what the review is run against. Its provenance is the foundation book's TypeScript provider set — naming, structure, code patterns, errors and logging, service patterns, and database patterns. That set also covers codegen, toolchain, config and environment, plus the kind registry. Where that book is at hand it carries the reasoning behind each rule. Where it is not, nothing here is deferred:
+The TypeScript standards, as this skill carries them. **Treat this restatement as the standard, whoever reads it** — it is what the review is run against. Its provenance is the foundation book's TypeScript provider set — naming, structure, code patterns, errors and logging, service patterns, and database patterns. That set also covers codegen, toolchain, config and environment, plus the kind registry. Where that book is at hand it carries the reasoning behind each rule. Where it is not, nothing here is deferred:
 
 **Naming/structure** — role suffixes (`Service`/`Repository`/`Provider`/`Manager`/`Entity`/`Controller`/`Listener`); module codes FULLY UPPERCASE in class/type/file names (`IAMOrgService`, never `IamOrgService`). Enums are `Type`-suffixed, with keys UPPER_SNAKE matching values; discriminators are `<noun>Type`/`<noun>_type`, never bare `type`; `Id`/`Ids` not `ID`. Acronyms are CAPS in type names; multi-export files are kebab-case, class files PascalCase; tests sit under `tests/`, never `src/`. The `spkind.json` key is present on new projects; `app/services|repositories|entities` are classes-only (helpers → `app/utils/` or `app/support/`); controllers and listeners are classes.
 
@@ -28,7 +28,7 @@ The TypeScript standards, as this skill carries them. **Treat this digest as the
 
 **Errors/logging** — throw over log; helpers over hand-built errors; no raw status numbers; no secrets/internal names in `data`. Logger provider (four levels; error object 3rd arg, data 4th), `console.log` bootstrap-only.
 
-**Service layer** — the one-screen Rule Digest: one terminal cached bulk reader per (entity, level); `_prepare*` pure, reached only via cached readers. Mutations return via `get<X>ById`, never `_prepare(saved)`; create takes no purge, update an exact-key purge; search hydrates repo ids in order. `@SPAuthorize` sits on every contract method at the right tier, and pre-auth methods stay bare; decorator order is Authorize → Reauth → Cache → Transactional. Cross-module writes go via request queues with requestKey; audit lands after the fresh read; active toggle not delete; null-skip updates; wholesale junction replacement. Repos take tenant scope first, throw on missing ids, never call services; secrets are masked at the mapper; 404 anti-enumeration.
+**Service layer** — the one-screen rule summary: one terminal cached bulk reader per (entity, level); `_prepare*` pure, reached only via cached readers. Mutations return via `get<X>ById`, never `_prepare(saved)`; create takes no purge, update an exact-key purge; search hydrates repo ids in order. `@SPAuthorize` sits on every contract method at the right tier, and pre-auth methods stay bare; decorator order is Authorize → Reauth → Cache → Transactional. Cross-module writes go via request queues with requestKey; audit lands after the fresh read; active toggle not delete; null-skip updates; wholesale junction replacement. Repos take tenant scope first, throw on missing ids, never call services; secrets are masked at the mapper; 404 anti-enumeration.
 
 **Database** — org_id leads indexes; ulid CHAR(26) service-assigned; column order (audit tail last); `active` flag, no `deleted_at`. Migrations pure, epoch-ms versioned, DDL/seed split; jsonb required-field additions handled across every literal/builder/fixture.
 

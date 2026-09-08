@@ -116,7 +116,7 @@ Numeric: `@min` `@max` `@range` `@multipleOf` · string: `@minLength` `@maxLengt
 
 ## Evolution — draft freely, then commit
 
-**Source of truth:** the foundation book's states standard, "Evolution — the change classification". This digests it and adds no rule of its own.
+**Source of truth:** the foundation book's states standard, "Evolution — the change classification". This restates it and adds no rule of its own.
 
 Ask **one question first: is this surface published?** — released as a package, or deployed where another team can call it.
 
@@ -145,7 +145,7 @@ surfacing later as a value typed as a string literal "because the client doesn't
 
 **Pass the FOLDER name** (`module-server-iam-ts`), never the scoped package name
 (`@saasplane/module-server-iam-ts`) — the scoped form crashes with `Cannot read properties of
-undefined (reading 'path')`, which reads like a tool bug and is an argument mistake.
+undefined (reading 'path')`, which looks like a tool bug and is an argument mistake.
 
 Keep `export const <Name>Schema` discipline: a validator not exported from its module file never
 becomes a named schema in the client.

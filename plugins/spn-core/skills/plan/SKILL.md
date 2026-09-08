@@ -3,6 +3,15 @@ name: plan
 description: Turn a requirement into a design the platform's own vocabulary can carry, before any code exists. Use when someone describes something they want built, changed, or investigated and no design has been agreed - classifying the requirement, finding what already covers it, naming the module that owns it, and sketching the contract. Stack-agnostic; the stack plugin supplies the scaffolding commands that follow.
 ---
 
+<!-- spn:restates
+{
+  "chapters": [
+    { "path": "docs/03-capabilities/05-docs/05-artifacts.md", "section": "The approach document", "seen": "7335f2fb" }
+  ]
+}
+-->
+
+
 # plan — a requirement becomes a design
 
 **Exit criterion: the work can be described entirely in platform vocabulary, and one module owns it.** Until both hold, planning is not finished and implementation must not start.
@@ -122,15 +131,16 @@ and the `spn-core` doc-check hook measures it. When a sentence fails, make one o
   card's argument take the voice. Tables, diagrams, behavior rows, glossary and decision rows,
   contract blocks and code samples keep their form untouched — **a warmed record is a defect**.
 - **Never write a set's cardinality into prose** (decision RD.GOV.008) — *"the five nouns"*,
-  *"the twenty decisions"*. Name the set by its rule instead. A count in prose goes stale silently
-  the day the set grows, and the prose that lied is never the prose anyone re-reads. The exception
+  *"the twenty decisions"*. Name the set by its rule instead. A count in prose is wrong the day the set
+  grows, and it says nothing about being wrong. The prose that lied is never the prose anyone
+  re-reads. The exception
   is a closed set whose count carries a ruling.
 
 The masthead **names its audience** — an artifact has no seat, so its content is decided by who
 reads it, and an artifact written for everyone is read carefully by nobody. `refs/doc-sets.md`
 carries the register in full; load it before writing.
 
-**Source of truth:** the foundation book's artifacts standard (`docs/03-capabilities/05-docs/05-artifacts.md`, "The approach document" section). This section digests it for use at the moment of writing and adds no rule of its own; where the two disagree, the book wins and this file is regenerated.
+**Source of truth:** the foundation book's artifacts standard (`docs/03-capabilities/05-docs/05-artifacts.md`, "The approach document" section). This section restates it for use at the moment of writing and adds no rule of its own; where the two disagree, the book wins and this file is regenerated.
 
 When a design is big enough that someone will read it more than once, the plan becomes a document with a fixed shape. Such a design is a new artifact, a contract that other teams build against, or a standard the tooling will enforce. **Why → What → How → Open → Deferred.** Nothing else, and in that order.
 
@@ -202,7 +212,7 @@ file path to keep the URL stable, and give the URL again every time the page cha
   call. A hand-started server dies with its shell and leaves a dead link, which reads as a missing
   page rather than a stopped process.
 
-It is **one self-contained HTML page named `<topic>-approach.html`** — one file per topic, replaced in place as it iterates, never a second copy in another format. HTML because these documents carry tables, samples and comparisons that a reader scans rather than reads. HTML also because a single file travels: it opens anywhere, needs nothing installed, and cannot drift from a companion version of itself.
+An approach document is **one self-contained HTML page named `<topic>-approach.html`** — one file per topic, replaced in place as it iterates, never a second copy in another format. HTML because these documents carry tables, samples and comparisons that a reader scans rather than reads. HTML also because a single file travels: it opens anywhere, needs nothing installed, and cannot drift from a companion version of itself.
 
 | Section | Answers | Written as |
 | --- | --- | --- |
@@ -266,7 +276,7 @@ seats. Write the path.
 
 **That column is the split plan.** You do not write a separate one: filter by scope, and each
 repo's rows are what that repo's documents must say. Splitting becomes division rather than
-rewriting, which is the whole point of the column.
+rewriting, which is what the column is for.
 
 **Sorted highest scope first, the table is also the order you write in.** The foundation before
 the repo, the repo before the seat — and all of it before the code. Approval opens the documents
@@ -294,7 +304,7 @@ The owner column names what changes each document — the book, the repo that bu
 
 **An empty `What re-aligns` table means one of two things.** Either the design obliges no document, which is rare and worth saying out loud. Or you stopped early, which is the ordinary case.
 
-**Source of truth:** the book's artifacts standard, `05-artifacts.md` — *`How` has two halves*. This digests it and adds no rule of its own.
+**Source of truth:** the book's artifacts standard, `05-artifacts.md` — *`How` has two halves*. This restates it and adds no rule of its own.
 
 ### Writing into a doc set
 
@@ -389,6 +399,6 @@ Wear `refs/lenses/architect.md` and `refs/lenses/product.md` while drafting — 
 
 ## Report
 
-The design, in this order: **the altitude, the highest document and the lowest shared package**. Then the classification, what already covers part of it, the behaviors, and the contract sketch. Then what changes per layer, the failure cases, and anything that needs a decision recorded. The first three are paths, and a report that omits them hands back an unclassified design. Close with what you are **unsure** about — an unstated assumption is the thing that gets discovered after the code is written.
+The design, in this order: **the altitude, the highest document and the lowest shared package**. Then the classification, what already covers part of it, the behaviors, and the contract sketch. Then what changes per layer, the failure cases, and anything that needs a decision recorded. The first three are paths, and a report that omits them hands back an unclassified design. Close with what you are **unsure** about — an unstated assumption is what somebody discovers after the code is written.
 
 Then hand to the stack's scaffolding skill, which supplies the commands.

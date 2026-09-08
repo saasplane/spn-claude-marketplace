@@ -1,6 +1,15 @@
+<!-- spn:restates
+{
+  "chapters": [
+    { "path": "CONCEPT.md", "section": "DevEx Utils", "seen": "9b61d399" },
+    { "path": "CONCEPT.md", "section": "Estate Blueprints", "seen": "2a958098" }
+  ]
+}
+-->
+
 # Layers and doors — the estate verb card
 
-**Source of truth:** the foundation's `CONCEPT.md` (DevEx Utils · Estate Blueprints). Use this card as the digest; the book governs. The realization is `spnutils infra …`.
+**Source of truth:** the foundation's `CONCEPT.md` (DevEx Utils · Estate Blueprints). Read this card as the restatement; the book governs. The realization is `spnutils infra …`.
 
 ## Layer nouns × verbs
 

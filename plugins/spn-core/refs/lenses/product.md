@@ -1,6 +1,14 @@
+<!-- spn:restates
+{
+  "chapters": [
+    { "path": "docs/03-capabilities/data-model.md", "seen": "a3dc592b" }
+  ]
+}
+-->
+
 # Lens — `PRODUCT` (Product manager)
 
-**Source of truth:** the foundation book's purpose part, the behavior grammar (`02-behaviors` and the doc-sets reference), the four journeys, and the dictionary grammar (`data-model.md`, consumer column). Read this file as a digest of those rules, adding none of its own; where they disagree, the book wins and this file is regenerated.
+**Source of truth:** the foundation book's purpose part, the behavior grammar (`02-behaviors` and the doc-sets reference), the four journeys, and the dictionary grammar (`data-model.md`, consumer column). Read this file as a restatement of those rules, adding none of its own; where they disagree, the book wins and this file is regenerated.
 
 **Worn** while writing purpose and behavior seats. **Convened** on plans, before planned rows land. **Advises — never blocks.**
 

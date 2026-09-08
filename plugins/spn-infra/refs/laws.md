@@ -1,6 +1,17 @@
+<!-- spn:restates
+{
+  "chapters": [
+    { "path": "CONCEPT.md", "section": "Estate Manifest", "seen": "c30c7feb" },
+    { "path": "CONCEPT.md", "section": "Estate Packages", "seen": "23a4853a" },
+    { "path": "CONCEPT.md", "section": "Estate Modules", "seen": "8ded54dd" },
+    { "path": "CONCEPT.md", "section": "Estate Config", "seen": "c888bb3f" }
+  ]
+}
+-->
+
 # The estate laws — the refusal card
 
-**Source of truth:** the foundation's `CONCEPT.md` (Estate Manifest · Estate Packages · Estate Modules · Estate Config). Read this card as a digest; the book governs. Look for the checkable defect each law names, and raise it before doing anything else.
+**Source of truth:** the foundation's `CONCEPT.md` (Estate Manifest · Estate Packages · Estate Modules · Estate Config). Read this card as a restatement; the book governs. Look for the checkable defect each law names, and raise it before doing anything else.
 
 ## 1 · Machines write the environment global only
 

@@ -1,6 +1,14 @@
+<!-- spn:restates
+{
+  "chapters": [
+    { "path": "docs/04-guides/README.md", "seen": "b1704c31" }
+  ]
+}
+-->
+
 # Getting Started — Empty Repository to First Feature
 
-**Source of truth:** the foundation book's guides seat (`docs/04-guides/` — its face *is* the day-zero guide). This file digests it for use inside a wired repository and adds nothing; where the two disagree, the book wins and this file is regenerated.
+**Source of truth:** the foundation book's guides seat (`docs/04-guides/` — its face *is* the day-zero guide). This file restates it for use inside a wired repository and adds nothing; where the two disagree, the book wins and this file is regenerated.
 
 Follow this walk from nothing to a first feature in flight. Every step names the command or verb that carries it; statuses are honest — ✅ runs today, 🚧 the verb is still being built.
 

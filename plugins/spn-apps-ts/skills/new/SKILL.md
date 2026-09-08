@@ -22,6 +22,23 @@ Then:
 
 ## Target: one of the supported kinds
 
+**A kind decides its test folders, so nothing is chosen when you scaffold.** `unit/` and `integration/` mirror `src/` path for path; `fixtures/`, `helpers/` and `setup/` are flat siblings any kind adds when it needs them. A folder a kind does not carry is not an omission to fill in.
+
+| Kind | `unit/` | `component/` | `integration/` | journeys |
+| --- | :--: | :--: | :--: | :--: |
+| `TOOLCHAIN` | ● (`node:test`, mirrors `src/`) | — | — | — |
+| `SUPPORT_UNIVERSAL` | ● | — | — | — |
+| `SUPPORT_SERVER` | ● | — | ● | — |
+| `SUPPORT_WEB` | ● | ● | — | — |
+| `MODULE_SERVER` | ● | — | — | — |
+| `MODULE_WEB` | ● (jsdom, and a browser where only paint shows it) | — | — | cited from the composing app |
+| `APP_SERVER` | ● | — | ● | — |
+| `APP_WEB` | ● | ○ | — | ● over its own surfaces |
+| `CLIENT_API` | ● | — | ● (contract) | — |
+| `APP_UTILITY` | ● | — | ● | — |
+
+**A domain module ships no shell, so it proves at unit and cites the application above it.** A server module cites the composing application's contract suite; a web module cites its journey. **An application owns both faces of what it composes**: the API face through its published client, the UI face in a browser. Neither substitutes for the other.
+
 | Target | Kind | Runtime | What gets created | Commands after creation |
 | --- | --- | --- | --- | --- |
 | `repo` | `sprepo.json` `{ type: APPS }` — a repo type, not a kind | — | The workspace root — see **Target: repo** above | — |
@@ -91,4 +108,4 @@ A product module owned by one app — a scaffold target rather than a workspace 
 
 ## Depth
 
-The kind registry, structure profiles, and toolchain rules are digested into this plugin and are the authority at the seat. Their owning chapters are the foundation provider set (`providers/apps/ts`: `kinds.md`, 02-structure, 08-toolchain) — cited for provenance, **not as a lookup**. The book is not delivered, so never send anyone there to finish a task. If something you need is missing from the digest, that is a regeneration owed, not a checkout to go find. Read `refs/doc-sets.md` in the **spn-core** plugin for the node grammar in full. After scaffolding, hand off to the `implement` skill.
+The kind registry, structure profiles, and toolchain rules are restated in this plugin and are the authority at the seat. Their owning chapters are the foundation provider set (`providers/apps/ts`: `kinds.md`, 02-structure, 08-toolchain) — cited for provenance, **not as a lookup**. The book is not delivered, so never send anyone there to finish a task. If something you need is missing from the restatement, that is a regeneration owed, not a checkout to go find. Read `refs/doc-sets.md` in the **spn-core** plugin for the node grammar in full. After scaffolding, hand off to the `implement` skill.

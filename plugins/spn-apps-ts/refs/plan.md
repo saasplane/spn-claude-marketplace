@@ -5,7 +5,7 @@
 (devex README § Skills and plugins). The `plan` skill resolves the node's world and stack claim
 from the nearest `sprepo.json`, then loads this file for the APPS · TS specifics below.
 
-**Source of truth:** the foundation book's docs domain and the apps provider set. Read this card as a digest; the book governs.
+**Source of truth:** the foundation book's docs domain and the apps provider set. Read this card as a restatement; the book governs.
 
 
 Pick the mode from the argument (`design` | `docs` | `decision`); if none was given, infer it from the request and say which you picked.

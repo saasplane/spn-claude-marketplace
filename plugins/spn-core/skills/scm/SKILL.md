@@ -3,6 +3,15 @@ name: scm
 description: The repository and project standard - what a project must declare, what its declaration decides, and how repos, branches, and wiring are standardized. Use when creating a repo or project, adding a package or app, judging where code belongs, or fixing a project that does not match its own kind. Stack-agnostic; the stack plugin supplies the scaffold and validate commands.
 ---
 
+<!-- spn:restates
+{
+  "chapters": [
+    { "path": "docs/README.md", "seen": "777ef5ce" }
+  ]
+}
+-->
+
+
 # scm — one declaration decides the rest
 
 **Every node declares exactly one kind, in `spkind.json` at its root, and everything derivable from that kind is never declared again.** Runtime, toolchain profile, structure, packaging, and whether the project publishes at all — all follow. A node without a kind is unfinished; a node that restates what its kind already implies has introduced a second source of truth. A folder with `spkind.json` and `docs/` **is** a node — which is how a module living inside an app is validated and scaffolded exactly like the packaged form.
@@ -60,7 +69,7 @@ A repo is wired by `repo`; the folder the repos sit in is minted by `workspace`.
 | `workspace sync` | brings the floor back to what the members imply | the workspace root |
 | `workspace status` | the orientation — members, world, wiring, every workstream, and any split-plan row still unlanded | reads only |
 
-**The machine seat sits one level above again: `~/.spnenv`, one file for every SaaS Plane value.** `init` and `sync` rewrite its managed region and add keys to the keep region, writing keys and never values. The tool writes no shell profile, and you never edit one either. **Never print or expand a value from that file** — test that a key is set, and nothing more. Run `init` inside a scratch folder and it rewrites the real seat, so point `HOME` at a temp directory for a demo. Read `refs/cross-repo.md` § The machine seat for the regions, the layout and the namespacing rule.
+**The machine seat sits one level above again: `~/.spnenv`, one file for every SaaS Plane value.** `init` and `sync` provision its **shape** — four marked regions, the producer and managed regions rewritten whole, the keep region laid out. **They derive no key.** You add a key when you build what needs it, and the developer supplies the value. The tool writes no shell profile, and you never edit one either. **Never print or expand a value from that file** — test that a key is set, and nothing more. Run `init` inside a scratch folder and it rewrites the real seat, so point `HOME` at a temp directory for a demo. Read `refs/cross-repo.md` § The machine seat for the regions, the layout and the namespacing rule.
 
 **There is no workstream verb, and adding one is a defect.** Opening a subject is `mkdir`, listing what is open is what `status` already reports, and the close is a gate rather than a command.
 
@@ -81,7 +90,9 @@ A workstream is `.spndevex/workstreams/{state}/{NNN}-{subject}/`, and its state 
 
 **Name the blocker, or the proposal is `open/`.** *Feels like later* is not a blocker, and a backlog nobody can explain is where work goes to be forgotten. The developer confirms or overrides in one word, because scope is theirs.
 
-**Moving `backlog/` to `open/` is how work starts.** It needs no ceremony, it is not a close, and no gate fires on it. Read `refs/cross-repo.md` for the full shape, the worked examples, and the two gates a workstream carries.
+**Moving `backlog/` to `open/` is how work starts.** It needs no ceremony, it is not a close, and no gate fires on it.
+
+**Then update the agent and reload before you execute anything — MUST** (RD.DEVEX.049). Your own surfaces improve as the work does, so a workstream that executes first spends its whole scope acting on the surfaces the last one left. Read `refs/cross-repo.md` § *Open a workstream with the agent update* for the steps, the producer and partner forms, and the two gates a workstream carries.
 
 ## The lines that hold
 

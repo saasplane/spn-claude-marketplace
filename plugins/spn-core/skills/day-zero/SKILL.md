@@ -5,7 +5,7 @@ description: Walk an empty folder to two working repositories - the estate quest
 
 # day-zero — an empty folder becomes two repositories
 
-Scan the workspace root, find no `sprepo.json` anywhere, and you are on day zero. You have no code to pattern-match against, and that is the whole point of the exercise. What you do have is the standards, the published packages, and the shape every platform here already takes.
+Scan the workspace root, find no `sprepo.json` anywhere, and you are on day zero. You have no code to pattern-match against, and that is the condition this walk is written for. What you do have is the standards, the published packages, and the shape every platform here already takes.
 
 **Nothing in this walk is hand-made except the estate repository itself.** Every other file arrives from a verb. If you find yourself opening an editor to create a manifest, stop. A verb owns that file, and hand-writing it starts a workspace out of standard on day one.
 
@@ -52,7 +52,7 @@ Two repositories, and the estate one comes first. It carries a package for the o
 
 - **Act 3 is where day zero used to stop.** A partner's first repository is an estate repo, it carries no `package.json`, and that is precisely the case the wiring verb refused. If you meet that refusal, say so plainly and name it as the known blocker rather than working around it by hand.
 - **A partner holds no marketplace checkout, so never offer `repo agent-init --local`.** Their plugins resolve from the published marketplace, and the book reaches them as a published rendering rather than a path they can open.
-- **Act 1 also writes the machine seat, `~/.spnenv`.** The verb writes the keys, and the values are theirs to fill in inside the `spnutils:keep` region. Point them there for every vendor account value, and never print one back — `refs/cross-repo.md` § The machine seat carries the rule.
+- **Act 1 also writes the machine seat, `~/.spnenv`.** The verb writes the file's **shape** — its markers, its managed defaults and an empty keep region. **It derives no key**, so a fresh partner file has nothing to fill in yet. A key arrives later, when you build what needs it, and you ask them for the value. Their own keys go in `spnutils:dev`, which no run reads or writes. Never print a value back — `refs/cross-repo.md` § The machine seat carries the rule.
 - **Act 7 is a conversation, not a generation.** Hand it to `ideate`, which agrees one block at a time. A concept you drafted whole is a concept nobody agreed to.
 - **Stop at the end of each act and say what it produced.** The developer is watching a workspace appear out of nothing, and a silent run of the whole walk gives them nothing to correct.
 
@@ -76,7 +76,7 @@ One more signal shapes your tone rather than your offer. Count the folders in `.
 
 ## Open with a greeting, and end with a door
 
-A session that opens with a status dump reads like a build log. Greet them, then show the ground, then leave one open question — never a menu of options. They arrive with something in mind, and a leading question picks their subject for them.
+A session that opens with a status dump greets nobody. Greet them, then show the ground, then leave one open question — never a menu of options. They arrive with something in mind, and a leading question picks their subject for them.
 
 > Welcome to SaaS Plane — this folder is minted and completely empty. A clean start.
 >

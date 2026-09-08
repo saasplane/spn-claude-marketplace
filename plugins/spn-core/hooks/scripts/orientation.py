@@ -170,8 +170,11 @@ def tree_files(path):
 
 
 def numbered(folder):
-    """`007-release-confidence` reads as number `007`, subject `release-confidence`. A folder
-    carrying no number is still a workstream — the older shapes have none."""
+    """`042-widget-pricing` reads as number `042`, subject `widget-pricing`. A folder
+    carrying no number is still a workstream — the older shapes have none.
+
+    The example is deliberately not a real workstream. This file discovers them by reading
+    `.spndevex/`, so naming one here would be a second answer competing with the folders."""
     match = NUMBERED.match(folder)
     return (match.group(1), match.group(2)) if match else ('', folder)
 
@@ -406,10 +409,15 @@ def workstream_lines(streams):
     row rather than as a heading, so a window skimming one line still knows what it is looking
     at. Closed collapses to one wrapped line — its number is what a later sitting cites."""
     if not streams:
-        return ['workstreams   none yet — a subject becomes one by mkdir under backlog/ or open/']
+        return ['workstreams   none yet — a subject becomes one by mkdir under backlog/ or open/',
+                '              then update the agent and reload BEFORE executing it — cross-repo.md']
     by_state = {state: [w for w in streams if w['state'] == state] for state in STATES}
     tally = ' · '.join(f'{len(by_state[state])} {state}' for state in STATES if by_state[state])
-    out = [f'workstreams   {tally}']
+    # RD.DEVEX.049. The MUST binds the moment a workstream is picked up, and this is the surface a
+    # session meets before any skill. Printed with the tally rather than under a workstream: it is
+    # true of whichever one you open, including one you are about to create.
+    out = [f'workstreams   {tally}',
+           '              open one with the agent update and the reload, then execute — cross-repo.md']
     live = by_state['open'] + by_state['backlog']
     width = max([len(w['subject']) for w in live] or [0]) + 4
     for state in ('open', 'backlog'):

@@ -1,3 +1,12 @@
+<!-- spn:restates
+{
+  "chapters": [
+    { "path": "docs/03-capabilities/02-apps/01-shape/03-architecture.md", "seen": "6415c78a" },
+    { "path": "docs/registers/conformance.md", "seen": "74754467" }
+  ]
+}
+-->
+
 # Contract Review Rules — Stack-Agnostic
 
 Use these rules as the review gate for any SaaS Plane contract surface, in any stack. Source of truth: the foundation book, `docs/03-capabilities/02-apps/03-module/01-server/contract/01-states.md` (constructs), `docs/03-capabilities/02-apps/01-shape/03-architecture.md` (evolution and the generation chain), and `docs/registers/conformance.md` in `spn-foundation`. Apply these to every API change; a rule that fails blocks the change until it is fixed or recorded as a versioned, planned exception.
@@ -14,7 +23,7 @@ A contract is a chain of six constructs: **Contract** → **Services** → **Met
 
 - **A command carries the caller's intent only — never the entity's stored configuration shape.** Server-derived data (masked displays, provider selection, minted secrets and their parameters) is computed server-side and never appears on a command. A client stubbing placeholder values for such fields is the signal the command shape is wrong. Where the input varies by variant, the command family itself is discriminated, each variant carrying only that operation's fields. Shapes designed as pure write input (input types; authored configurations whose secrets ride the write-only half) may embed.
 - **States are backward-compatible.** Once published, a field is never removed, retyped, or repurposed. New optional fields may be added at any time. Keep one consistent shape for success, failure, and effects.
-- **Events are immutable, minimal, append-only.** Past-tense names (`<Concern>Event`); identifiers, timestamps, type, correlation — never a snapshot that goes stale. Write corrections as new events. The queue carries events only — never commands, never states.
+- **Events are immutable, minimal, append-only.** Past-tense names (`<Concern>Event`); identifiers, timestamps, type, correlation — never a snapshot, which is wrong the moment its source changes. Write corrections as new events. The queue carries events only — never commands, never states.
 - **Enums are stable and additive.** New values may be added; existing values are never renamed or reused; consumers tolerate unknown values from a newer producer.
 - **Reuse shared command primitives** (get, bulk get, key lookup, active toggle) before minting a bespoke command for a single id or field.
 - **Constants have their own surface at the contract root.** Put contract-grade literals — manifest and artifact file names, markers, error codes, fixed maps — in a dedicated constants file beside the states, never inside a states file. A validator never consumes one: states carry shapes and enums only. The import edge runs one way: constants may read the states' enums, and a states file never reads back. The contract carries no logic anywhere: resolution, derivation and predicates belong to the layer that realizes the contract, never the layer that states it.

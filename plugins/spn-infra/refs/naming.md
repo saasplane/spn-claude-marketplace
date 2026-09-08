@@ -1,6 +1,15 @@
+<!-- spn:restates
+{
+  "chapters": [
+    { "path": "CONCEPT.md", "section": "Estate Coordinates", "seen": "738ec521" },
+    { "path": "CONCEPT.md", "section": "Estate Config", "seen": "c888bb3f" }
+  ]
+}
+-->
+
 # Names, DNS and the published vocabulary — quick reference
 
-**Source of truth:** the foundation's `CONCEPT.md` (Estate Coordinates · Estate Config). Read this card as a digest; the book governs. Examples use SPN Demo — org `spn`, platform `dmo`, domain `spndemo.app` — the only sample platform.
+**Source of truth:** the foundation's `CONCEPT.md` (Estate Coordinates · Estate Config). Read this card as a restatement; the book governs. Examples use SPN Demo — org `spn`, platform `dmo`, domain `spndemo.app` — the only sample platform.
 
 **Compose every name from coordinates; a name that cannot be composed is a defect.** Nothing is ever derived from a setup name — `{env}` = `{region}-{setup}` is a label; posture comes from `{workload}` (`PROD` · `NP`) alone. The provider's own region is a **mapping on the cloud entry, never a coordinate**.
 

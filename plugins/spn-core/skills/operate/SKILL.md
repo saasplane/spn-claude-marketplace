@@ -18,7 +18,7 @@ description: How a running platform is observed, responded to, and maintained - 
 
 - **Correlation is carried, never reconstructed.** Pass an identifier from the entry through every call, log line, and queued message the work produces. Work that starts a new identity mid-flight has broken the only thread an operator has.
 - **A log line is for whoever is reading it at 3am.** Say what was being attempted, on what, and what happened. Never a bare stack trace, never an internal detail that leaks outward, and never a secret, a token, or a customer's data.
-- **What is measured is what a customer feels** — latency at the entry, failure rate by code, queue depth and age. A dashboard of resource graphs with no customer-facing signal on it explains nothing when the thing that is wrong is the product.
+- **What is measured is what a customer feels** — latency at the entry, failure rate by code, queue depth and age. A dashboard of resource graphs with no customer-facing signal on it explains nothing when the product itself is what is wrong.
 
 ## During an incident
 

@@ -1,3 +1,22 @@
+<!-- spn:restates
+{
+  "chapters": [
+    {
+      "path": "CONCEPT.md",
+      "seen": "5dbfee5b"
+    },
+    {
+      "path": "docs/03-capabilities/01-saas/README.md",
+      "seen": "3e7085be"
+    },
+    {
+      "path": "docs/02-behaviors/01-decide.md",
+      "seen": "aec58547"
+    }
+  ]
+}
+-->
+
 # New-Platform Intake Worksheet
 
 The one-page artifact every new SaaS Plane platform starts from. Fill every row **before** any repository, manifest, or scaffold exists — adoption types these values into manifests, and a manifest is the wrong place to discover a decision was never made. The completed worksheet lands as the **coordinates section of the repository's `CONCEPT.md`**, produced by the `ideate` skill — coordinates settle here; the boundary, domains and surfaces are the concept's own job. Source of truth: the foundation book (`spn-foundation`), `docs/03-capabilities/01-saas/` and `docs/02-behaviors/01-decide.md` / `02-design.md`. SPN Demo (org `spn`, platform `dmo`, domain `spndemo.app`) is the book's sample platform, shown as the example column.
@@ -25,7 +44,7 @@ One organization tree, six node types; the business shape is a choice of which t
 | B2B2B | `ACCOUNT` + `ACCOUNT_ENTERPRISE` | clients with divisions / member businesses |
 | Marketplace | `PLATFORM_ENTERPRISE` + `PLATFORM_CONSUMER` | sellers and shoppers on the platform itself |
 
-(`PLATFORM` — the root — always exists; the Account is always the tenancy boundary for isolation, residency, entitlements, and billing.)
+(`PLATFORM` — the root — always exists; the Account is the tenancy boundary for isolation, residency, entitlements, and billing.)
 
 | Field | Your platform |
 | --- | --- |

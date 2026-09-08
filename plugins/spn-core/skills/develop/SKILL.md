@@ -5,7 +5,7 @@ description: The contract-first build loop - the order work is done in, what eac
 
 # develop — contract first, every time
 
-**Write the contract before the thing that implements it.** Not as ceremony: the contract is what generates the validators, the specification, the client, and the tool definitions, so writing it first is what makes those derivations possible at all. Code written before its contract has to be retrofitted into one, and the retrofit is where shapes go wrong.
+**Write the contract before the code implementing it.** Not as ceremony: the contract is what generates the validators, the specification, the client, and the tool definitions, so writing it first is what makes those derivations possible at all. Code written before its contract has to be retrofitted into one, and the retrofit is where shapes go wrong.
 
 ## The loop
 

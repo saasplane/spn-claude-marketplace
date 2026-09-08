@@ -5,13 +5,14 @@ Every other validator in this repo asks whether a document is well-formed: links
 resolve, metadata parses, statuses are legal. All of them pass while two documents
 state opposite rules, because nothing compares one rule to another.
 
-This asks five questions that only have answers across documents:
+This asks six questions that only have answers across documents:
 
   VOCABULARY   does every closed vocabulary say the same thing everywhere it appears
   RULING       does each row carry exactly one ruling, and nothing but ruling
   OWNERSHIP    is one subject ruled on by two documents that do not cite each other
   CARDINALITY  does prose write a count into a set that is free to grow
   HUB          does the readable face expand every section its concept states
+  RESTATES     does a file still say what the chapter it restates says
 
 **None of them asks whether a row's ruling is TRUE of the documents it governs**, and that is the
 question worth most. It needs a row to name the surfaces stating it, which `06-registers.md` now
@@ -29,6 +30,9 @@ import re
 import sys
 import pathlib
 from collections import defaultdict
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import restates as restates_block                                  # noqa: E402
 
 ROOT = pathlib.Path(".")
 # Filtered to what EXISTS, because this runs in any repo. A glob returns only real files, but the
@@ -224,8 +228,43 @@ def hub():
     return [out]
 
 
+def restatement_drift():
+    """A file under `providers/` restates chapters of this book, and it may have stopped.
+
+    These sit in the SAME repo as the chapters, so comparing them crosses no boundary and this
+    is the cheap half. The marketplace's plugin restatements are the other half, and they need
+    `restate-drift.py` because no repo holds both trees.
+
+    **It fails only on what exists.** A file with no `spn:restates` block is not reported here —
+    that count belongs to the stamping pass, and a finding on every unstamped file would be the
+    whole tree on the first run. What is reported is a block that has gone stale, points at a
+    chapter that does not resolve, names a section nobody kept, or cites a row the register
+    never carried.
+    """
+    providers = sorted(ROOT.glob("providers/**/*.md"))
+    if not providers:
+        return []                                  # no provider tree here; that is not drift
+    known = restates_block.register_rows(REGISTER)
+    findings = []
+    for path in providers:
+        block, broken = restates_block.parse(path)
+        if broken:
+            findings.append(f"{path}: {broken}")
+        elif block is not None:
+            findings.extend(restates_block.check(path, block, ROOT, known))
+    if not findings:
+        return []
+    out = f"RESTATES    {len(findings)} restatement(s) no longer agree with what they cite."
+    out += "\n            The chapter wins and the file is regenerated — never the reverse:"
+    for finding in findings[:8]:
+        out += f"\n              {finding}"
+    if len(findings) > 8:
+        out += f"\n              … and {len(findings) - 8} more"
+    return [out]
+
+
 def main():
-    findings = vocabulary() + rulings() + ownership() + cardinality() + hub()
+    findings = vocabulary() + rulings() + ownership() + cardinality() + hub() + restatement_drift()
     for f in findings:
         print(f)
         print()

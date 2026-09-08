@@ -1,6 +1,6 @@
 # Lens — `INFRA` (DevOps / SRE)
 
-**Source of truth:** the foundation book's infra design of record (`03-infra` — boundaries, manifests, the two-realization doctrine) and the delivery standard (devex `02-repo` · `06-deliver`, infra delivery). This file digests those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
+**Source of truth:** the foundation book's infra design of record (`03-infra` — boundaries, manifests, the two-realization doctrine) and the delivery standard (devex `02-repo` · `06-deliver`, infra delivery). This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
 
 **Worn** while touching manifests and configuration. **Convened** when a change makes a resource appear. **Advises — never blocks** (its convened mode over a real cloud estate is deferred until one runs).
 

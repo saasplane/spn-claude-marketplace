@@ -1,6 +1,15 @@
+<!-- spn:restates
+{
+  "chapters": [
+    { "path": "CONCEPT.md", "section": "Estate Manifest", "seen": "c30c7feb" },
+    { "path": "CONCEPT.md", "section": "Estate Packages", "seen": "23a4853a" }
+  ]
+}
+-->
+
 # Estate manifests — quick reference
 
-**Source of truth:** the foundation book's infra domain and the repo-root `CONCEPT.md` (Estate Manifest · Estate Packages) in `spn-foundation`. Use this card as the digest; the book governs.
+**Source of truth:** the foundation book's infra domain and the repo-root `CONCEPT.md` (Estate Manifest · Estate Packages) in `spn-foundation`. Read this card as the restatement; the book governs.
 
 ## Two files per node
 
@@ -62,7 +71,7 @@ Organization config, the essentials:
 }
 ```
 
-Platform config, the moving parts (manifest grammar laws — RD.INFRA.050/051). **`domains.platform.domain` is the `{spd}`** — the domain every host derives from, with its DNS `records[]` beside it; `domains.service[]` holds the service domains an app is reached on. **`owner`** is the platform owner — `email` · `firstName` · `lastName` · `displayName`. Treat the email as load-bearing: the identity module seeds it as the owner's sign-in handle. Every recovery and step-up message goes there. It MUST be deliverable, on the organization's `emailDomain` or on a domain whose declaration carries MX (RD.INFRA.093). **declaration vs realization** — `resources` · `apps` · `modules` say what the platform *is*; `providers` say where it *runs*. `resources.platform` names the total four: database · cache · queue · storage — secrets never declared, every environment has one. Beside it `resources.spaces[]` holds per-need data worlds: `code` = published prefix · families each optional · db declares `schemas` `{name, dedicated}` rows and `users` `[{group, purposes, schemas}]` grants. `apps[]` rows sit at config level (`kindCode` — claim ∧ grant · `repo` · optional **`space`** binding, absent = platform resources · `deployments[]` one per mtype). `environments[]` rows sit under `providers.cloud` (`setup` free text — nothing derives from it · `region` · `networkIndex` append-only 0–7 · `workload` `PROD|NP` · `size` · `hosting` — `CLUSTER` refused under `PROD` · `deploy` trigger). `providers.local` mirrors the declaration **thing-first**: `resources.platform` ports · `resources.spaces` and `modules` as **maps keyed by declared code**. Declare in arrays, realize in maps; an orphan key is a validate ERROR, and absent = derived. **One fact once**: realizations carry no `mtype` — the declared engine selects the realization schema.
+Platform config, part by part (manifest grammar laws — RD.INFRA.050/051). **`domains.platform.domain` is the `{spd}`** — the domain every host derives from, with its DNS `records[]` beside it; `domains.service[]` holds the service domains an app is reached on. **`owner`** is the platform owner — `email` · `firstName` · `lastName` · `displayName`. Treat the email as load-bearing: the identity module seeds it as the owner's sign-in handle. Every recovery and step-up message goes there. It MUST be deliverable, on the organization's `emailDomain` or on a domain whose declaration carries MX (RD.INFRA.093). **declaration vs realization** — `resources` · `apps` · `modules` say what the platform *is*; `providers` say where it *runs*. `resources.platform` names the total four: database · cache · queue · storage — secrets never declared, every environment has one. Beside it `resources.spaces[]` holds per-need data worlds: `code` = published prefix · families each optional · db declares `schemas` `{name, dedicated}` rows and `users` `[{group, purposes, schemas}]` grants. `apps[]` rows sit at config level (`kindCode` — claim ∧ grant · `repo` · optional **`space`** binding, absent = platform resources · `deployments[]` one per mtype). `environments[]` rows sit under `providers.cloud` (`setup` free text — nothing derives from it · `region` · `networkIndex` append-only 0–7 · `workload` `PROD|NP` · `size` · `hosting` — `CLUSTER` refused under `PROD` · `deploy` trigger). `providers.local` mirrors the declaration **thing-first**: `resources.platform` ports · `resources.spaces` and `modules` as **maps keyed by declared code**. Declare in arrays, realize in maps; an orphan key is a validate ERROR, and absent = derived. **One fact once**: realizations carry no `mtype` — the declared engine selects the realization schema.
 
 A module row:
 

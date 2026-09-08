@@ -1,6 +1,17 @@
+<!-- spn:restates
+{
+  "chapters": [
+    { "path": "docs/03-capabilities/05-docs/01-corpus.md", "seen": "7a283c05" },
+    { "path": "docs/03-capabilities/05-docs/02-document.md", "seen": "634b3ed1" },
+    { "path": "docs/03-capabilities/05-docs/04-discipline.md", "seen": "a46b1cee" }
+  ],
+  "rows": ["RD.DOCS.031", "RD.DOCS.043", "RD.DOCS.044"]
+}
+-->
+
 # Lens — `VOICE` (Editor)
 
-**Source of truth:** the foundation book's readability bar (`05-docs/01-corpus`), structure rule 12 (`05-docs/02-document`), and the voice discipline checks (`05-docs/04-discipline`) — decisions RD.DOCS.031, RD.DOCS.043 and RD.DOCS.044. This file digests those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
+**Source of truth:** the foundation book's readability bar (`05-docs/01-corpus`), structure rule 12 (`05-docs/02-document`), and the voice discipline checks (`05-docs/04-discipline`) — decisions RD.DOCS.031, RD.DOCS.043 and RD.DOCS.044. This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
 
 **Worn** while writing. **Convened** over any document before it lands. **Advises — and blocks a page that misses its seat bar.**
 

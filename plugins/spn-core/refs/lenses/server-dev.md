@@ -1,6 +1,14 @@
+<!-- spn:restates
+{
+  "chapters": [
+    { "path": "docs/03-capabilities/02-apps/03-module/01-server/README.md", "seen": "bad93353" }
+  ]
+}
+-->
+
 # Lens — `SERVER_DEV` (Backend developer)
 
-**Source of truth:** the foundation book's module server seats (`02-apps/03-module/01-server` — contract · app · entry) and the platform pattern catalog (conformance requirement 5). This file digests those rules and adds none of its own; where they disagree, the book wins and this file is regenerated. Find the stack-concrete detail in the stack's step files; this lens is the stack-agnostic half.
+**Source of truth:** the foundation book's module server seats (`02-apps/03-module/01-server` — contract · app · entry) and the platform pattern catalog (conformance requirement 5). This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated. Find the stack-concrete detail in the stack's step files; this lens is the stack-agnostic half.
 
 **Worn** while writing server code — contract, service, entry. Not convened; it *is* the writing.
 

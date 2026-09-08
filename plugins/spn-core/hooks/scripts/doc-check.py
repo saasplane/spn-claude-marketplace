@@ -219,10 +219,37 @@ def _section(text, name):
     return m.group(1) if m else None
 
 
-def _cards(body):
-    """Cards are h3 OR h4 — the corpus uses h4, and both read as a card to a person."""
+def _card_divs(body):
+    """Each `<div class="open">` with its own matching close, nesting counted.
+
+    THE BLIND SPOT THIS CLOSES. Splitting the section on headings alone left the LAST card's
+    chunk running to the end of the section, so it borrowed whatever came after it. On the 009
+    page a card carrying no options table passed, because a receipt table sat below it — and the
+    card a writer adds in a hurry is always the last one. A chunk that ends where its card ends
+    cannot borrow anything.
+    """
     out = []
-    for chunk in re.split(r'(?=<h[34]\b)', body):
+    for opening in re.finditer(r'<div\b[^>]*class="[^"]*\bopen\b[^"]*"[^>]*>', body, re.I):
+        depth, at = 1, opening.end()
+        for tag in re.finditer(r'<div\b[^>]*>|</div\s*>', body[opening.end():], re.I):
+            depth += -1 if tag.group(0).startswith('</') else 1
+            if depth == 0:
+                at = opening.end() + tag.start()
+                break
+        out.append(body[opening.end():at])
+    return out
+
+
+def _cards(body):
+    """Cards are h3 OR h4 — the corpus uses h4, and both read as a card to a person.
+
+    Where the page marks its cards with `<div class="open">` those bounds win, because they are
+    what the writer actually drew. The heading split is the fallback for a page that does not.
+    """
+    out = []
+    divs = _card_divs(body)
+    chunks = divs if divs else re.split(r'(?=<h[34]\b)', body)
+    for chunk in chunks:
         t = re.search(r'<h[34]\b[^>]*>(.*?)</h[34]>', chunk, re.S | re.I)
         if t:
             out.append((re.sub(r'<[^>]+>', '', t.group(1)).strip()[:60], chunk[t.end():]))
@@ -858,7 +885,15 @@ def main():
                  'RD.DOCS.043 · RD.DOCS.044).'
                  if any('RD.DOCS.04' in m or 'RD.DOCS.031' in m for _, m in found) else '')
         subject = 'these files miss' if plural else 'this file misses'
-        message = (f'Doc standard — {subject} bars the book states:\n' + body + moves +
+        # A GATE MUST SAY WHAT IT DID NOT CHECK. On an Edit the hook sees the REPLACEMENT TEXT and
+        # not the document, so two whole classes of finding cannot be reached from here: a cell
+        # scored as prose because nothing says it sits in a table, and an opening sentence that is
+        # only an opening sentence relative to a paragraph this run never had. Saying so costs one
+        # line and stops a clean run reading as more than it is.
+        limits = ('\n  This run scored the replacement text, not the document — a table cell reads '
+                  'as prose here, and a paragraph\'s opening sentence is not a fragment\'s. Sweep '
+                  'the whole file to reach those: `doc-check.py <path>`.' if fragment else '')
+        message = (f'Doc standard — {subject} bars the book states:\n' + body + moves + limits +
                    "\n  Load `refs/doc-sets.md` (One voice / Every surface / The artifacts pocket) and "
                    "the `plan` skill's approach-document section.")
         # The same text twice: `additionalContext` is what the agent reads; `systemMessage` is
@@ -911,7 +946,11 @@ def main():
               f"BLOCK {tot['BLOCK']} · RULE {tot['RULE']} · SOFT {tot['SOFT']}")
     for root, stats in per_root:
         rates(root, stats)
-    return 1 if tot['BLOCK'] else 0
+    # THE EXIT CODE NOW MATCHES THE OUTPUT. This returned 0 while printing a RULE, so
+    # `doc-check.py docs/ && echo clean` printed `clean` over a list of findings — and a gate read
+    # by its colour is the failure this workstream opened on. SOFT stays 0: the corpus is swept
+    # for length and not yet for reach, so a SOFT is a measurement rather than a verdict.
+    return min(tot['BLOCK'] + tot['RULE'], 250)
 
 
 if __name__ == '__main__':

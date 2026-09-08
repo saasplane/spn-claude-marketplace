@@ -56,6 +56,13 @@ SCRIPTS = [
     ('spn-core', 'split-plan.py', ['.']),
     ('spn-core', 'contract-cycle.py', ['.']),
     ('spn-core', 'orientation.py', []),
+    # Runs in the fixture, which holds plugins and NO book. That is a partner's shape exactly,
+    # and the check must print one line and exit clean rather than report every file as drifted.
+    ('spn-core', 'restate-drift.py', []),
+    # Reads its event from stdin and gets none here. It must exit clean rather than block or
+    # crash: it guards a file the loop legitimately uses, and a guard that takes the chain
+    # down is worse than the exposure it was written for.
+    ('spn-core', 'env-seat.py', []),
     ('spn-apps-ts', 'coverage.py', ['--check', 'route-e2e', '.']),
     ('spn-apps-ts', 'coverage.py', ['--check', 'spec-restore', '.']),
     ('spn-apps-ts', 'coverage.py', ['--check', 'foreign-double', '.']),
@@ -105,8 +112,11 @@ def main():
             failed.append((label, 'not found'))
             print(f'  ✘ {label}')
             continue
+        # stdin is CLOSED, not inherited. A PreToolUse hook reads its event from stdin, so running
+        # one here without this waits forever on the parent's terminal — and a harness that hangs
+        # is a harness nobody runs.
         run = subprocess.run([sys.executable, path, *args], cwd=fixture,
-                             capture_output=True, text=True)
+                             stdin=subprocess.DEVNULL, capture_output=True, text=True)
         if 'Traceback' in run.stderr:
             failed.append((label, run.stderr.strip().splitlines()[-1][:96]))
             print(f'  ✘ {label}')

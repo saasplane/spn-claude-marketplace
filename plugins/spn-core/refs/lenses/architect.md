@@ -1,6 +1,15 @@
+<!-- spn:restates
+{
+  "chapters": [
+    { "path": "docs/03-capabilities/02-apps/01-shape/README.md", "seen": "a81e3591" },
+    { "path": "docs/03-capabilities/data-model.md", "seen": "a3dc592b" }
+  ]
+}
+-->
+
 # Lens — `ARCHITECT` (Architect)
 
-**Source of truth:** the foundation book's saas model (`01-saas`), and the shape and module groups (`02-apps/01-shape` · `03-module`). Also the contract states standard including its evolution classification, and the dictionary grammar (`data-model.md`, capability column). This file digests those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
+**Source of truth:** the foundation book's saas model (`01-saas`), and the shape and module groups (`02-apps/01-shape` · `03-module`). Also the contract states standard including its evolution classification, and the dictionary grammar (`data-model.md`, capability column). This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
 
 **Worn** while designing. **Convened** when a module boundary moves, and over any design before its rows land. **Blocks:** a new mechanism reachable from more than one module, with no decision entry naming what it was weighed against. Below that threshold it advises, and flags anything that needs a decision entry.
 
@@ -30,7 +39,7 @@ A new **cross-cutting mechanism** blocks where it is **reachable from more than 
 - **The block is cheap to clear: you write the row.** It names the mechanism, what it was weighed against, and why those did not carry.
 - **A person still decides.** The lens does not choose the mechanism. It refuses to let one arrive unweighed.
 
-This is the failure mode that costs most later — a third way to do what the system already does twice, found after you have written the code.
+Duplication costs most later — a third way to do what the system already does twice, found after you have written the code.
 
 ## What it never does
 

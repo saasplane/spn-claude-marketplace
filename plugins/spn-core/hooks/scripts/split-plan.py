@@ -50,6 +50,9 @@ DEVEX = '.spndevex'
 UNDECIDED = {'', '-', '--', '?', '⬜', '☐', '[ ]', 'tbd', 'todo', 'open', 'unknown'}
 LANDED = ('landed', '✅', 'done', 'shipped')
 ACCOUNTED = ('landed', 'carried', 'deferred')
+# A cell opens with a mark glyph before its word:  carried,  deferred. The word is what
+# carries the meaning, so the reader skips anything that is not a letter to find it.
+LEAD = re.compile(r'^[^0-9a-z]+', re.I)
 SEGMENT = re.compile(r'\|\||&&|\||;|\n')
 MOVERS = ('mv', 'cp', 'rsync', 'install')
 SKIP = {'node_modules', '.git', 'dist', 'build', '.nx', 'coverage', '__pycache__'}
@@ -128,14 +131,34 @@ def rows_of(text, markdown):
 
 
 def state_of(row):
-    """`empty` · `landed` · `pending`. A mark that is neither blank nor a landing is somebody's
-    decision, so it passes the close and still owes the documents pass."""
-    state = row['state'].strip().lower()
-    if state in UNDECIDED:
+    """`empty` · `landed` · `carried` · `deferred` · `pending`.
+
+    **The close accepts three of the five, so it has to tell them apart.** `ACCOUNTED` named
+    all three from the first version and nothing read it. A row saying `carried` and a row
+    saying `agreed` were one value, so the gate warned about rows that had named their
+    successor. That teaches a reader that marking a row changes nothing.
+
+    `pending` is what is left over: somebody decided to do it and never said what became of
+    it. It still passes the close, by the same rule as before, and the warning names it.
+    """
+    raw = row['state'].strip().lower()
+    state = LEAD.sub("", raw)
+    if raw in UNDECIDED or not state:
         return 'empty'
-    if state.startswith(LANDED):
+    # `✅` IS ITSELF A LANDED MARK, so the raw cell is read before the glyph is stripped.
+    # Stripping first turned every `✅ 2026-09-07` into `2026-09-07` and lost eleven landings.
+    if raw.startswith(LANDED) or state.startswith(LANDED):
         return 'landed'
+    if state.startswith('carried'):
+        return 'carried'
+    if state.startswith('deferred'):
+        return 'deferred'
     return 'pending'
+
+
+def accounted(row):
+    """Whether a row said what became of it. Three states do; `pending` and `empty` do not."""
+    return state_of(row) in ('landed', 'carried', 'deferred')
 
 
 def read(path):
@@ -385,8 +408,47 @@ def gate_close(payload):
         pages = subject_pages(root, subject, source if source and os.path.isdir(source) else None)
         rows = [row for page in pages for row in plan_of(page)]
         empty = [row for row in rows if state_of(row) == 'empty']
+        # A GATE MUST SAY WHAT IT DID NOT CHECK. These two states used to leave here together, and
+        # a page that planned NOTHING closed exactly as green as a page accounting for everything.
+        # `plan_of` reads a `How` table by its `Scope` column, so a table without that header is
+        # not a split plan and the gate has nothing to hold the page to. Four pages were measured
+        # in that state on 2026-09-07 and every one of them would have closed clean.
+        if not rows:
+            emit(f'Close gate — `{subject}` carries no split plan, so nothing was checked.',
+                 deny=(f'Denied: `{subject}` has no split plan, so this gate checked NOTHING — '
+                       f'that is not the same as everything being accounted for, and it must not '
+                       f'read the same.\n'
+                       f'A split plan is a `How` table with a **Scope** column and a **State** '
+                       f'column, one row per construct. The gate reads those two and nothing '
+                       f'else.\n\n'
+                       f'Add the columns to the approach page\'s constructs table, then give each '
+                       f'row one of three states:\n'
+                       f'  landed <path>   the node that now holds the content\n'
+                       f'  carried         the successor scope that takes it on\n'
+                       f'  deferred        the event that brings it back\n\n'
+                       f'If this scope genuinely planned nothing, say so on the page in a one-row '
+                       f'table rather than by leaving the column out — an absent plan and a '
+                       f'finished one are indistinguishable to any reader, not just to this hook.'))
+            continue
+        pending = [row for row in rows if not accounted(row)]
         if not empty:
-            continue                                    # no plan, or every row accounted for
+            # ACCOUNTED FOR IS THREE STATES, AND `accounted()` READS ALL THREE. It did not
+            # once: `ACCOUNTED` was declared and never used, so a row naming its successor
+            # counted the same as one saying `🚧 agreed`, and closing `007` warned about
+            # sixteen rows that had each been decided. What is left here is the real case —
+            # designed, not done, and silent about where it went. It still closes, because
+            # whether that should refuse is the developer's rule to set. This says what it
+            # did not check rather than deciding for them.
+            if pending:
+                listed = '\n'.join(f'  - {r["scope"]} — {r["label"][:90]}' for r in pending[:10])
+                more = f'\n  … and {len(pending) - 10} more' if len(pending) > 10 else ''
+                emit(f'Close gate — `{subject}` closes with {len(pending)} row(s) that never say '
+                     f'what became of them. The gate did NOT check these:\n' + listed + more +
+                     f'\n\nEach one says somebody decided something and not what happened to it. '
+                     f'If the work moves on, mark it carried and name the scope; if it waits, mark '
+                     f'it deferred and name the trigger. Closing with work pending is ordinary — '
+                     f'closing without saying where it went is what nobody can follow.')
+            continue
         listed = '\n'.join(f"  - {r['scope']} — {r['label'][:90]}" for r in empty[:10])
         more = f'\n  … and {len(empty) - 10} more' if len(empty) > 10 else ''
         emit(f'Close gate — `{subject}` has rows nobody decided.',
@@ -414,10 +476,11 @@ def sweep(roots):
             if not pages:
                 print(f'  {subject}: no approach page — no split plan, and that is a valid shape')
                 continue
-            tally = {'landed': 0, 'pending': 0, 'empty': 0}
+            tally = {'landed': 0, 'carried': 0, 'deferred': 0, 'pending': 0, 'empty': 0}
             for row in rows:
                 tally[state_of(row)] += 1
             print(f"  {subject}: {len(rows)} rows · landed {tally['landed']} · "
+                  f"carried {tally['carried']} · deferred {tally['deferred']} · "
                   f"pending {tally['pending']} · undecided {tally['empty']} "
                   f"· {len(pages)} page(s)")
             for row in rows:

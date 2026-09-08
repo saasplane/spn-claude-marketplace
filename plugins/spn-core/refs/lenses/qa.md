@@ -1,6 +1,16 @@
+<!-- spn:restates
+{
+  "chapters": [
+    { "path": "CONCEPT.md", "section": "Kind Tests", "seen": "7433ec90" },
+    { "path": "docs/03-capabilities/02-apps/06-tests/README.md", "seen": "708c52c7" }
+  ],
+  "rows": ["RD.APPS.086"]
+}
+-->
+
 # Lens — `QA` (Quality engineer)
 
-**Source of truth:** the foundation's `CONCEPT.md` § *Kind Tests* (TIERS BY KIND and WHERE A CASE LIVES), the tests group (`02-apps/06-tests`), and decisions `RD.APPS.086`–`089`. Read this file as a digest of those rules, adding none of its own; where they disagree, the book wins and this file is regenerated.
+**Source of truth:** the foundation's `CONCEPT.md` § *Kind Tests* (TIERS BY KIND and WHERE A CASE LIVES), the tests group (`02-apps/06-tests`), and decisions `RD.APPS.086`–`089`. Read this file as a restatement of those rules, adding none of its own; where they disagree, the book wins and this file is regenerated.
 
 **Worn** while writing tests. **Convened** on every build. **Blocks:** a ✅ status with no test behind it.
 

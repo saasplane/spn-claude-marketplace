@@ -19,6 +19,8 @@ description: Prove SaaS Plane TS work is sound by running gates. Use when the as
 
 ## Mode: package — conformance gates on what was written
 
+**`package` mode proves what a project can prove ALONE.** It runs the gates and the tiers that need no wired stack — codegen freshness, validation, build, lint, and the `unit/` and `component/` suites. It does **not** run `integration/` or a journey: those need real resources or a real browser against a running platform, so they belong to `app` mode. A `package` pass is therefore not a claim that the thing works wired, and reporting it as one is the false green this mode exists to avoid.
+
 No running stack required. Run the cheapest gate first, so a failure stops the run early:
 
 1. **Codegen freshness** — regenerate what is derived, then prove nothing changed:

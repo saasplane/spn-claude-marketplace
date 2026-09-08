@@ -63,7 +63,7 @@ displayName: CDTString;
 
 ## Keep the rest out of the first sentence
 
-Elaborate as much as you like — it simply must not be the opening sentence, because that is the part that travels.
+Elaborate as much as you like — it simply must not be the opening sentence, because the opening sentence is what travels.
 
 - Put the reasoning **after a blank line**. It stays in the file and never reaches a generated surface.
 - **No long prose where the code already shows it.** A comment that narrates the next three lines is a maintenance cost with no reader.

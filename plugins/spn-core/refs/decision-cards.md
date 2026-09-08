@@ -14,7 +14,7 @@ The chapter is explicit, and this is the clause most often missed:
 > does — **MUST**. That covers a status reply, an answer to "what's left?", and a pending-work
 > report at any moment.*
 
-**These are one question, however it is phrased.** *"open items"* — the book's own wording —
+**Every phrasing below is one question.** *"open items"* — the book's own wording —
 · *"what's left?"* · *"open questions"* · *"open cards"* · *"what's open"* · *"what's pending"*
 · *"where are we"*. The list is illustrative, not exhaustive: **anything asking what is
 outstanding is this question.** None is a lighter version of another, and none earns a looser
@@ -75,7 +75,7 @@ already gave point at a different question. A reopened card keeps its number and
 **A card raised in conversation keeps the number it was given there.** The person has been reading
 those numbers, so the page uses them rather than starting a second run.
 
-> Digested from `05-docs/05-artifacts.md` — *The approach document* → `Open`. Where the two
+> Restates `05-docs/05-artifacts.md` — *The approach document* → `Open`. Where the two
 > disagree, the chapter wins.
 
 ## Deferred

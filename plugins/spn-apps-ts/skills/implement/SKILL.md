@@ -33,7 +33,7 @@ Scope reads to what the step needs — the inventory tells you which packages ex
 
 ## 3. Walk the steps
 
-Each step has a reference file in `steps/` — read the step file **before** writing that layer's code; it carries the golden path and the load-bearing rules digest:
+Each step has a reference file in `steps/` — read the step file **before** writing that layer's code; it carries the golden path and restates the load-bearing rules:
 
 1. [`steps/contract.md`](steps/contract.md) — states, commands, events, validators (`spnutils apps gen-validators`)
 2. [`steps/service.md`](steps/service.md) — the canonical service shape: authz, transactions, cache, queues, audit, repository, migrations
@@ -44,6 +44,8 @@ Each step has a reference file in `steps/` — read the step file **before** wri
 7. [`steps/docs.md`](steps/docs.md) — the doc set closes the change
 
 Order never changes; skip only what the classification skips. **Docs move with the steps, not after them.** The contract step updates `docs/03-capabilities/` rows and writes intent comments as it writes the surface. The test step embeds behavior ids in contract-tier test titles, and the docs step is the closing sweep that flips statuses. Regenerate at the marked points. Run `gen-validators` after any `contract/states/**` edit. Run `gen-barrel` after adding files to a lib package — never on apps or the API client. Regenerate the API client from the **running** service if routes or contracts changed before the FE consumes them.
+
+**The test step proves each claim once, at the level that owns it.** Pick the tier by what would break: a validation rule breaks in a unit, an authorization gate breaks against the real service, an outcome breaks end to end. A unit test for something that only fails when wired is a green proving nothing. A journey re-checking a rule the contract tier already decided is a slower copy of an answer you have. Contract-tier titles carry their behavior ids, which is what makes coverage readable later.
 
 ## 4. Close
 

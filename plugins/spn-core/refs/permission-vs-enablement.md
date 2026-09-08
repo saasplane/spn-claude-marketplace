@@ -2,7 +2,7 @@
 
 **For the agent adding a module, a state or a gate**, in any stack. You reach this file at the moment you write the gate, not afterwards. Get the answer wrong and you bake a product decision into code, gate a read, or mint a verb nobody else uses. All three have happened in this estate, and each one is named below with the file it happened in.
 
-Source of truth: the foundation book's people-and-access chapter and decisions RD.SAAS.033 · RD.SAAS.034 in `spn-foundation`. This file digests them for use at the seat and adds no rule of its own. Where the two disagree, the book wins and this file is regenerated.
+Source of truth: the foundation book's people-and-access chapter and decisions RD.SAAS.033 · RD.SAAS.034 in `spn-foundation`. This file restates them for use at the seat and adds no rule of its own. Where the two disagree, the book wins and this file is regenerated.
 
 ## The first question
 
@@ -60,7 +60,7 @@ A value-checked code needs a matching narrowing on the surface. Where the body c
 
 The ceiling is the list of organization types a definition may be set for. It answers **could this question ever sensibly apply to this type**, and nothing else.
 
-It is not an exemption mechanism. A type inside the ceiling with the answer `false` is governed and off. A type outside the ceiling was never asked. Reaching for the ceiling to grant something is the move that makes one column mean two things.
+The ceiling is not an exemption mechanism. A type inside the ceiling with the answer `false` is governed and off. A type outside the ceiling was never asked. Reaching for the ceiling to grant something is the move that makes one column mean two things.
 
 ### `PLATFORM` is governed like every other type
 
