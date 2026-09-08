@@ -1,14 +1,25 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/03-capabilities/05-docs/01-corpus.md", "seen": "7a283c05" }
+    {
+      "path": "docs/03-capabilities/05-docs/01-corpus.md",
+      "seen": "7a283c05"
+    },
+    {
+      "path": "docs/03-capabilities/01-saas/06-service-namespaces.md",
+      "seen": "296defc6"
+    },
+    {
+      "path": "docs/03-capabilities/04-devex/01-scm.md",
+      "seen": "306c1c68"
+    }
   ]
 }
 -->
 
 # Lens — `LEAD` (Engineering leader)
 
-**Source of truth:** the foundation book's purpose part, the paved-road doctrine and repo standard (devex `README` · `02-repo`), and the configuration-over-customization ladder (`01-saas/06-service-domains`). The readability check restates the corpus standard's readability bar (`05-docs/01-corpus`). Read this file as a restatement of those rules, adding none of its own; where they disagree, the book wins and this file is regenerated.
+**Source of truth:** the foundation book's purpose part, the paved-road doctrine and repo standard (devex `README` · `04-devex/01-scm`), and the configuration-over-customization ladder (`01-saas/06-service-namespaces`). The readability check restates the corpus standard's readability bar (`05-docs/01-corpus`). Read this file as a restatement of those rules, adding none of its own; where they disagree, the book wins and this file is regenerated.
 
 **Worn** while shaping repo standards and process. **Convened** on scope and fit questions. **Advises — never blocks.**
 

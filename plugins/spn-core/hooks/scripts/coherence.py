@@ -252,6 +252,8 @@ def restatement_drift():
             findings.append(f"{path}: {broken}")
         elif block is not None:
             findings.extend(restates_block.check(path, block, ROOT, known))
+            findings += [f"{path}: restates `{name}` and does not declare it"
+                         for name in restates_block.undeclared(path, block)]
     if not findings:
         return []
     out = f"RESTATES    {len(findings)} restatement(s) no longer agree with what they cite."

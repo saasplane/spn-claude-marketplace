@@ -1,8 +1,22 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/03-capabilities/02-apps/01-shape/README.md", "seen": "a81e3591" },
-    { "path": "docs/03-capabilities/data-model.md", "seen": "a3dc592b" }
+    {
+      "path": "docs/03-capabilities/02-apps/01-shape/README.md",
+      "seen": "a81e3591"
+    },
+    {
+      "path": "docs/03-capabilities/data-model.md",
+      "seen": "a3dc592b"
+    },
+    {
+      "path": "docs/03-capabilities/01-saas/README.md",
+      "seen": "3e7085be"
+    },
+    {
+      "path": "docs/03-capabilities/02-apps/03-module/README.md",
+      "seen": "1dd5844b"
+    }
   ]
 }
 -->

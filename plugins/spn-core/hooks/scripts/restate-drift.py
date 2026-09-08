@@ -57,7 +57,7 @@ def main():
         return 0
 
     known_rows = restates.register_rows(book / "docs/registers/decisions.md")
-    findings, stamped, undeclared = [], 0, []
+    findings, omissions, stamped, unstamped, unclassified = [], [], 0, [], set()
     for path in PLUGINS:
         block, broken = restates.parse(path)
         if broken:
@@ -65,30 +65,51 @@ def main():
             continue
         if block is None:
             if restates.declares_a_source(path):
-                undeclared.append(path)
+                unstamped.append(path)
             continue
         stamped += 1
         findings.extend(restates.check(path, block, book, known_rows))
+        omissions += [f"{path}: restates `{name}` and does not declare it"
+                      for name in restates.undeclared(path, block)]
+        unclassified.update(restates.named_sources(path)[2])
 
     for finding in findings:
         print(f"DRIFT       {finding}")
-    if undeclared:
+    if omissions:
         print()
-        print(f"UNSTAMPED   {len(undeclared)} file(s) say what they restate in prose and carry no block.")
+        print(f"UNDECLARED  {len(omissions)} source(s) a block leaves out. The file restates them")
+        print("            and nothing watches them, so a moved chapter reaches nobody:")
+        for omission in omissions:
+            print(f"              {omission}")
+
+    if unstamped:
+        print()
+        print(f"UNSTAMPED   {len(unstamped)} file(s) say what they restate in prose and carry no block.")
         print("            The sentence is not machine-readable, so no run can name them when a chapter moves:")
-        for path in undeclared[:10]:
+        for path in unstamped[:10]:
             print(f"              {path}")
-        if len(undeclared) > 10:
-            print(f"              … and {len(undeclared) - 10} more")
+        if len(unstamped) > 10:
+            print(f"              … and {len(unstamped) - 10} more")
+
+    if unclassified:
+        print()
+        print(f"UNREAD      {len(unclassified)} name(s) in a declaration that no rule here can")
+        print("            resolve to a document, so nothing compares them. This check")
+        print("            under-reports by exactly this much, and says so rather than hiding it:")
+        print("              " + " · ".join(sorted(unclassified)[:12]))
 
     print()
     print(f"{len(PLUGINS)} plugin document(s) · {stamped} carrying spn:restates · "
-          f"{len(findings)} drift · {len(undeclared)} unstamped — book at {book}")
+          f"{len(findings)} drift · {len(omissions)} undeclared · {len(unstamped)} unstamped · "
+          f"{len(unclassified)} unread name(s) — book at {book}")
     # UNSTAMPED IS REPORTED AND DOES NOT FAIL. It is coverage, not drift: those files are not
     # wrong, they are unmeasured. Failing on them would leave the gate red from the day it shipped
     # until somebody hand-wrote every last block — and a gate that is always red is one nobody
     # reads, which is the argument this whole construct rests on.
-    return len(findings)
+    # AN OMISSION FAILS, WHERE AN UNSTAMPED FILE DOES NOT. The unstamped list is the whole tree
+    # on day one, and a gate that is always red is one nobody reads. An omission is bounded and
+    # each one has a named fix: add the citation the file already says it restates.
+    return len(findings) + len(omissions)
 
 
 if __name__ == "__main__":

@@ -12,6 +12,10 @@
     {
       "path": "docs/02-behaviors/01-decide.md",
       "seen": "aec58547"
+    },
+    {
+      "path": "docs/02-behaviors/02-design.md",
+      "seen": "dedc1b3d"
     }
   ]
 }

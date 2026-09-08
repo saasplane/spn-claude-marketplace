@@ -1,15 +1,25 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/03-capabilities/02-apps/01-shape/03-architecture.md", "seen": "6415c78a" },
-    { "path": "docs/registers/conformance.md", "seen": "74754467" }
+    {
+      "path": "docs/03-capabilities/02-apps/01-shape/03-architecture.md",
+      "seen": "6415c78a"
+    },
+    {
+      "path": "docs/registers/conformance.md",
+      "seen": "74754467"
+    },
+    {
+      "path": "docs/03-capabilities/02-apps/03-module/01-server/01-contract/01-states.md",
+      "seen": "172d3ddc"
+    }
   ]
 }
 -->
 
 # Contract Review Rules — Stack-Agnostic
 
-Use these rules as the review gate for any SaaS Plane contract surface, in any stack. Source of truth: the foundation book, `docs/03-capabilities/02-apps/03-module/01-server/contract/01-states.md` (constructs), `docs/03-capabilities/02-apps/01-shape/03-architecture.md` (evolution and the generation chain), and `docs/registers/conformance.md` in `spn-foundation`. Apply these to every API change; a rule that fails blocks the change until it is fixed or recorded as a versioned, planned exception.
+Use these rules as the review gate for any SaaS Plane contract surface, in any stack. Source of truth: the foundation book, `docs/03-capabilities/02-apps/03-module/01-server/01-contract/01-states.md` (constructs), `docs/03-capabilities/02-apps/01-shape/03-architecture.md` (evolution and the generation chain), and `docs/registers/conformance.md` in `spn-foundation`. Apply these to every API change; a rule that fails blocks the change until it is fixed or recorded as a versioned, planned exception.
 
 ## The chain
 

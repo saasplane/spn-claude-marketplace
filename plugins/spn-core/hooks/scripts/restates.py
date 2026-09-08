@@ -28,6 +28,18 @@ restatements cite it. The QA lens cites one section of about a hundred lines. A 
 whole file re-stamps that lens every time anything else in the file moves — measured at roughly
 176 re-stamps in sixty days, almost all of them on content nobody cited. A finding that is
 usually wrong teaches people to stop reading the run.
+
+A BLOCK USED TO GET CREDIT FOR WHAT IT LEFT OUT (workstream 009, `A6`; fixed here 2026-09-08).
+`check()` walked `chapters` and `rows` and nothing else, so it could only ever validate what a
+file DECLARED. A source the file named in its own prose and omitted from the block was
+unreachable rather than unstamped, and both gates printed green over it. Two design lenses found
+that by reading, and no run could have.
+
+So `check()` now reads the file's own `Source of truth:` line and compares it against the block.
+**The comparison is loose in one direction only.** Prose says `05-docs/01-corpus` where the block
+says `docs/03-capabilities/05-docs/01-corpus.md`, so a prose name counts as declared when some
+declared path contains it. **What it cannot classify it reports rather than drops** — see
+`named_sources`, because an under-report here is the very defect this change closes.
 """
 import re
 import json
@@ -113,8 +125,86 @@ def declares_a_source(path):
     return bool(SOURCE_LINE.search(text))
 
 
+# A prose citation names a chapter the way a person would — `05-docs/01-corpus`, `CONCEPT.md`,
+# `docs/03-capabilities/02-apps/06-tests/README.md`. A token counts as naming a document when it
+# carries a path separator or a markdown extension.
+PROSE_PATH = re.compile(r"`([^`]+)`")
+# Names that appear inside a declaration and are NOT documents: the repository holding the book,
+# and the concept's own product name. Listing them beats a rule that silently drops anything odd.
+NOT_A_DOCUMENT = {"spn-foundation", "saasplane-concept", "spnutils"}
+# A seat named without a path — `01-saas`, `02-repo`, `03-module`. The corpus numbers its seats,
+# so the shape is what tells a seat from an ordinary word. A declaration line also carries example
+# values (`spn`, `dmo`, `spndemo.app`) and plain nouns, and calling those unresolved sources would
+# overstate the gap as badly as hiding it understates it.
+SEAT = re.compile(r"^(?:\d{2}-[a-z0-9-]+|README|CONCEPT|#{2,6} .+)$")
+
+
+def looks_like_a_document(token):
+    """A markdown file, or a path carrying one of the corpus's numbered seats.
+
+    **The corpus numbers its seats**, so `02-apps/03-module/01-server/contract/01-states` reads as
+    a path and `application/json` does not. Two earlier rules were wrong in the same direction:
+    *contains a slash* claimed the MIME type, and *two named segments* claimed it too. `ui/` is a
+    taxonomy folder inside a seat already declared, and it fails both halves.
+    """
+    if token.lower().endswith(".md"):
+        return True
+    return any(re.fullmatch(r"\d{2}-[a-z0-9-]+", segment) for segment in token.split("/"))
+
+
+def named_sources(path):
+    """What a file's own prose says it restates — `(documents, rows, unclassified)`.
+
+    The declaration line is the only place read. A path elsewhere in the file is an example or a
+    cross-reference, and reading those would report a file for every path it mentions.
+
+    **`unclassified` is returned rather than dropped.** A declaration naming `02-behaviors` names
+    a real seat and carries no path, so nothing here can resolve it to a file. Reporting those
+    keeps the limit visible: this check under-reports by exactly that list, and silently
+    under-reporting is the defect it exists to close.
+
+    Only seat-shaped names reach that list. A declaration line also carries example values and
+    ordinary nouns, and reporting those as unresolved sources would overstate the gap.
+    """
+    text = re.sub(r"<!--.*?-->", "", path.read_text(encoding="utf-8", errors="replace"), flags=re.S)
+    documents, rows, unclassified = set(), set(), set()
+    for line in SOURCE_LINE.findall(text):
+        rows.update(ROW_ID.findall(line))
+        for token in PROSE_PATH.findall(line):
+            token = token.strip()
+            if not token or token in NOT_A_DOCUMENT or ROW_ID.fullmatch(token):
+                continue
+            if looks_like_a_document(token):
+                documents.add(token)
+            elif SEAT.match(token):
+                unclassified.add(token)
+    return documents, rows, unclassified
+
+
+def undeclared(path, block):
+    """Sources the file's prose names that its block does not declare — **not drift**.
+
+    Until 2026-09-08 nothing asked this, so a block got credit for what it left out (`009` A6).
+    An omitted source is unreachable rather than unstamped: no run could name it when its chapter
+    moved, and both gates printed green.
+
+    A prose name matches loosely and in one direction: `05-docs/01-corpus` is covered by a
+    declared `docs/03-capabilities/05-docs/01-corpus.md`, and never the other way round.
+    """
+    documents, rows, _ = named_sources(path)
+    declared = [str(c.get("path", "")).lower() for c in block.get("chapters", []) if isinstance(c, dict)]
+    missing = [name for name in sorted(documents)
+               if not any(name.lower().strip("/") in one for one in declared)]
+    missing += [row for row in sorted(rows) if row not in block.get("rows", [])]
+    return missing
+
+
 def check(path, block, book_root, known_rows):
-    """Every finding one restatement's block earns. Empty where it is current.
+    """Every DRIFT finding one restatement's block earns. Empty where it is current.
+
+    **This asks only whether what the file declared is still true.** Whether the file declared
+    everything it restates is `undeclared`, a separate question with a separate answer — an
+    omission is not drift, and reporting them as one hides which of the two you are looking at.
 
     `known_rows` may be empty, and then row citations are not checked at all — a repo holding
     no register is a fact about that repo rather than a finding about it.
