@@ -50,6 +50,12 @@ DEVEX = '.spndevex'
 UNDECIDED = {'', '-', '--', '?', '⬜', '☐', '[ ]', 'tbd', 'todo', 'open', 'unknown'}
 LANDED = ('landed', '✅', 'done', 'shipped')
 ACCOUNTED = ('landed', 'carried', 'deferred')
+# `stopped` is the row somebody began and then put down — a question arrived, a plugin needed
+# a reload, the window ran out. It is NOT accounted for: half an edit sits in the tree, and
+# the one reader who knew where has closed their window. The glyph is read as well as the
+# word, for the same reason `✅` is: a cell reading `◐ 2026-09-08 …` strips to a date and
+# would otherwise classify as pending, which closes clean.
+STOPPED = ('stopped', '◐')
 # A cell opens with a mark glyph before its word:  carried,  deferred. The word is what
 # carries the meaning, so the reader skips anything that is not a letter to find it.
 LEAD = re.compile(r'^[^0-9a-z]+', re.I)
@@ -153,12 +159,17 @@ def state_of(row):
         return 'carried'
     if state.startswith('deferred'):
         return 'deferred'
+    # Read before `pending`, and by the glyph as well as the word, so a stop carrying a date
+    # rather than the word is still a stop rather than a row that closes clean.
+    if raw.startswith(STOPPED) or state.startswith(STOPPED):
+        return 'stopped'
     return 'pending'
 
 
 def accounted(row):
-    """Whether a row said what became of it. Three states do; `pending` and `empty` do not."""
-    return state_of(row) in ('landed', 'carried', 'deferred')
+    """Whether a row said what became of it. Three states do; `stopped`, `pending` and `empty`
+    do not. `ACCOUNTED` is that set, and this is the one reader it has."""
+    return state_of(row) in ACCOUNTED
 
 
 def read(path):
@@ -337,9 +348,120 @@ def closing(destination):
     return CLOSED.search(normalized) is not None
 
 
+
+# 05-artifacts.md § The approach document → Open — an answered question is not an `Open` entry
+# with an answer written beside it: it folds into the section that then states it, and leaves.
+# THE PAGE ALONE CANNOT TELL whether a card is answered, so this reads the arc beside it. An arc
+# logs an answer by naming the number — `Q3 to Q7 answered`, `Q13 answered C`, `Q10 answered
+# against both options`. A card still sitting in `Open` under a number the log calls answered is
+# the defect, and it is the one that gets missed: the answer landed, the work moved on, and the
+# page kept asking a question nobody was holding.
+#
+# Reported as a WARNING rather than a refusal. The page is mid-edit for exactly as long as it
+# takes to fold a card, and refusing a write during that would refuse the fix itself.
+CARD = re.compile(r'<div\b[^>]*class="[^"]*\bopen\b[^"]*"[^>]*>(.*?)</div>', re.S | re.I)
+CARD_NUMBER = re.compile(r'<h4[^>]*>\s*(Q\d+)\b', re.I)
+# `answered` may sit either side of the number, because a log writes both ways.
+ANSWERED = re.compile(r'\b(Q\d+)\b[^.\n]{0,80}?\banswered\b|\banswered\b[^.\n]{0,80}?\b(Q\d+)\b',
+                      re.I)
+# `Q3 to Q7 answered` names a run rather than one card.
+ANSWERED_RUN = re.compile(r'\bQ(\d+)\s*(?:to|through|–|—|-)\s*Q(\d+)\b[^.\n]{0,60}?\banswered\b',
+                          re.I)
+
+
+def answered_numbers(folder):
+    """Every `Q<n>` an arc in this workstream records as answered."""
+    out = set()
+    arcs = os.path.join(folder, 'arcs')
+    if not os.path.isdir(arcs):
+        return out
+    for name in sorted(os.listdir(arcs)):
+        if not name.endswith('.md'):
+            continue
+        text = read(os.path.join(arcs, name))
+        for match in ANSWERED.finditer(text):
+            out.add((match.group(1) or match.group(2)).upper())
+        for match in ANSWERED_RUN.finditer(text):
+            first, last = int(match.group(1)), int(match.group(2))
+            if 0 < last - first < 40:
+                out.update(f'Q{n}' for n in range(first, last + 1))
+    return out
+
+
+def stale_cards(folder, pages):
+    """Cards still in `Open` whose number an arc already records as answered."""
+    answered = answered_numbers(folder)
+    if not answered:
+        return []
+    out = []
+    for page in pages:
+        for body in CARD.findall(read(page)):
+            found = CARD_NUMBER.search(body)
+            if found and found.group(1).upper() in answered:
+                out.append((os.path.basename(page), found.group(1).upper()))
+    return out
+
+
+# THE OTHER HALF OF THE SAME RULE, and it is the one nothing tested. A card can leave `Open`
+# and carry nothing with it — deleted rather than folded. The page then reads as settled while
+# the reasoning that settled it lives only in a closed window.
+#
+# 05-artifacts.md § The approach document rules that what replaces the card is what execution
+# reads. So the test is not whether the number left `Open`; it is whether the page still says
+# anything about it. A number an arc calls answered, absent from the whole page, is an answer
+# nobody can act on.
+#
+# Deliberately weak. It asks only that the number appears somewhere outside `Open`, because no
+# check can judge whether a fold carries enough. A gate that fires on real deletions and stays
+# quiet on thin folds is worth more than one nobody trusts.
+def unfolded_cards(folder, pages):
+    """Numbers an arc records as answered that the page no longer mentions at all."""
+    answered = answered_numbers(folder)
+    if not answered:
+        return []
+    out = []
+    for page in pages:
+        text = read(page)
+        still_open = {found.group(1).upper()
+                      for body in CARD.findall(text)
+                      for found in [CARD_NUMBER.search(body)] if found}
+        mentioned = {match.group(0).upper() for match in re.finditer(r'\bQ\d+\b', text)}
+        for number in sorted(answered, key=lambda n: int(n[1:])):
+            if number not in still_open and number not in mentioned:
+                out.append((os.path.basename(page), number))
+    return out
+
+
 def gate_documents_first(payload):
     tool_input = payload.get('tool_input') or {}
     cwd = payload.get('cwd') or os.getcwd()
+    root = workspace_root(cwd)
+    if root:
+        # THE ANSWERED CARD, checked on every write. It is the rule most often broken by the
+        # agent that just obeyed it: the answer lands, the work moves on, and the page keeps
+        # asking. Checked here rather than at close because by then it has misled every reader.
+        for subject, pages in sorted(open_workstreams(root).items()):
+            if not pages:
+                continue
+            # The arcs sit beside the page, so the page's own folder is the workstream.
+            stale = stale_cards(os.path.dirname(pages[0]), pages)
+            gone = unfolded_cards(os.path.dirname(pages[0]), pages)
+            if gone:
+                named = ' · '.join(f'{number} in {page}' for page, number in gone[:6])
+                emit(f'An answered card left `Open` and took its answer with it — {named}. '
+                     f'The arc records it as answered, and the page now says nothing about it '
+                     f'at all. A fold moves the card into the section that states what it '
+                     f'settled; what replaces it is what execution reads, because the window '
+                     f'holding the answer is gone (05-artifacts.md, The approach document).')
+                break
+            if stale:
+                named = ' · '.join(f'{number} in {page}' for page, number in stale[:6])
+                emit(f'An answered card is still in `Open` — {named}. The arc records it as '
+                     f'answered, and the page still asks it. Fold each one into the section '
+                     f'that now states it, and take it out of `Open`: an answered question is '
+                     f'never an entry with the answer written beside it '
+                     f'(05-artifacts.md, The approach document).')
+                break
     targets = [tool_input['file_path']] if tool_input.get('file_path') else \
               [destination for _, destination in moves(tool_input.get('command') or '')]
     for target in targets:
@@ -431,7 +553,8 @@ def gate_close(payload):
                        f'finished one are indistinguishable to any reader, not just to this hook.'))
             continue
         pending = [row for row in rows if not accounted(row)]
-        if not empty:
+        stopped = [row for row in rows if state_of(row) == 'stopped']
+        if not empty and not stopped:
             # ACCOUNTED FOR IS THREE STATES, AND `accounted()` READS ALL THREE. It did not
             # once: `ACCOUNTED` was declared and never used, so a row naming its successor
             # counted the same as one saying `🚧 agreed`, and closing `007` warned about
@@ -451,17 +574,35 @@ def gate_close(payload):
             continue
         listed = '\n'.join(f"  - {r['scope']} — {r['label'][:90]}" for r in empty[:10])
         more = f'\n  … and {len(empty) - 10} more' if len(empty) > 10 else ''
-        emit(f'Close gate — `{subject}` has rows nobody decided.',
+        stopped_listed = '\n'.join(f"  - {r['scope']} — {r['label'][:90]}"
+                                   for r in stopped[:10])
+        # ONE REFUSAL CARRYING BOTH LISTS. Undecided and stopped are different defects
+        # wanting different repairs, and a gate that names one, gets fixed, then names the
+        # other has spent a round trip teaching nothing.
+        counts = ([f'{len(empty)} row(s) nobody decided'] if empty else []) + \
+                 ([f'{len(stopped)} row(s) you started and stopped'] if stopped else [])
+        stopped_block = ('\n\nRows started and stopped:\n' + stopped_listed +
+                         '\n\nA stopped row is half an edit sitting in the tree, and only the '
+                         'agent that stopped it knows where. Finish the work and mark the row '
+                         'landed, or split it honestly: the half that reached its node becomes '
+                         'a landed row, and the half that did not becomes a second row marked '
+                         'carried or deferred. Never retype the mark to deferred and leave the '
+                         'done half unrecorded — the next reader then edits over your work.'
+                         ) if stopped else ''
+        emit(f'Close gate — `{subject}` cannot close yet: ' + ' and '.join(counts) + '.',
              deny=(f'Denied: `{subject}` cannot close while its split plan holds a row nobody '
-                   f'decided. The check is ACCOUNTED FOR, never finished — landed, carried and '
-                   f'deferred all pass, and closing a scope with work pending is a normal act.\n'
-                   f'Undecided rows:\n' + listed + more +
-                   f'\n\nGive each row one of three states, in the plan\'s State column:\n'
-                   f'  landed   → the node that now holds the content, as a path\n'
-                   f'  carried  → the successor scope, which is now open\n'
-                   f'  deferred → the event that brings it back\n'
-                   f'There is no override. Recording the deferral is the way through, and it is '
-                   f'exactly what a later scope needs to find.'))
+                   f'decided, or a row somebody started and put down. The check is ACCOUNTED FOR, '
+                   f'never finished — landed, carried and deferred all pass, and closing a '
+                   f'scope with work pending is a normal act.\n'
+                   + ('Undecided rows:\n' + listed + more if empty else '')
+                   + stopped_block
+                   + ('\n\nGive each undecided row one of three states, in the plan\'s State '
+                      'column:\n'
+                      '  landed   → the node that now holds the content, as a path\n'
+                      '  carried  → the successor scope, which is now open\n'
+                      '  deferred → the event that brings it back\n' if empty else '\n\n')
+                   + 'There is no override. Recording what happened is the way through, and it '
+                     'is exactly what a later scope needs to find.'))
         return 0
     return 0
 
@@ -476,11 +617,12 @@ def sweep(roots):
             if not pages:
                 print(f'  {subject}: no approach page — no split plan, and that is a valid shape')
                 continue
-            tally = {'landed': 0, 'carried': 0, 'deferred': 0, 'pending': 0, 'empty': 0}
+            tally = {'landed': 0, 'carried': 0, 'deferred': 0, 'stopped': 0, 'pending': 0, 'empty': 0}
             for row in rows:
                 tally[state_of(row)] += 1
             print(f"  {subject}: {len(rows)} rows · landed {tally['landed']} · "
                   f"carried {tally['carried']} · deferred {tally['deferred']} · "
+                  f"stopped {tally['stopped']} · "
                   f"pending {tally['pending']} · undecided {tally['empty']} "
                   f"· {len(pages)} page(s)")
             for row in rows:

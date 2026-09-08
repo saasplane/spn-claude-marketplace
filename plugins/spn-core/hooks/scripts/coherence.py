@@ -47,8 +47,13 @@ REGISTER = ROOT / "docs/registers/decisions.md"
 SKIP_WORDS = {"what", "this", "that", "with", "from", "they", "them", "then",
               "never", "every", "which", "where", "their", "there", "once"}
 
-# Prose that is deliberately historical: a superseded ruling keeps its old words on
-# purpose, and an artifact describes the moment it was produced (RD.DOCS.021).
+# Prose that is deliberately historical: an artifact describes the moment it was produced
+# (RD.DOCS.021), so its struck-through text is a record rather than a claim.
+#
+# **This once said a superseded ruling keeps its old words on purpose. It does not.**
+# `06-registers.md` rules that a row is never annotated, struck through, or left standing
+# with a note. `doc-check.py` refuses one now, so a register carries none to skip. The
+# skip stays for artifacts, where the shape is still legitimate. Corrected 2026-09-08.
 HISTORICAL = re.compile(r"~~.*?~~|<del>.*?</del>", re.S)
 
 

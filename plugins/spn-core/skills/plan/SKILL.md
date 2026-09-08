@@ -6,7 +6,7 @@ description: Turn a requirement into a design the platform's own vocabulary can 
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/03-capabilities/05-docs/05-artifacts.md", "section": "The approach document", "seen": "b80a3b0f" }
+    { "path": "docs/03-capabilities/05-docs/05-artifacts.md", "section": "The approach document", "seen": "7d54b9d0" }
   ]
 }
 -->
@@ -224,6 +224,15 @@ An approach document is **one self-contained HTML page named `<topic>-approach.h
 | **Open** | the questions that **block** — the design is not settled until each is answered | **one card each, in the decidable layout below** — never a paragraph the reader has to mine for the question answer first |
 | **Deferred** | what was consciously **parked** — understood, decided against doing now | each with *why not now* and *what would bring it back*, so it is a decision rather than a backlog |
 
+**Fold an answered card before you do the work it unblocked.** `Open` being empty is what opens
+execution, so working first means editing while the page still asks the question. Understand the
+answer, fold the card into the section that now states it, check whether `Open` is empty, then work.
+
+**What replaces the card is what execution reads**, because the conversation carrying the answer is
+gone by then. A row reading *`Q7` answered A* names a letter, and a letter means nothing to a reader
+who never saw the options. **`Open` may still hold other cards after a fold**, so you check rather
+than assume.
+
 #### Where the argument lives while you argue it
 
 **A page in a repo's artifacts pocket is a landing, never a drafting table.** The pocket holds
@@ -256,6 +265,9 @@ that only changes the **amount of work** does not — it is a row, not a card.
 
 - **Reopen for a decision, never for a surprise.** Discovering the job is bigger is a row moving
   from ⬜ to 🚧. Discovering the model was wrong is a card.
+- **A row you began and put down is `◐ stopped`, and the close refuses it.** It carries what
+  resumes it, what already landed, what did not, and what nobody may touch meanwhile. `🚧
+  agreed` says the work never started, which misleads whoever picks the row up.
 - **Write the card when the fact is found**, not when somebody notices later. A page marked ✅
   while its author keeps arguing is the failure this rule prevents, and the amendment trail is
   what a later reader needs.
@@ -292,6 +304,11 @@ fires on it. `landed`, `carried` and `deferred` all pass, because the check is *
 and never *finished*.
 
 #### `How` names what re-aligns
+
+**A seat page writes `How` from the system's point of view, and a workstream page from the agent's.** Both carry two halves. A seat page explains how the design works and stays true. **A workstream page is a checklist with two readers** — the agent works from it, and a developer reads it to see what the change touches and which areas move. **The scope column is the only structural difference**, because scope belongs to execution rather than to a design.
+
+**Both tables are one split plan, and the close gate reads them the same.** A table carrying a scope column and a state is read as rows, whichever half it sits in. So an obliged document is a row rather than a note, and an undecided one refuses a close.
+
 
 `How` tracks code by habit: what gets built, and what keeps it true. That is half an answer, and the document half is the one you forget. So `How` carries a second table.
 

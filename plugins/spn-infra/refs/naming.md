@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "CONCEPT.md", "section": "Estate Coordinates", "seen": "738ec521" },
+    { "path": "CONCEPT.md", "section": "Estate Coordinates", "seen": "7bc44f0d" },
     { "path": "CONCEPT.md", "section": "Estate Config", "seen": "c888bb3f" }
   ]
 }
@@ -24,7 +24,7 @@
 3. Use typed separators: `-` joins coordinates, `_` joins data-plane tokens, `/` nests. The substrate picks the rendering; coordinates and order never change.
 4. A coordinate drops **only inside a sealed substrate** (namespace, broker, database interior). A cloud account is not sealed — cloud resources always carry full coordinates.
 
-Worked examples: network `spn-dmo-in-dev` · NP cluster `spn-dmo-np-in` · bucket `spn-dmo-in-live-s3-docs` (every bucket composes `…-s3-{name}`) · KMS alias `spn-dmo-in-live`. More of them: IAM role `spn-dmo-in-dev-splt` · log group `/spn-dmo-in-dev/prd/splt` · namespace `in-dev-prd` · registry pair `spn-infra-public|-private`. Note the governance seats: `spn-root` · `spn-internal-cc` · `spn-internal-log` · `spn-internal-audit`.
+Worked examples: network `spn-dmo-in-dev` · NP cluster `spn-dmo-np-in` · bucket `spn-dmo-in-live-s3-docs` (every bucket composes `…-s3-{name}`) · KMS alias `spn-dmo-in-live`. More of them: IAM role `spn-dmo-in-dev-splt` · log group `/spn-dmo-in-dev/prd/splt` · namespace `in-dev-prd` · registry pair `spn-infra-public|-private`. Note the governance seats: `spn-mgmt` · `spn-internal-cc` · `spn-internal-log` · `spn-internal-audit`.
 
 ## The DNS grammar — uniform `{env}`, no bare hostnames ever
 
@@ -40,7 +40,7 @@ custom domain      customer-owned               outside the zone, its own certif
 ```
 
 - **One world-marking rule covers every service hostname class** (RD.INFRA.052): the world token is the platform's `{spc}`, a space's code, or a module's code — **no unmarked default world exists**. A space that stands its own engine gets its own records (`in-dev-sas-database…`), which is why unmarked records would be ambiguous, not merely inconsistent. The world token always matches the key prefix of the facts carrying the hostname.
-- **Locally**: `{world}-{service}.{lc-domain}` for HTTP-facing services (`dmo-docs` · `sas-docs` · `idp-auth`); engines are `localhost:{port}` — no DNS fronts a local engine, the declared or derived port is the local world-distinguisher.
+- **Locally** (RD.INFRA.079): `{world}-{service}.{lc-domain}` for every service, engines included — `dmo-docs` · `sas-docs` · `idp-auth` · `dmo-database.lc-spndemo.app:9210` · `sas-cache.lc-spndemo.app:9311`. The record resolves to `127.0.0.1`, so nothing is proxied and no engine protocol is intercepted. The derived port stays the transport distinguisher, and the hostname carries the world. Server certificates are minted per `{world}-{family}`, so an engine presents a certificate for the name you dial.
 - **Module namespaces are validated** (RD.INFRA.056): no kindCode may equal a declared module code or begin with one plus a hyphen.
 - **Engine records**: the environment apply writes them into the private zone, pointing at whatever the hosting rendered. Use these names in published endpoint facts, **never provider hostnames** — an engine swap flips a record, and every consumer follows.
 - **PROD keeps `{env}` like every environment.** A bare name never exists as grammar, so published facts, config documents and minted URLs are env-pinned always.

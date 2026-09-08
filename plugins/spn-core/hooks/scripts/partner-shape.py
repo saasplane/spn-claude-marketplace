@@ -63,6 +63,9 @@ SCRIPTS = [
     # crash: it guards a file the loop legitimately uses, and a guard that takes the chain
     # down is worse than the exposure it was written for.
     ('spn-core', 'env-seat.py', []),
+    # Reads the reply from stdin and gets none here, so it must exit clean. It runs on `Stop`,
+    # which is the end of every turn — a crash there would report on work already finished.
+    ('spn-core', 'reply-shape.py', []),
     ('spn-apps-ts', 'coverage.py', ['--check', 'route-e2e', '.']),
     ('spn-apps-ts', 'coverage.py', ['--check', 'spec-restore', '.']),
     ('spn-apps-ts', 'coverage.py', ['--check', 'foreign-double', '.']),

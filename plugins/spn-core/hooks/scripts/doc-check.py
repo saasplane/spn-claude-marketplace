@@ -195,6 +195,48 @@ def structural(path):
     return out
 
 
+
+# 05-artifacts.md § `How` has two halves — what is built, and what re-aligns. The chapter names
+# the failure before it happens: *the document half is the one you are most likely to forget*,
+# and an empty table usually means *you stopped early*. **Measured 2026-09-08: eight of
+# fifty-eight approach pages carry both.**
+#
+# **It binds a seat page as well as a workstream page.** RD.DEVEX.038 says a page above any
+# single repository carries a scope column on BOTH `How` tables and a seat's page leaves the
+# column out — *the fixed shape is otherwise untouched*. A seat page needs the table more, if
+# anything: a workstream has a close gate that refuses an undecided row, and a seat page has
+# none, so the table is the only record that a document was owed.
+#
+# **Recognised two ways, because a page may name the heading or just carry the table.** An `h3`
+# naming re-alignment counts, and so does a second table inside `How`. Either satisfies it, so
+# the check reads the shape rather than one spelling of it.
+HALF_HEADING = re.compile(r'<h[34]\b[^>]*>(?:(?!</h[34]>).)*re-?align', re.S | re.I)
+HOW_TABLE = re.compile(r'<table\b', re.I)
+# SOFT, and the number is why. Fifty pages would fire on the day this lands, and a gate nobody
+# can get green is a gate everybody learns to scroll past — the same reasoning that keeps the
+# supersession check SOFT. Change this word to RULE when the corpus can pass it.
+TWO_HALVES = 'SOFT'
+
+
+def how_halves(text):
+    """`How` owes two tables: what is built, and which documents the design obliges."""
+    body = _section(text, 'How')
+    if body is None:
+        return []
+    # THE TABLE COUNT WAS A FALSE NEGATIVE, and a large one. Allowing "two tables in How" let
+    # 22 pages pass that carry no re-alignment at all — a How with a build table and any other
+    # table read as complete. The heading is the signal every page doing this right uses, and
+    # it is the only one that means what it says.
+    if HALF_HEADING.search(body):
+        return []
+    return [(TWO_HALVES,
+             'How carries one half. It says what is built and never which documents this '
+             'reasoning obliges, so the second table is missing (05-artifacts.md, How has two '
+             'halves) · add What re-aligns — one row per document, what re-aligns inside it, '
+             'and its state. An empty one is worth saying out loud; a missing one usually '
+             'means somebody stopped early')]
+
+
 def approach_shape(text):
     """Why -> What -> How -> Open -> Deferred, Terms optional first (05-artifacts)."""
     heads = [re.sub(r'<[^>]+>', '', h).strip().split()[0].rstrip(':—-').lower()
@@ -486,6 +528,69 @@ def is_register(path):
     return p.endswith('.md') and '/registers/' in p and os.path.basename(p) != 'README.md'
 
 
+# 06-registers.md § A row states present truth, and carries no supersession — a row is never
+# annotated, struck through, or left standing with a note, and it never names what it replaced.
+# THE WORD IS NOT THE BREACH; the ruling is. A row legitimately says `superseding the working
+# label "AGT"` (RD.GOV.016), `Supersedes the nine lens files` (RD.DEVEX.012) or `a superseded
+# kind spelling is an unknown value` (RD.APPS.027) — ordinary English about an enum value, a
+# file set or a config key. Twenty-eight rows in the foundation register read that way today.
+# So a ruling is only a ruling when a REGISTER ID sits inside the clause, and the two directions
+# are read separately. Both readings come from the workstream's own `regraph.py`, where each was
+# a bug this corpus actually carried:
+#
+#   RULES_OVER   `Amends the group field of RD.APPS.052` — no `by` between the verb and the id.
+#                An earlier reading allowed no words in the gap, so an active clause naming its
+#                target three words later was invisible.
+#   RULED_BY     `Amended by RD.APPS.036`. `by` is the marker, and every passive form carries it.
+#                Recording both directions the same way invented contested subjects.
+#   NOT a hit    `[RD.APPS.026]'s supersession of the old spelling` — the id governs the word, so
+#                the row cites a supersession rather than performing one.
+#
+# The gap stops at `. ! ? ; |` so one clause never reaches into the next. The `;` removed the one
+# false positive the corpus produced. A foreign id counts: `PD21` amended by `RD.SAAS.035` is a
+# breach in the row carrying the clause.
+REGISTER_ID = r'(?:[A-Z]{2,6}\.[A-Z]{1,8}\.\d{1,4}|[A-Z]{2,4}\d{1,4})'
+IS_REGISTER_ID = re.compile(r'^' + REGISTER_ID + r'$')
+RULE_GAP = r'(?:[^|.!?;]|\.(?=\d)|\.(?=[A-Za-z]))'
+RULES_OVER = re.compile(r'\b(?:supersedes?|superseding|amends?|amending)\b(?:\s+in\s+part)?'
+                        + RULE_GAP + r'{0,70}?(' + REGISTER_ID + r')', re.I)
+RULED_BY = re.compile(r'\b(?:superseded|amended)\b' + RULE_GAP + r'{0,60}?\bby\b'
+                      + RULE_GAP + r'{0,40}?(' + REGISTER_ID + r')', re.I)
+# An annotation the chapter names outright. `<s>` is deliberately absent — it is too short to
+# tell from a stray angle bracket, and no corpus row has ever used it.
+ANNOTATED = re.compile(r'~~[^~\n]+~~|<del\b', re.I)
+# SOFT, and the number is why. Measured 2026-09-08 over the two registers this workspace holds.
+# Both files pass every other bar in this script today, so a RULE turns a green file red in one
+# commit — and a gate nobody can get green is a gate everybody learns to scroll past. Workstream
+# 010 is removing them now. When `doc-check.py <register>` reads zero, change this word to RULE.
+# Nothing else moves.
+SUPERSESSION = 'SOFT'
+
+
+def supersession(rid, body, raw):
+    """A row ruling over another row, and a row wearing an annotation. Both are refused.
+
+    `body` is the row's cells with links collapsed and `*` and backtick markup stripped, so an
+    id reads the same whether it was written bare or as a link. `raw` keeps the markup, because
+    strikethrough IS markup and stripping it first would hide the thing being looked for.
+    """
+    out = []
+    over = sorted({m.group(1) for m in RULES_OVER.finditer(body) if m.group(1) != rid})
+    under = sorted({m.group(1) for m in RULED_BY.finditer(body) if m.group(1) != rid})
+    for name, how in [(n, 'rules over') for n in over] + [(n, 'is ruled by') for n in under]:
+        out.append((SUPERSESSION,
+                    f'row {rid} {how} {name} — a row states present truth and never names '
+                    f'what it replaced (06-registers.md § A row states present truth) '
+                    f'· rewrite the row, and let git keep the old wording'))
+    if ANNOTATED.search(raw):
+        out.append((SUPERSESSION,
+                    f'row {rid} carries struck-through or annotated text — a row is never '
+                    f'annotated, struck through, or left standing with a note '
+                    f'(06-registers.md § A row states present truth) · rewrite the cell, '
+                    f'and let git keep the old wording'))
+    return out
+
+
 def rows(text):
     """RD.DOCS.043 § Rows — a register row takes the plain substrate and stays a record.
 
@@ -513,6 +618,10 @@ def rows(text):
             continue
         rid = re.sub(r'[*`]', '', MD_LINK.sub(r'\1', cells[0])).strip() or f'line {i + 1}'
         body = [MD_LINK.sub(r'\1', c) for c in cells[1:]]
+        if IS_REGISTER_ID.match(rid):
+            # Only a row with a register id: an Open card's `| **A** | option | cost |` table
+            # lives in this same file and legitimately weighs a supersession as an option.
+            out += supersession(rid, re.sub(r'[*`]', ' ', ' '.join(body)), ' '.join(cells[1:]))
         if YOU.search(YOU_AS_TERM.sub(' ', ' '.join(body))):
             out.append(('RULE', f'row {rid} says *you* — a record is never warmed '
                                 f'(RD.DOCS.043 § Rows; 04-discipline § Voice discipline)'))
@@ -548,6 +657,7 @@ def check(path, text, fragment=False):
     if is_approach:
         if not fragment:
             out += approach_shape(text)
+            out += how_halves(text)
         out += open_cards(text)
     elif is_overview:
         out += overview_shape(text)

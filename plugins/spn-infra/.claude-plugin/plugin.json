@@ -1,7 +1,7 @@
 {
   "name": "spn-infra",
-  "version": "0.1.0",
-  "description": "SaaS Plane infra domain — one plugin for every estate repo: the estate verb skills (declare, plan-review, module-author, release); the manifest and locator quick reference; the layer-noun and door card; the name and DNS grammar with the published vocabulary; the estate laws; and a hook that denies secrets, ARNs, account ids, provider strings outside a cloud entry, and hand edits to dist/.",
+  "version": "0.2.0",
+  "description": "SaaS Plane infra domain \u2014 one plugin for every estate repo: the estate verb skills (declare, plan-review, module-author, release); the manifest and locator quick reference; the layer-noun and door card; the name and DNS grammar with the published vocabulary; the estate laws; and a hook that denies secrets, ARNs, account ids, provider strings outside a cloud entry, and hand edits to dist/.",
   "author": {
     "name": "SaaS Plane"
   }

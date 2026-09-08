@@ -3,11 +3,11 @@
   "chapters": [
     {
       "path": "CONCEPT.md",
-      "seen": "5dbfee5b"
+      "seen": "ddc8bfaa"
     },
     {
       "path": "docs/03-capabilities/04-devex/09-utils.md",
-      "seen": "d5a618e6"
+      "seen": "a5138715"
     },
     {
       "path": "docs/03-capabilities/04-devex/11-workspace.md",
@@ -42,7 +42,7 @@ Read across freely, in every direction — it needs no ceremony.
 
 ## The machine seat — `~/.spnenv`
 
-**One file on the machine holds every SaaS Plane value, and that file is `~/.spnenv`** (decision RD.DEVEX.048, amending RD.DEVEX.044; the chapter is DevEx Utils § *The env seat*). It sits **outside `~/.spnutils`** on purpose. `rm -rf ~/.spnutils/*` is an allowed reset, and the developer's typed credentials are the one thing on the machine nobody can regenerate.
+**One file on the machine holds every SaaS Plane value, and that file is `~/.spnenv`** (decision RD.DEVEX.048; the chapter is DevEx Utils § *The env seat*). It sits **outside `~/.spnutils`** on purpose. `rm -rf ~/.spnutils/*` is an allowed reset, and the developer's typed credentials are the one thing on the machine nobody can regenerate.
 
 `spnutils` reads it **directly**, so nothing has to be exported to reach a process.
 
@@ -169,7 +169,7 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
 
 **A workstream is never a Claude Code session.** Claude Code owns the window, and `SessionStart` is its hook. A workstream is a scope of work, and it outlives every window you open on it.
 
-**The number is an identity, never a priority.** You assign it once, in creation order, and nothing reuses or renumbers it. It rides along when the folder moves state, so a number reads the same wherever it sits. **A workstream holds one or more arcs**, and how many is the subject's business rather than a rule.
+**The number is an identity, never a priority.** You assign it once, in creation order, and nothing reuses or renumbers it. It rides along when the folder moves state, so a number reads the same wherever it sits. **A workstream holds one or more arcs**, and how many is the subject's business while you are planning. **A scope arriving mid-execution gets a new arc, always**, because an arc under execution is being read as a brief.
 
 | The state | Holds | You arrive by |
 | --- | --- | --- |
@@ -190,6 +190,10 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
 - **Scope belongs to the developer, and you only ever propose.** A workstream holds as much as they want it to hold. Widening is the default; splitting is the exception you raise, and never a folder you open on your own initiative.
 - **One release train at a time.** That is mechanical and it holds. Any number of arcs in one workstream is their judgement, and you do not overrule it.
 - **Closing a window costs nothing. Closing a scope is a check.** Moving `open/x` to `closed/x` is the one deliberate act in the loop, and the close gate below decides whether it may happen.
+- **A close ends the session, and names the scope that runs next.** The number never chooses it, so the close says which open scope to run and why, what it freed for the others, and what it carried to whom.
+- **A stop is a handover too.** Where you cannot finish, the question becomes the next `Q<n>` card and every row's state is written down. The prompt the next window starts from is recorded, because no file otherwise holds it.
+- **The handover goes in the arc and in the reply, as markdown**, and **the prompt itself is a fenced code block**. A fence carries a copy control; a blockquote reads the same and cannot be copied in one action.
+- **Execution starts when the page, the arc and the notes are all current**, never when the one you touched last is.
 
 When a window opens, surface what is stale — a subject untouched across sittings, an order nobody ran. Nothing has its permanent home in `.spndevex/`: everything there is on its way somewhere, and anything that stops moving is a decision nobody took.
 
@@ -280,7 +284,12 @@ Both read one thing: the **split plan**, which is the approach page's `How` tabl
 | Gate | Fires when | Verdict |
 | --- | --- | --- |
 | **documents first** | you write an approach page into a repo's own pocket while an open workstream's plan still has rows that have not landed | a **warning** naming the workstream. Getting ahead of the plan is sometimes right, so it never refuses |
-| **close** | a subject moves into `workstreams/closed/` | a **refusal** while any row is one nobody decided |
+| **close** | a subject moves into `workstreams/closed/` | a **refusal** while any row is one nobody decided, or one somebody started and put down |
+| **answered card** | you write while an approach page still asks a question its arc records as answered | a **warning** naming the card. Fold it into the section that now states it |
+
+**A seat page is where the split lands.** The workstream page is divided by scope into the documents that own each part, so a re-alignment row starts there and lives on the seat page afterwards. The workstream page then keeps it as a receipt.
+
+**The split plan is both `How` tables, not one.** The gate reads any of them carrying a scope column and a state, so the documents a design obliges are held exactly as the pieces you build are. Park one in a note and no gate can see it.
 
 **The close gate checks that work is accounted for, never that it is finished.** Every row reaches one of three states, and all three pass:
 
@@ -289,7 +298,10 @@ Both read one thing: the **split plan**, which is the approach page's `How` tabl
 | `landed` | the content is in the node that owns it | `landed → spn-platform-ts/packages/module-server-iam-ts/docs/…` |
 | `carried` | it moves to a named successor scope, which is now open | `carried → captcha-foundation-concept` |
 | `deferred` | consciously parked, with an event somebody will notice | `deferred → the first consumer outside this repo` |
-| ⬜ | nobody decided. **This is the one the gate refuses** | — |
+| ⬜ | nobody decided. **The gate refuses it** | — |
+| `◐ stopped` | begun and put down. **The gate refuses it too** — half an edit sits in the tree and only the agent that stopped knows where | `stopped → Q8 answered · did the chapter · left the row · unsafe decisions.md` |
+
+**A stopped row is finished, or split honestly.** The half that reached its node becomes a landed row, and the half that did not becomes a second row, carried or deferred. Never retype the mark and leave the done half unrecorded.
 
 **There is no override, and none is needed.** If you want to close and defer, say so and the row becomes `deferred` with its trigger. Recording the deferral is how you get through, and a flag would leave no trace where a recorded deferral is exactly what a later scope needs to find.
 

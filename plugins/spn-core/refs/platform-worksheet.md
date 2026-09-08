@@ -3,7 +3,7 @@
   "chapters": [
     {
       "path": "CONCEPT.md",
-      "seen": "5dbfee5b"
+      "seen": "ddc8bfaa"
     },
     {
       "path": "docs/03-capabilities/01-saas/README.md",

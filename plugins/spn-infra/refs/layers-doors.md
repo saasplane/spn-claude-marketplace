@@ -2,7 +2,7 @@
 {
   "chapters": [
     { "path": "CONCEPT.md", "section": "DevEx Utils", "seen": "9b61d399" },
-    { "path": "CONCEPT.md", "section": "Estate Blueprints", "seen": "2a958098" }
+    { "path": "CONCEPT.md", "section": "Estate Blueprints", "seen": "51552531" }
   ]
 }
 -->

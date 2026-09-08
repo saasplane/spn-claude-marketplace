@@ -7,7 +7,7 @@
     },
     {
       "path": "CONCEPT.md",
-      "seen": "5dbfee5b"
+      "seen": "ddc8bfaa"
     }
   ]
 }
@@ -334,8 +334,8 @@ RD.DOCS    the corpus standard — seats, metadata, derivation, artifacts
 ```
 
 - **The sequence is per area**, so areas grow without colliding. **Ids are never reused and never renumbered** — an id is identity; the section is only its address.
-- **Supersession is always written.** Because the number carries no chronology across areas, a superseding row names what it supersedes, by id, in the decision column.
-- **Rewrite what you supersede, in place.** A superseded row is not annotated or struck through — it is replaced so it states present truth, and the old wording lives in git history. A standing row that says something no longer true is worse than no row.
+- **A row states present truth, and never names what it replaced.** No supersession clause, no amendment notice, and no pointer to the row that used to answer.
+- **Update the row in place, at its own address.** A row is never annotated or struck through — it is rewritten so it states what is true now, and the old wording lives in git history. A standing row that says something no longer true is worse than no row.
 
 **Writing one:**
 
