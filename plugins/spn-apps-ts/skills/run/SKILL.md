@@ -106,13 +106,18 @@ shape an agent copies next. Call the owning project's target.
 
 ## The four things nx does not own
 
-**Typecheck.** The `typecheck` target is disabled on purpose, because project references set
-`noEmit`. Run these directly:
+**Typecheck of a suite.** The `typecheck` target compiles `src`. A suite has its own config, and
+**those configs are PER PROJECT — there is none at the workspace root.** Point `-p` at the project
+you mean:
 
 ```bash
-npx tsc --noEmit --pretty false -p tsconfig.test.json          # unit
-npx tsc --noEmit --pretty false -p tsconfig.integration.json   # component / e2e, where present
+npx tsc --noEmit --pretty false -p <project>/tsconfig.test.json         # unit
+npx tsc --noEmit --pretty false -p <project>/tsconfig.integration.json  # component / e2e, where present
 ```
+
+Most projects carry `tsconfig.test.json`; only the ones with a component or e2e tier carry
+`tsconfig.integration.json`. Running either from the root without a path fails with `TS5058: the
+specified path does not exist`, which reads as a broken command rather than a missing argument.
 
 **The browser suite.** The workspace root is not an nx project, so Playwright stays a root script:
 
