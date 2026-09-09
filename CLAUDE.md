@@ -2,7 +2,7 @@
 
 Agent guide.
 
-<!-- spnutils:agent-init:begin -->
+<!-- spnutils:agent:begin -->
 ## SaaS Plane
 
 This repo is wired for SaaS Plane. Standards and flows arrive via the saasplane plugins
@@ -10,8 +10,8 @@ This repo is wired for SaaS Plane. Standards and flows arrive via the saasplane 
 
 @.claude/saasplane/rules.md
 
-This block is managed by `spnutils repo agent-init` and refreshed by `spnutils repo agent-sync` — do not hand-edit inside the markers.
-<!-- spnutils:agent-init:end -->
+This block is managed by `spnutils repo agent-sync` — do not hand-edit inside the markers.
+<!-- spnutils:agent:end -->
 
 ## Versioning — this repo counts on its own
 
