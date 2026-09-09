@@ -8,7 +8,7 @@ The agent plugins for building on [SaaS Plane](https://saasplane.dev) — the wa
 /plugin marketplace add <org>/spn-claude-marketplace
 ```
 
-Then enable what your repository needs (or let `spnutils repo agent-init` derive it from `sprepo.json`):
+Then enable what your repository needs (or let `spnutils repo agent-sync` derive it from `sprepo.json`):
 
 | Plugin | Serves | Enable in |
 | --- | --- | --- |

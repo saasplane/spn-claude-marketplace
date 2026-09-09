@@ -44,14 +44,14 @@ Two repositories, and the estate one comes first. It carries a package for the o
 | --- | --- | --- | --- |
 | 1 | Mint the workspace | `spnutils workspace init` | The floor has to exist before a session has any guidance at all |
 | 2 | Make the estate repository | — a ground act | `repo create` refuses by name until the organization layer has run. This is the one hand-made repository |
-| 3 | Wire it | `spnutils repo agent-init` | Without it the session has no `declare`, no `plan-review`, no `release` |
+| 3 | Wire it | `spnutils repo agent-sync` | Without it the session has no `declare`, no `plan-review`, no `release` |
 | 4 | The two estate packages, organization first | `spnutils infra scaffold`, then `declare` | The platform package names the organization it belongs to |
 | 5 | Release them and stage the pins | `spnutils infra release --local` | The platform repo pins a version, and it cannot pin a working tree |
 | 6 | The platform repository | `repo create`, then `apps scaffold repo` | The scaffold takes both pins as arguments, so act 5 has to have happened |
 | 7 | Its concept, then its projects | the `ideate` skill, then `apps scaffold <kind>` | The concept decides which kinds exist. Scaffolding first is deciding by accident |
 
 - **Act 3 is where day zero used to stop.** A partner's first repository is an estate repo, it carries no `package.json`, and that is precisely the case the wiring verb refused. If you meet that refusal, say so plainly and name it as the known blocker rather than working around it by hand.
-- **A partner holds no marketplace checkout, so never offer `repo agent-init --local`.** Their plugins resolve from the published marketplace, and the book reaches them as a published rendering rather than a path they can open.
+- **A partner holds no marketplace checkout, and nothing has to be said about it.** The mode follows from where they are standing, so the same verb wires the published source. Their plugins resolve from the published marketplace, and the book reaches them as a published rendering rather than a path they can open.
 - **Act 1 also writes the machine seat, `~/.spnenv`.** The verb writes the file's **shape** — its markers, its managed defaults and an empty keep region. **It derives no key**, so a fresh partner file has nothing to fill in yet. A key arrives later, when you build what needs it, and you ask them for the value. Their own keys go in `spnutils:dev`, which no run reads or writes. Never print a value back — `refs/cross-repo.md` § The machine seat carries the rule.
 - **Act 7 is a conversation, not a generation.** Hand it to `ideate`, which agrees one block at a time. A concept you drafted whole is a concept nobody agreed to.
 - **Stop at the end of each act and say what it produced.** The developer is watching a workspace appear out of nothing, and a silent run of the whole walk gives them nothing to correct.

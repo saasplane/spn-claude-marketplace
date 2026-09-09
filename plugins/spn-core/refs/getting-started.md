@@ -16,7 +16,7 @@ Follow this walk from nothing to a first feature in flight. Every step names the
 | --- | --- | --- | --- |
 | 1 | Install the CLI | `spnutils` | ✅ |
 | 2 | Create the repository and converge it — branches, protections, team access | `spnutils repo create` | ✅ |
-| 3 | Wire the agent — plugins, managed instructions, version-matched rules | `spnutils repo agent-init` | ✅ |
+| 3 | Wire the agent — plugins, managed instructions, version-matched rules | `spnutils repo agent-sync` | ✅ |
 | 4 | Settle the platform's coordinates — the intake worksheet, landing as the concept's coordinates section | the `ideate` skill | ✅ |
 | 5 | Decide what the platform is — `CONCEPT.md`: boundary, domains, surfaces; the scaffold at the next step reads it | the `ideate` skill | 🚧 |
 | 6 | Create the monorepo and its `sprepo.json` — the stack claim and the infra couplings | the `new` skill, for a platform | 🚧 |

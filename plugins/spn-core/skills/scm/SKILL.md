@@ -51,7 +51,7 @@ A package organized by feature rather than by layer — a support library — ha
 
 ## Wiring a repo for agents
 
-`agent-init` registers the plugin marketplace, enables the plugins, writes a managed block in the repo's instruction file, and generates the local inventory. `agent-sync` refreshes that wiring afterwards. Neither parses code — both are pure reference refreshes from the manifests and workspace state.
+`agent-sync` registers the plugin marketplace, enables the plugins, writes a managed block in the repo's instruction file, and generates the local inventory. `agent-sync` refreshes that wiring afterwards. Neither parses code — both are pure reference refreshes from the manifests and workspace state.
 
 **A stack-agnostic verb reads SPN manifests and nothing else.** `sprepo.json` gives the world and the stack claim, `spkind.json` names an apps node, and `spinfrapkg.json` with `src/spestate.json` names an estate node. Everything a stack invents sits **behind the claim** — a package manifest, a lockfile, an installed-dependency tree. A verb that reaches for one unasked refuses the first repo that does not carry it. The node inventory is a **per-world** question rather than a per-stack one: an estate repo declares its packages too, and it must open with them listed.
 
@@ -66,7 +66,7 @@ A repo is wired by `repo`; the folder the repos sit in is minted by `workspace`.
 | Verb | Does | Touches |
 | --- | --- | --- |
 | `workspace init` | mints the folder — the permission floor, the marketplace, the state directory, the engine check | the workspace root |
-| `workspace sync` | brings the floor back to what the members imply | the workspace root |
+| `workspace agent-sync` | brings the floor back to what the members imply | the workspace root |
 | `workspace status` | the orientation — members, world, wiring, every workstream, and any split-plan row still unlanded | reads only |
 
 **The machine seat sits one level above again: `~/.spnenv`, one file for every SaaS Plane value.** `init` and `sync` provision its **shape** — four marked regions, the producer and managed regions rewritten whole, the keep region laid out. **They derive no key.** You add a key when you build what needs it, and the developer supplies the value. The tool writes no shell profile, and you never edit one either. **Never print or expand a value from that file** — test that a key is set, and nothing more. Run `init` inside a scratch folder and it rewrites the real seat, so point `HOME` at a temp directory for a demo. Read `refs/cross-repo.md` § The machine seat for the regions, the layout and the namespacing rule.

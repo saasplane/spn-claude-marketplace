@@ -19,8 +19,8 @@ One CLI serves every stack, in **three groups**. The group says *what kind of th
 | Verb | Does |
 | --- | --- |
 | `repo create <name> [--from <org-package>[@version]]` | creates the repository in the bound SCM if absent, then converges it to the standard — branches, protections, team access. Org context from the current repo's pin, or `--from` |
-| `repo agent-init` (`ai`) `[--local [path]]` | wires the repo for agents from `sprepo.json` — marketplace, plugins, managed CLAUDE block. **`--local` is producer-only**: it registers a marketplace checkout, which a partner does not hold |
-| `repo agent-sync` (`as`) | refreshes what init wired, from `sprepo.json` and installed package state |
+| `repo agent-sync` (`as`) | converges this repo's wiring from `sprepo.json` — marketplace, plugins, managed CLAUDE block. **The marketplace source follows the mode the place implies` is producer-only**: it registers a marketplace checkout, which a partner does not hold |
+| `repo agent-sync` (`as`) | converges this repo's wiring, from `sprepo.json` and installed package state |
 
 There is no `setup` and no `teams-init` — those verbs are retired; creation and convergence are one verb, `repo create`, and it is idempotent.
 
@@ -79,7 +79,7 @@ A **skill** names what the Agent was asked to do; a **group** names what is bein
 | `operate` | `OPERATE` | `infra --cloud` |
 | `check` | — | any — proving a claim against the code is something every stage does |
 
-**The `repo` command group is deliberately not renamed to `scm`** (decision RD.DEVEX.013): the group means repo-level change, which is wider than source control. `apps scaffold repo` scaffolds a repository and `repo agent-init` wires the agent, and neither is an SCM operation.
+**The `repo` command group is deliberately not renamed to `scm`** (decision RD.DEVEX.013): the group means repo-level change, which is wider than source control. `apps scaffold repo` scaffolds a repository and `repo agent-sync` wires the agent, and neither is an SCM operation.
 
 ## The project verbs
 

@@ -253,10 +253,10 @@ When a window opens, surface what is stale — a subject untouched across sittin
 | Step | What it covers | Live yet? |
 | --- | --- | --- |
 | 5 | **install** — uninstall and install at project scope, sequentially, from the workspace root | scripts only |
-| 6 | the **per-repo refresh and the workspace sync**, which re-mint what a session start reads | no |
+| 6 | the **per-repo refresh and the workspace agent-sync**, which re-mint what a session start reads | no |
 | 7 | a **fresh window** | yes |
 
-**Step 6 comes before step 7, and reversing them costs you a second reload.** The per-repo refresh writes each repo's generated rule file and its managed `CLAUDE.md` block; the workspace sync re-mints the floor's permission tiers. **All three are read at session start**, so a window opened before them loads the previous generation.
+**Step 6 comes before step 7, and reversing them costs you a second reload.** The per-repo refresh writes each repo's generated rule file and its managed `CLAUDE.md` block; the workspace agent-sync re-mints the floor's permission tiers. **All three are read at session start**, so a window opened before them loads the previous generation.
 
 **Reloading in the middle means reloading twice**, and a half-reloaded session is one where you cannot tell which surface answered. Do every edit, then install once, then sync, then take one fresh window.
 
@@ -268,7 +268,7 @@ When a window opens, surface what is stale — a subject untouched across sittin
 | --- | --- |
 | 1 | check whether a newer plugin version has been published |
 | 2 | **install** it — uninstall and install at project scope, sequentially, from the workspace root |
-| 3 | the **per-repo refresh and the workspace sync** |
+| 3 | the **per-repo refresh and the workspace agent-sync** |
 | 4 | a **fresh window** |
 
 **Where the update you need does not exist yet, the ask crosses upward as an order.** A rule you cannot get from a plugin or a package is a gap in what the Foundation publishes, and naming it is how it gets closed. It is never something to work around locally, because a local fix is a rule that exists for one workspace.
@@ -328,7 +328,7 @@ Plan one change across repos as an **arc**: ordered steps, each naming its targe
 | Never | Instead |
 | --- | --- |
 | point at a path inside a sibling checkout — the book's repo included | **cite the book by name**, because a path resolves only for someone holding both checkouts |
-| offer `repo agent-init --local`, which registers a marketplace checkout | let the marketplace resolve from GitHub, which is what a partner has |
+| nothing — `repo agent-sync` reads the mode and wires the checkout | nothing — the same verb reads the mode and wires the published source |
 | name `SPN_DEVEX_MARKETPLACE_PATH` as a value to set | mark it **producer-only** wherever it appears. It is the whole of the `spnutils:producer` region, which a partner's file does not have. `SPN_DEVEX_BLUEPRINT_PATH` is **retired** — a working tree is reached by an `@path` pin, declared per layer in a manifest |
 
 **No variable asks for a rehearsal, and none ever should.** A provisioning run names its own mode on
@@ -336,7 +336,7 @@ the command — `--plan` or `--apply`, exactly one, with no default (`RD.INFRA.0
 no account, so the cloud walk is rehearsable before any account exists. `SPN_POSTURE` is **retired**:
 it asked for a rehearsal through the environment, and a rehearsal is now a mode you type.
 
-**Not every `--local` is producer-only.** `infra release --local` stages a package into the machine store, and that is an ordinary partner act. The flag to mark is the one on `repo agent-init`.
+**Not every `--local` is producer-only.** `infra release --local` stages a package into the machine store, and that is an ordinary partner act. The flag to mark is the one on `repo agent-sync`.
 
 ## A consumer repo needs no peer checkout
 
