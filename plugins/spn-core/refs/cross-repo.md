@@ -329,7 +329,7 @@ Plan one change across repos as an **arc**: ordered steps, each naming its targe
 | --- | --- |
 | point at a path inside a sibling checkout — the book's repo included | **cite the book by name**, because a path resolves only for someone holding both checkouts |
 | nothing — `repo agent-sync` reads the mode and wires the checkout | nothing — the same verb reads the mode and wires the published source |
-| name `SPN_DEVEX_MARKETPLACE_PATH` as a value to set | mark it **producer-only** wherever it appears. It is the whole of the `spnutils:producer` region, which a partner's file does not have. `SPN_DEVEX_BLUEPRINT_PATH` is **retired** — a working tree is reached by an `@path` pin, declared per layer in a manifest |
+| name a marketplace PATH as a value to set | name `SPN_DEVEX_AGENT_WORKSPACE`, which names a place rather than a source. Set, and the repos inside it are a **builder**'s; unset — what every partner has — and the marketplace is the published one. Nothing may set it for somebody |
 
 **No variable asks for a rehearsal, and none ever should.** A provisioning run names its own mode on
 the command — `--plan` or `--apply`, exactly one, with no default (`RD.INFRA.094`). `--plan` reaches

@@ -41,7 +41,7 @@ _SELF = 'orientation'
 
 MARKETPLACE = 'saasplane'
 CORE = 'spn-core'
-# The derivation `repo agent-init` already performs, from the manifest and nothing else. A repo
+# The derivation `repo agent-sync` already performs, from the manifest and nothing else. A repo
 # with no claim at all — the marketplace itself is one — falls back to the core plugin alone.
 WORLD_PLUGINS = {'FOUNDATION': (CORE,), 'INFRA': (CORE, 'spn-infra')}
 SKIP = {'node_modules', '.git', 'dist', 'build', '.nx', 'coverage', '.output', 'tool-results',
