@@ -212,7 +212,7 @@ Every document opens with an invisible block holding **strict JSON**, marked `sp
   "id": "kebab-case-unique-id",
   "title": "Human Title",
   "lenses": ["ARCHITECT", "SERVER_DEV"],
-  "status": "IMPLEMENTED",
+  "status": "DONE",
   "summary": "One sentence — used by agents to select this doc, and by indexes.",
   "keywords": ["five", "to", "ten", "selection", "terms"]
 }
@@ -227,7 +227,7 @@ Every document opens with an invisible block holding **strict JSON**, marked `sp
 - **There is no `part` and no `altitude`.** Everything else is derived: the **seat** from the path and the **kind** from the node's manifest. The voice is one (RD.DOCS.031). The seat decides what a document carries, never its temperature.
 - **`lenses` are derived from the kind, not authored per page** (decision RD.DOCS.037) — one derivation, two clauses, because runtime says *where code runs* and `lenses` says *who reads it*. A kind you **build on** (support, module, app, client) derives from its declared runtime: `SERVER` → `SERVER_DEV`, `WEB` → `WEB_DEV`, `UNIVERSAL` → both. A kind that **serves building** — `TOOLCHAIN` and `APP_UTILITY`, and only those two — carries both whatever its runtime, because every builder uses it. Read the declared runtime, never parse the name. `ARCHITECT` is added by **seat**, never by kind. A node's doc face (`docs/README.md`) is the orientation page and carries it for every kind, leaf nodes included. The seat faces beneath it (purpose, behaviors, capabilities, guides, artifacts) carry the derived developer lenses alone. `ARCHITECT` there is authorship a scaffold never emits. The other six lenses are authored, never derived. A page MAY narrow the derived set where its subject genuinely serves one runtime, and MUST NOT widen it. **A scaffold template emits the derived set**, which is what makes generated pages compliant by construction.
 - `id` is identity and **never changes**, however the path does. The path is only its current address.
-- **Status is the state of what the document governs, never of the prose**: `IMPLEMENTED` ✅ · `IN_PROGRESS` 🚧 · `PLANNED` 🔮.
+- **Status is the state of what the document governs, never of the prose**: `DONE` ✅ · `IMPLEMENTING` 🚧 · `PLANNING` 🔮.
 
 ## One voice — the warm learning register
 
