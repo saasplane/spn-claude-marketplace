@@ -38,9 +38,9 @@ No running stack required. Run the cheapest gate first, so a failure stops the r
 
    One thing this cannot see, and it must not be reported as clean: a **Command's members**. The artifact carries states by name, so member descriptions are checked in the source. They are also the highest-value descriptions in the repo, because they become the input-field descriptions of every agent tool. So a package with described Commands and undescribed members is a worse result than the headline number suggests.
 3. **Kind conformance** — `spnutils apps validate`. Walks every workspace project and reports where one disagrees with what its own declared kind requires: `UNDECLARED`, `NAMING`, `TOOLCHAIN`, `SCOPE`, `LAYER`, `FILE_NAMING`. Exits non-zero on findings, changes nothing on disk. Each message names the rule *and* the remedy — apply the remedy rather than inventing one.
-4. **Build** — `pnpm nx run-many --target=build --all`, or the affected projects when the scope is narrower.
+4. **Build** — `npx nx run-many -t build --all`, or `-p '<pattern>'` when the scope is narrower.
 5. **Lint + format** — `npx eslint` on changed files, `npx prettier --check`.
-6. **Tests** — `pnpm nx run-many --target=test --all`, or the owning project's suite.
+6. **Tests** — `npx nx run-many -t test --all`, or `npx nx run <project>:test` for the owning suite.
 
 **What the gates cover follows from the project's declared kind**, not from the repo it sits in:
 

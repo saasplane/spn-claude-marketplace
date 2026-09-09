@@ -40,4 +40,4 @@ Command binding follows the verb: **GET binds from the querystring, POST from th
 
 ## After wiring
 
-If routes or contract changed and a frontend consumes them, regenerate the API client from the **running** service before the ui step. Run `pnpm --filter <app> gen:client` with the service up — a stopped or stale service silently produces a stale API client.
+If routes or contract changed and a frontend consumes them, regenerate the API client from the **running** service before the ui step. Run `npx nx run <client>:generate` with the service up — a stopped or stale service silently produces a stale API client. The target belongs to the CLIENT project, not the service: a wrapper on the service that delegates here is a second name for it.

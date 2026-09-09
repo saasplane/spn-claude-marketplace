@@ -50,7 +50,7 @@ Order never changes; skip only what the classification skips. **Docs move with t
 ## 4. Close
 
 - **Run the conformance gates** — the `verify` skill code mode: codegen freshness, `spnutils apps validate`, build, lint, tests. This is what catches a file whose name no longer matches its contents. It also catches a barrel that was never regenerated, or a reach past another module's contract. A passing build reveals none of them.
-- **Run the tests** — the `run` skill tests mode (typecheck the touched projects first: `pnpm nx build <nx-name>`).
+- **Run the tests** — the `run` skill tests mode. Typecheck the touched projects first: `npx nx run <project>:typecheck`, and `npx tsc --noEmit -p <project>/tsconfig.json` for a web app, whose `typecheck` target is disabled.
 - **Contract review gate** — if the contract surface changed, run the `review` skill contract mode before calling the work done. Code review (the `review` skill code mode) for everything else.
 - Report what changed per layer, what was regenerated, and test results. Never claim green without having run the commands.
 

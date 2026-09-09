@@ -7,7 +7,7 @@ Keep `tests/{unit, integration, helpers, setup}` at every project's root, **neve
 ## Unit tests
 
 - Put `tests/unit/*.spec.ts` in the owning project (jest for node projects, vitest for web). Cover the service rules you just wrote: guards (`_assert*` throwing), null-skip update behavior, mapper ladders, error codes/categories.
-- Typecheck first: `pnpm nx build <nx-name>` for every touched project — a stale barrel/validator or type error invalidates everything after it.
+- Typecheck first, for every touched project — a stale barrel or validator invalidates everything after it. `npx nx run <project>:typecheck`, and for a web app `npx tsc --noEmit -p <project>/tsconfig.json`, because its `typecheck` target is disabled and reports success while checking nothing.
 
 ## Typechecking the tests themselves
 
@@ -62,8 +62,11 @@ Never leave mutated: the platform org and its policies, org-TYPE/GLOBAL auth/dat
 ## Commands
 
 ```bash
-pnpm test:all        # everything            pnpm test:dev   # affected
-pnpm nx build <p>    # typecheck a project   pnpm test:e2e   # root Playwright (stack up + seeded)
+npx nx run-many -t test --all       # every unit suite
+npx nx run <project>:test           # one project
+npx nx run <client>:test:integration # the contract tier, against a live service
+pnpm test:e2e                       # root Playwright — the root is not an nx project
+npx tsc --noEmit --pretty false -p <project>/tsconfig.test.json   # a suite's own typecheck
 ```
 
 Use pnpm only — never npm/yarn. See the `run` skill and the `verify` skill for full local orchestration (bring-up, seeding, ports).
