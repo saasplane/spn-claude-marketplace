@@ -119,6 +119,20 @@ Most projects carry `tsconfig.test.json`; only the ones with a component or e2e 
 `tsconfig.integration.json`. Running either from the root without a path fails with `TS5058: the
 specified path does not exist`, which reads as a broken command rather than a missing argument.
 
+**One file out of a suite.** The target runs the whole tier. To narrow, pass the argument THROUGH
+it rather than going under it — everything after `--` reaches the runner:
+
+```bash
+npx nx run <project>:test -- <file>                    # one unit file
+npx nx run <project>:test:integration -- <file>        # one integration file
+npx nx run <project>:test -- --listTests               # what would run, without running it
+```
+
+**The integration config is `jest.config.integration.cjs`, never `.ts`** — you only meet the name
+if you bypass the target, and reaching for `.ts` is the natural guess. It fails describing a
+module rather than a missing file, so you go looking at your jest setup instead of at the
+extension. Passing through the target is why you never have to know this.
+
 **The browser suite.** The workspace root is not an nx project, so Playwright stays a root script:
 
 ```bash
