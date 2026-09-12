@@ -78,7 +78,7 @@ shape an agent copies next. Call the owning project's target.
 
 | Target | What it does |
 | --- | --- |
-| `test:ct` | Playwright component tests, where only paint can show the claim |
+| `test:ct` | Playwright component tests, where only paint can show the claim. **Check it runs before trusting it** — this tier sits on `@playwright/experimental-ct-react`, which upstream has **removed and no longer publishes**; a package can carry written cases that collect zero tests |
 | `dev` · `preview` · `serve` | its own harness, not an app |
 
 **`MODULE_SERVER` · `SUPPORT_*` — packages**
@@ -152,14 +152,21 @@ is fine, and `npx nx run-many -t test --all` is the same work.
 request, which a browser suite reads as a 45-second timeout rather than as a compile. Journeys run
 against `preview`.
 
-**`build:test`, never `build`, before a browser suite.** A production bundle sets `isDebug` false
-and emits no `data-testid`, so every selector times out. The suite refuses a plain build and says
-so — believe it the first time.
+**`build:test`, never `build`, before a browser suite.** Test attributes are gated on
+`isTestDataDebug`, set from `VITE_TEST_DATA_DEBUG`; a build without it emits no `data-testid` and every
+selector times out. The suite refuses such a build and names the variable — believe it the first time.
 
-**Registering an app adds a volume mount the ingress cannot reload into.** `infra app up` reloads
-nginx rather than recreating it. If `/config.json` 404s on a surface, that container predates the
-app. The symptom to know by sight: **a blank page and a navigation timeout, never a missing-file
-error.**
+**A rebuild that reports success may have rebuilt nothing.** A cached `build:test` prints
+*"successfully ran"* while leaving `dist` untouched — measured with timestamps 46 minutes stale and
+identical hashes. Before a sweep that must see your change, capture the served bundle name, rebuild
+with the cache skipped, and check three things: the hash moved, the marker is present, and what the
+host serves matches what is on disk. `vite preview` needs no restart — it serves `dist` per request.
+
+**Serve every app before a sweep, not just the one under test.** Signing in leaves for the hub, so
+an unserved `identity` makes nginx answer **502** and the login form never renders — which reads as
+broken auth. Measured: with one app served, 94 of 95 cases did not run. The snapshot tells you which:
+`502 Bad Gateway` means nothing is behind that host; `Welcome back` is a handoff timeout; a blank page
+means a build value was missing and threw at boot, naming the key.
 
 
 ## Mode: local — start the platform stack (start only, no tests)
