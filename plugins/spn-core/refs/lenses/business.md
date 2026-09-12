@@ -1,3 +1,13 @@
+<!-- spn:restates
+{
+  "chapters": [
+    { "path": "CONCEPT.md", "section": "DevEx Actors", "seen": "9aa515d1" },
+    { "path": "docs/02-behaviors/README.md", "seen": "c3ae6a1a" }
+  ],
+  "rows": []
+}
+-->
+
 # Lens — `BUSINESS` (Business manager)
 
 **Source of truth:** the model's actor set and the behaviors seat (`saasplane-concept` — DevEx Actors; `02-behaviors`). This file restates those rules and adds none of its own; where they disagree, the model wins and this file is regenerated.

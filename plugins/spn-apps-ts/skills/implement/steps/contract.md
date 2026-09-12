@@ -1,3 +1,12 @@
+<!-- spn:restates
+{
+  "chapters": [
+    { "path": "docs/03-capabilities/02-apps/03-module/01-server/01-contract/01-states.md", "section": "Evolution — the change classification", "seen": "3f447b7c" }
+  ],
+  "rows": []
+}
+-->
+
 # Step: contract — states first, everything else derives
 
 Keep the contract triple file-for-file per entity: `contract/states/<entity>.ts` (types), `contract/services/I<MOD><Entity>Service.ts` (the interface), `contract/validators/<entity>.ts` (**generated** Zod — never hand-edit). The rules below are the standard; their provenance is the naming, code-patterns and codegen chapters of the foundation book's TypeScript provider set.

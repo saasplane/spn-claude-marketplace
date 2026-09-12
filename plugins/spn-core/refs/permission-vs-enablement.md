@@ -1,3 +1,12 @@
+<!-- spn:restates
+{
+  "chapters": [
+    { "path": "docs/03-capabilities/01-saas/03-people-access.md", "seen": "cd23d043" }
+  ],
+  "rows": ["RD.SAAS.033", "RD.SAAS.034"]
+}
+-->
+
 # Permission or enablement — the first question
 
 **For the agent adding a module, a state or a gate**, in any stack. You reach this file at the moment you write the gate, not afterwards. Get the answer wrong and you bake a product decision into code, gate a read, or mint a verb nobody else uses. All three have happened in this estate, and each one is named below with the file it happened in.
