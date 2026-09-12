@@ -13,20 +13,31 @@
       "path": "docs/03-capabilities/04-devex/11-workspace.md",
       "section": "The agent is updated first, and reloaded before anything runs",
       "seen": "ba41b93f"
+    },
+    {
+      "path": "docs/03-capabilities/04-devex/10-delivery.md",
+      "section": "When an edit becomes behaviour",
+      "seen": "4d108ba0"
+    },
+    {
+      "path": "docs/03-capabilities/05-docs/04-discipline.md",
+      "section": "Restatement discipline",
+      "seen": "11808ae4"
     }
   ],
   "rows": [
     "RD.DEVEX.020",
     "RD.DEVEX.044",
     "RD.DEVEX.048",
-    "RD.DEVEX.049"
+    "RD.DEVEX.049",
+    "RD.DOCS.055"
   ]
 }
 -->
 
 # Cross-Repo Work — Stack-Agnostic
 
-How an agent works across more than one repository on a SaaS Plane estate, and where a rule belongs so every agent sees it. Apply it in any stack and to any repo pair. Source of truth: the foundation's `CONCEPT.md` — `#### DevEx Workspace`, and **THE MACHINE'S OWN LAYOUT** for the env seat. Also `03-capabilities/04-devex/09-utils.md` **§ The env seat**, `03-capabilities/04-devex/11-workspace.md` **§ The agent is updated first, and reloaded before anything runs**, and decisions RD.DEVEX.020, RD.DEVEX.044, RD.DEVEX.048 and RD.DEVEX.049. Where this restatement and those disagree, the sources win and this file is regenerated.
+How an agent works across more than one repository on a SaaS Plane estate, and where a rule belongs so every agent sees it. Apply it in any stack and to any repo pair. Source of truth: the foundation's `CONCEPT.md` — `#### DevEx Workspace`, and **THE MACHINE'S OWN LAYOUT** for the env seat. Also `03-capabilities/04-devex/09-utils.md` **§ The env seat**, and `03-capabilities/04-devex/11-workspace.md` **§ The agent is updated first, and reloaded before anything runs**. Then `03-capabilities/04-devex/10-delivery.md` **§ When an edit becomes behaviour**, and `03-capabilities/05-docs/04-discipline.md` **§ Restatement discipline**. The decisions are RD.DEVEX.020, RD.DEVEX.044, RD.DEVEX.048, RD.DEVEX.049 and RD.DOCS.055. Where this restatement and those disagree, the sources win and this file is regenerated.
 
 ## One window, laws by declaration
 
@@ -236,6 +247,38 @@ When a window opens, surface what is stale — a subject untouched across sittin
 **Agent setup is three repositories, never one.** The foundation states the rule, `spnutils` realizes the floor and the verbs, and the marketplace restates it. A pass that edits the plugins and stops has changed a restatement and left its source standing. That is how a rule ends up somewhere a partner can never read it.
 
 **Nothing you edit is live before the install.** You read the installed plugin cache, so changing the concept, the chapters, the registers, the providers and the plugins leaves changed files and unchanged behaviour. Skills, agent briefs, reference files and `hooks.json` need a fresh window on top of the install. A hook **script** is the one exception, and it reloads on its next run.
+
+### First, settle which mode you are in
+
+**Every authoring step here is a builder's, so answer this before you edit anything.** `SPN_DEVEX_AGENT_WORKSPACE` names the workspace the agent itself is built in, and your mode follows the place you are standing in. The concept rules it, under *The place decides the source* and the `PARTNER MODE` bullets. The key's own behaviour belongs to the `spnutils` repository's instruction file, and nothing here adds to it.
+
+**Run `spnutils workspace status` and read the marketplace source beside the floor.**
+
+| The source reads | You are | The marketplace is |
+| --- | --- | --- |
+| `directory:` and a path | a **builder** | the checkout beside its siblings, and its files are yours to edit |
+| `github:` and a repository | a **partner** | the published repository, installed rather than authored |
+
+**Unset means partner, and that is deliberate.** It is the answer a developer gets by doing nothing, so nothing sets that key for somebody.
+
+**A partner reports a standard that is wrong or missing, and never edits the plugin they installed.** That edit sits in your own plugin cache. It reaches nobody else, and the next install replaces it. So the ask crosses upward as an order, and no file here names a second channel. Where you want one, say that plainly rather than choosing one yourself.
+
+### The same loop runs whenever a pass changes a standard
+
+**A rule you decide reaches a partner only through step 4.** A pass that edits a chapter and stops has changed the book and changed nobody's session. So the seven steps above are also the answer to *what else must change*, entered wherever your change belongs.
+
+| You changed | It starts at | It reaches a session through |
+| --- | --- | --- |
+| a contradiction, or a new law | the concept, then the chapter carrying it | step 4, and nothing before it |
+| a decision worth citing later | a register row, `RD.<AREA>.<NNN>` | the chapter and the plugins restating it |
+| a realization true of one stack | that stack's provider seat | that stack's own plugin |
+| a verb, a gate, or the floor | the deterministic tool | its release, then step 6 |
+
+**The book is not loaded in a session, and that is why step 4 exists.** You read the installed plugins, so a rule living only in a chapter reaches nobody at all. Carry it into the core plugin where it is stack-agnostic, and into the stack's plugin where it is not — as a skill, a reference card, or a lens bullet.
+
+**A restatement citing a chapter carries a stamp, and that stamp moves when the chapter moves.** Restatement discipline makes a rule change N declared edits: the owning document, plus every registered restatement, in one change. Run `restate-drift.py` with the book's path to see which stamps your edit moved. **It reports and writes nothing**, so you correct each `seen` yourself.
+
+**A partner receives none of this until the marketplace is published.** Publishing is pushing that repository, and a plugin's installed cache is keyed by its version. So the version bump and the push belong to this loop rather than to whatever follows it. The marketplace's own instruction file rules when that count moves.
 
 ### The producer sweep — steps 1 to 4 are ours, and a partner performs none of them
 

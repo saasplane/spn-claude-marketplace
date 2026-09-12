@@ -2,7 +2,7 @@
 {
   "chapters": [
     { "path": "CONCEPT.md", "section": "Kind Tests", "seen": "8ed2b14b" },
-    { "path": "docs/03-capabilities/02-apps/06-tests/README.md", "seen": "d530457a" }
+    { "path": "docs/03-capabilities/02-apps/06-tests/README.md", "seen": "18e683e7" }
   ],
   "rows": ["RD.APPS.086"]
 }
@@ -30,6 +30,8 @@
 - **A result is read from the gate's own exit AND its finding count.** Zero findings with a non-zero status is a gate that refused to run, not clean code — and a gate wrapped in a shell block or piped onward reports the wrapper's status, so a runner can announce success over a failure. When the two disagree, the answer is unrun (`RD.APPS.096`).
 - **A run that must prove a change verifies the artifact, never the runner.** A cached task replays its output verbatim, so a task that never executed looks exactly like one that passed, and a cached build reports success having rewritten nothing. Check the timestamp, the hash, the marker, and that what is served matches what was built — capturing that state before the rebuild, or a silent no-op is invisible (`RD.APPS.097`).
 - **A tier nothing invokes proves nothing.** A tier declared, written and never executed is the most expensive absence, because every row resting on it reads as covered.
+- **Behaviour does not cross a harness's process boundary.** Where a component tier's harness drives the browser from another process, only data crosses. So behaviour a mount needs is defined in the build the browser runs. The case imports that module and drives it through serializable inputs alone. Most components need none of this, and the case keeps its own mount by default (`RD.APPS.099`).
+- **A red naming what no source declares is a stale build, not a defect.** A build cache keyed by file name outlives a rename, so it is cleared by the change that renamed, moved or deleted what it compiled (`RD.APPS.100`).
 - **A case that destroys a session runs where nothing else depends on that session.** Revoking a sign-in, logging out or changing a credential destroys the session other cases work in, and worker isolation cannot help because the damage is server-side (`RD.APPS.098`).
 
 ## What it never does

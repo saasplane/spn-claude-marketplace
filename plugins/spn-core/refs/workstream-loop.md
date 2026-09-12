@@ -45,6 +45,10 @@ context ends with the session and the files do not.
 | **S5** | **verify** | the last row is worked | the proof in the arc log — what ran, and what it said | nothing is asserted that was not run |
 | **S6** | **close** | verification holds | **the page is stamped closed**, then the folder moves, then the sweep — contradictions to a register row, conventions to the owning chapter — then one line saying what landed | the folder is in `closed/` and the page says so |
 
+**A standard the sweep corrects is not live yet.** A chapter reaches a session only once it is
+carried into the plugins, installed, and synced. `refs/cross-repo.md` § *Open a workstream with the
+agent update* holds that whole loop, and every authoring step in it is a builder's alone.
+
 **Two rules run through every state.** Nothing is held only in the conversation. And the agent never
 waits inside a state it can finish: it stops for a question only the developer can answer, or for a
 session boundary.

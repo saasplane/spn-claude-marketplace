@@ -78,7 +78,7 @@ shape an agent copies next. Call the owning project's target.
 
 | Target | What it does |
 | --- | --- |
-| `test:ct` | Playwright component tests, where only paint can show the claim. **Check it runs before trusting it** — this tier sits on `@playwright/experimental-ct-react`, which upstream has **removed and no longer publishes**; a package can carry written cases that collect zero tests |
+| `test:component` | Playwright component tests, where only paint can show the claim. **Check it runs before trusting it** — a package can carry written cases that collect zero tests. This tier sits on `@playwright/experimental-ct-react`, which upstream **froze at Playwright 1.63**: still published, still installable, no longer developed. Two constraints follow. The CT package version must match the `playwright` runner version exactly, and browser binaries are per-version, so a runner bump needs `npx playwright install`. The script clears the build cache first — `rm -rf playwright/.cache && playwright test -c playwright-ct.config.ts` — because that cache is keyed by file name and survives a rename |
 | `dev` · `preview` · `serve` | its own harness, not an app |
 
 **`MODULE_SERVER` · `SUPPORT_*` — packages**

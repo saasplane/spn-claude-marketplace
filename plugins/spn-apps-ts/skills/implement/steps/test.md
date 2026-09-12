@@ -34,6 +34,19 @@ Two traps worth knowing, because both produce a **passing command that checked n
 - **`--pretty false` is not cosmetic.** `tsc` prints ANSI codes between `error` and the code, so `grep "error TS"` silently matches nothing on colored output. An agent counting errors that way reads every failing project as clean.
 - **A test project must never keep incremental state.** With `incremental` inherited, `tsc` reads a stale `.tsbuildinfo`, reports itself up to date and exits `0` without checking. The shipped overlays pin `incremental: false`; do not override it.
 
+## Component tier (Playwright CT)
+
+Two traps here, and both cost real time. Neither shows up as a normal test failure.
+
+**A function cannot cross into the browser as a prop.** CT runs the spec in Node and marshals the mounted component's props to the browser, so only data survives. A function prop becomes a one-way call back into Node that answers `undefined` in the browser, and a component *defined* in a spec file cannot be mounted at all. So a mount taking behaviour — a render prop, a compound child like `{({ option }) => <div/>}`, a callback whose answer the component reads — cannot be written inline in the spec.
+
+- Put that JSX in `tests/component/helpers/<subject>-scenarios.tsx` and export it with a **`Scenario` suffix** (`DSWDataTableScenario`). The spec imports the wrapper and drives it through serializable props only, so the function is compiled into the browser bundle and never serialized.
+- **Not every component needs one.** A component mounted with plain serializable props stays inline in its spec — that is simpler and stays the default. Reach for a `Scenario` only when the mount itself takes a function.
+- The name is deliberate: `Fixture` is taken (a fixture is test *data*), and `Story` reads as Storybook, a separate app.
+- Measured: two specs written inline gave 4 failed / 213 passed; the same components behind wrappers gave 217 passed, on the same clean cache.
+
+**The CT build cache is keyed by file name and survives a rename.** `playwright/.cache` holds `metainfo.json` and generated assets under the paths they had when built, and nothing invalidates them when you rename, move or delete a file the tier compiles. The build then fails resolving a module no source references — seen as `Could not resolve .../PrincipalFactorVerificationBadge` when every source file and the spec already said `IdentityFactorVerificationBadge`. **Clear `playwright/.cache` in the same change as the rename**; moving it aside with zero source edits turned a total build failure into a full run. One Vite build serves every spec, so a stale name takes down the whole tier, not one suite.
+
 ## Repo-level integration (backend)
 
 - The BE integration suite lives with the **API client package** (`jest.config.integration.cjs`) and drives the **running** service through the API client — the same surface every real client uses. Run: service up, then `npx jest --config jest.config.integration.cjs --runInBand` from the client package.

@@ -59,6 +59,7 @@ Equally: **never infer one gate from another.** A passing build says nothing abo
 - **Say what you did not cover.** The gap a reader does not know about is the one that ships.
 - **Read the gate's own exit AND its finding count.** Zero findings with a non-zero status means the gate refused to run, not that the code is clean. A gate wrapped in a shell block or piped into another command reports the *wrapper's* status, so a runner can announce success over a failure. When the two numbers disagree, the answer is **unrun**.
 - **A cached result is a claim about inputs, not a run.** A build system replays a cached task's output verbatim — same ticks, same counts — and a cached build reports success having rewritten nothing. To prove a change you just made, verify the **artifact**: the timestamp moved, the hash changed, the marker is present, and what is served matches what was built. Capture that state *before* rebuilding, or a silent no-op is invisible.
+- **A cache fails in the other direction too.** A build cache keyed by file name outlives a rename. The next build then fails resolving something no source declares any more. Read that red as a **stale build, not a defect**. Then clear the cache in the change that renamed, moved or deleted what it compiled.
 - **A tier nothing invokes proves nothing.** Check the command you ran actually covers the tier you mean — a `test` target may drive one runner while another tier sits behind a script no gate calls. A tier declared, written and never executed is the most expensive absence, because every row resting on it reads as covered.
 
 ## Harness, fixture, helper — three things, kept apart
@@ -68,6 +69,8 @@ Equally: **never infer one gate from another.** A passing build says nothing abo
 - **Helper** — assertion-free convenience. The moment it starts or holds something, it is harness and belongs with the setup.
 
 A **double** stands in for a collaborator and belongs to the unit tier only; a **test provider** satisfies the real capability interface and behaves — the two are not interchangeable.
+
+**Behaviour does not cross a harness's process boundary.** A component tier's harness may drive the browser from another process. What it marshals across is data. A function handed over as an input answers nothing on the far side. A component declared inside the case may not be mountable at all. So you define that behaviour in the build the browser runs. It covers a render prop, a child that is a function, or a callback whose answer the component reads. The case imports that module and drives it through serializable inputs alone. **Most components need none of this**, and the case keeps its own mount by default.
 
 ## Managing the case set
 
