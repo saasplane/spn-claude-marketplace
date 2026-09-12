@@ -57,6 +57,9 @@ Equally: **never infer one gate from another.** A passing build says nothing abo
 - **Never report a gate or a check you did not run.** An assumed pass is worse than an unknown, because it stops anyone looking.
 - **A flake is a finding until proven environmental.** Confirm from evidence — the observed failure mode, not the inconvenience of the timing. A consistent failure is a regression no matter how much it looks like the last flake.
 - **Say what you did not cover.** The gap a reader does not know about is the one that ships.
+- **Read the gate's own exit AND its finding count.** Zero findings with a non-zero status means the gate refused to run, not that the code is clean. A gate wrapped in a shell block or piped into another command reports the *wrapper's* status, so a runner can announce success over a failure. When the two numbers disagree, the answer is **unrun**.
+- **A cached result is a claim about inputs, not a run.** A build system replays a cached task's output verbatim — same ticks, same counts — and a cached build reports success having rewritten nothing. To prove a change you just made, verify the **artifact**: the timestamp moved, the hash changed, the marker is present, and what is served matches what was built. Capture that state *before* rebuilding, or a silent no-op is invisible.
+- **A tier nothing invokes proves nothing.** Check the command you ran actually covers the tier you mean — a `test` target may drive one runner while another tier sits behind a script no gate calls. A tier declared, written and never executed is the most expensive absence, because every row resting on it reads as covered.
 
 ## Harness, fixture, helper — three things, kept apart
 
@@ -86,6 +89,7 @@ A test that proves a stated behavior should be traceable to it. Where the platfo
 - **A shared local stack is shared.** A destructive reset wipes data belonging to work that is not yours; it runs on an explicit instruction and against a named target.
 - **Seed and template changes only land on a clean re-migrate.** A warm database keeps the old row, so a seed edit tested against a warm stack proves nothing about a fresh one.
 - **Run journey tests on a quiesced system.** Building, provisioning, or resetting concurrently produces timeouts that read as failures and are not.
+- **A case that destroys a session runs where nothing else depends on that session.** Revoking a sign-in, logging out, revoking a device or changing a credential destroys the session other cases are working in, and worker isolation cannot help because the damage is server-side. Classify by what a case flips — nothing, its own throwaway data, a shared session, or global state — and let that decide both where it runs and when.
 
 ## Lenses
 

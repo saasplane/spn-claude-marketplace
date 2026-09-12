@@ -1,8 +1,8 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "CONCEPT.md", "section": "Kind Tests", "seen": "7433ec90" },
-    { "path": "docs/03-capabilities/02-apps/06-tests/README.md", "seen": "708c52c7" }
+    { "path": "CONCEPT.md", "section": "Kind Tests", "seen": "8ed2b14b" },
+    { "path": "docs/03-capabilities/02-apps/06-tests/README.md", "seen": "d530457a" }
   ],
   "rows": ["RD.APPS.086"]
 }
@@ -27,6 +27,10 @@
 - **Keep each claim at one tier.** A gate is not a test — passing lint says nothing about behavior; a passing build says nothing about structure; no gate is inferred from another.
 - **Suites group by actor where the consumer is people, and by capability where it is a system.** An actor's flows share auth setup, fixtures, and scope, which is what makes a suite runnable.
 - **Leave the system as the tests found it** — fixtures are test-scoped; the baseline belongs to migrations.
+- **A result is read from the gate's own exit AND its finding count.** Zero findings with a non-zero status is a gate that refused to run, not clean code — and a gate wrapped in a shell block or piped onward reports the wrapper's status, so a runner can announce success over a failure. When the two disagree, the answer is unrun (`RD.APPS.096`).
+- **A run that must prove a change verifies the artifact, never the runner.** A cached task replays its output verbatim, so a task that never executed looks exactly like one that passed, and a cached build reports success having rewritten nothing. Check the timestamp, the hash, the marker, and that what is served matches what was built — capturing that state before the rebuild, or a silent no-op is invisible (`RD.APPS.097`).
+- **A tier nothing invokes proves nothing.** A tier declared, written and never executed is the most expensive absence, because every row resting on it reads as covered.
+- **A case that destroys a session runs where nothing else depends on that session.** Revoking a sign-in, logging out or changing a credential destroys the session other cases work in, and worker isolation cannot help because the damage is server-side (`RD.APPS.098`).
 
 ## What it never does
 
