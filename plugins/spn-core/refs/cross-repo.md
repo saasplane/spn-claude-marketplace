@@ -263,6 +263,8 @@ When a window opens, surface what is stale — a subject untouched across sittin
 
 **A partner reports a standard that is wrong or missing, and never edits the plugin they installed.** That edit sits in your own plugin cache. It reaches nobody else, and the next install replaces it. So the ask crosses upward as an order, and no file here names a second channel. Where you want one, say that plainly rather than choosing one yourself.
 
+**A partner workspace is a full workspace, and you work it the same way.** Its repositories carry their own concept, their own documents, their own code and their own tests. What it does not hold is the foundation and the marketplace, so the book is cited by name and the plugins arrive installed. Everything else is the same: you read the members, you learn what each repository answers to, and you work its workstreams. So read the workspace you are standing in before you decide anything. Mode tells you which sources you may edit. It never tells you that there is less work to do.
+
 ### The loop belongs to the devex agent, and both modes run it
 
 **Every agent runs this loop. Only the AUTHORING steps are a builder's.** Your mode decides which steps you perform, never whether the loop applies to you. A pass that edits a chapter and stops has changed the book and changed nobody's session. So the seven steps above are also the answer to *what else must change*, entered wherever your change belongs.
