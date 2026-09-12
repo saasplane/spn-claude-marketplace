@@ -3,11 +3,11 @@
   "chapters": [
     {
       "path": "docs/03-capabilities/02-apps/07-comments/01-intent.md",
-      "seen": "4cbf0707"
+      "seen": "580918c6"
     },
     {
       "path": "docs/03-capabilities/02-apps/08-devex-agent/README.md",
-      "seen": "9ec45f06"
+      "seen": "c17133de"
     },
     {
       "path": "docs/03-capabilities/02-apps/03-module/01-server/01-contract/01-states.md",

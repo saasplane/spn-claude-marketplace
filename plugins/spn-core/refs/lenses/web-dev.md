@@ -1,8 +1,8 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/03-capabilities/02-apps/03-module/02-web/README.md", "seen": "04f85dd8" },
-    { "path": "docs/03-capabilities/02-apps/02-support/02-web/README.md", "seen": "fc2b9ee1" }
+    { "path": "docs/03-capabilities/02-apps/03-module/02-web/README.md", "seen": "1229d139" },
+    { "path": "docs/03-capabilities/02-apps/02-support/02-web/README.md", "seen": "1c881f45" }
   ]
 }
 -->

@@ -7,11 +7,11 @@
     },
     {
       "path": "docs/03-capabilities/01-saas/README.md",
-      "seen": "3e7085be"
+      "seen": "aa893ec8"
     },
     {
       "path": "docs/02-behaviors/01-decide.md",
-      "seen": "aec58547"
+      "seen": "28d2eb1b"
     },
     {
       "path": "docs/02-behaviors/02-design.md",

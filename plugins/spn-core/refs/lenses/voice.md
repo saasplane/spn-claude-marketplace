@@ -1,9 +1,9 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/03-capabilities/05-docs/01-corpus.md", "seen": "7a283c05" },
+    { "path": "docs/03-capabilities/05-docs/01-corpus.md", "seen": "fd889c96" },
     { "path": "docs/03-capabilities/05-docs/02-document.md", "seen": "634b3ed1" },
-    { "path": "docs/03-capabilities/05-docs/04-discipline.md", "seen": "a46b1cee" }
+    { "path": "docs/03-capabilities/05-docs/04-discipline.md", "seen": "bfcc55ef" }
   ],
   "rows": ["RD.DOCS.031", "RD.DOCS.043", "RD.DOCS.044"]
 }

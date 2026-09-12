@@ -3,11 +3,11 @@
   "chapters": [
     {
       "path": "docs/03-capabilities/05-docs/01-corpus.md",
-      "seen": "7a283c05"
+      "seen": "fd889c96"
     },
     {
       "path": "docs/03-capabilities/01-saas/06-service-namespaces.md",
-      "seen": "296defc6"
+      "seen": "f79520b0"
     },
     {
       "path": "docs/03-capabilities/04-devex/01-scm.md",

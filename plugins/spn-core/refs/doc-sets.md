@@ -3,7 +3,7 @@
   "chapters": [
     {
       "path": "docs/03-capabilities/05-docs/README.md",
-      "seen": "8decb467"
+      "seen": "b5223482"
     },
     {
       "path": "CONCEPT.md",

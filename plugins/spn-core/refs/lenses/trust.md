@@ -7,7 +7,7 @@
     },
     {
       "path": "docs/03-capabilities/02-apps/08-devex-agent/README.md",
-      "seen": "9ec45f06"
+      "seen": "c17133de"
     },
     {
       "path": "docs/03-capabilities/01-saas/03-people-access.md",

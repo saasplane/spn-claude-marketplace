@@ -3,11 +3,11 @@
   "chapters": [
     {
       "path": "docs/03-capabilities/02-apps/01-shape/03-architecture.md",
-      "seen": "6415c78a"
+      "seen": "e02a7788"
     },
     {
       "path": "docs/registers/conformance.md",
-      "seen": "9d7358ac"
+      "seen": "1b73a982"
     },
     {
       "path": "docs/03-capabilities/02-apps/03-module/01-server/01-contract/01-states.md",
