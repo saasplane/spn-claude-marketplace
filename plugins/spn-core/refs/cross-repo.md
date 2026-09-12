@@ -263,9 +263,11 @@ When a window opens, surface what is stale — a subject untouched across sittin
 
 **A partner reports a standard that is wrong or missing, and never edits the plugin they installed.** That edit sits in your own plugin cache. It reaches nobody else, and the next install replaces it. So the ask crosses upward as an order, and no file here names a second channel. Where you want one, say that plainly rather than choosing one yourself.
 
-### The same loop runs whenever a pass changes a standard
+### The loop belongs to the devex agent, and both modes run it
 
-**A rule you decide reaches a partner only through step 4.** A pass that edits a chapter and stops has changed the book and changed nobody's session. So the seven steps above are also the answer to *what else must change*, entered wherever your change belongs.
+**Every agent runs this loop. Only the AUTHORING steps are a builder's.** Your mode decides which steps you perform, never whether the loop applies to you. A pass that edits a chapter and stops has changed the book and changed nobody's session. So the seven steps above are also the answer to *what else must change*, entered wherever your change belongs.
+
+**A partner's half is short, and skipping it leaves you working from last month's rules.** You take the published update, install it, sync each repository, and then check that a fresh window really loads it. Where a standard is wrong or missing, you report it upward. You never edit the plugin you installed.
 
 | You changed | It starts at | It reaches a session through |
 | --- | --- | --- |
