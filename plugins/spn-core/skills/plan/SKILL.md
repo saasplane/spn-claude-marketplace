@@ -242,6 +242,11 @@ While a subject is open, its page lives in the workspace's own workstream folder
 it moves into the pocket by scope once the argument is settled. Writing it into a repo early is
 how a design ends up committed into a seat while its author is still changing their mind.
 
+**One workstream holds one approach page.** The page is named for the subject, and scope growth
+iterates it rather than opening a second. A subject raised mid-sitting becomes another arc under
+the same number, and the page gains that arc's rows and its cards in the same edit. Two pages
+under one number leave a reader deciding which argument is current, and neither says.
+
 **A workstream is a scope of work, never a Claude Code session** — Claude Code owns the window,
 and `SessionStart` is its hook. Its state is the folder it sits in: `backlog/` is parked,
 `open/` is being worked, and `closed/` is accounted for. The number is assigned once in creation
@@ -295,6 +300,22 @@ rewriting, which is what the column is for.
 **Sorted highest scope first, the table is also the order you write in.** The foundation before
 the repo, the repo before the seat — and all of it before the code. Approval opens the documents
 pass, never the code pass.
+
+**Arcs run in the order of the cycles they pay, never in the order of their subjects.** A cycle
+is the expensive thing an arc triggers: a release, a pin bump, a service restart, a client
+regeneration, a build, or a stack nobody else is driving. Group the arcs that share one cycle,
+so the cycle is paid once. Paying it twice is what this ordering prevents, and it is the cost
+that dwarfs the edits either side of it.
+
+**An arc that must follow another is blocked by it, and says so.** Write the blocker in the arc
+rather than leaving the order to look tidy. A reader who cannot see the block reorders the plan
+and pays the cycle again.
+
+**Match the mechanism to the work before you size it.** A change that is total and mechanical is
+one find-and-replace plus one verification, whatever the number of sites. Planning it site by
+site turns a job of minutes into an estimate of days, and the plan is then wrong about the work
+rather than about the effort. Ask what one act would finish it, and plan per item only where the
+items genuinely differ.
 
 Two gates read that column, and `refs/cross-repo.md` states them in full. The **documents-first**
 gate warns when you write an approach page into a repo's pocket while an open workstream still
