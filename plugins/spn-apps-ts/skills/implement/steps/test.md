@@ -4,6 +4,16 @@
 
 Keep `tests/{unit, integration, helpers, setup}` at every project's root, **never co-located with source**; the repo root `tests/` holds only cross-app E2E suites (Playwright).
 
+## Before you write or fix a case
+
+Three habits, in the order you need them. Each replaces reading you would otherwise pay for.
+
+- **Read the failure's own artifact before its source.** The runner writes one per failure — for a journey, `tests/.output/artifacts/<case>/error-context.md`, holding the message and a snapshot of the page as it rendered. That is shorter than the spec plus its component, and it tells you more, because a snapshot shows what rendered rather than what should have. Open it first, with the service log beside it.
+- **Fix by shape, not by instance.** Failures collapse into a few shapes, and *the case reads a control before waiting for it* is one of them. Name the shape from the first two failures, then grep for the rest and fix them together. Diagnosing the twentieth instance on its own costs twenty diagnoses.
+- **Write a case from the vocabularies, not the components.** The test-id enums, the label vocabulary, the route lock and the coverage map already say what a screen offers. A case written from those plus its behaviour row never has to open the component.
+
+**And every journey assertion says why it might have failed.** `expect(editors, 'the content page rendered no channel editor at all — the session may lack NTF_CONFIG_MANAGE').toHaveCount(1)` has diagnosed itself. Its neighbour reporting `expected > 0, received 0` costs the next reader an investigation. Playwright takes that message on `expect`, `expect.soft` and `expect.poll`, and a write-time check warns you when one is missing. Jest takes no such argument, so a contract case carries the same thinking in its title and in the comment above the assertion.
+
 ## Unit tests
 
 - Put `tests/unit/*.spec.ts` in the owning project (jest for node projects, vitest for web). Cover the service rules you just wrote: guards (`_assert*` throwing), null-skip update behavior, mapper ladders, error codes/categories.

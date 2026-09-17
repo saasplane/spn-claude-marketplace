@@ -40,7 +40,7 @@ No running stack required. Run the cheapest gate first, so a failure stops the r
 3. **Kind conformance** — `spnutils apps validate`. Walks every workspace project and reports where one disagrees with what its own declared kind requires: `UNDECLARED`, `NAMING`, `TOOLCHAIN`, `SCOPE`, `LAYER`, `FILE_NAMING`. Exits non-zero on findings, changes nothing on disk. Each message names the rule *and* the remedy — apply the remedy rather than inventing one.
 4. **Build** — `npx nx run-many -t build --all`, or `-p '<pattern>'` when the scope is narrower.
 5. **Lint + format** — `npx eslint` on changed files, `npx prettier --check`.
-6. **Tests** — `npx nx run-many -t test --all`, or `npx nx run <project>:test` for the owning suite.
+6. **Tests** — `npx nx run-many -t test --all`, or `npx nx run <project>:test` for the owning suite. **A red sends you to the failure's own artifact first, never to the source** — the error context the runner wrote, and the service log beside it. Then fix by shape rather than one instance at a time; see [implement/steps/test](../implement/steps/test.md#before-you-write-or-fix-a-case).
 
 **What the gates cover follows from the project's declared kind**, not from the repo it sits in:
 
