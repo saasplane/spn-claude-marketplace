@@ -11,12 +11,14 @@
 //   node docs.ts face <docs-tree>       write what is generated, between markers
 //   node docs.ts page <seat.md…>        produce each construct page from its seat file
 //   node docs.ts status <seat.md…>      derive the status from Binds and Proof, and refuse a false claim
+//   node docs.ts figures check|colour   labels fit and connectors join · a block's colouring matches its text
 //
 // Grades, per the N2 arc: RULE refuses, SOFT reports. N7 flips the SOFTs.
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync } from "node:fs";
 import { dirname, join, resolve, basename, relative } from "node:path";
 import { renderPage } from "./render.ts";
+import { checkFigures, colour, stripSpans } from "./figures.ts";
 
 type Grade = "RULE" | "SOFT";
 type Finding = { check: string; grade: Grade; file: string; message: string };
@@ -850,6 +852,36 @@ if (cmd === "face") {
   const f = face(tree, !rest.includes("--check"));
   for (const x of f) console.log(`${x.grade === "RULE" ? "✗" : "!"} ${x.grade.padEnd(4)} ${x.check.padEnd(9)} ${relative(workspace, x.file)}\n         ${x.message}`);
   process.exit(f.some((x) => x.grade === "RULE") ? 1 : 0);
+}
+
+if (cmd === "figures") {
+  const [sub, ...args] = rest;
+  const files = args.filter((a) => !a.startsWith("--")).map((p) => resolve(p));
+  if (sub === "check") {
+    let total = 0;
+    for (const f of files) {
+      const found = checkFigures(readFileSync(f, "utf8"));
+      total += found.length;
+      for (const x of found) console.log(`✗ RULE figure    ${relative(workspace, f)}\n         svg${x.figure}: ${x.message}`);
+    }
+    console.log(total ? `\n${total} figure finding${total > 1 ? "s" : ""}` : `clean — ${files.length} page${files.length > 1 ? "s" : ""}`);
+    process.exit(total ? 1 : 0);
+  }
+  if (sub === "colour") {
+    // The audit's half: a coloured block must strip back to what the author wrote.
+    let bad = 0;
+    for (const f of files) {
+      const src = readFileSync(f, "utf8");
+      for (const m of src.matchAll(/<pre data-lang="([a-z]+)">([\s\S]*?)<\/pre>/g)) {
+        const round = colour(stripSpans(m[2]), m[1]);
+        if (round !== m[2]) { bad++; console.log(`✗ RULE figure    ${relative(workspace, f)}\n         a \`${m[1]}\` block's colouring is not what \`figures colour\` produces from its own text`); }
+      }
+    }
+    console.log(bad ? `\n${bad} block${bad > 1 ? "s" : ""} off` : "every coloured block matches its own text");
+    process.exit(bad ? 1 : 0);
+  }
+  console.error("usage: node docs.ts figures check|colour <path…>");
+  process.exit(2);
 }
 
 if (cmd === "status") {
