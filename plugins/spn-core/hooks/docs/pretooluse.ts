@@ -33,6 +33,7 @@ import { checkContractCycle } from "./contract-cycle.ts";
 import { checkDoc, bashWrites } from "./doc-check.ts";
 import { gateDocumentsFirst, gateClose } from "./split-plan.ts";
 import { checkConfirmed } from "./confirmed.ts";
+import { applies as mirrorApplies, checkMirror } from "./mirror.ts";
 import { begin, end, span } from "./timing.ts";
 
 type Check = {
@@ -64,6 +65,9 @@ const CHECKS: Check[] = [
   { name: "split-plan.close", run: gateClose, needs: ["command"],
     applies: (path, command) => Boolean(path || command) },
   { name: "confirmed", run: checkConfirmed, needs: ["file_path"], applies: () => true },
+  // LAST, BECAUSE IT IS THE ONLY ONE THAT READS A DOCS TREE. Its fast path is a substring of the
+  // path, so an edit outside any `src/` pays that and stops; an edit inside one reads a single face.
+  { name: "mirror", run: checkMirror, needs: ["file_path"], applies: (path) => mirrorApplies(path) },
 ];
 
 const REGEN_HINT =

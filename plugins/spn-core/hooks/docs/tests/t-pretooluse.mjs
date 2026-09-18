@@ -117,6 +117,27 @@ one("generated build output is refused too",
               parity: false, why: "the Python dispatcher discarded it — this is finding F9" });
 }
 
+{
+  // STEP 7 — the mirror nudge, reached through the chain. It is not a port, so there is nothing to
+  // compare against: the Python dispatcher never carried it.
+  const root = workspace("dispatch-mirror", {
+    "pkg/docs/03-capabilities/README.md":
+      "# Capabilities\n\n## Map\n\n| File | Governs | Carries | Status |\n| --- | --- | --- | --- |\n" +
+      "| [app.md](app.md) | [`src/app/`](../../src/app) | the seams | \u2705 |\n",
+    "pkg/src/app/Service.ts": "export const x = 1;\n",
+  });
+  one("the mirror nudge reaches the turn through the dispatcher",
+    { tool_name: "Edit", cwd: root, session_id: "m1",
+      tool_input: { file_path: `${root}/pkg/src/app/Service.ts`, new_string: "export const x = 2;" } },
+    "note", { says: "is the mirror of `src/app/`", cwd: root,
+              parity: false, why: "step 7 is new work, and the Python dispatcher never carried it" });
+
+  one("an edit under a src/ no mirror governs stays silent",
+    { tool_name: "Edit", cwd: root, session_id: "m2",
+      tool_input: { file_path: `${root}/pkg/src/migrations/001.ts`, new_string: "x" } },
+    "silent", { cwd: root });
+}
+
 // UNTOUCHED — the ordinary calls that must stay silent and cheap.
 one("an ordinary Bash call", { tool_name: "Bash", tool_input: { command: "git status --short" } }, "silent");
 one("reading a source file", { tool_name: "Read", tool_input: { file_path: `${WORKSPACE}/CLAUDE.md` } }, "silent");
