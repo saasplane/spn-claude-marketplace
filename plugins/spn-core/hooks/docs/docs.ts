@@ -10,6 +10,7 @@
 //   node docs.ts audit <path…>          the invariants a page must hold
 //   node docs.ts face <docs-tree>       write what is generated, between markers
 //   node docs.ts page <seat.md…>        produce each construct page from its seat file
+//   node docs.ts status <seat.md…>      derive the status from Binds and Proof, and refuse a false claim
 //
 // Grades, per the N2 arc: RULE refuses, SOFT reports. N7 flips the SOFTs.
 
@@ -579,6 +580,73 @@ function face(tree: string, write: boolean): Finding[] {
   return findings;
 }
 
+// ---------------------------------------------------------------------------- status
+
+/**
+ * A construct's status is derived from its own content, never typed: from the *where it lives today*
+ * rows in `Binds`, and from `Proof`. `Q86` A then made the derivation a **gate** — it refuses a claim
+ * of IMPLEMENTING or DONE whose rows do not resolve, because deriving the badge proves a construct
+ * is well-formed and says nothing about whether it is true.
+ *
+ * It writes the seat file only. The page follows from `docs.ts page`, so there is one writer per file.
+ */
+function statusFor(seat: string, workspace: string, nodes: Set<string>, write: boolean): Finding[] {
+  const findings: Finding[] = [];
+  const src = readFileSync(seat, "utf8");
+  const { block, error } = readBlock(src);
+  if (!block) return [{ check: "status", grade: "RULE", file: seat, message: error ?? "no spn:doc block" }];
+  if (block.variant !== "construct") return [];
+
+  const binds = sectionBody(src, /Binds\b/) ?? "";
+  const proof = sectionBody(src, /Proof\b/) ?? "";
+
+  // The second table of Binds is *where it lives today*. Split on the blank line between them.
+  const tables = binds.split(/\n\s*\n/).filter((t) => /^\s*\|/m.test(t));
+  const rows = tables.length ? mdRows(tables[tables.length - 1]) : [];
+  const states = rows.map((r) => (r[3] ?? "").toLowerCase());
+  const proofRows = mdRows(proof).filter((r) => r[0] && r[0] !== "—");
+
+  let derived: "PLANNING" | "IMPLEMENTING" | "DONE";
+  if (!rows.length || states.every((s) => s.startsWith("planned"))) derived = "PLANNING";
+  else if (states.every((s) => s.startsWith("done")) && proofRows.length) derived = "DONE";
+  else derived = "IMPLEMENTING";
+
+  // The gate. A row resolves when its Node cell names a node, a plugin or a repository.
+  if (derived !== "PLANNING") {
+    for (const r of rows) {
+      const cell = (r[1] ?? "").replace(/`/g, "").trim();
+      if (!cell) continue;
+      const bare = cell.replace(/^the\s+/i, "").toLowerCase();
+      if (![...nodes].some((n) => n === bare || n.includes(bare) || bare.includes(n)))
+        findings.push({ check: "status", grade: "RULE", file: seat,
+          message: `\`${derived}\` is derived and the \`Node\` cell \`${cell}\` resolves to no node, plugin or repository — name the node and put what it provides in \`what it realizes\` (RD.DOCS.066)` });
+    }
+    if (!proofRows.length)
+      findings.push({ check: "status", grade: "RULE", file: seat,
+        message: `\`${derived}\` is derived and \`Proof\` names no command anybody can run (RD.DOCS.066)` });
+  }
+
+  if (findings.some((f) => f.grade === "RULE")) {
+    console.log(`refused  ${relative(workspace, seat)} — ${derived} is claimed and the rows do not carry it`);
+    return findings;
+  }
+
+  // Write the derived word into the block and the tag line. Both, or the page and the block disagree.
+  const glyph: Record<string, string> = { DONE: "✅", IMPLEMENTING: "🚧", PLANNING: "🔮" };
+  let out = src;
+  if (block.status !== derived) {
+    out = out.replace(/("status":\s*")(DONE|IMPLEMENTING|PLANNING)(")/, `$1${derived}$3`);
+    // The tag line is two backtick spans — `For: …` · `Status: …` — so the status span is matched
+    // on its own. Assuming one span is why the first version wrote the block and left the badge.
+    out = out.replace(/(`Status:\s*)([✅🚧🔮])(\s*)(DONE|IMPLEMENTING|PLANNING)(`)/u,
+                      `$1${glyph[derived]}$3${derived}$5`);
+  }
+  if (out === src) { console.log(`current  ${relative(workspace, seat)} — ${derived}`); return findings; }
+  if (write) { writeFileSync(seat, out); console.log(`wrote    ${relative(workspace, seat)} — ${block.status} → ${derived}`); }
+  else findings.push({ check: "status", grade: "RULE", file: seat, message: `the block says \`${block.status}\` and the rows derive \`${derived}\`` });
+  return findings;
+}
+
 // ---------------------------------------------------------------------------- page
 
 /** The furniture: one stylesheet and one pair of rail scripts, taken from the template. */
@@ -682,6 +750,15 @@ if (cmd === "face") {
   process.exit(f.some((x) => x.grade === "RULE") ? 1 : 0);
 }
 
+if (cmd === "status") {
+  const nodes = nodeIndex(resolve(workspace));
+  const check = rest.includes("--check");
+  const seats = rest.filter((r) => !r.startsWith("--")).map((p) => resolve(p));
+  const f = seats.flatMap((p) => statusFor(p, resolve(workspace), nodes, !check));
+  for (const x of f) console.log(`${x.grade === "RULE" ? "✗" : "!"} ${x.grade.padEnd(4)} ${x.check.padEnd(9)} ${relative(workspace, x.file)}\n         ${x.message}`);
+  process.exit(f.some((x) => x.grade === "RULE") ? 1 : 0);
+}
+
 if (cmd === "page") {
   const templates = process.env.SPN_TEMPLATES
     ?? join(resolve(workspace), "spn-foundation", "docs", "03-capabilities", "05-docs", "templates");
@@ -693,7 +770,7 @@ if (cmd === "page") {
 }
 
 if (cmd !== "audit" || rest.length === 0) {
-  console.error("usage: node docs.ts audit <path…> | face <docs-tree> [--check] | page <seat.md…> [--check]");
+  console.error("usage: node docs.ts audit <path…> | face <tree> | page <seat.md…> | status <seat.md…>   (--check reports without writing)");
   process.exit(2);
 }
 
