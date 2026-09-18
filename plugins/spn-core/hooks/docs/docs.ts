@@ -551,6 +551,92 @@ function buildMap(faceFile: string): { body: string; findings: Finding[] } {
   return { body: lines.join("\n"), findings };
 }
 
+/**
+ * A domain's face, generated from the concept's own section: the bridge paragraph, then its
+ * constructs in dependency order. The story is written once, in the concept, so the tree cannot
+ * disagree with it.
+ */
+function conceptSections(concept: string): Map<string, { bridge: string; lines: string[] }> {
+  const out = new Map<string, { bridge: string; lines: string[] }>();
+  const lines = readFileSync(concept, "utf8").split("\n");
+  let name: string | null = null, bridge: string[] = [], items: string[] = [];
+  const flush = () => { if (name) out.set(name, { bridge: bridge.join(" ").trim(), lines: items }); };
+  for (const l of lines) {
+    if (/^##\s/.test(l)) { flush(); name = l.replace(/^##\s*/, "").trim(); bridge = []; items = []; continue; }
+    if (name === null) continue;
+    if (/^[-*]\s/.test(l)) { items.push(l.replace(/^[-*]\s*/, "")); continue; }
+    if (l.trim() && !items.length) bridge.push(l.trim());
+  }
+  flush();
+  return out;
+}
+
+/** Constructs in an order no construct precedes one it depends on. */
+function readingOrder(constructs: { id: string; title: string; summary: string; deps: string[]; file: string }[]) {
+  const byId = new Map(constructs.map((c) => [c.id, c]));
+  const done = new Set<string>(), out: typeof constructs = [];
+  const visit = (c: (typeof constructs)[number], trail: Set<string>) => {
+    if (done.has(c.id) || trail.has(c.id)) return;
+    trail.add(c.id);
+    for (const d of c.deps) { const dep = byId.get(d); if (dep) visit(dep, trail); }
+    trail.delete(c.id);
+    if (!done.has(c.id)) { done.add(c.id); out.push(c); }
+  };
+  for (const c of constructs) visit(c, new Set());
+  return out;
+}
+
+function domainFaces(tree: string, concept: string | null): { faces: Map<string, string>; concept: string | null; findings: Finding[] } {
+  const findings: Finding[] = [];
+  const faces = new Map<string, string>();
+  const sections = concept ? conceptSections(concept) : new Map();
+
+  const constructsDir = join(tree, "02-constructs");
+  const domains = (() => { try { return readdirSync(constructsDir).filter((d) => statSync(join(constructsDir, d)).isDirectory()); } catch { return []; } })();
+
+  const all: { id: string; title: string; summary: string; deps: string[]; file: string; domain: string }[] = [];
+  for (const d of domains) {
+    for (const f of walkFiles(join(constructsDir, d), (p) => p.endsWith(".md") && basename(p) !== "README.md")) {
+      const { block } = readBlock(readFileSync(f, "utf8"));
+      if (!block) continue;
+      all.push({ id: block.id, title: block.title, summary: block.summary, deps: block.dependsOn ?? [], file: f, domain: d });
+    }
+  }
+
+  for (const d of domains) {
+    const mine = readingOrder(all.filter((c) => c.domain === d));
+    // The concept names the group; a domain folder the concept does not name is invariant 1's finding.
+    const label = d.replace(/^\d+-/, "");
+    const key = [...sections.keys()].find((k) => k.toLowerCase() === label.toLowerCase());
+    if (!key && concept) findings.push({ check: "face", grade: "RULE", file: join(constructsDir, d), message: `the concept names no section \`${label}\`, and a domain folder exists only where the concept names that domain (invariant 1)` });
+    const bridge = key ? sections.get(key)!.bridge : "";
+    const body = [bridge, "", "| Construct | What it is |", "| --- | --- |",
+      ...mine.map((c) => `| [${c.title}](${relative(join(constructsDir, d), c.file)}) | ${c.summary} |`)]
+      .filter((l, i) => !(i === 0 && !l)).join("\n");
+    faces.set(join(constructsDir, d, "README.md"), body);
+  }
+
+  // The concept's own line per construct, from each summary.
+  let conceptBody: string | null = null;
+  if (concept) {
+    // The concept names the group, so the heading is its own section name and never the folder slug.
+    const byDomain = new Map<string, typeof all>();
+    for (const c of all) {
+      const label = c.domain.replace(/^\d+-/, "");
+      const k = [...sections.keys()].find((x) => x.toLowerCase() === label.toLowerCase()) ?? label;
+      byDomain.set(k, [...(byDomain.get(k) ?? []), c]);
+    }
+    const out: string[] = [];
+    for (const [k, cs] of [...byDomain].sort()) {
+      out.push(`**${k}**`, "");
+      for (const c of readingOrder(cs)) out.push(`- **${c.title}** — ${c.summary}`);
+      out.push("");
+    }
+    conceptBody = out.join("\n").trimEnd();
+  }
+  return { faces, concept: conceptBody, findings };
+}
+
 function face(tree: string, write: boolean): Finding[] {
   const findings: Finding[] = [];
   const touched: string[] = [];
@@ -564,6 +650,22 @@ function face(tree: string, write: boolean): Finding[] {
     if (after !== before) { if (write) writeFileSync(dictFace, after); touched.push(relative(tree, dictFace)); }
   } else {
     findings.push({ check: "face", grade: "SOFT", file: dictFace, message: "no constructs seat face to write the dictionary into" });
+  }
+
+  // The domain faces, and the concept's one line per construct.
+  const conceptFile = ["CONCEPT.md", join("..", "CONCEPT.md")].map((c) => join(tree, c)).find(existsSync) ?? null;
+  const { faces, concept: conceptBody, findings: dfz } = domainFaces(tree, conceptFile);
+  findings.push(...dfz);
+  for (const [file, body] of faces) {
+    if (!existsSync(file)) { findings.push({ check: "face", grade: "SOFT", file, message: "no domain face to write into" }); continue; }
+    const before = readFileSync(file, "utf8");
+    const after = replaceRegion(before, "domain", body);
+    if (after !== before) { if (write) writeFileSync(file, after); touched.push(relative(tree, file)); }
+  }
+  if (conceptFile && conceptBody) {
+    const before = readFileSync(conceptFile, "utf8");
+    const after = replaceRegion(before, "constructs", conceptBody);
+    if (after !== before) { if (write) writeFileSync(conceptFile, after); touched.push(relative(tree, conceptFile)); }
   }
 
   for (const faceFile of walkFiles(join(tree, "04-capabilities"), (p) => basename(p) === "README.md")) {
