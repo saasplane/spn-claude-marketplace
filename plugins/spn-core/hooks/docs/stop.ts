@@ -16,6 +16,7 @@
 
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { join } from "node:path";
+import { begin, span, end } from "./timing.ts";
 
 type Warning = { check: string; message: string };
 
@@ -145,7 +146,15 @@ if (process.argv[1] && process.argv[1].endsWith("stop.ts")) {
   try { reply = JSON.parse(input || "{}")?.last_assistant_message ?? ""; } catch { reply = input; }
   const root = process.env.CLAUDE_PROJECT_DIR ?? process.cwd();
 
-  const warnings = [...checkRunnable(root), ...checkHold(root), ...checkHandover(reply)];
+  let facts: Record<string, unknown> = {};
+  try { const j = JSON.parse(input || "{}"); facts = { event: "Stop", tool: null, session: j.session_id ?? null }; } catch { facts = { event: "Stop" }; }
+  begin(facts, root);
+  const warnings = [
+    ...span("stop-runnable", () => checkRunnable(root)),
+    ...span("stop-hold", () => checkHold(root)),
+    ...span("stop-handover", () => checkHandover(reply)),
+  ];
+  end();
   if (warnings.length) {
     console.error(warnings.map((w) => `[${w.check}] ${w.message}`).join("\n\n"));
     process.exit(2);   // a Stop hook's non-zero is how the message reaches the turn

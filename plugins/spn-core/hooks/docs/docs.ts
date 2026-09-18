@@ -19,6 +19,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSy
 import { dirname, join, resolve, basename, relative } from "node:path";
 import { renderPage } from "./render.ts";
 import { checkFigures, colour, stripSpans } from "./figures.ts";
+import { begin, record, end } from "./timing.ts";
 
 type Grade = "RULE" | "SOFT";
 type Finding = { check: string; grade: Grade; file: string; message: string };
@@ -846,6 +847,12 @@ function audit(paths: string[], workspace: string): Finding[] {
 
 const [cmd, ...rest] = process.argv.slice(2);
 const workspace = process.env.SPN_WORKSPACE ?? process.cwd();
+
+// One line per verb, in the same log and the same shape as the Python checks, so the port can be
+// measured against what it replaced. Off unless `workspace timings --on` has been run.
+const startedAt = performance.now();
+begin({ event: process.env.CLAUDE_HOOK_EVENT ?? "command", tool: null, session: process.env.CLAUDE_SESSION_ID ?? null }, workspace);
+process.on("exit", () => { record(`docs-${cmd ?? "none"}`, performance.now() - startedAt); end(); });
 
 if (cmd === "face") {
   const tree = resolve(rest.find((r) => !r.startsWith("--")) ?? ".");
