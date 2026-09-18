@@ -16,7 +16,7 @@
 
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
-import { openWorkstreams, rowsOf, stateOf } from "./split-plan.ts";
+import { cardsOf, openWorkstreams, rowsOf, stateOf } from "./split-plan.ts";
 import { workspaceRoot } from "./hook.ts";
 import { begin, span, end } from "./timing.ts";
 
@@ -72,16 +72,21 @@ function unfinishedSteps(arc: string): string[] | null {
   return out;
 }
 
-/** A card that is open and unanswered: it carries no Decision. */
+/**
+ * A card that is open and unanswered.
+ *
+ * **F16 — THIS HELD A SECOND, WRONG COPY OF THE TEST, AND IT MADE BOTH CHECKS BLIND.** It asked
+ * whether `<b>Decision` appears at all. The card template ships `<b>Decision:</b> &mdash;`, which is
+ * a card still waiting — so every card written the way the template asks read as ANSWERED here.
+ * `runnable` therefore never saw a card as open and nagged through sittings where one was, and
+ * `hold` would have reported every HELD arc as naming no open card.
+ *
+ * `split-plan.ts` fixed exactly this as F5 and its `cardsOf` carries the correct test: the marker's
+ * presence is not the answer, what follows it is. There is one implementation now, because two were
+ * how this drifted.
+ */
 function openCards(page: string): string[] {
-  const src = read(page);
-  const sec = src.match(/<section id="s4"[\s\S]*?<\/section>/);
-  if (!sec) return [];
-  const out: string[] = [];
-  for (const m of sec[0].matchAll(/<h4 id="(q\d+)"[\s\S]*?(?=<h4 id="q|<\/section>)/gi)) {
-    if (!/<b>\s*Decision/i.test(m[0])) out.push(m[1].toUpperCase());
-  }
-  return out;
+  return cardsOf(page).filter((card) => !card.decided).map((card) => card.number);
 }
 
 export function checkRunnable(root: string): Warning[] {

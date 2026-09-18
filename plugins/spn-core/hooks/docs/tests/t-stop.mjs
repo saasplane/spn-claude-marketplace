@@ -129,6 +129,34 @@ one("an open workstream whose only arcs are N-named, and no page",
   workspace("stop-pageless-new", { ".spndevex/workstreams/open/001-a-subject/arcs/N1-a-subject.md": ARC() }),
   "warns", { says: "An open workstream with arcs and no page", parity: false, why: F11 });
 
+console.log("\n=== stop — F16: the template's own unanswered card must read as open");
+
+// The card template ships `<b>Decision:</b> &mdash;`. A check that asks only whether the marker is
+// PRESENT reads every such card as answered — which is what `openCards` did, so `runnable` could
+// never see a card as open and nagged through sittings where one was.
+const RUNNING = "# Arc — a subject\n\nStatus: **RUNNING**\n\n## Steps\n\n| # | What | Where | How you would know |\n| --- | --- | --- | --- |\n| 1 | a thing | here | ✅ landed |\n| 2 | another thing | here | ☐ raised |\n\n## Log\n\n- **2026-09-19 — go.**\n";
+
+function runningWorkspace(name, cards) {
+  return workspace(name, {
+    ".spndevex/workstreams/open/001-a-subject/a-subject-approach.html":
+      page({ cards, names: ["N1-a-subject.md"] }),
+    ".spndevex/workstreams/open/001-a-subject/arcs/N1-a-subject.md": RUNNING,
+  });
+}
+
+one("an unlanded step with the template's card open — runnable must stay quiet",
+  runningWorkspace("stop-f16-open", CARD),
+  "silent", { parity: false, why: "F16 — the Python read the template's `Decision:` marker as an answer" });
+
+const ANSWERED = CARD.replace("<b>Decision:</b> &mdash;", "<b>Decision:</b> A, 2026-09-19.");
+one("the same card once it carries a real decision — runnable speaks again",
+  runningWorkspace("stop-f16-answered", ANSWERED),
+  "warns", { says: "no card is open", parity: false, why: "F16 — the Python could not tell these two apart" });
+
+one("an unlanded step with no card at all",
+  runningWorkspace("stop-f16-none", ""),
+  "warns", { says: "no card is open", parity: false, why: "F11 — the Python listed arcs as `arc-*` only" });
+
 console.log("\n=== stop — F12: a card the page has already settled");
 
 const F12 = "an answered card's argument belongs in the arc, and the page carries the answer";
