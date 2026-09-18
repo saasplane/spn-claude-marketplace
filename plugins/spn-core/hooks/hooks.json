@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}\"/hooks/scripts/orientation.py --stdin",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}\"/hooks/docs/orientation.ts --stdin",
             "timeout": 20
           }
         ]
@@ -18,7 +18,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}\"/hooks/scripts/pretooluse.py",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}\"/hooks/docs/pretooluse.ts",
             "timeout": 20
           }
         ]
@@ -30,7 +30,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}\"/hooks/scripts/closed.py",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}\"/hooks/docs/closed.ts",
             "timeout": 10
           }
         ]
@@ -39,11 +39,6 @@
     "Stop": [
       {
         "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}\"/hooks/scripts/stop.py",
-            "timeout": 15
-          },
           {
             "type": "command",
             "command": "node \"${CLAUDE_PLUGIN_ROOT}\"/hooks/docs/stop.ts",

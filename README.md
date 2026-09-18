@@ -48,4 +48,4 @@ type, so a prefix is friction and you type `review` rather than `spn-review`. An
 resolved across every installed plugin, so it has to be unambiguous.
 
 **A ref, a hook script and a lens are named for what they hold**, with no prefix — `doc-sets.md`,
-`orientation.py`, `qa.md`. Only the agent name leaves this repository's namespace.
+`orientation.ts`, `qa.md`. Only the agent name leaves this repository's namespace.

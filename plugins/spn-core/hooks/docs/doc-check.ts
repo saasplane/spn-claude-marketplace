@@ -79,13 +79,13 @@ const IDIOMS = ["say the word", "earns its keep", "earn its keep", "at first gla
   "by and large", "for good measure", "the jury is out", "reads like", "read like",
   "a build log", "nail down", "nails down", "pin down", "pins down", "hold water",
   "holds water", "rings true", "ring true", "as it stands", "give or take"];
-const IDIOM = new RegExp(
+export const IDIOM = new RegExp(
   "(?<![a-z])(" + IDIOMS.map((i) => i.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|") + ")(?![a-z])", "gi");
 
 // A rule has to be able to quote the mistake it bans. The corpus marks a quoted counter-example the
 // way it marks any term — italics or backticks — so both are blanked before CARD and ABOUT run.
 const QUOTE_L = "\x02", QUOTE_R = "\x03";
-const MARKED = /\x02[^\x03\n]{0,200}\x03|\*[^*\n]{1,120}\*|`[^`\n]*`|“[^”\n]{1,120}”|"[^"\n]{1,120}"/g;
+export const MARKED = /\x02[^\x03\n]{0,200}\x03|\*[^*\n]{1,120}\*|`[^`\n]*`|“[^”\n]{1,120}”|"[^"\n]{1,120}"/g;
 
 // RD.DOCS.043 — the measure. Second person is whole-word and case-insensitive. Longest form first, or
 // `your` claims the front of `yours` and the rest never matches.
@@ -162,7 +162,7 @@ const MD_BLOCK_START = /^(?:#{1,6}\s|[-*+]\s|\d+[.)]\s)/;
 const MD_HEADING = /^#{1,6}\s/;
 const HTML_BLOCK_END = /<\/(?:p|h[1-6]|li|dt|dd|blockquote|figcaption|div|section|article|header|footer|nav|aside|summary|details)\s*>|<(?:br|hr)\b[^>]*>/gi;
 const SENT_END = /(?<=[.!?])[)"'”’\]]*\s+/;
-const BLOCK_BREAK = /\n\s*\n/;
+export const BLOCK_BREAK = /\n\s*\n/;
 const TABLE_SEP = /^\|?\s*:?-{3,}/;
 
 const read = (path: string): string => {
@@ -475,7 +475,7 @@ function fixed(value: number, digits: number): string {
   return (rounded < 0 ? "-" : "") + digitsOut.slice(0, -digits) + "." + digitsOut.slice(-digits);
 }
 
-function opening(s: string, n = 6): string {
+export function opening(s: string, n = 6): string {
   return s.split(/\s+/).filter(Boolean).slice(0, n).join(" ") + "…";
 }
 

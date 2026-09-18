@@ -79,12 +79,12 @@ separated, leave the sentence and say so in your report.
 
 ## Finish
 
-Run `doc-check.py` on the files you touched. Then report, in this order:
+Run `doc-check.ts` on the files you touched. Then report, in this order:
 
 1. Each paragraph you changed, as before and after
 2. Each paragraph you left alone, and why
 3. Anything you could not separate from an instruction
-4. The `doc-check.py` result
+4. The `doc-check.ts` result
 
 Report the ones you left alone as plainly as the ones you changed. **A batch that changed every
 paragraph it was given did the wrong job.**

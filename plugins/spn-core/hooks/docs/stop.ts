@@ -15,7 +15,9 @@
 // between steps, in the same turn as the next step.
 
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
-import { join } from "node:path";
+import { basename, dirname, join } from "node:path";
+import { openWorkstreams, rowsOf, stateOf } from "./split-plan.ts";
+import { workspaceRoot } from "./hook.ts";
 import { begin, span, end } from "./timing.ts";
 
 type Warning = { check: string; message: string };
@@ -27,7 +29,7 @@ function read(p: string): string {
   try { return readFileSync(p, "utf8"); } catch { return ""; }
 }
 
-function openWorkstreams(root: string): string[] {
+function openWorkstreamFolders(root: string): string[] {
   const dir = join(root, ".spndevex", "workstreams", "open");
   try { return readdirSync(dir).map((d) => join(dir, d)).filter((d) => statSync(d).isDirectory()); }
   catch { return []; }
@@ -84,7 +86,7 @@ function openCards(page: string): string[] {
 
 export function checkRunnable(root: string): Warning[] {
   const out: Warning[] = [];
-  for (const ws of openWorkstreams(root)) {
+  for (const ws of openWorkstreamFolders(root)) {
     const cards = pagesOf(ws).flatMap(openCards);
     for (const arc of arcsOf(ws)) {
       // Only the arc being executed. DECIDED means planned and waiting its turn, and warning about
@@ -112,7 +114,7 @@ export function checkRunnable(root: string): Warning[] {
 
 export function checkHold(root: string): Warning[] {
   const out: Warning[] = [];
-  for (const ws of openWorkstreams(root)) {
+  for (const ws of openWorkstreamFolders(root)) {
     const cards = new Set(pagesOf(ws).flatMap(openCards));
     for (const arc of arcsOf(ws)) {
       if (statusOf(arc) !== "HELD") continue;
@@ -137,6 +139,198 @@ export function checkHandover(reply: string): Warning[] {
   return [];
 }
 
+
+// ---------------------------------------------------------------------------- the arc-to-page checks
+//
+// PORTED FROM `hooks/scripts/stop.py`, WHICH WAS SILENT ON THIS WORKSPACE. Every one of its four
+// checks listed an open workstream's arcs as `name.startswith('arc-')`. The naming moved to
+// `N1-{subject}.md` and the filter was never followed, so on 2026-09-19 workstream `008` held
+// FOURTEEN arcs, none of them named `arc-`, and the whole file reported nothing.
+//
+// Drop the filter and the same code has three real findings on that workstream, and an arc carrying
+// two `Q` cards while the page's `Open` reads *none* — which is precisely the shape `cardsInArcs`
+// was written for. Finding F11 in this arc.
+//
+// So these read every `.md` under `arcs/`, which is what `arcsOf` above already did.
+
+/**
+ * Whether a page names a card number anywhere — an open card, a settled row, or a deferred one.
+ *
+ * `\b` after the digits is what keeps `Q1` from matching inside `Q11`.
+ */
+function namesCard(text: string, card: string): boolean {
+  return new RegExp(`\\b${card}\\b`, "i").test(text);
+}
+
+/** Whether a page carries at least one card in the card pattern. */
+function hasOpenCard(text: string): boolean {
+  return /<div\b[^>]*class="[^"]*\bopen\b[^"]*"/i.test(text);
+}
+
+/** The open workstreams that have a page, as subject → its pages. */
+function argued(root: string): Array<[string, string[]]> {
+  return [...openWorkstreams(root)].filter(([, pages]) => pages.length)
+    .sort((a, b) => a[0].localeCompare(b[0]));
+}
+
+/**
+ * Every arc in an open workstream that no row of its page names.
+ *
+ * AN ARC IS NOT WRITTEN UNTIL THE PAGE CARRIES IT. The arc is the plan and the page is what you
+ * read, so an arc no row names is work that looks finished from the only surface anybody opens.
+ *
+ * The page must name the arc FILE. Rows name pieces of work, never the arc they belong to, so
+ * matching a row's words against a filename was guesswork — it fired on a page that carried every
+ * arc under a heading. A citation is explicit, greppable, and useful to a reader who wants the
+ * argument behind a plan.
+ */
+export function unnamedArcs(root: string): Array<[string, string, string]> {
+  const out: Array<[string, string, string]> = [];
+  for (const [subject, pages] of argued(root)) {
+    const pageText = pages.map(read).join(" ");
+    for (const arc of arcsOf(dirname(pages[0]))) {
+      const name = basename(arc);
+      if (!pageText.includes(name)) out.push([subject, name, basename(pages[0])]);
+    }
+  }
+  return out;
+}
+
+/**
+ * Every open workstream that holds arcs and has no page at all.
+ *
+ * THE CHECK'S OWN WORST CASE, AND IT WAVED IT THROUGH. `unnamedArcs` begins by skipping a workstream
+ * with no pages, so the strongest form of the failure it exists to catch — an arc nobody can read,
+ * because there is no page to read — was the one shape it never reported. `008-plain-language` sat in
+ * exactly that state while the check ran green beside it.
+ */
+export function pagelessWorkstreams(root: string): string[] {
+  const out: string[] = [];
+  for (const [subject, pages] of [...openWorkstreams(root)].sort((a, b) => a[0].localeCompare(b[0]))) {
+    if (pages.length) continue;
+    for (const folder of openWorkstreamFolders(root))
+      if (basename(folder) === subject && arcsOf(folder).length) { out.push(subject); break; }
+  }
+  return out;
+}
+
+/**
+ * Every open workstream whose plan records a stop while its page says nothing is open.
+ *
+ * THE THIRD SHAPE, AND THE WORST OF THE THREE. The other two put a question in the wrong file, where
+ * a reader could still find it. Here the split plan knows a row waits on somebody and the one section
+ * they read says nothing does, so the question is written nowhere at all.
+ */
+export function stopsWithEmptyOpen(root: string): Array<[string, string]> {
+  const out: Array<[string, string]> = [];
+  for (const [subject, pages] of argued(root)) {
+    const text = pages.map(read).join(" ");
+    const waiting = rowsOf(text, false).filter((row) => stateOf(row) === "stopped");
+    if (waiting.length && !hasOpenCard(text)) out.push([subject, waiting[0].label]);
+  }
+  return out;
+}
+
+/**
+ * Every open workstream whose ARCS carry `Q<n>` cards while its page shows none.
+ *
+ * THIS IS THE SHAPE THAT ACTUALLY HAPPENED, twice in one sitting on `011`. The agent wrote five cards
+ * into an arc while the page's `Open` said nothing, and the developer caught it both times.
+ * `stopsWithEmptyOpen` reads a row's STATE, which catches a related shape and would not have caught
+ * this one: those rows read `pending`, and the question was never a row at all.
+ *
+ * A CARD THE PAGE ALREADY NAMES IS NOT THIS SHAPE. An arc is where a card's argument belongs — the
+ * options, what each costs, and why one won — once the page carries the answer somewhere a reader
+ * finds it. Finding F12: this fired on `008`'s `Q11`, argued in `N1b` and answered on the page in
+ * its *Settled already* table, which is the arrangement the convention asks for. The question is
+ * whether the PAGE names the number at all, not whether it still has a card open.
+ */
+export function cardsInArcs(root: string): Array<[string, string, string]> {
+  const out: Array<[string, string, string]> = [];
+  for (const [subject, pages] of argued(root)) {
+    const pageText = pages.map(read).join(" ");
+    if (hasOpenCard(pageText)) continue;
+    for (const arc of arcsOf(dirname(pages[0]))) {
+      const unrecorded = [...read(arc).matchAll(/^#{2,4}\s+`?(Q\d+[A-Z]?)`?\s*[·\u00b7]/gm)]
+        .map((found) => found[1])
+        .filter((card) => !namesCard(pageText, card));
+      if (unrecorded.length) { out.push([subject, basename(arc), unrecorded[0]]); break; }
+    }
+  }
+  return out;
+}
+
+// ---------------------------------------------------------------------------- reply-shape
+//
+// RESTATES: 05-artifacts.md § The approach document → Open. The clause is the one most often missed:
+// *open items put to a person in chat follow this layout exactly as a document's Open section does*
+// — MUST. That covers a status reply, an answer to "what's left?", and a pending-work report.
+//
+// THE FAILURE IT CATCHES IS EXACT. A reply names lettered options — "say A and I will…", "my
+// recommendation is B" — while showing no options table. The reader is asked to choose between
+// things they were never shown, and the card grammar exists to stop precisely that.
+//
+// What it deliberately does NOT do: it never reads whether a recommendation is good, never counts
+// words, and never fires on a reply that simply mentions a letter. Only a reply that asks for a
+// choice, and does not show one.
+
+// Every form seen in this workspace's own transcripts, and each needs a table.
+const ASKS = /\b(?:say|answer|reply|pick|choose|choosing|select)\s+(?:with\s+)?[`"*]?(?:Q\d+)?[A-D]\b|\brecommendation\s+is\s+[`"*]?[A-D]\b|\boption\s+[`"*]?[A-D]\b|\b[A-D]\s*,\s*[A-D]\s*(?:,\s*[A-D]\s*)?(?:or|\/)\s*[A-D]\b/i;
+// A markdown options table: a header row and the `| --- |` separator the grammar requires.
+const TABLE = /^\|.*\|\s*$\n^\|[\s:-]*\|[\s:|-]*$/m;
+// A lettered row inside a table — `| **A** | … | … |`. The shape the grammar actually asks for.
+const LETTERED_ROW = /^\|\s*\**\s*[A-D]\s*\**\s*\|/m;
+
+export function checkReplyShape(reply: string): Warning[] {
+  if (!ASKS.test(reply)) return [];
+  if (TABLE.test(reply) && LETTERED_ROW.test(reply)) return [];
+  return [{ check: "reply-shape", message:
+    "Your reply asks for a lettered choice and shows no options table. A card put to a person in " +
+    "chat follows the same layout a document uses — MUST: the choice as a numbered `Q<n>`, what it " +
+    "changes, what it costs to leave, and **the options as a table, lettered, with the trade-off in " +
+    "its own column** (05-artifacts.md, The approach document). Naming A and B without showing them " +
+    "asks somebody to choose between things they cannot see. Put the card on the approach page, and " +
+    "say in the reply that it is there." }];
+}
+
+/** The four arc-to-page checks, as warnings. */
+export function checkArcToPage(root: string): Warning[] {
+  const out: Warning[] = [];
+  const pageless = pagelessWorkstreams(root);
+  if (pageless.length)
+    out.push({ check: "pageless", message:
+      `An open workstream with arcs and no page — ${pageless.join(" · ")}. The arc is the plan and ` +
+      `the page is what anybody reads, so a workstream with no page is work nobody can pick up. ` +
+      `Give it an approach page in the fixed shape (05-artifacts.md, The approach document).` });
+
+  const inArcs = cardsInArcs(root);
+  if (inArcs.length)
+    out.push({ check: "cards-in-arcs", message:
+      `A card written into an arc while the page shows none — ` +
+      inArcs.slice(0, 4).map(([subject, arc, card]) => `${card} in ${arc} (${subject})`).join(" · ") +
+      `. An arc plans work and never holds a question. Move it to the page's \`Open\` as a \`Q<n>\` ` +
+      `card, in the card pattern (refs/decision-cards.md).` });
+
+  const stopped = stopsWithEmptyOpen(root);
+  if (stopped.length)
+    out.push({ check: "stopped-no-card", message:
+      `A row waiting on the developer while \`Open\` carries no card — ` +
+      stopped.slice(0, 4).map(([subject, row]) => `row ${row} in ${subject}`).join(" · ") +
+      `. A stop is an open item like any other, and a question the plan knows about while the page ` +
+      `says nothing is one nobody can answer. Write it as a \`Q<n>\` card in the page's \`Open\` ` +
+      `(refs/decision-cards.md).` });
+
+  const missing = unnamedArcs(root);
+  if (missing.length)
+    out.push({ check: "unnamed-arc", message:
+      `An arc no split-plan row names — ` +
+      missing.slice(0, 4).map(([subject, arc]) => `${arc} in ${subject}`).join(" · ") +
+      `. An arc is the plan and the page is what anybody reads, so an arc nothing names is work that ` +
+      `looks finished from the only surface they open. Add a row to that page's \`What is built\`, ` +
+      `with its scope and its state (05-artifacts.md, How has two halves).` });
+  return out;
+}
+
 // ---------------------------------------------------------------------------- the hook
 
 if (process.argv[1] && process.argv[1].endsWith("stop.ts")) {
@@ -144,12 +338,21 @@ if (process.argv[1] && process.argv[1].endsWith("stop.ts")) {
   try { input = readFileSync(0, "utf8"); } catch { /* no stdin: run as a check */ }
   let reply = "";
   try { reply = JSON.parse(input || "{}")?.last_assistant_message ?? ""; } catch { reply = input; }
-  const root = process.env.CLAUDE_PROJECT_DIR ?? process.cwd();
+  // THE EVENT'S OWN `cwd` FIRST, AND THEN THE WALK UP. This read `process.cwd()` and stopped there,
+  // so every check was silent whenever the hook ran anywhere but the workspace root — which is most
+  // of the time, because a session is usually rooted in one member. The Python it replaces took the
+  // payload's `cwd` and walked up to `.spndevex/`; this now does the same.
+  let start = "";
+  try { start = JSON.parse(input || "{}")?.cwd ?? ""; } catch { start = ""; }
+  const root = workspaceRoot(start || process.env.CLAUDE_PROJECT_DIR || process.cwd())
+            ?? (start || process.env.CLAUDE_PROJECT_DIR || process.cwd());
 
   let facts: Record<string, unknown> = {};
   try { const j = JSON.parse(input || "{}"); facts = { event: "Stop", tool: null, session: j.session_id ?? null }; } catch { facts = { event: "Stop" }; }
   begin(facts, root);
   const warnings = [
+    ...span("stop-reply-shape", () => checkReplyShape(reply)),
+    ...span("stop-arc-to-page", () => checkArcToPage(root)),
     ...span("stop-runnable", () => checkRunnable(root)),
     ...span("stop-hold", () => checkHold(root)),
     ...span("stop-handover", () => checkHandover(reply)),

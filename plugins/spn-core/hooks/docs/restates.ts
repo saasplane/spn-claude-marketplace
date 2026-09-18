@@ -1,0 +1,257 @@
+#!/usr/bin/env node
+// RESTATES: RD.DOCS.055, and `04-devex/10-delivery.md`, which makes it a MUST in both directions.
+//
+// The `spn:restates` block: how it is written, and what a hash covers.
+//
+// Two checks read this block and they must read it identically. `coherence.ts` compares the
+// foundation's own provider restatements against its chapters, inside one repo. `restate-drift.ts`
+// compares the marketplace's plugin restatements against a book it is handed. Writing the parser
+// twice would be the defect this construct exists to stop — the same rule stated twice, drifting,
+// with nothing comparing them.
+//
+// THE BLOCK
+//
+//     <!-- spn:restates
+//     {
+//       "chapters": [
+//         { "path": "CONCEPT.md", "section": "Kind Tests", "seen": "3f9c1e7a" },
+//         { "path": "docs/03-capabilities/02-apps/06-tests/README.md", "seen": "b204d81c" }
+//       ],
+//       "rows": ["RD.APPS.086"]
+//     }
+//     -->
+//
+// A CITATION IS AN OBJECT, and it carries its own `seen` (workstream 009, `Q11` answered A).
+// `section` is optional: name one and the hash covers that heading's own text, leave it out and the
+// hash covers the whole file. So a citation is exactly as precise as the sentence it replaces.
+//
+// WHY NOT ONE `seen` FOR THE BLOCK. `CONCEPT.md` is over seven thousand lines and eight restatements
+// cite it. The QA lens cites one section of about a hundred lines. A hash over the whole file
+// re-stamps that lens every time anything else in the file moves — measured at roughly 176 re-stamps
+// in sixty days, almost all of them on content nobody cited. A finding that is usually wrong teaches
+// people to stop reading the run.
+//
+// A BLOCK USED TO GET CREDIT FOR WHAT IT LEFT OUT (workstream 009, `A6`; fixed 2026-09-08). `check()`
+// walked `chapters` and `rows` and nothing else, so it could only ever validate what a file DECLARED.
+// A source the file named in its own prose and omitted from the block was unreachable rather than
+// unstamped, and both gates printed green over it. Two design lenses found that by reading, and no
+// run could have.
+//
+// So `check()` now reads the file's own `Source of truth:` line and compares it against the block.
+// THE COMPARISON IS LOOSE IN ONE DIRECTION ONLY. Prose says `05-docs/01-corpus` where the block says
+// `docs/03-capabilities/05-docs/01-corpus.md`, so a prose name counts as declared when some declared
+// path contains it. WHAT IT CANNOT CLASSIFY IT REPORTS RATHER THAN DROPS — see `namedSources`,
+// because an under-report here is the very defect this change closes.
+//
+// PORTED FROM `hooks/scripts/restates.py`. A hash is a promise: every `seen` already stamped across
+// the plugins must still read the same, so the port's test hashes the whole corpus with both.
+
+import { createHash } from "node:crypto";
+import { join } from "node:path";
+import { isFile, read } from "./hook.ts";
+
+const BLOCK = /<!--\s*spn:restates\s*(\{[\s\S]*?\})\s*-->/;
+// The DECLARATION form, which carries a colon. Bare prose does not declare anything, and one skill
+// says *a node that restates what its kind already implies has introduced a second source of truth*
+// — a sentence about the defect, matched as a declaration by a looser rule.
+const SOURCE_LINE = /^.*Source of truth\s*:?\*{0,2}\s*:.*$|^.*\*\*Source of truth:\*\*.*$/gim;
+const ROW_ID = /\bRD\.[A-Z]+\.\d{3}\b/g;
+const IS_ROW_ID = /^RD\.[A-Z]+\.\d{3}$/;
+const HEADING = /^(#{1,6})[ \t]+(.+?)[ \t]*$/gm;
+
+export type Citation = { path?: string; section?: string; seen?: string };
+export type Block = { chapters?: Citation[]; rows?: string[] };
+
+/**
+ * What a hash is taken over.
+ *
+ * Trailing whitespace and surrounding blank lines are invisible to a reader, so a change to them is
+ * not a change to the rule. Everything else counts, including a reordering — a rule list whose order
+ * changed is a rule list the restatement may now get wrong.
+ */
+export function normalize(text: string): string {
+  const lines = text.replace(/\r\n/g, "\n").split("\n").map((line) => line.replace(/\s+$/, ""));
+  while (lines.length && !lines[0]) lines.shift();
+  while (lines.length && !lines[lines.length - 1]) lines.pop();
+  return lines.join("\n");
+}
+
+/** Eight hex characters. Long enough that a collision is not the failure you will meet. */
+export function seenHash(text: string): string {
+  return createHash("sha256").update(normalize(text), "utf8").digest("hex").slice(0, 8);
+}
+
+/**
+ * One heading's own text, to the next heading at the same level or above.
+ *
+ * Returns null where no heading matches, which is itself the finding: a section that was renamed
+ * reads as absent, and a restatement citing it is pointing at nothing.
+ */
+export function sectionText(document: string, section: string): string | null {
+  const plain = (text: string) => text.toLowerCase().replace(/[^a-z0-9 ]/g, "");
+  const wanted = plain(section.trim());
+  const matches = [...document.matchAll(HEADING)];
+  for (let index = 0; index < matches.length; index += 1) {
+    const match = matches[index];
+    // Compared with the heading's own decoration removed, so `## *Kind Tests*` and a citation of
+    // `Kind Tests` are the same section. A citation names the words.
+    if (plain(match[2].trim()) !== wanted) continue;
+    const depth = match[1].length;
+    let end = document.length;
+    for (const later of matches.slice(index + 1))
+      if (later[1].length <= depth) { end = later.index!; break; }
+    return document.slice(match.index! + match[0].length, end);
+  }
+  return null;
+}
+
+/** The block in one file. Returns [block, error] — exactly one of them is null. */
+export function parse(path: string): [Block | null, string | null] {
+  const found = BLOCK.exec(read(path));
+  if (found === null) return [null, null];
+  let block: Block;
+  try { block = JSON.parse(found[1]); }
+  catch (broken) { return [null, `spn:restates is not valid JSON — ${(broken as Error).message}`]; }
+  if (block.chapters !== undefined && !Array.isArray(block.chapters))
+    return [null, "spn:restates `chapters` must be a list of citations"];
+  return [block, null];
+}
+
+/**
+ * A file that says what it restates in PROSE, whether or not it carries the block.
+ *
+ * Metadata is stripped first. `spn:doc` carries a `summary` field, and a summary describing a
+ * standard can hold the words *source of truth* without the file declaring anything — one provider
+ * guideline does exactly that. Reading it as a declaration reports a file as unstamped that never
+ * claimed a source at all.
+ */
+export function declaresASource(path: string): boolean {
+  const text = read(path).replace(/<!--[\s\S]*?-->/g, "");
+  SOURCE_LINE.lastIndex = 0;
+  return SOURCE_LINE.test(text);
+}
+
+// A prose citation names a chapter the way a person would. A token counts as naming a document when
+// it carries a path separator or a markdown extension.
+const PROSE_PATH = /`([^`]+)`/g;
+// Names that appear inside a declaration and are NOT documents: the repository holding the book, and
+// the concept's own product name. Listing them beats a rule that silently drops anything odd.
+const NOT_A_DOCUMENT = new Set(["spn-foundation", "saasplane-concept", "spnutils"]);
+// A seat named without a path — `01-saas`, `02-repo`, `03-module`. The corpus numbers its seats, so
+// the shape is what tells a seat from an ordinary word. A declaration line also carries example
+// values and plain nouns, and calling those unresolved sources would overstate the gap as badly as
+// hiding it understates it.
+const SEAT = /^(?:\d{2}-[a-z0-9-]+|README|CONCEPT|#{2,6} .+)$/;
+
+/**
+ * A markdown file, or a path carrying one of the corpus's numbered seats.
+ *
+ * THE CORPUS NUMBERS ITS SEATS, so `02-apps/03-module/01-server/contract/01-states` reads as a path
+ * and `application/json` does not. Two earlier rules were wrong in the same direction: *contains a
+ * slash* claimed the MIME type, and *two named segments* claimed it too. `ui/` is a taxonomy folder
+ * inside a seat already declared, and it fails both halves.
+ */
+export function looksLikeADocument(token: string): boolean {
+  if (token.toLowerCase().endsWith(".md")) return true;
+  return token.split("/").some((segment) => /^\d{2}-[a-z0-9-]+$/.test(segment));
+}
+
+/**
+ * What a file's own prose says it restates — `[documents, rows, unclassified]`.
+ *
+ * The declaration line is the only place read. A path elsewhere in the file is an example or a
+ * cross-reference, and reading those would report a file for every path it mentions.
+ *
+ * `unclassified` IS RETURNED RATHER THAN DROPPED. A declaration naming `02-behaviors` names a real
+ * seat and carries no path, so nothing here can resolve it to a file. Reporting those keeps the limit
+ * visible: this check under-reports by exactly that list, and silently under-reporting is the defect
+ * it exists to close.
+ */
+export function namedSources(path: string): [Set<string>, Set<string>, Set<string>] {
+  const text = read(path).replace(/<!--[\s\S]*?-->/g, "");
+  const documents = new Set<string>();
+  const rows = new Set<string>();
+  const unclassified = new Set<string>();
+  SOURCE_LINE.lastIndex = 0;
+  for (const line of text.match(SOURCE_LINE) ?? []) {
+    for (const row of line.match(ROW_ID) ?? []) rows.add(row);
+    for (const found of line.matchAll(PROSE_PATH)) {
+      const token = found[1].trim();
+      if (!token || NOT_A_DOCUMENT.has(token) || IS_ROW_ID.test(token)) continue;
+      if (looksLikeADocument(token)) documents.add(token);
+      else if (SEAT.test(token)) unclassified.add(token);
+    }
+  }
+  return [documents, rows, unclassified];
+}
+
+/**
+ * Sources the file's prose names that its block does not declare — NOT DRIFT.
+ *
+ * Until 2026-09-08 nothing asked this, so a block got credit for what it left out. An omitted source
+ * is unreachable rather than unstamped: no run could name it when its chapter moved, and both gates
+ * printed green.
+ *
+ * A prose name matches loosely and in one direction: `05-docs/01-corpus` is covered by a declared
+ * `docs/03-capabilities/05-docs/01-corpus.md`, and never the other way round.
+ */
+export function undeclared(path: string, block: Block): string[] {
+  const [documents, rows] = namedSources(path);
+  const declared = (block.chapters ?? [])
+    .filter((c) => c && typeof c === "object")
+    .map((c) => String(c.path ?? "").toLowerCase());
+  const missing = [...documents].sort().filter((name) =>
+    !declared.some((one) => one.includes(name.toLowerCase().replace(/^\/+|\/+$/g, ""))));
+  missing.push(...[...rows].sort().filter((row) => !(block.rows ?? []).includes(row)));
+  return missing;
+}
+
+/**
+ * Every DRIFT finding one restatement's block earns. Empty where it is current.
+ *
+ * THIS ASKS ONLY WHETHER WHAT THE FILE DECLARED IS STILL TRUE. Whether the file declared everything
+ * it restates is `undeclared`, a separate question with a separate answer — an omission is not drift,
+ * and reporting them as one hides which of the two you are looking at.
+ *
+ * `knownRows` may be empty, and then row citations are not checked at all — a repo holding no
+ * register is a fact about that repo rather than a finding about it.
+ */
+export function check(path: string, block: Block, bookRoot: string, knownRows: Set<string>): string[] {
+  const findings: string[] = [];
+  for (const citation of block.chapters ?? []) {
+    if (!citation || typeof citation !== "object" || citation.path === undefined) {
+      findings.push(`${path}: a citation must be an object with a \`path\``);
+      continue;
+    }
+    const cited = join(bookRoot, citation.path);
+    if (!isFile(cited)) {
+      findings.push(`${path}: cites \`${citation.path}\`, which does not resolve`);
+      continue;
+    }
+    let document: string | null = read(cited);
+    let where = citation.path;
+    if (citation.section) {
+      document = sectionText(document, citation.section);
+      where = `${citation.path} § ${citation.section}`;
+      if (document === null) {
+        findings.push(`${path}: cites \`${where}\`, and no such heading exists`);
+        continue;
+      }
+    }
+    const current = seenHash(document);
+    const stamped = citation.seen;
+    if (stamped === undefined) findings.push(`${path}: cites \`${where}\` with no \`seen\` — nothing to compare`);
+    else if (stamped !== current)
+      findings.push(`${path}: \`${where}\` has moved since this file restated it — seen ${stamped}, now ${current}`);
+  }
+  for (const row of block.rows ?? [])
+    if (knownRows.size && !knownRows.has(row))
+      findings.push(`${path}: cites \`${row}\`, which the register does not carry`);
+  return findings;
+}
+
+/** Every decision id the register declares. Empty where there is no register to read. */
+export function registerRows(register: string): Set<string> {
+  if (!isFile(register)) return new Set();
+  return new Set(read(register).match(ROW_ID) ?? []);
+}

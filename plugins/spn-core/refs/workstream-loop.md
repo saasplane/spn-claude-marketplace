@@ -98,11 +98,11 @@ Nothing above is enforced by good intentions. Every transition that can be check
 
 | Held | By |
 | --- | --- |
-| a page keeps its shape, its voice and its two `How` halves | `doc-check.py`, on every write |
-| the outline folds | `doc-check.py` |
-| an answered card does not sit in `Open` | `split-plan.py`, on every write |
-| an arc the page does not cite | `stop.py`, when a turn ends |
-| every row accounted for, and the page stamped, before a close | `split-plan.py --gate close` |
-| what landed, said out loud | `closed.py`, after the folder moves |
-| what the agent's own machinery costs | `timing.py`, on every hook run |
-| a repository write with no go on record | `confirmed.py`, on the first such write in a window |
+| a page keeps its shape, its voice and its two `How` halves | `doc-check.ts`, on every write |
+| the outline folds | `doc-check.ts` |
+| an answered card does not sit in `Open` | `split-plan.ts`, on every write |
+| an arc the page does not cite | `stop.ts`, when a turn ends |
+| every row accounted for, and the page stamped, before a close | `split-plan.ts --gate close` |
+| what landed, said out loud | `closed.ts`, after the folder moves |
+| what the agent's own machinery costs | `timing.ts`, on every hook run |
+| a repository write with no go on record | `confirmed.ts`, on the first such write in a window |

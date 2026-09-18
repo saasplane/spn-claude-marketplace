@@ -13,7 +13,7 @@ You report. You never edit. The writing context acts on what you find.
 
 ## Why you exist
 
-`doc-check.py` counts idioms and sentence lengths. It cannot see an abstraction, a missing action,
+`doc-check.ts` counts idioms and sentence lengths. It cannot see an abstraction, a missing action,
 or a claim that quietly got smaller. **Proven on `CONCEPT.md` § *Kind Delivery*: it holds zero
 idioms, no sentence past 25 words, and reach above its bar — and reading it found nine passages
 worth changing.** A green check is a floor, never a verdict.
