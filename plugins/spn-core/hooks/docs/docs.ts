@@ -9,11 +9,13 @@
 //
 //   node docs.ts audit <path…>          the invariants a page must hold
 //   node docs.ts face <docs-tree>       write what is generated, between markers
+//   node docs.ts page <seat.md…>        produce each construct page from its seat file
 //
 // Grades, per the N2 arc: RULE refuses, SOFT reports. N7 flips the SOFTs.
 
-import { readFileSync, writeFileSync, existsSync, readdirSync, statSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync } from "node:fs";
 import { dirname, join, resolve, basename, relative } from "node:path";
+import { renderPage } from "./render.ts";
 
 type Grade = "RULE" | "SOFT";
 type Finding = { check: string; grade: Grade; file: string; message: string };
@@ -386,6 +388,37 @@ function findConcept(workspace: string, file: string): string | null {
   return null;
 }
 
+/**
+ * The ninth check, and the one Q80 A traded for *md and html agree*: a page equals what `page`
+ * produces from its seat file. It is cheaper than comparing prose and it catches more, because it
+ * also catches a hand edit — the defect the old check could not see.
+ */
+function checkProduced(file: string, src: string, block: any, workspace: string, templates: string): Finding[] {
+  if (block?.variant !== "construct") return [];
+  // The pocket mirrors the seat folder for folder, so the pair is found by path alone.
+  const seat = file.replace(/\/artifacts\/constructs\//, "/02-constructs/").replace(/-construct\.html$/, ".md");
+  if (seat === file || !existsSync(seat))
+    return [{ check: "produced", grade: "SOFT", file, message: "no seat file sits at the mirrored path, so this page cannot be compared with what it would be produced from" }];
+  const seatSrc = readFileSync(seat, "utf8");
+  const { block: sb } = readBlock(seatSrc);
+  if (!sb) return [{ check: "produced", grade: "RULE", file: seat, message: "the seat file has no `spn:doc` block" }];
+  let html: string;
+  try {
+    html = renderPage({
+      block: sb,
+      markdown: seatSrc.replace(/<!--\s*spn:doc[\s\S]*?-->\n?/, ""),
+      workspace: process.env.SPN_ORG ?? "SaaS Plane",
+      location: process.env.SPN_LOCATION ?? locationOf(seat, workspace),
+      furniture: furniture(templates),
+    }).html;
+  } catch (e) {
+    return [{ check: "produced", grade: "SOFT", file, message: `the page could not be produced for comparison — ${(e as Error).message}` }];
+  }
+  if (html === src) return [];
+  return [{ check: "produced", grade: "RULE", file,
+    message: `this page is not what \`docs.ts page\` produces from ${relative(workspace, seat)}. A page is never edited by hand: edit the seat file and produce it again` }];
+}
+
 /** dependsOn is one way and acyclic, over whatever set of constructs is given. */
 function checkDepends(files: string[], blocks: Map<string, any>): Finding[] {
   const f: Finding[] = [];
@@ -546,12 +579,80 @@ function face(tree: string, write: boolean): Finding[] {
   return findings;
 }
 
+// ---------------------------------------------------------------------------- page
+
+/** The furniture: one stylesheet and one pair of rail scripts, taken from the template. */
+function furniture(templates: string): { style: string; scripts: string; footer: string } {
+  const t = readFileSync(join(templates, "pages", "construct-template.html"), "utf8");
+  const styles = [...t.matchAll(/<style>[\s\S]*?<\/style>/g)].map((m) => m[0]);
+  const scripts = [...t.matchAll(/<script>[\s\S]*?<\/script>/g)].map((m) => m[0]);
+  const foldStyle = styles.slice(1).join("\n\n");
+  const footer = t.match(/<footer>[\s\S]*?<\/footer>/)?.[0] ?? "<footer></footer>";
+  return {
+    style: styles[0] ?? "",
+    scripts: [scripts[0] ?? "", foldStyle, scripts[1] ?? ""].filter(Boolean).join("\n\n"),
+    footer,
+  };
+}
+
+/** The location field: a declared name, never a folder. */
+function locationOf(seat: string, workspace: string): string {
+  let dir = dirname(resolve(seat));
+  for (let i = 0; i < 8; i++) {
+    for (const m of ["sprepo.json", "spkind.json"]) {
+      const f = join(dir, m);
+      if (existsSync(f)) {
+        try {
+          const j = JSON.parse(readFileSync(f, "utf8"));
+          if (typeof j.name === "string" && j.name) return j.name;
+        } catch { /* another check's finding */ }
+      }
+    }
+    const up = dirname(dir);
+    if (up === dir) break;
+    dir = up;
+  }
+  return "—";
+}
+
+function pageFor(seat: string, workspace: string, templates: string, write: boolean): Finding[] {
+  const findings: Finding[] = [];
+  const src = readFileSync(seat, "utf8");
+  const { block, error } = readBlock(src);
+  if (!block) { findings.push({ check: "page", grade: "RULE", file: seat, message: error ?? "no spn:doc block" }); return findings; }
+
+  const markdown = src.replace(/<!--\s*spn:doc[\s\S]*?-->\n?/, "");
+  const org = process.env.SPN_ORG ?? "SaaS Plane";
+  const location = process.env.SPN_LOCATION ?? locationOf(seat, workspace);
+  if (location === "—")
+    findings.push({ check: "page", grade: "SOFT", file: seat, message: "no manifest above this file declares a `name`, so the header's location reads `—` (Q79 puts `name` on the manifests)" });
+
+  const { html, findings: rf } = renderPage({ block, markdown, workspace: org, location, furniture: furniture(templates) });
+  for (const r of rf) findings.push({ check: "page", grade: "RULE", file: seat, message: r.message });
+
+  // The page sits beside its seat file, in the pocket that mirrors the seat folder for folder.
+  const out = seat.replace(/\/02-constructs\//, "/artifacts/constructs/").replace(/\.md$/, "-construct.html");
+  const before = existsSync(out) ? readFileSync(out, "utf8") : "";
+  if (before === html) { console.log(`current  ${relative(workspace, out)}`); return findings; }
+  if (write) {
+    mkdirSync(dirname(out), { recursive: true });
+    writeFileSync(out, html);
+    console.log(`${before ? "rewrote " : "wrote   "} ${relative(workspace, out)}`);
+  } else {
+    findings.push({ check: "page", grade: "RULE", file: out,
+      message: before ? "this page is not what `docs.ts page` produces from its seat file — it was edited by hand, or the seat file moved on" : "no page has been produced from this seat file yet" });
+  }
+  return findings;
+}
+
 // ---------------------------------------------------------------------------- the command
 
 function audit(paths: string[], workspace: string): Finding[] {
   const findings: Finding[] = [];
   const blocks = new Map<string, any>();
   const nodes = nodeIndex(workspace);
+  const templates = process.env.SPN_TEMPLATES
+    ?? join(workspace, "spn-foundation", "docs", "03-capabilities", "05-docs", "templates");
   for (const p of paths) {
     const src = readFileSync(p, "utf8");
     const { block, error } = readBlock(src);
@@ -565,6 +666,7 @@ function audit(paths: string[], workspace: string): Finding[] {
     findings.push(...checkProof(p, src));
     findings.push(...checkBinds(p, src, block, nodes));
     findings.push(...checkOverviewSource(p, src, block, workspace));
+    findings.push(...checkProduced(p, src, block, workspace, templates));
   }
   findings.push(...checkDepends(paths, blocks));
   return findings;
@@ -580,8 +682,18 @@ if (cmd === "face") {
   process.exit(f.some((x) => x.grade === "RULE") ? 1 : 0);
 }
 
+if (cmd === "page") {
+  const templates = process.env.SPN_TEMPLATES
+    ?? join(resolve(workspace), "spn-foundation", "docs", "03-capabilities", "05-docs", "templates");
+  const check = rest.includes("--check");
+  const seats = rest.filter((r) => !r.startsWith("--")).map((p) => resolve(p));
+  const f = seats.flatMap((p) => pageFor(p, resolve(workspace), templates, !check));
+  for (const x of f) console.log(`${x.grade === "RULE" ? "✗" : "!"} ${x.grade.padEnd(4)} ${x.check.padEnd(9)} ${relative(workspace, x.file)}\n         ${x.message}`);
+  process.exit(f.some((x) => x.grade === "RULE") ? 1 : 0);
+}
+
 if (cmd !== "audit" || rest.length === 0) {
-  console.error("usage: node docs.ts audit <path…> | face <docs-tree> [--check]   (SPN_WORKSPACE sets the workspace root)");
+  console.error("usage: node docs.ts audit <path…> | face <docs-tree> [--check] | page <seat.md…> [--check]");
   process.exit(2);
 }
 
