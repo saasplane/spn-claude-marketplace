@@ -35,7 +35,27 @@ import { DEVEX, read } from "../lib/payload.ts";
 
 const DEBUG = ".debug";
 const MIRROR = "mirror";
-const FACE = join("docs", "03-capabilities", "README.md");
+
+/**
+ * The capability face governing a node, found through the node's own README.
+ *
+ * A node carries `README.md` and no docs tree: the seats live once, in the repository's tree, and
+ * the README links into the ones this node realizes. So the README is the index, and it is the only
+ * thing that knows which domain and which layer a node's mirrors sit under — a path cannot say it,
+ * because `packages/module-server-iam-ts` lands at `04-capabilities/01-iam/01-server/`.
+ *
+ * Silent where the README carries no such link. That is a node whose seat has not been written yet,
+ * and invariant 4 is what reports it — against the whole tree, once, rather than on every edit.
+ */
+export function faceOf(node: string): string | null {
+  const readme = read(join(node, "README.md"));
+  if (!readme) return null;
+  for (const m of readme.matchAll(/\]\(([^)\s]+04-capabilities\/[^)\s]*README\.md)\)/g)) {
+    const face = resolve(node, m[1]);
+    if (existsSync(face)) return face;
+  }
+  return null;
+}
 
 /** A Map row: the document, and the `src/` folder it governs. */
 export type Row = { file: string; governs: string; status: string };
@@ -124,8 +144,8 @@ export function checkMirror(payload: Payload): Verdict {
   if (!found) return null;
   const [node, within] = found;
 
-  const face = join(node, FACE);
-  if (!existsSync(face)) return null;              // no capabilities seat here yet — N3's work, not a nudge
+  const face = faceOf(node);
+  if (!face) return null;                          // the node's README names no capability face yet
   const row = governing(mapRows(face), dirname(within));
   if (!row) return null;                           // invariant 4's finding, and the audit owns it
 

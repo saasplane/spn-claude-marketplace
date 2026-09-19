@@ -1,25 +1,16 @@
 <!-- spn:restates
 {
   "chapters": [
-    {
-      "path": "docs/03-capabilities/02-apps/01-shape/03-architecture.md",
-      "seen": "e02a7788"
-    },
-    {
-      "path": "docs/registers/conformance.md",
-      "seen": "143ecdd8"
-    },
-    {
-      "path": "docs/03-capabilities/02-apps/03-module/01-server/01-contract/01-states.md",
-      "seen": "69eba950"
-    }
+    { "path": "docs/04-capabilities/02-support/01-apps/01-shape/03-architecture.md", "seen": "504cb4cf" },
+    { "path": "docs/registers/conformance.md", "seen": "69c33803" },
+    { "path": "docs/04-capabilities/02-support/01-apps/03-module/01-server/01-contract/01-states.md", "seen": "30d3b676" }
   ]
 }
 -->
 
 # Contract Review Rules — Stack-Agnostic
 
-Use these rules as the review gate for any SaaS Plane contract surface, in any stack. Source of truth: the foundation book, `docs/03-capabilities/02-apps/03-module/01-server/01-contract/01-states.md` (constructs), `docs/03-capabilities/02-apps/01-shape/03-architecture.md` (evolution and the generation chain), and `docs/registers/conformance.md` in `spn-foundation`. Apply these to every API change; a rule that fails blocks the change until it is fixed or recorded as a versioned, planned exception.
+Use these rules as the review gate for any SaaS Plane contract surface, in any stack. Source of truth: the foundation book, `docs/04-capabilities/02-support/01-apps/03-module/01-server/01-contract/01-states.md` (constructs), `docs/04-capabilities/02-support/01-apps/01-shape/03-architecture.md` (evolution and the generation chain), and `docs/registers/conformance.md` in `spn-foundation`. Apply these to every API change; a rule that fails blocks the change until it is fixed or recorded as a versioned, planned exception.
 
 ## The chain
 

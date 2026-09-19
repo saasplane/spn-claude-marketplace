@@ -15,7 +15,7 @@
 //     {
 //       "chapters": [
 //         { "path": "CONCEPT.md", "section": "Kind Tests", "seen": "3f9c1e7a" },
-//         { "path": "docs/03-capabilities/02-apps/06-tests/README.md", "seen": "b204d81c" }
+//         { "path": "docs/04-capabilities/02-support/01-apps/06-tests/README.md", "seen": "b204d81c" }
 //       ],
 //       "rows": ["RD.APPS.086"]
 //     }
@@ -39,7 +39,7 @@
 //
 // So `check()` now reads the file's own `Source of truth:` line and compares it against the block.
 // THE COMPARISON IS LOOSE IN ONE DIRECTION ONLY. Prose says `05-docs/01-corpus` where the block says
-// `docs/03-capabilities/05-docs/01-corpus.md`, so a prose name counts as declared when some declared
+// `docs/04-capabilities/01-foundation/02-docs/01-corpus.md`, so a prose name counts as declared when some declared
 // path contains it. WHAT IT CANNOT CLASSIFY IT REPORTS RATHER THAN DROPS — see `namedSources`,
 // because an under-report here is the very defect this change closes.
 //
@@ -162,7 +162,7 @@ export function looksLikeADocument(token: string): boolean {
  * The declaration line is the only place read. A path elsewhere in the file is an example or a
  * cross-reference, and reading those would report a file for every path it mentions.
  *
- * `unclassified` IS RETURNED RATHER THAN DROPPED. A declaration naming `02-behaviors` names a real
+ * `unclassified` IS RETURNED RATHER THAN DROPPED. A declaration naming `03-behaviors` names a real
  * seat and carries no path, so nothing here can resolve it to a file. Reporting those keeps the limit
  * visible: this check under-reports by exactly that list, and silently under-reporting is the defect
  * it exists to close.
@@ -193,7 +193,7 @@ export function namedSources(path: string): [Set<string>, Set<string>, Set<strin
  * printed green.
  *
  * A prose name matches loosely and in one direction: `05-docs/01-corpus` is covered by a declared
- * `docs/03-capabilities/05-docs/01-corpus.md`, and never the other way round.
+ * `docs/04-capabilities/01-foundation/02-docs/01-corpus.md`, and never the other way round.
  */
 export function undeclared(path: string, block: Block): string[] {
   const [documents, rows] = namedSources(path);

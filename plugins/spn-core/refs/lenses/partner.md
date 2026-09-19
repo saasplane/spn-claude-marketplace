@@ -1,25 +1,16 @@
 <!-- spn:restates
 {
   "chapters": [
-    {
-      "path": "docs/03-capabilities/02-apps/07-comments/01-intent.md",
-      "seen": "580918c6"
-    },
-    {
-      "path": "docs/03-capabilities/02-apps/08-devex-agent/README.md",
-      "seen": "c17133de"
-    },
-    {
-      "path": "docs/03-capabilities/02-apps/03-module/01-server/01-contract/01-states.md",
-      "seen": "69eba950"
-    }
+    { "path": "docs/04-capabilities/02-support/01-apps/07-comments/01-intent.md", "seen": "1ac66544" },
+    { "path": "docs/04-capabilities/02-support/01-apps/08-devex-agent/README.md", "seen": "2e5642bd" },
+    { "path": "docs/04-capabilities/02-support/01-apps/03-module/01-server/01-contract/01-states.md", "seen": "30d3b676" }
   ]
 }
 -->
 
 # Lens — `PARTNER` (Partner / integrator)
 
-**Source of truth:** the foundation book's evolution classification (`02-apps/03-module/01-server/01-contract/01-states`, "Evolution — the change classification"), the intent standard (`02-apps/07-comments/01-intent`), and the generated surface (`02-apps/08-devex-agent`). Find the review procedure in the contract-rules reference beside this file. This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
+**Source of truth:** the foundation book's evolution classification (`02-support/01-apps/03-module/01-server/01-contract/01-states`, "Evolution — the change classification"), the intent standard (`02-support/01-apps/07-comments/01-intent`), and the generated surface (`02-support/01-apps/08-devex-agent`). Find the review procedure in the contract-rules reference beside this file. This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
 
 **Worn** while writing contracts. **Convened** when the published surface changes. **Blocks:** a breaking change with no version and migration path.
 

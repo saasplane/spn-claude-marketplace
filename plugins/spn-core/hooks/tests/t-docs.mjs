@@ -1,0 +1,242 @@
+// `docs.ts` — the generated surface: the faces, the grouping, and the tag line.
+//
+// THIS SUITE EXISTS BECAUSE THE TOOL WRITES INTO EVERY DOCUMENT IN THE CORPUS. `face` renders each
+// file's tag line from its own metadata block, so a regex that is one character wrong edits eight
+// hundred files at once. Nothing here is a port, so the fixtures are the whole proof.
+//
+// Each case builds a throwaway tree, runs the real command against it, and reads what changed on
+// disk rather than what the command printed — a tool that reports a write it did not make, and one
+// that makes a write it did not report, both have to fail.
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join, resolve } from "node:path";
+import { execFileSync } from "node:child_process";
+
+const TOOL = resolve(import.meta.dirname, "..", "tools", "docs.ts");
+const BASE = mkdtempSync(join(tmpdir(), "t-docs-"));
+process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
+
+let made = 0;
+/** A repository: `sprepo.json`, `CONCEPT.md`, and a `docs/` tree, from a flat path map. */
+function repo(files, { type = "APPS" } = {}) {
+  made += 1;
+  const root = join(BASE, `r${made}`);
+  mkdirSync(root, { recursive: true });
+  writeFileSync(join(root, "sprepo.json"), JSON.stringify({ type, name: "t", config: null }));
+  for (const [path, text] of Object.entries(files)) {
+    const full = join(root, path);
+    mkdirSync(dirname(full), { recursive: true });
+    writeFileSync(full, text, "utf8");
+  }
+  return root;
+}
+
+const block = (o) => `<!-- spn:doc\n${JSON.stringify(o, null, 2)}\n-->\n`;
+
+/** A seat file, written the way an author writes one: block, title, tag line, prose. */
+const doc = (o, body = "Some prose.\n", tag = null) =>
+  block({ summary: `What ${o.title} is.`, ...o }) +
+  `\n# ${o.title}\n\n` + (tag === null ? "" : tag + "\n\n") + body;
+
+function run(root, args) {
+  try {
+    return execFileSync(process.execPath, [TOOL, ...args],
+      { encoding: "utf8", cwd: root, env: { ...process.env, SPN_WORKSPACE: root } });
+  } catch (e) { return String(e.stdout ?? "") + String(e.stderr ?? ""); }
+}
+const readAt = (root, p) => readFileSync(join(root, p), "utf8");
+
+let n = 0, failed = 0;
+function one(name, got, want) {
+  n += 1;
+  const ok = typeof want === "function" ? want(got) : got === want;
+  if (!ok) { failed += 1; console.log(`  FAIL  ${name}\n        got: ${JSON.stringify(String(got).slice(0, 220))}`); }
+  else console.log(`  PASS  ${name}`);
+}
+const has = (s) => (got) => String(got).includes(s);
+const lacks = (s) => (got) => !String(got).includes(s);
+
+
+// ---------------------------------------------------------------- the tag line
+
+console.log("=== the tag line is rendered from the block, never typed");
+{
+  const root = repo({
+    "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
+    "docs/02-constructs/README.md": doc({ id: "d", title: "Dictionary", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    "docs/02-constructs/01-core/README.md": doc({ id: "c", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    // What the whole corpus carried: the old label, and a status word that is not the enum's.
+    "docs/03-behaviors/README.md":
+      doc({ id: "b", title: "Behaviors", lenses: ["SERVER_DEV", "QA"], status: "DONE" },
+          "Prose under it.\n", "`Lenses: DevOps · everyone` · `Status: ✅ Implemented`"),
+  });
+  run(root, ["face", "docs"]);
+  const got = readAt(root, "docs/03-behaviors/README.md");
+  one("the label becomes For: and the actors come from the block",
+    got, has("`For: Backend developer · Quality engineer`"));
+  one("the status chip carries the enum word, not a synonym", got, has("`Status: ✅ DONE`"));
+  one("the blank line between the tag line and the lead paragraph survives",
+    got, has("`Status: ✅ DONE`\n\nProse under it."));
+
+  const before = readAt(root, "docs/03-behaviors/README.md");
+  run(root, ["face", "docs"]);
+  one("running it twice writes the same bytes", readAt(root, "docs/03-behaviors/README.md"), before);
+}
+
+{
+  const root = repo({
+    "CONCEPT.md": "# c\n",
+    "docs/03-behaviors/README.md":
+      doc({ id: "b", title: "Behaviors", lenses: ["QA"], status: "DONE" }, "Lead.\n"),
+  });
+  run(root, ["face", "docs"]);
+  one("a document with no tag line gets one under its title",
+    readAt(root, "docs/03-behaviors/README.md"),
+    has(`# Behaviors\n\n\`For: Quality engineer\` · \`Status: ✅ DONE\`\n\nLead.`));
+}
+
+{
+  // A chapter that teaches the document shape SHOWS one. Its example is content, not a tag line.
+  const root = repo({
+    "CONCEPT.md": "# c\n",
+    "docs/03-behaviors/README.md":
+      doc({ id: "b", title: "Behaviors", lenses: ["QA"], status: "DONE" },
+          "Lead.\n\n```text\n# An Example\n\n`For: Architect` · `Status: 🔮 PLANNING`\n```\n",
+          "`For: Quality engineer` · `Status: ✅ DONE`"),
+  });
+  run(root, ["face", "docs"]);
+  const got = readAt(root, "docs/03-behaviors/README.md");
+  one("a tag line inside a fence is content and is left alone", got, has("`For: Architect` · `Status: 🔮 PLANNING`"));
+  one("the real tag line is still the block's", got, has("`For: Quality engineer` · `Status: ✅ DONE`"));
+}
+
+
+// ---------------------------------------------------------------- the seat header check
+
+console.log("\n=== a markdown seat file is checked as a seat file, not as a page");
+{
+  const root = repo({
+    "CONCEPT.md": "# c\n",
+    "docs/a.md": doc({ id: "a", title: "A Title", lenses: ["QA"], status: "DONE" },
+                     "Lead.\n", "`For: Quality engineer` · `Status: ✅ DONE`"),
+  });
+  one("a well-formed seat file is clean — it is never asked for an HTML <header>",
+    run(root, ["audit", "docs/a.md"]), has("clean — 1 page"));
+}
+{
+  const root = repo({
+    "CONCEPT.md": "# c\n",
+    "docs/a.md": doc({ id: "a", title: "A Title", lenses: ["QA"], status: "DONE" },
+                     "Lead.\n", "`For: Architect` · `Status: ✅ DONE`"),
+  });
+  one("a lens line that disagrees with the block is a finding",
+    run(root, ["audit", "docs/a.md"]), has("which the block does not declare"));
+}
+{
+  const root = repo({
+    "CONCEPT.md": "# c\n",
+    "docs/a.md": doc({ id: "a", title: "A Title", lenses: ["QA"], status: "DONE" },
+                     "Lead.\n", "`For: Quality engineer` · `Status: 🔮 PLANNING`"),
+  });
+  one("a status chip that disagrees with the block is a finding",
+    run(root, ["audit", "docs/a.md"]), has("the block says `DONE`"));
+}
+{
+  const root = repo({
+    "CONCEPT.md": "# c\n",
+    "docs/a.md": doc({ id: "a", title: "A Title", lenses: ["QA"], status: "DONE" },
+                     "Lead.\n\n```text\n# A Second Title In A Fence\n```\n",
+                     "`For: Quality engineer` · `Status: ✅ DONE`"),
+  });
+  one("a title inside a fence is not a second title",
+    run(root, ["audit", "docs/a.md"]), has("clean — 1 page"));
+}
+
+
+// ---------------------------------------------------------------- the grouping
+
+console.log("\n=== a repository may group its domains by stage");
+const GROUPED = {
+  // The concept names the groups at `##` and the domains inside them at `###`.
+  "CONCEPT.md": "# c\n\n## SaaS Plane — Foundation   `REALIZED`\n\nWhat this stage realizes.\n\n" +
+                "### DevEx\n\nHow the function operates.\n\n### Docs\n\nHow the corpus is written.\n",
+  "docs/02-constructs/README.md": doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
+  "docs/02-constructs/01-foundation/README.md": doc({ id: "g", title: "Foundation", lenses: ["ARCHITECT"], status: "PLANNING" }),
+  "docs/02-constructs/01-foundation/01-devex/README.md": doc({ id: "dv", title: "DevEx", lenses: ["ARCHITECT"], status: "PLANNING" }),
+  "docs/02-constructs/01-foundation/02-docs/README.md": doc({ id: "dc", title: "Docs", lenses: ["ARCHITECT"], status: "PLANNING" }),
+  "docs/02-constructs/01-foundation/01-devex/agent.md":
+    doc({ id: "agent", variant: "construct", parentId: "c", dependsOn: [], title: "The Agent", lenses: ["ARCHITECT"], status: "PLANNING" }),
+};
+{
+  const root = repo(GROUPED);
+  const out = run(root, ["face", "docs"]);
+  one("a group two levels up still gets a face", out, has("02-constructs/01-foundation/README.md"));
+  one("and so does each domain under it", out, has("02-constructs/01-foundation/01-devex/README.md"));
+  one("the group's face maps its domains, read from the concept's own sections",
+    readAt(root, "docs/02-constructs/01-foundation/README.md"), has("| [devex](01-devex/README.md) |"));
+  one("the group's bridge is the concept's, not invented",
+    readAt(root, "docs/02-constructs/01-foundation/README.md"), has("What this stage realizes."));
+  one("a domain's face lists its constructs",
+    readAt(root, "docs/02-constructs/01-foundation/01-devex/README.md"), has("[The Agent](agent.md)"));
+  one("a heading the reader needs and a folder cannot hold is stripped — `SaaS Plane —`, the chip",
+    out, lacks("invariant 1"));
+}
+{
+  const root = repo({ ...GROUPED,
+    "docs/02-constructs/01-foundation/03-nobody-declared/README.md":
+      doc({ id: "x", title: "Nobody", lenses: ["ARCHITECT"], status: "PLANNING" }) });
+  one("a domain folder the concept does not name is invariant 1's finding",
+    run(root, ["face", "docs", "--check"]), has("invariant 1"));
+}
+
+
+// ---------------------------------------------------------------- what is never walked
+
+console.log("\n=== a seat's `templates/` is excluded by the folder, never per file");
+{
+  const root = repo({
+    "CONCEPT.md": "# c\n",
+    "docs/04-capabilities/01-x/01-server/README.md":
+      doc({ id: "f", title: "Face", lenses: ["SERVER_DEV"], status: "DONE" }, "Lead.\n",
+          "`For: Backend developer` · `Status: ✅ DONE`"),
+    "docs/04-capabilities/01-x/01-server/app.md":
+      doc({ id: "m", title: "App", lenses: ["SERVER_DEV"], status: "DONE" }, "Lead.\n",
+          "`For: Backend developer` · `Status: ✅ DONE`"),
+    // A template's block carries placeholders and it is a mirror of nothing.
+    "docs/04-capabilities/01-x/01-server/templates/a-template.md": "# {{NAME}}\n\nno block here.\n",
+  });
+  const out = run(root, ["face", "docs"]);
+  one("a template is never taken for a mirror", out, lacks("a-template.md"));
+  one("the real mirror still reaches the Map",
+    readAt(root, "docs/04-capabilities/01-x/01-server/README.md"), has("| [app.md](app.md) |"));
+  one("a template's own tag line is never written",
+    readAt(root, "docs/04-capabilities/01-x/01-server/templates/a-template.md"), "# {{NAME}}\n\nno block here.\n");
+}
+
+
+// ---------------------------------------------------------------- the authored seat
+
+console.log("\n=== a Map is a list of mirrors, so an authored seat has none");
+{
+  const files = {
+    "CONCEPT.md": "# c\n",
+    "docs/04-capabilities/README.md":
+      doc({ id: "f", title: "Capabilities", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
+          "`For: Architect` · `Status: ✅ DONE`"),
+    "docs/04-capabilities/01-chapter.md":
+      doc({ id: "ch", title: "A Chapter", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
+          "`For: Architect` · `Status: ✅ DONE`"),
+  };
+  const derived = repo(files);
+  run(derived, ["face", "docs"]);
+  one("where the seat is derived from source, the face carries a Map",
+    readAt(derived, "docs/04-capabilities/README.md"), has("spn:generated map"));
+
+  const authored = repo(files, { type: "FOUNDATION" });
+  run(authored, ["face", "docs"]);
+  one("where the seat is AUTHORED, no Map is invented — there is no src/ for a row to name",
+    readAt(authored, "docs/04-capabilities/README.md"), lacks("spn:generated map"));
+}
+
+console.log(failed ? `\n  ${failed} of ${n} FAILED` : `\n  all ${n} passed`);
+process.exit(failed ? 1 : 0);

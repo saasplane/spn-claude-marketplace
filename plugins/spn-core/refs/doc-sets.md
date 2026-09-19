@@ -1,21 +1,15 @@
 <!-- spn:restates
 {
   "chapters": [
-    {
-      "path": "docs/03-capabilities/05-docs/README.md",
-      "seen": "d225e8aa"
-    },
-    {
-      "path": "CONCEPT.md",
-      "seen": "23a9071e"
-    }
+    { "path": "docs/04-capabilities/01-foundation/02-docs/README.md", "seen": "171c01bc" },
+    { "path": "CONCEPT.md", "seen": "23a9071e" }
   ]
 }
 -->
 
 # Doc sets — the shape a repository carries
 
-**Source of truth:** the corpus standard (`03-capabilities/05-docs/`), with the concept's Node Docs section (`CONCEPT.md`, at the repository root) as the standing one-page view. Read this file as a restatement of those rules, adding none of its own. **The book governs**; the concept holds the last agreed idea and is updated on request, so where the three disagree the standard wins and this file is regenerated.
+**Source of truth:** the corpus standard (`04-capabilities/01-foundation/02-docs/`), with the concept's Node Docs section (`CONCEPT.md`, at the repository root) as the standing one-page view. Read this file as a restatement of those rules, adding none of its own. **The book governs**; the concept holds the last agreed idea and is updated on request, so where the three disagree the standard wins and this file is regenerated.
 
 **A repository has ONE docs tree, and it sits at the repository root.** Its seats divide by the
 domains the repository's own concept names, never by the packages it ships (decision RD.DOCS.001). A
@@ -333,7 +327,7 @@ The corpus speaks one voice (decision RD.DOCS.031, sharpened by RD.DOCS.043 and 
 **Watch a share, never a count of occurrences.** Splitting a long sentence is what this standard asks of you, and splitting dilutes a count. So the number to compare before and after is the share.
 
 **Your own instruction surface is in scope** (decision RD.DOCS.031 · RD.DOCS.043 · RD.DOCS.044, stated
-at depth in the book's `05-docs/01-corpus.md` § What the pattern binds). The voice reaches this book,
+at depth in the book's `01-foundation/02-docs/01-corpus.md` § What the pattern binds). The voice reaches this book,
 the foundation's provider set, and these plugins — your skills, lenses, agent briefs and reference
 restatements. **It also reaches what you say and print at runtime** (decision RD.DOCS.052). A session
 banner, a hook's output and your own chat reply are all held to it. Nothing you write escapes

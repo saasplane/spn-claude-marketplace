@@ -4,7 +4,7 @@ Docs are the contract; code is the implementation; tests are the proof. The chan
 
 **Before writing behavior rows or dictionary terms**, apply the **spn-core** plugin's `refs/doc-sets.md`. It carries the node grammar in full, and the node's declared kind fixes its consumer. That consumer in turn fixes the actor voice, how areas group, and which test tier proves a row. For a `MODULE_SERVER` the consumer is the composing app. Rows read *"a composing app can…"*, areas are named for capability, and proof is contract-tier with the id in the test title.
 
-**The seats are folders, numbered, at every altitude** (foundation decision RD.DOCS.008): `docs/01-purpose/` · `docs/02-behaviors/` · `docs/03-capabilities/` · `docs/04-guides/`. Each opens with the `README.md` that is its face, and the unnumbered pockets are `docs/registers/` and `docs/artifacts/`. A seat is absent only where the node cannot answer its question at all — a generated API client has no `02-behaviors/`, an app-owned module has no `04-guides/`. Never write into a `docs/capabilities.md` or a `docs/guides/getting-started.md` — if you find one, it is drift; hand it to the `plan` skill in its `docs` mode.
+**The seats are folders, numbered, at every altitude** (foundation decision RD.DOCS.008): `docs/01-purpose/` · `docs/03-behaviors/` · `docs/04-capabilities/` · `docs/05-guides/`. Each opens with the `README.md` that is its face, and the unnumbered pockets are `docs/registers/` and `docs/artifacts/`. A seat is absent only where the node cannot answer its question at all — a generated API client has no `03-behaviors/`, an app-owned module has no `05-guides/`. Never write into a `docs/capabilities.md` or a `docs/guides/getting-started.md` — if you find one, it is drift; hand it to the `plan` skill in its `docs` mode.
 
 ## Writing a seat from scratch
 
@@ -14,7 +14,7 @@ Use the tables below to close a *change*. Writing a seat that does not exist yet
 
 ### The two voices, and the line between them
 
-| | `02-behaviors/` | `03-capabilities/` |
+| | `03-behaviors/` | `04-capabilities/` |
 | --- | --- | --- |
 | Is | a **story** — an actor reaching an outcome | a **flow** — the sequence, the guard, the reason a rule exists |
 | Shape | `Title · Goal · Description · Acceptance`, and MAY carry `Attachments` | a seam entry per published thing |
@@ -56,8 +56,8 @@ Foundation decision RD.GOV.009: a document states a **status**, never a count. N
 
 | During step | The doc move |
 | --- | --- |
-| contract | New/changed states, commands, enums land in `docs/03-capabilities/` — face rows in `README.md`, terms in `data-model.md` (bilingual) (flip the plan's `🔮` to `🚧`); every `I*Service` method gets its one-line **intent comment** as it is written |
-| service | Interactions rows in `docs/03-capabilities/` (cache, queue, audit implications); permission rows if the authz surface grew |
+| contract | New/changed states, commands, enums land in `docs/04-capabilities/` — face rows in `README.md`, terms in `data-model.md` (bilingual) (flip the plan's `🔮` to `🚧`); every `I*Service` method gets its one-line **intent comment** as it is written |
+| service | Interactions rows in `docs/04-capabilities/` (cache, queue, audit implications); permission rows if the authz surface grew |
 | entry | Nothing extra — routes are generated surface (OpenAPI), never hand-documented |
 | ui | Component intent comments; the UI package's behaviors cite the domain ids they realize |
 | test | Behavior rows gain their proof; contract-tier test titles embed the behavior id (`<MOD>.<CAP>.<NN>`) |
@@ -66,15 +66,15 @@ Foundation decision RD.GOV.009: a document states a **status**, never a count. N
 
 | Seat or pocket | Close it by |
 | --- | --- |
-| `docs/02-behaviors/README.md` | Flip implemented rows `🔮/🚧 → ✅` in the face — only where the proof test exists; a row with no test stays 🚧. Where the face maps area files, the story in `01-<area>.md` moves with it |
-| `docs/03-capabilities/` | Face + `data-model.md` terms current with the code, **and the code mirror for every `src/` seat the node's kind mirrors** — `contract.md` · `app.md` · `entry.md` for a `MODULE_SERVER`, the `ui` seat expanded for a `MODULE_WEB`. A seat that gained or lost a folder gains or loses its mirror in the same change |
-| `docs/04-guides/README.md` | Only if install, mount, or configuration changed — this face **is** the getting-started, and it is written for a reader with no checkout of this repo. If it is generated, edit only inside `<!-- spnutils:keep:begin -->` / `<!-- spnutils:keep:end -->` (foundation decision RD.DOCS.009) |
+| `docs/03-behaviors/README.md` | Flip implemented rows `🔮/🚧 → ✅` in the face — only where the proof test exists; a row with no test stays 🚧. Where the face maps area files, the story in `01-<area>.md` moves with it |
+| `docs/04-capabilities/` | Face + `data-model.md` terms current with the code, **and the code mirror for every `src/` seat the node's kind mirrors** — `contract.md` · `app.md` · `entry.md` for a `MODULE_SERVER`, the `ui` seat expanded for a `MODULE_WEB`. A seat that gained or lost a folder gains or loses its mirror in the same change |
+| `docs/05-guides/README.md` | Only if install, mount, or configuration changed — this face **is** the getting-started, and it is written for a reader with no checkout of this repo. If it is generated, edit only inside `<!-- spnutils:keep:begin -->` / `<!-- spnutils:keep:end -->` (foundation decision RD.DOCS.009) |
 | `docs/01-purpose/README.md` | Only if the module's boundary itself shifted |
 | `docs/artifacts/resources/schema.sql` | Any entity/column/index change landed here **first** (or simultaneously), ported **verbatim** into `src/migrations/` — spec and migrations must never disagree |
 | `docs/README.md` | The node doc — only if the doc map or the node's identity changed |
 | `README.md` (package root) | The npm front door, not the node doc and not a mirror — only if identity, install, or key exports changed |
-| App-owned modules | The same seats **minus `04-guides/`**, inside `src/modules/<mod>/docs/` (UI under its `ui/` code seat) — the module is never adopted on its own, so wiring, composition, and running it all land in the **host app's** `docs/04-guides/`, which you update when the registration entry or what it commits the host to changed |
-| Workspace `docs/` | `03-capabilities/` for structure changes; `02-behaviors/` for new workspace-level abilities; `registers/conformance.md` when a requirement's status moves — same PR |
+| App-owned modules | The same seats **minus `05-guides/`**, inside `src/modules/<mod>/docs/` (UI under its `ui/` code seat) — the module is never adopted on its own, so wiring, composition, and running it all land in the **host app's** `docs/05-guides/`, which you update when the registration entry or what it commits the host to changed |
+| Workspace `docs/` | `04-capabilities/` for structure changes; `03-behaviors/` for new workspace-level abilities; `registers/conformance.md` when a requirement's status moves — same PR |
 
 Rules:
 
@@ -86,7 +86,7 @@ Rules:
 
 ## Env documentation
 
-A new module env variable (`{CODE}_{MOD}_*`) is documented where it lives: the module's `docs/03-capabilities/data-model.md` env terms (depth in `docs/04-guides/README.md`). It is also documented in the app's `envs/local.env`, under the module's banner comment. Committed env files carry **no secret values** — secrets appear empty with a required-in-shell annotation. Keep the env file's header key list in sync with what migrations actually read.
+A new module env variable (`{CODE}_{MOD}_*`) is documented where it lives: the module's `docs/04-capabilities/data-model.md` env terms (depth in `docs/05-guides/README.md`). It is also documented in the app's `envs/local.env`, under the module's banner comment. Committed env files carry **no secret values** — secrets appear empty with a required-in-shell annotation. Keep the env file's header key list in sync with what migrations actually read.
 
 ### Where a key goes — one order, in every env file
 
@@ -112,4 +112,4 @@ Anything the docs claim must match what runs: ✅ implemented = running reality,
 
 ## Contract-visible changes
 
-If the public contract surface changed, the generated artifacts already carry the truth (validators, OpenAPI, API client). The contract-surface rows in `docs/03-capabilities/` are the human projection of the same change. Update them in the same PR — the version-coupling rule: the spec changes in the same PR as the API it describes. **Do not hand-write a sample of the new call anywhere** (foundation decision RD.DOCS.011). The generated client and the contract tests are the worked example, and a prose copy of a payload is stale the first time a field moves.
+If the public contract surface changed, the generated artifacts already carry the truth (validators, OpenAPI, API client). The contract-surface rows in `docs/04-capabilities/` are the human projection of the same change. Update them in the same PR — the version-coupling rule: the spec changes in the same PR as the API it describes. **Do not hand-write a sample of the new call anywhere** (foundation decision RD.DOCS.011). The generated client and the contract tests are the worked example, and a prose copy of a payload is stale the first time a field moves.

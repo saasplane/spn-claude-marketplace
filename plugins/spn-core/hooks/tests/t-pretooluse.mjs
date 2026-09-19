@@ -80,7 +80,7 @@ one("env-seat's refusal survives the chain",
 // same purpose. A case whose fixture stops being a finding goes green while proving nothing.
 one("doc-check's finding survives the chain",
   { tool_name: "Write", tool_input: {
-    file_path: `${WORKSPACE}/spn-foundation/docs/03-capabilities/05-docs/probe.md`,
+    file_path: `${WORKSPACE}/spn-foundation/docs/04-capabilities/01-foundation/02-docs/probe.md`,
     content: "# A chapter\n\nYou will find five decisions here. You read each one and you move on.\n" } },
   "note", { says: "cardinality-in-prose" });
 
@@ -122,9 +122,12 @@ one("generated build output is refused too",
   // STEP 7 — the mirror nudge, reached through the chain. It is not a port, so there is nothing to
   // compare against: the Python dispatcher never carried it.
   const root = workspace("dispatch-mirror", {
-    "pkg/docs/03-capabilities/README.md":
+    // The face lives once, in the repository's tree; the node's README is what reaches it.
+    "docs/04-capabilities/01-domain/01-server/README.md":
       "# Capabilities\n\n## Map\n\n| File | Governs | Carries | Status |\n| --- | --- | --- | --- |\n" +
       "| [app.md](app.md) | [`src/app/`](../../src/app) | the seams | \u2705 |\n",
+    "pkg/README.md":
+      "# pkg\n\nIts capability face is [the server layer](../docs/04-capabilities/01-domain/01-server/README.md).\n",
     "pkg/src/app/Service.ts": "export const x = 1;\n",
   });
   one("the mirror nudge reaches the turn through the dispatcher",

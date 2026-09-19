@@ -6,7 +6,7 @@ description: The repository and project standard - what a project must declare, 
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/README.md", "seen": "6f6df52d" }
+    { "path": "docs/README.md", "seen": "fa7f9251" }
   ]
 }
 -->
@@ -14,7 +14,7 @@ description: The repository and project standard - what a project must declare, 
 
 # scm — one declaration decides the rest
 
-**Every node declares exactly one kind, in `spkind.json` at its root, and everything derivable from that kind is never declared again.** Runtime, toolchain profile, structure, packaging, and whether the project publishes at all — all follow. A node without a kind is unfinished; a node that restates what its kind already implies has introduced a second source of truth. A folder with `spkind.json` and `docs/` **is** a node — which is how a module living inside an app is validated and scaffolded exactly like the packaged form.
+**Every node declares exactly one kind, in `spkind.json` at its root, and everything derivable from that kind is never declared again.** Runtime, toolchain profile, structure, packaging, and whether the project publishes at all — all follow. A node without a kind is unfinished; a node that restates what its kind already implies has introduced a second source of truth. A folder with `spkind.json` **is** a node — which is how a module living inside an app is validated and scaffolded exactly like the packaged form. **A node carries `README.md` and no docs tree**: the seats live once, in the repository's own tree, and the node's README links into the ones it realizes.
 
 ## The kind decides, and it decides once
 

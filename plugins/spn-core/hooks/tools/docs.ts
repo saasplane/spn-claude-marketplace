@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: spn-foundation docs/03-capabilities/05-docs/03-tree.md · 05-artifacts.md · 02-document.md
+// RESTATES: spn-foundation docs/04-capabilities/01-foundation/02-docs/03-tree.md · 05-artifacts.md · 02-document.md
 // This file carries rules it does not own. Those chapters are the source of truth. A rule change is
 // edited there first, then here, in the same change. restates.py reports this copy when a source moves.
 //
@@ -148,10 +148,105 @@ function checkOutline(file: string, src: string, block: any): Finding[] {
   return f;
 }
 
+/**
+ * A markdown seat file's header: the one `# ` title, and the lens and status line under it.
+ *
+ * Both are DERIVED from the metadata block, so the check is that they agree with it rather than
+ * that they are present in some shape — a title that drifts from its block is the defect, and a
+ * status word that drifts from it is how a face comes to claim what its area files deny.
+ */
+/**
+ * The document with every fenced block blanked out, offsets preserved.
+ *
+ * A chapter that teaches the document shape SHOWS one, so its example carries a `#` title and a tag
+ * line of its own. Scanning the raw text finds two titles in a document that has one.
+ */
+function outsideFences(src: string): string {
+  return src.replace(/^(```|~~~)[^\n]*\n[\s\S]*?^\1[^\n]*$/gm, (m) => m.replace(/[^\n]/g, " "));
+}
+
+/** The status chip: the icon is the rendering and the word is the value (02-document.md). */
+function tagStatus(status: string): string {
+  const icon: Record<string, string> = { DONE: "✅", IMPLEMENTING: "🚧", PLANNING: "🔮" };
+  return `${icon[status] ?? "🔮"} ${STATUS_WORD[status] ?? "PLANNING"}`;
+}
+
+/** The tag line a document's block renders to, in the fixed order. */
+function tagLine(block: any): string {
+  const actors = (block.lenses ?? []).map((l: string) => LENS_LABEL[l]).filter(Boolean).join(" · ");
+  return `\`For: ${actors}\` · \`Status: ${tagStatus(block.status)}\``;
+}
+
+/**
+ * The tag line is RENDERED FROM THE BLOCK, NEVER TYPED (02-document.md, *The tag line*), so it is
+ * written here beside the faces rather than corrected file by file. It is the one generated thing
+ * that lives in every document rather than between markers in a few, which is why it carries no
+ * markers: the whole line is the generated region.
+ */
+function writeTagLines(tree: string, write: boolean): { touched: string[]; findings: Finding[] } {
+  const findings: Finding[] = [];
+  const touched: string[] = [];
+  for (const file of walkFiles(tree, (p) => p.endsWith(".md"))) {
+    const before = readFileSync(file, "utf8");
+    const { block } = readBlock(before);
+    if (!block || !block.lenses?.length || !(block.status in STATUS_WORD)) continue;
+    const want = tagLine(block);
+    const bare = outsideFences(before);
+    const TAG = /^`(?:For|Lenses):[^`\n]*`[ \t]*·[ \t]*`Status:[^`\n]*`[ \t]*$/m;
+
+    let after: string;
+    const at = bare.match(TAG);
+    if (at) {
+      after = before.slice(0, at.index!) + want + before.slice(at.index! + at[0].length);
+    } else {
+      const h1 = [...bare.matchAll(/^#\s+.+$/gm)];
+      if (h1.length !== 1) {
+        findings.push({ check: "face", grade: "SOFT", file, message: "no tag line and no single `#` title to render one under" });
+        continue;
+      }
+      const at = h1[0].index! + h1[0][0].length;
+      after = before.slice(0, at) + `\n\n${want}` + before.slice(at);
+    }
+    if (after !== before) { if (write) writeFileSync(file, after); touched.push(relative(tree, file)); }
+  }
+  return { touched, findings };
+}
+
+function checkSeatHeader(file: string, src: string, block: any): Finding[] {
+  const f: Finding[] = [];
+  const add = (grade: Grade, message: string) => f.push({ check: "header", grade, file, message });
+
+  const bare = outsideFences(src);
+  const h1 = [...bare.matchAll(/^#\s+(.+)$/gm)].map((m) => text(m[1]));
+  if (h1.length !== 1) add("RULE", `${h1.length} \`#\` title${h1.length === 1 ? "" : "s"}; a document has exactly one`);
+  else if (h1[0] !== text(block.title)) add("RULE", `the title \`${h1[0]}\` is not the block's \`${block.title}\``);
+
+  const rule = bare.match(/^`For:\s*([^`]*)`\s*·\s*`Status:\s*([^`]*)`/m);
+  if (!rule) { add("RULE", "no `For: … · Status: …` line — every seat file carries one under its title, rendered from its block"); return f; }
+
+  const want = (block.lenses ?? []).map((l: string) => LENS_LABEL[l]).filter(Boolean);
+  const got = rule[1].split("·").map((x) => x.trim()).filter(Boolean);
+  const missing = want.filter((w: string) => !got.includes(w));
+  const extra = got.filter((g) => !want.includes(g));
+  if (missing.length) add("RULE", `the lens line does not carry ${missing.join(" · ")}, which the block declares`);
+  if (extra.length) add("RULE", `the lens line carries ${extra.join(" · ")}, which the block does not declare`);
+
+  if (rule[2].trim() !== tagStatus(block.status))
+    add("RULE", `the status chip reads \`${rule[2].trim()}\`; the block says \`${block.status}\``);
+  return f;
+}
+
 function checkHeader(file: string, src: string, block: any): Finding[] {
   const f: Finding[] = [];
   const add = (grade: Grade, message: string) => f.push({ check: "header", grade, file, message });
   if (!block) return f;
+
+  // A seat file and a page wear the same six fields in different clothes. The page's two-line
+  // `<header>` is the artifacts chapter's; a markdown seat file opens with its `# ` title and the
+  // one-line `Lenses: … · Status: …` rule under it. Checking a seat file for a `<header>` element
+  // reports every markdown document in the corpus as malformed, which is what it was doing.
+  if (!file.endsWith(".html")) return checkSeatHeader(file, src, block);
+
   const head = src.match(/<header[\s\S]*?<\/header>/);
   if (!head) { add("RULE", "no `<header>` — every page opens with the two-line header"); return f; }
   const h = head[0];
@@ -488,6 +583,10 @@ function walkFiles(dir: string, keep: (p: string) => boolean, out: string[] = []
   let entries: string[]; try { entries = readdirSync(dir); } catch { return out; }
   for (const e of entries) {
     if (e === "node_modules" || e === ".git" || e === "dist") continue;
+    // `templates/` is excluded BY THE FOLDER rather than per file (03-tree.md, *A seat may carry
+    // `templates/`*). A template's block carries placeholders, it sits in no reading order, and it
+    // is never a mirror of anything — so no walk of a seat may pick one up as a document.
+    if (e === "templates") continue;
     const p = join(dir, e);
     let st; try { st = statSync(p); } catch { continue; }
     if (st.isDirectory()) walkFiles(p, keep, out);
@@ -565,15 +664,38 @@ function conceptSections(concept: string): Map<string, { bridge: string; lines: 
   const out = new Map<string, { bridge: string; lines: string[] }>();
   const lines = readFileSync(concept, "utf8").split("\n");
   let name: string | null = null, bridge: string[] = [], items: string[] = [];
-  const flush = () => { if (name) out.set(name, { bridge: bridge.join(" ").trim(), lines: items }); };
+  const flush = () => { if (name && !out.has(name)) out.set(name, { bridge: bridge.join(" ").trim(), lines: items }); };
   for (const l of lines) {
-    if (/^##\s/.test(l)) { flush(); name = l.replace(/^##\s*/, "").trim(); bridge = []; items = []; continue; }
+    // A group is named by a `##` section and a domain inside it by a `###` one, so both are read.
+    // A repository that groups by stage names the group once and each domain once, at two depths.
+    if (/^###?\s/.test(l)) { flush(); name = sectionKey(l.replace(/^###?\s*/, "")); bridge = []; items = []; continue; }
     if (name === null) continue;
     if (/^[-*]\s/.test(l)) { items.push(l.replace(/^[-*]\s*/, "")); continue; }
     if (l.trim() && !items.length) bridge.push(l.trim());
   }
   flush();
   return out;
+}
+
+/**
+ * The comparable name of a concept heading.
+ *
+ * A heading is written for a reader — `## SaaS Plane — Foundation`, `### Data & Trust` — and a
+ * folder is written for a path. This strips what only the reader needs: the book's own name, the
+ * status chip a concept section carries, and the punctuation a folder cannot hold.
+ */
+function sectionKey(heading: string): string {
+  return heading
+    .replace(/`[^`]*`/g, "")
+    .replace(/^SaaS Plane\s*[—–-]\s*/i, "")
+    .replace(/\s*&\s*/g, "-and-")
+    .trim().toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
+/** The folder name a domain or group folder carries, with its reading-order prefix stripped. */
+function folderKey(folder: string): string {
+  return folder.replace(/^\d+-/, "").toLowerCase();
 }
 
 /** Constructs in an order no construct precedes one it depends on. */
@@ -591,50 +713,95 @@ function readingOrder(constructs: { id: string; title: string; summary: string; 
   return out;
 }
 
+/** Every folder under the constructs seat, deepest last — each one carries a face. */
+function constructFolders(root: string): string[] {
+  const out: string[] = [];
+  const walk = (dir: string) => {
+    let entries: string[];
+    try { entries = readdirSync(dir); } catch { return; }
+    for (const e of entries) {
+      const p = join(dir, e);
+      if (!statSync(p).isDirectory()) continue;
+      out.push(p);
+      walk(p);
+    }
+  };
+  walk(root);
+  return out;
+}
+
+/**
+ * A group holds domains and never constructs of its own.
+ *
+ * That is the tree chapter's grouping rule read as a test rather than as a convention: *a group
+ * holding one domain IS that domain's folder*, so a folder carrying a construct file is the thing
+ * itself and never a level above it.
+ */
+function isGroup(dir: string): boolean {
+  try {
+    return !readdirSync(dir).some((e) => e.endsWith(".md") && e !== "README.md");
+  } catch { return false; }
+}
+
 function domainFaces(tree: string, concept: string | null): { faces: Map<string, string>; concept: string | null; findings: Finding[] } {
   const findings: Finding[] = [];
   const faces = new Map<string, string>();
   const sections = concept ? conceptSections(concept) : new Map();
 
   const constructsDir = join(tree, "02-constructs");
-  const domains = (() => { try { return readdirSync(constructsDir).filter((d) => statSync(join(constructsDir, d)).isDirectory()); } catch { return []; } })();
+  const folders = constructFolders(constructsDir);
 
-  const all: { id: string; title: string; summary: string; deps: string[]; file: string; domain: string }[] = [];
-  for (const d of domains) {
-    for (const f of walkFiles(join(constructsDir, d), (p) => p.endsWith(".md") && basename(p) !== "README.md")) {
+  type Construct = { id: string; title: string; summary: string; deps: string[]; file: string };
+  const constructsUnder = (dir: string): Construct[] => {
+    const out: Construct[] = [];
+    for (const f of walkFiles(dir, (p) => p.endsWith(".md") && basename(p) !== "README.md")) {
       const { block } = readBlock(readFileSync(f, "utf8"));
       if (!block) continue;
-      all.push({ id: block.id, title: block.title, summary: block.summary, deps: block.dependsOn ?? [], file: f, domain: d });
+      out.push({ id: block.id, title: block.title, summary: block.summary, deps: block.dependsOn ?? [], file: f });
     }
-  }
+    return out;
+  };
 
-  for (const d of domains) {
-    const mine = readingOrder(all.filter((c) => c.domain === d));
-    // The concept names the group; a domain folder the concept does not name is invariant 1's finding.
-    const label = d.replace(/^\d+-/, "");
-    const key = [...sections.keys()].find((k) => k.toLowerCase() === label.toLowerCase());
-    if (!key && concept) findings.push({ check: "face", grade: "RULE", file: join(constructsDir, d), message: `the concept names no section \`${label}\`, and a domain folder exists only where the concept names that domain (invariant 1)` });
+  /** The concept section a folder is named by, or null where the concept names no such thing. */
+  const named = (dir: string): string | null => {
+    const key = folderKey(basename(dir));
+    return [...sections.keys()].find((k) => k === key) ?? null;
+  };
+
+  for (const dir of folders) {
+    const depth = relative(constructsDir, dir).split("/").length;
+    const key = named(dir);
+
+    // Invariant 1 asks the concept, and it asks it of a DOMAIN. A group is depth 1 and a domain is
+    // depth 1 flat or depth 2 grouped; anything deeper is a level, which organizes an argument and
+    // is named by its author rather than by the concept.
+    const isDomainOrGroup = depth === 1 || (depth === 2 && isGroup(dirname(dir)));
+    if (!key && concept && isDomainOrGroup) {
+      findings.push({ check: "face", grade: "RULE", file: dir, message: `the concept names no section \`${folderKey(basename(dir))}\`, and a domain folder exists only where the concept names that domain (invariant 1)` });
+    }
+
     const bridge = key ? sections.get(key)!.bridge : "";
-    const body = [bridge, "", "| Construct | What it is |", "| --- | --- |",
-      ...mine.map((c) => `| [${c.title}](${relative(join(constructsDir, d), c.file)}) | ${c.summary} |`)]
-      .filter((l, i) => !(i === 0 && !l)).join("\n");
-    faces.set(join(constructsDir, d, "README.md"), body);
+
+    // A group's face maps the domains under it; a domain's face lists its constructs in order.
+    const body = isGroup(dir)
+      ? [bridge, "", "| Domain | What it holds |", "| --- | --- |",
+         ...readdirSync(dir).filter((e) => { try { return statSync(join(dir, e)).isDirectory(); } catch { return false; } }).sort()
+           .map((e) => { const k = named(join(dir, e)); return `| [${k ?? folderKey(e)}](${e}/README.md) | ${k ? sections.get(k)!.bridge.split(". ")[0] : "—"} |`; })]
+      : [bridge, "", "| Construct | What it is |", "| --- | --- |",
+         ...readingOrder(constructsUnder(dir)).map((c) => `| [${c.title}](${relative(dir, c.file)}) | ${c.summary} |`)];
+
+    faces.set(join(dir, "README.md"), body.filter((l, i) => !(i === 0 && !l)).join("\n"));
   }
 
-  // The concept's own line per construct, from each summary.
+  // The concept's own line per construct, filed under the domain folder that holds it.
   let conceptBody: string | null = null;
   if (concept) {
-    // The concept names the group, so the heading is its own section name and never the folder slug.
-    const byDomain = new Map<string, typeof all>();
-    for (const c of all) {
-      const label = c.domain.replace(/^\d+-/, "");
-      const k = [...sections.keys()].find((x) => x.toLowerCase() === label.toLowerCase()) ?? label;
-      byDomain.set(k, [...(byDomain.get(k) ?? []), c]);
-    }
     const out: string[] = [];
-    for (const [k, cs] of [...byDomain].sort()) {
-      out.push(`**${k}**`, "");
-      for (const c of readingOrder(cs)) out.push(`- **${c.title}** — ${c.summary}`);
+    for (const dir of folders.filter((d) => !isGroup(d)).sort()) {
+      const mine = constructsUnder(dir);
+      if (!mine.length) continue;
+      out.push(`**${named(dir) ?? folderKey(basename(dir))}**`, "");
+      for (const c of readingOrder(mine)) out.push(`- **${c.title}** — ${c.summary}`);
       out.push("");
     }
     conceptBody = out.join("\n").trimEnd();
@@ -673,7 +840,16 @@ function face(tree: string, write: boolean): Finding[] {
     if (after !== before) { if (write) writeFileSync(conceptFile, after); touched.push(relative(tree, conceptFile)); }
   }
 
-  for (const faceFile of walkFiles(join(tree, "04-capabilities"), (p) => basename(p) === "README.md")) {
+  // A Map is a list of MIRRORS, and a mirror is named for the source folder it governs. Where a
+  // repository's capabilities seat is AUTHORED rather than derived — the foundation book, and only
+  // it (03-tree.md, *Number what is ordered*) — there is no source folder for a row to name, and
+  // generating one invents a `src/` the repository does not have.
+  const authored = (() => {
+    try { return JSON.parse(readFileSync(join(tree, "..", "sprepo.json"), "utf8")).type === "FOUNDATION"; }
+    catch { return false; }
+  })();
+
+  for (const faceFile of authored ? [] : walkFiles(join(tree, "04-capabilities"), (p) => basename(p) === "README.md")) {
     const { body, findings: mf } = buildMap(faceFile);
     findings.push(...mf);
     const before = readFileSync(faceFile, "utf8");
@@ -681,9 +857,15 @@ function face(tree: string, write: boolean): Finding[] {
     if (after !== before) { if (write) writeFileSync(faceFile, after); touched.push(relative(tree, faceFile)); }
   }
 
+  const tags = writeTagLines(tree, write);
+  findings.push(...tags.findings);
+
   console.log(touched.length
     ? `${write ? "wrote" : "would write"} ${touched.length} face${touched.length > 1 ? "s" : ""}:\n  ${touched.join("\n  ")}`
     : "every face is already current");
+  console.log(tags.touched.length
+    ? `${write ? "wrote" : "would write"} ${tags.touched.length} tag line${tags.touched.length > 1 ? "s" : ""}`
+    : "every tag line is already rendered from its block");
   return findings;
 }
 
@@ -827,7 +1009,7 @@ function audit(paths: string[], workspace: string): Finding[] {
   const blocks = new Map<string, any>();
   const nodes = nodeIndex(workspace);
   const templates = process.env.SPN_TEMPLATES
-    ?? join(workspace, "spn-foundation", "docs", "03-capabilities", "05-docs", "templates");
+    ?? join(workspace, "spn-foundation", "docs", "04-capabilities", "01-foundation", "02-docs", "templates");
   for (const p of paths) {
     const src = readFileSync(p, "utf8");
     const { block, error } = readBlock(src);
@@ -904,7 +1086,7 @@ if (cmd === "status") {
 
 if (cmd === "page") {
   const templates = process.env.SPN_TEMPLATES
-    ?? join(resolve(workspace), "spn-foundation", "docs", "03-capabilities", "05-docs", "templates");
+    ?? join(resolve(workspace), "spn-foundation", "docs", "04-capabilities", "01-foundation", "02-docs", "templates");
   const check = rest.includes("--check");
   const seats = rest.filter((r) => !r.startsWith("--")).map((p) => resolve(p));
   const f = seats.flatMap((p) => pageFor(p, resolve(workspace), templates, !check));

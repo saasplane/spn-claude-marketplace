@@ -92,7 +92,7 @@ A kind whose `config` is `null` — `TOOLCHAIN`, `SUPPORT_*`, `CLIENT_API` — *
 ```
 
 - **The seats are folders, always, and every folder carries a `README.md`** — pockets included. Never a `purpose.md`, `capabilities.md`, `behaviors.md`, or `guides/getting-started.md` file: a seat holding nothing but its face is the compact state, not a defect.
-- **A seat is absent only when the node cannot answer its question at all**, and the node doc says so. Exactly two cases. `CLIENT_API` carries no `02-behaviors/`, because it is proven by the contract tests of the service that generated it. An **app-module** carries no `04-guides/`, because it ships inside its host and the host's guide covers running it.
+- **A seat is absent only when the node cannot answer its question at all**, and the node doc says so. Exactly two cases. `CLIENT_API` carries no `03-behaviors/`, because it is proven by the contract tests of the service that generated it. An **app-module** carries no `05-guides/`, because it ships inside its host and the host's guide covers running it.
 - **New seats start `🔮`/`🚧`, never `✅`** — a status claims running reality, and nothing runs yet.
 
 ## Target: app-module

@@ -1,14 +1,8 @@
 <!-- spn:restates
 {
   "chapters": [
-    {
-      "path": "docs/03-capabilities/04-devex/11-workspace.md",
-      "seen": "4e3fb7a2"
-    },
-    {
-      "path": "docs/03-capabilities/05-docs/05-artifacts.md",
-      "seen": "4f58eb45"
-    }
+    { "path": "docs/04-capabilities/01-foundation/01-devex/11-workspace.md", "seen": "fad27f84" },
+    { "path": "docs/04-capabilities/01-foundation/02-docs/05-artifacts.md", "seen": "b63bce9e" }
   ]
 }
 -->
@@ -16,7 +10,7 @@
 
 How a session decides what to do: the states a workstream moves through, what each one writes before
 it moves on, and the order anything unreviewed is taken in. Stack-agnostic. Source of truth: the
-foundation's `03-capabilities/04-devex/11-workspace.md` and `05-docs/05-artifacts.md`.
+foundation's `04-capabilities/01-foundation/01-devex/11-workspace.md` and `01-foundation/02-docs/05-artifacts.md`.
 
 ## The four inputs a session opens on
 

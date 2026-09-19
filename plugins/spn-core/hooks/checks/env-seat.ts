@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: spn-foundation docs/03-capabilities/04-devex § the machine seat — a value in `~/.spnenv`
+// RESTATES: spn-foundation docs/04-capabilities/01-foundation/01-devex § the machine seat — a value in `~/.spnenv`
 // is never printed or logged. The chapter is the source of truth; a rule change is edited there
 // first, then here, in the same change.
 //

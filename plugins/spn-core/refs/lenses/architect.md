@@ -1,29 +1,17 @@
 <!-- spn:restates
 {
   "chapters": [
-    {
-      "path": "docs/03-capabilities/02-apps/01-shape/README.md",
-      "seen": "a0c9deae"
-    },
-    {
-      "path": "docs/03-capabilities/data-model.md",
-      "seen": "da4fc0fd"
-    },
-    {
-      "path": "docs/03-capabilities/01-saas/README.md",
-      "seen": "aa893ec8"
-    },
-    {
-      "path": "docs/03-capabilities/02-apps/03-module/README.md",
-      "seen": "65d1bc35"
-    }
+    { "path": "docs/04-capabilities/02-support/01-apps/01-shape/README.md", "seen": "e48e628b" },
+    { "path": "docs/04-capabilities/data-model.md", "seen": "42ebf62b" },
+    { "path": "docs/04-capabilities/03-platform/README.md", "seen": "f46a3a12" },
+    { "path": "docs/04-capabilities/02-support/01-apps/03-module/README.md", "seen": "93a1cb31" }
   ]
 }
 -->
 
 # Lens — `ARCHITECT` (Architect)
 
-**Source of truth:** the foundation book's saas model (`01-saas`), and the shape and module groups (`02-apps/01-shape` · `03-module`). Also the contract states standard including its evolution classification, and the dictionary grammar (`data-model.md`, capability column). This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
+**Source of truth:** the foundation book's saas model (`03-platform`), and the shape and module groups (`02-support/01-apps/01-shape` · `03-module`). Also the contract states standard including its evolution classification, and the dictionary grammar (`data-model.md`, capability column). This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
 
 **Worn** while designing. **Convened** when a module boundary moves, and over any design before its rows land. **Blocks:** a new mechanism reachable from more than one module, with no decision entry naming what it was weighed against. Below that threshold it advises, and flags anything that needs a decision entry.
 

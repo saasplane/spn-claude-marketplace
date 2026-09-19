@@ -36,7 +36,7 @@ The TypeScript standards, as this skill carries them. **Treat this restatement a
 
 ## Docs coupling (both modes)
 
-A change to a module's contract surface, schema, permissions, errors, or env with **no delta in its doc set** is a **should-fix**. That doc set is `docs/03-capabilities/README.md` or its `data-model.md`, `docs/02-behaviors/README.md`, and `docs/artifacts/resources/schema.sql`. The doc set changes in the same PR as the API it describes. New `I*Service` methods or exported components without a one-line intent comment: should-fix (foundation decision RD.APPS.006). A behavior row flipped to ✅ without a citable test: blocking (statuses never claim what the code doesn't back).
+A change to a module's contract surface, schema, permissions, errors, or env with **no delta in its doc set** is a **should-fix**. That doc set is `docs/04-capabilities/README.md` or its `data-model.md`, `docs/03-behaviors/README.md`, and `docs/artifacts/resources/schema.sql`. The doc set changes in the same PR as the API it describes. New `I*Service` methods or exported components without a one-line intent comment: should-fix (foundation decision RD.APPS.006). A behavior row flipped to ✅ without a citable test: blocking (statuses never claim what the code doesn't back).
 
 ## Lenses
 

@@ -13,7 +13,7 @@ THE BLOCK
     {
       "chapters": [
         { "path": "CONCEPT.md", "section": "Kind Tests", "seen": "3f9c1e7a" },
-        { "path": "docs/03-capabilities/02-apps/06-tests/README.md", "seen": "b204d81c" }
+        { "path": "docs/04-capabilities/02-support/01-apps/06-tests/README.md", "seen": "b204d81c" }
       ],
       "rows": ["RD.APPS.086"]
     }
@@ -37,7 +37,7 @@ that by reading, and no run could have.
 
 So `check()` now reads the file's own `Source of truth:` line and compares it against the block.
 **The comparison is loose in one direction only.** Prose says `05-docs/01-corpus` where the block
-says `docs/03-capabilities/05-docs/01-corpus.md`, so a prose name counts as declared when some
+says `docs/04-capabilities/01-foundation/02-docs/01-corpus.md`, so a prose name counts as declared when some
 declared path contains it. **What it cannot classify it reports rather than drops** — see
 `named_sources`, because an under-report here is the very defect this change closes.
 """
@@ -126,7 +126,7 @@ def declares_a_source(path):
 
 
 # A prose citation names a chapter the way a person would — `05-docs/01-corpus`, `CONCEPT.md`,
-# `docs/03-capabilities/02-apps/06-tests/README.md`. A token counts as naming a document when it
+# `docs/04-capabilities/02-support/01-apps/06-tests/README.md`. A token counts as naming a document when it
 # carries a path separator or a markdown extension.
 PROSE_PATH = re.compile(r"`([^`]+)`")
 # Names that appear inside a declaration and are NOT documents: the repository holding the book,
@@ -158,7 +158,7 @@ def named_sources(path):
     The declaration line is the only place read. A path elsewhere in the file is an example or a
     cross-reference, and reading those would report a file for every path it mentions.
 
-    **`unclassified` is returned rather than dropped.** A declaration naming `02-behaviors` names
+    **`unclassified` is returned rather than dropped.** A declaration naming `03-behaviors` names
     a real seat and carries no path, so nothing here can resolve it to a file. Reporting those
     keeps the limit visible: this check under-reports by exactly that list, and silently
     under-reporting is the defect it exists to close.
@@ -189,7 +189,7 @@ def undeclared(path, block):
     moved, and both gates printed green.
 
     A prose name matches loosely and in one direction: `05-docs/01-corpus` is covered by a
-    declared `docs/03-capabilities/05-docs/01-corpus.md`, and never the other way round.
+    declared `docs/04-capabilities/01-foundation/02-docs/01-corpus.md`, and never the other way round.
     """
     documents, rows, _ = named_sources(path)
     declared = [str(c.get("path", "")).lower() for c in block.get("chapters", []) if isinstance(c, dict)]

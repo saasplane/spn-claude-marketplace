@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// RESTATES: spn-foundation docs/03-capabilities/05-docs/05-artifacts.md § The approach document
-//           docs/03-capabilities/04-devex/11-workspace.md § The workstream · the documents-first gate · the close gate
+// RESTATES: spn-foundation docs/04-capabilities/01-foundation/02-docs/05-artifacts.md § The approach document
+//           docs/04-capabilities/01-foundation/01-devex/11-workspace.md § The workstream · the documents-first gate · the close gate
 // The chapters are the source of truth. A rule change is edited there first, then here, in the same change.
 //
 // The two gates a workstream's split plan carries, and the parser both read it with. This script

@@ -6,7 +6,7 @@
 // in a folder already named.
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, relative, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
 
 const HOOKS = resolve(import.meta.dirname, "..");
@@ -24,6 +24,15 @@ function tree(files) {
     writeFileSync(full, text, "utf8");
   }
   mkdirSync(join(root, ".spndevex"), { recursive: true });
+  // A node carries `README.md` and no docs tree, and that README is what links into the seats it
+  // realizes. It is the only thing that knows which domain and layer this node's mirrors sit under,
+  // so every fixture with a face gets the node README that reaches it.
+  if (Object.keys(files).some((f) => f === FACE)) {
+    const link = relative("pkg", FACE).split("\\").join("/");
+    mkdirSync(join(root, "pkg"), { recursive: true });
+    writeFileSync(join(root, "pkg", "README.md"),
+      `# pkg\n\nWhat it is. Its capability face is [the server layer](${link}).\n`, "utf8");
+  }
   return root;
 }
 
@@ -34,7 +43,8 @@ const face = (rows) =>
     `| [${file}](${file}) | ${governs === null ? "&mdash;" : "[\`" + governs + "\`](../../" + governs + ")"} | what it carries | ${status} |`).join("\n") +
   "\n\n## Something else\n\n| File | Governs |\n| --- | --- |\n| [not-a-mirror.md](not-a-mirror.md) | [`src/app/`](../../src/app) |\n";
 
-const FACE = "pkg/docs/03-capabilities/README.md";
+// The face lives ONCE, in the repository's own tree, under the node's domain and layer.
+const FACE = "docs/04-capabilities/01-domain/01-server/README.md";
 
 function said(root, path, session) {
   const payload = JSON.stringify({
@@ -135,9 +145,9 @@ console.log("\n=== mirror — silent");
 }
 
 {
-  const root = tree({ [FACE]: face([["app.md", "src/app/", "✅"]]), "pkg/docs/03-capabilities/app.md": "x\n" });
+  const root = tree({ [FACE]: face([["app.md", "src/app/", "✅"]]), "docs/04-capabilities/01-domain/01-server/app.md": "x\n" });
   one("an edit to the mirror itself, which is not under src/",
-    said(root, "pkg/docs/03-capabilities/app.md", "s1"), { expect: "silent" });
+    said(root, "docs/04-capabilities/01-domain/01-server/app.md", "s1"), { expect: "silent" });
 }
 
 {

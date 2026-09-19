@@ -57,7 +57,7 @@ function one(label, payload, expect, says) {
 }
 
 const write = (path, content) => ({ tool_name: "Write", tool_input: { file_path: path, content } });
-const CHAPTER = `${WORKSPACE}/spn-foundation/docs/03-capabilities/05-docs/probe.md`;
+const CHAPTER = `${WORKSPACE}/spn-foundation/docs/04-capabilities/01-foundation/02-docs/probe.md`;
 const APPROACH = `${WORKSPACE}/spn-foundation/artifacts/approaches/probe-approach.html`;
 const REGISTER = `${WORKSPACE}/spn-foundation/docs/registers/probe.md`;
 

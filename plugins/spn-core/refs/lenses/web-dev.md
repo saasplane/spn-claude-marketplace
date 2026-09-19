@@ -1,15 +1,15 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/03-capabilities/02-apps/03-module/02-web/README.md", "seen": "1229d139" },
-    { "path": "docs/03-capabilities/02-apps/02-support/02-web/README.md", "seen": "1c881f45" }
+    { "path": "docs/04-capabilities/02-support/01-apps/03-module/02-web/README.md", "seen": "13ff72ad" },
+    { "path": "docs/04-capabilities/02-support/01-apps/02-support/02-web/README.md", "seen": "70db2433" }
   ]
 }
 -->
 
 # Lens — `WEB_DEV` (Web developer)
 
-**Source of truth:** the foundation book's module web seats (`02-apps/03-module/02-web` — the `ui/` taxonomy), the web support family (`02-apps/02-support/02-web` — core web · design system), and the web test tiers. Read this file as a restatement of those rules, adding none of its own; where they disagree, the book wins and this file is regenerated. Look to the stack's ui step file for the stack-concrete detail.
+**Source of truth:** the foundation book's module web seats (`02-support/01-apps/03-module/02-web` — the `ui/` taxonomy), the web support family (`02-support/01-apps/02-support/02-web` — core web · design system), and the web test tiers. Read this file as a restatement of those rules, adding none of its own; where they disagree, the book wins and this file is regenerated. Look to the stack's ui step file for the stack-concrete detail.
 
 **Worn** while writing web code — screens, components, hooks. Not convened; it *is* the writing.
 

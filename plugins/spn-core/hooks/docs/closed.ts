@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: spn-foundation docs/03-capabilities/04-devex/11-workspace.md § The workstream — closing.
+// RESTATES: spn-foundation docs/04-capabilities/01-foundation/01-devex/11-workspace.md § The workstream — closing.
 // The chapter is the source of truth. A rule change is edited there first, then here, in the same change.
 //
 // What gets said when a workstream closes.

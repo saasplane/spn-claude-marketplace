@@ -6,7 +6,7 @@ description: Turn a requirement into a design the platform's own vocabulary can 
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/03-capabilities/05-docs/05-artifacts.md", "section": "The approach document", "seen": "f7b7b960" }
+    { "path": "docs/04-capabilities/01-foundation/02-docs/05-artifacts.md", "section": "The approach document", "seen": "7e127e83" }
   ]
 }
 -->
@@ -140,7 +140,7 @@ The masthead **names its audience** — an artifact has no seat, so its content 
 reads it, and an artifact written for everyone is read carefully by nobody. `refs/doc-sets.md`
 carries the register in full; load it before writing.
 
-**Source of truth:** the foundation book's artifacts standard (`docs/03-capabilities/05-docs/05-artifacts.md`, "The approach document" section). This section restates it for use at the moment of writing and adds no rule of its own; where the two disagree, the book wins and this file is regenerated.
+**Source of truth:** the foundation book's artifacts standard (`docs/04-capabilities/01-foundation/02-docs/05-artifacts.md`, "The approach document" section). This section restates it for use at the moment of writing and adds no rule of its own; where the two disagree, the book wins and this file is regenerated.
 
 When a design is big enough that someone will read it more than once, the plan becomes a document with a fixed shape. Such a design is a new artifact, a contract that other teams build against, or a standard the tooling will enforce. **Why → What → How → Open → Deferred.** Nothing else, and in that order.
 

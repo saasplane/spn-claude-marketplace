@@ -26,7 +26,7 @@ App-local modules (a feature owned by one app) live under `apps/<app>/src/module
 
 ## The two contexts — read them, never re-derive them
 
-The surface has exactly two contexts and they point opposite ways (foundation book, `docs/03-capabilities/02-apps/02-support/02-web/04-design-system.md`):
+The surface has exactly two contexts and they point opposite ways (foundation book, `docs/04-capabilities/02-support/01-apps/02-support/02-web/04-design-system.md`):
 
 - **App context** — session, permission codes, the reader's locale facts (language, country, timezone, currency, date/number/time formats), the `translate` implementation, and the unauthenticated policy. Read it with the DS app-context hook; the app supplies it.
 - **DS context** — live theme and its setter, device, `navigate`, image transformation with placeholder/error, and `defaultComponentSize`. Read it with the DS context hook; `DSApp` supplies it.

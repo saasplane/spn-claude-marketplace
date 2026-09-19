@@ -1,5 +1,5 @@
-// RESTATES: spn-foundation docs/03-capabilities/05-docs/05-artifacts.md § The header · § The blocks
-//           docs/03-capabilities/05-docs/02-document.md § Metadata
+// RESTATES: spn-foundation docs/04-capabilities/01-foundation/02-docs/05-artifacts.md § The header · § The blocks
+//           docs/04-capabilities/01-foundation/02-docs/02-document.md § Metadata
 // The chapters are the source of truth. A rule change is edited there first, then here, in the same change.
 //
 // The page, produced from the seat file. The agent authors the markdown; this writes the HTML —
