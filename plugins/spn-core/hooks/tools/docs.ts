@@ -12,6 +12,7 @@
 //   node docs.ts page <seat.md…>        produce each construct page from its seat file
 //   node docs.ts status <seat.md…>      derive the status from Binds and Proof, and refuse a false claim
 //   node docs.ts figures check|colour   labels fit and connectors join · a block's colouring matches its text
+//   node docs.ts audit --report <repo>  the gap scan — one report per repository, written, never fixed
 //
 // Grades, per the N2 arc: RULE refuses, SOFT reports. N7 flips the SOFTs.
 
@@ -21,6 +22,7 @@ import { renderPage } from "../lib/render.ts";
 import { checkFigures, colour, stripSpans } from "../lib/figures.ts";
 import { begin, record, end } from "../lib/timing.ts";
 import { cardsOf } from "../checks/split-plan.ts";
+import { filesUnder as proseFilesUnder, paragraphs as proseParagraphs, score as proseScore } from "./prose-triage.ts";
 
 type Grade = "RULE" | "SOFT";
 type Finding = { check: string; grade: Grade; file: string; message: string };
@@ -773,7 +775,12 @@ function constructFolders(root: string): string[] {
  */
 function isGroup(dir: string): boolean {
   try {
-    return !readdirSync(dir).some((e) => e.endsWith(".md") && e !== "README.md");
+    const entries = readdirSync(dir);
+    // A group holds DOMAINS. An empty folder holds neither, so it is a domain with nothing written
+    // in it yet — which is the compact state of every seat the day it is minted, and reporting it
+    // as a group would hide every domain in a repository that has not started writing.
+    if (!entries.some((e) => { try { return statSync(join(dir, e)).isDirectory(); } catch { return false; } })) return false;
+    return !entries.some((e) => e.endsWith(".md") && e !== "README.md");
   } catch { return false; }
 }
 
@@ -1037,6 +1044,178 @@ function pageFor(seat: string, workspace: string, templates: string, write: bool
   return findings;
 }
 
+// ---------------------------------------------------------------------------- the gap scan
+
+/**
+ * One report per repository, written into its own pocket — which is where the standard puts a
+ * measurement, and why a stale one is safe to leave standing.
+ *
+ * IT EDITS NOTHING IT MEASURES. A scan that fixes as it goes cannot be trusted as a measure, and
+ * that is the whole reason this is a verb of its own rather than a flag on `face`.
+ *
+ * **It says what it does not measure.** Three of the nine prose faults cannot be told from good
+ * prose by a pattern; a construct nobody has written cannot be counted against a list nobody has
+ * written either; and the symbol index is a per-package build this cannot run. Each is named in the
+ * report rather than left to look like a zero.
+ */
+function gapReport(repo: string, workspace: string): number {
+  const tree = join(repo, "docs");
+  if (!existsSync(tree)) { console.error(`${relative(workspace, repo)} has no docs/ tree`); return 2; }
+  const name = basename(resolve(repo));
+  const at = new Date().toISOString().slice(0, 10);
+
+  const seats = ["01-purpose", "02-constructs", "03-behaviors", "04-capabilities", "05-guides"];
+  const seatRows = seats.map((seat) => ({
+    seat,
+    present: existsSync(join(tree, seat, "README.md")),
+    files: existsSync(join(tree, seat)) ? walkFiles(join(tree, seat), (p) => p.endsWith(".md")).length : 0,
+  }));
+
+  // A node carrying a docs tree is the shape the consolidation removed, so any at all is a finding.
+  const strays: string[] = [];
+  const walkNodes = (dir: string, depth: number): void => {
+    if (depth > 4) return;
+    let entries: string[];
+    try { entries = readdirSync(dir); } catch { return; }
+    for (const e of entries) {
+      if (e === "node_modules" || e === ".git" || e === "dist" || e === ".nx") continue;
+      if (e === "docs") {
+        if (resolve(dir) !== resolve(repo)) strays.push(relative(repo, join(dir, e)));
+        continue;
+      }
+      const p = join(dir, e);
+      try { if (statSync(p).isDirectory()) walkNodes(p, depth + 1); } catch { /* unreadable */ }
+    }
+  };
+  walkNodes(repo, 0);
+
+  // What a domain OWES is what its concept section lists; what it HAS is the files under it.
+  const conceptFile = join(repo, "CONCEPT.md");
+  const sections = existsSync(conceptFile) ? conceptSections(conceptFile) : new Map();
+  const constructsDir = join(tree, "02-constructs");
+  const domainRows = constructFolders(constructsDir).filter((d) => !isGroup(d)).map((dir) => {
+    const key = [...sections.keys()].find((k) => k === folderKey(basename(dir)));
+    return {
+      domain: relative(constructsDir, dir),
+      named: Boolean(key),
+      has: walkFiles(dir, (p) => p.endsWith(".md") && basename(p) !== "README.md").length,
+      owed: key ? sections.get(key)!.lines.length : 0,
+    };
+  });
+
+  const approachDir = join(tree, "artifacts", "approaches");
+  const approaches = existsSync(approachDir)
+    ? readdirSync(approachDir).filter((f) => f.endsWith(".html")).sort() : [];
+
+  const pages = walkFiles(tree, (p) => p.endsWith(".md") || p.endsWith(".html"));
+  const findings = audit(pages, workspace);
+  const byCheck = new Map<string, number>();
+  for (const f of findings) {
+    const k = `${f.check} (${f.grade})`;
+    byCheck.set(k, (byCheck.get(k) ?? 0) + 1);
+  }
+
+  const prose: { file: string; paras: number; flagged: number }[] = [];
+  for (const file of proseFilesUnder([tree], false)) {
+    let raw: string;
+    try { raw = readFileSync(file, "utf8"); } catch { continue; }
+    // `paragraphs` takes the RAW text and strips what must never change itself — a code block, a
+    // table row, a heading, the reading strip. A block is `[text, sentences]`.
+    const blocks = proseParagraphs(raw);
+    let flagged = 0;
+    for (const [text, sents] of blocks) if (Object.keys(proseScore(text, sents)).length) flagged += 1;
+    if (flagged) prose.push({ file: relative(repo, file), paras: blocks.length, flagged });
+  }
+  prose.sort((a, b) => b.flagged - a.flagged);
+
+  const totalFlagged = prose.reduce((n, p) => n + p.flagged, 0);
+  const totalParas = prose.reduce((n, p) => n + p.paras, 0);
+  const row = (cells: string[]) => `| ${cells.join(" | ")} |`;
+
+  const body = [
+    "<!-- spn:doc",
+    "{",
+    `  "id": "${name}-docs-audit",`,
+    `  "title": "Docs Audit — ${name}",`,
+    '  "lenses": ["ARCHITECT", "VOICE"],',
+    '  "status": "DONE",',
+    `  "summary": "What this repository's corpus looks like on ${at}, measured against the landed standard — its seats, what each domain owes, the arguments still in its pocket, the pages off the standard, and the paragraphs a language pass would read."`,
+    "}",
+    "-->",
+    "",
+    `# Docs Audit — ${name}`,
+    "",
+    "`For: Architect · Editor` · `Status: ✅ DONE`",
+    "",
+    `Measured ${at}. **Nothing here was fixed while it was counted** — a scan that edits as it goes cannot be trusted as a measure, so this verb writes one file and touches nothing else.`,
+    "",
+    "## The seats",
+    "",
+    row(["Seat", "Face", "Documents"]), row(["---", "---", "---"]),
+    ...seatRows.map((r) => row([`\`${r.seat}\``, r.present ? "✅" : "**missing**", String(r.files)])),
+    "",
+    strays.length
+      ? `**${strays.length} node(s) still carry a docs tree**, which the one-tree rule removed: ${strays.map((x) => `\`${x}\``).join(" · ")}.`
+      : "**No node carries a docs tree.** The repository has one, and every node carries `README.md` alone.",
+    "",
+    "## What each domain owes",
+    "",
+    "A domain owes what its concept section lists, and has what sits under it. A domain the concept does not name is invariant 1's finding.",
+    "",
+    row(["Domain", "Named by the concept", "Constructs written", "Lines the concept lists"]),
+    row(["---", "---", "---", "---"]),
+    ...domainRows.map((d) => row([`\`${d.domain}\``, d.named ? "✅" : "**no**", String(d.has), String(d.owed)])),
+    "",
+    "> [!NOTE]",
+    "> **Read a 0 in the last column as *unmeasured*, never as *owes nothing*.** A concept is given its one line per construct by `docs.ts face`, and it can only write that once the constructs exist. Until then the column reports the concept's own bullet lists, which most concepts do not yet carry.",
+    "",
+    "## The arguments still in the pocket",
+    "",
+    approaches.length
+      ? [`${approaches.length} approach page(s). Each argues one design and stays the record of the moment it was argued. Where a construct comes to carry its *What*, the page is retired rather than deleted.`, "",
+         ...approaches.map((a) => `- [${a.replace(/-approach\.html$/, "")}](../approaches/${a})`)].join("\n")
+      : "None.",
+    "",
+    "## Pages off the standard",
+    "",
+    findings.length
+      ? [`${findings.length} finding(s) over ${pages.length} page(s).`, "",
+         row(["Check", "Findings"]), row(["---", "---"]),
+         ...[...byCheck].sort((a, b) => b[1] - a[1]).map(([k, v]) => row([`\`${k}\``, String(v)]))].join("\n")
+      : `**Clean over ${pages.length} page(s).**`,
+    "",
+    "## The paragraphs a language pass would read",
+    "",
+    `${totalFlagged} candidate paragraph(s) in ${prose.length} file(s), out of ${totalParas} scanned.`,
+    "",
+    ...(prose.length
+      ? [row(["File", "Flagged", "Paragraphs"]), row(["---", "---", "---"]),
+         ...prose.slice(0, 40).map((p) => row([`\`${p.file}\``, String(p.flagged), String(p.paras)])),
+         ...(prose.length > 40 ? ["", `…and ${prose.length - 40} more file(s).`] : [])]
+      : []),
+    "",
+    "> [!NOTE]",
+    "> **Three of the nine faults are not here, and that is deliberate.** A compressed claim, a rule with no action, and an abstraction that is merely dull cannot be told from good prose by a pattern. The flagged set is where a pass starts, never the whole job.",
+    "",
+    "## What this report does not measure",
+    "",
+    row(["Not measured", "Why", "What would measure it"]), row(["---", "---", "---"]),
+    row(["Comments owed per package", "the symbol index is a per-package build this verb does not run", "`spnutils apps gen-symbols -p <pkg>`"]),
+    row(["Whether a written construct is TRUE", "a count cannot read", "the two-per-wave read"]),
+    row(["The constructs a concept has not listed", "see the note above", "`docs.ts face`, once the constructs exist"]),
+    "",
+  ].join("\n");
+
+  const out = join(tree, "artifacts", "reports", "docs-audit.md");
+  mkdirSync(dirname(out), { recursive: true });
+  writeFileSync(out, body);
+  console.log(relative(workspace, out));
+  console.log(`  seats ${seatRows.filter((r) => r.present).length}/5 · node trees ${strays.length} · domains ${domainRows.length}` +
+    ` · constructs ${domainRows.reduce((n, d) => n + d.has, 0)} · approaches ${approaches.length}` +
+    ` · page findings ${findings.length} · prose candidates ${totalFlagged} in ${prose.length} file(s)`);
+  return 0;
+}
+
 // ---------------------------------------------------------------------------- the command
 
 function audit(paths: string[], workspace: string): Finding[] {
@@ -1127,6 +1306,12 @@ if (cmd === "page") {
   const f = seats.flatMap((p) => pageFor(p, resolve(workspace), templates, !check));
   for (const x of f) console.log(`${x.grade === "RULE" ? "✗" : "!"} ${x.grade.padEnd(4)} ${x.check.padEnd(9)} ${relative(workspace, x.file)}\n         ${x.message}`);
   process.exit(f.some((x) => x.grade === "RULE") ? 1 : 0);
+}
+
+if (cmd === "audit" && rest.includes("--report")) {
+  const target = rest.find((r) => !r.startsWith("--"));
+  if (!target) { console.error("usage: node docs.ts audit --report <repo>"); process.exit(2); }
+  process.exit(gapReport(resolve(target), resolve(workspace)));
 }
 
 if (cmd !== "audit" || rest.length === 0) {

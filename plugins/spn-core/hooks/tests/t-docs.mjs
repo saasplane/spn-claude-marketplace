@@ -326,5 +326,34 @@ console.log("\n=== a Map is a list of mirrors, so an authored seat has none");
     readAt(authored, "docs/04-capabilities/README.md"), lacks("spn:generated map"));
 }
 
+console.log("\n=== the gap scan measures and never fixes");
+{
+  const root = repo({
+    "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n\n- **Session** — one person's live access\n",
+    "docs/README.md": doc({ id: "f", title: "Docs", lenses: ["ARCHITECT"], status: "DONE" }, "x\n", "`For: Architect` · `Status: ✅ DONE`"),
+    "docs/01-purpose/README.md": doc({ id: "p", title: "Purpose", lenses: ["ARCHITECT"], status: "PLANNING" }, "x\n", "`For: Architect` · `Status: 🔮 PLANNING`"),
+    "docs/02-constructs/README.md": doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }, "x\n", "`For: Architect` · `Status: 🔮 PLANNING`"),
+    "docs/02-constructs/01-core/README.md": doc({ id: "c", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }, "x\n", "`For: Architect` · `Status: 🔮 PLANNING`"),
+    "docs/artifacts/approaches/a-approach.html": "<p>an argument</p>\n",
+    // A page with no metadata block: the finding the scan exists to count.
+    "docs/03-behaviors/README.md": "# Behaviors\n\nno block here.\n",
+    // A node still carrying a tree: the shape the consolidation removed.
+    "pkg/docs/README.md": "# stray\n",
+  });
+  const before = readAt(root, "docs/03-behaviors/README.md");
+  const out = run(root, ["audit", "--report", "."]);
+  const rep = readAt(root, "docs/artifacts/reports/docs-audit.md");
+
+  one("it writes one report into the repository's own pocket", out, has("docs/artifacts/reports/docs-audit.md"));
+  one("IT FIXES NOTHING IT MEASURES", readAt(root, "docs/03-behaviors/README.md"), before);
+  one("a node still carrying a docs tree is a finding", rep, has("still carry a docs tree"));
+  one("a domain with nothing written in it is a DOMAIN, not a group", rep, has("`01-core`"));
+  one("what the concept lists is what the domain owes", rep, (g) => /\| `01-core` \| ✅ \| 0 \| 1 \|/.test(g));
+  one("the arguments still in the pocket are listed", rep, has("a-approach.html"));
+  one("a page with no block is counted", rep, has("block (RULE)"));
+  one("and it names what it did NOT measure rather than reporting a zero",
+    rep, has("What this report does not measure"));
+}
+
 console.log(failed ? `\n  ${failed} of ${n} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);
