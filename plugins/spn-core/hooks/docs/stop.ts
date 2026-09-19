@@ -280,7 +280,13 @@ export function cardsInArcs(root: string): Array<[string, string, string]> {
 // choice, and does not show one.
 
 // Every form seen in this workspace's own transcripts, and each needs a table.
-const ASKS = /\b(?:say|answer|reply|pick|choose|choosing|select)\s+(?:with\s+)?[`"*]?(?:Q\d+)?[A-D]\b|\brecommendation\s+is\s+[`"*]?[A-D]\b|\boption\s+[`"*]?[A-D]\b|\b[A-D]\s*,\s*[A-D]\s*(?:,\s*[A-D]\s*)?(?:or|\/)\s*[A-D]\b/i;
+//
+// CASE-SENSITIVE ON THE LETTER, AND THAT IS THE WHOLE OF F17. This carried an `i` flag, so `[A-D]`
+// matched the English article `a` — and `pick a file`, `select a row`, `choosing with a sign-in` all
+// read as somebody naming option A. It fired on a reply that asked nothing, over a behaviour row
+// reading `sends an organization id of their own choosing with a sign-in`. An option is written
+// upper-case, always, so the letter is upper-case here and only the leading word is either case.
+const ASKS = /\b(?:[Ss]ay|[Aa]nswer|[Rr]eply|[Pp]ick|[Cc]hoose|[Cc]hoosing|[Ss]elect)\s+(?:with\s+)?[`"*]?(?:Q\d+)?[A-D]\b|\b[Rr]ecommendation\s+is\s+[`"*]?[A-D]\b|\b[Oo]ption\s+[`"*]?[A-D]\b|\b[A-D]\s*,\s*[A-D]\s*(?:,\s*[A-D]\s*)?(?:or|\/)\s*[A-D]\b/;
 // A markdown options table: a header row and the `| --- |` separator the grammar requires.
 const TABLE = /^\|.*\|\s*$\n^\|[\s:-]*\|[\s:|-]*$/m;
 // A lettered row inside a table — `| **A** | … | … |`. The shape the grammar actually asks for.

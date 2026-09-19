@@ -193,5 +193,15 @@ one("a reply that merely mentions a letter",
   build("stop-reply-plain", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
   "silent", { reply: "Appendix A of the chapter covers it. Nothing is open." });
 
+// F17 — `[A-D]` under an `i` flag matched the English article `a`, so an ordinary sentence containing
+// `choosing with a …` read as somebody naming option A. It fired on a reply that asked nothing.
+one("an article after a choosing word is not an option",
+  build("stop-reply-article", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
+  "silent", { reply: "A caller sends an organization id of their own choosing with a sign-in, and it is ignored." });
+
+one("the other articles that used to fire",
+  build("stop-reply-articles", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
+  "silent", { reply: "Pick a file, select a row, and choose a tier. Nothing is open." });
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);
