@@ -11,7 +11,7 @@
     },
     {
       "path": "docs/03-capabilities/02-apps/03-module/01-server/01-contract/01-states.md",
-      "seen": "172d3ddc"
+      "seen": "69eba950"
     }
   ]
 }

@@ -3,7 +3,7 @@
   "chapters": [
     {
       "path": "docs/03-capabilities/data-model.md",
-      "seen": "8f2c9362"
+      "seen": "da4fc0fd"
     },
     {
       "path": "docs/02-behaviors/README.md",

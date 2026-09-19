@@ -3,11 +3,11 @@
   "chapters": [
     {
       "path": "docs/03-capabilities/02-apps/01-shape/README.md",
-      "seen": "f439278a"
+      "seen": "a0c9deae"
     },
     {
       "path": "docs/03-capabilities/data-model.md",
-      "seen": "8f2c9362"
+      "seen": "da4fc0fd"
     },
     {
       "path": "docs/03-capabilities/01-saas/README.md",
@@ -15,7 +15,7 @@
     },
     {
       "path": "docs/03-capabilities/02-apps/03-module/README.md",
-      "seen": "c9a391a3"
+      "seen": "65d1bc35"
     }
   ]
 }
@@ -35,6 +35,8 @@
 - **Change is classified before it is designed.** New capability · additive · breaking · fix — a breaking change never rides in as a plan row; it goes through the decision register with a version and migration path.
 - **Structural additions are flagged.** A new chapter, module, or kind hits a documented ceiling: the plan produces a decision entry draft, never a fait accompli.
 - **The dictionary's capability column is complete.** Every construct the design adds appears in the owning `data-model.md`, joined to the consumer word it realizes.
+- **A domain owns the constructs; a module does not.** A module carries `README.md` and no docs tree of its own — what it contributes sits in **the repository's one tree**, under the domain it belongs to: the domain's constructs in `02-constructs/<domain>/`, the rows for what a person can do in `03-behaviors/<domain>/`, and one mirror per source folder that earns one in `04-capabilities/<domain>/<layer>/`. A contract does not get a construct per state — the domain gets constructs, and states realize them. A behaviour row belongs to the domain that would have to change, never to the package that happens to serve it.
+- **A node answers a fixed set of lifecycle verbs, and its kind decides which.** Build it, prove one tier, run it, publish it — what each verb refuses is part of the standard, and a line that belongs to every node of a kind moves into the stack's toolchain rather than into that node.
 
 - **Blast radius is read as a design signal, not a work estimate.** A repair that breaks many call sites, changes GENERATED output, or crosses a package or repository boundary is a design decision that arrived wearing a compiler error. The scope of the damage is not the scope of the fix: the question is which LAYER owns the concern, asked before any mechanism is proposed.
 - **Prior art outranks invention.** Before designing a new mechanism, the system is searched for how it already handles that concern. A capability the codebase already has, reimplemented beside itself, is a defect even when both copies work.

@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/03-capabilities/01-saas/03-people-access.md", "seen": "cd23d043" }
+    { "path": "docs/03-capabilities/01-saas/03-people-access.md", "seen": "eb8af51b" }
   ],
   "rows": ["RD.SAAS.033", "RD.SAAS.034"]
 }
@@ -29,6 +29,8 @@ Two of these rows carry a trap. A plan feature looks like an org type when the e
 **A permission and an enablement never substitute for each other.** A permission is app-specific and says who may act. An enablement is cross-cutting and says what the caller's organization type is offered at all. A gate passes when both hold.
 
 ## If it is an enablement
+
+**Enablement is a construct, and it is modelled where every construct is.** It lives at `02-constructs/<iam>/enablement.md`, beside permission, and it depends on authorization and on organization type. It is realized the way a permission is: a module **registers its enablement definitions** in its contract constants, the session carries `enablements` exactly as it carries `permissions`, and a module's services and screens read `session.enablements` to decide what to offer. The chapter states the rule; the construct states the model, and this file restates neither more than once.
 
 ### Two answers means two codes
 

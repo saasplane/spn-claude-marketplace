@@ -1,17 +1,17 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/03-capabilities/05-docs/01-corpus.md", "seen": "fd889c96" },
-    { "path": "docs/03-capabilities/05-docs/02-document.md", "seen": "634b3ed1" },
-    { "path": "docs/03-capabilities/05-docs/04-discipline.md", "seen": "bfcc55ef" }
+    { "path": "docs/03-capabilities/05-docs/01-corpus.md", "seen": "f9ae65bd" },
+    { "path": "docs/03-capabilities/05-docs/02-document.md", "seen": "79be7af8" },
+    { "path": "docs/03-capabilities/05-docs/04-discipline.md", "seen": "9525f66d" }
   ],
-  "rows": ["RD.DOCS.031", "RD.DOCS.043", "RD.DOCS.044"]
+  "rows": ["RD.DOCS.031", "RD.DOCS.043", "RD.DOCS.044", "RD.DOCS.052", "RD.DOCS.062", "RD.DEVEX.032"]
 }
 -->
 
 # Lens — `VOICE` (Editor)
 
-**Source of truth:** the foundation book's readability bar (`05-docs/01-corpus`), structure rule 12 (`05-docs/02-document`), and the voice discipline checks (`05-docs/04-discipline`) — decisions RD.DOCS.031, RD.DOCS.043 and RD.DOCS.044. This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
+**Source of truth:** the foundation book's readability bar (`05-docs/01-corpus`), the document block and its tag line (`05-docs/02-document`), and the voice discipline checks (`05-docs/04-discipline`) — decisions RD.DOCS.031, RD.DOCS.043, RD.DOCS.044, RD.DOCS.052, RD.DOCS.062 and RD.DEVEX.032. This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
 
 **Worn** while writing. **Convened** over any document before it lands. **Advises — and blocks a page that misses its seat bar.**
 
@@ -22,6 +22,11 @@
 - **Find your reader.** A stretch reaching them by none of the three moves is describing a system to nobody. The moves and the per-seat shares are in [`refs/doc-sets.md`](../doc-sets.md) § One voice, and the `spn-core` doc-check sweep reports the share you actually hit.
 - **No idioms, and this one reaches your own speech.** An idiom means something its words do not say, so a second-language reader cannot guess it (RD.DOCS.052). Read the page for *say the word*, *earns its keep*, *reads like*, *goes stale*, *front door*. Replace each with the plain phrase. A defined house term is not an idiom and stays.
 - **A rule keeps its subject.** Warmth arrives in the sentence beside it, never inside it. A class subject — an application, a module, a space — never becomes *you*, and a record is never warmed at all.
+- **Precision outranks warmth on a file that instructs** (RD.DEVEX.032). Where a warmer sentence would be even slightly less exact about what your reader must do, leave the sentence as it is. A page at its bar in mechanical prose is worse than a page under it in good prose — and that ranking runs the other way too, so neither half wins by default.
+- **NOTHING MEASURES LENGTH, AND NOTHING COUNTS *you*.** Both measures were dropped. A sentence may be long when the idea needs it, and cutting the link between two ideas to make a sentence shorter is the defect the word count was causing. A count of a pronoun cannot see an imperative, so it read every instruction file as silent when it was anything but, and it rewarded sprinkling the word rather than writing to somebody. What is checked instead is the seven rules: the missing why, the undefined term, the idiom, the carried phrase, the dropped reasoning.
+- **The house words are for the people who need them, and a node `README.md` uses none of them** (RD.DOCS.062). *Seam*, *mirror*, *realize*, *face* and *construct* are this book's own words. A developer opening a package for the first time should not have to learn five of them to read its first page. So a node README and a behaviour area use none, and a construct or a mirror **defines each one where it is first met**.
+- **A construct is prose, and a developer reads it to Parts and stops.** Terms, Boundary, Model and Parts are written for whoever builds against the model; Relations, Binds and Proof are for the architect and the agent, and nothing in the first four may depend on having read the last three. A construct written as a field list has skipped the job its seat exists for.
+- **A register row is a record and stays one** (RD.DOCS.043). One clause a sentence, the decision column carrying the ruling and nothing else, and *you* inside a row is a finding. This is the one place a length rule survives, and it is a shape rather than a count.
 - **Could a newcomer do this after reading it?** — the test the number cannot make. A page that states a rule and gives neither its why nor the symptom of breaking it fails here, whatever its share says. This is the line this lens stops work over, alongside the seat bar.
 
 ## What it never does

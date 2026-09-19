@@ -2,7 +2,7 @@
 {
   "chapters": [
     { "path": "CONCEPT.md", "section": "Kind Tests", "seen": "8ed2b14b" },
-    { "path": "docs/03-capabilities/02-apps/06-tests/README.md", "seen": "18e683e7" }
+    { "path": "docs/03-capabilities/02-apps/06-tests/README.md", "seen": "955c7f8e" }
   ],
   "rows": ["RD.APPS.086"]
 }
@@ -23,6 +23,8 @@
 - **A support package owns the seam it invented**, so it proves every tier it reaches and may double at that seam. A library that creates runtimes proves a runtime can be created with it (`RD.APPS.089`).
 - **Each claim is proven once, at the level that owns it** (`RD.APPS.087`). A journey is never a slower copy of an answer the contract tier already gave.
 - **The id is the join, and a link has a direction.** Write the behavior id into the test title where the claim is proven, and cite it — never restate it — from the rows above. A UI row `Realizes` an API row, never a peer and never an id nothing declares.
+- **The join reads ONE register per repository, and that is what makes it whole.** A repository has one behaviors seat, so one id space and one set of rows, and the case glob is the repository's — a `✅` row is proven by a case anywhere in that repository, in the module that serves it, the app that hosts it, or a journey crossing both. Where each node kept its own register, a gate read one at a time and reported green over a repository that was not.
+- **A behaviour row names no package, and the join does not need it to.** The row belongs to the domain that would have to change if the behaviour changed; which packages realize it is stated on the capability side. A behaviour crossing a server module, a web module and the app hosting them is ordinary: one row, three mirrors claiming a share, one journey citing the id.
 - **Status honesty is enforced**: a ✅ row cites at least one test that **ran and passed**. A case listed by the runner is not proof — a case that skips itself is collected and proves nothing. No passing case → 🚧 or 🔮, never ✅. This is the line this lens stops work over.
 - **Keep each claim at one tier.** A gate is not a test — passing lint says nothing about behavior; a passing build says nothing about structure; no gate is inferred from another.
 - **Suites group by actor where the consumer is people, and by capability where it is a system.** An actor's flows share auth setup, fixtures, and scope, which is what makes a suite runnable.
@@ -30,6 +32,8 @@
 - **A result is read from the gate's own exit AND its finding count.** Zero findings with a non-zero status is a gate that refused to run, not clean code — and a gate wrapped in a shell block or piped onward reports the wrapper's status, so a runner can announce success over a failure. When the two disagree, the answer is unrun (`RD.APPS.096`).
 - **A run that must prove a change verifies the artifact, never the runner.** A cached task replays its output verbatim, so a task that never executed looks exactly like one that passed, and a cached build reports success having rewritten nothing. Check the timestamp, the hash, the marker, and that what is served matches what was built — capturing that state before the rebuild, or a silent no-op is invisible (`RD.APPS.097`).
 - **A tier nothing invokes proves nothing.** A tier declared, written and never executed is the most expensive absence, because every row resting on it reads as covered.
+- **A runner is not the runtime you ship, and no tier above proves that it is.** A test runner may load your source under a different module system, a different entry resolution, or a different loader than the published artifact meets — so anything reading its own module identity passes under the runner and breaks on the first install. Where it sits on disk, how it was loaded, what resolved it: each is a fact about the runtime, never about the code. You prove it by running what you publish, installed the way a consumer installs it.
+- **The `Owes` column is a floor, never a ceiling.** A node carrying more than it owes is correct rather than in breach, and a missing tier nobody owed is effort spent where the risk is. Not every node owes a unit tier: unit-testing a web application's composition means doubling the generated client and the design system, and the case then proves the doubles rather than the screen. The ladder is DATA now — a kind carries its owed tiers in the profile, so a gate compares what a node owes against what it carries (`RD.APPS.114`).
 - **Behaviour does not cross a harness's process boundary.** Where a component tier's harness drives the browser from another process, only data crosses. So behaviour a mount needs is defined in the build the browser runs. The case imports that module and drives it through serializable inputs alone. Most components need none of this, and the case keeps its own mount by default (`RD.APPS.099`).
 - **A red naming what no source declares is a stale build, not a defect.** A build cache keyed by file name outlives a rename, so it is cleared by the change that renamed, moved or deleted what it compiled (`RD.APPS.100`).
 - **A case that destroys a session runs where nothing else depends on that session.** Revoking a sign-in, logging out or changing a credential destroys the session other cases work in, and worker isolation cannot help because the damage is server-side (`RD.APPS.098`).
