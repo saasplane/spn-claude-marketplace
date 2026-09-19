@@ -257,6 +257,53 @@ console.log("\n=== a seat's `templates/` is excluded by the folder, never per fi
 
 // ---------------------------------------------------------------- the authored seat
 
+console.log("\n=== the dictionary is generated from the constructs, never typed (invariant 2)");
+{
+  // Each column has exactly one source, and that is what makes the generation possible: a
+  // construct's `Terms` table carries the consumer's word and the contract term, and the domain's
+  // data-model.md carries where it is stored, matched on the contract term.
+  const root = repo({
+    "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
+    "docs/02-constructs/README.md": doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    "docs/02-constructs/01-core/README.md": doc({ id: "c", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    "docs/02-constructs/01-core/session.md":
+      doc({ id: "session", variant: "construct", parentId: "c", dependsOn: [], title: "Session", lenses: ["ARCHITECT"], status: "PLANNING" },
+          "## Terms\n\n| Term | Contract term | What it means here |\n| --- | --- | --- |\n" +
+          "| sign-in | `SPSession` | one person's live access to one app site |\n" +
+          "| device | `SPDevice` | the client a session was opened from |\n\n" +
+          "## Boundary\n\nx\n\n## Model\n\nx\n\n## Parts\n\nx\n\n## Relations\n\nx\n\n" +
+          "## Binds\n\n| where it lives today | |\n| --- | --- |\n| a | b |\n\n## Proof\n\nx\n",
+          "`For: Architect` · `Status: 🔮 PLANNING`"),
+    "docs/04-capabilities/01-core/01-server/data-model.md":
+      doc({ id: "dm", title: "Contract Terms", lenses: ["SERVER_DEV"], status: "DONE" },
+          "| Table | Terms | Constraint |\n| --- | --- | --- |\n" +
+          "| `sp_session` | `SPSession` | one row per live access |\n",
+          "`For: Backend developer` · `Status: ✅ DONE`"),
+  });
+  run(root, ["face", "docs"]);
+  const dict = readAt(root, "docs/02-constructs/README.md");
+  one("a Terms row becomes a dictionary row", dict, has("| sign-in | `SPSession` |"));
+  one("the storage column is matched on the contract term, from data-model.md",
+    dict, (g) => /\| sign-in \| `SPSession` \| `sp_session` \|/.test(g));
+  one("a term no data-model names writes an em dash rather than a guess",
+    dict, (g) => /\| device \| `SPDevice` \| — \|/.test(g));
+  one("and the row says which construct it came from", dict, has("| Session |"));
+}
+{
+  const root = repo({
+    "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
+    "docs/02-constructs/README.md": doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    "docs/02-constructs/01-core/README.md": doc({ id: "c", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    "docs/02-constructs/01-core/session.md":
+      doc({ id: "session", variant: "construct", parentId: "c", dependsOn: [], title: "Session", lenses: ["ARCHITECT"], status: "PLANNING" },
+          "## Terms\n\n| Term | Contract term |\n| --- | --- |\n| sign-in | `SPSession` |\n",
+          "`For: Architect` · `Status: 🔮 PLANNING`"),
+  });
+  one("a two-column Terms table cannot be generated from, and says so",
+    run(root, ["face", "docs", "--check"]), has("two columns"));
+}
+
+
 console.log("\n=== a Map is a list of mirrors, so an authored seat has none");
 {
   const files = {
