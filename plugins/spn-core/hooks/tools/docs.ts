@@ -20,6 +20,7 @@ import { dirname, join, resolve, basename, relative } from "node:path";
 import { renderPage } from "../lib/render.ts";
 import { checkFigures, colour, stripSpans } from "../lib/figures.ts";
 import { begin, record, end } from "../lib/timing.ts";
+import { cardsOf } from "../checks/split-plan.ts";
 
 type Grade = "RULE" | "SOFT";
 type Finding = { check: string; grade: Grade; file: string; message: string };
@@ -217,13 +218,14 @@ function checkCards(file: string, src: string, block: any): Finding[] {
   if (nested) f.push({ check: "cards", grade: "RULE", file, message: `${nested} card${nested > 1 ? "s are" : " is"} nested inside another; a \`.open\` div was left unclosed` });
 
   // An answered card does not sit in `Open` — the page is the record, not the arc (finding F5).
-  const openSec = src.match(/<section id="s4"[\s\S]*?<\/section>/);
-  if (openSec) {
-    for (const body of openSec[0].matchAll(/<div class="open">([\s\S]*?)(?=<div class="open">|<\/section>)/g)) {
-      const num = body[1].match(/<h4 id="(q\d+)"/i)?.[1]?.toUpperCase();
-      if (num && /<b>\s*Decision/i.test(body[1]))
-        f.push({ check: "cards", grade: "RULE", file, message: `${num} is answered and still sits in \`Open\`; fold it into the section that now states it` });
-    }
+  //
+  // F19 — THIS TESTED FOR THE MARKER AND NOT FOR AN ANSWER, which is F16 in a second file. The card
+  // TEMPLATE ships `<b>Decision:</b> &mdash;`, so a presence test reads every open card as answered
+  // and the finding fires on a card nobody has decided. `cardsOf` already carries the right test:
+  // a decision counts when its tail holds an actual character, not when the label is present.
+  for (const card of cardsOf(file)) {
+    if (card.decided)
+      f.push({ check: "cards", grade: "RULE", file, message: `${card.number} is answered and still sits in \`Open\`; fold it into the section that now states it` });
   }
   return f;
 }
