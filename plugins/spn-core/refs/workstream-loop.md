@@ -3,11 +3,11 @@
   "chapters": [
     {
       "path": "docs/03-capabilities/04-devex/11-workspace.md",
-      "seen": "46327a45"
+      "seen": "4e3fb7a2"
     },
     {
       "path": "docs/03-capabilities/05-docs/05-artifacts.md",
-      "seen": "64be63b1"
+      "seen": "19d3b89e"
     }
   ]
 }
@@ -43,7 +43,7 @@ context ends with the session and the files do not.
 | **S3** | **confirm** | `Open` is empty and the scope is clear | nothing new — the plan is shown and a go is asked for | the developer says go, **and the arc's log records it**: `- **<date> — go.**` |
 | **S4** | **execute** | the developer said go | a row ticks only when its acceptance holds and is proven. A question hit mid-work becomes a card; everything not waiting on it keeps moving | every row is landed, carried or deferred |
 | **S5** | **verify** | the last row is worked | the proof in the arc log — what ran, and what it said | nothing is asserted that was not run |
-| **S6** | **close** | verification holds | **the page is stamped closed**, then the folder moves, then the sweep — contradictions to a register row, conventions to the owning chapter — then one line saying what landed | the folder is in `closed/` and the page says so |
+| **S6** | **close** | verification holds | **the page is stamped closed**, then the folder moves, then the sweep — contradictions to a register row, conventions to the owning chapter — then one line saying what landed. **The page itself never moves into a repository**: an argument closes with the workstream that argued it, and what outlives it is the register row and the construct rewritten fresh | the folder is in `closed/` and the page says so |
 
 **A standard the sweep corrects is not live yet.** A chapter reaches a session only once it is
 carried into the plugins, installed, and synced. `refs/cross-repo.md` § *Open a workstream with the

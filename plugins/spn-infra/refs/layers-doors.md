@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "CONCEPT.md", "section": "DevEx Utils", "seen": "9b61d399" },
+    { "path": "CONCEPT.md", "section": "DevEx Utils", "seen": "002a6a9d" },
     { "path": "CONCEPT.md", "section": "Estate Blueprints", "seen": "51552531" }
   ]
 }

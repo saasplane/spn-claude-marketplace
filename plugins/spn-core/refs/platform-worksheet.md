@@ -3,7 +3,7 @@
   "chapters": [
     {
       "path": "CONCEPT.md",
-      "seen": "13ee3812"
+      "seen": "23a9071e"
     },
     {
       "path": "docs/03-capabilities/01-saas/README.md",
@@ -15,7 +15,7 @@
     },
     {
       "path": "docs/02-behaviors/02-design.md",
-      "seen": "dedc1b3d"
+      "seen": "d610a9b1"
     }
   ]
 }

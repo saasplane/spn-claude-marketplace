@@ -3,16 +3,16 @@
   "chapters": [
     {
       "path": "CONCEPT.md",
-      "seen": "13ee3812"
+      "seen": "23a9071e"
     },
     {
       "path": "docs/03-capabilities/04-devex/09-utils.md",
-      "seen": "d6b0d363"
+      "seen": "4086d2db"
     },
     {
       "path": "docs/03-capabilities/04-devex/11-workspace.md",
       "section": "The agent is updated first, and reloaded before anything runs",
-      "seen": "ba41b93f"
+      "seen": "41e78db7"
     },
     {
       "path": "docs/03-capabilities/04-devex/10-delivery.md",
@@ -146,7 +146,7 @@ A developer's own key keeps its prefix too. `DMO_MY_THING` belongs to DMO becaus
 ### Two cautions before you run a workspace verb
 
 - **The tool never writes a shell profile.** `~/.zshenv` and its siblings stay the developer's. Sourcing `~/.spnenv` from a profile is their line to add, and it trades away the exposure this file avoids: every value exported to every process. **You never edit a shell profile yourself.**
-- **`workspace init` in a scratch folder rewrites the real `~/.spnenv`.** Point `HOME` at a temp directory before you run `init` or `sync` for a demo.
+- **`workspace init` in a scratch folder rewrites the real `~/.spnenv`.** Point `HOME` at a temp directory before you run `init` or `agent-sync` for a demo. The verb is `workspace agent-sync` — the floor, then `repo agent-sync` in every discovered member.
 
 ### A run manages only what it can observe
 
@@ -383,7 +383,7 @@ the command — `--plan` or `--apply`, exactly one, with no default (`RD.INFRA.0
 no account, so the cloud walk is rehearsable before any account exists. `SPN_POSTURE` is **retired**:
 it asked for a rehearsal through the environment, and a rehearsal is now a mode you type.
 
-**Not every `--local` is producer-only.** `infra release --local` stages a package into the machine store, and that is an ordinary partner act. The flag to mark is the one on `repo agent-sync`.
+**`--local` survives on one verb, and it is not an agent one.** `infra release --local` stages a package into the machine store, and that is an ordinary partner act. The wiring verbs take no flag at all: `repo agent-sync` has no options and reads the mode from `SPN_DEVEX_AGENT_WORKSPACE` — set, and the marketplace is the checkout beside its siblings; unset, which is what every partner has, and it is the published one. Nothing may set it for somebody.
 
 ## A consumer repo needs no peer checkout
 

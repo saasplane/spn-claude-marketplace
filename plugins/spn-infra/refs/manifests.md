@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "CONCEPT.md", "section": "Estate Manifest", "seen": "d4d91369" },
+    { "path": "CONCEPT.md", "section": "Estate Manifest", "seen": "61b99636" },
     { "path": "CONCEPT.md", "section": "Estate Packages", "seen": "23a4853a" }
   ]
 }

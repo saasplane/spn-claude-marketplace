@@ -6,7 +6,7 @@ description: Turn a requirement into a design the platform's own vocabulary can 
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/03-capabilities/05-docs/05-artifacts.md", "section": "The approach document", "seen": "083227ee" }
+    { "path": "docs/03-capabilities/05-docs/05-artifacts.md", "section": "The approach document", "seen": "f7b7b960" }
   ]
 }
 -->
@@ -150,7 +150,7 @@ When a design is big enough that someone will read it more than once, the plan b
 
 | Answer | Kind | Path | Shape |
 | --- | --- | --- | --- |
-| **yes** — a design was argued, a cost accepted | approach | `artifacts/approaches/<topic>-approach.html` | `Terms? → Why → What → How → Open → Deferred` |
+| **yes** — a design was argued, a cost accepted | approach | `.spndevex/workstreams/open/{NNN}-{subject}/{subject}-approach.html` — never a repository | `Terms? → Why → What → How → Open → Deferred` |
 | **no** — a concept section expanded so it can be read | overview | `artifacts/overviews/<section>-overview.html` | the section's own shape, at reading depth |
 
 A document with no options, no recommendation and no accepted cost is an **overview** whichever folder holds it. Filing it as an argument costs a reader the signal that says whether anything is still open.
@@ -162,14 +162,14 @@ Two rules separate them once you are writing:
 
 `concept-overview.html` is the concept's readable HTML face, one per repo; a `<section>-overview.html` expands one section and the section names it back. Everything below in this section governs the **approach** document.
 
-**Where the page lives decides whether it may be published** (decision RD.DOCS.054). An open page
-sits in `.spndevex/`, which is in no repository, so it reaches one machine and nobody else. A
-settled page sits in a repository pocket, where the git host already shares it.
+**Where the page lives decides whether it may be published** (decision RD.DOCS.054). The test is the
+same as it always was — does the git host already share it — and the page kind now answers it, because
+an approach page never enters a repository at all.
 
-| The page is | Reaches | So |
-| --- | --- | --- |
-| open, still argued | one machine | it **may be published** for review, on the developer's say-so |
-| settled, in a repository | anyone who pulls | **never publish it** |
+| The page | Lives | Reaches | So |
+| --- | --- | --- | --- |
+| an **approach** | the workstream, in `.spndevex/`, for its whole life | one machine | it **may be published** for review, on the developer's say-so |
+| an **overview** or a **construct** page | a repository's artifacts pocket | anyone who pulls | **never publish it** |
 
 - **Ask before publishing, every time.** The page leaves the machine, and what it carries is the
   developer's to judge. Never publish one unasked.
@@ -235,12 +235,20 @@ than assume.
 
 #### Where the argument lives while you argue it
 
-**A page in a repo's artifacts pocket is a landing, never a drafting table.** The pocket holds
-finished reference material, so an argument still being corrected does not belong there yet.
-While a subject is open, its page lives in the workspace's own workstream folder:
-`.spndevex/workstreams/open/{NNN}-{subject}/{subject}-approach.html`. You iterate it there, and
-it moves into the pocket by scope once the argument is settled. Writing it into a repo early is
-how a design ends up committed into a seat while its author is still changing their mind.
+**EVERY ARGUMENT LIVES IN THE WORKSTREAM THAT ARGUES IT, AND CLOSES WITH IT.** The page sits in
+the workspace's planning centre —
+`.spndevex/workstreams/open/{NNN}-{subject}/{subject}-approach.html` — for its whole life. It never
+moves into a repository's pocket, not while it is being argued and not once it is settled.
+
+**The reason is what the two places are for.** A pocket holds what a repository STATES and what
+somebody MEASURED. An argument is the record of a moment: the options weighed, and the costs that
+decided between them. Mixing the two is what let a stale argument be read as a statement of today —
+somebody opens a settled page two quarters later and reads it as the rule.
+
+**A workstream's decisions reach the repositories on the way to closing**, and they arrive in their
+durable form rather than as the page: the half that outlives the argument is a **register row**, and
+the construct the decision changed is **rewritten fresh**. The page is consumed by the decision it
+produces.
 
 **One workstream holds one approach page.** The page is named for the subject, and scope growth
 iterates it rather than opening a second. A subject raised mid-sitting becomes another arc under
@@ -286,7 +294,7 @@ between them, and it is one column:
 
 | The page argues | Where it lives | The `How` tables |
 | --- | --- | --- |
-| one node's design | that node's `docs/artifacts/approaches/` | Piece · Lands as · How you would know · State |
+| one node's design | the workstream that argues it — a node has no approaches folder | Piece · Lands as · How you would know · State |
 | a change across repos | the open workstream in `.spndevex/` | the same, **plus a `Scope` column** |
 
 **Scope names a node, not a repository.** A row reading `spn-platform-ts` has picked a building
@@ -318,8 +326,8 @@ rather than about the effort. Ask what one act would finish it, and plan per ite
 items genuinely differ.
 
 Two gates read that column, and `refs/cross-repo.md` states them in full. The **documents-first**
-gate warns when you write an approach page into a repo's pocket while an open workstream still
-has rows that have not landed. The **close** gate refuses a move into `workstreams/closed/`
+gate warns when you write into a repository's own documents while an open workstream still has rows
+that have not landed. The **close** gate refuses a move into `workstreams/closed/`
 while any row is one nobody decided. Moving `backlog/` to `open/` is not a close, so no gate
 fires on it. `landed`, `carried` and `deferred` all pass, because the check is *accounted for*
 and never *finished*.
@@ -423,9 +431,10 @@ The document is the working surface, not a record of the work:
 
 1. **Implement it.** The design is settled; the code follows.
 2. **Record the decision** in the decision register, if it changes a rule or an interface others depend on.
-3. **Then, and only then, the document lands in the artifacts pocket** of the node that owns the topic. That pocket holds finished reference material, never work in progress — an approach doc arrives when it describes something true, not while it is still deciding.
+3. **Rewrite what the decision changed, fresh** — the construct, the chapter, the rules in their owning files. That is how the argument reaches the repositories, and it is the only way it reaches them.
+4. **The page stays where it was argued**, and closes with its workstream. It is never copied into a repository's pocket: the register row is the durable half, and a second home for the same decision is a second thing to keep true.
 
-A document still carrying **open** questions lives with the work, not in the artifacts pocket. Deferred items travel with it, and are the first thing the next person reads when the topic comes back.
+Deferred items travel with the page, and are the first thing the next person reads when the topic comes back.
 
 **The document closes with a footer naming its sources** — the chapters and register rows it reasons over — **and the iteration contract**. A future session can then reopen and continue it: new questions land as Open cards, resolutions fold in, the status chip follows the shape.
 
