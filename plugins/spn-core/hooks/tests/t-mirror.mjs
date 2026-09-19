@@ -9,7 +9,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
 
-const DOCS = resolve(import.meta.dirname, "..");
+const HOOKS = resolve(import.meta.dirname, "..");
 
 const BASE = mkdtempSync(join(tmpdir(), "t-mirror-"));
 process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
@@ -41,7 +41,7 @@ function said(root, path, session) {
     tool_name: "Edit", cwd: root, session_id: session,
     tool_input: { file_path: join(root, path), new_string: "x" },
   });
-  const out = execFileSync(process.execPath, [`${DOCS}/mirror.ts`],
+  const out = execFileSync(process.execPath, [`${HOOKS}/checks/mirror.ts`],
     { input: payload, encoding: "utf8", cwd: root }).trim();
   if (!out) return "";
   try { return JSON.parse(out).systemMessage ?? ""; } catch { return out; }

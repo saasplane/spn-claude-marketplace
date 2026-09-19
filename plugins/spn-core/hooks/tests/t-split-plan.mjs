@@ -9,7 +9,7 @@ import { workspace } from "./fixture.mjs";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
-const HOOKS = resolve(import.meta.dirname, "..", "..");
+const HOOKS = resolve(import.meta.dirname, "..");
 const SCRIPTS = resolve(HOOKS, "scripts");
 const DOCS = resolve(HOOKS, "docs");
 
@@ -84,7 +84,7 @@ function verdict(out) {
 }
 
 function ts(gate, payload, cwd) {
-  try { return verdict(execFileSync("node", [`${DOCS}/split-plan.ts`, "--gate", gate], { input: JSON.stringify(payload), encoding: "utf8", cwd }).trim()); }
+  try { return verdict(execFileSync("node", [`${HOOKS}/checks/split-plan.ts`, "--gate", gate], { input: JSON.stringify(payload), encoding: "utf8", cwd }).trim()); }
   catch (e) { return ["error", String(e.stderr ?? e.message).slice(0, 300)]; }
 }
 function py(gate, payload, cwd) {

@@ -17,9 +17,9 @@
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync } from "node:fs";
 import { dirname, join, resolve, basename, relative } from "node:path";
-import { renderPage } from "./render.ts";
-import { checkFigures, colour, stripSpans } from "./figures.ts";
-import { begin, record, end } from "./timing.ts";
+import { renderPage } from "../lib/render.ts";
+import { checkFigures, colour, stripSpans } from "../lib/figures.ts";
+import { begin, record, end } from "../lib/timing.ts";
 
 type Grade = "RULE" | "SOFT";
 type Finding = { check: string; grade: Grade; file: string; message: string };

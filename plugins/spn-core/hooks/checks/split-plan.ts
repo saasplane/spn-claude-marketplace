@@ -34,7 +34,7 @@
 import { readdirSync, statSync } from "node:fs";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { DEVEX, emit, isDir, isFile, listdir, read, readPayload, runAlone, unescape, workspaceRoot,
-         type Payload, type Verdict } from "./hook.ts";
+         type Payload, type Verdict } from "../lib/payload.ts";
 
 // The state a row reaches. `landed` is the only one that satisfies the documents pass; all three
 // named states satisfy the close. A mark nobody wrote is what the close refuses.

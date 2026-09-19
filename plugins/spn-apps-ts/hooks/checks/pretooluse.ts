@@ -31,8 +31,9 @@
 // PreToolUse chain removes every other gate with it, which is worse than any single miss.
 
 import { resolve } from "node:path";
-import type { Payload, ToolInput, Verdict } from "./apps.ts";
-import { emit, isDir, isFile, payload } from "./apps.ts";
+import type { Payload, ToolInput, Verdict } from "../lib/payload.ts";
+import { emit, payload } from "../lib/payload.ts";
+import { isDir, isFile } from "../lib/source.ts";
 import { CHECKS as COVERAGE_CHECKS, run as runCoverage } from "./coverage.ts";
 import { run as runEnablementGrammar, watched as watchedEnablement } from "./enablement-grammar.ts";
 import { run as runHostAssertion } from "./host-assertion.ts";

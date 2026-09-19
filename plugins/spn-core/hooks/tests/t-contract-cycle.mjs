@@ -8,7 +8,7 @@ import { join } from "node:path";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
-const HOOKS = resolve(import.meta.dirname, "..", "..");
+const HOOKS = resolve(import.meta.dirname, "..");
 const SCRIPTS = resolve(HOOKS, "scripts");
 const DOCS = resolve(HOOKS, "docs");
 
@@ -56,7 +56,7 @@ function one(label, files, writing, expect, expectLoop) {
   const dir = seat(files);
   const payload = { tool_name: "Write", tool_input: { file_path: join(dir, `${writing.stem}.ts`),
     ...(writing.content !== undefined ? { content: writing.content } : { new_string: writing.new_string }) } };
-  const [ts, tsWhy] = verdict("node", [`${DOCS}/contract-cycle.ts`], payload);
+  const [ts, tsWhy] = verdict("node", [`${HOOKS}/checks/contract-cycle.ts`], payload);
   const [py, pyWhy] = hasPython("contract-cycle.py")
     ? verdict("python3", [`${SCRIPTS}/contract-cycle.py`, "--stdin"], payload)
     : [null, null];
@@ -117,7 +117,7 @@ one("an import of a file that is not in the seat",
   const dir = join(BASE, `s${n}`, "src", "services");
   mkdirSync(dir, { recursive: true });
   const payload = { tool_name: "Write", tool_input: { file_path: join(dir, "thing.ts"), content: "import { A } from './a';\n" } };
-  const [ts] = verdict("node", [`${DOCS}/contract-cycle.ts`], payload);
+  const [ts] = verdict("node", [`${HOOKS}/checks/contract-cycle.ts`], payload);
   const [py] = hasPython("contract-cycle.py")
     ? verdict("python3", [`${SCRIPTS}/contract-cycle.py`, "--stdin"], payload)
     : [null];

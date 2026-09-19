@@ -11,7 +11,7 @@ import { workspace } from "./fixture.mjs";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
-const HOOKS = resolve(import.meta.dirname, "..", "..");
+const HOOKS = resolve(import.meta.dirname, "..");
 const SCRIPTS = resolve(HOOKS, "scripts");
 const DOCS = resolve(HOOKS, "docs");
 
@@ -48,7 +48,7 @@ function run(cmd, args, payload, cwd) {
 let n = 0, failed = 0;
 function one(label, payload, expect, { says, cwd = `${WORKSPACE}`, parity = true, why = "" } = {}) {
   n += 1;
-  const [ts, tsWhy] = run("node", [`${DOCS}/pretooluse.ts`], payload, cwd);
+  const [ts, tsWhy] = run("node", [`${HOOKS}/docs/pretooluse.ts`], payload, cwd);
   const [py] = hasPython("pretooluse.py") ? run("python3", [`${SCRIPTS}/pretooluse.py`], payload, cwd) : [null];
   const saysOk = !says || tsWhy.toLowerCase().includes(says.toLowerCase());
   const ok = ts === expect && saysOk && (py === null || !parity || ts === py);
@@ -159,7 +159,7 @@ console.log("\n=== pretooluse — the chain's cost per call");
   };
   for (const [label, payload] of Object.entries(cases)) {
     const py = median(() => run("python3", [`${SCRIPTS}/pretooluse.py`], payload, `${WORKSPACE}`));
-    const ts = median(() => run("node", [`${DOCS}/pretooluse.ts`], payload, `${WORKSPACE}`));
+    const ts = median(() => run("node", [`${HOOKS}/docs/pretooluse.ts`], payload, `${WORKSPACE}`));
     console.log(`  ${label.padEnd(26)} python3 ${py.toFixed(1).padStart(6)} ms   node ${ts.toFixed(1).padStart(6)} ms   (whole chain, start-up included)`);
   }
 }

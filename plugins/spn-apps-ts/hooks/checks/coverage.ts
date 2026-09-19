@@ -37,8 +37,9 @@
 //   scan :  coverage.ts --check <name> <path> …      (any file or tree; prints what it can see)
 
 import { basename, dirname, join, resolve } from "node:path";
-import type { Payload, ToolInput, Verdict } from "./apps.ts";
-import { emit, filesUnder, isDir, isFile, lineOf, payload, read, resultingText, runAlone, SKIP } from "./apps.ts";
+import type { Payload, ToolInput, Verdict } from "../lib/payload.ts";
+import { emit, payload, runAlone } from "../lib/payload.ts";
+import { filesUnder, isDir, isFile, lineOf, read, resultingText, SKIP } from "../lib/source.ts";
 import { readdirSync } from "node:fs";
 
 const CODE = [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"];
@@ -317,7 +318,10 @@ export function run(name: string, input: ToolInput): Verdict {
   const path = input.file_path ?? "";
   if (!CODE.some((extension) => path.endsWith(extension))) return null;
   const normalized = resolve(path).split("\\").join("/");
-  if (normalized.includes("/hooks/scripts/") || normalized.includes("/hooks/checks/")) return null;
+  // A PLUGIN'S OWN HOOKS ARE EXEMPT, WHATEVER FOLDER THEY SIT IN. Naming the folders one by
+  // one is how F14 happened: `checks/` was added and `scripts/` was not removed, and the
+  // incumbent then refused the very port that replaced it. The rule is about `hooks/`.
+  if (normalized.includes("/hooks/")) return null;
   let source: string | null;
   let added: string | null;
   try {

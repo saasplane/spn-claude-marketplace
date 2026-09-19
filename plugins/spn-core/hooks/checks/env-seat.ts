@@ -34,7 +34,7 @@
 import { realpathSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { emit, readPayload, runAlone, type Payload, type Verdict } from "./hook.ts";
+import { emit, readPayload, runAlone, type Payload, type Verdict } from "../lib/payload.ts";
 
 const SEAT = ".spnenv";
 

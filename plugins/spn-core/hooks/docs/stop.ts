@@ -16,9 +16,9 @@
 
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
-import { cardsOf, openWorkstreams, rowsOf, stateOf } from "./split-plan.ts";
-import { workspaceRoot } from "./hook.ts";
-import { begin, span, end } from "./timing.ts";
+import { cardsOf, openWorkstreams, rowsOf, stateOf } from "../checks/split-plan.ts";
+import { workspaceRoot } from "../lib/payload.ts";
+import { begin, span, end } from "../lib/timing.ts";
 
 type Warning = { check: string; message: string };
 

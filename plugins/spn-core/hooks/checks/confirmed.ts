@@ -30,7 +30,7 @@
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { basename, isAbsolute, join, relative, resolve } from "node:path";
 import { DEVEX, emit, isDir, listdir, read, readPayload, runAlone, workspaceRoot,
-         type Payload, type Verdict } from "./hook.ts";
+         type Payload, type Verdict } from "../lib/payload.ts";
 
 const DEBUG = ".debug";
 const CONFIRMED = "confirmed";

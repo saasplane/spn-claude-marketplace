@@ -1,45 +1,15 @@
-// What every `spn-apps-ts` check shares: the event it is handed, the verdict it gives back, the
-// masking every parser runs over, and the two questions each one asks about a write.
+// Reading a source file the way a check has to read one: with its comments and strings masked out,
+// with the write the caller is about to make already applied, and with the question *did THIS edit
+// introduce it* answerable.
 //
-// WHY A VERDICT IS A RETURN VALUE, here as in `spn-core/hooks/docs/hook.ts`. A check that prints
-// its refusal and exits can have that refusal swallowed by whatever is reading its stdout — which
-// is exactly what happened to `confirmed` in the core plugin, silently, for 147 fires. A check that
-// RETURNS what it decided cannot lose it. Each file still runs alone: `emit` prints the same JSON
-// the Python printed, on the same stdout.
-//
-// EXIT 0, ALWAYS. A refusal is the documented PreToolUse decision on stdout, never a non-zero exit.
-// A hook that crashes takes every other gate in the chain down with it.
-//
-// THESE THREE HELPERS USED TO LIVE IN `enablement-grammar.py`, and four sibling scripts reached
-// into it with `importlib` to borrow them — each paying a second module load on top of its own
-// interpreter start-up. They are shared code and they now sit in a shared file.
+// THESE HELPERS USED TO LIVE IN `enablement-grammar.py`, and four sibling scripts reached into it
+// with `importlib` to borrow them — each paying a second module load on top of its own interpreter
+// start-up. They are shared code, and they sit in a shared file that says so in its name.
 
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 
-export type ToolInput = {
-  file_path?: string;
-  content?: string;
-  new_string?: string;
-  old_string?: string;
-  replace_all?: boolean;
-};
-
-export type Payload = {
-  tool_name?: string;
-  tool_input?: ToolInput;
-  cwd?: string;
-  session_id?: string;
-};
-
-/**
- * What a check decided. `deny` refuses the call; `note` is advice the turn reads.
- *
- * `headline` is the one line shown beside a refusal. Not every check has one — `host-assertion`
- * printed a `systemMessage` with its denial and `read-verb-naming` did not, and that difference is
- * visible to the developer, so it is carried rather than smoothed away.
- */
-export type Verdict = { deny?: string; note?: string; headline?: string } | null;
+import type { ToolInput } from "./payload.ts";
 
 export const SKIP = new Set([
   "node_modules", "dist", "build", ".git", ".nx", "coverage", ".output", "__pycache__",
@@ -222,40 +192,4 @@ function* walkUnsorted(roots: string[]): Generator<string> {
     };
     yield* walk(root);
   }
-}
-
-/** The event on stdin, or null when there is nothing parseable there. Unparsable input allows. */
-export async function payload(): Promise<Payload | null> {
-  const chunks: Buffer[] = [];
-  try {
-    for await (const chunk of process.stdin) chunks.push(chunk as Buffer);
-    return JSON.parse(Buffer.concat(chunks).toString("utf8")) as Payload;
-  } catch { return null; }
-}
-
-/** Print a verdict the way the Python did, on the same stdout. Silence is an allow. */
-export function emit(verdict: Verdict): void {
-  if (!verdict) return;
-  if (verdict.deny) {
-    process.stdout.write(JSON.stringify({
-      ...(verdict.headline ? { systemMessage: verdict.headline } : {}),
-      hookSpecificOutput: {
-        hookEventName: "PreToolUse",
-        permissionDecision: "deny",
-        permissionDecisionReason: verdict.deny,
-      },
-    }));
-    return;
-  }
-  if (verdict.note) {
-    process.stdout.write(JSON.stringify({
-      systemMessage: verdict.note,
-      hookSpecificOutput: { hookEventName: "PreToolUse", additionalContext: verdict.note },
-    }));
-  }
-}
-
-/** Whether this file is being run directly rather than imported by the dispatcher. */
-export function runAlone(name: string): boolean {
-  return Boolean(process.argv[1]) && process.argv[1].endsWith(name);
 }

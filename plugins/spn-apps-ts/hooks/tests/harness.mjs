@@ -11,7 +11,7 @@ import { dirname, join } from "node:path";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
-const HOOKS = resolve(import.meta.dirname, "..", "..");
+const HOOKS = resolve(import.meta.dirname, "..");
 export const SCRIPTS = resolve(HOOKS, "scripts");
 export const CHECKS = resolve(HOOKS, "checks");
 

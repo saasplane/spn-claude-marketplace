@@ -25,8 +25,8 @@
 import { createHash } from "node:crypto";
 import { readdirSync, readFileSync, statSync, appendFileSync } from "node:fs";
 import { basename, extname, join } from "node:path";
-import { isFile, read } from "./hook.ts";
-import { BLOCK_BREAK, IDIOM, MARKED, opening, proseOf, sentences, type Sentence } from "./doc-check.ts";
+import { isFile, read } from "../lib/payload.ts";
+import { BLOCK_BREAK, IDIOM, MARKED, opening, proseOf, sentences, type Sentence } from "../checks/doc-check.ts";
 
 const SKIP_DIR = new Set(["node_modules", ".git", "dist", "build", ".nx", "coverage", ".output",
   "__pycache__", ".venv", "tool-results", ".pnpm-store"]);

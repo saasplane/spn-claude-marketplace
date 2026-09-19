@@ -10,7 +10,7 @@ import { workspace } from "./fixture.mjs";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
-const HOOKS = resolve(import.meta.dirname, "..", "..");
+const HOOKS = resolve(import.meta.dirname, "..");
 const SCRIPTS = resolve(HOOKS, "scripts");
 const DOCS = resolve(HOOKS, "docs");
 
@@ -41,7 +41,7 @@ function build(name, go) {
 
 function ts(payload, cwd) {
   try {
-    return execFileSync("node", [`${DOCS}/confirmed.ts`], { input: JSON.stringify(payload), encoding: "utf8", cwd }).trim();
+    return execFileSync("node", [`${HOOKS}/checks/confirmed.ts`], { input: JSON.stringify(payload), encoding: "utf8", cwd }).trim();
   } catch (e) { return `ERROR: ${e.stderr ?? e.message}`; }
 }
 

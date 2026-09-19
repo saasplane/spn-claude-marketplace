@@ -27,14 +27,14 @@
 // A check now RETURNS a `Verdict`. There is no round trip for a verdict to be lost in.
 
 import { readFileSync } from "node:fs";
-import { emit, readPayload, type Payload, type Verdict } from "./hook.ts";
-import { checkEnvSeat } from "./env-seat.ts";
-import { checkContractCycle } from "./contract-cycle.ts";
-import { checkDoc, bashWrites } from "./doc-check.ts";
-import { gateDocumentsFirst, gateClose } from "./split-plan.ts";
-import { checkConfirmed } from "./confirmed.ts";
-import { applies as mirrorApplies, checkMirror } from "./mirror.ts";
-import { begin, end, span } from "./timing.ts";
+import { emit, readPayload, type Payload, type Verdict } from "../lib/payload.ts";
+import { checkEnvSeat } from "../checks/env-seat.ts";
+import { checkContractCycle } from "../checks/contract-cycle.ts";
+import { checkDoc, bashWrites } from "../checks/doc-check.ts";
+import { gateDocumentsFirst, gateClose } from "../checks/split-plan.ts";
+import { checkConfirmed } from "../checks/confirmed.ts";
+import { applies as mirrorApplies, checkMirror } from "../checks/mirror.ts";
+import { begin, end, span } from "../lib/timing.ts";
 
 type Check = {
   name: string;

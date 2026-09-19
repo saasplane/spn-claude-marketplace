@@ -7,7 +7,7 @@ import { tree } from "./harness.mjs";
 
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
-const HOOKS = resolve(import.meta.dirname, "..", "..");
+const HOOKS = resolve(import.meta.dirname, "..");
 const SCRIPTS = resolve(HOOKS, "scripts");
 const CHECKS = resolve(HOOKS, "checks");
 const PYTHON_HERE = existsSync(resolve(SCRIPTS, "pretooluse.py"))

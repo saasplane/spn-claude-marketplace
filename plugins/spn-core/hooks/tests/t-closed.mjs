@@ -12,7 +12,7 @@ import { workspace } from "./fixture.mjs";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
-const HOOKS = resolve(import.meta.dirname, "..", "..");
+const HOOKS = resolve(import.meta.dirname, "..");
 const SCRIPTS = resolve(HOOKS, "scripts");
 const DOCS = resolve(HOOKS, "docs");
 
@@ -61,7 +61,7 @@ let n = 0, failed = 0;
 function one(label, root, command, expect, { says, parity = true, why = "" } = {}) {
   n += 1;
   const payload = { tool_name: "Bash", cwd: root, tool_input: { command } };
-  const ts = run("node", [`${DOCS}/closed.ts`], payload, root);
+  const ts = run("node", [`${HOOKS}/docs/closed.ts`], payload, root);
   const py = hasPython("closed.py") ? run("python3", [`${SCRIPTS}/closed.py`], payload, root) : null;
   const saysOk = !says || ts.includes(says);
   const agrees = py === null || !parity || (Boolean(ts) === Boolean(py));

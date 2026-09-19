@@ -30,7 +30,7 @@
 
 import { readdirSync, statSync } from "node:fs";
 import { basename, dirname, join, resolve, sep } from "node:path";
-import { emit, read, readPayload, runAlone, type Payload, type Verdict } from "./hook.ts";
+import { emit, read, readPayload, runAlone, type Payload, type Verdict } from "../lib/payload.ts";
 
 const STATES_DIR = "src/contract/states";
 const SIBLING = /from\s+'\.\/([\w-]+)'/g;

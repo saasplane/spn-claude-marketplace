@@ -48,7 +48,7 @@
 
 import { createHash } from "node:crypto";
 import { join } from "node:path";
-import { isFile, read } from "./hook.ts";
+import { isFile, read } from "./payload.ts";
 
 const BLOCK = /<!--\s*spn:restates\s*(\{[\s\S]*?\})\s*-->/;
 // The DECLARATION form, which carries a colon. Bare prose does not declare anything, and one skill

@@ -15,15 +15,15 @@
 //
 // Run it after touching any hook, and before any release of the plugins.
 //
-// PORTED WITH THE HOOKS IT TESTS. It now runs the TypeScript under `hooks/docs/` and whatever Python
-// is still under `hooks/scripts/`, choosing the interpreter from the extension — so it keeps working
+// PORTED WITH THE HOOKS IT TESTS. It runs the TypeScript wherever a plugin's `hooks/` keeps it and
+// whatever Python is still under `hooks/scripts/`, choosing the interpreter from the extension — so it keeps working
 // through a port rather than only at its two ends.
 
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join, resolve } from "node:path";
-import { isDir, isFile, listdir, read } from "./hook.ts";
+import { isDir, isFile, listdir, read } from "../lib/payload.ts";
 
 const HERE = resolve(import.meta.dirname);
 
@@ -90,11 +90,26 @@ export function pluginRoot(name: string, folder: string): string | null {
   return null;
 }
 
-// WHERE A PLUGIN KEEPS ITS RUNNABLE FILES, WHICH IS NOT ONE ANSWER. `spn-core` keeps them in
-// `docs/` and `spn-apps-ts` in `checks/`, because the two plugins check different things and neither
-// folder name would be honest for the other. Python, wherever it is left, is in `scripts/`.
-const folderFor = (plugin: string, script: string) =>
-  script.endsWith(".ts") ? (plugin === "spn-apps-ts" ? "checks" : "docs") : "scripts";
+/**
+ * The folder a plugin keeps a given file in — FOUND, never guessed.
+ *
+ * This was a guess: TypeScript meant `checks/` in `spn-apps-ts` and `docs/` in `spn-core`, Python
+ * meant `scripts/`. Two things were wrong with that. It hard-coded one plugin's name into a tool
+ * meant to sweep any of them, and it went stale the moment the tree was arranged by nature — a
+ * sweep then reported every file as *declared, no file*, which reads exactly like the outage it
+ * exists to catch.
+ *
+ * So it LOOKS. The folder set is the shape of a plugin's `hooks/`, and a file is wherever it is.
+ */
+const HOOK_FOLDERS = ["events", "checks", "tools", "lib", "docs", "scripts"];
+
+const folderFor = (plugin: string, script: string): string | null => {
+  for (const folder of HOOK_FOLDERS) {
+    const where = pluginRoot(plugin, folder);
+    if (where && isFile(join(where, script))) return folder;
+  }
+  return null;
+};
 const runnerFor = (script: string) => (script.endsWith(".ts") ? process.execPath : "python3");
 
 /**
@@ -110,7 +125,7 @@ export function declared(): Array<[string, string]> {
   for (const plugin of isDir(family) ? readdirSync(family).sort() : []) {
     const manifest = join(family, plugin, "hooks", "hooks.json");
     if (!isFile(manifest)) continue;
-    for (const match of read(manifest).matchAll(/\/hooks\/(?:scripts|docs|checks)\/([A-Za-z0-9_.-]+\.(?:py|sh|ts))/g))
+    for (const match of read(manifest).matchAll(/\/hooks\/[A-Za-z0-9_-]+\/([A-Za-z0-9_.-]+\.(?:py|sh|ts))/g))
       found.add(`${plugin} ${match[1]}`);
   }
   return [...found].sort().map((entry) => entry.split(" ") as [string, string]);
@@ -139,7 +154,8 @@ export function main(argv: string[]): number {
 
   const failed: Array<[string, string]> = [];
   for (const [plugin, script] of declared()) {
-    const where = pluginRoot(plugin, folderFor(plugin, script));
+    const folder = folderFor(plugin, script);
+    const where = folder === null ? null : pluginRoot(plugin, folder);
     if (!where || !isFile(join(where, script))) {
       failed.push([`${plugin}/${script}`, "declared by hooks.json and absent from the plugin"]);
       console.log(`  ✘ ${plugin}/${script} — declared, no file`);
@@ -147,7 +163,8 @@ export function main(argv: string[]): number {
   }
 
   for (const [plugin, script, args] of SCRIPTS) {
-    const where = pluginRoot(plugin, folderFor(plugin, script));
+    const folder = folderFor(plugin, script);
+    const where = folder === null ? null : pluginRoot(plugin, folder);
     const path = where ? join(where, script) : "";
     const label = `${script} ${args.join(" ")}`.trim();
     if (!path || !isFile(path)) {

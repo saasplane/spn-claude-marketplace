@@ -40,7 +40,7 @@
 
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { basename, dirname, join, resolve, relative, sep } from "node:path";
-import { emit, readPayload, runAlone, unescape, type Payload, type Verdict } from "./hook.ts";
+import { emit, readPayload, runAlone, unescape, type Payload, type Verdict } from "../lib/payload.ts";
 
 export type Finding = [severity: string, message: string];
 

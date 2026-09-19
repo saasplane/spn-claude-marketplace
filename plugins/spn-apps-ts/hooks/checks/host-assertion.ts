@@ -25,8 +25,9 @@
 //   scan :  host-assertion.ts <path> …       (any file or tree; prints every finding it can see)
 
 import { basename, resolve } from "node:path";
-import type { Payload, ToolInput, Verdict } from "./apps.ts";
-import { emit, filesUnder, lineOf, payload, read, resultingText, runAlone } from "./apps.ts";
+import type { Payload, ToolInput, Verdict } from "../lib/payload.ts";
+import { emit, payload, runAlone } from "../lib/payload.ts";
+import { filesUnder, lineOf, read, resultingText } from "../lib/source.ts";
 
 const CODE = [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"];
 
@@ -166,7 +167,10 @@ export function run(input: ToolInput): Verdict {
   // A HOOK'S OWN SOURCE QUOTES THE PATTERN IT BANS. `checks/` joins `scripts/` here: the port moved
   // these files, and the incumbent's exemption named only the old folder — so the Python refused
   // this very file being written. Finding F14 in the N2 arc.
-  if (normalized.includes("/hooks/scripts/") || normalized.includes("/hooks/checks/")) return null;
+  // A PLUGIN'S OWN HOOKS ARE EXEMPT, WHATEVER FOLDER THEY SIT IN. Naming the folders one by
+  // one is how F14 happened: `checks/` was added and `scripts/` was not removed, and the
+  // incumbent then refused the very port that replaced it. The rule is about `hooks/`.
+  if (normalized.includes("/hooks/")) return null;
   let source: string | null;
   let added: string | null;
   try {

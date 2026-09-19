@@ -39,8 +39,8 @@ import { execFileSync } from "node:child_process";
 import { readdirSync, realpathSync, statSync } from "node:fs";
 import { homedir } from "node:os";
 import { basename, join, relative, resolve, sep } from "node:path";
-import { isDir, isFile, listdir, read, readPayload, runAlone, type Payload } from "./hook.ts";
-import { begin, end, record } from "./timing.ts";
+import { isDir, isFile, listdir, read, readPayload, runAlone, type Payload } from "../lib/payload.ts";
+import { begin, end, record } from "../lib/timing.ts";
 
 const MARKETPLACE = "saasplane";
 const CORE = "spn-core";

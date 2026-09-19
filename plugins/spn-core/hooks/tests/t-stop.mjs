@@ -10,7 +10,7 @@ import { workspace } from "./fixture.mjs";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
-const HOOKS = resolve(import.meta.dirname, "..", "..");
+const HOOKS = resolve(import.meta.dirname, "..");
 const SCRIPTS = resolve(HOOKS, "scripts");
 const DOCS = resolve(HOOKS, "docs");
 
@@ -82,7 +82,7 @@ let n = 0, failed = 0;
 function one(label, root, expect, { says, reply = "done", parity = true, why = "" } = {}) {
   n += 1;
   const payload = { cwd: root, last_assistant_message: reply };
-  const ts = said(run("node", [`${DOCS}/stop.ts`], payload, root));
+  const ts = said(run("node", [`${HOOKS}/docs/stop.ts`], payload, root));
   const py = hasPython("stop.py") ? said(run("python3", [`${SCRIPTS}/stop.py`], payload, root)) : null;
   const saysOk = !says || ts.includes(says);
   const spoke = Boolean(ts), pySpoke = Boolean(py);

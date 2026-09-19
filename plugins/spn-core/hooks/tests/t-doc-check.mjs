@@ -6,7 +6,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
-const HOOKS = resolve(import.meta.dirname, "..", "..");
+const HOOKS = resolve(import.meta.dirname, "..");
 const SCRIPTS = resolve(HOOKS, "scripts");
 const DOCS = resolve(HOOKS, "docs");
 
@@ -43,7 +43,7 @@ function run(cmd, args, payload) {
 /** One payload through both, compared on the findings each reports. */
 function one(label, payload, expect, says) {
   n += 1;
-  const ts = run("node", [`${DOCS}/doc-check.ts`, "--stdin"], payload);
+  const ts = run("node", [`${HOOKS}/checks/doc-check.ts`, "--stdin"], payload);
   const py = hasPython("doc-check.py") ? run("python3", [`${SCRIPTS}/doc-check.py`, "--stdin"], payload) : null;
   const saysOk = !says || ts.toLowerCase().includes(says.toLowerCase());
   const same = py === null || ts === py;
@@ -167,7 +167,7 @@ console.log("\n=== doc-check — every path a Bash command writes");
   n += 1;
   const command = "cat > docs/a.md <<'EOF'\nhello\nEOF\nsed -i '' 's/a/b/' docs/b.md\ncp docs/c.md docs/d.md\necho hi | tee -a docs/e.md";
   const payload = { tool_name: "Bash", tool_input: { command } };
-  const ts = run("node", [`${DOCS}/doc-check.ts`, "--bash-writes"], payload);
+  const ts = run("node", [`${HOOKS}/checks/doc-check.ts`, "--bash-writes"], payload);
   const py = hasPython("doc-check.py") ? run("python3", [`${SCRIPTS}/doc-check.py`, "--bash-writes"], payload) : null;
   const ok = (py === null || ts === py) && ["docs/a.md", "docs/b.md", "docs/d.md", "docs/e.md"].every((f) => ts.includes(f));
   if (!ok) failed += 1;

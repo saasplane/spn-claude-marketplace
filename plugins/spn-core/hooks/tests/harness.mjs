@@ -10,9 +10,12 @@ import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
-const HOOKS = resolve(import.meta.dirname, "..", "..");
+const HOOKS = resolve(import.meta.dirname, "..");
 export const SCRIPTS = resolve(HOOKS, "scripts");
-export const DOCS = resolve(HOOKS, "docs");
+export const EVENTS = resolve(HOOKS, "docs");
+export const CHECKS = resolve(HOOKS, "checks");
+export const TOOLS = resolve(HOOKS, "tools");
+export const LIB = resolve(HOOKS, "lib");
 
 // THESE SUITES ARE A BUILDER'S GATE, and they say so rather than pretending otherwise. Several cases
 // name real files in the surrounding workspace — a chapter, an approach page, this workstream's own
@@ -75,7 +78,7 @@ export function compare(name, pyArgs, tsFile, cases) {
     ? pyArgs : null;
   console.log(`\n=== ${name}${pyArgs && !against ? " — py not installed; the port stands alone" : ""}`);
   for (const c of cases) {
-    const tsOut = run("node", [`${DOCS}/${tsFile}`], c.payload, c.cwd);
+    const tsOut = run("node", [`${CHECKS}/${tsFile}`], c.payload, c.cwd);
     const ts = verdictOf(tsOut);
     const py = against ? verdictOf(run("python3", against.map((a) => a.replace("@", SCRIPTS)), c.payload, c.cwd)) : "—";
     const expected = ts === c.expect;

@@ -9,7 +9,7 @@ import { join } from "node:path";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
-const HOOKS = resolve(import.meta.dirname, "..", "..");
+const HOOKS = resolve(import.meta.dirname, "..");
 const SCRIPTS = resolve(HOOKS, "scripts");
 const DOCS = resolve(HOOKS, "docs");
 
@@ -45,7 +45,7 @@ let n = 0, failed = 0;
 function compare(label, root, mustSay = [], mustNotSay = []) {
   n += 1;
   const py = hasPython("orientation.py") ? run("python3", [`${SCRIPTS}/orientation.py`, root], root) : null;
-  const ts = run("node", [`${DOCS}/orientation.ts`, root], root);
+  const ts = run("node", [`${HOOKS}/docs/orientation.ts`, root], root);
   const identical = py === null || py === ts;
   const says = mustSay.every((s) => ts.includes(s));
   const quiet = mustNotSay.every((s) => !ts.includes(s));
@@ -162,7 +162,7 @@ if (IN_WORKSPACE) {
     catch (e) { return `ERROR ${e.stderr}`; }
   };
   const py = hasPython("orientation.py") ? one("python3", [`${SCRIPTS}/orientation.py`, "--stdin"]) : null;
-  const ts = one("node", [`${DOCS}/orientation.ts`, "--stdin"]);
+  const ts = one("node", [`${HOOKS}/docs/orientation.ts`, "--stdin"]);
   // COMPARED AS PARSED OBJECTS, NOT AS TEXT. Python's json.dumps puts a space after each separator
   // and JSON.stringify does not, so the two strings differ while carrying identical content — and
   // the harness reads the parsed object, never the bytes.

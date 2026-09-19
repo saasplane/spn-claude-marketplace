@@ -30,8 +30,8 @@
 
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
-import type { Payload, Verdict } from "./hook.ts";
-import { DEVEX, read } from "./hook.ts";
+import type { Payload, Verdict } from "../lib/payload.ts";
+import { DEVEX, read } from "../lib/payload.ts";
 
 const DEBUG = ".debug";
 const MIRROR = "mirror";
@@ -143,7 +143,7 @@ if (process.argv[1] && basename(process.argv[1]) === "mirror.ts") {
   for await (const chunk of process.stdin) chunks.push(chunk as Buffer);
   let payload: Payload = {};
   try { payload = JSON.parse(Buffer.concat(chunks).toString("utf8")) as Payload; } catch { /* allows */ }
-  const { emit } = await import("./hook.ts");
+  const { emit } = await import("../lib/payload.ts");
   emit(checkMirror(payload));
   process.exit(0);
 }

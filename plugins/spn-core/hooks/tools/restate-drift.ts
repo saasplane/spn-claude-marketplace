@@ -24,8 +24,8 @@
 
 import { readdirSync, statSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
-import { isDir, isFile } from "./hook.ts";
-import { check, declaresASource, namedSources, parse, registerRows, undeclared } from "./restates.ts";
+import { isDir, isFile } from "../lib/payload.ts";
+import { check, declaresASource, namedSources, parse, registerRows, undeclared } from "../lib/restates.ts";
 
 const SKIP = new Set(["node_modules", ".git", "dist", "build", ".nx", "coverage", "__pycache__"]);
 

@@ -28,9 +28,9 @@
 // refused on are the same reading of the same table.
 
 import { basename, resolve } from "node:path";
-import { isDir, readPayload, runAlone, workspaceRoot, type Payload } from "./hook.ts";
-import { closing, moves, planOf, stateOf, subjectPages } from "./split-plan.ts";
-import { begin, end, span } from "./timing.ts";
+import { isDir, readPayload, runAlone, workspaceRoot, type Payload } from "../lib/payload.ts";
+import { closing, moves, planOf, stateOf, subjectPages } from "../checks/split-plan.ts";
+import { begin, end, span } from "../lib/timing.ts";
 
 const STRUCTURE = new Set(["workstreams", "sessions", "arcs", "open", "backlog", "closed", ""]);
 
