@@ -119,6 +119,24 @@ Most projects carry `tsconfig.test.json`; only the ones with a component or e2e 
 `tsconfig.integration.json`. Running either from the root without a path fails with `TS5058: the
 specified path does not exist`, which reads as a broken command rather than a missing argument.
 
+## After a run: the rows say what it found
+
+A run leaves `tests/.output/<tier>/spn-tests.json` behind — every behaviour id its case titles carried, and what the runner actually did with each. Writing that into the registers is one command:
+
+```bash
+node "${CLAUDE_PLUGIN_ROOT}"/hooks/tools/behaviour-rows.ts            # what it would change
+node "${CLAUDE_PLUGIN_ROOT}"/hooks/tools/behaviour-rows.ts --write
+```
+
+**Pass `--reach repository` only when the artifacts on disk ARE the whole of the tiers they name** — a full run of every node that owes them. Without it, a row no artifact mentioned is left exactly as it was. With it, such a row goes back to `PLANNED`, which is right after a complete run and wrong after a single node's: runs are per node and a register is per repository, so one node's journey run would otherwise reset another's rows.
+
+| It writes | It never writes |
+| --- | --- |
+| `Status` and `Updated at`, from the run | `Type` and `Tier` — decisions a person makes, which the run reads |
+| `SUCCESS` · `FAILED` · `PENDING` | `MANUAL` — the one intent no evidence can recover |
+
+A hand edit to `Status` or `Updated at` is a claim rather than a finding, and the next run overwrites it. **Never edit those two cells by hand** — if a row is wrong, the case that proves it is what to change.
+
 **One file out of a suite.** The target runs the whole tier. To narrow, pass the argument THROUGH
 it rather than going under it — everything after `--` reaches the runner:
 
