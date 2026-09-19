@@ -32,6 +32,14 @@ rather than by package name; renaming, splitting or absorbing a package moves no
 a behaviour that crosses packages finally has a home — the domain that would have to change if the
 behaviour changed.
 
+> [!IMPORTANT]
+> **The rule above is the book's; the trees have not all moved yet.** Every repository in this
+> workspace — this book included — still carries the older shape, a docs tree per node with four
+> seats. The consolidation is its own arc, and until it runs you will open repositories that do not
+> match this page. **Write new documentation to the shape above**, and do not migrate a tree you
+> happen to be standing in: moving one is a planned change with link rewriting and id preservation,
+> not something done in passing.
+
 ## Every surface, one map
 
 Documentation is not one place. Resolve which surface a change belongs to **before writing a word** — the commonest documentation defect is correct content on the wrong surface, and editing cannot repair it.
