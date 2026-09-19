@@ -1,3 +1,13 @@
+<!-- spn:restates
+{
+  "chapters": [
+    { "path": "docs/03-capabilities/05-docs/README.md", "seen": "d225e8aa" },
+    { "path": "providers/apps/ts/README.md", "seen": "601a0ff9" },
+    { "path": "providers/apps/ts/03-code-patterns.md", "seen": "c52d1754" }
+  ]
+}
+-->
+
 # Planning in an APPS · TS node — the layer the `plan` skill loads
 
 **Read this as reference material, not a skill.** The verb is `DEVEX_PLAN`, and it lives once, in
@@ -57,7 +67,7 @@ Audit a package's, an app's, an app-owned module's, or the workspace's docs agai
 - **No markdown inside `packages/` or `apps/` outside the front door and the doc set** — extend the seats. No standalone status-tracking `.md`, no `tasks/` trees anywhere. Flag and fold in any stray files.
 - **Never hand-write or hand-fix the 📖 strip** — it is derived from the node's doc map and regenerated whenever the file set changes (foundation decision RD.DOCS.007). A generated guides face keeps only what sits inside `<!-- spnutils:keep:begin -->` / `<!-- spnutils:keep:end -->` (RD.DOCS.009); move hand-earned troubleshooting rows inside the block rather than out to a register.
 - **Keep status honest — drift runs both ways.** Documents lead code (foundation decision RD.DOCS.013), so a document may exist before the thing it describes — it carries `🔮` and reads as a design note. Fix any status that lets a plan read as fact (✅ implemented = running · 🚧 in progress · 🔮 planned). Where a document and the code disagree, the document is **not** automatically the stale one: work out which is wrong and record it (see `decision` mode). Never silently edit either side to match the other. Present truth, no changelog prose — git history is the history.
-- Verify `docs/artifacts/resources/schema.sql` against `src/migrations/` (must agree — the spec is authoritative), `docs/03-capabilities/` against `contract/services/`, and that every `✅` row in `docs/02-behaviors/README.md` has its proof. Verify intent comments exist on `I*Service` methods and exported components (provider chapter 03-code-patterns § Intent comments).
+- Verify the node's `docs/artifacts/schema.sql` against `src/migrations/` (must agree — the spec is authoritative; the book has since moved that file beside the `data-model.md` it is the authoritative form of, and the trees have not all followed yet), `docs/03-capabilities/` against `contract/services/`, and that every `✅` row in `docs/02-behaviors/README.md` has its proof. Verify intent comments exist on `I*Service` methods and exported components (provider chapter 03-code-patterns § Intent comments).
 - Report what was fixed and what needs a human call.
 
 ## Mode: decision — draft a decision-register entry

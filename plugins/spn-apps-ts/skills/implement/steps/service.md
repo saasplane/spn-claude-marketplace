@@ -1,3 +1,15 @@
+<!-- spn:restates
+{
+  "chapters": [
+    { "path": "docs/03-capabilities/02-apps/03-module/01-server/02-app/01-services.md", "seen": "88258dc6" },
+    { "path": "docs/03-capabilities/02-apps/03-module/01-server/02-app/02-repositories.md", "seen": "7cc440e5" },
+    { "path": "providers/apps/ts/05-service-patterns.md", "seen": "885cb7a5" },
+    { "path": "providers/apps/ts/06-database-patterns.md", "seen": "5ec9e452" },
+    { "path": "providers/apps/ts/02-structure.md", "seen": "af1417a1" }
+  ]
+}
+-->
+
 # Step: service — the canonical service shape
 
 Use one template for every module service — **this template is the standard**. The method families it fills in are the foundation book's, closed and stack-agnostic (`01-services.md` · `02-repositories.md`, the method-families sections). The TypeScript rendering and the fuller skeleton are the service-patterns and database-patterns chapters of the provider set. Layer rule: `app/services`, `app/repositories`, `app/entities` hold classes only — helpers go to `app/utils/` or `app/support/` (see `02-structure.md`).
