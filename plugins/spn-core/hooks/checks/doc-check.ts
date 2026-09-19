@@ -103,7 +103,14 @@ const YOU = new RegExp(YOU_SOURCE, "i");
 const YOU_ALL = new RegExp(YOU_SOURCE, "gi");
 // A row may MENTION the word as a term — *you* in italics, or in backticks — and that is not warming.
 const YOU_AS_TERM = /\*(?:you['’](?:re|ll|ve)|yourself|your|you)\*|`[^`]*`/gi;
-const AVG_SOFT = 18, AVG_RULE = 24, LONG = 30, ROW_LONG = 25, YOU_MIN_N = 8, YOU_PER = 12;
+// `ROW_LONG` is the ONE length rule the book kept, and it is a register row's shape rather than a
+// count of prose: one clause a sentence, because a row is a record. The prose measures that stood
+// beside it — an average, a thirty-word cap, and a `you` frequency — were dropped by the book and
+// are gone from here (`RD.DOCS.043` as `01-corpus.md` and `04-discipline.md` now state it).
+const ROW_LONG = 25;
+// Reported in the sweep's statistics table, never as a finding. A number is evidence you cite and
+// never the verdict you reach.
+const PAST_25 = 25, PAST_30 = 30;
 
 // RD.DOCS.044 — reaching the reader has three moves, and a script sees two of them: the reader as
 // subject, which YOU already finds, and the imperative, which opens the sentence with its verb. The
@@ -448,8 +455,8 @@ export function measure(sents: Sentence[], kind = "chapter"): Metrics {
   return {
     sentences: sents.length,
     words: sents.reduce((sum, [, n]) => sum + n, 0),
-    past25: sents.filter(([, n]) => n > 25).length,
-    past30: sents.filter(([, n]) => n > LONG).length,
+    past25: sents.filter(([, n]) => n > PAST_25).length,
+    past30: sents.filter(([, n]) => n > PAST_30).length,
     you: sents.reduce((sum, [s]) => sum + countOf(YOU_ALL, s), 0),
     reach: hit,
     counted,
@@ -508,18 +515,14 @@ export function voice(prose: string, sents: Sentence[], kind = "chapter", operat
 
   if (!sents.length) return out;
   const n = sents.length;
-  const avg = sents.reduce((sum, [, w]) => sum + w, 0) / n;
-  if (avg > AVG_RULE)
-    out.push(["RULE", `average sentence ${fixed(avg, 0)} words over ${n} sentences — the rule is ` +
-      `around fifteen, and an average past ${AVG_RULE} is a finding (RD.DOCS.043) · split it`]);
-  else if (avg > AVG_SOFT)
-    out.push(["SOFT", `average sentence ${fixed(avg, 0)} words over ${n} sentences — the rule is around fifteen (RD.DOCS.043) · split it`]);
 
-  const long = sents.filter(([, w]) => w > LONG);
-  if (long.length) {
-    const eg = long.slice(0, 3).map(([s, w]) => `"${opening(s)}" (${w})`).join(" · ");
-    out.push(["RULE", `${long.length} sentence(s) past thirty words — none may be (RD.DOCS.043): ${eg} · split it, never shorten it`]);
-  }
+  // NOTHING HERE MEASURES LENGTH. An average and a thirty-word cap were both findings until the book
+  // dropped them (`05-docs/01-corpus.md` § The readability bar, rule 4; `04-discipline.md` — *no rule
+  // measures length, and no rule counts `you`*). A sentence may be long when the idea needs it, and
+  // cutting the link between two ideas to make one shorter is the defect the count was causing.
+  //
+  // A register row is the one place a length rule survives, and it is a shape rather than a count —
+  // one clause a sentence, because a row is a record. `ROW_LONG` below is that rule and stays.
 
   const bolted = sents.filter(([s]) => {
     if (!BOLT.test(s)) return false;
@@ -530,18 +533,13 @@ export function voice(prose: string, sents: Sentence[], kind = "chapter", operat
     const eg = bolted.slice(0, 3).map((s) => `"${opening(s)}"`).join(" · ");
     out.push(["RULE", `${bolted.length} sentence(s) reach only by a tacked-on "… for you" — ` +
       `RD.DOCS.046: the measure serves personalization, so a sentence that reaches only by its last ` +
-      `two words reached nobody: ${eg} · rewrite it to address the reader, or leave it under the share`]);
+      `two words reached nobody: ${eg} · rewrite it to address the reader`]);
   }
 
-  const you = sents.reduce((sum, [s]) => sum + countOf(YOU_ALL, s), 0);
-  if (operative) {
-    // RD.DOCS.048 — neither count can see an imperative, which is this surface's move. The reach
-    // share below still binds, so a genuinely cold instruction file is still caught.
-  } else if (n >= YOU_MIN_N && you === 0) {
-    out.push(["RULE", `prose that never says *you* — ${n} sentences with no second person (RD.DOCS.043; RD.DOCS.031 talks to the reader) · say *you*`]);
-  } else if (n >= 5 && you * YOU_PER < n) {
-    out.push(["SOFT", `*you* appears ${you} time(s) in ${n} sentences — fewer than one in twelve (RD.DOCS.043) · say *you*`]);
-  }
+  // AND NOTHING COUNTS `you`. A count of a pronoun cannot see an imperative, so it read every
+  // instruction file as silent when it was anything but — which is why `operative` had to be carved
+  // out of it, and a measure needing a carve-out for a whole class of surface was measuring the
+  // wrong thing. What reaches the reader is judged by the reach share below and by a person.
 
   const bar = REACH_BAR[kind];
   if (bar) {

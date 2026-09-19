@@ -81,13 +81,24 @@ const CLEAN = `<!doctype html>
 
 console.log("\n=== doc-check — the fixtures");
 
-// KNOWN-BAD, one rule each.
-one("a sentence past thirty words",
+// THE TWO MEASURES THE BOOK RETIRED, asserted SILENT.
+//
+// Both were known-bad fixtures until 2026-09-19. `05-docs/01-corpus.md` § The readability bar now
+// says seven rules are the whole bar and none of them measures length, and `04-discipline.md` says
+// it outright: *no rule measures length, and no rule counts `you`*. A check still firing on either
+// produces a finding that is always wrong, and **a finding that is usually wrong teaches people to
+// stop reading the run** — which is the same argument `restates.py` gives for a per-citation hash.
+//
+// They are kept as cases rather than deleted, because a silent check proves nothing unless somebody
+// feeds it the thing it used to catch.
+one("a sentence past thirty words — RETIRED, must stay silent",
   write(CHAPTER,
     "# A chapter\n\nYou will find that this one sentence runs on and on and on past the bar the book " +
-    "sets for it, because it keeps adding clause after clause after clause until nobody reading it " +
-    "can remember how it began or what it was ever meant to say.\n"),
-  "reports", "past thirty words");
+    "once set for it, because it keeps adding clause after clause after clause until nobody reading " +
+    "it can remember how it began or what it was ever meant to say.\n"),
+  "silent");
+
+// KNOWN-BAD, one rule each.
 
 one("cardinality written into prose",
   write(CHAPTER, "# A chapter\n\nYou will find five decisions here. You read each one and you move on.\n"),
@@ -97,10 +108,14 @@ one("an idiom a second-language reader cannot guess",
   write(CHAPTER, "# A chapter\n\nYou get it out of the box. You read it once and you are done with it.\n"),
   "reports", "idiom");
 
-one("prose that never says you",
+// RETIRED with the length cap, and for a sharper reason: a count of a pronoun cannot see an
+// imperative, so it read every instruction file as silent when it was anything but. It still
+// reports the REACH share, which is a different measure and is not retired — so this asserts the
+// finding it must no longer name rather than asserting silence.
+one("prose that never says you — the COUNT is retired",
   write(CHAPTER, "# A chapter\n\n" + Array.from({ length: 9 }, (_, i) =>
     `The seat holds its own files and nothing else, in case ${i + 1}.`).join(" ") + "\n"),
-  "reports", "never says *you*");
+  "reports", "reach the reader");
 
 one("an approach page with no Why, What or How",
   write(APPROACH, `<div class="eyebrow">Who this is for &middot; a reader</div><section><h2>Background</h2><p>You read it once and you know it.</p></section>`),

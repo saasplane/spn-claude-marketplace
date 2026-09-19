@@ -98,7 +98,12 @@ YOU = re.compile(r"\b(?:you['’](?:re|ll|ve)|yourselves|yourself|yours|your|you
 # A row may MENTION the word as a term — *you* in italics, or in backticks — and that is not
 # warming. RD.DOCS.031 and RD.DOCS.043 both do.
 YOU_AS_TERM = re.compile(r"\*(?:you['’](?:re|ll|ve)|yourself|your|you)\*|`[^`]*`", re.I)
-AVG_SOFT, AVG_RULE, LONG, ROW_LONG, YOU_MIN_N, YOU_PER = 18, 24, 30, 25, 8, 12
+# `ROW_LONG` is the ONE length rule the book kept, and it is a register row's shape rather than a
+# count of prose: one clause a sentence, because a row is a record. The prose measures that stood
+# beside it — an average, a thirty-word cap, and a `you` frequency — were dropped by the book and
+# are gone from here. `PAST_25` and `PAST_30` are reported in the statistics table and are never a
+# finding: a number is evidence you cite, never the verdict you reach.
+ROW_LONG, PAST_25, PAST_30 = 25, 25, 30
 
 # RD.DOCS.044 — reaching the reader has three moves, and a script sees two of them: the
 # reader as subject, which YOU already finds, and the imperative, which opens the sentence
@@ -454,8 +459,8 @@ def measure(sents, kind='chapter'):
     hit, counted = reach(sents, kind)
     return {'sentences': len(sents),
             'words': sum(n for _, n in sents),
-            'past25': sum(1 for _, n in sents if n > 25),
-            'past30': sum(1 for _, n in sents if n > LONG),
+            'past25': sum(1 for _, n in sents if n > PAST_25),
+            'past30': sum(1 for _, n in sents if n > PAST_30),
             'you': sum(len(YOU.findall(s)) for s, _ in sents),
             'reach': hit,
             'counted': counted}
@@ -493,19 +498,13 @@ def voice(prose, sents, kind='chapter', operative=False):
     if not sents:
         return out
     n = len(sents)
-    avg = sum(w for _, w in sents) / n
-    if avg > AVG_RULE:
-        out.append(('RULE', f'average sentence {avg:.0f} words over {n} sentences — the rule is '
-                            f'around fifteen, and an average past {AVG_RULE} is a finding '
-                            f'(RD.DOCS.043) · split it'))
-    elif avg > AVG_SOFT:
-        out.append(('SOFT', f'average sentence {avg:.0f} words over {n} sentences — the rule is '
-                            f'around fifteen (RD.DOCS.043) · split it'))
-    long = [(s, w) for s, w in sents if w > LONG]
-    if long:
-        eg = ' · '.join(f'"{opening(s)}" ({w})' for s, w in long[:3])
-        out.append(('RULE', f'{len(long)} sentence(s) past thirty words — none may be '
-                            f'(RD.DOCS.043): {eg} · split it, never shorten it'))
+    # NOTHING HERE MEASURES LENGTH. An average and a thirty-word cap were both findings until the
+    # book dropped them (`05-docs/01-corpus.md` rule 4; `04-discipline.md` — *no rule measures
+    # length, and no rule counts `you`*). A sentence may be long when the idea needs it, and cutting
+    # the link between two ideas to make one shorter is the defect the count was causing.
+    #
+    # A register row is the one place a length rule survives, and it is a shape rather than a count.
+    # `ROW_LONG` is that rule and stays.
     bolted = [s for s, _ in sents if BOLT.search(s)
               and not (YOU.search(BOLT.sub('', s)) or IMPERATIVE.match(BOLT.sub('', s)))]
     if bolted:
@@ -513,18 +512,11 @@ def voice(prose, sents, kind='chapter', operative=False):
         out.append(('RULE', f'{len(bolted)} sentence(s) reach only by a tacked-on "… for you" '
                             f'— RD.DOCS.046: the measure serves personalization, so a sentence '
                             f'that reaches only by its last two words reached nobody: {eg} · '
-                            f'rewrite it to address the reader, or leave it under the share'))
-    you = sum(len(YOU.findall(s)) for s, _ in sents)
-    if operative:
-        # RD.DOCS.048 — neither count can see an imperative, which is this surface's move. The
-        # reach share below still binds, so a genuinely cold instruction file is still caught.
-        pass
-    elif n >= YOU_MIN_N and you == 0:
-        out.append(('RULE', f'prose that never says *you* — {n} sentences with no second person '
-                            f'(RD.DOCS.043; RD.DOCS.031 talks to the reader) · say *you*'))
-    elif n >= 5 and you * YOU_PER < n:
-        out.append(('SOFT', f'*you* appears {you} time(s) in {n} sentences — fewer than one in '
-                            f'twelve (RD.DOCS.043) · say *you*'))
+                            f'rewrite it to address the reader'))
+    # AND NOTHING COUNTS `you`. A count of a pronoun cannot see an imperative, so it read every
+    # instruction file as silent when it was anything but — which is why `operative` had to be
+    # carved out of it, and a measure needing a carve-out for a whole class of surface was measuring
+    # the wrong thing. What reaches the reader is judged by the reach share below and by a person.
     bar = REACH_BAR.get(kind)
     if bar:
         hit, counted = reach(sents, kind)

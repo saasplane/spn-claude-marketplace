@@ -75,13 +75,14 @@ one("env-seat's refusal survives the chain",
     "deny", { says: "dependency cycle" });
 }
 
+// The case is that doc-check's finding reaches the dispatcher at all. It rode a long sentence until
+// 2026-09-19, when the book retired the length measure; cardinality is a live rule and serves the
+// same purpose. A case whose fixture stops being a finding goes green while proving nothing.
 one("doc-check's finding survives the chain",
   { tool_name: "Write", tool_input: {
     file_path: `${WORKSPACE}/spn-foundation/docs/03-capabilities/05-docs/probe.md`,
-    content: "# A chapter\n\nYou will find that this one sentence runs on and on and on past the bar the " +
-      "book sets for it, because it keeps adding clause after clause after clause until nobody reading " +
-      "it can remember how it began or what it was ever meant to say.\n" } },
-  "note", { says: "past thirty words" });
+    content: "# A chapter\n\nYou will find five decisions here. You read each one and you move on.\n" } },
+  "note", { says: "cardinality-in-prose" });
 
 one("the generated-file guard, folded in from the shell script",
   { tool_name: "Write", tool_input: { file_path: `${WORKSPACE}/spn-support-ts/src/contract/validators/thing.ts`, content: "x" } },
