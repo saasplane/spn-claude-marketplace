@@ -123,6 +123,18 @@ console.log("\n=== mirror — once per mirror per session");
     { expect: "names it", says: "app.md" });
 }
 
+{
+  // A README that reaches the capabilities SEAT as well as this node's own face inside it names two
+  // true things, and only the deeper one carries this node's Map.
+  const root = tree({ [FACE]: face([["app.md", "src/app/", "✅"]]), "pkg/src/app/A.ts": "x\n",
+    "docs/04-capabilities/README.md": "# Capabilities\n\nthe seat.\n" });
+  writeFileSync(join(root, "pkg", "README.md"),
+    "# pkg\n\nThe [capabilities seat](../docs/04-capabilities/README.md), and " +
+    "[its own face](../docs/04-capabilities/01-domain/01-server/README.md).\n", "utf8");
+  one("the deepest capability link wins over the seat face above it",
+    said(root, "pkg/src/app/A.ts", "deep1"), { expect: "names it", names: "app.md" });
+}
+
 console.log("\n=== mirror — silent");
 
 {

@@ -44,17 +44,21 @@ const MIRROR = "mirror";
  * thing that knows which domain and which layer a node's mirrors sit under — a path cannot say it,
  * because `packages/module-server-iam-ts` lands at `04-capabilities/01-iam/01-server/`.
  *
+ * THE DEEPEST LINK WINS, for the same reason the longest governing folder does below: a README
+ * reaching both the capabilities SEAT and this node's own face inside it names two true things, and
+ * only the deeper one is about this node. The seat face carries no Map of this node's mirrors.
+ *
  * Silent where the README carries no such link. That is a node whose seat has not been written yet,
  * and invariant 4 is what reports it — against the whole tree, once, rather than on every edit.
  */
 export function faceOf(node: string): string | null {
   const readme = read(join(node, "README.md"));
   if (!readme) return null;
-  for (const m of readme.matchAll(/\]\(([^)\s]+04-capabilities\/[^)\s]*README\.md)\)/g)) {
-    const face = resolve(node, m[1]);
-    if (existsSync(face)) return face;
-  }
-  return null;
+  const faces = [...readme.matchAll(/\]\(([^)\s]+04-capabilities\/[^)\s]*README\.md)\)/g)]
+    .map((m) => resolve(node, m[1]))
+    .filter((face) => existsSync(face))
+    .sort((a, b) => b.split("/").length - a.split("/").length);
+  return faces[0] ?? null;
 }
 
 /** A Map row: the document, and the `src/` folder it governs. */

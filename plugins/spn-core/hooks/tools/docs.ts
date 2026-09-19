@@ -217,9 +217,12 @@ function checkSeatHeader(file: string, src: string, block: any): Finding[] {
   const add = (grade: Grade, message: string) => f.push({ check: "header", grade, file, message });
 
   const bare = outsideFences(src);
-  const h1 = [...bare.matchAll(/^#\s+(.+)$/gm)].map((m) => text(m[1]));
+  // The block's `title` is plain text; the heading may FORMAT it — `\`support-server-ts\`` is the
+  // same title in code voice. What must agree is the rendering, so the backticks come off both.
+  const plain = (t: string) => text(t).replace(/`/g, "").replace(/\s+/g, " ").trim();
+  const h1 = [...bare.matchAll(/^#\s+(.+)$/gm)].map((m) => plain(m[1]));
   if (h1.length !== 1) add("RULE", `${h1.length} \`#\` title${h1.length === 1 ? "" : "s"}; a document has exactly one`);
-  else if (h1[0] !== text(block.title)) add("RULE", `the title \`${h1[0]}\` is not the block's \`${block.title}\``);
+  else if (h1[0] !== plain(block.title)) add("RULE", `the title \`${h1[0]}\` is not the block's \`${block.title}\``);
 
   const rule = bare.match(/^`For:\s*([^`]*)`\s*·\s*`Status:\s*([^`]*)`/m);
   if (!rule) { add("RULE", "no `For: … · Status: …` line — every seat file carries one under its title, rendered from its block"); return f; }
@@ -674,6 +677,20 @@ function conceptSections(concept: string): Map<string, { bridge: string; lines: 
     if (l.trim() && !items.length) bridge.push(l.trim());
   }
   flush();
+
+  // A CONCEPT ALSO NAMES ITS DOMAINS IN A TABLE, and that is not a shortcut its author took — the
+  // document chapter's own format rule is *prefer a table over a prose list of parallel facts*, and
+  // one line per domain is exactly that. `spn-support-ts` names all nine under *What the stack
+  // ships*; `spn-platform-ts` names all nine under *The domains it holds*. Invariant 1 asks whether
+  // the concept NAMES the domain, so a row naming it is a declaration and a heading is not the only
+  // shape one can take. A heading wins where both exist, because it carries the argument.
+  for (const l of lines) {
+    const cells = l.trim().startsWith("|") ? l.split("|").slice(1, -1).map((c) => c.trim()) : null;
+    if (!cells || cells.length < 2 || /^[\s:|-]+$/.test(cells.join(""))) continue;
+    const key = sectionKey(cells[0]);
+    if (!key || out.has(key)) continue;
+    out.set(key, { bridge: cells.slice(1).filter(Boolean).join(" — "), lines: [] });
+  }
   return out;
 }
 
@@ -688,6 +705,7 @@ function sectionKey(heading: string): string {
   return heading
     .replace(/`[^`]*`/g, "")
     .replace(/^SaaS Plane\s*[—–-]\s*/i, "")
+    .replace(/^(?:The|A|An)\s+/i, "")
     .replace(/\s*&\s*/g, "-and-")
     .trim().toLowerCase()
     .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -711,6 +729,22 @@ function readingOrder(constructs: { id: string; title: string; summary: string; 
   };
   for (const c of constructs) visit(c, new Set());
   return out;
+}
+
+/**
+ * A link target moved from one document into another, re-based.
+ *
+ * A face's bridge is the concept's own prose, and the concept sits at the repository root. Its
+ * relative links resolve from there. Copied verbatim into `02-constructs/<group>/<domain>/README.md`
+ * they resolve from four levels down, which is a broken link the generator itself wrote.
+ */
+function rebase(body: string, fromDir: string, toDir: string): string {
+  return body.replace(/\]\(([^)\s]+)\)/g, (whole, target: string) => {
+    if (/^(?:https?:|mailto:|#|\/)/.test(target)) return whole;
+    const [path, hash] = target.split(/(?=#)/);
+    if (!path) return whole;
+    return `](${relative(toDir, resolve(fromDir, path))}${hash ?? ""})`;
+  });
 }
 
 /** Every folder under the constructs seat, deepest last — each one carries a face. */
@@ -747,6 +781,7 @@ function domainFaces(tree: string, concept: string | null): { faces: Map<string,
   const findings: Finding[] = [];
   const faces = new Map<string, string>();
   const sections = concept ? conceptSections(concept) : new Map();
+  const conceptDir = concept ? dirname(concept) : tree;
 
   const constructsDir = join(tree, "02-constructs");
   const folders = constructFolders(constructsDir);
@@ -780,13 +815,13 @@ function domainFaces(tree: string, concept: string | null): { faces: Map<string,
       findings.push({ check: "face", grade: "RULE", file: dir, message: `the concept names no section \`${folderKey(basename(dir))}\`, and a domain folder exists only where the concept names that domain (invariant 1)` });
     }
 
-    const bridge = key ? sections.get(key)!.bridge : "";
+    const bridge = key ? rebase(sections.get(key)!.bridge, conceptDir, dir) : "";
 
     // A group's face maps the domains under it; a domain's face lists its constructs in order.
     const body = isGroup(dir)
       ? [bridge, "", "| Domain | What it holds |", "| --- | --- |",
          ...readdirSync(dir).filter((e) => { try { return statSync(join(dir, e)).isDirectory(); } catch { return false; } }).sort()
-           .map((e) => { const k = named(join(dir, e)); return `| [${k ?? folderKey(e)}](${e}/README.md) | ${k ? sections.get(k)!.bridge.split(". ")[0] : "—"} |`; })]
+           .map((e) => { const k = named(join(dir, e)); return `| [${k ?? folderKey(e)}](${e}/README.md) | ${k ? rebase(sections.get(k)!.bridge.split(". ")[0], conceptDir, dir) : "—"} |`; })]
       : [bridge, "", "| Construct | What it is |", "| --- | --- |",
          ...readingOrder(constructsUnder(dir)).map((c) => `| [${c.title}](${relative(dir, c.file)}) | ${c.summary} |`)];
 

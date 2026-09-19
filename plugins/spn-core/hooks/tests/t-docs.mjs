@@ -182,10 +182,51 @@ const GROUPED = {
     out, lacks("invariant 1"));
 }
 {
+  // A bridge is the CONCEPT's prose, and the concept sits at the repository root.
+  const root = repo({ ...GROUPED,
+    "CONCEPT.md": GROUPED["CONCEPT.md"].replace("How the function operates.",
+      "How the function operates, argued in [the page](docs/artifacts/approaches/a.html)."),
+    "docs/artifacts/approaches/a.html": "<p>x</p>\n" });
+  run(root, ["face", "docs"]);
+  one("a link inside a copied bridge is re-based onto the face that now carries it",
+    readAt(root, "docs/02-constructs/01-foundation/01-devex/README.md"),
+    has("](../../../artifacts/approaches/a.html)"));
+}
+{
   const root = repo({ ...GROUPED,
     "docs/02-constructs/01-foundation/03-nobody-declared/README.md":
       doc({ id: "x", title: "Nobody", lenses: ["ARCHITECT"], status: "PLANNING" }) });
   one("a domain folder the concept does not name is invariant 1's finding",
+    run(root, ["face", "docs", "--check"]), has("invariant 1"));
+}
+
+
+console.log("\n=== a concept may name its domains in a table");
+{
+  // The document chapter's format rule is *prefer a table over a prose list of parallel facts*, and
+  // one line per domain is exactly that. Two of the three stack concepts name every domain this way.
+  const root = repo({
+    "CONCEPT.md": "# c\n\n## What the stack ships\n\n| Capability | Package |\n| --- | --- |\n" +
+                  "| Contract | `@x/contract` |\n| Design system | `@x/ds` |\n",
+    "docs/02-constructs/README.md": doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    "docs/02-constructs/01-contract/README.md": doc({ id: "c1", title: "Contract", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    "docs/02-constructs/06-design-system/README.md": doc({ id: "c2", title: "DS", lenses: ["WEB_DEV"], status: "PLANNING" }),
+  });
+  const out = run(root, ["face", "docs", "--check"]);
+  one("a domain named only by a table row satisfies invariant 1", out, lacks("invariant 1"));
+  run(root, ["face", "docs"]);
+  one("and the row's remaining cells become the face's bridge",
+    readAt(root, "docs/02-constructs/01-contract/README.md"), has("@x/contract"));
+  one("a multi-word domain matches its folder — `Design system` is `06-design-system`",
+    readAt(root, "docs/02-constructs/06-design-system/README.md"), has("@x/ds"));
+}
+{
+  const root = repo({
+    "CONCEPT.md": "# c\n\n## What the stack ships\n\n| Capability | Package |\n| --- | --- |\n| Contract | `@x/contract` |\n",
+    "docs/02-constructs/README.md": doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    "docs/02-constructs/07-nobody-declared/README.md": doc({ id: "n", title: "N", lenses: ["ARCHITECT"], status: "PLANNING" }),
+  });
+  one("a domain no row and no heading names is still invariant 1's finding",
     run(root, ["face", "docs", "--check"]), has("invariant 1"));
 }
 
