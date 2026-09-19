@@ -281,12 +281,19 @@ export function cardsInArcs(root: string): Array<[string, string, string]> {
 
 // Every form seen in this workspace's own transcripts, and each needs a table.
 //
+// F18 — `option B` FIRED ON A REFERENCE. `It was option B, which F replaced` is somebody naming a
+// superseded option in the past tense, not asking anybody to pick one, and the check's own contract
+// says it never fires on a reply that merely mentions a letter. The discriminator is position: an
+// option being PRESENTED opens a clause, an option being REFERRED TO sits inside one. So that branch
+// now needs a sentence start or a clause break in front of it. Bold is NOT such a marker: emphasis
+// wraps a reference as readily as an offer, and allowing it put the false positive straight back.
+//
 // CASE-SENSITIVE ON THE LETTER, AND THAT IS THE WHOLE OF F17. This carried an `i` flag, so `[A-D]`
 // matched the English article `a` — and `pick a file`, `select a row`, `choosing with a sign-in` all
 // read as somebody naming option A. It fired on a reply that asked nothing, over a behaviour row
 // reading `sends an organization id of their own choosing with a sign-in`. An option is written
 // upper-case, always, so the letter is upper-case here and only the leading word is either case.
-const ASKS = /\b(?:[Ss]ay|[Aa]nswer|[Rr]eply|[Pp]ick|[Cc]hoose|[Cc]hoosing|[Ss]elect)\s+(?:with\s+)?[`"*]?(?:Q\d+)?[A-D]\b|\b[Rr]ecommendation\s+is\s+[`"*]?[A-D]\b|\b[Oo]ption\s+[`"*]?[A-D]\b|\b[A-D]\s*,\s*[A-D]\s*(?:,\s*[A-D]\s*)?(?:or|\/)\s*[A-D]\b/;
+const ASKS = /\b(?:[Ss]ay|[Aa]nswer|[Rr]eply|[Pp]ick|[Cc]hoose|[Cc]hoosing|[Ss]elect)\s+(?:with\s+)?[`"*]?(?:Q\d+)?[A-D]\b|\b[Rr]ecommendation\s+is\s+[`"*]?[A-D]\b|(?:^|[.:;—]\s+)\**[Oo]ption\s+[`"*]?[A-D]\b|\b[A-D]\s*,\s*[A-D]\s*(?:,\s*[A-D]\s*)?(?:or|\/)\s*[A-D]\b/;
 // A markdown options table: a header row and the `| --- |` separator the grammar requires.
 const TABLE = /^\|.*\|\s*$\n^\|[\s:-]*\|[\s:|-]*$/m;
 // A lettered row inside a table — `| **A** | … | … |`. The shape the grammar actually asks for.

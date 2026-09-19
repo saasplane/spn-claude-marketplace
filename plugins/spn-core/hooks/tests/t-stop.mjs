@@ -94,6 +94,7 @@ function one(label, root, expect, { says, reply = "done", parity = true, why = "
 
 const F11 = "the Python listed arcs as `arc-*` only, so an N-named arc was invisible to it";
 const F17 = "the Python matches the article `a` as option A; the port is case-sensitive on the letter";
+const F18 = "the Python fires on `option B` used as a reference; the port needs it to open a clause";
 
 console.log("\n=== stop — the arc-to-page checks, with arcs named the way the Python expects");
 
@@ -205,6 +206,18 @@ one("the other articles that used to fire",
   build("stop-reply-articles", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
   "silent", { reply: "Pick a file, select a row, and choose a tier. Nothing is open.",
               parity: false, why: F17 });
+
+// F18 — `option B` fired on a REFERENCE. Naming a superseded option in the past tense is not asking
+// anybody to pick one, and the check's own contract says it never fires on a reply that merely
+// mentions a letter. Bold is not a presenting marker: emphasis wraps a reference just as readily.
+one("an option named in the past tense is a reference, not an ask",
+  build("stop-reply-ref", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
+  "silent", { reply: "It was **option B**, which F has now replaced. Nothing is open.",
+              parity: false, why: F18 });
+
+one("an option PRESENTED still asks",
+  build("stop-reply-present", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
+  "warns", { says: "asks for a lettered choice", reply: "Two ways: option A now, or wait." });
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);
