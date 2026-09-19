@@ -25,68 +25,72 @@ Each one opts out of the dependency graph and the cache that `nx.json` declares 
 `targetDefaults`. Each one also drifts from the repo the day somebody edits a script.
 
 **A target `run-many` skips is a target that project does not have.** That is information, not a
-failure — a `MODULE_SERVER` has no `preview` because it serves nothing.
+failure — a `MODULE_SERVER` has no `start` because it serves nothing, and a node has no
+`test:journey` unless it carries journey cases.
 
 **A script whose body is `pnpm --filter <other> run <target>` is a defect, not a shortcut.** It is a
 second name for a target that already exists, it hides which project does the work, and it is the
 shape an agent copies next. Call the owning project's target.
 
-## Every target, by the kind that carries it
+## A SCRIPT and a TARGET are different things, and this is where people trip
 
-**Common to every kind**
+**A node declares one script per verb, and nx carries a target per tier.** Both are real and they
+are not duplicates of each other (`RD.APPS.118`, and `Q95` = B):
 
-| Target | What it does | Notes |
+```bash
+pnpm test unit                     # the SCRIPT — one verb, the tier as its argument
+npx nx run <project>:test:unit     # the TARGET — inferred from what the node IS
+```
+
+**Why the targets stay per tier when the scripts do not.** nx declares `cache` on a TARGET, and
+`configurations` carry option sets alone — so a single `test` target would force one cache policy
+across every tier. The unit tier is cacheable and the four that need a running stack are not. Get
+that wrong either way and it costs: a cached journey run reports a stack it never touched, and an
+uncached unit tier is paid for on every commit of every day.
+
+**The targets are inferred, so no node declares them.** A node gains a tier by carrying a case for
+it, or by being a kind that owes it — never by somebody remembering a line. So
+`npx nx show project <p> --json` is the only honest answer to *what can I run here*; a
+`package.json` no longer lists the tiers.
+
+## The verbs, and what carries each
+
+**A verb exists where a fact the kind already declares says it does.** That is the rule; the table
+below is what it produces today, and a kind added later needs no row of its own.
+
+| Verb | Carried by | The variant, as an argument |
 | --- | --- | --- |
-| `build` | the production bundle | **cached**, and `dependsOn: ['^build']` |
-| `test` | that project's own suite | Jest on a server kind, Vitest on a web kind |
-| `lint` | ESLint | **cached** |
-| `format` | Prettier write | `lint:fix` and `prettier:fix` exist on package kinds |
-| `typecheck` | `tsc --build --emitDeclarationOnly` | **live on every kind except `APP_WEB`**, where it is disabled because project references set `noEmit` — that kind uses `vite:typecheck` |
+| `build` | every kind | `pnpm build test` — the bundle a browser tier drives, in development mode |
+| `check` · `format` | every kind | — |
+| `test` | every kind | `pnpm test unit` · `contract` · `journey` · `component` · `integration` |
+| `clean` | every kind | — |
+| `release` | what publishes | **the repository's, never a node's** — `-p` is refused (`RD.APPS.034`) |
+| `dev` · `start` · `stop` | what publishes nothing | `pnpm dev --mode API` on a kind that declares modes |
+| `migrate` | what owns a schema | `pnpm migrate up` · `down` · `list` · `pending` · `status` · `generate` |
+| `codegen` | `CLIENT_API` | `pnpm codegen api-client` |
 
-**`APP_SERVER` — the service**
+**`lint`, `prettier`, `test:<tier>`, `build:test`, `preview` and `release:verified` are retired
+spellings.** `lint` and `prettier` were second names for `check` and `format`; `preview` was `start`
+under another name; the rest spelled a variant as a verb. A node still carrying one has not been
+swept yet — read it as drift, not as a target to use.
+
+### Two things the word *mode* means, and they are unrelated
+
+| | Means |
+| --- | --- |
+| `--mode` on `build` | the build FLAVOUR, realized per bundler — vite takes `--mode development`, storybook takes `--test`, and a server app has no bundler so it takes neither |
+| `--mode` on `dev` · `start` | the SERVING mode — `ALL · API · QUEUE`, and only where the kind declares them. `spn-dev` refuses the flag by name on a kind that declares none |
+
+**`dist/spn-build.json` says which flavour the folder holds**, so a browser tier can tell a
+development bundle from a production one instead of guessing.
+
+### What a browser tier needs standing up
 
 | Target | What it does |
 | --- | --- |
-| `dev` | every entry at once (`APP_MODE=ALL`) |
-| `dev:api` · `dev:queue` | one entry only, when you want to isolate a face |
-| `start` · `start:api` · `start:queue` | the built bundle rather than the watcher |
-| `migrate:up` · `migrate:down` | apply, roll back |
-| `migrate:status` · `migrate:pending` · `migrate:list` | what has run, what has not |
-| `migrate:generate` | a new migration file |
-
-**`APP_WEB` — a web app**
-
-| Target | What it does |
-| --- | --- |
-| `dev` | vite dev server — **compiles a route inside the request** |
-| `build:test` | the bundle a browser suite needs, with `isDebug` on and `data-testid` emitted |
-| `preview` | serves what `build` or `build:test` produced |
-| `serve` · `serve-static` | the nx-native equivalents |
-| `build-deps` · `watch-deps` | build or watch this app's workspace dependencies |
-| `vite:typecheck` | `tsc --noEmit -p tsconfig.json` — narrower than the two forms below |
-
-**`CLIENT_API` — the generated client**
-
-| Target | What it does |
-| --- | --- |
-| `generate` | regenerate from the OpenAPI document |
-| `test:integration` | **the contract tier** — drives a live service, `--runInBand` |
-| `test:integration:dev` | the same, tolerating a stack that is down |
-| `release:verified` | integration suite, then build, then publish |
-
-**`MODULE_WEB` — a web module**
-
-| Target | What it does |
-| --- | --- |
-| `test:component` | Playwright component tests, where only paint can show the claim. **Check it runs before trusting it** — a package can carry written cases that collect zero tests. This tier sits on `@playwright/experimental-ct-react`, which upstream **froze at Playwright 1.63**: still published, still installable, no longer developed. Two constraints follow. The CT package version must match the `playwright` runner version exactly, and browser binaries are per-version, so a runner bump needs `npx playwright install`. The script clears the build cache first — `rm -rf playwright/.cache && playwright test -c playwright-ct.config.ts` — because that cache is keyed by file name and survives a rename |
-| `dev` · `preview` · `serve` | its own harness, not an app |
-
-**`MODULE_SERVER` · `SUPPORT_*` — packages**
-
-| Target | What it does |
-| --- | --- |
-| `test:integration` | where the package declares one |
-| `prerelease` · `postbuild` · `postrelease` | the release lifecycle, run by `release` |
+| `pnpm build test` | the bundle a browser suite drives, in development mode against the local env |
+| `pnpm start` | serves what `build` produced, on the port the estate's vhost proxies to |
+| `test:component` | Playwright component tests, where only paint can show the claim. **Check it runs before trusting it** — a package can carry written cases that collect zero tests. This tier sits on `@playwright/experimental-ct-react`, which upstream **froze at Playwright 1.63**: still published, still installable, no longer developed. Two constraints follow. The CT package version must match the `playwright` runner version exactly, and browser binaries are per-version, so a runner bump needs `npx playwright install`. The build cache is cleared first, because it is keyed by file name and survives a rename |
 
 ## The recipes you will actually type
 
@@ -94,15 +98,15 @@ shape an agent copies next. Call the owning project's target.
 | --- | --- |
 | see what a project can do | `npx nx show project <p> --json` |
 | start the service | `npx nx run <service>:dev` |
-| migrate a fresh schema | `npx nx run <service>:migrate:up` |
+| migrate a fresh schema | `pnpm --filter <service> migrate up` |
 | start one web app | `npx nx run <web>:dev` |
-| **prepare a browser run** | `npx nx run-many -t build:test -p 'web-*'` |
-| **serve it** | `npx nx run-many -t preview -p 'web-*'` |
-| unit tests, one project | `npx nx run <p>:test` |
-| unit tests, everywhere | `npx nx run-many -t test --all` |
-| lint everything | `npx nx run-many -t lint --all` |
+| **prepare a browser run** | `npx nx run-many -t build -p 'web-*'` then `pnpm --filter <web> build test` for the one under test |
+| **serve it** | `npx nx run-many -t start -p 'web-*'` |
+| unit tests, one project | `npx nx run <p>:test:unit` |
+| unit tests, everywhere | `npx nx run-many -t test:unit --all` |
+| check everything | `npx nx run-many -t check --all` |
 | the contract suite | `npx nx run <client>:test:integration` |
-| rebuild after a contract change | `npx nx run <client>:generate` then `npx nx run-many -t build --all` |
+| rebuild after a contract change | `pnpm --filter <client> codegen api-client` then `npx nx run-many -t build --all` |
 
 ## The four things nx does not own
 
@@ -141,9 +145,9 @@ A hand edit to `Status` or `Updated at` is a claim rather than a finding, and th
 it rather than going under it — everything after `--` reaches the runner:
 
 ```bash
-npx nx run <project>:test -- <file>                    # one unit file
+npx nx run <project>:test:unit -- <file>               # one unit file
 npx nx run <project>:test:integration -- <file>        # one integration file
-npx nx run <project>:test -- --listTests               # what would run, without running it
+npx nx run <project>:test:unit -- --listTests          # what would run, without running it
 ```
 
 **The integration config is `jest.config.integration.cjs`, never `.ts`** — you only meet the name
@@ -168,17 +172,19 @@ is fine, and `npx nx run-many -t test --all` is the same work.
 
 **`dev` and `preview` are alternatives, never concurrent.** `dev` compiles a route inside the
 request, which a browser suite reads as a 45-second timeout rather than as a compile. Journeys run
-against `preview`.
+against `start`, which serves the built bundle.
 
-**`build:test`, never `build`, before a browser suite.** Test attributes are gated on
+**`build test`, never `build`, before a browser suite.** Test attributes are gated on
 `isTestDataDebug`, set from `VITE_TEST_DATA_DEBUG`; a build without it emits no `data-testid` and every
 selector times out. The suite refuses such a build and names the variable — believe it the first time.
 
-**A rebuild that reports success may have rebuilt nothing.** A cached `build:test` prints
+**A rebuild that reports success may have rebuilt nothing.** A cached `build test` prints
 *"successfully ran"* while leaving `dist` untouched — measured with timestamps 46 minutes stale and
 identical hashes. Before a sweep that must see your change, capture the served bundle name, rebuild
 with the cache skipped, and check three things: the hash moved, the marker is present, and what the
-host serves matches what is on disk. `vite preview` needs no restart — it serves `dist` per request.
+host serves matches what is on disk. **`dist/spn-build.json` names the flavour and the instant**, so
+a stale folder is readable rather than inferred. The server needs no restart — it serves `dist` per
+request.
 
 **Serve every app before a sweep, not just the one under test.** Signing in leaves for the hub, so
 an unserved `identity` makes nginx answer **502** and the login form never renders — which reads as
@@ -193,8 +199,8 @@ means a build value was missing and threw at boot, naming the key.
 2. **Platform layer**: `spnutils infra platform up` — this platform's container group (database, cache, queue, and each installed module's local rendering) from the pinned declaration. Check with `spnutils infra platform status`.
 3. **App layer** (per app, if not yet registered): `spnutils infra app up -p <app>` — schemas, per-schema roles, local TLS certificate, hosts entry, ingress vhost. No containers of its own.
 4. **Hosted-vendor modules** need no step of their own — a vendor you run is a module row in the platform declaration, and its local rendering comes up with the platform layer. There is no vendor verb.
-5. **Start the service app**: `npx nx run <service>:dev`. It loads `local.env`, and its port and API-docs path come from the repo's own app env — read them rather than assume. On a fresh schema run `npx nx run <service>:migrate:up` first; it needs the platform-owner env variables sourced.
-6. **Start web apps** as needed: `npx nx run-many -t dev -p '<pattern>'`, on the ports each app declares in its own manifest. For a browser suite start `preview` instead, over a `build:test` bundle — never `dev`.
+5. **Start the service app**: `npx nx run <service>:dev`. It loads `local.env`, and its port and API-docs path come from the repo's own app env — read them rather than assume. On a fresh schema run `pnpm --filter <service> migrate up` first; it needs the platform-owner env variables sourced.
+6. **Start web apps** as needed: `npx nx run-many -t dev -p '<pattern>'`, on the ports each app declares in its own manifest. For a browser suite run `start` instead, over a `build test` bundle — never `dev`.
 
 Stop here — this mode starts things; it does not test or verify them. Hand off to the `verify` skill for health checks. Report what is up and on which ports/hosts.
 

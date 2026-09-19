@@ -19,7 +19,7 @@ description: Prove SaaS Plane TS work is sound by running gates. Use when the as
 
 ## Mode: package — conformance gates on what was written
 
-**`package` mode proves what a project can prove ALONE.** It runs the gates and the tiers that need no wired stack — codegen freshness, validation, build, lint, and the `unit/` and `component/` suites. It does **not** run `integration/` or a journey: those need real resources or a real browser against a running platform, so they belong to `app` mode. A `package` pass is therefore not a claim that the thing works wired, and reporting it as one is the false green this mode exists to avoid.
+**`package` mode proves what a project can prove ALONE.** It runs the gates and the tiers that need no wired stack — codegen freshness, validation, build, check, and the `unit/` and `component/` suites. It does **not** run `integration/` or a journey: those need real resources or a real browser against a running platform, so they belong to `app` mode. A `package` pass is therefore not a claim that the thing works wired, and reporting it as one is the false green this mode exists to avoid.
 
 No running stack required. Run the cheapest gate first, so a failure stops the run early:
 
@@ -46,19 +46,25 @@ No running stack required. Run the cheapest gate first, so a failure stops the r
 
    **It reads a register by its eight headings** — `Id · Who · Does · Sees · Type · Tier · Status · Updated at`. A repository whose rows do not yet carry that grammar has no register for it to read, and it says so in as many words rather than reporting every action as uncovered.
 5. **Build** — `npx nx run-many -t build --all`, or `-p '<pattern>'` when the scope is narrower.
-6. **Lint + format** — `npx eslint` on changed files, `npx prettier --check`.
-7. **Tests** — `npx nx run-many -t test --all`, or `npx nx run <project>:test` for the owning suite. **A red sends you to the failure's own artifact first, never to the source** — the error context the runner wrote, and the service log beside it. Then fix by shape rather than one instance at a time; see [implement/steps/test](../implement/steps/test.md#before-you-write-or-fix-a-case).
+6. **Check + format** — `npx nx run-many -t check --all`, or `-p '<pattern>'`. The verb is `check`:
+   `lint` and `prettier` were second names for it and are retired (`RD.APPS.118`). It runs the
+   project's own typecheck and ESLint together, so neither is inferred from the other.
+7. **Tests** — `npx nx run-many -t test:unit --all`, and `test:component` where a kind carries it.
+   **The tier is named, never aggregated**: there is no `test` target, because one word covering
+   every tier meant the unit tier for seven kinds and the component tier for a web application. The
+   per-tier targets are INFERRED from what a node is, so `npx nx show project <p> --json` is what
+   says which a node has. **A red sends you to the failure's own artifact first, never to the source** — the error context the runner wrote, and the service log beside it. Then fix by shape rather than one instance at a time; see [implement/steps/test](../implement/steps/test.md#before-you-write-or-fix-a-case).
 
 **What the gates cover follows from the project's declared kind**, not from the repo it sits in:
 
 | Kind | `package` mode covers |
 | --- | --- |
-| `SUPPORT_*` · `MODULE_SERVER` | validator + barrel freshness, `validate`, build, lint, unit tests |
-| `MODULE_WEB` | barrel freshness, `validate`, build, lint, unit tests — e2e belongs to the app that mounts it |
+| `SUPPORT_*` · `MODULE_SERVER` | validator + barrel freshness, `validate`, build, check, unit tests |
+| `MODULE_WEB` | barrel freshness, `validate`, build, check, unit tests — e2e belongs to the app that mounts it |
 | `APP_SERVER` | the above, plus migrations applying cleanly and the integration suite |
 | `APP_WEB` | the above, plus the production build and e2e |
 | `CLIENT_API` | regenerate from the live OpenAPI and diff — **a diff is the finding**, never a fix-up |
-| `APP_UTILITY` | build, lint, tests |
+| `APP_UTILITY` | build, check, tests |
 
 Report per gate: the command run and its **actual output**. Report the test count, not just the color — a suite that silently stopped collecting is green. **Never report a gate you did not run**, and never infer one gate from another: a passing build says nothing about kind conformance.
 

@@ -85,9 +85,10 @@ Never leave mutated: the platform org and its policies, org-TYPE/GLOBAL auth/dat
 ## Commands
 
 ```bash
-npx nx run-many -t test --all       # every unit suite
-npx nx run <project>:test           # one project
+npx nx run-many -t test:unit --all   # every unit suite
+npx nx run <project>:test:unit       # one project
 npx nx run <client>:test:integration # the contract tier, against a live service
+pnpm --filter <project> test unit    # the same, through the node's own script
 pnpm test:e2e                       # root Playwright — the root is not an nx project
 npx tsc --noEmit --pretty false -p <project>/tsconfig.test.json   # a suite's own typecheck
 ```
