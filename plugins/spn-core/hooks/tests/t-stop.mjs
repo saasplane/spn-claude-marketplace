@@ -93,6 +93,7 @@ function one(label, root, expect, { says, reply = "done", parity = true, why = "
 }
 
 const F11 = "the Python listed arcs as `arc-*` only, so an N-named arc was invisible to it";
+const F17 = "the Python matches the article `a` as option A; the port is case-sensitive on the letter";
 
 console.log("\n=== stop — the arc-to-page checks, with arcs named the way the Python expects");
 
@@ -197,11 +198,13 @@ one("a reply that merely mentions a letter",
 // `choosing with a …` read as somebody naming option A. It fired on a reply that asked nothing.
 one("an article after a choosing word is not an option",
   build("stop-reply-article", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
-  "silent", { reply: "A caller sends an organization id of their own choosing with a sign-in, and it is ignored." });
+  "silent", { reply: "A caller sends an organization id of their own choosing with a sign-in, and it is ignored.",
+              parity: false, why: F17 });
 
 one("the other articles that used to fire",
   build("stop-reply-articles", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
-  "silent", { reply: "Pick a file, select a row, and choose a tier. Nothing is open." });
+  "silent", { reply: "Pick a file, select a row, and choose a tier. Nothing is open.",
+              parity: false, why: F17 });
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);
