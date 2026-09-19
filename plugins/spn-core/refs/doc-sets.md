@@ -27,12 +27,12 @@ a behaviour that crosses packages finally has a home — the domain that would h
 behaviour changed.
 
 > [!IMPORTANT]
-> **The rule above is the book's; the trees have not all moved yet.** Every repository in this
-> workspace — this book included — still carries the older shape, a docs tree per node with four
-> seats. The consolidation is its own arc, and until it runs you will open repositories that do not
-> match this page. **Write new documentation to the shape above**, and do not migrate a tree you
-> happen to be standing in: moving one is a planned change with link rewriting and id preservation,
-> not something done in passing.
+> **A node you open carries `README.md` and no docs tree.** That README is the index: about
+> twenty-five lines saying what the node is, and links into the seats it realizes. It is the only
+> thing that knows where the node documents itself, because a path cannot say it —
+> `packages/module-server-iam-ts` documents itself at `docs/04-capabilities/01-iam/01-server/`.
+> **Read it before looking for a mirror**, and write what you add into the repository's one tree
+> rather than beside the code.
 
 ## Every surface, one map
 

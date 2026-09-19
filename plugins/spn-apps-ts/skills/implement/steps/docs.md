@@ -4,7 +4,11 @@ Docs are the contract; code is the implementation; tests are the proof. The chan
 
 **Before writing behavior rows or dictionary terms**, apply the **spn-core** plugin's `refs/doc-sets.md`. It carries the node grammar in full, and the node's declared kind fixes its consumer. That consumer in turn fixes the actor voice, how areas group, and which test tier proves a row. For a `MODULE_SERVER` the consumer is the composing app. Rows read *"a composing app can…"*, areas are named for capability, and proof is contract-tier with the id in the test title.
 
-**The seats are folders, numbered, at every altitude** (foundation decision RD.DOCS.008): `docs/01-purpose/` · `docs/03-behaviors/` · `docs/04-capabilities/` · `docs/05-guides/`. Each opens with the `README.md` that is its face, and the unnumbered pockets are `docs/registers/` and `docs/artifacts/`. A seat is absent only where the node cannot answer its question at all — a generated API client has no `03-behaviors/`, an app-owned module has no `05-guides/`. Never write into a `docs/capabilities.md` or a `docs/guides/getting-started.md` — if you find one, it is drift; hand it to the `plan` skill in its `docs` mode.
+**A REPOSITORY HAS ONE DOCS TREE AND A NODE HAS NONE** (foundation decisions RD.DOCS.001 · RD.DOCS.021). The tree sits at the repository root with five numbered seats — `docs/01-purpose/` · `docs/02-constructs/` · `docs/03-behaviors/` · `docs/04-capabilities/` · `docs/05-guides/` — and two unnumbered pockets, `docs/registers/` and `docs/artifacts/`. Each seat opens with the `README.md` that is its face.
+
+**The seats divide by the domains the repository's concept names, never by the packages it ships.** So a module you are changing does not have a seat: it has a domain, and what you write lands in that domain's folder inside the one tree. The node itself carries `README.md` — about twenty-five lines saying what it is, and linking into the seats it realizes. **Find the node's capability face through that README**, which is the only thing that knows where the node documents itself: a path cannot say it, because `packages/module-server-iam-ts` documents itself at `docs/04-capabilities/01-iam/01-server/`.
+
+You never meet an absent seat. Where a repository has nothing of its own to say, the face states what the seat would hold and cites the repository that owns the answer. Never write a `docs/` folder inside a package or an app — if you find one, it is drift; hand it to the `plan` skill in its `docs` mode.
 
 ## Writing a seat from scratch
 
@@ -66,21 +70,22 @@ Foundation decision RD.GOV.009: a document states a **status**, never a count. N
 
 | Seat or pocket | Close it by |
 | --- | --- |
-| `docs/03-behaviors/README.md` | Flip implemented rows `🔮/🚧 → ✅` in the face — only where the proof test exists; a row with no test stays 🚧. Where the face maps area files, the story in `01-<area>.md` moves with it |
-| `docs/04-capabilities/` | Face + `data-model.md` terms current with the code, **and the code mirror for every `src/` seat the node's kind mirrors** — `contract.md` · `app.md` · `entry.md` for a `MODULE_SERVER`, the `ui` seat expanded for a `MODULE_WEB`. A seat that gained or lost a folder gains or loses its mirror in the same change |
+| `docs/03-behaviors/<domain>/` | The area file for the domain your change touched. A behaviour belongs to the domain that would have to change if the behaviour changed, which is what its id's prefix names — never to the package that happens to realize it. A row is eight cells, and what a run found is written by the run rather than typed |
+| `docs/04-capabilities/<domain>/<layer>/` | The node's own face and the code mirror for every `src/` folder that earns one — `contract.md` · `app.md` · `entry.md` for a `MODULE_SERVER`, the `ui` mirrors for a `MODULE_WEB`. A source folder that appeared or went gains or loses its mirror in the same change. The face's Map is **generated**, so never hand-write a row in it |
 | `docs/05-guides/README.md` | Only if install, mount, or configuration changed — this face **is** the getting-started, and it is written for a reader with no checkout of this repo. If it is generated, edit only inside `<!-- spnutils:keep:begin -->` / `<!-- spnutils:keep:end -->` (foundation decision RD.DOCS.009) |
-| `docs/01-purpose/README.md` | Only if the module's boundary itself shifted |
-| `docs/artifacts/resources/schema.sql` | Any entity/column/index change landed here **first** (or simultaneously), ported **verbatim** into `src/migrations/` — spec and migrations must never disagree |
-| `docs/README.md` | The node doc — only if the doc map or the node's identity changed |
+| `docs/02-constructs/<domain>/` | The construct, if your change altered what a thing IS — what it is made of, what it depends on, or what it refuses. The dictionary is generated from each construct's `Terms` table, so a term is edited there and nowhere else |
+| `docs/01-purpose/README.md` | Only if the REPOSITORY's reason to exist shifted, which a module change almost never does |
+| `docs/04-capabilities/<domain>/<layer>/schema.sql` | Any entity/column/index change landed here **first** (or simultaneously), ported **verbatim** into `src/migrations/` — spec and migrations must never disagree. It sits beside the `data-model.md` it is the authoritative form of, and NOT in a pocket: nothing in a pocket may be depended on (foundation decision `Q88`) |
+| `docs/README.md` | The repository's own face — only if a seat was added or a domain's name changed |
 | `README.md` (package root) | The npm front door, not the node doc and not a mirror — only if identity, install, or key exports changed |
-| App-owned modules | The same seats **minus `05-guides/`**, inside `src/modules/<mod>/docs/` (UI under its `ui/` code seat) — the module is never adopted on its own, so wiring, composition, and running it all land in the **host app's** `docs/05-guides/`, which you update when the registration entry or what it commits the host to changed |
-| Workspace `docs/` | `04-capabilities/` for structure changes; `03-behaviors/` for new workspace-level abilities; `registers/conformance.md` when a requirement's status moves — same PR |
+| App-owned modules | **The module inherits its host application's domain and layer, and adds its own name** — `apps/web-www-ts/src/modules/onboarding/` documents itself at `docs/04-capabilities/10-surfaces/www/onboarding/`. It is never adopted on its own, so wiring, composition and running it land in the repository's `docs/05-guides/`, which you update when the registration entry or what it commits the host to changed |
+| `registers/conformance.md` | When a requirement's status moves — same PR |
 
 Rules:
 
-- **Do not add other markdown files inside `packages/` or `apps/`** — extend the seats. No per-module summaries, no standalone status-tracking `.md`, no `tasks/` trees anywhere.
+- **A node carries `README.md` and nothing else.** No `docs/` folder inside a package or an app, no per-module summaries, no standalone status-tracking `.md`, no `tasks/` trees. What a node documents goes in the repository's one tree, under the domain it realizes.
 - **Never hand-edit the 📖 strip** at the foot of a seat document — it is derived from the node's doc map and regenerated whenever the node's file set changes (foundation decision RD.DOCS.007). Adding or removing a file is what makes every strip in that node stale, not just the new one's.
-- **Never invent entities or columns in prose** — align with `docs/artifacts/resources/schema.sql` or update it first.
+- **Never invent entities or columns in prose** — align with the layer's `schema.sql` or update it first.
 - **Written fresh** — docs state present truth; no changelog prose, no "previously"; git history is the history.
 - **Regenerate, don't restate**: `spnutils apps gen-symbols -p <pkg>` refreshes the machine twin (`spn-symbols.json`); the doc seats are the human twin. Intent lives in the code and is harvested — never typed twice (foundation decision RD.APPS.006).
 
