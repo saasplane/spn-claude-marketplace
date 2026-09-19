@@ -3,7 +3,7 @@
   "chapters": [
     {
       "path": "docs/03-capabilities/05-docs/01-corpus.md",
-      "seen": "fd889c96"
+      "seen": "f9ae65bd"
     },
     {
       "path": "docs/03-capabilities/01-saas/06-service-namespaces.md",
@@ -11,7 +11,7 @@
     },
     {
       "path": "docs/03-capabilities/04-devex/01-scm.md",
-      "seen": "306c1c68"
+      "seen": "aec27d95"
     }
   ]
 }
@@ -30,7 +30,7 @@
 - **Is the paved road still the easiest way?** If a workaround is easier than the golden path, the road is the defect — fix the path, not the developer. An undocumented deviation is a defect regardless of the excuse.
 - **Does the process hold?** Four permanent branches, promotion one rung at a time, everything by pull request, mechanical steps as commands never instructions.
 - **Is the foundation making the team faster** — not merely more correct? Verify velocity claims against the engineering outcomes the purpose part names, rather than asserting them.
-- **Can a leader repeat it?** The opening of any document under review reads on the first pass by someone without our vocabulary. A sentence they must read twice is a finding — split it, never shorten it (readability bar item 1 · decision RD.DOCS.043).
+- **Can a leader repeat it?** The opening of any document under review reads on the first pass by someone without our vocabulary. A sentence they must read twice is a finding — split it, never shorten it (readability bar item 1 · decision RD.DOCS.043). **Length itself is not the finding**: no rule measures it, and a sentence may be long where the idea needs it. What you are reading for is a second pass, not a word count.
 
 ## What it never does
 

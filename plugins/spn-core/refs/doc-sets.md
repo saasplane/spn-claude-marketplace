@@ -3,21 +3,34 @@
   "chapters": [
     {
       "path": "docs/03-capabilities/05-docs/README.md",
-      "seen": "b5223482"
+      "seen": "d225e8aa"
     },
     {
       "path": "CONCEPT.md",
-      "seen": "13ee3812"
+      "seen": "23a9071e"
     }
   ]
 }
 -->
 
-# Doc sets — the shape every node carries
+# Doc sets — the shape a repository carries
 
 **Source of truth:** the corpus standard (`03-capabilities/05-docs/`), with the concept's Node Docs section (`CONCEPT.md`, at the repository root) as the standing one-page view. Read this file as a restatement of those rules, adding none of its own. **The book governs**; the concept holds the last agreed idea and is updated on request, so where the three disagree the standard wins and this file is regenerated.
 
-**Every node carries the same shape at every kind** — four seats and two pockets. Only the capabilities seat has a file set that varies, and it varies because it is *derived* rather than chosen.
+**A repository has ONE docs tree, and it sits at the repository root.** Its seats divide by the
+domains the repository's own concept names, never by the packages it ships (decision RD.DOCS.001). A
+node — an app, a package, a module — carries a `README.md` saying what it is and linking into the
+seats it realizes, and carries no seats of its own.
+
+The reason is the question each seat asks. *What can a person do* is answered by the platform rather
+than by one of its packages: somebody signing in meets a server module, a web module and the
+application hosting all three, and no package owns that sentence. A package is how delivery is
+divided, which is a different question from how understanding is divided.
+
+Three things follow, and you meet each of them in the first week: one place to look, found by domain
+rather than by package name; renaming, splitting or absorbing a package moves no documentation; and
+a behaviour that crosses packages finally has a home — the domain that would have to change if the
+behaviour changed.
 
 ## Every surface, one map
 
@@ -27,11 +40,11 @@ Documentation is not one place. Resolve which surface a change belongs to **befo
 | --- | --- | --- | --- | --- |
 | `CONCEPT.md` | **repository root**, beside `sprepo.json` | what the repo **is** — boundary, domains, surfaces, refusals | `ideate`, one agreed block at a time | the shape moves |
 | `README.md` | repository root | how to get in — identity, children map, doc map | scaffold, then by hand | the children change |
-| `README.md` | **node** root — package, app, module | this node in a paragraph, and where its docs are | scaffold, then by hand | the node's identity moves |
-| `docs/README.md` | node doc tree | the **node doc** — children with statuses, the doc map | generated map, hand-written identity | the file set changes |
-| seat face | `01-purpose` · `02-behaviors` · `03-capabilities` · `04-guides` | the fixed answer, distilled, plus the map below it | `FRAME`, then `develop` | the answer moves |
-| area file | beneath a seat, flat and named for the group it governs | the depth the face distils | `plan` lands rows, `develop` proves them | rows land or change |
-| child node | beneath a seat, answering a narrower question | its own README and seats | scaffold | a node is added |
+| `README.md` | **node** root — package, app, module | this node in a paragraph, and links into the seats it realizes. About twenty-five lines, and **none of the house words** (RD.DOCS.021 · RD.DOCS.062) | scaffold, then by hand | the node's identity moves |
+| `docs/README.md` | the repository's one docs tree | the tree's face — the seats, and the map | generated map, hand-written identity | the file set changes |
+| seat face | `01-purpose` · `02-constructs` · `03-behaviors` · `04-capabilities` · `05-guides` | the fixed answer, distilled, plus the map below it | `FRAME`, then `develop` | the answer moves |
+| domain folder | beneath a seat, named for a domain the **concept** names | that domain's share of the seat's answer | `plan` lands rows, `develop` proves them | rows land or change |
+| mirror | `04-capabilities/<domain>/<layer>/`, named for the **source folder** it governs | that folder's seams | `develop` | the source folder moves |
 | `registers/` | pocket, **governing nodes only** | the node's own rules and decision log | on a decision | a rule is decided |
 | `artifacts/` | pocket, **authoring nodes only** | what the node authors — a moment captured | on request, never on initiative | someone asks |
 | **intent comment** | every contract method and exported component | why this exists, in one line, harvested into the symbol index | `develop` (decision RD.APPS.006) | the symbol's intent moves |
@@ -55,77 +68,118 @@ Documentation is not one place. Resolve which surface a change belongs to **befo
 ## The shape
 
 ```text
-<node>/docs/
-├── README.md              the node doc — what this is, its children, the doc map
-├── 01-purpose/            WHY — why it exists
-├── 02-behaviors/          WHAT, as usecase — what its consumer can do
-├── 03-capabilities/       WHAT, as blueprint — what it carries
-├── 04-guides/             HOW — how to use what was realized
-├── registers/             POCKET — the node's own rules and decisions
-└── artifacts/             POCKET — what the node authors
+<repository>/docs/
+├── README.md              the tree's face — the seats, and the map
+├── 01-purpose/            WHY — why this repository exists
+├── 02-constructs/         WHAT, the model — the things it is about, and the word for each
+├── 03-behaviors/          WHAT, as product — what a person can do
+├── 04-capabilities/       WHAT, as engineering — what must exist for that to be possible
+├── 05-guides/             HOW — how to use what was realized
+├── registers/             POCKET — the repository's own rules and decisions
+└── artifacts/             POCKET — the overview and construct pages, and deliberate reports
 ```
 
-- **Seats are numbered** because they are read in order; **pockets are never numbered** because they are consulted.
-- **Open every folder with `README.md`** — never `INDEX.md`. A seat's README is its **face**: the complete distilled answer plus the map of what sits below it, never a bare table of contents.
+**The numbering IS the mental model, so the folder listing teaches it.** The concept's framework runs
+**Why → What → How**, and *What* has three parts. One folder answers Why, three answer What in the
+order they are written, and one answers How. Read the names top to bottom and you have read the
+framework.
+
+**Constructs come first inside *What*, and that is the whole reason the seat exists.** Behaviors and
+capabilities are both written in the constructs' words — one in the consumer's spelling, one in the
+contract's — so neither can be written until the words exist. Put the model second and each of them
+invents the vocabulary it needs, which is how one noun ends up meaning two things.
+
+- **Seats are numbered** because they are read in order; **pockets are never numbered** because they
+  are consulted.
+- **Open every folder with `README.md`** — never `INDEX.md`. A seat's README is its **face**: the
+  complete distilled answer plus the map of what sits below it, never a bare table of contents.
 - **A seat holding nothing but its face is the compact state, not a defect.**
-- **Pockets are earned**: `registers/` on governing nodes only, `artifacts/` only where the node authors something.
+- **Number what is ordered; never number what is named.** The seats, the domain levels and the layer
+  split (`01-server` · `02-web`) are numbered. `README.md`, `data-model.md`, `schema.sql`,
+  `registers/`, `artifacts/` and **every mirror** are not — a mirror's name must stay identical to the
+  source folder it governs.
 
 ## A seat is never absent
 
-Where a node has nothing of its own to say in a seat, the face **states what the seat would hold**. It also **cites the node that owns the answer**. And that face is *generated*, because a citation is derivable (decision RD.DOCS.017).
+Where a repository has nothing of its own to say in a seat, the face **states what the seat would
+hold** and **cites the repository that owns the answer** — a partner repository references the
+platform's constructs rather than copying them. That face is *generated*, because a citation is
+derivable (decision RD.DOCS.017).
 
-| Kind | Seat | Cites |
-| --- | --- | --- |
-| `CLIENT_API` | `02-behaviors` · `03-capabilities` | the service that generates it |
-| an app-owned module | `04-guides` | the host app that composes it |
-| any kind | `04-guides` | install, mount and configure, read off the manifest and scripts |
+A missing seat and an empty seat read identically from outside. Making the seat present and the
+answer a citation turns absence into a statement with an owner.
 
-A missing seat and an empty seat read identically from outside. Making the seat present and the answer a citation turns absence into a statement with an owner.
+## The capabilities seat is derived — a mirror per source folder
 
-## The capabilities seat is derived
+A capability document is a **mirror**: named for the source folder it governs, carrying that folder's
+seams. A capability named for a feature rather than a folder breaks the derivation, because then
+nothing says which folder is documented and which is not.
 
-**One document per published source group** (decision RD.DOCS.015). What a node publishes is what its kind decides:
+The tree hangs **by domain, then by layer, then by the source folder**:
 
-| Kind | Its capability documents |
-| --- | --- |
-| `FOUNDATION` (repo root) | its own structure, by subject — **authored, the only one that is** |
-| `APPS` (repo root) | `apps` · `packages` · `tasks` · `tests` — only those it has |
-| `TOOLCHAIN` | one per published configuration group |
-| `SUPPORT_UNIVERSAL` · `SUPPORT_SERVER` | one per published group |
-| `SUPPORT_WEB` | one per published group, with `ui` expanded |
-| `MODULE_SERVER` · `MODULE_WEB` · `APP_UTILITY` | `contract` · `app` · `entry` |
-| `APP_SERVER` · `APP_WEB` | `composition` |
-| `CLIENT_API` | none — a generated surface, documented by its service |
+```text
+04-capabilities/01-iam/01-server/
+├── README.md              the face: what this module provides, and the Map
+├── contract.md         →  src/contract/
+├── app/services/session.md · identity.md · org.md · authz.md
+├── app/repositories.md →  src/app/repositories/
+├── entry.md            →  src/entry/
+├── data-model.md          the tables, one line each
+└── schema.sql             its authoritative form
+```
 
-- **Named for the group it governs**, path joined by `-`, flat inside the seat, never numbered. That name is the same key the symbol index carries, so a symbol resolves to the document that explains it.
-- **Depth is earned by size and named by the code**: `app.md` becomes `app-services.md` only when it outgrows a section *and* `app/services/` exists. A document never splits by class, entity or feature.
-- **Excluded by construction**: a private segment (anything under a `_`-prefixed path), a generated folder, build output, and `migrations/`. A migration's useful content is seeding and ordering, which is vocabulary and belongs to the data model (decision RD.DOCS.018).
-- **The face and `data-model.md` are always present**, at every kind, including where the rule produces no capability documents at all.
+The face's **Map** declares `File │ Governs │ Carries │ Status`, so what is documented and what is
+not is a table rather than a hunt.
+
+- **A mirror is one document per seam family** — the deepest folder a developer would name when
+  asked *where does that live*.
+- **`schema.sql` sits beside the `data-model.md` it is the authoritative form of**, in the
+  capabilities seat and not in a pocket: migrations mirror it verbatim, the dictionary reads a
+  term's storage through it, and a repository with nine storage-owning domains has nine of them
+  (`Q88`, 2026-09-18). One pocket cannot hold nine files of one name.
+- **Excluded by construction**: a private segment (anything under a `_`-prefixed path), a generated
+  folder, build output, and `migrations/`. A migration's useful content is seeding and ordering,
+  which is vocabulary and belongs to the data model (decision RD.DOCS.018).
 
 Which makes the seat checkable in both directions:
 
 | Defect | What it means |
 | --- | --- |
-| a published group with no document | the surface is undocumented |
-| a document naming no group | it describes something that no longer exists |
-| a document for a private or generated folder | the interior leaked into the published surface |
+| a source folder with no mirror, and no face naming it | a folder is documented by nobody, and nobody notices |
+| a mirror naming no folder | it describes something that no longer exists |
+| a mirror for a private or generated folder | the interior leaked into the published surface |
 | a split with no matching subfolder | depth was invented rather than earned |
 
 ## What each seat holds
 
 | Seat | Holds | Reads as |
 | --- | --- | --- |
-| `README.md` | identity and orientation | what this node is, and the map of what sits under it |
-| `01-purpose` | why the node exists | explains and persuades. Carries **no rules** — normative language here is a defect |
-| `02-behaviors` | what its consumer can do | stories: a persona reaching an outcome, in the consumer's own words. `personas.md` where the node has more than one; `01-<area>.md` for depth |
-| `03-capabilities` | what it carries | engineering content in the one voice (RD.DOCS.043), and **normative wherever a consumer can violate the statement** — the sequence, the guard, the reason a rule exists (RD.DOCS.034; see the altitude note below) |
-| `04-guides` | how to use it | task-shaped — install, mount, configure, run. The face **is** the getting-started, for a reader with no checkout |
-| `registers/` | the node's own rules and decisions | lookup material, consulted rather than read start to end |
-| `artifacts/` | `schema.sql`, reports, approach documents | authored source of truth. Nested folders allowed here and nowhere else; sub-folders carry no README |
+| `README.md` | identity and orientation | what this repository is, and the map of what sits under it |
+| `01-purpose` | why the repository exists | explains and persuades. Carries **no rules** — normative language here is a defect. It answers four questions — the problem it ends, the payoff of solving that once, what you get, and who it is for — and the check reads for the four answers, never for a file count |
+| `02-constructs` | the model — one file per construct, under a folder per domain | contract terms: what a thing is, what it is made of, what it depends on, what it refuses. **A construct never appears before one it depends on**, and the face carries the order, generated from the declared dependencies and the concept's own sequence |
+| `03-behaviors` | what a person can do — rows, under a folder per domain | `Id · Who · Does · Sees · Proven`, in the consumer's own words. **A behaviour belongs to the domain that would have to change if the behaviour changed**, which is what its id's prefix names. A row says nothing about which packages realize it |
+| `04-capabilities` | what must exist for that to be possible — one **mirror** per source folder that earns one | engineering content in the one voice (RD.DOCS.043), and **normative wherever a consumer can violate the statement** — the sequence, the guard, the reason a rule exists (RD.DOCS.034; see the altitude note below) |
+| `05-guides` | how to use what was realized | task-shaped — install, mount, configure, run. It carries no id and nothing tests it; the face is the adoption path in phases, each naming the guides it takes |
+| `registers/` | the repository's own rules and decisions | lookup material, consulted rather than read start to end |
+| `artifacts/` | the overview and construct pages, and deliberate reports | authored source of truth. Nested folders allowed here and nowhere else; sub-folders carry no README |
+
+**The constructs face is the dictionary, and it is generated.** One table, three columns — the word a
+consumer uses, the term the contract uses, and where it is stored. The first two come from each
+construct's own `Terms` table, so that table is **three columns wide, not two**; the third comes from
+the domain's `data-model.md`, matched on the contract term. A `Terms` table of two columns cannot be
+generated from, and the audit reports it.
+
+**Six invariants hold this shape up, and the folders are only where they land.** A domain folder
+exists only where the concept names that domain. The dictionary is generated, never typed. Every
+noun in a behaviour row resolves to the dictionary. Every source folder has a mirror, or the face
+names it and says where its facts live. Every `✅` row is cited by a case, and every cited id exists.
+Every construct has at least one realization row, and its dependencies are acyclic and agree with the
+reading order. Each is a RULE, and invariant 2 is the one that decides whether the shape was worth
+adopting — a hand-maintained dictionary moves drift rather than removing it.
 
 **A code-mirror capability page is the spec its code realizes** (decision RD.DOCS.034). The per-group page mirrors one published source group — `cache.md`, `contract.md`, `app.md`, `entry.md`, `ui-*.md` and siblings. It **binds two parties**. The implementation is bound by what a `Guarantee` row states, and the consumer by what `Placement` and `Does not do` state. **Both directions are normative.** The test, one statement at a time: **does it bind someone — the implementation or the consumer?** If yes it takes `MUST`/`MUST NOT`/`MAY`; if it binds nobody it is commentary — advice, rationale, a trade-off note — and stays prose. **A capability page is normatively dense by design**, and the seam table's sections are the spec's shape, unchanged.
 
-**The spec treatment reaches those pages only.** A repo root's `03-capabilities` is a **map** of what the repository contains — *where does what live*, not *what must this code do*. So is a node's `03-capabilities/README.md` face, which routes, and so is `data-model.md`, which is a dictionary. The seat's job differs by what the node publishes: source groups yield specs, indexes and orientation yield maps. **Seat tables are in scope for modality; record tables are not** — dictionaries, behavior-row tables, data models, registries and proof-gap tables keep their form. Modality comes from the page, never from a sweeper.
+**The spec treatment reaches those pages only.** A seat face is a **map** of what the repository contains — *where does what live*, not *what must this code do*. So is the `04-capabilities/README.md` face, which routes, and so is `data-model.md`, which is a dictionary. The seat's job differs by what is being documented: a mirror of a source folder yields a spec, an index or an orientation yields a map. **Seat tables are in scope for modality; record tables are not** — dictionaries, behavior-row tables, data models, registries and proof-gap tables keep their form. Modality comes from the page, never from a sweeper.
 
 **`group` is the source axis; `area` is the story axis** (decision RD.DOCS.016). A group is a published top-level source folder — shared vocabulary between the symbol index and the capabilities seat. An area divides the behaviors seat and names an outcome, never a folder.
 
