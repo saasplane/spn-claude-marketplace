@@ -37,11 +37,9 @@
 import { readdirSync, statSync, writeFileSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { isFile, read } from "../lib/source.ts";
+import { cellsOf, isHeader, isUnderline } from "../lib/register.ts";
 
 const SKIP = new Set(["node_modules", ".git", "dist", "build", ".nx", "coverage"]);
-
-/** The eight cells, in order. A table with these headings is a behaviour register, wherever it sits. */
-const HEADINGS = ["id", "who", "does", "sees", "type", "tier", "status", "updated at"];
 
 /** The three a run can produce, plus the two a person owns. */
 const FROM_A_RUN = new Set(["SUCCESS", "FAILED", "PENDING"]);
@@ -101,19 +99,6 @@ function artifacts(root: string): { runs: Run[]; findings: string[] } {
   return { runs: runs, findings: findings };
 }
 
-/** Where a row's cells are, if this line is a row of a behaviour table. */
-const cellsOf = (line: string): string[] | null => {
-  if (!line.trimStart().startsWith("|")) return null;
-  const trimmed = line.trim().replace(/^\|/, "").replace(/\|$/, "");
-  const cells = trimmed.split("|");
-  return cells.length === HEADINGS.length ? cells : null;
-};
-
-const isHeader = (line: string): boolean => {
-  const cells = cellsOf(line);
-  return cells !== null && cells.every((cell, i) => cell.trim().toLowerCase() === HEADINGS[i]);
-};
-
 /** The worst of what a tier's results said about one id — a behaviour with a failing proof is not proven. */
 const worst = (statuses: string[]): string =>
   statuses.includes("FAILED") ? "FAILED" : statuses.includes("PENDING") ? "PENDING" : "SUCCESS";
@@ -129,7 +114,7 @@ function apply(source: string, runs: Run[], reachIsRepository: boolean, file: st
     const cells = cellsOf(lines[i]);
     if (!inTable) continue;
     if (cells === null) { inTable = false; continue; }
-    if (cells.every((cell) => /^[\s:-]*$/.test(cell))) continue;   // the header's underline
+    if (isUnderline(cells)) continue;                              // the header's underline
 
     const id = cells[0].trim().replace(/`/g, "");
     const tier = cells[5].trim().toUpperCase();

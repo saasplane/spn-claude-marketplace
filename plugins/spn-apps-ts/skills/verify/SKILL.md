@@ -38,9 +38,16 @@ No running stack required. Run the cheapest gate first, so a failure stops the r
 
    One thing this cannot see, and it must not be reported as clean: a **Command's members**. The artifact carries states by name, so member descriptions are checked in the source. They are also the highest-value descriptions in the repo, because they become the input-field descriptions of every agent tool. So a package with described Commands and undescribed members is a worse result than the headline number suggests.
 3. **Kind conformance** — `spnutils apps validate`. Walks every workspace project and reports where one disagrees with what its own declared kind requires: `UNDECLARED`, `NAMING`, `TOOLCHAIN`, `SCOPE`, `LAYER`, `FILE_NAMING`. Exits non-zero on findings, changes nothing on disk. Each message names the rule *and* the remedy — apply the remedy rather than inventing one.
-4. **Build** — `npx nx run-many -t build --all`, or `-p '<pattern>'` when the scope is narrower.
-5. **Lint + format** — `npx eslint` on changed files, `npx prettier --check`.
-6. **Tests** — `npx nx run-many -t test --all`, or `npx nx run <project>:test` for the owning suite. **A red sends you to the failure's own artifact first, never to the source** — the error context the runner wrote, and the service log beside it. Then fix by shape rather than one instance at a time; see [implement/steps/test](../implement/steps/test.md#before-you-write-or-fix-a-case).
+4. **Action coverage** — `node "${CLAUDE_PLUGIN_ROOT}"/hooks/tools/action-coverage.ts`. Reads every `@SPAPIRouteCommand` the repository publishes and every behaviour row it declares, and names each action that moves an entity between states which no row claims. Exits non-zero on one, changes nothing on disk; pass `--report` to see the same list without the gate.
+
+   **An unclaimed action is a missing ROW, not a missing test.** It is an interaction somebody can perform and no document says who may perform it — so writing a case would be proving something nobody has agreed to. Send the finding to whoever owns the register, not to whoever owns the suite.
+
+   It also prints each entity's action shape, where a dash is an action the API deliberately does not publish. **A dash owes a `NEGATIVE` row saying so**, in the same grammar as the `POSITIVE` one beside it; without one, nothing distinguishes *this cannot be created, by design* from *nobody has built create yet*.
+
+   **It reads a register by its eight headings** — `Id · Who · Does · Sees · Type · Tier · Status · Updated at`. A repository whose rows do not yet carry that grammar has no register for it to read, and it says so in as many words rather than reporting every action as uncovered.
+5. **Build** — `npx nx run-many -t build --all`, or `-p '<pattern>'` when the scope is narrower.
+6. **Lint + format** — `npx eslint` on changed files, `npx prettier --check`.
+7. **Tests** — `npx nx run-many -t test --all`, or `npx nx run <project>:test` for the owning suite. **A red sends you to the failure's own artifact first, never to the source** — the error context the runner wrote, and the service log beside it. Then fix by shape rather than one instance at a time; see [implement/steps/test](../implement/steps/test.md#before-you-write-or-fix-a-case).
 
 **What the gates cover follows from the project's declared kind**, not from the repo it sits in:
 
@@ -55,7 +62,7 @@ No running stack required. Run the cheapest gate first, so a failure stops the r
 
 Report per gate: the command run and its **actual output**. Report the test count, not just the color — a suite that silently stopped collecting is green. **Never report a gate you did not run**, and never infer one gate from another: a passing build says nothing about kind conformance.
 
-> Every gate here is static. Passing all five means the code is *well-formed*, not that the feature *works* — that is mode `app`, and for anything user-visible it is the real exit criterion.
+> Every gate here is static. Passing all seven means the code is *well-formed*, not that the feature *works* — that is mode `app`, and for anything user-visible it is the real exit criterion.
 
 ## Mode: app — health checks on what is running
 
