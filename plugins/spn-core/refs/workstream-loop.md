@@ -7,7 +7,7 @@
     },
     {
       "path": "docs/03-capabilities/05-docs/05-artifacts.md",
-      "seen": "19d3b89e"
+      "seen": "4f58eb45"
     }
   ]
 }

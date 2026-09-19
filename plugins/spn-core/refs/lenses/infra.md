@@ -2,10 +2,11 @@
 {
   "chapters": [
     { "path": "docs/03-capabilities/03-infra/README.md", "seen": "39dd6378" },
-    { "path": "docs/03-capabilities/04-devex/01-scm.md", "seen": "aec27d95" },
+    { "path": "docs/03-capabilities/04-devex/01-scm.md", "seen": "ac391222" },
     { "path": "docs/03-capabilities/04-devex/07-deliver.md", "seen": "c4d8e25a" },
     { "path": "docs/03-capabilities/04-devex/10-delivery.md", "seen": "8389db5b" }
-  ]
+  ],
+  "rows": ["RD.APPS.121"]
 }
 -->
 
@@ -22,6 +23,7 @@
 - **The change runs locally first.** Run a full platform on a developer's machine — the same manifests, not a mock; a capability that cannot come up under `infra` is not done.
 - **Configuration follows the config plane**: logical keys per namespace and app, local env files and cloud paths as two realizations of one list — never a value pasted into code.
 - **Promotion is the branch map's.** Where a change deploys is manifest data (`branchMap`), one rung at a time, by pull request — never a manual push to a setup.
+- **A repo-scoped script has three fates, and a script that probes the estate for a declared fact has only one of them.** `tasks/` is where a repository keeps the on-demand scripts its own developers run, so an empty one is not the goal. A task **stays** where the work is genuinely this repository's, such as a sandbox tied to one cloud account. It is **promoted** to a CLI verb where everything it needs is declared in SPN manifests rather than typed into the script. **It retires** where it was a workaround for something the platform did not answer and now does. A script that probes a running system for a fact a manifest already declares is that third case. Promote it and the workaround becomes permanent, with the absence that caused it still there (decision RD.APPS.121).
 - **Destructive operations are named and gated** — teardown, reset, and migration steps confirm before they mutate and report what they did.
 
 ## What it never does

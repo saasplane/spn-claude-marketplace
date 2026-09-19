@@ -11,9 +11,10 @@
     },
     {
       "path": "docs/03-capabilities/04-devex/01-scm.md",
-      "seen": "aec27d95"
+      "seen": "ac391222"
     }
-  ]
+  ],
+  "rows": ["RD.APPS.121"]
 }
 -->
 
@@ -29,6 +30,7 @@
 - **Is this the smallest design that meets the requirement?** Treat simplicity as a budget: every abstraction and layer spends complexity the team repays forever. Pick the smaller when two designs both work.
 - **Is the paved road still the easiest way?** If a workaround is easier than the golden path, the road is the defect — fix the path, not the developer. An undocumented deviation is a defect regardless of the excuse.
 - **Does the process hold?** Four permanent branches, promotion one rung at a time, everything by pull request, mechanical steps as commands never instructions.
+- **Where does a repo-scoped script belong, and is anyone asking?** `tasks/` is a home rather than a backlog, so an empty one is not the goal. Every script there has one of three fates, and the change that touches it names which. It **stays** where the work is genuinely this repository's. It is **promoted** to a CLI verb where it is generic and reads what SPN manifests declare rather than facts typed into the script. It **retires** where it was a workaround for something the platform did not answer and now does. **Retirement is the fate people miss, and it is the most common one** — promote a workaround and you make it permanent, leaving the absence that caused it exactly where it was (decision RD.APPS.121).
 - **Is the foundation making the team faster** — not merely more correct? Verify velocity claims against the engineering outcomes the purpose part names, rather than asserting them.
 - **Can a leader repeat it?** The opening of any document under review reads on the first pass by someone without our vocabulary. A sentence they must read twice is a finding — split it, never shorten it (readability bar item 1 · decision RD.DOCS.043). **Length itself is not the finding**: no rule measures it, and a sentence may be long where the idea needs it. What you are reading for is a second pass, not a word count.
 
