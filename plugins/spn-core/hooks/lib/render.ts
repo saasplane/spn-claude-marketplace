@@ -10,6 +10,9 @@
 // closed — headings, paragraphs, tables, lists, fenced blocks — and a dependency would have to be
 // installed on a partner's machine to read a document.
 
+import { basename, dirname, relative, resolve } from "node:path";
+import { existsSync } from "node:fs";
+
 import { draw, type Spec } from "./draw.ts";
 import { colour } from "./figures.ts";
 
@@ -43,6 +46,43 @@ const esc = (s: string) => s.replace(/&(?![a-zA-Z#][a-zA-Z0-9]*;)/g, "&amp;").re
  * from SUB at runtime, for the reason `figures.ts` records: a digit in the marker gets matched, and
  * writing the control character as a literal puts raw NUL bytes in this file.
  */
+/**
+ * How a relative link is re-expressed for the produced page. Set by `renderPage`, identity by default.
+ *
+ * A seat file's links are written from the SEAT's folder, and the page is produced into a different
+ * one whose siblings carry different names — `platform-grants.md` beside the seat is
+ * `platform-grants-construct.html` beside the page. Copying the href across verbatim broke a link on
+ * **every produced page in the workspace, 166 of 166**, and no check saw it: `docs.ts audit` reads
+ * structure and never follows a link.
+ */
+let rewriteHref: (href: string) => string = (h) => h;
+
+/**
+ * Re-express a seat file's link for the page produced from it.
+ *
+ * Resolve against the seat's folder, swap a construct seat file for the page produced from it, then
+ * express the result relative to the page's own folder. A construct seat always owes a page, so the
+ * swap is unconditional rather than a filesystem check — that keeps the answer the same whatever
+ * order the pages are produced in. `README.md` is a domain face with no page, and keeps pointing at
+ * the seat tree.
+ */
+export function hrefForPage(seat: string, out: string): (href: string) => string {
+  const seatDir = dirname(seat);
+  const outDir = dirname(out);
+  return (href) => {
+    if (/^(?:[a-z]+:|#|\/\/|\/)/i.test(href)) return href;
+    const hash = href.indexOf("#");
+    const path = hash < 0 ? href : href.slice(0, hash);
+    const frag = hash < 0 ? "" : href.slice(hash);
+    if (!path) return href;
+    let target = resolve(seatDir, path);
+    if (/\/02-constructs\/.*\.md$/.test(target) && basename(target) !== "README.md")
+      target = target.replace("/02-constructs/", "/artifacts/constructs/").replace(/\.md$/, "-construct.html");
+    const rel = relative(outDir, target);
+    return (rel.startsWith(".") ? rel : `./${rel}`) + frag;
+  };
+}
+
 function inline(s: string): string {
   const SEP = String.fromCharCode(26);
   const code: string[] = [];
@@ -53,7 +93,7 @@ function inline(s: string): string {
   };
   let out = s.replace(/`([^`]+)`/g, (_, c) => { code.push(c); return mark(code.length - 1); });
   out = esc(out);
-  out = out.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, t, h) => `<a href="${h}">${t}</a>`);
+  out = out.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, t, h) => `<a href="${rewriteHref(h)}">${t}</a>`);
   out = out.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
   out = out.replace(/(^|[^*])\*([^*]+)\*(?!\*)/g, "$1<em>$2</em>");
   return out.replace(new RegExp(`${SEP}([a-z]+)${SEP}`, "g"), (_, k: string) => {
@@ -158,7 +198,19 @@ export function renderPage(opts: {
   workspace: string;
   location: string;
   furniture: { style: string; scripts: string; footer: string };
+  /** Given a seat file's href, the one the produced page should carry. Identity when omitted. */
+  link?: (href: string) => string;
 }): { html: string; findings: Finding[] } {
+  const previousRewrite = rewriteHref;
+  rewriteHref = opts.link ?? ((h) => h);
+  try {
+    return renderPageBody(opts);
+  } finally {
+    rewriteHref = previousRewrite;
+  }
+}
+
+function renderPageBody(opts: Parameters<typeof renderPage>[0]): { html: string; findings: Finding[] } {
   const findings: Finding[] = [];
   const { block } = opts;
   const lines = opts.markdown.split("\n");
@@ -212,7 +264,10 @@ ${lead}
     `<div class="page">`,
     ``,
     `<nav class="rail" id="rail">`,
-    `  <a class="home" href="../README.md">&larr; the model</a>`,
+    // "the model" is the constructs seat's own face. The seat file sits one level under it, so
+    // `../README.md` is the link an author would write — and it is re-expressed for the page's
+    // folder by the same rewriter the body uses, rather than shipped as the literal it used to be.
+    `  <a class="home" href="${rewriteHref("../README.md")}">&larr; the model</a>`,
     `  <div class="rail-title">Outline</div>`,
     `</nav>`,
     `<div class="wrap">`,

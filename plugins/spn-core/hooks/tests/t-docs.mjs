@@ -594,6 +594,41 @@ console.log("\n=== the gap scan measures and never fixes");
     const got = run(ws, ["audit", ".spndevex/workstreams/open/001-a/a-approach.html"]);
     one("the same page in a workstream is not", got, (g) => !/belongs to the workstream/.test(g));
   }
+
+  // A PRODUCED PAGE'S LINKS ARE RE-EXPRESSED FOR THE FOLDER IT LANDS IN. The seat writes
+  // `sibling.md`; beside the page that file is `sibling-construct.html`, and the page sits three
+  // levels from the capabilities seat rather than two. Copying the href across verbatim broke a
+  // link on 166 of 166 produced pages in the workspace, and nothing saw it: the audit reads
+  // structure and never follows a link.
+  {
+    const seat = (id, body) => doc(
+      { id, variant: "construct", parentId: "concept", title: id, lenses: ["ARCHITECT"],
+        status: "PLANNING", dependsOn: [] },
+      body, "`For: Architect` · `Status: 🔮 PLANNING`");
+    const ws = repo({
+      "docs/02-constructs/01-core/thing.md": seat("thing",
+        "## Boundary\n\nSee [Other](other.md) and [the cap](../../04-capabilities/x.md).\n"),
+      "docs/02-constructs/01-core/other.md": seat("other", "## Boundary\n\nx\n"),
+      "docs/04-capabilities/x.md": "# X\n",
+    });
+    // `page` needs the real construct template for its furniture; the throwaway repo has none.
+    const templates = resolve(import.meta.dirname, "..", "..", "..", "..", "..",
+                              "spn-foundation", "docs", "04-capabilities", "01-foundation",
+                              "02-docs", "templates");
+    process.env.SPN_TEMPLATES = templates;
+    run(ws, ["page", "docs/02-constructs/01-core/thing.md"]);
+    run(ws, ["page", "docs/02-constructs/01-core/other.md"]);
+    const page = readAt(ws, "docs/artifacts/constructs/01-core/thing-construct.html");
+
+    one("a sibling seat link becomes the sibling PAGE", page, has('href="./other-construct.html"'));
+    one("a link out of the seat tree is re-based for the page's depth", page,
+        has('href="../../../04-capabilities/x.md"'));
+    one("the rail's home link is re-based too, not shipped as `../README.md`", page,
+        (g) => /class="home" href="\.\.\/\.\.\/\.\.\/02-constructs\/README\.md"/.test(g));
+    one("and the page it produced is the page the audit expects", run(ws, ["audit", "docs"]),
+        (g) => !/produced/.test(g));
+    delete process.env.SPN_TEMPLATES;
+  }
   one("and it names what it did NOT measure rather than reporting a zero",
     rep, has("What this report does not measure"));
 }

@@ -18,7 +18,7 @@
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync } from "node:fs";
 import { dirname, join, resolve, basename, relative } from "node:path";
-import { renderPage } from "../lib/render.ts";
+import { hrefForPage, renderPage } from "../lib/render.ts";
 import { checkFigures, colour, stripSpans } from "../lib/figures.ts";
 import { begin, record, end } from "../lib/timing.ts";
 import { cardsOf } from "../checks/split-plan.ts";
@@ -618,6 +618,9 @@ function checkProduced(file: string, src: string, block: any, workspace: string,
       workspace: process.env.SPN_ORG ?? "SaaS Plane",
       location: process.env.SPN_LOCATION ?? locationOf(seat, workspace),
       furniture: furniture(templates),
+      // The same rewriter `page` used, or this check re-renders with seat-relative links and
+      // reports every correctly produced page as hand-edited.
+      link: hrefForPage(seat, file),
     }).html;
   } catch (e) {
     return [{ check: "produced", grade: "SOFT", file, message: `the page could not be produced for comparison — ${(e as Error).message}` }];
@@ -1144,6 +1147,14 @@ function locationOf(seat: string, workspace: string): string {
 
 function pageFor(seat: string, workspace: string, templates: string, write: boolean): Finding[] {
   const findings: Finding[] = [];
+
+  // A PAGE IS PRODUCED FROM A CONSTRUCT SEAT AND FROM NOTHING ELSE. Given a whole docs tree, this
+  // walked every `.md` in it and wrote `<name>-construct.html` beside each one — purpose files,
+  // guides, data models, even a report — because the seat-to-page mapping below silently falls
+  // through for a path with no `/02-constructs/` in it. Eighteen junk pages in one run, all of them
+  // claiming to be constructs. A folder is a convenience for the caller, never a licence to produce.
+  if (!seat.replace(/\\/g, "/").includes("/02-constructs/")) return findings;
+
   const src = readFileSync(seat, "utf8");
   const { block, error } = readBlock(src);
   if (!block) { findings.push({ check: "page", grade: "RULE", file: seat, message: error ?? "no spn:doc block" }); return findings; }
@@ -1154,11 +1165,17 @@ function pageFor(seat: string, workspace: string, templates: string, write: bool
   if (location === "—")
     findings.push({ check: "page", grade: "SOFT", file: seat, message: "no manifest above this file declares a `name`, so the header's location reads `—` (Q79 puts `name` on the manifests)" });
 
-  const { html, findings: rf } = renderPage({ block, markdown, workspace: org, location, furniture: furniture(templates) });
-  for (const r of rf) findings.push({ check: "page", grade: "RULE", file: seat, message: r.message });
-
   // The page sits beside its seat file, in the pocket that mirrors the seat folder for folder.
+  // It is computed BEFORE rendering because the body's links are re-expressed against it: the seat
+  // writes `platform-grants.md` for a sibling, and beside the page that sibling is
+  // `platform-grants-construct.html`.
   const out = seat.replace(/\/02-constructs\//, "/artifacts/constructs/").replace(/\.md$/, "-construct.html");
+
+  const { html, findings: rf } = renderPage({
+    block, markdown, workspace: org, location, furniture: furniture(templates),
+    link: hrefForPage(seat, out),
+  });
+  for (const r of rf) findings.push({ check: "page", grade: "RULE", file: seat, message: r.message });
   const before = existsSync(out) ? readFileSync(out, "utf8") : "";
   if (before === html) { console.log(`current  ${relative(workspace, out)}`); return findings; }
   if (write) {
