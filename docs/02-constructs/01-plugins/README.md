@@ -13,3 +13,10 @@
 `For: Architect · Engineering leader` · `Status: 🔮 PLANNING`
 
 The model for **Plugins**. One file per construct, in an order where nothing appears before something it depends on.
+
+<!-- spn:generated domain — do not edit inside these markers; `docs.ts face` writes it -->
+what a plugin is, how the set a workspace loads is derived from its claim, and how one is published and installed
+
+| Construct | What it is |
+| --- | --- |
+<!-- /spn:generated -->

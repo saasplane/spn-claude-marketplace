@@ -13,3 +13,10 @@
 `For: Architect · Engineering leader` · `Status: 🔮 PLANNING`
 
 The model for **Skills**. One file per construct, in an order where nothing appears before something it depends on.
+
+<!-- spn:generated domain — do not edit inside these markers; `docs.ts face` writes it -->
+what a skill is — a verb's steps, loaded when the work matches, and never a second place a rule lives
+
+| Construct | What it is |
+| --- | --- |
+<!-- /spn:generated -->

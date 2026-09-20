@@ -13,3 +13,10 @@
 `For: Engineering leader · Architect` · `Status: 🔮 PLANNING`
 
 The model for **Agents**. One file per construct, in an order where nothing appears before something it depends on.
+
+<!-- spn:generated domain — do not edit inside these markers; `docs.ts face` writes it -->
+the personas and the lenses a review convenes, and what each one is allowed to decide
+
+| Construct | What it is |
+| --- | --- |
+<!-- /spn:generated -->

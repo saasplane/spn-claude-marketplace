@@ -18,3 +18,8 @@ One document per source folder that earns one, named for the folder it governs a
 
 **Nothing of this repository's own sits here yet.** You are not meeting an absent seat: the seat exists from the first day, and a seat holding nothing but its face is the compact state rather than a defect. What belongs here is written when there is something to write, and never as packaging for a single document.
 
+<!-- spn:generated map — do not edit inside these markers; `docs.ts face` writes it -->
+| File | Governs | Carries | Status |
+| --- | --- | --- | --- |
+| — | — | this layer carries no mirror yet | 🔮 |
+<!-- /spn:generated -->
