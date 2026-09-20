@@ -19,4 +19,5 @@ the personas and the lenses a review convenes, and what each one is allowed to d
 
 | Construct | What it is |
 | --- | --- |
+| [The Agent — A Persona a Session Can Convene](agent-set.md) | What an agent brief is — a name, a description that decides when it is convened, and the bound authority it carries once it runs, from a fixed persona to a lens picked at the moment of the call. |
 <!-- /spn:generated -->

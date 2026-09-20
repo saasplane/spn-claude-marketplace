@@ -320,6 +320,37 @@ const PROOF_OK = "## Proof\n\n| Check | Kind | What a green run shows |\n| --- |
 }
 
 
+// ------------------------------------------- a block inside a fence is an example
+
+console.log("\n=== a chapter that TEACHES the metadata block does not thereby declare one");
+// THE WRITER WAS ONE RUN FROM EDITING THE ILLUSTRATION A RULE IS TAUGHT BY. readBlock took the
+// first `spn:doc` anywhere, so a document showing an example block appeared to declare itself, and
+// `face` rendered a tag line FOR THE EXAMPLE and wrote it into the file. That is exactly what
+// happened to a rules file carrying no block of its own.
+{
+  const teaches = "<!-- spn:restates\n{}\n-->\n\n# How A Block Is Written\n\n" +
+    "Every document opens with one:\n\n```markdown\n" +
+    block({ id: "an-example", title: "Human Title", lenses: ["ARCHITECT"], status: "DONE", summary: "s." }) +
+    "\n# Human Title\n```\n";
+  const root = repo({ "CONCEPT.md": "# c\n", "docs/teaches.md": teaches });
+  one("the example's block is not read as the document's own",
+    run(root, ["audit", "docs/teaches.md"]), has("no spn:doc block"));
+  const before = readAt(root, "docs/teaches.md");
+  run(root, ["face", "docs"]);
+  one("and `face` writes no tag line into it — the file is untouched",
+    readAt(root, "docs/teaches.md"), before);
+}
+{
+  // The ordinary case must still work: a real block, and an example further down.
+  const both = doc({ id: "real", title: "Real", lenses: ["QA"], status: "DONE" },
+    "Lead.\n\n```markdown\n" + block({ id: "an-example", title: "Other", lenses: ["ARCHITECT"], status: "DONE", summary: "s." }) + "```\n",
+    "`For: Quality engineer` · `Status: ✅ DONE`");
+  const root = repo({ "CONCEPT.md": "# c\n", "docs/real.md": both });
+  one("a real block above a fenced example is still read, and it is the real one",
+    run(root, ["audit", "docs/real.md"]), has("clean"));
+}
+
+
 // ---------------------------------------------------------------- the grouping
 
 console.log("\n=== a repository may group its domains by stage");

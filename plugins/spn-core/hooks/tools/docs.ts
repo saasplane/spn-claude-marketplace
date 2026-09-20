@@ -77,8 +77,18 @@ function sectionName(heading: string): string {
   return text(heading).split(/\s+[—–-]\s+/)[0].trim();
 }
 
+/**
+ * A document's own metadata block.
+ *
+ * A BLOCK INSIDE A FENCE IS AN EXAMPLE, NOT THIS DOCUMENT'S OWN. A chapter that teaches the
+ * metadata block shows one, and reading the first match anywhere meant such a chapter appeared to
+ * declare itself — so `face` rendered a tag line FOR THE EXAMPLE and wrote it into the file. That
+ * is how `refs/doc-sets.md`, which carries no block of its own, acquired one: its only `spn:doc`
+ * sits inside its `## Metadata` sample. The writer was one run away from editing the illustration
+ * a rule is taught by.
+ */
 function readBlock(src: string): { block: any | null; error: string | null } {
-  const m = src.match(/<!--\s*spn:doc\s*([\s\S]*?)-->/);
+  const m = outsideFences(src).match(/<!--\s*spn:doc\s*([\s\S]*?)-->/);
   if (!m) return { block: null, error: "no spn:doc block" };
   try {
     return { block: JSON.parse(m[1].trim()), error: null };

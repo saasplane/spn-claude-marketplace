@@ -63,3 +63,25 @@ tells you so.
 cites one — and four of them, `contract-cycle`, `prose-triage`, `restate-drift` and `partner-shape`,
 it does not name at all. Naming is not documenting: the rule belongs to the book and the
 implementation belongs here.
+
+<!-- spn:generated constructs — do not edit inside these markers; `docs.ts face` writes it -->
+**plugins**
+
+- **The Plugin — Delivery Unit of the Marketplace** — What a plugin is made of, how the marketplace lists one, and how installing it puts bytes into a session — the container every hook, skill, ref and agent brief lives inside.
+
+**hooks**
+
+- **The Hook — Code the Runtime Calls For You** — What a hook is — code wired to a runtime event or run by name, what it may return, and the line between refusing a call and only reporting on it.
+
+**skills**
+
+- **The Skill — A Verb's Steps, Loaded on Match** — What a skill is — a name and a description a session matches against the work at hand, and the steps it loads once matched — and why a skill never becomes a second place a rule lives.
+
+**refs**
+
+- **The Ref — A Chapter, Restated and Stamped** — What a ref is — a markdown restatement of one or more chapters, carrying a hash of what it last saw, so a chapter that moves is reported rather than quietly outrun.
+
+**agents**
+
+- **The Agent — A Persona a Session Can Convene** — What an agent brief is — a name, a description that decides when it is convened, and the bound authority it carries once it runs, from a fixed persona to a lens picked at the moment of the call.
+<!-- /spn:generated -->

@@ -19,4 +19,5 @@ what a skill is — a verb's steps, loaded when the work matches, and never a se
 
 | Construct | What it is |
 | --- | --- |
+| [The Skill — A Verb's Steps, Loaded on Match](skill-set.md) | What a skill is — a name and a description a session matches against the work at hand, and the steps it loads once matched — and why a skill never becomes a second place a rule lives. |
 <!-- /spn:generated -->

@@ -19,4 +19,5 @@ what a ref is — a restatement of one or more chapters, stamped with what it sa
 
 | Construct | What it is |
 | --- | --- |
+| [The Ref — A Chapter, Restated and Stamped](ref-set.md) | What a ref is — a markdown restatement of one or more chapters, carrying a hash of what it last saw, so a chapter that moves is reported rather than quietly outrun. |
 <!-- /spn:generated -->
