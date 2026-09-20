@@ -1355,10 +1355,21 @@ if (cmd === "figures") {
   process.exit(2);
 }
 
+// A PATH IS A FILE OR A FOLDER, for `status` and `page` exactly as for `audit`. Given a folder
+// each of these read the directory itself and died on `EISDIR` with a raw stack trace. A folder
+// means every seat file under it — markdown only, because these two act on the file an author
+// writes rather than on the page produced from it.
+const seatPaths = (args: string[]): string[] =>
+  args.filter((r) => !r.startsWith("--")).flatMap((p) => {
+    const full = resolve(p);
+    let st; try { st = statSync(full); } catch { return [full]; }
+    return st.isDirectory() ? walkFiles(full, (f) => f.endsWith(".md") && basename(f) !== "README.md") : [full];
+  });
+
 if (cmd === "status") {
   const nodes = nodeIndex(resolve(workspace));
   const check = rest.includes("--check");
-  const seats = rest.filter((r) => !r.startsWith("--")).map((p) => resolve(p));
+  const seats = seatPaths(rest);
   const f = seats.flatMap((p) => statusFor(p, resolve(workspace), nodes, !check));
   for (const x of f) console.log(`${x.grade === "RULE" ? "✗" : "!"} ${x.grade.padEnd(4)} ${x.check.padEnd(9)} ${relative(workspace, x.file)}\n         ${x.message}`);
   process.exit(f.some((x) => x.grade === "RULE") ? 1 : 0);
@@ -1368,7 +1379,7 @@ if (cmd === "page") {
   const templates = process.env.SPN_TEMPLATES
     ?? join(resolve(workspace), "spn-foundation", "docs", "04-capabilities", "01-foundation", "02-docs", "templates");
   const check = rest.includes("--check");
-  const seats = rest.filter((r) => !r.startsWith("--")).map((p) => resolve(p));
+  const seats = seatPaths(rest);
   const f = seats.flatMap((p) => pageFor(p, resolve(workspace), templates, !check));
   for (const x of f) console.log(`${x.grade === "RULE" ? "✗" : "!"} ${x.grade.padEnd(4)} ${x.check.padEnd(9)} ${relative(workspace, x.file)}\n         ${x.message}`);
   process.exit(f.some((x) => x.grade === "RULE") ? 1 : 0);
