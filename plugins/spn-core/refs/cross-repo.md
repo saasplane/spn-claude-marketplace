@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "CONCEPT.md", "seen": "1e8fa57e" },
+    { "path": "CONCEPT.md", "seen": "2c1d21b5" },
     { "path": "docs/04-capabilities/01-foundation/01-devex/09-utils.md", "seen": "a8fdf4f3" },
     { "path": "docs/04-capabilities/01-foundation/01-devex/11-workspace.md", "section": "The agent is updated first, and reloaded before anything runs", "seen": "41e78db7" },
     { "path": "docs/04-capabilities/01-foundation/01-devex/10-delivery.md", "section": "When an edit becomes behaviour", "seen": "4d108ba0" },
