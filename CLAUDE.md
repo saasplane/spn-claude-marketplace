@@ -45,7 +45,7 @@ are running.
 reinstalling over a stale `0.1.0`. **A published source has not been tested that way**, so treat a
 backwards version move as unsafe there until somebody proves otherwise.
 
-**This is written down because you would otherwise apply the wrong rule.** Three plugins at three
+**You would otherwise apply the wrong rule here, which is why this is written down.** Three plugins at three
 versions looks like the lockstep defect that row names, and it is not one. Ruled by the developer
 on 2026-09-08.
 

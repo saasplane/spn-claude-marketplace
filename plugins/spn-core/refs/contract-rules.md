@@ -2,8 +2,8 @@
 {
   "chapters": [
     { "path": "docs/04-capabilities/02-support/01-apps/01-shape/03-architecture.md", "seen": "504cb4cf" },
-    { "path": "docs/registers/conformance.md", "seen": "d3974b29" },
-    { "path": "docs/04-capabilities/02-support/01-apps/03-module/01-server/01-contract/01-states.md", "seen": "30d3b676" }
+    { "path": "docs/registers/conformance.md", "seen": "e0df0852" },
+    { "path": "docs/04-capabilities/02-support/01-apps/03-module/01-server/01-contract/01-states.md", "seen": "39d71ca3" }
   ]
 }
 -->

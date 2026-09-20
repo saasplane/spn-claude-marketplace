@@ -2,9 +2,9 @@
 {
   "chapters": [
     { "path": "docs/04-capabilities/02-support/02-infra/README.md", "seen": "d8637066" },
-    { "path": "docs/04-capabilities/01-foundation/01-devex/01-scm.md", "seen": "53c51acc" },
-    { "path": "docs/04-capabilities/01-foundation/01-devex/07-deliver.md", "seen": "c06c944d" },
-    { "path": "docs/04-capabilities/01-foundation/01-devex/10-delivery.md", "seen": "3ace90d5" }
+    { "path": "docs/04-capabilities/01-foundation/01-devex/01-scm.md", "seen": "416a167e" },
+    { "path": "docs/04-capabilities/01-foundation/01-devex/07-deliver.md", "seen": "0bd19d37" },
+    { "path": "docs/04-capabilities/01-foundation/01-devex/10-delivery.md", "seen": "49a5dcc2" }
   ],
   "rows": [
     "RD.APPS.121"
@@ -25,7 +25,7 @@
 - **The change runs locally first.** Run a full platform on a developer's machine — the same manifests, not a mock; a capability that cannot come up under `infra` is not done.
 - **Configuration follows the config plane**: logical keys per namespace and app, local env files and cloud paths as two realizations of one list — never a value pasted into code.
 - **Promotion is the branch map's.** Where a change deploys is manifest data (`branchMap`), one rung at a time, by pull request — never a manual push to a setup.
-- **A repo-scoped script has three fates, and a script that probes the estate for a declared fact has only one of them.** `tasks/` is where a repository keeps the on-demand scripts its own developers run, so an empty one is not the goal. A task **stays** where the work is genuinely this repository's, such as a sandbox tied to one cloud account. It is **promoted** to a CLI verb where everything it needs is declared in SPN manifests rather than typed into the script. **It retires** where it was a workaround for something the platform did not answer and now does. A script that probes a running system for a fact a manifest already declares is that third case. Promote it and the workaround becomes permanent, with the absence that caused it still there (decision RD.APPS.121).
+- **A repo-scoped script ends up one of three ways, and a script that probes the estate for a declared fact ends up only one of them.** `tasks/` is where a repository keeps the on-demand scripts its own developers run, so an empty one is not the goal. A task **stays** where the work is genuinely this repository's, such as a sandbox tied to one cloud account. It is **promoted** to a CLI verb where everything it needs is declared in SPN manifests rather than typed into the script. **It retires** where it was a workaround for something the platform did not answer and now does. A script that probes a running system for a fact a manifest already declares is that third case. Promote it and the workaround becomes permanent, with the absence that caused it still there (decision RD.APPS.121).
 - **Destructive operations are named and gated** — teardown, reset, and migration steps confirm before they mutate and report what they did.
 
 ## What it never does

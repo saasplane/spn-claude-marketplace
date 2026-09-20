@@ -3,7 +3,7 @@
   "chapters": [
     { "path": "CONCEPT.md", "section": "Estate Manifest", "seen": "61b99636" },
     { "path": "CONCEPT.md", "section": "Estate Packages", "seen": "5ca7289e" },
-    { "path": "CONCEPT.md", "section": "Estate Modules", "seen": "8ded54dd" },
+    { "path": "CONCEPT.md", "section": "Estate Modules", "seen": "610b791e" },
     { "path": "CONCEPT.md", "section": "Estate Config", "seen": "c888bb3f" }
   ]
 }

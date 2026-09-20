@@ -1,10 +1,10 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/04-capabilities/01-foundation/02-docs/README.md", "seen": "171c01bc" },
-    { "path": "docs/04-capabilities/01-foundation/02-docs/05-artifacts.md", "seen": "b76885bb" },
-    { "path": "docs/04-capabilities/01-foundation/02-docs/03-tree.md", "seen": "93964dfd" },
-    { "path": "CONCEPT.md", "seen": "2c1d21b5" }
+    { "path": "docs/04-capabilities/01-foundation/02-docs/README.md", "seen": "1389ff5e" },
+    { "path": "docs/04-capabilities/01-foundation/02-docs/05-artifacts.md", "seen": "5ca0f7c4" },
+    { "path": "docs/04-capabilities/01-foundation/02-docs/03-tree.md", "seen": "562ad713" },
+    { "path": "CONCEPT.md", "seen": "6afd452b" }
   ]
 }
 -->

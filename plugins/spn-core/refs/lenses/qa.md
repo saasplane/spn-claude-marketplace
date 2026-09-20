@@ -2,7 +2,7 @@
 {
   "chapters": [
     { "path": "CONCEPT.md", "section": "Kind Tests", "seen": "8ed2b14b" },
-    { "path": "docs/04-capabilities/02-support/01-apps/06-tests/README.md", "seen": "17be81d8" }
+    { "path": "docs/04-capabilities/02-support/01-apps/06-tests/README.md", "seen": "12f88e9d" }
   ],
   "rows": [
     "RD.APPS.086",

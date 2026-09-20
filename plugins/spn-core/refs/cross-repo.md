@@ -1,8 +1,8 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "CONCEPT.md", "seen": "2c1d21b5" },
-    { "path": "docs/04-capabilities/01-foundation/01-devex/09-utils.md", "seen": "a8fdf4f3" },
+    { "path": "CONCEPT.md", "seen": "6afd452b" },
+    { "path": "docs/04-capabilities/01-foundation/01-devex/09-utils.md", "seen": "28200afe" },
     { "path": "docs/04-capabilities/01-foundation/01-devex/11-workspace.md", "section": "The agent is updated first, and reloaded before anything runs", "seen": "41e78db7" },
     { "path": "docs/04-capabilities/01-foundation/01-devex/10-delivery.md", "section": "When an edit becomes behaviour", "seen": "4d108ba0" },
     { "path": "docs/04-capabilities/01-foundation/02-docs/04-discipline.md", "section": "Restatement discipline", "seen": "11808ae4" }

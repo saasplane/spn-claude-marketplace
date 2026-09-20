@@ -1,9 +1,9 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/04-capabilities/01-foundation/02-docs/README.md", "seen": "171c01bc" },
+    { "path": "docs/04-capabilities/01-foundation/02-docs/README.md", "seen": "1389ff5e" },
     { "path": "providers/apps/ts/README.md", "seen": "1b645a3e" },
-    { "path": "providers/apps/ts/03-code-patterns.md", "seen": "87109b9b" }
+    { "path": "providers/apps/ts/03-code-patterns.md", "seen": "795882e4" }
   ]
 }
 -->

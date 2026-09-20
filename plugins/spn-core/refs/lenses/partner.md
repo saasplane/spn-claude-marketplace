@@ -2,8 +2,8 @@
 {
   "chapters": [
     { "path": "docs/04-capabilities/02-support/01-apps/07-comments/01-intent.md", "seen": "1ac66544" },
-    { "path": "docs/04-capabilities/02-support/01-apps/08-devex-agent/README.md", "seen": "2e5642bd" },
-    { "path": "docs/04-capabilities/02-support/01-apps/03-module/01-server/01-contract/01-states.md", "seen": "30d3b676" }
+    { "path": "docs/04-capabilities/02-support/01-apps/08-devex-agent/README.md", "seen": "407c7816" },
+    { "path": "docs/04-capabilities/02-support/01-apps/03-module/01-server/01-contract/01-states.md", "seen": "39d71ca3" }
   ]
 }
 -->

@@ -6,7 +6,7 @@ description: Turn a requirement into a design the platform's own vocabulary can 
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/04-capabilities/01-foundation/02-docs/05-artifacts.md", "section": "The approach document", "seen": "7e127e83" }
+    { "path": "docs/04-capabilities/01-foundation/02-docs/05-artifacts.md", "section": "The approach document", "seen": "8801f9e1" }
   ]
 }
 -->
