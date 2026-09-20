@@ -194,6 +194,48 @@ const construct = (sections) =>
 }
 
 
+// ------------------------------------------- an overview borrows headings at any depth
+
+console.log("\n=== an overview's source headings are read at any depth, not just `##`");
+// A DOMAIN SITS ONE LEVEL DOWN FROM A GROUP. The concept names a group at `##` and a domain inside
+// it at `###`, and this check read `^## ` alone — so the hub could pass and **no domain overview
+// ever could**: every heading it correctly borrowed was reported as invented. The rule is *an
+// overview never invents a heading its source does not have*, and that says nothing about depth.
+const overview = (sections) =>
+  `<meta charset="utf-8">\n<title>T</title>\n` +
+  block({ id: "o", variant: "overview", parentId: "concept", title: "T",
+          lenses: ["ARCHITECT"], summary: "s." }) +
+  sections.map((h) => `<h2>${h}</h2>\n<p>x</p>`).join("\n");
+
+const CONCEPT_TREE = "# c\n\n## SaaS Plane — Foundation\n\nstage.\n\n### DevEx\n\nhow it runs.\n\n### Docs\n\nhow it is written.\n\n## Adoption\n\nlast.\n";
+{
+  const root = repo({ "CONCEPT.md": CONCEPT_TREE,
+    "docs/artifacts/overviews/o.html": overview(["Overview", "DevEx", "Docs", "Glossary", "Where to go next"]) });
+  one("a domain heading at `###` is a real heading, and the overview may borrow it",
+    run(root, ["audit", "docs/artifacts/overviews/o.html"]), lacks("no counterpart"));
+}
+{
+  const root = repo({ "CONCEPT.md": CONCEPT_TREE,
+    "docs/artifacts/overviews/o.html": overview(["Overview", "DevEx", "Invented", "Glossary", "Where to go next"]) });
+  one("a heading the concept does not have anywhere is still a finding",
+    run(root, ["audit", "docs/artifacts/overviews/o.html"]), has("Invented — an overview never invents"));
+}
+{
+  const root = repo({ "CONCEPT.md": CONCEPT_TREE,
+    "docs/artifacts/overviews/o.html": overview(["Overview", "Docs", "DevEx", "Glossary", "Where to go next"]) });
+  one("and the source's order still binds across depths",
+    run(root, ["audit", "docs/artifacts/overviews/o.html"]), has("an overview holds its source's order"));
+}
+{
+  // A concept that SHOWS an example page in a fenced block is not declaring those headings.
+  const root = repo({
+    "CONCEPT.md": CONCEPT_TREE + "\n```markdown\n## Fenced Heading\n```\n",
+    "docs/artifacts/overviews/o.html": overview(["Overview", "Fenced Heading", "Glossary", "Where to go next"]) });
+  one("a heading inside a fence is not a heading the concept has",
+    run(root, ["audit", "docs/artifacts/overviews/o.html"]), has("Fenced Heading — an overview never invents"));
+}
+
+
 // ---------------------------------------------------------------- the grouping
 
 console.log("\n=== a repository may group its domains by stage");

@@ -494,9 +494,15 @@ function checkOverviewSource(file: string, src: string, block: any, workspace: s
     f.push({ check: "overview", grade: "SOFT", file, message: "`parentId` is `concept` and no `CONCEPT.md` was found to compare against" });
     return f;
   }
-  const source = readFileSync(concept, "utf8")
-    .split("\n").filter((l) => /^## /.test(l))
-    .map((l) => sectionName(l.replace(/^##\s*/, "").replace(/`[^`]*`/g, "").trim()));
+  // A HEADING AT ANY DEPTH IS STILL THE SOURCE'S HEADING. This read `^## ` alone, which is the
+  // level the repository's own hub borrows from — and **a domain sits one level down**. The
+  // concept names a group at `##` and a domain inside it at `###`, so a domain overview could
+  // never pass: every section it borrowed was reported as invented. The rule is *an overview never
+  // invents a heading its source does not have*, and that rule says nothing about depth.
+  // Fences are blanked first, so an example page inside a code block is not mistaken for structure.
+  const source = outsideFences(readFileSync(concept, "utf8"))
+    .split("\n").filter((l) => /^#{2,4} /.test(l))
+    .map((l) => sectionName(l.replace(/^#{2,4}\s*/, "").replace(/`[^`]*`/g, "").trim()));
   const borrowed = got.slice(1, -2);
   const unknown = borrowed.filter((b) => !source.includes(b));
   if (unknown.length)
