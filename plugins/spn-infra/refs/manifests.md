@@ -2,7 +2,7 @@
 {
   "chapters": [
     { "path": "CONCEPT.md", "section": "Estate Manifest", "seen": "61b99636" },
-    { "path": "CONCEPT.md", "section": "Estate Packages", "seen": "23a4853a" }
+    { "path": "CONCEPT.md", "section": "Estate Packages", "seen": "5ca7289e" }
   ]
 }
 -->

@@ -2,7 +2,7 @@
 {
   "chapters": [
     { "path": "docs/04-capabilities/01-foundation/02-docs/README.md", "seen": "171c01bc" },
-    { "path": "CONCEPT.md", "seen": "1e80a67d" }
+    { "path": "CONCEPT.md", "seen": "1e8fa57e" }
   ]
 }
 -->
