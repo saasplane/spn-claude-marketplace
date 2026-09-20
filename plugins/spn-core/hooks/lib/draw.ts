@@ -7,7 +7,7 @@
 //
 // The grid, from the chapter: canvas 760 wide, margin 24, three type sizes and no fourth.
 
-export type Box = { id: string; label: string; note?: string; em?: boolean; off?: boolean; warn?: boolean };
+export type Box = { id: string; label: string; note?: string; em?: boolean; off?: boolean; warn?: boolean; in?: string };
 export type Link = { from: string; to: string; label?: string; dashed?: boolean };
 export type Spec = { kind: string; boxes?: Box[]; links?: Link[]; caption?: string; title?: string };
 
@@ -102,10 +102,12 @@ function drawEntities(spec: Spec): { svg: string; findings: string[] } {
     const dash = l.dashed ? ' stroke-dasharray="5 4"' : "";
     out.push(`  <path class="c" d="M${x1} ${y1} H${mid} V${y2} H${x2}"${dash} marker-end="url(#ar)"/>`);
     if (l.label) {
-      // The label sits above the vertical leg, which is empty space by construction.
+      // THE LABEL SITS ABOVE BOTH BOXES, not at their mid-height. `y1` and `y2` are box CENTRES, so
+      // a label placed against them lands inside a box — and the figure check then measures it
+      // against that box's width and reports it overrunning something it was never inside.
       const w = l.label.length * W_NOTE;
       const x = Math.min(Math.max(mid - w / 2, margin), width - margin - w);
-      out.push(`  <text class="n" x="${x}" y="${Math.min(y1, y2) - 8}">${esc(l.label)}</text>`);
+      out.push(`  <text class="n" x="${x}" y="${Math.min(a.y, b.y) - 6}">${esc(l.label)}</text>`);
     }
   }
 
@@ -142,10 +144,130 @@ function drawChain(spec: Spec): { svg: string; findings: string[] } {
   };
 }
 
+/**
+ * MAP — the parts of one thing, and how they touch. The chapter's shape, exactly: **a box is a
+ * group, an arrow is what flows, a nested box is containment.**
+ *
+ * Groups lay out in rows that wrap at the canvas width, so a map of three parts is one row and a
+ * map of nine is three — the reader never scrolls sideways and no box is scaled down to fit. A box
+ * naming another in `in` is drawn INSIDE it, and its parent grows to hold it rather than the child
+ * being shrunk: containment is the claim, so the parent's size is derived from what it contains.
+ *
+ * Every connector leaves one edge and lands on another, which is the chapter's own test for a
+ * figure being checkable rather than a matter of taste. Boxes sharing a row connect straight across;
+ * boxes on different rows leave the bottom edge and enter the top, so no connector crosses a label.
+ */
+function drawMap(spec: Spec): { svg: string; findings: string[] } {
+  const findings: string[] = [];
+  const all = spec.boxes ?? [];
+  const links = spec.links ?? [];
+  if (!all.length) return { svg: "", findings: ["a `dg` figure with no boxes"] };
+
+  const byId = new Map(all.map((b) => [b.id, b]));
+  for (const l of links) for (const end of [l.from, l.to])
+    if (!byId.has(end)) findings.push(`a link names \`${end}\`, and no box has that id`);
+
+  const kids = new Map<string, Box[]>();
+  const top: Box[] = [];
+  for (const b of all) {
+    if (b.in === undefined) { top.push(b); continue; }
+    if (!byId.has(b.in)) { findings.push(`\`${b.id}\` is nested in \`${b.in}\`, and no box has that id`); top.push(b); continue; }
+    if (b.in === b.id) { findings.push(`\`${b.id}\` is nested in itself`); top.push(b); continue; }
+    kids.set(b.in, [...(kids.get(b.in) ?? []), b]);
+  }
+  if (!top.length) { findings.push("every box is nested, so none could be placed"); return { svg: "", findings }; }
+
+  const HEAD = 34, PAD_IN = 12;
+  const outerW = (b: Box): number => {
+    const own = boxWidth(b);
+    const inner = (kids.get(b.id) ?? []).map(outerW);
+    return inner.length ? Math.max(own, Math.max(...inner) + PAD_IN * 2) : own;
+  };
+  const outerH = (b: Box): number => {
+    const inner = kids.get(b.id) ?? [];
+    if (!inner.length) return boxHeight(b);
+    return HEAD + inner.reduce((h, c) => h + outerH(c) + 10, 0) + PAD_IN - 10 + PAD_IN;
+  };
+
+  // Rows that wrap at the canvas width, so the figure grows downward rather than sideways.
+  const CANVAS = 760, margin = 24, gapX = 28, gapY = 26;
+  const rows: Box[][] = [[]];
+  let used = 0;
+  for (const b of top) {
+    const w = outerW(b);
+    if (used && used + gapX + w > CANVAS - margin * 2) { rows.push([]); used = 0; }
+    rows[rows.length - 1].push(b);
+    used += (used ? gapX : 0) + w;
+  }
+
+  const out: string[] = [];
+  const at = new Map<string, { x: number; y: number; w: number; h: number }>();
+  const place = (b: Box, x: number, y: number, w: number, h: number) => {
+    const inner = kids.get(b.id) ?? [];
+    at.set(b.id, { x, y, w, h });
+    if (!inner.length) { out.push(rect(b, x, y, w, h)); return; }
+    // A group that contains things is drawn as a frame with its label in the band at the top.
+    out.push(`  <rect class="${boxClass(b)}" x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="none"/>`);
+    out.push(`  <text class="l" x="${x + PAD_IN}" y="${y + 22}">${esc(b.label)}</text>`);
+    let cy = y + HEAD;
+    for (const c of inner) { const ch = outerH(c); place(c, x + PAD_IN, cy, w - PAD_IN * 2, ch); cy += ch + 10; }
+  };
+
+  let y = margin;
+  const rowHeights = rows.map((r) => Math.max(...r.map(outerH)));
+  rows.forEach((row, i) => {
+    let x = margin;
+    for (const b of row) { const w = outerW(b); place(b, x, y, w, outerH(b)); x += w + gapX; }
+    y += rowHeights[i] + gapY;
+  });
+  const width = CANVAS;
+  const height = y - gapY + margin;
+
+  for (const l of links) {
+    const a = at.get(l.from), b = at.get(l.to);
+    if (!a || !b) continue;
+    const sameRow = a.y < b.y + b.h && b.y < a.y + a.h;
+    let d: string, lx: number, ly: number;
+    if (sameRow) {
+      const rightward = a.x < b.x;
+      const x1 = rightward ? a.x + a.w : a.x, x2 = rightward ? b.x : b.x + b.w;
+      const y1 = a.y + a.h / 2, y2 = b.y + b.h / 2;
+      const mid = (x1 + x2) / 2;
+      d = `M${x1} ${y1} H${mid} V${y2} H${x2}`;
+      // Above both boxes, never at their mid-height — `y1` and `y2` are centres, so a label placed
+      // against them sits inside a box rather than in the gap the connector runs through.
+      lx = mid; ly = Math.min(a.y, b.y) - 6;
+    } else {
+      const downward = a.y < b.y;
+      const y1 = downward ? a.y + a.h : a.y, y2 = downward ? b.y : b.y + b.h;
+      const x1 = a.x + a.w / 2, x2 = b.x + b.w / 2;
+      const mid = (y1 + y2) / 2;
+      d = `M${x1} ${y1} V${mid} H${x2} V${y2}`;
+      lx = (x1 + x2) / 2; ly = mid - 6;
+    }
+    const dash = l.dashed ? ' stroke-dasharray="5 4"' : "";
+    out.push(`  <path class="c" d="${d}"${dash} marker-end="url(#ar)"/>`);
+    if (l.label) {
+      const w = l.label.length * W_NOTE;
+      const x = Math.min(Math.max(lx - w / 2, margin), width - margin - w);
+      out.push(`  <text class="n" x="${x}" y="${ly}">${esc(l.label)}</text>`);
+    }
+  }
+
+  const svg = [
+    `<svg class="dg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(spec.title ?? spec.caption ?? "map")}">`,
+    `  <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>`,
+    ...out,
+    `</svg>`,
+  ].join("\n");
+  return { svg, findings };
+}
+
 const DRAWERS: Record<string, (s: Spec) => { svg: string; findings: string[] }> = {
   entities: drawEntities,
   chain: drawChain,
   flow: drawChain,
+  map: drawMap,
 };
 
 export const KINDS = Object.keys(DRAWERS);
