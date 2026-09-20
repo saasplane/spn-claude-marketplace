@@ -1,0 +1,369 @@
+<meta charset="utf-8">
+<title>The Agent — A Persona a Session Can Convene</title>
+<!-- spn:doc
+{"id":"agent-set","variant":"construct","parentId":"concept","title":"The Agent — A Persona a Session Can Convene","lenses":["LEAD","ARCHITECT"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"What an agent brief is — a name, a description that decides when it is convened, and the bound authority it carries once it runs, from a fixed persona to a lens picked at the moment of the call.","keywords":["agent","persona","lens","convene","subagent","authority"]}
+-->
+<!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
+<style>
+  :root {
+    --paper:#edf0f3; --card:#f7f9fb; --ink:#141920; --slate:#48525f; --faint:#7c8794;
+    --rule:#d2d9e0; --accent:#2f4e7a; --accent-soft:#e0e8f4;
+    --gap:#8f5714; --gap-soft:#f7ecda; --ok:#2a6459; --ok-soft:#dcece8;
+    --ui:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+    --xs:0.76rem; --sm:0.85rem; --md:0.97rem; --lg:1.32rem; --xl:1.62rem; --xxl:2.5rem;
+    --tk-k:#6d3a9c; --tk-s:#2a6459; --tk-c:#7c8794; --tk-t:#2f4e7a; --tk-n:#8f5714; --tk-add:#2a6459; --tk-del:#a63d3d;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){ --paper:#0f1318; --card:#171d24; --ink:#e3e8ee; --slate:#a3adb9; --faint:#6f7986;
+      --rule:#242d37; --accent:#86a9da; --accent-soft:#18232f;
+      --gap:#d59d4f; --gap-soft:#2a2113; --ok:#5db3a4; --ok-soft:#14251f; --tk-k:#c9a3ee; --tk-s:#7fc9b6; --tk-c:#6f7986; --tk-t:#86a9da; --tk-n:#d59d4f; --tk-add:#5db3a4; --tk-del:#e08a8a; }
+  }
+  :root[data-theme="dark"]{ --paper:#0f1318; --card:#171d24; --ink:#e3e8ee; --slate:#a3adb9; --faint:#6f7986;
+    --rule:#242d37; --accent:#86a9da; --accent-soft:#18232f;
+    --gap:#d59d4f; --gap-soft:#2a2113; --ok:#5db3a4; --ok-soft:#14251f; --tk-k:#c9a3ee; --tk-s:#7fc9b6; --tk-c:#6f7986; --tk-t:#86a9da; --tk-n:#d59d4f; --tk-add:#5db3a4; --tk-del:#e08a8a; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--ui);font-size:1rem;line-height:1.6;-webkit-font-smoothing:antialiased}
+  p{margin:0 0 1rem;max-width:58rem}
+  code,.m{font-family:var(--mono);font-size:0.87em}
+  strong{font-weight:600}
+  em{font-style:italic;color:var(--slate)}
+  a{color:var(--accent)}
+  .page{display:grid;grid-template-columns:13rem minmax(0,1fr);gap:3rem;max-width:min(98vw,80rem);margin:0 auto;padding:3rem 8px 6rem;align-items:start}
+  .rail{position:sticky;top:2.5rem;font-family:var(--ui);font-size:var(--xs)}
+  .rail .home{border-left:none;padding-left:0;margin-bottom:.9rem;color:var(--accent);font-weight:650;display:block}
+  .rail .rail-title{letter-spacing:.15em;text-transform:uppercase;color:var(--faint);margin-bottom:.85rem;font-size:.7rem}
+  .rail a{display:flex;gap:.55rem;text-decoration:none;color:var(--slate);padding:.28rem 0 .28rem .6rem;border-left:2px solid var(--rule);line-height:1.4}
+  .rail a .n{font-family:var(--mono);color:var(--faint);font-variant-numeric:tabular-nums}
+  .rail a.sub{padding-left:1.6rem;font-size:.72rem;color:var(--faint)}
+  .rail a:hover{color:var(--ink)}
+  .rail a.on{color:var(--accent);border-left-color:var(--accent);font-weight:650}
+  .rail .count{margin-left:auto;font-family:var(--mono);font-size:.68rem;background:var(--gap-soft);color:var(--gap);border-radius:2px;padding:0 .3rem}
+  .wrap{display:flex;flex-direction:column;gap:3.25rem;min-width:0}
+  .masthead{display:flex;flex-direction:column;gap:1.1rem}
+  .eyebrow{display:flex;flex-direction:column;gap:.5rem;font-family:var(--ui);font-size:var(--xs);color:var(--faint)}
+  .eyebrow .line{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem .6rem;line-height:1.7}
+  .eyebrow .sep{color:var(--rule);font-weight:300}
+  .eyebrow .line1{letter-spacing:.15em;text-transform:uppercase;font-weight:650;color:var(--faint);line-height:1.7}
+  .eyebrow .lbl{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+  .eyebrow .st{margin-left:auto;display:inline-flex;align-items:center;gap:.4rem}
+  .eyebrow .audience{display:inline-flex;flex-wrap:wrap;align-items:center;gap:.45rem}
+  .badge{display:inline-flex;align-items:center;gap:.35rem;padding:.1rem .6rem;border-radius:999px;border:1px solid var(--rule);background:var(--card);font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--slate);line-height:1.7;white-space:nowrap}
+  .badge.type{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);font-weight:650}
+  .badge.lens{font-family:var(--ui);font-size:.74rem;letter-spacing:0;text-transform:none}
+  .badge.status{font-weight:700}
+  .badge.status.planning{border-color:var(--gap);color:var(--gap);background:var(--gap-soft)}
+  .badge.status.implementing{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+  .badge.status.done{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(15rem,1fr));gap:.7rem;margin:.8rem 0 1.4rem}
+  .tile{border:1px solid var(--rule);background:var(--card);border-radius:3px;padding:.7rem .85rem;min-width:0}
+  .tile a{font-weight:600;color:var(--ink);text-decoration:none}
+  .tile a:hover{color:var(--accent)}
+  .tile p{font-size:var(--sm);color:var(--slate);margin:.25rem 0 0;max-width:none}
+  .tile .glyph{float:right;font-size:.8rem;margin-left:.4rem}
+  h1{font-family:var(--ui);font-size:var(--xxl);font-weight:700;letter-spacing:-.02em;line-height:1.15;text-wrap:balance;margin:0}
+  .standfirst{font-size:var(--lg);line-height:1.5;color:var(--slate);max-width:46rem}
+  .sec-head{display:grid;grid-template-columns:2.6rem 1fr;align-items:baseline;gap:.5rem;border-top:2px solid var(--ink);padding-top:.7rem;margin-bottom:1.1rem}
+  .sec-head .num{font-family:var(--mono);font-size:var(--sm);font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+  h2{font-family:var(--ui);font-size:var(--xl);font-weight:700;letter-spacing:-.01em;text-wrap:balance;margin:0}
+  h3{font-family:var(--ui);font-size:var(--lg);font-weight:600;letter-spacing:-.008em;margin:2rem 0 .6rem}
+  h4{font-family:var(--ui);font-size:var(--md);margin:0 0 .5rem;color:var(--ink)}
+  .scroll{overflow-x:auto;border:1px solid var(--rule);border-radius:3px;background:var(--card);margin:1.2rem 0}
+  table{border-collapse:collapse;width:100%;font-family:var(--ui);font-size:var(--sm);min-width:34rem}
+  .scroll table{table-layout:auto}
+  th{text-align:left;font-family:var(--mono);font-size:var(--xs);letter-spacing:.07em;text-transform:uppercase;color:var(--faint);font-weight:650;padding:.6rem .8rem;border-bottom:1px solid var(--rule)}
+  td{padding:.6rem .8rem;border-bottom:1px solid var(--rule);vertical-align:top;color:var(--slate)}
+  td strong{color:var(--ink)}
+  tr:last-child td{border-bottom:none}
+  .num-cell{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+  .yes{color:var(--ok);font-weight:650}
+  .no{color:var(--gap);font-weight:650}
+  .s{font-family:var(--mono);font-size:var(--xs);color:var(--faint)}
+  pre{background:var(--card);border:1px solid var(--rule);border-radius:3px;padding:.9rem 1.1rem;margin:1rem 0;overflow-x:auto;font-family:var(--mono);font-size:var(--sm);line-height:1.55;color:var(--slate);max-width:100%}
+  pre code{font-size:inherit}
+  pre .tk-k{color:var(--tk-k);font-weight:600} pre .tk-s{color:var(--tk-s)} pre .tk-c{color:var(--tk-c);font-style:italic} pre .tk-t{color:var(--tk-t)} pre .tk-n{color:var(--tk-n)} pre .tk-add{color:var(--tk-add)} pre .tk-del{color:var(--tk-del)} pre .tk-cmd{color:var(--tk-t);font-weight:600}
+  figure{margin:1.6rem 0}
+  figure svg{display:block;width:100%;max-width:1200px;height:auto;margin-inline:0}
+  figcaption{font-family:var(--ui);font-size:var(--xs);color:var(--faint);margin-top:.5rem;max-width:1200px}
+  .dg .box{fill:var(--card);stroke:var(--rule);stroke-width:1.5}
+  .dg .box.off{fill:none;stroke:var(--rule);stroke-width:1.5;stroke-dasharray:5 4}
+  .dg .box.warn{fill:var(--gap-soft);stroke:var(--gap);stroke-width:1.5}
+  .dg .box.em{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}
+  .dg .t{font-family:var(--ui);font-size:13px;font-weight:650;fill:var(--ink)}
+  .dg .l{font-family:var(--ui);font-size:12px;fill:var(--ink)}
+  .dg .s{font-family:var(--mono);font-size:11px;fill:var(--slate)}
+  .dg .n{font-family:var(--ui);font-size:11px;fill:var(--faint)}
+  .dg .c{stroke:var(--accent);stroke-width:1.6;fill:none}
+  .pull{border-left:2px solid var(--accent);background:var(--accent-soft);padding:1rem 1.2rem;margin:1.4rem 0;border-radius:0 3px 3px 0}
+  .pull .label{display:block;font-family:var(--ui);font-size:var(--xs);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.3rem}
+  .pull p{margin:0;max-width:none}
+  .open{background:var(--card);border:1px solid var(--rule);border-left:2px solid var(--gap);border-radius:0 3px 3px 0;padding:1.1rem 1.25rem;margin-bottom:.9rem}
+  .open h4{font-size:var(--md)}
+  .open .k{font-family:var(--mono);font-size:var(--xs);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);display:block;margin:.6rem 0 .2rem}
+  .open p{font-size:var(--sm);color:var(--slate);margin:0 0 .4rem;max-width:none}
+  .open .rec{margin-top:.75rem;padding-top:.65rem;border-top:1px dashed var(--rule);font-size:var(--sm);color:var(--ink)}
+  .open .rec b{color:var(--ok)}
+  .open .scroll{margin:.4rem 0}
+  pre.pv{font-family:var(--mono);font-size:var(--xs);background:var(--card);border:1px solid var(--rule);border-radius:3px;padding:.7rem .9rem;margin:1rem 0;overflow-x:auto;line-height:1.5}
+  footer{border-top:1px solid var(--rule);padding-top:1.3rem;font-family:var(--ui);font-size:var(--xs);color:var(--faint)}
+  @media (max-width:60rem){
+    .page{grid-template-columns:minmax(0,1fr);gap:1.5rem;padding-top:2rem}
+    .rail{position:static;border:1px solid var(--rule);border-radius:3px;background:var(--card);padding:.9rem 1rem}
+    .rail a{border-left:none;padding-left:0}
+    .rail a.on{border-left:none}
+  }
+</style>
+<div class="page">
+
+<nav class="rail" id="rail">
+  <a class="home" href="../README.md">&larr; the model</a>
+  <div class="rail-title">Outline</div>
+</nav>
+<div class="wrap">
+
+<header class="masthead">
+  <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
+  <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; The Agent — A Persona a Session Can Convene</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Construct</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">Engineering leader</span><span class="badge lens">Architect</span></span><span class="st"><span class="lbl">Status:</span> <span class="badge status planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>The Agent — A Persona a Session Can Convene</h1>
+  <p>The context that wrote a change has already agreed with every reason it gave itself. An agent brief is how this repository gets a second, independent read without opening a second terminal: a persona with its own name, convened mid-session, carrying only the authority its own file grants it. This construct names what that file is made of.</p>
+</header>
+
+<!-- 00 -->
+<section id="s0" data-block="glossary">
+  <div class="sec-head"><span class="num">00</span><h2>Terms — the words this construct needs</h2></div>
+  <div class="scroll"><table>
+    <thead><tr><th>Term</th><th>Contract term</th><th>What it means here</th></tr></thead>
+    <tbody>
+      <tr><td>an agent</td><td><code>AgentBrief</code></td><td>a markdown file under a plugin's <code>agents/</code>, naming a persona a session can convene by name</td></tr>
+      <tr><td>the trigger</td><td><code>AgentDescription</code></td><td>the <code>description</code> field in an agent's frontmatter — read to decide when this persona, rather than the session's own voice, should answer</td></tr>
+      <tr><td>a lens</td><td><code>LensFile</code></td><td>one of the eleven files under <code>refs/lenses/</code>, naming what one reviewing viewpoint may block and what it can only advise</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 01 -->
+<section id="s1" data-block="must">
+  <div class="sec-head"><span class="num">01</span><h2>Boundary — what it owns, and what it refuses</h2></div>
+  <p>If the question is <em>who is speaking, and what were they told they may decide</em>, it belongs here. If the question is <em>what does the standard actually require</em>, that is a rule the agent's own file points at rather than restates.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <tbody>
+      <tr><td>the frontmatter an agent declares — its name, its trigger, and the tools and model it is bound to</td><td>inventing a rule with no chapter behind it — an agent that does states a suggestion, never a finding</td><td><code>the foundation's 04-devex/10-delivery.md</code></td></tr>
+      <tr><td>a fixed persona's own voice, and a parameterized reviewer's authority once handed a lens</td><td>writing code on the reviewed change — a reviewing agent reports; the writing context acts</td><td><a href="../03-skills/skill-set.md">The Skill</a></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 02 -->
+<section id="s2" data-block="map">
+  <div class="sec-head"><span class="num">02</span><h2>Model — the shape, in one picture</h2></div>
+  <p>A session names an agent; the agent reads its own file, and — where it reviews rather than advises — a lens file besides.</p>
+  <figure>
+  <svg class="dg" viewBox="0 0 760 202" role="img" aria-label="map">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="box" x="24" y="24" width="195" height="64" rx="3"/>
+    <text class="l" x="38" y="50">a session</text>
+    <text class="n" x="38" y="69">convenes by name, mid-turn</text>
+    <rect class="box" x="247" y="24" width="304" height="64" rx="3"/>
+    <text class="l" x="261" y="50">AgentBrief</text>
+    <text class="n" x="261" y="69">name, description, optional model and tools</text>
+    <rect class="box" x="24" y="114" width="297" height="64" rx="3"/>
+    <text class="l" x="38" y="140">a lens file</text>
+    <text class="n" x="38" y="159">what this one viewpoint blocks vs. advises</text>
+    <rect class="box" x="349" y="114" width="323" height="64" rx="3"/>
+    <text class="l" x="363" y="140">a report</text>
+    <text class="n" x="363" y="159">findings, never an edit, for a reviewing agent</text>
+    <path class="c" d="M219 56 H233 V56 H247" marker-end="url(#ar)"/>
+    <text class="n" x="207.4" y="18">convenes</text>
+    <path class="c" d="M399 88 V101 H172.5 V114" marker-end="url(#ar)"/>
+    <text class="n" x="218.55" y="95">reads, when given one</text>
+    <path class="c" d="M399 88 V101 H510.5 V114" marker-end="url(#ar)"/>
+    <text class="n" x="416.35" y="95">answers with</text>
+  </svg>
+  </figure>
+  <!-- dg:source
+{ "kind": "map",
+  "boxes": [
+    { "id": "session", "label": "a session", "note": "convenes by name, mid-turn" },
+    { "id": "brief", "label": "AgentBrief", "note": "name, description, optional model and tools" },
+    { "id": "lens", "label": "a lens file", "note": "what this one viewpoint blocks vs. advises" },
+    { "id": "report", "label": "a report", "note": "findings, never an edit, for a reviewing agent" }
+  ],
+  "links": [
+    { "from": "session", "to": "brief", "label": "convenes" },
+    { "from": "brief", "to": "lens", "label": "reads, when given one" },
+    { "from": "brief", "to": "report", "label": "answers with" }
+  ] }
+  -->
+  <p>Most agents are a fixed persona: the brief alone is their whole authority. A reviewing agent is parameterized instead — the brief carries none of the eleven lenses itself, and is handed one by name at the moment it is convened, so the same file reviews a change from any viewpoint the caller names.</p>
+</section>
+
+<!-- 03 -->
+<section id="s3" data-block="reasons">
+  <div class="sec-head"><span class="num">03</span><h2>Parts — each piece, named once</h2></div>
+  <h3 id="the-frontmatter">The frontmatter</h3>
+  <p><code>name</code> and <code>description</code>, the same two fields a skill declares, read the same way: the description is matched against the moment, not browsed by a person, and it decides whether this persona rather than the session's own voice takes the reply. Two more fields are optional — <code>model</code>, overriding which model runs the persona, and <code>tools</code>, narrowing which tools it may call; leaving <code>tools</code> out grants every tool the session itself has. <em>Where:</em> the first lines of <code>plugins/*/agents/*.md</code></p>
+  <h3 id="a-fixed-persona">A fixed persona</h3>
+  <p>A brief with no lens argument is one voice, always: an engineering lead, a prose rewriter, a prose reviewer. Its whole authority is the words in its own file, read the same way on every convening. <em>Where:</em> <code>plugins/spn-core/agents/spn-engineer.md</code>, <code>spn-prose-rewriter.md</code>, <code>spn-prose-reviewer.md</code></p>
+  <h3 id="a-parameterized-reviewer">A parameterized reviewer</h3>
+  <p>One brief, <code>spn-panel</code>, takes a lens name as part of what it is convened over. It reads <code>refs/lenses/&lt;lens&gt;.md</code> before anything else, and that file — not the brief — states what this convening may block outright and what it may only advise. The same mechanism a skill uses to route by description routes here by an argument named at the call instead. <em>Where:</em> <code>plugins/spn-core/agents/spn-panel.md</code>, <code>plugins/spn-core/refs/lenses/</code></p>
+</section>
+
+<!-- 04 -->
+<section id="s4" data-block="comparison">
+  <div class="sec-head"><span class="num">04</span><h2>Relations — what it needs</h2></div>
+  <div class="scroll"><table>
+    <thead><tr><th>Needs</th><th>For</th></tr></thead>
+    <tbody>
+      <tr><td><a href="../01-plugins/plugin-set.md">The Plugin</a></td><td>the <code>agents/</code> folder an agent brief is delivered inside</td></tr>
+      <tr><td><a href="../03-skills/skill-set.md">The Skill</a></td><td>the same name-plus-description matching rule an agent's frontmatter reuses</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 05 -->
+<section id="s5" data-block="comparison">
+  <div class="sec-head"><span class="num">05</span><h2>Binds — what holds it, and where it lives today</h2></div>
+  <div class="scroll"><table>
+    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <tbody>
+      <tr><td><code>the foundation's 04-devex/10-delivery.md</code> § When an edit becomes behaviour</td><td>an agent brief needs a fresh window before a convening can read the edit</td><td>MUST</td></tr>
+      <tr><td><code>RD.DEVEX.019</code></td><td>every agent brief restates a chapter's persona or lens and adds no rule of its own</td><td>MUST</td></tr>
+    </tbody>
+  </table></div>
+  <div class="scroll"><table>
+    <thead><tr><th>Repo</th><th>Node</th><th>What it realizes</th><th>State</th></tr></thead>
+    <tbody>
+      <tr><td>spn-claude-marketplace</td><td>spn-core</td><td>the four agent briefs and the eleven lens files under <code>plugins/spn-core/</code></td><td>planned</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 06 -->
+<section id="s6" data-block="comparison">
+  <div class="sec-head"><span class="num">06</span><h2>Proof — how you check it</h2></div>
+  <div class="scroll"><table>
+    <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
+    <tbody>
+      <tr><td><code>node plugins/spn-core/hooks/tools/docs.ts audit docs/02-constructs/05-agents/agent-set.md</code></td><td>gate</td><td>the metadata block, the tag line and the outline hold the shape this construct names</td></tr>
+    </tbody>
+  </table></div>
+  <p>Try it: <code>node plugins/spn-core/hooks/tools/docs.ts audit docs/02-constructs/05-agents/agent-set.md</code></p>
+</section>
+
+<footer>
+  A template from workstream 008 &middot; copy it, keep the comments until the page is written, then delete them &middot; the rules live in the book; this file repeats them so you never write from memory
+</footer>
+
+</div>
+</div>
+
+<script>
+(function(){
+  var rail=document.getElementById('rail');if(!rail)return;
+  var secs=Array.prototype.slice.call(document.querySelectorAll('section[id]'));
+  var links=[];
+  secs.forEach(function(s){
+    var num=s.querySelector('.sec-head .num'),h2=s.querySelector('h2');if(!h2)return;
+    var a=document.createElement('a');a.href='#'+s.id;
+    var n=document.createElement('span');n.className='n';n.textContent=num?num.textContent:'';
+    var t=document.createElement('span');t.textContent=h2.textContent.split(' — ')[0];
+    a.appendChild(n);a.appendChild(t);
+    if(s.id==='s4'){var c=s.querySelectorAll('.open').length;if(c){var b=document.createElement('span');b.className='count';b.textContent=c;a.appendChild(b);}}
+    rail.appendChild(a);links.push({el:a,sec:s});
+    Array.prototype.forEach.call(s.querySelectorAll('h3[id]'),function(h){
+      var sa=document.createElement('a');sa.href='#'+h.id;sa.className='sub';sa.textContent=h.textContent;rail.appendChild(sa);
+    });
+  });
+  function mark(){var y=window.scrollY+120,cur=links[0];links.forEach(function(l){if(l.sec.offsetTop<=y)cur=l;});links.forEach(function(l){l.el.classList.toggle('on',l===cur);});}
+  window.addEventListener('scroll',mark,{passive:true});mark();
+})();
+</script>
+
+<style>
+  .rail .sub-group{display:block}
+  .rail.js .sub-group{display:none}
+  .rail.js .sub-group.shown{display:block}
+  /* The caret sits at the far right and appears only where a group exists. It is sized to be a
+     comfortable target rather than a decoration, and it reflects the group's REAL state. */
+  .rail a .caret{margin-left:auto;flex:none;width:1.1rem;height:1.1rem;display:grid;place-items:center;
+    color:var(--faint);font-size:.78rem;line-height:1;border-radius:2px;transition:transform .15s ease}
+  .rail a .caret::before{content:"\25B8"}
+  .rail a.group-open .caret{transform:rotate(90deg)}
+  .rail a .caret:hover{background:var(--accent-soft);color:var(--accent)}
+  .rail a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  @media (prefers-reduced-motion:reduce){.rail a.has-subs .caret{transition:none}}
+</style>
+
+<script>
+(function(){
+  var rail = document.getElementById('rail-list') || document.getElementById('rail');
+  if (!rail || rail.querySelector('.sub-group')) return;
+  var styled = document.getElementById('rail') || rail;
+
+  /* The caret and the group are one state with two faces. Writing both here is what stops the
+     caret claiming a section is open while its subsections are hidden. */
+  function setOpen(anchor, group, open){
+    group.classList.toggle('shown', open);
+    anchor.classList.toggle('group-open', open);
+    anchor.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+
+  /* Regroup whatever the page's own builder produced: a section anchor, then the `sub` anchors
+     that follow it, moved into one collapsing group. */
+  var entries = [], current = null;
+  Array.prototype.slice.call(rail.children).forEach(function(node){
+    if (node.tagName !== 'A' || node.classList.contains('home')) return;
+    if (node.classList.contains('sub')) {
+      if (!current) return;
+      if (!current.group) {
+        current.group = document.createElement('div');
+        current.group.className = 'sub-group';
+        rail.insertBefore(current.group, node);
+      }
+      current.group.appendChild(node);
+      return;
+    }
+    current = { anchor: node, group: null };
+    entries.push(current);
+  });
+
+  entries.forEach(function(entry){
+    if (!entry.group) return;                     // a section with no second level never folds
+    var anchor = entry.anchor, group = entry.group;
+    anchor.classList.add('has-subs');
+    var caret = document.createElement('span');
+    caret.className = 'caret';
+    caret.setAttribute('role', 'button');
+    caret.setAttribute('tabindex', '-1');
+    caret.setAttribute('aria-label', 'Show sections under ' + anchor.textContent.trim());
+    anchor.appendChild(caret);
+    /* The caret toggles without leaving the page; the label still navigates. Hit-testing the
+       element beats measuring offsetX, which broke the moment the caret moved to the right. */
+    anchor.addEventListener('click', function(event){
+      if (event.target !== caret) return;
+      event.preventDefault();
+      /* `pinned` means a reader decided, so the scroll must stop overriding them. */
+      anchor.dataset.pinned = '1';
+      setOpen(anchor, group, !group.classList.contains('shown'));
+    });
+    setOpen(anchor, group, false);
+  });
+
+  /* THE RAIL FOLLOWS THE SCROLL. The page's own builder already marks the current entry with
+     `on`, so this watches that mark rather than measuring offsets a second time — two answers to
+     where the reader is would disagree the first time either changed. */
+  function follow(){
+    entries.forEach(function(entry){
+      if (!entry.group || entry.anchor.dataset.pinned === '1') return;
+      var here = entry.anchor.classList.contains('on') || !!entry.group.querySelector('a.on');
+      setOpen(entry.anchor, entry.group, here);
+    });
+  }
+  new MutationObserver(follow).observe(rail, {subtree: true, attributes: true,
+                                              attributeFilter: ['class']});
+  /* Last, because everything above degrades to the full index when no script runs. */
+  styled.classList.add('js');
+  follow();
+})();
+</script>

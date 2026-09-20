@@ -1,0 +1,368 @@
+<meta charset="utf-8">
+<title>The Skill — A Verb's Steps, Loaded on Match</title>
+<!-- spn:doc
+{"id":"skill-set","variant":"construct","parentId":"concept","title":"The Skill — A Verb's Steps, Loaded on Match","lenses":["ARCHITECT","LEAD"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"What a skill is — a name and a description a session matches against the work at hand, and the steps it loads once matched — and why a skill never becomes a second place a rule lives.","keywords":["skill","SKILL.md","description","trigger","steps","verb"]}
+-->
+<!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
+<style>
+  :root {
+    --paper:#edf0f3; --card:#f7f9fb; --ink:#141920; --slate:#48525f; --faint:#7c8794;
+    --rule:#d2d9e0; --accent:#2f4e7a; --accent-soft:#e0e8f4;
+    --gap:#8f5714; --gap-soft:#f7ecda; --ok:#2a6459; --ok-soft:#dcece8;
+    --ui:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+    --xs:0.76rem; --sm:0.85rem; --md:0.97rem; --lg:1.32rem; --xl:1.62rem; --xxl:2.5rem;
+    --tk-k:#6d3a9c; --tk-s:#2a6459; --tk-c:#7c8794; --tk-t:#2f4e7a; --tk-n:#8f5714; --tk-add:#2a6459; --tk-del:#a63d3d;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){ --paper:#0f1318; --card:#171d24; --ink:#e3e8ee; --slate:#a3adb9; --faint:#6f7986;
+      --rule:#242d37; --accent:#86a9da; --accent-soft:#18232f;
+      --gap:#d59d4f; --gap-soft:#2a2113; --ok:#5db3a4; --ok-soft:#14251f; --tk-k:#c9a3ee; --tk-s:#7fc9b6; --tk-c:#6f7986; --tk-t:#86a9da; --tk-n:#d59d4f; --tk-add:#5db3a4; --tk-del:#e08a8a; }
+  }
+  :root[data-theme="dark"]{ --paper:#0f1318; --card:#171d24; --ink:#e3e8ee; --slate:#a3adb9; --faint:#6f7986;
+    --rule:#242d37; --accent:#86a9da; --accent-soft:#18232f;
+    --gap:#d59d4f; --gap-soft:#2a2113; --ok:#5db3a4; --ok-soft:#14251f; --tk-k:#c9a3ee; --tk-s:#7fc9b6; --tk-c:#6f7986; --tk-t:#86a9da; --tk-n:#d59d4f; --tk-add:#5db3a4; --tk-del:#e08a8a; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--ui);font-size:1rem;line-height:1.6;-webkit-font-smoothing:antialiased}
+  p{margin:0 0 1rem;max-width:58rem}
+  code,.m{font-family:var(--mono);font-size:0.87em}
+  strong{font-weight:600}
+  em{font-style:italic;color:var(--slate)}
+  a{color:var(--accent)}
+  .page{display:grid;grid-template-columns:13rem minmax(0,1fr);gap:3rem;max-width:min(98vw,80rem);margin:0 auto;padding:3rem 8px 6rem;align-items:start}
+  .rail{position:sticky;top:2.5rem;font-family:var(--ui);font-size:var(--xs)}
+  .rail .home{border-left:none;padding-left:0;margin-bottom:.9rem;color:var(--accent);font-weight:650;display:block}
+  .rail .rail-title{letter-spacing:.15em;text-transform:uppercase;color:var(--faint);margin-bottom:.85rem;font-size:.7rem}
+  .rail a{display:flex;gap:.55rem;text-decoration:none;color:var(--slate);padding:.28rem 0 .28rem .6rem;border-left:2px solid var(--rule);line-height:1.4}
+  .rail a .n{font-family:var(--mono);color:var(--faint);font-variant-numeric:tabular-nums}
+  .rail a.sub{padding-left:1.6rem;font-size:.72rem;color:var(--faint)}
+  .rail a:hover{color:var(--ink)}
+  .rail a.on{color:var(--accent);border-left-color:var(--accent);font-weight:650}
+  .rail .count{margin-left:auto;font-family:var(--mono);font-size:.68rem;background:var(--gap-soft);color:var(--gap);border-radius:2px;padding:0 .3rem}
+  .wrap{display:flex;flex-direction:column;gap:3.25rem;min-width:0}
+  .masthead{display:flex;flex-direction:column;gap:1.1rem}
+  .eyebrow{display:flex;flex-direction:column;gap:.5rem;font-family:var(--ui);font-size:var(--xs);color:var(--faint)}
+  .eyebrow .line{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem .6rem;line-height:1.7}
+  .eyebrow .sep{color:var(--rule);font-weight:300}
+  .eyebrow .line1{letter-spacing:.15em;text-transform:uppercase;font-weight:650;color:var(--faint);line-height:1.7}
+  .eyebrow .lbl{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+  .eyebrow .st{margin-left:auto;display:inline-flex;align-items:center;gap:.4rem}
+  .eyebrow .audience{display:inline-flex;flex-wrap:wrap;align-items:center;gap:.45rem}
+  .badge{display:inline-flex;align-items:center;gap:.35rem;padding:.1rem .6rem;border-radius:999px;border:1px solid var(--rule);background:var(--card);font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--slate);line-height:1.7;white-space:nowrap}
+  .badge.type{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);font-weight:650}
+  .badge.lens{font-family:var(--ui);font-size:.74rem;letter-spacing:0;text-transform:none}
+  .badge.status{font-weight:700}
+  .badge.status.planning{border-color:var(--gap);color:var(--gap);background:var(--gap-soft)}
+  .badge.status.implementing{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+  .badge.status.done{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(15rem,1fr));gap:.7rem;margin:.8rem 0 1.4rem}
+  .tile{border:1px solid var(--rule);background:var(--card);border-radius:3px;padding:.7rem .85rem;min-width:0}
+  .tile a{font-weight:600;color:var(--ink);text-decoration:none}
+  .tile a:hover{color:var(--accent)}
+  .tile p{font-size:var(--sm);color:var(--slate);margin:.25rem 0 0;max-width:none}
+  .tile .glyph{float:right;font-size:.8rem;margin-left:.4rem}
+  h1{font-family:var(--ui);font-size:var(--xxl);font-weight:700;letter-spacing:-.02em;line-height:1.15;text-wrap:balance;margin:0}
+  .standfirst{font-size:var(--lg);line-height:1.5;color:var(--slate);max-width:46rem}
+  .sec-head{display:grid;grid-template-columns:2.6rem 1fr;align-items:baseline;gap:.5rem;border-top:2px solid var(--ink);padding-top:.7rem;margin-bottom:1.1rem}
+  .sec-head .num{font-family:var(--mono);font-size:var(--sm);font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+  h2{font-family:var(--ui);font-size:var(--xl);font-weight:700;letter-spacing:-.01em;text-wrap:balance;margin:0}
+  h3{font-family:var(--ui);font-size:var(--lg);font-weight:600;letter-spacing:-.008em;margin:2rem 0 .6rem}
+  h4{font-family:var(--ui);font-size:var(--md);margin:0 0 .5rem;color:var(--ink)}
+  .scroll{overflow-x:auto;border:1px solid var(--rule);border-radius:3px;background:var(--card);margin:1.2rem 0}
+  table{border-collapse:collapse;width:100%;font-family:var(--ui);font-size:var(--sm);min-width:34rem}
+  .scroll table{table-layout:auto}
+  th{text-align:left;font-family:var(--mono);font-size:var(--xs);letter-spacing:.07em;text-transform:uppercase;color:var(--faint);font-weight:650;padding:.6rem .8rem;border-bottom:1px solid var(--rule)}
+  td{padding:.6rem .8rem;border-bottom:1px solid var(--rule);vertical-align:top;color:var(--slate)}
+  td strong{color:var(--ink)}
+  tr:last-child td{border-bottom:none}
+  .num-cell{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+  .yes{color:var(--ok);font-weight:650}
+  .no{color:var(--gap);font-weight:650}
+  .s{font-family:var(--mono);font-size:var(--xs);color:var(--faint)}
+  pre{background:var(--card);border:1px solid var(--rule);border-radius:3px;padding:.9rem 1.1rem;margin:1rem 0;overflow-x:auto;font-family:var(--mono);font-size:var(--sm);line-height:1.55;color:var(--slate);max-width:100%}
+  pre code{font-size:inherit}
+  pre .tk-k{color:var(--tk-k);font-weight:600} pre .tk-s{color:var(--tk-s)} pre .tk-c{color:var(--tk-c);font-style:italic} pre .tk-t{color:var(--tk-t)} pre .tk-n{color:var(--tk-n)} pre .tk-add{color:var(--tk-add)} pre .tk-del{color:var(--tk-del)} pre .tk-cmd{color:var(--tk-t);font-weight:600}
+  figure{margin:1.6rem 0}
+  figure svg{display:block;width:100%;max-width:1200px;height:auto;margin-inline:0}
+  figcaption{font-family:var(--ui);font-size:var(--xs);color:var(--faint);margin-top:.5rem;max-width:1200px}
+  .dg .box{fill:var(--card);stroke:var(--rule);stroke-width:1.5}
+  .dg .box.off{fill:none;stroke:var(--rule);stroke-width:1.5;stroke-dasharray:5 4}
+  .dg .box.warn{fill:var(--gap-soft);stroke:var(--gap);stroke-width:1.5}
+  .dg .box.em{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}
+  .dg .t{font-family:var(--ui);font-size:13px;font-weight:650;fill:var(--ink)}
+  .dg .l{font-family:var(--ui);font-size:12px;fill:var(--ink)}
+  .dg .s{font-family:var(--mono);font-size:11px;fill:var(--slate)}
+  .dg .n{font-family:var(--ui);font-size:11px;fill:var(--faint)}
+  .dg .c{stroke:var(--accent);stroke-width:1.6;fill:none}
+  .pull{border-left:2px solid var(--accent);background:var(--accent-soft);padding:1rem 1.2rem;margin:1.4rem 0;border-radius:0 3px 3px 0}
+  .pull .label{display:block;font-family:var(--ui);font-size:var(--xs);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.3rem}
+  .pull p{margin:0;max-width:none}
+  .open{background:var(--card);border:1px solid var(--rule);border-left:2px solid var(--gap);border-radius:0 3px 3px 0;padding:1.1rem 1.25rem;margin-bottom:.9rem}
+  .open h4{font-size:var(--md)}
+  .open .k{font-family:var(--mono);font-size:var(--xs);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);display:block;margin:.6rem 0 .2rem}
+  .open p{font-size:var(--sm);color:var(--slate);margin:0 0 .4rem;max-width:none}
+  .open .rec{margin-top:.75rem;padding-top:.65rem;border-top:1px dashed var(--rule);font-size:var(--sm);color:var(--ink)}
+  .open .rec b{color:var(--ok)}
+  .open .scroll{margin:.4rem 0}
+  pre.pv{font-family:var(--mono);font-size:var(--xs);background:var(--card);border:1px solid var(--rule);border-radius:3px;padding:.7rem .9rem;margin:1rem 0;overflow-x:auto;line-height:1.5}
+  footer{border-top:1px solid var(--rule);padding-top:1.3rem;font-family:var(--ui);font-size:var(--xs);color:var(--faint)}
+  @media (max-width:60rem){
+    .page{grid-template-columns:minmax(0,1fr);gap:1.5rem;padding-top:2rem}
+    .rail{position:static;border:1px solid var(--rule);border-radius:3px;background:var(--card);padding:.9rem 1rem}
+    .rail a{border-left:none;padding-left:0}
+    .rail a.on{border-left:none}
+  }
+</style>
+<div class="page">
+
+<nav class="rail" id="rail">
+  <a class="home" href="../README.md">&larr; the model</a>
+  <div class="rail-title">Outline</div>
+</nav>
+<div class="wrap">
+
+<header class="masthead">
+  <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
+  <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; The Skill — A Verb's Steps, Loaded on Match</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Construct</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">Architect</span><span class="badge lens">Engineering leader</span></span><span class="st"><span class="lbl">Status:</span> <span class="badge status planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>The Skill — A Verb's Steps, Loaded on Match</h1>
+  <p>Loading every rule this repository knows into every turn would drown the turn that needed one of them. A skill is how this repository loads instead of dumping: a name, a sentence that says when it applies, and the steps for doing that one thing — read only once a session's work actually matches the sentence. This construct names that shape.</p>
+</header>
+
+<!-- 00 -->
+<section id="s0" data-block="glossary">
+  <div class="sec-head"><span class="num">00</span><h2>Terms — the words this construct needs</h2></div>
+  <div class="scroll"><table>
+    <thead><tr><th>Term</th><th>Contract term</th><th>What it means here</th></tr></thead>
+    <tbody>
+      <tr><td>a skill</td><td><code>SkillFrontmatter</code></td><td>one folder under a plugin's <code>skills/</code>, named for its verb, holding <code>SKILL.md</code> and anything that file sequences</td></tr>
+      <tr><td>the trigger</td><td><code>SkillDescription</code></td><td>the <code>description</code> field in <code>SKILL.md</code>'s frontmatter — matched against the work at hand to decide whether to load the file</td></tr>
+      <tr><td>a step</td><td><code>SkillStep</code></td><td>a file under a skill's own <code>steps/</code>, named for one part of its walk, read only when the skill sequences it</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 01 -->
+<section id="s1" data-block="must">
+  <div class="sec-head"><span class="num">01</span><h2>Boundary — what it owns, and what it refuses</h2></div>
+  <p>If the question is <em>when does an agent reach for this, and what does it do once it has</em>, it belongs here. If the question is <em>what must be true for the thing the skill builds</em>, that is a rule, and the skill only carries it — it never becomes the second place that rule lives.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <tbody>
+      <tr><td>the frontmatter shape a skill declares, and the folder a multi-step skill sequences</td><td>stating a rule nowhere else states — a skill that invents one has become an undeclared second source</td><td><code>the foundation's 04-devex/10-delivery.md</code></td></tr>
+      <tr><td>matching one description against one turn's work to decide whether to load</td><td>naming a stack's own build commands — those belong to the stack's own plugin, not to this domain</td><td><a href="../01-plugins/plugin-set.md">The Plugin</a></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 02 -->
+<section id="s2" data-block="map">
+  <div class="sec-head"><span class="num">02</span><h2>Model — the shape, in one picture</h2></div>
+  <p>A turn's work is read once, matched against every loaded skill's own sentence, and at most the matching ones load.</p>
+  <figure>
+  <svg class="dg" viewBox="0 0 760 202" role="img" aria-label="map">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="box" x="24" y="24" width="214" height="64" rx="3"/>
+    <text class="l" x="38" y="50">the work at hand</text>
+    <text class="n" x="38" y="69">what the turn is trying to do</text>
+    <rect class="box" x="266" y="24" width="406" height="64" rx="3"/>
+    <text class="l" x="280" y="50">the skill listing</text>
+    <text class="n" x="280" y="69">every installed skill's name and description, one line each</text>
+    <rect class="box" x="24" y="114" width="182" height="64" rx="3"/>
+    <text class="l" x="38" y="140">SKILL.md</text>
+    <text class="n" x="38" y="159">loaded only once matched</text>
+    <rect class="box" x="234" y="114" width="470" height="64" rx="3"/>
+    <text class="l" x="248" y="140">steps/</text>
+    <text class="n" x="248" y="159">further files SKILL.md sequences, for a skill big enough to need them</text>
+    <path class="c" d="M238 56 H252 V56 H266" marker-end="url(#ar)"/>
+    <text class="n" x="204" y="18">matched against</text>
+    <path class="c" d="M469 88 V101 H115 V114" marker-end="url(#ar)"/>
+    <text class="n" x="240.8" y="95">loads on a match</text>
+    <path class="c" d="M206 146 H220 V146 H234" marker-end="url(#ar)"/>
+    <text class="n" x="133.6" y="108">reads in the order it names</text>
+  </svg>
+  </figure>
+  <!-- dg:source
+{ "kind": "map",
+  "boxes": [
+    { "id": "ask", "label": "the work at hand", "note": "what the turn is trying to do" },
+    { "id": "listing", "label": "the skill listing", "note": "every installed skill's name and description, one line each" },
+    { "id": "skill", "label": "SKILL.md", "note": "loaded only once matched" },
+    { "id": "steps", "label": "steps/", "note": "further files SKILL.md sequences, for a skill big enough to need them" }
+  ],
+  "links": [
+    { "from": "ask", "to": "listing", "label": "matched against" },
+    { "from": "listing", "to": "skill", "label": "loads on a match" },
+    { "from": "skill", "to": "steps", "label": "reads in the order it names" }
+  ] }
+  -->
+  <p>The listing is cheap to hold in full because it is one line per skill; <code>SKILL.md</code> and its steps are read only for the one skill that matched, which is what keeps a large skill from costing anything on a turn that never needed it.</p>
+</section>
+
+<!-- 03 -->
+<section id="s3" data-block="reasons">
+  <div class="sec-head"><span class="num">03</span><h2>Parts — each piece, named once</h2></div>
+  <h3 id="skill-md"><code>SKILL.md</code></h3>
+  <p>A YAML frontmatter block naming <code>name</code> and <code>description</code>, then a body of Markdown instructions. The description is written for matching, not for a human browsing a list: it states the class of ask this skill answers and gives worked examples of the phrasing that should trigger it, because the match is made against those words. <em>Where:</em> <code>plugins/*/skills/&lt;name&gt;/SKILL.md</code></p>
+  <h3 id="a-multi-step-skill">A multi-step skill</h3>
+  <p>A skill whose walk is long enough to outgrow one file keeps <code>SKILL.md</code> as the router — it classifies the ask and names which files to read in which order — and puts each part of the walk in its own file under <code>steps/</code>. <code>SKILL.md</code> is read on every match; a step file is read only once the router names it. <em>Where:</em> <code>plugins/*/skills/&lt;name&gt;/steps/</code></p>
+  <h3 id="loaded-not-run">Loaded, not run</h3>
+  <p>A skill is prose an agent reads and then follows, never a script the runtime executes on your behalf. It is a document that happens to be selected the way code is dispatched — by a match at the top rather than by a person opening the right file by hand. <em>Where:</em> the same folder as the frontmatter it belongs to.</p>
+</section>
+
+<!-- 04 -->
+<section id="s4" data-block="comparison">
+  <div class="sec-head"><span class="num">04</span><h2>Relations — what it needs</h2></div>
+  <div class="scroll"><table>
+    <thead><tr><th>Needs</th><th>For</th></tr></thead>
+    <tbody>
+      <tr><td><a href="../01-plugins/plugin-set.md">The Plugin</a></td><td>the folder a skill is delivered inside, and the install that makes its frontmatter loadable at all</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 05 -->
+<section id="s5" data-block="comparison">
+  <div class="sec-head"><span class="num">05</span><h2>Binds — what holds it, and where it lives today</h2></div>
+  <div class="scroll"><table>
+    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <tbody>
+      <tr><td><code>the foundation's 04-devex/10-delivery.md</code> § When an edit becomes behaviour</td><td>a skill edit needs a fresh window before it is loadable — it is not the one instrument that reloads live</td><td>MUST</td></tr>
+      <tr><td><code>RD.DEVEX.019</code></td><td>every skill restates a chapter's steps and adds no rule of its own</td><td>MUST</td></tr>
+    </tbody>
+  </table></div>
+  <div class="scroll"><table>
+    <thead><tr><th>Repo</th><th>Node</th><th>What it realizes</th><th>State</th></tr></thead>
+    <tbody>
+      <tr><td>spn-claude-marketplace</td><td>spn-core · spn-apps-ts · spn-infra</td><td>the <code>SKILL.md</code> frontmatter and step files each plugin ships under <code>skills/</code></td><td>planned</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 06 -->
+<section id="s6" data-block="comparison">
+  <div class="sec-head"><span class="num">06</span><h2>Proof — how you check it</h2></div>
+  <div class="scroll"><table>
+    <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
+    <tbody>
+      <tr><td><code>node plugins/spn-core/hooks/tools/docs.ts audit docs/02-constructs/03-skills/skill-set.md</code></td><td>gate</td><td>the metadata block, the tag line and the outline hold the shape this construct names</td></tr>
+    </tbody>
+  </table></div>
+  <p>Try it: <code>node plugins/spn-core/hooks/tools/docs.ts audit docs/02-constructs/03-skills/skill-set.md</code></p>
+</section>
+
+<footer>
+  A template from workstream 008 &middot; copy it, keep the comments until the page is written, then delete them &middot; the rules live in the book; this file repeats them so you never write from memory
+</footer>
+
+</div>
+</div>
+
+<script>
+(function(){
+  var rail=document.getElementById('rail');if(!rail)return;
+  var secs=Array.prototype.slice.call(document.querySelectorAll('section[id]'));
+  var links=[];
+  secs.forEach(function(s){
+    var num=s.querySelector('.sec-head .num'),h2=s.querySelector('h2');if(!h2)return;
+    var a=document.createElement('a');a.href='#'+s.id;
+    var n=document.createElement('span');n.className='n';n.textContent=num?num.textContent:'';
+    var t=document.createElement('span');t.textContent=h2.textContent.split(' — ')[0];
+    a.appendChild(n);a.appendChild(t);
+    if(s.id==='s4'){var c=s.querySelectorAll('.open').length;if(c){var b=document.createElement('span');b.className='count';b.textContent=c;a.appendChild(b);}}
+    rail.appendChild(a);links.push({el:a,sec:s});
+    Array.prototype.forEach.call(s.querySelectorAll('h3[id]'),function(h){
+      var sa=document.createElement('a');sa.href='#'+h.id;sa.className='sub';sa.textContent=h.textContent;rail.appendChild(sa);
+    });
+  });
+  function mark(){var y=window.scrollY+120,cur=links[0];links.forEach(function(l){if(l.sec.offsetTop<=y)cur=l;});links.forEach(function(l){l.el.classList.toggle('on',l===cur);});}
+  window.addEventListener('scroll',mark,{passive:true});mark();
+})();
+</script>
+
+<style>
+  .rail .sub-group{display:block}
+  .rail.js .sub-group{display:none}
+  .rail.js .sub-group.shown{display:block}
+  /* The caret sits at the far right and appears only where a group exists. It is sized to be a
+     comfortable target rather than a decoration, and it reflects the group's REAL state. */
+  .rail a .caret{margin-left:auto;flex:none;width:1.1rem;height:1.1rem;display:grid;place-items:center;
+    color:var(--faint);font-size:.78rem;line-height:1;border-radius:2px;transition:transform .15s ease}
+  .rail a .caret::before{content:"\25B8"}
+  .rail a.group-open .caret{transform:rotate(90deg)}
+  .rail a .caret:hover{background:var(--accent-soft);color:var(--accent)}
+  .rail a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  @media (prefers-reduced-motion:reduce){.rail a.has-subs .caret{transition:none}}
+</style>
+
+<script>
+(function(){
+  var rail = document.getElementById('rail-list') || document.getElementById('rail');
+  if (!rail || rail.querySelector('.sub-group')) return;
+  var styled = document.getElementById('rail') || rail;
+
+  /* The caret and the group are one state with two faces. Writing both here is what stops the
+     caret claiming a section is open while its subsections are hidden. */
+  function setOpen(anchor, group, open){
+    group.classList.toggle('shown', open);
+    anchor.classList.toggle('group-open', open);
+    anchor.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+
+  /* Regroup whatever the page's own builder produced: a section anchor, then the `sub` anchors
+     that follow it, moved into one collapsing group. */
+  var entries = [], current = null;
+  Array.prototype.slice.call(rail.children).forEach(function(node){
+    if (node.tagName !== 'A' || node.classList.contains('home')) return;
+    if (node.classList.contains('sub')) {
+      if (!current) return;
+      if (!current.group) {
+        current.group = document.createElement('div');
+        current.group.className = 'sub-group';
+        rail.insertBefore(current.group, node);
+      }
+      current.group.appendChild(node);
+      return;
+    }
+    current = { anchor: node, group: null };
+    entries.push(current);
+  });
+
+  entries.forEach(function(entry){
+    if (!entry.group) return;                     // a section with no second level never folds
+    var anchor = entry.anchor, group = entry.group;
+    anchor.classList.add('has-subs');
+    var caret = document.createElement('span');
+    caret.className = 'caret';
+    caret.setAttribute('role', 'button');
+    caret.setAttribute('tabindex', '-1');
+    caret.setAttribute('aria-label', 'Show sections under ' + anchor.textContent.trim());
+    anchor.appendChild(caret);
+    /* The caret toggles without leaving the page; the label still navigates. Hit-testing the
+       element beats measuring offsetX, which broke the moment the caret moved to the right. */
+    anchor.addEventListener('click', function(event){
+      if (event.target !== caret) return;
+      event.preventDefault();
+      /* `pinned` means a reader decided, so the scroll must stop overriding them. */
+      anchor.dataset.pinned = '1';
+      setOpen(anchor, group, !group.classList.contains('shown'));
+    });
+    setOpen(anchor, group, false);
+  });
+
+  /* THE RAIL FOLLOWS THE SCROLL. The page's own builder already marks the current entry with
+     `on`, so this watches that mark rather than measuring offsets a second time — two answers to
+     where the reader is would disagree the first time either changed. */
+  function follow(){
+    entries.forEach(function(entry){
+      if (!entry.group || entry.anchor.dataset.pinned === '1') return;
+      var here = entry.anchor.classList.contains('on') || !!entry.group.querySelector('a.on');
+      setOpen(entry.anchor, entry.group, here);
+    });
+  }
+  new MutationObserver(follow).observe(rail, {subtree: true, attributes: true,
+                                              attributeFilter: ['class']});
+  /* Last, because everything above degrades to the full index when no script runs. */
+  styled.classList.add('js');
+  follow();
+})();
+</script>
