@@ -1373,10 +1373,22 @@ if (cmd !== "audit" || rest.length === 0) {
   process.exit(2);
 }
 
-const found = audit(rest.map((p) => resolve(p)), resolve(workspace));
+// A PATH IS A FILE OR A FOLDER, and the usage says `path` rather than `file`. Given a folder it
+// used to read the directory itself and die on `EISDIR` with a raw stack trace — which reads as the
+// tool being broken rather than as the argument being a folder. A folder now means *every document
+// under it*, which is what anyone typing one meant, and the walk is the same one `face` uses, so
+// `templates/` is skipped by the rule that already exists.
+const pages = rest.flatMap((p) => {
+  const full = resolve(p);
+  let st; try { st = statSync(full); } catch { return [full]; }
+  return st.isDirectory() ? walkFiles(full, (f) => f.endsWith(".md") || f.endsWith(".html")) : [full];
+});
+if (!pages.length) { console.log("no document under that path"); process.exit(0); }
+
+const found = audit(pages, resolve(workspace));
 const rule = found.filter((f) => f.grade === "RULE");
 for (const f of found) console.log(`${f.grade === "RULE" ? "✗" : "!"} ${f.grade.padEnd(4)} ${f.check.padEnd(9)} ${relative(workspace, f.file)}\n         ${f.message}`);
 console.log(found.length
-  ? `\n${found.length} finding${found.length > 1 ? "s" : ""} — ${rule.length} RULE, ${found.length - rule.length} SOFT, over ${rest.length} page${rest.length > 1 ? "s" : ""}`
-  : `\nclean — ${rest.length} page${rest.length > 1 ? "s" : ""}`);
+  ? `\n${found.length} finding${found.length > 1 ? "s" : ""} — ${rule.length} RULE, ${found.length - rule.length} SOFT, over ${pages.length} page${pages.length > 1 ? "s" : ""}`
+  : `\nclean — ${pages.length} page${pages.length > 1 ? "s" : ""}`);
 process.exit(rule.length ? 1 : 0);
