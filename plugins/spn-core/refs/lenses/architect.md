@@ -2,7 +2,7 @@
 {
   "chapters": [
     { "path": "docs/04-capabilities/02-support/01-apps/01-shape/README.md", "seen": "e48e628b" },
-    { "path": "docs/04-capabilities/data-model.md", "seen": "42ebf62b" },
+    { "path": "docs/04-capabilities/data-model.md", "seen": "178846ce" },
     { "path": "docs/04-capabilities/03-platform/README.md", "seen": "f46a3a12" },
     { "path": "docs/04-capabilities/02-support/01-apps/03-module/README.md", "seen": "93a1cb31" }
   ]

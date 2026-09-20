@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/04-capabilities/01-foundation/01-devex/11-workspace.md", "seen": "fad27f84" },
+    { "path": "docs/04-capabilities/01-foundation/01-devex/11-workspace.md", "seen": "9e1cbbc5" },
     { "path": "docs/04-capabilities/01-foundation/02-docs/05-artifacts.md", "seen": "b63bce9e" }
   ]
 }

@@ -2,7 +2,7 @@
 {
   "chapters": [
     { "path": "docs/04-capabilities/01-foundation/02-docs/README.md", "seen": "171c01bc" },
-    { "path": "CONCEPT.md", "seen": "23a9071e" }
+    { "path": "CONCEPT.md", "seen": "1e80a67d" }
   ]
 }
 -->
@@ -151,6 +151,30 @@ Which makes the seat checkable in both directions:
 | a mirror naming no folder | it describes something that no longer exists |
 | a mirror for a private or generated folder | the interior leaked into the published surface |
 | a split with no matching subfolder | depth was invented rather than earned |
+
+### A repository may have no `src/`, and the rule still holds
+
+**The source root is declared on the capability face, never assumed.** Every rule above is written
+against `src/` because that is where almost every repository keeps its source — but a repository
+declaring `GENERAL` has no nodes, and may have no `src/` and no `tests/` at all. The marketplace's
+source is `plugins/<name>/`; another general repository's is whatever it is.
+
+So the face's block names the root it governs, and the Map is generated against that. **A face that
+declares nothing keeps `src`**, which is every repository that has one, so nothing already written
+changes. The rule itself is untouched: a mirror is still named for the folder it governs, and a
+folder with no mirror is still a finding.
+
+**What changes in a general repository is only what a cell RESOLVES TO**, and the reason is the same
+every time — nothing there derives from a node's kind, because there are no nodes:
+
+| | What still holds | What it resolves to |
+| --- | --- | --- |
+| a **realization** row | every construct has at least one, and the dependencies stay acyclic | it names **a folder or a file**, never a node. The index reads the repository's own top-level folders, so *plugins* or *hooks* resolves where *a node named hooks* could not |
+| a **behaviour** row | the id, `Who`, `Does`, `Sees` and `Type` | **`Tier` derives from a node's kind, and there is none** — so the row carries the repository's own runner or `—`, and `Status` stays `PLANNED` unless that runner writes it. Nothing owes a tier it cannot have |
+| the **mirror nudge** | — | it stays **silent**, because it fires on an edit under a `src/` folder. That is honest rather than a gap: an undocumented folder is still reported against the whole tree, which is where that finding belongs |
+
+**The id is never relaxed.** A behaviour with no id cannot be cited, proven later, or found twice —
+and a repository that cannot run a tier today may ship a runner tomorrow (`RD.GOV.024`).
 
 ## What each seat holds
 
