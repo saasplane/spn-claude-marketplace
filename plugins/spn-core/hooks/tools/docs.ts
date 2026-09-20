@@ -1363,7 +1363,30 @@ function audit(paths: string[], workspace: string): Finding[] {
 }
 
 const [cmd, ...rest] = process.argv.slice(2);
-const workspace = process.env.SPN_WORKSPACE ?? process.cwd();
+
+/**
+ * The workspace root — the folder the sibling checkouts sit in, not wherever you happen to stand.
+ *
+ * THE SAME COMMAND GAVE DIFFERENT ANSWERS FROM DIFFERENT DIRECTORIES. Taking cwd as the workspace
+ * means a run from inside a repository builds the templates path as `<repo>/spn-foundation/docs/…`,
+ * which does not exist — so every construct page reported *the page could not be produced for
+ * comparison*. 161 findings in one sweep, all of them the tool standing in the wrong place, and
+ * none of them about the corpus. A result that depends on your shell's cwd is not a measurement.
+ *
+ * The workspace is the nearest folder at or above cwd that holds `spn-foundation/` or `.spndevex/`.
+ * Neither found, cwd stands — which is what a fixture directory needs.
+ */
+function workspaceRoot(from: string): string {
+  let dir = resolve(from);
+  for (;;) {
+    if (existsSync(join(dir, "spn-foundation")) || existsSync(join(dir, ".spndevex"))) return dir;
+    const up = dirname(dir);
+    if (up === dir) return resolve(from);
+    dir = up;
+  }
+}
+
+const workspace = process.env.SPN_WORKSPACE ?? workspaceRoot(process.cwd());
 
 // One line per verb, in the same log and the same shape as the Python checks, so the port can be
 // measured against what it replaced. Off unless `workspace timings --on` has been run.
