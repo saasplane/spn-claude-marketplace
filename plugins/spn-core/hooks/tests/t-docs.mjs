@@ -153,6 +153,47 @@ console.log("\n=== a markdown seat file is checked as a seat file, not as a page
 }
 
 
+// ------------------------------------------- the outline check reads the format it is given
+
+console.log("\n=== a construct's outline is checked in markdown, not only in HTML");
+// THE GATE WAS BLIND, AND A BLIND GATE IS WORSE THAN NO GATE because its refusal is believed. The
+// outline check read `<h2>` only, so a hand-authored construct carrying all six required sections
+// reported all six missing. The first batch that ever wrote one distrusted the red light and traced
+// it. These cases are the other half of that fix: the check must still FAIL a file that is really
+// missing a section, or it has simply been made quiet.
+const SECTIONS = ["Boundary", "Model", "Parts", "Relations", "Binds", "Proof"];
+const construct = (sections) =>
+  doc({ id: "x", variant: "construct", parentId: "concept", dependsOn: [], title: "X", lenses: ["ARCHITECT"], status: "PLANNING" },
+      "Lead.\n\n" + sections.map((h) => `## ${h}\n\nWhat ${h} says.\n`).join("\n"),
+      "`For: Architect` · `Status: 🔮 PLANNING`");
+{
+  const root = repo({ "CONCEPT.md": "# c\n", "docs/02-constructs/x.md": construct(SECTIONS) });
+  one("a construct with every section, written as `##`, is clean",
+    run(root, ["audit", "docs/02-constructs/x.md"]), has("clean — 1 page"));
+}
+{
+  const root = repo({ "CONCEPT.md": "# c\n",
+    "docs/02-constructs/x.md": construct(SECTIONS.filter((h) => h !== "Binds")) });
+  const out = run(root, ["audit", "docs/02-constructs/x.md"]);
+  one("a construct genuinely missing a section is still a finding", out, has("missing section: Binds"));
+  one("and it names only the one that is missing", out, lacks("Boundary"));
+}
+{
+  // A construct that SHOWS an outline in an example is not carrying that section.
+  const root = repo({ "CONCEPT.md": "# c\n",
+    "docs/02-constructs/x.md": construct(SECTIONS.filter((h) => h !== "Binds"))
+      .replace("## Proof", "```text\n## Binds\n```\n\n## Proof") });
+  one("a heading inside a fence does not satisfy the outline",
+    run(root, ["audit", "docs/02-constructs/x.md"]), has("missing section: Binds"));
+}
+{
+  // `produced` compares a PAGE with the seat it would be produced from. A seat file is not a page.
+  const root = repo({ "CONCEPT.md": "# c\n", "docs/02-constructs/x.md": construct(SECTIONS) });
+  one("the produced check stays silent on a seat file, which has no page yet",
+    run(root, ["audit", "docs/02-constructs/x.md"]), lacks("no seat file sits at the mirrored path"));
+}
+
+
 // ---------------------------------------------------------------- the grouping
 
 console.log("\n=== a repository may group its domains by stage");

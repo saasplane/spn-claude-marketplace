@@ -91,6 +91,24 @@ function headings(src: string, tag: "h1" | "h2" | "h3"): string[] {
   return [...src.matchAll(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, "g"))].map((m) => m[1]);
 }
 
+/**
+ * The section headings of a document, read in the spelling its own format uses.
+ *
+ * THE OUTLINE CHECK IS THE SAME CHECK IN BOTH FORMATS, and it could read only one of them. A
+ * produced page writes its sections as `<h2>`; the seat file it is produced FROM writes them as
+ * `##`. Reading only the HTML meant every hand-authored construct reported all six required
+ * sections missing while carrying all six — the check was not finding a defect, it was blind. A
+ * gate that cannot see its input is worse than no gate, because its refusal is believed. Found by
+ * the first batch that ever wrote a construct, which distrusted the red light and traced it.
+ *
+ * Fences are blanked first, so an example inside a code block is content rather than structure.
+ */
+function sections(file: string, src: string, tag: "h1" | "h2" | "h3"): string[] {
+  if (!file.endsWith(".md")) return headings(src, tag);
+  const level = tag === "h1" ? 1 : tag === "h2" ? 2 : 3;
+  return [...outsideFences(src).matchAll(new RegExp(`^#{${level}}\\s+(.+)$`, "gm"))].map((m) => m[1]);
+}
+
 // ---------------------------------------------------------------------------- the checks
 
 function checkBlock(file: string, src: string, block: any, err: string | null): Finding[] {
@@ -127,7 +145,7 @@ function checkOutline(file: string, src: string, block: any): Finding[] {
   const f: Finding[] = [];
   const variant: Variant | undefined = block?.variant;
   const spec = variant ? OUTLINE[variant] : undefined;
-  const got = headings(src, "h2").map(sectionName);
+  const got = sections(file, src, "h2").map(sectionName);
   if (!spec) return f;
 
   const want = spec.required;
@@ -461,7 +479,7 @@ function checkBinds(file: string, src: string, block: any, nodes: Set<string>): 
 function checkOverviewSource(file: string, src: string, block: any, workspace: string): Finding[] {
   const f: Finding[] = [];
   if (block?.variant !== "overview") return f;
-  const got = headings(src, "h2").map(sectionName);
+  const got = sections(file, src, "h2").map(sectionName);
 
   if (got[0] !== OVERVIEW_FIXED_FIRST)
     f.push({ check: "overview", grade: "RULE", file, message: `an overview opens with \`${OVERVIEW_FIXED_FIRST}\`, not \`${got[0]}\`` });
@@ -512,6 +530,11 @@ function findConcept(workspace: string, file: string): string | null {
  */
 function checkProduced(file: string, src: string, block: any, workspace: string, templates: string): Finding[] {
   if (block?.variant !== "construct") return [];
+  // THIS CHECK JUDGES A PRODUCED PAGE, NEVER THE SEAT FILE IT IS PRODUCED FROM. Asked about a seat
+  // file it has nothing to compare: the substitution below is a no-op, so `seat === file`, and it
+  // reported the seat as a page missing its own source. Saying nothing is the honest answer — the
+  // page does not exist yet, and `docs.ts page` is what creates it.
+  if (!/\/artifacts\/constructs\/.*-construct\.html$/.test(file)) return [];
   // The pocket mirrors the seat folder for folder, so the pair is found by path alone.
   const seat = file.replace(/\/artifacts\/constructs\//, "/02-constructs/").replace(/-construct\.html$/, ".md");
   if (seat === file || !existsSync(seat))
