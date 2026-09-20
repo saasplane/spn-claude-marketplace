@@ -895,12 +895,18 @@ function domainFaces(tree: string, concept: string | null): { faces: Map<string,
     faces.set(join(dir, "README.md"), body.filter((l, i) => !(i === 0 && !l)).join("\n"));
   }
 
-  // The concept's own line per construct, filed under the domain folder that holds it.
+  // The concept's own line per construct, filed under the folder that holds it.
+  //
+  // ONE LINE PER CONSTRUCT, AND THE EMPHASIS IS ON *ONE*. `constructsUnder` recurses, which is
+  // right for a FACE — a face maps everything below it — and wrong here: a domain and each level
+  // beneath it both got a heading, so every construct in a nested domain was listed twice. The
+  // concept is an outline, and an outline that names a thing twice is not one. So a folder
+  // contributes only what sits DIRECTLY in it, and the nesting still shows through the headings.
   let conceptBody: string | null = null;
   if (concept) {
     const out: string[] = [];
     for (const dir of folders.filter((d) => !isGroup(d)).sort()) {
-      const mine = constructsUnder(dir);
+      const mine = constructsUnder(dir).filter((c) => dirname(c.file) === dir);
       if (!mine.length) continue;
       out.push(`**${named(dir) ?? folderKey(basename(dir))}**`, "");
       for (const c of readingOrder(mine)) out.push(`- **${c.title}** — ${c.summary}`);

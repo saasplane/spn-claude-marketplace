@@ -16,7 +16,7 @@ A new platform monorepo — the workspace root, which declares `sprepo.json` `{ 
 Then:
 
 1. **Create the repository**: `spnutils repo create <name>` — creates it in the bound SCM if absent, then converges it to the standard (branches, protections, team access). Idempotent.
-2. **Mint the workspace**: `spnutils apps scaffold repo --stack ts --organization <package[@version]> [--platform <package[@version]>]`. It writes `sprepo.json` with the stack claim and couplings — the organization coupling is never optional, and `platform: null` means nothing deploys. Then it writes the workspace skeleton: `apps/` · `packages/` · `docs/` (the workspace doc set — same shape as every other node, below) · `tests/` + `package.json`, `pnpm-workspace.yaml`, `nx.json`. No `tasks/` tree — designs live in the docs as 🔮 rows (foundation decision RD.DEVEX.007). pnpm only, never npm/yarn; Nx discovers projects from each `package.json`'s `nx` block.
+2. **Mint the workspace**: `spnutils apps scaffold repo --stack ts --organization <package[@version]> [--platform <package[@version]>]`. It writes `sprepo.json` with the stack claim and couplings — the organization coupling is never optional, and `platform: null` means nothing deploys. Then it writes the workspace skeleton: `apps/` · `packages/` · `docs/` (the repository's one docs tree — the shape below; a node scaffolded afterwards carries no docs tree of its own) · `tests/` + `package.json`, `pnpm-workspace.yaml`, `nx.json`. No `tasks/` tree — designs live in the docs as 🔮 rows (foundation decision RD.DEVEX.007). pnpm only, never npm/yarn; Nx discovers projects from each `package.json`'s `nx` block.
 3. **Agent wiring**: `spnutils repo agent-sync` (alias `as`). The marketplace source follows the mode the place implies, so nothing is passed — a builder wires the checkout, a partner does not hold, and writes `.claude/settings.local.json` instead). It registers the `saasplane` marketplace, enables `spn-core@saasplane` + `spn-apps-ts@saasplane`, maintains the managed `CLAUDE.md` block, and generates `.claude/saasplane/rules.md`.
 4. **Local infra**: `spnutils infra organization up` (once per machine) → `spnutils infra platform up` — see the `run` skill local mode.
 
@@ -46,7 +46,7 @@ Then:
 | `support-universal` | `SUPPORT_UNIVERSAL` | universal | Capability-group package under `packages/`, runtime-agnostic (`src/<group>/…`, root barrel) | `spnutils apps gen-barrel -p <pkg>` |
 | `support-server` | `SUPPORT_SERVER` | server | Same shape, server-only | `spnutils apps gen-barrel -p <pkg>` |
 | `support-web` | `SUPPORT_WEB` | web | Same shape, browser-only; `ui/` sits at the **source root**, because there it is the published surface rather than a module's adapter to it | `spnutils apps gen-barrel -p <pkg>` |
-| `module-server` | `MODULE_SERVER` | server | `packages/module-server-<mod>-ts` — the contract/app/entry triad + `migrations/` + module wiring (`interface.ts`, `<mod>Module.ts`, `<MOD>ModuleManager.ts`) + the doc set, with `docs/artifacts/resources/schema.sql` | `spnutils apps gen-validators -p <pkg>` (after states) · `gen-barrel -p <pkg>` |
+| `module-server` | `MODULE_SERVER` | server | `packages/module-server-<mod>-ts` — the contract/app/entry triad + `migrations/` + module wiring (`interface.ts`, `<mod>Module.ts`, `<MOD>ModuleManager.ts`) + a `README.md`; its mirrors, `data-model.md` and `schema.sql` land in the repository's own tree under its domain (see **Target: app-module § Docs**) | `spnutils apps gen-validators -p <pkg>` (after states) · `gen-barrel -p <pkg>` |
 | `module-web` | `MODULE_WEB` | web | `packages/module-web-<mod>-ts` — `src/entry/ui/{components,hooks,pages,utils}` (the browser is a transport, so the UI is the module's **entry**; `contract/` and `app/` arrive beside it only once the module owns client-side rules), named exports only | `spnutils apps gen-barrel -p <pkg>` |
 | `app-server` | `APP_SERVER` | server | `apps/service-<usecase>-ts` — bootstrap `index.ts`, `<CODE>AppManager.ts`, `interface.ts`, `modules/`, `envs/` (`local.env`, `cloud.env` — no secrets), the platform declaration's `apps[]` row | `spnutils infra app up -p <app>` · `pnpm migrate:up` |
 | `app-web` | `APP_WEB` | web | `apps/web-<usecase>-ts` — root holds only `index.tsx` · `index.css` · `interface.ts` · `<code>App.ts` · `<CODE>AppManager.ts`; the shell (`AppRouter`, `nav`, app context) lives in `src/modules/boot/ui/`, and vite carries per-module `manualChunks` | `spnutils infra app up -p <app>` |
@@ -72,28 +72,42 @@ A kind whose `config` is `null` — `TOOLCHAIN`, `SUPPORT_*`, `CLIENT_API` — *
 
 **Versioning** (RD.APPS.034): a scaffolded manifest carries the placeholder `0.0.0` and internal deps use `workspace:*`. The real version is stamped into the artifact at publish and the git tag is the source of truth — never edit a version into source.
 
-### The doc set every scaffold writes
+### What a scaffold writes into docs — one tree per repository, never one per node
 
-**One shape at every altitude** (foundation decision RD.DOCS.008) — a workspace, an app, a package, and an app-module all get the same tree; only the content branches on kind. Read `refs/doc-sets.md` in the **spn-core** plugin before writing a word of it.
+**A repository has ONE docs tree, at the repository root — never one per node** (foundation
+decision RD.DOCS.001). The `repo` target above writes it once, at scaffold time. Every kind
+scaffolded afterwards — an app, a package, an app-module — carries **`README.md` and no seats of
+its own** (decision RD.DOCS.021): about twenty-five lines saying what the node is, what it is for,
+and linking into the seats it realizes. Read `refs/doc-sets.md` in the **spn-core** plugin before
+writing a word into either.
 
 ```text
-<node>/
-├── README.md                  the front door (npm page / repo landing) — NOT the node doc
-└── docs/
-    ├── README.md              the node doc — identity, children map with statuses, doc map
-    ├── 01-purpose/README.md   the face — why it exists
-    ├── 02-behaviors/          README.md (the face — every row) + personas.md where several
-    │                          personas exist + numbered area files
-    ├── 03-capabilities/       README.md (the face) + data-model.md + one document per
-    │                          published source group — derived, not chosen (RD.DOCS.015)
-    ├── 04-guides/             README.md IS the getting-started; further guides numbered
-    ├── registers/README.md    pocket — governing nodes only
-    └── artifacts/README.md    pocket — what the node AUTHORS: resources/, reports/, approaches/
+<repository>/docs/
+├── README.md              the tree's face — the seats, and the map
+├── 01-purpose/            WHY — why this repository exists
+├── 02-constructs/         WHAT, the model — one file per construct, under a folder per domain
+├── 03-behaviors/          WHAT, as product — rows under a folder per domain, in the consumer's
+│                          own words, each carrying an id and a status
+├── 04-capabilities/       WHAT, as engineering — one mirror per source folder that earns one,
+│                          hung by domain then by layer; `data-model.md` and `schema.sql` sit
+│                          beside the layer that owns storage. Derived, not chosen (RD.DOCS.015)
+├── 05-guides/             HOW — README.md IS the getting-started; further guides numbered
+├── registers/             pocket — the repository's own rules and decisions
+└── artifacts/             pocket — the overview and construct pages, and deliberate reports
 ```
 
-- **The seats are folders, always, and every folder carries a `README.md`** — pockets included. Never a `purpose.md`, `capabilities.md`, `behaviors.md`, or `guides/getting-started.md` file: a seat holding nothing but its face is the compact state, not a defect.
-- **A seat is absent only when the node cannot answer its question at all**, and the node doc says so. Exactly two cases. `CLIENT_API` carries no `03-behaviors/`, because it is proven by the contract tests of the service that generated it. An **app-module** carries no `05-guides/`, because it ships inside its host and the host's guide covers running it.
-- **New seats start `🔮`/`🚧`, never `✅`** — a status claims running reality, and nothing runs yet.
+- **What a scaffolded node contributes lands under the domain it belongs to, in the repository's
+  own tree** — never in a tree beside the node. A new module's rows go into
+  `03-behaviors/<domain>/` and `04-capabilities/<domain>/<layer>/`, exactly as **Target: app-module
+  § Docs** below states for the app-owned case.
+- **The seats are folders, always, and every seat folder carries a `README.md`** — pockets
+  included. Never a `purpose.md`, `capabilities.md`, `behaviors.md`, or `guides/getting-started.md`
+  file: a seat holding nothing but its face is the compact state, not a defect.
+- **A capability mirror or a guide is absent only where the source folder truly cannot answer that
+  question**, and the owning face says so. `CLIENT_API` carries no mirror, because it is proven by
+  the contract tests of the service that generated it. An **app-module** contributes no guide of
+  its own, because it ships inside its host and the host's guide covers running it.
+- **New rows start `🔮`/`🚧`, never `✅`** — a status claims running reality, and nothing runs yet.
 
 ## Target: app-module
 

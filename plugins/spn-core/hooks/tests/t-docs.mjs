@@ -236,6 +236,35 @@ const CONCEPT_TREE = "# c\n\n## SaaS Plane — Foundation\n\nstage.\n\n### DevEx
 }
 
 
+// ------------------------------------------- the concept's outline names each construct once
+
+console.log("\n=== a construct nested under a level is listed once, not once per ancestor");
+// AN OUTLINE THAT NAMES A THING TWICE IS NOT ONE. The concept's generated block filed a line under
+// every folder, and the walk that found those constructs recurses — so a domain and each level
+// beneath it both listed the same construct. The faces are right to recurse, because a face maps
+// everything below it; the outline is not.
+{
+  const root = repo({
+    "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
+    "docs/02-constructs/README.md": doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    "docs/02-constructs/01-core/README.md": doc({ id: "c", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    "docs/02-constructs/01-core/loose.md":
+      doc({ id: "loose", variant: "construct", parentId: "c", dependsOn: [], title: "Loose", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    "docs/02-constructs/01-core/01-level/README.md": doc({ id: "lv", title: "Level", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    "docs/02-constructs/01-core/01-level/nested.md":
+      doc({ id: "nested", variant: "construct", parentId: "c", dependsOn: [], title: "Nested", lenses: ["ARCHITECT"], status: "PLANNING" }),
+  });
+  run(root, ["face", "docs"]);
+  const concept = readAt(root, "CONCEPT.md");
+  const lines = (concept.match(/^- \*\*Nested\*\*/gm) ?? []).length;
+  one("a nested construct appears exactly once in the concept's outline", lines, 1);
+  one("and the construct beside it does too",
+    (concept.match(/^- \*\*Loose\*\*/gm) ?? []).length, 1);
+  one("while the DOMAIN's face still maps everything below it, nested included",
+    readAt(root, "docs/02-constructs/01-core/README.md"), has("[Nested]"));
+}
+
+
 // ---------------------------------------------------------------- the grouping
 
 console.log("\n=== a repository may group its domains by stage");
