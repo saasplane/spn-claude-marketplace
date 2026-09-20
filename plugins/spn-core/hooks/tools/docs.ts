@@ -135,6 +135,15 @@ function checkBlock(file: string, src: string, block: any, err: string | null): 
   const variant: Variant | undefined = block.variant;
   if (variant && !VARIANTS.includes(variant)) add("RULE", `\`variant\` \`${variant}\` is not one of ${VARIANTS.join(" · ")}`);
 
+  // AN ARGUMENT IS A WORKSTREAM'S, NEVER A REPOSITORY'S (05-artifacts.md § What the pocket holds).
+  // The pocket's folder set is fixed — overviews, constructs, reports, resources — so `approaches/`
+  // was never a legal folder, and the rule held only as long as somebody remembered it. Fifteen
+  // pages had accumulated before this fired. A repository states what is true now; an approach page
+  // weighs options and carries open cards, and a pocket holding both is how a stale argument comes
+  // to be read as a statement of today.
+  if (variant === "approach" && /(^|\/)docs\//.test(file.replace(/\\/g, "/")))
+    add("RULE", "an approach page belongs to the workstream that argues it, never to a repository's `docs/` — move it under `.spndevex/workstreams/`");
+
   // An overview describes; it has no status. Every other page kind carries one.
   if (variant === "overview") {
     if ("status" in block) add("RULE", "an overview carries no `status` — a face is either current or a defect");

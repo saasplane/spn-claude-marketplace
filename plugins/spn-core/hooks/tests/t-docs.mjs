@@ -569,6 +569,31 @@ console.log("\n=== the gap scan measures and never fixes");
   one("what the concept lists is what the domain owes", rep, (g) => /\| `01-core` \| ✅ \| 0 \| 1 \|/.test(g));
   one("the arguments still in the pocket are listed", rep, has("a-approach.html"));
   one("a page with no block is counted", rep, has("block (RULE)"));
+
+  // AN ARGUMENT IS A WORKSTREAM'S, NEVER A REPOSITORY'S. The rule is old — 05-artifacts.md has
+  // always said "an argument does not live here", and the pocket's folder set never had an
+  // `approaches/` in it — but nothing checked it, so fifteen pages accumulated across three
+  // repositories before anybody counted. A rule a person has to remember is a rule that holds
+  // until the week somebody is busy.
+  {
+    const ws = repo({
+      "docs/artifacts/approaches/x-approach.html":
+        doc({ id: "x", variant: "approach", title: "X", lenses: ["ARCHITECT"], status: "PLANNING" },
+            "<p>an argument</p>\n"),
+    });
+    const got = run(ws, ["audit", "docs/artifacts/approaches/x-approach.html"]);
+    one("an approach page in a repository's docs is refused", got, has("belongs to the workstream"));
+  }
+  {
+    // The same page under a workstream is exactly where it belongs, and must pass untouched.
+    const ws = repo({
+      ".spndevex/workstreams/open/001-a/a-approach.html":
+        doc({ id: "a", variant: "approach", title: "A", lenses: ["ARCHITECT"], status: "PLANNING" },
+            "<p>an argument</p>\n"),
+    });
+    const got = run(ws, ["audit", ".spndevex/workstreams/open/001-a/a-approach.html"]);
+    one("the same page in a workstream is not", got, (g) => !/belongs to the workstream/.test(g));
+  }
   one("and it names what it did NOT measure rather than reporting a zero",
     rep, has("What this report does not measure"));
 }
