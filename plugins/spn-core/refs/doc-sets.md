@@ -2,7 +2,7 @@
 {
   "chapters": [
     { "path": "docs/04-capabilities/01-foundation/02-docs/README.md", "seen": "171c01bc" },
-    { "path": "docs/04-capabilities/01-foundation/02-docs/05-artifacts.md", "seen": "b63bce9e" },
+    { "path": "docs/04-capabilities/01-foundation/02-docs/05-artifacts.md", "seen": "b76885bb" },
     { "path": "docs/04-capabilities/01-foundation/02-docs/03-tree.md", "seen": "93964dfd" },
     { "path": "CONCEPT.md", "seen": "2c1d21b5" }
   ]
