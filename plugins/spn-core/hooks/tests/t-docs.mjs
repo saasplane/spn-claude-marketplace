@@ -595,6 +595,29 @@ console.log("\n=== the gap scan measures and never fixes");
     one("the same page in a workstream is not", got, (g) => !/belongs to the workstream/.test(g));
   }
 
+  // The pocket's folder set is overviews, constructs and reports. `resources/` held "what a
+  // document was written from", and every such file was a seat depending on a pocket — 229 files
+  // across five repositories, 187 of them cited by nothing.
+  {
+    const ws = repo({
+      "docs/artifacts/resources/packages/x/purpose.md":
+        doc({ id: "xp", title: "Purpose — x", lenses: ["ARCHITECT"], status: "DONE" },
+            "why x exists\n", "`For: Architect` · `Status: ✅ DONE`"),
+    });
+    const got = run(ws, ["audit", "docs/artifacts/resources/packages/x/purpose.md"]);
+    one("a file in the pocket's resources folder is refused", got, has("lives in a seat"));
+  }
+  {
+    // The same file in the seat that owns it is exactly right, and must pass untouched.
+    const ws = repo({
+      "docs/01-purpose/x.md":
+        doc({ id: "xp", title: "Purpose — x", lenses: ["ARCHITECT"], status: "DONE" },
+            "why x exists\n", "`For: Architect` · `Status: ✅ DONE`"),
+    });
+    const got = run(ws, ["audit", "docs/01-purpose/x.md"]);
+    one("the same file in 01-purpose is not", got, (g) => !/lives in a seat/.test(g));
+  }
+
   // A PRODUCED PAGE'S LINKS ARE RE-EXPRESSED FOR THE FOLDER IT LANDS IN. The seat writes
   // `sibling.md`; beside the page that file is `sibling-construct.html`, and the page sits three
   // levels from the capabilities seat rather than two. Copying the href across verbatim broke a

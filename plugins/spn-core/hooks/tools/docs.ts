@@ -144,6 +144,14 @@ function checkBlock(file: string, src: string, block: any, err: string | null): 
   if (variant === "approach" && /(^|\/)docs\//.test(file.replace(/\\/g, "/")))
     add("RULE", "an approach page belongs to the workstream that argues it, never to a repository's `docs/` — move it under `.spndevex/workstreams/`");
 
+  // THE POCKET'S FOLDER SET IS OVERVIEWS, CONSTRUCTS, REPORTS AND NOTHING ELSE. A `resources/`
+  // folder held "what a document was written from" — and every such file is a file some seat needs,
+  // so each one was a seat depending on a pocket, which is the one thing the pocket rule forbids.
+  // 229 files had collected across five repositories, 187 cited by nothing at all. A fact a seat
+  // needs lives in a seat.
+  if (/\/artifacts\/resources\//.test(file.replace(/\\/g, "/")))
+    add("RULE", "the pocket holds `overviews/`, `constructs/` and `reports/` — a fact a seat needs lives in a seat, never in `resources/`");
+
   // An overview describes; it has no status. Every other page kind carries one.
   if (variant === "overview") {
     if ("status" in block) add("RULE", "an overview carries no `status` — a face is either current or a defect");
