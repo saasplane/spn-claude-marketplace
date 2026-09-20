@@ -47,7 +47,7 @@ None.
 
 ## Pages off the standard
 
-**Clean over 11 page(s).**
+**Clean over 12 page(s).**
 
 ## The paragraphs a language pass would read
 
