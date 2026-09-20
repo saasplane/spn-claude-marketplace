@@ -381,8 +381,12 @@ function checkProof(file: string, src: string): Finding[] {
   const installable = /^(spnutils\b|pnpm test|pnpm test:|npx nx\b|node .*\.ts\b)|\.py\b|\bguard\b|\bgate\b/;
   for (const r of rows) {
     if (!r) continue;
-    if (/^pnpm task:/.test(r))
-      f.push({ check: "proof", grade: "SOFT", file, message: `\`${r}\` is not installable — a \`pnpm task:*\` script is a repository's own, so a partner cannot run it. It is accepted only while no verb exists` });
+    // A REPOSITORY'S OWN SCRIPT IS NOT A FALSE POSITIVE, and saying so plainly matters: a batch read
+    // the vaguer message below as the check being wrong and defended its row. A `pnpm task:*`
+    // entry, a `bash tests/…` invocation and a `./script` are all the same fact — real, runnable
+    // by whoever holds this checkout, and unrunnable by the partner the Proof row is written for.
+    if (/^pnpm task:|^(bash|sh|zsh) \S|^\.\//.test(r))
+      f.push({ check: "proof", grade: "SOFT", file, message: `\`${r}\` runs here and not for a partner — it is a script this repository carries rather than a verb an installed workspace has. **This is a true finding, not a heuristic miss.** It is accepted only while no verb runs it; when one exists, name the verb` });
     else if (!installable.test(r) && r.split(" ").length <= 6 && /[a-z]/.test(r) && !/^the /.test(r))
       f.push({ check: "proof", grade: "SOFT", file, message: `\`${r}\` may not name a command an installed workspace has` });
   }
