@@ -15,14 +15,20 @@ This block is managed by `spnutils repo agent-sync` — do not hand-edit inside 
 
 ## Versioning — this repo counts on its own
 
-**This repo claims no world, and you will find no `sprepo.json` here.** It is the one member of the
-workspace that deliberately has none. The workspace discovers its members, and **access control is
-absence**.
+**This repo declares `GENERAL` in `sprepo.json`** — no nodes, one docs tree. It answers to no
+stack, so the `apps` and `infra` verbs refuse it by name, and what the agent manages here is the
+docs tree and this repository's own files (`RD.GOV.024`). It loads `spn-core` and only `spn-core`:
+core governs docs trees, and a stack plugin acts on nodes this repository does not have.
 
-**So `RD.APPS.034` does not reach you here.** That row rules lockstep versioning *within a
+**Authoring a plugin is not loading it.** This repo authors all three and loads one. Editing
+`plugins/spn-apps-ts/skills/…/SKILL.md` is editing markdown, which core's doc rules govern, and the
+suites here run the source rather than the installed copy. Being the builder checkout is a separate
+axis — `SPN_DEVEX_AGENT_WORKSPACE`.
+
+**`RD.APPS.034` does not reach you here.** That row rules lockstep versioning *within a
 repository*, with the version stamped at publish rather than written into source. It governs `APPS`
-repos. **You follow the Claude marketplace's own convention instead** — one version per plugin, in
-each `.claude-plugin/plugin.json`.
+repos, and this one is not. **You follow the Claude marketplace's own convention instead** — one
+version per plugin, in each `.claude-plugin/plugin.json`.
 
 ### The count moves after the release, never before
 

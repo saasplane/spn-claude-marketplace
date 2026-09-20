@@ -686,14 +686,28 @@ function conceptSections(concept: string): Map<string, { bridge: string; lines: 
   const out = new Map<string, { bridge: string; lines: string[] }>();
   const lines = readFileSync(concept, "utf8").split("\n");
   let name: string | null = null, bridge: string[] = [], items: string[] = [];
+  // THE BRIDGE IS ONE PARAGRAPH, AND CLOSING IT IS THE WHOLE RULE. The concept's shape is *one
+  // section per domain, opening with a paragraph saying why that domain comes here, followed by one
+  // line per construct*. Collecting every non-bullet line until a bullet appears reads that as *the
+  // paragraph is everything before the list* — which is true only for a section that HAS a list. A
+  // section written as prose and tables has none, so the bridge swallowed the whole section and
+  // joined it with single spaces: sub-headings, table pipes and all, on one line. `### Docs` is that
+  // section, and every domain face in this book carried the dump.
+  let closed = false;
   const flush = () => { if (name && !out.has(name)) out.set(name, { bridge: bridge.join(" ").trim(), lines: items }); };
   for (const l of lines) {
     // A group is named by a `##` section and a domain inside it by a `###` one, so both are read.
     // A repository that groups by stage names the group once and each domain once, at two depths.
-    if (/^###?\s/.test(l)) { flush(); name = sectionKey(l.replace(/^###?\s*/, "")); bridge = []; items = []; continue; }
+    if (/^###?\s/.test(l)) { flush(); name = sectionKey(l.replace(/^###?\s*/, "")); bridge = []; items = []; closed = false; continue; }
     if (name === null) continue;
     if (/^[-*]\s/.test(l)) { items.push(l.replace(/^[-*]\s*/, "")); continue; }
-    if (l.trim() && !items.length) bridge.push(l.trim());
+    // A blank line ends the opening paragraph. What follows is the section's body, which the face
+    // does not carry — the constructs under it do.
+    if (!l.trim()) { if (bridge.length) closed = true; continue; }
+    // A deeper heading, a table or a fence is body rather than prose, and ends the paragraph even
+    // where no blank line separates it.
+    if (/^#{4,}\s/.test(l) || l.trim().startsWith("|") || l.trim().startsWith("```")) { closed = true; continue; }
+    if (!items.length && !closed) bridge.push(l.trim());
   }
   flush();
 

@@ -182,6 +182,26 @@ const GROUPED = {
     out, lacks("invariant 1"));
 }
 {
+  // A SECTION WRITTEN AS PROSE AND TABLES HAS NO BULLETS, and that is the shape the bridge used to
+  // swallow whole. `### Docs` in this book is exactly it: one opening paragraph, then sub-headings
+  // and tables. Reading *everything before the first bullet* as the paragraph meant a section with
+  // no bullet had no end, so the face carried the entire section joined with single spaces — table
+  // pipes included. The case asserts both halves: the paragraph is carried, and the body is not.
+  const root = repo({ ...GROUPED,
+    "CONCEPT.md": GROUPED["CONCEPT.md"].replace("### Docs\n\nHow the corpus is written.\n",
+      "### Docs\n\nHow the corpus is written.\n\n#### Node Vocabulary\n\n" +
+      "| Type | Purpose |\n| --- | --- |\n| `NODE` | anything that owns a doc set |\n\n" +
+      "A second paragraph the face must not carry.\n") });
+  run(root, ["face", "docs"]);
+  const face = readAt(root, "docs/02-constructs/01-foundation/02-docs/README.md");
+  one("a domain written as prose and tables still carries its opening paragraph",
+    face, has("How the corpus is written."));
+  one("and the face stops there — the table's own rows never reach it",
+    face, lacks("anything that owns a doc set"));
+  one("nor does the sub-heading, nor the paragraph after it",
+    face, lacks("A second paragraph the face must not carry."));
+}
+{
   // A bridge is the CONCEPT's prose, and the concept sits at the repository root.
   const root = repo({ ...GROUPED,
     "CONCEPT.md": GROUPED["CONCEPT.md"].replace("How the function operates.",
