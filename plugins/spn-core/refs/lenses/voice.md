@@ -2,7 +2,7 @@
 {
   "chapters": [
     { "path": "docs/04-capabilities/01-foundation/02-docs/01-corpus.md", "seen": "21df863a" },
-    { "path": "docs/04-capabilities/01-foundation/02-docs/02-document.md", "seen": "ee6e6b46" },
+    { "path": "docs/04-capabilities/01-foundation/02-docs/02-document.md", "seen": "06898edc" },
     { "path": "docs/04-capabilities/01-foundation/02-docs/04-discipline.md", "seen": "17b1e887" }
   ],
   "rows": [

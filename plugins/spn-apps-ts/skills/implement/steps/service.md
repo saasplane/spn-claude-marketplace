@@ -5,7 +5,7 @@
     { "path": "docs/04-capabilities/02-support/01-apps/03-module/01-server/02-app/02-repositories.md", "seen": "bd7eea70" },
     { "path": "providers/apps/ts/05-service-patterns.md", "seen": "571e7778" },
     { "path": "providers/apps/ts/06-database-patterns.md", "seen": "388057da" },
-    { "path": "providers/apps/ts/02-structure.md", "seen": "673d4ba3" }
+    { "path": "providers/apps/ts/02-structure.md", "seen": "bb8af740" }
   ]
 }
 -->
