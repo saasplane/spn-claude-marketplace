@@ -162,9 +162,16 @@ console.log("\n=== a construct's outline is checked in markdown, not only in HTM
 // it. These cases are the other half of that fix: the check must still FAIL a file that is really
 // missing a section, or it has simply been made quiet.
 const SECTIONS = ["Boundary", "Model", "Parts", "Relations", "Binds", "Proof"];
+// Binds and Proof carry real tables, because both are checked now — a section that is only a
+// heading used to pass, and only because the checks could not read markdown at all.
+const SECTION_BODY = {
+  Binds: "| Rule | What it decides | Weight |\n| --- | --- | --- |\n| `a.md` | x | MUST |\n\n" +
+         "| Repo | Node | What it realizes | State |\n| --- | --- | --- | --- |\n| R | n | x | planned |\n",
+  Proof: "| Check | Kind | What a green run shows |\n| --- | --- | --- |\n| `spnutils apps test` | gate | x |\n",
+};
 const construct = (sections) =>
   doc({ id: "x", variant: "construct", parentId: "concept", dependsOn: [], title: "X", lenses: ["ARCHITECT"], status: "PLANNING" },
-      "Lead.\n\n" + sections.map((h) => `## ${h}\n\nWhat ${h} says.\n`).join("\n"),
+      "Lead.\n\n" + sections.map((h) => `## ${h}\n\n${SECTION_BODY[h] ?? `What ${h} says.`}\n`).join("\n"),
       "`For: Architect` · `Status: 🔮 PLANNING`");
 {
   const root = repo({ "CONCEPT.md": "# c\n", "docs/02-constructs/x.md": construct(SECTIONS) });
@@ -262,6 +269,54 @@ console.log("\n=== a construct nested under a level is listed once, not once per
     (concept.match(/^- \*\*Loose\*\*/gm) ?? []).length, 1);
   one("while the DOMAIN's face still maps everything below it, nested included",
     readAt(root, "docs/02-constructs/01-core/README.md"), has("[Nested]"));
+}
+
+
+// ------------------------------------------- Binds and Proof are read in markdown too
+
+console.log("\n=== a seat file's Binds and Proof are checked, not skipped");
+// THE FOURTH TIME THIS EXACT BLINDNESS TURNED UP. checkBinds and checkProof searched for
+// `<h2>Binds` and returned early when they did not find it — so on a markdown seat file, the ONLY
+// form an author writes, they read nothing and reported nothing. 140 constructs passed with their
+// Binds and Proof entirely unexamined while the audit said clean.
+const withSections = (binds, proof) =>
+  doc({ id: "x", variant: "construct", parentId: "concept", dependsOn: [], title: "X", lenses: ["ARCHITECT"], status: "PLANNING" },
+      "Lead.\n\n## Boundary\n\nb\n\n## Model\n\nm\n\n## Parts\n\np\n\n## Relations\n\nr\n\n" + binds + "\n" + proof,
+      "`For: Architect` · `Status: 🔮 PLANNING`");
+const BINDS_OK = "## Binds\n\n| Rule | What it decides | Weight |\n| --- | --- | --- |\n| `a.md` | x | MUST |\n\n| Repo | Node | What it realizes | State |\n| --- | --- | --- | --- |\n| R | n | x | planned |\n";
+const PROOF_OK = "## Proof\n\n| Check | Kind | What a green run shows |\n| --- | --- | --- |\n| `spnutils apps test` | gate | x |\n";
+{
+  const root = repo({ "CONCEPT.md": "# c\n", "docs/02-constructs/x.md": withSections(BINDS_OK, PROOF_OK) });
+  one("a construct with both tables and a real command is clean",
+    run(root, ["audit", "docs/02-constructs/x.md"]), has("clean"));
+}
+{
+  const one_table = "## Binds\n\n| Rule | What it decides | Weight |\n| --- | --- | --- |\n| `a.md` | x | MUST |\n";
+  const root = repo({ "CONCEPT.md": "# c\n", "docs/02-constructs/x.md": withSections(one_table, PROOF_OK) });
+  one("Binds carrying one table is a finding — it is two",
+    run(root, ["audit", "docs/02-constructs/x.md"]), has("Binds carries 1 table"));
+}
+{
+  const no_row = "## Binds\n\n| Rule | What it decides | Weight |\n| --- | --- | --- |\n| `a.md` | x | MUST |\n\n| Repo | Node | What it realizes | State |\n| --- | --- | --- | --- |\n";
+  const root = repo({ "CONCEPT.md": "# c\n", "docs/02-constructs/x.md": withSections(no_row, PROOF_OK) });
+  one("a realization table with no row is invariant 6's finding",
+    run(root, ["audit", "docs/02-constructs/x.md"]), has("no row"));
+}
+{
+  const odd = BINDS_OK.replace("| R | n | x | planned |", "| R | n | x | nearly |");
+  const root = repo({ "CONCEPT.md": "# c\n", "docs/02-constructs/x.md": withSections(odd, PROOF_OK) });
+  one("a realization state outside planned · partial · done is reported",
+    run(root, ["audit", "docs/02-constructs/x.md"]), has("planned · partial · done"));
+}
+{
+  // A COMMAND IS WRITTEN AS CODE, and markdown's backticks are not part of the command.
+  const spec = PROOF_OK.replace("`spnutils apps test`", "`some-thing.spec.ts`");
+  const root = repo({ "CONCEPT.md": "# c\n", "docs/02-constructs/x.md": withSections(BINDS_OK, spec) });
+  one("a Proof row naming a spec file rather than a command is reported",
+    run(root, ["audit", "docs/02-constructs/x.md"]), has("may not name a command"));
+  const root2 = repo({ "CONCEPT.md": "# c\n", "docs/02-constructs/x.md": withSections(BINDS_OK, PROOF_OK) });
+  one("and a real command in backticks is NOT — the markers are stripped first",
+    run(root2, ["audit", "docs/02-constructs/x.md"]), lacks("may not name a command"));
 }
 
 

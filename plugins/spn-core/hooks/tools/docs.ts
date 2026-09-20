@@ -369,10 +369,14 @@ function checkCodeFigures(file: string, src: string, root: string): Finding[] {
 /** A Proof row names something an installed workspace can run. */
 function checkProof(file: string, src: string): Finding[] {
   const f: Finding[] = [];
-  const i = src.search(/<h2[^>]*>\s*Proof\b/);
+  const i = sectionAt(file, src, "Proof");
   if (i < 0) return f;
-  const seg = src.slice(i);
-  const rows = [...seg.matchAll(/<tr><td>([\s\S]*?)<\/td>/g)].map((m) => text(m[1]));
+  // A COMMAND IS WRITTEN AS CODE IN BOTH FORMATS, and the markers differ. `text()` strips the
+  // `<code>` tags an HTML page uses; markdown's backticks survive it, so every command read from a
+  // seat file began with a backtick and matched none of the patterns below — 157 rows across the
+  // corpus reported as "may not name a command" while naming perfectly good ones.
+  const rows = tablesIn(file, src.slice(i))
+    .flat().map((cells) => text(cells[0] ?? "").replace(/`/g, "").trim());
   if (!rows.length) return f;
   const installable = /^(spnutils\b|pnpm test|pnpm test:|npx nx\b|node .*\.ts\b)|\.py\b|\bguard\b|\bgate\b/;
   for (const r of rows) {
@@ -430,21 +434,56 @@ function nodeIndex(workspace: string): Set<string> {
   return names;
 }
 
+/**
+ * Where a named section starts, in the spelling the file uses.
+ *
+ * SAME BLINDNESS AS THE OUTLINE CHECK, FOUND LATER AND IN THREE MORE PLACES. `checkBinds` and
+ * `checkProof` looked for `<h2>Binds` and returned early when they did not find it — so on a
+ * markdown seat file, which is the ONLY form an author writes, they passed without reading
+ * anything. Every construct in the corpus had its Binds and Proof unchecked while the audit
+ * reported clean. A check that cannot see its input does not fail loudly; it agrees with you.
+ */
+function sectionAt(file: string, src: string, name: string): number {
+  return file.endsWith(".md")
+    ? outsideFences(src).search(new RegExp(`^##\\s+${name}\\b`, "m"))
+    : src.search(new RegExp(`<h2[^>]*>\\s*${name}\\b`));
+}
+
+/** Every table in a slice, as data rows of cells — header and separator dropped, both formats. */
+function tablesIn(file: string, seg: string): string[][][] {
+  if (!file.endsWith(".md"))
+    return [...seg.matchAll(/<table>[\s\S]*?<\/table>/g)].map((t) =>
+      [...t[0].matchAll(/<tr>([\s\S]*?)<\/tr>/g)]
+        .map((r) => [...r[1].matchAll(/<td>([\s\S]*?)<\/td>/g)].map((c) => text(c[1])))
+        .filter((cells) => cells.length));
+  const out: string[][][] = [];
+  let cur: string[][] | null = null;
+  for (const raw of outsideFences(seg).split("\n")) {
+    const t = raw.trim();
+    if (!(t.startsWith("|") && t.endsWith("|") && t.length > 2)) { cur = null; continue; }
+    const cells = t.slice(1, -1).split("|").map((c) => c.trim());
+    if (/^[\s:|-]*$/.test(cells.join(""))) continue;   // the --- separator under the header
+    if (!cur) { cur = []; out.push(cur); continue; }    // the header row itself is not data
+    cur.push(cells);
+  }
+  // A HEADER WITH NO ROWS UNDER IT IS STILL A TABLE, and dropping it would turn *this table has no
+  // row* into *this section is missing a table* — two different findings, and only one of them true.
+  return out;
+}
+
 function checkBinds(file: string, src: string, block: any, nodes: Set<string>): Finding[] {
   const f: Finding[] = [];
   if (block?.variant !== "construct") return f;
-  const i = src.search(/<h2[^>]*>\s*Binds\b/);
-  const j = src.search(/<h2[^>]*>\s*Proof\b/);
+  const i = sectionAt(file, src, "Binds");
+  const j = sectionAt(file, src, "Proof");
   if (i < 0) return f;
   const seg = src.slice(i, j > i ? j : undefined);
-  const tables = [...seg.matchAll(/<table>[\s\S]*?<\/table>/g)].map((m) => m[0]);
+  const tables = tablesIn(file, seg);
   if (tables.length < 2) {
     f.push({ check: "binds", grade: "RULE", file, message: `Binds carries ${tables.length} table${tables.length === 1 ? "" : "s"}; it is two — the rules that hold it, and where it lives today` });
     return f;
   }
-  const rows = [...tables[tables.length - 1].matchAll(/<tr>([\s\S]*?)<\/tr>/g)]
-    .map((m) => [...m[1].matchAll(/<td>([\s\S]*?)<\/td>/g)].map((c) => c[1]))
-    .filter((cells) => cells.length >= 4);
+  const rows = tables[tables.length - 1].filter((cells) => cells.length >= 4);
   if (!rows.length) {
     f.push({ check: "binds", grade: "RULE", file, message: "the `where it lives today` table has no row; every construct has at least one realization row (invariant 6)" });
     return f;
@@ -466,8 +505,8 @@ function checkBinds(file: string, src: string, block: any, nodes: Set<string>): 
           f.push({ check: "binds", grade: "RULE", file, message: `\`${block.status}\` is claimed and the \`Node\` cell \`${p}\` resolves to no node, plugin or repository. A verb, a command or a house word is none of the three — name the node here and put what it provides in \`what it realizes\` (RD.DOCS.066)` });
       }
     }
-    const proof = src.slice(j < 0 ? 0 : j);
-    if (j < 0 || !/<tr><td>/.test(proof))
+    const proofRows = j < 0 ? [] : tablesIn(file, src.slice(j)).flat();
+    if (j < 0 || !proofRows.length)
       f.push({ check: "binds", grade: "RULE", file, message: `\`${block.status}\` is claimed and \`Proof\` names no command anybody can run` });
   }
   if (known.length && known.every((s) => s.startsWith("done")) && block.status !== "DONE")
