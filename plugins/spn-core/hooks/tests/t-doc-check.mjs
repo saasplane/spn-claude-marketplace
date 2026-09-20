@@ -8,7 +8,7 @@ import { resolve } from "node:path";
 
 const HOOKS = resolve(import.meta.dirname, "..");
 const SCRIPTS = resolve(HOOKS, "scripts");
-const DOCS = resolve(HOOKS, "docs");
+const EVENTS = resolve(HOOKS, "events");
 
 // THESE SUITES ARE A BUILDER'S GATE, and they say so rather than pretending otherwise. Several cases
 // name real files in the surrounding workspace — a chapter, an approach page, this workstream's own
@@ -139,18 +139,18 @@ one("a Deferred card naming no trigger",
   "reports", "names no trigger");
 
 one("a register row that says you",
-  write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| RD.DOCS.099 | you may not do it |\n"),
+  write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| RD.EVENTS.099 | you may not do it |\n"),
   "reports", "says *you*");
 
 one("a register row past twenty-five words",
-  write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| RD.DOCS.099 | " +
+  write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| RD.EVENTS.099 | " +
     "A row states one clause a sentence and never more than that, and this particular row keeps " +
     "going well past the bar the chapter sets for it in every direction. |\n"),
   "reports", "a row states one clause a sentence");
 
 one("a register row that rules over another row",
-  write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| RD.DOCS.099 | Supersedes RD.DOCS.008 |\n"),
-  "reports", "rules over RD.DOCS.008");
+  write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| RD.EVENTS.099 | Supersedes RD.EVENTS.008 |\n"),
+  "reports", "rules over RD.EVENTS.008");
 
 // THIS ONE NEEDS A REAL NODE. The rule fires on a `CONCEPT.md` with an `spkind.json` beside it, and
 // the manifest is the workspace's, not something a fixture can stand in for. Run from a copy outside

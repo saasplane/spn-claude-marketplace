@@ -11,7 +11,7 @@ import { resolve } from "node:path";
 
 const HOOKS = resolve(import.meta.dirname, "..");
 const SCRIPTS = resolve(HOOKS, "scripts");
-const DOCS = resolve(HOOKS, "docs");
+const EVENTS = resolve(HOOKS, "events");
 
 // THESE SUITES ARE A BUILDER'S GATE, and they say so rather than pretending otherwise. Several cases
 // name real files in the surrounding workspace — a chapter, an approach page, this workstream's own
@@ -45,7 +45,7 @@ let n = 0, failed = 0;
 function compare(label, root, mustSay = [], mustNotSay = []) {
   n += 1;
   const py = hasPython("orientation.py") ? run("python3", [`${SCRIPTS}/orientation.py`, root], root) : null;
-  const ts = run("node", [`${HOOKS}/docs/orientation.ts`, root], root);
+  const ts = run("node", [`${HOOKS}/events/orientation.ts`, root], root);
   const identical = py === null || py === ts;
   const says = mustSay.every((s) => ts.includes(s));
   const quiet = mustNotSay.every((s) => !ts.includes(s));
@@ -162,13 +162,17 @@ if (IN_WORKSPACE) {
     catch (e) { return `ERROR ${e.stderr}`; }
   };
   const py = hasPython("orientation.py") ? one("python3", [`${SCRIPTS}/orientation.py`, "--stdin"]) : null;
-  const ts = one("node", [`${HOOKS}/docs/orientation.ts`, "--stdin"]);
+  const ts = one("node", [`${HOOKS}/events/orientation.ts`, "--stdin"]);
   // COMPARED AS PARSED OBJECTS, NOT AS TEXT. Python's json.dumps puts a space after each separator
   // and JSON.stringify does not, so the two strings differ while carrying identical content — and
   // the harness reads the parsed object, never the bytes.
   const same = (a, b) => JSON.stringify(JSON.parse(a)) === JSON.stringify(JSON.parse(b));
-  let ok = false;
-  try { ok = same(py, ts); } catch { ok = false; }
+  // THE PARITY ARM IS THE INCUMBENT, AND THE INCUMBENT IS GONE. `hasPython` already guarded the
+  // run; the comparison did not, so a null `py` threw inside `same` and the case read as a
+  // disagreement with something that is not there. With no Python to agree with, what the case
+  // still asserts is the half that outlives the port: the shape this hook must return.
+  let ok = py === null;
+  if (py !== null) { try { ok = same(py, ts); } catch { ok = false; } }
   let shape = false;
   try {
     const parsed = JSON.parse(ts);
@@ -179,7 +183,7 @@ if (IN_WORKSPACE) {
   } catch { shape = false; }
   ok = ok && shape;
   if (!ok) failed += 1;
-  console.log(`  ${ok ? "PASS" : "FAIL"}  --stdin returns one JSON object, identical to the Python\n        same content ${ok || "false"} · systemMessage plus the agent's extra line ${shape}`);
+  console.log(`  ${ok ? "PASS" : "FAIL"}  --stdin returns one JSON object${py === null ? "" : ", identical to the Python"}\n        ${py === null ? "no Python to compare — shape only" : `same content ${ok || "false"}`} · systemMessage plus the agent's extra line ${shape}`);
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

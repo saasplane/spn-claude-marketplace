@@ -12,7 +12,7 @@ import { resolve } from "node:path";
 
 const HOOKS = resolve(import.meta.dirname, "..");
 export const SCRIPTS = resolve(HOOKS, "scripts");
-export const EVENTS = resolve(HOOKS, "docs");
+export const EVENTS = resolve(HOOKS, "events");
 export const CHECKS = resolve(HOOKS, "checks");
 export const TOOLS = resolve(HOOKS, "tools");
 export const LIB = resolve(HOOKS, "lib");

@@ -394,6 +394,17 @@ function nodeIndex(workspace: string): Set<string> {
       try {
         const j = JSON.parse(readFileSync(p, "utf8"));
         for (const v of [j.name, j.code, j?.config?.name, basename(dirname(p))]) if (typeof v === "string" && v) names.add(v.toLowerCase());
+        // A GENERAL REPOSITORY HAS NO NODES, so a construct there is realized by a FOLDER. Its
+        // top-level source folders are indexed as realizations, because otherwise invariant 6 —
+        // every construct has at least one realization row — could never be satisfied in a
+        // repository the standard deliberately allows to have no nodes at all (`Q107`).
+        if (e === "sprepo.json" && j?.type === "GENERAL") {
+          const root = dirname(p);
+          for (const entry of readdirSync(root)) {
+            if (entry.startsWith(".") || ["docs", "node_modules", "dist"].includes(entry)) continue;
+            try { if (statSync(join(root, entry)).isDirectory()) names.add(entry.toLowerCase()); } catch { /* unreadable */ }
+          }
+        }
       } catch { /* a manifest that does not parse is another check's finding */ }
     }
   };
@@ -644,6 +655,12 @@ function buildDictionary(tree: string): { body: string; findings: Finding[] } {
 function buildMap(faceFile: string): { body: string; findings: Finding[] } {
   const findings: Finding[] = [];
   const dir = dirname(faceFile);
+  // WHERE THE SOURCE ROOT IS, READ FROM THE FACE RATHER THAN ASSUMED. A mirror is named for the
+  // folder it governs, and almost every node roots that at `src/`. A repository whose source is
+  // laid out differently — the marketplace, whose source is `plugins/<name>/` — declares its root
+  // on the face, and the Map then names a folder that exists instead of one that does not.
+  const { block: faceBlock } = readBlock(readFileSync(faceFile, "utf8"));
+  const root = (faceBlock?.governs ?? "src").replace(/\/+$/, "");
   const mirrors = walkFiles(dir, (p) => p.endsWith(".md") && basename(p) !== "README.md" && basename(p) !== "data-model.md")
     .sort((a, b) => a.localeCompare(b));
   const glyph: Record<string, string> = { DONE: "✅", IMPLEMENTING: "🚧", PLANNING: "🔮" };
@@ -653,7 +670,7 @@ function buildMap(faceFile: string): { body: string; findings: Finding[] } {
     const { block } = readBlock(readFileSync(m, "utf8"));
     if (!block) { findings.push({ check: "face", grade: "RULE", file: m, message: "a mirror with no `spn:doc` block cannot be put in the Map" }); continue; }
     // The mirror is named for the folder it governs, so the path is the derivation.
-    const governs = `src/${rel.replace(/\.md$/, "")}/`;
+    const governs = `${root}/${rel.replace(/\.md$/, "")}/`;
     lines.push(`| [${rel}](${rel}) | \`${governs}\` | ${block.summary} | ${glyph[block.status] ?? "🔮"} |`);
   }
   if (mirrors.length === 0) lines.push("| — | — | this layer carries no mirror yet | 🔮 |");

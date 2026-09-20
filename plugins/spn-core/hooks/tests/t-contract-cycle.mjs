@@ -10,7 +10,7 @@ import { resolve } from "node:path";
 
 const HOOKS = resolve(import.meta.dirname, "..");
 const SCRIPTS = resolve(HOOKS, "scripts");
-const DOCS = resolve(HOOKS, "docs");
+const EVENTS = resolve(HOOKS, "events");
 
 // THESE SUITES ARE A BUILDER'S GATE, and they say so rather than pretending otherwise. Several cases
 // name real files in the surrounding workspace — a chapter, an approach page, this workstream's own
