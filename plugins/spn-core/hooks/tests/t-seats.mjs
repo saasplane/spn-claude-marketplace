@@ -264,6 +264,41 @@ console.log("\n=== `figures check` takes a folder, the way `audit` does");
       has("clean — 1 page"));
 }
 
+console.log("\n=== a section is found by its whole name, not by its first word");
+{
+  const rows = "| Check | Kind | What a green run shows |\n| --- | --- | --- |\n| `spnutils apps test unit` | gate | green |\n";
+  one("`Proof — how you check it` is the Proof section",
+      run(repo({ "docs/02-constructs/01-core/01-boot.md":
+        seat("boot").replace("## Proof\n", "## Proof — how you check it\n").replace(/## Proof — how you check it\n\nWhat proves it\.\n\n\n/, `## Proof — how you check it\n\n${rows}`) }), ["audit", "docs"]),
+      lacks("carries a table of behaviour rows"));
+
+  // An overview's `Proof Tiers` is a different section that happens to share a first word. Read as
+  // Proof, its glossary rows were judged as proof rows — sixteen false findings on one page.
+  const typed = "| Id | Who | Does | Sees | Type | Tier | Status | Updated at |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n| CORE.BOOT.01 | A person | boots | it booted | POSITIVE | UNIT | SUCCESS | — |\n";
+  one("`Proof Tiers` is NOT the Proof section",
+      run(repo({ "docs/02-constructs/01-core/01-boot.md":
+        seat("boot").replace("## Proof\n\nWhat proves it.\n\n\n", `## Proof Tiers\n\n${typed}`) }), ["audit", "docs"]),
+      lacks("carries a table of behaviour rows"));
+  one("and a real Proof section is still judged",
+      run(repo({ "docs/02-constructs/01-core/01-boot.md":
+        seat("boot").replace("## Proof\n\nWhat proves it.\n\n\n", `## Proof\n\n${typed}`) }), ["audit", "docs"]),
+      has("carries a table of behaviour rows"));
+}
+
+console.log("\n=== a code figure names a PATH; a bare file name is a term");
+{
+  const withFig = (name) =>
+    "<!-- spn:doc\n" + JSON.stringify({ id: "c", variant: "construct", title: "C", lenses: ["ARCHITECT"], status: "DONE", summary: "s" }) + "\n-->\n\n" +
+    "# C\n\n`For: Architect` · `Status: ✅ DONE`\n\n" +
+    `<p>The manifest <code>${name}</code> declares it:</p>\n<pre>{ "kind": "MODULE_SERVER" }</pre>\n`;
+  one("a bare file name is not read as a path to open",
+      run(repo({ "docs/artifacts/constructs/01-core/a-construct.html": withFig("spkind.json") }), ["audit", "docs"]),
+      lacks("no such file exists"));
+  one("a real path that is not there is still a RULE",
+      run(repo({ "docs/artifacts/constructs/01-core/a-construct.html": withFig("packages/gone/spkind.json") }), ["audit", "docs"]),
+      has("a figure names `packages/gone/spkind.json`, and no such file exists"));
+}
+
 console.log("\n=== a topic name repeats across domains, and that is not drift");
 {
   // The foundation names `shape`, `ships`, `resources` and `operate` in two domains each. The

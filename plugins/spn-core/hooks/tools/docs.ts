@@ -410,6 +410,11 @@ function checkCodeFigures(file: string, src: string, root: string): Finding[] {
   // A pathed CODE figure names the file above it. The audit reads that file and compares.
   for (const m of src.matchAll(/<p>[^<]*<code>([^<]*?\.(?:ts|tsx|json|sql|md|py|sh|yml|yaml))<\/code>[^<]*<\/p>\s*<pre[^>]*>([\s\S]*?)<\/pre>/g)) {
     const [, path, body] = m;
+    // A PATHED FIGURE NAMES A PATH. A bare file name is a TERM — the book's whole job is to
+    // describe `spkind.json`, and refusing the chapter for not containing one gets it exactly
+    // backwards: a standard names the file a stack has, and has none of them itself. The rule's
+    // own sentence says *pathed*, and this read every mention of a file name as one.
+    if (!path.includes("/")) continue;
     const abs = resolve(root, path);
     if (!existsSync(abs)) {
       f.push({ check: "codefig", grade: "RULE", file, message: `a figure names \`${path}\`, and no such file exists` });
@@ -520,10 +525,18 @@ function nodeIndex(workspace: string): Set<string> {
  * anything. Every construct in the corpus had its Binds and Proof unchecked while the audit
  * reported clean. A check that cannot see its input does not fail loudly; it agrees with you.
  */
+/**
+ * A SECTION IS FOUND BY ITS WHOLE NAME, never by a prefix. `\\b` after the name matches any heading
+ * that STARTS with it, so an overview's *Proof Tiers* was read as the construct's *Proof* and its
+ * glossary rows were judged as proof rows — sixteen false findings on one page. A heading is
+ * `## Proof`, or `## Proof — how you check it` where an em dash separates a subtitle from the
+ * name; anything else is a different section that happens to share a first word.
+ */
 function sectionAt(file: string, src: string, name: string): number {
+  const tail = "(?=\\s*(?:$|—|&mdash;|</h2>))";
   return file.endsWith(".md")
-    ? outsideFences(src).search(new RegExp(`^##\\s+${name}\\b`, "m"))
-    : src.search(new RegExp(`<h2[^>]*>\\s*${name}\\b`));
+    ? outsideFences(src).search(new RegExp(`^##\\s+${name}${tail}`, "m"))
+    : src.search(new RegExp(`<h2[^>]*>\\s*${name}${tail}`));
 }
 
 /** Every table in a slice, as data rows of cells — header and separator dropped, both formats. */
