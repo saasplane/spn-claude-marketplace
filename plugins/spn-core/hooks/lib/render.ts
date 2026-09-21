@@ -27,17 +27,6 @@ const LENS_LABEL: Record<string, string> = {
 const STATUS_GLYPH: Record<string, string> = { DONE: "&#x2705;", IMPLEMENTING: "&#x1F6A7;", PLANNING: "&#x1F52E;" };
 
 /** The block a section declares, chosen the way the chapter's own order chooses it. */
-function blockOf(name: string, body: string): string {
-  const n = name.toLowerCase();
-  if (n === "terms" || n === "glossary") return "glossary";
-  if (n === "model") return "map";
-  if (n === "parts") return "reasons";
-  if (n === "boundary") return "must";
-  if (n === "relations" || n === "binds" || n === "proof") return "comparison";
-  if (/^\|/m.test(body)) return "comparison";
-  return "reasons";
-}
-
 const esc = (s: string) => s.replace(/&(?![a-zA-Z#][a-zA-Z0-9]*;)/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 /**
@@ -261,7 +250,14 @@ function renderPageBody(opts: Parameters<typeof renderPage>[0]): { html: string;
       const body = lines.slice(bounds[s] + 1, bounds[s + 1]);
       sections.push(
         `<!-- ${String(s).padStart(2, "0")} -->\n` +
-        `<section id="s${s}" data-block="${blockOf(name, body.join("\n"))}">\n` +
+        // NOTHING DECLARES *THE* BLOCK OF A SECTION, because a section rarely has one. The renderer
+        // stamped one anyway, guessed from the section's NAME — Model became `map`, Parts became
+        // `reasons`, anything with a table became `comparison` — which is the model the developer
+        // corrected: *blocks are not dictating usual paragraphs and text, blocks are basically have
+        // different visual appeal to differentiate from normal paragraphs list etc..* A block is a
+        // visually distinct insert a section may hold none, one or several of, so an attribute
+        // naming one per section was a claim the chapter denies (05-artifacts.md § The blocks).
+        `<section id="s${s}">\n` +
         // A number orders a file in a tree; a heading is a name. The section head carries no number
         // on the page and none in the rail (the developer's rule, 2026-09-21).
         `  <div class="sec-head"><h2>${inline(heading)}</h2></div>\n` +

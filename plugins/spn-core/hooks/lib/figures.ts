@@ -103,6 +103,15 @@ function onShape(p: Pt, shapes: Pt[][]): boolean {
 }
 
 /** A point sitting on a circle's circumference — a flowchart's on-page connector is one. */
+/** On the rim of an ellipse, within the same tolerance a box edge is judged by. */
+function onEllipse(p: Pt, ellipses: [number, number, number, number][]): boolean {
+  return ellipses.some(([cx, cy, rx, ry]) => {
+    if (rx <= 0 || ry <= 0) return false;
+    const dx = (p[0] - cx) / rx, dy = (p[1] - cy) / ry;
+    const r = Math.hypot(dx, dy);
+    return Math.abs(r - 1) * Math.min(rx, ry) <= JOIN_TOL;
+  });
+}
 function onCircle(p: Pt, circles: [number, number, number][]): boolean {
   for (const [cx, cy, r] of circles) if (Math.abs(Math.hypot(p[0] - cx, p[1] - cy) - r) <= BOX_TOL) return true;
   return false;
@@ -188,6 +197,11 @@ export function checkFigures(src: string): FigureFinding[] {
     }
     const circles: [number, number, number][] = [...svg.matchAll(/<circle[^>]*\scx="([\d.]+)"\s+cy="([\d.]+)"\s+r="([\d.]+)"/g)]
       .map((m) => [Number(m[1]), Number(m[2]), Number(m[3])]);
+    // AN ELLIPSE IS A SHAPE, and until now the check could not see one. A cylinder's cap and a pipe's
+    // end are drawn as ellipses, so a connector landing on the leftmost point of a queue was reported
+    // as ending in empty space — the drawer was right and the check was blind (N13, 2026-09-22).
+    const ellipses: [number, number, number, number][] = [...svg.matchAll(/<ellipse[^>]*\scx="([\d.]+)"\s+cy="([\d.]+)"\s+rx="([\d.]+)"\s+ry="([\d.]+)"/g)]
+      .map((m) => [Number(m[1]), Number(m[2]), Number(m[3]), Number(m[4])]);
 
     // A closed subpath is a SHAPE — a flowchart's decision diamond, a terminator — and a connector is
     // allowed to land on one, exactly as it lands on a `<rect>` edge.
@@ -233,7 +247,7 @@ export function checkFigures(src: string): FigureFinding[] {
       if (c.exempt) return;
       for (const [which, p] of [["start", c.pts[0]], ["end", c.pts[c.pts.length - 1]]] as [string, Pt][]) {
         if (onBox(p, rects)) continue;
-        if (onShape(p, shapes) || onCircle(p, circles)) continue;
+        if (onShape(p, shapes) || onCircle(p, circles) || onEllipse(p, ellipses)) continue;
         if (segs.some((s) => s.k !== k && distToSegment(p, s.a, s.b) <= JOIN_TOL)) continue;
         findings.push({ figure: n + 1, message: `a connector ${which}s in empty space at ${p[0]},${p[1]} — a connector is a claim that two things touch, so it lands on a box edge, on a shape, or on another connector` });
       }
@@ -264,12 +278,21 @@ export function checkFigures(src: string): FigureFinding[] {
       // the padding of the thing the line comes out of. Requiring 24 there would contradict the grid,
       // which fixes a container's padding at 16 — two rules of this chapter disagreeing, which is the
       // fault this whole arc keeps finding, so the narrower rule yields to the one the grid states.
-      const attached = rects.filter((r) => [seg.a, seg.b].some((p) => sideOfAny(p, r)));
+      // A CAP AND THE BODY IT CAPS ARE ONE SHAPE. A cylinder is a rect with an ellipse on its top
+      // edge and a queue is a rect with one on its left, so an arrow landing on the cap is landing on
+      // the thing — and measuring it against the body it just arrived at reported 13px of crowding
+      // where a connector had done exactly what it was told (N13, 2026-09-22).
+      const onCap = (p: Pt, r: Rect) => ellipses.some(([cx, cy, rx, ry]) =>
+        onEllipse(p, [[cx, cy, rx, ry]])
+        && cx >= r[0] - BOX_TOL && cx <= r[0] + r[2] + BOX_TOL
+        && cy >= r[1] - BOX_TOL && cy <= r[1] + r[3] + BOX_TOL);
+      const meets = (p: Pt, r: Rect) => sideOfAny(p, r) || onCap(p, r);
+      const attached = rects.filter((r) => [seg.a, seg.b].some((p) => meets(p, r)));
       const inside = (r: Rect) => attached.some((c) =>
         c !== r && r[0] >= c[0] && r[1] >= c[1] && r[0] + r[2] <= c[0] + c[2] && r[1] + r[3] <= c[1] + c[3]);
       for (const r of rects) {
         if (encloses(r) || inside(r)) continue;
-        const touches = [seg.a, seg.b].some((p) => sideOfAny(p, r));
+        const touches = [seg.a, seg.b].some((p) => meets(p, r));
         if (touches) continue;
         const d = distSegRect(seg.a, seg.b, r);
         if (d < LINE_CLEAR && (worstBox === null || d < worstBox)) worstBox = d;

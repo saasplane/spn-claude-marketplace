@@ -15,10 +15,32 @@
  * not decoration: a reader knows a decision from a step before reading either label, which is the
  * whole reason `FLOWCHART` is its own kind rather than a `MAP` with a diamond bolted on.
  */
-export type Shape = "process" | "terminator" | "decision" | "io" | "predefined" | "store" | "connector";
+export type Shape = "process" | "terminator" | "decision" | "io" | "predefined" | "store" | "connector"
+  | "window" | "chevron" | "pipe" | "bucket";
+
+/**
+ * A RESOURCE OUTSIDE A SYSTEM'S BOUNDARY CARRIES THE SHAPE OF WHAT IT IS (05-artifacts.md § SYSTEM,
+ * rule 4). Seven kinds, and each earns its place by being a different KIND of thing rather than a
+ * different colour of the same thing — you read what a box is before you read its name.
+ */
+export type Resource = "client" | "way-in" | "queue" | "store" | "cache" | "bucket" | "service";
+const RESOURCE: Record<Resource, { shape: Shape; soft?: boolean }> = {
+  client: { shape: "window" },
+  "way-in": { shape: "chevron" },
+  queue: { shape: "pipe" },
+  store: { shape: "store" },
+  cache: { shape: "store", soft: true },   // a cylinder you can afford to lose
+  bucket: { shape: "bucket" },
+  service: { shape: "process" },
+};
 export type Box = { id: string; label: string; note?: string; em?: boolean; off?: boolean; warn?: boolean; in?: string; shape?: Shape };
 export type Link = { from: string; to: string; label?: string; dashed?: boolean };
-export type Spec = { kind: string; boxes?: Box[]; links?: Link[]; caption?: string; title?: string };
+/** One band of a SYSTEM's boundary: a named layer, and the boxes inside it. */
+export type Layer = { name: string; boxes: Box[] };
+export type Spec = {
+  kind: string; boxes?: Box[]; links?: Link[]; caption?: string; title?: string;
+  layers?: Layer[]; outside?: (Box & { as?: Resource })[];
+};
 
 /** The measure the figure check uses, at the drawn scale. */
 const W_LABEL = 7, W_NOTE = 6.4, W_TITLE = 7.6;
@@ -351,6 +373,8 @@ const shapeOf = (b: Box): Shape => b.shape ?? "process";
 // The lean on a parallelogram, the bars on a predefined process, the cap on a cylinder, and the
 // radius of an on-page connector. Four numbers, each belonging to one shape and to nothing else.
 const SKEW = 16, BARS = 11, CAP = 13, DOT = 17;
+// A window's title bar, a chevron's point, and how far a bucket narrows towards its foot.
+const BAR = 22, POINT = 40, TAPER = 12;
 
 /**
  * TEXT IS CENTRED BY ARITHMETIC, NOT BY `text-anchor`. The figure check reads a `<text>` element's
@@ -375,6 +399,9 @@ function mapBoxWidth(b: Box): number {
     case "predefined": return base + BARS * 2;
     case "terminator": return base + 12;
     case "connector": return DOT * 2;
+    case "chevron": return base + POINT;
+    case "pipe": return base + CAP;
+    case "bucket": return base + TAPER * 2;
     default: return base;
   }
 }
@@ -388,6 +415,7 @@ function mapBoxHeight(b: Box): number {
     case "store": return base + CAP;
     case "terminator": return Math.max(base, 40);
     case "connector": return DOT * 2;
+    case "window": return base + BAR;
     default: return base;
   }
 }
@@ -431,6 +459,27 @@ function mapRect(b: Box, x: number, y: number, w: number, h: number): string {
     case "connector":
       body.push(`  <circle class="${cls}" cx="${cx}" cy="${cy}" r="${DOT}"/>`);
       break;
+    case "window":
+      // A client: a frame with a title bar. The bar is marked a curve so the figure check reads it
+      // as part of the picture rather than as a connector starting and ending on nothing.
+      body.push(`  <rect class="${cls}" x="${x}" y="${y}" width="${w}" height="${h}" rx="3"/>`,
+                `  <path class="c" data-role="curve" d="M${x} ${y + BAR} H${x + w}"/>`);
+      textTop = y + BAR + 24; textMid = y + BAR + (h - BAR) / 2 + 4; centre = false;
+      break;
+    case "chevron":
+      body.push(`  <path class="${cls}" d="M${x} ${y} H${x + w - POINT} L${x + w} ${cy} L${x + w - POINT} ${y + h} H${x} Z"/>`);
+      centre = false;
+      break;
+    case "pipe":
+      // A queue, lying on its side: the cap is at the end work enters, not on top.
+      body.push(`  <rect class="${cls}" x="${x + CAP}" y="${y}" width="${w - CAP}" height="${h}" rx="3"/>`,
+                `  <ellipse class="${cls}" cx="${x + CAP}" cy="${cy}" rx="${CAP}" ry="${h / 2}"/>`);
+      textTop = y + 26; textMid = cy + 4; centre = false;
+      break;
+    case "bucket":
+      body.push(`  <path class="${cls}" d="M${x} ${y} L${x + w} ${y} L${x + w - TAPER} ${y + h} L${x + TAPER} ${y + h} Z"/>`);
+      centre = false;
+      break;
     default:
       body.push(`  <rect class="${cls}" x="${x}" y="${y}" width="${w}" height="${h}" rx="3"/>`);
       centre = false;
@@ -473,6 +522,10 @@ function edgeX(b: Box, p: Placed, side: "left" | "right"): number {
   switch (shapeOf(b)) {
     case "io": return side === "left" ? p.x + SKEW / 2 : p.x + p.w - SKEW / 2;
     case "connector": return side === "left" ? cx - DOT : cx + DOT;
+    // A bucket narrows towards its foot, so at its own middle it is half a taper in on both sides.
+    case "bucket": return side === "left" ? p.x + TAPER / 2 : p.x + p.w - TAPER / 2;
+    // A pipe is entered at the tip of its cap, which is where work goes in.
+    case "pipe": return side === "left" ? p.x : p.x + p.w;
     default: return side === "left" ? p.x : p.x + p.w;
   }
 }
@@ -922,6 +975,358 @@ function drawMap(spec: Spec, opts: { downward?: boolean } = {}): { svg: string; 
 }
 
 /**
+ * SYSTEM — the architecture of a thing somebody builds, and the one kind that carries a server
+ * module, a web module and an estate package alike, because the three are the same shape: server
+ * runs entry → services → repositories → stores, web runs pages → hooks → services → client, an
+ * estate runs organization → account → network → resources (decision RD.DOCS.075).
+ *
+ * WHY IT IS A DRAWER RATHER THAN THREE RULES BOLTED ONTO THE MAP. The kind was specified fully and
+ * drawn by hand three times; placing ONE of those figures took more than twenty rounds against the
+ * figure check, and every fault was caught by a rule rather than by eye. A person cannot hold the
+ * spacing contract, the lane rules, the attachment points and the label clearances in their head at
+ * once, and should not have to (developer, 2026-09-21). So the spec names layers, the boxes inside
+ * them, the resources outside the boundary with the KIND of each, and the edges — and every
+ * coordinate is computed here.
+ *
+ * Three columns. What points INTO the system sits left, the system sits in the middle, what the
+ * system reaches sits right — the same rule `ENTITIES` uses, and for the same reason: with direction
+ * deciding the column, every outward edge runs one way and none of them crosses a label.
+ */
+function drawSystem(spec: Spec): { svg: string; findings: string[] } {
+  const findings: string[] = [];
+  const layers = spec.layers ?? [];
+  const outside = spec.outside ?? [];
+  const links = spec.links ?? [];
+  if (!layers.length) return { svg: "", findings: ["a `system` figure with no layers; a system is layers inside one boundary"] };
+
+  const inner = layers.flatMap((l) => l.boxes);
+  const byId = new Map<string, Box>([...inner, ...outside].map((b) => [b.id, b]));
+  const layerOf = new Map<string, number>();
+  layers.forEach((l, i) => l.boxes.forEach((b) => layerOf.set(b.id, i)));
+  const isOut = new Set(outside.map((b) => b.id));
+  for (const l of links) for (const end of [l.from, l.to])
+    if (!byId.has(end)) findings.push(`an edge names \`${end}\`, and no box has that id`);
+  // RULE 3 — an edge is a call or a flow of data and it carries what flows. An unlabelled line
+  // meaning *related* is the one thing this kind refuses, because *related* is what a reader was
+  // already assuming. Inside the boundary the layer order says it, so only outward edges are held.
+  for (const l of links)
+    if (!l.label && (isOut.has(l.from) || isOut.has(l.to)))
+      findings.push(`the edge \`${l.from}\` → \`${l.to}\` crosses the boundary with nothing on it; an edge carries what flows`);
+
+  // Which side of the boundary an outside thing belongs on: what points in sits left, what is
+  // reached sits right. A thing that does both is drawn on the left, where a loop closing back is
+  // easier to follow than a loop opening forward.
+  const reaches = new Set(links.filter((l) => !isOut.has(l.from) && isOut.has(l.to)).map((l) => l.to));
+  const feeds = new Set(links.filter((l) => isOut.has(l.from)).map((l) => l.from));
+  const left = outside.filter((b) => feeds.has(b.id));
+  const right = outside.filter((b) => !feeds.has(b.id) && reaches.has(b.id));
+  for (const b of outside)
+    if (!feeds.has(b.id) && !reaches.has(b.id))
+      findings.push(`\`${b.id}\` sits outside the boundary with no edge to it; anything drawn outside is something the system talks to`);
+
+  const shaped = (b: Box & { as?: Resource }): Box => b.shape ? b
+    : { ...b, shape: RESOURCE[b.as ?? "service"].shape, off: b.off ?? RESOURCE[b.as ?? "service"].soft };
+
+  const margin = 24, HEAD_MOD = 40, HEAD_LAYER = 36, PAD_IN = 16;
+  const innerW = Math.max(200, ...inner.map(mapBoxWidth));
+  const layerW = innerW + PAD_IN * 2, modW = layerW + PAD_IN * 2;
+
+  // The left side is itself a little chain — a client knocks on a door, the door calls the entry —
+  // so it lays out in columns by how far each box is from the boundary.
+  const depthOf = new Map<string, number>(left.map((b) => [b.id, 0]));
+  for (let pass = 0; pass < left.length; pass++)
+    for (const l of links)
+      if (depthOf.has(l.from) && depthOf.has(l.to))
+        depthOf.set(l.to, Math.max(depthOf.get(l.to)!, depthOf.get(l.from)! + 1));
+  const leftCols: (Box & { as?: Resource })[][] = [];
+  for (const b of left) (leftCols[depthOf.get(b.id) ?? 0] ??= []).push(b);
+  const leftW = leftCols.map((c) => Math.max(...c.map((b) => mapBoxWidth(shaped(b)))));
+  // A gap on the left holds the label of whatever is said across it, for the same reason.
+  const leftGap = leftCols.map((col) => {
+    const said = links.filter((l) => col.some((b) => b.id === l.from)).map((l) => (l.label ?? "").length * W_NOTE);
+    return Math.max(GAP_LINKED, Math.ceil(Math.max(0, ...said)) + 32);
+  });
+  const leftSpan = leftW.reduce((t, w, i) => t + w + leftGap[i], 0);
+  const rightW = right.length ? Math.max(...right.map((b) => mapBoxWidth(shaped(b)))) : 0;
+
+  const modX = margin + leftSpan;
+  // One corridor per outward edge, between the boundary and the right-hand column, GAP_APART apart.
+  const outEdges = links.filter((l) => !isOut.has(l.from) && reaches.has(l.to));
+  // The rail holds one corridor per outward edge AND the widest label said across it, because an
+  // outward edge's label sits on the run that lands in the right-hand column.
+  const outLabel = Math.max(0, ...outEdges.map((l) => (l.label ?? "").length * W_NOTE));
+  const railW = outEdges.length
+    ? Math.max(GAP_LINKED + GAP_APART * Math.max(0, outEdges.length - 1) + GAP_LINKED, Math.ceil(outLabel) + 32)
+    : GAP_LINKED;
+  const rightX = modX + modW + (right.length ? railW : 0);
+
+  // Vertical: the module first, since the outside boxes hang off what they connect to.
+  const at = new Map<string, { x: number; y: number; w: number; h: number }>();
+  const body: string[] = [];
+  const layerAt: { y: number; h: number }[] = [];
+  let y = margin + HEAD_MOD;
+  for (const layer of layers) {
+    const hs = layer.boxes.map(mapBoxHeight);
+    const lh = HEAD_LAYER + hs.reduce((t, h) => t + h, 0) + GAP_Y * (hs.length - 1) + PAD_IN;
+    layerAt.push({ y, h: lh });
+    let by = y + HEAD_LAYER;
+    layer.boxes.forEach((b, i) => { at.set(b.id, { x: modX + PAD_IN * 2, y: by, w: innerW, h: hs[i] }); by += hs[i] + GAP_Y; });
+    y += lh + GAP_LINKED;
+  }
+  const modH = y - GAP_LINKED + PAD_IN - margin;
+
+  // RULE 1 — one outermost container, and it is the thing being described.
+  body.push(`  <rect class="box off" x="${modX}" y="${margin}" width="${modW}" height="${modH}" rx="3" fill="none"/>`);
+  body.push(`  <text class="t" x="${modX + PAD_IN}" y="${margin + 26}">${esc(spec.title ?? "the system")}</text>`);
+  layers.forEach((layer, i) => {
+    const { y: ly, h: lh } = layerAt[i];
+    body.push(`  <rect class="box off" x="${modX + PAD_IN}" y="${ly}" width="${layerW}" height="${lh}" rx="3" fill="none"/>`);
+    body.push(`  <text class="t" x="${modX + PAD_IN * 2}" y="${ly + 24}">${esc(layer.name)}</text>`);
+    for (const b of layer.boxes) { const p = at.get(b.id)!; body.push(mapRect(b, p.x, p.y, p.w, p.h)); }
+  });
+
+  // RULE 2 — the layers run one way, the direction a call travels, and the arrow between them says so.
+  for (let i = 0; i + 1 < layers.length; i++) {
+    const a = layerAt[i], b = layerAt[i + 1];
+    body.push(`  <path class="c" d="M${modX + modW / 2} ${a.y + a.h} V${b.y}" marker-end="url(#ar)"/>`);
+  }
+
+  // An outside box is centred on what it connects to, then pushed down to keep the grid's own gap.
+  const settle = (boxes: (Box & { as?: Resource })[], want: (b: Box) => number, x: number, w: number) => {
+    const rows = boxes.map((b) => ({ b, h: mapBoxHeight(shaped(b)), y: want(b) }))
+      .sort((m, n) => m.y - n.y);
+    let floor = margin;
+    for (const r of rows) {
+      r.y = Math.max(r.y - r.h / 2, floor);
+      at.set(r.b.id, { x, y: r.y, w, h: r.h });
+      body.push(mapRect(shaped(r.b), x, r.y, w, r.h));
+      floor = r.y + r.h + GAP_Y;
+    }
+  };
+  const midOf = (id: string) => { const p = at.get(id); return p ? p.y + p.h / 2 : margin + modH / 2; };
+  let lx = margin;
+  leftCols.forEach((col, i) => {
+    settle(col, (b) => {
+      const onward = links.filter((l) => l.from === b.id).map((l) => l.to);
+      return onward.length ? onward.reduce((t, id) => t + midOf(id), 0) / onward.length : margin + modH / 2;
+    }, lx, leftW[i]);
+    lx += leftW[i] + leftGap[i];
+  });
+  settle(right, (b) => {
+    const back = links.filter((l) => l.to === b.id).map((l) => l.from);
+    return back.length ? back.reduce((t, id) => t + midOf(id), 0) / back.length : margin + modH / 2;
+  }, rightX, rightW);
+
+  // The edges. Inward runs land on the left of what they reach; outward runs leave the right of the
+  // box that owns them — which layer owns an edge is the claim the figure exists to make checkable.
+  const pending: Pending[] = [], verticals: Vert[] = [];
+
+  // A SIDE OFFERS THREE POINTS AND A LONE ARROW TAKES THE MIDDLE, on this kind as on every other.
+  // Two edges leaving one box both took its exact middle, so they ran side by side out of the
+  // boundary and the check read them as one line 7px thick. A shape's usable side is its own body:
+  // a cylinder's begins below its cap.
+  const leaving = new Map<string, number>(), arriving = new Map<string, number>();
+  for (const l of links) {
+    if (!at.has(l.from) || !at.has(l.to)) continue;
+    leaving.set(l.from, (leaving.get(l.from) ?? 0) + 1);
+    arriving.set(l.to, (arriving.get(l.to) ?? 0) + 1);
+  }
+  const span = (b: Box, p: { y: number; h: number }) =>
+    shapeOf(b) === "store" ? { start: p.y + CAP, len: p.h - CAP } : { start: p.y, len: p.h };
+
+  // TWO CONNECTORS MAY SHARE A POINT ONLY WHERE THEY PART AT ONCE. The map drawer lets a side's
+  // points be chosen by alignment, and two links taking the same one is fine there because each
+  // drops into a lane of its own within a few pixels. Here they do not: both edges leave the
+  // boundary and run RIGHT, so a shared point put them side by side for 88px and the check read
+  // them as one line 8px thick. On this kind a side's points are dealt out, one per edge, in the
+  // order the things at the other end sit — so the fan is a fan and its lines never touch.
+  const seat = new Map<Link, number>();
+  for (const [id, group] of new Map<string, Link[]>(
+    [...new Set(links.map((l) => l.from))].map((id) => [id, links.filter((l) => l.from === id && at.has(l.to))]))) {
+    if (!at.has(id)) continue;
+    group.sort((m, n) => at.get(m.to)!.y - at.get(n.to)!.y).forEach((l, i) => seat.set(l, i));
+  }
+  const arrive = new Map<Link, number>();
+  for (const [id, group] of new Map<string, Link[]>(
+    [...new Set(links.map((l) => l.to))].map((id) => [id, links.filter((l) => l.to === id && at.has(l.from))]))) {
+    if (!at.has(id)) continue;
+    group.sort((m, n) => at.get(m.from)!.y - at.get(n.from)!.y).forEach((l, i) => arrive.set(l, i));
+  }
+  const sideY = (b: Box, p: { y: number; h: number }, n: number, i: number) => {
+    const { start, len } = span(b, p);
+    const pts = sidePoints(start, len, n);
+    return pts[Math.min(i, pts.length - 1)];
+  };
+
+  // WHICH CORRIDOR AN OUTWARD EDGE TAKES IS CHOSEN, NOT COUNTED OFF — the same lesson the map
+  // drawer learned about lanes, met again one layer out. An edge leaves the boundary at its own seat,
+  // runs right to its corridor, drops, and runs right again into its resource. The FIRST run of one
+  // edge and the LAST run of another therefore share a stretch of x whenever the second corridor is
+  // the further out, and the contract's 24 has to hold between them. Ordering by where the resources
+  // sit is the obvious choice and it is wrong: it put a run into the cache 8px under a run out of
+  // services. So the order is searched and scored with the figure check's own rule, exhaustively up
+  // to six corridors and greedily beyond, and where nothing is clean the best is kept and reported.
+  const outward = links.filter((l) => isOut.has(l.to) && !isOut.has(l.from) && at.has(l.to) && at.has(l.from));
+  const railOf = new Map<Link, number>();
+  outward.forEach((l, i) => railOf.set(l, i));
+  if (outward.length > 1) {
+    const runsFor = (order: Link[]) => {
+      const segs: { k: Link; y: number; x1: number; x2: number }[] = [];
+      order.forEach((l, i) => {
+        const a = at.get(l.from)!, b = at.get(l.to)!;
+        const ba = shaped(byId.get(l.from) as Box & { as?: Resource });
+        const bb = shaped(byId.get(l.to) as Box & { as?: Resource });
+        const y1 = sideY(ba, a, leaving.get(l.from) ?? 1, seat.get(l) ?? 0);
+        const y2 = sideY(bb, b, arriving.get(l.to) ?? 1, arrive.get(l) ?? 0);
+        const via = modX + modW + GAP_LINKED + GAP_APART * i;
+        if (Math.abs(y1 - y2) < 1) segs.push({ k: l, y: y1, x1: edgeX(ba, { ...a, row: 0 }, "right"), x2: b.x });
+        else {
+          segs.push({ k: l, y: y1, x1: edgeX(ba, { ...a, row: 0 }, "right"), x2: via });
+          segs.push({ k: l, y: y2, x1: via, x2: b.x });
+        }
+      });
+      let bad = 0;
+      for (let i = 0; i < segs.length; i++) for (let j = i + 1; j < segs.length; j++) {
+        if (segs[i].k === segs[j].k) continue;
+        const apart = Math.abs(segs[i].y - segs[j].y);
+        if (apart < 0.5 || apart >= GAP_APART) continue;
+        if (Math.min(segs[i].x2, segs[j].x2) - Math.max(segs[i].x1, segs[j].x1) > LABEL_GAP) bad += 1;
+      }
+      return bad;
+    };
+    const permute = <T,>(xs: T[]): T[][] =>
+      xs.length <= 1 ? [xs] : xs.flatMap((x, i) => permute([...xs.slice(0, i), ...xs.slice(i + 1)]).map((r) => [x, ...r]));
+    let best = outward, score = runsFor(outward);
+    if (score) {
+      const tries = outward.length <= 6 ? permute(outward)
+        : [[...outward].sort((m, n) => at.get(m.to)!.y - at.get(n.to)!.y),
+           [...outward].sort((m, n) => at.get(n.to)!.y - at.get(m.to)!.y)];
+      for (const order of tries) {
+        const s2 = runsFor(order);
+        if (s2 < score) { best = order; score = s2; if (!score) break; }
+      }
+    }
+    best.forEach((l, i) => railOf.set(l, i));
+  }
+
+  for (const l of links) {
+    const a = at.get(l.from), b = at.get(l.to);
+    if (!a || !b) continue;
+    const ba = shaped(byId.get(l.from) as Box & { as?: Resource });
+    const bb = shaped(byId.get(l.to) as Box & { as?: Resource });
+    const dash = l.dashed ? ' stroke-dasharray="5 4"' : "";
+    const w = (l.label ?? "").length * W_NOTE;
+    // A CYLINDER'S MIDDLE IS THE MIDDLE OF ITS BODY, not of the box its cap is reserved in — the
+    // first draw put the only arrow into a database 7px off its own centre, twice, which is the
+    // same half-a-shape mistake the map drawer had in its rows.
+    const x1 = edgeX(ba, { ...a, row: 0 }, "right"), x2 = edgeX(bb, { ...b, row: 0 }, "left");
+    const y1 = sideY(ba, a, leaving.get(l.from) ?? 1, seat.get(l) ?? 0);
+    const y2 = sideY(bb, b, arriving.get(l.to) ?? 1, arrive.get(l) ?? 0);
+    let d: string, lx2: number, ly2: number;
+    if (isOut.has(l.to) && !isOut.has(l.from)) {
+      // Out of the boundary, down its own corridor, into the resource. The label rides the last run,
+      // which is the one stretch of the route that is outside every container on the page — a label
+      // left inside the module reads as belonging to the module, and the check measures it against
+      // the boundary it sits in and calls it an overrun, which it is.
+      const via = modX + modW + GAP_LINKED + GAP_APART * (railOf.get(l) ?? 0);
+      d = Math.abs(y1 - y2) < 1 ? `M${x1} ${y1} H${x2}` : `M${x1} ${y1} H${via} V${y2} H${x2}`;
+      const from = Math.abs(y1 - y2) < 1 ? modX + modW : via;
+      lx2 = from + (x2 - from - w) / 2; ly2 = y2 - LABEL_GAP;
+    } else {
+      // Inward, or between two things outside. The label sits above the run, before the boundary.
+      d = Math.abs(y1 - y2) < 1 ? `M${x1} ${y1} H${x2}` : `M${x1} ${y1} V${y2} H${x2}`;
+      const stop = isOut.has(l.to) ? x2 : modX;
+      lx2 = x1 + (stop - x1 - w) / 2; ly2 = Math.min(y1, y2) - LABEL_GAP;
+    }
+    body.push(`  <path class="c" d="${d}"${dash} marker-end="url(#ar)"/>`);
+    verticals.push(...vertsOf(d));
+    if (l.label) pending.push({ x: Math.round(lx2), y: Math.round(ly2), w, txt: l.label });
+  }
+  body.push(...placeLabels(pending, verticals, margin, rightX + rightW + margin));
+
+  return { svg: svgOf(body, spec.title ?? spec.caption ?? "system diagram"), findings };
+}
+
+/**
+ * SEQUENCE — a process with more than one participant, where WHO SPEAKS TO WHOM is the thing to see.
+ * One lifeline per participant, time running down, one arrow per message carrying its own label, and
+ * a dashed arrow for a reply (05-artifacts.md § The figures).
+ *
+ * **A lifeline runs on past the last message.** The developer, on the handoff figure: *for seq flow
+ * diagram can we have particpant vertical line grow extra*. A lifeline is the participant's existence
+ * through time and the messages are events on it, so one stopping dead at the final arrow says the
+ * parties ceased to exist at the last word spoken.
+ *
+ * A lifeline is marked `lifeline`, which the figure check reads as background rather than as a claim:
+ * it is exempt from the shaft, the clearance and the parallel-run rules, and a message landing on one
+ * still counts as landing on something, because a connector may end on another connector.
+ */
+function drawSequence(spec: Spec): { svg: string; findings: string[] } {
+  const findings: string[] = [];
+  const parts = spec.boxes ?? [];
+  const msgs = spec.links ?? [];
+  if (!parts.length) return { svg: "", findings: ["a `dg` figure with no boxes"] };
+
+  const idx = new Map(parts.map((b, i) => [b.id, i]));
+  for (const m of msgs) for (const end of [m.from, m.to])
+    if (!idx.has(end)) findings.push(`a message names \`${end}\`, and no participant has that id`);
+  const known = msgs.filter((m) => idx.has(m.from) && idx.has(m.to));
+  for (const m of known) if (!m.label)
+    findings.push(`the message \`${m.from}\` → \`${m.to}\` carries no label; a sequence shows who says WHAT to whom`);
+
+  const margin = 24;
+  // One pitch per message. A label sits LABEL_GAP above its own arrow and owes the same to the arrow
+  // above it, so the pitch is that gap twice plus the line itself — the same arithmetic a lane uses.
+  const HEAD_H = 44, PITCH = LABEL_H + LABEL_GAP * 3, TAIL = 36, SELF_W = 44, SELF_H = 22;
+
+  const ws = parts.map((b) => Math.max(120, Math.ceil(b.label.length * W_LABEL + PAD_X * 2)));
+  // A COLUMN GAP GROWS TO HOLD THE WIDEST THING SAID ACROSS IT. A message's label is centred on its
+  // own arrow, so a long one on a short arrow sprawls over the lifelines either side of it.
+  const gaps = parts.slice(0, -1).map((_, i) => {
+    const across = known.filter((m) => {
+      const a = idx.get(m.from)!, b = idx.get(m.to)!;
+      return Math.min(a, b) === i && Math.max(a, b) === i + 1;
+    });
+    const widest = Math.max(0, ...across.map((m) => (m.label ?? "").length * W_NOTE));
+    return Math.max(GAP_COL, Math.ceil(widest + 24 - (ws[i] + ws[i + 1]) / 2));
+  });
+
+  const out: string[] = [];
+  const xs: number[] = [];
+  let x = margin;
+  parts.forEach((b, i) => {
+    xs.push(x + ws[i] / 2);
+    out.push(`  <rect class="${boxClass(b)}" x="${x}" y="${margin}" width="${ws[i]}" height="${HEAD_H}" rx="3"/>`);
+    out.push(centred("l", b.label, x + ws[i] / 2, margin + HEAD_H / 2 + 4));
+    x += ws[i] + (gaps[i] ?? 0);
+  });
+
+  let y = margin + HEAD_H + PITCH;
+  for (const m of known) {
+    const a = xs[idx.get(m.from)!], b = xs[idx.get(m.to)!];
+    const dash = m.dashed ? ' stroke-dasharray="5 4"' : "";
+    if (m.from === m.to) {
+      // A PARTICIPANT SPEAKING TO ITSELF is a loop off its own lifeline and back, because an arrow
+      // from a line to the same line has nowhere to be and no length a reader could see.
+      out.push(`  <path class="c" d="M${a} ${y} H${a + SELF_W} V${y + SELF_H} H${a}"${dash} marker-end="url(#ar)"/>`);
+      if (m.label) out.push(`  <text class="n" x="${Math.round(a + SELF_W + LABEL_GAP)}" y="${y + SELF_H / 2 + 4}">${esc(m.label)}</text>`);
+      y += SELF_H + PITCH;
+      continue;
+    }
+    out.push(`  <path class="c" d="M${a} ${y} H${b}"${dash} marker-end="url(#ar)"/>`);
+    if (m.label) out.push(centred("n", m.label, (a + b) / 2, y - LABEL_GAP));
+    y += PITCH;
+  }
+
+  // The lifelines are drawn last so they run the full height, and they run on past the last message.
+  const foot = y - PITCH + TAIL;
+  parts.forEach((_, i) => out.push(
+    `  <path class="c lifeline" d="M${xs[i]} ${margin + HEAD_H} V${foot}" stroke-dasharray="3 5"/>`));
+
+  return { svg: svgOf(out, spec.title ?? spec.caption ?? "sequence diagram"), findings };
+}
+
+/**
  * FLOWCHART — the path somebody or something takes, and where it turns. It is laid out on the map's
  * own geometry, because rows-by-depth is what a flowchart already is; what the kind adds is the
  * standard shape vocabulary and the rule that the path runs DOWN the page.
@@ -959,16 +1364,32 @@ const DRAWERS: Record<string, (s: Spec) => { svg: string; findings: string[] }> 
   entities: drawEntities,
   chain: drawChain,
   flowchart: drawFlowchart,
-  // A flow declares links, and links decide rows: the map drawer lays it out, and a one-way path
-  // through every box is drawn as a straight line, horizontal when it fits, vertical when not.
-  flow: drawMap,
+  sequence: drawSequence,
+  system: drawSystem,
   map: drawMap,
+};
+
+/**
+ * `flow` IS RETIRED, and the refusal is where the distinction gets taught (Q136 A, 2026-09-22).
+ * It was registered as an alias of the map drawer before `FLOWCHART` existed, so a figure asking for
+ * a flow was laid out as boxes and arrows with no shapes at all — and the book's figure table never
+ * named a `FLOW`. A drawer that accepts a kind the book does not have is the same defect as a
+ * capability folder with no construct twin, which is the check this very step adds.
+ *
+ * A retired kind is worth more than an unknown one, because the two it might have meant are exactly
+ * the pair the chapter asks a reader to read twice: a map answers *what is this made of*, a
+ * flowchart answers *what happens, and where does it turn*.
+ */
+const RETIRED: Record<string, string> = {
+  flow: "`flow` is retired. Use `map` when the figure is the PARTS of one thing and how they touch, or `flowchart` when it is a PATH somebody takes and where it turns — a flowchart has the standard shapes because a decision is not a step, and a map has none because its boxes are all the same kind of thing (05-artifacts.md, The figures)",
 };
 
 export const KINDS = Object.keys(DRAWERS);
 
 export function draw(spec: Spec): { svg: string; findings: string[] } {
-  const drawer = DRAWERS[(spec.kind ?? "").toLowerCase()];
+  const kind = (spec.kind ?? "").toLowerCase();
+  if (RETIRED[kind]) return { svg: "", findings: [RETIRED[kind]] };
+  const drawer = DRAWERS[kind];
   if (!drawer)
     return { svg: "", findings: [`no helper draws a \`${spec.kind}\` figure. The helpers are ${KINDS.join(" · ")}; author this one as SVG in an HTML block in the seat file and it is used verbatim (05-artifacts.md, The figures)`] };
   return drawer(spec);

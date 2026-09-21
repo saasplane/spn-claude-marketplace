@@ -41,8 +41,8 @@ const FIGURES = {
     kind: "map", boxes: [{ id: "a", label: "Ground", note: "the company brings" }, { id: "b", label: "Estate", note: "SaaS Plane creates" }, { id: "c", label: "Deployments", note: "the apps deliver" }],
     links: [{ from: "a", to: "b", label: "derives" }, { from: "b", to: "c", label: "runs" }],
   },
-  "flow — a branch keeps every link, laid in rows": {
-    kind: "flow", boxes: [{ id: "a", label: "Judge" }, { id: "b", label: "Pass" }, { id: "c", label: "One more step" }, { id: "d", label: "Refuse" }],
+  "map — a branch keeps every link, laid in rows": {
+    kind: "map", boxes: [{ id: "a", label: "Judge" }, { id: "b", label: "Pass" }, { id: "c", label: "One more step" }, { id: "d", label: "Refuse" }],
     links: [{ from: "a", to: "b" }, { from: "a", to: "c" }, { from: "a", to: "d" }, { from: "c", to: "b" }] },
   "chain — too wide for the canvas stands up as a vertical line": {
     kind: "chain", boxes: "12345678".split("").map((n) => ({ id: "s" + n, label: "A long step name number " + n, note: "with a note that widens the box further" })) },
@@ -74,7 +74,7 @@ for (const [name, spec] of Object.entries(FIGURES)) {
   const flat = judge(FIGURES["map — a one-way chain that fits is one horizontal line"]).svg;
   one("a chain that fits has every box on one y", flat, (g) => new Set([...g.matchAll(/<rect[^>]* y="([\d.]+)"/g)].map((m) => m[1])).size === 1);
   one("and every link is a single horizontal segment", flat, (g) => [...g.matchAll(/<path class="c" d="([^"]+)"/g)].every((m) => /^M[\d.]+ [\d.]+ H[\d.]+$/.test(m[1])));
-  const branch = judge(FIGURES["flow — a branch keeps every link, laid in rows"]).svg;
+  const branch = judge(FIGURES["map — a branch keeps every link, laid in rows"]).svg;
   one("a flow with a branch draws all four links", branch, (g) => (g.match(/marker-end/g) ?? []).length === 4);
   one("and its boxes sit in more than one row", branch, (g) => new Set([...g.matchAll(/<rect[^>]* y="([\d.]+)"/g)].map((m) => m[1])).size > 1);
   const wide = judge(FIGURES["chain — too wide for the canvas stands up as a vertical line"]).svg;
@@ -92,6 +92,13 @@ for (const [name, spec] of Object.entries(FIGURES)) {
 
 console.log("\n=== the map drawer says what it cannot do, rather than drawing something wrong");
 one("`map` is a kind the book names, and a helper draws it", KINDS, (k) => k.includes("map"));
+// `flow` was an alias of the map drawer from before FLOWCHART existed, and the book's figure table
+// never named it. A drawer that accepts a kind the book does not have is the defect this step is
+// adding a check to refuse, so it refuses itself first (Q136 A, 2026-09-22).
+one("`flow` is retired rather than quietly aliased", KINDS, (k) => !k.includes("flow"));
+one("and asking for one names BOTH kinds it might have meant",
+  draw({ kind: "flow", boxes: [{ id: "a", label: "A" }] }).findings,
+  (g) => JSON.stringify(g).includes("`map`") && JSON.stringify(g).includes("`flowchart`") && JSON.stringify(g).includes("retired"));
 one("a figure with no boxes is a finding, not an empty canvas",
   draw({ kind: "map", boxes: [] }).findings, says("no boxes"));
 one("a link naming a box that does not exist is a finding",
@@ -235,6 +242,93 @@ console.log("\n=== a figure hugs its own content");
     one(`${short} — the viewBox holds everything drawn`, [x0 <= left + 0.5, right <= x0 + w + 0.5], (v) => v.every(Boolean));
     one(`${short} — and carries no more than 12px of air beside it`, [left - x0, x0 + w - right], (v) => v.every((g) => g <= 12));
   }
+}
+
+console.log("\n=== SYSTEM — one drawer for server, web and estate");
+{
+  const PRJ = { kind: "system", title: "modules/project",
+    layers: [
+      { name: "Entry", boxes: [{ id: "api", label: "api — controllers" }] },
+      { name: "App", boxes: [{ id: "svc", label: "services", note: "entities and utils sit beside", em: true }, { id: "repo", label: "repositories" }] },
+      { name: "Contract", boxes: [{ id: "ct", label: "states and commands" }] }],
+    outside: [
+      { id: "client", label: "A client", note: "outside the service", as: "client" },
+      { id: "door", label: "HTTP router", note: "the way in", as: "way-in" },
+      { id: "sib", label: "Sibling modules", note: "iam and ent", as: "service" },
+      { id: "cache", label: "Cache", note: "built and purged", as: "cache" },
+      { id: "calls", label: "iam and ent", note: "called, not imported", as: "service" },
+      { id: "db", label: "Database", note: "through typeorm", as: "store" }],
+    links: [
+      { from: "client", to: "door", label: "arrives" }, { from: "door", to: "api", label: "calls" },
+      { from: "sib", to: "ct", label: "import the contract" }, { from: "svc", to: "cache", label: "caches" },
+      { from: "svc", to: "calls", label: "calls" }, { from: "repo", to: "db", label: "rows" }] };
+  // The same figure the hand-drawn sample took more than twenty rounds against the check to place.
+  const r = judge(PRJ);
+  one("the project module draws without a finding", r.findings, none);
+  one("and the figure check passes what it drew", r.figure, none);
+  one("`system` is a kind the book names, and a helper draws it", KINDS, (k) => k.includes("system"));
+  one("there is one outermost container, and it is the thing described",
+    r.svg, (g) => g.includes(`>modules/project<`));
+  one("a store is drawn as a cylinder", r.svg, (g) => /<ellipse class="box"/.test(g));
+  one("a client is drawn as a window — a frame with a title bar",
+    r.svg, (g) => /data-role="curve"/.test(g));
+  one("a way in is drawn as a chevron", r.svg, (g) => /<path class="box" d="M[\d.]+ [\d.]+ H[\d.]+ L[\d.]+ [\d.]+ L[\d.]+ [\d.]+ H[\d.]+ Z"/.test(g));
+  one("the layers are joined one way, in the direction a call travels",
+    r.svg, (g) => (g.match(/<path class="c" d="M[\d.]+ [\d.]+ V[\d.]+" marker-end/g) ?? []).length === 2);
+
+  // WEB AND ESTATE ARE THE SAME SHAPE, which is the claim the kind makes rather than an illustration
+  // of it. Both were drawn from their own source and both found faults the server figure had not.
+  const WEB = { kind: "system", title: "apps/web-account",
+    layers: [{ name: "Pages", boxes: [{ id: "pg", label: "routes and pages" }] },
+      { name: "App", boxes: [{ id: "hk", label: "hooks", note: "one per capability", em: true }, { id: "cl", label: "the generated client" }] },
+      { name: "Config", boxes: [{ id: "cf", label: "the environment it is served with" }] }],
+    outside: [{ id: "br", label: "A browser", note: "the person using it", as: "client" },
+      { id: "cdn", label: "The CDN", note: "serves the bundle", as: "way-in" },
+      { id: "api", label: "platform-api", note: "over https", as: "service" },
+      { id: "blob", label: "Uploads", note: "signed put", as: "bucket" }],
+    links: [{ from: "br", to: "cdn", label: "opens" }, { from: "cdn", to: "pg", label: "serves" },
+      { from: "cl", to: "api", label: "calls" }, { from: "hk", to: "blob", label: "uploads" }] };
+  const EST = { kind: "system", title: "infra-platform-dmo",
+    layers: [{ name: "Organization", boxes: [{ id: "org", label: "the cloud organization" }] },
+      { name: "Account", boxes: [{ id: "acc", label: "one account per environment", em: true }, { id: "net", label: "network and subnets" }] },
+      { name: "Declaration", boxes: [{ id: "dec", label: "spinfrapkg.json" }] }],
+    outside: [{ id: "cli", label: "spnutils", note: "the only door", as: "way-in" },
+      { id: "st", label: "State store", note: "one key per layer", as: "store" },
+      { id: "reg", label: "Registry", note: "published packages", as: "bucket" },
+      { id: "q", label: "Deploy queue", note: "one trigger per app", as: "queue" }],
+    links: [{ from: "cli", to: "dec", label: "reads" }, { from: "acc", to: "st", label: "writes state" },
+      { from: "org", to: "reg", label: "pulls modules" }, { from: "net", to: "q", label: "signals" }] };
+  for (const [what, spec] of [["a web module", WEB], ["an estate package", EST]]) {
+    const g = judge(spec);
+    one(`${what} draws on the same geometry, without a finding`, g.findings, none);
+    one(`${what} — and the figure check passes it`, g.figure, none);
+  }
+
+  one("an edge crossing the boundary with nothing on it is a finding",
+    draw({ ...PRJ, links: PRJ.links.map((l) => (l.label === "rows" ? { from: l.from, to: l.to } : l)) }).findings,
+    says("crosses the boundary with nothing on it"));
+  one("a box outside the boundary with no edge to it is a finding",
+    draw({ ...PRJ, outside: [...PRJ.outside, { id: "lost", label: "Nothing points here", as: "service" }] }).findings,
+    says("sits outside the boundary with no edge"));
+  one("a system with no layers says so rather than drawing an empty boundary",
+    draw({ kind: "system", title: "x" }).findings, says("a system is layers inside one boundary"));
+}
+
+console.log("\n=== the figure check learned about ellipses, and is still able to fail");
+{
+  // VERIFY THE VERIFIER. Two rules were relaxed so a connector could land on a cylinder's cap and on
+  // a queue's end. A relaxed rule that can no longer fail is worse than the fault it was hiding, so
+  // each is shown a figure that genuinely breaks it.
+  const wrap = (body) => `<svg class="dg" viewBox="0 0 400 200" role="img" aria-label="x">${body}</svg>`;
+  const cyl = `<rect class="box" x="40" y="60" width="120" height="60" rx="3"/><ellipse class="box" cx="100" cy="60" rx="60" ry="13"/>`;
+  one("a connector landing on a cylinder's cap is accepted",
+    checkFigures(wrap(`${cyl}<rect class="box" x="240" y="60" width="100" height="60" rx="3"/><path class="c" d="M240 90 H160"/>`)), none);
+  one("but one stopping in the air beside the cap is still reported",
+    checkFigures(wrap(`${cyl}<rect class="box" x="240" y="60" width="100" height="60" rx="3"/><path class="c" d="M240 30 H185"/>`)),
+    says("empty space"));
+  one("and a line crowding a cylinder it never touches is still reported",
+    checkFigures(wrap(`${cyl}<rect class="box" x="240" y="60" width="100" height="60" rx="3"/><path class="c" d="M240 132 H40"/>`)),
+    says("clear air to every shape it merely goes by"));
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
