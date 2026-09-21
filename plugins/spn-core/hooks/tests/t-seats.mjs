@@ -5,15 +5,15 @@
 // version of `topics` taught that lesson the expensive way — it returned early when the constructs
 // seat named no numbered topic, so it reported CLEAN over seven repositories while comparing every
 // numbered behaviours file against an empty set. The regression case below is that exact tree.
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, existsSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, rmSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
 
 const TOOL = resolve(import.meta.dirname, "..", "tools", "docs.ts");
 const TEMPLATES = resolve(import.meta.dirname, "..", "..", "..", "..", "..",
-                          "spn-foundation", "docs", "04-capabilities", "01-foundation",
-                          "02-docs", "templates");
+                          "spn-foundation", "docs", "04-capabilities", "01-devex",
+                          "04-workspace", "04-docs", "templates");
 const BASE = mkdtempSync(join(tmpdir(), "t-seats-"));
 process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
 
@@ -172,6 +172,22 @@ console.log("\n=== the produced page joins the register's rows; the seat file ne
   one("the seat file on disk is untouched by the join",
       readAt(ws, "docs/02-constructs/01-core/01-boot.md"), before);
   one("an exact register is joined with no finding", out, lacks("SOFT proof"));
+
+  // THE TWO HALVES MUST AGREE ABOUT WHAT THE PAGE IS. `checkProduced` re-rendered the bare seat
+  // while `page` renders it with the rows spliced in, so a page `page` had just written reported
+  // as hand-edited — 16 of 21 in the first repository to get behaviour files beside its
+  // constructs, and it would have fired in every one of them.
+  one("a page `page` just wrote does not audit as hand-edited", run(ws, ["audit", "docs"]),
+      lacks("this page is not what `docs.ts page` produces"));
+  one("and a page that really was hand-edited still is", (() => {
+        // The produced page is found rather than named: the renderer decides the file name, and a
+        // test that hard-codes it fails for the wrong reason the day that changes.
+        const dir = join(ws, "docs/artifacts/constructs/01-core");
+        const f = join(dir, readdirSync(dir).find((x) => x.endsWith(".html")));
+        writeFileSync(f, `${readFileSync(f, "utf8")}\n<p>typed in by hand</p>\n`, "utf8");
+        return run(ws, ["audit", "docs"]);
+      })(),
+      has("this page is not what `docs.ts page` produces"));
 
   // The corpus mid-move: one register per domain, and every topic joining from it.
   const ws2 = repo({

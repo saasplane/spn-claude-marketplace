@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: spn-foundation docs/04-capabilities/01-foundation/02-docs/03-tree.md · 05-artifacts.md · 02-document.md
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md · 05-artifacts.md · 02-document.md
 // This file carries rules it does not own. Those chapters are the source of truth. A rule change is
 // edited there first, then here, in the same change. restates.py reports this copy when a source moves.
 //
@@ -668,7 +668,12 @@ function checkProduced(file: string, src: string, block: any, workspace: string,
   try {
     html = renderPage({
       block: sb,
-      markdown: seatSrc.replace(/<!--\s*spn:doc[\s\S]*?-->\n?/, ""),
+      // THE SAME MARKDOWN `page` RENDERS, JOIN AND ALL. This re-rendered the bare seat file while
+      // `page` renders it with the behaviour rows spliced into Proof, so every page carrying a
+      // joined row read as hand-edited the moment it was written — 16 of 21 in the first
+      // repository to get behaviour files beside its constructs, and it would have fired in every
+      // one of them. Two halves of one tool disagreeing about what the page IS.
+      markdown: joinProof(seat, seatSrc.replace(/<!--\s*spn:doc[\s\S]*?-->\n?/, ""), workspace).md,
       workspace: process.env.SPN_ORG ?? "SaaS Plane",
       location: process.env.SPN_LOCATION ?? locationOf(seat, workspace),
       furniture: furniture(templates),
@@ -1465,13 +1470,24 @@ function topicsCheck(repo: string): Finding[] {
       f.push({ check: "topics", grade: "RULE", file, message: `\`${name}\` sits under \`${here}\` here and under ${[...domains].map((d) => `\`${d}\``).join(" · ")} in the constructs seat — a topic keeps one domain, and the same number, in all three seats` });
   }
 
-  // In capabilities a chapter sits inside its package folder, so the domain is its GRANDPARENT.
+  // THE CAPABILITIES SEAT HAS TWO SHAPES AND BOTH ARE RIGHT. In a built repository a topic is one
+  // chapter inside each package that realizes the construct, so the FILE carries the topic's name.
+  // In this book a topic is a FOLDER of chapters, numbered inside it — `05-app/01-config.md` — so
+  // the folder carries it and the file's own number is a reading order within the topic. Judging
+  // every numbered file by its own name reported 80 perfectly correct chapters of the book as
+  // topics nobody had declared.
   const caps = join(repo, "docs", "04-capabilities");
   for (const file of existsSync(caps) ? walkFiles(caps, (x) => x.endsWith(".md")) : []) {
     const name = topicName(file);
     if (name === null) continue;
-    if (!named.has(name))
-      f.push({ check: "topics", grade: "RULE", file, message: `\`${name}\` is a numbered chapter of the capabilities seat and \`02-constructs/\` names no such construct — a chapter realizes a construct or it is not a chapter (Q130)` });
+    // The topic folder is not at a fixed depth: the book nests a runtime split inside it
+    // (`05-app/01-server/01-lifecycle.md`), so the topic is the grandparent there and the parent
+    // elsewhere. Walk up to the seat and accept the first ancestor that names a construct —
+    // guessing the depth reported 38 correct chapters as topics nobody had declared.
+    const ancestors = relative(caps, dirname(file)).split(/[\\/]/).filter(Boolean);
+    const viaFolder = ancestors.some((a) => /^\d\d-/.test(a) && named.has(a.replace(/^\d\d-/, "")));
+    if (!named.has(name) && !viaFolder)
+      f.push({ check: "topics", grade: "RULE", file, message: `\`${name}\` is a numbered chapter of the capabilities seat, and neither it nor the topic folder it sits in is a construct \`02-constructs/\` names — a chapter realizes a construct or it is not a chapter (Q130)` });
   }
   return f;
 }
@@ -1757,7 +1773,7 @@ function audit(paths: string[], workspace: string): Finding[] {
   const blocks = new Map<string, any>();
   const nodes = nodeIndex(workspace);
   const templates = process.env.SPN_TEMPLATES
-    ?? join(workspace, "spn-foundation", "docs", "04-capabilities", "01-foundation", "02-docs", "templates");
+    ?? join(workspace, "spn-foundation", "docs", "04-capabilities", "01-devex", "04-workspace", "04-docs", "templates");
   for (const p of paths) {
     const src = readFileSync(p, "utf8");
     const { block, error } = readBlock(src);
@@ -1885,7 +1901,7 @@ if (cmd === "status") {
 
 if (cmd === "page") {
   const templates = process.env.SPN_TEMPLATES
-    ?? join(resolve(workspace), "spn-foundation", "docs", "04-capabilities", "01-foundation", "02-docs", "templates");
+    ?? join(resolve(workspace), "spn-foundation", "docs", "04-capabilities", "01-devex", "04-workspace", "04-docs", "templates");
   const check = rest.includes("--check");
   const seats = seatPaths(rest);
   const f = seats.flatMap((p) => pageFor(p, resolve(workspace), templates, !check));

@@ -643,8 +643,8 @@ console.log("\n=== the gap scan measures and never fixes");
     });
     // `page` needs the real construct template for its furniture; the throwaway repo has none.
     const templates = resolve(import.meta.dirname, "..", "..", "..", "..", "..",
-                              "spn-foundation", "docs", "04-capabilities", "01-foundation",
-                              "02-docs", "templates");
+                              "spn-foundation", "docs", "04-capabilities", "01-devex",
+                              "04-workspace", "04-docs", "templates");
     process.env.SPN_TEMPLATES = templates;
     run(ws, ["page", "docs/02-constructs/01-core/thing.md"]);
     run(ws, ["page", "docs/02-constructs/01-core/other.md"]);
