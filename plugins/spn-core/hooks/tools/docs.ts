@@ -11,7 +11,7 @@
 //   node docs.ts face <docs-tree>       write what is generated, between markers
 //   node docs.ts page <seat.md…>        produce each construct page from its seat file
 //   node docs.ts status <seat.md…>      derive the status from Binds and Proof, and refuse a false claim
-//   node docs.ts topics <repo…>         refuse a numbered topic the constructs seat does not name
+//   node docs.ts topics <repo…>         refuse a numbered topic the constructs seat does not name, and two documents under one id
 //   node docs.ts coverage <repo…>       every construct a chapter, every chapter a construct, every package a construct
 //   node docs.ts figures check|colour   labels fit and connectors join · a block's colouring matches its text
 //   node docs.ts audit --report <repo>  the gap scan — one report per repository, written, never fixed
@@ -1461,6 +1461,40 @@ function topicsCheck(repo: string): Finding[] {
   return f;
 }
 
+/**
+ * ONE ID NAMES ONE DOCUMENT, and nothing checked it until two waves of agents collided on it.
+ *
+ * `id` is identity and never changes; the path is only a document's current address. Two documents
+ * sharing one id make every reference ambiguous — a `dependsOn`, a `Realizes`, a restatement — and
+ * the ambiguity is silent, because each file is individually correct. Found twice in one sitting:
+ * seventeen package faces that inherited the ids of the layer faces they replaced, and a merge
+ * agent asking out loud whether `operate` and `test` were already taken in another domain. Nothing
+ * enforced global uniqueness, so nobody could answer.
+ *
+ * Repository-scoped, because that is the scope an id is unique in — the same id in the foundation
+ * and in a stack repository is two different books naming their own thing.
+ */
+function duplicateIds(repo: string): Finding[] {
+  const f: Finding[] = [];
+  const tree = join(repo, "docs");
+  if (!existsSync(tree)) return f;
+  const seen = new Map<string, string[]>();
+  for (const file of walkFiles(tree, (p) => p.endsWith(".md"))) {
+    const { block } = readBlock(readFileSync(file, "utf8"));
+    const id = block?.id;
+    if (typeof id !== "string" || !id) continue;
+    if (!seen.has(id)) seen.set(id, []);
+    seen.get(id)!.push(file);
+  }
+  for (const [id, files] of seen) {
+    if (files.length < 2) continue;
+    const where = files.map((x) => relative(tree, x)).sort();
+    for (const file of files)
+      f.push({ check: "ids", grade: "RULE", file, message: `\`${id}\` is the id of ${files.length} documents — ${where.join(" · ")}. An id is identity and never changes; a path is only a document's current address. Two documents under one id make every \`dependsOn\`, every \`realizes\` and every restatement that names it ambiguous, and silently` });
+  }
+  return f;
+}
+
 /** The nodes a construct's Binds table says realize it — the second table, whose first column is the repo. */
 function realizingNodes(seatFile: string): string[] {
   const binds = sectionBody(readFileSync(seatFile, "utf8"), /Binds\b/);
@@ -1830,7 +1864,7 @@ if (cmd === "page") {
 if (cmd === "topics" || cmd === "coverage") {
   const targets = rest.filter((r) => !r.startsWith("--")).map((r) => resolve(r));
   if (!targets.length) { console.error(`usage: node docs.ts ${cmd} <repo…>`); process.exit(2); }
-  const f = targets.flatMap((t) => (cmd === "topics" ? topicsCheck(t) : coverageCheck(t, resolve(workspace))));
+  const f = targets.flatMap((t) => (cmd === "topics" ? [...topicsCheck(t), ...duplicateIds(t)] : coverageCheck(t, resolve(workspace))));
   for (const x of f) console.log(`${x.grade === "RULE" ? "✗" : "!"} ${x.grade.padEnd(4)} ${x.check.padEnd(9)} ${relative(workspace, x.file)}\n         ${x.message}`);
   const rule = f.filter((x) => x.grade === "RULE").length;
   console.log(f.length ? `\n${f.length} finding(s) — ${rule} RULE, ${f.length - rule} SOFT` : `\nclean — ${targets.length} repository(ies)`);

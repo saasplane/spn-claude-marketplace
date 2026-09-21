@@ -215,6 +215,40 @@ console.log("\n=== a behaviour row typed into a seat's Proof is refused");
       lacks("carries a table of behaviour rows"));
 }
 
+console.log("\n=== one id names one document");
+{
+  const doc2 = (id, title) => doc({ id, variant: "capability", title, lenses: ["SERVER_DEV"], status: "DONE" });
+  one("two documents under one id are a RULE, and both are named",
+      run(repo({
+        "docs/04-capabilities/01-core/pkg-ts/README.md": doc2("pkg-caps", "Capabilities — pkg-ts"),
+        "docs/04-capabilities/01-core/pkg-ts/01-boot.md": doc2("pkg-caps", "boot in pkg-ts"),
+      }), ["topics", "."]),
+      (g) => /`pkg-caps` is the id of 2 documents/.test(g) && (g.match(/RULE ids/g) ?? []).length === 2);
+
+  one("a tree where every id is its own is clean",
+      run(repo({
+        "docs/04-capabilities/01-core/pkg-ts/README.md": doc2("pkg-caps", "Capabilities — pkg-ts"),
+        "docs/04-capabilities/01-core/pkg-ts/01-boot.md": doc2("pkg-boot", "boot in pkg-ts"),
+      }), ["topics", "."]),
+      has("clean — 1 repository"));
+
+  one("three documents under one id say three, not two",
+      run(repo({
+        "docs/04-capabilities/01-core/a/README.md": doc2("same", "A"),
+        "docs/04-capabilities/01-core/b/README.md": doc2("same", "B"),
+        "docs/04-capabilities/01-core/c/README.md": doc2("same", "C"),
+      }), ["topics", "."]),
+      has("`same` is the id of 3 documents"));
+
+  // A template carries a placeholder id and is excluded from every walk by folder, not per file.
+  one("a template's placeholder id is not a collision",
+      run(repo({
+        "docs/04-capabilities/01-core/pkg-ts/README.md": doc2("pkg-caps", "Capabilities — pkg-ts"),
+        "docs/04-capabilities/templates/capability-template.md": doc2("pkg-caps", "A template"),
+      }), ["topics", "."]),
+      has("clean — 1 repository"));
+}
+
 console.log("\n=== `face` over a capability seat writes the chapters' own shape");
 {
   const chapter = (name, realizes, status = "DONE") =>
