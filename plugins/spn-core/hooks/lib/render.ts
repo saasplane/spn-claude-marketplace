@@ -126,10 +126,14 @@ function renderBody(lines: string[], findings: Finding[]): string {
   while (i < lines.length) {
     const l = lines[i];
 
-    if (/^###\s/.test(l)) {
+    // A `###` is a part and a `####` a sub-part; both are headings the seat file may use, so both are
+    // rendered. Before this, a `####` fell through to the paragraph path and the reader saw the
+    // hashes as text — found on the first page long enough to need one (N13's sample, 2026-09-21).
+    if (/^#{3,5}\s/.test(l)) {
       flush();
-      const t = l.replace(/^###\s*/, "");
-      out.push(`  <h3 id="${anchorOf(t)}">${inline(t)}</h3>`);
+      const level = (l.match(/^#+/) ?? ["###"])[0].length;
+      const t = l.replace(/^#+\s*/, "");
+      out.push(`  <h${level} id="${anchorOf(t)}">${inline(t)}</h${level}>`);
       i++; continue;
     }
     if (/^```/.test(l)) {
