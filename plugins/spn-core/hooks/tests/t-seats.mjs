@@ -285,6 +285,29 @@ console.log("\n=== a section is found by its whole name, not by its first word")
       has("carries a table of behaviour rows"));
 }
 
+console.log("\n=== a spec that draws nothing is a finding, not a silence");
+{
+  // `figures check` judged the SVGs a page HAS. Eight foundation seats asked for the retired
+  // `flow`; the drawer refuses it, the renderer then emits no figure element at all, and seven of
+  // those pages carried no figure while nothing reported anything. A page missing a figure it
+  // asked for looks exactly like a page that asked for none.
+  const withSpec = (spec) => `# c\n\n\`\`\`dg\n${spec}\n\`\`\`\n`;
+  const good = '{ "kind": "map", "boxes": [{ "id": "a", "label": "A" }, { "id": "b", "label": "B" }], "links": [{ "from": "a", "to": "b", "label": "to" }] }';
+
+  one("a seat whose spec draws is clean",
+      run(repo({ "docs/02-constructs/01-core/01-boot.md": withSpec(good) }), ["figures", "check", "docs"]),
+      has("clean — 1 page"));
+  one("a retired kind is named, rather than silently drawing nothing",
+      run(repo({ "docs/02-constructs/01-core/01-boot.md": withSpec(good.replace('"map"', '"flow"')) }), ["figures", "check", "docs"]),
+      (g) => /spec1:/.test(g) && /flow/.test(g));
+  one("a spec that is not valid JSON says so",
+      run(repo({ "docs/02-constructs/01-core/01-boot.md": withSpec('{ "kind": "map", oops }') }), ["figures", "check", "docs"]),
+      has("not valid JSON"));
+  one("and the finding names which spec on the page",
+      run(repo({ "docs/02-constructs/01-core/01-boot.md": withSpec(good) + "\n" + withSpec(good.replace('"map"', '"flow"')) }), ["figures", "check", "docs"]),
+      has("spec2:"));
+}
+
 console.log("\n=== a repository is never the book it restates");
 {
   // `findBook` names the book by what it CARRIES — a decisions register and a concept — and reads

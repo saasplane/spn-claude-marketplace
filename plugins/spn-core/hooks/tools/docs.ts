@@ -22,6 +22,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSy
 import { dirname, join, resolve, basename, relative } from "node:path";
 import { hrefForPage, renderPage } from "../lib/render.ts";
 import { checkFigures, colour, stripSpans } from "../lib/figures.ts";
+import { draw } from "../lib/draw.ts";
 import { begin, record, end } from "../lib/timing.ts";
 import { cardsOf } from "../checks/split-plan.ts";
 import { filesUnder as proseFilesUnder, paragraphs as proseParagraphs, score as proseScore } from "./prose-triage.ts";
@@ -1877,7 +1878,25 @@ if (cmd === "figures") {
   if (sub === "check") {
     let total = 0;
     for (const f of files) {
-      const found = checkFigures(readFileSync(f, "utf8"));
+      const src = readFileSync(f, "utf8");
+      // A SPEC THAT DRAWS NOTHING IS INVISIBLE TO THE REST OF THIS CHECK, which judges the SVGs a
+      // page HAS. Eight foundation seats asked for the retired `flow`; the drawer refuses it, the
+      // renderer then emits no figure element at all, and seven of those pages carried no figure
+      // while nothing reported a thing. So a seat file is judged on its specs as well: every `dg`
+      // block is drawn here, and a block that yields a finding or no drawing is named.
+      let n = 0;
+      for (const m of src.matchAll(/```dg\n([\s\S]*?)```/g)) {
+        n += 1;
+        let spec;
+        try { spec = JSON.parse(m[1]); }
+        catch (e) { total += 1; console.log(`✗ RULE figure    ${relative(workspace, f)}\n         spec${n}: not valid JSON — ${(e as Error).message}`); continue; }
+        let out;
+        try { out = draw(spec); }
+        catch (e) { total += 1; console.log(`✗ RULE figure    ${relative(workspace, f)}\n         spec${n}: the drawer refused it — ${(e as Error).message}`); continue; }
+        for (const d of out.findings) { total += 1; console.log(`✗ RULE figure    ${relative(workspace, f)}\n         spec${n}: ${d}`); }
+        if (!out.svg) { total += 1; console.log(`✗ RULE figure    ${relative(workspace, f)}\n         spec${n}: draws nothing, so the page renders no figure at all`); }
+      }
+      const found = checkFigures(src);
       total += found.length;
       for (const x of found) console.log(`✗ RULE figure    ${relative(workspace, f)}\n         svg${x.figure}: ${x.message}`);
     }
