@@ -1401,14 +1401,29 @@ function topicName(file: string): string | null {
   return m ? m[2] : null;
 }
 
-/** Every topic the constructs seat names, with the domain folder each sits in. */
-function constructTopics(repo: string): Map<string, string> {
+/**
+ * Every topic the constructs seat names, with EVERY domain each sits in.
+ *
+ * A topic name is unique inside its domain and not across the seat, which this returned a single
+ * domain per name and so got wrong. The foundation names `shape`, `ships`, `resources` and
+ * `operate` in two domains each — the applications half and the infra half both have a shape and
+ * both ship something, and neither is the other. Keeping one domain per name meant the last one
+ * walked won, and a behaviours file under the other reported as *sitting in the wrong domain*
+ * while sitting in exactly the right one.
+ *
+ * It was worse than a false finding: a merge agent read the rule off this check, concluded topic
+ * names must be unique seat-wide, and renamed a page to satisfy it. A check that is wrong does not
+ * only report noise — it gets obeyed.
+ */
+function constructTopics(repo: string): Map<string, Set<string>> {
   const seat = join(repo, "docs", "02-constructs");
-  const out = new Map<string, string>();
+  const out = new Map<string, Set<string>>();
   if (!existsSync(seat)) return out;
   for (const f of walkFiles(seat, (x) => x.endsWith(".md"))) {
     const name = topicName(f);
-    if (name) out.set(name, relative(seat, dirname(f)).replace(/\\/g, "/"));
+    if (!name) continue;
+    if (!out.has(name)) out.set(name, new Set());
+    out.get(name)!.add(relative(seat, dirname(f)).replace(/\\/g, "/"));
   }
   return out;
 }
@@ -1440,14 +1455,14 @@ function topicsCheck(repo: string): Finding[] {
   for (const file of existsSync(behaviors) ? walkFiles(behaviors, (x) => x.endsWith(".md")) : []) {
     const name = topicName(file);
     if (name === null) continue;
-    const domain = named.get(name);
-    if (domain === undefined) {
+    const domains = named.get(name);
+    if (domains === undefined) {
       f.push({ check: "topics", grade: "RULE", file, message: `\`${name}\` is a numbered topic of the behaviours seat and \`02-constructs/\` names no such construct — the constructs name the topics and the other two seats follow (03-tree.md, *One outline, three seats*)` });
       continue;
     }
     const here = relative(behaviors, dirname(file)).replace(/\\/g, "/");
-    if (here !== domain)
-      f.push({ check: "topics", grade: "RULE", file, message: `\`${name}\` sits under \`${here}\` here and under \`${domain}\` in the constructs seat — one topic, one domain, the same number in all three seats` });
+    if (!domains.has(here))
+      f.push({ check: "topics", grade: "RULE", file, message: `\`${name}\` sits under \`${here}\` here and under ${[...domains].map((d) => `\`${d}\``).join(" · ")} in the constructs seat — a topic keeps one domain, and the same number, in all three seats` });
   }
 
   // In capabilities a chapter sits inside its package folder, so the domain is its GRANDPARENT.

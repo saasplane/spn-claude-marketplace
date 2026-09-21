@@ -215,6 +215,29 @@ console.log("\n=== a behaviour row typed into a seat's Proof is refused");
       lacks("carries a table of behaviour rows"));
 }
 
+console.log("\n=== a topic name repeats across domains, and that is not drift");
+{
+  // The foundation names `shape`, `ships`, `resources` and `operate` in two domains each. The
+  // applications half and the infra half both have a shape and both ship something, and neither is
+  // the other. The first version of this check kept one domain per name, so the last one walked
+  // won and the other reported as sitting in the wrong place — and a merge agent, reading the rule
+  // off the check, renamed a page to satisfy it.
+  const two = {
+    // One topic name, two domains, two ids — which is exactly what the corpus does: the infra
+    // half's pages are `estate-*` so they cannot collide with the applications half's own.
+    "docs/02-constructs/01-apps/01-shape.md": seat("apps-shape"),
+    "docs/02-constructs/02-infra/01-shape.md": seat("estate-shape"),
+    "docs/03-behaviors/01-apps/01-shape.md": register("b1", [["APPS.SHAPE.01", "x", "UNIT", "PLANNED"]]),
+    "docs/03-behaviors/02-infra/01-shape.md": register("b2", [["INFRA.SHAPE.01", "y", "UNIT", "PLANNED"]]),
+  };
+  one("one name in two domains, with a rows file under each, is clean",
+      run(repo(two), ["topics", "."]), has("clean — 1 repository"));
+
+  one("and a third domain nothing names is still a RULE",
+      run(repo({ ...two, "docs/03-behaviors/03-other/01-shape.md": register("b3", [["OTHER.SHAPE.01", "z", "UNIT", "PLANNED"]]) }), ["topics", "."]),
+      (g) => /`shape` sits under `03-other` here and under/.test(g) && /`01-apps`/.test(g) && /`02-infra`/.test(g));
+}
+
 console.log("\n=== one id names one document");
 {
   const doc2 = (id, title) => doc({ id, variant: "capability", title, lenses: ["SERVER_DEV"], status: "DONE" });
