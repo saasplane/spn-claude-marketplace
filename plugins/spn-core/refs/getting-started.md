@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/05-guides/README.md", "seen": "836e043b" }
+    { "path": "docs/05-guides/README.md", "seen": "2d226764" }
   ]
 }
 -->

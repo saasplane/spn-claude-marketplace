@@ -1,8 +1,8 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "CONCEPT.md", "seen": "6afd452b" },
-    { "path": "docs/04-capabilities/03-platform/README.md", "seen": "64f54ee5" },
+    { "path": "CONCEPT.md", "seen": "9a52a641" },
+    { "path": "docs/04-capabilities/03-platform/README.md", "seen": "25412dec" },
     { "path": "docs/03-behaviors/01-decide.md", "seen": "15ace97a" },
     { "path": "docs/03-behaviors/02-design.md", "seen": "cf7338dc" }
   ]

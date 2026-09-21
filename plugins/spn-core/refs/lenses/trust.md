@@ -1,8 +1,8 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/04-capabilities/03-platform/08-trust.md", "seen": "581b26b1" },
-    { "path": "docs/04-capabilities/02-support/01-apps/08-devex-agent/README.md", "seen": "407c7816" },
+    { "path": "docs/04-capabilities/03-platform/08-trust.md", "seen": "e703b45e" },
+    { "path": "docs/04-capabilities/02-support/01-apps/08-devex-agent/README.md", "seen": "588e84b0" },
     { "path": "docs/04-capabilities/03-platform/03-people-access.md", "seen": "fd58f38e" },
     { "path": "docs/04-capabilities/02-support/01-apps/03-module/01-server/01-contract/01-states.md", "seen": "39d71ca3" }
   ]

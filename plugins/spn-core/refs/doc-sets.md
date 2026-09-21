@@ -1,10 +1,10 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/04-capabilities/01-foundation/02-docs/README.md", "seen": "1389ff5e" },
-    { "path": "docs/04-capabilities/01-foundation/02-docs/05-artifacts.md", "seen": "5ca0f7c4" },
+    { "path": "docs/04-capabilities/01-foundation/02-docs/README.md", "seen": "b4c00037" },
+    { "path": "docs/04-capabilities/01-foundation/02-docs/05-artifacts.md", "seen": "ccca6840" },
     { "path": "docs/04-capabilities/01-foundation/02-docs/03-tree.md", "seen": "562ad713" },
-    { "path": "CONCEPT.md", "seen": "6afd452b" }
+    { "path": "CONCEPT.md", "seen": "9a52a641" }
   ]
 }
 -->
@@ -223,7 +223,7 @@ The pocket holds what the node **authors** rather than derives, and its three au
 
 **An argument does not live here.** An approach document belongs to **the workstream that argues it**, in the workspace's planning centre, and it closes with that workstream. The pocket holds what the repository *states* and what somebody *measured*; where a design was weighed is the workstream's record. A pocket that also held the arguments made the two impossible to tell apart, which is how a stale argument came to be read as a statement of today.
 
-**The folder set is fixed, and adding one is a decision**: `overviews/`, `constructs/`, `reports/`, `resources/` and nothing else.
+**The folder set is fixed, and adding one is a decision**: `overviews/`, `constructs/`, `reports/` and nothing else.
 
 **They do not share a lifecycle** (decision RD.DOCS.021). Two describe a moment; one renders something live.
 
@@ -270,7 +270,7 @@ A register row records *what* was decided, never the options that lost or what t
 **The suffix names the kind, and the set is closed** (decision RD.DOCS.040). The routing test is one question: *were options weighed and one chosen?* Yes → `-approach`. No → `-overview`. A document with no options, no recommendation and no accepted cost is an overview whichever folder holds it.
 
 - **An overview comes at two sizes.** `concept-overview.html` is the concept's readable HTML face — the whole model, less depth, with the diagrams the root marker cannot carry; a repo has at most one. A `<section>-overview.html` expands **one** section that is too big to review where it stands, and the section names it back. Forbidden is the third copy: an overview restating another overview, or a section expanded twice under two names.
-- **Keep reports under their own name** in `reports/`; `resources/` holds what a document was written from. It holds **neither the templates nor `schema.sql`**, and one sentence rules out both: **nothing in a pocket may be depended on.** The templates live with the chapters whose rules they restate, and `schema.sql` lives in the capabilities seat beside the `data-model.md` it is the authoritative form of (`Q88`).
+- **Keep reports under their own name** in `reports/`. **A source a seat cites is not the pocket's to hold**, and one sentence decides it: **nothing in a pocket may be depended on.** A pocket once carried a `resources/` folder for *what a document was written from* — and every such file was a file some seat needed, so every one was a seat depending on a pocket. It is gone, and a fact a seat needs lives in a seat: the node's *why* in `01-purpose/`, what consuming it observably does in `03-behaviors/`, its *how* in `05-guides/`. The same sentence keeps the templates with the chapters whose rules they restate, and `schema.sql` in the capabilities seat beside the `data-model.md` it is the authoritative form of (`Q88`).
 - **Nothing here is validated against current state.** An artifact records a moment, so a checker that flags one for disagreeing with today's tree has misread what it is looking at.
 
 **An approach document is never kept in step with code.** It argues at a moment, so three relations are all legitimate: **ahead**, **level**, and **behind**. **Ahead** is arguing something not built yet — early iteration, leading the code as a concept does. **Behind** is a correct record of what was argued then. A design can reach an empty `Open` long before a line exists, and is complete at that point. **The defect is a silent rewrite** — editing one to read as though it always argued the current shape destroys the only record of what was weighed and rejected. Flag the contradiction; leave the artifact as the moment it was.

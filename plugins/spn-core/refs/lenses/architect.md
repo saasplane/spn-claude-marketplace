@@ -1,9 +1,9 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/04-capabilities/02-support/01-apps/01-shape/README.md", "seen": "e48e628b" },
+    { "path": "docs/04-capabilities/02-support/01-apps/01-shape/README.md", "seen": "97748dbd" },
     { "path": "docs/04-capabilities/data-model.md", "seen": "86c67bb2" },
-    { "path": "docs/04-capabilities/03-platform/README.md", "seen": "64f54ee5" },
+    { "path": "docs/04-capabilities/03-platform/README.md", "seen": "25412dec" },
     { "path": "docs/04-capabilities/02-support/01-apps/03-module/README.md", "seen": "93a1cb31" }
   ]
 }

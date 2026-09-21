@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/04-capabilities/01-foundation/02-docs/README.md", "seen": "1389ff5e" },
+    { "path": "docs/04-capabilities/01-foundation/02-docs/README.md", "seen": "b4c00037" },
     { "path": "providers/apps/ts/README.md", "seen": "1b645a3e" },
     { "path": "providers/apps/ts/03-code-patterns.md", "seen": "795882e4" }
   ]
