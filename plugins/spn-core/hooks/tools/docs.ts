@@ -1137,7 +1137,11 @@ function statusFor(seat: string, workspace: string, nodes: Set<string>, write: b
 
 // ---------------------------------------------------------------------------- page
 
-/** The furniture: one stylesheet and one pair of rail scripts, taken from the template. */
+/**
+ * The furniture: the template's first stylesheet, then every later stylesheet and every script,
+ * taken from the template in its own order. The rail builder runs first, the fold and the anchor
+ * links after it, so a script that reads a heading's text sees it before the anchor is appended.
+ */
 function furniture(templates: string): { style: string; scripts: string; footer: string } {
   const t = readFileSync(join(templates, "pages", "construct-template.html"), "utf8");
   const styles = [...t.matchAll(/<style>[\s\S]*?<\/style>/g)].map((m) => m[0]);
@@ -1146,7 +1150,7 @@ function furniture(templates: string): { style: string; scripts: string; footer:
   const footer = t.match(/<footer>[\s\S]*?<\/footer>/)?.[0] ?? "<footer></footer>";
   return {
     style: styles[0] ?? "",
-    scripts: [scripts[0] ?? "", foldStyle, scripts[1] ?? ""].filter(Boolean).join("\n\n"),
+    scripts: [scripts[0] ?? "", foldStyle, ...scripts.slice(1)].filter(Boolean).join("\n\n"),
     footer,
   };
 }

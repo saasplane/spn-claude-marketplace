@@ -657,6 +657,21 @@ console.log("\n=== the gap scan measures and never fixes");
         (g) => /class="home" href="\.\.\/\.\.\/\.\.\/02-constructs\/README\.md"/.test(g));
     one("and the page it produced is the page the audit expects", run(ws, ["audit", "docs"]),
         (g) => !/produced/.test(g));
+    // Every script of the template ships, in the template's order: the rail builder, the fold,
+    // and whatever the template adds after them (the anchor links, once the templates carry them).
+    const bookTemplate = readFileSync(resolve(templates, "pages", "construct-template.html"), "utf8");
+    const more = mkdtempSync(join(tmpdir(), "spn-templates-"));
+    mkdirSync(join(more, "pages"));
+    writeFileSync(join(more, "pages", "construct-template.html"),
+                  bookTemplate + "\n<script>/* a third script: the anchor links */</script>\n");
+    process.env.SPN_TEMPLATES = more;
+    run(ws, ["page", "docs/02-constructs/01-core/thing.md"]);
+    const withThree = readAt(ws, "docs/artifacts/constructs/01-core/thing-construct.html");
+    process.env.SPN_TEMPLATES = templates;
+    one("the page carries every script the template has, not the first two", withThree,
+        (g) => [...g.matchAll(/<script>[\s\S]*?<\/script>/g)].length ===
+               [...bookTemplate.matchAll(/<script>[\s\S]*?<\/script>/g)].length + 1);
+    rmSync(more, { recursive: true, force: true });
 
     // A `\|` in a cell is a pipe the author wants shown. The splitter cut the cell in two and the
     // reader saw a five-column row in a three-column table (N13's sample, 2026-09-21). And a `####`
