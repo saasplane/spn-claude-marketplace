@@ -23,6 +23,8 @@ const MIN_SHAFT = 36, LABEL_TOL = 1, PAD = 16, PAD_TOL = 2;
 // another label, and any connector. Checking for *clearance* rather than for overlap is the point —
 // a label one pixel clear of an arrow does not overlap it and is still unreadable.
 const LABEL_GAP = 8, GAP_APART = 24;
+// How far off a side's centre a lone arrow may land before a reader sees it as off-centre.
+const CENTRE_TOL = 2;
 /** The drawn length of a connector, summed over its segments. */
 const shaftOf = (pts: Pt[]): number => {
   let n = 0;
@@ -232,6 +234,54 @@ export function checkFigures(src: string): FigureFinding[] {
         }
       }
     });
+
+    // A SIDE WITH ONE CONNECTOR ON IT TAKES IT IN THE MIDDLE. Where several arrows share a side they
+    // spread across it; where one arrow has the side to itself, the middle is the only place it
+    // belongs — an arrow landing off-centre makes a reader look for the second arrow that would
+    // explain the offset, and there is none. No rule had an opinion about WHERE on a side an arrow
+    // lands, which is how a lone arrow came to dog-leg to a box it was pointing straight at
+    // (developer, 2026-09-21).
+    const sideOf = (p: Pt, r: Rect): string | null => {
+      const [rx, ry, rw, rh] = r;
+      const onX = rx - BOX_TOL <= p[0] && p[0] <= rx + rw + BOX_TOL;
+      const onY = ry - BOX_TOL <= p[1] && p[1] <= ry + rh + BOX_TOL;
+      if (onX && Math.abs(p[1] - ry) <= BOX_TOL) return "top";
+      if (onX && Math.abs(p[1] - (ry + rh)) <= BOX_TOL) return "bottom";
+      if (onY && Math.abs(p[0] - rx) <= BOX_TOL) return "left";
+      if (onY && Math.abs(p[0] - (rx + rw)) <= BOX_TOL) return "right";
+      return null;
+    };
+    // An endpoint belongs to the INNERMOST box whose side it lies on. A connector leaving a box inside
+    // a container crosses the container's edge at the same point, and judged against the container's
+    // centre it reads as off-centre when it is exactly where it should be — three of the first five
+    // findings this rule produced were that, and none of them was a fault in a figure.
+    const landings = new Map<string, Pt[]>();
+    for (const c of conns) {
+      if (c.exempt) continue;
+      for (const p of [c.pts[0], c.pts[c.pts.length - 1]]) {
+        const hits = rects.map((r, ri) => ({ ri, r, side: sideOf(p, r) })).filter((h) => h.side);
+        if (!hits.length) continue;
+        const inner = hits.reduce((a, b) => (a.r[2] * a.r[3] <= b.r[2] * b.r[3] ? a : b));
+        const key = `${inner.ri}:${inner.side}`;
+        landings.set(key, [...(landings.get(key) ?? []), p]);
+      }
+    }
+    // A CONTAINER IS EXEMPT. Where a connector leaves a box holding other boxes is decided by what is
+    // inside it, not by its own midpoint: a container carries a header band, so its content sits below
+    // its geometric centre and an arrow aligned with the row inside reads as 16px off the box.
+    const holds = (r: Rect) => rects.some((q) =>
+      q !== r && q[0] >= r[0] && q[1] >= r[1] && q[0] + q[2] <= r[0] + r[2] && q[1] + q[3] <= r[1] + r[3]);
+    for (const [key, pts] of landings) {
+      if (pts.length !== 1) continue;
+      const [ri, side] = key.split(":");
+      if (holds(rects[Number(ri)])) continue;
+      const [rx, ry, rw, rh] = rects[Number(ri)];
+      const across = side === "top" || side === "bottom";
+      const want = across ? rx + rw / 2 : ry + rh / 2;
+      const got = across ? pts[0][0] : pts[0][1];
+      if (Math.abs(got - want) > CENTRE_TOL)
+        findings.push({ figure: n + 1, message: `the only connector on a box's ${side} lands ${Math.round(Math.abs(got - want))}px off its centre — a side with one arrow on it takes that arrow in the middle` });
+    }
 
     // Every label, measured, so one can be compared with another and with the boxes it is NOT in.
     const HGT: Record<string, number> = { t: 13, l: 12, s: 11, n: 11 };
