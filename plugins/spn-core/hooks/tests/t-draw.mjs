@@ -28,7 +28,7 @@ console.log("=== every drawer's output passes the figure check");
 const FIGURES = {
   "entities — a centre with what points at it and what it points to": {
     kind: "entities", boxes: [{ id: "c", label: "Account", em: true }, { id: "u", label: "User" }, { id: "o", label: "Org" }],
-    links: [{ from: "u", to: "c", label: "belongs to" }, { from: "c", to: "o", label: "scopes" }],
+    links: [{ from: "u", to: "c", label: "belongs to", card: "N:1" }, { from: "c", to: "o", label: "scopes", card: "1:N" }],
   },
   "chain — a box per step, an arrow means then": {
     kind: "chain", boxes: [{ id: "a", label: "Plan" }, { id: "b", label: "Build" }, { id: "c", label: "Prove" }],
@@ -356,6 +356,36 @@ console.log("\n=== every example in the blocks reference actually draws");
   // And every kind the reference names in its table is a kind the drawer has.
   const named = [...src.matchAll(/^\| `(\w+)` \| (?:the content|a process|the construct|a straight)/gm)].map((m) => m[1]);
   one("every kind the reference's table names is a kind a helper draws", named, (g) => g.length >= 6 && g.every((k) => KINDS.includes(k)));
+}
+
+console.log("\n=== ENTITIES — every relation line says one or many");
+{
+  const boxes = [{ id: "c", label: "Account", em: true }, { id: "u", label: "User" },
+                 { id: "o", label: "Org" }, { id: "m", label: "Membership" }];
+  const links = [{ from: "u", to: "c", label: "belongs to", card: "N:1" },
+                 { from: "c", to: "o", label: "scopes", card: "1:N" },
+                 { from: "m", to: "c", label: "grants a role in", card: "N:1" }];
+  // The chapter asks for it and the drawer had no field for it: an ER diagram whose lines say only
+  // *belongs to* leaves the reader with the question they opened it to answer.
+  one("a relation with no cardinality is a finding",
+    draw({ kind: "entities", boxes, links: links.map(({ card, ...l }) => l) }).findings,
+    says("carries no cardinality"));
+  one("and the cardinality is rendered with its label, as one phrase",
+    draw({ kind: "entities", boxes, links }).svg, (g) => g.includes("belongs to  N:1"));
+
+  // THREE RELATIONS BROKE THIS DRAWER, and it broke without any cardinality involved — proven by
+  // running the same three bare. The label was slid clear of two connectors and dropped onto the box
+  // it named, because the placing pass knew about lines and not about boxes or about labels it had
+  // already placed. A gap now holds its elbows as well as its words, each label rides its OWN leg,
+  // and a gap has two bands rather than one.
+  for (const k of [2, 3, 4]) {
+    const spec = { kind: "entities",
+      boxes: [...boxes, { id: "s", label: "Session" }].slice(0, k + 1),
+      links: [...links, { from: "c", to: "s", label: "opens", card: "1:N" }].slice(0, k) };
+    const r = judge(spec);
+    one(`${k} relations draw without a finding`, r.findings, none);
+    one(`${k} relations pass the figure check`, r.figure, none);
+  }
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

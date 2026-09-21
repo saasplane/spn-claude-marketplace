@@ -60,7 +60,7 @@ fake either.
 
 A **box** takes `id` · `label` · `note` (a second line, wrapped for you) · `em` (accented) ·
 `warn` (a refusal) · `off` (faded) · `in` (the id of the box that contains it) · `shape`.
-A **link** takes `from` · `to` · `label` · `dashed`.
+A **link** takes `from` · `to` · `label` · `dashed` · `card` (its cardinality, on an `entities` figure).
 
 **Never write a coordinate.** Every drawer computes them, and the figure check holds the result to
 the contract: `24` between unconnected shapes and parallel runs, `56` where a connector joins two
@@ -75,7 +75,7 @@ one figure by hand took more than twenty rounds against that check.
 | `flowchart` | the content is a **path** somebody takes, and where it turns | `shape` per box. The path runs down the page |
 | `system` | the content is the **architecture** of something you build | `layers` and `outside` instead of `boxes` |
 | `sequence` | a process has more than one participant and **who speaks to whom** is the point | `boxes` are participants, `links` are messages in order; `dashed` is a reply |
-| `entities` | the construct is **data** and what relates to what is the point | nothing. The subject is `em`; direction decides the column |
+| `entities` | the construct is **data** and what relates to what is the point | `card` on every link. The subject is `em`; direction decides the column |
 | `chain` | a straight run of steps, left to right | nothing. No `links` needed |
 
 `flow` is **retired**. It aliased `map` before `flowchart` existed; asking for one is refused.
@@ -129,6 +129,21 @@ the outward edges — **a repository reaches the database and nothing else**.
 `queue` (a pipe) · `store` (a cylinder) · `cache` (a cylinder you can afford to lose) · `bucket` ·
 `service` (a plain rectangle). **Every edge crossing the boundary carries what flows** — an
 unlabelled line meaning *related* is the one thing this kind refuses.
+
+### `entities` — and every relation line says one or many
+
+```dg
+{ "kind": "entities",
+  "caption": "What an account relates to, and how many of each.",
+  "boxes": [{ "id": "c", "label": "Account", "em": true }, { "id": "u", "label": "User" },
+            { "id": "m", "label": "Membership" }, { "id": "o", "label": "Org" }],
+  "links": [{ "from": "u", "to": "c", "label": "belongs to", "card": "N:1" },
+            { "from": "m", "to": "c", "label": "grants a role in", "card": "N:1" },
+            { "from": "c", "to": "o", "label": "scopes", "card": "1:N" }] }
+```
+
+**A relation with no `card` is a finding.** A diagram whose lines say only *belongs to* leaves the
+reader with the one question they opened it to answer.
 
 ### `sequence` — lifelines, and a dashed arrow for a reply
 

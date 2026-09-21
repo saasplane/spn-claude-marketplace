@@ -34,7 +34,7 @@ const RESOURCE: Record<Resource, { shape: Shape; soft?: boolean }> = {
   service: { shape: "process" },
 };
 export type Box = { id: string; label: string; note?: string; em?: boolean; off?: boolean; warn?: boolean; in?: string; shape?: Shape };
-export type Link = { from: string; to: string; label?: string; dashed?: boolean };
+export type Link = { from: string; to: string; label?: string; dashed?: boolean; card?: string };
 /** One band of a SYSTEM's boundary: a named layer, and the boxes inside it. */
 export type Layer = { name: string; boxes: Box[] };
 export type Spec = {
@@ -141,12 +141,31 @@ function vertsOf(d: string): Vert[] {
  * nowhere clear to go stays where it was put, and the figure check reports it rather than this
  * quietly stacking it somewhere worse.
  */
-function placeLabels(pending: Pending[], verticals: Vert[], margin: number, width: number): string[] {
+function placeLabels(pending: Pending[], verticals: Vert[], margin: number, width: number,
+                     boxes: { x: number; y: number; w: number; h: number }[] = []): string[] {
+  // AND A LABEL ALREADY PLACED BLOCKS THE ONE AFTER IT. The pass slid each label clear of the lines
+  // and the boxes and then dropped it on its neighbour, because it kept no memory of where it had
+  // just put one — two labels in the same band, 70px of overlap, and each of them individually
+  // correct. This is the same rule the figure check applies when it says two words that close read
+  // as one phrase; the placer now applies it while it still has somewhere else to go.
+  const settled: { x: number; y: number; w: number }[] = [];
   return pending.map((p) => {
     const top = p.y - LABEL_H, bottom = p.y + 2;
-    const blocked = verticals
-      .filter((v) => Math.min(v.y1, v.y2) < bottom && Math.max(v.y1, v.y2) > top)
-      .map((v) => [v.x - LABEL_GAP, v.x + LABEL_GAP] as [number, number]);
+    // A BOX IS AS BLOCKING AS A CONNECTOR, and this pass only knew about connectors. Sliding a label
+    // clear of two vertical runs pushed it OUT of the column gap and onto the box it named: the
+    // sliding rule solved the problem it was given and created a worse one nobody had told it about.
+    // A box overlapping the label's own band blocks its whole width plus the clear air it is owed.
+    const blocked = [
+      ...verticals
+        .filter((v) => Math.min(v.y1, v.y2) < bottom && Math.max(v.y1, v.y2) > top)
+        .map((v) => [v.x - LABEL_GAP, v.x + LABEL_GAP] as [number, number]),
+      ...boxes
+        .filter((b) => b.y < bottom + LABEL_GAP && b.y + b.h > top - LABEL_GAP)
+        .map((b) => [b.x - LABEL_GAP, b.x + b.w + LABEL_GAP] as [number, number]),
+      ...settled
+        .filter((q) => Math.abs(q.y - p.y) < LABEL_H + LABEL_GAP)
+        .map((q) => [q.x - LABEL_GAP, q.x + q.w + LABEL_GAP] as [number, number]),
+    ];
     const free = (x: number) => x >= margin && x + p.w <= width - margin
       && !blocked.some(([lo, hi]) => lo < x + p.w && x < hi);
     let x = p.x;
@@ -156,6 +175,7 @@ function placeLabels(pending: Pending[], verticals: Vert[], margin: number, widt
         .sort((m, n) => Math.abs(m - p.x) - Math.abs(n - p.x));
       if (tries.length) x = tries[0];
     }
+    settled.push({ x, y: p.y, w: p.w });
     return `  <text class="n" x="${Math.round(x)}" y="${p.y}">${esc(p.txt)}</text>`;
   });
 }
@@ -240,8 +260,20 @@ function drawEntities(spec: Spec): { svg: string; findings: string[] } {
   // A link's label rides in the column gap, so the gap is as wide as the widest label plus the clear
   // air it owes on both sides. Sized from GAP_COL alone, a label longer than 56px was hung above a
   // box instead and landed inside the next column (N13, 2026-09-21).
-  const widestLabel = Math.max(0, ...links.map((l) => (l.label ?? "").length * W_NOTE));
-  const gapCol = Math.max(GAP_COL, Math.ceil(widestLabel) + LABEL_GAP * 2);
+  // A RELATION'S TEXT IS ITS LABEL AND ITS CARDINALITY, as one phrase, computed ONCE. Sizing the
+  // column gap from the label alone and then drawing the label plus its cardinality is two readings
+  // of one thing, which is the shape of fault this arc keeps finding: the gap came out 80 wide for
+  // text that needed 96, and three labels landed over boxes they did not belong to.
+  const relationText = (l: Link) => l.label ? (l.card ? `${l.label}  ${l.card}` : l.label) : (l.card ?? "");
+  const widestLabel = Math.max(0, ...links.map((l) => relationText(l).length * W_NOTE));
+  // A COLUMN GAP HOLDS THE LABELS **AND** THE ELBOWS. Sized for the widest label alone, a gap two
+  // relations cross has its own two vertical runs standing in the space the labels were measured
+  // for — so each label is pushed off its centre, onto a box or onto its neighbour. The gap is wide
+  // enough for the widest thing said across it plus a lane for every relation after the first.
+  const crossings = Math.max(
+    links.filter((l) => l.to === centre.id).length,
+    links.filter((l) => l.from === centre.id).length, 1);
+  const gapCol = Math.max(GAP_COL, Math.ceil(widestLabel) + LABEL_GAP * 2 + GAP_APART * (crossings - 1));
   const height = Math.max(hL, hC, hR) + margin * 2;
   const width = margin * 2 + wL + wC + wR + gapCol * 2;
   const xL = margin, xC = margin + wL + gapCol, xR = xC + wC + gapCol;
@@ -297,20 +329,36 @@ function drawEntities(spec: Spec): { svg: string; findings: string[] } {
     const dPath = `M${x1} ${y1} H${mid} V${y2} H${x2}`;
     out.push(`  <path class="c" d="${dPath}"${dash} marker-end="url(#ar)"/>`);
     eVerts.push(...vertsOf(dPath));
-    if (l.label) {
+    // EVERY RELATION LINE CARRIES ITS CARDINALITY, which is what the chapter asks of this kind and
+    // what the drawer had no field for: an ER diagram whose lines say only *belongs to* leaves the
+    // reader with the one question they opened it to answer — one, or many? It rides with the label
+    // rather than sitting apart from it, because the two are read as one phrase.
+    if (!l.card)
+      findings.push(`the relation \`${l.from}\` → \`${l.to}\` carries no cardinality; every relation line in an entity diagram says one or many (\`card\`: "1:N")`);
+    const text = relationText(l);
+    if (text) {
       // THE LABEL SITS IN THE COLUMN GAP, on the connector's own vertical run — the one place in an
       // ER layout where no box can be. Hung above a box instead, it lands inside whichever column is
       // taller. Where the run is straight across it goes a standard gap above the line.
-      const w = l.label.length * W_NOTE;
-      // Centred on the GAP, not on the connector's own vertical: the gap is sized to hold the widest
-      // label with its clear air, and a vertical spread across that gap sits off-centre, so a label
-      // centred on it would hang over a box. Above the higher of the two horizontal runs, where the
-      // vertical has not started, is the one spot crossed by neither the line nor a box.
-      ePending.push({ x: Math.round((x1 + x2 - w) / 2), y: Math.min(y1, y2) - LABEL_GAP, w, txt: l.label });
+      const w = text.length * W_NOTE;
+      // ON ITS OWN OUTBOUND LEG, not centred on the gap. Centring every label on the gap put them all
+      // at one x, so with more than one relation crossing a gap each was pushed off by the other's
+      // elbow — onto a box, or onto its neighbour. A link's own leg runs from its source to its own
+      // elbow, at its own height, and that is a stretch no other relation in the gap occupies.
+      const lead = Math.min(x1, mid), tail = Math.max(x1, mid);
+      const want = (lead + tail - w) / 2;
+      // Kept inside the gap, so a label never starts over the column it came from.
+      const lo = Math.min(x1, x2) + LABEL_GAP, hi = Math.max(x1, x2) - LABEL_GAP;
+      // A GAP HAS TWO BANDS, NOT ONE. Relations after the first in a gap alternate to the underside
+      // of their own leg, which doubles the room without widening the figure — and a label under a
+      // line reads as belonging to it exactly as one above it does.
+      const under = i % 2 === 1;
+      ePending.push({ x: Math.round(Math.min(Math.max(want, lo), Math.max(lo, hi - w))),
+                      y: y1 + (under ? LABEL_H + LABEL_GAP : -LABEL_GAP), w, txt: text });
     }
   }
 
-  out.push(...placeLabels(ePending, eVerts, margin, width));
+  out.push(...placeLabels(ePending, eVerts, margin, width, [...at.values()]));
 
   return { svg: svgOf(out, spec.title ?? spec.caption ?? "entity diagram"), findings };
 }
