@@ -131,6 +131,12 @@ function drawChain(spec: Spec): { svg: string; findings: string[] } {
   const h = Math.max(...boxes.map(boxHeight));
   const widths = boxes.map(boxWidth);
   const width = margin * 2 + widths.reduce((a, b) => a + b, 0) + gap * (boxes.length - 1);
+  // A chain wider than the canvas is drawn by the map drawer as a one-way chain, which stands it
+  // up as a vertical line. The neighbours are the links, since a chain declares none.
+  if (width > 1100) {
+    const links = boxes.slice(0, -1).map((b, i) => ({ from: b.id, to: boxes[i + 1].id }));
+    return drawMap({ ...spec, kind: "map", links });
+  }
   const height = margin * 2 + h;
   const out: string[] = [];
   let x = margin;
@@ -469,7 +475,9 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
 const DRAWERS: Record<string, (s: Spec) => { svg: string; findings: string[] }> = {
   entities: drawEntities,
   chain: drawChain,
-  flow: drawChain,
+  // A flow declares links, and links decide rows: the map drawer lays it out, and a one-way path
+  // through every box is drawn as a straight line, horizontal when it fits, vertical when not.
+  flow: drawMap,
   map: drawMap,
 };
 
