@@ -660,6 +660,11 @@ console.log("\n=== the gap scan measures and never fixes");
     const page2 = readAt(ws, "docs/artifacts/constructs/01-core/thing-construct.html");
     one("an escaped pipe stays inside its cell", page2, has("<code>{org}-public|-private</code></td><td>x</td>"));
     one("a level-four heading is a heading, not a paragraph of hashes", page2, has('<h4 id="a-sub-part">A sub-part</h4>'));
+    writeFileSync(join(ws, "docs/02-constructs/01-core/thing.md"), seat("thing",
+      "## Boundary\n<!-- RESTATES: a chapter\n     never add a rule here -->\n\nvisible\n<!-- block: REASONS -->\n"));
+    run(ws, ["page", "docs/02-constructs/01-core/thing.md"]);
+    const page3 = readAt(ws, "docs/artifacts/constructs/01-core/thing-construct.html");
+    one("an author's HTML comment never reaches the page", page3, (g) => !/RESTATES|block: REASONS/.test(g) && /<p>visible<\/p>/.test(g));
     delete process.env.SPN_TEMPLATES;
   }
   one("and it names what it did NOT measure rather than reporting a zero",

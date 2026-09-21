@@ -128,6 +128,15 @@ function renderBody(lines: string[], findings: Finding[]): string {
   while (i < lines.length) {
     const l = lines[i];
 
+    // An HTML comment in the seat file is a note to the author — a RESTATES header, a block
+    // declaration — and never part of the page. Before this it was escaped into the paragraph and
+    // the reader saw the whole note as text (N13's sample, 2026-09-21). Single-line or spanning lines.
+    if (/^\s*<!--/.test(l)) {
+      flush();
+      while (i < lines.length && !/-->\s*$/.test(lines[i])) i++;
+      i++; continue;
+    }
+
     // A `###` is a part and a `####` a sub-part; both are headings the seat file may use, so both are
     // rendered. Before this, a `####` fell through to the paragraph path and the reader saw the
     // hashes as text — found on the first page long enough to need one (N13's sample, 2026-09-21).
