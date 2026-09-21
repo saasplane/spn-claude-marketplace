@@ -3,15 +3,15 @@
   "chapters": [
     { "path": "CONCEPT.md", "seen": "9a52a641" },
     { "path": "docs/04-capabilities/03-platform/README.md", "seen": "25412dec" },
-    { "path": "docs/03-behaviors/01-decide.md", "seen": "15ace97a" },
-    { "path": "docs/03-behaviors/02-design.md", "seen": "cf7338dc" }
+    { "path": "docs/03-behaviors/01-devex/04-workspace/04-docs.md", "seen": "15ace97a" },
+    { "path": "docs/03-behaviors/02-support/02-infra/01-shape.md", "seen": "cf7338dc" }
   ]
 }
 -->
 
 # New-Platform Intake Worksheet
 
-The one-page artifact every new SaaS Plane platform starts from. Fill every row **before** any repository, manifest, or scaffold exists — adoption types these values into manifests, and a manifest is the wrong place to discover a decision was never made. The completed worksheet lands as the **coordinates section of the repository's `CONCEPT.md`**, produced by the `ideate` skill — coordinates settle here; the boundary, domains and surfaces are the concept's own job. Source of truth: the foundation book (`spn-foundation`), `docs/04-capabilities/03-platform/` and `docs/03-behaviors/01-decide.md` / `02-design.md`. SPN Demo (org `spn`, platform `dmo`, domain `spndemo.app`) is the book's sample platform, shown as the example column.
+The one-page artifact every new SaaS Plane platform starts from. Fill every row **before** any repository, manifest, or scaffold exists — adoption types these values into manifests, and a manifest is the wrong place to discover a decision was never made. The completed worksheet lands as the **coordinates section of the repository's `CONCEPT.md`**, produced by the `ideate` skill — coordinates settle here; the boundary, domains and surfaces are the concept's own job. Source of truth: the foundation book (`spn-foundation`), `docs/04-capabilities/03-platform/` and `docs/03-behaviors/01-devex/04-workspace/04-docs.md` / `02-design.md`. SPN Demo (org `spn`, platform `dmo`, domain `spndemo.app`) is the book's sample platform, shown as the example column.
 
 Expect every row to be consumed verbatim by a later step; nothing here is a throwaway answer.
 

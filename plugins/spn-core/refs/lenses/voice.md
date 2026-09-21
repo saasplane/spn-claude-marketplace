@@ -1,9 +1,9 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/04-capabilities/01-foundation/02-docs/01-corpus.md", "seen": "21df863a" },
-    { "path": "docs/04-capabilities/01-foundation/02-docs/02-document.md", "seen": "f6ca790a" },
-    { "path": "docs/04-capabilities/01-foundation/02-docs/04-discipline.md", "seen": "17b1e887" }
+    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md", "seen": "21df863a" },
+    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md", "seen": "f6ca790a" },
+    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md", "seen": "17b1e887" }
   ],
   "rows": [
     "RD.DOCS.031",
@@ -20,7 +20,7 @@
 
 # Lens — `VOICE` (Editor)
 
-**Source of truth:** the foundation book's readability bar (`01-foundation/02-docs/01-corpus`), the document block, its tag line and the behaviour row (`01-foundation/02-docs/02-document`), and the voice discipline checks (`01-foundation/02-docs/04-discipline`) — decisions RD.DOCS.031, RD.DOCS.043, RD.DOCS.044, RD.DOCS.052, RD.DOCS.060, RD.DOCS.062, RD.DOCS.067 and RD.DEVEX.032. This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
+**Source of truth:** the foundation book's readability bar (`01-devex/04-workspace/04-docs/01-corpus`), the document block, its tag line and the behaviour row (`01-devex/04-workspace/04-docs/02-document`), and the voice discipline checks (`01-devex/04-workspace/04-docs/04-discipline`) — decisions RD.DOCS.031, RD.DOCS.043, RD.DOCS.044, RD.DOCS.052, RD.DOCS.060, RD.DOCS.062, RD.DOCS.067 and RD.DEVEX.032. This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
 
 **Worn** while writing. **Convened** over any document before it lands. **Advises — and blocks a page that misses its seat bar.**
 

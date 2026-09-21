@@ -2,10 +2,10 @@
 {
   "chapters": [
     { "path": "CONCEPT.md", "seen": "9a52a641" },
-    { "path": "docs/04-capabilities/01-foundation/01-devex/09-utils.md", "seen": "1f6dfee7" },
-    { "path": "docs/04-capabilities/01-foundation/01-devex/11-workspace.md", "section": "The agent is updated first, and reloaded before anything runs", "seen": "41e78db7" },
-    { "path": "docs/04-capabilities/01-foundation/01-devex/10-delivery.md", "section": "When an edit becomes behaviour", "seen": "4d108ba0" },
-    { "path": "docs/04-capabilities/01-foundation/02-docs/04-discipline.md", "section": "Restatement discipline", "seen": "11808ae4" }
+    { "path": "docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md", "seen": "1f6dfee7" },
+    { "path": "docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md", "section": "The agent is updated first, and reloaded before anything runs", "seen": "41e78db7" },
+    { "path": "docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md", "section": "When an edit becomes behaviour", "seen": "4d108ba0" },
+    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md", "section": "Restatement discipline", "seen": "11808ae4" }
   ],
   "rows": [
     "RD.DEVEX.020",
@@ -19,7 +19,7 @@
 
 # Cross-Repo Work — Stack-Agnostic
 
-How an agent works across more than one repository on a SaaS Plane estate, and where a rule belongs so every agent sees it. Apply it in any stack and to any repo pair. Source of truth: the foundation's `CONCEPT.md` — `#### DevEx Workspace`, and **THE MACHINE'S OWN LAYOUT** for the env seat. Also `04-capabilities/01-foundation/01-devex/09-utils.md` **§ The env seat**, and `04-capabilities/01-foundation/01-devex/11-workspace.md` **§ The agent is updated first, and reloaded before anything runs**. Then `04-capabilities/01-foundation/01-devex/10-delivery.md` **§ When an edit becomes behaviour**, and `04-capabilities/01-foundation/02-docs/04-discipline.md` **§ Restatement discipline**. The decisions are RD.DEVEX.020, RD.DEVEX.044, RD.DEVEX.048, RD.DEVEX.049 and RD.DOCS.055. Where this restatement and those disagree, the sources win and this file is regenerated.
+How an agent works across more than one repository on a SaaS Plane estate, and where a rule belongs so every agent sees it. Apply it in any stack and to any repo pair. Source of truth: the foundation's `CONCEPT.md` — `#### DevEx Workspace`, and **THE MACHINE'S OWN LAYOUT** for the env seat. Also `04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md` **§ The env seat**, and `04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md` **§ The agent is updated first, and reloaded before anything runs**. Then `04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md` **§ When an edit becomes behaviour**, and `04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` **§ Restatement discipline**. The decisions are RD.DEVEX.020, RD.DEVEX.044, RD.DEVEX.048, RD.DEVEX.049 and RD.DOCS.055. Where this restatement and those disagree, the sources win and this file is regenerated.
 
 ## One window, laws by declaration
 

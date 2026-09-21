@@ -6,7 +6,7 @@ description: Turn a requirement into a design the platform's own vocabulary can 
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/04-capabilities/01-foundation/02-docs/05-artifacts.md", "section": "The approach document — a workstream's, never a repository's", "seen": "0c54997e" }
+    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "section": "The approach document — a workstream's, never a repository's", "seen": "0c54997e" }
   ]
 }
 -->
@@ -140,7 +140,7 @@ The masthead **names its audience** — an artifact has no seat, so its content 
 reads it, and an artifact written for everyone is read carefully by nobody. `refs/doc-sets.md`
 carries the register in full; load it before writing.
 
-**Source of truth:** the foundation book's artifacts standard (`docs/04-capabilities/01-foundation/02-docs/05-artifacts.md`, "The approach document — a workstream's, never a repository's" section). This section restates it for use at the moment of writing and adds no rule of its own; where the two disagree, the book wins and this file is regenerated.
+**Source of truth:** the foundation book's artifacts standard (`docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md`, "The approach document — a workstream's, never a repository's" section). This section restates it for use at the moment of writing and adds no rule of its own; where the two disagree, the book wins and this file is regenerated.
 
 When a design is big enough that someone will read it more than once, the plan becomes a document with a fixed shape. Such a design is a new artifact, a contract that other teams build against, or a standard the tooling will enforce. **Why → What → How → Open → Deferred.** Nothing else, and in that order.
 
