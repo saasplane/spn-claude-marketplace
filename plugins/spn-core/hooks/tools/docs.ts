@@ -418,6 +418,22 @@ function checkProof(file: string, src: string): Finding[] {
   const f: Finding[] = [];
   const i = sectionAt(file, src, "Proof");
   if (i < 0) return f;
+
+  // A BEHAVIOUR ROW TYPED INTO A SEAT FILE'S PROOF IS A SECOND COPY OF A STATUS (Q131). The rows
+  // live in the register, where the test run writes them, and the produced page joins them; a row
+  // typed here is a claim frozen at the moment somebody typed it, and it is the copy a reader
+  // happens to be looking at. Recognised by the register's own header rather than by shape, so a
+  // typed check table — `Check · Kind · What a green run shows` — is untouched.
+  for (const line of src.slice(i).split("\n")) {
+    const t = line.trim();
+    if (!(t.startsWith("|") && t.endsWith("|"))) continue;
+    const names = t.slice(1, -1).split("|").map((c) => c.trim().toLowerCase());
+    if (names.includes("id") && names.includes("status")) {
+      f.push({ check: "proof", grade: "RULE", file, message: "`Proof` carries a table of behaviour rows. The rows live in `03-behaviors/` — the register the test run writes — and the produced page joins them with the status of the last run (Q131). What is typed here is the checks a reader can run, or nothing" });
+      break;
+    }
+  }
+
   // A COMMAND IS WRITTEN AS CODE IN BOTH FORMATS, and the markers differ. `text()` strips the
   // `<code>` tags an HTML page uses; markdown's backticks survive it, so every command read from a
   // seat file began with a backtick and matched none of the patterns below — 157 rows across the

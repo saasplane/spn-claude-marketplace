@@ -203,6 +203,18 @@ console.log("\n=== the produced page joins the register's rows; the seat file ne
       readAt(ws4, "docs/artifacts/constructs/01-core/01-boot-construct.html"), lacks("joined from the register"));
 }
 
+console.log("\n=== a behaviour row typed into a seat's Proof is refused");
+{
+  const typed = "| Id | Who | Does | Sees | Type | Tier | Status | Updated at |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n| CORE.BOOT.01 | A person | boots | it booted | POSITIVE | UNIT | SUCCESS | — |\n";
+  one("a register table in Proof is a RULE — the status lives in one place",
+      run(repo({ "docs/02-constructs/01-core/01-boot.md": seat("boot", { proof: typed }) }), ["audit", "docs"]),
+      has("`Proof` carries a table of behaviour rows"));
+  one("a typed check table is untouched by that rule",
+      run(repo({ "docs/02-constructs/01-core/01-boot.md": seat("boot", {
+        proof: "| Check | Kind | What a green run shows |\n| --- | --- | --- |\n| `spnutils apps test unit` | gate | green |\n" }) }), ["audit", "docs"]),
+      lacks("carries a table of behaviour rows"));
+}
+
 // ---------------------------------------------------------------- the status a run writes (Q107)
 
 console.log("\n=== the plugins' own run writes the two cells a run owns, and no others");
