@@ -241,7 +241,7 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
     if (pass === topIds.length) { findings.push("the links form a cycle, so the rows could not be decided; a map flows one way"); break; }
   }
 
-  const CANVAS = 760, margin = 24, gapX = 36, gapY = 52;
+  const CANVAS = 760, margin = 24, gapX = 36;
   const levels = [...new Set([...depth.values()])].sort((a, b) => a - b);
   const rows: Box[][] = [];
   for (const lv of levels) {
@@ -267,6 +267,20 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
     for (const c of inner) { const ch = outerH(c); place(c, x + PAD_IN, cy, w - PAD_IN * 2, ch, row); cy += ch + 10; }
   };
 
+  // Each link between neighbouring rows gets its own lane through the gap, so two horizontal runs
+  // never sit on top of each other and each label has a line of its own. The gap is as tall as the
+  // lanes it carries.
+  const rowOf = new Map<string, number>();
+  rows.forEach((row, i) => { for (const b of row) rowOf.set(b.id, i); });
+  const rowOfAny = (id: string) => rowOf.get(holder(id)) ?? -1;
+  const laneOf = new Map<Link, number>(), lanesIn: number[] = rows.map(() => 0);
+  for (const l of links) {
+    const ra = rowOfAny(l.from), rb = rowOfAny(l.to);
+    if (ra >= 0 && rb === ra + 1 && !(ra === rb)) { laneOf.set(l, lanesIn[ra]); lanesIn[ra] += 1; }
+  }
+  const LANE_H = 22;
+  const gapAfter = (i: number) => Math.max(52, 20 + LANE_H * lanesIn[i]);
+
   const rowTop: number[] = [], rowBottom: number[] = [];
   let y = margin;
   rows.forEach((row, i) => {
@@ -275,10 +289,22 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
     let x = margin + Math.floor((CANVAS - margin * 2 - rw) / 2);   // rows are centred
     rowTop.push(y); rowBottom.push(y + rh);
     for (const b of row) { const w = outerW(b); place(b, x, y, w, outerH(b), i); x += w + gapX; }
-    y += rh + gapY;
+    y += rh + (i < rows.length - 1 ? gapAfter(i) : 0);
   });
   const width = CANVAS;
-  const height = y - gapY + margin;
+  const height = y + margin;
+
+  // Where a box has several links leaving its bottom or arriving at its top, the points are spread
+  // along the edge rather than piled on its centre, so two arrows never share one head.
+  const outs = new Map<string, Link[]>(), ins = new Map<string, Link[]>();
+  for (const l of links) {
+    if (!at.has(l.from) || !at.has(l.to)) continue;
+    outs.set(l.from, [...(outs.get(l.from) ?? []), l]); ins.set(l.to, [...(ins.get(l.to) ?? []), l]);
+  }
+  const spread = (box: { x: number; w: number }, list: Link[], l: Link) => {
+    const i = list.indexOf(l), n = list.length;
+    return Math.round(box.x + (box.w * (i + 1)) / (n + 1));
+  };
   const LANE = width - margin / 2;   // the return lane down the right edge, clear of every box
 
   // Labels live in the gaps between rows. Two labels in one gap are stacked so neither overprints.
@@ -309,17 +335,23 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
       d = `M${x1} ${y1} H${mid} V${y2} H${x2}`;
       if (l.label) label = labelAt(-1 - a.row, mid, w, Math.min(a.y, b.y) - 8);
     } else if (b.row === a.row + 1) {
-      // The next row down: out of the bottom, one elbow in the gap, into the top.
-      const x1 = a.x + a.w / 2, x2 = b.x + b.w / 2;
-      const y1 = a.y + a.h, y2 = b.y, mid = Math.round((y1 + y2) / 2);
-      d = Math.abs(x1 - x2) < 1 ? `M${x1} ${y1} V${y2}` : `M${x1} ${y1} V${mid} H${x2} V${y2}`;
+      // The next row down: out of the bottom, along this link's own lane in the gap, into the top.
+      const x1 = spread(a, outs.get(l.from) ?? [l], l), x2 = spread(b, ins.get(l.to) ?? [l], l);
+      const y1 = a.y + a.h, y2 = b.y;
+      const lane = laneOf.get(l) ?? 0;
+      const mid = rowBottom[a.row] + 10 + LANE_H * lane + 12;
+      const straight = Math.abs(x1 - x2) < 1;
+      d = straight ? `M${x1} ${y1} V${y2}` : `M${x1} ${y1} V${mid} H${x2} V${y2}`;
       if (l.label) {
-        // Beside the vertical run when the link is straight; on the horizontal run otherwise. Either
-        // way the text is in the gap and its span never contains a vertical segment.
-        const straight = Math.abs(x1 - x2) < 1;
-        const cx = straight ? x1 + 8 + w / 2 : (Math.min(x1, x2) + Math.max(x1, x2)) / 2;
-        label = labelAt(a.row, cx, w, straight ? mid + 4 : mid - 6);
-        if (!straight && label.x + 2 < Math.max(x1, x2) && Math.max(x1, x2) < label.x + w - 2) label.y = mid - 6; // the horizontal run is below the text
+        // Above this link's own horizontal run, or beside the vertical run when the link is straight.
+        // Either way the text is in the gap and its span never contains a vertical segment.
+        const lo = Math.min(x1, x2), hi = Math.max(x1, x2);
+        const cx = straight ? x1 + 8 + w / 2 : (lo + hi) / 2;
+        label = { x: Math.min(Math.max(cx - w / 2, margin), width - margin - w), y: straight ? mid + 4 : mid - 5 };
+        if (!straight && w > hi - lo - 8) { // a label longer than its run sits clear of both verticals
+          label.x = Math.min(Math.max(hi + 6, margin), width - margin - w);
+          if (label.x + w > width - margin) label.x = Math.max(lo - w - 6, margin);
+        }
       }
     } else if (b.row > a.row) {
       // Skips a row: down into the gap, along it to the lane at the right edge, down the lane to the
