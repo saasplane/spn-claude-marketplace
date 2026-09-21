@@ -18,8 +18,8 @@
 
 ## Follows the pattern
 
-- What a plugin is made of, and what a cache keyed by name and version means — [The Plugin](../../../02-constructs/01-plugins/plugin-set.md)
-- Which plugins a repository is entitled to load — the foundation's `04-devex/10-delivery.md`
+- What a plugin is made of, and what a cache keyed by name and version means — [The Plugin](../../../02-constructs/01-spn-core/01-plugin-set.md)
+- Which plugins a repository is entitled to load — the foundation's `02-delivery.md`
 
 ## Special handling
 
@@ -45,7 +45,7 @@
 
 **Why** — *a session reads the cache, not the checkout*. The exception is a hook script, which is read from disk on its next run; `hooks.json`, a skill and an agent brief are not.
 **What** — changing a `SKILL.md` or the event wiring here has no effect on a running window until the plugin is installed again, and some of it waits for a fresh window after that.
-**How** — the instruments and their reload behaviour are the other constructs' subject; what the plugin owns is the boundary. Read the foundation's `04-devex/10-delivery.md` § When an edit becomes behaviour.
+**How** — the instruments and their reload behaviour are the other constructs' subject; what the plugin owns is the boundary. Read the foundation's `02-delivery.md` § When an edit becomes behaviour.
 
 ## Between modules
 

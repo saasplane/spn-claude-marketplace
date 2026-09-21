@@ -20,7 +20,7 @@ Four markdown files sit under `plugins/spn-core/agents/`, each a persona a sessi
 
 ## Follows the pattern
 
-- The frontmatter, the trigger and the bound authority — [The Agent](../../../02-constructs/05-agents/agent-set.md)
+- The frontmatter, the trigger and the bound authority — [The Agent](../../../02-constructs/01-spn-core/10-agent-set.md)
 - The eleven viewpoints and their block-or-advise line — [Lenses in spn-core](09-lenses.md)
 
 ## Special handling

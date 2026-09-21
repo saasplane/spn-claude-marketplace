@@ -20,7 +20,7 @@
 
 ## Follows the pattern
 
-- The four events and what each may say back — [The Hook](../../../02-constructs/02-hooks/hook-set.md)
+- The four events and what each may say back — [The Hook](../../../02-constructs/01-spn-core/02-hook-set.md)
 - The dispatcher, the verdict and the always-zero exit — [Hook in spn-core](02-hook-set.md)
 
 ## Special handling

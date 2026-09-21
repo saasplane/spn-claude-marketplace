@@ -18,7 +18,7 @@ This plugin restates exactly one thing on its own: the planning layer for a node
 
 ## Follows the pattern
 
-- The `spn:restates` block, the stamp and what drift means — [The Ref](../../../02-constructs/04-refs/ref-set.md)
+- The `spn:restates` block, the stamp and what drift means — [The Ref](../../../02-constructs/01-spn-core/08-ref-set.md)
 - How a ref is stamped, parsed and compared — [Ref in spn-core](../../01-spn-core/spn-core/08-ref-set.md)
 
 ## Special handling

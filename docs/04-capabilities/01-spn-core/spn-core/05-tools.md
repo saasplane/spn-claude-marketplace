@@ -21,8 +21,8 @@ Nothing in this folder is wired in `hooks.json`. Each file is invoked by its own
 
 ## Follows the pattern
 
-- A tool is run by name and grades its own findings — [The Hook](../../../02-constructs/02-hooks/hook-set.md) § A tool
-- The `spn:restates` block and the hash a citation carries — [The Ref](../../../02-constructs/04-refs/ref-set.md)
+- A tool is run by name and grades its own findings — [The Tool](../../../02-constructs/01-spn-core/05-tools.md)
+- The `spn:restates` block and the hash a citation carries — [The Ref](../../../02-constructs/01-spn-core/08-ref-set.md)
 
 ## Special handling
 

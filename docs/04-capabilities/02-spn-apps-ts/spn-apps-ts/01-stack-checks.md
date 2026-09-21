@@ -25,7 +25,7 @@ Six checks live under `plugins/spn-apps-ts/hooks/checks/`, each catching one pat
 ## Follows the pattern
 
 - The verdict, the composition and the always-zero exit — [Hook in spn-core](../../01-spn-core/spn-core/02-hook-set.md)
-- What a check may decide on its own account — [The Hook](../../../02-constructs/02-hooks/hook-set.md)
+- What a check may decide on its own account — [The Hook](../../../02-constructs/01-spn-core/02-hook-set.md)
 
 ## Special handling
 

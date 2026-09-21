@@ -18,7 +18,7 @@ The whole of this plugin's hook surface is one file: a shell script wired to eve
 
 ## Follows the pattern
 
-- The four events and the refuse-or-report line — [The Hook](../../../02-constructs/02-hooks/hook-set.md)
+- The four events and the refuse-or-report line — [The Hook](../../../02-constructs/01-spn-core/02-hook-set.md)
 - The decision JSON a refusal is printed as, and the always-zero exit — [Hook in spn-core](../../01-spn-core/spn-core/02-hook-set.md)
 
 ## Special handling

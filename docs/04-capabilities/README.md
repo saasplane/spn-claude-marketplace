@@ -17,7 +17,7 @@
 
 One document per source folder that earns one, named for the folder it governs and carrying that folder's seams. **This repository declares `GENERAL`, so it has no `src/` at all** — its source root is `plugins/`, named above on this face's own block rather than assumed, so the Map below reads real folders instead of one that does not exist.
 
-Two things under `plugins/` earn no mirror here on purpose. Each plugin's `.claude-plugin/plugin.json`, and the repository's own root `.claude-plugin/marketplace.json`, are the plugin construct's own shape — see [The Plugin](../02-constructs/01-plugins/plugin-set.md) rather than a second statement of the same fields here. And a `hooks/tests/` folder, where one exists, is proof rather than capability surface: its own suite is what a mirror's `Proven by` column cites, never a mirror of its own.
+Two things under `plugins/` earn no mirror here on purpose. Each plugin's `.claude-plugin/plugin.json`, and the repository's own root `.claude-plugin/marketplace.json`, are the plugin construct's own shape — see [The Plugin](../02-constructs/01-spn-core/01-plugin-set.md) rather than a second statement of the same fields here. And a `hooks/tests/` folder, where one exists, is proof rather than capability surface: its own suite is what a mirror's `Proven by` column cites, never a mirror of its own.
 
 <!-- spn:generated map — do not edit inside these markers; `docs.ts face` writes it -->
 | File | Governs | Carries | Status |

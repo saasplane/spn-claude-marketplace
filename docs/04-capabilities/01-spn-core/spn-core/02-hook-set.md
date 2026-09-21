@@ -19,8 +19,8 @@
 
 ## Follows the pattern
 
-- The four events, the verdict shape, and the line between refusing and reporting — [The Hook](../../../02-constructs/02-hooks/hook-set.md)
-- The folder and the manifest a hook is wired inside — [The Plugin](../../../02-constructs/01-plugins/plugin-set.md)
+- The four events, the verdict shape, and the line between refusing and reporting — [The Hook](../../../02-constructs/01-spn-core/02-hook-set.md)
+- The folder and the manifest a hook is wired inside — [The Plugin](../../../02-constructs/01-spn-core/01-plugin-set.md)
 
 ## Special handling
 

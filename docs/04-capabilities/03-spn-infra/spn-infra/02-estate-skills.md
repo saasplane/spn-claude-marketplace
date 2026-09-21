@@ -20,7 +20,7 @@ Four folders sit under `plugins/spn-infra/skills/`: `declare`, `plan-review`, `m
 
 ## Follows the pattern
 
-- The frontmatter, the matching and the description that is matched — [The Skill](../../../02-constructs/03-skills/skill-set.md)
+- The frontmatter, the matching and the description that is matched — [The Skill](../../../02-constructs/01-spn-core/07-skill-set.md)
 - The stack-agnostic verbs these four realize — [Skill in spn-core](../../01-spn-core/spn-core/07-skill-set.md)
 
 ## Special handling

@@ -19,8 +19,8 @@
 
 ## Follows the pattern
 
-- The frontmatter, the matching and the steps a skill sequences — [The Skill](../../../02-constructs/03-skills/skill-set.md)
-- The folder a skill is delivered inside — [The Plugin](../../../02-constructs/01-plugins/plugin-set.md)
+- The frontmatter, the matching and the steps a skill sequences — [The Skill](../../../02-constructs/01-spn-core/07-skill-set.md)
+- The folder a skill is delivered inside — [The Plugin](../../../02-constructs/01-spn-core/01-plugin-set.md)
 
 ## Special handling
 

@@ -18,7 +18,7 @@ Eleven markdown files sit directly under `plugins/spn-core/refs/`, each restatin
 
 ## Follows the pattern
 
-- The `spn:restates` block, the stamp and what drift means — [The Ref](../../../02-constructs/04-refs/ref-set.md)
+- The `spn:restates` block, the stamp and what drift means — [The Ref](../../../02-constructs/01-spn-core/08-ref-set.md)
 - How a tool is run and how it grades — [Tools in spn-core](05-tools.md)
 
 ## Special handling

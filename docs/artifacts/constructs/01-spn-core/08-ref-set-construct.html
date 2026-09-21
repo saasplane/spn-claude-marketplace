@@ -1,0 +1,462 @@
+<meta charset="utf-8">
+<title>The Ref — A Chapter, Restated and Stamped</title>
+<!-- spn:doc
+{"id":"ref-set","variant":"construct","title":"The Ref — A Chapter, Restated and Stamped","lenses":["VOICE","ARCHITECT"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"A markdown restatement of one or more chapters, carrying a hash of the exact text it last read, so a chapter that moves is reported rather than quietly outrun — and the three ways a restatement can fail to be comparable at all.","keywords":["ref","spn:restates","seen","hash","drift","unstamped"]}
+-->
+<!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
+<style>
+  :root {
+    --paper:#edf0f3; --card:#f7f9fb; --ink:#141920; --slate:#48525f; --faint:#7c8794;
+    --rule:#d2d9e0; --accent:#2f4e7a; --accent-soft:#e0e8f4;
+    --gap:#8f5714; --gap-soft:#f7ecda; --ok:#2a6459; --ok-soft:#dcece8;
+    --ui:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+    --xs:0.76rem; --sm:0.85rem; --md:0.97rem; --lg:1.32rem; --xl:1.62rem; --xxl:2.5rem;
+    --tk-k:#6d3a9c; --tk-s:#2a6459; --tk-c:#7c8794; --tk-t:#2f4e7a; --tk-n:#8f5714; --tk-add:#2a6459; --tk-del:#a63d3d;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){ --paper:#0f1318; --card:#171d24; --ink:#e3e8ee; --slate:#a3adb9; --faint:#6f7986;
+      --rule:#242d37; --accent:#86a9da; --accent-soft:#18232f;
+      --gap:#d59d4f; --gap-soft:#2a2113; --ok:#5db3a4; --ok-soft:#14251f; --tk-k:#c9a3ee; --tk-s:#7fc9b6; --tk-c:#6f7986; --tk-t:#86a9da; --tk-n:#d59d4f; --tk-add:#5db3a4; --tk-del:#e08a8a; }
+  }
+  :root[data-theme="dark"]{ --paper:#0f1318; --card:#171d24; --ink:#e3e8ee; --slate:#a3adb9; --faint:#6f7986;
+    --rule:#242d37; --accent:#86a9da; --accent-soft:#18232f;
+    --gap:#d59d4f; --gap-soft:#2a2113; --ok:#5db3a4; --ok-soft:#14251f; --tk-k:#c9a3ee; --tk-s:#7fc9b6; --tk-c:#6f7986; --tk-t:#86a9da; --tk-n:#d59d4f; --tk-add:#5db3a4; --tk-del:#e08a8a; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--ui);font-size:1rem;line-height:1.6;-webkit-font-smoothing:antialiased}
+  p{margin:0 0 1rem;max-width:58rem}
+  code,.m{font-family:var(--mono);font-size:0.87em}
+  strong{font-weight:600}
+  em{font-style:italic;color:var(--slate)}
+  a{color:var(--accent)}
+  .page{display:grid;grid-template-columns:13rem minmax(0,1fr);gap:3rem;max-width:min(98vw,80rem);margin:0 auto;padding:3rem 8px 6rem;align-items:start}
+  .rail{position:sticky;top:2.5rem;font-family:var(--ui);font-size:var(--xs)}
+  .rail .home{border-left:none;padding-left:0;margin-bottom:.9rem;color:var(--accent);font-weight:650;display:block}
+  .rail .rail-title{letter-spacing:.15em;text-transform:uppercase;color:var(--faint);margin-bottom:.85rem;font-size:.7rem}
+  .rail a{display:flex;gap:.55rem;text-decoration:none;color:var(--slate);padding:.28rem 0 .28rem .6rem;border-left:2px solid var(--rule);line-height:1.4}
+  .rail a .n{display:none}
+  .rail a.sub{padding-left:1.6rem;font-size:.72rem;color:var(--faint)}
+  .rail a:hover{color:var(--ink)}
+  .rail a.on{color:var(--accent);border-left-color:var(--accent);font-weight:650}
+  .rail .count{margin-left:auto;font-family:var(--mono);font-size:.68rem;background:var(--gap-soft);color:var(--gap);border-radius:2px;padding:0 .3rem}
+  .wrap{display:flex;flex-direction:column;gap:3.25rem;min-width:0}
+  .masthead{display:flex;flex-direction:column;gap:1.1rem}
+  .eyebrow{display:flex;flex-direction:column;gap:.5rem;font-family:var(--ui);font-size:var(--xs);color:var(--faint)}
+  .eyebrow .line{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem .6rem;line-height:1.7}
+  .eyebrow .sep{color:var(--rule);font-weight:300}
+  .eyebrow .line1{letter-spacing:.15em;text-transform:uppercase;font-weight:650;color:var(--faint);line-height:1.7}
+  .eyebrow .lbl{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+  .eyebrow .st{margin-left:auto;display:inline-flex;align-items:center;gap:.4rem}
+  .eyebrow .audience{display:inline-flex;flex-wrap:wrap;align-items:center;gap:.45rem}
+  .badge{display:inline-flex;align-items:center;gap:.35rem;padding:.1rem .6rem;border-radius:999px;border:1px solid var(--rule);background:var(--card);font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--slate);line-height:1.7;white-space:nowrap}
+  .badge.type{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);font-weight:650}
+  .badge.lens{font-family:var(--ui);font-size:.74rem;letter-spacing:0;text-transform:none}
+  .badge.status{font-weight:700}
+  .badge.status.planning{border-color:var(--gap);color:var(--gap);background:var(--gap-soft)}
+  .badge.status.implementing{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+  .badge.status.done{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(18rem,1fr));gap:.8rem;margin:1.6rem 0}
+  .tile{display:flex;flex-direction:column;border:1px solid var(--rule);background:var(--card);border-radius:3px;padding:.85rem 1rem;min-width:0}
+  .tile h4{margin:0 0 .35rem;font-size:var(--md)}
+  .tile h4 a{color:var(--ink);text-decoration:none}
+  .tile h4 a:hover{color:var(--accent)}
+  .tile p{font-size:var(--sm);color:var(--slate);margin:0 0 .6rem;max-width:none;flex:1}
+  .tile .more{font-size:var(--sm);font-weight:600;text-decoration:none;align-self:flex-start}
+  p > .more{font-weight:600;text-decoration:none}
+  h1{font-family:var(--ui);font-size:var(--xxl);font-weight:700;letter-spacing:-.02em;line-height:1.15;text-wrap:balance;margin:0}
+  .standfirst{font-size:var(--lg);line-height:1.5;color:var(--slate);max-width:46rem}
+  .sec-head{display:grid;grid-template-columns:1fr;align-items:baseline;gap:.5rem;border-top:2px solid var(--ink);padding-top:.7rem;margin-bottom:1.1rem}
+  .sec-head .num{font-family:var(--mono);font-size:var(--sm);font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+  h2{font-family:var(--ui);font-size:var(--xl);font-weight:700;letter-spacing:-.01em;text-wrap:balance;margin:0}
+  h3{font-family:var(--ui);font-size:var(--lg);font-weight:600;letter-spacing:-.008em;margin:2rem 0 .6rem}
+  h4{font-family:var(--ui);font-size:var(--md);margin:0 0 .5rem;color:var(--ink)}
+  .scroll{overflow-x:auto;border:1px solid var(--rule);border-radius:3px;background:var(--card);margin:1.6rem 0}
+  table{border-collapse:collapse;width:100%;font-family:var(--ui);font-size:var(--sm);min-width:34rem}
+  .scroll table{table-layout:auto}
+  th{text-align:left;font-family:var(--mono);font-size:var(--xs);letter-spacing:.07em;text-transform:uppercase;color:var(--faint);font-weight:650;padding:.6rem .8rem;border-bottom:1px solid var(--rule)}
+  td{padding:.6rem .8rem;border-bottom:1px solid var(--rule);vertical-align:top;color:var(--slate)}
+  td strong{color:var(--ink)}
+  tr:last-child td{border-bottom:none}
+  .num-cell{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+  .yes{color:var(--ok);font-weight:650}
+  .no{color:var(--gap);font-weight:650}
+  .s{font-family:var(--mono);font-size:var(--xs);color:var(--faint)}
+  pre{background:var(--card);border:1px solid var(--rule);border-radius:3px;padding:.9rem 1.1rem;margin:1.6rem 0;overflow-x:auto;font-family:var(--mono);font-size:var(--sm);line-height:1.55;color:var(--slate);max-width:100%}
+  pre code{font-size:inherit}
+  pre .tk-k{color:var(--tk-k);font-weight:600} pre .tk-s{color:var(--tk-s)} pre .tk-c{color:var(--tk-c);font-style:italic} pre .tk-t{color:var(--tk-t)} pre .tk-n{color:var(--tk-n)} pre .tk-add{color:var(--tk-add)} pre .tk-del{color:var(--tk-del)} pre .tk-cmd{color:var(--tk-t);font-weight:600}
+  /* A FIGURE RUNS EDGE TO EDGE. It takes no padding, border or background of its own: the section
+     already provides the page's padding, and the drawing's own containers are its frame. That is the
+     opposite of a PROSE panel, which carries all three. A figure is also not held to the prose
+     measure — 58rem is for a sentence, and a drawing is not read a line at a time. */
+  /* ONE VERTICAL RHYTHM. A paragraph keeps its 1rem; every block gets 1.6rem above and below, and a
+     figure 2.4rem — it is the largest thing on a page, and it needs the air to read as one unit rather
+     than as something the paragraph above it is still saying. Margins collapse, so the larger wins. */
+  figure{margin:2.4rem 0;padding:0;border:0;background:none}
+  figure svg{display:block;width:100%;max-width:none;height:auto;margin-inline:0}
+  figcaption{font-family:var(--ui);font-size:var(--xs);color:var(--faint);margin-top:.5rem;max-width:none}
+  .dg .box{fill:var(--card);stroke:var(--rule);stroke-width:1.5}
+  .dg .box.off{fill:none;stroke:var(--rule);stroke-width:1.5;stroke-dasharray:5 4}
+  .dg .box.warn{fill:var(--gap-soft);stroke:var(--gap);stroke-width:1.5}
+  .dg .box.em{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}
+  .dg .t{font-family:var(--ui);font-size:13px;font-weight:650;fill:var(--ink)}
+  .dg .l{font-family:var(--ui);font-size:12px;fill:var(--ink)}
+  .dg .s{font-family:var(--mono);font-size:11px;fill:var(--slate)}
+  .dg .n{font-family:var(--ui);font-size:11px;fill:var(--faint)}
+  .dg .c{stroke:var(--accent);stroke-width:1.6;fill:none}
+  .pull{border-left:2px solid var(--accent);background:var(--accent-soft);padding:1rem 1.2rem;margin:1.6rem 0;border-radius:0 3px 3px 0}
+  .pull .label{display:block;font-family:var(--ui);font-size:var(--xs);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.3rem}
+  .pull p{margin:0;max-width:none}
+  .open{background:var(--card);border:1px solid var(--rule);border-left:2px solid var(--gap);border-radius:0 3px 3px 0;padding:1.1rem 1.25rem;margin-bottom:.9rem}
+  .open h4{font-size:var(--md)}
+  .open .k{font-family:var(--mono);font-size:var(--xs);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);display:block;margin:.6rem 0 .2rem}
+  .open p{font-size:var(--sm);color:var(--slate);margin:0 0 .4rem;max-width:none}
+  .open .rec{margin-top:.75rem;padding-top:.65rem;border-top:1px dashed var(--rule);font-size:var(--sm);color:var(--ink)}
+  .open .rec b{color:var(--ok)}
+  .open .scroll{margin:.4rem 0}
+  pre.pv{font-family:var(--mono);font-size:var(--xs);background:var(--card);border:1px solid var(--rule);border-radius:3px;padding:.7rem .9rem;margin:1rem 0;overflow-x:auto;line-height:1.5}
+  footer{border-top:1px solid var(--rule);padding-top:1.3rem;font-family:var(--ui);font-size:var(--xs);color:var(--faint)}
+  @media (max-width:60rem){
+    .page{grid-template-columns:minmax(0,1fr);gap:1.5rem;padding-top:2rem}
+    .rail{position:static;border:1px solid var(--rule);border-radius:3px;background:var(--card);padding:.9rem 1rem}
+    .rail a{border-left:none;padding-left:0}
+    .rail a.on{border-left:none}
+  }
+</style>
+<div class="page">
+
+<nav class="rail" id="rail">
+  <a class="home" href="../../../02-constructs/README.md">&larr; the model</a>
+  <div class="rail-title">Outline</div>
+</nav>
+<div class="wrap">
+
+<header class="masthead">
+  <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
+  <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; The Ref — A Chapter, Restated and Stamped</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Construct</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">Editor</span><span class="badge lens">Architect</span></span><span class="st"><span class="lbl">Status:</span> <span class="badge status planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>The Ref — A Chapter, Restated and Stamped</h1>
+  <p class="standfirst">A citation nobody checks is a promise nobody keeps. The chapter it names moves on, the words copied from it quietly stop being true, and everybody finds out by accident. A ref is how this repository keeps that promise: a restatement carrying a hash of the exact text it last read, so a run can say <em>this chapter moved since I copied it</em>.</p>
+  <p>A ref exists because a reader may hold the plugins and never hold the book. It is a copy, made deliberately, under a stamp. It adds no rule; where a ref and its chapter disagree, the chapter wins and the ref is rewritten.</p>
+</header>
+
+<!-- 00 -->
+<section id="s0">
+  <div class="sec-head"><h2>Terms</h2></div>
+  <div class="scroll"><table>
+    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <tbody>
+      <tr><td>a ref</td><td>—</td><td>a markdown file under a plugin's <code>refs/</code>, restating part of the foundation book for a reader who cannot open it</td></tr>
+      <tr><td>the block</td><td><code>spn:restates</code></td><td>a comment at the top of that file, holding strict JSON, naming what the file restates</td></tr>
+      <tr><td>a stamp</td><td><code>Citation</code></td><td>one entry of the block — a chapter's path, an optional section, and the hash last read there</td></tr>
+      <tr><td>the hash</td><td><code>seen</code></td><td>eight characters over the cited text, with trailing spaces and surrounding blank lines removed</td></tr>
+      <tr><td>drift</td><td>—</td><td>a stamp whose hash no longer matches the chapter's text today</td></tr>
+      <tr><td>a source line</td><td>—</td><td>a file's own prose naming what it restates; it is read beside the block, and an omission from the block is a finding</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 01 -->
+<section id="s1">
+  <div class="sec-head"><h2>Model</h2></div>
+  <p>The hash is taken once, when the copy is made. Everything afterwards is a comparison.</p>
+  <figure>
+  <svg class="dg" viewBox="429 22 241 428" role="img" aria-label="map">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="box" x="431" y="24" width="237" height="76" rx="3"/>
+    <text class="l" x="447" y="50">a chapter</text>
+    <text class="n" x="447" y="69">the rule's one home, in the</text>
+    <text class="n" x="447" y="88">foundation book</text>
+    <path class="c" d="M549.5 100 V140" marker-end="url(#ar)"/>
+    <text class="n" x="559.5" y="124">copied into</text>
+    <rect class="box" x="431" y="140" width="237" height="76" rx="3"/>
+    <text class="l" x="447" y="166">the restatement</text>
+    <text class="n" x="447" y="185">the copy a reader with no book</text>
+    <text class="n" x="447" y="204">checkout can read</text>
+    <path class="c" d="M549.5 216 V256" marker-end="url(#ar)"/>
+    <text class="n" x="559.5" y="240">carries</text>
+    <rect class="box" x="431" y="256" width="237" height="76" rx="3"/>
+    <text class="l" x="447" y="282">the stamp</text>
+    <text class="n" x="447" y="301">a path, an optional section, and</text>
+    <text class="n" x="447" y="320">the hash last seen</text>
+    <path class="c" d="M549.5 332 V372" marker-end="url(#ar)"/>
+    <text class="n" x="559.5" y="356">read by</text>
+    <rect class="box" x="431" y="372" width="237" height="76" rx="3"/>
+    <text class="l" x="447" y="398">the drift run</text>
+    <text class="n" x="447" y="417">re-reads the chapter today and</text>
+    <text class="n" x="447" y="436">compares the hash</text>
+  </svg>
+  </figure>
+  <!-- dg:source
+{ "kind": "map",
+  "boxes": [
+    { "id": "a", "label": "a chapter", "note": "the rule's one home, in the foundation book" },
+    { "id": "b", "label": "the restatement", "note": "the copy a reader with no book checkout can read" },
+    { "id": "c", "label": "the stamp", "note": "a path, an optional section, and the hash last seen" },
+    { "id": "d", "label": "the drift run", "note": "re-reads the chapter today and compares the hash" }
+  ],
+  "links": [
+    { "from": "a", "to": "b", "label": "copied into" },
+    { "from": "b", "to": "c", "label": "carries" },
+    { "from": "c", "to": "d", "label": "read by" }
+  ] }
+  -->
+  <p>The comparison needs both trees, so it runs where the book is checked out beside the plugins, and answers with one clean line anywhere else.</p>
+</section>
+
+<!-- 02 -->
+<section id="s2">
+  <div class="sec-head"><h2>Parts</h2></div>
+  <h3 id="the-block-and-what-it-holds">The block, and what it holds</h3>
+  <p>A comment carrying strict JSON: a list of chapters, each with a path, an optional section, and its hash; and optionally a list of register rows the file also depends on. It sits at the top of the file, in the position a document's metadata block would take, and a ref carries this rather than that. <em>Where:</em> the first lines of <code>plugins/spn-core/refs/cross-repo.md</code></p>
+  <h3 id="a-stamp-is-as-precise-as-the-sentence-it">A stamp is as precise as the sentence it replaces</h3>
+  <p>Name a section and the hash covers that heading's own text; name only a path and it covers the whole file. The reason is measurable. One concept file runs to thousands of lines and many restatements cite it, so hashing the whole file re-stamps a lens every time anything else in it moves — and a finding that is usually wrong teaches people to stop reading the run. <em>Where:</em> <code>plugins/spn-core/hooks/lib/restates.ts</code></p>
+  <h3 id="what-the-hash-ignores-and-what-it-does-n">What the hash ignores, and what it does not</h3>
+  <p>Trailing spaces and the blank lines around the cited text are invisible to a reader, so a change to them is not a change to the rule. Everything else counts, a reordering included, because a list of rules whose order changed is a list a restatement may now state wrongly. <em>Where:</em> <code>plugins/spn-core/hooks/lib/restates.ts</code>, <code>normalize</code></p>
+  <h3 id="the-parser-lives-once-because-two-checks">The parser lives once because two checks read it</h3>
+  <p>Comparing the foundation's own restatements inside one repository and comparing this repository's restatements against a book are different questions with the same parser. Writing that parser twice would be the defect this construct exists to stop, inside the instrument meant to catch it. So it is a library file, and neither check owns it. <em>Where:</em> <code>plugins/spn-core/hooks/lib/restates.ts</code></p>
+  <h3 id="a-block-used-to-get-credit-for-what-it-l">A block used to get credit for what it left out</h3>
+  <p>A check that walks only the block can validate only what the file declared, so a source named in the file's own prose and omitted from the block was unreachable rather than unstamped, and both runs printed green over it. The check now reads the file's own source line and compares it against the block. The comparison is loose in one direction only: a name in prose counts as declared when some declared path contains it. <em>Where:</em> <code>plugins/spn-core/hooks/lib/restates.ts</code>, <code>undeclared</code></p>
+  <h3 id="three-ways-a-restatement-fails-and-they-">Three ways a restatement fails, and they are not the same finding</h3>
+  <p><strong>Undeclared</strong> is prose naming a source the block leaves out, which no run can see. <strong>Unstamped</strong> is a file saying what it restates and carrying no block at all, so nothing machine-readable exists to compare. <strong>Unread</strong> is a name no check can resolve to a file, which is an under-report rather than a hidden fault. Several files in this marketplace are unstamped today, and one carries a marker of its own that nothing reads. <em>Where:</em> <code>plugins/spn-core/hooks/tools/restate-drift.ts</code></p>
+  <h3 id="a-source-comment-is-not-a-stamp">A source comment is not a stamp</h3>
+  <p>Every hook and tool here opens with a line naming the chapter it restates. That line carries no hash, so nothing compares it. It is deliberate, and it means something narrower: a change is made in the chapter first and in the code second, in the same change. <em>Where:</em> compare the header of <code>plugins/spn-core/hooks/checks/doc-check.ts</code> with the block at the top of <code>plugins/spn-core/refs/doc-sets.md</code></p>
+</section>
+
+<!-- 03 -->
+<section id="s3">
+  <div class="sec-head"><h2>Boundary</h2></div>
+  <p>This page answers what a restatement is and how it stays honest. It does not answer what any chapter says — the chapter answers that, and a ref only ever repeats it under a stamp. It does not answer how a ref is delivered either, or when a reader loads one: a ref is loaded because something names it, and the thing naming it is a skill, a brief or a check.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <tbody>
+      <tr><td>the block, the stamp, what the hash covers, and the three ways a restatement stops being comparable</td><td>whether the rule being restated is correct</td><td>the foundation chapter the stamp names</td></tr>
+      <tr><td>that a bare source comment in code names a chapter and is not a stamp</td><td>when a session reads a ref, and what names it</td><td><a href="./07-skill-set-construct.html">The Skill</a> · <a href="./10-agent-set-construct.html">The Agent</a></td></tr>
+      <tr><td>that a ref adds no rule of its own</td><td>a restatement whose subject is one reviewing viewpoint</td><td><a href="./09-lenses-construct.html">The Lens</a></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 04 -->
+<section id="s4">
+  <div class="sec-head"><h2>Binds</h2></div>
+  <div class="scroll"><table>
+    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <tbody>
+      <tr><td><code>RD.DOCS.055</code></td><td>a file carrying a rule it does not own is a restatement, and the verb is <code>restates</code></td><td>MUST</td></tr>
+      <tr><td>the foundation's <code>04-discipline.md</code> § Restatement discipline</td><td>repetition is allowed only as a declared restatement, carrying its source and never a new rule</td><td>MUST</td></tr>
+      <tr><td><a href="../../../registers/decisions.md">MD3</a></td><td>a ref that carries no block is unstamped, and a marker no tool reads is not a declaration</td><td>MUST</td></tr>
+    </tbody>
+  </table></div>
+  <div class="scroll"><table>
+    <thead><tr><th>Repo</th><th>Node</th><th>What it realizes</th><th>State</th></tr></thead>
+    <tbody>
+      <tr><td>spn-foundation</td><td><code>01-devex/02-agent/04-plugins</code></td><td>the foundation construct this one realizes</td><td>planned</td></tr>
+      <tr><td>spn-claude-marketplace</td><td><code>spn-core</code></td><td>the restatements a reader with no book can still read, the block parser, and the comparison that reports what moved</td><td>planned</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 05 -->
+<section id="s5">
+  <div class="sec-head"><h2>Proof</h2></div>
+  <p><em>Behaviours: joined from the register, <code>03-behaviors/01-spn-core/08-ref-set.md</code> as of 2026-09-22 — never typed in the seat file.</em></p>
+  <div class="scroll"><table>
+    <thead><tr><th>Row</th><th>Does</th><th>Tier</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td><code>MKT.REF.01</code></td><td>read a standard in full with no book checkout</td><td>UNIT</td><td>PLANNED</td></tr>
+      <tr><td><code>MKT.REF.02</code></td><td>be told when a chapter a copy depends on has moved</td><td>UNIT</td><td>PLANNED</td></tr>
+      <tr><td><code>MKT.REF.03</code></td><td>cite one section without being re-flagged by the rest of a large file</td><td>UNIT</td><td>PLANNED</td></tr>
+      <tr><td><code>MKT.REF.04</code></td><td>reformat a file's trailing space without tripping the comparison</td><td>UNIT</td><td>PLANNED</td></tr>
+      <tr><td><code>MKT.REF.05</code></td><td>reorder a list of rules and have the comparison notice</td><td>UNIT</td><td>PLANNED</td></tr>
+      <tr><td><code>MKT.REF.06</code></td><td>be caught naming a source in prose and leaving it out of the block</td><td>UNIT</td><td>PLANNED</td></tr>
+      <tr><td><code>MKT.REF.07</code></td><td>tell an unstamped file from one that fell behind</td><td>UNIT</td><td>PLANNED</td></tr>
+      <tr><td><code>MKT.REF.08</code></td><td>have both comparisons read a block the same way</td><td>UNIT</td><td>PLANNED</td></tr>
+    </tbody>
+  </table></div>
+  <div class="scroll"><table>
+    <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
+    <tbody>
+      <tr><td><code>node plugins/spn-core/hooks/tools/restate-drift.ts</code></td><td>gate</td><td>every stamped chapter still reads as it did when the copy was made, and every source named in prose is declared in the block</td></tr>
+    </tbody>
+  </table></div>
+  <p>Try it: <code>node plugins/spn-core/hooks/tools/restate-drift.ts</code></p>
+</section>
+
+<footer>
+  A template from workstream 008 &middot; copy it, keep the comments until the page is written, then delete them &middot; the rules live in the book; this file repeats them so you never write from memory &middot; every block and figure is shown once in <code>blocks-template.html</code>
+</footer>
+
+</div>
+</div>
+
+<script>
+(function(){
+  var rail=document.getElementById('rail');if(!rail)return;
+  var secs=Array.prototype.slice.call(document.querySelectorAll('section[id]'));
+  var links=[];
+  secs.forEach(function(s){
+    var num=s.querySelector('.sec-head .num'),h2=s.querySelector('h2');if(!h2)return;
+    var a=document.createElement('a');a.href='#'+s.id;
+    var n=document.createElement('span');n.className='n';n.textContent=num?num.textContent:'';
+    var t=document.createElement('span');t.textContent=h2.textContent.split(' — ')[0];
+    a.appendChild(n);a.appendChild(t);
+    if(s.id==='s4'){var c=s.querySelectorAll('.open').length;if(c){var b=document.createElement('span');b.className='count';b.textContent=c;a.appendChild(b);}}
+    rail.appendChild(a);links.push({el:a,sec:s});
+    Array.prototype.forEach.call(s.querySelectorAll('h3[id]'),function(h){
+      var sa=document.createElement('a');sa.href='#'+h.id;sa.className='sub';sa.textContent=h.textContent;rail.appendChild(sa);
+    });
+  });
+  function mark(){var y=window.scrollY+120,cur=links[0];links.forEach(function(l){if(l.sec.offsetTop<=y)cur=l;});links.forEach(function(l){l.el.classList.toggle('on',l===cur);});}
+  window.addEventListener('scroll',mark,{passive:true});mark();
+})();
+</script>
+
+<style>
+/* anchor links: a section or subsection title carries a link to itself — small, grey, set off from the title; copied on click */
+a.anchor{display:inline-block;margin-left:.6em;font-family:var(--mono);font-size:.55em;font-weight:400;line-height:1;color:var(--slate,#6b7280);text-decoration:none;opacity:.35;transition:opacity .15s;vertical-align:middle;position:relative;top:-.1em}
+.sec-head:hover a.anchor,h3[id]:hover a.anchor,a.anchor:hover,a.anchor:focus,a.anchor.copied{opacity:1}
+a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7d4a);margin-left:.3em}
+</style>
+
+<style>
+  .rail .sub-group{display:block}
+  .rail.js .sub-group{display:none}
+  .rail.js .sub-group.shown{display:block}
+  /* The caret sits at the far right and appears only where a group exists. It is sized to be a
+     comfortable target rather than a decoration, and it reflects the group's REAL state. */
+  .rail a .caret{margin-left:auto;flex:none;width:1.1rem;height:1.1rem;display:grid;place-items:center;
+    color:var(--faint);font-size:.78rem;line-height:1;border-radius:2px;transition:transform .15s ease}
+  .rail a .caret::before{content:"\25B8"}
+  .rail a.group-open .caret{transform:rotate(90deg)}
+  .rail a .caret:hover{background:var(--accent-soft);color:var(--accent)}
+  .rail a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  @media (prefers-reduced-motion:reduce){.rail a.has-subs .caret{transition:none}}
+</style>
+
+<style>
+  /* a quote is a sentence set apart — a rule stated in full, or a line from the source the page is about */
+  blockquote{margin:1.6rem 0;padding:.2rem 0 .2rem 1.1rem;border-left:2px solid var(--rule);color:var(--slate)}
+  blockquote p{margin:0;max-width:none}
+  .tile .s{margin-top:.45rem}
+  /* PROSE — the markdown block. Its own border, background and text colour, so a passage of ordinary
+     markdown reads as a block the page chose rather than as the page's own voice continuing. */
+  .prose{border:1px solid var(--rule);background:var(--card);color:var(--slate);border-radius:3px;
+    padding:1.1rem 1.3rem;margin:1.6rem 0}
+  .prose > :first-child{margin-top:0}
+  .prose > :last-child{margin-bottom:0}
+  .prose p,.prose li{max-width:none}
+  .prose strong,.prose h4{color:var(--ink)}
+  .prose code{color:var(--ink)}
+  .prose blockquote{border-left-color:var(--accent);margin:1rem 0}
+  /* NEXT — small on purpose: a title and a direction, nothing else */
+  .nextnav{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.7rem;margin:1.6rem 0}
+  .nextnav-card{display:flex;flex-direction:column;gap:.15rem;border:1px solid var(--rule);background:var(--card);
+    border-radius:3px;padding:.65rem .85rem;text-decoration:none;min-width:0}
+  .nextnav-card:hover{border-color:var(--accent)}
+  .nextnav-card .dir{font-family:var(--mono);font-size:var(--xs);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+  .nextnav-card .ttl{font-size:var(--sm);font-weight:600;color:var(--ink)}
+  .nextnav-card:hover .ttl{color:var(--accent)}
+  .nextnav-card.next{text-align:right}
+</style>
+
+<script>
+(function(){
+  var rail = document.getElementById('rail-list') || document.getElementById('rail');
+  if (!rail || rail.querySelector('.sub-group')) return;
+  var styled = document.getElementById('rail') || rail;
+
+  /* The caret and the group are one state with two faces. Writing both here is what stops the
+     caret claiming a section is open while its subsections are hidden. */
+  function setOpen(anchor, group, open){
+    group.classList.toggle('shown', open);
+    anchor.classList.toggle('group-open', open);
+    anchor.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+
+  /* Regroup whatever the page's own builder produced: a section anchor, then the `sub` anchors
+     that follow it, moved into one collapsing group. */
+  var entries = [], current = null;
+  Array.prototype.slice.call(rail.children).forEach(function(node){
+    if (node.tagName !== 'A' || node.classList.contains('home')) return;
+    if (node.classList.contains('sub')) {
+      if (!current) return;
+      if (!current.group) {
+        current.group = document.createElement('div');
+        current.group.className = 'sub-group';
+        rail.insertBefore(current.group, node);
+      }
+      current.group.appendChild(node);
+      return;
+    }
+    current = { anchor: node, group: null };
+    entries.push(current);
+  });
+
+  entries.forEach(function(entry){
+    if (!entry.group) return;                     // a section with no second level never folds
+    var anchor = entry.anchor, group = entry.group;
+    anchor.classList.add('has-subs');
+    var caret = document.createElement('span');
+    caret.className = 'caret';
+    caret.setAttribute('role', 'button');
+    caret.setAttribute('tabindex', '-1');
+    caret.setAttribute('aria-label', 'Show sections under ' + anchor.textContent.trim());
+    anchor.appendChild(caret);
+    /* The caret toggles without leaving the page; the label still navigates. Hit-testing the
+       element beats measuring offsetX, which broke the moment the caret moved to the right. */
+    anchor.addEventListener('click', function(event){
+      if (event.target !== caret) return;
+      event.preventDefault();
+      /* `pinned` means a reader decided, so the scroll must stop overriding them. */
+      anchor.dataset.pinned = '1';
+      setOpen(anchor, group, !group.classList.contains('shown'));
+    });
+    setOpen(anchor, group, false);
+  });
+
+  /* THE RAIL FOLLOWS THE SCROLL. The page's own builder already marks the current entry with
+     `on`, so this watches that mark rather than measuring offsets a second time — two answers to
+     where the reader is would disagree the first time either changed. */
+  function follow(){
+    entries.forEach(function(entry){
+      if (!entry.group || entry.anchor.dataset.pinned === '1') return;
+      var here = entry.anchor.classList.contains('on') || !!entry.group.querySelector('a.on');
+      setOpen(entry.anchor, entry.group, here);
+    });
+  }
+  new MutationObserver(follow).observe(rail, {subtree: true, attributes: true,
+                                              attributeFilter: ['class']});
+  /* Last, because everything above degrades to the full index when no script runs. */
+  styled.classList.add('js');
+  follow();
+})();
+</script>
+
+<script>
+/* Every section (h2 inside .sec-head) and every subsection (h3 with an id) gets an anchor link.
+   Clicking it moves the address to that heading and copies the full link, so a subsection can be shared. */
+(function(){
+  function pageBase(){
+    var ref=document.referrer||'';
+    if(window.top!==window&&ref.indexOf('/artifact/')>-1)return ref.split('#')[0];
+    return location.href.split('#')[0];
+  }
+  function attach(h,id){
+    if(!id||h.querySelector('a.anchor'))return;
+    var a=document.createElement('a');a.className='anchor';a.href='#'+id;a.textContent='#';a.title='Copy link to this heading';a.setAttribute('aria-label','Copy link to '+h.textContent.trim());
+    a.addEventListener('click',function(ev){
+      var url=pageBase()+'#'+id;
+      try{history.replaceState(null,'',location.pathname+location.search+'#'+id);}catch(e){}
+      var done=function(){a.classList.add('copied');setTimeout(function(){a.classList.remove('copied');},1400);};
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(done,done);}else{done();}
+      var target=document.getElementById(id);if(target){ev.preventDefault();target.scrollIntoView({block:'start'});}
+    });
+    h.appendChild(a);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('section[id]'),function(s){
+    var h2=s.querySelector('.sec-head h2');if(!h2)return;
+    if(!h2.id)h2.id=s.id+'-title';
+    attach(h2,s.id);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('h3[id]'),function(h){attach(h,h.id);});
+})();
+</script>

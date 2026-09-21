@@ -4,7 +4,8 @@
   "title": "Behaviors — spn-claude-marketplace",
   "lenses": ["PRODUCT", "QA"],
   "status": "PLANNING",
-  "summary": "The behaviors seat of spn-claude-marketplace — what it would hold, stated while it holds nothing of its own."
+  "summary": "The behaviors seat of spn-claude-marketplace — one file of rows beside each construct, written by the plugins' own suites because this repository declares no stack.",
+  "keywords": ["behaviors", "rows", "register", "runner", "tier", "id"]
 }
 -->
 
@@ -14,7 +15,14 @@
 
 **What** — this seat answers what a person can do, in the consumer's own words.
 
-One area file per domain, each a table of eight-cell rows. A behaviour belongs to the domain that would have to change if the behaviour changed.
+One file of rows sits beside each construct, at the same relative path and the same number. So `03-behaviors/01-spn-core/04-checks.md` proves `02-constructs/01-spn-core/04-checks.md`, and a produced page joins its own rows with nothing to look up.
 
-**Nothing of this repository's own sits here yet.** You are not meeting an absent seat: the seat exists from the first day, and a seat holding nothing but its face is the compact state rather than a defect. What belongs here is written when there is something to write, and never as packaging for a single document.
+**This repository writes its own rows.** It declares no stack, so the deterministic tool serves it with its docs verbs alone and has no runner for it. The plugins' own suites are the runner: a case whose title carries a row's id becomes a result, the results become an artifact in the pocket, and the writer puts what the run found into the `Status` and the `Updated at` cells. Every other cell is a decision somebody made, and nothing writes over those.
 
+**A row here is declared, never claimed.** Each one reads `PLANNED` until a run says otherwise. A row whose tier a run covered and whose case the run never reached reads as pending afterwards, which is the honest answer and the one a reader needs.
+
+| Domain | What it promises |
+| --- | --- |
+| [spn-core](01-spn-core/README.md) | The plugin every repository loads, and everything a session reads from it |
+| [spn-apps-ts](02-spn-apps-ts/README.md) | The apps world made concrete for TypeScript |
+| [spn-infra](03-spn-infra/README.md) | The estate world, and the boundary none of its verbs crosses |

@@ -19,7 +19,7 @@ Eleven files sit under `plugins/spn-core/refs/lenses/`, one per reviewing viewpo
 ## Follows the pattern
 
 - The stamped block every ref carries — [Ref in spn-core](08-ref-set.md)
-- The frontmatter and the convening of a parameterized reviewer — [The Agent](../../../02-constructs/05-agents/agent-set.md)
+- The frontmatter and the convening of a parameterized reviewer — [The Agent](../../../02-constructs/01-spn-core/10-agent-set.md)
 
 ## Special handling
 

@@ -21,7 +21,7 @@ Five folders sit under `plugins/spn-apps-ts/skills/`: `new`, `implement`, `revie
 
 ## Follows the pattern
 
-- The frontmatter, the matching and the steps a skill sequences — [The Skill](../../../02-constructs/03-skills/skill-set.md)
+- The frontmatter, the matching and the steps a skill sequences — [The Skill](../../../02-constructs/01-spn-core/07-skill-set.md)
 - The stack-agnostic verbs these five realize — [Skill in spn-core](../../01-spn-core/spn-core/07-skill-set.md)
 
 ## Special handling

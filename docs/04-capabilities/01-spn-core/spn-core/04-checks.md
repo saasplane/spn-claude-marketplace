@@ -22,8 +22,8 @@ A check is one file under `hooks/checks/`, exporting a function that reads the c
 ## Follows the pattern
 
 - The verdict, the composition, the always-zero exit — [Hook in spn-core](02-hook-set.md)
-- What a check may decide alone — [The Hook](../../../02-constructs/02-hooks/hook-set.md)
-- The citation a header carries — [The Ref](../../../02-constructs/04-refs/ref-set.md)
+- What a check may decide alone — [The Hook](../../../02-constructs/01-spn-core/02-hook-set.md)
+- The citation a header carries — [The Ref](../../../02-constructs/01-spn-core/08-ref-set.md)
 
 ## Special handling
 
