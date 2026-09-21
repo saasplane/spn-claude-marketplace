@@ -29,7 +29,12 @@ import { filesUnder as proseFilesUnder, paragraphs as proseParagraphs, score as 
 type Grade = "RULE" | "SOFT";
 type Finding = { check: string; grade: Grade; file: string; message: string };
 
-const VARIANTS = ["approach", "overview", "construct", "behaviors", "report"] as const;
+// `capability` joined the set with Q130. The chapter kind existed, its template existed, and the
+// checker had never heard of it — so every capability chapter in the corpus was a document whose
+// own declared variant was not a variant. It carries no fixed outline: a chapter is Where ·
+// Follows the pattern · Special handling · Between modules, and a construct that is pure pattern
+// legitimately has no Special handling at all.
+const VARIANTS = ["approach", "overview", "construct", "behaviors", "capability", "report"] as const;
 type Variant = (typeof VARIANTS)[number];
 
 /** The lens register, as the document chapter's table renders each value for a reader. */
