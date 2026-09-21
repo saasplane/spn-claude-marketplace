@@ -285,6 +285,39 @@ console.log("\n=== a section is found by its whole name, not by its first word")
       has("carries a table of behaviour rows"));
 }
 
+console.log("\n=== a repository is never the book it restates");
+{
+  // `findBook` names the book by what it CARRIES — a decisions register and a concept — and reads
+  // the siblings of its own parent, which includes itself. The marketplace earned both the day it
+  // was documented as a GENERAL repository, so the bare command compared the plugins against
+  // their own repository's docs and reported 77 drifts that were not drift at all.
+  const { findBook } = await import("../tools/restate-drift.ts");
+  const book = (name) => ({
+    [`${name}/docs/registers/decisions.md`]: "# decisions\n",
+    [`${name}/CONCEPT.md`]: "# c\n",
+  });
+  const parent = join(BASE, `books${made += 1}`);
+  for (const [rel, body] of Object.entries({ ...book("self"), ...book("the-book") })) {
+    const full = join(parent, rel);
+    mkdirSync(join(full, ".."), { recursive: true });
+    writeFileSync(full, body, "utf8");
+  }
+  one("the repository being checked is skipped, even though it carries both files",
+      findBook(undefined, join(parent, "self")), join(parent, "the-book"));
+  one("and an explicit argument is still honoured",
+      findBook(join(parent, "self"), join(parent, "self")), join(parent, "self"));
+  // With a sibling that also carries both, `the-book` finds `self` — which is right: the test is
+  // what a repository CARRIES, and a second book beside you is a candidate. What must never
+  // happen is finding yourself.
+  const alone = join(BASE, `alone${made += 1}`, "only");
+  for (const [rel, body] of Object.entries({ "docs/registers/decisions.md": "# d\n", "CONCEPT.md": "# c\n" })) {
+    mkdirSync(join(alone, rel, ".."), { recursive: true });
+    writeFileSync(join(alone, rel), body, "utf8");
+  }
+  one("a repository with no sibling book finds none, rather than itself",
+      findBook(undefined, alone), null);
+}
+
 console.log("\n=== a code figure names a PATH; a bare file name is a term");
 {
   const withFig = (name) =>

@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/04-capabilities/02-support/01-apps/03-module/01-server/02-app/01-services.md", "seen": "79fb3e9e" },
+    { "path": "docs/04-capabilities/02-support/01-apps/03-module/01-server/02-app/01-services.md", "seen": "f826eedc" },
     { "path": "docs/04-capabilities/02-support/01-apps/03-module/01-server/02-app/02-repositories.md", "seen": "bd7eea70" },
     { "path": "providers/apps/ts/05-service-patterns.md", "seen": "961bbdd7" },
     { "path": "providers/apps/ts/06-database-patterns.md", "seen": "95599b34" },

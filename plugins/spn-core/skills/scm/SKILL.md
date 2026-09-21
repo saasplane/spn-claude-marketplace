@@ -6,7 +6,7 @@ description: The repository and project standard - what a project must declare, 
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/README.md", "seen": "fa7f9251" }
+    { "path": "docs/README.md", "seen": "ac9129e9" }
   ]
 }
 -->

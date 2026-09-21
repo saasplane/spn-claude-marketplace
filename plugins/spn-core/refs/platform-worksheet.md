@@ -1,17 +1,20 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "CONCEPT.md", "seen": "9a52a641" },
-    { "path": "docs/04-capabilities/03-platform/README.md", "seen": "25412dec" },
-    { "path": "docs/03-behaviors/01-devex/04-workspace/04-docs.md", "seen": "15ace97a" },
-    { "path": "docs/03-behaviors/02-support/02-infra/01-shape.md", "seen": "cf7338dc" }
+    { "path": "docs/02-constructs/02-support/02-infra/01-shape.md", "seen": "ba312336" },
+    { "path": "docs/02-constructs/03-platform/01-core/01-tenancy.md", "seen": "e8b98624" },
+    { "path": "docs/04-capabilities/03-platform/README.md", "seen": "de1465ec" },
+    { "path": "docs/03-behaviors/01-devex/04-workspace/04-docs.md", "seen": "de4c61f9" },
+    { "path": "docs/03-behaviors/02-support/02-infra/01-shape.md", "seen": "4ca4d9d3" }
   ]
 }
 -->
 
 # New-Platform Intake Worksheet
 
-The one-page artifact every new SaaS Plane platform starts from. Fill every row **before** any repository, manifest, or scaffold exists — adoption types these values into manifests, and a manifest is the wrong place to discover a decision was never made. The completed worksheet lands as the **coordinates section of the repository's `CONCEPT.md`**, produced by the `ideate` skill — coordinates settle here; the boundary, domains and surfaces are the concept's own job. Source of truth: the foundation book (`spn-foundation`), `docs/04-capabilities/03-platform/` and `docs/03-behaviors/01-devex/04-workspace/04-docs.md` / `02-design.md`. SPN Demo (org `spn`, platform `dmo`, domain `spndemo.app`) is the book's sample platform, shown as the example column.
+The one-page artifact every new SaaS Plane platform starts from. Fill every row **before** any repository, manifest, or scaffold exists — adoption types these values into manifests, and a manifest is the wrong place to discover a decision was never made. The completed worksheet lands as the **coordinates section of the repository's `CONCEPT.md`**, produced by the `ideate` skill — coordinates settle here; the boundary, domains and surfaces are the concept's own job. SPN Demo (org `spn`, platform `dmo`, domain `spndemo.app`) is the book's sample platform, shown as the example column.
+
+Source of truth: the foundation book (`spn-foundation`). The constructs are `docs/02-constructs/03-platform/01-core/01-tenancy.md` for the organization tree and the archetypes, and `docs/02-constructs/02-support/02-infra/01-shape.md` for the coordinates every estate name is composed from; the standards are `docs/04-capabilities/03-platform/README.md`. The rows this worksheet serves sit beside those constructs in the behaviours seat: `docs/03-behaviors/01-devex/04-workspace/04-docs.md` carries what a leader can establish from the book alone, and `docs/03-behaviors/02-support/02-infra/01-shape.md` carries deriving every estate name from the coordinates settled here.
 
 Expect every row to be consumed verbatim by a later step; nothing here is a throwaway answer.
 

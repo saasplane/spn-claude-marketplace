@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md", "seen": "fd58f38e" }
+    { "path": "docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md", "seen": "3b4c9c92" }
   ],
   "rows": [
     "RD.SAAS.033",

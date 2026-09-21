@@ -1,17 +1,17 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/04-capabilities/03-platform/01-core/04-data-and-trust/02-trust.md", "seen": "e703b45e" },
-    { "path": "docs/04-capabilities/02-support/01-apps/08-devex-agent/README.md", "seen": "588e84b0" },
-    { "path": "docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md", "seen": "fd58f38e" },
-    { "path": "docs/04-capabilities/02-support/01-apps/03-module/01-server/01-contract/01-states.md", "seen": "39d71ca3" }
+    { "path": "docs/04-capabilities/03-platform/01-core/04-data-and-trust/02-trust.md", "seen": "ffc78858" },
+    { "path": "docs/04-capabilities/02-support/01-apps/08-agent-surface/README.md", "seen": "4a652e95" },
+    { "path": "docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md", "seen": "3b4c9c92" },
+    { "path": "docs/04-capabilities/02-support/01-apps/03-module/01-server/01-contract/01-states.md", "seen": "b57723a5" }
   ]
 }
 -->
 
 # Lens — `TRUST` (DevSecOps / Security)
 
-**Source of truth:** the foundation book's trust chapter (`03-platform/08-trust`), the four build invariants (`02-support/01-apps/08-devex-agent`), the authorization and step-up model (`03-platform/03-people-access`), and the secrets and error disciplines (`02-support/01-apps/03-module/01-server/01-contract/01-states`). This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
+**Source of truth:** the foundation book's trust chapter (`03-platform/01-core/04-data-and-trust/02-trust`), the four build invariants (`02-support/01-apps/08-agent-surface`), the authorization and step-up model (`03-platform/01-core/01-tenancy/03-people-access`), and the secrets and error disciplines (`02-support/01-apps/03-module/01-server/01-contract/01-states`). This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
 
 **Worn** while writing any mutation. **Convened** on every build. **Blocks:** a mutation with no authorization or no audit.
 

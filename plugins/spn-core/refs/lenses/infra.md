@@ -1,10 +1,10 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/04-capabilities/02-support/02-infra/README.md", "seen": "d8637066" },
-    { "path": "docs/04-capabilities/01-devex/01-function/01-scm.md", "seen": "416a167e" },
-    { "path": "docs/04-capabilities/01-devex/01-function/07-deliver.md", "seen": "0bd19d37" },
-    { "path": "docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md", "seen": "49a5dcc2" }
+    { "path": "docs/04-capabilities/02-support/02-infra/README.md", "seen": "96f660d6" },
+    { "path": "docs/04-capabilities/01-devex/01-function/01-scm.md", "seen": "6ee20169" },
+    { "path": "docs/04-capabilities/01-devex/01-function/07-deliver.md", "seen": "5ccbaa78" },
+    { "path": "docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md", "seen": "4dd88c9e" }
   ],
   "rows": [
     "RD.APPS.121"
@@ -14,7 +14,7 @@
 
 # Lens — `INFRA` (DevOps / SRE)
 
-**Source of truth:** the foundation book's infra design of record (`02-support/02-infra` — boundaries, manifests, the two-realization doctrine) and the delivery standard (devex `01-scm` · `07-deliver` · `10-delivery`). This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
+**Source of truth:** the foundation book's infra design of record (`02-support/02-infra` — boundaries, manifests, the two-realization doctrine) and the delivery standard (devex `01-function/01-scm` · `01-function/07-deliver` · `03-utils/01-spnutils/02-delivery`). This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
 
 **Worn** while touching manifests and configuration. **Convened** when a change makes a resource appear. **Advises — never blocks** (its convened mode over a real cloud estate is deferred until one runs).
 

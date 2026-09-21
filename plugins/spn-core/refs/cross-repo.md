@@ -1,9 +1,10 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "CONCEPT.md", "seen": "9a52a641" },
-    { "path": "docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md", "seen": "1f6dfee7" },
-    { "path": "docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md", "section": "The agent is updated first, and reloaded before anything runs", "seen": "41e78db7" },
+    { "path": "docs/02-constructs/01-devex/04-workspace/01-workspace.md", "seen": "59692fb2" },
+    { "path": "docs/02-constructs/01-devex/04-workspace/02-workstream.md", "seen": "05be59e7" },
+    { "path": "docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md", "seen": "3c7d36f0" },
+    { "path": "docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md", "section": "The agent is updated first, and reloaded before anything runs", "seen": "687ada82" },
     { "path": "docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md", "section": "When an edit becomes behaviour", "seen": "4d108ba0" },
     { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md", "section": "Restatement discipline", "seen": "11808ae4" }
   ],
@@ -19,7 +20,7 @@
 
 # Cross-Repo Work — Stack-Agnostic
 
-How an agent works across more than one repository on a SaaS Plane estate, and where a rule belongs so every agent sees it. Apply it in any stack and to any repo pair. Source of truth: the foundation's `CONCEPT.md` — `#### DevEx Workspace`, and **THE MACHINE'S OWN LAYOUT** for the env seat. Also `04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md` **§ The env seat**, and `04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md` **§ The agent is updated first, and reloaded before anything runs**. Then `04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md` **§ When an edit becomes behaviour**, and `04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` **§ Restatement discipline**. The decisions are RD.DEVEX.020, RD.DEVEX.044, RD.DEVEX.048, RD.DEVEX.049 and RD.DOCS.055. Where this restatement and those disagree, the sources win and this file is regenerated.
+How an agent works across more than one repository on a SaaS Plane estate, and where a rule belongs so every agent sees it. Apply it in any stack and to any repo pair. Source of truth: the foundation's `02-constructs/01-devex/04-workspace/01-workspace.md` and `02-constructs/01-devex/04-workspace/02-workstream.md` — the workspace itself, and the scope of work inside it. The machine seat is `04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md` **§ The machine's own layout** and **§ The env seat**, and `04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md` **§ The agent is updated first, and reloaded before anything runs**. Then `04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md` **§ When an edit becomes behaviour**, and `04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` **§ Restatement discipline**. The decisions are RD.DEVEX.020, RD.DEVEX.044, RD.DEVEX.048, RD.DEVEX.049 and RD.DOCS.055. Where this restatement and those disagree, the sources win and this file is regenerated.
 
 ## One window, laws by declaration
 
@@ -156,9 +157,11 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
         notes/                            scratch, scoped to this subject
     closed/
       {NNN}-{subject}/                    the whole folder, once its plan is accounted for
-  orders/
+  .debug/                                 what the agent's own machinery says about itself
   README.md
 ```
+
+**Those are the only two containers.** `workstreams/` holds one folder per scope of work, and `.debug/` holds what the machinery says about itself. A leading dot hides `.debug/` from every reader of the workstreams, by a rule the corpus already carries.
 
 **A workstream is never a Claude Code session.** Claude Code owns the window, and `SessionStart` is its hook. A workstream is a scope of work, and it outlives every window you open on it.
 

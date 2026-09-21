@@ -1,9 +1,10 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md", "seen": "21df863a" },
-    { "path": "docs/04-capabilities/03-platform/01-core/03-surfaces/03-service-namespaces.md", "seen": "0b50fbc0" },
-    { "path": "docs/04-capabilities/01-devex/01-function/01-scm.md", "seen": "416a167e" }
+    { "path": "docs/04-capabilities/README.md", "seen": "0546bad5" },
+    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md", "seen": "f0a23b62" },
+    { "path": "docs/04-capabilities/03-platform/01-core/03-surfaces/03-service-namespaces.md", "seen": "f6829f2b" },
+    { "path": "docs/04-capabilities/01-devex/01-function/01-scm.md", "seen": "6ee20169" }
   ],
   "rows": [
     "RD.APPS.121"
@@ -13,7 +14,7 @@
 
 # Lens — `LEAD` (Engineering leader)
 
-**Source of truth:** the foundation book's purpose part, the paved-road doctrine and repo standard (devex `README` · `01-devex/01-function/01-scm`), and the configuration-over-customization ladder (`03-platform/01-core/03-surfaces/03-service-namespaces`). The readability check restates the corpus standard's readability bar (`01-devex/04-workspace/04-docs/01-corpus`). Read this file as a restatement of those rules, adding none of its own; where they disagree, the book wins and this file is regenerated.
+**Source of truth:** the foundation book's purpose part, the paved-road doctrine and repo standard (`04-capabilities/README` · `01-devex/01-function/01-scm`), and the configuration-over-customization ladder (`03-platform/01-core/03-surfaces/03-service-namespaces`). The readability check restates the corpus standard's readability bar (`01-devex/04-workspace/04-docs/01-corpus`). Read this file as a restatement of those rules, adding none of its own; where they disagree, the book wins and this file is regenerated.
 
 **Worn** while shaping repo standards and process. **Convened** on scope and fit questions. **Advises — never blocks.**
 

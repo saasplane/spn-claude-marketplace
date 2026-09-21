@@ -55,11 +55,18 @@ export function findBook(argument: string | undefined, root: string): string | n
   }
   // A sibling checkout, which only a producer workspace has. Named by what it CARRIES rather than by
   // what it is called, so a differently-named checkout still answers.
-  const parent = dirname(resolve(root));
+  const here = resolve(root);
+  const parent = dirname(here);
   let siblings: string[];
   try { siblings = readdirSync(parent).sort(); } catch { return null; }
   for (const name of siblings) {
     const sibling = join(parent, name);
+    // A SIBLING, WHICH IS NEVER THE REPOSITORY BEING CHECKED. The test is *carries a decisions
+    // register and a concept*, and the marketplace earned both the day it was documented as a
+    // GENERAL repository — so the check compared the plugins against their own repository's docs
+    // and reported 77 drifts that were not drift at all. A repository cannot be the book it
+    // restates.
+    if (resolve(sibling) === here) continue;
     if (isFile(join(sibling, "docs/registers/decisions.md")) && isFile(join(sibling, "CONCEPT.md")))
       return sibling;
   }

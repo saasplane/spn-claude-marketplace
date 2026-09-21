@@ -1,8 +1,8 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "CONCEPT.md", "section": "DevEx Actors", "seen": "9aa515d1" },
-    { "path": "docs/03-behaviors/README.md", "seen": "27fc088f" }
+    { "path": "docs/02-constructs/01-devex/02-agent/03-lenses.md", "seen": "150e1528" },
+    { "path": "docs/03-behaviors/README.md", "seen": "35978308" }
   ],
   "rows": []
 }
@@ -10,7 +10,7 @@
 
 # Lens — `BUSINESS` (Business manager)
 
-**Source of truth:** the model's actor set and the behaviors seat (`saasplane-concept` — DevEx Actors; `03-behaviors`). This file restates those rules and adds none of its own; where they disagree, the model wins and this file is regenerated.
+**Source of truth:** the model's actor set (`02-constructs/01-devex/02-agent/03-lenses.md`) and the behaviors seat (`03-behaviors`). This file restates those rules and adds none of its own; where they disagree, the model wins and this file is regenerated.
 
 **Convened** when a change alters what a platform charges for, what a customer is entitled to, or what an account can be moved between. Never worn while writing code — this lens has no code of its own.
 

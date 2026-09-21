@@ -1,17 +1,18 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/README.md", "seen": "b4c00037" },
-    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "ccca6840" },
-    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md", "seen": "562ad713" },
-    { "path": "CONCEPT.md", "seen": "9a52a641" }
+    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/README.md", "seen": "8a482c0d" },
+    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "5d03bdc4" },
+    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md", "seen": "cbc46d80" },
+    { "path": "docs/02-constructs/01-devex/04-workspace/04-docs.md", "seen": "84f8ba98" },
+    { "path": "CONCEPT.md", "seen": "8595584d" }
   ]
 }
 -->
 
 # Doc sets — the shape a repository carries
 
-**Source of truth:** the corpus standard (`04-capabilities/01-devex/04-workspace/04-docs/`), with the concept's Node Docs section (`CONCEPT.md`, at the repository root) as the standing one-page view. Read this file as a restatement of those rules, adding none of its own. **The book governs**; the concept holds the last agreed idea and is updated on request, so where the three disagree the standard wins and this file is regenerated.
+**Source of truth:** the corpus standard (`04-capabilities/01-devex/04-workspace/04-docs/`), with The Docs Tree construct (`02-constructs/01-devex/04-workspace/04-docs.md`) as the standing one-page view. The repository's `CONCEPT.md` sits above both as an outline: it names the domains and areas a tree divides by, and states no rule of its own. Read this file as a restatement of those chapters, adding none of its own. **The book governs**, so where the three disagree the standard wins and this file is regenerated.
 
 **A repository has ONE docs tree, and it sits at the repository root.** Its seats divide by the
 domains the repository's own concept names, never by the packages it ships (decision RD.DOCS.001). A
@@ -24,17 +25,22 @@ application hosting all three, and no package owns that sentence. A package is h
 divided, which is a different question from how understanding is divided.
 
 Three things follow, and you meet each of them in the first week: one place to look, found by domain
-rather than by package name; renaming, splitting or absorbing a package moves no documentation; and
-a behaviour that crosses packages finally has a home — the domain that would have to change if the
-behaviour changed.
+rather than by package name; renaming, splitting or absorbing a package moves **no argument**,
+because its chapters are named for the constructs it realizes, so what moves is a folder name rather
+than a page's subject; and a behaviour that crosses packages finally has a home — the domain that
+would have to change if the behaviour changed. The cost is honest and small: a package extracted
+into another repository takes its chapters with it as a move, and the domain list has to follow the
+concept, which invariant 1 checks.
 
 > [!IMPORTANT]
 > **A node you open carries `README.md` and no docs tree.** That README is the index: about
 > twenty-five lines saying what the node is, and links into the seats it realizes. It is the only
 > thing that knows where the node documents itself, because a path cannot say it —
-> `packages/module-server-iam-ts` documents itself at `docs/04-capabilities/01-iam/01-server/`.
-> **Read it before looking for a mirror**, and write what you add into the repository's one tree
-> rather than beside the code.
+> `packages/module-server-iam-ts` documents itself at
+> `docs/04-capabilities/01-iam/module-server-iam-ts/`. It also carries a **generated index of its
+> own source folders**, one line each, naming the chapter that covers it, so standing in the package
+> you can still see which of its folders nobody has written about. **Read it before looking for a
+> chapter**, and write what you add into the repository's one tree rather than beside the code.
 
 ## Every surface, one map
 
@@ -48,7 +54,7 @@ Documentation is not one place. Resolve which surface a change belongs to **befo
 | `docs/README.md` | the repository's one docs tree | the tree's face — the seats, and the map | generated map, hand-written identity | the file set changes |
 | seat face | `01-purpose` · `02-constructs` · `03-behaviors` · `04-capabilities` · `05-guides` | the fixed answer, distilled, plus the map below it | `FRAME`, then `develop` | the answer moves |
 | domain folder | beneath a seat, named for a domain the **concept** names | that domain's share of the seat's answer | `plan` lands rows, `develop` proves them | rows land or change |
-| mirror | `04-capabilities/<domain>/<layer>/`, named for the **source folder** it governs | that folder's seams | `develop` | the source folder moves |
+| capability chapter | `04-capabilities/<domain>/<package>/`, carrying the number of the **construct** it realizes | what this package does that the pattern does not | `develop` | the construct or the package moves |
 | `registers/` | pocket, **governing nodes only** | the node's own rules and decision log | on a decision | a rule is decided |
 | `artifacts/` | pocket, **authoring nodes only** | what the node authors — a moment captured | on request, never on initiative | someone asks |
 | **intent comment** | every contract method and exported component | why this exists, in one line, harvested into the symbol index | `develop` (decision RD.APPS.006) | the symbol's intent moves |
@@ -98,10 +104,16 @@ invents the vocabulary it needs, which is how one noun ends up meaning two thing
 - **Open every folder with `README.md`** — never `INDEX.md`. A seat's README is its **face**: the
   complete distilled answer plus the map of what sits below it, never a bare table of contents.
 - **A seat holding nothing but its face is the compact state, not a defect.**
-- **Number what is ordered; never number what is named.** The seats, the domain levels and the layer
-  split (`01-server` · `02-web`) are numbered. `README.md`, `data-model.md`, `schema.sql`,
-  `registers/`, `artifacts/` and **every mirror** are not — a mirror's name must stay identical to the
-  source folder it governs.
+- **Number what is ordered; never number what is named.** The seats, the area and domain levels, and
+  every construct file with the behaviour and capability files carrying its number, are numbered.
+  `README.md`, `data-model.md`, `schema.sql`, `personas.md`, `registers/`, `artifacts/`,
+  `templates/` and **every package folder in the capabilities seat** are not — a package folder's
+  name must stay identical to the package it is named for.
+- **One level holds numbered folders or numbered files, never both.** A file browser sorts every
+  folder above every file, so a mixed level hides the reading order at the one place a reader lands.
+- **Below a domain there are only files.** A construct sits at most three levels under its seat — the
+  area, the domain where an area has domains, then the file. The capabilities seat in a built
+  repository is the one place a fourth level is right, and that level is the package.
 
 ## A seat is never absent
 
@@ -113,30 +125,41 @@ derivable (decision RD.DOCS.017).
 A missing seat and an empty seat read identically from outside. Making the seat present and the
 answer a citation turns absence into a statement with an owner.
 
-## The capabilities seat is derived — a mirror per source folder
+## The capabilities seat hangs by domain, then package, then construct
 
-A capability document is a **mirror**: named for the source folder it governs, carrying that folder's
-seams. A capability named for a feature rather than a folder breaks the derivation, because then
-nothing says which folder is documented and which is not.
+A capability document is a **chapter**: one per construct per package that realizes it, carrying the
+construct's own number. A chapter named for a source folder rather than for a construct breaks the
+numbering, because then nothing says which construct is documented and which is not.
 
-The tree hangs **by domain, then by layer, then by the source folder**:
+The tree hangs **by domain, then by the package, then by the construct**:
 
 ```text
-04-capabilities/01-iam/01-server/
-├── README.md              the face: what this module provides, and the Map
-├── contract.md         →  src/contract/
-├── app/services/session.md · identity.md · org.md · authz.md
-├── app/repositories.md →  src/app/repositories/
-├── entry.md            →  src/entry/
-├── data-model.md          the tables, one line each
-└── schema.sql             its authoritative form
+04-capabilities/01-iam/
+├── README.md                   the domain face: its packages, and what each realizes
+├── data-model.md               contract term → table and column, once for the domain
+├── schema.sql                  the tables this domain owns, authoritative
+├── module-server-iam-ts/
+│   ├── README.md               the package face: the constructs it realizes, and those it does not
+│   ├── 01-organization-tree.md
+│   └── 04-sign-in.md        →  the server half of the Sign-in construct
+└── module-web-iam-ts/
+    ├── README.md
+    └── 04-sign-in.md        →  the web half of the same construct, same number
 ```
 
-The face's **Map** declares `File │ Governs │ Carries │ Status`, so what is documented and what is
-not is a table rather than a hunt.
+**The folder carries the package's name**, never a layer name standing in for it. `01-server/` was
+exact only while a domain had one server package, and it stopped being exact the moment a domain had
+two. A package that realizes nothing of a construct has no chapter for it, and its face says so — so
+what you meet is a declaration rather than a gap you have to investigate.
 
-- **A mirror is one document per seam family** — the deepest folder a developer would name when
-  asked *where does that live*.
+- **The code mirror survives, and it moved to the node.** Every node's `README.md` carries a
+  generated list of its source folders with the chapter covering each, so *is this folder
+  documented* is still a table rather than a hunt — asked where a developer is standing when they
+  ask it (decision RD.DOCS.078).
+- **`data-model.md` sits at the domain's root and never once per package** (decision RD.DOCS.074). A
+  domain has one data model however many packages realize it, so a domain's server and web packages
+  carry neither it nor the schema. It holds what a migration knows — which contract term is stored
+  in which table and column — and defines no term, because the words are the constructs' own.
 - **`schema.sql` sits beside the `data-model.md` it is the authoritative form of**, in the
   capabilities seat and not in a pocket: migrations mirror it verbatim, the dictionary reads a
   term's storage through it, and a repository with nine storage-owning domains has nine of them
@@ -145,26 +168,25 @@ not is a table rather than a hunt.
   folder, build output, and `migrations/`. A migration's useful content is seeding and ordering,
   which is vocabulary and belongs to the data model (decision RD.DOCS.018).
 
-Which makes the seat checkable in both directions:
+Which makes the seat checkable in every direction:
 
 | Defect | What it means |
 | --- | --- |
-| a source folder with no mirror, and no face naming it | a folder is documented by nobody, and nobody notices |
-| a mirror naming no folder | it describes something that no longer exists |
-| a mirror for a private or generated folder | the interior leaked into the published surface |
-| a split with no matching subfolder | depth was invented rather than earned |
+| a construct a package realizes with no chapter for it | the package builds something nobody wrote a topic for |
+| a chapter naming a construct that does not exist | it describes something that no longer exists |
+| a package holding code that realizes no construct | the code grew a subject the model never got |
+| a construct no package realizes | the model grew a subject nothing builds |
+| a source folder the node's generated index shows no chapter for | a folder is documented by nobody, and now somebody notices |
+| a `data-model.md` under a package rather than a domain | a domain's tables were written down twice |
+| a pattern explained inside a chapter | the stack's standard was copied, and the copy is the stale one |
 
-### A repository may have no `src/`, and the rule still holds
+### A repository may have no `src/`, and the grammar still holds
 
-**The source root is declared on the capability face, never assumed.** Every rule above is written
-against `src/` because that is where almost every repository keeps its source — but a repository
-declaring `GENERAL` has no nodes, and may have no `src/` and no `tests/` at all. The marketplace's
-source is `plugins/<name>/`; another general repository's is whatever it is.
-
-So the face's block names the root it governs, and the Map is generated against that. **A face that
-declares nothing keeps `src`**, which is every repository that has one, so nothing already written
-changes. The rule itself is untouched: a mirror is still named for the folder it governs, and a
-folder with no mirror is still a finding.
+Every rule above is written against `src/` because that is where almost every repository keeps its
+source — but a repository declaring `GENERAL` has no nodes, and may have no `src/` and no `tests/`
+at all. The marketplace's source is `plugins/<name>/`; another general repository's is whatever it
+is. **The grammar is untouched**: the seats are the same five, a chapter is still numbered as its
+construct, and a construct nothing realizes is still a finding.
 
 **What changes in a general repository is only what a cell RESOLVES TO**, and the reason is the same
 every time — nothing there derives from a node's kind, because there are no nodes:
@@ -173,7 +195,7 @@ every time — nothing there derives from a node's kind, because there are no no
 | --- | --- | --- |
 | a **realization** row | every construct has at least one, and the dependencies stay acyclic | it names **a folder or a file**, never a node. The index reads the repository's own top-level folders, so *plugins* or *hooks* resolves where *a node named hooks* could not |
 | a **behaviour** row | the id, `Who`, `Does`, `Sees` and `Type` | **`Tier` derives from a node's kind, and there is none** — so the row carries the repository's own runner or `—`, and `Status` stays `PLANNED` unless that runner writes it. Nothing owes a tier it cannot have |
-| the **mirror nudge** | — | it stays **silent**, because it fires on an edit under a `src/` folder. That is honest rather than a gap: an undocumented folder is still reported against the whole tree, which is where that finding belongs |
+| the **source-folder index** | it is generated, never a list somebody maintains | it has **no node to sit on**, because a node's own `README.md` is where it is generated. That is honest rather than a gap: a folder no chapter covers is still reported against the whole tree, which is where that finding belongs |
 
 **The id is never relaxed.** A behaviour with no id cannot be cited, proven later, or found twice —
 and a repository that cannot run a tier today may ship a runner tomorrow (`RD.GOV.024`).
@@ -185,8 +207,8 @@ and a repository that cannot run a tier today may ship a runner tomorrow (`RD.GO
 | `README.md` | identity and orientation | what this repository is, and the map of what sits under it |
 | `01-purpose` | why the repository exists | explains and persuades. Carries **no rules** — normative language here is a defect. It answers four questions — the problem it ends, the payoff of solving that once, what you get, and who it is for — and the check reads for the four answers, never for a file count |
 | `02-constructs` | the model — one file per construct, under a folder per domain | contract terms: what a thing is, what it is made of, what it depends on, what it refuses. **A construct never appears before one it depends on**, and the face carries the order, generated from the declared dependencies and the concept's own sequence |
-| `03-behaviors` | what a person can do — rows, under a folder per domain | `Id · Who · Does · Sees · Proven`, in the consumer's own words. **A behaviour belongs to the domain that would have to change if the behaviour changed**, which is what its id's prefix names. A row says nothing about which packages realize it |
-| `04-capabilities` | what must exist for that to be possible — one **mirror** per source folder that earns one | engineering content in the one voice (RD.DOCS.043), and **normative wherever a consumer can violate the statement** — the sequence, the guard, the reason a rule exists (RD.DOCS.034; see the altitude note below) |
+| `03-behaviors` | what a person can do — **one file of rows per topic**, beside the construct of the same number, with `personas.md` | in the foundation a **promise**: `Id · Who · Does · Sees · Type`, `Type` reading `PROMISE`, and **no status at all**, because this book ships no code that could write one. In a built repository the row is **proven** and carries the same cells plus `Where`, `Tier`, `Status` and `Updated at`, with a `Names` cell naming the promise it fulfils. Written in the consumer's own words. **A behaviour belongs to the domain that would have to change if the behaviour changed**, which is what its id's prefix names |
+| `04-capabilities` | what must exist for that to be possible — in this book the standard for one topic; in a built repository **one chapter per construct per package that realizes it** | engineering content in the one voice (RD.DOCS.043), and **normative wherever a consumer can violate the statement** — the sequence, the guard, the reason a rule exists (RD.DOCS.034 · RD.DOCS.073; see the altitude note below) |
 | `05-guides` | how to use what was realized | task-shaped — install, mount, configure, run. It carries no id and nothing tests it; the face is the adoption path in phases, each naming the guides it takes |
 | `registers/` | the repository's own rules and decisions | lookup material, consulted rather than read start to end |
 | `artifacts/` | the overview and construct pages, and deliberate reports | authored source of truth. Nested folders allowed here and nowhere else; sub-folders carry no README |
@@ -199,17 +221,28 @@ generated from, and the audit reports it.
 
 **Six invariants hold this shape up, and the folders are only where they land.** A domain folder
 exists only where the concept names that domain. The dictionary is generated, never typed. Every
-noun in a behaviour row resolves to the dictionary. Every source folder has a mirror, or the face
-names it and says where its facts live. Every `✅` row is cited by a case, and every cited id exists.
-Every construct has at least one realization row, and its dependencies are acyclic and agree with the
-reading order. Each is a RULE, and invariant 2 is the one that decides whether the shape was worth
+noun in a behaviour row resolves to the dictionary. Every construct has a chapter in every package
+that realizes it, every chapter names a construct that exists, and every package holding code
+realizes at least one construct. Every proven row resolves to a case and every cited id exists — a
+promise carries no status, and a proven row names a promise that exists. Every construct has at
+least one realization row, and its dependencies are acyclic and agree with the reading order. Each
+is a RULE, and invariant 2 is the one that decides whether the shape was worth
 adopting — a hand-maintained dictionary moves drift rather than removing it.
 
-**A capability chapter is the spec the code it names realizes** (decision RD.DOCS.034). It is **one chapter per construct per package that realizes it**, under the construct's own domain and carrying its number — `01-iam/module-server-iam-ts/04-sign-in.md`. The per-group mirror it replaced — `cache.md`, `contract.md`, `app.md`, `entry.md`, `ui-*.md` and siblings — is retired (Q130): a package's folders are not the reader's question, and 98 of those mirrors ran to 5,000 words restating a pattern the stack's standard already states once. A chapter is Where · Follows the pattern · Special handling · Between modules, under 800 words. It **binds two parties**. The implementation is bound by what a `Guarantee` row states, and the consumer by what `Placement` and `Does not do` state. **Both directions are normative.** The test, one statement at a time: **does it bind someone — the implementation or the consumer?** If yes it takes `MUST`/`MUST NOT`/`MAY`; if it binds nobody it is commentary — advice, rationale, a trade-off note — and stays prose. **A capability page is normatively dense by design**, and the seam table's sections are the spec's shape, unchanged.
+**A capability chapter is the spec the code it names realizes** (decisions RD.DOCS.034 · RD.DOCS.073). It is **one chapter per construct per package that realizes it**, under the construct's own domain and carrying its number — `01-iam/module-server-iam-ts/04-sign-in.md`. The per-group mirror it replaced — `cache.md`, `contract.md`, `app.md`, `entry.md`, `ui-*.md` and siblings — is retired: a package's folders are not the reader's question, and 98 of those mirrors ran to 5,000 words restating a pattern the stack's standard already states once. **A chapter has four sections and nothing else**, each one there because something would otherwise be copied into it:
 
-**The spec treatment reaches chapters only.** A seat face is a **map** of what the repository contains — *where does what live*, not *what must this code do*. So is the `04-capabilities/README.md` face, which routes, and so is `data-model.md`, which is a dictionary. The seat's job differs by what is being documented: a mirror of a source folder yields a spec, an index or an orientation yields a map. **Seat tables are in scope for modality; record tables are not** — dictionaries, behavior-row tables, data models, registries and proof-gap tables keep their form. Modality comes from the page, never from a sweeper.
+| Section | Holds |
+| --- | --- |
+| **Where** | a short table: each part of the construct, the place it lives in this package, and what that place is |
+| **Follows the pattern** | one line per pattern that applies unchanged, each linking the stack's standard |
+| **Special handling** | one entry per method, flow or rule the construct forces off the pattern — **why**, then **what**, then **how**, with one place in the code. This is the chapter's substance, and a chapter with nothing here should not have been written |
+| **Between modules** | what this package takes from other modules for this construct, and what it publishes to them |
 
-**`group` is the source axis; `area` is the top division of a seat.** A group is a published top-level source folder — shared vocabulary between the symbol index and the capabilities seat. An **area** is a folder, and the same areas divide all three *What* seats alike, so one number names the model, the rows and the standard of one thing. The foundation has four — `01-devex` · `02-support` · `03-platform` · `04-launchpad`; every other repository divides by domain with no area above it. The older half of [RD.DOCS.016](../../../../spn-foundation/docs/registers/decisions.md) — that an area names an outcome and never a folder — was written when the behaviours seat alone had areas, and is superseded.
+**Why comes before what**, because a reader given the rule can predict the handling. **Three things are deliberately absent**: no line-by-line walk, which the code's own comments carry; no proof rows, which are the behaviours seat's; and no known gaps, which live in the workstream's split plan and the behaviour row's status. **A chapter stays under 800 words**, and that is a consequence rather than a cap — everything long has a better home above it. The two altitudes bind different people: the book's standard binds everyone building anything, and a chapter binds whoever maintains this package. So the test is one statement at a time: **does it bind someone?** If yes it takes `MUST`/`MUST NOT`/`MAY`; if it binds nobody it is commentary — advice, rationale, a trade-off note — and stays prose. **A capability chapter is normatively dense by design.**
+
+**The spec treatment reaches chapters only.** A seat face is a **map** of what the repository contains — *where does what live*, not *what must this code do*. So is the `04-capabilities/README.md` face, which routes, and so is `data-model.md`, which is a dictionary. The seat's job differs by what is being documented: a chapter of a construct yields a spec, an index or an orientation yields a map. **Seat tables are in scope for modality; record tables are not** — dictionaries, behavior-row tables, data models, registries and proof-gap tables keep their form. Modality comes from the page, never from a sweeper.
+
+**`group` is the source axis; `area` is the top division of a seat.** A group is a published top-level source folder, and it is now the **symbol index's** vocabulary alone — the capabilities seat stopped sharing it the moment a chapter became named for a construct, and what carries the source-folder axis is the generated index on a node's own `README.md` (decision RD.DOCS.078). An **area** is a folder, and the same areas divide all three *What* seats alike, so one number names the model, the rows and the standard of one thing. **The foundation has four — `01-devex` · `02-support` · `03-platform` · `04-launchpad` — and it is the only repository that divides this way** (decision RD.DOCS.071, retiring RD.DOCS.063); every other repository divides by domain with no area above it. Three rules bound the level: the concept names the areas, every seat that divides by domain divides the same way or none does, and **an area with no sub-areas holds its topic files directly** rather than a single child folder. The older half of [RD.DOCS.016](../../../../spn-foundation/docs/registers/decisions.md) — that an area names an outcome and never a folder — was written when the behaviours seat alone had areas, and is superseded.
 
 ## The artifacts pocket — concept, overview, construct page
 
@@ -218,12 +251,56 @@ The pocket holds what the node **authors** rather than derives, and its three au
 | Kind | Path | Holds | Earned when |
 | --- | --- | --- | --- |
 | **Concept** | `CONCEPT.md`, the repository root | the whole model, once — shape, never depth | the repo exists |
-| **Overview** | `artifacts/overviews/<section>-overview.html` | one concept section at reading depth | the section is too big to review where it stands |
-| **Construct page** | `artifacts/constructs/<domain>/<slug>-construct.html` | one construct at reading depth, produced from its seat file | a construct exists
+| **Overview** | `artifacts/overviews/<source>-overview.html` | one source expanded to reading depth, one level down | the fixed set below names it |
+| **Construct page** | `artifacts/constructs/<domain>/<slug>-construct.html` | one construct at reading depth, produced from its seat file | a construct exists |
+
+**A concept is not an artifact.** It sits at the repository root beside `README.md`, a scaffold marker written before `docs/` exists and read by somebody who may never open the tree. It is listed here because it is the first altitude of the progression, not because the pocket holds it.
+
+**`constructs/` mirrors the constructs seat folder for folder**, with `<slug>-construct.html` beside each `<slug>.md` and **no `README.md` anywhere inside it**. That is what lets the audit pair a page with its seat file by path alone, rather than by an index somebody maintains.
+
+**Four page kinds cover everything somebody writes by hand**, and each answers one reader: an **approach** for the person deciding, a **hub** for the person arriving, an **overview** for the person taking one reading path, and a **construct** for the person building against the model. Only the approach carries cards, and only the approach lives outside the pocket.
 
 **An argument does not live here.** An approach document belongs to **the workstream that argues it**, in the workspace's planning centre, and it closes with that workstream. The pocket holds what the repository *states* and what somebody *measured*; where a design was weighed is the workstream's record. A pocket that also held the arguments made the two impossible to tell apart, which is how a stale argument came to be read as a statement of today.
 
-**The folder set is fixed, and adding one is a decision**: `overviews/`, `constructs/`, `reports/` and nothing else.
+**The folder set is fixed, and adding one is a decision**: `overviews/`, `constructs/`, `reports/` and nothing else. A `resources/` folder for *what a document was written from* is refused by name: every such file is a file some seat needs, and **nothing in a pocket may be depended on** (decision RD.DOCS.078).
+
+### A construct page has six sections, in one order
+
+**A construct page is produced, never authored.** What an author writes is the seat file, `02-constructs/<domain>/<name>.md` — the metadata block with its dependencies, the six sections, and each figure as a fenced specification. The page is produced from that, and **a page edited by hand is a defect**, because the next production overwrites it and the audit checks that a page equals what production would produce.
+
+| Section | Goes in | Never |
+| --- | --- | --- |
+| **Terms** | the words this construct gives a meaning to: the word a person uses, the contract term, and what it means | a word every engineer already knows; a row that points somewhere else instead of explaining |
+| **Model** | what you are looking at, in prose first — the general shape, then its parts, then its kinds — with a figure where seeing is faster | a field list standing in for an explanation |
+| **Parts** | one subsection per part: what it is, why it exists, and the facts that shape it | a *Where:* line — where a thing lives is the `Binds` table's job |
+| **Boundary** | in plain prose: what this page does not answer, where that is answered, and when you go there | an edge stated before the reader has seen the shape |
+| **Binds** | two tables: the rules that hold it, and where it lives today | a rule repeated; a state typed anywhere else |
+| **Proof** | the checks a person can run — or nothing | a behaviour row typed by hand |
+
+**Terms comes first because the model uses those words**, and **Boundary comes after the parts** because a reader can judge an edge only once they have seen the shape. `Relations` is retired: the metadata block's `dependsOn` already carries what it listed, one way and machine-readable, and a section restating a declared field is a second copy that drifts.
+
+**Proof is joined from the register, never typed** (decision RD.DOCS.072). Every behaviour row naming this construct is read from the behaviours seat when the page is produced and rendered with its tier and the status the last run wrote, and the footer names the register version it read. In this book the joined rows are promises, which carry no status. **So the seat file's `Proof` holds typed checks or nothing at all**, and an empty `Proof` is a correct page rather than an incomplete one. **A `Proof` row names a command somebody else can run** — a `spnutils` verb, a stack's own test target, a gate the plugins carry — and **a file name is never a command**, because a row naming a `.spec.ts` reads as verified and cannot be acted on. A script the repository carries is accepted while no verb runs it, and the exemption ends the moment a verb exists.
+
+**A construct's status is derived, never typed.** No realization row, or every row planned, is 🔮 `PLANNING`; any row partial or done but not all done, **or** `Proof` empty, is 🚧 `IMPLEMENTING`; every row done **and** `Proof` naming a check is ✅ `DONE`. A page may not carry 🚧 or ✅ until its realization rows resolve — and a row resolves only when its `Node` cell names a node, a plugin or a repository the workspace can be asked about. A verb, a command, a folder or a house word is not one of the three.
+
+**There is no length cap on a page and none on a part.** What decides whether a part should become a construct of its own is a judgement about the concept — does a reader meet this on its own, with its own actor? — never a line count.
+
+### The templates sit beside the chapters, in `templates/`
+
+Every page somebody writes by hand is copied from a template, and the templates live in the docs domain's own `templates/` folder — beside the chapters whose rules they carry, so a rule change and its restatement are one diff apart. **A seat may hold that one folder that is not documents.** It is unnumbered, because you consult a template rather than reading the set in order, and it is excluded from the document checks **by the folder rather than per file**: a per-file exemption is a hole, and a named folder is a rule. **Each template declares the chapter it restates**, at the top of the file.
+
+| Folder | Holds | Shapes |
+| --- | --- | --- |
+| `templates/pages/` | `overview-template.html` · `construct-template.html` · `report-shell.md` | the page kinds a repository has — concept, overview, construct — and the report |
+| `templates/seat-files/` | `construct-seat-template.md` · `schema-template.sql` | what an author writes *inside* a seat: the markdown a construct page is produced from, and the authoritative data model |
+| `templates/workstream/` | `approach-template.html` · `arc-template.md` · `order-template.md` · `handover-template.md` | the workstream's own files. **The approach document is here because an argument is a workstream's**, never a repository's |
+| `templates/agent/` | `skill-template.md` · `agent-template.md` · `lens-template.md` · `ref-template.md` · `hook-template.py` | the agent's own files — hand-written too, and a kind with no template gets written from the last one its author happened to see |
+
+**The plugin and the CLI carry different sets, because they answer different moments.** `pages/` and `seat-files/` ship in both, since the agent copies one to write a page and `repo create` emits a started hub page. `workstream/` and `agent/` ship in the plugin alone: the CLI creates a workstream folder with `mkdir` and owes no shape, and it never writes a skill. The copies are stamped with the book's hash and exported on release, so a release whose copies disagree with the source fails rather than publishing drift.
+
+**A scaffold beats a template, a template beats a document, and a document beats a conversation.** Where the CLI creates a file, that scaffold *is* the template and none is kept in the book — a seat face, a behaviour file, a capability chapter and the dictionary are all made that way.
+
+**Seven templates carry the page and seat-file shapes**: `hub-template.html` for the one hub a repository has, `overview-template.html` for one reading path, `construct-template.html` for a produced construct page, `approach-template.html` for a workstream's argument, `construct-seat-template.md` for the seat file an author actually writes, `capability-template.md` for one capability chapter, and `blocks-template.html` for nothing at all — it is the **source** of the sample-block section the four page templates carry.
 
 **They do not share a lifecycle** (decision RD.DOCS.021). Two describe a moment; one renders something live.
 
@@ -243,7 +320,9 @@ The pocket holds what the node **authors** rather than derives, and its three au
 | 🚧 **agreed** | the approach is settled and the work is running |
 | ✅ **landed** | the content is in the node that owns it |
 
-The three marks above are for work in flight. `landed` · `carried` · `deferred` are what the close sweep asks of every row, and only the first is shared between them.
+**A row you started and put down gets its own mark, and it is `◐ stopped`.** None of the three above fits: `🚧 agreed` says the work has not begun, and a bare cell says nobody decided it, while half an edit already sits in the tree. The mark carries four things, because only the agent who stopped knows any of them — `→` what has to happen before it resumes, `did` what already reached its node, `left` what did not, and `unsafe` what nobody may touch until it resumes.
+
+The marks above are for work in flight. `landed` · `carried` · `deferred` are what the close sweep asks of every row, and only the first is shared between them. **The close refuses a stopped row**, and that is the one place it differs from deferred: a deferred row was parked before anything was touched, and a stopped one was not. You finish the work and mark the row landed, or you split it in two — the half that reached its node becomes a landed row, and the half that did not becomes a second row, carried or deferred.
 
 **Carry the face and the arguments inside the workstream that changes them**, rather than tidying them afterwards. A workstream runs concept → docs → code, so the model moves first and the face moves with it. Leave the face to a later pass and the hub states a model the code has already left. Expansion is earned the same way. Where implementing a workstream shows a section is too big to review in place, the face gains one then — that is when somebody has read it at depth.
 
@@ -269,7 +348,8 @@ A register row records *what* was decided, never the options that lost or what t
 
 **The suffix names the kind, and the set is closed** (decision RD.DOCS.040). The routing test is one question: *were options weighed and one chosen?* Yes → `-approach`. No → `-overview`. A document with no options, no recommendation and no accepted cost is an overview whichever folder holds it.
 
-- **An overview comes at two sizes.** `concept-overview.html` is the concept's readable HTML face — the whole model, less depth, with the diagrams the root marker cannot carry; a repo has at most one. A `<section>-overview.html` expands **one** section that is too big to review where it stands, and the section names it back. Forbidden is the third copy: an overview restating another overview, or a section expanded twice under two names.
+- **The overview set is fixed: the hub, plus one page per reading path** (decision RD.DOCS.074). A reading path is a run of constructs somebody reads in order to decide one thing, and a domain earns as many pages as it has paths. `concept-overview.html` is the concept's readable HTML face — the whole model, less depth, with the diagrams the root marker cannot carry — and it is **the hub**, one per repository. Beside it, `concept-<domain>-<path>-overview.html` expands one reading path through one domain, and `<journey>-overview.html` expands one journey over the guides seat. **A built repository starts with the hub alone and earns a domain page** when the tiles can no longer carry the path. Forbidden is the third copy: an overview restating another overview, or a section expanded twice under two names.
+- **Every construct the pocket holds is linked from the hub — MUST.** Prove it by listing both sets and diffing them, never by scanning the page. A hub section standing over no construct is a **declared gap**, which is the honest kind and what the next workstream picks up; a construct the hub does not link is an orphan.
 - **Keep reports under their own name** in `reports/`. **A source a seat cites is not the pocket's to hold**, and one sentence decides it: **nothing in a pocket may be depended on.** A pocket once carried a `resources/` folder for *what a document was written from* — and every such file was a file some seat needed, so every one was a seat depending on a pocket. It is gone, and a fact a seat needs lives in a seat: the node's *why* in `01-purpose/`, what consuming it observably does in `03-behaviors/`, its *how* in `05-guides/`. The same sentence keeps the templates with the chapters whose rules they restate, and `schema.sql` in the capabilities seat beside the `data-model.md` it is the authoritative form of (`Q88`).
 - **Nothing here is validated against current state.** An artifact records a moment, so a checker that flags one for disagreeing with today's tree has misread what it is looking at.
 
@@ -294,7 +374,7 @@ A register row records *what* was decided, never the options that lost or what t
 
 **Markdown keeps its own grammar and HTML keeps the blocks.** A capability chapter stays markdown and is never produced as a page, so none of this reaches it. The split is stated in the book: `02-document.md` governs markdown, `05-artifacts.md` governs the page.
 
-**A block is a visual insert, not a section shape.** Normal prose needs no block. Reach for one when the content is *not* a paragraph, a list or a table — a rule the reader must not skim, a picture, a fixed list of doors, a comparison. Every block and every figure kind is written out, in the spelling you actually type, in [`blocks.md`](blocks.md) beside this file — read that before authoring a document with figures in it, and read a page template beside it. **Do not open the HTML blocks template**: it is the *rendered* reference a person opens, it costs about 16,400 tokens, and three quarters of it is stylesheet, inline SVG and script that the renderer and the drawer produce for you (Q135, 2026-09-22).
+**A block is a visual insert, not a section shape.** Normal prose needs no block. Reach for one when the content is *not* a paragraph, a list or a table — a rule the reader must not skim, a picture, a fixed list of doors, a comparison. **The set is closed**: `MUST` · `CATALOG` · `COMPARISON` · `GLOSSARY` · `CODE` · `DIFF` · `TREE` · `PROSE` · `CARDS` · `NEXT`, plus the figure kinds below, and a new kind is a decision rather than an invention. Every block and every figure kind is written out, in the spelling you actually type, in [`blocks.md`](blocks.md) beside this file — read that before authoring a document with figures in it, and read a page template beside it. **Do not open the HTML blocks template**: it is the *rendered* reference a person opens, it costs about 16,400 tokens, and three quarters of it is stylesheet, inline SVG and script that the renderer and the drawer produce for you (decision RD.DOCS.076). Every `dg` example in the markdown form is executed by the drawer's test suite, so an example you copy draws.
 
 ### The figure kinds
 
