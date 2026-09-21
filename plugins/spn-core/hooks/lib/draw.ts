@@ -5,7 +5,10 @@
 // and this turns one into inline SVG. Nothing is drawn by eye: every box is measured from its own
 // text, so a connector lands on an edge and a label fits by construction rather than by luck.
 //
-// The grid, from the chapter: canvas 760 wide, margin 24, three type sizes and no fourth.
+// The grid: canvas 1100 wide, margin 24, three type sizes and no fourth. The chapter says 760; the page
+// renders a figure at the width of its column, about 1100, so a 760 canvas was scaled up by half and
+// every box and label read big and dark beside the hand-drawn figures of the hub (N13, 2026-09-21).
+// The chapter changes to 1100 in N13 step 1; this is the one measure from here on.
 
 export type Box = { id: string; label: string; note?: string; em?: boolean; off?: boolean; warn?: boolean; in?: string };
 export type Link = { from: string; to: string; label?: string; dashed?: boolean };
@@ -241,7 +244,7 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
     if (pass === topIds.length) { findings.push("the links form a cycle, so the rows could not be decided; a map flows one way"); break; }
   }
 
-  const CANVAS = 760, margin = 24, gapX = 36;
+  const CANVAS = 1100, margin = 24, gapX = 36;
 
   // A ONE-WAY CHAIN IS A STRAIGHT LINE. When every box has at most one link in and one out and the
   // links form a single path through all of them, the figure is a flow, and a flow reads best as a
