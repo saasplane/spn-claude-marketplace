@@ -288,6 +288,47 @@ A register row records *what* was decided, never the options that lost or what t
 
 **A contradiction is a decision entry naming which one is wrong, never a silent edit in either direction.** The offer trigger stays tight on purpose: *a design was discussed* is too loose and rebuilds slot-filling in a softer form. **Options weighed, one chosen** is the bar.
 
+## Blocks and figures — what a page is made of
+
+**A page is produced, never authored.** You write a **seat file in markdown** and `docs.ts page` renders it. You never name a block, never write a class, and never paste HTML into a seat file. The renderer reads ordinary markdown components and gives each one its form: a table becomes a card, a fenced block with a language becomes a coloured code block, a blockquote becomes the `MUST` callout, a numbered list becomes an ordered list, a ```` ```dg ```` fence becomes a drawn figure.
+
+**Markdown keeps its own grammar and HTML keeps the blocks.** A capability chapter stays markdown and is never produced as a page, so none of this reaches it. The split is stated in the book: `02-document.md` governs markdown, `05-artifacts.md` governs the page.
+
+**A block is a visual insert, not a section shape.** Normal prose needs no block. Reach for one when the content is *not* a paragraph, a list or a table — a rule the reader must not skim, a picture, a fixed list of doors, a comparison. Every block is defined once in `.spndevex/workstreams/open/008-plain-language/templates/blocks-template.html`; read that page before authoring a document with figures in it, and read a page template beside it.
+
+### The figure kinds
+
+Write the specification in a ```` ```dg ```` fence and the drawer computes every coordinate. **Never hand-write SVG for a kind that has a drawer.**
+
+| Kind | Draw it when the reader must see | 
+| --- | --- |
+| `MAP` | the parts of one thing, where there is no inside and no order |
+| `FLOWCHART` | a path one actor walks, with the shapes a flowchart has — a diamond is a choice |
+| `SEQUENCE` | a path several actors walk together, when *who said it* is the fact |
+| `ENTITIES` | data and how it relates |
+| `TREE` · `STATE` · `CODE` · `DIFF` | a hierarchy · a lifecycle · source · a change |
+| `SYSTEM` | the architecture of something you build — a server module, a web module, an estate package |
+
+### Drawing a `SYSTEM` figure for a module you are looking at
+
+`SYSTEM` is a constrained `MAP` (decision RD.DOCS.075), and it is the kind you will reach for most when documenting a repository. Derive it from the source rather than from a template:
+
+1. **The container is the module**, and its name is the module's own. Anything outside it is something the module talks to.
+2. **Read `entry/` for the doors.** Each door is its own box — `api`, `cli`, `queue` — and each is met by the thing that knocks on it. **Draw the doors the module actually has**: a module with only `api` gets one door, and pretending otherwise draws a fiction.
+3. **Read `app/` for the middle layer** — `services` and `repositories`, with `entities` and `utils` beside them.
+4. **The layer at the foot is what the module is given or publishes** — `config` (the environment it is started with) for a deployable, `contract` (the surface its siblings import) for a module inside one.
+5. **Read the imports for the outward edges, and attribute each to its layer.** This is the load-bearing step, because which layer owns an edge is a claim about the code. A **repository reaches the database and nothing else** — a repository importing a file store is a finding, not a drawing. **Services** reaches the queue, the cache, transactions, the file store and sibling modules.
+6. **Give each outside thing the shape of what it is**: a store is a cylinder, a cache a cylinder you can afford to lose, a queue a pipe, an object store a bucket, a client a window, a way in a chevron, a service a plain rectangle.
+7. **Draw every starting point, and the edges that close a loop.** A system is entered from more than one place, and some flows come back.
+
+**Worked examples**: `samples/prj-module-system.html` is one derived from real source; the blocks page carries server, web and estate drawn on identical geometry, which is the point of the kind.
+
+### The geometry is checked, so do not tune it by eye
+
+`checkFigures` in `spn-core/hooks/lib/figures.ts` reads every figure on every produced page and reports what it finds. The numbers it holds you to: **24** between unconnected shapes and parallel connector runs · **56** where a connector joins two boxes · **16** padding, leaf and container alike · **36** minimum visible shaft · **8** of clear air between a label and any shape or arrow · a side offers **three** attachment points and a lone arrow takes the middle of its side.
+
+**Hand-placed geometry does not survive these rules.** Drawing one `SYSTEM` figure by hand took more than twenty rounds against the check, and every fault was caught by a rule rather than by eye. Use a `dg` fence.
+
 ## Metadata
 
 Every document opens with an invisible block holding **strict JSON**, marked `spn:doc`, followed by the title and a tag line rendered from it (decision RD.DOCS.014).
