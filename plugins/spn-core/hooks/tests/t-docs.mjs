@@ -693,6 +693,23 @@ console.log("\n=== the gap scan measures and never fixes");
     run(ws, ["page", "docs/02-constructs/01-core/thing.md"]);
     const page4 = readAt(ws, "docs/artifacts/constructs/01-core/thing-construct.html");
     one("the first lead paragraph is the standfirst, the rest are the summary", page4, (g) => /<p class="standfirst">The promise, in one line\.<\/p>\s*<p>The summary paragraph\.<\/p>/.test(g));
+
+    // A NUMBERED LIST IS A LIST. There was no case for `1.`, so it fell through to the paragraph path
+    // and the reader met one run-on paragraph beginning with the characters `1.` — the order, which is
+    // the whole content of such a passage, was gone. Found on the Sign-in construct, whose four
+    // organization checks run in a fixed order (N13, 2026-09-22). The bullet case is asserted beside
+    // it because the two patterns sit next to each other and must not eat one another.
+    writeFileSync(join(ws, "docs/02-constructs/01-core/thing.md"), seat("thing",
+      "## Boundary\n\n1. **First** the step that comes first.\n2. **Then** the next one.\n3) A closing paren is a list too.\n\n- a bullet after it\n- another\n"));
+    run(ws, ["page", "docs/02-constructs/01-core/thing.md"]);
+    const page5 = readAt(ws, "docs/artifacts/constructs/01-core/thing-construct.html");
+    one("a numbered list is an ordered list, not a paragraph of digits", page5,
+        (g) => /<ol>[\s\S]*<li><strong>First<\/strong> the step that comes first\.<\/li>[\s\S]*<\/ol>/.test(g));
+    one("every item of it is in the list, `)` included", page5,
+        (g) => (g.match(/<ol>[\s\S]*?<\/ol>/)?.[0].match(/<li>/g) ?? []).length === 3);
+    one("no numbered item leaks into a paragraph", page5, (g) => !/<p>\s*\d+[.)]\s/.test(g));
+    one("a bullet list beside it is still a bullet list", page5,
+        (g) => /<ul>\s*<li>a bullet after it<\/li>/.test(g));
     delete process.env.SPN_TEMPLATES;
   }
   one("and it names what it did NOT measure rather than reporting a zero",

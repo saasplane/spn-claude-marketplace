@@ -16,7 +16,9 @@ export type Spec = { kind: string; boxes?: Box[]; links?: Link[]; caption?: stri
 
 /** The measure the figure check uses, at the drawn scale. */
 const W_LABEL = 7, W_NOTE = 6.4, W_TITLE = 7.6;
-const PAD_X = 14, GAP_Y = 20, GAP_COL = 56;
+// One pair of numbers, both axes: 24 where nothing connects two boxes, 56 where a connector does.
+// Padding is one number, 16, for a leaf and a container alike (05-artifacts.md § The grid).
+const PAD_X = 16, GAP_Y = 24, GAP_COL = 56, GAP_LINKED = 56;
 const H_ONE = 44, H_TWO = 64;
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -127,7 +129,9 @@ function drawEntities(spec: Spec): { svg: string; findings: string[] } {
 function drawChain(spec: Spec): { svg: string; findings: string[] } {
   const boxes = spec.boxes ?? [];
   if (!boxes.length) return { svg: "", findings: ["a `dg` figure with no boxes"] };
-  const margin = 24, gap = 22;
+  // 56 is the connected gap: a 7 arrowhead and 49 of shaft. It was 22, which is the grid's
+  // unconnected gap — the two rules contradicted each other and the chain followed the wrong one.
+  const margin = 24, gap = 56;
   const h = Math.max(...boxes.map(boxHeight));
   const widths = boxes.map(boxWidth);
   const width = margin * 2 + widths.reduce((a, b) => a + b, 0) + gap * (boxes.length - 1);
@@ -225,7 +229,9 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
   }
   if (!top.length) { findings.push("every box is nested, so none could be placed"); return { svg: "", findings }; }
 
-  const HEAD = 34, PAD_IN = 12;
+  // 16 inside a container, the same number a leaf pads its own label by — one padding, not two
+  // (05-artifacts.md § The primitives). It was 12, so a nested box read as falling out of its parent.
+  const HEAD = 34, PAD_IN = 16;
   const outerW = (b: Box): number => {
     const own = mapBoxWidth(b);
     const inner = (kids.get(b.id) ?? []).map(outerW);
@@ -250,7 +256,7 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
     if (pass === topIds.length) { findings.push("the links form a cycle, so the rows could not be decided; a map flows one way"); break; }
   }
 
-  const CANVAS = 1100, margin = 24, gapX = 36;
+  const CANVAS = 1100, margin = 24, gapX = GAP_LINKED;
 
   // A ONE-WAY CHAIN IS A STRAIGHT LINE. When every box has at most one link in and one out and the
   // links form a single path through all of them, the figure is a flow, and a flow reads best as a

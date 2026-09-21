@@ -192,6 +192,16 @@ function renderBody(lines: string[], findings: Finding[]): string {
       out.push(`  <ul>\n${items.map((x) => `    <li>${inline(x)}</li>`).join("\n")}\n  </ul>`);
       continue;
     }
+    // A numbered list, where the order IS the content. Without this it fell through to the paragraph
+    // path and the reader met one run-on paragraph beginning with the characters `1.` — found on the
+    // Sign-in construct, whose four organization checks run in a fixed order (N13, 2026-09-22).
+    if (/^\d+[.)]\s/.test(l)) {
+      flush();
+      const items: string[] = [];
+      while (i < lines.length && /^\d+[.)]\s/.test(lines[i])) items.push(lines[i++].replace(/^\d+[.)]\s*/, ""));
+      out.push(`  <ol>\n${items.map((x) => `    <li>${inline(x)}</li>`).join("\n")}\n  </ol>`);
+      continue;
+    }
     if (/^>\s?/.test(l)) {
       flush();
       const q: string[] = [];
