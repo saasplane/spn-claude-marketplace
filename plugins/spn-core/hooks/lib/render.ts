@@ -252,7 +252,9 @@ function renderPageBody(opts: Parameters<typeof renderPage>[0]): { html: string;
       sections.push(
         `<!-- ${String(s).padStart(2, "0")} -->\n` +
         `<section id="s${s}" data-block="${blockOf(name, body.join("\n"))}">\n` +
-        `  <div class="sec-head"><span class="num">${String(s).padStart(2, "0")}</span><h2>${inline(heading)}</h2></div>\n` +
+        // A number orders a file in a tree; a heading is a name. The section head carries no number
+        // on the page and none in the rail (the developer's rule, 2026-09-21).
+        `  <div class="sec-head"><h2>${inline(heading)}</h2></div>\n` +
         renderBody(body, findings) + `\n</section>`);
     }
   }

@@ -668,6 +668,7 @@ console.log("\n=== the gap scan measures and never fixes");
     run(ws, ["page", "docs/02-constructs/01-core/thing.md"]);
     const withThree = readAt(ws, "docs/artifacts/constructs/01-core/thing-construct.html");
     process.env.SPN_TEMPLATES = templates;
+    one("a section head carries no number — a heading is a name", page, (g) => !/class="num"/.test(g));
     one("the page carries every script the template has, not the first two", withThree,
         (g) => [...g.matchAll(/<script>[\s\S]*?<\/script>/g)].length ===
                [...bookTemplate.matchAll(/<script>[\s\S]*?<\/script>/g)].length + 1);
