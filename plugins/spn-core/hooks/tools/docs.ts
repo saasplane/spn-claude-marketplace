@@ -1556,6 +1556,15 @@ function coverageCheck(repo: string, workspace: string): Finding[] {
   const seat = join(repo, "docs", "02-constructs");
   const caps = join(repo, "docs", "04-capabilities");
   if (!existsSync(seat)) return f;
+  // A BOOK MIRRORS NO PACKAGES, so this whole check is about somebody else's repository. The
+  // foundation's capabilities seat is the STANDARD per topic, authored rather than derived, and a
+  // construct's Binds there names the repositories of the workspace that deliver it — `spn-core`,
+  // `docs` — which are not packages of this repository and own no chapter in it. Applied to the
+  // book it reported 129 correct constructs as uncovered. `face` already makes the same exception
+  // by the same test.
+  try {
+    if (JSON.parse(readFileSync(join(repo, "sprepo.json"), "utf8")).type === "FOUNDATION") return f;
+  } catch { /* no manifest: judge it as an ordinary repository */ }
 
   // what the seat SAYS, per construct: which nodes realize it
   const claimed = new Map<string, { domain: string; nodes: string[]; file: string }>();

@@ -141,6 +141,17 @@ console.log("\n=== every construct a chapter, every chapter a construct, every p
         ...good, "packages/pkg-ts/dist/spkind.json": kind }), ["coverage", "."]),
       lacks("`pkg-ts` holds code and no construct"));
 
+  // A BOOK MIRRORS NO PACKAGES. The foundation's capabilities seat is the standard per topic and
+  // its Binds names the repositories that deliver a construct, not its own packages — so the whole
+  // check is about somebody else's repository. Applied to the book it reported 129 correct
+  // constructs as uncovered.
+  one("a FOUNDATION repository is exempt, because its Binds names other repositories",
+      run(repo({ "docs/02-constructs/01-core/01-boot.md": seat("boot", { binds }) }, { type: "FOUNDATION" }), ["coverage", "."]),
+      has("clean — 1 repository"));
+  one("and an APPS repository with the same shape is not",
+      run(repo({ "docs/02-constructs/01-core/01-boot.md": seat("boot", { binds }) }), ["coverage", "."]),
+      has("says `pkg-ts` realizes it"));
+
   one("the rules table of Binds is never read as a placement",
       run(repo({ "docs/02-constructs/01-core/01-boot.md": seat("boot") }), ["coverage", "."]),
       lacks("realizes it and `04-capabilities/`"));
