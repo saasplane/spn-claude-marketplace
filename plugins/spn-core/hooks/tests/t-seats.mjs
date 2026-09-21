@@ -215,6 +215,52 @@ console.log("\n=== a behaviour row typed into a seat's Proof is refused");
       lacks("carries a table of behaviour rows"));
 }
 
+console.log("\n=== `face` over a capability seat writes the chapters' own shape");
+{
+  const chapter = (name, realizes, status = "DONE") =>
+    "<!-- spn:doc\n" + JSON.stringify({ id: `pkg-${realizes}`, variant: "capability", title: `${realizes} in pkg-ts`,
+      lenses: ["SERVER_DEV"], status, realizes: [realizes], summary: `What pkg-ts does for ${realizes}.` }) + "\n-->\n\n" +
+    `# ${realizes} in pkg-ts\n\n\`For: Backend developer\` · \`Status: ✅ ${status}\` · \`Realizes: ${realizes}\`\n\n## Where\n\nIn the package.\n`;
+  const face = (title) =>
+    "<!-- spn:doc\n" + JSON.stringify({ id: "pkg-capabilities", variant: "capability", title,
+      lenses: ["SERVER_DEV"], status: "DONE", summary: "The constructs pkg-ts realizes." }) + "\n-->\n\n" +
+    `# ${title}\n\n\`For: Backend developer\` · \`Status: ✅ DONE\`\n\n` +
+    "<!-- spn:generated map — do not edit inside these markers; `docs.ts face` writes it -->\n" +
+    "<!-- /spn:generated map -->\n";
+
+  const ws = repo({
+    "CONCEPT.md": "# c\n",
+    "docs/02-constructs/01-core/01-boot.md": seat("boot"),
+    "docs/04-capabilities/README.md": face("Capabilities"),
+    "docs/04-capabilities/01-core/README.md": face("Capabilities — core"),
+    "docs/04-capabilities/01-core/pkg-ts/README.md": face("Capabilities — pkg-ts"),
+    "docs/04-capabilities/01-core/pkg-ts/01-boot.md": chapter("01-boot.md", "boot"),
+    "docs/04-capabilities/01-core/pkg-ts/02-log.md": chapter("02-log.md", "log"),
+  });
+  run(ws, ["face", "docs"]);
+  const pkgFace = readAt(ws, "docs/04-capabilities/01-core/pkg-ts/README.md");
+
+  // A CHAPTER REALIZES A CONSTRUCT; IT GOVERNS NO SOURCE FOLDER. The mirror-per-folder Map derived
+  // `src/01-boot/` from a chapter's file name and named a folder that does not exist.
+  one("a package face's Map names the construct each chapter realizes", pkgFace,
+      (g) => /\| Chapter \| Realizes \| Carries \| Status \|/.test(g));
+  one("and never invents a src folder from a chapter's file name", pkgFace, lacks("src/01-boot"));
+  one("every chapter beside it is a row", pkgFace,
+      (g) => g.includes("01-boot.md") && g.includes("02-log.md"));
+
+  // The bug a 6b agent found by probing rather than by trusting: the tag-line pattern ended at the
+  // Status chip, so a `Realizes:` chip made it miss and write a SECOND tag line under the title.
+  const ch = readAt(ws, "docs/04-capabilities/01-core/pkg-ts/01-boot.md");
+  one("a chapter carrying a Realizes chip keeps exactly one tag line", ch,
+      (g) => (g.match(/^`For:/gm) ?? []).length === 1);
+  one("and the chip the author added survives the rewrite", ch, has("· `Realizes: boot`"));
+  one("running face twice writes the same bytes", (run(ws, ["face", "docs"]), readAt(ws, "docs/04-capabilities/01-core/pkg-ts/01-boot.md")), ch);
+
+  // A seat-level face is still the older shape, because it lists domains and not chapters.
+  one("a seat face is not turned into a chapter list",
+      readAt(ws, "docs/04-capabilities/README.md"), lacks("| Chapter | Realizes |"));
+}
+
 // ---------------------------------------------------------------- the status a run writes (Q107)
 
 console.log("\n=== the plugins' own run writes the two cells a run owns, and no others");

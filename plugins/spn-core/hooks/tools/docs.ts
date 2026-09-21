@@ -264,12 +264,17 @@ function writeTagLines(tree: string, write: boolean): { touched: string[]; findi
     if (!block || !block.lenses?.length || !(block.status in STATUS_WORD)) continue;
     const want = tagLine(block);
     const bare = outsideFences(before);
-    const TAG = /^`(?:For|Lenses):[^`\n]*`[ \t]*·[ \t]*`Status:[^`\n]*`[ \t]*$/m;
+    // A CHIP AFTER STATUS IS THE AUTHOR'S AND IS KEPT. The pattern used to end at the Status
+    // chip, so a capability chapter's `· `Realizes: …`` made it miss its own tag line and fall
+    // through to *there is no tag line* — writing a second one under the title, in every chapter
+    // of the corpus. The audit could not see it either, because it reads the first match.
+    // `For` and `Status` are rendered from the block; anything after them is carried across.
+    const TAG = /^`(?:For|Lenses):[^`\n]*`[ \t]*·[ \t]*`Status:[^`\n]*`((?:[ \t]*·[ \t]*`[^`\n]*`)*)[ \t]*$/m;
 
     let after: string;
     const at = bare.match(TAG);
     if (at) {
-      after = before.slice(0, at.index!) + want + before.slice(at.index! + at[0].length);
+      after = before.slice(0, at.index!) + want + (at[1] ?? "") + before.slice(at.index! + at[0].length);
     } else {
       const h1 = [...bare.matchAll(/^#\s+.+$/gm)];
       if (h1.length !== 1) {
@@ -794,10 +799,21 @@ function buildDictionary(tree: string): { body: string; findings: Finding[] } {
   return { body: lines.join("\n"), findings };
 }
 
-/** A capability face's Map: one row per mirror beside it, each governing the src folder it is named for. */
+/**
+ * A capability face's Map.
+ *
+ * TWO SHAPES, BECAUSE Q130 GAVE THE SEAT A SECOND ONE. A face at a seat or domain level still lists
+ * MIRRORS, and a mirror is named for the source folder it governs. A face inside a PACKAGE folder
+ * lists CHAPTERS, and a chapter realizes a construct — there is no `src/<chapter>/` to govern, and
+ * deriving one names a folder that does not exist. Left unsplit, running `face` over a repository
+ * that had just been given its chapters would have stamped `src/01-plugin-set/` on all of them.
+ */
 function buildMap(faceFile: string): { body: string; findings: Finding[] } {
   const findings: Finding[] = [];
   const dir = dirname(faceFile);
+  // A package folder is the level below a domain: `04-capabilities/<domain>/<package>/README.md`.
+  const rel = faceFile.replace(/\\/g, "/").split("/04-capabilities/")[1] ?? "";
+  if (rel.split("/").length >= 3) return buildChapterMap(faceFile);
   // WHERE THE SOURCE ROOT IS, READ FROM THE FACE RATHER THAN ASSUMED. A mirror is named for the
   // folder it governs, and almost every node roots that at `src/`. A repository whose source is
   // laid out differently — the marketplace, whose source is `plugins/<name>/` — declares its root
@@ -817,6 +833,27 @@ function buildMap(faceFile: string): { body: string; findings: Finding[] } {
     lines.push(`| [${rel}](${rel}) | \`${governs}\` | ${block.summary} | ${glyph[block.status] ?? "🔮"} |`);
   }
   if (mirrors.length === 0) lines.push("| — | — | this layer carries no mirror yet | 🔮 |");
+  return { body: lines.join("\n"), findings };
+}
+
+/** A package face's Map: one row per chapter, each naming the construct it realizes. */
+function buildChapterMap(faceFile: string): { body: string; findings: Finding[] } {
+  const findings: Finding[] = [];
+  const dir = dirname(faceFile);
+  const chapters = walkFiles(dir, (p) => p.endsWith(".md") && basename(p) !== "README.md" && basename(p) !== "data-model.md")
+    .sort((a, b) => a.localeCompare(b));
+  const glyph: Record<string, string> = { DONE: "✅", IMPLEMENTING: "🚧", PLANNING: "🔮" };
+  const lines = ["| Chapter | Realizes | Carries | Status |", "| --- | --- | --- | --- |"];
+  for (const m of chapters) {
+    const name = relative(dir, m);
+    const { block } = readBlock(readFileSync(m, "utf8"));
+    if (!block) { findings.push({ check: "face", grade: "RULE", file: m, message: "a chapter with no `spn:doc` block cannot be put in the Map" }); continue; }
+    // The construct is declared, and the file name is the fallback — a chapter is numbered as its
+    // construct is, so the stem after the number IS the construct wherever nothing says otherwise.
+    const realizes = (block.realizes ?? [])[0] ?? name.replace(/\.md$/, "").replace(/^\d\d-/, "");
+    lines.push(`| [${name}](${name}) | \`${realizes}\` | ${block.summary} | ${glyph[block.status] ?? "🔮"} |`);
+  }
+  if (!chapters.length) lines.push("| — | — | this package realizes no construct yet | 🔮 |");
   return { body: lines.join("\n"), findings };
 }
 
