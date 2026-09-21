@@ -132,8 +132,19 @@ export function checkHold(root: string): Warning[] {
   return out;
 }
 
+/**
+ * A REPLY THAT ENDS A SITTING owes the next window the seven fields, because a session's context ends
+ * with the session and the block is the only thing that crosses.
+ *
+ * WHAT COUNTS AS SAYING SO was the bare word `handover` anywhere in the reply, and that fired on
+ * every sentence ABOUT a handover — *the handover marks it as not mine to decide*, *this reply
+ * carries no handover block* — so answering a question about the open cards demanded a handover
+ * block twice in a row. The check had no tests at all, which is how it survived: an unverified gate
+ * is the thing this arc keeps finding. The signal is a statement that a window is needed or that the
+ * work is being handed on, or a line that OPENS one, never a passing mention of the noun.
+ */
 export function checkHandover(reply: string): Warning[] {
-  if (!/new window|fresh window|another window|hand this over|handover/i.test(reply)) return [];
+  if (!/\b(?:new|fresh|another|next) window\b|\bhand(?:ing)? (?:this |it )?over\b|^[ \t]{0,3}#{0,4}[ \t]*handover\b/im.test(reply)) return [];
   const fenced = [...reply.matchAll(/```[\s\S]*?```/g)].map((m) => m[0].toLowerCase());
   const block = fenced.find((f) => /workstream/.test(f) && /arc/.test(f));
   if (!block)

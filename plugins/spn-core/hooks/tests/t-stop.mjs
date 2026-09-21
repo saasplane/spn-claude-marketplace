@@ -219,5 +219,45 @@ one("an option PRESENTED still asks",
   build("stop-reply-present", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
   "warns", { says: "asks for a lettered choice", reply: "Two ways: option A now, or wait." });
 
+console.log("\n=== the handover check — what counts as saying a window is needed");
+{
+  // THIS CHECK HAD NO TESTS AT ALL, which is how it shipped triggering on the bare word `handover`
+  // anywhere in a reply. Answering a question ABOUT the open cards — "the handover marks it as not
+  // mine to decide" — demanded a handover block, twice in a row. An unverified gate is the thing
+  // this arc keeps finding, so the narrowed trigger is asserted in both directions: what must fire,
+  // and what must stay quiet.
+  const { checkHandover } = await import("../events/stop.ts");
+  const BLOCK = ["```", "workstream: 008", "arc and step: N13 step 4", "model: Opus 5",
+    "read first: the arc", "state: green", "done when: it lands", "do not touch: Q115",
+    "open: Q138", "```"].join("\n");
+  const says = (reply) => checkHandover(reply).length > 0;
+
+  for (const [what, reply] of [
+    ["a passing mention of the noun", "The handover marks it as not mine to decide."],
+    ["saying a reply carries no block", "This reply carries no handover block."],
+    ["an ordinary report", "I fixed the drawer and committed it."],
+    ["the word window in another sense", "The browser window is not involved here."],
+    ["a window needed, and the block given", `Pick this up in a new window.\n${BLOCK}`],
+  ]) { n += 1; const ok = !says(reply); if (!ok) failed += 1;
+       console.log(`  ${ok ? "PASS" : "FAIL"}  silent — ${what}`); }
+
+  for (const [what, reply] of [
+    ["a new window is needed, with no block", "Pick this up in a new window."],
+    ["a fresh window", "Start a fresh window from here."],
+    ["the next window", "The next window starts at step 5."],
+    ["handing over", "I am handing over here."],
+    ["handing this over", "I am handing this over now."],
+    ["a heading that opens one", "## Handover — 2026-09-22\n\nsome prose and no block"],
+  ]) { n += 1; const ok = says(reply); if (!ok) failed += 1;
+       console.log(`  ${ok ? "PASS" : "FAIL"}  reports — ${what}`); }
+
+  // And a block that is present but short still names what is missing, rather than passing.
+  n += 1;
+  const short = checkHandover("Pick this up in a new window.\n```\nworkstream: 008\narc and step: N13\n```");
+  const named = short.length === 1 && /model/.test(short[0].message) && /open/.test(short[0].message);
+  if (!named) failed += 1;
+  console.log(`  ${named ? "PASS" : "FAIL"}  a short block is told which fields it is missing`);
+}
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);
