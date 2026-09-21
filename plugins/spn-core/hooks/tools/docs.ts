@@ -161,7 +161,10 @@ function checkBlock(file: string, src: string, block: any, err: string | null): 
 
   if (variant === "construct") {
     if (!block.parentId) add("RULE", "a construct names the outline it belongs to in `parentId`");
-    if (!Array.isArray(block.dependsOn)) add("SOFT", "a construct declares `dependsOn`, even as an empty list");
+    // RULE since workstream 008 closed. It was SOFT while the constructs were being written, because
+    // a gate that fires on every unwritten file teaches everyone to scroll past it. Every construct
+    // in the workspace now declares it, so the rule fires on nothing and holds the next one.
+    if (!Array.isArray(block.dependsOn)) add("RULE", "a construct declares `dependsOn`, even as an empty list");
   }
   if ("keywords" in block && (!Array.isArray(block.keywords) || block.keywords.length < 1))
     add("SOFT", "`keywords` is present but carries nothing");

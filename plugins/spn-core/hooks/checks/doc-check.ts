@@ -214,9 +214,12 @@ export function structural(path: string): Finding[] {
 // failure before it happens: *the document half is the one you are most likely to forget*.
 // Recognised two ways, because a page may name the heading or just carry the table.
 const HALF_HEADING = /<h[34]\b[^>]*>(?:(?!<\/h[34]>)[\s\S])*re-?align/i;
-// SOFT, and the number is why. Fifty pages would fire on the day this lands, and a gate nobody can
-// get green is a gate everybody learns to scroll past.
-const TWO_HALVES = "SOFT";
+// RULE since workstream 008 closed. It was SOFT for one reason and the reason has gone: fifty pages
+// would have fired the day it landed, and a gate nobody can get green is a gate everybody learns to
+// scroll past. Approach pages no longer sit in a repository at all — they live in the workstream
+// that argues them — and of the ten that exist, eight carry the heading. The two that do not are in
+// CLOSED workstreams, which are records of a moment and are never rewritten.
+const TWO_HALVES = "RULE";
 
 /** The body of one `<h2>` section, to the next `<h2>`. */
 function section(text: string, name: string): string | null {
@@ -505,9 +508,8 @@ export function voice(prose: string, sents: Sentence[], kind = "chapter", operat
   const idioms = [...unmarked.matchAll(IDIOM)].map((m) => m[1]);
   if (idioms.length) {
     const eg = [...new Set(idioms)].sort().slice(0, 4).map((i) => `"${i}"`).join(" · ");
-    out.push(["SOFT", `${idioms.length} idiom(s) — RD.DOCS.052: an idiom means something its words ` +
-      `do not say, so a second-language reader cannot guess it: ${eg} · write the plain phrase. ` +
-      `Reported SOFT until workstream 008 retrofits the corpus`]);
+    out.push(["RULE", `${idioms.length} idiom(s) — RD.DOCS.052: an idiom means something its words ` +
+      `do not say, so a second-language reader cannot guess it: ${eg} · write the plain phrase`]);
   }
   const nAbout = [...unmarked.matchAll(ABOUT)].length;
   if (nAbout)
