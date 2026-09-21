@@ -40,11 +40,16 @@ const LENS_LABEL: Record<string, string> = {
 
 const STATUS_WORD: Record<string, string> = { PLANNING: "PLANNING", IMPLEMENTING: "IMPLEMENTING", DONE: "DONE" };
 
-/** The fixed outlines. A construct's Terms and an approach's Terms are the only optional sections. */
+/**
+ * The fixed outlines. A construct is six sections in one order — Terms first, because the model uses
+ * those words; Boundary after the parts, because an edge can be judged only once the shape is seen
+ * (workstream 008, N13, 2026-09-21). Relations is gone: `dependsOn` in the block carries it. An
+ * approach's Terms is its only optional section.
+ */
 const OUTLINE: Partial<Record<Variant, { required: string[]; optional: string[] }>> = {
   construct: {
-    required: ["Boundary", "Model", "Parts", "Relations", "Binds", "Proof"],
-    optional: ["Terms"],
+    required: ["Terms", "Model", "Parts", "Boundary", "Binds", "Proof"],
+    optional: [],
   },
   approach: {
     required: ["Why", "What", "How", "Open", "Deferred"],
@@ -160,7 +165,7 @@ function checkBlock(file: string, src: string, block: any, err: string | null): 
   }
 
   if (variant === "construct") {
-    if (!block.parentId) add("RULE", "a construct names the outline it belongs to in `parentId`");
+    // `parentId` is no longer asked for: the folder is the parent (N13). A block that still carries it is not wrong.
     // RULE since workstream 008 closed. It was SOFT while the constructs were being written, because
     // a gate that fires on every unwritten file teaches everyone to scroll past it. Every construct
     // in the workspace now declares it, so the rule fires on nothing and holds the next one.
@@ -177,6 +182,16 @@ function checkOutline(file: string, src: string, block: any): Finding[] {
   const spec = variant ? OUTLINE[variant] : undefined;
   const got = sections(file, src, "h2").map(sectionName);
   if (!spec) return f;
+
+  // UNTIL N13 MOVES THE CORPUS, a construct in the v1 shape (Boundary before Model, a Relations
+  // section) is reported softly rather than refused: the rule binds every new page now, and the 177
+  // existing pages are re-shaped by the arc that merges them, not by a gate that fires on all of them.
+  if (variant === "construct" && got.includes("Relations")) {
+    const v1 = ["Terms", "Boundary", "Model", "Parts", "Relations", "Binds", "Proof"];
+    const missing1 = v1.slice(1).filter((w) => !got.includes(w));
+    f.push({ check: "outline", grade: "SOFT", file, message: `carries the v1 outline (Boundary · Model · Parts · Relations · Binds · Proof); the construct outline is now Terms → Model → Parts → Boundary → Binds → Proof, and N13 re-shapes it${missing1.length ? ` — and it is missing ${missing1.join(" · ")}` : ""}` });
+    return f;
+  }
 
   const want = spec.required;
   const seen = got.filter((g) => want.includes(g) || spec.optional.includes(g));

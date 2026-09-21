@@ -161,7 +161,7 @@ console.log("\n=== a construct's outline is checked in markdown, not only in HTM
 // reported all six missing. The first batch that ever wrote one distrusted the red light and traced
 // it. These cases are the other half of that fix: the check must still FAIL a file that is really
 // missing a section, or it has simply been made quiet.
-const SECTIONS = ["Boundary", "Model", "Parts", "Relations", "Binds", "Proof"];
+const SECTIONS = ["Terms", "Model", "Parts", "Boundary", "Binds", "Proof"];
 // Binds and Proof carry real tables, because both are checked now — a section that is only a
 // heading used to pass, and only because the checks could not read markdown at all.
 const SECTION_BODY = {
@@ -183,7 +183,14 @@ const construct = (sections) =>
     "docs/02-constructs/x.md": construct(SECTIONS.filter((h) => h !== "Binds")) });
   const out = run(root, ["audit", "docs/02-constructs/x.md"]);
   one("a construct genuinely missing a section is still a finding", out, has("missing section: Binds"));
-  one("and it names only the one that is missing", out, lacks("Boundary"));
+  one("and it names only the one that is missing", out, lacks("missing section: Terms"));
+}
+{
+  const v1 = doc({ id: "x", variant: "construct", parentId: "concept", dependsOn: [], title: "X", lenses: ["ARCHITECT"], status: "PLANNING" },
+      "Lead.\n\n## Boundary\n\nb\n\n## Model\n\nm\n\n## Parts\n\np\n\n## Relations\n\nr\n\n" + SECTION_BODY.Binds + "\n## Proof\n\n" + SECTION_BODY.Proof,
+      "`For: Architect` · `Status: 🔮 PLANNING`");
+  const out = run(repo({ "CONCEPT.md": "# c\n", "docs/02-constructs/x.md": v1 }), ["audit", "docs/02-constructs/x.md"]);
+  one("a v1-shaped construct is reported softly until N13 re-shapes it, never refused", out, (g) => /carries the v1 outline/.test(g) && !/missing section/.test(g));
 }
 {
   // A construct that SHOWS an outline in an example is not carrying that section.
@@ -281,7 +288,7 @@ console.log("\n=== a seat file's Binds and Proof are checked, not skipped");
 // Binds and Proof entirely unexamined while the audit said clean.
 const withSections = (binds, proof) =>
   doc({ id: "x", variant: "construct", parentId: "concept", dependsOn: [], title: "X", lenses: ["ARCHITECT"], status: "PLANNING" },
-      "Lead.\n\n## Boundary\n\nb\n\n## Model\n\nm\n\n## Parts\n\np\n\n## Relations\n\nr\n\n" + binds + "\n" + proof,
+      "Lead.\n\n## Terms\n\nt\n\n## Model\n\nm\n\n## Parts\n\np\n\n## Boundary\n\nb\n\n" + binds + "\n" + proof,
       "`For: Architect` · `Status: 🔮 PLANNING`");
 const BINDS_OK = "## Binds\n\n| Rule | What it decides | Weight |\n| --- | --- | --- |\n| `a.md` | x | MUST |\n\n| Repo | Node | What it realizes | State |\n| --- | --- | --- | --- |\n| R | n | x | planned |\n";
 const PROOF_OK = "## Proof\n\n| Check | Kind | What a green run shows |\n| --- | --- | --- |\n| `spnutils apps test` | gate | x |\n";
@@ -489,7 +496,7 @@ console.log("\n=== the dictionary is generated from the constructs, never typed 
           "## Terms\n\n| Term | Contract term | What it means here |\n| --- | --- | --- |\n" +
           "| sign-in | `SPSession` | one person's live access to one app site |\n" +
           "| device | `SPDevice` | the client a session was opened from |\n\n" +
-          "## Boundary\n\nx\n\n## Model\n\nx\n\n## Parts\n\nx\n\n## Relations\n\nx\n\n" +
+          "## Model\n\nx\n\n## Parts\n\nx\n\n## Boundary\n\nx\n\n" +
           "## Binds\n\n| where it lives today | |\n| --- | --- |\n| a | b |\n\n## Proof\n\nx\n",
           "`For: Architect` · `Status: 🔮 PLANNING`"),
     "docs/04-capabilities/01-core/01-server/data-model.md":
