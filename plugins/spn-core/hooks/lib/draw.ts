@@ -10,7 +10,13 @@
 // every box and label read big and dark beside the hand-drawn figures of the hub (N13, 2026-09-21).
 // The chapter changes to 1100 in N13 step 1; this is the one measure from here on.
 
-export type Box = { id: string; label: string; note?: string; em?: boolean; off?: boolean; warn?: boolean; in?: string };
+/**
+ * THE FLOWCHART SHAPES, and each one carries its meaning (05-artifacts.md § The figures). A shape is
+ * not decoration: a reader knows a decision from a step before reading either label, which is the
+ * whole reason `FLOWCHART` is its own kind rather than a `MAP` with a diamond bolted on.
+ */
+export type Shape = "process" | "terminator" | "decision" | "io" | "predefined" | "store" | "connector";
+export type Box = { id: string; label: string; note?: string; em?: boolean; off?: boolean; warn?: boolean; in?: string; shape?: Shape };
 export type Link = { from: string; to: string; label?: string; dashed?: boolean };
 export type Spec = { kind: string; boxes?: Box[]; links?: Link[]; caption?: string; title?: string };
 
@@ -29,6 +35,65 @@ const LABEL_H = 12, LABEL_GAP = 8;
 const H_ONE = 44, H_TWO = 64;
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+/**
+ * A FIGURE'S viewBox HUGS ITS CONTENT, so a drawing is as wide as the paragraph above it. Every
+ * drawer lays out inside a 1100 canvas and centres its rows in it, which is right for placing things
+ * and wrong for shipping them: a four-box flowchart 250px wide arrived inside a 1156 canvas and
+ * rendered as a small picture marooned in white space. The developer saw it on the blocks page —
+ * *let each type of blocks take full width* — and the hand-authored figures were fitted then; the
+ * drawer never was, so every figure it produced still paid the inset the edge-to-edge rule forbids.
+ *
+ * Bleed is `2`, so a `1.5` stroke on an outer edge is not clipped, and `9` wherever a connector
+ * reaches the boundary, so the check's own `8px` frame rule still holds. `<defs>` is excluded: the
+ * arrowhead defined there has its own coordinate space starting at 0,0, and measuring it makes every
+ * figure look as though it already began at the origin (N13, 2026-09-22).
+ */
+function fit(body: string[]): { x0: number; y0: number; w: number; h: number } {
+  const src = body.filter((l) => !l.includes("<defs>")).join("\n");
+  let lo: [number, number] = [Infinity, Infinity], hi: [number, number] = [-Infinity, -Infinity];
+  const see = (x: number, y: number, pad = 0) => {
+    lo = [Math.min(lo[0], x - pad), Math.min(lo[1], y - pad)];
+    hi = [Math.max(hi[0], x + pad), Math.max(hi[1], y + pad)];
+  };
+  for (const m of src.matchAll(/<rect[^>]*\sx="(-?[\d.]+)" y="(-?[\d.]+)" width="([\d.]+)" height="([\d.]+)"/g))
+    { const [x, y, w, h] = m.slice(1).map(Number); see(x, y); see(x + w, y + h); }
+  for (const m of src.matchAll(/<circle[^>]*\scx="(-?[\d.]+)" cy="(-?[\d.]+)" r="([\d.]+)"/g))
+    { const [cx, cy, r] = m.slice(1).map(Number); see(cx, cy, r); }
+  for (const m of src.matchAll(/<ellipse[^>]*\scx="(-?[\d.]+)" cy="(-?[\d.]+)" rx="([\d.]+)" ry="([\d.]+)"/g))
+    { const [cx, cy, rx, ry] = m.slice(1).map(Number); see(cx - rx, cy - ry); see(cx + rx, cy + ry); }
+  // Text is measured from the same character widths the figure check measures it by, and a baseline
+  // sits below its own line, so the box runs upward from `y`.
+  for (const m of src.matchAll(/<text class="(\w+)" x="(-?[\d.]+)" y="(-?[\d.]+)">([\s\S]*?)<\/text>/g)) {
+    const cls = m[1], x = Number(m[2]), y = Number(m[3]);
+    const w = m[4].replace(/&[a-z]+;/g, " ").length * (cls === "t" ? W_TITLE : cls === "l" ? W_LABEL : W_NOTE);
+    see(x, y - 13); see(x + w, y + 3);
+  }
+  for (const m of src.matchAll(/<path[^>]*\sd="([^"]+)"/g)) {
+    const conn = m[0].includes('class="c');
+    let x = 0, y = 0;
+    for (const [, c, u, v] of m[1].matchAll(/([MLHV])\s*(-?[\d.]+)(?:\s+(-?[\d.]+))?/g)) {
+      const a = Number(u);
+      x = c === "V" ? x : a;
+      y = c === "V" ? a : c === "H" ? y : Number(v);
+      see(x, y, conn ? 9 : 2);
+    }
+  }
+  if (!Number.isFinite(lo[0])) return { x0: 0, y0: 0, w: 1100, h: 1 };
+  const x0 = Math.floor(lo[0] - 2), y0 = Math.floor(lo[1] - 2);
+  return { x0, y0, w: Math.ceil(hi[0] + 2) - x0, h: Math.ceil(hi[1] + 2) - y0 };
+}
+
+/** One masthead for every drawer: the marker it needs, and a viewBox that hugs what was drawn. */
+function svgOf(body: string[], label: string): string {
+  const { x0, y0, w, h } = fit(body);
+  return [
+    `<svg class="dg" viewBox="${x0} ${y0} ${w} ${h}" role="img" aria-label="${esc(label)}">`,
+    `  <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>`,
+    ...body,
+    `</svg>`,
+  ].join("\n");
+}
 
 type Vert = { x: number; y1: number; y2: number };
 type Pending = { x: number; y: number; w: number; txt: string };
@@ -225,13 +290,7 @@ function drawEntities(spec: Spec): { svg: string; findings: string[] } {
 
   out.push(...placeLabels(ePending, eVerts, margin, width));
 
-  const svg = [
-    `<svg class="dg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(spec.title ?? spec.caption ?? "entity diagram")}">`,
-    `  <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>`,
-    ...out,
-    `</svg>`,
-  ].join("\n");
-  return { svg, findings };
+  return { svg: svgOf(out, spec.title ?? spec.caption ?? "entity diagram"), findings };
 }
 
 /** CHAIN — a FLOW read left to right: a box per step, an arrow means *then*. */
@@ -259,9 +318,7 @@ function drawChain(spec: Spec): { svg: string; findings: string[] } {
     x += widths[i] + gap;
   });
   return {
-    svg: [`<svg class="dg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(spec.title ?? spec.caption ?? "flow")}">`,
-      `  <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>`,
-      ...out, `</svg>`].join("\n"),
+    svg: svgOf(out, spec.title ?? spec.caption ?? "chain"),
     findings: [],
   };
 }
@@ -289,22 +346,138 @@ function wrapNote(note: string): string[] {
   if (cur) lines.push(cur);
   return lines;
 }
+const shapeOf = (b: Box): Shape => b.shape ?? "process";
+
+// The lean on a parallelogram, the bars on a predefined process, the cap on a cylinder, and the
+// radius of an on-page connector. Four numbers, each belonging to one shape and to nothing else.
+const SKEW = 16, BARS = 11, CAP = 13, DOT = 17;
+
+/**
+ * TEXT IS CENTRED BY ARITHMETIC, NOT BY `text-anchor`. The figure check reads a `<text>` element's
+ * `x` as the LEFT edge of the word and measures its box from there, so a centred label declared the
+ * SVG way would be judged half a word to the right of where it actually sits — every clearance
+ * around it wrong, and wrong in the direction that passes. So the drawer computes the left edge
+ * itself from the same character width the check uses, and the two halves agree by construction.
+ */
+function centred(cls: "l" | "n", txt: string, cx: number, y: number): string {
+  const w = txt.length * (cls === "l" ? W_LABEL : W_NOTE);
+  return `  <text class="${cls}" x="${Math.round(cx - w / 2)}" y="${y}">${esc(txt)}</text>`;
+}
+
 function mapBoxWidth(b: Box): number {
   const lines = b.note ? wrapNote(b.note) : [];
   const widest = Math.max(b.label.length * W_LABEL, ...lines.map((l) => l.length * W_NOTE));
-  return Math.ceil(widest + PAD_X * 2);
+  const base = Math.ceil(widest + PAD_X * 2);
+  switch (shapeOf(b)) {
+    // A diamond wastes its corners, so the text needs the room the corners take away.
+    case "decision": return base + 56;
+    case "io": return base + SKEW;
+    case "predefined": return base + BARS * 2;
+    case "terminator": return base + 12;
+    case "connector": return DOT * 2;
+    default: return base;
+  }
 }
 function mapBoxHeight(b: Box): number {
   const lines = b.note ? wrapNote(b.note).length : 0;
-  return lines ? 26 + 19 * lines + 12 : H_ONE;
+  const base = lines ? 26 + 19 * lines + 12 : H_ONE;
+  switch (shapeOf(b)) {
+    case "decision": return base + 28;
+    // The cap sits INSIDE the box's own bounds rather than above them, so the grid's spacing keeps
+    // every neighbour clear of it without the layout knowing a cylinder is there.
+    case "store": return base + CAP;
+    case "terminator": return Math.max(base, 40);
+    case "connector": return DOT * 2;
+    default: return base;
+  }
 }
+
+/**
+ * A SHAPE IS DRAWN, AND ITS TEXT IS PLACED INSIDE IT. Everything but `process` centres its label,
+ * because a leaning, pointed or round shape has no left edge a reader's eye can rest on.
+ *
+ * Only `<rect>` is a shape the figure check measures sides of, which is deliberate rather than a
+ * gap: a connector lands on a diamond's vertex or a terminator's end, and the check reads those as
+ * points on a closed path — it is the CENTRING rule that wants a rectangle, and a diamond has no
+ * side to be off the middle of.
+ */
 function mapRect(b: Box, x: number, y: number, w: number, h: number): string {
-  const out = [`  <rect class="${boxClass(b)}" x="${x}" y="${y}" width="${w}" height="${h}" rx="3"/>`];
-  if (!b.note) { out.push(`  <text class="l" x="${x + PAD_X}" y="${y + h / 2 + 4}">${esc(b.label)}</text>`); return out.join("\n"); }
-  out.push(`  <text class="l" x="${x + PAD_X}" y="${y + 26}">${esc(b.label)}</text>`);
-  wrapNote(b.note).forEach((line, i) => out.push(`  <text class="n" x="${x + PAD_X}" y="${y + 45 + 19 * i}">${esc(line)}</text>`));
-  return out.join("\n");
+  const cls = boxClass(b), cx = x + w / 2, cy = y + h / 2;
+  const body: string[] = [];
+  let textTop = y + 26, textMid = cy + 4, centre = true;
+
+  switch (shapeOf(b)) {
+    case "terminator":
+      body.push(`  <rect class="${cls}" x="${x}" y="${y}" width="${w}" height="${h}" rx="${h / 2}"/>`);
+      break;
+    case "decision":
+      body.push(`  <path class="${cls}" d="M${cx} ${y} L${x + w} ${cy} L${cx} ${y + h} L${x} ${cy} Z"/>`);
+      break;
+    case "io":
+      body.push(`  <path class="${cls}" d="M${x + SKEW} ${y} L${x + w} ${y} L${x + w - SKEW} ${y + h} L${x} ${y + h} Z"/>`);
+      break;
+    case "predefined":
+      body.push(`  <rect class="${cls}" x="${x}" y="${y}" width="${w}" height="${h}" rx="3"/>`,
+                `  <path class="${cls}" d="M${x + BARS} ${y} V${y + h}"/>`,
+                `  <path class="${cls}" d="M${x + w - BARS} ${y} V${y + h}"/>`);
+      break;
+    case "store":
+      // Rect from the cap's waist down, cap centred on that waist: a connector lands on the rect,
+      // which is a shape the check can measure, and the cap is the picture rather than the claim.
+      body.push(`  <rect class="${cls}" x="${x}" y="${y + CAP}" width="${w}" height="${h - CAP}" rx="3"/>`,
+                `  <ellipse class="${cls}" cx="${cx}" cy="${y + CAP}" rx="${w / 2}" ry="${CAP}"/>`);
+      textTop = y + CAP + 26; textMid = y + CAP + (h - CAP) / 2 + 4;
+      break;
+    case "connector":
+      body.push(`  <circle class="${cls}" cx="${cx}" cy="${cy}" r="${DOT}"/>`);
+      break;
+    default:
+      body.push(`  <rect class="${cls}" x="${x}" y="${y}" width="${w}" height="${h}" rx="3"/>`);
+      centre = false;
+  }
+
+  if (!b.note) {
+    body.push(centre ? centred("l", b.label, cx, textMid) : `  <text class="l" x="${x + PAD_X}" y="${textMid}">${esc(b.label)}</text>`);
+    return body.join("\n");
+  }
+  body.push(centre ? centred("l", b.label, cx, textTop) : `  <text class="l" x="${x + PAD_X}" y="${textTop}">${esc(b.label)}</text>`);
+  wrapNote(b.note).forEach((line, i) => body.push(
+    centre ? centred("n", line, cx, textTop + 19 * (i + 1))
+           : `  <text class="n" x="${x + PAD_X}" y="${textTop + 19 + 19 * i}">${esc(line)}</text>`));
+  return body.join("\n");
 }
+
+type Placed = { x: number; y: number; w: number; h: number; row: number };
+
+/**
+ * WHERE A CONNECTOR MEETS A SHAPE depends on the shape, which is the price of having shapes at all.
+ * A rectangle's top is a flat run offering up to three points; a diamond's top is a single vertex; a
+ * parallelogram's top is a flat run shifted by its own lean; a cylinder's top is the waist of its
+ * cap. Get this wrong and the arrow lands in white space beside the shape it points at — which the
+ * figure check reports as a connector starting nowhere, and which a reader sees immediately.
+ */
+function acrossPoints(b: Box, p: Placed, side: "top" | "bottom", asking: number): number[] {
+  const cx = p.x + p.w / 2;
+  switch (shapeOf(b)) {
+    case "decision": case "connector": case "terminator": return [Math.round(cx)];
+    case "io": return [Math.round(cx + (side === "top" ? SKEW / 2 : -SKEW / 2))];
+    default: return sidePoints(p.x, p.w, asking);
+  }
+}
+/** A cylinder's top edge is the waist its cap is centred on, because that is where its rect starts. */
+const edgeY = (b: Box, p: Placed, side: "top" | "bottom") =>
+  side === "bottom" ? p.y + p.h : shapeOf(b) === "store" ? p.y + CAP : p.y;
+/** A shape's left and right, measured at its own middle, where a sideways connector meets it. */
+function edgeX(b: Box, p: Placed, side: "left" | "right"): number {
+  const cx = p.x + p.w / 2;
+  switch (shapeOf(b)) {
+    case "io": return side === "left" ? p.x + SKEW / 2 : p.x + p.w - SKEW / 2;
+    case "connector": return side === "left" ? cx - DOT : cx + DOT;
+    default: return side === "left" ? p.x : p.x + p.w;
+  }
+}
+/** A cylinder's middle is the middle of its body, not of the box its cap is reserved in. */
+const midY = (b: Box, p: Placed) => shapeOf(b) === "store" ? p.y + CAP + (p.h - CAP) / 2 : p.y + p.h / 2;
 
 /**
  * MAP — groups and what flows between them. Boxes are laid in rows by dependency depth: a box
@@ -318,7 +491,8 @@ function mapRect(b: Box, x: number, y: number, w: number, h: number): string {
  * filled its own row, every box stacked in one column, and each connector ran straight through the
  * boxes between its ends with its label printed over them (N13's sample, 2026-09-21).
  */
-function drawMap(spec: Spec): { svg: string; findings: string[] } {
+function drawMap(spec: Spec, opts: { downward?: boolean } = {}): { svg: string; findings: string[] } {
+  const label = opts.downward ? "flowchart" : "map";
   const findings: string[] = [];
   const all = spec.boxes ?? [];
   const links = spec.links ?? [];
@@ -377,6 +551,9 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
     const heads = topIds.filter((id) => !(inOf.get(id) ?? 0));
     const simple = topIds.every((id) => (inOf.get(id) ?? 0) <= 1 && (outOf.get(id) ?? 0) <= 1);
     if (simple && heads.length === 1 && edges.length === topIds.length - 1 && topIds.length > 1) {
+      // A FLOWCHART RUNS DOWN THE PAGE even when it is a straight line and would fit across one.
+      // A map of three parts reads fine either way; a path does not, because a reader follows a
+      // path downward and a decision's answers have to fall on either side of where it turns.
       const next = new Map(edges);
       const order: string[] = []; let cur: string | undefined = heads[0];
       while (cur && order.length <= topIds.length) { order.push(cur); cur = next.get(cur); }
@@ -389,7 +566,7 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
         const total = ws.reduce((s, w) => s + w, 0) + gaps.reduce((s, g) => s + g, 0);
         const out: string[] = [];
         let width = CANVAS, height = 0;
-        if (total <= CANVAS - margin * 2) {
+        if (total <= CANVAS - margin * 2 && !opts.downward) {
           const h = Math.max(...hs);
           let x = margin + Math.floor((CANVAS - margin * 2 - total) / 2);
           const y = margin;
@@ -427,11 +604,7 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
           });
           height = y + hs[hs.length - 1] + margin;
         }
-        const svg = [
-          `<svg class="dg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(spec.title ?? spec.caption ?? "map")}">`,
-          `  <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>`,
-          ...out, `</svg>`].join("\n");
-        return { svg, findings };
+        return { svg: svgOf(out, spec.title ?? spec.caption ?? label), findings };
       }
     }
   }
@@ -547,13 +720,17 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
   // down one of these rather than out to the figure's far edge, so the figure is only as wide as the
   // routes it actually needs.
 
-  const rightMost = Math.max(CANVAS - margin, ...[...at.values()].map((p2) => p2.x + p2.w));
+  // THE CORRIDOR SITS BESIDE THE BOXES, not beside the canvas. It was floored at the canvas edge, so
+  // a four-box flowchart 260px wide sent its one skipping link out to x=1132 and back — a sweep the
+  // width of a page to join two boxes a hand's breadth apart, and 725px of viewBox for 260px of
+  // picture. The canvas is where things are LAID OUT; it is not where they end up.
+  const rightMost = Math.max(...[...at.values()].map((p2) => p2.x + p2.w));
   const skippers = links.filter((l) => {
     const ra = rowOfAny(l.from), rb = rowOfAny(l.to);
     return ra >= 0 && rb >= 0 && (rb < ra || rb > ra + 1);
   });
   const sideLane = (l: Link) => rightMost + GAP_LINKED + Math.max(0, skippers.indexOf(l)) * GAP_Y;
-  const width = Math.max(CANVAS, (skippers.length ? sideLane(skippers[skippers.length - 1]) : 0) + margin);
+  const width = Math.max(rightMost, skippers.length ? sideLane(skippers[skippers.length - 1]) : 0) + margin;
   const height = y + margin;
 
   // WHERE A CONNECTOR MEETS A BOX, decided once so the lane search and the drawing cannot disagree.
@@ -562,14 +739,14 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
     const up = b.row < a.row;
     const n = (up ? leaveTop : leaveBottom).get(l.from) ?? 0;
     const towards = b.row === a.row + 1 ? b.x + b.w / 2 : sideLane(l);
-    return alignedTo(sidePoints(a.x, a.w, n), towards);
+    return alignedTo(acrossPoints(byId.get(l.from)!, a, up ? "top" : "bottom", n), towards);
   };
   const entryX = (l: Link) => {
     const a = at.get(l.from)!, b = at.get(l.to)!;
     const up = b.row < a.row;
     const n = (up ? enterBottom : enterTop).get(l.to) ?? 0;
     const towards = b.row === a.row + 1 ? a.x + a.w / 2 : sideLane(l);
-    return alignedTo(sidePoints(b.x, b.w, n), towards);
+    return alignedTo(acrossPoints(byId.get(l.to)!, b, up ? "bottom" : "top", n), towards);
   };
 
   // WHICH LANE A LINK TAKES IN A GAP IS CHOSEN, NOT COUNTED OFF. Lanes keep the horizontal runs
@@ -587,8 +764,9 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
     if (!a || !b || a.row === b.row) continue;
     const down = b.row > a.row;
     const el = exitLane.get(l), en = entryLane.get(l);
-    if (el) drops.push({ link: l, lane: el, x: exitX(l), edge: down ? a.y + a.h : a.y });
-    if (en) drops.push({ link: l, lane: en, x: entryX(l), edge: down ? b.y : b.y + b.h });
+    const ba = byId.get(l.from)!, bb = byId.get(l.to)!;
+    if (el) drops.push({ link: l, lane: el, x: exitX(l), edge: edgeY(ba, a, down ? "bottom" : "top") });
+    if (en) drops.push({ link: l, lane: en, x: entryX(l), edge: edgeY(bb, b, down ? "top" : "bottom") });
   }
 
   // The figure check's own rule, applied to a candidate order rather than to a drawing.
@@ -667,14 +845,15 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
     if (a.row === b.row) {
       // Side by side: out of one vertical edge, into the other, the label above both.
       const rightward = a.x < b.x;
-      const x1 = rightward ? a.x + a.w : a.x, x2 = rightward ? b.x : b.x + b.w;
-      const y1 = a.y + a.h / 2, y2 = b.y + b.h / 2, mid = (x1 + x2) / 2;
+      const ba = byId.get(l.from)!, bb = byId.get(l.to)!;
+      const x1 = edgeX(ba, a, rightward ? "right" : "left"), x2 = edgeX(bb, b, rightward ? "left" : "right");
+      const y1 = midY(ba, a), y2 = midY(bb, b), mid = (x1 + x2) / 2;
       d = `M${x1} ${y1} H${mid} V${y2} H${x2}`;
       if (l.label) label = labelAt(-1 - a.row, mid, w, Math.min(a.y, b.y) - LABEL_GAP);
     } else if (b.row === a.row + 1) {
       // The next row down: out of the bottom, along this link's own lane in the gap, into the top.
       const x1 = exitX(l), x2 = entryX(l);
-      const y1 = a.y + a.h, y2 = b.y;
+      const y1 = edgeY(byId.get(l.from)!, a, "bottom"), y2 = edgeY(byId.get(l.to)!, b, "top");
       const lane = exitLane.get(l);
       const mid = laneY(a.row, lane ? lane.index : 0);
       const straight = Math.abs(x1 - x2) < 1;
@@ -702,14 +881,15 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
       const sideX = sideLane(l);
       const parts: string[] = [];
       let runY: number, runFrom: number;
-      if (bySide(l.from)) { runY = a.y + a.h / 2; runFrom = a.x + a.w; parts.push(`M${runFrom} ${runY}`); }
+      const ba = byId.get(l.from)!, bb = byId.get(l.to)!;
+      if (bySide(l.from)) { runY = midY(ba, a); runFrom = edgeX(ba, a, "right"); parts.push(`M${runFrom} ${runY}`); }
       else {
         const el = exitLane.get(l)!; runY = laneY(el.gap, el.index); runFrom = exitX(l);
-        parts.push(`M${runFrom} ${a.y + a.h}`, `V${runY}`);
+        parts.push(`M${runFrom} ${edgeY(ba, a, "bottom")}`, `V${runY}`);
       }
       parts.push(`H${sideX}`);
-      if (bySide(l.to)) parts.push(`V${b.y + b.h / 2}`, `H${b.x + b.w}`);
-      else { const en = entryLane.get(l)!; parts.push(`V${laneY(en.gap, en.index)}`, `H${entryX(l)}`, `V${b.y}`); }
+      if (bySide(l.to)) parts.push(`V${midY(bb, b)}`, `H${edgeX(bb, b, "right")}`);
+      else { const en = entryLane.get(l)!; parts.push(`V${laneY(en.gap, en.index)}`, `H${entryX(l)}`, `V${edgeY(bb, b, "top")}`); }
       d = parts.join(" ");
       if (l.label) label = labelAt(a.row, (runFrom + sideX) / 2, w, runY - LABEL_GAP);
     } else {
@@ -719,14 +899,15 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
       const sideX = sideLane(l);
       const parts: string[] = [];
       let runY: number, runFrom: number;
-      if (bySide(l.from)) { runY = a.y + a.h / 2; runFrom = a.x + a.w; parts.push(`M${runFrom} ${runY}`); }
+      const ba = byId.get(l.from)!, bb = byId.get(l.to)!;
+      if (bySide(l.from)) { runY = midY(ba, a); runFrom = edgeX(ba, a, "right"); parts.push(`M${runFrom} ${runY}`); }
       else {
         const el = exitLane.get(l)!; runY = laneY(el.gap, el.index); runFrom = exitX(l);
-        parts.push(`M${runFrom} ${a.y}`, `V${runY}`);
+        parts.push(`M${runFrom} ${edgeY(ba, a, "top")}`, `V${runY}`);
       }
       parts.push(`H${sideX}`);
-      if (bySide(l.to)) parts.push(`V${b.y + b.h / 2}`, `H${b.x + b.w}`);
-      else { const en = entryLane.get(l)!; parts.push(`V${laneY(en.gap, en.index)}`, `H${entryX(l)}`, `V${b.y + b.h}`); }
+      if (bySide(l.to)) parts.push(`V${midY(bb, b)}`, `H${edgeX(bb, b, "right")}`);
+      else { const en = entryLane.get(l)!; parts.push(`V${laneY(en.gap, en.index)}`, `H${entryX(l)}`, `V${edgeY(bb, b, "bottom")}`); }
       d = parts.join(" ");
       if (l.label) label = labelAt(a.row - 1, (runFrom + sideX) / 2, w, runY - LABEL_GAP);
     }
@@ -737,18 +918,47 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
 
   out.push(...placeLabels(pending, verticals, margin, width));
 
-  const svg = [
-    `<svg class="dg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(spec.title ?? spec.caption ?? "map")}">`,
-    `  <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>`,
-    ...out,
-    `</svg>`,
-  ].join("\n");
+  return { svg: svgOf(out, spec.title ?? spec.caption ?? label), findings };
+}
+
+/**
+ * FLOWCHART — the path somebody or something takes, and where it turns. It is laid out on the map's
+ * own geometry, because rows-by-depth is what a flowchart already is; what the kind adds is the
+ * standard shape vocabulary and the rule that the path runs DOWN the page.
+ *
+ * A shape is inferred only where the author has not named one, and only for the two a flowchart
+ * cannot be read without: the ends of the path are terminators, and a box with more than one way out
+ * is a decision. Everything else stays a process, which is what it usually is. Naming `shape` in the
+ * spec always wins — inference is a convenience, never an opinion the author cannot overrule.
+ */
+function drawFlowchart(spec: Spec): { svg: string; findings: string[] } {
+  const boxes = spec.boxes ?? [];
+  const links = spec.links ?? [];
+  const outs = new Map<string, number>(), ins = new Map<string, number>();
+  for (const l of links) { outs.set(l.from, (outs.get(l.from) ?? 0) + 1); ins.set(l.to, (ins.get(l.to) ?? 0) + 1); }
+
+  const shaped: Box[] = boxes.map((b) => {
+    if (b.shape) return b;
+    if (!ins.get(b.id) || !outs.get(b.id)) return { ...b, shape: "terminator" as Shape };
+    if ((outs.get(b.id) ?? 0) > 1) return { ...b, shape: "decision" as Shape };
+    return b;
+  });
+  const shapeById = new Map(shaped.map((b) => [b.id, shapeOf(b)]));
+
+  const { svg, findings } = drawMap({ ...spec, boxes: shaped }, { downward: true });
+  // A DIAMOND WITH AN UNANSWERED BRANCH is the one fault this kind can have that a map cannot. The
+  // chapter says a decision carries each branch's answer, and a reader meeting two unlabelled arrows
+  // out of a diamond has to guess which one is yes — which is the question the diamond was asked.
+  for (const l of links)
+    if (shapeById.get(l.from) === "decision" && !l.label)
+      findings.push(`the branch \`${l.from}\` → \`${l.to}\` leaves a decision with no answer on it; each branch out of a diamond carries its own answer`);
   return { svg, findings };
 }
 
 const DRAWERS: Record<string, (s: Spec) => { svg: string; findings: string[] }> = {
   entities: drawEntities,
   chain: drawChain,
+  flowchart: drawFlowchart,
   // A flow declares links, and links decide rows: the map drawer lays it out, and a one-way path
   // through every box is drawn as a straight line, horizontal when it fits, vertical when not.
   flow: drawMap,

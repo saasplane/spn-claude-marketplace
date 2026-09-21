@@ -172,5 +172,70 @@ console.log("\n=== the map drawer keeps the three rules it was found breaking");
   one("and the figure it draws has nothing for the check to report", checkFigures(svg), none);
 }
 
+console.log("\n=== FLOWCHART — the standard shapes, and the path runs down the page");
+{
+  const spec = { kind: "flowchart",
+    boxes: [{ id: "s", label: "A request arrives" }, { id: "c", label: "Is the caller a member?" },
+      { id: "y", label: "Mint a session" }, { id: "n", label: "Refuse", warn: true },
+      { id: "log", label: "Write the audit row", shape: "store" }, { id: "e", label: "Done" }],
+    links: [{ from: "s", to: "c" }, { from: "c", to: "y", label: "yes" }, { from: "c", to: "n", label: "no" },
+      { from: "y", to: "log" }, { from: "n", to: "e" }, { from: "log", to: "e" }] };
+  const r = judge(spec);
+  one("a flowchart draws without a finding", r.findings, none);
+  one("and the figure check passes it", r.figure, none);
+  one("`flowchart` is a kind the book names, and a helper draws it", KINDS, (k) => k.includes("flowchart"));
+  one("the ends of the path are terminators — a rect rounded to a half its own height",
+    r.svg, (g) => (g.match(/<rect[^>]*height="44"[^>]*rx="22"/g) ?? []).length === 2);
+  one("a box with two ways out is drawn as a diamond", r.svg, (g) => /<path class="box" d="M[\d.]+ [\d.]+ L[\d.]+ [\d.]+ L[\d.]+ [\d.]+ L[\d.]+ [\d.]+ Z"/.test(g));
+  one("a store carries a cap, and its body is a rect the check can measure",
+    r.svg, (g) => /<ellipse class="box"/.test(g) && /<rect class="box"[^>]*\/>\n  <ellipse/.test(g));
+  // Inference gives `c` a diamond because it has two ways out; naming a shape must overrule that.
+  one("a named shape always wins over the inferred one",
+    draw({ ...spec, boxes: spec.boxes.map((b) => (b.id === "c" ? { ...b, shape: "process" } : b)) }).svg,
+    (g) => !/<path class="box" d="M[\d.]+ [\d.]+ L/.test(g));
+  one("a branch out of a decision with no answer on it is a finding",
+    draw({ ...spec, links: spec.links.map((l) => (l.label === "no" ? { from: l.from, to: l.to } : l)) }).findings,
+    says("leaves a decision with no answer"));
+  // A map of three parts may read left to right; a path never does.
+  const line = { kind: "flowchart", boxes: [{ id: "a", label: "Start" }, { id: "b", label: "Do the thing" }, { id: "c", label: "Stop" }],
+    links: [{ from: "a", to: "b" }, { from: "b", to: "c" }] };
+  one("a flowchart that would fit across the page still runs down it",
+    draw(line).svg, (g) => new Set([...g.matchAll(/<rect[^>]* y="([\d.]+)"/g)].map((m) => m[1])).size === 3);
+  one("and the same boxes as a `map` lie across it",
+    draw({ ...line, kind: "map" }).svg, (g) => new Set([...g.matchAll(/<rect[^>]* y="([\d.]+)"/g)].map((m) => m[1])).size === 1);
+}
+
+console.log("\n=== a figure hugs its own content");
+{
+  // The drawer lays out in a 1100 canvas and centres its rows in it. That is right for PLACING
+  // things and wrong for shipping them: a narrow figure arrived marooned in white space.
+  //
+  // Measured over every coordinate the drawing puts on the page — boxes, connectors and words
+  // alike. A corridor beside the boxes is content too, so measuring against the boxes alone would
+  // call a figure wasteful for routing a link exactly where it had to go.
+  const spread = (svg) => {
+    const body = svg.split("\n").filter((l) => !l.includes("<defs>")).join("\n");
+    const xs = [];
+    for (const m of body.matchAll(/<rect[^>]* x="(-?[\d.]+)"[^>]* width="([\d.]+)"/g)) xs.push(Number(m[1]), Number(m[1]) + Number(m[2]));
+    for (const m of body.matchAll(/<ellipse[^>]* cx="(-?[\d.]+)" cy="(-?[\d.]+)" rx="([\d.]+)"/g)) xs.push(Number(m[1]) - Number(m[3]), Number(m[1]) + Number(m[3]));
+    // The same three character widths the drawer measures by and the figure check judges by.
+    const PX = { t: 7.6, l: 7.0, s: 6.6, n: 6.4 };
+    for (const m of body.matchAll(/<text class="(\w+)" x="(-?[\d.]+)"[^>]*>([\s\S]*?)<\/text>/g))
+      xs.push(Number(m[2]), Number(m[2]) + m[3].replace(/&[a-z]+;/g, " ").length * (PX[m[1]] ?? 7));
+    for (const m of body.matchAll(/<path[^>]* d="([^"]+)"/g)) {
+      for (const [, c, u] of m[1].matchAll(/([MLHV])\s*(-?[\d.]+)/g)) if (c !== "V") xs.push(Number(u));
+    }
+    return [Math.min(...xs), Math.max(...xs)];
+  };
+  for (const [name, spec] of Object.entries(FIGURES)) {
+    const { svg } = draw(spec);
+    const [x0, , w] = svg.match(/viewBox="(-?[\d.]+) (-?[\d.]+) ([\d.]+) ([\d.]+)"/).slice(1).map(Number);
+    const [left, right] = spread(svg);
+    const short = name.split(" —")[0];
+    one(`${short} — the viewBox holds everything drawn`, [x0 <= left + 0.5, right <= x0 + w + 0.5], (v) => v.every(Boolean));
+    one(`${short} — and carries no more than 12px of air beside it`, [left - x0, x0 + w - right], (v) => v.every((g) => g <= 12));
+  }
+}
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);
