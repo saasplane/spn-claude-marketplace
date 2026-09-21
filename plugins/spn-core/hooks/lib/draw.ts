@@ -393,8 +393,14 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
           const h = Math.max(...hs);
           let x = margin + Math.floor((CANVAS - margin * 2 - total) / 2);
           const y = margin;
+          // A BOX IS CENTRED ON THE ROW'S MIDDLE, not hung from its top. The connector runs at the
+          // tallest box's mid-height, so a shorter box left at the top took its only arrow off its
+          // own centre — 7px on a row of one noted box and two plain ones, which is exactly the
+          // fault the centring rule refuses. Centring is also what the developer asked for of every
+          // figure: elements may be centred, and spacing is what must not vary.
           boxes.forEach((b, i) => {
-            out.push(mapRect(b, x, y, ws[i], hs[i]));
+            const by = y + (h - hs[i]) / 2;   // not rounded: a half-pixel here is the arrow off centre
+            out.push(mapRect(b, x, by, ws[i], hs[i]));
             if (i < boxes.length - 1) {
               const l = linkOf(order[i], order[i + 1]);
               const x1 = x + ws[i], x2 = x1 + gaps[i], cy = y + h / 2;
@@ -478,14 +484,45 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
   const rowOf = new Map<string, number>();
   rows.forEach((row, i) => { for (const b of row) rowOf.set(b.id, i); });
   const rowOfAny = (id: string) => rowOf.get(holder(id)) ?? -1;
-  const laneOf = new Map<Link, number>(), laneEnd = new Map<Link, number>();
+
+  // A BOX LEAVES BY ITS SIDE ONLY IF NOTHING IN ITS ROW SITS BEYOND IT. The side corridor runs to the
+  // right of every box, so a connector taking the right edge of a box that is NOT last in its row
+  // travels the width of the row straight through every box after it: the nine-group map ran one link
+  // across five boxes at their own mid-height, 0px of clear air, and printed its label over five more.
+  // The chapter's rule is that a link which skips rows runs down a corridor clear of every box, and
+  // clear is a fact about this row rather than an assumption — so it is decided per box. Last in its
+  // row leaves by the side; anything else drops into the lane below, which is clear by construction.
+  const lastInRow = new Set(rows.map((row) => row[row.length - 1].id));
+  const bySide = (id: string) => lastInRow.has(holder(id));
+
+  type Lane = { gap: number; index: number };
+  const exitLane = new Map<Link, Lane>(), entryLane = new Map<Link, Lane>();
   const lanesIn: number[] = rows.map(() => 0);
-  const takeLane = (gap: number) => { const lane = lanesIn[gap]; lanesIn[gap] += 1; return lane; };
+  const takeLane = (gap: number): Lane => ({ gap, index: lanesIn[gap]++ });
+
+  // How many connectors use each edge of each box, which is what decides how many points that edge
+  // offers. Counted from the routes actually taken rather than from the rows alone: a link that skips
+  // rows leaves by the side when it can and by the bottom when it cannot, and a box whose only arrow
+  // leaves by the side must not have its bottom counted, or the one arrow on the bottom of the box
+  // below it stops landing in the middle.
+  const leaveBottom = new Map<string, number>(), enterTop = new Map<string, number>();
+  const leaveTop = new Map<string, number>(), enterBottom = new Map<string, number>();
+  const bump = (m: Map<string, number>, id: string) => m.set(id, (m.get(id) ?? 0) + 1);
+
   for (const l of links) {
     const ra = rowOfAny(l.from), rb = rowOfAny(l.to);
-    if (ra < 0 || rb <= ra) continue;
-    laneOf.set(l, takeLane(ra));
-    if (rb > ra + 1) laneEnd.set(l, takeLane(rb - 1));
+    if (ra < 0 || rb < 0 || ra === rb) continue;
+    if (rb === ra + 1) {                                   // neighbours: one lane, bottom to top
+      const lane = takeLane(ra);
+      exitLane.set(l, lane); entryLane.set(l, lane);
+      bump(leaveBottom, l.from); bump(enterTop, l.to);
+    } else if (rb > ra + 1) {                              // skips down the right-hand corridor
+      if (!bySide(l.from)) { exitLane.set(l, takeLane(ra)); bump(leaveBottom, l.from); }
+      if (!bySide(l.to)) { entryLane.set(l, takeLane(rb - 1)); bump(enterTop, l.to); }
+    } else {                                               // upward, and reported below
+      if (!bySide(l.from)) { exitLane.set(l, takeLane(ra - 1)); bump(leaveTop, l.from); }
+      if (!bySide(l.to)) { entryLane.set(l, takeLane(rb)); bump(enterBottom, l.to); }
+    }
   }
   // A lane is not a line, it is a line plus the label riding above it plus the clear air the
   // contract owes on both sides. Deriving the pitch from LABEL_GAP is what stops a label touching
@@ -495,17 +532,6 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
   const gapAfter = (i: number) => Math.max(GAP_LINKED, LANE_TOP + LANE_H * lanesIn[i]);
 
   const laneY = (gap: number, lane: number) => rowBottom[gap] + LANE_TOP + LANE_H * lane;
-
-  // How many connectors actually use a box's bottom, and a box's top. Only a link between neighbouring
-  // rows uses those edges — one that skips rows leaves by a side — so a box below a fan-out still
-  // takes its single arrow dead centre.
-  const leaveBottom = new Map<string, number>(), enterTop = new Map<string, number>();
-  for (const l of links) {
-    const ra = rowOfAny(l.from), rb = rowOfAny(l.to);
-    if (ra < 0 || rb !== ra + 1) continue;
-    leaveBottom.set(l.from, (leaveBottom.get(l.from) ?? 0) + 1);
-    enterTop.set(l.to, (enterTop.get(l.to) ?? 0) + 1);
-  }
 
   const rowTop: number[] = [], rowBottom: number[] = [];
   let y = margin;
@@ -524,11 +550,95 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
   const rightMost = Math.max(CANVAS - margin, ...[...at.values()].map((p2) => p2.x + p2.w));
   const skippers = links.filter((l) => {
     const ra = rowOfAny(l.from), rb = rowOfAny(l.to);
-    return ra >= 0 && Math.abs(rb - ra) > 1;
+    return ra >= 0 && rb >= 0 && (rb < ra || rb > ra + 1);
   });
   const sideLane = (l: Link) => rightMost + GAP_LINKED + Math.max(0, skippers.indexOf(l)) * GAP_Y;
   const width = Math.max(CANVAS, (skippers.length ? sideLane(skippers[skippers.length - 1]) : 0) + margin);
   const height = y + margin;
+
+  // WHERE A CONNECTOR MEETS A BOX, decided once so the lane search and the drawing cannot disagree.
+  const exitX = (l: Link) => {
+    const a = at.get(l.from)!, b = at.get(l.to)!;
+    const up = b.row < a.row;
+    const n = (up ? leaveTop : leaveBottom).get(l.from) ?? 0;
+    const towards = b.row === a.row + 1 ? b.x + b.w / 2 : sideLane(l);
+    return alignedTo(sidePoints(a.x, a.w, n), towards);
+  };
+  const entryX = (l: Link) => {
+    const a = at.get(l.from)!, b = at.get(l.to)!;
+    const up = b.row < a.row;
+    const n = (up ? enterBottom : enterTop).get(l.to) ?? 0;
+    const towards = b.row === a.row + 1 ? a.x + a.w / 2 : sideLane(l);
+    return alignedTo(sidePoints(b.x, b.w, n), towards);
+  };
+
+  // WHICH LANE A LINK TAKES IN A GAP IS CHOSEN, NOT COUNTED OFF. Lanes keep the horizontal runs
+  // apart, and nothing kept the VERTICAL runs apart: a link drops from its source to its own lane,
+  // and drops again from that lane to its target, so a link on a high lane has a long second drop
+  // passing every lane below it — and that drop can land inside the contract's 24 of another link's
+  // first drop. Three links out of one gap came out 22 apart, and no arithmetic here was wrong: the
+  // ORDER was. So the order is searched and scored with the same rule the figure check applies to
+  // the finished drawing, and the first clean one wins. Where no order is clean the best is kept and
+  // the check reports it, which is the promise the drawer makes everywhere: try, then tell the truth.
+  type Drop = { link: Link; lane: Lane; x: number; edge: number };
+  const drops: Drop[] = [];
+  for (const l of links) {
+    const a = at.get(l.from), b = at.get(l.to);
+    if (!a || !b || a.row === b.row) continue;
+    const down = b.row > a.row;
+    const el = exitLane.get(l), en = entryLane.get(l);
+    if (el) drops.push({ link: l, lane: el, x: exitX(l), edge: down ? a.y + a.h : a.y });
+    if (en) drops.push({ link: l, lane: en, x: entryX(l), edge: down ? b.y : b.y + b.h });
+  }
+
+  // The figure check's own rule, applied to a candidate order rather than to a drawing.
+  const clashes = (ds: Drop[], yOf: (lane: Lane) => number): number => {
+    const segs = ds.map((d) => { const ly = yOf(d.lane); return { k: d.link, x: d.x, y1: Math.min(d.edge, ly), y2: Math.max(d.edge, ly) }; });
+    let n = 0;
+    for (let i = 0; i < segs.length; i++) for (let j = i + 1; j < segs.length; j++) {
+      if (segs[i].k === segs[j].k) continue;
+      const apart = Math.abs(segs[i].x - segs[j].x);
+      if (apart < 0.5 || apart >= GAP_APART) continue;   // collinear reads as one line continuing
+      if (Math.min(segs[i].y2, segs[j].y2) - Math.max(segs[i].y1, segs[j].y1) > LABEL_GAP) n += 1;
+    }
+    return n;
+  };
+  const orders = <T,>(xs: T[]): T[][] =>
+    xs.length <= 1 ? [xs] : xs.flatMap((x, i) => orders([...xs.slice(0, i), ...xs.slice(i + 1)]).map((r) => [x, ...r]));
+
+  for (let g = 0; g < rows.length; g++) {
+    const ds = drops.filter((d) => d.lane.gap === g);
+    const lanes = [...new Set(ds.map((d) => d.lane))];
+    if (lanes.length < 2) continue;
+    const yFor = (order: Lane[]) => {
+      const m = new Map(order.map((ln, i) => [ln, rowBottom[g] + LANE_TOP + LANE_H * i]));
+      return (ln: Lane) => m.get(ln)!;
+    };
+    let best = lanes, score = clashes(ds, yFor(lanes));
+    // Six lanes in one gap is 720 orders and the search is exhaustive; beyond that it is greedy —
+    // each place in turn takes whichever lane adds fewest clashes to what is already settled.
+    if (score) {
+      if (lanes.length <= 6) {
+        for (const order of orders(lanes)) {
+          const s2 = clashes(ds, yFor(order));
+          if (s2 < score) { best = order; score = s2; if (!score) break; }
+        }
+      } else {
+        const rest = [...lanes], picked: Lane[] = [];
+        while (rest.length) {
+          let at2 = 0, low = Infinity;
+          for (let i = 0; i < rest.length; i++) {
+            const trial = [...picked, rest[i]];
+            const s2 = clashes(ds.filter((d) => trial.includes(d.lane)), yFor([...trial, ...rest.filter((r) => r !== rest[i])]));
+            if (s2 < low) { low = s2; at2 = i; }
+          }
+          picked.push(...rest.splice(at2, 1));
+        }
+        if (clashes(ds, yFor(picked)) < score) best = picked;
+      }
+    }
+    best.forEach((ln, i) => { ln.index = i; });
+  }
 
 
   // Labels live in the gaps between rows. Two labels in one gap are stacked so neither overprints.
@@ -563,11 +673,10 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
       if (l.label) label = labelAt(-1 - a.row, mid, w, Math.min(a.y, b.y) - LABEL_GAP);
     } else if (b.row === a.row + 1) {
       // The next row down: out of the bottom, along this link's own lane in the gap, into the top.
-      const x1 = alignedTo(sidePoints(a.x, a.w, (leaveBottom.get(l.from) ?? 0)), b.x + b.w / 2);
-      const x2 = alignedTo(sidePoints(b.x, b.w, (enterTop.get(l.to) ?? 0)), a.x + a.w / 2);
+      const x1 = exitX(l), x2 = entryX(l);
       const y1 = a.y + a.h, y2 = b.y;
-      const lane = laneOf.get(l) ?? 0;
-      const mid = laneY(a.row, lane);
+      const lane = exitLane.get(l);
+      const mid = laneY(a.row, lane ? lane.index : 0);
       const straight = Math.abs(x1 - x2) < 1;
       d = straight ? `M${x1} ${y1} V${y2}` : `M${x1} ${y1} V${mid} H${x2} V${y2}`;
       if (l.label) {
@@ -582,24 +691,44 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
         }
       }
     } else if (b.row > a.row) {
-      // Skips a row: down into the gap, along it to the lane at the right edge, down the lane to the
-      // gap above the target, back along that gap, and in from the top. No box is crossed.
-      // OUT OF THE RIGHT EDGE AND IN AT THE RIGHT EDGE. A connector leaves whichever side puts it on
-      // the shortest honest route, rather than always the bottom: leaving the bottom forced a link
-      // that skips two rows out to the figure's far edge and back across everything, when the two
-      // boxes it joins are one above the other (developer, 2026-09-21).
+      // Skips a row: out to a corridor of its own, clear to the right of every box, down it, and
+      // back in beside the target. A connector leaves whichever side puts it on the shortest honest
+      // route rather than always the bottom — leaving the bottom forced a link that skips two rows
+      // out to the figure's far edge and back across everything, to join two boxes sitting one above
+      // the other (developer, 2026-09-21). HONEST is the word that does the work: the right edge is
+      // the shortest route only for a box with nothing beyond it in its row, and for any other box
+      // it is a run straight through its neighbours. So the side is taken when it is clear, and the
+      // lane below is taken when it is not.
       const sideX = sideLane(l);
-      const y1 = a.y + a.h / 2, y2 = b.y + b.h / 2;
-      d = `M${a.x + a.w} ${y1} H${sideX} V${y2} H${b.x + b.w}`;
-      if (l.label) label = labelAt(a.row, (a.x + a.w + sideX) / 2, w, y1 - LABEL_GAP);
+      const parts: string[] = [];
+      let runY: number, runFrom: number;
+      if (bySide(l.from)) { runY = a.y + a.h / 2; runFrom = a.x + a.w; parts.push(`M${runFrom} ${runY}`); }
+      else {
+        const el = exitLane.get(l)!; runY = laneY(el.gap, el.index); runFrom = exitX(l);
+        parts.push(`M${runFrom} ${a.y + a.h}`, `V${runY}`);
+      }
+      parts.push(`H${sideX}`);
+      if (bySide(l.to)) parts.push(`V${b.y + b.h / 2}`, `H${b.x + b.w}`);
+      else { const en = entryLane.get(l)!; parts.push(`V${laneY(en.gap, en.index)}`, `H${entryX(l)}`, `V${b.y}`); }
+      d = parts.join(" ");
+      if (l.label) label = labelAt(a.row, (runFrom + sideX) / 2, w, runY - LABEL_GAP);
     } else {
       // Upward: out of the top, along the gap above to the lane, up to the gap below the target, in
       // from the bottom. Drawn, and reported, because a map is meant to flow one way.
       findings.push(`the link \`${l.from}\` → \`${l.to}\` runs upward; a map flows one way, so a link points at a box below its source`);
       const sideX = sideLane(l);
-      const y1 = a.y + a.h / 2, y2 = b.y + b.h / 2;
-      d = `M${a.x + a.w} ${y1} H${sideX} V${y2} H${b.x + b.w}`;
-      if (l.label) label = labelAt(a.row - 1, (a.x + a.w + sideX) / 2, w, y1 - LABEL_GAP);
+      const parts: string[] = [];
+      let runY: number, runFrom: number;
+      if (bySide(l.from)) { runY = a.y + a.h / 2; runFrom = a.x + a.w; parts.push(`M${runFrom} ${runY}`); }
+      else {
+        const el = exitLane.get(l)!; runY = laneY(el.gap, el.index); runFrom = exitX(l);
+        parts.push(`M${runFrom} ${a.y}`, `V${runY}`);
+      }
+      parts.push(`H${sideX}`);
+      if (bySide(l.to)) parts.push(`V${b.y + b.h / 2}`, `H${b.x + b.w}`);
+      else { const en = entryLane.get(l)!; parts.push(`V${laneY(en.gap, en.index)}`, `H${entryX(l)}`, `V${b.y + b.h}`); }
+      d = parts.join(" ");
+      if (l.label) label = labelAt(a.row - 1, (runFrom + sideX) / 2, w, runY - LABEL_GAP);
     }
     out.push(`  <path class="c" d="${d}"${dash} marker-end="url(#ar)"/>`);
     if (label && l.label) { verticals.push(...vertsOf(d)); pending.push({ ...label, w, txt: l.label }); }

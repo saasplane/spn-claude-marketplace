@@ -117,5 +117,60 @@ console.log("\n=== containment is drawn as containment");
     p[2] >= k[2], true);
 }
 
+// THE THREE FAULTS THE MAP DRAWER SHIPPED WITH, each asserted against the rule it broke rather than
+// only against the figure check. A check can go blind — that is how all three survived a release —
+// so each rule is also stated here in the terms the chapter states it in.
+console.log("\n=== the map drawer keeps the three rules it was found breaking");
+{
+  // A row of boxes of unequal height was hung from its top while the connector ran at the tallest
+  // box's mid-height, so a box that is pointed at once took its one arrow 7px off its own centre.
+  const { svg } = draw({ kind: "map",
+    boxes: [{ id: "a", label: "Contract", note: "the shared surface" }, { id: "b", label: "App" }, { id: "c", label: "Entry" }],
+    links: [{ from: "a", to: "b", label: "types" }, { from: "b", to: "c" }] });
+  const rects = [...svg.matchAll(/<rect[^>]*y="([\d.]+)"[^>]*height="([\d.]+)"/g)].map((m) => [Number(m[1]), Number(m[2])]);
+  const runs = [...svg.matchAll(/<path class="c" d="M[\d.]+ ([\d.]+) H/g)].map((m) => Number(m[1]));
+  one("a row of unequal boxes shares one centre line, so a lone arrow is straight",
+    rects.map(([y, h]) => y + h / 2), (mids) => new Set(mids).size === 1 && runs.every((r) => r === mids[0]));
+}
+{
+  // Three links out of one gap: the lane ORDER decides where the vertical drops fall, and two of
+  // them came out 22px apart while every other number in the figure obeyed 24.
+  const { svg } = draw({ kind: "map",
+    boxes: [{ id: "v", label: "Vocabulary" }, { id: "g", label: "Ground" }, { id: "p", label: "Providers" }, { id: "c", label: "Coordinates" }],
+    links: [{ from: "v", to: "c" }, { from: "g", to: "p" }, { from: "g", to: "c" }] });
+  const verts = [];
+  [...svg.matchAll(/<path class="c" d="([^"]+)"/g)].forEach((m, k) => {
+    let x = 0, y = 0;
+    for (const [, cmd, u, v] of m[1].matchAll(/([MHV])\s*(-?[\d.]+)(?:\s+(-?[\d.]+))?/g)) {
+      const a = Number(u);
+      const nx = cmd === "V" ? x : a, ny = cmd === "V" ? a : cmd === "M" ? Number(v) : y;
+      if (cmd === "V") verts.push({ k, x, y1: Math.min(y, ny), y2: Math.max(y, ny) });
+      x = nx; y = ny;
+    }
+  });
+  const tooClose = [];
+  for (let i = 0; i < verts.length; i++) for (let j = i + 1; j < verts.length; j++) {
+    if (verts[i].k === verts[j].k) continue;
+    const apart = Math.abs(verts[i].x - verts[j].x);
+    const run = Math.min(verts[i].y2, verts[j].y2) - Math.max(verts[i].y1, verts[j].y1);
+    if (apart >= 0.5 && apart < 24 && run > 8) tooClose.push(`${apart}px for ${run}px`);
+  }
+  one("no two verticals from different connectors run closer than 24", tooClose, none);
+}
+{
+  // A link that skips a row left by the right edge of a box sitting FIRST in a row of six, so it ran
+  // the width of the row through five boxes at their own mid-height with 0px of clear air.
+  const { svg } = draw({ kind: "map",
+    boxes: Array.from({ length: 9 }, (_, i) => ({ id: `b${i}`, label: `Domain ${i + 1}`, note: "what it holds" })),
+    links: [{ from: "b0", to: "b8", label: "depends on" }] });
+  const rows = [...svg.matchAll(/<rect[^>]*y="([\d.]+)"[^>]*height="([\d.]+)"/g)].map((m) => [Number(m[1]), Number(m[2])]);
+  const top = rows[0];
+  const d = svg.match(/<path class="c" d="([^"]+)"/)[1];
+  one("a skipping link out of a box that is not last in its row drops below the row before it travels",
+    d, (g) => /^M[\d.]+ ([\d.]+) V([\d.]+) H/.test(g)
+      && Number(/^M[\d.]+ ([\d.]+)/.exec(g)[1]) >= top[0] + top[1]);
+  one("and the figure it draws has nothing for the check to report", checkFigures(svg), none);
+}
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);
