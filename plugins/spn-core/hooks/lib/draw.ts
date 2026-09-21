@@ -74,17 +74,24 @@ function placeLabels(pending: Pending[], verticals: Vert[], margin: number, widt
 }
 
 /**
- * THE POINTS A SIDE OFFERS: its middle, and the middle of each half — three at most. A shorter side
- * offers fewer, because two points closer than the contract's gap read as one. A connector then takes
- * whichever point lines up best with the box at its other end, and two connectors may well take the
- * same one: forcing every arrow onto a point of its own bends lines that had no reason to bend, and
- * alignment is what a reader follows (developer, 2026-09-21).
+ * THE POINTS A SIDE OFFERS, and HOW MANY CONNECTORS ASK FOR THEM decides which: one connector takes
+ * the middle, two take the middle of each half, three take all three. That order matters — a side is
+ * not a fixed set of slots a lone arrow has to pick from, or a single connector lands off-centre and
+ * dog-legs to reach a box it was pointing straight at (developer, 2026-09-21).
+ *
+ * A short side offers fewer, because two points closer than the contract's gap read as one. Among the
+ * points on offer a connector takes whichever lines up best with the box at its other end, and two
+ * connectors may well take the same one: forcing every arrow onto a point of its own bends lines that
+ * had no reason to bend, and alignment is what a reader follows.
  */
-function sidePoints(start: number, len: number): number[] {
+function sidePoints(start: number, len: number, asking: number): number[] {
   const at = (f: number) => Math.round(start + len * f);
-  if (len / (SIDE_POINTS + 1) >= GAP_APART) return [at(0.25), at(0.5), at(0.75)];
-  if (len / 2 >= GAP_APART) return [at(0.25), at(0.75)];
-  return [at(0.5)];
+  const halves = [at(0.25), at(0.75)], all = [at(0.25), at(0.5), at(0.75)];
+  const want = Math.min(Math.max(asking, 1), SIDE_POINTS);
+  if (want === 1) return [at(0.5)];
+  if (want === 2) return len / 2 >= GAP_APART ? halves : [at(0.5)];
+  if (len / (SIDE_POINTS + 1) >= GAP_APART) return all;
+  return len / 2 >= GAP_APART ? halves : [at(0.5)];
 }
 const alignedTo = (points: number[], towards: number): number =>
   points.reduce((best, p) => (Math.abs(p - towards) < Math.abs(best - towards) ? p : best), points[0]);
@@ -171,6 +178,17 @@ function drawEntities(spec: Spec): { svg: string; findings: string[] } {
   // point, so each would run straight through the other's label. Each gets a share of the gap and a
   // share of the edge it lands on, which is what keeps the labels readable (N13, 2026-09-21).
   const eVerts: Vert[] = [], ePending: Pending[] = [];
+  // Per box AND per side, because a box can be pointed at from the left and point on to the right,
+  // and each of those sides answers the how-many question on its own.
+  const leaves = new Map<string, number>(), lands = new Map<string, number>();
+  for (const l of links) {
+    const a = at.get(l.from), b = at.get(l.to);
+    if (!a || !b) continue;
+    const side = a.x < b.x ? "R" : "L";
+    const bump = (m: Map<string, number>, k: string) => m.set(k, (m.get(k) ?? 0) + 1);
+    bump(leaves, `${l.from}:${side}`);
+    bump(lands, `${l.to}:${side === "R" ? "L" : "R"}`);
+  }
   const lane = new Map<Link, { i: number; n: number }>();
   for (const l of links) {
     const peers = links.filter((p) => (at.get(p.from)?.x ?? -1) === (at.get(l.from)?.x ?? -2)
@@ -185,8 +203,8 @@ function drawEntities(spec: Spec): { svg: string; findings: string[] } {
     const x1 = fromRight ? a.x + a.w : a.x;
     const x2 = fromRight ? b.x : b.x + b.w;
     const { i, n } = lane.get(l) ?? { i: 0, n: 1 };
-    const y1 = a.y + a.h / 2;
-    const y2 = alignedTo(sidePoints(b.y, b.h), n > 1 ? y1 : b.y + b.h / 2);
+    const y1 = alignedTo(sidePoints(a.y, a.h, leaves.get(`${l.from}:${fromRight ? "R" : "L"}`) ?? 0), b.y + b.h / 2);
+    const y2 = alignedTo(sidePoints(b.y, b.h, lands.get(`${l.to}:${fromRight ? "L" : "R"}`) ?? 0), y1);
     const mid = x1 + ((x2 - x1) * (i + 1)) / (n + 1);
     const dash = l.dashed ? ' stroke-dasharray="5 4"' : "";
     const dPath = `M${x1} ${y1} H${mid} V${y2} H${x2}`;
@@ -478,6 +496,17 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
 
   const laneY = (gap: number, lane: number) => rowBottom[gap] + LANE_TOP + LANE_H * lane;
 
+  // How many connectors actually use a box's bottom, and a box's top. Only a link between neighbouring
+  // rows uses those edges — one that skips rows leaves by a side — so a box below a fan-out still
+  // takes its single arrow dead centre.
+  const leaveBottom = new Map<string, number>(), enterTop = new Map<string, number>();
+  for (const l of links) {
+    const ra = rowOfAny(l.from), rb = rowOfAny(l.to);
+    if (ra < 0 || rb !== ra + 1) continue;
+    leaveBottom.set(l.from, (leaveBottom.get(l.from) ?? 0) + 1);
+    enterTop.set(l.to, (enterTop.get(l.to) ?? 0) + 1);
+  }
+
   const rowTop: number[] = [], rowBottom: number[] = [];
   let y = margin;
   rows.forEach((row, i) => {
@@ -534,8 +563,8 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
       if (l.label) label = labelAt(-1 - a.row, mid, w, Math.min(a.y, b.y) - LABEL_GAP);
     } else if (b.row === a.row + 1) {
       // The next row down: out of the bottom, along this link's own lane in the gap, into the top.
-      const x1 = alignedTo(sidePoints(a.x, a.w), b.x + b.w / 2);
-      const x2 = alignedTo(sidePoints(b.x, b.w), a.x + a.w / 2);
+      const x1 = alignedTo(sidePoints(a.x, a.w, (leaveBottom.get(l.from) ?? 0)), b.x + b.w / 2);
+      const x2 = alignedTo(sidePoints(b.x, b.w, (enterTop.get(l.to) ?? 0)), a.x + a.w / 2);
       const y1 = a.y + a.h, y2 = b.y;
       const lane = laneOf.get(l) ?? 0;
       const mid = laneY(a.row, lane);
