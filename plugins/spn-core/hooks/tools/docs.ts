@@ -11,6 +11,8 @@
 //   node docs.ts face <docs-tree>       write what is generated, between markers
 //   node docs.ts page <seat.md…>        produce each construct page from its seat file
 //   node docs.ts status <seat.md…>      derive the status from Binds and Proof, and refuse a false claim
+//   node docs.ts topics <repo…>         refuse a numbered topic the constructs seat does not name
+//   node docs.ts coverage <repo…>       every construct a chapter, every chapter a construct, every package a construct
 //   node docs.ts figures check|colour   labels fit and connectors join · a block's colouring matches its text
 //   node docs.ts audit --report <repo>  the gap scan — one report per repository, written, never fixed
 //
@@ -1175,6 +1177,118 @@ function locationOf(seat: string, workspace: string): string {
   return "—";
 }
 
+/** Today, on the clock the reader shares. `toISOString` is UTC, which is a day behind here. */
+function today(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+// ---------------------------------------------------------- the Proof join (Q131, opened by Q138)
+
+/**
+ * The register file holding one construct's behaviour rows.
+ *
+ * `Q138` A is what makes this a lookup rather than a search: a topic is one file of rows at the
+ * SAME relative path as its construct, so `02-constructs/01-iam/04-sign-in.md` is proved by
+ * `03-behaviors/01-iam/04-sign-in.md` and nothing has to guess which rows belong to which page.
+ *
+ * The fallbacks exist for exactly as long as the move does. Until step 6 regroups them, a domain
+ * still keeps one register for all of its topics — as a `README.md` of rows in the platform today,
+ * or as a single `<domain>.md` elsewhere — and a page that refused to render during the move would
+ * make the move impossible to check as it went. A fallback is reported, never silent.
+ */
+function registerFor(seat: string): { file: string; exact: boolean } | null {
+  const norm = seat.replace(/\\/g, "/");
+  const at = norm.indexOf("/02-constructs/");
+  if (at < 0) return null;
+  const rel = norm.slice(at + "/02-constructs/".length);
+  const root = `${norm.slice(0, at)}/03-behaviors/`;
+  if (existsSync(root + rel)) return { file: root + rel, exact: true };
+  const dir = rel.includes("/") ? rel.slice(0, rel.lastIndexOf("/")) : "";
+  if (!dir) return null;
+  for (const fallback of [`${root}${dir}/README.md`, `${root}${dir}.md`])
+    if (existsSync(fallback)) return { file: fallback, exact: false };
+  return null;
+}
+
+type BehaviourRow = { id: string; does: string; tier: string; status: string };
+
+/**
+ * Every behaviour row in a register file, read by COLUMN NAME rather than by position.
+ *
+ * The row grammar is nine cells and a foundation promise is four, so a fixed index would read the
+ * wrong cell on one of the two. Reading the header means a register that gains a column keeps
+ * joining, and a table that is not a behaviour table — a persona list, an explanatory table inside
+ * the prose — is skipped because it has no `Id` and no `Status`.
+ */
+function behaviourRows(file: string): BehaviourRow[] {
+  const src = outsideFences(readFileSync(file, "utf8"));
+  const out: BehaviourRow[] = [];
+  let head: string[] | null = null;
+  for (const raw of src.split("\n")) {
+    const t = raw.trim();
+    if (!(t.startsWith("|") && t.endsWith("|") && t.length > 2)) { head = null; continue; }
+    const cells = t.slice(1, -1).split("|").map((c) => c.trim());
+    if (/^[\s:|-]*$/.test(cells.join(""))) continue;
+    if (!head) { head = cells.map((c) => c.toLowerCase()); continue; }
+    const at = (name: string): number => head!.indexOf(name);
+    if (at("id") < 0) continue;
+    const id = cells[at("id")] ?? "";
+    if (!/^[A-Z]/.test(id.replace(/[`*]/g, ""))) continue;   // a continuation line, not a row
+    out.push({
+      id: id.replace(/[`*]/g, ""),
+      does: cells[at("does")] ?? cells[at("journey")] ?? "",
+      tier: cells[at("tier")] ?? "—",
+      status: cells[at("status")] ?? "—",
+    });
+  }
+  return out;
+}
+
+/**
+ * The joined rows, written into the seat's own `## Proof` before it is rendered.
+ *
+ * THE SEAT FILE IS NOT TOUCHED. The join happens on the markdown in memory, which is the whole
+ * point of `Q131`: a status lives in one place — the register the test run writes — and a page
+ * that carries it carries a copy that cannot drift, because it is produced again on every write.
+ *
+ * The rows go ABOVE the typed checks and below whatever prose the seat opens the section with,
+ * which is the order the reviewed sample uses: what the product promises, then what you can run.
+ */
+function joinProof(seat: string, markdown: string, workspace: string): { md: string; findings: Finding[] } {
+  const findings: Finding[] = [];
+  const reg = registerFor(seat);
+  if (!reg) return { md: markdown, findings };
+  const rows = behaviourRows(reg.file);
+  if (!rows.length) return { md: markdown, findings };
+  if (!reg.exact)
+    findings.push({ check: "proof", grade: "SOFT", file: seat,
+      message: `the behaviour rows were joined from \`${relative(workspace, reg.file)}\`, the domain's register, because this topic has no file of its own yet — \`Q138\` A puts one row file beside each construct, and step 6 writes it` });
+
+  const lines = markdown.split("\n");
+  const head = lines.findIndex((l) => /^##\s+Proof\b/.test(l));
+  if (head < 0) return { md: markdown, findings };
+  const next = lines.findIndex((l, k) => k > head && /^##\s/.test(l));
+  const endOf = next < 0 ? lines.length : next;
+  let cut = lines.findIndex((l, k) => k > head && k < endOf && l.trim().startsWith("|"));
+  if (cut < 0) cut = endOf;
+
+  const at = today();
+  // Named relative to the repository's own `docs/`, which is how every other path on a page reads.
+  const treeRoot = seat.replace(/\\/g, "/").slice(0, seat.replace(/\\/g, "/").indexOf("/02-constructs/"));
+  const shown = relative(treeRoot, reg.file).replace(/\\/g, "/");
+  const table = [
+    "",
+    `*Behaviours: joined from the register, \`${shown}\` as of ${at} — never typed in the seat file.*`,
+    "",
+    "| Row | Does | Tier | Status |",
+    "| --- | --- | --- | --- |",
+    ...rows.map((r) => `| \`${r.id}\` | ${r.does} | ${r.tier} | ${r.status} |`),
+    "",
+  ];
+  return { md: [...lines.slice(0, cut), ...table, ...lines.slice(cut)].join("\n"), findings };
+}
+
 function pageFor(seat: string, workspace: string, templates: string, write: boolean): Finding[] {
   const findings: Finding[] = [];
 
@@ -1189,7 +1303,9 @@ function pageFor(seat: string, workspace: string, templates: string, write: bool
   const { block, error } = readBlock(src);
   if (!block) { findings.push({ check: "page", grade: "RULE", file: seat, message: error ?? "no spn:doc block" }); return findings; }
 
-  const markdown = src.replace(/<!--\s*spn:doc[\s\S]*?-->\n?/, "");
+  const stripped = src.replace(/<!--\s*spn:doc[\s\S]*?-->\n?/, "");
+  const { md: markdown, findings: jf } = joinProof(seat, stripped, workspace);
+  findings.push(...jf);
   const org = process.env.SPN_ORG ?? "SaaS Plane";
   const location = process.env.SPN_LOCATION ?? locationOf(seat, workspace);
   if (location === "—")
@@ -1219,6 +1335,142 @@ function pageFor(seat: string, workspace: string, templates: string, write: bool
   return findings;
 }
 
+// ------------------------------------------------- the topics check, and capability coverage
+
+/** A numbered document's topic name: `04-sign-in.md` is `sign-in`. Unnumbered files are not topics. */
+function topicName(file: string): string | null {
+  const m = /^(\d\d)-(.+)\.md$/.exec(basename(file));
+  return m ? m[2] : null;
+}
+
+/** Every topic the constructs seat names, with the domain folder each sits in. */
+function constructTopics(repo: string): Map<string, string> {
+  const seat = join(repo, "docs", "02-constructs");
+  const out = new Map<string, string>();
+  if (!existsSync(seat)) return out;
+  for (const f of walkFiles(seat, (x) => x.endsWith(".md"))) {
+    const name = topicName(f);
+    if (name) out.set(name, relative(seat, dirname(f)).replace(/\\/g, "/"));
+  }
+  return out;
+}
+
+/**
+ * A topic the constructs seat does not name may not appear in the other two seats.
+ *
+ * This is the rule `03-tree.md` states under *One outline, three seats*, and it is the reason the
+ * numbers mean anything: one number names the model, the rows and the standard of one thing. Without
+ * a check the three seats drift apart one file at a time, each growing a topic the others never
+ * heard of — which is how a corpus ends up with three different answers to *what is this repository
+ * about*.
+ *
+ * The domain is checked as well as the name, because a topic that moved domain without moving in
+ * all three seats is the same drift wearing a name that still resolves.
+ */
+function topicsCheck(repo: string): Finding[] {
+  const f: Finding[] = [];
+  const named = constructTopics(repo);
+  // NO EARLY RETURN ON AN EMPTY SET. It was here, and it made the check vacuous on every repository
+  // in the corpus: constructs are not numbered until step 6 numbers them, so `named` was empty, and
+  // an empty set made every numbered behaviours file pass by being compared against nothing. A check
+  // that reports clean because it found no rule to apply is worse than no check — it is a green light
+  // over an unexamined tree. An absent seat is the one honest silence, and `constructTopics` already
+  // gives it.
+  if (!existsSync(join(repo, "docs", "02-constructs"))) return f;
+
+  const behaviors = join(repo, "docs", "03-behaviors");
+  for (const file of existsSync(behaviors) ? walkFiles(behaviors, (x) => x.endsWith(".md")) : []) {
+    const name = topicName(file);
+    if (name === null) continue;
+    const domain = named.get(name);
+    if (domain === undefined) {
+      f.push({ check: "topics", grade: "RULE", file, message: `\`${name}\` is a numbered topic of the behaviours seat and \`02-constructs/\` names no such construct — the constructs name the topics and the other two seats follow (03-tree.md, *One outline, three seats*)` });
+      continue;
+    }
+    const here = relative(behaviors, dirname(file)).replace(/\\/g, "/");
+    if (here !== domain)
+      f.push({ check: "topics", grade: "RULE", file, message: `\`${name}\` sits under \`${here}\` here and under \`${domain}\` in the constructs seat — one topic, one domain, the same number in all three seats` });
+  }
+
+  // In capabilities a chapter sits inside its package folder, so the domain is its GRANDPARENT.
+  const caps = join(repo, "docs", "04-capabilities");
+  for (const file of existsSync(caps) ? walkFiles(caps, (x) => x.endsWith(".md")) : []) {
+    const name = topicName(file);
+    if (name === null) continue;
+    if (!named.has(name))
+      f.push({ check: "topics", grade: "RULE", file, message: `\`${name}\` is a numbered chapter of the capabilities seat and \`02-constructs/\` names no such construct — a chapter realizes a construct or it is not a chapter (Q130)` });
+  }
+  return f;
+}
+
+/** The nodes a construct's Binds table says realize it — the second table, whose first column is the repo. */
+function realizingNodes(seatFile: string): string[] {
+  const binds = sectionBody(readFileSync(seatFile, "utf8"), /Binds\b/);
+  if (binds === null) return [];
+  const out: string[] = [];
+  for (const row of mdRows(binds)) {
+    // The rules table is `Rule | What it decides | Weight`; the placements table is
+    // `Repo | Node | What it realizes | State`. Four cells with a node in the second is the one.
+    if (row.length < 4) continue;
+    const node = (row[1] ?? "").replace(/[`*]/g, "").trim();
+    if (/^[a-z][a-z0-9-]*$/.test(node)) out.push(node);
+  }
+  return out;
+}
+
+/**
+ * The three halves of *the capabilities seat mirrors the code*, checked together.
+ *
+ * They are one verb because each alone is satisfiable by doing nothing. A check that every chapter
+ * names a construct passes on an empty seat; a check that every construct has a chapter passes on a
+ * repository with no packages. Only together do they say the seat and the code are the same shape.
+ *
+ * The third — every package with code realizes a construct — is the one that catches a package
+ * nobody documented, which is the failure the gap scan kept finding by hand.
+ */
+function coverageCheck(repo: string, workspace: string): Finding[] {
+  const f: Finding[] = [];
+  const seat = join(repo, "docs", "02-constructs");
+  const caps = join(repo, "docs", "04-capabilities");
+  if (!existsSync(seat)) return f;
+
+  // what the seat SAYS, per construct: which nodes realize it
+  const claimed = new Map<string, { domain: string; nodes: string[]; file: string }>();
+  for (const file of walkFiles(seat, (x) => x.endsWith(".md"))) {
+    const name = topicName(file);
+    if (name === null) continue;
+    claimed.set(name, { domain: relative(seat, dirname(file)).replace(/\\/g, "/"), nodes: realizingNodes(file), file });
+  }
+
+  // what the seat HAS, per construct: which package folders hold a chapter for it
+  const written = new Map<string, Set<string>>();
+  for (const file of existsSync(caps) ? walkFiles(caps, (x) => x.endsWith(".md")) : []) {
+    const name = topicName(file);
+    if (name === null) continue;
+    const pkg = basename(dirname(file));
+    if (!written.has(name)) written.set(name, new Set());
+    written.get(name)!.add(pkg);
+  }
+
+  for (const [name, { nodes, file }] of claimed) {
+    const has = written.get(name) ?? new Set<string>();
+    for (const node of nodes)
+      if (!has.has(node))
+        f.push({ check: "coverage", grade: "RULE", file, message: `\`${name}\` says \`${node}\` realizes it and \`04-capabilities/\` carries no chapter for it there — every construct owes a chapter in every package that realizes it (Q130)` });
+  }
+
+  // every package with code realizes something
+  const nodes = walkFiles(repo, (x) => basename(x) === "spkind.json")
+    .filter((x) => !x.includes("/dist/") && !x.includes("/node_modules/"))
+    .map((x) => basename(dirname(x)));
+  const realizes = new Set([...claimed.values()].flatMap((c) => c.nodes));
+  for (const node of new Set(nodes))
+    if (!realizes.has(node))
+      f.push({ check: "coverage", grade: "SOFT", file: join(repo, "docs", "02-constructs", "README.md"),
+        message: `\`${node}\` holds code and no construct's Binds names it — either it realizes a construct nobody wrote down, or it is a node nobody documented (${relative(workspace, repo)})` });
+  return f;
+}
+
 // ---------------------------------------------------------------------------- the gap scan
 
 /**
@@ -1237,7 +1489,7 @@ function gapReport(repo: string, workspace: string): number {
   const tree = join(repo, "docs");
   if (!existsSync(tree)) { console.error(`${relative(workspace, repo)} has no docs/ tree`); return 2; }
   const name = basename(resolve(repo));
-  const at = new Date().toISOString().slice(0, 10);
+  const at = today();
 
   const seats = ["01-purpose", "02-constructs", "03-behaviors", "04-capabilities", "05-guides"];
   const seatRows = seats.map((seat) => ({
@@ -1517,6 +1769,16 @@ if (cmd === "page") {
   process.exit(f.some((x) => x.grade === "RULE") ? 1 : 0);
 }
 
+if (cmd === "topics" || cmd === "coverage") {
+  const targets = rest.filter((r) => !r.startsWith("--")).map((r) => resolve(r));
+  if (!targets.length) { console.error(`usage: node docs.ts ${cmd} <repo…>`); process.exit(2); }
+  const f = targets.flatMap((t) => (cmd === "topics" ? topicsCheck(t) : coverageCheck(t, resolve(workspace))));
+  for (const x of f) console.log(`${x.grade === "RULE" ? "✗" : "!"} ${x.grade.padEnd(4)} ${x.check.padEnd(9)} ${relative(workspace, x.file)}\n         ${x.message}`);
+  const rule = f.filter((x) => x.grade === "RULE").length;
+  console.log(f.length ? `\n${f.length} finding(s) — ${rule} RULE, ${f.length - rule} SOFT` : `\nclean — ${targets.length} repository(ies)`);
+  process.exit(rule ? 1 : 0);
+}
+
 if (cmd === "audit" && rest.includes("--report")) {
   const target = rest.find((r) => !r.startsWith("--"));
   if (!target) { console.error("usage: node docs.ts audit --report <repo>"); process.exit(2); }
@@ -1524,7 +1786,7 @@ if (cmd === "audit" && rest.includes("--report")) {
 }
 
 if (cmd !== "audit" || rest.length === 0) {
-  console.error("usage: node docs.ts audit <path…> | face <tree> | page <seat.md…> | status <seat.md…>   (--check reports without writing)");
+  console.error("usage: node docs.ts audit <path…> | face <tree> | page <seat.md…> | status <seat.md…> | topics <repo…> | coverage <repo…>   (--check reports without writing)");
   process.exit(2);
 }
 
