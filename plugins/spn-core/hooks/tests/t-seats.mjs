@@ -215,6 +215,28 @@ console.log("\n=== a behaviour row typed into a seat's Proof is refused");
       lacks("carries a table of behaviour rows"));
 }
 
+console.log("\n=== `figures check` takes a folder, the way `audit` does");
+{
+  // Given a folder it read the directory itself and died on EISDIR with a raw stack trace, which
+  // reads as the tool being broken rather than as the argument being a folder. Found by a step 7
+  // agent, which then ran it per file and said so rather than reporting the crash as a green.
+  const page = (svg) => `<h1>p</h1>\n<figure><svg viewBox="0 0 100 60">${svg}</svg></figure>\n`;
+  const clean = page('<rect x="10" y="10" width="40" height="20"/>');
+  const ws = repo({
+    "docs/artifacts/constructs/01-core/a-construct.html": clean,
+    "docs/artifacts/constructs/01-core/b-construct.html": clean,
+  });
+  const out = run(ws, ["figures", "check", "docs/artifacts/constructs"]);
+  one("a folder is every page under it, not a read of the directory", out, lacks("EISDIR"));
+  one("and it says how many it judged", out, has("clean — 2 pages"));
+  one("a path that is not there is named, not read",
+      run(repo({ "docs/README.md": "# x\n" }), ["figures", "check", "docs/artifacts"]),
+      (g) => /no such file or folder/.test(g) && !/ENOENT/.test(g));
+  one("an empty folder says so rather than claiming clean",
+      run(repo({ "docs/README.md": "# x\n" }, {}), ["figures", "check", "docs"]),
+      has("clean — 1 page"));
+}
+
 console.log("\n=== a topic name repeats across domains, and that is not drift");
 {
   // The foundation names `shape`, `ships`, `resources` and `operate` in two domains each. The

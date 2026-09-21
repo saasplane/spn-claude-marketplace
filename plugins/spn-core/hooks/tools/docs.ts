@@ -1818,7 +1818,24 @@ if (cmd === "face") {
 
 if (cmd === "figures") {
   const [sub, ...args] = rest;
-  const files = args.filter((a) => !a.startsWith("--")).map((p) => resolve(p));
+  // A PATH IS A FILE OR A FOLDER, exactly as it is for `audit`. Given a folder this read the
+  // directory itself and died on EISDIR with a raw stack trace, which reads as the tool being
+  // broken rather than as the argument being a folder — and `figures check <repo>/docs/artifacts`
+  // is the only way step 8 can judge a corpus. The same walk `audit` uses, so `templates/` is
+  // skipped by the rule that already exists.
+  const missing: string[] = [];
+  const files = args.filter((a) => !a.startsWith("--")).flatMap((p) => {
+    const full = resolve(p);
+    let st;
+    // A PATH THAT IS NOT THERE IS NAMED, never read. Falling through to `readFileSync` turned a
+    // typo into a raw ENOENT stack trace, which is the same fault as the folder one wearing a
+    // different error code: the tool reporting itself as broken when the argument was.
+    try { st = statSync(full); } catch { missing.push(full); return []; }
+    return st.isDirectory() ? walkFiles(full, (f) => f.endsWith(".html") || f.endsWith(".md")) : [full];
+  });
+  for (const m of missing) console.log(`✗ RULE figure    ${relative(workspace, m)}\n         no such file or folder`);
+  if (!files.length && !missing.length) { console.log("no page under that path"); process.exit(0); }
+  if (!files.length) process.exit(1);
   if (sub === "check") {
     let total = 0;
     for (const f of files) {
