@@ -235,7 +235,10 @@ function renderPageBody(opts: Parameters<typeof renderPage>[0]): { html: string;
   const firstSection = lines.findIndex((l) => /^##\s/.test(l));
   const leadLines = lines.slice(0, firstSection < 0 ? lines.length : firstSection)
     .filter((l) => !/^#\s/.test(l) && !/^`(For|Lenses):/.test(l.trim()));
-  const lead = renderBody(leadLines, findings);
+  // The first lead paragraph is the standfirst — the page's promise in one line — and the ones after it
+  // are the summary. Rendering the first with the standfirst class is what gives a construct the same
+  // masthead rhythm as an overview (the developer's rule, 2026-09-21).
+  const lead = renderBody(leadLines, findings).replace(/^(\s*)<p>/, "$1<p class=\"standfirst\">");
 
   const sections: string[] = [];
   if (firstSection >= 0) {

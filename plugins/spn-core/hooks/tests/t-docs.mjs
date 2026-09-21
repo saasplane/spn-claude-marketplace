@@ -665,6 +665,11 @@ console.log("\n=== the gap scan measures and never fixes");
     run(ws, ["page", "docs/02-constructs/01-core/thing.md"]);
     const page3 = readAt(ws, "docs/artifacts/constructs/01-core/thing-construct.html");
     one("an author's HTML comment never reaches the page", page3, (g) => !/RESTATES|block: REASONS/.test(g) && /<p>visible<\/p>/.test(g));
+    writeFileSync(join(ws, "docs/02-constructs/01-core/thing.md"), seat("thing",
+      "The promise, in one line.\n\nThe summary paragraph.\n\n## Boundary\n\nx\n"));
+    run(ws, ["page", "docs/02-constructs/01-core/thing.md"]);
+    const page4 = readAt(ws, "docs/artifacts/constructs/01-core/thing-construct.html");
+    one("the first lead paragraph is the standfirst, the rest are the summary", page4, (g) => /<p class="standfirst">The promise, in one line\.<\/p>\s*<p>The summary paragraph\.<\/p>/.test(g));
     delete process.env.SPN_TEMPLATES;
   }
   one("and it names what it did NOT measure rather than reporting a zero",
