@@ -19,6 +19,10 @@ const EDGE = 8, JOIN_TOL = 6, BOX_TOL = 4;
 // Found by the developer on the SYSTEM samples, 2026-09-22: every fault was in hand-drawn SVG, and
 // every drawer-produced figure was already clean.
 const MIN_SHAFT = 36, LABEL_TOL = 1, PAD = 16, PAD_TOL = 2;
+// A label owes this much clear air to everything that is not its own text: a box it is not inside,
+// another label, and any connector. Checking for *clearance* rather than for overlap is the point —
+// a label one pixel clear of an arrow does not overlap it and is still unreadable.
+const LABEL_GAP = 8, GAP_APART = 24;
 /** The drawn length of a connector, summed over its segments. */
 const shaftOf = (pts: Pt[]): number => {
   let n = 0;
@@ -105,6 +109,20 @@ function distToSegment(p: Pt, a: Pt, b: Pt): number {
   return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
 }
 
+/**
+ * How close a connector segment comes to a label's box, which is what decides whether the two can be
+ * read apart. A drawn connector is axis-aligned, so its bounding box IS the segment and the distance
+ * between two axis-aligned boxes is exact. A hand-drawn diagonal falls back to its corners, which
+ * under-states the distance and so errs towards reporting rather than towards silence.
+ */
+function distSegRect(a: Pt, b: Pt, r: Rect): number {
+  const [rx, ry, rw, rh] = r;
+  const lo = [Math.min(a[0], b[0]), Math.min(a[1], b[1])], hi = [Math.max(a[0], b[0]), Math.max(a[1], b[1])];
+  const dx = Math.max(0, rx - hi[0], lo[0] - (rx + rw));
+  const dy = Math.max(0, ry - hi[1], lo[1] - (ry + rh));
+  return Math.hypot(dx, dy);
+}
+
 function onBox(p: Pt, rects: Rect[]): boolean {
   const [x, y] = p;
   for (const [rx, ry, rw, rh] of rects) {
@@ -174,6 +192,28 @@ export function checkFigures(src: string): FigureFinding[] {
     conns.forEach((c, k) => { for (let i = 1; i < c.pts.length; i++) segs.push({ k, a: c.pts[i - 1], b: c.pts[i] }); });
     const crossable = segs.filter((s) => !conns[s.k].exempt);
 
+    // TWO CONNECTORS TRAVELLING SIDE BY SIDE read as one thick line, and the reader cannot tell which
+    // label belongs to which. Found on the Sign-in flow, where a link that skipped a row was placed at
+    // its gap's midpoint while a link to the next row was placed in a numbered lane — two independent
+    // arithmetics in one gap, landing 4px apart (N13, 2026-09-21).
+    const axis = (s: { a: Pt; b: Pt }): 0 | 1 | -1 =>
+      Math.abs(s.a[0] - s.b[0]) < 1 ? 0 : Math.abs(s.a[1] - s.b[1]) < 1 ? 1 : -1;
+    let worst: { gap: number; run: number } | null = null;
+    for (let i = 0; i < crossable.length; i++) for (let j = i + 1; j < crossable.length; j++) {
+      const s = crossable[i], t = crossable[j];
+      if (s.k === t.k) continue;
+      const av = axis(s);
+      if (av < 0 || av !== axis(t)) continue;       // not parallel, or not axis-aligned
+      const gap = Math.abs(s.a[av] - t.a[av]);
+      if (gap < 0.5 || gap >= GAP_APART) continue;  // on top of each other is a different fault
+      const o = av === 0 ? 1 : 0;
+      const run = Math.min(Math.max(s.a[o], s.b[o]), Math.max(t.a[o], t.b[o]))
+                - Math.max(Math.min(s.a[o], s.b[o]), Math.min(t.a[o], t.b[o]));
+      if (run > LABEL_GAP && (!worst || gap < worst.gap)) worst = { gap, run };
+    }
+    if (worst)
+      findings.push({ figure: n + 1, message: `two connectors run ${Math.round(worst.gap)}px apart for ${Math.round(worst.run)}px — parallel runs are ${GAP_APART}px apart, or a reader reads them as one line` });
+
     conns.forEach((c, k) => {
       if (c.exempt) return;
       for (const [which, p] of [["start", c.pts[0]], ["end", c.pts[c.pts.length - 1]]] as [string, Pt][]) {
@@ -205,6 +245,9 @@ export function checkFigures(src: string): FigureFinding[] {
       const w = txt.length * (PX[cls] ?? 7);
       const lh = HGT[cls] ?? 12;
       const lr: Rect = [x, y - lh, w, lh];
+      // The same rect, grown by the clear air the label is owed on every side. Everything below is
+      // measured against THIS, so "they do not overlap" is no longer a pass.
+      const air: Rect = [x - LABEL_GAP, y - lh - LABEL_GAP, w + LABEL_GAP * 2, lh + LABEL_GAP * 2];
       // A label lying across a box it does not belong to is the commonest fault on a hand-drawn
       // figure, and the one a reader notices first: an edge's label is squeezed into the gap between
       // two boxes and runs over the one it points at.
@@ -215,11 +258,40 @@ export function checkFigures(src: string): FigureFinding[] {
           findings.push({ figure: n + 1, message: `the label "${txt.slice(0, 34)}" lies ${Math.round(ox)}px over a box it is not inside — give the edge room rather than letting its label cross what it points at` });
           break;
         }
+        const [ax2, ay2] = overlap(air, b);
+        if (ax2 > 0 && ay2 > 0) {
+          findings.push({ figure: n + 1, message: `the label "${txt.slice(0, 34)}" comes within ${Math.round(LABEL_GAP - Math.min(ax2, ay2))}px of a box it is not inside — a label owes ${LABEL_GAP}px of clear air to every shape but its own` });
+          break;
+        }
       }
       for (const q of placed) {
         const [ox, oy] = overlap(lr, q.r);
         if (ox > LABEL_TOL && oy > LABEL_TOL) {
           findings.push({ figure: n + 1, message: `the labels "${q.txt.slice(0, 22)}" and "${txt.slice(0, 22)}" overlap by ${Math.round(ox)}px` });
+          break;
+        }
+        const [ax2, ay2] = overlap(air, q.r);
+        if (ax2 > 0 && ay2 > 0) {
+          findings.push({ figure: n + 1, message: `the labels "${q.txt.slice(0, 22)}" and "${txt.slice(0, 22)}" are only ${Math.round(LABEL_GAP - Math.min(ax2, ay2))}px apart — two words that close read as one phrase` });
+          break;
+        }
+      }
+      // A label INSIDE a shape that is not a `<rect>` — the letter in an on-page connector circle, a
+      // word in a diamond — is the shape's own text, and every connector that lands on that shape
+      // reaches its boundary by design. Measuring those as near misses reported the vocabulary the
+      // flowchart had only just gained (N13, 2026-09-21).
+      const inShape = circles.some(([cx, cy, r]) => Math.hypot(x + w / 2 - cx, y - lh / 2 - cy) <= r)
+        || shapes.some((pts) => {
+          const xs = pts.map((q) => q[0]), ys = pts.map((q) => q[1]);
+          return x >= Math.min(...xs) && x + w <= Math.max(...xs)
+              && y - lh >= Math.min(...ys) && y <= Math.max(...ys);
+        });
+      // Every connector, not just a vertical one crossing the text. A label sits a standard gap from
+      // the run it names, so anything closer than that gap is a different connector passing too near.
+      for (const s of inShape ? [] : crossable) {
+        const d = distSegRect(s.a, s.b, lr);
+        if (d < LABEL_GAP - 0.5) {
+          findings.push({ figure: n + 1, message: `a connector runs ${Math.round(d)}px from the label "${txt.slice(0, 30)}" — a label owes ${LABEL_GAP}px of clear air to every arrow, its own included` });
           break;
         }
       }

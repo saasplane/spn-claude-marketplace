@@ -19,9 +19,75 @@ const W_LABEL = 7, W_NOTE = 6.4, W_TITLE = 7.6;
 // One pair of numbers, both axes: 24 where nothing connects two boxes, 56 where a connector does.
 // Padding is one number, 16, for a leaf and a container alike (05-artifacts.md § The grid).
 const PAD_X = 16, GAP_Y = 24, GAP_COL = 56, GAP_LINKED = 56;
+// A box edge carries three connection points at most; a fourth link leaves by another side.
+// A side offers three points at most — its middle and the middle of each half.
+const SIDE_POINTS = 3, GAP_APART = 24;
+// A connector's label and the connector itself. Every figure puts this much clear space between a
+// label's line and any arrow — its own or a neighbour's — so no drawer invents its own offset and
+// no reader has to work out which run a word belongs to.
+const LABEL_H = 12, LABEL_GAP = 8;
 const H_ONE = 44, H_TWO = 64;
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+type Vert = { x: number; y1: number; y2: number };
+type Pending = { x: number; y: number; w: number; txt: string };
+
+/** Every vertical run in a path, so a label can be kept off all of them and not merely off its own. */
+function vertsOf(d: string): Vert[] {
+  const out: Vert[] = [];
+  let x = 0, y = 0;
+  for (const [, c, u, v] of d.matchAll(/([MHV])\s*(-?[\d.]+)(?:\s+(-?[\d.]+))?/g)) {
+    const a = Number(u);
+    const nx = c === "V" ? x : a, ny = c === "V" ? a : c === "M" ? Number(v) : y;
+    if (c === "V") out.push({ x, y1: y, y2: ny });
+    x = nx; y = ny;
+  }
+  return out;
+}
+
+/**
+ * WHERE A LABEL FINALLY SITS is decided once every line is drawn, because the connector that crosses
+ * a label is rarely the one it names — it belongs to a third link passing through the same gap, which
+ * no drawer can see while it is placing its own text. Each label slides along its own line to the
+ * nearest stretch no vertical run crosses, keeping the clear air the contract owes. A label with
+ * nowhere clear to go stays where it was put, and the figure check reports it rather than this
+ * quietly stacking it somewhere worse.
+ */
+function placeLabels(pending: Pending[], verticals: Vert[], margin: number, width: number): string[] {
+  return pending.map((p) => {
+    const top = p.y - LABEL_H, bottom = p.y + 2;
+    const blocked = verticals
+      .filter((v) => Math.min(v.y1, v.y2) < bottom && Math.max(v.y1, v.y2) > top)
+      .map((v) => [v.x - LABEL_GAP, v.x + LABEL_GAP] as [number, number]);
+    const free = (x: number) => x >= margin && x + p.w <= width - margin
+      && !blocked.some(([lo, hi]) => lo < x + p.w && x < hi);
+    let x = p.x;
+    if (!free(x)) {
+      const tries = [...blocked.flatMap(([lo, hi]) => [hi, lo - p.w]), margin, width - margin - p.w]
+        .filter(free)
+        .sort((m, n) => Math.abs(m - p.x) - Math.abs(n - p.x));
+      if (tries.length) x = tries[0];
+    }
+    return `  <text class="n" x="${Math.round(x)}" y="${p.y}">${esc(p.txt)}</text>`;
+  });
+}
+
+/**
+ * THE POINTS A SIDE OFFERS: its middle, and the middle of each half — three at most. A shorter side
+ * offers fewer, because two points closer than the contract's gap read as one. A connector then takes
+ * whichever point lines up best with the box at its other end, and two connectors may well take the
+ * same one: forcing every arrow onto a point of its own bends lines that had no reason to bend, and
+ * alignment is what a reader follows (developer, 2026-09-21).
+ */
+function sidePoints(start: number, len: number): number[] {
+  const at = (f: number) => Math.round(start + len * f);
+  if (len / (SIDE_POINTS + 1) >= GAP_APART) return [at(0.25), at(0.5), at(0.75)];
+  if (len / 2 >= GAP_APART) return [at(0.25), at(0.75)];
+  return [at(0.5)];
+}
+const alignedTo = (points: number[], towards: number): number =>
+  points.reduce((best, p) => (Math.abs(p - towards) < Math.abs(best - towards) ? p : best), points[0]);
 
 function boxWidth(b: Box): number {
   const label = b.label.length * W_LABEL;
@@ -77,9 +143,14 @@ function drawEntities(spec: Spec): { svg: string; findings: string[] } {
   const hL = colHeight(left), hC = boxHeight(centre), hR = colHeight(right);
 
   const margin = 24;
+  // A link's label rides in the column gap, so the gap is as wide as the widest label plus the clear
+  // air it owes on both sides. Sized from GAP_COL alone, a label longer than 56px was hung above a
+  // box instead and landed inside the next column (N13, 2026-09-21).
+  const widestLabel = Math.max(0, ...links.map((l) => (l.label ?? "").length * W_NOTE));
+  const gapCol = Math.max(GAP_COL, Math.ceil(widestLabel) + LABEL_GAP * 2);
   const height = Math.max(hL, hC, hR) + margin * 2;
-  const width = margin * 2 + wL + wC + wR + GAP_COL * 2;
-  const xL = margin, xC = margin + wL + GAP_COL, xR = xC + wC + GAP_COL;
+  const width = margin * 2 + wL + wC + wR + gapCol * 2;
+  const xL = margin, xC = margin + wL + gapCol, xR = xC + wC + gapCol;
 
   const out: string[] = [];
   const at = new Map<string, { x: number; y: number; w: number; h: number }>();
@@ -96,25 +167,45 @@ function drawEntities(spec: Spec): { svg: string; findings: string[] } {
   layColumn([centre], xC, wC, hC);
   layColumn(right, xR, wR, hR);
 
+  // Two links crossing the same column gap would otherwise share one vertical x and one landing
+  // point, so each would run straight through the other's label. Each gets a share of the gap and a
+  // share of the edge it lands on, which is what keeps the labels readable (N13, 2026-09-21).
+  const eVerts: Vert[] = [], ePending: Pending[] = [];
+  const lane = new Map<Link, { i: number; n: number }>();
+  for (const l of links) {
+    const peers = links.filter((p) => (at.get(p.from)?.x ?? -1) === (at.get(l.from)?.x ?? -2)
+                                   && (at.get(p.to)?.x ?? -1) === (at.get(l.to)?.x ?? -2));
+    lane.set(l, { i: peers.indexOf(l), n: peers.length });
+  }
+
   for (const l of links) {
     const a = at.get(l.from), b = at.get(l.to);
     if (!a || !b) continue;
     const fromRight = a.x < b.x;
     const x1 = fromRight ? a.x + a.w : a.x;
     const x2 = fromRight ? b.x : b.x + b.w;
-    const y1 = a.y + a.h / 2, y2 = b.y + b.h / 2;
-    const mid = (x1 + x2) / 2;
+    const { i, n } = lane.get(l) ?? { i: 0, n: 1 };
+    const y1 = a.y + a.h / 2;
+    const y2 = alignedTo(sidePoints(b.y, b.h), n > 1 ? y1 : b.y + b.h / 2);
+    const mid = x1 + ((x2 - x1) * (i + 1)) / (n + 1);
     const dash = l.dashed ? ' stroke-dasharray="5 4"' : "";
-    out.push(`  <path class="c" d="M${x1} ${y1} H${mid} V${y2} H${x2}"${dash} marker-end="url(#ar)"/>`);
+    const dPath = `M${x1} ${y1} H${mid} V${y2} H${x2}`;
+    out.push(`  <path class="c" d="${dPath}"${dash} marker-end="url(#ar)"/>`);
+    eVerts.push(...vertsOf(dPath));
     if (l.label) {
-      // THE LABEL SITS ABOVE BOTH BOXES, not at their mid-height. `y1` and `y2` are box CENTRES, so
-      // a label placed against them lands inside a box — and the figure check then measures it
-      // against that box's width and reports it overrunning something it was never inside.
+      // THE LABEL SITS IN THE COLUMN GAP, on the connector's own vertical run — the one place in an
+      // ER layout where no box can be. Hung above a box instead, it lands inside whichever column is
+      // taller. Where the run is straight across it goes a standard gap above the line.
       const w = l.label.length * W_NOTE;
-      const x = Math.min(Math.max(mid - w / 2, margin), width - margin - w);
-      out.push(`  <text class="n" x="${x}" y="${Math.min(a.y, b.y) - 6}">${esc(l.label)}</text>`);
+      // Centred on the GAP, not on the connector's own vertical: the gap is sized to hold the widest
+      // label with its clear air, and a vertical spread across that gap sits off-centre, so a label
+      // centred on it would hang over a box. Above the higher of the two horizontal runs, where the
+      // vertical has not started, is the one spot crossed by neither the line nor a box.
+      ePending.push({ x: Math.round((x1 + x2 - w) / 2), y: Math.min(y1, y2) - LABEL_GAP, w, txt: l.label });
     }
   }
+
+  out.push(...placeLabels(ePending, eVerts, margin, width));
 
   const svg = [
     `<svg class="dg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(spec.title ?? spec.caption ?? "entity diagram")}">`,
@@ -361,19 +452,31 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
     for (const c of inner) { const ch = outerH(c); place(c, x + PAD_IN, cy, w - PAD_IN * 2, ch, row); cy += ch + 10; }
   };
 
-  // Each link between neighbouring rows gets its own lane through the gap, so two horizontal runs
-  // never sit on top of each other and each label has a line of its own. The gap is as tall as the
-  // lanes it carries.
+  // EVERY horizontal run through a gap takes a lane of its own, so no two connectors travel side by
+  // side and each label has a line to itself. A link to the next row crosses one gap and takes one
+  // lane; a link that skips rows travels through two and takes a lane in each. Both are counted,
+  // because a gap is as tall as everything crossing it, and lanes are a whole gap apart so the two
+  // kinds cannot be placed by different arithmetic and land on each other.
   const rowOf = new Map<string, number>();
   rows.forEach((row, i) => { for (const b of row) rowOf.set(b.id, i); });
   const rowOfAny = (id: string) => rowOf.get(holder(id)) ?? -1;
-  const laneOf = new Map<Link, number>(), lanesIn: number[] = rows.map(() => 0);
+  const laneOf = new Map<Link, number>(), laneEnd = new Map<Link, number>();
+  const lanesIn: number[] = rows.map(() => 0);
+  const takeLane = (gap: number) => { const lane = lanesIn[gap]; lanesIn[gap] += 1; return lane; };
   for (const l of links) {
     const ra = rowOfAny(l.from), rb = rowOfAny(l.to);
-    if (ra >= 0 && rb === ra + 1 && !(ra === rb)) { laneOf.set(l, lanesIn[ra]); lanesIn[ra] += 1; }
+    if (ra < 0 || rb <= ra) continue;
+    laneOf.set(l, takeLane(ra));
+    if (rb > ra + 1) laneEnd.set(l, takeLane(rb - 1));
   }
-  const LANE_H = 22;
-  const gapAfter = (i: number) => Math.max(52, 20 + LANE_H * lanesIn[i]);
+  // A lane is not a line, it is a line plus the label riding above it plus the clear air the
+  // contract owes on both sides. Deriving the pitch from LABEL_GAP is what stops a label touching
+  // the arrow above it: whatever room a label needs, the next lane starts past it by construction.
+  // One lane therefore makes a gap of exactly GAP_LINKED, which is the connected minimum.
+  const LANE_H = LABEL_H + LABEL_GAP * 2, LANE_TOP = LANE_H;
+  const gapAfter = (i: number) => Math.max(GAP_LINKED, LANE_TOP + LANE_H * lanesIn[i]);
+
+  const laneY = (gap: number, lane: number) => rowBottom[gap] + LANE_TOP + LANE_H * lane;
 
   const rowTop: number[] = [], rowBottom: number[] = [];
   let y = margin;
@@ -385,21 +488,19 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
     for (const b of row) { const w = outerW(b); place(b, x, y, w, outerH(b), i); x += w + gapX; }
     y += rh + (i < rows.length - 1 ? gapAfter(i) : 0);
   });
-  const width = CANVAS;
+  // A SIDE CORRIDOR PER SKIPPING LINK, clear to the right of every box. A link that skips rows runs
+  // down one of these rather than out to the figure's far edge, so the figure is only as wide as the
+  // routes it actually needs.
+
+  const rightMost = Math.max(CANVAS - margin, ...[...at.values()].map((p2) => p2.x + p2.w));
+  const skippers = links.filter((l) => {
+    const ra = rowOfAny(l.from), rb = rowOfAny(l.to);
+    return ra >= 0 && Math.abs(rb - ra) > 1;
+  });
+  const sideLane = (l: Link) => rightMost + GAP_LINKED + Math.max(0, skippers.indexOf(l)) * GAP_Y;
+  const width = Math.max(CANVAS, (skippers.length ? sideLane(skippers[skippers.length - 1]) : 0) + margin);
   const height = y + margin;
 
-  // Where a box has several links leaving its bottom or arriving at its top, the points are spread
-  // along the edge rather than piled on its centre, so two arrows never share one head.
-  const outs = new Map<string, Link[]>(), ins = new Map<string, Link[]>();
-  for (const l of links) {
-    if (!at.has(l.from) || !at.has(l.to)) continue;
-    outs.set(l.from, [...(outs.get(l.from) ?? []), l]); ins.set(l.to, [...(ins.get(l.to) ?? []), l]);
-  }
-  const spread = (box: { x: number; w: number }, list: Link[], l: Link) => {
-    const i = list.indexOf(l), n = list.length;
-    return Math.round(box.x + (box.w * (i + 1)) / (n + 1));
-  };
-  const LANE = width - margin / 2;   // the return lane down the right edge, clear of every box
 
   // Labels live in the gaps between rows. Two labels in one gap are stacked so neither overprints.
   const taken: { gap: number; x1: number; x2: number; y: number }[] = [];
@@ -407,13 +508,16 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
     let x = Math.min(Math.max(cx - w / 2, margin), width - margin - w);
     let ly = baseY;
     for (let tries = 0; tries < 4; tries++) {
-      const hit = taken.find((t) => t.gap === gap && Math.abs(t.y - ly) < 12 && t.x1 < x + w && x < t.x2);
+      const hit = taken.find((t) => t.gap === gap && Math.abs(t.y - ly) < LABEL_H + LABEL_GAP && t.x1 < x + w && x < t.x2);
       if (!hit) break;
-      ly += 14;
+      ly += LABEL_H + LABEL_GAP;
     }
     taken.push({ gap, x1: x, x2: x + w, y: ly });
     return { x, y: ly };
   };
+
+  const verticals: Vert[] = [];
+  const pending: Pending[] = [];
 
   for (const l of links) {
     const a = at.get(l.from), b = at.get(l.to);
@@ -427,13 +531,14 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
       const x1 = rightward ? a.x + a.w : a.x, x2 = rightward ? b.x : b.x + b.w;
       const y1 = a.y + a.h / 2, y2 = b.y + b.h / 2, mid = (x1 + x2) / 2;
       d = `M${x1} ${y1} H${mid} V${y2} H${x2}`;
-      if (l.label) label = labelAt(-1 - a.row, mid, w, Math.min(a.y, b.y) - 8);
+      if (l.label) label = labelAt(-1 - a.row, mid, w, Math.min(a.y, b.y) - LABEL_GAP);
     } else if (b.row === a.row + 1) {
       // The next row down: out of the bottom, along this link's own lane in the gap, into the top.
-      const x1 = spread(a, outs.get(l.from) ?? [l], l), x2 = spread(b, ins.get(l.to) ?? [l], l);
+      const x1 = alignedTo(sidePoints(a.x, a.w), b.x + b.w / 2);
+      const x2 = alignedTo(sidePoints(b.x, b.w), a.x + a.w / 2);
       const y1 = a.y + a.h, y2 = b.y;
       const lane = laneOf.get(l) ?? 0;
-      const mid = rowBottom[a.row] + 10 + LANE_H * lane + 12;
+      const mid = laneY(a.row, lane);
       const straight = Math.abs(x1 - x2) < 1;
       d = straight ? `M${x1} ${y1} V${y2}` : `M${x1} ${y1} V${mid} H${x2} V${y2}`;
       if (l.label) {
@@ -441,7 +546,7 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
         // Either way the text is in the gap and its span never contains a vertical segment.
         const lo = Math.min(x1, x2), hi = Math.max(x1, x2);
         const cx = straight ? x1 + 8 + w / 2 : (lo + hi) / 2;
-        label = { x: Math.min(Math.max(cx - w / 2, margin), width - margin - w), y: straight ? mid + 4 : mid - 5 };
+        label = { x: Math.min(Math.max(cx - w / 2, margin), width - margin - w), y: straight ? mid + LABEL_GAP : mid - LABEL_GAP };
         if (!straight && w > hi - lo - 8) { // a label longer than its run sits clear of both verticals
           label.x = Math.min(Math.max(hi + 6, margin), width - margin - w);
           if (label.x + w > width - margin) label.x = Math.max(lo - w - 6, margin);
@@ -450,24 +555,29 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
     } else if (b.row > a.row) {
       // Skips a row: down into the gap, along it to the lane at the right edge, down the lane to the
       // gap above the target, back along that gap, and in from the top. No box is crossed.
-      const x1 = a.x + a.w / 2, x2 = b.x + b.w / 2;
-      const g1 = Math.round((rowBottom[a.row] + rowTop[a.row + 1]) / 2);
-      const g2 = Math.round((rowBottom[b.row - 1] + rowTop[b.row]) / 2);
-      d = `M${x1} ${a.y + a.h} V${g1} H${LANE} V${g2} H${x2} V${b.y}`;
-      if (l.label) label = labelAt(a.row, (x1 + LANE) / 2, w, g1 - 6);
+      // OUT OF THE RIGHT EDGE AND IN AT THE RIGHT EDGE. A connector leaves whichever side puts it on
+      // the shortest honest route, rather than always the bottom: leaving the bottom forced a link
+      // that skips two rows out to the figure's far edge and back across everything, when the two
+      // boxes it joins are one above the other (developer, 2026-09-21).
+      const sideX = sideLane(l);
+      const y1 = a.y + a.h / 2, y2 = b.y + b.h / 2;
+      d = `M${a.x + a.w} ${y1} H${sideX} V${y2} H${b.x + b.w}`;
+      if (l.label) label = labelAt(a.row, (a.x + a.w + sideX) / 2, w, y1 - LABEL_GAP);
     } else {
       // Upward: out of the top, along the gap above to the lane, up to the gap below the target, in
       // from the bottom. Drawn, and reported, because a map is meant to flow one way.
       findings.push(`the link \`${l.from}\` → \`${l.to}\` runs upward; a map flows one way, so a link points at a box below its source`);
-      const x1 = a.x + a.w / 2, x2 = b.x + b.w / 2;
-      const g1 = Math.round((rowBottom[a.row - 1] + rowTop[a.row]) / 2);
-      const g2 = Math.round((rowBottom[b.row] + rowTop[b.row + 1]) / 2);
-      d = `M${x1} ${a.y} V${g1} H${LANE} V${g2} H${x2} V${b.y + b.h}`;
-      if (l.label) label = labelAt(a.row - 1, (x1 + LANE) / 2, w, g1 - 6);
+      const sideX = sideLane(l);
+      const y1 = a.y + a.h / 2, y2 = b.y + b.h / 2;
+      d = `M${a.x + a.w} ${y1} H${sideX} V${y2} H${b.x + b.w}`;
+      if (l.label) label = labelAt(a.row - 1, (a.x + a.w + sideX) / 2, w, y1 - LABEL_GAP);
     }
     out.push(`  <path class="c" d="${d}"${dash} marker-end="url(#ar)"/>`);
-    if (label && l.label) out.push(`  <text class="n" x="${label.x}" y="${label.y}">${esc(l.label)}</text>`);
+    if (label && l.label) { verticals.push(...vertsOf(d)); pending.push({ ...label, w, txt: l.label }); }
+    else verticals.push(...vertsOf(d));
   }
+
+  out.push(...placeLabels(pending, verticals, margin, width));
 
   const svg = [
     `<svg class="dg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(spec.title ?? spec.caption ?? "map")}">`,
