@@ -242,10 +242,89 @@ function drawMap(spec: Spec): { svg: string; findings: string[] } {
   }
 
   const CANVAS = 760, margin = 24, gapX = 36;
+
+  // A ONE-WAY CHAIN IS A STRAIGHT LINE. When every box has at most one link in and one out and the
+  // links form a single path through all of them, the figure is a flow, and a flow reads best as a
+  // line: horizontal when it fits the canvas, vertical when it does not. Labels sit above a
+  // horizontal link, beside a vertical one — never on a box. The developer's rule, 2026-09-21.
+  if (!kids.size) {
+    const inOf = new Map<string, number>(), outOf = new Map<string, number>();
+    for (const [f, t] of edges) { outOf.set(f, (outOf.get(f) ?? 0) + 1); inOf.set(t, (inOf.get(t) ?? 0) + 1); }
+    const heads = topIds.filter((id) => !(inOf.get(id) ?? 0));
+    const simple = topIds.every((id) => (inOf.get(id) ?? 0) <= 1 && (outOf.get(id) ?? 0) <= 1);
+    if (simple && heads.length === 1 && edges.length === topIds.length - 1 && topIds.length > 1) {
+      const next = new Map(edges);
+      const order: string[] = []; let cur: string | undefined = heads[0];
+      while (cur && order.length <= topIds.length) { order.push(cur); cur = next.get(cur); }
+      if (order.length === topIds.length) {
+        const boxes = order.map((id) => byId.get(id)!);
+        const linkOf = (a: string, b: string) => links.find((l) => holder(l.from) === a && holder(l.to) === b);
+        const labelW = (i: number) => ((linkOf(order[i], order[i + 1])?.label ?? "").length * W_NOTE);
+        const ws = boxes.map(mapBoxWidth), hs = boxes.map(mapBoxHeight);
+        const gaps = boxes.slice(0, -1).map((_, i) => Math.max(gapX, labelW(i) + 16));
+        const total = ws.reduce((s, w) => s + w, 0) + gaps.reduce((s, g) => s + g, 0);
+        const out: string[] = [];
+        let width = CANVAS, height = 0;
+        if (total <= CANVAS - margin * 2) {
+          const h = Math.max(...hs);
+          let x = margin + Math.floor((CANVAS - margin * 2 - total) / 2);
+          const y = margin;
+          boxes.forEach((b, i) => {
+            out.push(mapRect(b, x, y, ws[i], hs[i]));
+            if (i < boxes.length - 1) {
+              const l = linkOf(order[i], order[i + 1]);
+              const x1 = x + ws[i], x2 = x1 + gaps[i], cy = y + h / 2;
+              out.push(`  <path class="c" d="M${x1} ${cy} H${x2}"${l?.dashed ? ' stroke-dasharray="5 4"' : ""} marker-end="url(#ar)"/>`);
+              if (l?.label) out.push(`  <text class="n" x="${Math.round(x1 + (gaps[i] - labelW(i)) / 2)}" y="${cy - 8}">${esc(l.label)}</text>`);
+              x = x2;
+            }
+          });
+          height = margin + h + margin;
+        } else {
+          const w = Math.max(...ws);
+          const x = margin + Math.floor((CANVAS - margin * 2 - w) / 2);
+          let y = margin;
+          const GAP_V = 40;
+          boxes.forEach((b, i) => {
+            out.push(mapRect(b, x, y, w, hs[i]));
+            if (i < boxes.length - 1) {
+              const l = linkOf(order[i], order[i + 1]);
+              const cx = x + w / 2, y1 = y + hs[i], y2 = y1 + GAP_V;
+              out.push(`  <path class="c" d="M${cx} ${y1} V${y2}"${l?.dashed ? ' stroke-dasharray="5 4"' : ""} marker-end="url(#ar)"/>`);
+              if (l?.label) out.push(`  <text class="n" x="${cx + 10}" y="${y1 + GAP_V / 2 + 4}">${esc(l.label)}</text>`);
+              y = y2;
+            }
+          });
+          height = y + hs[hs.length - 1] + margin;
+        }
+        const svg = [
+          `<svg class="dg" viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(spec.title ?? spec.caption ?? "map")}">`,
+          `  <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>`,
+          ...out, `</svg>`].join("\n");
+        return { svg, findings };
+      }
+    }
+  }
+
   const levels = [...new Set([...depth.values()])].sort((a, b) => a - b);
+  // Within a row, boxes are ordered by where the boxes they link to sit — a sweep down by sources,
+  // then up by targets — so two links in one gap do not cross. Order is what makes a picture read.
+  const pos = new Map<string, number>();
+  const byLevel = levels.map((lv) => top.filter((b) => depth.get(b.id) === lv));
+  byLevel.forEach((row) => row.forEach((b, i) => pos.set(b.id, i)));
+  const mean = (ids: string[], fallback: number) => ids.length ? ids.reduce((s, id) => s + (pos.get(id) ?? 0), 0) / ids.length : fallback;
+  const sweep = (down: boolean) => {
+    const order = down ? byLevel : [...byLevel].reverse();
+    for (const row of order) {
+      const key = (b: Box) => mean(edges.filter(([f, t]) => (down ? t : f) === b.id).map(([f, t]) => (down ? f : t)), pos.get(b.id) ?? 0);
+      row.sort((a, b) => key(a) - key(b) || (pos.get(a.id) ?? 0) - (pos.get(b.id) ?? 0));
+      row.forEach((b, i) => pos.set(b.id, i));
+    }
+  };
+  sweep(true); sweep(false); sweep(true);
   const rows: Box[][] = [];
   for (const lv of levels) {
-    const members = top.filter((b) => depth.get(b.id) === lv);
+    const members = byLevel[levels.indexOf(lv)];
     let row: Box[] = []; let used = 0;
     for (const b of members) {
       const w = outerW(b);

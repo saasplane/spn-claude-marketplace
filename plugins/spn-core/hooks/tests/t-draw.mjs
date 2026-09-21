@@ -37,6 +37,18 @@ const FIGURES = {
     kind: "map", boxes: [{ id: "a", label: "Contract", note: "the shared surface" }, { id: "b", label: "App" }, { id: "c", label: "Entry" }],
     links: [{ from: "a", to: "b", label: "types" }, { from: "b", to: "c" }],
   },
+  "map — a one-way chain that fits is one horizontal line": {
+    kind: "map", boxes: [{ id: "a", label: "Ground", note: "the company brings" }, { id: "b", label: "Estate", note: "SaaS Plane creates" }, { id: "c", label: "Deployments", note: "the apps deliver" }],
+    links: [{ from: "a", to: "b", label: "derives" }, { from: "b", to: "c", label: "runs" }],
+  },
+  "map — a one-way chain too wide for the canvas is one vertical line": {
+    kind: "map", boxes: "abcdef".split("").map((id) => ({ id, label: `Step ${id.toUpperCase()}`, note: "a note long enough to make the row too wide" })),
+    links: [["a","b"],["b","c"],["c","d"],["d","e"],["e","f"]].map(([from, to]) => ({ from, to, label: "then" })),
+  },
+  "map — rows are ordered so links do not cross": {
+    kind: "map", boxes: [{ id: "v", label: "Vocabulary" }, { id: "g", label: "Ground" }, { id: "p", label: "Providers" }, { id: "c", label: "Coordinates" }],
+    links: [{ from: "v", to: "c" }, { from: "g", to: "p" }, { from: "g", to: "c" }],
+  },
   "map — a nested box is containment": {
     kind: "map", boxes: [{ id: "repo", label: "Repository" }, { id: "s1", label: "01-purpose", in: "repo" },
       { id: "s2", label: "02-constructs", in: "repo" }, { id: "n", label: "Node", note: "README.md only" }],
@@ -51,6 +63,20 @@ for (const [name, spec] of Object.entries(FIGURES)) {
   const r = judge(spec);
   one(`${name} — draws without a finding`, r.findings, none);
   one(`${name} — and the figure check passes it`, r.figure, none);
+}
+
+{
+  const flat = judge(FIGURES["map — a one-way chain that fits is one horizontal line"]).svg;
+  one("a chain that fits has every box on one y", flat, (g) => new Set([...g.matchAll(/<rect[^>]* y="([\d.]+)"/g)].map((m) => m[1])).size === 1);
+  one("and every link is a single horizontal segment", flat, (g) => [...g.matchAll(/<path class="c" d="([^"]+)"/g)].every((m) => /^M[\d.]+ [\d.]+ H[\d.]+$/.test(m[1])));
+  const tall = judge(FIGURES["map — a one-way chain too wide for the canvas is one vertical line"]).svg;
+  one("a chain too wide has every box on one x", tall, (g) => new Set([...g.matchAll(/<rect[^>]* x="([\d.]+)"/g)].map((m) => m[1])).size === 1);
+  one("and every link is a single vertical segment", tall, (g) => [...g.matchAll(/<path class="c" d="([^"]+)"/g)].every((m) => /^M[\d.]+ [\d.]+ V[\d.]+$/.test(m[1])));
+  const ordered = judge(FIGURES["map — rows are ordered so links do not cross"]).svg;
+  const xOf = (label) => Number(ordered.match(new RegExp(`<text class="l" x="([\\d.]+)" y="[\\d.]+">${label}<`))[1]);
+  // Two orders are crossing-free (Ground first or Vocabulary first); what must hold is that the
+  // rows agree, so the one link that could cross another does not.
+  one("the two rows are ordered the same way, so no run crosses another", ordered, () => (xOf("Ground") < xOf("Vocabulary")) === (xOf("Providers") < xOf("Coordinates")));
 }
 
 console.log("\n=== the map drawer says what it cannot do, rather than drawing something wrong");
