@@ -259,5 +259,35 @@ console.log("\n=== the handover check — what counts as saying a window is need
   console.log(`  ${named ? "PASS" : "FAIL"}  a short block is told which fields it is missing`);
 }
 
+console.log("\n=== reply-shape — a sentence that reports an answer is not asking for one");
+{
+  // It fired on a reply that had just told the developer their ALREADY ANSWERED card turned out to
+  // match option B — a sentence ABOUT a decision they had made, demanded back as a decision card.
+  // COUNTING options was the wrong cure, and the suite caught that: "Two ways: option A now, or
+  // wait" is a real offer with one letter in it. What separates the two is the FRAME, so a sentence
+  // saying the thing was answered, decided or chosen is set aside and the rest is read for an ask.
+  const { checkReplyShape } = await import("../events/stop.ts");
+  const TABLE = ["| | What it does | What it costs |", "| --- | --- | --- |",
+                 "| **A** | keeps it | nothing |", "| **B** | moves it | a sweep |"].join("\n");
+  for (const [what, reply] of [
+    ["one option named, inside a report", "After you answered, it builds one file per domain — option B."],
+    ["a letter in the past tense", "After you answered, your A now changes the generator too."],
+    ["two options with the table", `Option A keeps it. Option B moves it.\n${TABLE}`],
+    ["a decision reported with no table", "Q136 was decided A, and it is built."],
+    ["a recommendation with the table", `Recommendation is A.\n${TABLE}`],
+    ["a plain report", "I fixed the drawer and committed it."],
+  ]) { n += 1; const ok = checkReplyShape(reply).length === 0; if (!ok) failed += 1;
+       console.log(`  ${ok ? "PASS" : "FAIL"}  silent — ${what}`); }
+
+  for (const [what, reply] of [
+    ["two options and no table", "Option A keeps it. Option B moves it."],
+    ["one option PRESENTED still asks", "Two ways: option A now, or wait."],
+    ["pick B with no table", "Pick B and we move on."],
+    ["A, B or C with no table", "It is A, B or C."],
+    ["a recommendation with no table", "Recommendation is A."],
+  ]) { n += 1; const ok = checkReplyShape(reply).length === 1; if (!ok) failed += 1;
+       console.log(`  ${ok ? "PASS" : "FAIL"}  reports — ${what}`); }
+}
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

@@ -304,14 +304,30 @@ export function cardsInArcs(root: string): Array<[string, string, string]> {
 // read as somebody naming option A. It fired on a reply that asked nothing, over a behaviour row
 // reading `sends an organization id of their own choosing with a sign-in`. An option is written
 // upper-case, always, so the letter is upper-case here and only the leading word is either case.
-const ASKS = /\b(?:[Ss]ay|[Aa]nswer|[Rr]eply|[Pp]ick|[Cc]hoose|[Cc]hoosing|[Ss]elect)\s+(?:with\s+)?[`"*]?(?:Q\d+)?[A-D]\b|\b[Rr]ecommendation\s+is\s+[`"*]?[A-D]\b|(?:^|[.:;—]\s+)\**[Oo]ption\s+[`"*]?[A-D]\b|\b[A-D]\s*,\s*[A-D]\s*(?:,\s*[A-D]\s*)?(?:or|\/)\s*[A-D]\b/;
+const ASKS = /\b(?:[Ss]ay|[Aa]nswer|[Rr]eply|[Pp]ick|[Cc]hoose|[Cc]hoosing|[Ss]elect)\s+(?:with\s+)?[`"*]?(?:Q\d+)?[A-D]\b|\b[Rr]ecommendation\s+is\s+[`"*]?[A-D]\b|(?:^|[.:;\u2014]\s+)\**[Oo]ption\s+[`"*]?[A-D]\b|\b[A-D]\s*,\s*[A-D]\s*(?:,\s*[A-D]\s*)?(?:or|\/)\s*[A-D]\b/;
+
+/**
+ * A SENTENCE THAT REPORTS AN ANSWER IS NOT ASKING FOR ONE, and the pattern above cannot tell the
+ * two apart because both name a letter. It fired on *…found it builds one file per domain — option
+ * B*, which told the developer that their ALREADY ANSWERED card turned out to match option B: a
+ * sentence about a decision they had made, demanded back as a decision card.
+ *
+ * Counting options was the wrong cure — *Two ways: option A now, or wait* is a real offer with one
+ * letter in it. What separates them is the FRAME: a report says the thing was answered, decided or
+ * chosen. So a sentence carrying one of those words is set aside, and whatever is left is read for
+ * an ask. A reply that is genuinely putting a choice does not describe it as already made.
+ */
+const REPORTS = /\b(?:answered|decided|chose|chosen|settled|recorded)\b/i;
+const asking = (reply: string) =>
+  ASKS.test(reply.split(/(?<=[.!?\n])\s+/).filter((line) => !REPORTS.test(line)).join(" "));
+
 // A markdown options table: a header row and the `| --- |` separator the grammar requires.
 const TABLE = /^\|.*\|\s*$\n^\|[\s:-]*\|[\s:|-]*$/m;
 // A lettered row inside a table — `| **A** | … | … |`. The shape the grammar actually asks for.
 const LETTERED_ROW = /^\|\s*\**\s*[A-D]\s*\**\s*\|/m;
 
 export function checkReplyShape(reply: string): Warning[] {
-  if (!ASKS.test(reply)) return [];
+  if (!asking(reply)) return [];
   if (TABLE.test(reply) && LETTERED_ROW.test(reply)) return [];
   return [{ check: "reply-shape", message:
     "Your reply asks for a lettered choice and shows no options table. A card put to a person in " +
