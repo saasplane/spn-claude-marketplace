@@ -117,17 +117,43 @@ function svgOf(body: string[], label: string): string {
   ].join("\n");
 }
 
-type Vert = { x: number; y1: number; y2: number };
-type Pending = { x: number; y: number; w: number; txt: string };
+type Vert = { x: number; y1: number; y2: number; path?: number };
+type Blocker = { x: number; y: number; w: number; h: number; path?: number };
+// A LABEL IS NEVER BLOCKED BY ITS OWN CONNECTOR. Once runs became blockers the placer started
+// pushing each label away from the very line it names — a system diagram's labels sit a standard
+// gap above their own horizontal leg, which is exactly where they belong. Each run carries the
+// path it came from and each label the path it names, and the placer skips the match.
+type Pending = { x: number; y: number; w: number; txt: string; path?: number };
 
 /** Every vertical run in a path, so a label can be kept off all of them and not merely off its own. */
-function vertsOf(d: string): Vert[] {
+function vertsOf(d: string, path?: number): Vert[] {
   const out: Vert[] = [];
   let x = 0, y = 0;
   for (const [, c, u, v] of d.matchAll(/([MHV])\s*(-?[\d.]+)(?:\s+(-?[\d.]+))?/g)) {
     const a = Number(u);
     const nx = c === "V" ? x : a, ny = c === "V" ? a : c === "M" ? Number(v) : y;
-    if (c === "V") out.push({ x, y1: y, y2: ny });
+    if (c === "V") out.push({ x, y1: y, y2: ny, path });
+    x = nx; y = ny;
+  }
+  return out;
+}
+
+/**
+ * Every HORIZONTAL run in a path, shaped as a zero-height blocker.
+ *
+ * `placeLabels` already keeps a label clear of every box and every vertical run, and a horizontal
+ * run was the third thing on the canvas that nothing told it about. Giving a label a second axis
+ * to move on made that gap visible immediately: a label stepped to a free band and landed 1px from
+ * the horizontal leg of another connector. A run with no height blocks exactly the way a flat box
+ * would, so the placer needs no new rule — only the shape it already knows.
+ */
+function horzOf(d: string, path?: number): Blocker[] {
+  const out: Blocker[] = [];
+  let x = 0, y = 0;
+  for (const [, c, u, v] of d.matchAll(/([MHV])\s*(-?[\d.]+)(?:\s+(-?[\d.]+))?/g)) {
+    const a = Number(u);
+    const nx = c === "V" ? x : a, ny = c === "V" ? a : c === "M" ? Number(v) : y;
+    if (c === "H") out.push({ x: Math.min(x, nx), y: y, w: Math.abs(nx - x), h: 0, path });
     x = nx; y = ny;
   }
   return out;
@@ -142,41 +168,65 @@ function vertsOf(d: string): Vert[] {
  * quietly stacking it somewhere worse.
  */
 function placeLabels(pending: Pending[], verticals: Vert[], margin: number, width: number,
-                     boxes: { x: number; y: number; w: number; h: number }[] = []): string[] {
+                     boxes: Blocker[] = []): string[] {
   // AND A LABEL ALREADY PLACED BLOCKS THE ONE AFTER IT. The pass slid each label clear of the lines
   // and the boxes and then dropped it on its neighbour, because it kept no memory of where it had
   // just put one — two labels in the same band, 70px of overlap, and each of them individually
   // correct. This is the same rule the figure check applies when it says two words that close read
   // as one phrase; the placer now applies it while it still has somewhere else to go.
   const settled: { x: number; y: number; w: number }[] = [];
+  // A BAND IS THE SECOND AXIS, and the pass used to have only the first. It slid a label sideways
+  // along its own line and, where every x was taken, left it sitting on a connector and let the
+  // figure check report it — eleven findings on one six-box map, each of them a label with nowhere
+  // horizontal to go and a perfectly empty band a few pixels above. A label may now step to the
+  // next band up or down, two at most, so it stays beside the line it names; the pitch is the one
+  // the contract already uses everywhere else. Horizontal is still tried first at every band,
+  // because sliding along the line reads better than floating away from it.
+  const PITCH = LABEL_H + LABEL_GAP;
+  const bands = [0, -PITCH, PITCH, -2 * PITCH, 2 * PITCH, -3 * PITCH, 3 * PITCH];
   return pending.map((p) => {
-    const top = p.y - LABEL_H, bottom = p.y + 2;
     // A BOX IS AS BLOCKING AS A CONNECTOR, and this pass only knew about connectors. Sliding a label
     // clear of two vertical runs pushed it OUT of the column gap and onto the box it named: the
     // sliding rule solved the problem it was given and created a worse one nobody had told it about.
     // A box overlapping the label's own band blocks its whole width plus the clear air it is owed.
-    const blocked = [
-      ...verticals
-        .filter((v) => Math.min(v.y1, v.y2) < bottom && Math.max(v.y1, v.y2) > top)
-        .map((v) => [v.x - LABEL_GAP, v.x + LABEL_GAP] as [number, number]),
-      ...boxes
-        .filter((b) => b.y < bottom + LABEL_GAP && b.y + b.h > top - LABEL_GAP)
-        .map((b) => [b.x - LABEL_GAP, b.x + b.w + LABEL_GAP] as [number, number]),
-      ...settled
-        .filter((q) => Math.abs(q.y - p.y) < LABEL_H + LABEL_GAP)
-        .map((q) => [q.x - LABEL_GAP, q.x + q.w + LABEL_GAP] as [number, number]),
-    ];
-    const free = (x: number) => x >= margin && x + p.w <= width - margin
-      && !blocked.some(([lo, hi]) => lo < x + p.w && x < hi);
-    let x = p.x;
-    if (!free(x)) {
+    const blockedAt = (y: number): [number, number][] => {
+      // THE SAME RECTANGLE THE CHECK MEASURES, to the pixel. The placer used to model the label as
+      // `y - LABEL_H` to `y + 2`, two pixels taller at the bottom than the check's `y - lh` to `y`,
+      // and those two pixels were the whole bug: a label sitting the contract's exact gap above its
+      // own connector read as blocked, so the placer moved it — off a position that was already
+      // correct and onto one that was not. A label owes clear air to every arrow, its own included,
+      // so nothing here is excluded for belonging to the label. It simply has to measure what the
+      // gate measures.
+      const top = y - LABEL_H, bottom = y;
+      return [
+        ...verticals
+          .filter((v) => Math.min(v.y1, v.y2) < bottom + LABEL_GAP && Math.max(v.y1, v.y2) > top - LABEL_GAP)
+          .map((v) => [v.x - LABEL_GAP, v.x + LABEL_GAP] as [number, number]),
+        ...boxes
+          .filter((b) => b.y < bottom + LABEL_GAP && b.y + b.h > top - LABEL_GAP)
+          .map((b) => [b.x - LABEL_GAP, b.x + b.w + LABEL_GAP] as [number, number]),
+        ...settled
+          .filter((q) => Math.abs(q.y - y) < PITCH)
+          .map((q) => [q.x - LABEL_GAP, q.x + q.w + LABEL_GAP] as [number, number]),
+      ];
+    };
+    let best: { x: number; y: number } | null = null;
+    for (const dy of bands) {
+      const y = p.y + dy;
+      const blocked = blockedAt(y);
+      const free = (x: number) => x >= margin && x + p.w <= width - margin
+        && !blocked.some(([lo, hi]) => lo < x + p.w && x < hi);
+      if (free(p.x)) { best = { x: p.x, y: y }; break; }
       const tries = [...blocked.flatMap(([lo, hi]) => [hi, lo - p.w]), margin, width - margin - p.w]
         .filter(free)
         .sort((m, n) => Math.abs(m - p.x) - Math.abs(n - p.x));
-      if (tries.length) x = tries[0];
+      if (tries.length) { best = { x: tries[0], y: y }; break; }
     }
-    settled.push({ x, y: p.y, w: p.w });
-    return `  <text class="n" x="${Math.round(x)}" y="${p.y}">${esc(p.txt)}</text>`;
+    // NOWHERE CLEAR ANYWHERE still leaves it where it was put, and the check still reports it.
+    // A placer that invents room it does not have hides the crowding instead of fixing it.
+    const at = best ?? { x: p.x, y: p.y };
+    settled.push({ x: at.x, y: at.y, w: p.w });
+    return `  <text class="n" x="${Math.round(at.x)}" y="${Math.round(at.y)}">${esc(p.txt)}</text>`;
   });
 }
 
@@ -297,6 +347,7 @@ function drawEntities(spec: Spec): { svg: string; findings: string[] } {
   // point, so each would run straight through the other's label. Each gets a share of the gap and a
   // share of the edge it lands on, which is what keeps the labels readable (N13, 2026-09-21).
   const eVerts: Vert[] = [], ePending: Pending[] = [];
+  const eHorz: Blocker[] = [];
   // Per box AND per side, because a box can be pointed at from the left and point on to the right,
   // and each of those sides answers the how-many question on its own.
   const leaves = new Map<string, number>(), lands = new Map<string, number>();
@@ -315,7 +366,7 @@ function drawEntities(spec: Spec): { svg: string; findings: string[] } {
     lane.set(l, { i: peers.indexOf(l), n: peers.length });
   }
 
-  for (const l of links) {
+  for (const [pathId, l] of links.entries()) {
     const a = at.get(l.from), b = at.get(l.to);
     if (!a || !b) continue;
     const fromRight = a.x < b.x;
@@ -328,7 +379,7 @@ function drawEntities(spec: Spec): { svg: string; findings: string[] } {
     const dash = l.dashed ? ' stroke-dasharray="5 4"' : "";
     const dPath = `M${x1} ${y1} H${mid} V${y2} H${x2}`;
     out.push(`  <path class="c" d="${dPath}"${dash} marker-end="url(#ar)"/>`);
-    eVerts.push(...vertsOf(dPath));
+    eVerts.push(...vertsOf(dPath, pathId)); eHorz.push(...horzOf(dPath, pathId));
     // EVERY RELATION LINE CARRIES ITS CARDINALITY, which is what the chapter asks of this kind and
     // what the drawer had no field for: an ER diagram whose lines say only *belongs to* leaves the
     // reader with the one question they opened it to answer — one, or many? It rides with the label
@@ -354,11 +405,11 @@ function drawEntities(spec: Spec): { svg: string; findings: string[] } {
       // line reads as belonging to it exactly as one above it does.
       const under = i % 2 === 1;
       ePending.push({ x: Math.round(Math.min(Math.max(want, lo), Math.max(lo, hi - w))),
-                      y: y1 + (under ? LABEL_H + LABEL_GAP : -LABEL_GAP), w, txt: text });
+                      y: y1 + (under ? LABEL_H + LABEL_GAP : -LABEL_GAP), w, txt: text, path: pathId });
     }
   }
 
-  out.push(...placeLabels(ePending, eVerts, margin, width, [...at.values()]));
+  out.push(...placeLabels(ePending, eVerts, margin, width, [...at.values(), ...eHorz]));
 
   return { svg: svgOf(out, spec.title ?? spec.caption ?? "entity diagram"), findings };
 }
@@ -935,9 +986,10 @@ function drawMap(spec: Spec, opts: { downward?: boolean } = {}): { svg: string; 
   };
 
   const verticals: Vert[] = [];
+  const horizontals: Blocker[] = [];
   const pending: Pending[] = [];
 
-  for (const l of links) {
+  for (const [pathId, l] of links.entries()) {
     const a = at.get(l.from), b = at.get(l.to);
     if (!a || !b) continue;
     const dash = l.dashed ? ' stroke-dasharray="5 4"' : "";
@@ -1013,11 +1065,17 @@ function drawMap(spec: Spec, opts: { downward?: boolean } = {}): { svg: string; 
       if (l.label) label = labelAt(a.row - 1, (runFrom + sideX) / 2, w, runY - LABEL_GAP);
     }
     out.push(`  <path class="c" d="${d}"${dash} marker-end="url(#ar)"/>`);
-    if (label && l.label) { verticals.push(...vertsOf(d)); pending.push({ ...label, w, txt: l.label }); }
-    else verticals.push(...vertsOf(d));
+    horizontals.push(...horzOf(d, pathId));
+    if (label && l.label) { verticals.push(...vertsOf(d, pathId)); pending.push({ ...label, w, txt: l.label, path: pathId }); }
+    else verticals.push(...vertsOf(d, pathId));
   }
 
-  out.push(...placeLabels(pending, verticals, margin, width));
+  // THE BOXES GO IN. `placeLabels` has known since it was written that a box blocks as surely as a
+  // connector, and this call site never passed them — so a map's labels were slid clear of every
+  // line and dropped 2px from a box, which is the one fault the placer's own comment describes.
+  // Three call sites, one of them passing the argument: the lesson was learned in `entities` and
+  // never carried across.
+  out.push(...placeLabels(pending, verticals, margin, width, [...at.values(), ...horizontals]));
 
   return { svg: svgOf(out, spec.title ?? spec.caption ?? label), findings };
 }
@@ -1257,7 +1315,7 @@ function drawSystem(spec: Spec): { svg: string; findings: string[] } {
     best.forEach((l, i) => railOf.set(l, i));
   }
 
-  for (const l of links) {
+  for (const [pathId, l] of links.entries()) {
     const a = at.get(l.from), b = at.get(l.to);
     if (!a || !b) continue;
     const ba = shaped(byId.get(l.from) as Box & { as?: Resource });
@@ -1287,8 +1345,8 @@ function drawSystem(spec: Spec): { svg: string; findings: string[] } {
       lx2 = x1 + (stop - x1 - w) / 2; ly2 = Math.min(y1, y2) - LABEL_GAP;
     }
     body.push(`  <path class="c" d="${d}"${dash} marker-end="url(#ar)"/>`);
-    verticals.push(...vertsOf(d));
-    if (l.label) pending.push({ x: Math.round(lx2), y: Math.round(ly2), w, txt: l.label });
+    verticals.push(...vertsOf(d, pathId));
+    if (l.label) pending.push({ x: Math.round(lx2), y: Math.round(ly2), w, txt: l.label, path: pathId });
   }
   body.push(...placeLabels(pending, verticals, margin, rightX + rightW + margin));
 

@@ -388,5 +388,39 @@ console.log("\n=== ENTITIES — every relation line says one or many");
   }
 }
 
+// A LABEL HAS TWO AXES AND THE PLACER ONLY USED ONE. It slid each label along its own line and,
+// where every x in that band was taken, left it sitting on a connector — the figure check then
+// reported it, which is honest but is not a figure anybody can read. The two reviewed samples of
+// N13 carried ELEVEN such findings each. A label may now step to the next band up or down, two
+// either way, so it stays beside the line it names; horizontal is still tried first at every band.
+{
+  // The estate shape map, six boxes and six links with two crossing runs — the denser of the two
+  // samples, and the one that went from eleven findings to none.
+  const dense = { kind: "map",
+    boxes: [{ id: "repo", label: "Repository", note: "one sprepo.json at root", em: true },
+            { id: "world", label: "World", note: "what the repository grants" },
+            { id: "work", label: "Work branch", note: "feat · fix · chore" },
+            { id: "perm", label: "Permanent branches", note: "develop · qa · uat · main" },
+            { id: "tag", label: "Release tag", note: "one digest, approved" },
+            { id: "env", label: "Environment row", note: "declares its trigger" }],
+    links: [{ from: "repo", to: "world", label: "declares" },
+            { from: "work", to: "perm", label: "by pull request" },
+            { from: "perm", to: "tag", label: "cut from main" },
+            { from: "perm", to: "env", label: "deploys" },
+            { from: "tag", to: "env", label: "promotes into" }] };
+  const r = judge(dense);
+  one("a dense map draws with no finding of its own", r.findings, none);
+  one("and its labels each keep the clear air the contract owes", r.figure, none);
+  one("every label it was given is still on the figure", r.svg,
+      (g) => dense.links.every((l) => g.includes(l.label)));
+
+  // The placer may move a label to a neighbouring band; it may never move it out of the picture.
+  // A FIGURE HUGS ITS CONTENT, so its viewBox has an origin of its own and is not `0 0 w h`.
+  const ys = [...r.svg.matchAll(/<text class="n"[^>]*y="([\d.]+)"/g)].map((m) => Number(m[1]));
+  const vb = /viewBox="([\d.-]+) ([\d.-]+) ([\d.-]+) ([\d.-]+)"/.exec(r.svg).slice(1).map(Number);
+  one("no label is placed outside the figure's own box", ys,
+      (g) => g.length > 0 && g.every((y) => y >= vb[1] && y <= vb[1] + vb[3]));
+}
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);
