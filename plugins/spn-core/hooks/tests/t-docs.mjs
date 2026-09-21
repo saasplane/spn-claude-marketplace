@@ -650,6 +650,16 @@ console.log("\n=== the gap scan measures and never fixes");
         (g) => /class="home" href="\.\.\/\.\.\/\.\.\/02-constructs\/README\.md"/.test(g));
     one("and the page it produced is the page the audit expects", run(ws, ["audit", "docs"]),
         (g) => !/produced/.test(g));
+
+    // A `\|` in a cell is a pipe the author wants shown. The splitter cut the cell in two and the
+    // reader saw a five-column row in a three-column table (N13's sample, 2026-09-21). And a `####`
+    // used to fall through to the paragraph path, hashes and all.
+    writeFileSync(join(ws, "docs/02-constructs/01-core/thing.md"), seat("thing",
+      "## Boundary\n\n#### A sub-part\n\n| a | b | c |\n| --- | --- | --- |\n| repos | `{org}-public\\|-private` | x |\n"));
+    run(ws, ["page", "docs/02-constructs/01-core/thing.md"]);
+    const page2 = readAt(ws, "docs/artifacts/constructs/01-core/thing-construct.html");
+    one("an escaped pipe stays inside its cell", page2, has("<code>{org}-public|-private</code></td><td>x</td>"));
+    one("a level-four heading is a heading, not a paragraph of hashes", page2, has('<h4 id="a-sub-part">A sub-part</h4>'));
     delete process.env.SPN_TEMPLATES;
   }
   one("and it names what it did NOT measure rather than reporting a zero",

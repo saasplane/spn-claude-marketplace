@@ -104,7 +104,9 @@ function inline(s: string): string {
 }
 
 function table(lines: string[]): string {
-  const cells = (l: string) => l.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map((c) => c.trim());
+  // A `\|` inside a cell is a pipe the author wants shown, not a column break — markdown's own rule,
+  // and the one the first pattern table in the corpus needed (`{org}-{family}-public\|-private`).
+  const cells = (l: string) => l.trim().replace(/^\|/, "").replace(/\|$/, "").split(/(?<!\\)\|/).map((c) => c.trim().replace(/\\\|/g, "|"));
   const head = cells(lines[0]);
   const rows = lines.slice(2).map(cells);
   const th = head.map((c) => `<th>${inline(c)}</th>`).join("");
