@@ -543,17 +543,13 @@ export function voice(prose: string, sents: Sentence[], kind = "chapter", operat
   // out of it, and a measure needing a carve-out for a whole class of surface was measuring the
   // wrong thing. What reaches the reader is judged by the reach share below and by a person.
 
-  const bar = REACH_BAR[kind];
-  if (bar) {
-    const [hit, counted] = reach(sents, kind);
-    const share = counted ? (100 * hit) / counted : 0;
-    if (counted >= REACH_MIN_N && share < bar) {
-      const skipped = kind === "chapter" || kind === "concept" ? " — normative sentences sit outside the count" : "";
-      out.push(["SOFT", `${fixed(share, 0)} % of prose sentences reach the reader — ${hit} of ` +
-        `${counted} counted${skipped}, and the ${kind} bar is ${bar} % (RD.DOCS.044) · land it on ` +
-        `your reader. The corpus is swept for length, not yet for reach`]);
-    }
-  }
+  // THE REACH SHARE IS A STATISTIC, NEVER A FINDING (Q100, decided N13). It was reported per file as
+  // a SOFT, and a share is not a defect in the file it is measured on: reaching the reader is three
+  // moves, a script sees two of them, and the one it cannot see — a second person addressed without
+  // the word *you* — is the commonest. So a file scoring low is as likely to be prose the counter
+  // cannot read as prose that fails its reader, and a per-file verdict from a measure that admits it
+  // under-counts is a verdict nobody can act on. It stays in the rates table at the foot of a run,
+  // where a share is read across a corpus and compared against its bar, which is what a share is for.
   return out;
 }
 

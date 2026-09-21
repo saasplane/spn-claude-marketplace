@@ -331,5 +331,32 @@ console.log("\n=== the figure check learned about ellipses, and is still able to
     says("clear air to every shape it merely goes by"));
 }
 
+console.log("\n=== every example in the blocks reference actually draws");
+{
+  // THE REFERENCE IS WHAT AN AUTHOR COPIES FROM, so an example in it that does not draw is worse
+  // than no example: it is a wrong answer with the authority of a reference behind it. Q135 asked
+  // for a drift gate on this file, and this is it — the examples are executed, not proof-read.
+  const { readFileSync, existsSync } = await import("node:fs");
+  const here = new URL("../../refs/blocks.md", import.meta.url);
+  // A missing reference FAILS a case; it does not throw. A suite that crashes reports one word to
+  // the runner and loses every case after it, which is how a gate stops being one.
+  one("the blocks reference is where the plugin ships it", existsSync(here), true);
+  const src = existsSync(here) ? readFileSync(here, "utf8") : "";
+  const fences = [...src.matchAll(/```dg\n([\s\S]*?)\n```/g)].map((m) => m[1]);
+  one("the reference carries a worked example of more than one kind", fences.length, (g) => g >= 4);
+  for (const [i, f] of fences.entries()) {
+    let spec = null;
+    try { spec = JSON.parse(f); } catch (e) { spec = null; }
+    one(`example ${i + 1} is strict JSON`, spec, (g) => g !== null);
+    if (!spec) continue;
+    const r = judge(spec);
+    one(`example ${i + 1} (${spec.kind}) draws without a finding`, r.findings, none);
+    one(`example ${i + 1} (${spec.kind}) passes the figure check`, r.figure, none);
+  }
+  // And every kind the reference names in its table is a kind the drawer has.
+  const named = [...src.matchAll(/^\| `(\w+)` \| (?:the content|a process|the construct|a straight)/gm)].map((m) => m[1]);
+  one("every kind the reference's table names is a kind a helper draws", named, (g) => g.length >= 6 && g.every((k) => KINDS.includes(k)));
+}
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

@@ -294,7 +294,7 @@ A register row records *what* was decided, never the options that lost or what t
 
 **Markdown keeps its own grammar and HTML keeps the blocks.** A capability chapter stays markdown and is never produced as a page, so none of this reaches it. The split is stated in the book: `02-document.md` governs markdown, `05-artifacts.md` governs the page.
 
-**A block is a visual insert, not a section shape.** Normal prose needs no block. Reach for one when the content is *not* a paragraph, a list or a table — a rule the reader must not skim, a picture, a fixed list of doors, a comparison. Every block is defined once in `.spndevex/workstreams/open/008-plain-language/templates/blocks-template.html`; read that page before authoring a document with figures in it, and read a page template beside it.
+**A block is a visual insert, not a section shape.** Normal prose needs no block. Reach for one when the content is *not* a paragraph, a list or a table — a rule the reader must not skim, a picture, a fixed list of doors, a comparison. Every block and every figure kind is written out, in the spelling you actually type, in [`blocks.md`](blocks.md) beside this file — read that before authoring a document with figures in it, and read a page template beside it. **Do not open the HTML blocks template**: it is the *rendered* reference a person opens, it costs about 16,400 tokens, and three quarters of it is stylesheet, inline SVG and script that the renderer and the drawer produce for you (Q135, 2026-09-22).
 
 ### The figure kinds
 

@@ -109,13 +109,17 @@ one("an idiom a second-language reader cannot guess",
   "reports", "idiom");
 
 // RETIRED with the length cap, and for a sharper reason: a count of a pronoun cannot see an
-// imperative, so it read every instruction file as silent when it was anything but. It still
-// reports the REACH share, which is a different measure and is not retired — so this asserts the
-// finding it must no longer name rather than asserting silence.
-one("prose that never says you — the COUNT is retired",
+// imperative, so it read every instruction file as silent when it was anything but.
+//
+// AND THE REACH SHARE IS RETIRED AS A FINDING TOO (Q100, decided N13). It survives as a STATISTIC in
+// the rates table, because a share is read across a corpus and not pronounced on one file — the
+// measure admits it cannot see one of the three moves, and a verdict from a measure that
+// under-counts is a verdict nobody can act on. So this file, which reaches its reader by none of the
+// three moves, must now draw NOTHING from either measure.
+one("prose that never says you draws no finding — neither the count nor the share",
   write(CHAPTER, "# A chapter\n\n" + Array.from({ length: 9 }, (_, i) =>
     `The seat holds its own files and nothing else, in case ${i + 1}.`).join(" ") + "\n"),
-  "reports", "reach the reader");
+  "silent");
 
 one("an approach page with no Why, What or How",
   write(APPROACH, `<div class="eyebrow">Who this is for &middot; a reader</div><section><h2>Background</h2><p>You read it once and you know it.</p></section>`),
