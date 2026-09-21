@@ -25,6 +25,11 @@ const MIN_SHAFT = 36, LABEL_TOL = 1, PAD = 16, PAD_TOL = 2;
 const LABEL_GAP = 8, GAP_APART = 24;
 // How far off a side's centre a lone arrow may land before a reader sees it as off-centre.
 const CENTRE_TOL = 2;
+// The clear air a connector owes a shape it passes without touching. It is the contract's own
+// unconnected gap rather than the padding number: at 16 a line threading between two stacked boxes
+// measured clean and still read as cramped, because what was too small was the corridor, not the
+// line's distance from either side. 24 forces the corridor to be one a reader can see through.
+const LINE_CLEAR = GAP_APART;
 /** The drawn length of a connector, summed over its segments. */
 const shaftOf = (pts: Pt[]): number => {
   let n = 0;
@@ -123,6 +128,14 @@ function distSegRect(a: Pt, b: Pt, r: Rect): number {
   const dx = Math.max(0, rx - hi[0], lo[0] - (rx + rw));
   const dy = Math.max(0, ry - hi[1], lo[1] - (ry + rh));
   return Math.hypot(dx, dy);
+}
+
+function sideOfAny(p: Pt, r: Rect): boolean {
+  const [rx, ry, rw, rh] = r;
+  const onX = rx - BOX_TOL <= p[0] && p[0] <= rx + rw + BOX_TOL;
+  const onY = ry - BOX_TOL <= p[1] && p[1] <= ry + rh + BOX_TOL;
+  return (onX && (Math.abs(p[1] - ry) <= BOX_TOL || Math.abs(p[1] - (ry + rh)) <= BOX_TOL))
+      || (onY && (Math.abs(p[0] - rx) <= BOX_TOL || Math.abs(p[0] - (rx + rw)) <= BOX_TOL));
 }
 
 function onBox(p: Pt, rects: Rect[]): boolean {
@@ -235,6 +248,38 @@ export function checkFigures(src: string): FigureFinding[] {
       }
     });
 
+    // A CONNECTOR OWES CLEAR AIR TO EVERY SHAPE IT MERELY PASSES. Landing on a box is a claim; running
+    // alongside one is not, and a line threaded two pixels past a corner reads as touching it. The
+    // rules so far protected labels from lines and lines from each other, and left the commonest
+    // crowding in a dense figure unmeasured (developer, 2026-09-21).
+    // A CONTAINER IS EXEMPT HERE TOO, and for a plainer reason than the centring rule: a connector that
+    // reaches a box inside a boundary from outside it MUST cross that boundary, so measuring the wall
+    // it crosses reports the idiom rather than a fault. Every 0px hit the rule first produced was one
+    // of those, and the one real finding under them was a line five pixels off a terminal.
+    const encloses = (r: Rect) => rects.some((q) =>
+      q !== r && q[0] >= r[0] && q[1] >= r[1] && q[0] + q[2] <= r[0] + r[2] && q[1] + q[3] <= r[1] + r[3]);
+    for (const seg of crossable) {
+      let worstBox: number | null = null;
+      // A box INSIDE a container the line is attached to is not a box the line merely passes: it is
+      // the padding of the thing the line comes out of. Requiring 24 there would contradict the grid,
+      // which fixes a container's padding at 16 — two rules of this chapter disagreeing, which is the
+      // fault this whole arc keeps finding, so the narrower rule yields to the one the grid states.
+      const attached = rects.filter((r) => [seg.a, seg.b].some((p) => sideOfAny(p, r)));
+      const inside = (r: Rect) => attached.some((c) =>
+        c !== r && r[0] >= c[0] && r[1] >= c[1] && r[0] + r[2] <= c[0] + c[2] && r[1] + r[3] <= c[1] + c[3]);
+      for (const r of rects) {
+        if (encloses(r) || inside(r)) continue;
+        const touches = [seg.a, seg.b].some((p) => sideOfAny(p, r));
+        if (touches) continue;
+        const d = distSegRect(seg.a, seg.b, r);
+        if (d < LINE_CLEAR && (worstBox === null || d < worstBox)) worstBox = d;
+      }
+      if (worstBox !== null) {
+        findings.push({ figure: n + 1, message: `a connector passes ${Math.round(worstBox)}px from a box it does not touch — a line owes ${LINE_CLEAR}px of clear air to every shape it merely goes by` });
+        break;
+      }
+    }
+
     // A SIDE WITH ONE CONNECTOR ON IT TAKES IT IN THE MIDDLE. Where several arrows share a side they
     // spread across it; where one arrow has the side to itself, the middle is the only place it
     // belongs — an arrow landing off-centre makes a reader look for the second arrow that would
@@ -310,7 +355,12 @@ export function checkFigures(src: string): FigureFinding[] {
         }
         const [ax2, ay2] = overlap(air, b);
         if (ax2 > 0 && ay2 > 0) {
-          findings.push({ figure: n + 1, message: `the label "${txt.slice(0, 34)}" comes within ${Math.round(LABEL_GAP - Math.min(ax2, ay2))}px of a box it is not inside — a label owes ${LABEL_GAP}px of clear air to every shape but its own` });
+          // The shortfall can compute to zero or less, which means the two are touching within the
+          // tolerance the overlap rule allows — say so rather than printing a negative distance.
+          const room = Math.round(LABEL_GAP - Math.min(ax2, ay2));
+          findings.push({ figure: n + 1, message: room > 0
+            ? `the label "${txt.slice(0, 34)}" comes within ${room}px of a box it is not inside — a label owes ${LABEL_GAP}px of clear air to every shape but its own`
+            : `the label "${txt.slice(0, 34)}" touches a box it is not inside — a label owes ${LABEL_GAP}px of clear air to every shape but its own` });
           break;
         }
       }
