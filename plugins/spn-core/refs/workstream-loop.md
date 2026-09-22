@@ -2,7 +2,7 @@
 {
   "chapters": [
     { "path": "docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md", "seen": "cad9fd97" },
-    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "5d03bdc4" }
+    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "ced836b6" }
   ]
 }
 -->

@@ -100,9 +100,15 @@ function sectionName(heading: string): string {
  * is how `refs/doc-sets.md`, which carries no block of its own, acquired one: its only `spn:doc`
  * sits inside its `## Metadata` sample. The writer was one run away from editing the illustration
  * a rule is taught by.
+ *
+ * AN INLINE CODE SPAN IS A MENTION FOR THE SAME REASON A FENCE IS. A brief describing what to write
+ * says *the `<!-- spn:doc { ... } -->` block*, and reading that as this document's own reported
+ * `not strict JSON` against the literal three dots — a refusal about prose that was correctly
+ * quoting the grammar. Spans are blanked to their own length, so every later offset still lines up.
  */
 function readBlock(src: string): { block: any | null; error: string | null } {
-  const m = outsideFences(src).match(/<!--\s*spn:doc\s*([\s\S]*?)-->/);
+  const mentions = outsideFences(src).replace(/`[^`\n]*`/g, (s) => " ".repeat(s.length));
+  const m = mentions.match(/<!--\s*spn:doc\s*([\s\S]*?)-->/);
   if (!m) return { block: null, error: "no spn:doc block" };
   try {
     return { block: JSON.parse(m[1].trim()), error: null };
@@ -507,6 +513,13 @@ function folderTree(dir: string): string[] {
  * The scripts are what is compared, because they are the behaviour: the rail builder, the fold, and
  * the anchor that makes a heading shareable. Whitespace is normalized, because a re-indent is not a
  * change in what the page does.
+ *
+ * THE PALETTE IS COMPARED BY TOKEN NAME AND NEVER BY COLOUR. Fourteen pages defined the seven
+ * code-colour tokens in their light block and in neither dark one, so every code figure on them
+ * kept light-mode syntax colours on a near-black ground; four guarded the system-dark block with a
+ * bare `:root`, which a reader who had explicitly chosen light could not override. A missing token
+ * is not a choice — it falls back to whatever the light block said. A DIFFERENT VALUE IS a choice,
+ * because the palette is the one part of the furniture a repository is allowed to set for itself.
  */
 function checkFurniture(file: string, src: string, templates: string): Finding[] {
   if (!src.includes('id="rail"')) return [];
@@ -523,6 +536,65 @@ function checkFurniture(file: string, src: string, templates: string): Finding[]
   return [{ check: "furniture", grade: "RULE", file, message:
     `this page's scripts are not the template's — ${missing} missing, ${extra} it does not share. ` +
     "A page carrying a rail carries the rail builder, the fold and the heading anchor as the template ships them" }];
+}
+
+/** The three palette blocks, in the order a browser resolves them. */
+const PALETTES: ReadonlyArray<readonly [string, string]> = [
+  [":root", "the light palette"],
+  [':root:not([data-theme="light"])', "the palette a dark system gets"],
+  [':root[data-theme="dark"]', "the palette an explicit dark choice gets"],
+];
+
+/**
+ * Every `--token:` declared in the rule with this exact selector, or null when there is no such rule.
+ *
+ * THE EARLIER OF THE TWO SPELLINGS WINS, never the braced one by preference. Trying `:root{` before
+ * `:root {` made the check read a *later* block as the light palette on a page whose dark rule had
+ * lost its `:not([data-theme="light"])` guard — and it then reported nine light tokens missing,
+ * which was the tool matching the wrong rule rather than the page lacking anything.
+ */
+function paletteTokens(src: string, selector: string): Set<string> | null {
+  const tight = src.indexOf(selector + "{");
+  const loose = src.indexOf(selector + " {");
+  const at = tight < 0 ? loose : loose < 0 ? tight : Math.min(tight, loose);
+  if (at < 0) return null;
+  const open = src.indexOf("{", at);
+  const close = src.indexOf("}", open);
+  if (open < 0 || close < 0) return null;
+  return new Set([...src.slice(open + 1, close).matchAll(/(--[a-z0-9-]+)\s*:/g)].map((m) => m[1]));
+}
+
+/**
+ * A page's palette declares every token the template declares, in all three of its blocks.
+ *
+ * Separate from `checkFurniture` because the remedy is different. A stale script is replaced with
+ * the template's; a short palette is filled with the tokens it lacks, and the colours the page
+ * already sets are left exactly as they are.
+ */
+function checkPalette(file: string, src: string, templates: string): Finding[] {
+  if (!src.includes('id="rail"')) return [];
+  let tpl: string;
+  try { tpl = readFileSync(join(templates, "pages", "construct-template.html"), "utf8"); }
+  catch { return []; }
+  const f: Finding[] = [];
+  for (const [selector, plain] of PALETTES) {
+    const want = paletteTokens(tpl, selector);
+    if (!want?.size) continue;
+    const have = paletteTokens(src, selector);
+    if (have === null) {
+      f.push({ check: "palette", grade: "RULE", file, message:
+        `there is no \`${selector}\` rule, so ${plain} is missing entirely. ` +
+        "Without it a reader's explicit theme choice loses to whatever their system is set to" });
+      continue;
+    }
+    const short = [...want].filter((t) => !have.has(t));
+    if (!short.length) continue;
+    f.push({ check: "palette", grade: "RULE", file, message:
+      `${plain} declares ${short.length} token(s) fewer than the template — ${short.join(", ")}. ` +
+      "A token the page does not set falls back to the light value, which on a dark ground is unreadable. " +
+      "Add the names; the colours a page already sets are its own" });
+  }
+  return f;
 }
 
 function checkStyleBalance(file: string, src: string): Finding[] {
@@ -2067,6 +2139,7 @@ function audit(paths: string[], workspace: string): Finding[] {
     findings.push(...checkTreeFigures(p, src, workspace));
     findings.push(...checkStyleBalance(p, src));
     findings.push(...checkFurniture(p, src, templates));
+    findings.push(...checkPalette(p, src, templates));
     findings.push(...checkGovernsMap(p, src));
     findings.push(...checkProof(p, src));
     findings.push(...checkBinds(p, src, block, nodes));
