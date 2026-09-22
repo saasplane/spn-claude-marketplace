@@ -36,6 +36,7 @@ Each verb is a different point on one walk, and the last box is the same for all
 
 ```dg
 { "kind": "map",
+  "caption": "Every verb ends at the tool verb, because a cloud is changed only through the tool's own doors.",
   "boxes": [
     { "id": "a", "label": "the ask", "note": "change what the estate is, or publish what it runs" },
     { "id": "b", "label": "the verb", "note": "one of the four folders, chosen by its own description" },

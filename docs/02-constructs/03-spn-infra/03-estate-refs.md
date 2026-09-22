@@ -36,6 +36,7 @@ A card sits between the book and the moment somebody needs a word, and it is rea
 
 ```dg
 { "kind": "map",
+  "caption": "The card is reached by a citation rather than by a folder, so the reader needs no book checkout.",
   "boxes": [
     { "id": "a", "label": "the book", "note": "the estate sections of the foundation's own concept" },
     { "id": "b", "label": "the card", "note": "one subject, restated in full, under a stamp" },

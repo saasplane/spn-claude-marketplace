@@ -36,6 +36,7 @@ The hash is taken once, when the copy is made. Everything afterwards is a compar
 
 ```dg
 { "kind": "map",
+  "caption": "The stamp stands between the copy and the drift run, which is what lets a run name the chapter that moved.",
   "boxes": [
     { "id": "a", "label": "a chapter", "note": "the rule's one home, in the foundation book" },
     { "id": "b", "label": "the restatement", "note": "the copy a reader with no book checkout can read" },

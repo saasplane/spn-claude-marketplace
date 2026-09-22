@@ -36,6 +36,7 @@ A gate names a viewpoint, the viewpoint resolves to a file, and the file is what
 
 ```dg
 { "kind": "map",
+  "caption": "Authority comes from the lens file rather than from the gate, which only chooses which viewpoint reads.",
   "boxes": [
     { "id": "a", "label": "a gate", "note": "a moment a skill says to convene a review" },
     { "id": "b", "label": "a lens name", "note": "one of the values the panel's own description lists" },

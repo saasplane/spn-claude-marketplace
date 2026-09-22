@@ -36,6 +36,7 @@ The path is read first, because one refusal needs nothing else. Then the text th
 
 ```dg
 { "kind": "map",
+  "caption": "The path is read before any text, because the build output refusal needs nothing else to decide.",
   "boxes": [
     { "id": "a", "label": "a Write or an Edit", "note": "the only two calls the wiring matches" },
     { "id": "b", "label": "the path", "note": "build output is refused here, before any text is read" },

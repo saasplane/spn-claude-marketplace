@@ -36,6 +36,7 @@ One call reaches one process. That process asks each check that could have an op
 
 ```dg
 { "kind": "map",
+  "caption": "The verdict is returned rather than printed and parsed back, so a refusal cannot be lost.",
   "boxes": [
     { "id": "a", "label": "hooks.json", "note": "one entry per moment — a matcher, a command, a timeout" },
     { "id": "b", "label": "the event", "note": "the harness hands the script its payload on stdin" },

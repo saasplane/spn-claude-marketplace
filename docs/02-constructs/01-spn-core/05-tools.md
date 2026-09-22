@@ -36,6 +36,7 @@ Nothing matches a tool against the work you are doing, so you reach one by namin
 
 ```dg
 { "kind": "map",
+  "caption": "The findings a person reads and the exit code a pipeline reads come from one list, and only the refusals are counted.",
   "boxes": [
     { "id": "a", "label": "a person or a skill", "note": "nothing wires a tool; it is invoked by its own path" },
     { "id": "b", "label": "the tool", "note": "a file under hooks/tools/, run against a repository" },

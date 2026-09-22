@@ -36,6 +36,7 @@ The moments run in the order a session meets them. Nothing chains one to the nex
 
 ```dg
 { "kind": "map",
+  "caption": "Only the call moment sits before the act, so every later moment can speak and never refuse.",
   "boxes": [
     { "id": "a", "label": "the window opens", "note": "SessionStart — the ground is read and printed" },
     { "id": "b", "label": "a call is about to run", "note": "PreToolUse — the one moment a call can be refused" },

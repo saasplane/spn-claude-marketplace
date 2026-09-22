@@ -36,6 +36,7 @@ The register is found by what it looks like, its rows are matched against a run 
 
 ```dg
 { "kind": "map",
+  "caption": "Only Status and Updated at are rewritten, because every other cell is a decision somebody made.",
   "boxes": [
     { "id": "a", "label": "the register", "note": "any table carrying the headings, wherever it sits" },
     { "id": "b", "label": "a row", "note": "four cells somebody decided, and two a run found" },

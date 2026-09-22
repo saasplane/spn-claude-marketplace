@@ -36,6 +36,7 @@ The listing is cheap to hold because it is one line per skill. Everything expens
 
 ```dg
 { "kind": "map",
+  "caption": "The listing is the only part held in full; everything after it is read only on a match.",
   "boxes": [
     { "id": "a", "label": "the work at hand", "note": "what this turn is trying to do, in your own words" },
     { "id": "b", "label": "the listing", "note": "every installed skill's name and description, one line each" },

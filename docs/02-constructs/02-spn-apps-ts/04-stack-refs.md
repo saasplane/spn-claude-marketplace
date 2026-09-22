@@ -36,6 +36,7 @@ The verb is one. The layer is chosen from the repository's own claim, and what i
 
 ```dg
 { "kind": "map",
+  "caption": "The claim selects the layer, so the layer file needs no trigger of its own to be reached.",
   "boxes": [
     { "id": "a", "label": "the planning verb", "note": "stack-agnostic, and shipped once by the core plugin" },
     { "id": "b", "label": "the claim", "note": "the world and the stack the repository declares for itself" },

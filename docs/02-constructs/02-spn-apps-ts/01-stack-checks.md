@@ -36,6 +36,7 @@ A write is read as the file would be after it lands, then searched, and only a p
 
 ```dg
 { "kind": "map",
+  "caption": "The middle step overlays the pending write, so only the pattern this edit introduces is answered for.",
   "boxes": [
     { "id": "a", "label": "a Write or an Edit", "note": "the only two calls this plugin's wiring matches" },
     { "id": "b", "label": "the source as it would be", "note": "comments masked, the pending write overlaid" },

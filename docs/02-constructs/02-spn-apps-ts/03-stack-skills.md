@@ -36,6 +36,7 @@ The ask is matched to a verb, the verb is narrowed by a mode, and only the longe
 
 ```dg
 { "kind": "map",
+  "caption": "Each step narrows the one before it, and only the build verb divides into ordered steps at all.",
   "boxes": [
     { "id": "a", "label": "the ask", "note": "build, scaffold, run, prove, review — in your own words" },
     { "id": "b", "label": "the verb", "note": "one of the five folders, chosen by its own description" },

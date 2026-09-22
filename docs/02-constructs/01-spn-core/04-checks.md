@@ -36,6 +36,7 @@ Every check is asked the same questions in the same order, and the order is what
 
 ```dg
 { "kind": "map",
+  "caption": "The `applies` test stands before any reading, so a call that cannot interest a check costs almost nothing.",
   "boxes": [
     { "id": "a", "label": "the call", "note": "a path, a shell command, or both" },
     { "id": "b", "label": "applies", "note": "could this check have an opinion, from the path alone" },

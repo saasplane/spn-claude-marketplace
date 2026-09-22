@@ -36,6 +36,7 @@ The author writes one file. Everything else in the chain is produced from it, in
 
 ```dg
 { "kind": "map",
+  "caption": "The comparison judges the page against what the seat file produces again, so a hand edit cannot survive.",
   "boxes": [
     { "id": "a", "label": "the seat file", "note": "markdown an author writes, with its metadata block" },
     { "id": "b", "label": "the renderer", "note": "the body, each figure drawn, then the furniture" },

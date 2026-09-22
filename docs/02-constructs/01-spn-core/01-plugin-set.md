@@ -35,6 +35,7 @@ Three files carry a plugin from an author's edit to the session that reads it, a
 
 ```dg
 { "kind": "map",
+  "caption": "No arrow reaches a session from this checkout; only the installed copy is ever read.",
   "boxes": [
     { "id": "a", "label": "marketplace.json", "note": "one entry per plugin — its name, its folder, its description" },
     { "id": "b", "label": "plugin.json", "note": "the plugin's own claim — name, version, description, author" },

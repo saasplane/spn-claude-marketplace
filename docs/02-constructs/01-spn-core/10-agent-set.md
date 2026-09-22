@@ -36,6 +36,7 @@ A session names a persona. The brief decides what that persona may do, and the a
 
 ```dg
 { "kind": "map",
+  "caption": "The brief's own authority bounds the answer, so a caller cannot ask a reviewing persona to edit.",
   "boxes": [
     { "id": "a", "label": "a session", "note": "convenes a persona by name, in the middle of a turn" },
     { "id": "b", "label": "the brief", "note": "a name, a description, and sometimes a model and tools" },
