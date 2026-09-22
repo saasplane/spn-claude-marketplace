@@ -1679,13 +1679,15 @@ function joinProof(seat: string, markdown: string, workspace: string): { md: str
   let cut = lines.findIndex((l, k) => k > head && k < endOf && l.trim().startsWith("|"));
   if (cut < 0) cut = endOf;
 
-  const at = today();
   // Named relative to the repository's own `docs/`, which is how every other path on a page reads.
   const treeRoot = seat.replace(/\\/g, "/").slice(0, seat.replace(/\\/g, "/").indexOf("/02-constructs/"));
   const shown = relative(treeRoot, reg.file).replace(/\\/g, "/");
+  // No date here. A produced page is a function of its sources, and the day it was produced is not
+  // one of them — a stamp made every page differ from itself the morning after it was written, and
+  // `produced` compares bytes. The line says where the rows came from, which is what a reader uses.
   const table = [
     "",
-    `*Behaviours: joined from the register, \`${shown}\` as of ${at} — never typed in the seat file.*`,
+    `*Behaviours: joined from the register, \`${shown}\` — never typed in the seat file.*`,
     "",
     "| Row | Does | Tier | Status |",
     "| --- | --- | --- | --- |",
@@ -2025,7 +2027,7 @@ function gapReport(repo: string, workspace: string): number {
     // table row, a heading, the reading strip. A block is `[text, sentences]`.
     const blocks = proseParagraphs(raw);
     let flagged = 0;
-    for (const [text, sents] of blocks) if (Object.keys(proseScore(text, sents)).length) flagged += 1;
+    for (const [text, sents, section] of blocks) if (Object.keys(proseScore(text, sents, section)).length) flagged += 1;
     if (flagged) prose.push({ file: relative(repo, file), paras: blocks.length, flagged });
   }
   prose.sort((a, b) => b.flagged - a.flagged);

@@ -69,7 +69,7 @@ export function commentBlocks(src: string, style: string): string[] {
   return out;
 }
 
-type Block = [text: string, sentences: Sentence[]];
+type Block = [text: string, sentences: Sentence[], section?: string];
 
 /**
  * Comment blocks carrying a real sentence.
@@ -103,17 +103,57 @@ const ABSTRACT = /\bthe (?:property|thing|point|reason|part) (?:that|which)\b|\b
 // has to clear, which costs more than it saves.
 const METAPHOR = /\b(?:fates?|degrade[sd]? into|centre of gravity|center of gravity|lifeblood|heartbeat|marriage of|wedded to|a home for|breathes?)\b/i;
 
+// A section whose OPENING FORM the document chapter mandates. Every construct page carries a
+// `## Boundary`, and its paragraphs are required to read "This page answers … It does not answer X.
+// That is Y." — so the pronoun opener fires on all of them, correctly by the letter of the rule and
+// wrongly about the corpus. It was 287 of 445 candidates, and a rewriting pass would have taken the
+// mandated form out of every construct page in the workspace while obeying its instrument.
+// The section is the unit the book mandates, so the section is the unit exempted. Only the opener
+// is waived: an idiom inside a Boundary block is still an idiom.
+const MANDATED_OPENER = /^boundary$/i;
+
 const FAULTS = ["idiom", "opener", "abstract", "metaphor"];
 
 /**
- * Prose blocks, each with its sentences. `proseOf` has already removed every code block, table row,
- * heading and rail, so what is left is what a reader actually reads.
+ * Each `##` section of a document, with its heading.
+ *
+ * Fences are tracked, because a `## ` line inside a fenced sample is a sample and not a heading —
+ * splitting on it would put the rest of the document in a section that does not exist.
+ */
+function sectionsOf(raw: string): { heading: string; body: string }[] {
+  const out: { heading: string; body: string }[] = [];
+  let heading = "";
+  let body: string[] = [];
+  let fenced = false;
+  for (const line of raw.split("\n")) {
+    if (/^\s*```/.test(line)) fenced = !fenced;
+    const head = fenced ? null : /^##\s+(.+?)\s*$/.exec(line);
+    if (head) {
+      out.push({ heading, body: body.join("\n") });
+      heading = head[1].replace(/[*`_]/g, "").trim();
+      body = [];
+      continue;
+    }
+    body.push(line);
+  }
+  out.push({ heading, body: body.join("\n") });
+  return out;
+}
+
+/**
+ * Prose blocks, each with its sentences and the section it came from. `proseOf` has already removed
+ * every code block, table row, heading and rail, so what is left is what a reader actually reads.
+ *
+ * The section is carried because `proseOf` blanks headings, so by the time a block is scored there
+ * is no way left to tell which section it sat in — and one section's opening form is mandated.
  */
 export function paragraphs(raw: string): Block[] {
   const out: Block[] = [];
-  for (const block of proseOf(raw, false).split(BLOCK_BREAK)) {
-    const sents = sentences(block);
-    if (sents.length) out.push([block.split(/\s+/).filter(Boolean).join(" "), sents]);
+  for (const { heading, body } of sectionsOf(raw)) {
+    for (const block of proseOf(body, false).split(BLOCK_BREAK)) {
+      const sents = sentences(block);
+      if (sents.length) out.push([block.split(/\s+/).filter(Boolean).join(" "), sents, heading]);
+    }
   }
   return out;
 }
@@ -122,13 +162,15 @@ export function paragraphs(raw: string): Block[] {
  * Which of the detectable faults this paragraph carries, and why — the reason is what a rewriting
  * agent is given, so it never has to re-derive the finding.
  */
-export function score(block: string, sents: Sentence[]): Record<string, string> {
+export function score(block: string, sents: Sentence[], section = ""): Record<string, string> {
   const found: Record<string, string> = {};
   const clean = block.replace(MARKED, " ");
   const idioms = [...new Set([...clean.matchAll(IDIOM)].map((m) => m[1].toLowerCase()))].sort();
   if (idioms.length) found.idiom = idioms.join(" · ");
   const first = sents[0][0];
-  const hits = Object.entries(OPENERS).filter(([, pattern]) => pattern.test(first)).map(([name]) => name);
+  const hits = MANDATED_OPENER.test(section)
+    ? []
+    : Object.entries(OPENERS).filter(([, pattern]) => pattern.test(first)).map(([name]) => name);
   if (hits.length) found.opener = `${hits.join(" + ")} — "${opening(first, 8)}"`;
   const abstract = [...clean.matchAll(ABSTRACT)].map((m) => m[0].trim().toLowerCase());
   if (abstract.length) found.abstract = [...new Set(abstract)].sort().join(" · ");
@@ -192,7 +234,7 @@ function survey(roots: string[], done: Set<string>, comments: boolean): [Row[], 
     if (done.has(digest(path))) { skipped += 1; continue; }
     const style = CODE_EXT[extname(path)];
     const blocks = style ? proseComments(path, style) : paragraphs(raw);
-    const flagged = blocks.map(([b, s]) => [b, s, score(b, s)] as [string, Sentence[], Record<string, string>])
+    const flagged = blocks.map(([b, s, sec]) => [b, s, score(b, s, sec)] as [string, Sentence[], Record<string, string>])
       .filter(([, , found]) => Object.keys(found).length);
     if (blocks.length)
       rows.push([path, blocks.length, blocks.reduce((sum, [, s]) => sum + s.length, 0), flagged]);
@@ -220,8 +262,8 @@ export function main(argv: string[]): number {
     for (const path of filesUnder(roots, comments)) {
       const style = CODE_EXT[extname(path)];
       const blocks = style ? proseComments(path, style) : paragraphs(read(path));
-      for (const [block, sents] of blocks) {
-        const found = score(block, sents);
+      for (const [block, sents, section] of blocks) {
+        const found = score(block, sents, section);
         if (!Object.keys(found).length) continue;
         console.log(`\n--- ${path}  [${Object.entries(found).map(([k, v]) => `${k}: ${v}`).join(" · ")}]`);
         console.log(block);
