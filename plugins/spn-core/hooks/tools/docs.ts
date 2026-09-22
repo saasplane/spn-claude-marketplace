@@ -475,6 +475,32 @@ function folderTree(dir: string): string[] {
  * does not exist misleads a reader following the page; a folder that exists and is not drawn is how
  * the page silently falls behind the code it describes. Only the second one happens by itself.
  */
+/**
+ * A page's stylesheet closes every brace it opens.
+ *
+ * ONE STRAY `}` ENDS THE SHEET AND EVERY RULE AFTER IT IS DISCARDED, silently — the page still
+ * renders, the rules that came first still apply, and nothing reports anything. That is how 47
+ * pages shipped with a dead tail: a restore spliced a `@media` rule in without its opener and kept
+ * both closing braces, so the sheet balanced at -1 from that point on. It was found by reading a
+ * browser's inspector, which is the opposite of a gate.
+ *
+ * Comments are removed first, because a brace inside one is text rather than structure.
+ */
+function checkStyleBalance(file: string, src: string): Finding[] {
+  const f: Finding[] = [];
+  const blocks = [...src.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)];
+  blocks.forEach((m, i) => {
+    const body = m[1].replace(/\/\*[\s\S]*?\*\//g, "");
+    const depth = (body.match(/\{/g) ?? []).length - (body.match(/\}/g) ?? []).length;
+    if (depth === 0) return;
+    const which = blocks.length > 1 ? ` (style block ${i + 1} of ${blocks.length})` : "";
+    f.push({ check: "style", grade: "RULE", file, message: depth < 0
+      ? `the stylesheet closes ${-depth} more brace(s) than it opens${which} — everything after the extra \`}\` is discarded`
+      : `the stylesheet leaves ${depth} brace(s) open${which} — the rules after it are swallowed by whatever did not close` });
+  });
+  return f;
+}
+
 function checkTreeFigures(file: string, src: string, root: string): Finding[] {
   const f: Finding[] = [];
   // THE PARAGRAPH BEFORE A TREE NAMES ITS FOLDER, and the path is the LAST `<code>` in it.
@@ -2000,6 +2026,7 @@ function audit(paths: string[], workspace: string): Finding[] {
     findings.push(...checkCards(p, src, block));
     findings.push(...checkCodeFigures(p, src, workspace));
     findings.push(...checkTreeFigures(p, src, workspace));
+    findings.push(...checkStyleBalance(p, src));
     findings.push(...checkGovernsMap(p, src));
     findings.push(...checkProof(p, src));
     findings.push(...checkBinds(p, src, block, nodes));

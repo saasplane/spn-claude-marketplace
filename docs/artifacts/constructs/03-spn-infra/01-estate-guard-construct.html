@@ -102,6 +102,11 @@
   .dg .l{font-family:var(--ui);font-size:12px;fill:var(--ink)}
   .dg .s{font-family:var(--mono);font-size:11px;fill:var(--slate)}
   .dg .n{font-family:var(--ui);font-size:11px;fill:var(--faint)}
+  /* The arrowhead is a marker filled with `currentColor`, and a marker resolves that against
+     its own inherited colour rather than the path that references it. With nothing setting
+     `color` on the figure, every connector drew a blue line ending in a black head. Setting it
+     on `.dg` makes the head take the line's colour, and the marker needs no change. */
+  .dg{color:var(--accent)}
   .dg .c{stroke:var(--accent);stroke-width:1.6;fill:none}
   .pull{border-left:2px solid var(--accent);background:var(--accent-soft);padding:1rem 1.2rem;margin:1.6rem 0;border-radius:0 3px 3px 0}
   .pull .label{display:block;font-family:var(--ui);font-size:var(--xs);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.3rem}
@@ -121,6 +126,48 @@
     .rail a{border-left:none;padding-left:0}
     .rail a.on{border-left:none}
   }
+
+  /* THE OUTLINE HAS TWO LEVELS, AND THEY DIFFER ON THREE AXES — size, weight and colour together.
+     One axis is not enough at rail size: a single step reads as noise rather than as a level, and
+     the two collapse into each other. Nothing in an outline sits on --faint either, because that is
+     the token for text a reader is meant to skim past and an outline is what they navigate by. */
+  .rail a:not(.sub):not(.home){font-size:.88rem;font-weight:400;color:var(--ink);letter-spacing:-.005em}
+  .rail a.sub{font-size:.78rem;font-weight:400;color:var(--slate)}
+  .rail .rail-title{color:var(--slate)}
+
+  /* ONE LEFT EDGE FOR BOTH LEVELS. An indent repeats what the fold already says, and it costs the
+     longer labels a wrapped line. Both are stated in one rule: setting only the subsection's
+     padding leaves it outdented past its own section, because another rule still sets the
+     section's. */
+  .rail a:not(.home), .rail a.sub{padding-left:.6rem}
+
+  /* EVERYTHING ON THE RIGHT SITS ON THE LABEL'S CENTRE LINE. The row is a flex line, and its
+     default is to stretch, so a chevron or a count badge beside a label that wrapped to two lines
+     was pinned to the top of the row rather than level with it. */
+  .rail a{align-items:center}
+  .rail .count{align-self:center}
+
+  /* WEIGHT AND COLOUR MARK WHERE YOU ARE, NEVER WHAT A LEVEL IS. The notch is an inset shadow and
+     not a border: a border changes the box, so a label would jump sideways by the notch's width the
+     moment it became current. These are restated at matching specificity because the level rules
+     above are more specific than `.rail a.on`, and would otherwise strip the selected state. */
+  .rail a.on:not(.sub):not(.home){font-weight:650;color:var(--accent);box-shadow:inset 1.5px 0 0 var(--accent)}
+  .rail a.on.sub{color:var(--accent);box-shadow:inset 1.5px 0 0 var(--accent)}
+  .rail a:not(.sub):not(.home):hover{color:var(--accent)}
+  .rail a.sub:hover{color:var(--ink)}
+
+  /* THE DISCLOSURE IS A CHEVRON, DRAWN RATHER THAN TYPED. A glyph ties the mark to whatever font
+     is resolved and to that font's own idea of weight and baseline; two borders on a rotated box
+     are the same shape at every size and inherit the row's colour. Right means closed, down means
+     open, and only the chevron turns — the box around it stays put so the hit target never moves. */
+  .rail a .caret{margin-left:auto;flex:none;width:1.35rem;height:1.35rem;display:grid;place-items:center;
+    color:var(--faint);border-radius:3px;transform:none}
+  .rail a .caret::before{content:"";width:.32rem;height:.32rem;border-right:1.5px solid currentColor;
+    border-bottom:1.5px solid currentColor;transform:translateX(-.1rem) rotate(-45deg);transition:transform .15s ease}
+  .rail a.group-open .caret{transform:none}
+  .rail a.group-open .caret::before{transform:translateY(-.1rem) rotate(45deg)}
+  .rail a .caret:hover{background:var(--accent-soft);color:var(--accent)}
+  @media (prefers-reduced-motion:reduce){.rail a .caret::before{transition:none}}
 </style>
 <div class="page">
 
