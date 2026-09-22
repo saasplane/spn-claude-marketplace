@@ -552,7 +552,11 @@ export function gateDocumentsFirst(payload: Payload): Verdict {
 // tells everyone who opens the page — rather than the folder — that the work is live. `010` sat that
 // way until the developer noticed it, and this gate passed it: it read rows, and nobody reads rows first.
 const EYEBROW = /class="eyebrow"[^>]*>([\s\S]*?)<\/div>/i;
-const CLOSED_WORDS = ["closed", "landed", "complete"];
+// `DONE` is here because it is the BOOK'S OWN finished word — `SPDocStatusType` is
+// `DONE · IMPLEMENTING · PLANNING`, and a page stamped DONE is not a page that says it is
+// running. Leaving it out made the gate ask for a vocabulary the document standard does not
+// have, so closing correctly meant writing a word no other page uses.
+const CLOSED_WORDS = ["closed", "landed", "complete", "done"];
 
 /** Whether the page's own masthead says the work is finished. */
 function saysItIsClosed(page: string): boolean {

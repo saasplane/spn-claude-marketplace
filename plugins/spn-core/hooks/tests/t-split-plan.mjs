@@ -201,5 +201,18 @@ console.log(`  one that names the plan  node ${tsPlan.toFixed(1)} ms   — the s
   console.log(`  ${ok ? "PASS" : "FAIL"}  the fast path changes the cost and not the verdict (${v})`);
 }
 
+// THE GATE MUST ACCEPT THE BOOK'S OWN FINISHED WORD. `SPDocStatusType` is DONE · IMPLEMENTING ·
+// PLANNING, and the gate listed closed, landed and complete — so closing a workstream correctly
+// meant stamping its masthead with a word no other page in the corpus uses.
+one("a masthead reading DONE closes", "close",
+  build("sp-done", { eyebrow: "Status: &#x2705; DONE" }),
+  move(".spndevex/workstreams/open/001-a-subject", ".spndevex/workstreams/closed/"),
+  "silent");
+
+one("and one still saying it is running is refused", "close",
+  build("sp-running", { eyebrow: "Status: &#x1F6A7; IMPLEMENTING" }),
+  move(".spndevex/workstreams/open/001-a-subject", ".spndevex/workstreams/closed/"),
+  "deny", { says: "does not say it is closed" });
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);
