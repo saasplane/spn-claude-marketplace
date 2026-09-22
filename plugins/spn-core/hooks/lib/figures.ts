@@ -206,12 +206,27 @@ export function checkFigures(src: string): FigureFinding[] {
     // A closed subpath is a SHAPE — a flowchart's decision diamond, a terminator — and a connector is
     // allowed to land on one, exactly as it lands on a `<rect>` edge.
     const shapes: Pt[][] = [];
+    // A DIAMOND, as centre and half-axes: four points, opposite pairs sharing a centre, one pair on
+    // each axis. That is the shape the drawer emits for a decision, and the only closed path whose
+    // label containment can be tested by a formula rather than by a point-in-polygon walk.
+    const diamonds: [number, number, number, number][] = [];
     for (const m of svg.matchAll(/<path\b([^>]*)>/g)) {
       const at = m[1];
       const d = at.match(/\sd="([^"]+)"/);
       if (!d) continue;
       const parts = subpathsAll(d[1]);
-      for (const sp of parts) if (sp.closed && sp.pts.length >= 3) shapes.push(sp.pts);
+      for (const sp of parts) if (sp.closed && sp.pts.length >= 3) {
+        shapes.push(sp.pts);
+        const q = sp.pts.length === 5 && sp.pts[0][0] === sp.pts[4][0] && sp.pts[0][1] === sp.pts[4][1]
+          ? sp.pts.slice(0, 4) : sp.pts.length === 4 ? sp.pts : null;
+        if (!q) continue;
+        const cx = (q[0][0] + q[2][0]) / 2, cy = (q[1][1] + q[3][1]) / 2;
+        const onAxis = Math.abs(q[0][0] - cx) < 1 && Math.abs(q[2][0] - cx) < 1
+                    && Math.abs(q[1][1] - cy) < 1 && Math.abs(q[3][1] - cy) < 1;
+        if (!onAxis) continue;
+        const a = Math.abs(q[1][0] - cx), b = Math.abs(q[0][1] - cy);
+        if (a > 1 && b > 1) diamonds.push([cx, cy, a, b]);
+      }
       if (!at.includes('class="c')) continue;
       const exempt = /lifeline|axis|curve/.test(at);
       for (const sp of parts) if (!sp.closed && sp.pts.length >= 2) conns.push({ pts: sp.pts, exempt });
@@ -366,6 +381,24 @@ export function checkFigures(src: string): FigureFinding[] {
       // The same rect, grown by the clear air the label is owed on every side. Everything below is
       // measured against THIS, so "they do not overlap" is no longer a pass.
       const air: Rect = [x - LABEL_GAP, y - lh - LABEL_GAP, w + LABEL_GAP * 2, lh + LABEL_GAP * 2];
+      // A DIAMOND HOLDS ONLY THE RECTANGLE INSCRIBED IN IT, and nothing checked that. Only `<rect>`
+      // is measured for a label fitting its box, so a decision — a closed path, not a rect — was
+      // outside every containment rule here: the Sign-in flowchart shipped with *The organization
+      // judges* wider than its diamond and the note's last line hanging outside the shape, through
+      // a check that reported the page clean. A point inside a diamond of half-width `a` and
+      // half-height `b` satisfies `|dx|/a + |dy|/b <= 1`, so each corner of the label is tested
+      // against the edge it is nearest (2026-09-22).
+      for (const d of diamonds) {
+        const [cx, cy, a, b] = d;
+        if (!(cx >= lr[0] && cx <= lr[0] + lr[2]) && !(lr[0] >= cx - a && lr[0] + lr[2] <= cx + a)) continue;
+        if (Math.abs(y - cy) > b + lh) continue;   // not this diamond's label
+        const corners: Pt[] = [[lr[0], lr[1]], [lr[0] + lr[2], lr[1]], [lr[0], lr[1] + lr[3]], [lr[0] + lr[2], lr[1] + lr[3]]];
+        let worst = 0;
+        for (const [px, py] of corners) worst = Math.max(worst, Math.abs(px - cx) / a + Math.abs(py - cy) / b);
+        if (worst > 1)
+          findings.push({ figure: n + 1, message: `the label "${txt}" runs outside the diamond holding it — a decision holds only the rectangle inscribed in it, and this text needs ${Math.round(worst * 100)}% of the room the shape has at that height` });
+      }
+
       // A label lying across a box it does not belong to is the commonest fault on a hand-drawn
       // figure, and the one a reader notices first: an edge's label is squeezed into the gap between
       // two boxes and runs over the one it points at.

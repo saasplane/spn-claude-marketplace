@@ -422,6 +422,65 @@ console.log("\n=== ENTITIES — every relation line says one or many");
       (g) => g.length > 0 && g.every((y) => y >= vb[1] && y <= vb[1] + vb[3]));
 }
 
+console.log("\n=== a decision holds only the rectangle inscribed in it");
+{
+  // Only `<rect>` was ever measured for a label fitting its box, so a diamond — a closed path — sat
+  // outside every containment rule. The Sign-in flowchart shipped with "The organization judges"
+  // wider than its diamond and the note's last line outside the shape, and the check called the
+  // page clean (found by the developer on the published sample, 2026-09-22).
+  const diamond = (a, b) => `<path class="box" d="M200 ${100 - b} L${200 + a} 100 L200 ${100 + b} L${200 - a} 100 Z"/>`;
+  const label = (txt, y) => `<text class="l" x="${200 - txt.length * 3.5}" y="${y}">${txt}</text>`;
+  const svgOf = (body) => `<svg class="dg" viewBox="0 0 400 200" role="img" aria-label="x">${body}</svg>`;
+  const says = (s) => (got) => JSON.stringify(got).includes(s);
+
+  one("a label that overruns its diamond is reported",
+      checkFigures(svgOf(diamond(60, 40) + label("The organization judges", 104))),
+      says("runs outside the diamond"));
+  one("and the finding says how much room it needed",
+      checkFigures(svgOf(diamond(60, 40) + label("The organization judges", 104))),
+      says("% of the room"));
+  one("the same label in a diamond twice the size is silent",
+      checkFigures(svgOf(diamond(200, 60) + label("The organization judges", 104))), none);
+  // A LABEL HIGH IN A DIAMOND FAILS WHERE THE SAME LABEL AT THE WAIST PASSES, which is the whole
+  // point of the rule and the reason the drawer now centres the block rather than hanging it.
+  one("a label that fits at the waist fails near the top vertex",
+      checkFigures(svgOf(diamond(120, 60) + label("The organization judges", 55))),
+      says("runs outside the diamond"));
+  one("and passes at the waist", checkFigures(svgOf(diamond(120, 60) + label("The organization judges", 104))), none);
+
+  // The drawer's own decision, drawn from a spec, must satisfy the rule it now enforces.
+  const drawn = draw({ kind: "flowchart", caption: "c",
+    boxes: [{ id: "a", label: "A request arrives" },
+            { id: "q", label: "The organization judges", note: "method allowed · age · second factor" },
+            { id: "y", label: "Mint a session" }, { id: "n", label: "Refuse", warn: true }],
+    links: [{ from: "a", to: "q", label: "asks" }, { from: "q", to: "y", label: "passes" },
+            { from: "q", to: "n", label: "says no" }] });
+  one("a decision the drawer produces holds its own label", checkFigures(drawn.svg), none);
+  one("and the drawer reports nothing of its own", drawn.findings, none);
+}
+
+console.log("\n=== a figure is never scaled UP to the column it sits in");
+{
+  // The page sets `width:100%`, which shrinks a wide figure to the column and stretched a narrow
+  // one: the Sign-in flowchart is 586 across, was blown up to about 1100, and its text rendered at
+  // twice the size of the entity diagram above it (2026-09-22). The cap is the figure's own width.
+  const box = (n) => ({ id: `b${n}`, label: `Box ${n}`, note: "a note that sets the width" });
+  const narrow = draw({ kind: "flowchart", caption: "c", boxes: [box(1), box(2), box(3)],
+                        links: [{ from: "b1", to: "b2", label: "then" }, { from: "b2", to: "b3", label: "then" }] });
+  const capOf = (svg) => Number(/style="max-width:(\d+)px"/.exec(svg)?.[1]);
+  const widthOf = (svg) => Number(/viewBox="[-\d.]+ [-\d.]+ (\d+)/.exec(svg)[1]);
+  one("the cap is present and is the figure's own width",
+      capOf(narrow.svg), widthOf(narrow.svg));
+  one("a narrow figure caps well under the 1100 canvas, so the page cannot stretch it",
+      capOf(narrow.svg), (got) => got > 0 && got < 1100);
+  const wide = draw({ kind: "map", caption: "c",
+                      boxes: [box(1), box(2), box(3), box(4)],
+                      links: [{ from: "b1", to: "b2" }, { from: "b1", to: "b3" }, { from: "b1", to: "b4" }] });
+  one("a wide figure caps at its own width too, and `width:100%` still shrinks it to the column",
+      capOf(wide.svg), widthOf(wide.svg));
+  one("the cap does not disturb the geometry the check measures", checkFigures(narrow.svg), none);
+}
+
 console.log("\n=== the label a screen reader is given is spoken, not rendered");
 {
   // A caption carries the page's own markdown — a code span for a contract term — and the

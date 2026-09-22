@@ -120,7 +120,12 @@ function fit(body: string[]): { x0: number; y0: number; w: number; h: number } {
 function svgOf(body: string[], label: string): string {
   const { x0, y0, w, h } = fit(body);
   return [
-    `<svg class="dg" viewBox="${x0} ${y0} ${w} ${h}" role="img" aria-label="${esc(spoken(label))}">`,
+    // A FIGURE IS NEVER SCALED UP. The page sets `width:100%` so a wide figure shrinks to the column,
+    // and that same rule stretched a NARROW one: a flowchart 586 across was blown up to the column's
+    // 1100, so its text rendered at twice the size of the figure above it and the drawing stood
+    // 1650px tall. The cap is the figure's own width, inline so it beats the stylesheet, and
+    // `width:100%` still shrinks it on a narrow screen (2026-09-22, found on the Sign-in sample).
+    `<svg class="dg" viewBox="${x0} ${y0} ${w} ${h}" style="max-width:${w}px" role="img" aria-label="${esc(spoken(label))}">`,
     `  <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>`,
     ...body,
     `</svg>`,
@@ -502,8 +507,14 @@ function mapBoxWidth(b: Box): number {
   const widest = Math.max(b.label.length * W_LABEL, ...lines.map((l) => l.length * W_NOTE));
   const base = Math.ceil(widest + PAD_X * 2);
   switch (shapeOf(b)) {
-    // A diamond wastes its corners, so the text needs the room the corners take away.
-    case "decision": return base + 56;
+    // A DIAMOND HOLDS ONLY THE RECTANGLE INSCRIBED IN IT. A rectangle centred in a diamond of width
+    // W and height H fits exactly when `tw/W + th/H <= 1`, so a flat allowance cannot be right at
+    // any size — the wider the text, the more the corners take away. Doubling each side puts both
+    // ratios at one half, which leaves the text's own corners inside the edge with its padding to
+    // spare. Found by the developer on the Sign-in flowchart, where *The organization judges* sat
+    // wider than the diamond at its own height and the note's last line fell outside it entirely
+    // (2026-09-22).
+    case "decision": return base * 2;
     case "io": return base + SKEW;
     case "predefined": return base + BARS * 2;
     case "terminator": return base + 12;
@@ -518,7 +529,9 @@ function mapBoxHeight(b: Box): number {
   const lines = b.note ? wrapNote(b.note).length : 0;
   const base = lines ? 26 + 19 * lines + 12 : H_ONE;
   switch (shapeOf(b)) {
-    case "decision": return base + 28;
+    // The other half of the inscribed rule above: doubled, so the text's height uses half the
+    // diamond and its width the other half.
+    case "decision": return base * 2;
     // The cap sits INSIDE the box's own bounds rather than above them, so the grid's spacing keeps
     // every neighbour clear of it without the layout knowing a cylinder is there.
     case "store": return base + CAP;
@@ -549,6 +562,11 @@ function mapRect(b: Box, x: number, y: number, w: number, h: number): string {
       break;
     case "decision":
       body.push(`  <path class="${cls}" d="M${cx} ${y} L${x + w} ${cy} L${cx} ${y + h} L${x} ${cy} Z"/>`);
+      // THE BLOCK IS CENTRED ON THE DIAMOND'S WAIST, not hung from its top. A diamond is at its
+      // widest exactly at the middle, so text starting 26 below the top vertex begins where the
+      // shape is still narrow — and once the height was doubled to fit the text at all, a
+      // top-anchored block sat high and left the room it needed empty underneath it.
+      textTop = cy - (19 * (b.note ? wrapNote(b.note).length : 0)) / 2 + 4;
       break;
     case "io":
       body.push(`  <path class="${cls}" d="M${x + SKEW} ${y} L${x + w} ${y} L${x + w - SKEW} ${y + h} L${x} ${y + h} Z"/>`);
