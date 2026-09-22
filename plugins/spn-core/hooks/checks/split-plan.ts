@@ -552,18 +552,35 @@ export function gateDocumentsFirst(payload: Payload): Verdict {
 // tells everyone who opens the page — rather than the folder — that the work is live. `010` sat that
 // way until the developer noticed it, and this gate passed it: it read rows, and nobody reads rows first.
 const EYEBROW = /class="eyebrow"[^>]*>([\s\S]*?)<\/div>/i;
-// `DONE` is here because it is the BOOK'S OWN finished word — `SPDocStatusType` is
-// `DONE · IMPLEMENTING · PLANNING`, and a page stamped DONE is not a page that says it is
-// running. Leaving it out made the gate ask for a vocabulary the document standard does not
-// have, so closing correctly meant writing a word no other page uses.
-const CLOSED_WORDS = ["closed", "landed", "complete", "done"];
+// THE STATUS IS ONE FIELD OF THE MASTHEAD, AND THE GATE READS THAT FIELD. `05-artifacts.md` § The
+// approach document says the masthead CARRIES a status drawn from a closed set — the status is not
+// the whole line. Scanning the whole line for a finished word reads the title and the lens list as
+// though they were the status, so a page stamped `Status: PLANNING` under a title carrying the word
+// *complete* closed as green. Where a masthead labels its status, only what follows the label is
+// read; where it does not — the older pages trail `· closed` after the audience — the whole line is,
+// because there is no field to narrow to.
+const STATUS_FIELD = /\bstatus\s*:\s*([^|]*)$/i;
+// Both vocabularies a page in this corpus is written in, because a page carries one or the other and
+// a gate that knows one of them asks for words the book does not have:
+//
+//   the approach document's own set   `05-artifacts.md` § The approach document —
+//                                     🚧 in progress · ✅ authoritative · ✅ executed — record · living
+//   a document's front-matter status  `SPDocStatusType` — DONE · IMPLEMENTING · PLANNING
+//
+// `closed` · `landed` · `complete` are kept beside them: the pages closed before the standard was
+// written say so in those words, and a gate that stopped reading them would report nine settled
+// pages as running.
+const CLOSED_WORDS = ["closed", "landed", "complete", "completed", "done", "authoritative", "executed"];
+// WORDS, NOT SUBSTRINGS. `incomplete` contains `complete` and `unfinished business` is not a close.
+const FINISHED = new RegExp(`(?:^|[^a-z])(?:${CLOSED_WORDS.join("|")})(?:[^a-z]|$)`, "i");
 
 /** Whether the page's own masthead says the work is finished. */
 function saysItIsClosed(page: string): boolean {
   const found = EYEBROW.exec(read(page));
   if (found === null) return true;                  // no masthead to read is not a finding
-  const text = flat(found[1]).toLowerCase();
-  return CLOSED_WORDS.some((word) => text.includes(word));
+  const line = flat(found[1]);
+  const labelled = STATUS_FIELD.exec(line);
+  return FINISHED.test(labelled ? labelled[1] : line);
 }
 
 export function gateClose(payload: Payload): Verdict {

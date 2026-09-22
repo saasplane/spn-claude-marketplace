@@ -214,5 +214,41 @@ one("and one still saying it is running is refused", "close",
   move(".spndevex/workstreams/open/001-a-subject", ".spndevex/workstreams/closed/"),
   "deny", { says: "does not say it is closed" });
 
+// THE STATUS IS A FIELD, AND THE TITLE IS NOT IT. `05-artifacts.md` § The approach document says the
+// masthead CARRIES a status; reading the whole line for a finished word reads the title too, so this
+// page — still PLANNING, under a title with the word *complete* in it — closed as green.
+one("a title carrying a finished word does not close a page that is still PLANNING", "close",
+  build("sp-title-word", { eyebrow: "Title: The Complete Rewrite | Status: PLANNING" }),
+  move(".spndevex/workstreams/open/001-a-subject", ".spndevex/workstreams/closed/"),
+  "deny", { says: "does not say it is closed" });
+
+// AND A STATUS THAT IS ONLY NEARLY A FINISHED WORD IS NOT ONE. `incomplete` contains `complete`, so a
+// substring read let a page say the opposite of what the gate heard.
+one("a status reading incomplete is not read as complete", "close",
+  build("sp-incomplete", { eyebrow: "Status: incomplete" }),
+  move(".spndevex/workstreams/open/001-a-subject", ".spndevex/workstreams/closed/"),
+  "deny", { says: "does not say it is closed" });
+
+// THE OTHER HALF OF THE SAME FAULT: the gate must know the words the standard actually gives an
+// approach page. `executed — record` is `05-artifacts.md`'s own finished status, and a page stamped
+// exactly as the chapter requires was refused for it.
+one("a masthead reading the book's own executed status closes", "close",
+  build("sp-executed", { eyebrow: "Status: &#x2705; executed &mdash; record" }),
+  move(".spndevex/workstreams/open/001-a-subject", ".spndevex/workstreams/closed/"),
+  "silent");
+
+one("and so does one reading authoritative, its other settled status", "close",
+  build("sp-authoritative", { eyebrow: "Status: &#x2705; authoritative" }),
+  move(".spndevex/workstreams/open/001-a-subject", ".spndevex/workstreams/closed/"),
+  "silent");
+
+// THE PAGES CLOSED BEFORE THE STANDARD EXISTED STILL READ AS CLOSED. Nine of them trail `· closed`
+// after the audience and label no status at all, so there is no field to narrow to and the whole
+// line is what the gate has.
+one("a masthead with no status label is read whole, as the older pages are written", "close",
+  build("sp-unlabelled", { eyebrow: "written for the DevEx agent &middot; &#x2705; settled &middot; closed" }),
+  move(".spndevex/workstreams/open/001-a-subject", ".spndevex/workstreams/closed/"),
+  "silent");
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

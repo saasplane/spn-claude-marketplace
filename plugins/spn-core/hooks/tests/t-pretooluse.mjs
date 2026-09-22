@@ -142,6 +142,23 @@ one("generated build output is refused too",
     "silent", { cwd: root });
 }
 
+{
+  // COMMENT-CHECK REACHES THE TURN TOO, and it is the newest link in the chain — a check whose file
+  // exists but which no dispatcher imports is a check that never fires, which is how a rule the book
+  // names by name went three arcs with nothing behind it.
+  one("a history word in a source write is refused through the dispatcher",
+    { tool_name: "Write",
+      tool_input: { file_path: `${WORKSPACE}/spn-support-ts/packages/pkg/src/app/Session.ts`,
+                    content: "/**\n * The live sessions. This used to be a regular expression.\n */\nexport const sessionsOf = (id) => id;\n" } },
+    "deny", { says: "history word", parity: false, why: "the Python dispatcher never carried this check" });
+
+  one("and a source write whose comments are right passes the chain untouched",
+    { tool_name: "Write",
+      tool_input: { file_path: `${WORKSPACE}/spn-support-ts/packages/pkg/src/app/Session.ts`,
+                    content: "/**\n * Every session an identity holds, across devices.\n */\nexport const sessionsOf = (id) => id;\n" } },
+    "silent", { parity: false, why: "the Python dispatcher never carried this check" });
+}
+
 // UNTOUCHED — the ordinary calls that must stay silent and cheap.
 one("an ordinary Bash call", { tool_name: "Bash", tool_input: { command: "git status --short" } }, "silent");
 one("reading a source file", { tool_name: "Read", tool_input: { file_path: `${WORKSPACE}/CLAUDE.md` } }, "silent");

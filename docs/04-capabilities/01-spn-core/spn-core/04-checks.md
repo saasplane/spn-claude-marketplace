@@ -1,17 +1,18 @@
 <!-- spn:doc
-{"id": "spn-core-capabilities-checks", "variant": "capability", "title": "Checks in spn-core", "lenses": ["SERVER_DEV", "ARCHITECT"], "status": "DONE", "realizes": ["checks"], "summary": "Six stack-agnostic checks the dispatcher composes, each naming in its own header the chapter it restates, and each carrying a fast path so an ordinary edit pays almost nothing.", "keywords": ["check", "deny", "note", "restates", "fast path", "gate"]}
+{"id": "spn-core-capabilities-checks", "variant": "capability", "title": "Checks in spn-core", "lenses": ["SERVER_DEV", "ARCHITECT"], "status": "DONE", "realizes": ["checks"], "summary": "Seven stack-agnostic checks the dispatcher composes, each naming in its own header the chapter it restates, and each carrying a fast path so an ordinary edit pays almost nothing.", "keywords": ["check", "deny", "note", "restates", "fast path", "gate"]}
 -->
 
 # Checks in spn-core
 
 `For: Backend developer · Architect` · `Status: ✅ DONE` · `Realizes: Checks`
 
-A check is one file under `hooks/checks/`, exporting a function that reads the call and returns a verdict. Six exist, and the dispatcher composes them into one process. Two habits run through the folder. **Each names, in its header, the chapter it restates**, so the rule has one home. And **each reads the smallest slice the call touches** — the sweep-everything shape once cost three quarters of every millisecond hooks had spent.
+A check is one file under `hooks/checks/`, exporting a function that reads the call and returns a verdict. Seven exist, and the dispatcher composes them into one process. Two habits run through the folder. **Each names, in its header, the chapter it restates**, so the rule has one home. And **each reads the smallest slice the call touches** — the sweep-everything shape once cost three quarters of every millisecond hooks had spent.
 
 ## Where
 
 | Part of the construct | Lives in | What it is |
 | --- | --- | --- |
+| What the code says about itself | `plugins/spn-core/hooks/checks/comment-check.ts` | refuses a history word, a `//` where JSDoc is owed, a comment repeating its line, a guess |
 | Confirmed execution | `plugins/spn-core/hooks/checks/confirmed.ts` | warns on an edit with no recorded go |
 | The contract cycle | `plugins/spn-core/hooks/checks/contract-cycle.ts` | refuses a state write that would close a loop |
 | The document bars | `plugins/spn-core/hooks/checks/doc-check.ts` | measures prose against what a script can measure |
@@ -26,6 +27,22 @@ A check is one file under `hooks/checks/`, exporting a function that reads the c
 - The citation a header carries — [The Ref](../../../02-constructs/01-spn-core/08-ref-set.md)
 
 ## Special handling
+
+### A check says which of its rules it carries
+
+**Why** — the comments group grades every rule on its page as a finding, and this check carries only the ones a fragment can decide. A reader who has to work out the coverage will assume it is complete, and the finding that is missing is the one they stop looking for.
+
+**What** — the file's own header lists the chapter's whole set and marks each finding `here` or `NOT here` with the reason. The ones that are absent wait on the package's declaration set, which only the symbol index answers, or on judgement the chapter itself grades SOFT.
+
+**How** — the header is read beside the chapter, and the withdrawn finding names what it refused wrongly when it was tried. `plugins/spn-core/hooks/checks/comment-check.ts`.
+
+### A pattern is narrowed against the corpus before it ships
+
+**Why** — a check that is wrong occasionally is not merely noisy. An agent handed a false refusal does not argue with it; it rewrites the sentence, and the sentence was right.
+
+**What** — every pattern in the comments check was measured against 1,707 files under `src/` in the two TypeScript stacks, and each narrowing is written beside the pattern with the live sentence it protects: *a flag used to decide which branch runs*, *a renamed test changes the answer*, *a CLI that appears to hang*.
+
+**How** — the same sentences are the untouched half of the suite, named with the file they came from, so nobody re-broadens a pattern without meeting them. `plugins/spn-core/hooks/tests/t-comment-check.mjs`.
 
 ### Refusing beats an allowlist of safe reads
 

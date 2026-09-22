@@ -33,6 +33,7 @@ import { checkContractCycle } from "../checks/contract-cycle.ts";
 import { checkDoc, bashWrites } from "../checks/doc-check.ts";
 import { gateDocumentsFirst, gateClose } from "../checks/split-plan.ts";
 import { checkConfirmed } from "../checks/confirmed.ts";
+import { applies as commentsApply, checkComments } from "../checks/comment-check.ts";
 import { applies as mirrorApplies, checkMirror } from "../checks/mirror.ts";
 import { begin, end, span } from "../lib/timing.ts";
 
@@ -65,6 +66,9 @@ const CHECKS: Check[] = [
   { name: "split-plan.close", run: gateClose, needs: ["command"],
     applies: (path, command) => Boolean(path || command) },
   { name: "confirmed", run: checkConfirmed, needs: ["file_path"], applies: () => true },
+  // It reads the fragment it was handed and opens no file, so its whole cost is the path test above
+  // it and a pass over the text being written.
+  { name: "comment-check", run: checkComments, needs: ["file_path"], applies: (path) => commentsApply(path) },
   // LAST, BECAUSE IT IS THE ONLY ONE THAT READS A DOCS TREE. Its fast path is a substring of the
   // path, so an edit outside any `src/` pays that and stops; an edit inside one reads a single face.
   { name: "mirror", run: checkMirror, needs: ["file_path"], applies: (path) => mirrorApplies(path) },
