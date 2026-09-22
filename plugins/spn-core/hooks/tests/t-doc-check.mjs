@@ -146,6 +146,46 @@ one("a register row that says you",
   write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| RD.EVENTS.099 | you may not do it |\n"),
   "reports", "says *you*");
 
+// N27 step 12 — a row that QUOTES somebody saying `you` is evidence, not the row warming its reader.
+// RD.DOCS.049 says the marking is how a check tells the two apart, and the exemption used to cover
+// only the bare word in italics, so a quoted PHRASE still fired. Four real rows carried one.
+one("a register row quoting a person saying you — the marking is the exemption",
+  write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| RD.EVENTS.099 | " +
+    "Asked by the developer: *\"you can call revoke signed-in if other tests are working\"* |\n"),
+  "silent");
+
+one("a register row citing another document's phrase in italics",
+  write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| RD.EVENTS.099 | " +
+    "A number written **four ways**, and the section's own *seven yours and two the agent's* again |\n"),
+  "silent");
+
+one("a register row quoting a string in double quotes",
+  write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| RD.EVENTS.099 | " +
+    "The hub shows a neutral \"taking you to your provider\" state until the redirect leaves |\n"),
+  "silent");
+
+// The other half, and the one that matters: the exemption must not swallow a real breach. Bold is in
+// the row on purpose — `**shape**` leaves an unpaired asterisk, and an exemption that strips every
+// marked span pairs it with the opening `*` of a later `*you*` and exposes the word it was meant to
+// protect. Anchoring the exemption on the word is what makes this case pass.
+one("a register row that says you beside bold — still reports",
+  write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| RD.EVENTS.099 | " +
+    "A row keeps its **shape**, and you should install the plugin before you open a window |\n"),
+  "reports", "says *you*");
+
+// N27 step 13 — `one` is a pronoun as often as it is an impersonal subject, and only the obligation
+// form is the construction RD.DOCS.031 is named after.
+one("one as a pronoun, not an impersonal subject",
+  write(CHAPTER, "# A probe\n\n`For: Architect` \u00b7 `Status: \ud83d\udd2e PLANNING`\n\n" +
+    "Modules are separated precisely because a change to one must not force a redeploy of another, " +
+    "and you can read the boundary off the manifest itself.\n"),
+  "silent");
+
+one("one as an impersonal subject — still reports",
+  write(CHAPTER, "# A probe\n\n`For: Architect` \u00b7 `Status: \ud83d\udd2e PLANNING`\n\n" +
+    "One must install the plugin before opening a window, and you will not see it otherwise.\n"),
+  "reports", "written about the reader");
+
 one("a register row past twenty-five words",
   write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| RD.EVENTS.099 | " +
     "A row states one clause a sentence and never more than that, and this particular row keeps " +

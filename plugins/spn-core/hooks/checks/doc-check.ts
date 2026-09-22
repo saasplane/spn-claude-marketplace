@@ -59,7 +59,11 @@ const CARD = new RegExp(
 // ordinary noun phrase, and every one of the ten occurrences this corpus carried was legitimate. So
 // it counts only in the obligation form, which is the construction the rule is named after.
 const ABOUT = new RegExp(
-  "\\b(the reader\\s+(?:must|should|needs?\\s+to|is\\s+expected)|one must|one should|" +
+  "\\b(the reader\\s+(?:must|should|needs?\\s+to|is\\s+expected)|" +
+  // `one` is a pronoun as often as it is an impersonal subject, and the obligation form is the only
+  // one this rule is named after. `a change to one must not force a redeploy of another` counts one
+  // module, and read as a breach it asked a page to be rewritten away from what it meant.
+  "(?<!\\b(?:to|of|in|on|at|for|from|than|with|and|or|but|is|as|only|than)\\s)one (?:must|should)|" +
   "the user is expected|it is recommended that)\\b", "gi");
 // RD.DOCS.052 — an idiom means something its words do not say, so a reader whose first language is
 // not English cannot guess it. Length limits do not catch one, because an idiom is usually short.
@@ -102,7 +106,22 @@ const YOU_SOURCE = "\\b(?:you['’](?:re|ll|ve)|yourselves|yourself|yours|your|y
 const YOU = new RegExp(YOU_SOURCE, "i");
 const YOU_ALL = new RegExp(YOU_SOURCE, "gi");
 // A row may MENTION the word as a term — *you* in italics, or in backticks — and that is not warming.
-const YOU_AS_TERM = /\*(?:you['’](?:re|ll|ve)|yourself|your|you)\*|`[^`]*`/gi;
+// RD.DOCS.049 — the marking is how a check tells quotation from breach. This exempted the bare word
+// in italics and any code span, and missed the shape this corpus actually quotes in: a WHOLE PHRASE
+// in italics or quotation marks. Two rows carried one — a developer's own sentence, and another
+// document's phrase cited as the thing the row corrects — and both read as the row warming its
+// reader when neither does.
+//
+// IT ANCHORS ON THE WORD, AND THAT IS WHY IT IS WRITTEN THIS WAY. Stripping every marked span
+// instead is what the general `MARKED` does, and on a row it is wrong: `**reader.**` leaves an
+// unpaired `*`, which then pairs with the opening `*` of a later `*you*` and EXPOSES the word the
+// marking was protecting. Requiring the word inside the span makes that pairing impossible.
+const YOU_WORD = "you(?:['’](?:re|ll|ve)|rself|rs|r)?";
+const YOU_AS_TERM = new RegExp(
+  `\\*[^*\\n]{0,200}?\\b${YOU_WORD}\\b[^*\\n]{0,200}?\\*` + "|" +
+  `"[^"\\n]{0,200}?\\b${YOU_WORD}\\b[^"\\n]{0,200}?"` + "|" +
+  `“[^”\\n]{0,200}?\\b${YOU_WORD}\\b[^”\\n]{0,200}?”` + "|" +
+  "`[^`]*`", "gi");
 // `ROW_LONG` is the ONE length rule the book kept, and it is a register row's shape rather than a
 // count of prose: one clause a sentence, because a row is a record. The prose measures that stood
 // beside it — an average, a thirty-word cap, and a `you` frequency — were dropped by the book and
