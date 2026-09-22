@@ -486,6 +486,39 @@ function folderTree(dir: string): string[] {
  *
  * Comments are removed first, because a brace inside one is text rather than structure.
  */
+/**
+ * A page carries the furniture its template carries.
+ *
+ * A PRODUCED PAGE IS COMPARED TO ITS SEAT AND A HAND-WRITTEN ONE TO NOTHING. `checkProduced` takes
+ * the stylesheet and the scripts from `construct-template.html` and refuses any difference — but an
+ * overview, a hub, an approach page and every sample is authored by hand, so each one carries
+ * whichever furniture was current on the day somebody wrote it.
+ *
+ * Four drifts were found in a single sitting, every one by looking at a page in a browser: a rail
+ * that would not fold, a chevron drawn twice, a number beside every rail entry, and headings with
+ * no copy-link. One cohort of pages, one generation behind, and nothing that could say so.
+ *
+ * The scripts are what is compared, because they are the behaviour: the rail builder, the fold, and
+ * the anchor that makes a heading shareable. Whitespace is normalized, because a re-indent is not a
+ * change in what the page does.
+ */
+function checkFurniture(file: string, src: string, templates: string): Finding[] {
+  if (!src.includes('id="rail"')) return [];
+  const flatten = (t: string): string[] =>
+    (t.match(/<script\b[^>]*>[\s\S]*?<\/script>/g) ?? []).map((x) => x.replace(/\s+/g, " ").trim()).sort();
+  let want: string[];
+  try { want = flatten(readFileSync(join(templates, "pages", "construct-template.html"), "utf8")); }
+  catch { return []; }
+  if (!want.length) return [];
+  const have = flatten(src);
+  if (have.length === want.length && have.every((h, i) => h === want[i])) return [];
+  const missing = want.filter((w) => !have.includes(w)).length;
+  const extra = have.filter((h) => !want.includes(h)).length;
+  return [{ check: "furniture", grade: "RULE", file, message:
+    `this page's scripts are not the template's — ${missing} missing, ${extra} it does not share. ` +
+    "A page carrying a rail carries the rail builder, the fold and the heading anchor as the template ships them" }];
+}
+
 function checkStyleBalance(file: string, src: string): Finding[] {
   const f: Finding[] = [];
   const blocks = [...src.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)];
@@ -2027,6 +2060,7 @@ function audit(paths: string[], workspace: string): Finding[] {
     findings.push(...checkCodeFigures(p, src, workspace));
     findings.push(...checkTreeFigures(p, src, workspace));
     findings.push(...checkStyleBalance(p, src));
+    findings.push(...checkFurniture(p, src, templates));
     findings.push(...checkGovernsMap(p, src));
     findings.push(...checkProof(p, src));
     findings.push(...checkBinds(p, src, block, nodes));

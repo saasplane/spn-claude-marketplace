@@ -503,19 +503,127 @@
 </div>
 </div>
 
+
+
 <script>
 (function(){
-  var links = Array.prototype.slice.call(document.querySelectorAll('#rail a[href^="#"]'));
-  var targets = links.map(function(a){ return document.querySelector(a.getAttribute('href')); });
-  function sync(){
-    var best = 0;
-    for (var i = 0; i < targets.length; i++){
-      if (targets[i] && targets[i].getBoundingClientRect().top <= 120) best = i;
-    }
-    links.forEach(function(a, i){ a.classList.toggle('on', i === best); });
+  var rail=document.getElementById('rail');if(!rail)return;
+  var secs=Array.prototype.slice.call(document.querySelectorAll('section[id]'));
+  var links=[];
+  secs.forEach(function(s){
+    var num=s.querySelector('.sec-head .num'),h2=s.querySelector('h2');if(!h2)return;
+    var a=document.createElement('a');a.href='#'+s.id;
+    var n=document.createElement('span');n.className='n';n.textContent=num?num.textContent:'';
+    var t=document.createElement('span');t.textContent=h2.textContent.split(' — ')[0];
+    a.appendChild(n);a.appendChild(t);
+    if(s.id==='s4'){var c=s.querySelectorAll('.open').length;if(c){var b=document.createElement('span');b.className='count';b.textContent=c;a.appendChild(b);}}
+    rail.appendChild(a);links.push({el:a,sec:s});
+    Array.prototype.forEach.call(s.querySelectorAll('h3[id]'),function(h){
+      var sa=document.createElement('a');sa.href='#'+h.id;sa.className='sub';sa.textContent=h.textContent;rail.appendChild(sa);
+    });
+  });
+  function mark(){var y=window.scrollY+120,cur=links[0];links.forEach(function(l){if(l.sec.offsetTop<=y)cur=l;});links.forEach(function(l){l.el.classList.toggle('on',l===cur);});}
+  window.addEventListener('scroll',mark,{passive:true});mark();
+})();
+</script>
+<script>
+(function(){
+  var rail = document.getElementById('rail-list') || document.getElementById('rail');
+  if (!rail || rail.querySelector('.sub-group')) return;
+  var styled = document.getElementById('rail') || rail;
+
+  /* The caret and the group are one state with two faces. Writing both here is what stops the
+     caret claiming a section is open while its subsections are hidden. */
+  function setOpen(anchor, group, open){
+    group.classList.toggle('shown', open);
+    anchor.classList.toggle('group-open', open);
+    anchor.setAttribute('aria-expanded', open ? 'true' : 'false');
   }
-  document.addEventListener('scroll', sync, {passive:true});
-  window.addEventListener('resize', sync);
-  sync();
+
+  /* Regroup whatever the page's own builder produced: a section anchor, then the `sub` anchors
+     that follow it, moved into one collapsing group. */
+  var entries = [], current = null;
+  Array.prototype.slice.call(rail.children).forEach(function(node){
+    if (node.tagName !== 'A' || node.classList.contains('home')) return;
+    if (node.classList.contains('sub')) {
+      if (!current) return;
+      if (!current.group) {
+        current.group = document.createElement('div');
+        current.group.className = 'sub-group';
+        rail.insertBefore(current.group, node);
+      }
+      current.group.appendChild(node);
+      return;
+    }
+    current = { anchor: node, group: null };
+    entries.push(current);
+  });
+
+  entries.forEach(function(entry){
+    if (!entry.group) return;                     // a section with no second level never folds
+    var anchor = entry.anchor, group = entry.group;
+    anchor.classList.add('has-subs');
+    var caret = document.createElement('span');
+    caret.className = 'caret';
+    caret.setAttribute('role', 'button');
+    caret.setAttribute('tabindex', '-1');
+    caret.setAttribute('aria-label', 'Show sections under ' + anchor.textContent.trim());
+    anchor.appendChild(caret);
+    /* The caret toggles without leaving the page; the label still navigates. Hit-testing the
+       element beats measuring offsetX, which broke the moment the caret moved to the right. */
+    anchor.addEventListener('click', function(event){
+      if (event.target !== caret) return;
+      event.preventDefault();
+      /* `pinned` means a reader decided, so the scroll must stop overriding them. */
+      anchor.dataset.pinned = '1';
+      setOpen(anchor, group, !group.classList.contains('shown'));
+    });
+    setOpen(anchor, group, false);
+  });
+
+  /* THE RAIL FOLLOWS THE SCROLL. The page's own builder already marks the current entry with
+     `on`, so this watches that mark rather than measuring offsets a second time — two answers to
+     where the reader is would disagree the first time either changed. */
+  function follow(){
+    entries.forEach(function(entry){
+      if (!entry.group || entry.anchor.dataset.pinned === '1') return;
+      var here = entry.anchor.classList.contains('on') || !!entry.group.querySelector('a.on');
+      setOpen(entry.anchor, entry.group, here);
+    });
+  }
+  new MutationObserver(follow).observe(rail, {subtree: true, attributes: true,
+                                              attributeFilter: ['class']});
+  /* Last, because everything above degrades to the full index when no script runs. */
+  styled.classList.add('js');
+  follow();
+})();
+</script>
+<script>
+/* Every section (h2 inside .sec-head) and every subsection (h3 with an id) gets an anchor link.
+   Clicking it moves the address to that heading and copies the full link, so a subsection can be shared. */
+(function(){
+  function pageBase(){
+    var ref=document.referrer||'';
+    if(window.top!==window&&ref.indexOf('/artifact/')>-1)return ref.split('#')[0];
+    return location.href.split('#')[0];
+  }
+  function attach(h,id){
+    if(!id||h.querySelector('a.anchor'))return;
+    var a=document.createElement('a');a.className='anchor';a.href='#'+id;a.textContent='#';a.title='Copy link to this heading';a.setAttribute('aria-label','Copy link to '+h.textContent.trim());
+    a.addEventListener('click',function(ev){
+      var url=pageBase()+'#'+id;
+      try{history.replaceState(null,'',location.pathname+location.search+'#'+id);}catch(e){}
+      var done=function(){a.classList.add('copied');setTimeout(function(){a.classList.remove('copied');},1400);};
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(done,done);}else{done();}
+      var target=document.getElementById(id);if(target){ev.preventDefault();target.scrollIntoView({block:'start'});}
+    });
+    h.appendChild(a);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('section[id]'),function(s){
+    var h2=s.querySelector('.sec-head h2');if(!h2)return;
+    if(!h2.id)h2.id=s.id+'-title';
+    attach(h2,s.id);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('h3[id]'),function(h){attach(h,h.id);});
 })();
 </script>
