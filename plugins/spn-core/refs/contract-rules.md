@@ -2,7 +2,7 @@
 {
   "chapters": [
     { "path": "docs/04-capabilities/02-support/01-apps/01-shape/03-architecture.md", "seen": "504cb4cf" },
-    { "path": "docs/registers/conformance.md", "seen": "5cacece4" },
+    { "path": "docs/registers/conformance.md", "seen": "aaa3f1cb" },
     { "path": "docs/04-capabilities/02-support/01-apps/03-module/01-server/01-contract/01-states.md", "seen": "b57723a5" }
   ]
 }
