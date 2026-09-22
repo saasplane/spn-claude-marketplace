@@ -10,6 +10,9 @@ import { resolve } from "node:path";
 const HOOKS = resolve(import.meta.dirname, "..");
 const SCRIPTS = resolve(HOOKS, "scripts");
 const CHECKS = resolve(HOOKS, "checks");
+// The entry point a registration names lives in `events/`, beside `spn-core`'s four. The checks it
+// calls stay in `checks/` — this constant is the dispatcher itself, not one of them.
+const EVENTS = resolve(HOOKS, "events");
 const PYTHON_HERE = existsSync(resolve(SCRIPTS, "pretooluse.py"))
   || existsSync(resolve(SCRIPTS, "coverage.py"));
 
@@ -52,7 +55,7 @@ let n = 0, failed = 0;
 function one(label, { root, input, expect, says }) {
   n += 1;
   const payload = { tool_name: input.content !== undefined ? "Write" : "Edit", tool_input: input, cwd: root };
-  const out = once("node", [`${CHECKS}/pretooluse.ts`], payload, root);
+  const out = once("node", [`${EVENTS}/pretooluse.ts`], payload, root);
   const ts = decide(out);
   const py = chain(payload, root);
   let reason = "";

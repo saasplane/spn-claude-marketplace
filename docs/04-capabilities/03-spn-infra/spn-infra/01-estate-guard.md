@@ -13,7 +13,7 @@ The whole of this plugin's hook surface is one file: a shell script wired to eve
 | Part of the construct | Lives in | What it is |
 | --- | --- | --- |
 | The wiring | `plugins/spn-infra/hooks/hooks.json` | one `PreToolUse` entry matching `Write` and `Edit`, with no timeout of its own |
-| The guard | `plugins/spn-infra/hooks/scripts/deny-estate-violations.sh` | the five clauses, each with its own refusal message |
+| The guard | `plugins/spn-infra/hooks/events/deny-estate-violations.sh` | the five clauses, each with its own refusal message |
 | The rules it cites | `plugins/spn-infra/refs/laws.md` | the estate laws every refusal message points the reader at |
 
 ## Follows the pattern
@@ -27,7 +27,7 @@ The whole of this plugin's hook surface is one file: a shell script wired to eve
 
 **Why** — *a hook that crashes or over-refuses is removed by the people it blocks*. The five clauses are narrow on purpose, and anything outside them is somebody else's business.
 **What** — no `jq` on the machine, unreadable input, or a call with no file path all end the script silently with the call allowed. A refusal prints the documented decision JSON and still exits zero.
-**How** — the guards sit at the top of the file, each a single test followed by an exit. `plugins/spn-infra/hooks/scripts/deny-estate-violations.sh`.
+**How** — the guards sit at the top of the file, each a single test followed by an exit. `plugins/spn-infra/hooks/events/deny-estate-violations.sh`.
 
 ### It reads the text the call would add, not the file
 

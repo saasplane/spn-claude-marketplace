@@ -208,7 +208,7 @@
 <section id="s2">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="unsure-means-allow-and-every-exit-is-zer">Unsure means allow, and every exit is zero</h3>
-  <p>No parser on the machine, unreadable input, or a call naming no file all end the script in silence with the call allowed. A refusal prints the documented decision and still exits zero, because a hook that fails loudly takes every other gate down with it. The tests that produce these outcomes sit at the top of the file, each one a single condition followed by an exit. <em>Where:</em> <code>plugins/spn-infra/hooks/scripts/deny-estate-violations.sh</code></p>
+  <p>No parser on the machine, unreadable input, or a call naming no file all end the script in silence with the call allowed. A refusal prints the documented decision and still exits zero, because a hook that fails loudly takes every other gate down with it. The tests that produce these outcomes sit at the top of the file, each one a single condition followed by an exit. <em>Where:</em> <code>plugins/spn-infra/hooks/events/deny-estate-violations.sh</code></p>
   <h3 id="it-reads-the-text-the-call-would-add-not">It reads the text the call would add, not the file</h3>
   <p>A refusal must be about what is being written. Judging the file on disk would refuse an edit to a file that already carries the fault and miss the fault arriving now. So a write's content or an edit's replacement is taken, whichever is present, and where there is no new text only the clause that reads the path alone can fire. <em>Where:</em> the same script, near the top</p>
   <h3 id="build-output-is-refused-by-path-alone">Build output is refused by path alone</h3>

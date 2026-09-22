@@ -34,12 +34,12 @@ import { resolve } from "node:path";
 import type { Payload, ToolInput, Verdict } from "../lib/payload.ts";
 import { emit, payload } from "../lib/payload.ts";
 import { isDir, isFile } from "../lib/source.ts";
-import { CHECKS as COVERAGE_CHECKS, run as runCoverage } from "./coverage.ts";
-import { run as runEnablementGrammar, watched as watchedEnablement } from "./enablement-grammar.ts";
-import { run as runHostAssertion } from "./host-assertion.ts";
-import { run as runReadVerbNaming, watched as watchedReadVerb } from "./read-verb-naming.ts";
-import { run as runAwaitSequencing, watched as watchedAwait } from "./await-sequencing.ts";
-import { run as runAssertionMessage, watched as watchedAssertion } from "./assertion-message.ts";
+import { CHECKS as COVERAGE_CHECKS, run as runCoverage } from "../checks/coverage.ts";
+import { run as runEnablementGrammar, watched as watchedEnablement } from "../checks/enablement-grammar.ts";
+import { run as runHostAssertion } from "../checks/host-assertion.ts";
+import { run as runReadVerbNaming, watched as watchedReadVerb } from "../checks/read-verb-naming.ts";
+import { run as runAwaitSequencing, watched as watchedAwait } from "../checks/await-sequencing.ts";
+import { run as runAssertionMessage, watched as watchedAssertion } from "../checks/assertion-message.ts";
 
 type Check = {
   name: string;

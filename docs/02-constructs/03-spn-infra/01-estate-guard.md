@@ -56,7 +56,7 @@ There is no divided tree of events, checks, tools and shared code here, because 
 
 ### Unsure means allow, and every exit is zero
 
-No parser on the machine, unreadable input, or a call naming no file all end the script in silence with the call allowed. A refusal prints the documented decision and still exits zero, because a hook that fails loudly takes every other gate down with it. The tests that produce these outcomes sit at the top of the file, each one a single condition followed by an exit. *Where:* `plugins/spn-infra/hooks/scripts/deny-estate-violations.sh`
+No parser on the machine, unreadable input, or a call naming no file all end the script in silence with the call allowed. A refusal prints the documented decision and still exits zero, because a hook that fails loudly takes every other gate down with it. The tests that produce these outcomes sit at the top of the file, each one a single condition followed by an exit. *Where:* `plugins/spn-infra/hooks/events/deny-estate-violations.sh`
 
 ### It reads the text the call would add, not the file
 

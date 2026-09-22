@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}\"/hooks/checks/pretooluse.ts",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}\"/hooks/events/pretooluse.ts",
             "timeout": 20
           }
         ]
