@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/04-capabilities/02-support/01-apps/06-tests/README.md", "seen": "1338f378" }
+    { "path": "docs/04-capabilities/02-support/01-apps/06-tests/README.md", "seen": "9489b986" }
   ],
   "rows": [
     "RD.APPS.086",

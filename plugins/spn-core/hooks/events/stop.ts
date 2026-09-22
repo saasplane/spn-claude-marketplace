@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// RESTATES: spn-foundation docs/04-capabilities/01-foundation/01-devex/11-workspace.md § The arc · § How the agent replies
-//           docs/04-capabilities/01-foundation/02-docs/05-artifacts.md § The approach document
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md § The arc · § Stopping in the middle is a handover
+//           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The approach document
 // The chapters are the source of truth. A rule change is edited there first, then here, in the same change.
 //
 // The Stop checks. They read what the turn is about to leave behind, and warn — never refuse, because

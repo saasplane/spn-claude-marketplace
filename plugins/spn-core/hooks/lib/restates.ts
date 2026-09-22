@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// RESTATES: RD.DOCS.055, and `04-devex/10-delivery.md`, which makes it a MUST in both directions.
+// RESTATES: RD.DOCS.055, and `docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` § Restatement discipline, which makes
+// it a MUST in both directions.
 //
 // The `spn:restates` block: how it is written, and what a hash covers.
 //
@@ -47,7 +48,8 @@
 // the plugins must still read the same, so the port's test hashes the whole corpus with both.
 
 import { createHash } from "node:crypto";
-import { join } from "node:path";
+import { readdirSync, statSync } from "node:fs";
+import { join, join as joinPath, resolve as resolvePath } from "node:path";
 import { isFile, read } from "./payload.ts";
 
 const BLOCK = /<!--\s*spn:restates\s*(\{[\s\S]*?\})\s*-->/;
@@ -254,4 +256,97 @@ export function check(path: string, block: Block, bookRoot: string, knownRows: S
 export function registerRows(register: string): Set<string> {
   if (!isFile(register)) return new Set();
   return new Set(read(register).match(ROW_ID) ?? []);
+}
+
+// ---------------------------------------------------------------- a code file's own header
+//
+// A SOURCE FILE SAYS WHAT IT RESTATES IN A COMMENT, AND NOTHING READ IT. `restate-drift` reads a
+// DOCUMENT's `spn:restates` block, so a `// RESTATES:` header is outside its set — and ten hook
+// sources sat behind a green light naming a folder that no longer exists. A header is the same
+// promise a block makes, in the one place a reader of the code will see it, so it earns the same
+// check (N15 step 2, 2026-09-22).
+
+/** A `// RESTATES:` header: the line it starts on, and every source it names. */
+export type Header = { line: number; cited: string[] };
+
+/**
+ * Every `// RESTATES:` header in a source file, with the sources each names.
+ *
+ * THE LINE MUST OPEN WITH THE MARKER, which is what tells a claim from a mention. A fixture string
+ * inside a test carries `<!-- RESTATES: a chapter` mid-line, and reading that would report the test
+ * for the document it invents. A header continues onto following `//` lines, the way every one of
+ * them is written today.
+ */
+export function headerSources(text: string): Header[] {
+  const out: Header[] = [];
+  const lines = text.split("\n");
+  for (let i = 0; i < lines.length; i++) {
+    if (!/^\s*\/\/\s*RESTATES:/.test(lines[i])) continue;
+    const body: string[] = [lines[i].replace(/^\s*\/\/\s*RESTATES:/, "")];
+    // A HEADER RUNS TO THE FIRST BARE `//`, and that is read from the corpus rather than assumed.
+    // The first rule here wanted an indent of two, because `split-plan.ts` writes its second line
+    // as `//           docs/…`. Six headers wrap at ONE space — `doc-check.ts` names four chapters
+    // that way — so the rule read line two of those headers and silently dropped the rest, which is
+    // the under-report this check exists to end. An empty comment line ends the claim; the prose
+    // after it is the file explaining itself.
+    for (let n = i + 1; n < lines.length; n++) {
+      const m = /^\s*\/\/(?!\/)[ \t]*(\S.*)$/.exec(lines[n]);
+      if (!m) break;
+      body.push(m[1]);
+      i = n;
+    }
+    const cited: string[] = [];
+    for (const token of body.join(" ").split(/[\s`,;()]+/)) {
+      const clean = token.replace(/^[·—–*“"']+|[.,:;·—–*”"']+$/g, "");
+      if (!clean || NOT_A_DOCUMENT.has(clean) || IS_ROW_ID.test(clean)) continue;
+      if (/\.(md|py|ts|mjs|sql|json)$/i.test(clean) && !clean.includes("*")) cited.push(clean);
+    }
+    out.push({ line: i + 1, cited });
+  }
+  return out;
+}
+
+/**
+ * Where a header's source resolves, or null.
+ *
+ * A HEADER NAMES A SIBLING BARE. `03-tree.md · 05-artifacts.md · 02-document.md` is three chapters of
+ * one folder, and only the first carries a path — so the folder of the last source that resolved is
+ * a root for the next one. That is how these headers are written, and a resolver that missed it
+ * would report two thirds of a correct header as broken.
+ */
+export function resolveSource(token: string, roots: string[]): string | null {
+  for (const root of roots) {
+    if (!root) continue;
+    const full = resolvePath(root, token);
+    if (isFile(full)) return full;
+  }
+  return null;
+}
+
+/**
+ * Every file under a tree, indexed by its bare name.
+ *
+ * A PATH AND A BARE NAME ARE DIFFERENT CLAIMS, and one test cannot judge both. `docs/…/05-artifacts.md`
+ * claims a LOCATION, so it is wrong the moment the folder is renamed — which is exactly the defect
+ * nine headers carried. A bare `06-registers.md` claims only that the file EXISTS, and a reader finds
+ * it; demanding a path there would report six correct headers as broken and push every one of them
+ * into a verbose rewrite. So a bare name is looked up by name, across the whole workspace, because
+ * the CLI that owns a rule is a different repository from the plugins that restate it.
+ */
+export function nameIndex(root: string, skip: Set<string>): Map<string, string[]> {
+  const index = new Map<string, string[]>();
+  const walk = (dir: string): void => {
+    let entries: string[];
+    try { entries = readdirSync(dir); } catch { return; }
+    for (const entry of entries) {
+      if (skip.has(entry) || entry.startsWith(".")) continue;
+      const full = joinPath(dir, entry);
+      let stat;
+      try { stat = statSync(full); } catch { continue; }
+      if (stat.isDirectory()) walk(full);
+      else { const at = index.get(entry) ?? []; at.push(full); index.set(entry, at); }
+    }
+  };
+  walk(root);
+  return index;
 }

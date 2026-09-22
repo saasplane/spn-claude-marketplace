@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// RESTATES: RD.DOCS.055, and `04-devex/10-delivery.md`, which makes it a MUST in both directions.
+// RESTATES: RD.DOCS.055, and `docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` § Restatement discipline, which makes
+// it a MUST in both directions.
 //
 // Do the plugins still say what the book says?
 //
@@ -22,10 +23,10 @@
 // With no argument it looks for a sibling checkout carrying the register. Exit code is the number of
 // findings.
 
-import { readdirSync, statSync } from "node:fs";
+import { readFileSync, readdirSync, statSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { isDir, isFile } from "../lib/payload.ts";
-import { check, declaresASource, namedSources, parse, registerRows, undeclared } from "../lib/restates.ts";
+import { check, declaresASource, headerSources, nameIndex, namedSources, parse, registerRows, resolveSource, undeclared } from "../lib/restates.ts";
 
 const SKIP = new Set(["node_modules", ".git", "dist", "build", ".nx", "coverage", "__pycache__"]);
 
@@ -45,6 +46,66 @@ function pluginDocuments(root: string): string[] {
   };
   walk(join(root, "plugins"));
   return out.sort();
+}
+
+/** Every source file under `plugins/` whose comments could carry a `RESTATES:` header. */
+function pluginSources(root: string): string[] {
+  const out: string[] = [];
+  const walk = (dir: string): void => {
+    let entries: string[];
+    try { entries = readdirSync(dir).sort(); } catch { return; }
+    for (const entry of entries) {
+      const full = join(dir, entry);
+      let stat;
+      try { stat = statSync(full); } catch { continue; }
+      if (stat.isDirectory()) { if (!SKIP.has(entry)) walk(full); }
+      else if (/\.(ts|mjs|py)$/.test(entry)) out.push(full);
+    }
+  };
+  walk(join(root, "plugins"));
+  return out.sort();
+}
+
+/**
+ * Headers whose named source resolves nowhere on disk.
+ *
+ * A HEADER IS A CLAIM ABOUT ANOTHER FILE, and a claim naming a path that does not exist is worse
+ * than no claim: a reader follows it, finds nothing, and cannot tell a moved chapter from a typo.
+ * Nine of these named `docs/04-capabilities/01-foundation/…`, a folder N13 renamed, and the tenth
+ * named a chapter that never existed.
+ */
+function headerFindings(root: string, book: string): string[] {
+  const out: string[] = [];
+  // ONE INDEX FOR THE WHOLE WORKSPACE, built once and only because a bare name needs it. The CLI
+  // that owns a rule is a different repository from the plugins restating it, so `contract-purity.ts`
+  // is a true claim about a file two repositories away.
+  const workspace = dirname(root);
+  let index: Map<string, string[]> | null = null;
+  const byName = (name: string): string[] => {
+    index ??= nameIndex(workspace, SKIP);
+    return index.get(name) ?? [];
+  };
+  for (const path of pluginSources(root)) {
+    const plugin = /(.*\/plugins\/[^/]+)\//.exec(path)?.[1] ?? root;
+    let carried = "";
+    for (const header of headerSources(readFileSync(path, "utf8"))) {
+      for (const token of header.cited) {
+        const where = resolveSource(token, [
+          carried, book, join(book, "docs"), join(book, "docs/04-capabilities"),
+          root, join(root, "plugins"), plugin, dirname(path),
+        ]);
+        if (where !== null) { carried = dirname(where); continue; }
+        const at = token.includes("/") ? [] : byName(token);
+        if (at.length) continue;
+        // A PATH THAT IS WRONG IS TOLD WHERE THE FILE WENT, because the fix is the rename and a
+        // finding that names it costs the reader nothing to act on.
+        const moved = token.includes("/") ? byName(token.split("/").pop() as string) : [];
+        const hint = moved.length === 1 ? ` — that name is at \`${relative(workspace, moved[0])}\`` : "";
+        out.push(`${relative(root, path)}:${header.line}: names \`${token}\`, which resolves to no file${hint}`);
+      }
+    }
+  }
+  return out;
 }
 
 /** The book's location, or null. An explicit path wins and is never second-guessed. */
@@ -132,16 +193,30 @@ export function main(argv: string[], root: string): number {
     console.log("              " + [...unclassified].sort().slice(0, 12).join(" · "));
   }
 
+  // THE CODE'S OWN HEADERS, which no run had ever read. Reported apart from a document's drift,
+  // because a broken header is a claim pointing at nothing rather than a chapter that moved.
+  const headers = headerFindings(root, book);
+  if (headers.length) {
+    console.log();
+    console.log(`HEADER      ${headers.length} \`// RESTATES:\` header(s) in code name a file that is not there.`);
+    console.log("            A reader follows the claim, finds nothing, and cannot tell a moved");
+    console.log("            chapter from a typo:");
+    for (const finding of headers) console.log(`              ${finding}`);
+  }
+
   console.log();
   console.log(`${documents.length} plugin document(s) · ${stamped} carrying spn:restates · ` +
     `${findings.length} drift · ${omissions.length} undeclared · ${unstamped.length} unstamped · ` +
-    `${unclassified.size} unread name(s) — book at ${book}`);
+    `${unclassified.size} unread name(s) · ${headers.length} broken header(s) — book at ${book}`);
   // UNSTAMPED IS REPORTED AND DOES NOT FAIL. It is coverage, not drift: those files are not wrong,
   // they are unmeasured. Failing on them would leave the gate red from the day it shipped until
   // somebody hand-wrote every last block — and a gate that is always red is one nobody reads.
   // AN OMISSION FAILS, WHERE AN UNSTAMPED FILE DOES NOT. The unstamped list is the whole tree on day
   // one; an omission is bounded and each one has a named fix.
-  return findings.length + omissions.length;
+  // A BROKEN HEADER FAILS FROM THE DAY IT SHIPS, and it can, because the fourteen it found were
+  // fixed in the same sitting. Each one is bounded and the finding names the fix: the file the path
+  // meant is printed beside it.
+  return findings.length + omissions.length + headers.length;
 }
 
 if (process.argv[1] && basename(process.argv[1]) === "restate-drift.ts")

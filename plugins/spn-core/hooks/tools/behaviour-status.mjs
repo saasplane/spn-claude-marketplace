@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: spn-foundation docs/04-capabilities/01-foundation/02-docs/02-document.md — the behaviour row
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md — the behaviour row
 // This file carries rules it does not own. That chapter is the source of truth. A rule change is
 // edited there first, then here, in the same change.
 //

@@ -1,10 +1,10 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/02-constructs/02-support/02-infra/01-shape.md", "seen": "ba312336" },
+    { "path": "docs/02-constructs/02-support/02-infra/01-shape.md", "seen": "64937ff9" },
     { "path": "docs/02-constructs/03-platform/01-core/01-tenancy.md", "seen": "e8b98624" },
-    { "path": "docs/04-capabilities/03-platform/README.md", "seen": "de1465ec" },
-    { "path": "docs/03-behaviors/01-devex/04-workspace/04-docs.md", "seen": "de4c61f9" },
+    { "path": "docs/04-capabilities/03-platform/README.md", "seen": "c6aa51b8" },
+    { "path": "docs/03-behaviors/01-devex/04-workspace/04-docs.md", "seen": "92bbadfe" },
     { "path": "docs/03-behaviors/02-support/02-infra/01-shape.md", "seen": "4ca4d9d3" }
   ]
 }

@@ -1,10 +1,11 @@
-// RESTATES: the contract of `hooks/scripts/timing.py`, which owns these rules.
-// A change to the switch, the record shape or the size cap is made there first, then here.
+// This file OWNS these rules — the switch, the record shape and the size cap — and restates nothing.
+// It carried a `RESTATES:` header naming the Python script it was ported from, and that script is
+// gone, so the header pointed at nothing and a reader had no way to tell a moved rule from a typo.
 //
-// What the TypeScript tools cost, written only while the developer has asked for it. It writes the
-// SAME record shape into the SAME log as `timing.py`, so `workspace timings` reads one file and the
-// port can be measured against the Python it replaced. Without this the telemetry goes blind at
-// exactly the moment it has to prove the per-write cost fell, which is this arc's own acceptance.
+// What the TypeScript tools cost, written only while the developer has asked for it. One record
+// shape in one log, so `workspace timings` reads a single file. Without this the telemetry goes
+// blind at exactly the moment it has to prove the per-write cost fell, which is the arc's own
+// acceptance.
 //
 // Measuring is free; writing is the cost. `begin()` touches no filesystem, so a check that refuses
 // early and exits pays nothing. The switch is read at the moment of writing.

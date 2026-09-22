@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/02-constructs/02-support/02-infra/02-packages.md", "seen": "b728084d" },
+    { "path": "docs/02-constructs/02-support/02-infra/02-packages.md", "seen": "a303da8b" },
     { "path": "docs/04-capabilities/02-support/02-infra/02-packages/01-manifests.md", "seen": "31f0d9dd" }
   ]
 }

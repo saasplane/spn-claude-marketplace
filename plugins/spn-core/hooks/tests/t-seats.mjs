@@ -358,6 +358,77 @@ console.log("\n=== a figure that says nothing about itself is refused");
              && /draws nothing/.test(g) && /0 SOFT/.test(g));
 }
 
+console.log("\n=== a code file's own RESTATES header is read, and a path that is not there is refused");
+{
+  // `restate-drift` read a DOCUMENT's `spn:restates` block and nothing else, so a `// RESTATES:`
+  // header in code was outside its set — and FOURTEEN hook sources named a chapter that is not
+  // there, nine of them under a folder N13 renamed, behind a green light (N15 step 2, 2026-09-22).
+  const { headerSources } = await import("../lib/restates.ts");
+
+  // THE CONTINUATION RULE IS WHAT BIT FIRST. The first version wanted an indent of two spaces,
+  // because `split-plan.ts` wraps that way; six headers wrap at ONE space, so it read line two and
+  // silently dropped the rest — an under-report by a check whose whole job is to stop one.
+  const wrapped = [
+    "// RESTATES: the foundation book — 02-document.md rule 9, and",
+    "// 04-discipline.md § Voice discipline and 06-registers.md § Writing a row.",
+    "//",
+    "// Ordinary prose about 99-not-a-source.md, which is not part of the claim.",
+  ].join("\n");
+  one("a header wrapped at one space is read whole, not just its first line",
+      headerSources(wrapped)[0].cited,
+      (got) => got.join(" ") === "02-document.md 04-discipline.md 06-registers.md");
+  one("and the prose after the bare `//` is not part of the claim",
+      headerSources(wrapped)[0].cited, (got) => !got.includes("99-not-a-source.md"));
+  one("a `RESTATES:` mid-line is a mention, not a header — a test fixture carries one",
+      headerSources('const page = "## Boundary\\n<!-- RESTATES: a chapter -->";'), (got) => got.length === 0);
+  one("a decision id is not a source, and neither is a plain word",
+      headerSources("// RESTATES: RD.DOCS.055 and the layer promise, per docs/a/01-thing.md")[0].cited,
+      (got) => got.length === 1 && got[0] === "docs/a/01-thing.md");
+  one("a second header deeper in the file is found too",
+      headerSources("// RESTATES: docs/a/01-x.md\n\ncode();\n\n// RESTATES: docs/b/02-y.md\n"),
+      (got) => got.length === 2 && got[1].cited[0] === "docs/b/02-y.md");
+
+  // END TO END, over a fixture tree: a path is a claim about a LOCATION and a bare name a claim
+  // about EXISTENCE, so the two are judged differently. Judging both as paths reported six correct
+  // headers as broken; judging both by name would have hidden all nine renamed ones.
+  const bookAt = join(BASE, `hbook${made += 1}`);
+  for (const [rel, body] of Object.entries({
+    "docs/registers/decisions.md": "# decisions\n\n| RD.DOCS.055 | a row |\n",
+    "CONCEPT.md": "# c\n",
+    "docs/04-capabilities/01-devex/05-real.md": "# real\n",
+  })) {
+    mkdirSync(join(bookAt, rel, ".."), { recursive: true });
+    writeFileSync(join(bookAt, rel), body, "utf8");
+  }
+  const pluginAt = join(BASE, `hplug${made += 1}`);
+  const write = (rel, body) => {
+    mkdirSync(join(pluginAt, rel, ".."), { recursive: true });
+    writeFileSync(join(pluginAt, rel), body, "utf8");
+  };
+  write("plugins/spn-x/refs/a.md", "# a ref\n");
+  write("plugins/spn-x/hooks/good.ts", "// RESTATES: docs/04-capabilities/01-devex/05-real.md § A part\n");
+  write("plugins/spn-x/hooks/bare.ts", "// RESTATES: 05-real.md § A part, named without a path\n");
+  write("plugins/spn-x/hooks/bad.ts", "// RESTATES: docs/04-capabilities/01-gone/05-real.md § A part\n");
+  const drift = (args) => {
+    try {
+      return { out: execFileSync(process.execPath, [resolve(import.meta.dirname, "..", "tools", "restate-drift.ts"), ...args],
+        { encoding: "utf8", cwd: pluginAt }), status: 0 };
+    } catch (e) { return { out: String(e.stdout ?? ""), status: e.status ?? -1 }; }
+  };
+  const run2 = drift([bookAt]);
+  one("a header naming a path that is not there is reported",
+      run2.out, has("plugins/spn-x/hooks/bad.ts"));
+  one("and the finding names where that file actually is, so the fix is in the message",
+      run2.out, has("that name is at"));
+  one("a header naming a real path is silent",
+      run2.out, lacks("good.ts"));
+  one("a bare name is judged on whether the file EXISTS, not on where it sits",
+      run2.out, lacks("bare.ts"));
+  one("one broken header, counted", run2.out, has("1 broken header"));
+  one("and the command refuses, so a renamed chapter cannot pass unnoticed again",
+      run2.status, (got) => got !== 0);
+}
+
 console.log("\n=== a repository is never the book it restates");
 {
   // `findBook` names the book by what it CARRIES — a decisions register and a concept — and reads

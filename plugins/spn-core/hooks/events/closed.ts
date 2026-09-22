@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: spn-foundation docs/04-capabilities/01-foundation/01-devex/11-workspace.md § The workstream — closing.
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md § Retirement is close-or-graduate.
 // The chapter is the source of truth. A rule change is edited there first, then here, in the same change.
 //
 // What gets said when a workstream closes.

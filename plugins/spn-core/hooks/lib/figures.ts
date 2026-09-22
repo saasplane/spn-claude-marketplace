@@ -1,4 +1,4 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-foundation/02-docs/05-artifacts.md § The figures · § A connector is a claim
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The figures · § A connector is a claim
 //           § One stylesheet, shipped with the template
 // The chapter is the source of truth. A rule change is edited there first, then here, in the same change.
 //

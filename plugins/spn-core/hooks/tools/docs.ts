@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md · 05-artifacts.md · 02-document.md
 // This file carries rules it does not own. Those chapters are the source of truth. A rule change is
-// edited there first, then here, in the same change. restates.py reports this copy when a source moves.
+// edited there first, then here, in the same change. `restate-drift.ts` reports this copy when a
+// source moves, and reports this header too when a chapter it names is not where it says.
 //
 // The docs tools. TypeScript run by node directly — Node 22 strips types, so there is no build step
 // and no node_modules. One file serves the write-time hook and the on-demand tool, so a check exists
