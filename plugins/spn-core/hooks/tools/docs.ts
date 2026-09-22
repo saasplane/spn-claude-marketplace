@@ -341,9 +341,15 @@ function checkHeader(file: string, src: string, block: any): Finding[] {
     else if (parts[2] !== text(block.title)) add("RULE", `the header title \`${parts[2]}\` is not the block's \`${block.title}\``);
   }
 
+  // AN OVERVIEW IS NAMED IN THE MASTHEAD AND PROMISES IN ITS `h1`, and the template says so in its
+  // own placeholders: one slot asks for `{{PAGE NAME: Concept · Infra · Shape}}` and the other for
+  // `{{The promise, as a short sentence…}}`. Requiring both to equal the block title made that
+  // impossible, so all forty overviews put the promise in all three and the tab strip read as forty
+  // sentences. Every other kind's name and title are the same words, which is why this hid.
   const h1 = headings(src, "h1").map(text);
   if (h1.length !== 1) add("RULE", `${h1.length} \`<h1>\`; a page has exactly one`);
-  else if (h1[0] !== text(block.title)) add("RULE", `the \`<h1>\` \`${h1[0]}\` is not the block's \`${block.title}\``);
+  else if (block.variant !== "overview" && h1[0] !== text(block.title))
+    add("RULE", `the \`<h1>\` \`${h1[0]}\` is not the block's \`${block.title}\``);
 
   // Type equals the block's variant, and the file name's suffix.
   const typeBadge = h.match(/class="badge type"[^>]*>([\s\S]*?)<\/span>/);
