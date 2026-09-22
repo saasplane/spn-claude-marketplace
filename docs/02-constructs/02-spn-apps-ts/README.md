@@ -17,6 +17,7 @@ The model for everything that can only be said about one stack. One file per con
 Each construct here is the stack-concrete form of one in the core domain, so read its counterpart there first. The shape a check takes, what a tool is, and how a skill is matched are all settled in the core domain and are not restated in this one.
 
 <!-- spn:generated domain — do not edit inside these markers; `docs.ts face` writes it -->
+**The TypeScript stack plugin.** It holds what only a stack can say: a check whose rule is true of one stack and nowhere else, a tool over that stack's own register, and the verbs that can only be said in its own words. **A verb that is stack-agnostic stays in `spn-core` and reaches a concrete step through a ref here**, rather than being copied.
 
 | Construct | What it is |
 | --- | --- |

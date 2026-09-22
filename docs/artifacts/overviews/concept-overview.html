@@ -257,7 +257,7 @@
   <a href="#s1"><span class="n">01</span><span>Boundary</span><span class="count">gap</span></a>
   <a href="#s2"><span class="n">02</span><span>Who it serves</span><span class="count">gap</span></a>
   <a href="#s3"><span class="n">03</span><span>The domains it holds</span><span class="count">gap</span></a>
-  <a href="#s4"><span class="n">04</span><span>It declares no world</span></a>
+  <a href="#s4"><span class="n">04</span><span>The world it declares</span></a>
   <a href="#s5"><span class="n">05</span><span>Glossary</span></a>
   <a href="#s6"><span class="n">06</span><span>Where to go next</span></a>
 </nav>
@@ -399,81 +399,64 @@
 <!-- ─────────────────────────────────────────── 03 -->
 <section id="s3">
   <h2>The domains it holds</h2>
-  <p class="lede">It divides by the <strong>kind</strong> of instrument, and never by the three
-  plugins it ships them in.</p>
+  <p class="lede">This repository is a monorepo of plugins, so it divides by plugin.</p>
 
-  <p>A plugin is how delivery is divided, which is a different question from how understanding
-  is divided. The same hook grammar governs a check in <code>spn-core</code> and a check in
-  <code>spn-apps-ts</code>. If the model were divided by plugin, then anyone with a question
-  about hooks would first have to work out which plugin answers it — and that is a question
-  about packaging, asked of somebody who wanted to know about hooks.</p>
+  <p>A monorepo divides by the thing it holds many of, and what this one holds many of is Claude
+  plugins for SaaS Plane. Each is a domain, with a section of its own in the concept and one
+  folder of the same name in every <em>What</em> seat.</p>
 
   <div class="scroll">
     <table>
-      <thead><tr><th>Domain</th><th>Owns</th></tr></thead>
+      <thead><tr><th>Domain</th><th>Ships</th><th>Instruments it carries</th></tr></thead>
       <tbody>
-        <tr><td><strong>Plugins</strong></td>
-            <td>what a plugin is, how the set a workspace loads is derived from its claim, and
-            how one is published and installed</td></tr>
-        <tr><td><strong>Hooks</strong></td>
-            <td>what a hook is — the events it may run on, the grades it may return, what it may
-            refuse and what it may only report</td></tr>
-        <tr><td><strong>Skills</strong></td>
-            <td>what a skill is — a verb's steps, loaded when the work matches, and never a
-            second place a rule lives</td></tr>
-        <tr><td><strong>Refs</strong></td>
-            <td>what a ref is — a restatement of one or more chapters, stamped with what it saw,
-            so a moved chapter is reported rather than discovered</td></tr>
-        <tr><td><strong>Agents</strong></td>
-            <td>the personas and the lenses a review convenes, and what each one is allowed to
-            decide</td></tr>
+        <tr><td><strong><code>spn-core</code></strong></td>
+            <td>the stack-agnostic plugin, loaded by every repository whatever world it
+            declares</td>
+            <td>all five kinds — plugins, hooks, skills, refs and agents</td></tr>
+        <tr><td><strong><code>spn-apps-ts</code></strong></td>
+            <td>the TypeScript stack plugin</td>
+            <td>checks, tools, skills and refs, each true of that stack and nowhere else</td></tr>
+        <tr><td><strong><code>spn-infra</code></strong></td>
+            <td>the estate plugin</td>
+            <td>one guard, plus the skills and refs that change an estate</td></tr>
       </tbody>
     </table>
   </div>
 
-  <p>Delivery is a separate cut across the same five domains: <code>spn-core</code> carries all
-  five instrument kinds and is loaded by every repository whatever world it declares;
-  <code>spn-apps-ts</code> and <code>spn-infra</code> add the stack-specific and estate-specific
-  instruments beside it.</p>
+  <p>The risk in dividing by delivery is that somebody with a general question has to guess which
+  plugin answers it. <strong>It does not arise, because a grammar shared by all three lives in
+  <code>spn-core</code> and the stack plugins restate none of it.</strong> The same hook grammar
+  governs a check here and a check in <code>spn-apps-ts</code>, so <em>what a hook is</em> has one
+  answer in one place — <code>spn-core</code>'s hook set. A stack plugin's chapter says what its
+  own checks decide, never what a check is.</p>
 
-  <div class="gapc">
-    <h4><span class="chip">gap</span> The domains it holds — the tree does not yet match</h4>
-    <div class="scroll"><table><tbody>
-      <tr><th>Owed</th><td>the concept divides by instrument kind; the constructs and
-        capabilities seats are laid out by plugin — <code>01-spn-core</code>,
-        <code>02-spn-apps-ts</code>, <code>03-spn-infra</code>. One of the two is wrong, and
-        nothing has decided which</td></tr>
-      <tr><th>Stated today</th><td><a href="../../../CONCEPT.md">CONCEPT.md</a> § The domains it
-        holds · <a href="../../02-constructs/README.md">the constructs seat</a> ·
-        <a href="../../04-capabilities/README.md">the capabilities seat</a></td></tr>
-      <tr><th>Why none yet</th><td><strong>genuinely owed, and already visible to a tool.</strong>
-        Running the face writer over this tree reports each plugin folder as a domain the
-        concept does not name</td></tr>
-      <tr><th>What would earn one</th><td>a fourth plugin, or an instrument kind that two
-        plugins ship differently — either makes the mismatch cost something</td></tr>
-      <tr><th>Owner · lands at</th><td>this repo · <code>.spndevex/workstreams/</code></td></tr>
-    </tbody></table></div>
-  </div>
+  <p><strong>The five instrument kinds are a shape, not a seat.</strong> Plugin, hook, skill, ref
+  and agent are what an instrument can be, each defined once, in <code>spn-core</code>. They are
+  the vocabulary the three domains are written in rather than a division of the tree — which is
+  why you find <em>the hook set</em> as a chapter under <code>spn-core</code> and never as a
+  folder of its own.</p>
 </section>
 
 <!-- ─────────────────────────────────────────── 04 -->
 <section id="s4">
-  <h2>It declares no world</h2>
-  <p class="lede">This repository carries no <code>sprepo.json</code>, and it gains none.</p>
+  <h2>The world it declares</h2>
+  <p class="lede">This repository declares <code>GENERAL</code>, which is a world with no stack in it.</p>
 
   <p>A repository's manifest declares which world it belongs to — <code>FOUNDATION</code>,
-  <code>APPS</code> or <code>INFRA</code> — and a public marketplace is none of the three. It
-  ships no application, no package a service depends on, and no estate declaration.</p>
+  <code>APPS</code>, <code>INFRA</code> or <code>GENERAL</code> — and a public marketplace is the
+  last of those. It ships no application, no package a service depends on, and no estate
+  declaration; it holds one docs tree and no nodes at all, so the <code>apps</code> and
+  <code>infra</code> verbs refuse it by name.</p>
 
   <div class="pull">
     <p>A docs tree is keyed to the <strong>tree</strong>, never to a manifest
-    (<code>Q107</code>, 2026-09-20). So a tool you run here must tolerate that absence rather
-    than refuse the repository — and if one refuses you, that is the tool's defect and not this
+    (<code>Q107</code>, 2026-09-20). So a tool you run here must tolerate the absence of nodes
+    rather than refuse the repository — and if one refuses you, that is the tool's defect and not this
     repository's.</p>
   </div>
 
-  <p>The same absence decides where the source lives. With no world declared there is no
-  <code>src/</code> at all: the source root is <code>plugins/</code>, and the capabilities seat
+  <p>The same absence decides where the source lives. With no node in the repository there is
+  no <code>src/</code> at all: the source root is <code>plugins/</code>, and the capabilities seat
   mirrors it folder for folder, one document per source folder that earns one, each named for
   the folder it governs. Add a checker and write no mirror for it, and you have added a surface
   nobody documented — which is exactly what the coverage invariant is there to tell you.</p>

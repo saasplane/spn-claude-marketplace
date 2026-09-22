@@ -29,27 +29,59 @@ it here, before you publish.
 
 ## The domains it holds   `DRAFT`
 
-**It divides by the KIND of instrument, never by the three plugins it ships them in.** A plugin is
-how delivery is divided, which is a different question from how understanding is divided. The same
-hook grammar governs a check in `spn-core` and one in `spn-apps-ts`, so when you have a question
-about hooks you should not first have to work out which plugin answers it.
+**This repository is a monorepo of plugins, so it divides by plugin.** A monorepo divides by the
+thing it holds many of, and what this one holds many of is Claude plugins for SaaS Plane. Each is a
+domain, with a subsection here and one folder of the same name in every *What* seat.
 
-| Domain | Owns |
-| --- | --- |
-| **Plugins** | what a plugin is, how the set a workspace loads is derived from its claim, and how one is published and installed |
-| **Hooks** | what a hook is — the events it may run on, the grades it may return, what it may refuse and what it may only report |
-| **Skills** | what a skill is — a verb's steps, loaded when the work matches, and never a second place a rule lives |
-| **Refs** | what a ref is — a restatement of one or more chapters, stamped with what it saw, so a moved chapter is reported rather than discovered |
-| **Agents** | the personas and the lenses a review convenes, and what each one is allowed to decide |
+| Domain | Ships | Instruments it carries |
+| --- | --- | --- |
+| **`spn-core`** | the stack-agnostic plugin, loaded by every repository | all five kinds — plugins, hooks, skills, refs and agents |
+| **`spn-apps-ts`** | the TypeScript stack plugin | checks, tools, skills and refs, each true of that stack and nowhere else |
+| **`spn-infra`** | the estate plugin | one guard, plus the skills and refs that change an estate |
 
-## It declares no world   `DRAFT`
+### spn-core
 
-**This repository carries no `sprepo.json`, and gains none.** A repository's manifest declares which
-world it belongs to — `FOUNDATION`, `APPS` or `INFRA` — and a public marketplace is none of the
-three. It ships no application, no package a service depends on, and no estate declaration.
+**The stack-agnostic plugin, and the one every repository loads.** It holds what is true of every plugin: what an instrument of each of the five kinds is, the events a hook may run on, the grades it may return, and how the set a workspace loads is derived from that workspace's own claim.
 
-So a tool you run here must tolerate that absence rather than refuse the repository, and if one
-refuses you, that is the tool's defect and not this repository's. **A docs tree is keyed to the
+**A grammar shared by all three lives here, and the stack plugins restate none of it.**
+The same hook grammar governs a check here and one in `spn-apps-ts`, so a question about *what a
+hook is* has one answer and one place: `spn-core`'s hook set. A stack plugin's chapter says what its
+own checks decide, never what a check is.
+
+**That is what keeps the division by plugin from splitting a concept in three.** The risk in
+dividing by delivery is that a reader with a general question has to guess which plugin answers it.
+It does not arise, because the general answer is never in a stack plugin — it is in the one every
+repository loads.
+
+### spn-apps-ts
+
+**The TypeScript stack plugin.** It holds what only a stack can say: a check whose rule is true of one stack and nowhere else, a tool over that stack's own register, and
+the verbs that can only be said in its own words. **A verb that is stack-agnostic stays in
+`spn-core` and reaches a concrete step through a ref here**, rather than being copied.
+
+### spn-infra
+
+**The estate plugin.** It holds what changes an estate: one shell script standing between an estate edit and the file it would write, the verbs that change
+what an estate is, and the estate's own vocabulary restated for a reader who may never open the
+book.
+
+### The five instrument kinds are a shape, not a seat
+
+**Plugin · hook · skill · ref · agent are what an instrument can be**, and every one of them is
+defined once, in `spn-core`. They are a vocabulary the three domains are written in rather than a
+division of the tree — which is why you will find *the hook set* as a chapter under `spn-core` and
+never as a folder of its own.
+
+## The world it declares   `DRAFT`
+
+**This repository declares `GENERAL` in `sprepo.json`, which is a world with no stack in it.** A
+manifest declares which world a repository belongs to — `FOUNDATION`, `APPS`, `INFRA` or `GENERAL` —
+and a public marketplace is the last of those: it ships no application, no package a service depends
+on, and no estate declaration. It holds one docs tree and no nodes at all, so the `apps` and `infra`
+verbs refuse it by name.
+
+So a tool you run here must tolerate the absence of nodes rather than refuse the repository, and if
+one refuses you, that is the tool's defect and not this repository's. **A docs tree is keyed to the
 tree, never to a manifest** (`Q107`, 2026-09-20).
 
 ## `plugins/` is source   `DRAFT`
