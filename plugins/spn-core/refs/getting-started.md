@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/05-guides/README.md", "seen": "8317ce08" }
+    { "path": "docs/05-guides/README.md", "seen": "0f055867" }
   ]
 }
 -->
@@ -11,6 +11,20 @@
 **Source of truth:** the foundation book's guides seat (`docs/05-guides/` — its face *is* the day-zero guide). This file restates it for use inside a wired repository and adds nothing; where the two disagree, the book wins and this file is regenerated.
 
 Follow this walk from nothing to a first feature in flight. Every step names the command or verb that carries it; statuses are honest — ✅ runs today, 🚧 the verb is still being built.
+
+**Before step 1, the machine.** Installed once, and none of it is SaaS Plane's own: **node** at the
+version the repositories pin, a version manager that reads that pin (`fnm` or `nvm`), **pnpm**, and a
+**container runtime** — the local estate is real containers rather than mocks. Then the CLI itself,
+`npm install -g @saasplane/utility-ts`. **`spnutils --version` answering is the whole test**, and if
+it does, step 1 is already done.
+
+**The version is not written here**, because a number in prose goes out of date the first time
+somebody bumps it. `.nvmrc` and the `engines` field carry it, and a version manager reads the file.
+
+**Optionally a browser** — `npm install -g playwright` and `npx playwright install chromium` — for
+checks that render a page rather than reading it. They report *not checked* where it is absent, so
+nothing is blocked by skipping it. This is **not** the automation profile: `spnutils` provisions its
+own Chrome under `~/.spnutils/browser/chrome`, and you install nothing for that.
 
 | # | Step | Runs | Status |
 | --- | --- | --- | --- |

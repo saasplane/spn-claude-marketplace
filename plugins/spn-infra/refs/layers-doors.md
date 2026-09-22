@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md", "seen": "3c7d36f0" },
+    { "path": "docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md", "seen": "bedbf3af" },
     { "path": "docs/04-capabilities/02-support/02-infra/03-blueprints/01-layers.md", "seen": "c5af69a1" }
   ]
 }

@@ -3,7 +3,7 @@
   "chapters": [
     { "path": "docs/02-constructs/01-devex/04-workspace/01-workspace.md", "seen": "2481b6c2" },
     { "path": "docs/02-constructs/01-devex/04-workspace/02-workstream.md", "seen": "feebc7e9" },
-    { "path": "docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md", "seen": "3c7d36f0" },
+    { "path": "docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md", "seen": "bedbf3af" },
     { "path": "docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md", "section": "The agent is updated first, and reloaded before anything runs", "seen": "687ada82" },
     { "path": "docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md", "section": "When an edit becomes behaviour", "seen": "4d108ba0" },
     { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md", "section": "Restatement discipline", "seen": "11808ae4" }
