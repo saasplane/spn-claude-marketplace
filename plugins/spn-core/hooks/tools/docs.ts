@@ -2122,6 +2122,51 @@ function gapReport(repo: string, workspace: string): number {
 
 // ---------------------------------------------------------------------------- the command
 
+/**
+ * A link is opened, rather than merely written.
+ *
+ * TWELVE LINKS NAMING A FOLDER `N13` DELETED SURVIVED A CORPUS REPORTING 0 RULE. Every check here
+ * asks whether a document is well-formed, and a link that resolves nowhere is perfectly well-formed
+ * — so a page could name a path that had not existed for days and nothing said so. Two of those
+ * links sat on pages a reader opens.
+ *
+ * What it reads is a RELATIVE link to a file: markdown `](path)` and HTML `href="path"`. An absolute
+ * URL belongs to somebody else's server, a root-relative path belongs to a rendering this corpus
+ * does not control, and a bare `#fragment` names this page. A `path#anchor` is checked as its path,
+ * because the anchor is a heading and headings move for good reasons.
+ *
+ * TEMPLATES ARE SKIPPED, and the reason is not convenience. A template's links are placeholders —
+ * `{{path}}.md` is the shape a produced page fills in — so reading them as paths reports the
+ * template for being a template.
+ */
+function checkLinks(file: string, src: string): Finding[] {
+  if (file.replace(/\\/g, "/").includes("/templates/")) return [];
+  const f: Finding[] = [];
+  const here = dirname(file);
+  const seen = new Set<string>();
+  // A fenced block is a SAMPLE, and a page teaching link syntax writes one on purpose. Reading it as
+  // a path reports the page for explaining itself. No corpus page carries that shape today, which is
+  // exactly why it is handled now rather than after somebody writes one and is told they are wrong.
+  const prose = outsideFences(src).replace(/<pre\b[\s\S]*?<\/pre>/gi, (m) => m.replace(/[^\n]/g, " "));
+  const targets = [
+    ...[...prose.matchAll(/\]\(([^)\s]+)\)/g)].map((m) => m[1]),
+    ...[...prose.matchAll(/href="([^"]+)"/g)].map((m) => m[1]),
+  ];
+  for (const raw of targets) {
+    const target = raw.split("#")[0].trim();
+    if (!target) continue;                                    // a fragment names this page
+    if (/^[a-z][a-z0-9+.-]*:/i.test(target)) continue;        // http, mailto, data, anything scheme-led
+    if (target.startsWith("/")) continue;                     // a rendering this corpus does not control
+    if (target.includes("{{")) continue;                      // a placeholder, not a path
+    if (seen.has(target)) continue;
+    seen.add(target);
+    if (!existsSync(resolve(here, target)))
+      f.push({ check: "link", grade: "RULE", file,
+        message: `names \`${target}\`, and nothing is there — a link is a promise that a reader can follow it` });
+  }
+  return f;
+}
+
 function audit(paths: string[], workspace: string): Finding[] {
   const findings: Finding[] = [];
   const blocks = new Map<string, any>();
@@ -2140,6 +2185,7 @@ function audit(paths: string[], workspace: string): Finding[] {
     findings.push(...checkCodeFigures(p, src, workspace));
     findings.push(...checkTreeFigures(p, src, workspace));
     findings.push(...checkStyleBalance(p, src));
+    findings.push(...checkLinks(p, src));
     findings.push(...checkFurniture(p, src, templates));
     findings.push(...checkPalette(p, src, templates));
     findings.push(...checkGovernsMap(p, src));

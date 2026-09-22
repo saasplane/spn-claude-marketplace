@@ -609,6 +609,51 @@ console.log("\n=== a seat face lists the mirrors beside it, never the chapters t
 
 // ---------------------------------------------------------------- the Map cell resolves on disk
 
+console.log("\n=== a link is opened, rather than merely written");
+{
+  // KNOWN-BAD INPUT. Twelve links naming a folder N13 deleted survived a corpus reporting 0 RULE,
+  // because every other check asks whether a document is well-formed and a dangling link is
+  // perfectly well-formed. One link of each shape here, so a check that reports all of them — or
+  // none — fails.
+  const root = repo({
+    "CONCEPT.md": "# c\n",
+    "docs/02-constructs/01-here/01-here.md":
+      doc({ id: "l-here", title: "Here", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
+          "`For: Architect` · `Status: ✅ DONE`") +
+      "\nA link that [resolves](02-there.md), and one that [does not](03-gone.md).\n" +
+      "\nA [heading on a page that exists](02-there.md#a-heading), and a [heading here](#a-heading).\n" +
+      "\nAn [absolute one](https://example.com/x.md), and a [root-relative one](/docs/x.md).\n",
+    "docs/02-constructs/01-here/02-there.md":
+      doc({ id: "l-there", title: "There", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
+          "`For: Architect` · `Status: ✅ DONE`"),
+  });
+  const out = run(root, ["audit", "docs"]);
+  one("a link naming nothing is reported", out, has("names `03-gone.md`, and nothing is there"));
+  one("a link that resolves is not", out, lacks("names `02-there.md`"));
+  one("an anchor on a page that exists is the page, and the page is there",
+    out, lacks("names `02-there.md#a-heading`"));
+  one("a bare fragment names this page and is not a path", out, lacks("names `#a-heading`"));
+  one("an absolute URL belongs to somebody else's server", out, lacks("example.com"));
+  one("a root-relative path belongs to a rendering this corpus does not control",
+    out, lacks("names `/docs/x.md`"));
+}
+
+{
+  // A page that TEACHES link syntax writes a dead path on purpose. No corpus page carries this
+  // shape today, which is why it is a fixture rather than a corpus case.
+  const root = repo({
+    "CONCEPT.md": "# c\n",
+    "docs/02-constructs/01-here/01-here.md":
+      doc({ id: "l-fence", title: "Fence", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
+          "`For: Architect` · `Status: ✅ DONE`") +
+      "\nA link is written like this:\n\n```md\nSee [the other page](99-nowhere.md).\n```\n" +
+      "\nAnd in a page, like this:\n\n<pre>&lt;a href=\"98-nowhere.md\"&gt;the other page&lt;/a&gt;</pre>\n",
+  });
+  const out = run(root, ["audit", "docs"]);
+  one("a link inside a fenced sample is a sample", out, lacks("99-nowhere.md"));
+  one("a link inside a pre block is a sample too", out, lacks("98-nowhere.md"));
+}
+
 console.log("\n=== a Governs cell names a folder that exists, and the audit says so when it does not");
 {
   // KNOWN-BAD INPUT, because a gate that has only seen a clean tree has not been tested. One cell
@@ -625,6 +670,14 @@ console.log("\n=== a Governs cell names a folder that exists, and the audit says
       "| [ghost.md](ghost.md) | `src/01-core/01-server/ghost/` | A folder nobody has. | ✅ |\n" +
       "<!-- /spn:generated -->\n",
     "src/app/index.ts": "export const a = 1;\n",
+    // The Map's own links resolve, because a generated Map names files it walked. What is under test
+    // is the Governs CELL, and a fixture whose links dangle would be reporting something else.
+    "docs/04-capabilities/app.md":
+      doc({ id: "g-app", title: "App", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
+          "`For: Architect` · `Status: ✅ DONE`"),
+    "docs/04-capabilities/ghost.md":
+      doc({ id: "g-ghost", title: "Ghost", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
+          "`For: Architect` · `Status: ✅ DONE`"),
   });
   const out = run(root, ["audit", "docs"]);
   one("the cell that resolves to nothing is reported", out, has("`src/01-core/01-server/ghost/`, and no such folder exists"));

@@ -3,7 +3,7 @@
 // this workspace is not in and would otherwise never be exercised: day zero, a workspace with no
 // workstreams, one with exactly one open (the standing offer), and the legacy shapes.
 import { execFileSync } from "node:child_process";
-import { mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { mkdirSync, writeFileSync, rmSync, cpSync } from "node:fs";
 import { join } from "node:path";
 
 import { existsSync } from "node:fs";
@@ -203,6 +203,42 @@ if (IN_WORKSPACE) {
   ok = ok && shape;
   if (!ok) failed += 1;
   console.log(`  ${ok ? "PASS" : "FAIL"}  --stdin returns one JSON object${py === null ? "" : ", identical to the Python"}\n        ${py === null ? "no Python to compare — shape only" : `same content ${ok || "false"}`} · systemMessage plus the agent's extra line ${shape}`);
+}
+
+console.log("\n=== a window says when it loaded wiring older than what is installed");
+{
+  // N16 step 3. The copy is a COPY rather than a symlink on purpose: Node resolves a symlink when it
+  // computes `import.meta.url`, so a symlinked fixture would report the source path and prove
+  // nothing. A real install is a copy, which is the shape being tested.
+  const cache = join(BASE, "pc", "plugins", "cache", "saasplane", "spn-core");
+  mkdirSync(join(cache, "9.9.9"), { recursive: true });
+  mkdirSync(join(cache, "0.0.1"), { recursive: true });
+  cpSync(HOOKS, join(cache, "0.0.1", "hooks"), { recursive: true });
+  const installed = join(cache, "0.0.1", "hooks", "events", "orientation.ts");
+
+  const check = (label, text, must, mustNot = []) => {
+    n += 1;
+    const ok = must.every((m) => text.includes(m)) && mustNot.every((m) => !text.includes(m));
+    if (!ok) failed += 1;
+    console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}`);
+  };
+
+  check("a window behind the newest install says so, and names both versions",
+    run("node", [installed, WORKSPACE], WORKSPACE),
+    ["this window loaded", "0.0.1", "9.9.9", "take a fresh window"]);
+
+  // N33's lesson, as a case: a retired install carries `.orphaned_at` and nothing loads it, so a
+  // clock that counts one reports a window behind a version that no longer exists.
+  writeFileSync(join(cache, "9.9.9", ".orphaned_at"), "retired\n");
+  check("a retired install is a corpse and does not count",
+    run("node", [installed, WORKSPACE], WORKSPACE),
+    [], ["this window loaded"]);
+  rmSync(join(cache, "9.9.9", ".orphaned_at"), { force: true });
+
+  // The everyday case, and the one that must never speak: a checkout is not behind an install.
+  check("running from source says nothing — a checkout IS the source",
+    run("node", [`${HOOKS}/events/orientation.ts`, WORKSPACE], WORKSPACE),
+    [], ["this window loaded"]);
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

@@ -39,6 +39,7 @@ import { execFileSync } from "node:child_process";
 import { readdirSync, realpathSync, statSync } from "node:fs";
 import { homedir } from "node:os";
 import { basename, join, relative, resolve, sep } from "node:path";
+import { fileURLToPath } from "node:url";
 import { isDir, isFile, listdir, read, readPayload, runAlone, type Payload } from "../lib/payload.ts";
 import { begin, end, record } from "../lib/timing.ts";
 
@@ -332,10 +333,47 @@ function digest(path: string): string {
       let stat;
       try { stat = statSync(full); } catch { continue; }
       if (stat.isDirectory()) { if (!SKIP.has(entry)) stack.push(full); }
-      else out.push(`${relative(base, full)} ${stat.size}`);
+      else out.push(`${relative(base, full)}\u0000${stat.size}`);
     }
   }
   return out.sort().join("\n");
+}
+
+/**
+ * The wiring this window is running, when it is older than what is installed.
+ *
+ * `cacheState` above answers a different question — whether the cache was built from current source
+ * — and it carries the assumption this one tests: *only the newest cache directory is the one a
+ * window loads*. That is true of the NEXT window. A window loads whatever was installed the moment
+ * it started, and it keeps that copy for its whole life, so a session running while somebody else
+ * installs is reading a directory that is no longer the newest.
+ *
+ * THE VERSION IS READ OFF THIS FILE'S OWN PATH, because that is the one thing a running hook knows
+ * for certain about itself. An installed copy lives at `…/cache/<marketplace>/<plugin>/<version>/`,
+ * so the path names the version that answered. Running from source there is no such segment, and
+ * this returns null rather than guessing — a checkout is not behind an install, it IS the source.
+ *
+ * `RD.DEVEX.057` puts the handover on the tool that changes the wiring. This is the other end of the
+ * same rule: the window that cannot adopt its own new wiring can at least say so on the way in.
+ */
+function loadedBehind(): string | null {
+  let here: string;
+  try { here = fileURLToPath(import.meta.url).replace(/\\/g, "/"); }
+  catch { return null; }
+  // THE CACHE ROOT COMES FROM THE PATH TOO, rather than from `homedir()`. The copy that answered
+  // knows where it lives, and deriving the root removes an assumption about where installs are kept.
+  const at = /^(.*\/plugins\/cache)\/([^/]+)\/([^/]+)\/([^/]+)\//.exec(here);
+  if (!at) return null;                                  // running from source
+  const [, cacheRoot, , plugin, loaded] = at;
+  const cached = join(cacheRoot, at[2], plugin);
+  // A directory carrying `.orphaned_at` is a previous install nothing loads, and reading one is how
+  // a clock came to report a window behind a version that had been retired.
+  const versions = listdir(cached).filter((v) => !isFile(join(cached, v, ".orphaned_at")));
+  if (!versions.length) return null;
+  const newest = versions.reduce((a, b) => (compareVersions(a, b) >= 0 ? a : b));
+  if (compareVersions(newest, loaded) <= 0) return null;
+  return `⚠ this window loaded \`${plugin} ${loaded}\` and \`${newest}\` is installed — ` +
+    "it keeps the copy it started with, so take a fresh window before trusting a skill, a brief or a rule file";
 }
 
 /**
@@ -647,6 +685,8 @@ export function orient(root: string, cwd: string): [text: string, note: string] 
     : "floor not minted — no plugins enabled here";
   lines.push("## The ground", "",
     `\`${root}\` · ${head}`);
+  const behind = loadedBehind();
+  if (behind) lines.push("", behind);
   if (resolve(cwd) !== root) lines.push("", `Rooted in \`${relative(root, resolve(cwd))}\`.`);
   lines.push("");
 
