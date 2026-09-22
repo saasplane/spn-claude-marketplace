@@ -1,0 +1,469 @@
+<meta charset="utf-8">
+<title>spn-claude-marketplace — Concept Overview</title>
+<!-- spn:doc
+{
+  "id": "spn-claude-marketplace-concept-overview",
+  "variant": "overview",
+  "parentId": "concept",
+  "title": "Instruments, not rules.",
+  "lenses": ["ARCHITECT", "SERVER_DEV", "PARTNER"],
+  "summary": "The marketplace's model at reading depth: what it owns and what it refuses, the two readers who hold different halves of it, the five instrument kinds it divides by, and why it declares no world at all.",
+  "keywords": ["concept", "overview", "marketplace", "plugins", "hooks", "skills", "refs", "agents"]
+}
+-->
+<style>
+  :root {
+    --paper:#edf0f3; --card:#f7f9fb; --ink:#141920; --slate:#48525f; --faint:#7c8794;
+    --rule:#d2d9e0; --accent:#2f4e7a; --accent-soft:#e0e8f4;
+    --gap:#8f5714; --gap-soft:#f7ecda; --ok:#2a6459; --ok-soft:#dcece8;
+    --ui:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+    --xs:0.76rem; --sm:0.85rem; --md:0.97rem; --lg:1.32rem; --xl:1.62rem; --xxl:2.5rem;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{ --paper:#0f1318; --card:#171d24; --ink:#e3e8ee; --slate:#a3adb9; --faint:#6f7986;
+      --rule:#242d37; --accent:#86a9da; --accent-soft:#18232f;
+      --gap:#d59d4f; --gap-soft:#2a2113; --ok:#5db3a4; --ok-soft:#14251f; }
+  }
+  :root[data-theme="dark"]{ --paper:#0f1318; --card:#171d24; --ink:#e3e8ee; --slate:#a3adb9; --faint:#6f7986;
+    --rule:#242d37; --accent:#86a9da; --accent-soft:#18232f;
+    --gap:#d59d4f; --gap-soft:#2a2113; --ok:#5db3a4; --ok-soft:#14251f; }
+  :root[data-theme="light"]{ --paper:#edf0f3; --card:#f7f9fb; --ink:#141920; --slate:#48525f; --faint:#7c8794;
+    --rule:#d2d9e0; --accent:#2f4e7a; --accent-soft:#e0e8f4;
+    --gap:#8f5714; --gap-soft:#f7ecda; --ok:#2a6459; --ok-soft:#dcece8; }
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--ui);
+    font-size:1rem;line-height:1.6;-webkit-font-smoothing:antialiased}
+  p{margin:0 0 1rem}
+  code,.m{font-family:var(--mono);font-size:0.87em}
+  strong{font-weight:600}
+  a{color:var(--accent)}
+
+  /* ── layout: sticky rail + column ───────────────────────────── */
+  .page{display:grid;grid-template-columns:11.5rem minmax(0,1fr);gap:2.5rem;
+    max-width:68rem;margin:0 auto;padding:4rem 2rem 6rem;align-items:start}
+  .rail{position:sticky;top:2.5rem;font-family:var(--ui);font-size:var(--xs)}
+  .rail .home{border-left:none;padding-left:0;margin-bottom:.9rem;color:var(--accent);
+    font-weight:650;display:block}
+  .rail .home:hover{text-decoration:underline}
+  .rail .rail-title{letter-spacing:.15em;text-transform:uppercase;color:var(--faint);
+    margin-bottom:.85rem;font-size:.7rem}
+  .rail a{display:flex;gap:.55rem;text-decoration:none;color:var(--slate);
+    padding:.28rem 0 .28rem .6rem;border-left:2px solid var(--rule);line-height:1.4}
+  .rail a .n{font-family:var(--mono);color:var(--faint);font-variant-numeric:tabular-nums}
+  .rail a:hover{color:var(--ink)}
+  .rail a.on{color:var(--accent);border-left-color:var(--accent);font-weight:650}
+  .rail .count{margin-left:auto;font-family:var(--mono);font-size:.68rem;
+    background:var(--gap-soft);color:var(--gap);border-radius:2px;padding:0 .3rem}
+  .wrap{display:flex;flex-direction:column;gap:3.25rem;min-width:0}
+
+  /* hero */
+  .hero{display:flex;flex-direction:column;gap:1.2rem;padding-bottom:2.5rem;
+    border-bottom:2px solid var(--ink)}
+  .eyebrow{font-family:var(--ui);font-size:var(--xs);letter-spacing:.15em;
+    text-transform:uppercase;color:var(--faint)}
+  h1{font-family:var(--ui);font-size:var(--xxl);font-weight:700;letter-spacing:-.032em;
+    line-height:1.05;text-wrap:balance;margin:0;max-width:22ch}
+  .standfirst{font-size:var(--lg);line-height:1.5;color:var(--slate);max-width:38rem}
+  .tagline{font-family:var(--ui);font-size:1.06rem;line-height:1.55;color:var(--ink);
+    max-width:38rem;border-left:2px solid var(--accent);padding-left:1rem;margin:0}
+  .tagline b{font-weight:650;color:var(--accent)}
+  .hero-meta{display:flex;flex-wrap:wrap;gap:.5rem;font-family:var(--mono);font-size:var(--xs)}
+  .hero-meta span{border:1px solid var(--rule);border-radius:2px;padding:.2rem .55rem;
+    color:var(--slate);background:var(--card)}
+
+  h2{font-family:var(--ui);font-size:var(--xl);font-weight:700;letter-spacing:-.01em;
+    text-wrap:balance;margin:0 0 1rem;padding-top:.7rem;border-top:1px solid var(--rule)}
+  h3{font-family:var(--ui);font-size:var(--lg);font-weight:600;letter-spacing:-.008em;
+    margin:2rem 0 .6rem}
+  .lede{font-size:1.06rem;color:var(--slate)}
+
+  .scroll{overflow-x:auto;border:1px solid var(--rule);border-radius:3px;
+    background:var(--card);margin:1.2rem 0}
+  table{border-collapse:collapse;width:100%;font-family:var(--ui);font-size:var(--sm);min-width:30rem}
+  th{text-align:left;font-family:var(--mono);font-size:var(--xs);letter-spacing:.07em;text-transform:uppercase;
+    color:var(--faint);font-weight:650;padding:.6rem .8rem;border-bottom:1px solid var(--rule)}
+  td{padding:.6rem .8rem;border-bottom:1px solid var(--rule);vertical-align:top;color:var(--slate)}
+  td strong{color:var(--ink)}
+  tr:last-child td{border-bottom:none}
+  .dim{color:var(--faint)}
+
+  figure{margin:1.6rem 0}
+  figure svg{display:block;width:100%;max-width:760px;height:auto;margin-inline:auto}
+  figcaption{font-family:var(--ui);font-size:var(--xs);color:var(--faint);margin-top:.5rem}
+
+  .pull{border-left:2px solid var(--accent);background:var(--accent-soft);
+    padding:1rem 1.2rem;margin:1.4rem 0;border-radius:0 3px 3px 0}
+  .pull p{margin:0}
+
+  /* ── a declared gap ─────────────────────────────────────────────
+     A section with no argument behind it says so here rather than
+     reading as complete. The colour is --gap, which this corpus
+     already reserves for a terminal or outstanding state. */
+  .gapc{border:1px solid var(--gap);border-left-width:3px;border-radius:0 3px 3px 0;
+    background:var(--gap-soft);padding:.95rem 1.1rem;margin:1.5rem 0}
+  .gapc h4{font-family:var(--ui);font-size:var(--sm);font-weight:650;margin:0;color:var(--gap);
+    display:flex;align-items:baseline;gap:.55rem;flex-wrap:wrap}
+  .gapc .chip{font-family:var(--mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;
+    border:1px solid var(--gap);border-radius:2px;padding:0 .35rem;color:var(--gap)}
+  .gapc .scroll{margin:.8rem 0 0;background:transparent;border-color:var(--gap)}
+  .gapc table{min-width:26rem}
+  .gapc th{width:11rem;color:var(--gap);border-bottom-color:var(--gap);opacity:.85}
+  .gapc td{border-bottom-color:var(--gap);color:var(--ink);opacity:.9}
+
+  footer{border-top:1px solid var(--rule);padding-top:1.3rem;font-family:var(--ui);
+    font-size:var(--xs);color:var(--faint)}
+
+  @media (max-width:60rem){
+    .page{grid-template-columns:minmax(0,1fr);gap:1.5rem;padding-top:2rem}
+    .rail{position:static;border:1px solid var(--rule);border-radius:3px;
+      background:var(--card);padding:.9rem 1rem}
+    .rail a{border-left:none;padding-left:0}
+    .rail a.on{border-left:none}
+  }
+  /* masthead — the two-line header every page wears (artifacts chapter) */
+  .eyebrow .line{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem .6rem;line-height:1.7}
+  .eyebrow .sep{color:var(--rule);font-weight:300}
+  .eyebrow .line1{display:block;letter-spacing:.15em;text-transform:uppercase;font-weight:650;color:var(--faint);line-height:1.7}
+  .eyebrow .lbl{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+  .eyebrow .audience{display:inline-flex;flex-wrap:wrap;align-items:center;gap:.45rem}
+  .badge{display:inline-flex;align-items:center;gap:.35rem;padding:.1rem .6rem;border-radius:999px;border:1px solid var(--rule);background:var(--card);font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--slate);line-height:1.7;white-space:nowrap}
+  .badge.type{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);font-weight:650}
+  .badge.lens{font-family:var(--ui);font-size:.74rem;letter-spacing:0;text-transform:none}
+</style>
+
+<div class="page">
+
+<nav class="rail" id="rail">
+  <a class="home" href="../README.md">← Artifacts</a>
+  <div class="rail-title">Outline</div>
+  <a href="#s0"><span class="n">00</span><span>Overview</span></a>
+  <a href="#s1"><span class="n">01</span><span>Boundary</span><span class="count">gap</span></a>
+  <a href="#s2"><span class="n">02</span><span>Who it serves</span><span class="count">gap</span></a>
+  <a href="#s3"><span class="n">03</span><span>The domains it holds</span><span class="count">gap</span></a>
+  <a href="#s4"><span class="n">04</span><span>It declares no world</span></a>
+  <a href="#s5"><span class="n">05</span><span>Glossary</span></a>
+  <a href="#s6"><span class="n">06</span><span>Where to go next</span></a>
+</nav>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Marketplace &nbsp;|&nbsp; Instruments, not rules.</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Overview</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">Architect</span><span class="badge lens">Backend developer</span><span class="badge lens">Partner / integrator</span></span></span></div>
+  <h1>Instruments, not rules.</h1>
+  <p class="tagline">The foundation book <b>states</b>; this repository <b>delivers</b>. Every
+  rule here is a restatement of a chapter somewhere else, and a rule invented here is a
+  defect.</p>
+  <p class="standfirst">This is the public marketplace the SaaS Plane agent instruments are
+  shipped from: three plugins, five kinds of instrument, and the machinery that reads the
+  rules and runs them at the moment somebody is working.</p>
+  <div class="hero-meta">
+    <span>3 plugins</span><span>5 instrument kinds</span>
+    <span>no sprepo.json</span><span>public, while the book is not</span>
+  </div>
+</header>
+
+<!-- ─────────────────────────────────────────── 00 -->
+<section id="s0">
+  <h2>Overview</h2>
+  <p class="lede">A SaaS Plane workspace loads its agent instruments from here. They are
+  hooks that fire on an event, tools somebody runs by name, skills that carry a verb's steps,
+  refs that restate a chapter of the foundation book, and the agent briefs a session
+  convenes.</p>
+
+  <p>What makes this repository unusual is what it is <em>not</em> allowed to be. It holds no
+  rule of its own. A rule true of every repository belongs in the foundation book, and a copy
+  kept here would be a second source that drifts away from the first. So every file that
+  carries a rule names the chapter it restates, and a checker compares the two.</p>
+
+  <div class="pull">
+    <p>What is genuinely this repository's is not the rules but the <strong>machinery</strong>:
+    the code that reads them, the events it runs on, and the shape each instrument takes.</p>
+  </div>
+
+  <p>Each section below expands one section of
+  <a href="../../../CONCEPT.md"><code>CONCEPT.md</code></a>, under the concept's own headings and
+  in the concept's own order. It stops well short of the concept's depth, and where the two
+  differ the concept is right.</p>
+</section>
+
+<!-- ─────────────────────────────────────────── 01 -->
+<section id="s1">
+  <h2>Boundary</h2>
+  <p class="lede">The instruments themselves, as code and as files a runtime loads — and
+  nothing about what those instruments say.</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>The line</th><th>Which side this repository is on</th></tr></thead>
+      <tbody>
+        <tr><td><strong>What it owns</strong></td>
+            <td>how an instrument is shaped, what it may refuse, what it may never do, and how
+            the set reaches a workspace — the hooks, the tools, the skills, the refs and the
+            agent briefs, as files</td></tr>
+        <tr><td><strong>What it refuses</strong></td>
+            <td>authoring a rule. A rule true of every repository belongs in the foundation
+            book, and a copy here is a second source that will drift</td></tr>
+        <tr><td><strong>How the refusal is kept</strong></td>
+            <td>every file carrying a rule declares the chapter it restates, and a drift
+            checker compares this tree against the book's</td></tr>
+        <tr><td><strong>Why it is public</strong></td>
+            <td>an instrument is loaded by a runtime on your own machine, so you have to be
+            able to reach it without a grant</td></tr>
+        <tr><td><strong>Why that forces restatement</strong></td>
+            <td>you cannot reach the book the same way. That, and only that, is why a ref
+            restates a chapter instead of linking to one</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>The last two rows are one argument, not two facts. Being public is not a convenience
+  here — it is the constraint the whole restatement machinery exists to answer.</p>
+
+  <div class="gapc">
+    <h4><span class="chip">gap</span> Boundary — no argument recorded</h4>
+    <div class="scroll"><table><tbody>
+      <tr><th>Owed</th><td>why the drift checker compares a stamped hash rather than resolving
+        the chapter at read time, and what is given up by that choice</td></tr>
+      <tr><th>Stated today</th><td><a href="../../../CONCEPT.md">CONCEPT.md</a> § Boundary ·
+        <a href="../../02-constructs/01-spn-core/08-ref-set.md">the Ref construct</a></td></tr>
+      <tr><th>Why none yet</th><td><strong>genuinely owed.</strong> The stamp is what makes a
+        moved chapter reportable rather than silently outrun, and it also means a ref can be
+        correct about a chapter that no longer says what it said</td></tr>
+      <tr><th>What would earn one</th><td>a chapter moving under a released ref, which is the
+        first time the cost is paid by somebody who did not choose it</td></tr>
+      <tr><th>Owner · lands at</th><td>this repo · <code>.spndevex/workstreams/</code></td></tr>
+    </tbody></table></div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────── 02 -->
+<section id="s2">
+  <h2>Who it serves</h2>
+  <p class="lede">Two readers hold different halves of the same chain, and the difference
+  decides how every page here is written.</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Reader</th><th>What they hold</th><th>What follows for them</th></tr></thead>
+      <tbody>
+        <tr><td><strong>The partner</strong></td>
+            <td>this repository, and not the foundation book</td>
+            <td>every citation they meet here <em>names</em> a chapter rather than linking to
+            one, and a ref carries enough of that chapter to be read in full without the
+            book</td></tr>
+        <tr><td><strong>The builder</strong></td>
+            <td>both trees, side by side in one workspace</td>
+            <td>the drift checker is theirs. It is the only thing in the workspace that reads
+            across the two trees, and it is run here, before anything is published</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>This is why a broken link is a worse defect here than in most repositories. A partner
+  cannot follow it to the source, so the restatement has to stand on its own.</p>
+
+  <div class="gapc">
+    <h4><span class="chip">gap</span> Who it serves — no argument recorded</h4>
+    <div class="scroll"><table><tbody>
+      <tr><th>Owed</th><td>how much of a chapter a ref must carry before a partner can act on
+        it without the book, and who decides that a restatement is thin</td></tr>
+      <tr><th>Stated today</th><td><a href="../../../CONCEPT.md">CONCEPT.md</a> § Who it serves ·
+        <a href="../../01-purpose/03-who.md">01-purpose § who</a></td></tr>
+      <tr><th>Why none yet</th><td><strong>genuinely owed.</strong> Completeness is judged by
+        whoever writes the ref, and the reader who would notice the gap is the one reader who
+        cannot check it against the source</td></tr>
+      <tr><th>What would earn one</th><td>a partner reporting that a ref was not enough to act
+        on, which is the only evidence this question has</td></tr>
+      <tr><th>Owner · lands at</th><td>this repo · <code>.spndevex/workstreams/</code></td></tr>
+    </tbody></table></div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────── 03 -->
+<section id="s3">
+  <h2>The domains it holds</h2>
+  <p class="lede">It divides by the <strong>kind</strong> of instrument, and never by the three
+  plugins it ships them in.</p>
+
+  <p>A plugin is how delivery is divided, which is a different question from how understanding
+  is divided. The same hook grammar governs a check in <code>spn-core</code> and a check in
+  <code>spn-apps-ts</code>. If the model were divided by plugin, then anyone with a question
+  about hooks would first have to work out which plugin answers it — and that is a question
+  about packaging, asked of somebody who wanted to know about hooks.</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Domain</th><th>Owns</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Plugins</strong></td>
+            <td>what a plugin is, how the set a workspace loads is derived from its claim, and
+            how one is published and installed</td></tr>
+        <tr><td><strong>Hooks</strong></td>
+            <td>what a hook is — the events it may run on, the grades it may return, what it may
+            refuse and what it may only report</td></tr>
+        <tr><td><strong>Skills</strong></td>
+            <td>what a skill is — a verb's steps, loaded when the work matches, and never a
+            second place a rule lives</td></tr>
+        <tr><td><strong>Refs</strong></td>
+            <td>what a ref is — a restatement of one or more chapters, stamped with what it saw,
+            so a moved chapter is reported rather than discovered</td></tr>
+        <tr><td><strong>Agents</strong></td>
+            <td>the personas and the lenses a review convenes, and what each one is allowed to
+            decide</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>Delivery is a separate cut across the same five domains: <code>spn-core</code> carries all
+  five instrument kinds and is loaded by every repository whatever world it declares;
+  <code>spn-apps-ts</code> and <code>spn-infra</code> add the stack-specific and estate-specific
+  instruments beside it.</p>
+
+  <div class="gapc">
+    <h4><span class="chip">gap</span> The domains it holds — the tree does not yet match</h4>
+    <div class="scroll"><table><tbody>
+      <tr><th>Owed</th><td>the concept divides by instrument kind; the constructs and
+        capabilities seats are laid out by plugin — <code>01-spn-core</code>,
+        <code>02-spn-apps-ts</code>, <code>03-spn-infra</code>. One of the two is wrong, and
+        nothing has decided which</td></tr>
+      <tr><th>Stated today</th><td><a href="../../../CONCEPT.md">CONCEPT.md</a> § The domains it
+        holds · <a href="../../02-constructs/README.md">the constructs seat</a> ·
+        <a href="../../04-capabilities/README.md">the capabilities seat</a></td></tr>
+      <tr><th>Why none yet</th><td><strong>genuinely owed, and already visible to a tool.</strong>
+        Running the face writer over this tree reports each plugin folder as a domain the
+        concept does not name</td></tr>
+      <tr><th>What would earn one</th><td>a fourth plugin, or an instrument kind that two
+        plugins ship differently — either makes the mismatch cost something</td></tr>
+      <tr><th>Owner · lands at</th><td>this repo · <code>.spndevex/workstreams/</code></td></tr>
+    </tbody></table></div>
+  </div>
+</section>
+
+<!-- ─────────────────────────────────────────── 04 -->
+<section id="s4">
+  <h2>It declares no world</h2>
+  <p class="lede">This repository carries no <code>sprepo.json</code>, and it gains none.</p>
+
+  <p>A repository's manifest declares which world it belongs to — <code>FOUNDATION</code>,
+  <code>APPS</code> or <code>INFRA</code> — and a public marketplace is none of the three. It
+  ships no application, no package a service depends on, and no estate declaration.</p>
+
+  <div class="pull">
+    <p>A docs tree is keyed to the <strong>tree</strong>, never to a manifest
+    (<code>Q107</code>, 2026-09-20). So a tool you run here must tolerate that absence rather
+    than refuse the repository — and if one refuses you, that is the tool's defect and not this
+    repository's.</p>
+  </div>
+
+  <p>The same absence decides where the source lives. With no world declared there is no
+  <code>src/</code> at all: the source root is <code>plugins/</code>, and the capabilities seat
+  mirrors it folder for folder, one document per source folder that earns one, each named for
+  the folder it governs. Add a checker and write no mirror for it, and you have added a surface
+  nobody documented — which is exactly what the coverage invariant is there to tell you.</p>
+
+  <p>One thing that absence does not excuse. The foundation book names some of these checkers
+  where a rule cites one, and four of them it does not name at all. Naming is not documenting:
+  the rule belongs to the book, and the implementation belongs here.</p>
+</section>
+
+<!-- ─────────────────────────────────────────── 05 -->
+<section id="s5">
+  <h2>Glossary</h2>
+  <p class="lede">The words this page leans on. Each is meant in the narrow sense this
+  repository gives it, and where the foundation book defines one, the book wins.</p>
+
+  <div class="scroll"><table>
+    <tr><th>Word</th><th>What it means here</th></tr>
+    <tr><td><strong>the marketplace</strong></td><td>this repository, and the public listing at
+      its root that tells a runtime which plugins exist and where each one sits</td></tr>
+    <tr><td><strong>a plugin</strong></td><td>one delivery unit — a manifest and a folder tree —
+      holding any of the five instrument kinds. Three are shipped:
+      <code>spn-core</code>, <code>spn-apps-ts</code>, <code>spn-infra</code></td></tr>
+    <tr><td><strong>an instrument</strong></td><td>the house word for anything this repository
+      delivers to a session: a hook, a tool, a skill, a ref, a lens or an agent brief</td></tr>
+    <tr><td><strong>a hook</strong></td><td>code the runtime calls for you at a named moment of
+      the loop. It returns a verdict rather than printing one, and only one of the four moments
+      is allowed to refuse anything</td></tr>
+    <tr><td><strong>a skill</strong></td><td>a verb's steps, in a folder with a description
+      written to be <em>matched</em> against the work at hand rather than browsed by a
+      person</td></tr>
+    <tr><td><strong>a ref</strong></td><td>a restatement of one or more chapters of the
+      foundation book, carried here in full so a reader with no book checkout can still read
+      it</td></tr>
+    <tr><td><strong>the stamp</strong></td><td>the hash of the chapter a ref last saw. It is
+      what turns a moved chapter into something reported rather than discovered later</td></tr>
+    <tr><td><strong>a lens</strong></td><td>one reviewing viewpoint, naming the single thing it
+      may block and everything it can only advise. A panel is convened by naming one</td></tr>
+    <tr><td><strong>an agent brief</strong></td><td>a persona a session can convene, and the
+      bound authority it carries once it runs — which for most of them excludes
+      writing</td></tr>
+    <tr><td><strong>the book</strong></td><td>the foundation repository, which states the rules
+      this one delivers. It is private; this one is not, and that asymmetry is the reason
+      restatement exists</td></tr>
+  </table></div>
+</section>
+
+<!-- ─────────────────────────────────────────── 06 -->
+<section id="s6">
+  <h2>Where to go next</h2>
+  <p class="lede">Pick the row that matches what you came for. Each is the shortest path from
+  this page to the thing that states the answer in full.</p>
+
+  <div class="scroll"><table>
+    <tr><th>If you want</th><th>Open</th></tr>
+    <tr><td>the model, stated once and in full</td>
+      <td><a href="../../../CONCEPT.md"><code>CONCEPT.md</code></a> at the repository root</td></tr>
+    <tr><td>this repository's own doc set</td>
+      <td><a href="../../README.md"><code>docs/</code></a> — the five seats and the two
+      pockets</td></tr>
+    <tr><td>why the marketplace exists at all</td>
+      <td><a href="../../01-purpose/README.md">01-purpose</a> — why, what, and who</td></tr>
+    <tr><td>what a hook, skill, ref or agent <em>is</em></td>
+      <td><a href="../../02-constructs/README.md">02-constructs</a>, one seat file per
+      construct</td></tr>
+    <tr><td>what exists under <code>plugins/</code> today</td>
+      <td><a href="../../04-capabilities/README.md">04-capabilities</a> — a mirror per source
+      folder that earns one</td></tr>
+    <tr><td>to install the plugins into a workspace</td>
+      <td><a href="../../05-guides/01-install-the-plugins.md">the install guide</a>, which names
+      the commands in order</td></tr>
+    <tr><td>to prove the hooks still work</td>
+      <td><code>node plugins/spn-core/hooks/tests/run.mjs</code>, the suite runner this
+      repository carries</td></tr>
+    <tr><td>the rules themselves, rather than the code that runs them</td>
+      <td>the foundation book. If you hold only this tree, the
+      <a href="../../02-constructs/01-spn-core/08-ref-set.md">refs</a> are the copy you can
+      read</td></tr>
+  </table></div>
+</section>
+
+<footer>
+  This page summarizes <a href="../../../CONCEPT.md">CONCEPT.md</a>, which states the model in
+  full. Where the two differ, the concept is right — this page trades completeness for your
+  first read. It carries no open list of its own: the concept holds that, and the sections here
+  that have no argument behind them say so with a declared gap instead. Sources:
+  <code>CONCEPT.md</code>, the five docs seats, and the three plugin trees under
+  <code>plugins/</code> — read 2026-09-22. Replaced in place as the concept moves.
+</footer>
+
+</div>
+</div>
+
+<script>
+(function(){
+  var links = Array.prototype.slice.call(document.querySelectorAll('#rail a[href^="#"]'));
+  var targets = links.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+  function sync(){
+    var best = 0;
+    for (var i = 0; i < targets.length; i++){
+      if (targets[i] && targets[i].getBoundingClientRect().top <= 120) best = i;
+    }
+    links.forEach(function(a, i){ a.classList.toggle('on', i === best); });
+  }
+  document.addEventListener('scroll', sync, {passive:true});
+  window.addEventListener('resize', sync);
+  sync();
+})();
+</script>

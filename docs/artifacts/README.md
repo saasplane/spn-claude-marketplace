@@ -4,8 +4,8 @@
   "title": "Artifacts — What This Repository Authors",
   "lenses": ["ARCHITECT", "LEAD"],
   "status": "IMPLEMENTING",
-  "summary": "The pocket of this repository: the construct pages produced from the model's seat files, and the reports somebody asked for.",
-  "keywords": ["artifacts", "pocket", "constructs", "reports", "marketplace", "plugins"]
+  "summary": "The pocket of this repository: the concept hub that gives CONCEPT.md a readable face, the construct pages produced from the model's seat files, and the reports somebody asked for.",
+  "keywords": ["artifacts", "pocket", "overview", "hub", "constructs", "reports", "marketplace", "plugins"]
 }
 -->
 
@@ -15,7 +15,17 @@
 
 You consult a pocket; you never read it through. That is why it carries no number, and why it sits outside the five seats the 📖 walk crosses in order.
 
-**The folder set is fixed**: `overviews/`, `constructs/`, `reports/` and nothing else. A folder here is earned, so this pocket carries only what this repository actually authors — it holds no `overviews/` yet, because nothing has needed the model's face expanded beyond what `CONCEPT.md` states.
+**The folder set is fixed**: `overviews/`, `constructs/`, `reports/` and nothing else. A folder here is earned, so this pocket carries only what this repository actually authors — today that is the concept hub, the construct pages produced from their seat files, and one report.
+
+## Overviews
+
+The hub gives [`CONCEPT.md`](../../CONCEPT.md) a readable face. It borrows the concept's own headings, in the concept's own order, and it stops well short of the concept's depth.
+
+| Document | Explains | Status |
+| --- | --- | --- |
+| [concept-overview](overviews/concept-overview.html) | the whole model — what the repository owns and what it refuses, the partner and the builder who hold different halves of it, the five instrument kinds it divides by, and why it declares no world | 🚧 |
+
+There is **one hub per repository**, and it is replaced in place as the concept moves. A hub section with no argument behind it carries a declared gap rather than reading as settled; when one is argued, the argument lands in the workstream that argued it and the section links to it.
 
 ## Constructs
 
