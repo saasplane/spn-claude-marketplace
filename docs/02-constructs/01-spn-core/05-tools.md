@@ -80,7 +80,7 @@ Handing a whole corpus to a rewriting pass is the expensive way to improve it, a
 
 ### A tool that writes rather than reports
 
-One tool here writes. It reads a run's own results file and puts what the run found into the cells a run owns, leaving every other cell exactly as it was. It exists because this repository declares no stack, so no stack runner writes its rows, and the plugins' own suites are the thing that knows. *Where:* `plugins/spn-core/hooks/tools/behaviour-status.mjs`
+One tool here writes. It reads a run's own results file and puts what the run found into the cells a run owns, leaving every other cell exactly as it was. It exists because this repository declares no stack, so no stack runner writes its rows, and only the plugins' own suites know. *Where:* `plugins/spn-core/hooks/tools/behaviour-status.mjs`
 
 ## Boundary
 

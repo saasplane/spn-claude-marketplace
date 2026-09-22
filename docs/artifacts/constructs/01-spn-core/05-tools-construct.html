@@ -267,7 +267,7 @@
   <h3 id="a-tool-that-reports-candidates-rather-th">A tool that reports candidates rather than verdicts</h3>
   <p>Handing a whole corpus to a rewriting pass is the expensive way to improve it, and most of the corpus needs no change. So the prose triage reports the paragraphs a pattern can recognise, with a ledger of what it has already scored so a long sweep can resume, and it leaves the faults no pattern can tell from good prose to a reader. <em>Where:</em> <code>plugins/spn-core/hooks/tools/prose-triage.ts</code></p>
   <h3 id="a-tool-that-writes-rather-than-reports">A tool that writes rather than reports</h3>
-  <p>One tool here writes. It reads a run's own results file and puts what the run found into the cells a run owns, leaving every other cell exactly as it was. It exists because this repository declares no stack, so no stack runner writes its rows, and the plugins' own suites are the thing that knows. <em>Where:</em> <code>plugins/spn-core/hooks/tools/behaviour-status.mjs</code></p>
+  <p>One tool here writes. It reads a run's own results file and puts what the run found into the cells a run owns, leaving every other cell exactly as it was. It exists because this repository declares no stack, so no stack runner writes its rows, and only the plugins' own suites know. <em>Where:</em> <code>plugins/spn-core/hooks/tools/behaviour-status.mjs</code></p>
 </section>
 
 <!-- 03 -->

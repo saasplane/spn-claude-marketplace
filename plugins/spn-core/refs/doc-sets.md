@@ -394,7 +394,7 @@ Write the specification in a ```` ```dg ```` fence and the drawer computes every
 `SYSTEM` is a constrained `MAP` (decision RD.DOCS.075), and it is the kind you will reach for most when documenting a repository. Derive it from the source rather than from a template:
 
 1. **The container is the module**, and its name is the module's own. Anything outside it is something the module talks to.
-2. **Read `entry/` for the doors.** Each door is its own box — `api`, `cli`, `queue` — and each is met by the thing that knocks on it. **Draw the doors the module actually has**: a module with only `api` gets one door, and pretending otherwise draws a fiction.
+2. **Read `entry/` for the doors.** Each door is its own box — `api`, `cli`, `queue` — and each is met by whatever knocks on it. **Draw the doors the module actually has**: a module with only `api` gets one door, and pretending otherwise draws a fiction.
 3. **Read `app/` for the middle layer** — `services` and `repositories`, with `entities` and `utils` beside them.
 4. **The layer at the foot is what the module is given or publishes** — `config` (the environment it is started with) for a deployable, `contract` (the surface its siblings import) for a module inside one.
 5. **Read the imports for the outward edges, and attribute each to its layer.** This is the load-bearing step, because which layer owns an edge is a claim about the code. A **repository reaches the database and nothing else** — a repository importing a file store is a finding, not a drawing. **Services** reaches the queue, the cache, transactions, the file store and sibling modules.
