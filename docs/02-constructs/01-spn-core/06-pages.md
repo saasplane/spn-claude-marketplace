@@ -109,7 +109,7 @@ This page answers how a page is produced, what a figure is measured against, and
 
 | Check | Kind | What a green run shows |
 | --- | --- | --- |
-| `node plugins/spn-core/hooks/tools/docs.ts figures check docs/artifacts/constructs` | gate | every label fits its box, every connector starts and ends on a shape, and nothing crowds its neighbour |
+| `node plugins/spn-core/hooks/tools/docs.ts figures check docs` | gate | every label fits its box, every connector starts and ends on a shape, nothing crowds its neighbour, and every figure's spec carries the caption a reader is owed. The path is the whole tree rather than the produced pages alone, because a caption is read from the spec in the seat file and a produced page holds none |
 | `node plugins/spn-core/hooks/tools/docs.ts audit docs` | gate | every page is what its seat file produces, so no page carries a hand edit |
 
-Try it: `node plugins/spn-core/hooks/tools/docs.ts figures check docs/artifacts/constructs`
+Try it: `node plugins/spn-core/hooks/tools/docs.ts figures check docs`

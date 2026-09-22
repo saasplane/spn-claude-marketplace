@@ -277,11 +277,11 @@
   <div class="scroll"><table>
     <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
     <tbody>
-      <tr><td><code>node plugins/spn-core/hooks/tools/docs.ts figures check docs/artifacts/constructs</code></td><td>gate</td><td>every label fits its box, every connector starts and ends on a shape, and nothing crowds its neighbour</td></tr>
+      <tr><td><code>node plugins/spn-core/hooks/tools/docs.ts figures check docs</code></td><td>gate</td><td>every label fits its box, every connector starts and ends on a shape, nothing crowds its neighbour, and every figure's spec carries the caption a reader is owed. The path is the whole tree rather than the produced pages alone, because a caption is read from the spec in the seat file and a produced page holds none</td></tr>
       <tr><td><code>node plugins/spn-core/hooks/tools/docs.ts audit docs</code></td><td>gate</td><td>every page is what its seat file produces, so no page carries a hand edit</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>node plugins/spn-core/hooks/tools/docs.ts figures check docs/artifacts/constructs</code></p>
+  <p>Try it: <code>node plugins/spn-core/hooks/tools/docs.ts figures check docs</code></p>
 </section>
 
 <footer>

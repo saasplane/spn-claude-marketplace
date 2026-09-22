@@ -1877,8 +1877,9 @@ if (cmd === "figures") {
   if (!files.length) process.exit(1);
   if (sub === "check") {
     let total = 0;
-    // SOFTS ARE COUNTED APART FROM RULES, so the caption gap is visible and falling rather than a
-    // wall on day one. The exit code stays a RULE's alone.
+    // SOFTS ARE COUNTED APART FROM RULES, and the exit code is a RULE's alone. Nothing this check
+    // reports is SOFT today; the split stays because the next soft finding should not have to
+    // reinvent the summary line, and a reader of the line can tell a report from a refusal.
     let soft = 0;
     for (const f of files) {
       const src = readFileSync(f, "utf8");
@@ -1900,15 +1901,16 @@ if (cmd === "figures") {
         // ONLY `caption` RENDERS A `<figcaption>`: `render.ts` reads that one field, and `title`
         // reaches the reader as the `aria-label` alone. So a spec carrying just a title satisfies
         // the arc's wording and still leaves the reader with nothing, and it is reported too.
-        // SOFT while the 94 are authored (N14 step 1) and a RULE at step 3 — refusing on day one
-        // would wall off two thirds of the seat files in six repositories at once.
+        // IT WAS SOFT FOR ONE SITTING AND THE REASON HAS GONE. Reporting rather than refusing was
+        // step 1, so the count could be seen and could fall; step 2 authored all 94, one agent per
+        // repository; and every repository reads clean, so a RULE walls nothing off. N14 step 3.
         const said = (k: string) => (typeof spec?.[k] === "string" ? String(spec[k]).trim() : "");
         if (!said("caption")) {
-          soft += 1;
+          total += 1;
           const why = said("title")
             ? "carries a `title` and no `caption` — only a `caption` renders a `<figcaption>`, so the reader is still told nothing about what to notice"
             : `carries neither \`title\` nor \`caption\`, so the page renders no \`<figcaption>\` and the figure's \`aria-label\` falls back to \`${said("kind") || "figure"}\` — a screen reader announces the kind word`;
-          console.log(`! SOFT figure    ${relative(workspace, f)}\n         spec${n}: ${why}`);
+          console.log(`✗ RULE figure    ${relative(workspace, f)}\n         spec${n}: ${why}`);
         }
         let out;
         try { out = draw(spec); }

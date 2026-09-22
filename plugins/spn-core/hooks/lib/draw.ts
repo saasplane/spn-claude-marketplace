@@ -57,6 +57,16 @@ const LABEL_H = 12, LABEL_GAP = 8;
 const H_ONE = 44, H_TWO = 64;
 
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+// A LABEL IS SPOKEN, NOT RENDERED. A caption may carry the page's own markdown — a code span for a
+// contract term, emphasis on one word — and the `<figcaption>` renders it as markup. The `aria-label`
+// is read aloud instead, so the same sentence reaching it verbatim makes a screen reader announce the
+// backtick characters themselves. Found by a step 2 agent on the one caption that spells a contract
+// term as a code span (N14, 2026-09-22). The markers are the four `render.ts` renders inline.
+const spoken = (s: string) => s
+  .replace(/`([^`]+)`/g, "$1")
+  .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+  .replace(/\*\*([^*]+)\*\*/g, "$1")
+  .replace(/(^|[^*])\*([^*]+)\*(?!\*)/g, "$1$2");
 
 /**
  * A FIGURE'S viewBox HUGS ITS CONTENT, so a drawing is as wide as the paragraph above it. Every
@@ -110,7 +120,7 @@ function fit(body: string[]): { x0: number; y0: number; w: number; h: number } {
 function svgOf(body: string[], label: string): string {
   const { x0, y0, w, h } = fit(body);
   return [
-    `<svg class="dg" viewBox="${x0} ${y0} ${w} ${h}" role="img" aria-label="${esc(label)}">`,
+    `<svg class="dg" viewBox="${x0} ${y0} ${w} ${h}" role="img" aria-label="${esc(spoken(label))}">`,
     `  <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>`,
     ...body,
     `</svg>`,

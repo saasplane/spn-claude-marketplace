@@ -422,5 +422,32 @@ console.log("\n=== ENTITIES — every relation line says one or many");
       (g) => g.length > 0 && g.every((y) => y >= vb[1] && y <= vb[1] + vb[3]));
 }
 
+console.log("\n=== the label a screen reader is given is spoken, not rendered");
+{
+  // A caption carries the page's own markdown — a code span for a contract term — and the
+  // `<figcaption>` renders it as markup. The `aria-label` is read ALOUD, so the same sentence
+  // reaching it verbatim makes a screen reader announce the backtick characters. Found by a step 2
+  // agent on the one caption that spells a contract term as a code span (N14, 2026-09-22), which is
+  // the same fault this arc exists to fix: the label was the bare word `map` before, and a label
+  // reading *backtick applies backtick* is no better.
+  const boxes = [{ id: "a", label: "A" }, { id: "b", label: "B" }];
+  const labelOf = (spec) => /aria-label="([^"]*)"/.exec(draw(spec).svg)?.[1];
+
+  one("a code span reaches the label as the term alone",
+      labelOf({ kind: "map", caption: "The `applies` test stands first.", boxes }),
+      "The applies test stands first.");
+  one("emphasis and a strong span are spoken as their own words",
+      labelOf({ kind: "map", caption: "**Every** arrow runs *one* way.", boxes }),
+      "Every arrow runs one way.");
+  one("a link is spoken as its text, never as its address",
+      labelOf({ kind: "map", caption: "Read [the chapter](../05-artifacts.md) for the rule.", boxes }),
+      "Read the chapter for the rule.");
+  one("a caption with no markdown in it is untouched",
+      labelOf({ kind: "map", caption: "The ledger sits apart, because it is not a resource.", boxes }),
+      "The ledger sits apart, because it is not a resource.");
+  one("and an ampersand is still escaped, because the label is an attribute",
+      labelOf({ kind: "map", caption: "Plan & prove.", boxes }), "Plan &amp; prove.");
+}
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);
