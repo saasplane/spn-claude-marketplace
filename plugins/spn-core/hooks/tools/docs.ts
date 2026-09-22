@@ -430,6 +430,60 @@ function checkCodeFigures(file: string, src: string, root: string): Finding[] {
   return f;
 }
 
+/**
+ * The repository a document sits in: the nearest folder at or above it that declares itself.
+ *
+ * A MAP CELL IS REPOSITORY-RELATIVE, not workspace-relative — `src/…` in a node repo,
+ * `plugins/…` here — so resolving one against the workspace root is the wrong question.
+ * `checkCodeFigures` resolves against the workspace because a figure names a workspace path.
+ */
+function repoOf(file: string): string | null {
+  let dir = dirname(resolve(file));
+  for (;;) {
+    if (existsSync(join(dir, "sprepo.json"))) return dir;
+    const up = dirname(dir);
+    if (up === dir) return null;
+    dir = up;
+  }
+}
+
+/**
+ * A `Governs` cell in a generated Map names a folder that exists.
+ *
+ * NOTHING PROVED A MAP CELL, AND THE AUDIT READ CLEAN OVER SEVENTEEN FOLDERS THAT WERE NOT THERE.
+ * `checkCodeFigures` already proves that a pathed figure resolves; a Map row is the same kind of
+ * claim — *this document governs that folder* — and it was derived by a generator rather than
+ * typed, which is exactly why no reader caught it. A derived path is still a claim about disk.
+ *
+ * ONLY THE GENERATED REGION IS READ. `Governs` is also a column heading in authored tables, where
+ * the cell is a sentence rather than a path — the foundation's register index and its docs domain
+ * both carry one, and a cell reading *auth/data policies* looks like a path to anything that only
+ * tests for a slash. The marked region is where the derivation happens, so it is what is judged.
+ */
+function checkGovernsMap(file: string, src: string): Finding[] {
+  const f: Finding[] = [];
+  const repo = repoOf(file);
+  if (!repo) return f;
+  for (const region of src.matchAll(/<!-- spn:generated map[^>]*-->([\s\S]*?)<!-- \/spn:generated -->/g)) {
+    const rows = region[1].split("\n").map((l) => l.trim()).filter((l) => l.startsWith("|"))
+      .map((l) => l.replace(/^\|/, "").replace(/\|$/, "").split("|").map((c) => c.trim()));
+    const column = (rows[0] ?? []).findIndex((c) => c.toLowerCase() === "governs");
+    if (column < 0) continue;
+    for (const cells of rows.slice(1)) {
+      const cell = (cells[column] ?? "").replace(/`/g, "").trim();
+      // The separator row, and the empty-Map row the generator writes when a level has no mirror.
+      if (!cell || cell === "—" || /^[-:]+$/.test(cell)) continue;
+      if (!existsSync(resolve(repo, cell))) {
+        // The first cell is a markdown link, and the finding wants the mirror's name rather than
+        // its link syntax — a message a reader has to parse is a message that gets skimmed.
+        const mirror = (cells[0] ?? "").replace(/\[([^\]]*)\]\([^)]*\)/g, "$1").trim() || "a mirror";
+        f.push({ check: "map", grade: "SOFT", file, message: `the Map says \`${mirror}\` governs \`${cell}\`, and no such folder exists` });
+      }
+    }
+  }
+  return f;
+}
+
 /** A Proof row names something an installed workspace can run. */
 function checkProof(file: string, src: string): Finding[] {
   const f: Finding[] = [];
@@ -779,6 +833,30 @@ function walkFiles(dir: string, keep: (p: string) => boolean, out: string[] = []
   return out;
 }
 
+/**
+ * The files directly in a folder, with nothing below it read.
+ *
+ * A MIRROR IS A DIRECT CHILD, and the recursive walk is what made the Map name folders that do not
+ * exist. `walkFiles` reaches every depth, so a seat face three levels above the chapters collected
+ * them all and derived `<root>/<the docs-relative path>/` from each — a source root with the seat's
+ * own numbering concatenated onto it. 36 such cells stood across three repositories, every one
+ * naming nothing. A level that holds no `.md` of its own governs no mirror, and saying so is the
+ * correct answer rather than an empty table to be filled in later.
+ */
+function directFiles(dir: string, keep: (p: string) => boolean): string[] {
+  let entries: string[]; try { entries = readdirSync(dir); } catch { return []; }
+  const out: string[] = [];
+  for (const e of entries) {
+    const p = join(dir, e);
+    let st; try { st = statSync(p); } catch { continue; }
+    // A folder is never a mirror here. `templates/` needs no exception of its own: nothing inside
+    // any folder is a direct child.
+    if (st.isDirectory()) continue;
+    if (keep(p)) out.push(p);
+  }
+  return out;
+}
+
 /** The dictionary: one row per term, three columns, generated from the constructs and the data models. */
 function buildDictionary(tree: string): { body: string; findings: Finding[] } {
   const findings: Finding[] = [];
@@ -840,7 +918,12 @@ function buildMap(faceFile: string): { body: string; findings: Finding[] } {
   // on the face, and the Map then names a folder that exists instead of one that does not.
   const { block: faceBlock } = readBlock(readFileSync(faceFile, "utf8"));
   const root = (faceBlock?.governs ?? "src").replace(/\/+$/, "");
-  const mirrors = walkFiles(dir, (p) => p.endsWith(".md") && basename(p) !== "README.md" && basename(p) !== "data-model.md")
+  // ONLY THE DIRECT CHILDREN, BECAUSE THE DERIVATION BELOW IS ONE LEVEL DEEP. `governs` is a source
+  // root and `rel` is appended to it whole, so a file collected from further down carries the
+  // levels between — the domain folder and the package folder — into a path that never existed.
+  // The chapter branch above is where a deeper file belongs, and it is reached by the face that
+  // owns it. A folder with no `.md` of its own governs no mirror, and the empty case below says so.
+  const mirrors = directFiles(dir, (p) => p.endsWith(".md") && basename(p) !== "README.md" && basename(p) !== "data-model.md")
     .sort((a, b) => a.localeCompare(b));
   const glyph: Record<string, string> = { DONE: "✅", IMPLEMENTING: "🚧", PLANNING: "🔮" };
   const lines = ["| File | Governs | Carries | Status |", "| --- | --- | --- | --- |"];
@@ -1808,6 +1891,7 @@ function audit(paths: string[], workspace: string): Finding[] {
     findings.push(...checkHeader(p, src, block));
     findings.push(...checkCards(p, src, block));
     findings.push(...checkCodeFigures(p, src, workspace));
+    findings.push(...checkGovernsMap(p, src));
     findings.push(...checkProof(p, src));
     findings.push(...checkBinds(p, src, block, nodes));
     findings.push(...checkOverviewSource(p, src, block, workspace));

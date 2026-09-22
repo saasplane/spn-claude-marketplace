@@ -551,6 +551,134 @@ console.log("\n=== a Map is a list of mirrors, so an authored seat has none");
     readAt(authored, "docs/04-capabilities/README.md"), lacks("spn:generated map"));
 }
 
+
+// ---------------------------------------------------------------- a mirror is a DIRECT child
+
+console.log("\n=== a seat face lists the mirrors beside it, never the chapters three levels down");
+{
+  // The shape every affected repository has: the seat holds domains, a domain holds packages, and
+  // only a package holds chapters. A recursive walk collected the chapters and derived
+  // `src/<domain>/<package>/<chapter>/` for each — a path with the seat's own numbering
+  // concatenated onto the source root, naming a folder that has never existed.
+  const root = repo({
+    "CONCEPT.md": "# c\n",
+    "docs/04-capabilities/README.md":
+      doc({ id: "f", title: "Capabilities", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
+          "`For: Architect` · `Status: ✅ DONE`"),
+    "docs/04-capabilities/01-core/README.md":
+      doc({ id: "dm", title: "Core", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
+          "`For: Architect` · `Status: ✅ DONE`"),
+    "docs/04-capabilities/01-core/01-server/README.md":
+      doc({ id: "pk", title: "Server", lenses: ["SERVER_DEV"], status: "DONE" }, "Lead.\n",
+          "`For: Backend developer` · `Status: ✅ DONE`"),
+    "docs/04-capabilities/01-core/01-server/01-app.md":
+      doc({ id: "ch", title: "App", lenses: ["SERVER_DEV"], status: "DONE" }, "Lead.\n",
+          "`For: Backend developer` · `Status: ✅ DONE`"),
+  });
+  run(root, ["face", "docs"]);
+  const seat = readAt(root, "docs/04-capabilities/README.md");
+  one("a chapter three levels down never reaches the seat's Map",
+    seat, lacks("01-core/01-server/01-app"));
+  one("and the seat says it carries no mirror rather than inventing one",
+    seat, has("this layer carries no mirror yet"));
+  one("the domain face between them says the same",
+    readAt(root, "docs/04-capabilities/01-core/README.md"), has("this layer carries no mirror yet"));
+  one("the package face still lists the chapter — the chapter branch is unchanged",
+    readAt(root, "docs/04-capabilities/01-core/01-server/README.md"), has("| [01-app.md](01-app.md) |"));
+
+  const before = seat;
+  run(root, ["face", "docs"]);
+  one("running it twice writes the same bytes", readAt(root, "docs/04-capabilities/README.md"), before);
+}
+{
+  // A mirror that IS a direct child still reaches the Map, and is still named for its folder.
+  const root = repo({
+    "CONCEPT.md": "# c\n",
+    "docs/04-capabilities/README.md":
+      doc({ id: "f", title: "Capabilities", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
+          "`For: Architect` · `Status: ✅ DONE`"),
+    "docs/04-capabilities/app.md":
+      doc({ id: "m", title: "App", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
+          "`For: Architect` · `Status: ✅ DONE`"),
+  });
+  run(root, ["face", "docs"]);
+  one("a direct `.md` child is a mirror and names the folder it governs",
+    readAt(root, "docs/04-capabilities/README.md"), has("| [app.md](app.md) | `src/app/` |"));
+}
+
+
+// ---------------------------------------------------------------- the Map cell resolves on disk
+
+console.log("\n=== a Governs cell names a folder that exists, and the audit says so when it does not");
+{
+  // KNOWN-BAD INPUT, because a gate that has only seen a clean tree has not been tested. One cell
+  // resolves and one does not, in the same region, so a check that reports both — or neither —
+  // fails here.
+  const root = repo({
+    "CONCEPT.md": "# c\n",
+    "docs/04-capabilities/README.md":
+      doc({ id: "f", title: "Capabilities", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
+          "`For: Architect` · `Status: ✅ DONE`") +
+      "\n<!-- spn:generated map — do not edit inside these markers; `docs.ts face` writes it -->\n" +
+      "| File | Governs | Carries | Status |\n| --- | --- | --- | --- |\n" +
+      "| [app.md](app.md) | `src/app/` | The app layer. | ✅ |\n" +
+      "| [ghost.md](ghost.md) | `src/01-core/01-server/ghost/` | A folder nobody has. | ✅ |\n" +
+      "<!-- /spn:generated -->\n",
+    "src/app/index.ts": "export const a = 1;\n",
+  });
+  const out = run(root, ["audit", "docs"]);
+  one("the cell that resolves to nothing is reported", out, has("`src/01-core/01-server/ghost/`, and no such folder exists"));
+  one("and the row it sits on is named by its text, not its link syntax",
+    out, (g) => g.includes("the Map says `ghost.md` governs") && !g.includes("[ghost.md](ghost.md)"));
+  one("the cell that resolves is not reported", out, lacks("`src/app/`, and no such folder exists"));
+  one("it reports rather than refuses — SOFT for one sitting", out, (g) => /SOFT\s+map/.test(g) && /0 RULE/.test(g));
+}
+{
+  // The same file with the dead row removed: the check stays quiet.
+  const root = repo({
+    "CONCEPT.md": "# c\n",
+    "docs/04-capabilities/README.md":
+      doc({ id: "f", title: "Capabilities", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
+          "`For: Architect` · `Status: ✅ DONE`") +
+      "\n<!-- spn:generated map — do not edit inside these markers; `docs.ts face` writes it -->\n" +
+      "| File | Governs | Carries | Status |\n| --- | --- | --- | --- |\n" +
+      "| [app.md](app.md) | `src/app/` | The app layer. | ✅ |\n" +
+      "<!-- /spn:generated -->\n",
+    "src/app/index.ts": "export const a = 1;\n",
+  });
+  one("a Map whose every cell resolves reports nothing", run(root, ["audit", "docs"]), lacks("SOFT map"));
+}
+{
+  // The empty Map the generator writes where a level has no mirror is not a dead cell.
+  const root = repo({
+    "CONCEPT.md": "# c\n",
+    "docs/04-capabilities/README.md":
+      doc({ id: "f", title: "Capabilities", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
+          "`For: Architect` · `Status: ✅ DONE`") +
+      "\n<!-- spn:generated map — do not edit inside these markers; `docs.ts face` writes it -->\n" +
+      "| File | Governs | Carries | Status |\n| --- | --- | --- | --- |\n" +
+      "| — | — | this layer carries no mirror yet | 🔮 |\n" +
+      "<!-- /spn:generated -->\n",
+  });
+  one("`this layer carries no mirror yet` is the right answer, not a finding",
+    run(root, ["audit", "docs"]), lacks("SOFT map"));
+}
+{
+  // `Governs` IS ALSO A COLUMN HEADING IN AUTHORED TABLES, where the cell is a sentence. The
+  // foundation's register index carries one, and a cell reading `auth/data policies` looks like a
+  // path to anything that only tests for a slash. Only the generated region is judged.
+  const root = repo({
+    "CONCEPT.md": "# c\n",
+    "docs/04-capabilities/README.md":
+      doc({ id: "f", title: "Capabilities", lenses: ["ARCHITECT"], status: "DONE" },
+          "| Register | Governs | Status |\n| --- | --- | --- |\n" +
+          "| [glossary.md](glossary.md) | auth/data policies with merged effective reads | ✅ |\n",
+          "`For: Architect` · `Status: ✅ DONE`"),
+  });
+  one("an authored `Governs` column of prose is not read as a path",
+    run(root, ["audit", "docs"]), lacks("SOFT map"));
+}
+
 console.log("\n=== the gap scan measures and never fixes");
 {
   const root = repo({
