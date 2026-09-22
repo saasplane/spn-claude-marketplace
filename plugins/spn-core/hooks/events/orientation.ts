@@ -573,14 +573,14 @@ export function orient(root: string, cwd: string): [text: string, note: string] 
     const text = `# Welcome to SaaS Plane${who ? ", " + who : ""}! Good to see you 👋\n\n` +
       "## Your team's time belongs to your product. 🚀\n\n" +
       "**The AI-native, DevEx-first Foundation for Building and Launching Secure, " +
-      "Scalable, Compliance-ready SaaS Platforms.**\n\n&nbsp;\n\n&nbsp;\n\n" +
+      "Scalable, Compliance-ready SaaS Platforms.**\n\n&nbsp;\n\n" +
       "🤖 **I am the DevEx agent** — think of me as your engineering brain for this " +
       "platform, and I work on it with you.\n\n" +
       "I know the engineering workflows end to end: setting a repo up, shaping an idea, planning it, " +
       "developing, testing, provisioning the estate, delivering a change, and operating " +
       "what runs. Each has its own standards and its own proof, and I carry both. " +
       "Architects, QA, ops and security each have a road here, not developers alone.\n\n" +
-      "&nbsp;\n\n&nbsp;\n\n" +
+      "&nbsp;\n\n" +
       "This folder is empty, which is a good place to start. There is nothing to read " +
       "yet, so we begin with the shape. When you are ready, I have five questions. " +
       "Your answers name every account, package and prefix that comes after.\n\n" +
@@ -608,8 +608,6 @@ export function orient(root: string, cwd: string): [text: string, note: string] 
     "",
     "&nbsp;",
     "",
-    "&nbsp;",
-    "",
     "🤖 **I am the DevEx agent** — think of me as your engineering brain for this platform, and I work on it with you.",
     "",
     "I know the engineering workflows end to end: setting a repo up, shaping an idea, planning it, developing, testing, provisioning the estate, delivering a change, and operating what runs. Each has its own standards and its own proof, and I carry both. Architects, QA, ops and security each have a road here, not developers alone.",
@@ -628,7 +626,7 @@ export function orient(root: string, cwd: string): [text: string, note: string] 
   const head = plugins.length
     ? `floor ${plugins.length} plugins · ${cacheState(root, plugins)}`
     : "floor not minted — no plugins enabled here";
-  lines.push("&nbsp;", "", "&nbsp;", "", "## The ground", "",
+  lines.push("&nbsp;", "", "## The ground", "",
     `\`${root}\` · ${head}`);
   if (resolve(cwd) !== root) lines.push("", `Rooted in \`${relative(root, resolve(cwd))}\`.`);
   lines.push("");
