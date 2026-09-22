@@ -38,8 +38,10 @@ package that realizes it, and **here the package is the plugin itself** — so a
 exactly one folder of the same name, `01-spn-core/spn-core/`. That is the plugin tree mirrored:
 one chapter per construct, and the chapter names what the plugin actually ships.
 
-`docs/registers/` holds [`decisions.md`](docs/registers/decisions.md) alone. There is no
-`05-guides/` content beyond its face, and no `01-purpose/` content beyond its own.
+`docs/registers/` holds [`decisions.md`](docs/registers/decisions.md) alone.
+[`01-purpose/`](docs/01-purpose/README.md) carries the repository's own why · what · who, one set for
+the repository and never one per plugin. [`05-guides/`](docs/05-guides/README.md) carries tasks named
+as tasks — installing the plugin set, and running the suites.
 
 ## Versioning — this repo counts on its own
 
