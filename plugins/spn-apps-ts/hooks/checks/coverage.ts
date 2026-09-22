@@ -191,7 +191,7 @@ export function covered(root: string, route: string, path: string | null = null)
  * A spec, and not a helper the specs call.
  *
  * The first live scan flagged `tests/helpers/enablement.ts` and `tests/helpers/sso.ts` — both mutate,
- * and neither is the thing that must restore. **The spec that calls a helper owns the restore**,
+ * and neither is what must restore. **The spec that calls a helper owns the restore**,
  * because it is the one that knows when the mutation ends. So a file under a test tree qualifies
  * only when it declares cases of its own.
  */
