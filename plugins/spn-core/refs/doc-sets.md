@@ -2,7 +2,7 @@
 {
   "chapters": [
     { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/README.md", "seen": "bb9243a0" },
-    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "ced836b6" },
+    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "3bcf359b" },
     { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md", "seen": "0229e250" },
     { "path": "docs/02-constructs/01-devex/04-workspace/04-docs.md", "seen": "5d904408" },
     { "path": "CONCEPT.md", "seen": "3e6cde1c" }
@@ -322,7 +322,7 @@ Every page somebody writes by hand is copied from a template, and the templates 
 
 **A row you started and put down gets its own mark, and it is `◐ stopped`.** None of the three above fits: `🚧 agreed` says the work has not begun, and a bare cell says nobody decided it, while half an edit already sits in the tree. The mark carries four things, because only the agent who stopped knows any of them — `→` what has to happen before it resumes, `did` what already reached its node, `left` what did not, and `unsafe` what nobody may touch until it resumes.
 
-The marks above are for work in flight. `landed` · `carried` · `deferred` are what the close sweep asks of every row, and only the first is shared between them. **The close refuses a stopped row**, and that is the one place it differs from deferred: a deferred row was parked before anything was touched, and a stopped one was not. You finish the work and mark the row landed, or you split it in two — the half that reached its node becomes a landed row, and the half that did not becomes a second row, carried or deferred.
+The marks above are for work in flight. `landed` · `carried` · `deferred` are what the close sweep asks of every row, and only the first is shared between them. **`carried` means the work LEAVES this workstream**, so it names a successor scope that can receive it — another workstream, in `open/` or `backlog/`. A row pointing at a later arc of its own workstream is **sequencing**, not a carry, and it resolves through that arc: landed once the arc lands, pending while it has not. **The close refuses a stopped row**, and that is the one place it differs from deferred: a deferred row was parked before anything was touched, and a stopped one was not. You finish the work and mark the row landed, or you split it in two — the half that reached its node becomes a landed row, and the half that did not becomes a second row, carried or deferred.
 
 **Carry the face and the arguments inside the workstream that changes them**, rather than tidying them afterwards. A workstream runs concept → docs → code, so the model moves first and the face moves with it. Leave the face to a later pass and the hub states a model the code has already left. Expansion is earned the same way. Where implementing a workstream shows a section is too big to review in place, the face gains one then — that is when somebody has read it at depth.
 

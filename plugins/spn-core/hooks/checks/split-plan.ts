@@ -177,6 +177,128 @@ export function stateOf(row: Row): string {
   return "pending";
 }
 
+// ---------------------------------------------------------------------------- what `carried` names
+//
+// `carried` MEANS THE WORK LEAVES THIS WORKSTREAM (05-artifacts.md § The approach document).
+// A carried row names a successor scope that can receive it: another workstream, in `open/` or
+// `backlog/`. Three things were one value before this, and the count lied because of it.
+//
+//   a handover        → carried, and the target must exist and not be closed
+//   sequencing        → NOT carried. A row pointing at a later arc of its own workstream resolves
+//                       through that arc: landed once it lands, pending while it has not
+//   a dead handover   → carried at a scope that cannot receive it, which the close refuses
+//
+// MEASURED ON `008` 2026-09-22: twelve carried rows, and TEN named a later arc of `008` itself.
+// `carried → N15 step 8` read as accounted for the whole time step 8 sat blocked on an open card,
+// and the page reported `pending 0` above it.
+
+/** An arc of this same workstream — `N15`, `N3 step 2`, `arcs/N15-….md step 8`. Never a handover. */
+const OWN_ARC = /(?:^|\/)(?:arcs\/)?N\d+[a-z]?\b/i;
+/** A workstream a carry can name — `003-cloud-day-0`, `010`, `017 Phase 3`. */
+const SUCCESSOR = /\b(\d{3})(?:-[a-z0-9-]+)?\b/;
+
+/** What a carried cell points at, read from the text after the word `carried`. */
+export function carryTarget(row: Row): { kind: "own-arc" | "workstream" | "unnamed"; name: string } {
+  const after = row.state.replace(LEAD, "").replace(/^carried\s*(?:→|->|to)?\s*/i, "").trim();
+  if (!after) return { kind: "unnamed", name: "" };
+  // THE OWN-ARC TEST RUNS FIRST. `carried → arcs/N15-what-the-final-shape-left-owed.md step 8` holds
+  // digits that `SUCCESSOR` would read as a workstream number if it were asked first.
+  const arc = after.match(OWN_ARC);
+  if (arc) return { kind: "own-arc", name: arc[0].replace(/^.*\//, "") };
+  const ws = after.match(SUCCESSOR);
+  if (ws) return { kind: "workstream", name: ws[1] };
+  return { kind: "unnamed", name: after.slice(0, 60) };
+}
+
+/**
+ * Where a named workstream sits, or `null` where none of the three states holds it. The folder IS
+ * the state, so this is a directory listing and never a guess.
+ */
+export function workstreamState(root: string, number: string): string | null {
+  for (const container of CONTAINERS) {
+    for (const state of STATES) {
+      const dir = join(root, DEVEX, container, state);
+      if (!isDir(dir)) continue;
+      for (const entry of listdir(dir)) {
+        if (entry === number || entry.startsWith(`${number}-`)) return state;
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * Whether a carried row can ever land, and why not where it cannot.
+ *
+ * FOUND ON `008`: `The decision registers` was carried to `010 Phase 3`, and `010-register-retrofit`
+ * sits in `closed/`. Reading `010` showed the carry was two hops — it had closed carrying Phase 3 to
+ * *its own scope, proposed and not opened*, and no such workstream exists in any state. Both closes
+ * passed. The refusal falls on the page that WROTE the row, never on the workstream named, which may
+ * have closed honestly on what it knew.
+ */
+export function carryFault(root: string, row: Row): string | null {
+  const target = carryTarget(row);
+  if (target.kind === "own-arc") return null;      // sequencing; `resolvedState` handles it
+  if (target.kind === "unnamed")
+    return `names no successor scope — a carry must name the workstream that takes it on`;
+  const state = workstreamState(root, target.name);
+  if (state === null) return `names workstream ${target.name}, which exists in no state`;
+  if (state === "closed") return `names workstream ${target.name}, which is closed and cannot receive it`;
+  return null;
+}
+
+// The words an arc's Status line may open with. `LANDED` is the only one that means finished; the
+// rest all mean work is left, and an arc with no Status line at all is three of `008`'s own.
+const ARC_STATES = new Set(["LANDED", "PART-LANDED", "TAKEN", "RUNNING", "OPEN", "DECIDED", "REVISED", "STOPPED"]);
+
+/**
+ * An arc's own status word, or `null` where the arc has no file or names no status.
+ *
+ * ARC STATUSES ARE A VOCABULARY, and only one of them means finished: `LANDED`. `PART-LANDED`,
+ * `TAKEN`, `RUNNING`, `OPEN`, `DECIDED` and `REVISED` all mean work is left, and three arcs in `008`
+ * carry no status line at all. So this reads the word and never guesses at the ones it does not know.
+ */
+export function arcStatus(root: string, subject: string, arc: string): string | null {
+  for (const container of CONTAINERS) {
+    for (const state of STATES) {
+      const dir = join(root, DEVEX, container, state);
+      if (!isDir(dir)) continue;
+      for (const entry of listdir(dir)) {
+        if (!(entry === subject || entry.startsWith(`${subject.slice(0, 3)}-`))) continue;
+        const arcs = join(dir, entry, "arcs");
+        if (!isDir(arcs)) continue;
+        // `N8` LIVES IN `N7-N8-flip-and-close.md`. An arc is not always the first name in its file,
+        // so a prefix match alone finds nothing and reads as *no such arc*.
+        const file = listdir(arcs).find((f) =>
+          f.toLowerCase().startsWith(`${arc.toLowerCase()}-`) || f.toLowerCase().includes(`-${arc.toLowerCase()}-`));
+        if (!file) continue;
+        const line = read(join(arcs, file)).split("\n").find((l) => /^status:/i.test(l.trim()));
+        if (!line) return null;
+        const word = line.replace(/^\s*status:\s*/i, "").replace(/[*_`]/g, "").trim().split(/[\s—–]/)[0]?.toUpperCase() ?? "";
+        // AN UNRECOGNISED WORD IS `null`, NEVER A GUESS. `N7-N8-flip-and-close.md` holds two arcs and
+        // opens `Status: **N7 LANDED … N8, the close, runs after N13.**`, so its first word is `N7`
+        // and the line answers for neither arc on its own. Unknown resolves as unfinished, which
+        // refuses; reading `N7` as a status would have passed `N8` on a word that is not a state.
+        return ARC_STATES.has(word) ? word : null;
+      }
+    }
+  }
+  return null;
+}
+
+/**
+ * Whether a sequencing row has resolved — MEANING THE ARC IT WAITS ON HAS LANDED.
+ *
+ * This is the transitive half of the rule: a row pointing inside its own workstream is worth exactly
+ * what the arc it names is worth. Ten rows on `008` pointed at `N15`, `N3` and `N8`, and every one of
+ * those arcs still had steps left while the page reported `pending 0`.
+ */
+export function sequencingResolved(root: string, subject: string, row: Row): boolean {
+  const target = carryTarget(row);
+  if (target.kind !== "own-arc") return true;
+  return arcStatus(root, subject, target.name) === "LANDED";
+}
+
 /**
  * Whether a row said what became of it. Three states do; `stopped`, `pending` and `empty` do not.
  * `ACCOUNTED` is that set, and this is the one reader it has.
@@ -656,6 +778,57 @@ export function gateClose(payload: Payload): Verdict {
 
     const pending = rows.filter((row) => !accounted(row));
     const stopped = rows.filter((row) => stateOf(row) === "stopped");
+
+    // A CARRY THAT CANNOT LAND IS NOT ACCOUNTED FOR, whatever its cell says. This runs before the
+    // undecided and stopped lists because it is the one fault a reader cannot see: the cell reads
+    // `carried`, the tally counts it, and the named scope will never run it.
+    const dead = rows
+      .filter((row) => stateOf(row) === "carried")
+      .map((row) => ({ row, fault: carryFault(root, row) }))
+      .filter((entry): entry is { row: Row; fault: string } => entry.fault !== null);
+    // SEQUENCING THAT HAS NOT RESOLVED IS NOT ACCOUNTED FOR. A row pointing at a later arc of this
+    // same workstream is worth what that arc is worth, so the close waits on the arc rather than on
+    // the word in the cell. This is the transitive half of the rule, and it is what moves `008`'s
+    // own number: ten rows named `N15`, `N3` and `N8`, none of which had landed.
+    const unresolved = rows
+      .filter((row) => stateOf(row) === "carried" && carryTarget(row).kind === "own-arc")
+      .filter((row) => !sequencingResolved(root, subject, row));
+    if (unresolved.length && !dead.length) {
+      const listed = unresolved.slice(0, 10).map((r) => {
+        const arc = carryTarget(r).name;
+        return `  - ${r.scope} — waits on ${arc} (${arcStatus(root, subject, arc) ?? "no status this check can read"})`;
+      }).join("\n");
+      const more = unresolved.length > 10 ? `\n  … and ${unresolved.length - 10} more` : "";
+      return {
+        note: `Close gate — \`${subject}\` has ${unresolved.length} row(s) waiting on its own arcs.`,
+        deny:
+          `Denied: \`${subject}\` cannot close while a row waits on an arc of this same workstream ` +
+          `that has not landed. Those rows are SEQUENCING rather than carried — the work never left ` +
+          `here, so nobody else is going to do it (05-artifacts.md, The approach document).\n\n` +
+          `${listed}${more}\n\n` +
+          `Land the arc, or split the row: the half that reached its node becomes a landed row, and ` +
+          `the half that did not becomes a row carried to a scope that can receive it, or deferred ` +
+          `with the event that brings it back. Only \`LANDED\` resolves — PART-LANDED, TAKEN, ` +
+          `RUNNING, DECIDED and an arc with no status all mean work is left.`,
+      };
+    }
+
+    if (dead.length) {
+      const listed = dead.slice(0, 10).map((d) => `  - ${d.row.scope} — ${d.row.label.slice(0, 70)}\n      ${d.fault}`).join("\n");
+      const more = dead.length > 10 ? `\n  … and ${dead.length - 10} more` : "";
+      return {
+        note: `Close gate — \`${subject}\` carries ${dead.length} row(s) to a scope that cannot receive them.`,
+        deny:
+          `Denied: \`${subject}\` cannot close while a carried row names a scope that will never ` +
+          `run it. \`carried\` means the work LEAVES this workstream, so the target must be another ` +
+          `workstream in \`open/\` or \`backlog/\` (05-artifacts.md, The approach document).\n\n` +
+          `${listed}${more}\n\n` +
+          `Repair each on THIS page, never in the workstream named — a closed scope closed honestly ` +
+          `on what it knew, and a receipt is not rewritten by a later standard. Either name a scope ` +
+          `that can receive the work, open one, or mark the row deferred with the event that brings ` +
+          `it back here.`,
+      };
+    }
     if (!empty.length && !stopped.length) {
       // ACCOUNTED FOR IS THREE STATES, AND `accounted()` READS ALL THREE. It did not once: a row
       // naming its successor counted the same as one saying `🚧 agreed`, and closing `007` warned
@@ -727,14 +900,31 @@ function sweep(roots: string[]): number {
         continue;
       }
       const rows = pages.flatMap(planOf);
-      const tally: Record<string, number> = { landed: 0, carried: 0, deferred: 0, stopped: 0, pending: 0, empty: 0 };
-      for (const row of rows) tally[stateOf(row)] += 1;
+      // SEQUENCING IS COUNTED APART FROM HANDOVER. A row pointing at a later arc of this same
+      // workstream is not carried; it resolves through that arc, and counting it as accounted for is
+      // how `pending 0` stood over ten rows of undone work.
+      const tally: Record<string, number> = { landed: 0, carried: 0, sequencing: 0, deferred: 0, stopped: 0, pending: 0, empty: 0 };
+      for (const row of rows) {
+        const state = stateOf(row);
+        // A carried row pointing inside this workstream is sequencing, and it is reported as its own
+        // number. The sweep is where a reader takes the count from, so this is where it has to be true.
+        if (state === "carried" && carryTarget(row).kind === "own-arc") tally.sequencing += 1;
+        else tally[state] += 1;
+      }
       console.log(
         `  ${subject}: ${rows.length} rows · landed ${tally.landed} · carried ${tally.carried} · ` +
-        `deferred ${tally.deferred} · stopped ${tally.stopped} · pending ${tally.pending} · ` +
-        `undecided ${tally.empty} · ${pages.length} page(s)`);
+        `sequencing ${tally.sequencing} · deferred ${tally.deferred} · stopped ${tally.stopped} · ` +
+        `pending ${tally.pending} · undecided ${tally.empty} · ${pages.length} page(s)`);
       for (const row of rows)
         if (stateOf(row) === "empty") console.log(`      undecided  ${row.scope} — ${row.label.slice(0, 70)}`);
+      // NAMED, NOT JUST COUNTED. `sequencing 10` above a page reading `pending 0` is still a number
+      // somebody has to go and resolve by hand, and the arcs it waits on are what they need.
+      const waiting = rows.filter((row) => stateOf(row) === "carried" && carryTarget(row).kind === "own-arc");
+      for (const row of waiting)
+        console.log(`      sequencing  ${row.scope} — waits on ${carryTarget(row).name}`);
+      const broken = rows.filter((row) => stateOf(row) === "carried").map((row) => [row, carryFault(root, row)] as const).filter(([, f]) => f);
+      for (const [row, fault] of broken)
+        console.log(`      DEAD CARRY  ${row.scope} — ${fault}`);
     }
   }
   return 0;

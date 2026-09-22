@@ -6,7 +6,7 @@ description: Turn a requirement into a design the platform's own vocabulary can 
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "section": "The approach document — a workstream's, never a repository's", "seen": "c6fde0ad" }
+    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "section": "The approach document — a workstream's, never a repository's", "seen": "98fccd46" }
   ]
 }
 -->
@@ -330,7 +330,10 @@ gate warns when you write into a repository's own documents while an open workst
 that have not landed. The **close** gate refuses a move into `workstreams/closed/`
 while any row is one nobody decided. Moving `backlog/` to `open/` is not a close, so no gate
 fires on it. `landed`, `carried` and `deferred` all pass, because the check is *accounted for*
-and never *finished*.
+and never *finished*. **`carried` means the work leaves this workstream** and names a scope
+that can receive it, so a target that is closed or does not exist refuses. A row pointing at a
+later arc of this same workstream is **sequencing**: it resolves through that arc, and only
+`LANDED` resolves it.
 
 #### `How` names what re-aligns
 

@@ -57,16 +57,22 @@ const card = (n, decision) => `  <div class="open">
     <div class="rec"><b>Recommended: A.</b> Because of the reason. <b>Decision:</b> ${decision}</div>
   </div>`;
 
-const arc = (log = "") =>
-  `# Arc — a subject\n\nStatus: **RUNNING**\n\n## Log\n\n- **2026-09-18 — go.** Finish it.\n${log}`;
+// THE STATUS IS A PARAMETER because a sequencing row resolves through it: only `LANDED` means the
+// arc is finished, and `RUNNING` — the default here — is one of the words that means work is left.
+const arc = (log = "", status = "RUNNING") =>
+  `# Arc — a subject\n\nStatus: **${status}**\n\n## Log\n\n- **2026-09-18 — go.** Finish it.\n${log}`;
 
 const LANDED = [["the chapter", "spn-foundation", "&#x2705; landed"], ["the check", "spn-support-ts", "&#x2705; landed"]];
 
-function build(name, { eyebrow, rows = LANDED, cards = "", log = "", state = "open" } = {}) {
+function build(name, { eyebrow, rows = LANDED, cards = "", log = "", state = "open", arcStatus = "RUNNING" } = {}) {
   const folder = `.spndevex/workstreams/${state}/001-a-subject`;
   return workspace(name, {
     [`${folder}/a-subject-approach.html`]: page({ eyebrow, rows, cards }),
-    [`${folder}/arcs/N1-something.md`]: arc(log),
+    [`${folder}/arcs/N1-something.md`]: arc(log, arcStatus),
+    // A SIBLING SCOPE, SO A CARRY HAS SOMEWHERE REAL TO POINT. `carried` means the work leaves this
+    // workstream, and the gate reads the folder to see whether the named scope can receive it — so a
+    // tree holding one workstream can only ever test a carry that fails.
+    ".spndevex/workstreams/backlog/002-a-successor/a-successor-approach.html": "<h1>002</h1>\n",
     "spn-support-ts/artifacts/approaches/keep.md": "placeholder\n",
   });
 }
@@ -135,7 +141,7 @@ one("no split plan at all is refused, not passed", "close",
   "deny", { says: "checked NOTHING" });
 
 one("landed, carried and deferred all pass", "close",
-  build("sp-accounted", { rows: [["a", "spn-foundation", "&#x2705; landed"], ["b", "spn-support-ts", "&#x21B7; carried to N4"], ["c", "spn-platform-ts", "&#x2298; deferred until a partner asks"]] }),
+  build("sp-accounted", { rows: [["a", "spn-foundation", "&#x2705; landed"], ["b", "spn-support-ts", "&#x21B7; carried to 002-a-successor"], ["c", "spn-platform-ts", "&#x2298; deferred until a partner asks"]] }),
   move(".spndevex/workstreams/open/001-a-subject", ".spndevex/workstreams/closed/"),
   "silent");
 
@@ -249,6 +255,103 @@ one("a masthead with no status label is read whole, as the older pages are writt
   build("sp-unlabelled", { eyebrow: "written for the DevEx agent &middot; &#x2705; settled &middot; closed" }),
   move(".spndevex/workstreams/open/001-a-subject", ".spndevex/workstreams/closed/"),
   "silent");
+
+// THE SAME RULE THROUGH THE REAL GATE, because a reader that answers correctly and a gate that acts
+// on it are two different claims. These four are the ones a close actually meets.
+
+one("a carry to a scope that can receive it closes", "close",
+  build("sp-carry-ok", { rows: [["a", "spn-foundation", "&#x2705; landed"], ["b", "spn-support-ts", "&#x21B7; carried to 002-a-successor"]] }),
+  move(".spndevex/workstreams/open/001-a-subject", ".spndevex/workstreams/closed/"),
+  "silent");
+
+// KNOWN-BAD. `008` carried a row to `010 Phase 3` while `010-register-retrofit` sat in `closed/`,
+// and reading `010` showed it had already carried Phase 3 onward to a scope nobody opened. Two
+// closes passed and no check ever said so.
+one("a carry to a scope that does not exist is refused", "close",
+  build("sp-carry-missing", { rows: [["a", "spn-foundation", "&#x2705; landed"], ["b", "spn-support-ts", "&#x21B7; carried to 042-nowhere"]] }),
+  move(".spndevex/workstreams/open/001-a-subject", ".spndevex/workstreams/closed/"),
+  "deny", { says: "exists in no state" });
+
+// SEQUENCING, NOT HANDOVER. The row names an arc of this same workstream, so nobody else is going to
+// do it — and `N1-something.md` carries no status line, which resolves as unfinished rather than as
+// a guess.
+one("a row waiting on an arc of its own workstream is refused", "close",
+  build("sp-sequencing", { rows: [["a", "spn-foundation", "&#x2705; landed"], ["b", "spn-support-ts", "&#x21B7; carried &rarr; N1 step 2"]] }),
+  move(".spndevex/workstreams/open/001-a-subject", ".spndevex/workstreams/closed/"),
+  "deny", { says: "waits on an arc" });
+
+one("and it closes once that arc has landed", "close",
+  build("sp-sequencing-landed", {
+    arcStatus: "LANDED",
+    rows: [["a", "spn-foundation", "&#x2705; landed"], ["b", "spn-support-ts", "&#x21B7; carried &rarr; N1 step 2"]],
+  }),
+  move(".spndevex/workstreams/open/001-a-subject", ".spndevex/workstreams/closed/"),
+  "silent");
+
+// ---------------------------------------------------------------- what `carried` is allowed to mean
+//
+// `carried` MEANS THE WORK LEAVES THIS WORKSTREAM (05-artifacts.md § The approach document). Before
+// that rule the word covered two things, and the count lied: measured on `008` 2026-09-22, TEN of
+// twelve carried rows named a later arc of `008` itself, and the page reported `pending 0` above
+// them while one of those arcs sat blocked on an open card.
+//
+// THESE CASES RUN IN BOTH DIRECTIONS ON PURPOSE. A reader that answered `null` to everything would
+// pass every known-bad case below if only the good ones were written, and a gate taught to stay
+// quiet is worse than no gate — it carries the authority of one.
+
+const splitPlan = await import("../checks/split-plan.ts");
+const carried = (state) => ({ scope: "a scope", label: "a row", state });
+
+function carry(name, state, want) {
+  n += 1;
+  const got = splitPlan.carryTarget(carried(state)).kind;
+  const ok = got === want;
+  if (!ok) failed += 1;
+  console.log(`  ${ok ? "PASS" : "FAIL"}  ${name}\n        expect ${want} · got ${got}`);
+}
+
+carry("a bare arc number is this workstream's own sequencing", "⤵ carried → N15", "own-arc");
+carry("and so is one naming a step", "⤵ carried → N15 step 8", "own-arc");
+// THE ARC TEST RUNS FIRST FOR THIS CASE. An arc path holds digits a workstream matcher reads as a
+// number, so asking `which workstream` first turned every `arcs/N15-….md` into a handover.
+carry("an arc named by its file path is still sequencing", "⤵ carried → arcs/N15-what-the-final-shape-left-owed.md step 8", "own-arc");
+carry("a numbered scope is a handover", "⤵ carried → 003-cloud-day-0", "workstream");
+carry("and so is one naming a phase inside it", "⤵ carried → 010 Phase 3 owns the split", "workstream");
+carry("a cell naming nothing names no successor", "⤵ carried", "unnamed");
+
+function fault(name, state, shouldRefuse) {
+  n += 1;
+  const got = splitPlan.carryFault(WORKSPACE, carried(state));
+  const ok = shouldRefuse ? got !== null : got === null;
+  if (!ok) failed += 1;
+  console.log(`  ${ok ? "PASS" : "FAIL"}  ${name}\n        expect ${shouldRefuse ? "a fault" : "silent"} · got ${got ?? "silent"}`);
+}
+
+// KNOWN-BAD. `008` carried a row to `010 Phase 3` and `010-register-retrofit` is in `closed/`;
+// reading `010` showed it had already carried Phase 3 onward to a scope nobody opened. Both closes
+// passed, and no check ever said so.
+fault("a carry to a closed workstream is refused", "⤵ carried → 010 Phase 3 owns the split", true);
+fault("a carry to a workstream in no state is refused", "⤵ carried → 042-does-not-exist", true);
+fault("a carry naming no successor at all is refused", "⤵ carried", true);
+
+// KNOWN-GOOD. A backlog scope can still receive work, and sequencing is not a carry at all.
+fault("a carry to a backlog workstream passes", "⤵ carried → 003-cloud-day-0", false);
+fault("an arc of this same workstream is not a carry", "⤵ carried → N15 step 8", false);
+
+function where(name, number, want) {
+  n += 1;
+  const got = splitPlan.workstreamState(WORKSPACE, number);
+  const ok = got === want;
+  if (!ok) failed += 1;
+  console.log(`  ${ok ? "PASS" : "FAIL"}  ${name}\n        expect ${want} · got ${got}`);
+}
+
+// THE FOLDER IS THE STATE, so this is a directory listing rather than a guess. These read the real
+// workspace, which is what makes them worth running: a fixture would agree with whatever it invented.
+where("an open workstream reads open", "008", "open");
+where("a closed one reads closed", "010", "closed");
+where("a parked one reads backlog", "003", "backlog");
+where("a number nobody used reads nothing", "042", null);
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);
