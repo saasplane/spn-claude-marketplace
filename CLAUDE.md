@@ -45,10 +45,22 @@ as tasks — installing the plugin set, and running the suites.
 
 ## Versioning — this repo counts on its own
 
-**`RD.APPS.034` does not reach you here.** That row rules lockstep versioning *within a
-repository*, with the version stamped at publish rather than written into source. It governs `APPS`
-repos, and this one is not. **You follow the Claude marketplace's own convention instead** — one
-version per plugin, in each `.claude-plugin/plugin.json`, and the three move independently.
+**`RD.APPS.034` does not reach you here, and this repo still moves its three plugins together.**
+That row rules lockstep versioning *within a repository*, with the version stamped at publish
+rather than written into source. It governs `APPS` repos, and this one is not — the version is
+written into each `.claude-plugin/plugin.json`, because that is what a Claude marketplace reads.
+
+**But the three carry the same number, and every release moves all three.** A plugin with no
+change in it is released anyway, at the new number. Ruled by the developer on 2026-09-22,
+reversing the 2026-09-08 ruling that let them move independently.
+
+**The reason is that a reader cannot tell three numbers apart.** The three plugins are installed as
+one set, by one command, and a session loads whichever of them its repository declares. When they
+read `0.7.3 · 0.7.1 · 0.7.1` there is no way to know from the outside whether that is three
+deliberate versions or one release that half-landed — and the second is what it looked like all
+day on 2026-09-22, while `spn-core 0.7.3` was declared and the workspace root ran `0.7.2 · 0.7.0 ·
+0.7.0`. **One number answers *are you current?* and three numbers only raise it.** The cost is
+releasing a plugin that did not change, which costs nothing.
 
 ### The count moves after the release, never before
 
@@ -65,9 +77,9 @@ are running.
 reinstalling over a stale build of the same version. **A published source has not been tested that
 way**, so treat a backwards version move as unsafe there until somebody proves otherwise.
 
-**You would otherwise apply the wrong rule here, which is why this is written down.** Three plugins at three
-versions looks like the lockstep defect that row names, and it is not one. Ruled by the developer
-on 2026-09-08.
+**So the increment is the set's, not the plugin's.** After a release, the first edit to *any* of
+the three moves *all three* to the next patch. Bumping only the plugin you touched is what produced
+the split this rule ends.
 
 <!-- spnutils:agent:begin -->
 ## SaaS Plane
