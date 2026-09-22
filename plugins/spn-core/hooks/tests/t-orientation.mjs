@@ -91,8 +91,26 @@ console.log("\n=== orientation — the states this workspace is not in");
 
 compare("day zero: no sprepo.json anywhere",
   fixture("day-zero", { "README.md": "nothing here yet\n", ".spndevex/README.md": "the workspace state, and no repo cloned yet\n" }),
-  ["This folder is empty, which is a good place to start"],
-  ["workstreams", "wired"]);
+  ["This folder is empty, which is a good place to start",
+   // Act 0 is a door, and the render has to BE the door rather than announce a form. The screen
+   // that said "I have five questions" opened the walk on a question nobody had agreed to answer.
+   "Would you like to start a new platform?", "lands in a file as you give it",
+   "open a workstream to hold your answers"],
+  ["workstreams", "wired", "So — what are we building?"]);
+
+// THE WINDOW THAT CLOSES AFTER THE THIRD QUESTION. Still no sprepo.json, so this is still day 0 —
+// and offering the door again asks somebody to name their organization twice. The screen has to
+// find the workstream its own act 2 opened.
+compare("day zero resumed: a new-platform workstream is already open",
+  fixture("day-zero-resumed", {
+    "README.md": "nothing here yet\n",
+    ".spndevex/README.md": "the workspace state, and no repo cloned yet\n",
+    ".spndevex/workstreams/open/001-new-platform/arcs/N1-estate-coordinates.md":
+      "| 1 | The organization's code, its name, and the mail domain | `acme` | … |\n",
+  }),
+  ["You started a platform here and we did not finish", "001-new-platform",
+   "Shall we carry on?", "Read its arc BEFORE you say anything"],
+  ["Would you like to start a new platform?", "So — what are we building?"]);
 
 compare("an estate-only workspace, rung 1",
   fixture("estate-only", {

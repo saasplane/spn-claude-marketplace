@@ -570,6 +570,11 @@ export function orient(root: string, cwd: string): [text: string, note: string] 
   const [level, why] = rung(governed);
 
   if (!governed.length) {
+    // A DAY-0 WALK IS RESUMED, NEVER RESTARTED. The answers land in a workstream before the first
+    // repository exists, so a window lost mid-walk reopens on this same screen with three answers
+    // already on disk. Offering the door again would ask somebody to name their organization twice
+    // — and the second answer is the one that reaches the manifests.
+    const started = streams.find((s) => s.state === "open" && s.subject === "new-platform");
     const text = `# Welcome to SaaS Plane${who ? ", " + who : ""}! Good to see you 👋\n\n` +
       "## Your team's time belongs to your product. 🚀\n\n" +
       "**The AI-native, DevEx-first Foundation for Building and Launching Secure, " +
@@ -581,13 +586,29 @@ export function orient(root: string, cwd: string): [text: string, note: string] 
       "what runs. Each has its own standards and its own proof, and I carry both. " +
       "Architects, QA, ops and security each have a road here, not developers alone.\n\n" +
       "&nbsp;\n\n" +
-      "This folder is empty, which is a good place to start. There is nothing to read " +
-      "yet, so we begin with the shape. When you are ready, I have five questions. " +
-      "Your answers name every account, package and prefix that comes after.\n\n" +
-      "So — what are we building?\n";
+      (started
+        ? "You started a platform here and we did not finish. No repository exists yet, and " +
+          "your answers are on disk where you left them — `.spndevex/workstreams/open/" +
+          started.folder + "/arcs/`.\n\n" +
+          "I will read what you already answered, tell you where we stopped, and pick up at the " +
+          "next question. Nothing you decided is asked again.\n\n" +
+          "Shall we carry on?\n"
+        : "This folder is empty, which is a good place to start. There is nothing to read " +
+          "yet, so nothing here is decided.\n\n" +
+          "Say yes and I mint the workspace, open a workstream to hold your answers, then " +
+          "ask the estate questions one at a time. Your answers name every account, package " +
+          "and prefix that comes after, and each one lands in a file as you give it — so " +
+          "nothing rests on this window staying open. Say no and nothing is created.\n\n" +
+          "Would you like to start a new platform?\n");
     const note = "\n---\nDay-0 mode: no sprepo.json under " + root + ". You have no code to read, " +
-      "so do not orient — load the `day-zero` skill and walk it. Ask the five estate " +
-      "questions first, in order, and let the developer answer before any act.\n";
+      "so do not orient — load the `day-zero` skill and walk it. " +
+      (started
+        ? "A day-0 walk is already open here: `.spndevex/workstreams/open/" + started.folder +
+          "/`. Read its arc BEFORE you say anything. Resume at the first coordinate it does not " +
+          "carry an answer for, and never ask again for one it holds.\n"
+        : "Act 0 is the door above: ask, and run nothing until they answer. A no is a real " +
+          "answer and this folder stays empty. On a yes, act 1 mints the workspace and act 2 " +
+          "opens the workstream that holds the answers, before the first question is asked.\n");
     return [text, note];
   }
 
