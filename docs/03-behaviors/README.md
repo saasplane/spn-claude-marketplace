@@ -19,6 +19,8 @@ One file of rows sits beside each construct, at the same relative path and the s
 
 **This repository writes its own rows.** It declares no stack, so the deterministic tool serves it with its docs verbs alone and has no runner for it. The plugins' own suites are the runner: a case whose title carries a row's id becomes a result, the results become an artifact in the pocket, and the writer puts what the run found into the `Status` and the `Updated at` cells. Every other cell is a decision somebody made, and nothing writes over those.
 
+**The actor each row names is defined once, in [personas](personas.md).** The people who meet these plugins are engineering functions, so every `Who` cell resolves to one of the lens register's own names and no area invents a word of its own.
+
 **A row here is declared, never claimed.** Each one reads `PLANNED` until a run says otherwise. A row whose tier a run covered and whose case the run never reached reads as pending afterwards, which is the honest answer and the one a reader needs.
 
 | Domain | What it promises |
