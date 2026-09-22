@@ -292,7 +292,9 @@ console.log("\n=== a spec that draws nothing is a finding, not a silence");
   // those pages carried no figure while nothing reported anything. A page missing a figure it
   // asked for looks exactly like a page that asked for none.
   const withSpec = (spec) => `# c\n\n\`\`\`dg\n${spec}\n\`\`\`\n`;
-  const good = '{ "kind": "map", "boxes": [{ "id": "a", "label": "A" }, { "id": "b", "label": "B" }], "links": [{ "from": "a", "to": "b", "label": "to" }] }';
+  // The spec carries a caption, because a spec without one is now a finding of its own and this
+  // block is about whether a figure DRAWS. The caption gap has its own cases below.
+  const good = '{ "kind": "map", "caption": "the two boxes and the link between them", "boxes": [{ "id": "a", "label": "A" }, { "id": "b", "label": "B" }], "links": [{ "from": "a", "to": "b", "label": "to" }] }';
 
   one("a seat whose spec draws is clean",
       run(repo({ "docs/02-constructs/01-core/01-boot.md": withSpec(good) }), ["figures", "check", "docs"]),
@@ -306,6 +308,49 @@ console.log("\n=== a spec that draws nothing is a finding, not a silence");
   one("and the finding names which spec on the page",
       run(repo({ "docs/02-constructs/01-core/01-boot.md": withSpec(good) + "\n" + withSpec(good.replace('"map"', '"flow"')) }), ["figures", "check", "docs"]),
       has("spec2:"));
+}
+
+console.log("\n=== a figure that says nothing about itself is reported, and reported as a SOFT");
+{
+  // `05-artifacts.md § The figures` has asked for a caption since it was written — *a figure with
+  // neither is decoration* — and nothing enforced it: 94 of the corpus's 150 specs carried neither
+  // field, half of them in the book. The check reports rather than refuses while they are authored
+  // (N14 step 1); step 3 makes it a RULE, and these cases are what tells the two apart.
+  const withSpec = (spec) => `# c\n\n\`\`\`dg\n${spec}\n\`\`\`\n`;
+  const boxes = '"boxes": [{ "id": "a", "label": "A" }, { "id": "b", "label": "B" }], "links": [{ "from": "a", "to": "b", "label": "to" }]';
+  const mute = `{ "kind": "map", ${boxes} }`;
+  const titled = `{ "kind": "map", "title": "a title", ${boxes} }`;
+  const captioned = `{ "kind": "map", "caption": "what to notice", ${boxes} }`;
+  const at = (spec) => repo({ "docs/02-constructs/01-core/01-boot.md": withSpec(spec) });
+  // The exit CODE is half of what a SOFT means, and `run` above reports stdout alone.
+  const statusOf = (root, args) => {
+    try {
+      execFileSync(process.execPath, [TOOL, ...args],
+        { encoding: "utf8", cwd: root, env: { ...process.env, SPN_WORKSPACE: root, SPN_TEMPLATES: TEMPLATES } });
+      return 0;
+    } catch (e) { return e.status ?? -1; }
+  };
+
+  one("a spec with neither field is named, and the kind word a screen reader would announce with it",
+      run(at(mute), ["figures", "check", "docs"]),
+      (g) => /! SOFT figure/.test(g) && /spec1:/.test(g) && /`map`/.test(g));
+  one("it is counted as a SOFT and not as a RULE",
+      run(at(mute), ["figures", "check", "docs"]),
+      has("0 RULE, 1 SOFT"));
+  one("and the command still exits clean, so the gate reports the gap rather than walling it off",
+      statusOf(at(mute), ["figures", "check", "docs"]), 0);
+  // ONLY `caption` RENDERS A `<figcaption>` — `render.ts` reads that field alone and `title` becomes
+  // the `aria-label`. A spec with a title only satisfies the words *neither title nor caption* and
+  // still leaves the reader with no caption, so it is reported too.
+  one("a `title` with no `caption` is reported too, because a title renders no caption",
+      run(at(titled), ["figures", "check", "docs"]),
+      (g) => /! SOFT figure/.test(g) && /only a `caption` renders/.test(g));
+  one("a spec that carries a caption is silent",
+      run(at(captioned), ["figures", "check", "docs"]),
+      has("clean — 1 page"));
+  one("and a RULE beside a SOFT still fails the gate",
+      statusOf(at(mute.replace('"map"', '"flow"')), ["figures", "check", "docs"]),
+      (g) => g !== 0);
 }
 
 console.log("\n=== a repository is never the book it restates");
