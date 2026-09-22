@@ -580,6 +580,7 @@ export function orient(root: string, cwd: string): [text: string, note: string] 
       "developing, testing, provisioning the estate, delivering a change, and operating " +
       "what runs. Each has its own standards and its own proof, and I carry both. " +
       "Architects, QA, ops and security each have a road here, not developers alone.\n\n" +
+      "&nbsp;\n\n" +
       "This folder is empty, which is a good place to start. There is nothing to read " +
       "yet, so we begin with the shape. When you are ready, I have five questions. " +
       "Your answers name every account, package and prefix that comes after.\n\n" +
