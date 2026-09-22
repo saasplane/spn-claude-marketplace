@@ -84,7 +84,8 @@ const IN_WORKSPACE = existsSync(resolve(WORKSPACE, ".spndevex"));
 console.log(IN_WORKSPACE ? "\n=== orientation — the real workspace"
   : "\n=== orientation — the real workspace: not run, this copy sits outside one");
 if (IN_WORKSPACE) compare("this workspace, as a window actually sees it", `${WORKSPACE}`,
-  ["Welcome to SaaS Plane", `workspace  ${WORKSPACE}`, "workstreams", "So — what are we building?"]);
+  ["Welcome to SaaS Plane", "Your team's time belongs to your product.", `\`${WORKSPACE}\``,
+   "### Workstreams", "So — what are we building?"]);
 
 console.log("\n=== orientation — the states this workspace is not in");
 

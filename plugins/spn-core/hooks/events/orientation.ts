@@ -270,8 +270,16 @@ export function workstreams(root: string): Workstream[] {
         const [number, subject] = numbered(folder);
         found.set(folder, {
           folder, number, subject, state,
-          page: [...files].sort().find((f) => f.endsWith("-approach.html")) ?? "",
-          arcs: files.filter((f) => basename(f).startsWith("arc-")).length,
+          // BOTH OF THESE READ ONE LEVEL, NOT THE TREE. `treeFiles` walks everything under the
+          // folder, and a workstream's `notes/retired/` holds whole pockets that other repositories
+          // gave up — 51 approach pages in one case, every one of them sorting before the
+          // workstream's own. A recursive `find` therefore linked a retired page belonging to
+          // another repo, and the arc count matched a template rather than the arcs.
+          page: (() => {
+            const own = listdir(path).filter((f) => f.endsWith("-approach.html")).sort()[0];
+            return own ? join(path, own) : "";
+          })(),
+          arcs: listdir(join(path, "arcs")).filter((f) => f.endsWith(".md")).length,
           when: newest(files) || newest([path]),
           legacy,
         });
@@ -479,34 +487,41 @@ function sessionsHere(root: string): number {
  */
 function workstreamLines(streams: Workstream[]): string[] {
   if (!streams.length)
-    return ["workstreams   none yet — a subject becomes one by mkdir under backlog/ or open/",
-            "              then update the agent and reload BEFORE executing it — cross-repo.md"];
+    return ["### Workstreams — none yet", "",
+            "A subject becomes one by `mkdir` under `backlog/` or `open/` — then update the agent "
+            + "and reload BEFORE executing it (`cross-repo.md`)."];
   const byState: Record<string, Workstream[]> = Object.fromEntries(
     STATES.map((state) => [state, streams.filter((w) => w.state === state)]));
   const tally = STATES.filter((s) => byState[s].length).map((s) => `${byState[s].length} ${s}`).join(" · ");
   // RD.DEVEX.049. The MUST binds the moment a workstream is picked up, and this is the surface a
   // session meets before any skill. Printed with the tally rather than under a workstream: it is
   // true of whichever one you open, including one you are about to create.
-  const out = [`workstreams   ${tally}`,
-    "              open one with the agent update and the reload, then execute — cross-repo.md"];
+  const out = [`### Workstreams — ${tally}`, "",
+    "Open one with the agent update and the reload, then execute — `cross-repo.md`."];
+  // A TABLE, BECAUSE THESE ROWS ARE COMPARED RATHER THAN READ. A reader scanning for what to pick up
+  // is comparing the same four facts across every workstream, and aligned columns are what makes
+  // that a glance instead of a parse. Markdown rather than padding: the surface renders it.
   const live = [...byState.open, ...byState.backlog];
-  const width = Math.max(0, ...live.map((w) => w.subject.length)) + 4;
-  for (const state of ["open", "backlog"])
-    for (const w of byState[state]) {
-      const marks = [w.page ? "approach page" : "no approach page yet",
-        `${w.arcs} arc${w.arcs === 1 ? "" : "s"}`, age(w.when)];
-      if (w.legacy) marks.push("still in " + w.legacy);
-      out.push(`  ${state.padEnd(9)}${(w.number || "—").padEnd(5)}${w.subject.padEnd(width)}` + marks.join(" · "));
-      // A page nobody can open is a page nobody reads. VS Code shows an .html file as source, so the
-      // row offers the URL a browser takes rather than the path an editor opens. Only an open
-      // workstream gets one: a parked page is not being read.
-      if (state === "open" && w.page) out.push(" ".repeat(16) + "file://" + w.page);
-    }
+  if (live.length) {
+    out.push("", "| | # | Workstream | Page | Arcs | Touched |", "| --- | --- | --- | --- | --- | --- |");
+    for (const state of ["open", "backlog"])
+      for (const w of byState[state]) {
+        // A page nobody can open is a page nobody reads. VS Code shows an `.html` file as source, so
+        // the cell offers the URL a browser takes rather than the path an editor opens. Only an OPEN
+        // workstream gets a link: a parked page is not being read.
+        const page = !w.page ? "—"
+          : state === "open" ? `[approach page](file://${w.page})`
+          : "approach page";
+        const legacy = w.legacy ? ` · still in ${w.legacy}` : "";
+        out.push(`| ${state === "open" ? "🟢 open" : "⏸ backlog"} | ${w.number || "—"} | ${w.subject} `
+          + `| ${page} | ${w.arcs} | ${age(w.when)}${legacy} |`);
+      }
+  }
+  // CLOSED STAYS A LINE. It is a receipt rather than something to pick up, and twelve rows of it
+  // would outweigh the handful a reader can actually act on.
   if (byState.closed.length) {
-    const wrapped = wrap(byState.closed.map((w) => w.folder).join(" · "), 84);
-    const lines = wrapped.length ? wrapped : [""];
-    out.push(`  ${"closed".padEnd(9)}${lines[0]}`);
-    out.push(...lines.slice(1).map((line) => " ".repeat(11) + line));
+    out.push("", `**${byState.closed.length} closed** — `
+      + byState.closed.map((w) => "`" + w.folder + "`").join(" · "));
   }
   return out;
 }
@@ -555,18 +570,20 @@ export function orient(root: string, cwd: string): [text: string, note: string] 
   const [level, why] = rung(governed);
 
   if (!governed.length) {
-    const text = `👋 Good to see you${who ? ", " + who : ""}! Welcome to SaaS Plane.\n\n` +
-      "🚀 Your team's time belongs to your product.\n\n" +
-      "The AI-native, DevEx-first Foundation for Building and Launching Secure, " +
-      "Scalable,\nCompliance-ready SaaS Platforms.\n\n" +
-      "🤖 I am the DevEx agent, and I work on it with you.\n\n" +
-      "Not only on code. I work the whole way a change travels — shaping the idea,\n" +
-      "planning it, building, testing, standing up the estate, releasing, and keeping\n" +
-      "what runs healthy. Architects, QA, ops and security each have a road here, not\n" +
-      "developers alone.\n\n" +
+    const text = `# Welcome to SaaS Plane${who ? ", " + who : ""}! Good to see you 👋\n\n` +
+      "## 🚀 Your team's time belongs to your product.\n\n" +
+      "**The AI-native, DevEx-first Foundation for Building and Launching Secure, " +
+      "Scalable, Compliance-ready SaaS Platforms.**\n\n---\n\n" +
+      "🤖 **I am the DevEx agent** — think of me as your engineering brain for this " +
+      "platform, and I work on it with you.\n\n" +
+      "I know the engineering workflows end to end: setting a repo up, shaping an idea, planning it, " +
+      "developing, testing, provisioning the estate, delivering a change, and operating " +
+      "what runs. Each has its own standards and its own proof, and I carry both. " +
+      "Architects, QA, ops and security each have a road here, not developers alone.\n\n" +
+      "---\n\n" +
       "This folder is empty, which is a good place to start. There is nothing to read " +
-      "yet, so\nwe begin with the shape. When you are ready, I have five questions. " +
-      "Your answers name\nevery account, package and prefix that comes after.\n\n" +
+      "yet, so we begin with the shape. When you are ready, I have five questions. " +
+      "Your answers name every account, package and prefix that comes after.\n\n" +
       "So — what are we building?\n";
     const note = "\n---\nDay-0 mode: no sprepo.json under " + root + ". You have no code to read, " +
       "so do not orient — load the `day-zero` skill and walk it. Ask the five estate " +
@@ -583,26 +600,24 @@ export function orient(root: string, cwd: string): [text: string, note: string] 
   // how access control works — so a banner sourced from that book would render empty for the reader
   // who needs it most. Everything below the welcome is discovered, and the welcome alone is declared.
   const lines: string[] = [
-    `👋 Good to see you${who ? ", " + who : ""}! Welcome to SaaS Plane.`,
+    `# Welcome to SaaS Plane${who ? ", " + who : ""}! Good to see you 👋`,
     "",
-    "🚀 Your team's time belongs to your product.",
+    "## 🚀 Your team's time belongs to your product.",
     "",
-    "The AI-native, DevEx-first Foundation for Building and Launching Secure, Scalable,",
-    "Compliance-ready SaaS Platforms.",
+    "**The AI-native, DevEx-first Foundation for Building and Launching Secure, Scalable, Compliance-ready SaaS Platforms.**",
     "",
-    "🤖 I am the DevEx agent, and I work on it with you.",
+    "---",
     "",
-    "Not only on code. I work the whole way a change travels — shaping the idea,",
-    "planning it, building, testing, standing up the estate, releasing, and keeping",
-    "what runs healthy. Architects, QA, ops and security each have a road here, not",
-    "developers alone.",
+    "🤖 **I am the DevEx agent** — think of me as your engineering brain for this platform, and I work on it with you.",
     "",
-    "💡 Tell me what you want to build. Your idea can be rough. We shape it together",
-    "first, then build it in four steps: the approach, the docs, the code, and the",
-    "tests that prove it works.",
+    "I know the engineering workflows end to end: setting a repo up, shaping an idea, planning it, developing, testing, provisioning the estate, delivering a change, and operating what runs. Each has its own standards and its own proof, and I carry both. Architects, QA, ops and security each have a road here, not developers alone.",
     "",
-    ...wrap(`You have ${spell(repos.length)} repo${repos.length === 1 ? "" : "s"} here and one ` +
-      "window. Every file follows its own rules, and finding them is my job. You just build.", 84),
+    "### 💡 Tell me what you want to build",
+    "",
+    "Your idea can be rough. We shape it together first, then build it in four steps: the approach, the docs, the code, and the tests that prove it works.",
+    "",
+    `You have ${spell(repos.length)} repo${repos.length === 1 ? "" : "s"} here and one `
+      + "window. Every file follows its own rules, and finding them is my job. You just build.",
     "",
   ];
   const settings = readJson(join(root, ".claude", "settings.json")) ?? {};
@@ -611,21 +626,23 @@ export function orient(root: string, cwd: string): [text: string, note: string] 
   const head = plugins.length
     ? `floor ${plugins.length} plugins · ${cacheState(root, plugins)}`
     : "floor not minted — no plugins enabled here";
-  lines.push(`workspace  ${root}   ${head}`);
-  if (resolve(cwd) !== root) lines.push(`rooted in  ${relative(root, resolve(cwd))}`);
+  lines.push("---", "", "## The ground", "",
+    `\`${root}\` · ${head}`);
+  if (resolve(cwd) !== root) lines.push("", `Rooted in \`${relative(root, resolve(cwd))}\`.`);
   lines.push("");
 
-  const column = (key: (r: Repo) => string, pad = 2) => Math.max(...repos.map((r) => key(r).length)) + pad;
-  const nameWidth = column((r) => r.name);
-  const claimWidth = column((r) => claim(r));
-  const pluginWidth = column((r) => r.want.join(" "));
+  // A TABLE, NOT PADDED COLUMNS. This text is rendered as markdown wherever a session actually
+  // reads it, and a proportional font throws away every space `padEnd` inserted — so the columns
+  // that lined up in a terminal arrive as ragged prose. The pipes survive both surfaces.
+  lines.push("### Repositories", "",
+    "| Repo | Law | Plugins | Wiring | Holds |",
+    "| --- | --- | --- | --- | --- |");
   for (const r of repos) {
     const facts: string[] = [];
-    if (!r.world) facts.push("no claim");
     if (r.nodes) facts.push(`${r.nodes} node${r.nodes !== 1 ? "s" : ""}`);
     facts.push(...r.pins);
-    lines.push(r.name.padEnd(nameWidth) + claim(r).padEnd(claimWidth) +
-      r.want.join(" ").padEnd(pluginWidth) + (r.wired ? "wired" : "UNWIRED").padEnd(9) + facts.join(" · "));
+    lines.push(`| \`${r.name}\` | ${r.world ? claim(r) : "_no claim_"} | ${r.want.join(" ") || "—"} `
+      + `| ${r.wired ? "wired" : "**UNWIRED**"} | ${facts.join(" · ") || "—"} |`);
   }
   lines.push("");
 
