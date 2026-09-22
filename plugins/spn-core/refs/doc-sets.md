@@ -1,11 +1,11 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/README.md", "seen": "7eefc348" },
+    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/README.md", "seen": "bb9243a0" },
     { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "5d03bdc4" },
     { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md", "seen": "0229e250" },
     { "path": "docs/02-constructs/01-devex/04-workspace/04-docs.md", "seen": "5d904408" },
-    { "path": "CONCEPT.md", "seen": "6d48c1ec" }
+    { "path": "CONCEPT.md", "seen": "3e6cde1c" }
   ]
 }
 -->

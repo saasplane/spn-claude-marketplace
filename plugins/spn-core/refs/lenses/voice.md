@@ -3,7 +3,7 @@
   "chapters": [
     { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md", "seen": "f0a23b62" },
     { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md", "seen": "c30fe68a" },
-    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md", "seen": "2e56164e" }
+    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md", "seen": "e3b6472d" }
   ],
   "rows": [
     "RD.DOCS.031",
@@ -16,6 +16,7 @@
     "RD.DOCS.071",
     "RD.DOCS.072",
     "RD.DOCS.082",
+    "RD.DOCS.084",
     "RD.DEVEX.032"
   ]
 }
@@ -23,7 +24,7 @@
 
 # Lens — `VOICE` (Editor)
 
-**Source of truth:** the foundation book's readability bar (`01-devex/04-workspace/04-docs/01-corpus`), the document block, its tag line and the behaviour row (`01-devex/04-workspace/04-docs/02-document`), and the voice and upkeep discipline checks (`01-devex/04-workspace/04-docs/04-discipline`) — decisions RD.DOCS.031, RD.DOCS.043, RD.DOCS.044, RD.DOCS.052, RD.DOCS.060, RD.DOCS.062, RD.DOCS.067, RD.DOCS.071, RD.DOCS.072, RD.DOCS.082 and RD.DEVEX.032. This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
+**Source of truth:** the foundation book's readability bar (`01-devex/04-workspace/04-docs/01-corpus`), the document block, its tag line and the behaviour row (`01-devex/04-workspace/04-docs/02-document`), and the voice, upkeep and counting discipline checks (`01-devex/04-workspace/04-docs/04-discipline`) — decisions RD.DOCS.031, RD.DOCS.043, RD.DOCS.044, RD.DOCS.052, RD.DOCS.060, RD.DOCS.062, RD.DOCS.067, RD.DOCS.071, RD.DOCS.072, RD.DOCS.082, RD.DOCS.084 and RD.DEVEX.032. This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
 
 **Worn** while writing. **Convened** over any document before it lands. **Advises — and blocks a page that misses its seat bar.**
 
@@ -42,6 +43,7 @@
 - **A foundation row is a promise of five cells, and a built repository's row carries all ten** (RD.DOCS.071 · RD.DOCS.072). A promise is `Id · Who · Does · Sees · Type`, with `Type` reading `PROMISE` — the generic behaviour of an area that the standards make possible, written in the actor's own words, whether or not anything fulfils it yet. It carries no `Where`, no `Tier`, no `Status` and no `Updated at`, because the foundation ships no code and nothing could ever write them, and **a foundation row claiming a status is refused**. A row in a built repository carries every cell, and its `Names` cell holds the foundation id it delivers. A promise nothing fulfils is not a gap; it is the standard saying what it expects.
 - **A register row is a record and stays one** (RD.DOCS.043). One clause a sentence, the decision column carrying the ruling and nothing else, and *you* inside a row is a finding. This is the one place a length rule survives, and it is a shape rather than a count.
 - **An edit leaves what it touched at standard, and you judge it on that — MUST** (RD.DOCS.082). Whatever the writer opened the file for, the part they changed comes back satisfying every rule of this domain: the naming rules, the checks above, the metadata block and the tag line. That work belongs to the change being made rather than to a later one, so a defect somebody introduced and corrected inside the same change is not a finding and you do not report it. **The reach stops at the file the change opened.** A defect you notice in a document this change never touched is a finding you record, because fixing it there would move a file nobody is reviewing beside this work. The rule exists so a corpus-wide pass has to run once: without it, the next page written arrives carrying the defects that pass removed, and the count climbs back to where it started.
+- **A number in prose only when the set is closed and the sentence names what it holds — MUST** (RD.DOCS.084, restating structure rule 9 and RD.GOV.008). *A workstream is `open`, `backlog` or `closed`* is honest, because the sentence carries all three and a fourth would be a redesign. A set that grows takes its generating rule instead — *one for each engineering function*, *one chapter per construct per package*. **The test is not whether the count is right today**: ask what happens when somebody adds one, and if the answer is an ordinary decision rather than a redesign, the count has to go. This is the check you run most and the tools help you least with — the cardinality rule fires only in front of a short list of nouns, so a count in front of a domain noun reaches you having passed every gate.
 - **Could a newcomer do this after reading it?** — the test the number cannot make. A page that states a rule and gives neither its why nor the symptom of breaking it fails here, whatever its share says. This is the line this lens stops work over, alongside the seat bar.
 
 ## What it never does
