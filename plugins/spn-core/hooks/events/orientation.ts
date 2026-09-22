@@ -555,10 +555,15 @@ export function orient(root: string, cwd: string): [text: string, note: string] 
   const [level, why] = rung(governed);
 
   if (!governed.length) {
-    const text = `Good to see you${who ? ", " + who : ""}. Welcome to SaaS Plane — build the ` +
-      "product, not the platform.\nIt is the AI-native, DevEx-first foundation for " +
-      "building and launching secure,\nscalable, compliance-ready SaaS platforms.\n\n" +
-      "I am the DevEx agent, and I work on it with you.\n\n" +
+    const text = `👋 Good to see you${who ? ", " + who : ""}! Welcome to SaaS Plane.\n\n` +
+      "🚀 Your team's time belongs to your product.\n\n" +
+      "The AI-native, DevEx-first Foundation for Building and Launching Secure, " +
+      "Scalable,\nCompliance-ready SaaS Platforms.\n\n" +
+      "🤖 I am the DevEx agent, and I work on it with you.\n\n" +
+      "Not only on code. I work the whole way a change travels — shaping the idea,\n" +
+      "planning it, building, testing, standing up the estate, releasing, and keeping\n" +
+      "what runs healthy. Architects, QA, ops and security each have a road here, not\n" +
+      "developers alone.\n\n" +
       "This folder is empty, which is a good place to start. There is nothing to read " +
       "yet, so\nwe begin with the shape. When you are ready, I have five questions. " +
       "Your answers name\nevery account, package and prefix that comes after.\n\n" +
@@ -578,17 +583,23 @@ export function orient(root: string, cwd: string): [text: string, note: string] 
   // how access control works — so a banner sourced from that book would render empty for the reader
   // who needs it most. Everything below the welcome is discovered, and the welcome alone is declared.
   const lines: string[] = [
-    `Good to see you${who ? ", " + who : ""}.`,
+    `👋 Good to see you${who ? ", " + who : ""}! Welcome to SaaS Plane.`,
     "",
-    "Welcome to SaaS Plane — build the product, not the platform. It is the AI-native,",
-    "DevEx-first foundation for building and launching secure, scalable, compliance-ready",
-    "SaaS platforms.",
+    "🚀 Your team's time belongs to your product.",
     "",
-    "I am the DevEx agent, and I work on it with you.",
+    "The AI-native, DevEx-first Foundation for Building and Launching Secure, Scalable,",
+    "Compliance-ready SaaS Platforms.",
     "",
-    "Tell me what you want to build. Your idea can be rough. We shape it together first,",
-    "then build it in four steps: the idea, the docs, the code, and the tests that prove",
-    "it works.",
+    "🤖 I am the DevEx agent, and I work on it with you.",
+    "",
+    "Not only on code. I work the whole way a change travels — shaping the idea,",
+    "planning it, building, testing, standing up the estate, releasing, and keeping",
+    "what runs healthy. Architects, QA, ops and security each have a road here, not",
+    "developers alone.",
+    "",
+    "💡 Tell me what you want to build. Your idea can be rough. We shape it together",
+    "first, then build it in four steps: the approach, the docs, the code, and the",
+    "tests that prove it works.",
     "",
     ...wrap(`You have ${spell(repos.length)} repo${repos.length === 1 ? "" : "s"} here and one ` +
       "window. Every file follows its own rules, and finding them is my job. You just build.", 84),
