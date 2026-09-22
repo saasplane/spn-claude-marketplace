@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/05-guides/README.md", "seen": "0f055867" }
+    { "path": "docs/05-guides/README.md", "seen": "2a44ce6e" }
   ]
 }
 -->
@@ -21,9 +21,10 @@ it does, step 1 is already done.
 **The version is not written here**, because a number in prose goes out of date the first time
 somebody bumps it. `.nvmrc` and the `engines` field carry it, and a version manager reads the file.
 
-**Optionally a browser** — `npm install -g playwright` and `npx playwright install chromium` — for
-checks that render a page rather than reading it. They report *not checked* where it is absent, so
-nothing is blocked by skipping it. This is **not** the automation profile: `spnutils` provisions its
+**The setup ends with a browser** — `npm install -g playwright`, then
+`npx playwright install chromium` — for checks that render a page rather than reading its source.
+Those checks report *not checked* on a machine without it, so a setup that stops early still works.
+This is **not** the automation profile: `spnutils` provisions its
 own Chrome under `~/.spnutils/browser/chrome`, and you install nothing for that.
 
 | # | Step | Runs | Status |
