@@ -6,59 +6,100 @@ Two command vocabularies belong to the platform rather than to any stack: the **
 
 ## `spnutils` — the foundation CLI
 
-One CLI serves every stack, in **three groups**. The group says *what kind of thing changes*, which is what keeps the boundary stable as verbs are added:
+One CLI serves every stack. The group says *what kind of thing changes*, which is what keeps the boundary stable as verbs are added — a new verb joins a group rather than minting one:
 
 | Group | Changes | Never |
 | --- | --- | --- |
 | `repo` | the repository and its remote — creation, convergence to the standard, agent wiring | the content of code, tests, or docs |
 | `apps` | the apps domain's nodes — scaffolds, generated sources, conformance, release | repo settings or the estate |
 | `infra` | the estate — layers, apps, config, estate packages; **local is the default realization, `--cloud` is asked for by name** | committed code |
+| `workspace` | the level above the repository — the floor's permission tiers, the plugin union, the machine env seat, and `.spndevex/` | anything inside a repository |
 
-### `repo` — the repository and its remote (any repo)
+<!-- spn:generated commands — do not edit inside these markers; `commands-ref.ts` writes it -->
+Rendered from `spnutils 1.2.64` — the **released** CLI, which is what a partner holds.
+Surface `fc7ccc4683b4`. A release that adds no verb leaves that unchanged and owes no regeneration.
 
-| Verb | Does |
-| --- | --- |
-| `repo create <name> [--from <org-package>[@version]]` | creates the repository in the bound SCM if absent, then converges it to the standard — branches, protections, team access. Org context from the current repo's pin, or `--from` |
-| `repo agent-sync` (`as`) | converges this repo's wiring from `sprepo.json` — marketplace, plugins, managed CLAUDE block. **The marketplace source follows the mode the place implies` is producer-only**: it registers a marketplace checkout, which a partner does not hold |
-| `repo agent-sync` (`as`) | converges this repo's wiring, from `sprepo.json` and installed package state |
+#### `apps`
 
-There is no `setup` and no `teams-init` — those verbs are retired; creation and convergence are one verb, `repo create`, and it is idempotent.
+| Command | Does | Options |
+| --- | --- | --- |
+| `apps build` | Build one node, the way its kind builds | `--package <package>` · `--json` |
+| `apps check` | Typecheck, then lint | `--package <package>` · `--json` |
+| `apps clean` | Remove what a build and an install left behind | `--package <package>` · `--json` |
+| `apps codegen` | Generate from a published surface | `--package <package>` · `--json` |
+| `apps dev` | Run this node from source, watching it | `--package <package>` · `--json` · `--mode <mode>` |
+| `apps format` | Write the formatting and the fixable rules | `--package <package>` · `--json` |
+| `apps gen-barrel` | Generate the package's barrel — its public surface | `--package <package>` |
+| `apps gen-labels` | Generate the label manifest (scans translate() call sites -> dist/generated/spn-labels.json) | `--package <package>` |
+| `apps gen-symbols` | Generate the symbol index (public surface -> dist/generated/spn-symbols.json) | `--package <package>` |
+| `apps gen-validators` | Generate contract state validators | `--package <package>` |
+| `apps migrate` | Move this node's migration history — a task, never a run mode | `--package <package>` · `--json` |
+| `apps release` | Publish every releasable project in this repository, at one version (lockstep) — the scope is the repository, never one package | `--message <message>` · `--dry-run` · `--approved` · `--json` |
+| `apps scaffold` | Scaffold a SaaS Plane artifact — a repository, or a project of a declared kind | `--usecase <usecase>` · `--code <code>` · `--scope <scope>` · `--support-version <version>` · `--app <folder>` · `--name <name>` · `--stack <stack>` · `--organization <ref>` · `--platform <ref>` |
+| `apps start` | Run what the build produced | `--package <package>` · `--json` · `--mode <mode>` |
+| `apps stop` | Stop what dev or start left running | `--package <package>` · `--json` |
+| `apps test` | Run one tier this node owes or carries, and write what it proved | `--package <package>` · `--json` |
+| `apps validate` | Check a target against what its kind requires | `--usecase <usecase>` · `--app <folder>` · `--json` |
 
-### `apps` — the apps domain's nodes (`APPS` repos)
+#### `infra`
 
-| Verb | Does |
-| --- | --- |
-| `apps scaffold repo --stack <stack> --organization <package[@version]> [--platform <package[@version]>]` | mints the checkout as an APPS repo: `sprepo.json` with the stack claim and couplings, then the workspace skeleton |
-| `apps scaffold <kind> [-u --usecase <name>] [-c --code <CODE>]` | a project of a declared kind, with the tree the kind prescribes. The target is the kind in **kebab-case** (`module-server`, `app-utility`, `client-api`); `--usecase` builds the name and `--code` carries the `spkind.json` config value |
-| `apps scaffold app-module -a --app <folder> [-u] [-c]` | an app-owned module inside an application |
-| `apps gen-validators` (`gvl`) `[-p <package>]` | regenerates contract state validators — after any contract/states edit; never hand-edited |
-| `apps gen-barrel` (`gbr`) `[-p <package>]` | regenerates the package's barrel — its public surface |
-| `apps gen-labels` (`glb`) `[-p <package>]` | regenerates the label manifest from `translate()` call sites |
-| `apps gen-symbols` (`gsy`) `[-p <package>]` | regenerates the symbol index — the public surface the agents read |
-| `apps validate [-p <package>] [--json]` | reports where a project disagrees with what its own declared kind requires |
-| `apps release [version] [-m <msg>] [--dry-run] [-y --approved] [--json]` | publishes every releasable project at one version, lockstep — routed to the `-public` or `-private` registry pair by each package's scope |
+| Command | Does | Options |
+| --- | --- | --- |
+| `infra app down` | Deregister an app | `--package <package>` · `--clean` |
+| `infra app up` | Bootstrap an app: its schemas, certs, /etc/hosts, ingress vhost — the app derived from the cwd | `--package <package>` |
+| `infra config diff` | Compare two environments' answered keys — a peer baseline, never a truth claim | `--json` |
+| `infra config export` | ONE prefix as a plain JSON object — authored values, references unexpanded. A working file, never a committed one. | `--scope <scope>` · `--env <env>` · `--app <kindcode>` |
+| `infra config get` | Read one key at a prefix | `--scope <scope>` · `--env <env>` · `--app <kindcode>` |
+| `infra config import` | Bulk upsert one prefix from a plain object, each key through set's guards — deleting nothing | `--dry-run` · `--approve` · `--scope <scope>` · `--env <env>` · `--app <kindcode>` |
+| `infra config list` | Read the app plane at a prefix | `--json` · `--scope <scope>` · `--env <env>` · `--app <kindcode>` |
+| `infra config render` | The composed environment exactly as the deploy materializes it, secrets masked — table or --json, never an executable form | `--json` |
+| `infra config set` | Write keys into the app plane at the derived prefix | `--scope <scope>` · `--env <env>` · `--app <kindcode>` |
+| `infra domain register` | Proxy one or more hosts to a local dev server — TLS (local CA), /etc/hosts, ingress vhost | `--port <port>` · `--app <kind-code>` · `--deployment <code>` · `--unit <name>` · `--cors` · `--no-websocket` |
+| `infra domain unregister` | Remove a registered unit (ingress vhost, /etc/hosts block) — by --code, or by a single host | `--unit <name>` · `--clean` |
+| `infra environment down` | Take the environment layer down. Say --plan or --apply. A layer operation never destroys a stateful resource — --clean is how you ask for that, separately. | `--cloud` · `--local` · `--plan` · `--apply` · `--approve` · `--clean` |
+| `infra environment status` | What is running | `--cloud` · `--local` · `--json` |
+| `infra environment up` | Stand the environment layer up — locally by default. Say --plan or --apply. | `--cloud` · `--local` · `--plan` · `--apply` · `--approve` · `--json` |
+| `infra logs` | Tail the realization's logs (optionally one service) | `--cloud` · `--local` |
+| `infra organization down` | Take the organization layer down. Say --plan or --apply. A layer operation never destroys a stateful resource — --clean is how you ask for that, separately. | `--cloud` · `--local` · `--plan` · `--apply` · `--approve` · `--clean` |
+| `infra organization status` | What is running | `--cloud` · `--local` · `--json` |
+| `infra organization trust-ca` | Trust the machine CA in the system keychain — what `up` does as part of the local trust bootstrap | `--force` |
+| `infra organization up` | Stand the organization layer up — locally by default. Say --plan or --apply. | `--cloud` · `--local` · `--plan` · `--apply` · `--approve` · `--json` · `--reset-certs` |
+| `infra platform down` | Take the platform layer down. Say --plan or --apply. A layer operation never destroys a stateful resource — --clean is how you ask for that, separately. | `--cloud` · `--local` · `--plan` · `--apply` · `--approve` · `--clean` |
+| `infra platform status` | What is running | `--cloud` · `--local` · `--json` |
+| `infra platform up` | Stand the platform layer up — locally by default. Say --plan or --apply. | `--cloud` · `--local` · `--plan` · `--apply` · `--approve` · `--json` |
+| `infra release` | Build then publish: validate, test, stage dist/ (spinfrapkg.json + src/), publish the dist whole to the organization's registry pair — or with --local, into this machine's store | `--package <package>` · `--dry-run` · `--local` · `--approved` · `--json` |
+| `infra scaffold module` | A lifecycle module node — identity-only manifest, renderings derived from its tree | `--name <name>` |
+| `infra scaffold organization` | The organization node — at most one per repo | `--name <name>` |
+| `infra scaffold platform` | A platform node | `--name <name>` |
+| `infra scaffold repo` | Mint the checkout as the org's estate repo — the cwd, and what it is called | `--name <name>` |
+| `infra show` | Resolve the declaration that reaches this folder and say where it came from — including PINNED @ version per layer | `--json` |
+| `infra test` | The render harness — each node's tests/run.sh, where one exists; its exit code is the verdict | `--package <package>` |
+| `infra validate` | Check a target against what its type requires | `--json` |
+
+#### `repo`
+
+| Command | Does | Options |
+| --- | --- | --- |
+| `repo agent-sync` | Converges this repo for SaaS Plane agents: the marketplace registration, the plugins its sprepo.json implies, the managed CLAUDE.md block and the generated rules beside it, and any installed plugin that has drifted from the marketplace. One path, whether the repo was wired before or not | — |
+| `repo create` | Create the repository in the bound SCM if absent, then converge it — branches, protections, team access | `--from <ref>` |
+
+#### `workspace`
+
+| Command | Does | Options |
+| --- | --- | --- |
+| `workspace agent-sync` | Re-converge the floor, then run repo agent-sync in every discovered member. Reports what drifted rather than fixing it silently | — |
+| `workspace init` | Mint this folder as a DevEx workspace: the marketplace, the plugin union, the permission tiers, ~/.spnenv and .spndevex/. Converges on a re-run, and wires every member repo too | — |
+| `workspace status` | The orientation — members, the law each carries, its wiring, what it owes, and the workstreams in backlog, open and closed | `--json` |
+| `workspace timings` | What the agent's own machinery costs — the hook checks, and the interpreter start beside them. Recording is off until you ask for it | `--on` · `--off` |
+<!-- /spn:generated -->
 
 **Every scaffolded node declares itself in `spkind.json` at its root** (decision RD.APPS.029) — never a key in `package.json`. The reason: two places declaring one fact is drift waiting to happen, and an app-owned module has no package file to carry a key at all.
 
 **The stack is never typed on an `apps` verb** — it comes from the repo's claim in `sprepo.json`. Only `apps scaffold repo` types it, once, at the moment the claim is made. A flag may override a derivable fact; a silent default never exists.
 
-### `infra` — the estate (local by default; `--cloud` by name)
+**`infra` layers are nouns, and local is the default realization.** `--cloud` is asked for by name. Cloud mutation runs only where the declaration is authored, plus CI; in the cloud a missing layer below is a named refusal, never an implicit apply. Hosted vendors are **modules** (`infra-module-{code}`) — their local rendering rides the platform layer's container group, and there is no separate vendor verb.
 
-The layers are **nouns** — `organization` · `platform` · `environment` — and each has `plan` · `up` · `down` · `status`:
-
-| Verb | Does |
-| --- | --- |
-| `infra organization plan\|up\|down\|status [--cloud]` | the organization layer. Locally, `up` converges the machine's trust bootstrap — the CA, its one trust prompt, the shared ingress |
-| `infra platform plan\|up\|down\|status [--cloud]` | the platform layer. Locally, `up` converges org-local prerequisites first, then the platform's container group |
-| `infra environment plan\|up\|down\|status --env <env> --cloud` | the environment layer — **cloud only**: the machine is one environment, so no local form exists and targeting it is refused by name |
-| `infra app up\|down [-p <package>] [--clean]` | the deployments layer locally: schemas, certs, hosts entry, ingress vhost — the app derived from the cwd, reading its `spkind.json` and env against the pinned platform |
-| `infra logs [service] [--cloud]` · `infra show [--json]` | tail the realization's logs; resolve the declaration that reaches this folder and say where it came from |
-| `infra config set\|get\|list\|export\|import\|diff\|render` | the seven config verbs against the app plane, addressed by `--scope organization\|platform\|environment [--env <env>] [--app <kindcode>]` — never the ledger, which no person opens |
-| `infra scaffold repo\|organization\|platform\|module` | an estate node with the tree its type prescribes — the one authored fact per type stated, everything else derived |
-| `infra validate [-p] [--json]` · `infra test [-p]` | structure against the type, manifest against the contract; the render harness |
-| `infra release [-p] [--local] [--dry-run] [-y --approved] [--json]` | build then publish an estate package to the org's `-public`/`-private` pair by the name's scope — `--local` stages into the machine store (`~/.spnutils/registry`) instead, and the target is chosen, never derived; the semver read from `spinfrapkg.json`'s `version`, bumped by the reviewed edit |
-
-Hosted vendors are **modules** (`infra-module-{code}`) — their local rendering rides the platform layer's container group; there is no separate vendor verb. Cloud mutation runs only where the declaration is authored, plus CI; in the cloud a missing layer below is a named refusal, never an implicit apply.
+**`repo create` is creation and convergence in one idempotent verb.** There is no `setup` and no `teams-init`; both are retired.
 
 ### The derivation laws bind every verb
 
