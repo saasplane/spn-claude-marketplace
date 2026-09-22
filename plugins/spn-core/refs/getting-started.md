@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/05-guides/README.md", "seen": "2a44ce6e" }
+    { "path": "docs/05-guides/README.md", "seen": "cf2482d4" }
   ]
 }
 -->
@@ -12,19 +12,21 @@
 
 Follow this walk from nothing to a first feature in flight. Every step names the command or verb that carries it; statuses are honest — ✅ runs today, 🚧 the verb is still being built.
 
-**Before step 1, the machine.** Installed once, and none of it is SaaS Plane's own: **node** at the
-version the repositories pin, a version manager that reads that pin (`fnm` or `nvm`), **pnpm**, and a
-**container runtime** — the local estate is real containers rather than mocks. Then the CLI itself,
-`npm install -g @saasplane/utility-ts`. **`spnutils --version` answering is the whole test**, and if
+**Before step 1, the machine**, in the order one thing depends on the next: **node** at the version
+the repositories pin, a version manager that reads that pin (`fnm` or `nvm`), **pnpm**, a **container
+runtime** — the local estate is real containers rather than mocks — then a **browser**, and the CLI
+last, **because it is what turns the rest on**: step 3 is `repo agent-sync`, which wires the agent to
+the versions actually installed, so whatever is on the machine when the CLI arrives is what the agent
+gets. **`spnutils --version` answering is the whole test**, and if
 it does, step 1 is already done.
 
 **The version is not written here**, because a number in prose goes out of date the first time
 somebody bumps it. `.nvmrc` and the `engines` field carry it, and a version manager reads the file.
 
-**The setup ends with a browser** — `npm install -g playwright`, then
-`npx playwright install chromium` — for checks that render a page rather than reading its source.
-Those checks report *not checked* on a machine without it, so a setup that stops early still works.
-This is **not** the automation profile: `spnutils` provisions its
+**The browser is `npm install -g playwright` then `npx playwright install chromium`**, and it goes in
+before the CLI: it serves the checks that render a page rather than reading its source. Those report
+*not checked* on a machine without it, so an install that skipped it still works. This is **not** the
+automation profile: `spnutils` provisions its
 own Chrome under `~/.spnutils/browser/chrome`, and you install nothing for that.
 
 | # | Step | Runs | Status |
