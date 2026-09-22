@@ -103,7 +103,7 @@ A value may reference another by name. The grammar is **shared with the cloud se
 
 **You may read this file. You may not print one.**
 
-That distinction is the whole rule, and it is narrower than the one this reference used to state. The tool's own verb reads every value in the file on every `sync`, because preserving the developer's regions requires reading them. So *do not read it* was never true, and stating it did not stop the thing it was written to stop.
+That distinction is the whole rule, and it is narrower than the one this reference used to state. The tool's own command reads every value in the file on every `sync`, because preserving the developer's regions requires reading them. So *do not read it* was never true, and stating it did not stop the thing it was written to stop.
 
 **What actually protects the developer is the output.** Render **key names and set-state**, or a diff of key names. A value reaches a terminal only when the developer asks for that one value by name.
 
@@ -126,10 +126,10 @@ Keys carry the platform code as their prefix — `DMO_`, `LPD_`, `SAS_` — and 
 
 A developer's own key keeps its prefix too. `DMO_MY_THING` belongs to DMO because of its name, never because of where it sits — which is why living in `spnutils:dev` costs it nothing.
 
-### Two cautions before you run a workspace verb
+### Two cautions before you run a workspace command
 
 - **The tool never writes a shell profile.** `~/.zshenv` and its siblings stay the developer's. Sourcing `~/.spnenv` from a profile is their line to add, and it trades away the exposure this file avoids: every value exported to every process. **You never edit a shell profile yourself.**
-- **`workspace init` in a scratch folder rewrites the real `~/.spnenv`.** Point `HOME` at a temp directory before you run `init` or `agent-sync` for a demo. The verb is `workspace agent-sync` — the floor, then `repo agent-sync` in every discovered member.
+- **`workspace init` in a scratch folder rewrites the real `~/.spnenv`.** Point `HOME` at a temp directory before you run `init` or `agent-sync` for a demo. The command is `workspace agent-sync` — the floor, then `repo agent-sync` in every discovered member.
 
 ### A run manages only what it can observe
 
@@ -229,7 +229,7 @@ When a window opens, surface what is stale — a subject untouched across sittin
 
 **A workstream opens with the agent update and the reload — MUST** (RD.DEVEX.049). Your own surfaces improve as the work does, so the update is never the closing act. A workstream that executes first spends its whole scope acting on the surfaces the last one left behind.
 
-**Agent setup is three repositories, never one.** The foundation states the rule, `spnutils` realizes the floor and the verbs, and the marketplace restates it. A pass that edits the plugins and stops has changed a restatement and left its source standing. That is how a rule ends up somewhere a partner can never read it.
+**Agent setup is three repositories, never one.** The foundation states the rule, `spnutils` realizes the floor and the commands, and the marketplace restates it. A pass that edits the plugins and stops has changed a restatement and left its source standing. That is how a rule ends up somewhere a partner can never read it.
 
 **Nothing you edit is live before the install.** You read the installed plugin cache, so changing the concept, the chapters, the registers, the providers and the plugins leaves changed files and unchanged behaviour. Skills, agent briefs, reference files and `hooks.json` need a fresh window on top of the install. A hook **script** is the one exception, and it reloads on its next run.
 
@@ -261,7 +261,7 @@ When a window opens, surface what is stale — a subject untouched across sittin
 | a contradiction, or a new law | the concept, then the chapter carrying it | step 4, and nothing before it |
 | a decision worth citing later | a register row, `RD.<AREA>.<NNN>` | the chapter and the plugins restating it |
 | a realization true of one stack | that stack's provider seat | that stack's own plugin |
-| a verb, a gate, or the floor | the deterministic tool | its release, then step 6 |
+| a command, a gate, or the floor | the deterministic tool | its release, then step 6 |
 
 **The book is not loaded in a session, and that is why step 4 exists.** You read the installed plugins, so a rule living only in a chapter reaches nobody at all. Carry it into the core plugin where it is stack-agnostic, and into the stack's plugin where it is not — as a skill, a reference card, or a lens bullet.
 
@@ -277,7 +277,7 @@ When a window opens, surface what is stale — a subject untouched across sittin
 | --- | --- | --- |
 | 1 | the concept, then the chapters that carry it | no |
 | 2 | the registers — the decision row, and the instrument that reaches it | no |
-| 3 | the provider seats, then the deterministic tool where a verb or the floor changes | no |
+| 3 | the provider seats, then the deterministic tool where a command or the floor changes | no |
 | 4 | the plugins, which restate all of it | no |
 
 ### The reload — both modes run these, and the order is load-bearing
@@ -360,7 +360,7 @@ Plan one change across repos as an **arc**: ordered steps, each naming its targe
 | Never | Instead |
 | --- | --- |
 | point at a path inside a sibling checkout — the book's repo included | **cite the book by name**, because a path resolves only for someone holding both checkouts |
-| nothing — `repo agent-sync` reads the mode and wires the checkout | nothing — the same verb reads the mode and wires the published source |
+| nothing — `repo agent-sync` reads the mode and wires the checkout | nothing — the same command reads the mode and wires the published source |
 | name a marketplace PATH as a value to set | name `SPN_DEVEX_AGENT_WORKSPACE`, which names a place rather than a source. Set, and the repos inside it are a **builder**'s; unset — what every partner has — and the marketplace is the published one. Nothing may set it for somebody |
 
 **No variable asks for a rehearsal, and none ever should.** A provisioning run names its own mode on
@@ -368,7 +368,7 @@ the command — `--plan` or `--apply`, exactly one, with no default (`RD.INFRA.0
 no account, so the cloud walk is rehearsable before any account exists. `SPN_POSTURE` is **retired**:
 it asked for a rehearsal through the environment, and a rehearsal is now a mode you type.
 
-**`--local` survives on one verb, and it is not an agent one.** `infra release --local` stages a package into the machine store, and that is an ordinary partner act. The wiring verbs take no flag at all: `repo agent-sync` has no options and reads the mode from `SPN_DEVEX_AGENT_WORKSPACE` — set, and the marketplace is the checkout beside its siblings; unset, which is what every partner has, and it is the published one. Nothing may set it for somebody.
+**`--local` survives on one command, and it is not an agent one.** `infra release --local` stages a package into the machine store, and that is an ordinary partner act. The wiring commands take no flag at all: `repo agent-sync` has no options and reads the mode from `SPN_DEVEX_AGENT_WORKSPACE` — set, and the marketplace is the checkout beside its siblings; unset, which is what every partner has, and it is the published one. Nothing may set it for somebody.
 
 ## A consumer repo needs no peer checkout
 

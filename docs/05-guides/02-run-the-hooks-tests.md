@@ -15,7 +15,7 @@
 
 Run these after any change to a hook, a check or a tool here. They exercise the source in your working tree rather than the installed copy, so you get an answer before you install anything.
 
-They also do a second job that no other repository's suites do. **This repository declares `GENERAL`, so `spnutils` serves it with its document verbs alone and has no test runner for it.** There is no other program that could write this repository's behaviour rows, so these suites are that program too.
+They also do a second job that no other repository's suites do. **This repository declares `GENERAL`, so `spnutils` serves it with its document commands alone and has no test runner for it.** There is no other program that could write this repository's behaviour rows, so these suites are that program too.
 
 ## Run the whole set
 

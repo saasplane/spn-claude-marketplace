@@ -26,7 +26,7 @@ A card is a ref, so it carries a stamp and adds no rule of its own. What makes t
 | a card | `refs/` | one markdown file restating one subject of the estate model, in full, under a stamp |
 | the manifests | `spestate.json` · `spinfrapkg.json` | the files that mark an estate node and name what kind it is |
 | the path locator | — | how a node is resolved from wherever you are standing, rather than guessed from a folder name |
-| a layer | — | one band of the estate, with the same verbs as every other and a fixed place in the order |
+| a layer | — | one band of the estate, with the same commands as every other and a fixed place in the order |
 | a coordinate | — | one part a resource name is composed from, drawn from a closed vocabulary |
 | a law | — | one thing a declaration must never do, written with the checkable defect it names |
 
@@ -62,7 +62,7 @@ The folder name is checked against the manifest rather than trusted as one. Infe
 
 ### The layers are read in order, and the order explains most failures
 
-A lower layer that is missing is the usual reason a higher one will not start, and that is a diagnosis rather than a rule. The card lists the layer nouns, gives each of them the same verbs, and states the order they come up in. It names the tool verb realizing each act, so the card can be read beside a command that is already running. *Where:* `plugins/spn-infra/refs/layers-doors.md`
+A lower layer that is missing is the usual reason a higher one will not start, and that is a diagnosis rather than a rule. The card lists the layer nouns, gives each of them the same commands, and states the order they come up in. It names the tool's command realizing each act, so the card can be read beside a command that is already running. *Where:* `plugins/spn-infra/refs/layers-doors.md`
 
 ### A name that cannot be composed from coordinates is a defect
 
@@ -80,7 +80,7 @@ This page answers which subjects the estate's cards cover and what a card may co
 | --- | --- | --- |
 | the subjects restated here, and that every value in them is grammar rather than a real one | the block, the stamp, the hash and the drift comparison | [The Ref](../01-spn-core/08-ref-set.md) |
 | that a refusal's reasoning is one hop from the refusal | what is refused at the moment an estate file is written | [The Estate Guard](01-estate-guard.md) |
-| that a card holds the words a verb uses | the verbs themselves, and the walk each one sequences | [Estate Skills](02-estate-skills.md) |
+| that a card holds the words a skill uses | the skills themselves, and the walk each one sequences | [Estate Skills](02-estate-skills.md) |
 
 ## Binds
 

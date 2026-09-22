@@ -23,5 +23,5 @@ Each file here holds the rows of one construct, and it sits at the same path and
 | --- | --- |
 | [01-stack-checks.md](01-stack-checks.md) | Stack checks — a stack's own rules at write time |
 | [02-stack-tools.md](02-stack-tools.md) | Stack tools — commands over a stack's own register |
-| [03-stack-skills.md](03-stack-skills.md) | Stack skills — a stack's own verbs |
-| [04-stack-refs.md](04-stack-refs.md) | Stack refs — the layer a stack-agnostic verb loads |
+| [03-stack-skills.md](03-stack-skills.md) | Stack skills — a stack's own skills |
+| [04-stack-refs.md](04-stack-refs.md) | Stack refs — the layer a stack-agnostic skill loads |

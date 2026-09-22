@@ -52,7 +52,7 @@ Nothing in this folder is wired in `hooks.json`. Each file is invoked by its own
 
 ### This repository writes its own behaviour rows
 
-**Why** — *`spnutils` serves a `GENERAL` repository with its docs verbs only*, so no stack runner writes the rows here. The plugins' own suite knows.
+**Why** — *`spnutils` serves a `GENERAL` repository with its docs commands only*, so no stack runner writes the rows here. The plugins' own suite knows.
 **What** — only `Status` and `Updated at` are written, from the run's results file. A row whose tier no result covered is left as it was, and a row marked `MANUAL` is never written over.
 **How** — it reads the artifact shape `spn-apps-ts`'s writer reads, so a stack repository and this one report in one vocabulary. `plugins/spn-core/hooks/tools/behaviour-status.mjs`.
 

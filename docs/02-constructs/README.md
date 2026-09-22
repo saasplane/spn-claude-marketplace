@@ -17,8 +17,8 @@ This seat is the model: one file per construct, saying what a thing is, what it 
 | Domain | What it holds |
 | --- | --- |
 | [spn-core](01-spn-core/README.md) | The plugin every repository loads: the delivery folder, the code the runtime calls, the commands run by name, the page production, and the skills, restatements, viewpoints and personas a session reads |
-| [spn-apps-ts](02-spn-apps-ts/README.md) | The apps world made concrete for TypeScript: the write-time rules only this stack has, the tools over its own registers, its verbs, and the planning layer it ships |
-| [spn-infra](03-spn-infra/README.md) | The estate world: the single guard standing between an edit and an estate file, the verbs that change what an estate is, and the cards holding its vocabulary |
+| [spn-apps-ts](02-spn-apps-ts/README.md) | The apps world made concrete for TypeScript: the write-time rules only this stack has, the tools over its own registers, its skills, and the planning layer it ships |
+| [spn-infra](03-spn-infra/README.md) | The estate world: the single guard standing between an edit and an estate file, the skills that change what an estate is, and the cards holding its vocabulary |
 
 **The face below is the dictionary**, and it is generated. One row per term: the word a consumer uses, the term the contract uses, where it is stored, and the construct it comes from. Each column has exactly one source, which is what makes the generation possible.
 
@@ -41,47 +41,47 @@ This seat is the model: one file per construct, saying what a thing is, what it 
 | a generated region | `spn:generated` | — | The Page — Produced From a Seat File, Never Typed |
 | a hand-checked row | `MANUAL` | — | Stack Tools — Commands Over a Stack's Own Register |
 | a hook | `hooks.json` | — | The Hook — Code the Runtime Calls on Your Behalf |
+| a job | — | — | The Tool — A Command Run by Its Own Path |
 | a law | — | — | Estate Refs — The Estate's Vocabulary, Restated as Cards |
 | a layer | — | — | Estate Refs — The Estate's Vocabulary, Restated as Cards |
 | a lens | `lenses/` | — | The Lens — One Reviewing Viewpoint, Written Down |
 | a matcher | `matcher` | — | Loop Events — The Moments a Session Offers a Hook |
-| a mode | — | — | The Skill — A Verb's Steps, Loaded on Match |
-| a mode | — | — | Stack Skills — A Stack's Own Verbs |
-| a mode | — | — | Stack Refs — The Layer a Stack-Agnostic Verb Loads |
-| a module | `spinfrapkg.json` | — | Estate Skills — The Verbs That Change an Estate |
+| a mode | — | — | The Skill — A Stage's Steps, Loaded on Match |
+| a mode | — | — | Stack Skills — The Five a Stack Ships |
+| a mode | — | — | Stack Refs — The Layer a Stack-Agnostic Skill Loads |
+| a module | `spinfrapkg.json` | — | Estate Skills — The Skills That Change an Estate |
 | a moment | `hooks` | — | Loop Events — The Moments a Session Offers a Hook |
 | a parameterized brief | — | — | The Agent — A Persona a Session Can Convene |
-| a pin flip | — | — | Estate Skills — The Verbs That Change an Estate |
-| a planned row | — | — | Stack Refs — The Layer a Stack-Agnostic Verb Loads |
+| a pin flip | — | — | Estate Skills — The Skills That Change an Estate |
+| a planned row | — | — | Stack Refs — The Layer a Stack-Agnostic Skill Loads |
 | a plugin | `plugin.json` | — | The Plugin — Delivery Unit of the Marketplace |
 | a ref | — | — | The Ref — A Chapter, Restated and Stamped |
 | a refusal | `deny` | — | The Check — One Rule, Asked on Every Call |
 | a register | `HEADINGS` | — | Stack Tools — Commands Over a Stack's Own Register |
-| a rendering | — | — | Estate Skills — The Verbs That Change an Estate |
+| a rendering | — | — | Estate Skills — The Skills That Change an Estate |
 | a row | `cellsOf` | — | Stack Tools — Commands Over a Stack's Own Register |
 | a sanctioned home | `region` | — | The Estate Guard — One Script Wired to Every Write |
 | a seat file | — | — | The Page — Produced From a Seat File, Never Typed |
-| a skill | `SKILL.md` | — | The Skill — A Verb's Steps, Loaded on Match |
+| a skill | `SKILL.md` | — | The Skill — A Stage's Steps, Loaded on Match |
 | a source line | — | — | The Ref — A Chapter, Restated and Stamped |
 | a stack check | `CHECK` | — | Stack Checks — A Stack's Own Rules at Write Time |
-| a stack ref | `refs/` | — | Stack Refs — The Layer a Stack-Agnostic Verb Loads |
-| a stack verb | `SKILL.md` | — | Stack Skills — A Stack's Own Verbs |
+| a stack ref | `refs/` | — | Stack Refs — The Layer a Stack-Agnostic Skill Loads |
+| a stack skill | `SKILL.md` | — | Stack Skills — The Five a Stack Ships |
 | a stamp | `Citation` | — | The Ref — A Chapter, Restated and Stamped |
-| a step | `steps/` | — | The Skill — A Verb's Steps, Loaded on Match |
-| a step | `steps/` | — | Stack Skills — A Stack's Own Verbs |
+| a step | `steps/` | — | The Skill — A Stage's Steps, Loaded on Match |
+| a step | `steps/` | — | Stack Skills — The Five a Stack Ships |
 | a tool | — | — | The Hook — Code the Runtime Calls on Your Behalf |
 | a tool | — | — | The Tool — A Command Run by Its Own Path |
 | a turn about to end | `Stop` | — | Loop Events — The Moments a Session Offers a Hook |
-| a verb | — | — | The Tool — A Command Run by Its Own Path |
 | a verdict | `Verdict` | — | The Hook — Code the Runtime Calls on Your Behalf |
 | advice | `note` | — | The Check — One Rule, Asked on Every Call |
 | allowing | — | — | The Estate Guard — One Script Wired to Every Write |
 | an action | `@SPAPIRouteCommand` | — | Stack Tools — Commands Over a Stack's Own Register |
-| an approval | — | — | Estate Skills — The Verbs That Change an Estate |
-| an estate verb | `SKILL.md` | — | Estate Skills — The Verbs That Change an Estate |
+| an approval | — | — | Estate Skills — The Skills That Change an Estate |
+| an estate skill | `SKILL.md` | — | Estate Skills — The Skills That Change an Estate |
 | an instrument | — | — | The Plugin — Delivery Unit of the Marketplace |
 | convened | — | — | The Lens — One Reviewing Viewpoint, Written Down |
-| declaring | — | — | Estate Skills — The Verbs That Change an Estate |
+| declaring | — | — | Estate Skills — The Skills That Change an Estate |
 | drift | — | — | The Ref — A Chapter, Restated and Stamped |
 | introduced | `introduced` | — | Stack Checks — A Stack's Own Rules at Write Time |
 | masking | `mask` | — | Stack Checks — A Stack's Own Rules at Write Time |
@@ -92,10 +92,10 @@ This seat is the model: one file per construct, saying what a thing is, what it 
 | the bound model | `model` | — | The Agent — A Persona a Session Can Convene |
 | the bound tools | `tools` | — | The Agent — A Persona a Session Can Convene |
 | the call | `ToolInput` | — | The Hook — Code the Runtime Calls on Your Behalf |
-| the claim | `sprepo.json` | — | Stack Refs — The Layer a Stack-Agnostic Verb Loads |
-| the classification | — | — | Stack Skills — A Stack's Own Verbs |
-| the closing gate | — | — | Stack Skills — A Stack's Own Verbs |
-| the contract-first order | — | — | Stack Skills — A Stack's Own Verbs |
+| the claim | `sprepo.json` | — | Stack Refs — The Layer a Stack-Agnostic Skill Loads |
+| the classification | — | — | Stack Skills — The Five a Stack Ships |
+| the closing gate | — | — | Stack Skills — The Five a Stack Ships |
+| the contract-first order | — | — | Stack Skills — The Five a Stack Ships |
 | the dispatcher | `dispatch` | — | The Hook — Code the Runtime Calls on Your Behalf |
 | the dispatcher | `dispatch` | — | Stack Checks — A Stack's Own Rules at Write Time |
 | the drawer | `Spec` | — | The Page — Produced From a Seat File, Never Typed |
@@ -106,12 +106,12 @@ This seat is the model: one file per construct, saying what a thing is, what it 
 | the grade | `Grade` | — | The Tool — A Command Run by Its Own Path |
 | the guard | `deny-estate-violations.sh` | — | The Estate Guard — One Script Wired to Every Write |
 | the hash | `seen` | — | The Ref — A Chapter, Restated and Stamped |
-| the layer | — | — | Stack Refs — The Layer a Stack-Agnostic Verb Loads |
+| the layer | — | — | Stack Refs — The Layer a Stack-Agnostic Skill Loads |
 | the lens register | `LENS_LABEL` | — | The Lens — One Reviewing Viewpoint, Written Down |
-| the listing | — | — | The Skill — A Verb's Steps, Loaded on Match |
+| the listing | — | — | The Skill — A Stage's Steps, Loaded on Match |
 | the manifests | `spestate.json` · `spinfrapkg.json` | — | Estate Refs — The Estate's Vocabulary, Restated as Cards |
 | the marketplace | `marketplace.json` | — | The Plugin — Delivery Unit of the Marketplace |
-| the name | `name` | — | The Skill — A Verb's Steps, Loaded on Match |
+| the name | `name` | — | The Skill — A Stage's Steps, Loaded on Match |
 | the name | `name` | — | The Agent — A Persona a Session Can Convene |
 | the new text | `content` · `new_string` | — | The Estate Guard — One Script Wired to Every Write |
 | the path locator | — | — | Estate Refs — The Estate's Vocabulary, Restated as Cards |
@@ -119,9 +119,9 @@ This seat is the model: one file per construct, saying what a thing is, what it 
 | the plugin root | `CLAUDE_PLUGIN_ROOT` | — | The Plugin — Delivery Unit of the Marketplace |
 | the resulting text | `resultingText` | — | Stack Checks — A Stack's Own Rules at Write Time |
 | the results file | — | — | Stack Tools — Commands Over a Stack's Own Register |
-| the stamp | `spn:restates` | — | Stack Refs — The Layer a Stack-Agnostic Verb Loads |
+| the stamp | `spn:restates` | — | Stack Refs — The Layer a Stack-Agnostic Skill Loads |
 | the tier | `tier` | — | Stack Tools — Commands Over a Stack's Own Register |
-| the trigger | `description` | — | The Skill — A Verb's Steps, Loaded on Match |
+| the trigger | `description` | — | The Skill — A Stage's Steps, Loaded on Match |
 | the trigger | `description` | — | The Agent — A Persona a Session Can Convene |
 | the version | `version` | — | The Plugin — Delivery Unit of the Marketplace |
 | the watch | `watched` | — | Stack Checks — A Stack's Own Rules at Write Time |

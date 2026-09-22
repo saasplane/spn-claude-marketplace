@@ -12,7 +12,7 @@
 
 `For: Architect · Editor` · `Status: ✅ DONE`
 
-Measured 2026-09-21. **Nothing here was fixed while it was counted** — a scan that edits as it goes cannot be trusted as a measure, so this verb writes one file and touches nothing else.
+Measured 2026-09-21. **Nothing here was fixed while it was counted** — a scan that edits as it goes cannot be trusted as a measure, so this audit writes one file and touches nothing else.
 
 ## The seats
 
@@ -61,6 +61,6 @@ None.
 
 | Not measured | Why | What would measure it |
 | --- | --- | --- |
-| Comments owed per package | the symbol index is a per-package build this verb does not run | `spnutils apps gen-symbols -p <pkg>` |
+| Comments owed per package | the symbol index is a per-package build this audit does not run | `spnutils apps gen-symbols -p <pkg>` |
 | Whether a written construct is TRUE | a count cannot read | the two-per-wave read |
 | The constructs a concept has not listed | see the note above | `docs.ts face`, once the constructs exist |

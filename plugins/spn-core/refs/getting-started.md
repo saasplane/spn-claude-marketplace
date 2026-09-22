@@ -10,7 +10,7 @@
 
 **Source of truth:** the foundation book's guides seat (`docs/05-guides/` — its face *is* the day-zero guide). This file restates it for use inside a wired repository and adds nothing; where the two disagree, the book wins and this file is regenerated.
 
-Follow this walk from nothing to a first feature in flight. Every step names the command or verb that carries it; statuses are honest — ✅ runs today, 🚧 the verb is still being built.
+Follow this walk from nothing to a first feature in flight. Every step names the command that carries it; statuses are honest — ✅ runs today, 🚧 the command is still being built.
 
 **Before step 1, the machine**, in the order one thing depends on the next: **node** at the version
 the repositories pin, a version manager that reads that pin (`fnm` or `nvm`), **pnpm**, a **container

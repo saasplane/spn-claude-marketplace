@@ -1,7 +1,7 @@
 <meta charset="utf-8">
-<title>The Skill — A Verb's Steps, Loaded on Match</title>
+<title>The Skill — A Stage's Steps, Loaded on Match</title>
 <!-- spn:doc
-{"id":"skill-set","variant":"construct","title":"The Skill — A Verb's Steps, Loaded on Match","lenses":["ARCHITECT","LEAD"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"A named unit of work a session can be asked for — a folder, a description matched against the work at hand, the instructions loaded once it matches, and the rule that a skill carries steps and never a rule of its own.","keywords":["skill","SKILL.md","description","match","steps","verb"]}
+{"id":"skill-set","variant":"construct","title":"The Skill — A Stage's Steps, Loaded on Match","lenses":["ARCHITECT","LEAD"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"A named unit of work a session can be asked for — a folder, a description matched against the work at hand, the instructions loaded once it matches, and the rule that a skill carries steps and never a rule of its own.","keywords":["skill","SKILL.md","description","match","steps","stage"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
 <style>
@@ -179,8 +179,8 @@
 
 <header class="masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; The Skill — A Verb's Steps, Loaded on Match</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Construct</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">Architect</span><span class="badge lens">Engineering leader</span></span><span class="st"><span class="lbl">Status:</span> <span class="badge status planning">&#x1F52E; PLANNING</span></span></span></div>
-  <h1>The Skill — A Verb's Steps, Loaded on Match</h1>
+  <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; The Skill — A Stage's Steps, Loaded on Match</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Construct</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">Architect</span><span class="badge lens">Engineering leader</span></span><span class="st"><span class="lbl">Status:</span> <span class="badge status planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>The Skill — A Stage's Steps, Loaded on Match</h1>
   <p class="standfirst">Loading every rule this repository knows into every turn would drown the turn that needed one of them. A skill is how the loading is narrowed instead: a name, a sentence saying when it applies, and the instructions for doing that one thing, read only once the work at hand matches the sentence. This page names that shape.</p>
   <p>The sentence is the part people write wrongly. A description here is matched against what you are doing, never browsed by a person, so it states the class of ask it answers and the words a developer actually types. A description written as a catalogue entry is a skill that never fires.</p>
 </header>
@@ -191,7 +191,7 @@
   <div class="scroll"><table>
     <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
     <tbody>
-      <tr><td>a skill</td><td><code>SKILL.md</code></td><td>one folder under a plugin's <code>skills/</code>, named for its verb, holding the file a session loads</td></tr>
+      <tr><td>a skill</td><td><code>SKILL.md</code></td><td>one folder under a plugin's <code>skills/</code>, named for its stage, holding the file a session loads</td></tr>
       <tr><td>the name</td><td><code>name</code></td><td>the value a person types to ask for the skill directly, and the folder's own bare name</td></tr>
       <tr><td>the trigger</td><td><code>description</code></td><td>the sentence matched against the work at hand, which decides whether the file is loaded at all</td></tr>
       <tr><td>the listing</td><td>—</td><td>every installed skill's name and description, one line each; this is what a session holds in full</td></tr>
@@ -255,17 +255,17 @@
 <section id="s2">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="the-file-a-session-loads">The file a session loads</h3>
-  <p>A frontmatter block naming <code>name</code> and <code>description</code>, then instructions in markdown. The frontmatter carries those two fields and nothing more for a stack-agnostic verb. Everything a session decides about whether to read the file is decided from those first lines. <em>Where:</em> <code>plugins/spn-core/skills/plan/SKILL.md</code>, and the same file in every other skill folder</p>
+  <p>A frontmatter block naming <code>name</code> and <code>description</code>, then instructions in markdown. The frontmatter carries those two fields and nothing more for a stack-agnostic skill. Everything a session decides about whether to read the file is decided from those first lines. <em>Where:</em> <code>plugins/spn-core/skills/plan/SKILL.md</code>, and the same file in every other skill folder</p>
   <h3 id="a-skill-that-outgrows-one-file">A skill that outgrows one file</h3>
-  <p>A skill whose walk is long enough keeps its own file as the router — it classifies the ask and names which files to read in which order — and puts each part of the walk in its own step file. The router is read on every match; a step is read only once the router names it. No stack-agnostic verb here needs one, and one stack verb does. <em>Where:</em> <code>plugins/spn-apps-ts/skills/implement/steps/</code></p>
+  <p>A skill whose walk is long enough keeps its own file as the router — it classifies the ask and names which files to read in which order — and puts each part of the walk in its own step file. The router is read on every match; a step is read only once the router names it. No stack-agnostic skill here needs one, and one stack skill does. <em>Where:</em> <code>plugins/spn-apps-ts/skills/implement/steps/</code></p>
   <h3 id="a-mode-is-an-argument-never-a-second-ski">A mode is an argument, never a second skill</h3>
   <p>Two skills with almost the same description compete for the same match, and the matching gets worse as the pair grows. So a skill that answers several close asks takes a mode as an argument, names its modes in the description, and says which neighbouring skill an adjacent ask belongs to instead. A destructive mode says so in the sentence a session matches against, rather than only in the body loaded afterwards. <em>Where:</em> <code>plugins/spn-apps-ts/skills/verify/SKILL.md</code></p>
   <h3 id="loaded-not-run">Loaded, not run</h3>
   <p>A skill is prose an agent reads and then follows, never a script the runtime executes. It is a document selected the way code is dispatched — by a match at the top rather than by a person opening the right file by hand. <em>Where:</em> the same folder as the frontmatter it belongs to</p>
   <h3 id="a-skill-carries-steps-and-never-a-rule">A skill carries steps, and never a rule</h3>
   <p>The moment a skill states a rule stated nowhere else, it has become a second source nothing audits. A skill names the chapter or the card that holds the rule and sequences the work around it. Where a step file does carry rules, it carries them under the same stamp a ref carries, so a drift run reads a step exactly as it reads a ref. <em>Where:</em> <code>plugins/spn-apps-ts/skills/implement/steps/contract.md</code></p>
-  <h3 id="a-verb-that-cannot-be-stack-agnostic-is-">A verb that cannot be stack-agnostic is not copied</h3>
-  <p>Where a stack-agnostic verb needs a concrete step, the verb stays in one place and reads a file the stack's own plugin ships. Copying the verb into each stack would put one rule in two folders, drifting, with nothing comparing them. <em>Where:</em> <code>plugins/spn-core/skills/plan/SKILL.md</code>, <code>plugins/spn-apps-ts/refs/plan.md</code></p>
+  <h3 id="a-skill-that-cannot-be-stack-agnostic-is">A skill that cannot be stack-agnostic is not copied</h3>
+  <p>Where a stack-agnostic skill needs a concrete step, the skill stays in one place and reads a file the stack's own plugin ships. Copying the skill into each stack would put one rule in two folders, drifting, with nothing comparing them. <em>Where:</em> <code>plugins/spn-core/skills/plan/SKILL.md</code>, <code>plugins/spn-apps-ts/refs/plan.md</code></p>
   <h3 id="some-skills-ask-rather-than-read">Some skills ask rather than read</h3>
   <p>A few answers cannot be derived from the ground, because they are decisions rather than readings. A skill of that kind works one agreed block at a time and runs no act on an answer nobody gave, and its description says so. <em>Where:</em> <code>plugins/spn-core/skills/ideate/SKILL.md</code>, <code>plugins/spn-core/skills/day-zero/SKILL.md</code></p>
 </section>
@@ -273,11 +273,11 @@
 <!-- 03 -->
 <section id="s3">
   <div class="sec-head"><h2>Boundary</h2></div>
-  <p>This page answers what a skill is, how it is selected, and what it may contain. It does not answer which verbs exist for a given world — the stack-agnostic set is realized by the core plugin, and each stack's own set by that stack's plugin. It does not answer what a lens or an agent brief is either, although both are selected the same way; each has its own page.</p>
+  <p>This page answers what a skill is, how it is selected, and what it may contain. It does not answer which skills exist for a given world — the stack-agnostic set is realized by the core plugin, and each stack's own set by that stack's plugin. It does not answer what a lens or an agent brief is either, although both are selected the same way; each has its own page.</p>
   <div class="scroll"><table>
     <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
     <tbody>
-      <tr><td>the frontmatter a skill declares, the matching, the step folder, and the mode argument</td><td>the list of verbs a given world offers, and what each one does</td><td><a href="../02-spn-apps-ts/03-stack-skills-construct.html">Stack Skills</a> · <a href="../03-spn-infra/02-estate-skills-construct.html">Estate Skills</a></td></tr>
+      <tr><td>the frontmatter a skill declares, the matching, the step folder, and the mode argument</td><td>the list of skills a given world offers, and what each one does</td><td><a href="../02-spn-apps-ts/03-stack-skills-construct.html">Stack Skills</a> · <a href="../03-spn-infra/02-estate-skills-construct.html">Estate Skills</a></td></tr>
       <tr><td>that a skill carries steps and never a rule of its own</td><td>where the rule a skill carries actually lives</td><td><a href="./08-ref-set-construct.html">The Ref</a></td></tr>
       <tr><td>that a skill is loaded and followed rather than executed</td><td>a persona convened by name, which is selected the same way and is a different thing</td><td><a href="./10-agent-set-construct.html">The Agent</a></td></tr>
     </tbody>
@@ -299,7 +299,7 @@
     <thead><tr><th>Repo</th><th>Node</th><th>What it realizes</th><th>State</th></tr></thead>
     <tbody>
       <tr><td>spn-foundation</td><td><code>01-devex/02-agent/02-skills</code></td><td>the foundation construct this one realizes</td><td>planned</td></tr>
-      <tr><td>spn-claude-marketplace</td><td><code>spn-core</code></td><td>one folder per stack-agnostic verb, each holding the file a session loads on a match</td><td>planned</td></tr>
+      <tr><td>spn-claude-marketplace</td><td><code>spn-core</code></td><td>one folder per stack-agnostic skill, each holding the file a session loads on a match</td><td>planned</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -313,7 +313,7 @@
     <tbody>
       <tr><td><code>MKT.SKILL.01</code></td><td>ask for the same thing twice and get the same steps both times</td><td>UNIT</td><td>PLANNED</td></tr>
       <tr><td><code>MKT.SKILL.02</code></td><td>pay nothing for a large skill on a turn that never needed it</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.SKILL.03</code></td><td>reach a stack-concrete step from a verb that is stack-agnostic</td><td>UNIT</td><td>PLANNED</td></tr>
+      <tr><td><code>MKT.SKILL.03</code></td><td>reach a stack-concrete step from a skill that is stack-agnostic</td><td>UNIT</td><td>PLANNED</td></tr>
       <tr><td><code>MKT.SKILL.04</code></td><td>ask a close variant and land in one folder rather than between two</td><td>UNIT</td><td>PLANNED</td></tr>
       <tr><td><code>MKT.SKILL.05</code></td><td>decide what something IS one agreed block at a time</td><td>UNIT</td><td>PLANNED</td></tr>
       <tr><td><code>MKT.SKILL.06</code></td><td>never receive a report nobody asked for</td><td>UNIT</td><td>PLANNED</td></tr>

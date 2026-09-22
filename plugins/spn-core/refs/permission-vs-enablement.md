@@ -12,7 +12,7 @@
 
 # Permission or enablement — the first question
 
-**For the agent adding a module, a state or a gate**, in any stack. You reach this file at the moment you write the gate, not afterwards. Get the answer wrong and you bake a product decision into code, gate a read, or mint a verb nobody else uses. All three have happened in this estate, and each one is named below with the file it happened in.
+**For the agent adding a module, a state or a gate**, in any stack. You reach this file at the moment you write the gate, not afterwards. Get the answer wrong and you bake a product decision into code, gate a read, or mint a command nobody else uses. All three have happened in this estate, and each one is named below with the file it happened in.
 
 Source of truth: the foundation book's people-and-access chapter and decisions RD.SAAS.033 · RD.SAAS.034 in `spn-foundation`. This file restates them for use at the seat and adds no rule of its own. Where the two disagree, the book wins and this file is regenerated.
 

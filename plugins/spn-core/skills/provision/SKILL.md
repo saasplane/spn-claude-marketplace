@@ -5,7 +5,7 @@ description: How infrastructure appears for development - the layer order, what 
 
 # provision — layers, in order, from the declarations
 
-**Nothing about a local stack is hardcoded by the caller.** Ports, hosts, schemas, and modules are read from the declarations the repo pins. That is what makes the same verbs correct in every repo, and it is why a command that assumes a port is a bug even when it happens to work.
+**Nothing about a local stack is hardcoded by the caller.** Ports, hosts, schemas, and modules are read from the declarations the repo pins. That is what makes the same commands correct in every repo, and it is why a command that assumes a port is a bug even when it happens to work.
 
 ## The layers come up in order
 
@@ -20,7 +20,7 @@ The layers are nouns — each has `plan`, `up`, `down`, and `status`; the app ha
 
 ## A hosted vendor is a module, not a lifecycle of its own
 
-**There is no vendor verb.** A vendor you *run* is a module (`infra-module-{code}`, named by purpose, never by product) whose local rendering is a container in the platform layer's group. It appears because the platform declaration carries its row, comes up with the platform layer, and its footprint leaves when the row does. A vendor reached over the network is application configuration behind a support seam — the estate never sees it.
+**There is no vendor command.** A vendor you *run* is a module (`infra-module-{code}`, named by purpose, never by product) whose local rendering is a container in the platform layer's group. It appears because the platform declaration carries its row, comes up with the platform layer, and its footprint leaves when the row does. A vendor reached over the network is application configuration behind a support seam — the estate never sees it.
 
 ## Destructive operations
 
@@ -34,7 +34,7 @@ The layers are nouns — each has `plan`, `up`, `down`, and `status`; the app ha
 
 Work down the layers, not across the symptoms:
 
-1. Is the layer below up, and does its own status verb report healthy?
+1. Is the layer below up, and does its own status command report healthy?
 2. Does the declaration actually carry what you expect — the port, the schema, the host?
 3. Is the value it needs set at all — a provider credential or a module fact in the machine seat, `~/.spnenv`? Test that the key is **set**, and never print or expand it (`refs/cross-repo.md` § The machine seat).
 4. Was the app layer ever registered for this app?

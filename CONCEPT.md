@@ -8,7 +8,7 @@ that reads them, the events it runs on, and the shape each instrument takes.
 ## Boundary   `DRAFT`
 
 **What it owns.** The instruments themselves, as code and as files a runtime loads: the hooks that
-fire on an event, the tools somebody runs by name, the skills that carry a verb's steps, the refs
+fire on an event, the tools somebody runs by name, the skills that carry a stage's steps, the refs
 that restate a chapter, and the agent briefs. It owns how one is shaped, what it may refuse, what it
 may never do, and how the set reaches a workspace.
 
@@ -56,12 +56,12 @@ repository loads.
 ### spn-apps-ts
 
 **The TypeScript stack plugin.** It holds what only a stack can say: a check whose rule is true of one stack and nowhere else, a tool over that stack's own register, and
-the verbs that can only be said in its own words. **A verb that is stack-agnostic stays in
+the skills that can only be said in its own words. **A skill that is stack-agnostic stays in
 `spn-core` and reaches a concrete step through a ref here**, rather than being copied.
 
 ### spn-infra
 
-**The estate plugin.** It holds what changes an estate: one shell script standing between an estate edit and the file it would write, the verbs that change
+**The estate plugin.** It holds what changes an estate: one shell script standing between an estate edit and the file it would write, the skills that change
 what an estate is, and the estate's own vocabulary restated for a reader who may never open the
 book.
 
@@ -78,7 +78,7 @@ never as a folder of its own.
 manifest declares which world a repository belongs to — `FOUNDATION`, `APPS`, `INFRA` or `GENERAL` —
 and a public marketplace is the last of those: it ships no application, no package a service depends
 on, and no estate declaration. It holds one docs tree and no nodes at all, so the `apps` and `infra`
-verbs refuse it by name.
+commands refuse it by name.
 
 So a tool you run here must tolerate the absence of nodes rather than refuse the repository, and if
 one refuses you, that is the tool's defect and not this repository's. **A docs tree is keyed to the
@@ -105,7 +105,7 @@ implementation belongs here.
 - **The Check — One Rule, Asked on Every Call** — One rule a script can decide about a single call — the fast path that says whether it could have an opinion, the smallest slice it reads to answer, the chapter it names instead of restating, and the line between refusing a call and only speaking about it.
 - **The Tool — A Command Run by Its Own Path** — Code a plugin ships that nothing wires — invoked by a person, a skill or another tool, answering with graded findings and an exit code, and degrading to silence wherever the input it needs is absent.
 - **The Page — Produced From a Seat File, Never Typed** — The HTML a reader opens, produced from the markdown an author writes — the block vocabulary that markdown is written in, the drawer that measures every figure from its own text, the checker that treats a connector as a claim, and the comparison that catches a hand edit.
-- **The Skill — A Verb's Steps, Loaded on Match** — A named unit of work a session can be asked for — a folder, a description matched against the work at hand, the instructions loaded once it matches, and the rule that a skill carries steps and never a rule of its own.
+- **The Skill — A Stage's Steps, Loaded on Match** — A named unit of work a session can be asked for — a folder, a description matched against the work at hand, the instructions loaded once it matches, and the rule that a skill carries steps and never a rule of its own.
 - **The Ref — A Chapter, Restated and Stamped** — A markdown restatement of one or more chapters, carrying a hash of the exact text it last read, so a chapter that moves is reported rather than quietly outrun — and the three ways a restatement can fail to be comparable at all.
 - **The Lens — One Reviewing Viewpoint, Written Down** — One engineering function's judgment stated as a file — what it checks, the one condition it may block on, everything below that which it can only advise, and why the same values also name the audience a document declares.
 - **The Agent — A Persona a Session Can Convene** — A named persona a session can call mid-turn — the frontmatter that decides when it answers, the authority its own file grants it, the difference between a fixed voice and one parameterized by a viewpoint, and where the permission to write actually comes from.
@@ -114,12 +114,12 @@ implementation belongs here.
 
 - **Stack Checks — A Stack's Own Rules at Write Time** — A check whose rule is true of one stack and nowhere else — read against the source as the pending write would leave it, asking whether this edit introduces the pattern, and refusing only where the model behind the rule is settled.
 - **Stack Tools — Commands Over a Stack's Own Register** — A tool that reads or writes one stack's own declarations — the register found by its header rather than by a path, the two cells a run owns against the cells a person decides, and coverage measured against published actions rather than routes.
-- **Stack Skills — A Stack's Own Verbs** — The verbs that can only be said in one stack's own words — what makes a verb stack-concrete, why one of them divides into ordered steps, why a mode is an argument, and the verb that is deliberately absent here.
-- **Stack Refs — The Layer a Stack-Agnostic Verb Loads** — Reference material a stack ships for a verb it does not own — how a stack-agnostic verb reaches a concrete step without being copied, why the file has no trigger of its own, and where the rows a design produces are written.
+- **Stack Skills — The Five a Stack Ships** — The skills that can only be said in one stack's own words — what makes a skill stack-concrete, why one of them divides into ordered steps, why a mode is an argument, and the skill that is deliberately absent here.
+- **Stack Refs — The Layer a Stack-Agnostic Skill Loads** — Reference material a stack ships for a skill it does not own — how a stack-agnostic skill reaches a concrete step without being copied, why the file has no trigger of its own, and where the rows a design produces are written.
 
 **spn-infra**
 
 - **The Estate Guard — One Script Wired to Every Write** — A single shell script standing between an estate edit and the file it would write — the narrow set of things it knows about, the text it judges, and the direction it fails in when it does not understand its input.
-- **Estate Skills — The Verbs That Change an Estate** — The verbs an estate repository answers to — changing what the estate is, reading a rendering before it is approved, authoring a module end to end, and publishing a package — and the boundary every one of them restates rather than works around.
+- **Estate Skills — The Skills That Change an Estate** — The skills an estate repository answers to — changing what the estate is, reading a rendering before it is approved, authoring a module end to end, and publishing a package — and the boundary every one of them restates rather than works around.
 - **Estate Refs — The Estate's Vocabulary, Restated as Cards** — The estate's own words, restated for a reader who may never open the book — which file declares what, which layer owns which act, how a name is composed from coordinates, and the laws a declaration must hold to.
 <!-- /spn:generated -->

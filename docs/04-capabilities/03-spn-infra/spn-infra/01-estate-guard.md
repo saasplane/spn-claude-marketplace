@@ -49,7 +49,7 @@ The whole of this plugin's hook surface is one file: a shell script wired to eve
 
 ### Build output is refused by path alone
 
-**Why** — *the published artifact is staged whole by the release verb*. A hand edit under the output folder is lost on the next build, and until then it is what is running.
+**Why** — *the published artifact is staged whole by the release command*. A hand edit under the output folder is lost on the next build, and until then it is what is running.
 **What** — any path under a `dist/` folder is refused before the text is even read, and the message names the source folder to edit instead.
 **How** — this is the only clause that does not need the written text. Same file, clause one.
 

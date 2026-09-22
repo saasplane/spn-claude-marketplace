@@ -27,7 +27,7 @@ Each file here holds the rows of one construct, and it sits at the same path and
 | [04-checks.md](04-checks.md) | The check — one rule, asked on every call |
 | [05-tools.md](05-tools.md) | The tool — a command run by its own path |
 | [06-pages.md](06-pages.md) | The page — produced from a seat file, never typed |
-| [07-skill-set.md](07-skill-set.md) | The skill — a verb's steps, loaded on match |
+| [07-skill-set.md](07-skill-set.md) | The skill — a stage's steps, loaded on match |
 | [08-ref-set.md](08-ref-set.md) | The ref — a chapter, restated and stamped |
 | [09-lenses.md](09-lenses.md) | The lens — one reviewing viewpoint, written down |
 | [10-agent-set.md](10-agent-set.md) | The agent — a persona a session can convene |

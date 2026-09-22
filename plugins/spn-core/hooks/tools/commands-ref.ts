@@ -15,13 +15,13 @@
 // four ways inside one file.
 //
 // WHY THE RELEASED CLI AND NOT THE SOURCE. A partner holds the published plugin and the published
-// CLI. A region rendered from a checkout would describe verbs a partner cannot run, and an agent
+// CLI. A region rendered from a checkout would describe commands a partner cannot run, and an agent
 // reading it has no reason to doubt it — so it would offer a command that fails, which is worse
 // than no ref at all. The lag behind the workspace is correct rather than tolerated.
 //
 // TWO STAMPS, BECAUSE THEY ANSWER DIFFERENT QUESTIONS. The version says WHICH CLI this describes,
 // which is what a partner reads. The surface hash decides WHETHER the region is stale. The payload
-// carries no semver of its own, so a patch that fixes a bug inside a verb leaves the hash unmoved
+// carries no semver of its own, so a patch that fixes a bug inside a command leaves the hash unmoved
 // and forces no plugin release — which matters, because all three plugins move on one number and a
 // release nobody needs is a regeneration somebody skips.
 
@@ -53,7 +53,7 @@ function surface(): { payload: Surface; version: string } {
  *
  * Over the COMMANDS alone and with keys sorted, so the answer does not move when a serializer
  * reorders a field or the CLI's own name changes. Measured 2026-09-22: no semver appears anywhere
- * in the payload, so this is stable across a release that adds no verb.
+ * in the payload, so this is stable across a release that adds no command.
  */
 export function fingerprint(payload: Surface): string {
   return createHash("sha256").update(JSON.stringify(payload.commands, Object.keys(payload.commands[0] ?? {}).sort())).digest("hex").slice(0, 12);
@@ -61,7 +61,7 @@ export function fingerprint(payload: Surface): string {
 
 const cell = (s: string | null) => (s ?? "—").replace(/\|/g, "\\|").replace(/\n+/g, " ").trim() || "—";
 
-/** One table per group, because the group is what an agent narrows by before it reads a verb. */
+/** One table per group, because the group is what an agent narrows by before it reads a command. */
 export function render(payload: Surface, version: string, hash: string): string {
   const groups = new Map<string, Command[]>();
   for (const c of payload.commands) {
@@ -70,7 +70,7 @@ export function render(payload: Surface, version: string, hash: string): string 
   }
   const out: string[] = [
     `Rendered from \`spnutils ${version}\` — the **released** CLI, which is what a partner holds.`,
-    `Surface \`${hash}\`. A release that adds no verb leaves that unchanged and owes no regeneration.`,
+    `Surface \`${hash}\`. A release that adds no command leaves that unchanged and owes no regeneration.`,
     "",
   ];
   for (const group of [...groups.keys()].sort()) {

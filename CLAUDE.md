@@ -10,7 +10,7 @@ copy here would be a second source that drifts.
 ## `GENERAL`, and what that decides
 
 **This repo declares `GENERAL` in `sprepo.json`** — no nodes, one docs tree. It answers to no
-stack, so the `apps` and `infra` verbs refuse it by name, and what the agent manages here is the
+stack, so the `apps` and `infra` commands refuse it by name, and what the agent manages here is the
 docs tree and this repository's own files (`RD.GOV.024`). It loads `spn-core` and only `spn-core`:
 core governs docs trees, and a stack plugin acts on nodes this repository does not have.
 

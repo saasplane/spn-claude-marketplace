@@ -16,7 +16,7 @@
 | [04 — Checks](04-checks.md) | Six stack-agnostic checks, each naming the chapter it restates and reading the smallest slice it can |
 | [05 — Tools](05-tools.md) | Six commands run by name: the corpus audit, coherence, drift, the partner proof, the prose triage, the row writer |
 | [06 — Pages](06-pages.md) | The renderer, the figure drawer, the figure checker, and the rule that a page is never edited by hand |
-| [07 — Skill](07-skill-set.md) | Eleven stage verbs, one folder each, whose descriptions are written to be matched |
+| [07 — Skill](07-skill-set.md) | Eleven stage skills, one folder each, whose descriptions are written to be matched |
 | [08 — Ref](08-ref-set.md) | Eleven restatements, each stamped with the hash of what it last saw |
 | [09 — Lenses](09-lenses.md) | Eleven reviewing viewpoints, each naming the one thing it may block |
 | [10 — Agent](10-agent-set.md) | Four briefs a session convenes, of which one may write |
@@ -36,7 +36,7 @@ Source folders: `hooks/hooks.json` and `hooks/lib/payload.ts` for Hook · `hooks
 | [04-checks.md](04-checks.md) | `checks` | Seven stack-agnostic checks the dispatcher composes, each naming in its own header the chapter it restates, and each carrying a fast path so an ordinary edit pays almost nothing. | ✅ |
 | [05-tools.md](05-tools.md) | `tools` | Six commands run by their own path rather than fired by an event — the corpus audit, the corpus against itself, the drift check that crosses into the book, the partner proof, the prose triage, and the writer of the repository's own behaviour rows. | ✅ |
 | [06-pages.md](06-pages.md) | `pages` | The renderer that turns a seat file into the page a reader opens, the drawer that measures every figure from its own text, and the checker that treats a connector as a claim. | ✅ |
-| [07-skill-set.md](07-skill-set.md) | `skill-set` | Eleven stack-agnostic verbs, one folder and one SKILL.md each, whose descriptions are written to be matched against a turn's work rather than browsed by a person. | ✅ |
+| [07-skill-set.md](07-skill-set.md) | `skill-set` | Eleven stack-agnostic skills, one folder and one SKILL.md each, whose descriptions are written to be matched against a turn's work rather than browsed by a person. | ✅ |
 | [08-ref-set.md](08-ref-set.md) | `ref-set` | Eleven restatements a reader with no book checkout can still read in full, each stamped with the hash of what it last saw, and the one parser two different drift checks share. | ✅ |
 | [09-lenses.md](09-lenses.md) | `lenses` | Eleven reviewing viewpoints, each naming the one thing it may block and everything it can only advise, read by name at the moment a panel is convened rather than carried by eleven agents. | ✅ |
 | [10-agent-set.md](10-agent-set.md) | `agent-set` | Four briefs a session can convene — one fixed engineering persona, one reviewer parameterized by a lens, and a rewrite and review pair in which only the rewriter is allowed to edit. | ✅ |

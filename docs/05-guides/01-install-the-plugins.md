@@ -64,7 +64,7 @@ claude plugin validate /opt/work/saasplane/code/spn-claude-marketplace
 
 ## Step 3 — install what the repository declares
 
-**Prefer the CLI verb.** It reads `sprepo.json`, derives which plugins that repository loads, installs them, writes the managed instruction block and the generated rules, and reinstalls any plugin that has drifted from its source:
+**Prefer the CLI command.** It reads `sprepo.json`, derives which plugins that repository loads, installs them, writes the managed instruction block and the generated rules, and reinstalls any plugin that has drifted from its source:
 
 ```bash
 spnutils repo agent-sync          # this repository

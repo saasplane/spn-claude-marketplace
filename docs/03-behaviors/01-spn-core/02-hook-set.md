@@ -25,5 +25,5 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.HOOK.03 | Architect | keep every other gate alive when one of them breaks | A check that throws is passed over, and the rest of the chain still runs | NEGATIVE | UNIT | PLANNED | — |
 | MKT.HOOK.04 | Architect | have a refusal end the chain and advice accumulate | The first refusal is the answer, and every note is joined into one message | POSITIVE | UNIT | PLANNED | — |
 | MKT.HOOK.05 | Backend developer | pay one interpreter start-up for a whole chain rather than one per rule | The wiring declares one entry per moment, and the dispatcher imports every check behind it | POSITIVE | UNIT | PLANNED | — |
-| MKT.HOOK.06 | Backend developer | be refused a hand edit to a file a generator owns | The dispatcher's own guard runs before the chain and names the verb to run instead | NEGATIVE | UNIT | PLANNED | — |
+| MKT.HOOK.06 | Backend developer | be refused a hand edit to a file a generator owns | The dispatcher's own guard runs before the chain and names the command to run instead | NEGATIVE | UNIT | PLANNED | — |
 | MKT.HOOK.07 | DevSecOps / Security | see a hook end cleanly whatever it decided | Every path exits zero, and a refusal is the printed decision rather than a failure code | POSITIVE | UNIT | PLANNED | — |

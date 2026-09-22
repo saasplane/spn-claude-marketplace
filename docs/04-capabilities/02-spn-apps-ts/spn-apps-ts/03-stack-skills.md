@@ -1,12 +1,12 @@
 <!-- spn:doc
-{"id": "spn-apps-ts-capabilities-stack-skills", "variant": "capability", "title": "Stack Skills in spn-apps-ts", "lenses": ["SERVER_DEV", "WEB_DEV"], "status": "DONE", "realizes": ["stack-skills"], "summary": "Five verb skills for a TypeScript repository, one of them large enough to divide into seven ordered step files, and a deliberate absence where planning would be.", "keywords": ["skill", "implement", "steps", "contract-first", "verify", "review"]}
+{"id": "spn-apps-ts-capabilities-stack-skills", "variant": "capability", "title": "Stack Skills in spn-apps-ts", "lenses": ["SERVER_DEV", "WEB_DEV"], "status": "DONE", "realizes": ["stack-skills"], "summary": "Five skills for a TypeScript repository, one of them large enough to divide into seven ordered step files, and a deliberate absence where planning would be.", "keywords": ["skill", "implement", "steps", "contract-first", "verify", "review"]}
 -->
 
 # Stack Skills in spn-apps-ts
 
 `For: Backend developer · Web developer` · `Status: ✅ DONE` · `Realizes: Stack Skills`
 
-Five folders sit under `plugins/spn-apps-ts/skills/`: `new`, `implement`, `review`, `run` and `verify`. Each is one verb of the `apps` command group, made concrete for a SaaS Plane TypeScript repository. The absence is as deliberate as the five. **Planning is not here.** The verb is stack-agnostic and lives once in `spn-core`; this plugin supplies only the layer that verb reads for the `APPS` and TypeScript combination.
+Five folders sit under `plugins/spn-apps-ts/skills/`: `new`, `implement`, `review`, `run` and `verify`. Each is named for a command of the `apps` group, made concrete for a SaaS Plane TypeScript repository. The absence is as deliberate as the five. **Planning is not here.** The skill is stack-agnostic and lives once in `spn-core`; this plugin supplies only the layer that skill reads for the `APPS` and TypeScript combination.
 
 ## Where
 
@@ -22,7 +22,7 @@ Five folders sit under `plugins/spn-apps-ts/skills/`: `new`, `implement`, `revie
 ## Follows the pattern
 
 - The frontmatter, the matching and the steps a skill sequences — [The Skill](../../../02-constructs/01-spn-core/07-skill-set.md)
-- The stack-agnostic verbs these five realize — [Skill in spn-core](../../01-spn-core/spn-core/07-skill-set.md)
+- The stack-agnostic skills these five realize — [Skill in spn-core](../../01-spn-core/spn-core/07-skill-set.md)
 
 ## Special handling
 
@@ -60,7 +60,7 @@ Five folders sit under `plugins/spn-apps-ts/skills/`: `new`, `implement`, `revie
 
 | Direction | With | What | Why |
 | --- | --- | --- | --- |
-| takes | spn-core | the stack-agnostic verbs, the command vocabulary and the contract review rules | a stack plugin realizes a verb and never redefines it |
+| takes | spn-core | the stack-agnostic skills, the command vocabulary and the contract review rules | a stack plugin realizes a skill and never redefines it |
 | takes | spn-foundation | the TypeScript provider chapters each step restates | the golden path is stated once, in the book |
-| publishes | spn-core's plan skill | the `APPS` and TypeScript layer, through this plugin's own ref | planning stays one verb with a concrete step |
-| publishes | every TypeScript stack repository | five verbs a session matches against the work at hand | the paved road is loadable rather than remembered |
+| publishes | spn-core's plan skill | the `APPS` and TypeScript layer, through this plugin's own ref | planning stays one skill with a concrete step |
+| publishes | every TypeScript stack repository | five skills a session matches against the work at hand | the paved road is loadable rather than remembered |

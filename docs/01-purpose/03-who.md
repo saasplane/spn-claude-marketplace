@@ -25,10 +25,10 @@ Every engineering function meets them, because the standards are not a developer
 
 | You are | What reaches you | Where you meet it |
 | --- | --- | --- |
-| a **backend or web developer** | the verb skills, the write-time guards, the orientation a window opens with | on nearly every turn |
+| a **backend or web developer** | the skills, the write-time guards, the orientation a window opens with | on nearly every turn |
 | an **architect** | the review panel, the lenses, the plan and ideate skills, the document checks | at a design gate, and when a boundary moves |
 | a **quality engineer** | the test skill, the tier ladder it derives, and the rows a run writes back | when you decide what proves something |
-| a **DevOps or SRE engineer** | the estate verbs, the manifest and naming cards, the guard over an estate write | when you declare or bring up an estate |
+| a **DevOps or SRE engineer** | the estate skills, the manifest and naming cards, the guard over an estate write | when you declare or bring up an estate |
 | a **security engineer** | the refusals — secrets, account identifiers, estate mutation — and the fact that each one is a decision rather than a crash | when you assure what the tooling allows |
 | an **engineering leader** | the release discipline, and the review that is convened rather than remembered | when you want to know which bytes ran |
 

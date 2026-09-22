@@ -84,7 +84,7 @@ Part of a face is written by a person and part is generated. The two are told ap
 
 ## Boundary
 
-This page answers how a page is produced, what a figure is measured against, and why a page is never edited. It does not answer what a document must contain — the sections a construct owes, the fields its metadata block carries — because that is the corpus standard, and the book states it. It does not answer what a tool is either: the verbs that produce and check a page are tools, and [The Tool](05-tools.md) names what that means.
+This page answers how a page is produced, what a figure is measured against, and why a page is never edited. It does not answer what a document must contain — the sections a construct owes, the fields its metadata block carries — because that is the corpus standard, and the book states it. It does not answer what a tool is either: the jobs that produce and check a page are tools, and [The Tool](05-tools.md) names what that means.
 
 | Owns | Refuses | Who owns that instead |
 | --- | --- | --- |
@@ -103,7 +103,7 @@ This page answers how a page is produced, what a figure is measured against, and
 | Repo | Node | What it realizes | State |
 | --- | --- | --- | --- |
 | spn-foundation | `01-devex/04-workspace/04-docs` | the foundation construct this one realizes | planned |
-| spn-claude-marketplace | `spn-core` | the renderer, the drawer, the figure checker, the block card, and the verbs that produce and compare a page | planned |
+| spn-claude-marketplace | `spn-core` | the renderer, the drawer, the figure checker, the block card, and the jobs that produce and compare a page | planned |
 
 ## Proof
 

@@ -11,7 +11,7 @@
 
 # Planning in an APPS · TS node — the layer the `plan` skill loads
 
-**Read this as reference material, not a skill.** The verb is `DEVEX_PLAN`, and it lives once, in
+**Read this as reference material, not a skill.** The skill is `DEVEX_PLAN`, and it lives once, in
 `spn-core`. There is no `APPS_PLAN` — the book's `SPSkillType` is closed and does not carry one
 (devex README § Skills and plugins). The `plan` skill resolves the node's world and stack claim
 from the nearest `sprepo.json`, then loads this file for the APPS · TS specifics below.
@@ -138,4 +138,4 @@ Name the register it belongs in: the workspace's own `docs/registers/decisions.m
 
 ## Hand-off
 
-End every mode by naming the next verb. `design` → the `new` skill (if scaffolding is needed) or the `implement` skill. `docs`/`decision` → done, or the `review` skill if code changed alongside.
+End every mode by naming the next skill. `design` → the `new` skill (if scaffolding is needed) or the `implement` skill. `docs`/`decision` → done, or the `review` skill if code changed alongside.

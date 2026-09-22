@@ -103,7 +103,7 @@ Look again at the last row — it is the one people miss. An agent calling a too
 | implementation of a contract | the class | **how it realizes it** — the vendor, the mechanism | `/** Redis realization — SETEX with the configured lifetime. */` |
 | `REPOSITORY` | — | nothing; internal, and the contract already said it | |
 | `CONTROLLER` · `LISTENER` | — | nothing; a transport adapter adds no fact the route or topic does not | |
-| `CLI_COMMAND` | the `.description()` | what the verb does, as `--help` shows it | `.description('Generate the symbol index')` |
+| `CLI_COMMAND` | the `.description()` | what the command does, as `--help` shows it | `.description('Generate the symbol index')` |
 | `COMPONENT` | the exported binding | what a user can do with it | `/** Rename one customer account. */` |
 | `HOOK` | the exported binding | what it returns and when it refetches | `/** One system provider, reloading on demand. */` |
 | `PAGE` | the exported binding | the screen, in product words | `/** The account list, filtered by org. */` |

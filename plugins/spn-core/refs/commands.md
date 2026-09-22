@@ -1,12 +1,12 @@
 # Command Vocabulary — Stack-Agnostic
 
-Two command vocabularies belong to the platform rather than to any stack: the **`spnutils` verbs** and the **DevEx stage verbs**. Both mean the same thing in every repo and every language. What *runs* when you invoke one is the stack's business, and it is the only part that differs.
+Two command vocabularies belong to the platform rather than to any stack: the **`spnutils` commands** and the **DevEx stage skills**. Both mean the same thing in every repo and every language. What *runs* when you invoke one is the stack's business, and it is the only part that differs.
 
-**The verb never forks; only its realization does.** A stack joins by realizing this vocabulary, not by extending it. So an agent that knows these verbs can operate any SaaS Plane repo, including one built on a stack it has never seen. A second stack changes no verb: the groups are the platform's vocabulary, the stack adapters its realizations.
+**The command never forks; only its realization does.** A stack joins by realizing this vocabulary, not by extending it. So an agent that knows these commands can operate any SaaS Plane repo, including one built on a stack it has never seen. A second stack changes no command: the groups are the platform's vocabulary, the stack adapters its realizations.
 
 ## `spnutils` — the foundation CLI
 
-One CLI serves every stack. The group says *what kind of thing changes*, which is what keeps the boundary stable as verbs are added — a new verb joins a group rather than minting one:
+One CLI serves every stack. The group says *what kind of thing changes*, which is what keeps the boundary stable as commands are added — a new command joins a group rather than minting one:
 
 | Group | Changes | Never |
 | --- | --- | --- |
@@ -17,7 +17,7 @@ One CLI serves every stack. The group says *what kind of thing changes*, which i
 
 <!-- spn:generated commands — do not edit inside these markers; `commands-ref.ts` writes it -->
 Rendered from `spnutils 1.2.64` — the **released** CLI, which is what a partner holds.
-Surface `fc7ccc4683b4`. A release that adds no verb leaves that unchanged and owes no regeneration.
+Surface `fc7ccc4683b4`. A release that adds no command leaves that unchanged and owes no regeneration.
 
 #### `apps`
 
@@ -95,15 +95,15 @@ Surface `fc7ccc4683b4`. A release that adds no verb leaves that unchanged and ow
 
 **Every scaffolded node declares itself in `spkind.json` at its root** (decision RD.APPS.029) — never a key in `package.json`. The reason: two places declaring one fact is drift waiting to happen, and an app-owned module has no package file to carry a key at all.
 
-**The stack is never typed on an `apps` verb** — it comes from the repo's claim in `sprepo.json`. Only `apps scaffold repo` types it, once, at the moment the claim is made. A flag may override a derivable fact; a silent default never exists.
+**The stack is never typed on an `apps` command** — it comes from the repo's claim in `sprepo.json`. Only `apps scaffold repo` types it, once, at the moment the claim is made. A flag may override a derivable fact; a silent default never exists.
 
-**`infra` layers are nouns, and local is the default realization.** `--cloud` is asked for by name. Cloud mutation runs only where the declaration is authored, plus CI; in the cloud a missing layer below is a named refusal, never an implicit apply. Hosted vendors are **modules** (`infra-module-{code}`) — their local rendering rides the platform layer's container group, and there is no separate vendor verb.
+**`infra` layers are nouns, and local is the default realization.** `--cloud` is asked for by name. Cloud mutation runs only where the declaration is authored, plus CI; in the cloud a missing layer below is a named refusal, never an implicit apply. Hosted vendors are **modules** (`infra-module-{code}`) — their local rendering rides the platform layer's container group, and there is no separate vendor command.
 
-**`repo create` is creation and convergence in one idempotent verb.** There is no `setup` and no `teams-init`; both are retired.
+**`repo create` is creation and convergence in one idempotent command.** There is no `setup` and no `teams-init`; both are retired.
 
-### The derivation laws bind every verb
+### The derivation laws bind every command
 
-**Nothing contextual is typed**: the stack comes from the repo's claim, the estate from its pins or tree. The registry and every package scope come from the organization, the target project from the cwd. A flag may override; absence of both refuses by name; a silent default never exists. There is no whole-estate verb. And a mutation is reviewable or it does not exist: pins bump by editing the manifest, versions are typed by a human, estate publishes run from CI alone.
+**Nothing contextual is typed**: the stack comes from the repo's claim, the estate from its pins or tree. The registry and every package scope come from the organization, the target project from the cwd. A flag may override; absence of both refuses by name; a silent default never exists. There is no whole-estate command. And a mutation is reviewable or it does not exist: pins bump by editing the manifest, versions are typed by a human, estate publishes run from CI alone.
 
 ### Skills and command groups are mapped, not matched
 
@@ -122,17 +122,17 @@ A **skill** names what the Agent was asked to do; a **group** names what is bein
 
 **The `repo` command group is deliberately not renamed to `scm`** (decision RD.DEVEX.013): the group means repo-level change, which is wider than source control. `apps scaffold repo` scaffolds a repository and `repo agent-sync` wires the agent, and neither is an SCM operation.
 
-## The project verbs
+## The project commands
 
-Six verbs describe everything a developer does with a project, in any stack:
+Six commands describe everything a developer does with a project, in any stack:
 
 `dev` · `build` · `lint` · `format` · `test` · `release`
 
-The verb is the platform's vocabulary; the command that realizes it belongs to the stack's toolchain and is documented in that stack's provider set and its plugin. **Ask for the verb, then use the repo's realization of it** — never substitute a raw toolchain invocation where the repo defines the verb. The repo's version carries the flags, the ordering, and the scoping the toolchain call does not.
+The command is the platform's vocabulary; what realizes it belongs to the stack's toolchain and is documented in that stack's provider set and its plugin. **Ask for the command, then use the repo's realization of it** — never substitute a raw toolchain invocation where the repo defines the command. The repo's version carries the flags, the ordering, and the scoping the toolchain call does not.
 
 ## Scope is never guessed
 
-Almost every verb is scoped to something — a package on the `apps` verbs, a project on the project verbs, an app on `infra app up` / `infra app down`. **When the request does not name one and the repo holds more than one, ask before running: this app, this package, or all?**
+Almost every command is scoped to something — a package on the `apps` commands, a project on the project commands, an app on `infra app up` / `infra app down`. **When the request does not name one and the repo holds more than one, ask before running: this app, this package, or all?**
 
 Do not infer the scope from the last file edited, from what the branch changed, from the most prominent project in the repo, or from what was scoped last time. Both wrong answers cost real time. Running the whole workspace when one package was meant burns a long build. Running one package when the workspace was meant reports a green that proves nothing about the rest. Where the answer genuinely is *everything*, the caller is the one who says so.
 
@@ -140,9 +140,9 @@ The same applies to anything destructive, only harder — a reset names its targ
 
 ## Standing rules for both vocabularies
 
-- **Never invent a verb.** If a verb does not exist, the operation is not part of the vocabulary yet — say so rather than approximating it with something adjacent.
+- **Never invent a command.** If a command does not exist, the operation is not part of the vocabulary yet — say so rather than approximating it with something adjacent.
 - **Never report a command you did not run**, and never infer one command's result from another's. A passing build says nothing about conformance.
-- **Regenerate generated outputs, never hand-edit them.** Everything a `gen-*` verb writes is derived; the only edit path is the source plus a re-run.
-- **Run the regenerating verbs before committing.** A repo whose generated artifacts disagree with their source fails at runtime, not at review.
-- **Run a destructive verb only on an explicit instruction.** A local stack is frequently shared; a `--clean` wipes state belonging to work that is not yours.
+- **Regenerate generated outputs, never hand-edit them.** Everything a `gen-*` command writes is derived; the only edit path is the source plus a re-run.
+- **Run the regenerating commands before committing.** A repo whose generated artifacts disagree with their source fails at runtime, not at review.
+- **Run a destructive command only on an explicit instruction.** A local stack is frequently shared; a `--clean` wipes state belonging to work that is not yours.
 - **Take the scope from the project's declared kind.** What `build`, `test`, or a reset actually covers follows from the kind a project declares in its manifest — not from the repo it happens to sit in.

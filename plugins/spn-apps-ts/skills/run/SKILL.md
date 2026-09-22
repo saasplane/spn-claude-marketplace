@@ -34,11 +34,11 @@ shape an agent copies next. Call the owning project's target.
 
 ## A SCRIPT and a TARGET are different things, and this is where people trip
 
-**A node declares one script per verb, and nx carries a target per tier.** Both are real and they
+**A node declares one script per command, and nx carries a target per tier.** Both are real and they
 are not duplicates of each other (`RD.APPS.118`, and `Q95` = B):
 
 ```bash
-pnpm test unit                     # the SCRIPT — one verb, the tier as its argument
+pnpm test unit                     # the SCRIPT — one command, the tier as its argument
 npx nx run <project>:test:unit     # the TARGET — inferred from what the node IS
 ```
 
@@ -53,12 +53,12 @@ it, or by being a kind that owes it — never by somebody remembering a line. So
 `npx nx show project <p> --json` is the only honest answer to *what can I run here*; a
 `package.json` no longer lists the tiers.
 
-## The verbs, and what carries each
+## The commands, and what carries each
 
-**A verb exists where a fact the kind already declares says it does.** That is the rule; the table
+**A command exists where a fact the kind already declares says it does.** That is the rule; the table
 below is what it produces today, and a kind added later needs no row of its own.
 
-| Verb | Carried by | The variant, as an argument |
+| Command | Carried by | The variant, as an argument |
 | --- | --- | --- |
 | `build` | every kind | `pnpm build test` — the bundle a browser tier drives, in development mode |
 | `check` · `format` | every kind | — |
@@ -71,7 +71,7 @@ below is what it produces today, and a kind added later needs no row of its own.
 
 **`lint`, `prettier`, `test:<tier>`, `build:test`, `preview` and `release:verified` are retired
 spellings.** `lint` and `prettier` were second names for `check` and `format`; `preview` was `start`
-under another name; the rest spelled a variant as a verb. A node still carrying one has not been
+under another name; the rest spelled a variant as a command. A node still carrying one has not been
 swept yet — read it as drift, not as a target to use.
 
 ### Two things the word *mode* means, and they are unrelated
@@ -198,7 +198,7 @@ means a build value was missing and threw at boot, naming the key.
 1. **Organization layer** (once per machine — skip if already up): `spnutils infra organization up` — the machine's trust bootstrap: the local certificate authority, its one trust prompt, the shared ingress.
 2. **Platform layer**: `spnutils infra platform up` — this platform's container group (database, cache, queue, and each installed module's local rendering) from the pinned declaration. Check with `spnutils infra platform status`.
 3. **App layer** (per app, if not yet registered): `spnutils infra app up -p <app>` — schemas, per-schema roles, local TLS certificate, hosts entry, ingress vhost. No containers of its own.
-4. **Hosted-vendor modules** need no step of their own — a vendor you run is a module row in the platform declaration, and its local rendering comes up with the platform layer. There is no vendor verb.
+4. **Hosted-vendor modules** need no step of their own — a vendor you run is a module row in the platform declaration, and its local rendering comes up with the platform layer. There is no vendor command.
 5. **Start the service app**: `npx nx run <service>:dev`. It loads `local.env`, and its port and API-docs path come from the repo's own app env — read them rather than assume. On a fresh schema run `pnpm --filter <service> migrate up` first; it needs the platform-owner env variables sourced.
 6. **Start web apps** as needed: `npx nx run-many -t dev -p '<pattern>'`, on the ports each app declares in its own manifest. For a browser suite run `start` instead, over a `build test` bundle — never `dev`.
 

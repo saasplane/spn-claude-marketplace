@@ -13,7 +13,7 @@ Four markdown files sit under `plugins/spn-infra/refs/`: `manifests`, `layers-do
 | Part of the construct | Lives in | What it is |
 | --- | --- | --- |
 | Which file declares what | `plugins/spn-infra/refs/manifests.md` | the two files per node, and how a node is found from where you stand |
-| Which layer owns which act | `plugins/spn-infra/refs/layers-doors.md` | the layer nouns, their four verbs, and the order they start in |
+| Which layer owns which act | `plugins/spn-infra/refs/layers-doors.md` | the layer nouns, their four commands, and the order they start in |
 | How a name is composed | `plugins/spn-infra/refs/naming.md` | the resource name grammar and the published vocabulary |
 | What must never happen | `plugins/spn-infra/refs/laws.md` | the estate laws, written as a refusal card |
 
@@ -45,14 +45,14 @@ Four markdown files sit under `plugins/spn-infra/refs/`: `manifests`, `layers-do
 ### The layers are read in order, and the order explains most failures
 
 **Why** — *a lower layer that is missing is the usual reason a higher one will not start*, and that is a diagnosis rather than a rule.
-**What** — the card lists the layer nouns, gives each the same four verbs, and states the order they come up in.
-**How** — it names the tool verb that realizes each act, so the card can be read beside a command that is already running. `plugins/spn-infra/refs/layers-doors.md`.
+**What** — the card lists the layer nouns, gives each the same four commands, and states the order they come up in.
+**How** — it names the tool's command that realizes each act, so the card can be read beside a command that is already running. `plugins/spn-infra/refs/layers-doors.md`.
 
 ## Between modules
 
 | Direction | With | What | Why |
 | --- | --- | --- | --- |
 | takes | spn-foundation | the estate sections of the concept each card restates, stamped per file | the book governs and the card is the copy |
-| publishes | spn-infra's skills | the manifest, layer, naming and law vocabulary each verb uses | a skill sequences the work and the card holds the words |
+| publishes | spn-infra's skills | the manifest, layer, naming and law vocabulary each skill uses | a skill sequences the work and the card holds the words |
 | publishes | spn-infra's guard | the laws its five refusals cite by name | the script catches the part a script can catch |
 | publishes | a partner | four cards readable with no book checkout | the book is cited by name and never required |

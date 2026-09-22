@@ -195,7 +195,7 @@
       <tr><td>a finding</td><td><code>Finding</code></td><td>one thing a run found: which check raised it, its grade, the file, and what a reader should do</td></tr>
       <tr><td>the grade</td><td><code>Grade</code></td><td>how a finding is weighted — <code>RULE</code> refuses and <code>SOFT</code> reports</td></tr>
       <tr><td>the exit code</td><td>—</td><td>the count of refusals; a report alone leaves a run green</td></tr>
-      <tr><td>a verb</td><td>—</td><td>one named job inside a tool, such as <code>audit</code>, <code>page</code>, <code>topics</code> or <code>coverage</code></td></tr>
+      <tr><td>a job</td><td>—</td><td>one named unit of work inside a tool, such as <code>audit</code>, <code>page</code>, <code>topics</code> or <code>coverage</code></td></tr>
       <tr><td>silence</td><td>—</td><td>the answer where the input a question needs is absent, which is a fact about the repository rather than a finding about it</td></tr>
     </tbody>
   </table></div>
@@ -256,8 +256,8 @@
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="one-file-serves-the-write-time-check-and">One file serves the write-time check and the sweep</h3>
   <p>A rule answered one way while a file is written and another way in a sweep is two rules. So the code that decides lives once, and both callers import it. The practical consequence is that the same file must read a document in both of its spellings — the markdown an author writes and the HTML a page is produced as — because reading only one of them once reported every hand-written page as missing every section it carried. <em>Where:</em> <code>plugins/spn-core/hooks/tools/docs.ts</code></p>
-  <h3 id="a-verb-not-a-flag">A verb, not a flag</h3>
-  <p>A tool with more than one job gives each job a verb and a path argument, and a path is a file or a folder in every one of them. Given a folder, a verb means every document under it, which is what anybody typing one meant. <em>Where:</em> <code>plugins/spn-core/hooks/tools/docs.ts</code></p>
+  <h3 id="a-job-not-a-flag">A job, not a flag</h3>
+  <p>A tool with more than one job gives each job a name and a path argument, and a path is a file or a folder in every one of them. Given a folder, a job means every document under it, which is what anybody typing one meant. <em>Where:</em> <code>plugins/spn-core/hooks/tools/docs.ts</code></p>
   <h3 id="two-questions-that-look-alike-and-are-no">Two questions that look alike and are not</h3>
   <p>Comparing documents inside one repository and comparing a restatement against a book in another repository are different questions with different inputs, and no repository holds both trees. So they are two tools, and both read one parser, because writing the parser twice would be the defect the instrument exists to catch. <em>Where:</em> <code>plugins/spn-core/hooks/tools/coherence.ts</code>, <code>plugins/spn-core/hooks/tools/restate-drift.ts</code></p>
   <h3 id="silence-where-the-input-is-absent">Silence where the input is absent</h3>
@@ -273,7 +273,7 @@
 <!-- 03 -->
 <section id="s3">
   <div class="sec-head"><h2>Boundary</h2></div>
-  <p>This page answers what a tool is, how it is reached, and what it answers with. It does not answer what a hook is or how a verdict is composed — that is <a href="./02-hook-set-construct.html">The Hook</a>. It does not answer the page production either: producing and checking a page is a subject of its own, and the verbs that do it are named on that page.</p>
+  <p>This page answers what a tool is, how it is reached, and what it answers with. It does not answer what a hook is or how a verdict is composed — that is <a href="./02-hook-set-construct.html">The Hook</a>. It does not answer the page production either: producing and checking a page is a subject of its own, and the jobs that do it are named on that page.</p>
   <div class="scroll"><table>
     <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
     <tbody>
@@ -291,7 +291,7 @@
     <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
     <tbody>
       <tr><td><code>RD.DEVEX.019</code></td><td>a tool restates a chapter and adds no rule of its own</td><td>MUST</td></tr>
-      <tr><td><code>RD.GOV.024</code></td><td>this repository is served with docs verbs alone, which is why its own rows are written by a tool the plugins ship</td><td>MUST</td></tr>
+      <tr><td><code>RD.GOV.024</code></td><td>this repository is served with docs commands alone, which is why its own rows are written by a tool the plugins ship</td><td>MUST</td></tr>
       <tr><td>the foundation's <code>02-delivery.md</code> § What it makes checkable</td><td>which standards a tool is expected to answer rather than a reader</td><td>MUST</td></tr>
     </tbody>
   </table></div>
@@ -312,7 +312,7 @@
     <thead><tr><th>Row</th><th>Does</th><th>Tier</th><th>Status</th></tr></thead>
     <tbody>
       <tr><td><code>MKT.TOOL.01</code></td><td>get the same answer from a rule at write time and in a sweep</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.TOOL.02</code></td><td>hand a verb a folder wherever it would take a file</td><td>UNIT</td><td>PLANNED</td></tr>
+      <tr><td><code>MKT.TOOL.02</code></td><td>hand a job a folder wherever it would take a file</td><td>UNIT</td><td>PLANNED</td></tr>
       <tr><td><code>MKT.TOOL.03</code></td><td>run a tool in a repository holding no book at all</td><td>UNIT</td><td>PLANNED</td></tr>
       <tr><td><code>MKT.TOOL.04</code></td><td>read a run as a list and a pipeline read it as a number</td><td>UNIT</td><td>PLANNED</td></tr>
       <tr><td><code>MKT.TOOL.05</code></td><td>prove every hook still works in a repository carrying only the plugins</td><td>UNIT</td><td>PLANNED</td></tr>

@@ -31,8 +31,8 @@ Kinds exist only for runtimes a stack actually covers. A stack that covers only 
 
 ## Never hand-build layout
 
-1. **Scaffold** — the stack's scaffold verb writes the structure the kind requires and sets the manifest key. Copying an existing project by hand reproduces its accidents along with its shape.
-2. **Validate** — the stack's validate verb walks every project and reports where one disagrees with what its own declared kind requires. It exits non-zero on findings and changes nothing on disk.
+1. **Scaffold** — the stack's scaffold command writes the structure the kind requires and sets the manifest key. Copying an existing project by hand reproduces its accidents along with its shape.
+2. **Validate** — the stack's validate command walks every project and reports where one disagrees with what its own declared kind requires. It exits non-zero on findings and changes nothing on disk.
 3. **Apply the remedy the finding names.** Each message names the rule *and* its remedy; inventing a different fix is how a workspace ends up with two conventions.
 
 Run validate after any structural change, not only after scaffolding — it is the only mechanical check that a project still is what it says it is.
@@ -53,7 +53,7 @@ A package organized by feature rather than by layer — a support library — ha
 
 `agent-sync` registers the plugin marketplace, enables the plugins, writes a managed block in the repo's instruction file, and generates the local inventory. `agent-sync` refreshes that wiring afterwards. Neither parses code — both are pure reference refreshes from the manifests and workspace state.
 
-**A stack-agnostic verb reads SPN manifests and nothing else.** `sprepo.json` gives the world and the stack claim, `spkind.json` names an apps node, and `spinfrapkg.json` with `src/spestate.json` names an estate node. Everything a stack invents sits **behind the claim** — a package manifest, a lockfile, an installed-dependency tree. A verb that reaches for one unasked refuses the first repo that does not carry it. The node inventory is a **per-world** question rather than a per-stack one: an estate repo declares its packages too, and it must open with them listed.
+**A stack-agnostic command reads SPN manifests and nothing else.** `sprepo.json` gives the world and the stack claim, `spkind.json` names an apps node, and `spinfrapkg.json` with `src/spestate.json` names an estate node. Everything a stack invents sits **behind the claim** — a package manifest, a lockfile, an installed-dependency tree. A command that reaches for one unasked refuses the first repo that does not carry it. The node inventory is a **per-world** question rather than a per-stack one: an estate repo declares its packages too, and it must open with them listed.
 
 **The plugin set is derived from the manifest, never typed.** `FOUNDATION` takes the core plugin, `INFRA` takes core plus the estate plugin, and an `APPS` repo takes core plus the plugin matching its stack claim. A repo with no claim at all falls back to the core plugin alone.
 
@@ -63,7 +63,7 @@ A package organized by feature rather than by layer — a support library — ha
 
 A repo is wired by `repo`; the folder the repos sit in is minted by `workspace`. They are different levels with different writers, and the workspace level is the one people forget exists.
 
-| Verb | Does | Touches |
+| Command | Does | Touches |
 | --- | --- | --- |
 | `workspace init` | mints the folder — the permission floor, the marketplace, the state directory, the engine check | the workspace root |
 | `workspace agent-sync` | brings the floor back to what the members imply | the workspace root |
@@ -71,7 +71,7 @@ A repo is wired by `repo`; the folder the repos sit in is minted by `workspace`.
 
 **The machine seat sits one level above again: `~/.spnenv`, one file for every SaaS Plane value.** `init` and `sync` provision its **shape** — four marked regions, the producer and managed regions rewritten whole, the keep region laid out. **They derive no key.** You add a key when you build what needs it, and the developer supplies the value. The tool writes no shell profile, and you never edit one either. **Never print or expand a value from that file** — test that a key is set, and nothing more. Run `init` inside a scratch folder and it rewrites the real seat, so point `HOME` at a temp directory for a demo. Read `refs/cross-repo.md` § The machine seat for the regions, the layout and the namespacing rule.
 
-**There is no workstream verb, and adding one is a defect.** Opening a subject is `mkdir`, listing what is open is what `status` already reports, and the close is a gate rather than a command.
+**There is no workstream command, and adding one is a defect.** Opening a subject is `mkdir`, listing what is open is what `status` already reports, and the close is a gate rather than a command.
 
 ### When work earns a workstream
 

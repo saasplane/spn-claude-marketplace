@@ -64,7 +64,7 @@ A refusal must be about what is being written. Judging the file on disk would re
 
 ### Build output is refused by path alone
 
-The published artifact is staged whole by the release verb. A hand edit under the output folder is lost on the next build, and until then it is what is running. So a path under a build output folder is refused before the text is even read, and the message names the source folder to edit instead. *Where:* the same script, the first clause
+The published artifact is staged whole by the release command. A hand edit under the output folder is lost on the next build, and until then it is what is running. So a path under a build output folder is refused before the text is even read, and the message names the source folder to edit instead. *Where:* the same script, the first clause
 
 ### An identifier is refused where a key names it
 

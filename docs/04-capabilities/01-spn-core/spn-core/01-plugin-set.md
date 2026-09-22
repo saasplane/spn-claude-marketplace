@@ -51,6 +51,6 @@
 
 | Direction | With | What | Why |
 | --- | --- | --- | --- |
-| publishes | spn-apps-ts · spn-infra | the payload and verdict shape, the command vocabulary and the stage verbs each stack plugin realizes | a stack plugin supplies the layer, never the vocabulary |
+| publishes | spn-apps-ts · spn-infra | the payload and verdict shape, the command vocabulary and the stage skills each stack plugin realizes | a stack plugin supplies the layer, never the vocabulary |
 | publishes | every consuming repository | the whole instrument tree, once installed from the marketplace row | the repository's own manifest decides the set; a workspace never types a plugin name |
 | takes | spn-foundation | the chapters its refs, hooks and skills restate | a plugin adds no rule of its own |

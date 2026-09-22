@@ -1,7 +1,7 @@
 <meta charset="utf-8">
-<title>Stack Refs — The Layer a Stack-Agnostic Verb Loads</title>
+<title>Stack Refs — The Layer a Stack-Agnostic Skill Loads</title>
 <!-- spn:doc
-{"id":"stack-refs","variant":"construct","title":"Stack Refs — The Layer a Stack-Agnostic Verb Loads","lenses":["SERVER_DEV","ARCHITECT"],"status":"PLANNING","dependsOn":["ref-set"],"summary":"Reference material a stack ships for a verb it does not own — how a stack-agnostic verb reaches a concrete step without being copied, why the file has no trigger of its own, and where the rows a design produces are written.","keywords":["ref","layer","plan","stack","mode","rows"]}
+{"id":"stack-refs","variant":"construct","title":"Stack Refs — The Layer a Stack-Agnostic Skill Loads","lenses":["SERVER_DEV","ARCHITECT"],"status":"PLANNING","dependsOn":["ref-set"],"summary":"Reference material a stack ships for a skill it does not own — how a stack-agnostic skill reaches a concrete step without being copied, why the file has no trigger of its own, and where the rows a design produces are written.","keywords":["ref","layer","plan","stack","mode","rows"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
 <style>
@@ -179,10 +179,10 @@
 
 <header class="masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Stack Refs — The Layer a Stack-Agnostic Verb Loads</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Construct</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">Backend developer</span><span class="badge lens">Architect</span></span><span class="st"><span class="lbl">Status:</span> <span class="badge status planning">&#x1F52E; PLANNING</span></span></span></div>
-  <h1>Stack Refs — The Layer a Stack-Agnostic Verb Loads</h1>
-  <p class="standfirst">Some verbs are the same in every world and still need an answer only one world can give. Planning is one: the act is identical everywhere, and the seats a design's rows land in are not. A stack ref is how the second half is supplied without splitting the first: reference material the stack ships, read by a verb the stack does not own.</p>
-  <p>The thing to know before opening one is that <strong>it is reference material and not a skill</strong>. It has no frontmatter, it matches no ask, and nothing loads it except the verb that already resolved which stack it is standing in.</p>
+  <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Stack Refs — The Layer a Stack-Agnostic Skill Loads</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Construct</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">Backend developer</span><span class="badge lens">Architect</span></span><span class="st"><span class="lbl">Status:</span> <span class="badge status planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>Stack Refs — The Layer a Stack-Agnostic Skill Loads</h1>
+  <p class="standfirst">Some skills are the same in every world and still need an answer only one world can give. Planning is one: the act is identical everywhere, and the seats a design's rows land in are not. A stack ref is how the second half is supplied without splitting the first: reference material the stack ships, read by a skill the stack does not own.</p>
+  <p>The thing to know before opening one is that <strong>it is reference material and not a skill</strong>. It has no frontmatter, it matches no ask, and nothing loads it except the skill that already resolved which stack it is standing in.</p>
 </header>
 
 <!-- 00 -->
@@ -191,7 +191,7 @@
   <div class="scroll"><table>
     <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
     <tbody>
-      <tr><td>a stack ref</td><td><code>refs/</code></td><td>a markdown file a stack's plugin ships for a verb living in another plugin</td></tr>
+      <tr><td>a stack ref</td><td><code>refs/</code></td><td>a markdown file a stack's plugin ships for a skill living in another plugin</td></tr>
       <tr><td>the layer</td><td>—</td><td>the part of a walk that cannot be stack-agnostic: which seats a row lands in, and what each row must carry</td></tr>
       <tr><td>the claim</td><td><code>sprepo.json</code></td><td>what a repository declares about its own world and stack, which is what selects the layer</td></tr>
       <tr><td>a mode</td><td>—</td><td>which of the walks this file describes is running, named out loud even where it was inferred</td></tr>
@@ -204,12 +204,12 @@
 <!-- 01 -->
 <section id="s1">
   <div class="sec-head"><h2>Model</h2></div>
-  <p>The verb is one. The layer is chosen from the repository's own claim, and what it names is where the design is written down.</p>
+  <p>The skill is one. The layer is chosen from the repository's own claim, and what it names is where the design is written down.</p>
   <figure>
   <svg class="dg" viewBox="429 22 241 428" style="max-width:241px" role="img" aria-label="The claim selects the layer, so the layer file needs no trigger of its own to be reached.">
     <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
     <rect class="box" x="431" y="24" width="237" height="76" rx="3"/>
-    <text class="l" x="447" y="50">the planning verb</text>
+    <text class="l" x="447" y="50">the planning skill</text>
     <text class="n" x="447" y="69">stack-agnostic, and shipped once</text>
     <text class="n" x="447" y="88">by the core plugin</text>
     <path class="c" d="M549.5 100 V140" marker-end="url(#ar)"/>
@@ -237,7 +237,7 @@
 { "kind": "map",
   "caption": "The claim selects the layer, so the layer file needs no trigger of its own to be reached.",
   "boxes": [
-    { "id": "a", "label": "the planning verb", "note": "stack-agnostic, and shipped once by the core plugin" },
+    { "id": "a", "label": "the planning skill", "note": "stack-agnostic, and shipped once by the core plugin" },
     { "id": "b", "label": "the claim", "note": "the world and the stack the repository declares for itself" },
     { "id": "c", "label": "the layer file", "note": "reference material with no frontmatter and no trigger" },
     { "id": "d", "label": "rows in the seats", "note": "where a design lands, marked planned" }
@@ -253,14 +253,14 @@
 <!-- 02 -->
 <section id="s2">
   <div class="sec-head"><h2>Parts</h2></div>
-  <h3 id="the-verb-has-no-stack-variant-so-the-lay">The verb has no stack variant, so the layer is a ref</h3>
-  <p>The book's verb set is closed and carries no planning verb for this world. Shipping one here would add a value the standard does not have, and two skills with almost the same description would then compete for the same ask. So the verb stays in one plugin and this file supplies the part that cannot be general. <em>Where:</em> <code>plugins/spn-apps-ts/refs/plan.md</code></p>
+  <h3 id="the-skill-has-no-stack-variant-so-the-la">The skill has no stack variant, so the layer is a ref</h3>
+  <p>The book's skill set is closed and carries no planning skill for this world. Shipping one here would add a value the standard does not have, and two skills with almost the same description would then compete for the same ask. So the skill stays in one plugin and this file supplies the part that cannot be general. <em>Where:</em> <code>plugins/spn-apps-ts/refs/plan.md</code></p>
   <h3 id="it-says-in-its-first-line-that-it-is-not">It says in its first line that it is not a skill</h3>
   <p>A reader who opens the file directly, or an agent that finds it while searching, has to be told immediately what it is. So the file states its own standing at the top, before anything it describes. <em>Where:</em> the first lines of <code>plugins/spn-apps-ts/refs/plan.md</code></p>
   <h3 id="a-design-lands-as-rows-in-the-documents-">A design lands as rows in the documents that already exist</h3>
   <p>Planning is written into the documents that will later be flipped to done. A scratch file or a task tree becomes a second plan, and the build then reconciles documents instead of changing statuses. So the file names the seats a row belongs in — what a person can do, and what the contract gains — and marks every one of them as planned. <em>Where:</em> <code>plugins/spn-apps-ts/refs/plan.md</code></p>
   <h3 id="the-mode-is-chosen-and-the-choice-is-sai">The mode is chosen, and the choice is said out loud</h3>
-  <p>A reader who cannot tell which walk ran cannot tell whether the output is complete. The file describes more than one walk, takes the choice from the verb's own argument, and requires the inferred one to be named where nobody gave it. <em>Where:</em> <code>plugins/spn-apps-ts/refs/plan.md</code></p>
+  <p>A reader who cannot tell which walk ran cannot tell whether the output is complete. The file describes more than one walk, takes the choice from the skill's own argument, and requires the inferred one to be named where nobody gave it. <em>Where:</em> <code>plugins/spn-apps-ts/refs/plan.md</code></p>
   <h3 id="it-is-stamped-like-any-other-restatement">It is stamped like any other restatement</h3>
   <p>The file carries the same block a core ref carries, naming each chapter it restates and the hash last read there, so a drift run reads it exactly as it reads the rest. <em>Where:</em> the <code>spn:restates</code> block at the top of <code>plugins/spn-apps-ts/refs/plan.md</code></p>
 </section>
@@ -268,13 +268,13 @@
 <!-- 03 -->
 <section id="s3">
   <div class="sec-head"><h2>Boundary</h2></div>
-  <p>This page answers why a stack ships reference material for a verb it does not own, and what such a file may contain. It does not answer how a restatement is stamped, parsed or compared — that is <a href="../01-spn-core/08-ref-set-construct.html">The Ref</a>. It does not answer what the planning walk itself is either: the walk belongs to the verb, and this file supplies only the part the verb could not know.</p>
+  <p>This page answers why a stack ships reference material for a skill it does not own, and what such a file may contain. It does not answer how a restatement is stamped, parsed or compared — that is <a href="../01-spn-core/08-ref-set-construct.html">The Ref</a>. It does not answer what the planning walk itself is either: the walk belongs to the skill, and this file supplies only the part the skill could not know.</p>
   <div class="scroll"><table>
     <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
     <tbody>
-      <tr><td>that a verb with no stack variant reads a layer rather than being copied, and that the layer carries no trigger</td><td>the block, the stamp, the hash and the drift comparison</td><td><a href="../01-spn-core/08-ref-set-construct.html">The Ref</a></td></tr>
+      <tr><td>that a skill with no stack variant reads a layer rather than being copied, and that the layer carries no trigger</td><td>the block, the stamp, the hash and the drift comparison</td><td><a href="../01-spn-core/08-ref-set-construct.html">The Ref</a></td></tr>
       <tr><td>which seats a design's rows land in for this stack, and what each row carries</td><td>the planning walk itself, and the vocabulary it is written in</td><td><a href="../01-spn-core/07-skill-set-construct.html">The Skill</a></td></tr>
-      <tr><td>that reference material is not a skill</td><td>the verbs this stack does own</td><td><a href="./03-stack-skills-construct.html">Stack Skills</a></td></tr>
+      <tr><td>that reference material is not a skill</td><td>the skills this stack does own</td><td><a href="./03-stack-skills-construct.html">Stack Skills</a></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -285,7 +285,7 @@
   <div class="scroll"><table>
     <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
     <tbody>
-      <tr><td>the foundation's DevEx Skills construct</td><td>the verb set is closed, so a stack adds a layer rather than a verb</td><td>MUST</td></tr>
+      <tr><td>the foundation's DevEx Skills construct</td><td>the skill set is closed, so a stack adds a layer rather than a skill</td><td>MUST</td></tr>
       <tr><td><code>RD.DOCS.055</code></td><td>this file is a restatement, carrying its sources and adding no rule</td><td>MUST</td></tr>
       <tr><td><code>RD.DEVEX.019</code></td><td>a stack plugin supplies the layer and never the vocabulary</td><td>MUST</td></tr>
     </tbody>

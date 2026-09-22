@@ -7,7 +7,7 @@ description: Walk an empty folder to a platform running locally - the door first
 
 Scan the workspace root, find no `sprepo.json` anywhere, and you are on day zero. You have no code to pattern-match against, and that is the condition this walk is written for. What you do have is the standards, the published packages, and the shape every platform here already takes.
 
-**Nothing in this walk is hand-made except the estate repository itself.** Every other file arrives from a verb. If you find yourself opening an editor to create a manifest, stop. A verb owns that file, and hand-writing it starts a workspace out of standard on day one.
+**Nothing in this walk is hand-made except the estate repository itself.** Every other file arrives from a command. If you find yourself opening an editor to create a manifest, stop. A command owns that file, and hand-writing it starts a workspace out of standard on day one.
 
 ## Act 0 is a door, and a no is a real answer
 
@@ -31,7 +31,7 @@ Two repositories come out of this, and the estate one comes first. It carries a 
                                                  platform:     pkg@ver } }
 ```
 
-| # | The act | The verb | Why it sits here and not later |
+| # | The act | The command | Why it sits here and not later |
 | --- | --- | --- | --- |
 | 0 | The door | — you ask | An act nobody agreed to is an act nobody can undo |
 | 1 | Mint the workspace | `spnutils workspace init` | The floor has to exist before a session has any guidance at all. It also mints `.spndevex/`, so it comes before the workstream |
@@ -49,12 +49,12 @@ Two repositories come out of this, and the estate one comes first. It carries a 
 | 13 | Run the stack, and say what they should see | the stack plugin's run skill | This is the acceptance. Day zero ends on a platform that answers, not on a filled arc |
 | 14 | Close the workstream | — move the folder to `closed/` | Both repositories exist and the concept is agreed, so the folder is a receipt |
 
-- **Act 6 is where day zero used to stop.** A partner's first repository is an estate repo, it carries no `package.json`, and that is precisely the case the wiring verb refused. If you meet that refusal, say so plainly and name it as the known blocker rather than working around it by hand.
-- **A partner holds no marketplace checkout, and nothing has to be said about it.** The mode follows from where they are standing, so the same verb wires the published source. Their plugins resolve from the published marketplace, and the book reaches them as a published rendering rather than a path they can open.
-- **Act 1 also writes the machine seat, `~/.spnenv`.** The verb writes the file's **shape** — its markers, its managed defaults and an empty keep region. **It derives no key**, so a fresh partner file has nothing to fill in yet. A key arrives later, when you build what needs it, and you ask them for the value. Their own keys go in `spnutils:dev`, which no run reads or writes. Never print a value back — `refs/cross-repo.md` § The machine seat carries the rule.
+- **Act 6 is where day zero used to stop.** A partner's first repository is an estate repo, it carries no `package.json`, and that is precisely the case the wiring command refused. If you meet that refusal, say so plainly and name it as the known blocker rather than working around it by hand.
+- **A partner holds no marketplace checkout, and nothing has to be said about it.** The mode follows from where they are standing, so the same command wires the published source. Their plugins resolve from the published marketplace, and the book reaches them as a published rendering rather than a path they can open.
+- **Act 1 also writes the machine seat, `~/.spnenv`.** The command writes the file's **shape** — its markers, its managed defaults and an empty keep region. **It derives no key**, so a fresh partner file has nothing to fill in yet. A key arrives later, when you build what needs it, and you ask them for the value. Their own keys go in `spnutils:dev`, which no run reads or writes. Never print a value back — `refs/cross-repo.md` § The machine seat carries the rule.
 - **Act 10 is a conversation, not a generation.** Hand it to `ideate`, which agrees one block at a time. A concept you drafted whole is a concept nobody agreed to.
 - **Acts 11 to 13 are the acceptance, and they are what day zero is for.** A partner who has never seen this estate finishes the walk, runs the local stack, and sees the default SaaS Plane platform answer. Anything short of that is a form somebody filled in.
-- **Acts 12 and 13 go through the CLI's own doors.** `infra organization up` and `infra platform up` are the verbs, and `tofu apply` is never hand-run, locally or anywhere else.
+- **Acts 12 and 13 go through the CLI's own doors.** `infra organization up` and `infra platform up` are the commands, and `tofu apply` is never hand-run, locally or anywhere else.
 - **Stop at the end of each act and say what it produced.** The developer is watching a workspace appear out of nothing, and a silent run of the whole walk gives them nothing to correct.
 
 ## Act 2 — the workstream that holds the answers
@@ -259,12 +259,12 @@ Then say which act runs next, and run it.
 4. **Wait.** Then confirm what is set with `spnutils workspace status`, which reports key names and set-state.
 
 - **Never print a value back, and never read a region of that file onto the screen.** A transcript outlives the session that wrote it, and a printed credential is exposed from that moment. `refs/cross-repo.md` § The machine seat carries the rule.
-- **Confirm presence, never content.** The status verb answers *is it set* without answering *what is it*, which is the only question you need.
+- **Confirm presence, never content.** The status command answers *is it set* without answering *what is it*, which is the only question you need.
 - **A key they choose to skip is an answer.** Say which family will refuse to boot, and let them decide. Do not fill one in, and do not invent a test value.
 
 ## Act 12 — bring the estate up
 
-Two verbs, in order, because the platform layer reads what the organization layer wrote.
+Two commands, in order, because the platform layer reads what the organization layer wrote.
 
 ```
 spnutils infra organization up
@@ -329,6 +329,6 @@ A session that opens with a status dump greets nobody. Greet them, then show the
 - **Never invent a legal entity, an owner's name, or a cloud region.** These are the three an agent reaches for when it wants to be helpful, and all three end up in a manifest somebody signs.
 - **Never print a provider key back, and never read the machine seat onto the screen.** Confirm that a key is set; never confirm what it is.
 - **Never run an act whose input nobody supplied.** A default you chose quietly is the hardest kind of decision to find later.
-- **Never hand-write a manifest, a settings file or a scaffolded folder.** The verb that owns it writes it, and a hand-made copy drifts from the standard on the day it is created.
+- **Never hand-write a manifest, a settings file or a scaffolded folder.** The command that owns it writes it, and a hand-made copy drifts from the standard on the day it is created.
 - **Never skip act 1.** A workspace nobody minted has no permission floor, so the session guiding the rest of the walk is the one session with no guidance.
 - **Never ask a question before the arc exists.** An answer given to a session with nowhere to put it is an answer the next window cannot read.

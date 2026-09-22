@@ -765,7 +765,7 @@ function checkProof(file: string, src: string): Finding[] {
     // entry, a `bash tests/…` invocation and a `./script` are all the same fact — real, runnable
     // by whoever holds this checkout, and unrunnable by the partner the Proof row is written for.
     if (/^pnpm task:|^(bash|sh|zsh) \S|^\.\//.test(r))
-      f.push({ check: "proof", grade: "SOFT", file, message: `\`${r}\` runs here and not for a partner — it is a script this repository carries rather than a verb an installed workspace has. **This is a true finding, not a heuristic miss.** It is accepted only while no verb runs it; when one exists, name the verb` });
+      f.push({ check: "proof", grade: "SOFT", file, message: `\`${r}\` runs here and not for a partner — it is a script this repository carries rather than a command an installed workspace has. **This is a true finding, not a heuristic miss.** It is accepted only while no command runs it; when one exists, name the command` });
     else if (!installable.test(r) && r.split(" ").length <= 6 && /[a-z]/.test(r) && !/^the /.test(r))
       f.push({ check: "proof", grade: "SOFT", file, message: `\`${r}\` may not name a command an installed workspace has` });
   }
@@ -893,7 +893,7 @@ function checkBinds(file: string, src: string, block: any, nodes: Set<string>): 
         const bare = p.replace(/^the\s+/i, "").toLowerCase();
         if (!bare) continue;
         if (![...nodes].some((n) => n === bare || n.includes(bare) || bare.includes(n)))
-          f.push({ check: "binds", grade: "RULE", file, message: `\`${block.status}\` is claimed and the \`Node\` cell \`${p}\` resolves to no node, plugin or repository. A verb, a command or a house word is none of the three — name the node here and put what it provides in \`what it realizes\` (RD.DOCS.066)` });
+          f.push({ check: "binds", grade: "RULE", file, message: `\`${block.status}\` is claimed and the \`Node\` cell \`${p}\` resolves to no node, plugin or repository. A command or a house word is none of the three — name the node here and put what it provides in \`what it realizes\` (RD.DOCS.066)` });
       }
     }
     const proofRows = j < 0 ? [] : tablesIn(file, src.slice(j)).flat();
@@ -1887,7 +1887,7 @@ function realizingNodes(seatFile: string): string[] {
 /**
  * The three halves of *the capabilities seat mirrors the code*, checked together.
  *
- * They are one verb because each alone is satisfiable by doing nothing. A check that every chapter
+ * They are one check because each alone is satisfiable by doing nothing. A check that every chapter
  * names a construct passes on an empty seat; a check that every construct has a chapter passes on a
  * repository with no packages. Only together do they say the seat and the code are the same shape.
  *
@@ -1953,7 +1953,7 @@ function coverageCheck(repo: string, workspace: string): Finding[] {
  * measurement, and why a stale one is safe to leave standing.
  *
  * IT EDITS NOTHING IT MEASURES. A scan that fixes as it goes cannot be trusted as a measure, and
- * that is the whole reason this is a verb of its own rather than a flag on `face`.
+ * that is the whole reason this is an audit of its own rather than a flag on `face`.
  *
  * **It says what it does not measure.** Three of the nine prose faults cannot be told from good
  * prose by a pattern; a construct nobody has written cannot be counted against a list nobody has
@@ -2049,7 +2049,7 @@ function gapReport(repo: string, workspace: string): number {
     "",
     "`For: Architect · Editor` · `Status: ✅ DONE`",
     "",
-    `Measured ${at}. **Nothing here was fixed while it was counted** — a scan that edits as it goes cannot be trusted as a measure, so this verb writes one file and touches nothing else.`,
+    `Measured ${at}. **Nothing here was fixed while it was counted** — a scan that edits as it goes cannot be trusted as a measure, so this audit writes one file and touches nothing else.`,
     "",
     "## The seats",
     "",
@@ -2102,7 +2102,7 @@ function gapReport(repo: string, workspace: string): number {
     "## What this report does not measure",
     "",
     row(["Not measured", "Why", "What would measure it"]), row(["---", "---", "---"]),
-    row(["Comments owed per package", "the symbol index is a per-package build this verb does not run", "`spnutils apps gen-symbols -p <pkg>`"]),
+    row(["Comments owed per package", "the symbol index is a per-package build this audit does not run", "`spnutils apps gen-symbols -p <pkg>`"]),
     row(["Whether a written construct is TRUE", "a count cannot read", "the two-per-wave read"]),
     row(["The constructs a concept has not listed", "see the note above", "`docs.ts face`, once the constructs exist"]),
     "",
@@ -2176,7 +2176,7 @@ function workspaceRoot(from: string): string {
 
 const workspace = process.env.SPN_WORKSPACE ?? workspaceRoot(process.cwd());
 
-// One line per verb, in the same log and the same shape as the Python checks, so the port can be
+// One line per tool run, in the same log and the same shape as the Python checks, so the port can be
 // measured against what it replaced. Off unless `workspace timings --on` has been run.
 const startedAt = performance.now();
 begin({ event: process.env.CLAUDE_HOOK_EVENT ?? "command", tool: null, session: process.env.CLAUDE_SESSION_ID ?? null }, workspace);

@@ -1,7 +1,7 @@
 <meta charset="utf-8">
-<title>Stack Skills — A Stack's Own Verbs</title>
+<title>Stack Skills — The Five a Stack Ships</title>
 <!-- spn:doc
-{"id":"stack-skills","variant":"construct","title":"Stack Skills — A Stack's Own Verbs","lenses":["SERVER_DEV","WEB_DEV"],"status":"PLANNING","dependsOn":["skill-set"],"summary":"The verbs that can only be said in one stack's own words — what makes a verb stack-concrete, why one of them divides into ordered steps, why a mode is an argument, and the verb that is deliberately absent here.","keywords":["skill","verb","steps","contract-first","mode","absence"]}
+{"id":"stack-skills","variant":"construct","title":"Stack Skills — The Five a Stack Ships","lenses":["SERVER_DEV","WEB_DEV"],"status":"PLANNING","dependsOn":["skill-set"],"summary":"The skills that can only be said in one stack's own words — what makes a skill stack-concrete, why one of them divides into ordered steps, why a mode is an argument, and the skill that is deliberately absent here.","keywords":["skill","stack","steps","contract-first","mode","absence"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
 <style>
@@ -179,10 +179,10 @@
 
 <header class="masthead">
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Stack Skills — A Stack's Own Verbs</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Construct</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">Backend developer</span><span class="badge lens">Web developer</span></span><span class="st"><span class="lbl">Status:</span> <span class="badge status planning">&#x1F52E; PLANNING</span></span></span></div>
-  <h1>Stack Skills — A Stack's Own Verbs</h1>
-  <p class="standfirst">A verb belongs to a stack when the steps behind it name that stack's own commands, layers and file shapes. Scaffolding a project, building a capability, running the suites, proving a package: each of those is a different walk in a different stack, so each lives in the plugin for the stack it describes.</p>
-  <p>The absence here is as deliberate as anything present. <strong>Planning is not a stack verb.</strong> The book's set of verbs is closed and carries no planning verb for this world, so shipping one would add a value the standard does not have, and two skills would then compete for the same ask. The verb stays in the core plugin, and this plugin supplies only the layer that verb reads.</p>
+  <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Stack Skills — The Five a Stack Ships</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Construct</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">Backend developer</span><span class="badge lens">Web developer</span></span><span class="st"><span class="lbl">Status:</span> <span class="badge status planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>Stack Skills — The Five a Stack Ships</h1>
+  <p class="standfirst">A skill belongs to a stack when the steps behind it name that stack's own commands, layers and file shapes. Scaffolding a project, building a capability, running the suites, proving a package: each of those is a different walk in a different stack, so each lives in the plugin for the stack it describes.</p>
+  <p>The absence here is as deliberate as anything present. <strong>Planning is not a stack skill.</strong> The book's set of skills is closed and carries no planning skill for this world, so shipping one would add a value the standard does not have, and two skills would then compete for the same ask. The skill stays in the core plugin, and this plugin supplies only the layer that skill reads.</p>
 </header>
 
 <!-- 00 -->
@@ -191,12 +191,12 @@
   <div class="scroll"><table>
     <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
     <tbody>
-      <tr><td>a stack verb</td><td><code>SKILL.md</code></td><td>one folder under this plugin's <code>skills/</code>, named for a verb of the command group this stack answers to</td></tr>
-      <tr><td>a mode</td><td>—</td><td>an argument a verb's own description names, so one folder answers several close asks</td></tr>
+      <tr><td>a stack skill</td><td><code>SKILL.md</code></td><td>one folder under this plugin's <code>skills/</code>, named for a command of the group this stack answers to</td></tr>
+      <tr><td>a mode</td><td>—</td><td>an argument a skill's own description names, so one folder answers several close asks</td></tr>
       <tr><td>a step</td><td><code>steps/</code></td><td>one file of a longer walk, read only when the skill's own router names it</td></tr>
       <tr><td>the contract-first order</td><td>—</td><td>the fixed order the steps run in, because everything downstream is generated from the contract or written against it</td></tr>
       <tr><td>the classification</td><td>—</td><td>the first thing the router does: deciding which layers an ask actually touches</td></tr>
-      <tr><td>the closing gate</td><td>—</td><td>the review a verb hands its own work to, named in its description so the hand-off happens without being asked for</td></tr>
+      <tr><td>the closing gate</td><td>—</td><td>the review a skill hands its own work to, named in its description so the hand-off happens without being asked for</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -204,9 +204,9 @@
 <!-- 01 -->
 <section id="s1">
   <div class="sec-head"><h2>Model</h2></div>
-  <p>The ask is matched to a verb, the verb is narrowed by a mode, and only the longest verb divides further into ordered steps.</p>
+  <p>The ask is matched to a skill, the skill is narrowed by a mode, and only the longest skill divides further into ordered steps.</p>
   <figure>
-  <svg class="dg" viewBox="423 22 254 428" style="max-width:254px" role="img" aria-label="Each step narrows the one before it, and only the build verb divides into ordered steps at all.">
+  <svg class="dg" viewBox="423 22 254 428" style="max-width:254px" role="img" aria-label="Each step narrows the one before it, and only the build skill divides into ordered steps at all.">
     <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
     <rect class="box" x="425" y="24" width="250" height="76" rx="3"/>
     <text class="l" x="441" y="50">the ask</text>
@@ -215,7 +215,7 @@
     <path class="c" d="M550 100 V140" marker-end="url(#ar)"/>
     <text class="n" x="560" y="124">matched to</text>
     <rect class="box" x="425" y="140" width="250" height="76" rx="3"/>
-    <text class="l" x="441" y="166">the verb</text>
+    <text class="l" x="441" y="166">the skill</text>
     <text class="n" x="441" y="185">one of the five folders, chosen by</text>
     <text class="n" x="441" y="204">its own description</text>
     <path class="c" d="M550 216 V256" marker-end="url(#ar)"/>
@@ -231,14 +231,14 @@
     <text class="n" x="441" y="417">one skill divides into ordered</text>
     <text class="n" x="441" y="436">files; the rest do not</text>
   </svg>
-    <figcaption>Each step narrows the one before it, and only the build verb divides into ordered steps at all.</figcaption>
+    <figcaption>Each step narrows the one before it, and only the build skill divides into ordered steps at all.</figcaption>
   </figure>
   <!-- dg:source
 { "kind": "map",
-  "caption": "Each step narrows the one before it, and only the build verb divides into ordered steps at all.",
+  "caption": "Each step narrows the one before it, and only the build skill divides into ordered steps at all.",
   "boxes": [
     { "id": "a", "label": "the ask", "note": "build, scaffold, run, prove, review — in your own words" },
-    { "id": "b", "label": "the verb", "note": "one of the five folders, chosen by its own description" },
+    { "id": "b", "label": "the skill", "note": "one of the five folders, chosen by its own description" },
     { "id": "c", "label": "the mode", "note": "an argument the description names, never a second skill" },
     { "id": "d", "label": "the steps", "note": "one skill divides into ordered files; the rest do not" }
   ],
@@ -253,30 +253,30 @@
 <!-- 02 -->
 <section id="s2">
   <div class="sec-head"><h2>Parts</h2></div>
-  <h3 id="one-verb-divides-into-steps-and-the-orde">One verb divides into steps, and the order is the rule</h3>
-  <p>The contract comes first, and everything downstream is generated from it or written against it. A service written before its state is a service that will be rewritten. So the build verb is the only folder here with a step folder, its steps run in a fixed order, and each one is read before that layer's code is written rather than after. <em>Where:</em> <code>plugins/spn-apps-ts/skills/implement/steps/</code></p>
+  <h3 id="one-skill-divides-into-steps-and-the-ord">One skill divides into steps, and the order is the rule</h3>
+  <p>The contract comes first, and everything downstream is generated from it or written against it. A service written before its state is a service that will be rewritten. So the build skill is the only folder here with a step folder, its steps run in a fixed order, and each one is read before that layer's code is written rather than after. <em>Where:</em> <code>plugins/spn-apps-ts/skills/implement/steps/</code></p>
   <h3 id="the-router-classifies-before-it-sequence">The router classifies before it sequences</h3>
-  <p>The build verb first decides whether the ask touches the back end alone, the front end alone, or both, and that classification decides which steps apply. Sequencing every step for every ask would make the smallest change cost the largest walk. <em>Where:</em> <code>plugins/spn-apps-ts/skills/implement/SKILL.md</code></p>
+  <p>The build skill first decides whether the ask touches the back end alone, the front end alone, or both, and that classification decides which steps apply. Sequencing every step for every ask would make the smallest change cost the largest walk. <em>Where:</em> <code>plugins/spn-apps-ts/skills/implement/SKILL.md</code></p>
   <h3 id="a-mode-is-an-argument-not-a-second-folde">A mode is an argument, not a second folder</h3>
-  <p>Two folders with almost the same description compete for the same match, and the matching gets worse as the pair grows. So a verb answering several close asks takes a mode, names its modes in the sentence a session matches against, and says which neighbouring verb an adjacent ask belongs to instead. A destructive mode says it is destructive in that same sentence. <em>Where:</em> <code>plugins/spn-apps-ts/skills/verify/SKILL.md</code></p>
+  <p>Two folders with almost the same description compete for the same match, and the matching gets worse as the pair grows. So a skill answering several close asks takes a mode, names its modes in the sentence a session matches against, and says which neighbouring skill an adjacent ask belongs to instead. A destructive mode says it is destructive in that same sentence. <em>Where:</em> <code>plugins/spn-apps-ts/skills/verify/SKILL.md</code></p>
   <h3 id="a-step-carries-rules-it-does-not-own">A step carries rules it does not own</h3>
   <p>A step file is where the next developer copies from, so a rule missing there is a rule that will not be followed, and a rule invented there is a second source. The steps that carry rules carry them under the same stamp a ref carries, and cite their chapters in the text where they do not. <em>Where:</em> <code>plugins/spn-apps-ts/skills/implement/steps/contract.md</code>, <code>plugins/spn-apps-ts/skills/implement/steps/service.md</code></p>
-  <h3 id="the-closing-gate-belongs-to-the-verb">The closing gate belongs to the verb</h3>
-  <p>A contract change reviewed at the end of a session is reviewed by the context that wrote it. So the build verb closes with the suites and then hands the change to the review verb in its contract mode, and the hand-off is named in the description, so it happens even when nobody asks for it. <em>Where:</em> <code>plugins/spn-apps-ts/skills/implement/SKILL.md</code></p>
-  <h3 id="the-absent-verb-and-where-its-layer-live">The absent verb, and where its layer lives</h3>
-  <p>Planning stays in the core plugin. What this plugin ships instead is reference material the planning verb reads once it has resolved which stack it is standing in. That keeps one verb, one description and one match, with a concrete step at the end of it. <em>Where:</em> <code>plugins/spn-apps-ts/refs/plan.md</code></p>
+  <h3 id="the-closing-gate-belongs-to-the-skill">The closing gate belongs to the skill</h3>
+  <p>A contract change reviewed at the end of a session is reviewed by the context that wrote it. So the build skill closes with the suites and then hands the change to the review skill in its contract mode, and the hand-off is named in the description, so it happens even when nobody asks for it. <em>Where:</em> <code>plugins/spn-apps-ts/skills/implement/SKILL.md</code></p>
+  <h3 id="the-absent-skill-and-where-its-layer-liv">The absent skill, and where its layer lives</h3>
+  <p>Planning stays in the core plugin. What this plugin ships instead is reference material the planning skill reads once it has resolved which stack it is standing in. That keeps one skill, one description and one match, with a concrete step at the end of it. <em>Where:</em> <code>plugins/spn-apps-ts/refs/plan.md</code></p>
 </section>
 
 <!-- 03 -->
 <section id="s3">
   <div class="sec-head"><h2>Boundary</h2></div>
-  <p>This page answers what makes a verb this stack's own, and how the verbs here are shaped. It does not answer what a skill is — the frontmatter, the matching against a listing, and the rule that a skill carries steps and never a rule are <a href="../01-spn-core/07-skill-set-construct.html">The Skill</a>. It does not answer what the planning layer says either.</p>
+  <p>This page answers what makes a skill this stack's own, and how the skills here are shaped. It does not answer what a skill is — the frontmatter, the matching against a listing, and the rule that a skill carries steps and never a rule are <a href="../01-spn-core/07-skill-set-construct.html">The Skill</a>. It does not answer what the planning layer says either.</p>
   <div class="scroll"><table>
     <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
     <tbody>
-      <tr><td>the verbs this stack answers to, the step order behind the longest of them, and the modes each one takes</td><td>the frontmatter, the listing, the matching and the step mechanism</td><td><a href="../01-spn-core/07-skill-set-construct.html">The Skill</a></td></tr>
-      <tr><td>that the planning verb is deliberately absent here</td><td>the planning verb itself, and the layer this plugin hands it</td><td><a href="./04-stack-refs-construct.html">Stack Refs</a></td></tr>
-      <tr><td>that a verb hands its own work to a review at its close</td><td>what that review checks, and which viewpoint it convenes</td><td><a href="../01-spn-core/09-lenses-construct.html">The Lens</a></td></tr>
+      <tr><td>the skills this stack answers to, the step order behind the longest of them, and the modes each one takes</td><td>the frontmatter, the listing, the matching and the step mechanism</td><td><a href="../01-spn-core/07-skill-set-construct.html">The Skill</a></td></tr>
+      <tr><td>that the planning skill is deliberately absent here</td><td>the planning skill itself, and the layer this plugin hands it</td><td><a href="./04-stack-refs-construct.html">Stack Refs</a></td></tr>
+      <tr><td>that a skill hands its own work to a review at its close</td><td>what that review checks, and which viewpoint it convenes</td><td><a href="../01-spn-core/09-lenses-construct.html">The Lens</a></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -287,7 +287,7 @@
   <div class="scroll"><table>
     <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
     <tbody>
-      <tr><td>the foundation's DevEx Skills construct</td><td>the verb set is closed, and a skill's value spells the domain of the plugin that ships it</td><td>MUST</td></tr>
+      <tr><td>the foundation's DevEx Skills construct</td><td>the skill set is closed, and a skill's value spells the domain of the plugin that ships it</td><td>MUST</td></tr>
       <tr><td><code>RD.DEVEX.019</code></td><td>every step restates a chapter of the provider standard and adds no rule of its own</td><td>MUST</td></tr>
       <tr><td>the foundation's <code>02-delivery.md</code> § When an edit becomes behaviour</td><td>a skill edit is loadable only after an install and a fresh window</td><td>MUST</td></tr>
     </tbody>
@@ -296,7 +296,7 @@
     <thead><tr><th>Repo</th><th>Node</th><th>What it realizes</th><th>State</th></tr></thead>
     <tbody>
       <tr><td>spn-foundation</td><td><code>01-devex/02-agent/02-skills</code></td><td>the foundation construct this one realizes</td><td>planned</td></tr>
-      <tr><td>spn-claude-marketplace</td><td><code>spn-apps-ts</code></td><td>the verbs for a TypeScript stack repository, the ordered steps behind the build verb, and the deliberate absence where planning would be</td><td>planned</td></tr>
+      <tr><td>spn-claude-marketplace</td><td><code>spn-apps-ts</code></td><td>the skills for a TypeScript stack repository, the ordered steps behind the build skill, and the deliberate absence where planning would be</td><td>planned</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -314,7 +314,7 @@
       <tr><td><code>MKT.TSSKILL.04</code></td><td>learn a mode is destructive before it runs</td><td>UNIT</td><td>PLANNED</td></tr>
       <tr><td><code>MKT.TSSKILL.05</code></td><td>copy from a step file and get the rules with it</td><td>UNIT</td><td>PLANNED</td></tr>
       <tr><td><code>MKT.TSSKILL.06</code></td><td>have a contract change reviewed by something that did not write it</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.TSSKILL.07</code></td><td>plan in a stack repository without a second planning verb competing</td><td>UNIT</td><td>PLANNED</td></tr>
+      <tr><td><code>MKT.TSSKILL.07</code></td><td>plan in a stack repository without a second planning skill competing</td><td>UNIT</td><td>PLANNED</td></tr>
     </tbody>
   </table></div>
   <div class="scroll"><table>

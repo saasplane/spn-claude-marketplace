@@ -22,8 +22,8 @@ The marketplace ships three plugins. Which of them a repository loads follows fr
 | Plugin | Carries | Loaded by |
 | --- | --- | --- |
 | `spn-core` | the stage skills, the day-zero walk, the engineer persona, the review panel and its lenses, the document checks, the cross-repo protocol, and the orientation a window opens with | every repository |
-| `spn-apps-ts` | the TypeScript verb skills — new, implement, review, run, verify — their step files, and the write-time guards over enablement grammar, naming and what proves a change | an `APPS` repository claiming `TS` |
-| `spn-infra` | the estate verb skills, the manifest and naming cards, the estate laws, and the guard over secrets and account identifiers | an `INFRA` repository |
+| `spn-apps-ts` | the TypeScript skills — new, implement, review, run, verify — their step files, and the write-time guards over enablement grammar, naming and what proves a change | an `APPS` repository claiming `TS` |
+| `spn-infra` | the estate skills, the manifest and naming cards, the estate laws, and the guard over secrets and account identifiers | an `INFRA` repository |
 
 **A plugin is how delivery is divided, and it is not how understanding is divided.** The same hook grammar governs a check in `spn-core` and a check in `spn-apps-ts`. So this repository's own documents divide by the kind of instrument, and you never have to work out which plugin answers a question before you can ask it.
 
@@ -34,7 +34,7 @@ Everything a plugin folder holds is one of five things. A plugin carries any mix
 | Instrument | What it is | When you meet it |
 | --- | --- | --- |
 | a **hook** | code the runtime calls for you, wired to a moment in the session | at the moment a write would land, when a window opens, when a turn ends |
-| a **skill** | a verb's steps, loaded once the work matches its description | when you ask for the thing it covers, or name it directly |
+| a **skill** | a stage's steps, loaded once the work matches its description | when you ask for the thing it covers, or name it directly |
 | a **ref** | a chapter restated as markdown, stamped with the version it last saw | when a skill loads it, or when you read one for the vocabulary |
 | a **lens** | one reviewer's viewpoint, with the authority that viewpoint carries | when a review is convened at a gate |
 | an **agent brief** | a persona a session can convene, bound by the tools it declares | when work is delegated to a fresh context |
@@ -47,7 +47,7 @@ Each boundary below exists because crossing it would make something else here un
 
 - **Not a place a rule is authored.** A rule true of every repository belongs to the foundation book. What sits here is a restatement that names its chapter, so a checker can tell you when the two have parted company.
 - **Not a package anything runs on.** Nothing here is imported by a service or shipped to a consumer. The `@saasplane` packages, the platform modules and the blueprint library travel through granted registries, separately.
-- **Not a repository with nodes.** It declares `GENERAL`, holds no apps and no packages, and answers to no stack. The apps and estate verbs decline it by name, which is the correct answer rather than a gap.
+- **Not a repository with nodes.** It declares `GENERAL`, holds no apps and no packages, and answers to no stack. The apps and estate commands decline it by name, which is the correct answer rather than a gap.
 - **Not a second copy of the book.** You get the rules as far as a session needs them. Where you want the full argument, the ref names the chapter and you read it there.
 
 ## How a change reaches you

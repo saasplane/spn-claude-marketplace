@@ -53,5 +53,5 @@ Eleven files sit under `plugins/spn-core/refs/lenses/`, one per reviewing viewpo
 | --- | --- | --- | --- |
 | takes | spn-foundation | the chapters each viewpoint restates, stamped per file | a lens carries rules it does not own |
 | publishes | spn-core's agents | the eleven files the panel reads by name | one procedure, any viewpoint |
-| publishes | spn-core's skills | the gate each verb names — after a plan draft, a contract change, a build | a skill says which lens to convene and when |
+| publishes | spn-core's skills | the gate each skill names — after a plan draft, a contract change, a build | a skill says which lens to convene and when |
 | publishes | every document in the workspace | the audience values a metadata block may declare | the reader and the reviewer are one list |

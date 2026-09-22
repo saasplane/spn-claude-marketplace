@@ -27,7 +27,7 @@ A tool and a check draw the same line between refusing and reporting, and they d
 | a finding | `Finding` | one thing a run found: which check raised it, its grade, the file, and what a reader should do |
 | the grade | `Grade` | how a finding is weighted — `RULE` refuses and `SOFT` reports |
 | the exit code | — | the count of refusals; a report alone leaves a run green |
-| a verb | — | one named job inside a tool, such as `audit`, `page`, `topics` or `coverage` |
+| a job | — | one named unit of work inside a tool, such as `audit`, `page`, `topics` or `coverage` |
 | silence | — | the answer where the input a question needs is absent, which is a fact about the repository rather than a finding about it |
 
 ## Model
@@ -58,9 +58,9 @@ The exit code is what a pipeline reads and the findings are what a person reads,
 
 A rule answered one way while a file is written and another way in a sweep is two rules. So the code that decides lives once, and both callers import it. The practical consequence is that the same file must read a document in both of its spellings — the markdown an author writes and the HTML a page is produced as — because reading only one of them once reported every hand-written page as missing every section it carried. *Where:* `plugins/spn-core/hooks/tools/docs.ts`
 
-### A verb, not a flag
+### A job, not a flag
 
-A tool with more than one job gives each job a verb and a path argument, and a path is a file or a folder in every one of them. Given a folder, a verb means every document under it, which is what anybody typing one meant. *Where:* `plugins/spn-core/hooks/tools/docs.ts`
+A tool with more than one job gives each job a name and a path argument, and a path is a file or a folder in every one of them. Given a folder, a job means every document under it, which is what anybody typing one meant. *Where:* `plugins/spn-core/hooks/tools/docs.ts`
 
 ### Two questions that look alike and are not
 
@@ -84,7 +84,7 @@ One tool here writes. It reads a run's own results file and puts what the run fo
 
 ## Boundary
 
-This page answers what a tool is, how it is reached, and what it answers with. It does not answer what a hook is or how a verdict is composed — that is [The Hook](02-hook-set.md). It does not answer the page production either: producing and checking a page is a subject of its own, and the verbs that do it are named on that page.
+This page answers what a tool is, how it is reached, and what it answers with. It does not answer what a hook is or how a verdict is composed — that is [The Hook](02-hook-set.md). It does not answer the page production either: producing and checking a page is a subject of its own, and the jobs that do it are named on that page.
 
 | Owns | Refuses | Who owns that instead |
 | --- | --- | --- |
@@ -97,7 +97,7 @@ This page answers what a tool is, how it is reached, and what it answers with. I
 | Rule | What it decides | Weight |
 | --- | --- | --- |
 | `RD.DEVEX.019` | a tool restates a chapter and adds no rule of its own | MUST |
-| `RD.GOV.024` | this repository is served with docs verbs alone, which is why its own rows are written by a tool the plugins ship | MUST |
+| `RD.GOV.024` | this repository is served with docs commands alone, which is why its own rows are written by a tool the plugins ship | MUST |
 | the foundation's `02-delivery.md` § What it makes checkable | which standards a tool is expected to answer rather than a reader | MUST |
 
 | Repo | Node | What it realizes | State |

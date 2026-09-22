@@ -22,8 +22,8 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | MKT.SKILL.01 | Engineering leader | ask for the same thing twice and get the same steps both times | The ask matches one named walk rather than an improvisation invented fresh each time | POSITIVE | UNIT | PLANNED | — |
 | MKT.SKILL.02 | Backend developer | pay nothing for a large skill on a turn that never needed it | Only the listing is held in full; the file is read once a description matches | POSITIVE | UNIT | PLANNED | — |
-| MKT.SKILL.03 | Architect | reach a stack-concrete step from a verb that is stack-agnostic | The verb resolves the repository's own claim and reads that stack's layer file | POSITIVE | UNIT | PLANNED | — |
+| MKT.SKILL.03 | Architect | reach a stack-concrete step from a skill that is stack-agnostic | The skill resolves the repository's own claim and reads that stack's layer file | POSITIVE | UNIT | PLANNED | — |
 | MKT.SKILL.04 | Engineering leader | ask a close variant and land in one folder rather than between two | A mode is an argument the description names, and the description says which neighbour takes an adjacent ask | POSITIVE | UNIT | PLANNED | — |
-| MKT.SKILL.05 | Architect | decide what something IS one agreed block at a time | An interactive verb asks, and runs no act on an answer nobody gave | POSITIVE | UNIT | PLANNED | — |
-| MKT.SKILL.06 | Engineering leader | never receive a report nobody asked for | The reporting verb says in its own description that it is never run unasked | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SKILL.05 | Architect | decide what something IS one agreed block at a time | An interactive skill asks, and runs no act on an answer nobody gave | POSITIVE | UNIT | PLANNED | — |
+| MKT.SKILL.06 | Engineering leader | never receive a report nobody asked for | The reporting skill says in its own description that it is never run unasked | NEGATIVE | UNIT | PLANNED | — |
 | MKT.SKILL.07 | Architect | find the rule a skill carries stated somewhere a check can read | A skill names the chapter or card holding the rule and states none of its own | POSITIVE | UNIT | PLANNED | — |

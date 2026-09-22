@@ -55,5 +55,5 @@ Four markdown files sit under `plugins/spn-core/agents/`, each a persona a sessi
 | --- | --- | --- | --- |
 | takes | spn-core's refs | the eleven lens files, read by name when the panel is convened | one brief reviews from any viewpoint |
 | takes | spn-core's tools | the flagged paragraphs the prose triage reports | the rewriter reads candidates, never a corpus |
-| publishes | spn-core's skills | the gate personas each verb convenes after a plan, a contract change or a build | a skill says who reads next |
+| publishes | spn-core's skills | the gate personas each skill convenes after a plan, a contract change or a build | a skill says who reads next |
 | publishes | every session | four names a turn can convene without opening a second window | a fresh read costs a call, not a context |

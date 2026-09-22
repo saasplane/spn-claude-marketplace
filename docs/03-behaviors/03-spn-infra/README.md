@@ -22,5 +22,5 @@ Each file here holds the rows of one construct, and it sits at the same path and
 | File | The construct it proves |
 | --- | --- |
 | [01-estate-guard.md](01-estate-guard.md) | The estate guard — one script wired to every write |
-| [02-estate-skills.md](02-estate-skills.md) | Estate skills — the verbs that change an estate |
+| [02-estate-skills.md](02-estate-skills.md) | Estate skills — the skills that change an estate |
 | [03-estate-refs.md](03-estate-refs.md) | Estate refs — the estate's vocabulary, restated as cards |

@@ -18,8 +18,8 @@ description: Turn a requirement into a design the platform's own vocabulary can 
 
 ## First, resolve the layer — before anything below
 
-Planning is one verb (`DEVEX_PLAN`) and it lives only here. What changes by node is *reference
-material*, never the verb, so resolve the node and load its layers before applying a single rule:
+Planning is one skill (`DEVEX_PLAN`) and it lives only here. What changes by node is *reference
+material*, never the skill, so resolve the node and load its layers before applying a single rule:
 
 1. **Find the node's law** — the nearest `sprepo.json` above the file names the **world**
    (`FOUNDATION` · `APPS` · `INFRA`) and the **stack claim**. The node's own manifest

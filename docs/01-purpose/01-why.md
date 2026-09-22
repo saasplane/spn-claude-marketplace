@@ -36,7 +36,7 @@ An instrument is loaded by a runtime on your own machine. That is the whole reas
 Several things move at once when that happens:
 
 - **A rule fires where the work is.** A hook runs at the moment a write would land, so a defect is answered before it is a file on disk rather than after it is a line in a diff.
-- **A verb carries its own steps.** A skill is loaded when the work matches it, so the procedure arrives with the task instead of being looked up.
+- **A skill carries its own steps.** A skill is loaded when the work matches it, so the procedure arrives with the task instead of being looked up.
 - **A standard travels to people you never meet.** Publishing here is pushing the repository, and a partner installs the result the same way you do.
 
 ## Why it authors no rule of its own

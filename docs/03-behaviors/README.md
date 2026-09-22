@@ -17,7 +17,7 @@
 
 One file of rows sits beside each construct, at the same relative path and the same number. So `03-behaviors/01-spn-core/04-checks.md` proves `02-constructs/01-spn-core/04-checks.md`, and a produced page joins its own rows with nothing to look up.
 
-**This repository writes its own rows.** It declares no stack, so the deterministic tool serves it with its docs verbs alone and has no runner for it. The plugins' own suites are the runner: a case whose title carries a row's id becomes a result, the results become an artifact in the pocket, and the writer puts what the run found into the `Status` and the `Updated at` cells. Every other cell is a decision somebody made, and nothing writes over those.
+**This repository writes its own rows.** It declares no stack, so the deterministic tool serves it with its docs commands alone and has no runner for it. The plugins' own suites are the runner: a case whose title carries a row's id becomes a result, the results become an artifact in the pocket, and the writer puts what the run found into the `Status` and the `Updated at` cells. Every other cell is a decision somebody made, and nothing writes over those.
 
 **The actor each row names is defined once, in [personas](personas.md).** The people who meet these plugins are engineering functions, so every `Who` cell resolves to one of the lens register's own names and no area invents a word of its own.
 
@@ -27,4 +27,4 @@ One file of rows sits beside each construct, at the same relative path and the s
 | --- | --- |
 | [spn-core](01-spn-core/README.md) | The plugin every repository loads, and everything a session reads from it |
 | [spn-apps-ts](02-spn-apps-ts/README.md) | The apps world made concrete for TypeScript |
-| [spn-infra](03-spn-infra/README.md) | The estate world, and the boundary none of its verbs crosses |
+| [spn-infra](03-spn-infra/README.md) | The estate world, and the boundary none of its skills crosses |

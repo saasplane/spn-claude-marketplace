@@ -1,6 +1,6 @@
 ---
 name: declare
-description: The declare verb for SaaS Plane estate repos - a change to what the estate IS, done as a manifest edit, validated, and reviewed as a one-line-per-choice diff. Use when adding or changing an environment, an app grant row, a module row, a region, a schema, a size, a hosting or a deploy trigger. Not for authoring a new module package (module-author skill) and not for publishing (release skill).
+description: The declare skill for SaaS Plane estate repos - a change to what the estate IS, done as a manifest edit, validated, and reviewed as a one-line-per-choice diff. Use when adding or changing an environment, an app grant row, a module row, a region, a schema, a size, a hosting or a deploy trigger. Not for authoring a new module package (module-author skill) and not for publishing (release skill).
 ---
 
 # declare — edit the manifest, validate, review the choices
