@@ -45,6 +45,21 @@ function pluginDocuments(root: string): string[] {
     }
   };
   walk(join(root, "plugins"));
+  if (out.length) return out.sort();
+  // A WORKSPACE IS NOT A REPOSITORY, AND THIS IS RUN FROM THE WORKSPACE. `<root>/plugins` exists in
+  // the marketplace checkout and nowhere else, so run from the folder the sibling checkouts sit in
+  // — which is where every other tool here is run from — this found nothing, printed "no plugins
+  // here" and RETURNED 0. A record then carried `restate-drift 0` that had compared nothing at all.
+  // So a root holding no `plugins/` of its own looks one level down for the sibling that has one.
+  let siblings: string[];
+  try { siblings = readdirSync(root).sort(); } catch { return []; }
+  for (const entry of siblings) {
+    if (SKIP.has(entry)) continue;
+    const sibling = join(root, entry);
+    try { if (!statSync(sibling).isDirectory()) continue; } catch { continue; }
+    walk(join(sibling, "plugins"));
+    if (out.length) return out.sort();
+  }
   return out.sort();
 }
 
@@ -63,6 +78,18 @@ function pluginSources(root: string): string[] {
     }
   };
   walk(join(root, "plugins"));
+  if (out.length) return out.sort();
+  // The same blindness as `pluginDocuments` above, and the same fix. Run from the workspace this
+  // found no sources and the summary read `0 broken header(s)` having opened none of them.
+  let siblings: string[];
+  try { siblings = readdirSync(root).sort(); } catch { return []; }
+  for (const entry of siblings) {
+    if (SKIP.has(entry)) continue;
+    const sibling = join(root, entry);
+    try { if (!statSync(sibling).isDirectory()) continue; } catch { continue; }
+    walk(join(sibling, "plugins"));
+    if (out.length) return out.sort();
+  }
   return out.sort();
 }
 
@@ -92,7 +119,11 @@ function headerFindings(root: string, book: string): string[] {
       for (const token of header.cited) {
         const where = resolveSource(token, [
           carried, book, join(book, "docs"), join(book, "docs/04-capabilities"),
-          root, join(root, "plugins"), plugin, dirname(path),
+          // `dirname(plugin)` is the plugins root the file was actually found under, and it is
+          // what makes the answer the same from the workspace as from the marketplace. Without it
+          // `join(root, "plugins")` resolved only when the tool was run from inside the marketplace,
+          // so one header read as broken from one directory and fine from the other.
+          root, join(root, "plugins"), dirname(plugin), plugin, dirname(path),
         ]);
         if (where !== null) { carried = dirname(where); continue; }
         const at = token.includes("/") ? [] : byName(token);
