@@ -9,23 +9,19 @@ description: Produce a report or an approach document into a node's artifacts po
 
 ## The templates
 
-| Template | Answers | Lifecycle |
+| Report | Answers | Read against |
 | --- | --- | --- |
-| `REPO_AUDIT` | what this repository looks like against the standards, today | superseded |
-| `CHANGE_PLAN` | what a proposed change would touch, and in what order | superseded |
-| `SURFACE_DIFF` | what changed in a published surface between two versions | superseded |
-| `TRACEABILITY_MATRIX` | which behaviour rows a run has proved, and which nothing has proved yet | superseded |
-| `ESTATE_PLAN` | what a change needs provisioned, configured, or promoted | superseded |
-| `RELEASE_NOTE` | what shipped in one release | **kept** |
-| `INCIDENT_RECORD` | what happened, what was done, what changed because of it | **kept** |
-| `DRIFT_REPORT` | where the code and the documents disagree | superseded |
+| **`audit`** | is this repository **wired** the way the standard says — its plugin set and versions, its `sprepo.json` and `spkind.json`, its configuration files, and what has drifted from what it declares | the repository standard and the repository's own manifests |
+| **`code`** | where the **source** departs from the stack's standards — naming, structure, the patterns a kind owes | the stack's provider files |
+| **`docs`** | where the **corpus** departs from the docs standards — a missing seat, a page off its template, a term used two ways | the docs chapters |
+| **`tests`** | what the tests have **proved**, and what nothing has proved yet | the behaviour rows, joined to what the last run reported |
 
-- **`superseded`** — replaced in place by the next run of the same template, so a node never accumulates six audits nobody will re-read.
-- **`kept`** — dated in its filename and never overwritten, because the value is the record of that particular moment.
+**All four are superseded** — the next one replaces it in place, so a pocket never holds six audits nobody will re-read. The set is closed (decision `RD.DOCS.089`); a fifth kind is a decision entry rather than a new filename.
+
 
 ## Where it lands
 
-`<node>/docs/artifacts/reports/<template-slug>.html` — or `<template-slug>-<date>.html` where the template is `kept`.
+`<node>/docs/artifacts/reports/<kind>-report.html` — `audit-report.html`, `code-report.html`, `docs-report.html`, `tests-report.html`. The suffix is the page kind and the name is what it measures, so the folder reads without this skill.
 
 - **The artifacts pocket is earned.** A node that has never authored anything has no pocket; creating one is part of writing the first report into it.
 - **Nested folders are allowed here and nowhere else in a pocket**, and sub-folders carry **no `README.md`** — the pocket's own README says what the pocket holds.
@@ -79,5 +75,5 @@ Then the body, and it obeys the corpus rules that apply everywhere. No changelog
 
 - **Never write into a seat.** Reports live in a pocket. A finding that belongs in a standard is a decision entry someone else makes.
 - **Never generate on a schedule or a hunch.** On request only.
-- **Never overwrite a `kept` report**, and never leave two live copies of a `superseded` one.
+- **Never leave two live copies of one kind.** A report is replaced in place, so the previous one goes in the same change.
 - **Never soften a result.** A repository that fails its own standards is reported as failing, with the specific rows; a report whose job is to be reassuring has no job.
