@@ -14,7 +14,7 @@
 
 `For: Engineering leader · Architect` · `Status: 🔮 PLANNING`
 
-These are the promises [The Agent](../../02-constructs/01-spn-core/10-agent-set.md) makes. A row says what somebody can do and what they see when they do it.
+The table below lists the promises [The Agent](../../02-constructs/01-spn-core/10-agent-set.md) makes. A row says what somebody can do and what they see when they do it.
 
 Every row below is declared and none is claimed: a run writes the last two cells.
 

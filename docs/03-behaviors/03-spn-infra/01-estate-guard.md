@@ -14,7 +14,7 @@
 
 `For: DevOps / SRE · DevSecOps / Security` · `Status: 🔮 PLANNING`
 
-These are the promises [The Estate Guard](../../02-constructs/03-spn-infra/01-estate-guard.md) makes. A row says what somebody can do and what they see when they do it.
+[The Estate Guard](../../02-constructs/03-spn-infra/01-estate-guard.md) makes these promises. A row says what somebody can do and what they see when they do it.
 
 Every row below is declared and none is claimed: a run writes the last two cells.
 

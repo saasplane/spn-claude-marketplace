@@ -14,7 +14,7 @@
 
 `For: Architect · Backend developer` · `Status: 🔮 PLANNING`
 
-These are the promises [The Hook](../../02-constructs/01-spn-core/02-hook-set.md) makes. A row says what somebody can do and what they see when they do it.
+The table below lists the promises [The Hook](../../02-constructs/01-spn-core/02-hook-set.md) makes. A row says what somebody can do and what they see when they do it.
 
 Every row below is declared and none is claimed: a run writes the last two cells, and a row no case reached says so.
 

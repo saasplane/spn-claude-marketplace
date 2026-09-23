@@ -14,7 +14,7 @@
 
 `For: DevOps / SRE · Architect` · `Status: 🔮 PLANNING`
 
-These are the promises [Estate Refs](../../02-constructs/03-spn-infra/03-estate-refs.md) makes. A row says what somebody can do and what they see when they do it.
+This page lists the promises [Estate Refs](../../02-constructs/03-spn-infra/03-estate-refs.md) makes. A row says what somebody can do and what they see when they do it.
 
 Every row below is declared and none is claimed: a run writes the last two cells.
 

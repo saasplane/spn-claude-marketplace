@@ -14,7 +14,7 @@
 
 `For: Backend developer · Web developer` · `Status: 🔮 PLANNING`
 
-These are the promises [Stack Skills](../../02-constructs/02-spn-apps-ts/03-stack-skills.md) makes. A row says what somebody can do and what they see when they do it.
+This page lists the promises [Stack Skills](../../02-constructs/02-spn-apps-ts/03-stack-skills.md) makes. A row says what somebody can do and what they see when they do it.
 
 Every row below is declared and none is claimed: a run writes the last two cells.
 

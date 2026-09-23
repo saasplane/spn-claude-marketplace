@@ -14,7 +14,7 @@
 
 `For: Backend developer · Web developer` · `Status: 🔮 PLANNING`
 
-These are the promises [Stack Checks](../../02-constructs/02-spn-apps-ts/01-stack-checks.md) makes. A row says what somebody can do and what they see when they do it.
+[Stack Checks](../../02-constructs/02-spn-apps-ts/01-stack-checks.md) makes these promises. A row says what somebody can do and what they see when they do it.
 
 Every row below is declared and none is claimed: a run writes the last two cells.
 

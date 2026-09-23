@@ -61,7 +61,7 @@ the skills that can only be said in its own words. **A skill that is stack-agnos
 
 ### spn-infra
 
-**The estate plugin.** It holds what changes an estate: one shell script standing between an estate edit and the file it would write, the skills that change
+**The estate plugin** holds what changes an estate: one shell script standing between an estate edit and the file it would write, the skills that change
 what an estate is, and the estate's own vocabulary restated for a reader who may never open the
 book.
 

@@ -54,7 +54,7 @@ The skill is one. The layer is chosen from the repository's own claim, and what 
 
 ### The skill has no stack variant, so the layer is a ref
 
-The book's skill set is closed and carries no planning skill for this world. Shipping one here would add a value the standard does not have, and two skills with almost the same description would then compete for the same ask. So the skill stays in one plugin and this file supplies the part that cannot be general. *Where:* `plugins/spn-apps-ts/refs/plan.md`
+The book's skill set is closed and carries no planning skill for this world. Shipping one here would add a value the standard does not have, and two skills with almost the same description would then compete for the same ask. So the skill stays in one plugin, and this file supplies the layer instead — the part of the plan that only this stack can answer. *Where:* `plugins/spn-apps-ts/refs/plan.md`
 
 ### It says in its first line that it is not a skill
 

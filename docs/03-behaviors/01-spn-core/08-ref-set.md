@@ -14,7 +14,7 @@
 
 `For: Editor · Architect` · `Status: 🔮 PLANNING`
 
-These are the promises [The Ref](../../02-constructs/01-spn-core/08-ref-set.md) makes. A row says what somebody can do and what they see when they do it.
+[The Ref](../../02-constructs/01-spn-core/08-ref-set.md) makes the promises below. A row says what somebody can do and what they see when they do it.
 
 Every row below is declared and none is claimed: a run writes the last two cells.
 

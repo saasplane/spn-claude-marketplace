@@ -26,7 +26,7 @@ This plugin restates exactly one thing on its own: the planning layer for a node
 ### The skill has no stack variant, so the layer is a ref
 
 **Why** — *the book's skill vocabulary is closed and carries no planning skill for the apps world*. Shipping one here would add a value the standard does not have, and two skills would then compete for the same ask.
-**What** — the planning skill stays in `spn-core`. This file supplies the part that cannot be stack-agnostic: which seats a design's rows land in, and what each row must carry.
+**What** — the planning skill stays in `spn-core`. This file supplies what only a stack-concrete file can state: which seats a design's rows land in, and what each row must carry.
 **How** — the file states its own status in its first line, so a reader who opens it directly is told it is not a skill. `plugins/spn-apps-ts/refs/plan.md`.
 
 ### A design lands as rows in the owning documents

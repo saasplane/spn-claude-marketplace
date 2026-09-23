@@ -14,10 +14,10 @@
 
 The model for the estate world, whatever cloud sits behind it. One file per construct, in an order where nothing appears before something it depends on.
 
-This is the smallest of the three domains, and the boundary is what holds it together: nothing here changes a cloud. The guard refuses, the cards explain, and each skill names the tool's command that does the work through the tool's own doors.
+The estate domain is the smallest of the three domains, and the boundary is what holds it together: nothing here changes a cloud. The guard refuses, the cards explain, and each skill names the tool's command that does the work through the tool's own doors.
 
 <!-- spn:generated domain — do not edit inside these markers; `docs.ts face` writes it -->
-**The estate plugin.** It holds what changes an estate: one shell script standing between an estate edit and the file it would write, the skills that change what an estate is, and the estate's own vocabulary restated for a reader who may never open the book.
+**The estate plugin** holds what changes an estate: one shell script standing between an estate edit and the file it would write, the skills that change what an estate is, and the estate's own vocabulary restated for a reader who may never open the book.
 
 | Construct | What it is |
 | --- | --- |

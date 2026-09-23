@@ -277,7 +277,7 @@ spnutils infra platform up
 
 ## Act 13 — run it, and say what they should see
 
-**This is the acceptance the whole walk exists for.** Hand the run to the stack plugin's run skill, which owns how a platform of that stack starts.
+**Act 13 is the acceptance the whole walk exists for.** Hand the run to the stack plugin's run skill, which owns how a platform of that stack starts.
 
 Then say, in plain words, what they are looking at:
 
