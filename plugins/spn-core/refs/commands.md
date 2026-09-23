@@ -16,8 +16,8 @@ One CLI serves every stack. The group says *what kind of thing changes*, which i
 | `workspace` | the level above the repository — the floor's permission tiers, the plugin union, the machine env seat, and `.spndevex/` | anything inside a repository |
 
 <!-- spn:generated commands — do not edit inside these markers; `commands-ref.ts` writes it -->
-Rendered from `spnutils 1.2.70` — the **released** CLI, which is what a partner holds.
-Surface `020833b2d772`. A release that adds no command leaves that unchanged and owes no regeneration.
+Rendered from `spnutils 1.2.71` — the **released** CLI, which is what a partner holds.
+Surface `d44f5c7f8b04`. A release that adds no command leaves that unchanged and owes no regeneration.
 
 #### `apps`
 
@@ -38,7 +38,7 @@ Surface `020833b2d772`. A release that adds no command leaves that unchanged and
 | `apps scaffold` | Scaffold a SaaS Plane artifact — a repository, or a project of a declared kind | `--usecase <usecase>` · `--code <code>` · `--scope <scope>` · `--support-version <version>` · `--name <name>` · `--stack <stack>` · `--organization <ref>` · `--platform <ref>` |
 | `apps start` | Run what the build produced | `--json` · `--mode <mode>` |
 | `apps stop` | Stop what dev or start left running | `--json` |
-| `apps test` | Run one tier this node owes or carries, and write what it proved | `--json` |
+| `apps test` | Run one tier this node owes or carries, and write what it proved | `--json` · `--phase <phase>` |
 | `apps validate` | Check a target against what its kind requires | `--usecase <usecase>` · `--json` |
 
 #### `infra`
@@ -46,7 +46,7 @@ Surface `020833b2d772`. A release that adds no command leaves that unchanged and
 | Command | Does | Options |
 | --- | --- | --- |
 | `infra app down` | Deregister an app | `--clean` |
-| `infra app up` | Bootstrap an app: its schemas, certs, /etc/hosts, ingress vhost — the app derived from the cwd | — |
+| `infra app up` | Bootstrap an app: its schemas, certs, /etc/hosts, ingress vhost — for the package you name | — |
 | `infra config diff` | Compare two environments' answered keys — a peer baseline, never a truth claim | `--json` |
 | `infra config export` | ONE prefix as a plain JSON object — authored values, references unexpanded. A working file, never a committed one. | `--scope <scope>` · `--env <env>` · `--app <kindcode>` |
 | `infra config get` | Read one key at a prefix | `--scope <scope>` · `--env <env>` · `--app <kindcode>` |
