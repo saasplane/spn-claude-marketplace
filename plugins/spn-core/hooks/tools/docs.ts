@@ -623,18 +623,47 @@ function checkTreeFigures(file: string, src: string, root: string): Finding[] {
   for (const m of src.matchAll(/<p>([\s\S]*?)<\/p>\s*<pre[^>]*>([\s\S]*?)<\/pre>/g)) {
     const [, caption, body] = m;
     const codes = [...caption.matchAll(/<code>([^<]+)<\/code>/g)].map((c) => c[1]);
-    // A CITATION IS WORKSPACE-ROOTED, so its first segment names a repository. Without that test
-    // every folder name in a caption read as a citation: `entry/ui/` and `src/aws/` are layer names
-    // a chapter is describing, and `docs/artifacts/approaches/` is repository-relative. All three
-    // were refused as stale citations on the first run, over trees that were perfectly correct.
-    const cited = (c: string): boolean => {
-      if (!c.endsWith("/") || !c.slice(0, -1).includes("/")) return false;
-      const head = join(root, c.split("/")[0]);
-      try { return statSync(head).isDirectory(); } catch { return false; }
+    // A CITATION NAMES A FOLDER THAT EXISTS, and it reaches it one of two ways.
+    //
+    // Workspace-rooted is the plain case: the first segment names a repository. That test alone is
+    // what every folder name in a caption was measured against at first, and it is necessary —
+    // `entry/ui/` and `src/aws/` are layer names a chapter is DESCRIBING, and refusing them as
+    // stale citations reported trees that were perfectly correct.
+    //
+    // It is not sufficient, because the book's stack-agnostic chapters may not carry a
+    // repository's identifiers (the workspace law). Their captions name the repository in prose
+    // and the path inside it — *the Support repo → `apps/utility-ts/assets/…`* — so the first
+    // segment is `apps`, no repository matches, and the citation was skipped. SILENTLY, because a
+    // paragraph citing no folder is the ordinary case. Measured across the corpus at the time:
+    // 15 folder-shaped paths, of which 0 resolved and 10 were real citations the check owed.
+    //
+    // So a repository-relative path is resolved against every repository, and accepted ONLY where
+    // exactly one holds it. One match is the citation; several would be a guess, and a guess in a
+    // gate is worse than the silence this replaces.
+    const repoRoots = (): string[] => {
+      try {
+        return readdirSync(root).filter((e) => {
+          try { return statSync(join(root, e)).isDirectory() && existsSync(join(root, e, ".git")); }
+          catch { return false; }
+        });
+      } catch { return []; }
     };
-    const path = codes.reverse().find(cited);
-    if (!path) continue;
-    const abs = resolve(root, path);
+    const resolveCited = (c: string): string | null => {
+      if (!c.endsWith("/") || !c.slice(0, -1).includes("/")) return null;
+      const head = join(root, c.split("/")[0]);
+      try { if (statSync(head).isDirectory()) return resolve(root, c); } catch { /* not a repo */ }
+      const hits = repoRoots().filter((r) => {
+        try { return statSync(join(root, r, c)).isDirectory(); } catch { return false; }
+      });
+      return hits.length === 1 ? join(root, hits[0], c) : null;
+    };
+    let path: string | null = null;
+    let abs: string | null = null;
+    for (const c of codes.reverse()) {
+      const hit = resolveCited(c);
+      if (hit) { path = c; abs = hit; break; }
+    }
+    if (!path || !abs) continue;
     if (!existsSync(abs)) {
       f.push({ check: "treefig", grade: "RULE", file, message: `a tree names \`${path}\`, and no such folder exists` });
       continue;
