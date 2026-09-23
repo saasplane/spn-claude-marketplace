@@ -46,10 +46,12 @@ ${settled.map((c) => `    <tr><td>${c} &middot; a question</td><td>Answered B, 2
 ${cards}
 </section>`;
 
-const CARD = `  <div class="open"><h4 id="q1">Q1 &middot; a real question</h4>
+// A CARD IS A TABLE ROW (Q185), options nested, so the reader is exercised on the shape that breaks
+// a first-`</tr>` match rather than on the inline shape that happens to survive one.
+const CARD = `  <tr id="q1"><td>Q1</td><td>a real question</td><td>
     <div class="scroll"><table><thead><tr><th></th><th>What</th></tr></thead>
     <tbody><tr><td><strong>A</strong></td><td>one way</td></tr></tbody></table></div>
-    <div class="rec"><b>Recommended: A.</b> <b>Decision:</b> &mdash;</div></div>`;
+    <div class="rec"><b>Recommended: A.</b> <b>Decision:</b> &mdash;</div></td></tr>`;
 
 const ARC = (extra = "") => `# Arc — a subject\n\nStatus: **RUNNING**\n\n## Steps\n\n| # | What | Where | How you would know |\n| --- | --- | --- | --- |\n| 1 | a thing | here | ✅ landed |\n\n## Log\n\n- **2026-09-19 — go.**\n${extra}`;
 

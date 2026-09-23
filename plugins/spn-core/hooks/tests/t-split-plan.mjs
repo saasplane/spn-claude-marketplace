@@ -45,8 +45,11 @@ ${cards}
 </section>
 `;
 
-const card = (n, decision) => `  <div class="open">
-    <h4 id="q${n}">Q${n} &middot; a question only the developer can settle</h4>
+// A CARD IS A TABLE ROW (Q185), and it keeps its options as a NESTED table on purpose: a reader
+// that stops at the first `</tr>` cuts the card off at its first option, and passes on a page whose
+// options are written inline. The nesting is the case worth having.
+const card = (n, decision) => `  <tr id="q${n}">
+    <td>Q${n}</td><td>a question only the developer can settle</td><td>
     <span class="k">What</span>
     <p>What is being decided.</p>
     <span class="k">Options</span>
@@ -55,7 +58,8 @@ const card = (n, decision) => `  <div class="open">
       <tbody><tr><td><strong>A</strong></td><td>one way</td></tr><tr><td><strong>B</strong></td><td>the other</td></tr></tbody>
     </table></div>
     <div class="rec"><b>Recommended: A.</b> Because of the reason. <b>Decision:</b> ${decision}</div>
-  </div>`;
+    </td>
+  </tr>`;
 
 // THE STATUS IS A PARAMETER because a sequencing row resolves through it: only `LANDED` means the
 // arc is finished, and `RUNNING` — the default here — is one of the words that means work is left.

@@ -506,7 +506,18 @@ export function closing(destination: string): boolean {
 // a `<div class="rec">`, so a non-greedy match ends at the first inner `</div>` and never sees the
 // decision. That is the shape of F5.
 const OPEN_SECTION = /<section id="s4"[\s\S]*?<\/section>/i;
-const CARD = /<h4[^>]*\bid="(q\d+)"[^>]*>[\s\S]*?(?=<h4[^>]*\bid="q|$)/gi;
+// A CARD IS A TABLE ROW, and it was a heading until Q185 was answered. `cardsOf` looked for
+// `<h4 id="q<n>">` and the pages had stopped writing it: measured 2026-09-23 across every workstream
+// page, `011` carried 23 headings, `015` carried one heading and ten rows, and the open workstream
+// carried NONE and 54 rows. The four checks that read cards were therefore reading a shape that
+// appears on no page they open — they walk `workstreams/open/` alone, so a closed workstream's
+// headings were never their input. Three of the four fail permissive, which is why going blind
+// looked like a clean corpus.
+//
+// THE HEADING FORM IS NOT KEPT AS A SECOND SPELLING. `Q185` option C was exactly that and was
+// refused: two spellings with one reader is the defect `RD.DEVEX.058` had removed from arc statuses
+// the day before, and it would make the drift permanent instead of ending it.
+const CARD_OPEN = /<tr[^>]*\bid="(q\d+)"[^>]*>/gi;
 const DECISION = /<b>\s*Decision:?\s*<\/b>([\s\S]{0,600})/i;
 // `answered` may sit either side of the number, because a log writes both ways.
 const ANSWERED = /\b(Q\d+)\b[^.\n]{0,80}?\banswered\b|\banswered\b[^.\n]{0,80}?\b(Q\d+)\b/gi;
@@ -542,9 +553,19 @@ export function answeredNumbers(folder: string): Set<string> {
  * read as an answer follows it. Punctuation and dashes strip away; a letter or a digit does not.
  */
 function carriesDecision(card: string): boolean {
+  // A ROW STATES ITS ANSWER IN WORDS, where a heading card used a `<b>Decision:</b>` marker. Both are
+  // read, because the marker is what the card template ships and the row is what the pages write.
+  //
+  // `ANSWERED` IS REQUIRED TO BE FOLLOWED BY SOMETHING, for the reason recorded as F16: the template
+  // ships `Decision:` with an empty value, so the marker's PRESENCE is never the answer — what
+  // follows it is. The same trap exists here, because a row that says `OPEN` also contains the word
+  // `ANSWERED` as soon as it explains what answering it would mean.
+  const flattened = flat(card);
+  if (/\bOPEN\b(?![^.]{0,40}\banswered\b)/.test(flattened) && !/\bANSWERED\b/.test(flattened)) return false;
+  if (/\bANSWERED\b/.test(flattened)) return true;
   const found = DECISION.exec(card);
   if (!found) return false;
-  const tail = found[1].split(/<\/div>|<\/p>|<h4/i)[0];
+  const tail = found[1].split(/<\/div>|<\/p>|<h4|<\/tr/i)[0];
   return /[0-9a-z]/i.test(flat(tail));
 }
 
@@ -552,10 +573,33 @@ function carriesDecision(card: string): boolean {
 export function cardsOf(page: string): Array<{ number: string; decided: boolean }> {
   const section = OPEN_SECTION.exec(read(page));
   if (!section) return [];
-  return [...section[0].matchAll(CARD)].map((m) => ({
-    number: m[1].toUpperCase(),
-    decided: carriesDecision(m[0]),
-  }));
+  const html = section[0];
+  const out: Array<{ number: string; decided: boolean }> = [];
+  CARD_OPEN.lastIndex = 0;
+  for (let m = CARD_OPEN.exec(html); m; m = CARD_OPEN.exec(html)) {
+    out.push({ number: m[1].toUpperCase(), decided: carriesDecision(rowAt(html, m.index)) });
+  }
+  return out;
+}
+
+/**
+ * One table row whole, counting nesting rather than stopping at the first `</tr>`.
+ *
+ * **A CARD CARRIES ITS OPTIONS AS A TABLE**, which the approach template has always said, so a card
+ * row holds rows. A non-greedy `[\s\S]*?</tr>` cuts such a card off at its first option and reads
+ * the rest of it as absent — and it passes on a page whose options happen to be written inline,
+ * which is what the open workstream does today. Proven against a nested fixture rather than against
+ * the page that got lucky.
+ */
+function rowAt(html: string, start: number): string {
+  const TAG = /<(\/?)tr\b/gi;
+  TAG.lastIndex = start;
+  let depth = 0;
+  for (let m = TAG.exec(html); m; m = TAG.exec(html)) {
+    depth += m[1] ? -1 : 1;
+    if (depth === 0) return html.slice(start, html.indexOf(">", m.index) + 1);
+  }
+  return html.slice(start);
 }
 
 /**
