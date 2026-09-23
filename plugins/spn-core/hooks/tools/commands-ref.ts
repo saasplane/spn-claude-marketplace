@@ -20,10 +20,14 @@
 // than no ref at all. The lag behind the workspace is correct rather than tolerated.
 //
 // TWO STAMPS, BECAUSE THEY ANSWER DIFFERENT QUESTIONS. The version says WHICH CLI this describes,
-// which is what a partner reads. The surface hash decides WHETHER the region is stale. The payload
-// carries no semver of its own, so a patch that fixes a bug inside a command leaves the hash unmoved
-// and forces no plugin release — which matters, because all three plugins move on one number and a
-// release nobody needs is a regeneration somebody skips.
+// which is what a partner reads. The surface hash says whether the COMMANDS moved, which is what a
+// reader of the diff wants to know — the payload carries no semver of its own, so a patch fixing a
+// bug inside a command leaves the hash unmoved and the diff is one line.
+//
+// **Either stamp going out of date makes the region stale**, and the check compares the whole body
+// rather than the hash alone. An earlier version of this comment said the hash decided it, and that
+// was wrong in the direction that matters: it would have left the ref naming a CLI nobody was
+// running, which is the one thing a partner reads it for. A version bump owes one line.
 
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -70,7 +74,7 @@ export function render(payload: Surface, version: string, hash: string): string 
   }
   const out: string[] = [
     `Rendered from \`spnutils ${version}\` — the **released** CLI, which is what a partner holds.`,
-    `Surface \`${hash}\`. A release that adds no command leaves that unchanged and owes no regeneration.`,
+    `Surface \`${hash}\` — the COMMANDS. A release that adds none leaves it unmoved, so the diff is the version line alone.`,
     "",
   ];
   for (const group of [...groups.keys()].sort()) {

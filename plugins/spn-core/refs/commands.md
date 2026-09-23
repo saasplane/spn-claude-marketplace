@@ -16,8 +16,8 @@ One CLI serves every stack. The group says *what kind of thing changes*, which i
 | `workspace` | the level above the repository — the floor's permission tiers, the plugin union, the machine env seat, and `.spndevex/` | anything inside a repository |
 
 <!-- spn:generated commands — do not edit inside these markers; `commands-ref.ts` writes it -->
-Rendered from `spnutils 1.2.71` — the **released** CLI, which is what a partner holds.
-Surface `d44f5c7f8b04`. A release that adds no command leaves that unchanged and owes no regeneration.
+Rendered from `spnutils 1.2.72` — the **released** CLI, which is what a partner holds.
+Surface `d44f5c7f8b04` — the COMMANDS. A release that adds none leaves it unmoved, so the diff is the version line alone.
 
 #### `apps`
 
