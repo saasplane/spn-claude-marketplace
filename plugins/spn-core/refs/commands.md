@@ -16,37 +16,37 @@ One CLI serves every stack. The group says *what kind of thing changes*, which i
 | `workspace` | the level above the repository — the floor's permission tiers, the plugin union, the machine env seat, and `.spndevex/` | anything inside a repository |
 
 <!-- spn:generated commands — do not edit inside these markers; `commands-ref.ts` writes it -->
-Rendered from `spnutils 1.2.68` — the **released** CLI, which is what a partner holds.
-Surface `4f84135ac03d`. A release that adds no command leaves that unchanged and owes no regeneration.
+Rendered from `spnutils 1.2.70` — the **released** CLI, which is what a partner holds.
+Surface `020833b2d772`. A release that adds no command leaves that unchanged and owes no regeneration.
 
 #### `apps`
 
 | Command | Does | Options |
 | --- | --- | --- |
-| `apps build` | Build one node, the way its kind builds | `--package <package>` · `--json` |
-| `apps check` | Typecheck, then lint | `--package <package>` · `--json` |
-| `apps clean` | Remove what a build and an install left behind | `--package <package>` · `--json` |
-| `apps codegen` | Generate from a published surface | `--package <package>` · `--json` |
-| `apps dev` | Run this node from source, watching it | `--package <package>` · `--json` · `--mode <mode>` |
-| `apps format` | Write the formatting and the fixable rules | `--package <package>` · `--json` |
-| `apps gen-barrel` | Generate the package's barrel — its public surface | `--package <package>` |
-| `apps gen-labels` | Generate the label manifest (scans translate() call sites -> dist/generated/spn-labels.json) | `--package <package>` |
-| `apps gen-symbols` | Generate the symbol index (public surface -> dist/generated/spn-symbols.json) | `--package <package>` |
-| `apps gen-validators` | Generate contract state validators | `--package <package>` |
-| `apps migrate` | Move this node's migration history — a task, never a run mode | `--package <package>` · `--json` |
+| `apps build` | Build one node, the way its kind builds | `--json` |
+| `apps check` | Typecheck, then lint | `--json` |
+| `apps clean` | Remove what a build and an install left behind | `--json` |
+| `apps codegen` | Generate from a published surface | `--json` |
+| `apps dev` | Run this node from source, watching it | `--json` · `--mode <mode>` |
+| `apps format` | Write the formatting and the fixable rules | `--json` |
+| `apps gen-barrel` | Generate the package's barrel — its public surface | — |
+| `apps gen-labels` | Generate the label manifest (scans translate() call sites -> dist/generated/spn-labels.json) | — |
+| `apps gen-symbols` | Generate the symbol index (public surface -> dist/generated/spn-symbols.json) | — |
+| `apps gen-validators` | Generate contract state validators | — |
+| `apps migrate` | Move this node's migration history — a task, never a run mode | `--json` |
 | `apps release` | Publish every releasable project in this repository, at one version (lockstep) — the scope is the repository, never one package | `--dry-run` · `--approved` · `--json` |
-| `apps scaffold` | Scaffold a SaaS Plane artifact — a repository, or a project of a declared kind | `--usecase <usecase>` · `--code <code>` · `--scope <scope>` · `--support-version <version>` · `--app <folder>` · `--name <name>` · `--stack <stack>` · `--organization <ref>` · `--platform <ref>` |
-| `apps start` | Run what the build produced | `--package <package>` · `--json` · `--mode <mode>` |
-| `apps stop` | Stop what dev or start left running | `--package <package>` · `--json` |
-| `apps test` | Run one tier this node owes or carries, and write what it proved | `--package <package>` · `--json` |
-| `apps validate` | Check a target against what its kind requires | `--usecase <usecase>` · `--app <folder>` · `--json` |
+| `apps scaffold` | Scaffold a SaaS Plane artifact — a repository, or a project of a declared kind | `--usecase <usecase>` · `--code <code>` · `--scope <scope>` · `--support-version <version>` · `--name <name>` · `--stack <stack>` · `--organization <ref>` · `--platform <ref>` |
+| `apps start` | Run what the build produced | `--json` · `--mode <mode>` |
+| `apps stop` | Stop what dev or start left running | `--json` |
+| `apps test` | Run one tier this node owes or carries, and write what it proved | `--json` |
+| `apps validate` | Check a target against what its kind requires | `--usecase <usecase>` · `--json` |
 
 #### `infra`
 
 | Command | Does | Options |
 | --- | --- | --- |
-| `infra app down` | Deregister an app | `--package <package>` · `--clean` |
-| `infra app up` | Bootstrap an app: its schemas, certs, /etc/hosts, ingress vhost — the app derived from the cwd | `--package <package>` |
+| `infra app down` | Deregister an app | `--clean` |
+| `infra app up` | Bootstrap an app: its schemas, certs, /etc/hosts, ingress vhost — the app derived from the cwd | — |
 | `infra config diff` | Compare two environments' answered keys — a peer baseline, never a truth claim | `--json` |
 | `infra config export` | ONE prefix as a plain JSON object — authored values, references unexpanded. A working file, never a committed one. | `--scope <scope>` · `--env <env>` · `--app <kindcode>` |
 | `infra config get` | Read one key at a prefix | `--scope <scope>` · `--env <env>` · `--app <kindcode>` |
@@ -67,13 +67,13 @@ Surface `4f84135ac03d`. A release that adds no command leaves that unchanged and
 | `infra platform down` | Take the platform layer down. Say --plan or --apply. A layer operation never destroys a stateful resource — --clean is how you ask for that, separately. | `--cloud` · `--local` · `--plan` · `--apply` · `--approve` · `--clean` |
 | `infra platform status` | What is running | `--cloud` · `--local` · `--json` |
 | `infra platform up` | Stand the platform layer up — locally by default. Say --plan or --apply. | `--cloud` · `--local` · `--plan` · `--apply` · `--approve` · `--json` |
-| `infra release` | Build then publish: validate, test, stage dist/ (spinfrapkg.json + src/), publish the dist whole to the organization's registry pair — or with --local, into this machine's store | `--package <package>` · `--dry-run` · `--local` · `--approved` · `--json` |
+| `infra release` | Build then publish: validate, test, stage dist/ (spinfrapkg.json + src/), publish the dist whole to the organization's registry pair — or with --local, into this machine's store | `--dry-run` · `--local` · `--approved` · `--json` |
 | `infra scaffold module` | A lifecycle module node — identity-only manifest, renderings derived from its tree | `--name <name>` |
 | `infra scaffold organization` | The organization node — at most one per repo | `--name <name>` |
 | `infra scaffold platform` | A platform node | `--name <name>` |
 | `infra scaffold repo` | Mint the checkout as the org's estate repo — the cwd, and what it is called | `--name <name>` |
 | `infra show` | Resolve the declaration that reaches this folder and say where it came from — including PINNED @ version per layer | `--json` |
-| `infra test` | The render harness — each node's tests/run.sh, where one exists; its exit code is the verdict | `--package <package>` |
+| `infra test` | The render harness — each node's tests/run.sh, where one exists; its exit code is the verdict | — |
 | `infra validate` | Check a target against what its type requires | `--json` |
 
 #### `repo`
