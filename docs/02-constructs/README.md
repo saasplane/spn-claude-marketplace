@@ -32,7 +32,6 @@ This seat is the model: one file per construct, saying what a thing is, what it 
 | a call about to run | `PreToolUse` | — | Loop Events — The Moments a Session Offers a Hook |
 | a card | `refs/` | — | Estate Refs — The Estate's Vocabulary, Restated as Cards |
 | a check | `Check` | — | The Check — One Rule, Asked on Every Call |
-| a clause | — | — | The Estate Guard — One Script Wired to Every Write |
 | a command that finished | `PostToolUse` | — | Loop Events — The Moments a Session Offers a Hook |
 | a connector | `Link` | — | The Page — Produced From a Seat File, Never Typed |
 | a coordinate | — | — | Estate Refs — The Estate's Vocabulary, Restated as Cards |
@@ -60,7 +59,8 @@ This seat is the model: one file per construct, saying what a thing is, what it 
 | a register | `HEADINGS` | — | Stack Tools — Commands Over a Stack's Own Register |
 | a rendering | — | — | Estate Skills — The Skills That Change an Estate |
 | a row | `cellsOf` | — | Stack Tools — Commands Over a Stack's Own Register |
-| a sanctioned home | `region` | — | The Estate Guard — One Script Wired to Every Write |
+| a rule | `checks/estate-violations.ts` | — | The Estate Guard — Named Rules Wired to Every Write |
+| a sanctioned home | `region` | — | The Estate Guard — Named Rules Wired to Every Write |
 | a seat file | — | — | The Page — Produced From a Seat File, Never Typed |
 | a skill | `SKILL.md` | — | The Skill — A Stage's Steps, Loaded on Match |
 | a source line | — | — | The Ref — A Chapter, Restated and Stamped |
@@ -75,7 +75,7 @@ This seat is the model: one file per construct, saying what a thing is, what it 
 | a turn about to end | `Stop` | — | Loop Events — The Moments a Session Offers a Hook |
 | a verdict | `Verdict` | — | The Hook — Code the Runtime Calls on Your Behalf |
 | advice | `note` | — | The Check — One Rule, Asked on Every Call |
-| allowing | — | — | The Estate Guard — One Script Wired to Every Write |
+| allowing | — | — | The Estate Guard — Named Rules Wired to Every Write |
 | an action | `@SPAPIRouteCommand` | — | Stack Tools — Commands Over a Stack's Own Register |
 | an approval | — | — | Estate Skills — The Skills That Change an Estate |
 | an estate skill | `SKILL.md` | — | Estate Skills — The Skills That Change an Estate |
@@ -99,12 +99,12 @@ This seat is the model: one file per construct, saying what a thing is, what it 
 | the dispatcher | `dispatch` | — | The Hook — Code the Runtime Calls on Your Behalf |
 | the dispatcher | `dispatch` | — | Stack Checks — A Stack's Own Rules at Write Time |
 | the drawer | `Spec` | — | The Page — Produced From a Seat File, Never Typed |
-| the estate manifest | `spestate.json` | — | The Estate Guard — One Script Wired to Every Write |
+| the estate manifest | `spestate.json` | — | The Estate Guard — Named Rules Wired to Every Write |
 | the exit code | — | — | The Tool — A Command Run by Its Own Path |
 | the fast path | `applies` | — | The Check — One Rule, Asked on Every Call |
 | the grade | `Grade` | — | The Check — One Rule, Asked on Every Call |
 | the grade | `Grade` | — | The Tool — A Command Run by Its Own Path |
-| the guard | `deny-estate-violations.sh` | — | The Estate Guard — One Script Wired to Every Write |
+| the guard | `events/pretooluse.ts` | — | The Estate Guard — Named Rules Wired to Every Write |
 | the hash | `seen` | — | The Ref — A Chapter, Restated and Stamped |
 | the layer | — | — | Stack Refs — The Layer a Stack-Agnostic Skill Loads |
 | the lens register | `LENS_LABEL` | — | The Lens — One Reviewing Viewpoint, Written Down |
@@ -113,7 +113,7 @@ This seat is the model: one file per construct, saying what a thing is, what it 
 | the marketplace | `marketplace.json` | — | The Plugin — Delivery Unit of the Marketplace |
 | the name | `name` | — | The Skill — A Stage's Steps, Loaded on Match |
 | the name | `name` | — | The Agent — A Persona a Session Can Convene |
-| the new text | `content` · `new_string` | — | The Estate Guard — One Script Wired to Every Write |
+| the new text | `content` · `new_string` | — | The Estate Guard — Named Rules Wired to Every Write |
 | the path locator | — | — | Estate Refs — The Estate's Vocabulary, Restated as Cards |
 | the payload | `Payload` | — | The Hook — Code the Runtime Calls on Your Behalf |
 | the plugin root | `CLAUDE_PLUGIN_ROOT` | — | The Plugin — Delivery Unit of the Marketplace |

@@ -26,7 +26,7 @@ Source folders: `hooks/hooks.json` and `hooks/scripts/` for Estate Guard · `ski
 <!-- spn:generated map — do not edit inside these markers; `docs.ts face` writes it -->
 | Chapter | Realizes | Carries | Status |
 | --- | --- | --- | --- |
-| [01-estate-guard.md](01-estate-guard.md) | `estate-guard` | One shell script wired to every write, denying the five ways an estate edit leaks a secret or pins something a driver should discover, and allowing the call on anything it does not understand. | ✅ |
+| [01-estate-guard.md](01-estate-guard.md) | `estate-guard` | A dispatcher wired to every write, running seven named rules over what an estate edit would add, denying the ways one leaks a secret or pins something a driver should discover, and allowing the call on anything it cannot read. | ✅ |
 | [02-estate-skills.md](02-estate-skills.md) | `estate-skills` | Four skills for an estate repository — declaring what the estate is, reading a plan before it is approved, authoring a module end to end, and publishing a package — none of which mutates a cloud itself. | ✅ |
 | [03-estate-refs.md](03-estate-refs.md) | `estate-refs` | Four cards restating the estate's own vocabulary — which file declares what, which layer owns which act, how a name is composed from coordinates, and the laws a declaration must hold to. | ✅ |
 <!-- /spn:generated -->

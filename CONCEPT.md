@@ -119,7 +119,7 @@ implementation belongs here.
 
 **spn-infra**
 
-- **The Estate Guard — One Script Wired to Every Write** — A single shell script standing between an estate edit and the file it would write — the narrow set of things it knows about, the text it judges, and the direction it fails in when it does not understand its input.
+- **The Estate Guard — Named Rules Wired to Every Write** — A dispatcher and its named rules standing between an estate edit and the file it would write — the narrow set of things they know about, the text they judge, and the direction they fail in when the input cannot be read.
 - **Estate Skills — The Skills That Change an Estate** — The skills an estate repository answers to — changing what the estate is, reading a rendering before it is approved, authoring a module end to end, and publishing a package — and the boundary every one of them restates rather than works around.
 - **Estate Refs — The Estate's Vocabulary, Restated as Cards** — The estate's own words, restated for a reader who may never open the book — which file declares what, which layer owns which act, how a name is composed from coordinates, and the laws a declaration must hold to.
 <!-- /spn:generated -->

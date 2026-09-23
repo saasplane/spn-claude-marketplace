@@ -786,7 +786,9 @@ function checkProof(file: string, src: string): Finding[] {
   const rows = tablesIn(file, src.slice(i))
     .flat().map((cells) => text(cells[0] ?? "").replace(/`/g, "").trim());
   if (!rows.length) return f;
-  const installable = /^(spnutils\b|pnpm test|pnpm test:|npx nx\b|node .*\.ts\b)|\.py\b|\bguard\b|\bgate\b/;
+  // `node <path>` is the same fact whatever the extension: all three plugins ship their suite as
+  // `hooks/tests/run.mjs`, and accepting only `.ts` reported the standard runner as unrunnable.
+  const installable = /^(spnutils\b|pnpm test|pnpm test:|npx nx\b|node .*\.(ts|mjs|cjs|js)\b)|\.py\b|\bguard\b|\bgate\b/;
   for (const r of rows) {
     if (!r) continue;
     // A REPOSITORY'S OWN SCRIPT IS NOT A FALSE POSITIVE, and saying so plainly matters: a batch read
