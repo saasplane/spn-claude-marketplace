@@ -140,10 +140,10 @@ const OPENERS: Record<string, RegExp> = {
   pronoun: /^(?:it|they|this|these|those)\s+(?:is|are|was|were|arrives|carries|holds|has|have|makes|does|comes|goes|means|sits|lives)\b/i,
   defines: /^\w[\w\s`'-]{0,40}?\s+is\s+(?:what\s+happens|the\s+\w+\s+that\s+\w+s\b)/i,
 };
-const ABSTRACT = /\bthe (?:property|thing|point|reason|part) (?:that|which)\b|\bcomes down to\b|\bis always the\b/gi;
+const ABSTRACT = /\bthe (?:property|thing|point|reason|part) (?:that|which)\b|\bcomes down to\b/gi;
 // Metaphor doing real work. Kept short and literal — a long guess list produces noise a reader then
 // has to clear, which costs more than it saves.
-const METAPHOR = /\b(?:fates?|degrade[sd]? into|centre of gravity|center of gravity|lifeblood|heartbeat|marriage of|wedded to|a home for|breathes?)\b/i;
+const METAPHOR = /\b(?:fates?|degrade[sd]? into|centre of gravity|center of gravity|lifeblood|marriage of|wedded to|a home for|breathes?)\b/i;
 
 // A section whose OPENING FORM the document chapter mandates. Every construct page carries a
 // `## Boundary`, and its paragraphs are required to read "This page answers … It does not answer X.

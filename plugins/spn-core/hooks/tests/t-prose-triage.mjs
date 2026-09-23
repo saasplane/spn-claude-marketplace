@@ -114,5 +114,40 @@ const afterEdit = run([repo, `--ledger=${ledger}`], BASE);
 one("and editing it brings it straight back",
   afterEdit.out.includes("01-kept.md"));
 
+// ── two patterns that flagged only good prose, and their twins (N55) ──
+
+// The LEDGER above is for a judged exception: prose a generally-sound pattern cannot clear. These
+// two are a different thing. `is always the` had ELEVEN hits across the whole workspace and not one
+// was an abstraction — it is a copula that was sitting in a list of vague noun-phrases. `heartbeat`
+// is this platform's own name for a mechanism, carried by `module-server-job-ts` through four source
+// files, a behaviour row and an env var. A ledger entry would have hidden each next correct use.
+//
+// So every case here has the twin this file's header asks for: the sentence that must go quiet, and
+// beside it one carrying a pattern that must still fire. A removal that silenced its neighbours
+// would be worse than the false positives it fixed.
+const patterns = join(BASE, "patterns");
+mkdirSync(join(patterns, "docs"), { recursive: true });
+
+const only = (name, body) => {
+  const dir = join(patterns, name);
+  mkdirSync(join(dir, "docs"), { recursive: true });
+  writeFileSync(join(dir, "docs", "01-p.md"), `# A page\n\n${body}\n`);
+  return candidates(run([dir], BASE).out);
+};
+
+one("a concrete claim using 'is always the' is not an abstraction",
+  only("copula", "The private zone is always the child name, never the apex.")?.paragraphs === 0);
+one("but a vague noun-phrase still is",
+  only("vague", "The thing that matters here is left for the reader to work out.")?.paragraphs === 1);
+one("and 'comes down to' still is",
+  only("comes", "Whether it holds comes down to something nobody has written down yet.")?.paragraphs === 1);
+
+one("'heartbeat' is a named mechanism, not a figure of speech",
+  only("term", "The reconcile heartbeat re-arms every schedule whose next firing is already past.")?.paragraphs === 0);
+one("but 'lifeblood' is still a metaphor",
+  only("blood", "The registry is the lifeblood of every platform that reads from it.")?.paragraphs === 1);
+one("and 'wedded to' still is",
+  only("wed", "The release is wedded to the branch it was cut from, for better or worse.")?.paragraphs === 1);
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);
