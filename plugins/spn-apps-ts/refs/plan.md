@@ -1,10 +1,10 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/README.md", "seen": "bb9243a0" },
-    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md", "seen": "0229e250" },
+    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/README.md", "seen": "13d462c3" },
+    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md", "seen": "5b35f925" },
     { "path": "providers/apps/ts/README.md", "seen": "0da8309f" },
-    { "path": "providers/apps/ts/03-code-patterns.md", "seen": "795882e4" }
+    { "path": "providers/apps/ts/03-code-patterns.md", "seen": "56ef9a7f" }
   ]
 }
 -->

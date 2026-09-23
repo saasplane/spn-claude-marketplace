@@ -1,8 +1,8 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md", "seen": "cad9fd97" },
-    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "3bcf359b" }
+    { "path": "docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md", "seen": "654a9cbb" },
+    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "d379d42b" }
   ]
 }
 -->

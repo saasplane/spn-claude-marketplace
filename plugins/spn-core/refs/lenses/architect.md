@@ -1,8 +1,8 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/04-capabilities/02-support/01-apps/01-shape/README.md", "seen": "82cad3ed" },
-    { "path": "docs/02-constructs/README.md", "seen": "a3eaa5df" },
+    { "path": "docs/04-capabilities/02-support/01-apps/01-shape/README.md", "seen": "719d5b19" },
+    { "path": "docs/02-constructs/README.md", "seen": "1cf79a1b" },
     { "path": "docs/04-capabilities/03-platform/README.md", "seen": "c6aa51b8" },
     { "path": "docs/04-capabilities/02-support/01-apps/03-module/README.md", "seen": "dda0a97e" }
   ]

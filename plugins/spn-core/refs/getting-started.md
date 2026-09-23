@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/05-guides/README.md", "seen": "cf2482d4" }
+    { "path": "docs/05-guides/README.md", "seen": "9c97f7cb" }
   ]
 }
 -->
@@ -25,9 +25,10 @@ somebody bumps it. `.nvmrc` and the `engines` field carry it, and a version mana
 
 **The browser is `npm install -g playwright` then `npx playwright install chromium`**, and it goes in
 before the CLI: it serves the checks that render a page rather than reading its source. Those report
-*not checked* on a machine without it, so an install that skipped it still works. This is **not** the
-automation profile: `spnutils` provisions its
-own Chrome under `~/.spnutils/browser/chrome`, and you install nothing for that.
+*not checked* on a machine without it, so an install that skipped it still works. **The browser you
+install here is for the rendering checks, not for automation**: `spnutils` provisions its own Chrome
+under `~/.spnutils/browser/chrome`, because Chrome refuses automation on the default one, and you
+install nothing for that.
 
 | # | Step | Runs | Status |
 | --- | --- | --- | --- |

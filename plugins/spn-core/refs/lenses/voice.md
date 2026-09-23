@@ -1,9 +1,9 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md", "seen": "f0a23b62" },
-    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md", "seen": "c30fe68a" },
-    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md", "seen": "e3b6472d" }
+    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md", "seen": "8c2210a7" },
+    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md", "seen": "59189379" },
+    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md", "seen": "323d40a5" }
   ],
   "rows": [
     "RD.DOCS.031",
@@ -17,6 +17,7 @@
     "RD.DOCS.072",
     "RD.DOCS.082",
     "RD.DOCS.084",
+    "RD.DOCS.086",
     "RD.DEVEX.032"
   ]
 }
@@ -24,7 +25,7 @@
 
 # Lens — `VOICE` (Editor)
 
-**Source of truth:** the foundation book's readability bar (`01-devex/04-workspace/04-docs/01-corpus`), the document block, its tag line and the behaviour row (`01-devex/04-workspace/04-docs/02-document`), and the voice, upkeep and counting discipline checks (`01-devex/04-workspace/04-docs/04-discipline`) — decisions RD.DOCS.031, RD.DOCS.043, RD.DOCS.044, RD.DOCS.052, RD.DOCS.060, RD.DOCS.062, RD.DOCS.067, RD.DOCS.071, RD.DOCS.072, RD.DOCS.082, RD.DOCS.084 and RD.DEVEX.032. This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
+**Source of truth:** the foundation book's readability bar (`01-devex/04-workspace/04-docs/01-corpus`), the document block, its tag line and the behaviour row (`01-devex/04-workspace/04-docs/02-document`), and the voice, upkeep and counting discipline checks (`01-devex/04-workspace/04-docs/04-discipline`) — decisions RD.DOCS.031, RD.DOCS.043, RD.DOCS.044, RD.DOCS.052, RD.DOCS.060, RD.DOCS.062, RD.DOCS.067, RD.DOCS.071, RD.DOCS.072, RD.DOCS.082, RD.DOCS.084, RD.DOCS.086 and RD.DEVEX.032. This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
 
 **Worn** while writing. **Convened** over any document before it lands. **Advises — and blocks a page that misses its seat bar.**
 
@@ -38,6 +39,7 @@
 - **Precision outranks warmth on a file that instructs** (RD.DEVEX.032). Where a warmer sentence would be even slightly less exact about what your reader must do, leave the sentence as it is. A page at its bar in mechanical prose is worse than a page under it in good prose — and that ranking runs the other way too, so neither half wins by default.
 - **NOTHING MEASURES LENGTH, AND NOTHING COUNTS *you*.** Both measures were dropped. A sentence may be long when the idea needs it, and cutting the link between two ideas to make a sentence shorter is the defect the word count was causing. A count of a pronoun cannot see an imperative, so it read every instruction file as silent when it was anything but, and it rewarded sprinkling the word rather than writing to somebody. What is checked instead is the seven rules: the missing why, the undefined term, the idiom, the carried phrase, the dropped reasoning.
 - **The house words are for the people who need them, and a node `README.md` uses none of them** (RD.DOCS.062). *Seam*, *mirror*, *realize*, *face* and *construct* are this book's own words. A developer opening a package for the first time should not have to learn five of them to read its first page. So a node README and a behaviour area use none, and a construct or a mirror **defines each one where it is first met**.
+- **A term names its area, and a generic word is not a name — MUST** (RD.DOCS.086). A word that could belong to any area tells the reader nothing about which one is meant, and one word used by two areas makes both unreadable. So the first choice is the word that is true for the area: `spnutils` ships **commands**, so they are commands. **A second word is used only where the first collides head-on** — the things coverage measures are also commands in plain English, and `Command` already names the contract's own write shapes, so coverage takes **action**. An incidental overlap is not a collision: `Action` in the notifications module is domain-prefixed every time it appears, so `CoverageAction` sits beside `NtfAction` the way any two domain-prefixed names do. **What this rule ends is the bare generic word** — the corpus used *verb* for the CLI's commands and for the coverage model at once, and neither reader could tell which was meant.
 - **A construct is prose, and a developer reads it to Parts and stops.** Terms, Model, Parts, Boundary, Binds, Proof, in that order: Terms first because the model uses those words, Boundary after the parts because an edge is judged once the shape is seen. A section is a container; its content is blocks chosen by kind. Binds and Proof are for the architect and the agent.
 - **A behaviour row is a record with a shape, and two of its cells are not yours to write** (RD.DOCS.067 · RD.DOCS.079). The row is `Id · Who · Does · Sees · Where · Type · Tier · Status · Updated at`, plus `Names` where it fulfils a promise. **The count is not stated here**: there are three widths and `02-document.md` is the only place that gives them, because a number repeated is a number that will be wrong somewhere. The rest are declared by hand: what the behaviour is, what realizes it (`Where`), whether it states something a person can do, something they are refused or something the standards promise (`Type`), the tier that will prove it (`Tier`), and the foundation promise it fulfils (`Names`). The agent writes `Status` and `Updated at` from a run. Read `Does` for the arrangement and the action in one clause, with no service, no table and no type in it; read `Sees` for the outcome, which is **never empty**. **A status is a reading and never a claim** — the retired `Proven` cell put a claim where a reading belonged, and the word is the value while the icon is only the rendering.
 - **A foundation row is a promise of five cells, and a built repository's row carries all ten** (RD.DOCS.071 · RD.DOCS.072). A promise is `Id · Who · Does · Sees · Type`, with `Type` reading `PROMISE` — the generic behaviour of an area that the standards make possible, written in the actor's own words, whether or not anything fulfils it yet. It carries no `Where`, no `Tier`, no `Status` and no `Updated at`, because the foundation ships no code and nothing could ever write them, and **a foundation row claiming a status is refused**. A row in a built repository carries every cell, and its `Names` cell holds the foundation id it delivers. A promise nothing fulfils is not a gap; it is the standard saying what it expects.

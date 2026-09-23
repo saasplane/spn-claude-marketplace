@@ -1,10 +1,10 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/02-constructs/01-devex/04-workspace/01-workspace.md", "seen": "2481b6c2" },
-    { "path": "docs/02-constructs/01-devex/04-workspace/02-workstream.md", "seen": "feebc7e9" },
-    { "path": "docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md", "seen": "bedbf3af" },
-    { "path": "docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md", "section": "The agent is updated first, and reloaded before anything runs", "seen": "687ada82" },
+    { "path": "docs/02-constructs/01-devex/04-workspace/01-workspace.md", "seen": "2fbe40c5" },
+    { "path": "docs/02-constructs/01-devex/04-workspace/02-workstream.md", "seen": "654b23c2" },
+    { "path": "docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md", "seen": "07a688b1" },
+    { "path": "docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md", "section": "The agent is updated first, and reloaded before anything runs", "seen": "97526696" },
     { "path": "docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md", "section": "An arc's status says which of eight states it is in", "seen": "f6636752" },
     { "path": "docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md", "section": "When an edit becomes behaviour", "seen": "4d108ba0" },
     { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md", "section": "Restatement discipline", "seen": "11808ae4" }

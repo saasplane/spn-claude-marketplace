@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/04-capabilities/02-support/01-apps/07-comments/01-intent.md", "seen": "d037079a" },
+    { "path": "docs/04-capabilities/02-support/01-apps/07-comments/01-intent.md", "seen": "e408139b" },
     { "path": "docs/04-capabilities/02-support/01-apps/08-agent-surface/README.md", "seen": "4a652e95" },
     { "path": "docs/04-capabilities/02-support/01-apps/03-module/01-server/01-contract/01-states.md", "seen": "b57723a5" }
   ]

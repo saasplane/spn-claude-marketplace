@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/02-constructs/01-devex/02-agent/03-lenses.md", "seen": "3a60f98c" },
+    { "path": "docs/02-constructs/01-devex/02-agent/03-lenses.md", "seen": "ce48edfc" },
     { "path": "docs/03-behaviors/README.md", "seen": "35978308" }
   ],
   "rows": []
