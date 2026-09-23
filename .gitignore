@@ -6,3 +6,7 @@ __pycache__/
 .npmrc
 .claude/settings.local.json
 .claude/saasplane/spn-symbols.json
+
+# ── what a run proved, not what a person wrote: the suites in plugins/spn-core/hooks/tests/
+#    write their artifact here, rewritten with a fresh timestamp on every run ──
+**/tests/.output/

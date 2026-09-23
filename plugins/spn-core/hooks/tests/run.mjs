@@ -11,7 +11,7 @@
 // `spnutils` serves it with its docs verbs only and has no runner to write its behaviour rows.
 // These suites ARE its runner. Every case whose title carries a behaviour id in brackets —
 // `[MKT.DOCS.01]`, the book's rule that an id is carried by a test title — becomes a result, the
-// results become `docs/artifacts/reports/spn-tests.json`, and `behaviour-status.mjs` writes the
+// results become `tests/.output/unit/spn-tests.json`, and `behaviour-status.mjs` writes the
 // two cells a run owns. A case with no id in its title proves nothing to the register and is
 // counted only here, which is how it should be: a register row is a promise somebody made, not
 // every assertion anybody wrote.
@@ -62,7 +62,12 @@ console.log(`\n  ${suites.length} suite(s) · ${cases} case(s)` +
 // THE ARTIFACT IS WRITTEN EVEN WHEN NO CASE CARRIES AN ID, because an empty result set is a fact
 // about the run — the register then says PENDING for rows this tier covers and nothing proved,
 // which is true and is what a reader needs. An absent file would read as *the run never happened*.
-const artifact = resolve(REPO, "docs", "artifacts", "reports", "spn-tests.json");
+//
+// IT IS A RUN'S OUTPUT AND NOT A DOCUMENT, so it lives where every other stack's runner puts one —
+// `tests/.output/<tier>/spn-tests.json`, the path `spn-test.mjs` derives. The pocket beside it
+// holds pages a person wrote (RD.DOCS.089); a file rewritten by every run is not one, and while it
+// sat there a suite run reported a changed tree on its timestamp alone, which a release refuses.
+const artifact = resolve(REPO, "tests", ".output", TIER.toLowerCase(), "spn-tests.json");
 mkdirSync(dirname(artifact), { recursive: true });
 writeFileSync(artifact, `${JSON.stringify({
   env: "local", tiers: [TIER], ranAt: new Date().toISOString(), from: "plugins/spn-core/hooks/tests/run.mjs", results,
