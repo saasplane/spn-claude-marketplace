@@ -710,8 +710,11 @@ export function orient(root: string, cwd: string): [text: string, note: string] 
   const note = "\n---\nGround, read at load — the members, their law, and every workstream in all " +
     "three states. `open/` is available now, `backlog/` is parked behind a named " +
     "blocker, and `closed/` is the receipt. The number is an identity, never a " +
-    `priority. Rung ${level}: ${why}. Say hello with the welcome above, then this ground, ` +
-    "then the closing question. Never turn the rung into a menu. The standing offer " +
+    `priority. Rung ${level}: ${why}. Say hello with the welcome above, then this ground. ` +
+    "The closing question is asked ONLY when the developer's first message does not already " +
+    "say what to do. A handover block, an arc name, or any named next step replaces it — open " +
+    "with what you are picking up and the first thing you will do, never by asking again. " +
+    "Never turn the rung into a menu. The standing offer " +
     "under that question appears only when exactly one workstream is open and no other " +
     "session is live here — so where you cannot see one, do not propose resuming " +
     "anything.\n";

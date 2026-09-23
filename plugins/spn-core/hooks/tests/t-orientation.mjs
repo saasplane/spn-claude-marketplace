@@ -241,5 +241,41 @@ console.log("\n=== a window says when it loaded wiring older than what is instal
     [], ["this window loaded"]);
 }
 
+// ── the closing question is CONDITIONAL, and the hook cannot see the condition (N54) ──
+
+// `SessionStart` fires before the developer has typed, so the script cannot know whether the first
+// message carries a handover block. The question is therefore always right to EMIT, and the thing
+// that had to change is the instruction the agent reads beside it. A developer who arrives with a
+// handover block and is asked "what are we building?" has to retype what the block already said —
+// and a handover block is the one artifact built to stop work living only in a conversation.
+//
+// So this case asserts both halves at once: the ground is unchanged, and the note now carries the
+// condition. Asserting only the note would pass over a regression that silenced the question.
+console.log("\n=== orientation — the closing question is asked only when nothing was said");
+
+{
+  /** Same tally as `compare`, for assertions over one captured render rather than two. */
+  const says = (label, ok) => {
+    n += 1;
+    if (!ok) failed += 1;
+    console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}`);
+  };
+
+  const ground = fixture("conditional-ask", {
+    "spn-infra/sprepo.json": repo("INFRA"),
+    ".spndevex/README.md": "state\n",
+  });
+  const text = run("node", [`${HOOKS}/events/orientation.ts`, ground], ground);
+
+  says("the ground still ends with the question, because the hook cannot see the first message",
+    text.includes("So — what are we building?"));
+  says("and the note now makes asking it conditional",
+    text.includes("The closing question is asked ONLY when the developer's first message does not already"));
+  says("it names what replaces the question, rather than only forbidding it",
+    text.includes("A handover block, an arc name, or any named next step replaces it"));
+  says("and the standing-offer rule beside it is untouched",
+    text.includes("The standing offer") && text.includes("do not propose resuming"));
+}
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);
