@@ -2135,7 +2135,7 @@ function gapReport(repo: string, workspace: string, asJson: boolean): number {
     "## What this report does not measure",
     "",
     row(["Not measured", "Why", "What would measure it"]), row(["---", "---", "---"]),
-    row(["Comments owed per package", "the symbol index is a per-package build this audit does not run", "`spnutils apps gen-symbols -p <pkg>`"]),
+    row(["Comments owed per package", "the symbol index is a per-package build this audit does not run", "`spnutils apps gen-symbols <package>`"]),
     row(["Whether a written construct is TRUE", "a count cannot read", "the two-per-wave read"]),
     row(["The constructs a concept has not listed", "see the note above", "`docs.ts face`, once the constructs exist"]),
     "",

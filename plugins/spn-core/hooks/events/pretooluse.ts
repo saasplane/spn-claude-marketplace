@@ -88,7 +88,7 @@ const CHECKS: Check[] = [
 const REGEN_HINT =
   "This file is generated — hand edits are lost on the next generator run. Edit the source instead " +
   "and regenerate: contract validators come from contract/states/** via 'spnutils apps gen-validators " +
-  "-p <pkg>'; package barrels via 'spnutils apps gen-barrel -p <pkg>'; client SDKs regenerate from the " +
+  "<package>'; package barrels via 'spnutils apps gen-barrel <package>'; client SDKs regenerate from the " +
   "running service's published API document. Never hand-edit generated output.";
 
 /**

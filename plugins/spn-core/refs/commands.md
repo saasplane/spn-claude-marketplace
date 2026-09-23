@@ -103,7 +103,11 @@ Surface `4f84135ac03d`. A release that adds no command leaves that unchanged and
 
 ### The derivation laws bind every command
 
-**Nothing contextual is typed**: the stack comes from the repo's claim, the estate from its pins or tree. The registry and every package scope come from the organization, the target project from the cwd. A flag may override; absence of both refuses by name; a silent default never exists. There is no whole-estate command. And a mutation is reviewable or it does not exist: pins bump by editing the manifest, versions are typed by a human, estate publishes run from CI alone.
+**Nothing contextual is typed**: the stack comes from the repo's claim, the estate from its pins or tree. The registry and every package scope come from the organization. A flag may override a derivable fact; absence of both refuses by name; a silent default never exists. There is no whole-estate command. And a mutation is reviewable or it does not exist: pins bump by editing the manifest, versions are typed by a human, estate publishes run from CI alone.
+
+**The package is NAMED, never derived from where you are standing.** Every command that acts on one node takes it as a trailing positional — `spnutils apps test unit utility-ts`, `spnutils infra release infra-platform-dmo`. The word is `<package>` at every kind, and what a package is *called* belongs to the stack: nx spells it `utility-ts`, an estate holds `infra-platform-dmo`, an application folder reads `web-portal-ts`.
+
+**Run them from the repository root.** `apps`, `infra` and `repo` all resolve the repository by walking up from the cwd, so a deeper folder still works — but the root is the one place every command behaves the same, and naming the package means standing anywhere else buys nothing. `repo create` is the exception that runs above a repository, because it mints one. `workspace` commands take the cwd AS the workspace and are run from the workspace root.
 
 ### Skills and command groups are mapped, not matched
 
