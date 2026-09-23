@@ -15,7 +15,7 @@
 //   node docs.ts topics <repo…>         refuse a numbered topic the constructs seat does not name, and two documents under one id
 //   node docs.ts coverage <repo…>       every construct a chapter, every chapter a construct, every package a construct
 //   node docs.ts figures check|colour   labels fit and connectors join · a block's colouring matches its text
-//   node docs.ts audit --report <repo>  the gap scan — one report per repository, written, never fixed
+//   node docs.ts audit --report <repo>  the gap scan, to stdout — add --json for the agent, never a file
 //
 // Grades, per the N2 arc: RULE refuses, SOFT reports. N7 flips the SOFTs.
 
@@ -1962,7 +1962,7 @@ function coverageCheck(repo: string, workspace: string): Finding[] {
  * written either; and the symbol index is a per-package build this cannot run. Each is named in the
  * report rather than left to look like a zero.
  */
-function gapReport(repo: string, workspace: string): number {
+function gapReport(repo: string, workspace: string, asJson: boolean): number {
   const tree = join(repo, "docs");
   if (!existsSync(tree)) { console.error(`${relative(workspace, repo)} has no docs/ tree`); return 2; }
   const name = basename(resolve(repo));
@@ -2110,11 +2110,25 @@ function gapReport(repo: string, workspace: string): number {
     "",
   ].join("\n");
 
-  const out = join(tree, "artifacts", "reports", "docs-audit.md");
-  mkdirSync(dirname(out), { recursive: true });
-  writeFileSync(out, body);
-  console.log(relative(workspace, out));
-  console.log(`  seats ${seatRows.filter((r) => r.present).length}/5 · node trees ${strays.length} · domains ${domainRows.length}` +
+  // THE MEASUREMENT GOES TO THE CALLER, NEVER INTO A DEVELOPER'S POCKET (RD.DOCS.089). A report is
+  // written by the agent from what it read; a tool that holds a measurement the agent needs hands it
+  // over on standard output. Writing one here made this the only machine-authored file in a folder
+  // of authored pages, and it regenerated on every run whether anybody had asked for it or not.
+  if (asJson) {
+    console.log(JSON.stringify({
+      repo: name,
+      measuredAt: at,
+      seats: seatRows,
+      nodeTrees: strays,
+      domains: domainRows,
+      approaches: approaches,
+      pageFindings: findings,
+      proseCandidates: { total: totalFlagged, files: prose.length },
+    }, null, 2));
+    return 0;
+  }
+  console.log(body);
+  console.error(`  seats ${seatRows.filter((r) => r.present).length}/5 · node trees ${strays.length} · domains ${domainRows.length}` +
     ` · constructs ${domainRows.reduce((n, d) => n + d.has, 0)} · approaches ${approaches.length}` +
     ` · page findings ${findings.length} · prose candidates ${totalFlagged} in ${prose.length} file(s)`);
   return 0;
@@ -2370,7 +2384,7 @@ if (cmd === "topics" || cmd === "coverage") {
 if (cmd === "audit" && rest.includes("--report")) {
   const target = rest.find((r) => !r.startsWith("--"));
   if (!target) { console.error("usage: node docs.ts audit --report <repo>"); process.exit(2); }
-  process.exit(gapReport(resolve(target), resolve(workspace)));
+  process.exit(gapReport(resolve(target), resolve(workspace), rest.includes("--json")));
 }
 
 if (cmd !== "audit" || rest.length === 0) {

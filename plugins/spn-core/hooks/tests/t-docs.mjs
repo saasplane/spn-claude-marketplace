@@ -7,7 +7,7 @@
 // Each case builds a throwaway tree, runs the real command against it, and reads what changed on
 // disk rather than what the command printed — a tool that reports a write it did not make, and one
 // that makes a write it did not report, both have to fail.
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
@@ -45,6 +45,7 @@ function run(root, args) {
   } catch (e) { return String(e.stdout ?? "") + String(e.stderr ?? ""); }
 }
 const readAt = (root, p) => readFileSync(join(root, p), "utf8");
+const absent = (root, p) => !existsSync(join(root, p));
 
 let n = 0, failed = 0;
 function one(name, got, want) {
@@ -747,16 +748,25 @@ console.log("\n=== the gap scan measures and never fixes");
     "pkg/docs/README.md": "# stray\n",
   });
   const before = readAt(root, "docs/03-behaviors/README.md");
-  const out = run(root, ["audit", "--report", "."]);
-  const rep = readAt(root, "docs/artifacts/reports/docs-audit.md");
+  const rep = run(root, ["audit", "--report", "."]);
 
-  one("it writes one report into the repository's own pocket", out, has("docs/artifacts/reports/docs-audit.md"));
+  // THE MEASUREMENT IS A RETURN VALUE, NEVER A FILE (RD.DOCS.089). A report is written by the agent
+  // from what it read; a tool hands over what it measured and writes nothing into a pocket. Before
+  // this, the scan wrote the only machine-authored page in a folder of authored ones, and rewrote
+  // it on every run whether anybody had asked a question or not.
+  one("it writes nothing into the repository's pocket", absent(root, "docs/artifacts/reports/docs-audit.md"), true);
+  one("the measurement comes back to the caller", rep, has("still carry a docs tree"));
   one("IT FIXES NOTHING IT MEASURES", readAt(root, "docs/03-behaviors/README.md"), before);
   one("a node still carrying a docs tree is a finding", rep, has("still carry a docs tree"));
   one("a domain with nothing written in it is a DOMAIN, not a group", rep, has("`01-core`"));
   one("what the concept lists is what the domain owes", rep, (g) => /\| `01-core` \| ✅ \| 0 \| 1 \|/.test(g));
   one("the arguments still in the pocket are listed", rep, has("a-approach.html"));
   one("a page with no block is counted", rep, has("block (RULE)"));
+  one("--json hands the agent the same measurement as data",
+    run(root, ["audit", "--report", ".", "--json"]), (g) => {
+      try { const d = JSON.parse(g); return d.repo !== undefined && Array.isArray(d.seats) && d.measuredAt !== undefined; }
+      catch { return false; }
+    });
 
   // AN ARGUMENT IS A WORKSTREAM'S, NEVER A REPOSITORY'S. The rule is old — 05-artifacts.md has
   // always said "an argument does not live here", and the pocket's folder set never had an

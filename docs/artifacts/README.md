@@ -41,11 +41,9 @@ One page per construct, **produced from its seat file and never edited by hand**
 
 ## Reports
 
-A report answers a question at a moment. It is **superseded** by the next run of the same template, or **kept** and dated in its filename where the particular answer is worth holding onto.
+A report answers a question at a moment, and is **replaced in place** by the next one of its kind. There are four, each named for what a reader wants to know (decision `RD.DOCS.089`): **audit** is this repository's wiring, **code** is its source against the stack's standards, **docs** is its corpus against the docs standards, and **tests** is what its tests have proved.
 
-| Report | Answers | Lifecycle |
-| --- | --- | --- |
-| [Docs audit](reports/docs-audit.md) | what this repository's docs tree holds, and what it owes | superseded on the next run |
+**None is written yet, and that is a fact rather than a gap.** A report is written by the agent on request, never produced by a command — so the pocket holds one when somebody has asked a question, and holds none until then.
 
 ## What does not live here
 
