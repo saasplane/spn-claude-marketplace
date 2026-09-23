@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 # spn-infra PreToolUse guard: deny Write/Edit that would break the estate laws.
 #
+# THE REGISTRATION NAMES `events/pretooluse.ts`, AND THIS FILE STAYS UNTIL THE NEXT REINSTALL.
+# `hooks.json` is read once at session start, so a window opened before that change still invokes
+# this script by name; deleting it now would break every such window past repair. It is retired by
+# the reinstall that loads the new registration, and `tests/harness.mjs` runs it as the parity arm
+# until then — every case asserts that it and the port decide alike.
+#
 # Denies (conservative — when unsure, allow):
 #   1. Any edit under */dist/*                — dist is staged by the build, published whole
 #   2. Content carrying an ARN               — identifiers are discovered, never typed

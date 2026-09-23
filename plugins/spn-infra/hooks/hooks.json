@@ -6,7 +6,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}\"/hooks/events/deny-estate-violations.sh"
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}\"/hooks/events/pretooluse.ts",
+            "timeout": 20
           }
         ]
       }
