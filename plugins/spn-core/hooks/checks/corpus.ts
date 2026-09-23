@@ -49,6 +49,21 @@ const WIRED = [
 ];
 
 /**
+ * The checks that ask one question of the whole workspace rather than one per docs tree.
+ *
+ * `commands-ref` is `N18` step 3, and it waited on a baseline rather than on a host: it reported
+ * STALE until the `1.2.67` release let the ref be regenerated from a CLI that was not already behind
+ * the source. It exits 1 on a stale region, so it gates the same way the others do.
+ *
+ * IT DEGRADES TO SILENCE WITH NO CLI ON THE MACHINE, the rule `coherence.ts` already states: it asks
+ * `spnutils help --json` for the surface, and a partner holds the plugins without the CLI. A missing
+ * `spnutils` is a fact about that machine, not a finding about the ref.
+ */
+const WORKSPACE_WIDE = [
+  { tool: "commands-ref.ts", label: "commands-ref", needs: "spnutils" },
+];
+
+/**
  * The corpus tools deliberately NOT wired, and the count each reports on a clean corpus.
  *
  * THIS LIST IS THE HONEST HALF OF THE RUN. `N38` step 4 requires that a run say which tools it ran
@@ -74,6 +89,16 @@ const MAX_FILES = 20000;
 
 function read(path: string): string {
   try { return readFileSync(path, "utf8"); } catch { return ""; }
+}
+
+/** Where a command resolves on this machine, or null. No spawn — `which` is a filesystem question. */
+function onPath(command: string): string | null {
+  for (const dir of (process.env.PATH ?? "").split(":")) {
+    if (!dir) continue;
+    const full = join(dir, command);
+    try { if (statSync(full).isFile()) return full; } catch { /* next */ }
+  }
+  return null;
 }
 
 /** Every repository under the workspace that declares itself and carries a docs tree. */
@@ -125,10 +150,18 @@ export function fingerprint(root: string, trees: string[], toolDir: string): str
   // THE CHECK'S OWN BYTES ARE HERE TOO, and leaving them out bit immediately: editing this file to
   // fix the verdict-caching defect left the old verdict cached, because the hash had not moved. A
   // fingerprint that cannot see a change to the checker is a stale-green generator.
-  for (const tool of [join(toolDir, "docs.ts"), join(toolDir, "coherence.ts"), import.meta.filename]) {
+  for (const tool of [join(toolDir, "docs.ts"), join(toolDir, "coherence.ts"), join(toolDir, "commands-ref.ts"), import.meta.filename]) {
     try { const st = statSync(tool); lines.push(`${basename(tool)}\t${st.size}\t${st.mtimeMs}`); }
     catch { lines.push(`${basename(tool)}\tabsent`); }
   }
+  // THE INSTALLED CLI IS AN INPUT TOO, and no walk of the docs trees can see it. `commands-ref` asks
+  // `spnutils` what commands exist, so a release that adds one makes the ref stale WITHOUT changing a
+  // single tracked file — and a fingerprint blind to that would skip the run forever. The binary is
+  // STATTED rather than executed: asking `spnutils --version` on every turn would cost a spawn and
+  // undo the cheap skip this whole design exists for.
+  const cli = onPath("spnutils");
+  try { const st = statSync(cli ?? ""); lines.push(`spnutils\t${st.size}\t${st.mtimeMs}`); }
+  catch { lines.push("spnutils\tabsent"); }
   return createHash("sha256").update(lines.join("\n")).digest("hex");
 }
 
@@ -188,8 +221,11 @@ function runOne(root: string, toolDir: string, tool: string, args: string[]): { 
     if (error?.status === 1) {
       const lines = out.split("\n");
       const rule: string[] = [];
+      // `✗` RATHER THAN `✗ RULE`, because not every tool here grades its findings. `docs.ts` writes
+      // `✗ RULE` and `! SOFT`; `commands-ref` writes a bare `✗`. Matching the mark catches both and
+      // still leaves SOFT alone, which is the line this check does not fail on.
       for (let i = 0; i < lines.length; i++) {
-        if (!lines[i].includes("✗ RULE")) continue;
+        if (!lines[i].includes("✗")) continue;
         const why = (lines[i + 1] ?? "").trim();
         rule.push(`${lines[i].replace(/^✗\s*RULE\s*/, "").trim()}${why ? ` — ${why}` : ""}`);
       }
@@ -238,7 +274,15 @@ export function checkCorpus(root: string): Warning[] {
       for (const line of rule) findings.push(`${basename(dirname(tree))} · ${step.label} · ${line}`);
     }
   }
-  const which = `Ran ${WIRED.map((w) => `\`${w.label}\``).join(" · ")} over ${trees.length} docs tree(s). ` +
+  for (const step of WORKSPACE_WIDE) {
+    if (step.needs && !onPath(step.needs)) { ran.push({ tree: "(workspace)", tool: `${step.label} — skipped, no ${step.needs}`, rule: 0 }); continue; }
+    const { rule, broke: failure } = runOne(root, toolDir, step.tool, []);
+    ran.push({ tree: "(workspace)", tool: step.label, rule: rule.length });
+    if (failure) { broke.push(`\`${step.label}\` could not run — ${failure}`); continue; }
+    for (const line of rule) findings.push(`workspace · ${step.label} · ${line}`);
+  }
+
+  const which = `Ran ${[...WIRED, ...WORKSPACE_WIDE].map((w) => `\`${w.label}\``).join(" · ")} over ${trees.length} docs tree(s). ` +
     `NOT run, and each is somebody's owed work rather than a clean result: ` +
     REPORTED_ELSEWHERE.map((t) => `\`${t.label}\` (${t.why})`).join(" · ") + ".";
 
