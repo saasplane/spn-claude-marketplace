@@ -87,7 +87,7 @@ Rules:
 - **Never hand-edit the 📖 strip** at the foot of a seat document — it is derived from the node's doc map and regenerated whenever the node's file set changes (foundation decision RD.DOCS.007). Adding or removing a file is what makes every strip in that node stale, not just the new one's.
 - **Never invent entities or columns in prose** — align with the layer's `schema.sql` or update it first.
 - **Written fresh** — docs state present truth; no changelog prose, no "previously"; git history is the history.
-- **Regenerate, don't restate**: `spnutils apps gen-symbols -p <pkg>` refreshes the machine twin (`spn-symbols.json`); the doc seats are the human twin. Intent lives in the code and is harvested — never typed twice (foundation decision RD.APPS.006).
+- **Regenerate, don't restate**: `spnutils apps gen-symbols <pkg>` refreshes the machine twin (`spn-symbols.json`); the doc seats are the human twin. Intent lives in the code and is harvested — never typed twice (foundation decision RD.APPS.006).
 
 ## Env documentation
 

@@ -24,8 +24,8 @@ description: Prove SaaS Plane TS work is sound by running gates. Use when the as
 No running stack required. Run the cheapest gate first, so a failure stops the run early:
 
 1. **Codegen freshness** — regenerate what is derived, then prove nothing changed:
-   - `spnutils apps gen-validators -p <pkg>` for every package with edited `contract/states/**`
-   - `spnutils apps gen-barrel -p <pkg>` for every lib package that gained or lost files (never apps, never the API client, never the CLI)
+   - `spnutils apps gen-validators <pkg>` for every package with edited `contract/states/**`
+   - `spnutils apps gen-barrel <pkg>` for every lib package that gained or lost files (never apps, never the API client, never the CLI)
    - then `git status --short` on the generated paths. **A diff here is the finding**: either generated output was hand-edited or a generator was never re-run. Both mean the committed artifact and its source disagree.
    - `spnutils apps gen-symbols` — **no `-p`** — sweeps every project in the workspace, the way `repo agent-sync` refreshes the merged index. Run it when you need the workspace's own packages to describe themselves *now*. Generation is a release-time cost by design, so a package changed on this branch otherwise still advertises the surface it last released. It writes to `dist/` and is never committed, so there is no diff to check — the point is fresh context, not a gate.
 2. **Description coverage** — the symbol indexes ARE the report. After the sweep above, read each `dist/generated/spn-symbols.json`. Count the symbols in the **required set** whose `intent` is null. That set is `SERVICE`, `OPERATION`, `COMMAND`, `STATE`, `EVENT`, `ENUM`, `COMPONENT`, `HOOK`, `PAGE`, `CLI_COMMAND`, and every `ERROR` / `PERMISSION` member. Each one is a published symbol an agent cannot select (the core plugin's `refs/intent.md` owns the rule). Report the count per package and name the worst offenders; a repo-wide sweep is one pass over files that already exist, so there is no reason to sample.

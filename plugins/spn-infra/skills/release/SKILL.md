@@ -14,7 +14,7 @@ Edit **`version`** in the node's `spinfrapkg.json` — semver, typed by a human,
 ## 2 · Dry-run
 
 ```text
-spnutils infra release -p <package> --dry-run
+spnutils infra release <package> --dry-run
 ```
 
 Validate, test, stage `dist/` = **`spinfrapkg.json` + `src/**`, whole — nothing else, nothing stamped**. `docs/`, `tests/` and `README.md` never ship — an artifact carries source alone. Confirm the staged set before approving.
@@ -22,8 +22,8 @@ Validate, test, stage `dist/` = **`spinfrapkg.json` + `src/**`, whole — nothin
 ## 3 · Publish — the target is chosen, never derived
 
 ```text
-spnutils infra release -p <package> -y            # → the org's registry pair
-spnutils infra release -p <package> --local -y    # → the machine store, staged only
+spnutils infra release <package> -y            # → the org's registry pair
+spnutils infra release <package> --local -y    # → the machine store, staged only
 ```
 
 - **The release target is the organization's `-public`/`-private` pair**, routed by the name's scope. Same as `apps release`. **`--local` stages into the machine store (`~/.spnutils/registry`) instead** — the target is a choice on the command, never derived from what happens to be bound.

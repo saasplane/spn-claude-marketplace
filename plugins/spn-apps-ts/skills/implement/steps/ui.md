@@ -53,7 +53,7 @@ Auth surfaces: business apps never implement login — the auth gate hands off t
 
 ## Regenerate
 
-- Run `spnutils apps gen-barrel -p module-web-<mod>-ts` after adding/removing files.
+- Run `spnutils apps gen-barrel module-web-<mod>-ts` after adding/removing files.
 - If the BE contract changed: regenerate the API client from the running service **before** consuming it.
-- Write labels as `translate('<scope>.<key>', 'Fallback')` with dotted scope + snake_case leaf (`common.*` flat, mirrors its value; module keys may add one subscope). `spnutils apps gen-labels -p <pkg>` builds the label manifest at build/prerelease (a `dist` artifact — not committed, not a pre-commit step).
+- Write labels as `translate('<scope>.<key>', 'Fallback')` with dotted scope + snake_case leaf (`common.*` flat, mirrors its value; module keys may add one subscope). `spnutils apps gen-labels <pkg>` builds the label manifest at build/prerelease (a `dist` artifact — not committed, not a pre-commit step).
 - Verify with the FE builds — `npx nx run-many -t build -p '<ui-pkg>,web-*'`.

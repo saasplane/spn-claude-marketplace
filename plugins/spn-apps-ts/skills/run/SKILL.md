@@ -197,7 +197,7 @@ means a build value was missing and threw at boot, naming the key.
 
 1. **Organization layer** (once per machine — skip if already up): `spnutils infra organization up` — the machine's trust bootstrap: the local certificate authority, its one trust prompt, the shared ingress.
 2. **Platform layer**: `spnutils infra platform up` — this platform's container group (database, cache, queue, and each installed module's local rendering) from the pinned declaration. Check with `spnutils infra platform status`.
-3. **App layer** (per app, if not yet registered): `spnutils infra app up -p <app>` — schemas, per-schema roles, local TLS certificate, hosts entry, ingress vhost. No containers of its own.
+3. **App layer** (per app, if not yet registered): `spnutils infra app up <app>` — schemas, per-schema roles, local TLS certificate, hosts entry, ingress vhost. No containers of its own.
 4. **Hosted-vendor modules** need no step of their own — a vendor you run is a module row in the platform declaration, and its local rendering comes up with the platform layer. There is no vendor command.
 5. **Start the service app**: `npx nx run <service>:dev`. It loads `local.env`, and its port and API-docs path come from the repo's own app env — read them rather than assume. On a fresh schema run `pnpm --filter <service> migrate up` first; it needs the platform-owner env variables sourced.
 6. **Start web apps** as needed: `npx nx run-many -t dev -p '<pattern>'`, on the ports each app declares in its own manifest. For a browser suite run `start` instead, over a `build test` bundle — never `dev`.
@@ -223,6 +223,6 @@ npx nx run-many -t test --all            # every unit suite
 
 **FE E2E**: `pnpm test:e2e` (root Playwright) — after the BE suite, on a quiesced stack (no concurrent resets/builds), with the stack seeded.
 
-Codegen freshness comes before any suite. Run `spnutils apps gen-validators -p <pkg>` for packages with edited `contract/states/**`. Run `spnutils apps gen-barrel -p <pkg>` for lib packages that gained/lost files — never apps, never the API client.
+Codegen freshness comes before any suite. Run `spnutils apps gen-validators <pkg>` for packages with edited `contract/states/**`. Run `spnutils apps gen-barrel <pkg>` for lib packages that gained/lost files — never apps, never the API client.
 
 Report per-suite results honestly — a suite you did not run is "not run", never assumed green. Test-state hygiene rules: the `implement` skill steps/test.md.

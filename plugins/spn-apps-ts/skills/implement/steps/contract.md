@@ -137,8 +137,8 @@ Two traps: a field is published even when **no known consumer calls it** — pub
 ## Generate — part of the edit, not a step at the end
 
 ```bash
-spnutils apps gen-validators -p <folder-name>   # after ANY contract/states/** edit — validators are generated, never hand-edited
-spnutils apps gen-barrel -p <folder-name>       # lib packages that gained/lost files — NEVER apps, NEVER the API client, NEVER the CLI package
+spnutils apps gen-validators <folder-name>   # after ANY contract/states/** edit — validators are generated, never hand-edited
+spnutils apps gen-barrel <folder-name>       # lib packages that gained/lost files — NEVER apps, NEVER the API client, NEVER the CLI package
 ```
 
 **Run these in the same step as the edit, for every package you touched** — not batched before a
@@ -162,8 +162,8 @@ becomes a named schema in the client.
 Two sweeps prove no drift anywhere, and an empty result is the proof:
 
 ```bash
-for d in packages/module-server-*-ts; do spnutils apps gen-validators -p $(basename $d); done
-for d in packages/module-{server,web}-*-ts; do spnutils apps gen-barrel -p $(basename $d); done
+for d in packages/module-server-*-ts; do spnutils apps gen-validators "$(basename $d)"; done
+for d in packages/module-{server,web}-*-ts; do spnutils apps gen-barrel "$(basename $d)"; done
 git status --short packages/*/src/contract/validators/ packages/*/src/index.ts
 ```
 

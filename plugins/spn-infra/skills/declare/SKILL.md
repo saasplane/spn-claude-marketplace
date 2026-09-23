@@ -26,7 +26,7 @@ Find the node root by `spinfrapkg.json` and read the type from `src/spestate.jso
 ## 3 · Validate
 
 ```text
-spnutils infra validate -p <package>
+spnutils infra validate <package>
 ```
 
 Structure against the type, manifest against the contract, fmt and validate per rendering. Green before any review is asked for.

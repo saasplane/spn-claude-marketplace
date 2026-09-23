@@ -43,13 +43,13 @@ Then:
 | --- | --- | --- | --- | --- |
 | `repo` | `sprepo.json` `{ type: APPS }` — a repo type, not a kind | — | The workspace root — see **Target: repo** above | — |
 | `toolchain` | `TOOLCHAIN` | universal | `packages/toolchain-ts` — the tsconfig bases, flat lint config, test presets, bundler factory, release bins. Publishes **files consumed by path**, so no barrel and no symbol index. Singleton, one per stack | — |
-| `support-universal` | `SUPPORT_UNIVERSAL` | universal | Capability-group package under `packages/`, runtime-agnostic (`src/<group>/…`, root barrel) | `spnutils apps gen-barrel -p <pkg>` |
-| `support-server` | `SUPPORT_SERVER` | server | Same shape, server-only | `spnutils apps gen-barrel -p <pkg>` |
-| `support-web` | `SUPPORT_WEB` | web | Same shape, browser-only; `ui/` sits at the **source root**, because there it is the published surface rather than a module's adapter to it | `spnutils apps gen-barrel -p <pkg>` |
-| `module-server` | `MODULE_SERVER` | server | `packages/module-server-<mod>-ts` — the contract/app/entry triad + `migrations/` + module wiring (`interface.ts`, `<mod>Module.ts`, `<MOD>ModuleManager.ts`) + a `README.md`; its mirrors, `data-model.md` and `schema.sql` land in the repository's own tree under its domain (see **Target: app-module § Docs**) | `spnutils apps gen-validators -p <pkg>` (after states) · `gen-barrel -p <pkg>` |
-| `module-web` | `MODULE_WEB` | web | `packages/module-web-<mod>-ts` — `src/entry/ui/{components,hooks,pages,utils}` (the browser is a transport, so the UI is the module's **entry**; `contract/` and `app/` arrive beside it only once the module owns client-side rules), named exports only | `spnutils apps gen-barrel -p <pkg>` |
-| `app-server` | `APP_SERVER` | server | `apps/service-<usecase>-ts` — bootstrap `index.ts`, `<CODE>AppManager.ts`, `interface.ts`, `modules/`, `envs/` (`local.env`, `cloud.env` — no secrets), the platform declaration's `apps[]` row | `spnutils infra app up -p <app>` · `pnpm migrate:up` |
-| `app-web` | `APP_WEB` | web | `apps/web-<usecase>-ts` — root holds only `index.tsx` · `index.css` · `interface.ts` · `<code>App.ts` · `<CODE>AppManager.ts`; the shell (`AppRouter`, `nav`, app context) lives in `src/modules/boot/entry/ui/`, and vite carries per-module `manualChunks` | `spnutils infra app up -p <app>` |
+| `support-universal` | `SUPPORT_UNIVERSAL` | universal | Capability-group package under `packages/`, runtime-agnostic (`src/<group>/…`, root barrel) | `spnutils apps gen-barrel <pkg>` |
+| `support-server` | `SUPPORT_SERVER` | server | Same shape, server-only | `spnutils apps gen-barrel <pkg>` |
+| `support-web` | `SUPPORT_WEB` | web | Same shape, browser-only; `ui/` sits at the **source root**, because there it is the published surface rather than a module's adapter to it | `spnutils apps gen-barrel <pkg>` |
+| `module-server` | `MODULE_SERVER` | server | `packages/module-server-<mod>-ts` — the contract/app/entry triad + `migrations/` + module wiring (`interface.ts`, `<mod>Module.ts`, `<MOD>ModuleManager.ts`) + a `README.md`; its mirrors, `data-model.md` and `schema.sql` land in the repository's own tree under its domain (see **Target: app-module § Docs**) | `spnutils apps gen-validators <pkg>` (after states) · `gen-barrel -p <pkg>` |
+| `module-web` | `MODULE_WEB` | web | `packages/module-web-<mod>-ts` — `src/entry/ui/{components,hooks,pages,utils}` (the browser is a transport, so the UI is the module's **entry**; `contract/` and `app/` arrive beside it only once the module owns client-side rules), named exports only | `spnutils apps gen-barrel <pkg>` |
+| `app-server` | `APP_SERVER` | server | `apps/service-<usecase>-ts` — bootstrap `index.ts`, `<CODE>AppManager.ts`, `interface.ts`, `modules/`, `envs/` (`local.env`, `cloud.env` — no secrets), the platform declaration's `apps[]` row | `spnutils infra app up <app>` · `pnpm migrate:up` |
+| `app-web` | `APP_WEB` | web | `apps/web-<usecase>-ts` — root holds only `index.tsx` · `index.css` · `interface.ts` · `<code>App.ts` · `<CODE>AppManager.ts`; the shell (`AppRouter`, `nav`, app context) lives in `src/modules/boot/entry/ui/`, and vite carries per-module `manualChunks` | `spnutils infra app up <app>` |
 | `app-utility` | `APP_UTILITY` | server | `apps/utility<-usecase>-ts` — the layers of a module, the frame of an app; `src/index.ts` is the executable a user invokes (`#!/usr/bin/env node`), so **never run `gen-barrel` against it** | — |
 | `client-api` | `CLIENT_API` | universal | `packages/client-<usecase>-api-ts` — the **shell** is scaffolded like any kind (manifest, tsconfigs, lint, tests, generator config, hand-written barrel). Only `src/generated/` is emitted, from the running service's published spec; hand edits there are lost by design | `pnpm --filter <app> gen:client` |
 | `app-module` | (the module's own) | — | A module folder inside an app — see **Target: app-module** below | |
@@ -59,11 +59,11 @@ Then:
 **Two arguments, and they are different facts.** `--usecase` builds the *name*; `--code` is the value `spkind.json`'s config carries. They coincide for modules and diverge for apps — `utility-ts` carries the code `utilities`.
 
 ```bash
-spnutils apps scaffold module-server -u ord            # code defaults to ORD
-spnutils apps scaffold app-server    -u sample -c SPN
-spnutils apps scaffold support-server                  # → support-server-ts, the family base
-spnutils apps scaffold support-server -u service       # → support-server-service-ts
-spnutils apps scaffold client-api     -u sample        # → client-sample-api-ts
+spnutils apps scaffold kind module-server -u ord            # code defaults to ORD
+spnutils apps scaffold kind app-server    -u sample -c SPN
+spnutils apps scaffold kind support-server                  # → support-server-ts, the family base
+spnutils apps scaffold kind support-server -u service       # → support-server-service-ts
+spnutils apps scaffold kind client-api     -u sample        # → client-sample-api-ts
 ```
 
 A kind whose `config` is `null` — `TOOLCHAIN`, `SUPPORT_*`, `CLIENT_API` — **refuses `--code` by name** rather than ignoring it; so does the `repo` target, which is not a kind at all.
@@ -116,7 +116,7 @@ A product module owned by one app — a scaffold target rather than a workspace 
 - **Backend**: `apps/<service-app>/src/modules/<code>/` mirroring the module skeleton — `spkind.json`, `interface.ts`, `<code>Module.ts`, `<CODE>ModuleManager.ts`, `contract/` (states, services, validators, constants), `app/` (entities, repositories, services, support, utils), `entry/api/controllers/`, `migrations/`. Add **one line** to the app manager's module list to register it.
 - **Frontend** (if it has a surface): `apps/<web-app>/src/modules/<code>/entry/ui/` with `components/hooks/pages`, its own vite `manualChunks` claim, literal route strings in `nav.ts` (no URL-helper package).
 - **Docs**: the module carries **`README.md` and no docs tree** (decision RD.DOCS.021). About twenty-five lines — what it is, what it is for, and links into the seats it realizes — using **none of the house words** (RD.DOCS.062). What it contributes sits in **the repository's one tree**, under the domain it belongs to: the domain's constructs in `02-constructs/<domain>/`, the rows for what a person can do in `03-behaviors/<domain>/`, and one mirror per source folder that earns one in `04-capabilities/<domain>/<layer>/`, with `data-model.md` and `schema.sql` where the module owns storage. A behaviour row belongs to the domain that would have to change, never to the package that happens to serve it.
-- Commands: `spnutils apps gen-validators -p <app-pkg>` after writing `contract/states/**` (gen-validators applies to apps too); do **not** run `gen-barrel` on apps (their `index.ts` is a bootstrap, not a barrel).
+- Commands: `spnutils apps gen-validators <app-pkg>` after writing `contract/states/**` (gen-validators applies to apps too); do **not** run `gen-barrel` on apps (their `index.ts` is a bootstrap, not a barrel).
 
 **The scaffold writes the gate table; it cannot answer the question behind it.** Every new module gets an `app/utils/authz.ts` and a seeded permission catalog. Before you fill either, decide what varies the answer — a person, an organization type, or a plan. `refs/permission-vs-enablement.md` in the **spn-core** plugin carries that question, the `{MOD}_MANAGE_{NOUN}` grammar, and the append rule an app-owned module needs when it contributes an option to another module's definition. This plugin's `hooks/scripts/enablement-grammar.py` refuses the checkable mistakes as you write them.
 
