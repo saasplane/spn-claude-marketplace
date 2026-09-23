@@ -33,6 +33,7 @@ import { checkContractCycle } from "../checks/contract-cycle.ts";
 import { checkDoc, bashWrites } from "../checks/doc-check.ts";
 import { gateDocumentsFirst, gateClose } from "../checks/split-plan.ts";
 import { checkConfirmed } from "../checks/confirmed.ts";
+import { checkReleaseGo, applies as releaseApplies } from "../checks/release-go.ts";
 import { applies as commentsApply, checkComments } from "../checks/comment-check.ts";
 import { applies as mirrorApplies, checkMirror } from "../checks/mirror.ts";
 import { begin, end, span } from "../lib/timing.ts";
@@ -66,6 +67,11 @@ const CHECKS: Check[] = [
   { name: "split-plan.close", run: gateClose, needs: ["command"],
     applies: (path, command) => Boolean(path || command) },
   { name: "confirmed", run: checkConfirmed, needs: ["file_path"], applies: () => true },
+  // BEFORE the workspace walks below it, because a release is the one call in this list that cannot
+  // be taken back. Its fast path is a regular expression over the command, so every edit pays that
+  // and stops.
+  { name: "release-go", run: checkReleaseGo, needs: ["command"],
+    applies: (path, command) => releaseApplies(path, command) },
   // It reads the fragment it was handed and opens no file, so its whole cost is the path test above
   // it and a pass over the text being written.
   { name: "comment-check", run: checkComments, needs: ["file_path"], applies: (path) => commentsApply(path) },

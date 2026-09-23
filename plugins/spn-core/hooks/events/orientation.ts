@@ -383,7 +383,7 @@ function loadedBehind(): string | null {
  * globbed rather than named, and a directory carrying `.orphaned_at` is skipped — it is a previous
  * install nothing loads. Any surprise reads as unknown rather than as current.
  */
-function cacheState(root: string, pluginNames: string[]): string {
+export function cacheState(root: string, pluginNames: string[]): string {
   // The marketplace is registered in `settings.local.json` on this machine and could be in either
   // file, so both are read and the local one wins — it is the per-developer override.
   const sources: Record<string, any> = {};

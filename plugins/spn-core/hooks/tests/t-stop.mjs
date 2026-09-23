@@ -159,6 +159,53 @@ one("an unlanded step with no card at all",
   runningWorkspace("stop-f16-none", ""),
   "warns", { says: "no card is open", parity: false, why: "F11 — the Python listed arcs as `arc-*` only" });
 
+console.log("\n=== runnable — N39 step 8: which arc is being executed is a fact, not a status word");
+
+// MEASURED 2026-09-23 OVER WORKSTREAM `008`: no arc has ever carried the word `RUNNING`. The
+// statuses in use are LANDED, DONE, IMPLEMENTING, PLANNING, OPEN and PART-LANDED, and 45 of 56 arcs
+// carry no status line at all. So this gate — the one written for *reported and stopped* — could not
+// fire, and did not, through every sitting of the workstream. What the sitting wrote is on disk.
+{
+  const { checkRunnable } = await import("../events/stop.ts");
+  const OPEN_ARC = RUNNING.replace("Status: **RUNNING**", "**Status: OPEN \u2014 opened today**");
+  const root = workspace("stop-runnable-touched", {
+    ".spndevex/workstreams/open/001-a-subject/a-subject-approach.html": page({ cards: "", names: ["N1-a-subject.md"] }),
+    ".spndevex/workstreams/open/001-a-subject/arcs/N1-a-subject.md": OPEN_ARC,
+  });
+  const past = Date.now() - 60_000, future = Date.now() + 60_000;
+
+  for (const [what, since, expected] of [
+    ["an arc written this sitting, whatever its status says", past, 1],
+    ["the same arc when this sitting did not write it", future, 0],
+    ["no baseline at all — the first Stop of a workspace stays quiet", 0, 0],
+  ]) {
+    n += 1;
+    const got = checkRunnable(root, since).length;
+    const ok = got === expected;
+    if (!ok) failed += 1;
+    console.log(`  ${ok ? "PASS" : "FAIL"}  ${what} -> ${got} warning(s)`);
+  }
+
+  // THE STATUS WORD STILL COUNTS where it appears, so nothing that worked before stops working —
+  // and it must work with NO baseline, because it is a claim rather than something measured.
+  n += 1;
+  const claimed = checkRunnable(workspace("stop-runnable-claimed", {
+    ".spndevex/workstreams/open/001-a-subject/a-subject-approach.html": page({ cards: "", names: ["N1-a-subject.md"] }),
+    ".spndevex/workstreams/open/001-a-subject/arcs/N1-a-subject.md": RUNNING,
+  }), 0).length === 1;
+  if (!claimed) failed += 1;
+  console.log(`  ${claimed ? "PASS" : "FAIL"}  an arc that SAYS RUNNING still fires with no baseline`);
+
+  // A LANDED ARC'S UNFINISHED ROWS ARE HISTORY. Editing one to add a log line must not report it.
+  n += 1;
+  const landed = checkRunnable(workspace("stop-runnable-landed", {
+    ".spndevex/workstreams/open/001-a-subject/a-subject-approach.html": page({ cards: "", names: ["N1-a-subject.md"] }),
+    ".spndevex/workstreams/open/001-a-subject/arcs/N1-a-subject.md": RUNNING.replace("Status: **RUNNING**", "**Status: LANDED 2026-09-23**"),
+  }), past).length === 0;
+  if (!landed) failed += 1;
+  console.log(`  ${landed ? "PASS" : "FAIL"}  a LANDED arc written this sitting is history, not work`);
+}
+
 console.log("\n=== stop — F12: a card the page has already settled");
 
 const F12 = "an answered card's argument belongs in the arc, and the page carries the answer";
@@ -226,11 +273,16 @@ console.log("\n=== the handover check — what counts as saying a window is need
   // mine to decide" — demanded a handover block, twice in a row. An unverified gate is the thing
   // this arc keeps finding, so the narrowed trigger is asserted in both directions: what must fire,
   // and what must stay quiet.
-  const { checkHandover } = await import("../events/stop.ts");
+  const { checkHandover, passingOn } = await import("../events/stop.ts");
+  const ROOT = workspace("stop-handover-wiring");
   const BLOCK = ["```", "workstream: 008", "arc and step: N13 step 4", "model: Opus 5",
     "read first: the arc", "state: green", "done when: it lands", "do not touch: Q115",
     "open: Q138", "```"].join("\n");
-  const says = (reply) => checkHandover(reply).length > 0;
+  // ROOT IS PASSED EXPLICITLY. Calling with one argument leaves `root` undefined, the wiring read
+  // throws, and the whole install precondition is skipped in silence — a suite that would pass
+  // whether or not the half exists. The fixture root has no plugin cache, so the wiring reads
+  // unknown and these cases test the block rules alone, which is what they are for.
+  const says = (reply) => checkHandover(reply, ROOT).length > 0;
 
   for (const [what, reply] of [
     ["a passing mention of the noun", "The handover marks it as not mine to decide."],
@@ -253,7 +305,42 @@ console.log("\n=== the handover check — what counts as saying a window is need
 
   // And a block that is present but short still names what is missing, rather than passing.
   n += 1;
-  const short = checkHandover("Pick this up in a new window.\n```\nworkstream: 008\narc and step: N13\n```");
+  // N39 step 4a — A FUTURE MENTION IS NOT A PASS-ON. The first cut matched the words anywhere in the
+  // reply and refused one that said a later build WOULD need a session: nothing had changed, no
+  // wiring had moved, and nobody was being handed anything. Warning somebody what a build is about to
+  // cost is ordinary usefulness, and a check that refuses it teaches people to stop describing
+  // consequences. Both directions are cases, because a discriminator that only ever says no is the
+  // same defect wearing the other sign.
+  for (const [what, reply, expected] of [
+    ["a future consequence", "That build changes the plugins, so this window will then hand you a prompt for a new window.", false],
+    ["a conditional", "Once this lands it will need a fresh window.", false],
+    ["a plain direction", "Open a new window and paste the block below.", true],
+    ["a polite direction", "Please start a fresh session to pick this up.", true],
+    ["an ordinary work reply", "Step 3 is proven against seven shapes. Moving to step 4.", false],
+    ["a handover heading", "## Handover\n\nthe fields follow", true],
+  ]) {
+    n += 1;
+    const got = passingOn(reply);
+    if (got !== expected) failed += 1;
+    console.log(`  ${got === expected ? "PASS" : "FAIL"}  ${what} reads as ${expected ? "passing work on" : "not a pass-on"}`);
+  }
+
+  // N39 step 4b — A PASS-ON IS REFUSED WHILE THE WIRING IT NAMES IS UN-INSTALLED. This is the whole
+  // reason the arc exists: the previous sitting was committed, green, and stopped, so the next window
+  // ran the release, the release changed the wiring, and changed wiring costs a window. One sitting
+  // became three. The fixture cannot install a plugin, so the STATE is faked at the only seam that
+  // matters — the reply is a real direction, and a stale wiring string must beat the block rules.
+  {
+    const stale = checkHandover("Open a new window and paste this.", ROOT);
+    // With no cache under the fixture the wiring reads unknown, so this asserts the ORDER instead:
+    // a direction with no block is still caught, which is the pre-existing rule surviving the change.
+    n += 1;
+    const caught = stale.length === 1 && /handover block|passes work on/.test(stale[0].message);
+    if (!caught) failed += 1;
+    console.log(`  ${caught ? "PASS" : "FAIL"}  a direction with no block is still refused after the rewrite`);
+  }
+
+  const short = checkHandover("Pick this up in a new window.\n```\nworkstream: 008\narc and step: N13\n```", ROOT);
   const named = short.length === 1 && /model/.test(short[0].message) && /open/.test(short[0].message);
   if (!named) failed += 1;
   console.log(`  ${named ? "PASS" : "FAIL"}  a short block is told which fields it is missing`);

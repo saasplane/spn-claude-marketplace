@@ -21,11 +21,12 @@
 // you should continue when there is no blocker.* Reporting is not stopping. A milestone line belongs
 // between steps, in the same turn as the next step.
 
-import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
+import { readFileSync, readdirSync, statSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { checkCorpus } from "../checks/corpus.ts";
 import { cardsOf, openWorkstreams, rowsOf, stateOf } from "../checks/split-plan.ts";
-import { workspaceRoot } from "../lib/payload.ts";
+import { DEVEX, workspaceRoot } from "../lib/payload.ts";
+import { cacheState } from "./orientation.ts";
 import { begin, span, end } from "../lib/timing.ts";
 
 type Warning = { check: string; message: string };
@@ -54,10 +55,37 @@ function pagesOf(ws: string): string[] {
   catch { return []; }
 }
 
-/** An arc's status word, from the first `Status:` line. */
+/**
+ * An arc's status word, from the first `Status:` line, in either spelling the corpus uses.
+ *
+ * **IT READ ONE SPELLING AND THE CORPUS HAS TWO.** The pattern was `Status: **WORD`, and every arc
+ * written from `N30` onward opens `**Status: WORD` — the bold around the label rather than after it.
+ * Measured 2026-09-23 over workstream `008`: 37 arcs read, **10 unread, and the 10 are `N30` to
+ * `N39`** — every arc of the current week. So the checks that read a status were blind to exactly
+ * the arcs somebody was working on, which is the worst possible subset to be blind to.
+ *
+ * A hyphen is part of the word: `PART-LANDED` is a status, not `PART`.
+ */
 function statusOf(arc: string): string {
-  const m = read(arc).match(/^Status:\s*\*\*([A-Z]+)/m);
+  const m = read(arc).match(/^\*{0,2}Status:?\*{0,2}\s*\*{0,2}\s*([A-Z][A-Z-]*)/m);
   return m ? m[1] : "";
+}
+
+/** Statuses that mean the arc is finished, so unfinished rows in it are history rather than work. */
+const TERMINAL = new Set(["LANDED", "DONE", "CLOSED", "CARRIED", "DEFERRED"]);
+
+/** When this workspace's `Stop` hook last ran, as milliseconds. 0 when it never has. */
+function lastStopAt(root: string): number {
+  try { return JSON.parse(readFileSync(join(root, DEVEX, ".debug", "stop", "last.json"), "utf8")).at ?? 0; }
+  catch { return 0; }
+}
+
+function rememberStop(root: string): void {
+  try {
+    const dir = join(root, DEVEX, ".debug", "stop");
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, "last.json"), JSON.stringify({ at: Date.now() }), "utf8");
+  } catch { /* the check must never fail because it could not write its own note */ }
 }
 
 /** The rows of an arc's own step table that are not yet done. */
@@ -97,14 +125,32 @@ function openCards(page: string): string[] {
   return cardsOf(page).filter((card) => !card.decided).map((card) => card.number);
 }
 
-export function checkRunnable(root: string): Warning[] {
+export function checkRunnable(root: string, since = lastStopAt(root)): Warning[] {
   const out: Warning[] = [];
+
   for (const ws of openWorkstreamFolders(root)) {
     const cards = pagesOf(ws).flatMap(openCards);
     for (const arc of arcsOf(ws)) {
-      // Only the arc being executed. DECIDED means planned and waiting its turn, and warning about
-      // every planned arc would make the check noise on the first day of a workstream.
-      if (statusOf(arc) !== "RUNNING") continue;
+      // WHICH ARC IS BEING EXECUTED IS A FACT, NOT A CLAIM. This asked for the status word
+      // `RUNNING`, and measured over workstream `008` on 2026-09-23 **no arc has ever carried it**:
+      // the statuses in use are LANDED, DONE, IMPLEMENTING, PLANNING, OPEN and PART-LANDED, and 45
+      // of 56 arcs carry no status line at all. So the gate written for *reported and stopped* could
+      // not fire, and did not, through every sitting of this workstream.
+      //
+      // A check keying on one positive word exempts every synonym in silence, and it fails in the
+      // direction that produces no signal. What this sitting actually wrote is on the filesystem, so
+      // an arc TOUCHED SINCE THE LAST STOP is the arc being executed — whatever its status claims.
+      // The word still counts where it appears, so nothing that worked before stops working.
+      const status = statusOf(arc);
+      if (TERMINAL.has(status)) continue;          // its unfinished rows are history, not work
+      // NO BASELINE MEANS NO INFERENCE — but a status that SAYS `RUNNING` still counts, because it
+      // is a claim rather than something measured. On the first `Stop` of a workspace there is
+      // nothing to compare an mtime against, and treating every arc as touched reports the whole
+      // backlog: measured at 28 warnings over workstream `008`. A gate whose first appearance is 28
+      // findings is one nobody reads twice, which is the condition `N38` shipped for the corpus run.
+      let touched = false;
+      if (since) { try { touched = statSync(arc).mtimeMs > since; } catch { touched = false; } }
+      if (status !== "RUNNING" && !touched) continue;
       const steps = unfinishedSteps(arc);
       if (steps === null) {
         out.push({ check: "runnable", message: `\`${arc.split("/").pop()}\` is RUNNING and has no \`## Steps\` table, so nothing can say whether work is left. Give it the step table the arc template carries.` });
@@ -115,7 +161,7 @@ export function checkRunnable(root: string): Warning[] {
       if (cards.length) continue;   // a card blocks: the hold reply covers that case
       out.push({
         check: "runnable",
-        message: `stopped with runnable work — \`${arc.split("/").pop()}\` is RUNNING and ${left.length} step` +
+        message: `stopped with runnable work — \`${arc.split("/").pop()}\` was written this sitting and ${left.length} step` +
           `${left.length > 1 ? "s are" : " is"} not landed, and no card is open. The next one is ${left[0]}. ` +
           `Reporting is not stopping: a milestone line goes between steps, in the same turn as the next step ` +
           `(11-workspace.md, how the agent replies).`,
@@ -151,12 +197,66 @@ export function checkHold(root: string): Warning[] {
  * is the thing this arc keeps finding. The signal is a statement that a window is needed or that the
  * work is being handed on, or a line that OPENS one, never a passing mention of the noun.
  */
-export function checkHandover(reply: string): Warning[] {
-  if (!/\b(?:new|fresh|another|next) window\b|\bhand(?:ing)? (?:this |it )?over\b|^[ \t]{0,3}#{0,4}[ \t]*handover\b/im.test(reply)) return [];
+/**
+ * Whether this reply PASSES WORK ON, rather than merely naming a session that does not exist yet.
+ *
+ * THE PAYLOAD CANNOT ANSWER THIS, and saying otherwise would be the fault this whole arc is about.
+ * `Stop` fires once per TURN, not once per sitting, so nothing in the event says the session is
+ * ending — every turn looks identical to this hook. What the text CAN be read for is whether it
+ * DIRECTS somebody to act, and that is a narrower question than whether it contains a phrase.
+ *
+ * WHY THE NARROWING WAS NEEDED. The first cut matched the words for a replacement session anywhere
+ * in the reply, and it refused a reply that said a later build WOULD need one — nothing had changed,
+ * no wiring had moved, and no work was being passed to anybody. Warning somebody what a build is
+ * about to cost is the normal way to be useful about it, and a check that refuses it teaches people
+ * to stop describing consequences.
+ *
+ * So a future or conditional mention is not a pass-on. A direction is.
+ */
+const SESSION = /\b(?:new|fresh|another|next)\s+(?:window|session)\b|\bhand(?:ing)?\s+(?:this |it )?over\b/gi;
+const NOT_YET = /\b(?:will|would|'ll|once|after|when|going to|about to|then|may|might|could|if)\b[^.?!]{0,80}$/i;
+
+export function passingOn(reply: string): boolean {
+  // A handover block is a pass-on whatever the prose around it says.
+  if (/^[ \t]{0,3}#{0,4}[ \t]*handover\b/im.test(reply)) return true;
+  for (const hit of reply.matchAll(SESSION)) {
+    const before = reply.slice(Math.max(0, (hit.index ?? 0) - 90), hit.index ?? 0);
+    if (!NOT_YET.test(before)) return true;      // stated plainly: this is being passed on
+  }
+  return false;
+}
+
+export function checkHandover(reply: string, root: string): Warning[] {
+  if (!passingOn(reply)) return [];
+
+  // THE SECOND HALF FIRST, because it is the one that costs a window. A reply that tells somebody to
+  // open a session is only true if the wiring that session will load is actually installed. The
+  // previous sitting's own note read *the release, which is the developer's* — it was committed,
+  // green, and stopped. The next window then ran the release, the release changed the wiring, and
+  // changed wiring costs a window: one sitting's work became three windows, every note correct.
+  //
+  // `RD.DEVEX.057` says the tool that changed the wiring owes the note. It says what the note must
+  // CONTAIN and never what must be TRUE before one is offered, so a note naming un-installed wiring
+  // satisfies it completely. This is that missing precondition (N39 step 4).
+  // ROOT IS PASSED IN, never read from `process.cwd()`. That is the fault this file already carries
+  // a note about: a check reading the process's directory went silent whenever the hook ran anywhere
+  // but the workspace root, which is most of the time.
+  let wiring = "";
+  try { wiring = cacheState(root, ["spn-core", "spn-apps-ts", "spn-infra"]); } catch { wiring = ""; }
+  if (wiring.startsWith("cache stale")) {
+    return [{ check: "handover", message:
+      `This reply passes work on while the plugin source is ahead of what is installed — ${wiring}. ` +
+      `The session that changed the wiring is the one session that cannot load it, and it is also the ` +
+      `only one that knows what changed. So finishing is this sitting's job, not the next reader's: ` +
+      `release what changed, bump the plugins, install them, run \`workspace agent-sync\`, and verify ` +
+      `every location from \`installed_plugins.json\`. Passing this on first is what turns one ` +
+      `sitting into three windows (N39).` }];
+  }
+
   const fenced = [...reply.matchAll(/```[\s\S]*?```/g)].map((m) => m[0].toLowerCase());
   const block = fenced.find((f) => /workstream/.test(f) && /arc/.test(f));
   if (!block)
-    return [{ check: "handover", message: "this reply says a new window is needed and carries no handover block. Give the seven fields in a fenced block — workstream, arc and step, model, read first, state, done when, do not touch, open — and write the same block into the arc's log." }];
+    return [{ check: "handover", message: "this reply passes work on to another session and carries no handover block. Give the seven fields in a fenced block — workstream, arc and step, model, read first, state, done when, do not touch, open — and write the same block into the arc's log." }];
   const missing = HANDOVER_FIELDS.filter((f) => !block.includes(f));
   if (missing.length)
     return [{ check: "handover", message: `the handover block is missing ${missing.join(" · ")}. The next window starts from that block and has nothing else.` }];
@@ -408,10 +508,12 @@ if (process.argv[1] && process.argv[1].endsWith("stop.ts")) {
     ...span("stop-arc-to-page", () => checkArcToPage(root)),
     ...span("stop-runnable", () => checkRunnable(root)),
     ...span("stop-hold", () => checkHold(root)),
-    ...span("stop-handover", () => checkHandover(reply)),
+    ...span("stop-handover", () => checkHandover(reply, root)),
     ...span("stop-corpus", () => checkCorpus(root)),
   ];
   end();
+  // AFTER the checks, never before: they compare against this and would compare against now.
+  rememberStop(root);
   if (warnings.length) {
     console.error(warnings.map((w) => `[${w.check}] ${w.message}`).join("\n\n"));
     process.exit(2);   // a Stop hook's non-zero is how the message reaches the turn
