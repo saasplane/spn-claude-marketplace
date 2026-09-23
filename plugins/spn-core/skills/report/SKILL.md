@@ -14,7 +14,7 @@ description: Produce a report or an approach document into a node's artifacts po
 | `REPO_AUDIT` | what this repository looks like against the standards, today | superseded |
 | `CHANGE_PLAN` | what a proposed change would touch, and in what order | superseded |
 | `SURFACE_DIFF` | what changed in a published surface between two versions | superseded |
-| `TRACEABILITY_MATRIX` | which behavior rows have proof, and where | superseded |
+| `TRACEABILITY_MATRIX` | which behaviour rows a run has proved, and which nothing has proved yet | superseded |
 | `ESTATE_PLAN` | what a change needs provisioned, configured, or promoted | superseded |
 | `RELEASE_NOTE` | what shipped in one release | **kept** |
 | `INCIDENT_RECORD` | what happened, what was done, what changed because of it | **kept** |
@@ -33,6 +33,23 @@ description: Produce a report or an approach document into a node's artifacts po
 - **An approach document's `How` has two halves.** It says what is built and how it stays true, then names **what re-aligns** — every document the reasoning obliges, with its owner and state. A contradicted artifact appears there as *a register row names which side is wrong*, never as an edit. An empty table means the design obliges no document, which is rare, or that you stopped early.
 - **A page arguing a change across repos does not start in a pocket.** It lives in the workspace's open workstream — `.spndevex/workstreams/open/{NNN}-{subject}/` — while you argue it, and both `How` tables carry a **`Scope`** column naming the node each row belongs to. Filter by scope and you have the split plan. The page moves into the owning node's pocket once it is settled, and a row lands when its content is in the node that owns it.
 - **The `State` column is read by a gate, so fill it.** Closing a subject refuses while any row is one nobody decided; `landed`, `carried` and `deferred` all pass. The check is *accounted for*, never *finished*, so parking work is a recorded act rather than a blocked one.
+
+### The traceability matrix reads the rows, and never derives them
+
+**The behaviour rows ARE the obligation** (decision `RD.APPS.081`). A row says what a persona can do; a case proves it by
+naming the row's id in its title; a run writes `Status` and `Updated at` back into the row. So this report **reads two
+things and joins them** — the rows in `docs/03-behaviors/`, and what the last run of each tier actually reported.
+
+**It never works the obligation out for itself.** An earlier model derived what a screen owed from the shape of its path,
+which reported a screen as covered while most of what can be done there had never been performed. Deriving is the fault
+this report exists downstream of.
+
+**A run speaks for the tiers it ran and no others.** Say which tiers the numbers cover, in the report, every time. A row
+whose tier did not run is **unproved, not failing**, and those are different findings needing different work.
+
+**Two questions live next door and are not this one.** *Does an action exist that no row claims?* is
+`action-coverage`, which reads declared API actions against the rows. *Did the suite go green?* is the run itself. Folding
+either into this report is how a percentage gets back in.
 
 ## Format
 

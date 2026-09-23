@@ -100,7 +100,12 @@ Destructive, and the local stack is frequently **shared**: `infra platform down 
 4. **Hosted-vendor modules cycle with the platform layer.** A vendor you run is a module row in the platform declaration, with no lifecycle of its own. Its state is wiped only by the same explicit `--clean`, never as an inferred side step.
 5. **Migrate** the clean database.
 6. **Seed and test** — run the suite that seeds, then the integration suite, then any e2e on a **quiesced** stack. Do not run a reset, a build, or a re-provision concurrently with e2e; the resulting timeouts read as failures and are not.
-7. **Finish** — stop what you started unless told to leave it running, and report the seeded credentials and the tally per suite.
+7. **Write back what the run proved** — a full run is the one moment the documents can be brought current, so do it here and not by hand.
+   - `node "${CLAUDE_PLUGIN_ROOT}"/hooks/tools/behaviour-rows.ts --write --reach repository` writes `Status` and `Updated at` into every behaviour row the run's ids resolve to. **`--reach repository` is the caller saying these artifacts are the whole of these tiers**, which is true after a full run and false after any narrower one — it sends a row nothing cited back to `PLANNED`, so on a partial run it erases evidence that was true. Run it without the flag when you ran less than everything.
+   - **Run the tiers through `spnutils apps test <tier>`.** Where a repository still consumes a published toolchain older than the derived-artifact change, any other door runs the suite and writes nothing — and with `--reach repository` set, that silence resets rows the run actually proved.
+   - **Then produce the pages whose behaviours moved**: `node "${CLAUDE_PLUGIN_ROOT}"/../spn-core/hooks/tools/docs.ts page <the matching 02-constructs seat>`. A construct page joins its behaviours from the register, so writing statuses makes every page for a changed construct stale, and `docs.ts audit` reds until they are produced again.
+   - **Last, the report** — the `TRACEABILITY_MATRIX` template through the `spn-core:report` skill, into `docs/artifacts/reports/`. It is written by you from what you just read, never by a tool, and it names which tiers the run spoke for.
+8. **Finish** — stop what you started unless told to leave it running, and report the seeded credentials and the tally per suite.
 
 A seed or template migration edit only lands on a clean re-migrate. A warm database keeps the old row, so a seed change tested against a warm stack proves nothing about a fresh one.
 

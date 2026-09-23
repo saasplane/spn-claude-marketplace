@@ -291,7 +291,7 @@ Every page somebody writes by hand is copied from a template, and the templates 
 
 | Folder | Holds | Shapes |
 | --- | --- | --- |
-| `templates/pages/` | `overview-template.html` · `construct-template.html` · `report-shell.md` | the page kinds a repository has — concept, overview, construct — and the report |
+| `templates/pages/` | `overview-template.html` · `construct-template.html` · `report-template.html` | the page kinds a repository has — concept, overview, construct — and the report |
 | `templates/seat-files/` | `construct-seat-template.md` · `schema-template.sql` | what an author writes *inside* a seat: the markdown a construct page is produced from, and the authoritative data model |
 | `templates/workstream/` | `approach-template.html` · `arc-template.md` · `order-template.md` · `handover-template.md` | the workstream's own files. **The approach document is here because an argument is a workstream's**, never a repository's |
 | `templates/agent/` | `skill-template.md` · `agent-template.md` · `lens-template.md` · `ref-template.md` · `hook-template.py` | the agent's own files — hand-written too, and a kind with no template gets written from the last one its author happened to see |
