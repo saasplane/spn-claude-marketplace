@@ -9,6 +9,13 @@
 //   runnable   a turn that ends while the running arc still has rows to do, and nothing blocks them
 //   hold       an arc whose status reads HELD must name a card that exists and is unanswered
 //   handover   a reply that says a new window is needed carries the seven fields
+//   corpus     the docs trees still answer the questions only a whole-corpus read can ask
+//
+// `corpus` is the newest and the odd one out: every other check here reads what the TURN wrote, and
+// that one reads the workspace. It is here because nothing else ran it — `N38` found that every
+// corpus tool in this plugin was hand-run, so a defect was only ever found by somebody looking for
+// something else. It fingerprints first and does nothing at all when no document moved, which is what
+// makes a per-turn hook affordable; see `checks/corpus.ts` for why that matters and what it costs.
 //
 // `runnable` is the one the developer asked for by name: *you keep getting stuck after reporting, and
 // you should continue when there is no blocker.* Reporting is not stopping. A milestone line belongs
@@ -16,6 +23,7 @@
 
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
+import { checkCorpus } from "../checks/corpus.ts";
 import { cardsOf, openWorkstreams, rowsOf, stateOf } from "../checks/split-plan.ts";
 import { workspaceRoot } from "../lib/payload.ts";
 import { begin, span, end } from "../lib/timing.ts";
@@ -401,6 +409,7 @@ if (process.argv[1] && process.argv[1].endsWith("stop.ts")) {
     ...span("stop-runnable", () => checkRunnable(root)),
     ...span("stop-hold", () => checkHold(root)),
     ...span("stop-handover", () => checkHandover(reply)),
+    ...span("stop-corpus", () => checkCorpus(root)),
   ];
   end();
   if (warnings.length) {
