@@ -336,6 +336,10 @@ console.log("\n=== the handover check — what counts as saying a window is need
     ["a polite direction", "Please start a fresh session to pick this up.", true],
     ["an ordinary work reply", "Step 3 is proven against seven shapes. Moving to step 4.", false],
     ["a handover heading", "## Handover\n\nthe fields follow", true],
+    // THE CONDITIONAL CAN FOLLOW THE PHRASE, not only precede it. This exact sentence was refused by
+    // the first cut while nothing had changed and nobody was being handed anything.
+    ["a consequence stated after the phrase", "A fresh window would load the installed 0.8.4 copy, so the fix is not in it yet.", false],
+    ["another, with will", "The next window will pick up whatever is installed at that point.", false],
   ]) {
     n += 1;
     const got = passingOn(reply);

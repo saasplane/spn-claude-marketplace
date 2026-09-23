@@ -266,13 +266,20 @@ export function checkHold(root: string): Warning[] {
  */
 const SESSION = /\b(?:new|fresh|another|next)\s+(?:window|session)\b|\bhand(?:ing)?\s+(?:this |it )?over\b/gi;
 const NOT_YET = /\b(?:will|would|'ll|once|after|when|going to|about to|then|may|might|could|if)\b[^.?!]{0,80}$/i;
+// AND IT CAN FOLLOW, which the first cut missed. "a fresh window WOULD load the installed copy" is a
+// description of a consequence, and every conditional word in it sits after the phrase rather than
+// before. Looking only backwards refused a reply that was explaining what a build costs.
+const NOT_YET_AFTER = /^[^.?!]{0,60}\b(?:will|would|'ll|may|might|could|is going to)\b/i;
 
 export function passingOn(reply: string): boolean {
   // A handover block is a pass-on whatever the prose around it says.
   if (/^[ \t]{0,3}#{0,4}[ \t]*handover\b/im.test(reply)) return true;
   for (const hit of reply.matchAll(SESSION)) {
-    const before = reply.slice(Math.max(0, (hit.index ?? 0) - 90), hit.index ?? 0);
-    if (!NOT_YET.test(before)) return true;      // stated plainly: this is being passed on
+    const at = hit.index ?? 0;
+    const before = reply.slice(Math.max(0, at - 90), at);
+    const after = reply.slice(at + hit[0].length, at + hit[0].length + 70);
+    if (NOT_YET.test(before) || NOT_YET_AFTER.test(after)) continue;
+    return true;                                 // stated plainly: this is being passed on
   }
   return false;
 }
