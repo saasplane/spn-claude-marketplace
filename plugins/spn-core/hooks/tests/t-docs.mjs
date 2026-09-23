@@ -1016,6 +1016,24 @@ console.log("=== a closed value is declared once, and agrees with what realizes 
   }
 
   {
+    // A MEMBER REFERENCE NAMES ITS TYPE. `SPDocPassType.FRAME` claims the type exists exactly as the
+    // bare name does, and reading only the bare form missed three of the four stale contract terms
+    // found the day this check was written — each naming a vocabulary the contract had deleted.
+    const root = repo({
+      "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
+      "docs/02-constructs/01-core/rungs.md":
+        doc({ id: "rungs", parentId: "concept", title: "Rungs", variant: "construct", lenses: ["ARCHITECT"],
+              status: "PLANNING", dependsOn: [] },
+            "## Terms\n\n| Term | Contract term | What it means |\n| --- | --- | --- |\n| Alone | `SPRungType.UNIT` | proven with nothing running |\n\n## Model\n\nThe model.\n\n## Parts\n\nNo declaration here.\n\n## Boundary\n\nIt stops here.\n\n## Binds\n\n| Rule | What it decides | Weight |\n| --- | --- | --- |\n| `RD.GOV.011` | one place | MUST |\n\n| Repo | Node | What it realizes | State |\n| --- | --- | --- | --- |\n| t | thing-ts | the enum | planned |\n\n## Proof\n\nNothing yet.\n",
+            "`For: Architect` · `Status: 🔮 PLANNING`"),
+      "docs/02-constructs/01-core/other.md": chapter("Other", "other", "Nor here.\n"),
+    });
+    one("a member reference names its type, and an undeclared one is reported",
+      run(root, ["audit", "docs/02-constructs/01-core/rungs.md", "docs/02-constructs/01-core/other.md"]),
+      has("`SPRungType` is named as a contract term"));
+  }
+
+  {
     // One page cannot see the corpus, so it must not accuse another chapter of not existing.
     const root = repo({
       "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",

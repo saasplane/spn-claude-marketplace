@@ -1196,7 +1196,10 @@ function checkVocabulary(
  * A second declaration of one value is the other half of `RD.GOV.011` — *it is the ONE place the
  * vocabulary is written* — and two pages drifting apart is exactly what the rule prevents.
  */
-const TERMS_CONTRACT = /^\|[^|]*\|\s*`([A-Z][A-Za-z0-9_]*Type)`\s*\|/gm;
+// A MEMBER REFERENCE NAMES ITS TYPE, and reading only the bare form missed three of the four stale
+// terms found the day this was written: `SPDocPassType.FRAME` is as much a claim that the type
+// exists as `SPDocPassType` is, and the contract had deleted it the day before.
+const TERMS_CONTRACT = /^\|[^|]*\|\s*`([A-Z][A-Za-z0-9_]*Type)(?:\.[A-Z][A-Za-z0-9_]*)?`\s*\|/gm;
 
 function checkVocabularyCoverage(files: string[], sources: Map<string, string>): Finding[] {
   const f: Finding[] = [];
