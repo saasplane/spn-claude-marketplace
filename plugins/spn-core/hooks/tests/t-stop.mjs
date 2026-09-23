@@ -161,10 +161,10 @@ one("an unlanded step with no card at all",
 
 console.log("\n=== runnable — N39 step 8: which arc is being executed is a fact, not a status word");
 
-// MEASURED 2026-09-23 OVER WORKSTREAM `008`: no arc has ever carried the word `RUNNING`. The
-// statuses in use are LANDED, DONE, IMPLEMENTING, PLANNING, OPEN and PART-LANDED, and 45 of 56 arcs
-// carry no status line at all. So this gate — the one written for *reported and stopped* — could not
-// fire, and did not, through every sitting of the workstream. What the sitting wrote is on disk.
+// MEASURED 2026-09-23 OVER WORKSTREAM `008`: exactly ONE arc of 57 carries the word `RUNNING`, and
+// it is not the arc any recent sitting has been executing. The rest read LANDED 26, PART-LANDED 15,
+// DECIDED 2, OPEN 2, TAKEN 1, and 10 carry no status line at all. So this gate — the one written for
+// *reported and stopped* — can speak about one arc in fifty-seven. What the sitting wrote is on disk.
 {
   const { checkRunnable } = await import("../events/stop.ts");
   const OPEN_ARC = RUNNING.replace("Status: **RUNNING**", "**Status: OPEN \u2014 opened today**");

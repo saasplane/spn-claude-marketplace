@@ -132,10 +132,10 @@ export function checkRunnable(root: string, since = lastStopAt(root)): Warning[]
     const cards = pagesOf(ws).flatMap(openCards);
     for (const arc of arcsOf(ws)) {
       // WHICH ARC IS BEING EXECUTED IS A FACT, NOT A CLAIM. This asked for the status word
-      // `RUNNING`, and measured over workstream `008` on 2026-09-23 **no arc has ever carried it**:
-      // the statuses in use are LANDED, DONE, IMPLEMENTING, PLANNING, OPEN and PART-LANDED, and 45
-      // of 56 arcs carry no status line at all. So the gate written for *reported and stopped* could
-      // not fire, and did not, through every sitting of this workstream.
+      // `RUNNING`, and measured over workstream `008` on 2026-09-23 exactly ONE arc of 57 carries it.
+      // The rest read LANDED 26, PART-LANDED 15, DECIDED 2, OPEN 2, TAKEN 1, and 10 carry no status
+      // line at all. So the gate written for *reported and stopped* could speak about one arc in
+      // fifty-seven, and the arc a sitting is actually executing is usually not that one.
       //
       // A check keying on one positive word exempts every synonym in silence, and it fails in the
       // direction that produces no signal. What this sitting actually wrote is on the filesystem, so

@@ -5,10 +5,12 @@
     { "path": "docs/02-constructs/01-devex/04-workspace/02-workstream.md", "seen": "feebc7e9" },
     { "path": "docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md", "seen": "bedbf3af" },
     { "path": "docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md", "section": "The agent is updated first, and reloaded before anything runs", "seen": "687ada82" },
+    { "path": "docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md", "section": "An arc's status says which of eight states it is in", "seen": "f6636752" },
     { "path": "docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md", "section": "When an edit becomes behaviour", "seen": "4d108ba0" },
     { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md", "section": "Restatement discipline", "seen": "11808ae4" }
   ],
   "rows": [
+    "RD.DEVEX.058",
     "RD.DEVEX.020",
     "RD.DEVEX.044",
     "RD.DEVEX.048",
@@ -350,6 +352,32 @@ Plan one change across repos as an **arc**: ordered steps, each naming its targe
 **The return path is unchanged.** Where work in any repo uncovers something contradicting the foundation, that comes home as a decision-register row. A convention corrected quietly in a sibling is a fork nobody declared.
 
 **The partner boundary crosses upward only as an ask, never as work.** No level takes orders from the level below.
+
+### An arc carries a status, and it is one of eight
+
+**The set is closed (`RD.DEVEX.058`).** Every check that reads an arc reads this word, so a word
+outside the set is a state nothing can act on, and an arc with no status is one no check can see.
+
+| Status | What it means | Terminal |
+| --- | --- | --- |
+| `PROPOSED` | Written and argued, but nobody has said go yet | no |
+| `DECIDED` | Agreed and waiting its turn; no step has started | no |
+| `RUNNING` | Being executed now — steps are landing in this sitting | no |
+| `HELD` | Stopped on a named blocker: an open card, or an arc that must land first | no |
+| `PART-LANDED` | Some steps landed, the rest are owed, and nobody is on it | no |
+| `LANDED` | Every step landed. Nothing is owed | yes |
+| `CARRIED` | The remaining work left this workstream, and the status names where | yes |
+| `DROPPED` | Abandoned on purpose, with the reason in the same line | yes |
+
+**Write it as `Status: **WORD …**` on its own line under the title — one spelling.** A reader that
+has to know two spellings knows neither, and the check that reads this word was blind to every arc
+written in one week because a second spelling had appeared.
+
+**`HELD` names its blocker in the same line and `DROPPED` names its reason.** A status that records
+a stop without recording what it waits for moves the question somewhere nobody can find it.
+
+**A terminal status means the arc is finished, so its unlanded rows are history rather than work.**
+
 
 ## Producer and partner — two shapes of workspace
 

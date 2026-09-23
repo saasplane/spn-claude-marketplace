@@ -34,6 +34,7 @@ import { checkDoc, bashWrites } from "../checks/doc-check.ts";
 import { gateDocumentsFirst, gateClose } from "../checks/split-plan.ts";
 import { checkConfirmed } from "../checks/confirmed.ts";
 import { checkReleaseGo, applies as releaseApplies } from "../checks/release-go.ts";
+import { checkArcStatus, applies as arcStatusApplies } from "../checks/arc-status.ts";
 import { applies as commentsApply, checkComments } from "../checks/comment-check.ts";
 import { applies as mirrorApplies, checkMirror } from "../checks/mirror.ts";
 import { begin, end, span } from "../lib/timing.ts";
@@ -74,6 +75,10 @@ const CHECKS: Check[] = [
     applies: (path, command) => releaseApplies(path, command) },
   // It reads the fragment it was handed and opens no file, so its whole cost is the path test above
   // it and a pass over the text being written.
+  // Its fast path is one regular expression over the path, so every write outside an `arcs/` folder
+  // pays that and stops.
+  { name: "arc-status", run: checkArcStatus, needs: ["command", "file_path"],
+    applies: (path, command) => arcStatusApplies(path, command) },
   { name: "comment-check", run: checkComments, needs: ["file_path"], applies: (path) => commentsApply(path) },
   // LAST, BECAUSE IT IS THE ONLY ONE THAT READS A DOCS TREE. Its fast path is a substring of the
   // path, so an edit outside any `src/` pays that and stops; an edit inside one reads a single face.
