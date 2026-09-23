@@ -22,14 +22,56 @@
 // action, and an abstraction that is merely dull cannot be told from good prose by a pattern. The
 // report says so rather than implying the flagged set is the whole job.
 
+import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { readdirSync, readFileSync, statSync, appendFileSync } from "node:fs";
-import { basename, extname, join } from "node:path";
+import { readdirSync, readFileSync, realpathSync, statSync, appendFileSync } from "node:fs";
+import { basename, extname, join, resolve } from "node:path";
 import { isFile, read } from "../lib/payload.ts";
 import { BLOCK_BREAK, IDIOM, MARKED, opening, proseOf, sentences, type Sentence } from "../checks/doc-check.ts";
 
 const SKIP_DIR = new Set(["node_modules", ".git", "dist", "build", ".nx", "coverage", ".output",
   "__pycache__", ".venv", "tool-results", ".pnpm-store"]);
+
+/**
+ * Every folder the repository holding `dir` ignores, as absolute paths.
+ *
+ * The corpus is what a repository keeps. A downloaded provider mirror, a build cache and a
+ * scratch folder are all prose to a pattern and none of them is anybody's writing here, so
+ * scoring them inflates a count that arcs are judged by. `SKIP_DIR` above is a typed list and a
+ * typed list is only ever as complete as the last defect somebody hit; git already knows the
+ * answer, so this asks it once per repository rather than naming folders one at a time.
+ *
+ * A folder outside any repository is kept, because nothing has said to drop it.
+ */
+function ignoredFolders(dir: string): Set<string> {
+  let top: string;
+  try {
+    top = execFileSync("git", ["-C", dir, "rev-parse", "--show-toplevel"],
+      { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+  } catch { return new Set(); }
+  if (top === "") return new Set();
+  // Both sides are resolved before they are compared. git answers with the real path, and on a Mac
+  // the workspace is commonly reached through a symlink — so the two spellings named one folder and
+  // the set matched nothing. The count came back identical and no part of the run looked wrong.
+  const cached = IGNORED.get(top);
+  if (cached) return cached;
+  const found = new Set<string>();
+  try {
+    const listed = execFileSync("git",
+      ["-C", top, "ls-files", "--others", "--ignored", "--exclude-standard", "--directory"],
+      { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], maxBuffer: 64 * 1024 * 1024 });
+    for (const line of listed.split("\n"))
+      if (line.endsWith("/")) found.add(realOf(join(top, line.slice(0, -1))));
+  } catch { /* a repository git cannot read is one nothing is skipped in */ }
+  IGNORED.set(top, found);
+  return found;
+}
+const IGNORED = new Map<string, Set<string>>();
+
+/** An absolute path with every symlink resolved, or the plain absolute path where it cannot be. */
+function realOf(target: string): string {
+  try { return realpathSync(resolve(target)); } catch { return resolve(target); }
+}
 // Regenerated from something else, so an edit here is overwritten by the next build.
 const SKIP_FILE = /^(CHANGELOG|LICENSE|spn-symbols|.*\.generated)\.md$/i;
 
@@ -207,7 +249,8 @@ export function* filesUnder(roots: string[], comments = false): Generator<string
         let entryStat;
         try { entryStat = statSync(full); } catch { continue; }
         if (entryStat.isDirectory()) {
-          if (!SKIP_DIR.has(entry) && !entry.startsWith(".")) folders.push(full);
+          if (!SKIP_DIR.has(entry) && !entry.startsWith(".") && !ignoredFolders(dir).has(realOf(full)))
+            folders.push(full);
           continue;
         }
         if (entry.endsWith(".md") && !SKIP_FILE.test(entry)) yield full;
