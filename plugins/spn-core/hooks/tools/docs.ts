@@ -1059,6 +1059,173 @@ function checkDepends(files: string[], blocks: Map<string, any>): Finding[] {
   return f;
 }
 
+/**
+ * A CLOSED VALUE IS NAMED IN A CHAPTER, AND NOTHING SAID WHAT ITS MEMBERS ARE.
+ *
+ * `RD.GOV.011` is a MUST and had zero compliant instances when this was written: *a chapter that
+ * owns a closed vocabulary states it as a contract block, and every other mention cites it.* A
+ * vocabulary named but never listed cannot be implemented from the document, which is the one thing
+ * the book is for — somebody building a second stack reads a page and writes the value.
+ *
+ * Measured the day it was written: the tier ladder documented all five rungs with more than an enum
+ * carries, and beside it one chapter promised a third behaviour kind the corpus and the contract
+ * disagree about. Both states were invisible because nothing compared a page with the code under it.
+ *
+ * **The finder is TypeScript-shaped and the rule is not.** A realization is found by reading
+ * `export enum <Name>` out of the workspace's source, which is this stack's spelling. A workspace
+ * holding no such file is not in breach: the book is the source, a realization is a realization,
+ * and a value nothing realizes yet is reported as unrealized rather than as a disagreement.
+ *
+ * SOFT on purpose, for now. A new check that refuses is a check people satisfy by editing the page
+ * to match the tool, and this one is reading a corpus that has never been held to it.
+ */
+
+/** A declaration block: a fenced `ts` enum in a chapter, with one line of meaning per member. */
+type Declaration = { name: string; members: string[]; file: string };
+
+const ENUM_BLOCK = /```ts\n([\s\S]*?)```/g;
+// AN ENUM BODY HOLDS NO BRACE, so the body is read as "everything that is not one". Closing at the
+// first line-start `}` instead looked right and was not: a one-line `export enum X { A = 'A' }` has
+// no such brace, so the match ran on into the NEXT enum and reported the neighbour's members as
+// this one's. That produced a confident, precise, wrong finding about a chapter that was correct.
+const ENUM_HEAD = /export enum ([A-Za-z][A-Za-z0-9_]*)\s*\{([^{}]*)\}/g;
+// A member on its own line, or several on one line in a compact declaration.
+const ENUM_MEMBER = /(?:^|[{,]|\n)\s*([A-Z][A-Z0-9_]*)\s*=/g;
+
+/** Every closed value a chapter declares, read out of its fenced `ts` blocks. */
+function declarationsIn(file: string, src: string): Declaration[] {
+  const found: Declaration[] = [];
+  for (const fence of src.matchAll(ENUM_BLOCK)) {
+    for (const decl of fence[1].matchAll(ENUM_HEAD)) {
+      const members = [...decl[2].matchAll(ENUM_MEMBER)].map((m) => m[1]);
+      found.push({ name: decl[1], members: members, file: file });
+    }
+  }
+  return found;
+}
+
+/**
+ * Every closed value the workspace's source declares, indexed by name.
+ *
+ * Built once per run rather than per page. Only `src/` is read: a build output and a dependency
+ * hold copies, and a copy disagreeing with its source is a finding about the build rather than
+ * about the book.
+ */
+function realizationIndex(workspace: string): Map<string, { file: string; members: string[] }> {
+  const index = new Map<string, { file: string; members: string[] }>();
+  const walk = (dir: string, depth: number): void => {
+    if (depth > 8) return;
+    let entries;
+    try { entries = readdirSync(dir, { withFileTypes: true }); } catch { return; }
+    for (const entry of entries) {
+      const full = join(dir, entry.name);
+      if (entry.isDirectory()) {
+        if (entry.name === "node_modules" || entry.name === "dist" || entry.name[0] === ".") continue;
+        walk(full, depth + 1);
+      } else if (entry.name.endsWith(".ts") && !entry.name.endsWith(".d.ts")) {
+        let body;
+        try { body = readFileSync(full, "utf8"); } catch { continue; }
+        if (!body.includes("export enum ")) continue;
+        for (const decl of body.matchAll(ENUM_HEAD)) {
+          const members = [...decl[2].matchAll(ENUM_MEMBER)].map((m) => m[1]);
+          // A generated client mirrors somebody else's vocabulary. First writer wins, and a
+          // generated file never overwrites a hand-written declaration.
+          if (index.has(decl[1]) && full.includes("/generated/")) continue;
+          index.set(decl[1], { file: full.slice(workspace.length + 1), members: members });
+        }
+      }
+    }
+  };
+  /** The nodes of one repository — `<repo>/apps/<node>/src` and `<repo>/packages/<node>/src`. */
+  const nodesOf = (repo: string): void => {
+    for (const holder of ["apps", "packages"]) {
+      const under = join(repo, holder);
+      if (!existsSync(under)) continue;
+      for (const node of readdirSync(under, { withFileTypes: true })) {
+        if (node.isDirectory()) walk(join(under, node.name, "src"), 0);
+      }
+    }
+  };
+  // THE WORKSPACE IS SOMETIMES THE REPOSITORY, and reading only one shape finds nothing in the
+  // other. `workspaceRoot` walks up to the folder holding the sibling checkouts, so a normal run
+  // gets `<workspace>/<repo>/packages/…`; a run with `SPN_WORKSPACE` pointed at a single
+  // repository gets `<workspace>/packages/…`. Both are read, because an index that quietly finds
+  // no source reports no disagreement and looks exactly like a corpus that agrees.
+  nodesOf(workspace);
+  for (const repo of (() => { try { return readdirSync(workspace, { withFileTypes: true }); } catch { return []; } })()) {
+    if (!repo.isDirectory() || repo.name[0] === ".") continue;
+    nodesOf(join(workspace, repo.name));
+  }
+  return index;
+}
+
+/** Each declaration in this chapter, read against the code that realizes it. */
+function checkVocabulary(
+  file: string, src: string, realized: Map<string, { file: string; members: string[] }>
+): Finding[] {
+  const f: Finding[] = [];
+  for (const decl of declarationsIn(file, src)) {
+    if (decl.members.length === 0) {
+      f.push({ check: "vocabulary", grade: "SOFT", file,
+        message: `\`${decl.name}\` is declared with no members a reader can enumerate` });
+      continue;
+    }
+    const code = realized.get(decl.name);
+    // A value the book states and nothing realizes yet is the normal state of a standard. It is
+    // reported nowhere, because a book that could only name what exists would never lead anything.
+    if (!code) continue;
+    const extra = decl.members.filter((m) => !code.members.includes(m));
+    const missing = code.members.filter((m) => !decl.members.includes(m));
+    if (extra.length === 0 && missing.length === 0) continue;
+    const said: string[] = [];
+    if (extra.length) said.push(`names ${extra.join(" · ")}, which ${code.file} does not have`);
+    if (missing.length) said.push(`does not name ${missing.join(" · ")}, which ${code.file} carries`);
+    f.push({ check: "vocabulary", grade: "SOFT", file,
+      message: `\`${decl.name}\` ${said.join("; and ")} — one of the two is wrong, and nothing else compares them` });
+  }
+  return f;
+}
+
+/**
+ * A value named as a contract term, and nowhere declared.
+ *
+ * Read across the whole corpus rather than per page, because the chapter naming a value is often
+ * not the chapter that owns it: `Terms` gives a reader the word, and the declaration gives an
+ * implementer the members. Both are correct, and only the second may be absent.
+ *
+ * A second declaration of one value is the other half of `RD.GOV.011` — *it is the ONE place the
+ * vocabulary is written* — and two pages drifting apart is exactly what the rule prevents.
+ */
+const TERMS_CONTRACT = /^\|[^|]*\|\s*`([A-Z][A-Za-z0-9_]*Type)`\s*\|/gm;
+
+function checkVocabularyCoverage(files: string[], sources: Map<string, string>): Finding[] {
+  const f: Finding[] = [];
+  const declaredIn = new Map<string, string[]>();
+  for (const file of files) {
+    for (const decl of declarationsIn(file, sources.get(file) ?? "")) {
+      declaredIn.set(decl.name, [...(declaredIn.get(decl.name) ?? []), file]);
+    }
+  }
+  // Only where a corpus was given. One page on its own cannot say whether another declares a value.
+  if (files.length < 2) return f;
+  for (const [name, where] of declaredIn) {
+    if (where.length > 1) f.push({ check: "vocabulary", grade: "SOFT", file: where[0],
+      message: `\`${name}\` is declared in ${where.length} chapters — ${where.join(" · ")}; a closed vocabulary is written in one place and cited everywhere else` });
+  }
+  const named = new Map<string, string>();
+  for (const file of files) {
+    for (const row of (sources.get(file) ?? "").matchAll(TERMS_CONTRACT)) {
+      if (!named.has(row[1])) named.set(row[1], file);
+    }
+  }
+  for (const [name, file] of named) {
+    if (declaredIn.has(name)) continue;
+    f.push({ check: "vocabulary", grade: "SOFT", file,
+      message: `\`${name}\` is named as a contract term and no chapter declares its members — a reader cannot write the value from the book` });
+  }
+  return f;
+}
+
 // ---------------------------------------------------------------------------- face
 
 // What is generated is generated, and it sits between markers so the prose around it is a person's.
@@ -2215,13 +2382,18 @@ function checkLinks(file: string, src: string): Finding[] {
 function audit(paths: string[], workspace: string): Finding[] {
   const findings: Finding[] = [];
   const blocks = new Map<string, any>();
+  const sources = new Map<string, string>();
   const nodes = nodeIndex(workspace);
+  // Read once for the whole run. Per page this would walk every repository's source once per
+  // chapter, and the corpus is 339 of them.
+  const realized = realizationIndex(workspace);
   const templates = process.env.SPN_TEMPLATES
     ?? join(workspace, "spn-foundation", "docs", "04-capabilities", "01-devex", "04-workspace", "04-docs", "templates");
   for (const p of paths) {
     const src = readFileSync(p, "utf8");
     const { block, error } = readBlock(src);
     blocks.set(p, block);
+    sources.set(p, src);
     findings.push(...checkBlock(p, src, block, error));
     if (!block) continue;
     findings.push(...checkOutline(p, src, block));
@@ -2238,8 +2410,10 @@ function audit(paths: string[], workspace: string): Finding[] {
     findings.push(...checkBinds(p, src, block, nodes));
     findings.push(...checkOverviewSource(p, src, block, workspace));
     findings.push(...checkProduced(p, src, block, workspace, templates));
+    findings.push(...checkVocabulary(p, src, realized));
   }
   findings.push(...checkDepends(paths, blocks));
+  findings.push(...checkVocabularyCoverage(paths, sources));
   return findings;
 }
 

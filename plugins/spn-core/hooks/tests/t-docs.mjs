@@ -907,5 +907,139 @@ console.log("\n=== the gap scan measures and never fixes");
     rep, has("What this report does not measure"));
 }
 
+// ------------------------------------------------- a closed vocabulary, and the code under it
+
+console.log("=== a closed value is declared once, and agrees with what realizes it");
+{
+  // A chapter DECLARING a value, and a node whose source carries the same enum. The realization
+  // index walks `<repo>/<apps|packages>/<node>/src`, which is where a declaration lives on this
+  // stack, so the fixture is shaped that way rather than mocked.
+  // The tag line is not decoration here. Without it every fixture earns a RULE header finding, and
+  // a `lacks("vocabulary")` assertion then passes on a page the check never got to read — which is
+  // how the first run of this suite reported four passes that proved nothing.
+  const chapter = (title, id, body) =>
+    doc({ id: id, parentId: "concept", title: title, variant: "construct", lenses: ["ARCHITECT"],
+          status: "PLANNING", dependsOn: [] },
+        `## Terms\n\n| Term | Contract term | What it means |\n| --- | --- | --- |\n| Rung | \`SPRungType\` | how much is real |\n\n## Model\n\nThe model.\n\n## Parts\n\n${body}\n\n## Boundary\n\nIt stops here.\n\n## Binds\n\n| Rule | What it decides | Weight |\n| --- | --- | --- |\n| \`RD.GOV.011\` | that a closed vocabulary is stated once | MUST |\n\n| Repo | Node | What it realizes | State |\n| --- | --- | --- | --- |\n| t | thing-ts | the enum | planned |\n\n## Proof\n\nNothing yet.\n`,
+        "`For: Architect` · `Status: 🔮 PLANNING`");
+
+  const AGREES = "```ts\nexport enum SPRungType {\n  UNIT = 'UNIT',    // alone\n  WIRED = 'WIRED',  // against the real thing\n}\n```";
+  const SOURCE = "export enum SPRungType {\n  UNIT = 'UNIT',\n  WIRED = 'WIRED',\n}\n";
+
+  {
+    const root = repo({
+      "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
+      "packages/thing-ts/src/rungs.ts": SOURCE,
+      "docs/02-constructs/01-core/rungs.md": chapter("Rungs", "rungs", AGREES),
+    });
+    one("a declaration that matches the code it realizes is reported nowhere",
+      run(root, ["audit", "docs/02-constructs/01-core/rungs.md"]), lacks("vocabulary"));
+  }
+
+  {
+    // The book ahead of the code. This is the normal way a standard leads, so the MESSAGE has to
+    // name both sides rather than assert which one is wrong.
+    const root = repo({
+      "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
+      "packages/thing-ts/src/rungs.ts": SOURCE,
+      "docs/02-constructs/01-core/rungs.md": chapter("Rungs", "rungs",
+        "```ts\nexport enum SPRungType {\n  UNIT = 'UNIT',      // alone\n  WIRED = 'WIRED',    // against the real thing\n  BROWSED = 'BROWSED',// in a real browser\n}\n```"),
+    });
+    const got = run(root, ["audit", "docs/02-constructs/01-core/rungs.md"]);
+    one("a member the book names and the code lacks is reported", got, has("names BROWSED"));
+    one("and the finding names the file that would have to change", got, has("src/rungs.ts"));
+    one("neither side is called the wrong one", got, has("one of the two is wrong"));
+  }
+
+  {
+    // The code ahead of the book — a value added in a release nobody documented. The corpus had
+    // exactly this the day the check was written, and nothing compared the two.
+    const root = repo({
+      "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
+      "packages/thing-ts/src/rungs.ts": "export enum SPRungType {\n  UNIT = 'UNIT',\n  WIRED = 'WIRED',\n  BROWSED = 'BROWSED',\n}\n",
+      "docs/02-constructs/01-core/rungs.md": chapter("Rungs", "rungs", AGREES),
+    });
+    one("a member the code carries and the book omits is reported",
+      run(root, ["audit", "docs/02-constructs/01-core/rungs.md"]), has("does not name BROWSED"));
+  }
+
+  {
+    // A COMPACT DECLARATION, AND THE NEIGHBOUR BELOW IT. The first reading of this closed a body at
+    // the first line-start `}`, which a one-line enum does not have — so the match ran into the
+    // next enum and reported its members as this one's. The corpus finding it produced was
+    // confident, precise and wrong about a chapter that was correct.
+    const root = repo({
+      "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
+      "packages/thing-ts/src/rungs.ts": "export enum SPRungType { UNIT = 'UNIT' }\nexport enum SPOther {\n  ADM = 'ADM',\n  MIG = 'MIG',\n}\n",
+      "docs/02-constructs/01-core/rungs.md": chapter("Rungs", "rungs",
+        "```ts\nexport enum SPRungType { UNIT = 'UNIT' }  // alone\n\nexport enum SPOther {\n  ADM = 'ADM',  // administer\n  MIG = 'MIG',  // migrate\n}\n```"),
+    });
+    const got = run(root, ["audit", "docs/02-constructs/01-core/rungs.md"]);
+    one("a one-line enum does not swallow the enum after it", got, lacks("vocabulary"));
+    one("and neither is accused of carrying the other's members", got, lacks("ADM"));
+  }
+
+  {
+    // A value nothing realizes is the normal state of a standard, and reporting it would make the
+    // book unable to lead anything.
+    const root = repo({
+      "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
+      "docs/02-constructs/01-core/rungs.md": chapter("Rungs", "rungs", AGREES),
+    });
+    one("a value no source realizes yet is reported nowhere",
+      run(root, ["audit", "docs/02-constructs/01-core/rungs.md"]), lacks("vocabulary"));
+  }
+
+  {
+    // The other half of the rule: ONE place. Two chapters declaring one value is two answers that
+    // drift, which is what the rule exists to prevent.
+    const root = repo({
+      "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
+      "docs/02-constructs/01-core/rungs.md": chapter("Rungs", "rungs", AGREES),
+      "docs/02-constructs/01-core/again.md": chapter("Again", "again", AGREES),
+    });
+    one("one value declared in two chapters is reported",
+      run(root, ["audit", "docs/02-constructs/01-core/rungs.md", "docs/02-constructs/01-core/again.md"]),
+      has("is declared in 2 chapters"));
+  }
+
+  {
+    // Named in Terms, declared nowhere — the state 51 chapters were in when this was written.
+    const root = repo({
+      "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
+      "docs/02-constructs/01-core/rungs.md": chapter("Rungs", "rungs", "No declaration here.\n"),
+      "docs/02-constructs/01-core/other.md": chapter("Other", "other", "Nor here.\n"),
+    });
+    one("a contract term no chapter declares is reported",
+      run(root, ["audit", "docs/02-constructs/01-core/rungs.md", "docs/02-constructs/01-core/other.md"]),
+      has("`SPRungType` is named as a contract term and no chapter declares"));
+  }
+
+  {
+    // One page cannot see the corpus, so it must not accuse another chapter of not existing.
+    const root = repo({
+      "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
+      "docs/02-constructs/01-core/rungs.md": chapter("Rungs", "rungs", "No declaration here.\n"),
+    });
+    one("one page audited alone never claims a value is undeclared",
+      run(root, ["audit", "docs/02-constructs/01-core/rungs.md"]), lacks("no chapter declares"));
+  }
+
+  {
+    // A grade, not a refusal. A new check that refuses is a check people satisfy by editing the
+    // page to match the tool.
+    const root = repo({
+      "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
+      "packages/thing-ts/src/rungs.ts": SOURCE,
+      "docs/02-constructs/01-core/rungs.md": chapter("Rungs", "rungs",
+        "```ts\nexport enum SPRungType {\n  UNIT = 'UNIT',  // alone\n}\n```"),
+    });
+    const got = run(root, ["audit", "docs/02-constructs/01-core/rungs.md"]);
+    one("a disagreement reports rather than refuses", got, has("SOFT vocabulary"));
+    one("and it is counted among the soft findings", got, has("0 RULE, 1 SOFT"));
+  }
+}
+
+
 console.log(failed ? `\n  ${failed} of ${n} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);
