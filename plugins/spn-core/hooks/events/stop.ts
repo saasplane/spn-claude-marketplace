@@ -23,6 +23,7 @@
 
 import { readFileSync, readdirSync, statSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
+import { createHash } from "node:crypto";
 import { checkCorpus } from "../checks/corpus.ts";
 import { cardsOf, openWorkstreams, rowsOf, stateOf } from "../checks/split-plan.ts";
 import { DEVEX, workspaceRoot } from "../lib/payload.ts";
@@ -75,6 +76,8 @@ function statusOf(arc: string): string {
 const TERMINAL = new Set(["LANDED", "DONE", "CLOSED", "CARRIED", "DEFERRED"]);
 
 /** When this workspace's `Stop` hook last ran, as milliseconds. 0 when it never has. */
+const DEBUG = ".debug";
+
 function lastStopAt(root: string): number {
   try { return JSON.parse(readFileSync(join(root, DEVEX, ".debug", "stop", "last.json"), "utf8")).at ?? 0; }
   catch { return 0; }
@@ -82,7 +85,7 @@ function lastStopAt(root: string): number {
 
 function rememberStop(root: string): void {
   try {
-    const dir = join(root, DEVEX, ".debug", "stop");
+    const dir = join(root, DEVEX, DEBUG, "stop");
     mkdirSync(dir, { recursive: true });
     writeFileSync(join(dir, "last.json"), JSON.stringify({ at: Date.now() }), "utf8");
   } catch { /* the check must never fail because it could not write its own note */ }
@@ -125,7 +128,40 @@ function openCards(page: string): string[] {
   return cardsOf(page).filter((card) => !card.decided).map((card) => card.number);
 }
 
-export function checkRunnable(root: string, since = lastStopAt(root)): Warning[] {
+/**
+ * Just the step table's rows, so a log entry, a status line or a handover block cannot look like
+ * work. This is the whole discriminator: the sitting writing ABOUT an arc moves everything else.
+ */
+function stepRows(text: string): string {
+  return (text.match(/^\|\s*\d+[a-z]?\s*\|.*$/gim) ?? []).join("\n");
+}
+
+/**
+ * The step rows each arc carried at the last `Stop`, so this sitting's edits can be classified.
+ *
+ * **IT CANNOT USE `git`, AND THE FIRST CUT DID.** The workstream folder lives at the workspace root,
+ * which is not a repository — `git show HEAD:./arc.md` fails there for every arc, the baseline was
+ * always absent, and the fallback took the touch at face value. So the fix changed nothing and the
+ * suite stayed green over it, because no case covered a workspace without a repo. Proven by running
+ * it against the real workspace rather than by reading it.
+ */
+function lastSteps(root: string): Record<string, string> {
+  try { return JSON.parse(readFileSync(join(root, DEVEX, DEBUG, "stop", "steps.json"), "utf8")); }
+  catch { return {}; }
+}
+
+function rememberSteps(root: string): void {
+  const seen: Record<string, string> = {};
+  for (const ws of openWorkstreamFolders(root))
+    for (const arc of arcsOf(ws)) seen[arc] = createHash("sha256").update(stepRows(read(arc))).digest("hex").slice(0, 12);
+  try {
+    const dir = join(root, DEVEX, DEBUG, "stop");
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, "steps.json"), JSON.stringify(seen), "utf8");
+  } catch { /* the check must never fail because it could not write its own note */ }
+}
+
+export function checkRunnable(root: string, since = lastStopAt(root), stepsAt = lastSteps(root)): Warning[] {
   const out: Warning[] = [];
 
   for (const ws of openWorkstreamFolders(root)) {
@@ -150,10 +186,25 @@ export function checkRunnable(root: string, since = lastStopAt(root)): Warning[]
       // findings is one nobody reads twice, which is the condition `N38` shipped for the corpus run.
       let touched = false;
       if (since) { try { touched = statSync(arc).mtimeMs > since; } catch { touched = false; } }
+      // EDITING AN ARC IS NOT EXECUTING IT, and the first cut could not tell the two apart. A sweep
+      // that set the status line of five arcs made every one of them report as runnable work in the
+      // same turn — five findings about arcs nobody had touched the substance of. What separates
+      // them is WHICH BYTES MOVED: a status line, a log entry and a handover block are the sitting
+      // writing ABOUT the arc. A step table changing is the sitting working ON it.
+      if (touched) {
+        const now = createHash("sha256").update(stepRows(read(arc))).digest("hex").slice(0, 12);
+        // NO BASELINE MEANS NO INFERENCE, the same rule the timestamp follows. An empty map is the
+        // first Stop after this check learned to tell a record edit from a work edit, and firing on
+        // every arc the sitting touched would make that upgrade look like a burst of findings.
+        const then = Object.keys(stepsAt).length ? stepsAt[arc] : now;
+        if (then === now) touched = false;                        // the record moved, the work did not
+      }
       if (status !== "RUNNING" && !touched) continue;
       const steps = unfinishedSteps(arc);
       if (steps === null) {
-        out.push({ check: "runnable", message: `\`${arc.split("/").pop()}\` is RUNNING and has no \`## Steps\` table, so nothing can say whether work is left. Give it the step table the arc template carries.` });
+        // THE WORD IS READ, NOT ASSUMED. This said "is RUNNING" from when only a RUNNING arc could
+        // reach here; a touched arc reaches it now, and the message named a status the arc did not carry.
+        out.push({ check: "runnable", message: `\`${arc.split("/").pop()}\` reads ${status || "no status"} and has no \`## Steps\` table, so nothing can say whether work is left. Give it the step table the arc template carries.` });
         continue;
       }
       const left = steps;
@@ -514,6 +565,7 @@ if (process.argv[1] && process.argv[1].endsWith("stop.ts")) {
   end();
   // AFTER the checks, never before: they compare against this and would compare against now.
   rememberStop(root);
+  rememberSteps(root);
   if (warnings.length) {
     console.error(warnings.map((w) => `[${w.check}] ${w.message}`).join("\n\n"));
     process.exit(2);   // a Stop hook's non-zero is how the message reaches the turn

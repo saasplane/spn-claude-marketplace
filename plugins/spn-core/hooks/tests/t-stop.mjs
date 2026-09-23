@@ -7,8 +7,8 @@
 import { execFileSync } from "node:child_process";
 import { workspace } from "./fixture.mjs";
 
-import { existsSync } from "node:fs";
-import { resolve } from "node:path";
+import { existsSync, readFileSync } from "node:fs";
+import { resolve, join } from "node:path";
 
 const HOOKS = resolve(import.meta.dirname, "..");
 const SCRIPTS = resolve(HOOKS, "scripts");
@@ -174,16 +174,34 @@ console.log("\n=== runnable — N39 step 8: which arc is being executed is a fac
   });
   const past = Date.now() - 60_000, future = Date.now() + 60_000;
 
-  for (const [what, since, expected] of [
-    ["an arc written this sitting, whatever its status says", past, 1],
-    ["the same arc when this sitting did not write it", future, 0],
-    ["no baseline at all — the first Stop of a workspace stays quiet", 0, 0],
+  // The third argument is the STEP-ROW baseline. Editing an arc is not executing it: a sweep that set
+  // the status line of five arcs made every one report as runnable work in the same turn, which is
+  // five findings about arcs nobody touched the substance of. So a stale hash means the work moved,
+  // a matching hash means only the record did, and an empty map means there is no baseline to judge by.
+  const arcPath = join(root, ".spndevex/workstreams/open/001-a-subject/arcs/N1-a-subject.md");
+  const WORK_MOVED = { [arcPath]: "a-different-hash" };
+
+  for (const [what, since, expected, baseline] of [
+    ["an arc whose STEP ROWS moved this sitting, whatever its status says", past, 1, WORK_MOVED],
+    ["the same arc when this sitting did not write it", future, 0, WORK_MOVED],
+    ["no timestamp baseline — the first Stop of a workspace stays quiet", 0, 0, WORK_MOVED],
   ]) {
     n += 1;
-    const got = checkRunnable(root, since).length;
+    const got = checkRunnable(root, since, baseline).length;
     const ok = got === expected;
     if (!ok) failed += 1;
     console.log(`  ${ok ? "PASS" : "FAIL"}  ${what} -> ${got} warning(s)`);
+  }
+
+  // THE CASE THE SWEEP TAUGHT: the file moved and the step table did not.
+  n += 1;
+  {
+    const { createHash } = await import("node:crypto");
+    const rows = (readFileSync(arcPath, "utf8").match(/^\|\s*\d+[a-z]?\s*\|.*$/gim) ?? []).join("\n");
+    const same = { [arcPath]: createHash("sha256").update(rows).digest("hex").slice(0, 12) };
+    const quiet = checkRunnable(root, past, same).length === 0;
+    if (!quiet) failed += 1;
+    console.log(`  ${quiet ? "PASS" : "FAIL"}  an arc whose RECORD moved but whose step rows did not is silent`);
   }
 
   // THE STATUS WORD STILL COUNTS where it appears, so nothing that worked before stops working —
