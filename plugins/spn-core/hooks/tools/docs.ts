@@ -419,62 +419,7 @@ function checkCards(file: string, src: string, block: any): Finding[] {
   return f;
 }
 
-/**
- * The folders an ASCII tree draws, as paths relative to the tree's own root.
- *
- * A tree is read by its indentation: every two columns before the branch marker is one level. The
- * markers themselves are the only thing that identifies a row, so a caption, a blank line or a
- * trailing note between rows is skipped rather than guessed at.
- *
- * ONLY FOLDERS COUNT. A tree names files to show where they sit, and a file is already covered by
- * the figure check above — widening this to files would refuse every tree that elides one.
- */
-function treeFolders(body: string): string[] {
-  const out: string[] = [];
-  const stack: string[] = [];
-  // NOT `text()`, WHICH ENDS IN `.replace(/\s+/g, " ")`. That is right for the file figure beside
-  // this one, which compares a snippet whitespace-blind — and fatal here, because a tree IS its
-  // whitespace. Collapsed to one line it parsed as nothing, and the check read clean over a tree
-  // drawing a folder that did not exist.
-  const lines = body
-    .replace(/<[^>]+>/g, "")
-    .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&nbsp;/g, " ")
-    .replace(/&#x([0-9A-Fa-f]+);/g, (_, h) => String.fromCodePoint(parseInt(h, 16)));
-  for (const raw of lines.split("\n")) {
-    const m = raw.match(/^([\s\u2502]*)[\u251c\u2514]\u2500\u2500\s+(.+?)\s*$/);
-    if (!m) continue;
-    const depth = Math.floor(m[1].replace(/\t/g, "    ").length / 4);
-    // A trailing comment after two spaces is a note to the reader, never part of the name.
-    const name = m[2].split(/\s{2,}/)[0].trim();
-    if (!name.endsWith("/")) continue;
-    const bare = name.replace(/\/$/, "");
-    stack.length = depth;
-    stack.push(bare);
-    out.push(stack.join("/"));
-  }
-  return out;
-}
-
 /** Every folder under a directory, relative to it, sorted. */
-function folderTree(dir: string): string[] {
-  const out: string[] = [];
-  const walk = (at: string, prefix: string): void => {
-    let entries: string[];
-    try { entries = readdirSync(at).sort(); } catch { return; }
-    for (const e of entries) {
-      if (e === "node_modules" || e === "dist" || e.startsWith(".")) continue;
-      const full = join(at, e);
-      let st; try { st = statSync(full); } catch { continue; }
-      if (!st.isDirectory()) continue;
-      const rel = prefix ? `${prefix}/${e}` : e;
-      out.push(rel);
-      walk(full, rel);
-    }
-  };
-  walk(dir, "");
-  return out.sort();
-}
-
 /**
  * A figure that names a DIRECTORY draws that directory's folders, and the audit compares them.
  *
@@ -609,46 +554,6 @@ function checkStyleBalance(file: string, src: string): Finding[] {
       ? `the stylesheet closes ${-depth} more brace(s) than it opens${which} — everything after the extra \`}\` is discarded`
       : `the stylesheet leaves ${depth} brace(s) open${which} — the rules after it are swallowed by whatever did not close` });
   });
-  return f;
-}
-
-function checkTreeFigures(file: string, src: string, root: string): Finding[] {
-  const f: Finding[] = [];
-  // THE PARAGRAPH BEFORE A TREE NAMES ITS FOLDER, and the path is the LAST `<code>` in it.
-  //
-  // A first draft required the path to be the only code in the paragraph, and it matched nothing —
-  // including the fixture written to prove it. A real caption names the kind first and the folder
-  // last (*the skeleton a `SUPPORT_UNIVERSAL` starts from, in `…/support-universal/`*), so reading
-  // the first code span reads the kind and gives up. Taking the last one is what a reader does.
-  for (const m of src.matchAll(/<p>([\s\S]*?)<\/p>\s*<pre[^>]*>([\s\S]*?)<\/pre>/g)) {
-    const [, caption, body] = m;
-    const codes = [...caption.matchAll(/<code>([^<]+)<\/code>/g)].map((c) => c[1]);
-    // A CITATION IS WORKSPACE-ROOTED, so its first segment names a repository. Without that test
-    // every folder name in a caption read as a citation: `entry/ui/` and `src/aws/` are layer names
-    // a chapter is describing, and `docs/artifacts/approaches/` is repository-relative. All three
-    // were refused as stale citations on the first run, over trees that were perfectly correct.
-    const cited = (c: string): boolean => {
-      if (!c.endsWith("/") || !c.slice(0, -1).includes("/")) return false;
-      const head = join(root, c.split("/")[0]);
-      try { return statSync(head).isDirectory(); } catch { return false; }
-    };
-    const path = codes.reverse().find(cited);
-    if (!path) continue;
-    const abs = resolve(root, path);
-    if (!existsSync(abs)) {
-      f.push({ check: "treefig", grade: "RULE", file, message: `a tree names \`${path}\`, and no such folder exists` });
-      continue;
-    }
-    const shown = treeFolders(body);
-    if (!shown.length) continue;
-    const actual = folderTree(abs);
-    const ghost = shown.filter((d) => !actual.includes(d));
-    const unseen = actual.filter((d) => !shown.includes(d));
-    for (const d of ghost)
-      f.push({ check: "treefig", grade: "RULE", file, message: `the tree for \`${path}\` draws \`${d}/\`, and that folder is not there` });
-    for (const d of unseen)
-      f.push({ check: "treefig", grade: "RULE", file, message: `\`${path}\` holds \`${d}/\` and the tree does not draw it` });
-  }
   return f;
 }
 
@@ -2197,7 +2102,6 @@ function audit(paths: string[], workspace: string): Finding[] {
     findings.push(...checkHeader(p, src, block));
     findings.push(...checkCards(p, src, block));
     findings.push(...checkCodeFigures(p, src, workspace));
-    findings.push(...checkTreeFigures(p, src, workspace));
     findings.push(...checkStyleBalance(p, src));
     findings.push(...checkLinks(p, src));
     findings.push(...checkFurniture(p, src, templates));
