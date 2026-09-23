@@ -33,7 +33,7 @@
 // understand is a gate somebody turns off, and this one guards the act that most needs to stay on.
 
 import { execFileSync } from "node:child_process";
-import { join } from "node:path";
+import { isAbsolute, join } from "node:path";
 import { DEVEX, isDir, listdir, read, workspaceRoot, type Payload, type Verdict } from "../lib/payload.ts";
 
 /** `apps release 2.0.0` / `infra release 2.0.0`, however the CLI is spelled to get there. */
@@ -60,6 +60,30 @@ export function stampedVersion(command: string): string | null {
     return SEMVER.test(word) ? word : null;
   }
   return null;
+}
+
+/**
+ * The directory the release will actually run in, which is not always where the session stands.
+ *
+ * `payload.cwd` is the SESSION's directory, and a Bash call routinely carries its own
+ * `cd <repo> && …` because the caller is moving between checkouts in one workspace. Those are two
+ * different directories and this check reads git tags out of one of them.
+ *
+ * FOUND BY BEING WRONG, on 2026-09-23. `cd spn-support-ts && … apps release 1.2.68` was compared
+ * against the tags of `spn-platform-ts`, where the session happened to be standing. That repository
+ * carries `v0.1.0`, so a patch bump read as a major one and a correct release was refused, with a
+ * message naming a version the caller had never typed. The same `cd` also stopped the permission
+ * floor's `allow` rule from matching, because a pattern matches the FIRST token — one prefix,
+ * two failures, neither of them visible in the other.
+ *
+ * It reads only the leading `cd`, and only when a separator follows it. Anything more elaborate is a
+ * command this cannot reason about, and the session's own directory is the honest answer there.
+ */
+export function commandCwd(command: string, sessionCwd: string): string {
+  const found = /^\s*cd\s+(?:'([^']+)'|"([^"]+)"|([^\s;&|]+))\s*(?:&&|;)/.exec(command);
+  const named = found?.[1] ?? found?.[2] ?? found?.[3];
+  if (!named) return sessionCwd;
+  return isAbsolute(named) ? named : join(sessionCwd, named);
 }
 
 /** The newest released version this repository carries, read from its own tags. */
@@ -103,7 +127,7 @@ export function checkReleaseGo(payload: Payload): Verdict {
   const version = stampedVersion(command);
   if (!version) return null;                       // omitted: the CLI increments, never a major bump
 
-  const cwd = payload.cwd ?? process.cwd();
+  const cwd = commandCwd(command, payload.cwd ?? process.cwd());
   const current = currentVersion(cwd);
   if (!current) return null;                       // nothing to compare against: not this check's call
   if (!isMajorBump(version, current)) return null; // minor and patch are the standing authorization

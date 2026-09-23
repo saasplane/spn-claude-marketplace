@@ -16,8 +16,8 @@ One CLI serves every stack. The group says *what kind of thing changes*, which i
 | `workspace` | the level above the repository — the floor's permission tiers, the plugin union, the machine env seat, and `.spndevex/` | anything inside a repository |
 
 <!-- spn:generated commands — do not edit inside these markers; `commands-ref.ts` writes it -->
-Rendered from `spnutils 1.2.67` — the **released** CLI, which is what a partner holds.
-Surface `fc7ccc4683b4`. A release that adds no command leaves that unchanged and owes no regeneration.
+Rendered from `spnutils 1.2.68` — the **released** CLI, which is what a partner holds.
+Surface `4f84135ac03d`. A release that adds no command leaves that unchanged and owes no regeneration.
 
 #### `apps`
 
@@ -34,7 +34,7 @@ Surface `fc7ccc4683b4`. A release that adds no command leaves that unchanged and
 | `apps gen-symbols` | Generate the symbol index (public surface -> dist/generated/spn-symbols.json) | `--package <package>` |
 | `apps gen-validators` | Generate contract state validators | `--package <package>` |
 | `apps migrate` | Move this node's migration history — a task, never a run mode | `--package <package>` · `--json` |
-| `apps release` | Publish every releasable project in this repository, at one version (lockstep) — the scope is the repository, never one package | `--message <message>` · `--dry-run` · `--approved` · `--json` |
+| `apps release` | Publish every releasable project in this repository, at one version (lockstep) — the scope is the repository, never one package | `--dry-run` · `--approved` · `--json` |
 | `apps scaffold` | Scaffold a SaaS Plane artifact — a repository, or a project of a declared kind | `--usecase <usecase>` · `--code <code>` · `--scope <scope>` · `--support-version <version>` · `--app <folder>` · `--name <name>` · `--stack <stack>` · `--organization <ref>` · `--platform <ref>` |
 | `apps start` | Run what the build produced | `--package <package>` · `--json` · `--mode <mode>` |
 | `apps stop` | Stop what dev or start left running | `--package <package>` · `--json` |
