@@ -114,6 +114,42 @@ console.log("\n=== corpus — the trigger, against a known-bad corpus");
   check("a workspace carrying no docs tree is silent and does not crash", !warned, out.slice(0, 300));
 }
 
+// ---- F3: the file `commands-ref` writes is an input, and it is not under any docs tree
+{
+  // A COMMANDS FINDING COULD BE REPORTED AND NEVER CLEARED, which is F1 seen from the other side.
+  // `commands-ref` reads `refs/commands.md`, a release moved the CLI, the ref went stale and the
+  // RULE appeared — and regenerating the ref changed no watched input, so every later turn replayed
+  // the same finding over a file that was already correct. The CLI stat beside it cannot help: the
+  // binary is exactly what it was when the finding was found.
+  //
+  // `fingerprint` is called directly here rather than through the check, because the path it reads
+  // is relative to the TOOL directory — so a fixture proves it and the real `refs/` is left alone.
+  const { fingerprint } = await import(CHECK);
+  const root = fixture("commands-ref-input");
+  const tools = join(BASE, "plug", "hooks", "tools");
+  const refs = join(BASE, "plug", "refs");
+  mkdirSync(tools, { recursive: true });
+  mkdirSync(refs, { recursive: true });
+  const trees = [join(root, "repo-a", "docs")];
+
+  writeFileSync(join(refs, "commands.md"), "# commands\n\n52 of them.\n", "utf8");
+  const before = fingerprint(root, trees, tools);
+  writeFileSync(join(refs, "commands.md"), "# commands\n\n53 of them, which is one more.\n", "utf8");
+  const after = fingerprint(root, trees, tools);
+
+  check("[F3] regenerating the commands ref moves the fingerprint", before !== after,
+    `both runs hashed to ${before.slice(0, 12)}`);
+
+  // And the corpus itself is still what decides — a ref that did not move must not wake a run.
+  check("[F3] a ref that did not move leaves the fingerprint where it was",
+    fingerprint(root, trees, tools) === after);
+
+  // An absent ref is a state rather than a crash: a plugin checkout without one still hashes.
+  rmSync(join(refs, "commands.md"), { force: true });
+  check("[F3] an absent ref hashes rather than throwing",
+    typeof fingerprint(root, trees, tools) === "string");
+}
+
 rmSync(BASE, { recursive: true, force: true });
 console.log(failed ? `  ${failed} FAILED` : `  all ${count} passed`);
 process.exit(failed ? 1 : 0);
