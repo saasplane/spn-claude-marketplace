@@ -30,10 +30,9 @@
 // IT NEVER TAKES THE CHAIN DOWN. A check that throws is skipped, not fatal. A gate that crashes the
 // PreToolUse chain removes every other gate with it, which is worse than any single miss.
 
-import { resolve } from "node:path";
 import type { Payload, ToolInput, Verdict } from "../lib/payload.ts";
+import { begin, span, end as endTiming } from "../lib/timing.ts";
 import { emit, payload } from "../lib/payload.ts";
-import { isDir, isFile } from "../lib/source.ts";
 import { CHECKS as COVERAGE_CHECKS, run as runCoverage } from "../checks/coverage.ts";
 import { run as runEnablementGrammar, watched as watchedEnablement } from "../checks/enablement-grammar.ts";
 import { run as runHostAssertion } from "../checks/host-assertion.ts";
@@ -66,36 +65,6 @@ const CHECKS: Check[] = [
   })),
 ];
 
-/**
- * `span` from `spn-core`'s `timing.ts`, or a pass-through.
- *
- * The timer lives in the other plugin, and a partner may hold one plugin without the other, so this
- * resolves it at runtime and records nothing when it is absent. A missing neighbour must never be
- * the reason a gate stops running.
- */
-async function timer(): Promise<{
-  begin: (facts: Record<string, unknown>, start?: string) => void;
-  span: <T>(name: string, fn: () => T) => T;
-  end: () => void;
-}> {
-  const passthrough = { begin: () => {}, span: <T,>(_: string, fn: () => T) => fn(), end: () => {} };
-  const family = resolve(import.meta.dirname, "..", "..", "..");   // holds spn-core beside us
-  const direct = resolve(family, "spn-core", "hooks", "docs", "timing.ts");
-  let target = isFile(direct) ? direct : null;
-  if (!target) {
-    // The installed cache puts a VERSION directory between the plugin and its files.
-    const versioned = resolve(family, "..", "spn-core");
-    if (isDir(versioned)) {
-      const { readdirSync } = await import("node:fs");
-      const picks = readdirSync(versioned)
-        .filter((d) => isFile(resolve(versioned, d, "hooks", "docs", "timing.ts"))).sort();
-      if (picks.length) target = resolve(versioned, picks[picks.length - 1], "hooks", "docs", "timing.ts");
-    }
-  }
-  if (!target) return passthrough;
-  try { return (await import(target)) as Awaited<ReturnType<typeof timer>>; } catch { return passthrough; }
-}
-
 export function dispatch(event: Payload, span: <T>(name: string, fn: () => T) => T): Verdict {
   const supplied = event.tool_input ?? {};
   if (!supplied.file_path) return null;            // every check here reads a path
@@ -116,14 +85,19 @@ export function dispatch(event: Payload, span: <T>(name: string, fn: () => T) =>
 }
 
 const event = await payload();
-const clock = await timer();
 // MEASURING IS FREE; WRITING IS THE COST. `begin` touches no filesystem, so the loop always times and
 // always reports. What the window decides is whether any of it is ever written down — which is the
 // only part anybody pays for.
-clock.begin({ event: "PreToolUse", tool: event?.tool_name ?? null, session: event?.session_id ?? null },
-            event?.cwd ?? process.cwd());
+//
+// THE TIMER IS THIS PLUGIN'S OWN, and that is the rule rather than a convenience. A plugin carries
+// its libraries; a neighbour's file is not a dependency it may have. Plugins version and install
+// separately, a partner may hold either without the other, and the installed cache puts a version
+// directory between a plugin and its files — so reaching across resolves at runtime, and a resolve
+// that misses returns the working pass-through, which is silence wearing the shape of success.
+begin({ event: "PreToolUse", tool: event?.tool_name ?? null, session: event?.session_id ?? null },
+      event?.cwd ?? process.cwd());
 let verdict: Verdict = null;
-try { verdict = event ? dispatch(event, clock.span) : null; } catch { verdict = null; }
-clock.end();
+try { verdict = event ? dispatch(event, span) : null; } catch { verdict = null; }
+endTiming();
 emit(verdict);
 process.exit(0);
