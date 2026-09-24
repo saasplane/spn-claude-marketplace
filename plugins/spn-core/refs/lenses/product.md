@@ -19,7 +19,7 @@ A product manager may never open the book: asks arrive loose, not as specs in pl
 
 - **Rows are outcomes, not tours.** "A merchant can refund an order within its settlement window" is an outcome; "a merchant can read the refunds page" is a tour. Every row names *whose* outcome it is — the `Who` cell carries a persona and says whose, never who may read.
 - **Write acceptance at plan time.** Put it in the row's `Sees` cell — what is true when it works — and never leave it empty; each case testable, in the consumer's language.
-- **The consumer vocabulary is real.** Every product word the design uses appears in the owning module's `data-model.md` consumer column, backed by a construct in the capability column. A product word with no code behind it is a defect; a construct no consumer speaks of takes a deliberate dash, never an invented word.
+- **The consumer vocabulary is real.** Every product word the design uses appears in its domain's dictionary — the generated table on `02-constructs/<domain>/README.md` — as a `Term`, with a contract term beside it. A product word with no code behind it is a defect; a term no consumer speaks of takes a deliberate dash in that column, never an invented word.
 - **The journey holds.** A new behavior lands inside a journey a consumer can actually complete — entry point, steps, what they see — not as an orphan capability.
 - **Product outcomes over code delivery.** The measure of a change is the consumer outcome it ships — usage and experience — never the volume of code that shipped it.
 

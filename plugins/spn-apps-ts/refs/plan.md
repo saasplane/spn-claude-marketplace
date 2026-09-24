@@ -32,7 +32,7 @@ Pick the mode from the argument (`design` | `docs` | `decision`); if none was gi
    - **`docs/02-constructs/<domain>/<NN>-<construct>.md`** — where the ability needs a word the model does not carry yet. A topic a construct does not name may not appear in the other two seats, so the construct is written first, and its `Terms` table carries the consumer's word beside the contract term.
    - **`docs/03-behaviors/<domain>/<NN>-<construct>.md`** — one file of rows per topic, carrying the same number as the construct it belongs to. A row is a record of cells, not a sentence: `Id · Who · Does · Sees · Where · Type · Tier · Status · Updated at · Names`. `Who` is a persona from the repository's own personas table, never a lens; `Does` is the arrangement and the action; `Sees` is what is true when it works and is never empty; `Where` names the app or package that realizes it; `Type` is `POSITIVE` or `NEGATIVE`; `Tier` is declared before any case exists; `Status` is `PLANNED` at birth and the agent writes it afterwards; `Names` holds the foundation promise this row fulfils. The id is `<DOMAIN>.<AREA>.<NN>`, and the domain is the one that would have to change if the behaviour changed.
    - **`docs/04-capabilities/<domain>/<package>/<NN>-<construct>.md`** — one chapter per construct per package that realizes it, numbered as the construct is. A chapter has four sections — **Where** (each part of the construct and the place it lives in this package), **Follows the pattern** (one line per pattern that applies unchanged, linking the stack's standard), **Special handling** (the methods, flows and rules the construct forces off the pattern — why, then what, then how, with one place in the code), and **Between modules** (what this package takes from other modules and what it publishes to them). It stays under 800 words, names no test and claims no status.
-   - **`docs/04-capabilities/<domain>/data-model.md`** beside its `schema.sql` — one per domain, at the domain root, never once per package (foundation decision RD.DOCS.074). It carries which contract term is stored in which table and column, and defines no term: the words are the constructs' `Terms` tables. The contract delta — new and changed states and commands, the read levels the entity needs, enum values and their handling, the queue, cache and audit interactions, and authz tiers (`VIEW`/`MANAGE`/`ADMIN` or authenticated) — belongs in the capability chapter for the construct it changes.
+   - **`docs/04-capabilities/<domain>/<server package>/data-model.md`** beside its `schema.sql` — in the package that owns `src/migrations`, never at the domain root and never in a half that stores nothing (foundation decision RD.DOCS.074). Still one per domain, because a domain has one migrations folder. It carries which contract term is stored in which table and column, and defines no term: the words are the constructs' `Terms` tables. **A domain that stores nothing writes none.** The contract delta — new and changed states and commands, the read levels the entity needs, enum values and their handling, the queue, cache and audit interactions, and authz tiers (`VIEW`/`MANAGE`/`ADMIN` or authenticated) — belongs in the capability chapter for the construct it changes.
    - **`docs/01-purpose/README.md`** — only if the repository's reason to exist shifts, which a module change almost never does.
    - **`docs/05-guides/README.md`** — only if the design changes how a consumer installs, mounts, or configures the module. An app-owned module contributes no guide of its own; its host app's guide is where that lands.
    - Cross-module needs land under the *other* module's own domain, as contract-level rows (or a request queue for writes) — never as internals.
@@ -58,7 +58,7 @@ in the **spn-core** plugin carries the shape in full; audit against exactly this
 ├── 04-capabilities/       WHAT, as engineering — one chapter per construct per package that
 │                          realizes it, hung by domain then by package then by the construct,
 │                          each chapter numbered as its construct is; `data-model.md` and
-│                          `schema.sql` sit once at the domain root (RD.DOCS.074)
+│                          `schema.sql` sit in the package owning src/migrations (RD.DOCS.074)
 ├── 05-guides/             HOW — README.md IS the getting-started; further guides numbered
 │                          (a guide an app-owned module would need lives on its host instead)
 ├── registers/             pocket — the repository's own rules and decision log
@@ -79,7 +79,7 @@ in the **spn-core** plugin carries the shape in full; audit against exactly this
   sitting as a file is also drift: fold it into the seat's face.
 - **Number what is ordered; never number what is named.** The seats, the domain levels, and every
   construct file with the behaviour and capability files carrying its number take numbers. Never
-  numbered: `README.md`, `data-model.md`, `schema.sql`, `personas.md`, the two pockets, and a
+  numbered: `README.md`, `data-model.md`, `surface-map.md`, `schema.sql`, `personas.md`, the two pockets, and a
   package folder in the capabilities seat — that folder is named for the package it mirrors, and
   the name must stay identical to it.
 - **A capability chapter or a guide is absent only where the package truly realizes nothing of that
@@ -110,8 +110,8 @@ in the **spn-core** plugin carries the shape in full; audit against exactly this
   disagree, the document is **not** automatically the stale one: work out which is wrong and record
   it (see `decision` mode). Never silently edit either side to match the other. Present truth, no
   changelog prose — git history is the history.
-- Verify each `data-model.md`/`schema.sql` pair at `04-capabilities/<domain>/` against
-  `src/migrations/` for the modules of that domain (must agree — `schema.sql` is the authoritative
+- Verify each `data-model.md`/`schema.sql` pair at `04-capabilities/<domain>/<server package>/`
+  against that package's own `src/migrations/` (must agree — `schema.sql` is the authoritative
   form), each package's capability chapters there against its `contract/services/`, and that every
   `SUCCESS` row in `03-behaviors/<domain>/` resolves to a case that ran. Verify intent comments
   exist on `I*Service` methods and exported components (provider chapter 03-code-patterns §

@@ -89,8 +89,8 @@ writing a word into either.
 ├── 03-behaviors/          WHAT, as product — rows under a folder per domain, in the consumer's
 │                          own words, each carrying an id and a status
 ├── 04-capabilities/       WHAT, as engineering — one mirror per source folder that earns one,
-│                          hung by domain then by layer; `data-model.md` and `schema.sql` sit
-│                          beside the layer that owns storage. Derived, not chosen (RD.DOCS.015)
+│                          hung by domain then by package; `data-model.md` and `schema.sql` sit
+│                          in the package owning src/migrations. Derived, not chosen (RD.DOCS.015)
 ├── 05-guides/             HOW — README.md IS the getting-started; further guides numbered
 ├── registers/             pocket — the repository's own rules and decisions
 └── artifacts/             pocket — the overview and construct pages, and deliberate reports

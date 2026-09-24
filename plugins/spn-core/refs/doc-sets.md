@@ -106,7 +106,7 @@ invents the vocabulary it needs, which is how one noun ends up meaning two thing
 - **A seat holding nothing but its face is the compact state, not a defect.**
 - **Number what is ordered; never number what is named.** The seats, the area and domain levels, and
   every construct file with the behaviour and capability files carrying its number, are numbered.
-  `README.md`, `data-model.md`, `schema.sql`, `personas.md`, `registers/`, `artifacts/`,
+  `README.md`, `data-model.md`, `surface-map.md`, `route-map.md`, `schema.sql`, `personas.md`, `registers/`, `artifacts/`,
   `templates/` and **every package folder in the capabilities seat** are not — a package folder's
   name must stay identical to the package it is named for.
 - **One level holds numbered folders or numbered files, never both.** A file browser sorts every
@@ -136,10 +136,10 @@ The tree hangs **by domain, then by the package, then by the construct**:
 ```text
 04-capabilities/01-iam/
 ├── README.md                   the domain face: its packages, and what each realizes
-├── data-model.md               contract term → table and column, once for the domain
-├── schema.sql                  the tables this domain owns, authoritative
 ├── module-server-iam-ts/
 │   ├── README.md               the package face: the constructs it realizes, and those it does not
+│   ├── data-model.md           contract term → table and column
+│   ├── schema.sql              the tables this half owns, authoritative
 │   ├── 01-organization-tree.md
 │   └── 04-sign-in.md        →  the server half of the Sign-in construct
 └── module-web-iam-ts/
@@ -156,14 +156,16 @@ what you meet is a declaration rather than a gap you have to investigate.
   generated list of its source folders with the chapter covering each, so *is this folder
   documented* is still a table rather than a hunt — asked where a developer is standing when they
   ask it (decision RD.DOCS.078).
-- **`data-model.md` sits at the domain's root and never once per package** (decision RD.DOCS.074). A
-  domain has one data model however many packages realize it, so a domain's server and web packages
-  carry neither it nor the schema. It holds what a migration knows — which contract term is stored
-  in which table and column — and defines no term, because the words are the constructs' own.
+- **`data-model.md` sits beside the migrations it mirrors** — in the realizing package that owns
+  `src/migrations` — and never in a half that stores nothing (decision RD.DOCS.074). A capability is
+  realized by halves and only the server half stores, so that is still one data model per domain: a
+  domain has one migrations folder, and placement follows storage. It holds what a migration knows —
+  which contract term is stored in which table and column — and defines no term, because the words
+  are the constructs' own. **A domain that stores nothing writes none at all.**
 - **`schema.sql` sits beside the `data-model.md` it is the authoritative form of**, in the
-  capabilities seat and not in a pocket: migrations mirror it verbatim, the dictionary reads a
-  term's storage through it, and a repository with nine storage-owning domains has nine of them
-  (`Q88`, 2026-09-18). One pocket cannot hold nine files of one name.
+  capabilities seat and not in a pocket: migrations mirror it verbatim, and a repository with nine
+  storage-owning domains has nine of them (`Q88`, 2026-09-18). One pocket cannot hold nine files of
+  one name, and neither can one domain folder hold both halves' realizations.
 - **Excluded by construction**: a private segment (anything under a `_`-prefixed path), a generated
   folder, build output, and `migrations/`. A migration's useful content is seeding and ordering,
   which is vocabulary and belongs to the data model (decision RD.DOCS.018).
@@ -177,7 +179,8 @@ Which makes the seat checkable in every direction:
 | a package holding code that realizes no construct | the code grew a subject the model never got |
 | a construct no package realizes | the model grew a subject nothing builds |
 | a source folder the node's generated index shows no chapter for | a folder is documented by nobody, and now somebody notices |
-| a `data-model.md` under a package rather than a domain | a domain's tables were written down twice |
+| a `data-model.md` in a package with no `src/migrations` | a half that stores nothing wrote down storage |
+| a domain folder holding a `data-model.md` beside its package folders | the file sits above the half that owns it |
 | a pattern explained inside a chapter | the stack's standard was copied, and the copy is the stale one |
 
 ### A repository may have no `src/`, and the grammar still holds
@@ -213,11 +216,23 @@ and a repository that cannot run a tier today may ship a runner tomorrow (`RD.GO
 | `registers/` | the repository's own rules and decisions | lookup material, consulted rather than read start to end |
 | `artifacts/` | the overview and construct pages, and deliberate reports | authored source of truth. Nested folders allowed here and nowhere else; sub-folders carry no README |
 
-**The constructs face is the dictionary, and it is generated.** One table, three columns — the word a
-consumer uses, the term the contract uses, and where it is stored. The first two come from each
-construct's own `Terms` table, so that table is **three columns wide, not two**; the third comes from
-the domain's `data-model.md`, matched on the contract term. A `Terms` table of two columns cannot be
-generated from, and the audit reports it.
+**A domain face carries its dictionary, and it is generated.** One table, three columns — the word a
+consumer uses, the term the contract uses, and what it means — joined from every construct `Terms`
+table in that domain, with the term linked to the construct that declares it. A `Terms` table of two
+columns cannot be generated from, and the audit reports it.
+
+**It sits on the domain, not on the seat face.** A repository-wide table ran to 573 rows in the
+foundation and 347 in the platform, where a domain's is twelve to a hundred and twenty-two — and a
+term written twice in one domain sits in adjacent rows rather than two hundred apart. The seat face
+keeps the domain table it already carries and no dictionary.
+
+**There is no *where it is stored* column.** It was joined from the domain's `data-model.md` and
+named a table in none of 252 rows measured; deleting it repaired the defect that no correction to
+the files could. Storage is read in the data model itself, which is grouped by table and says which
+constraint matters and why each index exists.
+
+**A domain's overview is its face in HTML**: it links into `artifacts/constructs/<domain>/` and
+carries the same dictionary. Extra reading paths beneath it carry none.
 
 **Six invariants hold this shape up, and the folders are only where they land.** A domain folder
 exists only where the concept names that domain. The dictionary is generated, never typed. Every

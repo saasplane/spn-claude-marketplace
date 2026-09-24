@@ -60,7 +60,7 @@ Foundation decision RD.GOV.009: a document states a **status**, never a count. N
 
 | During step | The doc move |
 | --- | --- |
-| contract | New/changed states, commands, enums land in `docs/04-capabilities/` — face rows in `README.md`, terms in `data-model.md` (bilingual) (flip the plan's `🔮` to `🚧`); every `I*Service` method gets its one-line **intent comment** as it is written |
+| contract | New/changed states, commands and enums land as **terms in the construct's `Terms` table** under `docs/02-constructs/<domain>/` — a term is written in exactly one construct and the domain's dictionary is generated from it. A closed vocabulary states its members there as a fenced contract block. Storage goes to the server package's `data-model.md`, face rows to `README.md` (flip the plan's `🔮` to `🚧`); every `I*Service` method gets its one-line **intent comment** as it is written |
 | service | Interactions rows in `docs/04-capabilities/` (cache, queue, audit implications); permission rows if the authz surface grew |
 | entry | Nothing extra — routes are generated surface (OpenAPI), never hand-documented |
 | ui | Component intent comments; the UI package's behaviors cite the domain ids they realize |
@@ -75,7 +75,7 @@ Foundation decision RD.GOV.009: a document states a **status**, never a count. N
 | `docs/05-guides/README.md` | Only if install, mount, or configuration changed — this face **is** the getting-started, and it is written for a reader with no checkout of this repo. If it is generated, edit only inside `<!-- spnutils:keep:begin -->` / `<!-- spnutils:keep:end -->` (foundation decision RD.DOCS.009) |
 | `docs/02-constructs/<domain>/` | The construct, if your change altered what a thing IS — what it is made of, what it depends on, or what it refuses. The dictionary is generated from each construct's `Terms` table, so a term is edited there and nowhere else |
 | `docs/01-purpose/README.md` | Only if the REPOSITORY's reason to exist shifted, which a module change almost never does |
-| `docs/04-capabilities/<domain>/<layer>/schema.sql` | Any entity/column/index change landed here **first** (or simultaneously), ported **verbatim** into `src/migrations/` — spec and migrations must never disagree. It sits beside the `data-model.md` it is the authoritative form of, and NOT in a pocket: nothing in a pocket may be depended on (foundation decision `Q88`) |
+| `docs/04-capabilities/<domain>/<server package>/schema.sql` | Any entity/column/index change landed here **first** (or simultaneously), ported **verbatim** into that package's `src/migrations/` — spec and migrations must never disagree. It sits beside the `data-model.md` it is the authoritative form of, in the package that owns the migrations, and NOT in a pocket: nothing in a pocket may be depended on (`Q88`, `RD.DOCS.074`) |
 | `docs/README.md` | The repository's own face — only if a seat was added or a domain's name changed |
 | `README.md` (package root) | The npm front door, not the node doc and not a mirror — only if identity, install, or key exports changed |
 | App-owned modules | **The module inherits its host application's domain and layer, and adds its own name** — `apps/web-www-ts/src/modules/onboarding/` documents itself at `docs/04-capabilities/10-surfaces/www/onboarding/`. It is never adopted on its own, so wiring, composition and running it land in the repository's `docs/05-guides/`, which you update when the registration entry or what it commits the host to changed |
@@ -91,7 +91,7 @@ Rules:
 
 ## Env documentation
 
-A new module env variable (`{CODE}_{MOD}_*`) is documented where it lives: the module's `docs/04-capabilities/data-model.md` env terms (depth in `docs/05-guides/README.md`). It is also documented in the app's `envs/local.env`, under the module's banner comment. Committed env files carry **no secret values** — secrets appear empty with a required-in-shell annotation. Keep the env file's header key list in sync with what migrations actually read.
+A new module env variable (`{CODE}_{MOD}_*`) is documented where it lives: **the package's own `README.md`**, in its configuration matrix (depth in `docs/05-guides/README.md`). It is configuration rather than a contract term, so it goes in neither the data model nor a `Terms` table. It is also documented in the app's `envs/local.env`, under the module's banner comment. Committed env files carry **no secret values** — secrets appear empty with a required-in-shell annotation. Keep the env file's header key list in sync with what migrations actually read.
 
 ### Where a key goes — one order, in every env file
 

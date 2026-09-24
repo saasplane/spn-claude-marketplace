@@ -31,12 +31,25 @@ import { filesUnder as proseFilesUnder, paragraphs as proseParagraphs, score as 
 type Grade = "RULE" | "SOFT";
 type Finding = { check: string; grade: Grade; file: string; message: string };
 
+// THE SET IS OWNED BY `SPDocVariantType` in the CLI's contract, and this is a copy of it. Nothing
+// links the two, so a value added there and not here is silently refused, and one added here and
+// not there passes a check the contract would reject. Keeping them in step is manual until a check
+// reads the contract; that check is owed (workstream 008, N63).
+//
 // `capability` joined the set with Q130. The chapter kind existed, its template existed, and the
 // checker had never heard of it — so every capability chapter in the corpus was a document whose
 // own declared variant was not a variant. It carries no fixed outline: a chapter is Where ·
 // Follows the pattern · Special handling · Between modules, and a construct that is pure pattern
 // legitimately has no Special handling at all.
-const VARIANTS = ["approach", "overview", "construct", "behaviors", "capability", "report"] as const;
+//
+// The five that joined in 2026-09: a FACE is 226 documents of one shape that no kind could name,
+// and 29 of them declared a chapter's variant instead. A DATA_MODEL's table shape is stated in
+// `RD.DOCS.074` and was written four different ways across 25 files. SURFACE_MAP and ROUTE_MAP
+// carry no document yet. **None of the five has an outline here on purpose**: the corpus has not
+// been written to one, so a gate now would refuse 222 documents for a shape nobody was told about.
+// The outlines land with the pass that brings those documents to them.
+const VARIANTS = ["approach", "overview", "construct", "behaviors", "capability", "report",
+                  "face", "data_model", "surface_map", "route_map", "register"] as const;
 type Variant = (typeof VARIANTS)[number];
 
 /** The lens register, as the document chapter's table renders each value for a reader. */
