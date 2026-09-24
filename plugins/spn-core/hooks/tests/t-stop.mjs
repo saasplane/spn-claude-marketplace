@@ -251,12 +251,12 @@ console.log("\n=== stop — reply-shape");
 
 one("a reply asking for a lettered choice with no options table",
   build("stop-reply-bad", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
-  "warns", { says: "asks for a lettered choice and shows no options table",
+  "warns", { says: "the card is not whole",
              reply: "I recommend we do this. Say A and I will start, or say B to wait." });
 
 one("the same choice, shown as a lettered table",
   build("stop-reply-good", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
-  "silent", { reply: "Q9 · which way\n\n| | What it does | What it costs |\n| --- | --- | --- |\n| **A** | start now | the cycle |\n| **B** | wait | the delay |\n\nRecommended: A. Say A and I will start." });
+  "silent", { reply: "Q9 · which way\n\n**What** — the gate in stop.ts, one part checked or five.\n\n**Why** — what it costs to leave it: a half card passes.\n\n| | What it does | What it costs |\n| --- | --- | --- |\n| **A** | start now | the cycle |\n| **B** | wait | the delay |\n\nRecommended: A. Say A and I will start." });
 
 one("a reply that merely mentions a letter",
   build("stop-reply-plain", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
@@ -284,7 +284,28 @@ one("an option named in the past tense is a reference, not an ask",
 
 one("an option PRESENTED still asks",
   build("stop-reply-present", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
-  "warns", { says: "asks for a lettered choice", reply: "Two ways: option A now, or wait." });
+  "warns", { says: "the card is not whole", reply: "Two ways: option A now, or wait." });
+
+// `N68` — THE CARD IS SIX PARTS AND THE GATE CHECKED ONE. These four cases are the replies `008`
+// actually sent on 2026-09-24: each was green, and each was missing a part the grammar requires.
+// The developer caught all of them, which is the failure this arc exists to stop repeating.
+one("a card with a table but no What and no Why — what 008 sent twice",
+  build("stop-reply-nowhat", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
+  "warns", { says: "**What**",
+             reply: "Q256 · does the release go now\n\n| | Option | What it costs |\n| --- | --- | --- |\n| **A** | release now | two trains |\n| **B** | wait | open-ended |\n\nMy recommendation is A." });
+
+one("a card cut to one sentence — the turn after",
+  build("stop-reply-shrunk", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
+  "warns", { says: "the card is not whole",
+             reply: "One card is open and it is yours: Q256 — release 1.2.74 now, or wait. Say A or B." });
+
+one("a card with every part is silent",
+  build("stop-reply-whole", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
+  "silent", { reply: "Q256 · does the release go now\n\n**What** — spnutils 1.2.74, carrying N64 and N39 step 7.\n\n**Why** — what it costs to leave it: .spndevex has no history, which cost three status lines.\n\n| | Option | What it costs |\n| --- | --- | --- |\n| **A** | release now | two trains |\n| **B** | wait | open-ended |\n\nRecommended: A, because the wait is unbounded. Say A and I will release." });
+
+one("a reply that asks nothing is still silent, whatever parts it lacks",
+  build("stop-reply-noask", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
+  "silent", { reply: "Landed and committed. Nothing is open." });
 
 console.log("\n=== the handover check — what counts as saying a window is needed");
 {
@@ -383,12 +404,18 @@ console.log("\n=== reply-shape — a sentence that reports an answer is not aski
   for (const [what, reply] of [
     ["one option named, inside a report", "After you answered, it builds one file per domain — option B."],
     ["a letter in the past tense", "After you answered, your A now changes the generator too."],
-    ["two options with the table", `Option A keeps it. Option B moves it.\n${TABLE}`],
     ["a decision reported with no table", "Q136 was decided A, and it is built."],
-    ["a recommendation with the table", `Recommendation is A.\n${TABLE}`],
     ["a plain report", "I fixed the drawer and committed it."],
+    // A WHOLE card stays silent, and it is the only offer shape that does now.
+    ["an offer carrying every part", `Q9 · which way\n\n**What** — the drawer, kept or moved.\n\n` +
+      `**Why** — what it costs to leave it: the sweep grows every week.\n\n${TABLE}\n\nRecommended: A.`],
   ]) { n += 1; const ok = checkReplyShape(reply).length === 0; if (!ok) failed += 1;
        console.log(`  ${ok ? "PASS" : "FAIL"}  silent — ${what}`); }
+
+  // `N68` / `Q258` `A` — THESE TWO USED TO BE SILENT AND THAT WAS THE DEFECT. Both put a decision
+  // and show a table, and both carry no number, no `What`, no `Why`. The gate tested for the table
+  // alone, so a half card was green — which is how `008` sent one twice in a row on 2026-09-24 and
+  // the developer, not the gate, caught it. The expectation moved deliberately.
 
   for (const [what, reply] of [
     ["two options and no table", "Option A keeps it. Option B moves it."],
@@ -396,6 +423,8 @@ console.log("\n=== reply-shape — a sentence that reports an answer is not aski
     ["pick B with no table", "Pick B and we move on."],
     ["A, B or C with no table", "It is A, B or C."],
     ["a recommendation with no table", "Recommendation is A."],
+    ["two options with the table and no What or Why", `Option A keeps it. Option B moves it.\n${TABLE}`],
+    ["a recommendation with the table and nothing else", `Recommendation is A.\n${TABLE}`],
   ]) { n += 1; const ok = checkReplyShape(reply).length === 1; if (!ok) failed += 1;
        console.log(`  ${ok ? "PASS" : "FAIL"}  reports — ${what}`); }
 }

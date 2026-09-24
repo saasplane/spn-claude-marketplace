@@ -527,16 +527,48 @@ const TABLE = /^\|.*\|\s*$\n^\|[\s:-]*\|[\s:|-]*$/m;
 // A lettered row inside a table — `| **A** | … | … |`. The shape the grammar actually asks for.
 const LETTERED_ROW = /^\|\s*\**\s*[A-D]\s*\**\s*\|/m;
 
+// THE CARD IS SIX PARTS AND THIS USED TO CHECK ONE. `refs/decision-cards.md` states the shape:
+// number and summary, what, why, options, recommendation, preview. The gate tested for an options
+// table and nothing else, so a reply carrying a heading, a table and two paragraphs was green —
+// which is exactly what `008` sent, twice, with no `What`, no `Why` and no recommendation line.
+//
+// The developer's words are the contract (`Q258` `A`, 2026-09-24): *why ur not showing open question
+// in correct format* · *prose should be always simple for chat as well as pages* · *when showing
+// decision cards show information in detail such that devs can understand with context and take
+// decision*.
+//
+// PRESENCE, NEVER QUALITY. This never reads whether a recommendation is good, never counts words and
+// never scores an argument. A gate that judges prose is one people learn to write around, which is
+// why `N43` step 5 was dropped. A part is here or it is not.
+const NUMBERED = /\bQ\d+\b/;
+// `What` and `Why` may be headings, bold leads or the `**What it changes**` form the pages use. What
+// they may not be is absent — a reader deciding days later has only what the card carries.
+const WHAT = /(^|\n)\s*(?:#{2,4}\s*|\*\*|<b>)?\s*What\b|\bwhat (?:it |this )?(?:changes|does|is being decided|it would change)\b/i;
+const WHY = /(^|\n)\s*(?:#{2,4}\s*|\*\*|<b>)?\s*Why\b|\bwhat it costs to (?:leave|wait|do nothing)\b|\bwhat it blocks\b/i;
+const RECOMMENDS = /\brecommend(?:ation|ed|s)?\b|\bI would take\b|\bthe one I would pick\b/i;
+
+/** Which parts of the card a reply that puts a decision is missing, named one by one. */
+function missingParts(reply: string): string[] {
+  const out: string[] = [];
+  if (!NUMBERED.test(reply)) out.push("**the number** — a card is `Q<n>`, stable across the whole exchange");
+  if (!(TABLE.test(reply) && LETTERED_ROW.test(reply)))
+    out.push("**the options as a lettered table**, the trade-off in its own column");
+  if (!WHAT.test(reply)) out.push("**What** — the change concretely: the file, the rule, the before and after");
+  if (!WHY.test(reply)) out.push("**Why** — what it costs to leave it alone, and what it blocks");
+  if (!RECOMMENDS.test(reply)) out.push("**the recommendation** — one option, carrying the reason it wins");
+  return out;
+}
+
 export function checkReplyShape(reply: string): Warning[] {
   if (!asking(reply)) return [];
-  if (TABLE.test(reply) && LETTERED_ROW.test(reply)) return [];
+  const missing = missingParts(reply);
+  if (!missing.length) return [];
   return [{ check: "reply-shape", message:
-    "Your reply asks for a lettered choice and shows no options table. A card put to a person in " +
-    "chat follows the same layout a document uses — MUST: the choice as a numbered `Q<n>`, what it " +
-    "changes, what it costs to leave, and **the options as a table, lettered, with the trade-off in " +
-    "its own column** (05-artifacts.md, The approach document). Naming A and B without showing them " +
-    "asks somebody to choose between things they cannot see. Put the card on the approach page, and " +
-    "say in the reply that it is there." }];
+    "Your reply puts a decision and the card is not whole. Missing: " + missing.join(" · ") + ". " +
+    "A card put to a person in chat follows the same layout a document uses — MUST — and it assumes " +
+    "**no memory of this session**, because people decide days later (refs/decision-cards.md). " +
+    "Write it in full in the reply, with the detail to decide from, and put the same card on the " +
+    "approach page." }];
 }
 
 /** The four arc-to-page checks, as warnings. */
