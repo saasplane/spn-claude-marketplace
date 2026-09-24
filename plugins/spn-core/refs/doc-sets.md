@@ -2,7 +2,7 @@
 {
   "chapters": [
     { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/README.md", "seen": "13d462c3" },
-    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "c8c097e8" },
+    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "a548541e" },
     { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md", "seen": "db625a2f" },
     { "path": "docs/02-constructs/01-devex/04-workspace/04-docs.md", "seen": "9809bc2b" },
     { "path": "CONCEPT.md", "seen": "924bf289" }
@@ -285,14 +285,15 @@ The pocket holds what the node **authors** rather than derives, and its three au
 
 | Section | Goes in | Never |
 | --- | --- | --- |
+| **Overview** | why this construct exists: the problem in the reader's own terms, what changes because it exists, and what a first-time reader has to unlearn | describing the shape — that is the `Model`, and two descriptions of one thing disagree eventually |
 | **Terms** | the words this construct gives a meaning to: the word a person uses, the contract term, and what it means | a word every engineer already knows; a row that points somewhere else instead of explaining |
-| **Model** | what you are looking at, in prose first — the general shape, then its parts, then its kinds — with a figure where seeing is faster | a field list standing in for an explanation |
-| **Parts** | one subsection per part: what it is, why it exists, and the facts that shape it | a *Where:* line — where a thing lives is the `Binds` table's job |
+| **Model** | what it is: what you are looking at, in prose first — the general shape, then its parts, then its kinds — with a figure where seeing is faster | a field list standing in for an explanation; an argument, which is the `Overview`'s |
+| **Parts** | the detail of the what: one subsection per piece the `Model` named, in that order — what it is, why it exists, and the facts that shape it | a *Where:* line — where a thing lives is the `Binds` table's job; a heading the `Model` did not lead the reader to expect |
 | **Boundary** | in plain prose: what this page does not answer, where that is answered, and when you go there | an edge stated before the reader has seen the shape |
 | **Binds** | two tables: the rules that hold it, and where it lives today | a rule repeated; a state typed anywhere else |
 | **Proof** | the checks a person can run — or nothing | a behaviour row typed by hand |
 
-**Terms comes first because the model uses those words**, and **Boundary comes after the parts** because a reader can judge an edge only once they have seen the shape. `Relations` is retired: the metadata block's `dependsOn` already carries what it listed, one way and machine-readable, and a section restating a declared field is a second copy that drifts.
+**The three sections that carry the argument divide by question** — `Overview` answers why, `Model` answers what, and `Parts` carries the detail of that what, one subsection per piece the `Model` named. **`Terms` comes second because the `Model` uses those words and the `Overview` does not**, and **`Boundary` comes after the parts** because a reader can judge an edge only once they have seen the shape. **The opening above the first heading is a standfirst and a summary, and nothing else**: measured across a workspace, 117 of 117 constructs opened with prose no outline named and no check read, so the orientation stays there and everything that argues moves into `Overview`. `Relations` is retired: the metadata block's `dependsOn` already carries what it listed, one way and machine-readable, and a section restating a declared field is a second copy that drifts.
 
 **Proof is joined from the register, never typed** (decision RD.DOCS.072). Every behaviour row naming this construct is read from the behaviours seat when the page is produced and rendered with its tier and the status the last run wrote, and the footer names the register version it read. In this book the joined rows are promises, which carry no status. **So the seat file's `Proof` holds typed checks or nothing at all**, and an empty `Proof` is a correct page rather than an incomplete one. **A `Proof` row names a command somebody else can run** — a `spnutils` command, a stack's own test target, a gate the plugins carry — and **a file name is never a command**, because a row naming a `.spec.ts` reads as verified and cannot be acted on. A script the repository carries is accepted while no command runs it, and the exemption ends the moment a command exists.
 

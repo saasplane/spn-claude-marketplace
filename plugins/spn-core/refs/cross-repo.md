@@ -5,7 +5,7 @@
     { "path": "docs/02-constructs/01-devex/04-workspace/02-workstream.md", "seen": "654b23c2" },
     { "path": "docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md", "seen": "07a688b1" },
     { "path": "docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md", "section": "The agent is updated first, and reloaded before anything runs", "seen": "97526696" },
-    { "path": "docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md", "section": "An arc's status says which of eight states it is in", "seen": "3e64bec2" },
+    { "path": "docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md", "section": "An arc's status says which of eight states it is in", "seen": "0b096adf" },
     { "path": "docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md", "section": "When an edit becomes behaviour", "seen": "37aada54" },
     { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md", "section": "Restatement discipline", "seen": "11808ae4" }
   ],
@@ -386,6 +386,8 @@ abandoned, and the next reader stops using the status.
 where the work moved to another workstream; `IN FLIGHT` is `RUNNING`; `PREPARED` is `DECIDED`. The
 pattern in all six is a word for a **stage** rather than a word for a **state** — *closing* says what
 somebody is doing, and only what is true of the arc can be read by anything but a person.
+
+**`PART-LANDED` is how a sitting resumes.** When an agent stops after changing some of what an arc asked for, that arc is `PART-LANDED`, and the next sitting reads it to find where the work was left. That gives it two moments: at the end of a turn only an arc **this sitting touched** is worth reporting, because a warning for every parked arc is one nobody reads twice; at the start of a sitting **every** `PART-LANDED` arc is listed, because that is the whole reason the status exists.
 
 **The status decides none of these three.** It does not carry **ordering**, which is the plan's
 business. It does not describe a **workstream**, whose state is the folder it sits in. It does not
