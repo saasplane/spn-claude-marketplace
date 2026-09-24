@@ -2,7 +2,7 @@
 {
   "chapters": [
     { "path": "docs/04-capabilities/02-support/01-apps/01-shape/README.md", "seen": "719d5b19" },
-    { "path": "docs/02-constructs/README.md", "seen": "1cf79a1b" },
+    { "path": "docs/02-constructs/README.md", "seen": "a78978da" },
     { "path": "docs/04-capabilities/03-platform/README.md", "seen": "c6aa51b8" },
     { "path": "docs/04-capabilities/02-support/01-apps/03-module/README.md", "seen": "dda0a97e" }
   ]
@@ -11,7 +11,7 @@
 
 # Lens — `ARCHITECT` (Architect)
 
-**Source of truth:** the foundation book's saas model (`03-platform`), and the shape and module groups (`02-support/01-apps/01-shape` · `03-module`). Also the contract states standard including its evolution classification, and the dictionary grammar — the generated dictionary's capability column. This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
+**Source of truth:** the foundation book's saas model (`03-platform`), and the shape and module groups (`02-support/01-apps/01-shape` · `03-module`). Also the contract states standard including its evolution classification, and the dictionary grammar — the `Contract term` column of the dictionary generated onto each domain's face. This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
 
 **Worn** while designing. **Convened** when a module boundary moves, and over any design before its rows land. **Blocks:** a new mechanism reachable from more than one module, with no decision entry naming what it was weighed against. Below that threshold it advises, and flags anything that needs a decision entry.
 

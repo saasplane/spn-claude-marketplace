@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "chapters": [
-    { "path": "docs/02-constructs/README.md", "seen": "1cf79a1b" },
+    { "path": "docs/02-constructs/README.md", "seen": "a78978da" },
     { "path": "docs/03-behaviors/README.md", "seen": "35978308" }
   ]
 }
@@ -9,7 +9,7 @@
 
 # Lens — `PRODUCT` (Product manager)
 
-**Source of truth:** the foundation book's purpose part, the behavior grammar (`03-behaviors` and the doc-sets reference), the four journeys, and the dictionary grammar — the generated dictionary's consumer column. Read this file as a restatement of those rules, adding none of its own; where they disagree, the book wins and this file is regenerated.
+**Source of truth:** the foundation book's purpose part, the behavior grammar (`03-behaviors` and the doc-sets reference), the four journeys, and the dictionary grammar — the `Term` column of the dictionary generated onto each domain's face. Read this file as a restatement of those rules, adding none of its own; where they disagree, the book wins and this file is regenerated.
 
 **Worn** while writing purpose and behavior seats. **Convened** on plans, before planned rows land. **Advises — never blocks.**
 

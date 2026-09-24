@@ -485,9 +485,9 @@ console.log("\n=== a seat's `templates/` is excluded by the folder, never per fi
 
 console.log("\n=== the dictionary is generated from the constructs, never typed (invariant 2)");
 {
-  // Each column has exactly one source, and that is what makes the generation possible: a
-  // construct's `Terms` table carries the consumer's word and the contract term, and the domain's
-  // data-model.md carries where it is stored, matched on the contract term.
+  // It is ONE DOMAIN's dictionary, on that domain's own face, in three columns. The fixture carries
+  // a `data-model.md` on purpose: nothing it says may reach a dictionary row, because the column
+  // that read it is gone.
   const root = repo({
     "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
     "docs/02-constructs/README.md": doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
@@ -507,13 +507,41 @@ console.log("\n=== the dictionary is generated from the constructs, never typed 
           "`For: Backend developer` · `Status: ✅ DONE`"),
   });
   run(root, ["face", "docs"]);
-  const dict = readAt(root, "docs/02-constructs/README.md");
-  one("a Terms row becomes a dictionary row", dict, has("| sign-in | `SPSession` |"));
-  one("the storage column is matched on the contract term, from data-model.md",
-    dict, (g) => /\| sign-in \| `SPSession` \| `sp_session` \|/.test(g));
-  one("a term no data-model names writes an em dash rather than a guess",
-    dict, (g) => /\| device \| `SPDevice` \| — \|/.test(g));
-  one("and the row says which construct it came from", dict, has("| Session |"));
+  const domain = readAt(root, "docs/02-constructs/01-core/README.md");
+  one("a Terms row becomes a dictionary row on its own domain's face",
+    domain, has("| [sign-in](session.md) | `SPSession` | one person's live access to one app site |"));
+  one("the term is the link to the construct that declares it, and there is no fourth column",
+    domain, lacks("| Session |"));
+  one("the domain's dictionary carries a heading a reader can land on",
+    domain, has("## The dictionary"));
+  one("a term the domain's data model names is not stored-column joined — the column is gone",
+    domain, lacks("sp_session"));
+  one("and the table is three columns wide",
+    domain, has("| Term | Contract term | What it means |"));
+  one("the seat face carries the domain table and no dictionary",
+    readAt(root, "docs/02-constructs/README.md"), lacks("sign-in"));
+}
+{
+  // THE REGION THE OLD SHAPE LEFT BEHIND. A generated region nothing regenerates goes stale rather
+  // than standing still, so the run takes it off the seat face instead of writing past it.
+  const stale =
+    "<!-- spn:generated dictionary — do not edit inside these markers; `docs.ts face` writes it -->\n" +
+    "| Term | Contract term | Where it is stored | From |\n| --- | --- | --- | --- |\n" +
+    "| sign-in | `SPSession` | `${APP}_JOB_SCHEDULER_PROVIDER` | Session |\n" +
+    "<!-- /spn:generated -->\n";
+  const root = repo({
+    "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
+    "docs/02-constructs/README.md":
+      doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }, "Some prose.\n\n" + stale),
+    "docs/02-constructs/01-core/README.md": doc({ id: "c", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
+  });
+  const out = run(root, ["face", "docs"]);
+  const seat = readAt(root, "docs/02-constructs/README.md");
+  one("a dictionary left on a seat face by the old shape is removed", seat, lacks("Where it is stored"));
+  one("and the markers go with it, so nothing invites an edit inside a region nobody writes",
+    seat, lacks("spn:generated dictionary"));
+  one("the author's own prose around it is untouched", seat, has("Some prose."));
+  one("and the run reports the file it rewrote", out, has("02-constructs/README.md"));
 }
 {
   const root = repo({

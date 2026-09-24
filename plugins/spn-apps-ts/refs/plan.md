@@ -2,7 +2,7 @@
 {
   "chapters": [
     { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/README.md", "seen": "13d462c3" },
-    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md", "seen": "5b35f925" },
+    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md", "seen": "db625a2f" },
     { "path": "providers/apps/ts/README.md", "seen": "0da8309f" },
     { "path": "providers/apps/ts/03-code-patterns.md", "seen": "56ef9a7f" }
   ]
@@ -51,7 +51,7 @@ in the **spn-core** plugin carries the shape in full; audit against exactly this
 ├── README.md              the tree's face — the seats, and the map
 ├── 01-purpose/            WHY — why this repository exists
 ├── 02-constructs/         WHAT, the model — one file per topic, under a folder per domain,
-│                          numbered in reading order; the face is the generated dictionary
+│                          numbered in reading order; each domain's face carries its dictionary
 ├── 03-behaviors/          WHAT, as product — one file of rows per topic, under the same
 │                          folders and carrying the same numbers as the constructs, plus
 │                          `personas.md` beside them

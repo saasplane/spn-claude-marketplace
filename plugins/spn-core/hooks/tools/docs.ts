@@ -1258,7 +1258,23 @@ function replaceRegion(src: string, what: string, body: string): string {
   return src.slice(0, i) + `${begin}\n${body}\n${END}` + src.slice(j + END.length);
 }
 
-type Row = { term: string; contract: string; means: string; construct: string };
+/**
+ * A generated region taken off a page for good.
+ *
+ * A region nothing regenerates does not stand still, it goes stale: the dictionary left on the seat
+ * face would be a copy of a table that now lives in 36 places, and the only thing keeping it right
+ * was the run that stopped writing it.
+ */
+function removeRegion(src: string, what: string): string {
+  const begin = BEGIN(what);
+  const i = src.indexOf(begin);
+  if (i < 0) return src;
+  const j = src.indexOf(END, i);
+  if (j < 0) return src;
+  return (src.slice(0, i).trimEnd() + "\n" + src.slice(j + END.length).replace(/^\n+/, "\n")).trimEnd() + "\n";
+}
+
+type Row = { term: string; contract: string; means: string; file: string };
 
 /** A markdown table's data rows, as trimmed cells. */
 function mdRows(block: string): string[][] {
@@ -1316,14 +1332,31 @@ function directFiles(dir: string, keep: (p: string) => boolean): string[] {
   return out;
 }
 
-/** The dictionary: one row per term, three columns, generated from the constructs and the data models. */
-function buildDictionary(tree: string): { body: string; findings: Finding[] } {
+/**
+ * The dictionary of ONE DOMAIN: one row per term, three columns, generated from that domain's own
+ * constructs.
+ *
+ * IT SITS ON THE DOMAIN RATHER THAN ON THE SEAT. A repository-wide table ran to 573 rows in the
+ * foundation and 347 in the platform, where a single domain's is twelve to a hundred and twenty-two
+ * — and a term written twice in one domain sat two hundred rows apart, which is why 55 duplicates
+ * across the workspace were never read as duplicates (`refs/doc-sets.md`, *A domain face carries its
+ * dictionary*).
+ *
+ * THERE IS NO *WHERE IT IS STORED* COLUMN, AND ITS DELETION IS THE REPAIR. It was joined from the
+ * domain's `data-model.md` by taking each row's first cell as a table name, and it named a table in
+ * none of 252 rows measured. No correction to those files could have repaired it either: a data
+ * model is grouped by table and a dictionary row is keyed by term, so even a faithful storage mirror
+ * answers *which terms live in this table* while the column asks the opposite. Storage is read in
+ * the data model itself, beside the migrations it mirrors (RD.DOCS.074).
+ *
+ * THE CONSTRUCT IS THE TERM'S LINK RATHER THAN A FOURTH COLUMN. A reader wanting the page that
+ * defines the word follows the word.
+ */
+function buildDictionary(domainDir: string, faceFile: string): { body: string; findings: Finding[] } {
   const findings: Finding[] = [];
-  const constructsDir = join(tree, "02-constructs");
   const rows: Row[] = [];
-  for (const file of walkFiles(constructsDir, (p) => p.endsWith(".md") && basename(p) !== "README.md")) {
+  for (const file of walkFiles(domainDir, (p) => p.endsWith(".md") && basename(p) !== "README.md")) {
     const src = readFileSync(file, "utf8");
-    const { block } = readBlock(src);
     const body = sectionBody(src, /Terms\b/);
     if (!body) continue;
     const cells = mdRows(body);
@@ -1331,28 +1364,19 @@ function buildDictionary(tree: string): { body: string; findings: Finding[] } {
       findings.push({ check: "face", grade: "RULE", file, message: "the `Terms` table has two columns; the dictionary needs the consumer's word, the contract term and the meaning (03-tree.md, the dictionary's three sources)" });
       continue;
     }
-    for (const c of cells) rows.push({ term: c[0], contract: c[1], means: c[2], construct: block?.title ?? basename(file, ".md") });
-  }
-
-  // Where it is stored: the domain's data-model.md is keyed by table and names the term it holds.
-  const stored = new Map<string, string>();
-  for (const file of walkFiles(join(tree, "04-capabilities"), (p) => basename(p) === "data-model.md")) {
-    const body = readFileSync(file, "utf8");
-    for (const c of mdRows(body)) {
-      if (c.length < 2) continue;
-      const table = c[0].replace(/`/g, "").trim();
-      for (const term of c[1].split("·").map((x) => x.replace(/`/g, "").trim()).filter(Boolean))
-        if (term && !stored.has(term)) stored.set(term, table);
-    }
+    for (const c of cells) rows.push({ term: c[0], contract: c[1], means: c[2], file });
   }
 
   rows.sort((a, b) => a.term.localeCompare(b.term));
-  const lines = ["| Term | Contract term | Where it is stored | From |", "| --- | --- | --- | --- |"];
+  const lines = ["## The dictionary", "", "| Term | Contract term | What it means |", "| --- | --- | --- |"];
   for (const r of rows) {
-    const key = r.contract.replace(/`/g, "").split("·")[0].trim();
-    lines.push(`| ${r.term} | ${r.contract} | ${stored.get(key) ? `\`${stored.get(key)}\`` : "—"} | ${r.construct} |`);
+    // A term no consumer speaks of carries a deliberate dash in this column, and a dash links
+    // nowhere — the reader is being told there is no word, not sent to a page.
+    const target = relative(dirname(faceFile), r.file);
+    const term = r.term && r.term !== "—" ? `[${r.term}](${target})` : r.term;
+    lines.push(`| ${term} | ${r.contract} | ${r.means} |`);
   }
-  if (!rows.length) lines.push("| — | — | — | no construct carries a `Terms` table yet |");
+  if (!rows.length) lines.push("| — | — | no construct in this domain carries a `Terms` table yet |");
   return { body: lines.join("\n"), findings };
 }
 
@@ -1557,6 +1581,20 @@ function isGroup(dir: string): boolean {
   } catch { return false; }
 }
 
+/**
+ * A DOMAIN, which is the half of invariant 1's test that excludes a group.
+ *
+ * A domain sits directly under the constructs seat, or one level down where its parent is a group.
+ * A group maps the domains beneath it and declares no term of its own; a level beneath a domain
+ * organizes one domain's argument and its terms belong to the domain above it. So the dictionary
+ * lands on a domain folder and on no other kind.
+ */
+function isDomainFolder(constructsDir: string, dir: string): boolean {
+  if (isGroup(dir)) return false;
+  const depth = relative(constructsDir, dir).split("/").length;
+  return depth === 1 || (depth === 2 && isGroup(dirname(dir)));
+}
+
 function domainFaces(tree: string, concept: string | null): { faces: Map<string, string>; concept: string | null; findings: Finding[] } {
   const findings: Finding[] = [];
   const faces = new Map<string, string>();
@@ -1634,15 +1672,30 @@ function face(tree: string, write: boolean): Finding[] {
   const findings: Finding[] = [];
   const touched: string[] = [];
 
-  const dictFace = join(tree, "02-constructs", "README.md");
-  if (existsSync(dictFace)) {
-    const { body, findings: df } = buildDictionary(tree);
+  // ONE DICTIONARY PER DOMAIN, AND NONE ON THE SEAT. The seat face keeps the domain table it already
+  // carries, and a reader who wants the words goes to the domain that decides their meaning
+  // (`refs/doc-sets.md`, *It sits on the domain, not on the seat face*).
+  const constructsDir = join(tree, "02-constructs");
+  for (const dir of constructFolders(constructsDir).filter((d) => isDomainFolder(constructsDir, d))) {
+    const domainFace = join(dir, "README.md");
+    if (!existsSync(domainFace)) {
+      findings.push({ check: "face", grade: "SOFT", file: domainFace, message: "no domain face to write the dictionary into" });
+      continue;
+    }
+    const { body, findings: df } = buildDictionary(dir, domainFace);
     findings.push(...df);
-    const before = readFileSync(dictFace, "utf8");
+    const before = readFileSync(domainFace, "utf8");
     const after = replaceRegion(before, "dictionary", body);
-    if (after !== before) { if (write) writeFileSync(dictFace, after); touched.push(relative(tree, dictFace)); }
+    if (after !== before) { if (write) writeFileSync(domainFace, after); touched.push(relative(tree, domainFace)); }
+  }
+
+  const seatFace = join(constructsDir, "README.md");
+  if (existsSync(seatFace)) {
+    const before = readFileSync(seatFace, "utf8");
+    const after = removeRegion(before, "dictionary");
+    if (after !== before) { if (write) writeFileSync(seatFace, after); touched.push(relative(tree, seatFace)); }
   } else {
-    findings.push({ check: "face", grade: "SOFT", file: dictFace, message: "no constructs seat face to write the dictionary into" });
+    findings.push({ check: "face", grade: "SOFT", file: seatFace, message: "no constructs seat face" });
   }
 
   // The domain faces, and the concept's one line per construct.
