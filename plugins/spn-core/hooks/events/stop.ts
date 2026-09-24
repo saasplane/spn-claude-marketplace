@@ -25,7 +25,7 @@ import { readFileSync, readdirSync, statSync, existsSync, mkdirSync, writeFileSy
 import { basename, dirname, join } from "node:path";
 import { createHash } from "node:crypto";
 import { checkCorpus } from "../checks/corpus.ts";
-import { cardsOf, openWorkstreams, rowsOf, stateOf } from "../checks/split-plan.ts";
+import { answeredNumbers, cardsOf, openWorkstreams, rowsOf, stateOf } from "../checks/split-plan.ts";
 import { TERMINAL } from "../checks/arc-status.ts";
 import { DEVEX, workspaceRoot } from "../lib/payload.ts";
 import { cacheState } from "./orientation.ts";
@@ -319,8 +319,52 @@ export function passingOn(reply: string): boolean {
   return false;
 }
 
+/**
+ * Every `Q<n>` open and unanswered across every open workstream's page.
+ *
+ * `openCards` above takes ONE page and is about that page's own cards; this asks the workspace-wide
+ * question a handover has to answer, and it subtracts what an arc records as settled — a card the
+ * page still shows but an arc has answered is not work anybody is waiting on.
+ */
+function cardsWaiting(root: string): string[] {
+  const out: string[] = [];
+  for (const [, pages] of argued(root)) {
+    const folder = dirname(pages[0]);
+    const answered = answeredNumbers(folder);
+    for (const page of pages)
+      for (const card of cardsOf(page))
+        if (!card.decided && !answered.has(card.number)) out.push(card.number);
+  }
+  return [...new Set(out)].sort();
+}
+
 export function checkHandover(reply: string, root: string): Warning[] {
   if (!passingOn(reply)) return [];
+
+  // AN OPEN CARD BEATS A HANDOVER, AND IT COMES FIRST — finding F20, caught by the developer twice
+  // in one session after the agent offered a new window with two cards standing.
+  //
+  // **A card open is work nobody can plan around.** Its answer may change which arc runs next, what
+  // the next window reads first, and whether the step named in the block is still the right step —
+  // so a handover written over an open card is a plan built on an unknown. The next window inherits
+  // the question AND a brief that assumed an answer to it.
+  //
+  // The rule the book already states is *you stop only when something needs deciding*, and a card is
+  // exactly that. What it never said is the converse: **while something needs deciding, you do not
+  // hand the work to somebody else** — you ask, and the answer either changes the plan or it does
+  // not. Asking costs a turn; a handover built on a guess costs a window.
+  //
+  // This fires BEFORE the wiring check because it is the cheaper truth: there is no point telling
+  // somebody their install is stale if the work itself is not ready to pass on.
+  const waiting = cardsWaiting(root);
+  if (waiting.length) {
+    return [{ check: "handover", message:
+      `This reply passes work on while ${waiting.length === 1 ? "a card is" : `${waiting.length} cards are`} ` +
+      `open — ${waiting.join(" \u00b7 ")}. **Answer first, then hand over.** A card's answer can change which ` +
+      `arc runs next and what the next window reads first, so a handover written over one is a brief that ` +
+      `assumed an answer nobody gave. Put the cards to the developer in full, and offer the window once they ` +
+      `are settled.` }];
+  }
 
   // THE SECOND HALF FIRST, because it is the one that costs a window. A reply that tells somebody to
   // open a session is only true if the wiring that session will load is actually installed. The

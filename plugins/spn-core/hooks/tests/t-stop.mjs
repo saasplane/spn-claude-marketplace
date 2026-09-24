@@ -95,7 +95,7 @@ function one(label, root, expect, { says, reply = "done", parity = true, why = "
   const ok = spoke === (expect === "warns") && saysOk && (py === null || !parity || spoke === pySpoke);
   if (!ok) failed += 1;
   console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}\n        expect ${expect} · ts ${spoke ? "warns" : "silent"} · py ${py === null ? "not installed" : pySpoke ? "warns" : "silent"}${says ? ` · names "${says}" ${saysOk}` : ""}${parity ? "" : ` (parity waived: ${why})`}`);
-  if (!ok) console.log(`        ts: ${ts.slice(0, 300)}\n        py: ${py.slice(0, 300)}`);
+  if (!ok) console.log(`        ts: ${ts.slice(0, 300)}\n        py: ${py === null ? "(not installed)" : py.slice(0, 300)}`);
 }
 
 const F11 = "the Python listed arcs as `arc-*` only, so an N-named arc was invisible to it";
@@ -325,6 +325,15 @@ one("an ask outside the fence still fires, fence or no fence",
 one("a reply that asks nothing is still silent, whatever parts it lacks",
   build("stop-reply-noask", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
   "silent", { reply: "Landed and committed. Nothing is open." });
+
+// F20 — A HANDOVER OVER AN OPEN CARD. The developer caught this twice in one session: the agent
+// offered a new window with two cards standing. A card's answer can change which arc runs next and
+// what the next window reads first, so a handover written over one is a brief that assumed an
+// answer nobody gave.
+one("a handover offered while a card is open is refused, and the card is named",
+  build("stop-handover-open-card", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
+  "warns", { says: "Answer first, then hand over",
+             reply: "Pick this up in a new window.\n```\nworkstream: 001\narc and step: N1 step 1\nmodel: Opus 5\nread first: the page\nstate: clean\ndone when: it lands\ndo not touch: closed\nopen: none\n```" });
 
 console.log("\n=== the handover check — what counts as saying a window is needed");
 {
