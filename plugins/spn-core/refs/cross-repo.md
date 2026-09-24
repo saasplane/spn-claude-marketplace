@@ -5,7 +5,7 @@
     { "path": "docs/02-constructs/01-devex/04-workspace/02-workstream.md", "seen": "654b23c2" },
     { "path": "docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md", "seen": "07a688b1" },
     { "path": "docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md", "section": "The agent is updated first, and reloaded before anything runs", "seen": "97526696" },
-    { "path": "docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md", "section": "An arc's status says which of eight states it is in", "seen": "f6636752" },
+    { "path": "docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md", "section": "An arc's status says which of eight states it is in", "seen": "3e64bec2" },
     { "path": "docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md", "section": "When an edit becomes behaviour", "seen": "37aada54" },
     { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md", "section": "Restatement discipline", "seen": "11808ae4" }
   ],
@@ -363,16 +363,34 @@ Plan one change across repos as an **arc**: ordered steps, each naming its targe
 **The set is closed (`RD.DEVEX.058`).** Every check that reads an arc reads this word, so a word
 outside the set is a state nothing can act on, and an arc with no status is one no check can see.
 
-| Status | What it means | Terminal |
-| --- | --- | --- |
-| `PROPOSED` | Written and argued, but nobody has said go yet | no |
-| `DECIDED` | Agreed and waiting its turn; no step has started | no |
-| `RUNNING` | Being executed now — steps are landing in this sitting | no |
-| `HELD` | Stopped on a named blocker: an open card, or an arc that must land first | no |
-| `PART-LANDED` | Some steps landed, the rest are owed, and nobody is on it | no |
-| `LANDED` | Every step landed. Nothing is owed | yes |
-| `CARRIED` | The remaining work left this workstream, and the status names where | yes |
-| `DROPPED` | Abandoned on purpose, with the reason in the same line | yes |
+| Status | What it means | Runnable work? | Terminal | Must also carry |
+| --- | --- | --- | --- | --- |
+| `PROPOSED` | Written and argued, but nobody has said go yet | **no** — not agreed | no | — |
+| `DECIDED` | Agreed and waiting its turn; no step has started | **no** — waiting, by definition | no | — |
+| `RUNNING` | Being executed now — steps are landing in this sitting | **yes** | no | — |
+| `HELD` | Stopped on a named blocker: an open card, or an arc that must land first | **no** | no | the blocker, in the same line |
+| `PART-LANDED` | Some steps landed, the rest are owed, and nobody is on it | **yes** | no | — |
+| `LANDED` | Every step landed. Nothing is owed | no | yes | — |
+| `CARRIED` | The remaining work left this workstream | no | yes | where it went |
+| `DROPPED` | Abandoned on purpose | no | yes | the reason, in the same line |
+
+**The runnable column is stated because a check that has to infer it gets it wrong.** *Runnable*
+asks whether there is work here somebody could pick up now, and four of the eight answer no for four
+different reasons: nobody agreed it, its turn has not come, it is blocked, or it is finished. A gate
+left to infer reads *unfinished steps* as *work waiting*, which is true of two rows and false of the
+rest — so an arc opened at `DECIDED` on the day it is planned gets reported as work somebody
+abandoned, and the next reader stops using the status.
+
+**Six spellings are not statuses**, and each already had a word in the set: `OPEN` is `DECIDED` (or
+`PROPOSED` where nobody agreed it); `CLOSED`, `CLOSED IN` and `CLOSING` are `LANDED`, or `CARRIED`
+where the work moved to another workstream; `IN FLIGHT` is `RUNNING`; `PREPARED` is `DECIDED`. The
+pattern in all six is a word for a **stage** rather than a word for a **state** — *closing* says what
+somebody is doing, and only what is true of the arc can be read by anything but a person.
+
+**The status decides none of these three.** It does not carry **ordering**, which is the plan's
+business. It does not describe a **workstream**, whose state is the folder it sits in. It does not
+describe the **approach document**, which carries the document status vocabulary instead. Three
+altitudes, three vocabularies, and no word shared between them.
 
 **Write it as `Status: **WORD …**` on its own line under the title — one spelling.** A reader that
 has to know two spellings knows neither, and the check that reads this word was blind to every arc
