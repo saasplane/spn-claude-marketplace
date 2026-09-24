@@ -17,6 +17,8 @@
 
 A check is one file that reads a call and says what it thinks about it. The dispatcher composes them, so a check never has to know that other checks exist; it only has to answer for itself. This page names what a check is made of and the two habits every check in this marketplace keeps.
 
+## Overview
+
 The first habit is that **a check names the chapter it restates** in its own header, so the rule has exactly one home and a change is made there first. The second is that **a check reads the smallest slice the call touches**. Reading everything on every call once cost three quarters of every millisecond the hooks had spent, and a gate that makes a session slow is a gate somebody eventually removes.
 
 ## Terms

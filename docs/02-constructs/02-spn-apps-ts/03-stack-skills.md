@@ -17,6 +17,8 @@
 
 A skill belongs to a stack when the steps behind it name that stack's own commands, layers and file shapes. Scaffolding a project, building a capability, running the suites, proving a package: each of those is a different walk in a different stack, so each lives in the plugin for the stack it describes.
 
+## Overview
+
 The absence here is as deliberate as anything present. **Planning is not a stack skill.** The book's set of skills is closed and carries no planning skill for this world, so shipping one would add a value the standard does not have, and two skills would then compete for the same ask. The skill stays in the core plugin, and this plugin supplies only the layer that skill reads.
 
 ## Terms

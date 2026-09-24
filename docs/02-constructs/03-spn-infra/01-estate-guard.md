@@ -17,6 +17,8 @@
 
 An estate declaration says what infrastructure should exist. Things that must never appear in one — a credential, an identifier a tool discovers for itself, a provider's own string outside the entry that sanctions it — are cheap to catch at the moment somebody writes them and expensive to find later. The estate guard is that catch: a dispatcher wired to every write and every edit, running a set of named rules with nothing else between them and the file.
 
+## Overview
+
 Read the direction it fails in before you read anything else. **When the guard does not understand its input, it allows the call.** A guard refusing whatever it cannot parse would deny far more than the things it actually knows about, and people would route around it, which leaves an estate with no guard at all.
 
 ## Terms

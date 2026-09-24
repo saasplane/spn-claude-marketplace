@@ -17,6 +17,8 @@
 
 Some skills are the same in every world and still need an answer only one world can give. Planning is one: the act is identical everywhere, and the seats a design's rows land in are not. A stack ref is how the second half is supplied without splitting the first: reference material the stack ships, read by a skill the stack does not own.
 
+## Overview
+
 The thing to know before opening one is that **it is reference material and not a skill**. It has no frontmatter, it matches no ask, and nothing loads it except the skill that already resolved which stack it is standing in.
 
 ## Terms

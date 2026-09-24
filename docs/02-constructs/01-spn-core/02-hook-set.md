@@ -17,6 +17,8 @@
 
 A rule that lives only in a document is read once, trusted from memory, and eventually broken by somebody who never opened that document. A hook is the answer this repository ships: code the runtime itself calls, at a moment it chooses, so the rule is asked again on every single call. This page names the frame — the wiring, the shapes a hook is handed and gives back, and the two promises every hook here keeps.
 
+## Overview
+
 Both promises come from the same failure. A verdict was once printed and parsed back, and a refusal that did not parse was dropped in silence — one check fired a hundred and forty-seven times and changed nothing. So a check now **returns** what it decided, and the dispatcher reads the object. And a hook **always exits zero**, because a hook that crashes takes every other gate beside it down with it.
 
 ## Terms

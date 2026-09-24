@@ -17,6 +17,8 @@
 
 A rule an agent cannot load is a rule it cannot follow, however well the rule is written. The plugin is the unit that carries a rule from this repository into a running session: one folder, one small manifest, one entry in a list this repository keeps by hand. Every hook, skill, ref, lens and agent brief here lives inside one, so this page names the container before the other pages name what sits in it.
 
+## Overview
+
 The last of the three — the installed copy — is what costs people an afternoon. A session never reads this checkout. It reads an installed copy, and that copy is found by the plugin's name together with the version its manifest carries. So an edit here is not yet a change in behaviour, and a version that has not moved is a version whose installed copy an edit can sit silently behind.
 
 ## Terms

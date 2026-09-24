@@ -182,11 +182,16 @@
   <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Stack Tools — Commands Over a Stack's Own Register</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Construct</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">Backend developer</span><span class="badge lens">Quality engineer</span></span><span class="st"><span class="lbl">Status:</span> <span class="badge status planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>Stack Tools — Commands Over a Stack's Own Register</h1>
   <p class="standfirst">A tool becomes a stack's own when what it reads is a shape only that stack declares. The tools here read one such shape: the behaviour register a repository keeps, and the actions a node publishes. Neither is wired to a moment; each is invoked by its own path against one repository, and neither holds state of its own.</p>
-  <p>One decision shapes both of them. <strong>Part of a row is somebody's decision and part is what a run found</strong>, and a tool writing over the first part would turn a declaration into a guess. So the shape of a register lives in a third file that both tools import, and the writer touches only the cells a run owns.</p>
 </header>
 
 <!-- 00 -->
 <section id="s0">
+  <div class="sec-head"><h2>Overview</h2></div>
+  <p>One decision shapes both of them. <strong>Part of a row is somebody's decision and part is what a run found</strong>, and a tool writing over the first part would turn a declaration into a guess. So the shape of a register lives in a third file that both tools import, and the writer touches only the cells a run owns.</p>
+</section>
+
+<!-- 01 -->
+<section id="s1">
   <div class="sec-head"><h2>Terms</h2></div>
   <div class="scroll"><table>
     <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
@@ -201,8 +206,8 @@
   </table></div>
 </section>
 
-<!-- 01 -->
-<section id="s1">
+<!-- 02 -->
+<section id="s2">
   <div class="sec-head"><h2>Model</h2></div>
   <p>The register is found by what it looks like, its rows are matched against a run by id and tier, and only the cells a run owns are rewritten.</p>
   <figure>
@@ -251,8 +256,8 @@
   <p>The other tool walks the same registers in the other direction, asking which published action no row claims.</p>
 </section>
 
-<!-- 02 -->
-<section id="s2">
+<!-- 03 -->
+<section id="s3">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="a-register-is-found-by-its-header-never-">A register is found by its header, never by a path</h3>
   <p>A documents tree that moves must break neither tool, and reading the header is the only way to be right in the layout a repository has today and in the one that follows it. So any table whose headings are the behaviour headings is a register. The headings and the row test are one exported pair, read by both tools, because two tools parsing a table differently means one writes rows the other cannot see. <em>Where:</em> <code>plugins/spn-apps-ts/hooks/lib/register.ts</code></p>
@@ -268,8 +273,8 @@
   <p>The glob this replaced named one stack's folder shape, and it missed a whole module whose home was an application rather than a package. The declaration itself is what makes something an action, so looking for the declaration needs no folder shape and finds a module wherever it is kept. <em>Where:</em> <code>plugins/spn-apps-ts/hooks/tools/action-coverage.ts</code></p>
 </section>
 
-<!-- 03 -->
-<section id="s3">
+<!-- 04 -->
+<section id="s4">
   <div class="sec-head"><h2>Boundary</h2></div>
   <p>This page answers what these tools read, what they may write, and why. It does not answer what a tool is in general — that a tool is invoked by its own path, grades its findings and counts only refusals into its exit code is <a href="../01-spn-core/05-tools-construct.html">The Tool</a>. It does not answer what a behaviour row means either; the book states the row grammar, and this plugin only reads and writes it.</p>
   <div class="scroll"><table>
@@ -282,8 +287,8 @@
   </table></div>
 </section>
 
-<!-- 04 -->
-<section id="s4">
+<!-- 05 -->
+<section id="s5">
   <div class="sec-head"><h2>Binds</h2></div>
   <div class="scroll"><table>
     <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
@@ -302,8 +307,8 @@
   </table></div>
 </section>
 
-<!-- 05 -->
-<section id="s5">
+<!-- 06 -->
+<section id="s6">
   <div class="sec-head"><h2>Proof</h2></div>
   <p><em>Behaviours: joined from the register, <code>03-behaviors/02-spn-apps-ts/02-stack-tools.md</code> — never typed in the seat file.</em></p>
   <div class="scroll"><table>

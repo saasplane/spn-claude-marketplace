@@ -17,6 +17,8 @@
 
 Loading every rule this repository knows into every turn would drown the turn that needed one of them. A skill is how the loading is narrowed instead: a name, a sentence saying when it applies, and the instructions for doing that one thing, read only once the work at hand matches the sentence. This page names that shape.
 
+## Overview
+
 The sentence is the part people write wrongly. A description here is matched against what you are doing, never browsed by a person, so it states the class of ask it answers and the words a developer actually types. A description written as a catalogue entry is a skill that never fires.
 
 ## Terms

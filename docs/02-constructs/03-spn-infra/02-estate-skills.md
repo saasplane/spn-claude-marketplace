@@ -17,6 +17,8 @@
 
 An estate is changed by editing what it declares itself to be, and then by letting a tool render and apply that declaration. The skills here cover that walk: saying what the estate is, reading what a change would render before anybody approves it, writing a new piece for the estate to run, and publishing a piece that is finished.
 
+## Overview
+
 They share one boundary, and each of them restates it. **No skill here changes a cloud.** Each names the tool's command that does, and the caution the workspace states everywhere — a cloud is changed only through the tool's own doors — is repeated rather than worked around.
 
 ## Terms

@@ -17,6 +17,8 @@
 
 Some rules are true everywhere. How a contract is named, how a service sequences its work, what an assertion in a browser test must compare — those are true of one stack and meaningless in another. A stack check is where such a rule lives: a file in the stack's own plugin, wired to the moments where that stack's code is written.
 
+## Overview
+
 Two things separate a stack check from a stack-agnostic one. Its header names a chapter of that stack's own provider standard rather than a general one, because anything general enough to hold everywhere belongs in the core plugin instead. And it asks whether **this edit** introduces the pattern rather than whether the file already carries it, which is what makes a refusal fair on a file somebody else wrote.
 
 ## Terms

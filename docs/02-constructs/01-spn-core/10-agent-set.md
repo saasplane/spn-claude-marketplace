@@ -17,6 +17,8 @@
 
 The context that wrote a change has already agreed with every reason it gave itself. A brief is how a second, independent read arrives without opening a second window: a persona with its own name, convened mid-turn, carrying only what its own file grants it. This page names what that file is made of.
 
+## Overview
+
 The thing to check first in any brief is its authority — what this persona may decide, and whether it may write anything at all. Some of that authority is bound by the frontmatter and some of it is only stated in the prose, and the two are not the same promise.
 
 ## Terms

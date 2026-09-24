@@ -17,6 +17,8 @@
 
 A hook is code the runtime calls, and a moment is when it calls it. The moments are not interchangeable, because each one arrives at a different point relative to the act it might object to. This page names the moments this marketplace wires, what each one is handed, and what each one is allowed to do about it.
 
+## Overview
+
 One sentence carries the model: **the moment decides the authority**. A call about to run is the only place a call can still be stopped. Every other moment arrives after the thing it might have objected to has already happened, so all it can do is speak.
 
 ## Terms

@@ -17,6 +17,8 @@
 
 A backend developer reads a change differently than a security reviewer does, and both read it differently than the person who owns the release. Give every change one undifferentiated review and each of those people works out what to look for from nothing, every time. A lens is that working-out, written down once: one file per engineering function, saying what it checks and where its authority stops.
 
+## Overview
+
 A lens is a ref, so it carries a stamp and adds no rule of its own. What makes it a construct rather than another restatement is how it is used. **A lens is an argument handed to one reviewer, not a reviewer of its own.** The brief that reviews carries none of the viewpoints; it is given a name at the moment it is convened and reads that file before it says anything.
 
 ## Terms

@@ -182,11 +182,16 @@
   <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Stack Skills — The Five a Stack Ships</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Construct</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">Backend developer</span><span class="badge lens">Web developer</span></span><span class="st"><span class="lbl">Status:</span> <span class="badge status planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>Stack Skills — The Five a Stack Ships</h1>
   <p class="standfirst">A skill belongs to a stack when the steps behind it name that stack's own commands, layers and file shapes. Scaffolding a project, building a capability, running the suites, proving a package: each of those is a different walk in a different stack, so each lives in the plugin for the stack it describes.</p>
-  <p>The absence here is as deliberate as anything present. <strong>Planning is not a stack skill.</strong> The book's set of skills is closed and carries no planning skill for this world, so shipping one would add a value the standard does not have, and two skills would then compete for the same ask. The skill stays in the core plugin, and this plugin supplies only the layer that skill reads.</p>
 </header>
 
 <!-- 00 -->
 <section id="s0">
+  <div class="sec-head"><h2>Overview</h2></div>
+  <p>The absence here is as deliberate as anything present. <strong>Planning is not a stack skill.</strong> The book's set of skills is closed and carries no planning skill for this world, so shipping one would add a value the standard does not have, and two skills would then compete for the same ask. The skill stays in the core plugin, and this plugin supplies only the layer that skill reads.</p>
+</section>
+
+<!-- 01 -->
+<section id="s1">
   <div class="sec-head"><h2>Terms</h2></div>
   <div class="scroll"><table>
     <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
@@ -201,8 +206,8 @@
   </table></div>
 </section>
 
-<!-- 01 -->
-<section id="s1">
+<!-- 02 -->
+<section id="s2">
   <div class="sec-head"><h2>Model</h2></div>
   <p>The ask is matched to a skill, the skill is narrowed by a mode, and only the longest skill divides further into ordered steps.</p>
   <figure>
@@ -250,8 +255,8 @@
   -->
 </section>
 
-<!-- 02 -->
-<section id="s2">
+<!-- 03 -->
+<section id="s3">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="one-skill-divides-into-steps-and-the-ord">One skill divides into steps, and the order is the rule</h3>
   <p>The contract comes first, and everything downstream is generated from it or written against it. A service written before its state is a service that will be rewritten. So the build skill is the only folder here with a step folder, its steps run in a fixed order, and each one is read before that layer's code is written rather than after. <em>Where:</em> <code>plugins/spn-apps-ts/skills/implement/steps/</code></p>
@@ -267,8 +272,8 @@
   <p>Planning stays in the core plugin. What this plugin ships instead is reference material the planning skill reads once it has resolved which stack it is standing in. That keeps one skill, one description and one match, with a concrete step at the end of it. <em>Where:</em> <code>plugins/spn-apps-ts/refs/plan.md</code></p>
 </section>
 
-<!-- 03 -->
-<section id="s3">
+<!-- 04 -->
+<section id="s4">
   <div class="sec-head"><h2>Boundary</h2></div>
   <p>This page answers what makes a skill this stack's own, and how the skills here are shaped. It does not answer what a skill is — the frontmatter, the matching against a listing, and the rule that a skill carries steps and never a rule are <a href="../01-spn-core/07-skill-set-construct.html">The Skill</a>. It does not answer what the planning layer says either.</p>
   <div class="scroll"><table>
@@ -281,8 +286,8 @@
   </table></div>
 </section>
 
-<!-- 04 -->
-<section id="s4">
+<!-- 05 -->
+<section id="s5">
   <div class="sec-head"><h2>Binds</h2></div>
   <div class="scroll"><table>
     <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
@@ -301,8 +306,8 @@
   </table></div>
 </section>
 
-<!-- 05 -->
-<section id="s5">
+<!-- 06 -->
+<section id="s6">
   <div class="sec-head"><h2>Proof</h2></div>
   <p><em>Behaviours: joined from the register, <code>03-behaviors/02-spn-apps-ts/03-stack-skills.md</code> — never typed in the seat file.</em></p>
   <div class="scroll"><table>

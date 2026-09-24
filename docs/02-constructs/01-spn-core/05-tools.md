@@ -17,6 +17,8 @@
 
 Not every rule is worth asking on every keystroke. Some answers need a whole tree, some need two repositories side by side, and some are wanted only when somebody asks. A tool is how a plugin ships that kind of code: a file nothing wires, invoked by its own path, which reads what it was pointed at and prints what it found.
 
+## Overview
+
 A tool and a check draw the same line between refusing and reporting, and they draw it in different currency. A check answers one call with a verdict. A tool answers one run with findings, each graded, and an exit code that counts only the refusals.
 
 ## Terms

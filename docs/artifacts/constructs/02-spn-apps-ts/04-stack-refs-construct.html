@@ -182,11 +182,16 @@
   <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Stack Refs — The Layer a Stack-Agnostic Skill Loads</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Construct</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">Backend developer</span><span class="badge lens">Architect</span></span><span class="st"><span class="lbl">Status:</span> <span class="badge status planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>Stack Refs — The Layer a Stack-Agnostic Skill Loads</h1>
   <p class="standfirst">Some skills are the same in every world and still need an answer only one world can give. Planning is one: the act is identical everywhere, and the seats a design's rows land in are not. A stack ref is how the second half is supplied without splitting the first: reference material the stack ships, read by a skill the stack does not own.</p>
-  <p>The thing to know before opening one is that <strong>it is reference material and not a skill</strong>. It has no frontmatter, it matches no ask, and nothing loads it except the skill that already resolved which stack it is standing in.</p>
 </header>
 
 <!-- 00 -->
 <section id="s0">
+  <div class="sec-head"><h2>Overview</h2></div>
+  <p>The thing to know before opening one is that <strong>it is reference material and not a skill</strong>. It has no frontmatter, it matches no ask, and nothing loads it except the skill that already resolved which stack it is standing in.</p>
+</section>
+
+<!-- 01 -->
+<section id="s1">
   <div class="sec-head"><h2>Terms</h2></div>
   <div class="scroll"><table>
     <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
@@ -200,8 +205,8 @@
   </table></div>
 </section>
 
-<!-- 01 -->
-<section id="s1">
+<!-- 02 -->
+<section id="s2">
   <div class="sec-head"><h2>Model</h2></div>
   <p>The skill is one. The layer is chosen from the repository's own claim, and what it names is where the design is written down.</p>
   <figure>
@@ -249,8 +254,8 @@
   -->
 </section>
 
-<!-- 02 -->
-<section id="s2">
+<!-- 03 -->
+<section id="s3">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="the-skill-has-no-stack-variant-so-the-la">The skill has no stack variant, so the layer is a ref</h3>
   <p>The book's skill set is closed and carries no planning skill for this world. Shipping one here would add a value the standard does not have, and two skills with almost the same description would then compete for the same ask. So the skill stays in one plugin, and this file supplies the layer instead — the part of the plan that only this stack can answer. <em>Where:</em> <code>plugins/spn-apps-ts/refs/plan.md</code></p>
@@ -264,8 +269,8 @@
   <p>The file carries the same block a core ref carries, naming each chapter it restates and the hash last read there, so a drift run reads it exactly as it reads the rest. <em>Where:</em> the <code>spn:restates</code> block at the top of <code>plugins/spn-apps-ts/refs/plan.md</code></p>
 </section>
 
-<!-- 03 -->
-<section id="s3">
+<!-- 04 -->
+<section id="s4">
   <div class="sec-head"><h2>Boundary</h2></div>
   <p>This page answers why a stack ships reference material for a skill it does not own, and what such a file may contain. It does not answer how a restatement is stamped, parsed or compared — that is <a href="../01-spn-core/08-ref-set-construct.html">The Ref</a>. It does not answer what the planning walk itself is either: the walk belongs to the skill, and this file supplies only the part the skill could not know.</p>
   <div class="scroll"><table>
@@ -278,8 +283,8 @@
   </table></div>
 </section>
 
-<!-- 04 -->
-<section id="s4">
+<!-- 05 -->
+<section id="s5">
   <div class="sec-head"><h2>Binds</h2></div>
   <div class="scroll"><table>
     <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
@@ -298,8 +303,8 @@
   </table></div>
 </section>
 
-<!-- 05 -->
-<section id="s5">
+<!-- 06 -->
+<section id="s6">
   <div class="sec-head"><h2>Proof</h2></div>
   <p><em>Behaviours: joined from the register, <code>03-behaviors/02-spn-apps-ts/04-stack-refs.md</code> — never typed in the seat file.</em></p>
   <div class="scroll"><table>

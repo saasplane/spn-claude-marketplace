@@ -182,11 +182,16 @@
   <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Loop Events — The Moments a Session Offers a Hook</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Construct</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">Backend developer</span><span class="badge lens">Architect</span></span><span class="st"><span class="lbl">Status:</span> <span class="badge status planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>Loop Events — The Moments a Session Offers a Hook</h1>
   <p class="standfirst">A hook is code the runtime calls, and a moment is when it calls it. The moments are not interchangeable, because each one arrives at a different point relative to the act it might object to. This page names the moments this marketplace wires, what each one is handed, and what each one is allowed to do about it.</p>
-  <p>One sentence carries the model: <strong>the moment decides the authority</strong>. A call about to run is the only place a call can still be stopped. Every other moment arrives after the thing it might have objected to has already happened, so all it can do is speak.</p>
 </header>
 
 <!-- 00 -->
 <section id="s0">
+  <div class="sec-head"><h2>Overview</h2></div>
+  <p>One sentence carries the model: <strong>the moment decides the authority</strong>. A call about to run is the only place a call can still be stopped. Every other moment arrives after the thing it might have objected to has already happened, so all it can do is speak.</p>
+</section>
+
+<!-- 01 -->
+<section id="s1">
   <div class="sec-head"><h2>Terms</h2></div>
   <div class="scroll"><table>
     <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
@@ -201,8 +206,8 @@
   </table></div>
 </section>
 
-<!-- 01 -->
-<section id="s1">
+<!-- 02 -->
+<section id="s2">
   <div class="sec-head"><h2>Model</h2></div>
   <p>The moments run in the order a session meets them. Nothing chains one to the next: each is offered independently, and a plugin wires the ones it has something to say at.</p>
   <figure>
@@ -251,8 +256,8 @@
   <p><code>spn-core</code> is the only plugin here that wires more than one moment. It wires all four, one script each, and none of those scripts is reached any other way.</p>
 </section>
 
-<!-- 02 -->
-<section id="s2">
+<!-- 03 -->
+<section id="s3">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="the-window-opening">The window opening</h3>
   <p>One script runs when a session starts, resumes or is cleared, and what it prints is the first screen a developer reads. Nothing in that screen is typed: the script walks the workspace, reads each repository's own manifest for the world and the stack it claims, checks the wiring that claim implies, and lists every workstream in each of its states. A workspace holding no manifest at all is the case where there is nothing to read, and the script then asks instead of reporting, and points at the day-zero skill. Every read is wrapped, because a crash here is a window that opens on a stack trace. <em>Where:</em> <code>plugins/spn-core/hooks/events/orientation.ts</code></p>
@@ -266,8 +271,8 @@
   <p>Whatever a script decides, it ends with a zero exit code. A refusal is the documented decision written to standard output, never a failure code. Two of these scripts also run by hand, printing the same text, so they can be read without opening a session at all. <em>Where:</em> <code>plugins/spn-core/hooks/events/</code></p>
 </section>
 
-<!-- 03 -->
-<section id="s3">
+<!-- 04 -->
+<section id="s4">
   <div class="sec-head"><h2>Boundary</h2></div>
   <p>This page answers which moments exist, what each is handed, and what each may do. It does not answer how a script is wired or what shape its answer takes — that is <a href="./02-hook-set-construct.html">The Hook</a>, and you read it first. It does not answer what any individual gate looks for either: the checks behind the call moment have their own page.</p>
   <div class="scroll"><table>
@@ -280,8 +285,8 @@
   </table></div>
 </section>
 
-<!-- 04 -->
-<section id="s4">
+<!-- 05 -->
+<section id="s5">
   <div class="sec-head"><h2>Binds</h2></div>
   <div class="scroll"><table>
     <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
@@ -300,8 +305,8 @@
   </table></div>
 </section>
 
-<!-- 05 -->
-<section id="s5">
+<!-- 06 -->
+<section id="s6">
   <div class="sec-head"><h2>Proof</h2></div>
   <p><em>Behaviours: joined from the register, <code>03-behaviors/01-spn-core/03-loop-events.md</code> — never typed in the seat file.</em></p>
   <div class="scroll"><table>

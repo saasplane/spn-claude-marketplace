@@ -17,6 +17,8 @@
 
 A tool becomes a stack's own when what it reads is a shape only that stack declares. The tools here read one such shape: the behaviour register a repository keeps, and the actions a node publishes. Neither is wired to a moment; each is invoked by its own path against one repository, and neither holds state of its own.
 
+## Overview
+
 One decision shapes both of them. **Part of a row is somebody's decision and part is what a run found**, and a tool writing over the first part would turn a declaration into a guess. So the shape of a register lives in a third file that both tools import, and the writer touches only the cells a run owns.
 
 ## Terms

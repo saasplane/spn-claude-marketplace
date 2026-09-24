@@ -182,11 +182,16 @@
   <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; The Plugin — Delivery Unit of the Marketplace</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Construct</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">Architect</span><span class="badge lens">Engineering leader</span></span><span class="st"><span class="lbl">Status:</span> <span class="badge status planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>The Plugin — Delivery Unit of the Marketplace</h1>
   <p class="standfirst">A rule an agent cannot load is a rule it cannot follow, however well the rule is written. The plugin is the unit that carries a rule from this repository into a running session: one folder, one small manifest, one entry in a list this repository keeps by hand. Every hook, skill, ref, lens and agent brief here lives inside one, so this page names the container before the other pages name what sits in it.</p>
-  <p>The last of the three — the installed copy — is what costs people an afternoon. A session never reads this checkout. It reads an installed copy, and that copy is found by the plugin's name together with the version its manifest carries. So an edit here is not yet a change in behaviour, and a version that has not moved is a version whose installed copy an edit can sit silently behind.</p>
 </header>
 
 <!-- 00 -->
 <section id="s0">
+  <div class="sec-head"><h2>Overview</h2></div>
+  <p>The last of the three — the installed copy — is what costs people an afternoon. A session never reads this checkout. It reads an installed copy, and that copy is found by the plugin's name together with the version its manifest carries. So an edit here is not yet a change in behaviour, and a version that has not moved is a version whose installed copy an edit can sit silently behind.</p>
+</section>
+
+<!-- 01 -->
+<section id="s1">
   <div class="sec-head"><h2>Terms</h2></div>
   <div class="scroll"><table>
     <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
@@ -200,8 +205,8 @@
   </table></div>
 </section>
 
-<!-- 01 -->
-<section id="s1">
+<!-- 02 -->
+<section id="s2">
   <div class="sec-head"><h2>Model</h2></div>
   <p>Three files carry a plugin from an author's edit to the session that reads it, and confusing any two of them is where the afternoon goes. Read them left to right: what names a plugin, what a plugin claims about itself, where its bytes end up, and who reads them there.</p>
   <figure>
@@ -250,8 +255,8 @@
   <p>The last arrow is the one to remember: a session reads the installed copy, so editing either file changes nothing until an install runs again.</p>
 </section>
 
-<!-- 02 -->
-<section id="s2">
+<!-- 03 -->
+<section id="s3">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="the-manifest">The manifest</h3>
   <p>Each plugin folder carries one manifest at <code>.claude-plugin/plugin.json</code>, holding a <code>name</code>, a <code>version</code>, a <code>description</code> and an <code>author</code>. The description is long on purpose. It is matched against the work at hand rather than browsed by a person, so it states in full what the plugin carries. <em>Where:</em> <code>plugins/spn-core/.claude-plugin/plugin.json</code>, and the same path in the other two folders.</p>
@@ -265,8 +270,8 @@
   <p>A plugin folder holds any mix of instruments and owes none of them. <code>spn-core</code> carries every kind, which is why it is the folder to open to see what a full plugin looks like. <code>spn-infra</code> carries a single shell script beside its cards, and no tools and no agent briefs. Each kind is named by its own page, and none of them is named here. <em>Where:</em> <code>plugins/</code></p>
 </section>
 
-<!-- 03 -->
-<section id="s3">
+<!-- 04 -->
+<section id="s4">
   <div class="sec-head"><h2>Boundary</h2></div>
   <p>This page answers what a plugin is made of, how it is listed, and what an installed copy is. It does not answer which plugins a given repository is entitled to load — that is derived from the repository's own manifest, and the foundation's delivery chapter rules it. It also does not answer what any one instrument is: each kind has its own page, and you read the one you need next.</p>
   <div class="scroll"><table>
@@ -278,8 +283,8 @@
   </table></div>
 </section>
 
-<!-- 04 -->
-<section id="s4">
+<!-- 05 -->
+<section id="s5">
   <div class="sec-head"><h2>Binds</h2></div>
   <div class="scroll"><table>
     <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
@@ -299,8 +304,8 @@
   </table></div>
 </section>
 
-<!-- 05 -->
-<section id="s5">
+<!-- 06 -->
+<section id="s6">
   <div class="sec-head"><h2>Proof</h2></div>
   <p><em>Behaviours: joined from the register, <code>03-behaviors/01-spn-core/01-plugin-set.md</code> — never typed in the seat file.</em></p>
   <div class="scroll"><table>

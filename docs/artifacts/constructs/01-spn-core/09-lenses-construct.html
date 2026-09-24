@@ -182,11 +182,16 @@
   <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; The Lens — One Reviewing Viewpoint, Written Down</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Construct</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">Engineering leader</span><span class="badge lens">Architect</span></span><span class="st"><span class="lbl">Status:</span> <span class="badge status planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>The Lens — One Reviewing Viewpoint, Written Down</h1>
   <p class="standfirst">A backend developer reads a change differently than a security reviewer does, and both read it differently than the person who owns the release. Give every change one undifferentiated review and each of those people works out what to look for from nothing, every time. A lens is that working-out, written down once: one file per engineering function, saying what it checks and where its authority stops.</p>
-  <p>A lens is a ref, so it carries a stamp and adds no rule of its own. What makes it a construct rather than another restatement is how it is used. <strong>A lens is an argument handed to one reviewer, not a reviewer of its own.</strong> The brief that reviews carries none of the viewpoints; it is given a name at the moment it is convened and reads that file before it says anything.</p>
 </header>
 
 <!-- 00 -->
 <section id="s0">
+  <div class="sec-head"><h2>Overview</h2></div>
+  <p>A lens is a ref, so it carries a stamp and adds no rule of its own. What makes it a construct rather than another restatement is how it is used. <strong>A lens is an argument handed to one reviewer, not a reviewer of its own.</strong> The brief that reviews carries none of the viewpoints; it is given a name at the moment it is convened and reads that file before it says anything.</p>
+</section>
+
+<!-- 01 -->
+<section id="s1">
   <div class="sec-head"><h2>Terms</h2></div>
   <div class="scroll"><table>
     <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
@@ -201,8 +206,8 @@
   </table></div>
 </section>
 
-<!-- 01 -->
-<section id="s1">
+<!-- 02 -->
+<section id="s2">
   <div class="sec-head"><h2>Model</h2></div>
   <p>A gate names a viewpoint, the viewpoint resolves to a file, and the file is what decides how far the reviewer's authority reaches.</p>
   <figure>
@@ -251,8 +256,8 @@
   <p>The set of files is closed by a rule rather than fixed at a number: one lens per engineering function, and the functions are named in the book.</p>
 </section>
 
-<!-- 02 -->
-<section id="s2">
+<!-- 03 -->
+<section id="s3">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="what-one-file-says">What one file says</h3>
   <p>A lens file opens by saying when the viewpoint is worn, when it is convened, and the one condition on which it blocks. Then it says what it checks. Everything below the stated threshold is advice, and the file says so plainly, because a reviewer who can block anything stops being a reviewer and the work stops on taste. <em>Where:</em> <code>plugins/spn-core/refs/lenses/architect.md</code></p>
@@ -266,8 +271,8 @@
   <p>Wearing a lens while writing makes the work better and is never a review, because the context that drafted something already agrees with its own reasoning. Convening is the other act: a reader who did not write the work, holding one file, reporting what that viewpoint found. A skill says which gate convenes which viewpoint. <em>Where:</em> <code>plugins/spn-core/skills/plan/SKILL.md</code>, <code>plugins/spn-core/skills/develop/SKILL.md</code></p>
 </section>
 
-<!-- 03 -->
-<section id="s3">
+<!-- 04 -->
+<section id="s4">
   <div class="sec-head"><h2>Boundary</h2></div>
   <p>This page answers what a viewpoint file holds and how far its authority reaches. It does not answer how a restatement is stamped or compared — a lens is a ref, and <a href="./08-ref-set-construct.html">The Ref</a> answers that. It does not answer who does the reviewing either: the brief that reads a lens is a persona, and it has its own page.</p>
   <div class="scroll"><table>
@@ -280,8 +285,8 @@
   </table></div>
 </section>
 
-<!-- 04 -->
-<section id="s4">
+<!-- 05 -->
+<section id="s5">
   <div class="sec-head"><h2>Binds</h2></div>
   <div class="scroll"><table>
     <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
@@ -300,8 +305,8 @@
   </table></div>
 </section>
 
-<!-- 05 -->
-<section id="s5">
+<!-- 06 -->
+<section id="s6">
   <div class="sec-head"><h2>Proof</h2></div>
   <p><em>Behaviours: joined from the register, <code>03-behaviors/01-spn-core/09-lenses.md</code> — never typed in the seat file.</em></p>
   <div class="scroll"><table>

@@ -182,11 +182,16 @@
   <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; The Estate Guard — Named Rules Wired to Every Write</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Construct</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">DevOps / SRE</span><span class="badge lens">DevSecOps / Security</span></span><span class="st"><span class="lbl">Status:</span> <span class="badge status planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>The Estate Guard — Named Rules Wired to Every Write</h1>
   <p class="standfirst">An estate declaration says what infrastructure should exist. Things that must never appear in one — a credential, an identifier a tool discovers for itself, a provider's own string outside the entry that sanctions it — are cheap to catch at the moment somebody writes them and expensive to find later. The estate guard is that catch: a dispatcher wired to every write and every edit, running a set of named rules with nothing else between them and the file.</p>
-  <p>Read the direction it fails in before you read anything else. <strong>When the guard does not understand its input, it allows the call.</strong> A guard refusing whatever it cannot parse would deny far more than the things it actually knows about, and people would route around it, which leaves an estate with no guard at all.</p>
 </header>
 
 <!-- 00 -->
 <section id="s0">
+  <div class="sec-head"><h2>Overview</h2></div>
+  <p>Read the direction it fails in before you read anything else. <strong>When the guard does not understand its input, it allows the call.</strong> A guard refusing whatever it cannot parse would deny far more than the things it actually knows about, and people would route around it, which leaves an estate with no guard at all.</p>
+</section>
+
+<!-- 01 -->
+<section id="s1">
   <div class="sec-head"><h2>Terms</h2></div>
   <div class="scroll"><table>
     <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
@@ -201,8 +206,8 @@
   </table></div>
 </section>
 
-<!-- 01 -->
-<section id="s1">
+<!-- 02 -->
+<section id="s2">
   <div class="sec-head"><h2>Model</h2></div>
   <p>The path is read first, because one refusal needs nothing else. Then the text this call would add is taken, and each rule is asked about it in turn, the first denial ending the run.</p>
   <figure>
@@ -252,8 +257,8 @@
   <p>The helpers the dispatcher reads its event and records its timings through are <strong>this plugin's own copies</strong>. A plugin is installed on its own and a partner may hold one without the others, so a sibling's file cannot be a dependency — reaching for one means resolving it at runtime, and a resolve that misses has to return the pass-through, which is silence wearing the shape of success.</p>
 </section>
 
-<!-- 02 -->
-<section id="s2">
+<!-- 03 -->
+<section id="s3">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="unsure-means-allow-and-every-exit-is-zer">Unsure means allow, and every exit is zero</h3>
   <p>Unreadable input, or a call naming no file, ends the run in silence with the call allowed. A refusal prints the documented decision and still exits zero, because a hook that fails loudly takes every other gate down with it. The dispatcher returns as soon as it finds no file path, and the whole run is wrapped so nothing reaches the harness as a failure. <em>Where:</em> <code>plugins/spn-infra/hooks/events/pretooluse.ts</code></p>
@@ -269,8 +274,8 @@
   <p>A denial and its reasoning are one hop apart: each message points at the laws card this plugin ships, so a reader who has just been refused can reach the rule without searching for it. <em>Where:</em> <code>plugins/spn-infra/refs/laws.md</code></p>
 </section>
 
-<!-- 03 -->
-<section id="s3">
+<!-- 04 -->
+<section id="s4">
   <div class="sec-head"><h2>Boundary</h2></div>
   <p>This page answers what the guard refuses, what it reads to decide, and what it does when it cannot decide. It does not answer the frame it sits in — the wiring, the decision shape and the always-zero exit are <a href="../01-spn-core/02-hook-set-construct.html">The Hook</a>, and this dispatcher speaks that shape directly rather than importing it. It does not answer what the estate laws say either.</p>
   <div class="scroll"><table>
@@ -283,8 +288,8 @@
   </table></div>
 </section>
 
-<!-- 04 -->
-<section id="s4">
+<!-- 05 -->
+<section id="s5">
   <div class="sec-head"><h2>Binds</h2></div>
   <div class="scroll"><table>
     <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
@@ -304,8 +309,8 @@
   </table></div>
 </section>
 
-<!-- 05 -->
-<section id="s5">
+<!-- 06 -->
+<section id="s6">
   <div class="sec-head"><h2>Proof</h2></div>
   <p><em>Behaviours: joined from the register, <code>03-behaviors/03-spn-infra/01-estate-guard.md</code> — never typed in the seat file.</em></p>
   <div class="scroll"><table>

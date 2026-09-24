@@ -182,11 +182,16 @@
   <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; The Skill — A Stage's Steps, Loaded on Match</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Construct</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">Architect</span><span class="badge lens">Engineering leader</span></span><span class="st"><span class="lbl">Status:</span> <span class="badge status planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>The Skill — A Stage's Steps, Loaded on Match</h1>
   <p class="standfirst">Loading every rule this repository knows into every turn would drown the turn that needed one of them. A skill is how the loading is narrowed instead: a name, a sentence saying when it applies, and the instructions for doing that one thing, read only once the work at hand matches the sentence. This page names that shape.</p>
-  <p>The sentence is the part people write wrongly. A description here is matched against what you are doing, never browsed by a person, so it states the class of ask it answers and the words a developer actually types. A description written as a catalogue entry is a skill that never fires.</p>
 </header>
 
 <!-- 00 -->
 <section id="s0">
+  <div class="sec-head"><h2>Overview</h2></div>
+  <p>The sentence is the part people write wrongly. A description here is matched against what you are doing, never browsed by a person, so it states the class of ask it answers and the words a developer actually types. A description written as a catalogue entry is a skill that never fires.</p>
+</section>
+
+<!-- 01 -->
+<section id="s1">
   <div class="sec-head"><h2>Terms</h2></div>
   <div class="scroll"><table>
     <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
@@ -201,8 +206,8 @@
   </table></div>
 </section>
 
-<!-- 01 -->
-<section id="s1">
+<!-- 02 -->
+<section id="s2">
   <div class="sec-head"><h2>Model</h2></div>
   <p>The listing is cheap to hold because it is one line per skill. Everything expensive is read only after a match.</p>
   <figure>
@@ -251,8 +256,8 @@
   <p>A large skill therefore costs nothing on a turn that never needed it, which is what lets a skill be as long as its work actually is.</p>
 </section>
 
-<!-- 02 -->
-<section id="s2">
+<!-- 03 -->
+<section id="s3">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="the-file-a-session-loads">The file a session loads</h3>
   <p>A frontmatter block naming <code>name</code> and <code>description</code>, then instructions in markdown. The frontmatter carries those two fields and nothing more for a stack-agnostic skill. Everything a session decides about whether to read the file is decided from those first lines. <em>Where:</em> <code>plugins/spn-core/skills/plan/SKILL.md</code>, and the same file in every other skill folder</p>
@@ -270,8 +275,8 @@
   <p>A few answers cannot be derived from the ground, because they are decisions rather than readings. A skill of that kind works one agreed block at a time and runs no act on an answer nobody gave, and its description says so. <em>Where:</em> <code>plugins/spn-core/skills/ideate/SKILL.md</code>, <code>plugins/spn-core/skills/day-zero/SKILL.md</code></p>
 </section>
 
-<!-- 03 -->
-<section id="s3">
+<!-- 04 -->
+<section id="s4">
   <div class="sec-head"><h2>Boundary</h2></div>
   <p>This page answers what a skill is, how it is selected, and what it may contain. It does not answer which skills exist for a given world — the stack-agnostic set is realized by the core plugin, and each stack's own set by that stack's plugin. It does not answer what a lens or an agent brief is either, although both are selected the same way; each has its own page.</p>
   <div class="scroll"><table>
@@ -284,8 +289,8 @@
   </table></div>
 </section>
 
-<!-- 04 -->
-<section id="s4">
+<!-- 05 -->
+<section id="s5">
   <div class="sec-head"><h2>Binds</h2></div>
   <div class="scroll"><table>
     <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
@@ -304,8 +309,8 @@
   </table></div>
 </section>
 
-<!-- 05 -->
-<section id="s5">
+<!-- 06 -->
+<section id="s6">
   <div class="sec-head"><h2>Proof</h2></div>
   <p><em>Behaviours: joined from the register, <code>03-behaviors/01-spn-core/07-skill-set.md</code> — never typed in the seat file.</em></p>
   <div class="scroll"><table>

@@ -17,6 +17,8 @@
 
 An estate is declared in a small vocabulary, and every one of the words is precise. Which file marks a node, which layer owns which act, how a resource name is composed, what a declaration must never contain: get one of them wrong and the mistake is expensive rather than embarrassing. A card is where each of those subjects is restated, in full, for a reader who may never open the foundation book.
 
+## Overview
+
 A card is a ref, so it carries a stamp and adds no rule of its own. What makes these cards their own construct is what they refuse to hold. **Every value in them is grammar, never a real one.** No environment, region or account of any organization appears, and the sample platform in the examples exists to show the shape.
 
 ## Terms

@@ -182,11 +182,16 @@
   <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; The Check — One Rule, Asked on Every Call</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Construct</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">Backend developer</span><span class="badge lens">Architect</span></span><span class="st"><span class="lbl">Status:</span> <span class="badge status planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>The Check — One Rule, Asked on Every Call</h1>
   <p class="standfirst">A check is one file that reads a call and says what it thinks about it. The dispatcher composes them, so a check never has to know that other checks exist; it only has to answer for itself. This page names what a check is made of and the two habits every check in this marketplace keeps.</p>
-  <p>The first habit is that <strong>a check names the chapter it restates</strong> in its own header, so the rule has exactly one home and a change is made there first. The second is that <strong>a check reads the smallest slice the call touches</strong>. Reading everything on every call once cost three quarters of every millisecond the hooks had spent, and a gate that makes a session slow is a gate somebody eventually removes.</p>
 </header>
 
 <!-- 00 -->
 <section id="s0">
+  <div class="sec-head"><h2>Overview</h2></div>
+  <p>The first habit is that <strong>a check names the chapter it restates</strong> in its own header, so the rule has exactly one home and a change is made there first. The second is that <strong>a check reads the smallest slice the call touches</strong>. Reading everything on every call once cost three quarters of every millisecond the hooks had spent, and a gate that makes a session slow is a gate somebody eventually removes.</p>
+</section>
+
+<!-- 01 -->
+<section id="s1">
   <div class="sec-head"><h2>Terms</h2></div>
   <div class="scroll"><table>
     <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
@@ -200,8 +205,8 @@
   </table></div>
 </section>
 
-<!-- 01 -->
-<section id="s1">
+<!-- 02 -->
+<section id="s2">
   <div class="sec-head"><h2>Model</h2></div>
   <p>Every check is asked the same questions in the same order, and the order is what keeps an ordinary edit cheap.</p>
   <figure>
@@ -248,8 +253,8 @@
   <p>A refusal ends the chain, because anything said after an answer is noise. Advice does not end it, because two useful things are worth more than one.</p>
 </section>
 
-<!-- 02 -->
-<section id="s2">
+<!-- 03 -->
+<section id="s3">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="a-check-is-a-file-and-its-header-names-i">A check is a file, and its header names its source</h3>
   <p>Each check sits in its own file under <code>hooks/checks/</code> and opens with a line naming the chapter of the foundation book it restates. That line carries no hash and nothing compares it, and that is deliberate: it tells a reader where the rule lives, and the rule is that a change is made in the chapter first and here second, in the same change. <em>Where:</em> <code>plugins/spn-core/hooks/checks/</code></p>
@@ -269,8 +274,8 @@
   <p>A bar set from what the corpus already averages moves every time the corpus does, so a sweep would approve whatever is already there. The document check takes its numbers from the register row that states them, and takes headings, tables, code and metadata out of the text before measuring what is left. <em>Where:</em> <code>plugins/spn-core/hooks/checks/doc-check.ts</code></p>
 </section>
 
-<!-- 03 -->
-<section id="s3">
+<!-- 04 -->
+<section id="s4">
   <div class="sec-head"><h2>Boundary</h2></div>
   <p>This page answers what one check is and how it decides. It does not answer how checks are composed, what the payload is, or why the exit code is always zero — that is <a href="./02-hook-set-construct.html">The Hook</a>. It does not answer what the rules themselves say either: each check's header names the chapter that states its rule, and that chapter is where a change is made.</p>
   <div class="scroll"><table>
@@ -283,8 +288,8 @@
   </table></div>
 </section>
 
-<!-- 04 -->
-<section id="s4">
+<!-- 05 -->
+<section id="s5">
   <div class="sec-head"><h2>Binds</h2></div>
   <div class="scroll"><table>
     <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
@@ -303,8 +308,8 @@
   </table></div>
 </section>
 
-<!-- 05 -->
-<section id="s5">
+<!-- 06 -->
+<section id="s6">
   <div class="sec-head"><h2>Proof</h2></div>
   <p><em>Behaviours: joined from the register, <code>03-behaviors/01-spn-core/04-checks.md</code> — never typed in the seat file.</em></p>
   <div class="scroll"><table>

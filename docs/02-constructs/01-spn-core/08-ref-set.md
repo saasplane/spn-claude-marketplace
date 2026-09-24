@@ -17,6 +17,8 @@
 
 A citation nobody checks is a promise nobody keeps. The chapter it names moves on, the words copied from it quietly stop being true, and everybody finds out by accident. A ref is how this repository keeps that promise: a restatement carrying a hash of the exact text it last read, so a run can say *this chapter moved since I copied it*.
 
+## Overview
+
 A ref exists because a reader may hold the plugins and never hold the book. It is a copy, made deliberately, under a stamp. It adds no rule; where a ref and its chapter disagree, the chapter wins and the ref is rewritten.
 
 ## Terms

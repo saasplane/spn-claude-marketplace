@@ -17,6 +17,8 @@
 
 An author writes markdown. A reader opens HTML. Everything between the two is produced, and this page names that production: the vocabulary the markdown is written in, the renderer, the figure drawer, the figure checker, and the comparison that proves a page is still what its source would produce.
 
+## Overview
+
 One rule decides the design of all of it. **A page is never edited by hand.** A page somebody edited is a second source of truth, and the edit survives only until the next production run silently overwrites it. So the audit produces the page again and compares it byte for byte, and any difference is refused with one message: edit the seat file and produce it again.
 
 ## Terms
