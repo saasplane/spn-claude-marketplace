@@ -48,8 +48,12 @@ ${cards}
 // A CARD IS A TABLE ROW (Q185), and it keeps its options as a NESTED table on purpose: a reader
 // that stops at the first `</tr>` cuts the card off at its first option, and passes on a page whose
 // options are written inline. The nesting is the case worth having.
-const card = (n, decision) => `  <tr id="q${n}">
-    <td>Q${n}</td><td>a question only the developer can settle</td><td>
+// THE FIXTURE IS THE TEMPLATE'S CARD, not a row. `approach-template.html` writes an open card as
+// `<div class="open">` wrapping `<h4 id="qN">`, and the page's own furniture depends on it: `.open`
+// carries the amber left edge that marks a card undecided, and the rail's count badge is
+// `s4.querySelectorAll('.open').length`. A fixture shaped any other way tests a page nobody writes.
+const card = (n, decision) => `  <div class="open">
+    <h4 id="q${n}">Q${n} &middot; a question only the developer can settle</h4>
     <span class="k">What</span>
     <p>What is being decided.</p>
     <span class="k">Options</span>
@@ -58,8 +62,8 @@ const card = (n, decision) => `  <tr id="q${n}">
       <tbody><tr><td><strong>A</strong></td><td>one way</td></tr><tr><td><strong>B</strong></td><td>the other</td></tr></tbody>
     </table></div>
     <div class="rec"><b>Recommended: A.</b> Because of the reason. <b>Decision:</b> ${decision}</div>
-    </td>
-  </tr>`;
+  </div>
+`;
 
 // THE STATUS IS A PARAMETER because a sequencing row resolves through it: only a terminal word means
 // the arc is finished, and `RUNNING` is one of the words that means work is left.

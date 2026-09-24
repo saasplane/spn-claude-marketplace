@@ -1,0 +1,857 @@
+<title>Every Block, Once</title>
+<style>
+  :root {
+    --paper:#edf0f3; --card:#f7f9fb; --ink:#141920; --slate:#48525f; --faint:#7c8794;
+    --rule:#d2d9e0; --accent:#2f4e7a; --accent-soft:#e0e8f4;
+    --gap:#8f5714; --gap-soft:#f7ecda; --ok:#2a6459; --ok-soft:#dcece8;
+    --ui:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+    --xs:0.76rem; --sm:0.85rem; --md:0.97rem; --lg:1.32rem; --xl:1.62rem; --xxl:2.5rem;
+    --tk-k:#6d3a9c; --tk-s:#2a6459; --tk-c:#7c8794; --tk-t:#2f4e7a; --tk-n:#8f5714; --tk-add:#2a6459; --tk-del:#a63d3d;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){ --paper:#0f1318; --card:#171d24; --ink:#e3e8ee; --slate:#a3adb9; --faint:#6f7986;
+      --rule:#242d37; --accent:#86a9da; --accent-soft:#18232f;
+      --gap:#d59d4f; --gap-soft:#2a2113; --ok:#5db3a4; --ok-soft:#14251f; --tk-k:#c9a3ee; --tk-s:#7fc9b6; --tk-c:#6f7986; --tk-t:#86a9da; --tk-n:#d59d4f; --tk-add:#5db3a4; --tk-del:#e08a8a; }
+  }
+  :root[data-theme="dark"]{ --paper:#0f1318; --card:#171d24; --ink:#e3e8ee; --slate:#a3adb9; --faint:#6f7986;
+    --rule:#242d37; --accent:#86a9da; --accent-soft:#18232f;
+    --gap:#d59d4f; --gap-soft:#2a2113; --ok:#5db3a4; --ok-soft:#14251f; --tk-k:#c9a3ee; --tk-s:#7fc9b6; --tk-c:#6f7986; --tk-t:#86a9da; --tk-n:#d59d4f; --tk-add:#5db3a4; --tk-del:#e08a8a; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--ui);font-size:1rem;line-height:1.6;-webkit-font-smoothing:antialiased}
+  p{margin:0 0 1rem;max-width:58rem}
+  code,.m{font-family:var(--mono);font-size:0.87em}
+  strong{font-weight:600}
+  em{font-style:italic;color:var(--slate)}
+  a{color:var(--accent)}
+  .page{display:grid;grid-template-columns:13rem minmax(0,1fr);gap:3rem;max-width:min(98vw,80rem);margin:0 auto;padding:3rem 8px 6rem;align-items:start}
+  .rail{position:sticky;top:2.5rem;font-family:var(--ui);font-size:var(--xs)}
+  .rail .home{border-left:none;padding-left:0;margin-bottom:.9rem;color:var(--accent);font-weight:650;display:block}
+  .rail .rail-title{letter-spacing:.15em;text-transform:uppercase;color:var(--faint);margin-bottom:.85rem;font-size:.7rem;font-weight:700}
+  .rail a{display:flex;gap:.55rem;text-decoration:none;color:var(--slate);padding:.28rem 0 .28rem .6rem;border-left:2px solid var(--rule);line-height:1.4}
+  .rail a .n{display:none}
+  .rail a.sub{padding-left:1.6rem;font-size:.72rem;color:var(--faint)}
+  .rail a:hover{color:var(--ink)}
+  .rail a.on{color:var(--accent);border-left-color:var(--accent);font-weight:650}
+  .rail .count{margin-left:auto;font-family:var(--mono);font-size:.68rem;background:var(--gap-soft);color:var(--gap);border-radius:2px;padding:0 .3rem}
+  .wrap{display:flex;flex-direction:column;gap:3.25rem;min-width:0}
+  .masthead{display:flex;flex-direction:column;gap:1.1rem}
+  .eyebrow{display:flex;flex-direction:column;gap:.5rem;font-family:var(--ui);font-size:var(--xs);color:var(--faint)}
+  .eyebrow .line{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem .6rem;line-height:1.7}
+  .eyebrow .sep{color:var(--rule);font-weight:300}
+  .eyebrow .line1{letter-spacing:.15em;text-transform:uppercase;font-weight:650;color:var(--faint);line-height:1.7}
+  .eyebrow .lbl{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+  .eyebrow .st{margin-left:auto;display:inline-flex;align-items:center;gap:.4rem}
+  .eyebrow .audience{display:inline-flex;flex-wrap:wrap;align-items:center;gap:.45rem}
+  .badge{display:inline-flex;align-items:center;gap:.35rem;padding:.1rem .6rem;border-radius:999px;border:1px solid var(--rule);background:var(--card);font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--slate);line-height:1.7;white-space:nowrap}
+  .badge.type{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);font-weight:650}
+  .badge.lens{font-family:var(--ui);font-size:.74rem;letter-spacing:0;text-transform:none}
+  .badge.status{font-weight:700}
+  .badge.status.planning{border-color:var(--gap);color:var(--gap);background:var(--gap-soft)}
+  .badge.status.implementing{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+  .badge.status.done{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(18rem,1fr));gap:.8rem;margin:1.6rem 0}
+  .tile{display:flex;flex-direction:column;border:1px solid var(--rule);background:var(--card);border-radius:3px;padding:.85rem 1rem;min-width:0}
+  .tile h4{margin:0 0 .35rem;font-size:var(--md)}
+  .tile h4 a{color:var(--ink);text-decoration:none}
+  .tile h4 a:hover{color:var(--accent)}
+  .tile p{font-size:var(--sm);color:var(--slate);margin:0 0 .6rem;max-width:none;flex:1}
+  .tile .more{font-size:var(--sm);font-weight:600;text-decoration:none;align-self:flex-start}
+  p > .more{font-weight:600;text-decoration:none}
+  h1{font-family:var(--ui);font-size:var(--xxl);font-weight:700;letter-spacing:-.02em;line-height:1.15;text-wrap:balance;margin:0}
+  .standfirst{font-size:var(--lg);line-height:1.5;color:var(--slate);max-width:46rem}
+  .sec-head{display:grid;grid-template-columns:1fr;align-items:baseline;gap:.5rem;border-top:2px solid var(--ink);padding-top:.7rem;margin-bottom:1.1rem}
+  .sec-head .num{font-family:var(--mono);font-size:var(--sm);font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+  h2{font-family:var(--ui);font-size:var(--xl);font-weight:700;letter-spacing:-.01em;text-wrap:balance;margin:0}
+  h3{font-family:var(--ui);font-size:var(--lg);font-weight:600;letter-spacing:-.008em;margin:2rem 0 .6rem}
+  h4{font-family:var(--ui);font-size:var(--md);margin:0 0 .5rem;color:var(--ink)}
+  .scroll{overflow-x:auto;border:1px solid var(--rule);border-radius:3px;background:var(--card);margin:1.6rem 0}
+  table{border-collapse:collapse;width:100%;font-family:var(--ui);font-size:var(--sm);min-width:34rem}
+  .scroll table{table-layout:auto}
+  th{text-align:left;font-family:var(--mono);font-size:var(--xs);letter-spacing:.07em;text-transform:uppercase;color:var(--faint);font-weight:650;padding:.6rem .8rem;border-bottom:1px solid var(--rule)}
+  td{padding:.6rem .8rem;border-bottom:1px solid var(--rule);vertical-align:top;color:var(--slate)}
+  td strong{color:var(--ink)}
+  tr:last-child td{border-bottom:none}
+  .num-cell{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+  .yes{color:var(--ok);font-weight:650}
+  .no{color:var(--gap);font-weight:650}
+  .s{font-family:var(--mono);font-size:var(--xs);color:var(--faint)}
+  pre{background:var(--card);border:1px solid var(--rule);border-radius:3px;padding:.9rem 1.1rem;margin:1.6rem 0;overflow-x:auto;font-family:var(--mono);font-size:var(--sm);line-height:1.55;color:var(--slate);max-width:100%}
+  pre code{font-size:inherit}
+  pre .tk-k{color:var(--tk-k);font-weight:600} pre .tk-s{color:var(--tk-s)} pre .tk-c{color:var(--tk-c);font-style:italic} pre .tk-t{color:var(--tk-t)} pre .tk-n{color:var(--tk-n)} pre .tk-add{color:var(--tk-add)} pre .tk-del{color:var(--tk-del)} pre .tk-cmd{color:var(--tk-t);font-weight:600}
+  /* A FIGURE RUNS EDGE TO EDGE. It takes no padding, border or background of its own: the section
+     already provides the page's padding, and the drawing's own containers are its frame. That is the
+     opposite of a PROSE panel, which carries all three. A figure is also not held to the prose
+     measure — 58rem is for a sentence, and a drawing is not read a line at a time. */
+  /* ONE VERTICAL RHYTHM. A paragraph keeps its 1rem; every block gets 1.6rem above and below, and a
+     figure 2.4rem — it is the largest thing on a page, and it needs the air to read as one unit rather
+     than as something the paragraph above it is still saying. Margins collapse, so the larger wins. */
+  figure{margin:2.4rem 0;padding:0;border:0;background:none}
+  figure svg{display:block;width:auto;max-width:100%;height:auto;margin-inline:auto}
+  figcaption{font-family:var(--ui);font-size:var(--xs);color:var(--faint);margin-top:.5rem;max-width:none}
+  .dg .box{fill:var(--card);stroke:var(--rule);stroke-width:1.5}
+  .dg .box.off{fill:none;stroke:var(--rule);stroke-width:1.5;stroke-dasharray:5 4}
+  .dg .box.warn{fill:var(--gap-soft);stroke:var(--gap);stroke-width:1.5}
+  .dg .box.em{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}
+  .dg .t{font-family:var(--ui);font-size:13px;font-weight:650;fill:var(--ink)}
+  .dg .l{font-family:var(--ui);font-size:12px;fill:var(--ink)}
+  .dg .s{font-family:var(--mono);font-size:11px;fill:var(--slate)}
+  .dg .n{font-family:var(--ui);font-size:11px;fill:var(--faint)}
+  /* The arrowhead is a marker filled with `currentColor`, and a marker resolves that against
+     its own inherited colour rather than the path that references it. With nothing setting
+     `color` on the figure, every connector drew a blue line ending in a black head. Setting it
+     on `.dg` makes the head take the line's colour, and the marker needs no change. */
+  .dg{color:var(--accent)}
+  .dg .c{stroke:var(--accent);stroke-width:1.6;fill:none}
+  .pull{border-left:2px solid var(--accent);background:var(--accent-soft);padding:1rem 1.2rem;margin:1.6rem 0;border-radius:0 3px 3px 0}
+  .pull .label{display:block;font-family:var(--ui);font-size:var(--xs);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.3rem}
+  .pull p{margin:0;max-width:none}
+  .open{background:var(--card);border:1px solid var(--rule);border-left:2px solid var(--gap);border-radius:0 3px 3px 0;padding:1.1rem 1.25rem;margin-bottom:.9rem}
+  .open h4{font-size:var(--md)}
+  .open .k{font-family:var(--mono);font-size:var(--xs);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);display:block;margin:.6rem 0 .2rem}
+  .open p{font-size:var(--sm);color:var(--slate);margin:0 0 .4rem;max-width:none}
+  .open .rec{margin-top:.75rem;padding-top:.65rem;border-top:1px dashed var(--rule);font-size:var(--sm);color:var(--ink)}
+  .open .rec b{color:var(--ok)}
+  .open .scroll{margin:.4rem 0}
+  pre.pv{font-family:var(--mono);font-size:var(--xs);background:var(--card);border:1px solid var(--rule);border-radius:3px;padding:.7rem .9rem;margin:1rem 0;overflow-x:auto;line-height:1.5}
+  footer{border-top:1px solid var(--rule);padding-top:1.3rem;font-family:var(--ui);font-size:var(--xs);color:var(--faint)}
+  @media (max-width:60rem){
+    .page{grid-template-columns:minmax(0,1fr);gap:1.5rem;padding-top:2rem}
+    .rail{position:static;border:1px solid var(--rule);border-radius:3px;background:var(--card);padding:.9rem 1rem}
+    .rail a{border-left:none;padding-left:0}
+    .rail a.on{border-left:none}
+  }
+
+  /* THE OUTLINE HAS TWO LEVELS, AND THEY DIFFER ON THREE AXES — size, weight and colour together.
+     One axis is not enough at rail size: a single step reads as noise rather than as a level, and
+     the two collapse into each other. Nothing in an outline sits on --faint either, because that is
+     the token for text a reader is meant to skim past and an outline is what they navigate by. */
+  .rail a:not(.sub):not(.home){font-size:.88rem;font-weight:400;color:var(--ink);letter-spacing:-.005em}
+  .rail a.sub{font-size:.78rem;font-weight:400;color:var(--slate)}
+  .rail .rail-title{color:var(--slate)}
+
+  /* ONE LEFT EDGE FOR BOTH LEVELS. An indent repeats what the fold already says, and it costs the
+     longer labels a wrapped line. Both are stated in one rule: setting only the subsection's
+     padding leaves it outdented past its own section, because another rule still sets the
+     section's. */
+  .rail a:not(.home), .rail a.sub{padding-left:.6rem}
+
+  /* EVERYTHING ON THE RIGHT SITS ON THE LABEL'S CENTRE LINE. The row is a flex line, and its
+     default is to stretch, so a chevron or a count badge beside a label that wrapped to two lines
+     was pinned to the top of the row rather than level with it. */
+  .rail a{align-items:center}
+  .rail .count{align-self:center}
+
+  /* WEIGHT AND COLOUR MARK WHERE YOU ARE, NEVER WHAT A LEVEL IS. The notch is an inset shadow and
+     not a border: a border changes the box, so a label would jump sideways by the notch's width the
+     moment it became current. These are restated at matching specificity because the level rules
+     above are more specific than `.rail a.on`, and would otherwise strip the selected state. */
+  .rail a.on:not(.sub):not(.home){font-weight:650;color:var(--accent);box-shadow:inset 1.5px 0 0 var(--accent)}
+  .rail a.on.sub{color:var(--accent);box-shadow:inset 1.5px 0 0 var(--accent)}
+  .rail a:not(.sub):not(.home):hover{color:var(--accent)}
+  .rail a.sub:hover{color:var(--ink)}
+
+  /* THE DISCLOSURE IS A CHEVRON, DRAWN RATHER THAN TYPED. A glyph ties the mark to whatever font
+     is resolved and to that font's own idea of weight and baseline; two borders on a rotated box
+     are the same shape at every size and inherit the row's colour. Right means closed, down means
+     open, and only the chevron turns — the box around it stays put so the hit target never moves. */
+  .rail a .caret{margin-left:auto;flex:none;width:1.35rem;height:1.35rem;display:grid;place-items:center;
+    color:var(--faint);border-radius:3px;transform:none}
+  .rail a .caret::before{content:"";width:.32rem;height:.32rem;border-right:1.5px solid currentColor;
+    border-bottom:1.5px solid currentColor;transform:translateX(-.1rem) rotate(-45deg);transition:transform .15s ease}
+  .rail a.group-open .caret{transform:none}
+  .rail a.group-open .caret::before{transform:translateY(-.1rem) rotate(45deg)}
+  .rail a .caret:hover{background:var(--accent-soft);color:var(--accent)}
+  @media (prefers-reduced-motion:reduce){.rail a .caret::before{transition:none}}
+</style>
+<style>
+/* anchor links: a section or subsection title carries a link to itself — small, grey, set off from the title; copied on click */
+a.anchor{display:inline-block;margin-left:.6em;font-family:var(--mono);font-size:.55em;font-weight:400;line-height:1;color:var(--slate,#6b7280);text-decoration:none;opacity:.35;transition:opacity .15s;vertical-align:middle;position:relative;top:-.1em}
+.sec-head:hover a.anchor,h3[id]:hover a.anchor,a.anchor:hover,a.anchor:focus,a.anchor.copied{opacity:1}
+a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7d4a);margin-left:.3em}
+</style>
+<style>
+  .rail .sub-group{display:block}
+  .rail.js .sub-group{display:none}
+  .rail.js .sub-group.shown{display:block}
+  .rail a .caret:hover{background:var(--accent-soft);color:var(--accent)}
+  .rail a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+<style>
+  /* a quote is a sentence set apart — a rule stated in full, or a line from the source the page is about */
+  blockquote{margin:1.6rem 0;padding:.2rem 0 .2rem 1.1rem;border-left:2px solid var(--rule);color:var(--slate)}
+  blockquote p{margin:0;max-width:none}
+  .tile .s{margin-top:.45rem}
+  /* PROSE — the markdown block. Its own border, background and text colour, so a passage of ordinary
+     markdown reads as a block the page chose rather than as the page's own voice continuing. */
+  .prose{border:1px solid var(--rule);background:var(--card);color:var(--slate);border-radius:3px;
+    padding:1.1rem 1.3rem;margin:1.6rem 0}
+  .prose > :first-child{margin-top:0}
+  .prose > :last-child{margin-bottom:0}
+  .prose p,.prose li{max-width:none}
+  .prose strong,.prose h4{color:var(--ink)}
+  .prose code{color:var(--ink)}
+  .prose blockquote{border-left-color:var(--accent);margin:1rem 0}
+  /* NEXT — small on purpose: a title and a direction, nothing else */
+  .nextnav{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.7rem;margin:1.6rem 0}
+  .nextnav-card{display:flex;flex-direction:column;gap:.15rem;border:1px solid var(--rule);background:var(--card);
+    border-radius:3px;padding:.65rem .85rem;text-decoration:none;min-width:0}
+  .nextnav-card:hover{border-color:var(--accent)}
+  .nextnav-card .dir{font-family:var(--mono);font-size:var(--xs);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+  .nextnav-card .ttl{font-size:var(--sm);font-weight:600;color:var(--ink)}
+  .nextnav-card:hover .ttl{color:var(--accent)}
+  .nextnav-card.next{text-align:right}
+</style>
+<!-- PROPOSED v2 — workstream 008, N13, 2026-09-22. THE BLOCKS: the one page that shows every block and every
+     figure kind, rendered. It is a REFERENCE you consult while writing, never a file you copy.
+
+     WRITING A PAGE TAKES TWO FILES. The PAGE TEMPLATE for the kind you are writing — hub, overview, construct or
+     approach — carries what differs between kinds: the masthead, the sections and their order, the rules that kind
+     answers to. THIS FILE carries what is the same for all of them: normal content, and the blocks. Open both.
+     Fill the page template's sections with normal writing, and reach for a block where the chooser in that
+     template says the content earns one.
+
+     THIS IS AN HTML VOCABULARY. A seat file is markdown and keeps markdown's own components — a table, a fenced
+     block with its language, a list, a quote, an alert, a `dg` fence for a figure. An author writing markdown
+     never names a block. `docs.ts page` reads those components and gives each one the form shown below, which is
+     why the vocabulary can grow without editing a single seat file.
+
+     MOST OF A PAGE IS NOT A BLOCK. Paragraphs, lists, numbered steps and subheadings are what a section is made
+     of; a block is what you drop into that writing when a piece of content must not read as prose. One section or
+     subsection holds normal text and as many blocks as it needs — none, one, or several.
+
+     RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The blocks · § The figures
+     This file carries rules it does not own. The chapter above is the source of truth. Never add a rule here. -->
+<div class="page">
+<nav class="rail" id="rail">
+  <a class="home" href="../../../../README.md">&larr; .spndevex</a>
+  <div class="rail-title">Blocks</div>
+</nav>
+<div class="wrap">
+
+<header class="masthead">
+  <div class="eyebrow"><div class="line line1">SaaS Plane &middot; Foundation &middot; Blocks</div></div>
+  <h1>Every Block, Once</h1>
+  <p class="standfirst">The one source of the sample-block section every page template carries &mdash; each block kind and each figure kind shown once, so an author can see the whole vocabulary before choosing.</p>
+  <p>Writing a page takes two files: the <strong>page template</strong> for the kind you are writing, which carries its masthead and its sections, and <strong>this page</strong>, which carries what every kind shares. Open both. This is a reference you consult, never a file you copy &mdash; and it is an HTML vocabulary: a markdown seat file keeps markdown's own components, and the renderer gives each one the form you see here.</p>
+</header>
+
+<section id="normal">
+  <div class="sec-head"><h2>Normal content &mdash; no block, and no ceremony</h2></div>
+  <p>Most of a page is this: paragraphs, lists, numbered steps and subheadings, written plainly and marked as nothing at all. <strong>A block is not how you write a section.</strong> It is what you drop into the writing when something must not read as prose. So start here, and reach for a block only when the content has a shape of its own.</p>
+  <p>{{A paragraph. Say why before what. <strong>Bold</strong> marks a rule or a term, never emphasis; <em>italic</em> is a phrase quoted from somewhere else; <code>inline code</code> is a literal &mdash; a file, a field, a command. A link sits on the words that name what it opens.}}</p>
+  <h3 id="n-sub">{{A subheading, where a section has parts}}</h3>
+  <p>{{The part, in its own paragraphs. A subsection opens with its own overview, then its details.}}</p>
+  <ul>
+    <li><strong>{{A named point}}</strong> &mdash; {{what it is, and why it is here}}</li>
+    <li><strong>{{A named point}}</strong> &mdash; {{&hellip;}}</li>
+  </ul>
+  <ol>
+    <li>{{A step, where the order is the meaning}}</li>
+    <li>{{&hellip;}}</li>
+  </ol>
+  <p><a class="more" href="#">Read {{the page, by the name it carries}} &rarr;</a> &mdash; the link under a subsection's text, naming what it opens rather than saying &ldquo;read more&rdquo;</p>
+</section>
+
+<section id="blocks" data-block="example">
+  <div class="sec-head"><h2>Every block, once &mdash; delete when the page is written</h2></div>
+  <p>Each one below is a <strong>block</strong>: it carries a border, a background or a form of its own, so a reader sees it is not the surrounding prose before reading a word of it. Use one when the content is a rule, a set, a comparison, a literal, a shape, or a passage that belongs in its own panel.</p>
+  <h3 id="b-prose">PROSE &mdash; the markdown block</h3>
+  <p>{{A passage that explains. Use it wherever the content is plain writing and no other block fits: <strong>REASONS</strong> is for prose that makes a claim and gives grounds, and this is for prose that simply teaches. It carries its own border, background and text colour, so it reads as a block the page chose rather than as the page's own voice continuing. Everything markdown gives you renders inside it.}}</p>
+  <div class="prose">
+  <p>{{A paragraph. <strong>Bold</strong> marks a rule or a term, never emphasis; <em>italic</em> is a phrase quoted from somewhere else; <code>inline code</code> is a literal &mdash; a file, a field, a command. A link sits on the words that name what it opens, never on <a href="#">the whole sentence</a>.}}</p>
+  <ul>
+    <li><strong>{{A named point}}</strong> &mdash; {{what it is, and why it is here}}</li>
+    <li><strong>{{A named point}}</strong> &mdash; {{&hellip;}}</li>
+  </ul>
+  <ol>
+    <li>{{A step, where the order is the meaning}}</li>
+    <li>{{&hellip;}}</li>
+  </ol>
+  <blockquote><p>{{A sentence worth setting apart &mdash; a rule stated in full, or a line quoted from the source the page is about.}}</p></blockquote>
+  </div>
+  <h3 id="b-sequence">SEQUENCE &mdash; steps in order</h3>
+  <p>{{What you are looking at.}}</p>
+  <figure>
+  <svg class="dg" viewBox="18 18 1016 84" width="1016" height="84" role="img" aria-label="{{Three steps in order, left to right.}}">
+    <defs><marker id="ar-blk" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="box em" x="20" y="20" width="300" height="80" rx="3"/><text class="t" x="36" y="48">{{Step}}</text><text class="s" x="36" y="70">{{what it settles}}</text><text class="n" x="36" y="90">{{where it lives}}</text>
+    <path class="c" d="M320 60 H376" marker-end="url(#ar-blk)"/>
+    <rect class="box" x="376" y="20" width="300" height="80" rx="3"/><text class="t" x="392" y="48">{{Step}}</text><text class="s" x="392" y="70">{{what it settles}}</text>
+    <path class="c" d="M676 60 H732" marker-end="url(#ar-blk)"/>
+    <rect class="box" x="732" y="20" width="300" height="80" rx="3"/><text class="t" x="748" y="48">{{Step}}</text><text class="s" x="748" y="70">{{what it settles}}</text>
+  </svg>
+  <figcaption>{{What to notice.}}</figcaption>
+  </figure>
+  <ol>
+    <li><strong>{{Step}}</strong> &mdash; {{what happens, what must be true before it, what it leaves behind}}</li>
+    <li><strong>{{Step}}</strong> &mdash; {{&hellip;}}</li>
+  </ol>
+  <h3 id="b-map">MAP &mdash; the parts of one thing</h3>
+  <p>{{What you are looking at: the whole, then its parts and what flows between them.}}</p>
+  <figure>
+  <svg class="dg" viewBox="18 14 1036 234" width="1036" height="234" role="img" aria-label="{{A whole holding three parts; one part feeds the other two, and a fourth stands beside them.}}">
+    <defs><marker id="ar-blk2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="box off" x="20" y="16" width="1032" height="230" rx="3"/><text class="t" x="36" y="42">{{The whole}}</text>
+    <rect class="box em" x="36" y="62" width="300" height="168" rx="3"/><text class="t" x="52" y="100">{{Part}}</text><text class="s" x="52" y="126">{{what it is}}</text><text class="n" x="52" y="152">{{where it lives}}</text>
+    <path class="c" d="M336 98 H392" marker-end="url(#ar-blk2)"/>
+    <path class="c" d="M336 194 H392" marker-end="url(#ar-blk2)"/>
+    <rect class="box" x="392" y="62" width="280" height="72" rx="3"/><text class="t" x="408" y="92">{{Part}}</text><text class="s" x="408" y="116">{{what it is}}</text>
+    <rect class="box" x="392" y="158" width="280" height="72" rx="3"/><text class="t" x="408" y="188">{{Part}}</text><text class="s" x="408" y="212">{{what it is}}</text>
+    <rect class="box" x="696" y="62" width="340" height="168" rx="3"/><text class="t" x="712" y="100">{{Part}}</text><text class="s" x="712" y="126">{{stands beside}}</text>
+  </svg>
+  <figcaption>{{What to notice: which part everything else reads, and where the boundary is.}}</figcaption>
+  </figure>
+  <h3 id="b-seqdiagram">SEQUENCE figure &mdash; who speaks to whom</h3>
+  <p>{{What you are looking at: the participants, and the order they speak in. Use this instead of a flow whenever more than one party acts and <em>who</em> acted is the thing to see.}}</p>
+  <figure>
+  <svg class="dg" viewBox="58 14 984 306" width="984" height="306" role="img" aria-label="{{Three participants exchanging four messages in order, time running down.}}">
+    <defs><marker id="ar-seq" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="box em" x="60" y="16" width="260" height="48" rx="3"/><text class="t" x="76" y="46">{{Participant}}</text>
+    <rect class="box" x="420" y="16" width="260" height="48" rx="3"/><text class="t" x="436" y="46">{{Participant}}</text>
+    <rect class="box" x="780" y="16" width="260" height="48" rx="3"/><text class="t" x="796" y="46">{{Participant}}</text>
+    <path class="c" data-role="lifeline" d="M190 64 V318" stroke-dasharray="4 5"/>
+    <path class="c" data-role="lifeline" d="M550 64 V318" stroke-dasharray="4 5"/>
+    <path class="c" data-role="lifeline" d="M910 64 V318" stroke-dasharray="4 5"/>
+    <text class="l" x="200" y="104">{{the message it sends}}</text>
+    <path class="c" d="M190 114 H545" marker-end="url(#ar-seq)"/>
+    <text class="l" x="560" y="164">{{what it asks for}}</text>
+    <path class="c" d="M550 174 H905" marker-end="url(#ar-seq)"/>
+    <text class="l" x="560" y="224">{{what comes back &mdash; a reply is dashed}}</text>
+    <path class="c" d="M910 234 H555" stroke-dasharray="6 4" marker-end="url(#ar-seq)"/>
+    <text class="l" x="200" y="284">{{the outcome the first one sees}}</text>
+    <path class="c" d="M550 294 H195" marker-end="url(#ar-seq)"/>
+  </svg>
+  <figcaption>{{What to notice: which party never speaks to which, and where a reply crosses a boundary.}}</figcaption>
+  </figure>
+  <h3 id="b-entities">ENTITIES figure &mdash; what relates to what</h3>
+  <p>{{What you are looking at: the subject at the centre, what points at it, and what it points at. Every line carries its cardinality.}}</p>
+  <figure>
+  <svg class="dg" viewBox="38 38 1034 274" width="1034" height="274" role="img" aria-label="{{One central record, one thing pointing at it, and two things it points at, each relation labelled with its cardinality.}}">
+    <defs><marker id="ar-er" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="box" x="40" y="120" width="250" height="110" rx="3"/><text class="t" x="56" y="152">{{Entity}}</text><text class="s" x="56" y="180">{{the key}}</text><text class="n" x="56" y="208">{{what it is}}</text>
+    <rect class="box em" x="470" y="110" width="250" height="130" rx="3"/><text class="t" x="486" y="142">{{The subject}}</text><text class="s" x="486" y="170">{{the key}}</text><text class="n" x="486" y="196">{{the fields that relate}}</text><text class="n" x="486" y="222">{{what it is}}</text>
+    <rect class="box" x="880" y="40" width="190" height="100" rx="3"/><text class="t" x="896" y="72">{{Entity}}</text><text class="s" x="896" y="100">{{the key}}</text><text class="n" x="896" y="126">{{what it is}}</text>
+    <rect class="box" x="880" y="210" width="190" height="100" rx="3"/><text class="t" x="896" y="242">{{Entity}}</text><text class="s" x="896" y="270">{{the key}}</text><text class="n" x="896" y="296">{{what it is}}</text>
+    <text class="n" x="300" y="166">{{one}}</text><text class="n" x="400" y="166">{{many}}</text>
+    <path class="c" d="M290 175 H470" marker-end="url(#ar-er)"/>
+    <text class="n" x="300" y="200">{{what it means}}</text>
+    <text class="n" x="730" y="142">{{many}}</text><text class="n" x="812" y="82">{{one}}</text>
+    <path class="c" d="M720 150 H800 V90 H880" marker-end="url(#ar-er)"/>
+    <text class="n" x="730" y="192">{{many}}</text><text class="n" x="812" y="252">{{one}}</text>
+    <path class="c" d="M720 200 H800 V260 H880" marker-end="url(#ar-er)"/>
+  </svg>
+  <figcaption>{{What to notice: which way each relation points, and which of them may be absent.}}</figcaption>
+  </figure>
+  <h3 id="b-system">SYSTEM &mdash; the architecture of a thing you build</h3>
+  <p>{{What you are looking at: one bounded thing, its layers in the direction a call travels, and what it talks to outside its boundary. Use it for a server module, a web module, an app or an estate package &mdash; they are the same picture, and drawing them alike is the point.}}</p>
+  <div class="pull">
+    <span class="label">The three rules</span>
+    <p><strong>One outermost container, and it is the thing being described.</strong> Anything outside it is something the thing talks to, so a reader sees what is yours before reading a label. <strong>Inside it, boxes are grouped into layers that run one way</strong> &mdash; the direction a call travels &mdash; so the direction is learned once and never again. <strong>An edge is a call or data, and it carries what flows</strong>; an unlabelled line meaning <em>related</em> is the one thing this kind refuses.</p>
+    <p class="s">It is a MAP with those three rules added, so the drawer is unchanged. MAP keeps its own job: the parts of one thing, where there is no inside and no order.</p>
+  </div>
+  <p class="s">a server module &mdash; read the layers from the bottom: config, the environment it is started with, then app, then entry. Each door is met by the thing that knocks on it, and services and repositories are what reach outside</p>
+  <figure>
+  <svg class="dg" viewBox="18 14 1274 1002" width="1274" height="1002" role="img" aria-label="{{A server module: an ingress reaches the api, an operator the cli, a queue the consumer; inside, config sits under app which sits under entry; services reaches the queue, the cache, the database and the object store, and repositories reaches the database alone.}}">
+    <defs><marker id="ar-sys1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+
+    <rect class="box off" x="20" y="79" width="170" height="80" rx="3"/>
+    <path class="c" data-role="curve" d="M20 101 H190"/>
+    <text class="t" x="36" y="125">{{Browser}}</text><text class="n" x="36" y="147">a client, outside</text>
+    <path class="box" d="M286 79 H396 L436 119 L396 159 H286 Z"/>
+    <text class="t" x="300" y="115">{{Ingress}}</text><text class="n" x="300" y="137">the way in</text>
+
+    <rect class="box off" x="20" y="215" width="170" height="80" rx="3"/>
+    <text class="t" x="36" y="251">{{Terminal}}</text><text class="n" x="36" y="273">an operator, by hand</text>
+
+    <rect class="box off" x="20" y="415" width="170" height="80" rx="3"/>
+    <text class="t" x="36" y="451">{{Scheduler}}</text><text class="n" x="36" y="473">starts work on time</text>
+    <rect class="box" x="286" y="415" width="150" height="80" rx="3"/>
+    <ellipse class="box" cx="286" cy="455" rx="18" ry="40"/>
+    <ellipse class="box" cx="436" cy="455" rx="18" ry="40"/>
+    <text class="t" x="312" y="451">{{Queue}}</text><text class="n" x="312" y="473">work, in order</text>
+
+    <rect class="box off" x="560" y="16" width="320" height="976" rx="3"/><text class="t" x="576" y="42">{{module-server-iam-ts}}</text>
+    <rect class="box off" x="580" y="56" width="280" height="442" rx="3"/><text class="t" x="596" y="80">Entry</text>
+    <rect class="box" x="596" y="92" width="248" height="54" rx="3"/><text class="t" x="612" y="124">api</text>
+    <rect class="box" x="596" y="228" width="248" height="54" rx="3"/><text class="t" x="612" y="260">cli</text>
+    <rect class="box" x="596" y="428" width="248" height="54" rx="3"/><text class="t" x="612" y="460">queue</text>
+    <rect class="box off" x="580" y="554" width="280" height="260" rx="3"/><text class="t" x="596" y="578">App</text>
+    <rect class="box em" x="596" y="590" width="248" height="130" rx="3"/><text class="t" x="612" y="624">services</text><text class="n" x="612" y="646">every guarantee lives here</text>
+    <rect class="box" x="596" y="744" width="248" height="54" rx="3"/><text class="t" x="612" y="776">repositories</text>
+    <rect class="box off" x="580" y="870" width="280" height="106" rx="3"/><text class="t" x="596" y="894">Config</text>
+    <rect class="box" x="596" y="906" width="248" height="54" rx="3"/><text class="t" x="612" y="932">environment variables</text><text class="n" x="612" y="952">what it is told at start</text>
+
+    <rect class="box off" x="1100" y="577" width="190" height="90" rx="3"/>
+    <ellipse class="box" cx="1195" cy="577" rx="95" ry="13"/>
+    <text class="t" x="1116" y="629">{{Cache}}</text><text class="n" x="1116" y="651">losing it costs time</text>
+    <rect class="box" x="1100" y="896" width="190" height="90" rx="3"/>
+    <ellipse class="box" cx="1195" cy="896" rx="95" ry="13"/>
+    <text class="t" x="1116" y="948">{{Database}}</text><text class="n" x="1116" y="970">the record</text>
+    <path class="box" d="M1100 750 H1290 L1270 840 H1120 Z"/>
+    <text class="t" x="1130" y="790">{{Object store}}</text><text class="n" x="1130" y="812">files, not rows</text>
+
+    <text class="n" x="203" y="111">{{arrives}}</text>
+    <path class="c" d="M190 119 H286" marker-end="url(#ar-sys1)"/>
+    <text class="n" x="460" y="97">{{calls}}</text>
+    <path class="c" d="M436 119 V105 H596" marker-end="url(#ar-sys1)"/>
+    <text class="n" x="210" y="247">{{runs a command}}</text>
+    <path class="c" d="M190 255 H596" marker-end="url(#ar-sys1)"/>
+    <text class="n" x="250" y="347">{{calls the api instead}}</text>
+    <path class="c" d="M105 415 V355 H490 V132 H596" marker-end="url(#ar-sys1)"/>
+    <text class="n" x="200" y="447">{{enqueues}}</text>
+    <path class="c" d="M190 455 H286" marker-end="url(#ar-sys1)"/>
+    <text class="n" x="460" y="447">{{pulls}}</text>
+    <path class="c" d="M436 455 H596" marker-end="url(#ar-sys1)"/>
+
+    <path class="c" d="M720 498 V554" marker-end="url(#ar-sys1)"/>
+    <path class="c" d="M720 814 V870" marker-end="url(#ar-sys1)"/>
+
+    <text class="n" x="452" y="516">{{puts work}}</text>
+    <path class="c" d="M596 622 H500 V524 H361 V495" marker-end="url(#ar-sys1)"/>
+    <text class="n" x="200" y="548">{{creates a schedule}}</text>
+    <path class="c" d="M596 687 H540 V556 H105 V495" marker-end="url(#ar-sys1)"/>
+
+    <text class="n" x="896" y="614">{{caches}}</text>
+    <path class="c" d="M844 622 H1100" marker-end="url(#ar-sys1)"/>
+    <text class="n" x="896" y="647">{{commits}}</text>
+    <path class="c" d="M844 655 H1060 V918 H1100" marker-end="url(#ar-sys1)"/>
+    <text class="n" x="896" y="679">{{files}}</text>
+    <path class="c" d="M844 687 H980 V795 H1110" marker-end="url(#ar-sys1)"/>
+    <text class="n" x="896" y="763">{{rows}}</text>
+    <path class="c" d="M844 771 H1020 V963 H1100" marker-end="url(#ar-sys1)"/>
+  </svg>
+  <figcaption>{{What to notice: read the layers from the bottom &mdash; config, then app, then entry &mdash; and every door of the entry layer is met by the thing that knocks on it. Services is what reaches outward: it puts work in the queue, caches, commits a transaction and writes files. Repositories reaches one resource and one only, the database. Files are not its business, and that single edge is what makes it the storage seam.}}</figcaption>
+  </figure>
+  <p class="s">a web module &mdash; the same skeleton, drawn to the same coordinates as the server above. Read it from the bottom too: config, then app, then entry</p>
+  <figure>
+  <svg class="dg" viewBox="18 14 1274 1002" width="1274" height="1002" role="img" aria-label="{{A web module drawn on the same skeleton as the server module: a person through the router reaches the pages, a deep link reaches a route, a push channel reaches the subscriptions; hooks and stores are what reach outside.}}">
+    <defs><marker id="ar-sys2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+
+    <rect class="box off" x="20" y="79" width="170" height="80" rx="3"/>
+    <path class="c" data-role="curve" d="M20 101 H190"/>
+    <text class="t" x="36" y="125">{{Person}}</text><text class="n" x="36" y="147">at a screen, outside</text>
+    <path class="box" d="M286 79 H396 L436 119 L396 159 H286 Z"/>
+    <text class="t" x="300" y="115">{{Router}}</text><text class="n" x="300" y="137">the way in</text>
+
+    <rect class="box off" x="20" y="215" width="170" height="80" rx="3"/>
+    <text class="t" x="36" y="251">{{Deep link}}</text><text class="n" x="36" y="273">a url from elsewhere</text>
+
+    <rect class="box off" x="20" y="415" width="170" height="80" rx="3"/>
+    <text class="t" x="36" y="451">{{Push channel}}</text><text class="n" x="36" y="473">the server speaks first</text>
+    <rect class="box" x="286" y="415" width="150" height="80" rx="3"/>
+    <ellipse class="box" cx="286" cy="455" rx="18" ry="40"/>
+    <ellipse class="box" cx="436" cy="455" rx="18" ry="40"/>
+    <text class="t" x="312" y="451">{{Events}}</text><text class="n" x="312" y="473">messages, in order</text>
+
+    <rect class="box off" x="560" y="16" width="320" height="976" rx="3"/><text class="t" x="576" y="42">{{module-web-iam-ts}}</text>
+    <rect class="box off" x="580" y="56" width="280" height="442" rx="3"/><text class="t" x="596" y="80">Entry</text>
+    <rect class="box" x="596" y="92" width="248" height="54" rx="3"/><text class="t" x="612" y="124">pages</text>
+    <rect class="box" x="596" y="228" width="248" height="54" rx="3"/><text class="t" x="612" y="260">routes</text>
+    <rect class="box" x="596" y="428" width="248" height="54" rx="3"/><text class="t" x="612" y="460">subscriptions</text>
+    <rect class="box off" x="580" y="554" width="280" height="260" rx="3"/><text class="t" x="596" y="578">App</text>
+    <rect class="box em" x="596" y="590" width="248" height="130" rx="3"/><text class="t" x="612" y="624">hooks</text><text class="n" x="612" y="646">every guarantee lives here</text>
+    <rect class="box" x="596" y="744" width="248" height="54" rx="3"/><text class="t" x="612" y="776">stores</text>
+    <rect class="box off" x="580" y="870" width="280" height="106" rx="3"/><text class="t" x="596" y="894">Config</text>
+    <rect class="box" x="596" y="906" width="248" height="54" rx="3"/><text class="t" x="612" y="932">build-time settings</text><text class="n" x="612" y="952">what it is built with</text>
+
+    <rect class="box off" x="1100" y="577" width="190" height="90" rx="3"/>
+    <ellipse class="box" cx="1195" cy="577" rx="95" ry="13"/>
+    <text class="t" x="1116" y="629">{{Browser storage}}</text><text class="n" x="1116" y="651">losing it costs nothing</text>
+    <rect class="box" x="1100" y="896" width="190" height="90" rx="3"/>
+    <ellipse class="box" cx="1195" cy="896" rx="95" ry="13"/>
+    <text class="t" x="1116" y="948">{{The api}}</text><text class="n" x="1116" y="970">the server module</text>
+    <path class="box" d="M1100 750 H1290 L1270 840 H1120 Z"/>
+    <text class="t" x="1130" y="790">{{Asset CDN}}</text><text class="n" x="1130" y="812">images and bundles</text>
+
+    <text class="n" x="203" y="111">{{arrives}}</text>
+    <path class="c" d="M190 119 H286" marker-end="url(#ar-sys2)"/>
+    <text class="n" x="460" y="97">{{renders}}</text>
+    <path class="c" d="M436 119 V105 H596" marker-end="url(#ar-sys2)"/>
+    <text class="n" x="210" y="247">{{opens a route}}</text>
+    <path class="c" d="M190 255 H596" marker-end="url(#ar-sys2)"/>
+    <text class="n" x="250" y="347">{{or opens a page instead}}</text>
+    <path class="c" d="M105 415 V355 H490 V132 H596" marker-end="url(#ar-sys2)"/>
+    <text class="n" x="200" y="447">{{sends}}</text>
+    <path class="c" d="M190 455 H286" marker-end="url(#ar-sys2)"/>
+    <text class="n" x="460" y="447">{{subscribes}}</text>
+    <path class="c" d="M436 455 H596" marker-end="url(#ar-sys2)"/>
+
+    <path class="c" d="M720 498 V554" marker-end="url(#ar-sys2)"/>
+    <path class="c" d="M720 814 V870" marker-end="url(#ar-sys2)"/>
+
+    <text class="n" x="452" y="516">{{emits}}</text>
+    <path class="c" d="M596 622 H500 V524 H361 V495" marker-end="url(#ar-sys2)"/>
+    <text class="n" x="200" y="548">{{opens the channel}}</text>
+    <path class="c" d="M596 687 H540 V556 H105 V495" marker-end="url(#ar-sys2)"/>
+
+    <text class="n" x="896" y="614">{{caches}}</text>
+    <path class="c" d="M844 622 H1100" marker-end="url(#ar-sys2)"/>
+    <text class="n" x="896" y="647">{{calls}}</text>
+    <path class="c" d="M844 655 H1060 V918 H1100" marker-end="url(#ar-sys2)"/>
+    <text class="n" x="896" y="679">{{assets}}</text>
+    <path class="c" d="M844 687 H980 V795 H1110" marker-end="url(#ar-sys2)"/>
+    <text class="n" x="896" y="763">{{reads}}</text>
+    <path class="c" d="M844 771 H1020 V963 H1100" marker-end="url(#ar-sys2)"/>
+  </svg>
+  <figcaption>{{What to notice: it is the server figure with different words. A person arrives through the router, a deep link lands straight on a route, a push channel feeds the subscriptions. Hooks is what reaches outward &mdash; it subscribes, caches, and writes assets &mdash; and stores reaches one thing only, the api. That a web module and a server module have the same drawing is the claim this kind exists to make.}}</figcaption>
+  </figure>
+  <p class="s">an estate package &mdash; the same skeleton again. Here the layers are containment rather than call order, and it still reads from the bottom: what is declared, then what runs, then what is reachable</p>
+  <figure>
+  <svg class="dg" viewBox="18 14 1274 1002" width="1274" height="1002" role="img" aria-label="{{A cloud account drawn on the same skeleton: the public internet through dns reaches the public subnet, an operator reaches the bastion, a peered account reaches the peering link; compute is what reaches the managed resources.}}">
+    <defs><marker id="ar-sys3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+
+    <rect class="box off" x="20" y="79" width="170" height="80" rx="3"/>
+    <path class="c" data-role="curve" d="M20 101 H190"/>
+    <text class="t" x="36" y="125">{{Public internet}}</text><text class="n" x="36" y="147">outside every boundary</text>
+    <path class="box" d="M286 79 H396 L436 119 L396 159 H286 Z"/>
+    <text class="t" x="300" y="115">{{DNS}}</text><text class="n" x="300" y="137">the way in</text>
+
+    <rect class="box off" x="20" y="215" width="170" height="80" rx="3"/>
+    <text class="t" x="36" y="251">{{An operator}}</text><text class="n" x="36" y="273">with a named session</text>
+
+    <rect class="box off" x="20" y="415" width="170" height="80" rx="3"/>
+    <text class="t" x="36" y="451">{{A peer}}</text><text class="n" x="36" y="473">an account you trust</text>
+    <rect class="box" x="286" y="415" width="150" height="80" rx="3"/>
+    <ellipse class="box" cx="286" cy="455" rx="18" ry="40"/>
+    <ellipse class="box" cx="436" cy="455" rx="18" ry="40"/>
+    <text class="t" x="312" y="451">{{Peering}}</text><text class="n" x="312" y="473">traffic, one way</text>
+
+    <rect class="box off" x="560" y="16" width="320" height="976" rx="3"/><text class="t" x="576" y="42">{{account-spn-prod}}</text>
+    <rect class="box off" x="580" y="56" width="280" height="442" rx="3"/><text class="t" x="596" y="80">Entry</text>
+    <rect class="box" x="596" y="92" width="248" height="54" rx="3"/><text class="t" x="612" y="124">public subnet</text>
+    <rect class="box" x="596" y="228" width="248" height="54" rx="3"/><text class="t" x="612" y="260">bastion</text>
+    <rect class="box" x="596" y="428" width="248" height="54" rx="3"/><text class="t" x="612" y="460">peering endpoint</text>
+    <rect class="box off" x="580" y="554" width="280" height="260" rx="3"/><text class="t" x="596" y="578">App</text>
+    <rect class="box em" x="596" y="590" width="248" height="130" rx="3"/><text class="t" x="612" y="624">compute</text><text class="n" x="612" y="646">what actually runs</text>
+    <rect class="box" x="596" y="744" width="248" height="54" rx="3"/><text class="t" x="612" y="776">workers</text>
+    <rect class="box off" x="580" y="870" width="280" height="106" rx="3"/><text class="t" x="596" y="894">Config</text>
+    <rect class="box" x="596" y="906" width="248" height="54" rx="3"/><text class="t" x="612" y="932">declared variables</text><text class="n" x="612" y="952">what the account is given</text>
+
+    <rect class="box off" x="1100" y="577" width="190" height="90" rx="3"/>
+    <ellipse class="box" cx="1195" cy="577" rx="95" ry="13"/>
+    <text class="t" x="1116" y="629">{{Secret store}}</text><text class="n" x="1116" y="651">losing it costs everything</text>
+    <rect class="box" x="1100" y="896" width="190" height="90" rx="3"/>
+    <ellipse class="box" cx="1195" cy="896" rx="95" ry="13"/>
+    <text class="t" x="1116" y="948">{{Managed database}}</text><text class="n" x="1116" y="970">the record</text>
+    <path class="box" d="M1100 750 H1290 L1270 840 H1120 Z"/>
+    <text class="t" x="1130" y="790">{{Bucket}}</text><text class="n" x="1130" y="812">objects, not rows</text>
+
+    <text class="n" x="203" y="111">{{resolves}}</text>
+    <path class="c" d="M190 119 H286" marker-end="url(#ar-sys3)"/>
+    <text class="n" x="460" y="97">{{routes to}}</text>
+    <path class="c" d="M436 119 V105 H596" marker-end="url(#ar-sys3)"/>
+    <text class="n" x="210" y="247">{{opens a session}}</text>
+    <path class="c" d="M190 255 H596" marker-end="url(#ar-sys3)"/>
+    <text class="n" x="250" y="347">{{or reaches the subnet}}</text>
+    <path class="c" d="M105 415 V355 H490 V132 H596" marker-end="url(#ar-sys3)"/>
+    <text class="n" x="200" y="447">{{sends}}</text>
+    <path class="c" d="M190 455 H286" marker-end="url(#ar-sys3)"/>
+    <text class="n" x="460" y="447">{{accepts}}</text>
+    <path class="c" d="M436 455 H596" marker-end="url(#ar-sys3)"/>
+
+    <path class="c" d="M720 498 V554" marker-end="url(#ar-sys3)"/>
+    <path class="c" d="M720 814 V870" marker-end="url(#ar-sys3)"/>
+
+    <text class="n" x="452" y="516">{{answers}}</text>
+    <path class="c" d="M596 622 H500 V524 H361 V495" marker-end="url(#ar-sys3)"/>
+    <text class="n" x="200" y="548">{{authorises the peer}}</text>
+    <path class="c" d="M596 687 H540 V556 H105 V495" marker-end="url(#ar-sys3)"/>
+
+    <text class="n" x="896" y="614">{{reads}}</text>
+    <path class="c" d="M844 622 H1100" marker-end="url(#ar-sys3)"/>
+    <text class="n" x="896" y="647">{{writes}}</text>
+    <path class="c" d="M844 655 H1060 V918 H1100" marker-end="url(#ar-sys3)"/>
+    <text class="n" x="896" y="679">{{objects}}</text>
+    <path class="c" d="M844 687 H980 V795 H1110" marker-end="url(#ar-sys3)"/>
+    <text class="n" x="896" y="763">{{queries}}</text>
+    <path class="c" d="M844 771 H1020 V963 H1100" marker-end="url(#ar-sys3)"/>
+  </svg>
+  <figcaption>{{What to notice: the third drawing of the same figure. The public internet arrives through dns, an operator arrives at the bastion, a peered account arrives at the peering link. Compute is what reaches outward &mdash; the secret store, the managed database, the bucket &mdash; and the workers reach one thing only. Server, web and estate are one shape, which is the whole reason this kind is not three kinds.}}</figcaption>
+  </figure>
+  <h3 id="b-flowchart">FLOWCHART &mdash; a path somebody takes, in the shapes a flowchart has</h3>
+  <p>{{What you are looking at: where the path starts, each step, and the points where it branches. Use this rather than a <strong>MAP</strong> whenever the content is a path rather than a set of parts &mdash; a MAP answers <em>what is this made of</em>, a flowchart answers <em>what happens, and where does it turn</em>. The shape carries the meaning, so a reader reads the picture before the labels.}}</p>
+  <figure>
+  <svg class="dg" viewBox="38 10 1024 384" width="1024" height="384" role="img" aria-label="{{A flowchart: a rounded terminator starts it, a process step follows, a diamond branches two ways into an input shape and a predefined process, and both reach the end through a data store and an on-page connector.}}">
+    <defs><marker id="ar-flow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+
+    <rect class="box em" x="40" y="30" width="180" height="52" rx="26"/><text class="t" x="70" y="62">{{Start}}</text>
+    <path class="c" d="M220 56 H280" marker-end="url(#ar-flow)"/>
+    <rect class="box" x="280" y="30" width="220" height="52" rx="3"/><text class="t" x="300" y="62">{{A step}}</text>
+    <path class="c" d="M500 56 H560" marker-end="url(#ar-flow)"/>
+
+    <path class="box" d="M700 12 L840 56 L700 100 L560 56 Z"/><text class="l" x="643" y="61">{{A decision?}}</text>
+
+    <text class="n" x="708" y="140">{{no}}</text>
+    <path class="c" d="M700 100 V190" marker-end="url(#ar-flow)"/>
+    <text class="n" x="880" y="46">{{yes}}</text>
+    <path class="c" d="M840 56 H970 V190" marker-end="url(#ar-flow)"/>
+
+    <path class="box" d="M590 190 L820 190 L790 242 L560 242 Z"/><text class="t" x="600" y="222">{{Read input}}</text>
+    <rect class="box" x="880" y="190" width="180" height="52" rx="3"/><text class="t" x="908" y="222">{{A routine}}</text>
+    <path class="c" d="M892 190 V242"/><path class="c" d="M1048 190 V242"/>
+
+    <path class="box" d="M40 336 C40 327 85 320 140 320 C195 320 240 327 240 336 L240 376 C240 385 195 392 140 392 C85 392 40 385 40 376 Z"/><text class="t" x="80" y="362">{{Stored}}</text>
+    <circle class="box" cx="560" cy="356" r="22"/><text class="n" x="551" y="361">{{A}}</text>
+    <rect class="box em" x="880" y="330" width="180" height="52" rx="26"/><text class="t" x="916" y="362">{{End}}</text>
+
+    <path class="c" d="M240 356 H538" marker-end="url(#ar-flow)"/>
+    <path class="c" d="M582 356 H700" marker-end="url(#ar-flow)"/>
+    <path class="c" d="M700 242 V356 H880" marker-end="url(#ar-flow)"/>
+    <path class="c" d="M970 242 V330" marker-end="url(#ar-flow)"/>
+  </svg>
+  <figcaption>{{What to notice: every branch leaves the diamond with its answer written on it, and the path only ever moves down and to the right.}}</figcaption>
+  </figure>
+  <div class="scroll"><table>
+    <thead><tr><th>Shape</th><th>Means</th><th>Drawn as</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Terminator</strong></td><td>where the path starts, and where it ends</td><td>a rectangle with fully rounded ends</td></tr>
+      <tr><td><strong>Process</strong></td><td>one step: something is done</td><td>a plain rectangle</td></tr>
+      <tr><td><strong>Decision</strong></td><td>the path branches, and each branch carries its answer</td><td>a diamond</td></tr>
+      <tr><td><strong>Input or output</strong></td><td>something is read in or handed back</td><td>a parallelogram</td></tr>
+      <tr><td><strong>Predefined process</strong></td><td>a step defined somewhere else &mdash; a routine, a command, another flow</td><td>a rectangle with a bar down each side</td></tr>
+      <tr><td><strong>Data store</strong></td><td>something is read from or written to a store</td><td>a cylinder</td></tr>
+      <tr><td><strong>On-page connector</strong></td><td>the path continues from the matching letter, where a line would cross the page</td><td>a small circle with a letter in it</td></tr>
+    </tbody>
+  </table></div>
+  <h3 id="b-architecture">MAP figure, at its hardest &mdash; a cloud estate</h3>
+  <p>{{What you are looking at: the accounts an organization holds, then one of them opened up. This is still a MAP &mdash; containers holding boxes &mdash; and it holds the nesting rule: the account holds the network, the network holds the subnets, and nothing goes deeper. A third level is the first thing you will want and the first thing to cut.}}</p>
+  <figure>
+  <svg class="dg" viewBox="18 14 1064 578" width="1064" height="578" role="img" aria-label="{{A cloud organization holding four accounts, and one account opened to show its network, its three subnets and the services beside them.}}">
+    <defs><marker id="ar-arch" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="box off" x="20" y="16" width="1060" height="134" rx="3"/><text class="t" x="36" y="42">{{Cloud organization}}</text>
+    <rect class="box" x="40" y="62" width="240" height="72" rx="3"/><text class="t" x="56" y="88">{{Management}}</text><text class="n" x="56" y="112">{{users, policies, the root}}</text>
+    <rect class="box" x="300" y="62" width="240" height="72" rx="3"/><text class="t" x="316" y="88">{{Control centre}}</text><text class="n" x="316" y="112">{{registries, state, logs}}</text>
+    <rect class="box" x="560" y="62" width="240" height="72" rx="3"/><text class="t" x="576" y="88">{{Non-production}}</text><text class="n" x="576" y="112">{{dev &middot; qa &middot; uat}}</text>
+    <rect class="box em" x="820" y="62" width="240" height="72" rx="3"/><text class="t" x="836" y="88">{{Production}}</text><text class="n" x="836" y="112">{{live, one per region}}</text>
+    <rect class="box off" x="20" y="190" width="1060" height="400" rx="3"/><text class="t" x="36" y="216">{{Inside one account}}</text>
+    <rect class="box off" x="40" y="236" width="660" height="300" rx="3"/><text class="t" x="56" y="262">{{Network}}</text>
+    <rect class="box" x="60" y="282" width="250" height="90" rx="3"/><text class="t" x="76" y="308">{{Public subnet}}</text><text class="s" x="76" y="332">{{the only way in}}</text><text class="n" x="76" y="356">{{load balancer}}</text>
+    <rect class="box em" x="366" y="282" width="314" height="90" rx="3"/><text class="t" x="382" y="308">{{Private subnet}}</text><text class="s" x="382" y="332">{{no route from outside}}</text><text class="n" x="382" y="356">{{cluster nodes, workers}}</text>
+    <rect class="box" x="60" y="428" width="620" height="80" rx="3"/><text class="t" x="76" y="454">{{Data subnet}}</text><text class="n" x="76" y="480">{{database, cache, queue}}</text>
+    <rect class="box" x="720" y="236" width="340" height="76" rx="3"/><text class="t" x="736" y="262">{{Identity and access}}</text><text class="n" x="736" y="288">{{roles a workload assumes}}</text>
+    <rect class="box" x="720" y="328" width="340" height="76" rx="3"/><text class="t" x="736" y="354">{{Secrets and keys}}</text><text class="n" x="736" y="380">{{no long-lived credential}}</text>
+    <rect class="box" x="720" y="430" width="340" height="76" rx="3"/><text class="t" x="736" y="456">{{Object storage}}</text><text class="n" x="736" y="482">{{buckets, lifecycle rules}}</text>
+    <path class="c" d="M310 327 H366" marker-end="url(#ar-arch)"/>
+    <path class="c" d="M523 372 V400 H370 V428" marker-end="url(#ar-arch)"/>
+    <text class="n" x="532" y="404">{{only from private}}</text>
+    <path class="c" d="M680 468 H720" marker-end="url(#ar-arch)"/>
+  </svg>
+  <figcaption>{{What to notice: nothing reaches the data subnet from outside, and every account is the same shape at a different size.}}</figcaption>
+  </figure>
+  <h3 id="b-catalog">CATALOG &mdash; a fixed list, one line each</h3>
+  <p>{{What the set is, and the rule that decides what is in it.}}</p>
+  <div class="tiles">
+    <div class="tile"><h4>{{Thing}}</h4><p>{{one line: what it is for}}</p><p class="s"><code>{{its literal}}</code></p></div>
+    <div class="tile"><h4>{{Thing}}</h4><p>{{&hellip;}}</p><p class="s"><code>{{its literal}}</code></p></div>
+    <div class="tile"><h4>{{Thing}}</h4><p>{{&hellip;}}</p><p class="s"><code>{{its literal}}</code></p></div>
+  </div>
+  <h3 id="b-comparison">COMPARISON &mdash; things side by side</h3>
+  <div class="scroll"><table>
+    <thead><tr><th></th><th>{{A reader's question}}</th><th>{{A reader's question}}</th></tr></thead>
+    <tbody><tr><td><strong>{{Thing}}</strong></td><td>{{&hellip;}}</td><td>{{&hellip;}}</td></tr><tr><td><strong>{{Thing}}</strong></td><td>{{&hellip;}}</td><td>{{&hellip;}}</td></tr></tbody>
+  </table></div>
+  <h3 id="b-must">MUST &mdash; a rule</h3>
+  <div class="pull">
+    <span class="label">Must</span>
+    <p><strong>{{The rule, in one sentence.}}</strong> {{Who it binds, what it binds them to, and what happens when it is broken.}}</p>
+    <p class="s">Check it with <code>{{command}}</code>.</p>
+  </div>
+  <h3 id="b-example">EXAMPLE &mdash; faster to see, with a CODE figure</h3>
+  <p>{{One sentence saying what you are looking at.}}</p>
+  <pre data-lang="ts"><span class="tk-k">export</span> <span class="tk-k">enum</span> <span class="tk-t">{{SPContractType}}</span> {
+  {{MEMBER}} = <span class="tk-s">'{{member}}'</span>,   <span class="tk-c">// what this member means</span>
+}</pre>
+  <p>{{One sentence saying what to notice.}}</p>
+  <h3 id="b-code">CODE &mdash; one block per language the renderer colours</h3>
+  <p>{{Tag every block with its language. An untagged block is never coloured, and the colouring is added when the page is produced &mdash; these samples are the real output, not hand-written spans.}}</p>
+  <p class="s">ts &mdash; a contract as it is declared, a comment per member</p>
+  <pre data-lang="ts"><span class="tk-k">export</span> <span class="tk-k">interface</span> <span class="tk-t">SPSchemaRepo</span> {
+  <span class="tk-k">type</span>: <span class="tk-t">SPSchemaRepoType</span>;   <span class="tk-c">// the world, and the whole of what a tool dispatches on</span>
+  name: <span class="tk-t">CDTString</span>;          <span class="tk-c">// what a person calls this repository</span>
+  config: <span class="tk-t">SPSchemaRepoConfig</span> | <span class="tk-k">null</span>;
+}</pre>
+  <p class="s">json &mdash; a manifest, with real values</p>
+  <pre data-lang="json">{
+  <span class="tk-s">"type"</span>: <span class="tk-s">"APPS"</span>,
+  <span class="tk-s">"name"</span>: <span class="tk-s">"Platform"</span>,
+  <span class="tk-s">"config"</span>: { <span class="tk-s">"stack"</span>: <span class="tk-s">"TS"</span>, <span class="tk-s">"deploys"</span>: <span class="tk-k">true</span>, <span class="tk-s">"platform"</span>: <span class="tk-k">null</span> }
+}</pre>
+  <p class="s">yaml &mdash; a declaration a person edits</p>
+  <pre data-lang="yaml"><span class="tk-c"># one environment row, as the estate declares it</span>
+setup: dev
+region: in
+deploy:
+  mtype: BRANCH
+  branch: develop</pre>
+  <p class="s">sql &mdash; the authoritative shape of a table</p>
+  <pre data-lang="sql"><span class="tk-k">CREATE</span> <span class="tk-k">TABLE</span> iam_identity (
+  id CHAR(<span class="tk-n">26</span>) <span class="tk-k">PRIMARY</span> <span class="tk-k">KEY</span>,
+  handle VARCHAR(<span class="tk-n">180</span>) <span class="tk-k">NOT</span> <span class="tk-k">NULL</span> <span class="tk-k">UNIQUE</span>,
+  created_at TIMESTAMPTZ <span class="tk-k">DEFAULT</span> now()
+);</pre>
+  <p class="s">sh &mdash; a command somebody else can run</p>
+  <pre data-lang="sh"><span class="tk-c"># bring a repository to the standard, then wire its agent</span>
+spnutils repo create platform
+spnutils repo agent-sync</pre>
+  <p class="s">md &mdash; markdown shown as source, when the page is about the markup</p>
+  <pre data-lang="md">## Terms
+
+| Term | Contract term | What it means |
+| --- | --- | --- |
+| Estate | <span class="tk-s">`SPEstate`</span> | everything one company&#x27;s work runs on |</pre>
+  <p class="s">no language &mdash; output, a path, a name pattern: nothing to colour</p>
+  <pre>{{org}}-{{spc}}-{{env}}-{{region}}
+&rarr; spn-dmo-live-in</pre>
+  <h3 id="b-tree">TREE &mdash; a hierarchy, as a text block</h3>
+  <pre>{{root}}/
+├── {{child}}/        {{what it holds}}
+│   └── {{leaf}}      {{what it is}}
+└── {{child}}         {{what it is}}</pre>
+  <h3 id="b-diff">DIFF &mdash; what a file says today and what it will say (approach pages only)</h3>
+  <pre data-lang="diff"><span class="tk-del">- what the file says today</span>
+<span class="tk-add">+ what it will say</span></pre>
+  <h3 id="b-glossary">GLOSSARY &mdash; the words, in the order a reader meets them</h3>
+  <p class="s">On a <strong>domain overview</strong> this region is generated by <code>docs.ts face</code> from the constructs' <code>Terms</code> tables, grouped by construct in the domain's reading order. On a <strong>hub</strong> it is written by hand and carries <strong>two</strong> columns: a hub names the book's own structural words, and 9 of the foundation hub's 11 have no contract term at all.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <tbody><tr><td>{{Estate}}</td><td><code>{{SPEstate}}</code></td><td>{{a definition the reader understands on this line}}</td></tr></tbody>
+  </table></div>
+  <h3 id="b-cards">CARDS &mdash; navigation, on a hub</h3>
+  <div class="tiles">
+    <div class="tile"><h4><a href="#">{{Reading path}}</a></h4><p>{{what the path covers, in one line}}</p><a class="more" href="#">Read more &rarr;</a></div>
+    <div class="tile"><h4><a href="#">{{Reading path}}</a></h4><p>{{&hellip;}}</p><a class="more" href="#">Read more &rarr;</a></div>
+  </div>
+  <p><a class="more" href="#">Read {{the page, by the name it carries}} &rarr;</a> {{&mdash; the link under a subsection's text, when it has one path}}</p>
+  <h3 id="b-next">NEXT &mdash; the two doors either side of here</h3>
+  <p>{{Small on purpose: a title and a direction. A reader leaving a page wants the next page, not a paragraph about it.}}</p>
+  <div class="nextnav">
+    <a class="nextnav-card" href="#"><span class="dir">&larr; Previous</span><span class="ttl">{{The page before this one}}</span></a>
+    <a class="nextnav-card next" href="#"><span class="dir">Next &rarr;</span><span class="ttl">{{The page after this one}}</span></a>
+  </div>
+</section>
+
+</div>
+</div>
+<script>
+(function(){
+  var rail=document.getElementById('rail');if(!rail)return;
+  var secs=Array.prototype.slice.call(document.querySelectorAll('section[id]'));
+  var links=[];
+  secs.forEach(function(s){
+    var num=s.querySelector('.sec-head .num'),h2=s.querySelector('h2');if(!h2)return;
+    var a=document.createElement('a');a.href='#'+s.id;
+    var n=document.createElement('span');n.className='n';n.textContent=num?num.textContent:'';
+    var t=document.createElement('span');t.textContent=h2.textContent.split(' — ')[0];
+    a.appendChild(n);a.appendChild(t);
+    if(s.id==='s4'){var c=s.querySelectorAll('.open').length;if(c){var b=document.createElement('span');b.className='count';b.textContent=c;a.appendChild(b);}}
+    rail.appendChild(a);links.push({el:a,sec:s});
+    Array.prototype.forEach.call(s.querySelectorAll('h3[id]'),function(h){
+      var sa=document.createElement('a');sa.href='#'+h.id;sa.className='sub';sa.textContent=h.textContent;rail.appendChild(sa);
+    });
+  });
+  function mark(){var y=window.scrollY+120,cur=links[0];links.forEach(function(l){if(l.sec.offsetTop<=y)cur=l;});links.forEach(function(l){l.el.classList.toggle('on',l===cur);});}
+  window.addEventListener('scroll',mark,{passive:true});mark();
+})();
+</script>
+<script>
+(function(){
+  var rail = document.getElementById('rail-list') || document.getElementById('rail');
+  if (!rail || rail.querySelector('.sub-group')) return;
+  var styled = document.getElementById('rail') || rail;
+
+  /* The caret and the group are one state with two faces. Writing both here is what stops the
+     caret claiming a section is open while its subsections are hidden. */
+  function setOpen(anchor, group, open){
+    group.classList.toggle('shown', open);
+    anchor.classList.toggle('group-open', open);
+    anchor.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+
+  /* Regroup whatever the page's own builder produced: a section anchor, then the `sub` anchors
+     that follow it, moved into one collapsing group. */
+  var entries = [], current = null;
+  Array.prototype.slice.call(rail.children).forEach(function(node){
+    if (node.tagName !== 'A' || node.classList.contains('home')) return;
+    if (node.classList.contains('sub')) {
+      if (!current) return;
+      if (!current.group) {
+        current.group = document.createElement('div');
+        current.group.className = 'sub-group';
+        rail.insertBefore(current.group, node);
+      }
+      current.group.appendChild(node);
+      return;
+    }
+    current = { anchor: node, group: null };
+    entries.push(current);
+  });
+
+  entries.forEach(function(entry){
+    if (!entry.group) return;                     // a section with no second level never folds
+    var anchor = entry.anchor, group = entry.group;
+    anchor.classList.add('has-subs');
+    var caret = document.createElement('span');
+    caret.className = 'caret';
+    caret.setAttribute('role', 'button');
+    caret.setAttribute('tabindex', '-1');
+    caret.setAttribute('aria-label', 'Show sections under ' + anchor.textContent.trim());
+    anchor.appendChild(caret);
+    /* The caret toggles without leaving the page; the label still navigates. Hit-testing the
+       element beats measuring offsetX, which broke the moment the caret moved to the right. */
+    anchor.addEventListener('click', function(event){
+      if (event.target !== caret) return;
+      event.preventDefault();
+      /* `pinned` means a reader decided, so the scroll must stop overriding them. */
+      anchor.dataset.pinned = '1';
+      setOpen(anchor, group, !group.classList.contains('shown'));
+    });
+    setOpen(anchor, group, false);
+  });
+
+  /* THE RAIL FOLLOWS THE SCROLL. The page's own builder already marks the current entry with
+     `on`, so this watches that mark rather than measuring offsets a second time — two answers to
+     where the reader is would disagree the first time either changed. */
+  function follow(){
+    entries.forEach(function(entry){
+      if (!entry.group || entry.anchor.dataset.pinned === '1') return;
+      var here = entry.anchor.classList.contains('on') || !!entry.group.querySelector('a.on');
+      setOpen(entry.anchor, entry.group, here);
+    });
+  }
+  new MutationObserver(follow).observe(rail, {subtree: true, attributes: true,
+                                              attributeFilter: ['class']});
+  /* Last, because everything above degrades to the full index when no script runs. */
+  styled.classList.add('js');
+  follow();
+})();
+</script>
+<script>
+/* Every section (h2 inside .sec-head) and every subsection (h3 with an id) gets an anchor link.
+   Clicking it moves the address to that heading and copies the full link, so a subsection can be shared. */
+(function(){
+  function pageBase(){
+    var ref=document.referrer||'';
+    if(window.top!==window&&ref.indexOf('/artifact/')>-1)return ref.split('#')[0];
+    return location.href.split('#')[0];
+  }
+  function attach(h,id){
+    if(!id||h.querySelector('a.anchor'))return;
+    var a=document.createElement('a');a.className='anchor';a.href='#'+id;a.textContent='#';a.title='Copy link to this heading';a.setAttribute('aria-label','Copy link to '+h.textContent.trim());
+    a.addEventListener('click',function(ev){
+      var url=pageBase()+'#'+id;
+      try{history.replaceState(null,'',location.pathname+location.search+'#'+id);}catch(e){}
+      var done=function(){a.classList.add('copied');setTimeout(function(){a.classList.remove('copied');},1400);};
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(done,done);}else{done();}
+      var target=document.getElementById(id);if(target){ev.preventDefault();target.scrollIntoView({block:'start'});}
+    });
+    h.appendChild(a);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('section[id]'),function(s){
+    var h2=s.querySelector('.sec-head h2');if(!h2)return;
+    if(!h2.id)h2.id=s.id+'-title';
+    attach(h2,s.id);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('h3[id]'),function(h){attach(h,h.id);});
+})();
+</script>

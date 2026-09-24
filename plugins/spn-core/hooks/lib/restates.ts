@@ -84,6 +84,43 @@ export function seenHash(text: string): string {
 }
 
 /**
+ * A WHOLE FOLDER's hash — every file's path and every file's content, in one stamp.
+ *
+ * **A citation per file cannot see a file that was added.** A set of seventeen stamps reports an
+ * edit to any of the seventeen and says nothing at all about an eighteenth, because a file nobody
+ * cited has nothing to compare against. The same hole swallows a deletion: the citation fails to
+ * resolve, which reads as a broken reference rather than as *the book dropped this*.
+ *
+ * **So a folder is the honest unit wherever the SET is what is being restated**, which is exactly
+ * the case for the templates a partner copies from: what they need is every shape the book has, not
+ * a list somebody remembered to extend.
+ *
+ * THE PATH IS PART OF THE HASH, and that is not incidental. A template renamed is a template a
+ * reader cannot find by its old name, so a rename must move the stamp exactly as an edit does.
+ * Paths are sorted so the hash is the folder's contents rather than the order a filesystem
+ * happened to hand them over.
+ */
+export function treeHash(dir: string): string {
+  const files: string[] = [];
+  const walk = (at: string, prefix: string): void => {
+    for (const entry of readdirSync(at).sort()) {
+      const full = joinPath(at, entry);
+      const rel = prefix ? `${prefix}/${entry}` : entry;
+      if (statSync(full).isDirectory()) walk(full, rel);
+      else files.push(rel);
+    }
+  };
+  walk(dir, "");
+  const body = files.map((rel) => `${rel}\n${normalize(read(joinPath(dir, rel)))}`).join("\n\u0000\n");
+  return createHash("sha256").update(body, "utf8").digest("hex").slice(0, 8);
+}
+
+/** Whether a cited path is a folder rather than a file. */
+function isDir(path: string): boolean {
+  try { return statSync(path).isDirectory(); } catch { return false; }
+}
+
+/**
  * One heading's own text, to the next heading at the same level or above.
  *
  * Returns null where no heading matches, which is itself the finding: a section that was renamed
@@ -226,6 +263,22 @@ export function check(path: string, block: Block, bookRoot: string, knownRows: S
       continue;
     }
     const cited = join(bookRoot, citation.path);
+    // A FOLDER IS A CITATION TOO, and it answers a question a file cannot: whether the SET moved.
+    // A stamp per file reports every edit and misses every addition, because a file nobody cited
+    // has nothing to compare against. Where what is restated is *all of them* — the templates a
+    // partner copies from — the folder is the unit.
+    if (isDir(cited)) {
+      if (citation.section) {
+        findings.push(`${path}: cites \`${citation.path} \u00a7 ${citation.section}\` \u2014 a folder has no sections`);
+        continue;
+      }
+      const now = treeHash(cited);
+      if (citation.seen === undefined)
+        findings.push(`${path}: cites \`${citation.path}\` with no \`seen\` — nothing to compare`);
+      else if (citation.seen !== now)
+        findings.push(`${path}: \`${citation.path}\` has moved since this file restated it — a file was added, removed or edited. seen ${citation.seen}, now ${now}`);
+      continue;
+    }
     if (!isFile(cited)) {
       findings.push(`${path}: cites \`${citation.path}\`, which does not resolve`);
       continue;

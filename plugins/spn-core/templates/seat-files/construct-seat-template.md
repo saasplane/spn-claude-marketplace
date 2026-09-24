@@ -1,0 +1,123 @@
+<!-- spn:doc
+{
+  "id": "{{slug}}",
+  "variant": "construct",
+  "title": "{{NAME}}",
+  "lenses": ["{{LENS}}"],
+  "status": "PLANNING",
+  "dependsOn": ["{{id}}"],
+  "summary": "{{One sentence a newcomer understands.}}"
+}
+-->
+<!-- THE ONLY FILE AN AGENT AUTHORS for a construct. `docs.ts page` produces the HTML page from it — one block per
+     `##`, no block is forced and none is numbered. The block keeps seven keys: `id`, `variant`, `title`, `lenses`,
+     `status`, `dependsOn`, `summary`. `dependsOn` is the reading order and the only record of what this construct
+     needs; the domain face renders it. `status` is derived from Binds and Proof by `docs.ts status`, never typed.
+     RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The three page kinds · 03-tree.md § What — constructs
+     This file carries rules it does not own. The chapter above is the source of truth. Never add a rule here.
+
+     THE OPENING IS A STANDFIRST AND A SUMMARY, AND NOTHING ELSE. Measured across a workspace on 2026-09-24, 117 of
+     117 constructs opened with prose no outline named, no check read and no template held to a shape — a median of
+     195 words. A structure in every document of a corpus, declared nowhere, is the thing this order removes: the
+     orientation stays above the first heading and everything that argues moves into `Overview`.
+
+     SEVEN SECTIONS, IN THIS ORDER — Overview · Terms · Model · Parts · Boundary · Binds · Proof.
+     The three that carry the argument divide by question:
+       Overview  WHY this construct exists — the problem, and what changes because it does.
+       Model     WHAT it is — the whole shape, before any piece of it.
+       Parts     the detail of the What — one subsection per piece of the Model.
+     Terms sits between Overview and Model because the Model uses those words and the Overview does not need them.
+     Boundary, Binds and Proof are unchanged.
+
+     THERE IS STILL NO LENGTH CAP on any section. The concept decides how long its explanation is, and a page that is
+     long because its idea needs the room is right. What the opening gains is a JOB rather than a limit: it orients,
+     and everything that argues moves into Overview.
+
+     THE SHAPE OF A SECTION, unchanged. A section opens with its own overview, then a figure where seeing is faster,
+     then its content as blocks; a part opens with its own overview, then its details.
+     HEADINGS, unchanged. A heading never carries a count and is never a link; numbers are for file names.
+     THE VOICE, unchanged. Say why before what. Explain a word the first time it appears, in words the reader already
+     has. Simple words, no idioms. A table can hold facts; it cannot hold the explanation. -->
+# {{NAME — the subject in full, so the title stands alone: Estate Shape, not Shape; Kind Manifest, not Manifest.}}
+
+`For: {{Actor}} · {{Actor}}` · `Status: 🔮 PLANNING`
+
+{{THE PROMISE, in one line — the standfirst. What is true once this construct exists: "A repository is standardized at the moment it exists."}}
+
+{{THE SUMMARY — two or three sentences a newcomer understands: the problem, what this page gives you, and how to read it. This is the whole opening. Anything that argues belongs in Overview below.}}
+
+## Overview
+<!-- WHY THIS CONSTRUCT EXISTS. What went wrong without it, what it changes, and what a reader should expect to
+     believe by the end of the page. This is where the orientation that used to sit above the first heading now
+     lives, including "if this is your first … " and what a reader has to unlearn.
+     It argues. It does not describe the shape — that is the Model, and repeating it here is how two descriptions of
+     one thing start to disagree. -->
+{{The problem, in the reader's own terms, before any SaaS Plane word is used to solve it.}}
+
+{{What changes because this construct exists, and what a reader should believe by the end of this page.}}
+
+{{FOR A FIRST-TIME READER — "If this is your first …": no earlier reading assumed, what to unlearn, and the two or three sentences to keep if they read nothing else.}}
+
+## Terms
+<!-- Second, because the Model uses these words and the Overview does not. A Term is a word SaaS Plane gives a
+     meaning to — a contract term, or a word of its own such as estate or ring. A word every engineer already knows
+     is not a Term, even when the page uses it.
+     ONE DECLARATION PER TERM, PER REPOSITORY (Q249): this table declares only what THIS construct introduces, which
+     is the construct whose own contract declares the symbol. A word another domain's contract owns is linked from
+     Boundary and declared here by nobody.
+     The dictionary is generated from this table, so it is three columns, and a row that points somewhere else
+     instead of explaining is not a definition. Rows are in the order a newcomer meets the words. -->
+| Term | Contract term | What it means |
+| --- | --- | --- |
+| {{The word, capitalised}} | `{{ContractTerm}}` | {{one plain sentence}} |
+
+## Model
+<!-- WHAT IT IS. The whole shape before any piece of it: the general form, then its parts, then its kinds. A figure
+     where seeing is faster than reading; none where it is not. It describes. The reason it exists is the Overview's,
+     and a Model that argues is saying something twice. -->
+{{Opens with its own overview: what you are looking at, in prose first.}}
+
+```dg
+{ "kind": "map",
+  "boxes": [{ "id": "a", "label": "{{part}}", "note": "{{what it is}}" },
+            { "id": "b", "label": "{{part}}" }],
+  "links": [{ "from": "a", "to": "b", "label": "{{what flows}}" }] }
+```
+
+## Parts
+<!-- THE DETAIL OF THE WHAT. One subsection per piece the Model named, in the order a reader needs them — so a
+     reader who has read the Model already knows what these headings will be. Each part is explained in full where
+     nothing else covers it, and stops where another construct continues: name that construct once and link it.
+     A part that grows is not cut; it is a longer part. A part a reader meets on its own, with its own actor, is a
+     construct of its own — a judgement about the concept, never a line count. -->
+### {{Part — named exactly as the Model named it}}
+{{…}}
+
+### {{Part}}
+{{…}}
+
+## Boundary
+<!-- AFTER the parts: a reader judges an edge only once they have seen the shape. Prose, in plain words — what this
+     page does not answer, and where that is answered. This is also where a term another domain owns is linked
+     (Q249), so a reader who meets the word here can reach the one construct that declares it. -->
+{{This page answers {{the question it answers}}. It does not answer {{the neighbouring question}} — that is [{{construct}}]({{path}}.md), and you read it next when {{the situation}}.}}
+
+## Binds
+<!-- Two tables. The first: the rules that hold this construct. The second: where it lives today — and for a
+     repository's construct, the FIRST row names the foundation construct it realizes. -->
+| Rule | What it decides | Weight |
+| --- | --- | --- |
+| `{{chapter or RD.X.NNN}}` | {{…}} | MUST |
+
+| Repo | Node | What it realizes | State |
+| --- | --- | --- | --- |
+| {{Repo}} | {{node}} | {{…}} | planned |
+
+## Proof
+<!-- Typed here: only the checks a person can run, or nothing. Behaviour rows are joined into the produced page from
+     the register, never typed here. -->
+| Check | Kind | What a green run shows |
+| --- | --- | --- |
+| `{{command}}` | gate | {{…}} |
+
+Try it: `{{one command a partner can run}}`

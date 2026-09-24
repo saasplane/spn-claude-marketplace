@@ -48,3 +48,22 @@ Three things worth knowing on day one:
 - **The agent arrives equipped.** After step 3 it holds the persona, the skills, and rules matched to what is actually installed. It reads contract surfaces on demand instead of remembering them.
 - **Docs are not paperwork after the fact** — planning *produces* rows in the owning module's `docs/03-behaviors/README.md`; building flips their statuses. There is never a second record to reconcile.
 - **A full platform runs on your machine** — not a mock; the same manifests that drive your laptop will drive the cloud.
+
+## The pages you write, and where their shapes come from
+
+**You do not have the foundation book, and you do not need it.** The shapes every repository uses
+ship with these plugins, beside this file:
+
+| What you are writing | Its shape |
+| --- | --- |
+| an approach page, to argue a piece of work | [`templates/workstream/approach-template.html`](../templates/workstream/approach-template.html) |
+| a question you cannot answer alone | [`refs/decision-cards.md`](decision-cards.md) — it is a card, and a card is `div.open` wrapping an `h4` whose id is its number |
+| a construct, a domain face, an overview | [`refs/doc-sets.md`](doc-sets.md) |
+| the markdown and figures inside any of them | [`refs/blocks.md`](blocks.md) |
+
+**Copy the template rather than writing a page from memory.** It carries the section order, the card
+shape and the furniture every check reads, and a page assembled by hand is a page that passes review
+and fails a gate.
+
+**If a shape you need is not here, that is a defect in these plugins and not a licence to invent
+one.** Say so, and it gets restated — the book owns the rule, and this ref set is how it reaches you.

@@ -518,7 +518,31 @@ const OPEN_SECTION = /<section id="s4"[\s\S]*?<\/section>/i;
 // THE HEADING FORM IS NOT KEPT AS A SECOND SPELLING. `Q185` option C was exactly that and was
 // refused: two spellings with one reader is the defect `RD.DEVEX.058` had removed from arc statuses
 // the day before, and it would make the drift permanent instead of ending it.
-const CARD_OPEN = /<tr[^>]*\bid="(q\d+)"[^>]*>/gi;
+// A CARD IS THE `h4` INSIDE ITS `.open` OR `.card` BLOCK, and `Q185` moved this to `<tr>` on a
+// measurement that counted the wrong thing. That measurement said `008` carried *0 headings and 54
+// table rows*, and concluded the row was the card. **Those rows were the ANSWERED INDEX** — a table
+// listing cards already settled — while the card itself is the block the template ships.
+//
+// THE TEMPLATE IS THE AUTHORITY HERE, not any page. `approach-template.html` writes an open card as
+// `<div class="open">` wrapping `<h4 id="qN">`, and a decided one as `<div class="card">` with the
+// same heading. Pages written before that template exists prove nothing either way, so this rests on
+// what the template ships and on what the page furniture needs.
+//
+// AND THE FURNITURE IS NOT DECORATION. `.open` carries the amber left edge that marks a card
+// undecided — the template says so in its own words, *undecided cards first, with an amber edge; a
+// decided card carries a green edge* — and the rail's count badge is literally
+// `s4.querySelectorAll('.open').length`. A card written as a row has no edge and leaves the rail
+// saying nothing is waiting, which is the opposite of true.
+//
+// THIS IS NOT THE TWO-SPELLING DRIFT `Q185` OPTION C WAS REFUSED FOR. The two shapes were never two
+// spellings of one thing: a `.open`/`.card` block is a CARD, and a `<tr id="qN">` is a ROW IN AN
+// INDEX of cards already settled. Conflating them is what produced the defect, and separating them
+// is what fixes it.
+//
+// AND THE PAGE'S OWN FURNITURE ALREADY DEPENDED ON THE BLOCK. `.open` carries the amber left edge
+// that marks a card undecided, and the rail's count badge is `s4.querySelectorAll('.open').length`.
+// A card written as a row loses both — no edge, and a rail that says nothing is waiting.
+const CARD_OPEN = /<h4[^>]*\bid="(q\d+)"[^>]*>/gi;
 const DECISION = /<b>\s*Decision:?\s*<\/b>([\s\S]{0,600})/i;
 // `answered` may sit either side of the number, because a log writes both ways.
 const ANSWERED = /\b(Q\d+)\b[^.\n]{0,80}?\banswered\b|\banswered\b[^.\n]{0,80}?\b(Q\d+)\b/gi;
@@ -578,7 +602,7 @@ export function cardsOf(page: string): Array<{ number: string; decided: boolean 
   const out: Array<{ number: string; decided: boolean }> = [];
   CARD_OPEN.lastIndex = 0;
   for (let m = CARD_OPEN.exec(html); m; m = CARD_OPEN.exec(html)) {
-    out.push({ number: m[1].toUpperCase(), decided: carriesDecision(rowAt(html, m.index)) });
+    out.push({ number: m[1].toUpperCase(), decided: carriesDecision(cardAt(html, m.index)) });
   }
   return out;
 }
@@ -592,6 +616,21 @@ export function cardsOf(page: string): Array<{ number: string; decided: boolean 
  * which is what the open workstream does today. Proven against a nested fixture rather than against
  * the page that got lucky.
  */
+/**
+ * One card whole — from its own heading to the next card's, or to the end of the section.
+ *
+ * READING IT BY THE WRAPPING `<div>` DOES NOT WORK, and that is why this takes the heading as its
+ * anchor: a card nests a `<div class="scroll">` around its options table and a `<div class="rec">`
+ * around its recommendation, so a non-greedy match on the wrapper stops at the first inner `</div>`
+ * and never reaches the decision. The heading-to-heading span has no such hole.
+ */
+function cardAt(html: string, start: number): string {
+  const NEXT = /<h4[^>]*\bid="q\d+"[^>]*>/gi;
+  NEXT.lastIndex = start + 1;
+  const next = NEXT.exec(html);
+  return html.slice(start, next ? next.index : html.length);
+}
+
 function rowAt(html: string, start: number): string {
   const TAG = /<(\/?)tr\b/gi;
   TAG.lastIndex = start;

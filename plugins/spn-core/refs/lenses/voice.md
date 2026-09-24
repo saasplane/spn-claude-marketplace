@@ -3,7 +3,7 @@
   "chapters": [
     { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md", "seen": "8c2210a7" },
     { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md", "seen": "59189379" },
-    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md", "seen": "323d40a5" }
+    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md", "seen": "cdf396da" }
   ],
   "rows": [
     "RD.DOCS.031",

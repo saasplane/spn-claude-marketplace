@@ -1,0 +1,554 @@
+<!-- REPORT TEMPLATE. One shell for all four report kinds — AUDIT (the repository's wiring) · CODE (the source against
+     the stack's standards) · DOCS (the corpus against the docs standards) · TESTS (what the tests have proved). The set
+     is closed by RD.DOCS.089; a fifth kind is a decision entry, never a new filename. The skeleton is the overview
+     template's, so a report reads like every other page a developer opens; only the five sections below differ, and
+     only the Findings columns differ per kind.
+     LANDS AT `docs/artifacts/reports/<kind>-report.html`, replaced in place — the name says what was measured and the
+     suffix says what kind of document it is, so the folder reads without the book.
+     A REPORT ANSWERS ONE QUESTION AT ONE MOMENT. `measuredAt` is what lets the next one supersede it: a page with no
+     as-of cannot be superseded, because nobody can tell which is newer. It carries a `status` like every other document,
+     and that status is the state of WHAT IT MEASURED — never a claim about the page.
+     WRITTEN BY THE AGENT through the report skill, never by a tool. The agent reads the repository, fills this skeleton
+     from what it read, and every number on the page names where it was read from. A tool that needs to hand the agent a
+     measurement gives it `--json` on stdout; it never writes into a developer's pocket.
+     LIFECYCLE. A `superseded` kind is replaced in place, so a pocket never accumulates six audits nobody re-reads. A
+     `kept` kind is dated in its filename and never overwritten. The report skill's table says which is which.
+     WHAT IT NEVER DOES. It never fixes what it found, and it never says a thing is fine because it did not look at it —
+     the last section is where the boundary is stated, and it is not optional.
+     THE READABILITY BAR GOVERNS THIS PAGE LIKE EVERY OTHER — its seven rules are at the head of this file and
+     `01-corpus.md` owns them. Rule 2 is the one a report breaks most: explain a term the first time it appears, and
+     assume an engineer who has never seen this vocabulary. A report is opened by a developer who wants a number, not
+     by somebody who already knows the platform's words.
+     THREE THINGS A REPORT IN PARTICULAR HAS TO DO, which are that bar applied to a page made of counts:
+       · DEFINE THE UNIT BEFORE YOU COUNT IT. "This repository writes down 58 things it should be able to do" comes
+         before "16 are tested" — a reader cannot picture a count of something they have not met.
+       · QUOTE ONE REAL MEMBER of whatever you counted, from the thing you measured. An example makes an abstraction
+         concrete faster than a definition does.
+       · NAME A SET BY WHAT ITS MEMBERS DO, never by their labels: "the ones that check a screen, a published
+         interface, several pieces working together, or a whole journey" rather than a list of tier names.
+     The test is rule 2's own: a reader who has never opened this book finishes the first paragraph knowing what the
+     number means. -->
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § Reports and templates · § The four page kinds · § The suffix names the kind · § One stylesheet, shipped with the template
+     and docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md § The readability bar
+     This file carries rules it does not own. The chapters above are the source of truth.
+     A rule change is edited there first, then here, in the same change. Never add a rule here.
+     restate-drift reports this copy when a source moves. -->
+<meta charset="utf-8">
+<title>Report Template</title>
+<!-- spn:doc
+{"id": "{{repo}}-{{kind}}-report", "variant": "report", "reportType": "{{AUDIT|CODE|DOCS|TESTS}}", "title": "{{KIND, in plain words}} — {{repo}}", "lenses": ["{{LENS}}"], "status": "{{the state of WHAT WAS MEASURED, never of this page}}", "measuredAt": "{{YYYY-MM-DD}}", "summary": "{{One sentence: what was measured and the one number that matters.}}", "keywords": ["report", "{{kind}}"]}
+-->
+<style>
+  :root {
+    --paper:#edf0f3; --card:#f7f9fb; --ink:#141920; --slate:#48525f; --faint:#7c8794;
+    --rule:#d2d9e0; --accent:#2f4e7a; --accent-soft:#e0e8f4;
+    --gap:#8f5714; --gap-soft:#f7ecda; --ok:#2a6459; --ok-soft:#dcece8;
+    --ui:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+    --xs:0.76rem; --sm:0.85rem; --md:0.97rem; --lg:1.32rem; --xl:1.62rem; --xxl:2.5rem;
+    --tk-k:#6d3a9c; --tk-s:#2a6459; --tk-c:#7c8794; --tk-t:#2f4e7a; --tk-n:#8f5714; --tk-add:#2a6459; --tk-del:#a63d3d;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){ --paper:#0f1318; --card:#171d24; --ink:#e3e8ee; --slate:#a3adb9; --faint:#6f7986;
+      --rule:#242d37; --accent:#86a9da; --accent-soft:#18232f;
+      --gap:#d59d4f; --gap-soft:#2a2113; --ok:#5db3a4; --ok-soft:#14251f; --tk-k:#c9a3ee; --tk-s:#7fc9b6; --tk-c:#6f7986; --tk-t:#86a9da; --tk-n:#d59d4f; --tk-add:#5db3a4; --tk-del:#e08a8a; }
+  }
+  :root[data-theme="dark"]{ --paper:#0f1318; --card:#171d24; --ink:#e3e8ee; --slate:#a3adb9; --faint:#6f7986;
+    --rule:#242d37; --accent:#86a9da; --accent-soft:#18232f;
+    --gap:#d59d4f; --gap-soft:#2a2113; --ok:#5db3a4; --ok-soft:#14251f; --tk-k:#c9a3ee; --tk-s:#7fc9b6; --tk-c:#6f7986; --tk-t:#86a9da; --tk-n:#d59d4f; --tk-add:#5db3a4; --tk-del:#e08a8a; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--ui);font-size:1rem;line-height:1.6;-webkit-font-smoothing:antialiased}
+  p{margin:0 0 1rem;max-width:58rem}
+  code,.m{font-family:var(--mono);font-size:0.87em}
+  strong{font-weight:600}
+  em{font-style:italic;color:var(--slate)}
+  a{color:var(--accent)}
+  .page{display:grid;grid-template-columns:13rem minmax(0,1fr);gap:3rem;max-width:min(98vw,80rem);margin:0 auto;padding:3rem 8px 6rem;align-items:start}
+  .rail{position:sticky;top:2.5rem;font-family:var(--ui);font-size:var(--xs)}
+  .rail .home{border-left:none;padding-left:0;margin-bottom:.9rem;color:var(--accent);font-weight:650;display:block}
+  .rail .rail-title{letter-spacing:.15em;text-transform:uppercase;color:var(--faint);margin-bottom:.85rem;font-size:.7rem;font-weight:700}
+  .rail a{display:flex;gap:.55rem;text-decoration:none;color:var(--slate);padding:.28rem 0 .28rem .6rem;border-left:2px solid var(--rule);line-height:1.4}
+  .rail a .n{display:none}
+  .rail a.sub{padding-left:1.6rem;font-size:.72rem;color:var(--faint)}
+  .rail a:hover{color:var(--ink)}
+  .rail a.on{color:var(--accent);border-left-color:var(--accent);font-weight:650}
+  .rail .count{margin-left:auto;font-family:var(--mono);font-size:.68rem;background:var(--gap-soft);color:var(--gap);border-radius:2px;padding:0 .3rem}
+  .wrap{display:flex;flex-direction:column;gap:3.25rem;min-width:0}
+  .masthead{display:flex;flex-direction:column;gap:1.1rem}
+  .eyebrow{display:flex;flex-direction:column;gap:.5rem;font-family:var(--ui);font-size:var(--xs);color:var(--faint)}
+  .eyebrow .line{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem .6rem;line-height:1.7}
+  .eyebrow .sep{color:var(--rule);font-weight:300}
+  .eyebrow .line1{letter-spacing:.15em;text-transform:uppercase;font-weight:650;color:var(--faint);line-height:1.7}
+  .eyebrow .lbl{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+  .eyebrow .st{margin-left:auto;display:inline-flex;align-items:center;gap:.4rem}
+  .eyebrow .audience{display:inline-flex;flex-wrap:wrap;align-items:center;gap:.45rem}
+  .badge{display:inline-flex;align-items:center;gap:.35rem;padding:.1rem .6rem;border-radius:999px;border:1px solid var(--rule);background:var(--card);font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--slate);line-height:1.7;white-space:nowrap}
+  .badge.type{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);font-weight:650}
+  .badge.lens{font-family:var(--ui);font-size:.74rem;letter-spacing:0;text-transform:none}
+  .badge.status{font-weight:700}
+  .badge.status.planning{border-color:var(--gap);color:var(--gap);background:var(--gap-soft)}
+  .badge.status.implementing{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+  .badge.status.done{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(18rem,1fr));gap:.8rem;margin:1.6rem 0}
+  .tile{display:flex;flex-direction:column;border:1px solid var(--rule);background:var(--card);border-radius:3px;padding:.85rem 1rem;min-width:0}
+  .tile h4{margin:0 0 .35rem;font-size:var(--md)}
+  .tile h4 a{color:var(--ink);text-decoration:none}
+  .tile h4 a:hover{color:var(--accent)}
+  .tile p{font-size:var(--sm);color:var(--slate);margin:0 0 .6rem;max-width:none;flex:1}
+  .tile .more{font-size:var(--sm);font-weight:600;text-decoration:none;align-self:flex-start}
+  p > .more{font-weight:600;text-decoration:none}
+  h1{font-family:var(--ui);font-size:var(--xxl);font-weight:700;letter-spacing:-.02em;line-height:1.15;text-wrap:balance;margin:0}
+  .standfirst{font-size:var(--lg);line-height:1.5;color:var(--slate);max-width:46rem}
+  .sec-head{display:grid;grid-template-columns:1fr;align-items:baseline;gap:.5rem;border-top:2px solid var(--ink);padding-top:.7rem;margin-bottom:1.1rem}
+  .sec-head .num{font-family:var(--mono);font-size:var(--sm);font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+  h2{font-family:var(--ui);font-size:var(--xl);font-weight:700;letter-spacing:-.01em;text-wrap:balance;margin:0}
+  h3{font-family:var(--ui);font-size:var(--lg);font-weight:600;letter-spacing:-.008em;margin:2rem 0 .6rem}
+  h4{font-family:var(--ui);font-size:var(--md);margin:0 0 .5rem;color:var(--ink)}
+  .scroll{overflow-x:auto;border:1px solid var(--rule);border-radius:3px;background:var(--card);margin:1.6rem 0}
+  table{border-collapse:collapse;width:100%;font-family:var(--ui);font-size:var(--sm);min-width:34rem}
+  .scroll table{table-layout:auto}
+  th{text-align:left;font-family:var(--mono);font-size:var(--xs);letter-spacing:.07em;text-transform:uppercase;color:var(--faint);font-weight:650;padding:.6rem .8rem;border-bottom:1px solid var(--rule)}
+  td{padding:.6rem .8rem;border-bottom:1px solid var(--rule);vertical-align:top;color:var(--slate)}
+  td strong{color:var(--ink)}
+  tr:last-child td{border-bottom:none}
+  .num-cell{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+  .yes{color:var(--ok);font-weight:650}
+  .no{color:var(--gap);font-weight:650}
+  .s{font-family:var(--mono);font-size:var(--xs);color:var(--faint)}
+  pre{background:var(--card);border:1px solid var(--rule);border-radius:3px;padding:.9rem 1.1rem;margin:1.6rem 0;overflow-x:auto;font-family:var(--mono);font-size:var(--sm);line-height:1.55;color:var(--slate);max-width:100%}
+  pre code{font-size:inherit}
+  pre .tk-k{color:var(--tk-k);font-weight:600} pre .tk-s{color:var(--tk-s)} pre .tk-c{color:var(--tk-c);font-style:italic} pre .tk-t{color:var(--tk-t)} pre .tk-n{color:var(--tk-n)} pre .tk-add{color:var(--tk-add)} pre .tk-del{color:var(--tk-del)} pre .tk-cmd{color:var(--tk-t);font-weight:600}
+  /* A FIGURE RUNS EDGE TO EDGE. It takes no padding, border or background of its own: the section
+     already provides the page's padding, and the drawing's own containers are its frame. That is the
+     opposite of a PROSE panel, which carries all three. A figure is also not held to the prose
+     measure — 58rem is for a sentence, and a drawing is not read a line at a time. */
+  /* ONE VERTICAL RHYTHM. A paragraph keeps its 1rem; every block gets 1.6rem above and below, and a
+     figure 2.4rem — it is the largest thing on a page, and it needs the air to read as one unit rather
+     than as something the paragraph above it is still saying. Margins collapse, so the larger wins. */
+  figure{margin:2.4rem 0;padding:0;border:0;background:none}
+  figure svg{display:block;width:auto;max-width:100%;height:auto;margin-inline:auto}
+  figcaption{font-family:var(--ui);font-size:var(--xs);color:var(--faint);margin-top:.5rem;max-width:none}
+  .dg .box{fill:var(--card);stroke:var(--rule);stroke-width:1.5}
+  .dg .box.off{fill:none;stroke:var(--rule);stroke-width:1.5;stroke-dasharray:5 4}
+  .dg .box.warn{fill:var(--gap-soft);stroke:var(--gap);stroke-width:1.5}
+  .dg .box.em{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}
+  .dg .t{font-family:var(--ui);font-size:13px;font-weight:650;fill:var(--ink)}
+  .dg .l{font-family:var(--ui);font-size:12px;fill:var(--ink)}
+  .dg .s{font-family:var(--mono);font-size:11px;fill:var(--slate)}
+  .dg .n{font-family:var(--ui);font-size:11px;fill:var(--faint)}
+  /* The arrowhead is a marker filled with `currentColor`, and a marker resolves that against
+     its own inherited colour rather than the path that references it. With nothing setting
+     `color` on the figure, every connector drew a blue line ending in a black head. Setting it
+     on `.dg` makes the head take the line's colour, and the marker needs no change. */
+  .dg{color:var(--accent)}
+  .dg .c{stroke:var(--accent);stroke-width:1.6;fill:none}
+  .pull{border-left:2px solid var(--accent);background:var(--accent-soft);padding:1rem 1.2rem;margin:1.6rem 0;border-radius:0 3px 3px 0}
+  .pull .label{display:block;font-family:var(--ui);font-size:var(--xs);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.3rem}
+  .pull p{margin:0;max-width:none}
+  .open{background:var(--card);border:1px solid var(--rule);border-left:2px solid var(--gap);border-radius:0 3px 3px 0;padding:1.1rem 1.25rem;margin-bottom:.9rem}
+  .open h4{font-size:var(--md)}
+  .open .k{font-family:var(--mono);font-size:var(--xs);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);display:block;margin:.6rem 0 .2rem}
+  .open p{font-size:var(--sm);color:var(--slate);margin:0 0 .4rem;max-width:none}
+  .open .rec{margin-top:.75rem;padding-top:.65rem;border-top:1px dashed var(--rule);font-size:var(--sm);color:var(--ink)}
+  .open .rec b{color:var(--ok)}
+  .open .scroll{margin:.4rem 0}
+  pre.pv{font-family:var(--mono);font-size:var(--xs);background:var(--card);border:1px solid var(--rule);border-radius:3px;padding:.7rem .9rem;margin:1rem 0;overflow-x:auto;line-height:1.5}
+  footer{border-top:1px solid var(--rule);padding-top:1.3rem;font-family:var(--ui);font-size:var(--xs);color:var(--faint)}
+  @media (max-width:60rem){
+    .page{grid-template-columns:minmax(0,1fr);gap:1.5rem;padding-top:2rem}
+    .rail{position:static;border:1px solid var(--rule);border-radius:3px;background:var(--card);padding:.9rem 1rem}
+    .rail a{border-left:none;padding-left:0}
+    .rail a.on{border-left:none}
+  }
+
+  /* THE OUTLINE HAS TWO LEVELS, AND THEY DIFFER ON THREE AXES — size, weight and colour together.
+     One axis is not enough at rail size: a single step reads as noise rather than as a level, and
+     the two collapse into each other. Nothing in an outline sits on --faint either, because that is
+     the token for text a reader is meant to skim past and an outline is what they navigate by. */
+  .rail a:not(.sub):not(.home){font-size:.88rem;font-weight:400;color:var(--ink);letter-spacing:-.005em}
+  .rail a.sub{font-size:.78rem;font-weight:400;color:var(--slate)}
+  .rail .rail-title{color:var(--slate)}
+
+  /* ONE LEFT EDGE FOR BOTH LEVELS. An indent repeats what the fold already says, and it costs the
+     longer labels a wrapped line. Both are stated in one rule: setting only the subsection's
+     padding leaves it outdented past its own section, because another rule still sets the
+     section's. */
+  .rail a:not(.home), .rail a.sub{padding-left:.6rem}
+
+  /* EVERYTHING ON THE RIGHT SITS ON THE LABEL'S CENTRE LINE. The row is a flex line, and its
+     default is to stretch, so a chevron or a count badge beside a label that wrapped to two lines
+     was pinned to the top of the row rather than level with it. */
+  .rail a{align-items:center}
+  .rail .count{align-self:center}
+
+  /* WEIGHT AND COLOUR MARK WHERE YOU ARE, NEVER WHAT A LEVEL IS. The notch is an inset shadow and
+     not a border: a border changes the box, so a label would jump sideways by the notch's width the
+     moment it became current. These are restated at matching specificity because the level rules
+     above are more specific than `.rail a.on`, and would otherwise strip the selected state. */
+  .rail a.on:not(.sub):not(.home){font-weight:650;color:var(--accent);box-shadow:inset 1.5px 0 0 var(--accent)}
+  .rail a.on.sub{color:var(--accent);box-shadow:inset 1.5px 0 0 var(--accent)}
+  .rail a:not(.sub):not(.home):hover{color:var(--accent)}
+  .rail a.sub:hover{color:var(--ink)}
+
+  /* THE DISCLOSURE IS A CHEVRON, DRAWN RATHER THAN TYPED. A glyph ties the mark to whatever font
+     is resolved and to that font's own idea of weight and baseline; two borders on a rotated box
+     are the same shape at every size and inherit the row's colour. Right means closed, down means
+     open, and only the chevron turns — the box around it stays put so the hit target never moves. */
+  .rail a .caret{margin-left:auto;flex:none;width:1.35rem;height:1.35rem;display:grid;place-items:center;
+    color:var(--faint);border-radius:3px;transform:none}
+  .rail a .caret::before{content:"";width:.32rem;height:.32rem;border-right:1.5px solid currentColor;
+    border-bottom:1.5px solid currentColor;transform:translateX(-.1rem) rotate(-45deg);transition:transform .15s ease}
+  .rail a.group-open .caret{transform:none}
+  .rail a.group-open .caret::before{transform:translateY(-.1rem) rotate(45deg)}
+  .rail a .caret:hover{background:var(--accent-soft);color:var(--accent)}
+  @media (prefers-reduced-motion:reduce){.rail a .caret::before{transition:none}}
+</style>
+<style>
+/* anchor links: a section or subsection title carries a link to itself — small, grey, set off from the title; copied on click */
+a.anchor{display:inline-block;margin-left:.6em;font-family:var(--mono);font-size:.55em;font-weight:400;line-height:1;color:var(--slate,#6b7280);text-decoration:none;opacity:.35;transition:opacity .15s;vertical-align:middle;position:relative;top:-.1em}
+.sec-head:hover a.anchor,h3[id]:hover a.anchor,a.anchor:hover,a.anchor:focus,a.anchor.copied{opacity:1}
+a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7d4a);margin-left:.3em}
+</style>
+
+
+<div class="page">
+
+<!-- THE RAIL. Nothing in the rail is written by hand. Two scripts at the end of the page build it from the
+  content: every <section id> becomes an entry, named from its h2 — never numbered: a number orders a file in a tree, a heading is a name (the text
+  before the em dash, so name sections with a plain word first); every <h3 id> inside a section becomes a
+  sub-entry; the Open section shows its card count. Sub-entries fold under their section, open where the reader
+  is, with a caret at the far right to pin one open. The rail follows the scroll. Keep the ids and
+  the h2/h3 pattern and the rail-fold style block; a page without them is off its template. -->
+<nav class="rail" id="rail">
+  <a class="home" href="../../../../README.md">&larr; .spndevex</a>
+  <div class="rail-title">{{PAGE NAME &mdash; the same words as the masthead and the block title}}</div>
+</nav>
+<div class="wrap">
+
+<!-- ================================================================================================
+  THE WRITING RULES, read before you write a word. Every page kind carries these.
+  1. Say why before what. Open with the problem, then give the answer.
+  2. Explain a term the first time it appears, then use it. Never make the reader guess.
+  3. Use simple words: a word the reader can look up. No idioms, no metaphors, no wordplay.
+  4. One idea at a time. A sentence may be long when the idea needs it. Never cut the link between
+     two ideas to make a sentence shorter; a reader has to connect the dots.
+  5. Carry the source's facts and its terms. Never its phrasing.
+  6. Keep the reasoning. A plain page still explains why. It drops decoration, not connections.
+  7. Close a section with where to go next: a page to read or a command to run.
+  ================================================================================================ -->
+<!-- ================================================================================================
+  THE BLOCKS. MOST OF A PAGE IS NOT A BLOCK. Paragraphs, lists, numbered steps and subheadings are what a
+  section is made of; write them plainly and label them as nothing. A BLOCK is what you drop into that writing
+  when a piece of content must not read as prose — it carries a border, a background or a form of its own, so a
+  reader sees it is different before reading a word of it. ONE SECTION OR SUBSECTION HOLDS NORMAL TEXT AND AS
+  MANY BLOCKS AS IT NEEDS: none, one, or several. Nothing declares "the" block of a section.
+
+  WHAT YOU ARE WRITING, AND WHAT IT EARNS — read down, stop at the first row that matches.
+    an explanation, an argument, a part, the opening  → nothing: paragraphs, a list, a subheading
+    a rule somebody has to follow                     → MUST, in a callout, then the command that enforces it
+    a set of named things, no order between them      → CATALOG, a tile each
+    things side by side, or which to choose when      → COMPARISON, a table
+    a record: ids, rows, statuses, terms              → a table; GLOSSARY where the record is this page's words
+    a literal: a contract, a manifest, a command      → CODE, tagged with its language
+    what a file says today and what it will say       → DIFF, on an approach page only
+    a hierarchy easier read than drawn                → TREE, a plain text block
+    a shape: parts, steps, participants, data, estate → a FIGURE of the matching kind
+    a passage that must stand apart from the page     → PROSE, the markdown panel
+    several pages a reader might go to next           → CARDS
+    the two pages either side of this one             → NEXT, small: a title and a direction
+
+  The choice is a judgement about the content, and no rule can make it for you: the same subject is a table on
+  one page and a figure on another. What the list removes is the guessing — name what you are writing first.
+
+  A BLOCK THAT IS NEITHER NORMAL TEXT NOR A RECORD CARRIES A FORM. Normal text is paragraphs; a record is a
+  table, which already arrives as a bordered card. Everything else: MUST is the accent callout, CATALOG is
+  tiles, PROSE is a panel with its own border and colours, CODE/TREE/DIFF are code blocks, a figure is drawn,
+  CARDS is a grid of doors, NEXT is two small cards, and a quote is set apart. The forms come from the
+  stylesheet this template ships, never from markup you invent — that is what keeps a page renderable with no
+  library, in both themes, offline.
+  ================================================================================================ -->
+<!-- ================================================================================================
+  THE FIGURES, a closed set. A figure sits inside a block. Every figure has a sentence before it
+  (what you are looking at) and a figcaption after it (what to notice). In the markdown seat file a
+  figure is a mermaid block; on this page it is inline SVG in the .dg grammar, so the page needs no
+  network and no library. Labels fit their boxes; a connector ends on a box; a path keeps 16 px from the edge and
+  from any box it does not end on, and a return path runs in its own lane below the boxes, with its label.
+  FLOW      steps in order · flowchart left to right, a box per step, an arrow means "then", a diamond is a choice
+            lives in SEQUENCE · an approach's How · a construct's Parts when a part is a procedure
+  MAP       groups and what connects them · a box is a group, an arrow is what flows, a subgraph is containment
+            lives in MAP · a construct's Model when the construct is a structure
+  TREE      a hierarchy · top-down, or a plain-text tree in a code block for a folder layout
+            lives in MAP · a construct's Model when the construct is a hierarchy
+  SEQUENCE  who talks to whom, in what order · one lifeline per participant, time running down, one arrow per
+            message with its own label, a dashed arrow for a reply. Use it instead of FLOW whenever more than one
+            party acts and WHO acted is the thing to see: a FLOW shows what happens next, a SEQUENCE shows who said it
+            lives in a construct's Parts · REASONS when a claim is about a process
+  STATE     the states a thing can be in · an arrow names the event that moves it
+            lives in a construct's Model when it is a lifecycle · Parts for a part with states · an approach's What when it changes a vocabulary
+  ENTITIES  a data model and its relations · the subject at the centre, what points at it on one side and what it
+            points at on the other, every relation line carrying its cardinality
+            lives in a construct's Model when the construct is data · Parts for one part's records
+  CODE      a contract, a state, a manifest, a command and its output · a fenced block with its language, real values,
+            the path above it when copied from a file (the audit checks it still matches)
+            lives in EXAMPLE · MUST (the action) · a construct's Parts · Proof · an approach's What
+  DIFF      what a file says today, and what it will say · a diff block, - today / + after, the path above it
+            lives in an approach's What only. A construct or an overview states current truth, never a change
+  ================================================================================================ -->
+<!-- AN OVERVIEW IS WRITTEN FOR A NEW USER'S ONBOARDING. Every overview — the hub and every path — assumes no earlier
+  reading, says at the start who it is for and what the reader can do after it, explains each word on first use in words
+  the reader already has, and tells a first-time reader what to unlearn. A returning reader loses nothing by that; a new
+  one is lost without it.
+<!-- THREE LEVELS OF PAGE, and this template is the middle one. The HUB (concept-overview.html) is one page per
+  repository: the concept at reading depth — its narrative sections as they are, then one section per area with a
+  paragraph per domain and a tile per overview below. A DOMAIN OVERVIEW covers one READING PATH: the topics a reader
+  takes together to understand one thing. A small domain is one path and one page; a domain whose topics form more than
+  one path has one page per path, and the domain's complexity decides the count, never a rule of one. The name says the
+  path: concept-<area>-<domain>[-<path>]-overview.html. A built repository keeps the hub and earns a domain overview only
+  where its tiles cannot carry the path. A CONSTRUCT PAGE is the full page, linked and never told here.
+  THE MASTHEAD, on every overview: the header names the page (Concept; Infra · Shape); the title is the promise, a short sentence a reader would say; the standfirst is one
+  line saying what the page covers; then a plain paragraph — the problem, what the page gives you, how to read it.
+  A HEADING NEVER CARRIES A COUNT — "Apps — how to read it", never "Apps — two reading paths": a count changes, and the
+  book's rule is that a set is named by its rule, never by its cardinality (RD.GOV.008).
+  THE BOOK'S OWN JARGON is translated on an overview: say "the agent's viewpoint" and note once that the
+  book calls it a lens. A word a first-time reader cannot guess is
+  explained where it first appears or replaced by the plain one. A count is never an explanation: "the eight phases"
+  tells a newcomer nothing; say what the phases are.
+  A "HOW TO READ IT" SUBSECTION speaks to a first-time reader: the one thing to know or unlearn before choosing, then for each
+  path what it covers, when you read it, and what you can decide after it. Never a list of paths alone.
+  THE HUB'S AREA SECTIONS explain the area first — what it is, why it divides as it does, who reads it — with a figure
+  where seeing is faster, and only then the tiles, one per reading path. Tiles alone are not a section.
+  THE SHAPE of a domain overview: Overview (the path in a paragraph, and what you can decide after it) → one section per
+  topic, in reading order, each a summary you can decide from (~80 words: what it is, what it fixes, what you would
+  decide there) and a door to its construct → the rules the path shares, if any → Glossary (the path's Terms) → Where to
+  go next. Headings carry the topic's name in full, never its number. An overview has no status and no cards. -->
+<header class="masthead">
+<!-- THE HEADER: three segments — {workspace} | {repository} | {page name}. Line 2 is Type, For and MEASURED.
+  A report carries no status badge: what it holds is true of one moment and the date is what says so. -->
+  <div class="eyebrow"><span class="line1">{{WORKSPACE}} &nbsp;|&nbsp; {{REPOSITORY}} &nbsp;|&nbsp; {{KIND, in plain words}}</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Report</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">{{ROLE}}</span></span><span class="sep">|</span><span class="lbl">Measured:</span> <span class="badge">{{YYYY-MM-DD}}</span></span></div>
+  <h1>{{The answer in ordinary words, as a sentence a reader would say out loud — never the question, never the report's own name, and never a word this page has not yet explained.}}</h1>
+  <p class="standfirst">{{One line that DEFINES the thing being counted and then counts it — what a reader is looking at, in words they already have.}}</p>
+  <p>{{A plain paragraph that teaches the model in passing: where these things are written down, how one gets proved, and ONE real example quoted from what you measured. Then why it was measured now, and what it does not cover.}}</p>
+</header>
+
+<section id="s0" data-block="reasons">
+  <div class="sec-head"><h2>Summary</h2></div>
+  <p>{{The answer and the one number, in the words established above. A reader who stops here has the finding and needed no other page to understand it.}}</p>
+  <p>{{What changed since the last run of this same report, where there was one — a report nobody can diff is a report nobody reads twice.}}</p>
+</section>
+
+<section id="s1" data-block="reasons">
+  <div class="sec-head"><h2>What was measured</h2></div>
+  <p>{{What was read, and by what. Every row names its source, so a reader can re-run it and get the same answer.}}</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Measure</th><th>Value</th><th>Read from</th></tr></thead>
+    <tbody>
+      <tr><td>{{&hellip;}}</td><td>{{&hellip;}}</td><td><code>{{command or path}}</code></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="s2" data-block="must">
+  <div class="sec-head"><h2>Findings</h2></div>
+  <p>{{What the measurement says, worst first. A finding names where it is, so it can be acted on without a hunt.}}</p>
+  <!-- THE COLUMNS ARE THE ONE THING A KIND CHANGES. A coverage or traceability report reads
+       Row · Claim · Tier · Status · Proven by. An audit reads # · Finding · Where · Grade. Keep whichever
+       the kind needs and delete the other; do not carry both. -->
+  <div class="scroll"><table>
+    <thead><tr><th>#</th><th>Finding</th><th>Where</th><th>Grade</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>{{&hellip;}}</td><td><code>{{path}}</code></td><td>BLOCK &middot; RULE &middot; SOFT</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="s3" data-block="next">
+  <div class="sec-head"><h2>What to do</h2></div>
+  <p>{{One row per action, each owned and each with a condition a person can check. A report that ends at findings leaves the work to memory.}}</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Action</th><th>Owned by</th><th>Done when</th></tr></thead>
+    <tbody>
+      <tr><td>{{&hellip;}}</td><td>{{&hellip;}}</td><td>{{&hellip;}}</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="s4" data-block="reasons">
+  <div class="sec-head"><h2>What this did not look at</h2></div>
+  <p><strong>{{Say it plainly, and never leave this empty.}}</strong> {{What was out of scope, what could not be read, and what a clean result here therefore does not prove. A clean result mistaken for a scope it never had is the one way a report does harm.}}</p>
+</section>
+
+
+
+<!-- THE BLOCKS AND THE FIGURES ARE SHOWN ONCE, in templates/blocks-template.html — normal content first,
+     then every block and every figure kind rendered. It is a reference you consult while writing, not a section
+     you copy: the chooser above tells you which block a piece of content earns, and that page shows you what
+     each one looks like. Open it beside this template. -->
+
+</div>
+</div>
+
+<footer>
+  A template from workstream 008 &middot; copy it, keep the comments until the page is written, then delete them &middot; the rules live in the book; this file repeats them so you never write from memory &middot; every block and figure is shown once in <code>blocks-template.html</code>
+</footer>
+
+<script>
+(function(){
+  var rail=document.getElementById('rail');if(!rail)return;
+  var secs=Array.prototype.slice.call(document.querySelectorAll('section[id]'));
+  var links=[];
+  secs.forEach(function(s){
+    var num=s.querySelector('.sec-head .num'),h2=s.querySelector('h2');if(!h2)return;
+    var a=document.createElement('a');a.href='#'+s.id;
+    var n=document.createElement('span');n.className='n';n.textContent=num?num.textContent:'';
+    var t=document.createElement('span');t.textContent=h2.textContent.split(' — ')[0];
+    a.appendChild(n);a.appendChild(t);
+    if(s.id==='s4'){var c=s.querySelectorAll('.open').length;if(c){var b=document.createElement('span');b.className='count';b.textContent=c;a.appendChild(b);}}
+    rail.appendChild(a);links.push({el:a,sec:s});
+    Array.prototype.forEach.call(s.querySelectorAll('h3[id]'),function(h){
+      var sa=document.createElement('a');sa.href='#'+h.id;sa.className='sub';sa.textContent=h.textContent;rail.appendChild(sa);
+    });
+  });
+  function mark(){var y=window.scrollY+120,cur=links[0];links.forEach(function(l){if(l.sec.offsetTop<=y)cur=l;});links.forEach(function(l){l.el.classList.toggle('on',l===cur);});}
+  window.addEventListener('scroll',mark,{passive:true});mark();
+})();
+</script>
+
+<!-- rail-fold: subsections collapse under their section, the caret sits at the far right and only
+     where a group exists, and a group the reader has not pinned follows the scroll. This is the
+     shape 009 landed and the developer confirmed; it is applied here as a block appended AFTER the
+     page's own rail builder, because the corpus has two builders and one transform covers both.
+     05-artifacts.md § A page carries its own subsections. -->
+<style>
+  .rail .sub-group{display:block}
+  .rail.js .sub-group{display:none}
+  .rail.js .sub-group.shown{display:block}
+  .rail a .caret:hover{background:var(--accent-soft);color:var(--accent)}
+  .rail a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+<style>
+  /* a quote is a sentence set apart — a rule stated in full, or a line from the source the page is about */
+  blockquote{margin:1.6rem 0;padding:.2rem 0 .2rem 1.1rem;border-left:2px solid var(--rule);color:var(--slate)}
+  blockquote p{margin:0;max-width:none}
+  .tile .s{margin-top:.45rem}
+  /* PROSE — the markdown block. Its own border, background and text colour, so a passage of ordinary
+     markdown reads as a block the page chose rather than as the page's own voice continuing. */
+  .prose{border:1px solid var(--rule);background:var(--card);color:var(--slate);border-radius:3px;
+    padding:1.1rem 1.3rem;margin:1.6rem 0}
+  .prose > :first-child{margin-top:0}
+  .prose > :last-child{margin-bottom:0}
+  .prose p,.prose li{max-width:none}
+  .prose strong,.prose h4{color:var(--ink)}
+  .prose code{color:var(--ink)}
+  .prose blockquote{border-left-color:var(--accent);margin:1rem 0}
+  /* NEXT — small on purpose: a title and a direction, nothing else */
+  .nextnav{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.7rem;margin:1.6rem 0}
+  .nextnav-card{display:flex;flex-direction:column;gap:.15rem;border:1px solid var(--rule);background:var(--card);
+    border-radius:3px;padding:.65rem .85rem;text-decoration:none;min-width:0}
+  .nextnav-card:hover{border-color:var(--accent)}
+  .nextnav-card .dir{font-family:var(--mono);font-size:var(--xs);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+  .nextnav-card .ttl{font-size:var(--sm);font-weight:600;color:var(--ink)}
+  .nextnav-card:hover .ttl{color:var(--accent)}
+  .nextnav-card.next{text-align:right}
+</style>
+
+<script>
+(function(){
+  var rail = document.getElementById('rail-list') || document.getElementById('rail');
+  if (!rail || rail.querySelector('.sub-group')) return;
+  var styled = document.getElementById('rail') || rail;
+
+  /* The caret and the group are one state with two faces. Writing both here is what stops the
+     caret claiming a section is open while its subsections are hidden. */
+  function setOpen(anchor, group, open){
+    group.classList.toggle('shown', open);
+    anchor.classList.toggle('group-open', open);
+    anchor.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+
+  /* Regroup whatever the page's own builder produced: a section anchor, then the `sub` anchors
+     that follow it, moved into one collapsing group. */
+  var entries = [], current = null;
+  Array.prototype.slice.call(rail.children).forEach(function(node){
+    if (node.tagName !== 'A' || node.classList.contains('home')) return;
+    if (node.classList.contains('sub')) {
+      if (!current) return;
+      if (!current.group) {
+        current.group = document.createElement('div');
+        current.group.className = 'sub-group';
+        rail.insertBefore(current.group, node);
+      }
+      current.group.appendChild(node);
+      return;
+    }
+    current = { anchor: node, group: null };
+    entries.push(current);
+  });
+
+  entries.forEach(function(entry){
+    if (!entry.group) return;                     // a section with no second level never folds
+    var anchor = entry.anchor, group = entry.group;
+    anchor.classList.add('has-subs');
+    var caret = document.createElement('span');
+    caret.className = 'caret';
+    caret.setAttribute('role', 'button');
+    caret.setAttribute('tabindex', '-1');
+    caret.setAttribute('aria-label', 'Show sections under ' + anchor.textContent.trim());
+    anchor.appendChild(caret);
+    /* The caret toggles without leaving the page; the label still navigates. Hit-testing the
+       element beats measuring offsetX, which broke the moment the caret moved to the right. */
+    anchor.addEventListener('click', function(event){
+      if (event.target !== caret) return;
+      event.preventDefault();
+      /* `pinned` means a reader decided, so the scroll must stop overriding them. */
+      anchor.dataset.pinned = '1';
+      setOpen(anchor, group, !group.classList.contains('shown'));
+    });
+    setOpen(anchor, group, false);
+  });
+
+  /* THE RAIL FOLLOWS THE SCROLL. The page's own builder already marks the current entry with
+     `on`, so this watches that mark rather than measuring offsets a second time — two answers to
+     where the reader is would disagree the first time either changed. */
+  function follow(){
+    entries.forEach(function(entry){
+      if (!entry.group || entry.anchor.dataset.pinned === '1') return;
+      var here = entry.anchor.classList.contains('on') || !!entry.group.querySelector('a.on');
+      setOpen(entry.anchor, entry.group, here);
+    });
+  }
+  new MutationObserver(follow).observe(rail, {subtree: true, attributes: true,
+                                              attributeFilter: ['class']});
+  /* Last, because everything above degrades to the full index when no script runs. */
+  styled.classList.add('js');
+  follow();
+})();
+</script>
+<script>
+/* Every section (h2 inside .sec-head) and every subsection (h3 with an id) gets an anchor link.
+   Clicking it moves the address to that heading and copies the full link, so a subsection can be shared. */
+(function(){
+  function pageBase(){
+    var ref=document.referrer||'';
+    if(window.top!==window&&ref.indexOf('/artifact/')>-1)return ref.split('#')[0];
+    return location.href.split('#')[0];
+  }
+  function attach(h,id){
+    if(!id||h.querySelector('a.anchor'))return;
+    var a=document.createElement('a');a.className='anchor';a.href='#'+id;a.textContent='#';a.title='Copy link to this heading';a.setAttribute('aria-label','Copy link to '+h.textContent.trim());
+    a.addEventListener('click',function(ev){
+      var url=pageBase()+'#'+id;
+      try{history.replaceState(null,'',location.pathname+location.search+'#'+id);}catch(e){}
+      var done=function(){a.classList.add('copied');setTimeout(function(){a.classList.remove('copied');},1400);};
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(done,done);}else{done();}
+      var target=document.getElementById(id);if(target){ev.preventDefault();target.scrollIntoView({block:'start'});}
+    });
+    h.appendChild(a);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('section[id]'),function(s){
+    var h2=s.querySelector('.sec-head h2');if(!h2)return;
+    if(!h2.id)h2.id=s.id+'-title';
+    attach(h2,s.id);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('h3[id]'),function(h){attach(h,h.id);});
+})();
+</script>
