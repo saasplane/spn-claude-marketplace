@@ -6,7 +6,7 @@
     { "path": "docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md", "seen": "07a688b1" },
     { "path": "docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md", "section": "The agent is updated first, and reloaded before anything runs", "seen": "97526696" },
     { "path": "docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md", "section": "An arc's status says which of eight states it is in", "seen": "f6636752" },
-    { "path": "docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md", "section": "When an edit becomes behaviour", "seen": "4d108ba0" },
+    { "path": "docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md", "section": "When an edit becomes behaviour", "seen": "37aada54" },
     { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md", "section": "Restatement discipline", "seen": "11808ae4" }
   ],
   "rows": [
@@ -286,13 +286,19 @@ When a window opens, surface what is stale — a subject untouched across sittin
 
 | Step | What it covers | Live yet? |
 | --- | --- | --- |
-| 5 | **install** — uninstall and install at project scope, sequentially, from the workspace root | scripts only |
-| 6 | the **per-repo refresh and the workspace agent-sync**, which re-mint what a session start reads | no |
+| 5 | **release `spnutils`, where step 3 changed it** | the new CLI, once released |
+| 6 | **`spnutils workspace agent-sync`** — one verb | scripts only |
 | 7 | a **fresh window** | yes |
 
-**Step 6 comes before step 7, and reversing them costs you a second reload.** The per-repo refresh writes each repo's generated rule file and its managed `CLAUDE.md` block; the workspace agent-sync re-mints the floor's permission tiers. **All three are read at session start**, so a window opened before them loads the previous generation.
+**Step 5 comes first because the plugins restate a tool the session runs.** A plugin naming a command the installed CLI does not carry is a rule nobody can follow, and the CLI reports the last **release** rather than the checkout — so unreleased commits leave every window silently behind. Where step 3 changed only a comment and the generated output is byte-identical, there is nothing to release and saying so is the answer.
 
-**Reloading in the middle means reloading twice**, and a half-reloaded session is one where you cannot tell which surface answered. Do every edit, then install once, then sync, then take one fresh window.
+**Step 6 is one verb and not two.** `workspace agent-sync` refreshes every plugin whose installed copy differs from the marketplace checkout — uninstall and install at project scope, in the right order — and then re-mints each repo's generated rules, its managed `CLAUDE.md` block, and the floor's permission tiers. It reports one line per plugin: `installed`, `refreshed`, `current` or `unverified`.
+
+**Do not run `claude plugin uninstall` and `install` by hand first.** It is not merely the same thing twice. The installer compares the installed copy against the checkout **before** replacing it, because at that moment the installed copy is what the live window actually loaded — which is the only way to answer *did this window's hooks, agents and skills change*. Uninstalling by hand throws that moment away, and the sync that follows can then only report `current`: true, and useless. Reach for the raw CLI only where `spnutils` itself cannot run.
+
+**Step 6 comes before step 7, and reversing them costs you a second reload.** All of it is read at session start, so a window opened before them loads the previous generation.
+
+**Reloading in the middle means reloading twice**, and a half-reloaded session is one where you cannot tell which surface answered. Do every edit, release the tool if it moved, sync once, then take one fresh window.
 
 ### A partner's form of this rule, which is shorter
 
@@ -301,9 +307,8 @@ When a window opens, surface what is stale — a subject untouched across sittin
 | Step | What a partner does |
 | --- | --- |
 | 1 | check whether a newer plugin version has been published |
-| 2 | **install** it — uninstall and install at project scope, sequentially, from the workspace root |
-| 3 | the **per-repo refresh and the workspace agent-sync** |
-| 4 | a **fresh window** |
+| 2 | **`spnutils workspace agent-sync`** — one verb: it installs or refreshes what drifted, then re-mints the rules and the floor |
+| 3 | a **fresh window** |
 
 **Where the update you need does not exist yet, the ask crosses upward as an order.** A rule you cannot get from a plugin or a package is a gap in what the Foundation publishes, and naming it is how it gets closed. It is never something to work around locally, because a local fix is a rule that exists for one workspace.
 

@@ -4,7 +4,7 @@
     { "path": "docs/04-capabilities/02-support/02-infra/README.md", "seen": "96f660d6" },
     { "path": "docs/04-capabilities/01-devex/01-function/01-scm.md", "seen": "e68cbe59" },
     { "path": "docs/04-capabilities/01-devex/01-function/07-deliver.md", "seen": "c587fb16" },
-    { "path": "docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md", "seen": "3c7d4534" }
+    { "path": "docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md", "seen": "5e08fcd6" }
   ],
   "rows": [
     "RD.APPS.121",
