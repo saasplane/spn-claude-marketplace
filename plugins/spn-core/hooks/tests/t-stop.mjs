@@ -307,6 +307,21 @@ one("a card with every part is silent",
   build("stop-reply-whole", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
   "silent", { reply: "Q256 · does the release go now\n\n**What** — spnutils 1.2.74, carrying N64 and N39 step 7.\n\n**Why** — what it costs to leave it: .spndevex has no history, which cost three status lines.\n\n| | Option | What it costs |\n| --- | --- | --- |\n| **A** | release now | two trains |\n| **B** | wait | open-ended |\n\nRecommended: A, because the wait is unbounded. Say A and I will release." });
 
+// F19 — THE GATE REFUSED THE ONE REPLY SHAPE THE BOOK MAKES MANDATORY, on its first day. A handover
+// block names the cards a session leaves open, and naming one means writing its recommendation —
+// "the recommendation is D then A" — inside a fence, in a reply whose whole purpose is to stop. The
+// check read that as putting a decision. A fenced block is a quotation, not an ask.
+one("a handover block naming an open card's recommendation is not an ask",
+  build("stop-reply-handover", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
+  "silent", { reply: "This session is retiring.\n\n```text\nContinue workstream `008-x`, arc `N69`, step 1.\nOpen: `Q259` — how much of the book the plugins must restate; the recommendation is D then A.\n```\n\nBoth releases are done." });
+
+// The other half, and it is what stops the fix being a hole: an ask in PROSE, with a fence elsewhere
+// in the reply, still fires.
+one("an ask outside the fence still fires, fence or no fence",
+  build("stop-reply-fence-ask", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
+  "warns", { says: "the card is not whole",
+             reply: "Here is the state.\n\n```text\nworkstream: 008\n```\n\nTwo ways: option A now, or wait." });
+
 one("a reply that asks nothing is still silent, whatever parts it lacks",
   build("stop-reply-noask", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
   "silent", { reply: "Landed and committed. Nothing is open." });

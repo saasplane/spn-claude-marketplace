@@ -519,8 +519,23 @@ const ASKS = /\b(?:[Ss]ay|[Aa]nswer|[Rr]eply|[Pp]ick|[Cc]hoose|[Cc]hoosing|[Ss]e
  * an ask. A reply that is genuinely putting a choice does not describe it as already made.
  */
 const REPORTS = /\b(?:answered|decided|chose|chosen|settled|recorded)\b/i;
+// A FENCED BLOCK IS A QUOTATION, NOT AN ASK — finding F19, and this check found it on itself.
+//
+// The handover block the chapter REQUIRES names the cards a session is leaving open, and naming one
+// means writing its recommendation: *the recommendation is D then A*. That is a sentence about a
+// card, inside a fence, in a reply whose whole purpose is to stop. This check read it as putting a
+// decision and demanded the card be written out in full — in a block whose shape the book fixes.
+//
+// **So the gate refused the one reply shape the book makes mandatory**, on its first day, and the
+// reply that tripped it was correct. The same reasoning `split-plan.ts` already applies to card
+// numbers holds here: a number inside a code span is an EXAMPLE, and a card named inside a fence is
+// a reference. An ask is something you write to the reader, in prose, outside the quotation.
+//
+// Stripping fences does not weaken the real check: a card's options are a markdown TABLE, never a
+// fence, so every genuine card survives this unchanged.
+const FENCE = /```[\s\S]*?```/g;
 const asking = (reply: string) =>
-  ASKS.test(reply.split(/(?<=[.!?\n])\s+/).filter((line) => !REPORTS.test(line)).join(" "));
+  ASKS.test(reply.replace(FENCE, " ").split(/(?<=[.!?\n])\s+/).filter((line) => !REPORTS.test(line)).join(" "));
 
 // A markdown options table: a header row and the `| --- |` separator the grammar requires.
 const TABLE = /^\|.*\|\s*$\n^\|[\s:-]*\|[\s:|-]*$/m;
