@@ -144,6 +144,8 @@ A run writes what it can see, and it stops there. **It never deletes a key becau
 
 The workspace folder carries two dot-homes: `.claude/` (settings — the marketplace, the plugin union, the permission floor) and `.spndevex/` — the agent's working state. **State and settings, never rules**: a rule filed there has two homes, and the copy nobody updates is the one an agent reads.
 
+**The folder is a git repository with no remote, and that is what makes a mistake survivable.** `workspace init` starts its history; the record keeps its own versions locally and is never pushed anywhere. So a script that rewrote an arc wrongly can be read back with `git -C .spndevex diff`, and a line somebody deleted is still there in the last commit. **Nothing else tracks this folder** — it sits above every checkout, so without that repository there is no yesterday to ask about.
+
 **The container is a workstream, and it is named for its subject.** One folder holds everything a subject needs: the argument you read, the arcs the agent executes, and the brief behind every delegated run. Its name is a number and the subject; its parent folder is its state.
 
 ```
