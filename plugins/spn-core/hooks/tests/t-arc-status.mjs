@@ -14,7 +14,11 @@ const verdict = (text, path = ARC) =>
 function one(what, text, expected, path = ARC) {
   n += 1;
   const v = verdict(text, path);
-  const got = v && v.note ? "note" : "silent";
+  // IT REFUSES NOW RATHER THAN ADVISING (N66). The check shipped soft on purpose and its own note
+  // said it would advise until the corpus was clean under it; the corpus was cleaned on 2026-09-24
+  // and the word flipped. These cases read `deny` for the same reason they read `note` before — the
+  // question they ask is whether the check SPEAKS about a word outside the set, not how loudly.
+  const got = v && (v.deny || v.note) ? "note" : "silent";
   const ok = got === expected;
   if (!ok) failed += 1;
   console.log(`  ${ok ? "PASS" : "FAIL"}  ${what} -> ${got}`);

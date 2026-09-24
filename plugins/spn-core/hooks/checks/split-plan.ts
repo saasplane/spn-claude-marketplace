@@ -32,6 +32,7 @@
 // to a check that read only the arcs. Four cards sat in `Open` answered for a day.
 
 import { readdirSync, statSync } from "node:fs";
+import { TERMINAL, statusIn } from "./arc-status.ts";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { DEVEX, emit, isDir, isFile, listdir, read, readPayload, runAlone, unescape, workspaceRoot,
          type Payload, type Verdict } from "../lib/payload.ts";
@@ -873,6 +874,40 @@ export function gateClose(payload: Payload): Verdict {
           `it back here.`,
       };
     }
+    // EVERY ARC MUST BE FINISHED, AND NOTHING USED TO CHECK IT. This gate read arc statuses only to
+    // resolve sequencing ROWS that named an arc, so an arc nobody's row happened to name could sit
+    // at `RUNNING` while its workstream moved to `closed/`. Measured 2026-09-24 across the closed
+    // workstreams: **8 arcs still read `OPEN`**, and one of them recorded in its own log that it had
+    // landed — so the folder said finished, the arc said open, and no check had ever compared them.
+    //
+    // A TERMINAL STATUS IS THE WHOLE TEST. `LANDED` says nothing is owed, `CARRIED` says the work
+    // left and names where, `DROPPED` says it was abandoned and why. Any other word means somebody
+    // has to decide which of those three it is, and a receipt written before that decision records
+    // a state nobody checked. An arc with NO status is left alone here, the same way `arc-status`
+    // leaves it: a batch-shaped arc whose state has to be read is not pushed into a stamped word.
+    const unfinished: string[] = [];
+    for (const dir of pages.map((f) => join(dirname(f), "arcs")).filter(isDir)) {
+      for (const f of listdir(dir).filter((x) => x.endsWith(".md"))) {
+        const st = statusIn(read(join(dir, f)));
+        if (st && !TERMINAL.has(st)) unfinished.push(`  - ${f.replace(/\.md$/, "")} — ${st}`);
+      }
+    }
+    if (unfinished.length) {
+      const listed = unfinished.slice(0, 10).join("\n");
+      const more = unfinished.length > 10 ? `\n  … and ${unfinished.length - 10} more` : "";
+      return {
+        note: `Close gate — \`${subject}\` has ${unfinished.length} arc(s) that are not finished.`,
+        deny:
+          `Denied: \`${subject}\` cannot close while an arc under it carries a status that is not ` +
+          `terminal. The three that are: \`LANDED\` (nothing is owed), \`CARRIED\` (the work left, ` +
+          `and the status names where) and \`DROPPED\` (abandoned on purpose, with the reason).\n\n` +
+          `${listed}${more}\n\n` +
+          `For each one, decide which of the three it is and say so in its \`Status:\` line. An arc ` +
+          `left at \`PART-LANDED\` inside a closed workstream is a receipt that disagrees with ` +
+          `itself, and the next reader cannot tell whether the work was finished, moved or dropped.`,
+      };
+    }
+
     if (!empty.length && !stopped.length) {
       // ACCOUNTED FOR IS THREE STATES, AND `accounted()` READS ALL THREE. It did not once: a row
       // naming its successor counted the same as one saying `🚧 agreed`, and closing `007` warned

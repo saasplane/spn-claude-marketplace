@@ -26,6 +26,7 @@ import { basename, dirname, join } from "node:path";
 import { createHash } from "node:crypto";
 import { checkCorpus } from "../checks/corpus.ts";
 import { cardsOf, openWorkstreams, rowsOf, stateOf } from "../checks/split-plan.ts";
+import { TERMINAL } from "../checks/arc-status.ts";
 import { DEVEX, workspaceRoot } from "../lib/payload.ts";
 import { cacheState } from "./orientation.ts";
 import { begin, span, end } from "../lib/timing.ts";
@@ -73,7 +74,18 @@ function statusOf(arc: string): string {
 }
 
 /** Statuses that mean the arc is finished, so unfinished rows in it are history rather than work. */
-const TERMINAL = new Set(["LANDED", "DONE", "CLOSED", "CARRIED", "DEFERRED"]);
+// TERMINAL IS IMPORTED NOW, BECAUSE A SECOND COPY OF A CLOSED SET DRIFTS. This file
+// kept its own — `LANDED · DONE · CLOSED · CARRIED · DEFERRED` — against the register's
+// `LANDED · CARRIED · DROPPED`. Three of those five are not arc statuses at all, and `DROPPED` was
+// missing, so an arc abandoned on purpose reported as runnable work for as long as anybody touched
+// it. `arc-status.ts` already exported the set; this file simply did not ask for it.
+//
+// A STATUS THAT MEANS *DO NOT START THIS* IS NOT RUNNABLE, and four of the eight say so for four
+// different reasons: nobody agreed it, its turn has not come, it is blocked, or it is finished.
+// Inferring runnable from *has unfinished steps* is true of `RUNNING` and `PART-LANDED` and false of
+// the rest — which is how an arc opened at `DECIDED` was reported, within a minute of being written,
+// as work somebody had abandoned.
+const NOT_RUNNABLE = new Set(["PROPOSED", "DECIDED", "HELD"]);
 
 /** When this workspace's `Stop` hook last ran, as milliseconds. 0 when it never has. */
 const DEBUG = ".debug";
@@ -196,9 +208,19 @@ export function checkRunnable(root: string, since = lastStopAt(root), stepsAt = 
         // NO BASELINE MEANS NO INFERENCE, the same rule the timestamp follows. An empty map is the
         // first Stop after this check learned to tell a record edit from a work edit, and firing on
         // every arc the sitting touched would make that upgrade look like a burst of findings.
-        const then = Object.keys(stepsAt).length ? stepsAt[arc] : now;
+        // AN ARC WRITTEN THIS SITTING HAS NO BASELINE, AND THAT IS NOT EVIDENCE OF WORK. `stepsAt` is
+        // the previous sitting's map, so a file that did not exist then is absent from it —
+        // `undefined !== now`, and every newly written arc reported as worked-on whatever its status.
+        // The guard above exists for exactly this distinction, and could not reach a file that was
+        // not there when the baseline was taken. No baseline means no inference, the same rule the
+        // timestamp already follows two lines up.
+        const then = Object.keys(stepsAt).length ? stepsAt[arc] ?? now : now;
         if (then === now) touched = false;                        // the record moved, the work did not
       }
+      // `HELD` names its blocker in its own line, and that blocker is frequently an ARC rather than a
+      // card — which the `cards.length` guard below cannot see. Skipping it here reads the word the
+      // arc wrote instead of guessing at what it waits for.
+      if (NOT_RUNNABLE.has(status)) continue;
       if (status !== "RUNNING" && !touched) continue;
       const steps = unfinishedSteps(arc);
       if (steps === null) {
@@ -270,6 +292,18 @@ const NOT_YET = /\b(?:will|would|'ll|once|after|when|going to|about to|then|may|
 // description of a consequence, and every conditional word in it sits after the phrase rather than
 // before. Looking only backwards refused a reply that was explaining what a build costs.
 const NOT_YET_AFTER = /^[^.?!]{0,60}\b(?:will|would|'ll|may|might|could|is going to)\b/i;
+// AND A COST IS NOT A DIRECTION, which the two guards above cannot see because they look for
+// conditional WORDS and a cost is a noun phrase. "one bump, the installs, one `agent-sync`, and a
+// fresh window" is a list of what a plugin cycle costs; it directs nobody to do anything, and this
+// check fired on it twice in one sitting. The file's own note says why that matters: *warning
+// somebody what a build is about to cost is the normal way to be useful about it, and a check that
+// refuses it teaches people to stop describing consequences.*
+//
+// A LIST IS THE TEST, not a word. Where the phrase is the last item of a run of comma-separated
+// items — two or more before it, joined by `and` or `or` — it is being counted rather than asked
+// for. That is narrow on purpose: one comma is an ordinary sentence, and this must not swallow a
+// real pass-on such as "finish the release, then open a fresh window".
+const A_COST_LIST = /(?:,[^.?!,]{1,60}){2,}(?:,)?\s*(?:and|or)\s+[^.?!,]{0,30}$/i;
 
 export function passingOn(reply: string): boolean {
   // A handover block is a pass-on whatever the prose around it says.
@@ -279,6 +313,7 @@ export function passingOn(reply: string): boolean {
     const before = reply.slice(Math.max(0, at - 90), at);
     const after = reply.slice(at + hit[0].length, at + hit[0].length + 70);
     if (NOT_YET.test(before) || NOT_YET_AFTER.test(after)) continue;
+    if (A_COST_LIST.test(before)) continue;      // counted as a cost, not asked for
     return true;                                 // stated plainly: this is being passed on
   }
   return false;

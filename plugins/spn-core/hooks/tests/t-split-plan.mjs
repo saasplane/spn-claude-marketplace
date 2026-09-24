@@ -61,14 +61,20 @@ const card = (n, decision) => `  <tr id="q${n}">
     </td>
   </tr>`;
 
-// THE STATUS IS A PARAMETER because a sequencing row resolves through it: only `LANDED` means the
-// arc is finished, and `RUNNING` — the default here — is one of the words that means work is left.
-const arc = (log = "", status = "RUNNING") =>
+// THE STATUS IS A PARAMETER because a sequencing row resolves through it: only a terminal word means
+// the arc is finished, and `RUNNING` is one of the words that means work is left.
+//
+// THE DEFAULT IS `LANDED` NOW, AND IT WAS `RUNNING` (N66 step 7). The close gate refuses a
+// workstream holding an arc that is not terminal, so an unfinished arc in the DEFAULT fixture made
+// every close case meet that refusal — including the ones testing a row fault and the ones that must
+// be silent. A fixture should carry only the fault its case is about; an unfinished arc is now a
+// fault, so it is set where a case wants one rather than everywhere.
+const arc = (log = "", status = "LANDED") =>
   `# Arc — a subject\n\nStatus: **${status}**\n\n## Log\n\n- **2026-09-18 — go.** Finish it.\n${log}`;
 
 const LANDED = [["the chapter", "spn-foundation", "&#x2705; landed"], ["the check", "spn-support-ts", "&#x2705; landed"]];
 
-function build(name, { eyebrow, rows = LANDED, cards = "", log = "", state = "open", arcStatus = "RUNNING" } = {}) {
+function build(name, { eyebrow, rows = LANDED, cards = "", log = "", state = "open", arcStatus = "LANDED" } = {}) {
   const folder = `.spndevex/workstreams/${state}/001-a-subject`;
   return workspace(name, {
     [`${folder}/a-subject-approach.html`]: page({ eyebrow, rows, cards }),
@@ -280,7 +286,7 @@ one("a carry to a scope that does not exist is refused", "close",
 // do it — and `N1-something.md` carries no status line, which resolves as unfinished rather than as
 // a guess.
 one("a row waiting on an arc of its own workstream is refused", "close",
-  build("sp-sequencing", { rows: [["a", "spn-foundation", "&#x2705; landed"], ["b", "spn-support-ts", "&#x21B7; carried &rarr; N1 step 2"]] }),
+  build("sp-sequencing", { arcStatus: "RUNNING", rows: [["a", "spn-foundation", "&#x2705; landed"], ["b", "spn-support-ts", "&#x21B7; carried &rarr; N1 step 2"]] }),
   move(".spndevex/workstreams/open/001-a-subject", ".spndevex/workstreams/closed/"),
   "deny", { says: "waits on an arc" });
 
@@ -289,6 +295,28 @@ one("and it closes once that arc has landed", "close",
     arcStatus: "LANDED",
     rows: [["a", "spn-foundation", "&#x2705; landed"], ["b", "spn-support-ts", "&#x21B7; carried &rarr; N1 step 2"]],
   }),
+  move(".spndevex/workstreams/open/001-a-subject", ".spndevex/workstreams/closed/"),
+  "silent");
+
+// ---------------------------------------------------------------- every arc must be finished
+//
+// NOTHING CHECKED THIS UNTIL N66 STEP 7. The gate read arc statuses only to resolve sequencing ROWS
+// that named an arc, so an arc nobody's row happened to name could sit at `RUNNING` while its
+// workstream moved to `closed/`. Measured across the closed workstreams on 2026-09-24: eight arcs
+// still read `OPEN`, and one of them recorded in its own log that it had landed.
+
+one("a workstream holding an unfinished arc cannot close", "close",
+  build("sp-arc-unfinished", { arcStatus: "PART-LANDED" }),
+  move(".spndevex/workstreams/open/001-a-subject", ".spndevex/workstreams/closed/"),
+  "deny", { says: "not terminal" });
+
+one("and a DROPPED arc closes, because abandoning on purpose is finished", "close",
+  build("sp-arc-dropped", { arcStatus: "DROPPED" }),
+  move(".spndevex/workstreams/open/001-a-subject", ".spndevex/workstreams/closed/"),
+  "silent");
+
+one("a CARRIED arc closes too, because the work left and the status names where", "close",
+  build("sp-arc-carried", { arcStatus: "CARRIED" }),
   move(".spndevex/workstreams/open/001-a-subject", ".spndevex/workstreams/closed/"),
   "silent");
 
