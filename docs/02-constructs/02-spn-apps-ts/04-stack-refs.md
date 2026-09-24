@@ -26,7 +26,6 @@ The thing to know before opening one is that **it is reference material and not 
 | a stack ref | `refs/` | a markdown file a stack's plugin ships for a skill living in another plugin |
 | the layer | — | the part of a walk that cannot be stack-agnostic: which seats a row lands in, and what each row must carry |
 | the claim | `sprepo.json` | what a repository declares about its own world and stack, which is what selects the layer |
-| a mode | — | which of the walks this file describes is running, named out loud even where it was inferred |
 | the stamp | `spn:restates` | the block at the top, naming the chapters this file restates and the hash last read from each |
 | a planned row | — | what a design lands as: a row in the seat that will later be flipped, rather than an entry in a scratch file |
 
@@ -66,7 +65,7 @@ Planning is written into the documents that will later be flipped to done. A scr
 
 ### The mode is chosen, and the choice is said out loud
 
-A reader who cannot tell which walk ran cannot tell whether the output is complete. The file describes more than one walk, takes the choice from the skill's own argument, and requires the inferred one to be named where nobody gave it. *Where:* `plugins/spn-apps-ts/refs/plan.md`
+A reader who cannot tell which walk ran cannot tell whether the output is complete. The file describes more than one walk, takes the choice from the mode argument [the skill](03-stack-skills.md) declares, and requires the inferred one to be named where nobody gave it. *Where:* `plugins/spn-apps-ts/refs/plan.md`
 
 ### It is stamped like any other restatement
 

@@ -28,7 +28,6 @@ Both promises come from the same failure. A verdict was once printed and parsed 
 | the call | `ToolInput` | the fields inside that payload a hook actually reads — a file path, a shell command, the content or replacement text a write carries |
 | a verdict | `Verdict` | what a hook decided: `deny` refuses the call, `note` is advice the turn reads, and nothing at all is silence |
 | the dispatcher | `dispatch` | one process that asks every check applying to a call, keeps the first refusal, and joins the advice |
-| a tool | — | code under `hooks/tools/`, invoked by its own path rather than wired to a moment; it has its own page |
 
 ## Model
 

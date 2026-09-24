@@ -194,7 +194,6 @@
       <tr><td>a stack ref</td><td><code>refs/</code></td><td>a markdown file a stack's plugin ships for a skill living in another plugin</td></tr>
       <tr><td>the layer</td><td>—</td><td>the part of a walk that cannot be stack-agnostic: which seats a row lands in, and what each row must carry</td></tr>
       <tr><td>the claim</td><td><code>sprepo.json</code></td><td>what a repository declares about its own world and stack, which is what selects the layer</td></tr>
-      <tr><td>a mode</td><td>—</td><td>which of the walks this file describes is running, named out loud even where it was inferred</td></tr>
       <tr><td>the stamp</td><td><code>spn:restates</code></td><td>the block at the top, naming the chapters this file restates and the hash last read from each</td></tr>
       <tr><td>a planned row</td><td>—</td><td>what a design lands as: a row in the seat that will later be flipped, rather than an entry in a scratch file</td></tr>
     </tbody>
@@ -260,7 +259,7 @@
   <h3 id="a-design-lands-as-rows-in-the-documents-">A design lands as rows in the documents that already exist</h3>
   <p>Planning is written into the documents that will later be flipped to done. A scratch file or a task tree becomes a second plan, and the build then reconciles documents instead of changing statuses. So the file names the seats a row belongs in — what a person can do, and what the contract gains — and marks every one of them as planned. <em>Where:</em> <code>plugins/spn-apps-ts/refs/plan.md</code></p>
   <h3 id="the-mode-is-chosen-and-the-choice-is-sai">The mode is chosen, and the choice is said out loud</h3>
-  <p>A reader who cannot tell which walk ran cannot tell whether the output is complete. The file describes more than one walk, takes the choice from the skill's own argument, and requires the inferred one to be named where nobody gave it. <em>Where:</em> <code>plugins/spn-apps-ts/refs/plan.md</code></p>
+  <p>A reader who cannot tell which walk ran cannot tell whether the output is complete. The file describes more than one walk, takes the choice from the mode argument <a href="./03-stack-skills-construct.html">the skill</a> declares, and requires the inferred one to be named where nobody gave it. <em>Where:</em> <code>plugins/spn-apps-ts/refs/plan.md</code></p>
   <h3 id="it-is-stamped-like-any-other-restatement">It is stamped like any other restatement</h3>
   <p>The file carries the same block a core ref carries, naming each chapter it restates and the hash last read there, so a drift run reads it exactly as it reads the rest. <em>Where:</em> the <code>spn:restates</code> block at the top of <code>plugins/spn-apps-ts/refs/plan.md</code></p>
 </section>

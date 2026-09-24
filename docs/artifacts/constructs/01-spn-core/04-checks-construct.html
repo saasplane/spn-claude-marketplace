@@ -196,7 +196,6 @@
       <tr><td>what it reads</td><td><code>needs</code></td><td>which fields of a call a check requires; a call carrying none of them never reaches it</td></tr>
       <tr><td>a refusal</td><td><code>deny</code></td><td>the call is stopped, with the reason a reader is given</td></tr>
       <tr><td>advice</td><td><code>note</code></td><td>the call goes through and the turn is told something; advice from several checks is joined</td></tr>
-      <tr><td>the grade</td><td><code>Grade</code></td><td>how a finding is weighted when a check is also run as a sweep: <code>RULE</code> refuses, <code>SOFT</code> reports</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -257,7 +256,7 @@
   <h3 id="refusing-a-whole-route-beats-listing-the">Refusing a whole route beats listing the safe ones</h3>
   <p>Where a value must never be rendered, every route that would render it is refused rather than the safe routes listed. One pipeline prints key names and the next prints every value, and telling those apart inside a shell string is guesswork. The whole command is read, so even a quoted path inside a here-document is caught, and the message names the door to use instead. <em>Where:</em> <code>plugins/spn-core/hooks/checks/env-seat.ts</code></p>
   <h3 id="some-questions-are-about-the-folder-rath">Some questions are about the folder rather than the file</h3>
-  <p>A cycle among state files is a property of the whole folder, not of the file being written. So the check reads the folder with the pending write laid over it, and judges the graph the write would make. The same file runs as a hook and as a sweep over a tree. <em>Where:</em> <code>plugins/spn-core/hooks/checks/contract-cycle.ts</code></p>
+  <p>A cycle among state files is a property of the whole folder, not of the file being written. So the check reads the folder with the pending write laid over it, and judges the graph the write would make. The same file runs as a hook and as a sweep over a tree, and a sweep weights what it finds by the grade <a href="./05-tools-construct.html">The Tool</a> declares. <em>Where:</em> <code>plugins/spn-core/hooks/checks/contract-cycle.ts</code></p>
   <h3 id="a-warning-that-repeats-is-a-warning-nobo">A warning that repeats is a warning nobody reads</h3>
   <p>One turn writes many files, often into one folder. A line printed on every write teaches a reader to skip it, and the time it mattered goes past unread. So a check that speaks rather than refuses remembers what it already said and says it once, keeping that memory in the workspace's own folder for what its machinery says about itself. <em>Where:</em> <code>plugins/spn-core/hooks/checks/confirmed.ts</code>, <code>plugins/spn-core/hooks/checks/mirror.ts</code></p>
   <h3 id="some-checks-never-refuse-on-purpose">Some checks never refuse, on purpose</h3>

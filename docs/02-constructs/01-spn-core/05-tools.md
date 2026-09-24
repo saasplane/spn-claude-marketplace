@@ -25,7 +25,7 @@ A tool and a check draw the same line between refusing and reporting, and they d
 | --- | --- | --- |
 | a tool | — | a file under a plugin's `hooks/tools/`, named for what it measures, and wired to no moment |
 | a finding | `Finding` | one thing a run found: which check raised it, its grade, the file, and what a reader should do |
-| the grade | `Grade` | how a finding is weighted — `RULE` refuses and `SOFT` reports |
+| the grade | `Grade` | how a finding is weighted, whether a tool raised it or a check running as a sweep did — `RULE` refuses and `SOFT` reports |
 | the exit code | — | the count of refusals; a report alone leaves a run green |
 | a job | — | one named unit of work inside a tool, such as `audit`, `page`, `topics` or `coverage` |
 | silence | — | the answer where the input a question needs is absent, which is a fact about the repository rather than a finding about it |

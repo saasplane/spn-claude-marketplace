@@ -24,8 +24,6 @@ The thing to check first in any brief is its authority — what this persona may
 | Term | Contract term | What it means |
 | --- | --- | --- |
 | a brief | `agents/` | a markdown file naming a persona a session can convene by name |
-| the name | `name` | what a caller types to convene this persona |
-| the trigger | `description` | the sentence deciding when this persona rather than the session's own voice should answer |
 | the bound model | `model` | an optional field choosing which model runs the persona |
 | the bound tools | `tools` | an optional field narrowing what the persona may call; leaving it out grants everything the session has |
 | a parameterized brief | — | a brief holding a procedure and no subject matter, handed a viewpoint name at the moment it is convened |
@@ -56,7 +54,7 @@ Most briefs are a fixed persona and read the same way on every convening. One is
 
 ### The frontmatter
 
-`name` and `description`, read the same way a skill's are: the description is matched against the moment rather than browsed, and it decides whether this persona takes the reply. Two more fields are optional. `model` chooses which model runs the persona, and `tools` narrows what it may call. Leaving `tools` out grants every tool the session itself has. *Where:* the first lines of `plugins/spn-core/agents/spn-prose-rewriter.md`
+`name` and `description`, read the same way [a skill's](07-skill-set.md) are: the description is matched against the moment rather than browsed, and it decides whether this persona takes the reply. Two more fields are optional. `model` chooses which model runs the persona, and `tools` narrows what it may call. Leaving `tools` out grants every tool the session itself has. *Where:* the first lines of `plugins/spn-core/agents/spn-prose-rewriter.md`
 
 ### Where a read-only promise is actually bound
 

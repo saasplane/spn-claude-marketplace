@@ -28,7 +28,6 @@ The first habit is that **a check names the chapter it restates** in its own hea
 | what it reads | `needs` | which fields of a call a check requires; a call carrying none of them never reaches it |
 | a refusal | `deny` | the call is stopped, with the reason a reader is given |
 | advice | `note` | the call goes through and the turn is told something; advice from several checks is joined |
-| the grade | `Grade` | how a finding is weighted when a check is also run as a sweep: `RULE` refuses, `SOFT` reports |
 
 ## Model
 
@@ -64,7 +63,7 @@ Where a value must never be rendered, every route that would render it is refuse
 
 ### Some questions are about the folder rather than the file
 
-A cycle among state files is a property of the whole folder, not of the file being written. So the check reads the folder with the pending write laid over it, and judges the graph the write would make. The same file runs as a hook and as a sweep over a tree. *Where:* `plugins/spn-core/hooks/checks/contract-cycle.ts`
+A cycle among state files is a property of the whole folder, not of the file being written. So the check reads the folder with the pending write laid over it, and judges the graph the write would make. The same file runs as a hook and as a sweep over a tree, and a sweep weights what it finds by the grade [The Tool](05-tools.md) declares. *Where:* `plugins/spn-core/hooks/checks/contract-cycle.ts`
 
 ### A warning that repeats is a warning nobody reads
 
