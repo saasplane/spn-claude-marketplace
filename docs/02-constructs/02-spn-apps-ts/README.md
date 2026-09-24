@@ -28,32 +28,35 @@ Each construct here is the stack-concrete form of one in the core domain, so rea
 <!-- /spn:generated -->
 
 <!-- spn:generated dictionary — do not edit inside these markers; `docs.ts face` writes it -->
-## The dictionary
+## Glossary
 
 | Term | Contract term | What it means |
 | --- | --- | --- |
-| [a hand-checked row](02-stack-tools.md) | `MANUAL` | a row a person proves, which no run ever writes over |
-| [a mode](03-stack-skills.md) | — | an argument a skill's own description names, so one folder answers several close asks |
-| [a mode](04-stack-refs.md) | — | which of the walks this file describes is running, named out loud even where it was inferred |
-| [a planned row](04-stack-refs.md) | — | what a design lands as: a row in the seat that will later be flipped, rather than an entry in a scratch file |
-| [a register](02-stack-tools.md) | `HEADINGS` | any table carrying the behaviour headings in order, wherever in a repository it sits |
-| [a row](02-stack-tools.md) | `cellsOf` | one behaviour: who does what, what they see, its kind, the tier that proves it, its status and when that was found |
+| **Stack Checks** | | |
 | [a stack check](01-stack-checks.md) | `CHECK` | one file naming a pattern in how this stack writes its own layers, with the verdict it gives |
-| [a stack ref](04-stack-refs.md) | `refs/` | a markdown file a stack's plugin ships for a skill living in another plugin |
-| [a stack skill](03-stack-skills.md) | `SKILL.md` | one folder under this plugin's `skills/`, named for a command of the group this stack answers to |
-| [a step](03-stack-skills.md) | `steps/` | one file of a longer walk, read only when the skill's own router names it |
-| [an action](02-stack-tools.md) | `@SPAPIRouteCommand` | one published thing a caller can perform, found by its declaration rather than by a folder shape |
 | [introduced](01-stack-checks.md) | `introduced` | whether the pattern sits inside the text this edit adds, rather than somewhere the file already had |
 | [masking](01-stack-checks.md) | `mask` | blanking comments and string bodies before searching, so a word inside a quote is never read as code |
-| [the claim](04-stack-refs.md) | `sprepo.json` | what a repository declares about its own world and stack, which is what selects the layer |
+| [the dispatcher](01-stack-checks.md) | `dispatch` | this plugin's own composition of its checks into one process, in the shape the core plugin uses |
+| [the resulting text](01-stack-checks.md) | `resultingText` | the source as the pending write would leave it, which is what the search actually runs on |
+| [the watch](01-stack-checks.md) | `watched` | the paths a check could have an opinion about, decided from the path alone |
+| **Stack Tools** | | |
+| [a hand-checked row](02-stack-tools.md) | `MANUAL` | a row a person proves, which no run ever writes over |
+| [a register](02-stack-tools.md) | `HEADINGS` | any table carrying the behaviour headings in order, wherever in a repository it sits |
+| [a row](02-stack-tools.md) | `cellsOf` | one behaviour: who does what, what they see, its kind, the tier that proves it, its status and when that was found |
+| [an action](02-stack-tools.md) | `@SPAPIRouteCommand` | one published thing a caller can perform, found by its declaration rather than by a folder shape |
+| [the results file](02-stack-tools.md) | — | what a test runner wrote about one run, read by behaviour id and by tier |
+| [the tier](02-stack-tools.md) | `tier` | the rung a row is proven at; a run matches itself against this and leaves the other rungs alone |
+| **Stack Skills** | | |
+| [a mode](03-stack-skills.md) | — | an argument a skill's own description names, so one folder answers several close asks |
+| [a stack skill](03-stack-skills.md) | `SKILL.md` | one folder under this plugin's `skills/`, named for a command of the group this stack answers to |
+| [a step](03-stack-skills.md) | `steps/` | one file of a longer walk, read only when the skill's own router names it |
 | [the classification](03-stack-skills.md) | — | the first thing the router does: deciding which layers an ask actually touches |
 | [the closing gate](03-stack-skills.md) | — | the review a skill hands its own work to, named in its description so the hand-off happens without being asked for |
 | [the contract-first order](03-stack-skills.md) | — | the fixed order the steps run in, because everything downstream is generated from the contract or written against it |
-| [the dispatcher](01-stack-checks.md) | `dispatch` | this plugin's own composition of its checks into one process, in the shape the core plugin uses |
+| **Stack Refs** | | |
+| [a planned row](04-stack-refs.md) | — | what a design lands as: a row in the seat that will later be flipped, rather than an entry in a scratch file |
+| [a stack ref](04-stack-refs.md) | `refs/` | a markdown file a stack's plugin ships for a skill living in another plugin |
+| [the claim](04-stack-refs.md) | `sprepo.json` | what a repository declares about its own world and stack, which is what selects the layer |
 | [the layer](04-stack-refs.md) | — | the part of a walk that cannot be stack-agnostic: which seats a row lands in, and what each row must carry |
-| [the resulting text](01-stack-checks.md) | `resultingText` | the source as the pending write would leave it, which is what the search actually runs on |
-| [the results file](02-stack-tools.md) | — | what a test runner wrote about one run, read by behaviour id and by tier |
 | [the stamp](04-stack-refs.md) | `spn:restates` | the block at the top, naming the chapters this file restates and the hash last read from each |
-| [the tier](02-stack-tools.md) | `tier` | the rung a row is proven at; a run matches itself against this and leaves the other rungs alone |
-| [the watch](01-stack-checks.md) | `watched` | the paths a check could have an opinion about, decided from the path alone |
 <!-- /spn:generated -->
