@@ -162,7 +162,7 @@ console.log("\n=== a construct's outline is checked in markdown, not only in HTM
 // reported all six missing. The first batch that ever wrote one distrusted the red light and traced
 // it. These cases are the other half of that fix: the check must still FAIL a file that is really
 // missing a section, or it has simply been made quiet.
-const SECTIONS = ["Terms", "Model", "Parts", "Boundary", "Binds", "Proof"];
+const SECTIONS = ["Overview", "Terms", "Model", "Parts", "Boundary", "Binds", "Proof"];
 // Binds and Proof carry real tables, because both are checked now — a section that is only a
 // heading used to pass, and only because the checks could not read markdown at all.
 const SECTION_BODY = {
@@ -185,6 +185,24 @@ const construct = (sections) =>
   const out = run(root, ["audit", "docs/02-constructs/x.md"]);
   one("a construct genuinely missing a section is still a finding", out, has("missing section: Binds"));
   one("and it names only the one that is missing", out, lacks("missing section: Terms"));
+}
+{
+  // OVERVIEW IS REQUIRED, AND IT WAS OPTIONAL FOR ONE SITTING (N67). Adding a required section to
+  // documents that already exist has no safe order: move the corpus first and every moved page is
+  // refused for carrying a section the outline does not name; require it first and every page that
+  // has not moved is refused for lacking it. Optional is the state where both pass. These two cases
+  // hold the end state — required, and first — so the middle state cannot be left behind by accident.
+  const root = repo({ "CONCEPT.md": "# c\n",
+    "docs/02-constructs/x.md": construct(SECTIONS.filter((h) => h !== "Overview")) });
+  one("a construct with no Overview is refused, and named",
+    run(root, ["audit", "docs/02-constructs/x.md"]), has("missing section: Overview"));
+
+  // Order matters as much as presence: Overview argues WHY and Terms defines the words the Model
+  // uses, so a page that defines before it argues is a finding rather than a preference.
+  const swapped = repo({ "CONCEPT.md": "# c\n",
+    "docs/02-constructs/x.md": construct(["Terms", "Overview", "Model", "Parts", "Boundary", "Binds", "Proof"]) });
+  one("a construct that puts Terms before Overview is refused",
+    run(swapped, ["audit", "docs/02-constructs/x.md"]), has("`Terms` comes before `Overview`"));
 }
 {
   const v1 = doc({ id: "x", variant: "construct", parentId: "concept", dependsOn: [], title: "X", lenses: ["ARCHITECT"], status: "PLANNING" },
@@ -289,7 +307,7 @@ console.log("\n=== a seat file's Binds and Proof are checked, not skipped");
 // Binds and Proof entirely unexamined while the audit said clean.
 const withSections = (binds, proof) =>
   doc({ id: "x", variant: "construct", parentId: "concept", dependsOn: [], title: "X", lenses: ["ARCHITECT"], status: "PLANNING" },
-      "Lead.\n\n## Terms\n\nt\n\n## Model\n\nm\n\n## Parts\n\np\n\n## Boundary\n\nb\n\n" + binds + "\n" + proof,
+      "Lead.\n\n## Overview\n\nwhy\n\n## Terms\n\nt\n\n## Model\n\nm\n\n## Parts\n\np\n\n## Boundary\n\nb\n\n" + binds + "\n" + proof,
       "`For: Architect` · `Status: 🔮 PLANNING`");
 const BINDS_OK = "## Binds\n\n| Rule | What it decides | Weight |\n| --- | --- | --- |\n| `a.md` | x | MUST |\n\n| Repo | Node | What it realizes | State |\n| --- | --- | --- | --- |\n| R | n | x | planned |\n";
 const PROOF_OK = "## Proof\n\n| Check | Kind | What a green run shows |\n| --- | --- | --- |\n| `spnutils apps test` | gate | x |\n";
@@ -982,7 +1000,7 @@ console.log("=== a closed value is declared once, and agrees with what realizes 
   const chapter = (title, id, body) =>
     doc({ id: id, parentId: "concept", title: title, variant: "construct", lenses: ["ARCHITECT"],
           status: "PLANNING", dependsOn: [] },
-        `## Terms\n\n| Term | Contract term | What it means |\n| --- | --- | --- |\n| Rung | \`SPRungType\` | how much is real |\n\n## Model\n\nThe model.\n\n## Parts\n\n${body}\n\n## Boundary\n\nIt stops here.\n\n## Binds\n\n| Rule | What it decides | Weight |\n| --- | --- | --- |\n| \`RD.GOV.011\` | that a closed vocabulary is stated once | MUST |\n\n| Repo | Node | What it realizes | State |\n| --- | --- | --- | --- |\n| t | thing-ts | the enum | planned |\n\n## Proof\n\nNothing yet.\n`,
+        `## Overview\n\nWhy it exists.\n\n## Terms\n\n| Term | Contract term | What it means |\n| --- | --- | --- |\n| Rung | \`SPRungType\` | how much is real |\n\n## Model\n\nThe model.\n\n## Parts\n\n${body}\n\n## Boundary\n\nIt stops here.\n\n## Binds\n\n| Rule | What it decides | Weight |\n| --- | --- | --- |\n| \`RD.GOV.011\` | that a closed vocabulary is stated once | MUST |\n\n| Repo | Node | What it realizes | State |\n| --- | --- | --- | --- |\n| t | thing-ts | the enum | planned |\n\n## Proof\n\nNothing yet.\n`,
         "`For: Architect` · `Status: 🔮 PLANNING`");
 
   const AGREES = "```ts\nexport enum SPRungType {\n  UNIT = 'UNIT',    // alone\n  WIRED = 'WIRED',  // against the real thing\n}\n```";
@@ -1086,7 +1104,7 @@ console.log("=== a closed value is declared once, and agrees with what realizes 
       "docs/02-constructs/01-core/rungs.md":
         doc({ id: "rungs", parentId: "concept", title: "Rungs", variant: "construct", lenses: ["ARCHITECT"],
               status: "PLANNING", dependsOn: [] },
-            "## Terms\n\n| Term | Contract term | What it means |\n| --- | --- | --- |\n| Alone | `SPRungType.UNIT` | proven with nothing running |\n\n## Model\n\nThe model.\n\n## Parts\n\nNo declaration here.\n\n## Boundary\n\nIt stops here.\n\n## Binds\n\n| Rule | What it decides | Weight |\n| --- | --- | --- |\n| `RD.GOV.011` | one place | MUST |\n\n| Repo | Node | What it realizes | State |\n| --- | --- | --- | --- |\n| t | thing-ts | the enum | planned |\n\n## Proof\n\nNothing yet.\n",
+            "## Overview\n\nWhy it exists.\n\n## Terms\n\n| Term | Contract term | What it means |\n| --- | --- | --- |\n| Alone | `SPRungType.UNIT` | proven with nothing running |\n\n## Model\n\nThe model.\n\n## Parts\n\nNo declaration here.\n\n## Boundary\n\nIt stops here.\n\n## Binds\n\n| Rule | What it decides | Weight |\n| --- | --- | --- |\n| `RD.GOV.011` | one place | MUST |\n\n| Repo | Node | What it realizes | State |\n| --- | --- | --- | --- |\n| t | thing-ts | the enum | planned |\n\n## Proof\n\nNothing yet.\n",
             "`For: Architect` · `Status: 🔮 PLANNING`"),
       "docs/02-constructs/01-core/other.md": chapter("Other", "other", "Nor here.\n"),
     });

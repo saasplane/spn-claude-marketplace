@@ -70,7 +70,17 @@ const STATUS_WORD: Record<string, string> = { PLANNING: "PLANNING", IMPLEMENTING
  */
 const OUTLINE: Partial<Record<Variant, { required: string[]; optional: string[] }>> = {
   construct: {
-    required: ["Terms", "Model", "Parts", "Boundary", "Binds", "Proof"],
+    // OVERVIEW COMES FIRST, AND IT WAS OPTIONAL FOR ONE SITTING (N67). It answers WHY the construct
+    // exists; Model answers WHAT it is, and Parts carries the detail of that what. Terms sits
+    // between Overview and Model because the Model uses those words and the Overview does not.
+    //
+    // ADDING A REQUIRED SECTION TO DOCUMENTS THAT ALREADY EXIST HAS NO SAFE ORDER, and that is worth
+    // stating because the next new section will meet it too. Move the corpus first and this check
+    // refuses every page that has the section, because one the outline does not name is an `extra`.
+    // Require it first and it refuses every page that has not moved yet. **Optional is the state
+    // where both pass**, so the corpus moves a slice at a time and the word becomes required the day
+    // the last slice lands. 117 constructs crossed on 2026-09-24 that way.
+    required: ["Overview", "Terms", "Model", "Parts", "Boundary", "Binds", "Proof"],
     optional: [],
   },
   approach: {
