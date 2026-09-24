@@ -512,8 +512,10 @@ console.log("\n=== the dictionary is generated from the constructs, never typed 
     domain, has("| [sign-in](session.md) | `SPSession` | one person's live access to one app site |"));
   one("the term is the link to the construct that declares it, and there is no fourth column",
     domain, lacks("| Session |"));
-  one("the domain's dictionary carries a heading a reader can land on",
-    domain, has("## The dictionary"));
+  one("the domain's glossary carries a heading a reader can land on",
+    domain, has("## Glossary"));
+  one("the glossary is not called a dictionary, which is what the seat face used to carry",
+    domain, lacks("## The dictionary"));
   one("a term the domain's data model names is not stored-column joined — the column is gone",
     domain, lacks("sp_session"));
   one("and the table is three columns wide",
@@ -542,6 +544,38 @@ console.log("\n=== the dictionary is generated from the constructs, never typed 
     seat, lacks("spn:generated dictionary"));
   one("the author's own prose around it is untouched", seat, has("Some prose."));
   one("and the run reports the file it rewrote", out, has("02-constructs/README.md"));
+}
+
+console.log("\n=== the glossary is ordered the way a reader meets the words, not A-Z (Q233)");
+{
+  // THE TWO ORDERS ARE MADE TO DISAGREE ON PURPOSE. `Zebra` is read FIRST because `Alpha` depends
+  // on it, and its term `banana` sorts AFTER `Alpha`'s `apple`. An alphabetical glossary puts
+  // `apple` first; a glossary in the domain's own reading order puts `banana` first. A fixture
+  // where both orders agree proves nothing, which is how the old A-Z sort survived.
+  const terms = (t) => "## Terms\n\n| Term | Contract term | What it means |\n| --- | --- | --- |\n" +
+    `| ${t} | \`SP${t}\` | the ${t} |\n\n` +
+    "## Model\n\nx\n\n## Parts\n\nx\n\n## Boundary\n\nx\n\n" +
+    "## Binds\n\n| where it lives today | |\n| --- | --- |\n| a | b |\n\n## Proof\n\nx\n";
+  const root = repo({
+    "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
+    "docs/02-constructs/README.md": doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    "docs/02-constructs/01-core/README.md": doc({ id: "c", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    "docs/02-constructs/01-core/01-alpha.md":
+      doc({ id: "alpha", variant: "construct", parentId: "c", dependsOn: ["zebra"], title: "Alpha", lenses: ["ARCHITECT"], status: "PLANNING" },
+          terms("apple"), "`For: Architect` · `Status: 🔮 PLANNING`"),
+    "docs/02-constructs/01-core/02-zebra.md":
+      doc({ id: "zebra", variant: "construct", parentId: "c", dependsOn: [], title: "Zebra", lenses: ["ARCHITECT"], status: "PLANNING" },
+          terms("banana"), "`For: Architect` · `Status: 🔮 PLANNING`"),
+  });
+  run(root, ["face", "docs"]);
+  const domain = readAt(root, "docs/02-constructs/01-core/README.md");
+  const at = (needle) => domain.indexOf(needle);
+  one("a construct contributes a heading row, so the grouping is visible rather than implied",
+    domain, has("| **Zebra** | | |"));
+  one("the construct read first comes first, even though its term sorts last",
+    at("| **Zebra** | | |") > -1 && at("| **Alpha** | | |") > at("| **Zebra** | | |") ? "ok" : "wrong order", has("ok"));
+  one("and its term travels with it, ahead of the alphabetically earlier one",
+    at("banana") > -1 && at("apple") > at("banana") ? "ok" : "A-Z survived", has("ok"));
 }
 {
   const root = repo({
@@ -1086,6 +1120,173 @@ console.log("=== a closed value is declared once, and agrees with what realizes 
   }
 }
 
+
+console.log("\n=== the rail names the page, and the way back names where it goes (Q238, Q239)");
+{
+  const templates = resolve(import.meta.dirname, "..", "..", "..", "..", "..",
+                            "spn-foundation", "docs", "04-capabilities", "01-devex",
+                            "04-workspace", "04-docs", "templates");
+  process.env.SPN_TEMPLATES = templates;
+  const seat = (id, title) => doc(
+    { id, variant: "construct", parentId: "core", title, lenses: ["ARCHITECT"],
+      status: "PLANNING", dependsOn: [] },
+    "## Boundary\n\nx\n", "`For: Architect` · `Status: 🔮 PLANNING`");
+
+  // A DOMAIN AND ITS OVERVIEW JOIN ON THEIR TITLE AND NOTHING ELSE. The overview's file name
+  // carries the area in one repository and not in another, so no path can be computed. Here the
+  // face and the overview both say `Core` and the file is named for neither, which is what makes
+  // the join the only thing under test.
+  const ws = repo({
+    "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
+    "docs/02-constructs/README.md": doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    "docs/02-constructs/01-core/README.md": doc({ id: "core", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    "docs/02-constructs/01-core/thing.md": seat("thing", "The Thing Itself"),
+    "docs/artifacts/overviews/concept-anything-at-all-overview.html":
+      '<!-- spn:doc\n{"id":"ov","variant":"overview","title":"Core","lenses":["ARCHITECT"],"summary":"s"}\n-->\n<h1>x</h1>\n',
+  });
+  run(ws, ["page", "docs/02-constructs/01-core/thing.md"]);
+  const page = readAt(ws, "docs/artifacts/constructs/01-core/thing-construct.html");
+
+  one("the rail carries the page's own name, not the word Outline",
+    page, has('<div class="rail-title">The Thing Itself</div>'));
+  one("and never the word it replaced", page, lacks('<div class="rail-title">Outline</div>'));
+  one("the way back reaches the domain's overview, found by its title alone",
+    page, has('href="../../overviews/concept-anything-at-all-overview.html"'));
+  one("and it names the domain rather than a category", page, has("&larr; Core"));
+  one("so the old category label is gone", page, lacks("&larr; the model"));
+}
+
+{
+  // NO OVERVIEW, NO GUESS. Nine domains have no overview today, and a link that names a page which
+  // is not there is worse than the category label it replaced.
+  const templates = resolve(import.meta.dirname, "..", "..", "..", "..", "..",
+                            "spn-foundation", "docs", "04-capabilities", "01-devex",
+                            "04-workspace", "04-docs", "templates");
+  process.env.SPN_TEMPLATES = templates;
+  const ws = repo({
+    "docs/02-constructs/README.md": doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    "docs/02-constructs/01-core/README.md": doc({ id: "core", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    "docs/02-constructs/01-core/thing.md": doc(
+      { id: "thing", variant: "construct", parentId: "core", title: "Thing", lenses: ["ARCHITECT"],
+        status: "PLANNING", dependsOn: [] },
+      "## Boundary\n\nx\n", "`For: Architect` · `Status: 🔮 PLANNING`"),
+  });
+  run(ws, ["page", "docs/02-constructs/01-core/thing.md"]);
+  const page = readAt(ws, "docs/artifacts/constructs/01-core/thing-construct.html");
+  one("with no overview above it the constructs face stands, rather than a link to nothing",
+    page, has("&larr; the model"));
+}
+
+console.log("\n=== a domain overview borrows from its DOMAIN, not from the concept (Q228, Q229)");
+{
+  // THE DOMAIN'S READING ORDER IS NOT THE FILE ORDER. `beta` depends on `gamma`, so the face reads
+  // Gamma before Beta however the files are numbered — and an overview that lists them the other
+  // way round has invented an order its own face contradicts.
+  const seat = (id, title, deps) => doc(
+    { id, variant: "construct", parentId: "core", title, lenses: ["ARCHITECT"], status: "PLANNING", dependsOn: deps },
+    "## Boundary\n\nx\n", "`For: Architect` · `Status: 🔮 PLANNING`");
+  const tree = (sections) => ({
+    "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
+    "docs/02-constructs/README.md": doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    "docs/02-constructs/01-core/README.md": doc({ id: "core", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    "docs/02-constructs/01-core/01-beta.md": seat("beta", "Beta", ["gamma"]),
+    "docs/02-constructs/01-core/02-gamma.md": seat("gamma", "Gamma", []),
+    "docs/artifacts/overviews/concept-core-overview.html":
+      `<meta charset="utf-8">\n<title>Core</title>\n` +
+      block({ id: "o", variant: "overview", parentId: "concept", title: "Core", lenses: ["ARCHITECT"], summary: "s." }) +
+      sections.map((h) => `<h2>${h}</h2>\n<p>x</p>`).join("\n"),
+  });
+  const audit = (secs) => run(repo(tree(secs)), ["audit", "docs/artifacts/overviews/concept-core-overview.html"]);
+
+  // ASSERT ON THE FINDING UNDER TEST, never on the absence of every finding: this fixture carries
+  // no `<header>`, so `checkHeader` fires on it and a bare `lacks("✗")` was failing for a reason
+  // that has nothing to do with the source of an overview's sections.
+  one("a section per construct, in the face's reading order, is accepted",
+    audit(["Overview", "Gamma", "Beta", "Glossary", "Where to go next"]), lacks("name no construct"));
+  one("and its order is not questioned either",
+    audit(["Overview", "Gamma", "Beta", "Glossary", "Where to go next"]), lacks("reading order"));
+  one("and the concept naming nothing below the domain no longer refuses it",
+    audit(["Overview", "Gamma", "Beta", "Glossary", "Where to go next"]), lacks("no counterpart"));
+  one("one section naming no construct is the connective one, and it is allowed",
+    audit(["Overview", "Gamma", "Beta", "The rules this path shares", "Glossary", "Where to go next"]),
+    lacks("name no construct"));
+  one("two are refused, because the second is an argument the domain does not account for",
+    audit(["Overview", "Gamma", "Beta", "The rules", "Something else", "Glossary", "Where to go next"]),
+    has("name no construct of this domain"));
+  one("and the reading order is held, so the file order cannot be mistaken for it",
+    audit(["Overview", "Beta", "Gamma", "Glossary", "Where to go next"]),
+    has("holds its face's reading order"));
+}
+
+console.log("\n=== the domain's glossary lands on its overview too, in HTML (Q226 A, Q231, Q234)");
+{
+  const terms = "## Terms\n\n| Term | Contract term | What it means |\n| --- | --- | --- |\n" +
+    "| sign-in | `SPSession` | one person's live access |\n\n" +
+    "## Model\n\nx\n\n## Parts\n\nx\n\n## Boundary\n\nx\n\n" +
+    "## Binds\n\n| where it lives today | |\n| --- | --- |\n| a | b |\n\n## Proof\n\nx\n";
+  const ov = (inner) =>
+    `<meta charset="utf-8">\n<title>Core</title>\n` +
+    block({ id: "o", variant: "overview", parentId: "concept", title: "Core", lenses: ["ARCHITECT"], summary: "s." }) +
+    `<h2>Overview</h2>\n<p>x</p>\n` +
+    `<section id="s1" data-block="glossary">\n  <div class="sec-head"><h2>Glossary</h2></div>\n` +
+    `  <p>The authored line above the table.</p>\n${inner}\n</section>\n` +
+    `<h2>Where to go next</h2>\n<p>x</p>`;
+  const curated = '  <div class="scroll"><table>\n    <thead><tr><th>Term</th><th>What it means</th></tr></thead>\n' +
+    '    <tbody><tr><td>sign-in</td><td>typed by hand</td></tr></tbody>\n  </table></div>';
+  const root = repo({
+    "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
+    "docs/02-constructs/README.md": doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    "docs/02-constructs/01-core/README.md": doc({ id: "c", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    "docs/02-constructs/01-core/session.md":
+      doc({ id: "session", variant: "construct", parentId: "c", dependsOn: [], title: "Session", lenses: ["ARCHITECT"], status: "PLANNING" },
+          terms, "`For: Architect` · `Status: 🔮 PLANNING`"),
+    "docs/artifacts/overviews/concept-core-overview.html": ov(curated),
+  });
+  run(root, ["face", "docs"]);
+  const page = readAt(root, "docs/artifacts/overviews/concept-core-overview.html");
+
+  one("the overview gains a generated region, the first in any HTML page",
+    page, has("spn:generated glossary"));
+  one("and it carries the three columns the markdown face carries",
+    page, has("<th>Term</th><th>Contract term</th><th>What it means</th>"));
+  one("the term links to the construct PAGE, never the markdown seat (Q234)",
+    page, has('href="../constructs/01-core/session-construct.html"'));
+  one("the hand-typed row is gone, because the region replaced the table",
+    page, lacks("typed by hand"));
+  one("the authored line above the table survives (Q231)",
+    page, has("The authored line above the table"));
+  one("the markers sit INSIDE the section, not after the page",
+    page, (g) => g.indexOf("spn:generated glossary") < g.indexOf("Where to go next"));
+
+  // A REGION IS ONLY TRUSTWORTHY IF A SECOND RUN WRITES THE SAME BYTES. The first run replaces a
+  // curated table; the second has to find its own markers and land on the same page exactly.
+  const again = (() => { run(root, ["face", "docs"]); return readAt(root, "docs/artifacts/overviews/concept-core-overview.html"); })();
+  one("and a second run writes the same bytes", again === page ? "same" : "DIFFERENT", has("same"));
+}
+
+console.log("\n=== an HTML page links the HTML page, never the markdown seat (Q234)");
+{
+  const page = (href) =>
+    `<meta charset="utf-8">\n<title>T</title>\n` +
+    block({ id: "o", variant: "overview", parentId: "concept", title: "T", lenses: ["ARCHITECT"], summary: "s." }) +
+    `<h2>Overview</h2>\n<p>See <a href="${href}">it</a>.</p>\n<h2>Glossary</h2>\n<p>x</p>\n<h2>Where to go next</h2>\n<p>x</p>`;
+  const mk = (href) => repo({
+    "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
+    "docs/02-constructs/01-core/thing.md": "# Thing\n",
+    "docs/artifacts/overviews/o.html": page(href),
+  });
+  one("a link to a construct SEAT is refused, and it names the page it should have used",
+    run(mk("../../02-constructs/01-core/thing.md"), ["audit", "docs/artifacts/overviews/o.html"]),
+    has("thing-construct.html"));
+  one("a link to the produced page is silent",
+    run(mk("../constructs/01-core/thing-construct.html"), ["audit", "docs/artifacts/overviews/o.html"]),
+    lacks("an HTML page links the HTML page"));
+  // A SEAT README IS PRODUCED AS NO PAGE AT ALL, so a link to one has nowhere else to go. Refusing
+  // it would be a gate demanding a file the generator never writes.
+  one("a link to a seat README keeps its .md, because no page exists for it",
+    run(mk("../../02-constructs/README.md"), ["audit", "docs/artifacts/overviews/o.html"]),
+    lacks("an HTML page links the HTML page"));
+}
 
 console.log(failed ? `\n  ${failed} of ${n} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

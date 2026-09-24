@@ -214,6 +214,17 @@ export function renderPage(opts: {
   furniture: { style: string; scripts: string; footer: string };
   /** Given a seat file's href, the one the produced page should carry. Identity when omitted. */
   link?: (href: string) => string;
+  /**
+   * The way back, named for where it goes (Q238).
+   *
+   * A page's way back is the page one level up IN THE SAME RENDERING, and it says which one:
+   * a construct returns to its domain's overview, an overview to its repository. The corpus had
+   * SEVEN vocabularies for this link across 157 pages — `← the model` on 117 of them — and only
+   * two of the seven named a destination at all. The rest named a CATEGORY, which tells a reader
+   * what kind of thing they are going to and not which one. Omitted, the constructs seat's own
+   * face stands, which is what every produced page carried before.
+   */
+  home?: { href: string; label: string };
 }): { html: string; findings: Finding[] } {
   const previousRewrite = rewriteHref;
   rewriteHref = opts.link ?? ((h) => h);
@@ -290,11 +301,18 @@ ${lead}
     `<div class="page">`,
     ``,
     `<nav class="rail" id="rail">`,
-    // "the model" is the constructs seat's own face. The seat file sits one level under it, so
-    // `../README.md` is the link an author would write — and it is re-expressed for the page's
-    // folder by the same rewriter the body uses, rather than shipped as the literal it used to be.
-    `  <a class="home" href="${rewriteHref("../README.md")}">&larr; the model</a>`,
-    `  <div class="rail-title">Outline</div>`,
+    // THE WAY BACK NAMES WHERE IT GOES (Q238). Where the caller resolved the page above this one
+    // — a construct's domain overview — that page is named. Where it could not, the constructs
+    // seat's own face stands: the seat file sits one level under it, so `../README.md` is the link
+    // an author would write, re-expressed for the page's folder by the same rewriter the body uses.
+    opts.home
+      ? `  <a class="home" href="${opts.home.href}">&larr; ${esc(opts.home.label)}</a>`
+      : `  <a class="home" href="${rewriteHref("../README.md")}">&larr; the model</a>`,
+    // THE RAIL CARRIES THE PAGE'S OWN NAME, NOT THE WORD `Outline` (Q239). A reader already knows a
+    // rail is an outline — it is a list of this page's headings sitting beside them. What the label
+    // can add is WHOSE, which is the one thing the rail does not say once the masthead has scrolled
+    // away. 157 of 157 pages said `Outline`, and `blocks-template.html` already said `Blocks`.
+    `  <div class="rail-title">${esc(String(block.title ?? "Outline"))}</div>`,
     `</nav>`,
     `<div class="wrap">`,
     ``,

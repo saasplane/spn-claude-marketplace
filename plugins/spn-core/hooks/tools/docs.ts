@@ -950,6 +950,29 @@ function checkBinds(file: string, src: string, block: any, nodes: Set<string>): 
 }
 
 /** An overview's sections are borrowed from its source, in the source's order. */
+/**
+ * The domain a domain overview is the face of, or null where it is a hub (Q228).
+ *
+ * THE JOIN IS THE TITLE, exactly as it is for the way back: a domain's `README.md` and its overview
+ * carry the same name, and the overview's file name carries the area in one repository and not in
+ * another. Null means this page is not a domain's overview — a repository hub, or a reading path
+ * beneath a face — and its source stays `CONCEPT.md`.
+ */
+function domainFaceFor(file: string, block: any, workspace: string): string | null {
+  const title = block?.title;
+  if (!title) return null;
+  let dir = dirname(resolve(file));
+  while (dir !== dirname(dir) && !existsSync(join(dir, "02-constructs"))) dir = dirname(dir);
+  const constructsDir = join(dir, "02-constructs");
+  if (!existsSync(constructsDir)) return null;
+  for (const d of constructFolders(constructsDir).filter((x) => isDomainFolder(constructsDir, x))) {
+    const face = join(d, "README.md");
+    if (!existsSync(face)) continue;
+    if (readBlock(readFileSync(face, "utf8")).block?.title === title) return d;
+  }
+  return null;
+}
+
 function checkOverviewSource(file: string, src: string, block: any, workspace: string): Finding[] {
   const f: Finding[] = [];
   if (block?.variant !== "overview") return f;
@@ -960,6 +983,37 @@ function checkOverviewSource(file: string, src: string, block: any, workspace: s
   const tail = got.slice(-2);
   if (tail.join(" · ") !== OVERVIEW_FIXED_LAST.join(" · "))
     f.push({ check: "overview", grade: "RULE", file, message: `an overview closes with ${OVERVIEW_FIXED_LAST.join(" then ")}; it closes with ${tail.join(" then ")}` });
+
+  // A DOMAIN OVERVIEW BORROWS FROM ITS DOMAIN, NOT FROM `CONCEPT.md` (Q228). The concept names a
+  // domain and, in most repositories, nothing below it — so holding a domain overview to the
+  // concept's headings left twelve pages in `spn-platform-ts` unable to borrow anything at all, and
+  // they carry `Overview → Glossary → Where to go next` with nothing between. The domain's own
+  // constructs are what it has sections for, in the reading order its face already computes.
+  const domainDir = domainFaceFor(file, block, workspace);
+  if (domainDir) {
+    const constructs: { id: string; title: string; summary: string; deps: string[]; file: string }[] = [];
+    for (const cf of walkFiles(domainDir, (x) => x.endsWith(".md") && basename(x) !== "README.md")) {
+      const b = readBlock(readFileSync(cf, "utf8")).block;
+      if (b?.id) constructs.push({ id: b.id, title: b.title, summary: b.summary, deps: b.dependsOn ?? [], file: cf });
+    }
+    const order = readingOrder(constructs).map((c) => sectionName(c.title));
+    const borrowed = got.slice(1, -2);
+    // AT MOST ONE SECTION NAMES NO CONSTRUCT (Q229). `overview-template.html` ships it as `s3` and
+    // marks it *only when a rule is decided on one page and relied on by the others*; seven
+    // foundation overviews carry exactly one. Two would mean the page has grown an argument its
+    // domain does not account for.
+    const loose = borrowed.filter((b) => !order.includes(b));
+    if (loose.length > 1)
+      f.push({ check: "overview", grade: "RULE", file, message: `${loose.length} sections name no construct of this domain — ${loose.join(" · ")}. A domain overview takes one section per construct, plus at most one that carries what they share` });
+    const kept = borrowed.filter((b) => order.includes(b));
+    const ranked = kept.map((k) => order.indexOf(k));
+    for (let i = 1; i < ranked.length; i++)
+      if (ranked[i] < ranked[i - 1]) {
+        f.push({ check: "overview", grade: "RULE", file, message: `\`${kept[i]}\` comes before \`${kept[i - 1]}\`; a domain overview holds its face's reading order` });
+        break;
+      }
+    return f;
+  }
 
   // The source is what parentId names. For a hub that is the repository's CONCEPT.md.
   if (block.parentId !== "concept") return f;
@@ -1038,6 +1092,11 @@ function checkProduced(file: string, src: string, block: any, workspace: string,
       // The same rewriter `page` used, or this check re-renders with seat-relative links and
       // reports every correctly produced page as hand-edited.
       link: hrefForPage(seat, file),
+      // AND THE SAME WAY BACK, for the same reason the two lines above exist. `page` resolves the
+      // domain's overview and writes `← IAM`; a check that re-renders without it writes
+      // `← the model` and calls all 20 pages of a repository hand-edited. Third time this file has
+      // learned that both halves must be handed the same inputs.
+      home: overviewAbove(seat, file) ?? undefined,
     }).html;
   } catch (e) {
     return [{ check: "produced", grade: "SOFT", file, message: `the page could not be produced for comparison — ${(e as Error).message}` }];
@@ -1352,11 +1411,24 @@ function directFiles(dir: string, keep: (p: string) => boolean): string[] {
  * THE CONSTRUCT IS THE TERM'S LINK RATHER THAN A FOURTH COLUMN. A reader wanting the page that
  * defines the word follows the word.
  */
-function buildDictionary(domainDir: string, faceFile: string): { body: string; findings: Finding[] } {
+/**
+ * The rows of one domain's glossary, gathered once.
+ *
+ * TWO RENDERERS SHARE THIS AND NEITHER GATHERS ITS OWN. The markdown face and the HTML overview
+ * carry the same glossary, and this file has already learned three times what happens when two
+ * halves of one tool are given different inputs — the Proof join, the link rewriter, and the way
+ * back, each of which reported a correct corpus as broken until both halves were handed the same
+ * thing. A glossary written twice would be the fourth.
+ */
+function glossaryRows(domainDir: string): { rows: Array<Row & { group: string }>; findings: Finding[] } {
   const findings: Finding[] = [];
   const rows: Row[] = [];
+  type Construct = { id: string; title: string; summary: string; deps: string[]; file: string };
+  const constructs: Construct[] = [];
   for (const file of walkFiles(domainDir, (p) => p.endsWith(".md") && basename(p) !== "README.md")) {
     const src = readFileSync(file, "utf8");
+    const { block } = readBlock(src);
+    if (block?.id) constructs.push({ id: block.id, title: block.title, summary: block.summary, deps: block.dependsOn ?? [], file });
     const body = sectionBody(src, /Terms\b/);
     if (!body) continue;
     const cells = mdRows(body);
@@ -1367,9 +1439,78 @@ function buildDictionary(domainDir: string, faceFile: string): { body: string; f
     for (const c of cells) rows.push({ term: c[0], contract: c[1], means: c[2], file });
   }
 
-  rows.sort((a, b) => a.term.localeCompare(b.term));
-  const lines = ["## The dictionary", "", "| Term | Contract term | What it means |", "| --- | --- | --- |"];
+  // THE ORDER A NEWCOMER MEETS THEM, NOT THE ALPHABET (Q233). `overview-template.html` asks a
+  // glossary for "capitalised concept names, in the order a newcomer meets them" and this sorted
+  // A-Z, so a reader met `Access token` two hundred rows before the `Identity` it hangs off. The
+  // order is the domain face's OWN reading order — the one the construct table directly above is
+  // already written in — and terms sort by name inside their construct. A construct contributes a
+  // heading row, so the grouping is visible rather than implied.
+  const order = new Map(readingOrder(constructs).map((c, i) => [c.file, i]));
+  const label = new Map(constructs.map((c) => [c.file, sectionName(c.title)]));
+  const rank = (f: string) => order.get(f) ?? Number.MAX_SAFE_INTEGER;
+  rows.sort((a, b) => rank(a.file) - rank(b.file) || a.term.localeCompare(b.term));
+
+  return { rows: rows.map((r) => ({ ...r, group: label.get(r.file) ?? basename(r.file, ".md") })), findings };
+}
+
+/** The produced page a construct seat becomes, so an HTML page links an HTML page (Q234). */
+function pageForSeat(seat: string): string {
+  return seat.replace(/\\/g, "/").replace("/02-constructs/", "/artifacts/constructs/").replace(/\.md$/, "-construct.html");
+}
+
+/**
+ * The overview that is a domain's face in HTML, or null where the domain has none.
+ *
+ * NINE DOMAINS HAVE NO OVERVIEW and they arrive with `N41`; a null here means the glossary lands on
+ * the markdown face alone, which is what every domain had before this. The join is the title, the
+ * same one the way back uses.
+ */
+function overviewForDomain(domainDir: string): string | null {
+  const dir = resolve(domainDir).replace(/\\/g, "/");
+  const at = dir.lastIndexOf("/02-constructs/");
+  if (at < 0) return null;
+  const face = join(dir, "README.md");
+  if (!existsSync(face)) return null;
+  const title = readBlock(readFileSync(face, "utf8")).block?.title;
+  if (!title) return null;
+  const overviews = join(dir.slice(0, at), "artifacts", "overviews");
+  if (!existsSync(overviews)) return null;
+  for (const f of readdirSync(overviews).filter((x) => x.endsWith(".html")).sort()) {
+    const full = join(overviews, f);
+    if (readBlock(readFileSync(full, "utf8")).block?.title === title) return full;
+  }
+  return null;
+}
+
+/** The same glossary, as the domain's overview carries it (Q226 `A`). */
+function buildGlossaryHtml(domainDir: string, overviewFile: string): { body: string; findings: Finding[] } {
+  const { rows, findings } = glossaryRows(domainDir);
+  const esc = (x: string) => x.replace(/&(?![a-zA-Z#][a-zA-Z0-9]*;)/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const cell = (x: string) => esc(x).replace(/`([^`]*)`/g, "<code>$1</code>");
+  const out = [
+    '  <div class="scroll"><table class="gloss">',
+    "    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>",
+    "    <tbody>",
+  ];
+  let group: string | null = null;
   for (const r of rows) {
+    if (r.group !== group) { out.push(`      <tr class="grp"><td colspan="3">${esc(r.group)}</td></tr>`); group = r.group; }
+    const href = relative(dirname(overviewFile), pageForSeat(r.file));
+    const term = r.term && r.term !== "—" ? `<a href="${href}">${esc(r.term)}</a>` : esc(r.term);
+    out.push(`      <tr><td>${term}</td><td>${cell(r.contract)}</td><td>${cell(r.means)}</td></tr>`);
+  }
+  if (!rows.length) out.push('      <tr><td>&mdash;</td><td>&mdash;</td><td>no construct in this domain carries a <code>Terms</code> table yet</td></tr>');
+  out.push("    </tbody>", "  </table></div>");
+  return { body: out.join("\n"), findings };
+}
+
+/** One domain's glossary as the markdown face carries it. */
+function buildDictionary(domainDir: string, faceFile: string): { body: string; findings: Finding[] } {
+  const { rows, findings } = glossaryRows(domainDir);
+  const lines = ["## Glossary", "", "| Term | Contract term | What it means |", "| --- | --- | --- |"];
+  let group: string | null = null;
+  for (const r of rows) {
+    if (r.group !== group) { lines.push(`| **${r.group}** | | |`); group = r.group; }
     // A term no consumer speaks of carries a deliberate dash in this column, and a dash links
     // nowhere — the reader is being told there is no word, not sent to a page.
     const target = relative(dirname(faceFile), r.file);
@@ -1668,6 +1809,37 @@ function domainFaces(tree: string, concept: string | null): { faces: Map<string,
   return { faces, concept: conceptBody, findings };
 }
 
+/**
+ * The generated glossary placed inside an overview's `Glossary` section.
+ *
+ * AN OVERVIEW IS WRITTEN BY HAND AND THIS IS THE FIRST GENERATED REGION IN ONE. So the markers go
+ * INSIDE the section rather than at the end of the file, which is where `replaceRegion` puts a
+ * region it cannot find — correct for a markdown face, and after the closing tag on a page.
+ *
+ * THE AUTHORED LEAD SENTENCE ABOVE THE TABLE SURVIVES (Q231): only the table is replaced, because
+ * a generated table with no sentence above it makes a reader work out what they are looking at.
+ * Null where the page has no `Glossary` section or no table in it — the caller reports that rather
+ * than inventing a place to put it.
+ */
+function placeGlossary(src: string, body: string): string | null {
+  const m = src.match(/<section[^>]*data-block="glossary"[^>]*>[\s\S]*?<\/section>/);
+  if (!m) return null;
+  const sec = m[0];
+  const begin = BEGIN("glossary");
+  const i = sec.indexOf(begin);
+  let next: string;
+  if (i >= 0) {
+    const j = sec.indexOf(END, i);
+    if (j < 0) return null;
+    next = sec.slice(0, i) + `${begin}\n${body}\n  ${END}` + sec.slice(j + END.length);
+  } else {
+    const t = sec.match(/[ \t]*<div class="scroll"><table>[\s\S]*?<\/table><\/div>/);
+    if (!t) return null;
+    next = sec.replace(t[0], `  ${begin}\n${body}\n  ${END}`);
+  }
+  return src.replace(sec, next);
+}
+
 function face(tree: string, write: boolean): Finding[] {
   const findings: Finding[] = [];
   const touched: string[] = [];
@@ -1687,6 +1859,21 @@ function face(tree: string, write: boolean): Finding[] {
     const before = readFileSync(domainFace, "utf8");
     const after = replaceRegion(before, "dictionary", body);
     if (after !== before) { if (write) writeFileSync(domainFace, after); touched.push(relative(tree, domainFace)); }
+
+    // AND THE SAME GLOSSARY ON THE DOMAIN'S OVERVIEW (Q226 `A`). A reader of the overview meets the
+    // whole vocabulary at once and then learns it going through the constructs, which is what earns
+    // the contract term a column there. The rows are gathered once for both, so the two cannot
+    // drift; the findings are taken from the markdown build alone, or every two-column `Terms`
+    // table would be reported twice.
+    const overview = overviewForDomain(dir);
+    if (overview) {
+      const { body: html } = buildGlossaryHtml(dir, overview);
+      const ovBefore = readFileSync(overview, "utf8");
+      const ovAfter = placeGlossary(ovBefore, html);
+      if (ovAfter === null)
+        findings.push({ check: "face", grade: "SOFT", file: overview, message: "this domain's overview has no `Glossary` section with a table in it, so the domain's glossary has nowhere to land" });
+      else if (ovAfter !== ovBefore) { if (write) writeFileSync(overview, ovAfter); touched.push(relative(tree, overview)); }
+    }
   }
 
   const seatFace = join(constructsDir, "README.md");
@@ -1964,6 +2151,46 @@ function joinProof(seat: string, markdown: string, workspace: string): { md: str
   return { md: [...lines.slice(0, cut), ...table, ...lines.slice(cut)].join("\n"), findings };
 }
 
+/**
+ * The page a construct returns to: its domain's overview (Q238).
+ *
+ * A DOMAIN AND ITS OVERVIEW SHARE ONE TITLE, AND THAT IS THE ONLY JOIN. The file is
+ * `concept-devex-function-overview.html` in one repository and `concept-iam-overview.html` in
+ * another — area in the name here, not there — so the path cannot be computed from the seat. Both
+ * carry the block title `DevEx Function`, and that is stable because `face` writes the domain's own
+ * README from the same concept section the overview borrows.
+ *
+ * NULL WHERE THE DOMAIN HAS NO OVERVIEW, which is nine domains today, and the caller then keeps the
+ * constructs seat's face. A guess would be worse than the old link: it would name a page that is
+ * not there, and a link is a promise a reader can follow it.
+ */
+function overviewAbove(seat: string, out: string): { href: string; label: string } | null {
+  const seatPath = resolve(seat).replace(/\\/g, "/");
+  const at = seatPath.lastIndexOf("/02-constructs/");
+  if (at < 0) return null;
+  const constructsDir = seatPath.slice(0, at) + "/02-constructs";
+
+  // The domain is the folder invariant 1 already tests for: depth 1 under the seat, or depth 2
+  // where its parent is a group. Walk up from the seat until one of those is true.
+  let dir = dirname(seatPath);
+  while (dir.startsWith(constructsDir) && dir !== constructsDir && !isDomainFolder(constructsDir, dir)) dir = dirname(dir);
+  if (dir === constructsDir || !dir.startsWith(constructsDir)) return null;
+
+  const face = join(dir, "README.md");
+  if (!existsSync(face)) return null;
+  const { block } = readBlock(readFileSync(face, "utf8"));
+  const title = block?.title;
+  if (!title) return null;
+
+  const overviews = join(seatPath.slice(0, at), "artifacts", "overviews");
+  if (!existsSync(overviews)) return null;
+  for (const f of readdirSync(overviews).filter((x) => x.endsWith(".html")).sort()) {
+    const b = readBlock(readFileSync(join(overviews, f), "utf8")).block;
+    if (b?.title === title) return { href: relative(dirname(out), join(overviews, f)), label: title };
+  }
+  return null;
+}
+
 function pageFor(seat: string, workspace: string, templates: string, write: boolean): Finding[] {
   const findings: Finding[] = [];
 
@@ -1995,6 +2222,7 @@ function pageFor(seat: string, workspace: string, templates: string, write: bool
   const { html, findings: rf } = renderPage({
     block, markdown, workspace: org, location, furniture: furniture(templates),
     link: hrefForPage(seat, out),
+    home: overviewAbove(seat, out) ?? undefined,
   });
   for (const r of rf) findings.push({ check: "page", grade: "RULE", file: seat, message: r.message });
   const before = existsSync(out) ? readFileSync(out, "utf8") : "";
@@ -2420,6 +2648,36 @@ function gapReport(repo: string, workspace: string, asJson: boolean): number {
  * `{{path}}.md` is the shape a produced page fills in — so reading them as paths reports the
  * template for being a template.
  */
+/**
+ * An HTML page links the HTML page (Q234).
+ *
+ * MEASURED BEFORE IT WAS WRITTEN: of the links the 39 overviews make into a construct, 155 reached
+ * the produced page and 102 reached the markdown seat, with 20 of the 39 carrying both — one page
+ * doing it inside a single section. A reader of the rendered corpus who follows a `.md` link leaves
+ * it: they land on raw markdown rather than on the page with its rail, its figures and its
+ * furniture.
+ *
+ * A SEAT README IS NOT A CONSTRUCT AND KEEPS ITS `.md`. The constructs seat's own face, an area's
+ * and a domain's are produced as no page at all, so a link to one has nowhere else to go — which is
+ * why this tests for a construct FILE rather than for the folder.
+ */
+function checkConstructLink(file: string, src: string): Finding[] {
+  if (!file.endsWith(".html")) return [];
+  const f: Finding[] = [];
+  const seen = new Set<string>();
+  for (const m of src.matchAll(/href="([^"]*\/02-constructs\/[^"]*\.md)"/g)) {
+    const href = m[1];
+    if (basename(href.split("#")[0]) === "README.md") continue;
+    if (seen.has(href)) continue;
+    seen.add(href);
+    const page = basename(href).replace(/\.md(#.*)?$/, "-construct.html");
+    f.push({ check: "link", grade: "RULE", file, message:
+      "names the seat `" + href + "` — an HTML page links the HTML page, and this construct is produced as `" +
+      page + "`. A reader following it leaves the rendering" });
+  }
+  return f;
+}
+
 function checkLinks(file: string, src: string): Finding[] {
   if (file.replace(/\\/g, "/").includes("/templates/")) return [];
   const f: Finding[] = [];
@@ -2472,6 +2730,7 @@ function audit(paths: string[], workspace: string): Finding[] {
     findings.push(...checkTreeFigures(p, src, workspace));
     findings.push(...checkStyleBalance(p, src));
     findings.push(...checkLinks(p, src));
+    findings.push(...checkConstructLink(p, src));
     findings.push(...checkFurniture(p, src, templates));
     findings.push(...checkPalette(p, src, templates));
     findings.push(...checkGovernsMap(p, src));
