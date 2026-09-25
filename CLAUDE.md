@@ -15,7 +15,7 @@ docs tree and this repository's own files (`RD.GOV.024`). It loads `spn-devex` a
 core governs docs trees, and a domain plugin acts on nodes this repository does not have.
 
 **Authoring a plugin is not loading it.** This repo authors all three and loads one. Editing
-`plugins/spn-apps/skills/…/SKILL.md` is editing markdown, which core's doc rules govern, and the
+`plugins/spn-apps/src/skills/…/SKILL.md` is editing markdown, which spn-devex's doc rules govern, and the
 suites here run the source rather than the installed copy. Being the builder checkout is a separate
 axis — `SPN_DEVEX_AGENT_WORKSPACE`.
 
