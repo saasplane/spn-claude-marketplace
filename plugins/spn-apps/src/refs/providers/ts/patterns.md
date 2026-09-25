@@ -1,11 +1,11 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/providers/apps/ts/07-codegen.md", "seen": "b50ac6ab" },
-    { "path": "spn-foundation/providers/apps/ts/08-toolchain.md", "seen": "de6f79c0" },
-    { "path": "spn-foundation/providers/apps/ts/11-tests.md", "seen": "e9eb71b7" },
-    { "path": "spn-foundation/providers/apps/ts/04-errors-logging.md", "seen": "a95f9e13" },
-    { "path": "spn-foundation/providers/apps/ts/10-web-patterns.md", "seen": "e4d74691" }
+    { "path": "spn-foundation/providers/apps/ts/07-codegen.md", "seen": "014e1711" },
+    { "path": "spn-foundation/providers/apps/ts/08-toolchain.md", "seen": "f594929e" },
+    { "path": "spn-foundation/providers/apps/ts/11-tests.md", "seen": "d946b6af" },
+    { "path": "spn-foundation/providers/apps/ts/04-errors-logging.md", "seen": "e38919d0" },
+    { "path": "spn-foundation/providers/apps/ts/10-web-patterns.md", "seen": "4782098e" }
   ]
 }
 -->

@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/providers/infra/cloud/aws/guidelines/tags.md", "seen": "9864c846" }
+    { "path": "spn-foundation/providers/infra/cloud/aws/guidelines/tags.md", "seen": "a35baae3" }
   ]
 }
 -->

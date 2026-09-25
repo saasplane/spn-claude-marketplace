@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/providers/infra/cloud/aws/guidelines/networking.md", "seen": "e813165c" }
+    { "path": "spn-foundation/providers/infra/cloud/aws/guidelines/networking.md", "seen": "95909bbb" }
   ]
 }
 -->

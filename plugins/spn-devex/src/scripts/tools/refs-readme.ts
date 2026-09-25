@@ -36,6 +36,29 @@ const dirs = (at: string): string[] =>
 const chapters = (at: string): string[] =>
   existsSync(at) ? readdirSync(at).filter((e) => e.endsWith(".md") && e !== "README.md") : [];
 
+/**
+ * What a plugin restates in one group — its files, plus two shapes a filename match cannot see.
+ *
+ * **A CONSTRUCT MAY BE RESTATED AS A FOLDER.** `04-docs` carries twenty capability chapters, so the
+ * tree splits it into a folder of leaves named for it. Counting files alone read that as *not
+ * restated* while three refs sat inside it.
+ *
+ * **AND A `README.md` IS SOMETIMES THE REF ITSELF.** Under `providers/`, a cloud with one thing to
+ * say says it in the folder's README. Excluding every README as a face reported those folders as
+ * empty when they were complete.
+ *
+ * **A REPORT THAT INVENTS A GAP IS WHAT MAKES PEOPLE STOP READING IT**, so both shapes count.
+ */
+function restated(at: string): string[] {
+  const names = chapters(at).map((f) => f.replace(/\.md$/, ""));
+  for (const folder of dirs(at)) {
+    // A folder standing in for a construct holds leaves of its own; an empty one stands for nothing.
+    if (chapters(join(at, folder)).length) names.push(folder);
+  }
+  if (!names.length && existsSync(join(at, "README.md"))) names.push(basename(at));
+  return names;
+}
+
 type Row = {
   group: string;
   /** Refs whose name matches a construct the book states. */
@@ -76,12 +99,12 @@ function rowsFor(pluginRefs: string, book: string): Row[] {
     if (!groups.length) {
       // A domain with refs directly under it — `lenses/` is the standing example, and it is by
       // ROLE rather than by construct, so the book states nothing to measure it against.
-      const here = chapters(domainAt);
-      if (here.length) rows.push({ group: domain, covers: [], gaps: [], across: here.map((f) => f.replace(/\.md$/, "")).sort() });
+      const here = restated(domainAt);
+      if (here.length) rows.push({ group: domain, covers: [], gaps: [], across: here.sort() });
       continue;
     }
     for (const group of groups.sort()) {
-      const picked = chapters(join(domainAt, group)).map((f) => f.replace(/\.md$/, ""));
+      const picked = restated(join(domainAt, group));
       const states = statesFor(book, domain, group);
       // MATCHED BY NAME, NEVER BY COUNT. A ref named for no construct is not surplus coverage —
       // it is a rule that cuts ACROSS the group, which the tree allows and a count cannot see.

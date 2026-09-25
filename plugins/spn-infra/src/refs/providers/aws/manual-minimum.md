@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/providers/infra/cloud/aws/guides/00-manual-minimum.md", "seen": "331c07c2" }
+    { "path": "spn-foundation/providers/infra/cloud/aws/guides/00-manual-minimum.md", "seen": "8436c447" }
   ]
 }
 -->

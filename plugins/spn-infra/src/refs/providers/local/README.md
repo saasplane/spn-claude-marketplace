@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/providers/infra/local/README.md", "seen": "dc020cc7" }
+    { "path": "spn-foundation/providers/infra/local/README.md", "seen": "7d13de4a" }
   ]
 }
 -->
