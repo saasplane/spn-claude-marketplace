@@ -17,7 +17,7 @@ Keep the contract triple file-for-file per entity: `contract/states/<entity>.ts`
 
 **One comment, read at two lengths.** The opening sentence becomes the short label — the capability `intent`, and the sentence someone scans a list by. Everything up to the first `@tag` becomes the long form. `gen-validators` emits that long form as `.describe()` on the schema, so it appears as the description in the interface document and in an agent tool's input fields. Write the sentence that stands alone first, then the paragraph that explains it:
 
-```typescript
+```ts
 /**
  * Creates an org-scoped group for bulk role assignment.
  *
