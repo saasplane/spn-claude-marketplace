@@ -71,7 +71,7 @@ An answer written into the foundation book instead of the estate half's own repo
 
 **Everything built downstream of the estate half reaches it through a published version — MUST.** This is the most load-bearing promise in the chain, because nothing downstream can see past it to what actually changed.
 
-**Lockstep holds within the repository; independence holds across repositories.** A consumer pins a version and never tracks a range — a range is a build that changes without anybody having changed it, which defeats the whole point of naming a version at all. A breaking change is a version **and** a migration path together; either one alone is half a change, and shipping only the version bump leaves the consumer to reconstruct the migration by trial.
+**Lockstep holds within the repository; independence holds across repositories.** A consumer pins a version and never tracks a range — a range is a build that changes without anybody having changed it, and a version that names something that changes on its own names nothing. A breaking change is a version **and** a migration path together; either one alone is half a change, and shipping only the version bump leaves the consumer to reconstruct the migration by trial.
 
 A version that means something different from what it meant last time is a break arriving in the shape of an upgrade — the people it breaks are exactly the ones least able to see why, because nothing in the version number told them to look.
 

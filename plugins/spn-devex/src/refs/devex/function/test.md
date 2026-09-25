@@ -10,7 +10,7 @@
 
 **Source of truth:** the foundation's `02-constructs/01-devex/01-function/05-test.md` and `04-capabilities/01-devex/01-function/05-test.md`. Read this as the restatement; the book governs.
 
-## Testing is not a gate bolted on the end
+## Testing is not a quality check added after the build
 
 **Every behaviour row carries an id, and a test cites that id.** So the suite is not a second opinion about the code — it is the evidence for a claim the documents already made.
 

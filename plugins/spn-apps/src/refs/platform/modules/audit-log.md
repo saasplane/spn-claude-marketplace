@@ -32,4 +32,4 @@
 
 ## When you reach for it
 
-**Anything somebody may later have to prove happened.** Application logs are for operating the system; this is for answering a question under oath.
+**Anything somebody may later have to prove happened.** Application logs are for operating the system; this is for answering a question somebody has to be able to prove the answer to.

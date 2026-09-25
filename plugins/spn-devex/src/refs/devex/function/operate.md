@@ -14,7 +14,7 @@
 
 **A capability that works and cannot be watched is a capability nobody can support.** A fix that cannot be applied safely is not a fix.
 
-**The thing to unlearn is that operations is a separate discipline with its own tools and its own record.** Here it feeds the same loop: what an incident taught becomes a document change, a register row or a check — not a runbook in somebody's drawer.
+**The thing to unlearn is that operations is a separate discipline with its own tools and its own record.** Here it feeds the same loop: what an incident taught becomes a document change, a register row or a check — not a runbook nobody else can find.
 
 ## What a change owes before it can be operated at all
 
@@ -24,7 +24,7 @@
 
 ## The order an incident is handled in
 
-**Stop the harm, then find the cause, then fix it, then write down what it taught.** Reordering these is the commonest way an incident takes twice as long — a cause hunted before the bleeding stops is a cause found late.
+**Stop the harm, then find the cause, then fix it, then write down what it taught.** Reordering these is the commonest way an incident runs long: a cause hunted before the harm is stopped is a cause found late, while the harm continues.
 
 **Closing an incident owes something back.** The loop is only closed when what it taught has landed where the next person will meet it: the owning chapter, a register row, or a check that fires at write time.
 

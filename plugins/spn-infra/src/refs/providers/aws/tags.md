@@ -39,7 +39,7 @@
 
 **An auditor filters on `Region=in` and gets everything inside the India boundary**, whichever provider regions serve it. Carry `ap-south-1` in the tag instead and the filter becomes a question about AWS rather than about the law.
 
-## `DataClass` is the tag with teeth
+## `DataClass` is the tag that decides things mechanically
 
 **It decides encryption strength and retention mechanically**, so it is not a label somebody picks to be safe — picking a higher class costs real money and picking a lower one loses evidence.
 

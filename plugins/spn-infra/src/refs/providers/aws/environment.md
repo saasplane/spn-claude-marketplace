@@ -11,7 +11,7 @@
 
 **The command is `spnutils infra environment <env> up --cloud`.** The environment layer has **no local form** — the machine is one environment, and targeting it locally is refused by name. The runbook behind this names `cinfra env up`, which never shipped.
 
-## The order is the whole design
+## The order is what makes it work
 
 **Network, then resources, then compute.** Each act needs the one before it to exist, and running them out of order does not fail cleanly — it half-succeeds and leaves an environment whose state nobody can read.
 

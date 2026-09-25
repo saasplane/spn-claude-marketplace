@@ -13,7 +13,7 @@
 
 ## Addresses are computed, never chosen
 
-**IP planning fails slowly, which is why none of it is typed.** Two teams pick overlapping ranges, nothing breaks for years, and then the day the networks must connect they cannot — and renumbering a live network is not a task anybody gets to schedule.
+**A bad IP plan does not break anything for years, which is why none of it is typed.** Two teams pick overlapping ranges, nothing breaks for years, and then the day the networks must connect they cannot — and renumbering a live network is not a task anybody gets to schedule.
 
 ```text
 apps network   10.(16·P + R).(32·E).0/20

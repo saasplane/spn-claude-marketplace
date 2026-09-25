@@ -10,7 +10,7 @@
 
 **Source of truth:** the foundation's `02-constructs/03-platform/02-modules/02-translation.md` and its capability chapters. Read this as the restatement; the book governs.
 
-## The one thing to carry away
+## The one distinction that decides everything else
 
 **A label belongs to the platform, so the platform translates it. Content belongs to an organization, so the organization translates its own.** The two halves look symmetrical and are not.
 

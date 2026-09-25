@@ -24,7 +24,7 @@
 
 **Wearing a lens while writing makes the work better, and is never a review** — because the context that drafted something already agrees with its own reasoning. A lens that is only ever worn is never a review.
 
-**Convening opens a fresh reviewer**, which is the whole point: it reads the work without having written it.
+**Convening opens a fresh reviewer**, and that is the reason to convene one: it reads the work without having written it.
 
 **A panel reports; the writing context acts.** The panel does not edit, and it does not decide what happens next.
 

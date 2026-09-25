@@ -191,7 +191,7 @@ A session reads the installed cache, so changed files and unchanged behaviour is
 | If you… | Then |
 | --- | --- |
 | edit a ref and expect it live this session | nothing changed — you read the installed cache, not the checkout |
-| paste a chapter's own wording into a `docs` restatement | you have shipped the book instead of restating it — same rules, different wording is the whole point |
+| paste a chapter's own wording into a `docs` restatement | you have shipped the book instead of restating it — restating means the same rules in different words, and different words are what a restatement is for |
 | reword a `files` copy to read better | the improved copy is a different template, and nobody knows it diverged |
 | guess a `seen` hash instead of computing it | the block reports agreement that was never checked |
 | cite a chapter by path from a partner's ref | it resolves only for somebody holding both trees, so a partner's session gets a broken link |
