@@ -51,33 +51,33 @@ One call reaches one process. That process asks each check that could have an op
   ] }
 ```
 
-The shape is the same in all three plugins, and only the contents differ. `spn-core` wires every moment it can; `spn-apps-ts` wires one and puts six checks behind it; `spn-infra` wires one and puts a shell script behind it.
+The shape is the same in all three plugins, and only the contents differ. `spn-devex` wires every moment it can; `spn-apps-ts` wires one and puts six checks behind it; `spn-infra` wires one and puts a shell script behind it.
 
 ## Parts
 
 ### The wiring file
 
-`hooks.json` inside a plugin's `hooks/` folder is the whole declaration. Each moment carries an optional matcher naming which tool calls reach it, a command written against `CLAUDE_PLUGIN_ROOT`, and a timeout. One entry per moment is the rule that pays: five separate entries once matched a single edit, and each one paid an interpreter start-up before reading a byte. *Where:* `plugins/spn-core/hooks/hooks.json`, `plugins/spn-apps-ts/hooks/hooks.json`, `plugins/spn-infra/hooks/hooks.json`
+`hooks.json` inside a plugin's `hooks/` folder is the whole declaration. Each moment carries an optional matcher naming which tool calls reach it, a command written against `CLAUDE_PLUGIN_ROOT`, and a timeout. One entry per moment is the rule that pays: five separate entries once matched a single edit, and each one paid an interpreter start-up before reading a byte. *Where:* `plugins/spn-devex/hooks/hooks.json`, `plugins/spn-apps-ts/hooks/hooks.json`, `plugins/spn-infra/hooks/hooks.json`
 
 ### The payload, and what a hook reads from it
 
-The harness writes the event to standard input as JSON. `readPayload` parses it, and input it cannot parse is not a finding — the hook simply allows the call. What a check then reads is a small part of it: the path a write names, the shell command a call carries, and the text a write would add. *Where:* `plugins/spn-core/hooks/lib/payload.ts`
+The harness writes the event to standard input as JSON. `readPayload` parses it, and input it cannot parse is not a finding — the hook simply allows the call. What a check then reads is a small part of it: the path a write names, the shell command a call carries, and the text a write would add. *Where:* `plugins/spn-devex/hooks/lib/payload.ts`
 
 ### The verdict is a return value
 
-A check is a function returning `{ deny?, note? }` or nothing. The dispatcher calls it and reads the object, so there is no round trip a refusal can disappear in. A file can still be run on its own, and `emit` then prints the same decision JSON to the same stream. A refusal sets the decision and its reason; advice is set as context the agent reads, because a message put only in the developer's pane is invisible to the agent. *Where:* `plugins/spn-core/hooks/lib/payload.ts`
+A check is a function returning `{ deny?, note? }` or nothing. The dispatcher calls it and reads the object, so there is no round trip a refusal can disappear in. A file can still be run on its own, and `emit` then prints the same decision JSON to the same stream. A refusal sets the decision and its reason; advice is set as context the agent reads, because a message put only in the developer's pane is invisible to the agent. *Where:* `plugins/spn-devex/hooks/lib/payload.ts`
 
 ### One process, and the order inside it
 
-The dispatcher imports every check and calls each in turn. Each check declares what it `applies` to, decided from the path or the command alone, and which fields it `needs`, so a call that cannot interest a check never reaches it. The order is a path test, then a file read, then a workspace walk. A check that throws is caught and passed over, and the rest still run. *Where:* `plugins/spn-core/hooks/events/pretooluse.ts`
+The dispatcher imports every check and calls each in turn. Each check declares what it `applies` to, decided from the path or the command alone, and which fields it `needs`, so a call that cannot interest a check never reaches it. The order is a path test, then a file read, then a workspace walk. A check that throws is caught and passed over, and the rest still run. *Where:* `plugins/spn-devex/hooks/events/pretooluse.ts`
 
 ### The dispatcher's own refusal
 
-One guard is not a check in the list. Before the loop starts, the dispatcher asks whether any path this call would write is a file a generator owns — a generated validator, a build output folder, a generated route lock, or a file whose own header says a tool wrote it. That refusal is the dispatcher's own, and it runs first because it is the cheapest one there is and needs nothing read. *Where:* `plugins/spn-core/hooks/events/pretooluse.ts`, `generatedRefusal`
+One guard is not a check in the list. Before the loop starts, the dispatcher asks whether any path this call would write is a file a generator owns — a generated validator, a build output folder, a generated route lock, or a file whose own header says a tool wrote it. That refusal is the dispatcher's own, and it runs first because it is the cheapest one there is and needs nothing read. *Where:* `plugins/spn-devex/hooks/events/pretooluse.ts`, `generatedRefusal`
 
 ### Measuring what a run cost
 
-Every check is timed. Whether any of it reaches disk is a switch the developer sets, and every path swallows its own errors, because a gate failing because timing failed is worse than a number nobody recorded. *Where:* `plugins/spn-core/hooks/lib/timing.ts`
+Every check is timed. Whether any of it reaches disk is a switch the developer sets, and every path swallows its own errors, because a gate failing because timing failed is worse than a number nobody recorded. *Where:* `plugins/spn-devex/hooks/lib/timing.ts`
 
 ## Boundary
 
@@ -100,12 +100,12 @@ This page answers when a hook runs, what it is handed, and what it may say back.
 | Repo | Node | What it realizes | State |
 | --- | --- | --- | --- |
 | spn-foundation | `01-devex/02-agent/04-plugins` | the foundation construct this one realizes | planned |
-| spn-claude-marketplace | `spn-core` | the wiring file, the payload and verdict shapes, the dispatcher, and the timing every hook in the workspace is built on | planned |
+| spn-claude-marketplace | `spn-devex` | the wiring file, the payload and verdict shapes, the dispatcher, and the timing every hook in the workspace is built on | planned |
 
 ## Proof
 
 | Check | Kind | What a green run shows |
 | --- | --- | --- |
-| `node plugins/spn-core/hooks/tools/partner-shape.ts` | gate | every wired script runs against a repository holding nothing but the plugin, and none of them crashes on an input it was not written for |
+| `node plugins/spn-devex/hooks/tools/partner-shape.ts` | gate | every wired script runs against a repository holding nothing but the plugin, and none of them crashes on an input it was not written for |
 
-Try it: `node plugins/spn-core/hooks/tools/partner-shape.ts`
+Try it: `node plugins/spn-devex/hooks/tools/partner-shape.ts`

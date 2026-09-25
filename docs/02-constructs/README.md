@@ -16,7 +16,7 @@ This seat is the model: one file per construct, saying what a thing is, what it 
 
 | Domain | What it holds |
 | --- | --- |
-| [spn-core](01-spn-core/README.md) | The plugin every repository loads: the delivery folder, the code the runtime calls, the commands run by name, the page production, and the skills, restatements, viewpoints and personas a session reads |
+| [spn-devex](01-spn-devex/README.md) | The plugin every repository loads: the delivery folder, the code the runtime calls, the commands run by name, the page production, and the skills, restatements, viewpoints and personas a session reads |
 | [spn-apps-ts](02-spn-apps-ts/README.md) | The apps world made concrete for TypeScript: the write-time rules only this stack has, the tools over its own registers, its skills, and the planning layer it ships |
 | [spn-infra](03-spn-infra/README.md) | The estate world: the single guard standing between an edit and an estate file, the skills that change what an estate is, and the cards holding its vocabulary |
 

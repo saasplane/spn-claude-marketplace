@@ -58,7 +58,7 @@ A large skill therefore costs nothing on a turn that never needed it, which is w
 
 ### The file a session loads
 
-A frontmatter block naming `name` and `description`, then instructions in markdown. The frontmatter carries those two fields and nothing more for a stack-agnostic skill. Everything a session decides about whether to read the file is decided from those first lines. *Where:* `plugins/spn-core/skills/plan/SKILL.md`, and the same file in every other skill folder
+A frontmatter block naming `name` and `description`, then instructions in markdown. The frontmatter carries those two fields and nothing more for a stack-agnostic skill. Everything a session decides about whether to read the file is decided from those first lines. *Where:* `plugins/spn-devex/skills/plan/SKILL.md`, and the same file in every other skill folder
 
 ### A skill that outgrows one file
 
@@ -78,11 +78,11 @@ The moment a skill states a rule stated nowhere else, it has become a second sou
 
 ### A skill that cannot be stack-agnostic is not copied
 
-Where a stack-agnostic skill needs a concrete step, the skill stays in one place and reads a file the stack's own plugin ships. Copying the skill into each stack would put one rule in two folders, drifting, with nothing comparing them. *Where:* `plugins/spn-core/skills/plan/SKILL.md`, `plugins/spn-apps-ts/refs/plan.md`
+Where a stack-agnostic skill needs a concrete step, the skill stays in one place and reads a file the stack's own plugin ships. Copying the skill into each stack would put one rule in two folders, drifting, with nothing comparing them. *Where:* `plugins/spn-devex/skills/plan/SKILL.md`, `plugins/spn-apps-ts/refs/plan.md`
 
 ### Some skills ask rather than read
 
-A few answers cannot be derived from the ground, because they are decisions rather than readings. A skill of that kind works one agreed block at a time and runs no act on an answer nobody gave, and its description says so. *Where:* `plugins/spn-core/skills/ideate/SKILL.md`, `plugins/spn-core/skills/day-zero/SKILL.md`
+A few answers cannot be derived from the ground, because they are decisions rather than readings. A skill of that kind works one agreed block at a time and runs no act on an answer nobody gave, and its description says so. *Where:* `plugins/spn-devex/skills/ideate/SKILL.md`, `plugins/spn-devex/skills/day-zero/SKILL.md`
 
 ## Boundary
 
@@ -105,12 +105,12 @@ This page answers what a skill is, how it is selected, and what it may contain. 
 | Repo | Node | What it realizes | State |
 | --- | --- | --- | --- |
 | spn-foundation | `01-devex/02-agent/02-skills` | the foundation construct this one realizes | planned |
-| spn-claude-marketplace | `spn-core` | one folder per stack-agnostic skill, each holding the file a session loads on a match | planned |
+| spn-claude-marketplace | `spn-devex` | one folder per stack-agnostic skill, each holding the file a session loads on a match | planned |
 
 ## Proof
 
 | Check | Kind | What a green run shows |
 | --- | --- | --- |
-| `node plugins/spn-core/hooks/tools/restate-drift.ts` | gate | every skill and step carrying a stamp still reads as the chapter it names reads today |
+| `node plugins/spn-devex/hooks/tools/restate-drift.ts` | gate | every skill and step carrying a stamp still reads as the chapter it names reads today |
 
-Try it: `node plugins/spn-core/hooks/tools/restate-drift.ts`
+Try it: `node plugins/spn-devex/hooks/tools/restate-drift.ts`

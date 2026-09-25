@@ -4,14 +4,14 @@ The public marketplace that **authors and delivers the SaaS Plane Claude plugins
 sit at the root: `plugins/` — the three plugins themselves, each with its own
 `.claude-plugin/plugin.json` — and `docs/`, which describes them. `.claude-plugin/marketplace.json`
 is what a `claude plugin marketplace add` reads. **This file carries only what is true of this
-repo alone**; the docs-tree shape and the working protocol are stated in `spn-core` itself, and a
+repo alone**; the docs-tree shape and the working protocol are stated in `spn-devex` itself, and a
 copy here would be a second source that drifts.
 
 ## `GENERAL`, and what that decides
 
 **This repo declares `GENERAL` in `sprepo.json`** — no nodes, one docs tree. It answers to no
 stack, so the `apps` and `infra` commands refuse it by name, and what the agent manages here is the
-docs tree and this repository's own files (`RD.GOV.024`). It loads `spn-core` and only `spn-core`:
+docs tree and this repository's own files (`RD.GOV.024`). It loads `spn-devex` and only `spn-devex`:
 core governs docs trees, and a stack plugin acts on nodes this repository does not have.
 
 **Authoring a plugin is not loading it.** This repo authors all three and loads one. Editing
@@ -29,13 +29,13 @@ domain, with no area above them, and a domain **is a plugin** — so the same th
 
 | Domain | Describes | Its constructs |
 | --- | --- | --- |
-| [`01-spn-core`](docs/02-constructs/01-spn-core/README.md) | the stack-agnostic plugin | the plugin set, the hook set, the loop events, the checks, the tools, the pages, the skills, the refs, the lenses, the agents |
+| [`01-spn-devex`](docs/02-constructs/01-spn-devex/README.md) | the stack-agnostic plugin | the plugin set, the hook set, the loop events, the checks, the tools, the pages, the skills, the refs, the lenses, the agents |
 | [`02-spn-apps-ts`](docs/02-constructs/02-spn-apps-ts/README.md) | the TypeScript stack plugin | its checks, tools, skills and refs |
 | [`03-spn-infra`](docs/02-constructs/03-spn-infra/README.md) | the estate plugin | the estate guard, its skills, its refs |
 
 Under [`04-capabilities/`](docs/04-capabilities/README.md) the level below a domain is the
 package that realizes it, and **here the package is the plugin itself** — so a domain holds
-exactly one folder of the same name, `01-spn-core/spn-core/`. That is the plugin tree mirrored:
+exactly one folder of the same name, `01-spn-devex/spn-devex/`. That is the plugin tree mirrored:
 one chapter per construct, and the chapter names what the plugin actually ships.
 
 `docs/registers/` holds [`decisions.md`](docs/registers/decisions.md) alone.
@@ -58,7 +58,7 @@ reversing the 2026-09-08 ruling that let them move independently.
 one set, by one command, and a session loads whichever of them its repository declares. When they
 read `0.7.3 · 0.7.1 · 0.7.1` there is no way to know from the outside whether that is three
 deliberate versions or one release that half-landed — and the second is what it looked like all
-day on 2026-09-22, while `spn-core 0.7.3` was declared and the workspace root ran `0.7.2 · 0.7.0 ·
+day on 2026-09-22, while `spn-devex 0.7.3` was declared and the workspace root ran `0.7.2 · 0.7.0 ·
 0.7.0`. **One number answers *are you current?* and three numbers only raise it.** The cost is
 releasing a plugin that did not change, which costs nothing.
 
@@ -85,7 +85,7 @@ the split this rule ends.
 ## SaaS Plane
 
 This repo is wired for SaaS Plane. Standards and flows arrive via the saasplane plugins
-(spn-core); the version-matched repo inventory is imported below.
+(spn-devex); the version-matched repo inventory is imported below.
 
 @.claude/saasplane/rules.md
 

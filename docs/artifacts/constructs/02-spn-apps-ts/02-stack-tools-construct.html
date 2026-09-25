@@ -276,13 +276,13 @@
 <!-- 04 -->
 <section id="s4">
   <div class="sec-head"><h2>Boundary</h2></div>
-  <p>This page answers what these tools read, what they may write, and why. It does not answer what a tool is in general — that a tool is invoked by its own path, grades its findings and counts only refusals into its exit code is <a href="../01-spn-core/05-tools-construct.html">The Tool</a>. It does not answer what a behaviour row means either; the book states the row grammar, and this plugin only reads and writes it.</p>
+  <p>This page answers what these tools read, what they may write, and why. It does not answer what a tool is in general — that a tool is invoked by its own path, grades its findings and counts only refusals into its exit code is <a href="../01-spn-devex/05-tools-construct.html">The Tool</a>. It does not answer what a behaviour row means either; the book states the row grammar, and this plugin only reads and writes it.</p>
   <div class="scroll"><table>
     <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
     <tbody>
-      <tr><td>finding a register by its header, the cells a run owns, and measuring coverage against the published action surface</td><td>that a tool is invoked by its own path and grades what it finds</td><td><a href="../01-spn-core/05-tools-construct.html">The Tool</a></td></tr>
+      <tr><td>finding a register by its header, the cells a run owns, and measuring coverage against the published action surface</td><td>that a tool is invoked by its own path and grades what it finds</td><td><a href="../01-spn-devex/05-tools-construct.html">The Tool</a></td></tr>
       <tr><td>that a run speaks only for the tiers it covered, and never writes over a hand-checked row</td><td>what a behaviour row must contain, and the grammar of its id</td><td>the foundation's document chapter</td></tr>
-      <tr><td>the reading of a stack's own declarations</td><td>the same job done for a repository that declares no stack at all</td><td><a href="../01-spn-core/05-tools-construct.html">The Tool</a></td></tr>
+      <tr><td>the reading of a stack's own declarations</td><td>the same job done for a repository that declares no stack at all</td><td><a href="../01-spn-devex/05-tools-construct.html">The Tool</a></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -326,10 +326,10 @@
   <div class="scroll"><table>
     <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
     <tbody>
-      <tr><td><code>node plugins/spn-core/hooks/tools/partner-shape.ts</code></td><td>gate</td><td>both tools run against a repository holding nothing but the plugins, and answer rather than crash where there is no register to read</td></tr>
+      <tr><td><code>node plugins/spn-devex/hooks/tools/partner-shape.ts</code></td><td>gate</td><td>both tools run against a repository holding nothing but the plugins, and answer rather than crash where there is no register to read</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>node plugins/spn-core/hooks/tools/partner-shape.ts</code></p>
+  <p>Try it: <code>node plugins/spn-devex/hooks/tools/partner-shape.ts</code></p>
 </section>
 
 <footer>

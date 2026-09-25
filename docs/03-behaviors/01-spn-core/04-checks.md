@@ -14,7 +14,7 @@
 
 `For: Backend developer · Architect` · `Status: 🔮 PLANNING`
 
-[The Check](../../02-constructs/01-spn-core/04-checks.md) makes the promises below. A row says what somebody can do and what they see when they do it.
+[The Check](../../02-constructs/01-spn-devex/04-checks.md) makes the promises below. A row says what somebody can do and what they see when they do it.
 
 Every row below is declared and none is claimed: a run writes the last two cells.
 

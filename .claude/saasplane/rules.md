@@ -3,7 +3,7 @@
 # SaaS Plane rules — spn-claude-marketplace
 
 Version-matched inventory of this repo for agents. Standards and flows ship with the
-saasplane plugins (spn-core); this file pins what this repo uses.
+saasplane plugins (spn-devex); this file pins what this repo uses.
 
 This repository declares **GENERAL** in `sprepo.json`, and everything
 below is read from a SaaS Plane manifest. A stack's own files are read only where the claim
@@ -17,6 +17,6 @@ _No nodes, and that is what `GENERAL` declares — this repository holds one doc
 
 - Generated files are never hand-edited — barrels, validators, and api clients are regenerated via `spnutils`.
 - Contracts are the only cross-module surface.
-- Standards ship with the spn plugins (spn-core); do not restate them per repo.
+- Standards ship with the spn plugins (spn-devex); do not restate them per repo.
 
 _Refresh this file anytime with `spnutils repo agent-sync` — a pure reference refresh from this repo's sprepo.json; it never parses code._

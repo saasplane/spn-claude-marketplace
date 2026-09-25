@@ -57,35 +57,35 @@ A refusal ends the chain, because anything said after an answer is noise. Advice
 
 ### A check is a file, and its header names its source
 
-Each check sits in its own file under `hooks/checks/` and opens with a line naming the chapter of the foundation book it restates. That line carries no hash and nothing compares it, and that is deliberate: it tells a reader where the rule lives, and the rule is that a change is made in the chapter first and here second, in the same change. *Where:* `plugins/spn-core/hooks/checks/`
+Each check sits in its own file under `hooks/checks/` and opens with a line naming the chapter of the foundation book it restates. That line carries no hash and nothing compares it, and that is deliberate: it tells a reader where the rule lives, and the rule is that a change is made in the chapter first and here second, in the same change. *Where:* `plugins/spn-devex/hooks/checks/`
 
 ### Refusing a whole route beats listing the safe ones
 
-Where a value must never be rendered, every route that would render it is refused rather than the safe routes listed. One pipeline prints key names and the next prints every value, and telling those apart inside a shell string is guesswork. The whole command is read, so even a quoted path inside a here-document is caught, and the message names the door to use instead. *Where:* `plugins/spn-core/hooks/checks/env-seat.ts`
+Where a value must never be rendered, every route that would render it is refused rather than the safe routes listed. One pipeline prints key names and the next prints every value, and telling those apart inside a shell string is guesswork. The whole command is read, so even a quoted path inside a here-document is caught, and the message names the door to use instead. *Where:* `plugins/spn-devex/hooks/checks/env-seat.ts`
 
 ### Some questions are about the folder rather than the file
 
-A cycle among state files is a property of the whole folder, not of the file being written. So the check reads the folder with the pending write laid over it, and judges the graph the write would make. The same file runs as a hook and as a sweep over a tree, and a sweep weights what it finds by the grade [The Tool](05-tools.md) declares. *Where:* `plugins/spn-core/hooks/checks/contract-cycle.ts`
+A cycle among state files is a property of the whole folder, not of the file being written. So the check reads the folder with the pending write laid over it, and judges the graph the write would make. The same file runs as a hook and as a sweep over a tree, and a sweep weights what it finds by the grade [The Tool](05-tools.md) declares. *Where:* `plugins/spn-devex/hooks/checks/contract-cycle.ts`
 
 ### A warning that repeats is a warning nobody reads
 
-One turn writes many files, often into one folder. A line printed on every write teaches a reader to skip it, and the time it mattered goes past unread. So a check that speaks rather than refuses remembers what it already said and says it once, keeping that memory in the workspace's own folder for what its machinery says about itself. *Where:* `plugins/spn-core/hooks/checks/confirmed.ts`, `plugins/spn-core/hooks/checks/mirror.ts`
+One turn writes many files, often into one folder. A line printed on every write teaches a reader to skip it, and the time it mattered goes past unread. So a check that speaks rather than refuses remembers what it already said and says it once, keeping that memory in the workspace's own folder for what its machinery says about itself. *Where:* `plugins/spn-devex/hooks/checks/confirmed.ts`, `plugins/spn-devex/hooks/checks/mirror.ts`
 
 ### Some checks never refuse, on purpose
 
-Where deciding needs a reading rather than a match, a gate would be guessing. The check that names which document governs the folder you are editing does that and nothing else, and where no row governs a folder it stays silent — that gap belongs to a sweep over the whole tree rather than to one write. *Where:* `plugins/spn-core/hooks/checks/mirror.ts`
+Where deciding needs a reading rather than a match, a gate would be guessing. The check that names which document governs the folder you are editing does that and nothing else, and where no row governs a folder it stays silent — that gap belongs to a sweep over the whole tree rather than to one write. *Where:* `plugins/spn-devex/hooks/checks/mirror.ts`
 
 ### A check that asks for accounting, not for completion
 
-Closing a scope with work still pending is good housekeeping. What must not happen is a row nobody decided. So the close gate passes landed, carried and deferred alike, and refuses only the undecided row. There is no override, because recording the deferral is the way through. *Where:* `plugins/spn-core/hooks/checks/split-plan.ts`
+Closing a scope with work still pending is good housekeeping. What must not happen is a row nobody decided. So the close gate passes landed, carried and deferred alike, and refuses only the undecided row. There is no override, because recording the deferral is the way through. *Where:* `plugins/spn-devex/hooks/checks/split-plan.ts`
 
 ### One file can hold more than one gate
 
-Two of the workspace gates read the same table for different reasons, so they live in one file and the dispatcher registers each separately. Naming them apart in the register of checks matters, because one of them sweeps the workspace and the other reads a single path, and anybody measuring the cost needs to know which. *Where:* `plugins/spn-core/hooks/checks/split-plan.ts`
+Two of the workspace gates read the same table for different reasons, so they live in one file and the dispatcher registers each separately. Naming them apart in the register of checks matters, because one of them sweeps the workspace and the other reads a single path, and anybody measuring the cost needs to know which. *Where:* `plugins/spn-devex/hooks/checks/split-plan.ts`
 
 ### The bars a check measures come from a rule, never from the corpus
 
-A bar set from what the corpus already averages moves every time the corpus does, so a sweep would approve whatever is already there. The document check takes its numbers from the register row that states them, and takes headings, tables, code and metadata out of the text before measuring what is left. *Where:* `plugins/spn-core/hooks/checks/doc-check.ts`
+A bar set from what the corpus already averages moves every time the corpus does, so a sweep would approve whatever is already there. The document check takes its numbers from the register row that states them, and takes headings, tables, code and metadata out of the text before measuring what is left. *Where:* `plugins/spn-devex/hooks/checks/doc-check.ts`
 
 ## Boundary
 
@@ -108,13 +108,13 @@ This page answers what one check is and how it decides. It does not answer how c
 | Repo | Node | What it realizes | State |
 | --- | --- | --- | --- |
 | spn-foundation | `01-devex/02-agent/01-agent` | the foundation construct this one realizes | planned |
-| spn-claude-marketplace | `spn-core` | the stack-agnostic checks the dispatcher composes, each naming its own chapter and carrying its own fast path | planned |
+| spn-claude-marketplace | `spn-devex` | the stack-agnostic checks the dispatcher composes, each naming its own chapter and carrying its own fast path | planned |
 
 ## Proof
 
 | Check | Kind | What a green run shows |
 | --- | --- | --- |
-| `node plugins/spn-core/hooks/tools/partner-shape.ts` | gate | every check runs against a repository holding nothing but the plugin, and a missing input produces silence rather than a crash |
-| `node plugins/spn-core/hooks/tools/coherence.ts` | gate | no two documents in the repository state opposite rules about what a check decides |
+| `node plugins/spn-devex/hooks/tools/partner-shape.ts` | gate | every check runs against a repository holding nothing but the plugin, and a missing input produces silence rather than a crash |
+| `node plugins/spn-devex/hooks/tools/coherence.ts` | gate | no two documents in the repository state opposite rules about what a check decides |
 
-Try it: `node plugins/spn-core/hooks/tools/partner-shape.ts`
+Try it: `node plugins/spn-devex/hooks/tools/partner-shape.ts`

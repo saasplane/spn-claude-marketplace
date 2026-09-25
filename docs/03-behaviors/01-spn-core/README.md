@@ -1,15 +1,15 @@
 <!-- spn:doc
 {
-  "id": "spn-claude-marketplace-behaviors-spn-core",
-  "title": "spn-core — What It Promises",
+  "id": "spn-claude-marketplace-behaviors-spn-devex",
+  "title": "spn-devex — What It Promises",
   "lenses": ["ARCHITECT", "SERVER_DEV"],
   "status": "PLANNING",
   "summary": "The promises the stack-agnostic plugin makes, one file of rows beside each construct that states them, at the same path and the same number.",
-  "keywords": ["behaviors", "promises", "spn-core", "rows", "register", "tier"]
+  "keywords": ["behaviors", "promises", "spn-devex", "rows", "register", "tier"]
 }
 -->
 
-# spn-core — What It Promises
+# spn-devex — What It Promises
 
 `For: Architect · Backend developer` · `Status: 🔮 PLANNING`
 

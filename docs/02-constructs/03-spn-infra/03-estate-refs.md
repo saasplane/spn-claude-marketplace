@@ -76,11 +76,11 @@ A real coordinate in an example is a real coordinate published in a public repos
 
 ## Boundary
 
-This page answers which subjects the estate's cards cover and what a card may contain. It does not answer how a restatement is stamped, parsed or compared — that is [The Ref](../01-spn-core/08-ref-set.md), and these files carry the same block. It does not answer what the estate model itself is: the book states it, and a card is the copy.
+This page answers which subjects the estate's cards cover and what a card may contain. It does not answer how a restatement is stamped, parsed or compared — that is [The Ref](../01-spn-devex/08-ref-set.md), and these files carry the same block. It does not answer what the estate model itself is: the book states it, and a card is the copy.
 
 | Owns | Refuses | Who owns that instead |
 | --- | --- | --- |
-| the subjects restated here, and that every value in them is grammar rather than a real one | the block, the stamp, the hash and the drift comparison | [The Ref](../01-spn-core/08-ref-set.md) |
+| the subjects restated here, and that every value in them is grammar rather than a real one | the block, the stamp, the hash and the drift comparison | [The Ref](../01-spn-devex/08-ref-set.md) |
 | that a refusal's reasoning is one hop from the refusal | what is refused at the moment an estate file is written | [The Estate Guard](01-estate-guard.md) |
 | that a card holds the words a skill uses | the skills themselves, and the walk each one sequences | [Estate Skills](02-estate-skills.md) |
 
@@ -101,6 +101,6 @@ This page answers which subjects the estate's cards cover and what a card may co
 
 | Check | Kind | What a green run shows |
 | --- | --- | --- |
-| `node plugins/spn-core/hooks/tools/restate-drift.ts` | gate | every card's stamp still matches the sections it names, so none of the copies has fallen behind the book |
+| `node plugins/spn-devex/hooks/tools/restate-drift.ts` | gate | every card's stamp still matches the sections it names, so none of the copies has fallen behind the book |
 
-Try it: `node plugins/spn-core/hooks/tools/restate-drift.ts`
+Try it: `node plugins/spn-devex/hooks/tools/restate-drift.ts`

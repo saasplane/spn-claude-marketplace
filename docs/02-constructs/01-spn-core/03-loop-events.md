@@ -52,29 +52,29 @@ The moments run in the order a session meets them. Nothing chains one to the nex
   ] }
 ```
 
-`spn-core` is the only plugin here that wires more than one moment. It wires all four, one script each, and none of those scripts is reached any other way.
+`spn-devex` is the only plugin here that wires more than one moment. It wires all four, one script each, and none of those scripts is reached any other way.
 
 ## Parts
 
 ### The window opening
 
-One script runs when a session starts, resumes or is cleared, and what it prints is the first screen a developer reads. Nothing in that screen is typed: the script walks the workspace, reads each repository's own manifest for the world and the stack it claims, checks the wiring that claim implies, and lists every workstream in each of its states. A workspace holding no manifest at all is the case where there is nothing to read, and the script then asks instead of reporting, and points at the day-zero skill. Every read is wrapped, because a crash here is a window that opens on a stack trace. *Where:* `plugins/spn-core/hooks/events/orientation.ts`
+One script runs when a session starts, resumes or is cleared, and what it prints is the first screen a developer reads. Nothing in that screen is typed: the script walks the workspace, reads each repository's own manifest for the world and the stack it claims, checks the wiring that claim implies, and lists every workstream in each of its states. A workspace holding no manifest at all is the case where there is nothing to read, and the script then asks instead of reporting, and points at the day-zero skill. Every read is wrapped, because a crash here is a window that opens on a stack trace. *Where:* `plugins/spn-devex/hooks/events/orientation.ts`
 
 ### A call about to run
 
-One script, one matcher, and the whole chain of checks behind it. This is the only moment that may return a refusal, so every gate in the marketplace lives here or nowhere. Its matcher names the calls that could interest a check — reads, writes, edits, shell commands and searches. *Where:* `plugins/spn-core/hooks/events/pretooluse.ts`
+One script, one matcher, and the whole chain of checks behind it. This is the only moment that may return a refusal, so every gate in the marketplace lives here or nowhere. Its matcher names the calls that could interest a check — reads, writes, edits, shell commands and searches. *Where:* `plugins/spn-devex/hooks/events/pretooluse.ts`
 
 ### A shell command that finished
 
-One script, matched to shell commands alone. It reads the command that just ran, and when that command actually moved a workstream folder into the closed state, it says what landed, counted from that workstream's own split plan. The congratulation comes after the move rather than before it, because the gate that could have refused the move runs earlier and speaks only to refuse. *Where:* `plugins/spn-core/hooks/events/closed.ts`
+One script, matched to shell commands alone. It reads the command that just ran, and when that command actually moved a workstream folder into the closed state, it says what landed, counted from that workstream's own split plan. The congratulation comes after the move rather than before it, because the gate that could have refused the move runs earlier and speaks only to refuse. *Where:* `plugins/spn-devex/hooks/events/closed.ts`
 
 ### A turn about to end
 
-One script, no matcher. By the time it runs the turn is already written, so a refusal would only lose it. What it does instead is warn: a turn ending while the running arc still has rows nothing blocks, an arc held against no live card, and a reply announcing a new window without the fields a handover owes. *Where:* `plugins/spn-core/hooks/events/stop.ts`
+One script, no matcher. By the time it runs the turn is already written, so a refusal would only lose it. What it does instead is warn: a turn ending while the running arc still has rows nothing blocks, an arc held against no live card, and a reply announcing a new window without the fields a handover owes. *Where:* `plugins/spn-devex/hooks/events/stop.ts`
 
 ### Every moment exits zero
 
-Whatever a script decides, it ends with a zero exit code. A refusal is the documented decision written to standard output, never a failure code. Two of these scripts also run by hand, printing the same text, so they can be read without opening a session at all. *Where:* `plugins/spn-core/hooks/events/`
+Whatever a script decides, it ends with a zero exit code. A refusal is the documented decision written to standard output, never a failure code. Two of these scripts also run by hand, printing the same text, so they can be read without opening a session at all. *Where:* `plugins/spn-devex/hooks/events/`
 
 ## Boundary
 
@@ -97,12 +97,12 @@ This page answers which moments exist, what each is handed, and what each may do
 | Repo | Node | What it realizes | State |
 | --- | --- | --- | --- |
 | spn-foundation | `01-devex/02-agent/01-agent` | the foundation construct this one realizes | planned |
-| spn-claude-marketplace | `spn-core` | one script per moment, the only plugin here that wires more than one | planned |
+| spn-claude-marketplace | `spn-devex` | one script per moment, the only plugin here that wires more than one | planned |
 
 ## Proof
 
 | Check | Kind | What a green run shows |
 | --- | --- | --- |
-| `node plugins/spn-core/hooks/tools/partner-shape.ts` | gate | every script a moment names runs against a repository holding nothing but the plugin, and each one ends with a zero exit code |
+| `node plugins/spn-devex/hooks/tools/partner-shape.ts` | gate | every script a moment names runs against a repository holding nothing but the plugin, and each one ends with a zero exit code |
 
-Try it: `node plugins/spn-core/hooks/tools/partner-shape.ts`
+Try it: `node plugins/spn-devex/hooks/tools/partner-shape.ts`

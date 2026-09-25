@@ -82,13 +82,13 @@ The glob this replaced named one stack's folder shape, and it missed a whole mod
 
 ## Boundary
 
-This page answers what these tools read, what they may write, and why. It does not answer what a tool is in general — that a tool is invoked by its own path, grades its findings and counts only refusals into its exit code is [The Tool](../01-spn-core/05-tools.md). It does not answer what a behaviour row means either; the book states the row grammar, and this plugin only reads and writes it.
+This page answers what these tools read, what they may write, and why. It does not answer what a tool is in general — that a tool is invoked by its own path, grades its findings and counts only refusals into its exit code is [The Tool](../01-spn-devex/05-tools.md). It does not answer what a behaviour row means either; the book states the row grammar, and this plugin only reads and writes it.
 
 | Owns | Refuses | Who owns that instead |
 | --- | --- | --- |
-| finding a register by its header, the cells a run owns, and measuring coverage against the published action surface | that a tool is invoked by its own path and grades what it finds | [The Tool](../01-spn-core/05-tools.md) |
+| finding a register by its header, the cells a run owns, and measuring coverage against the published action surface | that a tool is invoked by its own path and grades what it finds | [The Tool](../01-spn-devex/05-tools.md) |
 | that a run speaks only for the tiers it covered, and never writes over a hand-checked row | what a behaviour row must contain, and the grammar of its id | the foundation's document chapter |
-| the reading of a stack's own declarations | the same job done for a repository that declares no stack at all | [The Tool](../01-spn-core/05-tools.md) |
+| the reading of a stack's own declarations | the same job done for a repository that declares no stack at all | [The Tool](../01-spn-devex/05-tools.md) |
 
 ## Binds
 
@@ -107,6 +107,6 @@ This page answers what these tools read, what they may write, and why. It does n
 
 | Check | Kind | What a green run shows |
 | --- | --- | --- |
-| `node plugins/spn-core/hooks/tools/partner-shape.ts` | gate | both tools run against a repository holding nothing but the plugins, and answer rather than crash where there is no register to read |
+| `node plugins/spn-devex/hooks/tools/partner-shape.ts` | gate | both tools run against a repository holding nothing but the plugins, and answer rather than crash where there is no register to read |
 
-Try it: `node plugins/spn-core/hooks/tools/partner-shape.ts`
+Try it: `node plugins/spn-devex/hooks/tools/partner-shape.ts`

@@ -260,19 +260,19 @@
 <section id="s3">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="a-small-renderer-rather-than-a-library">A small renderer rather than a library</h3>
-  <p>A partner installs nothing to read a document, so a dependency would have to be on the machine before a page could be produced at all. The seat file's grammar is closed — headings, paragraphs, tables, lists and fenced blocks — so the renderer covers that grammar and no more. <em>Where:</em> <code>plugins/spn-core/hooks/lib/render.ts</code></p>
+  <p>A partner installs nothing to read a document, so a dependency would have to be on the machine before a page could be produced at all. The seat file's grammar is closed — headings, paragraphs, tables, lists and fenced blocks — so the renderer covers that grammar and no more. <em>Where:</em> <code>plugins/spn-devex/hooks/lib/render.ts</code></p>
   <h3 id="the-block-vocabulary-an-author-types">The block vocabulary an author types</h3>
-  <p>An author never types HTML. One card states the whole vocabulary in the spelling it is written in: a paragraph is a paragraph, a rule is a blockquote, a literal is a fenced block tagged with its language, a figure is a fenced block tagged <code>dg</code>. The card is the thing to read before writing a seat file, and the chapter it restates is what wins where the two disagree. <em>Where:</em> <code>plugins/spn-core/refs/blocks.md</code></p>
+  <p>An author never types HTML. One card states the whole vocabulary in the spelling it is written in: a paragraph is a paragraph, a rule is a blockquote, a literal is a fenced block tagged with its language, a figure is a fenced block tagged <code>dg</code>. The card is the thing to read before writing a seat file, and the chapter it restates is what wins where the two disagree. <em>Where:</em> <code>plugins/spn-devex/refs/blocks.md</code></p>
   <h3 id="nothing-in-a-figure-is-drawn-by-eye">Nothing in a figure is drawn by eye</h3>
-  <p>Every box is measured from its own text, so a label fits and a connector lands on an edge by construction rather than by luck. The canvas is one width and the type sizes are a closed set. The shape carries meaning too: a reader knows a decision from a step before reading either label. <em>Where:</em> <code>plugins/spn-core/hooks/lib/draw.ts</code></p>
+  <p>Every box is measured from its own text, so a label fits and a connector lands on an edge by construction rather than by luck. The canvas is one width and the type sizes are a closed set. The shape carries meaning too: a reader knows a decision from a step before reading either label. <em>Where:</em> <code>plugins/spn-devex/hooks/lib/draw.ts</code></p>
   <h3 id="a-figure-check-reads-the-drawn-result-no">A figure check reads the drawn result, not the spec</h3>
-  <p>The checker asks whether each label fits its box, whether every connector starts and ends where it claims to, whether a connector has enough visible length for a reader to see it, and whether anything crowds the edge of the canvas or its neighbour. It reads the drawing rather than the specification, because a figure authored as drawing by hand is exactly the one nothing measured. <em>Where:</em> <code>plugins/spn-core/hooks/lib/figures.ts</code></p>
+  <p>The checker asks whether each label fits its box, whether every connector starts and ends where it claims to, whether a connector has enough visible length for a reader to see it, and whether anything crowds the edge of the canvas or its neighbour. It reads the drawing rather than the specification, because a figure authored as drawing by hand is exactly the one nothing measured. <em>Where:</em> <code>plugins/spn-devex/hooks/lib/figures.ts</code></p>
   <h3 id="the-links-a-page-carries-are-re-expresse">The links a page carries are re-expressed, never copied</h3>
-  <p>A seat file's links are written from the seat's own folder, and a page sits in a different folder whose neighbours carry different names. So the renderer re-expresses each relative link against the page's own location as it writes. Copying them across unchanged once broke a link on every produced page in the workspace, and no check saw it. <em>Where:</em> <code>plugins/spn-core/hooks/lib/render.ts</code>, <code>hrefForPage</code></p>
+  <p>A seat file's links are written from the seat's own folder, and a page sits in a different folder whose neighbours carry different names. So the renderer re-expresses each relative link against the page's own location as it writes. Copying them across unchanged once broke a link on every produced page in the workspace, and no check saw it. <em>Where:</em> <code>plugins/spn-devex/hooks/lib/render.ts</code>, <code>hrefForPage</code></p>
   <h3 id="behaviour-rows-are-joined-never-typed">Behaviour rows are joined, never typed</h3>
-  <p>A page's proof section carries the rows from the register beside it, spliced in at production time and marked with the register they came from. The seat file is not touched: the join happens on the markdown in memory. That is what keeps one status in one place, because the copy on the page is produced again on every write. <em>Where:</em> <code>plugins/spn-core/hooks/tools/docs.ts</code>, <code>joinProof</code></p>
+  <p>A page's proof section carries the rows from the register beside it, spliced in at production time and marked with the register they came from. The seat file is not touched: the join happens on the markdown in memory. That is what keeps one status in one place, because the copy on the page is produced again on every write. <em>Where:</em> <code>plugins/spn-devex/hooks/tools/docs.ts</code>, <code>joinProof</code></p>
   <h3 id="generated-regions-are-bounded-and-a-hand">Generated regions are bounded, and a hand edit inside them is lost</h3>
-  <p>Part of a face is written by a person and part is generated. The two are told apart by markers that name what writes the region, so no second file is needed to know which is which. A face also declares its own source root, so a repository whose source is not laid out in the usual place generates a map naming folders that exist. <em>Where:</em> <code>plugins/spn-core/hooks/tools/docs.ts</code>, <code>face</code></p>
+  <p>Part of a face is written by a person and part is generated. The two are told apart by markers that name what writes the region, so no second file is needed to know which is which. A face also declares its own source root, so a repository whose source is not laid out in the usual place generates a map naming folders that exist. <em>Where:</em> <code>plugins/spn-devex/hooks/tools/docs.ts</code>, <code>face</code></p>
 </section>
 
 <!-- 04 -->
@@ -304,7 +304,7 @@
     <thead><tr><th>Repo</th><th>Node</th><th>What it realizes</th><th>State</th></tr></thead>
     <tbody>
       <tr><td>spn-foundation</td><td><code>01-devex/04-workspace/04-docs</code></td><td>the foundation construct this one realizes</td><td>planned</td></tr>
-      <tr><td>spn-claude-marketplace</td><td><code>spn-core</code></td><td>the renderer, the drawer, the figure checker, the block card, and the jobs that produce and compare a page</td><td>planned</td></tr>
+      <tr><td>spn-claude-marketplace</td><td><code>spn-devex</code></td><td>the renderer, the drawer, the figure checker, the block card, and the jobs that produce and compare a page</td><td>planned</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -312,7 +312,7 @@
 <!-- 06 -->
 <section id="s6">
   <div class="sec-head"><h2>Proof</h2></div>
-  <p><em>Behaviours: joined from the register, <code>03-behaviors/01-spn-core/06-pages.md</code> — never typed in the seat file.</em></p>
+  <p><em>Behaviours: joined from the register, <code>03-behaviors/01-spn-devex/06-pages.md</code> — never typed in the seat file.</em></p>
   <div class="scroll"><table>
     <thead><tr><th>Row</th><th>Does</th><th>Tier</th><th>Status</th></tr></thead>
     <tbody>
@@ -329,11 +329,11 @@
   <div class="scroll"><table>
     <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
     <tbody>
-      <tr><td><code>node plugins/spn-core/hooks/tools/docs.ts figures check docs</code></td><td>gate</td><td>every label fits its box, every connector starts and ends on a shape, nothing crowds its neighbour, and every figure's spec carries the caption a reader is owed. The path is the whole tree rather than the produced pages alone, because a caption is read from the spec in the seat file and a produced page holds none</td></tr>
-      <tr><td><code>node plugins/spn-core/hooks/tools/docs.ts audit docs</code></td><td>gate</td><td>every page is what its seat file produces, so no page carries a hand edit</td></tr>
+      <tr><td><code>node plugins/spn-devex/hooks/tools/docs.ts figures check docs</code></td><td>gate</td><td>every label fits its box, every connector starts and ends on a shape, nothing crowds its neighbour, and every figure's spec carries the caption a reader is owed. The path is the whole tree rather than the produced pages alone, because a caption is read from the spec in the seat file and a produced page holds none</td></tr>
+      <tr><td><code>node plugins/spn-devex/hooks/tools/docs.ts audit docs</code></td><td>gate</td><td>every page is what its seat file produces, so no page carries a hand edit</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>node plugins/spn-core/hooks/tools/docs.ts figures check docs</code></p>
+  <p>Try it: <code>node plugins/spn-devex/hooks/tools/docs.ts figures check docs</code></p>
 </section>
 
 <footer>

@@ -14,7 +14,7 @@
 
 `For: Architect · Editor` · `Status: 🔮 PLANNING`
 
-The table below lists the promises [The Page](../../02-constructs/01-spn-core/06-pages.md) makes. A row says what somebody can do and what they see when they do it.
+The table below lists the promises [The Page](../../02-constructs/01-spn-devex/06-pages.md) makes. A row says what somebody can do and what they see when they do it.
 
 Every row below is declared and none is claimed: a run writes the last two cells.
 

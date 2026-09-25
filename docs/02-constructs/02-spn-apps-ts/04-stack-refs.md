@@ -75,12 +75,12 @@ The file carries the same block a core ref carries, naming each chapter it resta
 
 ## Boundary
 
-This page answers why a stack ships reference material for a skill it does not own, and what such a file may contain. It does not answer how a restatement is stamped, parsed or compared — that is [The Ref](../01-spn-core/08-ref-set.md). It does not answer what the planning walk itself is either: the walk belongs to the skill, and this file supplies only the part the skill could not know.
+This page answers why a stack ships reference material for a skill it does not own, and what such a file may contain. It does not answer how a restatement is stamped, parsed or compared — that is [The Ref](../01-spn-devex/08-ref-set.md). It does not answer what the planning walk itself is either: the walk belongs to the skill, and this file supplies only the part the skill could not know.
 
 | Owns | Refuses | Who owns that instead |
 | --- | --- | --- |
-| that a skill with no stack variant reads a layer rather than being copied, and that the layer carries no trigger | the block, the stamp, the hash and the drift comparison | [The Ref](../01-spn-core/08-ref-set.md) |
-| which seats a design's rows land in for this stack, and what each row carries | the planning walk itself, and the vocabulary it is written in | [The Skill](../01-spn-core/07-skill-set.md) |
+| that a skill with no stack variant reads a layer rather than being copied, and that the layer carries no trigger | the block, the stamp, the hash and the drift comparison | [The Ref](../01-spn-devex/08-ref-set.md) |
+| which seats a design's rows land in for this stack, and what each row carries | the planning walk itself, and the vocabulary it is written in | [The Skill](../01-spn-devex/07-skill-set.md) |
 | that reference material is not a skill | the skills this stack does own | [Stack Skills](03-stack-skills.md) |
 
 ## Binds
@@ -100,6 +100,6 @@ This page answers why a stack ships reference material for a skill it does not o
 
 | Check | Kind | What a green run shows |
 | --- | --- | --- |
-| `node plugins/spn-core/hooks/tools/restate-drift.ts` | gate | the layer file's stamp still matches the chapters it names, so the copy has not fallen behind the book |
+| `node plugins/spn-devex/hooks/tools/restate-drift.ts` | gate | the layer file's stamp still matches the chapters it names, so the copy has not fallen behind the book |
 
-Try it: `node plugins/spn-core/hooks/tools/restate-drift.ts`
+Try it: `node plugins/spn-devex/hooks/tools/restate-drift.ts`

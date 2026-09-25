@@ -258,17 +258,17 @@
 <section id="s3">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="the-frontmatter">The frontmatter</h3>
-  <p><code>name</code> and <code>description</code>, read the same way <a href="./07-skill-set-construct.html">a skill's</a> are: the description is matched against the moment rather than browsed, and it decides whether this persona takes the reply. Two more fields are optional. <code>model</code> chooses which model runs the persona, and <code>tools</code> narrows what it may call. Leaving <code>tools</code> out grants every tool the session itself has. <em>Where:</em> the first lines of <code>plugins/spn-core/agents/spn-prose-rewriter.md</code></p>
+  <p><code>name</code> and <code>description</code>, read the same way <a href="./07-skill-set-construct.html">a skill's</a> are: the description is matched against the moment rather than browsed, and it decides whether this persona takes the reply. Two more fields are optional. <code>model</code> chooses which model runs the persona, and <code>tools</code> narrows what it may call. Leaving <code>tools</code> out grants every tool the session itself has. <em>Where:</em> the first lines of <code>plugins/spn-devex/agents/spn-prose-rewriter.md</code></p>
   <h3 id="where-a-read-only-promise-is-actually-bo">Where a read-only promise is actually bound</h3>
-  <p>A brief declaring <code>tools</code> is bound by it: the permission is a fact about the convening rather than an instruction the persona is asked to follow. A brief that declares no <code>tools</code> inherits everything the session has, and its promise not to write is prose. Both kinds exist here, and telling them apart matters when a reviewer's independence is what the brief is for. <em>Where:</em> compare the frontmatter of <code>plugins/spn-core/agents/spn-prose-reviewer.md</code> with that of <code>plugins/spn-core/agents/spn-panel.md</code></p>
+  <p>A brief declaring <code>tools</code> is bound by it: the permission is a fact about the convening rather than an instruction the persona is asked to follow. A brief that declares no <code>tools</code> inherits everything the session has, and its promise not to write is prose. Both kinds exist here, and telling them apart matters when a reviewer's independence is what the brief is for. <em>Where:</em> compare the frontmatter of <code>plugins/spn-devex/agents/spn-prose-reviewer.md</code> with that of <code>plugins/spn-devex/agents/spn-panel.md</code></p>
   <h3 id="a-fixed-persona">A fixed persona</h3>
-  <p>A brief with no argument is one voice, always: an engineering lead, a prose rewriter, a prose reviewer. Its whole authority is the words in its own file, read the same way each time it is called. <em>Where:</em> <code>plugins/spn-core/agents/spn-engineer.md</code></p>
+  <p>A brief with no argument is one voice, always: an engineering lead, a prose rewriter, a prose reviewer. Its whole authority is the words in its own file, read the same way each time it is called. <em>Where:</em> <code>plugins/spn-devex/agents/spn-engineer.md</code></p>
   <h3 id="a-parameterized-reviewer">A parameterized reviewer</h3>
-  <p>One brief here takes a viewpoint name as part of what it is convened over. It reads that viewpoint's own file before anything else, and that file — rather than the brief — states what this convening may refuse and what it may only advise. The brief's own description lists the names a caller may pass, which is also what makes them discoverable. <em>Where:</em> <code>plugins/spn-core/agents/spn-panel.md</code></p>
+  <p>One brief here takes a viewpoint name as part of what it is convened over. It reads that viewpoint's own file before anything else, and that file — rather than the brief — states what this convening may refuse and what it may only advise. The brief's own description lists the names a caller may pass, which is also what makes them discoverable. <em>Where:</em> <code>plugins/spn-devex/agents/spn-panel.md</code></p>
   <h3 id="a-reviewer-that-edits-has-stopped-review">A reviewer that edits has stopped reviewing</h3>
-  <p>Where a persona both finds a problem and fixes it, the finding and the fix arrive together and nobody can weigh one without the other. So the reviewing briefs report, the engineering brief advises, and exactly one brief is permitted to write — over the paragraphs it was handed, never over a whole file. <em>Where:</em> <code>plugins/spn-core/agents/spn-prose-rewriter.md</code></p>
+  <p>Where a persona both finds a problem and fixes it, the finding and the fix arrive together and nobody can weigh one without the other. So the reviewing briefs report, the engineering brief advises, and exactly one brief is permitted to write — over the paragraphs it was handed, never over a whole file. <em>Where:</em> <code>plugins/spn-devex/agents/spn-prose-rewriter.md</code></p>
   <h3 id="a-brief-points-at-a-rule-and-never-inven">A brief points at a rule and never invents one</h3>
-  <p>A persona stating a rule with no chapter behind it has produced a suggestion wearing the clothes of a finding, and the next reader cannot tell which they are holding. Each brief names where its standard lives: the reviewing brief's standard is the viewpoint file, and that file's standard is the book. <em>Where:</em> <code>plugins/spn-core/agents/spn-engineer.md</code></p>
+  <p>A persona stating a rule with no chapter behind it has produced a suggestion wearing the clothes of a finding, and the next reader cannot tell which they are holding. Each brief names where its standard lives: the reviewing brief's standard is the viewpoint file, and that file's standard is the book. <em>Where:</em> <code>plugins/spn-devex/agents/spn-engineer.md</code></p>
 </section>
 
 <!-- 04 -->
@@ -300,7 +300,7 @@
     <thead><tr><th>Repo</th><th>Node</th><th>What it realizes</th><th>State</th></tr></thead>
     <tbody>
       <tr><td>spn-foundation</td><td><code>01-devex/02-agent/01-agent</code></td><td>the foundation construct this one realizes</td><td>planned</td></tr>
-      <tr><td>spn-claude-marketplace</td><td><code>spn-core</code></td><td>the briefs a session convenes, of which one is parameterized by a viewpoint and one may write</td><td>planned</td></tr>
+      <tr><td>spn-claude-marketplace</td><td><code>spn-devex</code></td><td>the briefs a session convenes, of which one is parameterized by a viewpoint and one may write</td><td>planned</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -308,7 +308,7 @@
 <!-- 06 -->
 <section id="s6">
   <div class="sec-head"><h2>Proof</h2></div>
-  <p><em>Behaviours: joined from the register, <code>03-behaviors/01-spn-core/10-agent-set.md</code> — never typed in the seat file.</em></p>
+  <p><em>Behaviours: joined from the register, <code>03-behaviors/01-spn-devex/10-agent-set.md</code> — never typed in the seat file.</em></p>
   <div class="scroll"><table>
     <thead><tr><th>Row</th><th>Does</th><th>Tier</th><th>Status</th></tr></thead>
     <tbody>
@@ -323,10 +323,10 @@
   <div class="scroll"><table>
     <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
     <tbody>
-      <tr><td><code>node plugins/spn-core/hooks/tools/restate-drift.ts</code></td><td>gate</td><td>every viewpoint a brief can be handed still reads as the chapters it stamps read today</td></tr>
+      <tr><td><code>node plugins/spn-devex/hooks/tools/restate-drift.ts</code></td><td>gate</td><td>every viewpoint a brief can be handed still reads as the chapters it stamps read today</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>node plugins/spn-core/hooks/tools/restate-drift.ts</code></p>
+  <p>Try it: <code>node plugins/spn-devex/hooks/tools/restate-drift.ts</code></p>
 </section>
 
 <footer>

@@ -84,11 +84,11 @@ A denial and its reasoning are one hop apart: each message points at the laws ca
 
 ## Boundary
 
-This page answers what the guard refuses, what it reads to decide, and what it does when it cannot decide. It does not answer the frame it sits in — the wiring, the decision shape and the always-zero exit are [The Hook](../01-spn-core/02-hook-set.md), and this dispatcher speaks that shape directly rather than importing it. It does not answer what the estate laws say either.
+This page answers what the guard refuses, what it reads to decide, and what it does when it cannot decide. It does not answer the frame it sits in — the wiring, the decision shape and the always-zero exit are [The Hook](../01-spn-devex/02-hook-set.md), and this dispatcher speaks that shape directly rather than importing it. It does not answer what the estate laws say either.
 
 | Owns | Refuses | Who owns that instead |
 | --- | --- | --- |
-| the rules, the text they read, and that anything unrecognised is allowed | the wiring shape, the decision JSON, and the exit code rule | [The Hook](../01-spn-core/02-hook-set.md) |
+| the rules, the text they read, and that anything unrecognised is allowed | the wiring shape, the decision JSON, and the exit code rule | [The Hook](../01-spn-devex/02-hook-set.md) |
 | that a refusal names the card carrying its reasoning | what the estate laws actually say, and which one a rule is catching | [Estate Refs](03-estate-refs.md) |
 | that an estate leak is caught at write time | how an estate is changed on purpose, and through which door | [Estate Skills](02-estate-skills.md) |
 
@@ -111,6 +111,6 @@ This page answers what the guard refuses, what it reads to decide, and what it d
 | Check | Kind | What a green run shows |
 | --- | --- | --- |
 | `node plugins/spn-infra/hooks/tests/run.mjs` | test | 21 cases: what each rule refuses, what it allows, and that both sides of the credential length boundary are where the rules say |
-| `node plugins/spn-core/hooks/tools/partner-shape.ts` | gate | the guard runs against a repository holding nothing but the plugins, allows what it cannot read, and exits zero either way |
+| `node plugins/spn-devex/hooks/tools/partner-shape.ts` | gate | the guard runs against a repository holding nothing but the plugins, allows what it cannot read, and exits zero either way |
 
 Try it: `node plugins/spn-infra/hooks/tests/run.mjs`

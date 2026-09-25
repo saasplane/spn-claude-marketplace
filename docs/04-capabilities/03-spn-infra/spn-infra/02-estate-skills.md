@@ -20,8 +20,8 @@ Four folders sit under `plugins/spn-infra/skills/`: `declare`, `plan-review`, `m
 
 ## Follows the pattern
 
-- The frontmatter, the matching and the description that is matched — [The Skill](../../../02-constructs/01-spn-core/07-skill-set.md)
-- The stack-agnostic skills these four realize — [Skill in spn-core](../../01-spn-core/spn-core/07-skill-set.md)
+- The frontmatter, the matching and the description that is matched — [The Skill](../../../02-constructs/01-spn-devex/07-skill-set.md)
+- The stack-agnostic skills these four realize — [Skill in spn-devex](../../01-spn-devex/spn-devex/07-skill-set.md)
 
 ## Special handling
 
@@ -54,5 +54,5 @@ Four folders sit under `plugins/spn-infra/skills/`: `declare`, `plan-review`, `m
 | Direction | With | What | Why |
 | --- | --- | --- | --- |
 | takes | spn-infra's refs | the manifest and locator card, the layer and door card, the naming grammar and the laws | a skill sequences the work and the card holds the vocabulary |
-| takes | spn-core | the stack-agnostic skills, the command vocabulary and the cross-repo protocol | a stack plugin realizes a skill and never redefines it |
+| takes | spn-devex | the stack-agnostic skills, the command vocabulary and the cross-repo protocol | a stack plugin realizes a skill and never redefines it |
 | publishes | every estate repository | four skills a session matches against the work at hand | the estate is changed by a named path rather than by hand |

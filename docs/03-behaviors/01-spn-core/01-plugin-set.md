@@ -14,7 +14,7 @@
 
 `For: Architect · Engineering leader` · `Status: 🔮 PLANNING`
 
-This page lists the promises [The Plugin](../../02-constructs/01-spn-core/01-plugin-set.md) makes. A row says what somebody can do and what they see when they do it.
+This page lists the promises [The Plugin](../../02-constructs/01-spn-devex/01-plugin-set.md) makes. A row says what somebody can do and what they see when they do it.
 
 The plugins' own suites are the runner for this repository, and a case whose title carries a row's id becomes that row's result. Every row below is declared and none is claimed: the `Status` and `Updated at` cells are written by a run rather than typed here.
 

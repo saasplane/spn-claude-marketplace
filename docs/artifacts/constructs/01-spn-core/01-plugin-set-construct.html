@@ -259,15 +259,15 @@
 <section id="s3">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="the-manifest">The manifest</h3>
-  <p>Each plugin folder carries one manifest at <code>.claude-plugin/plugin.json</code>, holding a <code>name</code>, a <code>version</code>, a <code>description</code> and an <code>author</code>. The description is long on purpose. It is matched against the work at hand rather than browsed by a person, so it states in full what the plugin carries. <em>Where:</em> <code>plugins/spn-core/.claude-plugin/plugin.json</code>, and the same path in the other two folders.</p>
+  <p>Each plugin folder carries one manifest at <code>.claude-plugin/plugin.json</code>, holding a <code>name</code>, a <code>version</code>, a <code>description</code> and an <code>author</code>. The description is long on purpose. It is matched against the work at hand rather than browsed by a person, so it states in full what the plugin carries. <em>Where:</em> <code>plugins/spn-devex/.claude-plugin/plugin.json</code>, and the same path in the other two folders.</p>
   <h3 id="the-version-names-what-is-published">The version names what is published</h3>
   <p>This repository releases at the version a plugin already carries, then moves the number. So the field answers <em>which bytes are installed</em>, and not <em>what am I building</em>. Each plugin counts on its own, following the marketplace's own convention of one version per plugin, and no file derives one number from another. <em>Where:</em> the <code>version</code> field of each <code>plugin.json</code>.</p>
   <h3 id="the-marketplace-entry">The marketplace entry</h3>
   <p>One file at the repository root, <code>.claude-plugin/marketplace.json</code>, carries a <code>plugins</code> array. Each entry names the plugin, the relative <code>source</code> folder holding it, and a description a listing can show without opening the folder. Nothing generates the file: a generator would need a source, and that source would be a second list able to disagree with this one. The price of writing it by hand is that the two descriptions can drift, and one pair has. <em>Where:</em> <code>.claude-plugin/marketplace.json</code></p>
   <h3 id="the-installed-copy-and-what-a-wired-path">The installed copy, and what a wired path names</h3>
-  <p>Installing reads an entry, copies that plugin's folder, and stores it where a session can read it. Everything a plugin wires names that folder through <code>CLAUDE_PLUGIN_ROOT</code> rather than through a path in this checkout, so a plugin works wherever it was installed. <em>Where:</em> <code>plugins/spn-core/hooks/hooks.json</code>, and the same file in the other two folders.</p>
+  <p>Installing reads an entry, copies that plugin's folder, and stores it where a session can read it. Everything a plugin wires names that folder through <code>CLAUDE_PLUGIN_ROOT</code> rather than through a path in this checkout, so a plugin works wherever it was installed. <em>Where:</em> <code>plugins/spn-devex/hooks/hooks.json</code>, and the same file in the other two folders.</p>
   <h3 id="what-a-plugin-may-hold-and-what-it-owes">What a plugin may hold, and what it owes</h3>
-  <p>A plugin folder holds any mix of instruments and owes none of them. <code>spn-core</code> carries every kind, which is why it is the folder to open to see what a full plugin looks like. <code>spn-infra</code> carries a single shell script beside its cards, and no tools and no agent briefs. Each kind is named by its own page, and none of them is named here. <em>Where:</em> <code>plugins/</code></p>
+  <p>A plugin folder holds any mix of instruments and owes none of them. <code>spn-devex</code> carries every kind, which is why it is the folder to open to see what a full plugin looks like. <code>spn-infra</code> carries a single shell script beside its cards, and no tools and no agent briefs. Each kind is named by its own page, and none of them is named here. <em>Where:</em> <code>plugins/</code></p>
 </section>
 
 <!-- 04 -->
@@ -299,7 +299,7 @@
     <thead><tr><th>Repo</th><th>Node</th><th>What it realizes</th><th>State</th></tr></thead>
     <tbody>
       <tr><td>spn-foundation</td><td><code>01-devex/02-agent/04-plugins</code></td><td>the foundation construct this one realizes</td><td>planned</td></tr>
-      <tr><td>spn-claude-marketplace</td><td><code>spn-core</code></td><td>the manifest, the marketplace entry and the installed copy, for the widest of the three folders</td><td>planned</td></tr>
+      <tr><td>spn-claude-marketplace</td><td><code>spn-devex</code></td><td>the manifest, the marketplace entry and the installed copy, for the widest of the three folders</td><td>planned</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -307,7 +307,7 @@
 <!-- 06 -->
 <section id="s6">
   <div class="sec-head"><h2>Proof</h2></div>
-  <p><em>Behaviours: joined from the register, <code>03-behaviors/01-spn-core/01-plugin-set.md</code> — never typed in the seat file.</em></p>
+  <p><em>Behaviours: joined from the register, <code>03-behaviors/01-spn-devex/01-plugin-set.md</code> — never typed in the seat file.</em></p>
   <div class="scroll"><table>
     <thead><tr><th>Row</th><th>Does</th><th>Tier</th><th>Status</th></tr></thead>
     <tbody>
@@ -322,10 +322,10 @@
   <div class="scroll"><table>
     <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
     <tbody>
-      <tr><td><code>node plugins/spn-core/hooks/tools/partner-shape.ts</code></td><td>gate</td><td>every plugin the marketplace declares is found from its own entry, and every hook inside it runs against a repository holding nothing but the plugin</td></tr>
+      <tr><td><code>node plugins/spn-devex/hooks/tools/partner-shape.ts</code></td><td>gate</td><td>every plugin the marketplace declares is found from its own entry, and every hook inside it runs against a repository holding nothing but the plugin</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>node plugins/spn-core/hooks/tools/partner-shape.ts</code></p>
+  <p>Try it: <code>node plugins/spn-devex/hooks/tools/partner-shape.ts</code></p>
 </section>
 
 <footer>

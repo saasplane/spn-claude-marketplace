@@ -1,24 +1,24 @@
 <!-- spn:doc
-{"id": "spn-core-capabilities-plugin-set", "variant": "capability", "title": "Plugin in spn-core", "lenses": ["ARCHITECT", "LEAD"], "status": "DONE", "realizes": ["plugin-set"], "summary": "One manifest, one marketplace row, and the only plugin of the three that carries all five instrument kinds — with a version field that names what is published rather than what is being worked on.", "keywords": ["plugin", "manifest", "marketplace", "version", "cache", "install"]}
+{"id": "spn-devex-capabilities-plugin-set", "variant": "capability", "title": "Plugin in spn-devex", "lenses": ["ARCHITECT", "LEAD"], "status": "DONE", "realizes": ["plugin-set"], "summary": "One manifest, one marketplace row, and the only plugin of the three that carries all five instrument kinds — with a version field that names what is published rather than what is being worked on.", "keywords": ["plugin", "manifest", "marketplace", "version", "cache", "install"]}
 -->
 
-# Plugin in spn-core
+# Plugin in spn-devex
 
 `For: Architect · Engineering leader` · `Status: ✅ DONE` · `Realizes: Plugin`
 
-`spn-core` realizes every part of the construct: the manifest, the marketplace row that names its folder, and the install that copies it into a session's cache. It is also the widest of the three plugins, holding all five instrument kinds — hooks, skills, refs, lenses and agent briefs — so the folder is where a reader learns what a full plugin looks like. Two things are worth knowing before you open it. **The version field names what is published**, so the number you read is the last release rather than the working tree. And **the description in the manifest is matched, not browsed**: it is long on purpose, because a session decides from those words whether to load the plugin's instruments at all.
+`spn-devex` realizes every part of the construct: the manifest, the marketplace row that names its folder, and the install that copies it into a session's cache. It is also the widest of the three plugins, holding all five instrument kinds — hooks, skills, refs, lenses and agent briefs — so the folder is where a reader learns what a full plugin looks like. Two things are worth knowing before you open it. **The version field names what is published**, so the number you read is the last release rather than the working tree. And **the description in the manifest is matched, not browsed**: it is long on purpose, because a session decides from those words whether to load the plugin's instruments at all.
 
 ## Where
 
 | Part of the construct | Lives in | What it is |
 | --- | --- | --- |
-| The manifest | `plugins/spn-core/.claude-plugin/plugin.json` | `name`, `version`, `description`, `author` |
-| The marketplace entry | `.claude-plugin/marketplace.json` | the repository's own list; the `spn-core` row names `./plugins/spn-core` |
-| The instrument tree | `plugins/spn-core/hooks/` · `skills/` · `refs/` · `agents/` | what the folder delivers once installed |
+| The manifest | `plugins/spn-devex/.claude-plugin/plugin.json` | `name`, `version`, `description`, `author` |
+| The marketplace entry | `.claude-plugin/marketplace.json` | the repository's own list; the `spn-devex` row names `./plugins/spn-devex` |
+| The instrument tree | `plugins/spn-devex/hooks/` · `skills/` · `refs/` · `agents/` | what the folder delivers once installed |
 
 ## Follows the pattern
 
-- What a plugin is made of, and what a cache keyed by name and version means — [The Plugin](../../../02-constructs/01-spn-core/01-plugin-set.md)
+- What a plugin is made of, and what a cache keyed by name and version means — [The Plugin](../../../02-constructs/01-spn-devex/01-plugin-set.md)
 - Which plugins a repository is entitled to load — the foundation's `02-delivery.md`
 
 ## Special handling
@@ -26,13 +26,13 @@
 ### The version is moved after the release, never before
 
 **Why** — *a cache directory is keyed by the plugin's name and its manifest version*. A plugin edited without moving the number installs over its own published bytes, and nothing on screen says which copy is running.
-**What** — `spn-core` ships at the version its manifest already carries, and the first edit after that release sets the next one. So the field answers *what does the cache hold*, not *what am I building*.
-**How** — the number is a hand edit to one field, reviewed like any other line. Read `plugins/spn-core/.claude-plugin/plugin.json`, then the repository's own `CLAUDE.md` § The count moves after the release.
+**What** — `spn-devex` ships at the version its manifest already carries, and the first edit after that release sets the next one. So the field answers *what does the cache hold*, not *what am I building*.
+**How** — the number is a hand edit to one field, reviewed like any other line. Read `plugins/spn-devex/.claude-plugin/plugin.json`, then the repository's own `CLAUDE.md` § The count moves after the release.
 
 ### Three plugins at three versions, on purpose
 
 **Why** — *`RD.APPS.034` rules lockstep versioning inside an `APPS` repository, and this repository declares `GENERAL`*. Read the wrong rule here and three different numbers look like a defect to be fixed.
-**What** — each plugin folder counts on its own, following the Claude marketplace's convention of one version per plugin. `spn-core` moves when `spn-core` changes, and the other two do not move with it.
+**What** — each plugin folder counts on its own, following the Claude marketplace's convention of one version per plugin. `spn-devex` moves when `spn-devex` changes, and the other two do not move with it.
 **How** — there is no shared version file and nothing derives one number from another. The three manifests are the three answers: `plugins/*/.claude-plugin/plugin.json`.
 
 ### The marketplace file is written by hand and by nothing else

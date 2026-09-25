@@ -276,13 +276,13 @@
 <!-- 04 -->
 <section id="s4">
   <div class="sec-head"><h2>Boundary</h2></div>
-  <p>This page answers what makes a check belong to a stack rather than to every repository. It does not answer the frame a check sits in — the payload, the verdict, the composition and the always-zero exit are <a href="../01-spn-core/02-hook-set-construct.html">The Hook</a>, and this plugin follows that shape rather than inventing one. It does not answer what a stack-agnostic check is either.</p>
+  <p>This page answers what makes a check belong to a stack rather than to every repository. It does not answer the frame a check sits in — the payload, the verdict, the composition and the always-zero exit are <a href="../01-spn-devex/02-hook-set-construct.html">The Hook</a>, and this plugin follows that shape rather than inventing one. It does not answer what a stack-agnostic check is either.</p>
   <div class="scroll"><table>
     <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
     <tbody>
-      <tr><td>reading a source file as the pending write would leave it, and answering only for what this edit introduces</td><td>the payload, the verdict, the dispatcher's shape, and the exit code</td><td><a href="../01-spn-core/02-hook-set-construct.html">The Hook</a></td></tr>
-      <tr><td>the line between refusing a settled rule and warning about an unsettled one</td><td>a rule true in every repository whatever it is built with</td><td><a href="../01-spn-core/04-checks-construct.html">The Check</a></td></tr>
-      <tr><td>that a refusal cites the card holding its reasoning</td><td>what that card says</td><td><a href="./04-stack-refs-construct.html">Stack Refs</a> · <a href="../01-spn-core/08-ref-set-construct.html">The Ref</a></td></tr>
+      <tr><td>reading a source file as the pending write would leave it, and answering only for what this edit introduces</td><td>the payload, the verdict, the dispatcher's shape, and the exit code</td><td><a href="../01-spn-devex/02-hook-set-construct.html">The Hook</a></td></tr>
+      <tr><td>the line between refusing a settled rule and warning about an unsettled one</td><td>a rule true in every repository whatever it is built with</td><td><a href="../01-spn-devex/04-checks-construct.html">The Check</a></td></tr>
+      <tr><td>that a refusal cites the card holding its reasoning</td><td>what that card says</td><td><a href="./04-stack-refs-construct.html">Stack Refs</a> · <a href="../01-spn-devex/08-ref-set-construct.html">The Ref</a></td></tr>
     </tbody>
   </table></div>
 </section>
@@ -326,10 +326,10 @@
   <div class="scroll"><table>
     <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
     <tbody>
-      <tr><td><code>node plugins/spn-core/hooks/tools/partner-shape.ts</code></td><td>gate</td><td>every check in this plugin runs against a repository holding nothing but the plugins, and none of them crashes on a file it was not written for</td></tr>
+      <tr><td><code>node plugins/spn-devex/hooks/tools/partner-shape.ts</code></td><td>gate</td><td>every check in this plugin runs against a repository holding nothing but the plugins, and none of them crashes on a file it was not written for</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>node plugins/spn-core/hooks/tools/partner-shape.ts</code></p>
+  <p>Try it: <code>node plugins/spn-devex/hooks/tools/partner-shape.ts</code></p>
 </section>
 
 <footer>

@@ -19,8 +19,8 @@ Four markdown files sit under `plugins/spn-infra/refs/`: `manifests`, `layers-do
 
 ## Follows the pattern
 
-- The `spn:restates` block, the stamp and what drift means — [The Ref](../../../02-constructs/01-spn-core/08-ref-set.md)
-- How a ref is stamped, parsed and compared — [Ref in spn-core](../../01-spn-core/spn-core/08-ref-set.md)
+- The `spn:restates` block, the stamp and what drift means — [The Ref](../../../02-constructs/01-spn-devex/08-ref-set.md)
+- How a ref is stamped, parsed and compared — [Ref in spn-devex](../../01-spn-devex/spn-devex/08-ref-set.md)
 
 ## Special handling
 

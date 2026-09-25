@@ -260,19 +260,19 @@
 <section id="s3">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="one-file-serves-the-write-time-check-and">One file serves the write-time check and the sweep</h3>
-  <p>A rule answered one way while a file is written and another way in a sweep is two rules. So the code that decides lives once, and both callers import it. The practical consequence is that the same file must read a document in both of its spellings — the markdown an author writes and the HTML a page is produced as — because reading only one of them once reported every hand-written page as missing every section it carried. <em>Where:</em> <code>plugins/spn-core/hooks/tools/docs.ts</code></p>
+  <p>A rule answered one way while a file is written and another way in a sweep is two rules. So the code that decides lives once, and both callers import it. The practical consequence is that the same file must read a document in both of its spellings — the markdown an author writes and the HTML a page is produced as — because reading only one of them once reported every hand-written page as missing every section it carried. <em>Where:</em> <code>plugins/spn-devex/hooks/tools/docs.ts</code></p>
   <h3 id="a-job-not-a-flag">A job, not a flag</h3>
-  <p>A tool with more than one job gives each job a name and a path argument, and a path is a file or a folder in every one of them. Given a folder, a job means every document under it, which is what anybody typing one meant. <em>Where:</em> <code>plugins/spn-core/hooks/tools/docs.ts</code></p>
+  <p>A tool with more than one job gives each job a name and a path argument, and a path is a file or a folder in every one of them. Given a folder, a job means every document under it, which is what anybody typing one meant. <em>Where:</em> <code>plugins/spn-devex/hooks/tools/docs.ts</code></p>
   <h3 id="two-questions-that-look-alike-and-are-no">Two questions that look alike and are not</h3>
-  <p>Comparing documents inside one repository and comparing a restatement against a book in another repository are different questions with different inputs, and no repository holds both trees. So they are two tools, and both read one parser, because writing the parser twice would be the defect the instrument exists to catch. <em>Where:</em> <code>plugins/spn-core/hooks/tools/coherence.ts</code>, <code>plugins/spn-core/hooks/tools/restate-drift.ts</code></p>
+  <p>Comparing documents inside one repository and comparing a restatement against a book in another repository are different questions with different inputs, and no repository holds both trees. So they are two tools, and both read one parser, because writing the parser twice would be the defect the instrument exists to catch. <em>Where:</em> <code>plugins/spn-devex/hooks/tools/coherence.ts</code>, <code>plugins/spn-devex/hooks/tools/restate-drift.ts</code></p>
   <h3 id="silence-where-the-input-is-absent">Silence where the input is absent</h3>
-  <p>A partner holds the plugins and neither the book nor its registers. A question whose input is missing answers with one line and a clean exit, because a crash on a repository the tool was not written for shows a partner a broken agent rather than a missing file. <em>Where:</em> <code>plugins/spn-core/hooks/tools/restate-drift.ts</code>, <code>plugins/spn-core/hooks/tools/coherence.ts</code></p>
+  <p>A partner holds the plugins and neither the book nor its registers. A question whose input is missing answers with one line and a clean exit, because a crash on a repository the tool was not written for shows a partner a broken agent rather than a missing file. <em>Where:</em> <code>plugins/spn-devex/hooks/tools/restate-drift.ts</code>, <code>plugins/spn-devex/hooks/tools/coherence.ts</code></p>
   <h3 id="a-tool-that-proves-the-other-tools">A tool that proves the other tools</h3>
-  <p>One tool builds a repository carrying only what a partner has, runs every hook and script against it, and reports. A crash is a failure there; a finding is not, because findings are that repository's own business. It picks an interpreter from each script's own extension, so a ported script is exercised the same way its predecessor was. <em>Where:</em> <code>plugins/spn-core/hooks/tools/partner-shape.ts</code></p>
+  <p>One tool builds a repository carrying only what a partner has, runs every hook and script against it, and reports. A crash is a failure there; a finding is not, because findings are that repository's own business. It picks an interpreter from each script's own extension, so a ported script is exercised the same way its predecessor was. <em>Where:</em> <code>plugins/spn-devex/hooks/tools/partner-shape.ts</code></p>
   <h3 id="a-tool-that-reports-candidates-rather-th">A tool that reports candidates rather than verdicts</h3>
-  <p>Handing a whole corpus to a rewriting pass is the expensive way to improve it, and most of the corpus needs no change. So the prose triage reports the paragraphs a pattern can recognise, with a ledger of what it has already scored so a long sweep can resume, and it leaves the faults no pattern can tell from good prose to a reader. <em>Where:</em> <code>plugins/spn-core/hooks/tools/prose-triage.ts</code></p>
+  <p>Handing a whole corpus to a rewriting pass is the expensive way to improve it, and most of the corpus needs no change. So the prose triage reports the paragraphs a pattern can recognise, with a ledger of what it has already scored so a long sweep can resume, and it leaves the faults no pattern can tell from good prose to a reader. <em>Where:</em> <code>plugins/spn-devex/hooks/tools/prose-triage.ts</code></p>
   <h3 id="a-tool-that-writes-rather-than-reports">A tool that writes rather than reports</h3>
-  <p>One tool here writes. It reads a run's own results file and puts what the run found into the cells a run owns, leaving every other cell exactly as it was. It exists because this repository declares no stack, so no stack runner writes its rows, and only the plugins' own suites know. <em>Where:</em> <code>plugins/spn-core/hooks/tools/behaviour-status.mjs</code></p>
+  <p>One tool here writes. It reads a run's own results file and puts what the run found into the cells a run owns, leaving every other cell exactly as it was. It exists because this repository declares no stack, so no stack runner writes its rows, and only the plugins' own suites know. <em>Where:</em> <code>plugins/spn-devex/hooks/tools/behaviour-status.mjs</code></p>
 </section>
 
 <!-- 04 -->
@@ -304,7 +304,7 @@
     <thead><tr><th>Repo</th><th>Node</th><th>What it realizes</th><th>State</th></tr></thead>
     <tbody>
       <tr><td>spn-foundation</td><td><code>01-devex/02-agent/04-plugins</code></td><td>the foundation construct this one realizes</td><td>planned</td></tr>
-      <tr><td>spn-claude-marketplace</td><td><code>spn-core</code></td><td>the stack-agnostic tools — the corpus audit, the corpus against itself, the drift comparison, the partner proof, the prose triage and this repository's own row writer</td><td>planned</td></tr>
+      <tr><td>spn-claude-marketplace</td><td><code>spn-devex</code></td><td>the stack-agnostic tools — the corpus audit, the corpus against itself, the drift comparison, the partner proof, the prose triage and this repository's own row writer</td><td>planned</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -312,7 +312,7 @@
 <!-- 06 -->
 <section id="s6">
   <div class="sec-head"><h2>Proof</h2></div>
-  <p><em>Behaviours: joined from the register, <code>03-behaviors/01-spn-core/05-tools.md</code> — never typed in the seat file.</em></p>
+  <p><em>Behaviours: joined from the register, <code>03-behaviors/01-spn-devex/05-tools.md</code> — never typed in the seat file.</em></p>
   <div class="scroll"><table>
     <thead><tr><th>Row</th><th>Does</th><th>Tier</th><th>Status</th></tr></thead>
     <tbody>
@@ -328,11 +328,11 @@
   <div class="scroll"><table>
     <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
     <tbody>
-      <tr><td><code>node plugins/spn-core/hooks/tools/partner-shape.ts</code></td><td>gate</td><td>every tool runs against a repository holding nothing but the plugin, and answers with silence where its input is absent</td></tr>
-      <tr><td><code>node plugins/spn-core/hooks/tools/coherence.ts</code></td><td>gate</td><td>no two documents in this repository state opposite rules, and every stamped restatement still reads as its chapter does</td></tr>
+      <tr><td><code>node plugins/spn-devex/hooks/tools/partner-shape.ts</code></td><td>gate</td><td>every tool runs against a repository holding nothing but the plugin, and answers with silence where its input is absent</td></tr>
+      <tr><td><code>node plugins/spn-devex/hooks/tools/coherence.ts</code></td><td>gate</td><td>no two documents in this repository state opposite rules, and every stamped restatement still reads as its chapter does</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>node plugins/spn-core/hooks/tools/coherence.ts</code></p>
+  <p>Try it: <code>node plugins/spn-devex/hooks/tools/coherence.ts</code></p>
 </section>
 
 <footer>

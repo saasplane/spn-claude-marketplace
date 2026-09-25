@@ -35,17 +35,17 @@ domain, with a subsection here and one folder of the same name in every *What* s
 
 | Domain | Ships | Instruments it carries |
 | --- | --- | --- |
-| **`spn-core`** | the stack-agnostic plugin, loaded by every repository | all five kinds — plugins, hooks, skills, refs and agents |
+| **`spn-devex`** | the stack-agnostic plugin, loaded by every repository | all five kinds — plugins, hooks, skills, refs and agents |
 | **`spn-apps-ts`** | the TypeScript stack plugin | checks, tools, skills and refs, each true of that stack and nowhere else |
 | **`spn-infra`** | the estate plugin | one guard, plus the skills and refs that change an estate |
 
-### spn-core
+### spn-devex
 
 **The stack-agnostic plugin, and the one every repository loads.** It holds what is true of every plugin: what an instrument of each of the five kinds is, the events a hook may run on, the grades it may return, and how the set a workspace loads is derived from that workspace's own claim.
 
 **A grammar shared by all three lives here, and the stack plugins restate none of it.**
 The same hook grammar governs a check here and one in `spn-apps-ts`, so a question about *what a
-hook is* has one answer and one place: `spn-core`'s hook set. A stack plugin's chapter says what its
+hook is* has one answer and one place: `spn-devex`'s hook set. A stack plugin's chapter says what its
 own checks decide, never what a check is.
 
 **That is what keeps the division by plugin from splitting a concept in three.** The risk in
@@ -57,7 +57,7 @@ repository loads.
 
 **The TypeScript stack plugin.** It holds what only a stack can say: a check whose rule is true of one stack and nowhere else, a tool over that stack's own register, and
 the skills that can only be said in its own words. **A skill that is stack-agnostic stays in
-`spn-core` and reaches a concrete step through a ref here**, rather than being copied.
+`spn-devex` and reaches a concrete step through a ref here**, rather than being copied.
 
 ### spn-infra
 
@@ -68,8 +68,8 @@ book.
 ### The five instrument kinds are a shape, not a seat
 
 **Plugin · hook · skill · ref · agent are what an instrument can be**, and every one of them is
-defined once, in `spn-core`. They are a vocabulary the three domains are written in rather than a
-division of the tree — which is why you will find *the hook set* as a chapter under `spn-core` and
+defined once, in `spn-devex`. They are a vocabulary the three domains are written in rather than a
+division of the tree — which is why you will find *the hook set* as a chapter under `spn-devex` and
 never as a folder of its own.
 
 ## The world it declares   `DRAFT`
@@ -97,7 +97,7 @@ it does not name at all. Naming is not documenting: the rule belongs to the book
 implementation belongs here.
 
 <!-- spn:generated constructs — do not edit inside these markers; `docs.ts face` writes it -->
-**spn-core**
+**spn-devex**
 
 - **The Plugin — Delivery Unit of the Marketplace** — The folder that carries a standard from this repository into a running session — its manifest, its entry in the marketplace list, the installed copy a session actually reads, and the version field that says which bytes those are.
 - **The Hook — Code the Runtime Calls on Your Behalf** — Code a plugin wires to a moment the runtime reaches — the file that declares the wiring, the payload it is handed, the verdict it returns rather than prints, and the exit code that is always zero.

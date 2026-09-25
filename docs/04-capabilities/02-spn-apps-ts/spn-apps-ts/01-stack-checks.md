@@ -6,7 +6,7 @@
 
 `For: Backend developer · Web developer` · `Status: ✅ DONE` · `Realizes: Stack Checks`
 
-Six checks live under `plugins/spn-apps-ts/hooks/checks/`, each catching one pattern in how this stack writes its contract, service and test layers. A seventh file is the dispatcher that composes them. Two things separate these from `spn-core`'s. **Each restates a chapter of the TypeScript provider standard**, never a stack-agnostic rule: anything general enough to hold everywhere belongs in the core plugin. And **each asks whether this edit introduces the pattern**, not whether the file already has it, which is what makes a refusal fair on a file somebody else wrote.
+Six checks live under `plugins/spn-apps-ts/hooks/checks/`, each catching one pattern in how this stack writes its contract, service and test layers. A seventh file is the dispatcher that composes them. Two things separate these from `spn-devex`'s. **Each restates a chapter of the TypeScript provider standard**, never a stack-agnostic rule: anything general enough to hold everywhere belongs in the core plugin. And **each asks whether this edit introduces the pattern**, not whether the file already has it, which is what makes a refusal fair on a file somebody else wrote.
 
 ## Where
 
@@ -24,8 +24,8 @@ Six checks live under `plugins/spn-apps-ts/hooks/checks/`, each catching one pat
 
 ## Follows the pattern
 
-- The verdict, the composition and the always-zero exit — [Hook in spn-core](../../01-spn-core/spn-core/02-hook-set.md)
-- What a check may decide on its own account — [The Hook](../../../02-constructs/01-spn-core/02-hook-set.md)
+- The verdict, the composition and the always-zero exit — [Hook in spn-devex](../../01-spn-devex/spn-devex/02-hook-set.md)
+- What a check may decide on its own account — [The Hook](../../../02-constructs/01-spn-devex/02-hook-set.md)
 
 ## Special handling
 
@@ -33,12 +33,12 @@ Six checks live under `plugins/spn-apps-ts/hooks/checks/`, each catching one pat
 
 **Why** — *eight separate entries meant eight interpreter start-ups on every write*. Measured on 19 September 2026, one ordinary edit cost 1,123 ms, of which 1,040 ms was starting programs. The checking was about 83 ms.
 **What** — `hooks.json` declares one entry. Porting the scripts alone would not have collected the saving, because eight entries are still eight start-ups.
-**How** — the dispatcher imports each check and calls it, in the shape `spn-core` uses. `plugins/spn-apps-ts/hooks/checks/pretooluse.ts`.
+**How** — the dispatcher imports each check and calls it, in the shape `spn-devex` uses. `plugins/spn-apps-ts/hooks/checks/pretooluse.ts`.
 
 ### The payload shape is copied, not imported
 
 **Why** — *a plugin never depends on another plugin's internals*. The two install separately and version separately, so an import across them would break on a version skew nobody chose.
-**What** — this plugin keeps its own `payload.ts`, named as `spn-core` names the same job, so learning one teaches you both.
+**What** — this plugin keeps its own `payload.ts`, named as `spn-devex` names the same job, so learning one teaches you both.
 **How** — the file says so in its opening comment. `plugins/spn-apps-ts/hooks/lib/payload.ts`.
 
 ### A source file is read with the write already applied
@@ -63,6 +63,6 @@ Six checks live under `plugins/spn-apps-ts/hooks/checks/`, each catching one pat
 
 | Direction | With | What | Why |
 | --- | --- | --- | --- |
-| takes | spn-core | the permission-and-enablement ref the grammar check's denials cite | the reasoning lives once, stack-agnostic |
+| takes | spn-devex | the permission-and-enablement ref the grammar check's denials cite | the reasoning lives once, stack-agnostic |
 | takes | spn-foundation | the TypeScript provider chapters each check restates | a chapter cannot fire when somebody writes the file |
 | publishes | every TypeScript stack repository | six refusals and warnings at the moment a pattern is written | the rule is checked on every call rather than remembered |

@@ -17,7 +17,7 @@ A behaviour is only meaningful once you know whose outcome it is. **Every `Who` 
 
 **This repository ships no product, so its people are the ones who meet the plugins.** What it ships is three plugins — the hooks that refuse a write, the checks that read a repository, the tools somebody runs by name, the skills a session loads, and the refs and lenses a review is argued from. The people who meet those are the engineering functions of whatever team installs them.
 
-So the personas below are **the lens register's own functions** — the closed set [the lens construct](../02-constructs/01-spn-core/09-lenses.md) defines, which is also the set a document declares as its audience. Each one is a role this repository's model already names, so nothing here is a new word. Nine of the register's eleven functions name a row today; the two that name none are listed at the end.
+So the personas below are **the lens register's own functions** — the closed set [the lens construct](../02-constructs/01-spn-devex/09-lenses.md) defines, which is also the set a document declares as its audience. Each one is a role this repository's model already names, so nothing here is a new word. Nine of the register's eleven functions name a row today; the two that name none are listed at the end.
 
 | Actor | Who they are | What the rows promise them |
 | --- | --- | --- |

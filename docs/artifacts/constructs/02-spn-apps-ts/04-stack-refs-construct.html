@@ -272,12 +272,12 @@
 <!-- 04 -->
 <section id="s4">
   <div class="sec-head"><h2>Boundary</h2></div>
-  <p>This page answers why a stack ships reference material for a skill it does not own, and what such a file may contain. It does not answer how a restatement is stamped, parsed or compared — that is <a href="../01-spn-core/08-ref-set-construct.html">The Ref</a>. It does not answer what the planning walk itself is either: the walk belongs to the skill, and this file supplies only the part the skill could not know.</p>
+  <p>This page answers why a stack ships reference material for a skill it does not own, and what such a file may contain. It does not answer how a restatement is stamped, parsed or compared — that is <a href="../01-spn-devex/08-ref-set-construct.html">The Ref</a>. It does not answer what the planning walk itself is either: the walk belongs to the skill, and this file supplies only the part the skill could not know.</p>
   <div class="scroll"><table>
     <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
     <tbody>
-      <tr><td>that a skill with no stack variant reads a layer rather than being copied, and that the layer carries no trigger</td><td>the block, the stamp, the hash and the drift comparison</td><td><a href="../01-spn-core/08-ref-set-construct.html">The Ref</a></td></tr>
-      <tr><td>which seats a design's rows land in for this stack, and what each row carries</td><td>the planning walk itself, and the vocabulary it is written in</td><td><a href="../01-spn-core/07-skill-set-construct.html">The Skill</a></td></tr>
+      <tr><td>that a skill with no stack variant reads a layer rather than being copied, and that the layer carries no trigger</td><td>the block, the stamp, the hash and the drift comparison</td><td><a href="../01-spn-devex/08-ref-set-construct.html">The Ref</a></td></tr>
+      <tr><td>which seats a design's rows land in for this stack, and what each row carries</td><td>the planning walk itself, and the vocabulary it is written in</td><td><a href="../01-spn-devex/07-skill-set-construct.html">The Skill</a></td></tr>
       <tr><td>that reference material is not a skill</td><td>the skills this stack does own</td><td><a href="./03-stack-skills-construct.html">Stack Skills</a></td></tr>
     </tbody>
   </table></div>
@@ -320,10 +320,10 @@
   <div class="scroll"><table>
     <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
     <tbody>
-      <tr><td><code>node plugins/spn-core/hooks/tools/restate-drift.ts</code></td><td>gate</td><td>the layer file's stamp still matches the chapters it names, so the copy has not fallen behind the book</td></tr>
+      <tr><td><code>node plugins/spn-devex/hooks/tools/restate-drift.ts</code></td><td>gate</td><td>the layer file's stamp still matches the chapters it names, so the copy has not fallen behind the book</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>node plugins/spn-core/hooks/tools/restate-drift.ts</code></p>
+  <p>Try it: <code>node plugins/spn-devex/hooks/tools/restate-drift.ts</code></p>
 </section>
 
 <footer>

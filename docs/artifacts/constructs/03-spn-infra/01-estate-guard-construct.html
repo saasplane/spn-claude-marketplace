@@ -277,11 +277,11 @@
 <!-- 04 -->
 <section id="s4">
   <div class="sec-head"><h2>Boundary</h2></div>
-  <p>This page answers what the guard refuses, what it reads to decide, and what it does when it cannot decide. It does not answer the frame it sits in — the wiring, the decision shape and the always-zero exit are <a href="../01-spn-core/02-hook-set-construct.html">The Hook</a>, and this dispatcher speaks that shape directly rather than importing it. It does not answer what the estate laws say either.</p>
+  <p>This page answers what the guard refuses, what it reads to decide, and what it does when it cannot decide. It does not answer the frame it sits in — the wiring, the decision shape and the always-zero exit are <a href="../01-spn-devex/02-hook-set-construct.html">The Hook</a>, and this dispatcher speaks that shape directly rather than importing it. It does not answer what the estate laws say either.</p>
   <div class="scroll"><table>
     <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
     <tbody>
-      <tr><td>the rules, the text they read, and that anything unrecognised is allowed</td><td>the wiring shape, the decision JSON, and the exit code rule</td><td><a href="../01-spn-core/02-hook-set-construct.html">The Hook</a></td></tr>
+      <tr><td>the rules, the text they read, and that anything unrecognised is allowed</td><td>the wiring shape, the decision JSON, and the exit code rule</td><td><a href="../01-spn-devex/02-hook-set-construct.html">The Hook</a></td></tr>
       <tr><td>that a refusal names the card carrying its reasoning</td><td>what the estate laws actually say, and which one a rule is catching</td><td><a href="./03-estate-refs-construct.html">Estate Refs</a></td></tr>
       <tr><td>that an estate leak is caught at write time</td><td>how an estate is changed on purpose, and through which door</td><td><a href="./02-estate-skills-construct.html">Estate Skills</a></td></tr>
     </tbody>
@@ -330,7 +330,7 @@
     <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
     <tbody>
       <tr><td><code>node plugins/spn-infra/hooks/tests/run.mjs</code></td><td>test</td><td>21 cases: what each rule refuses, what it allows, and that both sides of the credential length boundary are where the rules say</td></tr>
-      <tr><td><code>node plugins/spn-core/hooks/tools/partner-shape.ts</code></td><td>gate</td><td>the guard runs against a repository holding nothing but the plugins, allows what it cannot read, and exits zero either way</td></tr>
+      <tr><td><code>node plugins/spn-devex/hooks/tools/partner-shape.ts</code></td><td>gate</td><td>the guard runs against a repository holding nothing but the plugins, allows what it cannot read, and exits zero either way</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>node plugins/spn-infra/hooks/tests/run.mjs</code></p>

@@ -82,13 +82,13 @@ Where the reasoning behind a refusal is stack-agnostic, the message points at th
 
 ## Boundary
 
-This page answers what makes a check belong to a stack rather than to every repository. It does not answer the frame a check sits in — the payload, the verdict, the composition and the always-zero exit are [The Hook](../01-spn-core/02-hook-set.md), and this plugin follows that shape rather than inventing one. It does not answer what a stack-agnostic check is either.
+This page answers what makes a check belong to a stack rather than to every repository. It does not answer the frame a check sits in — the payload, the verdict, the composition and the always-zero exit are [The Hook](../01-spn-devex/02-hook-set.md), and this plugin follows that shape rather than inventing one. It does not answer what a stack-agnostic check is either.
 
 | Owns | Refuses | Who owns that instead |
 | --- | --- | --- |
-| reading a source file as the pending write would leave it, and answering only for what this edit introduces | the payload, the verdict, the dispatcher's shape, and the exit code | [The Hook](../01-spn-core/02-hook-set.md) |
-| the line between refusing a settled rule and warning about an unsettled one | a rule true in every repository whatever it is built with | [The Check](../01-spn-core/04-checks.md) |
-| that a refusal cites the card holding its reasoning | what that card says | [Stack Refs](04-stack-refs.md) · [The Ref](../01-spn-core/08-ref-set.md) |
+| reading a source file as the pending write would leave it, and answering only for what this edit introduces | the payload, the verdict, the dispatcher's shape, and the exit code | [The Hook](../01-spn-devex/02-hook-set.md) |
+| the line between refusing a settled rule and warning about an unsettled one | a rule true in every repository whatever it is built with | [The Check](../01-spn-devex/04-checks.md) |
+| that a refusal cites the card holding its reasoning | what that card says | [Stack Refs](04-stack-refs.md) · [The Ref](../01-spn-devex/08-ref-set.md) |
 
 ## Binds
 
@@ -107,6 +107,6 @@ This page answers what makes a check belong to a stack rather than to every repo
 
 | Check | Kind | What a green run shows |
 | --- | --- | --- |
-| `node plugins/spn-core/hooks/tools/partner-shape.ts` | gate | every check in this plugin runs against a repository holding nothing but the plugins, and none of them crashes on a file it was not written for |
+| `node plugins/spn-devex/hooks/tools/partner-shape.ts` | gate | every check in this plugin runs against a repository holding nothing but the plugins, and none of them crashes on a file it was not written for |
 
-Try it: `node plugins/spn-core/hooks/tools/partner-shape.ts`
+Try it: `node plugins/spn-devex/hooks/tools/partner-shape.ts`

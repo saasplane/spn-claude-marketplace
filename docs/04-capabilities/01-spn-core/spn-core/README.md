@@ -1,12 +1,12 @@
 <!-- spn:doc
-{"id": "spn-core-capabilities", "variant": "capability", "title": "Capabilities — spn-core", "lenses": ["ARCHITECT", "SERVER_DEV"], "status": "DONE", "summary": "The ten constructs of the core domain, one chapter each: the plugin that delivers them, the hook frame and the four moments it wires, the checks and tools, the page production, and the skills, refs, lenses and agent briefs a session loads.", "keywords": ["spn-core", "capabilities", "plugin", "hooks", "skills", "refs", "agents"]}
+{"id": "spn-devex-capabilities", "variant": "capability", "title": "Capabilities — spn-devex", "lenses": ["ARCHITECT", "SERVER_DEV"], "status": "DONE", "summary": "The ten constructs of the core domain, one chapter each: the plugin that delivers them, the hook frame and the four moments it wires, the checks and tools, the page production, and the skills, refs, lenses and agent briefs a session loads.", "keywords": ["spn-devex", "capabilities", "plugin", "hooks", "skills", "refs", "agents"]}
 -->
 
-# Capabilities — spn-core
+# Capabilities — spn-devex
 
 `For: Architect · Backend developer` · `Status: ✅ DONE`
 
-`spn-core` is the stack-agnostic plugin: the one every SaaS Plane repository loads, whatever world it declares. It carries all five instrument kinds — hooks, skills, refs, lenses and agent briefs — and it realizes every construct of this domain, so the ten chapters below are also the complete tour of what a plugin can hold. Two habits show up in every one of them. A rule always belongs to a chapter of the foundation book, and what lives here is the copy that can fire. And nothing refuses on a shape it does not understand: a hook exits zero, a guard allows, and a check that throws is skipped rather than taking the chain down.
+`spn-devex` is the stack-agnostic plugin: the one every SaaS Plane repository loads, whatever world it declares. It carries all five instrument kinds — hooks, skills, refs, lenses and agent briefs — and it realizes every construct of this domain, so the ten chapters below are also the complete tour of what a plugin can hold. Two habits show up in every one of them. A rule always belongs to a chapter of the foundation book, and what lives here is the copy that can fire. And nothing refuses on a shape it does not understand: a hook exits zero, a guard allows, and a check that throws is skipped rather than taking the chain down.
 
 | Chapter | What it carries |
 | --- | --- |
@@ -32,7 +32,7 @@ Source folders: `hooks/hooks.json` and `hooks/lib/payload.ts` for Hook · `hooks
 | --- | --- | --- | --- |
 | [01-plugin-set.md](01-plugin-set.md) | `plugin-set` | One manifest, one marketplace row, and the only plugin of the three that carries all five instrument kinds — with a version field that names what is published rather than what is being worked on. | ✅ |
 | [02-hook-set.md](02-hook-set.md) | `hook-set` | The wiring and the shared shapes every hook in the workspace is built on: a verdict that is returned rather than printed, one process for the whole PreToolUse chain, and an exit code that is always zero. | ✅ |
-| [03-loop-events.md](03-loop-events.md) | `loop-events` | The four moments spn-core wires into — the window opening, a call about to run, a shell command that finished, and a turn about to end — and why only one of them may refuse anything. | ✅ |
+| [03-loop-events.md](03-loop-events.md) | `loop-events` | The four moments spn-devex wires into — the window opening, a call about to run, a shell command that finished, and a turn about to end — and why only one of them may refuse anything. | ✅ |
 | [04-checks.md](04-checks.md) | `checks` | Seven stack-agnostic checks the dispatcher composes, each naming in its own header the chapter it restates, and each carrying a fast path so an ordinary edit pays almost nothing. | ✅ |
 | [05-tools.md](05-tools.md) | `tools` | Six commands run by their own path rather than fired by an event — the corpus audit, the corpus against itself, the drift check that crosses into the book, the partner proof, the prose triage, and the writer of the repository's own behaviour rows. | ✅ |
 | [06-pages.md](06-pages.md) | `pages` | The renderer that turns a seat file into the page a reader opens, the drawer that measures every figure from its own text, and the checker that treats a connector as a claim. | ✅ |

@@ -78,11 +78,11 @@ None of these files defines the estate's vocabulary. Each names the card that do
 
 ## Boundary
 
-This page answers which skills an estate repository answers to and what each one does. It does not answer what a skill is — the frontmatter, the matching and the rule that a skill carries steps and never a rule are [The Skill](../01-spn-core/07-skill-set.md). It does not answer the vocabulary these skills use either, and it does not answer what happens at write time when an edit would break a law.
+This page answers which skills an estate repository answers to and what each one does. It does not answer what a skill is — the frontmatter, the matching and the rule that a skill carries steps and never a rule are [The Skill](../01-spn-devex/07-skill-set.md). It does not answer the vocabulary these skills use either, and it does not answer what happens at write time when an edit would break a law.
 
 | Owns | Refuses | Who owns that instead |
 | --- | --- | --- |
-| the skills an estate answers to, and that none of them changes a cloud itself | the frontmatter, the listing and the matching every skill shares | [The Skill](../01-spn-core/07-skill-set.md) |
+| the skills an estate answers to, and that none of them changes a cloud itself | the frontmatter, the listing and the matching every skill shares | [The Skill](../01-spn-devex/07-skill-set.md) |
 | that a declaration change is read as one line per choice, before any approval | the manifest, layer, naming and law vocabulary each skill uses | [Estate Refs](03-estate-refs.md) |
 | that publishing is a reviewed version edit followed by the release command | what is refused at the moment an estate file is written | [The Estate Guard](01-estate-guard.md) |
 
@@ -103,6 +103,6 @@ This page answers which skills an estate repository answers to and what each one
 
 | Check | Kind | What a green run shows |
 | --- | --- | --- |
-| `node plugins/spn-core/hooks/tools/restate-drift.ts` | gate | every card these skills name still reads as the chapters it stamps read today |
+| `node plugins/spn-devex/hooks/tools/restate-drift.ts` | gate | every card these skills name still reads as the chapters it stamps read today |
 
-Try it: `node plugins/spn-core/hooks/tools/restate-drift.ts`
+Try it: `node plugins/spn-devex/hooks/tools/restate-drift.ts`

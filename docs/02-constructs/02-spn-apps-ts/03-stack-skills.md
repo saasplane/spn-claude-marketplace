@@ -80,13 +80,13 @@ Planning stays in the core plugin. What this plugin ships instead is reference m
 
 ## Boundary
 
-This page answers what makes a skill this stack's own, and how the skills here are shaped. It does not answer what a skill is — the frontmatter, the matching against a listing, and the rule that a skill carries steps and never a rule are [The Skill](../01-spn-core/07-skill-set.md). It does not answer what the planning layer says either.
+This page answers what makes a skill this stack's own, and how the skills here are shaped. It does not answer what a skill is — the frontmatter, the matching against a listing, and the rule that a skill carries steps and never a rule are [The Skill](../01-spn-devex/07-skill-set.md). It does not answer what the planning layer says either.
 
 | Owns | Refuses | Who owns that instead |
 | --- | --- | --- |
-| the skills this stack answers to, the step order behind the longest of them, and the modes each one takes | the frontmatter, the listing, the matching and the step mechanism | [The Skill](../01-spn-core/07-skill-set.md) |
+| the skills this stack answers to, the step order behind the longest of them, and the modes each one takes | the frontmatter, the listing, the matching and the step mechanism | [The Skill](../01-spn-devex/07-skill-set.md) |
 | that the planning skill is deliberately absent here | the planning skill itself, and the layer this plugin hands it | [Stack Refs](04-stack-refs.md) |
-| that a skill hands its own work to a review at its close | what that review checks, and which viewpoint it convenes | [The Lens](../01-spn-core/09-lenses.md) |
+| that a skill hands its own work to a review at its close | what that review checks, and which viewpoint it convenes | [The Lens](../01-spn-devex/09-lenses.md) |
 
 ## Binds
 
@@ -105,6 +105,6 @@ This page answers what makes a skill this stack's own, and how the skills here a
 
 | Check | Kind | What a green run shows |
 | --- | --- | --- |
-| `node plugins/spn-core/hooks/tools/restate-drift.ts` | gate | every step carrying a stamp still reads as the chapter it names reads today |
+| `node plugins/spn-devex/hooks/tools/restate-drift.ts` | gate | every step carrying a stamp still reads as the chapter it names reads today |
 
-Try it: `node plugins/spn-core/hooks/tools/restate-drift.ts`
+Try it: `node plugins/spn-devex/hooks/tools/restate-drift.ts`

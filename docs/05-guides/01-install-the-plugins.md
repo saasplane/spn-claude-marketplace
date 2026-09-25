@@ -78,8 +78,8 @@ A repository already installed and matching its source costs one comparison and 
 Where you want the underlying act — a hook edit you want live in the next window, say — it is an uninstall followed by an install, per plugin:
 
 ```bash
-claude plugin uninstall spn-core@saasplane --scope project
-claude plugin install   spn-core@saasplane --scope project
+claude plugin uninstall spn-devex@saasplane --scope project
+claude plugin install   spn-devex@saasplane --scope project
 ```
 
 **Sequentially, never in parallel.** The plugins share one installed-plugins register and one settings file, and concurrent installs race over both.
@@ -122,13 +122,13 @@ claude plugin list --json | node -e \
 For this repository that prints one line, because it declares `GENERAL` and loads the core plugin alone:
 
 ```
-spn-core@saasplane 0.7.3 enabled /Users/…/.claude/plugins/cache/saasplane/spn-core/0.7.3
+spn-devex@saasplane 0.7.3 enabled /Users/…/.claude/plugins/cache/saasplane/spn-devex/0.7.3
 ```
 
 **What that installed copy actually contains** — the inventory a session will read, and what it costs in context:
 
 ```bash
-claude plugin details spn-core@saasplane
+claude plugin details spn-devex@saasplane
 ```
 
 **Whether the installed copy matches its source.** This is the check that catches the failure nothing else reports. Ask the CLI for the live directory, then compare it against the checkout — so no version is ever typed:
@@ -139,9 +139,9 @@ LIVE=$(claude plugin list --json | node -e \
   'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{
      for (const p of JSON.parse(s))
        if (p.projectPath === process.argv[1] && p.id === process.argv[2]) console.log(p.installPath);
-   })' "$REPO" spn-core@saasplane)
+   })' "$REPO" spn-devex@saasplane)
 
-diff -rq "$LIVE/" "$REPO/plugins/spn-core/" | grep -v "__pycache__\|\.DS_Store\|\.in_use"
+diff -rq "$LIVE/" "$REPO/plugins/spn-devex/" | grep -v "__pycache__\|\.DS_Store\|\.in_use"
 ```
 
 Silence means the installed bytes are the bytes you are reading. Any output means the session is running something older than your working tree, and `spnutils repo agent-sync` is what reconciles it.

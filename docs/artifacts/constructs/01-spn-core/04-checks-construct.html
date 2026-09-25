@@ -257,21 +257,21 @@
 <section id="s3">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="a-check-is-a-file-and-its-header-names-i">A check is a file, and its header names its source</h3>
-  <p>Each check sits in its own file under <code>hooks/checks/</code> and opens with a line naming the chapter of the foundation book it restates. That line carries no hash and nothing compares it, and that is deliberate: it tells a reader where the rule lives, and the rule is that a change is made in the chapter first and here second, in the same change. <em>Where:</em> <code>plugins/spn-core/hooks/checks/</code></p>
+  <p>Each check sits in its own file under <code>hooks/checks/</code> and opens with a line naming the chapter of the foundation book it restates. That line carries no hash and nothing compares it, and that is deliberate: it tells a reader where the rule lives, and the rule is that a change is made in the chapter first and here second, in the same change. <em>Where:</em> <code>plugins/spn-devex/hooks/checks/</code></p>
   <h3 id="refusing-a-whole-route-beats-listing-the">Refusing a whole route beats listing the safe ones</h3>
-  <p>Where a value must never be rendered, every route that would render it is refused rather than the safe routes listed. One pipeline prints key names and the next prints every value, and telling those apart inside a shell string is guesswork. The whole command is read, so even a quoted path inside a here-document is caught, and the message names the door to use instead. <em>Where:</em> <code>plugins/spn-core/hooks/checks/env-seat.ts</code></p>
+  <p>Where a value must never be rendered, every route that would render it is refused rather than the safe routes listed. One pipeline prints key names and the next prints every value, and telling those apart inside a shell string is guesswork. The whole command is read, so even a quoted path inside a here-document is caught, and the message names the door to use instead. <em>Where:</em> <code>plugins/spn-devex/hooks/checks/env-seat.ts</code></p>
   <h3 id="some-questions-are-about-the-folder-rath">Some questions are about the folder rather than the file</h3>
-  <p>A cycle among state files is a property of the whole folder, not of the file being written. So the check reads the folder with the pending write laid over it, and judges the graph the write would make. The same file runs as a hook and as a sweep over a tree, and a sweep weights what it finds by the grade <a href="./05-tools-construct.html">The Tool</a> declares. <em>Where:</em> <code>plugins/spn-core/hooks/checks/contract-cycle.ts</code></p>
+  <p>A cycle among state files is a property of the whole folder, not of the file being written. So the check reads the folder with the pending write laid over it, and judges the graph the write would make. The same file runs as a hook and as a sweep over a tree, and a sweep weights what it finds by the grade <a href="./05-tools-construct.html">The Tool</a> declares. <em>Where:</em> <code>plugins/spn-devex/hooks/checks/contract-cycle.ts</code></p>
   <h3 id="a-warning-that-repeats-is-a-warning-nobo">A warning that repeats is a warning nobody reads</h3>
-  <p>One turn writes many files, often into one folder. A line printed on every write teaches a reader to skip it, and the time it mattered goes past unread. So a check that speaks rather than refuses remembers what it already said and says it once, keeping that memory in the workspace's own folder for what its machinery says about itself. <em>Where:</em> <code>plugins/spn-core/hooks/checks/confirmed.ts</code>, <code>plugins/spn-core/hooks/checks/mirror.ts</code></p>
+  <p>One turn writes many files, often into one folder. A line printed on every write teaches a reader to skip it, and the time it mattered goes past unread. So a check that speaks rather than refuses remembers what it already said and says it once, keeping that memory in the workspace's own folder for what its machinery says about itself. <em>Where:</em> <code>plugins/spn-devex/hooks/checks/confirmed.ts</code>, <code>plugins/spn-devex/hooks/checks/mirror.ts</code></p>
   <h3 id="some-checks-never-refuse-on-purpose">Some checks never refuse, on purpose</h3>
-  <p>Where deciding needs a reading rather than a match, a gate would be guessing. The check that names which document governs the folder you are editing does that and nothing else, and where no row governs a folder it stays silent — that gap belongs to a sweep over the whole tree rather than to one write. <em>Where:</em> <code>plugins/spn-core/hooks/checks/mirror.ts</code></p>
+  <p>Where deciding needs a reading rather than a match, a gate would be guessing. The check that names which document governs the folder you are editing does that and nothing else, and where no row governs a folder it stays silent — that gap belongs to a sweep over the whole tree rather than to one write. <em>Where:</em> <code>plugins/spn-devex/hooks/checks/mirror.ts</code></p>
   <h3 id="a-check-that-asks-for-accounting-not-for">A check that asks for accounting, not for completion</h3>
-  <p>Closing a scope with work still pending is good housekeeping. What must not happen is a row nobody decided. So the close gate passes landed, carried and deferred alike, and refuses only the undecided row. There is no override, because recording the deferral is the way through. <em>Where:</em> <code>plugins/spn-core/hooks/checks/split-plan.ts</code></p>
+  <p>Closing a scope with work still pending is good housekeeping. What must not happen is a row nobody decided. So the close gate passes landed, carried and deferred alike, and refuses only the undecided row. There is no override, because recording the deferral is the way through. <em>Where:</em> <code>plugins/spn-devex/hooks/checks/split-plan.ts</code></p>
   <h3 id="one-file-can-hold-more-than-one-gate">One file can hold more than one gate</h3>
-  <p>Two of the workspace gates read the same table for different reasons, so they live in one file and the dispatcher registers each separately. Naming them apart in the register of checks matters, because one of them sweeps the workspace and the other reads a single path, and anybody measuring the cost needs to know which. <em>Where:</em> <code>plugins/spn-core/hooks/checks/split-plan.ts</code></p>
+  <p>Two of the workspace gates read the same table for different reasons, so they live in one file and the dispatcher registers each separately. Naming them apart in the register of checks matters, because one of them sweeps the workspace and the other reads a single path, and anybody measuring the cost needs to know which. <em>Where:</em> <code>plugins/spn-devex/hooks/checks/split-plan.ts</code></p>
   <h3 id="the-bars-a-check-measures-come-from-a-ru">The bars a check measures come from a rule, never from the corpus</h3>
-  <p>A bar set from what the corpus already averages moves every time the corpus does, so a sweep would approve whatever is already there. The document check takes its numbers from the register row that states them, and takes headings, tables, code and metadata out of the text before measuring what is left. <em>Where:</em> <code>plugins/spn-core/hooks/checks/doc-check.ts</code></p>
+  <p>A bar set from what the corpus already averages moves every time the corpus does, so a sweep would approve whatever is already there. The document check takes its numbers from the register row that states them, and takes headings, tables, code and metadata out of the text before measuring what is left. <em>Where:</em> <code>plugins/spn-devex/hooks/checks/doc-check.ts</code></p>
 </section>
 
 <!-- 04 -->
@@ -303,7 +303,7 @@
     <thead><tr><th>Repo</th><th>Node</th><th>What it realizes</th><th>State</th></tr></thead>
     <tbody>
       <tr><td>spn-foundation</td><td><code>01-devex/02-agent/01-agent</code></td><td>the foundation construct this one realizes</td><td>planned</td></tr>
-      <tr><td>spn-claude-marketplace</td><td><code>spn-core</code></td><td>the stack-agnostic checks the dispatcher composes, each naming its own chapter and carrying its own fast path</td><td>planned</td></tr>
+      <tr><td>spn-claude-marketplace</td><td><code>spn-devex</code></td><td>the stack-agnostic checks the dispatcher composes, each naming its own chapter and carrying its own fast path</td><td>planned</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -311,7 +311,7 @@
 <!-- 06 -->
 <section id="s6">
   <div class="sec-head"><h2>Proof</h2></div>
-  <p><em>Behaviours: joined from the register, <code>03-behaviors/01-spn-core/04-checks.md</code> — never typed in the seat file.</em></p>
+  <p><em>Behaviours: joined from the register, <code>03-behaviors/01-spn-devex/04-checks.md</code> — never typed in the seat file.</em></p>
   <div class="scroll"><table>
     <thead><tr><th>Row</th><th>Does</th><th>Tier</th><th>Status</th></tr></thead>
     <tbody>
@@ -327,11 +327,11 @@
   <div class="scroll"><table>
     <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
     <tbody>
-      <tr><td><code>node plugins/spn-core/hooks/tools/partner-shape.ts</code></td><td>gate</td><td>every check runs against a repository holding nothing but the plugin, and a missing input produces silence rather than a crash</td></tr>
-      <tr><td><code>node plugins/spn-core/hooks/tools/coherence.ts</code></td><td>gate</td><td>no two documents in the repository state opposite rules about what a check decides</td></tr>
+      <tr><td><code>node plugins/spn-devex/hooks/tools/partner-shape.ts</code></td><td>gate</td><td>every check runs against a repository holding nothing but the plugin, and a missing input produces silence rather than a crash</td></tr>
+      <tr><td><code>node plugins/spn-devex/hooks/tools/coherence.ts</code></td><td>gate</td><td>no two documents in the repository state opposite rules about what a check decides</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>node plugins/spn-core/hooks/tools/partner-shape.ts</code></p>
+  <p>Try it: <code>node plugins/spn-devex/hooks/tools/partner-shape.ts</code></p>
 </section>
 
 <footer>

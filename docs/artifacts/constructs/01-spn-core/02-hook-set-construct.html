@@ -252,24 +252,24 @@
     { "from": "c", "to": "d", "label": "answers with" }
   ] }
   -->
-  <p>The shape is the same in all three plugins, and only the contents differ. <code>spn-core</code> wires every moment it can; <code>spn-apps-ts</code> wires one and puts six checks behind it; <code>spn-infra</code> wires one and puts a shell script behind it.</p>
+  <p>The shape is the same in all three plugins, and only the contents differ. <code>spn-devex</code> wires every moment it can; <code>spn-apps-ts</code> wires one and puts six checks behind it; <code>spn-infra</code> wires one and puts a shell script behind it.</p>
 </section>
 
 <!-- 03 -->
 <section id="s3">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="the-wiring-file">The wiring file</h3>
-  <p><code>hooks.json</code> inside a plugin's <code>hooks/</code> folder is the whole declaration. Each moment carries an optional matcher naming which tool calls reach it, a command written against <code>CLAUDE_PLUGIN_ROOT</code>, and a timeout. One entry per moment is the rule that pays: five separate entries once matched a single edit, and each one paid an interpreter start-up before reading a byte. <em>Where:</em> <code>plugins/spn-core/hooks/hooks.json</code>, <code>plugins/spn-apps-ts/hooks/hooks.json</code>, <code>plugins/spn-infra/hooks/hooks.json</code></p>
+  <p><code>hooks.json</code> inside a plugin's <code>hooks/</code> folder is the whole declaration. Each moment carries an optional matcher naming which tool calls reach it, a command written against <code>CLAUDE_PLUGIN_ROOT</code>, and a timeout. One entry per moment is the rule that pays: five separate entries once matched a single edit, and each one paid an interpreter start-up before reading a byte. <em>Where:</em> <code>plugins/spn-devex/hooks/hooks.json</code>, <code>plugins/spn-apps-ts/hooks/hooks.json</code>, <code>plugins/spn-infra/hooks/hooks.json</code></p>
   <h3 id="the-payload-and-what-a-hook-reads-from-i">The payload, and what a hook reads from it</h3>
-  <p>The harness writes the event to standard input as JSON. <code>readPayload</code> parses it, and input it cannot parse is not a finding — the hook simply allows the call. What a check then reads is a small part of it: the path a write names, the shell command a call carries, and the text a write would add. <em>Where:</em> <code>plugins/spn-core/hooks/lib/payload.ts</code></p>
+  <p>The harness writes the event to standard input as JSON. <code>readPayload</code> parses it, and input it cannot parse is not a finding — the hook simply allows the call. What a check then reads is a small part of it: the path a write names, the shell command a call carries, and the text a write would add. <em>Where:</em> <code>plugins/spn-devex/hooks/lib/payload.ts</code></p>
   <h3 id="the-verdict-is-a-return-value">The verdict is a return value</h3>
-  <p>A check is a function returning <code>{ deny?, note? }</code> or nothing. The dispatcher calls it and reads the object, so there is no round trip a refusal can disappear in. A file can still be run on its own, and <code>emit</code> then prints the same decision JSON to the same stream. A refusal sets the decision and its reason; advice is set as context the agent reads, because a message put only in the developer's pane is invisible to the agent. <em>Where:</em> <code>plugins/spn-core/hooks/lib/payload.ts</code></p>
+  <p>A check is a function returning <code>{ deny?, note? }</code> or nothing. The dispatcher calls it and reads the object, so there is no round trip a refusal can disappear in. A file can still be run on its own, and <code>emit</code> then prints the same decision JSON to the same stream. A refusal sets the decision and its reason; advice is set as context the agent reads, because a message put only in the developer's pane is invisible to the agent. <em>Where:</em> <code>plugins/spn-devex/hooks/lib/payload.ts</code></p>
   <h3 id="one-process-and-the-order-inside-it">One process, and the order inside it</h3>
-  <p>The dispatcher imports every check and calls each in turn. Each check declares what it <code>applies</code> to, decided from the path or the command alone, and which fields it <code>needs</code>, so a call that cannot interest a check never reaches it. The order is a path test, then a file read, then a workspace walk. A check that throws is caught and passed over, and the rest still run. <em>Where:</em> <code>plugins/spn-core/hooks/events/pretooluse.ts</code></p>
+  <p>The dispatcher imports every check and calls each in turn. Each check declares what it <code>applies</code> to, decided from the path or the command alone, and which fields it <code>needs</code>, so a call that cannot interest a check never reaches it. The order is a path test, then a file read, then a workspace walk. A check that throws is caught and passed over, and the rest still run. <em>Where:</em> <code>plugins/spn-devex/hooks/events/pretooluse.ts</code></p>
   <h3 id="the-dispatcher-s-own-refusal">The dispatcher's own refusal</h3>
-  <p>One guard is not a check in the list. Before the loop starts, the dispatcher asks whether any path this call would write is a file a generator owns — a generated validator, a build output folder, a generated route lock, or a file whose own header says a tool wrote it. That refusal is the dispatcher's own, and it runs first because it is the cheapest one there is and needs nothing read. <em>Where:</em> <code>plugins/spn-core/hooks/events/pretooluse.ts</code>, <code>generatedRefusal</code></p>
+  <p>One guard is not a check in the list. Before the loop starts, the dispatcher asks whether any path this call would write is a file a generator owns — a generated validator, a build output folder, a generated route lock, or a file whose own header says a tool wrote it. That refusal is the dispatcher's own, and it runs first because it is the cheapest one there is and needs nothing read. <em>Where:</em> <code>plugins/spn-devex/hooks/events/pretooluse.ts</code>, <code>generatedRefusal</code></p>
   <h3 id="measuring-what-a-run-cost">Measuring what a run cost</h3>
-  <p>Every check is timed. Whether any of it reaches disk is a switch the developer sets, and every path swallows its own errors, because a gate failing because timing failed is worse than a number nobody recorded. <em>Where:</em> <code>plugins/spn-core/hooks/lib/timing.ts</code></p>
+  <p>Every check is timed. Whether any of it reaches disk is a switch the developer sets, and every path swallows its own errors, because a gate failing because timing failed is worse than a number nobody recorded. <em>Where:</em> <code>plugins/spn-devex/hooks/lib/timing.ts</code></p>
 </section>
 
 <!-- 04 -->
@@ -301,7 +301,7 @@
     <thead><tr><th>Repo</th><th>Node</th><th>What it realizes</th><th>State</th></tr></thead>
     <tbody>
       <tr><td>spn-foundation</td><td><code>01-devex/02-agent/04-plugins</code></td><td>the foundation construct this one realizes</td><td>planned</td></tr>
-      <tr><td>spn-claude-marketplace</td><td><code>spn-core</code></td><td>the wiring file, the payload and verdict shapes, the dispatcher, and the timing every hook in the workspace is built on</td><td>planned</td></tr>
+      <tr><td>spn-claude-marketplace</td><td><code>spn-devex</code></td><td>the wiring file, the payload and verdict shapes, the dispatcher, and the timing every hook in the workspace is built on</td><td>planned</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -309,7 +309,7 @@
 <!-- 06 -->
 <section id="s6">
   <div class="sec-head"><h2>Proof</h2></div>
-  <p><em>Behaviours: joined from the register, <code>03-behaviors/01-spn-core/02-hook-set.md</code> — never typed in the seat file.</em></p>
+  <p><em>Behaviours: joined from the register, <code>03-behaviors/01-spn-devex/02-hook-set.md</code> — never typed in the seat file.</em></p>
   <div class="scroll"><table>
     <thead><tr><th>Row</th><th>Does</th><th>Tier</th><th>Status</th></tr></thead>
     <tbody>
@@ -325,10 +325,10 @@
   <div class="scroll"><table>
     <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
     <tbody>
-      <tr><td><code>node plugins/spn-core/hooks/tools/partner-shape.ts</code></td><td>gate</td><td>every wired script runs against a repository holding nothing but the plugin, and none of them crashes on an input it was not written for</td></tr>
+      <tr><td><code>node plugins/spn-devex/hooks/tools/partner-shape.ts</code></td><td>gate</td><td>every wired script runs against a repository holding nothing but the plugin, and none of them crashes on an input it was not written for</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>node plugins/spn-core/hooks/tools/partner-shape.ts</code></p>
+  <p>Try it: <code>node plugins/spn-devex/hooks/tools/partner-shape.ts</code></p>
 </section>
 
 <footer>

@@ -33,11 +33,11 @@ One page per construct, **produced from its seat file and never edited by hand**
 
 | Page | States |
 | --- | --- |
-| [Plugin Set](constructs/01-spn-core/01-plugin-set-construct.html) | what a plugin is, and what the set of them covers |
-| [Hook Set](constructs/01-spn-core/02-hook-set-construct.html) | what a hook is, and when each fires |
-| [Skill Set](constructs/01-spn-core/07-skill-set-construct.html) | what a skill is, and what invoking one does |
-| [Ref Set](constructs/01-spn-core/08-ref-set-construct.html) | what a ref restates, and from which chapter |
-| [Agent Set](constructs/01-spn-core/10-agent-set-construct.html) | what an agent is, and which lens each carries |
+| [Plugin Set](constructs/01-spn-devex/01-plugin-set-construct.html) | what a plugin is, and what the set of them covers |
+| [Hook Set](constructs/01-spn-devex/02-hook-set-construct.html) | what a hook is, and when each fires |
+| [Skill Set](constructs/01-spn-devex/07-skill-set-construct.html) | what a skill is, and what invoking one does |
+| [Ref Set](constructs/01-spn-devex/08-ref-set-construct.html) | what a ref restates, and from which chapter |
+| [Agent Set](constructs/01-spn-devex/10-agent-set-construct.html) | what an agent is, and which lens each carries |
 
 ## Reports
 

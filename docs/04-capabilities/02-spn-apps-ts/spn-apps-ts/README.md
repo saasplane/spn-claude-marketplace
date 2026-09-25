@@ -6,7 +6,7 @@
 
 `For: Backend developer · Web developer` · `Status: ✅ DONE`
 
-`spn-apps-ts` is the apps world made concrete for TypeScript. It carries no agent briefs and no lenses, because a persona and a reviewing viewpoint are stack-agnostic and live once in `spn-core`. What it does carry is everything that can only be said about this stack: the patterns its contract, service and test layers must hold to, the tools that read its behaviour registers, the five skills that build in it, and the one planning layer the stack-agnostic planning skill reads. The absence that shapes the set is planning itself, which is a `spn-core` skill and never duplicated here.
+`spn-apps-ts` is the apps world made concrete for TypeScript. It carries no agent briefs and no lenses, because a persona and a reviewing viewpoint are stack-agnostic and live once in `spn-devex`. What it does carry is everything that can only be said about this stack: the patterns its contract, service and test layers must hold to, the tools that read its behaviour registers, the five skills that build in it, and the one planning layer the stack-agnostic planning skill reads. The absence that shapes the set is planning itself, which is a `spn-devex` skill and never duplicated here.
 
 | Chapter | What it carries |
 | --- | --- |
@@ -19,10 +19,10 @@
 
 | Construct | Realized by |
 | --- | --- |
-| Plugin · Hook · Loop Events · Checks · Tools · Pages · Skill · Ref · Lenses · Agent | [spn-core](../../01-spn-core/spn-core/README.md) |
+| Plugin · Hook · Loop Events · Checks · Tools · Pages · Skill · Ref · Lenses · Agent | [spn-devex](../../01-spn-devex/spn-devex/README.md) |
 | Estate Guard · Estate Skills · Estate Refs | [spn-infra](../../03-spn-infra/spn-infra/README.md) |
 
-Source folders: `hooks/checks/` for Stack Checks · `hooks/tools/` for Stack Tools · `skills/` for Stack Skills · `refs/` for Stack Refs. `hooks/lib/` is shared code the checks and tools import and is covered in the chapter that uses each file; `hooks/tests/` is proof rather than capability surface; `.claude-plugin/plugin.json` belongs to the Plugin chapter in `spn-core`.
+Source folders: `hooks/checks/` for Stack Checks · `hooks/tools/` for Stack Tools · `skills/` for Stack Skills · `refs/` for Stack Refs. `hooks/lib/` is shared code the checks and tools import and is covered in the chapter that uses each file; `hooks/tests/` is proof rather than capability surface; `.claude-plugin/plugin.json` belongs to the Plugin chapter in `spn-devex`.
 
 <!-- spn:generated map — do not edit inside these markers; `docs.ts face` writes it -->
 | Chapter | Realizes | Carries | Status |

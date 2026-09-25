@@ -260,15 +260,15 @@
 <section id="s3">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="what-one-file-says">What one file says</h3>
-  <p>A lens file opens by saying when the viewpoint is worn, when it is convened, and the one condition on which it blocks. Then it says what it checks. Everything below the stated threshold is advice, and the file says so plainly, because a reviewer who can block anything stops being a reviewer and the work stops on taste. <em>Where:</em> <code>plugins/spn-core/refs/lenses/architect.md</code></p>
+  <p>A lens file opens by saying when the viewpoint is worn, when it is convened, and the one condition on which it blocks. Then it says what it checks. Everything below the stated threshold is advice, and the file says so plainly, because a reviewer who can block anything stops being a reviewer and the work stops on taste. <em>Where:</em> <code>plugins/spn-devex/refs/lenses/architect.md</code></p>
   <h3 id="one-procedure-many-viewpoints">One procedure, many viewpoints</h3>
-  <p>A brief for each viewpoint would be many copies of one procedure, drifting apart, each needing the same change. So the procedure lives in one brief — read fresh, review what you did not write, report and never edit — and the subject matter lives in the lens file. The caller passes the name and the work. <em>Where:</em> <code>plugins/spn-core/agents/spn-panel.md</code></p>
+  <p>A brief for each viewpoint would be many copies of one procedure, drifting apart, each needing the same change. So the procedure lives in one brief — read fresh, review what you did not write, report and never edit — and the subject matter lives in the lens file. The caller passes the name and the work. <em>Where:</em> <code>plugins/spn-devex/agents/spn-panel.md</code></p>
   <h3 id="the-names-are-also-the-audience-a-docume">The names are also the audience a document declares</h3>
-  <p>The reader a document is written for and the reviewer who judges it are one list. Two lists would let a document declare an audience no reviewer could be convened as. The register that maps each value to its reader label lives in the documents tool, and a document declaring a value outside the set is refused. <em>Where:</em> <code>plugins/spn-core/hooks/tools/docs.ts</code>, <code>LENS_LABEL</code></p>
+  <p>The reader a document is written for and the reviewer who judges it are one list. Two lists would let a document declare an audience no reviewer could be convened as. The register that maps each value to its reader label lives in the documents tool, and a document declaring a value outside the set is refused. <em>Where:</em> <code>plugins/spn-devex/hooks/tools/docs.ts</code>, <code>LENS_LABEL</code></p>
   <h3 id="a-lens-is-regenerated-never-argued-with">A lens is regenerated, never argued with</h3>
-  <p>Each file names its own sources at the top and states that it restates them and adds none of its own. Where a lens and the book disagree, the book wins. A lens that starts deciding rules has become a second standard nobody audits. <em>Where:</em> the first lines of <code>plugins/spn-core/refs/lenses/trust.md</code></p>
+  <p>Each file names its own sources at the top and states that it restates them and adds none of its own. Where a lens and the book disagree, the book wins. A lens that starts deciding rules has become a second standard nobody audits. <em>Where:</em> the first lines of <code>plugins/spn-devex/refs/lenses/trust.md</code></p>
   <h3 id="wearing-and-convening-are-different-acts">Wearing and convening are different acts</h3>
-  <p>Wearing a lens while writing makes the work better and is never a review, because the context that drafted something already agrees with its own reasoning. Convening is the other act: a reader who did not write the work, holding one file, reporting what that viewpoint found. A skill says which gate convenes which viewpoint. <em>Where:</em> <code>plugins/spn-core/skills/plan/SKILL.md</code>, <code>plugins/spn-core/skills/develop/SKILL.md</code></p>
+  <p>Wearing a lens while writing makes the work better and is never a review, because the context that drafted something already agrees with its own reasoning. Convening is the other act: a reader who did not write the work, holding one file, reporting what that viewpoint found. A skill says which gate convenes which viewpoint. <em>Where:</em> <code>plugins/spn-devex/skills/plan/SKILL.md</code>, <code>plugins/spn-devex/skills/develop/SKILL.md</code></p>
 </section>
 
 <!-- 04 -->
@@ -300,7 +300,7 @@
     <thead><tr><th>Repo</th><th>Node</th><th>What it realizes</th><th>State</th></tr></thead>
     <tbody>
       <tr><td>spn-foundation</td><td><code>01-devex/02-agent/03-lenses</code></td><td>the foundation construct this one realizes</td><td>planned</td></tr>
-      <tr><td>spn-claude-marketplace</td><td><code>spn-core</code></td><td>one file per reviewing viewpoint, the brief that reads one by name, and the register the document audience is drawn from</td><td>planned</td></tr>
+      <tr><td>spn-claude-marketplace</td><td><code>spn-devex</code></td><td>one file per reviewing viewpoint, the brief that reads one by name, and the register the document audience is drawn from</td><td>planned</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -308,7 +308,7 @@
 <!-- 06 -->
 <section id="s6">
   <div class="sec-head"><h2>Proof</h2></div>
-  <p><em>Behaviours: joined from the register, <code>03-behaviors/01-spn-core/09-lenses.md</code> — never typed in the seat file.</em></p>
+  <p><em>Behaviours: joined from the register, <code>03-behaviors/01-spn-devex/09-lenses.md</code> — never typed in the seat file.</em></p>
   <div class="scroll"><table>
     <thead><tr><th>Row</th><th>Does</th><th>Tier</th><th>Status</th></tr></thead>
     <tbody>
@@ -323,11 +323,11 @@
   <div class="scroll"><table>
     <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
     <tbody>
-      <tr><td><code>node plugins/spn-core/hooks/tools/restate-drift.ts</code></td><td>gate</td><td>every viewpoint file still reads as the chapters it stamps read today</td></tr>
-      <tr><td><code>node plugins/spn-core/hooks/tools/docs.ts audit docs</code></td><td>gate</td><td>every document declares an audience drawn from the closed set, and its header renders the labels that set maps to</td></tr>
+      <tr><td><code>node plugins/spn-devex/hooks/tools/restate-drift.ts</code></td><td>gate</td><td>every viewpoint file still reads as the chapters it stamps read today</td></tr>
+      <tr><td><code>node plugins/spn-devex/hooks/tools/docs.ts audit docs</code></td><td>gate</td><td>every document declares an audience drawn from the closed set, and its header renders the labels that set maps to</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>node plugins/spn-core/hooks/tools/restate-drift.ts</code></p>
+  <p>Try it: <code>node plugins/spn-devex/hooks/tools/restate-drift.ts</code></p>
 </section>
 
 <footer>

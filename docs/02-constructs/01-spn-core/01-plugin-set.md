@@ -57,7 +57,7 @@ The last arrow is the one to remember: a session reads the installed copy, so ed
 
 ### The manifest
 
-Each plugin folder carries one manifest at `.claude-plugin/plugin.json`, holding a `name`, a `version`, a `description` and an `author`. The description is long on purpose. It is matched against the work at hand rather than browsed by a person, so it states in full what the plugin carries. *Where:* `plugins/spn-core/.claude-plugin/plugin.json`, and the same path in the other two folders.
+Each plugin folder carries one manifest at `.claude-plugin/plugin.json`, holding a `name`, a `version`, a `description` and an `author`. The description is long on purpose. It is matched against the work at hand rather than browsed by a person, so it states in full what the plugin carries. *Where:* `plugins/spn-devex/.claude-plugin/plugin.json`, and the same path in the other two folders.
 
 ### The version names what is published
 
@@ -69,11 +69,11 @@ One file at the repository root, `.claude-plugin/marketplace.json`, carries a `p
 
 ### The installed copy, and what a wired path names
 
-Installing reads an entry, copies that plugin's folder, and stores it where a session can read it. Everything a plugin wires names that folder through `CLAUDE_PLUGIN_ROOT` rather than through a path in this checkout, so a plugin works wherever it was installed. *Where:* `plugins/spn-core/hooks/hooks.json`, and the same file in the other two folders.
+Installing reads an entry, copies that plugin's folder, and stores it where a session can read it. Everything a plugin wires names that folder through `CLAUDE_PLUGIN_ROOT` rather than through a path in this checkout, so a plugin works wherever it was installed. *Where:* `plugins/spn-devex/hooks/hooks.json`, and the same file in the other two folders.
 
 ### What a plugin may hold, and what it owes
 
-A plugin folder holds any mix of instruments and owes none of them. `spn-core` carries every kind, which is why it is the folder to open to see what a full plugin looks like. `spn-infra` carries a single shell script beside its cards, and no tools and no agent briefs. Each kind is named by its own page, and none of them is named here. *Where:* `plugins/`
+A plugin folder holds any mix of instruments and owes none of them. `spn-devex` carries every kind, which is why it is the folder to open to see what a full plugin looks like. `spn-infra` carries a single shell script beside its cards, and no tools and no agent briefs. Each kind is named by its own page, and none of them is named here. *Where:* `plugins/`
 
 ## Boundary
 
@@ -96,12 +96,12 @@ This page answers what a plugin is made of, how it is listed, and what an instal
 | Repo | Node | What it realizes | State |
 | --- | --- | --- | --- |
 | spn-foundation | `01-devex/02-agent/04-plugins` | the foundation construct this one realizes | planned |
-| spn-claude-marketplace | `spn-core` | the manifest, the marketplace entry and the installed copy, for the widest of the three folders | planned |
+| spn-claude-marketplace | `spn-devex` | the manifest, the marketplace entry and the installed copy, for the widest of the three folders | planned |
 
 ## Proof
 
 | Check | Kind | What a green run shows |
 | --- | --- | --- |
-| `node plugins/spn-core/hooks/tools/partner-shape.ts` | gate | every plugin the marketplace declares is found from its own entry, and every hook inside it runs against a repository holding nothing but the plugin |
+| `node plugins/spn-devex/hooks/tools/partner-shape.ts` | gate | every plugin the marketplace declares is found from its own entry, and every hook inside it runs against a repository holding nothing but the plugin |
 
-Try it: `node plugins/spn-core/hooks/tools/partner-shape.ts`
+Try it: `node plugins/spn-devex/hooks/tools/partner-shape.ts`

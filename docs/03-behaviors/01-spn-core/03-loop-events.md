@@ -14,7 +14,7 @@
 
 `For: Backend developer · Architect` · `Status: 🔮 PLANNING`
 
-[Loop Events](../../02-constructs/01-spn-core/03-loop-events.md) makes these promises. A row says what somebody can do and what they see when they do it.
+[Loop Events](../../02-constructs/01-spn-devex/03-loop-events.md) makes these promises. A row says what somebody can do and what they see when they do it.
 
 Every row below is declared and none is claimed: a run writes the last two cells.
 

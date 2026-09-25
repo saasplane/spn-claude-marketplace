@@ -14,7 +14,7 @@
 
 `For: Backend developer · Architect` · `Status: 🔮 PLANNING`
 
-This page lists the promises [The Tool](../../02-constructs/01-spn-core/05-tools.md) makes. A row says what somebody can do and what they see when they do it.
+This page lists the promises [The Tool](../../02-constructs/01-spn-devex/05-tools.md) makes. A row says what somebody can do and what they see when they do it.
 
 Every row below is declared and none is claimed: a run writes the last two cells.
 

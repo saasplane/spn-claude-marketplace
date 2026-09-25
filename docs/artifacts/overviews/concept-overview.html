@@ -342,7 +342,7 @@
       <tr><th>Owed</th><td>why the drift checker compares a stamped hash rather than resolving
         the chapter at read time, and what is given up by that choice</td></tr>
       <tr><th>Stated today</th><td><a href="../../../CONCEPT.md">CONCEPT.md</a> § Boundary ·
-        <a href="../constructs/01-spn-core/08-ref-set-construct.html">the Ref construct</a></td></tr>
+        <a href="../constructs/01-spn-devex/08-ref-set-construct.html">the Ref construct</a></td></tr>
       <tr><th>Why none yet</th><td><strong>genuinely owed.</strong> The stamp is what makes a
         moved chapter reportable rather than silently outrun, and it also means a ref can be
         correct about a chapter that no longer says what it said</td></tr>
@@ -409,7 +409,7 @@
     <table>
       <thead><tr><th>Domain</th><th>Ships</th><th>Instruments it carries</th></tr></thead>
       <tbody>
-        <tr><td><strong><code>spn-core</code></strong></td>
+        <tr><td><strong><code>spn-devex</code></strong></td>
             <td>the stack-agnostic plugin, loaded by every repository whatever world it
             declares</td>
             <td>all five kinds — plugins, hooks, skills, refs and agents</td></tr>
@@ -425,15 +425,15 @@
 
   <p>The risk in dividing by delivery is that somebody with a general question has to guess which
   plugin answers it. <strong>It does not arise, because a grammar shared by all three lives in
-  <code>spn-core</code> and the stack plugins restate none of it.</strong> The same hook grammar
+  <code>spn-devex</code> and the stack plugins restate none of it.</strong> The same hook grammar
   governs a check here and a check in <code>spn-apps-ts</code>, so <em>what a hook is</em> has one
-  answer in one place — <code>spn-core</code>'s hook set. A stack plugin's chapter says what its
+  answer in one place — <code>spn-devex</code>'s hook set. A stack plugin's chapter says what its
   own checks decide, never what a check is.</p>
 
   <p><strong>The five instrument kinds are a shape, not a seat.</strong> Plugin, hook, skill, ref
-  and agent are what an instrument can be, each defined once, in <code>spn-core</code>. They are
+  and agent are what an instrument can be, each defined once, in <code>spn-devex</code>. They are
   the vocabulary the three domains are written in rather than a division of the tree — which is
-  why you find <em>the hook set</em> as a chapter under <code>spn-core</code> and never as a
+  why you find <em>the hook set</em> as a chapter under <code>spn-devex</code> and never as a
   folder of its own.</p>
 </section>
 
@@ -478,7 +478,7 @@
       its root that tells a runtime which plugins exist and where each one sits</td></tr>
     <tr><td><strong>a plugin</strong></td><td>one delivery unit — a manifest and a folder tree —
       holding any of the five instrument kinds. Three are shipped:
-      <code>spn-core</code>, <code>spn-apps-ts</code>, <code>spn-infra</code></td></tr>
+      <code>spn-devex</code>, <code>spn-apps-ts</code>, <code>spn-infra</code></td></tr>
     <tr><td><strong>an instrument</strong></td><td>the house word for anything this repository
       delivers to a session: a hook, a tool, a skill, a ref, a lens or an agent brief</td></tr>
     <tr><td><strong>a hook</strong></td><td>code the runtime calls for you at a named moment of
@@ -528,11 +528,11 @@
       <td><a href="../../05-guides/01-install-the-plugins.md">the install guide</a>, which names
       the commands in order</td></tr>
     <tr><td>to prove the hooks still work</td>
-      <td><code>node plugins/spn-core/hooks/tests/run.mjs</code>, the suite runner this
+      <td><code>node plugins/spn-devex/hooks/tests/run.mjs</code>, the suite runner this
       repository carries</td></tr>
     <tr><td>the rules themselves, rather than the code that runs them</td>
       <td>the foundation book. If you hold only this tree, the
-      <a href="../constructs/01-spn-core/08-ref-set-construct.html">refs</a> are the copy you can
+      <a href="../constructs/01-spn-devex/08-ref-set-construct.html">refs</a> are the copy you can
       read</td></tr>
   </table></div>
 </section>

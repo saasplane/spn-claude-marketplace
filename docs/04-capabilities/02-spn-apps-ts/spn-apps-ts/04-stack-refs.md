@@ -6,7 +6,7 @@
 
 `For: Backend developer · Architect` · `Status: ✅ DONE` · `Realizes: Stack Refs`
 
-This plugin restates exactly one thing on its own: the planning layer for a node whose world is `APPS` and whose stack is TypeScript. Everything else a ref could carry — the command vocabulary, the contract rules, the cross-repo protocol, the card grammar — is `spn-core`'s, restated once and read by every stack's plugin. The one decision worth knowing before you open the file is that **it is reference material and not a skill**. It has no frontmatter, it matches no ask, and nothing loads it except the stack-agnostic `plan` skill once that skill has resolved which stack it is standing in.
+This plugin restates exactly one thing on its own: the planning layer for a node whose world is `APPS` and whose stack is TypeScript. Everything else a ref could carry — the command vocabulary, the contract rules, the cross-repo protocol, the card grammar — is `spn-devex`'s, restated once and read by every stack's plugin. The one decision worth knowing before you open the file is that **it is reference material and not a skill**. It has no frontmatter, it matches no ask, and nothing loads it except the stack-agnostic `plan` skill once that skill has resolved which stack it is standing in.
 
 ## Where
 
@@ -14,19 +14,19 @@ This plugin restates exactly one thing on its own: the planning layer for a node
 | --- | --- | --- |
 | The planning layer | `plugins/spn-apps-ts/refs/plan.md` | the three modes, the rows a design lands as, and the seats that hold them |
 | Its stamp | the `spn:restates` block at the top of that file | the docs domain and two apps provider chapters, each with the hash last seen |
-| The skill that loads it | `plugins/spn-core/skills/plan/SKILL.md` | resolves the world and stack claim, then reads this file |
+| The skill that loads it | `plugins/spn-devex/skills/plan/SKILL.md` | resolves the world and stack claim, then reads this file |
 
 ## Follows the pattern
 
-- The `spn:restates` block, the stamp and what drift means — [The Ref](../../../02-constructs/01-spn-core/08-ref-set.md)
-- How a ref is stamped, parsed and compared — [Ref in spn-core](../../01-spn-core/spn-core/08-ref-set.md)
+- The `spn:restates` block, the stamp and what drift means — [The Ref](../../../02-constructs/01-spn-devex/08-ref-set.md)
+- How a ref is stamped, parsed and compared — [Ref in spn-devex](../../01-spn-devex/spn-devex/08-ref-set.md)
 
 ## Special handling
 
 ### The skill has no stack variant, so the layer is a ref
 
 **Why** — *the book's skill vocabulary is closed and carries no planning skill for the apps world*. Shipping one here would add a value the standard does not have, and two skills would then compete for the same ask.
-**What** — the planning skill stays in `spn-core`. This file supplies what only a stack-concrete file can state: which seats a design's rows land in, and what each row must carry.
+**What** — the planning skill stays in `spn-devex`. This file supplies what only a stack-concrete file can state: which seats a design's rows land in, and what each row must carry.
 **How** — the file states its own status in its first line, so a reader who opens it directly is told it is not a skill. `plugins/spn-apps-ts/refs/plan.md`.
 
 ### A design lands as rows in the owning documents
@@ -46,5 +46,5 @@ This plugin restates exactly one thing on its own: the planning layer for a node
 | Direction | With | What | Why |
 | --- | --- | --- | --- |
 | takes | spn-foundation | the docs domain chapter and the apps provider chapters it restates, each stamped | the book governs and this file is the copy |
-| takes | spn-core | the corpus standard its row shapes point at, rather than restating it again | one description of a docs tree, cited from everywhere |
-| publishes | spn-core's plan skill | the concrete layer for the `APPS` and TypeScript combination | a stack-agnostic skill still reaches a stack-concrete step |
+| takes | spn-devex | the corpus standard its row shapes point at, rather than restating it again | one description of a docs tree, cited from everywhere |
+| publishes | spn-devex's plan skill | the concrete layer for the `APPS` and TypeScript combination | a stack-agnostic skill still reaches a stack-concrete step |

@@ -18,7 +18,7 @@ Two files sit under `plugins/spn-apps-ts/hooks/tools/`, and neither is wired to 
 
 ## Follows the pattern
 
-- A tool is run by name and answers with an exit code — [Tools in spn-core](../../01-spn-core/spn-core/05-tools.md)
+- A tool is run by name and answers with an exit code — [Tools in spn-devex](../../01-spn-devex/spn-devex/05-tools.md)
 - The behaviour row and the register it lives in — the foundation's `02-docs/02-document.md`
 
 ## Special handling
@@ -45,7 +45,7 @@ Two files sit under `plugins/spn-apps-ts/hooks/tools/`, and neither is wired to 
 
 **Why** — *a derived status reports a case that exists as a case that ran*. Crossing a route with a surface, or scanning a source tree for case titles, cannot see a case that was skipped or filtered out.
 **What** — the writer reads the results file the runner produced, so a case that never reached the runner says so.
-**How** — `spn-core`'s own writer reads the same artifact shape for this repository, which is not a stack. Same file, and `plugins/spn-core/hooks/tools/behaviour-status.mjs`.
+**How** — `spn-devex`'s own writer reads the same artifact shape for this repository, which is not a stack. Same file, and `plugins/spn-devex/hooks/tools/behaviour-status.mjs`.
 
 ### Coverage is measured against actions, not routes
 
@@ -58,5 +58,5 @@ Two files sit under `plugins/spn-apps-ts/hooks/tools/`, and neither is wired to 
 | Direction | With | What | Why |
 | --- | --- | --- | --- |
 | takes | a stack repository | its declared API actions, its behaviour registers, and its test results file | the tools read the repository they are pointed at and hold no state |
-| publishes | spn-core | the artifact shape and the two-cell rule its own row writer follows | a stack repository and the marketplace report in one vocabulary |
+| publishes | spn-devex | the artifact shape and the two-cell rule its own row writer follows | a stack repository and the marketplace report in one vocabulary |
 | publishes | the repository's own registers | the status of the last run, and when it ran | a row's proof is a finding rather than a memory |

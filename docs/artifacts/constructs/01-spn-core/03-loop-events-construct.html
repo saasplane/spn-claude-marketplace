@@ -253,22 +253,22 @@
     { "from": "c", "to": "d", "label": "then" }
   ] }
   -->
-  <p><code>spn-core</code> is the only plugin here that wires more than one moment. It wires all four, one script each, and none of those scripts is reached any other way.</p>
+  <p><code>spn-devex</code> is the only plugin here that wires more than one moment. It wires all four, one script each, and none of those scripts is reached any other way.</p>
 </section>
 
 <!-- 03 -->
 <section id="s3">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="the-window-opening">The window opening</h3>
-  <p>One script runs when a session starts, resumes or is cleared, and what it prints is the first screen a developer reads. Nothing in that screen is typed: the script walks the workspace, reads each repository's own manifest for the world and the stack it claims, checks the wiring that claim implies, and lists every workstream in each of its states. A workspace holding no manifest at all is the case where there is nothing to read, and the script then asks instead of reporting, and points at the day-zero skill. Every read is wrapped, because a crash here is a window that opens on a stack trace. <em>Where:</em> <code>plugins/spn-core/hooks/events/orientation.ts</code></p>
+  <p>One script runs when a session starts, resumes or is cleared, and what it prints is the first screen a developer reads. Nothing in that screen is typed: the script walks the workspace, reads each repository's own manifest for the world and the stack it claims, checks the wiring that claim implies, and lists every workstream in each of its states. A workspace holding no manifest at all is the case where there is nothing to read, and the script then asks instead of reporting, and points at the day-zero skill. Every read is wrapped, because a crash here is a window that opens on a stack trace. <em>Where:</em> <code>plugins/spn-devex/hooks/events/orientation.ts</code></p>
   <h3 id="a-call-about-to-run">A call about to run</h3>
-  <p>One script, one matcher, and the whole chain of checks behind it. This is the only moment that may return a refusal, so every gate in the marketplace lives here or nowhere. Its matcher names the calls that could interest a check — reads, writes, edits, shell commands and searches. <em>Where:</em> <code>plugins/spn-core/hooks/events/pretooluse.ts</code></p>
+  <p>One script, one matcher, and the whole chain of checks behind it. This is the only moment that may return a refusal, so every gate in the marketplace lives here or nowhere. Its matcher names the calls that could interest a check — reads, writes, edits, shell commands and searches. <em>Where:</em> <code>plugins/spn-devex/hooks/events/pretooluse.ts</code></p>
   <h3 id="a-shell-command-that-finished">A shell command that finished</h3>
-  <p>One script, matched to shell commands alone. It reads the command that just ran, and when that command actually moved a workstream folder into the closed state, it says what landed, counted from that workstream's own split plan. The congratulation comes after the move rather than before it, because the gate that could have refused the move runs earlier and speaks only to refuse. <em>Where:</em> <code>plugins/spn-core/hooks/events/closed.ts</code></p>
+  <p>One script, matched to shell commands alone. It reads the command that just ran, and when that command actually moved a workstream folder into the closed state, it says what landed, counted from that workstream's own split plan. The congratulation comes after the move rather than before it, because the gate that could have refused the move runs earlier and speaks only to refuse. <em>Where:</em> <code>plugins/spn-devex/hooks/events/closed.ts</code></p>
   <h3 id="a-turn-about-to-end">A turn about to end</h3>
-  <p>One script, no matcher. By the time it runs the turn is already written, so a refusal would only lose it. What it does instead is warn: a turn ending while the running arc still has rows nothing blocks, an arc held against no live card, and a reply announcing a new window without the fields a handover owes. <em>Where:</em> <code>plugins/spn-core/hooks/events/stop.ts</code></p>
+  <p>One script, no matcher. By the time it runs the turn is already written, so a refusal would only lose it. What it does instead is warn: a turn ending while the running arc still has rows nothing blocks, an arc held against no live card, and a reply announcing a new window without the fields a handover owes. <em>Where:</em> <code>plugins/spn-devex/hooks/events/stop.ts</code></p>
   <h3 id="every-moment-exits-zero">Every moment exits zero</h3>
-  <p>Whatever a script decides, it ends with a zero exit code. A refusal is the documented decision written to standard output, never a failure code. Two of these scripts also run by hand, printing the same text, so they can be read without opening a session at all. <em>Where:</em> <code>plugins/spn-core/hooks/events/</code></p>
+  <p>Whatever a script decides, it ends with a zero exit code. A refusal is the documented decision written to standard output, never a failure code. Two of these scripts also run by hand, printing the same text, so they can be read without opening a session at all. <em>Where:</em> <code>plugins/spn-devex/hooks/events/</code></p>
 </section>
 
 <!-- 04 -->
@@ -300,7 +300,7 @@
     <thead><tr><th>Repo</th><th>Node</th><th>What it realizes</th><th>State</th></tr></thead>
     <tbody>
       <tr><td>spn-foundation</td><td><code>01-devex/02-agent/01-agent</code></td><td>the foundation construct this one realizes</td><td>planned</td></tr>
-      <tr><td>spn-claude-marketplace</td><td><code>spn-core</code></td><td>one script per moment, the only plugin here that wires more than one</td><td>planned</td></tr>
+      <tr><td>spn-claude-marketplace</td><td><code>spn-devex</code></td><td>one script per moment, the only plugin here that wires more than one</td><td>planned</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -308,7 +308,7 @@
 <!-- 06 -->
 <section id="s6">
   <div class="sec-head"><h2>Proof</h2></div>
-  <p><em>Behaviours: joined from the register, <code>03-behaviors/01-spn-core/03-loop-events.md</code> — never typed in the seat file.</em></p>
+  <p><em>Behaviours: joined from the register, <code>03-behaviors/01-spn-devex/03-loop-events.md</code> — never typed in the seat file.</em></p>
   <div class="scroll"><table>
     <thead><tr><th>Row</th><th>Does</th><th>Tier</th><th>Status</th></tr></thead>
     <tbody>
@@ -324,10 +324,10 @@
   <div class="scroll"><table>
     <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
     <tbody>
-      <tr><td><code>node plugins/spn-core/hooks/tools/partner-shape.ts</code></td><td>gate</td><td>every script a moment names runs against a repository holding nothing but the plugin, and each one ends with a zero exit code</td></tr>
+      <tr><td><code>node plugins/spn-devex/hooks/tools/partner-shape.ts</code></td><td>gate</td><td>every script a moment names runs against a repository holding nothing but the plugin, and each one ends with a zero exit code</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>node plugins/spn-core/hooks/tools/partner-shape.ts</code></p>
+  <p>Try it: <code>node plugins/spn-devex/hooks/tools/partner-shape.ts</code></p>
 </section>
 
 <footer>

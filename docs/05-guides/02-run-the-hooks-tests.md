@@ -21,7 +21,7 @@ They also do a second job that no other repository's suites do. **This repositor
 
 ```bash
 cd /opt/work/saasplane/code/spn-claude-marketplace
-node plugins/spn-core/hooks/tests/run.mjs
+node plugins/spn-devex/hooks/tests/run.mjs
 ```
 
 Every file named `t-*.mjs` beside the runner is a suite, and they run in name order. The output is one line per suite and a tally:
@@ -42,7 +42,7 @@ A suite whose last line is not `all N passed` is printed as `FAIL`, with its own
 A suite is an ordinary program, so you run it directly while you iterate on the check it covers:
 
 ```bash
-node plugins/spn-core/hooks/tests/t-doc-check.mjs
+node plugins/spn-devex/hooks/tests/t-doc-check.mjs
 ```
 
 On its own it prints every case — `PASS` or `FAIL`, then the title — under the heading of the behaviour being exercised. That is the level to work at while a check is moving, because the aggregate view drops everything but the last line.
@@ -73,7 +73,7 @@ A case speaks for a behaviour row when its **title carries the row's id in brack
 Add the flag and the run also writes what it found into the behaviour rows:
 
 ```bash
-node plugins/spn-core/hooks/tests/run.mjs --write-status
+node plugins/spn-devex/hooks/tests/run.mjs --write-status
 ```
 
 **It writes the `Status` cell and the `Updated at` cell, and nothing else.** Every other cell in a row — who the actor is, what they do, what they see, the type, the tier — is a decision a person made, and a run has no opinion about any of it.
@@ -94,7 +94,7 @@ The suites pass in full and **no case carries a behaviour id yet**, so `--write-
 You can ask the writer what it would do without letting it write, by running it against the artifact directly:
 
 ```bash
-node plugins/spn-core/hooks/tools/behaviour-status.mjs \
+node plugins/spn-devex/hooks/tools/behaviour-status.mjs \
   --results docs/artifacts/reports/spn-tests.json .
 ```
 
