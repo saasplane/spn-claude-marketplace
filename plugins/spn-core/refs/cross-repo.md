@@ -4,8 +4,8 @@
     { "path": "docs/02-constructs/01-devex/04-workspace/01-workspace.md", "seen": "2fbe40c5" },
     { "path": "docs/02-constructs/01-devex/04-workspace/02-workstream.md", "seen": "654b23c2" },
     { "path": "docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md", "seen": "07a688b1" },
-    { "path": "docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md", "section": "The agent is updated first, and reloaded before anything runs", "seen": "97526696" },
-    { "path": "docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md", "section": "An arc's status says which of eight states it is in", "seen": "0b096adf" },
+    { "path": "docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md", "section": "The agent is updated first, and reloaded before anything runs", "seen": "97526696" },
+    { "path": "docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md", "section": "An arc's status says which of eight states it is in", "seen": "0b096adf" },
     { "path": "docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md", "section": "When an edit becomes behaviour", "seen": "37aada54" },
     { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md", "section": "Restatement discipline", "seen": "e1ff9549" }
   ],
@@ -22,7 +22,7 @@
 
 # Cross-Repo Work — Stack-Agnostic
 
-How an agent works across more than one repository on a SaaS Plane estate, and where a rule belongs so every agent sees it. Apply it in any stack and to any repo pair. Source of truth: the foundation's `02-constructs/01-devex/04-workspace/01-workspace.md` and `02-constructs/01-devex/04-workspace/02-workstream.md` — the workspace itself, and the scope of work inside it. The machine seat is `04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md` **§ The machine's own layout** and **§ The env seat**, and `04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md` **§ The agent is updated first, and reloaded before anything runs**. Then `04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md` **§ When an edit becomes behaviour**, and `04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` **§ Restatement discipline**. The decisions are RD.DEVEX.020, RD.DEVEX.044, RD.DEVEX.048, RD.DEVEX.049 and RD.DOCS.055. Where this restatement and those disagree, the sources win and this file is regenerated.
+How an agent works across more than one repository on a SaaS Plane estate, and where a rule belongs so every agent sees it. Apply it in any stack and to any repo pair. Source of truth: the foundation's `02-constructs/01-devex/04-workspace/01-workspace.md` and `02-constructs/01-devex/04-workspace/02-workstream.md` — the workspace itself, and the scope of work inside it. The machine seat is `04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md` **§ The machine's own layout** and **§ The env seat**, and `04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md` **§ The agent is updated first, and reloaded before anything runs**. Then `04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md` **§ When an edit becomes behaviour**, and `04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` **§ Restatement discipline**. The decisions are RD.DEVEX.020, RD.DEVEX.044, RD.DEVEX.048, RD.DEVEX.049 and RD.DOCS.055. Where this restatement and those disagree, the sources win and this file is regenerated.
 
 ## One window, laws by declaration
 
