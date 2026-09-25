@@ -1,14 +1,16 @@
 <!-- spn:restates
 {
   "docs": [
+    { "path": "spn-foundation/docs/02-constructs/01-devex/01-function/01-bootstrap.md", "seen": "98d7690f" },
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/01-bootstrap.md", "seen": "af018421" },
     { "path": "spn-foundation/docs/05-guides/README.md", "seen": "9c97f7cb" }
   ]
 }
 -->
 
-# Getting Started — Empty Repository to First Feature
+# Bootstrap — Empty Folder to First Feature
 
-**Source of truth:** the foundation book's guides seat (`docs/05-guides/` — its face *is* the day-zero guide). This file restates it for use inside a wired repository and adds nothing; where the two disagree, the book wins and this file is regenerated.
+**Source of truth:** the foundation's `02-constructs/01-devex/01-function/01-bootstrap.md` and `04-capabilities/01-devex/01-function/01-bootstrap.md` for the stage, and the guides seat (`docs/05-guides/`) for the walk itself. This file restates them for use inside a wired workspace and adds nothing; where the two disagree, the book wins and this file is regenerated.
 
 Follow this walk from nothing to a first feature in flight. Every step names the command that carries it; statuses are honest — ✅ runs today, 🚧 the command is still being built.
 
@@ -56,10 +58,10 @@ ship with these plugins, beside this file:
 
 | What you are writing | Its shape |
 | --- | --- |
-| an approach page, to argue a piece of work | [`templates/workstream/approach-template.html`](../templates/workstream/approach-template.html) |
-| a question you cannot answer alone | [`refs/decision-cards.md`](decision-cards.md) — it is a card, and a card is `div.open` wrapping an `h4` whose id is its number |
-| a construct, a domain face, an overview | [`refs/doc-sets.md`](doc-sets.md) |
-| the markdown and figures inside any of them | [`refs/blocks.md`](blocks.md) |
+| an approach page, to argue a piece of work | [`templates/workstream/approach-template.html`](../workspace/docs/templates/workstream/approach-template.html) |
+| a question you cannot answer alone | [`refs/decision-cards.md`](../workspace/docs/decision-cards.md) — it is a card, and a card is `div.open` wrapping an `h4` whose id is its number |
+| a construct, a domain face, an overview | [`refs/doc-sets.md`](../workspace/docs/doc-sets.md) |
+| the markdown and figures inside any of them | [`refs/blocks.md`](../workspace/docs/blocks.md) |
 
 **Copy the template rather than writing a page from memory.** It carries the section order, the card
 shape and the furniture every check reads, and a page assembled by hand is a page that passes review

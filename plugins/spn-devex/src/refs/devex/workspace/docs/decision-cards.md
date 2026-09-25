@@ -1,7 +1,14 @@
+<!-- spn:restates
+{
+  "docs": [
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "section": "The approach document — a workstream's, never a repository's", "seen": "73b87864" }
+  ]
+}
+-->
 # Decision cards — the shape, and where it is defined
 
 **The book owns this grammar.** It is stated in the foundation's
-`docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md`, under *The approach document* → `Open`, and
+`docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md`, under *The approach document — a workstream's, never a repository's* → `Open`, and
 several of its clauses are **MUST**. This file exists because the plugins ship without the
 book beside them. It restates the grammar for an agent that cannot open that chapter, and it
 must be kept in step with it. **When the two disagree, the book wins.**

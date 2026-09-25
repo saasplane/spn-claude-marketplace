@@ -33,7 +33,7 @@
 
 - **Read it aloud.** A sentence awkward when spoken is a sentence to split. Split it — never shorten it, because force lives in the exact term and the MUST.
 - **Ask what you are trying to say**, then check the page says that. A paragraph you cannot summarize in one line has not decided its point yet.
-- **Find your reader.** A stretch reaching them by none of the three moves is describing a system to nobody. The moves and the per-seat shares are in [`refs/doc-sets.md`](../doc-sets.md) § One voice, and the `spn-devex` doc-check sweep reports the share you actually hit.
+- **Find your reader.** A stretch reaching them by none of the three moves is describing a system to nobody. The moves and the per-seat shares are in [`refs/doc-sets.md`](../devex/workspace/docs/doc-sets.md) § One voice, and the `spn-devex` doc-check sweep reports the share you actually hit.
 - **No idioms, and this one reaches your own speech.** An idiom means something its words do not say, so a second-language reader cannot guess it (RD.DOCS.052). Read the page for *say the word*, *earns its keep*, *reads like*, *goes stale*, *front door*. Replace each with the plain phrase. A defined house term is not an idiom and stays.
 - **A rule keeps its subject.** Warmth arrives in the sentence beside it, never inside it. A class subject — an application, a module, a space — never becomes *you*, and a record is never warmed at all.
 - **Precision outranks warmth on a file that instructs** (RD.DEVEX.032). Where a warmer sentence would be even slightly less exact about what your reader must do, leave the sentence as it is. A page at its bar in mechanical prose is worse than a page under it in good prose — and that ranking runs the other way too, so neither half wins by default.

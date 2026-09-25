@@ -1,14 +1,14 @@
 <!-- spn:generated refs-readme — do not edit inside these markers; `refs-readme.ts` writes it -->
 # spn-devex — what these refs cover
 
-A ref is a self-contained leaf, named for a construct the book states. **This plugin ships 18.**
+A ref is a self-contained leaf, named for a construct the book states. **This plugin ships 19.**
 
 **Coverage is per group, never one number.** One figure over a plugin averages a complete group with an empty one, and is true of neither.
 
 | Group | Covers | Cuts across | Not restated |
 | --- | --- | ---: | ---: |
 | `devex/agent` | 1 of 4 constructs | — | 3 |
-| `devex/function` | 2 of 8 constructs | — | 6 |
+| `devex/function` | 3 of 8 constructs | — | 5 |
 | `devex/utils` | 1 of 3 constructs | — | 2 |
 | `devex/workspace` | 3 of 4 constructs | — | 1 |
 | `lenses` | — by role, not by construct | 11 | — |
@@ -18,7 +18,7 @@ A ref is a self-contained leaf, named for a construct the book states. **This pl
 **What is not restated, and that is a choice rather than an oversight.** A construct earns a ref when a reader here needs it; one whose rules a skill already carries would be a second home for them.
 
 - `devex/agent` — `agent` · `lenses` · `skills`
-- `devex/function` — `bootstrap` · `deliver` · `develop` · `operate` · `provision` · `test`
+- `devex/function` — `deliver` · `develop` · `operate` · `provision` · `test`
 - `devex/utils` — `apps-providers` · `infra-providers`
 - `devex/workspace` — `docs`
 

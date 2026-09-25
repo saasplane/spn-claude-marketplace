@@ -1,5 +1,14 @@
-<!-- spn:ref blocks -->
+<!-- spn:restates
+{
+  "docs": [
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "section": "The blocks — what a page reaches for instead of prose", "seen": "0dd7f138" },
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "section": "The figures — what sits inside a block, and the closed set of them", "seen": "40b967f2" }
+  ]
+}
+-->
 # Blocks and figures, in the spelling you actually write
+
+**Source of truth:** the foundation's `04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md` — *The blocks* and *The figures*. This file restates them for an agent that ships without the book beside it; where the two disagree, the book wins.
 
 **You write markdown.** `docs.ts page` produces the HTML, and the stylesheet the template ships
 supplies every border, background and colour. So this file is the whole vocabulary you need: what a

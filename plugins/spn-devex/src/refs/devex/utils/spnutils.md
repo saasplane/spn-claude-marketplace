@@ -1,4 +1,14 @@
+<!-- spn:restates
+{
+  "docs": [
+    { "path": "spn-foundation/docs/02-constructs/01-devex/03-utils/01-spnutils.md", "seen": "534871ef" },
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md", "seen": "07a688b1" }
+  ]
+}
+-->
 # Command Vocabulary — Stack-Agnostic
+
+**Source of truth:** the foundation's `02-constructs/01-devex/03-utils/01-spnutils.md` for what the CLI is, and `04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md` for the standard it holds to. The command listing below that is generated from the released CLI, so it states what a partner actually holds rather than what this file last claimed.
 
 Two command vocabularies belong to the platform rather than to any stack: the **`spnutils` commands** and the **DevEx stage skills**. Both mean the same thing in every repo and every language. What *runs* when you invoke one is the stack's business, and it is the only part that differs.
 

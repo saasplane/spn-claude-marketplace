@@ -4,7 +4,7 @@
     { "path": "spn-foundation/docs/04-capabilities/README.md", "seen": "37d477d7" },
     { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md", "seen": "8c2210a7" },
     { "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/03-surfaces/03-service-namespaces.md", "seen": "f6829f2b" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/01-scm.md", "seen": "e68cbe59" }
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md", "seen": "013ca3c9" }
   ],
   "decisions": [
     "RD.APPS.121",
@@ -15,7 +15,7 @@
 
 # Lens — `LEAD` (Engineering leader)
 
-**Source of truth:** the foundation book's purpose part, the paved-road doctrine and repo standard (`04-capabilities/README` · `01-devex/01-function/01-scm`), and the configuration-over-customization ladder (`03-platform/01-core/03-surfaces/03-service-namespaces`). The readability check restates the corpus standard's readability bar (`01-devex/04-workspace/04-docs/01-corpus`). Read this file as a restatement of those rules, adding none of its own; where they disagree, the book wins and this file is regenerated.
+**Source of truth:** the foundation book's purpose part, the paved-road doctrine and repo standard (`04-capabilities/README` · `01-devex/01-function/02-scm`), and the configuration-over-customization ladder (`03-platform/01-core/03-surfaces/03-service-namespaces`). The readability check restates the corpus standard's readability bar (`01-devex/04-workspace/04-docs/01-corpus`). Read this file as a restatement of those rules, adding none of its own; where they disagree, the book wins and this file is regenerated.
 
 **Worn** while shaping repo standards and process. **Convened** on scope and fit questions. **Advises — never blocks.**
 
@@ -31,5 +31,5 @@
 
 ## What it never does
 
-- Block work — its findings are advice, offered as decision cards ([`refs/decision-cards.md`](../decision-cards.md)).
+- Block work — its findings are advice, offered as decision cards ([`refs/decision-cards.md`](../devex/workspace/docs/decision-cards.md)).
 - Invent a rule. Treat a finding with no owning chapter behind it as a suggestion, and report it as one.
