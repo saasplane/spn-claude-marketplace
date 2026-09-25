@@ -1,6 +1,6 @@
 ---
 name: test
-description: What proves a behaviour, at which tier, and what a passing suite does and does not mean. Use when deciding where a test belongs, judging whether a change is adequately proven, or reading a test result honestly. Stack-agnostic; the stack plugin supplies the runners and the gate commands.
+description: What proves a behaviour, at which tier, and what a passing suite does and does not mean. Use when deciding where a test belongs, judging whether a change is adequately proven, or reading a test result honestly. Stack-agnostic; the domain plugin supplies the runners and the gate commands.
 ---
 
 # test — proof, at the tier that means something

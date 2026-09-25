@@ -1,6 +1,6 @@
 ---
 name: scm
-description: The repository and project standard - what a project must declare, what its declaration decides, and how repos, branches, and wiring are standardized. Use when creating a repo or project, adding a package or app, judging where code belongs, or fixing a project that does not match its own kind. Stack-agnostic; the stack plugin supplies the scaffold and validate commands.
+description: The repository and project standard - what a project must declare, what its declaration decides, and how repos, branches, and wiring are standardized. Use when creating a repo or project, adding a package or app, judging where code belongs, or fixing a project that does not match its own kind. Stack-agnostic; the domain plugin supplies the scaffold and validate commands.
 ---
 
 <!-- spn:restates

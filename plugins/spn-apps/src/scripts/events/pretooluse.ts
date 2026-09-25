@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Every `spn-apps-ts` PreToolUse check, in one process.
+// Every `spn-apps` PreToolUse check, in one process.
 //
 // WHY THIS EXISTS, AND WHAT IT IS WORTH. `hooks.json` declared six scripts as EIGHT separate
 // `PreToolUse` entries, each its own matcher block, so every `Write` and every `Edit` started eight

@@ -12,10 +12,10 @@ copy here would be a second source that drifts.
 **This repo declares `GENERAL` in `sprepo.json`** — no nodes, one docs tree. It answers to no
 stack, so the `apps` and `infra` commands refuse it by name, and what the agent manages here is the
 docs tree and this repository's own files (`RD.GOV.024`). It loads `spn-devex` and only `spn-devex`:
-core governs docs trees, and a stack plugin acts on nodes this repository does not have.
+core governs docs trees, and a domain plugin acts on nodes this repository does not have.
 
 **Authoring a plugin is not loading it.** This repo authors all three and loads one. Editing
-`plugins/spn-apps-ts/skills/…/SKILL.md` is editing markdown, which core's doc rules govern, and the
+`plugins/spn-apps/skills/…/SKILL.md` is editing markdown, which core's doc rules govern, and the
 suites here run the source rather than the installed copy. Being the builder checkout is a separate
 axis — `SPN_DEVEX_AGENT_WORKSPACE`.
 
@@ -30,7 +30,7 @@ domain, with no area above them, and a domain **is a plugin** — so the same th
 | Domain | Describes | Its constructs |
 | --- | --- | --- |
 | [`01-spn-devex`](docs/02-constructs/01-spn-devex/README.md) | the stack-agnostic plugin | the plugin set, the hook set, the loop events, the checks, the tools, the pages, the skills, the refs, the lenses, the agents |
-| [`02-spn-apps-ts`](docs/02-constructs/02-spn-apps-ts/README.md) | the TypeScript stack plugin | its checks, tools, skills and refs |
+| [`02-spn-apps`](docs/02-constructs/02-spn-apps/README.md) | the apps domain, stack-agnostic with its stacks inside it | its checks by subject, its parsers per stack, its skills and refs |
 | [`03-spn-infra`](docs/02-constructs/03-spn-infra/README.md) | the estate plugin | the estate guard, its skills, its refs |
 
 Under [`04-capabilities/`](docs/04-capabilities/README.md) the level below a domain is the

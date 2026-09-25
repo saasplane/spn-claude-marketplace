@@ -10,7 +10,7 @@
 // **Why this exists at all (Q107).** `spnutils` serves a GENERAL repository with its docs verbs
 // only — it has no test runner for a repository that is not a stack — so the marketplace's rows
 // have no agent to write them. The plugins' own runner is the thing that knows, so the plugins'
-// own runner writes them. `spn-apps-ts` does the same job for a stack repository through
+// own runner writes them. `spn-apps` does the same job for a stack repository through
 // `behaviour-rows.ts`, reading the same artifact shape.
 //
 // **Two cells are the agent's and the rest are a person's.** `Status` and `Updated at` are what the

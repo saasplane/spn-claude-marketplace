@@ -13,7 +13,7 @@ Then enable what your repository needs (or let `spnutils repo agent-sync` derive
 | Plugin | Serves | Enable in |
 | --- | --- | --- |
 | `spn-devex` | the stage skills including `plan`, the day-zero walk, the SPN engineer persona, the review panel and its lenses, contract and comment rules, the cross-repo protocol, the session orientation and its two split-plan gates | every repo |
-| `spn-apps-ts` | the TypeScript stack's skills — new · implement · review · run · verify — their step files, and the write-time guards over enablement grammar, host assertions and what proves a change | `APPS` repos claiming `TS` |
+| `spn-apps` | the TypeScript stack's skills — new · implement · review · run · verify — their step files, and the write-time guards over enablement grammar, host assertions and what proves a change | `APPS` repos claiming `TS` |
 | `spn-infra` | the estate skills, manifest and naming references, the estate laws, the secrets/ARN deny hook | `INFRA` repos |
 
 The plugins carry the standards in full — they restate the SaaS Plane foundation book and add no rule of their own. What *runs* — the `@saasplane` packages, the platform modules, the blueprint library — is delivered separately through granted registries.
@@ -23,7 +23,7 @@ The plugins carry the standards in full — they restate the SaaS Plane foundati
 ```
 .claude-plugin/marketplace.json   # the one manifest — hand-kept
 plugins/spn-devex/                 # source, edited in place
-plugins/spn-apps-ts/
+plugins/spn-apps/
 plugins/spn-infra/
 ```
 

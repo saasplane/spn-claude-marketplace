@@ -4,7 +4,7 @@ import { one, done, tree } from "./harness.mjs";
 const SRC = "packages/thing-ts/src/app/UserService.ts";
 const SPEC = "packages/thing-ts/src/app/UserService.spec.ts";
 const server = (kind = "APP_SERVER") => ({
-  "sprepo.json": '{"world":"APPS","stacks":["spn-apps-ts"]}\n',
+  "sprepo.json": '{"world":"APPS","stacks":["spn-apps"]}\n',
   "packages/thing-ts/spkind.json": '{"kind":"' + kind + '","config":null}\n',
 });
 

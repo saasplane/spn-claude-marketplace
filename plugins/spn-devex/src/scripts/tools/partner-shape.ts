@@ -28,7 +28,7 @@ import { isDir, isFile, listdir, read } from "../lib/payload.ts";
 const HERE = resolve(import.meta.dirname);
 
 const FIXTURE: Record<string, string> = {
-  "sprepo.json": '{"world":"APPS","stacks":["spn-devex","spn-apps-ts"]}\n',
+  "sprepo.json": '{"world":"APPS","stacks":["spn-devex","spn-apps"]}\n',
   "spkind.json": '{"kind":"APP_WEB","config":null}\n',
   "CONCEPT.md": "# Partner Platform — Concept\n\n## What this is\n\n" +
     "A partner platform built on SaaS Plane. You read this to learn its shape.\n\n" +
@@ -61,17 +61,17 @@ const SCRIPTS: Array<[plugin: string, script: string, args: string[]]> = [
   // the end of every turn — a crash there would report on work already finished.
   ["spn-devex", "stop.ts", []],
   ["spn-devex", "closed.ts", []],
-  // The `spn-apps-ts` half. Its dispatcher reads its event from stdin and gets none here, so it must
+  // The `spn-apps` half. Its dispatcher reads its event from stdin and gets none here, so it must
   // exit clean; the six checks behind it are swept the way the core tools are.
-  ["spn-apps-ts", "pretooluse.ts", []],
-  ["spn-apps-ts", "coverage.ts", ["--check", "route-e2e", "."]],
-  ["spn-apps-ts", "coverage.ts", ["--check", "spec-restore", "."]],
-  ["spn-apps-ts", "coverage.ts", ["--check", "foreign-double", "."]],
-  ["spn-apps-ts", "enablement-grammar.ts", ["."]],
-  ["spn-apps-ts", "host-assertion.ts", ["."]],
-  ["spn-apps-ts", "read-verb-naming.ts", ["."]],
-  ["spn-apps-ts", "await-sequencing.ts", ["."]],
-  ["spn-apps-ts", "assertion-message.ts", ["."]],
+  ["spn-apps", "pretooluse.ts", []],
+  ["spn-apps", "coverage.ts", ["--check", "route-e2e", "."]],
+  ["spn-apps", "coverage.ts", ["--check", "spec-restore", "."]],
+  ["spn-apps", "coverage.ts", ["--check", "foreign-double", "."]],
+  ["spn-apps", "enablement-grammar.ts", ["."]],
+  ["spn-apps", "host-assertion.ts", ["."]],
+  ["spn-apps", "read-verb-naming.ts", ["."]],
+  ["spn-apps", "await-sequencing.ts", ["."]],
+  ["spn-apps", "assertion-message.ts", ["."]],
 ];
 
 /**
@@ -97,7 +97,7 @@ export function pluginRoot(name: string, folder: string): string | null {
 /**
  * The folder a plugin keeps a given file in — FOUND, never guessed.
  *
- * This was a guess: TypeScript meant `checks/` in `spn-apps-ts` and `docs/` in `spn-devex`, Python
+ * This was a guess: TypeScript meant `checks/` in `spn-apps` and `docs/` in `spn-devex`, Python
  * meant `scripts/`. Two things were wrong with that. It hard-coded one plugin's name into a tool
  * meant to sweep any of them, and it went stale the moment the tree was arranged by nature — a
  * sweep then reported every file as *declared, no file*, which reads exactly like the outage it
@@ -151,7 +151,7 @@ function crashed(stderr: string): boolean {
 export function main(argv: string[]): number {
   // KEEP THE FIXTURE PATH IN ITS OWN NAME. This loop used to reassign `root` to each plugin's scripts
   // directory, so the run happened inside the plugins rather than the fixture, and the delete below
-  // then REMOVED the last plugin's scripts folder. That is how spn-apps-ts lost three scripts in
+  // then REMOVED the last plugin's scripts folder. That is how spn-apps lost three scripts in
   // 88ac5ca — the verifier removed its own test subjects, and the deletion was committed.
   const fixture = mkdtempSync(join(tmpdir(), "partner-shape-"));
   for (const [name, text] of Object.entries(FIXTURE)) writeFileSync(join(fixture, name), text, "utf8");

@@ -134,7 +134,7 @@ const one = compare("exactly one workstream open: the standing offer appears",
   fixture("one-open", {
     "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
     "spn-app-ts/CONCEPT.md": "# concept\n",
-    "spn-app-ts/.claude/settings.json": JSON.stringify({ enabledPlugins: { "spn-devex@saasplane": true, "spn-apps-ts@saasplane": true } }),
+    "spn-app-ts/.claude/settings.json": JSON.stringify({ enabledPlugins: { "spn-devex@saasplane": true, "spn-apps@saasplane": true } }),
     ".spndevex/workstreams/open/042-widget-pricing/arcs/N1-a.md": "# arc\n",
     ".spndevex/workstreams/open/042-widget-pricing/widget-pricing-approach.html": "<html></html>",
     ".spndevex/workstreams/backlog/043-parked/arcs/N1-a.md": "# arc\n",

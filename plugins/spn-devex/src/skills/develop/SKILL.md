@@ -1,6 +1,6 @@
 ---
 name: develop
-description: The contract-first build loop - the order work is done in, what each layer may and may not do, and what must be regenerated before anything is committed. Use when implementing a capability, changing an existing one, or judging whether code sits in the right layer. Stack-agnostic; the stack plugin supplies the per-layer step files and the commands.
+description: The contract-first build loop - the order work is done in, what each layer may and may not do, and what must be regenerated before anything is committed. Use when implementing a capability, changing an existing one, or judging whether code sits in the right layer. Stack-agnostic; the domain plugin supplies the per-layer step files and the commands.
 ---
 
 # develop — contract first, every time

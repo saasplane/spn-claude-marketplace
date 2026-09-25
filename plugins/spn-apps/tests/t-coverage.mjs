@@ -1,7 +1,7 @@
 // `coverage` — route-e2e, spec-restore and foreign-double.
 import { one, done, tree } from "./harness.mjs";
 
-const REPO = { "sprepo.json": '{"world":"APPS","stacks":["spn-apps-ts"]}\n' };
+const REPO = { "sprepo.json": '{"world":"APPS","stacks":["spn-apps"]}\n' };
 const APP = (dir) => ({ [dir + "/spkind.json"]: '{"kind":"APP_SERVER","config":null}\n' });
 const MODULE = (dir) => ({ [dir + "/spkind.json"]: '{"kind":"MODULE_SERVER","config":null}\n' });
 

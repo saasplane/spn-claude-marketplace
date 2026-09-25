@@ -1,4 +1,4 @@
-// The harness the six `spn-apps-ts` ports are tested through.
+// The harness the six `spn-apps` ports are tested through.
 //
 // EVERY CASE RUNS BOTH IMPLEMENTATIONS ON THE SAME EVENT. The Python is the incumbent and the test
 // is parity, so a case states what it expects AND whether the two must agree — a divergence is only

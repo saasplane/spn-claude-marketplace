@@ -1,4 +1,4 @@
-// The spn-apps-ts dispatcher — every refusal and every warning routed through one process.
+// The spn-apps dispatcher — every refusal and every warning routed through one process.
 //
 // THE COMPARISON IS THE CHAIN, NOT A SCRIPT. The incumbent is eight separate hook entries, so the
 // expectation is what the eight TOGETHER would have said: the first deny, or every warning.
@@ -68,7 +68,7 @@ function one(label, { root, input, expect, says }) {
   if (!ok) console.log(`        got: ${reason.slice(0, 260)}`);
 }
 
-const REPO = { "sprepo.json": '{"world":"APPS","stacks":["spn-apps-ts"]}\n' };
+const REPO = { "sprepo.json": '{"world":"APPS","stacks":["spn-apps"]}\n' };
 const APP = { "apps/api/spkind.json": '{"kind":"APP_SERVER","config":null}\n' };
 
 console.log("=== dispatcher — each refusal still arrives");

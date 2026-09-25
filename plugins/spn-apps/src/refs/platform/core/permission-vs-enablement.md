@@ -103,7 +103,7 @@ A module owns a question, or it contributes an option to someone else's. The two
 
 ## What a hook checks, and what it cannot
 
-`spn-apps-ts` carries `hooks/scripts/enablement-grammar.py`. It refuses four shapes at write time:
+`spn-apps` carries `hooks/scripts/enablement-grammar.py`. It refuses four shapes at write time:
 
 | # | Refused |
 | --- | --- |

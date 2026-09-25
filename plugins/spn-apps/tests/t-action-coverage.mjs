@@ -24,7 +24,7 @@ const ok = (label, condition, detail = "") => {
 const tree = (files) => {
   const root = mkdtempSync(join(tmpdir(), "actions-"));
   kept.push(root);
-  const all = { "sprepo.json": '{"world":"APPS","stacks":["spn-apps-ts"]}\n', ...files };
+  const all = { "sprepo.json": '{"world":"APPS","stacks":["spn-apps"]}\n', ...files };
   for (const [path, body] of Object.entries(all)) {
     const full = join(root, path);
     mkdirSync(dirname(full), { recursive: true });

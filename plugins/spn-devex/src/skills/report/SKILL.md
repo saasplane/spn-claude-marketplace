@@ -1,6 +1,6 @@
 ---
 name: report
-description: Produce a report or an approach document into a node's artifacts pocket - a repo audit, a change plan, a surface diff, a traceability matrix, an estate plan, a release note, an incident record, or a drift report. Use when the user asks what a repo looks like today, what a change would touch, what drifted, or asks for the reasoning behind a design to be written up. Never run unasked. Stack-agnostic; the stack plugin supplies the commands each template reads from.
+description: Produce a report or an approach document into a node's artifacts pocket - a repo audit, a change plan, a surface diff, a traceability matrix, an estate plan, a release note, an incident record, or a drift report. Use when the user asks what a repo looks like today, what a change would touch, what drifted, or asks for the reasoning behind a design to be written up. Never run unasked. Stack-agnostic; the domain plugin supplies the commands each template reads from.
 ---
 
 # report — an answer to a question at a moment

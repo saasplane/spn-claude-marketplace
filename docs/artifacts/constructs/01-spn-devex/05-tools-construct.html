@@ -1,0 +1,509 @@
+<meta charset="utf-8">
+<title>The Tool — A Command Run by Its Own Path</title>
+<!-- spn:doc
+{"id":"tools","variant":"construct","title":"The Tool — A Command Run by Its Own Path","lenses":["SERVER_DEV","ARCHITECT"],"status":"PLANNING","dependsOn":["hook-set"],"summary":"Code a plugin ships that nothing wires — invoked by a person, a skill or another tool, answering with graded findings and an exit code, and degrading to silence wherever the input it needs is absent.","keywords":["tool","invoke","finding","grade","exit code","silence"]}
+-->
+<!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
+<style>
+  :root {
+    --paper:#edf0f3; --card:#f7f9fb; --ink:#141920; --slate:#48525f; --faint:#7c8794;
+    --rule:#d2d9e0; --accent:#2f4e7a; --accent-soft:#e0e8f4;
+    --gap:#8f5714; --gap-soft:#f7ecda; --ok:#2a6459; --ok-soft:#dcece8;
+    --ui:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+    --xs:0.76rem; --sm:0.85rem; --md:0.97rem; --lg:1.32rem; --xl:1.62rem; --xxl:2.5rem;
+    --tk-k:#6d3a9c; --tk-s:#2a6459; --tk-c:#7c8794; --tk-t:#2f4e7a; --tk-n:#8f5714; --tk-add:#2a6459; --tk-del:#a63d3d;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){ --paper:#0f1318; --card:#171d24; --ink:#e3e8ee; --slate:#a3adb9; --faint:#6f7986;
+      --rule:#242d37; --accent:#86a9da; --accent-soft:#18232f;
+      --gap:#d59d4f; --gap-soft:#2a2113; --ok:#5db3a4; --ok-soft:#14251f; --tk-k:#c9a3ee; --tk-s:#7fc9b6; --tk-c:#6f7986; --tk-t:#86a9da; --tk-n:#d59d4f; --tk-add:#5db3a4; --tk-del:#e08a8a; }
+  }
+  :root[data-theme="dark"]{ --paper:#0f1318; --card:#171d24; --ink:#e3e8ee; --slate:#a3adb9; --faint:#6f7986;
+    --rule:#242d37; --accent:#86a9da; --accent-soft:#18232f;
+    --gap:#d59d4f; --gap-soft:#2a2113; --ok:#5db3a4; --ok-soft:#14251f; --tk-k:#c9a3ee; --tk-s:#7fc9b6; --tk-c:#6f7986; --tk-t:#86a9da; --tk-n:#d59d4f; --tk-add:#5db3a4; --tk-del:#e08a8a; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--ui);font-size:1rem;line-height:1.6;-webkit-font-smoothing:antialiased}
+  p{margin:0 0 1rem;max-width:58rem}
+  code,.m{font-family:var(--mono);font-size:0.87em}
+  strong{font-weight:600}
+  em{font-style:italic;color:var(--slate)}
+  a{color:var(--accent)}
+  .page{display:grid;grid-template-columns:13rem minmax(0,1fr);gap:3rem;max-width:min(98vw,80rem);margin:0 auto;padding:3rem 8px 6rem;align-items:start}
+  .rail{position:sticky;top:2.5rem;font-family:var(--ui);font-size:var(--xs)}
+  .rail .home{border-left:none;padding-left:0;margin-bottom:.9rem;color:var(--accent);font-weight:650;display:block}
+  .rail .rail-title{letter-spacing:.15em;text-transform:uppercase;color:var(--faint);margin-bottom:.85rem;font-size:.7rem;font-weight:700}
+  .rail a{display:flex;gap:.55rem;text-decoration:none;color:var(--slate);padding:.28rem 0 .28rem .6rem;border-left:2px solid var(--rule);line-height:1.4}
+  .rail a .n{display:none}
+  .rail a.sub{padding-left:1.6rem;font-size:.72rem;color:var(--faint)}
+  .rail a:hover{color:var(--ink)}
+  .rail a.on{color:var(--accent);border-left-color:var(--accent);font-weight:650}
+  .rail .count{margin-left:auto;font-family:var(--mono);font-size:.68rem;background:var(--gap-soft);color:var(--gap);border-radius:2px;padding:0 .3rem}
+  .wrap{display:flex;flex-direction:column;gap:3.25rem;min-width:0}
+  .masthead{display:flex;flex-direction:column;gap:1.1rem}
+  .eyebrow{display:flex;flex-direction:column;gap:.5rem;font-family:var(--ui);font-size:var(--xs);color:var(--faint)}
+  .eyebrow .line{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem .6rem;line-height:1.7}
+  .eyebrow .sep{color:var(--rule);font-weight:300}
+  .eyebrow .line1{letter-spacing:.15em;text-transform:uppercase;font-weight:650;color:var(--faint);line-height:1.7}
+  .eyebrow .lbl{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+  .eyebrow .st{margin-left:auto;display:inline-flex;align-items:center;gap:.4rem}
+  .eyebrow .audience{display:inline-flex;flex-wrap:wrap;align-items:center;gap:.45rem}
+  .badge{display:inline-flex;align-items:center;gap:.35rem;padding:.1rem .6rem;border-radius:999px;border:1px solid var(--rule);background:var(--card);font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--slate);line-height:1.7;white-space:nowrap}
+  .badge.type{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);font-weight:650}
+  .badge.lens{font-family:var(--ui);font-size:.74rem;letter-spacing:0;text-transform:none}
+  .badge.status{font-weight:700}
+  .badge.status.planning{border-color:var(--gap);color:var(--gap);background:var(--gap-soft)}
+  .badge.status.implementing{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+  .badge.status.done{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(18rem,1fr));gap:.8rem;margin:1.6rem 0}
+  .tile{display:flex;flex-direction:column;border:1px solid var(--rule);background:var(--card);border-radius:3px;padding:.85rem 1rem;min-width:0}
+  .tile h4{margin:0 0 .35rem;font-size:var(--md)}
+  .tile h4 a{color:var(--ink);text-decoration:none}
+  .tile h4 a:hover{color:var(--accent)}
+  .tile p{font-size:var(--sm);color:var(--slate);margin:0 0 .6rem;max-width:none;flex:1}
+  .tile .more{font-size:var(--sm);font-weight:600;text-decoration:none;align-self:flex-start}
+  p > .more{font-weight:600;text-decoration:none}
+  h1{font-family:var(--ui);font-size:var(--xxl);font-weight:700;letter-spacing:-.02em;line-height:1.15;text-wrap:balance;margin:0}
+  .standfirst{font-size:var(--lg);line-height:1.5;color:var(--slate);max-width:46rem}
+  .sec-head{display:grid;grid-template-columns:1fr;align-items:baseline;gap:.5rem;border-top:2px solid var(--ink);padding-top:.7rem;margin-bottom:1.1rem}
+  .sec-head .num{font-family:var(--mono);font-size:var(--sm);font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+  h2{font-family:var(--ui);font-size:var(--xl);font-weight:700;letter-spacing:-.01em;text-wrap:balance;margin:0}
+  h3{font-family:var(--ui);font-size:var(--lg);font-weight:600;letter-spacing:-.008em;margin:2rem 0 .6rem}
+  h4{font-family:var(--ui);font-size:var(--md);margin:0 0 .5rem;color:var(--ink)}
+  .scroll{overflow-x:auto;border:1px solid var(--rule);border-radius:3px;background:var(--card);margin:1.6rem 0}
+  table{border-collapse:collapse;width:100%;font-family:var(--ui);font-size:var(--sm);min-width:34rem}
+  .scroll table{table-layout:auto}
+  th{text-align:left;font-family:var(--mono);font-size:var(--xs);letter-spacing:.07em;text-transform:uppercase;color:var(--faint);font-weight:650;padding:.6rem .8rem;border-bottom:1px solid var(--rule)}
+  td{padding:.6rem .8rem;border-bottom:1px solid var(--rule);vertical-align:top;color:var(--slate)}
+  td strong{color:var(--ink)}
+  tr:last-child td{border-bottom:none}
+  .num-cell{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+  .yes{color:var(--ok);font-weight:650}
+  .no{color:var(--gap);font-weight:650}
+  .s{font-family:var(--mono);font-size:var(--xs);color:var(--faint)}
+  pre{background:var(--card);border:1px solid var(--rule);border-radius:3px;padding:.9rem 1.1rem;margin:1.6rem 0;overflow-x:auto;font-family:var(--mono);font-size:var(--sm);line-height:1.55;color:var(--slate);max-width:100%}
+  pre code{font-size:inherit}
+  pre .tk-k{color:var(--tk-k);font-weight:600} pre .tk-s{color:var(--tk-s)} pre .tk-c{color:var(--tk-c);font-style:italic} pre .tk-t{color:var(--tk-t)} pre .tk-n{color:var(--tk-n)} pre .tk-add{color:var(--tk-add)} pre .tk-del{color:var(--tk-del)} pre .tk-cmd{color:var(--tk-t);font-weight:600}
+  /* A FIGURE RUNS EDGE TO EDGE. It takes no padding, border or background of its own: the section
+     already provides the page's padding, and the drawing's own containers are its frame. That is the
+     opposite of a PROSE panel, which carries all three. A figure is also not held to the prose
+     measure — 58rem is for a sentence, and a drawing is not read a line at a time. */
+  /* ONE VERTICAL RHYTHM. A paragraph keeps its 1rem; every block gets 1.6rem above and below, and a
+     figure 2.4rem — it is the largest thing on a page, and it needs the air to read as one unit rather
+     than as something the paragraph above it is still saying. Margins collapse, so the larger wins. */
+  figure{margin:2.4rem 0;padding:0;border:0;background:none}
+  figure svg{display:block;width:auto;max-width:100%;height:auto;margin-inline:auto}
+  figcaption{font-family:var(--ui);font-size:var(--xs);color:var(--faint);margin-top:.5rem;max-width:none}
+  .dg .box{fill:var(--card);stroke:var(--rule);stroke-width:1.5}
+  .dg .box.off{fill:none;stroke:var(--rule);stroke-width:1.5;stroke-dasharray:5 4}
+  .dg .box.warn{fill:var(--gap-soft);stroke:var(--gap);stroke-width:1.5}
+  .dg .box.em{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}
+  .dg .t{font-family:var(--ui);font-size:13px;font-weight:650;fill:var(--ink)}
+  .dg .l{font-family:var(--ui);font-size:12px;fill:var(--ink)}
+  .dg .s{font-family:var(--mono);font-size:11px;fill:var(--slate)}
+  .dg .n{font-family:var(--ui);font-size:11px;fill:var(--faint)}
+  /* The arrowhead is a marker filled with `currentColor`, and a marker resolves that against
+     its own inherited colour rather than the path that references it. With nothing setting
+     `color` on the figure, every connector drew a blue line ending in a black head. Setting it
+     on `.dg` makes the head take the line's colour, and the marker needs no change. */
+  .dg{color:var(--accent)}
+  .dg .c{stroke:var(--accent);stroke-width:1.6;fill:none}
+  .pull{border-left:2px solid var(--accent);background:var(--accent-soft);padding:1rem 1.2rem;margin:1.6rem 0;border-radius:0 3px 3px 0}
+  .pull .label{display:block;font-family:var(--ui);font-size:var(--xs);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.3rem}
+  .pull p{margin:0;max-width:none}
+  .open{background:var(--card);border:1px solid var(--rule);border-left:2px solid var(--gap);border-radius:0 3px 3px 0;padding:1.1rem 1.25rem;margin-bottom:.9rem}
+  .open h4{font-size:var(--md)}
+  .open .k{font-family:var(--mono);font-size:var(--xs);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);display:block;margin:.6rem 0 .2rem}
+  .open p{font-size:var(--sm);color:var(--slate);margin:0 0 .4rem;max-width:none}
+  .open .rec{margin-top:.75rem;padding-top:.65rem;border-top:1px dashed var(--rule);font-size:var(--sm);color:var(--ink)}
+  .open .rec b{color:var(--ok)}
+  .open .scroll{margin:.4rem 0}
+  pre.pv{font-family:var(--mono);font-size:var(--xs);background:var(--card);border:1px solid var(--rule);border-radius:3px;padding:.7rem .9rem;margin:1rem 0;overflow-x:auto;line-height:1.5}
+  footer{border-top:1px solid var(--rule);padding-top:1.3rem;font-family:var(--ui);font-size:var(--xs);color:var(--faint)}
+  @media (max-width:60rem){
+    .page{grid-template-columns:minmax(0,1fr);gap:1.5rem;padding-top:2rem}
+    .rail{position:static;border:1px solid var(--rule);border-radius:3px;background:var(--card);padding:.9rem 1rem}
+    .rail a{border-left:none;padding-left:0}
+    .rail a.on{border-left:none}
+  }
+
+  /* THE OUTLINE HAS TWO LEVELS, AND THEY DIFFER ON THREE AXES — size, weight and colour together.
+     One axis is not enough at rail size: a single step reads as noise rather than as a level, and
+     the two collapse into each other. Nothing in an outline sits on --faint either, because that is
+     the token for text a reader is meant to skim past and an outline is what they navigate by. */
+  .rail a:not(.sub):not(.home){font-size:.88rem;font-weight:400;color:var(--ink);letter-spacing:-.005em}
+  .rail a.sub{font-size:.78rem;font-weight:400;color:var(--slate)}
+  .rail .rail-title{color:var(--slate)}
+
+  /* ONE LEFT EDGE FOR BOTH LEVELS. An indent repeats what the fold already says, and it costs the
+     longer labels a wrapped line. Both are stated in one rule: setting only the subsection's
+     padding leaves it outdented past its own section, because another rule still sets the
+     section's. */
+  .rail a:not(.home), .rail a.sub{padding-left:.6rem}
+
+  /* EVERYTHING ON THE RIGHT SITS ON THE LABEL'S CENTRE LINE. The row is a flex line, and its
+     default is to stretch, so a chevron or a count badge beside a label that wrapped to two lines
+     was pinned to the top of the row rather than level with it. */
+  .rail a{align-items:center}
+  .rail .count{align-self:center}
+
+  /* WEIGHT AND COLOUR MARK WHERE YOU ARE, NEVER WHAT A LEVEL IS. The notch is an inset shadow and
+     not a border: a border changes the box, so a label would jump sideways by the notch's width the
+     moment it became current. These are restated at matching specificity because the level rules
+     above are more specific than `.rail a.on`, and would otherwise strip the selected state. */
+  .rail a.on:not(.sub):not(.home){font-weight:650;color:var(--accent);box-shadow:inset 1.5px 0 0 var(--accent)}
+  .rail a.on.sub{color:var(--accent);box-shadow:inset 1.5px 0 0 var(--accent)}
+  .rail a:not(.sub):not(.home):hover{color:var(--accent)}
+  .rail a.sub:hover{color:var(--ink)}
+
+  /* THE DISCLOSURE IS A CHEVRON, DRAWN RATHER THAN TYPED. A glyph ties the mark to whatever font
+     is resolved and to that font's own idea of weight and baseline; two borders on a rotated box
+     are the same shape at every size and inherit the row's colour. Right means closed, down means
+     open, and only the chevron turns — the box around it stays put so the hit target never moves. */
+  .rail a .caret{margin-left:auto;flex:none;width:1.35rem;height:1.35rem;display:grid;place-items:center;
+    color:var(--faint);border-radius:3px;transform:none}
+  .rail a .caret::before{content:"";width:.32rem;height:.32rem;border-right:1.5px solid currentColor;
+    border-bottom:1.5px solid currentColor;transform:translateX(-.1rem) rotate(-45deg);transition:transform .15s ease}
+  .rail a.group-open .caret{transform:none}
+  .rail a.group-open .caret::before{transform:translateY(-.1rem) rotate(45deg)}
+  .rail a .caret:hover{background:var(--accent-soft);color:var(--accent)}
+  @media (prefers-reduced-motion:reduce){.rail a .caret::before{transition:none}}
+</style>
+<div class="page">
+
+<nav class="rail" id="rail">
+  <a class="home" href="../../../02-constructs/README.md">&larr; the model</a>
+  <div class="rail-title">The Tool — A Command Run by Its Own Path</div>
+</nav>
+<div class="wrap">
+
+<header class="masthead">
+  <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
+  <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; The Tool — A Command Run by Its Own Path</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Construct</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">Backend developer</span><span class="badge lens">Architect</span></span><span class="st"><span class="lbl">Status:</span> <span class="badge status planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>The Tool — A Command Run by Its Own Path</h1>
+  <p class="standfirst">Not every rule is worth asking on every keystroke. Some answers need a whole tree, some need two repositories side by side, and some are wanted only when somebody asks. A tool is how a plugin ships that kind of code: a file nothing wires, invoked by its own path, which reads what it was pointed at and prints what it found.</p>
+</header>
+
+<!-- 00 -->
+<section id="s0">
+  <div class="sec-head"><h2>Overview</h2></div>
+  <p>A tool and a check draw the same line between refusing and reporting, and they draw it in different currency. A check answers one call with a verdict. A tool answers one run with findings, each graded, and an exit code that counts only the refusals.</p>
+</section>
+
+<!-- 01 -->
+<section id="s1">
+  <div class="sec-head"><h2>Terms</h2></div>
+  <div class="scroll"><table>
+    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <tbody>
+      <tr><td>a tool</td><td>—</td><td>a file under a plugin's <code>hooks/tools/</code>, named for what it measures, and wired to no moment</td></tr>
+      <tr><td>a finding</td><td><code>Finding</code></td><td>one thing a run found: which check raised it, its grade, the file, and what a reader should do</td></tr>
+      <tr><td>the grade</td><td><code>Grade</code></td><td>how a finding is weighted, whether a tool raised it or a check running as a sweep did — <code>RULE</code> refuses and <code>SOFT</code> reports</td></tr>
+      <tr><td>the exit code</td><td>—</td><td>the count of refusals; a report alone leaves a run green</td></tr>
+      <tr><td>a job</td><td>—</td><td>one named unit of work inside a tool, such as <code>audit</code>, <code>page</code>, <code>topics</code> or <code>coverage</code></td></tr>
+      <tr><td>silence</td><td>—</td><td>the answer where the input a question needs is absent, which is a fact about the repository rather than a finding about it</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 02 -->
+<section id="s2">
+  <div class="sec-head"><h2>Model</h2></div>
+  <p>Nothing matches a tool against the work you are doing, so you reach one by naming it. A person, a skill or another tool names its path, the tool reads the repository it was pointed at, and you get both a list and a number.</p>
+  <figure>
+  <svg class="dg" viewBox="426 22 248 428" style="max-width:248px" role="img" aria-label="The findings a person reads and the exit code a pipeline reads come from one list, and only the refusals are counted.">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="box" x="428" y="24" width="244" height="76" rx="3"/>
+    <text class="l" x="444" y="50">a person or a skill</text>
+    <text class="n" x="444" y="69">nothing wires a tool; it is</text>
+    <text class="n" x="444" y="88">invoked by its own path</text>
+    <path class="c" d="M550 100 V140" marker-end="url(#ar)"/>
+    <text class="n" x="560" y="124">invokes</text>
+    <rect class="box" x="428" y="140" width="244" height="76" rx="3"/>
+    <text class="l" x="444" y="166">the tool</text>
+    <text class="n" x="444" y="185">a file under hooks/tools/, run</text>
+    <text class="n" x="444" y="204">against a repository</text>
+    <path class="c" d="M550 216 V256" marker-end="url(#ar)"/>
+    <text class="n" x="560" y="240">prints</text>
+    <rect class="box" x="428" y="256" width="244" height="76" rx="3"/>
+    <text class="l" x="444" y="282">the findings</text>
+    <text class="n" x="444" y="301">each graded RULE or SOFT, printed</text>
+    <text class="n" x="444" y="320">one per line</text>
+    <path class="c" d="M550 332 V372" marker-end="url(#ar)"/>
+    <text class="n" x="560" y="356">counted into</text>
+    <rect class="box" x="428" y="372" width="244" height="76" rx="3"/>
+    <text class="l" x="444" y="398">the exit code</text>
+    <text class="n" x="444" y="417">the refusals alone; a report is</text>
+    <text class="n" x="444" y="436">not a failure</text>
+  </svg>
+    <figcaption>The findings a person reads and the exit code a pipeline reads come from one list, and only the refusals are counted.</figcaption>
+  </figure>
+  <!-- dg:source
+{ "kind": "map",
+  "caption": "The findings a person reads and the exit code a pipeline reads come from one list, and only the refusals are counted.",
+  "boxes": [
+    { "id": "a", "label": "a person or a skill", "note": "nothing wires a tool; it is invoked by its own path" },
+    { "id": "b", "label": "the tool", "note": "a file under hooks/tools/, run against a repository" },
+    { "id": "c", "label": "the findings", "note": "each graded RULE or SOFT, printed one per line" },
+    { "id": "d", "label": "the exit code", "note": "the refusals alone; a report is not a failure" }
+  ],
+  "links": [
+    { "from": "a", "to": "b", "label": "invokes" },
+    { "from": "b", "to": "c", "label": "prints" },
+    { "from": "c", "to": "d", "label": "counted into" }
+  ] }
+  -->
+  <p>The exit code is what a pipeline reads and the findings are what a person reads, and the two must agree about which is which. That is the whole reason the grade is part of a finding rather than a judgement made at the end.</p>
+</section>
+
+<!-- 03 -->
+<section id="s3">
+  <div class="sec-head"><h2>Parts</h2></div>
+  <h3 id="one-file-serves-the-write-time-check-and">One file serves the write-time check and the sweep</h3>
+  <p>A rule answered one way while a file is written and another way in a sweep is two rules. So the code that decides lives once, and both callers import it. The practical consequence is that the same file must read a document in both of its spellings — the markdown an author writes and the HTML a page is produced as — because reading only one of them once reported every hand-written page as missing every section it carried. <em>Where:</em> <code>plugins/spn-devex/hooks/tools/docs.ts</code></p>
+  <h3 id="a-job-not-a-flag">A job, not a flag</h3>
+  <p>A tool with more than one job gives each job a name and a path argument, and a path is a file or a folder in every one of them. Given a folder, a job means every document under it, which is what anybody typing one meant. <em>Where:</em> <code>plugins/spn-devex/hooks/tools/docs.ts</code></p>
+  <h3 id="two-questions-that-look-alike-and-are-no">Two questions that look alike and are not</h3>
+  <p>Comparing documents inside one repository and comparing a restatement against a book in another repository are different questions with different inputs, and no repository holds both trees. So they are two tools, and both read one parser, because writing the parser twice would be the defect the instrument exists to catch. <em>Where:</em> <code>plugins/spn-devex/hooks/tools/coherence.ts</code>, <code>plugins/spn-devex/hooks/tools/restate-drift.ts</code></p>
+  <h3 id="silence-where-the-input-is-absent">Silence where the input is absent</h3>
+  <p>A partner holds the plugins and neither the book nor its registers. A question whose input is missing answers with one line and a clean exit, because a crash on a repository the tool was not written for shows a partner a broken agent rather than a missing file. <em>Where:</em> <code>plugins/spn-devex/hooks/tools/restate-drift.ts</code>, <code>plugins/spn-devex/hooks/tools/coherence.ts</code></p>
+  <h3 id="a-tool-that-proves-the-other-tools">A tool that proves the other tools</h3>
+  <p>One tool builds a repository carrying only what a partner has, runs every hook and script against it, and reports. A crash is a failure there; a finding is not, because findings are that repository's own business. It picks an interpreter from each script's own extension, so a ported script is exercised the same way its predecessor was. <em>Where:</em> <code>plugins/spn-devex/hooks/tools/partner-shape.ts</code></p>
+  <h3 id="a-tool-that-reports-candidates-rather-th">A tool that reports candidates rather than verdicts</h3>
+  <p>Handing a whole corpus to a rewriting pass is the expensive way to improve it, and most of the corpus needs no change. So the prose triage reports the paragraphs a pattern can recognise, with a ledger of what it has already scored so a long sweep can resume, and it leaves the faults no pattern can tell from good prose to a reader. <em>Where:</em> <code>plugins/spn-devex/hooks/tools/prose-triage.ts</code></p>
+  <h3 id="a-tool-that-writes-rather-than-reports">A tool that writes rather than reports</h3>
+  <p>One tool here writes. It reads a run's own results file and puts what the run found into the cells a run owns, leaving every other cell exactly as it was. It exists because this repository declares no stack, so no stack runner writes its rows, and only the plugins' own suites know. <em>Where:</em> <code>plugins/spn-devex/hooks/tools/behaviour-status.mjs</code></p>
+</section>
+
+<!-- 04 -->
+<section id="s4">
+  <div class="sec-head"><h2>Boundary</h2></div>
+  <p>This page answers what a tool is, how it is reached, and what it answers with. It does not answer what a hook is or how a verdict is composed — that is <a href="./02-hook-set-construct.html">The Hook</a>. It does not answer the page production either: producing and checking a page is a subject of its own, and the jobs that do it are named on that page.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <tbody>
+      <tr><td>that a tool is invoked by its own path, grades its findings, and counts only refusals into its exit code</td><td>code wired to a moment, and the verdict shape it returns</td><td><a href="./02-hook-set-construct.html">The Hook</a> · <a href="./03-loop-events-construct.html">Loop Events</a></td></tr>
+      <tr><td>that a question with no input answers with silence rather than a crash</td><td>what a produced page is, and how a figure is drawn and checked</td><td><a href="./06-pages-construct.html">The Page</a></td></tr>
+      <tr><td>the stack-agnostic tools</td><td>a tool that reads one stack's own declarations or registers</td><td><a href="../02-spn-apps/02-stack-tools-construct.html">Stack Tools</a></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 05 -->
+<section id="s5">
+  <div class="sec-head"><h2>Binds</h2></div>
+  <div class="scroll"><table>
+    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <tbody>
+      <tr><td><code>RD.DEVEX.019</code></td><td>a tool restates a chapter and adds no rule of its own</td><td>MUST</td></tr>
+      <tr><td><code>RD.GOV.024</code></td><td>this repository is served with docs commands alone, which is why its own rows are written by a tool the plugins ship</td><td>MUST</td></tr>
+      <tr><td>the foundation's <code>02-delivery.md</code> § What it makes checkable</td><td>which standards a tool is expected to answer rather than a reader</td><td>MUST</td></tr>
+    </tbody>
+  </table></div>
+  <div class="scroll"><table>
+    <thead><tr><th>Repo</th><th>Node</th><th>What it realizes</th><th>State</th></tr></thead>
+    <tbody>
+      <tr><td>spn-foundation</td><td><code>01-devex/02-agent/04-plugins</code></td><td>the foundation construct this one realizes</td><td>planned</td></tr>
+      <tr><td>spn-claude-marketplace</td><td><code>spn-devex</code></td><td>the stack-agnostic tools — the corpus audit, the corpus against itself, the drift comparison, the partner proof, the prose triage and this repository's own row writer</td><td>planned</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 06 -->
+<section id="s6">
+  <div class="sec-head"><h2>Proof</h2></div>
+  <p><em>Behaviours: joined from the register, <code>03-behaviors/01-spn-devex/05-tools.md</code> — never typed in the seat file.</em></p>
+  <div class="scroll"><table>
+    <thead><tr><th>Row</th><th>Does</th><th>Tier</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td><code>MKT.TOOL.01</code></td><td>get the same answer from a rule at write time and in a sweep</td><td>UNIT</td><td>PLANNED</td></tr>
+      <tr><td><code>MKT.TOOL.02</code></td><td>hand a job a folder wherever it would take a file</td><td>UNIT</td><td>PLANNED</td></tr>
+      <tr><td><code>MKT.TOOL.03</code></td><td>run a tool in a repository holding no book at all</td><td>UNIT</td><td>PLANNED</td></tr>
+      <tr><td><code>MKT.TOOL.04</code></td><td>read a run as a list and a pipeline read it as a number</td><td>UNIT</td><td>PLANNED</td></tr>
+      <tr><td><code>MKT.TOOL.05</code></td><td>prove every hook still works in a repository carrying only the plugins</td><td>UNIT</td><td>PLANNED</td></tr>
+      <tr><td><code>MKT.TOOL.06</code></td><td>get the paragraphs worth a rewrite rather than a whole corpus</td><td>UNIT</td><td>PLANNED</td></tr>
+      <tr><td><code>MKT.TOOL.07</code></td><td>have this repository's own rows written from its own suites</td><td>UNIT</td><td>PLANNED</td></tr>
+    </tbody>
+  </table></div>
+  <div class="scroll"><table>
+    <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
+    <tbody>
+      <tr><td><code>node plugins/spn-devex/hooks/tools/partner-shape.ts</code></td><td>gate</td><td>every tool runs against a repository holding nothing but the plugin, and answers with silence where its input is absent</td></tr>
+      <tr><td><code>node plugins/spn-devex/hooks/tools/coherence.ts</code></td><td>gate</td><td>no two documents in this repository state opposite rules, and every stamped restatement still reads as its chapter does</td></tr>
+    </tbody>
+  </table></div>
+  <p>Try it: <code>node plugins/spn-devex/hooks/tools/coherence.ts</code></p>
+</section>
+
+<footer>
+  A template from workstream 008 &middot; copy it, keep the comments until the page is written, then delete them &middot; the rules live in the book; this file repeats them so you never write from memory &middot; every block and figure is shown once in <code>blocks-template.html</code>
+</footer>
+
+</div>
+</div>
+
+<script>
+(function(){
+  var rail=document.getElementById('rail');if(!rail)return;
+  var secs=Array.prototype.slice.call(document.querySelectorAll('section[id]'));
+  var links=[];
+  secs.forEach(function(s){
+    var num=s.querySelector('.sec-head .num'),h2=s.querySelector('h2');if(!h2)return;
+    var a=document.createElement('a');a.href='#'+s.id;
+    var n=document.createElement('span');n.className='n';n.textContent=num?num.textContent:'';
+    var t=document.createElement('span');t.textContent=h2.textContent.split(' — ')[0];
+    a.appendChild(n);a.appendChild(t);
+    if(s.id==='s4'){var c=s.querySelectorAll('.open').length;if(c){var b=document.createElement('span');b.className='count';b.textContent=c;a.appendChild(b);}}
+    rail.appendChild(a);links.push({el:a,sec:s});
+    Array.prototype.forEach.call(s.querySelectorAll('h3[id]'),function(h){
+      var sa=document.createElement('a');sa.href='#'+h.id;sa.className='sub';sa.textContent=h.textContent;rail.appendChild(sa);
+    });
+  });
+  function mark(){var y=window.scrollY+120,cur=links[0];links.forEach(function(l){if(l.sec.offsetTop<=y)cur=l;});links.forEach(function(l){l.el.classList.toggle('on',l===cur);});}
+  window.addEventListener('scroll',mark,{passive:true});mark();
+})();
+</script>
+
+<style>
+/* anchor links: a section or subsection title carries a link to itself — small, grey, set off from the title; copied on click */
+a.anchor{display:inline-block;margin-left:.6em;font-family:var(--mono);font-size:.55em;font-weight:400;line-height:1;color:var(--slate,#6b7280);text-decoration:none;opacity:.35;transition:opacity .15s;vertical-align:middle;position:relative;top:-.1em}
+.sec-head:hover a.anchor,h3[id]:hover a.anchor,a.anchor:hover,a.anchor:focus,a.anchor.copied{opacity:1}
+a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7d4a);margin-left:.3em}
+</style>
+
+<style>
+  .rail .sub-group{display:block}
+  .rail.js .sub-group{display:none}
+  .rail.js .sub-group.shown{display:block}
+  .rail a .caret:hover{background:var(--accent-soft);color:var(--accent)}
+  .rail a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+
+<style>
+  /* a quote is a sentence set apart — a rule stated in full, or a line from the source the page is about */
+  blockquote{margin:1.6rem 0;padding:.2rem 0 .2rem 1.1rem;border-left:2px solid var(--rule);color:var(--slate)}
+  blockquote p{margin:0;max-width:none}
+  .tile .s{margin-top:.45rem}
+  /* PROSE — the markdown block. Its own border, background and text colour, so a passage of ordinary
+     markdown reads as a block the page chose rather than as the page's own voice continuing. */
+  .prose{border:1px solid var(--rule);background:var(--card);color:var(--slate);border-radius:3px;
+    padding:1.1rem 1.3rem;margin:1.6rem 0}
+  .prose > :first-child{margin-top:0}
+  .prose > :last-child{margin-bottom:0}
+  .prose p,.prose li{max-width:none}
+  .prose strong,.prose h4{color:var(--ink)}
+  .prose code{color:var(--ink)}
+  .prose blockquote{border-left-color:var(--accent);margin:1rem 0}
+  /* NEXT — small on purpose: a title and a direction, nothing else */
+  .nextnav{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.7rem;margin:1.6rem 0}
+  .nextnav-card{display:flex;flex-direction:column;gap:.15rem;border:1px solid var(--rule);background:var(--card);
+    border-radius:3px;padding:.65rem .85rem;text-decoration:none;min-width:0}
+  .nextnav-card:hover{border-color:var(--accent)}
+  .nextnav-card .dir{font-family:var(--mono);font-size:var(--xs);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
+  .nextnav-card .ttl{font-size:var(--sm);font-weight:600;color:var(--ink)}
+  .nextnav-card:hover .ttl{color:var(--accent)}
+  .nextnav-card.next{text-align:right}
+</style>
+
+<script>
+(function(){
+  var rail = document.getElementById('rail-list') || document.getElementById('rail');
+  if (!rail || rail.querySelector('.sub-group')) return;
+  var styled = document.getElementById('rail') || rail;
+
+  /* The caret and the group are one state with two faces. Writing both here is what stops the
+     caret claiming a section is open while its subsections are hidden. */
+  function setOpen(anchor, group, open){
+    group.classList.toggle('shown', open);
+    anchor.classList.toggle('group-open', open);
+    anchor.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+
+  /* Regroup whatever the page's own builder produced: a section anchor, then the `sub` anchors
+     that follow it, moved into one collapsing group. */
+  var entries = [], current = null;
+  Array.prototype.slice.call(rail.children).forEach(function(node){
+    if (node.tagName !== 'A' || node.classList.contains('home')) return;
+    if (node.classList.contains('sub')) {
+      if (!current) return;
+      if (!current.group) {
+        current.group = document.createElement('div');
+        current.group.className = 'sub-group';
+        rail.insertBefore(current.group, node);
+      }
+      current.group.appendChild(node);
+      return;
+    }
+    current = { anchor: node, group: null };
+    entries.push(current);
+  });
+
+  entries.forEach(function(entry){
+    if (!entry.group) return;                     // a section with no second level never folds
+    var anchor = entry.anchor, group = entry.group;
+    anchor.classList.add('has-subs');
+    var caret = document.createElement('span');
+    caret.className = 'caret';
+    caret.setAttribute('role', 'button');
+    caret.setAttribute('tabindex', '-1');
+    caret.setAttribute('aria-label', 'Show sections under ' + anchor.textContent.trim());
+    anchor.appendChild(caret);
+    /* The caret toggles without leaving the page; the label still navigates. Hit-testing the
+       element beats measuring offsetX, which broke the moment the caret moved to the right. */
+    anchor.addEventListener('click', function(event){
+      if (event.target !== caret) return;
+      event.preventDefault();
+      /* `pinned` means a reader decided, so the scroll must stop overriding them. */
+      anchor.dataset.pinned = '1';
+      setOpen(anchor, group, !group.classList.contains('shown'));
+    });
+    setOpen(anchor, group, false);
+  });
+
+  /* THE RAIL FOLLOWS THE SCROLL. The page's own builder already marks the current entry with
+     `on`, so this watches that mark rather than measuring offsets a second time — two answers to
+     where the reader is would disagree the first time either changed. */
+  function follow(){
+    entries.forEach(function(entry){
+      if (!entry.group || entry.anchor.dataset.pinned === '1') return;
+      var here = entry.anchor.classList.contains('on') || !!entry.group.querySelector('a.on');
+      setOpen(entry.anchor, entry.group, here);
+    });
+  }
+  new MutationObserver(follow).observe(rail, {subtree: true, attributes: true,
+                                              attributeFilter: ['class']});
+  /* Last, because everything above degrades to the full index when no script runs. */
+  styled.classList.add('js');
+  follow();
+})();
+</script>
+
+<script>
+/* Every section (h2 inside .sec-head) and every subsection (h3 with an id) gets an anchor link.
+   Clicking it moves the address to that heading and copies the full link, so a subsection can be shared. */
+(function(){
+  function pageBase(){
+    var ref=document.referrer||'';
+    if(window.top!==window&&ref.indexOf('/artifact/')>-1)return ref.split('#')[0];
+    return location.href.split('#')[0];
+  }
+  function attach(h,id){
+    if(!id||h.querySelector('a.anchor'))return;
+    var a=document.createElement('a');a.className='anchor';a.href='#'+id;a.textContent='#';a.title='Copy link to this heading';a.setAttribute('aria-label','Copy link to '+h.textContent.trim());
+    a.addEventListener('click',function(ev){
+      var url=pageBase()+'#'+id;
+      try{history.replaceState(null,'',location.pathname+location.search+'#'+id);}catch(e){}
+      var done=function(){a.classList.add('copied');setTimeout(function(){a.classList.remove('copied');},1400);};
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(done,done);}else{done();}
+      var target=document.getElementById(id);if(target){ev.preventDefault();target.scrollIntoView({block:'start'});}
+    });
+    h.appendChild(a);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('section[id]'),function(s){
+    var h2=s.querySelector('.sec-head h2');if(!h2)return;
+    if(!h2.id)h2.id=s.id+'-title';
+    attach(h2,s.id);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('h3[id]'),function(h){attach(h,h.id);});
+})();
+</script>

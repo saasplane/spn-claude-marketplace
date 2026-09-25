@@ -413,7 +413,7 @@
             <td>the stack-agnostic plugin, loaded by every repository whatever world it
             declares</td>
             <td>all five kinds — plugins, hooks, skills, refs and agents</td></tr>
-        <tr><td><strong><code>spn-apps-ts</code></strong></td>
+        <tr><td><strong><code>spn-apps</code></strong></td>
             <td>the TypeScript stack plugin</td>
             <td>checks, tools, skills and refs, each true of that stack and nowhere else</td></tr>
         <tr><td><strong><code>spn-infra</code></strong></td>
@@ -426,7 +426,7 @@
   <p>The risk in dividing by delivery is that somebody with a general question has to guess which
   plugin answers it. <strong>It does not arise, because a grammar shared by all three lives in
   <code>spn-devex</code> and the stack plugins restate none of it.</strong> The same hook grammar
-  governs a check here and a check in <code>spn-apps-ts</code>, so <em>what a hook is</em> has one
+  governs a check here and a check in <code>spn-apps</code>, so <em>what a hook is</em> has one
   answer in one place — <code>spn-devex</code>'s hook set. A stack plugin's chapter says what its
   own checks decide, never what a check is.</p>
 
@@ -478,7 +478,7 @@
       its root that tells a runtime which plugins exist and where each one sits</td></tr>
     <tr><td><strong>a plugin</strong></td><td>one delivery unit — a manifest and a folder tree —
       holding any of the five instrument kinds. Three are shipped:
-      <code>spn-devex</code>, <code>spn-apps-ts</code>, <code>spn-infra</code></td></tr>
+      <code>spn-devex</code>, <code>spn-apps</code>, <code>spn-infra</code></td></tr>
     <tr><td><strong>an instrument</strong></td><td>the house word for anything this repository
       delivers to a session: a hook, a tool, a skill, a ref, a lens or an agent brief</td></tr>
     <tr><td><strong>a hook</strong></td><td>code the runtime calls for you at a named moment of

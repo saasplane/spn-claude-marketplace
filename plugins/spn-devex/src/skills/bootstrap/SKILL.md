@@ -46,7 +46,7 @@ Two repositories come out of this, and the estate one comes first. It carries a 
 | 10 | Its concept, then its projects | the `ideate` skill, then `apps scaffold <kind>` | The concept decides which kinds exist. Scaffolding first is deciding by accident |
 | 11 | The provider keys | — you name them, they fill `~/.spnenv` | The provider registry fails fast at boot when a type or key is missing. A walk that ends in a running stack cannot defer this |
 | 12 | Bring the estate up | `spnutils infra organization up`, then `infra platform up` | The platform layer reads what the organization layer wrote |
-| 13 | Run the stack, and say what they should see | the stack plugin's run skill | This is the acceptance. Day zero ends on a platform that answers, not on a filled arc |
+| 13 | Run the stack, and say what they should see | the domain plugin's run skill | This is the acceptance. Day zero ends on a platform that answers, not on a filled arc |
 | 14 | Close the workstream | — move the folder to `closed/` | Both repositories exist and the concept is agreed, so the folder is a receipt |
 
 - **Act 6 is where day zero used to stop.** A partner's first repository is an estate repo, it carries no `package.json`, and that is precisely the case the wiring command refused. If you meet that refusal, say so plainly and name it as the known blocker rather than working around it by hand.
@@ -277,7 +277,7 @@ spnutils infra platform up
 
 ## Act 13 — run it, and say what they should see
 
-**Act 13 is the acceptance the whole walk exists for.** Hand the run to the stack plugin's run skill, which owns how a platform of that stack starts.
+**Act 13 is the acceptance the whole walk exists for.** Hand the run to the domain plugin's run skill, which owns how a platform of that stack starts.
 
 Then say, in plain words, what they are looking at:
 

@@ -36,26 +36,26 @@ domain, with a subsection here and one folder of the same name in every *What* s
 | Domain | Ships | Instruments it carries |
 | --- | --- | --- |
 | **`spn-devex`** | the stack-agnostic plugin, loaded by every repository | all five kinds — plugins, hooks, skills, refs and agents |
-| **`spn-apps-ts`** | the TypeScript stack plugin | checks, tools, skills and refs, each true of that stack and nowhere else |
+| **`spn-apps`** | the apps domain, stack-agnostic with its stacks inside it | the model an application is built from, the platform a partner adopts, the rules a change must obey, and a parser per stack under `providers/` |
 | **`spn-infra`** | the estate plugin | one guard, plus the skills and refs that change an estate |
 
 ### spn-devex
 
 **The stack-agnostic plugin, and the one every repository loads.** It holds what is true of every plugin: what an instrument of each of the five kinds is, the events a hook may run on, the grades it may return, and how the set a workspace loads is derived from that workspace's own claim.
 
-**A grammar shared by all three lives here, and the stack plugins restate none of it.**
-The same hook grammar governs a check here and one in `spn-apps-ts`, so a question about *what a
-hook is* has one answer and one place: `spn-devex`'s hook set. A stack plugin's chapter says what its
+**A grammar shared by all three lives here, and the domain plugins restate none of it.**
+The same hook grammar governs a check here and one in `spn-apps`, so a question about *what a
+hook is* has one answer and one place: `spn-devex`'s hook set. A domain plugin's chapter says what its
 own checks decide, never what a check is.
 
 **That is what keeps the division by plugin from splitting a concept in three.** The risk in
 dividing by delivery is that a reader with a general question has to guess which plugin answers it.
-It does not arise, because the general answer is never in a stack plugin — it is in the one every
+It does not arise, because the general answer is never in a domain plugin — it is in the one every
 repository loads.
 
-### spn-apps-ts
+### spn-apps
 
-**The TypeScript stack plugin.** It holds what only a stack can say: a check whose rule is true of one stack and nowhere else, a tool over that stack's own register, and
+**The TypeScript domain plugin.** It holds what only a stack can say: a check whose rule is true of one stack and nowhere else, a tool over that stack's own register, and
 the skills that can only be said in its own words. **A skill that is stack-agnostic stays in
 `spn-devex` and reaches a concrete step through a ref here**, rather than being copied.
 
@@ -110,7 +110,7 @@ implementation belongs here.
 - **The Lens — One Reviewing Viewpoint, Written Down** — One engineering function's judgment stated as a file — what it checks, the one condition it may block on, everything below that which it can only advise, and why the same values also name the audience a document declares.
 - **The Agent — A Persona a Session Can Convene** — A named persona a session can call mid-turn — the frontmatter that decides when it answers, the authority its own file grants it, the difference between a fixed voice and one parameterized by a viewpoint, and where the permission to write actually comes from.
 
-**spn-apps-ts**
+**spn-apps**
 
 - **Stack Checks — A Stack's Own Rules at Write Time** — A check whose rule is true of one stack and nowhere else — read against the source as the pending write would leave it, asking whether this edit introduces the pattern, and refusing only where the model behind the rule is settled.
 - **Stack Tools — Commands Over a Stack's Own Register** — A tool that reads or writes one stack's own declarations — the register found by its header rather than by a path, the two cells a run owns against the cells a person decides, and coverage measured against published actions rather than routes.

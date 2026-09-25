@@ -19,7 +19,7 @@
 | Construct | Realized by |
 | --- | --- |
 | Plugin · Hook · Loop Events · Checks · Tools · Pages · Skill · Ref · Lenses · Agent | [spn-devex](../../01-spn-devex/spn-devex/README.md) |
-| Stack Checks · Stack Tools · Stack Skills · Stack Refs | [spn-apps-ts](../../02-spn-apps-ts/spn-apps-ts/README.md) |
+| Stack Checks · Stack Tools · Stack Skills · Stack Refs | [spn-apps](../../02-spn-apps/spn-apps/README.md) |
 
 Source folders: `hooks/hooks.json` and `hooks/scripts/` for Estate Guard · `skills/` for Estate Skills · `refs/` for Estate Refs. This plugin has no `hooks/checks/`, no `hooks/lib/`, no `hooks/tools/` and no `hooks/tests/`; `.claude-plugin/plugin.json` belongs to the Plugin chapter in `spn-devex`.
 

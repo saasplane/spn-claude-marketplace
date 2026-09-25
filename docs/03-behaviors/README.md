@@ -26,5 +26,5 @@ One file of rows sits beside each construct, at the same relative path and the s
 | Domain | What it promises |
 | --- | --- |
 | [spn-devex](01-spn-devex/README.md) | The plugin every repository loads, and everything a session reads from it |
-| [spn-apps-ts](02-spn-apps-ts/README.md) | The apps world made concrete for TypeScript |
+| [spn-apps](02-spn-apps/README.md) | The apps world made concrete for TypeScript |
 | [spn-infra](03-spn-infra/README.md) | The estate world, and the boundary none of its skills crosses |

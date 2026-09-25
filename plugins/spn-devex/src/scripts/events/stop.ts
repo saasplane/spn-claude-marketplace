@@ -379,7 +379,7 @@ export function checkHandover(reply: string, root: string): Warning[] {
   // a note about: a check reading the process's directory went silent whenever the hook ran anywhere
   // but the workspace root, which is most of the time.
   let wiring = "";
-  try { wiring = cacheState(root, ["spn-devex", "spn-apps-ts", "spn-infra"]); } catch { wiring = ""; }
+  try { wiring = cacheState(root, ["spn-devex", "spn-apps", "spn-infra"]); } catch { wiring = ""; }
   if (wiring.startsWith("cache stale")) {
     return [{ check: "handover", message:
       `This reply passes work on while the plugin source is ahead of what is installed — ${wiring}. ` +
