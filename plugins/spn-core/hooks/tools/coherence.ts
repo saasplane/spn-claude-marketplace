@@ -16,6 +16,7 @@
 //   CARDINALITY  does prose write a count into a set that is free to grow
 //   HUB          does the readable face expand every section its concept states
 //   RESTATES     does a file still say what the chapter it restates says
+//   CITATION     does every `RD.<AREA>.<NNN>` cited anywhere resolve to a row that exists
 //
 // NONE OF THEM ASKS WHETHER A ROW'S RULING IS TRUE of the documents it governs, and that is the
 // question worth most. It needs a row to name the surfaces stating it, which `06-registers.md` now
@@ -314,11 +315,63 @@ function restatementDrift(root: string): string[] {
   return [out];
 }
 
+/**
+ * CITATION — does every decision id cited in this repository resolve to a row?
+ *
+ * **A citation to a row that does not exist is the one register failure a reader cannot work
+ * around.** Every other finding here leaves a reader with two answers to choose between. This one
+ * leaves them with none, and it is silent: `RD.APPS.020` reads exactly like a row that exists until
+ * somebody opens the register and searches for it.
+ *
+ * It is cheap because both halves are already on disk — the cited ids and the rows are in the same
+ * tree. `N76` found two ids that had dangled since before that arc, and nothing had ever asked.
+ *
+ * SOFT WHILE THE COUNT IS ABOVE ZERO. A gate that is red on the day it ships is one nobody reads,
+ * which is this corpus's own argument arriving as a constraint (see `checks/corpus.ts`). It joins
+ * the wired set on the day it is silent on a clean corpus.
+ *
+ * WHAT IT DELIBERATELY DOES NOT READ: a workstream folder. An arc log cites the row that governed
+ * an act when the act happened, and a row removed later does not make that log wrong — it makes it
+ * history. Rewriting it would state something that never happened.
+ */
+function citations(root: string): string[] {
+  const register = join(root, "docs/registers/decisions.md");
+  const registerText = read(register);
+  if (!registerText) return [];                    // no register here — not this repo's question
+  const rows = new Set<string>();
+  for (const line of registerText.split("\n")) {
+    const row = /^\|\s*(RD\.[A-Z]+\.\d+)\s*\|/.exec(line);
+    if (row) rows.add(row[1]);
+  }
+  if (!rows.size) return [];
+
+  const dangling = new Map<string, string[]>();
+  for (const path of sourcesOf(root)) {
+    const text = read(join(root, path));
+    for (const hit of text.matchAll(/RD\.[A-Z]+\.\d{3}/g)) {
+      const id = hit[0];
+      if (rows.has(id)) continue;
+      const where = dangling.get(id) ?? [];
+      if (!where.includes(path)) where.push(path);
+      dangling.set(id, where);
+    }
+  }
+  if (!dangling.size) return [];
+  let out = `CITATION    ${dangling.size} decision id(s) cited here resolve to no row.`;
+  out += "\n            A citation with no row answers nothing and says so to nobody:";
+  for (const [id, where] of [...dangling].slice(0, 8))
+    out += `\n              ${id} — cited in ${where.slice(0, 3).join(", ")}` +
+           (where.length > 3 ? ` and ${where.length - 3} more` : "");
+  if (dangling.size > 8) out += `\n              … and ${dangling.size - 8} more`;
+  return [out];
+}
+
 export function main(root: string): number {
   const sources = sourcesOf(root);
   const findings = [
     ...vocabulary(root, sources), ...rulings(root), ...ownership(root, sources),
     ...cardinality(root, sources), ...hub(root), ...restatementDrift(root),
+    ...citations(root),
   ];
   for (const finding of findings) { console.log(finding); console.log(); }
   const kinds = new Map<string, number>();
