@@ -337,7 +337,7 @@ console.log("\n=== every example in the blocks reference actually draws");
   // than no example: it is a wrong answer with the authority of a reference behind it. Q135 asked
   // for a drift gate on this file, and this is it — the examples are executed, not proof-read.
   const { readFileSync, existsSync } = await import("node:fs");
-  const here = new URL("../src/refs/blocks.md", import.meta.url);
+  const here = new URL("../src/refs/devex/workspace/docs/blocks.md", import.meta.url);
   // A missing reference FAILS a case; it does not throw. A suite that crashes reports one word to
   // the runner and loses every case after it, which is how a gate stops being one.
   one("the blocks reference is where the plugin ships it", existsSync(here), true);

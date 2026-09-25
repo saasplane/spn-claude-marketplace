@@ -32,7 +32,10 @@ const BOOK_TEMPLATES = "docs/04-capabilities/01-devex/04-workspace/04-docs/templ
 
 const HERE = dirname(new URL(import.meta.url).pathname);
 const PLUGIN = resolve(HERE, "..", "..");
-const OUT = join(PLUGIN, "templates");
+// THE COPY SITS BESIDE THE REF THAT NAMES IT. `doc-sets.md` carries the `files` citation for this
+// folder, so a drift check reads one directory rather than two — the citation and the thing cited
+// are siblings (RD.DOCS.091).
+const OUT = join(PLUGIN, "refs", "devex", "workspace", "docs", "templates");
 const INDEX = join(OUT, "README.md");
 /** The book's own generated index, beside the templates it lists. */
 const BOOK_INDEX = "index.md";
@@ -92,7 +95,11 @@ function renderBookIndex(book: string, names: string[]): string {
  * the book holds; the STAMP is the folder.
  */
 function renderIndex(book: string, names: string[]): string {
-  const chapters = [{ path: BOOK_TEMPLATES, seen: treeHash(join(book, BOOK_TEMPLATES)) }];
+  // A TEMPLATE IS COPIED, NEVER REWRITTEN, so the citation kind is `files` and not `docs`
+  // (RD.DOCS.091). A `docs` entry means the agent restates the source in its own words; a `files`
+  // entry means the copy is byte-identical, which is the whole value of a template — what a
+  // partner copies from is what the book ships.
+  const files = [{ path: `spn-foundation/${BOOK_TEMPLATES}`, seen: treeHash(join(book, BOOK_TEMPLATES)) }];
   const groups = new Map<string, string[]>();
   for (const name of names) {
     const [group, file] = name.split("/");
@@ -102,7 +109,7 @@ function renderIndex(book: string, names: string[]): string {
     `| \`${group}/\` | ${files.map((f) => `[\`${f}\`](${group}/${f})`).join(" · ")} |`);
   return [
     "<!-- spn:restates",
-    JSON.stringify({ chapters }, null, 2),
+    JSON.stringify({ files }, null, 2),
     "-->",
     "# The templates, as a partner has them",
     "",

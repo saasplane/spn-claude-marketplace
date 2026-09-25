@@ -15,6 +15,20 @@ const HOOKS = resolve(import.meta.dirname, "..");
 export const SCRIPTS = resolve(HOOKS, "scripts");
 export const CHECKS = resolve(HOOKS, "src", "scripts", "checks");
 
+// CHECKS ARE FILED BY SUBJECT — `contract/`, `src/`, `tests/` — because a rule belongs with the
+// thing it rules on. A case names the check and not its folder, so the folder is FOUND rather than
+// typed: a check that moves between subjects then breaks no test, and a case stays about the rule.
+const SUBJECTS = ["contract", "src", "tests"];
+export const checkPath = (script) => {
+  for (const subject of SUBJECTS) {
+    const candidate = resolve(CHECKS, subject, `${script}.ts`);
+    if (existsSync(candidate)) return candidate;
+  }
+  // Reported as the path a reader would have expected, so the failure names the missing file
+  // rather than an empty string.
+  return resolve(CHECKS, `${script}.ts`);
+};
+
 // THE PARITY ARM IS THE INCUMBENT, AND THE INCUMBENT IS GOING AWAY. Until the plugin reinstall
 // deletes `hooks/scripts/`, every case runs both implementations and requires them to agree. After
 // that the Python is not there to run, and each case still asserts what the port itself must decide
@@ -77,7 +91,7 @@ export function one(label, { script, args = [], root, input, expect, says, parit
   const payload = { tool_name: input.content !== undefined ? "Write" : "Edit", tool_input: input, cwd: root };
   const parityRuns = parity && hasPython(script);
   const py = parityRuns ? once("python3", [`${SCRIPTS}/${script}.py`, ...args, "--stdin"], payload, root) : "";
-  const ts = once("node", [`${CHECKS}/${script}.ts`, ...args, "--stdin"], payload, root);
+  const ts = once("node", [checkPath(script), ...args, "--stdin"], payload, root);
   const tsSaid = decision(ts), pySaid = decision(py);
   const saysOk = !says || reason(ts).includes(says);
   const ok = tsSaid === expect && saysOk && (!parityRuns || tsSaid === pySaid);

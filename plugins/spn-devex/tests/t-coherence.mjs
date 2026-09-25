@@ -21,7 +21,7 @@ import { mkdirSync, writeFileSync, mkdtempSync, rmSync, renameSync } from "node:
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 
-const TOOL = join(resolve(import.meta.dirname, ".."), "tools", "coherence.ts");
+const TOOL = join(resolve(import.meta.dirname, ".."), "src", "scripts", "tools", "coherence.ts");
 const BASE = mkdtempSync(join(tmpdir(), "t-coherence-"));
 process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
 
