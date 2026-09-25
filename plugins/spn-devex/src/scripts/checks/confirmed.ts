@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: spn-devex/refs/workstream-loop.md S3 — execution is confirmed, never assumed.
+// RESTATES: spn-devex/src/refs/devex/workspace/workstream.md S3 — execution is confirmed, never assumed.
 // The ref is the source of truth. A rule change is edited there first, then here, in the same change.
 //
 // WHAT IT CATCHES. A session reads an open workstream, understands the plan, and starts editing a
@@ -99,7 +99,7 @@ export function checkConfirmed(payload: Payload): Verdict {
         `Execution is confirmed rather than assumed: show the plan, ask, and write the ` +
         `answer down as a log line in the arc, opening \`- **<date> — go.**\`. A go held only ` +
         `in the conversation ends with the window, and the next session cannot tell a plan ` +
-        `from an agreement (refs/workstream-loop.md, S3).`,
+        `from an agreement (refs/devex/workspace/workstream.md, S3).`,
     };
   } catch {
     return null;                                    // never fail a gate over a warning

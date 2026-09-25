@@ -1,7 +1,10 @@
 #!/usr/bin/env node
-// RESTATES: the `N71` tree — `refs/<domain>/<group>/<construct>.md` against
-// `docs/<seat>/<NN-domain>/<NN-group>/<NN-chapter>.md`, numbers dropped. The arc is the source of
-// truth for the shape; this file only measures against it.
+// RESTATES: the `N71` tree. The arc is the source of truth for the shape; this file only measures
+// against it.
+//
+// The shape it measures: a ref sits at domain, then group, then a file named for a construct, and
+// the book's matching chapter sits at seat, then numbered domain, then numbered group, then a
+// numbered chapter. The numbers drop, because the book is read in order and a ref is looked up.
 //
 // What a plugin's refs cover, and what they do not.
 //
