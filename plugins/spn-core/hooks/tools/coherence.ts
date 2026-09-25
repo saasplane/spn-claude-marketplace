@@ -150,7 +150,7 @@ const BURIED = /\*\*([^*]{25,}?[.!?])\*\*/g;
  *
  * The register has a `Why` column, so the decision column carries no reasoning and no second answer.
  * A row that holds two rulings is two rows: the one a reader meets first is the one they act on, and
- * the other is invisible until somebody reads the whole cell. `RD.SAAS.035` carried a MUST two
+ * the other is invisible until somebody reads the whole cell. `RD.PLATFORM.035` carried a MUST two
  * hundred words in, which is the case this was written for.
  *
  * BOLD IS ORDINARY EMPHASIS IN A ROW, so its absence proves nothing and is not checked. What is

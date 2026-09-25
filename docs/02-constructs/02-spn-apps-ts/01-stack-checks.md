@@ -95,7 +95,7 @@ This page answers what makes a check belong to a stack rather than to every repo
 | Rule | What it decides | Weight |
 | --- | --- | --- |
 | `RD.DEVEX.019` | a check restates a chapter of the provider standard and adds no rule of its own | MUST |
-| `RD.SAAS.033` | the enablement grammar the refusals in this folder are written against | MUST |
+| `RD.PLATFORM.033` | the enablement grammar the refusals in this folder are written against | MUST |
 | the foundation's `02-delivery.md` § When an edit becomes behaviour | a check is a hook script, so an edit here is live on its next run | MUST |
 
 | Repo | Node | What it realizes | State |

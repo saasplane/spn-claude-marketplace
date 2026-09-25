@@ -549,7 +549,7 @@ A **governing node** carries `registers/` and keeps its decisions there. One row
 
 ```text
 RD.GOV     the node's own shape — principals, outline, standards placement, the register
-RD.SAAS    the platform model — tenancy, access, surfaces, service domains, trust
+RD.PLATFORM    the platform model — tenancy, access, surfaces, service domains, trust
 RD.APPS    kinds, structure, layers, the generated surface, proof, delivery
 RD.INFRA   the estate, and the stage chain it serves
 RD.DEVEX   stages, instruments, the Agent, the plugins
