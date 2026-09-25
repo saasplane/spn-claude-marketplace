@@ -2,9 +2,8 @@
 {
   "docs": [
     { "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md", "seen": "af7a9e28" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md", "seen": "0e0f8610" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md", "seen": "3d6943e5" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "a548541e" }
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md", "seen": "fb03d3b7" },
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "109a3f51" }
   ]
 }
 -->
@@ -14,7 +13,7 @@ How a session decides what to do: the states a workstream moves through, what ea
 it moves on, and the order anything unreviewed is taken in. Stack-agnostic. Source of truth: the
 foundation's `02-constructs/01-devex/04-workspace/02-workstream.md` and
 `04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md` for the workstream itself, and
-`01-workspace/01-workspace.md` and `04-docs/05-artifacts.md` for where it sits and what it writes.
+`04-docs/05-artifacts.md` for what it writes.
 
 ## The four inputs a session opens on
 

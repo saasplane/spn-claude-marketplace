@@ -1,10 +1,10 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/README.md", "seen": "96f660d6" },
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/README.md", "seen": "02580b4c" },
     { "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md", "seen": "013ca3c9" },
     { "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/07-deliver.md", "seen": "c401922d" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md", "seen": "5e08fcd6" }
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md", "seen": "f82f7ddd" }
   ],
   "decisions": [
     "RD.APPS.121",

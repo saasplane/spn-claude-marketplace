@@ -1,4 +1,4 @@
-<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md § The arc · § An arc is named for the cycle it pays
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The arc · § An arc is named for the cycle it pays · § A step names every surface the change reaches, and how you would know
      This file carries rules it does not own. The chapter above is the source of truth.
      A rule change is edited there first, then here, in the same change. Never add a rule here.
      restate-drift.ts reports this copy when its source moves. -->
@@ -26,10 +26,29 @@ Repos: {{repo}} · {{repo}} — {{in what order, and why}}
 ## What done means
 {{One paragraph: the observable state, and the command or check that shows it.}} An arc runs to this in one window unless a card blocks it; a milestone is reported between steps and never ends the turn while a row is runnable.
 
+## What this change reaches
+<!-- Name every surface before you name a step. A rename, an outline change, a contract change and a
+     new rule each reach a fixed set of surfaces — the chapter § A step names every surface the change
+     reaches lists them per kind. Delete the rows that do not apply; never delete the section. -->
+
+| Surface | This arc | Why it is reached |
+| --- | --- | --- |
+| Construct chapters | `{{repo}} → {{path}}` | {{…}} |
+| Behaviour rows | `{{repo}} → {{path}}` | {{…}} |
+| Capability chapters | `{{repo}} → {{path}}` | {{…}} |
+| Register rows | `{{ids}}` | {{…}} |
+| Source | `{{repo}} → {{path}}` | {{…}} |
+| Generated | `{{what regenerates, and by which command}}` | {{…}} |
+| Restatements | `{{the refs and templates that cite any of the above}}` | {{…}} |
+
 ## Steps
+<!-- How you would know is a COMMAND or a COUNT, never a sentence. A check whose subject is the file
+     the step just wrote proves the write, not the rule — name a gate that had a reason to fail. -->
+
 | # | What | Where | How you would know it works |
 | --- | --- | --- | --- |
-| 1 | {{…}} | `{{repo · path}}` | {{the observable result}} |
+| 1 | {{…}} | `{{repo · path}}` | `{{the command}}` → {{the count or exit code}} |
+| {{n}} | **Re-run what the earlier steps moved** | — | {{every gate above, green in one pass at the end}} |
 
 ## Before you write LANDED
 {{The approach page is current: every row this arc owns reads landed, carried or deferred; every card it answered

@@ -3,7 +3,7 @@
   "docs": [
     { "path": "spn-foundation/docs/02-constructs/01-devex/01-function/01-bootstrap.md", "seen": "98d7690f" },
     { "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/01-bootstrap.md", "seen": "af018421" },
-    { "path": "spn-foundation/docs/05-guides/README.md", "seen": "9c97f7cb" }
+    { "path": "spn-foundation/docs/05-guides/README.md", "seen": "3c40a6ac" }
   ]
 }
 -->

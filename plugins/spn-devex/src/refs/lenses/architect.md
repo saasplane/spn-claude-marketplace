@@ -3,7 +3,7 @@
   "docs": [
     { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/01-shape/README.md", "seen": "719d5b19" },
     { "path": "spn-foundation/docs/02-constructs/README.md", "seen": "a78978da" },
-    { "path": "spn-foundation/docs/04-capabilities/03-platform/README.md", "seen": "c6aa51b8" },
+    { "path": "spn-foundation/docs/04-capabilities/03-platform/README.md", "seen": "f1d3635c" },
     { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/README.md", "seen": "dda0a97e" }
   ]
 }

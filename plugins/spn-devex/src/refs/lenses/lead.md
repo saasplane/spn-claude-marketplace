@@ -1,9 +1,9 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/README.md", "seen": "37d477d7" },
+    { "path": "spn-foundation/docs/04-capabilities/README.md", "seen": "6367c3b9" },
     { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md", "seen": "8c2210a7" },
-    { "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/03-surfaces/03-service-namespaces.md", "seen": "f6829f2b" },
+    { "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/03-surfaces/03-service-namespaces.md", "seen": "b2fd0357" },
     { "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md", "seen": "013ca3c9" }
   ],
   "decisions": [

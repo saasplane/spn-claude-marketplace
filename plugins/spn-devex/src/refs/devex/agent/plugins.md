@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/04-plugins.md", "seen": "6ee4e4c7" },
+    { "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/04-plugins.md", "seen": "f8f9cb42" },
     { "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md", "seen": "cb521b23" }
   ]
 }
@@ -107,9 +107,13 @@ Plugins are named `spn-devex` plus `spn-<domain>`, mirroring the providers tree,
 | `spn-apps` | the apps domain, TypeScript instance | the stack commands, the build-loop step files, the TypeScript standards restated, and the write-time checks specific to that stack |
 | `spn-infra` | the estate, every provider | the estate commands, the manifest and layer references, the estate laws, and the hook that refuses secrets, account identifiers and hand edits to built output |
 
-**Apps earns one plugin per stack; infra earns exactly one.** Writing TypeScript and writing Python are different acts, so an agent needs different instructions for each. Authoring an estate declaration is the same act on every cloud, because the declaration is provider-agnostic. A new cloud is therefore a blueprint library and a provider folder — with no plugin and no skill of its own.
+**There are three plugins, one per domain, and the set is closed.** `spn-devex` installs in every repository. `spn-apps` acts on the nodes an apps repository declares. `spn-infra` acts on the estate.
 
-**A stack or a cloud is a folder inside the plugin that owns its domain (`refs/providers/<name>/`), never a plugin of its own.** There is no `spn-apps-ts` and no `spn-core` — the domain is the plugin, and the stack or provider is a folder beneath it.
+**A stack or a cloud is a folder inside the plugin that owns its domain — `refs/providers/<name>/` and `scripts/providers/<name>/` — never a plugin of its own.** The domain is the plugin, and the stack or provider is a folder beneath it.
+
+**The reason is that a domain's rules are the stable half and a stack's spelling is the volatile half.** Writing TypeScript and writing Python are different acts, so each needs its own parser and its own steps — but the rule they are checking is the same rule, and stating it once means a second stack joins by adding a folder rather than by copying a plugin. Authoring an estate declaration is the same act on every cloud, because the declaration is provider-agnostic, so a new cloud is a blueprint library and a provider folder with no skill of its own.
+
+**A plugin per stack would put one rule in as many homes as there are stacks**, and the copies drift one at a time — which is the defect the whole restatement discipline exists to stop.
 
 ## The listing, the manifest, and what a version means
 

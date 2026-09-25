@@ -2,10 +2,10 @@
 {
   "docs": [
     { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/README.md", "seen": "13d462c3" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "a548541e" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md", "seen": "db625a2f" },
-    { "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md", "seen": "9809bc2b" },
-    { "path": "spn-foundation/CONCEPT.md", "seen": "924bf289" }
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "109a3f51" },
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md", "seen": "bda7cb58" },
+    { "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md", "seen": "99b6ef71" },
+    { "path": "spn-foundation/CONCEPT.md", "seen": "38ad5523" }
   ]
 }
 -->
@@ -292,6 +292,12 @@ The pocket holds what the node **authors** rather than derives, and its three au
 | **Boundary** | in plain prose: what this page does not answer, where that is answered, and when you go there | an edge stated before the reader has seen the shape |
 | **Binds** | two tables: the rules that hold it, and where it lives today | a rule repeated; a state typed anywhere else |
 | **Proof** | the checks a person can run — or nothing | a behaviour row typed by hand |
+
+**A term appears in exactly one `Terms` table in a repository — MUST.** One source means one source per *term*, not per table, so the same word defined in two constructs is two sources whichever is read first.
+
+**The owner is decided by the contract, never by reading order and never by which chapter reaches the word first.** The construct whose own contract declares the type owns the term; every other chapter that needs it points at that construct rather than repeating a definition that will drift.
+
+**Nothing new is needed to carry the pointer, because `Boundary` already does** — it is the section that says what this page does not answer and where that is answered.
 
 **The three sections that carry the argument divide by question** — `Overview` answers why, `Model` answers what, and `Parts` carries the detail of that what, one subsection per piece the `Model` named. **`Terms` comes second because the `Model` uses those words and the `Overview` does not**, and **`Boundary` comes after the parts** because a reader can judge an edge only once they have seen the shape. **The opening above the first heading is a standfirst and a summary, and nothing else**: measured across a workspace, 117 of 117 constructs opened with prose no outline named and no check read, so the orientation stays there and everything that argues moves into `Overview`. `Relations` is retired: the metadata block's `dependsOn` already carries what it listed, one way and machine-readable, and a section restating a declared field is a second copy that drifts.
 

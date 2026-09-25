@@ -74,5 +74,5 @@ one("a repository with no register reports nothing", !run(noRegister).includes("
 const partial = tree("partial", "# A page\n\nThis mentions RD.GOV.1 and RD.GOV.001.\n");
 one("a short id is not read as a citation", !run(partial).includes("CITATION"));
 
-console.log(failed ? `t-coherence: ${failed} of ${n} failed` : `t-coherence: ${n} passed`);
+console.log(failed ? `${failed} of ${n} failed` : `all ${n} passed — coherence`);
 process.exit(failed ? 1 : 0);
