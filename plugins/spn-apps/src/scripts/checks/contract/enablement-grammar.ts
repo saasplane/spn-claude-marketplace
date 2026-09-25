@@ -315,10 +315,8 @@ export function check(path: string, source: string): Finding[] {
 // ---------------------------------------------------------------- the hook
 
 /** The verdict for one write, or null. Called alone and by the dispatcher. */
-export function run(input: ToolInput): Verdict {
-  const path = input.file_path ?? "";
-  if (!path.endsWith(".ts") || !watched(path)) return null;
-  const [source, added] = resultingText(input, path);
+/** The verdict for one write, given text that has ALREADY been parsed by the subject's validator. */
+export function verdict(path: string, source: string | null, added: string | null): Verdict {
   if (source === null) return null;
   let found: Finding[];
   try {
@@ -331,6 +329,14 @@ export function run(input: ToolInput): Verdict {
   for (const item of found) lines.push(`  [${item.rule}] ${item.message}`);
   lines.push(`  ${REF}`);
   return { deny: lines.join("\n") };
+}
+
+/** The verdict for one write, parsed here. Called alone; the dispatcher goes through a subject. */
+export function run(input: ToolInput): Verdict {
+  const path = input.file_path ?? "";
+  if (!path.endsWith(".ts") || !watched(path)) return null;
+  const [source, added] = resultingText(input, path);
+  return verdict(path, source, added);
 }
 
 export function scan(paths: string[]): number {

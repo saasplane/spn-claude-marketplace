@@ -30,53 +30,21 @@
 // IT NEVER TAKES THE CHAIN DOWN. A check that throws is skipped, not fatal. A gate that crashes the
 // PreToolUse chain removes every other gate with it, which is worse than any single miss.
 
-import type { Payload, ToolInput, Verdict } from "../lib/payload.ts";
+import type { Payload, Verdict } from "../lib/payload.ts";
 import { begin, span, end as endTiming } from "../lib/timing.ts";
 import { emit, payload } from "../lib/payload.ts";
-import { CHECKS as COVERAGE_CHECKS, run as runCoverage } from "../checks/tests/coverage.ts";
-import { run as runEnablementGrammar, watched as watchedEnablement } from "../checks/contract/enablement-grammar.ts";
-import { run as runHostAssertion } from "../checks/tests/host-assertion.ts";
-import { run as runReadVerbNaming, watched as watchedReadVerb } from "../checks/contract/read-verb-naming.ts";
-import { run as runAwaitSequencing, watched as watchedAwait } from "../checks/src/await-sequencing.ts";
-import { run as runAssertionMessage, watched as watchedAssertion } from "../checks/tests/assertion-message.ts";
-
-type Check = {
-  name: string;
-  run: (input: ToolInput) => Verdict;
-  /** What this check could possibly have an opinion about, from the path alone. */
-  applies: (path: string) => boolean;
-};
-
-const CODE = [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"];
-const isCode = (path: string) => CODE.some((extension) => path.endsWith(extension));
-
-// Cheapest first: a path test before a file read, a file read before a repository walk. The three
-// `coverage` checks come last because `route-e2e` reads a whole test tree to answer.
-const CHECKS: Check[] = [
-  { name: "read-verb-naming", run: runReadVerbNaming, applies: watchedReadVerb },
-  { name: "await-sequencing", run: runAwaitSequencing, applies: watchedAwait },
-  { name: "assertion-message", run: runAssertionMessage, applies: watchedAssertion },
-  { name: "enablement-grammar", run: runEnablementGrammar, applies: (path) => path.endsWith(".ts") && watchedEnablement(path) },
-  { name: "host-assertion", run: runHostAssertion, applies: isCode },
-  ...Object.keys(COVERAGE_CHECKS).map((name) => ({
-    name: `coverage.${name}`,
-    run: (input: ToolInput) => runCoverage(name, input),
-    applies: isCode,
-  })),
-];
+import { SUBJECTS } from "../checks/subjects.ts";
 
 export function dispatch(event: Payload, span: <T>(name: string, fn: () => T) => T): Verdict {
   const supplied = event.tool_input ?? {};
-  if (!supplied.file_path) return null;            // every check here reads a path
-  const path = supplied.file_path;
+  if (!supplied.file_path) return null;            // every rule here reads a path
   const notes: string[] = [];
-  for (const check of CHECKS) {
-    let applies = false;
-    try { applies = check.applies(path); } catch { continue; }
-    if (!applies) continue;
+  for (const subject of SUBJECTS) {
     let verdict: Verdict = null;
-    try { verdict = span(check.name, () => check.run(supplied)); }
-    catch { continue; }                             // a check that throws is skipped, never fatal
+    // A SUBJECT THAT THROWS IS SKIPPED, NEVER FATAL. A gate that crashes the PreToolUse chain
+    // removes every other gate with it, which is worse than any single miss.
+    try { verdict = span(subject.name, () => subject.validate(supplied)); }
+    catch { continue; }
     if (!verdict) continue;
     if (verdict.deny) return verdict;               // the first refusal is the answer
     if (verdict.note) notes.push(verdict.note);

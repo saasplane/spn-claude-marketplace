@@ -312,23 +312,15 @@ export const CHECKS: Record<string, Check> = {
 };
 
 /** The verdict for one write under one named check, or null. Called alone and by the dispatcher. */
-export function run(name: string, input: ToolInput): Verdict {
+/**
+ * The verdict for one write, given text that has ALREADY been parsed.
+ *
+ * **THE PARSE IS THE PROVIDER'S AND THE RULE IS THE DOMAIN'S.** The subject's validator reads the
+ * resulting text once and hands it to every rule that applies.
+ */
+export function verdict(name: string, path: string, source: string | null, added: string | null): Verdict {
   const check = CHECKS[name];
   if (!check) return null;
-  const path = input.file_path ?? "";
-  if (!CODE.some((extension) => path.endsWith(extension))) return null;
-  const normalized = resolve(path).split("\\").join("/");
-  // A PLUGIN'S OWN HOOKS ARE EXEMPT, WHATEVER FOLDER THEY SIT IN. Naming the folders one by
-  // one is how F14 happened: `checks/` was added and `scripts/` was not removed, and the
-  // incumbent then refused the very port that replaced it. The rule is about `hooks/`.
-  if (normalized.includes("/hooks/")) return null;
-  let source: string | null;
-  let added: string | null;
-  try {
-    [source, added] = resultingText(input, path);
-  } catch {
-    source = added = input.content ?? input.new_string ?? null;
-  }
   if (source === null) return null;
   let found: string[];
   try {
@@ -340,6 +332,30 @@ export function run(name: string, input: ToolInput): Verdict {
   const message = `${check.title} — ${basename(path)}:\n` +
     found.map((item) => `  - ${item}`).join("\n") + `\n  ${check.remedy}`;
   return { note: message };
+}
+
+/** The verdict for one write, parsed here. Called alone; the dispatcher goes through a subject. */
+export function run(name: string, input: ToolInput): Verdict {
+  if (!CHECKS[name]) return null;
+  const path = input.file_path ?? "";
+  if (!watched(path)) return null;
+  let source: string | null;
+  let added: string | null;
+  try {
+    [source, added] = resultingText(input, path);
+  } catch {
+    source = added = input.content ?? input.new_string ?? null;
+  }
+  return verdict(name, path, source, added);
+}
+
+/** Whether this subject's parser should bother reading the file at all. */
+export function watched(path: string): boolean {
+  if (!CODE.some((extension) => path.endsWith(extension))) return false;
+  // A PLUGIN'S OWN HOOKS ARE EXEMPT, WHATEVER FOLDER THEY SIT IN. Naming the folders one by one
+  // is how F14 happened: `checks/` was added and `scripts/` was not removed, and the incumbent
+  // then refused the very port that replaced it. The rule is about `hooks/`.
+  return !resolve(path).split("\\").join("/").includes("/hooks/");
 }
 
 export function scan(name: string, paths: string[]): number {

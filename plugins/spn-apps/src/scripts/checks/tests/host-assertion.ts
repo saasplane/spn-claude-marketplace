@@ -160,24 +160,21 @@ export function check(source: string): Finding[] {
 }
 
 /** The verdict for one write, or null. Called alone and by the dispatcher. */
-export function run(input: ToolInput): Verdict {
-  const path = input.file_path ?? "";
-  if (!CODE.some((extension) => path.endsWith(extension))) return null;
-  const normalized = resolve(path).split("\\").join("/");
-  // A HOOK'S OWN SOURCE QUOTES THE PATTERN IT BANS. `checks/` joins `scripts/` here: the port moved
-  // these files, and the incumbent's exemption named only the old folder — so the Python refused
-  // this very file being written. Finding F14 in the N2 arc.
-  // A PLUGIN'S OWN HOOKS ARE EXEMPT, WHATEVER FOLDER THEY SIT IN. Naming the folders one by
-  // one is how F14 happened: `checks/` was added and `scripts/` was not removed, and the
-  // incumbent then refused the very port that replaced it. The rule is about `hooks/`.
-  if (normalized.includes("/hooks/")) return null;
-  let source: string | null;
-  let added: string | null;
-  try {
-    [source, added] = resultingText(input, path);
-  } catch {
-    source = added = input.content ?? input.new_string ?? null;
-  }
+/**
+ * Whether this file could carry a navigation assertion at all.
+ *
+ * **A HOOK'S OWN SOURCE QUOTES THE PATTERN IT BANS**, so a plugin's own hooks are exempt whatever
+ * folder they sit in. Naming the folders one by one is how F14 happened: `checks/` was added,
+ * `scripts/` was not removed, and the incumbent refused the very port that replaced it. The rule
+ * is about `hooks/`.
+ */
+export function watched(path: string): boolean {
+  if (!CODE.some((extension) => path.endsWith(extension))) return false;
+  return !resolve(path).split("\\").join("/").includes("/hooks/");
+}
+
+/** The verdict for one write, given text that has ALREADY been parsed by the subject's validator. */
+export function verdict(path: string, source: string | null, added: string | null): Verdict {
   if (source === null) return null;
   let found: Finding[];
   try {
@@ -193,6 +190,20 @@ export function run(input: ToolInput): Verdict {
   lines.push("  A pattern with no anchor matches inside a query string, so a provider page " +
     "carrying your redirect_uri passes the check. " + REF);
   return { deny: lines.join("\n"), headline: lines[0] };
+}
+
+/** The verdict for one write, parsed here. Called alone; the dispatcher goes through a subject. */
+export function run(input: ToolInput): Verdict {
+  const path = input.file_path ?? "";
+  if (!watched(path)) return null;
+  let source: string | null;
+  let added: string | null;
+  try {
+    [source, added] = resultingText(input, path);
+  } catch {
+    source = added = input.content ?? input.new_string ?? null;
+  }
+  return verdict(path, source, added);
 }
 
 export function scan(paths: string[]): number {

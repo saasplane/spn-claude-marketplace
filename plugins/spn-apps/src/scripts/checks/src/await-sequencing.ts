@@ -90,16 +90,15 @@ export function findings(source: string, added: string | null): string[] {
 }
 
 /** The verdict for one write, or null. Called alone and by the dispatcher. */
-export function run(input: ToolInput): Verdict {
-  const path = input.file_path ?? "";
-  if (!watched(path)) return null;
-  let source: string | null;
-  let added: string | null;
-  try {
-    [source, added] = resultingText(input, path);
-  } catch {
-    source = added = input.content ?? input.new_string ?? null;
-  }
+/**
+ * The verdict for one write, given text that has ALREADY been parsed.
+ *
+ * **THE PARSE IS THE PROVIDER'S AND THE RULE IS THE DOMAIN'S.** A subject's validator reads the
+ * resulting text once and hands it to every rule that applies. Six rules each calling
+ * `resultingText` read and masked the same file six times at write time, which is where a person
+ * is waiting.
+ */
+export function verdict(path: string, source: string | null, added: string | null): Verdict {
   if (source === null) return null;
   let found: string[];
   try {
@@ -112,6 +111,20 @@ export function run(input: ToolInput): Verdict {
   for (const item of found) lines.push(`  - ${item}`);
   lines.push(`  ${REMEDY}`);
   return { deny: lines.join("\n"), headline: lines[0] };
+}
+
+/** The verdict for one write, parsed here. Called alone; the dispatcher goes through a subject. */
+export function run(input: ToolInput): Verdict {
+  const path = input.file_path ?? "";
+  if (!watched(path)) return null;
+  let source: string | null;
+  let added: string | null;
+  try {
+    [source, added] = resultingText(input, path);
+  } catch {
+    source = added = input.content ?? input.new_string ?? null;
+  }
+  return verdict(path, source, added);
 }
 
 export function scan(paths: string[]): number {

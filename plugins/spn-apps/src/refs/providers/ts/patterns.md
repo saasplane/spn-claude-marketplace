@@ -4,7 +4,7 @@
     { "path": "spn-foundation/providers/apps/ts/07-codegen.md", "seen": "014e1711" },
     { "path": "spn-foundation/providers/apps/ts/08-toolchain.md", "seen": "f594929e" },
     { "path": "spn-foundation/providers/apps/ts/11-tests.md", "seen": "d946b6af" },
-    { "path": "spn-foundation/providers/apps/ts/04-errors-logging.md", "seen": "e38919d0" },
+    { "path": "spn-foundation/providers/apps/ts/04-errors-logging.md", "seen": "61a77347" },
     { "path": "spn-foundation/providers/apps/ts/10-web-patterns.md", "seen": "4782098e" }
   ]
 }
