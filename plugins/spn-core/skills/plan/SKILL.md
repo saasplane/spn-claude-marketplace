@@ -35,7 +35,7 @@ material*, never the skill, so resolve the node and load its layers before apply
 3. **Where a layer disagrees with this file, the more specific layer wins** — it is closer to the
    node. Where a layer disagrees with the book, the book wins and the layer is regenerated.
 
-**There is no per-domain `plan` skill, and adding one is a defect** — the book's `SPSkillType` is
+**There is no per-domain `plan` skill, and adding one is a defect** — the book's `SPDevExAgentSkillType` is
 closed, and a folder whose derived value (`{DOMAIN}_{SKILL}`) is not in it fails conformance.
 
 ## Step 0 — classify the nature of the work

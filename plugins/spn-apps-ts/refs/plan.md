@@ -12,7 +12,7 @@
 # Planning in an APPS · TS node — the layer the `plan` skill loads
 
 **Read this as reference material, not a skill.** The skill is `DEVEX_PLAN`, and it lives once, in
-`spn-core`. There is no `APPS_PLAN` — the book's `SPSkillType` is closed and does not carry one
+`spn-core`. There is no `APPS_PLAN` — the book's `SPDevExAgentSkillType` is closed and does not carry one
 (devex README § Skills and plugins). The `plan` skill resolves the node's world and stack claim
 from the nearest `sprepo.json`, then loads this file for the APPS · TS specifics below.
 
@@ -104,7 +104,7 @@ in the **spn-core** plugin carries the shape in full; audit against exactly this
   RD.DOCS.013), so a document may exist before the thing it describes. **The icon is the rendering
   and the word is the value.** A document's own status is `SPDocStatusType` — `DONE` ·
   `IMPLEMENTING` · `PLANNING` — in its `spn:doc` block. A behaviour row's status is
-  `SPBehaviourStatusType` — `PLANNED` 🔮 · `PENDING` ⏳ · `SUCCESS` ✅ · `FAILED` ❌ · `MANUAL` 👤 —
+  `SPDocBehaviourStatusType` — `PLANNED` 🔮 · `PENDING` ⏳ · `SUCCESS` ✅ · `FAILED` ❌ · `MANUAL` 👤 —
   written `PLANNED` by hand at birth and by the agent from a run thereafter. Fix any status that
   lets a plan read as fact, and never hand-write a `SUCCESS`. Where a document and the code
   disagree, the document is **not** automatically the stale one: work out which is wrong and record

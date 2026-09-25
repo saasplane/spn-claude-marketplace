@@ -666,10 +666,10 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
   <h3 id="b-code">CODE &mdash; one block per language the renderer colours</h3>
   <p>{{Tag every block with its language. An untagged block is never coloured, and the colouring is added when the page is produced &mdash; these samples are the real output, not hand-written spans.}}</p>
   <p class="s">ts &mdash; a contract as it is declared, a comment per member</p>
-  <pre data-lang="ts"><span class="tk-k">export</span> <span class="tk-k">interface</span> <span class="tk-t">SPSchemaRepo</span> {
-  <span class="tk-k">type</span>: <span class="tk-t">SPSchemaRepoType</span>;   <span class="tk-c">// the world, and the whole of what a tool dispatches on</span>
+  <pre data-lang="ts"><span class="tk-k">export</span> <span class="tk-k">interface</span> <span class="tk-t">SPRepo</span> {
+  <span class="tk-k">type</span>: <span class="tk-t">SPRepoType</span>;   <span class="tk-c">// the world, and the whole of what a tool dispatches on</span>
   name: <span class="tk-t">CDTString</span>;          <span class="tk-c">// what a person calls this repository</span>
-  config: <span class="tk-t">SPSchemaRepoConfig</span> | <span class="tk-k">null</span>;
+  config: <span class="tk-t">SPRepoConfig</span> | <span class="tk-k">null</span>;
 }</pre>
   <p class="s">json &mdash; a manifest, with real values</p>
   <pre data-lang="json">{
