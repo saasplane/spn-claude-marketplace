@@ -3,7 +3,7 @@
 //
 // The construct: an enablement answers ONE question about one organization TYPE — what is this type
 // offered. A permission answers what a PERSON may do. The full reasoning, the placement rule and the
-// three traps this estate actually hit are in `refs/permission-vs-enablement.md` in the **spn-devex**
+// three traps this estate actually hit are named in the permission-versus-enablement rule
 // plugin. This checks only the part a check CAN check.
 //
 // Four rules, each named in its own denial:
@@ -54,7 +54,11 @@ const GENERIC = new Set(["CUSTOMIZATION", "MANAGEMENT", "CONFIG", "SETTINGS", "O
 
 const COMMENT = "\x01";
 
-const REF = "See refs/permission-vs-enablement.md in the spn-devex plugin " +
+// NAME THE RULE, NEVER ANOTHER PLUGIN'S FILE. A path into a sibling plugin breaks the day either
+// one is rearranged, and the agent has both loaded anyway — it needs the rule's name, not its
+// address.
+const REF = "A permission is what a caller may do; an enablement is what an organization has " +
+  "turned on. A gate that reads an enablement to decide authority has confused the two " +
   "(decisions RD.PLATFORM.033 · RD.PLATFORM.034).";
 
 export type Region = [number, number];

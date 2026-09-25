@@ -1,5 +1,5 @@
 // The event a check is handed, the verdict it gives back, and the two functions that carry each
-// across the process boundary. Named as `spn-devex/hooks/lib/payload.ts` names the same job, so a
+// across the process boundary. Every plugin carrying hooks has its own `payload.ts` under the same name, so a
 // reader who has learned one plugin has learned both.
 //
 // WHY A VERDICT IS A RETURN VALUE. A check that prints its refusal and exits can have that refusal

@@ -9,7 +9,7 @@ Pick the mode (`code` | `contract`); a change that touched `contract/states/**` 
 
 ## Mode: contract
 
-Apply the **spn-devex** plugin's `refs/contract-rules.md` (cross-plugin pointer — spn-devex ships alongside this plugin from the `saasplane` marketplace; use its review card as the checklist). The short form:
+Apply `refs/support/apps/module-changes.md`, in this plugin — the change gate, as a review card. The short form:
 
 - One Command in, one State out; commands forward-compatible + idempotent; auth context never in the body; states backward-compatible; events immutable/past-tense/append-only; enums additive.
 - Commands carry the caller's inputs only — never the entity's stored `Config` carrier; variant input = `mtype`-discriminated command variants; a client stubbing `maskedX: ''` / `provider: ''` means the command shape is wrong. Constructed family literals are annotated with the **variant** type, never the base.

@@ -11,7 +11,7 @@
 
 # Planning in an APPS · TS node — the layer the `plan` skill loads
 
-**Read this as reference material, not a skill.** The skill is `DEVEX_PLAN`, and it lives once, in
+**Read this as reference material, not a skill.** The skill is `DEVEX_IDEATE`, and it lives once, in
 `spn-devex`. There is no `APPS_PLAN` — the book's `SPDevExAgentSkillType` is closed and does not carry one
 (devex README § Skills and plugins). The `plan` skill resolves the node's world and stack claim
 from the nearest `sprepo.json`, then loads this file for the APPS · TS specifics below.

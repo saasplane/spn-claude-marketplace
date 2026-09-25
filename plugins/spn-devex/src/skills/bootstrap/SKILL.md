@@ -1,9 +1,9 @@
 ---
-name: day-zero
+name: bootstrap
 description: Walk an empty folder to a platform running locally - the door first, then the workspace, then a workstream that holds the estate answers, then the acts that make the estate repo, wire it, scaffold and release its packages, create the platform repo with its concept, name the provider keys the partner fills, bring both estate layers up and run the stack. Asks the identity, legal, hosting, cloud, owner, region, archetype, domain, stack and twin coordinates one at a time, and derives the tiers, the surfaces and both repository names rather than asking for them. Use when the workspace holds no sprepo.json at all, when someone is starting a new organization or platform from nothing, or when the session orientation reports day-0 mode. Interactive by design - you ask, they answer, and no act runs on an answer nobody gave. Stack-agnostic.
 ---
 
-# day-zero — an empty folder becomes two repositories
+# bootstrap — an empty folder becomes a working workspace
 
 Scan the workspace root, find no `sprepo.json` anywhere, and you are on day zero. You have no code to pattern-match against, and that is the condition this walk is written for. What you do have is the standards, the published packages, and the shape every platform here already takes.
 
@@ -311,7 +311,7 @@ Two cheap signals carry most of this. Whether `CONCEPT.md` exists separates rung
 
 One more signal shapes your tone rather than your offer. Count the folders in `.spndevex/workstreams/closed/` and you know whether this workspace has finished anything before. An empty archive means explain more; a full one means get out of the way.
 
-**A day-zero walk left half-finished is read from the same ground.** An `open/{NNN}-new-platform` folder means somebody started this before. Read its arc, see which rows carry answers, and resume from the first one that does not — never from question one, and never by asking again for something the file already holds.
+**A bootstrap walk left half-finished is read from the same ground.** An `open/{NNN}-new-platform` folder means somebody started this before. Read its arc, see which rows carry answers, and resume from the first one that does not — never from question one, and never by asking again for something the file already holds.
 
 ## Open with a greeting, and end with a door
 

@@ -26,7 +26,7 @@ Keep the contract triple file-for-file per entity: `contract/states/<entity>.ts`
 createGroup(command: CreateGroupCommand): Promise<Group>;
 ```
 
-**Where the comment goes, per symbol** — the full table is in the **spn-devex** plugin's `refs/intent.md` (cross-plugin pointer; it ships alongside this one from the `saasplane` marketplace). The TypeScript shape of it:
+**Where the comment goes, per symbol** — the full table is in `refs/support/apps/comments.md`, in this plugin. The TypeScript shape of it:
 
 | Symbol | Comment it | Never comment |
 | --- | --- | --- |

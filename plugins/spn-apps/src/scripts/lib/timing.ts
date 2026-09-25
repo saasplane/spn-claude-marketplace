@@ -1,7 +1,6 @@
 // What this plugin's checks cost, written only while the developer has asked for it.
 //
-// A PLUGIN CARRIES ITS OWN LIBRARIES. This is a copy of `spn-devex/hooks/lib/timing.ts` and is meant
-// to be one: a partner may hold either plugin without the other, plugins version and install
+// A PLUGIN CARRIES ITS OWN LIBRARIES. Every plugin carrying checks has its own `timing.ts`, deliberately: a partner may hold either plugin without the other, plugins version and install
 // separately, and the installed cache puts a version directory between a plugin and its files. The
 // same reasoning already gives this plugin its own `payload.ts`. The switch, the record shape and
 // the size cap are stated in both copies on purpose — both write the one log `workspace timings`

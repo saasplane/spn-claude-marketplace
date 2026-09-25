@@ -27,7 +27,7 @@
 // a priority — a workstream keeps it when it moves state.
 //
 // Day zero is the special case. No `sprepo.json` anywhere means there is no code to read, so the
-// agent asks instead of reading and the rung points at the `day-zero` skill.
+// agent asks instead of reading and the rung points at the `bootstrap` skill.
 //
 // Exit code is always 0 and every read is wrapped: a broken orientation must never cost a window.
 //
@@ -639,7 +639,7 @@ export function orient(root: string, cwd: string): [text: string, note: string] 
           "nothing rests on this window staying open. Say no and nothing is created.\n\n" +
           "Would you like to start a new platform?\n");
     const note = "\n---\nDay-0 mode: no sprepo.json under " + root + ". You have no code to read, " +
-      "so do not orient — load the `day-zero` skill and walk it. " +
+      "so do not orient — load the `bootstrap` skill and walk it. " +
       (started
         ? "A day-0 walk is already open here: `.spndevex/workstreams/open/" + started.folder +
           "/`. Read its arc BEFORE you say anything. Resume at the first coordinate it does not " +
