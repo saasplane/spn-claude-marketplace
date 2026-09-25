@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/02-constructs/02-support/01-apps/08-agent-surface.md", "seen": "2137b928" },
+    { "path": "spn-foundation/docs/02-constructs/02-support/01-apps/08-agent-surface.md", "seen": "4b31ce5f" },
     { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/08-agent-surface/", "seen": "69d3e20e" }
   ]
 }

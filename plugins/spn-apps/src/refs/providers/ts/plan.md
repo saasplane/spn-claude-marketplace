@@ -2,9 +2,9 @@
 {
   "docs": [
     { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/README.md", "seen": "13d462c3" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md", "seen": "db625a2f" },
-    { "path": "spn-foundation/providers/apps/ts/README.md", "seen": "0da8309f" },
-    { "path": "spn-foundation/providers/apps/ts/03-code-patterns.md", "seen": "56ef9a7f" }
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md", "seen": "bda7cb58" },
+    { "path": "spn-foundation/providers/apps/ts/README.md", "seen": "e246d674" },
+    { "path": "spn-foundation/providers/apps/ts/03-code-patterns.md", "seen": "3ae9c3c9" }
   ]
 }
 -->

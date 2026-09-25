@@ -141,7 +141,7 @@ Never mix the shapes in one paragraph. A question buried inside a status update 
 
 #### When you need an answer — decision cards
 
-Every open item arrives in the same shape, because the reader's job is to **decide**, not to reconstruct the question. **The shape is defined once, in [`refs/decision-cards.md`](../refs/decision-cards.md)** — number + summary · what · why it matters · a lettered options table · a recommendation carrying its reasoning · a preview where the decision is a shape.
+Every open item arrives in the same shape, because the reader's job is to **decide**, not to reconstruct the question. **The shape is defined once, in [`refs/decision-cards.md`](../refs/devex/workspace/docs/decision-cards.md)** — number + summary · what · why it matters · a lettered options table · a recommendation carrying its reasoning · a preview where the decision is a shape.
 
 Read it and follow it whenever a person owes a decision, and in full whenever one asks *"show open questions"* or *"show open cards"*. **Every open item is its own card**; a sentence beginning *"two things I did not act on"* is the exact failure it prevents.
 

@@ -138,11 +138,13 @@ export function main(workspace: string, check = false): number {
     const at = join(refs, "README.md");
     const now = existsSync(at) ? readFileSync(at, "utf8") : "";
     if (now === body) { console.log(`current  ${plugin}/src/refs/README.md`); continue; }
-    changed += 1;
-    if (check) { console.log(`would write  ${plugin}/src/refs/README.md`); continue; }
+    if (check) { changed += 1; console.log(`would write  ${plugin}/src/refs/README.md`); continue; }
     writeFileSync(at, body);
     console.log(`wrote    ${plugin}/src/refs/README.md`);
   }
+  // WRITING IS SUCCESS, and only --check reports staleness through the exit code. A generator that
+  // exits non-zero after writing correctly fails every build that regenerates as a step — and it
+  // makes `generate && verify` unwritable, which is the shape every caller wants.
   return changed;
 }
 

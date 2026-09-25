@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md", "seen": "d5f0400b" }
+    { "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md", "seen": "82d774b8" }
   ],
   "decisions": [
     "RD.PLATFORM.033",

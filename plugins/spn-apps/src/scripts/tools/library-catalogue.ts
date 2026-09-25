@@ -1,0 +1,99 @@
+#!/usr/bin/env node
+// RESTATES: nothing. This tool carries no rule of its own — it reads what the support repository
+// publishes and writes it down.
+//
+// Which libraries a node may depend on, as a table a partner can read without a checkout.
+//
+// **THE SAME ARGUMENT AS THE MODULE CATALOGUE, ONE AXIS OVER.** A published set moves every
+// release, so a hand-written list is stale the day after it is written and nothing reports it.
+// The block is a `commands` entry: the citation says *this is what that command produced*, and
+// re-running the command is how you check it.
+//
+// **WHAT IT LEAVES OUT IS THE POINT.** A package that is private, or that carries no name, is not
+// something a partner can depend on, so listing it would answer a question about the repository
+// rather than about what is available. The count in the table is the count a partner can install.
+//
+//     node library-catalogue.ts <workspace>            write refs/providers/ts/libraries.md
+//     node library-catalogue.ts <workspace> --check    report what would change, write nothing
+//
+// **THE SUPPORT REPOSITORY IS FOUND, NEVER ASSUMED** — the same stance `restate-drift.ts` takes.
+// Run from a partner's checkout it says so and exits clean; an empty table would read as *there
+// are no libraries*, which is a different claim from *this checkout cannot see them*.
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { basename, join } from "node:path";
+import { seenHash } from "../lib/stamp.ts";
+
+/** One published package, as its own `package.json` declares it. */
+type Library = { name: string; version: string; description: string };
+
+const SUPPORT = "spn-support-ts";
+const OUT = join("spn-claude-marketplace", "plugins", "spn-apps", "src", "refs", "providers", "ts", "libraries.md");
+/** The generator itself. A `commands` citation names what produced the file, and a hash of the
+ *  generator is what says the output is stale: change the renderer and every catalogue it wrote is
+ *  owed a re-run. A command STRING would resolve to nothing and report as broken forever. */
+const GENERATOR = "spn-claude-marketplace/plugins/spn-apps/src/scripts/tools/library-catalogue.ts";
+
+/**
+ * Every published package under the support repository's `packages/`.
+ *
+ * **A PRIVATE PACKAGE IS NOT A LIBRARY**, and neither is one with no name. Both exist in the
+ * repository for reasons of its own, and a partner cannot depend on either.
+ */
+function libraries(workspace: string): Library[] {
+  const packages = join(workspace, SUPPORT, "packages");
+  if (!existsSync(packages)) return [];
+  const found: Library[] = [];
+  for (const folder of readdirSync(packages).sort()) {
+    const manifest = join(packages, folder, "package.json");
+    if (!existsSync(manifest)) continue;
+    const declared = JSON.parse(readFileSync(manifest, "utf8"));
+    if (declared.private === true || typeof declared.name !== "string") continue;
+    found.push({
+      name: declared.name,
+      version: typeof declared.version === "string" ? declared.version : "—",
+      description: typeof declared.description === "string" ? declared.description : "—",
+    });
+  }
+  return found;
+}
+
+function render(found: Library[], generatorHash: string): string {
+  let out = `<!-- spn:restates\n{\n  "commands": [\n    { "path": "${GENERATOR}", "seen": "${generatorHash}" }\n  ]\n}\n-->\n`;
+  out += `<!-- spn:generated library-catalogue — do not edit inside these markers; \`library-catalogue.ts\` writes it -->\n`;
+  out += `# The published libraries — APPS · TS\n\n`;
+  out += `**This table is generated from the support repository's own manifests**, and it moves every release. **${found.length} package(s) are published.**\n\n`;
+  out += `**A version here names what is published, never what is being worked on.** A release stamps the number and the first edit after it increments, so a number you cannot find published is one that has not been released yet.\n\n`;
+  out += `| Package | Version | What it is |\n| --- | --- | --- |\n`;
+  for (const library of found) out += `| \`${library.name}\` | \`${library.version}\` | ${library.description} |\n`;
+  out += `\n**Depend on a published name, never on a path into a sibling checkout.** A path resolves only for somebody holding both repositories, and a partner holds one.\n`;
+  out += `\n<!-- /spn:generated -->\n`;
+  return out;
+}
+
+export function main(workspace: string, check = false): number {
+  if (!existsSync(join(workspace, SUPPORT, "packages"))) {
+    console.log("no support checkout here — nothing to catalogue, and the shipped catalogue stands");
+    return 0;
+  }
+  const found = libraries(workspace);
+  if (!found.length) {
+    console.log("the support checkout publishes no packages — refusing to write an empty catalogue");
+    return 0;
+  }
+  const body = render(found, seenHash(readFileSync(join(workspace, GENERATOR), "utf8")));
+  const at = join(workspace, OUT);
+  const now = existsSync(at) ? readFileSync(at, "utf8") : "";
+  if (now === body) { console.log(`current  ${OUT} — ${found.length} package(s)`); return 0; }
+  if (check) { console.log(`would write  ${OUT} — ${found.length} package(s)`); return 1; }
+  writeFileSync(at, body);
+  console.log(`wrote    ${OUT} — ${found.length} package(s)`);
+  // WRITING IS SUCCESS. The exit code says whether the run FAILED, and only --check reports
+  // staleness through it — a generator that exits non-zero after writing correctly fails every
+  // build that regenerates as a step.
+  return 0;
+}
+
+if (process.argv[1] && basename(process.argv[1]) === "library-catalogue.ts") {
+  const args = process.argv.slice(2);
+  process.exit(main(args.find((a) => !a.startsWith("-")) ?? process.cwd(), args.includes("--check")));
+}
