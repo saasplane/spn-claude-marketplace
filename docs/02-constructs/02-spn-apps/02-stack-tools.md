@@ -58,27 +58,27 @@ The other tool walks the same registers in the other direction, asking which pub
 
 ### A register is found by its header, never by a path
 
-A documents tree that moves must break neither tool, and reading the header is the only way to be right in the layout a repository has today and in the one that follows it. So any table whose headings are the behaviour headings is a register. The headings and the row test are one exported pair, read by both tools, because two tools parsing a table differently means one writes rows the other cannot see. *Where:* `plugins/spn-apps/hooks/lib/register.ts`
+A documents tree that moves must break neither tool, and reading the header is the only way to be right in the layout a repository has today and in the one that follows it. So any table whose headings are the behaviour headings is a register. The headings and the row test are one exported pair, read by both tools, because two tools parsing a table differently means one writes rows the other cannot see. *Where:* `plugins/spn-apps/src/scripts/lib/register.ts`
 
 ### Two cells are the run's and the rest are a person's
 
-The kind of behaviour and the tier that proves it are decisions somebody made. The status and the moment it was found are what the last run saw. The two were one cell until they disagreed quietly, and a row whose case had stopped running still read as proven. The writer touches those two and copies every other cell through untouched. *Where:* `plugins/spn-apps/hooks/tools/behaviour-rows.ts`
+The kind of behaviour and the tier that proves it are decisions somebody made. The status and the moment it was found are what the last run saw. The two were one cell until they disagreed quietly, and a row whose case had stopped running still read as proven. The writer touches those two and copies every other cell through untouched. *Where:* `plugins/spn-apps/src/scripts/tools/behaviour-rows.ts`
 
 ### A run speaks only for the tiers it ran
 
-A partial run that reset the whole register would make every status swing on every run, and nobody could read a red as new. So a run updates the rows declaring a tier it covered and leaves the rest exactly as it found them. That is why the tier is a person's cell to declare: it is what a run matches itself against. *Where:* `plugins/spn-apps/hooks/tools/behaviour-rows.ts`
+A partial run that reset the whole register would make every status swing on every run, and nobody could read a red as new. So a run updates the rows declaring a tier it covered and leaves the rest exactly as it found them. That is why the tier is a person's cell to declare: it is what a run matches itself against. *Where:* `plugins/spn-apps/src/scripts/tools/behaviour-rows.ts`
 
 ### It reads the run's own artifact, never a specification
 
-A status derived from a specification reports a case that exists as a case that ran. Crossing a route with a surface, or scanning a source tree for case titles, cannot see a case that was skipped or filtered out. So the writer reads the file the runner produced, and a row whose case never reached the runner says so. *Where:* `plugins/spn-apps/hooks/tools/behaviour-rows.ts`
+A status derived from a specification reports a case that exists as a case that ran. Crossing a route with a surface, or scanning a source tree for case titles, cannot see a case that was skipped or filtered out. So the writer reads the file the runner produced, and a row whose case never reached the runner says so. *Where:* `plugins/spn-apps/src/scripts/tools/behaviour-rows.ts`
 
 ### Coverage is measured against actions, not routes
 
-A route says where a screen lives and nothing about what can be done there. One settings route can carry several actions behind it, and counting routes reports that screen as covered while most of them have never been performed. Every published action is an interaction, whether a person performs it through a browser or another system performs it through the generated client, so the surface to measure against is the action surface. *Where:* `plugins/spn-apps/hooks/tools/action-coverage.ts`
+A route says where a screen lives and nothing about what can be done there. One settings route can carry several actions behind it, and counting routes reports that screen as covered while most of them have never been performed. Every published action is an interaction, whether a person performs it through a browser or another system performs it through the generated client, so the surface to measure against is the action surface. *Where:* `plugins/spn-apps/src/scripts/tools/action-coverage.ts`
 
 ### An action is found by its declaration, never by a folder
 
-The glob this replaced named one stack's folder shape, and it missed a whole module whose home was an application rather than a package. The declaration itself is what makes something an action, so looking for the declaration needs no folder shape and finds a module wherever it is kept. *Where:* `plugins/spn-apps/hooks/tools/action-coverage.ts`
+The glob this replaced named one stack's folder shape, and it missed a whole module whose home was an application rather than a package. The declaration itself is what makes something an action, so looking for the declaration needs no folder shape and finds a module wherever it is kept. *Where:* `plugins/spn-apps/src/scripts/tools/action-coverage.ts`
 
 ## Boundary
 
@@ -107,6 +107,6 @@ This page answers what these tools read, what they may write, and why. It does n
 
 | Check | Kind | What a green run shows |
 | --- | --- | --- |
-| `node plugins/spn-devex/hooks/tools/partner-shape.ts` | gate | both tools run against a repository holding nothing but the plugins, and answer rather than crash where there is no register to read |
+| `node plugins/spn-devex/src/scripts/tools/partner-shape.ts` | gate | both tools run against a repository holding nothing but the plugins, and answer rather than crash where there is no register to read |
 
-Try it: `node plugins/spn-devex/hooks/tools/partner-shape.ts`
+Try it: `node plugins/spn-devex/src/scripts/tools/partner-shape.ts`

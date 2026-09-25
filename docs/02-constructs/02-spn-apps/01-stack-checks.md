@@ -58,27 +58,27 @@ The reading in the middle is shared code, so every check in this plugin sees the
 
 ### One entry, and the saving that comes from it
 
-The wiring declares one entry matching writes and edits, and the dispatcher imports every check behind it. The registration is where the saving lives rather than the porting: separate entries are separate interpreter start-ups whatever language the scripts are written in, and on one measured edit the start-ups cost more than ten times the checking. *Where:* `plugins/spn-apps/hooks/hooks.json`, `plugins/spn-apps/hooks/checks/pretooluse.ts`
+The wiring declares one entry matching writes and edits, and the dispatcher imports every check behind it. The registration is where the saving lives rather than the porting: separate entries are separate interpreter start-ups whatever language the scripts are written in, and on one measured edit the start-ups cost more than ten times the checking. *Where:* `plugins/spn-apps/src/hooks/hooks.json`, `plugins/spn-apps/src/scripts/events/pretooluse.ts`
 
 ### The payload shape is copied, never imported
 
-A plugin never depends on another plugin's internals. The two install separately and version separately, so an import across them would break on a version difference nobody chose. This plugin keeps its own copy of the payload and verdict shapes, named exactly as the core plugin names the same job, so learning one teaches you both. *Where:* `plugins/spn-apps/hooks/lib/payload.ts`
+A plugin never depends on another plugin's internals. The two install separately and version separately, so an import across them would break on a version difference nobody chose. This plugin keeps its own copy of the payload and verdict shapes, named exactly as the core plugin names the same job, so learning one teaches you both. *Where:* `plugins/spn-apps/src/scripts/lib/payload.ts`
 
 ### A source file is read with the write already applied
 
-Reading what is on disk reports faults somebody else wrote and misses the one arriving now. So comments and string bodies are masked, the caller's pending text is laid over the file, and the search runs on that. The helpers doing it are shared rather than private to one check, because four checks reaching into a fifth is four extra module loads for one job. *Where:* `plugins/spn-apps/hooks/lib/source.ts`
+Reading what is on disk reports faults somebody else wrote and misses the one arriving now. So comments and string bodies are masked, the caller's pending text is laid over the file, and the search runs on that. The helpers doing it are shared rather than private to one check, because four checks reaching into a fifth is four extra module loads for one job. *Where:* `plugins/spn-apps/src/scripts/lib/source.ts`
 
 ### Refusals where the model is settled, warnings where it is not
 
-A refusal on a rule still being designed teaches people to work around the hook. So the rules with a settled model and a named exception refuse, and the findings whose model belongs to an open arc warn and under-report on purpose. The file carrying the unsettled ones marks the function to replace when that model lands, and keeps its trigger and its message meanwhile. *Where:* `plugins/spn-apps/hooks/checks/coverage.ts`
+A refusal on a rule still being designed teaches people to work around the hook. So the rules with a settled model and a named exception refuse, and the findings whose model belongs to an open arc warn and under-report on purpose. The file carrying the unsettled ones marks the function to replace when that model lands, and keeps its trigger and its message meanwhile. *Where:* `plugins/spn-apps/src/scripts/checks/tests/coverage.ts`
 
 ### A check exists because a green run was lying
 
-A pattern loose enough to match inside a longer string is a check that cannot fail. One matched a redirect address sitting inside a provider's own consent URL, so a browser journey agreed it was home while the screen was still the vendor's. The rule now compares a parsed host for equality, or anchors its pattern, and fires only where the literal looks like a host and the statement is about navigation. *Where:* `plugins/spn-apps/hooks/checks/host-assertion.ts`
+A pattern loose enough to match inside a longer string is a check that cannot fail. One matched a redirect address sitting inside a provider's own consent URL, so a browser journey agreed it was home while the screen was still the vendor's. The rule now compares a parsed host for equality, or anchors its pattern, and fires only where the literal looks like a host and the statement is about navigation. *Where:* `plugins/spn-apps/src/scripts/checks/tests/host-assertion.ts`
 
 ### A check names the ref its refusal cites
 
-Where the reasoning behind a refusal is stack-agnostic, the message points at the core plugin's own card rather than restating it. The check is the part a script can catch; the card is the part a person has to read. *Where:* `plugins/spn-apps/hooks/checks/enablement-grammar.ts`
+Where the reasoning behind a refusal is stack-agnostic, the message points at the core plugin's own card rather than restating it. The check is the part a script can catch; the card is the part a person has to read. *Where:* `plugins/spn-apps/src/scripts/checks/contract/enablement-grammar.ts`
 
 ## Boundary
 
@@ -107,6 +107,6 @@ This page answers what makes a check belong to a stack rather than to every repo
 
 | Check | Kind | What a green run shows |
 | --- | --- | --- |
-| `node plugins/spn-devex/hooks/tools/partner-shape.ts` | gate | every check in this plugin runs against a repository holding nothing but the plugins, and none of them crashes on a file it was not written for |
+| `node plugins/spn-devex/src/scripts/tools/partner-shape.ts` | gate | every check in this plugin runs against a repository holding nothing but the plugins, and none of them crashes on a file it was not written for |
 
-Try it: `node plugins/spn-devex/hooks/tools/partner-shape.ts`
+Try it: `node plugins/spn-devex/src/scripts/tools/partner-shape.ts`

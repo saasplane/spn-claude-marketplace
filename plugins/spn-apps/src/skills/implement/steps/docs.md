@@ -8,7 +8,7 @@ Docs are the contract; code is the implementation; tests are the proof. The chan
 
 **The seats divide by the domains the repository's concept names, never by the packages it ships.** So a module you are changing does not have a seat: it has a domain, and what you write lands in that domain's folder inside the one tree. The node itself carries `README.md` — about twenty-five lines saying what it is, and linking into the seats it realizes. **Find the node's capability face through that README**, which is the only thing that knows where the node documents itself: a path cannot say it, because `packages/module-server-iam-ts` documents itself at `docs/04-capabilities/01-iam/01-server/`.
 
-You never meet an absent seat. Where a repository has nothing of its own to say, the face states what the seat would hold and cites the repository that owns the answer. Never write a `docs/` folder inside a package or an app — if you find one, it is drift; hand it to the `plan` skill in its `docs` mode.
+You never meet an absent seat. Where a repository has nothing of its own to say, the face states what the seat would hold and cites the repository that owns the answer. Never write a `docs/` folder inside a package or an app — if you find one, it is drift; hand it to the `ideate` skill.
 
 ## Writing a seat from scratch
 

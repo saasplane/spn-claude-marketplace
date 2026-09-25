@@ -12,7 +12,7 @@
 
 | Part of the construct | Lives in | What it is |
 | --- | --- | --- |
-| The manifest | `plugins/spn-devex/.claude-plugin/plugin.json` | `name`, `version`, `description`, `author` |
+| The manifest | `plugins/spn-devex/src/.claude-plugin/plugin.json` | `name`, `version`, `description`, `author` |
 | The marketplace entry | `.claude-plugin/marketplace.json` | the repository's own list; the `spn-devex` row names `./plugins/spn-devex` |
 | The instrument tree | `plugins/spn-devex/hooks/` · `skills/` · `refs/` · `agents/` | what the folder delivers once installed |
 
@@ -27,7 +27,7 @@
 
 **Why** — *a cache directory is keyed by the plugin's name and its manifest version*. A plugin edited without moving the number installs over its own published bytes, and nothing on screen says which copy is running.
 **What** — `spn-devex` ships at the version its manifest already carries, and the first edit after that release sets the next one. So the field answers *what does the cache hold*, not *what am I building*.
-**How** — the number is a hand edit to one field, reviewed like any other line. Read `plugins/spn-devex/.claude-plugin/plugin.json`, then the repository's own `CLAUDE.md` § The count moves after the release.
+**How** — the number is a hand edit to one field, reviewed like any other line. Read `plugins/spn-devex/src/.claude-plugin/plugin.json`, then the repository's own `CLAUDE.md` § The count moves after the release.
 
 ### Three plugins at three versions, on purpose
 

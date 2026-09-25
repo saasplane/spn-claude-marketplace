@@ -14,12 +14,12 @@ Each rule carries its own name, so a refusal says which law it read rather than 
 
 | Part of the construct | Lives in | What it is |
 | --- | --- | --- |
-| The wiring | `plugins/spn-infra/hooks/hooks.json` | one `PreToolUse` entry matching `Write` and `Edit`, declaring a timeout of 20 |
-| The dispatcher | `plugins/spn-infra/hooks/events/pretooluse.ts` | reads the event, runs the rules in order, and stops at the first denial |
-| The rules | `plugins/spn-infra/hooks/checks/estate-violations.ts` | seven of them, each named, each with its own refusal message |
-| Its libraries | `plugins/spn-infra/hooks/lib/payload.ts` · `lib/timing.ts` | this plugin's own copies, because a plugin ships alone |
-| The tests | `plugins/spn-infra/hooks/tests/` | 21 cases, one command |
-| The rules it cites | `plugins/spn-infra/refs/laws.md` | the estate laws every refusal message points the reader at |
+| The wiring | `plugins/spn-infra/src/hooks/hooks.json` | one `PreToolUse` entry matching `Write` and `Edit`, declaring a timeout of 20 |
+| The dispatcher | `plugins/spn-infra/src/scripts/events/pretooluse.ts` | reads the event, runs the rules in order, and stops at the first denial |
+| The rules | `plugins/spn-infra/src/scripts/checks/estate-violations.ts` | seven of them, each named, each with its own refusal message |
+| Its libraries | `plugins/spn-infra/src/scripts/lib/payload.ts` · `lib/timing.ts` | this plugin's own copies, because a plugin ships alone |
+| The tests | `plugins/spn-infra/tests/` | 21 cases, one command |
+| The rules it cites | `plugins/spn-infra/src/refs/support/infra/laws.md` | the estate laws every refusal message points the reader at |
 
 ## Follows the pattern
 
@@ -32,7 +32,7 @@ Each rule carries its own name, so a refusal says which law it read rather than 
 
 **Why** — *a hook that crashes or over-refuses is removed by the people it blocks*. The rules are narrow on purpose, and anything outside them is somebody else's business.
 **What** — unreadable input, or a call naming no file, ends the run in silence with the call allowed. A refusal prints the documented decision JSON and still exits zero.
-**How** — the dispatcher returns as soon as it finds no file path, and the whole run is wrapped so that nothing reaches the harness as a failure. `plugins/spn-infra/hooks/events/pretooluse.ts`.
+**How** — the dispatcher returns as soon as it finds no file path, and the whole run is wrapped so that nothing reaches the harness as a failure. `plugins/spn-infra/src/scripts/events/pretooluse.ts`.
 
 ### A rule that throws is skipped, never fatal
 
@@ -44,7 +44,7 @@ Each rule carries its own name, so a refusal says which law it read rather than 
 
 **Why** — *a refusal must be about what is being written*. Judging the file on disk would refuse an edit to a file that already carries the fault and miss the fault arriving now.
 **What** — a `Write` carries its content and an `Edit` carries its replacement text, and `written()` takes whichever is present. With no new text, only the path-based rule can fire.
-**How** — the dispatcher skips any rule but `dist-is-build-output` when there is no new text. `plugins/spn-infra/hooks/checks/estate-violations.ts`.
+**How** — the dispatcher skips any rule but `dist-is-build-output` when there is no new text. `plugins/spn-infra/src/scripts/checks/estate-violations.ts`.
 
 ### Build output is refused by path alone
 

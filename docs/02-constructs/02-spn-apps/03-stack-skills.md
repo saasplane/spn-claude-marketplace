@@ -56,27 +56,27 @@ The ask is matched to a skill, the skill is narrowed by a mode, and only the lon
 
 ### One skill divides into steps, and the order is the rule
 
-The contract comes first, and everything downstream is generated from it or written against it. A service written before its state is a service that will be rewritten. So the build skill is the only folder here with a step folder, its steps run in a fixed order, and each one is read before that layer's code is written rather than after. *Where:* `plugins/spn-apps/skills/implement/steps/`
+The contract comes first, and everything downstream is generated from it or written against it. A service written before its state is a service that will be rewritten. So the build skill is the only folder here with a step folder, its steps run in a fixed order, and each one is read before that layer's code is written rather than after. *Where:* `plugins/spn-apps/src/skills/implement/steps/`
 
 ### The router classifies before it sequences
 
-The build skill first decides whether the ask touches the back end alone, the front end alone, or both, and that classification decides which steps apply. Sequencing every step for every ask would make the smallest change cost the largest walk. *Where:* `plugins/spn-apps/skills/implement/SKILL.md`
+The build skill first decides whether the ask touches the back end alone, the front end alone, or both, and that classification decides which steps apply. Sequencing every step for every ask would make the smallest change cost the largest walk. *Where:* `plugins/spn-apps/src/skills/implement/SKILL.md`
 
 ### A mode is an argument, not a second folder
 
-Two folders with almost the same description compete for the same match, and the matching gets worse as the pair grows. So a skill answering several close asks takes a mode, names its modes in the sentence a session matches against, and says which neighbouring skill an adjacent ask belongs to instead. A destructive mode says it is destructive in that same sentence. *Where:* `plugins/spn-apps/skills/verify/SKILL.md`
+Two folders with almost the same description compete for the same match, and the matching gets worse as the pair grows. So a skill answering several close asks takes a mode, names its modes in the sentence a session matches against, and says which neighbouring skill an adjacent ask belongs to instead. A destructive mode says it is destructive in that same sentence. *Where:* `plugins/spn-apps/src/skills/verify/SKILL.md`
 
 ### A step carries rules it does not own
 
-A step file is where the next developer copies from, so a rule missing there is a rule that will not be followed, and a rule invented there is a second source. The steps that carry rules carry them under the same stamp a ref carries, and cite their chapters in the text where they do not. *Where:* `plugins/spn-apps/skills/implement/steps/contract.md`, `plugins/spn-apps/skills/implement/steps/service.md`
+A step file is where the next developer copies from, so a rule missing there is a rule that will not be followed, and a rule invented there is a second source. The steps that carry rules carry them under the same stamp a ref carries, and cite their chapters in the text where they do not. *Where:* `plugins/spn-apps/src/skills/implement/steps/contract.md`, `plugins/spn-apps/src/skills/implement/steps/service.md`
 
 ### The closing gate belongs to the skill
 
-A contract change reviewed at the end of a session is reviewed by the context that wrote it. So the build skill closes with the suites and then hands the change to the review skill in its contract mode, and the hand-off is named in the description, so it happens even when nobody asks for it. *Where:* `plugins/spn-apps/skills/implement/SKILL.md`
+A contract change reviewed at the end of a session is reviewed by the context that wrote it. So the build skill closes with the suites and then hands the change to the review skill in its contract mode, and the hand-off is named in the description, so it happens even when nobody asks for it. *Where:* `plugins/spn-apps/src/skills/implement/SKILL.md`
 
 ### The absent skill, and where its layer lives
 
-Planning stays in the core plugin. What this plugin ships instead is reference material the planning skill reads once it has resolved which stack it is standing in. That keeps one skill, one description and one match, with a concrete step at the end of it. *Where:* `plugins/spn-apps/refs/plan.md`
+Planning stays in the core plugin. What this plugin ships instead is reference material the planning skill reads once it has resolved which stack it is standing in. That keeps one skill, one description and one match, with a concrete step at the end of it. *Where:* `plugins/spn-apps/src/refs/providers/ts/plan.md`
 
 ## Boundary
 
@@ -105,6 +105,6 @@ This page answers what makes a skill this stack's own, and how the skills here a
 
 | Check | Kind | What a green run shows |
 | --- | --- | --- |
-| `node plugins/spn-devex/hooks/tools/restate-drift.ts` | gate | every step carrying a stamp still reads as the chapter it names reads today |
+| `node plugins/spn-devex/src/scripts/tools/restate-drift.ts` | gate | every step carrying a stamp still reads as the chapter it names reads today |
 
-Try it: `node plugins/spn-devex/hooks/tools/restate-drift.ts`
+Try it: `node plugins/spn-devex/src/scripts/tools/restate-drift.ts`

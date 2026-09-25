@@ -18,7 +18,7 @@ Six folders sit under `plugins/spn-infra/src/skills/`: `new`, `implement`, `revi
 | Running a layer | `plugins/spn-infra/src/skills/run/SKILL.md` | bringing a layer up or down, and reading what is standing |
 | Proving it | `plugins/spn-infra/src/skills/verify/SKILL.md` | what `infra validate` and `infra test` prove, and what a green run does not |
 | Authoring a module | `plugins/spn-infra/src/skills/implement/SKILL.md` | scaffold, renderings, the path locator, proving, releasing, the pin flip |
-| Publishing | `plugins/spn-infra/skills/release/SKILL.md` | the version edit, the release command, the registry pair or the machine store |
+| Publishing | `plugins/spn-infra/src/skills/release/SKILL.md` | the version edit, the release command, the registry pair or the machine store |
 | The vocabulary they use | `plugins/spn-infra/refs/*.md` | manifests, layers and doors, naming, and the laws |
 
 ## Follows the pattern
@@ -50,7 +50,7 @@ Six folders sit under `plugins/spn-infra/src/skills/`: `new`, `implement`, `revi
 
 **Why** — *a version somebody typed into a build script is a second place the number lives*. The package manifest is the one place.
 **What** — `release` bumps the version field in the package manifest as a reviewed edit, then runs the release command. Publishing goes to the organization's registry pair, or stages into the machine store when asked to stay local.
-**How** — the skill also covers repointing a bespoke build script or workflow at the release command, so the second place stops existing. `plugins/spn-infra/skills/release/SKILL.md`.
+**How** — the skill also covers repointing a bespoke build script or workflow at the release command, so the second place stops existing. `plugins/spn-infra/src/skills/release/SKILL.md`.
 
 ## Between modules
 

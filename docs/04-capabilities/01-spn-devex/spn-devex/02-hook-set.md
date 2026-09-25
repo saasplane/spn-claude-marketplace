@@ -12,10 +12,10 @@
 
 | Part of the construct | Lives in | What it is |
 | --- | --- | --- |
-| The event wiring | `plugins/spn-devex/hooks/hooks.json` | four entries, one per moment, each naming a script and a timeout |
-| The verdict and the payload | `plugins/spn-devex/hooks/lib/payload.ts` | the `Payload` and `Verdict` types, `readPayload`, `emit`, `runAlone` |
-| The dispatcher | `plugins/spn-devex/hooks/events/pretooluse.ts` | one process for every `PreToolUse` check |
-| What a run cost | `plugins/spn-devex/hooks/lib/timing.ts` | one span per check, written only when the developer asked for it |
+| The event wiring | `plugins/spn-devex/src/hooks/hooks.json` | four entries, one per moment, each naming a script and a timeout |
+| The verdict and the payload | `plugins/spn-devex/src/scripts/lib/payload.ts` | the `Payload` and `Verdict` types, `readPayload`, `emit`, `runAlone` |
+| The dispatcher | `plugins/spn-devex/src/scripts/events/pretooluse.ts` | one process for every `PreToolUse` check |
+| What a run cost | `plugins/spn-devex/src/scripts/lib/timing.ts` | one span per check, written only when the developer asked for it |
 
 ## Follows the pattern
 
@@ -28,19 +28,19 @@
 
 **Why** — *a refusal that travels through stdout can be lost on the way*. Redirecting output, swapping arguments and parsing the last line gives a refusal several places to disappear, and it disappeared in all of them.
 **What** — each check is a function returning `{ deny?, note? } | null`. The dispatcher calls it and reads the object. A file can still be run on its own, and then `emit` prints the same JSON to the same stream.
-**How** — `emit` sets `permissionDecision` and `permissionDecisionReason` for a refusal and `additionalContext` for a note, because a message put only in the developer's pane is invisible to the agent. `plugins/spn-devex/hooks/lib/payload.ts`.
+**How** — `emit` sets `permissionDecision` and `permissionDecisionReason` for a refusal and `additionalContext` for a note, because a message put only in the developer's pane is invisible to the agent. `plugins/spn-devex/src/scripts/lib/payload.ts`.
 
 ### Exit zero, always, and a throwing check is skipped
 
 **Why** — *a hook that crashes takes every other gate in the chain with it*. One broken rule must never remove the rules beside it.
 **What** — a refusal is the documented decision on stdout and never a non-zero exit. Inside the chain, a check that throws is caught and passed over; the rest still run.
-**How** — the dispatch loop wraps each call, and the top level wraps the whole dispatch before emitting. `plugins/spn-devex/hooks/events/pretooluse.ts`, the `dispatch` function and the lines under it.
+**How** — the dispatch loop wraps each call, and the top level wraps the whole dispatch before emitting. `plugins/spn-devex/src/scripts/events/pretooluse.ts`, the `dispatch` function and the lines under it.
 
 ### One process, cheapest check first
 
 **Why** — *five hooks matched one edit and each paid an interpreter start-up before reading a byte*. Measured on 8 September 2026, the chain cost 117.7 ms per edit and 60 ms of that was five programs starting.
 **What** — `hooks.json` declares one `PreToolUse` entry. The dispatcher imports every check, and each declares what it `applies` to and which fields it `needs`, so a call that cannot interest a check never reaches it.
-**How** — the order is a path test, then a file read, then a workspace walk, and the tree-reading check is last. `plugins/spn-devex/hooks/events/pretooluse.ts`, the `CHECKS` list.
+**How** — the order is a path test, then a file read, then a workspace walk, and the tree-reading check is last. `plugins/spn-devex/src/scripts/events/pretooluse.ts`, the `CHECKS` list.
 
 ### The first refusal is the answer; advice adds up
 
@@ -52,7 +52,7 @@
 
 **Why** — *telemetry must not make the gate slower*, and a gate that fails because timing failed is worse than a number nobody recorded.
 **What** — every run is timed. Whether any of it reaches disk is a switch the developer sets, and every path swallows its own errors.
-**How** — `begin` touches no filesystem; the switch is read at the moment of writing, under a fixed size cap. `plugins/spn-devex/hooks/lib/timing.ts`.
+**How** — `begin` touches no filesystem; the switch is read at the moment of writing, under a fixed size cap. `plugins/spn-devex/src/scripts/lib/timing.ts`.
 
 ## Between modules
 

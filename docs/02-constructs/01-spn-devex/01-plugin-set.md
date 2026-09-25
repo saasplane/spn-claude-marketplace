@@ -57,7 +57,7 @@ The last arrow is the one to remember: a session reads the installed copy, so ed
 
 ### The manifest
 
-Each plugin folder carries one manifest at `.claude-plugin/plugin.json`, holding a `name`, a `version`, a `description` and an `author`. The description is long on purpose. It is matched against the work at hand rather than browsed by a person, so it states in full what the plugin carries. *Where:* `plugins/spn-devex/.claude-plugin/plugin.json`, and the same path in the other two folders.
+Each plugin folder carries one manifest at `.claude-plugin/plugin.json`, holding a `name`, a `version`, a `description` and an `author`. The description is long on purpose. It is matched against the work at hand rather than browsed by a person, so it states in full what the plugin carries. *Where:* `plugins/spn-devex/src/.claude-plugin/plugin.json`, and the same path in the other two folders.
 
 ### The version names what is published
 
@@ -69,7 +69,7 @@ One file at the repository root, `.claude-plugin/marketplace.json`, carries a `p
 
 ### The installed copy, and what a wired path names
 
-Installing reads an entry, copies that plugin's folder, and stores it where a session can read it. Everything a plugin wires names that folder through `CLAUDE_PLUGIN_ROOT` rather than through a path in this checkout, so a plugin works wherever it was installed. *Where:* `plugins/spn-devex/hooks/hooks.json`, and the same file in the other two folders.
+Installing reads an entry, copies that plugin's folder, and stores it where a session can read it. Everything a plugin wires names that folder through `CLAUDE_PLUGIN_ROOT` rather than through a path in this checkout, so a plugin works wherever it was installed. *Where:* `plugins/spn-devex/src/hooks/hooks.json`, and the same file in the other two folders.
 
 ### What a plugin may hold, and what it owes
 
@@ -102,6 +102,6 @@ This page answers what a plugin is made of, how it is listed, and what an instal
 
 | Check | Kind | What a green run shows |
 | --- | --- | --- |
-| `node plugins/spn-devex/hooks/tools/partner-shape.ts` | gate | every plugin the marketplace declares is found from its own entry, and every hook inside it runs against a repository holding nothing but the plugin |
+| `node plugins/spn-devex/src/scripts/tools/partner-shape.ts` | gate | every plugin the marketplace declares is found from its own entry, and every hook inside it runs against a repository holding nothing but the plugin |
 
-Try it: `node plugins/spn-devex/hooks/tools/partner-shape.ts`
+Try it: `node plugins/spn-devex/src/scripts/tools/partner-shape.ts`

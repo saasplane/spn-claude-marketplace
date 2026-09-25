@@ -58,15 +58,15 @@ A large skill therefore costs nothing on a turn that never needed it, which is w
 
 ### The file a session loads
 
-A frontmatter block naming `name` and `description`, then instructions in markdown. The frontmatter carries those two fields and nothing more for a stack-agnostic skill. Everything a session decides about whether to read the file is decided from those first lines. *Where:* `plugins/spn-devex/skills/plan/SKILL.md`, and the same file in every other skill folder
+A frontmatter block naming `name` and `description`, then instructions in markdown. The frontmatter carries those two fields and nothing more for a stack-agnostic skill. Everything a session decides about whether to read the file is decided from those first lines. *Where:* `plugins/spn-devex/src/skills/ideate/SKILL.md`, and the same file in every other skill folder
 
 ### A skill that outgrows one file
 
-A skill whose walk is long enough keeps its own file as the router — it classifies the ask and names which files to read in which order — and puts each part of the walk in its own step file. The router is read on every match; a step is read only once the router names it. No stack-agnostic skill here needs one, and one stack skill does. *Where:* `plugins/spn-apps/skills/implement/steps/`
+A skill whose walk is long enough keeps its own file as the router — it classifies the ask and names which files to read in which order — and puts each part of the walk in its own step file. The router is read on every match; a step is read only once the router names it. No stack-agnostic skill here needs one, and one stack skill does. *Where:* `plugins/spn-apps/src/skills/implement/steps/`
 
 ### A mode is an argument, never a second skill
 
-Two skills with almost the same description compete for the same match, and the matching gets worse as the pair grows. So a skill that answers several close asks takes a mode as an argument, names its modes in the description, and says which neighbouring skill an adjacent ask belongs to instead. A destructive mode says so in the sentence a session matches against, rather than only in the body loaded afterwards. *Where:* `plugins/spn-apps/skills/verify/SKILL.md`
+Two skills with almost the same description compete for the same match, and the matching gets worse as the pair grows. So a skill that answers several close asks takes a mode as an argument, names its modes in the description, and says which neighbouring skill an adjacent ask belongs to instead. A destructive mode says so in the sentence a session matches against, rather than only in the body loaded afterwards. *Where:* `plugins/spn-apps/src/skills/verify/SKILL.md`
 
 ### Loaded, not run
 
@@ -74,15 +74,15 @@ A skill is prose an agent reads and then follows, never a script the runtime exe
 
 ### A skill carries steps, and never a rule
 
-The moment a skill states a rule stated nowhere else, it has become a second source nothing audits. A skill names the chapter or the card that holds the rule and sequences the work around it. Where a step file does carry rules, it carries them under the same stamp a ref carries, so a drift run reads a step exactly as it reads a ref. *Where:* `plugins/spn-apps/skills/implement/steps/contract.md`
+The moment a skill states a rule stated nowhere else, it has become a second source nothing audits. A skill names the chapter or the card that holds the rule and sequences the work around it. Where a step file does carry rules, it carries them under the same stamp a ref carries, so a drift run reads a step exactly as it reads a ref. *Where:* `plugins/spn-apps/src/skills/implement/steps/contract.md`
 
 ### A skill that cannot be stack-agnostic is not copied
 
-Where a stack-agnostic skill needs a concrete step, the skill stays in one place and reads a file the stack's own plugin ships. Copying the skill into each stack would put one rule in two folders, drifting, with nothing comparing them. *Where:* `plugins/spn-devex/skills/plan/SKILL.md`, `plugins/spn-apps/refs/plan.md`
+Where a stack-agnostic skill needs a concrete step, the skill stays in one place and reads a file the stack's own plugin ships. Copying the skill into each stack would put one rule in two folders, drifting, with nothing comparing them. *Where:* `plugins/spn-devex/src/skills/ideate/SKILL.md`, `plugins/spn-apps/src/refs/providers/ts/plan.md`
 
 ### Some skills ask rather than read
 
-A few answers cannot be derived from the ground, because they are decisions rather than readings. A skill of that kind works one agreed block at a time and runs no act on an answer nobody gave, and its description says so. *Where:* `plugins/spn-devex/skills/ideate/SKILL.md`, `plugins/spn-devex/skills/day-zero/SKILL.md`
+A few answers cannot be derived from the ground, because they are decisions rather than readings. A skill of that kind works one agreed block at a time and runs no act on an answer nobody gave, and its description says so. *Where:* `plugins/spn-devex/src/skills/ideate/SKILL.md`, `plugins/spn-devex/src/skills/bootstrap/SKILL.md`
 
 ## Boundary
 
@@ -111,6 +111,6 @@ This page answers what a skill is, how it is selected, and what it may contain. 
 
 | Check | Kind | What a green run shows |
 | --- | --- | --- |
-| `node plugins/spn-devex/hooks/tools/restate-drift.ts` | gate | every skill and step carrying a stamp still reads as the chapter it names reads today |
+| `node plugins/spn-devex/src/scripts/tools/restate-drift.ts` | gate | every skill and step carrying a stamp still reads as the chapter it names reads today |
 
-Try it: `node plugins/spn-devex/hooks/tools/restate-drift.ts`
+Try it: `node plugins/spn-devex/src/scripts/tools/restate-drift.ts`

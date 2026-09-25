@@ -12,10 +12,10 @@
 
 | Part of the construct | Lives in | What it is |
 | --- | --- | --- |
-| The eleven folders | `plugins/spn-devex/skills/<skill>/` | one per stack-agnostic stage skill |
-| The file a session loads | `plugins/spn-devex/skills/<skill>/SKILL.md` | frontmatter with `name` and `description`, then the instructions |
-| The vocabulary they name | `plugins/spn-devex/refs/commands.md` | the command groups and the stage skills, stack-agnostic |
-| The layer a stack supplies | `plugins/spn-apps/refs/plan.md` | read by `plan`, rather than copied into it |
+| The eleven folders | `plugins/spn-devex/src/skills/<skill>/` | one per stack-agnostic stage skill |
+| The file a session loads | `plugins/spn-devex/src/skills/<skill>/SKILL.md` | frontmatter with `name` and `description`, then the instructions |
+| The vocabulary they name | `plugins/spn-devex/src/refs/devex/utils/spnutils.md` | the command groups and the stage skills, stack-agnostic |
+| The layer a stack supplies | `plugins/spn-apps/src/refs/providers/ts/plan.md` | read by `plan`, rather than copied into it |
 
 ## Follows the pattern
 
@@ -28,31 +28,31 @@
 
 **Why** — *the listing is what a session holds in full*, one line per skill, and the body is read only once a description matches. A description written as a catalogue entry never fires.
 **What** — each description states the class of ask the skill answers and gives the phrasing that should trigger it, including the words a developer actually types.
-**How** — the frontmatter carries `name` and `description` and nothing else. Read any `plugins/spn-devex/skills/<skill>/SKILL.md`, the first three lines.
+**How** — the frontmatter carries `name` and `description` and nothing else. Read any `plugins/spn-devex/src/skills/<skill>/SKILL.md`, the first three lines.
 
 ### Planning stays here, and the stack supplies its layer
 
 **Why** — *the skill is stack-agnostic*. Copying it into each stack's plugin would put the same rule in two places, drifting, with nothing comparing them.
 **What** — `plan` lives once, in this plugin, and reads the stack's own layer file at the point it needs a concrete step. The stack's plugin ships that file and no planning skill of its own.
-**How** — `plugins/spn-devex/skills/plan/SKILL.md` names the ref; `plugins/spn-apps/refs/plan.md` is the layer for the `APPS` and TypeScript combination.
+**How** — `plugins/spn-devex/src/skills/ideate/SKILL.md` names the ref; `plugins/spn-apps/src/refs/providers/ts/plan.md` is the layer for the `APPS` and TypeScript combination.
 
 ### Two skills are interactive by design
 
 **Why** — *some answers cannot be derived from the ground*. What a node IS, and what an organization's estate should be, are decisions rather than readings.
 **What** — `ideate` works one agreed block at a time and never drafts a whole concept in one pass. `day-zero` asks the estate questions first and runs no act on an answer nobody gave.
-**How** — both name the file the agreed answer lands in: `CONCEPT.md` at a repository root for `ideate`, and the two minted repositories for `day-zero`. `plugins/spn-devex/skills/ideate/SKILL.md` and `skills/day-zero/SKILL.md`.
+**How** — both name the file the agreed answer lands in: `CONCEPT.md` at a repository root for `ideate`, and the two minted repositories for `day-zero`. `plugins/spn-devex/src/skills/ideate/SKILL.md` and `skills/day-zero/SKILL.md`.
 
 ### One skill is never run unasked
 
 **Why** — *a report is an artifact somebody has to read and maintain*, and a report nobody asked for is work created rather than work done.
 **What** — `report` produces a report or an approach document into a node's artifacts pocket only on request, and says so in its own description.
-**How** — the templates it fills are the book's, and the commands each one reads from come from the stack's plugin. `plugins/spn-devex/skills/report/SKILL.md`.
+**How** — the templates it fills are the book's, and the commands each one reads from come from the stack's plugin. `plugins/spn-devex/src/skills/report/SKILL.md`.
 
 ### A skill names the command group, never the command
 
 **Why** — *the command belongs to the stack that realizes it*. A stack-agnostic skill naming a concrete command would be wrong in every repository that runs a different one.
 **What** — `deliver`, `develop`, `provision`, `operate`, `scm` and `test` each name the group they drive — `apps`, `infra`, `repo` — and hand the stack's plugin the job of realizing it. Four of the eleven drive no command group at all.
-**How** — the group for each skill is stated once, in `plugins/spn-devex/refs/commands.md`.
+**How** — the group for each skill is stated once, in `plugins/spn-devex/src/refs/devex/utils/spnutils.md`.
 
 ## Between modules
 

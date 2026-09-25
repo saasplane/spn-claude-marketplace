@@ -9,11 +9,11 @@
 }
 -->
 
-# Planning in an APPS · TS node — the layer the `plan` skill loads
+# Planning in an APPS · TS node — the layer the `ideate` skill loads
 
 **Read this as reference material, not a skill.** The skill is `DEVEX_IDEATE`, and it lives once, in
 `spn-devex`. There is no `APPS_PLAN` — the book's `SPDevExAgentSkillType` is closed and does not carry one
-(devex README § Skills and plugins). The `plan` skill resolves the node's world and stack claim
+(devex README § Skills and plugins). The `ideate` skill resolves the node's world and stack claim
 from the nearest `sprepo.json`, then loads this file for the APPS · TS specifics below.
 
 **Source of truth:** the foundation book's docs domain — its face and the tree grammar in `docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md` — and the apps provider set. Read this card as a restatement; the book governs.

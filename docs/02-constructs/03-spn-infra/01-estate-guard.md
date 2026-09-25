@@ -60,11 +60,11 @@ The helpers the dispatcher reads its event and records its timings through are *
 
 ### Unsure means allow, and every exit is zero
 
-Unreadable input, or a call naming no file, ends the run in silence with the call allowed. A refusal prints the documented decision and still exits zero, because a hook that fails loudly takes every other gate down with it. The dispatcher returns as soon as it finds no file path, and the whole run is wrapped so nothing reaches the harness as a failure. *Where:* `plugins/spn-infra/hooks/events/pretooluse.ts`
+Unreadable input, or a call naming no file, ends the run in silence with the call allowed. A refusal prints the documented decision and still exits zero, because a hook that fails loudly takes every other gate down with it. The dispatcher returns as soon as it finds no file path, and the whole run is wrapped so nothing reaches the harness as a failure. *Where:* `plugins/spn-infra/src/scripts/events/pretooluse.ts`
 
 ### It reads the text the call would add, not the file
 
-A refusal must be about what is being written. Judging the file on disk would refuse an edit to a file that already carries the fault and miss the fault arriving now. So a write's content or an edit's replacement is taken, whichever is present, and where there is no new text only the rule that reads the path alone can fire. *Where:* `plugins/spn-infra/hooks/checks/estate-violations.ts`, `written()`
+A refusal must be about what is being written. Judging the file on disk would refuse an edit to a file that already carries the fault and miss the fault arriving now. So a write's content or an edit's replacement is taken, whichever is present, and where there is no new text only the rule that reads the path alone can fire. *Where:* `plugins/spn-infra/src/scripts/checks/estate-violations.ts`, `written()`
 
 ### Build output is refused by path alone
 
@@ -80,7 +80,7 @@ A provider's own region string is legitimate in a small number of places — the
 
 ### Every refusal names the card that explains it
 
-A denial and its reasoning are one hop apart: each message points at the laws card this plugin ships, so a reader who has just been refused can reach the rule without searching for it. *Where:* `plugins/spn-infra/refs/laws.md`
+A denial and its reasoning are one hop apart: each message points at the laws card this plugin ships, so a reader who has just been refused can reach the rule without searching for it. *Where:* `plugins/spn-infra/src/refs/support/infra/laws.md`
 
 ## Boundary
 
@@ -110,7 +110,7 @@ This page answers what the guard refuses, what it reads to decide, and what it d
 
 | Check | Kind | What a green run shows |
 | --- | --- | --- |
-| `node plugins/spn-infra/hooks/tests/run.mjs` | test | 21 cases: what each rule refuses, what it allows, and that both sides of the credential length boundary are where the rules say |
-| `node plugins/spn-devex/hooks/tools/partner-shape.ts` | gate | the guard runs against a repository holding nothing but the plugins, allows what it cannot read, and exits zero either way |
+| `node plugins/spn-infra/tests/run.mjs` | test | 21 cases: what each rule refuses, what it allows, and that both sides of the credential length boundary are where the rules say |
+| `node plugins/spn-devex/src/scripts/tools/partner-shape.ts` | gate | the guard runs against a repository holding nothing but the plugins, allows what it cannot read, and exits zero either way |
 
-Try it: `node plugins/spn-infra/hooks/tests/run.mjs`
+Try it: `node plugins/spn-infra/tests/run.mjs`

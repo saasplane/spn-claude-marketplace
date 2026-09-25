@@ -6,15 +6,15 @@
 
 `For: Engineering leader · Architect` · `Status: ✅ DONE` · `Realizes: Lenses`
 
-Eleven files sit under `plugins/spn-devex/refs/lenses/`, one per reviewing viewpoint: `lead`, `business`, `product`, `architect`, `server-dev`, `web-dev`, `qa`, `infra`, `trust`, `partner` and `voice`. They are refs, so each carries a stamped block and adds no rule of its own. What makes them their own construct is how they are used. **A lens is an argument passed to one agent, not an agent of its own.** The panel brief carries none of the eleven; it is handed a name at the moment it is convened and reads that file before it says anything.
+Eleven files sit under `plugins/spn-devex/src/refs/lenses/`, one per reviewing viewpoint: `lead`, `business`, `product`, `architect`, `server-dev`, `web-dev`, `qa`, `infra`, `trust`, `partner` and `voice`. They are refs, so each carries a stamped block and adds no rule of its own. What makes them their own construct is how they are used. **A lens is an argument passed to one agent, not an agent of its own.** The panel brief carries none of the eleven; it is handed a name at the moment it is convened and reads that file before it says anything.
 
 ## Where
 
 | Part of the construct | Lives in | What it is |
 | --- | --- | --- |
-| The eleven files | `plugins/spn-devex/refs/lenses/*.md` | one viewpoint each, named for the lens value |
-| The reader | `plugins/spn-devex/agents/spn-panel.md` | the brief handed a lens name and the work to review |
-| The lens register | `plugins/spn-devex/hooks/tools/docs.ts` | the same eleven values a document's `lenses` field may carry, and the label each renders as |
+| The eleven files | `plugins/spn-devex/src/refs/lenses/*.md` | one viewpoint each, named for the lens value |
+| The reader | `plugins/spn-devex/src/agents/spn-panel.md` | the brief handed a lens name and the work to review |
+| The lens register | `plugins/spn-devex/src/scripts/tools/docs.ts` | the same eleven values a document's `lenses` field may carry, and the label each renders as |
 
 ## Follows the pattern
 
@@ -33,19 +33,19 @@ Eleven files sit under `plugins/spn-devex/refs/lenses/`, one per reviewing viewp
 
 **Why** — *eleven agent briefs would be eleven copies of one procedure*, drifting apart, each needing the same change.
 **What** — the panel brief holds the procedure — read fresh, review what you did not write, report and never edit — and the lens file holds the subject matter.
-**How** — the caller passes the lens name and what to review; the brief's own description lists the eleven names a caller may pass. `plugins/spn-devex/agents/spn-panel.md`.
+**How** — the caller passes the lens name and what to review; the brief's own description lists the eleven names a caller may pass. `plugins/spn-devex/src/agents/spn-panel.md`.
 
 ### The lens names are also the document audience
 
 **Why** — *the reader a document is written for and the reviewer who judges it are the same list*. Two lists would let a document declare an audience no reviewer could be convened as.
 **What** — the same eleven values are what a `spn:doc` block's `lenses` field may carry, and the audit refuses anything outside the list.
-**How** — the register maps each value to the label a tag line renders — `SERVER_DEV` reads *Backend developer*. `plugins/spn-devex/hooks/tools/docs.ts`, `LENS_LABEL`.
+**How** — the register maps each value to the label a tag line renders — `SERVER_DEV` reads *Backend developer*. `plugins/spn-devex/src/scripts/tools/docs.ts`, `LENS_LABEL`.
 
 ### A lens is regenerated, never argued with
 
 **Why** — *where a lens and the book disagree, the book wins*. A lens that starts deciding rules becomes a second standard nobody audits.
 **What** — each file names its own sources of truth at the top and states plainly that it restates them and adds none of its own.
-**How** — the stamped block above that line is what the drift run re-reads. Read the first fifteen lines of `plugins/spn-devex/refs/lenses/architect.md`.
+**How** — the stamped block above that line is what the drift run re-reads. Read the first fifteen lines of `plugins/spn-devex/src/refs/lenses/architect.md`.
 
 ## Between modules
 

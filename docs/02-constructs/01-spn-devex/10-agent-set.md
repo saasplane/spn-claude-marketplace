@@ -56,27 +56,27 @@ Most briefs are a fixed persona and read the same way on every convening. One is
 
 ### The frontmatter
 
-`name` and `description`, read the same way [a skill's](07-skill-set.md) are: the description is matched against the moment rather than browsed, and it decides whether this persona takes the reply. Two more fields are optional. `model` chooses which model runs the persona, and `tools` narrows what it may call. Leaving `tools` out grants every tool the session itself has. *Where:* the first lines of `plugins/spn-devex/agents/spn-prose-rewriter.md`
+`name` and `description`, read the same way [a skill's](07-skill-set.md) are: the description is matched against the moment rather than browsed, and it decides whether this persona takes the reply. Two more fields are optional. `model` chooses which model runs the persona, and `tools` narrows what it may call. Leaving `tools` out grants every tool the session itself has. *Where:* the first lines of `plugins/spn-devex/src/agents/spn-prose-rewriter.md`
 
 ### Where a read-only promise is actually bound
 
-A brief declaring `tools` is bound by it: the permission is a fact about the convening rather than an instruction the persona is asked to follow. A brief that declares no `tools` inherits everything the session has, and its promise not to write is prose. Both kinds exist here, and telling them apart matters when a reviewer's independence is what the brief is for. *Where:* compare the frontmatter of `plugins/spn-devex/agents/spn-prose-reviewer.md` with that of `plugins/spn-devex/agents/spn-panel.md`
+A brief declaring `tools` is bound by it: the permission is a fact about the convening rather than an instruction the persona is asked to follow. A brief that declares no `tools` inherits everything the session has, and its promise not to write is prose. Both kinds exist here, and telling them apart matters when a reviewer's independence is what the brief is for. *Where:* compare the frontmatter of `plugins/spn-devex/src/agents/spn-prose-reviewer.md` with that of `plugins/spn-devex/src/agents/spn-panel.md`
 
 ### A fixed persona
 
-A brief with no argument is one voice, always: an engineering lead, a prose rewriter, a prose reviewer. Its whole authority is the words in its own file, read the same way each time it is called. *Where:* `plugins/spn-devex/agents/spn-engineer.md`
+A brief with no argument is one voice, always: an engineering lead, a prose rewriter, a prose reviewer. Its whole authority is the words in its own file, read the same way each time it is called. *Where:* `plugins/spn-devex/src/agents/spn-engineer.md`
 
 ### A parameterized reviewer
 
-One brief here takes a viewpoint name as part of what it is convened over. It reads that viewpoint's own file before anything else, and that file — rather than the brief — states what this convening may refuse and what it may only advise. The brief's own description lists the names a caller may pass, which is also what makes them discoverable. *Where:* `plugins/spn-devex/agents/spn-panel.md`
+One brief here takes a viewpoint name as part of what it is convened over. It reads that viewpoint's own file before anything else, and that file — rather than the brief — states what this convening may refuse and what it may only advise. The brief's own description lists the names a caller may pass, which is also what makes them discoverable. *Where:* `plugins/spn-devex/src/agents/spn-panel.md`
 
 ### A reviewer that edits has stopped reviewing
 
-Where a persona both finds a problem and fixes it, the finding and the fix arrive together and nobody can weigh one without the other. So the reviewing briefs report, the engineering brief advises, and exactly one brief is permitted to write — over the paragraphs it was handed, never over a whole file. *Where:* `plugins/spn-devex/agents/spn-prose-rewriter.md`
+Where a persona both finds a problem and fixes it, the finding and the fix arrive together and nobody can weigh one without the other. So the reviewing briefs report, the engineering brief advises, and exactly one brief is permitted to write — over the paragraphs it was handed, never over a whole file. *Where:* `plugins/spn-devex/src/agents/spn-prose-rewriter.md`
 
 ### A brief points at a rule and never invents one
 
-A persona stating a rule with no chapter behind it has produced a suggestion wearing the clothes of a finding, and the next reader cannot tell which they are holding. Each brief names where its standard lives: the reviewing brief's standard is the viewpoint file, and that file's standard is the book. *Where:* `plugins/spn-devex/agents/spn-engineer.md`
+A persona stating a rule with no chapter behind it has produced a suggestion wearing the clothes of a finding, and the next reader cannot tell which they are holding. Each brief names where its standard lives: the reviewing brief's standard is the viewpoint file, and that file's standard is the book. *Where:* `plugins/spn-devex/src/agents/spn-engineer.md`
 
 ## Boundary
 
@@ -105,6 +105,6 @@ This page answers what a brief is, how a persona is convened, and where its auth
 
 | Check | Kind | What a green run shows |
 | --- | --- | --- |
-| `node plugins/spn-devex/hooks/tools/restate-drift.ts` | gate | every viewpoint a brief can be handed still reads as the chapters it stamps read today |
+| `node plugins/spn-devex/src/scripts/tools/restate-drift.ts` | gate | every viewpoint a brief can be handed still reads as the chapters it stamps read today |
 
-Try it: `node plugins/spn-devex/hooks/tools/restate-drift.ts`
+Try it: `node plugins/spn-devex/src/scripts/tools/restate-drift.ts`

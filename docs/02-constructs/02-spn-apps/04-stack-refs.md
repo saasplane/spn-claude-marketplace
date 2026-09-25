@@ -55,23 +55,23 @@ The skill is one. The layer is chosen from the repository's own claim, and what 
 
 ### The skill has no stack variant, so the layer is a ref
 
-The book's skill set is closed and carries no planning skill for this world. Shipping one here would add a value the standard does not have, and two skills with almost the same description would then compete for the same ask. So the skill stays in one plugin, and this file supplies the layer instead — the part of the plan that only this stack can answer. *Where:* `plugins/spn-apps/refs/plan.md`
+The book's skill set is closed and carries no planning skill for this world. Shipping one here would add a value the standard does not have, and two skills with almost the same description would then compete for the same ask. So the skill stays in one plugin, and this file supplies the layer instead — the part of the plan that only this stack can answer. *Where:* `plugins/spn-apps/src/refs/providers/ts/plan.md`
 
 ### It says in its first line that it is not a skill
 
-A reader who opens the file directly, or an agent that finds it while searching, has to be told immediately what it is. So the file states its own standing at the top, before anything it describes. *Where:* the first lines of `plugins/spn-apps/refs/plan.md`
+A reader who opens the file directly, or an agent that finds it while searching, has to be told immediately what it is. So the file states its own standing at the top, before anything it describes. *Where:* the first lines of `plugins/spn-apps/src/refs/providers/ts/plan.md`
 
 ### A design lands as rows in the documents that already exist
 
-Planning is written into the documents that will later be flipped to done. A scratch file or a task tree becomes a second plan, and the build then reconciles documents instead of changing statuses. So the file names the seats a row belongs in — what a person can do, and what the contract gains — and marks every one of them as planned. *Where:* `plugins/spn-apps/refs/plan.md`
+Planning is written into the documents that will later be flipped to done. A scratch file or a task tree becomes a second plan, and the build then reconciles documents instead of changing statuses. So the file names the seats a row belongs in — what a person can do, and what the contract gains — and marks every one of them as planned. *Where:* `plugins/spn-apps/src/refs/providers/ts/plan.md`
 
 ### The mode is chosen, and the choice is said out loud
 
-A reader who cannot tell which walk ran cannot tell whether the output is complete. The file describes more than one walk, takes the choice from the mode argument [the skill](03-stack-skills.md) declares, and requires the inferred one to be named where nobody gave it. *Where:* `plugins/spn-apps/refs/plan.md`
+A reader who cannot tell which walk ran cannot tell whether the output is complete. The file describes more than one walk, takes the choice from the mode argument [the skill](03-stack-skills.md) declares, and requires the inferred one to be named where nobody gave it. *Where:* `plugins/spn-apps/src/refs/providers/ts/plan.md`
 
 ### It is stamped like any other restatement
 
-The file carries the same block a core ref carries, naming each chapter it restates and the hash last read there, so a drift run reads it exactly as it reads the rest. *Where:* the `spn:restates` block at the top of `plugins/spn-apps/refs/plan.md`
+The file carries the same block a core ref carries, naming each chapter it restates and the hash last read there, so a drift run reads it exactly as it reads the rest. *Where:* the `spn:restates` block at the top of `plugins/spn-apps/src/refs/providers/ts/plan.md`
 
 ## Boundary
 
@@ -100,6 +100,6 @@ This page answers why a stack ships reference material for a skill it does not o
 
 | Check | Kind | What a green run shows |
 | --- | --- | --- |
-| `node plugins/spn-devex/hooks/tools/restate-drift.ts` | gate | the layer file's stamp still matches the chapters it names, so the copy has not fallen behind the book |
+| `node plugins/spn-devex/src/scripts/tools/restate-drift.ts` | gate | the layer file's stamp still matches the chapters it names, so the copy has not fallen behind the book |
 
-Try it: `node plugins/spn-devex/hooks/tools/restate-drift.ts`
+Try it: `node plugins/spn-devex/src/scripts/tools/restate-drift.ts`

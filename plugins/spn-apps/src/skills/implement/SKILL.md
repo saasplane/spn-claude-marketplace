@@ -5,7 +5,7 @@ description: THE requirement router for SaaS Plane TS repos. Use whenever the us
 
 # implement — classify, then walk the steps in order
 
-If the `plan` skill ran, the design is already in the owning module's docs as `🔮 planned` rows (behaviors + capabilities) — read those rows back as the spec. Otherwise classify from the request directly.
+If the `ideate` skill ran, the design is already in the owning module's docs as `🔮 planned` rows (behaviors + capabilities) — read those rows back as the spec. Otherwise classify from the request directly.
 
 ## 1. Classify
 
@@ -18,7 +18,7 @@ If the `plan` skill ran, the design is already in the owning module's docs as `�
 Gates before starting:
 
 - **Gate check.** Where the change adds or moves an authorization gate, settle what varies the answer before you write it. A rule that changes per person is a permission; per organization type, an enablement; per plan, billing. None substitutes for another, and an enablement never gates a read. `refs/permission-vs-enablement.md` in the **spn-devex** plugin carries the question, the grammar and the traps; this plugin's `hooks/scripts/enablement-grammar.py` refuses the checkable ones at write time.
-- **Additive check.** If the change removes/renames/retypes a published field, changes a meaning, or tightens validation on an existing command field, it is **breaking**. Stop and reroute through the `plan` skill (decision + versioning path). Additive by default is the rule, not a preference.
+- **Additive check.** If the change removes/renames/retypes a published field, changes a meaning, or tightens validation on an existing command field, it is **breaking**. Stop and reroute through the `ideate` skill (decision + versioning path). Additive by default is the rule, not a preference.
 - **Ownership check.** The change lands in the module that owns the capability (its package, or the app-owned module). Cross-module needs go through the other module's **contract** services — or a request queue for writes — never its internals.
 
 ## 2. Read the installed platform surface — per step, on demand

@@ -12,11 +12,11 @@
 
 | Part of the construct | Lives in | What it is |
 | --- | --- | --- |
-| The wiring | `plugins/spn-devex/hooks/hooks.json` | the four entries, their matchers and their timeouts |
-| The window opening | `plugins/spn-devex/hooks/events/orientation.ts` | `SessionStart`, on `startup`, `resume` or `clear` |
-| A call about to run | `plugins/spn-devex/hooks/events/pretooluse.ts` | `PreToolUse`, matching `Read`, `Write`, `Edit`, `Bash`, `Grep`, `Glob` and `NotebookRead` |
-| A shell command that finished | `plugins/spn-devex/hooks/events/closed.ts` | `PostToolUse`, matching `Bash` |
-| A turn about to end | `plugins/spn-devex/hooks/events/stop.ts` | `Stop`, with no matcher |
+| The wiring | `plugins/spn-devex/src/hooks/hooks.json` | the four entries, their matchers and their timeouts |
+| The window opening | `plugins/spn-devex/src/scripts/events/orientation.ts` | `SessionStart`, on `startup`, `resume` or `clear` |
+| A call about to run | `plugins/spn-devex/src/scripts/events/pretooluse.ts` | `PreToolUse`, matching `Read`, `Write`, `Edit`, `Bash`, `Grep`, `Glob` and `NotebookRead` |
+| A shell command that finished | `plugins/spn-devex/src/scripts/events/closed.ts` | `PostToolUse`, matching `Bash` |
+| A turn about to end | `plugins/spn-devex/src/scripts/events/stop.ts` | `Stop`, with no matcher |
 
 ## Follows the pattern
 
@@ -29,7 +29,7 @@
 
 **Why** — *the workspace is discovered, never declared*. A file naming the members in prose is wrong the first time somebody clones another repository, and a repository that is absent is not missing.
 **What** — nothing in the opening screen is typed. The script walks the root, reads each `sprepo.json` for the world and the stack claim, checks the wiring that claim implies, and lists every workstream in all three states.
-**How** — three parts in a fixed order: a welcome, the ground, and exactly one open question. You arrive with a subject in mind, so a list of options would only talk you out of it. Read `plugins/spn-devex/hooks/events/orientation.ts`.
+**How** — three parts in a fixed order: a welcome, the ground, and exactly one open question. You arrive with a subject in mind, so a list of options would only talk you out of it. Read `plugins/spn-devex/src/scripts/events/orientation.ts`.
 
 ### Day zero is the case where there is nothing to read
 
@@ -47,13 +47,13 @@
 
 **Why** — *the close gate runs before the move and speaks only to refuse*. Congratulating from there would congratulate something that has not happened and might still fail.
 **What** — `PostToolUse` on `Bash` reads the command's own `mv`, and when a workstream folder has actually moved into `closed/` it says what landed, counted from that page's split plan.
-**How** — the subject is taken from the source of the move, because `mv <subject> closed/` is how a close is typed and the destination is then only a structural name. It reads the same parser the close gate refused with, so both count the same table. `plugins/spn-devex/hooks/events/closed.ts`.
+**How** — the subject is taken from the source of the move, because `mv <subject> closed/` is how a close is typed and the destination is then only a structural name. It reads the same parser the close gate refused with, so both count the same table. `plugins/spn-devex/src/scripts/events/closed.ts`.
 
 ### A turn that ends warns and never refuses
 
 **Why** — *the turn is already written*, and a refusal at that point would only lose it.
 **What** — three warnings: a turn ending while the running arc still has rows nothing blocks, an arc marked `HELD` that names no live card, and a reply announcing a new window without the handover fields.
-**How** — the runnable warning exists because reporting is not stopping; a milestone line belongs between steps, in the same turn as the next step. `plugins/spn-devex/hooks/events/stop.ts`.
+**How** — the runnable warning exists because reporting is not stopping; a milestone line belongs between steps, in the same turn as the next step. `plugins/spn-devex/src/scripts/events/stop.ts`.
 
 ## Between modules
 

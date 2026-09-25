@@ -6,18 +6,18 @@
 
 `For: Backend developer · Web developer` · `Status: ✅ DONE` · `Realizes: Stack Skills`
 
-Five folders sit under `plugins/spn-apps/skills/`: `new`, `implement`, `review`, `run` and `verify`. Each is named for a command of the `apps` group, made concrete for a SaaS Plane TypeScript repository. The absence is as deliberate as the five. **Planning is not here.** The skill is stack-agnostic and lives once in `spn-devex`; this plugin supplies only the layer that skill reads for the `APPS` and TypeScript combination.
+Five folders sit under `plugins/spn-apps/src/skills/`: `new`, `implement`, `review`, `run` and `verify`. Each is named for a command of the `apps` group, made concrete for a SaaS Plane TypeScript repository. The absence is as deliberate as the five. **Planning is not here.** The skill is stack-agnostic and lives once in `spn-devex`; this plugin supplies only the layer that skill reads for the `APPS` and TypeScript combination.
 
 ## Where
 
 | Part of the construct | Lives in | What it is |
 | --- | --- | --- |
-| Scaffolding | `plugins/spn-apps/skills/new/SKILL.md` | a workspace root, a project of a supported kind, or an app-owned module |
-| The build loop | `plugins/spn-apps/skills/implement/SKILL.md` | classifies the requirement, then sequences the steps |
-| The ordered steps | `plugins/spn-apps/skills/implement/steps/*.md` | `contract` · `service` · `entry` · `queue` · `ui` · `test` · `docs` |
-| Review | `plugins/spn-apps/skills/review/SKILL.md` | two modes: the code standards, and the contract gate |
-| Running | `plugins/spn-apps/skills/run/SKILL.md` | start the stack locally, or run its suites |
-| Proving | `plugins/spn-apps/skills/verify/SKILL.md` | three modes: package, app, and a destructive reset |
+| Scaffolding | `plugins/spn-apps/src/skills/new/SKILL.md` | a workspace root, a project of a supported kind, or an app-owned module |
+| The build loop | `plugins/spn-apps/src/skills/implement/SKILL.md` | classifies the requirement, then sequences the steps |
+| The ordered steps | `plugins/spn-apps/src/skills/implement/steps/*.md` | `contract` · `service` · `entry` · `queue` · `ui` · `test` · `docs` |
+| Review | `plugins/spn-apps/src/skills/review/SKILL.md` | two modes: the code standards, and the contract gate |
+| Running | `plugins/spn-apps/src/skills/run/SKILL.md` | start the stack locally, or run its suites |
+| Proving | `plugins/spn-apps/src/skills/verify/SKILL.md` | three modes: package, app, and a destructive reset |
 
 ## Follows the pattern
 
@@ -30,7 +30,7 @@ Five folders sit under `plugins/spn-apps/skills/`: `new`, `implement`, `review`,
 
 **Why** — *the contract comes first, and everything downstream is generated from it or written against it*. A service written before its state is a service that will be rewritten.
 **What** — `implement` is the only skill here with a `steps/` folder. Seven files run in a fixed order, and each is read before that layer's code is written rather than after.
-**How** — the skill first classifies the requirement as back end only, front end only, or full stack, and that classification decides which steps apply. `plugins/spn-apps/skills/implement/SKILL.md`.
+**How** — the skill first classifies the requirement as back end only, front end only, or full stack, and that classification decides which steps apply. `plugins/spn-apps/src/skills/implement/SKILL.md`.
 
 ### A mode is an argument, not a second skill
 
@@ -42,7 +42,7 @@ Five folders sit under `plugins/spn-apps/skills/`: `new`, `implement`, `review`,
 
 **Why** — *a reset rebuilds from a clean state and throws away what was there*. Discovering that after the fact is the expensive way to learn it.
 **What** — `verify` marks its reset mode as destructive in the sentence a session matches against, not only in the body it loads afterwards.
-**How** — the same discipline applies to `run`, which states that it starts and does not verify. `plugins/spn-apps/skills/verify/SKILL.md`.
+**How** — the same discipline applies to `run`, which states that it starts and does not verify. `plugins/spn-apps/src/skills/verify/SKILL.md`.
 
 ### A step carries rules it does not own
 
@@ -54,7 +54,7 @@ Five folders sit under `plugins/spn-apps/skills/`: `new`, `implement`, `review`,
 
 **Why** — *a contract change reviewed at the end of a session is reviewed by the context that wrote it*.
 **What** — `implement` closes with tests and then hands the change to `review` in its contract mode, rather than leaving the gate to whoever remembers it.
-**How** — the hand-off is named in the description, so the match happens even when the developer does not ask for it. `plugins/spn-apps/skills/implement/SKILL.md`.
+**How** — the hand-off is named in the description, so the match happens even when the developer does not ask for it. `plugins/spn-apps/src/skills/implement/SKILL.md`.
 
 ## Between modules
 

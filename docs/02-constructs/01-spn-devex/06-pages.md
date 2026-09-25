@@ -58,31 +58,31 @@ The pocket holding pages mirrors the seat folder exactly, so a seat file and its
 
 ### A small renderer rather than a library
 
-A partner installs nothing to read a document, so a dependency would have to be on the machine before a page could be produced at all. The seat file's grammar is closed — headings, paragraphs, tables, lists and fenced blocks — so the renderer covers that grammar and no more. *Where:* `plugins/spn-devex/hooks/lib/render.ts`
+A partner installs nothing to read a document, so a dependency would have to be on the machine before a page could be produced at all. The seat file's grammar is closed — headings, paragraphs, tables, lists and fenced blocks — so the renderer covers that grammar and no more. *Where:* `plugins/spn-devex/src/scripts/lib/render.ts`
 
 ### The block vocabulary an author types
 
-An author never types HTML. One card states the whole vocabulary in the spelling it is written in: a paragraph is a paragraph, a rule is a blockquote, a literal is a fenced block tagged with its language, a figure is a fenced block tagged `dg`. The card is the thing to read before writing a seat file, and the chapter it restates is what wins where the two disagree. *Where:* `plugins/spn-devex/refs/blocks.md`
+An author never types HTML. One card states the whole vocabulary in the spelling it is written in: a paragraph is a paragraph, a rule is a blockquote, a literal is a fenced block tagged with its language, a figure is a fenced block tagged `dg`. The card is the thing to read before writing a seat file, and the chapter it restates is what wins where the two disagree. *Where:* `plugins/spn-devex/src/refs/devex/workspace/docs/blocks.md`
 
 ### Nothing in a figure is drawn by eye
 
-Every box is measured from its own text, so a label fits and a connector lands on an edge by construction rather than by luck. The canvas is one width and the type sizes are a closed set. The shape carries meaning too: a reader knows a decision from a step before reading either label. *Where:* `plugins/spn-devex/hooks/lib/draw.ts`
+Every box is measured from its own text, so a label fits and a connector lands on an edge by construction rather than by luck. The canvas is one width and the type sizes are a closed set. The shape carries meaning too: a reader knows a decision from a step before reading either label. *Where:* `plugins/spn-devex/src/scripts/lib/draw.ts`
 
 ### A figure check reads the drawn result, not the spec
 
-The checker asks whether each label fits its box, whether every connector starts and ends where it claims to, whether a connector has enough visible length for a reader to see it, and whether anything crowds the edge of the canvas or its neighbour. It reads the drawing rather than the specification, because a figure authored as drawing by hand is exactly the one nothing measured. *Where:* `plugins/spn-devex/hooks/lib/figures.ts`
+The checker asks whether each label fits its box, whether every connector starts and ends where it claims to, whether a connector has enough visible length for a reader to see it, and whether anything crowds the edge of the canvas or its neighbour. It reads the drawing rather than the specification, because a figure authored as drawing by hand is exactly the one nothing measured. *Where:* `plugins/spn-devex/src/scripts/lib/figures.ts`
 
 ### The links a page carries are re-expressed, never copied
 
-A seat file's links are written from the seat's own folder, and a page sits in a different folder whose neighbours carry different names. So the renderer re-expresses each relative link against the page's own location as it writes. Copying them across unchanged once broke a link on every produced page in the workspace, and no check saw it. *Where:* `plugins/spn-devex/hooks/lib/render.ts`, `hrefForPage`
+A seat file's links are written from the seat's own folder, and a page sits in a different folder whose neighbours carry different names. So the renderer re-expresses each relative link against the page's own location as it writes. Copying them across unchanged once broke a link on every produced page in the workspace, and no check saw it. *Where:* `plugins/spn-devex/src/scripts/lib/render.ts`, `hrefForPage`
 
 ### Behaviour rows are joined, never typed
 
-A page's proof section carries the rows from the register beside it, spliced in at production time and marked with the register they came from. The seat file is not touched: the join happens on the markdown in memory. That is what keeps one status in one place, because the copy on the page is produced again on every write. *Where:* `plugins/spn-devex/hooks/tools/docs.ts`, `joinProof`
+A page's proof section carries the rows from the register beside it, spliced in at production time and marked with the register they came from. The seat file is not touched: the join happens on the markdown in memory. That is what keeps one status in one place, because the copy on the page is produced again on every write. *Where:* `plugins/spn-devex/src/scripts/tools/docs.ts`, `joinProof`
 
 ### Generated regions are bounded, and a hand edit inside them is lost
 
-Part of a face is written by a person and part is generated. The two are told apart by markers that name what writes the region, so no second file is needed to know which is which. A face also declares its own source root, so a repository whose source is not laid out in the usual place generates a map naming folders that exist. *Where:* `plugins/spn-devex/hooks/tools/docs.ts`, `face`
+Part of a face is written by a person and part is generated. The two are told apart by markers that name what writes the region, so no second file is needed to know which is which. A face also declares its own source root, so a repository whose source is not laid out in the usual place generates a map naming folders that exist. *Where:* `plugins/spn-devex/src/scripts/tools/docs.ts`, `face`
 
 ## Boundary
 
@@ -111,7 +111,7 @@ This page answers how a page is produced, what a figure is measured against, and
 
 | Check | Kind | What a green run shows |
 | --- | --- | --- |
-| `node plugins/spn-devex/hooks/tools/docs.ts figures check docs` | gate | every label fits its box, every connector starts and ends on a shape, nothing crowds its neighbour, and every figure's spec carries the caption a reader is owed. The path is the whole tree rather than the produced pages alone, because a caption is read from the spec in the seat file and a produced page holds none |
-| `node plugins/spn-devex/hooks/tools/docs.ts audit docs` | gate | every page is what its seat file produces, so no page carries a hand edit |
+| `node plugins/spn-devex/src/scripts/tools/docs.ts figures check docs` | gate | every label fits its box, every connector starts and ends on a shape, nothing crowds its neighbour, and every figure's spec carries the caption a reader is owed. The path is the whole tree rather than the produced pages alone, because a caption is read from the spec in the seat file and a produced page holds none |
+| `node plugins/spn-devex/src/scripts/tools/docs.ts audit docs` | gate | every page is what its seat file produces, so no page carries a hand edit |
 
-Try it: `node plugins/spn-devex/hooks/tools/docs.ts figures check docs`
+Try it: `node plugins/spn-devex/src/scripts/tools/docs.ts figures check docs`

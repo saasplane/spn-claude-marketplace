@@ -42,7 +42,7 @@ install nothing for that.
 | 6 | Create the monorepo and its `sprepo.json` — the stack claim and the infra couplings | the `new` skill, for a platform | 🚧 |
 | 7 | Bring the platform up locally | `infra organization up` · `infra platform up` | ✅ |
 | 8 | Create the first app and register it | the `new` skill · `infra app up` | 🚧 |
-| 9 | First feature — plan, then build | the `plan` skill → the `implement` skill | 🚧 |
+| 9 | First feature — plan, then build | the `ideate` skill → the `implement` skill | 🚧 |
 | 10 | Refresh the wiring after upgrades | `spnutils repo agent-sync` | ✅ |
 
 Three things worth knowing on day one:

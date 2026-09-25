@@ -125,7 +125,7 @@ Two files name a plugin, and they answer different questions.
   "owner":   { "name": "SaaS Plane" },
   "plugins": [ { "name": "spn-devex", "source": "./plugins/spn-devex", "description": "…" } ] }
 
-// plugins/spn-devex/.claude-plugin/plugin.json — inside the plugin's own folder
+// plugins/spn-devex/src/.claude-plugin/plugin.json — inside the plugin's own folder
 { "name": "spn-devex", "version": "0.7.2", "description": "…", "author": { "name": "SaaS Plane" } }
 ```
 

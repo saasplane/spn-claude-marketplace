@@ -56,19 +56,19 @@ A card sits between the book and the moment somebody needs a word, and it is rea
 
 ### The laws card is written to be read first
 
-A law is useful at the moment somebody is about to break it. A list of principles read afterwards explains a mistake rather than preventing one. So the laws card asks a reader to look for the checkable defect each law names and to raise it before doing anything else, and each law is numbered and states its own defect. The guard's refusal messages point back at this card, so a denial and its reasoning are one hop apart. *Where:* `plugins/spn-infra/refs/laws.md`
+A law is useful at the moment somebody is about to break it. A list of principles read afterwards explains a mistake rather than preventing one. So the laws card asks a reader to look for the checkable defect each law names and to raise it before doing anything else, and each law is numbered and states its own defect. The guard's refusal messages point back at this card, so a denial and its reasoning are one hop apart. *Where:* `plugins/spn-infra/src/refs/support/infra/laws.md`
 
 ### A node is found by its manifest, never by its folder name
 
-The folder name is checked against the manifest rather than trusted as one. Inferring a node's kind from where it sits is how a package comes to be treated as something it is not. The card states which files every estate node carries and which of them answers which question, and the path locator in the same card is what resolves a node from where you are standing. *Where:* `plugins/spn-infra/refs/manifests.md`
+The folder name is checked against the manifest rather than trusted as one. Inferring a node's kind from where it sits is how a package comes to be treated as something it is not. The card states which files every estate node carries and which of them answers which question, and the path locator in the same card is what resolves a node from where you are standing. *Where:* `plugins/spn-infra/src/refs/support/infra/packages.md`
 
 ### The layers are read in order, and the order explains most failures
 
-A lower layer that is missing is the usual reason a higher one will not start, and that is a diagnosis rather than a rule. The card lists the layer nouns, gives each of them the same commands, and states the order they come up in. It names the tool's command realizing each act, so the card can be read beside a command that is already running. *Where:* `plugins/spn-infra/refs/layers-doors.md`
+A lower layer that is missing is the usual reason a higher one will not start, and that is a diagnosis rather than a rule. The card lists the layer nouns, gives each of them the same commands, and states the order they come up in. It names the tool's command realizing each act, so the card can be read beside a command that is already running. *Where:* `plugins/spn-infra/src/refs/support/infra/shape.md`
 
 ### A name that cannot be composed from coordinates is a defect
 
-A name derived from a label carries a meaning nobody can read back. The posture of an environment comes from the value it declares, never from a word inside its setup name. So the naming card gives the grammar and the closed vocabulary each part is drawn from, and states plainly that a provider's own region is a mapping on a cloud entry rather than a coordinate of the name. *Where:* `plugins/spn-infra/refs/naming.md`
+A name derived from a label carries a meaning nobody can read back. The posture of an environment comes from the value it declares, never from a word inside its setup name. So the naming card gives the grammar and the closed vocabulary each part is drawn from, and states plainly that a provider's own region is a mapping on a cloud entry rather than a coordinate of the name. *Where:* `plugins/spn-infra/src/refs/support/infra/naming.md`
 
 ### Every example uses one invented platform
 
@@ -101,6 +101,6 @@ This page answers which subjects the estate's cards cover and what a card may co
 
 | Check | Kind | What a green run shows |
 | --- | --- | --- |
-| `node plugins/spn-devex/hooks/tools/restate-drift.ts` | gate | every card's stamp still matches the sections it names, so none of the copies has fallen behind the book |
+| `node plugins/spn-devex/src/scripts/tools/restate-drift.ts` | gate | every card's stamp still matches the sections it names, so none of the copies has fallen behind the book |
 
-Try it: `node plugins/spn-devex/hooks/tools/restate-drift.ts`
+Try it: `node plugins/spn-devex/src/scripts/tools/restate-drift.ts`

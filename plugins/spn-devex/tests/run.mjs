@@ -76,7 +76,7 @@ console.log(`\n  ${suites.length} suite(s) · ${cases} case(s)` +
 const artifact = resolve(REPO, "tests", ".output", TIER.toLowerCase(), "spn-tests.json");
 mkdirSync(dirname(artifact), { recursive: true });
 writeFileSync(artifact, `${JSON.stringify({
-  env: "local", tiers: [TIER], ranAt: new Date().toISOString(), from: "plugins/spn-devex/hooks/tests/run.mjs", results,
+  env: "local", tiers: [TIER], ranAt: new Date().toISOString(), from: "plugins/spn-devex/tests/run.mjs", results,
 }, null, 2)}\n`, "utf8");
 console.log(`  ${results.length} case(s) carry a behaviour id -> ${artifact.slice(REPO.length + 1)}`);
 

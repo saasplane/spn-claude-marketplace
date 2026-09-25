@@ -1,15 +1,51 @@
 <!-- spn:restates
 {
   "docs": [
+    { "path": "spn-foundation/docs/02-constructs/02-support/02-infra/01-shape.md", "seen": "6e6b0c23" },
     { "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md", "seen": "07a688b1" },
     { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/03-blueprints/01-layers.md", "seen": "b9746c9d" }
   ]
 }
 -->
 
-# Layers and doors — the estate command card
+# Estate Shape — the words, the edge, the layers and the doors
 
-**Source of truth:** the foundation's `docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md` and `docs/04-capabilities/02-support/02-infra/03-blueprints/01-layers.md`. Read this card as the restatement; the book governs. The realization is `spnutils infra …`.
+**Source of truth:** the foundation's `02-constructs/02-support/02-infra/01-shape.md` for what the estate is, and `04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md` with `04-capabilities/02-support/02-infra/03-blueprints/01-layers.md` for the commands that act on it. Read this as the restatement; the book governs. The realization is `spnutils infra …`.
+
+## Four groups of facts, and none borrows from another
+
+A declaration asks four different questions, and each has its own group of facts. **No group ever borrows a value from another** — a posture is never a resource, and a namespace is never a provider. That separation is what lets a check reject a wrong value in one field without reading the rest of the file.
+
+| Group | Answers | Where the detail is |
+| --- | --- | --- |
+| **Vocabulary** | which values may I write here | the fixed lists below, and each enum in the manifest |
+| **The edge** | which of these is mine to bring, and which appears on its own | *What a company brings* below |
+| **Coordinates** | where does this sit, and what is it called | [`naming.md`](naming.md) — the codes and the grammar that joins them |
+| **Providers** | who actually runs it | [`packages.md`](packages.md) and the cloud entries in the manifest |
+
+**Each is stable only because of the other three.** The fixed lists are closed because SaaS Plane publishes the code that creates each value — that is the edge. The names compose because the values are short and fixed — that is the vocabulary meeting the coordinates. And the coordinates stay portable because no provider's own spelling is allowed to become one — the edge again, keeping a provider's words out of the model.
+
+## Most fields take one value from a fixed list
+
+**A field that looks like free text usually is not.** A value outside its list is refused before anything runs.
+
+**A fixed list is checked before anything is created**, so a misspelling costs a second rather than half an estate. It is also a promise: SaaS Plane publishes code for each value, so writing one is asking for something that already exists. **Adding a value is a register decision, never a setting somebody switches on.**
+
+**Never count the values in a list.** A list is read by the rule that defines it, not by how many values it holds today (`RD.GOV.008`), and each list is stated once with every other mention pointing at that statement (`RD.GOV.011`). A sentence that says *the four postures* goes stale the day a fifth is ruled in.
+
+### What a package is, and which rung a fact sits on
+
+Two lists sit at the top of every declaration, because a declaration has to say two things about itself.
+
+`SPEstateType` says **what kind of package you are holding**, so a tool can pick the right rules before reading a field: `SUPPORT` is the shared baseline every estate reads, `ORGANIZATION` is one company with its providers, regions and billing, `PLATFORM` is one product and the environments it runs, and `MODULE` is an attachable thing. **A `MODULE` carries identity alone and no usage**, because the same module is used differently by every platform that attaches it — putting the usage inside would give one fact as many sources as it has users.
+
+`SPEstateScopeType` says **which rung a fact sits on** — `ORGANIZATION`, `PLATFORM`, `ENVIRONMENT`. Every fact in an estate belongs to exactly one, the coordinates are built from them, and the configuration plane spells its paths the same way, so a path says which rung it belongs to and nothing else.
+
+## What a company brings, and what is created for it
+
+**An estate is built from the outside in.** At the outside is the company, which has already bought and signed for things no software can create for it: **somewhere to keep code, somewhere to run it, and a domain**. Just inside sits the declaration — a few short codes, written once, saying what the company is called, what its products are called, and what its running targets are called. From those codes, published code creates the estate, and the applications deploy on top.
+
+**Nothing points backwards.** What the company brings becomes a provider binding and a set of codes; the fixed lists supply the values those codes may hold; the estate is created from them; the applications run on it. A rule that would need the estate to decide what the company brings is a rule in the wrong place.
 
 ## Layer nouns × commands
 

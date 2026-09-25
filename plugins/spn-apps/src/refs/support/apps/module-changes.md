@@ -8,7 +8,7 @@
 }
 -->
 
-# Contract Review Rules — Stack-Agnostic
+# Changing a published contract — the review gate
 
 Use these rules as the review gate for any SaaS Plane contract surface, in any stack. Source of truth: the foundation book, `docs/04-capabilities/02-support/01-apps/03-module/01-server/01-contract/01-states.md` (constructs), `docs/04-capabilities/02-support/01-apps/01-shape/03-architecture.md` (evolution and the generation chain), and `docs/registers/conformance.md` in `spn-foundation`. Apply these to every API change; a rule that fails blocks the change until it is fixed or recorded as a versioned, planned exception.
 

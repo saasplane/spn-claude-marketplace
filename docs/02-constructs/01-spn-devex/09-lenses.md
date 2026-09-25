@@ -58,23 +58,23 @@ The set of files is closed by a rule rather than fixed at a number: one lens per
 
 ### What one file says
 
-A lens file opens by saying when the viewpoint is worn, when it is convened, and the one condition on which it blocks. Then it says what it checks. Everything below the stated threshold is advice, and the file says so plainly, because a reviewer who can block anything stops being a reviewer and the work stops on taste. *Where:* `plugins/spn-devex/refs/lenses/architect.md`
+A lens file opens by saying when the viewpoint is worn, when it is convened, and the one condition on which it blocks. Then it says what it checks. Everything below the stated threshold is advice, and the file says so plainly, because a reviewer who can block anything stops being a reviewer and the work stops on taste. *Where:* `plugins/spn-devex/src/refs/lenses/architect.md`
 
 ### One procedure, many viewpoints
 
-A brief for each viewpoint would be many copies of one procedure, drifting apart, each needing the same change. So the procedure lives in one brief — read fresh, review what you did not write, report and never edit — and the subject matter lives in the lens file. The caller passes the name and the work. *Where:* `plugins/spn-devex/agents/spn-panel.md`
+A brief for each viewpoint would be many copies of one procedure, drifting apart, each needing the same change. So the procedure lives in one brief — read fresh, review what you did not write, report and never edit — and the subject matter lives in the lens file. The caller passes the name and the work. *Where:* `plugins/spn-devex/src/agents/spn-panel.md`
 
 ### The names are also the audience a document declares
 
-The reader a document is written for and the reviewer who judges it are one list. Two lists would let a document declare an audience no reviewer could be convened as. The register that maps each value to its reader label lives in the documents tool, and a document declaring a value outside the set is refused. *Where:* `plugins/spn-devex/hooks/tools/docs.ts`, `LENS_LABEL`
+The reader a document is written for and the reviewer who judges it are one list. Two lists would let a document declare an audience no reviewer could be convened as. The register that maps each value to its reader label lives in the documents tool, and a document declaring a value outside the set is refused. *Where:* `plugins/spn-devex/src/scripts/tools/docs.ts`, `LENS_LABEL`
 
 ### A lens is regenerated, never argued with
 
-Each file names its own sources at the top and states that it restates them and adds none of its own. Where a lens and the book disagree, the book wins. A lens that starts deciding rules has become a second standard nobody audits. *Where:* the first lines of `plugins/spn-devex/refs/lenses/trust.md`
+Each file names its own sources at the top and states that it restates them and adds none of its own. Where a lens and the book disagree, the book wins. A lens that starts deciding rules has become a second standard nobody audits. *Where:* the first lines of `plugins/spn-devex/src/refs/lenses/trust.md`
 
 ### Wearing and convening are different acts
 
-Wearing a lens while writing makes the work better and is never a review, because the context that drafted something already agrees with its own reasoning. Convening is the other act: a reader who did not write the work, holding one file, reporting what that viewpoint found. A skill says which gate convenes which viewpoint. *Where:* `plugins/spn-devex/skills/plan/SKILL.md`, `plugins/spn-devex/skills/develop/SKILL.md`
+Wearing a lens while writing makes the work better and is never a review, because the context that drafted something already agrees with its own reasoning. Convening is the other act: a reader who did not write the work, holding one file, reporting what that viewpoint found. A skill says which gate convenes which viewpoint. *Where:* `plugins/spn-devex/src/skills/ideate/SKILL.md`, `plugins/spn-devex/src/skills/develop/SKILL.md`
 
 ## Boundary
 
@@ -103,7 +103,7 @@ This page answers what a viewpoint file holds and how far its authority reaches.
 
 | Check | Kind | What a green run shows |
 | --- | --- | --- |
-| `node plugins/spn-devex/hooks/tools/restate-drift.ts` | gate | every viewpoint file still reads as the chapters it stamps read today |
-| `node plugins/spn-devex/hooks/tools/docs.ts audit docs` | gate | every document declares an audience drawn from the closed set, and its header renders the labels that set maps to |
+| `node plugins/spn-devex/src/scripts/tools/restate-drift.ts` | gate | every viewpoint file still reads as the chapters it stamps read today |
+| `node plugins/spn-devex/src/scripts/tools/docs.ts audit docs` | gate | every document declares an audience drawn from the closed set, and its header renders the labels that set maps to |
 
-Try it: `node plugins/spn-devex/hooks/tools/restate-drift.ts`
+Try it: `node plugins/spn-devex/src/scripts/tools/restate-drift.ts`

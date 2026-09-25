@@ -6,15 +6,15 @@
 
 `For: Backend developer · Architect` · `Status: ✅ DONE` · `Realizes: Stack Refs`
 
-This plugin restates exactly one thing on its own: the planning layer for a node whose world is `APPS` and whose stack is TypeScript. Everything else a ref could carry — the command vocabulary, the contract rules, the cross-repo protocol, the card grammar — is `spn-devex`'s, restated once and read by every stack's plugin. The one decision worth knowing before you open the file is that **it is reference material and not a skill**. It has no frontmatter, it matches no ask, and nothing loads it except the stack-agnostic `plan` skill once that skill has resolved which stack it is standing in.
+This plugin restates exactly one thing on its own: the planning layer for a node whose world is `APPS` and whose stack is TypeScript. Everything else a ref could carry — the command vocabulary, the contract rules, the cross-repo protocol, the card grammar — is `spn-devex`'s, restated once and read by every stack's plugin. The one decision worth knowing before you open the file is that **it is reference material and not a skill**. It has no frontmatter, it matches no ask, and nothing loads it except the stack-agnostic `ideate` skill once that skill has resolved which stack it is standing in.
 
 ## Where
 
 | Part of the construct | Lives in | What it is |
 | --- | --- | --- |
-| The planning layer | `plugins/spn-apps/refs/plan.md` | the three modes, the rows a design lands as, and the seats that hold them |
+| The planning layer | `plugins/spn-apps/src/refs/providers/ts/plan.md` | the three modes, the rows a design lands as, and the seats that hold them |
 | Its stamp | the `spn:restates` block at the top of that file | the docs domain and two apps provider chapters, each with the hash last seen |
-| The skill that loads it | `plugins/spn-devex/skills/plan/SKILL.md` | resolves the world and stack claim, then reads this file |
+| The skill that loads it | `plugins/spn-devex/src/skills/ideate/SKILL.md` | resolves the world and stack claim, then reads this file |
 
 ## Follows the pattern
 
@@ -27,7 +27,7 @@ This plugin restates exactly one thing on its own: the planning layer for a node
 
 **Why** — *the book's skill vocabulary is closed and carries no planning skill for the apps world*. Shipping one here would add a value the standard does not have, and two skills would then compete for the same ask.
 **What** — the planning skill stays in `spn-devex`. This file supplies what only a stack-concrete file can state: which seats a design's rows land in, and what each row must carry.
-**How** — the file states its own status in its first line, so a reader who opens it directly is told it is not a skill. `plugins/spn-apps/refs/plan.md`.
+**How** — the file states its own status in its first line, so a reader who opens it directly is told it is not a skill. `plugins/spn-apps/src/refs/providers/ts/plan.md`.
 
 ### A design lands as rows in the owning documents
 
