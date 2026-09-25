@@ -16,7 +16,7 @@
 
 ## 1 · Machines write the environment rung only
 
-The estate's keys — the `{SPC}_ORG_*` · `{SPC}_PLATFORM_*` · `{SPC}_RESOURCE_*` families (RD.INFRA.043) — land in the environment rung and nowhere else. **Every rung ends in the same leaf segment, `vars`** (RD.INFRA.104), because an application carries a seat per deployment beneath it and a path cannot be both a value and a parent of values:
+The estate's keys — the `{SPC}_ORG_*` · `{SPC}_PLATFORM_*` · `{SPC}_RESOURCE_*` families (RD.INFRA.043) — land in the environment rung and nowhere else. **Every rung ends in the same leaf segment, `vars`** (RD.INFRA.054), because an application carries a seat per deployment beneath it and a path cannot be both a value and a parent of values:
 
 ```text
 /organization/vars
