@@ -1,11 +1,11 @@
 <!-- spn:restates
 {
-  "chapters": [
-    { "path": "docs/02-constructs/02-support/02-infra/01-shape.md", "seen": "986e7a76" },
-    { "path": "docs/02-constructs/03-platform/01-core/01-tenancy.md", "seen": "8890bc14" },
-    { "path": "docs/04-capabilities/03-platform/README.md", "seen": "c6aa51b8" },
-    { "path": "docs/03-behaviors/01-devex/04-workspace/04-docs.md", "seen": "94ae4daf" },
-    { "path": "docs/03-behaviors/02-support/02-infra/01-shape.md", "seen": "4ca4d9d3" }
+  "docs": [
+    { "path": "spn-foundation/docs/02-constructs/02-support/02-infra/01-shape.md", "seen": "986e7a76" },
+    { "path": "spn-foundation/docs/02-constructs/03-platform/01-core/01-tenancy.md", "seen": "8890bc14" },
+    { "path": "spn-foundation/docs/04-capabilities/03-platform/README.md", "seen": "c6aa51b8" },
+    { "path": "spn-foundation/docs/03-behaviors/01-devex/04-workspace/04-docs.md", "seen": "94ae4daf" },
+    { "path": "spn-foundation/docs/03-behaviors/02-support/02-infra/01-shape.md", "seen": "4ca4d9d3" }
   ]
 }
 -->

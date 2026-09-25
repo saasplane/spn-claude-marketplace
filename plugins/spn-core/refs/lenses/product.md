@@ -1,8 +1,8 @@
 <!-- spn:restates
 {
-  "chapters": [
-    { "path": "docs/02-constructs/README.md", "seen": "a78978da" },
-    { "path": "docs/03-behaviors/README.md", "seen": "35978308" }
+  "docs": [
+    { "path": "spn-foundation/docs/02-constructs/README.md", "seen": "a78978da" },
+    { "path": "spn-foundation/docs/03-behaviors/README.md", "seen": "35978308" }
   ]
 }
 -->

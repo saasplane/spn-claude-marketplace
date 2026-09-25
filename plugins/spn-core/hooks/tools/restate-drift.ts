@@ -196,7 +196,9 @@ export function main(argv: string[], root: string): number {
       continue;
     }
     stamped += 1;
-    findings.push(...check(shown(path), block, book, knownRows));
+    // A citation names its repository, so it resolves from the WORKSPACE — the folder the
+    // sibling checkouts sit in, which is the book's parent (RD.DOCS.091).
+    findings.push(...check(shown(path), dirname(book), block, knownRows));
     omissions.push(...undeclared(path, block)
       .map((name) => `${shown(path)}: restates \`${name}\` and does not declare it`));
     for (const name of namedSources(path)[2]) unclassified.add(name);

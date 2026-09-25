@@ -1,10 +1,10 @@
 <!-- spn:restates
 {
-  "chapters": [
-    { "path": "docs/02-constructs/01-devex/02-agent/03-lenses.md", "seen": "ce48edfc" },
-    { "path": "docs/03-behaviors/README.md", "seen": "35978308" }
+  "docs": [
+    { "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/03-lenses.md", "seen": "ce48edfc" },
+    { "path": "spn-foundation/docs/03-behaviors/README.md", "seen": "35978308" }
   ],
-  "rows": []
+  "decisions": []
 }
 -->
 

@@ -1,11 +1,11 @@
 <!-- spn:restates
 {
-  "chapters": [
-    { "path": "docs/02-constructs/02-support/02-infra/06-modules.md", "section": "The rungs, and what a path may be", "seen": "24b787b2" },
-    { "path": "docs/04-capabilities/02-support/02-infra/02-packages/01-manifests.md", "section": "Intent and resolved state", "seen": "86359c7a" },
-    { "path": "docs/04-capabilities/02-support/02-infra/02-packages/01-manifests.md", "section": "Providers are a pattern, at both scopes", "seen": "b599d3fa" },
-    { "path": "docs/04-capabilities/02-support/02-infra/02-packages/01-manifests.md", "section": "One packages declaration; the registry derives", "seen": "0f079b44" },
-    { "path": "docs/04-capabilities/02-support/02-infra/04-resources/02-vendors.md", "section": "The blueprint is also a library, and a module's world is its own", "seen": "31aec928" }
+  "docs": [
+    { "path": "spn-foundation/docs/02-constructs/02-support/02-infra/06-modules.md", "section": "The rungs, and what a path may be", "seen": "24b787b2" },
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/02-packages/01-manifests.md", "section": "Intent and resolved state", "seen": "86359c7a" },
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/02-packages/01-manifests.md", "section": "Providers are a pattern, at both scopes", "seen": "b599d3fa" },
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/02-packages/01-manifests.md", "section": "One packages declaration; the registry derives", "seen": "0f079b44" },
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/04-resources/02-vendors.md", "section": "The blueprint is also a library, and a module's world is its own", "seen": "31aec928" }
   ]
 }
 -->

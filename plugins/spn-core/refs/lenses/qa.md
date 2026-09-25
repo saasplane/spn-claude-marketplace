@@ -1,9 +1,9 @@
 <!-- spn:restates
 {
-  "chapters": [
-    { "path": "docs/04-capabilities/02-support/01-apps/06-tests/README.md", "seen": "3c9b07ac" }
+  "docs": [
+    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/README.md", "seen": "3c9b07ac" }
   ],
-  "rows": [
+  "decisions": [
     "RD.APPS.086",
     "RD.APPS.119",
     "RD.APPS.120"

@@ -1,11 +1,11 @@
 <!-- spn:restates
 {
-  "chapters": [
-    { "path": "docs/04-capabilities/02-support/01-apps/03-module/01-server/02-app/01-services.md", "seen": "f826eedc" },
-    { "path": "docs/04-capabilities/02-support/01-apps/03-module/01-server/02-app/02-repositories.md", "seen": "bd7eea70" },
-    { "path": "providers/apps/ts/05-service-patterns.md", "seen": "1b2ac791" },
-    { "path": "providers/apps/ts/06-database-patterns.md", "seen": "1e1a1adc" },
-    { "path": "providers/apps/ts/02-structure.md", "seen": "51129e68" }
+  "docs": [
+    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/01-server/02-app/01-services.md", "seen": "f826eedc" },
+    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/01-server/02-app/02-repositories.md", "seen": "bd7eea70" },
+    { "path": "spn-foundation/providers/apps/ts/05-service-patterns.md", "seen": "1b2ac791" },
+    { "path": "spn-foundation/providers/apps/ts/06-database-patterns.md", "seen": "1e1a1adc" },
+    { "path": "spn-foundation/providers/apps/ts/02-structure.md", "seen": "51129e68" }
   ]
 }
 -->

@@ -31,7 +31,7 @@
 // Exit code is the number of findings.
 
 import { readdirSync, statSync } from "node:fs";
-import { basename, join } from "node:path";
+import { basename, join, dirname, resolve } from "node:path";
 import { isFile, read } from "../lib/payload.ts";
 import { check as restatesCheck, parse as restatesParse, registerRows, undeclared } from "../lib/restates.ts";
 
@@ -302,7 +302,9 @@ function restatementDrift(root: string): string[] {
     const [block, broken] = restatesParse(join(root, path));
     if (broken) findings.push(`${path}: ${broken}`);
     else if (block !== null) {
-      findings.push(...restatesCheck(path, block, root, known));
+      // The repository's own restatements cite themselves by repository name too, so they
+      // resolve from the workspace — this repo's parent — exactly as a plugin's do.
+      findings.push(...restatesCheck(path, dirname(resolve(root)), block, known));
       findings.push(...undeclared(join(root, path), block)
         .map((name) => `${path}: restates \`${name}\` and does not declare it`));
     }

@@ -14,11 +14,11 @@
 //
 //     <!-- spn:restates
 //     {
-//       "chapters": [
+//       "docs": [
 //         { "path": "CONCEPT.md", "section": "Kind Tests", "seen": "3f9c1e7a" },
 //         { "path": "docs/04-capabilities/02-support/01-apps/06-tests/README.md", "seen": "b204d81c" }
 //       ],
-//       "rows": ["RD.APPS.086"]
+//       "decisions": ["RD.APPS.086"]
 //     }
 //     -->
 //
@@ -33,7 +33,7 @@
 // people to stop reading the run.
 //
 // A BLOCK USED TO GET CREDIT FOR WHAT IT LEFT OUT (workstream 009, `A6`; fixed 2026-09-08). `check()`
-// walked `chapters` and `rows` and nothing else, so it could only ever validate what a file DECLARED.
+// walked `docs` and `decisions` and nothing else, so it could only ever validate what a file DECLARED.
 // A source the file named in its own prose and omitted from the block was unreachable rather than
 // unstamped, and both gates printed green over it. Two design lenses found that by reading, and no
 // run could have.
@@ -62,7 +62,21 @@ const IS_ROW_ID = /^RD\.[A-Z]+\.\d{3}$/;
 const HEADING = /^(#{1,6})[ \t]+(.+?)[ \t]*$/gm;
 
 export type Citation = { path?: string; section?: string; seen?: string };
-export type Block = { chapters?: Citation[]; rows?: string[] };
+/**
+ * What a ref stands on. **Four kinds, because each names a different obligation** — a moved `docs`
+ * entry means somebody rewrites a paragraph, `files` means somebody copies a file again, `commands`
+ * means somebody re-runs something, and `decisions` moves when a row is rewritten. One list would
+ * report that something changed and not what you owe (RD.DOCS.091).
+ */
+export type Block = {
+  docs?: Citation[];        // rewritten in the ref's own words
+  files?: Citation[];       // copied rather than rewritten; a path may name a folder
+  commands?: Citation[];    // re-run to regenerate part of the ref
+  decisions?: string[];     // register rows, cited by id because a row has no file
+};
+
+/** Every citation kind whose entries are objects carrying a `path` and a `seen`. */
+export const PATH_KINDS = ["docs", "files", "commands"] as const;
 
 /**
  * What a hash is taken over.
@@ -151,8 +165,11 @@ export function parse(path: string): [Block | null, string | null] {
   let block: Block;
   try { block = JSON.parse(found[1]); }
   catch (broken) { return [null, `spn:restates is not valid JSON — ${(broken as Error).message}`]; }
-  if (block.chapters !== undefined && !Array.isArray(block.chapters))
-    return [null, "spn:restates `chapters` must be a list of citations"];
+  for (const kind of PATH_KINDS)
+    if (block[kind] !== undefined && !Array.isArray(block[kind]))
+      return [null, `spn:restates \`${kind}\` must be a list of citations`];
+  if (block.decisions !== undefined && !Array.isArray(block.decisions))
+    return [null, "spn:restates `decisions` must be a list of row ids"];
   return [block, null];
 }
 
@@ -236,12 +253,12 @@ export function namedSources(path: string): [Set<string>, Set<string>, Set<strin
  */
 export function undeclared(path: string, block: Block): string[] {
   const [documents, rows] = namedSources(path);
-  const declared = (block.chapters ?? [])
+  const declared = PATH_KINDS.flatMap((kind) => block[kind] ?? [])
     .filter((c) => c && typeof c === "object")
     .map((c) => String(c.path ?? "").toLowerCase());
   const missing = [...documents].sort().filter((name) =>
     !declared.some((one) => one.includes(name.toLowerCase().replace(/^\/+|\/+$/g, ""))));
-  missing.push(...[...rows].sort().filter((row) => !(block.rows ?? []).includes(row)));
+  missing.push(...[...rows].sort().filter((row) => !(block.decisions ?? []).includes(row)));
   return missing;
 }
 
@@ -252,17 +269,21 @@ export function undeclared(path: string, block: Block): string[] {
  * it restates is `undeclared`, a separate question with a separate answer — an omission is not drift,
  * and reporting them as one hides which of the two you are looking at.
  *
- * `knownRows` may be empty, and then row citations are not checked at all — a repo holding no
+ * `workspace` is the folder the sibling checkouts sit in, because a citation names its repository.\n *\n * `knownRows` may be empty, and then row citations are not checked at all — a repo holding no
  * register is a fact about that repo rather than a finding about it.
  */
-export function check(path: string, block: Block, bookRoot: string, knownRows: Set<string>): string[] {
+export function check(path: string, workspace: string, block: Block, knownRows: Set<string>): string[] {
   const findings: string[] = [];
-  for (const citation of block.chapters ?? []) {
+  for (const citation of PATH_KINDS.flatMap((kind) => block[kind] ?? [])) {
     if (!citation || typeof citation !== "object" || citation.path === undefined) {
       findings.push(`${path}: a citation must be an object with a \`path\``);
       continue;
     }
-    const cited = join(bookRoot, citation.path);
+    // A CITATION STARTS AT THE REPOSITORY, so it resolves from the WORKSPACE rather than from
+    // whichever checkout the reader happens to be standing in (RD.DOCS.091). That is what lets one
+    // ref cite the book, the CLI's own source and a blueprint in three different repositories
+    // without the checker needing to be told which tree each lives in.
+    const cited = join(workspace, citation.path);
     // A FOLDER IS A CITATION TOO, and it answers a question a file cannot: whether the SET moved.
     // A stamp per file reports every edit and misses every addition, because a file nobody cited
     // has nothing to compare against. Where what is restated is *all of them* — the templates a
@@ -299,7 +320,7 @@ export function check(path: string, block: Block, bookRoot: string, knownRows: S
     else if (stamped !== current)
       findings.push(`${path}: \`${where}\` has moved since this file restated it — seen ${stamped}, now ${current}`);
   }
-  for (const row of block.rows ?? [])
+  for (const row of block.decisions ?? [])
     if (knownRows.size && !knownRows.has(row))
       findings.push(`${path}: cites \`${row}\`, which the register does not carry`);
   return findings;

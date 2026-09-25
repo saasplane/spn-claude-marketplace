@@ -1,11 +1,11 @@
 <!-- spn:restates
 {
-  "chapters": [
-    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md", "seen": "8c2210a7" },
-    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md", "seen": "59189379" },
-    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md", "seen": "cdf396da" }
+  "docs": [
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md", "seen": "8c2210a7" },
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md", "seen": "59189379" },
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md", "seen": "cdf396da" }
   ],
-  "rows": [
+  "decisions": [
     "RD.DOCS.031",
     "RD.DOCS.043",
     "RD.DOCS.044",

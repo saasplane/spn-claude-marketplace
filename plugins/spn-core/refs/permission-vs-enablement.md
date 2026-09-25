@@ -1,9 +1,9 @@
 <!-- spn:restates
 {
-  "chapters": [
-    { "path": "docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md", "seen": "d5f0400b" }
+  "docs": [
+    { "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md", "seen": "d5f0400b" }
   ],
-  "rows": [
+  "decisions": [
     "RD.PLATFORM.033",
     "RD.PLATFORM.034"
   ]

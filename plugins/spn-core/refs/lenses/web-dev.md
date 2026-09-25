@@ -1,9 +1,9 @@
 <!-- spn:restates
 {
-  "chapters": [
-    { "path": "docs/04-capabilities/02-support/01-apps/03-module/02-web/README.md", "seen": "13ff72ad" },
-    { "path": "docs/04-capabilities/02-support/01-apps/02-support/02-web/README.md", "seen": "70db2433" },
-    { "path": "docs/04-capabilities/02-support/01-apps/07-comments/README.md", "seen": "b51be439" }
+  "docs": [
+    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/02-web/README.md", "seen": "13ff72ad" },
+    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/02-support/02-web/README.md", "seen": "70db2433" },
+    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/07-comments/README.md", "seen": "b51be439" }
   ]
 }
 -->

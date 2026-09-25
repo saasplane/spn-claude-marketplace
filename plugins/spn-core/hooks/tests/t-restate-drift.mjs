@@ -43,7 +43,7 @@ writeFileSync(join(book, "CONCEPT.md"), "# concept\n");
 writeFileSync(join(book, "docs", "registers", "decisions.md"), "| # | Decision | Why | Date |\n| --- | --- | --- | --- |\n");
 writeFileSync(join(book, "docs", "02-constructs", "01-thing.md"), "# A thing\n\nIt is stated here, once.\n");
 writeFileSync(join(market, "plugins", "spn-core", "refs", "thing.md"),
-  '<!-- spn:restates\n{\n  "chapters": [\n    { "path": "docs/02-constructs/01-thing.md", "seen": "deadbeef" }\n  ]\n}\n-->\n\n# Thing — quick reference\n');
+  '<!-- spn:restates\n{\n  "docs": [\n    { "path": "spn-foundation/docs/02-constructs/01-thing.md", "seen": "deadbeef" }\n  ]\n}\n-->\n\n# Thing — quick reference\n');
 
 console.log("\n=== it finds the plugins from the workspace, not only from the repository that holds them");
 

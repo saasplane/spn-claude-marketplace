@@ -1,11 +1,11 @@
 <!-- spn:restates
 {
-  "chapters": [
-    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/README.md", "seen": "13d462c3" },
-    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "a548541e" },
-    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md", "seen": "db625a2f" },
-    { "path": "docs/02-constructs/01-devex/04-workspace/04-docs.md", "seen": "9809bc2b" },
-    { "path": "CONCEPT.md", "seen": "924bf289" }
+  "docs": [
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/README.md", "seen": "13d462c3" },
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "a548541e" },
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md", "seen": "db625a2f" },
+    { "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md", "seen": "9809bc2b" },
+    { "path": "spn-foundation/CONCEPT.md", "seen": "924bf289" }
   ]
 }
 -->

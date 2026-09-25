@@ -5,8 +5,8 @@ description: Turn a requirement into a design the platform's own vocabulary can 
 
 <!-- spn:restates
 {
-  "chapters": [
-    { "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "section": "The approach document — a workstream's, never a repository's", "seen": "98fccd46" }
+  "docs": [
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "section": "The approach document — a workstream's, never a repository's", "seen": "98fccd46" }
   ]
 }
 -->

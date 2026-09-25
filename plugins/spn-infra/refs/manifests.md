@@ -1,8 +1,8 @@
 <!-- spn:restates
 {
-  "chapters": [
-    { "path": "docs/02-constructs/02-support/02-infra/02-packages.md", "seen": "d7765b97" },
-    { "path": "docs/04-capabilities/02-support/02-infra/02-packages/01-manifests.md", "seen": "c1f7accc" }
+  "docs": [
+    { "path": "spn-foundation/docs/02-constructs/02-support/02-infra/02-packages.md", "seen": "d7765b97" },
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/02-packages/01-manifests.md", "seen": "c1f7accc" }
   ]
 }
 -->
