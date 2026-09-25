@@ -25,7 +25,7 @@ They share one boundary, and each of them restates it. **No skill here changes a
 
 | Term | Contract term | What it means |
 | --- | --- | --- |
-| an estate skill | `SKILL.md` | one folder under this plugin's `skills/`, named for a command of the group an estate answers to |
+| an estate skill | `SKILL.md` | one folder under this plugin's `skills/`. **The six are the same six words the apps domain reads** — `new` · `implement` · `review` · `run` · `verify` · `release` — so a partner working in both domains learns one set of names |
 | declaring | — | changing what the estate says it is, as an edit to a manifest rather than to a rendering |
 | a rendering | — | what a declaration would produce if applied, read while changing it is still cheap |
 | an approval | — | the moment after which the estate has changed and the question becomes a repair |
@@ -41,7 +41,7 @@ Each skill is a different point on one walk, and the last box is the same for al
   "caption": "Every skill ends at the tool's command, because a cloud is changed only through the tool's own doors.",
   "boxes": [
     { "id": "a", "label": "the ask", "note": "change what the estate is, or publish what it runs" },
-    { "id": "b", "label": "the skill", "note": "one of the four folders, chosen by its own description" },
+    { "id": "b", "label": "the skill", "note": "one of the six folders, chosen by its own description" },
     { "id": "c", "label": "the manifest edit", "note": "one line per choice, validated and read as a diff" },
     { "id": "d", "label": "the tool's command", "note": "the only door a cloud is changed through" }
   ],
@@ -72,6 +72,10 @@ A vendor reached over the network is application configuration behind a seam, an
 
 A version typed into a build script is a second place the number lives. The package manifest is the one place. So the publishing skill edits that field as a reviewed change and then runs the release command, which stages and publishes. The same skill covers repointing a bespoke script at the release command, so the second place stops existing. *Where:* `plugins/spn-infra/skills/release/SKILL.md`
 
+### Standing a node up and running a layer are doors, not journeys
+
+Two of the six open a command that already ships and had nothing fronting it. **`new` scaffolds an estate node** — which type, where it goes, what its manifest must carry. **`run` brings a layer up or down and reports what is standing.** Neither carries a walk of its own, because the command is the walk; what the skill adds is knowing which target to name and what the flags mean before you type one.
+
 ### A skill names the card, and the card holds the words
 
 None of these files defines the estate's vocabulary. Each names the card that does — which file declares what, which layer owns which act, how a name is composed — so a skill sequences the work and the card holds the words. *Where:* `plugins/spn-infra/refs/`
@@ -82,7 +86,7 @@ This page answers which skills an estate repository answers to and what each one
 
 | Owns | Refuses | Who owns that instead |
 | --- | --- | --- |
-| the skills an estate answers to, and that none of them changes a cloud itself | the frontmatter, the listing and the matching every skill shares | [The Skill](../01-spn-devex/07-skill-set.md) |
+| the six skills an estate answers to, and that none of them changes a cloud itself | the frontmatter, the listing and the matching every skill shares | [The Skill](../01-spn-devex/07-skill-set.md) |
 | that a declaration change is read as one line per choice, before any approval | the manifest, layer, naming and law vocabulary each skill uses | [Estate Refs](03-estate-refs.md) |
 | that publishing is a reviewed version edit followed by the release command | what is refused at the moment an estate file is written | [The Estate Guard](01-estate-guard.md) |
 
