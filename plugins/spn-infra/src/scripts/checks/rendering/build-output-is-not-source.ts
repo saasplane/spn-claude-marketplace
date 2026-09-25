@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: `refs/support/infra/laws.md` § no hand edits to built output. The ref governs.
+// RESTATES: `spn-claude-marketplace/plugins/spn-infra/src/refs/support/infra/laws.md` § no hand edits to built output. The ref governs.
 //
 // Refuse a hand edit to a rendering, at the moment it is written.
 //

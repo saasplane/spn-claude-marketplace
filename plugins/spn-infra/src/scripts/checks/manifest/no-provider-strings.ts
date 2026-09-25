@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: `refs/support/infra/laws.md` § provider strings live only inside a cloud entry. The ref governs.
+// RESTATES: `spn-claude-marketplace/plugins/spn-infra/src/refs/support/infra/laws.md` § provider strings live only inside a cloud entry. The ref governs.
 //
 // Refuse a provider's own spelling in a declaration, outside the two places that sanction it.
 //
