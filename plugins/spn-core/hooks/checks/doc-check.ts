@@ -719,7 +719,7 @@ export function asWritten(path: string): string {
 /**
  * A surface an agent acts from, rather than one a person reads to learn (RD.DOCS.047).
  *
- * Two members. The foundation's provider set, matched by its three domains rather than by a bare
+ * Two members. The foundation's provider set, matched by its domains rather than by a bare
  * `providers/`, which is an ordinary folder name a consuming repo may use for its own code. And the
  * plugins' own instruction surface, which an agent loads every session and acts on. The scripts
  * beside them are code, never corpus. RD.DOCS.048 exempts this surface from the two second-person
@@ -727,7 +727,10 @@ export function asWritten(path: string): string {
  */
 export function isOperative(path: string): boolean {
   const p = slashes(resolve(path));
-  if (["/providers/apps/", "/providers/infra/", "/providers/devex/"].some((d) => p.includes(d))) return true;
+  // TWO DOMAINS, NOT THREE. `providers/devex/` was removed (RD.DEVEX.061): devex has one CLI and one
+  // agent runtime, which are complementary surfaces rather than alternatives, so the seat held nothing
+  // its own. An axis exists where a domain has alternatives.
+  if (["/providers/apps/", "/providers/infra/"].some((d) => p.includes(d))) return true;
   return p.includes("/plugins/") && ["agents", "skills", "refs", "commands"].some((d) => p.includes(`/${d}/`));
 }
 
