@@ -3,7 +3,7 @@
   "chapters": [
     {
       "path": "docs/04-capabilities/01-devex/04-workspace/04-docs/templates",
-      "seen": "b0c9ea14"
+      "seen": "8d77f277"
     }
   ]
 }

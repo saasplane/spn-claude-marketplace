@@ -429,8 +429,13 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
         <tr><td><strong>C</strong></td><td>{{leave it as it is, wherever that is viable}}</td><td>{{what that costs}}</td></tr>
       </tbody>
     </table></div>
-    <div class="rec"><b>Recommended: {{A}}.</b> {{The reason it wins, in two sentences.}} <b>Decision:</b> &mdash;</div>
+    <div class="rec"><b>Recommended: {{A}}.</b> {{The reason it wins, in two sentences.}}</div>
   </div>
+  <!-- A CARD CARRIES A RECOMMENDATION AND NO DECISION. There is no `Decision:` field here, and the card
+       grammar never had one: the six parts are the number and summary, What, Why, Options, Recommendation
+       and Preview. A decision field only made sense while an answered card stayed on the page, and one did
+       not — see the note below. **A card on a page is an open card**, so a field announcing that it is open
+       says nothing, and a field left empty is a blank somebody feels they should fill. -->
   <!-- AN ANSWERED CARD STOPS EXISTING. There is no decided-card block here on purpose: once a question is
        settled it is no longer a question, so its answer is written into the section that now states it —
        `Why` where it settles a reason, `What` where it settles a shape, `How` where it settles an execution
