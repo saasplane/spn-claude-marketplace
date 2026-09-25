@@ -39,8 +39,8 @@ Two repositories come out of this, and the estate one comes first. It carries a 
 | 3 | The estate questions, one at a time | — you ask, they answer | Each answer is written into the arc as it arrives |
 | 4 | Read the coordinates back and get a yes | — you ask | The coordinates are agreed once, in one place, before any name derives from them |
 | 5 | Make the estate repository | — a ground act | `repo create` refuses by name until the organization layer has run. This is the one hand-made repository |
-| 6 | Wire it | `spnutils repo agent-sync` | Without it the session has no `declare`, no `plan-review`, no `release` |
-| 7 | The two estate packages, organization first | `spnutils infra scaffold`, then `declare` | The platform package names the organization it belongs to |
+| 6 | Wire it | `spnutils repo agent-sync` | Without it the session has no `implement`, no `review`, no `release` |
+| 7 | The two estate packages, organization first | `spnutils infra scaffold`, then `implement` | The platform package names the organization it belongs to |
 | 8 | Release them and stage the pins | `spnutils infra release --local` | The platform repo pins a version, and it cannot pin a working tree |
 | 9 | The platform repository | `repo create`, then `apps scaffold repo` | The scaffold takes both pins as arguments, so act 8 has to have happened |
 | 10 | Its concept, then its projects | the `ideate` skill, then `apps scaffold <kind>` | The concept decides which kinds exist. Scaffolding first is deciding by accident |
