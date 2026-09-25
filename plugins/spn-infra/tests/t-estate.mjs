@@ -1,11 +1,11 @@
-// `estate-violations` — the five estate laws, each against what it must refuse AND what it must let
+// The estate laws — each against what it must refuse AND what it must let through, each against what it must refuse AND what it must let
 // through. A rule tested only on known-bad input cannot tell you it is conservative.
 import { one, done, hasBash } from "./harness.mjs";
 
 const EST = "/tmp/estate/src/spestate.json";
 const SRC = "/tmp/estate/src/blueprint.ts";
 
-console.log(`=== estate-violations — parity arm ${hasBash ? "ON (bash present)" : "OFF (bash retired)"}`);
+console.log(`=== estate laws — parity arm ${hasBash ? "ON (bash present)" : "OFF (bash retired)"}`);
 
 // 1 · dist/ — the path alone decides, and it decides even with no text at all.
 one("an edit under dist/", { input: { file_path: "/tmp/estate/dist/main.js", content: "x" }, expect: "deny", says: "under dist/" });
@@ -44,4 +44,4 @@ one("a region in ordinary source is not this rule's business", { input: { file_p
 one("no file path", { input: { content: "arn:aws:iam::1:role/x" }, expect: "" });
 one("a clean manifest", { input: { file_path: EST, content: '{"name": "platform"}' }, expect: "" });
 
-done();
+done("estate laws");

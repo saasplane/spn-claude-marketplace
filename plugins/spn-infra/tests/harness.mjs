@@ -66,8 +66,15 @@ export function one(title, { input, expect, says, diverges }) {
   else passed += 1;
 }
 
-export function done() {
+/**
+ * The summary line, named for the suite that called it.
+ *
+ * **THE NAME IS THE CALLER'S, NEVER THIS FILE'S.** A hardcoded name meant every suite's summary
+ * claimed to be the first one written — so a second suite's result read as the first suite's, and
+ * a reader scanning the run could not tell which had actually passed.
+ */
+export function done(suite = "estate") {
   for (const f of failures) console.log(`  FAIL  ${f}`);
-  console.log(failures.length ? `${failures.length} failed, ${passed} passed` : `all ${passed} passed — estate-violations`);
+  console.log(failures.length ? `${failures.length} failed, ${passed} passed` : `all ${passed} passed — ${suite}`);
   process.exit(failures.length ? 1 : 0);
 }

@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/01-shape/02-coordinates.md", "seen": "ce9596d3" },
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/01-shape/02-coordinates.md", "seen": "a9bdc3d5" },
     { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/06-modules/02-config.md", "section": "The published vocabulary", "seen": "bbe1fc76" },
     { "path": "spn-foundation/docs/02-constructs/02-support/02-infra/06-modules.md", "section": "The rungs, and what a path may be", "seen": "24b787b2" }
   ]

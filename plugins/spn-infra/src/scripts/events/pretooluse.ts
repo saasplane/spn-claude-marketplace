@@ -9,26 +9,24 @@
 
 import { emit, payload, type Payload, type ToolInput, type Verdict } from "../lib/payload.ts";
 import { begin, span, end as endTiming } from "../lib/timing.ts";
-import { RULES, written } from "../checks/estate-violations.ts";
+import { SUBJECTS, pathOnly, written } from "../checks/subjects.ts";
 
 export function dispatch(event: Payload, time: <T>(name: string, fn: () => T) => T): Verdict {
   const supplied: ToolInput = event.tool_input ?? {};
   const path = supplied.file_path;
   if (!path) return null;                          // every rule here is about a file
 
-  // THE PATH RULE RUNS BEFORE THE TEXT IS READ, because `dist/` is refused whatever it holds — an
-  // empty write into build output is still an edit to something the build owns.
+  // THE PATH-ONLY SUBJECTS RUN BEFORE THE TEXT IS READ, because `dist/` is refused whatever it
+  // holds — an empty write into build output is still an edit to something the build owns.
   const text = written(supplied);
-  for (const rule of RULES) {
-    let applies = false;
-    try { applies = rule.applies(path); } catch { continue; }
-    if (!applies) continue;
-    // A rule that needs text and has none has nothing to say. `dist-is-build-output` reads the path
-    // alone, so it is never skipped here.
-    if (!text && rule.name !== "dist-is-build-output") continue;
+  for (const subject of SUBJECTS) {
+    // A subject that needs text and has none has nothing to say.
+    if (!text && !pathOnly(subject.name)) continue;
     let verdict: Verdict = null;
-    try { verdict = time(rule.name, () => rule.run(path, text)); }
-    catch { continue; }                            // a rule that throws is skipped, never fatal
+    // A SUBJECT THAT THROWS IS SKIPPED, NEVER FATAL. A gate that crashes the PreToolUse chain
+    // removes every other gate with it, which is worse than any single miss.
+    try { verdict = time(subject.name, () => subject.validate(path, text)); }
+    catch { continue; }
     if (verdict?.deny) return verdict;             // first deny wins
   }
   return null;
