@@ -123,7 +123,7 @@ in the **spn-core** plugin carries the shape in full; audit against exactly this
 For a deviation from a golden path, a breaking change, or a doc-vs-code conflict. An undocumented deviation is treated as a defect — this entry is what makes it governed. Draft in chat (do not commit unasked):
 
 A row is `| id | ruling | why | date |`, and the id is `RD.<AREA>.<NNN>` over the closed area set
-`GOV · SAAS · APPS · INFRA · DEVEX · DOCS`, numbered per area. Ids are never reused or renumbered.
+`GOV · PLATFORM · APPS · INFRA · DEVEX · DOCS`, numbered per area. Ids are never reused or renumbered.
 
 ```
 | RD.<AREA>.<NNN> | **<the ruling, bolded, in one quotable sentence>** <what it changes
