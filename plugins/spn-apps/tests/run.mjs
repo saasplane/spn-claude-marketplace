@@ -8,11 +8,21 @@
 // Python arm stops running and each case still asserts its own expectation.
 
 import { execFileSync } from "node:child_process";
-import { readdirSync } from "node:fs";
+import { readdirSync, statSync } from "node:fs";
 import { resolve } from "node:path";
 
 const HERE = import.meta.dirname;
-const suites = readdirSync(HERE).filter((f) => f.startsWith("t-") && f.endsWith(".mjs")).sort();
+// THE SUITES ARE WALKED, NOT LISTED, and they mirror `src/`: a test for a provider's rule sits at
+// the path that rule sits at. A runner that globbed one folder made a rule test, a structural test
+// and a tool test indistinguishable, and it is why moving a rule used to move its test nowhere.
+const walk = (dir) => readdirSync(dir).flatMap((entry) => {
+  const at = `${dir}/${entry}`;
+  return statSync(at).isDirectory() ? walk(at) : [at];
+});
+const suites = walk(HERE)
+  .filter((f) => f.split("/").pop().startsWith("t-") && f.endsWith(".mjs"))
+  .map((f) => f.slice(HERE.length + 1))
+  .sort();
 
 let failed = 0;
 let cases = 0;

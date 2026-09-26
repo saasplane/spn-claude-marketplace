@@ -16,7 +16,7 @@
 
 ## The stacks are inside, not beside
 
-**`support/apps/providers/` holds one folder per stack.** This plugin is the apps domain, and a stack is a realization of it rather than a domain of its own — which is why there is no `spn-apps-ts`.
+**`support/apps/providers/` holds one folder per stack.** This plugin is the apps domain, and a stack is a realization of it rather than a domain of its own — which is why there is no `spn-apps`.
 
 **Every stack answers the same questions under the same file names**, and a stack with no capability for one writes the file anyway and says what to do instead. So the folder listing is the coverage.
 

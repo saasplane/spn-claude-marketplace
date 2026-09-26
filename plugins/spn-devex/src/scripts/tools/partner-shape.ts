@@ -42,7 +42,7 @@ const SCRIPTS: Array<[plugin: string, script: string, args: string[]]> = [
   ["spn-devex", "doc-check.ts", ["."]],
   ["spn-devex", "prose-triage.ts", ["."]],
   ["spn-devex", "split-plan.ts", ["."]],
-  ["spn-devex", "contract-cycle.ts", ["."]],
+  ["spn-apps", "contract-cycle.ts", ["."]],
   ["spn-devex", "orientation.ts", []],
   // Runs in the fixture, which holds plugins and NO book. That is a partner's shape exactly, and the
   // check must print one line and exit clean rather than report every file as drifted.
@@ -83,13 +83,16 @@ const SCRIPTS: Array<[plugin: string, script: string, args: string[]]> = [
  * MATTERS MOST, because that is the copy a partner's session actually loads.
  */
 export function pluginRoot(name: string, folder: string): string | null {
-  const family = resolve(HERE, "..", "..", "..");   // holds spn-devex beside us
-  const direct = join(family, name, "hooks", folder);
+  const family = resolve(HERE, "..", "..", "..", "..");   // holds spn-devex beside us
+  // A PLUGIN'S CODE SITS UNDER `src/`, and `hooks/` holds only `hooks.json`. This walked
+  // `hooks/<folder>` until 2026-09-26 and therefore resolved nothing at all — every script it
+  // checks reported *not found* under a summary that read like a pass.
+  const direct = join(family, name, "src", folder);
   if (isDir(direct)) return direct;                 // repo layout
   const versioned = join(resolve(family, ".."), name);   // cache layout
   if (isDir(versioned)) {
-    const picks = listdir(versioned).filter((d) => isDir(join(versioned, d, "hooks", folder))).sort();
-    if (picks.length) return join(versioned, picks[picks.length - 1], "hooks", folder);
+    const picks = listdir(versioned).filter((d) => isDir(join(versioned, d, "src", folder))).sort();
+    if (picks.length) return join(versioned, picks[picks.length - 1], "src", folder);
   }
   return null;
 }
@@ -105,15 +108,28 @@ export function pluginRoot(name: string, folder: string): string | null {
  *
  * So it LOOKS. The folder set is the shape of a plugin's `hooks/`, and a file is wherever it is.
  */
-const HOOK_FOLDERS = ["events", "checks", "tools", "lib", "docs", "scripts"];
-
-const folderFor = (plugin: string, script: string): string | null => {
-  for (const folder of HOOK_FOLDERS) {
-    const where = pluginRoot(plugin, folder);
-    if (where && isFile(join(where, script))) return folder;
+// A SCRIPT IS FOUND, NEVER FILED. This tried a fixed folder list until 2026-09-26 and therefore
+// resolved nothing once the plugins moved their code under `src/` and their rules behind `_src/`
+// and `_tests/` — every entry reported *not found* beneath a summary that read like a pass. The
+// walk costs one directory scan and survives the next move, which a list does not.
+const findIn = (base: string, script: string): string | null => {
+  const direct = join(base, script);
+  if (isFile(direct)) return direct;
+  for (const entry of listdir(base)) {
+    const next = join(base, entry);
+    if (!isDir(next)) continue;
+    const found = findIn(next, script);
+    if (found) return found;
   }
   return null;
 };
+
+/** The file behind a declared script, wherever the plugin keeps it. */
+const scriptPath = (plugin: string, script: string): string | null => {
+  const root = pluginRoot(plugin, ".");
+  return root ? findIn(root, script) : null;
+};
+
 const runnerFor = (script: string) => (script.endsWith(".ts") ? process.execPath : "python3");
 
 /**
@@ -158,18 +174,14 @@ export function main(argv: string[]): number {
 
   const failed: Array<[string, string]> = [];
   for (const [plugin, script] of declared()) {
-    const folder = folderFor(plugin, script);
-    const where = folder === null ? null : pluginRoot(plugin, folder);
-    if (!where || !isFile(join(where, script))) {
+    if (!scriptPath(plugin, script)) {
       failed.push([`${plugin}/${script}`, "declared by hooks.json and absent from the plugin"]);
       console.log(`  ✘ ${plugin}/${script} — declared, no file`);
     }
   }
 
   for (const [plugin, script, args] of SCRIPTS) {
-    const folder = folderFor(plugin, script);
-    const where = folder === null ? null : pluginRoot(plugin, folder);
-    const path = where ? join(where, script) : "";
+    const path = scriptPath(plugin, script) ?? "";
     const label = `${script} ${args.join(" ")}`.trim();
     if (!path || !isFile(path)) {
       failed.push([label, "not found"]);

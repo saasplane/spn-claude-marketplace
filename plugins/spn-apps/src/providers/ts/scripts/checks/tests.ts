@@ -12,9 +12,9 @@
 // one. A reader of this list sees what actually runs.
 import type { ToolInput, Verdict } from "../../../../scripts/lib/payload.ts";
 import { resultingText } from "../../../../scripts/lib/source.ts";
-import { verdict as assertionMessage, watched as assertionWatched } from "./assertion-message.ts";
-import { verdict as hostAssertion, watched as hostWatched } from "./host-assertion.ts";
-import { CHECKS as COVERAGE, verdict as coverage, watched as coverageWatched } from "./coverage.ts";
+import { verdict as assertionMessage, watched as assertionWatched } from "./_tests/assertion-message.ts";
+import { verdict as hostAssertion, watched as hostWatched } from "./_tests/host-assertion.ts";
+import { CHECKS as COVERAGE, verdict as coverage, watched as coverageWatched } from "./_tests/coverage.ts";
 
 type Bound = { name: string; watched: (path: string) => boolean; verdict: (path: string, source: string | null, added: string | null) => Verdict };
 

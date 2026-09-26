@@ -29,7 +29,6 @@
 import { readFileSync } from "node:fs";
 import { emit, readPayload, type Payload, type Verdict } from "../lib/payload.ts";
 import { checkEnvSeat } from "../checks/env-seat.ts";
-import { checkContractCycle } from "../checks/contract-cycle.ts";
 import { checkDoc, bashWrites } from "../checks/doc-check.ts";
 import { gateDocumentsFirst, gateClose } from "../checks/split-plan.ts";
 import { checkConfirmed } from "../checks/confirmed.ts";
@@ -57,8 +56,6 @@ const PROSE_SUFFIXES = [".md", ".html"];
 // saves is the check's own work, which is the same saving by a shorter route.
 const CHECKS: Check[] = [
   { name: "env-seat", run: checkEnvSeat, needs: ["command", "file_path"], applies: () => true },
-  { name: "contract-cycle", run: checkContractCycle, needs: ["file_path"],
-    applies: (path, command) => path.includes("/contract/states/") || command.includes("/contract/states/") },
   { name: "doc-check", run: checkDoc, needs: ["command", "file_path"],
     applies: (path, command) => PROSE_SUFFIXES.some((s) => path.endsWith(s) || command.includes(s)) },
   // Its workspace sweep is the point: an answered card must be caught on ANY write. What it cannot

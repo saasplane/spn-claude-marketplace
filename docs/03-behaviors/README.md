@@ -15,7 +15,7 @@
 
 **What** — this seat answers what a person can do, in the consumer's own words.
 
-One file of rows sits beside each construct, at the same relative path and the same number. So `03-behaviors/01-spn-devex/04-checks.md` proves `02-constructs/01-spn-devex/04-checks.md`, and a produced page joins its own rows with nothing to look up.
+One file of rows sits beside each construct, at the same relative path and the same number. So `03-behaviors/01-devex/05-scripts.md` proves `02-constructs/01-devex/05-scripts.md`, and a produced page joins its own rows with nothing to look up.
 
 **This repository writes its own rows.** It declares no stack, so the deterministic tool serves it with its docs commands alone and has no runner for it. The plugins' own suites are the runner: a case whose title carries a row's id becomes a result, the results become an artifact in the pocket, and the writer puts what the run found into the `Status` and the `Updated at` cells. Every other cell is a decision somebody made, and nothing writes over those.
 
@@ -25,6 +25,6 @@ One file of rows sits beside each construct, at the same relative path and the s
 
 | Domain | What it promises |
 | --- | --- |
-| [spn-devex](01-spn-devex/README.md) | The plugin every repository loads, and everything a session reads from it |
-| [spn-apps](02-spn-apps/README.md) | The apps world made concrete for TypeScript |
-| [spn-infra](03-spn-infra/README.md) | The estate world, and the boundary none of its skills crosses |
+| [spn-devex](01-devex/README.md) | The plugin every repository loads, and everything a session reads from it |
+| [spn-apps](02-apps/README.md) | The apps world made concrete for TypeScript |
+| [spn-infra](03-infra/README.md) | The estate world, and the boundary none of its skills crosses |

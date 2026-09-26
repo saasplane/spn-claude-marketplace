@@ -21,9 +21,10 @@
 // only when nothing denied.
 import type { ToolInput, Verdict } from "../../../../scripts/lib/payload.ts";
 import { resultingText } from "../../../../scripts/lib/source.ts";
-import { verdict as readVerbNaming, watched as readVerbWatched } from "./read-verb-naming.ts";
-import { verdict as enablementGrammar, watched as enablementWatched } from "./enablement-grammar.ts";
-import { verdict as awaitSequencing, watched as awaitWatched } from "./await-sequencing.ts";
+import { verdict as readVerbNaming, watched as readVerbWatched } from "./_src/read-verb-naming.ts";
+import { verdict as enablementGrammar, watched as enablementWatched } from "./_src/enablement-grammar.ts";
+import { verdict as awaitSequencing, watched as awaitWatched } from "./_src/await-sequencing.ts";
+import { verdict as contractCycle, watched as contractCycleWatched } from "./_src/contract-cycle.ts";
 
 /** One rule in this subject: what it looks at, and what it says once the text is parsed. */
 type Bound = { name: string; watched: (path: string) => boolean; verdict: (path: string, source: string | null, added: string | null) => Verdict };
@@ -32,6 +33,7 @@ export const RULES: Bound[] = [
   { name: "read-verb-naming", watched: readVerbWatched, verdict: readVerbNaming },
   { name: "enablement-grammar", watched: (path) => path.endsWith(".ts") && enablementWatched(path), verdict: enablementGrammar },
   { name: "await-sequencing", watched: awaitWatched, verdict: awaitSequencing },
+  { name: "contract-cycle", watched: contractCycleWatched, verdict: contractCycle },
 ];
 
 /**
