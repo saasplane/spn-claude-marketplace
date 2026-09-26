@@ -2,7 +2,7 @@
 {
   "docs": [
     { "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md", "seen": "3d3ddc2c" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md", "seen": "4c906f0a" },
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md", "seen": "b805d723" },
     { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "109a3f51" }
   ]
 }
