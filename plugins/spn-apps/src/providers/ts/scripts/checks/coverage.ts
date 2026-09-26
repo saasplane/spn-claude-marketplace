@@ -37,9 +37,9 @@
 //   scan :  coverage.ts --check <name> <path> …      (any file or tree; prints what it can see)
 
 import { basename, dirname, join, resolve } from "node:path";
-import type { Payload, ToolInput, Verdict } from "../../lib/payload.ts";
-import { emit, payload, runAlone } from "../../lib/payload.ts";
-import { filesUnder, isDir, isFile, lineOf, read, resultingText, SKIP } from "../../lib/source.ts";
+import type { Payload, ToolInput, Verdict } from "../../../../scripts/lib/payload.ts";
+import { emit, payload, runAlone } from "../../../../scripts/lib/payload.ts";
+import { filesUnder, isDir, isFile, lineOf, read, resultingText, SKIP } from "../../../../scripts/lib/source.ts";
 import { readdirSync } from "node:fs";
 
 const CODE = [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"];

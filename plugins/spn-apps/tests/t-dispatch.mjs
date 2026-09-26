@@ -68,7 +68,10 @@ function one(label, { root, input, expect, says }) {
   if (!ok) console.log(`        got: ${reason.slice(0, 260)}`);
 }
 
-const REPO = { "sprepo.json": '{"world":"APPS","stacks":["spn-apps"]}\n' };
+// THE MANIFEST IS THE REAL SHAPE, because the gate reads `config.stack` from it to decide which
+// provider answers. The fixture carried a shape no repository has ever written — `world` and
+// `stacks[]` — and nothing noticed while no code read it.
+const REPO = { "sprepo.json": '{"type":"APPS","name":"Probe","config":{"mtype":"APPS","stack":"TS"}}\n' };
 const APP = { "apps/api/spkind.json": '{"kind":"APP_SERVER","config":null}\n' };
 
 console.log("=== dispatcher — each refusal still arrives");

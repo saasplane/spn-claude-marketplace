@@ -36,9 +36,9 @@
 //   scan :  read-verb-naming.ts <path> …       (any file or tree; prints every finding it can see)
 
 import { basename, resolve } from "node:path";
-import type { Payload, ToolInput, Verdict } from "../../lib/payload.ts";
-import { emit, payload, runAlone } from "../../lib/payload.ts";
-import { filesUnder, introduced, lineOf, mask, read, resultingText } from "../../lib/source.ts";
+import type { Payload, ToolInput, Verdict } from "../../../../scripts/lib/payload.ts";
+import { emit, payload, runAlone } from "../../../../scripts/lib/payload.ts";
+import { filesUnder, introduced, lineOf, mask, read, resultingText } from "../../../../scripts/lib/source.ts";
 
 const WATCHED = "/src/contract/services/";
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-// RESTATES: nothing. The rules are in `checks/tests/`, stated once and stack-free.
+// RESTATES: nothing. It is the TypeScript half of the `tests` subject — the parse, the order,
+// and the rules that read what the parse produced. Every rule it runs sits beside it in this folder.
 //
 // The tests subject, for TypeScript: read the resulting text once, then run every tests rule.
 //
@@ -9,11 +10,11 @@
 //
 // **COVERAGE IS SEVERAL RULES BEHIND ONE MODULE**, so it is expanded here rather than counted as
 // one. A reader of this list sees what actually runs.
-import type { ToolInput, Verdict } from "../../lib/payload.ts";
-import { resultingText } from "../../lib/source.ts";
-import { verdict as assertionMessage, watched as assertionWatched } from "../../checks/tests/assertion-message.ts";
-import { verdict as hostAssertion, watched as hostWatched } from "../../checks/tests/host-assertion.ts";
-import { CHECKS as COVERAGE, verdict as coverage, watched as coverageWatched } from "../../checks/tests/coverage.ts";
+import type { ToolInput, Verdict } from "../../../../scripts/lib/payload.ts";
+import { resultingText } from "../../../../scripts/lib/source.ts";
+import { verdict as assertionMessage, watched as assertionWatched } from "./assertion-message.ts";
+import { verdict as hostAssertion, watched as hostWatched } from "./host-assertion.ts";
+import { CHECKS as COVERAGE, verdict as coverage, watched as coverageWatched } from "./coverage.ts";
 
 type Bound = { name: string; watched: (path: string) => boolean; verdict: (path: string, source: string | null, added: string | null) => Verdict };
 

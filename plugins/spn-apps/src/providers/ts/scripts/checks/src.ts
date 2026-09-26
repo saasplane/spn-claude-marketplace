@@ -1,24 +1,29 @@
 #!/usr/bin/env node
-// RESTATES: nothing. The rules are in `checks/contract/`, stated once and stack-free. This file
-// parses TypeScript and runs them; it states no rule of its own.
+// RESTATES: nothing. It is the TypeScript half of the `src` subject — the parse, the order, and the
+// rules that read what the parse produced. Every rule it runs sits beside it in this folder.
 //
-// The contract subject, for TypeScript: read the resulting text once, then run every contract rule.
-//
-// **THE RULE IS THE DOMAIN'S AND THE PARSE IS THE STACK'S.** *A read verb is named for the list it
-// returns* is true in any language. What a method signature LOOKS LIKE is TypeScript's business,
-// and so is which files count as a contract here. Keeping the two apart is what lets a second
-// stack join by adding a folder rather than by copying a rule.
+// **THE SUBJECT IS `src`, AND `contract` IS NOT A PEER OF IT.** Every rule below watches a path
+// UNDER `src/` — `/src/contract/services/` for the read-verb rule, `app/utils/authz.ts` and the
+// seeds and services for the enablement rule, any `.ts` under `/src/` for await sequencing. While
+// `contract` was a subject of its own, a write to `src/contract/services/Foo.ts` matched both and
+// the file was read and masked TWICE, at write time, where a person is waiting. That is the waste
+// the next paragraph exists to prevent, arriving one level up from where it was being prevented.
 //
 // **PARSED ONCE, NOT ONCE PER RULE.** Each rule used to call `resultingText` itself, so one write
-// read and masked the same file once per rule — at write time, which is where a person is waiting.
+// read and masked the same file once per rule.
+//
+// **WHICH RULES APPLY IS DECIDED BY THE PATH AND THE KIND, NEVER BY A SUBJECT NAME.** `watched`
+// reads the path alone, and `await-sequencing` narrows further to a node whose kind names the
+// server runtime. A subject that grouped rules by folder was standing in for both.
 //
 // **THE FIRST DENIAL WINS, AND A NOTE NEVER OUTRANKS ONE.** A person fixes one thing at a time, so
 // four denials for one edit read as a broken gate rather than as four problems. Notes are collected
 // only when nothing denied.
-import type { ToolInput, Verdict } from "../../lib/payload.ts";
-import { resultingText } from "../../lib/source.ts";
-import { verdict as readVerbNaming, watched as readVerbWatched } from "../../checks/contract/read-verb-naming.ts";
-import { verdict as enablementGrammar, watched as enablementWatched } from "../../checks/contract/enablement-grammar.ts";
+import type { ToolInput, Verdict } from "../../../../scripts/lib/payload.ts";
+import { resultingText } from "../../../../scripts/lib/source.ts";
+import { verdict as readVerbNaming, watched as readVerbWatched } from "./read-verb-naming.ts";
+import { verdict as enablementGrammar, watched as enablementWatched } from "./enablement-grammar.ts";
+import { verdict as awaitSequencing, watched as awaitWatched } from "./await-sequencing.ts";
 
 /** One rule in this subject: what it looks at, and what it says once the text is parsed. */
 type Bound = { name: string; watched: (path: string) => boolean; verdict: (path: string, source: string | null, added: string | null) => Verdict };
@@ -26,10 +31,11 @@ type Bound = { name: string; watched: (path: string) => boolean; verdict: (path:
 export const RULES: Bound[] = [
   { name: "read-verb-naming", watched: readVerbWatched, verdict: readVerbNaming },
   { name: "enablement-grammar", watched: (path) => path.endsWith(".ts") && enablementWatched(path), verdict: enablementGrammar },
+  { name: "await-sequencing", watched: awaitWatched, verdict: awaitSequencing },
 ];
 
 /**
- * Run the contract subject against one write.
+ * Run the `src` subject against one write.
  *
  * **A RULE THAT THROWS IS SKIPPED, NEVER FATAL.** A subject that crashes takes every other rule in
  * the chain with it, which is worse than any single miss.

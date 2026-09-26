@@ -25,9 +25,9 @@
 //   scan :  host-assertion.ts <path> …       (any file or tree; prints every finding it can see)
 
 import { basename, resolve } from "node:path";
-import type { Payload, ToolInput, Verdict } from "../../lib/payload.ts";
-import { emit, payload, runAlone } from "../../lib/payload.ts";
-import { filesUnder, lineOf, read, resultingText } from "../../lib/source.ts";
+import type { Payload, ToolInput, Verdict } from "../../../../scripts/lib/payload.ts";
+import { emit, payload, runAlone } from "../../../../scripts/lib/payload.ts";
+import { filesUnder, lineOf, read, resultingText } from "../../../../scripts/lib/source.ts";
 
 const CODE = [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"];
 

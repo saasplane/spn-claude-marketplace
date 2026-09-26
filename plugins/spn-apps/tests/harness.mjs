@@ -4,7 +4,7 @@
 // is parity, so a case states what it expects AND whether the two must agree — a divergence is only
 // allowed where it is named, with its reason, the way F5 and F11 were in the core port.
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 
@@ -15,18 +15,24 @@ const HOOKS = resolve(import.meta.dirname, "..");
 export const SCRIPTS = resolve(HOOKS, "scripts");
 export const CHECKS = resolve(HOOKS, "src", "scripts", "checks");
 
-// CHECKS ARE FILED BY SUBJECT — `contract/`, `src/`, `tests/` — because a rule belongs with the
-// thing it rules on. A case names the check and not its folder, so the folder is FOUND rather than
-// typed: a check that moves between subjects then breaks no test, and a case stays about the rule.
-const SUBJECTS = ["contract", "src", "tests"];
+// A RULE IS FILED UNDER THE PROVIDER THAT RUNS IT, because what a rule matches is that stack's
+// syntax. A case names the check and not its folder, so the folder is FOUND rather than typed: a
+// rule that moves between providers or subjects breaks no test, and a case stays about the rule.
+//
+// THE SEARCH IS OVER EVERY PROVIDER, not a named one. A harness that knew which stack to look in
+// would be the one place in this plugin that names an instance, which is the thing the provider
+// shape exists to remove.
+const PROVIDERS = resolve(import.meta.dirname, "..", "src", "providers");
 export const checkPath = (script) => {
-  for (const subject of SUBJECTS) {
-    const candidate = resolve(CHECKS, subject, `${script}.ts`);
+  let instances = [];
+  try { instances = readdirSync(PROVIDERS, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name); } catch { instances = []; }
+  for (const instance of instances) {
+    const candidate = resolve(PROVIDERS, instance, "scripts", "checks", `${script}.ts`);
     if (existsSync(candidate)) return candidate;
   }
   // Reported as the path a reader would have expected, so the failure names the missing file
   // rather than an empty string.
-  return resolve(CHECKS, `${script}.ts`);
+  return resolve(PROVIDERS, instances[0] ?? "ts", "scripts", "checks", `${script}.ts`);
 };
 
 // THE PARITY ARM IS THE INCUMBENT, AND THE INCUMBENT IS GOING AWAY. Until the plugin reinstall

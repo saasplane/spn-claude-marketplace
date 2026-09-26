@@ -38,9 +38,9 @@
 //   scan :  enablement-grammar.ts <path> …      (any folder or repo; prints every finding it can see)
 
 import { basename, resolve } from "node:path";
-import type { Payload, ToolInput, Verdict } from "../../lib/payload.ts";
-import { emit, payload, runAlone } from "../../lib/payload.ts";
-import { filesUnder, inComment, introduced, mask, read, resultingText } from "../../lib/source.ts";
+import type { Payload, ToolInput, Verdict } from "../../../../scripts/lib/payload.ts";
+import { emit, payload, runAlone } from "../../../../scripts/lib/payload.ts";
+import { filesUnder, inComment, introduced, mask, read, resultingText } from "../../../../scripts/lib/source.ts";
 
 const ORG_TYPES = new Set([
   "PLATFORM", "ACCOUNT",

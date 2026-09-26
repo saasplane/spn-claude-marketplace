@@ -46,9 +46,9 @@
 //   scan :  await-sequencing.ts <path> …       (any file or tree; prints every finding it can see)
 
 import { basename, resolve } from "node:path";
-import type { Payload, ToolInput, Verdict } from "../../lib/payload.ts";
-import { emit, payload, runAlone } from "../../lib/payload.ts";
-import { filesUnder, introduced, lineOf, mask, nodeKind, read, resultingText } from "../../lib/source.ts";
+import type { Payload, ToolInput, Verdict } from "../../../../scripts/lib/payload.ts";
+import { emit, payload, runAlone } from "../../../../scripts/lib/payload.ts";
+import { filesUnder, introduced, lineOf, mask, nodeKind, read, resultingText } from "../../../../scripts/lib/source.ts";
 
 // The runtime is implied by the kind (the TypeScript kinds registry). These four name the server.
 const SERVER_KINDS = new Set(["APP_SERVER", "APP_UTILITY", "MODULE_SERVER", "SUPPORT_SERVER"]);
