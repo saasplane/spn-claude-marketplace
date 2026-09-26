@@ -139,3 +139,19 @@ None of this is speculative. If you have never heard of `@saasplane/module-serve
 ## What this does not cover
 
 This page covers the seven standard-library modules — Reference Data, Translation, Notifications, Documents, Entities, Jobs and Audit Log. It does not cover platform core: Tenancy, Identity, Surfaces, or Data and Trust, each named above only where a module reads one of them — you will meet those as their own ref. It does not cover the module server contract's own shape — the read ladder, the service interface, the closed set of method families — ask for that ref when the question is how a contract is built rather than which module to adopt. And it does not enumerate packages or versions; ask for the module catalogue command.
+
+## Which modules ship
+
+**This folder is the list.** One ref per module, named for the construct the book states — so nothing is generated here and nothing can fall out of step with what exists.
+
+| | |
+| --- | --- |
+| [`reference-data.md`](reference-data.md) | one shared list, and one place to fix it |
+| [`translation.md`](translation.md) | labels belong to the platform; content belongs to an organization |
+| [`notifications.md`](notifications.md) | composed once, delivered through a seam |
+| [`documents.md`](documents.md) | a key is derived, and its first segment is the access class |
+| [`entities.md`](entities.md) | the patterns every record type can opt into |
+| [`jobs.md`](jobs.md) | a schedule is not an entry |
+| [`audit-log.md`](audit-log.md) | a record is never edited |
+
+**For which are installed in a given platform, and at which version, ask the CLI.** That answer moves, and a document that carries it is a document that is wrong between releases.

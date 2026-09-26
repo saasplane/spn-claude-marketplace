@@ -1,19 +1,29 @@
-<!-- spn:generated refs-readme — do not edit inside these markers; `refs-readme.ts` writes it -->
-# spn-infra — what these refs cover
+# What these refs are, and how they are arranged
 
-A ref is a self-contained leaf, named for a construct the book states. **This plugin ships 21.**
+**A ref is a self-contained leaf.** You are holding the plugin and not the book, so everything it restates is written out here, stamped with the version it was read at.
 
-**Coverage is per group, never one number.** One figure over a plugin averages a complete group with an empty one, and is true of neither.
+## Only domain folders live here
 
-| Group | Covers | Cuts across | Not restated |
-| --- | --- | ---: | ---: |
-| `providers/aws` | — by role, not by construct | 7 | — |
-| `providers/gcp` | — by role, not by construct | 1 | — |
-| `providers/local` | — by role, not by construct | 1 | — |
-| `support/infra` | 10 of 10 constructs | 2 | — |
+**`refs/` holds one folder per book domain and nothing else.** A folder under a domain is a group; a file under a group is named for a construct the book states; **a construct needing more than one file becomes a folder named for it** — which is why `shape/` and `providers/` are folders.
 
-**A ref that cuts across restates no single construct** — it carries a rule the whole group obeys, which is why it has no chapter to be named for.
+**A folder's `README.md` is that folder's own subject.** [`support/infra/README.md`](support/infra/README.md) is the estate laws, because those are the rules the whole group obeys and they belong to no single construct.
 
-**Every construct the book states in these groups has a ref.**
+| Holds | |
+| --- | --- |
+| [`support/infra/`](support/infra/) | the estate — shape, packages, blueprints, resources, apps, modules, trust, operate, what it ships, and the providers that render it |
 
-<!-- /spn:generated -->
+## The clouds are inside, and so is the machine
+
+**`support/infra/providers/` holds one folder per provider**, and the machine is one of them rather than a special case. It answers more of the contract today than either cloud does.
+
+**Every provider answers the same questions under the same file names.** A provider with no capability writes the file and says what to do instead — and a refusal is a ruling rather than a gap. The machine is one environment, so pointing an environment command at it is refused by name.
+
+## Estate caution, wherever you are
+
+**Cloud mutation goes through the CLI's own doors.** `tofu apply` and `tofu destroy` are never hand-run, on any cloud, at any layer — and the habit holds on a laptop, because the habit is what carries to the estate.
+
+**`up` and `down` each take exactly one of `--plan` or `--apply`, and there is no default.** A command that plans when you forget a flag is a command doing another command's job.
+
+## What is generated
+
+**Nothing here.** Every file is authored and stamped.

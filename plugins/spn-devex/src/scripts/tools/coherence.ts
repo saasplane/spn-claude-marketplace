@@ -426,12 +426,62 @@ function capabilityChapters(root: string): string[] {
   return [out];
 }
 
+/**
+ * A provider folder whose file list does not match the contract beside it.
+ *
+ * **EVERY INSTANCE ANSWERS THE SAME QUESTIONS UNDER THE SAME NAMES** (`RD.GOV.027`), and the set is
+ * stated in `02-contract.md` next to the instance folders. An instance with no capability for an
+ * entry **writes the file anyway** and says what to do instead — so a missing file is a missing
+ * answer rather than an absent capability, and the two used to look identical.
+ *
+ * **THE CONTRACT IS READ, NEVER ASSUMED.** The entries are the backticked file names in its table,
+ * so adding one to the contract is what puts it on every provider's bill. A folder with no contract
+ * beside it is not this question's business.
+ *
+ * **AND A FILE NOT IN THE CONTRACT IS REPORTED TOO.** A provider that answers something nobody
+ * asked has either found a question the contract is missing, or has written somewhere nobody will
+ * look — and both are worth knowing.
+ */
+function providerContracts(root: string): string[] {
+  const findings: string[] = [];
+  const dirs = (at: string): string[] =>
+    isDir(at) ? readdirSync(at).filter((e) => isDir(join(at, e))) : [];
+
+  // Every `10-providers`-shaped folder in the capabilities seat, found rather than named.
+  const seat = join(root, "docs/04-capabilities");
+  if (!isDir(seat)) return [];
+  for (const area of dirs(seat).sort())
+    for (const group of dirs(join(seat, area)).sort())
+      for (const construct of dirs(join(seat, area, group)).sort()) {
+        const at = join(seat, area, group, construct);
+        const contract = read(join(at, "02-contract.md"));
+        if (!contract) continue;                     // no contract here — not this question
+        const want = new Set([...contract.matchAll(/^\|\s*`([0-9A-Za-z.-]+\.md)`\s*\|/gm)].map((m) => m[1]));
+        if (!want.size) continue;
+        for (const instance of dirs(at).sort()) {
+          const have = new Set(readdirSync(join(at, instance)).filter((e) => e.endsWith(".md")));
+          const missing = [...want].filter((f) => !have.has(f)).sort();
+          const extra = [...have].filter((f) => !want.has(f)).sort();
+          const where = `${area}/${group}/${construct}/${instance}`;
+          if (missing.length) findings.push(`${where} does not answer ${missing.join(" · ")}`);
+          if (extra.length) findings.push(`${where} answers ${extra.join(" · ")}, which the contract does not ask`);
+        }
+      }
+  if (!findings.length) return [];
+  let out = `CONTRACT    ${findings.length} provider folder finding(s) against the contract beside them.`;
+  out += "\n            An instance answers every entry, writing the file even where the answer is that";
+  out += "\n            it does not — because a missing file cannot be told from a forgotten one:";
+  for (const f of findings.slice(0, 10)) out += `\n              ${f}`;
+  if (findings.length > 10) out += `\n              … and ${findings.length - 10} more`;
+  return [out];
+}
+
 export function main(root: string): number {
   const sources = sourcesOf(root);
   const findings = [
     ...vocabulary(root, sources), ...rulings(root), ...ownership(root, sources),
     ...cardinality(root, sources), ...hub(root), ...restatementDrift(root),
-    ...citations(root), ...capabilityChapters(root),
+    ...citations(root), ...capabilityChapters(root), ...providerContracts(root),
   ];
   for (const finding of findings) { console.log(finding); console.log(); }
   const kinds = new Map<string, number>();

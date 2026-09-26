@@ -122,5 +122,45 @@ mk(faceOnly, "docs/02-constructs/01-a/01-b/01-thing.md", "# Thing\n");
 mk(faceOnly, "docs/04-capabilities/01-a/01-b/01-thing/README.md", "# Thing\n");
 one("a folder holding only a face is not a chapter", run(faceOnly).includes("CHAPTER"));
 
+// ── the provider-contract question ────────────────────────────────────────────────────────────
+//
+// Every instance answers the same entries under the same names, and one with no capability writes
+// the file anyway. So a MISSING file is a missing answer rather than an absent capability — and
+// before the contract existed those two looked identical.
+//
+// THE CONTRACT IS READ, NEVER HARDCODED. Adding an entry to `02-contract.md` is what puts it on
+// every instance's bill, so these cases write their own contract rather than leaning on the book's.
+
+const contract = (root, where, entries) =>
+  mk(root, `${where}/02-contract.md`,
+     "# The contract\n\n| File | The question |\n| --- | --- |\n" +
+     entries.map((e) => `| \`${e}\` | something |`).join("\n") + "\n");
+
+// 10 — an instance answering every entry says nothing.
+const full = tree("contract-full", "", false);
+contract(full, "docs/04-capabilities/01-a/01-b/10-providers", ["01-one.md", "02-two.md"]);
+mk(full, "docs/04-capabilities/01-a/01-b/10-providers/x/01-one.md", "# One\n");
+mk(full, "docs/04-capabilities/01-a/01-b/10-providers/x/02-two.md", "# Two\n");
+one("an instance answering every entry reports nothing", !run(full).includes("CONTRACT"));
+
+// 11 — a missing entry is reported, and named.
+const short = tree("contract-short", "", false);
+contract(short, "docs/04-capabilities/01-a/01-b/10-providers", ["01-one.md", "02-two.md"]);
+mk(short, "docs/04-capabilities/01-a/01-b/10-providers/x/01-one.md", "# One\n");
+one("a missing entry is reported by name", run(short).includes("02-two.md"));
+
+// 12 — a file the contract does not ask for is reported too. It has either found a question the
+//      contract is missing, or been written somewhere nobody will look.
+const overfull = tree("contract-overfull", "", false);
+contract(overfull, "docs/04-capabilities/01-a/01-b/10-providers", ["01-one.md"]);
+mk(overfull, "docs/04-capabilities/01-a/01-b/10-providers/x/01-one.md", "# One\n");
+mk(overfull, "docs/04-capabilities/01-a/01-b/10-providers/x/99-invented.md", "# Invented\n");
+one("a file the contract does not ask for is reported", run(overfull).includes("99-invented.md"));
+
+// 13 — a folder with no contract beside it is not this question's business.
+const nocontract = tree("contract-none", "", false);
+mk(nocontract, "docs/04-capabilities/01-a/01-b/01-thing/x/01-one.md", "# One\n");
+one("a folder with no contract is left alone", !run(nocontract).includes("CONTRACT"));
+
 console.log(failed ? `${failed} of ${n} failed` : `all ${n} passed — coherence`);
 process.exit(failed ? 1 : 0);

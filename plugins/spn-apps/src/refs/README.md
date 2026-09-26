@@ -1,19 +1,27 @@
-<!-- spn:generated refs-readme — do not edit inside these markers; `refs-readme.ts` writes it -->
-# spn-apps — what these refs cover
+# What these refs are, and how they are arranged
 
-A ref is a self-contained leaf, named for a construct the book states. **This plugin ships 30.**
+**A ref is a self-contained leaf.** You are holding the plugin and not the book, so everything it restates is written out here, stamped with the version it was read at.
 
-**Coverage is per group, never one number.** One figure over a plugin averages a complete group with an empty one, and is true of neither.
+## Only domain folders live here
 
-| Group | Covers | Cuts across | Not restated |
-| --- | --- | ---: | ---: |
-| `platform/core` | 5 of 5 constructs | 1 | — |
-| `platform/modules` | 7 of 7 constructs | 2 | — |
-| `providers/ts` | — by role, not by construct | 4 | — |
-| `support/apps` | 10 of 10 constructs | 1 | — |
+**`refs/` holds one folder per book domain and nothing else.** A folder under a domain is a group; a file under a group is named for a construct the book states; **a construct needing more than one file becomes a folder named for it.**
 
-**A ref that cuts across restates no single construct** — it carries a rule the whole group obeys, which is why it has no chapter to be named for.
+**A folder's `README.md` is that folder's own subject.**
 
-**Every construct the book states in these groups has a ref.**
+| Domain | Holds |
+| --- | --- |
+| [`support/apps/`](support/apps/) | what a node is, and everything it is built from — shape, packages, modules, resources, apps, tests, comments, the agent surface, what it ships, and the stacks that realize it |
+| [`platform/core/`](platform/core/) | the platform a partner adopts rather than rebuilds — tenancy, identity, surfaces, data and trust, lifecycle |
+| [`platform/modules/`](platform/modules/) | one ref per module that ships, and the face says what a module is |
 
-<!-- /spn:generated -->
+## The stacks are inside, not beside
+
+**`support/apps/providers/` holds one folder per stack.** This plugin is the apps domain, and a stack is a realization of it rather than a domain of its own — which is why there is no `spn-apps-ts`.
+
+**Every stack answers the same questions under the same file names**, and a stack with no capability for one writes the file anyway and says what to do instead. So the folder listing is the coverage.
+
+## What is generated
+
+**One file**: `support/apps/providers/ts/libraries.md`, the list of published packages a node may depend on. There is no construct per package, so nothing in the book lists them and a hand-written list would be wrong at the next release.
+
+**The module list is not generated**, because there is one ref per module — the folder is the list.
