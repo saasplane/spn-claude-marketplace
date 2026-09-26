@@ -20,11 +20,16 @@
 //      hashed, and an unchanged corpus runs nothing at all. The walk is the whole cost on a turn that
 //      changed no document, which is most turns.
 //
-//   2. ONLY THE TOOLS THAT ARE AT ZERO ARE WIRED. `coherence` reports 111 findings today and
-//      `restate-drift` 32, and a gate that is red from the day it ships is one nobody reads — which
-//      is this corpus's own argument about SOFT grading, arriving as a design constraint. They join
-//      `WIRED` each on the day it is silent on a clean corpus, and `REPORTED_ELSEWHERE` below says so
-//      out loud rather than leaving a reader to infer that the set is complete.
+//   2. ONLY THE TOOLS THAT ARE AT ZERO ARE WIRED. A gate that is red from the day it ships is one
+//      nobody reads — which is this corpus's own argument about SOFT grading, arriving as a design
+//      constraint. A tool joins `WIRED` on the day it is silent on a clean corpus, and
+//      `REPORTED_ELSEWHERE` below says which are still outside rather than leaving a reader to
+//      infer that the set is complete.
+//
+//      NO ENTRY NAMES A COUNT. A number written into a message is a measurement taken once and
+//      then repeated forever: `restate-drift` was described here as reporting 32, and it reports
+//      none today. The reason a tool is outside has to be the SHAPE of what it reports, because
+//      that is the part that stays true until somebody changes the tool.
 //
 // AND THE SCOPE IS THE DOCS TREE, NEVER THE REPOSITORY ROOT. `audit` given a folder means *every
 // document under it*, so a root pulls in every package `README.md` and `CLAUDE.md` — none of which
@@ -71,8 +76,8 @@ const WORKSPACE_WIDE = [
  * nobody earned. A silent corpus check that quietly covers four of six tools would be exactly that.
  */
 const REPORTED_ELSEWHERE = [
-  { label: "coherence", why: "reports 111 on a clean corpus — 89 are a cardinality heuristic that cannot tell a closed set from one that can grow" },
-  { label: "restate-drift", why: "reports 32 drifts awaiting a read, and a stamp refreshed without reading the diff defeats the check" },
+  { label: "coherence", why: "most of what it reports is a cardinality heuristic that cannot tell a closed set from one that can grow, so it is read rather than gated on" },
+  { label: "restate-drift", why: "a drift is a question — does this restatement still hold — and the only answer is reading the diff, which a hook cannot do for you" },
   { label: "figures check", why: "joins once it has run clean across all seven trees on a day nothing was redrawn" },
 ];
 
