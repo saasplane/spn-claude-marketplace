@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: `spn-claude-marketplace/plugins/spn-infra/src/refs/support/infra/laws.md` — the estate
+// RESTATES: `spn-claude-marketplace/plugins/spn-infra/src/refs/support/infra/README.md` — the estate
 // laws, as refusals at write time. That ref is the source of truth; this file states no rule of its
 // own and only carries the sentence a refusal quotes, plus the shape a rule takes.
 //
@@ -13,9 +13,9 @@
 // different account of the same law depending on which file they happened to touch.
 import type { Verdict } from "../lib/payload.ts";
 
-/** What `refs/support/infra/laws.md` says, quoted at the point of refusal. */
+/** What `refs/support/infra/README.md` says, quoted at the point of refusal. */
 export const LAWS =
-  "See refs/support/infra/laws.md in the spn-infra plugin: no secrets, ARNs or account ids at any " +
+  "See refs/support/infra/README.md in the spn-infra plugin — the estate laws: no secrets, ARNs or account ids at any " +
   "path; every provider-assigned value is discovered by the driver and recorded as resolved state; " +
   "provider strings live only inside a cloud entry.";
 

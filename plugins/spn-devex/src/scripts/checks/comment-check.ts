@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // RESTATES: spn-foundation docs/04-capabilities/02-support/01-apps/07-comments/README.md § The check, and what each finding costs
 //           docs/04-capabilities/02-support/01-apps/07-comments/02-rationale.md § Forms that are always wrong
-//           providers/apps/ts/03-code-patterns.md § Comments
+//           docs/04-capabilities/02-support/01-apps/10-providers/ts/05-code.md § Comments
 // The chapters are the source of truth. A rule change is edited there first, then here, in the same change.
 //
 // What the code says about itself, read at the moment it is written.

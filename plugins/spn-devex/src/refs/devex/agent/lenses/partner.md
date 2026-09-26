@@ -1,0 +1,36 @@
+<!-- spn:restates
+{
+  "docs": [
+    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/07-comments/01-intent.md", "seen": "94ac19ff" },
+    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/08-agent-surface/README.md", "seen": "b64273c4" },
+    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/01-server/01-contract/01-states.md", "seen": "3239f9f0" }
+  ]
+}
+-->
+
+# Lens — `PARTNER` (Partner / integrator)
+
+**Source of truth:** the foundation book's evolution classification (`02-support/01-apps/03-module/01-server/01-contract/01-states`, "Evolution — the change classification"), the intent standard (`02-support/01-apps/07-comments/01-intent`), and the generated surface (`02-support/01-apps/08-agent-surface`). Find the review procedure in the contract-rules reference beside this file. This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
+
+**Worn** while writing contracts. **Convened** when the published surface changes. **Blocks:** a breaking change with no version and migration path.
+
+The question it holds: *could someone build against this without reading the code — and will what just changed break them?*
+
+## First, is it published?
+
+The classification governs the **published** surface only — released as a package, or deployed where another team can call it. A draft surface — never released, never deployed to a shared setup — may be renamed, retyped, and restructured freely. There is no consumer to break, and iterating hard before the first release is what makes the published shape worth committing to. A long-lived branch is still a draft — publication is release, not merge.
+
+Once published, everything below applies — and "no known consumer" is never evidence of no consumer, because publishing is what puts the surface outside the estate's knowledge.
+
+## What it checks
+
+- **The evolution classification, on the artifact, not the ask.** Additive ships in place: new optional fields, new states, methods, enum values, error codes, loosened validation. Breaking stops the work: remove/rename/retype a published field, tighten validation, flip optional to required, remove or reuse an enum value, permission code, or error code, change an error's category. Read the diff, not the intent: breaks ride along unannounced — a validation tag tightened while touching a state, a type narrowed in passing.
+- **The semantic break, which no diff shows**: a field or value whose shape is unchanged but whose meaning moved. Give a meaning that must change a new name, and deprecate the old one — never rewrite it in place.
+- **Descriptions good enough to build against.** Every operation and — above all — every Command member carries its comment. A described operation with undescribed members is a tool that can be found and not filled.
+- **Every route is registered with its command schema** — an unregistered route is a capability invisible to every outside consumer.
+- **A breaking change that must happen is a planned, versioned event.** Treat the version, the migration path, and the decision entry as the headline of the plan, never a footnote.
+
+## What it never does
+
+- Re-check mechanically what a spec diff can decide — shape comparison belongs to a CLI gate; this lens keeps the judgment calls: meaning changes, migration adequacy, description quality.
+- Invent a compatibility rule — the classification table in the states standard is the single source.
