@@ -33,15 +33,19 @@ Scope reads to what the step needs — the inventory tells you which packages ex
 
 ## 3. Walk the steps
 
-Each step has a reference file under `refs/providers/<stack>/steps/`, and **the stack is the node's own, read from the nearest `sprepo.json` — never typed on a command and never assumed.** Read the step file **before** writing that layer's code; it carries the golden path and rest
+**Each step is a file at `providers/{stack}/skills/implement/steps/{step}.md`**, and **the stack is the node's own, read from the nearest `sprepo.json` — never typed on a command and never assumed from a file extension.** This skill names the steps and their order; it never names a stack. Open them by composing that path.
 
-1. [`steps/contract.md`](../../refs/support/apps/providers/ts/steps/contract.md) — states, commands, events, validators (`spnutils apps gen-validators`)
-2. [`steps/service.md`](../../refs/support/apps/providers/ts/steps/service.md) — the canonical service shape: authz, transactions, cache, queues, audit, repository, migrations
-3. [`steps/entry.md`](../../refs/support/apps/providers/ts/steps/entry.md) — thin controllers, the route grammar, CLI controllers
-4. [`steps/queue.md`](../../refs/support/apps/providers/ts/steps/queue.md) — listeners, `subscriberId` as a consumption contract, why the handler is ungated, consumer-side idempotency
-5. [`steps/ui.md`](../../refs/support/apps/providers/ts/steps/ui.md) — `MODULE_WEB` plug-in points, hooks, permission gating (full-stack / FE-only)
-6. [`steps/test.md`](../../refs/support/apps/providers/ts/steps/test.md) — unit + repo-level integration, state hygiene
-7. [`steps/docs.md`](../../refs/support/apps/providers/ts/steps/docs.md) — the doc set closes the change
+| | Step | What it settles |
+| --- | --- | --- |
+| 1 | `contract` | states, commands, events, validators (`spnutils apps gen-validators`) |
+| 2 | `service` | the canonical service shape: authz, transactions, cache, queues, audit, repository, migrations |
+| 3 | `entry` | thin controllers, the route grammar, CLI controllers |
+| 4 | `queue` | listeners, `subscriberId` as a consumption contract, why the handler is ungated, consumer-side idempotency |
+| 5 | `ui` | `MODULE_WEB` plug-in points, hooks, permission gating (full-stack / FE-only) |
+| 6 | `test` | how this stack runs each tier. **Which tier a project owes is `DEVEX_TEST`'s**, and that skill carries the ladder |
+| 7 | `docs` | the doc set closes the change. **The seats, the two voices and the dictionary are `refs/doc-sets.md` in the spn-devex plugin**; this stack's half is `env` — where a key goes in its env files |
+
+**A step file this stack does not ship is a step this stack does not walk.** A realization that is absent says so; nothing here stubs one.
 
 Order never changes; skip only what the classification skips. **Docs move with the steps, not after them.** The contract step updates `docs/04-capabilities/` rows and writes intent comments as it writes the surface. The test step embeds behavior ids in contract-tier test titles, and the docs step is the closing sweep that flips statuses. Regenerate at the marked points. Run `gen-validators` after any `contract/states/**` edit. Run `gen-barrel` after adding files to a lib package — never on apps or the API client. Regenerate the API client from the **running** service if routes or contracts changed before the FE consumes them.
 

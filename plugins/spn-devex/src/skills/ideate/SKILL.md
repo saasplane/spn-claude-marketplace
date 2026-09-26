@@ -1,6 +1,6 @@
 ---
 name: ideate
-description: Decide what a node IS before anything is planned - its boundary, its domains, its surfaces, its architecture - and capture it in the repo's CONCEPT.md at the repository root (a concept belongs to a repo root, never to a node). Use when starting a platform, repo, module, app or package; when someone wants to conceptualize or think something through before building; or when a requirement turns out to need a new domain, a moved boundary, or a split module; or when a node's docs have moved ahead of its concept and someone asks for the concept to be brought up to date. Interactive by design - it works one agreed block at a time and never drafts a whole concept in one pass. Stack-agnostic.
+description: Decide what a node IS, and design a requirement inside that shape - its boundary, its domains, its surfaces, its architecture, captured in the repo's CONCEPT.md at the repository root (a concept belongs to a repo root, never to a node). Use when starting a platform, repo, module, app or package; when someone wants to conceptualize or think something through before building; or when a requirement turns out to need a new domain, a moved boundary, or a split module; or when a node's docs have moved ahead of its concept and someone asks for the concept to be brought up to date. Interactive by design - it works one agreed block at a time and never drafts a whole concept in one pass. Stack-agnostic.
 ---
 
 # ideate — decide the shape, one agreed section at a time
@@ -9,14 +9,38 @@ A boundary nobody decides still gets drawn: the first three features draw it, im
 
 Your output is exactly one file: **`CONCEPT.md` at the repository root**, beside `sprepo.json`. A concept belongs to a repo root, never to a node (decision RD.DOCS.012). Nodes carry `README.md` alone, so ideating a node lands as sections of its repo's concept. Never `docs/`. Never code.
 
-## Ideate decides the shape; plan works inside it
+## One skill, three modes — and `plan` is not a fourth
 
-| | Decides | Changes |
+**`PLAN` left the DevEx stages and folded in here** (`RD.DEVEX.062`). It named an output as if it were a phase, which is why it never had a command surface of its own. **Planning is not a skill, and the absence is the design**: this skill covers both deciding what a node **is** and designing a requirement **inside** that shape.
+
+Pick the mode from the argument — `shape` · `design` · `decision`. Where none was given, infer it from the request and say which you picked.
+
+| Mode | When | What it changes |
 | --- | --- | --- |
-| **ideate** | what this node **is** — boundary, domains, surfaces, architecture | the **shape** |
-| **plan** | how a requirement becomes a design the docs carry | the **content** inside that shape |
+| **`shape`** | a requirement needs a new domain, a moved boundary, or a split module | `CONCEPT.md` — the boundary, the domains, the surfaces. **The rest of this file is this mode** |
+| **`design`** | a requirement fits an existing domain | the owning docs, as `🔮 planned` rows |
+| **`decision`** | a deviation from a golden path, a breaking change, or a doc-versus-code conflict | one register row |
 
-**The test:** a requirement fits an existing domain → that is `plan`. It needs a new domain, a moved boundary, or a split module → it is **this** skill, and the concept changes before anything is planned.
+### Mode: design — a requirement becomes rows in the docs that own it
+
+**Spec-first, and no interim artifact** (`RD.DEVEX.007`): the design is written **into the owning docs as `🔮 planned` rows** — never to a scratch file, never to a `tasks/` tree. Implementation later flips statuses instead of reconciling two documents.
+
+1. **Restate the requirement** in one paragraph, in the asker's own words.
+2. **Classify it**: new capability · additive change to an existing contract · **breaking** change · pure fix. **A breaking change stops here** — reroute through the versioning path and record it in `decision` mode. A breaking change never rides in as a plan row.
+3. **Locate ownership** — which module owns the capability. Where none does, this is a scaffolding conversation first, and the ladder is *use → configure → generalize into the platform → build domain-specific*; descend only with a reason.
+4. **Write the rows**, into the repository's own docs tree, under the domain the module belongs to. **The seats, what each holds and the row grammar are `refs/doc-sets.md`** — read it there rather than from a copy. Where the node is in a declared stack, that stack's own planning notes are `providers/{stack}/skills/ideate/plan.md` in the domain plugin, and the stack comes from the nearest `sprepo.json`.
+
+### Mode: decision — one register row
+
+A row is `| id | ruling | why | date |`, the id `RD.<AREA>.<NNN>` over the closed set `GOV · PLATFORM · APPS · INFRA · DEVEX · DOCS`, numbered per area. **Ids are never reused and never renumbered.**
+
+**The `why` column is the load-bearing one.** A row without it is a rule nobody can re-derive, and the next person to hit the same problem argues it from scratch. Say what the alternative costs, in specifics — never *for consistency*.
+
+Name the register it belongs in: the workspace's own `docs/registers/decisions.md`, or the foundation book's for a foundation-level rule.
+
+### Hand off by naming the next skill
+
+`shape` and `design` → `new` where scaffolding is needed, otherwise `implement`. `decision` → done, or `review` where the ruling needs a second reading.
 
 ## Two directions, and the source decides which
 

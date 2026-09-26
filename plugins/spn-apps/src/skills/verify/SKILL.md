@@ -53,7 +53,7 @@ No running stack required. Run the cheapest gate first, so a failure stops the r
    **The tier is named, never aggregated**: there is no `test` target, because one word covering
    every tier meant the unit tier for seven kinds and the component tier for a web application. The
    per-tier targets are INFERRED from what a node is, so `npx nx show project <p> --json` is what
-   says which a node has. **A red sends you to the failure's own artifact first, never to the source** — the error context the runner wrote, and the service log beside it. Then fix by shape rather than one instance at a time; see [implement/steps/test](../../refs/support/apps/providers/ts/steps/test.md#before-you-write-or-fix-a-case).
+   says which a node has. **A red sends you to the failure's own artifact first, never to the source** — the error context the runner wrote, and the service log beside it. Then fix by shape rather than one instance at a time; see `implement`'s `test` step, § Before you write or fix a case — `providers/{stack}/skills/implement/steps/test.md`.
 
 **What the gates cover follows from the project's declared kind**, not from the repo it sits in:
 
@@ -94,7 +94,7 @@ For every kind except an app, there is no stack to tear down. Reset is `package`
 
 Destructive, and the local stack is frequently **shared**: `infra platform down --clean` wipes a database other work on the machine is using. **Run only on an explicit instruction, and only against a named target.**
 
-1. **Regenerate and typecheck first** — never reset onto stale or broken code. Run the codegen commands for everything touched on the branch, then build to green. A stale barrel or a type error means the reset boots broken code and the whole cycle is wasted. **A green build does not cover `tests/`** — `nx build` compiles `src` only, so typecheck each test sibling too (`tsc --noEmit --pretty false -p tsconfig.test.json`, and `tsconfig.integration.json` where present); see [implement/steps/test](../../refs/support/apps/providers/ts/steps/test.md#typechecking-the-tests-themselves).
+1. **Regenerate and typecheck first** — never reset onto stale or broken code. Run the codegen commands for everything touched on the branch, then build to green. A stale barrel or a type error means the reset boots broken code and the whole cycle is wasted. **A green build does not cover `tests/`** — `nx build` compiles `src` only, so typecheck each test sibling too (`tsc --noEmit --pretty false -p tsconfig.test.json`, and `tsconfig.integration.json` where present); see `implement`'s `test` step, § Typechecking the tests themselves — `providers/{stack}/skills/implement/steps/test.md`.
 2. **Stop what is running** — the app and any stale watch or dev-server processes holding its ports.
 3. **Cycle the stack** — `spnutils infra app down` → `infra platform down --clean` → `infra platform up` → `infra app up`.
 4. **Hosted-vendor modules cycle with the platform layer.** A vendor you run is a module row in the platform declaration, with no lifecycle of its own. Its state is wiped only by the same explicit `--clean`, never as an inferred side step.

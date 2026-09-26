@@ -43,7 +43,7 @@ The code is a **purpose, never a product** — `idp`, not a vendor name — so s
 
 ## 5 · Renderings derive from the tree
 
-`src/local/` (the compose rendering) first — local-first is the loop; `src/aws/` where a cloud rendering ships. **A rendering absent is absent, not stubbed** — its folder's presence is exactly what the hosting-pin check reads. A module shipping one rendering runs that one; shipping both, it follows the environment unless its row pins one.
+`src/local/` (the compose rendering) first — local-first is the loop; `src/{cloud}/` where a cloud rendering ships, the code being the one the estate declares rather than one typed here. **A rendering absent is absent, not stubbed** — its folder's presence is exactly what the hosting-pin check reads. A module shipping one rendering runs that one; shipping both, it follows the environment unless its row pins one.
 
 ## 6 · Compose the library — never reimplement it
 

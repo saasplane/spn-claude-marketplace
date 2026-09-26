@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: `spn-claude-marketplace/docs/02-constructs/01-spn-devex/11-provider-set.md` — a gate
+// RESTATES: `docs/02-constructs/01-spn-devex/11-provider-set.md` — a gate
 // never names an instance. That chapter is the source of truth; this file states no rule of its own
 // and only performs the read it describes.
 //
