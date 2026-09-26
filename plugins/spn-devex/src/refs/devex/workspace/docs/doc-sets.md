@@ -1,10 +1,10 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/README.md", "seen": "13d462c3" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "3f94fce7" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md", "seen": "bda7cb58" },
-    { "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md", "seen": "454875b1" },
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/README.md", "seen": "55c0c7e6" },
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "9b426f80" },
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md", "seen": "07ba6c0e" },
+    { "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md", "seen": "93f48e43" },
     { "path": "spn-foundation/CONCEPT.md", "seen": "24dbbf45" }
   ]
 }
@@ -216,7 +216,7 @@ and a repository that cannot run a tier today may ship a runner tomorrow (`RD.GO
 | `registers/` | the repository's own rules and decisions | lookup material, consulted rather than read start to end |
 | `artifacts/` | the overview and construct pages, and deliberate reports | authored source of truth. Nested folders allowed here and nowhere else; sub-folders carry no README |
 
-**A domain face carries its dictionary, and it is generated.** One table, three columns — the word a
+**A domain face carries its glossary, and it is generated.** One table, three columns — the word a
 consumer uses, the term the contract uses, and what it means — joined from every construct `Terms`
 table in that domain, with the term linked to the construct that declares it. A `Terms` table of two
 columns cannot be generated from, and the audit reports it.
@@ -224,7 +224,7 @@ columns cannot be generated from, and the audit reports it.
 **It sits on the domain, not on the seat face.** A repository-wide table ran to 573 rows in the
 foundation and 347 in the platform, where a domain's is twelve to a hundred and twenty-two — and a
 term written twice in one domain sits in adjacent rows rather than two hundred apart. The seat face
-keeps the domain table it already carries and no dictionary.
+keeps the domain table it already carries and no glossary.
 
 **There is no *where it is stored* column.** It was joined from the domain's `data-model.md` and
 named a table in none of 252 rows measured; deleting it repaired the defect that no correction to
@@ -232,17 +232,17 @@ the files could. Storage is read in the data model itself, which is grouped by t
 constraint matters and why each index exists.
 
 **A domain's overview is its face in HTML**: it links into `artifacts/constructs/<domain>/` and
-carries the same dictionary. Extra reading paths beneath it carry none.
+carries the same glossary. Extra reading paths beneath it carry none.
 
 **Six invariants hold this shape up, and the folders are only where they land.** A domain folder
-exists only where the concept names that domain. The dictionary is generated, never typed. Every
-noun in a behaviour row resolves to the dictionary. Every construct has a chapter in every package
+exists only where the concept names that domain. The glossary is generated, never typed. Every
+noun in a behaviour row resolves to the glossary. Every construct has a chapter in every package
 that realizes it, every chapter names a construct that exists, and every package holding code
 realizes at least one construct. Every proven row resolves to a case and every cited id exists — a
 promise carries no status, and a proven row names a promise that exists. Every construct has at
 least one realization row, and its dependencies are acyclic and agree with the reading order. Each
 is a RULE, and invariant 2 is the one that decides whether the shape was worth
-adopting — a hand-maintained dictionary moves drift rather than removing it.
+adopting — a hand-maintained glossary moves drift rather than removing it.
 
 **A capability chapter is the spec the code it names realizes** (decisions RD.DOCS.034 · RD.DOCS.073). It is **one chapter per construct per package that realizes it**, under the construct's own domain and carrying its number — `01-iam/module-server-iam-ts/04-sign-in.md`. The per-group mirror it replaced — `cache.md`, `contract.md`, `app.md`, `entry.md`, `ui-*.md` and siblings — is retired: a package's folders are not the reader's question, and 98 of those mirrors ran to 5,000 words restating a pattern the stack's standard already states once. **A chapter has four sections and nothing else**, each one there because something would otherwise be copied into it:
 
@@ -255,7 +255,7 @@ adopting — a hand-maintained dictionary moves drift rather than removing it.
 
 **Why comes before what**, because a reader given the rule can predict the handling. **Three things are deliberately absent**: no line-by-line walk, which the code's own comments carry; no proof rows, which are the behaviours seat's; and no known gaps, which live in the workstream's split plan and the behaviour row's status. **A chapter stays under 800 words**, and that is a consequence rather than a cap — everything long has a better home above it. The two altitudes bind different people: the book's standard binds everyone building anything, and a chapter binds whoever maintains this package. So the test is one statement at a time: **does it bind someone?** If yes it takes `MUST`/`MUST NOT`/`MAY`; if it binds nobody it is commentary — advice, rationale, a trade-off note — and stays prose. **A capability chapter is normatively dense by design.**
 
-**The spec treatment reaches chapters only.** A seat face is a **map** of what the repository contains — *where does what live*, not *what must this code do*. So is the `04-capabilities/README.md` face, which routes, and so is `data-model.md`, which is a dictionary. The seat's job differs by what is being documented: a chapter of a construct yields a spec, an index or an orientation yields a map. **Seat tables are in scope for modality; record tables are not** — dictionaries, behavior-row tables, data models, registries and proof-gap tables keep their form. Modality comes from the page, never from a sweeper.
+**The spec treatment reaches chapters only.** A seat face is a **map** of what the repository contains — *where does what live*, not *what must this code do*. So is the `04-capabilities/README.md` face, which routes, and so is `data-model.md`, which is a glossary. The seat's job differs by what is being documented: a chapter of a construct yields a spec, an index or an orientation yields a map. **Seat tables are in scope for modality; record tables are not** — glossaries, behavior-row tables, data models, registries and proof-gap tables keep their form. Modality comes from the page, never from a sweeper.
 
 **`group` is the source axis; `area` is the top division of a seat.** A group is a published top-level source folder, and it is now the **symbol index's** vocabulary alone — the capabilities seat stopped sharing it the moment a chapter became named for a construct, and what carries the source-folder axis is the generated index on a node's own `README.md` (decision RD.DOCS.078). An **area** is a folder, and the same areas divide all three *What* seats alike, so one number names the model, the rows and the standard of one thing. **The foundation has four — `01-devex` · `02-support` · `03-platform` · `04-launchpad` — and it is the only repository that divides this way** (decision RD.DOCS.071); every other repository divides by domain with no area above it. Three rules bound the level: the concept names the areas, every seat that divides by domain divides the same way or none does, and **an area with no sub-areas holds its topic files directly** rather than a single child folder. **An area is a folder**, and `RD.DOCS.016` states it as one.
 
@@ -320,7 +320,7 @@ Every page somebody writes by hand is copied from a template, and the templates 
 
 **The plugin and the CLI carry different sets, because they answer different moments.** `pages/` and `seat-files/` ship in both, since the agent copies one to write a page and `repo create` emits a started hub page. `workstream/` and `agent/` ship in the plugin alone: the CLI creates a workstream folder with `mkdir` and owes no shape, and it never writes a skill. The copies are stamped with the book's hash and exported on release, so a release whose copies disagree with the source fails rather than publishing drift.
 
-**A scaffold beats a template, a template beats a document, and a document beats a conversation.** Where the CLI creates a file, that scaffold *is* the template and none is kept in the book — a seat face, a behaviour file, a capability chapter and the dictionary are all made that way.
+**A scaffold beats a template, a template beats a document, and a document beats a conversation.** Where the CLI creates a file, that scaffold *is* the template and none is kept in the book — a seat face, a behaviour file, a capability chapter and the glossary are all made that way.
 
 **Seven templates carry the page and seat-file shapes**: `hub-template.html` for the one hub a repository has, `overview-template.html` for one reading path, `construct-template.html` for a produced construct page, `approach-template.html` for a workstream's argument, `construct-seat-template.md` for the seat file an author actually writes, `capability-template.md` for one capability chapter, and `blocks-template.html` for nothing at all — it is the **source** of the sample-block section the four page templates carry.
 
@@ -370,7 +370,7 @@ A register row records *what* was decided, never the options that lost or what t
 
 **The suffix names the kind, and the set is closed** (decision RD.DOCS.040). The routing test is one question: *were options weighed and one chosen?* Yes → `-approach`. No → `-overview`. A document with no options, no recommendation and no accepted cost is an overview whichever folder holds it.
 
-- **The overview set is the hub, one page per domain, and one more for every further reading path** (decision RD.DOCS.074). A reading path is a run of constructs somebody reads in order to decide one thing. **The first page in a domain is owed; every one after it is earned** — a hub with nothing beneath it dead-ends at the first click, so the middle rung exists wherever a domain has construct pages at all. `concept-overview.html` is the concept's readable HTML face, the hub, one per repository; `concept-<domain>-overview.html` is a domain's own face, linking that domain's construct pages and carrying its generated dictionary.
+- **The overview set is the hub, one page per domain, and one more for every further reading path** (decision RD.DOCS.074). A reading path is a run of constructs somebody reads in order to decide one thing. **The first page in a domain is owed; every one after it is earned** — a hub with nothing beneath it dead-ends at the first click, so the middle rung exists wherever a domain has construct pages at all. `concept-overview.html` is the concept's readable HTML face, the hub, one per repository; `concept-<domain>-overview.html` is a domain's own face, linking that domain's construct pages and carrying its generated glossary.
 - **Every construct the pocket holds is linked from the hub — MUST.** Prove it by listing both sets and diffing them, never by scanning the page. A hub section standing over no construct is a **declared gap**, which is the honest kind and what the next workstream picks up; a construct the hub does not link is an orphan.
 - **Keep reports under their own name** in `reports/`, as `<kind>-report.html`. **There are four kinds and the set is closed**. `audit` asks whether the repository is wired the way the standard says. `code` finds where the source departs from the stack's standards, and `docs` where the corpus departs from the docs standards. `tests` says what the tests have proved and what nothing has proved yet. Each one is replaced in place by the next report of its kind, so a pocket never holds six audits nobody will re-read. A report kept because the moment mattered — an incident, or what one release carried — is dated in its filename and never overwritten, and a fifth kind is a decision entry rather than a new filename. **A report is written by the agent and not produced by a command**: it reads the repository and fills the template, which is how it can name a fault no check could. **A source a seat cites is not the pocket's to hold**, and one sentence decides it: **nothing in a pocket may be depended on.** A pocket once carried a `resources/` folder for *what a document was written from* — and every such file was a file some seat needed, so every one was a seat depending on a pocket. It is gone, and a fact a seat needs lives in a seat: the node's *why* in `01-purpose/`, what consuming it observably does in `03-behaviors/`, its *how* in `05-guides/`. The same sentence keeps the templates with the chapters whose rules they restate, and `schema.sql` in the capabilities seat beside the `data-model.md` it is the authoritative form of (`Q88`).
 - **Nothing here is validated against current state.** An artifact records a moment, so a checker that flags one for disagreeing with today's tree has misread what it is looking at.

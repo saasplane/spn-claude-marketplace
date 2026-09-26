@@ -2,8 +2,8 @@
 {
   "docs": [
     { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md", "seen": "8c2210a7" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md", "seen": "e98073f6" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md", "seen": "fe3bb059" }
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md", "seen": "3bfd5929" },
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md", "seen": "ee4c46ed" }
   ],
   "decisions": [
     "RD.DOCS.031",

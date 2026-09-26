@@ -2,16 +2,16 @@
 {
   "docs": [
     { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/01-shape/README.md", "seen": "6637ce16" },
-    { "path": "spn-foundation/docs/02-constructs/README.md", "seen": "a78978da" },
-    { "path": "spn-foundation/docs/04-capabilities/03-platform/README.md", "seen": "f1d3635c" },
-    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/README.md", "seen": "283e643b" }
+    { "path": "spn-foundation/docs/02-constructs/README.md", "seen": "b794b20b" },
+    { "path": "spn-foundation/docs/04-capabilities/03-platform/README.md", "seen": "f4761dad" },
+    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/README.md", "seen": "a4980d9e" }
   ]
 }
 -->
 
 # Lens — `ARCHITECT` (Architect)
 
-**Source of truth:** the foundation book's saas model (`03-platform`), and the shape and module groups (`02-support/01-apps/01-shape` · `03-module`). Also the contract states standard including its evolution classification, and the dictionary grammar — the `Contract term` column of the dictionary generated onto each domain's face. This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
+**Source of truth:** the foundation book's saas model (`03-platform`), and the shape and module groups (`02-support/01-apps/01-shape` · `03-module`). Also the contract states standard including its evolution classification, and the glossary grammar — the `Contract term` column of the glossary generated onto each domain's face. This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
 
 **Worn** while designing. **Convened** when a module boundary moves, and over any design before its rows land. **Blocks:** a new mechanism reachable from more than one module, with no decision entry naming what it was weighed against. Below that threshold it advises, and flags anything that needs a decision entry.
 
@@ -22,7 +22,7 @@
 - **The data model is right in SaaS Plane terms.** States follow the read ladder (`Meta ⊂ Info ⊂ State`, `Details` by composition). Collections are keyed maps or ordered lists by what the answer means. Vocabularies are closed, `UPPER_SNAKE_CASE` and additive, and polymorphic families carry one discriminator. States and their interactions are the most load-bearing part of any design.
 - **Change is classified before it is designed.** New capability · additive · breaking · fix — a breaking change never rides in as a plan row; it goes through the decision register with a version and migration path.
 - **Structural additions are flagged.** A new chapter, module, or kind hits a documented ceiling: the plan produces a decision entry draft, never a fait accompli.
-- **The domain's dictionary is complete.** Every term the design adds is declared in one construct's `Terms` table — exactly one, in the domain that decides its meaning — so the generated dictionary on that domain's face carries it with a contract term beside it. A term declared in two constructs is a defect, and the same word standing for two different contract terms is a rename rather than a merge.
+- **The domain's glossary is complete.** Every term the design adds is declared in one construct's `Terms` table — exactly one, in the domain that decides its meaning — so the generated glossary on that domain's face carries it with a contract term beside it. A term declared in two constructs is a defect, and the same word standing for two different contract terms is a rename rather than a merge.
 - **A domain owns the constructs; a module does not.** A module carries `README.md` and no docs tree of its own — what it contributes sits in **the repository's one tree**, under the domain it belongs to: the domain's constructs in `02-constructs/<domain>/`, the rows for what a person can do in `03-behaviors/<domain>/`, and one mirror per source folder that earns one in `04-capabilities/<domain>/<layer>/`. A contract does not get a construct per state — the domain gets constructs, and states realize them. A behaviour row belongs to the domain that would have to change, never to the package that happens to serve it.
 - **A node answers a fixed set of lifecycle commands, and its kind decides which.** Build it, prove one tier, run it, publish it — what each command refuses is part of the standard, and a line that belongs to every node of a kind moves into the stack's toolchain rather than into that node.
 

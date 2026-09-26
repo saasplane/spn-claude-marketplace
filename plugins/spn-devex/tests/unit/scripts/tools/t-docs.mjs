@@ -801,7 +801,7 @@ console.log("\n=== a Governs cell names a folder that exists, and the audit says
     "docs/04-capabilities/README.md":
       doc({ id: "f", title: "Capabilities", lenses: ["ARCHITECT"], status: "DONE" },
           "| Register | Governs | Status |\n| --- | --- | --- |\n" +
-          "| [glossary.md](glossary.md) | auth/data policies with merged effective reads | ✅ |\n",
+          "| [naming.md](naming.md) | auth/data policies with merged effective reads | ✅ |\n",
           "`For: Architect` · `Status: ✅ DONE`"),
   });
   one("an authored `Governs` column of prose is not read as a path",

@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/aws/05-tagging.md", "seen": "ed4c198f" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/aws/05-tagging.md", "seen": "58622559" }
   ]
 }
 -->

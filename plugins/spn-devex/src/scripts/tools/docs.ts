@@ -1330,7 +1330,7 @@ function replaceRegion(src: string, what: string, body: string): string {
 /**
  * A generated region taken off a page for good.
  *
- * A region nothing regenerates does not stand still, it goes stale: the dictionary left on the seat
+ * A region nothing regenerates does not stand still, it goes stale: the glossary left on the seat
  * face would be a copy of a table that now lives in 36 places, and the only thing keeping it right
  * was the run that stopped writing it.
  */
@@ -1402,19 +1402,19 @@ function directFiles(dir: string, keep: (p: string) => boolean): string[] {
 }
 
 /**
- * The dictionary of ONE DOMAIN: one row per term, three columns, generated from that domain's own
+ * The glossary of ONE DOMAIN: one row per term, three columns, generated from that domain's own
  * constructs.
  *
  * IT SITS ON THE DOMAIN RATHER THAN ON THE SEAT. A repository-wide table ran to 573 rows in the
  * foundation and 347 in the platform, where a single domain's is twelve to a hundred and twenty-two
  * — and a term written twice in one domain sat two hundred rows apart, which is why 55 duplicates
  * across the workspace were never read as duplicates (`refs/doc-sets.md`, *A domain face carries its
- * dictionary*).
+ * glossary*).
  *
  * THERE IS NO *WHERE IT IS STORED* COLUMN, AND ITS DELETION IS THE REPAIR. It was joined from the
  * domain's `data-model.md` by taking each row's first cell as a table name, and it named a table in
  * none of 252 rows measured. No correction to those files could have repaired it either: a data
- * model is grouped by table and a dictionary row is keyed by term, so even a faithful storage mirror
+ * model is grouped by table and a glossary row is keyed by term, so even a faithful storage mirror
  * answers *which terms live in this table* while the column asks the opposite. Storage is read in
  * the data model itself, beside the migrations it mirrors (RD.DOCS.074).
  *
@@ -1443,7 +1443,7 @@ function glossaryRows(domainDir: string): { rows: Array<Row & { group: string }>
     if (!body) continue;
     const cells = mdRows(body);
     if (cells.length && cells[0].length < 3) {
-      findings.push({ check: "face", grade: "RULE", file, message: "the `Terms` table has two columns; the dictionary needs the consumer's word, the contract term and the meaning (03-tree.md, the dictionary's three sources)" });
+      findings.push({ check: "face", grade: "RULE", file, message: "the `Terms` table has two columns; the glossary needs the consumer's word, the contract term and the meaning (03-tree.md, the glossary's three sources)" });
       continue;
     }
     for (const c of cells) rows.push({ term: c[0], contract: c[1], means: c[2], file });
@@ -1515,7 +1515,7 @@ function buildGlossaryHtml(domainDir: string, overviewFile: string): { body: str
 }
 
 /** One domain's glossary as the markdown face carries it. */
-function buildDictionary(domainDir: string, faceFile: string): { body: string; findings: Finding[] } {
+function buildGlossary(domainDir: string, faceFile: string): { body: string; findings: Finding[] } {
   const { rows, findings } = glossaryRows(domainDir);
   const lines = ["## Glossary", "", "| Term | Contract term | What it means |", "| --- | --- | --- |"];
   let group: string | null = null;
@@ -1737,7 +1737,7 @@ function isGroup(dir: string): boolean {
  *
  * A domain sits directly under the constructs seat, or one level down where its parent is a group.
  * A group maps the domains beneath it and declares no term of its own; a level beneath a domain
- * organizes one domain's argument and its terms belong to the domain above it. So the dictionary
+ * organizes one domain's argument and its terms belong to the domain above it. So the glossary
  * lands on a domain folder and on no other kind.
  */
 function isDomainFolder(constructsDir: string, dir: string): boolean {
@@ -1842,10 +1842,10 @@ function face(tree: string, write: boolean): Finding[] {
   for (const dir of constructFolders(constructsDir).filter((d) => isDomainFolder(constructsDir, d))) {
     const domainFace = join(dir, "README.md");
     if (!existsSync(domainFace)) {
-      findings.push({ check: "face", grade: "SOFT", file: domainFace, message: "no domain face to write the dictionary into" });
+      findings.push({ check: "face", grade: "SOFT", file: domainFace, message: "no domain face to write the glossary into" });
       continue;
     }
-    const { body, findings: df } = buildDictionary(dir, domainFace);
+    const { body, findings: df } = buildGlossary(dir, domainFace);
     findings.push(...df);
     const before = readFileSync(domainFace, "utf8");
     const after = replaceRegion(before, "glossary", body);

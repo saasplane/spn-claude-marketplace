@@ -65,7 +65,7 @@
      ONE DECLARATION PER TERM, PER REPOSITORY (Q249): this table declares only what THIS construct introduces, which
      is the construct whose own contract declares the symbol. A word another domain's contract owns is linked from
      Boundary and declared here by nobody.
-     The dictionary is generated from this table, so it is three columns, and a row that points somewhere else
+     The glossary is generated from this table, so it is three columns, and a row that points somewhere else
      instead of explaining is not a definition. Rows are in the order a newcomer meets the words. -->
 | Term | Contract term | What it means |
 | --- | --- | --- |

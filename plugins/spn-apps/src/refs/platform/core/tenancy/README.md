@@ -2,7 +2,7 @@
 {
   "docs": [
     { "path": "spn-foundation/docs/02-constructs/03-platform/01-core/01-tenancy.md", "seen": "90d77dd8" },
-    { "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/", "seen": "e14e2169" }
+    { "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/", "seen": "12955ed1" }
   ]
 }
 -->

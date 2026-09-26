@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/02-trust.md", "seen": "ffc78858" },
+    { "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/02-trust.md", "seen": "5cfb4005" },
     { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/08-agent-surface/README.md", "seen": "b64273c4" },
     { "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md", "seen": "82d774b8" },
     { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/01-server/01-contract/01-states.md", "seen": "3239f9f0" }

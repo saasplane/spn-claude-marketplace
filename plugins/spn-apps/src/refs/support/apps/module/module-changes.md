@@ -1,8 +1,8 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/01-shape/03-architecture.md", "seen": "ed456a8a" },
-    { "path": "spn-foundation/docs/registers/conformance.md", "seen": "7c9fd1c2" },
+    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/01-shape/03-architecture.md", "seen": "f84e0106" },
+    { "path": "spn-foundation/docs/registers/conformance.md", "seen": "acc6a938" },
     { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/01-server/01-contract/01-states.md", "seen": "3239f9f0" }
   ]
 }

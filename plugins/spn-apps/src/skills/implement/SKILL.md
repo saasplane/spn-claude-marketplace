@@ -51,7 +51,7 @@ Scope reads to what the step needs — the inventory tells you which packages ex
 | 4 | `queue` | listeners, `subscriberId` as a consumption contract, why the handler is ungated, consumer-side idempotency |
 | 5 | `ui` | `MODULE_WEB` plug-in points, hooks, permission gating (full-stack / FE-only) |
 | 6 | `test` | how this stack runs each tier. **Which tier a project owes is `DEVEX_TEST`'s**, and that skill carries the ladder |
-| 7 | `docs` | the doc set closes the change. **The seats, the two voices and the dictionary are `refs/doc-sets.md` in the spn-devex plugin**; this stack's half is `env` — where a key goes in its env files |
+| 7 | `docs` | the doc set closes the change. **The seats, the two voices and the glossary are `refs/doc-sets.md` in the spn-devex plugin**; this stack's half is `env` — where a key goes in its env files |
 
 **A step file this stack does not ship is a step this stack does not walk.** A realization that is absent says so; nothing here stubs one.
 
