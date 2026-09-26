@@ -1,4 +1,4 @@
-<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The arc · § An arc is named for the cycle it pays · § A step names every surface the change reaches, and how you would know
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The arc · § An arc is named for the cycle it pays · § A step names every surface the change reaches, and how you would know · § An arc carries its specification, or names the note that holds it
      This file carries rules it does not own. The chapter above is the source of truth.
      A rule change is edited there first, then here, in the same change. Never add a rule here.
      restate-drift.ts reports this copy when its source moves. -->
@@ -40,6 +40,24 @@ Repos: {{repo}} · {{repo}} — {{in what order, and why}}
 | Source | `{{repo}} → {{path}}` | {{…}} |
 | Generated | `{{what regenerates, and by which command}}` | {{…}} |
 | Restatements | `{{the refs and templates that cite any of the above}}` | {{…}} |
+
+## The specification
+<!-- WHAT THE STEPS ACT ON, carried here or named by path (RD.DEVEX.064). A step that states a
+     COUNT and not the members has left the specification where the next session cannot reach it,
+     and a conversation is not a place. A move is a TABLE with unique targets. A step producing many
+     files carries ONE WORKED EXAMPLE, because a brief without one produces placeholders.
+     Too large for this section? It goes to notes/{{n}}-{{subject}}.tsv and a step names that path.
+     Carry NO COUNTS — RD.GOV.008. Name the set; let the reader count it. -->
+
+{{The closed sets, the move table, the rules — whichever this arc acts on. Delete what does not
+apply; never delete the section, because an empty one is a claim that the steps act on nothing.}}
+
+## Traps
+<!-- What is known to go wrong on this path, where somebody executing will meet it rather than in a
+     log they will not read first. A trap that cost one session costs the next one the same, and the
+     only thing that stops it is the sentence being in the way. -->
+
+- {{the trap, and what to do instead}}
 
 ## Steps
 <!-- How you would know is a COMMAND or a COUNT, never a sentence. A check whose subject is the file

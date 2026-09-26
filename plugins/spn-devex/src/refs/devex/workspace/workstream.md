@@ -1,8 +1,8 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md", "seen": "af7a9e28" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md", "seen": "fb03d3b7" },
+    { "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md", "seen": "3d3ddc2c" },
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md", "seen": "4c906f0a" },
     { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "109a3f51" }
   ]
 }
@@ -63,6 +63,24 @@ document, so one workstream holds a driver change, an estate change and a plugin
 | edits files this scope is mid-proof on | a rewrite landing on a measurement changes what was being measured |
 | cannot start until this one closes | a blocker parked inside a scope belongs in `backlog/` |
 | would hold this scope open indefinitely | a workstream nobody can close is a heading, not a scope |
+
+## An arc carries what its steps act on
+
+**An arc is a brief, not a summary.** You are reading it without having been in the room when it was argued, so everything you need has to be in front of you — and the same is true of whoever picks it up after you.
+
+**So a step acting on a set carries the members, never the count.** *Sixteen questions*, *twenty-eight moves*, *nine rules* — a step that names the number and not the things has left the specification somewhere you cannot reach, and a conversation is not a place. **The failure looks exactly like success**: the arc reads complete, every step has a sentence, and you invent a different sixteen.
+
+**Where the set is too large for the step, it goes to `notes/<arc>-<subject>.<ext>` and the step names that path.** `notes/` is the workstream's **working papers**, not its scratch — the line between the two is that a step names a working paper by path, and nothing names scratch.
+
+**Three rules follow.**
+
+- **A move is a table with unique targets.** Source and target, one row per file. Two rows naming one target is a finding about the table, not a detail to settle while moving.
+- **A step producing many files carries one worked example.** Twenty-six documents described as *a real answer rather than a placeholder* is twenty-six placeholders, because that is what a brief without an example produces.
+- **An arc carries no counts.** `RD.GOV.008` rules it for prose and it is broken most often in arcs. Name the set; let the reader count it.
+
+**And an arc records its traps** — what is known to go wrong on this path, written where you will meet it rather than in a log you will not read first.
+
+**If you are executing an arc and a step names a set you cannot see, stop.** The specification is missing rather than obvious, and guessing it is how the same mistake gets made twice.
 
 ## Anything the developer has not reviewed: preview, confirm, record, then code
 
