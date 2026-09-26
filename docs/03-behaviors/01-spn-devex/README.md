@@ -31,3 +31,4 @@ Each file here holds the rows of one construct, and it sits at the same path and
 | [08-ref-set.md](08-ref-set.md) | The ref — a chapter, restated and stamped |
 | [09-lenses.md](09-lenses.md) | The lens — one reviewing viewpoint, written down |
 | [10-agent-set.md](10-agent-set.md) | The agent — a persona a session can convene |
+| [11-provider-set.md](11-provider-set.md) | The provider — how a plugin is extended per instance |

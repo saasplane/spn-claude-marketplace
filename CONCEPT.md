@@ -109,6 +109,7 @@ implementation belongs here.
 - **The Ref — A Chapter, Restated and Stamped** — A markdown restatement of one or more chapters, carrying a hash of the exact text it last read, so a chapter that moves is reported rather than quietly outrun — and the three ways a restatement can fail to be comparable at all.
 - **The Lens — One Reviewing Viewpoint, Written Down** — One engineering function's judgment stated as a file — what it checks, the one condition it may block on, everything below that which it can only advise, and why the same values also name the audience a document declares.
 - **The Agent — A Persona a Session Can Convene** — A named persona a session can call mid-turn — the frontmatter that decides when it answers, the authority its own file grants it, the difference between a fixed voice and one parameterized by a viewpoint, and where the permission to write actually comes from.
+- **The Provider — How a Plugin Is Extended Per Instance** — How a plugin admits a second stack or a second cloud without a gate being edited — the two halves a provider contributes, the rule that decides whether it contributes a skills half at all, and the line between what a provider states and what it does.
 
 **spn-apps**
 

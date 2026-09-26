@@ -31,6 +31,7 @@ Read the first two before anything else. The plugin is the container, and the ho
 | [The Ref — A Chapter, Restated and Stamped](08-ref-set.md) | A markdown restatement of one or more chapters, carrying a hash of the exact text it last read, so a chapter that moves is reported rather than quietly outrun — and the three ways a restatement can fail to be comparable at all. |
 | [The Lens — One Reviewing Viewpoint, Written Down](09-lenses.md) | One engineering function's judgment stated as a file — what it checks, the one condition it may block on, everything below that which it can only advise, and why the same values also name the audience a document declares. |
 | [The Agent — A Persona a Session Can Convene](10-agent-set.md) | A named persona a session can call mid-turn — the frontmatter that decides when it answers, the authority its own file grants it, the difference between a fixed voice and one parameterized by a viewpoint, and where the permission to write actually comes from. |
+| [The Provider — How a Plugin Is Extended Per Instance](11-provider-set.md) | How a plugin admits a second stack or a second cloud without a gate being edited — the two halves a provider contributes, the rule that decides whether it contributes a skills half at all, and the line between what a provider states and what it does. |
 <!-- /spn:generated -->
 
 <!-- spn:generated dictionary — do not edit inside these markers; `docs.ts face` writes it -->
@@ -103,4 +104,10 @@ Read the first two before anything else. The plugin is the container, and the ho
 | [a parameterized brief](10-agent-set.md) | — | a brief holding a procedure and no subject matter, handed a viewpoint name at the moment it is convened |
 | [the bound model](10-agent-set.md) | `model` | an optional field choosing which model runs the persona |
 | [the bound tools](10-agent-set.md) | `tools` | an optional field narrowing what the persona may call; leaving it out grants everything the session has |
+| **The Provider** | | |
+| [a gate](11-provider-set.md) | `skills/<verb>/SKILL.md` · `scripts/checks/<subject>.ts` | the stack-free half: it resolves the instance and dispatches, and states no rule about any one of them |
+| [an instance](11-provider-set.md) | `providers/<instance>/` | one realization a plugin serves — a stack (`ts`), or a cloud (`aws`, `gcp`, `local`) |
+| [the contract](11-provider-set.md) | `refs/<domain>/…/providers/<instance>/` | what is **true** of this instance, restating a construct for a reader |
+| [the scripts half](11-provider-set.md) | `providers/<instance>/scripts/checks/` | what a gate runs for this instance — the parse and the rules it carries |
+| [the skills half](11-provider-set.md) | `providers/<instance>/skills/<skill>/` | what a skill loads when it is working in this instance — a procedure |
 <!-- /spn:generated -->

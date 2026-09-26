@@ -40,4 +40,5 @@ Source folders: `hooks/hooks.json` and `hooks/lib/payload.ts` for Hook · `hooks
 | [08-ref-set.md](08-ref-set.md) | `ref-set` | Eleven restatements a reader with no book checkout can still read in full, each stamped with the hash of what it last saw, and the one parser two different drift checks share. | ✅ |
 | [09-lenses.md](09-lenses.md) | `lenses` | Eleven reviewing viewpoints, each naming the one thing it may block and everything it can only advise, read by name at the moment a panel is convened rather than carried by eleven agents. | ✅ |
 | [10-agent-set.md](10-agent-set.md) | `agent-set` | Four briefs a session can convene — one fixed engineering persona, one reviewer parameterized by a lens, and a rewrite and review pair in which only the rewriter is allowed to edit. | ✅ |
+| [11-provider-set.md](11-provider-set.md) | `provider-set` | How the provider shape is realized across the three plugins — which of them carry provider folders, which halves each carries, and why spn-devex itself carries none. | 🔮 |
 <!-- /spn:generated -->

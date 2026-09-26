@@ -43,7 +43,7 @@ The estate domain is the smallest of the three domains, and the boundary is what
 | [a pin flip](02-estate-skills.md) | — | pointing a consumer at a published version, which is the last act of authoring a module |
 | [a rendering](02-estate-skills.md) | — | what a declaration would produce if applied, read while changing it is still cheap |
 | [an approval](02-estate-skills.md) | — | the moment after which the estate has changed and the question becomes a repair |
-| [an estate skill](02-estate-skills.md) | `SKILL.md` | one folder under this plugin's `skills/`, named for a command of the group an estate answers to |
+| [an estate skill](02-estate-skills.md) | `SKILL.md` | one folder under this plugin's `skills/`. **The six are the same six words the apps domain reads** — `new` · `implement` · `review` · `run` · `verify` · `release` — so a partner working in both domains learns one set of names |
 | [declaring](02-estate-skills.md) | — | changing what the estate says it is, as an edit to a manifest rather than to a rendering |
 | **Estate Refs** | | |
 | [a card](03-estate-refs.md) | `refs/` | one markdown file restating one subject of the estate model, in full, under a stamp |
