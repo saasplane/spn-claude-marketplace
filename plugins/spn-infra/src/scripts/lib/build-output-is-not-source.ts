@@ -10,7 +10,7 @@
 //
 // **THIS RULE READS THE PATH ALONE AND NEEDS NO TEXT**, which is why it costs nothing to run on
 // every write. It is the one rendering rule that can decide without parsing anything.
-import type { Rule } from "../laws.ts";
+import type { Rule } from "./laws.ts";
 
 export const RULES: Rule[] = [
   {

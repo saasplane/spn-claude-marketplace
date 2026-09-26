@@ -10,8 +10,8 @@
 // **ONLY WHERE A KEY NAMES IT.** A bare twelve-digit number is left alone, because twelve digits is
 // also a phone number, an id and a timestamp. Refusing those would be the false refusal the
 // conservative rule exists to avoid.
-import type { Rule } from "../laws.ts";
-import { LAWS } from "../laws.ts";
+import type { Rule } from "./laws.ts";
+import { LAWS } from "./laws.ts";
 
 export const RULES: Rule[] = [
   {

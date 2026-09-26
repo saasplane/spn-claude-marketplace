@@ -10,9 +10,9 @@
 // **THE SUBJECT IS SEPARATE FROM `manifest` BECAUSE THE PARSE IS.** A manifest is JSON a person
 // edits; a rendering is built output a person should not be editing at all. Running one set of
 // rules over both would make every finding say the wrong thing about half its inputs.
-import type { Verdict } from "../../lib/payload.ts";
-import type { Rule } from "../../checks/laws.ts";
-import { RULES as BUILD_OUTPUT } from "../../checks/rendering/build-output-is-not-source.ts";
+import type { Verdict } from "../../../../scripts/lib/payload.ts";
+import type { Rule } from "../../../../scripts/lib/laws.ts";
+import { RULES as BUILD_OUTPUT } from "../../../../scripts/lib/build-output-is-not-source.ts";
 
 export const RULES: Rule[] = [...BUILD_OUTPUT];
 

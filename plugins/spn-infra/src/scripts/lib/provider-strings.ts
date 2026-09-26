@@ -18,8 +18,8 @@
 // cloud's business: `eu-west-1` is AWS's spelling and `europe-west1` is Google's, and a rule
 // carrying both would be a rule that has to change every time a cloud joins. So each provider's
 // validator supplies its own patterns, and this file supplies the judgement.
-import type { Rule } from "../laws.ts";
-import { LAWS } from "../laws.ts";
+import type { Rule } from "./laws.ts";
+import { LAWS } from "./laws.ts";
 
 /** What one cloud's own strings look like. Supplied by that cloud's validator, never assumed here. */
 export type ProviderStrings = {

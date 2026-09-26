@@ -9,9 +9,12 @@
 
 import { emit, payload, type Payload, type ToolInput, type Verdict } from "../lib/payload.ts";
 import { begin, span, end as endTiming } from "../lib/timing.ts";
-import { SUBJECTS, pathOnly, written } from "../checks/subjects.ts";
+import { subjects, pathOnly, written } from "../checks/subjects.ts";
 
-export function dispatch(event: Payload, time: <T>(name: string, fn: () => T) => T): Verdict {
+// THE SUBJECTS ARE RESOLVED PER WRITE rather than held in a module-level list, because which
+// providers exist is read from the folder rather than written here. The set is the same every
+// time in practice; what changes is that adding a cloud needs no edit to this file or its gate.
+export async function dispatch(event: Payload, time: <T>(name: string, fn: () => T) => T): Promise<Verdict> {
   const supplied: ToolInput = event.tool_input ?? {};
   const path = supplied.file_path;
   if (!path) return null;                          // every rule here is about a file
@@ -19,7 +22,7 @@ export function dispatch(event: Payload, time: <T>(name: string, fn: () => T) =>
   // THE PATH-ONLY SUBJECTS RUN BEFORE THE TEXT IS READ, because `dist/` is refused whatever it
   // holds — an empty write into build output is still an edit to something the build owns.
   const text = written(supplied);
-  for (const subject of SUBJECTS) {
+  for (const subject of await subjects()) {
     // A subject that needs text and has none has nothing to say.
     if (!text && !pathOnly(subject.name)) continue;
     let verdict: Verdict = null;
@@ -38,7 +41,7 @@ const event = await payload();
 begin({ event: "PreToolUse", tool: event?.tool_name ?? null, session: event?.session_id ?? null },
       event?.cwd ?? process.cwd());
 let verdict: Verdict = null;
-try { verdict = event ? dispatch(event, span) : null; } catch { verdict = null; }
+try { verdict = event ? await dispatch(event, span) : null; } catch { verdict = null; }
 endTiming();
 emit(verdict);
 process.exit(0);

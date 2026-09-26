@@ -12,8 +12,8 @@
 // how a credential is supposed to arrive and is left alone, and a short value is a placeholder
 // rather than a secret. So the rule needs a credential-named key, a quoted literal, and eight
 // characters — three signals together, because any one of them alone is ordinary.
-import type { Rule } from "../laws.ts";
-import { LAWS } from "../laws.ts";
+import type { Rule } from "./laws.ts";
+import { LAWS } from "./laws.ts";
 
 export const RULES: Rule[] = [
   {
