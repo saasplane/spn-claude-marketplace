@@ -32,7 +32,7 @@
 
 import { readdirSync, statSync } from "node:fs";
 import { basename, join, dirname, resolve } from "node:path";
-import { isFile, read } from "../lib/payload.ts";
+import { isDir, isFile, read } from "../lib/payload.ts";
 import { check as restatesCheck, parse as restatesParse, registerRows, undeclared } from "../lib/restates.ts";
 
 const SKIP_DIRS = new Set(["node_modules", ".git", "dist", "build", ".nx", "coverage", "__pycache__"]);
@@ -368,12 +368,70 @@ function citations(root: string): string[] {
   return [out];
 }
 
+/**
+ * A construct the book states, with no capability chapter to say how it is held to.
+ *
+ * **A CONSTRUCT SAYS WHAT A THING IS; A CAPABILITY CHAPTER SAYS WHAT IT IS HELD TO.** A construct
+ * with no chapter is a model nobody can be measured against, and the gap is invisible from either
+ * seat: the constructs tree looks complete on its own, and the capabilities tree has nothing that
+ * says which chapter is absent. Only comparing the two finds it.
+ *
+ * **THE CHAPTER TAKES THREE SHAPES, AND ALL THREE COUNT.** A construct with a single subject gets
+ * a FILE. One with several gets a FOLDER of chapters. One whose subjects divide again — by runtime,
+ * say — gets a folder of folders, and its chapters sit a level down. Counting only folders reported
+ * eight stages as missing; counting only the top level of a folder reported five more, because
+ * `03-module/` holds `01-server/` and `02-web/` and nothing else but a face.
+ *
+ * **SO THE TEST IS *IS THERE A CHAPTER ANYWHERE BENEATH IT*, AT ANY DEPTH.** A face is not a
+ * chapter — it is a map of what the folder contains — so `README.md` never answers on its own.
+ *
+ * **ONLY THE BOOK ANSWERS THIS.** A built repository derives its capabilities seat rather than
+ * authoring it, so the question is the foundation's alone — run elsewhere it finds no constructs
+ * tree and says nothing.
+ */
+function capabilityChapters(root: string): string[] {
+  const constructs = join(root, "docs/02-constructs");
+  const capabilities = join(root, "docs/04-capabilities");
+  if (!isDir(constructs) || !isDir(capabilities)) return [];
+
+  const owed: string[] = [];
+  /** Every `.md` directly under `at` that is a chapter rather than a face. */
+  const chapters = (at: string): string[] =>
+    isDir(at) ? readdirSync(at).filter((e) => e.endsWith(".md") && e !== "README.md") : [];
+  const folders = (at: string): string[] =>
+    isDir(at) ? readdirSync(at).filter((e) => isDir(join(at, e))) : [];
+
+  /** Whether any chapter sits under `at`, however deep. A face alone does not answer. */
+  const anyChapter = (at: string): boolean =>
+    chapters(at).length > 0 || folders(at).some((child) => anyChapter(join(at, child)));
+
+  const held = (where: string, stem: string): boolean =>
+    isFile(join(capabilities, where, `${stem}.md`)) || anyChapter(join(capabilities, where, stem));
+
+  for (const area of folders(constructs).sort()) {
+    for (const group of folders(join(constructs, area)).sort())
+      for (const chapter of chapters(join(constructs, area, group)).sort())
+        if (!held(`${area}/${group}`, chapter.replace(/\.md$/, "")))
+          owed.push(`${area}/${group}/${chapter}`);
+    // An area whose constructs sit directly under it, with no group level.
+    for (const chapter of chapters(join(constructs, area)).sort())
+      if (!held(area, chapter.replace(/\.md$/, "")))
+        owed.push(`${area}/${chapter}`);
+  }
+  if (!owed.length) return [];
+  let out = `CHAPTER     ${owed.length} construct(s) the book states have no capability chapter.`;
+  out += "\n            A construct with no chapter is a model nothing can be held to:";
+  for (const one of owed.slice(0, 10)) out += `\n              ${one}`;
+  if (owed.length > 10) out += `\n              … and ${owed.length - 10} more`;
+  return [out];
+}
+
 export function main(root: string): number {
   const sources = sourcesOf(root);
   const findings = [
     ...vocabulary(root, sources), ...rulings(root), ...ownership(root, sources),
     ...cardinality(root, sources), ...hub(root), ...restatementDrift(root),
-    ...citations(root),
+    ...citations(root), ...capabilityChapters(root),
   ];
   for (const finding of findings) { console.log(finding); console.log(); }
   const kinds = new Map<string, number>();
