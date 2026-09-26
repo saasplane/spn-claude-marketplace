@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: `spn-claude-marketplace/plugins/spn-infra/src/refs/support/infra/README.md` § no secrets at any path. The ref governs.
+// RESTATES: `spn-infra/src/refs/support/infra/README.md` § no secrets at any path. The ref governs.
 //
 // Refuse secret material at the moment it is written, at any path.
 //
