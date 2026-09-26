@@ -15,7 +15,7 @@
 
 **The company, once.** The organization layer is where the account tree, the guardrails on it and the identity that reaches it are created. **Everything above it assumes all three exist**, which is why it runs first and why a half-finished run is worse than none.
 
-## The five acts
+## The acts, in order
 
 | | Act | Why it is here |
 | --- | --- | --- |

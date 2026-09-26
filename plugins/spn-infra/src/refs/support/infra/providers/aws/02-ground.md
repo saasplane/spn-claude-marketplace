@@ -5,7 +5,7 @@
   ]
 }
 -->
-# The manual minimum — the five things no software can make for you
+# Ground — the manual minimum no software can make for you
 
 **Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/aws/02-ground.md`. Read this as the restatement; that node governs.
 
@@ -13,11 +13,11 @@
 
 ## Why there is a manual minimum at all
 
-**An estate is built from the outside in, and at the outside is a company that has already bought and signed for things.** No software can create a cloud account for somebody who has no cloud account, open a code host for somebody who has none, or make a domain theirs. The five steps below are exactly that set — **the smallest number of hand-made things everything after this assumes.**
+**An estate is built from the outside in, and at the outside is a company that has already bought and signed for things.** No software can create a cloud account for somebody who has no cloud account, open a code host for somebody who has none, or make a domain theirs. The steps below are exactly that set — **the smallest number of hand-made things everything after this assumes.**
 
 **Keeping it small is the design.** Every hand-made thing is a thing nobody can re-create from a declaration, so the list is a cost paid forever rather than once.
 
-## The five
+## The steps
 
 | | Step | What it settles |
 | --- | --- | --- |

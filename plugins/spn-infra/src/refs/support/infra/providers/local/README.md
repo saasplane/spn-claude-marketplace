@@ -11,9 +11,27 @@
 
 **This is the realized one.** A full platform runs on a developer's machine before it runs anywhere else — that is the local-first rule, and it is why local is the default target rather than a simulation of the real one.
 
+## Every entry is answered
+
+| | |
+| --- | --- |
+| [`01-realization.md`](01-realization.md) | what local is, and what it binds |
+| [`02-ground.md`](02-ground.md) | what is brought by hand — nothing |
+| [`03-session.md`](03-session.md) | how a run authenticates |
+| [`04-addressing.md`](04-addressing.md) | how names and addresses are computed |
+| [`05-tagging.md`](05-tagging.md) | how coordinates are rendered — they are not |
+| [`06-organization.md`](06-organization.md) | the organization layer |
+| [`07-platform.md`](07-platform.md) | the platform layer |
+| [`08-environment.md`](08-environment.md) | the environment layer — refused by name |
+| [`09-deployments.md`](09-deployments.md) | what actually runs |
+| [`10-library.md`](10-library.md) | what the blueprint library ships |
+| [`11-conformance.md`](11-conformance.md) | what local must prove |
+
+**Where an entry is negative it says why.** Nothing is tagged on a machine, because a laptop has no billing boundary for a tag to answer for. And the environment layer is refused by name rather than emulated.
+
 ## Realization is a target, not a command group
 
-**There is one estate surface and local is its default.** `--cloud` is the target that provisions real accounts, and it is asked for by name. **There is no separate local command to learn**, which is the point: what you run on your machine is the command you will run against the estate.
+**There is one estate surface and local is its default.** `--cloud` is the target that provisions real accounts, and it is asked for by name. **There is no separate local command to learn**, so what you run on your machine is the command you will run against the estate.
 
 | Layer | What it is, locally | Command |
 | --- | --- | --- |
@@ -38,4 +56,4 @@
 
 ## Estate caution still applies here
 
-Cloud mutation goes through the CLI's own doors. `tofu apply` and `tofu destroy` are never hand-run — the habit is the same on a laptop, because the habit is what carries to the estate.
+**`up` and `down` each take exactly one of `--plan` or `--apply`, with no default.** Cloud mutation goes through the CLI's own doors. `tofu apply` and `tofu destroy` are never hand-run — the habit is the same on a laptop, because the habit is what carries to the estate.

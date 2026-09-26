@@ -23,7 +23,7 @@
 | 4 | Data services, and a role per schema | the data VPC, and its endpoints |
 | 5 | DNS and certificates | the control center's zones, which this layer writes names into |
 
-**Act 1 computes and does not ask.** If a step here is waiting for somebody to supply a CIDR, the addressing rule has been broken upstream — see `networking.md`.
+**Act 1 computes and does not ask.** If a step here is waiting for somebody to supply a CIDR, the addressing rule has been broken upstream — see [`04-addressing.md`](04-addressing.md).
 
 **A role per schema, not a role per service.** The grant follows the data rather than the caller, so a second service reading the same schema needs no new role and a service reading two schemas holds two.
 

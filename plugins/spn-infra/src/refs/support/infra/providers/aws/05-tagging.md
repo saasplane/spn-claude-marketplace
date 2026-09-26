@@ -5,7 +5,7 @@
   ]
 }
 -->
-# Tags on AWS — the seven, and why nobody types one
+# Tagging on AWS — the mandatory set, and why nobody types one
 
 **Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/aws/05-tagging.md`. Read this as the restatement; that node governs.
 
@@ -13,7 +13,7 @@
 
 **An auditor, an incident responder and a finance lead all ask the same three questions about a resource**: whose is this, what is it for, and what data does it hold. Tags are how a resource answers without anybody being paged.
 
-## The seven, on every taggable resource
+## The mandatory set, on every taggable resource
 
 **Keys are PascalCase and values are lowercase.** No exceptions, because a mixed-case value is a value that silently fails every filter written against it.
 
@@ -25,7 +25,7 @@
 | `Setup` | the deployment's lifecycle purpose | `dev` · `uat` · `stg` · `prod` · `demo`, or a customer-dedicated code |
 | `Env` | the full environment coordinate | `{region}-{setup}` — `in-uat` |
 | `Workload` | which isolation boundary, and therefore which account | `prod` · `np` · `stg` |
-| `DataClass` | what the resource holds | one of the nine below |
+| `DataClass` | what the resource holds | one of the values below |
 
 ## `Region` is the jurisdiction, never the provider's region
 

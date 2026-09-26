@@ -5,7 +5,7 @@
   ]
 }
 -->
-# Networking on AWS — computed addresses, two VPCs, and what may reach what
+# Addressing on AWS — computed addresses, two VPCs, and what may reach what
 
 **Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/aws/04-addressing.md`, which applies the addressing formula the coordinates chapter owns. Read this as the restatement; that node governs.
 
@@ -34,7 +34,7 @@ Worked through for `P = 0`, region `in` (`R = 0`):
 
 **No CIDR appears in any manifest, ticket or spreadsheet.** Add a region or a platform as an appended index and the addresses follow. **If you are about to write a CIDR down, you have found a defect rather than a task.**
 
-## Two VPCs, and the two rules that carry the security
+## Two VPCs — apps and data — and the rules that carry the security
 
 **Every environment is two VPCs** — apps and data. The split exists so the data plane has **no route to the internet at all**.
 
