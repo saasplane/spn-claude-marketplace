@@ -38,10 +38,6 @@
 
 **`14-libraries.md` is the one entry that differs from the book's.** The book states the rule for how a stack distributes libraries; this folder carries the list a partner installs. The ref says so at its top.
 
-## What else is in this folder
-
-**[`plan.md`](plan.md) and [`steps/`](steps/) are not contract entries.** They are the material the `ideate` and `implement` skills load at the moment you need it, and they stay where they are.
-
 ## Where to start
 
 **Find the node's kind first**, because everything else derives from it — the runtime, the folders, what it publishes, the tiers it owes and the commands it answers. Read `01-kinds.md`, then the entry that matches the layer you are about to touch.
