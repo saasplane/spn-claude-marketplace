@@ -1,3 +1,11 @@
+<!-- spn:restates
+{
+  "docs": [
+    { "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md", "seen": "716e5e8e" },
+    { "path": "spn-foundation/docs/02-constructs/01-devex/01-function/02-scm.md", "seen": "e83f0012" }
+  ]
+}
+-->
 ---
 name: new
 description: Stand up a new estate node or a new estate repository with spnutils infra scaffold - choosing the type, placing it, and knowing what its manifest must carry. Use when an estate repo must be minted, when an organization or platform node is needed, or when a platform needs a new lifecycle module package. Not for changing an existing node's declaration (implement skill) and not for publishing one (release skill).

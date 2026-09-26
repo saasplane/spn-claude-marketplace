@@ -1,3 +1,10 @@
+<!-- spn:restates
+{
+  "docs": [
+    { "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md", "seen": "716e5e8e" }
+  ]
+}
+-->
 ---
 name: check
 description: Prove or disprove a claim about what a SaaS Plane codebase actually does. Use when the ask is a statement that could be true or false - "verify platform accounts have MFA enabled in migrations", "check that org deletion cascades", "is rate limiting applied to OTP sends", "did we ever implement X". Runs no build and no tests; it locates evidence and reports a verdict with citations. Stack-agnostic.

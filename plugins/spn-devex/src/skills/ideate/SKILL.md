@@ -1,3 +1,11 @@
+<!-- spn:restates
+{
+  "docs": [
+    { "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md", "seen": "716e5e8e" },
+    { "path": "spn-foundation/docs/02-constructs/01-devex/01-function/03-ideate.md", "seen": "5064ebb7" }
+  ]
+}
+-->
 ---
 name: ideate
 description: Decide what a node IS, and design a requirement inside that shape - its boundary, its domains, its surfaces, its architecture, captured in the repo's CONCEPT.md at the repository root (a concept belongs to a repo root, never to a node). Use when starting a platform, repo, module, app or package; when someone wants to conceptualize or think something through before building; or when a requirement turns out to need a new domain, a moved boundary, or a split module; or when a node's docs have moved ahead of its concept and someone asks for the concept to be brought up to date. Interactive by design - it works one agreed block at a time and never drafts a whole concept in one pass. Stack-agnostic.

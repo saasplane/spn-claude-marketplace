@@ -1,3 +1,11 @@
+<!-- spn:restates
+{
+  "docs": [
+    { "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md", "seen": "716e5e8e" },
+    { "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md", "seen": "8f8c3d72" }
+  ]
+}
+-->
 ---
 name: verify
 description: Run the estate's gates - spnutils infra validate for structure and manifest, spnutils infra test for the render harness - and say honestly what a green run proves. Use before asking for any review, after a scaffold or a declaration edit, and whenever a claim is made that an estate node is sound. Not for bringing a layer up (run skill) and not for judging a plan's contents (review skill).

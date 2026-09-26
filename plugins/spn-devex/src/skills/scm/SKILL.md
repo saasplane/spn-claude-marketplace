@@ -1,3 +1,11 @@
+<!-- spn:restates
+{
+  "docs": [
+    { "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md", "seen": "716e5e8e" },
+    { "path": "spn-foundation/docs/02-constructs/01-devex/01-function/02-scm.md", "seen": "e83f0012" }
+  ]
+}
+-->
 ---
 name: scm
 description: The repository and project standard - what a project must declare, what its declaration decides, and how repos, branches, and wiring are standardized. Use when creating a repo or project, adding a package or app, judging where code belongs, or fixing a project that does not match its own kind. Stack-agnostic; the domain plugin supplies the scaffold and validate commands.
