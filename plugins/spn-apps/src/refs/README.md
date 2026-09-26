@@ -22,6 +22,6 @@
 
 ## What is generated
 
-**One file**: `support/apps/providers/ts/libraries.md`, the list of published packages a node may depend on. There is no construct per package, so nothing in the book lists them and a hand-written list would be wrong at the next release.
+**One file**: [`support/apps/providers/ts/14-libraries.md`](support/apps/providers/ts/14-libraries.md), the list of published packages a node may depend on. There is no construct per package, so nothing in the book lists them and a hand-written list would be wrong at the next release.
 
 **The module list is not generated**, because there is one ref per module — the folder is the list.

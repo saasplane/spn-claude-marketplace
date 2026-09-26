@@ -13,7 +13,7 @@
 // something a partner can depend on, so listing it would answer a question about the repository
 // rather than about what is available. The count in the table is the count a partner can install.
 //
-//     node library-catalogue.ts <workspace>            write refs/providers/ts/libraries.md
+//     node library-catalogue.ts <workspace>            write the TS provider's 14-libraries.md
 //     node library-catalogue.ts <workspace> --check    report what would change, write nothing
 //
 // **THE SUPPORT REPOSITORY IS FOUND, NEVER ASSUMED** — the same stance `restate-drift.ts` takes.
@@ -27,11 +27,36 @@ import { seenHash } from "../lib/stamp.ts";
 type Library = { name: string; version: string; description: string };
 
 const SUPPORT = "spn-support-ts";
-const OUT = join("spn-claude-marketplace", "plugins", "spn-apps", "src", "refs", "providers", "ts", "libraries.md");
+/** The TS provider folder's `14-libraries` entry. **THE TWO TREES ANSWER THIS ENTRY DIFFERENTLY**,
+ *  and that is deliberate: the book's `14-libraries.md` states the RULE for how a stack distributes
+ *  libraries, and this one carries the LIST a partner installs. A rule is written once and a list
+ *  moves every release, so only one of them can be generated. */
+const OUT = join("spn-claude-marketplace", "plugins", "spn-apps", "src", "refs",
+  "support", "apps", "providers", "ts", "14-libraries.md");
 /** The generator itself. A `commands` citation names what produced the file, and a hash of the
  *  generator is what says the output is stale: change the renderer and every catalogue it wrote is
  *  owed a re-run. A command STRING would resolve to nothing and report as broken forever. */
 const GENERATOR = "spn-claude-marketplace/plugins/spn-apps/src/scripts/tools/library-catalogue.ts";
+/** The book entry this ref answers. The RULE is the book's; the LIST is this file's. */
+const BOOK_RULE = "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/14-libraries.md";
+
+/**
+ * The hash of the book entry, computed where the book is there and carried forward where it is not.
+ *
+ * **A HASH WRITTEN DOWN BY HAND IS A HASH SOMEBODY HAS TO REMEMBER**, and this tool already runs in
+ * a workspace that holds the book — it needs the support and platform checkouts, and anywhere those
+ * exist the book does too. So it reads the chapter and stamps what it read.
+ *
+ * **A PARTNER'S RUN KEEPS WHAT IS ALREADY STAMPED** rather than blanking it. The book is found,
+ * never assumed — the same stance `restate-drift.ts` takes, and for the same reason: a builder's
+ * gate that fails for a partner is a gate a partner turns off.
+ */
+function bookSeen(workspace: string, at: string): string {
+  const chapter = join(workspace, BOOK_RULE);
+  if (existsSync(chapter)) return seenHash(readFileSync(chapter, "utf8"));
+  const standing = existsSync(at) ? /"path": "[^"]*14-libraries\.md", "seen": "([0-9a-f]+)"/.exec(readFileSync(at, "utf8")) : null;
+  return standing?.[1] ?? "unread";
+}
 
 /**
  * Every published package under the support repository's `packages/`.
@@ -57,10 +82,12 @@ function libraries(workspace: string): Library[] {
   return found;
 }
 
-function render(found: Library[], generatorHash: string): string {
-  let out = `<!-- spn:restates\n{\n  "commands": [\n    { "path": "${GENERATOR}", "seen": "${generatorHash}" }\n  ]\n}\n-->\n`;
+function render(found: Library[], generatorHash: string, bookSeen: string): string {
+  let out = `<!-- spn:restates\n{\n  "docs": [\n    { "path": "${BOOK_RULE}", "seen": "${bookSeen}" }\n  ],\n`;
+  out += `  "commands": [\n    { "path": "${GENERATOR}", "seen": "${generatorHash}" }\n  ]\n}\n-->\n`;
   out += `<!-- spn:generated library-catalogue — do not edit inside these markers; \`library-catalogue.ts\` writes it -->\n`;
-  out += `# The published libraries — APPS · TS\n\n`;
+  out += `# Libraries — the published packages a node may depend on\n\n`;
+  out += `**Source of truth:** the foundation's \`10-providers/ts/14-libraries.md\`. **That chapter states the rule and this ref carries the list**, which is the one entry where the book and this folder answer the same question differently. How a package travels in this stack — the scopes, the registry each one publishes to, and why a consumer pins an exact version rather than a range — is the book's. Which packages exist is nobody's to write by hand, because the set moves at every release.\n\n`;
   out += `**This table is generated from the support repository's own manifests**, and it moves every release. **${found.length} package(s) are published.**\n\n`;
   out += `**A version here names what is published, never what is being worked on.** A release stamps the number and the first edit after it increments, so a number you cannot find published is one that has not been released yet.\n\n`;
   out += `| Package | Version | What it is |\n| --- | --- | --- |\n`;
@@ -80,8 +107,8 @@ export function main(workspace: string, check = false): number {
     console.log("the support checkout publishes no packages — refusing to write an empty catalogue");
     return 0;
   }
-  const body = render(found, seenHash(readFileSync(join(workspace, GENERATOR), "utf8")));
   const at = join(workspace, OUT);
+  const body = render(found, seenHash(readFileSync(join(workspace, GENERATOR), "utf8")), bookSeen(workspace, at));
   const now = existsSync(at) ? readFileSync(at, "utf8") : "";
   if (now === body) { console.log(`current  ${OUT} — ${found.length} package(s)`); return 0; }
   if (check) { console.log(`would write  ${OUT} — ${found.length} package(s)`); return 1; }

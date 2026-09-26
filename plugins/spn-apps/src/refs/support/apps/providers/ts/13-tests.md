@@ -1,0 +1,30 @@
+<!-- spn:restates
+{
+  "docs": [
+    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/13-tests.md", "seen": "0347ca4e" }
+  ]
+}
+-->
+# Tests — which runner per tier, and where a case lives
+
+**Source of truth:** the foundation's `10-providers/ts/13-tests.md`. Read this as the restatement; that chapter governs.
+
+**Read this before you write anything**, because the tier map decides where a case lives.
+
+**A node owns the tiers its kind names, and a dash in the tier map is a ruling rather than a gap.** An `APP_SERVER` owns no journey tier, and that is a prohibition — a journey case written there is in the wrong node, not merely in an unusual one.
+
+| Tier | Runner | What it proves |
+| --- | --- | --- |
+| unit | Jest on the server, Vitest on the web | one unit, nothing real behind it |
+| component | Playwright component testing | one component rendered, in a browser |
+| contract | the generated client against a live service | that the published surface is what the client believes |
+| integration | Testcontainers | the node against a real resource it fronts |
+| journey | Playwright against a running stack | a path a person takes, end to end |
+
+**A node may double a seam it owns, and nothing else.** That one rule decides where a case belongs: a case reaching for a double of somebody else's seam is a case in the wrong node.
+
+**Only Jest typechecks as it runs.** A type error that Jest would catch passes silently under the other runners, so a server package's red is not reproducible by running the web suite.
+
+**An integration case skips itself when its service is unreachable**, and a skipped case proves nothing. Read the count, not the colour — and remember that a line reporter drops the artifacts that say *which* case skipped.
+
+**Run the tier that owns the rule you changed.** A change to a refusal needs the integration tier; unit passes straight over it.
