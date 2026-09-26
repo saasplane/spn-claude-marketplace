@@ -16,7 +16,7 @@ The model for the plugin every repository loads, whatever world it declares. One
 
 Read the first two before anything else. The plugin is the container, and the hook is the shape every piece of running code here takes. Everything below them is one kind of thing that container can hold.
 
-<!-- spn:generated domain — do not edit inside these markers; `docs.ts face` writes it -->
+<!-- spn:generated constructs — do not edit inside these markers; `docs.ts face` writes it -->
 **The stack-agnostic plugin, and the one every repository loads.** It holds what is true of every plugin: what an instrument of each of the five kinds is, the events a hook may run on, the grades it may return, and how the set a workspace loads is derived from that workspace's own claim.
 
 | Construct | What it is |
@@ -31,7 +31,7 @@ Read the first two before anything else. The plugin is the container, and the ho
 | [Tests — The Tier, the Mirror, and a Runner That Walks](08-tests.md) | The folder a plugin proves itself from — the tier that says what kind of proof a suite is, the mirror that says what it is proof of, the runner that finds every suite by walking rather than by a list, and the two tiers deliberately left absent. |
 <!-- /spn:generated -->
 
-<!-- spn:generated dictionary — do not edit inside these markers; `docs.ts face` writes it -->
+<!-- spn:generated glossary — do not edit inside these markers; `docs.ts face` writes it -->
 ## Glossary
 
 | Term | Contract term | What it means |

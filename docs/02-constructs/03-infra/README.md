@@ -16,7 +16,7 @@ The model for the estate world, whatever cloud sits behind it. One file per cons
 
 The estate domain is the smallest of the three domains, and the boundary is what holds it together: nothing here changes a cloud. The guard refuses, the cards explain, and each skill names the tool's command that does the work through the tool's own doors.
 
-<!-- spn:generated domain — do not edit inside these markers; `docs.ts face` writes it -->
+<!-- spn:generated constructs — do not edit inside these markers; `docs.ts face` writes it -->
 **The estate plugin** holds what changes an estate: one shell script standing between an estate edit and the file it would write, the skills that change what an estate is, and the estate's own vocabulary restated for a reader who may never open the book.
 
 | Construct | What it is |
@@ -30,7 +30,7 @@ The estate domain is the smallest of the three domains, and the boundary is what
 | [Tests — The Tier, the Mirror, and a Runner That Walks](07-tests.md) | How this plugin proves its own gate — a tree named by tier and then by what a suite proves, a runner that walks rather than globs, a harness that finds the plugin root instead of counting it, and the absences that say what does not run here. |
 <!-- /spn:generated -->
 
-<!-- spn:generated dictionary — do not edit inside these markers; `docs.ts face` writes it -->
+<!-- spn:generated glossary — do not edit inside these markers; `docs.ts face` writes it -->
 ## Glossary
 
 | Term | Contract term | What it means |

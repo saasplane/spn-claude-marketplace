@@ -21,7 +21,7 @@ One document per source folder that earns one, named for the folder it governs a
 
 Two things under `plugins/` earn no mirror here on purpose. Each plugin's `.claude-plugin/plugin.json`, and the repository's own root `.claude-plugin/marketplace.json`, are the plugin construct's own shape — see [The Plugin](../02-constructs/01-devex/01-plugin.md) rather than a second statement of the same fields here. And a `hooks/tests/` folder, where one exists, is proof rather than capability surface: its own suite is what a mirror's `Proven by` column cites, never a mirror of its own.
 
-<!-- spn:generated map — do not edit inside these markers; `docs.ts face` writes it -->
+<!-- spn:generated contents — do not edit inside these markers; `docs.ts face` writes it -->
 | File | Governs | Carries | Status |
 | --- | --- | --- | --- |
 | — | — | this layer carries no mirror yet | 🔮 |

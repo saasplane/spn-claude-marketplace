@@ -35,4 +35,4 @@ Every row below is declared and none is claimed: a run writes the last two cells
 
 | Retired | Re-issued as |
 | --- | --- |
-| `MKT.REF.01` – `MKT.REF.08` | `MKT.REFS.01` – `MKT.REFS.08`, in order |
+| `MKT.REF.01` – `MKT.REF.02` | `MKT.REFS.01` – `MKT.REFS.08`, in order |

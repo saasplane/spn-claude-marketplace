@@ -21,9 +21,9 @@
 | Plugin · Hook · Loop Events · Checks · Tools · Pages · Skill · Ref · Lenses · Agent | [spn-devex](../../01-devex/spn-devex/README.md) |
 | Stack Checks · Stack Tools · Stack Skills · Stack Refs | [spn-apps](../../02-apps/spn-apps/README.md) |
 
-Source folders: `hooks/hooks.json` and `hooks/scripts/` for Estate Guard · `skills/` for Estate Skills · `refs/` for Estate Refs. This plugin has no `hooks/checks/`, no `hooks/lib/`, no `hooks/tools/` and no `hooks/tests/`; `.claude-plugin/plugin.json` belongs to the Plugin chapter in `spn-devex`.
+Source folders, one per chapter: `.claude-plugin/plugin.json` for Plugin · `hooks/hooks.json` for Hooks · `skills/` for Skills · `scripts/` for Scripts — the gate, and the `lib/` holding every rule body because each is cloud-free · `refs/` for Refs · `providers/{aws,gcp}/` for Providers, a scripts half only · `tests/` for Tests. This plugin ships no `agents/` and no `scripts/tools/`, and each absence says so.
 
-<!-- spn:generated map — do not edit inside these markers; `docs.ts face` writes it -->
+<!-- spn:generated contents — do not edit inside these markers; `docs.ts face` writes it -->
 | Chapter | Realizes | Carries | Status |
 | --- | --- | --- | --- |
 | [01-plugin.md](01-plugin.md) | `estate-plugin` | The estate plugin as a delivery unit — the manifest that names it, the description a session matches against, the version it carries in step with its two siblings, and the construct folders it ships. | ✅ |

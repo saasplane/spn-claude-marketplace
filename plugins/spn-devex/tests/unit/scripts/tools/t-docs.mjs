@@ -270,13 +270,12 @@ const CONCEPT_TREE = "# c\n\n## SaaS Plane — Foundation\n\nstage.\n\n### DevEx
 }
 
 
-// ------------------------------------------- the concept's outline names each construct once
+// ------------------------------------------- a domain face maps everything below it
 
-console.log("\n=== a construct nested under a level is listed once, not once per ancestor");
-// AN OUTLINE THAT NAMES A THING TWICE IS NOT ONE. The concept's generated block filed a line under
-// every folder, and the walk that found those constructs recurses — so a domain and each level
-// beneath it both listed the same construct. The faces are right to recurse, because a face maps
-// everything below it; the outline is not.
+console.log("\n=== a domain face maps a construct nested under a level, not just its direct children");
+// A FACE RECURSES, AND THAT IS ITS JOB. The concept carried the same list a second time until MD10
+// dropped it — one source with two generated homes — so this is now the only place the walk's
+// recursion is asserted.
 {
   const root = repo({
     "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
@@ -289,12 +288,7 @@ console.log("\n=== a construct nested under a level is listed once, not once per
       doc({ id: "nested", variant: "construct", parentId: "c", dependsOn: [], title: "Nested", lenses: ["ARCHITECT"], status: "PLANNING" }),
   });
   run(root, ["face", "docs"]);
-  const concept = readAt(root, "CONCEPT.md");
-  const lines = (concept.match(/^- \*\*Nested\*\*/gm) ?? []).length;
-  one("a nested construct appears exactly once in the concept's outline", lines, 1);
-  one("and the construct beside it does too",
-    (concept.match(/^- \*\*Loose\*\*/gm) ?? []).length, 1);
-  one("while the DOMAIN's face still maps everything below it, nested included",
+  one("the DOMAIN's face maps everything below it, nested included",
     readAt(root, "docs/02-constructs/01-core/README.md"), has("[Nested]"));
 }
 
@@ -546,7 +540,7 @@ console.log("\n=== the dictionary is generated from the constructs, never typed 
   // THE REGION THE OLD SHAPE LEFT BEHIND. A generated region nothing regenerates goes stale rather
   // than standing still, so the run takes it off the seat face instead of writing past it.
   const stale =
-    "<!-- spn:generated dictionary — do not edit inside these markers; `docs.ts face` writes it -->\n" +
+    "<!-- spn:generated glossary — do not edit inside these markers; `docs.ts face` writes it -->\n" +
     "| Term | Contract term | Where it is stored | From |\n| --- | --- | --- | --- |\n" +
     "| sign-in | `SPSession` | `${APP}_JOB_SCHEDULER_PROVIDER` | Session |\n" +
     "<!-- /spn:generated -->\n";
@@ -624,13 +618,13 @@ console.log("\n=== a Map is a list of mirrors, so an authored seat has none");
   };
   const derived = repo(files);
   run(derived, ["face", "docs"]);
-  one("where the seat is derived from source, the face carries a Map",
-    readAt(derived, "docs/04-capabilities/README.md"), has("spn:generated map"));
+  one("where the seat is derived from source, the face carries a Contents table",
+    readAt(derived, "docs/04-capabilities/README.md"), has("spn:generated contents"));
 
   const authored = repo(files, { type: "FOUNDATION" });
   run(authored, ["face", "docs"]);
-  one("where the seat is AUTHORED, no Map is invented — there is no src/ for a row to name",
-    readAt(authored, "docs/04-capabilities/README.md"), lacks("spn:generated map"));
+  one("where the seat is AUTHORED, no Contents table is invented — there is no src/ for a row to name",
+    readAt(authored, "docs/04-capabilities/README.md"), lacks("spn:generated contents"));
 }
 
 
@@ -746,7 +740,7 @@ console.log("\n=== a Governs cell names a folder that exists, and the audit says
     "docs/04-capabilities/README.md":
       doc({ id: "f", title: "Capabilities", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
           "`For: Architect` · `Status: ✅ DONE`") +
-      "\n<!-- spn:generated map — do not edit inside these markers; `docs.ts face` writes it -->\n" +
+      "\n<!-- spn:generated contents — do not edit inside these markers; `docs.ts face` writes it -->\n" +
       "| File | Governs | Carries | Status |\n| --- | --- | --- | --- |\n" +
       "| [app.md](app.md) | `src/app/` | The app layer. | ✅ |\n" +
       "| [ghost.md](ghost.md) | `src/01-core/01-server/ghost/` | A folder nobody has. | ✅ |\n" +
@@ -764,9 +758,9 @@ console.log("\n=== a Governs cell names a folder that exists, and the audit says
   const out = run(root, ["audit", "docs"]);
   one("the cell that resolves to nothing is reported", out, has("`src/01-core/01-server/ghost/`, and no such folder exists"));
   one("and the row it sits on is named by its text, not its link syntax",
-    out, (g) => g.includes("the Map says `ghost.md` governs") && !g.includes("[ghost.md](ghost.md)"));
+    out, (g) => g.includes("the Contents table says `ghost.md` governs") && !g.includes("[ghost.md](ghost.md)"));
   one("the cell that resolves is not reported", out, lacks("`src/app/`, and no such folder exists"));
-  one("it reports rather than refuses — SOFT for one sitting", out, (g) => /SOFT\s+map/.test(g) && /0 RULE/.test(g));
+  one("it reports rather than refuses — SOFT for one sitting", out, (g) => /SOFT\s+contents/.test(g) && /0 RULE/.test(g));
 }
 {
   // The same file with the dead row removed: the check stays quiet.
@@ -775,7 +769,7 @@ console.log("\n=== a Governs cell names a folder that exists, and the audit says
     "docs/04-capabilities/README.md":
       doc({ id: "f", title: "Capabilities", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
           "`For: Architect` · `Status: ✅ DONE`") +
-      "\n<!-- spn:generated map — do not edit inside these markers; `docs.ts face` writes it -->\n" +
+      "\n<!-- spn:generated contents — do not edit inside these markers; `docs.ts face` writes it -->\n" +
       "| File | Governs | Carries | Status |\n| --- | --- | --- | --- |\n" +
       "| [app.md](app.md) | `src/app/` | The app layer. | ✅ |\n" +
       "<!-- /spn:generated -->\n",
@@ -790,7 +784,7 @@ console.log("\n=== a Governs cell names a folder that exists, and the audit says
     "docs/04-capabilities/README.md":
       doc({ id: "f", title: "Capabilities", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
           "`For: Architect` · `Status: ✅ DONE`") +
-      "\n<!-- spn:generated map — do not edit inside these markers; `docs.ts face` writes it -->\n" +
+      "\n<!-- spn:generated contents — do not edit inside these markers; `docs.ts face` writes it -->\n" +
       "| File | Governs | Carries | Status |\n| --- | --- | --- | --- |\n" +
       "| — | — | this layer carries no mirror yet | 🔮 |\n" +
       "<!-- /spn:generated -->\n",

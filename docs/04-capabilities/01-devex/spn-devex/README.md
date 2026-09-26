@@ -25,9 +25,9 @@
 
 Every construct of this domain is realized here. The domain plugins realize their own constructs — see [spn-apps](../../02-apps/spn-apps/README.md) and [spn-infra](../../03-infra/spn-infra/README.md).
 
-Source folders: `hooks/hooks.json` and `hooks/lib/payload.ts` for Hook · `hooks/events/` for Loop Events · `hooks/checks/` for Checks · `hooks/tools/` for Tools · `hooks/lib/render.ts`, `draw.ts` and `figures.ts` for Pages · `skills/` for Skill · `refs/` for Ref · `refs/lenses/` for Lenses · `agents/` for Agent. `hooks/tests/` is proof rather than capability surface, and `.claude-plugin/plugin.json` belongs to the Plugin chapter.
+Source folders, one per chapter: `.claude-plugin/plugin.json` for Plugin · `hooks/hooks.json` for Hooks · `agents/` for Agents, with the viewpoint files they are handed in `refs/devex/agent/lenses/` · `skills/` for Skills · `scripts/` for Scripts — `checks/`, `events/`, `tools/` and the `lib/` they share · `refs/` for Refs · `tests/` for Tests. This plugin carries no `providers/`, because it answers to no stack and no cloud; the Providers chapter states the shape the other two obey.
 
-<!-- spn:generated map — do not edit inside these markers; `docs.ts face` writes it -->
+<!-- spn:generated contents — do not edit inside these markers; `docs.ts face` writes it -->
 | Chapter | Realizes | Carries | Status |
 | --- | --- | --- | --- |
 | [01-plugin.md](01-plugin.md) | `plugin-set` | One manifest, one marketplace row, and the widest of the three folders — with a version field that names what is published rather than what is being worked on. | ✅ |

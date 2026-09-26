@@ -544,8 +544,8 @@ console.log("\n=== `face` over a capability seat writes the chapters' own shape"
     "<!-- spn:doc\n" + JSON.stringify({ id: "pkg-capabilities", variant: "capability", title,
       lenses: ["SERVER_DEV"], status: "DONE", summary: "The constructs pkg-ts realizes." }) + "\n-->\n\n" +
     `# ${title}\n\n\`For: Backend developer\` · \`Status: ✅ DONE\`\n\n` +
-    "<!-- spn:generated map — do not edit inside these markers; `docs.ts face` writes it -->\n" +
-    "<!-- /spn:generated map -->\n";
+    "<!-- spn:generated contents — do not edit inside these markers; `docs.ts face` writes it -->\n" +
+    "<!-- /spn:generated contents -->\n";
 
   const ws = repo({
     "CONCEPT.md": "# c\n",

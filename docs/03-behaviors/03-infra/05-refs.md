@@ -20,14 +20,14 @@ Every row below is declared and none is claimed: a run writes the last two cells
 
 | Id | Who | Does | Sees | Type | Tier | Status | Updated at |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| MKT.REFS.01 | Partner / integrator | read the estate's whole vocabulary with no book checkout | Each card restates its subject in full and cites the book by name | POSITIVE | UNIT | PLANNED | — |
-| MKT.REFS.02 | DevOps / SRE | reach the reasoning one hop from a refusal | Every refusal message points at the laws card, and each law states its own defect | POSITIVE | UNIT | PLANNED | — |
-| MKT.REFS.03 | DevOps / SRE | resolve a node from where you are standing rather than from a folder name | The manifests card names which file answers which question, and carries the path locator | POSITIVE | UNIT | PLANNED | — |
-| MKT.REFS.04 | DevOps / SRE | diagnose a layer that will not start from the order alone | The card lists the layer nouns, gives each the same commands, and states the order | POSITIVE | UNIT | PLANNED | — |
-| MKT.REFS.05 | Architect | compose a resource name from coordinates rather than from a label | The naming card gives the grammar and the closed vocabulary each part is drawn from | POSITIVE | UNIT | PLANNED | — |
-| MKT.REFS.06 | DevSecOps / Security | read a public card and find no real coordinate in it | Every example uses one invented platform, and the sample exists for no other purpose | NEGATIVE | UNIT | PLANNED | — |
-| MKT.REFS.07 | Editor | be told when a card has fallen behind the book | Each card carries a stamp, and the drift run re-reads the sections it names | NEGATIVE | UNIT | PLANNED | — |
-| MKT.REFS.08 | Partner / integrator | look up what one cloud calls something without leaving the refs tree | Each cloud's words are restated subject by subject, whether or not any code reads them | POSITIVE | UNIT | PLANNED | — |
+| MKT.REFS.17 | Partner / integrator | read the estate's whole vocabulary with no book checkout | Each card restates its subject in full and cites the book by name | POSITIVE | UNIT | PLANNED | — |
+| MKT.REFS.18 | DevOps / SRE | reach the reasoning one hop from a refusal | Every refusal message points at the laws card, and each law states its own defect | POSITIVE | UNIT | PLANNED | — |
+| MKT.REFS.19 | DevOps / SRE | resolve a node from where you are standing rather than from a folder name | The manifests card names which file answers which question, and carries the path locator | POSITIVE | UNIT | PLANNED | — |
+| MKT.REFS.20 | DevOps / SRE | diagnose a layer that will not start from the order alone | The card lists the layer nouns, gives each the same commands, and states the order | POSITIVE | UNIT | PLANNED | — |
+| MKT.REFS.21 | Architect | compose a resource name from coordinates rather than from a label | The naming card gives the grammar and the closed vocabulary each part is drawn from | POSITIVE | UNIT | PLANNED | — |
+| MKT.REFS.22 | DevSecOps / Security | read a public card and find no real coordinate in it | Every example uses one invented platform, and the sample exists for no other purpose | NEGATIVE | UNIT | PLANNED | — |
+| MKT.REFS.23 | Editor | be told when a card has fallen behind the book | Each card carries a stamp, and the drift run re-reads the sections it names | NEGATIVE | UNIT | PLANNED | — |
+| MKT.REFS.24 | Partner / integrator | look up what one cloud calls something without leaving the refs tree | Each cloud's words are restated subject by subject, whether or not any code reads them | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 
@@ -35,4 +35,4 @@ An id is a promise somebody already made, so a promise re-issued under a new con
 
 | Retired | Re-issued as |
 | --- | --- |
-| `MKT.EREF.01` – `MKT.EREF.07` | `MKT.REFS.01` – `MKT.REFS.07` |
+| `MKT.EREF.01` – `MKT.EREF.02` | `MKT.REFS.17` – `MKT.REFS.23` |

@@ -85,7 +85,7 @@ function libraries(workspace: string): Library[] {
 function render(found: Library[], generatorHash: string, bookSeen: string): string {
   let out = `<!-- spn:restates\n{\n  "docs": [\n    { "path": "${BOOK_RULE}", "seen": "${bookSeen}" }\n  ],\n`;
   out += `  "commands": [\n    { "path": "${GENERATOR}", "seen": "${generatorHash}" }\n  ]\n}\n-->\n`;
-  out += `<!-- spn:generated library-catalogue — do not edit inside these markers; \`library-catalogue.ts\` writes it -->\n`;
+  out += `<!-- spn:generated libraries — do not edit inside these markers; \`library-catalogue.ts\` writes it -->\n`;
   out += `# Libraries — the published packages a node may depend on\n\n`;
   out += `**Source of truth:** the foundation's \`10-providers/ts/14-libraries.md\`. **That chapter states the rule and this ref carries the list**, which is the one entry where the book and this folder answer the same question differently. How a package travels in this stack — the scopes, the registry each one publishes to, and why a consumer pins an exact version rather than a range — is the book's. Which packages exist is nobody's to write by hand, because the set moves at every release.\n\n`;
   out += `**This table is generated from the support repository's own manifests**, and it moves every release. **${found.length} package(s) are published.**\n\n`;

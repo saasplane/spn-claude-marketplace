@@ -4,11 +4,11 @@
     { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/14-libraries.md", "seen": "42c6cdcb" }
   ],
   "commands": [
-    { "path": "spn-claude-marketplace/plugins/spn-apps/src/scripts/tools/library-catalogue.ts", "seen": "37d704f5" }
+    { "path": "spn-claude-marketplace/plugins/spn-apps/src/scripts/tools/library-catalogue.ts", "seen": "c0459cf9" }
   ]
 }
 -->
-<!-- spn:generated library-catalogue — do not edit inside these markers; `library-catalogue.ts` writes it -->
+<!-- spn:generated libraries — do not edit inside these markers; `library-catalogue.ts` writes it -->
 # Libraries — the published packages a node may depend on
 
 **Source of truth:** the foundation's `10-providers/ts/14-libraries.md`. **That chapter states the rule and this ref carries the list**, which is the one entry where the book and this folder answer the same question differently. How a package travels in this stack — the scopes, the registry each one publishes to, and why a consumer pins an exact version rather than a range — is the book's. Which packages exist is nobody's to write by hand, because the set moves at every release.

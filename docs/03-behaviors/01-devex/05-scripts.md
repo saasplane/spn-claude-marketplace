@@ -49,8 +49,8 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | --- | --- |
 | `MKT.CHECK.01` · `MKT.CHECK.02` | `MKT.SCRIPTS.01` · `MKT.SCRIPTS.02` |
 | `MKT.CHECK.03` | **struck** — the contract-state rule reads one stack's own language, and it is the apps domain that promises it |
-| `MKT.CHECK.04` – `MKT.CHECK.07` | `MKT.SCRIPTS.03` – `MKT.SCRIPTS.06`, in order |
-| `MKT.TOOL.01` – `MKT.TOOL.07` | `MKT.SCRIPTS.07` – `MKT.SCRIPTS.13`, in order |
+| `MKT.CHECK.04` – `MKT.CHECK.05` | `MKT.SCRIPTS.03` – `MKT.SCRIPTS.06`, in order |
+| `MKT.TOOL.01` – `MKT.TOOL.02` | `MKT.SCRIPTS.07` – `MKT.SCRIPTS.13`, in order |
 | `MKT.PAGE.01` · `MKT.PAGE.02` · `MKT.PAGE.03` | `MKT.SCRIPTS.14` · `MKT.SCRIPTS.15` · `MKT.SCRIPTS.16` |
 | `MKT.PAGE.04` | **struck** — a figure's grammar is stated in the foundation's `05-artifacts.md`, and it is the book's promise to make |
-| `MKT.PAGE.05` – `MKT.PAGE.08` | `MKT.SCRIPTS.17` – `MKT.SCRIPTS.20`, in order |
+| `MKT.PAGE.05` – `MKT.PAGE.06` | `MKT.SCRIPTS.17` – `MKT.SCRIPTS.20`, in order |

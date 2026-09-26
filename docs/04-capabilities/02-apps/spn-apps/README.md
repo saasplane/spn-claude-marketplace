@@ -22,9 +22,9 @@
 | Plugin · Hook · Loop Events · Checks · Tools · Pages · Skill · Ref · Lenses · Agent | [spn-devex](../../01-devex/spn-devex/README.md) |
 | Estate Guard · Estate Skills · Estate Refs | [spn-infra](../../03-infra/spn-infra/README.md) |
 
-Source folders: `hooks/checks/` for Stack Checks · `hooks/tools/` for Stack Tools · `skills/` for Stack Skills · `refs/` for Stack Refs. `hooks/lib/` is shared code the checks and tools import and is covered in the chapter that uses each file; `hooks/tests/` is proof rather than capability surface; `.claude-plugin/plugin.json` belongs to the Plugin chapter in `spn-devex`.
+Source folders, one per chapter: `.claude-plugin/plugin.json` for Plugin · `hooks/hooks.json` for Hooks · `skills/` for Skills · `scripts/` for Scripts — the gate, plus the `lib/` and `tools/` beside it · `refs/` for Refs · `providers/ts/` for Providers, both halves · `tests/` for Tests. This plugin ships no `agents/`, and the absence is the statement.
 
-<!-- spn:generated map — do not edit inside these markers; `docs.ts face` writes it -->
+<!-- spn:generated contents — do not edit inside these markers; `docs.ts face` writes it -->
 | Chapter | Realizes | Carries | Status |
 | --- | --- | --- | --- |
 | [01-plugin.md](01-plugin.md) | `apps-plugin` | How this domain's delivery unit is realized — the manifest that claims its name and describes what it carries, the marketplace entry that names its folder, and the version it shares with every other plugin here. | ✅ |

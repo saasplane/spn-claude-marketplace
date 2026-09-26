@@ -16,7 +16,7 @@ The model for everything that can only be said about one stack. One file per con
 
 Each construct here is the stack-concrete form of one in the core domain, so read its counterpart there first. The shape a check takes, what a tool is, and how a skill is matched are all settled in the core domain and are not restated in this one.
 
-<!-- spn:generated domain — do not edit inside these markers; `docs.ts face` writes it -->
+<!-- spn:generated constructs — do not edit inside these markers; `docs.ts face` writes it -->
 **The TypeScript domain plugin.** It holds what only a stack can say: a check whose rule is true of one stack and nowhere else, a tool over that stack's own register, and the skills that can only be said in its own words. **A skill that is stack-agnostic stays in `spn-devex` and reaches a concrete step through a ref here**, rather than being copied.
 
 | Construct | What it is |
@@ -30,7 +30,7 @@ Each construct here is the stack-concrete form of one in the core domain, so rea
 | [Tests — The Stack's Own Folders, Without the Stack's Framework](07-tests.md) | How this plugin proves itself — the tier first and the mirror second, an absent tier that says so by being absent, a runner that walks rather than lists, and the rule that nothing may count its own depth. |
 <!-- /spn:generated -->
 
-<!-- spn:generated dictionary — do not edit inside these markers; `docs.ts face` writes it -->
+<!-- spn:generated glossary — do not edit inside these markers; `docs.ts face` writes it -->
 ## Glossary
 
 | Term | Contract term | What it means |

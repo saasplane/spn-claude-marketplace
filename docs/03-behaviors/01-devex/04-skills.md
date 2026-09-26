@@ -34,4 +34,4 @@ Every row below is declared and none is claimed: a run writes the last two cells
 
 | Retired | Re-issued as |
 | --- | --- |
-| `MKT.SKILL.01` – `MKT.SKILL.07` | `MKT.SKILLS.01` – `MKT.SKILLS.07`, in order |
+| `MKT.SKILL.01` – `MKT.SKILL.02` | `MKT.SKILLS.01` – `MKT.SKILLS.07`, in order |

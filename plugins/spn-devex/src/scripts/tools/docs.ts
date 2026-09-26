@@ -761,7 +761,7 @@ function checkGovernsMap(file: string, src: string): Finding[] {
   const f: Finding[] = [];
   const repo = repoOf(file);
   if (!repo) return f;
-  for (const region of src.matchAll(/<!-- spn:generated map[^>]*-->([\s\S]*?)<!-- \/spn:generated -->/g)) {
+  for (const region of src.matchAll(/<!-- spn:generated contents[^>]*-->([\s\S]*?)<!-- \/spn:generated -->/g)) {
     const rows = region[1].split("\n").map((l) => l.trim()).filter((l) => l.startsWith("|"))
       .map((l) => l.replace(/^\|/, "").replace(/\|$/, "").split("|").map((c) => c.trim()));
     const column = (rows[0] ?? []).findIndex((c) => c.toLowerCase() === "governs");
@@ -774,7 +774,7 @@ function checkGovernsMap(file: string, src: string): Finding[] {
         // The first cell is a markdown link, and the finding wants the mirror's name rather than
         // its link syntax — a message a reader has to parse is a message that gets skimmed.
         const mirror = (cells[0] ?? "").replace(/\[([^\]]*)\]\([^)]*\)/g, "$1").trim() || "a mirror";
-        f.push({ check: "map", grade: "SOFT", file, message: `the Map says \`${mirror}\` governs \`${cell}\`, and no such folder exists` });
+        f.push({ check: "contents", grade: "SOFT", file, message: `the Contents table says \`${mirror}\` governs \`${cell}\`, and no such folder exists` });
       }
     }
   }
@@ -1746,7 +1746,7 @@ function isDomainFolder(constructsDir: string, dir: string): boolean {
   return depth === 1 || (depth === 2 && isGroup(dirname(dir)));
 }
 
-function domainFaces(tree: string, concept: string | null): { faces: Map<string, string>; concept: string | null; findings: Finding[] } {
+function domainFaces(tree: string, concept: string | null): { faces: Map<string, string>; findings: Finding[] } {
   const findings: Finding[] = [];
   const faces = new Map<string, string>();
   const sections = concept ? conceptSections(concept) : new Map();
@@ -1797,26 +1797,7 @@ function domainFaces(tree: string, concept: string | null): { faces: Map<string,
     faces.set(join(dir, "README.md"), body.filter((l, i) => !(i === 0 && !l)).join("\n"));
   }
 
-  // The concept's own line per construct, filed under the folder that holds it.
-  //
-  // ONE LINE PER CONSTRUCT, AND THE EMPHASIS IS ON *ONE*. `constructsUnder` recurses, which is
-  // right for a FACE — a face maps everything below it — and wrong here: a domain and each level
-  // beneath it both got a heading, so every construct in a nested domain was listed twice. The
-  // concept is an outline, and an outline that names a thing twice is not one. So a folder
-  // contributes only what sits DIRECTLY in it, and the nesting still shows through the headings.
-  let conceptBody: string | null = null;
-  if (concept) {
-    const out: string[] = [];
-    for (const dir of folders.filter((d) => !isGroup(d)).sort()) {
-      const mine = constructsUnder(dir).filter((c) => dirname(c.file) === dir);
-      if (!mine.length) continue;
-      out.push(`**${named(dir) ?? folderKey(basename(dir))}**`, "");
-      for (const c of readingOrder(mine)) out.push(`- **${c.title}** — ${c.summary}`);
-      out.push("");
-    }
-    conceptBody = out.join("\n").trimEnd();
-  }
-  return { faces, concept: conceptBody, findings };
+  return { faces, findings };
 }
 
 /**
@@ -1835,7 +1816,7 @@ function placeGlossary(src: string, body: string): string | null {
   const m = src.match(/<section[^>]*data-block="glossary"[^>]*>[\s\S]*?<\/section>/);
   if (!m) return null;
   const sec = m[0];
-  const begin = BEGIN("glossary");
+  const begin = BEGIN("glossary-html");
   const i = sec.indexOf(begin);
   let next: string;
   if (i >= 0) {
@@ -1867,7 +1848,7 @@ function face(tree: string, write: boolean): Finding[] {
     const { body, findings: df } = buildDictionary(dir, domainFace);
     findings.push(...df);
     const before = readFileSync(domainFace, "utf8");
-    const after = replaceRegion(before, "dictionary", body);
+    const after = replaceRegion(before, "glossary", body);
     if (after !== before) { if (write) writeFileSync(domainFace, after); touched.push(relative(tree, domainFace)); }
 
     // AND THE SAME GLOSSARY ON THE DOMAIN'S OVERVIEW (Q226 `A`). A reader of the overview meets the
@@ -1889,28 +1870,26 @@ function face(tree: string, write: boolean): Finding[] {
   const seatFace = join(constructsDir, "README.md");
   if (existsSync(seatFace)) {
     const before = readFileSync(seatFace, "utf8");
-    const after = removeRegion(before, "dictionary");
+    const after = removeRegion(before, "glossary");
     if (after !== before) { if (write) writeFileSync(seatFace, after); touched.push(relative(tree, seatFace)); }
   } else {
     findings.push({ check: "face", grade: "SOFT", file: seatFace, message: "no constructs seat face" });
   }
 
-  // The domain faces, and the concept's one line per construct.
+  // THE DOMAIN FACE IS THE ONE PLACE A CONSTRUCT LIST IS GENERATED. The concept once carried the
+  // same list a second time, and it was the face's inventory wearing the concept's clothes: one
+  // source, two generated homes, and a reader one click from the place whose whole job is to be
+  // that list. A concept states the model at SHAPE depth — which domains exist and why the
+  // repository divides that way — and a construct's summary is depth (MD10).
   const conceptFile = ["CONCEPT.md", join("..", "CONCEPT.md")].map((c) => join(tree, c)).find(existsSync) ?? null;
-  const { faces, concept: conceptBody, findings: dfz } = domainFaces(tree, conceptFile);
+  const { faces, findings: dfz } = domainFaces(tree, conceptFile);
   findings.push(...dfz);
   for (const [file, body] of faces) {
     if (!existsSync(file)) { findings.push({ check: "face", grade: "SOFT", file, message: "no domain face to write into" }); continue; }
     const before = readFileSync(file, "utf8");
-    const after = replaceRegion(before, "domain", body);
+    const after = replaceRegion(before, "constructs", body);
     if (after !== before) { if (write) writeFileSync(file, after); touched.push(relative(tree, file)); }
   }
-  if (conceptFile && conceptBody) {
-    const before = readFileSync(conceptFile, "utf8");
-    const after = replaceRegion(before, "constructs", conceptBody);
-    if (after !== before) { if (write) writeFileSync(conceptFile, after); touched.push(relative(tree, conceptFile)); }
-  }
-
   // A Map is a list of MIRRORS, and a mirror is named for the source folder it governs. Where a
   // repository's capabilities seat is AUTHORED rather than derived — the foundation book, and only
   // it (03-tree.md, *Number what is ordered*) — there is no source folder for a row to name, and
@@ -1924,7 +1903,7 @@ function face(tree: string, write: boolean): Finding[] {
     const { body, findings: mf } = buildMap(faceFile);
     findings.push(...mf);
     const before = readFileSync(faceFile, "utf8");
-    const after = replaceRegion(before, "map", body);
+    const after = replaceRegion(before, "contents", body);
     if (after !== before) { if (write) writeFileSync(faceFile, after); touched.push(relative(tree, faceFile)); }
   }
 
