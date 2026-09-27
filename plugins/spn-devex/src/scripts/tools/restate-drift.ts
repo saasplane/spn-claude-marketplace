@@ -292,9 +292,11 @@ export function main(argv: string[], root: string): number {
 
   // THE CODE'S OWN HEADERS, which no run had ever read. Reported apart from a document's drift,
   // because a broken header is a claim pointing at nothing rather than a chapter that moved.
-  // RD.DOCS.095, SOFT for one sitting: a stamp may live only in a marketplace plugin, and may cite
-  // only another repository. Reported rather than failing, because a new rule that turns the gate
-  // red on day one is a gate nobody reads (N66's ordering, and `a-wrong-check-gets-obeyed`).
+  // RD.DOCS.095: a stamp may live only in a marketplace plugin, and may cite only another
+  // repository. It shipped SOFT for one sitting — N66's ordering, and `a-wrong-check-gets-obeyed` —
+  // and FAILS from 2026-09-27, which it can because the corpus was brought to zero in that same
+  // sitting: five in-book headers removed and two self-citations deleted. A rule that turns the
+  // gate red on day one is a gate nobody reads; a rule whose corpus is already clean is free.
   const strays = strayStamps(dirname(book), join(root, "plugins"));
   const selves = documents.flatMap((path) => {
     const [block] = parse(path);
@@ -302,7 +304,8 @@ export function main(argv: string[], root: string): number {
   });
   if (strays.length || selves.length) {
     console.log();
-    console.log(`PLACEMENT   ${strays.length + selves.length} stamp(s) break RD.DOCS.095 — SOFT for one sitting:`);
+    console.log(`PLACEMENT   ${strays.length + selves.length} stamp(s) break RD.DOCS.095 — a stamp lives only in a`);
+    console.log("            marketplace plugin, and cites only another repository:");
     for (const finding of [...strays, ...selves]) console.log(`              ${finding}`);
   }
 
@@ -328,7 +331,7 @@ export function main(argv: string[], root: string): number {
   // A BROKEN HEADER FAILS FROM THE DAY IT SHIPS, and it can, because the fourteen it found were
   // fixed in the same sitting. Each one is bounded and the finding names the fix: the file the path
   // meant is printed beside it.
-  return findings.length + omissions.length + headers.length;
+  return findings.length + omissions.length + headers.length + strays.length + selves.length;
 }
 
 if (process.argv[1] && basename(process.argv[1]) === "restate-drift.ts")
