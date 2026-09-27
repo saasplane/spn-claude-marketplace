@@ -1,11 +1,11 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/README.md", "seen": "55c0c7e6" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "9b426f80" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md", "seen": "5d434d16" },
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/README.md", "seen": "c924071a" },
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "9517b2e7" },
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md", "seen": "304f6768" },
     { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md", "seen": "7c970245" },
-    { "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md", "seen": "83b2eafe" },
+    { "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md", "seen": "4eb6953c" },
     { "path": "spn-foundation/CONCEPT.md", "seen": "24dbbf45" }
   ]
 }
@@ -175,10 +175,10 @@ Which makes the seat checkable in every direction:
 
 | Defect | What it means |
 | --- | --- |
-| a construct a package realizes with no chapter for it | the package builds something nobody wrote a topic for |
+| a construct with no behaviours file at its own path | nothing can roll its status up, and the rows that would prove it are missing |
 | a chapter naming a construct that does not exist | it describes something that no longer exists |
-| a package holding code that realizes no construct | the code grew a subject the model never got |
-| a construct no package realizes | the model grew a subject nothing builds |
+| a package the repository declares with no folder under `04-capabilities/` | the code grew a subject nobody wrote a topic for |
+| a `04-capabilities/` folder naming no declared package | a chapter sits inside a package this repository does not have |
 | a source folder the node's generated index shows no chapter for | a folder is documented by nobody, and now somebody notices |
 | a `data-model.md` in a package with no `src/migrations` | a half that stores nothing wrote down storage |
 | a domain folder holding a `data-model.md` beside its package folders | the file sits above the half that owns it |
@@ -190,14 +190,14 @@ Every rule above is written against `src/` because that is where almost every re
 source — but a repository declaring `GENERAL` has no nodes, and may have no `src/` and no `tests/`
 at all. The marketplace's source is `plugins/<name>/`; another general repository's is whatever it
 is. **The grammar is untouched**: the seats are the same five, a chapter is still numbered as its
-construct, and a construct nothing realizes is still a finding.
+construct, and a construct with no behaviours file at its own path is still a finding.
 
 **What changes in a general repository is only what a cell RESOLVES TO**, and the reason is the same
 every time — nothing there derives from a node's kind, because there are no nodes:
 
 | | What still holds | What it resolves to |
 | --- | --- | --- |
-| a **realization** row | every construct has at least one, and the dependencies stay acyclic | it names **a folder or a file**, never a node. The index reads the repository's own top-level folders, so *plugins* or *hooks* resolves where *a node named hooks* could not |
+| a **capability chapter's folder** | it names a package the repository declares, and every declared package carries one | a **plugin** is what it resolves to here, read from the marketplace's own declaration rather than from a manifest — a plugin is a package with no `spkind.json` of its own |
 | a **behaviour** row | the id, `Who`, `Does`, `Sees` and `Type` | **`Tier` derives from a node's kind, and there is none** — so the row carries the repository's own runner or `—`, and `Status` stays `PLANNED` unless that runner writes it. Nothing owes a tier it cannot have |
 | the **source-folder index** | it is generated, never a list somebody maintains | it has **no node to sit on**, because a node's own `README.md` is where it is generated. That is honest rather than a gap: a folder no chapter covers is still reported against the whole tree, which is where that finding belongs |
 
@@ -235,15 +235,18 @@ constraint matters and why each index exists.
 **A domain's overview is its face in HTML**: it links into `artifacts/constructs/<domain>/` and
 carries the same glossary. Extra reading paths beneath it carry none.
 
-**Six invariants hold this shape up, and the folders are only where they land.** A domain folder
-exists only where the concept names that domain. The glossary is generated, never typed. Every
-noun in a behaviour row resolves to the glossary. Every construct has a chapter in every package
-that realizes it, every chapter names a construct that exists, and every package holding code
-realizes at least one construct. Every proven row resolves to a case and every cited id exists — a
-promise carries no status, and a proven row names a promise that exists. Every construct has at
-least one realization row, and its dependencies are acyclic and agree with the reading order. Each
-is a RULE, and invariant 2 is the one that decides whether the shape was worth
-adopting — a hand-maintained glossary moves drift rather than removing it.
+**The invariants between the seats hold this shape up, and the folders are only where they land.** A
+domain folder exists only where the concept names that domain. The glossary is generated, never
+typed. Every noun in a behaviour row resolves to the glossary. Every
+`04-capabilities/<domain>/<package>/` folder names a package the repository declares, and every
+declared package carries one. Every `SUCCESS` row resolves to a case and every cited id exists — a
+promise carries no status, and a proven row names a promise that exists. A construct's dependencies
+are acyclic and agree with the reading order. **`03-behaviors/` mirrors `02-constructs/` file for
+file, both ways**, which is what a rolled-up status reads and what pairs a construct with its rows.
+That pairing is of PATHS and never of rows: a behaviours file with no rows is honest wherever the
+product is not built. The two youngest report SOFT, because a new check ships SOFT first. The
+glossary one decides whether the shape was worth adopting — a hand-maintained glossary moves drift
+rather than removing it.
 
 **A capability chapter is the spec the code it names realizes** (decisions RD.DOCS.034 · RD.DOCS.073). It is **one chapter per construct per package that realizes it**, under the construct's own domain and carrying its number — `01-iam/module-server-iam-ts/04-sign-in.md`. The per-group mirror it replaced — `cache.md`, `contract.md`, `app.md`, `entry.md`, `ui-*.md` and siblings — is retired: a package's folders are not the reader's question, and 98 of those mirrors ran to 5,000 words restating a pattern the stack's standard already states once. **A chapter has four sections and nothing else**, each one there because something would otherwise be copied into it:
 
@@ -289,10 +292,9 @@ The pocket holds what the node **authors** rather than derives, and its three au
 | **Overview** | why this construct exists: the problem in the reader's own terms, what changes because it exists, and what a first-time reader has to unlearn | describing the shape — that is the `Model`, and two descriptions of one thing disagree eventually |
 | **Terms** | the words this construct gives a meaning to: the word a person uses, the contract term, and what it means | a word every engineer already knows; a row that points somewhere else instead of explaining |
 | **Model** | what it is: what you are looking at, in prose first — the general shape, then its parts, then its kinds — with a figure where seeing is faster | a field list standing in for an explanation; an argument, which is the `Overview`'s |
-| **Parts** | the detail of the what: one subsection per piece the `Model` named, in that order — what it is, why it exists, and the facts that shape it | a *Where:* line — where a thing lives is the `Binds` table's job; a heading the `Model` did not lead the reader to expect |
+| **Parts** | the detail of the what: one subsection per piece the `Model` named, in that order — what it is, why it exists, and the facts that shape it | a *Where:* line — which package builds it is answered by that package's own capability chapter; a heading the `Model` did not lead the reader to expect |
 | **Boundary** | in plain prose: what this page does not answer, where that is answered, and when you go there | an edge stated before the reader has seen the shape |
-| **Binds** | two tables: the rules that hold it, and where it lives today | a rule repeated; a state typed anywhere else |
-| **Proof** | the checks a person can run — or nothing | a behaviour row typed by hand |
+| **Binds** | one table: the rules that hold it, each with what it decides and how much it binds | a rule repeated; a claim about which package builds it, or a state typed anywhere |
 
 **A term appears in exactly one `Terms` table in a repository — MUST.** One source means one source per *term*, not per table, so the same word defined in two constructs is two sources whichever is read first.
 
@@ -302,9 +304,11 @@ The pocket holds what the node **authors** rather than derives, and its three au
 
 **The three sections that carry the argument divide by question** — `Overview` answers why, `Model` answers what, and `Parts` carries the detail of that what, one subsection per piece the `Model` named. **`Terms` comes second because the `Model` uses those words and the `Overview` does not**, and **`Boundary` comes after the parts** because a reader can judge an edge only once they have seen the shape. **The opening above the first heading is a standfirst and a summary, and nothing else**: measured across a workspace, 117 of 117 constructs opened with prose no outline named and no check read, so the orientation stays there and everything that argues moves into `Overview`. `Relations` is retired: the metadata block's `dependsOn` already carries what it listed, one way and machine-readable, and a section restating a declared field is a second copy that drifts.
 
-**Proof is joined from the register, never typed** (decision RD.DOCS.072). Every behaviour row naming this construct is read from the behaviours seat when the page is produced and rendered with its tier and the status the last run wrote, and the footer names the register version it read. In this book the joined rows are promises, which carry no status. **So the seat file's `Proof` holds typed checks or nothing at all**, and an empty `Proof` is a correct page rather than an incomplete one. **A `Proof` row names a command somebody else can run** — a `spnutils` command, a stack's own test target, a gate the plugins carry — and **a file name is never a command**, because a row naming a `.spec.ts` reads as verified and cannot be acted on. A script the repository carries is accepted while no command runs it, and the exemption ends the moment a command exists.
+**A construct types no proof — MUST** (decision RD.DOCS.072). What proves it is the behaviour rows at its own path: `02-constructs/<domain>/<name>.md` is proved by `03-behaviors/<domain>/<name>.md` and by nothing else. A row's `Status` is written by the run that proved it, so never write one. In this book the rows are promises and carry no status at all. What a run proved is read in the repository's `tests` report.
 
-**A construct's status is derived, never typed.** No realization row, or every row planned, is 🔮 `PLANNING`; any row partial or done but not all done, **or** `Proof` empty, is 🚧 `IMPLEMENTING`; every row done **and** `Proof` naming a check is ✅ `DONE`. A page may not carry 🚧 or ✅ until its realization rows resolve — and a row resolves only when its `Node` cell names a node, a plugin or a repository the workspace can be asked about. A command, a folder or a house word is not one of the three.
+**Pages written before the sweep still carry a `Proof` table**, and their rows are joined from the register when the page is produced. Do not add one, and do not type a row into one. While a page carries the table, two rules hold: **a `Proof` row names a command somebody else can run** — a `spnutils` command, a stack's own test target, a gate the plugins carry — and **a file name is never a command**, because a row naming a `.spec.ts` reads as verified and cannot be acted on. A script the repository carries is accepted while no command runs it, and the exemption ends the moment a command exists.
+
+**A construct's status is rolled up from those same rows, and never typed.** Nothing started, or no rows at all, is 🔮 `PLANNING`. Every row `SUCCESS` and carrying a `Tier` is ✅ `DONE`. Anything between the two is 🚧 `IMPLEMENTING`. `MANUAL` counts as started and never as proven, because no run writes it. **A construct in a `FOUNDATION` repository carries no `status` key and no `Status:` chip** — its rows are promises, and a promise has no proof state. Where the mirrored behaviours file is missing altogether, the derivation reports it rather than stamping 🔮 `PLANNING`: no rows means nothing ran, and no file means nothing was measured.
 
 **There is no length cap on a page and none on a part.** What decides whether a part should become a construct of its own is a judgement about the concept — does a reader meet this on its own, with its own actor? — never a line count.
 

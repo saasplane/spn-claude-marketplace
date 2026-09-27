@@ -1,9 +1,9 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md", "seen": "37fc1b0d" },
+    { "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md", "seen": "ffd73000" },
     { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md", "seen": "b97cea60" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "9b426f80" }
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "9517b2e7" }
   ]
 }
 -->

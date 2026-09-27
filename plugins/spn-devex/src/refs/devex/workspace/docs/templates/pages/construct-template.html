@@ -5,8 +5,8 @@
      capitalised concept names in the order a newcomer meets them; a contract is a code block with a comment per member;
      a list of keys with meanings is a table; an author's note (a comment) never reaches the page; there is no length cap;
      a one-way flow figure is a straight line, horizontal when it fits; every figure is reviewed by eye after it is produced.
-     PROOF IS JOINED, NOT TYPED (Q131): the seat file's Proof holds runnable checks or nothing; the page joins the behaviour
-     rows that name the construct from the register, with the status the last test run wrote. Status is never in the markdown.
+     A CONSTRUCT TYPES NO PROOF: what proves it is the behaviour rows at its own path, 03-behaviors/<same relative path>,
+     and a run writes their status. Status is never in the markdown — docs.ts status rolls it up from those rows.
      THE SHAPE OF A SECTION, on every page kind: a section opens with its own overview — what you are looking at, in
      prose — then a figure where seeing is faster, then its content as blocks. A subsection opens with its own overview,
      then its details. On the hub a subsection's details are navigation: one door under the subsection's
@@ -21,7 +21,7 @@
      THE BLOCKS AND THE FIGURES ARE ONE VOCABULARY FOR EVERY PAGE KIND — approach, overview, construct. Any page uses any block
      kind (prose, table, list, code, figure, comparison, rule) and any figure kind wherever its content calls for it; the lists
      below are shared, not this page kind's own. Only the sections differ between kinds. -->
-<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The four page kinds · § A construct's six sections · § Proof is joined, never typed · § The header · § A construct's status is derived — this file is the SPECIFICATION of a produced page
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The four page kinds · § A construct's six sections · § A construct types no proof · § The header · § A construct's status is derived — this file is the SPECIFICATION of a produced page
      This file carries rules it does not own. The chapter above is the source of truth.
      A rule change is edited there first, then here, in the same change. Never add a rule here.
      restate-drift.ts reports this copy when its source moves. -->
@@ -282,15 +282,15 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
             lives in a construct's Model when the construct is data · Parts for one part's records
   CODE      a contract, a state, a manifest, a command and its output · a fenced block with its language, real values,
             the path above it when copied from a file (the audit checks it still matches)
-            lives in EXAMPLE · MUST (the action) · a construct's Parts · Proof · an approach's What
+            lives in EXAMPLE · MUST (the action) · a construct's Parts or Binds · an approach's What
   DIFF      what a file says today, and what it will say · a diff block, - today / + after, the path above it
             lives in an approach's What only. A construct or an overview states current truth, never a change
   ================================================================================================ -->
 <!-- THE CONSTRUCT. This file is the SPECIFICATION of a produced page, not something an agent copies: the agent authors
   docs/02-constructs/…/{{NN}}-{{slug}}.md and docs.ts page produces the page from it — the body from the markdown, each figure
   from its dg spec, then this furniture. A page is never edited by hand. The audit checks a page equals what page produces,
-  the six h2 are in order, dependsOn is acyclic, Binds rows resolve to real nodes and a pathed CODE figure still matches its file.
-  THE SIX SECTIONS, in this order and no other: Terms · Model · Parts · Boundary · Binds · Proof, under an opening that
+  the six h2 are in order, dependsOn is acyclic, and a pathed CODE figure still matches its file.
+  THE SIX SECTIONS, in this order and no other: Overview · Terms · Model · Parts · Boundary · Binds, under an opening that
   says what the thing is and why it exists, in a newcomer's words, as long as it needs. Nothing else is fixed and nothing
   has a length cap: the concept decides.
   TERMS come first because the model uses the words. A Term is a word SaaS Plane gives a meaning to — a contract term or a
@@ -304,10 +304,10 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
   nothing here prescribes which kinds a section holds. So the Model opens with an overview in prose and then holds
   whatever blocks the model needs: a figure if the shape is faster seen, a contract as a code block with a comment per
   member only when the model has a contract, a table only when there is a list. A Part is the same: one h3, h4 inside,
-  blocks chosen by content. A list of keys with meanings is a CATALOG table, never a code block; no Where line — where a
-  thing lives is Binds' job. BOUNDARY comes after the parts, as plain prose: what this page does not answer and
-  where that is answered. BINDS: the rules that hold it, and where it lives today (a repository's construct names the
-  foundation construct it realizes first). PROOF: what you can run. STATUS is never typed; docs.ts status derives it.
+  blocks chosen by content. A list of keys with meanings is a CATALOG table, never a code block; no Where line — which
+  package builds this is its own capability chapter's answer. BOUNDARY comes after the parts, as plain prose: what this
+  page does not answer and where that is answered. BINDS: the rules that hold it, and nothing else. THERE IS NO PROOF
+  SECTION. STATUS is never typed; docs.ts status rolls it up from the behaviour rows at this construct's own path.
   THE FIGURE: a structure → MAP · a hierarchy → TREE · a lifecycle → STATE · data → ENTITIES · a procedure → FLOW. A map
   flows one way; a one-way chain is drawn as a straight line. After the page is produced, every figure is looked at by eye
   for layout and readability, and the verdict written down. An author's note in the seat file (a comment) never reaches
@@ -396,38 +396,10 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
     <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
     <tbody><tr><td><code>{{chapter or RD.X.NNN}}</code></td><td>{{&hellip;}}</td><td>MUST</td></tr></tbody>
   </table></div>
-  <div class="scroll"><table>
-    <thead><tr><th>Repo</th><th>Node</th><th>What it realizes</th><th>State</th></tr></thead>
-    <tbody><tr><td>{{Repo}}</td><td>{{node}}</td><td>{{the foundation construct it realizes, first}}</td><td>planned &middot; partial &middot; done</td></tr></tbody>
-  </table></div>
-</section>
-
-<section id="s6" data-block="comparison">
-  <div class="sec-head"><h2>Proof</h2></div>
-  <p>What proves this construct: the behaviour rows that name it, with the status the last test run wrote, and the checks a reader can run.</p>
-  <!-- GENERATED when the page is produced: every row of 03-behaviors/ whose construct is this one, from the register,
-       never from the seat file. A foundation construct shows its promise rows, which carry no status column.
-       STATUS IS THE REGISTER'S OWN VOCABULARY, never a second one invented here: SPDocBehaviourStatusType is
-       PLANNED 🔮 · PENDING ⏳ · SUCCESS ✅ · FAILED ❌ · MANUAL 👤 (02-document.md § The behaviour row). The word
-       is the value and the icon is the rendering, so the cell shows both and the register holds the word.
-       TIER IS THE REGISTER'S VOCABULARY TOO: SPTestTierType is UNIT · INTEGRATION · CONTRACT · COMPONENT ·
-       JOURNEY — five, and the row declares one by hand before a case exists (02-document.md § The behaviour
-       row). Neither set is ever shortened here: a placeholder that lists three of five teaches four. -->
-  <p class="s">Behaviours: joined from the register, {{register version}}</p>
-  <div class="scroll"><table>
-    <thead><tr><th>Row</th><th>Does</th><th>Tier</th><th>Status</th></tr></thead>
-    <tbody>
-      <tr><td><code>{{ID}}</code></td><td>{{what a person can do}}</td><td>{{UNIT &middot; INTEGRATION &middot; CONTRACT &middot; COMPONENT &middot; JOURNEY}}</td><td>{{&#x2705; SUCCESS &middot; &#x23F3; PENDING &middot; &#x1F52E; PLANNED &middot; &#x274C; FAILED &middot; &#x1F464; MANUAL}}</td></tr>
-    </tbody>
-  </table></div>
-  <!-- TYPED in the seat file: the runnable checks, or none. -->
-  <div class="scroll"><table>
-    <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
-    <tbody><tr><td><code>{{command}}</code></td><td>gate &middot; command &middot; test</td><td>{{&hellip;}}</td></tr></tbody>
-  </table></div>
+  <!-- ONE TABLE. Which package builds this construct is answered by that package's own capability chapter, and
+       04-capabilities/<domain>/<package>/ is the claim a check reads. A construct claims no realization. -->
   <p>Try it: <code>{{one command a reader can run}}</code></p>
 </section>
-
 
 <!-- THE BLOCKS AND THE FIGURES ARE SHOWN ONCE, in templates/blocks-template.html — normal content first,
      then every block and every figure kind rendered. It is a reference you consult while writing, not a section

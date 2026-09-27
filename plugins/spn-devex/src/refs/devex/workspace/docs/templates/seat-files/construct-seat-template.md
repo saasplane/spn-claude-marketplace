@@ -12,8 +12,10 @@
 <!-- THE ONLY FILE AN AGENT AUTHORS for a construct. `docs.ts page` produces the HTML page from it — one block per
      `##`, no block is forced and none is numbered. The block keeps seven keys: `id`, `variant`, `title`, `lenses`,
      `status`, `dependsOn`, `summary`. `dependsOn` is the reading order and the only record of what this construct
-     needs; the domain face renders it. `status` is derived from Binds and Proof by `docs.ts status`, never typed.
-     RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The three page kinds · 03-tree.md § What — constructs
+     needs; the domain face renders it. `status` is rolled up by `docs.ts status` from the behaviour rows at this
+     construct's own path — `03-behaviors/<same relative path>` — and is never typed. IN A `FOUNDATION` REPOSITORY THERE
+     IS NO `status` KEY AND NO `Status:` CHIP: those rows are promises, and a promise has no proof state.
+     RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The four page kinds · § A construct's status is derived, never typed · 03-tree.md § What — constructs
      This file carries rules it does not own. The chapter above is the source of truth. Never add a rule here.
 
      THE OPENING IS A STANDFIRST AND A SUMMARY, AND NOTHING ELSE. Measured across a workspace on 2026-09-24, 117 of
@@ -21,13 +23,15 @@
      195 words. A structure in every document of a corpus, declared nowhere, is the thing this order removes: the
      orientation stays above the first heading and everything that argues moves into `Overview`.
 
-     SEVEN SECTIONS, IN THIS ORDER — Overview · Terms · Model · Parts · Boundary · Binds · Proof.
+     SIX SECTIONS, IN THIS ORDER — Overview · Terms · Model · Parts · Boundary · Binds.
      The three that carry the argument divide by question:
        Overview  WHY this construct exists — the problem, and what changes because it does.
        Model     WHAT it is — the whole shape, before any piece of it.
        Parts     the detail of the What — one subsection per piece of the Model.
      Terms sits between Overview and Model because the Model uses those words and the Overview does not need them.
-     Boundary, Binds and Proof are unchanged.
+     Boundary is unchanged. BINDS IS THE RULES TABLE ALONE: which package builds this construct is answered by that
+     package's own capability chapter, and a construct claims no realization. THERE IS NO PROOF SECTION — what proves
+     a construct is the behaviour rows at its own path, and a run writes their status.
 
      THERE IS STILL NO LENGTH CAP on any section. The concept decides how long its explanation is, and a page that is
      long because its idea needs the room is right. What the opening gains is a JOB rather than a limit: it orients,
@@ -103,21 +107,13 @@
 {{This page answers {{the question it answers}}. It does not answer {{the neighbouring question}} — that is [{{construct}}]({{path}}.md), and you read it next when {{the situation}}.}}
 
 ## Binds
-<!-- Two tables. The first: the rules that hold this construct. The second: where it lives today — and for a
-     repository's construct, the FIRST row names the foundation construct it realizes. -->
+<!-- ONE TABLE: the rules that hold this construct, each with what it decides and how much it binds. A rule stated
+     elsewhere is cited here and never restated. NO REALIZATION TABLE: which package builds this is the capability
+     chapter's answer, inside that package, and `04-capabilities/<domain>/<package>/` is the claim a check reads.
+     In a repository that realizes a book construct, name the book's path in the Overview as a code span — never a
+     link, and never an id, because an id is repo-local. -->
 | Rule | What it decides | Weight |
 | --- | --- | --- |
 | `{{chapter or RD.X.NNN}}` | {{…}} | MUST |
-
-| Repo | Node | What it realizes | State |
-| --- | --- | --- | --- |
-| {{Repo}} | {{node}} | {{…}} | planned |
-
-## Proof
-<!-- Typed here: only the checks a person can run, or nothing. Behaviour rows are joined into the produced page from
-     the register, never typed here. -->
-| Check | Kind | What a green run shows |
-| --- | --- | --- |
-| `{{command}}` | gate | {{…}} |
 
 Try it: `{{one command a partner can run}}`

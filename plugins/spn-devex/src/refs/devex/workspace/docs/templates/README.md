@@ -3,7 +3,7 @@
   "files": [
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/templates",
-      "seen": "2abaddb2"
+      "seen": "2eca4e80"
     }
   ]
 }
@@ -21,7 +21,7 @@ would report every edit and miss every addition — a template nobody cited has 
 against, and *the book grew a shape a partner does not have* is what this copy exists to prevent.
 A folder hash covers added, removed, renamed and edited at once.
 
-**The templates are here because the plugins ship without the book beside them.** A partner installs the
+**They are here because the plugins ship without the book beside them.** A partner installs the
 marketplace and the libraries and never gets `docs/`. The moment that costs most is the first one:
 a new repository whose own documentation is the thing they are about to write, with nothing on
 disk to copy from.
