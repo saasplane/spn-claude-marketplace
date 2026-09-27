@@ -36,7 +36,6 @@ const OUT = join("spn-claude-marketplace", "plugins", "spn-apps", "src", "refs",
 /** The generator itself. A `commands` citation names what produced the file, and a hash of the
  *  generator is what says the output is stale: change the renderer and every catalogue it wrote is
  *  owed a re-run. A command STRING would resolve to nothing and report as broken forever. */
-const GENERATOR = "spn-claude-marketplace/plugins/spn-apps/src/scripts/tools/library-catalogue.ts";
 /** The book entry this ref answers. The RULE is the book's; the LIST is this file's. */
 const BOOK_RULE = "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/14-libraries.md";
 
@@ -82,9 +81,12 @@ function libraries(workspace: string): Library[] {
   return found;
 }
 
-function render(found: Library[], generatorHash: string, bookSeen: string): string {
-  let out = `<!-- spn:restates\n{\n  "docs": [\n    { "path": "${BOOK_RULE}", "seen": "${bookSeen}" }\n  ],\n`;
-  out += `  "commands": [\n    { "path": "${GENERATOR}", "seen": "${generatorHash}" }\n  ]\n}\n-->\n`;
+function render(found: Library[], bookSeen: string): string {
+  // A RESTATEMENT CITES ANOTHER REPOSITORY, NEVER ITS OWN (`RD.DOCS.095`). This file used to stamp
+  // `library-catalogue.ts` beside the book rule — a ref in the marketplace citing a script in the
+  // marketplace, which has no distance to measure because both move in the same commit. The
+  // generator's freshness is the generator's problem, and the paragraph below names the command.
+  let out = `<!-- spn:restates\n{\n  "docs": [\n    { "path": "${BOOK_RULE}", "seen": "${bookSeen}" }\n  ]\n}\n-->\n`;
   out += `<!-- spn:generated libraries — do not edit inside these markers; \`library-catalogue.ts\` writes it -->\n`;
   out += `# Libraries — the published packages a node may depend on\n\n`;
   out += `**Source of truth:** the foundation's \`10-providers/ts/14-libraries.md\`. **That chapter states the rule and this ref carries the list**, which is the one entry where the book and this folder answer the same question differently. How a package travels in this stack — the scopes, the registry each one publishes to, and why a consumer pins an exact version rather than a range — is the book's. Which packages exist is nobody's to write by hand, because the set moves at every release.\n\n`;
@@ -108,7 +110,7 @@ export function main(workspace: string, check = false): number {
     return 0;
   }
   const at = join(workspace, OUT);
-  const body = render(found, seenHash(readFileSync(join(workspace, GENERATOR), "utf8")), bookSeen(workspace, at));
+  const body = render(found, bookSeen(workspace, at));
   const now = existsSync(at) ? readFileSync(at, "utf8") : "";
   if (now === body) { console.log(`current  ${OUT} — ${found.length} package(s)`); return 0; }
   if (check) { console.log(`would write  ${OUT} — ${found.length} package(s)`); return 1; }

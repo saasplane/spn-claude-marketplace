@@ -1,10 +1,3 @@
-<!-- spn:restates
-{
-  "commands": [
-    { "path": "spn-claude-marketplace/plugins/spn-devex/src/scripts/tools/commands-ref.ts", "seen": "d6b198ce" }
-  ]
-}
--->
 # The commands, as the released CLI answers them
 
 **Source:** `commands-ref.ts`, reading the **released** `spnutils` — which is what a partner holds rather than what this checkout builds.

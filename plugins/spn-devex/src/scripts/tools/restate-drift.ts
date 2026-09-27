@@ -165,6 +165,70 @@ export function findBook(argument: string | undefined, root: string): string | n
   return null;
 }
 
+/**
+ * A `spn:restates` header anywhere but a marketplace plugin, and any citation pointing at the
+ * plugin's own repository (`RD.DOCS.095`).
+ *
+ * **A RESTATEMENT MEASURES A DISTANCE.** It exists because a rule lives in one repository and is
+ * repeated in another that cannot see it, and the `seen` hash is what makes that gap reportable.
+ * A document citing its own repository has no distance to measure — both halves move in the same
+ * commit and the same person reads them — so the stamp has no job, nobody maintains it, and the
+ * hash rots. Measured 2026-09-27: every one of the five in-book headers was stale and not one had
+ * ever been reported, because this check reads plugin documents only.
+ *
+ * **A FENCED SAMPLE IS NOT A HEADER, and telling them apart is the whole difficulty.** The construct
+ * that teaches this format carries a worked example inside a ```jsonc fence, and the produced page
+ * carries the same thing inside a <pre>. A line-anchored match reads both as live headers — it did,
+ * and deleting what it found would have removed the only place the format is written down. So both
+ * regions are tracked and skipped.
+ */
+function strayStamps(workspace: string, pluginsRoot: string): string[] {
+  const out: string[] = [];
+  const walk = (dir: string): void => {
+    for (const entry of readdirSync(dir)) {
+      if (entry === "node_modules" || entry === ".git" || entry.startsWith(".")) continue;
+      const full = join(dir, entry);
+      if (isDir(full)) { if (!full.startsWith(pluginsRoot)) walk(full); continue; }
+      if (!/\.(md|html)$/.test(entry)) continue;
+      let fence = false;
+      let pre = false;
+      let line = 0;
+      for (const text of readFileSync(full, "utf8").split("\n")) {
+        line += 1;
+        if (text.trim().startsWith("```")) { fence = !fence; continue; }
+        if (text.includes("<pre")) pre = true;
+        if (text.includes("</pre>")) { pre = false; continue; }
+        if (!fence && !pre && /^[ \t]*<!-- spn:restates/.test(text))
+          out.push(`${relative(workspace, full)}:${line}: a spn:restates header outside the plugins — ` +
+            `a restatement measures the distance between two repositories, and this one has none`);
+      }
+    }
+  };
+  for (const repo of readdirSync(workspace)) {
+    const full = join(workspace, repo);
+    if (repo.startsWith(".") || !isDir(full)) continue;
+    walk(full);
+  }
+  return out;
+}
+
+/**
+ * A citation naming the repository the citing file already lives in.
+ *
+ * **THE OWNER IS THE REPOSITORY, NOT THE PATH'S FIRST SEGMENT.** A document's shown path is relative
+ * to its own repository, so it begins `plugins/…` — while a citation begins with a repository name.
+ * Comparing those two compares `plugins` against `spn-claude-marketplace` and matches nothing: the
+ * first version of this function reported zero on a corpus with two known self-citations in it, and
+ * the planted-bad test is the only reason that was caught.
+ */
+function selfCitations(owner: string, shownPath: string, block: { docs?: { path?: string }[]; files?: { path?: string }[]; commands?: { path?: string }[] }): string[] {
+  const cited = [...(block.docs ?? []), ...(block.files ?? []), ...(block.commands ?? [])];
+  return cited
+    .map((c) => c.path ?? "")
+    .filter((p) => p && p.split("/")[0] === owner)
+    .map((p) => `${shownPath}: cites \`${p}\` in its own repository — a restatement cites another repository, never itself`);
+}
+
 export function main(argv: string[], root: string): number {
   const documents = pluginDocuments(root);
   const shown = (path: string) => relative(root, path);
@@ -228,6 +292,20 @@ export function main(argv: string[], root: string): number {
 
   // THE CODE'S OWN HEADERS, which no run had ever read. Reported apart from a document's drift,
   // because a broken header is a claim pointing at nothing rather than a chapter that moved.
+  // RD.DOCS.095, SOFT for one sitting: a stamp may live only in a marketplace plugin, and may cite
+  // only another repository. Reported rather than failing, because a new rule that turns the gate
+  // red on day one is a gate nobody reads (N66's ordering, and `a-wrong-check-gets-obeyed`).
+  const strays = strayStamps(dirname(book), join(root, "plugins"));
+  const selves = documents.flatMap((path) => {
+    const [block] = parse(path);
+    return block ? selfCitations(basename(root), shown(path), block as never) : [];
+  });
+  if (strays.length || selves.length) {
+    console.log();
+    console.log(`PLACEMENT   ${strays.length + selves.length} stamp(s) break RD.DOCS.095 — SOFT for one sitting:`);
+    for (const finding of [...strays, ...selves]) console.log(`              ${finding}`);
+  }
+
   const headers = headerFindings(root, book);
   if (headers.length) {
     console.log();
@@ -240,7 +318,8 @@ export function main(argv: string[], root: string): number {
   console.log();
   console.log(`${documents.length} plugin document(s) · ${stamped} carrying spn:restates · ` +
     `${findings.length} drift · ${omissions.length} undeclared · ${unstamped.length} unstamped · ` +
-    `${unclassified.size} unread name(s) · ${headers.length} broken header(s) — book at ${book}`);
+    `${unclassified.size} unread name(s) · ${headers.length} broken header(s) · ` +
+    `${strays.length + selves.length} misplaced (SOFT) — book at ${book}`);
   // UNSTAMPED IS REPORTED AND DOES NOT FAIL. It is coverage, not drift: those files are not wrong,
   // they are unmeasured. Failing on them would leave the gate red from the day it shipped until
   // somebody hand-wrote every last block — and a gate that is always red is one nobody reads.
