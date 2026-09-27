@@ -29,7 +29,7 @@
 
 ## `Region` is the jurisdiction, never the provider's region
 
-**This is the one that gets confused, and confusing it breaks the residency evidence.** `Region` carries the governance coordinate — the jurisdiction the data-residency obligation attaches to — never the provider region that happens to serve it.
+**Readers confuse `Region` with the provider's region, and that confusion breaks the residency evidence.** `Region` carries the governance coordinate — the jurisdiction the data-residency obligation attaches to — never the provider region that happens to serve it.
 
 | `Region` | provider region | the residency claim |
 | --- | --- | --- |

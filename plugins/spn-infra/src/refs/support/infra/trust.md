@@ -9,7 +9,7 @@
 
 # Trust — who may reach what, and how identity is proved between layers
 
-This is what you enforce and check for when an estate change touches access, a credential, or what is allowed to run. Nobody holds a permanent credential, and nothing runs that cannot prove where it came from — those two guarantees are this whole file.
+Enforce and check what follows when an estate change touches access, a credential, or what is allowed to run. Nobody holds a permanent credential, and nothing runs that cannot prove where it came from — those two guarantees are this whole file.
 
 ## Terms
 

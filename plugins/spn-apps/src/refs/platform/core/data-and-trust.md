@@ -110,7 +110,7 @@ Before you ship a new capability, answer all five — a design that cannot answe
 | 4 | Auditability — does every access answer the auditability test? | the append-only trail |
 | 5 | Contract-reachability — is the capability reachable only through its declared contract? | the surfaces model |
 
-Retrofitting an answer under deadline is what happens to a capability that shipped without asking these first.
+A capability that ships without asking these first has its answer retrofitted under deadline.
 
 ## What this replaces
 

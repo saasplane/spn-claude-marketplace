@@ -9,7 +9,7 @@
 
 **Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/local/README.md`. Read this as the restatement; that node governs.
 
-**This is the realized one.** A full platform runs on a developer's machine before it runs anywhere else — that is the local-first rule, and it is why local is the default target rather than a simulation of the real one.
+**Local is the realized provider.** A full platform runs on a developer's machine before it runs anywhere else — that is the local-first rule, and it is why local is the default target rather than a simulation of the real one.
 
 ## Every entry is answered
 

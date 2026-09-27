@@ -31,7 +31,7 @@ A declaration asks four different questions, and each has its own group of facts
 
 **A fixed list is checked before anything is created**, so a misspelling costs a second rather than half an estate. It is also a promise: SaaS Plane publishes code for each value, so writing one is asking for something that already exists. **Adding a value is a register decision, never a setting somebody switches on.**
 
-**Never count the values in a list.** A list is read by the rule that defines it, not by how many values it holds today (`RD.GOV.008`), and each list is stated once with every other mention pointing at that statement (`RD.GOV.011`). A sentence that says *the four postures* goes stale the day a fifth is ruled in.
+**Never count the values in a list.** A list is read by the rule that defines it, not by how many values it holds today (`RD.GOV.008`), and each list is stated once with every other mention pointing at that statement (`RD.GOV.011`). A sentence that says *the four postures* stops being true the day a fifth is ruled in.
 
 ### What a package is, and which rung a fact sits on
 

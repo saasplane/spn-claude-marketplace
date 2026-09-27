@@ -21,7 +21,7 @@ Everything a plugin can execute lives in one folder. Some of it is called by a m
 
 Two habits run through the whole folder. The first is that **a script names the chapter it restates** in its own header, so the rule has exactly one home and a change is made there first. The second is that **a script reads the smallest slice its question needs**. Reading everything on every call once cost three quarters of every millisecond the hooks had spent, and a gate that makes a session slow is a gate somebody eventually removes.
 
-The third habit is the one that decides the folder's shape. **A rule answered one way while a file is written and another way in a sweep is two rules**, so the code that decides lives once and both callers import it.
+Sharing one decision between a write-time check and a sweep is the habit that decides the folder's shape. **A rule answered one way while a file is written and another way in a sweep is two rules**, so the code that decides lives once and both callers import it.
 
 ## Terms
 

@@ -10,7 +10,7 @@
 
 **Source of truth:** the foundation's `02-constructs/02-support/02-infra/10-providers.md` and its capability chapters. Read this as the restatement; the book governs.
 
-**This is not `providers/aws/*`.** Those say what AWS actually does. This says what a provider *is*, and what the commands above it are therefore allowed to know.
+**This folder is not `providers/aws/*`.** Those say what AWS actually does. This says what a provider *is*, and what the commands above it are therefore allowed to know.
 
 ## Why two engineers can run different infrastructure and read the same rule
 

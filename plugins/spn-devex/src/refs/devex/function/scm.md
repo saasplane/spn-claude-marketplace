@@ -97,7 +97,7 @@ feat/* · fix/* · chore/*  ──►  develop  ──►  qa  ──►  uat  �
 
 ### The protection rules
 
-These are not conventions a team agrees to follow. They are protection rules the repository host enforces on every branch, applied as state a command converges rather than as a habit somebody remembers.
+Protection rules are not conventions a team agrees to follow. They are protection rules the repository host enforces on every branch, applied as state a command converges rather than as a habit somebody remembers.
 
 - Every change **MUST** arrive by pull request, with at least one approval, and new commits **MUST** dismiss stale approvals. There are no direct pushes.
 - Promotion **MUST** move one rung at a time.
@@ -158,17 +158,17 @@ Some work belongs to one repository and nowhere else: the scripted release its p
 
 **A hook may read the book where it exists and may never require it.** Silence on a missing input is the contract: a hook that cannot read what it wanted says nothing, and you keep working. A `tasks/` script cannot degrade that way — it is simply absent from a repository that does not have it, and nothing can report an absence there is nothing to report against.
 
-### A task has three possible fates
+### A task ends in one of three ways
 
 Read `tasks/` as a home, not a backlog. An empty `tasks/` is not the goal.
 
-| Fate | When | What you do |
+| Ending | When | What you do |
 | --- | --- | --- |
 | it stays | the work is genuinely this repository's — a sandbox tied to one account, a sequence only this product needs | leave it, and keep its header current |
 | it is promoted | it is generic, and everything it needs is declared in SaaS Plane manifests rather than typed into the script | it becomes a command, and the task is deleted in the same change |
 | it retires | it works around a gap the platform itself now answers | delete it, and say in the change which answer replaced it |
 
-**Retirement is the fate people miss most often.** A script that reads source code to work out what a test run covered, or probes a running system for a fact a manifest already declares, is not waiting to be promoted — it is a symptom. Promoting it makes the workaround permanent and leaves the platform's gap in place. The test that separates promotion from retirement is what the script has to know: a tool reading SaaS Plane's own declarations is generic and can be promoted; one reading a product's paths, vocabulary or screens belongs to that product and either stays or retires.
+**Retirement is the ending people miss most often.** A script that reads source code to work out what a test run covered, or probes a running system for a fact a manifest already declares, is not waiting to be promoted — it is a symptom. Promoting it makes the workaround permanent and leaves the platform's gap in place. The test that separates promotion from retirement is what the script has to know: a tool reading SaaS Plane's own declarations is generic and can be promoted; one reading a product's paths, vocabulary or screens belongs to that product and either stays or retires.
 
 ## Standardization is a command
 

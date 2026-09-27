@@ -108,7 +108,7 @@ APP_ENV / APP_MODE / NODE_ENV                 ← bootstrap, unprefixed
 
 ## The platform namespace
 
-**These are bootstrap and setup values read at the point of use** by seed migrations and module bootstrap, never parsed into structural configuration. The loader does not read them at all.
+**Platform-namespace variables are bootstrap and setup values read at the point of use** by seed migrations and module bootstrap, never parsed into structural configuration. The loader does not read them at all.
 
 - **Runtime code never reads them directly.** The one read is the composition-root parse into the application config, and everything else consumes that config. A migration is the deliberate exception, because a migration must stay self-contained.
 - **The prefix is never hardcoded.** A platform package derives it at runtime, so one migration seeds every deployment from its own values.

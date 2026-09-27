@@ -9,7 +9,7 @@
 
 # Operate — what a running estate owes
 
-This is what a deployment must derive rather than have authored, what it must expose to be observable, what it must refuse, and what recovery looks like when the declaration and the running estate disagree. Nobody writes a deployment by hand, one artifact is built once and promoted forward, and a difference between what is declared and what is running is reported rather than corrected quietly in either direction.
+A running estate owes what a deployment must derive rather than have authored, what it must expose to be observable, what it must refuse, and what recovery looks like when the declaration and the running estate disagree. Nobody writes a deployment by hand, one artifact is built once and promoted forward, and a difference between what is declared and what is running is reported rather than corrected quietly in either direction.
 
 ## Terms
 

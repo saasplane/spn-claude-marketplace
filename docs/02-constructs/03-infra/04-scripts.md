@@ -62,7 +62,7 @@ A rule that fails is skipped rather than fatal: a gate that crashes the chain re
 
 ### Three folders, and what decides which one a file goes in
 
-`events/` holds what the wiring calls, and there is one such file because there is one wired moment. `checks/` holds the gate — the part that knows which subjects exist and how to reach a provider's parse of each. `lib/` holds everything more than one of them needs: the rule bodies, the event shape, the timing recorder. **The axis is what the file is for, not what it is about**, which is why a rule about secrets and a rule about built output sit side by side. *Where:* `plugins/spn-infra/src/scripts/`
+`events/` holds what the wiring calls, and there is one such file because there is one wired moment. `checks/` holds the gate, which knows which subjects exist and how to reach a provider's parse of each. `lib/` holds everything more than one of them needs: the rule bodies, the event shape, the timing recorder. **The axis is what the file is for, not what it is about**, which is why a rule about secrets and a rule about built output sit side by side. *Where:* `plugins/spn-infra/src/scripts/`
 
 ### Unsure means allow, and every exit is zero
 

@@ -10,7 +10,7 @@
 
 **Source of truth:** the foundation's `02-constructs/02-support/01-apps/10-providers.md` and its capability chapters. Read this as the restatement; the book governs.
 
-**This is not the [`ts/`](ts/README.md) folder.** Those refs say what TypeScript actually does. This says what *any* stack is allowed to be — read it before adding a second one, and before assuming a tool can work out which stack you are in.
+**This folder is not [`ts/`](ts/README.md).** Those refs say what TypeScript actually does. This says what *any* stack is allowed to be — read it before adding a second one, and before assuming a tool can work out which stack you are in.
 
 ## The two sentences that carry it
 

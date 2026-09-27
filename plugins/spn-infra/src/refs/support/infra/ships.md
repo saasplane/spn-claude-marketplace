@@ -9,7 +9,7 @@
 
 # Ships — what the estate stage owes a consumer
 
-This is what the estate half of the Support stage must publish to count as shipped, and how you judge whether a given release meets that bar. The estate half is shared by every stack a company runs — a TypeScript platform and a different stack both stand infrastructure up from the same published material — and it is judged by the same rules the per-stack half is.
+The estate half of the Support stage must publish what follows to count as shipped, and how you judge whether a given release meets that bar. The estate half is shared by every stack a company runs — a TypeScript platform and a different stack both stand infrastructure up from the same published material — and it is judged by the same rules the per-stack half is.
 
 ## Terms
 

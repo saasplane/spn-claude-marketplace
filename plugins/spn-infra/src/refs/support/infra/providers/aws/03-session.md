@@ -29,7 +29,7 @@
 
 **Establishing OIDC is what retires the `M4` fine-grained token** that [`02-ground.md`](02-ground.md) recorded. The cloud runs switch their repository operations from that token to OIDC, the token is revoked, and the revocation is kept as evidence.
 
-**This is the act people skip, because the token still works.** Nothing breaks on the day OIDC goes live, so the revocation has no event forcing it. An unrevoked `M4` token is a long-lived credential sitting in the delivery path, which is the thing this design exists to remove.
+**Revoking the bootstrap token is the act people skip, because the token still works.** Nothing breaks on the day OIDC goes live, so the revocation has no event forcing it. An unrevoked `M4` token is a long-lived credential sitting in the delivery path, which is the thing this design exists to remove.
 
 ## What proves it
 

@@ -24,7 +24,7 @@
 
 **A node's kind fixes its consumer, and the consumer fixes the tier.** Where a test goes is not a preference.
 
-**Pick by what would break.** If the thing that could go wrong is the unit's own logic, it is a unit case. If it is the seam to something real, it is integration.
+**Pick by what would break.** If what could go wrong is the unit's own logic, it is a unit case. If it is the seam to something real, it is integration.
 
 **A node may double a seam it owns, and nothing else.** That single rule decides where a case lives: a case reaching for a double of somebody else's seam belongs in the other node.
 

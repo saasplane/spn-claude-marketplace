@@ -11,7 +11,7 @@
 
 **Local realizes the design of record on one developer machine.** It consumes the same manifests a cloud provider consumes, so it is a realization rather than a second design.
 
-**This is the realized one.** A full platform runs locally before it runs anywhere else, which is the local-first rule. Local answers more of the provider contract today than either cloud does.
+**Local is the realized provider.** A full platform runs locally before it runs anywhere else, which is the local-first rule. Local answers more of the provider contract today than either cloud does.
 
 ## Realization is a target, not a command group
 

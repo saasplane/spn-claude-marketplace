@@ -21,4 +21,4 @@
 
 **A rendering may add grouping its own policy mechanics want, and the logical tree never widens for it.** So that mapping is a contract rather than a sketch, and a Google Cloud realization would be judged against it.
 
-**What is missing is the code that makes the tree exist.** Given credentials, the same hierarchy should come to exist on whichever provider the declaration names.
+**The code that makes the tree exist is what is missing.** Given credentials, the same hierarchy should come to exist on whichever provider the declaration names.

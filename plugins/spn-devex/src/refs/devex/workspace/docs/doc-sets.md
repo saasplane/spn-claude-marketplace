@@ -221,7 +221,7 @@ consumer uses, the term the contract uses, and what it means — joined from eve
 table in that domain, with the term linked to the construct that declares it. A `Terms` table of two
 columns cannot be generated from, and the audit reports it.
 
-**It sits on the domain, not on the seat face.** A repository-wide table ran to 573 rows in the
+**The glossary sits on the domain, not on the seat face.** A repository-wide table ran to 573 rows in the
 foundation and 347 in the platform, where a domain's is twelve to a hundred and twenty-two — and a
 term written twice in one domain sits in adjacent rows rather than two hundred apart. The seat face
 keeps the domain table it already carries and no glossary.

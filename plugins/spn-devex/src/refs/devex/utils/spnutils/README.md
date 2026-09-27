@@ -29,4 +29,4 @@ One CLI serves every stack. The group says *what kind of thing changes*, which i
 
 **The released CLI's whole surface is [`commands.md`](commands.md) beside this file**, written by `commands-ref.ts` from the version a partner actually holds.
 
-**It is a separate file because it is generated and this one is not.** A file half authored and half produced means editing prose around markers you must not touch, and the boundary is invisible until somebody crosses it.
+**The command list is a separate file because it is generated and this one is not.** A file half authored and half produced means editing prose around markers you must not touch, and the boundary is invisible until somebody crosses it.

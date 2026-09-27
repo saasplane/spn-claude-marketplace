@@ -37,7 +37,7 @@ rather than pretending the option exists.
    nothing is published.
 3. **Stamps the version into the built artifact**, after the gates pass and before anything
    ships. The stamp lands in what gets published, never in the source tree — source keeps a
-   placeholder, which is the whole point of lockstep (`RD.APPS.034`): there is no version bump
+   placeholder, which is what lockstep is for (`RD.APPS.034`): there is no version bump
    to review in a diff, because there is nothing to bump.
 4. **Commits and tags** the release at that version.
 5. **Publishes** every releasable project to the organization's registry pair (public/private,

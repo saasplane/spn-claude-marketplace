@@ -27,7 +27,7 @@
 
 **A policy attached to an account instead of its OU is the commonest mistake here**, and it fails silently: the account is governed today and the next account beside it is not.
 
-**Identity last, and the bootstrap profile ends when it lands.** Running with the bootstrap credential after identity exists means the thing that was meant to be temporary has become the way in.
+**Identity last, and the bootstrap profile ends when it lands.** Running with the bootstrap credential after identity exists means a credential meant to be temporary has become the way in.
 
 ## Before you run it
 

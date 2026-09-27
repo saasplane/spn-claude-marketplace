@@ -50,7 +50,7 @@ An edit to the folder changes nothing about the cache until an install copies on
 
 ## The `spn:restates` stamp
 
-**A stamp lives here and nowhere else, and it cites another repository — never this one** (`RD.DOCS.095`). Both halves follow from what a restatement is for: it exists because a rule lives in the book and is repeated here, where the book cannot be read, and the `seen` hash is what makes that gap reportable. **A file citing its own repository has no gap to report** — both halves move in the same commit — so the stamp has no work to do and the hash goes stale with nobody to notice. Do not stamp a generated ref against the generator that writes it: say which command produces the file, in prose, and let a reader re-run it.
+**A stamp lives here and nowhere else, and it cites another repository — never this one** (`RD.DOCS.095`). Both halves follow from what a restatement is for: it exists because a rule lives in the book and is repeated here, where the book cannot be read, and the `seen` hash is what makes that gap reportable. **A file citing its own repository has no gap to report** — both halves move in the same commit — so the stamp has no work to do and the hash stops matching the file with nobody to notice. Do not stamp a generated ref against the generator that writes it: say which command produces the file, in prose, and let a reader re-run it.
 
 **The stamp is a comment block at the top of a ref, and it is the one place a restatement declares what it stands on.** You write one without reading any tool's source:
 
