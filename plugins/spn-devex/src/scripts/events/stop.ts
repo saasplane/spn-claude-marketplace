@@ -34,7 +34,29 @@ import { begin, span, end } from "../lib/timing.ts";
 type Warning = { check: string; message: string };
 
 const HANDOVER_FIELDS = ["workstream", "arc", "model", "read first", "state", "done when", "do not touch", "open"];
-const DONE_MARKS = ["✅", "↷", "⊘", "landed", "carried", "deferred"];
+// A GLYPH IS UNAMBIGUOUS AND A WORD IS NOT, so the two are read differently.
+//
+// `landed`, `carried` and `deferred` are ordinary English. Read against a whole row joined into one
+// string, a step counted its own DESCRIPTION as its marker: thirteen rows in `008-plain-language`
+// say one of those words in their prose, and `N90` step 3 — *spot-check the claimed-LANDED steps
+// rather than trusting them* — reported as done because it is a step ABOUT landed steps. That is the
+// direction that hides work, so the count it feeds is an undercount and nothing in the tables can
+// fix it.
+//
+// So a word counts only where a marker is WRITTEN — as a cell's whole content, or at its start so a
+// date or a commit may follow — and a glyph counts anywhere in the row, which is where the corpus
+// puts it (`| 4 | ✅ **done 2026-09-23** — …`).
+const DONE_GLYPHS = ["✅", "↷", "⊘"];
+const DONE_WORDS = ["landed", "carried", "deferred"];
+
+/** Whether a step row carries a done-mark, as opposed to merely naming one. */
+function isDone(cells: string[]): boolean {
+  if (cells.some((c) => DONE_GLYPHS.some((g) => c.includes(g)))) return true;
+  return cells.some((c) => {
+    const bare = c.replace(/[*_`~]/g, "").trim().toLowerCase();
+    return DONE_WORDS.some((w) => bare === w || bare.startsWith(`${w} `));
+  });
+}
 
 function read(p: string): string {
   try { return readFileSync(p, "utf8"); } catch { return ""; }
@@ -117,8 +139,7 @@ function unfinishedSteps(arc: string): string[] | null {
     if (/^\s*\|[\s:|-]+\|\s*$/.test(l)) continue;
     const cells = l.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map((c) => c.trim());
     if (!/^\d+[a-z]?$/i.test(cells[0])) continue;  // the header, or a field row. `0b` is a step too.
-    const row = cells.join(" ");
-    if (!DONE_MARKS.some((m) => row.includes(m))) out.push(`step ${cells[0]} — ${cells[1].slice(0, 70)}`);
+    if (!isDone(cells)) out.push(`step ${cells[0]} — ${cells[1].slice(0, 70)}`);
   }
   return out;
 }

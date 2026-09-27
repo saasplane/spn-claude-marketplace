@@ -166,6 +166,35 @@ one("an unlanded step with no card at all",
   runningWorkspace("stop-f16-none", ""),
   "warns", { says: "no card is open", parity: false, why: "F11 — the Python listed arcs as `arc-*` only" });
 
+// N90 STEP 6 — A MARK WORD IN A ROW'S PROSE IS NOT A MARKER.
+//
+// `DONE_MARKS` was read against the whole row joined into one string, and three of its six entries
+// are ordinary English. So a step DESCRIBING landed work counted as landed work. Measured over
+// `008-plain-language`: thirteen rows, `N90`'s own step 3 among them — *spot-check the claimed-LANDED
+// steps rather than trusting them* — reported done because the sentence contains `landed`.
+//
+// BOTH DIRECTIONS ARE PROVEN HERE, because only the pair distinguishes the fix from deleting the
+// words: a row that merely mentions landing is still open, and a cell that IS the word still counts.
+const PROSE_MENTIONS_MARK = RUNNING.replace(
+  "| 2 | another thing | here | ☐ raised |",
+  "| 2 | the gate that `N2` records as landed, and is not | here | ☐ raised |");
+one("a step whose own prose says `landed` is still an open step",
+  workspace("stop-n90-word-in-prose", {
+    ".spndevex/workstreams/open/001-a-subject/a-subject-approach.html": page({ names: ["N1-a-subject.md"] }),
+    ".spndevex/workstreams/open/001-a-subject/arcs/N1-a-subject.md": PROSE_MENTIONS_MARK,
+  }),
+  "warns", { says: "no card is open", parity: false, why: "N90 step 6 — the reader could not tell a marker from a word" });
+
+const WORD_AS_CELL = RUNNING.replace(
+  "| 2 | another thing | here | ☐ raised |",
+  "| 2 | another thing | here | landed 2026-09-27, `abc1234` |");
+one("a state cell reading `landed` with a date still counts as done",
+  workspace("stop-n90-word-as-cell", {
+    ".spndevex/workstreams/open/001-a-subject/a-subject-approach.html": page({ names: ["N1-a-subject.md"] }),
+    ".spndevex/workstreams/open/001-a-subject/arcs/N1-a-subject.md": WORD_AS_CELL,
+  }),
+  "silent", { parity: false, why: "N90 step 6 — the fix bounds where a word is read, it does not drop the word" });
+
 console.log("\n=== runnable — N39 step 8: which arc is being executed is a fact, not a status word");
 
 // MEASURED 2026-09-23 OVER WORKSTREAM `008`: exactly ONE arc of 57 carries the word `RUNNING`, and
