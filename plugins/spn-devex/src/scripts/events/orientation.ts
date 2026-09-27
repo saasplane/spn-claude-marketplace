@@ -405,8 +405,18 @@ export function cacheState(root: string, pluginNames: string[]): string {
   const stale: string[] = [];
   for (const [market, source] of pairs) {
     if (!source || !isDir(source)) return "cache unknown";
+    // THE MANIFEST SAYS WHERE A PLUGIN'S BYTES ARE, AND GUESSING THE LAYOUT IS WHAT BROKE THIS.
+    // `marketplace.json` declares `./plugins/<name>/src`, and this compared the cache against
+    // `plugins/<name>` — a folder holding `src/` AND `tests/`, which the cache never contains. The
+    // two could not match, so every run reported all three plugins stale whatever their real state,
+    // and a stop hook told each sitting to reinstall work that was already installed. A check that
+    // is always red is read as noise and then obeyed anyway. Read the declared source instead.
+    const declared: Record<string, string> = {};
+    for (const entry of ((readJson(join(source, ".claude-plugin", "marketplace.json")) ?? {}).plugins ?? []))
+      if (entry?.name && typeof entry.source === "string") declared[entry.name] = entry.source;
+
     for (const plugin of pluginNames) {
-      const live = join(source, "plugins", plugin);
+      const live = join(source, declared[plugin] ?? join("plugins", plugin));
       const cached = join(homedir(), ".claude", "plugins", "cache", market, plugin);
       const versions = listdir(cached).filter((v) => !isFile(join(cached, v, ".orphaned_at")));
       if (!isDir(live) || !versions.length) return "cache unknown";
