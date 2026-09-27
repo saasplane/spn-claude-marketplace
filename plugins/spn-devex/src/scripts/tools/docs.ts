@@ -11,9 +11,9 @@
 //   node docs.ts audit <path…>          the invariants a page must hold
 //   node docs.ts face <docs-tree>       write what is generated, between markers
 //   node docs.ts page <seat.md…>        produce each construct page from its seat file
-//   node docs.ts status <seat.md…>      derive the status from Binds and Proof, and refuse a false claim
+//   node docs.ts status <seat.md…>      roll the behaviour rows at a construct's own path up into its status
 //   node docs.ts topics <repo…>         refuse a numbered topic the constructs seat does not name, and two documents under one id
-//   node docs.ts coverage <repo…>       every construct a chapter, every chapter a construct, every package a construct
+//   node docs.ts coverage <repo…>       the set checks — the two seats pair, a chapter folder names a package, a Who names a persona
 //   node docs.ts figures check|colour   labels fit and connectors join · a block's colouring matches its text
 //   node docs.ts audit --report <repo>  the gap scan, to stdout — add --json for the agent, never a file
 //
@@ -65,10 +65,15 @@ const STATUS_WORD: Record<string, string> = { PLANNING: "PLANNING", IMPLEMENTING
 /**
  * The fixed outlines. A construct is six sections in one order — Terms first, because the model uses
  * those words; Boundary after the parts, because an edge can be judged only once the shape is seen
- * (workstream 008, N13, 2026-09-21). Relations is gone: `dependsOn` in the block carries it. An
- * approach's Terms is its only optional section.
+ * (workstream 008, N13, 2026-09-21). Relations is gone: `dependsOn` in the block carries it.
+ *
+ * `order` IS THE ONLY PLACE THE SEQUENCE IS WRITTEN, and `optional` names which of those sections a
+ * page may leave out. Required is derived from the two. The pair used to be `required` and
+ * `optional` as separate lists, which meant the order of an optional section was declared nowhere —
+ * the order check read every optional name as coming first, so a page carrying `Binds` last was
+ * judged out of order by an outline that had no opinion about where `Binds` went.
  */
-const OUTLINE: Partial<Record<Variant, { required: string[]; optional: string[] }>> = {
+const OUTLINE: Partial<Record<Variant, { order: string[]; optional: string[] }>> = {
   construct: {
     // OVERVIEW COMES FIRST, AND IT WAS OPTIONAL FOR ONE SITTING (N67). It answers WHY the construct
     // exists; Model answers WHAT it is, and Parts carries the detail of that what. Terms sits
@@ -80,11 +85,18 @@ const OUTLINE: Partial<Record<Variant, { required: string[]; optional: string[] 
     // Require it first and it refuses every page that has not moved yet. **Optional is the state
     // where both pass**, so the corpus moves a slice at a time and the word becomes required the day
     // the last slice lands. 117 constructs crossed on 2026-09-24 that way.
-    required: ["Overview", "Terms", "Model", "Parts", "Boundary", "Binds", "Proof"],
-    optional: [],
+    //
+    // `BINDS` AND `PROOF` ARE OPTIONAL BECAUSE THE CORPUS CROSSES IN TWO STEPS. Decision `E` takes
+    // the realization table out of `Binds` and takes `Proof` off the construct altogether: a
+    // construct states the model, and what proves it is rolled up from the behaviour rows at its own
+    // path. The tool agrees with that shape from today; the sweep that edits the 122 pages is its own
+    // arc. Optional is the one state where both shapes pass — required refuses every swept page, and
+    // absent refuses every page not yet swept. They leave this list the day the sweep lands.
+    order: ["Overview", "Terms", "Model", "Parts", "Boundary", "Binds", "Proof"],
+    optional: ["Binds", "Proof"],
   },
   approach: {
-    required: ["Why", "What", "How", "Open", "Deferred"],
+    order: ["Terms", "Why", "What", "How", "Open", "Deferred"],
     optional: ["Terms"],
   },
 };
@@ -195,10 +207,17 @@ function checkBlock(file: string, src: string, block: any, err: string | null): 
   if (/\/artifacts\/resources\//.test(file.replace(/\\/g, "/")))
     add("RULE", "the pocket holds `overviews/`, `constructs/` and `reports/` — a fact a seat needs lives in a seat, never in `resources/`");
 
-  // An overview describes; it has no status. Every other page kind carries one.
+  // An overview describes, and a FOUNDATION construct states a standard; neither carries a status.
+  // Every other page kind carries one. `carriesStatus` states why, in one place.
+  //
+  // A FOUNDATION CONSTRUCT STILL CARRYING THE WORD IS `docs.ts status`'s FINDING, NOT THIS ONE. That
+  // command derives the status and strips it where nothing is derived, so it both reports the fault
+  // and fixes it, and it names all 51 of the book's constructs in one run. Reporting it here as well
+  // put 204 findings on the foundation — the same fault twice per page, from the block and from the
+  // header it renders — where there had been one, and a count that size is a count nobody reads.
   if (variant === "overview") {
     if ("status" in block) add("RULE", "an overview carries no `status` — a face is either current or a defect");
-  } else if (!(block.status in STATUS_WORD)) {
+  } else if (carriesStatus(file, block) && !(block.status in STATUS_WORD)) {
     add("RULE", "`status` must be PLANNING · IMPLEMENTING · DONE");
   }
 
@@ -231,16 +250,16 @@ function checkOutline(file: string, src: string, block: any): Finding[] {
     return f;
   }
 
-  const want = spec.required;
-  const seen = got.filter((g) => want.includes(g) || spec.optional.includes(g));
+  const want = spec.order.filter((w) => !spec.optional.includes(w));
+  const seen = got.filter((g) => spec.order.includes(g));
   const missing = want.filter((w) => !got.includes(w));
-  const extra = got.filter((g) => !want.includes(g) && !spec.optional.includes(g));
+  const extra = got.filter((g) => !spec.order.includes(g));
 
   if (missing.length) f.push({ check: "outline", grade: "RULE", file, message: `missing section${missing.length > 1 ? "s" : ""}: ${missing.join(" · ")}` });
   if (extra.length) f.push({ check: "outline", grade: "RULE", file, message: `section${extra.length > 1 ? "s" : ""} the ${variant} outline does not have: ${extra.join(" · ")}` });
 
   // Order, over the sections that belong — a swapped pair is the fault this catches.
-  const order = [...spec.optional, ...want];
+  const order = spec.order;
   const ranked = seen.map((s) => order.indexOf(s));
   for (let i = 1; i < ranked.length; i++) {
     if (ranked[i] < ranked[i - 1]) {
@@ -274,10 +293,17 @@ function tagStatus(status: string): string {
   return `${icon[status] ?? "🔮"} ${STATUS_WORD[status] ?? "PLANNING"}`;
 }
 
-/** The tag line a document's block renders to, in the fixed order. */
-function tagLine(block: any): string {
+/**
+ * The tag line a document's block renders to, in the fixed order.
+ *
+ * The status chip is left off where the block carries no status, which is a face and a FOUNDATION
+ * repository's construct. Rendering `Status: 🔮 PLANNING` from an absent field is how a page comes to
+ * claim a proof state its own rows never mention.
+ */
+function tagLine(file: string, block: any): string {
   const actors = (block.lenses ?? []).map((l: string) => LENS_LABEL[l]).filter(Boolean).join(" · ");
-  return `\`For: ${actors}\` · \`Status: ${tagStatus(block.status)}\``;
+  const forPart = `\`For: ${actors}\``;
+  return carriesStatus(file, block) ? `${forPart} · \`Status: ${tagStatus(block.status)}\`` : forPart;
 }
 
 /**
@@ -292,15 +318,22 @@ function writeTagLines(tree: string, write: boolean): { touched: string[]; findi
   for (const file of walkFiles(tree, (p) => p.endsWith(".md"))) {
     const before = readFileSync(file, "utf8");
     const { block } = readBlock(before);
-    if (!block || !block.lenses?.length || !(block.status in STATUS_WORD)) continue;
-    const want = tagLine(block);
+    if (!block || !block.lenses?.length) continue;
+    // A STATUSLESS BLOCK IS STILL RENDERED, and skipping it left the old chip standing forever. The
+    // guard used to require a status word, so a face or a FOUNDATION construct fell through here and
+    // kept whatever word a person had typed, with nothing able to remove it.
+    if (carriesStatus(file, block) && !(block.status in STATUS_WORD)) continue;
+    const want = tagLine(file, block);
     const bare = outsideFences(before);
     // A CHIP AFTER STATUS IS THE AUTHOR'S AND IS KEPT. The pattern used to end at the Status
     // chip, so a capability chapter's `· `Realizes: …`` made it miss its own tag line and fall
     // through to *there is no tag line* — writing a second one under the title, in every chapter
     // of the corpus. The audit could not see it either, because it reads the first match.
     // `For` and `Status` are rendered from the block; anything after them is carried across.
-    const TAG = /^`(?:For|Lenses):[^`\n]*`[ \t]*·[ \t]*`Status:[^`\n]*`((?:[ \t]*·[ \t]*`[^`\n]*`)*)[ \t]*$/m;
+    // THE STATUS CHIP IS OPTIONAL IN THE PATTERN TOO. A face and a FOUNDATION construct render
+    // `For: …` alone, so a pattern demanding `Status:` matched nothing on them and the fallback
+    // wrote a SECOND tag line under the title.
+    const TAG = /^`(?:For|Lenses):[^`\n]*`(?:[ \t]*·[ \t]*`Status:[^`\n]*`)?((?:[ \t]*·[ \t]*`[^`\n]*`)*)[ \t]*$/m;
 
     let after: string;
     const at = bare.match(TAG);
@@ -332,8 +365,9 @@ function checkSeatHeader(file: string, src: string, block: any): Finding[] {
   if (h1.length !== 1) add("RULE", `${h1.length} \`#\` title${h1.length === 1 ? "" : "s"}; a document has exactly one`);
   else if (h1[0] !== plain(block.title)) add("RULE", `the title \`${h1[0]}\` is not the block's \`${block.title}\``);
 
-  const rule = bare.match(/^`For:\s*([^`]*)`\s*·\s*`Status:\s*([^`]*)`/m);
-  if (!rule) { add("RULE", "no `For: … · Status: …` line — every seat file carries one under its title, rendered from its block"); return f; }
+  const wantsStatus = carriesStatus(file, block);
+  const rule = bare.match(/^`For:\s*([^`]*)`(?:\s*·\s*`Status:\s*([^`]*)`)?/m);
+  if (!rule) { add("RULE", "no `For: …` line — every seat file carries one under its title, rendered from its block"); return f; }
 
   const want = (block.lenses ?? []).map((l: string) => LENS_LABEL[l]).filter(Boolean);
   const got = rule[1].split("·").map((x) => x.trim()).filter(Boolean);
@@ -342,8 +376,17 @@ function checkSeatHeader(file: string, src: string, block: any): Finding[] {
   if (missing.length) add("RULE", `the lens line does not carry ${missing.join(" · ")}, which the block declares`);
   if (extra.length) add("RULE", `the lens line carries ${extra.join(" · ")}, which the block does not declare`);
 
-  if (rule[2].trim() !== tagStatus(block.status))
+  // A CHIP THE BLOCK DOES NOT DECLARE IS A PAGE NOBODY RE-RENDERED, and that is this check's fault to
+  // report. A chip that agrees with a block still carrying the word is the block's fault, and
+  // `docs.ts status` names it — saying it twice reported one fault as two on every page in the book.
+  if (!wantsStatus) {
+    if (rule[2] !== undefined && !("status" in block))
+      add("RULE", `the status chip reads \`${rule[2].trim()}\` and the block declares no status — render the tag line from the block again`);
+  } else if (rule[2] === undefined) {
+    add("RULE", "no `Status: …` chip on the tag line; every page but a face and a FOUNDATION construct carries one");
+  } else if (rule[2].trim() !== tagStatus(block.status)) {
     add("RULE", `the status chip reads \`${rule[2].trim()}\`; the block says \`${block.status}\``);
+  }
   return f;
 }
 
@@ -398,10 +441,12 @@ function checkHeader(file: string, src: string, block: any): Finding[] {
     add("RULE", `For reads \`${chips.join(" · ")}\`; the block's lenses render as \`${wantChips.join(" · ")}\``);
   if (/\bLenses:/.test(h)) add("RULE", "the tag line reads `For:`, never `Lenses:`");
 
-  // Status: the chip carries the enum word; an overview has no chip at all.
+  // Status: the chip carries the enum word; a face and a FOUNDATION construct have no chip at all.
   const statusChip = h.match(/class="badge status[^"]*"[^>]*>([\s\S]*?)<\/span>/);
-  if (block.variant === "overview") {
-    if (statusChip) add("RULE", "an overview shows no status chip");
+  if (!carriesStatus(file, block)) {
+    if (statusChip && (block.variant === "overview" || !("status" in block)))
+      add("RULE", block.variant === "overview" ? "an overview shows no status chip"
+        : "a status chip is here and the block declares no status — produce the page again from its seat file");
   } else if (!statusChip) {
     add("RULE", "no Status chip");
   } else if (!text(statusChip[1]).includes(STATUS_WORD[block.status])) {
@@ -745,6 +790,35 @@ function repoOf(file: string): string | null {
 }
 
 /**
+ * The world a repository declares in its `sprepo.json` — FOUNDATION · APPS · INFRA · GENERAL.
+ *
+ * Null where nothing declares one, which is what a fixture directory looks like. A caller reading
+ * null judges the file as an ordinary repository's, because a missing declaration is another check's
+ * finding and never a reason for this one to change its answer.
+ */
+function worldOf(file: string): string | null {
+  const repo = repoOf(file);
+  if (!repo) return null;
+  try { return JSON.parse(readFileSync(join(repo, "sprepo.json"), "utf8")).type ?? null; }
+  catch { return null; }
+}
+
+/**
+ * Whether this document's block carries a `status` at all.
+ *
+ * TWO KINDS CARRY NONE, and the reason is the same one twice. An overview describes, so a face is
+ * either current or a defect. A FOUNDATION repository's construct states a standard, and its
+ * behaviour rows are `PROMISE` — five columns, no `Status` and no `Tier` — so there is no run to roll
+ * up and no proof state to name. A word written there would be a claim somebody typed once, which is
+ * exactly what `05-artifacts.md` § *A construct's status is derived, never typed* forbids.
+ */
+function carriesStatus(file: string, block: any): boolean {
+  if (block?.variant === "overview") return false;
+  if (block?.variant === "construct" && worldOf(file) === "FOUNDATION") return false;
+  return true;
+}
+
+/**
  * A `Governs` cell in a generated Map names a folder that exists.
  *
  * NOTHING PROVED A MAP CELL, AND THE AUDIT READ CLEAN OVER SEVENTEEN FOLDERS THAT WERE NOT THERE.
@@ -826,51 +900,6 @@ function checkProof(file: string, src: string): Finding[] {
   return f;
 }
 
-/** Every `where it lives today` row resolves to a real node — Q86's gate. */
-function nodeIndex(workspace: string): Set<string> {
-  const names = new Set<string>();
-  const walk = (dir: string, depth: number) => {
-    if (depth > 4) return;
-    let entries: string[];
-    try { entries = readdirSync(dir); } catch { return; }
-    for (const e of entries) {
-      if (e === "node_modules" || e === ".git" || e === "dist" || e === ".nx") continue;
-      if (e.startsWith(".") && e !== ".claude-plugin") continue;
-      const p = join(dir, e);
-      let st; try { st = statSync(p); } catch { continue; }
-      if (st.isDirectory()) { walk(p, depth + 1); continue; }
-      // A plugin is a realization with no manifest of its own, so the marketplace's own
-      // declaration is read beside the four manifests. Without this, a construct realized by a
-      // plugin cannot resolve, and the marketplace repository declares no `sprepo.json` at all.
-      if (e === "marketplace.json") {
-        try {
-          const j = JSON.parse(readFileSync(p, "utf8"));
-          for (const pl of j.plugins ?? []) if (typeof pl?.name === "string") names.add(pl.name.toLowerCase());
-        } catch { /* another check's finding */ }
-        continue;
-      }
-      if (!["sprepo.json", "spkind.json", "spinfrapkg.json", "spestate.json"].includes(e)) continue;
-      try {
-        const j = JSON.parse(readFileSync(p, "utf8"));
-        for (const v of [j.name, j.code, j?.config?.name, basename(dirname(p))]) if (typeof v === "string" && v) names.add(v.toLowerCase());
-        // A GENERAL REPOSITORY HAS NO NODES, so a construct there is realized by a FOLDER. Its
-        // top-level source folders are indexed as realizations, because otherwise invariant 6 —
-        // every construct has at least one realization row — could never be satisfied in a
-        // repository the standard deliberately allows to have no nodes at all (`Q107`).
-        if (e === "sprepo.json" && j?.type === "GENERAL") {
-          const root = dirname(p);
-          for (const entry of readdirSync(root)) {
-            if (entry.startsWith(".") || ["docs", "node_modules", "dist"].includes(entry)) continue;
-            try { if (statSync(join(root, entry)).isDirectory()) names.add(entry.toLowerCase()); } catch { /* unreadable */ }
-          }
-        }
-      } catch { /* a manifest that does not parse is another check's finding */ }
-    }
-  };
-  walk(workspace, 0);
-  return names;
-}
-
 /**
  * Where a named section starts, in the spelling the file uses.
  *
@@ -916,7 +945,20 @@ function tablesIn(file: string, seg: string): string[][][] {
   return out;
 }
 
-function checkBinds(file: string, src: string, block: any, nodes: Set<string>): Finding[] {
+/**
+ * `Binds` carries the rules that hold a construct, and — while the corpus crosses — where it lives today.
+ *
+ * THE `NODE` CELL IS NO LONGER RESOLVED, and the resolver it used went with decision `E`. It matched a
+ * declared name anywhere inside the cell, or the cell anywhere inside a declared name, so
+ * `docs/…/10-providers` resolved through `support` and *the estate declaration* through `estate` — loose
+ * in the dangerous direction, because a cell that resolves to the wrong node reads as checked. `E`
+ * removes the table the cell sits in, and the four set checks in `docs.ts coverage` compare whole paths.
+ *
+ * ONE TABLE OR TWO, BOTH PASS. `E` leaves the rules table alone and takes the realization table out, and
+ * the sweep that edits the 122 pages is a separate arc. Demanding two refuses every swept page; so the
+ * count is judged only when a second table is there to judge.
+ */
+function checkBinds(file: string, src: string, block: any): Finding[] {
   const f: Finding[] = [];
   if (block?.variant !== "construct") return f;
   const i = sectionAt(file, src, "Binds");
@@ -924,38 +966,17 @@ function checkBinds(file: string, src: string, block: any, nodes: Set<string>): 
   if (i < 0) return f;
   const seg = src.slice(i, j > i ? j : undefined);
   const tables = tablesIn(file, seg);
-  if (tables.length < 2) {
-    f.push({ check: "binds", grade: "RULE", file, message: `Binds carries ${tables.length} table${tables.length === 1 ? "" : "s"}; it is two — the rules that hold it, and where it lives today` });
+  if (!tables.length) {
+    f.push({ check: "binds", grade: "RULE", file, message: "Binds carries no table; it carries the rules that hold this construct" });
     return f;
   }
+  // The realization table is the second one, and its rows are four cells — `Repo · Node · What it
+  // realizes · State`. One table is the rules alone, which is the shape `E` leaves behind.
+  if (tables.length < 2) return f;
   const rows = tables[tables.length - 1].filter((cells) => cells.length >= 4);
-  if (!rows.length) {
-    f.push({ check: "binds", grade: "RULE", file, message: "the `where it lives today` table has no row; every construct has at least one realization row (invariant 6)" });
-    return f;
-  }
-  const states = rows.map((r) => text(r[3]).toLowerCase());
-  const known = states.filter((s) => /^(planned|partial|done)\b/.test(s));
-  for (const s of states) if (!/^(planned|partial|done)\b/.test(s))
-    f.push({ check: "binds", grade: "SOFT", file, message: `a realization row's state reads \`${s}\`; it is planned · partial · done` });
-
-  // Q86 A — the gate. A construct may not claim IMPLEMENTING or DONE on rows that do not resolve.
-  if (block.status === "IMPLEMENTING" || block.status === "DONE") {
-    for (const r of rows) {
-      const node = text(r[1]);
-      const parts = node.split("·").map((p) => p.trim()).filter(Boolean);
-      for (const p of parts) {
-        const bare = p.replace(/^the\s+/i, "").toLowerCase();
-        if (!bare) continue;
-        if (![...nodes].some((n) => n === bare || n.includes(bare) || bare.includes(n)))
-          f.push({ check: "binds", grade: "RULE", file, message: `\`${block.status}\` is claimed and the \`Node\` cell \`${p}\` resolves to no node, plugin or repository. A command or a house word is none of the three — name the node here and put what it provides in \`what it realizes\` (RD.DOCS.066)` });
-      }
-    }
-    const proofRows = j < 0 ? [] : tablesIn(file, src.slice(j)).flat();
-    if (j < 0 || !proofRows.length)
-      f.push({ check: "binds", grade: "RULE", file, message: `\`${block.status}\` is claimed and \`Proof\` names no command anybody can run` });
-  }
-  if (known.length && known.every((s) => s.startsWith("done")) && block.status !== "DONE")
-    f.push({ check: "binds", grade: "SOFT", file, message: `every realization row is done; the derived status is DONE, and the block says \`${block.status}\`` });
+  for (const state of rows.map((r) => text(r[3]).toLowerCase()))
+    if (!/^(planned|partial|done)\b/.test(state))
+      f.push({ check: "binds", grade: "SOFT", file, message: `a realization row's state reads \`${state}\`; it is planned · partial · done` });
   return f;
 }
 
@@ -1922,53 +1943,97 @@ function face(tree: string, write: boolean): Finding[] {
 // ---------------------------------------------------------------------------- status
 
 /**
- * A construct's status is derived from its own content, never typed: from the *where it lives today*
- * rows in `Binds`, and from `Proof`. `Q86` A then made the derivation a **gate** — it refuses a claim
- * of IMPLEMENTING or DONE whose rows do not resolve, because deriving the badge proves a construct
- * is well-formed and says nothing about whether it is true.
+ * The status a set of behaviour rows rolls up to.
+ *
+ * A construct's status is what the runs say about the behaviours at its own path, and nothing else.
+ * It used to be read from the *where it lives today* rows in `Binds` and from `Proof` — a table
+ * somebody typed about where code sits, which says where the work is rather than whether it works.
+ * Decision `E` moves it to the rows, so the word changes when a run changes and at no other moment.
+ *
+ * `PLANNED` is the author's mark and means nothing has run, so a file of `PLANNED` rows and a file of
+ * no rows roll up the same way. **A file with no rows is honest** where the product is not built:
+ * `spn-launchpad-ts` has two, because Surfaces and Web Shell settle declarations rather than acts.
+ *
+ * `MANUAL` is counted as started and never as proven. It is the one status a run never writes — the
+ * contract says the agent never writes it — so letting it reach `DONE` would put a hand-typed word
+ * back in charge of the badge, which is the thing this derivation exists to remove.
+ *
+ * A `Tier` is required for `DONE` because a proven row with no tier names no rung anybody can re-run.
+ */
+function deriveStatus(rows: BehaviourRow[]): "PLANNING" | "IMPLEMENTING" | "DONE" {
+  const value = (r: BehaviourRow) => r.status.replace(/[`*]/g, "").trim().toUpperCase();
+  const started = rows.filter((r) => ["PENDING", "SUCCESS", "FAILED", "MANUAL"].includes(value(r)));
+  if (!started.length) return "PLANNING";
+  const proven = rows.filter((r) => value(r) === "SUCCESS");
+  const tiered = (r: BehaviourRow) => !["", "—", "-"].includes(r.tier.replace(/[`*]/g, "").trim());
+  if (proven.length === rows.length && proven.every(tiered)) return "DONE";
+  return "IMPLEMENTING";
+}
+
+/**
+ * The behaviours file at a construct's own path, or null.
+ *
+ * `02-constructs/01-iam/04-sign-in.md` is proved by `03-behaviors/01-iam/04-sign-in.md` and by
+ * nothing else. **No fallback.** `registerFor` keeps two, for the Proof join that has to render a
+ * page during a move; a derivation must not, because rolling a domain's whole register up into one
+ * construct stamps every page in the domain with the same word and each one reads as its own claim.
+ * An absent file is what path parity reports, and this returns null rather than guessing.
+ */
+function behavioursFor(seat: string): string | null {
+  const norm = seat.replace(/\\/g, "/");
+  const at = norm.indexOf("/02-constructs/");
+  if (at < 0) return null;
+  const mirrored = `${norm.slice(0, at)}/03-behaviors/${norm.slice(at + "/02-constructs/".length)}`;
+  return existsSync(mirrored) ? mirrored : null;
+}
+
+/**
+ * A construct's status, derived from the behaviour rows at its own path and never typed.
+ *
+ * A FOUNDATION repository's construct derives nothing at all: its rows are `PROMISE`, five columns
+ * with no `Status`, and a promise has no proof state. So the word is REMOVED there rather than
+ * computed — from the block and from the tag line, the two places it renders.
  *
  * It writes the seat file only. The page follows from `docs.ts page`, so there is one writer per file.
  */
-function statusFor(seat: string, workspace: string, nodes: Set<string>, write: boolean): Finding[] {
+function statusFor(seat: string, workspace: string, write: boolean): Finding[] {
   const findings: Finding[] = [];
   const src = readFileSync(seat, "utf8");
   const { block, error } = readBlock(src);
   if (!block) return [{ check: "status", grade: "RULE", file: seat, message: error ?? "no spn:doc block" }];
   if (block.variant !== "construct") return [];
+  const shown = relative(workspace, seat);
 
-  const binds = sectionBody(src, /Binds\b/) ?? "";
-  const proof = sectionBody(src, /Proof\b/) ?? "";
-
-  // The second table of Binds is *where it lives today*. Split on the blank line between them.
-  const tables = binds.split(/\n\s*\n/).filter((t) => /^\s*\|/m.test(t));
-  const rows = tables.length ? mdRows(tables[tables.length - 1]) : [];
-  const states = rows.map((r) => (r[3] ?? "").toLowerCase());
-  const proofRows = mdRows(proof).filter((r) => r[0] && r[0] !== "—");
-
-  let derived: "PLANNING" | "IMPLEMENTING" | "DONE";
-  if (!rows.length || states.every((s) => s.startsWith("planned"))) derived = "PLANNING";
-  else if (states.every((s) => s.startsWith("done")) && proofRows.length) derived = "DONE";
-  else derived = "IMPLEMENTING";
-
-  // The gate. A row resolves when its Node cell names a node, a plugin or a repository.
-  if (derived !== "PLANNING") {
-    for (const r of rows) {
-      const cell = (r[1] ?? "").replace(/`/g, "").trim();
-      if (!cell) continue;
-      const bare = cell.replace(/^the\s+/i, "").toLowerCase();
-      if (![...nodes].some((n) => n === bare || n.includes(bare) || bare.includes(n)))
-        findings.push({ check: "status", grade: "RULE", file: seat,
-          message: `\`${derived}\` is derived and the \`Node\` cell \`${cell}\` resolves to no node, plugin or repository — name the node and put what it provides in \`what it realizes\` (RD.DOCS.066)` });
-    }
-    if (!proofRows.length)
-      findings.push({ check: "status", grade: "RULE", file: seat,
-        message: `\`${derived}\` is derived and \`Proof\` names no command anybody can run (RD.DOCS.066)` });
-  }
-
-  if (findings.some((f) => f.grade === "RULE")) {
-    console.log(`refused  ${relative(workspace, seat)} — ${derived} is claimed and the rows do not carry it`);
+  if (!carriesStatus(seat, block)) {
+    // ONE COMMA GOES WITH THE FIELD, AND WHICH ONE DEPENDS ON WHERE THE FIELD SITS. Taking the
+    // leading comma unconditionally leaves `{ , "title": …` behind when `status` is the first key,
+    // and the block then fails to parse — a page broken by the command that was tidying it.
+    const pair = '"status":\\s*"(?:DONE|IMPLEMENTING|PLANNING)"';
+    const leading = new RegExp(`,\\s*${pair}`);
+    const out = (leading.test(src) ? src.replace(leading, "") : src.replace(new RegExp(`${pair}\\s*,\\s*`), ""))
+      .replace(/(`For:[^`\n]*`)[ \t]*·[ \t]*`Status:[^`\n]*`/u, "$1");
+    if (out === src) { console.log(`current  ${shown} — a FOUNDATION construct states a standard and carries no status`); return findings; }
+    // SOFT while the book's constructs still carry the word. The sweep runs this command in write
+    // mode over the tree; until it does, the finding says what is owed rather than refusing 51 pages.
+    if (write) { writeFileSync(seat, out); console.log(`wrote    ${shown} — status removed; a FOUNDATION construct's rows are \`PROMISE\``); }
+    else findings.push({ check: "status", grade: "SOFT", file: seat,
+      message: "a construct in a FOUNDATION repository carries no `status` — its behaviour rows are `PROMISE` and a promise has no proof state" });
     return findings;
   }
+
+  const behaviours = behavioursFor(seat);
+  if (!behaviours) {
+    // AN ABSENT FILE AND AN EMPTY ONE ARE DIFFERENT ANSWERS. No rows means nothing has run, which
+    // rolls up to PLANNING. No file means the derivation has no input at all, so it claims nothing
+    // and names what is missing — silently stamping PLANNING would read as a measurement.
+    findings.push({ check: "status", grade: "SOFT", file: seat,
+      message: "no behaviours file at this construct's own path, so nothing rolls up — `03-behaviors/` mirrors `02-constructs/` file for file, and `docs.ts coverage` reports the pair" });
+    console.log(`unread   ${shown} — no behaviours file at the mirrored path`);
+    return findings;
+  }
+
+  const rows = behaviourRows(behaviours);
+  const derived = deriveStatus(rows);
 
   // Write the derived word into the block and the tag line. Both, or the page and the block disagree.
   const glyph: Record<string, string> = { DONE: "✅", IMPLEMENTING: "🚧", PLANNING: "🔮" };
@@ -1980,9 +2045,10 @@ function statusFor(seat: string, workspace: string, nodes: Set<string>, write: b
     out = out.replace(/(`Status:\s*)([✅🚧🔮])(\s*)(DONE|IMPLEMENTING|PLANNING)(`)/u,
                       `$1${glyph[derived]}$3${derived}$5`);
   }
-  if (out === src) { console.log(`current  ${relative(workspace, seat)} — ${derived}`); return findings; }
-  if (write) { writeFileSync(seat, out); console.log(`wrote    ${relative(workspace, seat)} — ${block.status} → ${derived}`); }
-  else findings.push({ check: "status", grade: "RULE", file: seat, message: `the block says \`${block.status}\` and the rows derive \`${derived}\`` });
+  const from = relative(workspace, behaviours);
+  if (out === src) { console.log(`current  ${shown} — ${derived} from ${rows.length} row(s) in ${from}`); return findings; }
+  if (write) { writeFileSync(seat, out); console.log(`wrote    ${shown} — ${block.status} → ${derived}, from ${rows.length} row(s) in ${from}`); }
+  else findings.push({ check: "status", grade: "RULE", file: seat, message: `the block says \`${block.status}\` and the ${rows.length} behaviour row(s) in \`${from}\` derive \`${derived}\`` });
   return findings;
 }
 
@@ -2060,7 +2126,7 @@ function registerFor(seat: string): { file: string; exact: boolean } | null {
   return null;
 }
 
-type BehaviourRow = { id: string; does: string; tier: string; status: string };
+type BehaviourRow = { id: string; who: string; does: string; tier: string; status: string };
 
 /**
  * Every behaviour row in a register file, read by COLUMN NAME rather than by position.
@@ -2086,6 +2152,8 @@ function behaviourRows(file: string): BehaviourRow[] {
     if (!/^[A-Z]/.test(id.replace(/[`*]/g, ""))) continue;   // a continuation line, not a row
     out.push({
       id: id.replace(/[`*]/g, ""),
+      // `Who` is the actor the row is written for, and `personaCoverage` joins it to `personas.md`.
+      who: cells[at("who")] ?? cells[at("actor")] ?? "",
       does: cells[at("does")] ?? cells[at("journey")] ?? "",
       tier: cells[at("tier")] ?? "—",
       status: cells[at("status")] ?? "—",
@@ -2355,81 +2423,245 @@ function duplicateIds(repo: string): Finding[] {
   return f;
 }
 
-/** The nodes a construct's Binds table says realize it — the second table, whose first column is the repo. */
-function realizingNodes(seatFile: string): string[] {
-  const binds = sectionBody(readFileSync(seatFile, "utf8"), /Binds\b/);
-  if (binds === null) return [];
-  const out: string[] = [];
-  for (const row of mdRows(binds)) {
-    // The rules table is `Rule | What it decides | Weight`; the placements table is
-    // `Repo | Node | What it realizes | State`. Four cells with a node in the second is the one.
-    if (row.length < 4) continue;
-    const node = (row[1] ?? "").replace(/[`*]/g, "").trim();
-    if (/^[a-z][a-z0-9-]*$/.test(node)) out.push(node);
+/**
+ * The set checks — four questions about whole SETS of paths, rows and packages (decision `E`).
+ *
+ * THEY REPLACE A RESOLVER, AND THE RESOLVER IS WHY THEY ARE SET CHECKS. `Binds`' `Node` cell was
+ * matched against every declared name, accepting a hit anywhere inside either string, so
+ * `docs/…/10-providers` resolved through a node called `support` and *the estate declaration* through
+ * one called `estate`. A cell that resolves to the wrong thing reads as checked, which is the worse
+ * of the two possible errors. Each check below compares whole values: a path to a path, an id to an
+ * id, a folder name to a package name, a persona to a persona.
+ *
+ * **Three are here and one is not.** Id coverage — every behaviour id cited by a case, and every
+ * cited id declared as a row — is already built, in both directions, in the CLI's own
+ * `behaviours-join.ts` under `RD.APPS.084`, and `spnutils apps validate repo` reports it. Building a
+ * second one here would be the divergence that file's own header describes: two implementations of
+ * one idea, disagreeing about the same estate.
+ *
+ * **A check that cannot run says so.** An absent scan and an absent finding must never share a
+ * verdict, so a seat with no ids and a seat with no `personas.md` are each reported by name with the
+ * reason, rather than counted clean.
+ *
+ * **Every one of them ships SOFT.** An agent once read a rule off a buggy check and renamed a page to
+ * satisfy it; a check firing over a whole corpus on day one is read as noise and then obeyed anyway.
+ */
+
+/** A seat file that is neither a face nor the personas table — the files the seats mirror. */
+const isTopicFile = (p: string) => {
+  const name = basename(p);
+  return name !== "README.md" && name !== "personas.md";
+};
+
+/** Every topic file under a seat, as paths relative to that seat. */
+function topicPaths(seat: string): string[] {
+  if (!existsSync(seat)) return [];
+  return walkFiles(seat, (p) => p.endsWith(".md") && isTopicFile(p))
+    .map((p) => relative(seat, p).replace(/\\/g, "/")).sort();
+}
+
+/**
+ * `03-behaviors/` mirrors `02-constructs/` file for file, both ways.
+ *
+ * **PATHS, NEVER ROWS.** A behaviours file with no rows in it is honest wherever the product is not
+ * built — `spn-launchpad-ts` has two, because Surfaces and Web Shell settle declarations rather than
+ * acts — so a check that demanded a row per file would fail truthfully empty files on day one. What
+ * the pairing promises is that one number names one thing in both seats, and that is a question about
+ * file paths alone.
+ */
+function pathParity(repo: string): Finding[] {
+  const f: Finding[] = [];
+  const constructs = join(repo, "docs", "02-constructs");
+  const behaviors = join(repo, "docs", "03-behaviors");
+  if (!existsSync(constructs)) return f;
+  if (!existsSync(behaviors)) {
+    f.push({ check: "parity", grade: "SOFT", file: constructs,
+      message: "the constructs seat is here and `03-behaviors/` is not, so nothing was compared — the two seats mirror each other file for file" });
+    return f;
+  }
+  const here = topicPaths(constructs);
+  const there = topicPaths(behaviors);
+  for (const p of here) if (!there.includes(p))
+    f.push({ check: "parity", grade: "SOFT", file: join(constructs, p),
+      message: `no \`03-behaviors/${p}\` — a construct's rows sit at the construct's own path, and a status is rolled up from them` });
+  for (const p of there) if (!here.includes(p))
+    f.push({ check: "parity", grade: "SOFT", file: join(behaviors, p),
+      message: `no \`02-constructs/${p}\` — these rows prove a construct nothing declares` });
+  return f;
+}
+
+/**
+ * Every package folder of a repository, by the manifest that declares it.
+ *
+ * A MANIFEST SITS TWO LEVELS DOWN AND NO DEEPER. `apps/utility-ts/spkind.json` declares a package;
+ * `apps/service-sample-ts/src/modules/order/spkind.json` declares a module inside one, and a fixture
+ * estate under `tests/` declares nothing about this repository at all. Walking every manifest indexed
+ * all three as packages, so a capability folder that had to exist for a test fixture would have
+ * counted as owed.
+ *
+ * A plugin is a package with no manifest of its own, so the marketplace's own declaration is read
+ * beside the two — otherwise every plugin's chapters would read as mirroring nothing.
+ */
+function packageIndex(repo: string): Set<string> {
+  const names = new Set<string>();
+  for (const group of existsSync(repo) ? readdirSync(repo) : []) {
+    const dir = join(repo, group);
+    if (group.startsWith(".") || group === "node_modules" || group === "docs") continue;
+    let st; try { st = statSync(dir); } catch { continue; }
+    if (!st.isDirectory()) continue;
+    for (const entry of readdirSync(dir)) {
+      const at = join(dir, entry);
+      try { if (!statSync(at).isDirectory()) continue; } catch { continue; }
+      if (["spkind.json", "spinfrapkg.json", "spestate.json"].some((m) => existsSync(join(at, m)))) names.add(entry);
+    }
+  }
+  const marketplace = join(repo, ".claude-plugin", "marketplace.json");
+  if (existsSync(marketplace)) {
+    try {
+      const j = JSON.parse(readFileSync(marketplace, "utf8"));
+      for (const pl of j.plugins ?? []) if (typeof pl?.name === "string") names.add(pl.name);
+    } catch { /* a manifest that does not parse is another check's finding */ }
+  }
+  return names;
+}
+
+/**
+ * `04-capabilities/<domain>/<package>/` names a real package, and every real package has one.
+ *
+ * IT COMPARES FOLDERS TO PACKAGES, and it used to compare `Binds` rows to folders. `E` takes the
+ * realization table away, so the claim *this node realizes this construct* is no longer written down
+ * anywhere — and it does not need to be. The folder IS the claim: a chapter sits inside the package
+ * it describes, so the seat and the code are the same shape or they are not.
+ *
+ * A BOOK MIRRORS NO PACKAGES. The foundation's capabilities seat is the STANDARD per topic, authored
+ * rather than derived, and its folders are areas rather than packages. Judging it this way reported
+ * 129 correct constructs as uncovered.
+ */
+function capabilityMirror(repo: string, workspace: string): Finding[] {
+  const f: Finding[] = [];
+  const caps = join(repo, "docs", "04-capabilities");
+  if (!existsSync(caps)) return f;
+  if (worldOf(caps) === "FOUNDATION") return f;
+
+  const packages = packageIndex(repo);
+  if (!packages.size) {
+    f.push({ check: "mirror", grade: "SOFT", file: caps,
+      message: "nothing in this repository declares a package, so the capabilities seat was compared against nothing — a chapter mirrors the package it describes" });
+    return f;
+  }
+
+  const mirrored = new Set<string>();
+  for (const domain of readdirSync(caps)) {
+    const domainDir = join(caps, domain);
+    try { if (!statSync(domainDir).isDirectory()) continue; } catch { continue; }
+    for (const entry of readdirSync(domainDir)) {
+      const at = join(domainDir, entry);
+      try { if (!statSync(at).isDirectory()) continue; } catch { continue; }
+      if (packages.has(entry)) { mirrored.add(entry); continue; }
+      f.push({ check: "mirror", grade: "SOFT", file: at,
+        message: `\`${entry}\` is a folder of the capabilities seat and no package of this repository is called that — a chapter sits inside the package it describes (Q130)` });
+    }
+  }
+  for (const name of [...packages].sort())
+    if (!mirrored.has(name))
+      f.push({ check: "mirror", grade: "SOFT", file: caps,
+        message: `\`${name}\` declares itself a package and \`04-capabilities/\` carries no folder for it — either it realizes a construct nobody wrote down, or it is a package nobody documented (${relative(workspace, repo)})` });
+  return f;
+}
+
+/**
+ * A persona as the join compares it — the actor, with the article and the formatting off.
+ *
+ * `Service app` in the personas table and `a service app` in a `Who` cell are the same person, and
+ * the two repositories that write them differently are each internally consistent. So a leading
+ * article comes off, the formatting comes off, and the rest must match WHOLE. **No substring**: that
+ * looseness is exactly what the retired `Node` resolver did, and a `Who` of *a module* would have
+ * matched a persona called *a module service* without anybody being told.
+ */
+function personaKey(value: string): string {
+  return value.replace(/[`*]/g, "").replace(/^(?:a|an|the)\s+/i, "").replace(/\s+/g, " ").trim().toLowerCase();
+}
+
+/** Every actor the personas table names, keyed for comparison, with the spelling it used. */
+function personasIn(file: string): Map<string, string> {
+  const out = new Map<string, string>();
+  let head: string[] | null = null;
+  for (const raw of outsideFences(readFileSync(file, "utf8")).split("\n")) {
+    const t = raw.trim();
+    if (!(t.startsWith("|") && t.endsWith("|") && t.length > 2)) { head = null; continue; }
+    const cells = t.slice(1, -1).split("|").map((c) => c.trim());
+    if (/^[\s:|-]*$/.test(cells.join(""))) continue;
+    if (!head) { head = cells.map((c) => c.toLowerCase()); continue; }
+    // THE TABLE IS FOUND BY ITS OWN FIRST COLUMN. A personas page also carries explanatory tables,
+    // and reading every table's first cell as an actor indexed prose as people.
+    if (head[0] !== "actor" && head[0] !== "persona") continue;
+    const shown = cells[0].replace(/[`*]/g, "").trim();
+    if (shown) out.set(personaKey(shown), shown);
   }
   return out;
 }
 
 /**
- * The three halves of *the capabilities seat mirrors the code*, checked together.
+ * Every `Who` resolves to the personas table, and every persona is named by a row.
  *
- * They are one check because each alone is satisfiable by doing nothing. A check that every chapter
- * names a construct passes on an empty seat; a check that every construct has a chapter passes on a
+ * The rule is `02-document.md`'s — *every `Who` resolves to one personas table, in the behaviors
+ * seat's face, and a persona is invented nowhere else*. It is anchored to the CELL, so a seat whose
+ * rows carry no `Who` owes no personas table: `spn-infra` and `spn-support-infra` write their rows as
+ * `Observably · Where · Because`, with neither an id nor an actor, and there is nothing to compare.
+ *
+ * Both directions, because each is invisible to the other. A `Who` nobody declared is a person
+ * invented in a row; a persona no row names is a person the seat promises nothing to.
+ */
+function personaCoverage(repo: string): Finding[] {
+  const f: Finding[] = [];
+  const behaviors = join(repo, "docs", "03-behaviors");
+  if (!existsSync(behaviors)) return f;
+
+  const used = new Map<string, { shown: string; file: string }>();
+  for (const file of walkFiles(behaviors, (p) => p.endsWith(".md") && isTopicFile(p))) {
+    for (const who of behaviourRows(file).map((r) => r.who)) {
+      const key = personaKey(who);
+      if (key && !used.has(key)) used.set(key, { shown: who.replace(/[`*]/g, "").trim(), file });
+    }
+  }
+
+  const table = join(behaviors, "personas.md");
+  if (!existsSync(table)) {
+    if (used.size)
+      f.push({ check: "personas", grade: "SOFT", file: behaviors,
+        message: `${used.size} \`Who\` cell${used.size > 1 ? "s" : ""} name a person and there is no \`personas.md\` beside the rows — every \`Who\` resolves to one personas table, in the behaviors seat's face (02-document.md)` });
+    else
+      f.push({ check: "personas", grade: "SOFT", file: behaviors,
+        message: "no `personas.md` and no row carrying a `Who`, so nothing was compared — this seat's rows are written without an actor" });
+    return f;
+  }
+
+  const declared = personasIn(table);
+  if (!declared.size) {
+    f.push({ check: "personas", grade: "SOFT", file: table,
+      message: "`personas.md` is here and its table declares no actor, so nothing was compared — the first column is `Actor`" });
+    return f;
+  }
+  for (const [key, { shown, file }] of used)
+    if (!declared.has(key))
+      f.push({ check: "personas", grade: "SOFT", file,
+        message: `\`${shown}\` is a \`Who\` and \`personas.md\` declares no such actor — a persona is invented nowhere else (02-document.md)` });
+  for (const [key, shown] of declared)
+    if (!used.has(key))
+      f.push({ check: "personas", grade: "SOFT", file: table,
+        message: `\`${shown}\` is declared as a persona and no behaviour row names it — a persona is somebody the rows promise an outcome` });
+  return f;
+}
+
+/**
+ * The three halves of *the capabilities seat mirrors the code*, plus the two seats' own pairing.
+ *
+ * They run together because each alone is satisfiable by doing nothing. A check that every chapter
+ * names a package passes on an empty seat; a check that every package has a chapter passes on a
  * repository with no packages. Only together do they say the seat and the code are the same shape.
- *
- * The third — every package with code realizes a construct — is the one that catches a package
- * nobody documented, which is the failure the gap scan kept finding by hand.
  */
 function coverageCheck(repo: string, workspace: string): Finding[] {
-  const f: Finding[] = [];
-  const seat = join(repo, "docs", "02-constructs");
-  const caps = join(repo, "docs", "04-capabilities");
-  if (!existsSync(seat)) return f;
-  // A BOOK MIRRORS NO PACKAGES, so this whole check is about somebody else's repository. The
-  // foundation's capabilities seat is the STANDARD per topic, authored rather than derived, and a
-  // construct's Binds there names the repositories of the workspace that deliver it — `spn-devex`,
-  // `docs` — which are not packages of this repository and own no chapter in it. Applied to the
-  // book it reported 129 correct constructs as uncovered. `face` already makes the same exception
-  // by the same test.
-  try {
-    if (JSON.parse(readFileSync(join(repo, "sprepo.json"), "utf8")).type === "FOUNDATION") return f;
-  } catch { /* no manifest: judge it as an ordinary repository */ }
-
-  // what the seat SAYS, per construct: which nodes realize it
-  const claimed = new Map<string, { domain: string; nodes: string[]; file: string }>();
-  for (const file of walkFiles(seat, (x) => x.endsWith(".md"))) {
-    const name = topicName(file);
-    if (name === null) continue;
-    claimed.set(name, { domain: relative(seat, dirname(file)).replace(/\\/g, "/"), nodes: realizingNodes(file), file });
-  }
-
-  // what the seat HAS, per construct: which package folders hold a chapter for it
-  const written = new Map<string, Set<string>>();
-  for (const file of existsSync(caps) ? walkFiles(caps, (x) => x.endsWith(".md")) : []) {
-    const name = topicName(file);
-    if (name === null) continue;
-    const pkg = basename(dirname(file));
-    if (!written.has(name)) written.set(name, new Set());
-    written.get(name)!.add(pkg);
-  }
-
-  for (const [name, { nodes, file }] of claimed) {
-    const has = written.get(name) ?? new Set<string>();
-    for (const node of nodes)
-      if (!has.has(node))
-        f.push({ check: "coverage", grade: "RULE", file, message: `\`${name}\` says \`${node}\` realizes it and \`04-capabilities/\` carries no chapter for it there — every construct owes a chapter in every package that realizes it (Q130)` });
-  }
-
-  // every package with code realizes something
-  const nodes = walkFiles(repo, (x) => basename(x) === "spkind.json")
-    .filter((x) => !x.includes("/dist/") && !x.includes("/node_modules/"))
-    .map((x) => basename(dirname(x)));
-  const realizes = new Set([...claimed.values()].flatMap((c) => c.nodes));
-  for (const node of new Set(nodes))
-    if (!realizes.has(node))
-      f.push({ check: "coverage", grade: "SOFT", file: join(repo, "docs", "02-constructs", "README.md"),
-        message: `\`${node}\` holds code and no construct's Binds names it — either it realizes a construct nobody wrote down, or it is a node nobody documented (${relative(workspace, repo)})` });
-  return f;
+  return [...pathParity(repo), ...capabilityMirror(repo, workspace), ...personaCoverage(repo)];
 }
 
 // ---------------------------------------------------------------------------- the gap scan
@@ -2699,7 +2931,6 @@ function audit(paths: string[], workspace: string): Finding[] {
   const findings: Finding[] = [];
   const blocks = new Map<string, any>();
   const sources = new Map<string, string>();
-  const nodes = nodeIndex(workspace);
   // Read once for the whole run. Per page this would walk every repository's source once per
   // chapter, and the corpus is 339 of them.
   const realized = realizationIndex(workspace);
@@ -2724,7 +2955,7 @@ function audit(paths: string[], workspace: string): Finding[] {
     findings.push(...checkPalette(p, src, templates));
     findings.push(...checkGovernsMap(p, src));
     findings.push(...checkProof(p, src));
-    findings.push(...checkBinds(p, src, block, nodes));
+    findings.push(...checkBinds(p, src, block));
     findings.push(...checkOverviewSource(p, src, block, workspace));
     findings.push(...checkProduced(p, src, block, workspace, templates));
     findings.push(...checkVocabulary(p, src, realized));
@@ -2875,10 +3106,9 @@ const seatPaths = (args: string[]): string[] =>
   });
 
 if (cmd === "status") {
-  const nodes = nodeIndex(resolve(workspace));
   const check = rest.includes("--check");
   const seats = seatPaths(rest);
-  const f = seats.flatMap((p) => statusFor(p, resolve(workspace), nodes, !check));
+  const f = seats.flatMap((p) => statusFor(p, resolve(workspace), !check));
   for (const x of f) console.log(`${x.grade === "RULE" ? "✗" : "!"} ${x.grade.padEnd(4)} ${x.check.padEnd(9)} ${relative(workspace, x.file)}\n         ${x.message}`);
   process.exit(f.some((x) => x.grade === "RULE") ? 1 : 0);
 }

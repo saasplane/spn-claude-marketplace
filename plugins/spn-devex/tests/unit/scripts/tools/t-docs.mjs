@@ -182,10 +182,24 @@ const construct = (sections) =>
 }
 {
   const root = repo({ "CONCEPT.md": "# c\n",
-    "docs/02-constructs/x.md": construct(SECTIONS.filter((h) => h !== "Binds")) });
+    "docs/02-constructs/x.md": construct(SECTIONS.filter((h) => h !== "Boundary")) });
   const out = run(root, ["audit", "docs/02-constructs/x.md"]);
-  one("a construct genuinely missing a section is still a finding", out, has("missing section: Binds"));
+  one("a construct genuinely missing a section is still a finding", out, has("missing section: Boundary"));
   one("and it names only the one that is missing", out, lacks("missing section: Terms"));
+}
+{
+  // BINDS AND PROOF ARE OPTIONAL WHILE THE CORPUS CROSSES. Decision `E` takes the realization table
+  // out of `Binds` and takes `Proof` off the construct, and the sweep that edits the 122 pages is a
+  // separate arc — so both shapes pass, and the order of the two is still the outline's.
+  const root = repo({ "CONCEPT.md": "# c\n",
+    "docs/02-constructs/x.md": construct(["Overview", "Terms", "Model", "Parts", "Boundary"]) });
+  one("a construct carrying neither Binds nor Proof is clean, which is the shape `E` leaves",
+    run(root, ["audit", "docs/02-constructs/x.md"]), has("clean — 1 page"));
+
+  const swapped = repo({ "CONCEPT.md": "# c\n",
+    "docs/02-constructs/x.md": construct(["Overview", "Terms", "Model", "Parts", "Proof", "Boundary"]) });
+  one("an optional section out of place is still out of place",
+    run(swapped, ["audit", "docs/02-constructs/x.md"]), has("`Proof` comes before `Boundary`"));
 }
 {
   // OVERVIEW IS REQUIRED, AND IT WAS OPTIONAL FOR ONE SITTING (N67). Adding a required section to
@@ -215,10 +229,10 @@ const construct = (sections) =>
 {
   // A construct that SHOWS an outline in an example is not carrying that section.
   const root = repo({ "CONCEPT.md": "# c\n",
-    "docs/02-constructs/x.md": construct(SECTIONS.filter((h) => h !== "Binds"))
-      .replace("## Proof", "```text\n## Binds\n```\n\n## Proof") });
+    "docs/02-constructs/x.md": construct(SECTIONS.filter((h) => h !== "Boundary"))
+      .replace("## Binds", "```text\n## Boundary\n```\n\n## Binds") });
   one("a heading inside a fence does not satisfy the outline",
-    run(root, ["audit", "docs/02-constructs/x.md"]), has("missing section: Binds"));
+    run(root, ["audit", "docs/02-constructs/x.md"]), has("missing section: Boundary"));
 }
 {
   // `produced` compares a PAGE with the seat it would be produced from. A seat file is not a page.
@@ -312,16 +326,34 @@ const PROOF_OK = "## Proof\n\n| Check | Kind | What a green run shows |\n| --- |
     run(root, ["audit", "docs/02-constructs/x.md"]), has("clean"));
 }
 {
+  // ONE TABLE IS THE SHAPE `E` LEAVES BEHIND — the rules that hold the construct, and nothing about
+  // where code sits. Demanding two would refuse every page the sweep touches.
   const one_table = "## Binds\n\n| Rule | What it decides | Weight |\n| --- | --- | --- |\n| `a.md` | x | MUST |\n";
   const root = repo({ "CONCEPT.md": "# c\n", "docs/02-constructs/x.md": withSections(one_table, PROOF_OK) });
-  one("Binds carrying one table is a finding — it is two",
-    run(root, ["audit", "docs/02-constructs/x.md"]), has("Binds carries 1 table"));
+  one("Binds carrying the rules table alone is clean",
+    run(root, ["audit", "docs/02-constructs/x.md"]), has("clean"));
 }
 {
+  const no_table = "## Binds\n\nThe rules are written down somewhere else.\n";
+  const root = repo({ "CONCEPT.md": "# c\n", "docs/02-constructs/x.md": withSections(no_table, PROOF_OK) });
+  one("Binds carrying no table at all is still a finding",
+    run(root, ["audit", "docs/02-constructs/x.md"]), has("Binds carries no table"));
+}
+{
+  // A realization table with no row was invariant 6's RULE, and `E` removes the table it read.
   const no_row = "## Binds\n\n| Rule | What it decides | Weight |\n| --- | --- | --- |\n| `a.md` | x | MUST |\n\n| Repo | Node | What it realizes | State |\n| --- | --- | --- | --- |\n";
   const root = repo({ "CONCEPT.md": "# c\n", "docs/02-constructs/x.md": withSections(no_row, PROOF_OK) });
-  one("a realization table with no row is invariant 6's finding",
-    run(root, ["audit", "docs/02-constructs/x.md"]), has("no row"));
+  one("an empty realization table is no longer a finding — `E` retires the row it demanded",
+    run(root, ["audit", "docs/02-constructs/x.md"]), has("clean"));
+}
+{
+  // THE `NODE` CELL IS NOT RESOLVED ANY MORE, and the case names the exact substring match that went:
+  // `the estate declaration` used to resolve through a node called `estate`, so a cell naming a house
+  // word read as checked. Nothing here resolves, and nothing here is reported.
+  const loose = BINDS_OK.replace("| R | n | x | planned |", "| R | the estate declaration | x | done |");
+  const root = repo({ "CONCEPT.md": "# c\n", "docs/02-constructs/x.md": withSections(loose, PROOF_OK) });
+  one("a `Node` cell is no longer resolved, loosely or at all",
+    run(root, ["audit", "docs/02-constructs/x.md"]), lacks("resolves to no node"));
 }
 {
   const odd = BINDS_OK.replace("| R | n | x | planned |", "| R | n | x | nearly |");

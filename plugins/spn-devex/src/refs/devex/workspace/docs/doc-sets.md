@@ -4,6 +4,7 @@
     { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/README.md", "seen": "55c0c7e6" },
     { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "9b426f80" },
     { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md", "seen": "5d434d16" },
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md", "seen": "7c970245" },
     { "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md", "seen": "83b2eafe" },
     { "path": "spn-foundation/CONCEPT.md", "seen": "24dbbf45" }
   ]
