@@ -1,0 +1,9 @@
+{
+  "session_id": "fixture",
+  "cwd": "/tmp",
+  "tool_name": "Write",
+  "tool_input": {
+    "file_path": "/tmp/estate/packages/infra-module-idp/src/aws/environment/idp.ts",
+    "content": "export const code = \"idp\";\n"
+  }
+}

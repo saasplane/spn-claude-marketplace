@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/02-constructs/02-support/02-infra/02-packages.md", "seen": "918a3e82" },
+    { "path": "spn-foundation/docs/02-constructs/02-support/02-infra/02-packages.md", "seen": "4541b6c0" },
     { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/02-packages/01-manifests.md", "seen": "06e21746" }
   ]
 }
@@ -73,7 +73,7 @@ Organization config, the essentials:
   "legal": { "name": "…", "address": "…" },                                         // the registering entity, on the account
 
   "regions": [{ "code": "in", "networkIndex": 0 }],                                 // R — appended forever, never reused
-  "providers": { "scm": { "mtype": "GITHUB" },
+  "providers": { "scm": { "mtype": "GITHUB", "org": "saasplane" },                  // the one account every platform's repositories live under
                  "cloud": { "mtype": "AWS", "home": "in",
                             "regions": [{ "code": "in", "region": "ap-south-1" }],  // the ONLY place a provider region is spelled
                             "profiles": null },

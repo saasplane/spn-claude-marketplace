@@ -1,0 +1,9 @@
+{
+  "session_id": "fixture",
+  "cwd": "/tmp",
+  "tool_name": "Write",
+  "tool_input": {
+    "file_path": "/tmp/estate/packages/infra-platform-dmo/dist/main.js",
+    "content": "// hand-edited build output"
+  }
+}

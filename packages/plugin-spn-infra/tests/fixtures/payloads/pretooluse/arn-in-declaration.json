@@ -1,0 +1,9 @@
+{
+  "session_id": "fixture",
+  "cwd": "/tmp",
+  "tool_name": "Write",
+  "tool_input": {
+    "file_path": "/tmp/estate/src/spestate.json",
+    "content": "{\"note\":\"arn:aws:iam::111111111111:role/deploy\"}"
+  }
+}

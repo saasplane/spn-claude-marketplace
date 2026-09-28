@@ -18,7 +18,7 @@
 // `providers/` holds and imports each one's subjects. A third cloud joins by adding a folder, and
 // the gate that would otherwise have needed four new import lines needs none.
 import { readdirSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { basename, dirname, join } from "node:path";
 import type { Verdict } from "../../../../plugin-support-lib/src/lib/payload.ts";
 import { validate as testTreeShape } from "../lib/test-file-outside-tier-folder.ts";
 import { validate as harnessManifestIdentity } from "../lib/harness-reimplements-manifest-identity.ts";
@@ -42,7 +42,32 @@ const CORE_SUBJECTS: Subject[] = [
   { name: "harness-manifest-identity", validate: harnessManifestIdentity },
 ];
 
-const PROVIDERS = resolve(import.meta.dirname, "..", "..", "providers");
+/**
+ * This plugin's own `src/` — this file's home when it runs from source, or the sibling of
+ * wherever this file ends up bundled to.
+ *
+ * ESBUILD COLLAPSES EVERY INLINED MODULE'S `import.meta.dirname` TO THE BUNDLE'S OWN LOCATION
+ * (the same defect `corpus.ts` in `plugin-spn-devex` documents and fixes). This file is a static
+ * import of `events/pretooluse.ts`, so once that event is built to `dist/events/pretooluse.mjs`,
+ * `import.meta.dirname` inside this module reads as `.../src/dist/events`, never
+ * `.../src/scripts/checks`. A fixed `resolve(dirname, "..", "..", "providers")` answered
+ * `src/providers` either way ONLY BECAUSE `scripts/checks` and `dist/events` happen to sit at the
+ * same depth under `src/` — a coincidence, not a guarantee a future entry keeps. Climbing to the
+ * nearer ancestor named `scripts` or `dist` and returning ITS OWN PARENT (the plugin's `src/`) is
+ * correct whichever way this file is reached, and does not depend on the two trees matching depth.
+ */
+export function pluginSrcDir(from: string): string {
+  let dir = from;
+  for (let hop = 0; hop < 8; hop++) {
+    const name = basename(dir);
+    if (name === "scripts" || name === "dist") return dirname(dir);
+    const up = dirname(dir);
+    if (up === dir) break;
+    dir = up;
+  }
+  return from;
+}
+const PROVIDERS = join(pluginSrcDir(import.meta.dirname), "providers");
 
 /** Every cloud this plugin ships a provider folder for, sorted so the order is stable. */
 function instances(): string[] {

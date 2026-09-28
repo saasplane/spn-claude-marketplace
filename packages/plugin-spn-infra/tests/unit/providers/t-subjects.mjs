@@ -11,6 +11,8 @@
 // resolve to and refusing only the declared one would miss the mistake somebody makes while
 // moving between them.
 import { one, done } from "../../helpers/harness.mjs";
+import { pluginSrcDir } from "../../../src/scripts/checks/subjects.ts";
+import { join, sep } from "node:path";
 
 const EST = "/tmp/estate/src/spestate.json";
 
@@ -56,5 +58,32 @@ one("a region named in ordinary source", {
 one("a write under dist/ with no content at all", {
   input: { file_path: "/tmp/estate/dist/main.js" },
   expect: "deny", says: "under dist/" });
+
+// 6 · `pluginSrcDir` resolves `PROVIDERS` from wherever this file ends up, not only from its own
+//     source depth. A fixed `../..` climb answered correctly after bundling only because
+//     `scripts/checks` and `dist/events` happen to sit at the same depth under `src/` — a
+//     coincidence a future entry at a different depth would break silently (`subjects.ts`'s own
+//     comment). These synthetic paths prove the climb-to-named-ancestor approach does not depend
+//     on that coincidence.
+console.log("\n=== subjects — pluginSrcDir resolves src/ from any depth under scripts/ or dist/");
+{
+  const cases = [
+    ["source depth (scripts/checks)", join(sep, "plugin", "src", "scripts", "checks"), join(sep, "plugin", "src")],
+    ["bundled depth (dist/events), same depth as source — the coincidence today relies on",
+      join(sep, "plugin", "src", "dist", "events"), join(sep, "plugin", "src")],
+    ["a bundle nested deeper than its source (dist/events/sub)",
+      join(sep, "plugin", "src", "dist", "events", "sub"), join(sep, "plugin", "src")],
+    ["scripts nested deeper than dist ever is (scripts/checks/providers)",
+      join(sep, "plugin", "src", "scripts", "checks", "providers"), join(sep, "plugin", "src")],
+  ];
+  let failed = 0;
+  for (const [label, from, want] of cases) {
+    const got = pluginSrcDir(from);
+    if (got === want) { console.log(`  PASS  ${label}`); }
+    else { failed += 1; console.log(`  FAIL  ${label}: got ${got}, wanted ${want}`); }
+  }
+  if (failed) { console.log(`\n  ${failed} FAILED — pluginSrcDir`); process.exit(1); }
+  console.log(`  all ${cases.length} passed — pluginSrcDir`);
+}
 
 done("subjects");

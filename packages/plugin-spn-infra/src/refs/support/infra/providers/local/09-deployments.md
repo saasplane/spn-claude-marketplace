@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/09-deployments.md", "seen": "53cdc81b" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/09-deployments.md", "seen": "24c0dc55" }
   ]
 }
 -->
@@ -28,6 +28,12 @@
 **No served host needs an `/etc/hosts` line** — the local resolver answers every local domain and `lc-test`.
 
 **`spnutils infra domain register <host> --app <app>` registers a host with the shared ingress, needs no privilege and never writes `/etc/hosts`**; a host no local resolver answers is refused by name (`RD.INFRA.106`): the vhost, a certificate the wildcard covers or the local CA mints, a reload. `infra domain unregister` removes it. **The local edge provider calls it for every route the running platform writes**, storing the route at `~/.spnutils/platforms/{org}/{spc}/routes/{host}.json`, as the cloud provider calls its vendor — so a tenant signed up locally loads at `https://acme.lc-spndemo.app` with no manual step. **A test picks its own customer domain under `lc-test`**, such as `shop.acme.lc-test`.
+
+## A web release rides the platform's storage engine
+
+**`spnutils infra web deploy <env> <app> --dist <dir>` and `infra web rollback <env> <app> <release>` reach no separate store — they read and write the platform's own storage engine**, the one `platform up` already stands. Two buckets live inside it: `webapps` holds `{app}/releases/{hash}/**`, the immutable copy of a built bundle, and `routes` holds `releases/{env}/{app}`, the local stand-in for the pointer the cloud keeps in its route store. `deploy` refuses by name when the engine is not running, rather than starting the platform itself.
+
+The machine is one environment, so `<env>` is always the same value here. It stays a typed argument rather than a derived one, because the command's signature is shared with the cloud realization, where more than one environment exists.
 
 ## What runs, and what does not
 

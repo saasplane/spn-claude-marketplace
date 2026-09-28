@@ -1,0 +1,9 @@
+{
+  "session_id": "fixture",
+  "cwd": "/tmp",
+  "tool_name": "Write",
+  "tool_input": {
+    "file_path": "/tmp/estate/packages/infra-module-idp/tests/integration/module-seat.tftest.hcl",
+    "content": "run \"MOD_SEAT_01\" {\n  assert {\n    condition     = aws_iam_role.this.arn == \"arn:aws:iam::000000000000:role/idp\"\n    error_message = \"seat role mismatch\"\n  }\n}\n"
+  }
+}
