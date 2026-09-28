@@ -7,7 +7,7 @@
 //     spn-apps coverage floor [--write] <project> …
 //
 // **STACK-GENERIC, NEVER STACK-SPECIFIC.** The floor logic stays under
-// `providers/<stack>/scripts/tools/coverage-floor.ts`; nothing here repeats it. This file reads the
+// `providers/<stack>/scripts/lib/coverage-floor.ts`; nothing here repeats it. This file reads the
 // project's own `sprepo.json` to learn which stack answers, then calls that stack's exported
 // `cli(argv)` with the same argv a person would pass the tool directly, so both doors agree.
 import { join, resolve } from "node:path";
@@ -29,7 +29,7 @@ export async function run(args: string[]): Promise<number> {
   }
   let provider: { cli?: (argv: string[]) => number };
   try {
-    provider = await import(`../../../providers/${stack}/scripts/tools/coverage-floor.ts`);
+    provider = await import(`../../../providers/${stack}/scripts/lib/coverage-floor.ts`);
   } catch {
     process.stderr.write(`coverage floor: this plugin ships no coverage-floor tool for the ${stack} stack\n`);
     return 1;

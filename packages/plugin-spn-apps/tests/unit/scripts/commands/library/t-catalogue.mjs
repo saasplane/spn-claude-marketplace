@@ -1,6 +1,5 @@
-// `commands/library/catalogue.ts` — the one implementation now (moved from `scripts/tools/library-
-// catalogue.ts`, `N101` step 1b). This suite proves the command itself; `scripts/tools/library-
-// catalogue.ts` is a thin forwarder and its own case below proves only that it still forwards.
+// `commands/library/catalogue.ts` — the one implementation (the old `scripts/tools/library-
+// catalogue.ts` forwarder is gone, `N101` step 1b's path sweep). This suite proves the command.
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -8,7 +7,6 @@ import { join, resolve } from "node:path";
 
 // RUN THROUGH THE CLI, NOT THE COMMAND FILE DIRECTLY — see `commands/coverage/t-floor.mjs` for why.
 const CLI = resolve(import.meta.dirname, "..", "..", "..", "..", "..", "src", "scripts", "cli.ts");
-const FORWARDER = resolve(import.meta.dirname, "..", "..", "..", "..", "..", "src", "scripts", "tools", "library-catalogue.ts");
 const kept = [];
 process.on("exit", () => { for (const d of kept) rmSync(d, { recursive: true, force: true }); });
 
@@ -45,18 +43,6 @@ console.log("\n=== library catalogue command — against the real workspace, --c
   ok("finds the sibling support checkout and reports current or would-write, never a crash",
      code === 0 || code === 1, out);
   ok("names the count of packages, one way or the other", /\d+ package\(s\)/.test(out), out);
-}
-
-console.log("\n=== scripts/tools/library-catalogue.ts — the forwarder, argv and exit code unchanged");
-
-{
-  const root = mkdtempSync(join(tmpdir(), "catalogue-forwarder-"));
-  kept.push(root);
-  const viaCommand = run(CLI, "library", "catalogue", root);
-  const viaForwarder = run(FORWARDER, root);
-  ok("the old path answers exactly what the new command answers",
-     viaCommand.out === viaForwarder.out && viaCommand.code === viaForwarder.code,
-     `command: ${viaCommand.out}\nforwarder: ${viaForwarder.out}`);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — library catalogue command` : `\n  all ${total} passed — library catalogue command`);

@@ -14,8 +14,8 @@
 import { readdirSync, statSync, writeFileSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { read } from "../../../../scripts/lib/source.ts";
-import { MEASURES, floorBlock, floorOf, isDated, isFloorConfig } from "../lib/floors.ts";
-import type { Floor, Measure } from "../lib/floors.ts";
+import { MEASURES, floorBlock, floorOf, isDated, isFloorConfig } from "./floors.ts";
+import type { Floor, Measure } from "./floors.ts";
 
 /** The comment a raised floor carries. The date is the measurement's, never the moment the script ran. */
 const COMMENT = /\/\/ Coverage floor measured \d{4}-\d{2}-\d{2}[^\n]*\n/;

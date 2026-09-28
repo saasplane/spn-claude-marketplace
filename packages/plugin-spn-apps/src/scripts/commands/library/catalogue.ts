@@ -21,8 +21,8 @@
 // Run from a partner's checkout it says so and exits clean; an empty table would read as *there
 // are no libraries*, which is a different claim from *this checkout cannot see them*.
 //
-// **ONE IMPLEMENTATION ONLY.** `scripts/tools/library-catalogue.ts` is now a thin forwarder to
-// `main` below, kept until B3c-2's path sweep deletes it.
+// **ONE IMPLEMENTATION ONLY.** The old `scripts/tools/library-catalogue.ts` forwarder is gone
+// (`N101` step 1b's path sweep); `spn-apps library catalogue` is the one door.
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { seenHash } from "../../lib/stamp.ts";
@@ -35,7 +35,7 @@ const SUPPORT = "spn-support-ts";
  *  and that is deliberate: the book's `14-libraries.md` states the RULE for how a stack distributes
  *  libraries, and this one carries the LIST a partner installs. A rule is written once and a list
  *  moves every release, so only one of them can be generated. */
-const OUT = join("spn-claude-marketplace", "plugins", "spn-apps", "src", "refs",
+const OUT = join("spn-claude-marketplace", "packages", "plugin-spn-apps", "src", "refs",
   "support", "apps", "providers", "ts", "14-libraries.md");
 /** The book entry this ref answers. The RULE is the book's; the LIST is this file's. */
 const BOOK_RULE = "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/14-libraries.md";
@@ -88,7 +88,7 @@ function render(found: Library[], bookSeen: string): string {
   // marketplace, which has no distance to measure because both move in the same commit. The
   // generator's freshness is the generator's problem, and the paragraph below names the command.
   let out = `<!-- spn:restates\n{\n  "docs": [\n    { "path": "${BOOK_RULE}", "seen": "${bookSeen}" }\n  ]\n}\n-->\n`;
-  out += `<!-- spn:generated libraries — do not edit inside these markers; \`library-catalogue.ts\` writes it -->\n`;
+  out += `<!-- spn:generated libraries — do not edit inside these markers; \`spn-apps library catalogue\` writes it -->\n`;
   out += `# Libraries — the published packages a node may depend on\n\n`;
   out += `**Source of truth:** the foundation's \`10-providers/ts/14-libraries.md\`. **That chapter states the rule and this ref carries the list**, which is the one entry where the book and this folder answer the same question differently. How a package travels in this stack — the scopes, the registry each one publishes to, and why a consumer pins an exact version rather than a range — is the book's. Which packages exist is nobody's to write by hand, because the set moves at every release.\n\n`;
   out += `**This table is generated from the support repository's own manifests**, and it moves every release. **${found.length} package(s) are published.**\n\n`;

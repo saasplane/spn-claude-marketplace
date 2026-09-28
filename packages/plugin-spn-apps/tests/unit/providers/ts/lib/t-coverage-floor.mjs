@@ -7,7 +7,7 @@ import { mkdtempSync, mkdirSync, readFileSync, rmSync, utimesSync, writeFileSync
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 
-const TOOL = resolve(PLUGIN, "src", "providers", "ts", "scripts", "tools", "coverage-floor.ts");
+const TOOL = resolve(PLUGIN, "src", "providers", "ts", "scripts", "lib", "coverage-floor.ts");
 const kept = [];
 process.on("exit", () => { for (const d of kept) rmSync(d, { recursive: true, force: true }); });
 

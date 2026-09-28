@@ -1,0 +1,7 @@
+{
+  "tool_name": "Write",
+  "tool_input": {
+    "file_path": "apps/api/tests/journeys/signin.spec.ts",
+    "content": "test('it', async () => {\n  await setBooleanEnablement('X', true);\n  await expect(rows).toHaveCount(1);\n});\n"
+  }
+}

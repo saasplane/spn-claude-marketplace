@@ -1,6 +1,6 @@
 // `commands/coverage/floor.ts` — thin: it picks the target's stack and forwards argv to that
-// stack's own `cli()`. The floor logic itself is `providers/ts/scripts/tools/coverage-floor.ts`'s
-// own suite (`tests/unit/providers/ts/tools/t-coverage-floor.mjs`), unchanged and not repeated here.
+// stack's own `cli()`. The floor logic itself is `providers/ts/scripts/lib/coverage-floor.ts`'s
+// own suite (`tests/unit/providers/ts/lib/t-coverage-floor.mjs`), unchanged and not repeated here.
 import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
