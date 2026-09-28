@@ -20,6 +20,10 @@ import { execFileSync } from "node:child_process";
 import { mkdirSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 
+// Every hook a case launches inherits this, so a test run never writes into the workspace's
+// telemetry log, where its records would read as the developer's own tool calls.
+process.env.SPN_TELEMETRY = "off";
+
 const HERE = import.meta.dirname;
 const REPO = resolve(HERE, "..", "..", "..");
 // THE SUITES ARE WALKED, NOT LISTED, and they mirror `src/` beneath the tier that proves them: a

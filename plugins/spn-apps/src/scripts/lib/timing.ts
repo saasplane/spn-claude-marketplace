@@ -63,6 +63,8 @@ export function end(): void {
   try {
     const root = state.root;
     if (!root || !state.spans.length) return;
+    // A test run launches hooks inside the real workspace, and its records would read as the developer's.
+    if (process.env.SPN_TELEMETRY === "off") return;
     const debug = join(root, DEVEX, DEBUG);
     if (!existsSync(join(debug, SWITCH))) return;      // off by default, and reading it is the only cost
 
@@ -73,7 +75,10 @@ export function end(): void {
     try { if (existsSync(log) && statSync(log).size > MAX_BYTES) writeFileSync(log, ""); } catch { /* ignore */ }
 
     const at = new Date().toISOString().slice(0, 19);
-    const lines = state.spans.map((s) => JSON.stringify({
+    // The whole process, Node start to here. Startup, TypeScript loading and the imports are most of
+    // a hook's cost, and no span inside a check can see them.
+    const spans = [...state.spans, { script: "process", ms: Math.round(performance.now() * 100) / 100 }];
+    const lines = spans.map((s) => JSON.stringify({
       script: s.script, ms: s.ms,
       event: state.facts.event ?? null, tool: state.facts.tool ?? null,
       session: state.facts.session ?? null, at, pid: process.pid,

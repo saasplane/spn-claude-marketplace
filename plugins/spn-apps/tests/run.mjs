@@ -11,6 +11,10 @@ import { execFileSync } from "node:child_process";
 import { readdirSync, statSync } from "node:fs";
 import { resolve } from "node:path";
 
+// Every hook a case launches inherits this, so a test run never writes into the workspace's
+// telemetry log, where its records would read as the developer's own tool calls.
+process.env.SPN_TELEMETRY = "off";
+
 const HERE = import.meta.dirname;
 // THE SUITES ARE WALKED, NOT LISTED, and they mirror `src/`: a test for a provider's rule sits at
 // the path that rule sits at. A runner that globbed one folder made a rule test, a structural test
