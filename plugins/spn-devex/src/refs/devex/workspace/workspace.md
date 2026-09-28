@@ -1,8 +1,8 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/01-workspace.md", "seen": "b3e441a6" },
-    { "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md", "seen": "ffd73000" },
+    { "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/01-workspace.md", "seen": "b8de31f1" },
+    { "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md", "seen": "1d95cfde" },
     { "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md", "seen": "07a688b1" },
     { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md", "section": "The agent is updated first, and reloaded before anything runs", "seen": "97526696" },
     { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md", "section": "An arc's status says which of eight states it is in", "seen": "0b096adf" },

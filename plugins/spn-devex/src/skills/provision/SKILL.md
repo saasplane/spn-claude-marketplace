@@ -1,8 +1,8 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md", "seen": "4d055c4e" },
-    { "path": "spn-foundation/docs/02-constructs/01-devex/01-function/06-provision.md", "seen": "d9fd597f" }
+    { "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md", "seen": "ebb9e28f" },
+    { "path": "spn-foundation/docs/02-constructs/01-devex/01-function/06-provision.md", "seen": "7b62eb1c" }
   ]
 }
 -->

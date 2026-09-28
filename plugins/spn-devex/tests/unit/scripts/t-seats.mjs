@@ -297,37 +297,32 @@ console.log("\n=== every Who resolves to the personas table, and every persona i
       (g) => !/^. RULE /m.test(g) && /0 RULE/.test(g));
 }
 
-// ---------------------------------------------------------------- the Proof join
+// ---------------------------------------------------------------- nothing is joined
 
-console.log("\n=== the produced page joins the register's rows; the seat file never carries them");
+console.log("\n=== the produced page is the seat, and no register row is joined into it");
 {
-  const proof = "| Check | Kind | What a green run shows |\n| --- | --- | --- |\n| `spnutils apps test unit` | gate | the unit tier is green |\n";
+  // A construct types no proof (RD.DOCS.072). Its rows are read in the tests report, so a register
+  // beside it changes nothing on its page — not a row, not a status, not a line naming the source.
   const rows = [["CORE.BOOT.01", "can boot a service", "UNIT", "PLANNED"],
                 ["CORE.BOOT.02", "sees a clean shutdown", "INTEGRATION", "DONE"]];
   const ws = repo({
-    "docs/02-constructs/01-core/01-boot.md": seat("boot", { proof }),
+    "docs/02-constructs/01-core/01-boot.md": seat("boot"),
     "docs/03-behaviors/01-core/01-boot.md": register("b", rows),
   });
   const before = readAt(ws, "docs/02-constructs/01-core/01-boot.md");
   const out = run(ws, ["page", "docs/02-constructs/01-core/01-boot.md"]);
   const page = readAt(ws, "docs/artifacts/constructs/01-core/01-boot-construct.html");
 
-  one("every register row reaches the page", page,
-      (g) => g.includes("CORE.BOOT.01") && g.includes("CORE.BOOT.02"));
-  one("the row carries the status the register wrote, not a status the seat claims", page,
-      has("<td>INTEGRATION</td><td>DONE</td>"));
-  one("the joined table says where it came from", page,
-      has("<code>03-behaviors/01-core/01-boot.md</code>"));
-  one("the seat's own typed check is still there, after the rows", page,
-      (g) => g.indexOf("CORE.BOOT.01") < g.indexOf("spnutils apps test unit"));
-  one("the seat file on disk is untouched by the join",
+  one("no register row reaches the page", page,
+      (g) => !g.includes("CORE.BOOT.01") && !g.includes("CORE.BOOT.02"));
+  one("and no line claims rows were joined", page, lacks("joined from the register"));
+  one("the seat file on disk is untouched by production",
       readAt(ws, "docs/02-constructs/01-core/01-boot.md"), before);
-  one("an exact register is joined with no finding", out, lacks("SOFT proof"));
+  one("producing the page raises no proof finding", out, lacks("proof"));
 
-  // THE TWO HALVES MUST AGREE ABOUT WHAT THE PAGE IS. `checkProduced` re-rendered the bare seat
-  // while `page` renders it with the rows spliced in, so a page `page` had just written reported
-  // as hand-edited — 16 of 21 in the first repository to get behaviour files beside its
-  // constructs, and it would have fired in every one of them.
+  // THE TWO HALVES MUST AGREE ABOUT WHAT THE PAGE IS. `checkProduced` renders the same markdown
+  // `page` does; if either added something the other did not, every produced page would read as
+  // hand-edited the moment it was written.
   one("a page `page` just wrote does not audit as hand-edited", run(ws, ["audit", "docs"]),
       lacks("this page is not what `docs.ts page` produces"));
   one("and a page that really was hand-edited still is", (() => {
@@ -340,34 +335,15 @@ console.log("\n=== the produced page joins the register's rows; the seat file ne
       })(),
       has("this page is not what `docs.ts page` produces"));
 
-  // The corpus mid-move: one register per domain, and every topic joining from it.
+  // A domain-wide register is not joined either, and nothing reports a fallback that no longer exists.
   const ws2 = repo({
-    "docs/02-constructs/01-core/01-boot.md": seat("boot", { proof }),
+    "docs/02-constructs/01-core/01-boot.md": seat("boot"),
     "docs/03-behaviors/01-core/README.md": register("b", rows),
   });
   const out2 = run(ws2, ["page", "docs/02-constructs/01-core/01-boot.md"]);
-  one("a domain register is joined while the move is still running",
-      readAt(ws2, "docs/artifacts/constructs/01-core/01-boot-construct.html"), has("CORE.BOOT.01"));
-  one("and the fallback is reported rather than hidden", out2,
-      has("because this topic has no file of its own yet"));
-
-  // No register at all: a page, and no invented table.
-  const ws3 = repo({ "docs/02-constructs/01-core/01-boot.md": seat("boot", { proof }) });
-  run(ws3, ["page", "docs/02-constructs/01-core/01-boot.md"]);
-  const page3 = readAt(ws3, "docs/artifacts/constructs/01-core/01-boot-construct.html");
-  one("a construct with no register still produces a page", page3, has("Proof"));
-  one("and it carries no joined table it could not fill", page3, lacks("joined from the register"));
-
-  // A table that is not a behaviour table must not be joined.
-  const ws4 = repo({
-    "docs/02-constructs/01-core/01-boot.md": seat("boot", { proof }),
-    "docs/03-behaviors/01-core/01-boot.md":
-      doc({ id: "b", variant: "behaviors", title: "boot", lenses: ["QA"], status: "PLANNING" },
-          "| Persona | Means |\n| --- | --- |\n| A person | someone |\n"),
-  });
-  run(ws4, ["page", "docs/02-constructs/01-core/01-boot.md"]);
-  one("a table with no Id column is not mistaken for rows",
-      readAt(ws4, "docs/artifacts/constructs/01-core/01-boot-construct.html"), lacks("joined from the register"));
+  one("a domain register reaches no page",
+      readAt(ws2, "docs/artifacts/constructs/01-core/01-boot-construct.html"), lacks("CORE.BOOT.01"));
+  one("and no fallback is reported", out2, lacks("because this topic has no file of its own yet"));
 }
 
 console.log("\n=== a behaviour row typed into a seat's Proof is refused");

@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/02-constructs/02-support/02-infra/07-trust.md", "seen": "a44d7a3e" },
+    { "path": "spn-foundation/docs/02-constructs/02-support/02-infra/07-trust.md", "seen": "5c3be302" },
     { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/07-trust/", "seen": "74f60a60" }
   ]
 }

@@ -1111,12 +1111,9 @@ function checkProduced(file: string, src: string, block: any, workspace: string,
   try {
     html = renderPage({
       block: sb,
-      // THE SAME MARKDOWN `page` RENDERS, JOIN AND ALL. This re-rendered the bare seat file while
-      // `page` renders it with the behaviour rows spliced into Proof, so every page carrying a
-      // joined row read as hand-edited the moment it was written — 16 of 21 in the first
-      // repository to get behaviour files beside its constructs, and it would have fired in every
-      // one of them. Two halves of one tool disagreeing about what the page IS.
-      markdown: joinProof(seat, seatSrc.replace(/<!--\s*spn:doc[\s\S]*?-->\n?/, ""), workspace).md,
+      // THE SAME MARKDOWN `page` RENDERS: the seat without its metadata block, and nothing added.
+      // Two halves of one tool disagreeing about what the page IS reads every page as hand-edited.
+      markdown: seatSrc.replace(/<!--\s*spn:doc[\s\S]*?-->\n?/, ""),
       workspace: process.env.SPN_ORG ?? "SaaS Plane",
       location: process.env.SPN_LOCATION ?? locationOf(seat, workspace),
       furniture: furniture(templates),
@@ -2163,52 +2160,6 @@ function behaviourRows(file: string): BehaviourRow[] {
 }
 
 /**
- * The joined rows, written into the seat's own `## Proof` before it is rendered.
- *
- * THE SEAT FILE IS NOT TOUCHED. The join happens on the markdown in memory, which is the whole
- * point of `Q131`: a status lives in one place — the register the test run writes — and a page
- * that carries it carries a copy that cannot drift, because it is produced again on every write.
- *
- * The rows go ABOVE the typed checks and below whatever prose the seat opens the section with,
- * which is the order the reviewed sample uses: what the product promises, then what you can run.
- */
-function joinProof(seat: string, markdown: string, workspace: string): { md: string; findings: Finding[] } {
-  const findings: Finding[] = [];
-  const reg = registerFor(seat);
-  if (!reg) return { md: markdown, findings };
-  const rows = behaviourRows(reg.file);
-  if (!rows.length) return { md: markdown, findings };
-  if (!reg.exact)
-    findings.push({ check: "proof", grade: "SOFT", file: seat,
-      message: `the behaviour rows were joined from \`${relative(workspace, reg.file)}\`, the domain's register, because this topic has no file of its own yet — \`Q138\` A puts one row file beside each construct, and step 6 writes it` });
-
-  const lines = markdown.split("\n");
-  const head = lines.findIndex((l) => /^##\s+Proof\b/.test(l));
-  if (head < 0) return { md: markdown, findings };
-  const next = lines.findIndex((l, k) => k > head && /^##\s/.test(l));
-  const endOf = next < 0 ? lines.length : next;
-  let cut = lines.findIndex((l, k) => k > head && k < endOf && l.trim().startsWith("|"));
-  if (cut < 0) cut = endOf;
-
-  // Named relative to the repository's own `docs/`, which is how every other path on a page reads.
-  const treeRoot = seat.replace(/\\/g, "/").slice(0, seat.replace(/\\/g, "/").indexOf("/02-constructs/"));
-  const shown = relative(treeRoot, reg.file).replace(/\\/g, "/");
-  // No date here. A produced page is a function of its sources, and the day it was produced is not
-  // one of them — a stamp made every page differ from itself the morning after it was written, and
-  // `produced` compares bytes. The line says where the rows came from, which is what a reader uses.
-  const table = [
-    "",
-    `*Behaviours: joined from the register, \`${shown}\` — never typed in the seat file.*`,
-    "",
-    "| Row | Does | Tier | Status |",
-    "| --- | --- | --- | --- |",
-    ...rows.map((r) => `| \`${r.id}\` | ${r.does} | ${r.tier} | ${r.status} |`),
-    "",
-  ];
-  return { md: [...lines.slice(0, cut), ...table, ...lines.slice(cut)].join("\n"), findings };
-}
-
-/**
  * The page a construct returns to: its domain's overview (Q238).
  *
  * A DOMAIN AND ITS OVERVIEW SHARE ONE TITLE, AND THAT IS THE ONLY JOIN. The file is
@@ -2262,9 +2213,9 @@ function pageFor(seat: string, workspace: string, templates: string, write: bool
   const { block, error } = readBlock(src);
   if (!block) { findings.push({ check: "page", grade: "RULE", file: seat, message: error ?? "no spn:doc block" }); return findings; }
 
-  const stripped = src.replace(/<!--\s*spn:doc[\s\S]*?-->\n?/, "");
-  const { md: markdown, findings: jf } = joinProof(seat, stripped, workspace);
-  findings.push(...jf);
+  // A construct types no proof (RD.DOCS.072), so the page is the seat and nothing is joined into it.
+  // What proves it is read in the tests report, from the behaviour rows at the construct's own path.
+  const markdown = src.replace(/<!--\s*spn:doc[\s\S]*?-->\n?/, "");
   const org = process.env.SPN_ORG ?? "SaaS Plane";
   const location = process.env.SPN_LOCATION ?? locationOf(seat, workspace);
   if (location === "—")

@@ -2,10 +2,10 @@
 {
   "docs": [
     { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/README.md", "seen": "c924071a" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "9517b2e7" },
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "2f0bd1a1" },
     { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md", "seen": "304f6768" },
     { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md", "seen": "7c970245" },
-    { "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md", "seen": "4eb6953c" },
+    { "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md", "seen": "2ddc68a7" },
     { "path": "spn-foundation/CONCEPT.md", "seen": "24dbbf45" }
   ]
 }
@@ -305,8 +305,6 @@ The pocket holds what the node **authors** rather than derives, and its three au
 **The three sections that carry the argument divide by question** — `Overview` answers why, `Model` answers what, and `Parts` carries the detail of that what, one subsection per piece the `Model` named. **`Terms` comes second because the `Model` uses those words and the `Overview` does not**, and **`Boundary` comes after the parts** because a reader can judge an edge only once they have seen the shape. **The opening above the first heading is a standfirst and a summary, and nothing else**: measured across a workspace, 117 of 117 constructs opened with prose no outline named and no check read, so the orientation stays there and everything that argues moves into `Overview`. `Relations` is retired: the metadata block's `dependsOn` already carries what it listed, one way and machine-readable, and a section restating a declared field is a second copy that drifts.
 
 **A construct types no proof — MUST** (decision RD.DOCS.072). What proves it is the behaviour rows at its own path: `02-constructs/<domain>/<name>.md` is proved by `03-behaviors/<domain>/<name>.md` and by nothing else. A row's `Status` is written by the run that proved it, so never write one. In this book the rows are promises and carry no status at all. What a run proved is read in the repository's `tests` report.
-
-**Pages written before the sweep still carry a `Proof` table**, and their rows are joined from the register when the page is produced. Do not add one, and do not type a row into one. While a page carries the table, two rules hold: **a `Proof` row names a command somebody else can run** — a `spnutils` command, a stack's own test target, a gate the plugins carry — and **a file name is never a command**, because a row naming a `.spec.ts` reads as verified and cannot be acted on. A script the repository carries is accepted while no command runs it, and the exemption ends the moment a command exists.
 
 **A construct's status is rolled up from those same rows, and never typed.** Nothing started, or no rows at all, is 🔮 `PLANNING`. Every row `SUCCESS` and carrying a `Tier` is ✅ `DONE`. Anything between the two is 🚧 `IMPLEMENTING`. `MANUAL` counts as started and never as proven, because no run writes it. **A construct in a `FOUNDATION` repository carries no `status` key and no `Status:` chip** — its rows are promises, and a promise has no proof state. Where the mirrored behaviours file is missing altogether, the derivation reports it rather than stamping 🔮 `PLANNING`: no rows means nothing ran, and no file means nothing was measured.
 
