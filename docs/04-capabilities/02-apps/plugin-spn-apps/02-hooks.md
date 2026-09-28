@@ -32,6 +32,12 @@ The wiring of this plugin is one file declaring one entry. It claims the moment 
 **What** — the wiring declares one entry, and one process runs the whole chain. Porting the scripts to another language alone would not have collected the saving, because eight entries are still eight start-ups.
 **How** — the dispatcher asks each subject that applies and returns one answer. `packages/plugin-spn-apps/src/scripts/events/pretooluse.ts`.
 
+### A hook runs a committed bundle, not its source
+
+**Why** — *a fresh process pays for start-up on every call, and type-stripping a TypeScript source is the largest piece of it* — the foundation's `04-plugins/02-shape.md` § *Why a hook runs a bundle* states the general case and the measurements it rests on.
+**What** — `hooks.json` names `dist/events/*.mjs`, never `scripts/events/*.ts`. Measured on this machine, 2026-09-28: `PreToolUse` fell from 50 ms to 23 ms.
+**How** — `pnpm build:plugins` at the marketplace root rebuilds every plugin once; `pnpm build:plugins:watch` rebuilds on every source change while editing a hook; `spn-devex plugin build` runs the same script from inside any plugin checkout. An edit to a hook's source is not live until the next rebuild — `tests/unit/t-dist-current.mjs` refuses a bundle older than its sources, so an unrebuilt edit fails the suite by name rather than running silently stale. `packages/plugin-spn-apps/src/hooks/hooks.json`.
+
 ### The narrowest wiring this plugin could have
 
 **Why** — *a moment claimed for symmetry is a start-up paid on every call in a session*, for an answer nobody asked for.

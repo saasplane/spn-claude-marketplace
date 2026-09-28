@@ -31,6 +31,12 @@ This plugin's wiring is one entry. Every law it holds is about what a file conta
 **What** — one `PreToolUse` entry, and nothing at the window opening, after a command, or before a turn ends. This plugin has nothing to say at any of those.
 **How** — the single entry in `packages/plugin-spn-infra/src/hooks/hooks.json`.
 
+### A hook runs a committed bundle, not its source
+
+**Why** — *a fresh process pays for start-up on every call, and type-stripping a TypeScript source is the largest piece of it* — the foundation's `04-plugins/02-shape.md` § *Why a hook runs a bundle* states the general case and the measurements it rests on.
+**What** — `hooks.json` names `dist/events/*.mjs`, never `scripts/events/*.ts`. Measured on this machine, 2026-09-28: `PreToolUse` fell from 61 ms to 52 ms — the smaller win of the three plugins, because this hook statically imports less for a bundle to inline than devex's or apps's does.
+**How** — `pnpm build:plugins` at the marketplace root rebuilds every plugin once; `pnpm build:plugins:watch` rebuilds on every source change while editing a hook; `spn-devex plugin build` runs the same script from inside any plugin checkout. An edit to a hook's source is not live until the next rebuild — `tests/unit/t-dist-current.mjs` refuses a bundle older than its sources, so an unrebuilt edit fails the suite by name rather than running silently stale. `packages/plugin-spn-infra/src/hooks/hooks.json`.
+
 ### The matcher narrows before the command runs
 
 **Why** — *a script deciding for itself whether it cares is a process started for every read and every search*. The narrowing has to happen outside the script to cost nothing.

@@ -40,7 +40,7 @@ Twenty suites drive the real scripts as processes, feeding each one an event on 
 ### The Stop check's cache lives outside `.spndevex/`
 
 **Why** — *`.spndevex/` is shared by every window and workstream, so two sessions finishing together would read and overwrite each other's verdict*. `checks/corpus.ts` is proven by this plugin's own suite, and its cache lives where a parallel window cannot collide with another.
-**What** — `checks/corpus.ts` keeps one verdict per docs tree in `~/.spnutils/cache/corpus/`, the machine store, keyed by a content hash rather than by "last run" — so two windows either share an identical verdict or never meet, and a finding is replayed rather than dropped on a second run. `.spndevex/.debug/corpus/` is no longer read or written.
+**What** — `checks/corpus.ts` keeps one verdict per docs tree in `~/.spnutils/cache/corpus/`, the machine store, keyed by a content hash rather than by "last run" — so two windows either share an identical verdict or never meet, and a finding is replayed rather than dropped on a second run. `.spndevex/.debug/corpus/` is no longer read or written. Measured on this machine, 2026-09-28: the Stop hook averaged about 5.2 s per stop before this cache existed, since every tree re-ran on every turn's end. With the per-tree cache: about 0.1 s when nothing changed, about 0.55 s when one small tree changed, and a full cold run — every tree, nothing cached yet — costs the same as before, about 5.4 s.
 **How** — proven the same way the rest of this folder is: a suite drives the real check as a process and reads its verdict back. `packages/plugin-spn-devex/src/scripts/lib/corpus-cache.ts`, proven in `tests/unit/scripts/checks/t-corpus.mjs`.
 
 ### The folders are the stack's convention; the framework is not

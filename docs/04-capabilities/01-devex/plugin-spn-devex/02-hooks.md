@@ -45,6 +45,12 @@
 **What** — `hooks.json` declares one `PreToolUse` entry. The dispatcher imports every check, and each declares what it `applies` to and which fields it `needs`, so a call that cannot interest a check never reaches it.
 **How** — the order is a path test, then a file read, then a workspace walk, and the tree-reading check is last. `packages/plugin-spn-devex/src/scripts/events/pretooluse.ts`, the `CHECKS` list.
 
+### A hook runs a committed bundle, not its source
+
+**Why** — *a fresh process pays for start-up on every call, and type-stripping a TypeScript source is the largest piece of it* — the foundation's `04-plugins/02-shape.md` § *Why a hook runs a bundle* states the general case and the measurements it rests on.
+**What** — `hooks.json` names `dist/events/*.mjs`, never `scripts/events/*.ts`. Measured on this machine, 2026-09-28: `PreToolUse` fell from 63 ms to 26 ms.
+**How** — `pnpm build:plugins` at the marketplace root rebuilds every plugin once; `pnpm build:plugins:watch` rebuilds on every source change while editing a hook; `spn-devex plugin build` runs the same script from inside any plugin checkout. An edit to a hook's source is not live until the next rebuild — `tests/unit/t-dist-current.mjs` refuses a bundle older than its sources, so an unrebuilt edit fails the suite by name rather than running silently stale. `packages/plugin-spn-devex/src/hooks/hooks.json`, `packages/plugin-spn-devex/src/scripts/commands/plugin/build.ts`.
+
 ### The first refusal is the answer; advice adds up
 
 **Why** — *a refusal ends the call, so anything after it is noise*, while two pieces of advice are worth more than one.
