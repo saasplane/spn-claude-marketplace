@@ -21,6 +21,8 @@ A skill belongs to this domain when the work it describes is work on an apps nod
 
 The thing to check first is that **a skill here names no stack**. The steps of a build differ in every language, so the skill states the order and reads the step files from the provider the node's own `sprepo.json` declares. The second thing is the absence: **planning is not a skill of this domain.** The book's skill set is closed and folded planning into a stack-agnostic skill, so shipping one here would add a value the standard does not have, and two skills would then compete for the same ask.
 
+This construct realizes the book's `01-devex/02-agent/02-skills`.
+
 ## Terms
 
 | Term | Contract term | What it means |
@@ -57,35 +59,35 @@ The ask is matched to a skill, the skill is narrowed by a mode, and the longest 
 
 ### One skill divides into steps, and the order is the rule
 
-The contract comes first, and everything downstream is generated from it or written against it. A service written before its state is a service that will be rewritten. So the build skill is the only folder here that sequences steps at all, the order is fixed, and each step is read before that layer's code is written rather than after. *Where:* `plugins/spn-apps/src/skills/implement/SKILL.md`
+The contract comes first, and everything downstream is generated from it or written against it. A service written before its state is a service that will be rewritten. So the build skill is the only folder here that sequences steps at all, the order is fixed, and each step is read before that layer's code is written rather than after.
 
 ### The skill names the step; the provider holds it
 
-A step file is written in a language, so it cannot live in a skill that serves every stack this domain may grow. The skill states the step names, their order and what each one settles, and composes the path `providers/{stack}/skills/implement/steps/{step}.md` from the nearest `sprepo.json`. A step file the declared stack does not ship is a step that stack does not walk, and nothing here stubs one. *Where:* `plugins/spn-apps/src/skills/implement/SKILL.md` · [Providers](06-providers.md)
+A step file is written in a language, so it cannot live in a skill that serves every stack this domain may grow. The skill states the step names, their order and what each one settles, and composes the path `providers/{stack}/skills/implement/steps/{step}.md` from the nearest `sprepo.json`. A step file the declared stack does not ship is a step that stack does not walk, and nothing here stubs one.
 
 ### The router classifies before it sequences
 
-The build skill first decides whether the ask touches the back end alone, the front end alone, or both, and that classification decides which steps apply. Sequencing every step for every ask would make the smallest change cost the largest walk. *Where:* `plugins/spn-apps/src/skills/implement/SKILL.md`
+The build skill first decides whether the ask touches the back end alone, the front end alone, or both, and that classification decides which steps apply. Sequencing every step for every ask would make the smallest change cost the largest walk.
 
 ### A mode is an argument, not a second folder
 
-Two folders with almost the same description compete for the same match, and the matching gets worse as the pair grows. So a skill answering several close asks takes a mode, names its modes in the sentence a session matches against, and says which neighbouring skill an adjacent ask belongs to instead. A destructive mode says it is destructive in that same sentence rather than in the body it loads afterwards. *Where:* `plugins/spn-apps/src/skills/verify/SKILL.md`, `plugins/spn-apps/src/skills/run/SKILL.md`
+Two folders with almost the same description compete for the same match, and the matching gets worse as the pair grows. So a skill answering several close asks takes a mode, names its modes in the sentence a session matches against, and says which neighbouring skill an adjacent ask belongs to instead. A destructive mode says it is destructive in that same sentence rather than in the body it loads afterwards.
 
 ### Each skill declares the one stage it serves
 
-A skill and a stage are separate closed sets mapped many to one, and the mapping is what makes *which standards apply to this request* derivable from the skill that was invoked. Scaffolding answers to the repository stage, proving answers to the test stage, and the build loop's skills answer to the develop stage. Flattening them derives nothing. *Where:* the `spn:restates` block at the top of each `plugins/spn-apps/src/skills/*/SKILL.md`
+A skill and a stage are separate closed sets mapped many to one, and the mapping is what makes *which standards apply to this request* derivable from the skill that was invoked. Scaffolding answers to the repository stage, proving answers to the test stage, and the build loop's skills answer to the develop stage. Flattening them derives nothing.
 
 ### A skill carries a stamp, so a chapter it fell behind can say so
 
-A skill is prose the agent loads, and prose drifts from the book silently because nothing compares it. Every skill here opens with a block naming the chapters it restates and the hash last read from each, so a drift run reads a skill exactly as it reads a ref. *Where:* `plugins/spn-apps/src/skills/implement/SKILL.md`
+A skill is prose the agent loads, and prose drifts from the book silently because nothing compares it. Every skill here opens with a block naming the chapters it restates and the hash last read from each, so a drift run reads a skill exactly as it reads a ref.
 
 ### The closing gate belongs to the skill
 
-A contract change reviewed at the end of a session is reviewed by the context that wrote it. So the build skill closes with the suites and then hands the change to the review skill in its contract mode, and the hand-off is named in the description, so it happens even when nobody asks for it. *Where:* `plugins/spn-apps/src/skills/implement/SKILL.md`
+A contract change reviewed at the end of a session is reviewed by the context that wrote it. So the build skill closes with the suites and then hands the change to the review skill in its contract mode, and the hand-off is named in the description, so it happens even when nobody asks for it.
 
 ### The absent skill, and where its material lives
 
-Deciding what a node is belongs to a skill that is the same in every world, and it lives once in the core plugin. What this plugin supplies is the part of that walk only a stack can answer, and it sits under the provider for that stack rather than under `skills/`. *Where:* `plugins/spn-apps/src/providers/ts/skills/ideate/plan.md`
+Deciding what a node is belongs to a skill that is the same in every world, and it lives once in the core plugin. What this plugin supplies is the part of that walk only a stack can answer, and it sits under the provider for that stack rather than under `skills/`.
 
 ## Boundary
 
@@ -107,17 +109,5 @@ This page answers which skills this domain ships and how they are shaped. It doe
 | `RD.DEVEX.062` | planning folds into a stack-agnostic skill, which is why this domain ships none | MUST |
 | `RD.DOCS.055` | a skill that carries a rule it does not own is a restatement, and says so under a stamp | MUST |
 | the foundation's `02-delivery.md` § When an edit becomes behaviour | a skill edit is loadable only after an install and a fresh window | MUST |
-
-| Repo | Node | What it realizes | State |
-| --- | --- | --- | --- |
-| spn-foundation | `01-devex/02-agent/02-skills` | the foundation construct this one realizes | planned |
-| spn-claude-marketplace | `spn-apps` | the skills an apps repository answers to, the step order behind the build skill, and the deliberate absence where planning would be | planned |
-
-## Proof
-
-| Check | Kind | What a green run shows |
-| --- | --- | --- |
-| `node plugins/spn-devex/src/scripts/tools/restate-drift.ts` | gate | every skill carrying a stamp still reads as the chapters it names read today |
-| `node plugins/spn-devex/src/scripts/tools/coherence.ts` | gate | every rule a skill cites resolves to a row, and every plugin path it names is on disk |
 
 Try it: `node plugins/spn-devex/src/scripts/tools/restate-drift.ts`

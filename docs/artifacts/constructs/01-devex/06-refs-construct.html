@@ -188,6 +188,7 @@
 <section id="s0">
   <div class="sec-head"><h2>Overview</h2></div>
   <p>A ref exists because a reader may hold the plugins and never hold the book. It is a copy, made deliberately, under a stamp. It adds no rule; where a ref and its chapter disagree, the chapter wins and the ref is rewritten.</p>
+  <p>This construct realizes the book's <code>01-devex/02-agent/04-plugins</code>.</p>
 </section>
 
 <!-- 01 -->
@@ -260,21 +261,21 @@
 <section id="s3">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="the-folder-mirrors-the-book-and-holds-no">The folder mirrors the book, and holds nothing else</h3>
-  <p>A ref's path says which part of the book it restates, so <code>refs/</code> reads as a map of the chapters a plugin's readers need rather than as a pile of documents. Material that restates no chapter — a procedure a skill loads, a list of steps — is not a ref and does not belong there, whatever it happens to be about. <em>Where:</em> <code>plugins/spn-devex/src/refs/devex/</code></p>
+  <p>A ref's path says which part of the book it restates, so <code>refs/</code> reads as a map of the chapters a plugin's readers need rather than as a pile of documents. Material that restates no chapter — a procedure a skill loads, a list of steps — is not a ref and does not belong there, whatever it happens to be about.</p>
   <h3 id="the-block-and-what-it-holds">The block, and what it holds</h3>
-  <p>A comment carrying strict JSON: a list of chapters, each with a path, an optional section, and its hash; and optionally a list of register rows the file also depends on. It sits at the top of the file, in the position a document's metadata block would take, and a ref carries this rather than that. <em>Where:</em> the first lines of <code>plugins/spn-devex/src/refs/devex/workspace/workspace.md</code></p>
+  <p>A comment carrying strict JSON: a list of chapters, each with a path, an optional section, and its hash; and optionally a list of register rows the file also depends on. It sits at the top of the file, in the position a document's metadata block would take, and a ref carries this rather than that.</p>
   <h3 id="a-stamp-is-as-precise-as-the-sentence-it">A stamp is as precise as the sentence it replaces</h3>
-  <p>Name a section and the hash covers that heading's own text; name only a path and it covers the whole file. The reason is measurable. One concept file runs to thousands of lines and many restatements cite it, so hashing the whole file re-stamps a viewpoint every time anything else in it moves — and a finding that is usually wrong teaches people to stop reading the run. <em>Where:</em> <code>plugins/spn-devex/src/scripts/lib/restates.ts</code></p>
+  <p>Name a section and the hash covers that heading's own text; name only a path and it covers the whole file. The reason is measurable. One concept file runs to thousands of lines and many restatements cite it, so hashing the whole file re-stamps a viewpoint every time anything else in it moves — and a finding that is usually wrong teaches people to stop reading the run.</p>
   <h3 id="what-the-hash-ignores-and-what-it-does-n">What the hash ignores, and what it does not</h3>
-  <p>Trailing spaces and the blank lines around the cited text are invisible to a reader, so a change to them is not a change to the rule. Everything else counts, a reordering included, because a list of rules whose order changed is a list a restatement may now state wrongly. <em>Where:</em> <code>plugins/spn-devex/src/scripts/lib/restates.ts</code>, <code>normalize</code></p>
+  <p>Trailing spaces and the blank lines around the cited text are invisible to a reader, so a change to them is not a change to the rule. Everything else counts, a reordering included, because a list of rules whose order changed is a list a restatement may now state wrongly.</p>
   <h3 id="the-parser-lives-once-because-two-checks">The parser lives once because two checks read it</h3>
-  <p>Comparing the foundation's own restatements inside one repository and comparing this repository's restatements against a book are different questions with the same parser. Writing that parser twice would be the defect this construct exists to stop, inside the instrument meant to catch it. So it is a library file, and neither check owns it. <em>Where:</em> <code>plugins/spn-devex/src/scripts/lib/restates.ts</code></p>
+  <p>Comparing the foundation's own restatements inside one repository and comparing this repository's restatements against a book are different questions with the same parser. Writing that parser twice would be the defect this construct exists to stop, inside the instrument meant to catch it. So it is a library file, and neither check owns it.</p>
   <h3 id="a-block-used-to-get-credit-for-what-it-l">A block used to get credit for what it left out</h3>
-  <p>A check that walks only the block can validate only what the file declared, so a source named in the file's own prose and omitted from the block was unreachable rather than unstamped, and both runs printed green over it. The check now reads the file's own source line and compares it against the block. The comparison is loose in one direction only: a name in prose counts as declared when some declared path contains it. <em>Where:</em> <code>plugins/spn-devex/src/scripts/lib/restates.ts</code>, <code>undeclared</code></p>
+  <p>A check that walks only the block can validate only what the file declared, so a source named in the file's own prose and omitted from the block was unreachable rather than unstamped, and both runs printed green over it. The check now reads the file's own source line and compares it against the block. The comparison is loose in one direction only: a name in prose counts as declared when some declared path contains it.</p>
   <h3 id="three-ways-a-restatement-fails-and-they-">Three ways a restatement fails, and they are not the same finding</h3>
-  <p><strong>Undeclared</strong> is prose naming a source the block leaves out, which no run can see. <strong>Unstamped</strong> is a file saying what it restates and carrying no block at all, so nothing machine-readable exists to compare. <strong>Unread</strong> is a name no check can resolve to a file, which is an under-report rather than a hidden fault. <em>Where:</em> <code>plugins/spn-devex/src/scripts/tools/restate-drift.ts</code></p>
+  <p><strong>Undeclared</strong> is prose naming a source the block leaves out, which no run can see. <strong>Unstamped</strong> is a file saying what it restates and carrying no block at all, so nothing machine-readable exists to compare. <strong>Unread</strong> is a name no check can resolve to a file, which is an under-report rather than a hidden fault.</p>
   <h3 id="a-source-comment-is-not-a-stamp">A source comment is not a stamp</h3>
-  <p>Every script here opens with a line naming the chapter it restates. That line carries no hash, so nothing compares it. It is deliberate, and it means something narrower: a change is made in the chapter first and in the code second, in the same change. <em>Where:</em> compare the header of <code>plugins/spn-devex/src/scripts/checks/doc-check.ts</code> with the block at the top of <code>plugins/spn-devex/src/refs/devex/workspace/docs/doc-sets.md</code></p>
+  <p>Every script here opens with a line naming the chapter it restates. That line carries no hash, so nothing compares it. It is deliberate, and it means something narrower: a change is made in the chapter first and in the code second, in the same change.</p>
 </section>
 
 <!-- 04 -->
@@ -301,38 +302,6 @@
       <tr><td><code>RD.DOCS.055</code></td><td>a file carrying a rule it does not own is a restatement, and the verb is <code>restates</code></td><td>MUST</td></tr>
       <tr><td>the foundation's <code>04-discipline.md</code> § Restatement discipline</td><td>repetition is allowed only as a declared restatement, carrying its source and never a new rule</td><td>MUST</td></tr>
       <tr><td><a href="../../../registers/decisions.md">MD3</a></td><td>a ref that carries no block is unstamped, and a marker no tool reads is not a declaration</td><td>MUST</td></tr>
-    </tbody>
-  </table></div>
-  <div class="scroll"><table>
-    <thead><tr><th>Repo</th><th>Node</th><th>What it realizes</th><th>State</th></tr></thead>
-    <tbody>
-      <tr><td>spn-foundation</td><td><code>01-devex/02-agent/04-plugins</code></td><td>the foundation construct this one realizes</td><td>planned</td></tr>
-      <tr><td>spn-claude-marketplace</td><td><code>spn-devex</code></td><td>the restatements a reader with no book can still read, the block parser, and the comparison that reports what moved</td><td>planned</td></tr>
-    </tbody>
-  </table></div>
-</section>
-
-<!-- 06 -->
-<section id="s6">
-  <div class="sec-head"><h2>Proof</h2></div>
-  <p><em>Behaviours: joined from the register, <code>03-behaviors/01-devex/06-refs.md</code> — never typed in the seat file.</em></p>
-  <div class="scroll"><table>
-    <thead><tr><th>Row</th><th>Does</th><th>Tier</th><th>Status</th></tr></thead>
-    <tbody>
-      <tr><td><code>MKT.REFS.01</code></td><td>read a standard in full with no book checkout</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.REFS.02</code></td><td>be told when a chapter a copy depends on has moved</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.REFS.03</code></td><td>cite one section without being re-flagged by the rest of a large file</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.REFS.04</code></td><td>reformat a file's trailing space without tripping the comparison</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.REFS.05</code></td><td>reorder a list of rules and have the comparison notice</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.REFS.06</code></td><td>be caught naming a source in prose and leaving it out of the block</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.REFS.07</code></td><td>tell an unstamped file from one that fell behind</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.REFS.08</code></td><td>have both comparisons read a block the same way</td><td>UNIT</td><td>PLANNED</td></tr>
-    </tbody>
-  </table></div>
-  <div class="scroll"><table>
-    <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
-    <tbody>
-      <tr><td><code>node plugins/spn-devex/src/scripts/tools/restate-drift.ts</code></td><td>gate</td><td>every stamped chapter still reads as it did when the copy was made, and every source named in prose is declared in the block</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>node plugins/spn-devex/src/scripts/tools/restate-drift.ts</code></p>

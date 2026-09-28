@@ -189,6 +189,7 @@
   <div class="sec-head"><h2>Overview</h2></div>
   <p>The thing to check first in any brief is its authority — what this persona may decide, and whether it may write anything at all. Some of that authority is bound by the frontmatter and some of it is only stated in the prose, and the two are not the same promise.</p>
   <p>A lens is where the rest of the authority comes from. <strong>A lens is an argument handed to one reviewer, not a reviewer of its own.</strong> The brief that reviews carries none of the viewpoints; it is given a name at the moment it is convened and reads that file before it says anything, and that file — rather than the brief — states what this convening may refuse and what it may only advise.</p>
+  <p>This construct realizes the book's <code>01-devex/02-agent/01-agent</code>.</p>
 </section>
 
 <!-- 01 -->
@@ -265,25 +266,25 @@
 <section id="s3">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="the-frontmatter">The frontmatter</h3>
-  <p><code>name</code> and <code>description</code>, read the same way <a href="./04-skills-construct.html">a skill's</a> are: the description is matched against the moment rather than browsed, and it decides whether this persona takes the reply. Two more fields are optional. <code>model</code> chooses which model runs the persona, and <code>tools</code> narrows what it may call. Leaving <code>tools</code> out grants every tool the session itself has. <em>Where:</em> the first lines of <code>plugins/spn-devex/src/agents/spn-prose-rewriter.md</code></p>
+  <p><code>name</code> and <code>description</code>, read the same way <a href="./04-skills-construct.html">a skill's</a> are: the description is matched against the moment rather than browsed, and it decides whether this persona takes the reply. Two more fields are optional. <code>model</code> chooses which model runs the persona, and <code>tools</code> narrows what it may call. Leaving <code>tools</code> out grants every tool the session itself has.</p>
   <h3 id="where-a-read-only-promise-is-actually-bo">Where a read-only promise is actually bound</h3>
-  <p>A brief declaring <code>tools</code> is bound by it: the permission is a fact about the convening rather than an instruction the persona is asked to follow. A brief that declares no <code>tools</code> inherits everything the session has, and its promise not to write is prose. Both kinds exist here, and telling them apart matters when a reviewer's independence is what the brief is for. <em>Where:</em> compare the frontmatter of <code>plugins/spn-devex/src/agents/spn-prose-reviewer.md</code> with that of <code>plugins/spn-devex/src/agents/spn-panel.md</code></p>
+  <p>A brief declaring <code>tools</code> is bound by it: the permission is a fact about the convening rather than an instruction the persona is asked to follow. A brief that declares no <code>tools</code> inherits everything the session has, and its promise not to write is prose. Both kinds exist here, and telling them apart matters when a reviewer's independence is what the brief is for.</p>
   <h3 id="a-fixed-persona">A fixed persona</h3>
-  <p>A brief with no argument is one voice, always: an engineering lead, a prose rewriter, a prose reviewer. Its whole authority is the words in its own file, read the same way each time it is called. <em>Where:</em> <code>plugins/spn-devex/src/agents/spn-engineer.md</code></p>
+  <p>A brief with no argument is one voice, always: an engineering lead, a prose rewriter, a prose reviewer. Its whole authority is the words in its own file, read the same way each time it is called.</p>
   <h3 id="a-parameterized-reviewer">A parameterized reviewer</h3>
-  <p>One brief here takes a viewpoint name as part of what it is convened over. It reads that viewpoint's own file before anything else, and the brief's own description lists the names a caller may pass, which is also what makes them discoverable. A brief for each viewpoint would be many copies of one procedure, drifting apart, each needing the same change — so the procedure lives in one file and the subject matter lives beside it. <em>Where:</em> <code>plugins/spn-devex/src/agents/spn-panel.md</code></p>
+  <p>One brief here takes a viewpoint name as part of what it is convened over. It reads that viewpoint's own file before anything else, and the brief's own description lists the names a caller may pass, which is also what makes them discoverable. A brief for each viewpoint would be many copies of one procedure, drifting apart, each needing the same change — so the procedure lives in one file and the subject matter lives beside it.</p>
   <h3 id="what-one-lens-file-says">What one lens file says</h3>
-  <p>A lens file opens by saying when the viewpoint is worn, when it is convened, and the one condition on which it blocks. Then it says what it checks. Everything below the stated threshold is advice, and the file says so plainly, because a reviewer who can block anything stops being a reviewer and the work stops on taste. <em>Where:</em> <code>plugins/spn-devex/src/refs/devex/agent/lenses/architect.md</code></p>
+  <p>A lens file opens by saying when the viewpoint is worn, when it is convened, and the one condition on which it blocks. Then it says what it checks. Everything below the stated threshold is advice, and the file says so plainly, because a reviewer who can block anything stops being a reviewer and the work stops on taste.</p>
   <h3 id="wearing-and-convening-are-different-acts">Wearing and convening are different acts</h3>
-  <p>Wearing a lens while writing makes the work better and is never a review, because the context that drafted something already agrees with its own reasoning. Convening is the other act: a reader who did not write the work, holding one file, reporting what that viewpoint found. A skill says which gate convenes which viewpoint. <em>Where:</em> <code>plugins/spn-devex/src/skills/ideate/SKILL.md</code>, <code>plugins/spn-devex/src/skills/develop/SKILL.md</code></p>
+  <p>Wearing a lens while writing makes the work better and is never a review, because the context that drafted something already agrees with its own reasoning. Convening is the other act: a reader who did not write the work, holding one file, reporting what that viewpoint found. A skill says which gate convenes which viewpoint.</p>
   <h3 id="the-lens-names-are-also-the-audience-a-d">The lens names are also the audience a document declares</h3>
-  <p>The reader a document is written for and the reviewer who judges it are one list. Two lists would let a document declare an audience no reviewer could be convened as. The register that maps each value to its reader label lives in the documents tool, and a document declaring a value outside the set is refused. <em>Where:</em> <code>plugins/spn-devex/src/scripts/tools/docs.ts</code>, <code>LENS_LABEL</code></p>
+  <p>The reader a document is written for and the reviewer who judges it are one list. Two lists would let a document declare an audience no reviewer could be convened as. The register that maps each value to its reader label lives in the documents tool, and a document declaring a value outside the set is refused.</p>
   <h3 id="a-lens-is-regenerated-never-argued-with">A lens is regenerated, never argued with</h3>
-  <p>A lens is a ref, so it carries a stamp and adds no rule of its own. Each file names its own sources at the top and states that it restates them. Where a lens and the book disagree, the book wins and the lens is rewritten; a lens that starts deciding rules has become a second standard nobody audits. <em>Where:</em> the first lines of <code>plugins/spn-devex/src/refs/devex/agent/lenses/trust.md</code></p>
+  <p>A lens is a ref, so it carries a stamp and adds no rule of its own. Each file names its own sources at the top and states that it restates them. Where a lens and the book disagree, the book wins and the lens is rewritten; a lens that starts deciding rules has become a second standard nobody audits.</p>
   <h3 id="a-reviewer-that-edits-has-stopped-review">A reviewer that edits has stopped reviewing</h3>
-  <p>Where a persona both finds a problem and fixes it, the finding and the fix arrive together and nobody can weigh one without the other. So the reviewing briefs report, the engineering brief advises, and exactly one brief is permitted to write — over the paragraphs it was handed, never over a whole file. <em>Where:</em> <code>plugins/spn-devex/src/agents/spn-prose-rewriter.md</code></p>
+  <p>Where a persona both finds a problem and fixes it, the finding and the fix arrive together and nobody can weigh one without the other. So the reviewing briefs report, the engineering brief advises, and exactly one brief is permitted to write — over the paragraphs it was handed, never over a whole file.</p>
   <h3 id="a-brief-points-at-a-rule-and-never-inven">A brief points at a rule and never invents one</h3>
-  <p>A persona stating a rule with no chapter behind it has produced a suggestion wearing the clothes of a finding, and the next reader cannot tell which they are holding. Each brief names where its standard lives: the reviewing brief's standard is the viewpoint file, and that file's standard is the book. <em>Where:</em> <code>plugins/spn-devex/src/agents/spn-engineer.md</code></p>
+  <p>A persona stating a rule with no chapter behind it has produced a suggestion wearing the clothes of a finding, and the next reader cannot tell which they are holding. Each brief names where its standard lives: the reviewing brief's standard is the viewpoint file, and that file's standard is the book.</p>
 </section>
 
 <!-- 04 -->
@@ -311,43 +312,6 @@
       <tr><td>the foundation's <code>02-delivery.md</code> § When an edit becomes behaviour</td><td>a brief edit needs an install and a fresh window before a convening can read it</td><td>MUST</td></tr>
       <tr><td><code>RD.DOCS.055</code></td><td>a lens is a restatement, and the book wins wherever the two disagree</td><td>MUST</td></tr>
       <tr><td><a href="../../../registers/decisions.md">MD4</a></td><td>a read-only promise is bound only where the brief declares <code>tools</code>; elsewhere it is prose</td><td>MUST</td></tr>
-    </tbody>
-  </table></div>
-  <div class="scroll"><table>
-    <thead><tr><th>Repo</th><th>Node</th><th>What it realizes</th><th>State</th></tr></thead>
-    <tbody>
-      <tr><td>spn-foundation</td><td><code>01-devex/02-agent/01-agent</code></td><td>the foundation construct this one realizes</td><td>planned</td></tr>
-      <tr><td>spn-claude-marketplace</td><td><code>spn-devex</code></td><td>the briefs a session convenes, one file per reviewing viewpoint, and the register the document audience is drawn from</td><td>planned</td></tr>
-    </tbody>
-  </table></div>
-</section>
-
-<!-- 06 -->
-<section id="s6">
-  <div class="sec-head"><h2>Proof</h2></div>
-  <p><em>Behaviours: joined from the register, <code>03-behaviors/01-devex/03-agents.md</code> — never typed in the seat file.</em></p>
-  <div class="scroll"><table>
-    <thead><tr><th>Row</th><th>Does</th><th>Tier</th><th>Status</th></tr></thead>
-    <tbody>
-      <tr><td><code>MKT.AGENTS.01</code></td><td>get a read from a context that did not write the work</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.AGENTS.02</code></td><td>check a persona's authority before trusting its finding</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.AGENTS.03</code></td><td>tell a bound permission from a stated intention</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.AGENTS.04</code></td><td>receive a review that reports rather than one that edits as it reads</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.AGENTS.05</code></td><td>review from any viewpoint without a brief per viewpoint</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.AGENTS.06</code></td><td>tell a finding from a suggestion</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.AGENTS.07</code></td><td>convene one engineering function's judgment over a change</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.AGENTS.08</code></td><td>know in advance what a reviewer can refuse on</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.AGENTS.09</code></td><td>have work stopped on a stated threshold rather than on taste</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.AGENTS.10</code></td><td>change the review procedure once rather than once per viewpoint</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.AGENTS.11</code></td><td>declare a document's audience from the same list reviewers are drawn from</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.AGENTS.12</code></td><td>be told when a viewpoint file has fallen behind the book</td><td>UNIT</td><td>PLANNED</td></tr>
-    </tbody>
-  </table></div>
-  <div class="scroll"><table>
-    <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
-    <tbody>
-      <tr><td><code>node plugins/spn-devex/src/scripts/tools/restate-drift.ts</code></td><td>gate</td><td>every viewpoint a brief can be handed still reads as the chapters it stamps read today</td></tr>
-      <tr><td><code>node plugins/spn-devex/src/scripts/tools/docs.ts audit docs</code></td><td>gate</td><td>every document declares an audience drawn from the closed set, and its header renders the labels that set maps to</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>node plugins/spn-devex/src/scripts/tools/restate-drift.ts</code></p>

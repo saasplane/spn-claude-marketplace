@@ -261,15 +261,15 @@
 <section id="s3">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="a-gate-never-names-an-instance">A gate never names an instance</h3>
-  <p>The instance is read from the nearest <code>sprepo.json</code>, never typed on a command and never guessed from a file extension. A gate that could name an instance is a gate somebody edits to add the next one, and the edit is the thing this construct exists to remove. <em>Where:</em> <code>plugins/spn-apps/src/scripts/lib/stack.ts</code>, <code>plugins/spn-infra/src/scripts/checks/subjects.ts</code></p>
+  <p>The instance is read from the nearest <code>sprepo.json</code>, never typed on a command and never guessed from a file extension. A gate that could name an instance is a gate somebody edits to add the next one, and the edit is the thing this construct exists to remove.</p>
   <h3 id="the-two-halves-and-what-each-holds">The two halves, and what each holds</h3>
-  <p>The skills half holds a <strong>procedure</strong> — what to do, in order, when working in this instance. The scripts half holds a <strong>parse and its rules</strong> — what this instance's text looks like and what is true of it. A rule is an implementation detail of the check that runs it and lives beside it, not in a shared registry above it. <em>Where:</em> <code>plugins/spn-apps/src/providers/ts/skills/</code>, <code>plugins/spn-apps/src/providers/ts/scripts/checks/</code></p>
+  <p>The skills half holds a <strong>procedure</strong> — what to do, in order, when working in this instance. The scripts half holds a <strong>parse and its rules</strong> — what this instance's text looks like and what is true of it. A rule is an implementation detail of the check that runs it and lives beside it, not in a shared registry above it.</p>
   <h3 id="a-private-rule-sits-behind-an-underscore">A private rule sits behind an underscore</h3>
-  <p>Where a subject's gate is one door and several rules stand behind it, the rules go under a folder whose name opens with an underscore and the door stays the only file at the top. A reader listing the folder then sees the subjects a gate dispatches over, and nothing that is only reachable through one of them. <em>Where:</em> <code>plugins/spn-apps/src/providers/ts/scripts/checks/_src/</code>, <code>plugins/spn-apps/src/providers/ts/scripts/checks/_tests/</code></p>
+  <p>Where a subject's gate is one door and several rules stand behind it, the rules go under a folder whose name opens with an underscore and the door stays the only file at the top. A reader listing the folder then sees the subjects a gate dispatches over, and nothing that is only reachable through one of them.</p>
   <h3 id="a-skills-half-is-earned-by-changing-the-">A skills half is earned by changing the authoring stack</h3>
-  <p>The test is not whether an instance has a procedure yet; it is whether the instance <strong>changes the language the work is written in</strong>. Where the instance <em>is</em> the stack, it always does. Where the instance is a cloud and every rendering is written in the same engine against the same declaration, it never does — and that provider carries a scripts half alone. The asymmetry is a fact about the two domains rather than a gap in one of them. <em>Where:</em> <code>plugins/spn-infra/src/providers/aws/scripts/checks/</code></p>
+  <p>The test is not whether an instance has a procedure yet; it is whether the instance <strong>changes the language the work is written in</strong>. Where the instance <em>is</em> the stack, it always does. Where the instance is a cloud and every rendering is written in the same engine against the same declaration, it never does — and that provider carries a scripts half alone. The asymmetry is a fact about the two domains rather than a gap in one of them.</p>
   <h3 id="a-shared-rule-body-is-a-factory-not-a-ru">A shared rule body is a factory, not a rule</h3>
-  <p>Where two instances genuinely need one rule, what they share is a function parameterized by each instance's own values, and it lives with the plugin's other shared code. It is not a rule folder: the moment a rule folder exists, rules drift into it that only one instance ever needed. <em>Where:</em> <code>plugins/spn-infra/src/scripts/lib/provider-strings.ts</code></p>
+  <p>Where two instances genuinely need one rule, what they share is a function parameterized by each instance's own values, and it lives with the plugin's other shared code. It is not a rule folder: the moment a rule folder exists, rules drift into it that only one instance ever needed.</p>
   <h3 id="adding-an-instance">Adding an instance</h3>
   <p>Add <code>providers/&lt;instance&gt;/</code>, with a <code>skills/</code> half for what a skill loads and a <code>scripts/</code> half for what a gate runs, mirroring the folders those gates already have. No gate changes, and a listing of the folder is the coverage.</p>
 </section>
@@ -298,39 +298,6 @@
       <tr><td><code>RD.DEVEX.025</code></td><td>a folder per skill value and a value per folder, so a gate's own folder set is closed and a provider cannot add to it</td><td>MUST</td></tr>
       <tr><td><code>RD.GOV.024</code></td><td>a repository answers to the world it declares, which is what makes <code>sprepo.json</code> the one place an instance is read from</td><td>MUST</td></tr>
       <tr><td>the apps plugin's subject registry</td><td><em>until a parser exists there is no folder for it</em> — a realization that is absent says so, and a stub that answers teaches you it works</td><td>MUST</td></tr>
-    </tbody>
-  </table></div>
-  <div class="scroll"><table>
-    <thead><tr><th>Repo</th><th>Node</th><th>What it realizes</th><th>State</th></tr></thead>
-    <tbody>
-      <tr><td>spn-claude-marketplace</td><td><code>spn-devex</code></td><td>the shape itself, and no provider folder of its own</td><td>planned</td></tr>
-      <tr><td>spn-claude-marketplace</td><td><code>spn-apps</code></td><td>both halves, for the one stack it serves</td><td>planned</td></tr>
-      <tr><td>spn-claude-marketplace</td><td><code>spn-infra</code></td><td>the scripts half alone, for the clouds it serves</td><td>planned</td></tr>
-    </tbody>
-  </table></div>
-</section>
-
-<!-- 06 -->
-<section id="s6">
-  <div class="sec-head"><h2>Proof</h2></div>
-  <p><em>Behaviours: joined from the register, <code>03-behaviors/01-devex/07-providers.md</code> — never typed in the seat file.</em></p>
-  <div class="scroll"><table>
-    <thead><tr><th>Row</th><th>Does</th><th>Tier</th><th>Status</th></tr></thead>
-    <tbody>
-      <tr><td><code>MKT.PROVIDERS.01</code></td><td>add a second stack or cloud without editing a gate</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PROVIDERS.02</code></td><td>tell which instance a session is working in without being told</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PROVIDERS.03</code></td><td>read a provider folder and know what kind of thing each part is</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PROVIDERS.04</code></td><td>tell a realization that is absent from one that is unfinished</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PROVIDERS.05</code></td><td>find the rule a refusal came from without leaving the provider</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PROVIDERS.06</code></td><td>keep a domain folder a mirror of the constructs it restates</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PROVIDERS.07</code></td><td>be sure a provider folder cannot register a skill of its own</td><td>UNIT</td><td>PLANNED</td></tr>
-    </tbody>
-  </table></div>
-  <div class="scroll"><table>
-    <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
-    <tbody>
-      <tr><td><code>node plugins/spn-devex/src/scripts/tools/coherence.ts</code></td><td>gate</td><td>every provider folder holds only folders its plugin itself holds, and no gate names an instance</td></tr>
-      <tr><td><code>node plugins/spn-devex/src/scripts/tools/restate-drift.ts</code></td><td>gate</td><td>a provider's contract entries still read as the chapters they stamp read today</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>node plugins/spn-devex/src/scripts/tools/coherence.ts</code></p>

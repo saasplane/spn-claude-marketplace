@@ -21,6 +21,8 @@ Every law this plugin holds is about what a file contains. A credential, an iden
 
 **The moment decides the authority, and only one moment can refuse.** A call about to run is the last point at which a write can still be stopped; every later moment arrives after the file exists and can do nothing but comment. An estate leak is cheap to catch at the moment somebody writes it and expensive to find afterwards, so this plugin claims that moment and no other.
 
+This construct realizes the book's `01-devex/02-agent/04-plugins`.
+
 ## Terms
 
 | Term | Contract term | What it means |
@@ -58,23 +60,23 @@ One entry, read from the outside in: a moment, the calls it is narrowed to, and 
 
 ### One moment, because every law here is about text
 
-`spn-devex` wires four moments across seven tools, and it has reason to: it has something to say when a window opens, after a command has run, and before a turn is handed back. This plugin has nothing to say at any of those. **What it knows is what a file may not contain**, and the only moment that knowledge can act on is the one before a file is written. *Where:* `plugins/spn-infra/src/hooks/hooks.json`
+`spn-devex` wires four moments across seven tools, and it has reason to: it has something to say when a window opens, after a command has run, and before a turn is handed back. This plugin has nothing to say at any of those. **What it knows is what a file may not contain**, and the only moment that knowledge can act on is the one before a file is written.
 
 ### The matcher narrows before the command runs
 
-The moment fires on every tool call, and a script deciding for itself whether it cares would be a process started for every read, every search and every shell command. The matcher is where that cost is refused: the harness starts nothing at all unless the call is a write or an edit. *Where:* the `matcher` field of the one entry.
+The moment fires on every tool call, and a script deciding for itself whether it cares would be a process started for every read, every search and every shell command. The matcher is where that cost is refused: the harness starts nothing at all unless the call is a write or an edit.
 
 ### The command is written against the plugin root
 
-`${CLAUDE_PLUGIN_ROOT}` is the installed copy, so the same wiring works in every repository that loads the plugin and nothing has to know where the plugin was installed. The path under it — `scripts/events/pretooluse.ts` — is the dispatcher, and the wiring stops there: what that dispatcher runs is discovered rather than declared. *Where:* the `command` field of the one entry.
+`${CLAUDE_PLUGIN_ROOT}` is the installed copy, so the same wiring works in every repository that loads the plugin and nothing has to know where the plugin was installed. The path under it — `scripts/events/pretooluse.ts` — is the dispatcher, and the wiring stops there: what that dispatcher runs is discovered rather than declared.
 
 ### The folder holds the wiring and nothing else
 
-`hooks/` carries `hooks.json` alone. **Code lives under `scripts/`**, filed by what kind of thing it is, which is why the wired path leaves the hooks folder immediately. A reader looking for what a refusal says opens the scripts tree, and a reader looking for when it fires opens this one file. *Where:* `plugins/spn-infra/src/hooks/`
+`hooks/` carries `hooks.json` alone. **Code lives under `scripts/`**, filed by what kind of thing it is, which is why the wired path leaves the hooks folder immediately. A reader looking for what a refusal says opens the scripts tree, and a reader looking for when it fires opens this one file.
 
 ### One timeout, and it is generous on purpose
 
-The dispatcher resolves its subjects by reading a folder and importing each cloud's validators, so a first run pays for the imports. The declared allowance is large enough that a cold run finishes inside it, because a hook the harness gives up on is a gate nobody can tell from a gate that allowed the call. *Where:* the `timeout` field of the one entry.
+The dispatcher resolves its subjects by reading a folder and importing each cloud's validators, so a first run pays for the imports. The declared allowance is large enough that a cold run finishes inside it, because a hook the harness gives up on is a gate nobody can tell from a gate that allowed the call.
 
 ## Boundary
 
@@ -93,17 +95,5 @@ This page answers what this plugin wires and where. It does not answer what a ho
 | the foundation's `02-delivery.md` § When an edit becomes behaviour | an edit to a wired script is live on its next run, while a change to `hooks.json` waits for a reinstall | MUST |
 | `RD.DEVEX.019` | the wiring names a script and carries no rule of its own | MUST |
 | `MD8` | a plugin carries its own libraries and never reaches into a sibling at runtime, which is why the wired path is under this plugin's own root | MUST |
-
-| Repo | Node | What it realizes | State |
-| --- | --- | --- | --- |
-| spn-foundation | `01-devex/02-agent/04-plugins` | the foundation construct this one realizes | planned |
-| spn-claude-marketplace | `spn-infra` | one `PreToolUse` entry on writes and edits, naming this plugin's dispatcher | planned |
-
-## Proof
-
-| Check | Kind | What a green run shows |
-| --- | --- | --- |
-| `node plugins/spn-devex/src/scripts/tools/partner-shape.ts` | gate | the wired command resolves from the plugin root and runs against a repository holding nothing but the plugins |
-| `node plugins/spn-infra/tests/run.mjs` | test | the dispatcher the wiring names answers a write event with a refusal or with silence, and never with a crash |
 
 Try it: `node plugins/spn-infra/tests/run.mjs`

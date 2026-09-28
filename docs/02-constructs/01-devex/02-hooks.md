@@ -23,6 +23,8 @@ One sentence carries the model: **the moment decides the authority**. A call abo
 
 Two more promises come from one failure. A verdict was once printed and parsed back, and a refusal that did not parse was dropped in silence — one check fired a hundred and forty-seven times and changed nothing. So a check now **returns** what it decided, and the dispatcher reads the object. And a hook **always exits zero**, because a hook that crashes takes every other gate beside it down with it.
 
+This construct realizes the book's `01-devex/02-agent/04-plugins`.
+
 ## Terms
 
 | Term | Contract term | What it means |
@@ -65,35 +67,35 @@ The moments run in the order a session meets them. Nothing chains one to the nex
 
 ### The wiring file
 
-`hooks.json` inside a plugin's `hooks/` folder is the whole declaration, and it is the only file that folder holds. Each moment carries an optional matcher naming which tool calls reach it, a command written against `CLAUDE_PLUGIN_ROOT`, and a timeout. One entry per moment is the rule that pays: five separate entries once matched a single edit, and each one paid an interpreter start-up before reading a byte. *Where:* `plugins/spn-devex/src/hooks/hooks.json`, `plugins/spn-apps/src/hooks/hooks.json`, `plugins/spn-infra/src/hooks/hooks.json`
+`hooks.json` inside a plugin's `hooks/` folder is the whole declaration, and it is the only file that folder holds. Each moment carries an optional matcher naming which tool calls reach it, a command written against `CLAUDE_PLUGIN_ROOT`, and a timeout. One entry per moment is the rule that pays: five separate entries once matched a single edit, and each one paid an interpreter start-up before reading a byte.
 
 ### The window opening
 
-One script runs when a session starts, resumes or is cleared, and what it prints is the first screen a developer reads. Nothing in that screen is typed: the script walks the workspace, reads each repository's own manifest for the world and the stack it claims, checks the wiring that claim implies, and lists every workstream in each of its states. A workspace holding no manifest at all is the case where there is nothing to read, and the script then asks instead of reporting, and points at the day-zero skill. Every read is wrapped, because a crash here is a window that opens on a stack trace. *Where:* `plugins/spn-devex/src/scripts/events/orientation.ts`
+One script runs when a session starts, resumes or is cleared, and what it prints is the first screen a developer reads. Nothing in that screen is typed: the script walks the workspace, reads each repository's own manifest for the world and the stack it claims, checks the wiring that claim implies, and lists every workstream in each of its states. A workspace holding no manifest at all is the case where there is nothing to read, and the script then asks instead of reporting, and points at the day-zero skill. Every read is wrapped, because a crash here is a window that opens on a stack trace.
 
 ### A call about to run
 
-One script, one matcher, and the whole chain of checks behind it. This is the only moment that may return a refusal, so every gate in the marketplace lives here or nowhere. Its matcher names the calls that could interest a check — reads, writes, edits, shell commands and searches. *Where:* `plugins/spn-devex/src/scripts/events/pretooluse.ts`
+One script, one matcher, and the whole chain of checks behind it. This is the only moment that may return a refusal, so every gate in the marketplace lives here or nowhere. Its matcher names the calls that could interest a check — reads, writes, edits, shell commands and searches.
 
 ### A shell command that finished
 
-One script, matched to shell commands alone. It reads the command that just ran, and when that command actually moved a workstream folder into the closed state, it says what landed, counted from that workstream's own split plan. The congratulation comes after the move rather than before it, because the gate that could have refused the move runs earlier and speaks only to refuse. *Where:* `plugins/spn-devex/src/scripts/events/closed.ts`
+One script, matched to shell commands alone. It reads the command that just ran, and when that command actually moved a workstream folder into the closed state, it says what landed, counted from that workstream's own split plan. The congratulation comes after the move rather than before it, because the gate that could have refused the move runs earlier and speaks only to refuse.
 
 ### A turn about to end
 
-One script, no matcher. By the time it runs the turn is already written, so a refusal would only lose it. What it does instead is warn: a turn ending while the running arc still has rows nothing blocks, an arc held against no live card, and a reply announcing a new window without the fields a handover owes. *Where:* `plugins/spn-devex/src/scripts/events/stop.ts`
+One script, no matcher. By the time it runs the turn is already written, so a refusal would only lose it. What it does instead is warn: a turn ending while the running arc still has rows nothing blocks, an arc held against no live card, and a reply announcing a new window without the fields a handover owes.
 
 ### The payload, and what a hook reads from it
 
-The harness writes the event to standard input as JSON. `readPayload` parses it, and input it cannot parse is not a finding — the hook simply allows the call. What a check then reads is a small part of it: the path a write names, the shell command a call carries, and the text a write would add. *Where:* `plugins/spn-devex/src/scripts/lib/payload.ts`
+The harness writes the event to standard input as JSON. `readPayload` parses it, and input it cannot parse is not a finding — the hook simply allows the call. What a check then reads is a small part of it: the path a write names, the shell command a call carries, and the text a write would add.
 
 ### The verdict is a return value
 
-A check is a function returning `{ deny?, note? }` or nothing. The dispatcher calls it and reads the object, so there is no round trip a refusal can disappear in. A file can still be run on its own, and `emit` then prints the same decision JSON to the same stream. A refusal sets the decision and its reason; advice is set as context the agent reads, because a message put only in the developer's pane is invisible to the agent. *Where:* `plugins/spn-devex/src/scripts/lib/payload.ts`
+A check is a function returning `{ deny?, note? }` or nothing. The dispatcher calls it and reads the object, so there is no round trip a refusal can disappear in. A file can still be run on its own, and `emit` then prints the same decision JSON to the same stream. A refusal sets the decision and its reason; advice is set as context the agent reads, because a message put only in the developer's pane is invisible to the agent.
 
 ### One process, and the order inside it
 
-The dispatcher imports every check and calls each in turn. Each check declares what it `applies` to, decided from the path or the command alone, and which fields it `needs`, so a call that cannot interest a check never reaches it. The order is a path test, then a file read, then a workspace walk. A check that throws is caught and passed over, and the rest still run. *Where:* `plugins/spn-devex/src/scripts/events/pretooluse.ts`
+The dispatcher imports every check and calls each in turn. Each check declares what it `applies` to, decided from the path or the command alone, and which fields it `needs`, so a call that cannot interest a check never reaches it. The order is a path test, then a file read, then a workspace walk. A check that throws is caught and passed over, and the rest still run.
 
 ```dg
 { "kind": "map",
@@ -113,15 +115,15 @@ The dispatcher imports every check and calls each in turn. Each check declares w
 
 ### The dispatcher's own refusal
 
-One guard is not a check in the list. Before the loop starts, the dispatcher asks whether any path this call would write is a file a generator owns — a generated validator, a build output folder, a generated route lock, or a file whose own header says a tool wrote it. That refusal is the dispatcher's own, and it runs first because it is the cheapest one there is and needs nothing read. *Where:* `plugins/spn-devex/src/scripts/events/pretooluse.ts`, `generatedRefusal`
+One guard is not a check in the list. Before the loop starts, the dispatcher asks whether any path this call would write is a file a generator owns — a generated validator, a build output folder, a generated route lock, or a file whose own header says a tool wrote it. That refusal is the dispatcher's own, and it runs first because it is the cheapest one there is and needs nothing read.
 
 ### Measuring what a run cost
 
-Every check is timed. Whether any of it reaches disk is a switch the developer sets, and every path swallows its own errors, because a gate failing because timing failed is worse than a number nobody recorded. *Where:* `plugins/spn-devex/src/scripts/lib/timing.ts`
+Every check is timed. Whether any of it reaches disk is a switch the developer sets, and every path swallows its own errors, because a gate failing because timing failed is worse than a number nobody recorded.
 
 ### Every moment exits zero
 
-Whatever a script decides, it ends with a zero exit code. A refusal is the documented decision written to standard output, never a failure code. Two of these scripts also run by hand, printing the same text, so they can be read without opening a session at all. *Where:* `plugins/spn-devex/src/scripts/events/`
+Whatever a script decides, it ends with a zero exit code. A refusal is the documented decision written to standard output, never a failure code. Two of these scripts also run by hand, printing the same text, so they can be read without opening a session at all.
 
 ## Boundary
 
@@ -141,17 +143,5 @@ This page answers which moments exist, how a script claims one, what it is hande
 | `RD.DEVEX.019` | a hook carries a rule it does not own, and names the chapter that owns it | MUST |
 | `RD.DEVEX.020` | the workspace is discovered rather than declared, so the opening screen is read from each repository's own manifest | MUST |
 | [MD2](../../registers/decisions.md) | the dispatcher does refuse on its own account, through the generated-file guard it runs before the list | MUST |
-
-| Repo | Node | What it realizes | State |
-| --- | --- | --- | --- |
-| spn-foundation | `01-devex/02-agent/04-plugins` | the foundation construct this one realizes | planned |
-| spn-claude-marketplace | `spn-devex` | the wiring file, one script per moment, the payload and verdict shapes, the dispatcher, and the timing every hook in the workspace is built on | planned |
-
-## Proof
-
-| Check | Kind | What a green run shows |
-| --- | --- | --- |
-| `node plugins/spn-devex/src/scripts/tools/partner-shape.ts` | gate | every wired script runs against a repository holding nothing but the plugin, none of them crashes on an input it was not written for, and each one ends with a zero exit code |
-| `node plugins/spn-devex/tests/run.mjs` | suite | the dispatcher composes, the first refusal wins, a throwing check is skipped, and each moment's script answers the way its authority allows |
 
 Try it: `node plugins/spn-devex/src/scripts/tools/partner-shape.ts`

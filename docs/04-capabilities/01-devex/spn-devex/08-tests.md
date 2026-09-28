@@ -20,6 +20,7 @@ Twenty suites drive the real scripts as processes, feeding each one an event on 
 | Tools | `plugins/spn-devex/tests/unit/scripts/tools/` | the corpus tools, each run as a command |
 | Libraries | `plugins/spn-devex/tests/unit/scripts/lib/` | the shared computations a tool and a check both read |
 | The corpus-shape suite | `plugins/spn-devex/tests/unit/scripts/t-seats.mjs` | a whole-tree property rather than one file's behaviour |
+| What fills a row from a run | `plugins/spn-devex/src/scripts/tools/behaviour-status.mjs` | reads the run's own artifact and writes the two cells a run owns into each row a case's title names |
 
 ## Follows the pattern
 

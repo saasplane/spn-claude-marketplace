@@ -188,6 +188,7 @@
 <section id="s0">
   <div class="sec-head"><h2>Overview</h2></div>
   <p><strong>This domain's provider carries both halves, and it always will.</strong> A provider earns a half that a skill loads when the instance changes the language the work is written in — and here the instance <em>is</em> the stack, so writing a contract, a service and an entry is a different procedure in a different language every time. That is a fact about this domain rather than a stage it is passing through.</p>
+  <p>This construct realizes the book's <code>01-devex/02-agent/04-plugins</code>.</p>
 </section>
 
 <!-- 01 -->
@@ -259,23 +260,23 @@
 <section id="s3">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="the-folder-mirrors-the-plugin-s-own-name">The folder mirrors the plugin's own names</h3>
-  <p>A plugin holds <code>skills/</code> and <code>scripts/</code>; a provider contributes under the same two names. A contributor filling one has already read the folders it mirrors, so plugging in a stack needs no explanation. It is also why a provider folder holds markdown and TypeScript side by side while every other folder in a plugin holds one kind: the organizing axis here is <em>what changes</em>, and that is paid deliberately. <em>Where:</em> <code>plugins/spn-apps/src/providers/ts/</code></p>
+  <p>A plugin holds <code>skills/</code> and <code>scripts/</code>; a provider contributes under the same two names. A contributor filling one has already read the folders it mirrors, so plugging in a stack needs no explanation. It is also why a provider folder holds markdown and TypeScript side by side while every other folder in a plugin holds one kind: the organizing axis here is <em>what changes</em>, and that is paid deliberately.</p>
   <h3 id="the-build-steps-are-the-skills-half">The build steps are the skills half</h3>
-  <p>The build skill names the steps and their order and holds none of them. Each step file settles one layer for this stack — the contract and its validators, the service shape, the thin entry, the queue listener and its consumption contract, the front end's plug-in points, how each test tier is run, and where an environment key goes in this stack's own files. A step this stack does not ship is a step this stack does not walk. <em>Where:</em> <code>plugins/spn-apps/src/providers/ts/skills/implement/steps/</code></p>
+  <p>The build skill names the steps and their order and holds none of them. Each step file settles one layer for this stack — the contract and its validators, the service shape, the thin entry, the queue listener and its consumption contract, the front end's plug-in points, how each test tier is run, and where an environment key goes in this stack's own files. A step this stack does not ship is a step this stack does not walk.</p>
   <h3 id="a-folder-is-named-for-the-skill-not-for-">A folder is named for the skill, not for the plugin that ships it</h3>
-  <p>One folder here serves a skill that lives in the core plugin: the part of deciding what a node is that only a language can answer — how ownership of a capability is read from what the repository actually composes, and where markdown may not go. It sits under the skill's own name, because what a reader needs to know is which skill loads it. This is the material that proves the shape works across plugins at all. <em>Where:</em> <code>plugins/spn-apps/src/providers/ts/skills/ideate/plan.md</code></p>
+  <p>One folder here serves a skill that lives in the core plugin: the part of deciding what a node is that only a language can answer — how ownership of a capability is read from what the repository actually composes, and where markdown may not go. It sits under the skill's own name, because what a reader needs to know is which skill loads it. This is the material that proves the shape works across plugins at all.</p>
   <h3 id="the-subjects-are-two-and-they-line-up-wi">The subjects are two, and they line up with the paths the rules watch</h3>
-  <p>A write is asked about its source and about its tests, and nothing else. A third subject for contracts was a grouping that overlapped the first on every contract file: every contract rule watches a path under <code>src/</code>, so a contract file was read and masked twice, at write time, where a person is waiting. Which rules apply is decided by the path and the node's kind, never by a subject's name. <em>Where:</em> <code>plugins/spn-apps/src/providers/ts/scripts/checks/src.ts</code> · <code>plugins/spn-apps/src/providers/ts/scripts/checks/tests.ts</code></p>
+  <p>A write is asked about its source and about its tests, and nothing else. A third subject for contracts was a grouping that overlapped the first on every contract file: every contract rule watches a path under <code>src/</code>, so a contract file was read and masked twice, at write time, where a person is waiting. Which rules apply is decided by the path and the node's kind, never by a subject's name.</p>
   <h3 id="a-door-parses-once-orders-the-answers-an">A door parses once, orders the answers, and survives a rule that throws</h3>
-  <p>The file a gate imports is the only file in the subject that reads the source: it builds the resulting text once per write rather than once per rule. It keeps the first refusal, because a person fixes one thing at a time and several refusals for one edit read as a broken gate. It collects every note, because advice is advice and several pieces can be true at once. And it skips a rule that throws rather than losing the whole subject with it. <em>Where:</em> <code>plugins/spn-apps/src/providers/ts/scripts/checks/src.ts</code></p>
+  <p>The file a gate imports is the only file in the subject that reads the source: it builds the resulting text once per write rather than once per rule. It keeps the first refusal, because a person fixes one thing at a time and several refusals for one edit read as a broken gate. It collects every note, because advice is advice and several pieces can be true at once. And it skips a rule that throws rather than losing the whole subject with it.</p>
   <h3 id="a-rule-is-private-to-the-door-beside-it">A rule is private to the door beside it</h3>
-  <p>A rule is an implementation detail of the check that runs it, not an entry in a shared registry, so it sits behind an underscore folder named for its own subject. A listing of the checks folder therefore shows the doors and nothing else, and what a door runs is read by opening the folder beside it. Nothing outside a private folder imports into it. <em>Where:</em> <code>plugins/spn-apps/src/providers/ts/scripts/checks/_src/</code> · <code>plugins/spn-apps/src/providers/ts/scripts/checks/_tests/</code></p>
+  <p>A rule is an implementation detail of the check that runs it, not an entry in a shared registry, so it sits behind an underscore folder named for its own subject. A listing of the checks folder therefore shows the doors and nothing else, and what a door runs is read by opening the folder beside it. Nothing outside a private folder imports into it.</p>
   <h3 id="what-the-source-subject-refuses">What the source subject refuses</h3>
-  <p>Its rules read this stack's own syntax: an enablement code that is not prefixed by the module owning it, a read method returning a list type under a plural name, a chained continuation where the stack's own standard asks for a sequenced wait, and a contract state that would close a dependency cycle. Each names the chapter or the card holding its reasoning rather than restating it, because a check is the part a script can catch and a card is the part a person has to read. <em>Where:</em> <code>plugins/spn-apps/src/providers/ts/scripts/checks/_src/enablement-grammar.ts</code> · <code>plugins/spn-apps/src/providers/ts/scripts/checks/_src/read-verb-naming.ts</code> · <code>plugins/spn-apps/src/providers/ts/scripts/checks/_src/await-sequencing.ts</code> · <code>plugins/spn-apps/src/providers/ts/scripts/checks/_src/contract-cycle.ts</code></p>
+  <p>Its rules read this stack's own syntax: an enablement code that is not prefixed by the module owning it, a read method returning a list type under a plural name, a chained continuation where the stack's own standard asks for a sequenced wait, and a contract state that would close a dependency cycle. Each names the chapter or the card holding its reasoning rather than restating it, because a check is the part a script can catch and a card is the part a person has to read.</p>
   <h3 id="one-rule-is-written-twice-on-purpose-and">One rule is written twice on purpose, and says where the other copy is</h3>
-  <p>The cycle rule is also in the command-line tool, and this copy exists because the failure it prevents lands at boot: a loop resolves to nothing at start-up, so the application comes up broken rather than failing to build, and a check that runs at review time runs after the damage. The header names the tool's own file as the single home of the rule, with the instruction that a change is made there first and here second, in the same change. <em>Where:</em> <code>plugins/spn-apps/src/providers/ts/scripts/checks/_src/contract-cycle.ts</code></p>
+  <p>The cycle rule is also in the command-line tool, and this copy exists because the failure it prevents lands at boot: a loop resolves to nothing at start-up, so the application comes up broken rather than failing to build, and a check that runs at review time runs after the damage. The header names the tool's own file as the single home of the rule, with the instruction that a change is made there first and here second, in the same change.</p>
   <h3 id="what-the-tests-subject-refuses-and-what-">What the tests subject refuses, and what it only warns about</h3>
-  <p>A journey assertion whose host pattern could match inside a longer address is refused, because a pattern loose enough to match inside a string is a check that cannot fail — one agreed a browser was home while the screen was still a vendor's consent page. An assertion with nothing explaining an absence is refused for the same reason. The coverage findings warn instead, and under-report on purpose, because the model behind them belongs to an open argument and a refusal on an unsettled rule teaches people to work around the gate. <em>Where:</em> <code>plugins/spn-apps/src/providers/ts/scripts/checks/_tests/host-assertion.ts</code> · <code>plugins/spn-apps/src/providers/ts/scripts/checks/_tests/assertion-message.ts</code> · <code>plugins/spn-apps/src/providers/ts/scripts/checks/_tests/coverage.ts</code></p>
+  <p>A journey assertion whose host pattern could match inside a longer address is refused, because a pattern loose enough to match inside a string is a check that cannot fail — one agreed a browser was home while the screen was still a vendor's consent page. An assertion with nothing explaining an absence is refused for the same reason. The coverage findings warn instead, and under-report on purpose, because the model behind them belongs to an open argument and a refusal on an unsettled rule teaches people to work around the gate.</p>
   <h3 id="adding-a-stack">Adding a stack</h3>
   <p>Add a folder named for the stack, with a skills half for what a skill loads and a scripts half for what a gate imports, mirroring the folders those gates already have. No gate changes, and a listing of this folder is the coverage.</p>
 </section>
@@ -305,44 +306,6 @@
       <tr><td><code>RD.DEVEX.025</code></td><td>a folder per skill value and a value per folder, so a provider folder carries material and never a skill of its own</td><td>MUST</td></tr>
       <tr><td><code>RD.DEVEX.035</code></td><td>a rule reaches a write-time hook only where review would be too late, which is why the cycle rule is here as well as in the command-line tool</td><td>MUST</td></tr>
       <tr><td><code>RD.PLATFORM.033</code></td><td>the enablement grammar the source subject's refusals are written against</td><td>MUST</td></tr>
-    </tbody>
-  </table></div>
-  <div class="scroll"><table>
-    <thead><tr><th>Repo</th><th>Node</th><th>What it realizes</th><th>State</th></tr></thead>
-    <tbody>
-      <tr><td>spn-foundation</td><td><code>01-devex/02-agent/04-plugins</code></td><td>the foundation construct this one realizes</td><td>planned</td></tr>
-      <tr><td>spn-claude-marketplace</td><td><code>spn-apps</code></td><td>both halves for the one stack this domain serves today — the build steps, the material a core skill loads, and the two doors with their private rules</td><td>planned</td></tr>
-    </tbody>
-  </table></div>
-</section>
-
-<!-- 06 -->
-<section id="s6">
-  <div class="sec-head"><h2>Proof</h2></div>
-  <p><em>Behaviours: joined from the register, <code>03-behaviors/02-apps/06-providers.md</code> — never typed in the seat file.</em></p>
-  <div class="scroll"><table>
-    <thead><tr><th>Row</th><th>Does</th><th>Tier</th><th>Status</th></tr></thead>
-    <tbody>
-      <tr><td><code>MKT.PROVIDERS.08</code></td><td>add a second stack by adding a folder</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PROVIDERS.09</code></td><td>walk a build step written for this node's own language</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PROVIDERS.10</code></td><td>have a core-plugin skill load this stack's own half</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PROVIDERS.11</code></td><td>see the doors when listing a checks folder, and nothing else</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PROVIDERS.12</code></td><td>edit a file somebody else wrote without being refused for their pattern</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PROVIDERS.13</code></td><td>write the name of a pattern inside a comment or a string safely</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PROVIDERS.14</code></td><td>be refused an enablement code that is not prefixed by its own module</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PROVIDERS.15</code></td><td>be refused a read method returning a list type under a plural name</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PROVIDERS.16</code></td><td>be refused a contract state write that would close a dependency cycle</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PROVIDERS.17</code></td><td>be refused a navigation assertion whose host pattern could match inside a longer address</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PROVIDERS.18</code></td><td>be warned rather than refused where the model behind a rule is still open</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PROVIDERS.19</code></td><td>find the one home of a rule that is written in two places</td><td>UNIT</td><td>PLANNED</td></tr>
-    </tbody>
-  </table></div>
-  <div class="scroll"><table>
-    <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
-    <tbody>
-      <tr><td><code>node plugins/spn-apps/tests/run.mjs</code></td><td>suite</td><td>each private rule answers as its own suite expects, and the suites find their rule by searching the provider folders rather than by naming one</td></tr>
-      <tr><td><code>node plugins/spn-devex/src/scripts/tools/partner-shape.ts</code></td><td>gate</td><td>every rule behind both doors runs against a repository holding nothing but the plugins, and none of them crashes on a file it was not written for</td></tr>
-      <tr><td><code>node plugins/spn-devex/src/scripts/tools/restate-drift.ts</code></td><td>gate</td><td>each step file carrying a stamp still reads as the chapters it names read today</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>node plugins/spn-apps/tests/run.mjs</code></p>

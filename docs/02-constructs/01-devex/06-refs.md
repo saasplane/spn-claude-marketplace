@@ -21,6 +21,8 @@ A citation nobody checks is a promise nobody keeps. The chapter it names moves o
 
 A ref exists because a reader may hold the plugins and never hold the book. It is a copy, made deliberately, under a stamp. It adds no rule; where a ref and its chapter disagree, the chapter wins and the ref is rewritten.
 
+This construct realizes the book's `01-devex/02-agent/04-plugins`.
+
 ## Terms
 
 | Term | Contract term | What it means |
@@ -58,35 +60,35 @@ The comparison needs both trees, so it runs where the book is checked out beside
 
 ### The folder mirrors the book, and holds nothing else
 
-A ref's path says which part of the book it restates, so `refs/` reads as a map of the chapters a plugin's readers need rather than as a pile of documents. Material that restates no chapter — a procedure a skill loads, a list of steps — is not a ref and does not belong there, whatever it happens to be about. *Where:* `plugins/spn-devex/src/refs/devex/`
+A ref's path says which part of the book it restates, so `refs/` reads as a map of the chapters a plugin's readers need rather than as a pile of documents. Material that restates no chapter — a procedure a skill loads, a list of steps — is not a ref and does not belong there, whatever it happens to be about.
 
 ### The block, and what it holds
 
-A comment carrying strict JSON: a list of chapters, each with a path, an optional section, and its hash; and optionally a list of register rows the file also depends on. It sits at the top of the file, in the position a document's metadata block would take, and a ref carries this rather than that. *Where:* the first lines of `plugins/spn-devex/src/refs/devex/workspace/workspace.md`
+A comment carrying strict JSON: a list of chapters, each with a path, an optional section, and its hash; and optionally a list of register rows the file also depends on. It sits at the top of the file, in the position a document's metadata block would take, and a ref carries this rather than that.
 
 ### A stamp is as precise as the sentence it replaces
 
-Name a section and the hash covers that heading's own text; name only a path and it covers the whole file. The reason is measurable. One concept file runs to thousands of lines and many restatements cite it, so hashing the whole file re-stamps a viewpoint every time anything else in it moves — and a finding that is usually wrong teaches people to stop reading the run. *Where:* `plugins/spn-devex/src/scripts/lib/restates.ts`
+Name a section and the hash covers that heading's own text; name only a path and it covers the whole file. The reason is measurable. One concept file runs to thousands of lines and many restatements cite it, so hashing the whole file re-stamps a viewpoint every time anything else in it moves — and a finding that is usually wrong teaches people to stop reading the run.
 
 ### What the hash ignores, and what it does not
 
-Trailing spaces and the blank lines around the cited text are invisible to a reader, so a change to them is not a change to the rule. Everything else counts, a reordering included, because a list of rules whose order changed is a list a restatement may now state wrongly. *Where:* `plugins/spn-devex/src/scripts/lib/restates.ts`, `normalize`
+Trailing spaces and the blank lines around the cited text are invisible to a reader, so a change to them is not a change to the rule. Everything else counts, a reordering included, because a list of rules whose order changed is a list a restatement may now state wrongly.
 
 ### The parser lives once because two checks read it
 
-Comparing the foundation's own restatements inside one repository and comparing this repository's restatements against a book are different questions with the same parser. Writing that parser twice would be the defect this construct exists to stop, inside the instrument meant to catch it. So it is a library file, and neither check owns it. *Where:* `plugins/spn-devex/src/scripts/lib/restates.ts`
+Comparing the foundation's own restatements inside one repository and comparing this repository's restatements against a book are different questions with the same parser. Writing that parser twice would be the defect this construct exists to stop, inside the instrument meant to catch it. So it is a library file, and neither check owns it.
 
 ### A block used to get credit for what it left out
 
-A check that walks only the block can validate only what the file declared, so a source named in the file's own prose and omitted from the block was unreachable rather than unstamped, and both runs printed green over it. The check now reads the file's own source line and compares it against the block. The comparison is loose in one direction only: a name in prose counts as declared when some declared path contains it. *Where:* `plugins/spn-devex/src/scripts/lib/restates.ts`, `undeclared`
+A check that walks only the block can validate only what the file declared, so a source named in the file's own prose and omitted from the block was unreachable rather than unstamped, and both runs printed green over it. The check now reads the file's own source line and compares it against the block. The comparison is loose in one direction only: a name in prose counts as declared when some declared path contains it.
 
 ### Three ways a restatement fails, and they are not the same finding
 
-**Undeclared** is prose naming a source the block leaves out, which no run can see. **Unstamped** is a file saying what it restates and carrying no block at all, so nothing machine-readable exists to compare. **Unread** is a name no check can resolve to a file, which is an under-report rather than a hidden fault. *Where:* `plugins/spn-devex/src/scripts/tools/restate-drift.ts`
+**Undeclared** is prose naming a source the block leaves out, which no run can see. **Unstamped** is a file saying what it restates and carrying no block at all, so nothing machine-readable exists to compare. **Unread** is a name no check can resolve to a file, which is an under-report rather than a hidden fault.
 
 ### A source comment is not a stamp
 
-Every script here opens with a line naming the chapter it restates. That line carries no hash, so nothing compares it. It is deliberate, and it means something narrower: a change is made in the chapter first and in the code second, in the same change. *Where:* compare the header of `plugins/spn-devex/src/scripts/checks/doc-check.ts` with the block at the top of `plugins/spn-devex/src/refs/devex/workspace/docs/doc-sets.md`
+Every script here opens with a line naming the chapter it restates. That line carries no hash, so nothing compares it. It is deliberate, and it means something narrower: a change is made in the chapter first and in the code second, in the same change.
 
 ## Boundary
 
@@ -106,16 +108,5 @@ This page answers what a restatement is, where one belongs in the folder, and ho
 | `RD.DOCS.055` | a file carrying a rule it does not own is a restatement, and the verb is `restates` | MUST |
 | the foundation's `04-discipline.md` § Restatement discipline | repetition is allowed only as a declared restatement, carrying its source and never a new rule | MUST |
 | [MD3](../../registers/decisions.md) | a ref that carries no block is unstamped, and a marker no tool reads is not a declaration | MUST |
-
-| Repo | Node | What it realizes | State |
-| --- | --- | --- | --- |
-| spn-foundation | `01-devex/02-agent/04-plugins` | the foundation construct this one realizes | planned |
-| spn-claude-marketplace | `spn-devex` | the restatements a reader with no book can still read, the block parser, and the comparison that reports what moved | planned |
-
-## Proof
-
-| Check | Kind | What a green run shows |
-| --- | --- | --- |
-| `node plugins/spn-devex/src/scripts/tools/restate-drift.ts` | gate | every stamped chapter still reads as it did when the copy was made, and every source named in prose is declared in the block |
 
 Try it: `node plugins/spn-devex/src/scripts/tools/restate-drift.ts`

@@ -15,6 +15,7 @@
 | The manifest | `plugins/spn-devex/src/.claude-plugin/plugin.json` | `name`, `version`, `description`, `author` |
 | The marketplace entry | `.claude-plugin/marketplace.json` | the repository's own list; the `spn-devex` row names `./plugins/spn-devex` |
 | What the folder delivers | `plugins/spn-devex/src/` | `hooks/` · `agents/` · `skills/` · `scripts/` · `refs/`, with `tests/` beside them at the plugin's root |
+| What a wired path names | `plugins/spn-devex/src/hooks/hooks.json` | a command written against `CLAUDE_PLUGIN_ROOT`, so it resolves inside the installed copy rather than in this checkout |
 
 ## Follows the pattern
 

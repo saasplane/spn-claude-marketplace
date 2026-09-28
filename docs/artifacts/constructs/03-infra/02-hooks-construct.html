@@ -188,6 +188,7 @@
 <section id="s0">
   <div class="sec-head"><h2>Overview</h2></div>
   <p><strong>The moment decides the authority, and only one moment can refuse.</strong> A call about to run is the last point at which a write can still be stopped; every later moment arrives after the file exists and can do nothing but comment. An estate leak is cheap to catch at the moment somebody writes it and expensive to find afterwards, so this plugin claims that moment and no other.</p>
+  <p>This construct realizes the book's <code>01-devex/02-agent/04-plugins</code>.</p>
 </section>
 
 <!-- 01 -->
@@ -260,15 +261,15 @@
 <section id="s3">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="one-moment-because-every-law-here-is-abo">One moment, because every law here is about text</h3>
-  <p><code>spn-devex</code> wires four moments across seven tools, and it has reason to: it has something to say when a window opens, after a command has run, and before a turn is handed back. This plugin has nothing to say at any of those. <strong>What it knows is what a file may not contain</strong>, and the only moment that knowledge can act on is the one before a file is written. <em>Where:</em> <code>plugins/spn-infra/src/hooks/hooks.json</code></p>
+  <p><code>spn-devex</code> wires four moments across seven tools, and it has reason to: it has something to say when a window opens, after a command has run, and before a turn is handed back. This plugin has nothing to say at any of those. <strong>What it knows is what a file may not contain</strong>, and the only moment that knowledge can act on is the one before a file is written.</p>
   <h3 id="the-matcher-narrows-before-the-command-r">The matcher narrows before the command runs</h3>
-  <p>The moment fires on every tool call, and a script deciding for itself whether it cares would be a process started for every read, every search and every shell command. The matcher is where that cost is refused: the harness starts nothing at all unless the call is a write or an edit. <em>Where:</em> the <code>matcher</code> field of the one entry.</p>
+  <p>The moment fires on every tool call, and a script deciding for itself whether it cares would be a process started for every read, every search and every shell command. The matcher is where that cost is refused: the harness starts nothing at all unless the call is a write or an edit.</p>
   <h3 id="the-command-is-written-against-the-plugi">The command is written against the plugin root</h3>
-  <p><code>${CLAUDE_PLUGIN_ROOT}</code> is the installed copy, so the same wiring works in every repository that loads the plugin and nothing has to know where the plugin was installed. The path under it — <code>scripts/events/pretooluse.ts</code> — is the dispatcher, and the wiring stops there: what that dispatcher runs is discovered rather than declared. <em>Where:</em> the <code>command</code> field of the one entry.</p>
+  <p><code>${CLAUDE_PLUGIN_ROOT}</code> is the installed copy, so the same wiring works in every repository that loads the plugin and nothing has to know where the plugin was installed. The path under it — <code>scripts/events/pretooluse.ts</code> — is the dispatcher, and the wiring stops there: what that dispatcher runs is discovered rather than declared.</p>
   <h3 id="the-folder-holds-the-wiring-and-nothing-">The folder holds the wiring and nothing else</h3>
-  <p><code>hooks/</code> carries <code>hooks.json</code> alone. <strong>Code lives under <code>scripts/</code></strong>, filed by what kind of thing it is, which is why the wired path leaves the hooks folder immediately. A reader looking for what a refusal says opens the scripts tree, and a reader looking for when it fires opens this one file. <em>Where:</em> <code>plugins/spn-infra/src/hooks/</code></p>
+  <p><code>hooks/</code> carries <code>hooks.json</code> alone. <strong>Code lives under <code>scripts/</code></strong>, filed by what kind of thing it is, which is why the wired path leaves the hooks folder immediately. A reader looking for what a refusal says opens the scripts tree, and a reader looking for when it fires opens this one file.</p>
   <h3 id="one-timeout-and-it-is-generous-on-purpos">One timeout, and it is generous on purpose</h3>
-  <p>The dispatcher resolves its subjects by reading a folder and importing each cloud's validators, so a first run pays for the imports. The declared allowance is large enough that a cold run finishes inside it, because a hook the harness gives up on is a gate nobody can tell from a gate that allowed the call. <em>Where:</em> the <code>timeout</code> field of the one entry.</p>
+  <p>The dispatcher resolves its subjects by reading a folder and importing each cloud's validators, so a first run pays for the imports. The declared allowance is large enough that a cold run finishes inside it, because a hook the harness gives up on is a gate nobody can tell from a gate that allowed the call.</p>
 </section>
 
 <!-- 04 -->
@@ -294,37 +295,6 @@
       <tr><td>the foundation's <code>02-delivery.md</code> § When an edit becomes behaviour</td><td>an edit to a wired script is live on its next run, while a change to <code>hooks.json</code> waits for a reinstall</td><td>MUST</td></tr>
       <tr><td><code>RD.DEVEX.019</code></td><td>the wiring names a script and carries no rule of its own</td><td>MUST</td></tr>
       <tr><td><code>MD8</code></td><td>a plugin carries its own libraries and never reaches into a sibling at runtime, which is why the wired path is under this plugin's own root</td><td>MUST</td></tr>
-    </tbody>
-  </table></div>
-  <div class="scroll"><table>
-    <thead><tr><th>Repo</th><th>Node</th><th>What it realizes</th><th>State</th></tr></thead>
-    <tbody>
-      <tr><td>spn-foundation</td><td><code>01-devex/02-agent/04-plugins</code></td><td>the foundation construct this one realizes</td><td>planned</td></tr>
-      <tr><td>spn-claude-marketplace</td><td><code>spn-infra</code></td><td>one <code>PreToolUse</code> entry on writes and edits, naming this plugin's dispatcher</td><td>planned</td></tr>
-    </tbody>
-  </table></div>
-</section>
-
-<!-- 06 -->
-<section id="s6">
-  <div class="sec-head"><h2>Proof</h2></div>
-  <p><em>Behaviours: joined from the register, <code>03-behaviors/03-infra/02-hooks.md</code> — never typed in the seat file.</em></p>
-  <div class="scroll"><table>
-    <thead><tr><th>Row</th><th>Does</th><th>Tier</th><th>Status</th></tr></thead>
-    <tbody>
-      <tr><td><code>MKT.HOOKS.21</code></td><td>have every write and every edit read before it lands</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.HOOKS.22</code></td><td>pay nothing for a call that is not a write</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.HOOKS.23</code></td><td>run the same wiring wherever the plugin was installed</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.HOOKS.24</code></td><td>change what a rule refuses without reinstalling the plugin</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.HOOKS.25</code></td><td>find when a refusal fires in one file and what it says in another</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.HOOKS.26</code></td><td>be sure a slow first run is not quietly given up on</td><td>UNIT</td><td>PLANNED</td></tr>
-    </tbody>
-  </table></div>
-  <div class="scroll"><table>
-    <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
-    <tbody>
-      <tr><td><code>node plugins/spn-devex/src/scripts/tools/partner-shape.ts</code></td><td>gate</td><td>the wired command resolves from the plugin root and runs against a repository holding nothing but the plugins</td></tr>
-      <tr><td><code>node plugins/spn-infra/tests/run.mjs</code></td><td>test</td><td>the dispatcher the wiring names answers a write event with a refusal or with silence, and never with a crash</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>node plugins/spn-infra/tests/run.mjs</code></p>

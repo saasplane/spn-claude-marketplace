@@ -188,6 +188,7 @@
 <section id="s0">
   <div class="sec-head"><h2>Overview</h2></div>
   <p>Two things about the manifest pull in opposite directions, and both are deliberate. <strong>The version is the set's and the identity is this plugin's own.</strong> The number moves with its two siblings whether or not anything here changed, so a reader comparing three numbers never has to wonder whether a release half-landed. The description belongs to <code>spn-infra</code> alone, and it is what a session matches against when it decides whether to load the plugin at all.</p>
+  <p>This construct realizes the book's <code>01-devex/02-agent/04-plugins</code>.</p>
 </section>
 
 <!-- 01 -->
@@ -258,15 +259,15 @@
 <section id="s3">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="the-three-plugins-carry-one-number-and-e">The three plugins carry one number, and every release moves all three</h3>
-  <p><strong>A reader cannot tell three version numbers apart.</strong> The plugins install as one set, by one command, and a session loads whichever of them its repository declares. Faced with three different numbers there is no way to tell from the outside whether that is three deliberate versions or one release that half-landed. So the three move together, and a plugin with nothing changed in it is released anyway at the new number. The cost is releasing an unchanged plugin, which costs nothing. <em>Where:</em> <code>plugins/spn-infra/src/.claude-plugin/plugin.json</code>, and the same file in each sibling folder.</p>
+  <p><strong>A reader cannot tell three version numbers apart.</strong> The plugins install as one set, by one command, and a session loads whichever of them its repository declares. Faced with three different numbers there is no way to tell from the outside whether that is three deliberate versions or one release that half-landed. So the three move together, and a plugin with nothing changed in it is released anyway at the new number. The cost is releasing an unchanged plugin, which costs nothing.</p>
   <h3 id="the-number-names-what-is-published-not-w">The number names what is published, not what somebody is working on</h3>
-  <p><strong>The release happens at the version the plugins already carry, and the count moves afterwards.</strong> A published version ships, and the first edit after it increments the patch — for all three, not for the one that was touched. That is what makes a stale cache findable: a cache directory is keyed by version, so a plugin edited without an increment installs over its own published bytes and nothing tells a reader which of the two is running. <em>Where:</em> the <code>version</code> field of each manifest.</p>
+  <p><strong>The release happens at the version the plugins already carry, and the count moves afterwards.</strong> A published version ships, and the first edit after it increments the patch — for all three, not for the one that was touched. That is what makes a stale cache findable: a cache directory is keyed by version, so a plugin edited without an increment installs over its own published bytes and nothing tells a reader which of the two is running.</p>
   <h3 id="the-description-is-this-plugin-s-own-and">The description is this plugin's own, and it decides the load</h3>
-  <p><strong>A description is matched, not browsed.</strong> It states in full what the plugin carries — the estate skills, the cards that hold the estate's vocabulary, the per-cloud material, and the refusal a write meets — because a session compares it against the work at hand rather than reading it for pleasure. The marketplace entry carries a second description for a listing to show, and the manifest is the current one wherever the two disagree. <em>Where:</em> <code>plugins/spn-infra/src/.claude-plugin/plugin.json</code> · <code>.claude-plugin/marketplace.json</code></p>
+  <p><strong>A description is matched, not browsed.</strong> It states in full what the plugin carries — the estate skills, the cards that hold the estate's vocabulary, the per-cloud material, and the refusal a write meets — because a session compares it against the work at hand rather than reading it for pleasure. The marketplace entry carries a second description for a listing to show, and the manifest is the current one wherever the two disagree.</p>
   <h3 id="it-loads-where-a-repository-declares-inf">It loads where a repository declares INFRA</h3>
-  <p><strong>The world is read from the repository, never typed by a workspace.</strong> A repository declaring <code>INFRA</code> gets this plugin, and that covers both the estate repository and the blueprint repository beside it, because both are edited under the estate's laws. A repository declaring another world never loads it, which is why the guard can be narrow: it only ever meets files that belong to an estate. <em>Where:</em> the consuming repository's own <code>sprepo.json</code></p>
+  <p><strong>The world is read from the repository, never typed by a workspace.</strong> A repository declaring <code>INFRA</code> gets this plugin, and that covers both the estate repository and the blueprint repository beside it, because both are edited under the estate's laws. A repository declaring another world never loads it, which is why the guard can be narrow: it only ever meets files that belong to an estate.</p>
   <h3 id="what-this-plugin-holds-and-what-it-leave">What this plugin holds, and what it leaves out</h3>
-  <p><code>spn-infra</code> ships <code>hooks/</code>, <code>skills/</code>, <code>scripts/</code>, <code>refs/</code>, <code>providers/</code> and <code>tests/</code>. <strong>It ships no <code>agents/</code> folder, and the absence is the statement</strong>: an agent brief convenes a reviewer over a change, and the estate's own review happens against a rendering through the tool's doors rather than against a diff. Each of the folders it does ship is named by its own page here. <em>Where:</em> <code>plugins/spn-infra/src/</code></p>
+  <p><code>spn-infra</code> ships <code>hooks/</code>, <code>skills/</code>, <code>scripts/</code>, <code>refs/</code>, <code>providers/</code> and <code>tests/</code>. <strong>It ships no <code>agents/</code> folder, and the absence is the statement</strong>: an agent brief convenes a reviewer over a change, and the estate's own review happens against a rendering through the tool's doors rather than against a diff. Each of the folders it does ship is named by its own page here.</p>
 </section>
 
 <!-- 04 -->
@@ -292,37 +293,6 @@
       <tr><td><a href="../../../registers/decisions.md">MD6</a></td><td>the manifest is the current description, and a marketplace entry disagreeing with it is the stale side</td><td>MUST</td></tr>
       <tr><td><code>RD.GOV.024</code></td><td>a repository answers to the world it declares, which is what decides this plugin is loaded at all</td><td>MUST</td></tr>
       <tr><td>the foundation's <code>02-delivery.md</code> § The set a repo gets is derived from its own claim</td><td>a workspace never types a plugin name; the set comes from the consuming repository's own manifest</td><td>MUST</td></tr>
-    </tbody>
-  </table></div>
-  <div class="scroll"><table>
-    <thead><tr><th>Repo</th><th>Node</th><th>What it realizes</th><th>State</th></tr></thead>
-    <tbody>
-      <tr><td>spn-foundation</td><td><code>01-devex/02-agent/04-plugins</code></td><td>the foundation construct this one realizes</td><td>planned</td></tr>
-      <tr><td>spn-claude-marketplace</td><td><code>spn-infra</code></td><td>the estate plugin's own manifest, its description, and the shared version it carries</td><td>planned</td></tr>
-    </tbody>
-  </table></div>
-</section>
-
-<!-- 06 -->
-<section id="s6">
-  <div class="sec-head"><h2>Proof</h2></div>
-  <p><em>Behaviours: joined from the register, <code>03-behaviors/03-infra/01-plugin.md</code> — never typed in the seat file.</em></p>
-  <div class="scroll"><table>
-    <thead><tr><th>Row</th><th>Does</th><th>Tier</th><th>Status</th></tr></thead>
-    <tbody>
-      <tr><td><code>MKT.PLUGIN.13</code></td><td>read one number and know whether the whole set is current</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PLUGIN.14</code></td><td>tell published bytes apart from bytes somebody is working on</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PLUGIN.15</code></td><td>find a stale installed copy instead of running it unknowingly</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PLUGIN.16</code></td><td>have the estate plugin loaded without naming it anywhere</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PLUGIN.17</code></td><td>work in the blueprint repository under the same estate laws</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PLUGIN.18</code></td><td>read one description saying in full what the plugin carries</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PLUGIN.19</code></td><td>find no agent brief here and know the absence is deliberate</td><td>UNIT</td><td>PLANNED</td></tr>
-    </tbody>
-  </table></div>
-  <div class="scroll"><table>
-    <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
-    <tbody>
-      <tr><td><code>node plugins/spn-devex/src/scripts/tools/partner-shape.ts</code></td><td>gate</td><td>this plugin is found from its own marketplace entry, and everything it wires runs against a repository holding nothing but the plugins</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>node plugins/spn-devex/src/scripts/tools/partner-shape.ts</code></p>

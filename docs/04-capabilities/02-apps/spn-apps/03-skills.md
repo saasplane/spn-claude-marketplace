@@ -20,6 +20,7 @@ Each folder under this plugin's `skills/` is named for a command of the `apps` g
 | Publishing | `plugins/spn-apps/src/skills/release/SKILL.md` | the repository's releasable projects, in lockstep, scoped to the repository and never one package |
 | The steps it names | `plugins/spn-apps/src/providers/ts/skills/implement/steps/` | one file per layer, held by the provider for the declared stack |
 | What each one restates | the `spn:restates` block at the top of each `SKILL.md` | the skills chapter, and the chapter of the one stage that skill serves |
+| The absent planning skill's material | `plugins/spn-apps/src/providers/ts/skills/ideate/plan.md` | the part of the core `ideate` walk only this stack can answer, held by the provider rather than under `skills/` |
 
 ## Follows the pattern
 

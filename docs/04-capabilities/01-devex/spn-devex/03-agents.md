@@ -19,6 +19,7 @@ Four markdown files sit under `plugins/spn-devex/src/agents/`, each a persona a 
 | The viewpoint files | `plugins/spn-devex/src/refs/devex/agent/lenses/` | one file per reviewing function: `lead` · `business` · `product` · `architect` · `server-dev` · `web-dev` · `qa` · `infra` · `trust` · `partner` · `voice` |
 | What the set of viewpoints is | `plugins/spn-devex/src/refs/devex/agent/lenses.md` | the restatement that states the set itself, and what each function is for |
 | The lens register | `plugins/spn-devex/src/scripts/tools/docs.ts` | the same values a document's `lenses` field may carry, and the label each renders as |
+| Where a viewpoint is convened | `plugins/spn-devex/src/skills/ideate/SKILL.md` · `plugins/spn-devex/src/skills/develop/SKILL.md` | the skills that say which gate convenes which viewpoint |
 
 ## Follows the pattern
 

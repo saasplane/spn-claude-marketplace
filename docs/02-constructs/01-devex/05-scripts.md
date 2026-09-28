@@ -23,6 +23,8 @@ Two habits run through the whole folder. The first is that **a script names the 
 
 Sharing one decision between a write-time check and a sweep is the habit that decides the folder's shape. **A rule answered one way while a file is written and another way in a sweep is two rules**, so the code that decides lives once and both callers import it.
 
+This construct realizes the book's `01-devex/02-agent/01-agent`.
+
 ## Terms
 
 | Term | Contract term | What it means |
@@ -66,67 +68,67 @@ A refusal ends a chain, because anything said after an answer is noise. Advice d
 
 ### The four folders, and what reaches each
 
-`checks/` holds the files a moment's dispatcher composes. `events/` holds one file per moment, which is the only code the wiring names. `tools/` holds the files nothing wires, reached by typing a path. `lib/` holds what more than one of the others reads and what none of them owns. The whole tree sits under `scripts/`, and the plugin's `hooks/` folder holds the wiring file alone. *Where:* `plugins/spn-devex/src/scripts/`
+`checks/` holds the files a moment's dispatcher composes. `events/` holds one file per moment, which is the only code the wiring names. `tools/` holds the files nothing wires, reached by typing a path. `lib/` holds what more than one of the others reads and what none of them owns. The whole tree sits under `scripts/`, and the plugin's `hooks/` folder holds the wiring file alone.
 
 ### A check is a file, and its header names its source
 
-Each check sits in its own file under `scripts/checks/` and opens with a line naming the chapter or register row of the foundation book it restates. That line carries no hash and nothing compares it, and that is deliberate: it tells a reader where the rule lives, and the rule is that a change is made in the chapter first and here second, in the same change. *Where:* `plugins/spn-devex/src/scripts/checks/`
+Each check sits in its own file under `scripts/checks/` and opens with a line naming the chapter or register row of the foundation book it restates. That line carries no hash and nothing compares it, and that is deliberate: it tells a reader where the rule lives, and the rule is that a change is made in the chapter first and here second, in the same change.
 
 ### Refusing a whole route beats listing the safe ones
 
-Where a value must never be rendered, every route that would render it is refused rather than the safe routes listed. One pipeline prints key names and the next prints every value, and telling those apart inside a shell string is guesswork. The whole command is read, so even a quoted path inside a here-document is caught, and the message names the door to use instead. *Where:* `plugins/spn-devex/src/scripts/checks/env-seat.ts`
+Where a value must never be rendered, every route that would render it is refused rather than the safe routes listed. One pipeline prints key names and the next prints every value, and telling those apart inside a shell string is guesswork. The whole command is read, so even a quoted path inside a here-document is caught, and the message names the door to use instead.
 
 ### Some checks speak and never refuse
 
-Where deciding needs a reading rather than a match, a gate would be guessing. The check that names which document governs the folder you are editing does that and nothing else, and where no row governs a folder it stays silent — that gap belongs to a sweep over the whole tree rather than to one write. And a warning that repeats is a warning nobody reads: one turn writes many files, often into one folder, so a speaking check remembers what it already said and says it once, keeping that memory in the workspace's own folder for what its machinery says about itself. *Where:* `plugins/spn-devex/src/scripts/checks/mirror.ts`, `plugins/spn-devex/src/scripts/checks/confirmed.ts`
+Where deciding needs a reading rather than a match, a gate would be guessing. The check that names which document governs the folder you are editing does that and nothing else, and where no row governs a folder it stays silent — that gap belongs to a sweep over the whole tree rather than to one write. And a warning that repeats is a warning nobody reads: one turn writes many files, often into one folder, so a speaking check remembers what it already said and says it once, keeping that memory in the workspace's own folder for what its machinery says about itself.
 
 ### A fragment cannot answer a question about a tree
 
-Every check under `checks/` reads the fragment being written, and a fragment cannot show that a page names a folder deleted last week or that a produced page stopped matching its seat. Those are corpus questions, and one check exists to ask a few of them without waiting for somebody to type a command. *Where:* `plugins/spn-devex/src/scripts/checks/corpus.ts`
+Every check under `checks/` reads the fragment being written, and a fragment cannot show that a page names a folder deleted last week or that a produced page stopped matching its seat. Those are corpus questions, and one check exists to ask a few of them without waiting for somebody to type a command.
 
 ### The workspace gates ask for accounting, not completion
 
-Closing a scope with work still pending is good housekeeping. What must not happen is a row nobody decided. So the close gate passes landed, carried and deferred alike, and refuses only the undecided row, and there is no override because recording the deferral is the way through. Two of the workspace gates read the same table for different reasons, so they live in one file and the dispatcher registers each separately. Naming them apart matters: one sweeps the workspace and the other reads a single path, and anybody measuring the cost needs to know which. *Where:* `plugins/spn-devex/src/scripts/checks/split-plan.ts`
+Closing a scope with work still pending is good housekeeping. What must not happen is a row nobody decided. So the close gate passes landed, carried and deferred alike, and refuses only the undecided row, and there is no override because recording the deferral is the way through. Two of the workspace gates read the same table for different reasons, so they live in one file and the dispatcher registers each separately. Naming them apart matters: one sweeps the workspace and the other reads a single path, and anybody measuring the cost needs to know which.
 
 ### The bars a check measures come from a rule, never from the corpus
 
-A bar set from what the corpus already averages moves every time the corpus does, so a sweep would approve whatever is already there. The document check takes its numbers from the register row that states them, and takes headings, tables, code and metadata out of the text before measuring what is left. *Where:* `plugins/spn-devex/src/scripts/checks/doc-check.ts`
+A bar set from what the corpus already averages moves every time the corpus does, so a sweep would approve whatever is already there. The document check takes its numbers from the register row that states them, and takes headings, tables, code and metadata out of the text before measuring what is left.
 
 ### A tool is reached by name, and grades what it finds
 
-Nothing matches a tool against the work you are doing, so you reach one by naming its path. It reads the repository it was pointed at and answers with both a list and a number: findings a person reads, each carrying its grade, and an exit code a pipeline reads that counts only the refusals. That is why the grade is part of a finding rather than a judgement made at the end. *Where:* `plugins/spn-devex/src/scripts/tools/`
+Nothing matches a tool against the work you are doing, so you reach one by naming its path. It reads the repository it was pointed at and answers with both a list and a number: findings a person reads, each carrying its grade, and an exit code a pipeline reads that counts only the refusals. That is why the grade is part of a finding rather than a judgement made at the end.
 
 ### One file serves the write-time check and the sweep
 
-A rule answered one way while a file is written and another way in a sweep is two rules. The practical consequence is that the same file must read a document in both of its spellings — the markdown an author writes and the HTML a page is produced as — because reading only one of them once reported every hand-written page as missing every section it carried. *Where:* `plugins/spn-devex/src/scripts/tools/docs.ts`
+A rule answered one way while a file is written and another way in a sweep is two rules. The practical consequence is that the same file must read a document in both of its spellings — the markdown an author writes and the HTML a page is produced as — because reading only one of them once reported every hand-written page as missing every section it carried.
 
 ### A job, not a flag
 
-A tool with more than one job gives each job a name and a path argument, and a path is a file or a folder in every one of them. Given a folder, a job means every document under it, which is what anybody typing one meant. *Where:* `plugins/spn-devex/src/scripts/tools/docs.ts`
+A tool with more than one job gives each job a name and a path argument, and a path is a file or a folder in every one of them. Given a folder, a job means every document under it, which is what anybody typing one meant.
 
 ### Two questions that look alike and are not
 
-Comparing documents inside one repository and comparing a restatement against a book in another repository are different questions with different inputs, and no repository holds both trees. So they are two tools, and both read one parser, because writing the parser twice would be the defect the instrument exists to catch. *Where:* `plugins/spn-devex/src/scripts/tools/coherence.ts`, `plugins/spn-devex/src/scripts/tools/restate-drift.ts`
+Comparing documents inside one repository and comparing a restatement against a book in another repository are different questions with different inputs, and no repository holds both trees. So they are two tools, and both read one parser, because writing the parser twice would be the defect the instrument exists to catch.
 
 ### Silence where the input is absent
 
-A partner holds the plugins and neither the book nor its registers. A question whose input is missing answers with one line and a clean exit, because a crash on a repository the tool was not written for shows a partner a broken agent rather than a missing file. *Where:* `plugins/spn-devex/src/scripts/tools/restate-drift.ts`, `plugins/spn-devex/src/scripts/tools/coherence.ts`
+A partner holds the plugins and neither the book nor its registers. A question whose input is missing answers with one line and a clean exit, because a crash on a repository the tool was not written for shows a partner a broken agent rather than a missing file.
 
 ### A tool that proves the other scripts
 
-One tool builds a repository carrying only what a partner has, runs every wired script and every other tool against it, and reports. A crash is a failure there; a finding is not, because findings are that repository's own business. It picks an interpreter from each script's own extension, so a ported script is exercised the same way its predecessor was. *Where:* `plugins/spn-devex/src/scripts/tools/partner-shape.ts`
+One tool builds a repository carrying only what a partner has, runs every wired script and every other tool against it, and reports. A crash is a failure there; a finding is not, because findings are that repository's own business. It picks an interpreter from each script's own extension, so a ported script is exercised the same way its predecessor was.
 
 ### A tool that reports candidates rather than verdicts
 
-Handing a whole corpus to a rewriting pass is the expensive way to improve it, and most of the corpus needs no change. So the prose triage reports the paragraphs a pattern can recognise, with a ledger of what it has already scored so a long sweep can resume, and it leaves the faults no pattern can tell from good prose to a reader. *Where:* `plugins/spn-devex/src/scripts/tools/prose-triage.ts`
+Handing a whole corpus to a rewriting pass is the expensive way to improve it, and most of the corpus needs no change. So the prose triage reports the paragraphs a pattern can recognise, with a ledger of what it has already scored so a long sweep can resume, and it leaves the faults no pattern can tell from good prose to a reader.
 
 ### A tool that writes rather than reports
 
-One tool here writes. It reads a run's own results file and puts what the run found into the cells a run owns, leaving every other cell exactly as it was. It exists because this repository declares no stack, so no stack runner writes its rows, and only the plugins' own suites know. *Where:* `plugins/spn-devex/src/scripts/tools/behaviour-status.mjs`
+One tool here writes. It reads a run's own results file and puts what the run found into the cells a run owns, leaving every other cell exactly as it was. It exists because this repository declares no stack, so no stack runner writes its rows, and only the plugins' own suites know.
 
 ### A tool produces the pages, and the page's own shape belongs to the book
 
-An author writes markdown and a reader opens HTML, and the whole of what sits between the two is a job of the documents tool: `page` produces, `face` writes the generated regions of a face, `figures` measures every drawing, and `audit` produces a page again and compares it byte for byte, so a hand edit is found rather than inherited. What the tool must not decide is what a page is made of. **The block vocabulary, the figure grammar and the furniture a page carries are the foundation's**, stated in `spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md` with the templates beside it, and this folder only realizes them. Where the two disagree, the chapter wins. *Where:* `plugins/spn-devex/src/scripts/tools/docs.ts`, and the renderer, drawer and figure checker it imports from `plugins/spn-devex/src/scripts/lib/`
+An author writes markdown and a reader opens HTML, and the whole of what sits between the two is a job of the documents tool: `page` produces, `face` writes the generated regions of a face, `figures` measures every drawing, and `audit` produces a page again and compares it byte for byte, so a hand edit is found rather than inherited. What the tool must not decide is what a page is made of. **The block vocabulary, the figure grammar and the furniture a page carries are the foundation's**, stated in `spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md` with the templates beside it, and this folder only realizes them. Where the two disagree, the chapter wins.
 
 ## Boundary
 
@@ -148,19 +150,5 @@ This page answers what a script is, how each kind is reached, and what it answer
 | `RD.GOV.024` | this repository is served with docs commands alone, which is why its own rows are written by a tool the plugins ship | MUST |
 | the foundation's `02-delivery.md` § What it makes checkable | which standards are expected to be answered by a script rather than by a reader | MUST |
 | the foundation's `05-artifacts.md` § The blocks · § The figures | what a produced page is made of, which this folder renders and never decides | MUST |
-
-| Repo | Node | What it realizes | State |
-| --- | --- | --- | --- |
-| spn-foundation | `01-devex/02-agent/01-agent` | the foundation construct this one realizes | planned |
-| spn-claude-marketplace | `spn-devex` | the stack-agnostic checks the dispatcher composes, the tools a person reaches by name, and the library both read | planned |
-
-## Proof
-
-| Check | Kind | What a green run shows |
-| --- | --- | --- |
-| `node plugins/spn-devex/src/scripts/tools/partner-shape.ts` | gate | every script runs against a repository holding nothing but the plugin, a missing input produces silence rather than a crash, and nothing there crashes |
-| `node plugins/spn-devex/src/scripts/tools/coherence.ts` | gate | no two documents in the repository state opposite rules about what a script decides |
-| `node plugins/spn-devex/src/scripts/tools/docs.ts audit docs` | gate | every page is what its seat file produces, so no page carries a hand edit |
-| `node plugins/spn-devex/src/scripts/tools/docs.ts figures check docs` | gate | every label fits its box, every connector starts and ends on a shape, and nothing crowds its neighbour |
 
 Try it: `node plugins/spn-devex/src/scripts/tools/partner-shape.ts`

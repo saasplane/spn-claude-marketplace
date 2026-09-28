@@ -60,31 +60,31 @@ The tree sits at the plugin's root rather than beside the source, so a suite is 
 
 ### What the folder holds, and the two tiers that are absent
 
-`tests/` holds the runner, a `helpers/` folder for what every suite imports, and one folder per tier. Only `unit/` exists. `integration/` is absent because nothing in these plugins runs at that tier, and `setup/` is absent because the runner needs none. **An absent folder says what is true; a folder standing empty to look complete teaches a reader that the tier works.** *Where:* `plugins/spn-devex/tests/`
+`tests/` holds the runner, a `helpers/` folder for what every suite imports, and one folder per tier. Only `unit/` exists. `integration/` is absent because nothing in these plugins runs at that tier, and `setup/` is absent because the runner needs none. **An absent folder says what is true; a folder standing empty to look complete teaches a reader that the tier works.**
 
 ### The mirror repeats the source's own path
 
-Under the tier, a suite sits at the path its source sits at inside the plugin. A check under `src/scripts/checks/` is proven under `unit/scripts/checks/`, and a provider's rule under `src/providers/<instance>/checks/_<subject>/` is proven under `unit/providers/<instance>/checks/_<subject>/`. Nothing maps one to the other: the path is the map. *Where:* `plugins/spn-devex/tests/unit/scripts/checks/`, `plugins/spn-apps/tests/unit/providers/ts/checks/_src/`
+Under the tier, a suite sits at the path its source sits at inside the plugin. A check under `src/scripts/checks/` is proven under `unit/scripts/checks/`, and a provider's rule under `src/providers/<instance>/checks/_<subject>/` is proven under `unit/providers/<instance>/checks/_<subject>/`. Nothing maps one to the other: the path is the map.
 
 ### The folders are the convention; the framework is not
 
-The authoring stack's own test step names a framework as well as a tree, and only the tree is adopted here. These suites drive real hook processes through standard input and assert on what comes back out, so a framework would wrap a subprocess harness in another harness and buy nothing. **The runner stays a plain `.mjs` file with no dependency**, which is also what lets a partner run it with nothing installed. *Where:* `plugins/spn-devex/tests/run.mjs`
+The authoring stack's own test step names a framework as well as a tree, and only the tree is adopted here. These suites drive real hook processes through standard input and assert on what comes back out, so a framework would wrap a subprocess harness in another harness and buy nothing. **The runner stays a plain `.mjs` file with no dependency**, which is also what lets a partner run it with nothing installed.
 
 ### Nothing counts a `..` hop
 
-A suite that types its own depth is a suite the next move breaks, and every suite broke at once the first time these folders changed. So the plugin root is resolved once, in the harness, and exported; the runner finds the tier by walking down from its own folder; and the helper that resolves a script's path walks whatever folders a provider's `checks/` actually holds. A suite imports those answers and computes none of them. *Where:* `plugins/spn-devex/tests/helpers/harness.mjs`, `PLUGIN`
+A suite that types its own depth is a suite the next move breaks, and every suite broke at once the first time these folders changed. So the plugin root is resolved once, in the harness, and exported; the runner finds the tier by walking down from its own folder; and the helper that resolves a script's path walks whatever folders a provider's `checks/` actually holds. A suite imports those answers and computes none of them.
 
 ### A suite is found by a walk, never by a list
 
-The runner walks the tier and runs every file it finds. A list would be a second place a new suite has to be added, and the suite nobody added to it is the one that silently never runs. *Where:* `plugins/spn-devex/tests/run.mjs`
+The runner walks the tier and runs every file it finds. A list would be a second place a new suite has to be added, and the suite nobody added to it is the one that silently never runs.
 
 ### A case that carries a behaviour id becomes that row's result
 
-This repository declares no stack, so no stack runner writes its behaviour rows. The suites are the runner instead: a case whose title carries a row's id writes that row's result into the run's own artifact, and a tool reads the artifact and fills the two cells a run owns. A row no case reached is left saying so. *Where:* `plugins/spn-devex/tests/run.mjs`, and `plugins/spn-devex/src/scripts/tools/behaviour-status.mjs`
+This repository declares no stack, so no stack runner writes its behaviour rows. The suites are the runner instead: a case whose title carries a row's id writes that row's result into the run's own artifact, and a tool reads the artifact and fills the two cells a run owns. A row no case reached is left saying so.
 
 ### What a suite proves is the shipping shape
 
-A suite runs the script the way a moment runs it — as a process, handed a payload on standard input, read back from standard output — rather than importing a function and calling it. A gate that passes when imported and fails when spawned is a gate that has never been proven, and both spellings exist in the folder it is asked about. *Where:* `plugins/spn-devex/tests/helpers/harness.mjs`, `run` and `one`
+A suite runs the script the way a moment runs it — as a process, handed a payload on standard input, read back from standard output — rather than importing a function and calling it. A gate that passes when imported and fails when spawned is a gate that has never been proven, and both spellings exist in the folder it is asked about.
 
 ## Boundary
 
@@ -105,19 +105,5 @@ This page answers where a suite sits, how it is found, and what it may not compu
 | the apps provider's `test` step | `tests/` sits at a project's root and never beside the source it proves | MUST |
 | `RD.GOV.024` | this repository is served with docs commands alone, which is why the plugins' own suites are its runner | MUST |
 | `RD.DEVEX.019` | a suite proves a restatement fires; it states no rule of its own | MUST |
-
-| Repo | Node | What it realizes | State |
-| --- | --- | --- | --- |
-| spn-claude-marketplace | `spn-devex` | the tree, the walking runner, and the harness the other two copy | planned |
-| spn-claude-marketplace | `spn-apps` | the same tree, mirroring both its own scripts and its one provider's rules | planned |
-| spn-claude-marketplace | `spn-infra` | the same tree, mirroring its shared rule bodies and the clouds' subjects | planned |
-
-## Proof
-
-| Check | Kind | What a green run shows |
-| --- | --- | --- |
-| `node plugins/spn-devex/tests/run.mjs` | suite | every suite under the tier is found by a walk, each one runs against the shipping script, and the run reports its own suite and case counts |
-| `node plugins/spn-apps/tests/run.mjs` | suite | the mirror holds for a plugin whose suites cover a provider's private rules as well as its own scripts |
-| `node plugins/spn-devex/src/scripts/tools/partner-shape.ts` | gate | the runner and every suite work in a repository holding nothing but the plugin, with nothing installed |
 
 Try it: `node plugins/spn-devex/tests/run.mjs`

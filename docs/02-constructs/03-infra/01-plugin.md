@@ -21,6 +21,8 @@ A rule an agent never loads is a rule nobody follows. `spn-infra` is the folder 
 
 Two things about the manifest pull in opposite directions, and both are deliberate. **The version is the set's and the identity is this plugin's own.** The number moves with its two siblings whether or not anything here changed, so a reader comparing three numbers never has to wonder whether a release half-landed. The description belongs to `spn-infra` alone, and it is what a session matches against when it decides whether to load the plugin at all.
 
+This construct realizes the book's `01-devex/02-agent/04-plugins`.
+
 ## Terms
 
 | Term | Contract term | What it means |
@@ -56,23 +58,23 @@ A session never reads this checkout. It reads an installed copy, found by the pl
 
 ### The three plugins carry one number, and every release moves all three
 
-**A reader cannot tell three version numbers apart.** The plugins install as one set, by one command, and a session loads whichever of them its repository declares. Faced with three different numbers there is no way to tell from the outside whether that is three deliberate versions or one release that half-landed. So the three move together, and a plugin with nothing changed in it is released anyway at the new number. The cost is releasing an unchanged plugin, which costs nothing. *Where:* `plugins/spn-infra/src/.claude-plugin/plugin.json`, and the same file in each sibling folder.
+**A reader cannot tell three version numbers apart.** The plugins install as one set, by one command, and a session loads whichever of them its repository declares. Faced with three different numbers there is no way to tell from the outside whether that is three deliberate versions or one release that half-landed. So the three move together, and a plugin with nothing changed in it is released anyway at the new number. The cost is releasing an unchanged plugin, which costs nothing.
 
 ### The number names what is published, not what somebody is working on
 
-**The release happens at the version the plugins already carry, and the count moves afterwards.** A published version ships, and the first edit after it increments the patch — for all three, not for the one that was touched. That is what makes a stale cache findable: a cache directory is keyed by version, so a plugin edited without an increment installs over its own published bytes and nothing tells a reader which of the two is running. *Where:* the `version` field of each manifest.
+**The release happens at the version the plugins already carry, and the count moves afterwards.** A published version ships, and the first edit after it increments the patch — for all three, not for the one that was touched. That is what makes a stale cache findable: a cache directory is keyed by version, so a plugin edited without an increment installs over its own published bytes and nothing tells a reader which of the two is running.
 
 ### The description is this plugin's own, and it decides the load
 
-**A description is matched, not browsed.** It states in full what the plugin carries — the estate skills, the cards that hold the estate's vocabulary, the per-cloud material, and the refusal a write meets — because a session compares it against the work at hand rather than reading it for pleasure. The marketplace entry carries a second description for a listing to show, and the manifest is the current one wherever the two disagree. *Where:* `plugins/spn-infra/src/.claude-plugin/plugin.json` · `.claude-plugin/marketplace.json`
+**A description is matched, not browsed.** It states in full what the plugin carries — the estate skills, the cards that hold the estate's vocabulary, the per-cloud material, and the refusal a write meets — because a session compares it against the work at hand rather than reading it for pleasure. The marketplace entry carries a second description for a listing to show, and the manifest is the current one wherever the two disagree.
 
 ### It loads where a repository declares INFRA
 
-**The world is read from the repository, never typed by a workspace.** A repository declaring `INFRA` gets this plugin, and that covers both the estate repository and the blueprint repository beside it, because both are edited under the estate's laws. A repository declaring another world never loads it, which is why the guard can be narrow: it only ever meets files that belong to an estate. *Where:* the consuming repository's own `sprepo.json`
+**The world is read from the repository, never typed by a workspace.** A repository declaring `INFRA` gets this plugin, and that covers both the estate repository and the blueprint repository beside it, because both are edited under the estate's laws. A repository declaring another world never loads it, which is why the guard can be narrow: it only ever meets files that belong to an estate.
 
 ### What this plugin holds, and what it leaves out
 
-`spn-infra` ships `hooks/`, `skills/`, `scripts/`, `refs/`, `providers/` and `tests/`. **It ships no `agents/` folder, and the absence is the statement**: an agent brief convenes a reviewer over a change, and the estate's own review happens against a rendering through the tool's doors rather than against a diff. Each of the folders it does ship is named by its own page here. *Where:* `plugins/spn-infra/src/`
+`spn-infra` ships `hooks/`, `skills/`, `scripts/`, `refs/`, `providers/` and `tests/`. **It ships no `agents/` folder, and the absence is the statement**: an agent brief convenes a reviewer over a change, and the estate's own review happens against a rendering through the tool's doors rather than against a diff. Each of the folders it does ship is named by its own page here.
 
 ## Boundary
 
@@ -91,16 +93,5 @@ This page answers what carries the estate standard into a session and which byte
 | [MD6](../../registers/decisions.md) | the manifest is the current description, and a marketplace entry disagreeing with it is the stale side | MUST |
 | `RD.GOV.024` | a repository answers to the world it declares, which is what decides this plugin is loaded at all | MUST |
 | the foundation's `02-delivery.md` § The set a repo gets is derived from its own claim | a workspace never types a plugin name; the set comes from the consuming repository's own manifest | MUST |
-
-| Repo | Node | What it realizes | State |
-| --- | --- | --- | --- |
-| spn-foundation | `01-devex/02-agent/04-plugins` | the foundation construct this one realizes | planned |
-| spn-claude-marketplace | `spn-infra` | the estate plugin's own manifest, its description, and the shared version it carries | planned |
-
-## Proof
-
-| Check | Kind | What a green run shows |
-| --- | --- | --- |
-| `node plugins/spn-devex/src/scripts/tools/partner-shape.ts` | gate | this plugin is found from its own marketplace entry, and everything it wires runs against a repository holding nothing but the plugins |
 
 Try it: `node plugins/spn-devex/src/scripts/tools/partner-shape.ts`

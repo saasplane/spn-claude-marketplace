@@ -188,6 +188,7 @@
 <section id="s0">
   <div class="sec-head"><h2>Overview</h2></div>
   <p>The thing to check first is that <strong>a skill here names no stack</strong>. The steps of a build differ in every language, so the skill states the order and reads the step files from the provider the node's own <code>sprepo.json</code> declares. The second thing is the absence: <strong>planning is not a skill of this domain.</strong> The book's skill set is closed and folded planning into a stack-agnostic skill, so shipping one here would add a value the standard does not have, and two skills would then compete for the same ask.</p>
+  <p>This construct realizes the book's <code>01-devex/02-agent/02-skills</code>.</p>
 </section>
 
 <!-- 01 -->
@@ -262,21 +263,21 @@
 <section id="s3">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="one-skill-divides-into-steps-and-the-ord">One skill divides into steps, and the order is the rule</h3>
-  <p>The contract comes first, and everything downstream is generated from it or written against it. A service written before its state is a service that will be rewritten. So the build skill is the only folder here that sequences steps at all, the order is fixed, and each step is read before that layer's code is written rather than after. <em>Where:</em> <code>plugins/spn-apps/src/skills/implement/SKILL.md</code></p>
+  <p>The contract comes first, and everything downstream is generated from it or written against it. A service written before its state is a service that will be rewritten. So the build skill is the only folder here that sequences steps at all, the order is fixed, and each step is read before that layer's code is written rather than after.</p>
   <h3 id="the-skill-names-the-step-the-provider-ho">The skill names the step; the provider holds it</h3>
-  <p>A step file is written in a language, so it cannot live in a skill that serves every stack this domain may grow. The skill states the step names, their order and what each one settles, and composes the path <code>providers/{stack}/skills/implement/steps/{step}.md</code> from the nearest <code>sprepo.json</code>. A step file the declared stack does not ship is a step that stack does not walk, and nothing here stubs one. <em>Where:</em> <code>plugins/spn-apps/src/skills/implement/SKILL.md</code> · <a href="./06-providers-construct.html">Providers</a></p>
+  <p>A step file is written in a language, so it cannot live in a skill that serves every stack this domain may grow. The skill states the step names, their order and what each one settles, and composes the path <code>providers/{stack}/skills/implement/steps/{step}.md</code> from the nearest <code>sprepo.json</code>. A step file the declared stack does not ship is a step that stack does not walk, and nothing here stubs one.</p>
   <h3 id="the-router-classifies-before-it-sequence">The router classifies before it sequences</h3>
-  <p>The build skill first decides whether the ask touches the back end alone, the front end alone, or both, and that classification decides which steps apply. Sequencing every step for every ask would make the smallest change cost the largest walk. <em>Where:</em> <code>plugins/spn-apps/src/skills/implement/SKILL.md</code></p>
+  <p>The build skill first decides whether the ask touches the back end alone, the front end alone, or both, and that classification decides which steps apply. Sequencing every step for every ask would make the smallest change cost the largest walk.</p>
   <h3 id="a-mode-is-an-argument-not-a-second-folde">A mode is an argument, not a second folder</h3>
-  <p>Two folders with almost the same description compete for the same match, and the matching gets worse as the pair grows. So a skill answering several close asks takes a mode, names its modes in the sentence a session matches against, and says which neighbouring skill an adjacent ask belongs to instead. A destructive mode says it is destructive in that same sentence rather than in the body it loads afterwards. <em>Where:</em> <code>plugins/spn-apps/src/skills/verify/SKILL.md</code>, <code>plugins/spn-apps/src/skills/run/SKILL.md</code></p>
+  <p>Two folders with almost the same description compete for the same match, and the matching gets worse as the pair grows. So a skill answering several close asks takes a mode, names its modes in the sentence a session matches against, and says which neighbouring skill an adjacent ask belongs to instead. A destructive mode says it is destructive in that same sentence rather than in the body it loads afterwards.</p>
   <h3 id="each-skill-declares-the-one-stage-it-ser">Each skill declares the one stage it serves</h3>
-  <p>A skill and a stage are separate closed sets mapped many to one, and the mapping is what makes <em>which standards apply to this request</em> derivable from the skill that was invoked. Scaffolding answers to the repository stage, proving answers to the test stage, and the build loop's skills answer to the develop stage. Flattening them derives nothing. <em>Where:</em> the <code>spn:restates</code> block at the top of each <code>plugins/spn-apps/src/skills/*/SKILL.md</code></p>
+  <p>A skill and a stage are separate closed sets mapped many to one, and the mapping is what makes <em>which standards apply to this request</em> derivable from the skill that was invoked. Scaffolding answers to the repository stage, proving answers to the test stage, and the build loop's skills answer to the develop stage. Flattening them derives nothing.</p>
   <h3 id="a-skill-carries-a-stamp-so-a-chapter-it-">A skill carries a stamp, so a chapter it fell behind can say so</h3>
-  <p>A skill is prose the agent loads, and prose drifts from the book silently because nothing compares it. Every skill here opens with a block naming the chapters it restates and the hash last read from each, so a drift run reads a skill exactly as it reads a ref. <em>Where:</em> <code>plugins/spn-apps/src/skills/implement/SKILL.md</code></p>
+  <p>A skill is prose the agent loads, and prose drifts from the book silently because nothing compares it. Every skill here opens with a block naming the chapters it restates and the hash last read from each, so a drift run reads a skill exactly as it reads a ref.</p>
   <h3 id="the-closing-gate-belongs-to-the-skill">The closing gate belongs to the skill</h3>
-  <p>A contract change reviewed at the end of a session is reviewed by the context that wrote it. So the build skill closes with the suites and then hands the change to the review skill in its contract mode, and the hand-off is named in the description, so it happens even when nobody asks for it. <em>Where:</em> <code>plugins/spn-apps/src/skills/implement/SKILL.md</code></p>
+  <p>A contract change reviewed at the end of a session is reviewed by the context that wrote it. So the build skill closes with the suites and then hands the change to the review skill in its contract mode, and the hand-off is named in the description, so it happens even when nobody asks for it.</p>
   <h3 id="the-absent-skill-and-where-its-material-">The absent skill, and where its material lives</h3>
-  <p>Deciding what a node is belongs to a skill that is the same in every world, and it lives once in the core plugin. What this plugin supplies is the part of that walk only a stack can answer, and it sits under the provider for that stack rather than under <code>skills/</code>. <em>Where:</em> <code>plugins/spn-apps/src/providers/ts/skills/ideate/plan.md</code></p>
+  <p>Deciding what a node is belongs to a skill that is the same in every world, and it lives once in the core plugin. What this plugin supplies is the part of that walk only a stack can answer, and it sits under the provider for that stack rather than under <code>skills/</code>.</p>
 </section>
 
 <!-- 04 -->
@@ -305,40 +306,6 @@
       <tr><td><code>RD.DEVEX.062</code></td><td>planning folds into a stack-agnostic skill, which is why this domain ships none</td><td>MUST</td></tr>
       <tr><td><code>RD.DOCS.055</code></td><td>a skill that carries a rule it does not own is a restatement, and says so under a stamp</td><td>MUST</td></tr>
       <tr><td>the foundation's <code>02-delivery.md</code> § When an edit becomes behaviour</td><td>a skill edit is loadable only after an install and a fresh window</td><td>MUST</td></tr>
-    </tbody>
-  </table></div>
-  <div class="scroll"><table>
-    <thead><tr><th>Repo</th><th>Node</th><th>What it realizes</th><th>State</th></tr></thead>
-    <tbody>
-      <tr><td>spn-foundation</td><td><code>01-devex/02-agent/02-skills</code></td><td>the foundation construct this one realizes</td><td>planned</td></tr>
-      <tr><td>spn-claude-marketplace</td><td><code>spn-apps</code></td><td>the skills an apps repository answers to, the step order behind the build skill, and the deliberate absence where planning would be</td><td>planned</td></tr>
-    </tbody>
-  </table></div>
-</section>
-
-<!-- 06 -->
-<section id="s6">
-  <div class="sec-head"><h2>Proof</h2></div>
-  <p><em>Behaviours: joined from the register, <code>03-behaviors/02-apps/03-skills.md</code> — never typed in the seat file.</em></p>
-  <div class="scroll"><table>
-    <thead><tr><th>Row</th><th>Does</th><th>Tier</th><th>Status</th></tr></thead>
-    <tbody>
-      <tr><td><code>MKT.SKILLS.08</code></td><td>build a capability in an order that does not have to be undone</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.SKILLS.09</code></td><td>make a front-end change without walking the server steps</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.SKILLS.10</code></td><td>reach a step written for this node's own language without naming one</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.SKILLS.11</code></td><td>ask for a review and get the mode the ask meant</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.SKILLS.12</code></td><td>learn a mode is destructive before it runs</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.SKILLS.13</code></td><td>derive which standards apply from the skill that was invoked</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.SKILLS.14</code></td><td>be told when a skill has fallen behind the chapters it restates</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.SKILLS.15</code></td><td>have a contract change reviewed by something that did not write it</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.SKILLS.16</code></td><td>decide what a node is without a second skill competing for the ask</td><td>UNIT</td><td>PLANNED</td></tr>
-    </tbody>
-  </table></div>
-  <div class="scroll"><table>
-    <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
-    <tbody>
-      <tr><td><code>node plugins/spn-devex/src/scripts/tools/restate-drift.ts</code></td><td>gate</td><td>every skill carrying a stamp still reads as the chapters it names read today</td></tr>
-      <tr><td><code>node plugins/spn-devex/src/scripts/tools/coherence.ts</code></td><td>gate</td><td>every rule a skill cites resolves to a row, and every plugin path it names is on disk</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>node plugins/spn-devex/src/scripts/tools/restate-drift.ts</code></p>

@@ -61,23 +61,23 @@ The thing to check first is whether any gate names an instance. A gate that spel
 
 ### A gate never names an instance
 
-The instance is read from the nearest `sprepo.json`, never typed on a command and never guessed from a file extension. A gate that could name an instance is a gate somebody edits to add the next one, and the edit is the thing this construct exists to remove. *Where:* `plugins/spn-apps/src/scripts/lib/stack.ts`, `plugins/spn-infra/src/scripts/checks/subjects.ts`
+The instance is read from the nearest `sprepo.json`, never typed on a command and never guessed from a file extension. A gate that could name an instance is a gate somebody edits to add the next one, and the edit is the thing this construct exists to remove.
 
 ### The two halves, and what each holds
 
-The skills half holds a **procedure** — what to do, in order, when working in this instance. The scripts half holds a **parse and its rules** — what this instance's text looks like and what is true of it. A rule is an implementation detail of the check that runs it and lives beside it, not in a shared registry above it. *Where:* `plugins/spn-apps/src/providers/ts/skills/`, `plugins/spn-apps/src/providers/ts/scripts/checks/`
+The skills half holds a **procedure** — what to do, in order, when working in this instance. The scripts half holds a **parse and its rules** — what this instance's text looks like and what is true of it. A rule is an implementation detail of the check that runs it and lives beside it, not in a shared registry above it.
 
 ### A private rule sits behind an underscore
 
-Where a subject's gate is one door and several rules stand behind it, the rules go under a folder whose name opens with an underscore and the door stays the only file at the top. A reader listing the folder then sees the subjects a gate dispatches over, and nothing that is only reachable through one of them. *Where:* `plugins/spn-apps/src/providers/ts/scripts/checks/_src/`, `plugins/spn-apps/src/providers/ts/scripts/checks/_tests/`
+Where a subject's gate is one door and several rules stand behind it, the rules go under a folder whose name opens with an underscore and the door stays the only file at the top. A reader listing the folder then sees the subjects a gate dispatches over, and nothing that is only reachable through one of them.
 
 ### A skills half is earned by changing the authoring stack
 
-The test is not whether an instance has a procedure yet; it is whether the instance **changes the language the work is written in**. Where the instance *is* the stack, it always does. Where the instance is a cloud and every rendering is written in the same engine against the same declaration, it never does — and that provider carries a scripts half alone. The asymmetry is a fact about the two domains rather than a gap in one of them. *Where:* `plugins/spn-infra/src/providers/aws/scripts/checks/`
+The test is not whether an instance has a procedure yet; it is whether the instance **changes the language the work is written in**. Where the instance *is* the stack, it always does. Where the instance is a cloud and every rendering is written in the same engine against the same declaration, it never does — and that provider carries a scripts half alone. The asymmetry is a fact about the two domains rather than a gap in one of them.
 
 ### A shared rule body is a factory, not a rule
 
-Where two instances genuinely need one rule, what they share is a function parameterized by each instance's own values, and it lives with the plugin's other shared code. It is not a rule folder: the moment a rule folder exists, rules drift into it that only one instance ever needed. *Where:* `plugins/spn-infra/src/scripts/lib/provider-strings.ts`
+Where two instances genuinely need one rule, what they share is a function parameterized by each instance's own values, and it lives with the plugin's other shared code. It is not a rule folder: the moment a rule folder exists, rules drift into it that only one instance ever needed.
 
 ### Adding an instance
 
@@ -101,18 +101,5 @@ Add `providers/<instance>/`, with a `skills/` half for what a skill loads and a 
 | `RD.DEVEX.025` | a folder per skill value and a value per folder, so a gate's own folder set is closed and a provider cannot add to it | MUST |
 | `RD.GOV.024` | a repository answers to the world it declares, which is what makes `sprepo.json` the one place an instance is read from | MUST |
 | the apps plugin's subject registry | *until a parser exists there is no folder for it* — a realization that is absent says so, and a stub that answers teaches you it works | MUST |
-
-| Repo | Node | What it realizes | State |
-| --- | --- | --- | --- |
-| spn-claude-marketplace | `spn-devex` | the shape itself, and no provider folder of its own | planned |
-| spn-claude-marketplace | `spn-apps` | both halves, for the one stack it serves | planned |
-| spn-claude-marketplace | `spn-infra` | the scripts half alone, for the clouds it serves | planned |
-
-## Proof
-
-| Check | Kind | What a green run shows |
-| --- | --- | --- |
-| `node plugins/spn-devex/src/scripts/tools/coherence.ts` | gate | every provider folder holds only folders its plugin itself holds, and no gate names an instance |
-| `node plugins/spn-devex/src/scripts/tools/restate-drift.ts` | gate | a provider's contract entries still read as the chapters they stamp read today |
 
 Try it: `node plugins/spn-devex/src/scripts/tools/coherence.ts`

@@ -17,6 +17,7 @@
 | The version | the `version` field of that manifest | the number saying which bytes are published, shared with the other plugins |
 | The marketplace entry | `.claude-plugin/marketplace.json` | the name, the source folder, and a description a listing can show without opening the folder |
 | What the folder holds | `plugins/spn-apps/src/` | wiring, skills, scripts, refs, providers and tests — and no agents |
+| What a wired path names | `plugins/spn-apps/src/hooks/hooks.json` | a command written against `CLAUDE_PLUGIN_ROOT`, so it resolves inside the installed copy rather than in this checkout |
 
 ## Follows the pattern
 

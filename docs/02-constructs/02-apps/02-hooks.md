@@ -21,6 +21,8 @@ A plugin's wiring says which moments of a session it has an opinion about. This 
 
 The core plugin wires several moments across a wide set of tools, because its rules are about how a session behaves — what it opened, what it ran, what it is about to say. **This plugin's rules are all about text**, so it claims the moment a write is about to happen and nothing else. Reading a file, running a command or ending a turn cannot introduce a pattern in a contract, a service or a test, so a hook there would cost a start-up and answer nothing.
 
+This construct realizes the book's `01-devex/02-agent/04-plugins`.
+
 ## Terms
 
 | Term | Contract term | What it means |
@@ -56,27 +58,27 @@ One moment, narrowed to two tool names, behind one command — and what that com
 
 ### One moment, and why the others are not claimed
 
-The moment a call is about to run is the only one that can still stop it, and a rule about a file's contents has nothing to say at any other. A moment claimed for the sake of symmetry is an interpreter start-up on every call in a session, paid for an answer nobody asked for. *Where:* `plugins/spn-apps/src/hooks/hooks.json`
+The moment a call is about to run is the only one that can still stop it, and a rule about a file's contents has nothing to say at any other. A moment claimed for the sake of symmetry is an interpreter start-up on every call in a session, paid for an answer nobody asked for.
 
 ### The matcher is the first and cheapest filter
 
-The entry narrows to the two tool names that change a file. Everything else a session does never reaches this plugin at all, which is a filter the harness applies before any process of this plugin's starts. *Where:* the `matcher` field of `plugins/spn-apps/src/hooks/hooks.json`
+The entry narrows to the two tool names that change a file. Everything else a session does never reaches this plugin at all, which is a filter the harness applies before any process of this plugin's starts.
 
 ### One entry, and the saving that comes from it
 
-Several entries are several interpreter start-ups on every write, whatever language the scripts are written in, and on one measured edit the start-ups cost more than ten times the checking. So the wiring declares one entry and the dispatcher runs everything behind it. The saving lives in the registration rather than in the scripts. *Where:* `plugins/spn-apps/src/hooks/hooks.json` · `plugins/spn-apps/src/scripts/events/pretooluse.ts`
+Several entries are several interpreter start-ups on every write, whatever language the scripts are written in, and on one measured edit the start-ups cost more than ten times the checking. So the wiring declares one entry and the dispatcher runs everything behind it. The saving lives in the registration rather than in the scripts.
 
 ### The timeout is the plugin's promise back to the session
 
-The entry declares how long the whole chain may take. A gate that can hang is a gate somebody removes, so the budget is stated in the wiring rather than trusted to the scripts underneath it. *Where:* the `timeout` field of `plugins/spn-apps/src/hooks/hooks.json`
+The entry declares how long the whole chain may take. A gate that can hang is a gate somebody removes, so the budget is stated in the wiring rather than trusted to the scripts underneath it.
 
 ### What runs is resolved per write, never listed
 
-The dispatcher does not hold a fixed set of rules. It reads the stack from the nearest `sprepo.json` and asks the provider for that stack, so one installed plugin serves whatever a node declares and a second stack joins by adding a folder. A repository declaring a stack this plugin ships nothing for is left alone rather than refused. *Where:* `plugins/spn-apps/src/scripts/checks/subjects.ts`
+The dispatcher does not hold a fixed set of rules. It reads the stack from the nearest `sprepo.json` and asks the provider for that stack, so one installed plugin serves whatever a node declares and a second stack joins by adding a folder. A repository declaring a stack this plugin ships nothing for is left alone rather than refused.
 
 ### The wiring names the plugin root, never a checkout
 
-The command is written against the installed folder rather than against a path in this repository, so the entry works wherever the plugin was installed. *Where:* the `command` field of `plugins/spn-apps/src/hooks/hooks.json`
+The command is written against the installed folder rather than against a path in this repository, so the entry works wherever the plugin was installed.
 
 ## Boundary
 
@@ -94,17 +96,5 @@ This page answers what this plugin wires and why it wires one moment. It does no
 | `RD.GOV.024` | a repository answers to the world it declares, which is what makes its manifest the one place a stack is read from | MUST |
 | `RD.DEVEX.035` | a rule reaches a write-time hook only where review would be too late | MUST |
 | the foundation's `02-delivery.md` § When an edit becomes behaviour | a hook script is live on its next run, and the wiring file is not | MUST |
-
-| Repo | Node | What it realizes | State |
-| --- | --- | --- | --- |
-| spn-foundation | `01-devex/02-agent/04-plugins` | the foundation construct this one realizes | planned |
-| spn-claude-marketplace | `spn-apps` | one `PreToolUse` entry narrowed to writes, and the dispatcher that resolves its subjects per call | planned |
-
-## Proof
-
-| Check | Kind | What a green run shows |
-| --- | --- | --- |
-| `node plugins/spn-devex/src/scripts/tools/partner-shape.ts` | gate | the entry this plugin declares is found and runs against a repository holding nothing but the plugins |
-| `node plugins/spn-apps/tests/run.mjs` | suite | the dispatcher classifies a real manifest, resolves the subjects behind it, and returns one answer for a write |
 
 Try it: `node plugins/spn-apps/tests/run.mjs`

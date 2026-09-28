@@ -15,6 +15,8 @@ Eleven markdown files sit directly under `plugins/spn-devex/refs/`, each restati
 | The restatements | `plugins/spn-devex/refs/*.md` | eleven files: `blocks`, `commands`, `contract-rules`, `cross-repo`, `decision-cards`, `doc-sets`, `getting-started`, `intent`, `permission-vs-enablement`, `platform-worksheet`, `workstream-loop` |
 | The block and its hash | `plugins/spn-devex/src/scripts/lib/restates.ts` | parsing, the hash, and the undeclared, unstamped and unread classification |
 | The comparison | `plugins/spn-devex/src/scripts/tools/restate-drift.ts` | every stamp re-read against a book handed to it |
+| The folder that mirrors the book | `plugins/spn-devex/src/refs/devex/` | one folder per part of the book restated: `agent` · `function` · `utils` · `workspace` |
+| A stamped block, as written | the first lines of `plugins/spn-devex/src/refs/devex/workspace/workspace.md` | the `spn:restates` comment: each chapter's path, an optional section, and its hash |
 
 ## Follows the pattern
 

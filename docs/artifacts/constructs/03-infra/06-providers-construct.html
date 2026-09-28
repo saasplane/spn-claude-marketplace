@@ -188,6 +188,7 @@
 <section id="s0">
   <div class="sec-head"><h2>Overview</h2></div>
   <p><strong>A skills half is earned by changing the authoring stack.</strong> In the apps domain the instance <em>is</em> the stack, so a provider there always changes the language the work is written in and always carries a procedure. Here the instance is the cloud, and the cloud does not change what an author writes: an estate declaration is provider-neutral, and every rendering is written against OpenTofu whichever cloud it will reach. So the walk is the same on every cloud, and <strong>this plugin is not expected to grow a skills half</strong>. The asymmetry is a fact about the two domains rather than a gap in one of them.</p>
+  <p>This construct realizes the book's <code>01-devex/02-agent/04-plugins</code>.</p>
 </section>
 
 <!-- 01 -->
@@ -260,15 +261,15 @@
 <section id="s3">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="the-clouds-this-plugin-ships-a-parse-for">The clouds this plugin ships a parse for</h3>
-  <p><code>providers/aws/</code> and <code>providers/gcp/</code> each hold <code>scripts/checks/manifest.ts</code> and <code>scripts/checks/rendering.ts</code>. <strong>The rule is the domain's and the parse is the provider's</strong>: a rule says <em>an account id is never pinned</em>, which holds on every cloud, while what a region or an instance class looks like belongs to the cloud and to nothing else. Each validator reads the text once and hands it to every rule that applies, so four rules are not four passes over the same text. <em>Where:</em> <code>plugins/spn-infra/src/providers/aws/scripts/checks/</code> · <code>plugins/spn-infra/src/providers/gcp/scripts/checks/</code></p>
+  <p><code>providers/aws/</code> and <code>providers/gcp/</code> each hold <code>scripts/checks/manifest.ts</code> and <code>scripts/checks/rendering.ts</code>. <strong>The rule is the domain's and the parse is the provider's</strong>: a rule says <em>an account id is never pinned</em>, which holds on every cloud, while what a region or an instance class looks like belongs to the cloud and to nothing else. Each validator reads the text once and hands it to every rule that applies, so four rules are not four passes over the same text.</p>
   <h3 id="a-cloud-with-no-folder-is-a-cloud-with-n">A cloud with no folder is a cloud with no parse, and it says so</h3>
-  <p><code>local</code> has no folder here. Its vocabulary is restated in the refs tree like every other cloud's, because those words are true whether or not code reads them — but no validator ships for it, and the absence is the statement rather than an oversight. A stub folder answering with silence would teach a reader that the write-time check works there. <em>Where:</em> <code>plugins/spn-infra/src/providers/</code> · <code>plugins/spn-infra/src/refs/support/infra/providers/local/</code></p>
+  <p><code>local</code> has no folder here. Its vocabulary is restated in the refs tree like every other cloud's, because those words are true whether or not code reads them — but no validator ships for it, and the absence is the statement rather than an oversight. A stub folder answering with silence would teach a reader that the write-time check works there.</p>
   <h3 id="the-vocabulary-is-a-fact-so-it-lives-in-">The vocabulary is a fact, so it lives in refs rather than here</h3>
-  <p>What differs between clouds is what they call things, and a name is a fact. Each cloud's words are restated subject by subject under the refs tree, where a reader looking something up and a skill citing it both find them in one place. <strong><code>providers/</code> executes and <code>refs/</code> states</strong>, and that line is what keeps a cloud's spellings out of a folder a gate dispatches into. <em>Where:</em> <code>plugins/spn-infra/src/refs/support/infra/providers/</code></p>
+  <p>What differs between clouds is what they call things, and a name is a fact. Each cloud's words are restated subject by subject under the refs tree, where a reader looking something up and a skill citing it both find them in one place. <strong><code>providers/</code> executes and <code>refs/</code> states</strong>, and that line is what keeps a cloud's spellings out of a folder a gate dispatches into.</p>
   <h3 id="the-gate-discovers-the-clouds-and-runs-e">The gate discovers the clouds and runs every one of them</h3>
-  <p>The gate lists no cloud. It reads the folders the providers tree holds, sorted so the order is stable, and imports each one's validator per subject; a cloud shipping nothing for a subject simply contributes nothing there. <strong>And it runs every cloud's validators rather than the declared one.</strong> Running only the declared cloud's patterns would let an AWS region into a declaration whose cloud entry says Google — the mistake somebody makes while moving an estate between clouds, and the moment the gate is most worth having. A write-time gate cannot read a resolved estate anyway, because there may not be one yet. <em>Where:</em> <code>plugins/spn-infra/src/scripts/checks/subjects.ts</code></p>
+  <p>The gate lists no cloud. It reads the folders the providers tree holds, sorted so the order is stable, and imports each one's validator per subject; a cloud shipping nothing for a subject simply contributes nothing there. <strong>And it runs every cloud's validators rather than the declared one.</strong> Running only the declared cloud's patterns would let an AWS region into a declaration whose cloud entry says Google — the mistake somebody makes while moving an estate between clouds, and the moment the gate is most worth having. A write-time gate cannot read a resolved estate anyway, because there may not be one yet.</p>
   <h3 id="a-shared-rule-body-is-a-factory-not-a-ru">A shared rule body is a factory, not a rule</h3>
-  <p>Where every cloud needs one rule, what they share is the judgement and what differs is the pattern. The provider-string rule is written as a function each cloud's validator feeds its own spellings to, and it lives with the plugin's other shared code rather than inside any cloud's folder. Inlining it would put one copy of the same rule in each cloud, which is the duplication the factory exists to prevent. <em>Where:</em> <code>plugins/spn-infra/src/scripts/lib/provider-strings.ts</code></p>
+  <p>Where every cloud needs one rule, what they share is the judgement and what differs is the pattern. The provider-string rule is written as a function each cloud's validator feeds its own spellings to, and it lives with the plugin's other shared code rather than inside any cloud's folder. Inlining it would put one copy of the same rule in each cloud, which is the duplication the factory exists to prevent.</p>
   <h3 id="adding-a-cloud">Adding a cloud</h3>
   <p>Add <code>providers/&lt;cloud&gt;/scripts/checks/</code>, with a validator per subject it has an opinion about, and restate that cloud's vocabulary in the refs tree. No gate changes, no import list changes, and a listing of the folder is the coverage.</p>
 </section>
@@ -296,39 +297,6 @@
       <tr><td><code>RD.GOV.024</code></td><td>a repository answers to the world it declares, which is what makes <code>sprepo.json</code> the one place an instance is read from</td><td>MUST</td></tr>
       <tr><td><code>RD.DEVEX.019</code></td><td>a provider folder restates nothing and states no rule the domain owns</td><td>MUST</td></tr>
       <tr><td>the apps plugin's subject registry</td><td><em>until a parser exists there is no folder for it</em> — a realization that is absent says so, and a stub that answers teaches you it works</td><td>MUST</td></tr>
-    </tbody>
-  </table></div>
-  <div class="scroll"><table>
-    <thead><tr><th>Repo</th><th>Node</th><th>What it realizes</th><th>State</th></tr></thead>
-    <tbody>
-      <tr><td>spn-foundation</td><td><code>01-devex/02-agent/04-plugins</code></td><td>the foundation construct this one realizes</td><td>planned</td></tr>
-      <tr><td>spn-claude-marketplace</td><td><code>spn-infra</code></td><td>a scripts half per cloud, no skills half, and a gate that discovers the folders rather than listing them</td><td>planned</td></tr>
-    </tbody>
-  </table></div>
-</section>
-
-<!-- 06 -->
-<section id="s6">
-  <div class="sec-head"><h2>Proof</h2></div>
-  <p><em>Behaviours: joined from the register, <code>03-behaviors/03-infra/06-providers.md</code> — never typed in the seat file.</em></p>
-  <div class="scroll"><table>
-    <thead><tr><th>Row</th><th>Does</th><th>Tier</th><th>Status</th></tr></thead>
-    <tbody>
-      <tr><td><code>MKT.PROVIDERS.20</code></td><td>admit a cloud by adding a folder</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PROVIDERS.21</code></td><td>find one cloud's own spellings only inside that cloud's folder</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PROVIDERS.22</code></td><td>read a rule once rather than once per cloud</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PROVIDERS.23</code></td><td>learn one walk rather than one per cloud</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PROVIDERS.24</code></td><td>tell a cloud with no write-time check from one that has one</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PROVIDERS.25</code></td><td>look up a cloud's words even where no code reads them</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PROVIDERS.26</code></td><td>ship a validator for one subject and not another</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PROVIDERS.27</code></td><td>find no skill discovered inside a provider folder</td><td>UNIT</td><td>PLANNED</td></tr>
-    </tbody>
-  </table></div>
-  <div class="scroll"><table>
-    <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
-    <tbody>
-      <tr><td><code>node plugins/spn-infra/tests/run.mjs</code></td><td>test</td><td>each cloud's own spellings are refused, each cloud's sanctioned homes are still allowed, and the other cloud's spellings are caught too</td></tr>
-      <tr><td><code>node plugins/spn-devex/src/scripts/tools/coherence.ts</code></td><td>gate</td><td>every provider folder holds only folders its plugin itself holds, and no gate names a cloud</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>node plugins/spn-infra/tests/run.mjs</code></p>

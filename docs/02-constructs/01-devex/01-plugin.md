@@ -21,6 +21,8 @@ A rule an agent cannot load is a rule it cannot follow, however well the rule is
 
 The last of the three — the installed copy — is what costs people an afternoon. A session never reads this checkout. It reads an installed copy, and that copy is found by the plugin's name together with the version its manifest carries. So an edit here is not yet a change in behaviour, and a version that has not moved is a version whose installed copy an edit can sit silently behind.
 
+This construct realizes the book's `01-devex/02-agent/04-plugins`.
+
 ## Terms
 
 | Term | Contract term | What it means |
@@ -57,23 +59,23 @@ The last arrow is the one to remember: a session reads the installed copy, so ed
 
 ### The manifest
 
-Each plugin folder carries one manifest at `.claude-plugin/plugin.json`, holding a `name`, a `version`, a `description` and an `author`. The description is long on purpose. It is matched against the work at hand rather than browsed by a person, so it states in full what the plugin carries. *Where:* `plugins/spn-devex/src/.claude-plugin/plugin.json`, and the same path in the other two folders.
+Each plugin folder carries one manifest at `.claude-plugin/plugin.json`, holding a `name`, a `version`, a `description` and an `author`. The description is long on purpose. It is matched against the work at hand rather than browsed by a person, so it states in full what the plugin carries.
 
 ### The version names what is published
 
-This repository releases at the version a plugin already carries, then moves the number. So the field answers *which bytes are installed*, and not *what am I building*. Each plugin counts on its own, following the marketplace's own convention of one version per plugin, and no file derives one number from another. *Where:* the `version` field of each `plugin.json`.
+This repository releases at the version a plugin already carries, then moves the number. So the field answers *which bytes are installed*, and not *what am I building*. Each plugin counts on its own, following the marketplace's own convention of one version per plugin, and no file derives one number from another.
 
 ### The marketplace entry
 
-One file at the repository root, `.claude-plugin/marketplace.json`, carries a `plugins` array. Each entry names the plugin, the relative `source` folder holding it, and a description a listing can show without opening the folder. Nothing generates the file: a generator would need a source, and that source would be a second list able to disagree with this one. The price of writing it by hand is that the two descriptions can drift, and one pair has. *Where:* `.claude-plugin/marketplace.json`
+One file at the repository root, `.claude-plugin/marketplace.json`, carries a `plugins` array. Each entry names the plugin, the relative `source` folder holding it, and a description a listing can show without opening the folder. Nothing generates the file: a generator would need a source, and that source would be a second list able to disagree with this one. The price of writing it by hand is that the two descriptions can drift, and one pair has.
 
 ### The installed copy, and what a wired path names
 
-Installing reads an entry, copies that plugin's folder, and stores it where a session can read it. Everything a plugin wires names that folder through `CLAUDE_PLUGIN_ROOT` rather than through a path in this checkout, so a plugin works wherever it was installed. *Where:* `plugins/spn-devex/src/hooks/hooks.json`, and the same file in the other two folders.
+Installing reads an entry, copies that plugin's folder, and stores it where a session can read it. Everything a plugin wires names that folder through `CLAUDE_PLUGIN_ROOT` rather than through a path in this checkout, so a plugin works wherever it was installed.
 
 ### What a plugin may hold, and what it owes
 
-A plugin folder holds any mix of the constructs this domain names, and owes none of them. `spn-devex` carries every one except `providers/`, which is why it is the folder to open to see what a full plugin looks like. `spn-apps` and `spn-infra` each carry a `providers/` folder and no `agents/`. Each construct is named by its own page, and none of them is described here. *Where:* `plugins/`
+A plugin folder holds any mix of the constructs this domain names, and owes none of them. `spn-devex` carries every one except `providers/`, which is why it is the folder to open to see what a full plugin looks like. `spn-apps` and `spn-infra` each carry a `providers/` folder and no `agents/`. Each construct is named by its own page, and none of them is described here.
 
 ## Boundary
 
@@ -92,16 +94,5 @@ This page answers what a plugin is made of, how it is listed, and what an instal
 | `RD.GOV.024` | a repository with no nodes still declares a world and still earns a docs tree, which is why this model is written here at all | MUST |
 | the foundation's `02-delivery.md` § The set a repo gets is derived from its own claim | a workspace never types a plugin name; the set comes from the consuming repository's own manifest | MUST |
 | [MD6](../../registers/decisions.md) | the manifest is the current description, and a marketplace entry that disagrees with it is the stale side | MUST |
-
-| Repo | Node | What it realizes | State |
-| --- | --- | --- | --- |
-| spn-foundation | `01-devex/02-agent/04-plugins` | the foundation construct this one realizes | planned |
-| spn-claude-marketplace | `spn-devex` | the manifest, the marketplace entry and the installed copy, for the widest of the three folders | planned |
-
-## Proof
-
-| Check | Kind | What a green run shows |
-| --- | --- | --- |
-| `node plugins/spn-devex/src/scripts/tools/partner-shape.ts` | gate | every plugin the marketplace declares is found from its own entry, and every hook inside it runs against a repository holding nothing but the plugin |
 
 Try it: `node plugins/spn-devex/src/scripts/tools/partner-shape.ts`

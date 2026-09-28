@@ -23,6 +23,8 @@ The thing to check first in any brief is its authority — what this persona may
 
 A lens is where the rest of the authority comes from. **A lens is an argument handed to one reviewer, not a reviewer of its own.** The brief that reviews carries none of the viewpoints; it is given a name at the moment it is convened and reads that file before it says anything, and that file — rather than the brief — states what this convening may refuse and what it may only advise.
 
+This construct realizes the book's `01-devex/02-agent/01-agent`.
+
 ## Terms
 
 | Term | Contract term | What it means |
@@ -64,43 +66,43 @@ Most briefs are a fixed persona and read the same way on every convening. One is
 
 ### The frontmatter
 
-`name` and `description`, read the same way [a skill's](04-skills.md) are: the description is matched against the moment rather than browsed, and it decides whether this persona takes the reply. Two more fields are optional. `model` chooses which model runs the persona, and `tools` narrows what it may call. Leaving `tools` out grants every tool the session itself has. *Where:* the first lines of `plugins/spn-devex/src/agents/spn-prose-rewriter.md`
+`name` and `description`, read the same way [a skill's](04-skills.md) are: the description is matched against the moment rather than browsed, and it decides whether this persona takes the reply. Two more fields are optional. `model` chooses which model runs the persona, and `tools` narrows what it may call. Leaving `tools` out grants every tool the session itself has.
 
 ### Where a read-only promise is actually bound
 
-A brief declaring `tools` is bound by it: the permission is a fact about the convening rather than an instruction the persona is asked to follow. A brief that declares no `tools` inherits everything the session has, and its promise not to write is prose. Both kinds exist here, and telling them apart matters when a reviewer's independence is what the brief is for. *Where:* compare the frontmatter of `plugins/spn-devex/src/agents/spn-prose-reviewer.md` with that of `plugins/spn-devex/src/agents/spn-panel.md`
+A brief declaring `tools` is bound by it: the permission is a fact about the convening rather than an instruction the persona is asked to follow. A brief that declares no `tools` inherits everything the session has, and its promise not to write is prose. Both kinds exist here, and telling them apart matters when a reviewer's independence is what the brief is for.
 
 ### A fixed persona
 
-A brief with no argument is one voice, always: an engineering lead, a prose rewriter, a prose reviewer. Its whole authority is the words in its own file, read the same way each time it is called. *Where:* `plugins/spn-devex/src/agents/spn-engineer.md`
+A brief with no argument is one voice, always: an engineering lead, a prose rewriter, a prose reviewer. Its whole authority is the words in its own file, read the same way each time it is called.
 
 ### A parameterized reviewer
 
-One brief here takes a viewpoint name as part of what it is convened over. It reads that viewpoint's own file before anything else, and the brief's own description lists the names a caller may pass, which is also what makes them discoverable. A brief for each viewpoint would be many copies of one procedure, drifting apart, each needing the same change — so the procedure lives in one file and the subject matter lives beside it. *Where:* `plugins/spn-devex/src/agents/spn-panel.md`
+One brief here takes a viewpoint name as part of what it is convened over. It reads that viewpoint's own file before anything else, and the brief's own description lists the names a caller may pass, which is also what makes them discoverable. A brief for each viewpoint would be many copies of one procedure, drifting apart, each needing the same change — so the procedure lives in one file and the subject matter lives beside it.
 
 ### What one lens file says
 
-A lens file opens by saying when the viewpoint is worn, when it is convened, and the one condition on which it blocks. Then it says what it checks. Everything below the stated threshold is advice, and the file says so plainly, because a reviewer who can block anything stops being a reviewer and the work stops on taste. *Where:* `plugins/spn-devex/src/refs/devex/agent/lenses/architect.md`
+A lens file opens by saying when the viewpoint is worn, when it is convened, and the one condition on which it blocks. Then it says what it checks. Everything below the stated threshold is advice, and the file says so plainly, because a reviewer who can block anything stops being a reviewer and the work stops on taste.
 
 ### Wearing and convening are different acts
 
-Wearing a lens while writing makes the work better and is never a review, because the context that drafted something already agrees with its own reasoning. Convening is the other act: a reader who did not write the work, holding one file, reporting what that viewpoint found. A skill says which gate convenes which viewpoint. *Where:* `plugins/spn-devex/src/skills/ideate/SKILL.md`, `plugins/spn-devex/src/skills/develop/SKILL.md`
+Wearing a lens while writing makes the work better and is never a review, because the context that drafted something already agrees with its own reasoning. Convening is the other act: a reader who did not write the work, holding one file, reporting what that viewpoint found. A skill says which gate convenes which viewpoint.
 
 ### The lens names are also the audience a document declares
 
-The reader a document is written for and the reviewer who judges it are one list. Two lists would let a document declare an audience no reviewer could be convened as. The register that maps each value to its reader label lives in the documents tool, and a document declaring a value outside the set is refused. *Where:* `plugins/spn-devex/src/scripts/tools/docs.ts`, `LENS_LABEL`
+The reader a document is written for and the reviewer who judges it are one list. Two lists would let a document declare an audience no reviewer could be convened as. The register that maps each value to its reader label lives in the documents tool, and a document declaring a value outside the set is refused.
 
 ### A lens is regenerated, never argued with
 
-A lens is a ref, so it carries a stamp and adds no rule of its own. Each file names its own sources at the top and states that it restates them. Where a lens and the book disagree, the book wins and the lens is rewritten; a lens that starts deciding rules has become a second standard nobody audits. *Where:* the first lines of `plugins/spn-devex/src/refs/devex/agent/lenses/trust.md`
+A lens is a ref, so it carries a stamp and adds no rule of its own. Each file names its own sources at the top and states that it restates them. Where a lens and the book disagree, the book wins and the lens is rewritten; a lens that starts deciding rules has become a second standard nobody audits.
 
 ### A reviewer that edits has stopped reviewing
 
-Where a persona both finds a problem and fixes it, the finding and the fix arrive together and nobody can weigh one without the other. So the reviewing briefs report, the engineering brief advises, and exactly one brief is permitted to write — over the paragraphs it was handed, never over a whole file. *Where:* `plugins/spn-devex/src/agents/spn-prose-rewriter.md`
+Where a persona both finds a problem and fixes it, the finding and the fix arrive together and nobody can weigh one without the other. So the reviewing briefs report, the engineering brief advises, and exactly one brief is permitted to write — over the paragraphs it was handed, never over a whole file.
 
 ### A brief points at a rule and never invents one
 
-A persona stating a rule with no chapter behind it has produced a suggestion wearing the clothes of a finding, and the next reader cannot tell which they are holding. Each brief names where its standard lives: the reviewing brief's standard is the viewpoint file, and that file's standard is the book. *Where:* `plugins/spn-devex/src/agents/spn-engineer.md`
+A persona stating a rule with no chapter behind it has produced a suggestion wearing the clothes of a finding, and the next reader cannot tell which they are holding. Each brief names where its standard lives: the reviewing brief's standard is the viewpoint file, and that file's standard is the book.
 
 ## Boundary
 
@@ -121,17 +123,5 @@ This page answers what a brief is, how a persona is convened, what a viewpoint f
 | the foundation's `02-delivery.md` § When an edit becomes behaviour | a brief edit needs an install and a fresh window before a convening can read it | MUST |
 | `RD.DOCS.055` | a lens is a restatement, and the book wins wherever the two disagree | MUST |
 | [MD4](../../registers/decisions.md) | a read-only promise is bound only where the brief declares `tools`; elsewhere it is prose | MUST |
-
-| Repo | Node | What it realizes | State |
-| --- | --- | --- | --- |
-| spn-foundation | `01-devex/02-agent/01-agent` | the foundation construct this one realizes | planned |
-| spn-claude-marketplace | `spn-devex` | the briefs a session convenes, one file per reviewing viewpoint, and the register the document audience is drawn from | planned |
-
-## Proof
-
-| Check | Kind | What a green run shows |
-| --- | --- | --- |
-| `node plugins/spn-devex/src/scripts/tools/restate-drift.ts` | gate | every viewpoint a brief can be handed still reads as the chapters it stamps read today |
-| `node plugins/spn-devex/src/scripts/tools/docs.ts audit docs` | gate | every document declares an audience drawn from the closed set, and its header renders the labels that set maps to |
 
 Try it: `node plugins/spn-devex/src/scripts/tools/restate-drift.ts`

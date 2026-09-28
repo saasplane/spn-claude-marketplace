@@ -188,6 +188,7 @@
 <section id="s0">
   <div class="sec-head"><h2>Overview</h2></div>
   <p>Two things about a plugin are worth separating before anything else. <strong>Its identity is its own</strong> — the name and the description, which say what this plugin carries and therefore whether the work at hand has anything to do with it. <strong>Its version is not its own</strong> — every plugin in this marketplace carries the same number, and a release moves all of them together.</p>
+  <p>This construct realizes the book's <code>01-devex/02-agent/04-plugins</code>.</p>
 </section>
 
 <!-- 01 -->
@@ -258,15 +259,15 @@
 <section id="s3">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="the-identity-is-this-plugin-s-own">The identity is this plugin's own</h3>
-  <p>The manifest names this folder <code>spn-apps</code> and describes the apps domain before any language is chosen: the contract model a module publishes, the rules a contract state follows, and the worksheet a partner fills in to decide which shipped modules they adopt. The description is long deliberately, because it is matched against the work at hand rather than browsed by a person, and material nothing matches is material nothing reaches. <em>Where:</em> <code>plugins/spn-apps/src/.claude-plugin/plugin.json</code></p>
+  <p>The manifest names this folder <code>spn-apps</code> and describes the apps domain before any language is chosen: the contract model a module publishes, the rules a contract state follows, and the worksheet a partner fills in to decide which shipped modules they adopt. The description is long deliberately, because it is matched against the work at hand rather than browsed by a person, and material nothing matches is material nothing reaches.</p>
   <h3 id="the-world-decides-who-gets-it">The world decides who gets it</h3>
-  <p>A workspace never types a plugin name. Each repository declares its world in its own manifest, and the set of plugins it is entitled to load is derived from that declaration — which is why this plugin arrives in a repository that answers to the apps world and nowhere else. The derivation is the foundation's, and this page only says which side of it this plugin sits on. <em>Where:</em> the foundation's <code>02-delivery.md</code> § The set a repo gets is derived from its own claim</p>
+  <p>A workspace never types a plugin name. Each repository declares its world in its own manifest, and the set of plugins it is entitled to load is derived from that declaration — which is why this plugin arrives in a repository that answers to the apps world and nowhere else. The derivation is the foundation's, and this page only says which side of it this plugin sits on.</p>
   <h3 id="the-version-is-shared-and-it-is-not-a-cl">The version is shared, and it is not a claim about this folder</h3>
-  <p>Every plugin in this marketplace carries the same number, and a release moves all of them — a plugin with no change in it is released anyway, at the new number. The reason is that a reader cannot tell three numbers apart: the plugins are installed as one set by one command, so differing numbers cannot be told from one release that half-landed. One number answers <em>are you current?</em> and several only raise the question. <em>Where:</em> the <code>version</code> field of <code>plugins/spn-apps/src/.claude-plugin/plugin.json</code>, and of each sibling manifest</p>
+  <p>Every plugin in this marketplace carries the same number, and a release moves all of them — a plugin with no change in it is released anyway, at the new number. The reason is that a reader cannot tell three numbers apart: the plugins are installed as one set by one command, so differing numbers cannot be told from one release that half-landed. One number answers <em>are you current?</em> and several only raise the question.</p>
   <h3 id="the-count-moves-after-a-release-never-be">The count moves after a release, never before</h3>
-  <p>The release happens at the number a manifest already carries, and the first edit after it moves the number. So the field names <strong>what is published</strong> rather than what somebody is working on. That is also what makes a stale cache findable: a cache directory is keyed by version, so a plugin edited without an increment installs over its own published bytes and nothing tells a reader which of the two is running. <em>Where:</em> the <code>version</code> field of <code>plugins/spn-apps/src/.claude-plugin/plugin.json</code></p>
+  <p>The release happens at the number a manifest already carries, and the first edit after it moves the number. So the field names <strong>what is published</strong> rather than what somebody is working on. That is also what makes a stale cache findable: a cache directory is keyed by version, so a plugin edited without an increment installs over its own published bytes and nothing tells a reader which of the two is running.</p>
   <h3 id="what-this-plugin-holds-and-what-it-does-">What this plugin holds, and what it does not</h3>
-  <p>This folder ships wiring, skills, scripts, refs, providers and tests. It ships no agents, because a persona and a reviewing viewpoint answer to no stack and live once in the core plugin — and the absence is a statement rather than a gap. Each folder it does ship has its own page, and none of them is described here. <em>Where:</em> <code>plugins/spn-apps/src/</code></p>
+  <p>This folder ships wiring, skills, scripts, refs, providers and tests. It ships no agents, because a persona and a reviewing viewpoint answer to no stack and live once in the core plugin — and the absence is a statement rather than a gap. Each folder it does ship has its own page, and none of them is described here.</p>
 </section>
 
 <!-- 04 -->
@@ -293,36 +294,6 @@
       <tr><td><code>RD.GOV.024</code></td><td>a repository answers to the world it declares, which is what the plugin set is derived from</td><td>MUST</td></tr>
       <tr><td>the marketplace's <code>CLAUDE.md</code> § Versioning</td><td>the plugins move together, at one number, stamped in each manifest because that is what a marketplace reads</td><td>MUST</td></tr>
       <tr><td>the foundation's <code>02-delivery.md</code> § The set a repo gets is derived from its own claim</td><td>a workspace never types a plugin name</td><td>MUST</td></tr>
-    </tbody>
-  </table></div>
-  <div class="scroll"><table>
-    <thead><tr><th>Repo</th><th>Node</th><th>What it realizes</th><th>State</th></tr></thead>
-    <tbody>
-      <tr><td>spn-foundation</td><td><code>01-devex/02-agent/04-plugins</code></td><td>the foundation construct this one realizes</td><td>planned</td></tr>
-      <tr><td>spn-claude-marketplace</td><td><code>spn-apps</code></td><td>the apps domain's own manifest, its description, and the shared version it is published at</td><td>planned</td></tr>
-    </tbody>
-  </table></div>
-</section>
-
-<!-- 06 -->
-<section id="s6">
-  <div class="sec-head"><h2>Proof</h2></div>
-  <p><em>Behaviours: joined from the register, <code>03-behaviors/02-apps/01-plugin.md</code> — never typed in the seat file.</em></p>
-  <div class="scroll"><table>
-    <thead><tr><th>Row</th><th>Does</th><th>Tier</th><th>Status</th></tr></thead>
-    <tbody>
-      <tr><td><code>MKT.PLUGIN.07</code></td><td>reach this domain's material without knowing the plugin exists</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PLUGIN.08</code></td><td>get this plugin in a repository that answers to the apps world, and not elsewhere</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PLUGIN.09</code></td><td>answer <em>are you current?</em> from one number</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PLUGIN.10</code></td><td>tell what is published from what somebody is working on</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PLUGIN.11</code></td><td>be spared a plugin installing silently over its own published bytes</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PLUGIN.12</code></td><td>tell a folder this plugin does not ship from one that is unfinished</td><td>UNIT</td><td>PLANNED</td></tr>
-    </tbody>
-  </table></div>
-  <div class="scroll"><table>
-    <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
-    <tbody>
-      <tr><td><code>node plugins/spn-devex/src/scripts/tools/partner-shape.ts</code></td><td>gate</td><td>this plugin is found from its own marketplace entry, and every hook inside it runs against a repository holding nothing but the plugins</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>node plugins/spn-devex/src/scripts/tools/partner-shape.ts</code></p>

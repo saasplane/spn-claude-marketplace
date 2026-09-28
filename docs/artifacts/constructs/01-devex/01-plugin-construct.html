@@ -188,6 +188,7 @@
 <section id="s0">
   <div class="sec-head"><h2>Overview</h2></div>
   <p>The last of the three — the installed copy — is what costs people an afternoon. A session never reads this checkout. It reads an installed copy, and that copy is found by the plugin's name together with the version its manifest carries. So an edit here is not yet a change in behaviour, and a version that has not moved is a version whose installed copy an edit can sit silently behind.</p>
+  <p>This construct realizes the book's <code>01-devex/02-agent/04-plugins</code>.</p>
 </section>
 
 <!-- 01 -->
@@ -259,15 +260,15 @@
 <section id="s3">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="the-manifest">The manifest</h3>
-  <p>Each plugin folder carries one manifest at <code>.claude-plugin/plugin.json</code>, holding a <code>name</code>, a <code>version</code>, a <code>description</code> and an <code>author</code>. The description is long on purpose. It is matched against the work at hand rather than browsed by a person, so it states in full what the plugin carries. <em>Where:</em> <code>plugins/spn-devex/src/.claude-plugin/plugin.json</code>, and the same path in the other two folders.</p>
+  <p>Each plugin folder carries one manifest at <code>.claude-plugin/plugin.json</code>, holding a <code>name</code>, a <code>version</code>, a <code>description</code> and an <code>author</code>. The description is long on purpose. It is matched against the work at hand rather than browsed by a person, so it states in full what the plugin carries.</p>
   <h3 id="the-version-names-what-is-published">The version names what is published</h3>
-  <p>This repository releases at the version a plugin already carries, then moves the number. So the field answers <em>which bytes are installed</em>, and not <em>what am I building</em>. Each plugin counts on its own, following the marketplace's own convention of one version per plugin, and no file derives one number from another. <em>Where:</em> the <code>version</code> field of each <code>plugin.json</code>.</p>
+  <p>This repository releases at the version a plugin already carries, then moves the number. So the field answers <em>which bytes are installed</em>, and not <em>what am I building</em>. Each plugin counts on its own, following the marketplace's own convention of one version per plugin, and no file derives one number from another.</p>
   <h3 id="the-marketplace-entry">The marketplace entry</h3>
-  <p>One file at the repository root, <code>.claude-plugin/marketplace.json</code>, carries a <code>plugins</code> array. Each entry names the plugin, the relative <code>source</code> folder holding it, and a description a listing can show without opening the folder. Nothing generates the file: a generator would need a source, and that source would be a second list able to disagree with this one. The price of writing it by hand is that the two descriptions can drift, and one pair has. <em>Where:</em> <code>.claude-plugin/marketplace.json</code></p>
+  <p>One file at the repository root, <code>.claude-plugin/marketplace.json</code>, carries a <code>plugins</code> array. Each entry names the plugin, the relative <code>source</code> folder holding it, and a description a listing can show without opening the folder. Nothing generates the file: a generator would need a source, and that source would be a second list able to disagree with this one. The price of writing it by hand is that the two descriptions can drift, and one pair has.</p>
   <h3 id="the-installed-copy-and-what-a-wired-path">The installed copy, and what a wired path names</h3>
-  <p>Installing reads an entry, copies that plugin's folder, and stores it where a session can read it. Everything a plugin wires names that folder through <code>CLAUDE_PLUGIN_ROOT</code> rather than through a path in this checkout, so a plugin works wherever it was installed. <em>Where:</em> <code>plugins/spn-devex/src/hooks/hooks.json</code>, and the same file in the other two folders.</p>
+  <p>Installing reads an entry, copies that plugin's folder, and stores it where a session can read it. Everything a plugin wires names that folder through <code>CLAUDE_PLUGIN_ROOT</code> rather than through a path in this checkout, so a plugin works wherever it was installed.</p>
   <h3 id="what-a-plugin-may-hold-and-what-it-owes">What a plugin may hold, and what it owes</h3>
-  <p>A plugin folder holds any mix of the constructs this domain names, and owes none of them. <code>spn-devex</code> carries every one except <code>providers/</code>, which is why it is the folder to open to see what a full plugin looks like. <code>spn-apps</code> and <code>spn-infra</code> each carry a <code>providers/</code> folder and no <code>agents/</code>. Each construct is named by its own page, and none of them is described here. <em>Where:</em> <code>plugins/</code></p>
+  <p>A plugin folder holds any mix of the constructs this domain names, and owes none of them. <code>spn-devex</code> carries every one except <code>providers/</code>, which is why it is the folder to open to see what a full plugin looks like. <code>spn-apps</code> and <code>spn-infra</code> each carry a <code>providers/</code> folder and no <code>agents/</code>. Each construct is named by its own page, and none of them is described here.</p>
 </section>
 
 <!-- 04 -->
@@ -293,36 +294,6 @@
       <tr><td><code>RD.GOV.024</code></td><td>a repository with no nodes still declares a world and still earns a docs tree, which is why this model is written here at all</td><td>MUST</td></tr>
       <tr><td>the foundation's <code>02-delivery.md</code> § The set a repo gets is derived from its own claim</td><td>a workspace never types a plugin name; the set comes from the consuming repository's own manifest</td><td>MUST</td></tr>
       <tr><td><a href="../../../registers/decisions.md">MD6</a></td><td>the manifest is the current description, and a marketplace entry that disagrees with it is the stale side</td><td>MUST</td></tr>
-    </tbody>
-  </table></div>
-  <div class="scroll"><table>
-    <thead><tr><th>Repo</th><th>Node</th><th>What it realizes</th><th>State</th></tr></thead>
-    <tbody>
-      <tr><td>spn-foundation</td><td><code>01-devex/02-agent/04-plugins</code></td><td>the foundation construct this one realizes</td><td>planned</td></tr>
-      <tr><td>spn-claude-marketplace</td><td><code>spn-devex</code></td><td>the manifest, the marketplace entry and the installed copy, for the widest of the three folders</td><td>planned</td></tr>
-    </tbody>
-  </table></div>
-</section>
-
-<!-- 06 -->
-<section id="s6">
-  <div class="sec-head"><h2>Proof</h2></div>
-  <p><em>Behaviours: joined from the register, <code>03-behaviors/01-devex/01-plugin.md</code> — never typed in the seat file.</em></p>
-  <div class="scroll"><table>
-    <thead><tr><th>Row</th><th>Does</th><th>Tier</th><th>Status</th></tr></thead>
-    <tbody>
-      <tr><td><code>MKT.PLUGIN.01</code></td><td>reach every standard the plane ships without being granted anything</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PLUGIN.02</code></td><td>find every plugin this repository ships from one file</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PLUGIN.03</code></td><td>tell which published bytes a session is running</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PLUGIN.04</code></td><td>move one plugin's version without moving the other two</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PLUGIN.05</code></td><td>install a plugin and have every wired path still resolve</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.PLUGIN.06</code></td><td>be told when a marketplace entry has fallen behind its own manifest</td><td>UNIT</td><td>PLANNED</td></tr>
-    </tbody>
-  </table></div>
-  <div class="scroll"><table>
-    <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
-    <tbody>
-      <tr><td><code>node plugins/spn-devex/src/scripts/tools/partner-shape.ts</code></td><td>gate</td><td>every plugin the marketplace declares is found from its own entry, and every hook inside it runs against a repository holding nothing but the plugin</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>node plugins/spn-devex/src/scripts/tools/partner-shape.ts</code></p>

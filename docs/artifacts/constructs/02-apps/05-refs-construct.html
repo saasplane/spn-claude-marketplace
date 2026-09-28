@@ -188,6 +188,7 @@
 <section id="s0">
   <div class="sec-head"><h2>Overview</h2></div>
   <p>Two rules keep the folder honest. <strong>A ref states and never executes</strong> — it says what is true of an apps node, and anything a skill performs lives elsewhere. And <strong>a ref restates and adds nothing</strong> — the book governs, the copy carries, and the copy says which version of the book it was read at, so a copy that has fallen behind can be reported rather than believed.</p>
+  <p>This construct realizes the book's <code>01-devex/02-agent/04-plugins</code>.</p>
 </section>
 
 <!-- 01 -->
@@ -260,21 +261,21 @@
 <section id="s3">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="the-tree-holds-domain-folders-and-nothin">The tree holds domain folders and nothing else</h3>
-  <p>The top of this folder is one folder per book domain. A folder under a domain is a group, a file under a group is named for a construct the book states, and a construct needing more than one file becomes a folder named for it. Nothing else is allowed a place, which is what keeps the arrangement readable without a map. <em>Where:</em> <code>plugins/spn-apps/src/refs/README.md</code></p>
+  <p>The top of this folder is one folder per book domain. A folder under a domain is a group, a file under a group is named for a construct the book states, and a construct needing more than one file becomes a folder named for it. Nothing else is allowed a place, which is what keeps the arrangement readable without a map.</p>
   <h3 id="a-folder-s-face-is-that-folder-s-own-sub">A folder's face is that folder's own subject</h3>
-  <p>Every folder carries a face, and the face is about the folder rather than a listing of what is inside it. A folder whose face is an index is a folder nobody can tell the subject of. <em>Where:</em> <code>plugins/spn-apps/src/refs/support/apps/providers/README.md</code></p>
+  <p>Every folder carries a face, and the face is about the folder rather than a listing of what is inside it. A folder whose face is an index is a folder nobody can tell the subject of.</p>
   <h3 id="what-this-plugin-restates-and-in-which-d">What this plugin restates, and in which domains</h3>
-  <p>One domain carries what a node is and everything it is built from — its shape, its packages, its modules, its resources, its apps, its tests, its comments, its agent surface and what it ships. A second carries the platform a partner adopts rather than rebuilds: tenancy, identity, surfaces, data and trust, lifecycle. A third carries one entry per module that ships, so the folder listing is the list. <em>Where:</em> <code>plugins/spn-apps/src/refs/support/apps/</code> · <code>plugins/spn-apps/src/refs/platform/core/</code> · <code>plugins/spn-apps/src/refs/platform/modules/</code></p>
+  <p>One domain carries what a node is and everything it is built from — its shape, its packages, its modules, its resources, its apps, its tests, its comments, its agent surface and what it ships. A second carries the platform a partner adopts rather than rebuilds: tenancy, identity, surfaces, data and trust, lifecycle. A third carries one entry per module that ships, so the folder listing is the list.</p>
   <h3 id="a-stack-sits-inside-the-domain-not-besid">A stack sits inside the domain, not beside it</h3>
-  <p>This plugin is the apps domain, and a stack is a realization of that domain rather than a domain of its own. So the stack entries sit under the domain folder, one folder per stack, and every stack answers the same questions under the same file names — which makes the folder listing the coverage. A stack with no capability for one of those questions writes the file anyway and says what to do instead. <em>Where:</em> <code>plugins/spn-apps/src/refs/support/apps/providers/ts/README.md</code></p>
+  <p>This plugin is the apps domain, and a stack is a realization of that domain rather than a domain of its own. So the stack entries sit under the domain folder, one folder per stack, and every stack answers the same questions under the same file names — which makes the folder listing the coverage. A stack with no capability for one of those questions writes the file anyway and says what to do instead.</p>
   <h3 id="a-ref-states-what-is-true-it-never-says-">A ref states what is true; it never says what to do</h3>
-  <p>The stack entries say what a kind is, how a name is formed, what generation produces, which tiers a node owes and what conformance means. The procedure a skill walks in that stack is not here, because a ref restates a construct and a procedure restates none. <em>Where:</em> <code>plugins/spn-apps/src/refs/support/apps/providers/ts/15-conformance.md</code> · <a href="./06-providers-construct.html">Providers</a></p>
+  <p>The stack entries say what a kind is, how a name is formed, what generation produces, which tiers a node owes and what conformance means. The procedure a skill walks in that stack is not here, because a ref restates a construct and a procedure restates none.</p>
   <h3 id="a-leaf-is-self-contained-because-the-rea">A leaf is self-contained, because the reader has no book</h3>
-  <p>A ref does not link into the foundation and expect a reader to follow it. Everything it restates is written out, under a stamp naming the version it was read at. That is the cost of being installable alone, and it is paid deliberately. <em>Where:</em> the <code>spn:restates</code> block at the top of <code>plugins/spn-apps/src/refs/support/apps/shape.md</code></p>
+  <p>A ref does not link into the foundation and expect a reader to follow it. Everything it restates is written out, under a stamp naming the version it was read at. That is the cost of being installable alone, and it is paid deliberately.</p>
   <h3 id="one-file-is-written-by-a-command-and-say">One file is written by a command, and says so</h3>
-  <p>The list of published packages a node may depend on moves every release, so a hand-written one is stale the day after it is written and nothing reports it. That file carries a citation naming the command that produced it, and re-running the command is how a reader checks it. There is no construct per package, so nothing in the book lists them and a hand-written list would be wrong at the next release. <em>Where:</em> <code>plugins/spn-apps/src/refs/support/apps/providers/ts/14-libraries.md</code> · <code>plugins/spn-apps/src/scripts/tools/library-catalogue.ts</code></p>
+  <p>The list of published packages a node may depend on moves every release, so a hand-written one is stale the day after it is written and nothing reports it. That file carries a citation naming the command that produced it, and re-running the command is how a reader checks it. There is no construct per package, so nothing in the book lists them and a hand-written list would be wrong at the next release.</p>
   <h3 id="the-module-list-is-not-generated-because">The module list is not generated, because the folder is the list</h3>
-  <p>One entry per module that ships means the listing already answers <em>which modules are there</em>. A generator over it would produce a second answer able to disagree with the first. <em>Where:</em> <code>plugins/spn-apps/src/refs/platform/modules/README.md</code></p>
+  <p>One entry per module that ships means the listing already answers <em>which modules are there</em>. A generator over it would produce a second answer able to disagree with the first.</p>
 </section>
 
 <!-- 04 -->
@@ -302,39 +303,6 @@
       <tr><td><code>RD.DEVEX.019</code></td><td>the plugins are authored and delivered in one public repository, so the corpus is restatements that add no rule of their own</td><td>MUST</td></tr>
       <tr><td><code>RD.GOV.024</code></td><td>a repository answers to the world it declares, which is what makes a stack a claim rather than something detected</td><td>MUST</td></tr>
       <tr><td>the foundation's <code>02-delivery.md</code> § When an edit becomes behaviour</td><td>a ref is readable only after an install, so an edit here is not live in the open session</td><td>MUST</td></tr>
-    </tbody>
-  </table></div>
-  <div class="scroll"><table>
-    <thead><tr><th>Repo</th><th>Node</th><th>What it realizes</th><th>State</th></tr></thead>
-    <tbody>
-      <tr><td>spn-foundation</td><td><code>01-devex/02-agent/04-plugins</code></td><td>the foundation construct this one realizes</td><td>planned</td></tr>
-      <tr><td>spn-claude-marketplace</td><td><code>spn-apps</code></td><td>the apps domain restated for a reader holding no book — what a node is, the platform it adopts, the modules that ship, and what each stack is</td><td>planned</td></tr>
-    </tbody>
-  </table></div>
-</section>
-
-<!-- 06 -->
-<section id="s6">
-  <div class="sec-head"><h2>Proof</h2></div>
-  <p><em>Behaviours: joined from the register, <code>03-behaviors/02-apps/05-refs.md</code> — never typed in the seat file.</em></p>
-  <div class="scroll"><table>
-    <thead><tr><th>Row</th><th>Does</th><th>Tier</th><th>Status</th></tr></thead>
-    <tbody>
-      <tr><td><code>MKT.REFS.09</code></td><td>read a rule this plugin needs with no copy of the book beside them</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.REFS.10</code></td><td>find where a restatement belongs without being told</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.REFS.11</code></td><td>open a folder and learn its subject rather than its contents</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.REFS.12</code></td><td>compare two stacks question by question</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.REFS.13</code></td><td>tell a stack this plugin describes from one it does not</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.REFS.14</code></td><td>be told when a restatement has fallen behind the chapter it copies</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.REFS.15</code></td><td>trust the list of packages a node may depend on after a release</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.REFS.16</code></td><td>look for a procedure and not find one here</td><td>UNIT</td><td>PLANNED</td></tr>
-    </tbody>
-  </table></div>
-  <div class="scroll"><table>
-    <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
-    <tbody>
-      <tr><td><code>node plugins/spn-devex/src/scripts/tools/restate-drift.ts</code></td><td>gate</td><td>every ref's stamp still matches the chapters it names, so no copy has fallen behind the book unnoticed</td></tr>
-      <tr><td><code>node plugins/spn-devex/src/scripts/tools/coherence.ts</code></td><td>gate</td><td>every rule a ref cites resolves to a row, and every plugin path it names is on disk</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>node plugins/spn-devex/src/scripts/tools/restate-drift.ts</code></p>

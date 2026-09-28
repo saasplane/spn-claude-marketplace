@@ -188,6 +188,7 @@
 <section id="s0">
   <div class="sec-head"><h2>Overview</h2></div>
   <p><strong>The folders are the convention and the framework is not.</strong> The stack's own test step puts a project's suites at its root, divided by tier, never beside the source — and that is followed here exactly. What is not followed is the choice of runner. These suites drive real hook processes through standard input and read what those processes write back, so a framework would wrap a subprocess harness inside another harness and buy nothing.</p>
+  <p>This construct realizes the book's <code>01-devex/02-agent/04-plugins</code>.</p>
 </section>
 
 <!-- 01 -->
@@ -259,21 +260,21 @@
 <section id="s3">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="the-tier-is-the-first-folder-and-the-mir">The tier is the first folder, and the mirror sits under it</h3>
-  <p>Putting the mirror first would leave nowhere to file a second kind of proof for the same file. With the tier first, a wired proof of something a unit suite already covers lands under its own tier at the same path, and neither collides with the other. <em>Where:</em> <code>plugins/spn-apps/tests/unit/</code></p>
+  <p>Putting the mirror first would leave nowhere to file a second kind of proof for the same file. With the tier first, a wired proof of something a unit suite already covers lands under its own tier at the same path, and neither collides with the other.</p>
   <h3 id="a-tier-with-nothing-in-it-has-no-folder">A tier with nothing in it has no folder</h3>
-  <p>There is no folder for a tier this plugin proves nothing at, and none for a setup the runner does not need. This is the same rule the gate already states about a realization that is absent: an empty folder teaches a reader that the thing works, where a missing one says what is true. <em>Where:</em> <code>plugins/spn-apps/tests/</code></p>
+  <p>There is no folder for a tier this plugin proves nothing at, and none for a setup the runner does not need. This is the same rule the gate already states about a realization that is absent: an empty folder teaches a reader that the thing works, where a missing one says what is true.</p>
   <h3 id="the-mirror-is-exact-so-a-rule-and-its-pr">The mirror is exact, so a rule and its proof move together</h3>
-  <p>A suite sits at the path its subject sits at inside the plugin. A rule under a provider's private folder has its suite under the same provider's private folder, and a script under the shared folder has its suite under the shared folder. A runner that globbed one flat folder made a rule's proof, a structural proof and a tool's proof indistinguishable, and it is why moving a rule used to move its proof nowhere. <em>Where:</em> <code>plugins/spn-apps/tests/unit/providers/</code> · <code>plugins/spn-apps/tests/unit/scripts/</code></p>
+  <p>A suite sits at the path its subject sits at inside the plugin. A rule under a provider's private folder has its suite under the same provider's private folder, and a script under the shared folder has its suite under the shared folder. A runner that globbed one flat folder made a rule's proof, a structural proof and a tool's proof indistinguishable, and it is why moving a rule used to move its proof nowhere.</p>
   <h3 id="the-runner-walks-and-judges-on-the-exit-">The runner walks, and judges on the exit code</h3>
-  <p>The suites are found by walking rather than by a list, so a new one is picked up by existing. The verdict is each suite's exit code, and the summary line only says how many cases there were: judging on the printed text alone read a suite that fails while printing a cheerful summary as green, and a suite that passes in different words as red. A runner that can disagree with its own suites proves nothing. <em>Where:</em> <code>plugins/spn-apps/tests/run.mjs</code></p>
+  <p>The suites are found by walking rather than by a list, so a new one is picked up by existing. The verdict is each suite's exit code, and the summary line only says how many cases there were: judging on the printed text alone read a suite that fails while printing a cheerful summary as green, and a suite that passes in different words as red. A runner that can disagree with its own suites proves nothing.</p>
   <h3 id="a-suite-s-own-error-output-is-discarded">A suite's own error output is discarded</h3>
-  <p>A suite exercising a gate prints that gate's findings, and inheriting them would put a fixture's warnings into this run's summary as though they were real. So the runner captures what a suite decided and drops what it wrote to the error stream. <em>Where:</em> <code>plugins/spn-apps/tests/run.mjs</code></p>
+  <p>A suite exercising a gate prints that gate's findings, and inheriting them would put a fixture's warnings into this run's summary as though they were real. So the runner captures what a suite decided and drops what it wrote to the error stream.</p>
   <h3 id="nothing-counts-its-own-depth">Nothing counts its own depth</h3>
-  <p>The suites sit at many depths because the mirror puts them there, so a relative hop from a suite to the plugin root would be a constant every move has to update — the defect the mirror exists to remove rather than introduce. The plugin root is found once and exported, the runner walks, and the search for a rule walks whatever folders a provider ships. Moving the suites once already broke all of them at the same moment, each having computed its own depth. <em>Where:</em> <code>plugins/spn-apps/tests/helpers/harness.mjs</code></p>
+  <p>The suites sit at many depths because the mirror puts them there, so a relative hop from a suite to the plugin root would be a constant every move has to update — the defect the mirror exists to remove rather than introduce. The plugin root is found once and exported, the runner walks, and the search for a rule walks whatever folders a provider ships. Moving the suites once already broke all of them at the same moment, each having computed its own depth.</p>
   <h3 id="a-case-names-the-rule-never-its-folder">A case names the rule, never its folder</h3>
-  <p>The harness searches every provider folder for the file a case names, rather than looking in a folder it was told about. A harness that knew which stack to look in would be the one place in this plugin naming an instance. So a rule that moves between subjects or between providers breaks no suite, and a case stays about the rule. <em>Where:</em> <code>plugins/spn-apps/tests/helpers/harness.mjs</code></p>
+  <p>The harness searches every provider folder for the file a case names, rather than looking in a folder it was told about. A harness that knew which stack to look in would be the one place in this plugin naming an instance. So a rule that moves between subjects or between providers breaks no suite, and a case stays about the rule.</p>
   <h3 id="a-case-runs-the-real-process-against-a-t">A case runs the real process against a throwaway tree</h3>
-  <p>The harness writes a temporary tree, sends a real payload to the real script on standard input, and reads what came back — so what is proven is what a session would actually get, rather than what a function returns when called directly. The trees are removed when the run ends. <em>Where:</em> <code>plugins/spn-apps/tests/helpers/harness.mjs</code></p>
+  <p>The harness writes a temporary tree, sends a real payload to the real script on standard input, and reads what came back — so what is proven is what a session would actually get, rather than what a function returns when called directly. The trees are removed when the run ends.</p>
 </section>
 
 <!-- 04 -->
@@ -299,39 +300,6 @@
       <tr><td><code>RD.APPS.035</code></td><td>the tier ladder, and that a test title carries the behaviour id it proves</td><td>MUST</td></tr>
       <tr><td><code>RD.DEVEX.008</code></td><td>a behaviour row's shape and its id grammar, which is what a suite's title joins to</td><td>MUST</td></tr>
       <tr><td>the foundation's <code>02-delivery.md</code> § When an edit becomes behaviour</td><td>a suite is run from this checkout, so it proves the source rather than an installed copy</td><td>MUST</td></tr>
-    </tbody>
-  </table></div>
-  <div class="scroll"><table>
-    <thead><tr><th>Repo</th><th>Node</th><th>What it realizes</th><th>State</th></tr></thead>
-    <tbody>
-      <tr><td>spn-foundation</td><td><code>01-devex/02-agent/04-plugins</code></td><td>the foundation construct this one realizes</td><td>planned</td></tr>
-      <tr><td>spn-claude-marketplace</td><td><code>spn-apps</code></td><td>one tier, mirrored on the plugin's own source, behind a runner that walks and a harness that finds rather than types</td><td>planned</td></tr>
-    </tbody>
-  </table></div>
-</section>
-
-<!-- 06 -->
-<section id="s6">
-  <div class="sec-head"><h2>Proof</h2></div>
-  <p><em>Behaviours: joined from the register, <code>03-behaviors/02-apps/07-tests.md</code> — never typed in the seat file.</em></p>
-  <div class="scroll"><table>
-    <thead><tr><th>Row</th><th>Does</th><th>Tier</th><th>Status</th></tr></thead>
-    <tbody>
-      <tr><td><code>MKT.TESTS.09</code></td><td>add a suite and have it run without registering it anywhere</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.TESTS.10</code></td><td>trust the runner's verdict over a suite's own summary line</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.TESTS.11</code></td><td>read a run without a fixture's own findings in it</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.TESTS.12</code></td><td>find the proof of a rule from the rule's own path</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.TESTS.13</code></td><td>add a second kind of proof for a file that already has one</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.TESTS.14</code></td><td>tell a tier this plugin proves nothing at from one that is unfinished</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.TESTS.15</code></td><td>move a rule between subjects or providers without breaking its suite</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.TESTS.16</code></td><td>move the suites without every one of them breaking at once</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.TESTS.17</code></td><td>prove what a session would actually get rather than what a function returns</td><td>UNIT</td><td>PLANNED</td></tr>
-    </tbody>
-  </table></div>
-  <div class="scroll"><table>
-    <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
-    <tbody>
-      <tr><td><code>node plugins/spn-apps/tests/run.mjs</code></td><td>suite</td><td>every suite under the folder is found, run, and judged on its own exit code, and each reports what it proved</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>node plugins/spn-apps/tests/run.mjs</code></p>

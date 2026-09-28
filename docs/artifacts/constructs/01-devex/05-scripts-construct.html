@@ -189,6 +189,7 @@
   <div class="sec-head"><h2>Overview</h2></div>
   <p>Two habits run through the whole folder. The first is that <strong>a script names the chapter it restates</strong> in its own header, so the rule has exactly one home and a change is made there first. The second is that <strong>a script reads the smallest slice its question needs</strong>. Reading everything on every call once cost three quarters of every millisecond the hooks had spent, and a gate that makes a session slow is a gate somebody eventually removes.</p>
   <p>Sharing one decision between a write-time check and a sweep is the habit that decides the folder's shape. <strong>A rule answered one way while a file is written and another way in a sweep is two rules</strong>, so the code that decides lives once and both callers import it.</p>
+  <p>This construct realizes the book's <code>01-devex/02-agent/01-agent</code>.</p>
 </section>
 
 <!-- 01 -->
@@ -267,37 +268,37 @@
 <section id="s3">
   <div class="sec-head"><h2>Parts</h2></div>
   <h3 id="the-four-folders-and-what-reaches-each">The four folders, and what reaches each</h3>
-  <p><code>checks/</code> holds the files a moment's dispatcher composes. <code>events/</code> holds one file per moment, which is the only code the wiring names. <code>tools/</code> holds the files nothing wires, reached by typing a path. <code>lib/</code> holds what more than one of the others reads and what none of them owns. The whole tree sits under <code>scripts/</code>, and the plugin's <code>hooks/</code> folder holds the wiring file alone. <em>Where:</em> <code>plugins/spn-devex/src/scripts/</code></p>
+  <p><code>checks/</code> holds the files a moment's dispatcher composes. <code>events/</code> holds one file per moment, which is the only code the wiring names. <code>tools/</code> holds the files nothing wires, reached by typing a path. <code>lib/</code> holds what more than one of the others reads and what none of them owns. The whole tree sits under <code>scripts/</code>, and the plugin's <code>hooks/</code> folder holds the wiring file alone.</p>
   <h3 id="a-check-is-a-file-and-its-header-names-i">A check is a file, and its header names its source</h3>
-  <p>Each check sits in its own file under <code>scripts/checks/</code> and opens with a line naming the chapter or register row of the foundation book it restates. That line carries no hash and nothing compares it, and that is deliberate: it tells a reader where the rule lives, and the rule is that a change is made in the chapter first and here second, in the same change. <em>Where:</em> <code>plugins/spn-devex/src/scripts/checks/</code></p>
+  <p>Each check sits in its own file under <code>scripts/checks/</code> and opens with a line naming the chapter or register row of the foundation book it restates. That line carries no hash and nothing compares it, and that is deliberate: it tells a reader where the rule lives, and the rule is that a change is made in the chapter first and here second, in the same change.</p>
   <h3 id="refusing-a-whole-route-beats-listing-the">Refusing a whole route beats listing the safe ones</h3>
-  <p>Where a value must never be rendered, every route that would render it is refused rather than the safe routes listed. One pipeline prints key names and the next prints every value, and telling those apart inside a shell string is guesswork. The whole command is read, so even a quoted path inside a here-document is caught, and the message names the door to use instead. <em>Where:</em> <code>plugins/spn-devex/src/scripts/checks/env-seat.ts</code></p>
+  <p>Where a value must never be rendered, every route that would render it is refused rather than the safe routes listed. One pipeline prints key names and the next prints every value, and telling those apart inside a shell string is guesswork. The whole command is read, so even a quoted path inside a here-document is caught, and the message names the door to use instead.</p>
   <h3 id="some-checks-speak-and-never-refuse">Some checks speak and never refuse</h3>
-  <p>Where deciding needs a reading rather than a match, a gate would be guessing. The check that names which document governs the folder you are editing does that and nothing else, and where no row governs a folder it stays silent — that gap belongs to a sweep over the whole tree rather than to one write. And a warning that repeats is a warning nobody reads: one turn writes many files, often into one folder, so a speaking check remembers what it already said and says it once, keeping that memory in the workspace's own folder for what its machinery says about itself. <em>Where:</em> <code>plugins/spn-devex/src/scripts/checks/mirror.ts</code>, <code>plugins/spn-devex/src/scripts/checks/confirmed.ts</code></p>
+  <p>Where deciding needs a reading rather than a match, a gate would be guessing. The check that names which document governs the folder you are editing does that and nothing else, and where no row governs a folder it stays silent — that gap belongs to a sweep over the whole tree rather than to one write. And a warning that repeats is a warning nobody reads: one turn writes many files, often into one folder, so a speaking check remembers what it already said and says it once, keeping that memory in the workspace's own folder for what its machinery says about itself.</p>
   <h3 id="a-fragment-cannot-answer-a-question-abou">A fragment cannot answer a question about a tree</h3>
-  <p>Every check under <code>checks/</code> reads the fragment being written, and a fragment cannot show that a page names a folder deleted last week or that a produced page stopped matching its seat. Those are corpus questions, and one check exists to ask a few of them without waiting for somebody to type a command. <em>Where:</em> <code>plugins/spn-devex/src/scripts/checks/corpus.ts</code></p>
+  <p>Every check under <code>checks/</code> reads the fragment being written, and a fragment cannot show that a page names a folder deleted last week or that a produced page stopped matching its seat. Those are corpus questions, and one check exists to ask a few of them without waiting for somebody to type a command.</p>
   <h3 id="the-workspace-gates-ask-for-accounting-n">The workspace gates ask for accounting, not completion</h3>
-  <p>Closing a scope with work still pending is good housekeeping. What must not happen is a row nobody decided. So the close gate passes landed, carried and deferred alike, and refuses only the undecided row, and there is no override because recording the deferral is the way through. Two of the workspace gates read the same table for different reasons, so they live in one file and the dispatcher registers each separately. Naming them apart matters: one sweeps the workspace and the other reads a single path, and anybody measuring the cost needs to know which. <em>Where:</em> <code>plugins/spn-devex/src/scripts/checks/split-plan.ts</code></p>
+  <p>Closing a scope with work still pending is good housekeeping. What must not happen is a row nobody decided. So the close gate passes landed, carried and deferred alike, and refuses only the undecided row, and there is no override because recording the deferral is the way through. Two of the workspace gates read the same table for different reasons, so they live in one file and the dispatcher registers each separately. Naming them apart matters: one sweeps the workspace and the other reads a single path, and anybody measuring the cost needs to know which.</p>
   <h3 id="the-bars-a-check-measures-come-from-a-ru">The bars a check measures come from a rule, never from the corpus</h3>
-  <p>A bar set from what the corpus already averages moves every time the corpus does, so a sweep would approve whatever is already there. The document check takes its numbers from the register row that states them, and takes headings, tables, code and metadata out of the text before measuring what is left. <em>Where:</em> <code>plugins/spn-devex/src/scripts/checks/doc-check.ts</code></p>
+  <p>A bar set from what the corpus already averages moves every time the corpus does, so a sweep would approve whatever is already there. The document check takes its numbers from the register row that states them, and takes headings, tables, code and metadata out of the text before measuring what is left.</p>
   <h3 id="a-tool-is-reached-by-name-and-grades-wha">A tool is reached by name, and grades what it finds</h3>
-  <p>Nothing matches a tool against the work you are doing, so you reach one by naming its path. It reads the repository it was pointed at and answers with both a list and a number: findings a person reads, each carrying its grade, and an exit code a pipeline reads that counts only the refusals. That is why the grade is part of a finding rather than a judgement made at the end. <em>Where:</em> <code>plugins/spn-devex/src/scripts/tools/</code></p>
+  <p>Nothing matches a tool against the work you are doing, so you reach one by naming its path. It reads the repository it was pointed at and answers with both a list and a number: findings a person reads, each carrying its grade, and an exit code a pipeline reads that counts only the refusals. That is why the grade is part of a finding rather than a judgement made at the end.</p>
   <h3 id="one-file-serves-the-write-time-check-and">One file serves the write-time check and the sweep</h3>
-  <p>A rule answered one way while a file is written and another way in a sweep is two rules. The practical consequence is that the same file must read a document in both of its spellings — the markdown an author writes and the HTML a page is produced as — because reading only one of them once reported every hand-written page as missing every section it carried. <em>Where:</em> <code>plugins/spn-devex/src/scripts/tools/docs.ts</code></p>
+  <p>A rule answered one way while a file is written and another way in a sweep is two rules. The practical consequence is that the same file must read a document in both of its spellings — the markdown an author writes and the HTML a page is produced as — because reading only one of them once reported every hand-written page as missing every section it carried.</p>
   <h3 id="a-job-not-a-flag">A job, not a flag</h3>
-  <p>A tool with more than one job gives each job a name and a path argument, and a path is a file or a folder in every one of them. Given a folder, a job means every document under it, which is what anybody typing one meant. <em>Where:</em> <code>plugins/spn-devex/src/scripts/tools/docs.ts</code></p>
+  <p>A tool with more than one job gives each job a name and a path argument, and a path is a file or a folder in every one of them. Given a folder, a job means every document under it, which is what anybody typing one meant.</p>
   <h3 id="two-questions-that-look-alike-and-are-no">Two questions that look alike and are not</h3>
-  <p>Comparing documents inside one repository and comparing a restatement against a book in another repository are different questions with different inputs, and no repository holds both trees. So they are two tools, and both read one parser, because writing the parser twice would be the defect the instrument exists to catch. <em>Where:</em> <code>plugins/spn-devex/src/scripts/tools/coherence.ts</code>, <code>plugins/spn-devex/src/scripts/tools/restate-drift.ts</code></p>
+  <p>Comparing documents inside one repository and comparing a restatement against a book in another repository are different questions with different inputs, and no repository holds both trees. So they are two tools, and both read one parser, because writing the parser twice would be the defect the instrument exists to catch.</p>
   <h3 id="silence-where-the-input-is-absent">Silence where the input is absent</h3>
-  <p>A partner holds the plugins and neither the book nor its registers. A question whose input is missing answers with one line and a clean exit, because a crash on a repository the tool was not written for shows a partner a broken agent rather than a missing file. <em>Where:</em> <code>plugins/spn-devex/src/scripts/tools/restate-drift.ts</code>, <code>plugins/spn-devex/src/scripts/tools/coherence.ts</code></p>
+  <p>A partner holds the plugins and neither the book nor its registers. A question whose input is missing answers with one line and a clean exit, because a crash on a repository the tool was not written for shows a partner a broken agent rather than a missing file.</p>
   <h3 id="a-tool-that-proves-the-other-scripts">A tool that proves the other scripts</h3>
-  <p>One tool builds a repository carrying only what a partner has, runs every wired script and every other tool against it, and reports. A crash is a failure there; a finding is not, because findings are that repository's own business. It picks an interpreter from each script's own extension, so a ported script is exercised the same way its predecessor was. <em>Where:</em> <code>plugins/spn-devex/src/scripts/tools/partner-shape.ts</code></p>
+  <p>One tool builds a repository carrying only what a partner has, runs every wired script and every other tool against it, and reports. A crash is a failure there; a finding is not, because findings are that repository's own business. It picks an interpreter from each script's own extension, so a ported script is exercised the same way its predecessor was.</p>
   <h3 id="a-tool-that-reports-candidates-rather-th">A tool that reports candidates rather than verdicts</h3>
-  <p>Handing a whole corpus to a rewriting pass is the expensive way to improve it, and most of the corpus needs no change. So the prose triage reports the paragraphs a pattern can recognise, with a ledger of what it has already scored so a long sweep can resume, and it leaves the faults no pattern can tell from good prose to a reader. <em>Where:</em> <code>plugins/spn-devex/src/scripts/tools/prose-triage.ts</code></p>
+  <p>Handing a whole corpus to a rewriting pass is the expensive way to improve it, and most of the corpus needs no change. So the prose triage reports the paragraphs a pattern can recognise, with a ledger of what it has already scored so a long sweep can resume, and it leaves the faults no pattern can tell from good prose to a reader.</p>
   <h3 id="a-tool-that-writes-rather-than-reports">A tool that writes rather than reports</h3>
-  <p>One tool here writes. It reads a run's own results file and puts what the run found into the cells a run owns, leaving every other cell exactly as it was. It exists because this repository declares no stack, so no stack runner writes its rows, and only the plugins' own suites know. <em>Where:</em> <code>plugins/spn-devex/src/scripts/tools/behaviour-status.mjs</code></p>
+  <p>One tool here writes. It reads a run's own results file and puts what the run found into the cells a run owns, leaving every other cell exactly as it was. It exists because this repository declares no stack, so no stack runner writes its rows, and only the plugins' own suites know.</p>
   <h3 id="a-tool-produces-the-pages-and-the-page-s">A tool produces the pages, and the page's own shape belongs to the book</h3>
-  <p>An author writes markdown and a reader opens HTML, and the whole of what sits between the two is a job of the documents tool: <code>page</code> produces, <code>face</code> writes the generated regions of a face, <code>figures</code> measures every drawing, and <code>audit</code> produces a page again and compares it byte for byte, so a hand edit is found rather than inherited. What the tool must not decide is what a page is made of. <strong>The block vocabulary, the figure grammar and the furniture a page carries are the foundation's</strong>, stated in <code>spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md</code> with the templates beside it, and this folder only realizes them. Where the two disagree, the chapter wins. <em>Where:</em> <code>plugins/spn-devex/src/scripts/tools/docs.ts</code>, and the renderer, drawer and figure checker it imports from <code>plugins/spn-devex/src/scripts/lib/</code></p>
+  <p>An author writes markdown and a reader opens HTML, and the whole of what sits between the two is a job of the documents tool: <code>page</code> produces, <code>face</code> writes the generated regions of a face, <code>figures</code> measures every drawing, and <code>audit</code> produces a page again and compares it byte for byte, so a hand edit is found rather than inherited. What the tool must not decide is what a page is made of. <strong>The block vocabulary, the figure grammar and the furniture a page carries are the foundation's</strong>, stated in <code>spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md</code> with the templates beside it, and this folder only realizes them. Where the two disagree, the chapter wins.</p>
 </section>
 
 <!-- 04 -->
@@ -326,53 +327,6 @@
       <tr><td><code>RD.GOV.024</code></td><td>this repository is served with docs commands alone, which is why its own rows are written by a tool the plugins ship</td><td>MUST</td></tr>
       <tr><td>the foundation's <code>02-delivery.md</code> § What it makes checkable</td><td>which standards are expected to be answered by a script rather than by a reader</td><td>MUST</td></tr>
       <tr><td>the foundation's <code>05-artifacts.md</code> § The blocks · § The figures</td><td>what a produced page is made of, which this folder renders and never decides</td><td>MUST</td></tr>
-    </tbody>
-  </table></div>
-  <div class="scroll"><table>
-    <thead><tr><th>Repo</th><th>Node</th><th>What it realizes</th><th>State</th></tr></thead>
-    <tbody>
-      <tr><td>spn-foundation</td><td><code>01-devex/02-agent/01-agent</code></td><td>the foundation construct this one realizes</td><td>planned</td></tr>
-      <tr><td>spn-claude-marketplace</td><td><code>spn-devex</code></td><td>the stack-agnostic checks the dispatcher composes, the tools a person reaches by name, and the library both read</td><td>planned</td></tr>
-    </tbody>
-  </table></div>
-</section>
-
-<!-- 06 -->
-<section id="s6">
-  <div class="sec-head"><h2>Proof</h2></div>
-  <p><em>Behaviours: joined from the register, <code>03-behaviors/01-devex/05-scripts.md</code> — never typed in the seat file.</em></p>
-  <div class="scroll"><table>
-    <thead><tr><th>Row</th><th>Does</th><th>Tier</th><th>Status</th></tr></thead>
-    <tbody>
-      <tr><td><code>MKT.SCRIPTS.01</code></td><td>make an ordinary edit and pay almost nothing for the gates</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.SCRIPTS.02</code></td><td>be refused any route that would render the machine seat</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.SCRIPTS.03</code></td><td>write many files in one turn and read a warning once</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.SCRIPTS.04</code></td><td>be told which document governs the folder being edited</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.SCRIPTS.05</code></td><td>close a scope with work pending and still pass</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.SCRIPTS.06</code></td><td>have a document measured against a stated bar rather than against the corpus average</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.SCRIPTS.07</code></td><td>get the same answer from a rule at write time and in a sweep</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.SCRIPTS.08</code></td><td>hand a job a folder wherever it would take a file</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.SCRIPTS.09</code></td><td>run a tool in a repository holding no book at all</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.SCRIPTS.10</code></td><td>read a run as a list and a pipeline read it as a number</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.SCRIPTS.11</code></td><td>prove every script still works in a repository carrying only the plugins</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.SCRIPTS.12</code></td><td>get the paragraphs worth a rewrite rather than a whole corpus</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.SCRIPTS.13</code></td><td>have this repository's own rows written from its own suites</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.SCRIPTS.14</code></td><td>write markdown and never HTML</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.SCRIPTS.15</code></td><td>have a hand edit to a page found rather than inherited</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.SCRIPTS.16</code></td><td>read a produced page with nothing installed</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.SCRIPTS.17</code></td><td>be told when a figure claims two things touch and they do not</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.SCRIPTS.18</code></td><td>follow a link on a produced page and land where the seat file meant</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.SCRIPTS.19</code></td><td>read a page's behaviour rows without them being typed into it</td><td>UNIT</td><td>PLANNED</td></tr>
-      <tr><td><code>MKT.SCRIPTS.20</code></td><td>tell a generated region of a face from the prose around it</td><td>UNIT</td><td>PLANNED</td></tr>
-    </tbody>
-  </table></div>
-  <div class="scroll"><table>
-    <thead><tr><th>Check</th><th>Kind</th><th>What a green run shows</th></tr></thead>
-    <tbody>
-      <tr><td><code>node plugins/spn-devex/src/scripts/tools/partner-shape.ts</code></td><td>gate</td><td>every script runs against a repository holding nothing but the plugin, a missing input produces silence rather than a crash, and nothing there crashes</td></tr>
-      <tr><td><code>node plugins/spn-devex/src/scripts/tools/coherence.ts</code></td><td>gate</td><td>no two documents in the repository state opposite rules about what a script decides</td></tr>
-      <tr><td><code>node plugins/spn-devex/src/scripts/tools/docs.ts audit docs</code></td><td>gate</td><td>every page is what its seat file produces, so no page carries a hand edit</td></tr>
-      <tr><td><code>node plugins/spn-devex/src/scripts/tools/docs.ts figures check docs</code></td><td>gate</td><td>every label fits its box, every connector starts and ends on a shape, and nothing crowds its neighbour</td></tr>
     </tbody>
   </table></div>
   <p>Try it: <code>node plugins/spn-devex/src/scripts/tools/partner-shape.ts</code></p>
