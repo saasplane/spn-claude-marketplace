@@ -46,7 +46,7 @@ Every estate node is a package. **Find its root by `spinfrapkg.json`; read its t
 | `PLATFORM` | `@{org}/infra-platform-{spc}` | `org` · `spc` · `name` · `domains` (`platform.domain` = the `{spd}`, never the marketing domain, plus its `records[]`; `service[]` for service domains) · `owner` · `network` · **declaration**: `resources` (`platform` + `spaces[]`) · `apps` · `modules` · **realization**: `providers` (scm · cloud environments · local) — RD.INFRA.051 | the manifest alone |
 | `MODULE` | `@{org}/infra-module-{code}` — **purpose code, never a product** (`idp`, not a vendor name) | `mtype` · `name` — identity only; usage stays on the referencing `modules[]` row | `spestate.json` + `aws/` + `local/` renderings — a rendering ships iff its folder exists |
 
-Keep `docs/`, `tests/`, `README.md` repo-internal, always; `tests/` exists only where a render harness does. `infra validate` holds every tree to its type's shape.
+Keep `docs/`, `tests/`, `README.md` repo-internal, always. `infra validate` holds every tree to its type's shape. `tests/` holds one folder per tier the node's kind owes — `contract/` always, `unit/` for `SUPPORT` alone, `integration/` for every kind — the folder naming the tier and the file's kind naming the engine; see `blueprints.md` § *What proves an estate change* for the ladder and `02-tests.md` in the foundation for the tree itself.
 
 **The blueprint tree orders seam, then provider, then layer, then step** (RD.INFRA.101) — `src/{seam}/{provider}/{layer}[/{step}]`:
 

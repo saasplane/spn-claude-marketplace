@@ -18,10 +18,10 @@
 // **THE FIRST REFUSAL WINS, AND IT IS NAMED.** A person fixes one thing at a time, and a list of
 // four denials for one edit reads as a broken gate rather than as four problems.
 import type { Verdict } from "../../../../../../plugin-support-lib/src/lib/payload.ts";
-import type { Rule } from "../../../../scripts/lib/laws.ts";
-import { RULES as SECRETS } from "../../../../scripts/lib/no-secrets.ts";
-import { RULES as PINNED } from "../../../../scripts/lib/no-pinned-account.ts";
-import { rulesFor } from "../../../../scripts/lib/provider-strings.ts";
+import type { Rule } from "../../../../scripts/lib/laws/law.ts";
+import { RULES as SECRETS } from "../../../../scripts/lib/laws/no-secrets.ts";
+import { RULES as PINNED } from "../../../../scripts/lib/laws/no-pinned-account-id.ts";
+import { rulesFor } from "../../../../scripts/lib/laws/provider-strings-only-in-cloud-entry.ts";
 
 /**
  * What Google Cloud's own strings look like — this cloud's business, and nowhere else's.

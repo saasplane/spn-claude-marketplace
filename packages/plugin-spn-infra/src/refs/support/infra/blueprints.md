@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/02-constructs/02-support/02-infra/03-blueprints.md", "seen": "173fa2ce" },
+    { "path": "spn-foundation/docs/02-constructs/02-support/02-infra/03-blueprints.md", "seen": "92815ff5" },
     { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/03-blueprints/", "seen": "1038bc8e" }
   ]
 }
@@ -142,19 +142,19 @@ Five rungs rather than three, because a three-rung ladder collapses production-a
 
 ## What proves an estate change
 
-**A declaration is proven by rendering it against a target, never by calling a function and reading what comes back** (`RD.INFRA.097`). `SPEstateTierType` names no contract state — the tiers are named by the standard and by each harness (`RD.INFRA.102`).
+**A declaration is proven by rendering it against a target, never by calling a function and reading what comes back** (`RD.INFRA.097`). **The tiers are the apps ladder's own** — `SPTestTierType`, never a second enum that would drift from it (`RD.INFRA.102`) — and an estate node reuses a tier's name wherever its meaning is the same (`RD.INFRA.107`).
 
 | Tier | Stands on | Proves | Cannot prove |
 | --- | --- | --- | --- |
-| `FORM` | the files alone | the declaration parses and its files are shaped the way the layer system expects | anything about whether it describes something real |
-| `CONTRACT` | the source tree | every layer declares its input and output shape, and the repository's own stated rules hold | that anything resolves |
-| `RENDER` | a fixture declaration and the provider's own planner | a declaration resolves — coordinates derived, parameters resolved, outputs shaped | that a provider would accept the plan |
-| `ACCEPTANCE` | a render, and a consumer's committed expectations | the render is what its consumer expected | that anything was stood up |
-| `STANDUP` | a real target — local by default, cloud by name | the layer provisions, and its published outputs are real | anything about a target it did not run against |
+| `UNIT` | a derivation, rendered once and run with nothing standing | a derivation the blueprints compute alone — a router function, a naming helper — gives the right answer for each input | that the engine renders it |
+| `CONTRACT` | the source tree | the node's declared interface holds: a layer's input and output shape, a declaration's shape and the names it publishes, and the repository's own stated rules | that anything resolves |
+| `INTEGRATION` | a fixture declaration or the node's own, the provider's own planner under mock providers, and a consumer's committed expectations | a module validates against the providers it pins, and a plan-only render is what its consumer expected | that a provider would accept the plan, or that anything was stood up |
 
-**Form is a static gate, never proof** — the same way a type check is not a test; it is the one thing every broken estate change also was. **A render is the tier you can afford on every write** — it holds no resources and touches nothing, which is what keeps a stand-up rare. **A stand-up speaks for its target and for no other — never claim a layer works on the strength of a tier that never touched the target in question.** Where nothing has ever been applied against a target, say plainly that the tiers below it pass and this one has not run.
+**A node owes the tiers its kind fixes, and no node chooses its own.** The blueprints (`SUPPORT`) owe all three — they derive, declare an interface and render. An `ORGANIZATION`, a `PLATFORM` and a `MODULE` owe `CONTRACT` and `INTEGRATION`: the ground and organization layers render an organization's declaration from a seat of its own; the platform layer renders a platform's declaration once, and the environment and deployments layers again per declared environment; the estate stands a seat for a module's world. A declaration's integration runs under `tofu test`, planning the pinned blueprints with mock providers, and each run's name carries the behaviour id it proves.
 
-Nothing here asks for a test framework — it asks for a run that names the tier it ran and reports what it found, which a shell script satisfies. A pipeline publishes the run's artifact and stops there; it never edits a document to say a run succeeded (`RD.INFRA.094` — every provisioning run names its own mode, and a rehearsal needs no credential).
+**Two rungs sit outside the ladder, on purpose.** The build — the declaration parses, the tree matches its type, the manifest matches its contract — is a static gate, never proof, the same way a type check is not a test; `spnutils infra test` runs it first and it prints no case. A stand-up provisions against a real target and speaks for that target and for no other — never claim a layer works on the strength of a run that never touched the target in question. Where nothing has ever been applied against a target, say plainly that the tiers pass and the stand-up has not run.
+
+**Every estate package keeps its tests in the same tree**: one folder per owed tier under `tests/` — the folder naming the tier, the file's kind naming the engine — so a case sitting in the wrong folder is refused rather than counted. A harness reports cases, never only an exit code: `ok`, `not ok` or `skip`, the tier, the behaviour id, a title, through `helpers/case.sh`; `spnutils infra test` turns the lines into the run artifact apps write, the agent stamps the rows from it, and `spnutils infra release` refuses a node whose owed tier has no case or a failing one. A pipeline publishes the artifact and stops there; it never edits a document to say a run succeeded (`RD.INFRA.094` — every provisioning run names its own mode, and a rehearsal needs no credential).
 
 ## What it makes checkable
 

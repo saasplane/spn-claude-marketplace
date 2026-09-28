@@ -20,6 +20,8 @@
 import { readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import type { Verdict } from "../../../../plugin-support-lib/src/lib/payload.ts";
+import { validate as testTreeShape } from "../lib/test-file-outside-tier-folder.ts";
+import { validate as harnessManifestIdentity } from "../lib/harness-reimplements-manifest-identity.ts";
 
 /** One subject, parsed once per provider that has an opinion about it. */
 export type Subject = { name: string; validate: (path: string, text: string) => Verdict };
@@ -28,9 +30,17 @@ export type Subject = { name: string; validate: (path: string, text: string) => 
  * The subjects an estate node has, in the order a person would want to hear about them.
  *
  * `rendering` reads the path alone, so it runs first and costs nothing when it does not apply.
- * `manifest` needs the text the write would produce.
+ * `manifest` needs the text the write would produce. `test-tree-shape` and
+ * `harness-manifest-identity` are cloud-free — the test tree's own layout, not a provider's — so
+ * they run once each rather than once per provider.
  */
 export const SUBJECT_NAMES = ["rendering", "manifest"] as const;
+
+/** The cloud-free subjects, run once regardless of which provider folders exist. */
+const CORE_SUBJECTS: Subject[] = [
+  { name: "test-tree-shape", validate: testTreeShape },
+  { name: "harness-manifest-identity", validate: harnessManifestIdentity },
+];
 
 const PROVIDERS = resolve(import.meta.dirname, "..", "..", "providers");
 
@@ -50,7 +60,7 @@ function instances(): string[] {
  * statement as a cloud with no folder: a realization that is absent says so.
  */
 export async function subjects(): Promise<Subject[]> {
-  const found: Subject[] = [];
+  const found: Subject[] = [...CORE_SUBJECTS];
   for (const name of SUBJECT_NAMES) {
     for (const instance of instances()) {
       try {
@@ -69,4 +79,4 @@ export const written = (input: { content?: string; new_string?: string }): strin
   input.content ?? input.new_string ?? "";
 
 /** True where a subject can decide without reading any text — the path is enough. */
-export const pathOnly = (name: string): boolean => name.startsWith("rendering:");
+export const pathOnly = (name: string): boolean => name.startsWith("rendering:") || name === "test-tree-shape";

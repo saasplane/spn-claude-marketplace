@@ -11,7 +11,7 @@
 // **AND IT IS ONE SENTENCE, IN ONE PLACE.** Every rule in every subject quotes this, so the law
 // reads identically whichever rule fired. Copied per rule, the copies drift and a person meets a
 // different account of the same law depending on which file they happened to touch.
-import type { Verdict } from "./payload.ts";
+import type { Verdict } from "../../../../../plugin-support-lib/src/lib/payload.ts";
 
 /** What `refs/support/infra/README.md` says, quoted at the point of refusal. */
 export const LAWS =

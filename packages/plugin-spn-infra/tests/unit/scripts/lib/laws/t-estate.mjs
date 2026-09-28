@@ -1,6 +1,6 @@
 // The estate laws — each against what it must refuse AND what it must let through, each against what it must refuse AND what it must let
 // through. A rule tested only on known-bad input cannot tell you it is conservative.
-import { one, done, hasBash } from "../../../helpers/harness.mjs";
+import { one, done, hasBash } from "../../../../helpers/harness.mjs";
 
 const EST = "/tmp/estate/src/spestate.json";
 const SRC = "/tmp/estate/src/blueprint.ts";
@@ -16,6 +16,18 @@ one("a folder merely named distribution", { input: { file_path: "/tmp/estate/dis
 one("an ARN in a manifest", { input: { file_path: EST, content: '{"role":"arn:aws:iam::1:role/x"}' }, expect: "deny", says: "ARN" });
 one("an ARN in ordinary source", { input: { file_path: SRC, content: 'const r = "arn:aws-cn:s3:::b";' }, expect: "deny", says: "ARN" });
 one("the word arn on its own", { input: { file_path: SRC, content: 'const arn = discovered();' }, expect: "" });
+
+// 2b · the placeholder account, sanctioned only inside a *.tftest.hcl file (N102 step 7, Q-B).
+const TFTEST = "/tmp/estate/tests/integration/edge.tftest.hcl";
+one("a placeholder ARN in a .tftest.hcl file", {
+  input: { file_path: TFTEST, content: 'mock_resource "aws_cloudfront_distribution" {\n  defaults = { arn = "arn:aws:cloudfront::000000000000:distribution/EDFDVBD6EXAMPLE" } }\n}' },
+  expect: "" });
+one("a real-looking ARN in a .tftest.hcl file is still refused", {
+  input: { file_path: TFTEST, content: 'mock_resource "aws_cloudfront_distribution" {\n  defaults = { arn = "arn:aws:cloudfront::123456789012:distribution/EDFDVBD6EXAMPLE" } }\n}' },
+  expect: "deny", says: "ARN" });
+one("the placeholder account outside a .tftest.hcl file is still refused", {
+  input: { file_path: EST, content: '{"role":"arn:aws:iam::000000000000:role/x"}' },
+  expect: "deny", says: "ARN" });
 
 // 3 · Secret shapes.
 one("an access key id", { input: { file_path: SRC, content: 'const k = "AKIAIOSFODNN7EXAMPLE";' }, expect: "deny", says: "access key id" });

@@ -11,8 +11,8 @@
 // edits; a rendering is built output a person should not be editing at all. Running one set of
 // rules over both would make every finding say the wrong thing about half its inputs.
 import type { Verdict } from "../../../../../../plugin-support-lib/src/lib/payload.ts";
-import type { Rule } from "../../../../scripts/lib/laws.ts";
-import { RULES as BUILD_OUTPUT } from "../../../../scripts/lib/build-output-is-not-source.ts";
+import type { Rule } from "../../../../scripts/lib/laws/law.ts";
+import { RULES as BUILD_OUTPUT } from "../../../../scripts/lib/laws/no-edits-to-built-output.ts";
 
 export const RULES: Rule[] = [...BUILD_OUTPUT];
 
