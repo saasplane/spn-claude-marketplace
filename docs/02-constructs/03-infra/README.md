@@ -45,7 +45,7 @@ The estate domain is the smallest of the three domains, and the boundary is what
 | **Hooks** | | |
 | [a call about to run](02-hooks.md) | `PreToolUse` | the moment before a tool call is performed, and the only moment that may refuse one |
 | [the command](02-hooks.md) | `command` | what the harness runs, written against the plugin root rather than against any checkout |
-| [the matcher](02-hooks.md) | `Write\ | Edit` |
+| [the matcher](02-hooks.md) | `Write\|Edit` | the calls the moment is narrowed to, so nothing else pays for the hook at all |
 | [the plugin root](02-hooks.md) | `CLAUDE_PLUGIN_ROOT` | the installed folder a session reads, which is what makes the wired path portable |
 | [the timeout](02-hooks.md) | `timeout` | the seconds the harness allows the command before it gives up on it |
 | [the wiring](02-hooks.md) | `hooks.json` | the one file declaring which moments this plugin claims and what it runs at each |

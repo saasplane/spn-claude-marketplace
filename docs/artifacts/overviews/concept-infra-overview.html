@@ -304,7 +304,7 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
       <tr class="grp"><td colspan="3">Hooks</td></tr>
       <tr><td><a href="../constructs/03-infra/02-hooks-construct.html">a call about to run</a></td><td><code>PreToolUse</code></td><td>the moment before a tool call is performed, and the only moment that may refuse one</td></tr>
       <tr><td><a href="../constructs/03-infra/02-hooks-construct.html">the command</a></td><td><code>command</code></td><td>what the harness runs, written against the plugin root rather than against any checkout</td></tr>
-      <tr><td><a href="../constructs/03-infra/02-hooks-construct.html">the matcher</a></td><td>`Write\</td><td>Edit`</td></tr>
+      <tr><td><a href="../constructs/03-infra/02-hooks-construct.html">the matcher</a></td><td><code>Write|Edit</code></td><td>the calls the moment is narrowed to, so nothing else pays for the hook at all</td></tr>
       <tr><td><a href="../constructs/03-infra/02-hooks-construct.html">the plugin root</a></td><td><code>CLAUDE_PLUGIN_ROOT</code></td><td>the installed folder a session reads, which is what makes the wired path portable</td></tr>
       <tr><td><a href="../constructs/03-infra/02-hooks-construct.html">the timeout</a></td><td><code>timeout</code></td><td>the seconds the harness allows the command before it gives up on it</td></tr>
       <tr><td><a href="../constructs/03-infra/02-hooks-construct.html">the wiring</a></td><td><code>hooks.json</code></td><td>the one file declaring which moments this plugin claims and what it runs at each</td></tr>

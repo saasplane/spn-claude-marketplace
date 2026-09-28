@@ -46,7 +46,7 @@ Each construct here is the stack-concrete form of one in the core domain, so rea
 | [a subject](02-hooks.md) | `SUBJECT_NAMES` | one grouping of rules the dispatcher asks about a write, resolved per call rather than listed |
 | [the dispatcher](02-hooks.md) | `pretooluse.ts` | the single process the entry names, which resolves what to run and joins the answers |
 | [the entry](02-hooks.md) | — | one declaration behind which every rule runs, rather than one declaration per rule |
-| [the matcher](02-hooks.md) | `Write\ | Edit` |
+| [the matcher](02-hooks.md) | `Write\|Edit` | the tool names this entry narrows to, so nothing else in a session reaches the chain at all |
 | [the wiring](02-hooks.md) | `hooks.json` | the single file declaring what this plugin claims, at which moment, with which command and which timeout |
 | **Skills** | | |
 | [a mode](03-skills.md) | — | an argument a skill's own description names, so one folder answers several close asks |

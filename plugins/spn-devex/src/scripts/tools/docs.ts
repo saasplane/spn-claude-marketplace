@@ -45,9 +45,12 @@ type Finding = { check: string; grade: Grade; file: string; message: string };
 // The five that joined in 2026-09: a FACE is 226 documents of one shape that no kind could name,
 // and 29 of them declared a chapter's variant instead. A DATA_MODEL's table shape is stated in
 // `RD.DOCS.074` and was written four different ways across 25 files. SURFACE_MAP and ROUTE_MAP
-// carry no document yet. **None of the five has an outline here on purpose**: the corpus has not
-// been written to one, so a gate now would refuse 222 documents for a shape nobody was told about.
-// The outlines land with the pass that brings those documents to them.
+// carry no document yet.
+//
+// DATA_MODEL AND SURFACE_MAP HAVE THEIR OUTLINES NOW, AND THEY REPORT SOFTLY (N37 step 3). Both are
+// stated in `03-tree.md` § *A capability is realized by halves*. A new check ships SOFT, so the
+// files are brought to the shape by the pass that rewrites them rather than refused by a gate that
+// arrived first. FACE, ROUTE_MAP and REGISTER still have none, for the reason above.
 const VARIANTS = ["approach", "overview", "construct", "behaviors", "capability", "report",
                   "face", "data_model", "surface_map", "route_map", "register"] as const;
 type Variant = (typeof VARIANTS)[number];
@@ -99,7 +102,40 @@ const OUTLINE: Partial<Record<Variant, { order: string[]; optional: string[] }>>
     order: ["Terms", "Why", "What", "How", "Open", "Deferred"],
     optional: ["Terms"],
   },
+  // WHAT A MIGRATION KNOWS, AND NOTHING ELSE (03-tree.md, RD.DOCS.074). A data model defines no
+  // term; the words are the constructs' `Terms` tables. What seeds and what must run first is
+  // storage knowledge too (RD.DOCS.023), so it closes the file rather than moving elsewhere.
+  data_model: {
+    order: ["Tables", "Indexes", "Seeds and order"],
+    optional: ["Seeds and order"],
+  },
 };
+
+/**
+ * The heading row a section's first table carries, per kind — the column names a reader trusts.
+ *
+ * A HEADING IS A PROMISE ABOUT EVERY CELL UNDER IT, which is the whole of `N37`. Four vocabularies
+ * sat under one file kind for a year because nothing read the first row. A surface map has no
+ * fixed section names — one section per folder under `ui/` — so its heading is the whole outline.
+ */
+const TABLE_HEAD: Partial<Record<Variant, Record<string, string[]>>> = {
+  data_model: {
+    Tables: ["Table", "Stores", "The rule it keeps"],
+    Indexes: ["Index", "Why it exists"],
+  },
+  surface_map: {
+    "*": ["Surface", "Kind", "Contract term", "What it is for"],
+  },
+};
+
+/** The four kinds of surface a package's `ui/` exports (N63 `Q243`). */
+const SURFACE_KINDS = ["page", "component", "widget", "hook"];
+
+/** The kinds whose outline findings are still SOFT, because the check is new (N37 step 3). */
+const SOFT_OUTLINES = new Set<Variant>(["data_model", "surface_map"]);
+
+/** A fixed file name and the kind it must declare — the name is the location's claim, the block the file's. */
+const NAMED_KIND: Record<string, Variant> = { "data-model.md": "data_model", "surface-map.md": "surface_map" };
 
 /** An overview's outline is borrowed, with one fixed opener and two fixed closers. */
 const OVERVIEW_FIXED_FIRST = "Overview";
@@ -254,17 +290,169 @@ function checkOutline(file: string, src: string, block: any): Finding[] {
   const seen = got.filter((g) => spec.order.includes(g));
   const missing = want.filter((w) => !got.includes(w));
   const extra = got.filter((g) => !spec.order.includes(g));
+  const grade: Grade = SOFT_OUTLINES.has(variant!) ? "SOFT" : "RULE";
 
-  if (missing.length) f.push({ check: "outline", grade: "RULE", file, message: `missing section${missing.length > 1 ? "s" : ""}: ${missing.join(" · ")}` });
-  if (extra.length) f.push({ check: "outline", grade: "RULE", file, message: `section${extra.length > 1 ? "s" : ""} the ${variant} outline does not have: ${extra.join(" · ")}` });
+  if (missing.length) f.push({ check: "outline", grade, file, message: `missing section${missing.length > 1 ? "s" : ""}: ${missing.join(" · ")}` });
+  if (extra.length) f.push({ check: "outline", grade, file, message: `section${extra.length > 1 ? "s" : ""} the ${variant} outline does not have: ${extra.join(" · ")}` });
 
   // Order, over the sections that belong — a swapped pair is the fault this catches.
   const order = spec.order;
   const ranked = seen.map((s) => order.indexOf(s));
   for (let i = 1; i < ranked.length; i++) {
     if (ranked[i] < ranked[i - 1]) {
-      f.push({ check: "outline", grade: "RULE", file, message: `\`${seen[i - 1]}\` comes before \`${seen[i]}\`; the ${variant} outline is ${order.join(" → ")}` });
+      f.push({ check: "outline", grade, file, message: `\`${seen[i - 1]}\` comes before \`${seen[i]}\`; the ${variant} outline is ${order.join(" → ")}` });
       break;
+    }
+  }
+  return f;
+}
+
+/** Every markdown table in a slice, with its heading row kept apart from its data rows. */
+function headedTables(seg: string): { head: string[]; rows: string[][] }[] {
+  const out: { head: string[]; rows: string[][] }[] = [];
+  let cur: { head: string[]; rows: string[][] } | null = null;
+  for (const raw of outsideFences(seg).split("\n")) {
+    const t = raw.trim();
+    if (!(t.startsWith("|") && t.endsWith("|") && t.length > 2)) { cur = null; continue; }
+    // AN ESCAPED PIPE IS CONTENT. `Write\|Edit` is one cell, and splitting on it shifted every
+    // column after it one place to the right.
+    const cells = t.slice(1, -1).split(/(?<!\\)\|/).map((c) => c.trim());
+    if (/^[\s:|-]*$/.test(cells.join(""))) continue;
+    if (!cur) { cur = { head: cells, rows: [] }; out.push(cur); continue; }
+    cur.rows.push(cells);
+  }
+  return out;
+}
+
+/** A markdown document cut at its `##` headings: each section's name and its body. */
+function sectionsWithBodies(src: string): { name: string; body: string }[] {
+  const bare = outsideFences(src).split("\n");
+  const raw = src.split("\n");
+  const out: { name: string; body: string }[] = [];
+  let name: string | null = null;
+  let lines: string[] = [];
+  bare.forEach((l, i) => {
+    const m = l.match(/^##\s+(.+)$/);
+    if (m) {
+      if (name !== null) out.push({ name, body: lines.join("\n") });
+      name = sectionName(m[1]); lines = [];
+      return;
+    }
+    if (name !== null) lines.push(raw[i]);
+  });
+  if (name !== null) out.push({ name, body: lines.join("\n") });
+  return out;
+}
+
+/**
+ * The two realization files: the kind a fixed name declares, where it sits, and the heading rows.
+ *
+ * A FILE KIND NOTHING CAN NAME IS A FILE KIND NOTHING CAN CHECK, and that is how one document grew
+ * four incompatible shapes (N37). So a `data-model.md` or a `surface-map.md` that declares no kind
+ * is itself a finding: the outline below would otherwise never be read for it.
+ *
+ * A DATA MODEL AT A DOMAIN'S ROOT SITS ABOVE THE HALF THAT OWNS THE STORAGE (RD.DOCS.074). It sits
+ * beside the migrations it mirrors, which is always a package folder: `04-capabilities/<domain>/
+ * <package>/data-model.md`. A domain that stores nothing writes none at all.
+ *
+ * ALL SOFT, BECAUSE THE CHECK IS NEW. It reports the corpus as it is while the pass that rewrites
+ * the files is under way, and it is flipped once that pass has landed.
+ */
+function checkRealizationFile(file: string, src: string, block: any): Finding[] {
+  const f: Finding[] = [];
+  if (!file.endsWith(".md")) return f;
+  const add = (message: string) => f.push({ check: "outline", grade: "SOFT", file, message });
+  const name = basename(file);
+  const want = NAMED_KIND[name];
+  const variant: Variant | undefined = block?.variant;
+  if (want && variant !== want) add(`\`${name}\` declares \`variant\` \`${variant ?? "—"}\`; the file kind is \`${want}\`, and a file with no kind is one no outline is read against`);
+  const kind = variant ?? want;
+  if (!kind) return f;
+
+  const rel = file.replace(/\\/g, "/").split("/04-capabilities/")[1];
+  if (kind === "data_model" && rel !== undefined && rel.split("/").length < 3)
+    add("a data model sits beside the migrations it mirrors, in the package that owns `src/migrations` — at a domain's root it sits above the half that owns the storage (RD.DOCS.074)");
+
+  const heads = TABLE_HEAD[kind];
+  if (!heads) return f;
+  for (const sec of sectionsWithBodies(src)) {
+    const wantHead = heads[sec.name] ?? heads["*"];
+    if (!wantHead) continue;
+    const tables = headedTables(sec.body);
+    if (!tables.length) { add(`\`${sec.name}\` carries no table; its first row is \`${wantHead.join(" · ")}\``); continue; }
+    const got = tables[0].head.map((c) => c.replace(/\*\*/g, "").trim());
+    if (got.join("|") !== wantHead.join("|"))
+      add(`\`${sec.name}\`'s first row is \`${got.join(" · ")}\`; the ${kind} heading is \`${wantHead.join(" · ")}\``);
+    if (kind === "surface_map") {
+      const at = got.indexOf("Kind");
+      for (const row of tables[0].rows) {
+        const k = (row[at] ?? "").replace(/`/g, "").trim();
+        if (at >= 0 && !SURFACE_KINDS.includes(k))
+          add(`\`${(row[0] ?? "").replace(/`/g, "")}\` is of kind \`${k || "—"}\`; a surface is one of ${SURFACE_KINDS.join(" · ")}`);
+      }
+    }
+  }
+  return f;
+}
+
+/**
+ * THE CHECK THIS ARC WAS OPENED FOR: A GENERATED COLUMN IS READ AGAINST ITS OWN HEADING (N37 step 7).
+ *
+ * *Where it is stored* carried an environment variable on 64 rows and a status marker on 12, and
+ * named a table on none of 252. `audit`, `face --check`, `topics` and `coverage` were all green over
+ * it, because each asked whether a document was well-formed and none asked whether a column meant
+ * what its heading said. So every heading a generator writes has a reading of its values here, and
+ * **a heading with no reading is itself a finding** — a column cannot ship without somebody saying
+ * what belongs under it, which is the step the deleted column skipped.
+ *
+ * Only the regions `docs.ts face` writes are read. A hand-written table is the author's, and the
+ * outline checks above read the ones whose shape is fixed. SOFT, because the check is new.
+ */
+const LINK = /^\[[^\]]+\]\([^)]+\)$/;
+const COLUMN_READING: Record<string, { says: string; ok: (cell: string) => boolean }> = {
+  "Term": { says: "a word linked to the construct that declares it", ok: (c) => LINK.test(c) },
+  // THE TERM AS THE SYSTEM SPELLS IT, SO IT CARRIES CODE. A cell may qualify the spelling — a field
+  // after `§`, a list of siblings — but a cell with no code span at all is a description standing
+  // where a spelling belongs, and a status marker there is the defect this check was written for.
+  "Contract term": {
+    says: "the term as the system spells it — at least one code span, or `—`",
+    ok: (c) => c === "—" || (/`[^`]+`/.test(c) && !/^[✅🚧🔮]/u.test(c)),
+  },
+  "What it means": { says: "a meaning in words", ok: (c) => /[a-z]{3}/i.test(c) && !/^[✅🚧🔮]/u.test(c) },
+  "Chapter": { says: "a link to the chapter", ok: (c) => LINK.test(c) || c === "—" },
+  "File": { says: "a link to the mirror", ok: (c) => LINK.test(c) || c === "—" },
+  "Realizes": { says: "a construct id in a code span", ok: (c) => /^`[^`\s]+`$/.test(c) || c === "—" },
+  "Governs": { says: "a source path in a code span, or `—`", ok: (c) => /^`[^`\s]+`$/.test(c) || c === "—" },
+  "Carries": { says: "what the file carries, in words", ok: (c) => /[a-z]{3}/i.test(c) },
+  "Status": { says: "one of ✅ · 🚧 · 🔮", ok: (c) => /^(✅|🚧|🔮)$/u.test(c) },
+  "Construct": { says: "a link to the construct", ok: (c) => LINK.test(c) },
+  "Domain": { says: "a link to the domain", ok: (c) => LINK.test(c) },
+  "What it is": { says: "a sentence", ok: (c) => /[a-z]{3}/i.test(c) },
+  "What it holds": { says: "a sentence", ok: (c) => /[a-z]{3}/i.test(c) },
+};
+
+function checkGeneratedColumns(file: string, src: string): Finding[] {
+  const f: Finding[] = [];
+  if (!file.endsWith(".md")) return f;
+  const re = /<!-- spn:generated (\S+)[^>]*-->([\s\S]*?)<!-- \/spn:generated -->/g;
+  for (const m of src.matchAll(re)) {
+    const kind = m[1];
+    for (const t of headedTables(m[2])) {
+      t.head.forEach((heading, col) => {
+        const reading = COLUMN_READING[heading];
+        if (!reading) {
+          f.push({ check: "column", grade: "SOFT", file, message: `the generated ${kind} column \`${heading}\` has no reading of its values — a heading nothing checks can sit over anything` });
+          return;
+        }
+        const bad: string[] = [];
+        for (const row of t.rows) {
+          // A GROUP ROW IS A CONSTRUCT'S NAME IN BOLD WITH THE REST EMPTY: a divider, not data.
+          if (/^\*\*[^*]+\*\*$/.test(row[0] ?? "") && row.slice(1).every((c) => !c)) continue;
+          const cell = (row[col] ?? "").trim();
+          if (!reading.ok(cell)) bad.push(cell || "(empty)");
+        }
+        if (bad.length) f.push({ check: "column", grade: "SOFT", file, message: `${bad.length} cell${bad.length > 1 ? "s" : ""} under the generated ${kind} column \`${heading}\` ${bad.length > 1 ? "are" : "is"} not ${reading.says}: ${bad.slice(0, 3).map((b) => `\`${b.replace(/`/g, "")}\``).join(" · ")}${bad.length > 3 ? " …" : ""}` });
+      });
     }
   }
   return f;
@@ -1367,7 +1555,10 @@ type Row = { term: string; contract: string; means: string; file: string };
 function mdRows(block: string): string[][] {
   return block.split("\n")
     .filter((l) => l.trim().startsWith("|") && !/^\s*\|[\s:|-]+\|\s*$/.test(l))
-    .map((l) => l.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map((c) => c.trim()))
+    // AN ESCAPED PIPE IS CONTENT. Splitting `Write\|Edit` on it wrote a glossary row whose contract
+    // term was `Write\` and whose meaning was `Edit` — found by the column check below, which is the
+    // first thing that ever read a generated cell against its heading (N37 step 7).
+    .map((l) => l.trim().replace(/^\|/, "").replace(/(?<!\\)\|$/, "").split(/(?<!\\)\|/).map((c) => c.trim()))
     .slice(1); // the header
 }
 
@@ -1514,7 +1705,8 @@ function overviewForDomain(domainDir: string): string | null {
 function buildGlossaryHtml(domainDir: string, overviewFile: string): { body: string; findings: Finding[] } {
   const { rows, findings } = glossaryRows(domainDir);
   const esc = (x: string) => x.replace(/&(?![a-zA-Z#][a-zA-Z0-9]*;)/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  const cell = (x: string) => esc(x).replace(/`([^`]*)`/g, "<code>$1</code>");
+  // `\|` is markdown's way to keep a pipe inside a cell; HTML has no such need, so the pipe is bare.
+  const cell = (x: string) => esc(x.replace(/\\\|/g, "|")).replace(/`([^`]*)`/g, "<code>$1</code>");
   const out = [
     '  <div class="scroll"><table class="gloss">',
     "    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>",
@@ -1595,7 +1787,9 @@ function buildMap(faceFile: string): { body: string; findings: Finding[] } {
 function buildChapterMap(faceFile: string): { body: string; findings: Finding[] } {
   const findings: Finding[] = [];
   const dir = dirname(faceFile);
-  const chapters = walkFiles(dir, (p) => p.endsWith(".md") && basename(p) !== "README.md" && basename(p) !== "data-model.md")
+  // THE REALIZATION FILES ARE NOT CHAPTERS. A data model and a surface map sit beside a package's
+  // chapters and realize no construct, so a Map row for either would name a topic nobody declared.
+  const chapters = walkFiles(dir, (p) => p.endsWith(".md") && !["README.md", "data-model.md", "surface-map.md"].includes(basename(p)))
     .sort((a, b) => a.localeCompare(b));
   const glyph: Record<string, string> = { DONE: "✅", IMPLEMENTING: "🚧", PLANNING: "🔮" };
   const lines = ["| Chapter | Realizes | Carries | Status |", "| --- | --- | --- | --- |"];
@@ -2895,6 +3089,8 @@ function audit(paths: string[], workspace: string): Finding[] {
     findings.push(...checkBlock(p, src, block, error));
     if (!block) continue;
     findings.push(...checkOutline(p, src, block));
+    findings.push(...checkRealizationFile(p, src, block));
+    findings.push(...checkGeneratedColumns(p, src));
     findings.push(...checkHeader(p, src, block));
     findings.push(...checkCards(p, src, block));
     findings.push(...checkCodeFigures(p, src, workspace));

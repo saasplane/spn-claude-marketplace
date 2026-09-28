@@ -1333,5 +1333,119 @@ console.log("\n=== an HTML page links the HTML page, never the markdown seat (Q2
     lacks("an HTML page links the HTML page"));
 }
 
+// ---------------------------------------------------------------- N37: the realization files
+
+console.log("\n=== a data model is read against its fixed outline, and reports softly while it is new (N37 step 3)");
+{
+  const dm = (body, o = {}) => doc({ id: "dm", variant: "data_model", title: "Data Model", lenses: ["SERVER_DEV"], status: "DONE", ...o }, body,
+    "`For: Backend developer` · `Status: ✅ DONE`");
+  const good = "The tables below mirror `src/migrations`.\n\n## Tables\n\n| Table | Stores | The rule it keeps |\n| --- | --- | --- |\n" +
+    "| `sp_session` | `SPSession` | one row per live access |\n\n## Indexes\n\n| Index | Why it exists |\n| --- | --- |\n" +
+    "| `sp_session_org_idx` | a sign-out ends every session of one organization |\n";
+  const at = "docs/04-capabilities/01-core/module-server-core-ts/data-model.md";
+  const mk = (path, text) => repo({ "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n", [path]: text });
+
+  one("a data model in the shape, beside its package, is clean",
+    run(mk(at, dm(good)), ["audit", at]), has("clean — 1 page"));
+  // THE KNOWN-BAD INPUT IS THE CORPUS'S OWN FIRST ROW: 19 of 25 files opened with this dictionary heading.
+  const dictionary = good.replace("| Table | Stores | The rule it keeps |", "| Consumer | Capability | Description |");
+  const out = run(mk(at, dm(dictionary)), ["audit", at]);
+  one("a dictionary's first row under Tables is an outline finding", out,
+    has("`Tables`'s first row is `Consumer · Capability · Description`; the data_model heading is `Table · Stores · The rule it keeps`"));
+  one("and it is SOFT, because the check is new", out, has("SOFT outline"));
+  one("and nothing about it refuses", out, has("0 RULE"));
+  one("a data model with no Indexes section is missing one",
+    run(mk(at, dm(good.replace(/## Indexes[\s\S]*$/, ""))), ["audit", at]), has("missing section: Indexes"));
+  one("Seeds and order is optional, and in its place it is silent",
+    run(mk(at, dm(good + "\n## Seeds and order\n\nThe roles migration runs first.\n")), ["audit", at]), has("clean — 1 page"));
+  one("a section the outline does not have is named",
+    run(mk(at, dm(good + "\n## Environment Variables\n\nNone.\n")), ["audit", at]), has("the data_model outline does not have: Environment Variables"));
+  const root = "docs/04-capabilities/01-core/data-model.md";
+  one("a data model at a domain's root sits above the half that owns the storage",
+    run(mk(root, dm(good)), ["audit", root]), has("at a domain's root it sits above the half that owns the storage"));
+  const bare = doc({ id: "dm", title: "Contract Terms", lenses: ["SERVER_DEV"], status: "DONE" }, good, "`For: Backend developer` · `Status: ✅ DONE`");
+  one("a data-model.md that declares no kind is itself a finding — nothing else would read its outline",
+    run(mk(at, bare), ["audit", at]), has("declares `variant` `—`; the file kind is `data_model`"));
+}
+
+console.log("\n=== a surface map carries one table per ui/ folder, and a surface is one of four kinds (N37 step 3)");
+{
+  const sm = (body) => doc({ id: "sm", variant: "surface_map", title: "Surface Map", lenses: ["WEB_DEV"], status: "DONE" }, body,
+    "`For: Web developer` · `Status: ✅ DONE`");
+  const good = "## security\n\n| Surface | Kind | Contract term | What it is for |\n| --- | --- | --- | --- |\n" +
+    "| `FactorsPage` | page | `IdentityFactor` | adds and removes a second way to confirm who you are |\n" +
+    "| `useIdentityFactors` | hook | `IdentityFactor` | reads the factors a person has |\n\n" +
+    "## layout\n\n| Surface | Kind | Contract term | What it is for |\n| --- | --- | --- | --- |\n" +
+    "| `DSButton` | component | — | a button |\n";
+  const at = "docs/04-capabilities/01-core/module-web-core-ts/surface-map.md";
+  const mk = (text) => repo({ "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n", [at]: text });
+  one("a surface map in the shape is clean", run(mk(sm(good)), ["audit", at]), has("clean — 1 page"));
+  one("a kind outside the four is named",
+    run(mk(sm(good.replace("| hook |", "| util |"))), ["audit", at]), has("`useIdentityFactors` is of kind `util`; a surface is one of page · component · widget · hook"));
+  one("a screen-keyed first row is refused softly — routes are the application's",
+    run(mk(sm(good.replace("| Surface | Kind | Contract term | What it is for |", "| Screen | Route | Contract term | Surfaces |"))), ["audit", at]),
+    has("`security`'s first row is `Screen · Route · Contract term · Surfaces`"));
+}
+
+console.log("\n=== a generated column is read against its own heading (N37 step 7)");
+{
+  const face = (region) => doc({ id: "c", title: "Core", lenses: ["ARCHITECT"] }, "Lead.\n\n" +
+    "<!-- spn:generated glossary — do not edit inside these markers; `docs.ts face` writes it -->\n" + region + "<!-- /spn:generated -->\n",
+    "`For: Architect`");
+  const at = "docs/02-constructs/01-core/README.md";
+  const mk = (region) => repo({ "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n", [at]: face(region) });
+  const good = "| Term | Contract term | What it means |\n| --- | --- | --- |\n| **Session** | | |\n" +
+    "| [sign-in](session.md) | `SPSession` | one person's live access |\n| [device](session.md) | — | the client a session opened from |\n";
+  one("a glossary whose cells answer their headings is silent", run(mk(good), ["audit", at]), lacks("column"));
+  // THE DEFECT THAT OPENED THE ARC, REPRODUCED: the column no reading was ever written for.
+  const stored = "| Term | Contract term | Where it is stored |\n| --- | --- | --- |\n" +
+    "| [scheduler](job.md) | `JobScheduler` | `${APP}_JOB_SCHEDULER_PROVIDER` |\n| [queue](job.md) | `JobQueue` | ✅ written |\n";
+  const out = run(mk(stored), ["audit", at]);
+  one("a generated column no reading exists for is reported by a run", out,
+    has("the generated glossary column `Where it is stored` has no reading of its values"));
+  one("a status marker under Contract term is not a spelling",
+    run(mk(good.replace("`SPSession`", "✅ written")), ["audit", at]), has("under the generated glossary column `Contract term` is not the term as the system spells it"));
+  one("a description standing where a spelling belongs is named",
+    run(mk(good.replace("`SPSession`", "the estate's app row")), ["audit", at]), has("`the estate's app row`"));
+  one("a group divider row is not data", run(mk(good), ["audit", at]), lacks("`Session`"));
+  one("a table written by hand, outside the markers, is the author's and is not read",
+    run(repo({ "CONCEPT.md": "# c\n", [at]: doc({ id: "c", title: "Core", lenses: ["ARCHITECT"] }, "| Term | Anything |\n| --- | --- |\n| a | ✅ |\n", "`For: Architect`") }), ["audit", at]),
+    lacks("column"));
+}
+
+console.log("\n=== an escaped pipe inside a Terms cell stays one cell (found by the column check)");
+{
+  const root = repo({
+    "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
+    "docs/02-constructs/README.md": doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"] }),
+    "docs/02-constructs/01-core/README.md": doc({ id: "c", title: "Core", lenses: ["ARCHITECT"] }),
+    "docs/02-constructs/01-core/hooks.md":
+      doc({ id: "hooks", variant: "construct", dependsOn: [], title: "Hooks", lenses: ["ARCHITECT"] },
+          "## Terms\n\n| Term | Contract term | What it means |\n| --- | --- | --- |\n" +
+          "| the matcher | `Write\\|Edit` | the tool names an entry narrows to |\n"),
+  });
+  run(root, ["face", "docs"]);
+  const got = readAt(root, "docs/02-constructs/01-core/README.md");
+  one("the contract term keeps its pipe and the meaning keeps its column",
+    got, has("| [the matcher](hooks.md) | `Write\\|Edit` | the tool names an entry narrows to |"));
+}
+
+console.log("\n=== a package face's Map names chapters, never the realization files beside them");
+{
+  const root = repo({
+    "CONCEPT.md": "# c\n",
+    "docs/04-capabilities/01-core/module-web-core-ts/README.md":
+      doc({ id: "pk", title: "Web", lenses: ["WEB_DEV"], status: "DONE" }, "Lead.\n", "`For: Web developer` · `Status: ✅ DONE`"),
+    "docs/04-capabilities/01-core/module-web-core-ts/01-app.md":
+      doc({ id: "ch", title: "App", lenses: ["WEB_DEV"], status: "DONE" }, "Lead.\n", "`For: Web developer` · `Status: ✅ DONE`"),
+    "docs/04-capabilities/01-core/module-web-core-ts/surface-map.md":
+      doc({ id: "sm", variant: "surface_map", title: "Surface Map", lenses: ["WEB_DEV"], status: "DONE" }, "x\n", "`For: Web developer` · `Status: ✅ DONE`"),
+  });
+  run(root, ["face", "docs"]);
+  const got = readAt(root, "docs/04-capabilities/01-core/module-web-core-ts/README.md");
+  one("the chapter is in the Map", got, has("| [01-app.md](01-app.md) |"));
+  one("the surface map is not a chapter", got, lacks("surface-map.md"));
+}
+
 console.log(failed ? `\n  ${failed} of ${n} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);
