@@ -21,15 +21,52 @@
 // With no argument it looks for a sibling checkout carrying the register. Exit code is the number of
 // findings.
 
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { lstatSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { isDir, isFile } from "../../lib/payload.ts";
-import { check, declaresASource, headerSources, nameIndex, namedSources, parse, registerRows, resolveSource, undeclared } from "../../lib/restates.ts";
+import { check, declaresASource, headerSources, nameIndex, namedSources, parse, resolveSource, undeclared } from "../../lib/restates.ts";
 
 const SKIP = new Set(["node_modules", ".git", "dist", "build", ".nx", "coverage", "__pycache__"]);
 
-/** Every markdown file under `plugins/`, sorted, relative to where the tool was run. */
-function pluginDocuments(root: string): string[] {
+/**
+ * The real folder holding every plugin's files, under one candidate repository root — `packages/`,
+ * each entry a `plugin-<name>/` folder.
+ *
+ * Returns null where the candidate holds none — the test this function's callers use to decide
+ * whether they have found the marketplace or have to look further.
+ */
+function pluginsFolder(candidate: string): string | null {
+  const packages = join(candidate, "packages");
+  return isDir(packages) && readdirSync(packages).some((e) => e.startsWith("plugin-") && isDir(join(packages, e)))
+    ? packages : null;
+}
+
+/**
+ * Where the marketplace repository actually is, whether `root` is that repository itself or the
+ * WORKSPACE it sits in — the same two shapes `pluginDocuments` below already has to answer for.
+ *
+ * A CALLER THAT KEEPS RE-GUESSING GETS A DIFFERENT ANSWER FROM A DIFFERENT DIRECTORY. `strayStamps`
+ * used to build its own "is this inside the plugins" prefix from `root` directly, which is the
+ * marketplace only when the tool happens to be run from inside it — run from the workspace instead,
+ * `root` names the workspace, no file could ever start with that prefix, and every real plugin
+ * document was misread as sitting outside one. Resolving it once, the same way document discovery
+ * already does, is what makes the two directories agree.
+ */
+export function marketplaceOf(root: string): string | null {
+  if (pluginsFolder(root)) return root;
+  let siblings: string[];
+  try { siblings = readdirSync(root).sort(); } catch { return null; }
+  for (const entry of siblings) {
+    if (SKIP.has(entry)) continue;
+    const sibling = join(root, entry);
+    try { if (!statSync(sibling).isDirectory()) continue; } catch { continue; }
+    if (pluginsFolder(sibling)) return sibling;
+  }
+  return null;
+}
+
+/** Every markdown file under the plugins, sorted, relative to where the tool was run. */
+export function pluginDocuments(root: string): string[] {
   const out: string[] = [];
   const walk = (dir: string): void => {
     let entries: string[];
@@ -42,26 +79,28 @@ function pluginDocuments(root: string): string[] {
       else if (entry.endsWith(".md")) out.push(full);
     }
   };
-  walk(join(root, "plugins"));
+  const here = pluginsFolder(root);
+  if (here) walk(here);
   if (out.length) return out.sort();
-  // A WORKSPACE IS NOT A REPOSITORY, AND THIS IS RUN FROM THE WORKSPACE. `<root>/plugins` exists in
-  // the marketplace checkout and nowhere else, so run from the folder the sibling checkouts sit in
-  // — which is where every other tool here is run from — this found nothing, printed "no plugins
+  // A WORKSPACE IS NOT A REPOSITORY, AND THIS IS RUN FROM THE WORKSPACE. The plugins exist in the
+  // marketplace checkout and nowhere else, so run from the folder the sibling checkouts sit in —
+  // which is where every other tool here is run from — this found nothing, printed "no plugins
   // here" and RETURNED 0. A record then carried `restate-drift 0` that had compared nothing at all.
-  // So a root holding no `plugins/` of its own looks one level down for the sibling that has one.
+  // So a root holding no plugins of its own looks one level down for the sibling that has some.
   let siblings: string[];
   try { siblings = readdirSync(root).sort(); } catch { return []; }
   for (const entry of siblings) {
     if (SKIP.has(entry)) continue;
     const sibling = join(root, entry);
     try { if (!statSync(sibling).isDirectory()) continue; } catch { continue; }
-    walk(join(sibling, "plugins"));
+    const found = pluginsFolder(sibling);
+    if (found) walk(found);
     if (out.length) return out.sort();
   }
   return out.sort();
 }
 
-/** Every source file under `plugins/` whose comments could carry a `RESTATES:` header. */
+/** Every source file under the plugins whose comments could carry a `RESTATES:` header. */
 function pluginSources(root: string): string[] {
   const out: string[] = [];
   const walk = (dir: string): void => {
@@ -75,7 +114,8 @@ function pluginSources(root: string): string[] {
       else if (/\.(ts|mjs|py)$/.test(entry)) out.push(full);
     }
   };
-  walk(join(root, "plugins"));
+  const here = pluginsFolder(root);
+  if (here) walk(here);
   if (out.length) return out.sort();
   // The same blindness as `pluginDocuments` above, and the same fix. Run from the workspace this
   // found no sources and the summary read `0 broken header(s)` having opened none of them.
@@ -85,7 +125,8 @@ function pluginSources(root: string): string[] {
     if (SKIP.has(entry)) continue;
     const sibling = join(root, entry);
     try { if (!statSync(sibling).isDirectory()) continue; } catch { continue; }
-    walk(join(sibling, "plugins"));
+    const found = pluginsFolder(sibling);
+    if (found) walk(found);
     if (out.length) return out.sort();
   }
   return out.sort();
@@ -108,18 +149,19 @@ function headerFindings(root: string, book: string): string[] {
     index ??= nameIndex(workspace, SKIP);
     return index.get(name) ?? [];
   };
+  const marketRoot = marketplaceOf(root) ?? root;
+  const foundPlugins = pluginsFolder(marketRoot);
   for (const path of pluginSources(root)) {
-    const plugin = /(.*\/plugins\/[^/]+)\//.exec(path)?.[1] ?? root;
+    // A SOURCE FILE IS FOUND UNDER `packages/plugin-<name>/`, where a plugin's files live.
+    const plugin = /(.*\/packages\/plugin-[^/]+)\//.exec(path)?.[1] ?? root;
     let carried = "";
     for (const header of headerSources(readFileSync(path, "utf8"))) {
       for (const token of header.cited) {
         const where = resolveSource(token, [
           carried, book, join(book, "docs"), join(book, "docs/04-capabilities"),
           // `dirname(plugin)` is the plugins root the file was actually found under, and it is
-          // what makes the answer the same from the workspace as from the marketplace. Without it
-          // `join(root, "plugins")` resolved only when the tool was run from inside the marketplace,
-          // so one header read as broken from one directory and fine from the other.
-          root, join(root, "plugins"), dirname(plugin), plugin, dirname(path),
+          // what makes the answer the same from the workspace as from the marketplace.
+          root, foundPlugins ?? marketRoot, dirname(plugin), plugin, dirname(path),
         ]);
         if (where !== null) { carried = dirname(where); continue; }
         const at = token.includes("/") ? [] : byName(token);
@@ -164,14 +206,32 @@ export function findBook(argument: string | undefined, root: string): string | n
 /**
  * A `spn:restates` header anywhere but a marketplace plugin, and any citation pointing at the
  * plugin's own repository (`RD.DOCS.095`).
+ *
+ * `marketplaceRoot` IS THE MARKETPLACE REPOSITORY ITSELF, and every real plugin file sits under
+ * `packages/plugin-<name>/` beneath it — the prefix `insideAPlugin` below tests against. Found
+ * running this command for real, not by a case: a wrong prefix here read every real ref, skill and
+ * agent brief in this very plugin as a stray stamp, over a hundred false findings from one run.
  */
-function strayStamps(workspace: string, pluginsRoot: string): string[] {
+function strayStamps(workspace: string, marketplaceRoot: string): string[] {
   const out: string[] = [];
+  const packages = join(marketplaceRoot, "packages");
+  // Only a real `packages/plugin-<name>/` folder counts as "inside a plugin"; `packages/` itself,
+  // and a non-plugin entry beside it such as `plugin-support-lib/`, are still walked.
+  const insideAPlugin = (full: string): boolean => {
+    if (!full.startsWith(`${packages}/`)) return false;
+    return full.slice(packages.length + 1).split("/")[0].startsWith("plugin-");
+  };
   const walk = (dir: string): void => {
     for (const entry of readdirSync(dir)) {
       if (entry === "node_modules" || entry === ".git" || entry.startsWith(".")) continue;
       const full = join(dir, entry);
-      if (isDir(full)) { if (!full.startsWith(pluginsRoot)) walk(full); continue; }
+      // A SYMBOLIC LINK IS NEVER WALKED. Its target is real content sitting at its own real path,
+      // walked from there; entering it a second time through a link would visit the same files
+      // twice, once correctly and once under whatever name the link happens to carry.
+      let stat;
+      try { stat = lstatSync(full); } catch { continue; }
+      if (stat.isSymbolicLink()) continue;
+      if (isDir(full)) { if (!insideAPlugin(full)) walk(full); continue; }
       if (!/\.(md|html)$/.test(entry)) continue;
       let fence = false;
       let pre = false;
@@ -201,8 +261,8 @@ function strayStamps(workspace: string, pluginsRoot: string): string[] {
  * THE OWNER IS THE REPOSITORY, NOT THE PATH'S FIRST SEGMENT. A document's shown path is relative to
  * its own repository, so it begins `plugins/…` — while a citation begins with a repository name.
  */
-function selfCitations(owner: string, shownPath: string, block: { docs?: { path?: string }[]; files?: { path?: string }[]; commands?: { path?: string }[] }): string[] {
-  const cited = [...(block.docs ?? []), ...(block.files ?? []), ...(block.commands ?? [])];
+function selfCitations(owner: string, shownPath: string, block: { docs?: { path?: string }[]; files?: { path?: string }[] }): string[] {
+  const cited = [...(block.docs ?? []), ...(block.files ?? [])];
   return cited
     .map((c) => c.path ?? "")
     .filter((p) => p && p.split("/")[0] === owner)
@@ -225,7 +285,6 @@ export function main(argv: string[], root: string): number {
     return 0;
   }
 
-  const knownRows = registerRows(join(book, "docs/registers/decisions.md"));
   const findings: string[] = [];
   const omissions: string[] = [];
   const unstamped: string[] = [];
@@ -242,7 +301,7 @@ export function main(argv: string[], root: string): number {
     stamped += 1;
     // A citation names its repository, so it resolves from the WORKSPACE — the folder the
     // sibling checkouts sit in, which is the book's parent (RD.DOCS.091).
-    findings.push(...check(shown(path), dirname(book), block, knownRows));
+    findings.push(...check(shown(path), dirname(book), block));
     omissions.push(...undeclared(path, block)
       .map((name) => `${shown(path)}: restates \`${name}\` and does not declare it`));
     for (const name of namedSources(path)[2]) unclassified.add(name);
@@ -272,7 +331,7 @@ export function main(argv: string[], root: string): number {
 
   // THE CODE'S OWN HEADERS, which no run had ever read. Reported apart from a document's drift,
   // because a broken header is a claim pointing at nothing rather than a chapter that moved.
-  const strays = strayStamps(dirname(book), join(root, "plugins"));
+  const strays = strayStamps(dirname(book), marketplaceOf(root) ?? root);
   const selves = documents.flatMap((path) => {
     const [block] = parse(path);
     return block ? selfCitations(basename(root), shown(path), block as never) : [];

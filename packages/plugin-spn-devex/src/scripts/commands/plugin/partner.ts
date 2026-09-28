@@ -36,13 +36,16 @@ const FIXTURE: Record<string, string> = {
 const SCRIPTS: Array<[plugin: string, script: string, args: string[]]> = [
   ["spn-devex", "coherence.ts", ["."]],
   ["spn-devex", "doc-check.ts", ["."]],
-  ["spn-devex", "prose-triage.ts", ["."]],
+  ["spn-devex", "docs/prose.ts", ["."]],
   ["spn-devex", "split-plan.ts", ["."]],
   ["spn-apps", "contract-cycle.ts", ["."]],
   ["spn-devex", "orientation.ts", []],
   // Runs in the fixture, which holds plugins and NO book. That is a partner's shape exactly, and the
-  // check must print one line and exit clean rather than report every file as drifted.
-  ["spn-devex", "restate-drift.ts", []],
+  // check must print one line and exit clean rather than report every file as drifted. Named
+  // `restates/check.ts` — there are two files named bare `check.ts` in this plugin
+  // (`commands/behaviours/check.ts` is the other), so the parent folder disambiguates which one
+  // `findIn` below walks to.
+  ["spn-devex", "restates/check.ts", []],
   // Reads its event from stdin and gets none here. It must exit clean rather than block or crash: it
   // guards a file the loop legitimately uses, and a guard that takes the chain down is worse than the
   // exposure it was written for.
@@ -130,14 +133,29 @@ const runnerFor = (script: string) => (script.endsWith(".ts") ? process.execPath
  * A HOOK DECLARED WITH NO FILE BEHIND IT is the failure this reads for. `SCRIPTS` above is hand-kept,
  * so it can agree with itself while `hooks.json` points at a script nobody shipped. A partner meets
  * that as a broken agent, because the declaration is what their session loads.
+ *
+ * `hooks.json` names `"${CLAUDE_PLUGIN_ROOT}"/scripts/events/<script>.ts` (source) or
+ * `.../dist/events/<script>.mjs` (bundled), so a script is matched only under one of those two
+ * folders — found here rather than by a run turning red, which is exactly the class of defect this
+ * sweep exists to stop.
  */
+export const HOOK_SCRIPT = /\/(?:scripts\/events|dist\/events)\/([A-Za-z0-9_.-]+\.(?:ts|mjs))/g;
+
 export function declared(): Array<[string, string]> {
-  const family = resolve(HERE, "..", "..", "..", "..");
+  // `family` IS THE FOLDER HOLDING EVERY PLUGIN, BESIDE THIS ONE — `packages/`, the same folder
+  // `pluginRoot` above resolves to. A prior version climbed one `..` short and landed on this
+  // plugin's own folder, so the walk below found no sibling plugin and read as clean having swept
+  // nothing.
+  const family = resolve(HERE, "..", "..", "..", "..", "..");
   const found = new Set<string>();
-  for (const plugin of isDir(family) ? readdirSync(family).sort() : []) {
-    const manifest = join(family, plugin, "hooks", "hooks.json");
+  for (const folder of isDir(family) ? readdirSync(family).sort() : []) {
+    const manifest = join(family, folder, "src", "hooks", "hooks.json");
     if (!isFile(manifest)) continue;
-    for (const match of read(manifest).matchAll(/\/hooks\/[A-Za-z0-9_-]+\/([A-Za-z0-9_.-]+\.(?:py|sh|ts))/g))
+    // THE BARE NAME, NEVER THE FOLDER'S OWN — `SCRIPTS` above and every report line already say
+    // `spn-devex`, and a folder is `plugin-spn-devex` only because `02-shape.md` prefixes kind
+    // folders under `packages/`; the plugin's own name never carries that prefix.
+    const plugin = folder.replace(/^plugin-/, "");
+    for (const match of read(manifest).matchAll(HOOK_SCRIPT))
       found.add(`${plugin} ${match[1]}`);
   }
   return [...found].sort().map((entry) => entry.split(" ") as [string, string]);

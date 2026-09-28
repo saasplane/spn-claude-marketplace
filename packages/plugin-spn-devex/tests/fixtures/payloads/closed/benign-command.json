@@ -1,0 +1,8 @@
+{
+  "session_id": "fixture",
+  "cwd": "/tmp",
+  "tool_name": "Bash",
+  "tool_input": {
+    "command": "echo hi"
+  }
+}

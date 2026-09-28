@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}\"/scripts/events/orientation.ts --stdin",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}\"/dist/events/orientation.mjs --stdin",
             "timeout": 20
           }
         ]
@@ -18,7 +18,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}\"/scripts/events/pretooluse.ts",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}\"/dist/events/pretooluse.mjs",
             "timeout": 20
           }
         ]
@@ -30,7 +30,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}\"/scripts/events/closed.ts",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}\"/dist/events/closed.mjs",
             "timeout": 10
           }
         ]
@@ -41,7 +41,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"${CLAUDE_PLUGIN_ROOT}\"/scripts/events/stop.ts",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}\"/dist/events/stop.mjs",
             "timeout": 30
           }
         ]

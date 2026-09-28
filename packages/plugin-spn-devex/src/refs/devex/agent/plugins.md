@@ -1,8 +1,8 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/04-plugins.md", "seen": "5092ce4d" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md", "seen": "82ccb043" }
+    { "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/04-plugins.md", "seen": "f910a1be" },
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md", "seen": "478766b6" }
   ]
 }
 -->
@@ -70,34 +70,33 @@ An edit to the folder changes nothing about the cache until an install copies on
     { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/templates/", "seen": "c41b90d2" }
   ],
 
-  // Commands you RE-RUN to regenerate part of the ref. The stamp is of the command's own
-  // source, so a change to what it emits is reported.
-  "commands": [
-    { "path": "spn-support-ts/apps/utility-ts/src/entry/cli/workspace.ts", "seen": "7d2e5a11" }
-  ],
-
-  // Register rows the ref carries the ruling of. An id, not a path — a row has no file of its own.
-  "decisions": ["RD.APPS.086"]
+  // Register rows the ref carries the ruling of. `repo` names the workspace member carrying the
+  // register — every register lives at that repo's fixed `docs/registers/decisions.md` — `row` is
+  // the decision id, and `seen` hashes that row's own line, never the whole register.
+  "decisions": [
+    { "repo": "spn-foundation", "row": "RD.APPS.086", "seen": "79c8a6ab" }
+  ]
 }
 -->
 ```
 
-**The block carries exactly four kinds, and they are four different obligations — never treat them as one list.**
+**The block carries exactly three kinds, and they are three different obligations — never treat them as one list.**
 
 | Kind | What you do with the source | So the copy is |
 | --- | --- | --- |
 | `docs` | **rewrite** the chapter in your own words | different wording, same rules — pasting a chapter has shipped the book |
 | `files` | **copy** the file | byte-identical. A template is used as-is; an improved copy is a different template, silently |
-| `commands` | **re-run** the command and take its output | whatever the command emits, never hand-edited |
-| `decisions` | cite the register row by id | moves when the row is rewritten |
+| `decisions` | **re-read** the row, then update the ref and restamp | moves when that one row's own line is rewritten |
 
-A moved `docs` entry means somebody rewrites a paragraph. A moved `files` entry means somebody copies a file again. A moved `commands` entry means somebody re-runs something. A `decisions` entry moves when the row is rewritten. Collapsing them tells you that something changed and not what you owe.
+A moved `docs` entry means somebody rewrites a paragraph. A moved `files` entry means somebody copies a file again. A `decisions` entry moves when the row it names is rewritten — never when an unrelated row in the same register changes. Collapsing them tells you that something changed and not what you owe.
 
-**A path starts at the repository**, so it resolves from the workspace rather than from whichever checkout you happen to be standing in. **A citation that does not resolve is broken, never skipped** — the check reports it rather than passing over an address it cannot resolve.
+**A fourth kind, `commands`, was tried and dropped (2026-09-28).** The idea was a citation that re-ran a command and took its output — the way `utils/spnutils.md` once rendered `spnutils help --json` into a generated region. The command surface has one source, the book, and a ref restates that source the same way it restates anything else: through `docs`, in its own words. A second generator for facts `docs` already covers was a second source of truth for no reader.
+
+**A path starts at the repository**, so it resolves from the workspace rather than from whichever checkout you happen to be standing in — a `decisions` citation names its repository the same way, through `repo` rather than a path, because every register sits at that repository's own fixed `docs/registers/decisions.md`. **A citation that does not resolve is broken, never skipped** — the check reports it rather than passing over an address it cannot resolve.
 
 **`section` is optional, and it decides what the hash covers.** Name one and the stamp covers that heading's own text; leave it out and it covers the whole file. A citation is exactly as precise as the sentence it replaces, so a long chapter does not re-stamp every ref that cites one paragraph of it. **Each citation carries its own `seen`, not one stamp per block** — a block citing an eight-thousand-line concept and a hundred-line section would otherwise re-stamp the second every time the first moved, which is usually a wrong finding and teaches you to stop reading the run.
 
-**Compute every `seen` yourself; never invent one.** A wrong hash reports agreement that was never checked. A file's hash and a folder's hash come from different functions — `seenHash` for a file, `treeHash` for a folder — both in the marketplace's own `restates.ts` library.
+**Compute every `seen` yourself; never invent one.** A wrong hash reports agreement that was never checked. A file's hash, a folder's hash and a decision row's hash come from different functions — `seenHash` for a file, `treeHash` for a folder, `rowHash` for one row's own line in a register — all in the marketplace's own `restates.ts` library. `restates decisions --write <ref>` computes and writes a `decisions` citation's `seen` for you, once you have re-read the row and corrected any disagreement in the ref's own text.
 
 ## The three plugins, and how they divide
 
@@ -125,9 +124,9 @@ Two files name a plugin, and they answer different questions.
 // .claude-plugin/marketplace.json — one file at the marketplace root, hand-kept
 { "name": "saasplane",
   "owner":   { "name": "SaaS Plane" },
-  "plugins": [ { "name": "spn-devex", "source": "./plugins/spn-devex", "description": "…" } ] }
+  "plugins": [ { "name": "spn-devex", "source": "./packages/plugin-spn-devex", "description": "…" } ] }
 
-// plugins/spn-devex/src/.claude-plugin/plugin.json — inside the plugin's own folder
+// packages/plugin-spn-devex/src/.claude-plugin/plugin.json — inside the plugin's own folder
 { "name": "spn-devex", "version": "0.7.2", "description": "…", "author": { "name": "SaaS Plane" } }
 ```
 
@@ -189,6 +188,12 @@ A session reads the installed cache, so changed files and unchanged behaviour is
 **The sitting that changed the wiring finishes it before it offers a handover — MUST** (`RD.DEVEX.059`). A handover can be complete and still point at wiring nobody installed, and the next window then opens on the previous generation.
 
 **A partner's form of this is shorter and the order is identical**: check whether a newer version is published, install it, run the syncs, take a fresh window.
+
+## What a hook runs, and where its cache lives
+
+**A hook runs a committed, pre-built bundle, never its source — MUST.** Every hook call starts a fresh process, and stripping a TypeScript source of its types on every one of those starts costs more than the check inside the hook ever does. Building once, at commit time, moves that cost out of the path a session pays on every tool call — the plugin's own tests refuse a bundle older than its sources, so an edit made without a rebuild is caught in the plugin's own suite rather than discovered later from a session quietly running an older version of itself.
+
+**A plugin's cache lives in the machine store, keyed by content, and never in the shared workspace folder — MUST.** `.spndevex/` is shared by every parallel window and every workstream, so a mutable file written there is overwritten by whichever window finishes second, and neither session did anything wrong — they only disagree about which verdict is current. A cache kept in the machine store and keyed by content sidesteps the race rather than resolving it: two windows either compute the identical verdict or never touch the same key at all.
 
 ## What breaks if you skip this
 

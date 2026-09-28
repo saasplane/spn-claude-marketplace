@@ -53,6 +53,8 @@ import { join, join as joinPath, resolve as resolvePath } from "node:path";
 import { isFile, read } from "./payload.ts";
 
 const BLOCK = /<!--\s*spn:restates\s*(\{[\s\S]*?\})\s*-->/;
+/** The whole `spn:restates` comment, for a writer that replaces it with a re-serialized block. */
+export const BLOCK_COMMENT = BLOCK;
 // The DECLARATION form, which carries a colon. Bare prose does not declare anything, and one skill
 // says *a node that restates what its kind already implies has introduced a second source of truth*
 // — a sentence about the defect, matched as a declaration by a looser rule.
@@ -63,20 +65,35 @@ const HEADING = /^(#{1,6})[ \t]+(.+?)[ \t]*$/gm;
 
 export type Citation = { path?: string; section?: string; seen?: string };
 /**
- * What a ref stands on. **Four kinds, because each names a different obligation** — a moved `docs`
- * entry means somebody rewrites a paragraph, `files` means somebody copies a file again, `commands`
- * means somebody re-runs something, and `decisions` moves when a row is rewritten. One list would
- * report that something changed and not what you owe (RD.DOCS.091).
+ * A `decisions` citation. `repo` names a workspace member by its folder — never `spn-foundation`
+ * alone by assumption, because a citation is not always the foundation's own register — and the
+ * register it carries is always at the fixed `<repo>/docs/registers/decisions.md`; the check
+ * resolves that path itself, so a repo with no register there is a broken citation, never skipped.
+ * `row` is the decision id; `seen` is the hash of that row's own line in the register, never of the
+ * whole file — a register accumulates rows nobody's ref cites, and hashing the file would re-stamp
+ * every citing ref on every unrelated row.
+ */
+export type DecisionCitation = { repo?: string; row?: string; seen?: string };
+/**
+ * What a ref stands on. **Three kinds, because each names a different obligation** — a moved `docs`
+ * entry means somebody rewrites a paragraph, `files` means somebody copies a file again, and
+ * `decisions` moves when a row is rewritten. One list would report that something changed and not
+ * what you owe (RD.DOCS.091).
+ *
+ * A FOURTH KIND, `commands`, WAS TRIED AND DROPPED (2026-09-28). The command surface has one
+ * source — the book — and a ref restates it the same way it restates anything else the book states:
+ * through `docs`, rewritten in the ref's own words. A generator that rendered a CLI's `help --json`
+ * straight into a region added a second source of truth for no reader the `docs` kind did not
+ * already serve.
  */
 export type Block = {
-  docs?: Citation[];        // rewritten in the ref's own words
-  files?: Citation[];       // copied rather than rewritten; a path may name a folder
-  commands?: Citation[];    // re-run to regenerate part of the ref
-  decisions?: string[];     // register rows, cited by id because a row has no file
+  docs?: Citation[];               // rewritten in the ref's own words
+  files?: Citation[];              // copied rather than rewritten; a path may name a folder
+  decisions?: DecisionCitation[];  // a register row, named by the register it lives in and its id
 };
 
 /** Every citation kind whose entries are objects carrying a `path` and a `seen`. */
-export const PATH_KINDS = ["docs", "files", "commands"] as const;
+export const PATH_KINDS = ["docs", "files"] as const;
 
 /**
  * What a hash is taken over.
@@ -168,8 +185,15 @@ export function parse(path: string): [Block | null, string | null] {
   for (const kind of PATH_KINDS)
     if (block[kind] !== undefined && !Array.isArray(block[kind]))
       return [null, `spn:restates \`${kind}\` must be a list of citations`];
-  if (block.decisions !== undefined && !Array.isArray(block.decisions))
-    return [null, "spn:restates `decisions` must be a list of row ids"];
+  if (block.decisions !== undefined) {
+    if (!Array.isArray(block.decisions))
+      return [null, "spn:restates `decisions` must be a list of citations"];
+    // NO BARE-STRING FORM IS ACCEPTED. A citation naming only an id has no register to check it
+    // against, so a moved row is invisible to this file for as long as it stays that way.
+    for (const citation of block.decisions)
+      if (typeof citation !== "object" || citation === null || Array.isArray(citation))
+        return [null, "spn:restates `decisions` entries must be objects with `repo`, `row` and `seen` — not a bare id"];
+  }
   return [block, null];
 }
 
@@ -242,6 +266,36 @@ export function namedSources(path: string): [Set<string>, Set<string>, Set<strin
 }
 
 /**
+ * One decision row's own line in a register, or null where the register carries no such row.
+ *
+ * A LINE, NEVER THE WHOLE FILE. A register accumulates rows nobody's ref cites, so hashing the file
+ * would re-stamp every citing ref the moment an unrelated row landed — the same reasoning a `docs`
+ * citation's `section` already carries, read here for a table row instead of a heading.
+ */
+export function rowText(register: string, row: string): string | null {
+  // ANCHORED TO THE ROW'S OWN FIRST CELL, never a bare search over every line. A register row
+  // routinely cross-references another row inside its own prose — `RD.DOCS.031`'s row cites
+  // `RD.DOCS.043` in its own text, earlier in the file than `RD.DOCS.043`'s own row — so a search
+  // for "does this line mention the id anywhere" returns the wrong row's text, and two different
+  // citations can silently hash to the same line.
+  const pattern = new RegExp(`^\\|\\s*${row.replace(/\./g, "\\.")}\\s*\\|`);
+  for (const line of read(register).split("\n"))
+    if (pattern.test(line.trim())) return line;
+  return null;
+}
+
+/** The hash a `decisions` citation's `seen` stands against — of the row's own line, not the file. */
+export function rowHash(register: string, row: string): string | null {
+  const line = rowText(register, row);
+  return line === null ? null : seenHash(line);
+}
+
+/** Where a `decisions` citation's register lives — fixed, because every register sits at this path. */
+export function registerPath(workspace: string, repo: string): string {
+  return join(workspace, repo, "docs", "registers", "decisions.md");
+}
+
+/**
  * Sources the file's prose names that its block does not declare — NOT DRIFT.
  *
  * Until 2026-09-08 nothing asked this, so a block got credit for what it left out. An omitted source
@@ -258,7 +312,8 @@ export function undeclared(path: string, block: Block): string[] {
     .map((c) => String(c.path ?? "").toLowerCase());
   const missing = [...documents].sort().filter((name) =>
     !declared.some((one) => one.includes(name.toLowerCase().replace(/^\/+|\/+$/g, ""))));
-  missing.push(...[...rows].sort().filter((row) => !(block.decisions ?? []).includes(row)));
+  const declaredRows = new Set((block.decisions ?? []).map((c) => c?.row).filter(Boolean));
+  missing.push(...[...rows].sort().filter((row) => !declaredRows.has(row)));
   return missing;
 }
 
@@ -269,16 +324,15 @@ export function undeclared(path: string, block: Block): string[] {
  * it restates is `undeclared`, a separate question with a separate answer — an omission is not drift,
  * and reporting them as one hides which of the two you are looking at.
  *
- * `workspace` is the folder the sibling checkouts sit in, because a citation names its repository.\n *\n * `knownRows` may be empty, and then row citations are not checked at all — a repo holding no
- * register is a fact about that repo rather than a finding about it.
+ * `workspace` is the folder the sibling checkouts sit in, because a citation names its repository.
  *
  * `only` narrows the citation kinds read — a caller that owns one kind (`restates docs`, `restates
  * decisions`) passes it so a drift names its owed act; omitted, every kind is read, which is what
  * the combined `restates check` needs.
  */
 export function check(
-  path: string, workspace: string, block: Block, knownRows: Set<string>,
-  only?: ReadonlyArray<"docs" | "files" | "commands" | "decisions">,
+  path: string, workspace: string, block: Block,
+  only?: ReadonlyArray<"docs" | "files" | "decisions">,
 ): string[] {
   const kinds = only ? PATH_KINDS.filter((kind) => only.includes(kind)) : PATH_KINDS;
   const findings: string[] = [];
@@ -329,9 +383,29 @@ export function check(
       findings.push(`${path}: \`${where}\` has moved since this file restated it — seen ${stamped}, now ${current}`);
   }
   if (!only || only.includes("decisions"))
-    for (const row of block.decisions ?? [])
-      if (knownRows.size && !knownRows.has(row))
-        findings.push(`${path}: cites \`${row}\`, which the register does not carry`);
+    for (const citation of block.decisions ?? []) {
+      if (!citation || typeof citation !== "object" || !citation.repo || !citation.row) {
+        findings.push(`${path}: a decisions citation must be an object with a \`repo\` and a \`row\``);
+        continue;
+      }
+      const register = registerPath(workspace, citation.repo);
+      // A REGISTER PATH THAT RESOLVES TO NOTHING IS A BROKEN CITATION, NEVER SKIPPED — the same
+      // rule a `docs`/`files` citation already follows, read here for the repo naming the register
+      // rather than the row naming the file.
+      if (!isFile(register)) {
+        findings.push(`${path}: cites \`${citation.row}\` in \`${citation.repo}\`, whose register does not resolve`);
+        continue;
+      }
+      const current = rowHash(register, citation.row);
+      if (current === null) {
+        findings.push(`${path}: cites \`${citation.row}\`, which \`${citation.repo}\`'s register does not carry`);
+        continue;
+      }
+      if (citation.seen === undefined)
+        findings.push(`${path}: cites \`${citation.row}\` with no \`seen\` — nothing to compare`);
+      else if (citation.seen !== current)
+        findings.push(`${path}: \`${citation.row}\` has moved since this file restated it — re-read the row, update the ref, then restamp. seen ${citation.seen}, now ${current}`);
+    }
   return findings;
 }
 

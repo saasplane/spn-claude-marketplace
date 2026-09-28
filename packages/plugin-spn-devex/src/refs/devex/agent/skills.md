@@ -1,8 +1,8 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md", "seen": "ebb9e28f" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/02-skills/01-skills.md", "seen": "a00bf6b3" }
+    { "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md", "seen": "96e06365" },
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/02-skills/01-skills.md", "seen": "cf2bbda8" }
   ]
 }
 -->
@@ -23,9 +23,9 @@
 **A skill's value is `{DOMAIN}_{SKILL}`.** The domain is taken from the claim of the plugin that ships it and is never authored a second time. **The folder name stays bare.**
 
 ```text
-plugins/spn-devex/src/skills/bootstrap/   →  DEVEX_BOOTSTRAP
-plugins/spn-apps/src/skills/implement/    →  APPS_IMPLEMENT
-plugins/spn-infra/src/skills/implement/   →  INFRA_IMPLEMENT
+packages/plugin-spn-devex/src/skills/bootstrap/   →  DEVEX_BOOTSTRAP
+packages/plugin-spn-apps/src/skills/implement/    →  APPS_IMPLEMENT
+packages/plugin-spn-infra/src/skills/implement/   →  INFRA_IMPLEMENT
 ```
 
 **Three plugins shipping into one flat vocabulary would collide**, and nothing in a bare value would say who answers for it. Deriving the prefix keeps the fact in one place; bare folders keep each plugin's tree readable on its own terms.

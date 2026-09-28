@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: spn-devex/src/refs/devex/workspace/workstream.md S3 — execution is confirmed, never assumed.
+// RESTATES: plugin-spn-devex/src/refs/devex/workspace/workstream.md S3 — execution is confirmed, never assumed.
 // The ref is the source of truth. A rule change is edited there first, then here, in the same change.
 //
 // WHAT IT CATCHES. A release the developer never agreed to, at a version that cannot be taken back.

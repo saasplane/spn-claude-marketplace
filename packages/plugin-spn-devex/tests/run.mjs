@@ -91,15 +91,15 @@ console.log(`\n  ${suites.length} suite(s) · ${cases} case(s)` +
 const artifact = resolve(REPO, "tests", ".output", TIER.toLowerCase(), "spn-tests.json");
 mkdirSync(dirname(artifact), { recursive: true });
 writeFileSync(artifact, `${JSON.stringify({
-  env: "local", tiers: [TIER], ranAt: new Date().toISOString(), from: "plugins/spn-devex/tests/run.mjs", results,
+  env: "local", tiers: [TIER], ranAt: new Date().toISOString(), from: "packages/plugin-spn-devex/tests/run.mjs", results,
 }, null, 2)}\n`, "utf8");
 console.log(`  ${results.length} case(s) carry a behaviour id -> ${artifact.slice(REPO.length + 1)}`);
 
 if (writeStatus) {
   // This run is the whole of its tier here, so a row no case named any more goes back to PLANNED.
-  const tool = resolve(HERE, "..", "src", "scripts", "tools", "behaviour-rows.ts");
+  const cli = resolve(HERE, "..", "src", "scripts", "cli.ts");
   try {
-    console.log(execFileSync(process.execPath, [tool, "--write", "--reach", "repository", "--results", artifact, REPO], { encoding: "utf8" }));
+    console.log(execFileSync(process.execPath, [cli, "behaviours", "stamp", "--write", "--reach", "repository", "--results", artifact, REPO], { encoding: "utf8" }));
   } catch (error) { console.log(String(error.stdout ?? "")); }
 }
 

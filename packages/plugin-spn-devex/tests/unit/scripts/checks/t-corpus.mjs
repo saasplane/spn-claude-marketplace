@@ -20,7 +20,7 @@ import { appendFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync
 import fs from "node:fs";
 import { syncBuiltinESMExports } from "node:module";
 import { tmpdir } from "node:os";
-import { delimiter, join, resolve } from "node:path";
+import { join, resolve } from "node:path";
 
 const BASE = mkdtempSync(join(tmpdir(), "spn-corpus-"));
 const STORE = join(BASE, "store");
@@ -33,10 +33,7 @@ cpSync(resolve(PLUGIN, "..", "plugin-support-lib", "src"), join(BASE, "packages"
 const CHECK = join(COPY, "scripts", "checks", "corpus.ts");
 const CACHE_LIB = join(COPY, "scripts", "lib", "corpus-cache.ts");
 
-// `commands-ref` asks the installed `spnutils`, which makes a fixture's verdict depend on this machine.
-// Leaving the CLI off the path makes it the documented skip, so every case reads the docs trees alone.
-const PATH = (process.env.PATH ?? "").split(delimiter).filter((dir) => dir && !existsSync(join(dir, "spnutils"))).join(delimiter);
-const ENV = { ...process.env, PATH, SPN_TELEMETRY: "off", SPN_CORPUS_CACHE_FOR_TESTS: STORE };
+const ENV = { ...process.env, SPN_TELEMETRY: "off", SPN_CORPUS_CACHE_FOR_TESTS: STORE };
 // The cases that import the store in this process read the same override.
 process.env.SPN_CORPUS_CACHE_FOR_TESTS = STORE;
 
@@ -180,7 +177,7 @@ console.log("\n=== corpus — the trigger, against a known-bad corpus");
   const root = fixture("checker", { "repo-a/docs/bad.md": BAD }, ["repo-a", "repo-b"]);
   run(root);
   check("warm before the checker changes", Object.values(run(root).subjects).every((s) => s === "replayed" || s === "skipped"));
-  const tool = join(COPY, "scripts", "tools", "docs.ts");
+  const tool = join(COPY, "scripts", "commands", "docs", "audit.ts");
   const before = readFileSync(tool, "utf8");
   appendFileSync(tool, "\n// a changed byte in a tool the check runs\n", "utf8");
   const changed = run(root);
@@ -268,7 +265,7 @@ console.log("\n=== corpus — the trigger, against a known-bad corpus");
 {
   emptyStore();
   const root = fixture("missing-tool", { "repo-a/docs/bad.md": BAD });
-  const tool = join(COPY, "scripts", "tools", "docs.ts");
+  const tool = join(COPY, "scripts", "cli.ts");
   const kept = readFileSync(tool);
   rmSync(tool);
   const missing = run(root);
@@ -295,26 +292,6 @@ console.log("\n=== corpus — the trigger, against a known-bad corpus");
   mkdirSync(join(root, ".spndevex"), { recursive: true });
   const { warned, out } = run(root);
   check("a workspace carrying no docs tree is silent and does not crash", !warned, out.slice(0, 300));
-}
-
-// ---- F3: the file `commands-ref` checks is an input, and it is not under any docs tree
-{
-  // A COMMANDS FINDING COULD BE REPORTED AND NEVER CLEARED, which is F1 seen from the other side.
-  // `commands-ref` reads `refs/commands.md`, a release moved the CLI, the ref went stale and the
-  // RULE appeared — and regenerating the ref changed no watched input, so every later turn replayed
-  // the same finding over a file that was already correct.
-  const { workspaceHash } = await import(CHECK);
-  const ref = join(BASE, "refs", "commands.md");
-  mkdirSync(join(ref, ".."), { recursive: true });
-  writeFileSync(ref, "# commands\n\n52 of them.\n", "utf8");
-  const before = workspaceHash(ref);
-  writeFileSync(ref, "# commands\n\n53 of them, which is one more.\n", "utf8");
-  const after = workspaceHash(ref);
-  check("[F3] regenerating the commands ref moves the workspace key", before !== after,
-    `both runs hashed to ${before.slice(0, 12)}`);
-  check("[F3] a ref that did not move leaves the key where it was", workspaceHash(ref) === after);
-  rmSync(ref, { force: true });
-  check("[F3] an absent ref hashes rather than throwing", typeof workspaceHash(ref) === "string");
 }
 
 rmSync(BASE, { recursive: true, force: true });

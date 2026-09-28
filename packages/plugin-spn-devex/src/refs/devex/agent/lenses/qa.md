@@ -4,9 +4,9 @@
     { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/README.md", "seen": "d2d663e9" }
   ],
   "decisions": [
-    "RD.APPS.086",
-    "RD.APPS.119",
-    "RD.APPS.120"
+    { "repo": "spn-foundation", "row": "RD.APPS.086", "seen": "79c8a6ab" },
+    { "repo": "spn-foundation", "row": "RD.APPS.119", "seen": "ca6ac4b0" },
+    { "repo": "spn-foundation", "row": "RD.APPS.120", "seen": "58c40896" }
   ]
 }
 -->

@@ -49,25 +49,10 @@ export type Warning = { check: string; message: string };
 
 /** The docs commands that are silent on a clean corpus today, so a finding from one means something. */
 const WIRED = [
-  { tool: "docs.ts", args: (tree: string) => ["audit", tree], label: "audit" },
-  { tool: "docs.ts", args: (tree: string) => ["face", "--check", dirname(tree)], label: "face --check" },
-  { tool: "docs.ts", args: (tree: string) => ["topics", dirname(tree)], label: "topics" },
-  { tool: "docs.ts", args: (tree: string) => ["coverage", dirname(tree)], label: "coverage" },
-];
-
-/**
- * The checks that ask one question of the whole workspace rather than one per docs tree.
- *
- * `commands-ref` is `N18` step 3, and it waited on a baseline rather than on a host: it reported
- * STALE until the `1.2.67` release let the ref be regenerated from a CLI that was not already behind
- * the source. It exits 1 on a stale region, so it gates the same way the others do.
- *
- * IT DEGRADES TO SILENCE WITH NO CLI ON THE MACHINE, the rule `coherence.ts` already states: it asks
- * `spnutils help --json` for the surface, and a partner holds the plugins without the CLI. A missing
- * `spnutils` is a fact about that machine, not a finding about the ref.
- */
-const WORKSPACE_WIDE = [
-  { tool: "commands-ref.ts", label: "commands-ref", needs: "spnutils" },
+  { args: (tree: string) => ["docs", "audit", tree], label: "audit" },
+  { args: (tree: string) => ["docs", "face", "--check", dirname(tree)], label: "face --check" },
+  { args: (tree: string) => ["docs", "topics", dirname(tree)], label: "topics" },
+  { args: (tree: string) => ["docs", "coverage", dirname(tree)], label: "coverage" },
 ];
 
 /**
@@ -92,16 +77,6 @@ const BUDGET_MS = 10000;
 // A corpus of a few hundred pages walks in milliseconds. A workspace that somehow holds far more is a
 // fact worth refusing on rather than a reason to make every turn slow.
 const MAX_FILES = 20000;
-
-/** Where a command resolves on this machine, or null. No spawn — `which` is a filesystem question. */
-function onPath(command: string): string | null {
-  for (const dir of (process.env.PATH ?? "").split(":")) {
-    if (!dir) continue;
-    const full = join(dir, command);
-    try { if (statSync(full).isFile()) return full; } catch { /* next */ }
-  }
-  return null;
-}
 
 /** Every repository under the workspace that declares itself and carries a docs tree. */
 export function docsTrees(root: string): string[] {
@@ -128,12 +103,12 @@ export function docsTrees(root: string): string[] {
  * up from its own cwd. A finding then names a file as `../../../../private/tmp/…`, which is unreadable
  * and, worse, unclickable — the reader cannot get to the page they are being told about.
  */
-function runOne(root: string, toolDir: string, tool: string, args: string[]): { rule: string[]; broke: string | null } {
-  // A MISSING TOOL IS A FAILURE, NEVER A CLEAN RESULT. Node exits 1 when it cannot find the file, and
+function runOne(root: string, cli: string, args: string[]): { rule: string[]; broke: string | null } {
+  // A MISSING CLI IS A FAILURE, NEVER A CLEAN RESULT. Node exits 1 when it cannot find the file, and
   // exit 1 with no `✗` line below would read as a tool that found nothing.
-  if (!existsSync(join(toolDir, tool))) return { rule: [], broke: `no tool at ${join(toolDir, tool)}` };
+  if (!existsSync(cli)) return { rule: [], broke: `no CLI at ${cli}` };
   try {
-    execFileSync(process.execPath, [join(toolDir, tool), ...args],
+    execFileSync(process.execPath, [cli, ...args],
       { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], timeout: 20000, cwd: root, env: { ...process.env, SPN_WORKSPACE: root } });
     return { rule: [], broke: null };
   } catch (error: any) {
@@ -141,15 +116,15 @@ function runOne(root: string, toolDir: string, tool: string, args: string[]): { 
     // a crashing check that reads as `no findings` is the exact defect this arc was opened over.
     const out = String(error?.stdout ?? "");
     // A FINDING IS TWO LINES, and taking only the first ships a warning that names a file and no
-    // fault. `docs.ts` prints `✗ RULE <check> <file>` and then the reason, indented, beneath it —
+    // fault. `docs audit` prints `✗ RULE <check> <file>` and then the reason, indented, beneath it —
     // so the pair is rejoined here. Caught by running this against a known-bad page and reading
     // what the warning actually said, which is the only way this class of defect ever shows up.
     if (error?.status === 1) {
       const lines = out.split("\n");
       const rule: string[] = [];
-      // `✗` RATHER THAN `✗ RULE`, because not every tool here grades its findings. `docs.ts` writes
-      // `✗ RULE` and `! SOFT`; `commands-ref` writes a bare `✗`. Matching the mark catches both and
-      // still leaves SOFT alone, which is the line this check does not fail on.
+      // `✗` RATHER THAN `✗ RULE`, so a finding is caught whether or not the command that produced it
+      // grades its own findings — `docs audit` writes `✗ RULE` and `! SOFT`, and matching the bare
+      // mark still leaves SOFT alone, which is the line this check does not fail on.
       for (let i = 0; i < lines.length; i++) {
         if (!lines[i].includes("✗")) continue;
         const why = (lines[i + 1] ?? "").trim();
@@ -169,9 +144,9 @@ function runOne(root: string, toolDir: string, tool: string, args: string[]): { 
  * (proven empirically, not assumed): this file is a static import of `events/stop.ts`, so once
  * `stop.ts` is built to `dist/events/stop.mjs`, `import.meta.dirname` inside this module reads as
  * `.../src/dist/events`, never `.../src/checks`. `dirname(import.meta.dirname)` alone therefore
- * answered `.../src/dist` after bundling — a folder with no `tools/`, no `refs/`, and no import of
- * `plugin-support-lib` — which is why `TOOL_DIR` below is walked to a named ancestor rather than
- * a fixed number of `..`. `scripts/` and `dist/` are always siblings directly under the plugin's
+ * answered `.../src/dist` after bundling — a folder with no `commands/`, no `refs/`, and no import
+ * of `plugin-support-lib` — which is why this is walked to a named ancestor rather than a fixed
+ * number of `..`. `scripts/` and `dist/` are always siblings directly under the plugin's
  * `src/`, so climbing to the nearer of the two and returning its `scripts` sibling is correct
  * whether this file is running from its own source path or bundled anywhere inside `dist/`.
  */
@@ -187,11 +162,20 @@ function pluginScriptsDir(from: string): string {
   return from;
 }
 const SCRIPTS = pluginScriptsDir(import.meta.dirname);
-const TOOL_DIR = join(SCRIPTS, "tools");
+/**
+ * This plugin's own CLI entry — the committed bundle where one has been built, the source
+ * otherwise. `dist/` and `scripts/` are always siblings directly under `src/` (`02-shape.md` §
+ * The tree), which is what lets this resolve correctly whether the corpus check itself is running
+ * bundled (inlined into `dist/events/stop.mjs`) or from source, as the tests run it from a copy
+ * that carries no `dist/` at all.
+ */
+function cliPath(scripts: string): string {
+  const bundled = join(dirname(scripts), "dist", "cli.mjs");
+  return existsSync(bundled) ? bundled : join(scripts, "cli.ts");
+}
+const CLI = cliPath(SCRIPTS);
 /** The helpers the plugins share, imported by relative path. An installed copy runs bundles and has none. */
 const SUPPORT_LIB = resolve(SCRIPTS, "..", "..", "..", "plugin-support-lib", "src", "lib");
-/** The file `commands-ref` checks, which sits in `refs/` rather than under any docs tree. */
-const COMMANDS_REF = join(SCRIPTS, "..", "refs", "devex", "utils", "spnutils", "commands.md");
 
 const shortHash = (hash: ReturnType<typeof createHash>): string => hash.digest("hex").slice(0, 32);
 
@@ -248,32 +232,7 @@ export function treeHash(root: string, tree: string): string | null {
   return shortHash(hash);
 }
 
-/**
- * The inputs of the checks that ask one question of the whole workspace, as one hash.
- *
- * THE INSTALLED CLI IS AN INPUT, and no walk of the docs trees can see it. `commands-ref` asks
- * `spnutils` what commands exist, so a release that adds one makes the ref stale WITHOUT changing a
- * single tracked file, and a key blind to that would replay a clean verdict forever. The binary is
- * STATTED rather than executed: asking `spnutils --version` on every turn would cost a spawn and undo
- * the cheap replay this design exists for.
- *
- * AND THE FILE `commands-ref` CHECKS IS AN INPUT. Without it a commands finding could be reported and
- * never cleared: the release moved the CLI, the ref went stale, the finding appeared, and regenerating
- * the ref changed no watched input, so every later turn replayed the same RULE over a file that was
- * already correct. The CLI stat beside it cannot help, because the binary is what it was when the
- * finding was found.
- */
-export function workspaceHash(commandsRef = COMMANDS_REF): string {
-  const hash = createHash("sha256");
-  hash.update("workspace\0commands-ref\0");
-  hashFile(hash, "commands.md", commandsRef);
-  const cli = onPath("spnutils");
-  try { const st = statSync(cli ?? ""); hash.update(`spnutils\0${cli}\0${st.size}\0${st.mtimeMs}\0`); }
-  catch { hash.update("spnutils\0absent\0"); }
-  return shortHash(hash);
-}
-
-/** What happened to one docs tree, or to the workspace-wide checks, on this run. */
+/** What happened to one docs tree on this run. */
 export type SubjectRun = { subject: string; source: Source | "skipped" | "not reached" };
 
 /**
@@ -318,7 +277,7 @@ export function runCorpus(root: string): { warnings: Warning[]; runs: SubjectRun
       let complete = true, failed = false;
       for (const step of WIRED) {
         if (Date.now() > deadline) { complete = false; cutShort = true; break; }
-        const { rule, broke: failure } = runOne(root, TOOL_DIR, step.tool, step.args(tree));
+        const { rule, broke: failure } = runOne(root, CLI, step.args(tree));
         ran.push({ tool: step.label, rule: rule.length });
         if (failure) { failed = true; broke.push(`\`${step.label}\` could not run over \`${subject}\` — ${failure}`); continue; }
         for (const line of rule) found.push(`${basename(dirname(tree))} · ${step.label} · ${line}`);
@@ -330,20 +289,9 @@ export function runCorpus(root: string): { warnings: Warning[]; runs: SubjectRun
     findings.push(...lines);
   }
 
-  for (const step of WORKSPACE_WIDE) {
-    // IT DEGRADES TO SILENCE WITH NO CLI ON THE MACHINE, and a skip costs nothing, so it is not stored.
-    if (step.needs && !onPath(step.needs)) { runs.push({ subject: `(workspace) ${step.label}`, source: "skipped" }); continue; }
-    if (Date.now() > deadline) { cutShort = true; runs.push({ subject: `(workspace) ${step.label}`, source: "not reached" }); continue; }
-    const lines = settle(`(workspace) ${step.label}`, checker && `${workspaceHash()}.${checker}`, () => {
-      const { rule, broke: failure } = runOne(root, TOOL_DIR, step.tool, []);
-      if (failure) broke.push(`\`${step.label}\` could not run — ${failure}`);
-      return { findings: rule.map((line) => `workspace · ${step.label} · ${line}`), ran: [{ tool: step.label, rule: rule.length }], store: !failure };
-    });
-    findings.push(...lines);
-  }
   if (runs.some((r) => r.source === "ran")) prune();
 
-  const which = `Ran ${[...WIRED, ...WORKSPACE_WIDE].map((w) => `\`${w.label}\``).join(" · ")} over ${trees.length} docs tree(s). ` +
+  const which = `Ran ${WIRED.map((w) => `\`${w.label}\``).join(" · ")} over ${trees.length} docs tree(s). ` +
     `NOT run, and each is somebody's owed work rather than a clean result: ` +
     REPORTED_ELSEWHERE.map((t) => `\`${t.label}\` (${t.why})`).join(" · ") + ".";
 

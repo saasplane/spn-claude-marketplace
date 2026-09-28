@@ -3,7 +3,7 @@
   "docs": [
     { "path": "spn-foundation/docs/02-constructs/01-devex/01-function/01-bootstrap.md", "seen": "72f53b70" },
     { "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/01-bootstrap.md", "seen": "ada95ffb" },
-    { "path": "spn-foundation/docs/05-guides/README.md", "seen": "3c40a6ac" }
+    { "path": "spn-foundation/docs/05-guides/README.md", "seen": "d3913ba1" }
   ]
 }
 -->
@@ -15,12 +15,14 @@
 Follow this walk from nothing to a first feature in flight. Every step names the command that carries it; statuses are honest — ✅ runs today, 🚧 the command is still being built.
 
 **Before step 1, the machine**, in the order one thing depends on the next: **node** at the version
-the repositories pin, a version manager that reads that pin (`fnm` or `nvm`), **pnpm**, a **container
-runtime** — the local estate is real containers rather than mocks — then a **browser**, and the CLI
-last, **because it is what turns the rest on**: step 3 is `repo agent-sync`, which wires the agent to
+the repositories pin, a version manager that reads that pin (`fnm` or `nvm`), **pnpm**, **OpenTofu**
+(`tofu`, never `terraform` — every infra node is OpenTofu, and its tests plan with `tofu test`),
+**`jq`** — an infra node's contract cases read its declaration with it — a **container runtime** —
+the local estate is real containers rather than mocks — then a **browser**, and the CLI last,
+**because it is what turns the rest on**: step 3 is `repo agent-sync`, which wires the agent to
 the versions actually installed, so whatever is on the machine when the CLI arrives is what the agent
-gets. **`spnutils --version` answering is the whole test**, and if
-it does, step 1 is already done.
+gets. **`tofu -v` reporting OpenTofu, `jq --version` answering and `spnutils --version` answering are
+the whole test**, and if all three do, step 1 is already done.
 
 **The version is not written here**, because a number in prose goes out of date the first time
 somebody bumps it. `.nvmrc` and the `engines` field carry it, and a version manager reads the file.

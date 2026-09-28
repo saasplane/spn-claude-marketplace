@@ -6,19 +6,19 @@
     { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md", "seen": "47cd8c62" }
   ],
   "decisions": [
-    "RD.DOCS.031",
-    "RD.DOCS.043",
-    "RD.DOCS.044",
-    "RD.DOCS.052",
-    "RD.DOCS.060",
-    "RD.DOCS.062",
-    "RD.DOCS.067",
-    "RD.DOCS.071",
-    "RD.DOCS.072",
-    "RD.DOCS.082",
-    "RD.DOCS.084",
-    "RD.DOCS.086",
-    "RD.DEVEX.032"
+    { "repo": "spn-foundation", "row": "RD.DOCS.031", "seen": "d6700f7d" },
+    { "repo": "spn-foundation", "row": "RD.DOCS.043", "seen": "83fa43ec" },
+    { "repo": "spn-foundation", "row": "RD.DOCS.044", "seen": "24f1da5b" },
+    { "repo": "spn-foundation", "row": "RD.DOCS.052", "seen": "e84fd57b" },
+    { "repo": "spn-foundation", "row": "RD.DOCS.060", "seen": "258aaa05" },
+    { "repo": "spn-foundation", "row": "RD.DOCS.062", "seen": "597fb231" },
+    { "repo": "spn-foundation", "row": "RD.DOCS.067", "seen": "57937b65" },
+    { "repo": "spn-foundation", "row": "RD.DOCS.071", "seen": "ae85dabc" },
+    { "repo": "spn-foundation", "row": "RD.DOCS.072", "seen": "d6454797" },
+    { "repo": "spn-foundation", "row": "RD.DOCS.082", "seen": "90df1d4a" },
+    { "repo": "spn-foundation", "row": "RD.DOCS.084", "seen": "8a9e528c" },
+    { "repo": "spn-foundation", "row": "RD.DOCS.086", "seen": "9fbd2847" },
+    { "repo": "spn-foundation", "row": "RD.DEVEX.032", "seen": "68b3c117" }
   ]
 }
 -->

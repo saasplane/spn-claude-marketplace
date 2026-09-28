@@ -1,14 +1,14 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/README.md", "seen": "446f09bd" },
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/README.md", "seen": "5a0bc97b" },
     { "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md", "seen": "e1e35154" },
     { "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/07-deliver.md", "seen": "7bb4e536" },
     { "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md", "seen": "f82f7ddd" }
   ],
   "decisions": [
-    "RD.APPS.121",
-    "RD.DEVEX.060"
+    { "repo": "spn-foundation", "row": "RD.APPS.121", "seen": "81ebb2d7" },
+    { "repo": "spn-foundation", "row": "RD.DEVEX.060", "seen": "26d6ea08" }
   ]
 }
 -->

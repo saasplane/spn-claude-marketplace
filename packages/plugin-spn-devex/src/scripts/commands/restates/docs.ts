@@ -11,40 +11,11 @@
 //
 // Exit code is the number of findings.
 
-import { readdirSync, statSync } from "node:fs";
-import { dirname, join, relative } from "node:path";
-import { check as checkKind, parse, registerRows, undeclared } from "../../lib/restates.ts";
-import { findBook } from "./check.ts";
+import { dirname, relative } from "node:path";
+import { check as checkKind, parse, undeclared } from "../../lib/restates.ts";
+import { findBook, pluginDocuments } from "./check.ts";
 
-const SKIP = new Set(["node_modules", ".git", "dist", "build", ".nx", "coverage", "__pycache__"]);
 const IS_ROW = /^RD\.[A-Z]+\.\d{3}$/;
-
-function pluginDocuments(root: string): string[] {
-  const out: string[] = [];
-  const walk = (dir: string): void => {
-    let entries: string[];
-    try { entries = readdirSync(dir).sort(); } catch { return; }
-    for (const entry of entries) {
-      const full = join(dir, entry);
-      let stat;
-      try { stat = statSync(full); } catch { continue; }
-      if (stat.isDirectory()) { if (!SKIP.has(entry)) walk(full); }
-      else if (entry.endsWith(".md")) out.push(full);
-    }
-  };
-  walk(join(root, "plugins"));
-  if (out.length) return out.sort();
-  let siblings: string[];
-  try { siblings = readdirSync(root).sort(); } catch { return []; }
-  for (const entry of siblings) {
-    if (SKIP.has(entry)) continue;
-    const sibling = join(root, entry);
-    try { if (!statSync(sibling).isDirectory()) continue; } catch { continue; }
-    walk(join(sibling, "plugins"));
-    if (out.length) return out.sort();
-  }
-  return out.sort();
-}
 
 export function main(argv: string[], root: string): number {
   const documents = pluginDocuments(root);
@@ -59,7 +30,6 @@ export function main(argv: string[], root: string): number {
     console.log("  Pass the book's path to run it: restates docs path/to/spn-foundation");
     return 0;
   }
-  const knownRows = registerRows(join(book, "docs/registers/decisions.md"));
   const findings: string[] = [];
   const unrewritten: string[] = [];
   let stamped = 0;
@@ -68,7 +38,7 @@ export function main(argv: string[], root: string): number {
     if (broken) { findings.push(`${shown(path)}: ${broken}`); continue; }
     if (block === null) continue;
     stamped += 1;
-    findings.push(...checkKind(shown(path), dirname(book), block, knownRows, ["docs"]));
+    findings.push(...checkKind(shown(path), dirname(book), block, ["docs"]));
     unrewritten.push(...undeclared(path, block)
       .filter((name) => !IS_ROW.test(name))
       .map((name) => `${shown(path)}: restates \`${name}\` in prose and its block does not declare it`));

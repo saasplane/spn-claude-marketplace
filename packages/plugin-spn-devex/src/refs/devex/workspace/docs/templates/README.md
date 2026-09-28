@@ -3,7 +3,7 @@
   "files": [
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/templates",
-      "seen": "2eca4e80"
+      "seen": "863e6911"
     }
   ]
 }
@@ -12,9 +12,9 @@
 
 **The book owns every file here and this folder is a copy.** They are byte-identical to
 `spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/templates/`, and when the two
-disagree the book wins. `templates-export.ts` writes them and `restate-drift` reports a copy that
-has fallen behind, so a builder's edit reaches every partner with the next plugin release rather
-than being discovered by somebody's first session going wrong.
+disagree the book wins. `restates files --write` writes them and `restates check` reports a copy
+that has fallen behind, so a builder's edit reaches every partner with the next plugin release
+rather than being discovered by somebody's first session going wrong.
 
 **The stamp above names the folder, not each file** (`RD.DOCS.091`). One citation per template
 would report every edit and miss every addition — a template nobody cited has nothing to compare

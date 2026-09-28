@@ -6,7 +6,7 @@
 
 **`refs/` holds one folder per book domain and nothing else.** A folder under a domain is a group, and a file under a group is named for a construct the book states.
 
-**A construct that needs more than one file becomes a folder named for it**, and expands inside. That is why `workspace/docs/` and `utils/spnutils/` are folders: one holds the doc-set grammar split three ways, the other separates what is written from what is generated.
+**A construct that needs more than one file becomes a folder named for it**, and expands inside. That is why `workspace/docs/` is a folder: the doc-set grammar splits three ways plus a copied templates set, and each part earns its own ref. Every other construct here — `utils/spnutils.md` among them — is one file, because it does not expand that way.
 
 **A folder's `README.md` is that folder's own subject** — the group's, or the construct's where the folder is a construct.
 
@@ -19,8 +19,8 @@
 
 ## What is authored, and what is not
 
-**Almost everything here is authored**, read from a chapter and written for you, stamped with the version it was read at. A drift check compares those stamps against the book and reports what moved.
+**Everything here is authored** — read from a chapter and rewritten in this ref's own words, stamped with the version it was read at. A drift check compares those stamps against the book and reports what moved.
 
-**One file is generated**: `devex/utils/spnutils/commands.md`, from the released CLI. A command added to the binary changes no document, so no stamp would move and nothing would report a hand-written list going stale.
+**One folder is copied byte for byte** — `workspace/docs/templates/`, because a template is the thing you copy rather than a thing you restate.
 
-**And one folder is copied byte for byte** — `workspace/docs/templates/`, because a template is the thing you copy rather than a thing you restate.
+**No file here is generated from a running tool.** A `commands.md` rendered from `spnutils help --json` was tried and dropped (2026-09-28): the command surface has one source, the book, and `utils/spnutils.md` restates it the same way any other ref restates its chapter — through `docs`, in its own words — rather than adding a second generator for the same facts.

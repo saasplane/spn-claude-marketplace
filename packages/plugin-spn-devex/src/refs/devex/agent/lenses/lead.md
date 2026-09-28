@@ -7,8 +7,8 @@
     { "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md", "seen": "e1e35154" }
   ],
   "decisions": [
-    "RD.APPS.121",
-    "RD.DEVEX.060"
+    { "repo": "spn-foundation", "row": "RD.APPS.121", "seen": "81ebb2d7" },
+    { "repo": "spn-foundation", "row": "RD.DEVEX.060", "seen": "26d6ea08" }
   ]
 }
 -->

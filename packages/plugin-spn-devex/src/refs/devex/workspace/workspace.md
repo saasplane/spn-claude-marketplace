@@ -3,19 +3,19 @@
   "docs": [
     { "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/01-workspace.md", "seen": "b8de31f1" },
     { "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md", "seen": "1d95cfde" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md", "seen": "063102d9" },
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md", "seen": "fcc9f0f9" },
     { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md", "section": "The agent is updated first, and reloaded before anything runs", "seen": "97526696" },
     { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md", "section": "An arc's status says which of eight states it is in", "seen": "0b096adf" },
     { "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md", "section": "When an edit becomes behaviour", "seen": "37aada54" },
     { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md", "section": "Restatement discipline", "seen": "e1ff9549" }
   ],
   "decisions": [
-    "RD.DEVEX.058",
-    "RD.DEVEX.020",
-    "RD.DEVEX.044",
-    "RD.DEVEX.048",
-    "RD.DEVEX.049",
-    "RD.DOCS.055"
+    { "repo": "spn-foundation", "row": "RD.DEVEX.058", "seen": "c0cd1ae0" },
+    { "repo": "spn-foundation", "row": "RD.DEVEX.020", "seen": "24448877" },
+    { "repo": "spn-foundation", "row": "RD.DEVEX.044", "seen": "0b6942fd" },
+    { "repo": "spn-foundation", "row": "RD.DEVEX.048", "seen": "d047e6f2" },
+    { "repo": "spn-foundation", "row": "RD.DEVEX.049", "seen": "e59c3f22" },
+    { "repo": "spn-foundation", "row": "RD.DOCS.055", "seen": "a47eced8" }
   ]
 }
 -->
@@ -269,7 +269,7 @@ When a window opens, surface what is stale — a subject untouched across sittin
 
 **The book is not loaded in a session, and that is why step 4 exists.** You read the installed plugins, so a rule living only in a chapter reaches nobody at all. Carry it into the core plugin where it is stack-agnostic, and into the stack's plugin where it is not — as a skill, a reference card, or a lens bullet.
 
-**A restatement citing a chapter carries a stamp, and that stamp moves when the chapter moves.** Restatement discipline makes a rule change N declared edits: the owning document, plus every registered restatement, in one change. Run `restate-drift.ts` with the book's path to see which stamps your edit moved. **It reports and writes nothing**, so you correct each `seen` yourself.
+**A restatement citing a chapter carries a stamp, and that stamp moves when the chapter moves.** Restatement discipline makes a rule change N declared edits: the owning document, plus every registered restatement, in one change. Run `spn-devex restates check` with the book's path to see which stamps your edit moved. **It reports and writes nothing for a `docs` or `files` citation**, so you correct each of those `seen` values yourself once you have re-read the source and corrected any disagreement; `restates decisions --write <ref>` restamps a `decisions` citation the same way, after the same re-read.
 
 **A citation names a file, a section of a file, or a whole folder** (`RD.DOCS.091`). The first two answer *did this rule move*. A folder answers the one they cannot — *did the set change* — because a stamp per file reports every edit and says nothing about a file nobody cited. Use it wherever what is restated is **all of them**: the clearest case is what the plugins carry for a partner, who never gets the book, where *the book grew a shape a partner does not have* is the failure the copy exists to prevent.
 

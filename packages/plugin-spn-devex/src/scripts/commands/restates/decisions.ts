@@ -6,43 +6,51 @@
 // that row still exists. `restates check` runs all four kinds together; this narrows to one, so a
 // drift names its owed act — a `decisions` drift is re-read, never rewritten or copied (RD.DOCS.091).
 //
-//     spn-devex restates decisions [path/to/spn-foundation]
+//     spn-devex restates decisions [path/to/spn-foundation]      check: is every cited row current?
+//     spn-devex restates decisions --write <ref>                 restamp one ref's decisions citations
 //
 // Exit code is the number of findings.
 
-import { readdirSync, statSync } from "node:fs";
-import { dirname, join, relative } from "node:path";
-import { check as checkKind, parse, registerRows, undeclared } from "../../lib/restates.ts";
-import { findBook } from "./check.ts";
+import { readFileSync, writeFileSync } from "node:fs";
+import { dirname, relative, resolve } from "node:path";
+import { workspaceRoot } from "../../lib/payload.ts";
+import { BLOCK_COMMENT, check as checkKind, type DecisionCitation, parse, registerPath, rowHash, undeclared } from "../../lib/restates.ts";
+import { findBook, pluginDocuments } from "./check.ts";
 
-const SKIP = new Set(["node_modules", ".git", "dist", "build", ".nx", "coverage", "__pycache__"]);
 const IS_ROW = /^RD\.[A-Z]+\.\d{3}$/;
 
-function pluginDocuments(root: string): string[] {
-  const out: string[] = [];
-  const walk = (dir: string): void => {
-    let entries: string[];
-    try { entries = readdirSync(dir).sort(); } catch { return; }
-    for (const entry of entries) {
-      const full = join(dir, entry);
-      let stat;
-      try { stat = statSync(full); } catch { continue; }
-      if (stat.isDirectory()) { if (!SKIP.has(entry)) walk(full); }
-      else if (entry.endsWith(".md")) out.push(full);
-    }
-  };
-  walk(join(root, "plugins"));
-  if (out.length) return out.sort();
-  let siblings: string[];
-  try { siblings = readdirSync(root).sort(); } catch { return []; }
-  for (const entry of siblings) {
-    if (SKIP.has(entry)) continue;
-    const sibling = join(root, entry);
-    try { if (!statSync(sibling).isDirectory()) continue; } catch { continue; }
-    walk(join(sibling, "plugins"));
-    if (out.length) return out.sort();
+/**
+ * Restamp one ref's `decisions` citations after the developer has re-read each row and corrected
+ * any disagreement in the ref's own prose — this never rewrites the ref's text, only the `seen`
+ * hash each citation carries. A citation whose register or row does not resolve is left as found
+ * and named, because there is nothing here to restamp it against.
+ */
+function writeOne(refPath: string): number {
+  const workspace = workspaceRoot(dirname(refPath));
+  if (!workspace) {
+    console.error(`${refPath}: no workspace found walking up from this file (no .spndevex)`);
+    return 2;
   }
-  return out.sort();
+  const [block, broken] = parse(refPath);
+  if (broken) { console.error(`${refPath}: ${broken}`); return 1; }
+  const citations: DecisionCitation[] = block?.decisions ?? [];
+  if (!citations.length) { console.log(`${refPath}: no decisions citations to restamp`); return 0; }
+  let restamped = 0;
+  const unresolved: string[] = [];
+  for (const citation of citations) {
+    if (!citation.repo || !citation.row) { unresolved.push(`a citation with no \`repo\` or \`row\``); continue; }
+    const now = rowHash(registerPath(workspace, citation.repo), citation.row);
+    if (now === null) { unresolved.push(`\`${citation.row}\` — \`${citation.repo}\`'s register does not carry it`); continue; }
+    if (citation.seen !== now) { citation.seen = now; restamped += 1; }
+  }
+  if (restamped) {
+    const src = readFileSync(refPath, "utf8");
+    const next = src.replace(BLOCK_COMMENT, `<!-- spn:restates\n${JSON.stringify(block, null, 2)}\n-->`);
+    writeFileSync(refPath, next, "utf8");
+  }
+  console.log(`${refPath}: ${restamped} row(s) restamped` +
+    (unresolved.length ? `, ${unresolved.length} left as found:\n  ${unresolved.join("\n  ")}` : ""));
+  return 0;
 }
 
 export function main(argv: string[], root: string): number {
@@ -58,7 +66,6 @@ export function main(argv: string[], root: string): number {
     console.log("  Pass the book's path to run it: restates decisions path/to/spn-foundation");
     return 0;
   }
-  const knownRows = registerRows(join(book, "docs/registers/decisions.md"));
   const findings: string[] = [];
   const unread: string[] = [];
   let stamped = 0;
@@ -67,7 +74,7 @@ export function main(argv: string[], root: string): number {
     if (broken) { findings.push(`${shown(path)}: ${broken}`); continue; }
     if (block === null) continue;
     stamped += 1;
-    findings.push(...checkKind(shown(path), dirname(book), block, knownRows, ["decisions"]));
+    findings.push(...checkKind(shown(path), dirname(book), block, ["decisions"]));
     unread.push(...undeclared(path, block)
       .filter((name) => IS_ROW.test(name))
       .map((row) => `${shown(path)}: cites \`${row}\` in prose and its block does not declare it`));
@@ -85,6 +92,13 @@ export function main(argv: string[], root: string): number {
 }
 
 export const describe = "the `decisions`-kind restatement alone — a drift here owes a re-read of the row";
-export function run(args: string[]): number { return Math.min(main(args, process.cwd()), 250); }
+export function run(args: string[]): number {
+  if (args.includes("--write")) {
+    const ref = args.find((a) => !a.startsWith("-"));
+    if (!ref) { console.error("usage: restates decisions --write <ref>"); return 2; }
+    return writeOne(resolve(ref));
+  }
+  return Math.min(main(args, process.cwd()), 250);
+}
 
 if (process.argv[1] && new URL(import.meta.url).pathname === process.argv[1]) process.exit(run(process.argv.slice(2)));

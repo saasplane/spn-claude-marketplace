@@ -1,8 +1,8 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md", "seen": "ebb9e28f" },
-    { "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md", "seen": "7a01baf8" }
+    { "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md", "seen": "96e06365" },
+    { "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md", "seen": "6cb0dbee" }
   ]
 }
 -->
@@ -107,10 +107,10 @@ A test that proves a stated behavior should be traceable to it. Where the platfo
 **`spnutils` runs a tier and writes `tests/.output/<tier>/spn-tests.json`, and never a row** (`RD.DEVEX.071`). What the run means for the documents is yours, through this plugin's scripts:
 
 ```bash
-node "${CLAUDE_PLUGIN_ROOT}"/scripts/tools/behaviour-rows.ts .                  # what it would change
-node "${CLAUDE_PLUGIN_ROOT}"/scripts/tools/behaviour-rows.ts --write .          # Status and Updated at, from the run
-node "${CLAUDE_PLUGIN_ROOT}"/scripts/checks/behaviour-proof.ts .                # a SUCCESS row its tier's run contradicts
-node "${CLAUDE_PLUGIN_ROOT}"/scripts/tools/behaviour-coverage.ts --json .       # the tests report's measurement
+node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs behaviours stamp .                    # what it would change
+node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs behaviours stamp --write .            # Status and Updated at, from the run
+node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs behaviours check .                    # a SUCCESS row its tier's run contradicts
+node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs behaviours coverage --json .          # the tests report's measurement
 ```
 
 The writer stamps a row only from a result at the row's own `Tier`, never writes over `MANUAL`, and leaves a row nothing named alone unless `--reach repository` says the artifacts are the whole of their tiers. It reads a register by its headings, so an eight-, nine- or ten-cell row is stamped alike. A stack's plugin adds what knows the stack — where a case lives, for the join, and the coverage floors.
