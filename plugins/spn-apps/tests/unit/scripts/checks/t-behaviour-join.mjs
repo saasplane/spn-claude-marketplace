@@ -91,5 +91,14 @@ console.log("\n=== behaviour-join — what it passes");
   ok("a stack with no case reader says only the rows were read", out.includes("no case reader for the py stack"), out);
 }
 
+{
+  const { out, code } = run(repo([["IAM.LOGIN.01", "PLANNED"]], {
+    "packages/toolchain-ts/spkind.json": '{"kind":"TOOLCHAIN"}',
+    "packages/toolchain-ts/tests/unit/bin/spn-test.spec.mjs": spec("IAM.GHOST.09 a sample title proving the runner, not a behaviour"),
+  }));
+  ok("[MKT.SCRIPTS.52] a case under a TOOLCHAIN-kind node is not join evidence — it proves the toolchain, not a behaviour",
+     code === 0 && !out.includes("IAM.GHOST.09"), out);
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — behaviour-join` : `\n  all ${total} passed — behaviour-join`);
 process.exit(failed ? 1 : 0);

@@ -51,6 +51,23 @@ export function floorOf(text: string): Floor {
   return floor;
 }
 
+/** The dated comment the floor script writes above `coverageThreshold`/`thresholds`, matched loosely. */
+const DATED_COMMENT = /\/\/\s*Coverage floor measured \d{4}-\d{2}-\d{2}/;
+
+/**
+ * Whether a configuration's floor carries the dated measurement comment the floor script writes.
+ * A floor with no such comment is a guess nobody measured, so its first measurement may replace it
+ * either way; once it carries the comment, only a higher number may follow (RD.APPS.133).
+ */
+export function isDated(text: string): boolean {
+  const key = text.search(/\b(coverageThreshold|thresholds)\s*:/);
+  if (key < 0) return false;
+  const lineStart = text.lastIndexOf("\n", key) + 1;
+  const before = text.slice(0, lineStart);
+  const previous = before.slice(before.lastIndexOf("\n", before.length - 2) + 1);
+  return DATED_COMMENT.test(previous);
+}
+
 /** Where the exclude list sits: `coveragePathIgnorePatterns` for Jest, `exclude` inside `coverage` for Vitest. */
 function excludeList(text: string): { start: number; end: number } | null {
   const jest = text.search(/\bcoveragePathIgnorePatterns\s*:\s*\[/);

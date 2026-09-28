@@ -62,6 +62,9 @@ export function casesUnder(root: string): { cases: ProvingCase[]; filesRead: num
   for (const file of walk(root)) {
     const tier = tierOf(file, root);
     if (tier === null) continue;
+    // A case under a TOOLCHAIN-kind node proves the toolchain's own machinery, not a behaviour — its
+    // sample titles (a made-up id used to prove the runner reads a title correctly) are never join evidence.
+    if (kindAbove(file, root) === "TOOLCHAIN") continue;
     const source = read(file);
     if (source === null) continue;
     filesRead += 1;

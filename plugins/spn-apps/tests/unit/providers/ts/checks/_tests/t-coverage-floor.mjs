@@ -12,19 +12,36 @@ const VITEST = (floor, excludes = "") =>
   "export default defineWebVitestConfig('x', {\n  test: {\n    coverage: {\n" +
   (excludes ? `      exclude: [\n${excludes}      ],\n` : "") +
   `      thresholds: { statements: ${floor[0]}, branches: ${floor[1]}, functions: ${floor[2]}, lines: ${floor[3]} },\n    },\n  },\n});\n`;
+// A floor already carrying the dated comment the script writes — only that one is protected from lowering.
+const JEST_DATED = (floor, excludes = "") =>
+  "module.exports = {\n  displayName: 'x',\n  coverageDirectory: 'cov',\n" +
+  (excludes ? `  coveragePathIgnorePatterns: [\n${excludes}  ],\n` : "") +
+  "  // Coverage floor measured 2026-09-20 by the spn-apps floor script — it rises and never falls (RD.APPS.133).\n" +
+  `  coverageThreshold: {\n    global: { statements: ${floor[0]}, branches: ${floor[1]}, functions: ${floor[2]}, lines: ${floor[3]} },\n  },\n};\n`;
+const VITEST_DATED = (floor, excludes = "") =>
+  "export default defineWebVitestConfig('x', {\n  test: {\n    coverage: {\n" +
+  (excludes ? `      exclude: [\n${excludes}      ],\n` : "") +
+  "      // Coverage floor measured 2026-09-20 by the spn-apps floor script — it rises and never falls (RD.APPS.133).\n" +
+  `      thresholds: { statements: ${floor[0]}, branches: ${floor[1]}, functions: ${floor[2]}, lines: ${floor[3]} },\n    },\n  },\n});\n`;
 
 console.log("=== coverage-floor — known-bad");
 
-one("[MKT.PROVIDERS.30] an edit lowering a Jest floor is refused", {
-  script: "coverage-floor", root: tree({ ...REPO, "jest.config.cjs": JEST([43, 36, 42, 42]) }),
+one("[MKT.PROVIDERS.30] an edit lowering a dated Jest floor is refused", {
+  script: "coverage-floor", root: tree({ ...REPO, "jest.config.cjs": JEST_DATED([43, 36, 42, 42]) }),
   input: { file_path: "jest.config.cjs", old_string: "statements: 43", new_string: "statements: 40" },
   expect: "deny", says: "statements falls from 43 to 40",
 });
 
-one("[MKT.PROVIDERS.30] a write removing a Vitest floor is refused", {
-  script: "coverage-floor", root: tree({ ...REPO, "vitest.config.ts": VITEST([80, 80, 80, 80]) }),
+one("[MKT.PROVIDERS.30] a write removing a dated Vitest floor is refused", {
+  script: "coverage-floor", root: tree({ ...REPO, "vitest.config.ts": VITEST_DATED([80, 80, 80, 80]) }),
   input: { file_path: "vitest.config.ts", content: "export default defineWebVitestConfig('x', {});\n" },
   expect: "deny", says: "lines falls from 80 to nothing",
+});
+
+one("[MKT.PROVIDERS.29] an edit lowering an undated floor is allowed — a guess earns no protection yet", {
+  script: "coverage-floor", root: tree({ ...REPO, "jest.config.cjs": JEST([80, 80, 80, 80]) }),
+  input: { file_path: "jest.config.cjs", old_string: "statements: 80", new_string: "statements: 62" },
+  expect: "",
 });
 
 one("[MKT.PROVIDERS.31] a new exclude with no reason is refused", {
@@ -63,7 +80,7 @@ one("a Playwright configuration is never read", {
 
 // Through the one PreToolUse entry the plugin registers, so the rule is wired and not only written.
 {
-  const root = tree({ ...REPO, "packages/x/spkind.json": '{"kind":"SUPPORT_SERVER"}', "packages/x/jest.config.cjs": JEST([43, 36, 42, 42]) });
+  const root = tree({ ...REPO, "packages/x/spkind.json": '{"kind":"SUPPORT_SERVER"}', "packages/x/jest.config.cjs": JEST_DATED([43, 36, 42, 42]) });
   const out = execFileSync("node", [resolve(PLUGIN, "src", "scripts", "events", "pretooluse.ts")], {
     input: JSON.stringify({ tool_name: "Edit", cwd: root, tool_input: {
       file_path: resolve(root, "packages/x/jest.config.cjs"), old_string: "lines: 42", new_string: "lines: 10" } }),

@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/README.md", "seen": "7a380519" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/README.md", "seen": "d2d663e9" }
   ],
   "decisions": [
     "RD.APPS.086",
@@ -34,6 +34,7 @@
 - **Each claim is proven once, at the level that owns it** (`RD.APPS.087`). A journey is never a slower copy of an answer the contract tier already gave.
 - **The id is the join, and a link has a direction.** Write the behavior id into the test title where the claim is proven, and cite it — never restate it — from the rows above. A UI row `Realizes` an API row, never a peer and never an id nothing declares.
 - **The join reads ONE register per repository, and that is what makes it whole.** A repository has one behaviors seat, so one id space and one set of rows, and the case glob is the repository's — a `SUCCESS` row is proven by a case anywhere in that repository, in the module that serves it, the app that hosts it, or a journey crossing both. Where each node kept its own register, a gate read one at a time and reported green over a repository that was not.
+- **A case proving the toolchain's own machinery is not join evidence.** The toolchain carries suites that write sample titles — a made-up id, used only to prove that the runner reads a title correctly — and the join excludes every case found under a `TOOLCHAIN`-kind node, so a sample id there is never read as an uncited row or an undeclared id.
 - **A behaviour row names no package, and the join does not need it to.** The row belongs to the domain that would have to change if the behaviour changed; which packages realize it is stated on the capability side. A behaviour crossing a server module, a web module and the app hosting them is ordinary: one row, three mirrors claiming a share, one journey citing the id.
 - **Status honesty is enforced**: a `SUCCESS` row resolves to a case that **ran and passed**. A case listed by the runner is not proof — a case that skips itself is collected and proves nothing. A row with no case behind it is `PLANNED`; a row whose case the last run did not reach is `PENDING`; neither is green. This is the line this lens stops work over.
 - **A run speaks for the tier it ran and for the nodes it collected, and for nothing else.** A run writes only the rows declaring its own tier and leaves every other row exactly as it found it, which is why `Tier` is declared by hand before any case exists. Read a narrow run that resets the rows it never reached as a register reporting whatever ran last rather than what is true.
@@ -50,7 +51,7 @@
 - **Behaviour does not cross a harness's process boundary.** Where a component tier's harness drives the browser from another process, only data crosses. So behaviour a mount needs is defined in the build the browser runs. The case imports that module and drives it through serializable inputs alone. Most components need none of this, and the case keeps its own mount by default (`RD.APPS.099`).
 - **A red naming what no source declares is a stale build, not a defect.** A build cache keyed by file name outlives a rename, so it is cleared by the change that renamed, moved or deleted what it compiled (`RD.APPS.100`).
 - **A case that destroys a session runs where nothing else depends on that session.** Revoking a sign-in, logging out or changing a credential destroys the session other cases work in, and worker isolation cannot help because the damage is server-side (`RD.APPS.098`).
-- **Every project carries a code-coverage floor, measured rather than chosen, in the test tool's own configuration, and it rises and never falls** (`RD.APPS.133`). The agent's plugin script raises it after a run; nobody types the number. Code a case cannot reach is excluded with its reason in a comment beside the entry, never hidden by a lower number.
+- **Every project carries a code-coverage floor, measured rather than chosen, in the test tool's own configuration, and it rises and never falls** (`RD.APPS.133`). The agent's plugin script sets it after a run; nobody types the number. **A floor with no dated comment is a guess**, so its first measurement replaces it, up or down; once dated, the script only raises it and the check refuses a lowering. Code a case cannot reach is excluded with its reason in a comment beside the entry, never hidden by a lower number.
 
 ## What it never does
 

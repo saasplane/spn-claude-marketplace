@@ -13,7 +13,7 @@ import { basename } from "node:path";
 import type { Payload, ToolInput, Verdict } from "../../../../../scripts/lib/payload.ts";
 import { emit, payload, runAlone } from "../../../../../scripts/lib/payload.ts";
 import { filesUnder, read, resultingText } from "../../../../../scripts/lib/source.ts";
-import { MEASURES, excludesOf, floorOf, isFloorConfig } from "../../lib/floors.ts";
+import { MEASURES, excludesOf, floorOf, isDated, isFloorConfig } from "../../lib/floors.ts";
 
 /** Whether this rule reads the file at all: a configuration that runs code. */
 export const watched = (path: string): boolean => isFloorConfig(path);
@@ -23,11 +23,15 @@ export function findings(before: string, after: string): string[] {
   const found: string[] = [];
   const was = floorOf(before);
   const now = floorOf(after);
-  for (const measure of MEASURES) {
-    if (was[measure] === undefined) continue;
-    const next = now[measure] ?? 0;
-    if (next < (was[measure] as number)) {
-      found.push(`${measure} falls from ${was[measure]} to ${now[measure] ?? "nothing"}`);
+  // An undated floor is a guess nobody measured; its first measurement may replace it either way,
+  // so a lowering is refused only once the floor it lowers carries the dated comment.
+  if (isDated(before)) {
+    for (const measure of MEASURES) {
+      if (was[measure] === undefined) continue;
+      const next = now[measure] ?? 0;
+      if (next < (was[measure] as number)) {
+        found.push(`${measure} falls from ${was[measure]} to ${now[measure] ?? "nothing"}`);
+      }
     }
   }
   const existing = new Set(excludesOf(before).map((one) => one.entry));

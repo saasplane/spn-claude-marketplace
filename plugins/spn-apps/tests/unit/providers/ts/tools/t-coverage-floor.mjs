@@ -46,6 +46,10 @@ const run = (root, ...args) => {
 const JEST_WITH = (s, b, f, l) =>
   `module.exports = {\n  displayName: 'x',\n  coverageDirectory: 'cov',\n  coverageThreshold: {\n    global: {\n      branches: ${b},\n      functions: ${f},\n      lines: ${l},\n      statements: ${s},\n    },\n  },\n};\n`;
 
+/** A floor that already carries the dated comment the script writes — protected, and only ever raised. */
+const JEST_WITH_DATED = (date, s, b, f, l) =>
+  `module.exports = {\n  displayName: 'x',\n  coverageDirectory: 'cov',\n  // Coverage floor measured ${date} by the spn-apps floor script — it rises and never falls (RD.APPS.133).\n  coverageThreshold: {\n    global: {\n      branches: ${b},\n      functions: ${f},\n      lines: ${l},\n      statements: ${s},\n    },\n  },\n};\n`;
+
 console.log("=== coverage-floor — raising");
 
 {
@@ -77,21 +81,35 @@ console.log("=== coverage-floor — raising");
   ok("[MKT.PROVIDERS.28] a Vitest coverage block gains thresholds", /thresholds:\s*\{\s*statements: 61,\s*branches: 50,\s*functions: 58,\s*lines: 60,/.test(text), text);
 }
 
-console.log("\n=== coverage-floor — never lowering");
+console.log("\n=== coverage-floor — an undated floor is a guess, so its first measurement may move it either way");
 
 {
   const before = JEST_WITH(80, 80, 80, 80);
+  const root = project({ "jest.config.cjs": before }, { cov: [62.3, 55.1, 58.9, 60.4] });
+  const out = run(root, "--write");
+  const text = readFileSync(join(root, "jest.config.cjs"), "utf8");
+  ok("[MKT.PROVIDERS.29] an undated 80 is lowered to the first measurement",
+     /statements: 62,/.test(text) && /branches: 55,/.test(text) && /functions: 58,/.test(text) && /lines: 60,/.test(text), text);
+  ok("[MKT.PROVIDERS.29] and that write is what dates it",
+     text.includes("// Coverage floor measured 2026-09-28 by the spn-apps floor script"), text);
+  ok("[MKT.PROVIDERS.29] a first measurement is not reported as falling below the floor", !out.includes("falls below the floor"), out);
+}
+
+console.log("\n=== coverage-floor — a dated floor only ever rises");
+
+{
+  const before = JEST_WITH_DATED("2026-09-20", 80, 80, 80, 80);
   const root = project({ "jest.config.cjs": before }, { cov: [43.77, 36.48, 42.4, 42.54] });
   const out = run(root, "--write");
-  ok("[MKT.PROVIDERS.29] a measurement under the floor leaves it as it was", readFileSync(join(root, "jest.config.cjs"), "utf8") === before);
+  ok("[MKT.PROVIDERS.29] a dated floor, measured under it, leaves it exactly as it was", readFileSync(join(root, "jest.config.cjs"), "utf8") === before);
   ok("[MKT.PROVIDERS.29] and says the run falls below it", out.includes("falls below the floor") && out.includes("statements 43.77 under 80"), out);
 }
 
 {
-  const root = project({ "jest.config.cjs": JEST_WITH(40, 50, 40, 40) }, { cov: [43.77, 36.48, 42.4, 42.54] });
+  const root = project({ "jest.config.cjs": JEST_WITH_DATED("2026-09-20", 40, 50, 40, 40) }, { cov: [43.77, 36.48, 42.4, 42.54] });
   run(root, "--write");
   const text = readFileSync(join(root, "jest.config.cjs"), "utf8");
-  ok("[MKT.PROVIDERS.29] a measure under its floor stays while the others rise", /branches: 50,/.test(text) && /statements: 43,/.test(text), text);
+  ok("[MKT.PROVIDERS.29] a dated measure under its floor stays while the others rise", /branches: 50,/.test(text) && /statements: 43,/.test(text), text);
 }
 
 console.log("\n=== coverage-floor — what it refuses to guess");

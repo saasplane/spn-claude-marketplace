@@ -14,7 +14,7 @@
 import { readdirSync, statSync, writeFileSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { read } from "../../../../scripts/lib/source.ts";
-import { MEASURES, floorBlock, floorOf, isFloorConfig } from "../lib/floors.ts";
+import { MEASURES, floorBlock, floorOf, isDated, isFloorConfig } from "../lib/floors.ts";
 import type { Floor, Measure } from "../lib/floors.ts";
 
 /** The comment a raised floor carries. The date is the measurement's, never the moment the script ran. */
@@ -109,13 +109,16 @@ export function raiseFloors(project: string): Outcome[] {
       continue;
     }
     const was = floorOf(text);
+    const dated = isDated(text);
     const next = {} as Required<Floor>;
     const below: string[] = [];
     for (const measure of MEASURES as readonly Measure[]) {
       const measuredFloor = Math.floor(run.totals[measure] ?? 0);
       const current = was[measure] ?? 0;
-      next[measure] = Math.max(current, measuredFloor);
-      if (measuredFloor < current) below.push(`${measure} ${run.totals[measure]} under ${current}`);
+      // An undated floor is a guess nobody measured: its first measurement replaces it, up or down.
+      // Once a floor is dated, it only ever rises.
+      next[measure] = dated ? Math.max(current, measuredFloor) : measuredFloor;
+      if (dated && measuredFloor < current) below.push(`${measure} ${run.totals[measure]} under ${current}`);
     }
     const same = MEASURES.every((measure) => was[measure] === next[measure]);
     const fall = below.length ? ` The run falls below the floor (${below.join(" · ")}), and the floor stays.` : "";
