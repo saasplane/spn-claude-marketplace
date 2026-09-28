@@ -6,25 +6,25 @@
 
 `For: DevOps / SRE · Architect` · `Status: ✅ DONE` · `Realizes: Skills`
 
-The folders under `plugins/spn-infra/src/skills/` are `new`, `implement`, `review`, `run`, `verify` and `release`. They are the words the apps domain reads, so a partner working in both learns one set of names. Each holds one `SKILL.md` and none divides into steps. They realize the `infra` command group's layer model for an estate repository, and they share one boundary that is stated in each of them. **No skill here mutates a cloud.** Each names the command that does, and the estate caution — cloud mutation passes only through the tool's own doors — is restated rather than worked around.
+The folders under `packages/plugin-spn-infra/src/skills/` are `new`, `implement`, `review`, `run`, `verify` and `release`. They are the words the apps domain reads, so a partner working in both learns one set of names. Each holds one `SKILL.md` and none divides into steps. They realize the `infra` command group's layer model for an estate repository, and they share one boundary that is stated in each of them. **No skill here mutates a cloud.** Each names the command that does, and the estate caution — cloud mutation passes only through the tool's own doors — is restated rather than worked around.
 
 ## Where
 
 | Part of the construct | Lives in | What it is |
 | --- | --- | --- |
-| Standing a node up | `plugins/spn-infra/src/skills/new/SKILL.md` | which node type, where it goes, and what its manifest must carry |
-| What the estate is | `plugins/spn-infra/src/skills/implement/SKILL.md` | locating the node, then an environment, a grant row, a module row, a region, a schema, a size, a hosting, a trigger |
-| Reading a plan | `plugins/spn-infra/src/skills/review/SKILL.md` | what a plan must name and what it must never contain, before any approval, and a declaration read as one line per choice |
-| Running a layer | `plugins/spn-infra/src/skills/run/SKILL.md` | bringing a layer up or down, and reading what is standing |
-| Proving it | `plugins/spn-infra/src/skills/verify/SKILL.md` | what the validate and test commands prove, and what a green run does not |
-| Authoring a module | `plugins/spn-infra/src/skills/implement/SKILL.md` | scaffold, renderings, the path locator, proving, releasing, the pin flip |
-| Publishing | `plugins/spn-infra/src/skills/release/SKILL.md` | the version edit, the release command, the registry pair or the machine store |
-| The vocabulary they use | `plugins/spn-infra/src/refs/support/infra/` | the manifests, the layers and doors, the naming grammar, and the laws |
+| Standing a node up | `packages/plugin-spn-infra/src/skills/new/SKILL.md` | which node type, where it goes, and what its manifest must carry |
+| What the estate is | `packages/plugin-spn-infra/src/skills/implement/SKILL.md` | locating the node, then an environment, a grant row, a module row, a region, a schema, a size, a hosting, a trigger |
+| Reading a plan | `packages/plugin-spn-infra/src/skills/review/SKILL.md` | what a plan must name and what it must never contain, before any approval, and a declaration read as one line per choice |
+| Running a layer | `packages/plugin-spn-infra/src/skills/run/SKILL.md` | bringing a layer up or down, and reading what is standing |
+| Proving it | `packages/plugin-spn-infra/src/skills/verify/SKILL.md` | what the validate and test commands prove, and what a green run does not |
+| Authoring a module | `packages/plugin-spn-infra/src/skills/implement/SKILL.md` | scaffold, renderings, the path locator, proving, releasing, the pin flip |
+| Publishing | `packages/plugin-spn-infra/src/skills/release/SKILL.md` | the version edit, the release command, the registry pair or the machine store |
+| The vocabulary they use | `packages/plugin-spn-infra/src/refs/support/infra/` | the manifests, the layers and doors, the naming grammar, and the laws |
 
 ## Follows the pattern
 
 - The frontmatter, the matching and the description that is matched — [The Skill](../../../02-constructs/01-devex/04-skills.md)
-- The stack-agnostic skills these realize — [Skills in spn-devex](../../01-devex/spn-devex/04-skills.md)
+- The stack-agnostic skills these realize — [Skills in spn-devex](../../01-devex/plugin-spn-devex/04-skills.md)
 
 ## Special handling
 
@@ -32,31 +32,31 @@ The folders under `plugins/spn-infra/src/skills/` are `new`, `implement`, `revie
 
 **Why** — *a change to what the estate is should read as one line per choice*. A diff that mixes rendered output with declared intent hides the decision inside the consequence.
 **What** — `implement` locates the node and changes the manifest; `verify` validates it; `review` shows the diff in that shape. Authoring a new module package and publishing one are explicitly not this skill.
-**How** — the description names both neighbours so the wrong ask lands in the right skill. `plugins/spn-infra/src/skills/implement/SKILL.md`.
+**How** — the description names both neighbours so the wrong ask lands in the right skill. `packages/plugin-spn-infra/src/skills/implement/SKILL.md`.
 
 ### A plan is read before anything is approved
 
 **Why** — *approval is the last moment a wrong rendering is cheap*. After it, the estate has changed and the question becomes a repair.
 **What** — `review` states what a plan output must name and what it must never contain, and it also answers the narrower question of whether a declaration change rendered exactly what was intended and nothing more.
-**How** — it is convened before any approval flag is passed, never after. `plugins/spn-infra/src/skills/review/SKILL.md`.
+**How** — it is convened before any approval flag is passed, never after. `packages/plugin-spn-infra/src/skills/review/SKILL.md`.
 
 ### Authoring a module names what is not a module
 
 **Why** — *a vendor reached over the network is application configuration behind a support seam*, and the estate never sees it. Treating one as a module builds infrastructure for something that does not exist.
 **What** — `implement` also covers a lifecycle plug-in the platform actually runs — a vendor you host, a warehouse, a search engine — and its description rules out the networked vendor case in the sentence a session matches against.
-**How** — it walks the whole path in one skill, from scaffold to the pin flip that points a consumer at the published version. `plugins/spn-infra/src/skills/implement/SKILL.md`.
+**How** — it walks the whole path in one skill, from scaffold to the pin flip that points a consumer at the published version. `packages/plugin-spn-infra/src/skills/implement/SKILL.md`.
 
 ### The version is a reviewed edit, and the release command does the rest
 
 **Why** — *a version somebody typed into a build script is a second place the number lives*. The package manifest is the one place.
 **What** — `release` bumps the version field in the package manifest as a reviewed edit, then runs the release command. Publishing goes to the organization's registry pair, or stages into the machine store when asked to stay local.
-**How** — the skill also covers repointing a bespoke build script or workflow at the release command, so the second place stops existing. `plugins/spn-infra/src/skills/release/SKILL.md`.
+**How** — the skill also covers repointing a bespoke build script or workflow at the release command, so the second place stops existing. `packages/plugin-spn-infra/src/skills/release/SKILL.md`.
 
 ### The cloud never reaches a skill
 
 **Why** — *a skills half is earned by changing the authoring stack*, and the cloud does not change it: an estate declaration is provider-neutral and every rendering is written against the same engine.
 **What** — no skill here loads a per-cloud procedure, and this plugin ships no skills half under any provider folder. The walk reads the same whichever cloud the estate resolves to.
-**How** — what does differ per cloud is the vocabulary, restated as a fact in the refs tree. `plugins/spn-infra/src/refs/support/infra/providers/`.
+**How** — what does differ per cloud is the vocabulary, restated as a fact in the refs tree. `packages/plugin-spn-infra/src/refs/support/infra/providers/`.
 
 ## Between modules
 

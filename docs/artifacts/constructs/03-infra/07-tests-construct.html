@@ -273,6 +273,10 @@
   <p>The harness writes a hook event to a fresh process on standard input and parses the decision back out, so what a case proves is what the harness would see rather than what a function returns. A case states the decision it expects and, for a refusal, a fragment the message must carry — which is how a rule that fires for the wrong reason is caught rather than counted as a pass.</p>
   <h3 id="what-is-absent-and-the-absence-is-the-st">What is absent, and the absence is the statement</h3>
   <p>There is no <code>integration/</code> folder and no <code>setup/</code> folder. Nothing runs at that tier in this plugin, and the runner needs no fixture stood up before it starts. <strong>An empty folder would teach a reader that the tier works</strong>, so neither exists, which is the same rule a cloud with no validator follows.</p>
+  <h3 id="the-payload-a-case-replays-sits-beside-t">The payload a case replays sits beside the suites, once per event</h3>
+  <p><code>tests/fixtures/payloads/pretooluse/</code> holds one recorded call for the one event this plugin wires, and a suite reads it rather than constructing its own. A payload is an input, never a generated answer, so a stale one is a fixture problem and never a passing case that stopped proving anything.</p>
+  <h3 id="two-more-cases-prove-the-bundle-not-one-">Two more cases prove the bundle, not one file</h3>
+  <p><code>unit/t-dist-current.mjs</code> and <code>unit/t-bundle-parity.mjs</code> sit at the tree's root rather than under any one mirror, because each proves a property of the whole plugin: the first recomputes a bundle's declared sources against the banner esbuild wrote into it, and the second runs a recorded payload through the source and through the committed bundle and asserts the two agree. Both call the one shared harness the foundation's plugins realization states, <code>packages/plugin-support-lib/tests/helpers/</code>, so the build and the check can never quietly disagree. This plugin ships no <code>commands/</code>, but <code>hooks.json</code> still runs a built <code>dist/events/pretooluse.mjs</code>, so it owes both cases exactly as its two siblings do.</p>
 </section>
 
 <!-- 04 -->
@@ -295,12 +299,13 @@
   <div class="scroll"><table>
     <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
     <tbody>
-      <tr><td>the foundation's DevEx Test construct</td><td>which tier a proof belongs to, and that a tier names a kind of proof rather than a folder of convenience</td><td>MUST</td></tr>
+      <tr><td>the foundation's DevEx Test construct § The test tree</td><td>which tier a proof belongs to, and that a tier names a kind of proof rather than a folder of convenience</td><td>MUST</td></tr>
       <tr><td><code>RD.DEVEX.019</code></td><td>a suite proves a rule stated elsewhere and states none of its own</td><td>MUST</td></tr>
       <tr><td>the apps plugin's subject registry</td><td><em>until a parser exists there is no folder for it</em> — which is why no tier stands empty here</td><td>MUST</td></tr>
+      <tr><td>the foundation's <code>04-plugins/02-shape.md</code></td><td>the staleness case, the parity case, the payload fixture, and the shared harness every plugin's tests owe once it builds</td><td>MUST</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>node plugins/spn-infra/tests/run.mjs</code></p>
+  <p>Try it: <code>node packages/plugin-spn-infra/tests/run.mjs</code></p>
 </section>
 
 <footer>

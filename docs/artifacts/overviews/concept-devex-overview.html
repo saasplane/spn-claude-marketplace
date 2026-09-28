@@ -305,7 +305,7 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
     <tbody>
       <tr class="grp"><td colspan="3">The Plugin</td></tr>
       <tr><td><a href="../constructs/01-devex/01-plugin-construct.html">a construct</a></td><td>—</td><td>one folder a plugin may ship: <code>hooks/</code>, <code>agents/</code>, <code>skills/</code>, <code>scripts/</code>, <code>refs/</code>, <code>providers/</code> or <code>tests/</code>. A plugin holds any mix and owes none</td></tr>
-      <tr><td><a href="../constructs/01-devex/01-plugin-construct.html">a plugin</a></td><td><code>plugin.json</code></td><td>one folder under <code>plugins/</code>, named for what it serves, carrying <code>.claude-plugin/plugin.json</code> and any mix of the constructs below it</td></tr>
+      <tr><td><a href="../constructs/01-devex/01-plugin-construct.html">a plugin</a></td><td><code>plugin.json</code></td><td>one folder under <code>packages/</code>, named for what it serves, carrying <code>.claude-plugin/plugin.json</code> and any mix of the constructs below it</td></tr>
       <tr><td><a href="../constructs/01-devex/01-plugin-construct.html">the marketplace</a></td><td><code>marketplace.json</code></td><td>the one file at <code>.claude-plugin/marketplace.json</code> naming every plugin this repository ships, and the folder each one lives in</td></tr>
       <tr><td><a href="../constructs/01-devex/01-plugin-construct.html">the plugin root</a></td><td><code>CLAUDE_PLUGIN_ROOT</code></td><td>the installed folder a session reads, and the base every wired command path is written against</td></tr>
       <tr><td><a href="../constructs/01-devex/01-plugin-construct.html">the version</a></td><td><code>version</code></td><td>the field in a manifest saying which bytes are published; the count moves after a release, never before</td></tr>
@@ -382,7 +382,7 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
   <ul>
     <li>The stack plugin, which adds what only a stack can say &rarr; <a href="concept-apps-overview.html">spn-apps</a></li>
     <li>The estate plugin, which adds what only an estate can say &rarr; <a href="concept-infra-overview.html">spn-infra</a></li>
-    <li>What each chapter here is held to in this plugin's own source &rarr; <a href="../../04-capabilities/01-devex/spn-devex/README.md">capabilities: spn-devex</a></li>
+    <li>What each chapter here is held to in this plugin's own source &rarr; <a href="../../04-capabilities/01-devex/plugin-spn-devex/README.md">capabilities: spn-devex</a></li>
     <li>What a developer using this plugin is promised &rarr; <a href="../../03-behaviors/01-devex/README.md">behaviours: devex</a></li>
     <li>Every construct of this domain, in reading order &rarr; <a href="../../02-constructs/01-devex/README.md">constructs: devex</a></li>
     <li>Back to the whole model &rarr; <a href="concept-overview.html">the hub</a></li>

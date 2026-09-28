@@ -93,5 +93,6 @@ This page answers what carries the estate standard into a session and which byte
 | [MD6](../../registers/decisions.md) | the manifest is the current description, and a marketplace entry disagreeing with it is the stale side | MUST |
 | `RD.GOV.024` | a repository answers to the world it declares, which is what decides this plugin is loaded at all | MUST |
 | the foundation's `02-delivery.md` § The set a repo gets is derived from its own claim | a workspace never types a plugin name; the set comes from the consuming repository's own manifest | MUST |
+| the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | source beside a committed build, one command entry, a shared folder never installed on its own | MUST |
 
-Try it: `node plugins/spn-devex/src/scripts/tools/partner-shape.ts`
+Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs plugin partner` (or `spn-devex plugin partner`, once installed)

@@ -133,5 +133,6 @@ This page answers what sits in this plugin's scripts folder and what each part m
 | `RD.DEVEX.035` | a rule reaches a write-time hook only where review would be too late | MUST |
 | `RD.GOV.024` | a repository answers to the world it declares, which is what the gate reads the stack from | MUST |
 | the foundation's `02-delivery.md` § When an edit becomes behaviour | a script here is live on its next run, so an edit lands without an install | MUST |
+| the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | the four kinds of script, one command entry, a shared folder never installed on its own | MUST |
 
-Try it: `node plugins/spn-apps/tests/run.mjs`
+Try it: `node packages/plugin-spn-apps/tests/run.mjs`

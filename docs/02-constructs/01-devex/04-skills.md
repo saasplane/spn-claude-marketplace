@@ -106,4 +106,4 @@ This page answers what a skill is, how it is selected, and what it may contain. 
 | `RD.DEVEX.019` | a skill restates a chapter's steps and adds no rule of its own | MUST |
 | `RD.DEVEX.025` | a folder per skill value and a value per folder, so the set a gate dispatches over is closed | MUST |
 
-Try it: `node plugins/spn-devex/src/scripts/tools/restate-drift.ts`
+Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs restates check` (or `spn-devex restates check`, once installed)

@@ -12,17 +12,17 @@ The wiring of this plugin is one file declaring one entry. It claims the moment 
 
 | Part of the construct | Lives in | What it is |
 | --- | --- | --- |
-| The wiring | `plugins/spn-apps/src/hooks/hooks.json` | one `PreToolUse` entry, its matcher, its command and its time budget |
+| The wiring | `packages/plugin-spn-apps/src/hooks/hooks.json` | one `PreToolUse` entry, its matcher, its command and its time budget |
 | The moment | the `PreToolUse` key of that file | the only moment that may refuse a call, and the only one this plugin claims |
 | The matcher | the `matcher` field of that entry | the two tool names that change a file, and nothing else |
 | The command | the `command` field of that entry | the one process, addressed through the plugin root rather than through this checkout |
-| The dispatcher | `plugins/spn-apps/src/scripts/events/pretooluse.ts` | runs everything behind the entry, keeps the first refusal, joins the advice |
-| What it resolves | `plugins/spn-apps/src/scripts/checks/subjects.ts` | the subjects for the stack the nearest manifest declares |
+| The dispatcher | `packages/plugin-spn-apps/src/scripts/events/pretooluse.ts` | runs everything behind the entry, keeps the first refusal, joins the advice |
+| What it resolves | `packages/plugin-spn-apps/src/scripts/checks/subjects.ts` | the subjects for the stack the nearest manifest declares |
 
 ## Follows the pattern
 
 - The moments a session offers, the payload, the verdict and the always-zero exit — [Hooks](../../../02-constructs/01-devex/02-hooks.md)
-- The same frame across several moments and a wider tool set — [Hooks in spn-devex](../../01-devex/spn-devex/02-hooks.md)
+- The same frame across several moments and a wider tool set — [Hooks in spn-devex](../../01-devex/plugin-spn-devex/02-hooks.md)
 
 ## Special handling
 
@@ -30,13 +30,13 @@ The wiring of this plugin is one file declaring one entry. It claims the moment 
 
 **Why** — *separate entries are separate interpreter start-ups on every write*. Measured on 19 September 2026, one ordinary edit cost 1,123 ms across eight entries, of which 1,040 ms was starting programs. The checking itself was about 83 ms.
 **What** — the wiring declares one entry, and one process runs the whole chain. Porting the scripts to another language alone would not have collected the saving, because eight entries are still eight start-ups.
-**How** — the dispatcher asks each subject that applies and returns one answer. `plugins/spn-apps/src/scripts/events/pretooluse.ts`.
+**How** — the dispatcher asks each subject that applies and returns one answer. `packages/plugin-spn-apps/src/scripts/events/pretooluse.ts`.
 
 ### The narrowest wiring this plugin could have
 
 **Why** — *a moment claimed for symmetry is a start-up paid on every call in a session*, for an answer nobody asked for.
 **What** — one moment, narrowed to `Write` and `Edit`. Everything else a session does never reaches this plugin at all.
-**How** — the harness applies the matcher before any process of this plugin's starts, so the filter is free. `plugins/spn-apps/src/hooks/hooks.json`.
+**How** — the harness applies the matcher before any process of this plugin's starts, so the filter is free. `packages/plugin-spn-apps/src/hooks/hooks.json`.
 
 ### The budget is declared in the wiring, not trusted to the scripts
 
@@ -48,7 +48,7 @@ The wiring of this plugin is one file declaring one entry. It claims the moment 
 
 **Why** — *a plugin that listed its rules would need editing for a second stack*, which is the edit the provider shape exists to remove.
 **What** — the dispatcher asks a gate that reads the stack from the nearest manifest and imports the provider's own half by a path composed from that declaration.
-**How** — a repository declaring a stack this plugin ships no folder for resolves to no subject and is left alone rather than refused. `plugins/spn-apps/src/scripts/checks/subjects.ts`.
+**How** — a repository declaring a stack this plugin ships no folder for resolves to no subject and is left alone rather than refused. `packages/plugin-spn-apps/src/scripts/checks/subjects.ts`.
 
 ## Between modules
 

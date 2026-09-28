@@ -13,9 +13,9 @@
 | Part of the construct | Lives in | What it is |
 | --- | --- | --- |
 | The shape itself | this chapter and [The Provider](../../../02-constructs/01-devex/07-providers.md) | stated once, obeyed by every plugin |
-| A stack's skills half | `plugins/spn-apps/src/providers/ts/skills/<skill>/` | the step files an apps skill loads when the node is TypeScript |
-| A stack's scripts half | `plugins/spn-apps/src/providers/ts/scripts/checks/` | one file per subject, parsing TypeScript and carrying its rules |
-| A cloud's scripts half | `plugins/spn-infra/src/providers/<cloud>/scripts/checks/` | one file per subject, parsing that cloud's manifests and renderings |
+| A stack's skills half | `packages/plugin-spn-apps/src/providers/ts/skills/<skill>/` | the step files an apps skill loads when the node is TypeScript |
+| A stack's scripts half | `packages/plugin-spn-apps/src/providers/ts/scripts/checks/` | one file per subject, parsing TypeScript and carrying its rules |
+| A cloud's scripts half | `packages/plugin-spn-infra/src/providers/<cloud>/scripts/checks/` | one file per subject, parsing that cloud's manifests and renderings |
 | The gates | `skills/<verb>/SKILL.md` · `scripts/checks/<subject>.ts` | stack-free in both plugins; they resolve and dispatch |
 | A shared rule body | `scripts/lib/` | a factory parameterized by each instance's own values |
 

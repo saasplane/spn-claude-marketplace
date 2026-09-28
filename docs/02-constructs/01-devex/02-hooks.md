@@ -143,5 +143,6 @@ This page answers which moments exist, how a script claims one, what it is hande
 | `RD.DEVEX.019` | a hook carries a rule it does not own, and names the chapter that owns it | MUST |
 | `RD.DEVEX.020` | the workspace is discovered rather than declared, so the opening screen is read from each repository's own manifest | MUST |
 | [MD2](../../registers/decisions.md) | the dispatcher does refuse on its own account, through the generated-file guard it runs before the list | MUST |
+| the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | a hook is the Event kind of script, run from a committed bundle a staleness test keeps current | MUST |
 
-Try it: `node plugins/spn-devex/src/scripts/tools/partner-shape.ts`
+Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs plugin partner` (or `spn-devex plugin partner`, once installed)

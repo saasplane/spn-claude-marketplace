@@ -275,6 +275,10 @@
   <p>The harness searches every provider folder for the file a case names, rather than looking in a folder it was told about. A harness that knew which stack to look in would be the one place in this plugin naming an instance. So a rule that moves between subjects or between providers breaks no suite, and a case stays about the rule.</p>
   <h3 id="a-case-runs-the-real-process-against-a-t">A case runs the real process against a throwaway tree</h3>
   <p>The harness writes a temporary tree, sends a real payload to the real script on standard input, and reads what came back — so what is proven is what a session would actually get, rather than what a function returns when called directly. The trees are removed when the run ends.</p>
+  <h3 id="the-payload-a-case-replays-sits-beside-t">The payload a case replays sits beside the suites, once per event</h3>
+  <p><code>tests/fixtures/payloads/pretooluse/</code> holds one recorded call for the one event this plugin wires, and a suite reads it rather than constructing its own. A payload is an input, never a generated answer, so a stale one is a fixture problem and never a passing case that stopped proving anything.</p>
+  <h3 id="two-more-cases-prove-the-bundle-not-one-">Two more cases prove the bundle, not one file</h3>
+  <p><code>unit/t-dist-current.mjs</code> and <code>unit/t-bundle-parity.mjs</code> sit at the tree's root rather than under any one mirror, because each proves a property of the whole plugin: the first recomputes a bundle's declared sources against the banner esbuild wrote into it, and the second runs a recorded payload through the source and through the committed bundle and asserts the two agree. Both call the one shared harness the foundation's plugins realization states, <code>packages/plugin-support-lib/tests/helpers/</code>, so the build and the check can never quietly disagree.</p>
 </section>
 
 <!-- 04 -->
@@ -300,9 +304,10 @@
       <tr><td><code>RD.APPS.035</code></td><td>the tier ladder, and that a test title carries the behaviour id it proves</td><td>MUST</td></tr>
       <tr><td><code>RD.DEVEX.008</code></td><td>a behaviour row's shape and its id grammar, which is what a suite's title joins to</td><td>MUST</td></tr>
       <tr><td>the foundation's <code>02-delivery.md</code> § When an edit becomes behaviour</td><td>a suite is run from this checkout, so it proves the source rather than an installed copy</td><td>MUST</td></tr>
+      <tr><td>the foundation's test construct § The test tree, and its <code>04-plugins/02-shape.md</code></td><td>the staleness case, the parity case, the payload fixture, and the shared harness every plugin's tests owe once it builds</td><td>MUST</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>node plugins/spn-apps/tests/run.mjs</code></p>
+  <p>Try it: <code>node packages/plugin-spn-apps/tests/run.mjs</code></p>
 </section>
 
 <footer>

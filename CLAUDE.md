@@ -1,8 +1,10 @@
 # CLAUDE.md — spn-claude-marketplace
 
-The public marketplace that **authors and delivers the SaaS Plane Claude plugins**. Two trees
-sit at the root: `plugins/` — the three plugins themselves, each with its own
-`.claude-plugin/plugin.json` — and `docs/`, which describes them. `.claude-plugin/marketplace.json`
+The public marketplace that **authors and delivers the SaaS Plane Claude plugins**. Three trees
+sit at the root: `packages/` — the three plugins plus the shared support folder, each plugin with
+its own `.claude-plugin/plugin.json` — `docs/`, which describes them, and a root `package.json` /
+`scripts/build-plugins.mjs`, a dev-only build that bundles each plugin's `cli.ts` and `events/*.ts`
+into a committed `dist/` and never ships or installs. `.claude-plugin/marketplace.json`
 is what a `claude plugin marketplace add` reads. **This file carries only what is true of this
 repo alone**; the docs-tree shape and the working protocol are stated in `spn-devex` itself, and a
 copy here would be a second source that drifts.
@@ -15,7 +17,7 @@ docs tree and this repository's own files (`RD.GOV.024`). It loads `spn-devex` a
 core governs docs trees, and a domain plugin acts on nodes this repository does not have.
 
 **Authoring a plugin is not loading it.** This repo authors all three and loads one. Editing
-`plugins/spn-apps/src/skills/…/SKILL.md` is editing markdown, which spn-devex's doc rules govern, and the
+`packages/plugin-spn-apps/src/skills/…/SKILL.md` is editing markdown, which spn-devex's doc rules govern, and the
 suites here run the source rather than the installed copy. Being the builder checkout is a separate
 axis — `SPN_DEVEX_AGENT_WORKSPACE`.
 
@@ -35,7 +37,7 @@ domain, with no area above them, and a domain **is a plugin** — so the same th
 
 Under [`04-capabilities/`](docs/04-capabilities/README.md) the level below a domain is the
 package that realizes it, and **here the package is the plugin itself** — so a domain holds
-exactly one folder named for that plugin, `01-devex/spn-devex/`. That is the plugin tree mirrored:
+exactly one folder named for that plugin, `01-devex/plugin-spn-devex/`. That is the plugin tree mirrored:
 one chapter per construct, and the chapter names what the plugin actually ships.
 
 `docs/registers/` holds [`decisions.md`](docs/registers/decisions.md) alone.

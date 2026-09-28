@@ -197,7 +197,7 @@
   <div class="scroll"><table>
     <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
     <tbody>
-      <tr><td>a plugin</td><td><code>plugin.json</code></td><td>one folder under <code>plugins/</code>, named for what it serves, carrying <code>.claude-plugin/plugin.json</code> and any mix of the constructs below it</td></tr>
+      <tr><td>a plugin</td><td><code>plugin.json</code></td><td>one folder under <code>packages/</code>, named for what it serves, carrying <code>.claude-plugin/plugin.json</code> and any mix of the constructs below it</td></tr>
       <tr><td>the marketplace</td><td><code>marketplace.json</code></td><td>the one file at <code>.claude-plugin/marketplace.json</code> naming every plugin this repository ships, and the folder each one lives in</td></tr>
       <tr><td>the version</td><td><code>version</code></td><td>the field in a manifest saying which bytes are published; the count moves after a release, never before</td></tr>
       <tr><td>the plugin root</td><td><code>CLAUDE_PLUGIN_ROOT</code></td><td>the installed folder a session reads, and the base every wired command path is written against</td></tr>
@@ -294,10 +294,10 @@
       <tr><td><code>RD.GOV.024</code></td><td>a repository with no nodes still declares a world and still earns a docs tree, which is why this model is written here at all</td><td>MUST</td></tr>
       <tr><td>the foundation's <code>02-delivery.md</code> § The set a repo gets is derived from its own claim</td><td>a workspace never types a plugin name; the set comes from the consuming repository's own manifest</td><td>MUST</td></tr>
       <tr><td><a href="../../../registers/decisions.md">MD6</a></td><td>the manifest is the current description, and a marketplace entry that disagrees with it is the stale side</td><td>MUST</td></tr>
-      <tr><td>the foundation's <code>04-plugins/02-shape.md</code></td><td>the Node realization of this construct's own shape — source beside a committed build, and a shared folder never installed on its own</td><td>MUST</td></tr>
+      <tr><td>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></td><td>the Node realization of this construct's own shape — source beside a committed build, and a shared folder never installed on its own</td><td>MUST</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>node plugins/spn-devex/src/scripts/tools/partner-shape.ts</code></p>
+  <p>Try it: <code>node packages/plugin-spn-devex/src/dist/cli.mjs plugin partner</code> (or <code>spn-devex plugin partner</code>, once installed)</p>
 </section>
 
 <footer>

@@ -88,6 +88,14 @@ The harness searches every provider folder for the file a case names, rather tha
 
 The harness writes a temporary tree, sends a real payload to the real script on standard input, and reads what came back — so what is proven is what a session would actually get, rather than what a function returns when called directly. The trees are removed when the run ends.
 
+### The payload a case replays sits beside the suites, once per event
+
+`tests/fixtures/payloads/pretooluse/` holds one recorded call for the one event this plugin wires, and a suite reads it rather than constructing its own. A payload is an input, never a generated answer, so a stale one is a fixture problem and never a passing case that stopped proving anything.
+
+### Two more cases prove the bundle, not one file
+
+`unit/t-dist-current.mjs` and `unit/t-bundle-parity.mjs` sit at the tree's root rather than under any one mirror, because each proves a property of the whole plugin: the first recomputes a bundle's declared sources against the banner esbuild wrote into it, and the second runs a recorded payload through the source and through the committed bundle and asserts the two agree. Both call the one shared harness the foundation's plugins realization states, `packages/plugin-support-lib/tests/helpers/`, so the build and the check can never quietly disagree.
+
 ## Boundary
 
 This page answers how this plugin proves itself and how the folder is arranged. It does not answer which tier proves which behaviour in a repository this plugin governs — the ladder and the derivation are the foundation's, and this domain's test step restates them. It does not answer what any rule decides either.
@@ -105,5 +113,6 @@ This page answers how this plugin proves itself and how the folder is arranged. 
 | `RD.APPS.035` | the tier ladder, and that a test title carries the behaviour id it proves | MUST |
 | `RD.DEVEX.008` | a behaviour row's shape and its id grammar, which is what a suite's title joins to | MUST |
 | the foundation's `02-delivery.md` § When an edit becomes behaviour | a suite is run from this checkout, so it proves the source rather than an installed copy | MUST |
+| the foundation's test construct § The test tree, and its `04-plugins/02-shape.md` | the staleness case, the parity case, the payload fixture, and the shared harness every plugin's tests owe once it builds | MUST |
 
-Try it: `node plugins/spn-apps/tests/run.mjs`
+Try it: `node packages/plugin-spn-apps/tests/run.mjs`

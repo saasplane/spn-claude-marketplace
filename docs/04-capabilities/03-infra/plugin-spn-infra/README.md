@@ -18,8 +18,8 @@
 
 | Construct | Realized by |
 | --- | --- |
-| Plugin · Hook · Loop Events · Checks · Tools · Pages · Skill · Ref · Lenses · Agent | [spn-devex](../../01-devex/spn-devex/README.md) |
-| Stack Checks · Stack Tools · Stack Skills · Stack Refs | [spn-apps](../../02-apps/spn-apps/README.md) |
+| Plugin · Hook · Loop Events · Checks · Tools · Pages · Skill · Ref · Lenses · Agent | [spn-devex](../../01-devex/plugin-spn-devex/README.md) |
+| Stack Checks · Stack Tools · Stack Skills · Stack Refs | [spn-apps](../../02-apps/plugin-spn-apps/README.md) |
 
 Source folders, one per chapter: `.claude-plugin/plugin.json` for Plugin · `hooks/hooks.json` for Hooks · `skills/` for Skills · `scripts/` for Scripts — the gate, and the `lib/` holding every rule body because each is cloud-free · `refs/` for Refs · `providers/{aws,gcp}/` for Providers, a scripts half only · `tests/` for Tests. This plugin ships no `agents/` and no `scripts/tools/`, and each absence says so.
 

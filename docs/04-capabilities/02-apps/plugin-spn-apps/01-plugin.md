@@ -6,23 +6,23 @@
 
 `For: Architect · Engineering leader` · `Status: ✅ DONE` · `Realizes: Plugin`
 
-`spn-apps` is one folder under `plugins/`, and everything this domain ships sits inside it. Two facts about that folder pull in opposite directions and both matter. **Its description is its own**, because it is what a session matches the work at hand against, and material nothing matches is material nothing reaches. **Its version is not its own**: every plugin in this marketplace carries the same number, and a release moves all of them together.
+`spn-apps` is one folder under `packages/`, and everything this domain ships sits inside it. Two facts about that folder pull in opposite directions and both matter. **Its description is its own**, because it is what a session matches the work at hand against, and material nothing matches is material nothing reaches. **Its version is not its own**: every plugin in this marketplace carries the same number, and a release moves all of them together.
 
 ## Where
 
 | Part of the construct | Lives in | What it is |
 | --- | --- | --- |
-| The manifest | `plugins/spn-apps/src/.claude-plugin/plugin.json` | the name, the version, the description and the author |
+| The manifest | `packages/plugin-spn-apps/src/.claude-plugin/plugin.json` | the name, the version, the description and the author |
 | The description | the `description` field of that manifest | the apps domain stated before any language is chosen, matched against the work at hand |
 | The version | the `version` field of that manifest | the number saying which bytes are published, shared with the other plugins |
 | The marketplace entry | `.claude-plugin/marketplace.json` | the name, the source folder, and a description a listing can show without opening the folder |
-| What the folder holds | `plugins/spn-apps/src/` | wiring, skills, scripts, refs, providers and tests — and no agents |
-| What a wired path names | `plugins/spn-apps/src/hooks/hooks.json` | a command written against `CLAUDE_PLUGIN_ROOT`, so it resolves inside the installed copy rather than in this checkout |
+| What the folder holds | `packages/plugin-spn-apps/src/` | wiring, skills, scripts, refs, providers and tests — and no agents |
+| What a wired path names | `packages/plugin-spn-apps/src/hooks/hooks.json` | a command written against `CLAUDE_PLUGIN_ROOT`, so it resolves inside the installed copy rather than in this checkout |
 
 ## Follows the pattern
 
 - The manifest's shape, the marketplace list, the installed copy and the plugin root — [The Plugin](../../../02-constructs/01-devex/01-plugin.md)
-- How the same three files behave for the widest of the plugins — [Plugin in spn-devex](../../01-devex/spn-devex/01-plugin.md)
+- How the same three files behave for the widest of the plugins — [Plugin in spn-devex](../../01-devex/plugin-spn-devex/01-plugin.md)
 - The Node shape this folder realizes — source beside a committed build, one command entry, a shared folder never installed on its own — the foundation's `04-plugins/02-shape.md`
 
 ## Special handling
@@ -30,20 +30,20 @@
 ### The folder moved to packages/, and this plugin's shared copies are gone
 
 **Why** — *the foundation's `04-plugins/02-shape.md` states a shared folder as the way two plugins hold one copy of a helper instead of two that can quietly drift*, and this plugin's own copies were exactly that drift waiting to happen: `kinds.ts`, `register.ts` and `runs.ts` were byte-identical to `spn-devex`'s, and `payload.ts` and `timing.ts` were byte-identical to `spn-infra`'s.
-**What** — this plugin's source now sits at `packages/plugin-spn-apps/src/`, moved from `plugins/spn-apps/src/`. All five of those files were deleted from this plugin's own `scripts/lib/`; this plugin now imports the one copy of each from `packages/plugin-support-lib/src/lib/`, which carries no `package.json` and no name of its own.
+**What** — this plugin's source now sits at `packages/plugin-spn-apps/src/`, moved from `packages/plugin-spn-apps/src/`. All five of those files were deleted from this plugin's own `scripts/lib/`; this plugin now imports the one copy of each from `packages/plugin-support-lib/src/lib/`, which carries no `package.json` and no name of its own.
 **How** — by relative path, the way this plugin imports any other file in the checkout: `packages/plugin-spn-apps/src/`, `packages/plugin-support-lib/src/lib/`.
 
-### 🔮 Planned: a committed build beneath the source, reached through one command entry
+### A committed build sits beneath the source, reached through one command entry
 
-**Why** — the foundation's `04-plugins/02-shape.md` states the target every plugin here is moving to, and this plugin has not reached it yet.
-**What** — `src/scripts/` will gain one entry, `cli.ts`, dispatching `<group> <action>` to `commands/<group>/<action>.ts` files — `coverage` and `library` are this plugin's two groups — in place of today's flat `tools/`, and `hooks.json` will run a committed `dist/` instead of the `.ts` sources, with a test that refuses a bundle older than what it was built from.
+**Why** — the foundation's `04-plugins/02-shape.md` states the target every plugin here realizes.
+**What** — `src/scripts/` carries one entry, `cli.ts`, dispatching `<group> <action>` to `commands/<group>/<action>.ts` files — `coverage` and `library` are this plugin's two groups — and `hooks.json` runs a committed `dist/` instead of the `.ts` sources, with a test that refuses a bundle older than what it was built from.
 **How** — read the standard chapter before reading anything built against it here.
 
 ### The description is long deliberately, because it is matched rather than read
 
 **Why** — *a session reaches a plugin's material by matching this text against the work at hand*. A short description reads better and matches less, and material nothing matches is material nothing reaches.
 **What** — the description states what this plugin carries: the contract model a module publishes, the rules a contract state follows, and the worksheet a partner fills in to decide which shipped modules they adopt.
-**How** — it names those things in the words somebody would use for the work, rather than in the words the folder structure uses. `plugins/spn-apps/src/.claude-plugin/plugin.json`.
+**How** — it names those things in the words somebody would use for the work, rather than in the words the folder structure uses. `packages/plugin-spn-apps/src/.claude-plugin/plugin.json`.
 
 ### The version is shared, and the marketplace's own rule is why
 

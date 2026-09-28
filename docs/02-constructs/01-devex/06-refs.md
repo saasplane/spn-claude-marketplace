@@ -109,4 +109,4 @@ This page answers what a restatement is, where one belongs in the folder, and ho
 | the foundation's `04-discipline.md` § Restatement discipline | repetition is allowed only as a declared restatement, carrying its source and never a new rule | MUST |
 | [MD3](../../registers/decisions.md) | a ref that carries no block is unstamped, and a marker no tool reads is not a declaration | MUST |
 
-Try it: `node plugins/spn-devex/src/scripts/tools/restate-drift.ts`
+Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs restates check` (or `spn-devex restates check`, once installed)

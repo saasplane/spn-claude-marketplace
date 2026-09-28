@@ -25,8 +25,9 @@ is the whole reason a ref restates a chapter instead of linking to one.
 If you are a **partner**, you hold this repository and not the book, so every citation you meet here
 names a chapter rather than linking to one. If you are a **builder**, you hold both, and the drift
 checker is yours: it is the only thing in the workspace that reads across the two trees, and you run
-it here, before you publish — `node plugins/spn-devex/src/scripts/tools/restate-drift.ts`, which finds
-a sibling `spn-foundation` checkout by itself or takes its path as the one argument.
+it here, before you publish — `node packages/plugin-spn-devex/src/dist/cli.mjs restates check` (or
+`spn-devex restates check`, once installed), which finds a sibling `spn-foundation` checkout by
+itself or takes its path as the one argument.
 
 ## The domains it holds   `DRAFT`
 
@@ -86,15 +87,15 @@ So a tool you run here must tolerate the absence of nodes rather than refuse the
 one refuses you, that is the tool's defect and not this repository's. **A tool finds a docs tree by
 the `docs/` folder on disk, never by what a manifest declares** (`Q107`, 2026-09-20).
 
-## `plugins/` is source   `DRAFT`
+## `packages/` is source   `DRAFT`
 
 The capabilities seat is one chapter per construct, inside the one folder named for the plugin that
-ships it — `01-devex/spn-devex/`, `02-apps/spn-apps/`, `03-infra/spn-infra/`. Here the package **is**
+ships it — `01-devex/plugin-spn-devex/`, `02-apps/plugin-spn-apps/`, `03-infra/plugin-spn-infra/`. Here the package **is**
 the plugin, so the domain holds exactly one such folder rather than one document per source folder.
 When you add a checker and write no chapter for it, you have added a surface nobody documented, and
 invariant 4 is what tells you so.
 
-**What the book covers and what it does not.** The book names a checker under `plugins/` only where
+**What the book covers and what it does not.** The book names a checker under `packages/` only where
 one of its rules cites that checker. Four checkers are not named in the book at all:
 `contract-cycle`, `prose-triage`, `restate-drift` and `partner-shape`. Naming is not documenting: the rule belongs to the book and the
 implementation belongs here.

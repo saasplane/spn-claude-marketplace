@@ -53,6 +53,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.55 | Quality engineer | measure what the tests have proved, tier by tier | Every row is joined to the last run of its tier; a tier with no run reads `NOT_RUN` with its reason, never as a pass, and `--json` hands the measurement over | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.56 | Quality engineer | ask for the measurement in a foundation repository | The tool answers that the rows are promises with no status, and that no report is owed | NEGATIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.57 | Quality engineer | measure an unchanged tree twice | Both measurements are the same bytes, with the same digest, and `report.current` says whether the page already carries it | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.59 | Partner / integrator | discover every command this plugin offers without reading source | `cli.ts help --json` lists every `<group> <action>` with its own description, and an unknown group or action is refused by name — proven in `tests/unit/scripts/t-cli.mjs` | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

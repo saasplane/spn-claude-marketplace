@@ -38,7 +38,7 @@ Read the first two before anything else. The plugin is the container, and the ho
 | --- | --- | --- |
 | **The Plugin** | | |
 | [a construct](01-plugin.md) | — | one folder a plugin may ship: `hooks/`, `agents/`, `skills/`, `scripts/`, `refs/`, `providers/` or `tests/`. A plugin holds any mix and owes none |
-| [a plugin](01-plugin.md) | `plugin.json` | one folder under `plugins/`, named for what it serves, carrying `.claude-plugin/plugin.json` and any mix of the constructs below it |
+| [a plugin](01-plugin.md) | `plugin.json` | one folder under `packages/`, named for what it serves, carrying `.claude-plugin/plugin.json` and any mix of the constructs below it |
 | [the marketplace](01-plugin.md) | `marketplace.json` | the one file at `.claude-plugin/marketplace.json` naming every plugin this repository ships, and the folder each one lives in |
 | [the plugin root](01-plugin.md) | `CLAUDE_PLUGIN_ROOT` | the installed folder a session reads, and the base every wired command path is written against |
 | [the version](01-plugin.md) | `version` | the field in a manifest saying which bytes are published; the count moves after a release, never before |

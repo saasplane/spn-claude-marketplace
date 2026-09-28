@@ -22,15 +22,25 @@ The plugins carry the standards in full — they restate the SaaS Plane foundati
 
 ```
 .claude-plugin/marketplace.json   # the one manifest — hand-kept
-plugins/spn-devex/                 # source, edited in place
-plugins/spn-apps/
-plugins/spn-infra/
+package.json                       # the root build: esbuild, dev-only, never installed
+scripts/build-plugins.mjs          # bundles each plugin's cli.ts and events/*.ts into dist/
+packages/plugin-spn-devex/         # source, edited in place
+packages/plugin-spn-apps/
+packages/plugin-spn-infra/
+packages/plugin-support-lib/       # helpers two or more plugins share — a plain folder, never installed
 ```
 
-No build step exists. A change is: edit → reload your agent window → test → push.
+A hook runs the committed `dist/`, never `src/scripts/` directly. **A source edit needs a rebuild
+before it is live**:
 
-**A change to a hook script is live on its next run.** A skill, an agent, a ref or a change to
-`hooks.json` needs an install and a fresh window, so batch those and install once:
+```
+pnpm run build:plugins            # or build:plugins:watch while you work
+```
+
+Then reload your agent window → test → push. A change is: edit → rebuild → reload → test → push.
+
+**A skill, an agent, a ref, or a change to `hooks.json` or `dist/` needs an install and a fresh
+window**, so batch those and install once:
 
 ```
 claude plugin uninstall spn-devex@saasplane --scope project

@@ -34,6 +34,8 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.HOOKS.12 | Backend developer | read the same opening screen without opening a session | The orientation script runs by hand and prints the same text | POSITIVE | UNIT | PLANNED | — |
 | MKT.HOOKS.13 | Engineering leader | be told what landed after a scope is closed, not before | The closing line is said once the folder has actually moved, counted from that scope's own plan | POSITIVE | UNIT | PLANNED | — |
 | MKT.HOOKS.14 | Engineering leader | be warned at the end of a turn rather than refused | A turn ending with unblocked rows, a hold naming no live card, or a handover missing its fields | POSITIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.27 | Engineering leader | trust a hook reflects the source that was last checked in | `hooks.json` runs the committed `dist/events/*.mjs`, and a bundle older than its declared sources is refused by `tests/unit/t-dist-current.mjs` | POSITIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.28 | Engineering leader | finish a turn in one window without clobbering another window's verdict | `checks/corpus.ts` caches one verdict per docs tree in the machine store, keyed by content, and replays a finding rather than dropping it — proven in `tests/unit/scripts/checks/t-corpus.mjs` | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

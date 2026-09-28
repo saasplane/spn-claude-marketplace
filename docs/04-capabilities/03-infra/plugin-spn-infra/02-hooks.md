@@ -12,16 +12,16 @@ This plugin's wiring is one entry. Every law it holds is about what a file conta
 
 | Part of the construct | Lives in | What it is |
 | --- | --- | --- |
-| The wiring | `plugins/spn-infra/src/hooks/hooks.json` | one `PreToolUse` entry, its matcher, its command and its allowance |
-| The command it names | `plugins/spn-infra/src/scripts/events/pretooluse.ts` | the dispatcher, reached through `CLAUDE_PLUGIN_ROOT` rather than through any checkout |
-| What the dispatcher resolves | `plugins/spn-infra/src/scripts/checks/subjects.ts` | which subjects judge this write, discovered rather than listed in the wiring |
-| The decision it speaks | `plugins/spn-infra/src/scripts/lib/payload.ts` | this plugin's own copy of the event and verdict shapes |
-| The proof it fires | `plugins/spn-infra/tests/helpers/harness.mjs` | a real process per case, handed an event and read for its decision |
+| The wiring | `packages/plugin-spn-infra/src/hooks/hooks.json` | one `PreToolUse` entry, its matcher, its command and its allowance |
+| The command it names | `packages/plugin-spn-infra/src/scripts/events/pretooluse.ts` | the dispatcher, reached through `CLAUDE_PLUGIN_ROOT` rather than through any checkout |
+| What the dispatcher resolves | `packages/plugin-spn-infra/src/scripts/checks/subjects.ts` | which subjects judge this write, discovered rather than listed in the wiring |
+| The decision it speaks | `packages/plugin-spn-infra/src/scripts/lib/payload.ts` | this plugin's own copy of the event and verdict shapes |
+| The proof it fires | `packages/plugin-spn-infra/tests/helpers/harness.mjs` | a real process per case, handed an event and read for its decision |
 
 ## Follows the pattern
 
 - The moments, the payload, the verdict returned rather than printed, and the always-zero exit — [Hooks](../../../02-constructs/01-devex/02-hooks.md)
-- The plugin that wires four moments across seven tools — [Hooks in spn-devex](../../01-devex/spn-devex/02-hooks.md)
+- The plugin that wires four moments across seven tools — [Hooks in spn-devex](../../01-devex/plugin-spn-devex/02-hooks.md)
 
 ## Special handling
 
@@ -29,7 +29,7 @@ This plugin's wiring is one entry. Every law it holds is about what a file conta
 
 **Why** — *a call about to run is the last point a write can still be stopped*. Every later moment arrives after the file exists and can do nothing but comment, and an estate leak found after the fact is expensive.
 **What** — one `PreToolUse` entry, and nothing at the window opening, after a command, or before a turn ends. This plugin has nothing to say at any of those.
-**How** — the single entry in `plugins/spn-infra/src/hooks/hooks.json`.
+**How** — the single entry in `packages/plugin-spn-infra/src/hooks/hooks.json`.
 
 ### The matcher narrows before the command runs
 
@@ -47,7 +47,7 @@ This plugin's wiring is one entry. Every law it holds is about what a file conta
 
 **Why** — *code is filed by what kind of thing it is*, and a wiring file is not code.
 **What** — `hooks/` carries `hooks.json` and nothing else. The dispatcher, the gate and the rule bodies live under `scripts/`.
-**How** — the wired path leaves the hooks folder immediately, which is why a reader looking for what a refusal says opens the scripts tree. `plugins/spn-infra/src/scripts/`.
+**How** — the wired path leaves the hooks folder immediately, which is why a reader looking for what a refusal says opens the scripts tree. `packages/plugin-spn-infra/src/scripts/`.
 
 ### The allowance covers a cold run
 

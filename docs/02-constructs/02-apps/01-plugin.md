@@ -93,5 +93,6 @@ This page answers what this plugin claims about itself and what its version mean
 | `RD.GOV.024` | a repository answers to the world it declares, which is what the plugin set is derived from | MUST |
 | the marketplace's `CLAUDE.md` § Versioning | the plugins move together, at one number, stamped in each manifest because that is what a marketplace reads | MUST |
 | the foundation's `02-delivery.md` § The set a repo gets is derived from its own claim | a workspace never types a plugin name | MUST |
+| the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | source beside a committed build, one command entry, a shared folder never installed on its own | MUST |
 
-Try it: `node plugins/spn-devex/src/scripts/tools/partner-shape.ts`
+Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs plugin partner` (or `spn-devex plugin partner`, once installed)

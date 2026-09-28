@@ -6,25 +6,25 @@
 
 `For: DevOps / SRE · Architect` · `Status: ✅ DONE` · `Realizes: Plugin`
 
-`spn-infra` is one folder under `plugins/`, carrying a manifest and the construct folders beneath it. It is the smallest of the three plugins and the narrowest in reach: a session loads it only where the repository it is standing in declares the estate world. **The version is the set's and the identity is this plugin's own** — the number moves with its siblings whether or not anything here changed, and the description belongs to this folder alone.
+`spn-infra` is one folder under `packages/`, carrying a manifest and the construct folders beneath it. It is the smallest of the three plugins and the narrowest in reach: a session loads it only where the repository it is standing in declares the estate world. **The version is the set's and the identity is this plugin's own** — the number moves with its siblings whether or not anything here changed, and the description belongs to this folder alone.
 
 ## Where
 
 | Part of the construct | Lives in | What it is |
 | --- | --- | --- |
-| The manifest | `plugins/spn-infra/src/.claude-plugin/plugin.json` | the name, the version, the description a session matches against, and the author |
+| The manifest | `packages/plugin-spn-infra/src/.claude-plugin/plugin.json` | the name, the version, the description a session matches against, and the author |
 | The marketplace entry | `.claude-plugin/marketplace.json` | this plugin's entry: its name, the folder holding it, and a description a listing can show |
-| The wiring it ships | `plugins/spn-infra/src/hooks/hooks.json` | the one moment it claims, named against the plugin root |
-| The skills it ships | `plugins/spn-infra/src/skills/` | one folder per skill, each holding one `SKILL.md` |
-| The scripts it ships | `plugins/spn-infra/src/scripts/` | the dispatcher, the gate and the rule bodies |
-| The refs it ships | `plugins/spn-infra/src/refs/support/infra/` | the cards restating the estate's vocabulary, including each cloud's own words |
-| The providers it ships | `plugins/spn-infra/src/providers/` | one folder per cloud it carries a write-time parse for |
-| The tests it ships | `plugins/spn-infra/tests/` | its own proofs, run by one command |
+| The wiring it ships | `packages/plugin-spn-infra/src/hooks/hooks.json` | the one moment it claims, named against the plugin root |
+| The skills it ships | `packages/plugin-spn-infra/src/skills/` | one folder per skill, each holding one `SKILL.md` |
+| The scripts it ships | `packages/plugin-spn-infra/src/scripts/` | the dispatcher, the gate and the rule bodies |
+| The refs it ships | `packages/plugin-spn-infra/src/refs/support/infra/` | the cards restating the estate's vocabulary, including each cloud's own words |
+| The providers it ships | `packages/plugin-spn-infra/src/providers/` | one folder per cloud it carries a write-time parse for |
+| The tests it ships | `packages/plugin-spn-infra/tests/` | its own proofs, run by one command |
 
 ## Follows the pattern
 
 - The manifest shape, the marketplace file and what an installed copy is — [The Plugin](../../../02-constructs/01-devex/01-plugin.md)
-- How the widest of the three folders realizes the same shape — [Plugin in spn-devex](../../01-devex/spn-devex/01-plugin.md)
+- How the widest of the three folders realizes the same shape — [Plugin in spn-devex](../../01-devex/plugin-spn-devex/01-plugin.md)
 - The Node shape this folder realizes — source beside a committed build, a shared folder never installed on its own — the foundation's `04-plugins/02-shape.md`
 
 ## Special handling
@@ -32,20 +32,20 @@
 ### The folder moved to packages/, and this plugin's own payload and timing are gone
 
 **Why** — *the foundation's `04-plugins/02-shape.md` states a shared folder as the way two plugins hold one copy of a helper instead of two that can quietly drift*, and this plugin's `payload.ts` and `timing.ts` were byte-identical to `spn-apps`'s.
-**What** — this plugin's source now sits at `packages/plugin-spn-infra/src/`, moved from `plugins/spn-infra/src/`. Both files were deleted from this plugin's own `scripts/lib/`; this plugin now imports the one copy of each from `packages/plugin-support-lib/src/lib/`, which carries no `package.json` and no name of its own. This plugin never held `kinds.ts`, `register.ts` or `runs.ts` — it ships no register-reading tool — so nothing of those three moves for it.
+**What** — this plugin's source now sits at `packages/plugin-spn-infra/src/`, moved from `packages/plugin-spn-infra/src/`. Both files were deleted from this plugin's own `scripts/lib/`; this plugin now imports the one copy of each from `packages/plugin-support-lib/src/lib/`, which carries no `package.json` and no name of its own. This plugin never held `kinds.ts`, `register.ts` or `runs.ts` — it ships no register-reading tool — so nothing of those three moves for it.
 **How** — by relative path, the way this plugin imports any other file in the checkout: `packages/plugin-spn-infra/src/`, `packages/plugin-support-lib/src/lib/`.
 
-### 🔮 Planned, and further off than its two siblings: a committed build, no commands yet
+### A committed build, further off than its two siblings: no commands yet
 
-**Why** — the foundation's `04-plugins/02-shape.md` states the target every plugin here is moving to.
-**What** — this plugin gains a committed `dist/` that `hooks.json` will run instead of `src/scripts/events/pretooluse.ts`, with a test that refuses a bundle older than what it was built from — the same as its two siblings. **What it does not gain in this pass is a `cli.ts` or a `commands/` folder**: this plugin ships no `tools/` folder today, only the write-time gate, so there is no flat list of tools for a `<group> <action>` entry to replace yet.
+**Why** — the foundation's `04-plugins/02-shape.md` states the target every plugin here realizes.
+**What** — this plugin carries a committed `dist/` that `hooks.json` runs instead of `src/scripts/events/pretooluse.ts`, with a test that refuses a bundle older than what it was built from — the same as its two siblings. **What it does not gain is a `cli.ts` or a `commands/` folder**: this plugin ships no `tools/` folder, only the write-time gate, so there is no flat list of tools for a `<group> <action>` entry to replace.
 **How** — read the standard chapter before reading anything built against it here.
 
 ### The three plugins carry one number
 
 **Why** — *a reader cannot tell three version numbers apart*. The plugins install as one set, by one command, and a session loads whichever of them its repository declares; three different numbers leave nobody able to say whether that is three deliberate versions or one release that half-landed.
 **What** — the three carry the same version, and a release moves all three. A plugin with nothing changed in it is released anyway, at the new number.
-**How** — the number is written into each manifest, because that is what a Claude marketplace reads, and the increment belongs to the set: after a release, the first edit to any of the three moves all three. `plugins/spn-infra/src/.claude-plugin/plugin.json`.
+**How** — the number is written into each manifest, because that is what a Claude marketplace reads, and the increment belongs to the set: after a release, the first edit to any of the three moves all three. `packages/plugin-spn-infra/src/.claude-plugin/plugin.json`.
 
 ### The number names what is published
 
@@ -57,7 +57,7 @@
 
 **Why** — *a description is matched against the work at hand, not browsed by a person*. A short one leaves a session guessing, and a session that guesses wrong loads the wrong standard.
 **What** — it states in full what this plugin carries: the skills that change an estate, the cards holding the estate's vocabulary and the naming grammar, the per-cloud material, and the refusal a write meets.
-**How** — the marketplace entry carries a second description for a listing, and where the two disagree the manifest is the current side. `plugins/spn-infra/src/.claude-plugin/plugin.json`.
+**How** — the marketplace entry carries a second description for a listing, and where the two disagree the manifest is the current side. `packages/plugin-spn-infra/src/.claude-plugin/plugin.json`.
 
 ### It loads where a repository declares the estate world
 
@@ -69,7 +69,7 @@
 
 **Why** — *an agent brief convenes a reviewer over a change*, and the estate's own review happens against a rendering through the tool's doors rather than against a diff.
 **What** — this plugin ships no `agents/` folder. Nothing stands in its place, and no empty folder suggests one is coming.
-**How** — the review that does happen is a skill, not a brief. `plugins/spn-infra/src/skills/review/SKILL.md`.
+**How** — the review that does happen is a skill, not a brief. `packages/plugin-spn-infra/src/skills/review/SKILL.md`.
 
 ## Between modules
 

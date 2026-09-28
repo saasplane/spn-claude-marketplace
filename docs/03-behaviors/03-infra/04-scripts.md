@@ -32,6 +32,8 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.45 | Architect | add a cloud without editing the gate | The gate reads which provider folders exist rather than naming any cloud | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.46 | DevSecOps / Security | be caught spelling one cloud's region while the declaration names another | Every cloud's validators run rather than only the declared one's | NEGATIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.47 | Partner / integrator | install this plugin on its own and still have the gate work | The event and timing helpers are this plugin's own copies, so nothing is resolved out of a sibling | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.61 | Quality engineer | be refused at write time for filing a test under the wrong tier folder | A case-like file outside the tier folder its extension belongs to is denied, naming the tier it should sit under — proven in `tests/unit/scripts/lib/t-test-tree-shape.mjs` | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.62 | DevOps / SRE | write the one sanctioned test ARN without being denied | An ARN naming the placeholder account `000000000000` is allowed only inside a `*.tftest.hcl` file; the same ARN elsewhere, or any other account inside a test file, is denied — proven in `tests/unit/scripts/lib/laws/t-estate.mjs` | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

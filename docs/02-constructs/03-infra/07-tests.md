@@ -83,6 +83,14 @@ The harness writes a hook event to a fresh process on standard input and parses 
 
 There is no `integration/` folder and no `setup/` folder. Nothing runs at that tier in this plugin, and the runner needs no fixture stood up before it starts. **An empty folder would teach a reader that the tier works**, so neither exists, which is the same rule a cloud with no validator follows.
 
+### The payload a case replays sits beside the suites, once per event
+
+`tests/fixtures/payloads/pretooluse/` holds one recorded call for the one event this plugin wires, and a suite reads it rather than constructing its own. A payload is an input, never a generated answer, so a stale one is a fixture problem and never a passing case that stopped proving anything.
+
+### Two more cases prove the bundle, not one file
+
+`unit/t-dist-current.mjs` and `unit/t-bundle-parity.mjs` sit at the tree's root rather than under any one mirror, because each proves a property of the whole plugin: the first recomputes a bundle's declared sources against the banner esbuild wrote into it, and the second runs a recorded payload through the source and through the committed bundle and asserts the two agree. Both call the one shared harness the foundation's plugins realization states, `packages/plugin-support-lib/tests/helpers/`, so the build and the check can never quietly disagree. This plugin ships no `commands/`, but `hooks.json` still runs a built `dist/events/pretooluse.mjs`, so it owes both cases exactly as its two siblings do.
+
 ## Boundary
 
 This page answers where a proof of this plugin lives, what the path means, and what the runner and the harness each do. It does not answer what a tier is or what a passing suite does and does not mean — that is the foundation's test standard, restated for the agent's loop by [Tests](../01-devex/08-tests.md). It does not answer what any rule refuses.
@@ -97,8 +105,9 @@ This page answers where a proof of this plugin lives, what the path means, and w
 
 | Rule | What it decides | Weight |
 | --- | --- | --- |
-| the foundation's DevEx Test construct | which tier a proof belongs to, and that a tier names a kind of proof rather than a folder of convenience | MUST |
+| the foundation's DevEx Test construct § The test tree | which tier a proof belongs to, and that a tier names a kind of proof rather than a folder of convenience | MUST |
 | `RD.DEVEX.019` | a suite proves a rule stated elsewhere and states none of its own | MUST |
 | the apps plugin's subject registry | *until a parser exists there is no folder for it* — which is why no tier stands empty here | MUST |
+| the foundation's `04-plugins/02-shape.md` | the staleness case, the parity case, the payload fixture, and the shared harness every plugin's tests owe once it builds | MUST |
 
-Try it: `node plugins/spn-infra/tests/run.mjs`
+Try it: `node packages/plugin-spn-infra/tests/run.mjs`

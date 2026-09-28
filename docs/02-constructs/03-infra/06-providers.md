@@ -100,4 +100,4 @@ This page answers what this plugin puts in a provider folder and why the halves 
 | `RD.DEVEX.019` | a provider folder restates nothing and states no rule the domain owns | MUST |
 | the apps plugin's subject registry | *until a parser exists there is no folder for it* — a realization that is absent says so, and a stub that answers teaches you it works | MUST |
 
-Try it: `node plugins/spn-infra/tests/run.mjs`
+Try it: `node packages/plugin-spn-infra/tests/run.mjs`

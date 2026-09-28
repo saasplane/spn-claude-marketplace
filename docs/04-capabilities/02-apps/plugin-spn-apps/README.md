@@ -19,8 +19,8 @@
 
 | Construct | Realized by |
 | --- | --- |
-| Plugin · Hook · Loop Events · Checks · Tools · Pages · Skill · Ref · Lenses · Agent | [spn-devex](../../01-devex/spn-devex/README.md) |
-| Estate Guard · Estate Skills · Estate Refs | [spn-infra](../../03-infra/spn-infra/README.md) |
+| Plugin · Hook · Loop Events · Checks · Tools · Pages · Skill · Ref · Lenses · Agent | [spn-devex](../../01-devex/plugin-spn-devex/README.md) |
+| Estate Guard · Estate Skills · Estate Refs | [spn-infra](../../03-infra/plugin-spn-infra/README.md) |
 
 Source folders, one per chapter: `.claude-plugin/plugin.json` for Plugin · `hooks/hooks.json` for Hooks · `skills/` for Skills · `scripts/` for Scripts — the gate, plus the `lib/` and `tools/` beside it · `refs/` for Refs · `providers/ts/` for Providers, both halves · `tests/` for Tests. This plugin ships no `agents/`, and the absence is the statement.
 

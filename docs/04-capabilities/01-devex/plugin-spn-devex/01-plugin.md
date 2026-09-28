@@ -12,10 +12,10 @@
 
 | Part of the construct | Lives in | What it is |
 | --- | --- | --- |
-| The manifest | `plugins/spn-devex/src/.claude-plugin/plugin.json` | `name`, `version`, `description`, `author` |
-| The marketplace entry | `.claude-plugin/marketplace.json` | the repository's own list; the `spn-devex` row names `./plugins/spn-devex` |
-| What the folder delivers | `plugins/spn-devex/src/` | `hooks/` · `agents/` · `skills/` · `scripts/` · `refs/`, with `tests/` beside them at the plugin's root |
-| What a wired path names | `plugins/spn-devex/src/hooks/hooks.json` | a command written against `CLAUDE_PLUGIN_ROOT`, so it resolves inside the installed copy rather than in this checkout |
+| The manifest | `packages/plugin-spn-devex/src/.claude-plugin/plugin.json` | `name`, `version`, `description`, `author` |
+| The marketplace entry | `.claude-plugin/marketplace.json` | the repository's own list; the `spn-devex` row names `./packages/plugin-spn-devex` |
+| What the folder delivers | `packages/plugin-spn-devex/src/` | `hooks/` · `agents/` · `skills/` · `scripts/` · `refs/`, with `tests/` beside them at the plugin's root |
+| What a wired path names | `packages/plugin-spn-devex/src/hooks/hooks.json` | a command written against `CLAUDE_PLUGIN_ROOT`, so it resolves inside the installed copy rather than in this checkout |
 
 ## Follows the pattern
 
@@ -28,26 +28,26 @@
 ### The folder moved to packages/, and a shared folder now sits beside it
 
 **Why** — *esbuild follows a relative import*, so a helper more than one plugin needs can live once and still end up inside every plugin's own installed copy. Writing it as a package with a name would add machinery — a workspace entry, a second `package.json` — for no reader, so the foundation's `04-plugins/02-shape.md` states it as a plain folder instead, and this plugin is the first to realize that chapter.
-**What** — this plugin's source now sits at `packages/plugin-spn-devex/src/`, moved from `plugins/spn-devex/src/`. Three helpers this plugin shared byte-for-byte with `spn-apps` — `kinds.ts`, `register.ts` and `runs.ts` — moved out of this plugin's own `scripts/lib/` into the new `packages/plugin-support-lib/src/lib/`, which carries no `package.json` and no name of its own. This plugin's `payload.ts` and `timing.ts` stayed put rather than joining them: diffed against the copies `spn-apps` and `spn-infra` share, they turned out genuinely different in purpose — this plugin's read the hook's call payload off standard input synchronously and carry the file-walking helpers a dozen of its own checks import, where the shared pair reads it asynchronously and carries a field this plugin's own `emit` never used.
+**What** — this plugin's source now sits at `packages/plugin-spn-devex/src/`, moved from `packages/plugin-spn-devex/src/`. Three helpers this plugin shared byte-for-byte with `spn-apps` — `kinds.ts`, `register.ts` and `runs.ts` — moved out of this plugin's own `scripts/lib/` into the new `packages/plugin-support-lib/src/lib/`, which carries no `package.json` and no name of its own. This plugin's `payload.ts` and `timing.ts` stayed put rather than joining them: diffed against the copies `spn-apps` and `spn-infra` share, they turned out genuinely different in purpose — this plugin's read the hook's call payload off standard input synchronously and carry the file-walking helpers a dozen of its own checks import, where the shared pair reads it asynchronously and carries a field this plugin's own `emit` never used.
 **How** — a source file elsewhere in this plugin that needs a shared helper imports `../../../../plugin-support-lib/src/lib/<name>` by relative path, the same way it would import any other file in the checkout. `packages/plugin-spn-devex/src/`, `packages/plugin-support-lib/src/lib/`.
 
-### 🔮 Planned: a committed build beneath the source, reached through one command entry
+### A committed build sits beneath the source, reached through one command entry
 
-**Why** — *a hook that pays for type-stripping on every call is a hook somebody eventually stops trusting to be fast*, and a plugin offering sixteen tools by sixteen separate paths is a vocabulary that grows by one every time somebody adds a tool. The foundation's `04-plugins/02-shape.md` states the target every plugin here is moving to, and this plugin has not reached it yet.
-**What** — `src/scripts/` will gain one entry, `cli.ts`, dispatching `<group> <action>` to `commands/<group>/<action>.ts` files in place of today's flat `tools/`, and `hooks.json` will run a committed `dist/cli.mjs` and `dist/events/*.mjs` instead of the `.ts` sources, with a test that refuses a bundle older than what it was built from. A hook script stays live on its next run either way; a bundle changes what that means without changing the rule.
+**Why** — *a hook that pays for type-stripping on every call is a hook somebody eventually stops trusting to be fast*, and a plugin offering sixteen tools by sixteen separate paths is a vocabulary that grows by one every time somebody adds a tool. The foundation's `04-plugins/02-shape.md` states the target every plugin here realizes.
+**What** — `src/scripts/` carries one entry, `cli.ts`, dispatching `<group> <action>` to `commands/<group>/<action>.ts` files, and `hooks.json` runs a committed `dist/cli.mjs` and `dist/events/*.mjs` instead of the `.ts` sources. `tests/unit/t-dist-current.mjs` refuses a bundle older than what it was built from, calling the shared harness in `plugin-support-lib`. A hook script stays live on its next run either way; a bundle changes what that means without changing the rule.
 **How** — read the standard chapter before reading anything built against it here; a rule this plugin states and the chapter does not is a defect rather than something this plugin does differently.
 
 ### The version is moved after the release, never before
 
 **Why** — *a cache directory is keyed by the plugin's name and its manifest version*. A plugin edited without moving the number installs over its own published bytes, and nothing on screen says which copy is running.
 **What** — `spn-devex` ships at the version its manifest already carries, and the first edit after that release sets the next one. So the field answers *what does the cache hold*, not *what am I building*.
-**How** — the number is a hand edit to one field, reviewed like any other line. Read `plugins/spn-devex/src/.claude-plugin/plugin.json`, then the repository's own `CLAUDE.md` § The count moves after the release.
+**How** — the number is a hand edit to one field, reviewed like any other line. Read `packages/plugin-spn-devex/src/.claude-plugin/plugin.json`, then the repository's own `CLAUDE.md` § The count moves after the release.
 
 ### Three plugins at three versions, on purpose
 
 **Why** — *`RD.APPS.034` rules lockstep versioning inside an `APPS` repository, and this repository declares `GENERAL`*. Read the wrong rule here and three different numbers look like a defect to be fixed.
 **What** — each plugin folder counts on its own, following the Claude marketplace's convention of one version per plugin. `spn-devex` moves when `spn-devex` changes, and the other two do not move with it.
-**How** — there is no shared version file and nothing derives one number from another. The three manifests are the three answers: `plugins/spn-devex/src/.claude-plugin/plugin.json`, and the same path under `plugins/spn-apps/` and `plugins/spn-infra/`.
+**How** — there is no shared version file and nothing derives one number from another. The three manifests are the three answers: `packages/plugin-spn-devex/src/.claude-plugin/plugin.json`, and the same path under `packages/plugin-spn-apps/` and `packages/plugin-spn-infra/`.
 
 ### The marketplace file is written by hand and by nothing else
 

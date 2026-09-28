@@ -86,6 +86,14 @@ This repository declares no stack, so no stack runner writes its behaviour rows.
 
 A suite runs the script the way a moment runs it — as a process, handed a payload on standard input, read back from standard output — rather than importing a function and calling it. A gate that passes when imported and fails when spawned is a gate that has never been proven, and both spellings exist in the folder it is asked about.
 
+### The payload a case replays sits beside the suites, once per event
+
+`tests/fixtures/payloads/<event>/` holds one recorded call per event this plugin wires — `orientation` · `pretooluse` · `closed` · `stop` — and a suite reads one rather than constructing its own. A payload is an input, never a generated answer, so a stale one is a fixture problem and never a passing case that stopped proving anything.
+
+### Two more cases prove the bundle, not one file
+
+Once a plugin builds, `unit/t-dist-current.mjs` and `unit/t-bundle-parity.mjs` sit at the tree's root rather than under any one mirror, because each proves a property of the whole plugin: the first recomputes a bundle's declared sources against the banner esbuild wrote into it, and the second runs a recorded payload through the source and through the committed bundle and asserts the two agree. Both call the one shared harness the foundation's plugins realization states, `packages/plugin-support-lib/tests/helpers/`, so the build and the check can never quietly disagree.
+
 ## Boundary
 
 This page answers where a suite sits, how it is found, and what it may not compute for itself. It does not answer which tier a given behaviour belongs to, or what a passing suite does and does not mean — the foundation's own test chapter rules that, and it is the source of the tier names used here. It does not answer what the scripts under proof do either.
@@ -101,9 +109,10 @@ This page answers where a suite sits, how it is found, and what it may not compu
 
 | Rule | What it decides | Weight |
 | --- | --- | --- |
-| the foundation's test construct | the tier names, and what a passing suite may be read as saying | MUST |
+| the foundation's test construct § The test tree | the tier names, and what a passing suite may be read as saying | MUST |
 | the apps provider's `test` step | `tests/` sits at a project's root and never beside the source it proves | MUST |
 | `RD.GOV.024` | this repository is served with docs commands alone, which is why the plugins' own suites are its runner | MUST |
 | `RD.DEVEX.019` | a suite proves a restatement fires; it states no rule of its own | MUST |
+| the foundation's `04-plugins/02-shape.md` | the staleness case, the parity case, the payload fixture, and the shared harness every plugin's tests owe once it builds | MUST |
 
-Try it: `node plugins/spn-devex/tests/run.mjs`
+Try it: `node packages/plugin-spn-devex/tests/run.mjs`

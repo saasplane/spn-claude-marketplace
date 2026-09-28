@@ -141,7 +141,7 @@ LIVE=$(claude plugin list --json | node -e \
        if (p.projectPath === process.argv[1] && p.id === process.argv[2]) console.log(p.installPath);
    })' "$REPO" spn-devex@saasplane)
 
-diff -rq "$LIVE/" "$REPO/plugins/spn-devex/" | grep -v "__pycache__\|\.DS_Store\|\.in_use"
+diff -rq "$LIVE/" "$REPO/packages/plugin-spn-devex/" | grep -v "__pycache__\|\.DS_Store\|\.in_use"
 ```
 
 Silence means the installed bytes are the bytes you are reading. Any output means the session is running something older than your working tree, and `spnutils repo agent-sync` is what reconciles it.

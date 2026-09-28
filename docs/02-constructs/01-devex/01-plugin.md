@@ -27,7 +27,7 @@ This construct realizes the book's `01-devex/02-agent/04-plugins`.
 
 | Term | Contract term | What it means |
 | --- | --- | --- |
-| a plugin | `plugin.json` | one folder under `plugins/`, named for what it serves, carrying `.claude-plugin/plugin.json` and any mix of the constructs below it |
+| a plugin | `plugin.json` | one folder under `packages/`, named for what it serves, carrying `.claude-plugin/plugin.json` and any mix of the constructs below it |
 | the marketplace | `marketplace.json` | the one file at `.claude-plugin/marketplace.json` naming every plugin this repository ships, and the folder each one lives in |
 | the version | `version` | the field in a manifest saying which bytes are published; the count moves after a release, never before |
 | the plugin root | `CLAUDE_PLUGIN_ROOT` | the installed folder a session reads, and the base every wired command path is written against |
@@ -94,6 +94,6 @@ This page answers what a plugin is made of, how it is listed, and what an instal
 | `RD.GOV.024` | a repository with no nodes still declares a world and still earns a docs tree, which is why this model is written here at all | MUST |
 | the foundation's `02-delivery.md` § The set a repo gets is derived from its own claim | a workspace never types a plugin name; the set comes from the consuming repository's own manifest | MUST |
 | [MD6](../../registers/decisions.md) | the manifest is the current description, and a marketplace entry that disagrees with it is the stale side | MUST |
-| the foundation's `04-plugins/02-shape.md` | the Node realization of this construct's own shape — source beside a committed build, and a shared folder never installed on its own | MUST |
+| the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | the Node realization of this construct's own shape — source beside a committed build, and a shared folder never installed on its own | MUST |
 
-Try it: `node plugins/spn-devex/src/scripts/tools/partner-shape.ts`
+Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs plugin partner` (or `spn-devex plugin partner`, once installed)

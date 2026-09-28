@@ -1,10 +1,10 @@
 <!-- spn:doc
-{"id": "spn-devex-capabilities-tests", "variant": "capability", "title": "Tests in spn-devex", "lenses": ["ARCHITECT", "QA"], "status": "PLANNING", "realizes": ["tests"], "summary": "How this plugin proves itself — the tier folders it borrows from the TypeScript convention without its framework, the mirror that files a suite where its source sits, and the rule that no suite may count a path depth.", "keywords": ["tests", "tier", "mirror", "harness", "runner", "suite"]}
+{"id": "spn-devex-capabilities-tests", "variant": "capability", "title": "Tests in spn-devex", "lenses": ["ARCHITECT", "QA"], "status": "DONE", "realizes": ["tests"], "summary": "How this plugin proves itself — the tier folders it borrows from the TypeScript convention without its framework, the mirror that files a suite where its source sits, and the rule that no suite may count a path depth.", "keywords": ["tests", "tier", "mirror", "harness", "runner", "suite"]}
 -->
 
 # Tests in spn-devex
 
-`For: Architect · Quality engineer` · `Status: 🔮 PLANNING` · `Realizes: Tests`
+`For: Architect · Quality engineer` · `Status: ✅ DONE` · `Realizes: Tests`
 
 Twenty suites drive the real scripts as processes, feeding each one an event on standard input and reading the verdict back off standard output. **Nothing here imports a rule and calls it.** A check that passes when called as a function and fails when spawned as a hook is a check that does not work, and only the second is what a session runs.
 
@@ -12,15 +12,15 @@ Twenty suites drive the real scripts as processes, feeding each one an event on 
 
 | Part of the construct | Lives in | What it is |
 | --- | --- | --- |
-| The runner | `plugins/spn-devex/tests/run.mjs` | walks the tree for `t-*.mjs`, runs each, and reports per suite |
-| The shared harness | `plugins/spn-devex/tests/helpers/harness.mjs` | the plugin root, the fixture builder, and the one-case assertion |
-| The fixture builder | `plugins/spn-devex/tests/helpers/fixture.mjs` | a repository shaped on disk for a case to run against |
-| Checks | `plugins/spn-devex/tests/unit/scripts/checks/` | one suite per file under `src/scripts/checks/` |
-| Loop events | `plugins/spn-devex/tests/unit/scripts/events/` | the dispatcher, the orientation screen, the close, the stop |
-| Tools | `plugins/spn-devex/tests/unit/scripts/tools/` | the corpus tools, each run as a command |
-| Libraries | `plugins/spn-devex/tests/unit/scripts/lib/` | the shared computations a tool and a check both read |
-| The corpus-shape suite | `plugins/spn-devex/tests/unit/scripts/t-seats.mjs` | a whole-tree property rather than one file's behaviour |
-| What fills a row from a run | `plugins/spn-devex/src/scripts/tools/behaviour-rows.ts` | reads the run's own artifact and writes the two cells a run owns into each row a case's title names |
+| The runner | `packages/plugin-spn-devex/tests/run.mjs` | walks the tree for `t-*.mjs`, runs each, and reports per suite |
+| The shared harness | `packages/plugin-spn-devex/tests/helpers/harness.mjs` | the plugin root, the fixture builder, and the one-case assertion |
+| The fixture builder | `packages/plugin-spn-devex/tests/helpers/fixture.mjs` | a repository shaped on disk for a case to run against |
+| Checks | `packages/plugin-spn-devex/tests/unit/scripts/checks/` | one suite per file under `src/scripts/checks/` |
+| Loop events | `packages/plugin-spn-devex/tests/unit/scripts/events/` | the dispatcher, the orientation screen, the close, the stop |
+| Commands | `packages/plugin-spn-devex/tests/unit/scripts/commands/` | one folder per `<group>`, one suite per action, plus `t-cli.mjs` for the dispatcher itself |
+| Libraries | `packages/plugin-spn-devex/tests/unit/scripts/lib/` | the shared computations a command and a check both read |
+| The corpus-shape suite | `packages/plugin-spn-devex/tests/unit/scripts/t-seats.mjs` | a whole-tree property rather than one file's behaviour |
+| What fills a row from a run | `packages/plugin-spn-devex/src/scripts/commands/behaviours/stamp.ts` | reads the run's own artifact and writes the two cells a run owns into each row a case's title names |
 
 ## Follows the pattern
 
@@ -31,17 +31,17 @@ Twenty suites drive the real scripts as processes, feeding each one an event on 
 
 ## Special handling
 
-### 🔮 Planned: a staleness case and a parity case join the mirror
+### A staleness case and a parity case join the mirror
 
 **Why** — *a bundle older than its sources runs rules nobody wrote*, and a bundle that silently changed behaviour during a rebuild is worse than no bundle at all — the foundation's `04-plugins/02-shape.md` states both as things every plugin's suite must refuse once it builds.
-**What** — `unit/t-dist-current.mjs` will recompute the hash of a bundle's declared sources and compare it against the banner esbuild writes into the bundle, naming the bundle that is now lying about what it runs. `unit/t-bundle-parity.mjs` will run the same recorded payload through the source and through the committed bundle and assert the source's answer and exit code match the bundle's, reading fixtures from a new `tests/fixtures/payloads/`.
-**How** — both sit at `tests/unit/`, beside the suites this page already lists, because they prove a property of the whole plugin rather than of one file.
+**What** — `unit/t-dist-current.mjs` recomputes the hash of a bundle's declared sources and compares it against the banner esbuild writes into the bundle, naming the bundle that is now lying about what it runs. `unit/t-bundle-parity.mjs` runs the same recorded payload through the source and through the committed bundle and asserts the source's answer and exit code match the bundle's, reading fixtures from `tests/fixtures/payloads/`. Both call the shared harness in `packages/plugin-support-lib/tests/helpers/`.
+**How** — both sit at `tests/unit/`, beside the suites this page already lists, because they prove a property of the whole plugin rather than of one file. `packages/plugin-spn-devex/tests/unit/t-dist-current.mjs`, `packages/plugin-spn-devex/tests/unit/t-bundle-parity.mjs`.
 
-### 🔮 Planned: the Stop check's cache moves out of `.spndevex/`
+### The Stop check's cache lives outside `.spndevex/`
 
-**Why** — *`.spndevex/` is shared by every window and workstream, so two sessions finishing together would read and overwrite each other's verdict*. `checks/corpus.ts` is proven by this plugin's own suite, and its cache is moving to a place a parallel window cannot collide with.
-**What** — the fingerprint and the last-run record this check kept under `.spndevex/.debug/corpus/` move to `~/.spnutils/cache/corpus/`, the machine store, keyed by a content hash rather than by "last run" — so two windows either share an identical verdict or never meet, and a finding is replayed rather than dropped on a second run.
-**How** — proven the same way the rest of this folder is: a suite drives the real check as a process and reads its verdict back.
+**Why** — *`.spndevex/` is shared by every window and workstream, so two sessions finishing together would read and overwrite each other's verdict*. `checks/corpus.ts` is proven by this plugin's own suite, and its cache lives where a parallel window cannot collide with another.
+**What** — `checks/corpus.ts` keeps one verdict per docs tree in `~/.spnutils/cache/corpus/`, the machine store, keyed by a content hash rather than by "last run" — so two windows either share an identical verdict or never meet, and a finding is replayed rather than dropped on a second run. `.spndevex/.debug/corpus/` is no longer read or written.
+**How** — proven the same way the rest of this folder is: a suite drives the real check as a process and reads its verdict back. `packages/plugin-spn-devex/src/scripts/lib/corpus-cache.ts`, proven in `tests/unit/scripts/checks/t-corpus.mjs`.
 
 ### The folders are the stack's convention; the framework is not
 

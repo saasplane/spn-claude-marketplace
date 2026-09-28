@@ -110,4 +110,4 @@ This page answers which skills this domain ships and how they are shaped. It doe
 | `RD.DOCS.055` | a skill that carries a rule it does not own is a restatement, and says so under a stamp | MUST |
 | the foundation's `02-delivery.md` § When an edit becomes behaviour | a skill edit is loadable only after an install and a fresh window | MUST |
 
-Try it: `node plugins/spn-devex/src/scripts/tools/restate-drift.ts`
+Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs restates check` (or `spn-devex restates check`, once installed)
