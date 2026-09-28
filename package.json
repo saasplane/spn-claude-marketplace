@@ -1,0 +1,20 @@
+{
+  "name": "spn-claude-marketplace-build",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Dev-only build for the three plugins under packages/ — never installed, never shipped (N101 step 2).",
+  "type": "module",
+  "scripts": {
+    "build:plugins": "node scripts/build-plugins.mjs",
+    "build:plugins:watch": "node scripts/build-plugins.mjs --watch",
+    "test": "node scripts/test-all.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}

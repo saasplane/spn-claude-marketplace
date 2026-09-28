@@ -27,7 +27,13 @@ import { pathToFileURL } from "node:url";
 export type CommandModule = { describe: string; run: (args: string[]) => number | Promise<number> };
 
 const HERE = dirname(new URL(import.meta.url).pathname);
-const COMMANDS = join(HERE, "commands");
+// `commands/` ALWAYS SITS UNDER `scripts/`, never under `dist/` — the entry ships bundled to
+// `dist/cli.mjs`, but `commands/<group>/<action>.ts` stays real, unbundled source in the same `src/`
+// tree (`02-shape.md` § The tree), read here by its own relative path so a fresh action is reachable
+// the moment it exists, in either mode. `dirname(HERE)` is the plugin's `src/` whether this file is
+// running from `src/scripts/cli.ts` (HERE ends in `scripts`) or bundled to `src/dist/cli.mjs` (HERE
+// ends in `dist`), because both sit one level directly under `src/`.
+const COMMANDS = join(dirname(HERE), "scripts", "commands");
 const PLUGIN_NAME = "spn-devex";
 
 function isDir(path: string): boolean {
@@ -117,5 +123,8 @@ export async function main(argv: string[]): Promise<number> {
   return mod.run(rest);
 }
 
-if (process.argv[1] && basename(process.argv[1]) === "cli.ts")
+// MATCHES THE BUNDLED NAME TOO. `cli.ts` runs from source under that name; built, it runs as
+// `dist/cli.mjs` — the same file by a different extension, and a guard tied to one literal name
+// never fires for the other.
+if (process.argv[1] && ["cli.ts", "cli.mjs"].includes(basename(process.argv[1])))
   process.exit(await main(process.argv.slice(2)));

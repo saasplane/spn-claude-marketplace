@@ -161,8 +161,32 @@ function runOne(root: string, toolDir: string, tool: string, args: string[]): { 
   }
 }
 
-/** Every byte the checker runs sits under this folder: this check, the tools, the helpers they import. */
-const SCRIPTS = dirname(import.meta.dirname);
+/**
+ * The plugin's own `scripts/` folder — this check's own home when it runs from source, or the
+ * sibling of wherever this file ends up bundled to.
+ *
+ * ESBUILD COLLAPSES EVERY INLINED MODULE'S `import.meta.dirname` TO THE BUNDLE'S OWN LOCATION
+ * (proven empirically, not assumed): this file is a static import of `events/stop.ts`, so once
+ * `stop.ts` is built to `dist/events/stop.mjs`, `import.meta.dirname` inside this module reads as
+ * `.../src/dist/events`, never `.../src/checks`. `dirname(import.meta.dirname)` alone therefore
+ * answered `.../src/dist` after bundling — a folder with no `tools/`, no `refs/`, and no import of
+ * `plugin-support-lib` — which is why `TOOL_DIR` below is walked to a named ancestor rather than
+ * a fixed number of `..`. `scripts/` and `dist/` are always siblings directly under the plugin's
+ * `src/`, so climbing to the nearer of the two and returning its `scripts` sibling is correct
+ * whether this file is running from its own source path or bundled anywhere inside `dist/`.
+ */
+function pluginScriptsDir(from: string): string {
+  let dir = from;
+  for (let hop = 0; hop < 8; hop++) {
+    const name = basename(dir);
+    if (name === "scripts" || name === "dist") return join(dirname(dir), "scripts");
+    const up = dirname(dir);
+    if (up === dir) break;
+    dir = up;
+  }
+  return from;
+}
+const SCRIPTS = pluginScriptsDir(import.meta.dirname);
 const TOOL_DIR = join(SCRIPTS, "tools");
 /** The helpers the plugins share, imported by relative path. An installed copy runs bundles and has none. */
 const SUPPORT_LIB = resolve(SCRIPTS, "..", "..", "..", "plugin-support-lib", "src", "lib");

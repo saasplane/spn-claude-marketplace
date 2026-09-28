@@ -693,7 +693,12 @@ export function checkArcToPage(root: string): Warning[] {
 
 // ---------------------------------------------------------------------------- the hook
 
-if (process.argv[1] && process.argv[1].endsWith("stop.ts")) {
+// MATCHES THE BUNDLED NAME TOO, BY EXACT BASENAME. This hook ships built as `dist/events/stop.mjs`,
+// so the guard also accepts that name — but only the exact basename, never a suffix: this file's own
+// test imports it from `t-stop.mjs`, which `endsWith("stop.mjs")` also matches, and a loose check
+// made the test's own filename trip the guard it was never meant to fire for.
+const argv1Base = process.argv[1] ? basename(process.argv[1]) : "";
+if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   let input = "";
   try { input = readFileSync(0, "utf8"); } catch { /* no stdin: run as a check */ }
   let reply = "";

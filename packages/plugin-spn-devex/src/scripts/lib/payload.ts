@@ -11,7 +11,7 @@
 // exit. A hook that crashes takes every other gate in the chain down with it.
 
 import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { basename, dirname, join, resolve } from "node:path";
 
 export const DEVEX = ".spndevex";
 
@@ -113,7 +113,23 @@ export function emit(verdict: Verdict): void {
   console.log(JSON.stringify({ systemMessage: message, hookSpecificOutput: specific }));
 }
 
-/** True when this file was the one node was asked to run, rather than imported by the dispatcher. */
+/**
+ * True when this file was the one node was asked to run, rather than imported by another entry.
+ *
+ * `name` is the source file's own name (`"closed.ts"`), and matches when node's own entry is
+ * exactly that name — or the same stem bundled to `.mjs`/`.js`, since an event ships built as
+ * `dist/events/closed.mjs` and a guard that only recognised `.ts` never fired once the hook started
+ * running the bundle instead of the source it was built from.
+ *
+ * MATCHED ON THE EXACT BASENAME, NEVER A SUFFIX. A test file importing this module to reach its
+ * named exports is itself named `t-closed.mjs` — which `endsWith("closed.mjs")` also matches, so a
+ * loose suffix check made a test's own filename trip the guard it was never meant to fire for.
+ */
 export function runAlone(name: string): boolean {
-  return Boolean(process.argv[1] && process.argv[1].endsWith(name));
+  const argv1 = process.argv[1];
+  if (!argv1) return false;
+  const base = basename(argv1);
+  if (base === name) return true;
+  const stem = name.replace(/\.ts$/, "");
+  return base === `${stem}.mjs` || base === `${stem}.js`;
 }

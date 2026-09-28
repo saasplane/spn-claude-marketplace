@@ -10,10 +10,16 @@
 // discovers the set by walking that folder rather than listing it by hand, so a command that exists
 // is reachable and nothing here can drift from what `commands/` actually holds.
 import { readdirSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
 
 const NAME = "spn-apps";
-const COMMANDS_DIR = resolve(import.meta.dirname, "commands");
+// `commands/` ALWAYS SITS UNDER `scripts/`, never under `dist/` — this entry ships bundled to
+// `dist/cli.mjs`, but `commands/<group>/<action>.ts` stays real, unbundled source beside it in the
+// same `src/` tree (`02-shape.md` § The tree). `dirname(import.meta.dirname)` is the plugin's `src/`
+// whether this file runs from `src/scripts/cli.ts` or bundled to `src/dist/cli.mjs`, because both
+// sit one level directly under `src/`.
+const COMMANDS_DIR = resolve(dirname(import.meta.dirname), "scripts", "commands");
 
 type Command = { describe: string; run: (args: string[]) => number | Promise<number> };
 type Entry = { group: string; action: string; describe: string };
@@ -39,7 +45,12 @@ function discover(): { group: string; action: string }[] {
 
 async function load(group: string, action: string): Promise<Command | null> {
   try {
-    const module = await import(`./commands/${group}/${action}.ts`);
+    // `pathToFileURL(COMMANDS_DIR)`, NEVER A BARE RELATIVE SPECIFIER. `./commands/…` resolves
+    // relative to wherever THIS file's own module URL is — `src/scripts/cli.ts` from source, but
+    // `src/dist/cli.mjs` once built, where a relative `./commands/` would mean `src/dist/commands/`,
+    // which does not exist. Going through `COMMANDS_DIR` keeps both modes pointed at the one real
+    // folder, `src/scripts/commands/`.
+    const module = await import(pathToFileURL(join(COMMANDS_DIR, group, `${action}.ts`)).href);
     if (typeof module.run !== "function") return null;
     return { describe: typeof module.describe === "string" ? module.describe : "", run: module.run };
   } catch {
