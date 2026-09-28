@@ -1,10 +1,22 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/01-shape/README.md", "seen": "6637ce16" },
-    { "path": "spn-foundation/docs/02-constructs/README.md", "seen": "b794b20b" },
-    { "path": "spn-foundation/docs/04-capabilities/03-platform/README.md", "seen": "f4761dad" },
-    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/README.md", "seen": "a4980d9e" }
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/01-shape/README.md",
+      "seen": "6637ce16"
+    },
+    {
+      "path": "spn-foundation/docs/02-constructs/README.md",
+      "seen": "a0b09509"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/03-platform/README.md",
+      "seen": "9e249141"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/README.md",
+      "seen": "3e1b0df2"
+    }
   ]
 }
 -->

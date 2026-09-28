@@ -1,12 +1,27 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/README.md", "seen": "d2d663e9" }
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/README.md",
+      "seen": "25e32509"
+    }
   ],
   "decisions": [
-    { "repo": "spn-foundation", "row": "RD.SUPPORT.APPS.086", "seen": "79c8a6ab" },
-    { "repo": "spn-foundation", "row": "RD.SUPPORT.APPS.119", "seen": "ca6ac4b0" },
-    { "repo": "spn-foundation", "row": "RD.SUPPORT.APPS.120", "seen": "58c40896" }
+    {
+      "repo": "spn-foundation",
+      "row": "RD.SUPPORT.APPS.086",
+      "seen": "94cb911d"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.SUPPORT.APPS.119",
+      "seen": "ae5c3576"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.SUPPORT.APPS.120",
+      "seen": "d489cd69"
+    }
   ]
 }
 -->

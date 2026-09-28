@@ -1,8 +1,14 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/02-constructs/README.md", "seen": "b794b20b" },
-    { "path": "spn-foundation/docs/03-behaviors/README.md", "seen": "35978308" }
+    {
+      "path": "spn-foundation/docs/02-constructs/README.md",
+      "seen": "a0b09509"
+    },
+    {
+      "path": "spn-foundation/docs/03-behaviors/README.md",
+      "seen": "35978308"
+    }
   ]
 }
 -->

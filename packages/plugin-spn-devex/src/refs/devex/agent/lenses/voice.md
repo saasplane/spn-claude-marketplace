@@ -1,24 +1,85 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md", "seen": "8c2210a7" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md", "seen": "58dd67e2" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md", "seen": "47cd8c62" }
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md",
+      "seen": "65c6288d"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
+      "seen": "d82008b3"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
+      "seen": "03363c88"
+    }
   ],
   "decisions": [
-    { "repo": "spn-foundation", "row": "RD.DEVEX.WORKSPACE.096", "seen": "d6700f7d" },
-    { "repo": "spn-foundation", "row": "RD.DEVEX.WORKSPACE.106", "seen": "83fa43ec" },
-    { "repo": "spn-foundation", "row": "RD.DEVEX.WORKSPACE.107", "seen": "24f1da5b" },
-    { "repo": "spn-foundation", "row": "RD.DEVEX.WORKSPACE.115", "seen": "e84fd57b" },
-    { "repo": "spn-foundation", "row": "RD.DEVEX.WORKSPACE.123", "seen": "258aaa05" },
-    { "repo": "spn-foundation", "row": "RD.DEVEX.WORKSPACE.125", "seen": "597fb231" },
-    { "repo": "spn-foundation", "row": "RD.DEVEX.WORKSPACE.128", "seen": "57937b65" },
-    { "repo": "spn-foundation", "row": "RD.DEVEX.WORKSPACE.131", "seen": "ae85dabc" },
-    { "repo": "spn-foundation", "row": "RD.DEVEX.WORKSPACE.132", "seen": "d6454797" },
-    { "repo": "spn-foundation", "row": "RD.DEVEX.WORKSPACE.142", "seen": "90df1d4a" },
-    { "repo": "spn-foundation", "row": "RD.DEVEX.WORKSPACE.144", "seen": "8a9e528c" },
-    { "repo": "spn-foundation", "row": "RD.DEVEX.WORKSPACE.146", "seen": "9fbd2847" },
-    { "repo": "spn-foundation", "row": "RD.DEVEX.AGENT.032", "seen": "68b3c117" }
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.WORKSPACE.096",
+      "seen": "4709147e"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.WORKSPACE.106",
+      "seen": "ff6b9bba"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.WORKSPACE.107",
+      "seen": "b68ad9dd"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.WORKSPACE.115",
+      "seen": "2e6ee299"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.WORKSPACE.123",
+      "seen": "d849ffad"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.WORKSPACE.125",
+      "seen": "01791b6b"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.WORKSPACE.128",
+      "seen": "9d6cf718"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.WORKSPACE.131",
+      "seen": "1056821c"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.WORKSPACE.132",
+      "seen": "14c2ea18"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.WORKSPACE.142",
+      "seen": "d0144f4b"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.WORKSPACE.144",
+      "seen": "2409a449"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.WORKSPACE.146",
+      "seen": "923a6205"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.AGENT.032",
+      "seen": "b62ab180"
+    }
   ]
 }
 -->

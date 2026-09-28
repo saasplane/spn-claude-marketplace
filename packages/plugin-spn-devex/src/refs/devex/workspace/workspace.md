@@ -1,21 +1,70 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/01-workspace.md", "seen": "b8de31f1" },
-    { "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md", "seen": "1d95cfde" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md", "seen": "fcc9f0f9" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md", "section": "The agent is updated first, and reloaded before anything runs", "seen": "97526696" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md", "section": "An arc's status says which of eight states it is in", "seen": "0b096adf" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md", "section": "When an edit becomes behaviour", "seen": "37aada54" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md", "section": "Restatement discipline", "seen": "e1ff9549" }
+    {
+      "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/01-workspace.md",
+      "seen": "ce1ddbae"
+    },
+    {
+      "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
+      "seen": "7c725ca8"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
+      "seen": "18cbd178"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "section": "The agent is updated first, and reloaded before anything runs",
+      "seen": "97526696"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "section": "An arc's status says which of eight states it is in",
+      "seen": "5bb4305a"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",
+      "section": "When an edit becomes behaviour",
+      "seen": "37aada54"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
+      "section": "Restatement discipline",
+      "seen": "af497971"
+    }
   ],
   "decisions": [
-    { "repo": "spn-foundation", "row": "RD.DEVEX.WORKSPACE.058", "seen": "c0cd1ae0" },
-    { "repo": "spn-foundation", "row": "RD.DEVEX.WORKSPACE.020", "seen": "24448877" },
-    { "repo": "spn-foundation", "row": "RD.DEVEX.UTILS.044", "seen": "0b6942fd" },
-    { "repo": "spn-foundation", "row": "RD.DEVEX.UTILS.048", "seen": "d047e6f2" },
-    { "repo": "spn-foundation", "row": "RD.DEVEX.AGENT.049", "seen": "e59c3f22" },
-    { "repo": "spn-foundation", "row": "RD.DEVEX.WORKSPACE.118", "seen": "a47eced8" }
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.WORKSPACE.058",
+      "seen": "5b84393c"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.WORKSPACE.020",
+      "seen": "3661c8a9"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.UTILS.044",
+      "seen": "3f0880fd"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.UTILS.048",
+      "seen": "672ff778"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.AGENT.049",
+      "seen": "6dce9417"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.WORKSPACE.118",
+      "seen": "baf42b07"
+    }
   ]
 }
 -->
@@ -263,7 +312,7 @@ When a window opens, surface what is stale — a subject untouched across sittin
 | You changed | It starts at | It reaches a session through |
 | --- | --- | --- |
 | a contradiction, or a new law | the concept, then the chapter carrying it | step 4, and nothing before it |
-| a decision worth citing later | a register row, `RD.<AREA>.<NNN>` | the chapter and the plugins restating it |
+| a decision worth citing later | a register row, `RD.<DOMAIN>[.<SUBDOMAIN>].<NNN>` | the chapter and the plugins restating it |
 | a realization true of one stack | that stack's provider seat | that stack's own plugin |
 | a command, a gate, or the floor | the deterministic tool | its release, then step 6 |
 

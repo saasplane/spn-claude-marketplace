@@ -1,14 +1,34 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/README.md", "seen": "5a0bc97b" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md", "seen": "e1e35154" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/07-deliver.md", "seen": "7bb4e536" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md", "seen": "f82f7ddd" }
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/README.md",
+      "seen": "5a0bc97b"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
+      "seen": "6e0b1a03"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/07-deliver.md",
+      "seen": "1d377250"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",
+      "seen": "2b04ecbc"
+    }
   ],
   "decisions": [
-    { "repo": "spn-foundation", "row": "RD.SUPPORT.APPS.121", "seen": "81ebb2d7" },
-    { "repo": "spn-foundation", "row": "RD.DEVEX.FUNCTION.060", "seen": "26d6ea08" }
+    {
+      "repo": "spn-foundation",
+      "row": "RD.SUPPORT.APPS.121",
+      "seen": "89aabef8"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.FUNCTION.060",
+      "seen": "b3753049"
+    }
   ]
 }
 -->

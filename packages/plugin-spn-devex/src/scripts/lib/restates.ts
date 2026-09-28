@@ -154,7 +154,7 @@ export function treeHash(dir: string): string {
 }
 
 /** Whether a cited path is a folder rather than a file. */
-function isDir(path: string): boolean {
+export function isDir(path: string): boolean {
   try { return statSync(path).isDirectory(); } catch { return false; }
 }
 

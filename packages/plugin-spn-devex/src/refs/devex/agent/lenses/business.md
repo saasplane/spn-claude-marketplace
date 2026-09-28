@@ -1,8 +1,14 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/03-lenses.md", "seen": "db106d41" },
-    { "path": "spn-foundation/docs/03-behaviors/README.md", "seen": "35978308" }
+    {
+      "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/03-lenses.md",
+      "seen": "e809548f"
+    },
+    {
+      "path": "spn-foundation/docs/03-behaviors/README.md",
+      "seen": "35978308"
+    }
   ],
   "decisions": []
 }

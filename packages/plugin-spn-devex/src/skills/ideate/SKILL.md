@@ -1,8 +1,14 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md", "seen": "96e06365" },
-    { "path": "spn-foundation/docs/02-constructs/01-devex/01-function/03-ideate.md", "seen": "a9daca6e" }
+    {
+      "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
+      "seen": "636d41f6"
+    },
+    {
+      "path": "spn-foundation/docs/02-constructs/01-devex/01-function/03-ideate.md",
+      "seen": "2983688b"
+    }
   ]
 }
 -->
@@ -40,7 +46,7 @@ Pick the mode from the argument — `shape` · `design` · `decision`. Where non
 
 ### Mode: decision — one register row
 
-A row is `| id | ruling | why | date |`, the id `RD.<AREA>.<NNN>` over the closed set `GOV · PLATFORM · APPS · INFRA · DEVEX · DOCS`, numbered per area. **Ids are never reused and never renumbered.**
+A row is `| id | construct | ruling | why | date |`, the id `RD.<DOMAIN>[.<SUBDOMAIN>].<NNN>` — the group named for a folder of the repository's own `docs/02-constructs/` tree, numbered per group. **Ids are never reused and a correct id is never renumbered.**
 
 **The `why` column is the load-bearing one.** A row without it is a rule nobody can re-derive, and the next person to hit the same problem argues it from scratch. Say what the alternative costs, in specifics — never *for consistency*.
 

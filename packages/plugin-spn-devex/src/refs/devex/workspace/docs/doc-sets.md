@@ -1,12 +1,30 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/README.md", "seen": "c924071a" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "f45f1a47" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md", "seen": "a98553a1" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md", "seen": "58dd67e2" },
-    { "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md", "seen": "2f6212e1" },
-    { "path": "spn-foundation/CONCEPT.md", "seen": "a6015043" }
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/README.md",
+      "seen": "646a918b"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "seen": "3487aa0b"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
+      "seen": "ac5af87d"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
+      "seen": "d82008b3"
+    },
+    {
+      "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md",
+      "seen": "ccae114d"
+    },
+    {
+      "path": "spn-foundation/CONCEPT.md",
+      "seen": "a6015043"
+    }
   ]
 }
 -->
@@ -555,18 +573,15 @@ So a document routinely exists **before** the thing it describes, carrying 🔮 
 
 A **governing node** carries `registers/` and keeps its decisions there. One row per decision, and the register **self-shrinks** — an open item is a card with a recommendation, and the moment it is decided the card compresses to a row.
 
-**Every row carries `RD.<AREA>.<NNN>`** — *register decision*, the capability domain it governs, and a zero-padded sequence within it:
+**Every row carries `RD.<DOMAIN>[.<SUBDOMAIN>].<NNN>`** — *register decision*, the group it governs, and a zero-padded sequence within that group. The group is a folder of the repository's own `docs/02-constructs/` tree, written in capitals and without its number — a register never invents a classification of its own.
 
-```text
-RD.GOV     the node's own shape — principals, outline, standards placement, the register
-RD.PLATFORM    the platform model — tenancy, access, surfaces, service domains, trust
-RD.APPS    kinds, structure, layers, the generated surface, proof, delivery
-RD.INFRA   the estate, and the stage chain it serves
-RD.DEVEX   stages, instruments, the Agent, the plugins
-RD.DOCS    the corpus standard — seats, metadata, derivation, artifacts
-```
+| Repository | Its construct tree | Its ids | For example |
+| --- | --- | --- | --- |
+| The foundation | a domain, then a group within the domain | four parts | `RD.DEVEX.AGENT.049`, `RD.SUPPORT.APPS.133` |
+| Every other repository | the domain alone | three parts | `RD.IAM.004`, `RD.SERVER.012` |
 
-- **The sequence is per area**, so areas grow without colliding. **Ids are never reused and never renumbered** — an id is identity; the section is only its address.
+- **The group stops at the folder, never the construct.** A row's finer address is its own `Construct` column, not a longer id.
+- **The sequence is per group**, so groups grow without colliding. **Ids are never reused and a correct id is never renumbered** — a row keeps its id when its section is reordered, when it is superseded, and when it is rewritten.
 - **A row states present truth, and never names what it replaced.** No supersession clause, no amendment notice, and no pointer to the row that used to answer.
 - **Update the row in place, at its own address.** A row is never annotated or struck through — it is rewritten so it states what is true now, and the old wording lives in git history. A standing row that says something no longer true is worse than no row.
 

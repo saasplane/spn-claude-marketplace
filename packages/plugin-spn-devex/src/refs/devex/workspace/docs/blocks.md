@@ -1,8 +1,16 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "section": "The blocks — what a page reaches for instead of prose", "seen": "0dd7f138" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "section": "The figures — what sits inside a block, and the closed set of them", "seen": "40b967f2" }
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "section": "The blocks \u2014 what a page reaches for instead of prose",
+      "seen": "0dd7f138"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "section": "The figures \u2014 what sits inside a block, and the closed set of them",
+      "seen": "fa46b3d7"
+    }
   ]
 }
 -->

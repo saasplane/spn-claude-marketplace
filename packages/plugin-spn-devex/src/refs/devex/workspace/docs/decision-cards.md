@@ -1,7 +1,11 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "section": "The approach document — a workstream's, never a repository's", "seen": "73b87864" }
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "section": "The approach document \u2014 a workstream's, never a repository's",
+      "seen": "e8e39afb"
+    }
   ]
 }
 -->
