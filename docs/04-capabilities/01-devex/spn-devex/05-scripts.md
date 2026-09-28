@@ -42,8 +42,15 @@ Everything this plugin can execute sits under `plugins/spn-devex/src/scripts/`. 
 - The verdict, the composition, the always-zero exit — [Hooks in spn-devex](02-hooks.md)
 - The citation a header carries — [Refs](../../../02-constructs/01-devex/06-refs.md)
 - What a page is made of — the foundation's `04-docs/05-artifacts.md`
+- The one-entry, `<group> <action>` shape `tools/` is moving toward — the foundation's `04-plugins/02-shape.md`
 
 ## Special handling
+
+### 🔮 Planned: `tools/` becomes `commands/`, grouped and dispatched by one entry
+
+**Why** — *sixteen tools reached by sixteen separate paths is a vocabulary that grows by one every time somebody adds a tool*, and a partner has no way to list what exists short of reading the folder. The foundation's `04-plugins/02-shape.md` states the alternative: one entry, `<group> <action>`, `help --json` listing every action as data.
+**What** — `cli.ts` will lazily import `commands/<group>/<action>.ts`, one file per action, each exporting `{ describe, run }`. This plugin's groups: `docs` (the jobs `docs.ts` already runs — `audit` · `face` · `page` · `status` · `topics` · `coverage` · `prose` · `coherence` · `figure`) · `restates`, one action per `spn:restates` block kind — `docs` · `files` · `commands` · `decisions` — replacing today's separate `restate-drift.ts`, `templates-export.ts` and `commands-ref.ts`, so a drift names the owed act rather than one undifferentiated finding · `behaviours` (`stamp` · `check` · `coverage`, today's `behaviour-rows.ts`, `behaviour-proof.ts` and `behaviour-coverage.ts`) · `plugin` (`partner` · `paths` · `build` · `timings`, today's `partner-shape.ts` and the checks this arc adds beside it).
+**How** — a tool is printed as `spn-devex docs audit`, never as a bare path — a file under `commands/` is reachable, or it is not there, and nothing outside that folder is dispatched.
 
 ### A check says which of its rules it carries
 

@@ -23,8 +23,21 @@
 
 - The manifest's shape, the marketplace list, the installed copy and the plugin root — [The Plugin](../../../02-constructs/01-devex/01-plugin.md)
 - How the same three files behave for the widest of the plugins — [Plugin in spn-devex](../../01-devex/spn-devex/01-plugin.md)
+- The Node shape this folder realizes — source beside a committed build, one command entry, a shared folder never installed on its own — the foundation's `04-plugins/02-shape.md`
 
 ## Special handling
+
+### The folder moved to packages/, and this plugin's shared copies are gone
+
+**Why** — *the foundation's `04-plugins/02-shape.md` states a shared folder as the way two plugins hold one copy of a helper instead of two that can quietly drift*, and this plugin's own copies were exactly that drift waiting to happen: `kinds.ts`, `register.ts` and `runs.ts` were byte-identical to `spn-devex`'s, and `payload.ts` and `timing.ts` were byte-identical to `spn-infra`'s.
+**What** — this plugin's source now sits at `packages/plugin-spn-apps/src/`, moved from `plugins/spn-apps/src/`. All five of those files were deleted from this plugin's own `scripts/lib/`; this plugin now imports the one copy of each from `packages/plugin-support-lib/src/lib/`, which carries no `package.json` and no name of its own.
+**How** — by relative path, the way this plugin imports any other file in the checkout: `packages/plugin-spn-apps/src/`, `packages/plugin-support-lib/src/lib/`.
+
+### 🔮 Planned: a committed build beneath the source, reached through one command entry
+
+**Why** — the foundation's `04-plugins/02-shape.md` states the target every plugin here is moving to, and this plugin has not reached it yet.
+**What** — `src/scripts/` will gain one entry, `cli.ts`, dispatching `<group> <action>` to `commands/<group>/<action>.ts` files — `coverage` and `library` are this plugin's two groups — in place of today's flat `tools/`, and `hooks.json` will run a committed `dist/` instead of the `.ts` sources, with a test that refuses a bundle older than what it was built from.
+**How** — read the standard chapter before reading anything built against it here.
 
 ### The description is long deliberately, because it is matched rather than read
 

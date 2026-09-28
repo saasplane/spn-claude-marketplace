@@ -27,8 +27,21 @@ Twenty suites drive the real scripts as processes, feeding each one an event on 
 - The tier folders, the mirror and the discovery rule — [The Tests](../../../02-constructs/01-devex/08-tests.md)
 - What each script under test is for — [Scripts in spn-devex](05-scripts.md)
 - What a hook hands a script — [Hooks in spn-devex](02-hooks.md)
+- The staleness and bundle-parity cases every plugin owes once it builds — the foundation's `04-plugins/02-shape.md`
 
 ## Special handling
+
+### 🔮 Planned: a staleness case and a parity case join the mirror
+
+**Why** — *a bundle older than its sources runs rules nobody wrote*, and a bundle that silently changed behaviour during a rebuild is worse than no bundle at all — the foundation's `04-plugins/02-shape.md` states both as things every plugin's suite must refuse once it builds.
+**What** — `unit/t-dist-current.mjs` will recompute the hash of a bundle's declared sources and compare it against the banner esbuild writes into the bundle, naming the bundle that is now lying about what it runs. `unit/t-bundle-parity.mjs` will run the same recorded payload through the source and through the committed bundle and assert the source's answer and exit code match the bundle's, reading fixtures from a new `tests/fixtures/payloads/`.
+**How** — both sit at `tests/unit/`, beside the suites this page already lists, because they prove a property of the whole plugin rather than of one file.
+
+### 🔮 Planned: the Stop check's cache moves out of `.spndevex/`
+
+**Why** — *`.spndevex/` is shared by every window and workstream, so two sessions finishing together would read and overwrite each other's verdict*. `checks/corpus.ts` is proven by this plugin's own suite, and its cache is moving to a place a parallel window cannot collide with.
+**What** — the fingerprint and the last-run record this check kept under `.spndevex/.debug/corpus/` move to `~/.spnutils/cache/corpus/`, the machine store, keyed by a content hash rather than by "last run" — so two windows either share an identical verdict or never meet, and a finding is replayed rather than dropped on a second run.
+**How** — proven the same way the rest of this folder is: a suite drives the real check as a process and reads its verdict back.
 
 ### The folders are the stack's convention; the framework is not
 

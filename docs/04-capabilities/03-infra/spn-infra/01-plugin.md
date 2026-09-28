@@ -25,8 +25,21 @@
 
 - The manifest shape, the marketplace file and what an installed copy is — [The Plugin](../../../02-constructs/01-devex/01-plugin.md)
 - How the widest of the three folders realizes the same shape — [Plugin in spn-devex](../../01-devex/spn-devex/01-plugin.md)
+- The Node shape this folder realizes — source beside a committed build, a shared folder never installed on its own — the foundation's `04-plugins/02-shape.md`
 
 ## Special handling
+
+### The folder moved to packages/, and this plugin's own payload and timing are gone
+
+**Why** — *the foundation's `04-plugins/02-shape.md` states a shared folder as the way two plugins hold one copy of a helper instead of two that can quietly drift*, and this plugin's `payload.ts` and `timing.ts` were byte-identical to `spn-apps`'s.
+**What** — this plugin's source now sits at `packages/plugin-spn-infra/src/`, moved from `plugins/spn-infra/src/`. Both files were deleted from this plugin's own `scripts/lib/`; this plugin now imports the one copy of each from `packages/plugin-support-lib/src/lib/`, which carries no `package.json` and no name of its own. This plugin never held `kinds.ts`, `register.ts` or `runs.ts` — it ships no register-reading tool — so nothing of those three moves for it.
+**How** — by relative path, the way this plugin imports any other file in the checkout: `packages/plugin-spn-infra/src/`, `packages/plugin-support-lib/src/lib/`.
+
+### 🔮 Planned, and further off than its two siblings: a committed build, no commands yet
+
+**Why** — the foundation's `04-plugins/02-shape.md` states the target every plugin here is moving to.
+**What** — this plugin gains a committed `dist/` that `hooks.json` will run instead of `src/scripts/events/pretooluse.ts`, with a test that refuses a bundle older than what it was built from — the same as its two siblings. **What it does not gain in this pass is a `cli.ts` or a `commands/` folder**: this plugin ships no `tools/` folder today, only the write-time gate, so there is no flat list of tools for a `<group> <action>` entry to replace yet.
+**How** — read the standard chapter before reading anything built against it here.
 
 ### The three plugins carry one number
 

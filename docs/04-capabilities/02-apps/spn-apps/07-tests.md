@@ -22,8 +22,15 @@ This plugin holds other people's repositories to rules, so it owes proof of its 
 
 - Which tier proves which behaviour in a governed repository — the foundation's test standard, restated in `plugins/spn-apps/src/providers/ts/skills/implement/steps/test.md`
 - What the rules under test decide — [Providers in spn-apps](06-providers.md)
+- The staleness and bundle-parity cases every plugin owes once it builds — the foundation's `04-plugins/02-shape.md`
 
 ## Special handling
+
+### 🔮 Planned: a staleness case and a parity case join the mirror
+
+**Why** — the foundation's `04-plugins/02-shape.md` states both as things every plugin's suite must refuse once its `dist/` is committed: a bundle older than its sources, and a bundle whose behaviour drifted from its source during a rebuild.
+**What** — `unit/t-dist-current.mjs` will recompute the hash of a bundle's declared sources against the banner esbuild wrote into it. `unit/t-bundle-parity.mjs` will run a recorded payload through the source and through the committed bundle and assert source and bundle answer alike, reading fixtures from a new `tests/fixtures/payloads/`.
+**How** — both sit at `tests/unit/`, proving a property of the whole plugin rather than of one file.
 
 ### The tier comes first and the mirror second
 

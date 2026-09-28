@@ -21,8 +21,15 @@
 ## Follows the pattern
 
 - The tier, the mirror, and the discovery rule — [Tests](../../../02-constructs/01-devex/08-tests.md)
+- The staleness and bundle-parity cases every plugin owes once it builds — the foundation's `04-plugins/02-shape.md`
 
 ## Special handling
+
+### 🔮 Planned: a staleness case and a parity case join the mirror
+
+**Why** — the foundation's `04-plugins/02-shape.md` states both as things every plugin's suite must refuse once its `dist/` is committed: a bundle older than its sources, and a bundle whose behaviour drifted from its source during a rebuild. This plugin ships no `commands/` yet, but `hooks.json` will still run a built `dist/events/pretooluse.mjs`, so it owes both cases exactly as its two siblings do.
+**What** — `unit/t-dist-current.mjs` will recompute the hash of the bundle's declared sources against the banner esbuild wrote into it. `unit/t-bundle-parity.mjs` will run a recorded payload through the source and through the committed bundle and assert source and bundle decide alike.
+**How** — both sit at `tests/unit/`, proving a property of the whole plugin rather than of one rule.
 
 ### The runner walks rather than globbing one folder
 

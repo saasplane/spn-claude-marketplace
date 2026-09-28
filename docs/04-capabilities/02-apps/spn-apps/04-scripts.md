@@ -30,8 +30,15 @@ The folder divides by what calls each file. `events/` holds the one process the 
 - What a check may decide on its own account, and how a tool is graded — [The Check](../../../02-constructs/01-devex/05-scripts.md)
 - The verdict, the composition and the always-zero exit — [Hooks in spn-devex](../../01-devex/spn-devex/02-hooks.md)
 - The behaviour row and the register it lives in — the foundation's `02-docs/02-document.md`
+- The one-entry, `<group> <action>` shape `tools/` is moving toward — the foundation's `04-plugins/02-shape.md`
 
 ## Special handling
+
+### 🔮 Planned: `tools/` becomes `commands/`, under two groups
+
+**Why** — the foundation's `04-plugins/02-shape.md` states the target every plugin here is moving to: one entry, `<group> <action>`, in place of a tool reached by typing its own path.
+**What** — `cli.ts` will dispatch to `commands/<group>/<action>.ts`, one file per action. This plugin's two groups: `coverage` (`floor` · `check`, over the TS parts under `providers/ts`) and `library` (`catalogue`, today's `library-catalogue.ts`).
+**How** — a tool is printed as `spn-apps coverage check`, never as a bare path.
 
 ### The gate composes the provider path, and that is why a second stack costs no edit
 

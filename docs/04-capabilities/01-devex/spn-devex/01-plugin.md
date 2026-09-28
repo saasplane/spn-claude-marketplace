@@ -21,8 +21,21 @@
 
 - What a plugin is made of, and what a cache keyed by name and version means — [The Plugin](../../../02-constructs/01-devex/01-plugin.md)
 - Which plugins a repository is entitled to load — the foundation's `02-delivery.md`
+- The Node shape this folder realizes — source beside a committed build, one command entry, a shared folder never installed on its own — the foundation's `04-plugins/02-shape.md`
 
 ## Special handling
+
+### The folder moved to packages/, and a shared folder now sits beside it
+
+**Why** — *esbuild follows a relative import*, so a helper more than one plugin needs can live once and still end up inside every plugin's own installed copy. Writing it as a package with a name would add machinery — a workspace entry, a second `package.json` — for no reader, so the foundation's `04-plugins/02-shape.md` states it as a plain folder instead, and this plugin is the first to realize that chapter.
+**What** — this plugin's source now sits at `packages/plugin-spn-devex/src/`, moved from `plugins/spn-devex/src/`. Three helpers this plugin shared byte-for-byte with `spn-apps` — `kinds.ts`, `register.ts` and `runs.ts` — moved out of this plugin's own `scripts/lib/` into the new `packages/plugin-support-lib/src/lib/`, which carries no `package.json` and no name of its own. This plugin's `payload.ts` and `timing.ts` stayed put rather than joining them: diffed against the copies `spn-apps` and `spn-infra` share, they turned out genuinely different in purpose — this plugin's read the hook's call payload off standard input synchronously and carry the file-walking helpers a dozen of its own checks import, where the shared pair reads it asynchronously and carries a field this plugin's own `emit` never used.
+**How** — a source file elsewhere in this plugin that needs a shared helper imports `../../../../plugin-support-lib/src/lib/<name>` by relative path, the same way it would import any other file in the checkout. `packages/plugin-spn-devex/src/`, `packages/plugin-support-lib/src/lib/`.
+
+### 🔮 Planned: a committed build beneath the source, reached through one command entry
+
+**Why** — *a hook that pays for type-stripping on every call is a hook somebody eventually stops trusting to be fast*, and a plugin offering sixteen tools by sixteen separate paths is a vocabulary that grows by one every time somebody adds a tool. The foundation's `04-plugins/02-shape.md` states the target every plugin here is moving to, and this plugin has not reached it yet.
+**What** — `src/scripts/` will gain one entry, `cli.ts`, dispatching `<group> <action>` to `commands/<group>/<action>.ts` files in place of today's flat `tools/`, and `hooks.json` will run a committed `dist/cli.mjs` and `dist/events/*.mjs` instead of the `.ts` sources, with a test that refuses a bundle older than what it was built from. A hook script stays live on its next run either way; a bundle changes what that means without changing the rule.
+**How** — read the standard chapter before reading anything built against it here; a rule this plugin states and the chapter does not is a defect rather than something this plugin does differently.
 
 ### The version is moved after the release, never before
 

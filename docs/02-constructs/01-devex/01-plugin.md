@@ -94,5 +94,6 @@ This page answers what a plugin is made of, how it is listed, and what an instal
 | `RD.GOV.024` | a repository with no nodes still declares a world and still earns a docs tree, which is why this model is written here at all | MUST |
 | the foundation's `02-delivery.md` § The set a repo gets is derived from its own claim | a workspace never types a plugin name; the set comes from the consuming repository's own manifest | MUST |
 | [MD6](../../registers/decisions.md) | the manifest is the current description, and a marketplace entry that disagrees with it is the stale side | MUST |
+| the foundation's `04-plugins/02-shape.md` | the Node realization of this construct's own shape — source beside a committed build, and a shared folder never installed on its own | MUST |
 
 Try it: `node plugins/spn-devex/src/scripts/tools/partner-shape.ts`
