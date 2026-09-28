@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: `spn-infra/src/refs/support/infra/README.md` — the estate
+// RESTATES: `plugin-spn-infra/src/refs/support/infra/README.md` — the estate
 // laws, as refusals at write time. That ref is the source of truth; this file states no rule of its
 // own and only carries the sentence a refusal quotes, plus the shape a rule takes.
 //

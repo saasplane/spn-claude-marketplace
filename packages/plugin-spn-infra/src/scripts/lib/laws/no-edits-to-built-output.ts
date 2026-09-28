@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: `spn-infra/src/refs/support/infra/README.md` § no hand edits to built output. The ref governs.
+// RESTATES: `plugin-spn-infra/src/refs/support/infra/README.md` § no hand edits to built output. The ref governs.
 //
 // Refuse a hand edit to a rendering, at the moment it is written.
 //

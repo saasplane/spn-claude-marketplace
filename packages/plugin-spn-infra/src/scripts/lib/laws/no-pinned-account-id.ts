@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: `spn-infra/src/refs/support/infra/README.md` § every provider-assigned value is discovered. The ref governs.
+// RESTATES: `plugin-spn-infra/src/refs/support/infra/README.md` § every provider-assigned value is discovered. The ref governs.
 //
 // Refuse a pinned account id at the moment it is written.
 //
