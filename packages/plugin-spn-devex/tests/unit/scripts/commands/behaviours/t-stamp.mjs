@@ -1,4 +1,4 @@
-import { PLUGIN } from "../../../helpers/harness.mjs";
+import { PLUGIN } from "../../../../helpers/harness.mjs";
 // `behaviour-rows` — writing what a run found into the rows, and nothing else.
 //
 // The other suites here test CHECKS, which read and give a verdict. This one tests a tool that
@@ -9,7 +9,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, statSync }
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 
-const TOOL = resolve(PLUGIN, "src", "scripts", "tools", "behaviour-rows.ts");
+const TOOL = resolve(PLUGIN, "src", "scripts", "commands", "behaviours", "stamp.ts");
 const kept = [];
 process.on("exit", () => { for (const d of kept) rmSync(d, { recursive: true, force: true }); });
 

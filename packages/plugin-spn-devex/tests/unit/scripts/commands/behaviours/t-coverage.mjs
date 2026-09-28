@@ -1,4 +1,4 @@
-import { PLUGIN } from "../../../helpers/harness.mjs";
+import { PLUGIN } from "../../../../helpers/harness.mjs";
 // `behaviour-coverage` — the tests report's measurement. It writes nothing, so every case asserts
 // what it measured, and the one byte-level promise: an unchanged tree measures to the same bytes.
 import { execFileSync } from "node:child_process";
@@ -6,7 +6,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 
-const TOOL = resolve(PLUGIN, "src", "scripts", "tools", "behaviour-coverage.ts");
+const TOOL = resolve(PLUGIN, "src", "scripts", "commands", "behaviours", "coverage.ts");
 const kept = [];
 process.on("exit", () => { for (const d of kept) rmSync(d, { recursive: true, force: true }); });
 

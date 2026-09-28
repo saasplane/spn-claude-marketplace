@@ -271,10 +271,18 @@ export function undeclared(path: string, block: Block): string[] {
  *
  * `workspace` is the folder the sibling checkouts sit in, because a citation names its repository.\n *\n * `knownRows` may be empty, and then row citations are not checked at all — a repo holding no
  * register is a fact about that repo rather than a finding about it.
+ *
+ * `only` narrows the citation kinds read — a caller that owns one kind (`restates docs`, `restates
+ * decisions`) passes it so a drift names its owed act; omitted, every kind is read, which is what
+ * the combined `restates check` needs.
  */
-export function check(path: string, workspace: string, block: Block, knownRows: Set<string>): string[] {
+export function check(
+  path: string, workspace: string, block: Block, knownRows: Set<string>,
+  only?: ReadonlyArray<"docs" | "files" | "commands" | "decisions">,
+): string[] {
+  const kinds = only ? PATH_KINDS.filter((kind) => only.includes(kind)) : PATH_KINDS;
   const findings: string[] = [];
-  for (const citation of PATH_KINDS.flatMap((kind) => block[kind] ?? [])) {
+  for (const citation of kinds.flatMap((kind) => block[kind] ?? [])) {
     if (!citation || typeof citation !== "object" || citation.path === undefined) {
       findings.push(`${path}: a citation must be an object with a \`path\``);
       continue;
@@ -320,9 +328,10 @@ export function check(path: string, workspace: string, block: Block, knownRows: 
     else if (stamped !== current)
       findings.push(`${path}: \`${where}\` has moved since this file restated it — seen ${stamped}, now ${current}`);
   }
-  for (const row of block.decisions ?? [])
-    if (knownRows.size && !knownRows.has(row))
-      findings.push(`${path}: cites \`${row}\`, which the register does not carry`);
+  if (!only || only.includes("decisions"))
+    for (const row of block.decisions ?? [])
+      if (knownRows.size && !knownRows.has(row))
+        findings.push(`${path}: cites \`${row}\`, which the register does not carry`);
   return findings;
 }
 

@@ -1,4 +1,4 @@
-import { PLUGIN } from "../../../helpers/harness.mjs";
+import { PLUGIN } from "../../../../helpers/harness.mjs";
 // `coherence` CITATION — does every decision id cited in a repository resolve to a row?
 //
 // The question exists because `N76` found two ids cited in the foundation book with no row behind
@@ -22,7 +22,7 @@ import { mkdirSync, writeFileSync, mkdtempSync, rmSync, renameSync } from "node:
 import { dirname, join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 
-const TOOL = join(PLUGIN, "src", "scripts", "tools", "coherence.ts");
+const TOOL = join(PLUGIN, "src", "scripts", "commands", "docs", "coherence.ts");
 const BASE = mkdtempSync(join(tmpdir(), "t-coherence-"));
 process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
 

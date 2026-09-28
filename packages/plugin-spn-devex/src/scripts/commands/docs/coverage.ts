@@ -1,0 +1,36 @@
+#!/usr/bin/env node
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md · 05-artifacts.md · 02-document.md
+// The chapters are the source of truth; a rule change is edited there first, then here.
+//
+// The set checks — the two seats pair, a chapter folder names a package, a Who names a persona.
+//
+//   spn-devex docs coverage <repo…>
+
+import { basename, relative, resolve } from "node:path";
+import { begin, record, end } from "../../lib/timing.ts";
+import { coverageCheck, resolveWorkspace } from "./_lib.ts";
+
+export const describe = "the set checks — the two seats pair, a chapter folder names a package, a Who names a persona";
+
+function body(args: string[], workspace: string): number {
+  const targets = args.filter((r) => !r.startsWith("--")).map((r) => resolve(r));
+  if (!targets.length) { console.error("usage: spn-devex docs coverage <repo…>"); return 2; }
+  const f = targets.flatMap((t) => coverageCheck(t, resolve(workspace)));
+  for (const x of f) console.log(`${x.grade === "RULE" ? "✗" : "!"} ${x.grade.padEnd(4)} ${x.check.padEnd(9)} ${relative(workspace, x.file)}\n         ${x.message}`);
+  const rule = f.filter((x) => x.grade === "RULE").length;
+  console.log(f.length ? `\n${f.length} finding(s) — ${rule} RULE, ${f.length - rule} SOFT` : `\nclean — ${targets.length} repository(ies)`);
+  return rule ? 1 : 0;
+}
+
+export function run(args: string[]): number {
+  const workspace = resolveWorkspace();
+  const startedAt = performance.now();
+  begin({ event: process.env.CLAUDE_HOOK_EVENT ?? "command", tool: null, session: process.env.CLAUDE_SESSION_ID ?? null }, workspace);
+  const code = body(args, workspace);
+  record("docs-coverage", performance.now() - startedAt);
+  end();
+  return code;
+}
+
+if (process.argv[1] && basename(process.argv[1]) === "coverage.ts")
+  process.exit(run(process.argv.slice(2)));

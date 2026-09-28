@@ -1,4 +1,4 @@
-import { PLUGIN } from "../../../helpers/harness.mjs";
+import { PLUGIN } from "../../../../helpers/harness.mjs";
 // `prose-triage` — the tool that scored a Hashicorp README as somebody's writing.
 //
 // The triage had no suite at all, which is why both of its defects were found by running it while
@@ -19,7 +19,7 @@ import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 
 const HOOKS = PLUGIN;
-const TOOL = join(HOOKS, "src", "scripts", "tools", "prose-triage.ts");
+const TOOL = join(HOOKS, "src", "scripts", "commands", "docs", "prose.ts");
 const BASE = mkdtempSync(join(tmpdir(), "t-prose-triage-"));
 process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
 

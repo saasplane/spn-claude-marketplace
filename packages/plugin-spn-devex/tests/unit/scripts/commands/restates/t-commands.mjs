@@ -6,7 +6,7 @@
 // and require the fingerprint to move — and change things that are NOT the surface and require it
 // to hold. That second half is the one that matters: without it the safe answer is to rewrite the
 // region on every release, and a regeneration nobody needs is a regeneration somebody skips.
-import { fingerprint, regionOf, render } from "../../../../src/scripts/tools/commands-ref.ts";
+import { fingerprint, regionOf, render } from "../../../../../src/scripts/commands/restates/commands.ts";
 
 let n = 0, failed = 0;
 const one = (label, got, want) => {

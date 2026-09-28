@@ -1,4 +1,4 @@
-import { PLUGIN } from "../../../helpers/harness.mjs";
+import { PLUGIN } from "../../../../helpers/harness.mjs";
 // `restate-drift` — the tool that reported 0 having compared nothing.
 //
 // It walks `<root>/plugins`, which exists in the marketplace checkout and nowhere else. Run from the
@@ -16,7 +16,7 @@ import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 
 const HOOKS = PLUGIN;
-const TOOL = join(HOOKS, "src", "scripts", "tools", "restate-drift.ts");
+const TOOL = join(HOOKS, "src", "scripts", "commands", "restates", "check.ts");
 const BASE = mkdtempSync(join(tmpdir(), "t-restate-drift-"));
 process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
 

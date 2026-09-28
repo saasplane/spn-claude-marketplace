@@ -551,7 +551,7 @@ console.log("\n=== a repository is never the book it restates");
   // the siblings of its own parent, which includes itself. The marketplace earned both the day it
   // was documented as a GENERAL repository, so the bare command compared the plugins against
   // their own repository's docs and reported 77 drifts that were not drift at all.
-  const { findBook } = await import("../../../src/scripts/tools/restate-drift.ts");
+  const { findBook } = await import("../../../src/scripts/commands/restates/check.ts");
   const book = (name) => ({
     [`${name}/docs/registers/decisions.md`]: "# decisions\n",
     [`${name}/CONCEPT.md`]: "# c\n",
