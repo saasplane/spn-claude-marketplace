@@ -18,7 +18,7 @@ Four markdown files sit under `packages/plugin-spn-devex/src/agents/`, each a pe
 | The prose reviewer | `packages/plugin-spn-devex/src/agents/spn-prose-reviewer.md` | judges whether a rewrite kept every claim it had to keep |
 | The viewpoint files | `packages/plugin-spn-devex/src/refs/devex/agent/lenses/` | one file per reviewing function: `lead` · `business` · `product` · `architect` · `server-dev` · `web-dev` · `qa` · `infra` · `trust` · `partner` · `voice` |
 | What the set of viewpoints is | `packages/plugin-spn-devex/src/refs/devex/agent/lenses.md` | the restatement that states the set itself, and what each function is for |
-| The lens register | `packages/plugin-spn-devex/src/scripts/tools/docs.ts` | the same values a document's `lenses` field may carry, and the label each renders as |
+| The lens register | `packages/plugin-spn-devex/src/scripts/lib/render.ts` | the same values a document's `lenses` field may carry, and the label each renders as |
 | Where a viewpoint is convened | `packages/plugin-spn-devex/src/skills/ideate/SKILL.md` · `packages/plugin-spn-devex/src/skills/develop/SKILL.md` | the skills that say which gate convenes which viewpoint |
 
 ## Follows the pattern
@@ -50,7 +50,7 @@ Four markdown files sit under `packages/plugin-spn-devex/src/agents/`, each a pe
 
 **Why** — *the reader a document is written for and the reviewer who judges it are the same list*. Two lists would let a document declare an audience no reviewer could be convened as.
 **What** — the same values are what a `spn:doc` block's `lenses` field may carry, and the audit refuses anything outside the list.
-**How** — the register maps each value to the label a tag line renders — `SERVER_DEV` reads *Backend developer*. `packages/plugin-spn-devex/src/scripts/tools/docs.ts`, `LENS_LABEL`.
+**How** — the register maps each value to the label a tag line renders — `SERVER_DEV` reads *Backend developer*. `packages/plugin-spn-devex/src/scripts/lib/render.ts`, `LENS_LABEL`.
 
 ### A viewpoint file is regenerated, never argued with
 

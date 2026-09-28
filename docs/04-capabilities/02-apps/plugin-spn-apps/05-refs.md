@@ -19,7 +19,7 @@ A partner holding this plugin has no checkout of the foundation book beside it, 
 | What a stack is allowed to be | `packages/plugin-spn-apps/src/refs/support/apps/providers/README.md` | read before adding a second stack, and before assuming a tool can work out which one it is in |
 | What this stack does | `packages/plugin-spn-apps/src/refs/support/apps/providers/ts/` | a face plus the numbered entries, from kinds through conformance |
 | The generated table | `packages/plugin-spn-apps/src/refs/support/apps/providers/ts/14-libraries.md` | the published packages a node may depend on, written by a command |
-| The command that writes it | `packages/plugin-spn-apps/src/scripts/tools/library-catalogue.ts` | produces the generated table; re-running it is how a reader checks the file |
+| The command that writes it | `packages/plugin-spn-apps/src/scripts/commands/library/catalogue.ts` | produces the generated table; re-running it is how a reader checks the file |
 | A stamp | the `spn:restates` block at the top of `packages/plugin-spn-apps/src/refs/support/apps/shape.md` | each chapter restated, and the hash last read from it |
 
 ## Follows the pattern

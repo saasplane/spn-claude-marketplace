@@ -372,7 +372,8 @@
             <td>both trees, side by side in one workspace</td>
             <td>the drift checker is theirs. It is the only thing in the workspace that reads
             across the two trees, and it is run here, before anything is published:
-            <code>node plugins/spn-devex/src/scripts/tools/restate-drift.ts</code></td></tr>
+            <code>node packages/plugin-spn-devex/src/dist/cli.mjs restates check</code> (or
+            <code>spn-devex restates check</code>, once installed)</td></tr>
       </tbody>
     </table>
   </div>
@@ -549,8 +550,8 @@
       <td><a href="../../05-guides/01-install-the-plugins.md">the install guide</a>, which names
       the commands in order</td></tr>
     <tr><td>to prove the hooks still work</td>
-      <td><code>node plugins/spn-devex/tests/run.mjs</code>, the suite runner this
-      repository carries</td></tr>
+      <td><code>node packages/plugin-spn-devex/tests/run.mjs</code>, the suite runner this
+      repository carries (or <code>pnpm run test</code>, every plugin's suite in one command)</td></tr>
     <tr><td>the rules themselves, rather than the code that runs them</td>
       <td>the foundation book. If you hold only this tree, the
       <a href="../constructs/01-devex/06-refs-construct.html">refs</a> are the copy you can

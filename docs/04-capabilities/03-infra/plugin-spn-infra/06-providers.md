@@ -16,7 +16,7 @@
 | The AWS rendering parse | `packages/plugin-spn-infra/src/providers/aws/scripts/checks/rendering.ts` | the rendering subject for AWS, which decides on the path alone |
 | The Google Cloud manifest parse | `packages/plugin-spn-infra/src/providers/gcp/scripts/checks/manifest.ts` | Google's own region and machine-type patterns, which differ from AWS's by one separator |
 | The Google Cloud rendering parse | `packages/plugin-spn-infra/src/providers/gcp/scripts/checks/rendering.ts` | the rendering subject for Google Cloud |
-| The judgement each of them feeds | `packages/plugin-spn-infra/src/scripts/lib/provider-strings.ts` | the cloud-free rule, written as a factory taking one cloud's patterns |
+| The judgement each of them feeds | `packages/plugin-spn-infra/src/scripts/lib/laws/provider-strings-only-in-cloud-entry.ts` | the cloud-free rule, written as a factory taking one cloud's patterns |
 | The gate that discovers them | `packages/plugin-spn-infra/src/scripts/checks/subjects.ts` | reads the folder, imports each cloud's validator per subject, names no cloud |
 | Each cloud's vocabulary | `packages/plugin-spn-infra/src/refs/support/infra/providers/` | what that cloud calls things, restated as a fact rather than run as code |
 | The proof | `packages/plugin-spn-infra/tests/unit/providers/t-subjects.mjs` | each cloud's spellings refused, each cloud's sanctioned homes allowed |

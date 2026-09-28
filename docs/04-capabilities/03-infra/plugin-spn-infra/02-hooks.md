@@ -15,7 +15,7 @@ This plugin's wiring is one entry. Every law it holds is about what a file conta
 | The wiring | `packages/plugin-spn-infra/src/hooks/hooks.json` | one `PreToolUse` entry, its matcher, its command and its allowance |
 | The command it names | `packages/plugin-spn-infra/src/scripts/events/pretooluse.ts` | the dispatcher, reached through `CLAUDE_PLUGIN_ROOT` rather than through any checkout |
 | What the dispatcher resolves | `packages/plugin-spn-infra/src/scripts/checks/subjects.ts` | which subjects judge this write, discovered rather than listed in the wiring |
-| The decision it speaks | `packages/plugin-spn-infra/src/scripts/lib/payload.ts` | this plugin's own copy of the event and verdict shapes |
+| The decision it speaks | `packages/plugin-support-lib/src/lib/payload.ts` | the event and verdict shapes, one copy in the shared support folder |
 | The proof it fires | `packages/plugin-spn-infra/tests/helpers/harness.mjs` | a real process per case, handed an event and read for its decision |
 
 ## Follows the pattern

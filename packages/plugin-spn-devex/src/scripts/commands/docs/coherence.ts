@@ -525,10 +525,27 @@ function providerContracts(root: string): string[] {
  * so one side stayed clean while the other rotted: `N85` measured a fifth of the plugin paths the
  * marketplace docs named resolving to nothing, some for months.
  *
- * **WHAT COUNTS AS A PLUGIN PATH.** A path rooted at `plugins/<plugin>/`, or at `<plugin>/src/` or
- * `<plugin>/tests/` where `<plugin>` is a folder `plugins/` really holds. A path written relative to
- * a plugin — `scripts/checks/` inside a chapter — is not read: which plugin it means is an inference,
- * and an inference that guesses wrong is worse than silence. A relative link is the link audit's.
+ * **WHAT COUNTS AS A PLUGIN PATH.** A plugin is a folder named `plugin-*` directly under `packages/`
+ * — `packages/plugin-spn-devex`, `packages/plugin-support-lib`, and so on. A path is read rooted at
+ * `packages/plugin-<name>/`, or written relative to the plugin as `plugin-<name>/src/` or
+ * `plugin-<name>/tests/` where `plugin-<name>` is a folder `packages/` really holds. A path written
+ * relative to a construct inside a plugin — `scripts/checks/` inside a chapter, with neither the
+ * `packages/` root nor the plugin's own name in front of it — is not read: which plugin it means is
+ * an inference, and an inference that guesses wrong is worse than silence. A relative link is the
+ * link audit's.
+ *
+ * **`plugin-support-lib` IS CHECKED THE SAME WAY AS THE THREE INSTALLED PLUGINS.** It carries no
+ * `.claude-plugin/plugin.json` and is never installed, but this question only asks whether a path a
+ * document names resolves to a real file on disk — not whether the folder behind it is installable —
+ * and the corpus already names `packages/plugin-support-lib/tests/helpers/`. Leaving it out of the
+ * shelf would stop checking a citation that exists, which is the opposite of this question's job.
+ *
+ * **`${CLAUDE_PLUGIN_ROOT}` IS NOT A FORM THIS QUESTION READS.** It resolves at install time to the
+ * plugin whose own file names it — a skill, a ref, a hook — and that self is exactly what a shared
+ * document under `docs/` or an overview does not have. Reading it here would be the same guess this
+ * already refuses for a bare `scripts/checks/`, just spelled with a variable instead of an omission.
+ * `commands/plugin/paths.ts` owns that question instead: it reads a plugin's own skills, refs and
+ * hooks, where the plugin the variable means is never in doubt, against that same plugin's `src/`.
  *
  * **A PLACEHOLDER IS A SHAPE, NOT A NAME.** Where a path carries `<instance>`, `{aws,gcp}`, `*` or `…`,
  * the folder before it must exist and nothing after it is asked.
@@ -538,16 +555,17 @@ function providerContracts(root: string): string[] {
  *
  * WHERE IT READS: every source `sourcesOf` reads, plus the hand-authored overviews. A construct page
  * is produced from its seat file, which is read here, so reading the page too would report one
- * dead path twice. **A repo with no `plugins/` folder is not this question's business**, because
- * its docs can name a plugin path only as a fact about some other repository.
+ * dead path twice. **A repository with no `packages/plugin-*` folder is not this question's
+ * business**, because its docs can name a plugin path only as a fact about some other repository.
  *
  * SOFT. It is one of the questions `corpus.ts` reads rather than gates on, and it ships that way.
  */
 // A path character, or a whole `<placeholder>` — escaped or not — so `_<subject>/` stays one segment
 // while the `</code>` after a path on a page ends it.
 const PATH_CHAR = String.raw`(?:[^\s\`'"()<>\]|&]|<[a-z][a-z-]*>|&lt;[a-z][a-z-]*&gt;)`;
-const PLUGIN_PATH = new RegExp(String.raw`(?<![\w/.-])(plugins\/[a-z0-9][a-z0-9-]*\/${PATH_CHAR}*|` +
-  String.raw`[a-z0-9][a-z0-9-]*\/(?:src|tests)(?:\/${PATH_CHAR}*)?)`, "g");
+const PLUGIN_NAME = String.raw`plugin-[a-z0-9][a-z0-9-]*`;
+const PLUGIN_PATH = new RegExp(String.raw`(?<![\w/.-])(packages\/${PLUGIN_NAME}\/${PATH_CHAR}*|` +
+  String.raw`${PLUGIN_NAME}\/(?:src|tests)(?:\/${PATH_CHAR}*)?)`, "g");
 const PLACEHOLDER = /[<{*…]|&lt;/;
 
 /** Blank a fence, a comment or struck text, keeping every newline so line numbers still count. */
@@ -556,9 +574,11 @@ function blanked(text: string, pattern: RegExp): string {
 }
 
 function pluginPaths(root: string, sources: string[]): string[] {
-  const shelf = join(root, "plugins");
-  if (!isDir(shelf)) return [];                     // no plugins here — not this repo's question
-  const plugins = new Set(readdirSync(shelf).filter((entry) => isDir(join(shelf, entry))));
+  const shelf = join(root, "packages");
+  const plugins = new Set(isDir(shelf)
+    ? readdirSync(shelf).filter((entry) => entry.startsWith("plugin-") && isDir(join(shelf, entry)))
+    : []);
+  if (!plugins.size) return [];                     // no packages/plugin-* here — not this repo's question
   const overviews = join(root, "docs/artifacts/overviews");
   const pages = isDir(overviews)
     ? readdirSync(overviews).filter((e) => e.endsWith(".html")).sort().map((e) => `docs/artifacts/overviews/${e}`)
@@ -572,9 +592,9 @@ function pluginPaths(root: string, sources: string[]): string[] {
     text.split("\n").forEach((line, index) => {
       for (const hit of line.matchAll(PLUGIN_PATH)) {
         let named = hit[1].replace(/[.,:;]+$/, "");
-        if (!named.startsWith("plugins/")) {
-          if (!plugins.has(named.split("/")[0])) continue;  // `<word>/src/` that names no plugin
-          named = `plugins/${named}`;
+        if (!named.startsWith("packages/")) {
+          if (!plugins.has(named.split("/")[0])) continue;  // `plugin-<name>/src/` naming no real plugin
+          named = `packages/${named}`;
         }
         // A placeholder: the folder before it must exist, and nothing after it is asked.
         const cut = named.search(PLACEHOLDER);

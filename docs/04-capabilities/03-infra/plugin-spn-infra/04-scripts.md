@@ -23,7 +23,7 @@ Each rule carries its own name, so a refusal says which law it read rather than 
 | A hand edit to built output | `packages/plugin-spn-infra/src/scripts/lib/laws/no-edits-to-built-output.ts` | the one rule that decides on the path alone |
 | A test file in the wrong tier folder | `packages/plugin-spn-infra/src/scripts/lib/test-file-outside-tier-folder.ts` | refuses a case filed under a tier folder its extension does not belong to, the same defect `spnutils infra test` refuses at run time, caught here first |
 | A harness that re-checks the manifest | `packages/plugin-spn-infra/src/scripts/lib/harness-reimplements-manifest-identity.ts` | warns, never refuses, on an embedded Python heredoc reading a manifest file `infra validate` already checks |
-| Its libraries | `packages/plugin-spn-infra/src/scripts/lib/payload.ts` · `lib/timing.ts` | this plugin's own copies, because a plugin ships alone |
+| Its libraries | `packages/plugin-support-lib/src/lib/payload.ts` · `lib/timing.ts` | one copy in the shared support folder, bundled into each plugin's `dist` |
 | The tests | `packages/plugin-spn-infra/tests/` | one command, and each rule asserted on both sides |
 | The card it cites | `packages/plugin-spn-infra/src/refs/support/infra/README.md` | the estate laws every refusal message points the reader at |
 

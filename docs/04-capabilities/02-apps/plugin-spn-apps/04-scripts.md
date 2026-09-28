@@ -16,14 +16,14 @@ The folder divides by what calls each file. `events/` holds the one process the 
 | The stack read | `packages/plugin-spn-apps/src/scripts/lib/stack.ts` | walks to the nearest `sprepo.json` and returns the declared stack, or nothing |
 | The dispatcher | `packages/plugin-spn-apps/src/scripts/events/pretooluse.ts` | one process behind the entry: keeps the first refusal, joins the advice |
 | How a source file is read | `packages/plugin-spn-apps/src/scripts/lib/source.ts` | masking, and the source as the pending write would leave it |
-| The payload and verdict shapes | `packages/plugin-spn-apps/src/scripts/lib/payload.ts` | this plugin's own copy, named as the core plugin names the same job |
-| What a run cost | `packages/plugin-spn-apps/src/scripts/lib/timing.ts` | written only while the developer has asked for it, and never able to fail a gate |
+| The payload and verdict shapes | `packages/plugin-support-lib/src/lib/payload.ts` | one copy in the shared support folder, bundled into every plugin that reads a hook payload |
+| What a run cost | `packages/plugin-support-lib/src/lib/timing.ts` | written only while the developer has asked for it, and never able to fail a gate |
 | The restatement hash | `packages/plugin-spn-apps/src/scripts/lib/stamp.ts` | the `seen` value, spelled once per plugin and required to agree with the other copy |
-| What a register is | `packages/plugin-spn-apps/src/scripts/lib/register.ts` | the headings a register carries, each column found by its heading — this plugin's copy of the core plugin's file, held byte for byte to it |
-| The tiers each kind owes | `packages/plugin-spn-apps/src/scripts/lib/kinds.ts` | the book's table of kind and owed tier, which tells a contract case from an integration one |
-| What a run left behind | `packages/plugin-spn-apps/src/scripts/lib/runs.ts` | the walk the case reader uses; this plugin's copy of the core plugin's file |
+| What a register is | `packages/plugin-support-lib/src/lib/register.ts` | the headings a register carries, each column found by its heading, one copy in the shared support folder that every plugin reading a register imports |
+| The tiers each kind owes | `packages/plugin-support-lib/src/lib/kinds.ts` | the book's table of kind and owed tier, which tells a contract case from an integration one |
+| What a run left behind | `packages/plugin-support-lib/src/lib/runs.ts` | the walk the case reader uses, one copy in the shared support folder |
 | The join check | `packages/plugin-spn-apps/src/scripts/checks/behaviour-join.ts` | every row against every case title, in both directions |
-| The package table | `packages/plugin-spn-apps/src/scripts/tools/library-catalogue.ts` | writes the list of published packages a node may depend on |
+| The package table | `packages/plugin-spn-apps/src/scripts/commands/library/catalogue.ts` | writes the list of published packages a node may depend on |
 
 ## Follows the pattern
 
@@ -74,19 +74,19 @@ The folder divides by what calls each file. `events/` holds the one process the 
 
 **Why** — *a documents tree that moves must break no tool*. It is also the only way to be right in the layout a repository has today and in the one that follows it.
 **What** — any table carrying the behaviour headings is a register, wherever in the repository it sits.
-**How** — the headings and the row test are one exported pair read by every tool that touches a register, because two tools parsing a table differently means one writes rows the other cannot see. `packages/plugin-spn-apps/src/scripts/lib/register.ts`.
+**How** — the headings and the row test are one exported pair read by every tool that touches a register, because two tools parsing a table differently means one writes rows the other cannot see. `packages/plugin-support-lib/src/lib/register.ts`.
 
 ### The join is a repository gate, and the stack says where a case lives
 
 **Why** — *a case that exists is not a case that ran*, and the join asks only the first question: does a case cite each `SUCCESS` row, and does each cited id name a row. It reads both sets whole, so it cannot be a check at the moment one file is written. Whether a run supports a row is the core plugin's proof check, and stamping a row is the core plugin's writer (the book's RD.DEVEX.UTILS.071).
 **What** — the join names a `SUCCESS` row no case title cites, and a case title citing an id no row declares. It exits non-zero on a finding; `--report` prints the same and exits zero.
-**How** — where a case lives and how its title is written are the stack's, so the join imports `providers/<stack>/scripts/lib/cases.ts` by a composed path, the way the gate does. It reads rows through this plugin's copy of the core plugin's register grammar, which a case holds byte for byte to the original. `packages/plugin-spn-apps/src/scripts/checks/behaviour-join.ts`, proven in `packages/plugin-spn-apps/tests/unit/scripts/checks/t-behaviour-join.mjs`.
+**How** — where a case lives and how its title is written are the stack's, so the join imports `providers/<stack>/scripts/lib/cases.ts` by a composed path, the way the gate does. It reads rows through the register grammar in the shared support folder, the one copy every plugin imports. `packages/plugin-spn-apps/src/scripts/checks/behaviour-join.ts`, proven in `packages/plugin-spn-apps/tests/unit/scripts/checks/t-behaviour-join.mjs`.
 
 ### One table is written by a command, because nobody could keep it by hand
 
 **Why** — *a published set moves every release*, so a hand-written list is stale the day after it is written and nothing reports that.
 **What** — the tool reads what the support repository publishes and writes the table, leaving out anything a partner could not depend on.
-**How** — the output carries a citation naming the command that produced it, so re-running the command is how a reader checks it. `packages/plugin-spn-apps/src/scripts/tools/library-catalogue.ts`.
+**How** — the output carries a citation naming the command that produced it, so re-running the command is how a reader checks it. `packages/plugin-spn-apps/src/scripts/commands/library/catalogue.ts`.
 
 ## Between modules
 
