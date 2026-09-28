@@ -7,7 +7,7 @@
   "plugins": [
     {
       "name": "spn-devex",
-      "source": "./plugins/spn-devex/src",
+      "source": "./packages/plugin-spn-devex/src",
       "description": "SaaS Plane devex \u2014 installed in every repository, stack-agnostic. Ten skills: the eight stages in order (bootstrap, scm, ideate, develop, test, provision, deliver, operate) plus check and report, which serve any stage. The SPN engineer persona, the spn-panel reviewer and the eleven lens files it convenes. The refs a partner needs without the book: what a plugin is, what a skill is, the workspace and the workstream loop, what a repository declares, the doc-set grammar, block and figure spelling, decision cards, and the eighteen templates every page is copied from. Hooks that deny hand-edits to generated files, check every document against the bars the book states mechanically, print the window's orientation at session start, and read a workstream's split plan before a seat write or a close.",
       "author": {
         "name": "SaaS Plane"
@@ -15,7 +15,7 @@
     },
     {
       "name": "spn-apps",
-      "source": "./plugins/spn-apps/src",
+      "source": "./packages/plugin-spn-apps/src",
       "description": "SaaS Plane apps domain \u2014 one plugin for every APPS repository, stack-agnostic with its stacks inside it. Six skills: new, implement, review, run, verify, release. The apps model a node is built from, the platform model a partner adopts rather than rebuilds \u2014 tenancy, identity, surfaces, data and trust, lifecycle, and the seven modules that ship \u2014 and the rules a change must obey, with each stack's parser kept apart from the rule it serves.",
       "author": {
         "name": "SaaS Plane"
@@ -23,7 +23,7 @@
     },
     {
       "name": "spn-infra",
-      "source": "./plugins/spn-infra/src",
+      "source": "./packages/plugin-spn-infra/src",
       "description": "SaaS Plane infra domain \u2014 one plugin for every INFRA repository, cloud-agnostic with its clouds inside it. Six skills reading the same words as apps: new, implement, review, run, verify, release. The estate model \u2014 shape, packages, blueprints, resources, apps, modules, trust, operate, ships \u2014 the estate laws and the name grammar, and the per-cloud material. A hook that denies secrets, ARNs, account ids, provider strings outside a cloud entry, and hand edits to built output: the rule stated once and cloud-free, the spellings belonging to each cloud.",
       "author": {
         "name": "SaaS Plane"
