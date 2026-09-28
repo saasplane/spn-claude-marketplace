@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/01-realization.md", "seen": "61a5d971" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/01-realization.md", "seen": "5cfdf4c3" }
   ]
 }
 -->
@@ -27,10 +27,10 @@
 
 | Layer | Realized as | Brought up by |
 | --- | --- | --- |
-| Organization | the machine's trust bootstrap — the local certificate authority, its one trust prompt, the shared ingress | `spnutils infra organization up` |
+| Organization | the machine's trust bootstrap — the local certificate authority, its one trust prompt, the local resolver, the shared ingress | `spnutils infra organization up` |
 | Platform | the platform's container group from the pinned declaration — the engines, plus each installed module's local rendering | `spnutils infra platform up` |
 | Environment | **nothing** — the machine is one environment, so no local form exists and targeting it is refused by name | — |
-| Deployments | the applications in dev mode — schemas, certificates, a hosts entry, the ingress vhost | `spnutils infra app up` |
+| Deployments | the applications in dev mode — schemas, certificates, the ingress vhost | `spnutils infra app up` |
 
 **Read the environment row as a prohibition rather than a gap.** [`08-environment.md`](08-environment.md) states the refusal.
 

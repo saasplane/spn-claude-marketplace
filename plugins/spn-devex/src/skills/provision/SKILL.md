@@ -2,7 +2,7 @@
 {
   "docs": [
     { "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md", "seen": "ebb9e28f" },
-    { "path": "spn-foundation/docs/02-constructs/01-devex/01-function/06-provision.md", "seen": "7b62eb1c" }
+    { "path": "spn-foundation/docs/02-constructs/01-devex/01-function/06-provision.md", "seen": "248bb35b" }
   ]
 }
 -->
@@ -19,10 +19,10 @@ description: How infrastructure appears for development - the layer order, what 
 
 | Layer | Scope | Owns, locally |
 | --- | --- | --- |
-| **organization** | once per machine | the machine's trust bootstrap — the local certificate authority, its one trust prompt, the shared ingress |
+| **organization** | once per machine | the machine's trust bootstrap — the local certificate authority, its one trust prompt, the local resolver, the shared ingress |
 | **platform** | once per platform | the platform's container group — the shared data and messaging engines the declaration names, and each installed module's local rendering |
 | **environment** | — | **cloud only.** The machine is one environment, so no local form exists and targeting it locally is refused by name |
-| **app** | per service or web app | schemas, per-schema roles, a local certificate, a hosts entry, an ingress vhost — read from the app's `spkind.json` and env against the pinned platform |
+| **app** | per service or web app | schemas, per-schema roles, a local certificate, an ingress vhost — read from the app's `spkind.json` and env against the pinned platform |
 
 The layers are nouns — each has `plan`, `up`, `down`, and `status`; the app has `up` and `down`. Bring them up in order; a lower layer that is missing is the usual reason a higher one will not start — locally `up` converges the prerequisites below it in place. The app layer registers an app against the platform stack — it runs no containers of its own.
 

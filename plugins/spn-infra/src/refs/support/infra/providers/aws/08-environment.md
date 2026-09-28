@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/aws/08-environment.md", "seen": "0bf0080d" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/aws/08-environment.md", "seen": "c4c4973b" }
   ]
 }
 -->
@@ -22,6 +22,8 @@
 | 3 | Cluster, ingress, namespaces | a network to sit in |
 | 4 | Data services, and a role per schema | the data VPC, and its endpoints |
 | 5 | DNS and certificates | the control center's zones, which this layer writes names into |
+
+**Act 5 writes no tenant record and no wildcard record.** It stands the environment's own distribution with one exact alias and record per `{env}-{app}` host; a tenant host reaches the platform's tenant edge through the `*` record, and the runtime writes routes, never DNS (`RD.INFRA.104` · `RD.INFRA.105`).
 
 **Act 1 computes and does not ask.** If a step here is waiting for somebody to supply a CIDR, the addressing rule has been broken upstream — see [`04-addressing.md`](04-addressing.md).
 

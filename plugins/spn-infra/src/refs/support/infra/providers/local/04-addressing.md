@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/04-addressing.md", "seen": "b1cdd1e1" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/04-addressing.md", "seen": "ee1e8558" }
   ]
 }
 -->
@@ -19,13 +19,13 @@
 
 ## Hosts resolve to loopback, and the port carries the transport
 
-**Every local host record resolves to `127.0.0.1`**, so nothing is proxied and no engine protocol is intercepted. Engines are named like every other service, and the derived port stays the transport distinguisher — `dmo-database.lc-spndemo.app:9210` (`RD.INFRA.079`).
+**Every local host resolves to `127.0.0.1`**, answered by the resolver the organization layer installs for the local domain and `lc-test`, so no host needs an `/etc/hosts` line, nothing is proxied and no engine protocol is intercepted. **A host the running platform creates carries no environment prefix here** — `acme.lc-spndemo.app`, never `in-dev-acme…`. Engines are named like every other service, and the derived port stays the transport distinguisher — `dmo-database.lc-spndemo.app:9210` (`RD.INFRA.079`).
 
 **A space's engine ports derive** from the platform family's port plus one hundred for each space, the family's own secondary offsets riding along (`RD.INFRA.062`). The formula is realized identically in the blueprints render and in the CLI.
 
 ## A declared domain and its local rendering join both ways
 
-**Each declared domain gets one `{lc-domain}`, its own certificates from the machine's root CA, and hosts entries** (`RD.INFRA.087`). A declared domain with no local rendering is refused, and so is a local rendering of a domain the platform never declared.
+**Each declared domain gets one `{lc-domain}`, its own certificates from the machine's root CA, and an answer from the local resolver** (`RD.INFRA.087` · `RD.INFRA.106`). A declared domain with no local rendering is refused, and so is a local rendering of a domain the platform never declared.
 
 ## The tenancy fixtures
 

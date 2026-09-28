@@ -1,8 +1,8 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/01-shape/02-coordinates.md", "seen": "a8e69ea5" },
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/06-modules/02-config.md", "section": "The published vocabulary", "seen": "bbe1fc76" },
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/01-shape/02-coordinates.md", "seen": "ac0dc55f" },
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/06-modules/02-config.md", "section": "The published vocabulary", "seen": "08f1de16" },
     { "path": "spn-foundation/docs/02-constructs/02-support/02-infra/06-modules.md", "section": "The rungs, and what a path may be", "seen": "24b787b2" }
   ]
 }
@@ -36,14 +36,14 @@ consumer app       {env}-{app}.{domain}         every environment — PROD inclu
 module services    {env}-{module}-{service}.{spd}   the estate owns the namespace; the module names its services
 platform documents {env}-{world}-docs.{spd}
 storage API        {env}-{world}-storage.{spd}  CLUSTER only — the engine's S3 API via the ingress, TLS from the zone wildcard
-tenant             {env}-{tenant}.{spd}         canonical; a pretty name is a site entry
+tenant             {env}-{tenant}.{spd}         canonical; a pretty name is a site entry; a route, never a record
 custom domain      customer-owned               outside the zone, its own certificate
 ```
 
 - **`{domain}` is the zone an app's row binds** — the platform domain `{spd}` unless the row carries a `serviceDomain` key naming one of the platform's service domains. Engine records, the documents host and the storage API belong to a **world**, and a world has no domain: they stay on `{spd}` however many service domains the platform declares.
 - **Every declared domain stands a public zone `{domain}` and a private zone `internal.{domain}`, and the private zone is always a child name — never the apex** (RD.INFRA.086). A private zone takes precedence for its whole namespace inside every network it joins, so a private zone on the apex would make the platform's own public hosts unresolvable from inside the cluster.
 - **One world-marking rule covers every service hostname class** (RD.INFRA.052): the world token is the platform's `{spc}`, a space's code, or a module's code — **no unmarked default world exists**. A space that stands its own engine gets its own records (`in-dev-sas-database…`), which is why unmarked records would be ambiguous, not merely inconsistent. The world token always matches the key prefix of the facts carrying the hostname.
-- **Locally** (RD.INFRA.079): `{world}-{service}.{lc-domain}` for every service, engines included — `dmo-docs` · `sas-docs` · `idp-auth` · `dmo-database.lc-spndemo.app:9210` · `sas-cache.lc-spndemo.app:9311`. The record resolves to `127.0.0.1`, so nothing is proxied and no engine protocol is intercepted. The derived port stays the transport distinguisher, and the hostname carries the world. Server certificates are minted per `{world}-{family}`, so an engine presents a certificate for the name you dial.
+- **Locally** (RD.INFRA.079): `{world}-{service}.{lc-domain}` for every service, engines included — `dmo-docs` · `sas-docs` · `idp-auth` · `dmo-database.lc-spndemo.app:9210` · `sas-cache.lc-spndemo.app:9311`. The machine's resolver answers the host with `127.0.0.1`, so nothing is proxied and no engine protocol is intercepted. The derived port stays the transport distinguisher, and the hostname carries the world. Server certificates are minted per `{world}-{family}`, so an engine presents a certificate for the name you dial.
 - **Module namespaces are validated** (RD.INFRA.056): no kindCode may equal a declared module code or begin with one plus a hyphen.
 - **Engine records**: the environment apply writes them into the private zone, pointing at whatever the hosting rendered. Use these names in published endpoint facts, **never provider hostnames** — an engine swap flips a record, and every consumer follows.
 - **PROD keeps `{env}` like every environment.** A bare name never exists as grammar, so published facts, config documents and minted URLs are env-pinned always.
@@ -54,7 +54,7 @@ custom domain      customer-owned               outside the zone, its own certif
 Written by blueprints into each **resource world's own seat**. **Every configuration rung ends in the same leaf segment, `vars`** (RD.INFRA.054) — the platform world at `/environments/{env}/vars`, a space at `/environments/{env}/spaces/{code}/vars`, a module's private seat at `/environments/{env}/modules/{code}/vars`, with `/organization/vars` and `/platform/vars` above them. The app plane — `/environments/{env}/apps/{app}/vars` and one seat per deployment beneath it at `/environments/{env}/apps/{app}/deployments/{deployment}/vars` — is dev-authored (RD.INFRA.054). Identity facts flat; resources as connection blocks the support shell reads directly. **Plus each installed module's purpose code** — `DMO_IDP_URL` names the purpose as the environment stands it, never the product that renders it.
 
 ```text
-{SPC}_ORG_LEGAL_*                                   {SPC}_PLATFORM_CODE · _NAME · _DOMAIN · _OWNER_*
+{SPC}_ORG_LEGAL_*                                   {SPC}_PLATFORM_CODE · _NAME · _DOMAIN · _ENV · _APPS_{APP}_SUBDOMAIN · _OWNER_*
 {SPC}_RESOURCE_{FAM}_{WORLD}_ENDPOINTS              per connection block (RD.INFRA.055): DB_APP · DB_MIGRATION ·
                                                     DB_{SCHEMA} · CACHE_APP · QUEUE_APP · STORAGE_APP (+ _PUBLIC_ENDPOINTS)
 {SPC}_RESOURCE_{FAM}_{WORLD}_PROVIDER               connection worlds: APP everywhere; db adds MIGRATION + one {SCHEMA} block per custom schema

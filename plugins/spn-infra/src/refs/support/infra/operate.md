@@ -1,8 +1,8 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/02-constructs/02-support/02-infra/08-operate.md", "seen": "18c7aba0" },
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/08-operate/", "seen": "df620c8a" }
+    { "path": "spn-foundation/docs/02-constructs/02-support/02-infra/08-operate.md", "seen": "a3897b34" },
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/08-operate/", "seen": "12b780c3" }
   ]
 }
 -->
@@ -18,7 +18,7 @@ A running estate owes what a deployment must derive rather than have authored, w
 | Trigger | `SPEstateDeploy` | what starts a deployment into one environment: a branch, an approved tag, or a person |
 | Promotion | `SPEstateDeployTagApproval.promotesFrom` | moving an already-proven artifact to the next environment, skipping no rung |
 | Health listener | — | the separate port a long-running process answers probes on, never the serving port |
-| Hostname seam | — | the one door that makes a hostname serve: it issues the certificate and binds it at the edge |
+| Hostname seam | — | the one door that makes a hostname serve: it issues the certificate, binds it at the edge and writes the host's route |
 | Web releases store | — | an environment's own store of immutable web releases |
 | Declared state | — | what the manifests say should exist |
 | Actual state | — | what the provider holds right now |
@@ -92,19 +92,24 @@ A branch **MUST** be claimed by at most one environment per platform — otherwi
 
 Routing is data: a new customer surface is a row, never a release. **A customer's hostname is issued and bound when the request to serve it arrives, through the hostname seam, and never by an apply** (`RD.INFRA.084`). The serving layer's certificate set changes as hosts are bound, not as infrastructure is applied. A customer subdomain rides the declared domain's wildcard certificate; a customer's own domain rides the certificate the seam issued for it.
 
+**A host the system creates carries `{env}` in every cloud environment, production included, and none locally.** **The running platform writes routes and never DNS**, and a customer-owned domain's DNS is the customer's.
+
 | Writer | Owns |
 | --- | --- |
-| provisioning | the infrastructure records and the wildcard certificates |
-| the service publisher | one record per exposed deployment |
-| the running platform | customer subdomains |
+| the estate | the zones, the edge certificates, one record per `{env}-{app}` host, the zone's `*` record, the tenant edge and the route store |
+| the service publisher | one private record per exposed deployment |
+| the running platform | `sites/{host}` — the route `{env, app, orgCode, orgName}` |
+| the deploy | `releases/{env}/{app}` — the release one application serves in one environment |
 
-Each writer's scope is disjoint, so nothing races on a name. Provisioning creates the zones, the wildcards and a scoped write role, then stays out of the way. **No infrastructure change per customer, and none per customer-owned domain.** Every declared domain stands its own pair of zones (`RD.INFRA.086`), and the private zone is always the child name, never the apex.
+Each writer's scope is disjoint, so nothing races on a name (`RD.INFRA.105`). The runtime never writes `releases/` and the deploy never writes `sites/`, so a rollback cannot lose a tenant and a signup cannot repoint a release. **No infrastructure change per customer, and none per customer-owned domain.**
+
+**One tenant edge per platform serves every environment's tenant hosts** (`RD.INFRA.104`). The platform layer stands it with the alias `*.{spd}`, the zone's `*` record and one route store. Its function reads `sites/{host}` → `{env, app}`, then `releases/{env}/{app}`, and switches its origin to that environment's store; any miss answers 404. An environment's own distribution serves only its `{env}-{app}` hosts. **Not yet proven on an account** — the origin switch across environments and one store read by several distributions have not been run. Locally the same routes become ingress registrations (`RD.INFRA.106`). Every declared domain stands its own pair of zones (`RD.INFRA.086`), and the private zone is always the child name, never the apex.
 
 **Observability is not something anybody opts into.** An application is observable because it was deployed — the collectors were installed by a layer, and nothing depends on somebody remembering to wire one in.
 
 ## Web delivery is a store and a pointer
 
-A publicly exposed web deployment ships a bundle with no process, so its delivery never moves through the cluster. Every managed environment owns a web releases store of its own:
+A publicly exposed web deployment ships a bundle with no process, so its delivery never moves through the cluster. Every environment owns a web releases store of its own, under either hosting:
 
 ```text
 {app}/releases/{hash}/**     immutable — the whole build, one upload per release
@@ -112,9 +117,9 @@ A publicly exposed web deployment ships a bundle with no process, so its deliver
 
 | Act | What happens |
 | --- | --- |
-| **deploy** | copies the release into the environment's own store, verified by hash; repoints the distribution, invalidates only the short-lifetime class |
+| **deploy** | copies the release into the environment's own store, verified by hash; writes `releases/{env}/{app}`, invalidates only the short-lifetime class |
 | **promote** | builds the release again with the next environment's values, then deploys it |
-| **rollback** | repoints inside the environment's own history, with no other environment involved |
+| **rollback** | writes an earlier release of the same environment to `releases/{env}/{app}`, with no other environment involved |
 
 Files that are publicly readable version by riding the release, so a rollback restores exactly the assets that shipped with that build. **Retention is declared, not accumulated** — the store keeps a stated number of releases, so the rollback window is a number somebody wrote down and growth is bounded by it.
 
@@ -125,7 +130,7 @@ The cache contract derives from the tree and is rendered twice, never configured
 /*           short lifetime, invalidated      the entry document, public files
 ```
 
-**No store spans workloads.** Each environment's edge fronts its own store, in its own account, under its own key — a web release reaches another environment only by promotion, never by a shared origin.
+**No environment's edge reads another environment's store.** Each environment's distribution fronts its own store, in its own account, under its own key. The tenant edge is the one reader that crosses environments, and it reads only the store a route names. A web release reaches another environment only by promotion, never by a shared origin.
 
 ## What exists, what should exist, and where they disagree
 
@@ -175,6 +180,8 @@ Operate an estate from its declarations, never from inference. Answer against **
 | a tag promoted past a rung it never ran in | the path to production skipped a step |
 | a serving layer with an enumerated host list | a customer touchpoint became a release |
 | a second mutable object in a web store | the release stopped being immutable, and rollback stopped being a repoint |
-| a web store read by another environment's edge | the store boundary broke — no store spans workloads |
+| a web store read by another environment's edge | the store boundary broke — only the tenant edge crosses environments, and only by a route |
+| a DNS record written by the running platform | a tenant became an infrastructure change |
+| a route written by the deploy, or a release pointer by the runtime | a rollback can lose a tenant, or a signup repoint a release |
 | a drift corrected in a provider console | the declaration is no longer the source of truth |
 | an estate claim asserted with no source | inference was presented as fact |

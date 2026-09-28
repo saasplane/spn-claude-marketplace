@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/aws/01-realization.md", "seen": "f1b5af86" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/aws/01-realization.md", "seen": "d25a3dd7" }
   ]
 }
 -->
@@ -39,6 +39,7 @@
 | Root guardrails | tag and control policies at the organization root, so no member account can opt out of them | [`06-organization.md`](06-organization.md) |
 | Registry pairs | the image registry and the package registry in the control center, read by every workload account | [`07-platform.md`](07-platform.md) |
 | Zones | the public zone for the platform's domain and its `internal.` counterpart, each with one wildcard certificate | [`07-platform.md`](07-platform.md) |
+| Tenant edge | one distribution answering `*.{spd}` for every environment, and the one route store every distribution reads | [`07-platform.md`](07-platform.md) |
 
 **Each of these values is discovered rather than typed.** The run that creates a binding publishes it to the parameter registry, and later runs read it from there. The exception is the short list of values [`02-ground.md`](02-ground.md) records, which exist before any tool does.
 

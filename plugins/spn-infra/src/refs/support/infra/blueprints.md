@@ -2,7 +2,7 @@
 {
   "docs": [
     { "path": "spn-foundation/docs/02-constructs/02-support/02-infra/03-blueprints.md", "seen": "173fa2ce" },
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/03-blueprints/", "seen": "7066458b" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/03-blueprints/", "seen": "1038bc8e" }
   ]
 }
 -->
@@ -93,7 +93,7 @@ A provider entry always names a real provider. **The local realization binds non
 
 | Layer | On a laptop | In the cloud |
 | --- | --- | --- |
-| `ORGANIZATION` | the machine's trust bootstrap: the CA, its one trust prompt, the shared ingress | accounts, guardrails, the registry, the audit trail |
+| `ORGANIZATION` | the machine's trust bootstrap: the CA, its one trust prompt, the local resolver, the shared ingress | accounts, guardrails, the registry, the audit trail |
 | `PLATFORM` | the product's container group | containers, workload accounts, policies, zones, runners, observability |
 | `ENVIRONMENT` | no local form at all — the machine is one environment, and targeting it is refused by name | network, resources, compute |
 | `DEPLOYMENTS` | the applications, run directly | the applications, on the cluster |

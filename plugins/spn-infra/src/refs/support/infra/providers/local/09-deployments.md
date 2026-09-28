@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/09-deployments.md", "seen": "f9d7b1d3" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/09-deployments.md", "seen": "5529827e" }
   ]
 }
 -->
@@ -23,10 +23,11 @@
 | --- | --- |
 | the schemas the application's row declares, and their per-schema roles | the generated grant matrix — the same matrix a cloud apply generates ([resources](../../resources.md)) |
 | a leaf certificate pair per served host | the machine's own certificate authority |
-| a hosts entry per served host, resolving to loopback | the local domain of the zone the row binds to |
 | one vhost file in the shared ingress directory | the proxy the organization layer stood |
 
-**`spnutils infra domain register` routes one or more hosts through the same proxy**, which is how a customer-owned domain is exercised locally.
+**No served host needs an `/etc/hosts` line** — the local resolver answers the local domain and `lc-test`.
+
+**`spnutils infra domain register <host> --app <app> --unprivileged` registers a host with the shared ingress and needs no privilege** (`RD.INFRA.106`): the vhost, a certificate the wildcard covers or the local CA mints, a reload. `infra domain unregister` removes it. **The local edge provider calls it for every route the running platform writes**, storing the route at `~/.spnutils/platforms/{org}/{spc}/routes/{host}.json`, as the cloud provider calls its vendor — so a tenant signed up locally loads at `https://acme.lc-spndemo.app` with no manual step. **A test picks its own customer domain under `lc-test`**, such as `shop.acme.lc-test`.
 
 ## What runs, and what does not
 

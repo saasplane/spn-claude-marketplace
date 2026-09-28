@@ -1,8 +1,8 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/02-constructs/03-platform/01-core/03-surfaces.md", "seen": "b7392478" },
-    { "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/03-surfaces/", "seen": "2ed5be9c" }
+    { "path": "spn-foundation/docs/02-constructs/03-platform/01-core/03-surfaces.md", "seen": "5602aa41" },
+    { "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/03-surfaces/", "seen": "1b7176f4" }
   ]
 }
 -->
@@ -49,11 +49,11 @@ Never read the anchor as the bound organization — MUST NOT. A site anchored to
 
 You resolve a request in two reads and no code: the host finds the site's application, its anchor and its branding; the site then carries that context into sign-in, where the server — never the client — resolves it to the organization, application and scope a session will bind to. A caller sends a host and nothing else about itself, which is what makes the site behave like a registered client identifier: nothing a caller asserts can put it on an organization its site does not name.
 
-**A new customer touchpoint is a row somebody adds, never a release somebody ships.** If the developer wants to onboard an organization onto its own branded domain, add an app-site row naming the host, the app scope, and the owning organization — no code changes, and no deploy.
+**A new customer touchpoint is a row somebody adds, never a release somebody ships.** If the developer wants to onboard an organization onto its own branded domain, add an app-site row naming the host, the app scope, and the owning organization — no code changes, and no deploy. The host serves because the running platform writes its route — which environment and application it opens — through the edge seam, and never a DNS record (`RD.INFRA.105`); deactivating the site deletes every host's route.
 
 ## Custom domains
 
-An organization can bind its own domain to a site instead of using the platform's shared one. The domain is globally unique and first come, first served, and the binding moves through the same state machine carried in the Identity ref (`AppSiteDomainStatusType` — `PENDING` → `ISSUING` → `ACTIVE`, or `REMOVING` / `FAILED`), behind a swappable certificate provider.
+An organization can bind its own domain to a site instead of using the platform's shared one. The domain is globally unique and first come, first served, and the binding moves through the same state machine carried in the Identity ref (`AppSiteDomainStatusType` — `PENDING` → `ISSUING` → `ACTIVE`, or `REMOVING` / `FAILED`), behind the edge seam, which issues, binds and routes. An `ACTIVE` domain serves through its route, the customer's own DNS points it at the platform, and teardown runs unroute, unbind, revoke, delete.
 
 ## The coordinates an instance runs under
 

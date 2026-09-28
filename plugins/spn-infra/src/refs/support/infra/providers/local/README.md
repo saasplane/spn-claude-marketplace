@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/README.md", "seen": "748562fa" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/README.md", "seen": "e29eabe8" }
   ]
 }
 -->
@@ -35,10 +35,10 @@
 
 | Layer | What it is, locally | Command |
 | --- | --- | --- |
-| Organization | the machine's trust bootstrap — the local certificate authority, its one trust prompt, the shared ingress | `spnutils infra organization up` |
+| Organization | the machine's trust bootstrap — the local certificate authority, its one trust prompt, the local resolver, the shared ingress | `spnutils infra organization up` |
 | Platform | the platform's container group from the pinned declaration — the engines, plus each installed module's local rendering | `spnutils infra platform up` |
 | Environment | **nothing** — the machine is one environment, so no local form exists and targeting it is refused by name | — |
-| Deployments | the apps in dev mode — schemas, certificates, a hosts entry, the ingress vhost | `spnutils infra app up` |
+| Deployments | the apps in dev mode — schemas, certificates, the ingress vhost | `spnutils infra app up` |
 
 **The environment row is a prohibition, not a gap.** Read a dash as a ruling.
 

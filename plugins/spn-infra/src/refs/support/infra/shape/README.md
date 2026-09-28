@@ -1,9 +1,9 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/02-constructs/02-support/02-infra/01-shape.md", "seen": "11465bdf" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md", "seen": "c9a9084f" },
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/03-blueprints/01-layers.md", "seen": "f8a5ffba" }
+    { "path": "spn-foundation/docs/02-constructs/02-support/02-infra/01-shape.md", "seen": "f0aa93bf" },
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md", "seen": "04d58a37" },
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/03-blueprints/01-layers.md", "seen": "a1cb123e" }
   ]
 }
 -->
@@ -53,14 +53,14 @@ The layers are nouns; each takes `plan · up · down · status`. Start them in o
 
 | Noun | Commands | Locally | In the cloud |
 | --- | --- | --- | --- |
-| `organization` | plan · up · down · status | the machine's trust bootstrap — the CA, its one trust prompt, the shared ingress; `--reset-certs` after CA loss | accounts, root guardrails, registry pairs, zones |
-| `platform` | plan · up · down · status | the platform's container group — engines + each module's local rendering; converges org prerequisites in place | containers, workload accounts, policies, zone, instruments |
+| `organization` | plan · up · down · status | the machine's trust bootstrap — the CA, its one trust prompt, the local resolver, the shared ingress; `--reset-certs` after CA loss | accounts, root guardrails, registry pairs, zones |
+| `platform` | plan · up · down · status | the platform's container group — engines + each module's local rendering + every stored route registered with the ingress; converges org prerequisites in place | containers, workload accounts, policies, zone, instruments, the tenant edge and its route store |
 | `environment` | plan · up · down · status — `<env>`, **`--cloud` only** | **no local form exists** — the machine is one environment; targeting it locally is refused by name | network → resources → compute, in order |
-| `app` | up · down | the app's derived converge — schemas, certificates, a hosts entry and the ingress vhost; app from the cwd, `-p` overrides | — (deploys ride the pipeline) |
+| `app` | up · down | the app's derived converge — schemas, certificates and the ingress vhost; app from the cwd, `-p` overrides | — (deploys ride the pipeline) |
 
 **Every provisioning run names its mode, and there is no default** (RD.INFRA.094). `up` and `down` each take exactly one of `--plan` or `--apply`. A command that plans when you forget a flag is a command doing another command's job, and a default would decide the direction of the mistake for you.
 
-Beside the layers: `logs [service]` · `show` (resolution per layer, incl. **PINNED @ version or a path**) · `trust-ca` (trust the machine's own CA — what the local `organization up` does as part of its bootstrap) · `domain register|unregister` (route a host through the local proxy, for testing a customer-owned domain) · the `config` commands (`set · get · list · export · import · diff · render` — the app plane only, never the ledger) · `scaffold repo|organization|platform|module` · `validate` · `test` · `release`.
+Beside the layers: `logs [service]` · `show` (resolution per layer, incl. **PINNED @ version or a path**) · `trust-ca` (trust the machine's own CA — what the local `organization up` does as part of its bootstrap) · `domain register|unregister` (register a host with the local proxy, `--app <app> --unprivileged` needing no privilege — what the local edge provider calls for every route, and what a test calls for its own `lc-test` domain) · the `config` commands (`set · get · list · export · import · diff · render` — the app plane only, never the ledger) · `scaffold repo|organization|platform|module` · `validate` · `test` · `release`.
 
 ## Doors — who may run what, where
 

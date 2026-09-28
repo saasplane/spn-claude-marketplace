@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/07-platform.md", "seen": "64055dcc" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/07-platform.md", "seen": "5ef0a683" }
   ]
 }
 -->
@@ -28,6 +28,8 @@
 **There is no orchestrator, and that is a decision rather than a shortfall.** A deployment is derived, so no manifest exists for a local cluster to validate. What it would buy is already zero, and what it costs is the machine's memory and a slower loop.
 
 ## Coming down
+
+**`platform up` also registers every stored route with the ingress** — each `~/.spnutils/platforms/{org}/{spc}/routes/{host}.json` the local edge provider kept — so a rebuilt machine serves every tenant it served before (`RD.INFRA.106`).
 
 **A teardown removes what the platform owns and refuses its data.** Destroying a stateful resource is a separate act, named separately and confirmed separately (`RD.INFRA.024`). That rule holds on a laptop for the same reason it holds in an account: the habit is what carries.
 
