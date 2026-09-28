@@ -15,11 +15,11 @@ description: Decide what a node IS, and design a requirement inside that shape -
 
 A boundary nobody decides still gets drawn: the first three features draw it, implicitly, and by the time anyone notices, moving it means moving everything built inside it. **That is how projects go wrong slowly** — in the twenty minutes nobody spent deciding what the thing is and, harder, what it deliberately is not.
 
-Your output is exactly one file: **`CONCEPT.md` at the repository root**, beside `sprepo.json`. A concept belongs to a repo root, never to a node (decision RD.DOCS.012). Nodes carry `README.md` alone, so ideating a node lands as sections of its repo's concept. Never `docs/`. Never code.
+Your output is exactly one file: **`CONCEPT.md` at the repository root**, beside `sprepo.json`. A concept belongs to a repo root, never to a node (decision RD.DEVEX.WORKSPACE.080). Nodes carry `README.md` alone, so ideating a node lands as sections of its repo's concept. Never `docs/`. Never code.
 
 ## One skill, three modes — and `plan` is not a fourth
 
-**`PLAN` left the DevEx stages and folded in here** (`RD.DEVEX.062`). It named an output as if it were a phase, which is why it never had a command surface of its own. **Planning is not a skill, and the absence is the design**: this skill covers both deciding what a node **is** and designing a requirement **inside** that shape.
+**`PLAN` left the DevEx stages and folded in here** (`RD.DEVEX.FUNCTION.062`). It named an output as if it were a phase, which is why it never had a command surface of its own. **Planning is not a skill, and the absence is the design**: this skill covers both deciding what a node **is** and designing a requirement **inside** that shape.
 
 Pick the mode from the argument — `shape` · `design` · `decision`. Where none was given, infer it from the request and say which you picked.
 
@@ -31,7 +31,7 @@ Pick the mode from the argument — `shape` · `design` · `decision`. Where non
 
 ### Mode: design — a requirement becomes rows in the docs that own it
 
-**Spec-first, and no interim artifact** (`RD.DEVEX.007`): the design is written **into the owning docs as `🔮 planned` rows** — never to a scratch file, never to a `tasks/` tree. Implementation later flips statuses instead of reconciling two documents.
+**Spec-first, and no interim artifact** (`RD.DEVEX.FUNCTION.007`): the design is written **into the owning docs as `🔮 planned` rows** — never to a scratch file, never to a `tasks/` tree. Implementation later flips statuses instead of reconciling two documents.
 
 1. **Restate the requirement** in one paragraph, in the asker's own words.
 2. **Classify it**: new capability · additive change to an existing contract · **breaking** change · pure fix. **A breaking change stops here** — reroute through the versioning path and record it in `decision` mode. A breaking change never rides in as a plan row.
@@ -66,7 +66,7 @@ Name the register it belongs in: the workspace's own `docs/registers/decisions.m
 
 ## The loop — four gates, in order
 
-**A repo has one concept, however many nodes it grows.** Adding a package, app or module changes *sections* of the repo's concept — a `CONCEPT.md` beside a node manifest is always wrong (decision RD.DOCS.012). When a node is scaffolded, ask whether the concept needs a new section or a moved boundary; never offer the node a concept of its own. This is the likeliest wrong turn on a growing repo, because the node feels like the thing being decided.
+**A repo has one concept, however many nodes it grows.** Adding a package, app or module changes *sections* of the repo's concept — a `CONCEPT.md` beside a node manifest is always wrong (decision RD.DEVEX.WORKSPACE.080). When a node is scaffolded, ask whether the concept needs a new section or a moved boundary; never offer the node a concept of its own. This is the likeliest wrong turn on a growing repo, because the node feels like the thing being decided.
 
 **You do not draft the whole document and present it.** Each step is a gate: you produce one thing, the person reviews it, and only then do you move on. This is the entire mechanism — a concept produced in one pass is a concept nobody agreed to.
 
@@ -106,7 +106,7 @@ One section: **preview it, wait, then write it.** Never two at once, never the w
 Every unanswered question is a card with **real options and a recommendation**. A card with no options is a status update; a card with no recommendation makes the person do the analysis twice. **The shape is [`refs/decision-cards.md`](../../refs/devex/workspace/docs/decision-cards.md)** — the same one every open item uses, here and everywhere else.
 
 - **The stage ends when the questions are answered, not when they run out.**
-- **An expansion is made on request, and which kind it is depends on what was asked.** A question too large for an Open card needs somewhere to be **argued** — that is an approach document, `artifacts/approaches/<topic>-approach.html`. A section too big to review in place needs somewhere to be **read** — that is an overview, `artifacts/overviews/<section>-overview.html`. A concept states shape, so someone wanting the detail is asking for the expansion, not for a longer concept. The routing test is whether options were weighed and one chosen (decisions RD.DOCS.039 · RD.DOCS.040). Either way the section names the file and the file names the section back. **Offer; never start one unasked**, and never write one to make a concept look finished. A concept whose sections have none is the normal case, not an incomplete one.
+- **An expansion is made on request, and which kind it is depends on what was asked.** A question too large for an Open card needs somewhere to be **argued** — that is an approach document, `artifacts/approaches/<topic>-approach.html`. A section too big to review in place needs somewhere to be **read** — that is an overview, `artifacts/overviews/<section>-overview.html`. A concept states shape, so someone wanting the detail is asking for the expansion, not for a longer concept. The routing test is whether options were weighed and one chosen (decisions RD.DEVEX.WORKSPACE.102 · RD.DEVEX.WORKSPACE.103). Either way the section names the file and the file names the section back. **Offer; never start one unasked**, and never write one to make a concept look finished. A concept whose sections have none is the normal case, not an incomplete one.
 - A question deliberately not answered is **deferred with a trigger** — what would bring it back.
 
 ## The lenses you convene

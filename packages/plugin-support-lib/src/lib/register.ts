@@ -10,7 +10,7 @@
 // it is the only way to be right in both the per-node layout and the one-tree-per-repository layout
 // that follows it.
 //
-// **A column is found by its HEADING and never by its position** (the book's RD.DOCS.079). The row
+// **A column is found by its HEADING and never by its position** (the book's RD.DEVEX.WORKSPACE.139). The row
 // grammar has three widths: eight cells in the older registers, nine where `Where` or `Realizes`
 // joins them, and ten where `Names` does. A reader pinned to one width sees a wider register as no
 // register at all and reports a confident zero, which is the worst answer a tool can give.

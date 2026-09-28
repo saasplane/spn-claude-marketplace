@@ -79,7 +79,7 @@ One folder sits under `packages/plugin-spn-apps/src/providers/`, named for the s
 
 ### A floor rises by script and never falls by hand
 
-**Why** — *without a ratchet, the cheapest way past a failing floor is to edit it down* (the book's RD.APPS.133). A number somebody typed is a number nobody measured, and an exclude with no reason cannot be told from code nobody wrote a case for.
+**Why** — *without a ratchet, the cheapest way past a failing floor is to edit it down* (the book's RD.SUPPORT.APPS.133). A number somebody typed is a number nobody measured, and an exclude with no reason cannot be told from code nobody wrote a case for.
 **What** — after a run that collected coverage, the script reads `coverage-summary.json` and raises each of the four numbers in `coverageThreshold.global` or `coverage.thresholds` to the measured value rounded down, with the date in a comment. A number above the measurement is left as it was, and the script says the run falls below it. The check refuses a write that lowers any of the four, and refuses a new `coveragePathIgnorePatterns` or `coverage.exclude` entry with no comment beside it. A Playwright configuration is never read.
 **How** — the script writes the file directly, so the check at the moment of a write sees only a person's edit. `packages/plugin-spn-apps/src/providers/ts/scripts/tools/coverage-floor.ts` and `packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/coverage-floor.ts`, proven on fixtures in `packages/plugin-spn-apps/tests/unit/providers/ts/tools/t-coverage-floor.mjs` and `packages/plugin-spn-apps/tests/unit/providers/ts/checks/_tests/t-coverage-floor.mjs`.
 

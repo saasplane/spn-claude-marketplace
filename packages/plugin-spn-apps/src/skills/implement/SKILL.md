@@ -5,7 +5,7 @@
     { "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md", "seen": "f5707087" }
   ],
   "decisions": [
-    { "repo": "spn-foundation", "row": "RD.APPS.006", "seen": "bd83376e" }
+    { "repo": "spn-foundation", "row": "RD.SUPPORT.APPS.006", "seen": "bd83376e" }
   ]
 }
 -->
@@ -91,7 +91,7 @@ The step files are the `server-dev` and `web-dev` lenses worn — they carry the
 Three more that decide whether a symbol appears at all:
 
 - **Only the barrel is read.** A file under a `_`-prefixed path segment, a declaration without `export`, and a `private`/`protected` member are each excluded. Those are the three ways to keep something out, and they are the *only* ways.
-- **A one-line JSDoc intent is harvested** into the artifact (RD.APPS.006). No intent means the symbol is in the index with nothing to select it by — the single most common reason an agent cannot find work that already exists.
+- **A one-line JSDoc intent is harvested** into the artifact (RD.SUPPORT.APPS.006). No intent means the symbol is in the index with nothing to select it by — the single most common reason an agent cannot find work that already exists.
 - **`@deprecated` travels.** Tag a superseded export and every consumer's agent sees it.
 
 **The step files are the standard for anyone reading them** — generate against those, not against a document you may not have. Their provenance is the foundation book's TypeScript provider set — the standards chapters plus the kind registry and lifecycle seats. That set carries the reasoning behind each rule for readers who have it. Nothing in the steps is deferred to it.

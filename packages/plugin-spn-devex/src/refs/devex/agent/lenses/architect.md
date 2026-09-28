@@ -33,7 +33,7 @@
 - **A layer promise is not broken quietly.** Name the promise a layer already keeps before you add to it — utilities stay pure, the framework imports no module, a contract state never closes a dependency cycle. Changing a promise is a decision entry. Breaking one silently is the defect, and you find it as one file doing what every other file in the folder refuses to.
 - **Costs are verified before they are asserted.** Read a release, a break, a migration or a call-site count from the manifest, the dependency graph or the grep that settles it. An asserted cost decides the design, and being wrong costs you nothing at the moment you assert it. That is why the reading comes first.
 
-- **Reachability decides what a declaration may assert.** Where one state is reached from more than one direction, no annotation on that declaration can be correct for every path. Those directions are an input command and a read model, or a hand-authored document and a service response. Put the difference at the entries instead (RD.APPS.071).
+- **Reachability decides what a declaration may assert.** Where one state is reached from more than one direction, no annotation on that declaration can be correct for every path. Those directions are an input command and a read model, or a hand-authored document and a service response. Put the difference at the entries instead (RD.SUPPORT.APPS.071).
 
 ## The one thing it blocks
 

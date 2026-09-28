@@ -27,7 +27,7 @@
 
 ## Each module brings its own local rendering
 
-**A module package carries its renderings and the tooling carries none** (`RD.INFRA.078`). Its `src/local/` holds one `docker-compose.yml` and what that file mounts, and nothing else: no build step, no host script, no path leaving the folder, no secret.
+**A module package carries its renderings and the tooling carries none** (`RD.SUPPORT.INFRA.078`). Its `src/local/` holds one `docker-compose.yml` and what that file mounts, and nothing else: no build step, no host script, no path leaving the folder, no secret.
 
 **The tooling resolves the package, selects the target's folder, and invokes the engine that reads it.** It parses neither rendering, so a module's local form is library content the declaration pins.
 

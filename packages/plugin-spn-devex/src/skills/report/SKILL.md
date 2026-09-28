@@ -23,7 +23,7 @@ description: Produce a report or an approach document into a node's artifacts po
 | **`docs`** | where the **corpus** departs from the docs standards — a missing seat, a page off its template, a term used two ways | the docs chapters |
 | **`tests`** | what the tests have **proved**, and what nothing has proved yet | the behaviour rows, joined to what the last run reported |
 
-**All four are superseded** — the next one replaces it in place, so a pocket never holds six audits nobody will re-read. The set is closed (decision `RD.DOCS.089`); a fifth kind is a decision entry rather than a new filename.
+**All four are superseded** — the next one replaces it in place, so a pocket never holds six audits nobody will re-read. The set is closed (decision `RD.DEVEX.WORKSPACE.149`); a fifth kind is a decision entry rather than a new filename.
 
 
 ## Where it lands
@@ -32,14 +32,14 @@ description: Produce a report or an approach document into a node's artifacts po
 
 - **The artifacts pocket is earned.** A node that has never authored anything has no pocket; creating one is part of writing the first report into it.
 - **Nested folders are allowed here and nowhere else in a pocket**, and sub-folders carry **no `README.md`** — the pocket's own README says what the pocket holds.
-- **A report is not the pocket's only authored kind, and the neighbours are easy to confuse.** A report answers a question **at a moment** and carries an as-of. An **approach document** argues a design — options weighed, one chosen — at `docs/artifacts/approaches/<topic>-approach.html`, replaced in place while `Open` holds a card. An **overview** expands one `CONCEPT.md` section to reading depth at `docs/artifacts/overviews/<section>-overview.html`. The suffix set is closed (decisions RD.DOCS.039 · RD.DOCS.040). If what you are writing has no as-of, it is not a report — route it before writing.
+- **A report is not the pocket's only authored kind, and the neighbours are easy to confuse.** A report answers a question **at a moment** and carries an as-of. An **approach document** argues a design — options weighed, one chosen — at `docs/artifacts/approaches/<topic>-approach.html`, replaced in place while `Open` holds a card. An **overview** expands one `CONCEPT.md` section to reading depth at `docs/artifacts/overviews/<section>-overview.html`. The suffix set is closed (decisions RD.DEVEX.WORKSPACE.102 · RD.DEVEX.WORKSPACE.103). If what you are writing has no as-of, it is not a report — route it before writing.
 - **An approach document's `How` has two halves.** It says what is built and how it stays true, then names **what re-aligns** — every document the reasoning obliges, with its owner and state. A contradicted artifact appears there as *a register row names which side is wrong*, never as an edit. An empty table means the design obliges no document, which is rare, or that you stopped early.
 - **A page arguing a change across repos does not start in a pocket.** It lives in the workspace's open workstream — `.spndevex/workstreams/open/{NNN}-{subject}/` — while you argue it, and both `How` tables carry a **`Scope`** column naming the node each row belongs to. Filter by scope and you have the split plan. The page moves into the owning node's pocket once it is settled, and a row lands when its content is in the node that owns it.
 - **The `State` column is read by a gate, so fill it.** Closing a subject refuses while any row is one nobody decided; `landed`, `carried` and `deferred` all pass. The check is *accounted for*, never *finished*, so parking work is a recorded act rather than a blocked one.
 
 ### The traceability matrix reads the rows, and never derives them
 
-**The behaviour rows ARE the obligation** (decision `RD.APPS.081`). A row says what a persona can do; a case proves it by
+**The behaviour rows ARE the obligation** (decision `RD.SUPPORT.APPS.081`). A row says what a persona can do; a case proves it by
 naming the row's id in its title; after a run the agent's row writer stamps `Status` and `Updated at` into the row. So this report **reads two
 things and joins them** — the rows in `docs/03-behaviors/`, and what the last run of each tier actually reported.
 
@@ -67,7 +67,7 @@ Then the body, and it obeys the corpus rules that apply everywhere. No changelog
 
 ## Voice
 
-**A report is prose, and it takes the one voice** (decisions RD.DOCS.031 · RD.DOCS.043). Write it to the person who asked: second person, present tense, around fifteen words a sentence. Define each house term where it first appears. Keep MUST wherever a sentence is normative; force lives in the exact term, never in a dense sentence. The tables stay records — a finding row, a count, a matrix keep their form and are never warmed. HTML is no exemption. Load `refs/doc-sets.md` § One voice before writing. The `spn-devex` doc-check hook measures the page as you write it. A sentence past thirty words is a finding, and so is a page that never says *you*.
+**A report is prose, and it takes the one voice** (decisions RD.DEVEX.WORKSPACE.096 · RD.DEVEX.WORKSPACE.106). Write it to the person who asked: second person, present tense, around fifteen words a sentence. Define each house term where it first appears. Keep MUST wherever a sentence is normative; force lives in the exact term, never in a dense sentence. The tables stay records — a finding row, a count, a matrix keep their form and are never warmed. HTML is no exemption. Load `refs/doc-sets.md` § One voice before writing. The `spn-devex` doc-check hook measures the page as you write it. A sentence past thirty words is a finding, and so is a page that never says *you*.
 
 ## How to produce one
 

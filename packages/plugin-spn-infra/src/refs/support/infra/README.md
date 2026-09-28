@@ -16,7 +16,7 @@
 
 ## 1 · Machines write the environment rung only
 
-The estate's keys — the `{SPC}_ORG_*` · `{SPC}_PLATFORM_*` · `{SPC}_RESOURCE_*` families (RD.INFRA.043) — land in the environment rung and nowhere else. **Every rung ends in the same leaf segment, `vars`** (RD.INFRA.054), because an application carries a seat per deployment beneath it and a path cannot be both a value and a parent of values:
+The estate's keys — the `{SPC}_ORG_*` · `{SPC}_PLATFORM_*` · `{SPC}_RESOURCE_*` families (RD.SUPPORT.INFRA.043) — land in the environment rung and nowhere else. **Every rung ends in the same leaf segment, `vars`** (RD.SUPPORT.INFRA.054), because an application carries a seat per deployment beneath it and a path cannot be both a value and a parent of values:
 
 ```text
 /organization/vars
@@ -28,7 +28,7 @@ The estate's keys — the `{SPC}_ORG_*` · `{SPC}_PLATFORM_*` · `{SPC}_RESOURCE
 /environments/{env}/apps/{app}/deployments/{deployment}/vars
 ```
 
-The app plane — an application's own rung and the deployment seats beneath it — is **dev-authored; nothing lands there by machine**, with one composed exception: the deploy render supplies the published health-port default into the composition (RD.INFRA.048).
+The app plane — an application's own rung and the deployment seats beneath it — is **dev-authored; nothing lands there by machine**, with one composed exception: the deploy render supplies the published health-port default into the composition (RD.SUPPORT.INFRA.048).
 
 > Defect: a machine write outside the environment rung, or into the app plane past the render's composed defaults — the writer split broke, and a team's value can be silently replaced by an apply.
 
@@ -42,7 +42,7 @@ Nothing long-lived exists to store. Every provider-assigned value is **discovere
 
 Put **coordinates and intent** in a manifest: codes, regions, address index values (append-only, never reused), environments, sizes, hosting, deploy triggers, rows. Everything else is either **derived** (names, addresses) or **discovered** (identifiers) — written by tools, reviewed by nobody, regenerable at any moment.
 
-An environment states its `setup` and its `region` and stops there. It declares **neither its composed `{env}` name nor the cloud provider's own region string** (RD.INFRA.098): a stored copy of a computed value is a second source for one fact, and a published estate carrying `env: "in-prod"` beside `setup: "dev"` resolved as production with nothing to object.
+An environment states its `setup` and its `region` and stops there. It declares **neither its composed `{env}` name nor the cloud provider's own region string** (RD.SUPPORT.INFRA.098): a stored copy of a computed value is a second source for one fact, and a published estate carrying `env: "in-prod"` beside `setup: "dev"` resolved as production with nothing to object.
 
 > Defect: a derived name or discovered identifier typed into a reviewed file — it will drift the first time the derivation runs.
 

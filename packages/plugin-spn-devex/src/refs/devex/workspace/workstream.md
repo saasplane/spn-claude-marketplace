@@ -76,7 +76,7 @@ document, so one workstream holds a driver change, an estate change and a plugin
 
 - **A move is a table with unique targets.** Source and target, one row per file. Two rows naming one target is a finding about the table, not a detail to settle while moving.
 - **A step producing many files carries one worked example.** Twenty-six documents described as *a real answer rather than a placeholder* is twenty-six placeholders, because that is what a brief without an example produces.
-- **An arc carries no counts.** `RD.GOV.008` rules it for prose and it is broken most often in arcs. Name the set; let the reader count it.
+- **An arc carries no counts.** `RD.DEVEX.WORKSPACE.162` rules it for prose and it is broken most often in arcs. Name the set; let the reader count it.
 
 **And an arc records its traps** — what is known to go wrong on this path, written where you will meet it rather than in a log you will not read first.
 
@@ -106,7 +106,7 @@ document, so one workstream holds a driver change, an estate change and a plugin
 **A preview costs nothing to throw away.** Code written first makes the decision feel already taken,
 and it turns a question into a fait accompli.
 
-**A major release is agreed while the arc is planned — MUST** (`RD.DEVEX.069`). A minor or patch bump is released without asking. A major one is a card answered with the arc's other cards, and its go is a dated log line naming the version, so execution reads the record instead of stopping to ask.
+**A major release is agreed while the arc is planned — MUST** (`RD.DEVEX.WORKSPACE.069`). A minor or patch bump is released without asking. A major one is a card answered with the arc's other cards, and its go is a dated log line naming the version, so execution reads the record instead of stopping to ask.
 
 ## A go is written down, or it did not happen
 

@@ -395,7 +395,7 @@ export function checkHandover(reply: string, root: string): Warning[] {
   // green, and stopped. The next window then ran the release, the release changed the wiring, and
   // changed wiring costs a window: one sitting's work became three windows, every note correct.
   //
-  // `RD.DEVEX.057` says the tool that changed the wiring owes the note. It says what the note must
+  // `RD.DEVEX.AGENT.057` says the tool that changed the wiring owes the note. It says what the note must
   // CONTAIN and never what must be TRUE before one is offered, so a note naming un-installed wiring
   // satisfies it completely. This is that missing precondition (N39 step 4).
   // ROOT IS PASSED IN, never read from `process.cwd()`. That is the fault this file already carries

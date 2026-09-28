@@ -128,10 +128,10 @@ This page answers what sits in this plugin's scripts folder and what each part m
 
 | Rule | What it decides | Weight |
 | --- | --- | --- |
-| `RD.DEVEX.008` | a behaviour row's shape, its id grammar, and that a test title carries the id | MUST |
-| `RD.APPS.035` | which rung proves which behaviour, and that status is synced from a run rather than typed | MUST |
-| `RD.DEVEX.035` | a rule reaches a write-time hook only where review would be too late | MUST |
-| `RD.GOV.024` | a repository answers to the world it declares, which is what the gate reads the stack from | MUST |
+| `RD.DEVEX.FUNCTION.008` | a behaviour row's shape, its id grammar, and that a test title carries the id | MUST |
+| `RD.SUPPORT.APPS.035` | which rung proves which behaviour, and that status is synced from a run rather than typed | MUST |
+| `RD.DEVEX.FUNCTION.035` | a rule reaches a write-time hook only where review would be too late | MUST |
+| `RD.DEVEX.WORKSPACE.176` | a repository answers to the world it declares, which is what the gate reads the stack from | MUST |
 | the foundation's `02-delivery.md` § When an edit becomes behaviour | a script here is live on its next run, so an edit lands without an install | MUST |
 | the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | the four kinds of script, one command entry, a shared folder never installed on its own | MUST |
 

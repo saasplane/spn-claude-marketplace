@@ -36,7 +36,7 @@ Nodes sit under `packages/`, one folder each, and the family-first folder name i
 
 ## What the manifest must carry
 
-Two files per node, and no `package.json` anywhere in an estate tree (RD.INFRA.066) — one appearing is a defect, not metadata.
+Two files per node, and no `package.json` anywhere in an estate tree (RD.SUPPORT.INFRA.066) — one appearing is a defect, not metadata.
 
 - **`spinfrapkg.json`** names the publishable artifact: `name` (authoritative; its scope routes the publish) · `version` (the artifact's semver) · `description` · `author` · `license`.
 - **`src/spestate.json`** declares the node: `type` opens the file, and `config` is discriminated by its `mtype`. Keep it under `src/`, because what publishes is source.

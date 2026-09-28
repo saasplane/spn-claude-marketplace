@@ -15,7 +15,7 @@
 
 ## Realization is a target, not a command group
 
-**There is one estate surface, and local is its default.** The target that provisions real accounts is `--cloud`, and it is the one asked for by name (`RD.INFRA.018`). There is no separate local command to learn, so what you run on your machine is the command you will run against the estate.
+**There is one estate surface, and local is its default.** The target that provisions real accounts is `--cloud`, and it is the one asked for by name (`RD.SUPPORT.INFRA.018`). There is no separate local command to learn, so what you run on your machine is the command you will run against the estate.
 
 ## What it binds
 
@@ -38,6 +38,6 @@
 
 ## The boundary
 
-**The local provider provisions infrastructure state, never code.** And it never becomes a place to declare a resource the manifests do not know (`RD.INFRA.001`). A thing that exists only on one machine cannot be promoted.
+**The local provider provisions infrastructure state, never code.** And it never becomes a place to declare a resource the manifests do not know (`RD.SUPPORT.INFRA.001`). A thing that exists only on one machine cannot be promoted.
 
 **Estate caution holds here too.** `up` and `down` each take exactly one of `--plan` or `--apply`, with no default. Cloud mutation goes through the CLI's own doors, and `tofu apply` or `tofu destroy` is never hand-run.

@@ -45,7 +45,7 @@ function tree(name, pageBody, withRegister = true) {
   if (withRegister)
     writeFileSync(join(root, "docs", "registers", "decisions.md"),
       "# Decisions\n\n| # | Decision | Why | Date |\n| --- | --- | --- | --- |\n" +
-      "| RD.GOV.001 | A thing is so. | Because a fixture needs a row that exists. | 2026-09 |\n");
+      "| RD.DEVEX.WORKSPACE.155 | A thing is so. | Because a fixture needs a row that exists. | 2026-09 |\n");
   writeFileSync(join(root, "docs", "02-constructs", "a.md"), pageBody);
   return root;
 }
@@ -58,18 +58,18 @@ function mk(root, relative, body) {
 }
 
 // 1 — every citation resolves, so the check says nothing at all.
-const clean = tree("clean", "# A page\n\nThis cites RD.GOV.001, which the register carries.\n");
+const clean = tree("clean", "# A page\n\nThis cites RD.DEVEX.WORKSPACE.155, which the register carries.\n");
 one("a tree whose citations all resolve reports no CITATION finding",
   !run(clean).includes("CITATION"));
 
 // 2 — one dangling id, reported once, naming the id and the file that cites it.
 const dangling = tree("dangling",
-  "# A page\n\nThis cites RD.GOV.001, which exists, and RD.GOV.999, which does not.\n");
+  "# A page\n\nThis cites RD.DEVEX.WORKSPACE.155, which exists, and RD.GOV.999, which does not.\n");
 const out = run(dangling);
 one("a dangling id is reported", out.includes("CITATION"));
 one("the finding names the dangling id", out.includes("RD.GOV.999"));
 one("the finding names the file citing it", out.includes("docs/02-constructs/a.md"));
-one("a resolving id in the same file is not reported", !out.includes("RD.GOV.001 —"));
+one("a resolving id in the same file is not reported", !out.includes("RD.DEVEX.WORKSPACE.155 —"));
 one("one dangling id counts as one", /CITATION\s+1 decision id\(s\)/.test(out));
 
 // 3 — a repository with no register is not this question's business. The marketplace and the
@@ -79,8 +79,43 @@ one("a repository with no register reports nothing", !run(noRegister).includes("
 
 // 4 — the id must be a whole id. A three-digit sequence is the register's own grammar, and a
 //     looser match would report prose like "RD.GOV.1" that no reader would call a citation.
-const partial = tree("partial", "# A page\n\nThis mentions RD.GOV.1 and RD.GOV.001.\n");
+const partial = tree("partial", "# A page\n\nThis mentions RD.GOV.1 and RD.DEVEX.WORKSPACE.155.\n");
 one("a short id is not read as a citation", !run(partial).includes("CITATION"));
+
+// ── the RULING question ───────────────────────────────────────────────────────────────────────
+//
+// A register row states one ruling, and a row burying a second complete claim past its opening one
+// is a finding. A register carries FIVE columns — `# | Construct | Decision | Why | Date` — not
+// four, and reading the wrong cell as the ruling text is the known-bad case here: a four-cell
+// positional read takes the SECOND cell (`Construct`, a short label like `ideate`) as the ruling,
+// so a buried second claim sitting in the THIRD cell (`Decision`), where every register actually
+// writes it, was never reached.
+function rulingTree(name, id) {
+  const root = join(BASE, name);
+  mkdirSync(join(root, "docs", "registers"), { recursive: true });
+  writeFileSync(join(root, "docs", "registers", "decisions.md"),
+    "# Decisions\n\n| # | Construct | Decision | Why | Date |\n| --- | --- | --- | --- | --- |\n" +
+    `| ${id} | ideate | **The opening claim states the ruling.** **A buried second ruling states ` +
+    `its own complete claim right here.** | because a fixture needs a reason | 2026-09 |\n`);
+  return root;
+}
+
+// 5 — a three-part id (`RD.<DOMAIN>.<NNN>`).
+const rulingThree = rulingTree("ruling-three", "RD.GOV.100");
+one("a buried ruling under a three-part id is reported", run(rulingThree).includes("RULING"));
+
+// 6 — a four-part id (`RD.<DOMAIN>.<SUBDOMAIN>.<NNN>`), same shape.
+const rulingFour = rulingTree("ruling-four", "RD.DEVEX.WORKSPACE.201");
+one("a buried ruling under a four-part id is reported", run(rulingFour).includes("RULING"));
+
+// 7 — one ruling, nothing buried: the header read locates the real Decision cell rather than
+//     reporting on every row by construction.
+const rulingClean = join(BASE, "ruling-clean");
+mkdirSync(join(rulingClean, "docs", "registers"), { recursive: true });
+writeFileSync(join(rulingClean, "docs", "registers", "decisions.md"),
+  "# Decisions\n\n| # | Construct | Decision | Why | Date |\n| --- | --- | --- | --- | --- |\n" +
+  "| RD.GOV.101 | ideate | A single plain ruling with nothing bolded past it. | because | 2026-09 |\n");
+one("a register with no buried ruling reports no RULING finding", !run(rulingClean).includes("RULING"));
 
 // ── the capability-chapter question ───────────────────────────────────────────────────────────
 //

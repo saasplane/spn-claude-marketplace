@@ -23,7 +23,7 @@
 | 4 | Data services, and a role per schema | the data VPC, and its endpoints |
 | 5 | DNS and certificates | the control center's zones, which this layer writes names into |
 
-**Act 5 writes no tenant record and no wildcard record.** It stands the environment's own distribution with one exact alias and record per `{env}-{app}` host; a tenant host reaches the platform's tenant edge through the `*` record, and the runtime writes routes, never DNS (`RD.INFRA.104` · `RD.INFRA.105`).
+**Act 5 writes no tenant record and no wildcard record.** It stands the environment's own distribution with one exact alias and record per `{env}-{app}` host; a tenant host reaches the platform's tenant edge through the `*` record, and the runtime writes routes, never DNS (`RD.SUPPORT.INFRA.104` · `RD.SUPPORT.INFRA.105`).
 
 **Act 1 computes and does not ask.** If a step here is waiting for somebody to supply a CIDR, the addressing rule has been broken upstream — see [`04-addressing.md`](04-addressing.md).
 

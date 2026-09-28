@@ -148,7 +148,7 @@ one("a register row that says you",
   "reports", "says *you*");
 
 // N27 step 12 — a row that QUOTES somebody saying `you` is evidence, not the row warming its reader.
-// RD.DOCS.049 says the marking is how a check tells the two apart, and the exemption used to cover
+// RD.DEVEX.WORKSPACE.112 says the marking is how a check tells the two apart, and the exemption used to cover
 // only the bare word in italics, so a quoted PHRASE still fired. Four real rows carried one.
 one("a register row quoting a person saying you — the marking is the exemption",
   write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| RD.EVENTS.099 | " +
@@ -175,7 +175,7 @@ one("a register row that says you beside bold — still reports",
   "reports", "says *you*");
 
 // N27 step 13 — `one` is a pronoun as often as it is an impersonal subject, and only the obligation
-// form is the construction RD.DOCS.031 is named after.
+// form is the construction RD.DEVEX.WORKSPACE.096 is named after.
 one("one as a pronoun, not an impersonal subject",
   write(CHAPTER, "# A probe\n\n`For: Architect` \u00b7 `Status: \ud83d\udd2e PLANNING`\n\n" +
     "Modules are separated precisely because a change to one must not force a redeploy of another, " +
@@ -196,6 +196,22 @@ one("a register row past twenty-five words",
 one("a register row that rules over another row",
   write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| RD.EVENTS.099 | Supersedes RD.EVENTS.008 |\n"),
   "reports", "rules over RD.EVENTS.008");
+
+// A decision id names its domain now (`RD.<DOMAIN>.<SUBDOMAIN>.<NNN>`), and the id inside a
+// supersession clause must be read with the same grammar as a register row's own id — this is the
+// known-bad case: the two-segment pattern this check carried before stopped matching the moment a
+// cited id gained a domain segment, and a stale ruling would have gone unreported.
+one("a register row that rules over a four-part id",
+  write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n" +
+    "| RD.SUPPORT.APPS.099 | Supersedes RD.SUPPORT.APPS.008 |\n"),
+  "reports", "rules over RD.SUPPORT.APPS.008");
+
+// The repository-letter form (`PD1`, `SD23`) is retired — no id in the corpus is written that way
+// any more, and accepting it here would let a real, current supersession clause hide behind a shape
+// that reads as an id but is not one.
+one("the retired repository-letter form is not read as a register id",
+  write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| RD.EVENTS.099 | Supersedes PD1 |\n"),
+  "silent");
 
 // THIS ONE NEEDS A REAL NODE. The rule fires on a `CONCEPT.md` with an `spkind.json` beside it, and
 // the manifest is the workspace's, not something a fixture can stand in for. Run from a copy outside

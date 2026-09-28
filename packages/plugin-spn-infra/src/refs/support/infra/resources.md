@@ -15,7 +15,7 @@
 
 A resource is a backing service that holds state: a database, a cache, a queue, or object storage. A running process can be restarted; a lost row cannot — that is why the estate treats resources differently from everything else it stands up.
 
-**A platform declares which engine fills each family, and at what version — that is the whole ask.** The four engine families are the **platform baseline, total by contract**: every family is present, and no application selects among them (decision `RD.INFRA.050`). Declaring an engine buys its **baseline interior** — the invariant SaaS Plane ships with the blueprint: the role architecture and its per-application factory, the access model, the disabled default users, the naming policy. That interior versions with the blueprint pin and is identical on a laptop and in the cloud.
+**A platform declares which engine fills each family, and at what version — that is the whole ask.** The four engine families are the **platform baseline, total by contract**: every family is present, and no application selects among them (decision `RD.SUPPORT.INFRA.050`). Declaring an engine buys its **baseline interior** — the invariant SaaS Plane ships with the blueprint: the role architecture and its per-application factory, the access model, the disabled default users, the naming policy. That interior versions with the blueprint pin and is identical on a laptop and in the cloud.
 
 | Type (`SPEstateResourceType`, one family per key on `SPEstateResourcesPlatform`) | The estate supplies | The app's derived share |
 | --- | --- | --- |
@@ -52,7 +52,7 @@ export interface SPEstateResourceSchemaSpec {
 }
 ```
 
-A shared schema joins the default group. **A `dedicated` schema mints its own set of purpose roles and withholds the default group from it — an isolation posture inherited from an absent key is one nobody reviewed, which is why the flag is stated on every row rather than defaulted** (`RD.INFRA.077`). Both fields are always written; a declared schema or group adds to the baseline and never replaces it.
+A shared schema joins the default group. **A `dedicated` schema mints its own set of purpose roles and withholds the default group from it — an isolation posture inherited from an absent key is one nobody reviewed, which is why the flag is stated on every row rather than defaulted** (`RD.SUPPORT.INFRA.077`). Both fields are always written; a declared schema or group adds to the baseline and never replaces it.
 
 ## Resource spaces — the second extension axis
 
@@ -70,13 +70,13 @@ export interface SPEstateSpace {
 
 **A space is per-need where the platform resources are total.** A family absent from a space is not stood at all. Its database family speaks the baseline's own grammar — the same `schemas` rows, the same `users` grant rows. A space owns no applications, no accounts, no domains; an application binds to one by the `space` key on its registration row, and an absent key means the platform resources answer. An application still declares no demand — selecting a space is passing a code.
 
-**A space is one of two independent extension axes, and they never couple** (`RD.INFRA.085`). A space extends by **data**; a service domain (bound by `serviceDomain`) extends by **face**. An application takes either, both or neither.
+**A space is one of two independent extension axes, and they never couple** (`RD.SUPPORT.INFRA.085`). A space extends by **data**; a service domain (bound by `serviceDomain`) extends by **face**. An application takes either, both or neither.
 
 **The platform's own resources are a preset composition of the same blueprint functions a space composes** — database, schema, user, topic, bucket. There is no privileged path a space cannot take, and no capability the baseline has that a space cannot ask for.
 
 ## A module owns its own world
 
-A module's resources are its own engine instances, in its own world, under the module's own purpose code — **never databases or schemas inside the platform's engines** (`RD.INFRA.053`). A module that migrates itself is structurally the administrator of *something*, so it owns the whole world its administrator role reaches. **The estate standardizes the boundary — the world code, its host labels, a derived local port band, its placement, a private configuration seat, a ledger seat, and the standing guardrails — and never the interior.** Which resources a module stands, and how its blueprint stands them, is the module's own business. How a module reaches applications through the configuration plane is a separate topic, restated in the modules card.
+A module's resources are its own engine instances, in its own world, under the module's own purpose code — **never databases or schemas inside the platform's engines** (`RD.SUPPORT.INFRA.053`). A module that migrates itself is structurally the administrator of *something*, so it owns the whole world its administrator role reaches. **The estate standardizes the boundary — the world code, its host labels, a derived local port band, its placement, a private configuration seat, a ledger seat, and the standing guardrails — and never the interior.** Which resources a module stands, and how its blueprint stands them, is the module's own business. How a module reaches applications through the configuration plane is a separate topic, restated in the modules card.
 
 ## Hosting and size are independent axes
 
@@ -98,7 +98,7 @@ Storage is the one engine whose *provider* is derived rather than declared — a
 
 ## Storage's key grammar
 
-**Every object key leads with its access class — `public` or `private` — as the first segment, and those two roots are the only part of a key the estate ever reads** (`RD.INFRA.080`). The edge and the store's policy both scope by prefix; a class buried mid-key is one neither can see. Everything beneath the root belongs to the application layer, which is what lets a store be swapped without either side learning the other's vocabulary.
+**Every object key leads with its access class — `public` or `private` — as the first segment, and those two roots are the only part of a key the estate ever reads** (`RD.SUPPORT.INFRA.080`). The edge and the store's policy both scope by prefix; a class buried mid-key is one neither can see. Everything beneath the root belongs to the application layer, which is what lets a store be swapped without either side learning the other's vocabulary.
 
 **A stored file cannot be reclassified — MUST NOT.** Its class is stamped at creation, and because the class *is* the file's location, changing it would mean moving bytes and invalidating every link already handed out. A file needing a different class is a different file, uploaded as one — the store's contract carries no move and no copy. **A key is derived, never authored.** What a person sees is a logical folder path of bounded slugs, so traversal is excluded by shape rather than by a check; the display name is a row, not part of the key.
 

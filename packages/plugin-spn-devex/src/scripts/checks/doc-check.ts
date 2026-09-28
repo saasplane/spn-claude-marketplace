@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-// RESTATES: the foundation book — 02-document.md rule 9 (RD.GOV.008), rules 11-12 (RD.DOCS.031, the
-// one voice; RD.DOCS.043, its reach and its measure; RD.DOCS.044, the three moves that reach the
+// RESTATES: the foundation book — 02-document.md rule 9 (RD.DEVEX.WORKSPACE.162), rules 11-12 (RD.DEVEX.WORKSPACE.096, the
+// one voice; RD.DEVEX.WORKSPACE.106, its reach and its measure; RD.DEVEX.WORKSPACE.107, the three moves that reach the
 // reader), 04-discipline.md § Voice discipline, 05-artifacts.md (the approach document) and
 // 06-registers.md § Writing a row. The chapters are the source of truth: a rule change is edited
 // there first, then here, in the same change. This script checks only what a script CAN check; the
 // register itself is judgement.
 //
-// Calibrated to the rule, never to the corpus (RD.DOCS.043: the check reads the row's numbers, never
+// Calibrated to the rule, never to the corpus (RD.DEVEX.WORKSPACE.106: the check reads the row's numbers, never
 // the corpus's own average). Over prose only — records are exempt, headings and derived chrome are
 // not prose — the numbers are:
 //
@@ -46,7 +46,7 @@ export type Finding = [severity: string, message: string];
 
 const slashes = (path: string) => path.split(sep).join("/");
 
-// Only sets that GROW. RD.GOV.008 keeps the count where it carries a ruling: "if adding a member
+// Only sets that GROW. RD.DEVEX.WORKSPACE.162 keeps the count where it carries a ruling: "if adding a member
 // would be an ordinary decision entry, drop the count; if it would be a redesign, keep it." Scopes,
 // kinds, nouns, flows, seats and lenses are closed by a decision — a count there is load-bearing and
 // must not be flagged. Decisions, findings and open items are not.
@@ -54,7 +54,7 @@ const CARD = new RegExp(
   "\\b(one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|" +
   "fifteen|sixteen|seventeen|eighteen|nineteen|twenty)\\s+" +
   "(decisions|items|questions|findings|blockers|gaps|defects|open items|todos|tasks)\\b", "gi");
-// RD.DOCS.049 — a check reads how a phrase is used, never that it appeared. The four idioms here are
+// RD.DEVEX.WORKSPACE.112 — a check reads how a phrase is used, never that it appeared. The four idioms here are
 // impersonal obligation and have no innocent use. `the reader` is different in kind: it is an
 // ordinary noun phrase, and every one of the ten occurrences this corpus carried was legitimate. So
 // it counts only in the obligation form, which is the construction the rule is named after.
@@ -65,7 +65,7 @@ const ABOUT = new RegExp(
   // module, and read as a breach it asked a page to be rewritten away from what it meant.
   "(?<!\\b(?:to|of|in|on|at|for|from|than|with|and|or|but|is|as|only|than)\\s)one (?:must|should)|" +
   "the user is expected|it is recommended that)\\b", "gi");
-// RD.DOCS.052 — an idiom means something its words do not say, so a reader whose first language is
+// RD.DEVEX.WORKSPACE.115 — an idiom means something its words do not say, so a reader whose first language is
 // not English cannot guess it. Length limits do not catch one, because an idiom is usually short.
 // The house-term rule does not catch one either, because nobody defines an idiom. Listed rather than
 // inferred: a phrase earns its place here only when its meaning is not its words.
@@ -91,10 +91,10 @@ export const IDIOM = new RegExp(
 const QUOTE_L = "\x02", QUOTE_R = "\x03";
 export const MARKED = /\x02[^\x03\n]{0,200}\x03|\*[^*\n]{1,120}\*|`[^`\n]*`|“[^”\n]{1,120}”|"[^"\n]{1,120}"/g;
 
-// RD.DOCS.043 — the measure. Second person is whole-word and case-insensitive. Longest form first, or
+// RD.DEVEX.WORKSPACE.106 — the measure. Second person is whole-word and case-insensitive. Longest form first, or
 // `your` claims the front of `yours` and the rest never matches.
 // A sentence that reaches ONLY because a bare `… <prep> you` was appended to it satisfies the counter
-// and gives the reader nothing (RD.DOCS.046). Detection is exact: strip the phrase and ask whether
+// and gives the reader nothing (RD.DEVEX.WORKSPACE.109). Detection is exact: strip the phrase and ask whether
 // what remains still reaches.
 const BOLT = /(?:,\s*)?\s(?:for|to|on|with|around|before|beneath)\s+you\b\s*(?=[.!?;]|$)/i;
 // TWO SPELLINGS OF ONE PATTERN, AND THE REASON IS A REAL BUG THIS PORT HAD. A global regex carries a
@@ -106,7 +106,7 @@ const YOU_SOURCE = "\\b(?:you['’](?:re|ll|ve)|yourselves|yourself|yours|your|y
 const YOU = new RegExp(YOU_SOURCE, "i");
 const YOU_ALL = new RegExp(YOU_SOURCE, "gi");
 // A row may MENTION the word as a term — *you* in italics, or in backticks — and that is not warming.
-// RD.DOCS.049 — the marking is how a check tells quotation from breach. This exempted the bare word
+// RD.DEVEX.WORKSPACE.112 — the marking is how a check tells quotation from breach. This exempted the bare word
 // in italics and any code span, and missed the shape this corpus actually quotes in: a WHOLE PHRASE
 // in italics or quotation marks. Two rows carried one — a developer's own sentence, and another
 // document's phrase cited as the thing the row corrects — and both read as the row warming its
@@ -125,13 +125,13 @@ const YOU_AS_TERM = new RegExp(
 // `ROW_LONG` is the ONE length rule the book kept, and it is a register row's shape rather than a
 // count of prose: one clause a sentence, because a row is a record. The prose measures that stood
 // beside it — an average, a thirty-word cap, and a `you` frequency — were dropped by the book and
-// are gone from here (`RD.DOCS.043` as `01-corpus.md` and `04-discipline.md` now state it).
+// are gone from here (`RD.DEVEX.WORKSPACE.106` as `01-corpus.md` and `04-discipline.md` now state it).
 const ROW_LONG = 25;
 // Reported in the sweep's statistics table, never as a finding. A number is evidence you cite and
 // never the verdict you reach.
 const PAST_25 = 25, PAST_30 = 30;
 
-// RD.DOCS.044 — reaching the reader has three moves, and a script sees two of them: the reader as
+// RD.DEVEX.WORKSPACE.107 — reaching the reader has three moves, and a script sees two of them: the reader as
 // subject, which YOU already finds, and the imperative, which opens the sentence with its verb. The
 // beneficiary clause is judgement, so the number a script produces is a FLOOR. The verb list is
 // closed and deliberately short — every member is a word this corpus almost never opens a sentence
@@ -172,13 +172,13 @@ const IMPERATIVE = new RegExp(
 // MUST-grammar is uppercase by rule, so the match is case-sensitive: a lowercase *may* is ordinary
 // prose and excluding it would empty the denominator.
 const NORMATIVE = /\b(?:MUST NOT|MUST|SHOULD NOT|SHOULD|MAY)\b/;
-// The bar per seat, as a percentage. A register row has none — it is a record (RD.DOCS.043).
-// RD.DOCS.045 — an artifact is read by the same developers who read a chapter, so it carries a
+// The bar per seat, as a percentage. A register row has none — it is a record (RD.DEVEX.WORKSPACE.106).
+// RD.DEVEX.WORKSPACE.108 — an artifact is read by the same developers who read a chapter, so it carries a
 // chapter's share and not a higher one.
 const REACH_BAR: Record<string, number> = { "artifact-html": 15, readme: 25, chapter: 15, concept: 15 };
 const REACH_MIN_N = 8;
 
-// RD.DOCS.040 — the suffix names the kind, and the set is closed.
+// RD.DEVEX.WORKSPACE.103 — the suffix names the kind, and the set is closed.
 const POCKET_KIND: Record<string, string> = { approaches: "-approach.html", overviews: "-overview.html" };
 const NODE_MANIFESTS = ["spkind.json", "spinfrapkg.json"];
 const SKIP = new Set(["node_modules", ".git", "dist", "build", "coverage", "tool-results", ".output", ".nx"]);
@@ -204,16 +204,16 @@ export function structural(path: string): Finding[] {
   const folder = dirname(resolve(path));
   const base = basename(path);
 
-  // RD.DOCS.012 — a concept belongs to a repo root, never to a node.
+  // RD.DEVEX.WORKSPACE.080 — a concept belongs to a repo root, never to a node.
   if (base === "CONCEPT.md") {
     const hasNode = NODE_MANIFESTS.some((m) => exists(join(folder, m)));
     if (hasNode && !exists(join(folder, "sprepo.json")))
-      out.push(["BLOCK", "CONCEPT.md sits beside a node manifest — RD.DOCS.012: a concept " +
+      out.push(["BLOCK", "CONCEPT.md sits beside a node manifest — RD.DEVEX.WORKSPACE.080: a concept " +
         "belongs to a repo root. Ideating a node lands as sections of its repo's concept, " +
         "never as a file at the node"]);
   }
 
-  // RD.DOCS.040 — folder and suffix must agree.
+  // RD.DEVEX.WORKSPACE.103 — folder and suffix must agree.
   const parts = slashes(resolve(path)).split("/");
   if (parts.includes("artifacts") && base.endsWith(".html")) {
     const pocket = parts[parts.length - 2];
@@ -223,7 +223,7 @@ export function structural(path: string): Finding[] {
       const hint = base.endsWith(other)
         ? " — an overview explains, an approach argues; the test is whether options were weighed and one chosen"
         : "";
-      out.push(["BLOCK", `${base} sits in ${pocket}/ but does not end ${want} — RD.DOCS.040: the suffix names the kind${hint}`]);
+      out.push(["BLOCK", `${base} sits in ${pocket}/ but does not end ${want} — RD.DEVEX.WORKSPACE.103: the suffix names the kind${hint}`]);
     }
   }
   return out;
@@ -290,7 +290,7 @@ export function approachShape(text: string): Finding[] {
   const missing = ["why", "what", "how"].filter((s) => !heads.includes(s));
   if (missing.length)
     return [["RULE", "carries no " + missing.join(" + ") + " — this explains rather than argues, so " +
-      "it is an overview: artifacts/overviews/<name>-overview.html (RD.DOCS.039 / 040). An approach " +
+      "it is an overview: artifacts/overviews/<name>-overview.html (RD.DEVEX.WORKSPACE.102 / 040). An approach " +
       "is Why > What > How > Open > Deferred"]];
   return [];
 }
@@ -380,7 +380,7 @@ export function openCards(text: string): Finding[] {
 // ---------------------------------------------------------------------------- prose
 
 /**
- * Records are exempt — RD.DOCS.031: a warmed record is a defect.
+ * Records are exempt — RD.DEVEX.WORKSPACE.096: a warmed record is a defect.
  *
  * What comes back is prose with a blank line at every block boundary, so a heading or a list item
  * never runs into the paragraph below it and reads as one long sentence. Headings, an outline rail,
@@ -411,7 +411,7 @@ export function proseOf(text: string, isHtml: boolean): string {
   }
   t = lines.join("\n").replace(MD_LINK, "$1");
   t = t.replace(/\[!(?:NOTE|IMPORTANT|WARNING|TIP|CAUTION)\]/g, " ");
-  // RD.DOCS.049 lets a rule quote the mistake it bans, and the marking is how a check tells quotation
+  // RD.DEVEX.WORKSPACE.112 lets a rule quote the mistake it bans, and the marking is how a check tells quotation
   // from breach. That marking used to die on the strip below, which removes every `*` and backtick —
   // so `MARKED` was matching a string no longer carrying a marker, and a rule was flagged by itself.
   // Italic and code spans become sentinel-wrapped, which survives the strip. One delimiter in, one
@@ -456,7 +456,7 @@ const countOf = (pattern: RegExp, text: string): number =>
   [...text.matchAll(new RegExp(pattern.source, pattern.flags.includes("g") ? pattern.flags : pattern.flags + "g"))].length;
 
 /**
- * RD.DOCS.044 — how many prose sentences reach the reader, and how many were counted.
+ * RD.DEVEX.WORKSPACE.107 — how many prose sentences reach the reader, and how many were counted.
  *
  * A chapter and a concept keep their normative sentences out of the denominator: a rule binds a party
  * and its subject may not move, so the reader is reached in the sentence beside it. Every other seat
@@ -509,11 +509,11 @@ export function opening(s: string, n = 6): string {
 }
 
 /**
- * RD.DOCS.043 § Measure, over prose only.
+ * RD.DEVEX.WORKSPACE.106 § Measure, over prose only.
  *
  * Every check holds on every file, with one exception the book states. On an operative surface the
- * two second-person counts do not apply, and the reach share is the whole measure (RD.DOCS.048).
- * CARD and ABOUT read marked text as quotation, never as prose (RD.DOCS.049).
+ * two second-person counts do not apply, and the reach share is the whole measure (RD.DEVEX.WORKSPACE.111).
+ * CARD and ABOUT read marked text as quotation, never as prose (RD.DEVEX.WORKSPACE.112).
  */
 export function voice(prose: string, sents: Sentence[], kind = "chapter", operative = false): Finding[] {
   const out: Finding[] = [];
@@ -522,17 +522,17 @@ export function voice(prose: string, sents: Sentence[], kind = "chapter", operat
   const cardinality = [...unmarked.matchAll(CARD)];
   if (cardinality.length) {
     const eg = cardinality.slice(0, 4).map((m) => `${m[1]} ${m[2]}`).join(", ");
-    out.push(["RULE", `${cardinality.length} cardinality-in-prose (${eg}) — RD.GOV.008: name a set by its rule, not its count`]);
+    out.push(["RULE", `${cardinality.length} cardinality-in-prose (${eg}) — RD.DEVEX.WORKSPACE.162: name a set by its rule, not its count`]);
   }
   const idioms = [...unmarked.matchAll(IDIOM)].map((m) => m[1]);
   if (idioms.length) {
     const eg = [...new Set(idioms)].sort().slice(0, 4).map((i) => `"${i}"`).join(" · ");
-    out.push(["RULE", `${idioms.length} idiom(s) — RD.DOCS.052: an idiom means something its words ` +
+    out.push(["RULE", `${idioms.length} idiom(s) — RD.DEVEX.WORKSPACE.115: an idiom means something its words ` +
       `do not say, so a second-language reader cannot guess it: ${eg} · write the plain phrase`]);
   }
   const nAbout = [...unmarked.matchAll(ABOUT)].length;
   if (nAbout)
-    out.push(["RULE", `${nAbout} construction(s) written about the reader, not to them — RD.DOCS.031 talks to the reader · say *you*`]);
+    out.push(["RULE", `${nAbout} construction(s) written about the reader, not to them — RD.DEVEX.WORKSPACE.096 talks to the reader · say *you*`]);
 
   if (!sents.length) return out;
   const n = sents.length;
@@ -553,7 +553,7 @@ export function voice(prose: string, sents: Sentence[], kind = "chapter", operat
   if (bolted.length) {
     const eg = bolted.slice(0, 3).map((s) => `"${opening(s)}"`).join(" · ");
     out.push(["RULE", `${bolted.length} sentence(s) reach only by a tacked-on "… for you" — ` +
-      `RD.DOCS.046: the measure serves personalization, so a sentence that reaches only by its last ` +
+      `RD.DEVEX.WORKSPACE.109: the measure serves personalization, so a sentence that reaches only by its last ` +
       `two words reached nobody: ${eg} · rewrite it to address the reader`]);
   }
 
@@ -590,7 +590,11 @@ export function isRegister(path: string): boolean {
 // THE WORD IS NOT THE BREACH; the ruling is. A row legitimately says `superseding the working label
 // "AGT"` — ordinary English about an enum value, a file set or a config key. So a ruling is only a
 // ruling when a REGISTER ID sits inside the clause, and the two directions are read separately.
-const REGISTER_ID = "(?:[A-Z]{2,6}\\.[A-Z]{1,8}\\.\\d{1,4}|[A-Z]{2,4}\\d{1,4})";
+// One area segment, an optional second naming a sub-area inside it, then a number — the same
+// grammar a decision id carries. The repository-letter form (`PD1`, `SD23`) is retired: every id
+// this checker meets today names its domain, and a legacy form accepted here would let a stale
+// supersession clause pass unnoticed.
+const REGISTER_ID = "(?:[A-Z]{2,6}\\.[A-Z]{1,8}(?:\\.[A-Z]{1,8})?\\.\\d{1,4})";
 const IS_REGISTER_ID = new RegExp("^" + REGISTER_ID + "$");
 // The gap stops at `. ! ? ; |` so one clause never reaches into the next.
 const RULE_GAP = "(?:[^|.!?;]|\\.(?=\\d)|\\.(?=[A-Za-z]))";
@@ -630,7 +634,7 @@ export function supersession(rid: string, body: string, raw: string): Finding[] 
 }
 
 /**
- * RD.DOCS.043 § Rows — a register row takes the plain substrate and stays a record.
+ * RD.DEVEX.WORKSPACE.106 § Rows — a register row takes the plain substrate and stays a record.
  *
  * Every table body line is a row: the first cell is its id and is skipped; links collapse to their
  * text; `*` and backtick markup is stripped for the count. A cell sentence past twenty-five words is
@@ -657,13 +661,13 @@ export function rows(text: string): [Finding[], Metrics] {
       // same file and legitimately weighs a supersession as an option.
       out.push(...supersession(rid, body.join(" ").replace(/[*`]/g, " "), cells.slice(1).join(" ")));
     if (YOU.test(body.join(" ").replace(YOU_AS_TERM, " ")))
-      out.push(["RULE", `row ${rid} says *you* — a record is never warmed (RD.DOCS.043 § Rows; 04-discipline § Voice discipline)`]);
+      out.push(["RULE", `row ${rid} says *you* — a record is never warmed (RD.DEVEX.WORKSPACE.106 § Rows; 04-discipline § Voice discipline)`]);
     for (const cell of body)
       for (const [sent, n] of sentences(cell.replace(/[*`]/g, ""))) {
         sents.push([sent, n]);
         if (n > ROW_LONG)
           out.push(["RULE", `row ${rid}: a sentence of ${n} words, "${opening(sent)}" — a row states ` +
-            `one clause a sentence, none past twenty-five (RD.DOCS.043 § Rows) · split it`]);
+            `one clause a sentence, none past twenty-five (RD.DEVEX.WORKSPACE.106 § Rows) · split it`]);
       }
   }
   return [out, measure(sents, "register")];
@@ -673,7 +677,7 @@ export function rows(text: string): [Finding[], Metrics] {
 
 // How a stack spells a scaffold template. A stack DERIVES from the repo's own claim — `sprepo.json`
 // `config.stack`. Nothing here may assume one stack: `.tmpl` and `dot-` are TypeScript's, and the
-// `dot-` reason is npm's alone. This table READS the declaration and never authors it (RD.APPS.077).
+// `dot-` reason is npm's alone. This table READS the declaration and never authors it (RD.SUPPORT.APPS.077).
 const STACK_TEMPLATES: Record<string, { suffixes: string[]; dotPrefix: string | null }> = {
   TS: { suffixes: [".tmpl"], dotPrefix: "dot-" },
 };
@@ -717,17 +721,17 @@ export function asWritten(path: string): string {
 }
 
 /**
- * A surface an agent acts from, rather than one a person reads to learn (RD.DOCS.047).
+ * A surface an agent acts from, rather than one a person reads to learn (RD.DEVEX.WORKSPACE.110).
  *
  * Two members. The foundation's provider set, matched by its domains rather than by a bare
  * `providers/`, which is an ordinary folder name a consuming repo may use for its own code. And the
  * plugins' own instruction surface, which an agent loads every session and acts on. The scripts
- * beside them are code, never corpus. RD.DOCS.048 exempts this surface from the two second-person
+ * beside them are code, never corpus. RD.DEVEX.WORKSPACE.111 exempts this surface from the two second-person
  * counts. Reach still binds.
  */
 export function isOperative(path: string): boolean {
   const p = slashes(resolve(path));
-  // TWO DOMAINS, NOT THREE. `providers/devex/` was removed (RD.DEVEX.061): devex has one CLI and one
+  // TWO DOMAINS, NOT THREE. `providers/devex/` was removed (RD.DEVEX.AGENT.061): devex has one CLI and one
   // agent runtime, which are complementary surfaces rather than alternatives, so the seat held nothing
   // its own. An axis exists where a domain has alternatives.
   if (["/providers/apps/", "/providers/infra/"].some((d) => p.includes(d))) return true;
@@ -735,7 +739,7 @@ export function isOperative(path: string): boolean {
 }
 
 /**
- * What the hook and the sweep read (RD.DOCS.043 § Reach): every .md under docs/, every README.md,
+ * What the hook and the sweep read (RD.DEVEX.WORKSPACE.106 § Reach): every .md under docs/, every README.md,
  * CONCEPT.md, every .html under artifacts/, an approach or overview page anywhere, and .html under
  * .spndevex/notes/. A scaffold template counts as the file it writes. Not .md under .spndevex/ —
  * arcs, orders and notes are state, not corpus — and nothing under a build or dependency directory.
@@ -753,7 +757,7 @@ export function watched(path: string): boolean {
   if (!base.endsWith(".md")) return false;
   if (p.includes("/docs/")) return true;
   // The operative surface — the provider set and the plugins' instruction files. One predicate,
-  // because RD.DOCS.048 measures that surface differently and must name the same set.
+  // because RD.DEVEX.WORKSPACE.111 measures that surface differently and must name the same set.
   return isOperative(p);
 }
 
@@ -974,9 +978,9 @@ export function checkDoc(payload: Payload): Verdict {
   if (!found.length) return null;
 
   const body = found.map(([sev, msg]) => `  - [${sev}] ${msg}`).join("\n");
-  const moves = found.some(([, m]) => m.includes("RD.DOCS.04") || m.includes("RD.DOCS.031"))
+  const moves = found.some(([, m]) => m.includes("RD.DOCS.04") || m.includes("RD.DEVEX.WORKSPACE.096"))
     ? "\n  The four moves: split it · say *you* · define the term · land it on your reader — never " +
-      "shorten (`refs/doc-sets.md` § One voice; decisions RD.DOCS.043 · RD.DOCS.044)."
+      "shorten (`refs/doc-sets.md` § One voice; decisions RD.DEVEX.WORKSPACE.106 · RD.DEVEX.WORKSPACE.107)."
     : "";
   const subject = plural ? "these files miss" : "this file misses";
   // A GATE MUST SAY WHAT IT DID NOT CHECK. On an Edit the hook sees the REPLACEMENT TEXT and not the

@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-// RESTATES: the layer promise, and decisions RD.DEVEX.035 · RD.DEVEX.024. The rule itself lives once,
+// RESTATES: the layer promise, and decisions RD.DEVEX.FUNCTION.035 · RD.DEVEX.WORKSPACE.024. The rule itself lives once,
 // in the CLI's `contract-purity.ts`; a change is made there first, then here, in the same change.
 //
 // **IT IS A RULE OF THE `src` SUBJECT, IN THE TYPESCRIPT PROVIDER, AND NOT OF THE STACK-AGNOSTIC
 // PLUGIN.** Everything it matches is this stack's: `src/contract/states`, a `.ts` extension, and
 // `core.ts` as the named release valve. Filed under `spn-devex` it ran in every repository the
 // agent opens, including ones with no contract states at all — free only because the path never
-// matched, which is luck rather than design (RD.DEVEX.066).
+// matched, which is luck rather than design (RD.DEVEX.AGENT.066).
 //
 // Refuse a contract-state write that would close a dependency cycle.
 //
@@ -19,7 +19,7 @@
 // `core.ts` is the release valve for exactly that, and nothing else. A seat that has never hit a
 // cycle correctly has no `core.ts` at all.
 //
-// WHY A HOOK AND NOT `apps validate` ALONE (RD.DEVEX.035): the failure lands at boot, so a check that
+// WHY A HOOK AND NOT `apps validate` ALONE (RD.DEVEX.FUNCTION.035): the failure lands at boot, so a check that
 // runs at review time runs after the damage. This reads the same graph at write time so the loop
 // never reaches disk.
 //
@@ -130,7 +130,7 @@ export function verdict(path: string, source: string | null, _added: string | nu
       `at boot rather than failing at build — the application starts.\n` +
       `  A one-way sibling import is fine and a type belongs in its own domain file. Move only ` +
       `the state that CLOSES the loop into core.ts, which exists to open exactly this.\n` +
-      `  (layer promise; decisions RD.DEVEX.035 · RD.DEVEX.024)`,
+      `  (layer promise; decisions RD.DEVEX.FUNCTION.035 · RD.DEVEX.WORKSPACE.024)`,
   };
 }
 

@@ -460,7 +460,7 @@ console.log("\n=== the gap scan measures and never fixes");
   const before = readAt(root, "docs/03-behaviors/README.md");
   const rep = run(root, ["audit", "--report", "."]);
 
-  // THE MEASUREMENT IS A RETURN VALUE, NEVER A FILE (RD.DOCS.089). A report is written by the agent
+  // THE MEASUREMENT IS A RETURN VALUE, NEVER A FILE (RD.DEVEX.WORKSPACE.149). A report is written by the agent
   // from what it read; a tool hands over what it measured and writes nothing into a pocket. Before
   // this, the scan wrote the only machine-authored page in a folder of authored ones, and rewrote
   // it on every run whether anybody had asked a question or not.
@@ -542,7 +542,7 @@ console.log("=== a closed value is declared once, and agrees with what realizes 
   const chapter = (title, id, body) =>
     doc({ id: id, parentId: "concept", title: title, variant: "construct", lenses: ["ARCHITECT"],
           status: "PLANNING", dependsOn: [] },
-        `## Overview\n\nWhy it exists.\n\n## Terms\n\n| Term | Contract term | What it means |\n| --- | --- | --- |\n| Rung | \`SPRungType\` | how much is real |\n\n## Model\n\nThe model.\n\n## Parts\n\n${body}\n\n## Boundary\n\nIt stops here.\n\n## Binds\n\n| Rule | What it decides | Weight |\n| --- | --- | --- |\n| \`RD.GOV.011\` | that a closed vocabulary is stated once | MUST |\n\n| Repo | Node | What it realizes | State |\n| --- | --- | --- | --- |\n| t | thing-ts | the enum | planned |\n\n## Proof\n\nNothing yet.\n`,
+        `## Overview\n\nWhy it exists.\n\n## Terms\n\n| Term | Contract term | What it means |\n| --- | --- | --- |\n| Rung | \`SPRungType\` | how much is real |\n\n## Model\n\nThe model.\n\n## Parts\n\n${body}\n\n## Boundary\n\nIt stops here.\n\n## Binds\n\n| Rule | What it decides | Weight |\n| --- | --- | --- |\n| \`RD.DEVEX.WORKSPACE.165\` | that a closed vocabulary is stated once | MUST |\n\n| Repo | Node | What it realizes | State |\n| --- | --- | --- | --- |\n| t | thing-ts | the enum | planned |\n\n## Proof\n\nNothing yet.\n`,
         "`For: Architect` · `Status: 🔮 PLANNING`");
 
   const AGREES = "```ts\nexport enum SPRungType {\n  UNIT = 'UNIT',    // alone\n  WIRED = 'WIRED',  // against the real thing\n}\n```";
@@ -646,7 +646,7 @@ console.log("=== a closed value is declared once, and agrees with what realizes 
       "docs/02-constructs/01-core/rungs.md":
         doc({ id: "rungs", parentId: "concept", title: "Rungs", variant: "construct", lenses: ["ARCHITECT"],
               status: "PLANNING", dependsOn: [] },
-            "## Overview\n\nWhy it exists.\n\n## Terms\n\n| Term | Contract term | What it means |\n| --- | --- | --- |\n| Alone | `SPRungType.UNIT` | proven with nothing running |\n\n## Model\n\nThe model.\n\n## Parts\n\nNo declaration here.\n\n## Boundary\n\nIt stops here.\n\n## Binds\n\n| Rule | What it decides | Weight |\n| --- | --- | --- |\n| `RD.GOV.011` | one place | MUST |\n\n| Repo | Node | What it realizes | State |\n| --- | --- | --- | --- |\n| t | thing-ts | the enum | planned |\n\n## Proof\n\nNothing yet.\n",
+            "## Overview\n\nWhy it exists.\n\n## Terms\n\n| Term | Contract term | What it means |\n| --- | --- | --- |\n| Alone | `SPRungType.UNIT` | proven with nothing running |\n\n## Model\n\nThe model.\n\n## Parts\n\nNo declaration here.\n\n## Boundary\n\nIt stops here.\n\n## Binds\n\n| Rule | What it decides | Weight |\n| --- | --- | --- |\n| `RD.DEVEX.WORKSPACE.165` | one place | MUST |\n\n| Repo | Node | What it realizes | State |\n| --- | --- | --- | --- |\n| t | thing-ts | the enum | planned |\n\n## Proof\n\nNothing yet.\n",
             "`For: Architect` · `Status: 🔮 PLANNING`"),
       "docs/02-constructs/01-core/other.md": chapter("Other", "other", "Nor here.\n"),
     });

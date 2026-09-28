@@ -54,7 +54,7 @@ Each construct here is the stack-concrete form of one in the core domain, so rea
 | [a step](03-skills.md) | `steps/` | one file of a longer walk, read only when the skill's own router names it |
 | [the classification](03-skills.md) | — | the first thing the router does: deciding which layers an ask actually touches |
 | [the closing gate](03-skills.md) | — | the review a skill hands its own work to, named in its description so the hand-off happens without being asked for |
-| [the stage](03-skills.md) | `RD.DEVEX.017` | the one stage a skill serves, which is what makes the applicable standards derivable from the skill that was invoked |
+| [the stage](03-skills.md) | `RD.DEVEX.AGENT.017` | the one stage a skill serves, which is what makes the applicable standards derivable from the skill that was invoked |
 | [the value](03-skills.md) | `APPS_{SKILL}` | the name the enum carries for that folder, its domain prefix derived from the plugin's own claim |
 | **Scripts** | | |
 | [a hand-checked row](04-scripts.md) | `MANUAL` | a row a person proves, which no run ever writes over |

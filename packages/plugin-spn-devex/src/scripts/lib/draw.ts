@@ -1112,7 +1112,7 @@ function drawMap(spec: Spec, opts: { downward?: boolean } = {}): { svg: string; 
  * SYSTEM — the architecture of a thing somebody builds, and the one kind that carries a server
  * module, a web module and an estate package alike, because the three are the same shape: server
  * runs entry → services → repositories → stores, web runs pages → hooks → services → client, an
- * estate runs organization → account → network → resources (decision RD.DOCS.075).
+ * estate runs organization → account → network → resources (decision RD.DEVEX.WORKSPACE.135).
  *
  * WHY IT IS A DRAWER RATHER THAN THREE RULES BOLTED ONTO THE MAP. The kind was specified fully and
  * drawn by hand three times; placing ONE of those figures took more than twenty rounds against the

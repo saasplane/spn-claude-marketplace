@@ -13,7 +13,7 @@
 
 ## An application runs because a row grants it — MUST
 
-There is no file in a code repository that asks the estate for what an application needs. **A grant belongs where it is reviewed, so an application's existence in the cloud is one row of its platform's own declaration** — and the row is not a description of something that already exists, it is the permission for it to (`RD.INFRA.026`).
+There is no file in a code repository that asks the estate for what an application needs. **A grant belongs where it is reviewed, so an application's existence in the cloud is one row of its platform's own declaration** — and the row is not a description of something that already exists, it is the permission for it to (`RD.SUPPORT.INFRA.026`).
 
 Two independent statements have to agree before anything runs, made in two different repositories by two different reviews: a code node's kind manifest claims that it is code of a certain shape, and the estate row grants that shape a place to run. **A deployment needs both.** A code change alone can never open production access, and something running with no row behind it is a finding, never a fact.
 
@@ -67,7 +67,7 @@ export interface SPEstateAppDeployment {
 
 ## Exposure is declared, and the namespace is its ceiling — MUST
 
-Which edge a deployment answers on, which zone it sits in, and whether it stands on the public attack surface at all is **one declared fact**, never inferred (`RD.INFRA.103`).
+Which edge a deployment answers on, which zone it sits in, and whether it stands on the public attack surface at all is **one declared fact**, never inferred (`RD.SUPPORT.INFRA.103`).
 
 | Value (`SPEstateExposeType`) | The deployment | Reached by |
 | --- | --- | --- |
@@ -79,7 +79,7 @@ Which edge a deployment answers on, which zone it sits in, and whether it stands
 
 `SPEstateExposeType` is an enum rather than a string because the value crosses three boundaries — declared here, handed to a layer whose own variable validates it, and asserted against in a check — and a bare string would type-check at none of them.
 
-**A binding is supplied explicitly or not at all — MUST, no default at the layer that consumes it** (`RD.INFRA.089`). A driver that stops passing one is reported as awaiting its input, never resolved quietly to no ingress or to the platform domain — a defaulted variable is the one omission nothing reports. A face binding is a choice **inside** the exposure already declared: it can place a public surface on a different apex, and it never widens how far that surface reaches.
+**A binding is supplied explicitly or not at all — MUST, no default at the layer that consumes it** (`RD.SUPPORT.INFRA.089`). A driver that stops passing one is reported as awaiting its input, never resolved quietly to no ingress or to the platform domain — a defaulted variable is the one omission nothing reports. A face binding is a choice **inside** the exposure already declared: it can place a public surface on a different apex, and it never widens how far that surface reaches.
 
 ## What each shape adds
 

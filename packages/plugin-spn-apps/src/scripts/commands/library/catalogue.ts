@@ -83,7 +83,7 @@ function libraries(workspace: string): Library[] {
 }
 
 function render(found: Library[], bookSeen: string): string {
-  // A RESTATEMENT CITES ANOTHER REPOSITORY, NEVER ITS OWN (`RD.DOCS.095`). This file used to stamp
+  // A RESTATEMENT CITES ANOTHER REPOSITORY, NEVER ITS OWN (`RD.DEVEX.AGENT.073`). This file used to stamp
   // `library-catalogue.ts` beside the book rule — a ref in the marketplace citing a script in the
   // marketplace, which has no distance to measure because both move in the same commit. The
   // generator's freshness is the generator's problem, and the paragraph below names the command.

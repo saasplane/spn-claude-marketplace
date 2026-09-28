@@ -17,7 +17,7 @@ description: Publishing an estate package - bump the version field in spinfrapkg
 
 ## 1 · The bump is the reviewed act
 
-Edit **`version`** in the node's `spinfrapkg.json` — semver, typed by a human, in a pull request. **Never a git tag.** An infra tree holds **no `package.json`** — nothing in one is a JavaScript package (RD.INFRA.066). `spinfrapkg.json` carries the name, the semver and the descriptive fields, and it is the only file a bump touches.
+Edit **`version`** in the node's `spinfrapkg.json` — semver, typed by a human, in a pull request. **Never a git tag.** An infra tree holds **no `package.json`** — nothing in one is a JavaScript package (RD.SUPPORT.INFRA.066). `spinfrapkg.json` carries the name, the semver and the descriptive fields, and it is the only file a bump touches.
 
 ## 2 · Dry-run
 

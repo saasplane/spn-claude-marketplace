@@ -20,7 +20,7 @@ import type { Floor, Measure } from "./floors.ts";
 /** The comment a raised floor carries. The date is the measurement's, never the moment the script ran. */
 const COMMENT = /\/\/ Coverage floor measured \d{4}-\d{2}-\d{2}[^\n]*\n/;
 const commentFor = (date: string): string =>
-  `// Coverage floor measured ${date} by the spn-apps floor script — it rises and never falls (RD.APPS.133).`;
+  `// Coverage floor measured ${date} by the spn-apps floor script — it rises and never falls (RD.SUPPORT.APPS.133).`;
 
 export type Outcome = {
   config: string;

@@ -78,7 +78,7 @@ The folder divides by what calls each file. `events/` holds the one process the 
 
 ### The join is a repository gate, and the stack says where a case lives
 
-**Why** — *a case that exists is not a case that ran*, and the join asks only the first question: does a case cite each `SUCCESS` row, and does each cited id name a row. It reads both sets whole, so it cannot be a check at the moment one file is written. Whether a run supports a row is the core plugin's proof check, and stamping a row is the core plugin's writer (the book's RD.DEVEX.071).
+**Why** — *a case that exists is not a case that ran*, and the join asks only the first question: does a case cite each `SUCCESS` row, and does each cited id name a row. It reads both sets whole, so it cannot be a check at the moment one file is written. Whether a run supports a row is the core plugin's proof check, and stamping a row is the core plugin's writer (the book's RD.DEVEX.UTILS.071).
 **What** — the join names a `SUCCESS` row no case title cites, and a case title citing an id no row declares. It exits non-zero on a finding; `--report` prints the same and exits zero.
 **How** — where a case lives and how its title is written are the stack's, so the join imports `providers/<stack>/scripts/lib/cases.ts` by a composed path, the way the gate does. It reads rows through this plugin's copy of the core plugin's register grammar, which a case holds byte for byte to the original. `packages/plugin-spn-apps/src/scripts/checks/behaviour-join.ts`, proven in `packages/plugin-spn-apps/tests/unit/scripts/checks/t-behaviour-join.mjs`.
 

@@ -103,7 +103,7 @@ This page answers what a skill is, how it is selected, and what it may contain. 
 | --- | --- | --- |
 | the foundation's DevEx Skills construct | a skill is a named unit of work, and its value spells the domain of the plugin that ships it | MUST |
 | the foundation's `02-delivery.md` § When an edit becomes behaviour | a skill edit is loadable only after an install and a fresh window | MUST |
-| `RD.DEVEX.019` | a skill restates a chapter's steps and adds no rule of its own | MUST |
-| `RD.DEVEX.025` | a folder per skill value and a value per folder, so the set a gate dispatches over is closed | MUST |
+| `RD.DEVEX.UTILS.019` | a skill restates a chapter's steps and adds no rule of its own | MUST |
+| `RD.DEVEX.AGENT.025` | a folder per skill value and a value per folder, so the set a gate dispatches over is closed | MUST |
 
 Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs restates check` (or `spn-devex restates check`, once installed)

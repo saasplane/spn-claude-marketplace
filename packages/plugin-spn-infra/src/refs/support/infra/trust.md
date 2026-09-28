@@ -53,7 +53,7 @@ Every provisioning run names its own mode, and there is no default.
 
 - A **plan** reaches no account and changes nothing, so it needs no credential. Rehearse the riskiest path — the first cloud walk a new company takes — before any account exists.
 - An **apply** performs the change; against a cloud realization it also takes an explicit approval.
-- A run naming neither mode, or naming both, **MUST** be refused (`RD.INFRA.094`).
+- A run naming neither mode, or naming both, **MUST** be refused (`RD.SUPPORT.INFRA.094`).
 
 **The credential check reads the provider the estate declared**, expects that provider's own session variables, and refuses by naming the provider when they are absent. Nothing in the driver names a vendor — a session holding a different provider's credentials reads as holding none. That fails safe, not dangerously, but it is still worth surfacing as a defect if you see it happen.
 

@@ -111,9 +111,9 @@ This page answers what this domain's provider contributes and how it is arranged
 
 | Rule | What it decides | Weight |
 | --- | --- | --- |
-| `RD.GOV.024` | a repository answers to the world it declares, which is what makes its manifest the one place a stack is read from | MUST |
-| `RD.DEVEX.025` | a folder per skill value and a value per folder, so a provider folder carries material and never a skill of its own | MUST |
-| `RD.DEVEX.035` | a rule reaches a write-time hook only where review would be too late, which is why the cycle rule is here as well as in the command-line tool | MUST |
-| `RD.PLATFORM.033` | the enablement grammar the source subject's refusals are written against | MUST |
+| `RD.DEVEX.WORKSPACE.176` | a repository answers to the world it declares, which is what makes its manifest the one place a stack is read from | MUST |
+| `RD.DEVEX.AGENT.025` | a folder per skill value and a value per folder, so a provider folder carries material and never a skill of its own | MUST |
+| `RD.DEVEX.FUNCTION.035` | a rule reaches a write-time hook only where review would be too late, which is why the cycle rule is here as well as in the command-line tool | MUST |
+| `RD.PLATFORM.CORE.033` | the enablement grammar the source subject's refusals are written against | MUST |
 
 Try it: `node packages/plugin-spn-apps/tests/run.mjs`

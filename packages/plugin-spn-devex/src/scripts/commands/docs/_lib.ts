@@ -33,7 +33,7 @@ export type Finding = { check: string; grade: Grade; file: string; message: stri
 //
 // The five that joined in 2026-09: a FACE is 226 documents of one shape that no kind could name,
 // and 29 of them declared a chapter's variant instead. A DATA_MODEL's table shape is stated in
-// `RD.DOCS.074` and was written four different ways across 25 files. SURFACE_MAP and ROUTE_MAP
+// `RD.DEVEX.WORKSPACE.134` and was written four different ways across 25 files. SURFACE_MAP and ROUTE_MAP
 // carry no document yet.
 //
 // DATA_MODEL AND SURFACE_MAP HAVE THEIR OUTLINES NOW, AND THEY REPORT SOFTLY (N37 step 3). Both are
@@ -91,9 +91,9 @@ export const OUTLINE: Partial<Record<Variant, { order: string[]; optional: strin
     order: ["Terms", "Why", "What", "How", "Open", "Deferred"],
     optional: ["Terms"],
   },
-  // WHAT A MIGRATION KNOWS, AND NOTHING ELSE (03-tree.md, RD.DOCS.074). A data model defines no
+  // WHAT A MIGRATION KNOWS, AND NOTHING ELSE (03-tree.md, RD.DEVEX.WORKSPACE.134). A data model defines no
   // term; the words are the constructs' `Terms` tables. What seeds and what must run first is
-  // storage knowledge too (RD.DOCS.023), so it closes the file rather than moving elsewhere.
+  // storage knowledge too (RD.DEVEX.WORKSPACE.089), so it closes the file rather than moving elsewhere.
   data_model: {
     order: ["Tables", "Indexes", "Seeds and order"],
     optional: ["Seeds and order"],
@@ -340,7 +340,7 @@ export function sectionsWithBodies(src: string): { name: string; body: string }[
  * four incompatible shapes (N37). So a `data-model.md` or a `surface-map.md` that declares no kind
  * is itself a finding: the outline below would otherwise never be read for it.
  *
- * A DATA MODEL AT A DOMAIN'S ROOT SITS ABOVE THE HALF THAT OWNS THE STORAGE (RD.DOCS.074). It sits
+ * A DATA MODEL AT A DOMAIN'S ROOT SITS ABOVE THE HALF THAT OWNS THE STORAGE (RD.DEVEX.WORKSPACE.134). It sits
  * beside the migrations it mirrors, which is always a package folder: `04-capabilities/<domain>/
  * <package>/data-model.md`. A domain that stores nothing writes none at all.
  *
@@ -360,7 +360,7 @@ export function checkRealizationFile(file: string, src: string, block: any): Fin
 
   const rel = file.replace(/\\/g, "/").split("/04-capabilities/")[1];
   if (kind === "data_model" && rel !== undefined && rel.split("/").length < 3)
-    add("a data model sits beside the migrations it mirrors, in the package that owns `src/migrations` — at a domain's root it sits above the half that owns the storage (RD.DOCS.074)");
+    add("a data model sits beside the migrations it mirrors, in the package that owns `src/migrations` — at a domain's root it sits above the half that owns the storage (RD.DEVEX.WORKSPACE.134)");
 
   const heads = TABLE_HEAD[kind];
   if (!heads) return f;
@@ -1439,7 +1439,7 @@ export function checkDepends(files: string[], blocks: Map<string, any>): Finding
 /**
  * A CLOSED VALUE IS NAMED IN A CHAPTER, AND NOTHING SAID WHAT ITS MEMBERS ARE.
  *
- * `RD.GOV.011` is a MUST and had zero compliant instances when this was written: *a chapter that
+ * `RD.DEVEX.WORKSPACE.165` is a MUST and had zero compliant instances when this was written: *a chapter that
  * owns a closed vocabulary states it as a contract block, and every other mention cites it.* A
  * vocabulary named but never listed cannot be implemented from the document, which is the one thing
  * the book is for — somebody building a second stack reads a page and writes the value.
@@ -1570,7 +1570,7 @@ export function checkVocabulary(
  * not the chapter that owns it: `Terms` gives a reader the word, and the declaration gives an
  * implementer the members. Both are correct, and only the second may be absent.
  *
- * A second declaration of one value is the other half of `RD.GOV.011` — *it is the ONE place the
+ * A second declaration of one value is the other half of `RD.DEVEX.WORKSPACE.165` — *it is the ONE place the
  * vocabulary is written* — and two pages drifting apart is exactly what the rule prevents.
  */
 // A MEMBER REFERENCE NAMES ITS TYPE, and reading only the bare form missed three of the four stale
@@ -1714,7 +1714,7 @@ export function directFiles(dir: string, keep: (p: string) => boolean): string[]
  * none of 252 rows measured. No correction to those files could have repaired it either: a data
  * model is grouped by table and a glossary row is keyed by term, so even a faithful storage mirror
  * answers *which terms live in this table* while the column asks the opposite. Storage is read in
- * the data model itself, beside the migrations it mirrors (RD.DOCS.074).
+ * the data model itself, beside the migrations it mirrors (RD.DEVEX.WORKSPACE.134).
  *
  * THE CONSTRUCT IS THE TERM'S LINK RATHER THAN A FOURTH COLUMN. A reader wanting the page that
  * defines the word follows the word.
@@ -2496,7 +2496,7 @@ export function pageFor(seat: string, workspace: string, templates: string, writ
   const { block, error } = readBlock(src);
   if (!block) { findings.push({ check: "page", grade: "RULE", file: seat, message: error ?? "no spn:doc block" }); return findings; }
 
-  // A construct types no proof (RD.DOCS.072), so the page is the seat and nothing is joined into it.
+  // A construct types no proof (RD.DEVEX.WORKSPACE.132), so the page is the seat and nothing is joined into it.
   // What proves it is read in the tests report, from the behaviour rows at the construct's own path.
   const markdown = src.replace(/<!--\s*spn:doc[\s\S]*?-->\n?/, "");
   const org = process.env.SPN_ORG ?? "SaaS Plane";
@@ -2669,7 +2669,7 @@ export function duplicateIds(repo: string): Finding[] {
  *
  * **Three are here and one is not.** Id coverage — every behaviour id cited by a case, and every
  * cited id declared as a row — is already built, in both directions, in the CLI's own
- * `behaviours-join.ts` under `RD.APPS.084`, and `spnutils apps validate repo` reports it. Building a
+ * `behaviours-join.ts` under `RD.SUPPORT.APPS.084`, and `spnutils apps validate repo` reports it. Building a
  * second one here would be the divergence that file's own header describes: two implementations of
  * one idea, disagreeing about the same estate.
  *
@@ -3060,7 +3060,7 @@ export function gapReport(repo: string, workspace: string, asJson: boolean): num
     "",
   ].join("\n");
 
-  // THE MEASUREMENT GOES TO THE CALLER, NEVER INTO A DEVELOPER'S POCKET (RD.DOCS.089). A report is
+  // THE MEASUREMENT GOES TO THE CALLER, NEVER INTO A DEVELOPER'S POCKET (RD.DEVEX.WORKSPACE.149). A report is
   // written by the agent from what it read; a tool that holds a measurement the agent needs hands it
   // over on standard output. Writing one here made this the only machine-authored file in a folder
   // of authored pages, and it regenerated on every run whether anybody had asked for it or not.

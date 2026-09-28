@@ -100,7 +100,7 @@ A workstream is `.spndevex/workstreams/{state}/{NNN}-{subject}/`, and its state 
 
 **Moving `backlog/` to `open/` is how work starts.** It needs no ceremony, it is not a close, and no gate fires on it.
 
-**Then update the agent and reload before you execute anything — MUST** (RD.DEVEX.049). Your own surfaces improve as the work does, so a workstream that executes first spends its whole scope acting on the surfaces the last one left. Read `refs/cross-repo.md` § *Open a workstream with the agent update* for the steps, the producer and partner forms, and the two gates a workstream carries.
+**Then update the agent and reload before you execute anything — MUST** (RD.DEVEX.AGENT.049). Your own surfaces improve as the work does, so a workstream that executes first spends its whole scope acting on the surfaces the last one left. Read `refs/cross-repo.md` § *Open a workstream with the agent update* for the steps, the producer and partner forms, and the two gates a workstream carries.
 
 ## The lines that hold
 

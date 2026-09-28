@@ -24,16 +24,16 @@ process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
 const workspace = join(BASE, "ws");
 const registerFile = registerPath(workspace, "spn-foundation");
 mkdirSync(join(workspace, "spn-foundation", "docs", "registers"), { recursive: true });
-const ROW_LINE = "| RD.APPS.086 | Scaffold and validate read one profile | prevents two ideas of a node | 2026-09-01 |";
+const ROW_LINE = "| RD.SUPPORT.APPS.086 | Scaffold and validate read one profile | prevents two ideas of a node | 2026-09-01 |";
 writeFileSync(registerFile,
   "# Decisions\n\n| # | Decision | Why | Date |\n| --- | --- | --- | --- |\n" +
   `${ROW_LINE}\n` +
-  "| RD.APPS.087 | Some other row | some other reason | 2026-09-02 |\n");
+  "| RD.SUPPORT.APPS.087 | Some other row | some other reason | 2026-09-02 |\n");
 
 console.log("=== a bare-string decisions entry is refused, known-bad first");
 {
   const refPath = join(BASE, "bare.md");
-  writeFileSync(refPath, '<!-- spn:restates\n{\n  "decisions": ["RD.APPS.086"]\n}\n-->\n\n# a ref\n');
+  writeFileSync(refPath, '<!-- spn:restates\n{\n  "decisions": ["RD.SUPPORT.APPS.086"]\n}\n-->\n\n# a ref\n');
   const [block, broken] = parse(refPath);
   one("a bare id in the decisions list is refused, not silently accepted", block, null);
   one("and the refusal names the shape it wants", broken, (g) => /object/.test(g) && /repo/.test(g) && /row/.test(g));
@@ -41,8 +41,8 @@ console.log("=== a bare-string decisions entry is refused, known-bad first");
 
 console.log("\n=== rowText / rowHash read one row's own line, never the whole register");
 {
-  one("rowText finds the row's own line", rowText(registerFile, "RD.APPS.086"), (g) => g.includes("RD.APPS.086") && g.includes("Scaffold"));
-  one("rowHash is the hash of that line alone", rowHash(registerFile, "RD.APPS.086"), seenHash(ROW_LINE));
+  one("rowText finds the row's own line", rowText(registerFile, "RD.SUPPORT.APPS.086"), (g) => g.includes("RD.SUPPORT.APPS.086") && g.includes("Scaffold"));
+  one("rowHash is the hash of that line alone", rowHash(registerFile, "RD.SUPPORT.APPS.086"), seenHash(ROW_LINE));
   one("a row the register does not carry reads null", rowText(registerFile, "RD.APPS.999"), null);
 
   // KNOWN-BAD: A ROW CROSS-REFERENCES ANOTHER ROW IN ITS OWN PROSE, earlier in the file than that
@@ -52,17 +52,17 @@ console.log("\n=== rowText / rowHash read one row's own line, never the whole re
   const crossRefRegister = join(BASE, "cross-ref.md");
   writeFileSync(crossRefRegister,
     "| # | Decision | Why | Date |\n| --- | --- | --- | --- |\n" +
-    "| RD.APPS.001 | First rule, cites RD.APPS.002 in its own prose. | because | 2026-01-01 |\n" +
-    "| RD.APPS.002 | Second rule, sharpens RD.APPS.001. | because | 2026-01-02 |\n");
+    "| RD.SUPPORT.APPS.001 | First rule, cites RD.SUPPORT.APPS.002 in its own prose. | because | 2026-01-01 |\n" +
+    "| RD.SUPPORT.APPS.002 | Second rule, sharpens RD.SUPPORT.APPS.001. | because | 2026-01-02 |\n");
   one("a citation of the SECOND row is not satisfied by the FIRST row merely naming it",
-    rowText(crossRefRegister, "RD.APPS.002"), (g) => g !== null && g.includes("Second rule"));
+    rowText(crossRefRegister, "RD.SUPPORT.APPS.002"), (g) => g !== null && g.includes("Second rule"));
   one("and the two rows hash differently",
-    rowHash(crossRefRegister, "RD.APPS.001") !== rowHash(crossRefRegister, "RD.APPS.002"), true);
+    rowHash(crossRefRegister, "RD.SUPPORT.APPS.001") !== rowHash(crossRefRegister, "RD.SUPPORT.APPS.002"), true);
   {
-    const before = rowHash(registerFile, "RD.APPS.086");
+    const before = rowHash(registerFile, "RD.SUPPORT.APPS.086");
     const src = readFileSync(registerFile, "utf8");
     writeFileSync(registerFile, src.replace("some other row", "a rewritten other row"));
-    const after = rowHash(registerFile, "RD.APPS.086");
+    const after = rowHash(registerFile, "RD.SUPPORT.APPS.086");
     writeFileSync(registerFile, src); // restore
     one("editing an UNRELATED row leaves this row's hash where it was", before === after, true);
   }
@@ -71,7 +71,7 @@ console.log("\n=== rowText / rowHash read one row's own line, never the whole re
 console.log("\n=== check() — the four decisions findings, known-bad first");
 {
   const refPath = join(BASE, "ref.md");
-  const currentSeen = rowHash(registerFile, "RD.APPS.086");
+  const currentSeen = rowHash(registerFile, "RD.SUPPORT.APPS.086");
 
   const findingsFor = (decisions) => {
     writeFileSync(refPath, `<!-- spn:restates\n${JSON.stringify({ decisions })}\n-->\n\n# a ref\n`);
@@ -80,11 +80,11 @@ console.log("\n=== check() — the four decisions findings, known-bad first");
   };
 
   one("a citation missing repo or row is refused",
-    findingsFor([{ row: "RD.APPS.086", seen: "x" }]),
+    findingsFor([{ row: "RD.SUPPORT.APPS.086", seen: "x" }]),
     (g) => g.length === 1 && /repo/.test(g[0]) && /row/.test(g[0]));
 
   one("a register path that resolves to nothing is refused",
-    findingsFor([{ repo: "spn-ghost", row: "RD.APPS.086", seen: "x" }]),
+    findingsFor([{ repo: "spn-ghost", row: "RD.SUPPORT.APPS.086", seen: "x" }]),
     (g) => g.length === 1 && /does not resolve/.test(g[0]));
 
   one("a row the named register does not carry is refused",
@@ -92,15 +92,15 @@ console.log("\n=== check() — the four decisions findings, known-bad first");
     (g) => g.length === 1 && /does not carry/.test(g[0]));
 
   one("a rewritten row is refused, and the message says re-read, update, restamp",
-    findingsFor([{ repo: "spn-foundation", row: "RD.APPS.086", seen: "stale-hash" }]),
+    findingsFor([{ repo: "spn-foundation", row: "RD.SUPPORT.APPS.086", seen: "stale-hash" }]),
     (g) => g.length === 1 && /re-read the row, update the ref, then restamp/.test(g[0]));
 
   one("a current citation is clean",
-    findingsFor([{ repo: "spn-foundation", row: "RD.APPS.086", seen: currentSeen }]),
+    findingsFor([{ repo: "spn-foundation", row: "RD.SUPPORT.APPS.086", seen: currentSeen }]),
     (g) => g.length === 0);
 
   one("a citation with no seen at all is refused",
-    findingsFor([{ repo: "spn-foundation", row: "RD.APPS.086" }]),
+    findingsFor([{ repo: "spn-foundation", row: "RD.SUPPORT.APPS.086" }]),
     (g) => g.length === 1 && /nothing to compare/.test(g[0]));
 }
 
@@ -108,13 +108,13 @@ console.log("\n=== undeclared() — a row named in prose the block's object cita
 {
   const refPath = join(BASE, "prose.md");
   writeFileSync(refPath,
-    '<!-- spn:restates\n{\n  "decisions": [\n    { "repo": "spn-foundation", "row": "RD.APPS.086", "seen": "x" }\n  ]\n}\n-->\n\n' +
-    "# a ref\n\nSource of truth: RD.APPS.086 and RD.APPS.087.\n");
+    '<!-- spn:restates\n{\n  "decisions": [\n    { "repo": "spn-foundation", "row": "RD.SUPPORT.APPS.086", "seen": "x" }\n  ]\n}\n-->\n\n' +
+    "# a ref\n\nSource of truth: RD.SUPPORT.APPS.086 and RD.SUPPORT.APPS.087.\n");
   const [block] = parse(refPath);
   const missing = undeclared(refPath, block);
-  one("the declared row (RD.APPS.086) is not reported as undeclared", missing.includes("RD.APPS.086"), false);
-  one("the row named in prose but not declared by an object citation (RD.APPS.087) is reported",
-    missing.includes("RD.APPS.087"), true);
+  one("the declared row (RD.SUPPORT.APPS.086) is not reported as undeclared", missing.includes("RD.SUPPORT.APPS.086"), false);
+  one("the row named in prose but not declared by an object citation (RD.SUPPORT.APPS.087) is reported",
+    missing.includes("RD.SUPPORT.APPS.087"), true);
 }
 
 console.log("\n=== restates decisions --write — restamps after the developer's rewrite, never the prose");
@@ -125,13 +125,13 @@ console.log("\n=== restates decisions --write — restamps after the developer's
   const reg = registerPath(devexRoot, "spn-foundation");
   writeFileSync(reg, `# Decisions\n\n${ROW_LINE}\n`);
   const refPath2 = join(devexRoot, "ref.md");
-  const staleBody = '<!-- spn:restates\n{\n  "decisions": [\n    {\n      "repo": "spn-foundation",\n      "row": "RD.APPS.086",\n      "seen": "deadbeef"\n    }\n  ]\n}\n-->\n\n# a ref\n\nProse untouched by the writer.\n';
+  const staleBody = '<!-- spn:restates\n{\n  "decisions": [\n    {\n      "repo": "spn-foundation",\n      "row": "RD.SUPPORT.APPS.086",\n      "seen": "deadbeef"\n    }\n  ]\n}\n-->\n\n# a ref\n\nProse untouched by the writer.\n';
   writeFileSync(refPath2, staleBody);
   const TOOL = join(import.meta.dirname, "..", "..", "..", "..", "src", "scripts", "commands", "restates", "decisions.ts");
   const out = execFileSync("node", [TOOL, "--write", refPath2], { encoding: "utf8" });
   const after = readFileSync(refPath2, "utf8");
   one("the writer reports one row restamped", out, (g) => /1 row\(s\) restamped/.test(g));
-  one("the seen hash now matches the row's real text", after, (g) => g.includes(`"seen": "${rowHash(reg, "RD.APPS.086")}"`));
+  one("the seen hash now matches the row's real text", after, (g) => g.includes(`"seen": "${rowHash(reg, "RD.SUPPORT.APPS.086")}"`));
   one("the prose is byte-identical — the writer never rewrites text, only the stamp",
     after.endsWith("Prose untouched by the writer.\n"), true);
   const [block2] = parse(refPath2);

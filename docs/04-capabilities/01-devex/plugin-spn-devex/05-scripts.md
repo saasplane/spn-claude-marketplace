@@ -48,7 +48,7 @@ Everything this plugin can execute sits under `packages/plugin-spn-devex/src/scr
 ### One entry, `<group> <action>`, dispatches every command
 
 **Why** — *sixteen tools reached by sixteen separate paths is a vocabulary that grows by one every time somebody adds a tool*, and a partner has no way to list what exists short of reading the folder. The foundation's `04-plugins/02-shape.md` states the alternative: one entry, `<group> <action>`, `help --json` listing every action as data.
-**What** — `cli.ts` lazily imports `commands/<group>/<action>.ts`, one file per action, each exporting `{ describe, run }`. This plugin's groups: `docs` (`audit` · `face` · `page` · `status` · `topics` · `coverage` · `prose` · `coherence` · `figure`) · `restates`, one action per `spn:restates` block kind — `docs` · `files` · `decisions` (the foundation's decision `RD.DOCS.091`) — plus `check`, running all three · `behaviours` (`stamp` · `check` · `coverage`) · `plugin` (`partner` · `paths` · `build` · `timings`). No `tools/` folder survives: every path that once named one now names a command.
+**What** — `cli.ts` lazily imports `commands/<group>/<action>.ts`, one file per action, each exporting `{ describe, run }`. This plugin's groups: `docs` (`audit` · `face` · `page` · `status` · `topics` · `coverage` · `prose` · `coherence` · `figure`) · `restates`, one action per `spn:restates` block kind — `docs` · `files` · `decisions` (the foundation's decision `RD.DEVEX.AGENT.072`) — plus `check`, running all three · `behaviours` (`stamp` · `check` · `coverage`) · `plugin` (`partner` · `paths` · `build` · `timings`). No `tools/` folder survives: every path that once named one now names a command.
 **How** — a command is printed as `spn-devex docs audit`, never as a bare path — a file under `commands/` is reachable, or it is not there, and nothing outside that folder is dispatched.
 
 ### A check says which of its rules it carries
@@ -129,13 +129,13 @@ Everything this plugin can execute sits under `packages/plugin-spn-devex/src/scr
 
 ### One writer stamps every repository's rows
 
-**Why** — *rows are domain-neutral*. A stack repository, an estate repository and this one all carry registers, and `spnutils` writes the run artifact and never a row (the book's RD.DEVEX.071). One writer here serves all of them, so two writers can never disagree about a row's width or its rules.
+**Why** — *rows are domain-neutral*. A stack repository, an estate repository and this one all carry registers, and `spnutils` writes the run artifact and never a row (the book's RD.DEVEX.UTILS.071). One writer here serves all of them, so two writers can never disagree about a row's width or its rules.
 **What** — only `Status` and `Updated at` are written. A run speaks for the tiers it ran, and a result counts for a row only at the row's own `Tier`. `Updated at` is the newest run that named the row. `MANUAL` is never written over and a `PROMISE` row is never stamped. Rows nothing named are left alone unless `--reach repository` says the artifacts are the whole of their tiers; then they go back to `PLANNED`. `--results <file>` names the artifact to read, and without it every `spn-tests.json` under the root is read.
 **How** — a column is found by its heading, so an eight-, nine- or ten-cell register is stamped alike and keeps its width, and a file is rewritten only where a row changed. This repository's own runner, `packages/plugin-spn-devex/tests/run.mjs`, calls it with its one artifact. `packages/plugin-spn-devex/src/scripts/commands/behaviours/stamp.ts`, proven in `packages/plugin-spn-devex/tests/unit/scripts/commands/behaviours/t-stamp.mjs`.
 
 ### The proof and the measurement read the rows the writer stamps
 
-**Why** — *a case that exists is not a case that ran*, and a report is written by the agent and produced by no command (RD.DOCS.089).
+**Why** — *a case that exists is not a case that ran*, and a report is written by the agent and produced by no command (RD.DEVEX.WORKSPACE.149).
 **What** — the proof check refuses a `SUCCESS` row the last run of its tier contradicts, never judging a tier no run spoke for or a `MANUAL` row. The measurement joins every row to the last run of its tier, lists every tier the repository owes with a reason where it did not run, and hands the result over as `--json`; an unchanged tree measures to the same bytes. A foundation repository gets an absence and no report.
 **How** — both read the one register grammar and the one artifact reader the writer reads. `packages/plugin-spn-devex/src/scripts/checks/behaviour-proof.ts` and `packages/plugin-spn-devex/src/scripts/commands/behaviours/coverage.ts`, proven in `packages/plugin-spn-devex/tests/unit/scripts/checks/t-behaviour-proof.mjs` and `packages/plugin-spn-devex/tests/unit/scripts/commands/behaviours/t-coverage.mjs`.
 

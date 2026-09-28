@@ -46,4 +46,4 @@ packages/plugin-spn-infra/src/skills/implement/   →  INFRA_IMPLEMENT
 
 **No plugin may name another plugin's file path.** A cross-plugin address is a name, never a path — a partner's install has no sibling directory to reach into.
 
-**A path written in a plugin file names a file the installed plugins carry — MUST** (`RD.DEVEX.070`). A path the install does not carry sends the agent to nothing, and it writes the rule it expected to find.
+**A path written in a plugin file names a file the installed plugins carry — MUST** (`RD.DEVEX.AGENT.070`). A path the install does not carry sends the agent to nothing, and it writes the rule it expected to find.

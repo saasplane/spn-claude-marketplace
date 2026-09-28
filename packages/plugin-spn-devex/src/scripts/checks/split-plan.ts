@@ -516,7 +516,7 @@ const OPEN_SECTION = /<section id="s4"[\s\S]*?<\/section>/i;
 // looked like a clean corpus.
 //
 // THE HEADING FORM IS NOT KEPT AS A SECOND SPELLING. `Q185` option C was exactly that and was
-// refused: two spellings with one reader is the defect `RD.DEVEX.058` had removed from arc statuses
+// refused: two spellings with one reader is the defect `RD.DEVEX.WORKSPACE.058` had removed from arc statuses
 // the day before, and it would make the drift permanent instead of ending it.
 // A CARD IS THE `h4` INSIDE ITS `.open` OR `.card` BLOCK, and `Q185` moved this to `<tr>` on a
 // measurement that counted the wrong thing. That measurement said `008` carried *0 headings and 54

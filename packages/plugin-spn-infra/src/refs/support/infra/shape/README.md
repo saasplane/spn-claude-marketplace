@@ -31,7 +31,7 @@ A declaration asks four different questions, and each has its own group of facts
 
 **A fixed list is checked before anything is created**, so a misspelling costs a second rather than half an estate. It is also a promise: SaaS Plane publishes code for each value, so writing one is asking for something that already exists. **Adding a value is a register decision, never a setting somebody switches on.**
 
-**Never count the values in a list.** A list is read by the rule that defines it, not by how many values it holds today (`RD.GOV.008`), and each list is stated once with every other mention pointing at that statement (`RD.GOV.011`). A sentence that says *the four postures* stops being true the day a fifth is ruled in.
+**Never count the values in a list.** A list is read by the rule that defines it, not by how many values it holds today (`RD.DEVEX.WORKSPACE.162`), and each list is stated once with every other mention pointing at that statement (`RD.DEVEX.WORKSPACE.165`). A sentence that says *the four postures* stops being true the day a fifth is ruled in.
 
 ### What a package is, and which rung a fact sits on
 
@@ -58,7 +58,7 @@ The layers are nouns; each takes `plan · up · down · status`. Start them in o
 | `environment` | plan · up · down · status — `<env>`, **`--cloud` only** | **no local form exists** — the machine is one environment; targeting it locally is refused by name | network → resources → compute, in order |
 | `app` | up · down | the app's derived converge — schemas, certificates and the ingress vhost; app from the cwd, `-p` overrides | — (deploys ride the pipeline) |
 
-**Every provisioning run names its mode, and there is no default** (RD.INFRA.094). `up` and `down` each take exactly one of `--plan` or `--apply`. A command that plans when you forget a flag is a command doing another command's job, and a default would decide the direction of the mistake for you.
+**Every provisioning run names its mode, and there is no default** (RD.SUPPORT.INFRA.094). `up` and `down` each take exactly one of `--plan` or `--apply`. A command that plans when you forget a flag is a command doing another command's job, and a default would decide the direction of the mistake for you.
 
 Beside the layers: `logs [service]` · `show` (resolution per layer, incl. **PINNED @ version or a path**) · `trust-ca` (trust the machine's own CA — what the local `organization up` does as part of its bootstrap) · `domain register|unregister` (register a host with the local proxy, `--app <app>`, needing no privilege and writing no `/etc/hosts` — what the local edge provider calls for every route, and what a test calls for its own `lc-test` domain) · the `config` commands (`set · get · list · export · import · diff · render` — the app plane only, never the ledger) · `web deploy|rollback <env> <app>` (a built bundle into the platform's own storage engine, and a landed release back onto the route — no separate store) · `scaffold repo|organization|platform|module` · `validate` · `test` · `release`.
 

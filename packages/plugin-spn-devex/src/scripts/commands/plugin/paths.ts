@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RD.DEVEX.070, carried from `N97` step 4 and run here per `N101` step 6b — a path written in a
+// RD.DEVEX.AGENT.070, carried from `N97` step 4 and run here per `N101` step 6b — a path written in a
 // plugin file must name a file the installed plugins carry.
 //
 // `${CLAUDE_PLUGIN_ROOT}` is the one variable a skill, a ref or `hooks.json` ever writes a plugin
@@ -78,7 +78,7 @@ export function findDead(pluginRoot: string): Finding[] {
   return dead;
 }
 
-export const describe = "a plugin path named in its own skills/refs/hooks resolves to a shipped file (RD.DEVEX.070)";
+export const describe = "a plugin path named in its own skills/refs/hooks resolves to a shipped file (RD.DEVEX.AGENT.070)";
 
 export function run(args: string[]): number {
   const root = marketplaceRoot(args.find((a) => !a.startsWith("--")) ?? process.cwd());

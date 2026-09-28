@@ -1,21 +1,21 @@
 #!/usr/bin/env node
-// RESTATES: RD.DOCS.055, and `docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` §
+// RESTATES: RD.DEVEX.WORKSPACE.118, and `docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` §
 // Restatement discipline.
 //
 // The `docs`-kind restatement alone: a plugin document that rewrote a chapter's rule in its own
 // words, and whether that rewrite still says what the chapter says. `restates check` runs all four
 // kinds together; this narrows to one, so a drift names its owed act — a `docs` drift is rewritten,
-// never copied or re-run (RD.DOCS.091).
+// never copied or re-run (RD.DEVEX.AGENT.072).
 //
 //     spn-devex restates docs [path/to/spn-foundation]
 //
 // Exit code is the number of findings.
 
 import { dirname, relative } from "node:path";
-import { check as checkKind, parse, undeclared } from "../../lib/restates.ts";
+import { DECISION_ID_SRC, check as checkKind, parse, undeclared } from "../../lib/restates.ts";
 import { findBook, pluginDocuments } from "./check.ts";
 
-const IS_ROW = /^RD\.[A-Z]+\.\d{3}$/;
+const IS_ROW = new RegExp(`^${DECISION_ID_SRC}$`);
 
 export function main(argv: string[], root: string): number {
   const documents = pluginDocuments(root);

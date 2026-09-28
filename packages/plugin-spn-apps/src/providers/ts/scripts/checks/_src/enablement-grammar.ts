@@ -15,7 +15,7 @@
 //   3 NOUN      a multi-value definition is named for its OPTIONS, never its area. Name it for the
 //               area and the console shows "Customization" holding a list of entity types.
 //   4 ORG TYPE  no hardcoded Set or array of `OrgType` values in a service. That is a product
-//               decision written as code — the RD.PLATFORM.033 shape — invisible to the console and
+//               decision written as code — the RD.PLATFORM.CORE.033 shape — invisible to the console and
 //               changeable only by a release.
 //
 // **Not checked here, on purpose.** *Every gated method is a write* needs the decorator-to-method
@@ -59,7 +59,7 @@ const COMMENT = "\x01";
 // address.
 const REF = "A permission is what a caller may do; an enablement is what an organization has " +
   "turned on. A gate that reads an enablement to decide authority has confused the two " +
-  "(decisions RD.PLATFORM.033 · RD.PLATFORM.034).";
+  "(decisions RD.PLATFORM.CORE.033 · RD.PLATFORM.CORE.034).";
 
 export type Region = [number, number];
 export type Finding = { rule: string; region: Region; message: string };
@@ -263,7 +263,7 @@ export function orgTypeFindings(path: string, source: string, masked: string): F
     const listed = [...found].sort().join(", ");
     out.push(finding("ORG TYPE", region,
       `A hardcoded ${shape} of organization types (${listed}) in ${basename(path)}. ` +
-      "No module gates by organization type on its own authority (RD.PLATFORM.033). Which types are " +
+      "No module gates by organization type on its own authority (RD.PLATFORM.CORE.033). Which types are " +
       "offered a capability is a PRODUCT decision, authored as an enablement cell the platform " +
       "console can show and change — not a literal a release has to move. Register a " +
       "`{MOD}_MANAGE_{NOUN}` definition and check it with `assertEnabled`, or `assertAllows` " +

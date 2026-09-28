@@ -8,7 +8,7 @@ Frontend modules are plain packages composed by each app's router — no runtime
 
 ## The UI module package (`MODULE_WEB`)
 
-- Layout: `src/entry/ui/{components/<group>, hooks/<group>, pages/<group>, utils/url}` + generated root barrel — the browser is a transport, so the UI is the web module's **entry** (decision RD.APPS.031); `assets/` sits beside `entry/`, never inside. **Use named exports only** — no defaults anywhere; the app's `React.lazy` imports do the `{ default: m.Page }` mapping, the one sanctioned place it exists.
+- Layout: `src/entry/ui/{components/<group>, hooks/<group>, pages/<group>, utils/url}` + generated root barrel — the browser is a transport, so the UI is the web module's **entry** (decision RD.SUPPORT.APPS.031); `assets/` sits beside `entry/`, never inside. **Use named exports only** — no defaults anywhere; the app's `React.lazy` imports do the `{ default: m.Page }` mapping, the one sanctioned place it exists.
 - A ui package owns feature UI for its module and **never** owns routes, nav placement, or session handling — apps own composition. URL helpers (`get<Entity>ListPageUrl` / `…DetailPageUrl`) are how modules name their routes once.
 - Data access goes through the module's own hooks calling the **API client** — there is never a hand-written client. `src/generated/` in the client package is untouchable (regenerate from the running service instead).
 

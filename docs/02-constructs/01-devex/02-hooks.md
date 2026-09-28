@@ -140,9 +140,9 @@ This page answers which moments exist, how a script claims one, what it is hande
 | Rule | What it decides | Weight |
 | --- | --- | --- |
 | the foundation's `02-delivery.md` § When an edit becomes behaviour | a hook script is the one construct read from disk on its next run, with no fresh window owed | MUST |
-| `RD.DEVEX.019` | a hook carries a rule it does not own, and names the chapter that owns it | MUST |
-| `RD.DEVEX.020` | the workspace is discovered rather than declared, so the opening screen is read from each repository's own manifest | MUST |
-| [MD2](../../registers/decisions.md) | the dispatcher does refuse on its own account, through the generated-file guard it runs before the list | MUST |
+| `RD.DEVEX.UTILS.019` | a hook carries a rule it does not own, and names the chapter that owns it | MUST |
+| `RD.DEVEX.WORKSPACE.020` | the workspace is discovered rather than declared, so the opening screen is read from each repository's own manifest | MUST |
+| [RD.DEVEX.002](../../registers/decisions.md) | the dispatcher does refuse on its own account, through the generated-file guard it runs before the list | MUST |
 | the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | a hook is the Event kind of script, run from a committed bundle a staleness test keeps current | MUST |
 
 Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs plugin partner` (or `spn-devex plugin partner`, once installed)

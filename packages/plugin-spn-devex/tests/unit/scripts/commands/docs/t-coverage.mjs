@@ -10,7 +10,7 @@ import { PLUGIN } from "../../../../helpers/harness.mjs";
 // resolved through a node called `estate` and read as checked. Every case here plants a known-bad
 // that is bad in the check's OWN terms: a path with no pair, a folder naming no package, a `Who`
 // naming no persona. Id coverage is deliberately absent: the CLI's `behaviours-join.ts` already does
-// it in both directions under `RD.APPS.084`, and a second copy is the divergence that file warns
+// it in both directions under `RD.SUPPORT.APPS.084`, and a second copy is the divergence that file warns
 // about.
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";

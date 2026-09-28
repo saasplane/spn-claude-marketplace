@@ -104,7 +104,7 @@ A test that proves a stated behavior should be traceable to it. Where the platfo
 
 ## After a run: stamp the rows, then read them against the runs
 
-**`spnutils` runs a tier and writes `tests/.output/<tier>/spn-tests.json`, and never a row** (`RD.DEVEX.071`). What the run means for the documents is yours, through this plugin's scripts:
+**`spnutils` runs a tier and writes `tests/.output/<tier>/spn-tests.json`, and never a row** (`RD.DEVEX.UTILS.071`). What the run means for the documents is yours, through this plugin's scripts:
 
 ```bash
 node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs behaviours stamp .                    # what it would change

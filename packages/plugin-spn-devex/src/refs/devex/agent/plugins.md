@@ -50,7 +50,7 @@ An edit to the folder changes nothing about the cache until an install copies on
 
 ## The `spn:restates` stamp
 
-**A stamp lives here and nowhere else, and it cites another repository — never this one** (`RD.DOCS.095`). Both halves follow from what a restatement is for: it exists because a rule lives in the book and is repeated here, where the book cannot be read, and the `seen` hash is what makes that gap reportable. **A file citing its own repository has no gap to report** — both halves move in the same commit — so the stamp has no work to do and the hash stops matching the file with nobody to notice. Do not stamp a generated ref against the generator that writes it: say which command produces the file, in prose, and let a reader re-run it.
+**A stamp lives here and nowhere else, and it cites another repository — never this one** (`RD.DEVEX.AGENT.073`). Both halves follow from what a restatement is for: it exists because a rule lives in the book and is repeated here, where the book cannot be read, and the `seen` hash is what makes that gap reportable. **A file citing its own repository has no gap to report** — both halves move in the same commit — so the stamp has no work to do and the hash stops matching the file with nobody to notice. Do not stamp a generated ref against the generator that writes it: say which command produces the file, in prose, and let a reader re-run it.
 
 **The stamp is a comment block at the top of a ref, and it is the one place a restatement declares what it stands on.** You write one without reading any tool's source:
 
@@ -74,7 +74,7 @@ An edit to the folder changes nothing about the cache until an install copies on
   // register — every register lives at that repo's fixed `docs/registers/decisions.md` — `row` is
   // the decision id, and `seen` hashes that row's own line, never the whole register.
   "decisions": [
-    { "repo": "spn-foundation", "row": "RD.APPS.086", "seen": "79c8a6ab" }
+    { "repo": "spn-foundation", "row": "RD.SUPPORT.APPS.086", "seen": "79c8a6ab" }
   ]
 }
 -->
@@ -185,7 +185,7 @@ A session reads the installed cache, so changed files and unchanged behaviour is
 
 **A session cannot adopt its own new wiring, so the tool that changed it owes the handover — MUST.** The session that installs a plugin or re-mints a wiring level is the one session that will not read the result, and it is also the only one that knows what changed and why. A handover that reports only the fact is the failure this rule exists to prevent — told that the plugins updated, the next window starts from nothing and re-derives the work that produced the change. Carry the work itself, so the next window continues rather than restarts.
 
-**The sitting that changed the wiring finishes it before it offers a handover — MUST** (`RD.DEVEX.059`). A handover can be complete and still point at wiring nobody installed, and the next window then opens on the previous generation.
+**The sitting that changed the wiring finishes it before it offers a handover — MUST** (`RD.DEVEX.AGENT.059`). A handover can be complete and still point at wiring nobody installed, and the next window then opens on the previous generation.
 
 **A partner's form of this is shorter and the order is identical**: check whether a newer version is published, install it, run the syncs, take a fresh window.
 

@@ -86,7 +86,7 @@ console.log(`\n  ${suites.length} suite(s) · ${cases} case(s)` +
 //
 // IT IS A RUN'S OUTPUT AND NOT A DOCUMENT, so it lives where every other stack's runner puts one —
 // `tests/.output/<tier>/spn-tests.json`, the path `spn-test.mjs` derives. The pocket beside it
-// holds pages a person wrote (RD.DOCS.089); a file rewritten by every run is not one, and while it
+// holds pages a person wrote (RD.DEVEX.WORKSPACE.149); a file rewritten by every run is not one, and while it
 // sat there a suite run reported a changed tree on its timestamp alone, which a release refuses.
 const artifact = resolve(REPO, "tests", ".output", TIER.toLowerCase(), "spn-tests.json");
 mkdirSync(dirname(artifact), { recursive: true });

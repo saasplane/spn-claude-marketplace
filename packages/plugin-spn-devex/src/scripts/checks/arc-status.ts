@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: spn-foundation RD.DEVEX.058 — an arc carries a status, and it is one of a closed set.
+// RESTATES: spn-foundation RD.DEVEX.WORKSPACE.058 — an arc carries a status, and it is one of a closed set.
 // The register row is the source of truth. A rule change is edited there first, then here.
 //
 // WHAT IT CATCHES. An arc written with a status word nothing can act on, or with none at all.
@@ -42,7 +42,7 @@ export const STATUSES = ["PROPOSED", "DECIDED", "RUNNING", "HELD", "PART-LANDED"
 export const TERMINAL = new Set(["LANDED", "CARRIED", "DROPPED"]);
 
 // Both spellings are read, because the corpus has both and a reader that knows one is the fault this
-// check exists downstream of. `RD.DEVEX.058` names `Status: **WORD` as the one to WRITE.
+// check exists downstream of. `RD.DEVEX.WORKSPACE.058` names `Status: **WORD` as the one to WRITE.
 const STATUS_LINE = /^\*{0,2}Status:?\*{0,2}\s*\*{0,2}\s*([A-Z][A-Z-]*)/m;
 
 /** Only an arc file, which is any `.md` directly under a workstream's `arcs/`. */
@@ -82,7 +82,7 @@ export function checkArcStatus(payload: Payload): Verdict {
   return {
     deny:
       `\`${name}\` declares \`Status: ${declared}\`, which is not one of the eight ` +
-      `(RD.DEVEX.058): ${STATUSES.join(" · ")}.\n` +
+      `(RD.DEVEX.WORKSPACE.058): ${STATUSES.join(" · ")}.\n` +
       `Every check that reads an arc reads this word, so one outside the set is a state nothing can ` +
       `act on — \`runnable\` and \`hold\` both skip it in silence rather than reporting it.\n` +
       `${TERMINAL.has(declared) ? "" : "If some steps landed and nobody is on it, that is `PART-LANDED`. "}` +

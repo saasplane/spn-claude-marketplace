@@ -19,6 +19,6 @@
 
 **The shape of the refusal is already decided.** The check expects the declared provider's own session values and refuses by naming that provider when they are absent. An estate declaring Google Cloud would be told which provider's session was wanted.
 
-**That rule was written from this exact failure.** A credential posture type was built and withdrawn the same day because it probed one vendor's variables: a session holding another cloud's credentials read as a rehearsal, which fails safely and is still wrong (`RD.INFRA.094`).
+**That rule was written from this exact failure.** A credential posture type was built and withdrawn the same day because it probed one vendor's variables: a session holding another cloud's credentials read as a rehearsal, which fails safely and is still wrong (`RD.SUPPORT.INFRA.094`).
 
 **So this cloud is already covered by the law it has no realization for.** What is missing is a run to hold a credential, not a rule about holding one.

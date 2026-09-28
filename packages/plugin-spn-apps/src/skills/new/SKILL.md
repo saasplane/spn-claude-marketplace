@@ -24,7 +24,7 @@ A new platform monorepo — the workspace root, which declares `sprepo.json` `{ 
 Then:
 
 1. **Create the repository**: `spnutils repo create <name>` — creates it in the bound SCM if absent, then converges it to the standard (branches, protections, team access). Idempotent.
-2. **Mint the workspace**: `spnutils apps scaffold repo --stack ts --organization <package[@version]> [--platform <package[@version]>]`. It writes `sprepo.json` with the stack claim and couplings — the organization coupling is never optional, and `platform: null` means nothing deploys. Then it writes the workspace skeleton: `apps/` · `packages/` · `docs/` (the repository's one docs tree — the shape below; a node scaffolded afterwards carries no docs tree of its own) · `tests/` + `package.json`, `pnpm-workspace.yaml`, `nx.json`. No `tasks/` tree — designs live in the docs as 🔮 rows (foundation decision RD.DEVEX.007). pnpm only, never npm/yarn; Nx discovers projects from each `package.json`'s `nx` block.
+2. **Mint the workspace**: `spnutils apps scaffold repo --stack ts --organization <package[@version]> [--platform <package[@version]>]`. It writes `sprepo.json` with the stack claim and couplings — the organization coupling is never optional, and `platform: null` means nothing deploys. Then it writes the workspace skeleton: `apps/` · `packages/` · `docs/` (the repository's one docs tree — the shape below; a node scaffolded afterwards carries no docs tree of its own) · `tests/` + `package.json`, `pnpm-workspace.yaml`, `nx.json`. No `tasks/` tree — designs live in the docs as 🔮 rows (foundation decision RD.DEVEX.FUNCTION.007). pnpm only, never npm/yarn; Nx discovers projects from each `package.json`'s `nx` block.
 3. **Agent wiring**: `spnutils repo agent-sync` (alias `as`). The marketplace source follows the mode the place implies, so nothing is passed — a builder wires the checkout, a partner does not hold, and writes `.claude/settings.local.json` instead). It registers the `saasplane` marketplace, enables `spn-devex@saasplane` + `spn-apps@saasplane`, maintains the managed `CLAUDE.md` block, and generates `.claude/saasplane/rules.md`.
 4. **Local infra**: `spnutils infra organization up` (once per machine) → `spnutils infra platform up` — see the `run` skill local mode.
 
@@ -62,7 +62,7 @@ Then:
 | `client-api` | `CLIENT_API` | universal | `packages/client-<usecase>-api-ts` — the **shell** is scaffolded like any kind (manifest, tsconfigs, lint, tests, generator config, hand-written barrel). Only `src/generated/` is emitted, from the running service's published spec; hand edits there are lost by design | `pnpm --filter <app> gen:client` |
 | `app-module` | (the module's own) | — | A module folder inside an app — see **Target: app-module** below | |
 
-**Targets are kebab-case, and derived rather than tabled**: a target is its kind lowercased with `_` → `-`, so `MODULE_SERVER` is `module-server`. A superseded spelling is an **unknown** target, never a mapped one (RD.APPS.027) — it fails at the door.
+**Targets are kebab-case, and derived rather than tabled**: a target is its kind lowercased with `_` → `-`, so `MODULE_SERVER` is `module-server`. A superseded spelling is an **unknown** target, never a mapped one (RD.SUPPORT.APPS.027) — it fails at the door.
 
 **Two arguments, and they are different facts.** `--usecase` builds the *name*; `--code` is the value `spkind.json`'s config carries. They coincide for modules and diverge for apps — `utility-ts` carries the code `utilities`.
 
@@ -76,16 +76,16 @@ spnutils apps scaffold kind client-api     -u sample        # → client-sample-
 
 A kind whose `config` is `null` — `TOOLCHAIN`, `SUPPORT_*`, `CLIENT_API` — **refuses `--code` by name** rather than ignoring it; so does the `repo` target, which is not a kind at all.
 
-**Name grammar** (RD.APPS.037): every project name leads with its family token — `toolchain-{stack}` · `support{-usecase}-{stack}` · `support-server{-usecase}-{stack}` · `support-web{-usecase}-{stack}` · `module-server-{mod}-{stack}` · `module-web-{mod}-{stack}` · `service-{usecase}-{stack}` · `web-{usecase}-{stack}` · `utility{-usecase}-{stack}` · `client-{usecase}-api-{stack}`. The `APP` family is named by delivery form, `UNIVERSAL` is the unmarked runtime, and `{stack}` is appended by tooling and never typed. A downstream platform uses its own npm scope with the same folder grammar. **`domain-` and `ui-` are retired.**
+**Name grammar** (RD.SUPPORT.APPS.037): every project name leads with its family token — `toolchain-{stack}` · `support{-usecase}-{stack}` · `support-server{-usecase}-{stack}` · `support-web{-usecase}-{stack}` · `module-server-{mod}-{stack}` · `module-web-{mod}-{stack}` · `service-{usecase}-{stack}` · `web-{usecase}-{stack}` · `utility{-usecase}-{stack}` · `client-{usecase}-api-{stack}`. The `APP` family is named by delivery form, `UNIVERSAL` is the unmarked runtime, and `{stack}` is appended by tooling and never typed. A downstream platform uses its own npm scope with the same folder grammar. **`domain-` and `ui-` are retired.**
 
-**Versioning** (RD.APPS.034): a scaffolded manifest carries the placeholder `0.0.0` and internal deps use `workspace:*`. The real version is stamped into the artifact at publish and the git tag is the source of truth — never edit a version into source.
+**Versioning** (RD.SUPPORT.APPS.034): a scaffolded manifest carries the placeholder `0.0.0` and internal deps use `workspace:*`. The real version is stamped into the artifact at publish and the git tag is the source of truth — never edit a version into source.
 
 ### What a scaffold writes into docs — one tree per repository, never one per node
 
 **A repository has ONE docs tree, at the repository root — never one per node** (foundation
-decision RD.DOCS.001). The `repo` target above writes it once, at scaffold time. Every kind
+decision RD.DEVEX.WORKSPACE.070). The `repo` target above writes it once, at scaffold time. Every kind
 scaffolded afterwards — an app, a package, an app-module — carries **`README.md` and no seats of
-its own** (decision RD.DOCS.021): about twenty-five lines saying what the node is, what it is for,
+its own** (decision RD.DEVEX.WORKSPACE.088): about twenty-five lines saying what the node is, what it is for,
 and linking into the seats it realizes. Read `refs/doc-sets.md` in the **spn-devex** plugin before
 writing a word into either.
 
@@ -98,7 +98,7 @@ writing a word into either.
 │                          own words, each carrying an id and a status
 ├── 04-capabilities/       WHAT, as engineering — one mirror per source folder that earns one,
 │                          hung by domain then by package; `data-model.md` and `schema.sql` sit
-│                          in the package owning src/migrations. Derived, not chosen (RD.DOCS.015)
+│                          in the package owning src/migrations. Derived, not chosen (RD.DEVEX.WORKSPACE.083)
 ├── 05-guides/             HOW — README.md IS the getting-started; further guides numbered
 ├── registers/             pocket — the repository's own rules and decisions
 └── artifacts/             pocket — the overview and construct pages, and deliberate reports
@@ -119,11 +119,11 @@ writing a word into either.
 
 ## Target: app-module
 
-A product module owned by one app — a scaffold target rather than a workspace project, but **still a node**. It carries its own `spkind.json`, so it is documented, validated and scaffolded exactly like the packaged form (decision RD.APPS.029). Living inside an app is a packaging decision, not a different kind of thing.
+A product module owned by one app — a scaffold target rather than a workspace project, but **still a node**. It carries its own `spkind.json`, so it is documented, validated and scaffolded exactly like the packaged form (decision RD.SUPPORT.APPS.029). Living inside an app is a packaging decision, not a different kind of thing.
 
 - **Backend**: `apps/<service-app>/src/modules/<code>/` mirroring the module skeleton — `spkind.json`, `interface.ts`, `<code>Module.ts`, `<CODE>ModuleManager.ts`, `contract/` (states, services, validators, constants), `app/` (entities, repositories, services, support, utils), `entry/api/controllers/`, `migrations/`. Add **one line** to the app manager's module list to register it.
 - **Frontend** (if it has a surface): `apps/<web-app>/src/modules/<code>/entry/ui/` with `components/hooks/pages`, its own vite `manualChunks` claim, literal route strings in `nav.ts` (no URL-helper package).
-- **Docs**: the module carries **`README.md` and no docs tree** (decision RD.DOCS.021). About twenty-five lines — what it is, what it is for, and links into the seats it realizes — using **none of the house words** (RD.DOCS.062). What it contributes sits in **the repository's one tree**, under the domain it belongs to: the domain's constructs in `02-constructs/<domain>/`, the rows for what a person can do in `03-behaviors/<domain>/`, and one mirror per source folder that earns one in `04-capabilities/<domain>/<layer>/`, with `data-model.md` and `schema.sql` where the module owns storage. A behaviour row belongs to the domain that would have to change, never to the package that happens to serve it.
+- **Docs**: the module carries **`README.md` and no docs tree** (decision RD.DEVEX.WORKSPACE.088). About twenty-five lines — what it is, what it is for, and links into the seats it realizes — using **none of the house words** (RD.DEVEX.WORKSPACE.125). What it contributes sits in **the repository's one tree**, under the domain it belongs to: the domain's constructs in `02-constructs/<domain>/`, the rows for what a person can do in `03-behaviors/<domain>/`, and one mirror per source folder that earns one in `04-capabilities/<domain>/<layer>/`, with `data-model.md` and `schema.sql` where the module owns storage. A behaviour row belongs to the domain that would have to change, never to the package that happens to serve it.
 - Commands: `spnutils apps gen-validators <app-pkg>` after writing `contract/states/**` (gen-validators applies to apps too); do **not** run `gen-barrel` on apps (their `index.ts` is a bootstrap, not a barrel).
 
 **The scaffold writes the gate table; it cannot answer the question behind it.** Every new module gets an `app/utils/authz.ts` and a seeded permission catalog. Before you fill either, decide what varies the answer — a person, an organization type, or a plan. `refs/permission-vs-enablement.md` in the **spn-devex** plugin carries that question, the `{MOD}_MANAGE_{NOUN}` grammar, and the append rule an app-owned module needs when it contributes an option to another module's definition. This plugin's `hooks/scripts/enablement-grammar.py` refuses the checkable mistakes as you write them.

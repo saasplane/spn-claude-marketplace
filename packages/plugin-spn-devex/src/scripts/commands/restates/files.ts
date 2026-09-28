@@ -25,7 +25,7 @@ const HERE = dirname(new URL(import.meta.url).pathname);
 const PLUGIN = resolve(HERE, "..", "..", "..");
 // THE COPY SITS BESIDE THE REF THAT NAMES IT. `doc-sets.md` carries the `files` citation for this
 // folder, so a drift check reads one directory rather than two — the citation and the thing cited
-// are siblings (RD.DOCS.091).
+// are siblings (RD.DEVEX.AGENT.072).
 const OUT = join(PLUGIN, "refs", "devex", "workspace", "docs", "templates");
 const INDEX = join(OUT, "README.md");
 /** The book's own generated index, beside the templates it lists. */
@@ -72,7 +72,7 @@ function renderBookIndex(book: string, names: string[]): string {
 }
 
 /**
- * The index the drift check reads — ONE citation, naming the FOLDER (`RD.DOCS.091`).
+ * The index the drift check reads — ONE citation, naming the FOLDER (`RD.DEVEX.AGENT.072`).
  *
  * A STAMP PER FILE MISSES THE THING MOST WORTH CATCHING — a file nobody cited has nothing to
  * compare against, and *the book grew a shape a partner does not have* is precisely what this copy
@@ -80,7 +80,7 @@ function renderBookIndex(book: string, names: string[]): string {
  */
 function renderIndex(book: string, names: string[]): string {
   // A TEMPLATE IS COPIED, NEVER REWRITTEN, so the citation kind is `files` and not `docs`
-  // (RD.DOCS.091). A `docs` entry means the agent restates the source in its own words; a `files`
+  // (RD.DEVEX.AGENT.072). A `docs` entry means the agent restates the source in its own words; a `files`
   // entry means the copy is byte-identical, which is the whole value of a template — what a
   // partner copies from is what the book ships.
   const files = [{ path: `spn-foundation/${BOOK_TEMPLATES}`, seen: treeHash(join(book, BOOK_TEMPLATES)) }];
@@ -103,7 +103,7 @@ function renderIndex(book: string, names: string[]): string {
     "that has fallen behind, so a builder's edit reaches every partner with the next plugin release",
     "rather than being discovered by somebody's first session going wrong.",
     "",
-    "**The stamp above names the folder, not each file** (`RD.DOCS.091`). One citation per template",
+    "**The stamp above names the folder, not each file** (`RD.DEVEX.AGENT.072`). One citation per template",
     "would report every edit and miss every addition — a template nobody cited has nothing to compare",
     "against, and *the book grew a shape a partner does not have* is what this copy exists to prevent.",
     "A folder hash covers added, removed, renamed and edited at once.",

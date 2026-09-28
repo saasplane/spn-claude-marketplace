@@ -13,7 +13,7 @@ copy here would be a second source that drifts.
 
 **This repo declares `GENERAL` in `sprepo.json`** — no nodes, one docs tree. It answers to no
 stack, so the `apps` and `infra` commands refuse it by name, and what the agent manages here is the
-docs tree and this repository's own files (`RD.GOV.024`). It loads `spn-devex` and only `spn-devex`:
+docs tree and this repository's own files (`RD.DEVEX.WORKSPACE.176`). It loads `spn-devex` and only `spn-devex`:
 core governs docs trees, and a domain plugin acts on nodes this repository does not have.
 
 **Authoring a plugin is not loading it.** This repo authors all three and loads one. Editing
@@ -47,7 +47,7 @@ as tasks — installing the plugin set, and running the suites.
 
 ## Versioning — this repo counts on its own
 
-**`RD.APPS.034` does not reach you here, and this repo still moves its three plugins together.**
+**`RD.SUPPORT.APPS.034` does not reach you here, and this repo still moves its three plugins together.**
 That row rules lockstep versioning *within a repository*, with the version stamped at publish
 rather than written into source. It governs `APPS` repos, and this one is not — the version is
 written into each `.claude-plugin/plugin.json`, because that is what a Claude marketplace reads.

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: RD.DOCS.031 rule 7 and RD.DOCS.052. The chapters are the source of truth.
+// RESTATES: RD.DEVEX.WORKSPACE.096 rule 7 and RD.DEVEX.WORKSPACE.115. The chapters are the source of truth.
 //
 // Find the paragraphs worth rewriting, so a prose pass reads candidates rather than a corpus.
 //
@@ -75,7 +75,7 @@ function realOf(target: string): string {
 // Regenerated from something else, so an edit here is overwritten by the next build.
 const SKIP_FILE = /^(CHANGELOG|LICENSE|spn-symbols|.*\.generated)\.md$/i;
 
-// A comment is prose a developer and an agent both read, so RD.DOCS.052 reaches it exactly as it
+// A comment is prose a developer and an agent both read, so RD.DEVEX.WORKSPACE.115 reaches it exactly as it
 // reaches a chapter. What is never touched is the code around it.
 const CODE_EXT: Record<string, string> = { ".ts": "c", ".tsx": "c", ".js": "c", ".jsx": "c", ".py": "py", ".sh": "sh" };
 // An instruction to a tool rather than a sentence to a reader. Rewriting one breaks the tool.

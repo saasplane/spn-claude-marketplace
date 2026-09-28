@@ -3,7 +3,7 @@
 //
 // **The rule.** On the server, `await` is how one thing is sequenced after another. A chain says the
 // same thing at more length, and it is a second style in a file whose every other function awaits
-// (RD.APPS.106, stated in `docs/04-capabilities/02-support/01-apps/10-providers/ts/05-code.md`). A chapter is where the next
+// (RD.SUPPORT.APPS.106, stated in `docs/04-capabilities/02-support/01-apps/10-providers/ts/05-code.md`). A chapter is where the next
 // function gets copied from, and a chapter cannot fire when somebody writes the file.
 //
 // **The exception is a synchronous callback contract the code does not own.** A library that takes a

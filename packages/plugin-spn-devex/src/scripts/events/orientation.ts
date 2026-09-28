@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: the foundation's `CONCEPT.md` (`#### DevEx Workspace`) and RD.DEVEX.020, and the
+// RESTATES: the foundation's `CONCEPT.md` (`#### DevEx Workspace`) and RD.DEVEX.WORKSPACE.020, and the
 // workspace-level argument that decided this shape. A change is made there first, then here.
 //
 // The orientation a session opens with — read from the ground, never from a typed list.
@@ -353,7 +353,7 @@ function digest(path: string): string {
  * so the path names the version that answered. Running from source there is no such segment, and
  * this returns null rather than guessing — a checkout is not behind an install, it IS the source.
  *
- * `RD.DEVEX.057` puts the handover on the tool that changes the wiring. This is the other end of the
+ * `RD.DEVEX.AGENT.057` puts the handover on the tool that changes the wiring. This is the other end of the
  * same rule: the window that cannot adopt its own new wiring can at least say so on the way in.
  */
 function loadedBehind(): string | null {
@@ -541,7 +541,7 @@ function workstreamLines(streams: Workstream[]): string[] {
   const byState: Record<string, Workstream[]> = Object.fromEntries(
     STATES.map((state) => [state, streams.filter((w) => w.state === state)]));
   const tally = STATES.filter((s) => byState[s].length).map((s) => `${byState[s].length} ${s}`).join(" · ");
-  // RD.DEVEX.049. The MUST binds the moment a workstream is picked up, and this is the surface a
+  // RD.DEVEX.AGENT.049. The MUST binds the moment a workstream is picked up, and this is the surface a
   // session meets before any skill. Printed with the tally rather than under a workstream: it is
   // true of whichever one you open, including one you are about to create.
   const out = [`### Workstreams — ${tally}`, "",

@@ -45,7 +45,7 @@
 
 ### Three plugins at three versions, on purpose
 
-**Why** — *`RD.APPS.034` rules lockstep versioning inside an `APPS` repository, and this repository declares `GENERAL`*. Read the wrong rule here and three different numbers look like a defect to be fixed.
+**Why** — *`RD.SUPPORT.APPS.034` rules lockstep versioning inside an `APPS` repository, and this repository declares `GENERAL`*. Read the wrong rule here and three different numbers look like a defect to be fixed.
 **What** — each plugin folder counts on its own, following the Claude marketplace's convention of one version per plugin. `spn-devex` moves when `spn-devex` changes, and the other two do not move with it.
 **How** — there is no shared version file and nothing derives one number from another. The three manifests are the three answers: `packages/plugin-spn-devex/src/.claude-plugin/plugin.json`, and the same path under `packages/plugin-spn-apps/` and `packages/plugin-spn-infra/`.
 

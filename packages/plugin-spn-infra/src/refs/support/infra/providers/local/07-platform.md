@@ -15,7 +15,7 @@
 
 **The engines of every resource world, at the same versions the cloud runs.** A world stands its own instance, so a platform and a space bound beside it hold separate engines rather than sharing one ([resources](../../resources.md)). Each family takes a world-marked hostname and a derived port, which [`04-addressing.md`](04-addressing.md) states.
 
-**Each installed module's local rendering.** A module package carries its own renderings and the tooling carries none: `src/local/` holds one `docker-compose.yml` and what it mounts, applied by `docker compose` with a `.env` the tooling writes (`RD.INFRA.078`). The tooling parses neither rendering and names no product on either side.
+**Each installed module's local rendering.** A module package carries its own renderings and the tooling carries none: `src/local/` holds one `docker-compose.yml` and what it mounts, applied by `docker compose` with a `.env` the tooling writes (`RD.SUPPORT.INFRA.078`). The tooling parses neither rendering and names no product on either side.
 
 **A module with no local form is not a defect.** It ships cloud only, and the local stand-up warns by name and continues.
 
@@ -29,8 +29,8 @@
 
 ## Coming down
 
-**`platform up` also registers every stored route with the ingress** — each `~/.spnutils/platforms/{org}/{spc}/routes/{host}.json` the local edge provider kept — so a rebuilt machine serves every tenant it served before (`RD.INFRA.106`).
+**`platform up` also registers every stored route with the ingress** — each `~/.spnutils/platforms/{org}/{spc}/routes/{host}.json` the local edge provider kept — so a rebuilt machine serves every tenant it served before (`RD.SUPPORT.INFRA.106`).
 
-**A teardown removes what the platform owns and refuses its data.** Destroying a stateful resource is a separate act, named separately and confirmed separately (`RD.INFRA.024`). That rule holds on a laptop for the same reason it holds in an account: the habit is what carries.
+**A teardown removes what the platform owns and refuses its data.** Destroying a stateful resource is a separate act, named separately and confirmed separately (`RD.SUPPORT.INFRA.024`). That rule holds on a laptop for the same reason it holds in an account: the habit is what carries.
 
 **Estate caution holds here too.** `up` and `down` each take exactly one of `--plan` or `--apply`, with no default, and `tofu apply` or `tofu destroy` is never hand-run.

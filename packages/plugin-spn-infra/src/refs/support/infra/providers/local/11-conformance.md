@@ -25,11 +25,11 @@
 
 ## What only a local run proves
 
-**A grammar cannot be tested; only a host that resolves can.** The tenancy fixtures exist for that, and the custom-domain half is the one property nothing else establishes, because it is the only name outside the estate's own zone (`RD.INFRA.082`).
+**A grammar cannot be tested; only a host that resolves can.** The tenancy fixtures exist for that, and the custom-domain half is the one property nothing else establishes, because it is the only name outside the estate's own zone (`RD.SUPPORT.INFRA.082`).
 
-**The two-way join between a declared domain and its local rendering** is proven by the Support repository's own unit cases (`RD.INFRA.087`).
+**The two-way join between a declared domain and its local rendering** is proven by the Support repository's own unit cases (`RD.SUPPORT.INFRA.087`).
 
-**The derived engine ports are reproduced identically in the blueprints render and in the CLI** (`RD.INFRA.062`) — a formula realized twice, so each realization is a check on the other.
+**The derived engine ports are reproduced identically in the blueprints render and in the CLI** (`RD.SUPPORT.INFRA.062`) — a formula realized twice, so each realization is a check on the other.
 
 ## What exists today, and what a pass does not say
 

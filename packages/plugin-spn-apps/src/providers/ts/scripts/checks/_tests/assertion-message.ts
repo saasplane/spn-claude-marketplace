@@ -2,7 +2,7 @@
 // Warn about a journey assertion that says nothing about why it might have failed.
 //
 // **The rule.** An assertion names what it expected and what would explain the absence (rule 27 of
-// the tests chapter, RD.APPS.109). Writing that costs nothing at the time. Reading it later replaces
+// the tests chapter, RD.SUPPORT.APPS.109). Writing that costs nothing at the time. Reading it later replaces
 // the spec, the component and the permission model. A case reporting `expected > 0, received 0` buys
 // the next reader an investigation. A case reporting that no channel editor rendered at all, and
 // that the session may lack `NTF_CONFIG_MANAGE`, has diagnosed itself.

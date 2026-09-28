@@ -110,8 +110,8 @@ This page answers how this plugin proves itself and how the folder is arranged. 
 
 | Rule | What it decides | Weight |
 | --- | --- | --- |
-| `RD.APPS.035` | the tier ladder, and that a test title carries the behaviour id it proves | MUST |
-| `RD.DEVEX.008` | a behaviour row's shape and its id grammar, which is what a suite's title joins to | MUST |
+| `RD.SUPPORT.APPS.035` | the tier ladder, and that a test title carries the behaviour id it proves | MUST |
+| `RD.DEVEX.FUNCTION.008` | a behaviour row's shape and its id grammar, which is what a suite's title joins to | MUST |
 | the foundation's `02-delivery.md` § When an edit becomes behaviour | a suite is run from this checkout, so it proves the source rather than an installed copy | MUST |
 | the foundation's test construct § The test tree, and its `04-plugins/02-shape.md` | the staleness case, the parity case, the payload fixture, and the shared harness every plugin's tests owe once it builds | MUST |
 

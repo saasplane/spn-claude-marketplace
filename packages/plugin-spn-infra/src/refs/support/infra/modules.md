@@ -30,7 +30,7 @@ export interface SPEstateModule {
 
 ## Additive in its own world, never platform ground
 
-A module consumes only the outputs published at the step it named, runs under its own identity with every guardrail above it still in force, and publishes into resolved state and into the configuration plane at its own seat (`RD.INFRA.036`).
+A module consumes only the outputs published at the step it named, runs under its own identity with every guardrail above it still in force, and publishes into resolved state and into the configuration plane at its own seat (`RD.SUPPORT.INFRA.036`).
 
 > Additive in its own world — always. Changing platform ground — never. Needing to — that is a blueprint feature rather than a module power.
 
@@ -42,7 +42,7 @@ A module consumes only the outputs published at the step it named, runs under it
 
 **A module's layer is validated, never assumed.** One declared in a company's manifest names the ground or organization layer; one declared in a product's manifest names the platform, environment or deployments layer. Declaring across that line is refused by name.
 
-**A module sits at company scope only where what it stands is singular for the whole company** (`RD.INFRA.065`):
+**A module sits at company scope only where what it stands is singular for the whole company** (`RD.SUPPORT.INFRA.065`):
 
 - an immutable stream of artifacts consumed by pin — the package registry, base images;
 - a provider service singular per company by the provider's own design — identity federation at the root, billing controls, the company audit trail;
@@ -100,7 +100,7 @@ src/local/
 
 ## Two configuration stores, split by audience
 
-An environment's configuration is either a fact the estate discovered or a choice somebody made — different writers, different lifetimes, different readers, so they live in different stores and neither overwrites the other (`RD.INFRA.041`).
+An environment's configuration is either a fact the estate discovered or a choice somebody made — different writers, different lifetimes, different readers, so they live in different stores and neither overwrites the other (`RD.SUPPORT.INFRA.041`).
 
 | Store | Written by | Shape | Holds |
 | --- | --- | --- | --- |
@@ -126,7 +126,7 @@ An environment's configuration is either a fact the estate discovered or a choic
 
 **Every rung ends in the same leaf segment `/vars`, and that is what makes the tree enumerable — MUST.** A rung that ended at the thing it described worked only while it was a leaf, and an application is not one — it carries a seat per deployment beneath it, so its path would have to be both a value and a parent of values, which is a collision in a store shaped as a hierarchy. Moving every value one level down leaves the path above it free to branch.
 
-Each path exists as a plain half and a secret half. **Identity follows residency, which is why no path carries the platform's own token.** An environment's subtree is written by an apply bound to that environment's workload account; the organization and platform rungs by one bound to the platform's control account (`RD.INFRA.059`). The organization apply **writes** the organization's facts into each platform's store — platforms stay self-contained, a re-apply propagates, and nothing reads across an account at the moment of composition. **A module's seat sits at the rung its `layer` puts it on** — an environment-scope module publishes at `/environments/{env}/modules/{code}`, an organization-scope one at `/organization/modules/{code}` — admitted only for what is org-singular by nature (`RD.INFRA.065`).
+Each path exists as a plain half and a secret half. **Identity follows residency, which is why no path carries the platform's own token.** An environment's subtree is written by an apply bound to that environment's workload account; the organization and platform rungs by one bound to the platform's control account (`RD.SUPPORT.INFRA.059`). The organization apply **writes** the organization's facts into each platform's store — platforms stay self-contained, a re-apply propagates, and nothing reads across an account at the moment of composition. **A module's seat sits at the rung its `layer` puts it on** — an environment-scope module publishes at `/environments/{env}/modules/{code}`, an organization-scope one at `/organization/modules/{code}` — admitted only for what is org-singular by nature (`RD.SUPPORT.INFRA.065`).
 
 **Keys are open; paths are fixed.** SaaS Plane fixes the prefixes and defines nothing beneath them — a value nobody predicted is a write inside a prefix that already exists, never an estate edit, a blueprint change or a foundation release. A check can only ever test **placement**: is this write inside a prefix this writer may write, and is a credential being pinned into a manifest. The foundation has no vocabulary for which keys ought to exist, and does not pretend to.
 
@@ -141,7 +141,7 @@ the standard block
           → /environments/{env}/apps/{app}/deployments/{deployment}/vars
 ```
 
-**Later rungs win — MUST.** A team's value overrides a standard default by construction, and no deployment lists a path anywhere; the coordinate is the whole address. **The sequence can never be declared** (`RD.INFRA.054`): extending it is a register row, uniformly — a space's own rung entered exactly that way. The sanctioned ways to reach around it are to promote a value up a rung, to write a `${…}` reference, to author in the application plane, or to use a module's own seat. The narrowest rung is the deployment's own, and it is last because two deployments of one application differ in exactly the values that make them different deployments.
+**Later rungs win — MUST.** A team's value overrides a standard default by construction, and no deployment lists a path anywhere; the coordinate is the whole address. **The sequence can never be declared** (`RD.SUPPORT.INFRA.054`): extending it is a register row, uniformly — a space's own rung entered exactly that way. The sanctioned ways to reach around it are to promote a value up a rung, to write a `${…}` reference, to author in the application plane, or to use a module's own seat. The narrowest rung is the deployment's own, and it is last because two deployments of one application differ in exactly the values that make them different deployments.
 
 **A local environment is the same composition against a different source** — the compose tree stands in for the ledger, so an environment behaves the same on a laptop without a second mechanism, and a missing key is found on a laptop instead of in a pipeline.
 
@@ -157,11 +157,11 @@ Every resource key follows one shape, and the middle token names the **connectio
 {SPC}_RESOURCE_{FAMILY}_{WORLD}_{PROVIDER}_{FACT}      that product's own facts
 ```
 
-**The endpoints key is the canonical connectivity fact, per connection block** (`RD.INFRA.055`) — an ordered list of the estate-owned records the environment apply wrote, first entry primary, never a provider's own hostname. **The block set is fixed plus declared.** Every family carries a block for the application's own grants (`APP`); the database adds `MIGRATION` and one dynamic `{SCHEMA}` block per declared schema, `dedicated` deciding which role group fills it — **a consumer's connection keys never change when its isolation does**. A block naming a schema no declaration mentions is refused by name.
+**The endpoints key is the canonical connectivity fact, per connection block** (`RD.SUPPORT.INFRA.055`) — an ordered list of the estate-owned records the environment apply wrote, first entry primary, never a provider's own hostname. **The block set is fixed plus declared.** Every family carries a block for the application's own grants (`APP`); the database adds `MIGRATION` and one dynamic `{SCHEMA}` block per declared schema, `dedicated` deciding which role group fills it — **a consumer's connection keys never change when its isolation does**. A block naming a schema no declaration mentions is refused by name.
 
 **Every block exports one credential pair per purpose its engine stands** — `USER_*`/`PASSWORD_*`, full-word purposes. **Which pair a connection opens is the service's own choice at boot; `ADM` stays ledger-held, published to no application.** Provider-specific facts nest under the product that answered, so each variant carries exactly its own; provider tokens come from a closed list, decomposed by matching known values rather than by splitting on a separator.
 
-**Families are consumed by declaration, opted out by a present-but-empty marker** (`RD.INFRA.046`). An application's `connections` block names the families it opens; a family not stood publishes no record and no keys, so a missing key at boot names exactly what was never declared. **Worlds are per-need within a family** — a read-only database consumer declares no `MIGRATION` world and holds the `ro` pair alone.
+**Families are consumed by declaration, opted out by a present-but-empty marker** (`RD.SUPPORT.INFRA.046`). An application's `connections` block names the families it opens; a family not stood publishes no record and no keys, so a missing key at boot names exactly what was never declared. **Worlds are per-need within a family** — a read-only database consumer declares no `MIGRATION` world and holds the `ro` pair alone.
 
 **A space's family lands under its own prefix, exactly as the platform resources do.** An application bound to a space composes that space's blocks; bound to none, it composes the platform's. No application reads across a space boundary by composition, because the derivation never offers it those keys.
 

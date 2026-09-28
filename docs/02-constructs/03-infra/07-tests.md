@@ -106,7 +106,7 @@ This page answers where a proof of this plugin lives, what the path means, and w
 | Rule | What it decides | Weight |
 | --- | --- | --- |
 | the foundation's DevEx Test construct § The test tree | which tier a proof belongs to, and that a tier names a kind of proof rather than a folder of convenience | MUST |
-| `RD.DEVEX.019` | a suite proves a rule stated elsewhere and states none of its own | MUST |
+| `RD.DEVEX.UTILS.019` | a suite proves a rule stated elsewhere and states none of its own | MUST |
 | the apps plugin's subject registry | *until a parser exists there is no folder for it* — which is why no tier stands empty here | MUST |
 | the foundation's `04-plugins/02-shape.md` | the staleness case, the parity case, the payload fixture, and the shared harness every plugin's tests owe once it builds | MUST |
 

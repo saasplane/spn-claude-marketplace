@@ -29,7 +29,7 @@ This construct realizes the book's `01-devex/02-agent/02-skills`.
 | --- | --- | --- |
 | a skill | `SKILL.md` | one folder under this plugin's `skills/`, named for a command of the group this domain answers to |
 | the value | `APPS_{SKILL}` | the name the enum carries for that folder, its domain prefix derived from the plugin's own claim |
-| the stage | `RD.DEVEX.017` | the one stage a skill serves, which is what makes the applicable standards derivable from the skill that was invoked |
+| the stage | `RD.DEVEX.AGENT.017` | the one stage a skill serves, which is what makes the applicable standards derivable from the skill that was invoked |
 | a mode | — | an argument a skill's own description names, so one folder answers several close asks |
 | a step | `steps/` | one file of a longer walk, read only when the skill's own router names it |
 | the classification | — | the first thing the router does: deciding which layers an ask actually touches |
@@ -104,10 +104,10 @@ This page answers which skills this domain ships and how they are shaped. It doe
 
 | Rule | What it decides | Weight |
 | --- | --- | --- |
-| `RD.DEVEX.025` | one folder per skill value and one value per folder, the prefix derived from the shipping plugin's own claim | MUST |
-| `RD.DEVEX.017` | each skill declares the one stage it serves, so the standards that apply are derivable from the skill | MUST |
-| `RD.DEVEX.062` | planning folds into a stack-agnostic skill, which is why this domain ships none | MUST |
-| `RD.DOCS.055` | a skill that carries a rule it does not own is a restatement, and says so under a stamp | MUST |
+| `RD.DEVEX.AGENT.025` | one folder per skill value and one value per folder, the prefix derived from the shipping plugin's own claim | MUST |
+| `RD.DEVEX.AGENT.017` | each skill declares the one stage it serves, so the standards that apply are derivable from the skill | MUST |
+| `RD.DEVEX.FUNCTION.062` | planning folds into a stack-agnostic skill, which is why this domain ships none | MUST |
+| `RD.DEVEX.WORKSPACE.118` | a skill that carries a rule it does not own is a restatement, and says so under a stamp | MUST |
 | the foundation's `02-delivery.md` § When an edit becomes behaviour | a skill edit is loadable only after an install and a fresh window | MUST |
 
 Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs restates check` (or `spn-devex restates check`, once installed)

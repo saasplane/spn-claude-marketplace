@@ -1,4 +1,4 @@
-// `arc-status` — an arc's status is one of eight (RD.DEVEX.058).
+// `arc-status` — an arc's status is one of eight (RD.DEVEX.WORKSPACE.058).
 //
 // BOTH DIRECTIONS ARE CASES, because a check that only ever speaks is the same defect as one that
 // never does, wearing the other sign. The set drifted in the first place while a template comment

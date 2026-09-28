@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: RD.DOCS.055, and `docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` § Restatement discipline, which makes
+// RESTATES: RD.DEVEX.WORKSPACE.118, and `docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` § Restatement discipline, which makes
 // it a MUST in both directions.
 //
 // Do the plugins still say what the book says? All four `spn:restates` kinds at once — `restates
@@ -205,7 +205,7 @@ export function findBook(argument: string | undefined, root: string): string | n
 
 /**
  * A `spn:restates` header anywhere but a marketplace plugin, and any citation pointing at the
- * plugin's own repository (`RD.DOCS.095`).
+ * plugin's own repository (`RD.DEVEX.AGENT.073`).
  *
  * `marketplaceRoot` IS THE MARKETPLACE REPOSITORY ITSELF, and every real plugin file sits under
  * `packages/plugin-<name>/` beneath it — the prefix `insideAPlugin` below tests against. Found
@@ -300,7 +300,7 @@ export function main(argv: string[], root: string): number {
     }
     stamped += 1;
     // A citation names its repository, so it resolves from the WORKSPACE — the folder the
-    // sibling checkouts sit in, which is the book's parent (RD.DOCS.091).
+    // sibling checkouts sit in, which is the book's parent (RD.DEVEX.AGENT.072).
     findings.push(...check(shown(path), dirname(book), block));
     omissions.push(...undeclared(path, block)
       .map((name) => `${shown(path)}: restates \`${name}\` and does not declare it`));
@@ -338,7 +338,7 @@ export function main(argv: string[], root: string): number {
   });
   if (strays.length || selves.length) {
     console.log();
-    console.log(`PLACEMENT   ${strays.length + selves.length} stamp(s) break RD.DOCS.095 — a stamp lives only in a`);
+    console.log(`PLACEMENT   ${strays.length + selves.length} stamp(s) break RD.DEVEX.AGENT.073 — a stamp lives only in a`);
     console.log("            marketplace plugin, and cites only another repository:");
     for (const finding of [...strays, ...selves]) console.log(`              ${finding}`);
   }

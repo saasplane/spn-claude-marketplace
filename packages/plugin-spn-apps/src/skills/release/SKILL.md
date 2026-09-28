@@ -15,7 +15,7 @@ description: Publish this repository's releasable projects, in lockstep, through
 
 `apps release` is a repository-scoped command. It never takes a package: every releasable
 project in the repository publishes together, at one version, or none of them do
-(`RD.APPS.034`, `RD.APPS.118`). Asking it for one project is refused by name — the CLI says so
+(`RD.SUPPORT.APPS.034`, `RD.SUPPORT.APPS.118`). Asking it for one project is refused by name — the CLI says so
 rather than pretending the option exists.
 
 ## When to reach for it, and when not
@@ -37,7 +37,7 @@ rather than pretending the option exists.
    nothing is published.
 3. **Stamps the version into the built artifact**, after the gates pass and before anything
    ships. The stamp lands in what gets published, never in the source tree — source keeps a
-   placeholder, which is what lockstep is for (`RD.APPS.034`): there is no version bump
+   placeholder, which is what lockstep is for (`RD.SUPPORT.APPS.034`): there is no version bump
    to review in a diff, because there is nothing to bump.
 4. **Commits and tags** the release at that version.
 5. **Publishes** every releasable project to the organization's registry pair (public/private,
@@ -46,7 +46,7 @@ rather than pretending the option exists.
 
 What it leaves behind: a commit and a tag in this repository's history, published packages at
 the org's registry, and source manifests unchanged — still at the placeholder, exactly as they
-were before the release ran (`RD.APPS.045`).
+were before the release ran (`RD.SUPPORT.APPS.045`).
 
 ## What must be true before you run it — a clean tree, first
 
@@ -62,7 +62,7 @@ So before running anything but `--dry-run`:
   that it belongs in this release.
 - No other session holds uncommitted work in this repository. If you cannot be sure, ask rather
   than assume the tree is yours alone.
-- No source manifest carries a hand-typed real version. `RD.APPS.045` makes this an explicit
+- No source manifest carries a hand-typed real version. `RD.SUPPORT.APPS.045` makes this an explicit
   refusal — a manifest still holding a real version fails the run before anything is built —
   but catching it yourself first is cheaper than a failed gate run.
 

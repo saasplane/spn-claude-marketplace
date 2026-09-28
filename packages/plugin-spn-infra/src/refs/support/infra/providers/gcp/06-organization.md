@@ -17,7 +17,7 @@
 
 ## What is true today
 
-**The rendering of every logical node on this cloud is already written down.** The governance tree is logical and cloud-agnostic, and `RD.INFRA.029` maps it: a world node is a folder, a leaf is a project, and the organization node sits above them all.
+**The rendering of every logical node on this cloud is already written down.** The governance tree is logical and cloud-agnostic, and `RD.SUPPORT.INFRA.029` maps it: a world node is a folder, a leaf is a project, and the organization node sits above them all.
 
 **A rendering may add grouping its own policy mechanics want, and the logical tree never widens for it.** So that mapping is a contract rather than a sketch, and a Google Cloud realization would be judged against it.
 

@@ -93,8 +93,8 @@ This page answers what this plugin wires and why it wires one moment. It does no
 
 | Rule | What it decides | Weight |
 | --- | --- | --- |
-| `RD.GOV.024` | a repository answers to the world it declares, which is what makes its manifest the one place a stack is read from | MUST |
-| `RD.DEVEX.035` | a rule reaches a write-time hook only where review would be too late | MUST |
+| `RD.DEVEX.WORKSPACE.176` | a repository answers to the world it declares, which is what makes its manifest the one place a stack is read from | MUST |
+| `RD.DEVEX.FUNCTION.035` | a rule reaches a write-time hook only where review would be too late | MUST |
 | the foundation's `02-delivery.md` § When an edit becomes behaviour | a hook script is live on its next run, and the wiring file is not | MUST |
 | the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | a hook is the Event kind of script, run from a committed bundle a staleness test keeps current | MUST |
 

@@ -74,7 +74,7 @@ An image is built exactly once, from one commit, and the same digest is what rea
 
 **A rebuild is a new artifact, and a new artifact invalidates every test that ran against the old one — an image MUST NOT be rebuilt per environment.** Tags are labels applied to a digest over time; they never change what the artifact is. So *what is running in production* gets a one-word answer, and that word traces to one commit, one build, one test run and one approval — the same chain the trust model states.
 
-**A `WEB` bundle is the exception.** It carries its environment's values, built in (`RD.APPS.063`), so it is built once per environment. A web promotion moves a build rather than a name, and the bundle that passed non-production is not the bundle production runs.
+**A `WEB` bundle is the exception.** It carries its environment's values, built in (`RD.SUPPORT.APPS.063`), so it is built once per environment. A web promotion moves a build rather than a name, and the bundle that passed non-production is not the bundle production runs.
 
 ## Promotion is declared, not worked out
 
@@ -90,7 +90,7 @@ A branch **MUST** be claimed by at most one environment per platform — otherwi
 
 ## The serving contract is dynamic
 
-Routing is data: a new customer surface is a row, never a release. **A customer's hostname is issued and bound when the request to serve it arrives, through the edge seam, and never by an apply** (`RD.INFRA.084`). The serving layer's certificate set changes as hosts are bound, not as infrastructure is applied. A customer subdomain rides the declared domain's wildcard certificate; a customer's own domain rides the certificate the seam issued for it.
+Routing is data: a new customer surface is a row, never a release. **A customer's hostname is issued and bound when the request to serve it arrives, through the edge seam, and never by an apply** (`RD.SUPPORT.INFRA.084`). The serving layer's certificate set changes as hosts are bound, not as infrastructure is applied. A customer subdomain rides the declared domain's wildcard certificate; a customer's own domain rides the certificate the seam issued for it.
 
 **A host the system creates carries `{env}` in every cloud environment, production included, and none locally.** **The running platform writes routes and never DNS**, and a customer-owned domain's DNS is the customer's.
 
@@ -101,9 +101,9 @@ Routing is data: a new customer surface is a row, never a release. **A customer'
 | the running platform | `sites/{host}` — the route `{env, app, orgCode, orgName}` |
 | the deploy | `releases/{env}/{app}` — the release one application serves in one environment |
 
-Each writer's scope is disjoint, so nothing races on a name (`RD.INFRA.105`). The runtime never writes `releases/` and the deploy never writes `sites/`, so a rollback cannot lose a tenant and a signup cannot repoint a release. **No infrastructure change per customer, and none per customer-owned domain.**
+Each writer's scope is disjoint, so nothing races on a name (`RD.SUPPORT.INFRA.105`). The runtime never writes `releases/` and the deploy never writes `sites/`, so a rollback cannot lose a tenant and a signup cannot repoint a release. **No infrastructure change per customer, and none per customer-owned domain.**
 
-**One tenant edge per platform serves every environment's tenant hosts** (`RD.INFRA.104`). The platform layer stands it with the alias `*.{spd}`, the zone's `*` record and one route store. Its function reads `sites/{host}` → `{env, app}`, then `releases/{env}/{app}`, and switches its origin to that environment's store; any miss answers 404. An environment's own distribution serves only its `{env}-{app}` hosts. **Not yet proven on an account** — the origin switch across environments and one store read by several distributions have not been run. Locally the same routes become ingress registrations (`RD.INFRA.106`). Every declared domain stands its own pair of zones (`RD.INFRA.086`), and the private zone is always the child name, never the apex.
+**One tenant edge per platform serves every environment's tenant hosts** (`RD.SUPPORT.INFRA.104`). The platform layer stands it with the alias `*.{spd}`, the zone's `*` record and one route store. Its function reads `sites/{host}` → `{env, app}`, then `releases/{env}/{app}`, and switches its origin to that environment's store; any miss answers 404. An environment's own distribution serves only its `{env}-{app}` hosts. **Not yet proven on an account** — the origin switch across environments and one store read by several distributions have not been run. Locally the same routes become ingress registrations (`RD.SUPPORT.INFRA.106`). Every declared domain stands its own pair of zones (`RD.SUPPORT.INFRA.086`), and the private zone is always the child name, never the apex.
 
 **Observability is not something anybody opts into.** An application is observable because it was deployed — the collectors were installed by a layer, and nothing depends on somebody remembering to wire one in.
 

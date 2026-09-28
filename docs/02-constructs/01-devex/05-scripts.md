@@ -145,9 +145,9 @@ This page answers what a script is, how each kind is reached, and what it answer
 
 | Rule | What it decides | Weight |
 | --- | --- | --- |
-| `RD.DEVEX.019` | a script restates a chapter and adds no rule of its own | MUST |
-| `RD.DOCS.055` | a file carrying a rule it does not own is a restatement, and it names its source | MUST |
-| `RD.GOV.024` | this repository is served with docs commands alone, which is why its own rows are written by a tool the plugins ship | MUST |
+| `RD.DEVEX.UTILS.019` | a script restates a chapter and adds no rule of its own | MUST |
+| `RD.DEVEX.WORKSPACE.118` | a file carrying a rule it does not own is a restatement, and it names its source | MUST |
+| `RD.DEVEX.WORKSPACE.176` | this repository is served with docs commands alone, which is why its own rows are written by a tool the plugins ship | MUST |
 | the foundation's `02-delivery.md` § What it makes checkable | which standards are expected to be answered by a script rather than by a reader | MUST |
 | the foundation's `05-artifacts.md` § The blocks · § The figures | what a produced page is made of, which this folder renders and never decides | MUST |
 | the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | the four kinds of script, the `<group> <action>` shape `commands/` dispatches by, one command entry | MUST |

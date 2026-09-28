@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Write what the last run found into the behaviour rows, and nothing else — the one writer of
-// `Status` and `Updated at` in every repository (the book's RD.DEVEX.071: the CLI writes the run
+// `Status` and `Updated at` in every repository (the book's RD.DEVEX.UTILS.071: the CLI writes the run
 // artifact and never a row). It reads the registers under `docs/`, and every `spn-tests.json` under
 // the root unless `--results` names the artifacts to read.
 //

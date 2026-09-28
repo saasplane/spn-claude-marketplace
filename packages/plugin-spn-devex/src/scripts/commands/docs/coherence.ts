@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: RD.GOV.008, RD.DOCS.012, RD.DOCS.021, RD.DOCS.055, `04-discipline.md` and
+// RESTATES: RD.DEVEX.WORKSPACE.162, RD.DEVEX.WORKSPACE.080, RD.DEVEX.WORKSPACE.088, RD.DEVEX.WORKSPACE.118, `04-discipline.md` and
 // `06-registers.md`. The chapters are the source of truth; a rule change is edited there first.
 //
 // Check the corpus against itself, rather than against its own form.
@@ -34,7 +34,11 @@
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { basename, join, dirname, resolve } from "node:path";
 import { isDir, isFile, read } from "../../lib/payload.ts";
-import { check as restatesCheck, parse as restatesParse, registerRows, undeclared } from "../../lib/restates.ts";
+import { DECISION_ID_SRC, check as restatesCheck, parse as restatesParse, registerRows, undeclared } from "../../lib/restates.ts";
+
+const DECISION_ID = new RegExp(DECISION_ID_SRC, "g");
+const IS_DECISION_ID = new RegExp(`^${DECISION_ID_SRC}$`);
+const IS_DECISION_ID_ROW = new RegExp(`^\\|\\s*(${DECISION_ID_SRC})\\s*\\|`);
 
 const SKIP_DIRS = new Set(["node_modules", ".git", "dist", "build", ".nx", "coverage", "__pycache__"]);
 // Heading words too common to identify a section on their own.
@@ -42,7 +46,7 @@ const SKIP_WORDS = new Set(["what", "this", "that", "with", "from", "they", "the
   "never", "every", "which", "where", "their", "there", "once"]);
 
 // Prose that is deliberately historical: an artifact describes the moment it was produced
-// (RD.DOCS.021), so its struck-through text is a record rather than a claim.
+// (RD.DEVEX.WORKSPACE.088), so its struck-through text is a record rather than a claim.
 //
 // This once said a superseded ruling keeps its old words on purpose. It does not. `06-registers.md`
 // rules that a row is never annotated, struck through, or left standing with a note, and `doc-check`
@@ -147,12 +151,46 @@ function vocabulary(root: string, sources: string[]): string[] {
 // phrase is not this; a second ruling hiding in a long cell is.
 const BURIED = /\*\*([^*]{25,}?[.!?])\*\*/g;
 
+/** One markdown table row's cells, trimmed, honoring `\|` as a literal pipe rather than a divider. */
+function tableCells(line: string): string[] {
+  return line.trim().replace(/^\|/, "").replace(/\|$/, "").split(/(?<!\\)\|/).map((c) => c.trim());
+}
+
+/**
+ * Every data row of every table in a register, as a map from that table's own header cell text to
+ * the row's cell at the same position — so a caller reads `row.get("Decision")` rather than counting
+ * pipes. A register's tables all carry `# | Construct | Decision | Why | Date` today, but a column
+ * that is ever widened or reordered moves what a positional read sees without moving what a header
+ * read sees, which is the whole reason to read by heading.
+ */
+function registerTableRows(text: string): Array<Map<string, string>> {
+  const lines = text.split("\n");
+  const out: Array<Map<string, string>> = [];
+  let header: string[] | null = null;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (!line.startsWith("|")) { header = null; continue; }
+    const next = (lines[i + 1] ?? "").trim();
+    if (/^\|(\s*:?-{3,}:?\s*\|)+$/.test(next)) {      // the header's own separator, `| --- | --- |`
+      header = tableCells(line);
+      i += 1;                                         // the separator carries no data of its own
+      continue;
+    }
+    if (!header) continue;                            // a row above any header is not a table row
+    const cells = tableCells(line);
+    const row = new Map<string, string>();
+    header.forEach((name, idx) => row.set(name, cells[idx] ?? ""));
+    out.push(row);
+  }
+  return out;
+}
+
 /**
  * One ruling per row, and the whole decision column is that ruling.
  *
  * The register has a `Why` column, so the decision column carries no reasoning and no second answer.
  * A row that holds two rulings is two rows: the one a reader meets first is the one they act on, and
- * the other is invisible until somebody reads the whole cell. `RD.PLATFORM.035` carried a MUST two
+ * the other is invisible until somebody reads the whole cell. `RD.PLATFORM.CORE.035` carried a MUST two
  * hundred words in, which is the case this was written for.
  *
  * BOLD IS ORDINARY EMPHASIS IN A ROW, so its absence proves nothing and is not checked. What is
@@ -164,8 +202,10 @@ function rulings(root: string): string[] {
   if (!isFile(register)) return [];                // a repo earns a register; absence is not drift
   const split: Array<[number, string, string]> = [];
   const long: Array<[number, string]> = [];
-  for (const row of read(register).matchAll(/^\| (RD\.[A-Z]+\.\d+) \| (.+?) \| .+? \| .+? \|$/gm)) {
-    const [, rid, text] = row;
+  for (const row of registerTableRows(read(register))) {
+    const rid = row.get("#");
+    const text = row.get("Decision");
+    if (!rid || !IS_DECISION_ID.test(rid) || text === undefined) continue;
     const rest = text.replace(/^\*\*.+?\*\*/, "");  // the opening claim is the ruling
     const buried = [...rest.matchAll(BURIED)].map((m) => m[1]);
     if (buried.length) split.push([buried.length, rid, buried[0].split(/\s+/).join(" ").slice(0, 80)]);
@@ -192,7 +232,7 @@ function ownership(root: string, sources: string[]): string[] {
   const out: string[] = [];
   const owners = new Map<string, string[]>();
   for (const path of sources) {
-    // The concept may not cite a seat or a chapter at all — it links only outward (RD.DOCS.012), so
+    // The concept may not cite a seat or a chapter at all — it links only outward (RD.DEVEX.WORKSPACE.080), so
     // it can never satisfy this check and is not in scope for it.
     if (path === "CONCEPT.md") continue;
     if (path.includes("registers/decisions.md") || path.includes("/approaches/")) continue;
@@ -227,13 +267,13 @@ function ownership(root: string, sources: string[]): string[] {
   return out;
 }
 
-// RD.GOV.008 keeps a count where it carries the ruling: adding a member would be a redesign, not an
+// RD.DEVEX.WORKSPACE.162 keeps a count where it carries the ruling: adding a member would be a redesign, not an
 // ordinary register entry. These are those sets — the test is whether the number IS the decision,
 // not whether the set happens to be closed today.
 const LOAD_BEARING = new Set(["seats", "passes", "layers", "entries", "principals", "pockets",
   "stages", "runtimes", "directions", "disciplines", "families"]);
 
-/** A count written into prose for a set that is free to grow (RD.GOV.008). */
+/** A count written into prose for a set that is free to grow (RD.DEVEX.WORKSPACE.162). */
 function cardinality(root: string, sources: string[]): string[] {
   const WORDS = "(?:two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)";
   const GROWABLE = "(?:kinds?|constructs?|skills?|lenses|domains?|tiers?|artifacts?|" +
@@ -241,7 +281,7 @@ function cardinality(root: string, sources: string[]): string[] {
   const pattern = new RegExp(`\\bthe ${WORDS} (${GROWABLE})\\b`, "gi");
   const out: string[] = [];
   for (const path of sources) {
-    if (path.includes("/approaches/") || path.includes("/reports/")) continue;  // point-in-time (RD.DOCS.021)
+    if (path.includes("/approaches/") || path.includes("/reports/")) continue;  // point-in-time (RD.DEVEX.WORKSPACE.088)
     const text = body(root, path);
     for (const found of text.matchAll(pattern)) {
       const noun = found[1].toLowerCase().replace(/s+$/, "") + "s";
@@ -258,7 +298,7 @@ function cardinality(root: string, sources: string[]): string[] {
  * Every concept section owes a section in its readable face.
  *
  * A face renders a live seat, so unlike an argument or a measurement it CAN be checked against
- * current state (RD.DOCS.021). `concept-overview.html` is the concept's readable face rather than a
+ * current state (RD.DEVEX.WORKSPACE.088). `concept-overview.html` is the concept's readable face rather than a
  * record of a moment: a workstream that changes the model owes the face with it, and a section the
  * face never expands is a model somebody added and stopped.
  *
@@ -343,7 +383,7 @@ function citations(root: string): string[] {
   if (!registerText) return [];                    // no register here — not this repo's question
   const rows = new Set<string>();
   for (const line of registerText.split("\n")) {
-    const row = /^\|\s*(RD\.[A-Z]+\.\d+)\s*\|/.exec(line);
+    const row = IS_DECISION_ID_ROW.exec(line);
     if (row) rows.add(row[1]);
   }
   if (!rows.size) return [];
@@ -351,7 +391,7 @@ function citations(root: string): string[] {
   const dangling = new Map<string, string[]>();
   for (const path of sourcesOf(root)) {
     const text = read(join(root, path));
-    for (const hit of text.matchAll(/RD\.[A-Z]+\.\d{3}/g)) {
+    for (const hit of text.matchAll(DECISION_ID)) {
       const id = hit[0];
       if (rows.has(id)) continue;
       const where = dangling.get(id) ?? [];
@@ -430,7 +470,7 @@ function capabilityChapters(root: string): string[] {
 /**
  * A provider folder whose file list does not match the contract beside it.
  *
- * **EVERY INSTANCE ANSWERS THE SAME QUESTIONS UNDER THE SAME NAMES** (`RD.GOV.027`), and the set is
+ * **EVERY INSTANCE ANSWERS THE SAME QUESTIONS UNDER THE SAME NAMES** (`RD.DEVEX.WORKSPACE.179`), and the set is
  * stated in `02-contract.md` next to the instance folders. An instance with no capability for an
  * entry **writes the file anyway** and says what to do instead — so a missing file is a missing
  * answer rather than an absent capability, and the two used to look identical.

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: RD.DOCS.055, and `docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` § Restatement discipline, which makes
+// RESTATES: RD.DEVEX.WORKSPACE.118, and `docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` § Restatement discipline, which makes
 // it a MUST in both directions.
 //
 // The `spn:restates` block: how it is written, and what a hash covers.
@@ -18,7 +18,7 @@
 //         { "path": "CONCEPT.md", "section": "Kind Tests", "seen": "3f9c1e7a" },
 //         { "path": "docs/04-capabilities/02-support/01-apps/06-tests/README.md", "seen": "b204d81c" }
 //       ],
-//       "decisions": ["RD.APPS.086"]
+//       "decisions": ["RD.SUPPORT.APPS.086"]
 //     }
 //     -->
 //
@@ -59,8 +59,15 @@ export const BLOCK_COMMENT = BLOCK;
 // says *a node that restates what its kind already implies has introduced a second source of truth*
 // — a sentence about the defect, matched as a declaration by a looser rule.
 const SOURCE_LINE = /^.*Source of truth\s*:?\*{0,2}\s*:.*$|^.*\*\*Source of truth:\*\*.*$/gim;
-const ROW_ID = /\bRD\.[A-Z]+\.\d{3}\b/g;
-const IS_ROW_ID = /^RD\.[A-Z]+\.\d{3}$/;
+/**
+ * A decision id's grammar: `RD.<DOMAIN>[.<SUBDOMAIN>].<NNN>` — one area segment naming a domain, an
+ * optional second naming a sub-area inside it (a repository a domain spans, or a narrower seat),
+ * then a three-digit sequence. Exported so the other sites that parse a decision id — `coherence.ts`
+ * and the two `restates/*` commands — read the same grammar rather than a second copy that drifts.
+ */
+export const DECISION_ID_SRC = "RD\\.[A-Z]+(?:\\.[A-Z]+)?\\.\\d{3}";
+const ROW_ID = new RegExp(`\\b${DECISION_ID_SRC}\\b`, "g");
+const IS_ROW_ID = new RegExp(`^${DECISION_ID_SRC}$`);
 const HEADING = /^(#{1,6})[ \t]+(.+?)[ \t]*$/gm;
 
 export type Citation = { path?: string; section?: string; seen?: string };
@@ -78,7 +85,7 @@ export type DecisionCitation = { repo?: string; row?: string; seen?: string };
  * What a ref stands on. **Three kinds, because each names a different obligation** — a moved `docs`
  * entry means somebody rewrites a paragraph, `files` means somebody copies a file again, and
  * `decisions` moves when a row is rewritten. One list would report that something changed and not
- * what you owe (RD.DOCS.091).
+ * what you owe (RD.DEVEX.AGENT.072).
  *
  * A FOURTH KIND, `commands`, WAS TRIED AND DROPPED (2026-09-28). The command surface has one
  * source — the book — and a ref restates it the same way it restates anything else the book states:
@@ -274,8 +281,8 @@ export function namedSources(path: string): [Set<string>, Set<string>, Set<strin
  */
 export function rowText(register: string, row: string): string | null {
   // ANCHORED TO THE ROW'S OWN FIRST CELL, never a bare search over every line. A register row
-  // routinely cross-references another row inside its own prose — `RD.DOCS.031`'s row cites
-  // `RD.DOCS.043` in its own text, earlier in the file than `RD.DOCS.043`'s own row — so a search
+  // routinely cross-references another row inside its own prose — `RD.DEVEX.WORKSPACE.096`'s row cites
+  // `RD.DEVEX.WORKSPACE.106` in its own text, earlier in the file than `RD.DEVEX.WORKSPACE.106`'s own row — so a search
   // for "does this line mention the id anywhere" returns the wrong row's text, and two different
   // citations can silently hash to the same line.
   const pattern = new RegExp(`^\\|\\s*${row.replace(/\./g, "\\.")}\\s*\\|`);
@@ -342,7 +349,7 @@ export function check(
       continue;
     }
     // A CITATION STARTS AT THE REPOSITORY, so it resolves from the WORKSPACE rather than from
-    // whichever checkout the reader happens to be standing in (RD.DOCS.091). That is what lets one
+    // whichever checkout the reader happens to be standing in (RD.DEVEX.AGENT.072). That is what lets one
     // ref cite the book, the CLI's own source and a blueprint in three different repositories
     // without the checker needing to be told which tree each lives in.
     const cited = join(workspace, citation.path);

@@ -10,19 +10,19 @@
     { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md", "section": "Restatement discipline", "seen": "e1ff9549" }
   ],
   "decisions": [
-    { "repo": "spn-foundation", "row": "RD.DEVEX.058", "seen": "c0cd1ae0" },
-    { "repo": "spn-foundation", "row": "RD.DEVEX.020", "seen": "24448877" },
-    { "repo": "spn-foundation", "row": "RD.DEVEX.044", "seen": "0b6942fd" },
-    { "repo": "spn-foundation", "row": "RD.DEVEX.048", "seen": "d047e6f2" },
-    { "repo": "spn-foundation", "row": "RD.DEVEX.049", "seen": "e59c3f22" },
-    { "repo": "spn-foundation", "row": "RD.DOCS.055", "seen": "a47eced8" }
+    { "repo": "spn-foundation", "row": "RD.DEVEX.WORKSPACE.058", "seen": "c0cd1ae0" },
+    { "repo": "spn-foundation", "row": "RD.DEVEX.WORKSPACE.020", "seen": "24448877" },
+    { "repo": "spn-foundation", "row": "RD.DEVEX.UTILS.044", "seen": "0b6942fd" },
+    { "repo": "spn-foundation", "row": "RD.DEVEX.UTILS.048", "seen": "d047e6f2" },
+    { "repo": "spn-foundation", "row": "RD.DEVEX.AGENT.049", "seen": "e59c3f22" },
+    { "repo": "spn-foundation", "row": "RD.DEVEX.WORKSPACE.118", "seen": "a47eced8" }
   ]
 }
 -->
 
 # Cross-Repo Work — Stack-Agnostic
 
-How an agent works across more than one repository on a SaaS Plane estate, and where a rule belongs so every agent sees it. Apply it in any stack and to any repo pair. Source of truth: the foundation's `02-constructs/01-devex/04-workspace/01-workspace.md` and `02-constructs/01-devex/04-workspace/02-workstream.md` — the workspace itself, and the scope of work inside it. The machine seat is `04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md` **§ The machine's own layout** and **§ The env seat**, and `04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md` **§ The agent is updated first, and reloaded before anything runs**. Then `04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md` **§ When an edit becomes behaviour**, and `04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` **§ Restatement discipline**. The decisions are RD.DEVEX.020, RD.DEVEX.044, RD.DEVEX.048, RD.DEVEX.049 and RD.DOCS.055. Where this restatement and those disagree, the sources win and this file is regenerated.
+How an agent works across more than one repository on a SaaS Plane estate, and where a rule belongs so every agent sees it. Apply it in any stack and to any repo pair. Source of truth: the foundation's `02-constructs/01-devex/04-workspace/01-workspace.md` and `02-constructs/01-devex/04-workspace/02-workstream.md` — the workspace itself, and the scope of work inside it. The machine seat is `04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md` **§ The machine's own layout** and **§ The env seat**, and `04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md` **§ The agent is updated first, and reloaded before anything runs**. Then `04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md` **§ When an edit becomes behaviour**, and `04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` **§ Restatement discipline**. The decisions are RD.DEVEX.WORKSPACE.020, RD.DEVEX.UTILS.044, RD.DEVEX.UTILS.048, RD.DEVEX.AGENT.049 and RD.DEVEX.WORKSPACE.118. Where this restatement and those disagree, the sources win and this file is regenerated.
 
 ## One window, laws by declaration
 
@@ -38,7 +38,7 @@ Read across freely, in every direction — it needs no ceremony.
 
 ## The machine seat — `~/.spnenv`
 
-**One file on the machine holds every SaaS Plane value, and that file is `~/.spnenv`** (decision RD.DEVEX.048; the chapter is DevEx Utils § *The env seat*). It sits **outside `~/.spnutils`** on purpose. `rm -rf ~/.spnutils/*` is an allowed reset, and the developer's typed credentials are the one thing on the machine nobody can regenerate.
+**One file on the machine holds every SaaS Plane value, and that file is `~/.spnenv`** (decision RD.DEVEX.UTILS.048; the chapter is DevEx Utils § *The env seat*). It sits **outside `~/.spnutils`** on purpose. `rm -rf ~/.spnutils/*` is an allowed reset, and the developer's typed credentials are the one thing on the machine nobody can regenerate.
 
 `spnutils` reads it **directly**, so nothing has to be exported to reach a process.
 
@@ -211,7 +211,7 @@ When a window opens, surface what is stale — a subject untouched across sittin
 
 ### Which state a new workstream starts in
 
-**The starting state is a conversation, never a default.** The developer may simply say *backlog* or *open*. When they do not, **you propose one and say why**. You never pick silently, and you never leave it as an open question either. Scope belongs to the developer and you only ever propose — decision RD.DEVEX.038 — so they confirm or override your reason in one word.
+**The starting state is a conversation, never a default.** The developer may simply say *backlog* or *open*. When they do not, **you propose one and say why**. You never pick silently, and you never leave it as an open question either. Scope belongs to the developer and you only ever propose — decision RD.DEVEX.WORKSPACE.038 — so they confirm or override your reason in one word.
 
 | Propose | When | The tell |
 | --- | --- | --- |
@@ -231,7 +231,7 @@ When a window opens, surface what is stale — a subject untouched across sittin
 
 ## Open a workstream with the agent update, and execute after
 
-**A workstream opens with the agent update and the reload — MUST** (RD.DEVEX.049). Your own surfaces improve as the work does, so the update is never the closing act. A workstream that executes first spends its whole scope acting on the surfaces the last one left behind.
+**A workstream opens with the agent update and the reload — MUST** (RD.DEVEX.AGENT.049). Your own surfaces improve as the work does, so the update is never the closing act. A workstream that executes first spends its whole scope acting on the surfaces the last one left behind.
 
 **Agent setup is three repositories, never one.** The foundation states the rule, `spnutils` realizes the floor and the commands, and the marketplace restates it. A pass that edits the plugins and stops has changed a restatement and left its source standing. That is how a rule ends up somewhere a partner can never read it.
 
@@ -271,7 +271,7 @@ When a window opens, surface what is stale — a subject untouched across sittin
 
 **A restatement citing a chapter carries a stamp, and that stamp moves when the chapter moves.** Restatement discipline makes a rule change N declared edits: the owning document, plus every registered restatement, in one change. Run `spn-devex restates check` with the book's path to see which stamps your edit moved. **It reports and writes nothing for a `docs` or `files` citation**, so you correct each of those `seen` values yourself once you have re-read the source and corrected any disagreement; `restates decisions --write <ref>` restamps a `decisions` citation the same way, after the same re-read.
 
-**A citation names a file, a section of a file, or a whole folder** (`RD.DOCS.091`). The first two answer *did this rule move*. A folder answers the one they cannot — *did the set change* — because a stamp per file reports every edit and says nothing about a file nobody cited. Use it wherever what is restated is **all of them**: the clearest case is what the plugins carry for a partner, who never gets the book, where *the book grew a shape a partner does not have* is the failure the copy exists to prevent.
+**A citation names a file, a section of a file, or a whole folder** (`RD.DEVEX.AGENT.072`). The first two answer *did this rule move*. A folder answers the one they cannot — *did the set change* — because a stamp per file reports every edit and says nothing about a file nobody cited. Use it wherever what is restated is **all of them**: the clearest case is what the plugins carry for a partner, who never gets the book, where *the book grew a shape a partner does not have* is the failure the copy exists to prevent.
 
 **A partner receives none of this until the marketplace is published.** Publishing is pushing that repository, and a plugin's installed cache is keyed by its version. So the version bump and the push belong to this loop rather than to whatever follows it. The marketplace's own instruction file rules when that count moves.
 
@@ -364,7 +364,7 @@ Plan one change across repos as an **arc**: ordered steps, each naming its targe
 
 ### An arc carries a status, and it is one of eight
 
-**The set is closed (`RD.DEVEX.058`).** Every check that reads an arc reads this word, so a word
+**The set is closed (`RD.DEVEX.WORKSPACE.058`).** Every check that reads an arc reads this word, so a word
 outside the set is a state nothing can act on, and an arc with no status is one no check can see.
 
 | Status | What it means | Runnable work? | Terminal | Must also carry |
@@ -421,7 +421,7 @@ a stop without recording what it waits for moves the question somewhere nobody c
 | name a marketplace PATH as a value to set | name `SPN_DEVEX_AGENT_WORKSPACE`, which names a place rather than a source. Set, and the repos inside it are a **builder**'s; unset — what every partner has — and the marketplace is the published one. Nothing may set it for somebody |
 
 **No variable asks for a rehearsal, and none ever should.** A provisioning run names its own mode on
-the command — `--plan` or `--apply`, exactly one, with no default (`RD.INFRA.094`). `--plan` reaches
+the command — `--plan` or `--apply`, exactly one, with no default (`RD.SUPPORT.INFRA.094`). `--plan` reaches
 no account, so the cloud walk is rehearsable before any account exists. `SPN_POSTURE` is **retired**:
 it asked for a rehearsal through the environment, and a rehearsal is now a mode you type.
 
@@ -440,7 +440,7 @@ One constraint decides where every common rule lives. **A product repo built on 
 
 **Common rules are carried by the plugin, never by a link into a peer repo.** Cite by name any document that must be cited across repos, and let the plugin carry the substance.
 
-**The rule reaches every file that ships inside a repository, agent instruments included** (decision RD.DOCS.035). A `CLAUDE.md` is walked by no validator, but it travels with its repo and is read where the siblings may be absent — so it cites by name too. **The workspace's own `CLAUDE.md` is the one exception**: the sibling checkouts are its subject, and it ships nowhere. And a repository's instruction file states what is true of that repository, never what other repositories may do.
+**The rule reaches every file that ships inside a repository, agent instruments included** (decision RD.DEVEX.WORKSPACE.099). A `CLAUDE.md` is walked by no validator, but it travels with its repo and is read where the siblings may be absent — so it cites by name too. **The workspace's own `CLAUDE.md` is the one exception**: the sibling checkouts are its subject, and it ships nowhere. And a repository's instruction file states what is true of that repository, never what other repositories may do.
 
 ## Skills are what a consumer acts on; the book is why
 

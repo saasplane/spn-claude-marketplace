@@ -48,7 +48,7 @@ const JEST_WITH = (s, b, f, l) =>
 
 /** A floor that already carries the dated comment the script writes — protected, and only ever raised. */
 const JEST_WITH_DATED = (date, s, b, f, l) =>
-  `module.exports = {\n  displayName: 'x',\n  coverageDirectory: 'cov',\n  // Coverage floor measured ${date} by the spn-apps floor script — it rises and never falls (RD.APPS.133).\n  coverageThreshold: {\n    global: {\n      branches: ${b},\n      functions: ${f},\n      lines: ${l},\n      statements: ${s},\n    },\n  },\n};\n`;
+  `module.exports = {\n  displayName: 'x',\n  coverageDirectory: 'cov',\n  // Coverage floor measured ${date} by the spn-apps floor script — it rises and never falls (RD.SUPPORT.APPS.133).\n  coverageThreshold: {\n    global: {\n      branches: ${b},\n      functions: ${f},\n      lines: ${l},\n      statements: ${s},\n    },\n  },\n};\n`;
 
 console.log("=== coverage-floor — raising");
 

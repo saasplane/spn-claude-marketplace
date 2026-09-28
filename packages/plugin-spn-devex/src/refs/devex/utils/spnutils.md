@@ -111,7 +111,7 @@ The `gen-*` chain is never hand-edited: validators are what the API enforces, sy
 what the agents read. `apps release` publishes every releasable project at one version, lockstep,
 routed by each package's own scope.
 
-**`spnutils` never reads or writes a document — MUST** (`RD.DEVEX.071`). `apps test` runs a tier and
+**`spnutils` never reads or writes a document — MUST** (`RD.DEVEX.UTILS.071`). `apps test` runs a tier and
 writes the run artifact and nothing else; what that run means for the documents — stamping `Status`
 and `Updated at`, the join and proof checks, coverage — is the agent's own work, through plugin
 scripts.

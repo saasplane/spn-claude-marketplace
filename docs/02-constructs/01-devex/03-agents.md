@@ -121,7 +121,7 @@ This page answers what a brief is, how a persona is convened, what a viewpoint f
 | the foundation's DevEx Agent construct | one agent, equipped by the book, and a reviewer that reads what it did not write | MUST |
 | the foundation's Actors, Lenses and Panels construct | the viewpoint set is closed by a rule, and a reviewer blocks only where its own file says it may | MUST |
 | the foundation's `02-delivery.md` § When an edit becomes behaviour | a brief edit needs an install and a fresh window before a convening can read it | MUST |
-| `RD.DOCS.055` | a lens is a restatement, and the book wins wherever the two disagree | MUST |
-| [MD4](../../registers/decisions.md) | a read-only promise is bound only where the brief declares `tools`; elsewhere it is prose | MUST |
+| `RD.DEVEX.WORKSPACE.118` | a lens is a restatement, and the book wins wherever the two disagree | MUST |
+| [RD.DEVEX.004](../../registers/decisions.md) | a read-only promise is bound only where the brief declares `tools`; elsewhere it is prose | MUST |
 
 Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs restates check` (or `spn-devex restates check`, once installed)

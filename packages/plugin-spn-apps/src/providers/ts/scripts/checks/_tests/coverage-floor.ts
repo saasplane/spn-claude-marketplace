@@ -51,7 +51,7 @@ export function verdict(path: string, source: string | null, _added: string | nu
       found.map((item) => `  - ${item}`).join("\n") +
       "\n  A floor is raised by the floor script after a run, to what the run measured; it is never typed " +
       "down. To lower one, the code has to be covered or excluded: an exclude names the code a case " +
-      "cannot reach, with a comment on its entry giving the reason (RD.APPS.133).",
+      "cannot reach, with a comment on its entry giving the reason (RD.SUPPORT.APPS.133).",
   };
 }
 

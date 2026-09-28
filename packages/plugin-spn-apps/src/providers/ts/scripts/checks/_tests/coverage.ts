@@ -162,7 +162,7 @@ export function owningApp(path: string, root: string): string | null {
 /**
  * Where this route is proven, under the rule the coverage model settled.
  *
- * **An application owns the journeys of the surfaces it deploys** (RD.APPS.087, RD.APPS.088), so a
+ * **An application owns the journeys of the surfaces it deploys** (RD.SUPPORT.APPS.087, RD.SUPPORT.APPS.088), so a
  * route is covered by a case in its OWN node's test tree. A case at the workspace root used to count
  * and no longer does: the workspace owns only what no single application can resolve, and one route
  * resolving is not that.
@@ -231,7 +231,7 @@ export function checkRouteE2e(path: string, source: string, added: string | null
 export function checkSpecRestore(path: string, source: string, added: string | null): string[] {
   if (!isSpec(path, source)) return [];
   // Shared state is an application's problem and the workspace's. A module ships no shell, so it
-  // stands nothing up and doubles only a seam it owns (RD.APPS.088) — there is no shared baseline
+  // stands nothing up and doubles only a seam it owns (RD.SUPPORT.APPS.088) — there is no shared baseline
   // beneath it to leave moved. Asking a module spec for a restore reports a mutation that cannot
   // exist, and a finding that cannot be true is one a reader learns to ignore.
   const root = repoRoot(path);
@@ -254,7 +254,7 @@ export function checkSpecRestore(path: string, source: string, added: string | n
 /**
  * A module test doubling a seam its node does not own.
  *
- * **A node may double a seam it owns, and nothing else** (RD.APPS.088).
+ * **A node may double a seam it owns, and nothing else** (RD.SUPPORT.APPS.088).
  *
  * Only `@saasplane/*` targets are judged. A third-party module and a relative path are the node's
  * own business, and a relative path cannot reach outside the node anyway.

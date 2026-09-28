@@ -96,8 +96,8 @@ This page answers what this plugin puts in a provider folder and why the halves 
 
 | Rule | What it decides | Weight |
 | --- | --- | --- |
-| `RD.GOV.024` | a repository answers to the world it declares, which is what makes `sprepo.json` the one place an instance is read from | MUST |
-| `RD.DEVEX.019` | a provider folder restates nothing and states no rule the domain owns | MUST |
+| `RD.DEVEX.WORKSPACE.176` | a repository answers to the world it declares, which is what makes `sprepo.json` the one place an instance is read from | MUST |
+| `RD.DEVEX.UTILS.019` | a provider folder restates nothing and states no rule the domain owns | MUST |
 | the apps plugin's subject registry | *until a parser exists there is no folder for it* — a realization that is absent says so, and a stub that answers teaches you it works | MUST |
 
 Try it: `node packages/plugin-spn-infra/tests/run.mjs`

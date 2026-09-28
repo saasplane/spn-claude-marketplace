@@ -109,10 +109,10 @@ This page answers what the scripts tree holds, what it refuses, what it reads to
 
 | Rule | What it decides | Weight |
 | --- | --- | --- |
-| `RD.DEVEX.019` | the scripts restate the estate laws and add no rule of their own | MUST |
-| `RD.INFRA.026` | which manifest declares an estate node, and therefore which file the manifest rule applies to | MUST |
+| `RD.DEVEX.UTILS.019` | the scripts restate the estate laws and add no rule of their own | MUST |
+| `RD.SUPPORT.INFRA.026` | which manifest declares an estate node, and therefore which file the manifest rule applies to | MUST |
 | the foundation's `02-delivery.md` § When an edit becomes behaviour | a script is a hook's body, so an edit to it is live on its next run | MUST |
-| `MD8` | a plugin carries its own libraries and never reaches into a sibling at runtime | MUST |
+| `RD.DEVEX.008` | a plugin carries its own libraries and never reaches into a sibling at runtime | MUST |
 | the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | the four kinds of script, one command entry, a shared folder never installed on its own | MUST |
 
 Try it: `node packages/plugin-spn-infra/tests/run.mjs`

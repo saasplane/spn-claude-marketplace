@@ -23,7 +23,7 @@
 | 2 | Artifact registries | the pair the organization's `packages.scopes` declares — one public, one private |
 | 3 | State storage and the parameter registry | where a rendering's state and the estate's resolved values live. **These are the estate's memory; losing them is worse than losing a resource** |
 | 4 | The session act | a pipeline authenticating as itself rather than holding a secret somebody made. **Stated in full in [`03-session.md`](03-session.md)**, and not repeated here |
-| 5 | DNS zones, delegation and certificates; the tenant edge | the public zone and its `internal.` counterpart, associated with every environment's VPCs; one distribution with the alias `*.{spd}`, the `*` record and one route store (`RD.INFRA.104`) |
+| 5 | DNS zones, delegation and certificates; the tenant edge | the public zone and its `internal.` counterpart, associated with every environment's VPCs; one distribution with the alias `*.{spd}`, the `*` record and one route store (`RD.SUPPORT.INFRA.104`) |
 | 6 | Shared tooling and the discovered outputs | what the platform declared, then every discovered value published for later runs to read |
 
 **State locking is the property to check, not the storage.** Two concurrent applies must be impossible rather than discouraged, and the state replicates into the account that observes, which cannot change infrastructure.

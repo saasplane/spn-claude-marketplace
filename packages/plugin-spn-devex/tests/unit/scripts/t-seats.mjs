@@ -74,7 +74,7 @@ const lacks = (s) => (got) => !String(got).includes(s);
 
 console.log("\n=== the produced page is the seat, and no register row is joined into it");
 {
-  // A construct types no proof (RD.DOCS.072). Its rows are read in the tests report, so a register
+  // A construct types no proof (RD.DEVEX.WORKSPACE.132). Its rows are read in the tests report, so a register
   // beside it changes nothing on its page — not a row, not a status, not a line naming the source.
   const rows = [["CORE.BOOT.01", "can boot a service", "UNIT", "PLANNED"],
                 ["CORE.BOOT.02", "sees a clean shutdown", "INTEGRATION", "DONE"]];
@@ -271,7 +271,7 @@ console.log("\n=== a code file's own RESTATES header is read, and a path that is
   one("a `RESTATES:` mid-line is a mention, not a header — a test fixture carries one",
       headerSources('const page = "## Boundary\\n<!-- RESTATES: a chapter -->";'), (got) => got.length === 0);
   one("a decision id is not a source, and neither is a plain word",
-      headerSources("// RESTATES: RD.DOCS.055 and the layer promise, per docs/a/01-thing.md")[0].cited,
+      headerSources("// RESTATES: RD.DEVEX.WORKSPACE.118 and the layer promise, per docs/a/01-thing.md")[0].cited,
       (got) => got.length === 1 && got[0] === "docs/a/01-thing.md");
   one("a second header deeper in the file is found too",
       headerSources("// RESTATES: docs/a/01-x.md\n\ncode();\n\n// RESTATES: docs/b/02-y.md\n"),
@@ -282,7 +282,7 @@ console.log("\n=== a code file's own RESTATES header is read, and a path that is
   // headers as broken; judging both by name would have hidden all nine renamed ones.
   const bookAt = join(BASE, `hbook${made += 1}`);
   for (const [rel, body] of Object.entries({
-    "docs/registers/decisions.md": "# decisions\n\n| RD.DOCS.055 | a row |\n",
+    "docs/registers/decisions.md": "# decisions\n\n| RD.DEVEX.WORKSPACE.118 | a row |\n",
     "CONCEPT.md": "# c\n",
     "docs/04-capabilities/01-devex/05-real.md": "# real\n",
   })) {

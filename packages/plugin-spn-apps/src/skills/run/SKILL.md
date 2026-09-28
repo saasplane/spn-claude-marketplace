@@ -43,7 +43,7 @@ shape an agent copies next. Call the owning project's target.
 ## A SCRIPT and a TARGET are different things, and this is where people trip
 
 **A node declares one script per command, and nx carries a target per tier.** Both are real and they
-are not duplicates of each other (`RD.APPS.118`, and `Q95` = B):
+are not duplicates of each other (`RD.SUPPORT.APPS.118`, and `Q95` = B):
 
 ```bash
 pnpm test unit                     # the SCRIPT — one command, the tier as its argument
@@ -72,7 +72,7 @@ below is what it produces today, and a kind added later needs no row of its own.
 | `check` · `format` | every kind | — |
 | `test` | every kind | `pnpm test unit` · `contract` · `journey` · `component` · `integration` |
 | `clean` | every kind | — |
-| `release` | what publishes | **the repository's, never a node's** — `-p` is refused (`RD.APPS.034`) |
+| `release` | what publishes | **the repository's, never a node's** — `-p` is refused (`RD.SUPPORT.APPS.034`) |
 | `dev` · `start` · `stop` | what publishes nothing | `pnpm dev --mode API` on a kind that declares modes |
 | `migrate` | what owns a schema | `pnpm migrate up` · `down` · `list` · `pending` · `status` · `generate` |
 | `codegen` | `CLIENT_API` | `pnpm codegen api-client` |
@@ -133,7 +133,7 @@ specified path does not exist`, which reads as a broken command rather than a mi
 
 ## After a run: the rows say what it found
 
-A run leaves `tests/.output/<tier>/spn-tests.json` behind — every behaviour id its case titles carried, and what the runner actually did with each. **`spnutils` writes the artifact and never a row** (`RD.DEVEX.071`). Writing it into the registers is the **spn-devex** plugin's row writer, `spn-devex behaviours stamp` in that plugin (cross-plugin pointer; it ships alongside this plugin), run the way its `test` skill runs it: first without `--write` to see what it would change, then with it. The same plugin's `spn-devex behaviours check` then refuses a `SUCCESS` row the run of its tier contradicts.
+A run leaves `tests/.output/<tier>/spn-tests.json` behind — every behaviour id its case titles carried, and what the runner actually did with each. **`spnutils` writes the artifact and never a row** (`RD.DEVEX.UTILS.071`). Writing it into the registers is the **spn-devex** plugin's row writer, `spn-devex behaviours stamp` in that plugin (cross-plugin pointer; it ships alongside this plugin), run the way its `test` skill runs it: first without `--write` to see what it would change, then with it. The same plugin's `spn-devex behaviours check` then refuses a `SUCCESS` row the run of its tier contradicts.
 
 The join is this plugin's, because where a case lives is the stack's:
 

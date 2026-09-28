@@ -57,7 +57,7 @@ const DATED_COMMENT = /\/\/\s*Coverage floor measured \d{4}-\d{2}-\d{2}/;
 /**
  * Whether a configuration's floor carries the dated measurement comment the floor script writes.
  * A floor with no such comment is a guess nobody measured, so its first measurement may replace it
- * either way; once it carries the comment, only a higher number may follow (RD.APPS.133).
+ * either way; once it carries the comment, only a higher number may follow (RD.SUPPORT.APPS.133).
  */
 export function isDated(text: string): boolean {
   const key = text.search(/\b(coverageThreshold|thresholds)\s*:/);

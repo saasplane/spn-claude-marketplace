@@ -1,4 +1,4 @@
-// `coverage-floor` — a floor rises and never falls, and an exclude says why (RD.APPS.133).
+// `coverage-floor` — a floor rises and never falls, and an exclude says why (RD.SUPPORT.APPS.133).
 import { execFileSync } from "node:child_process";
 import { resolve } from "node:path";
 import { one, done, tree, PLUGIN } from "../../../../../helpers/harness.mjs";
@@ -16,12 +16,12 @@ const VITEST = (floor, excludes = "") =>
 const JEST_DATED = (floor, excludes = "") =>
   "module.exports = {\n  displayName: 'x',\n  coverageDirectory: 'cov',\n" +
   (excludes ? `  coveragePathIgnorePatterns: [\n${excludes}  ],\n` : "") +
-  "  // Coverage floor measured 2026-09-20 by the spn-apps floor script — it rises and never falls (RD.APPS.133).\n" +
+  "  // Coverage floor measured 2026-09-20 by the spn-apps floor script — it rises and never falls (RD.SUPPORT.APPS.133).\n" +
   `  coverageThreshold: {\n    global: { statements: ${floor[0]}, branches: ${floor[1]}, functions: ${floor[2]}, lines: ${floor[3]} },\n  },\n};\n`;
 const VITEST_DATED = (floor, excludes = "") =>
   "export default defineWebVitestConfig('x', {\n  test: {\n    coverage: {\n" +
   (excludes ? `      exclude: [\n${excludes}      ],\n` : "") +
-  "      // Coverage floor measured 2026-09-20 by the spn-apps floor script — it rises and never falls (RD.APPS.133).\n" +
+  "      // Coverage floor measured 2026-09-20 by the spn-apps floor script — it rises and never falls (RD.SUPPORT.APPS.133).\n" +
   `      thresholds: { statements: ${floor[0]}, branches: ${floor[1]}, functions: ${floor[2]}, lines: ${floor[3]} },\n    },\n  },\n});\n`;
 
 console.log("=== coverage-floor — known-bad");

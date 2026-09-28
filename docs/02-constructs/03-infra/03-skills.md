@@ -97,7 +97,7 @@ This page answers which skills an estate repository answers to and what each one
 | Rule | What it decides | Weight |
 | --- | --- | --- |
 | the foundation's DevEx Skills construct | the skill set is closed, and a skill's value spells the domain of the plugin that ships it | MUST |
-| `RD.DEVEX.020` | a cloud is changed only through the tool's own doors, and never by hand | MUST |
-| `RD.DEVEX.019` | every skill here restates a chapter and adds no rule of its own | MUST |
+| `RD.DEVEX.WORKSPACE.020` | a cloud is changed only through the tool's own doors, and never by hand | MUST |
+| `RD.DEVEX.UTILS.019` | every skill here restates a chapter and adds no rule of its own | MUST |
 
 Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs restates check` (or `spn-devex restates check`, once installed)

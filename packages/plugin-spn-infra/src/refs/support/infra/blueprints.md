@@ -15,7 +15,7 @@ This card is provider-agnostic. The estate ships as one plugin, and a cloud is a
 
 ## What a blueprint is
 
-A blueprint is published code, written by SaaS Plane and never by the company running it — the same relationship a support package has to an application (decision `RD.INFRA.013`). **You never write the code that stands an estate up — you give it a declaration, and it runs in a fixed order.** The execution engine is SaaS Plane's own choice, made once. The resource vocabulary is closed, because nothing can provision a type with no blueprint behind it. And a company parameterizes rather than writes, which is what makes an estate reproducible by someone who has never seen it.
+A blueprint is published code, written by SaaS Plane and never by the company running it — the same relationship a support package has to an application (decision `RD.SUPPORT.INFRA.013`). **You never write the code that stands an estate up — you give it a declaration, and it runs in a fixed order.** The execution engine is SaaS Plane's own choice, made once. The resource vocabulary is closed, because nothing can provision a type with no blueprint behind it. And a company parameterizes rather than writes, which is what makes an estate reproducible by someone who has never seen it.
 
 > A layer is an input shape, an output shape, and the components it creates.
 
@@ -35,7 +35,7 @@ The command surface **resolves and drives**; the blueprint library **creates**. 
 
 **These five are the model's layer nouns — `GROUND`, never `BOOTSTRAP`.** `GROUND` has no principals of its own and rides the `organization` command noun; `DEPLOYMENTS` rides the `environment` command noun the same way, so the command surface speaks three nouns for five layers.
 
-**Ordering inside a layer is not a boundary.** `PLATFORM` builds its containers before its accounts before its policies; `ENVIRONMENT` builds its network before the resources that sit in it before the compute beside them. A sequence earns a boundary only where the two sides differ in blast radius or in cadence (`RD.INFRA.024`). Everything inside one environment goes up together and comes down together.
+**Ordering inside a layer is not a boundary.** `PLATFORM` builds its containers before its accounts before its policies; `ENVIRONMENT` builds its network before the resources that sit in it before the compute beside them. A sequence earns a boundary only where the two sides differ in blast radius or in cadence (`RD.SUPPORT.INFRA.024`). Everything inside one environment goes up together and comes down together.
 
 A blueprint library is arranged the way the driver reads it: the seam first, then the provider, then the layer, then the step inside that layer. A second cloud arrives as a sibling folder rather than a change to every path.
 
@@ -65,7 +65,7 @@ The tree is logical and free of any provider's words — stated once in the name
 
 **A third account holds no environments at all.** Outside data lands in the staging account and is conditioned there before any of it reaches a workload. Workloads **pull** what they are entitled to; the staging account never pushes into them, holds no interactive access, and assumes no role into either workload.
 
-**Two workload accounts, however many regions a product runs in.** One environment lives in exactly one region; a workload holds as many regions as the product declares (`RD.INFRA.017`). An environment owns only its own slices, so it tears down without touching a sibling — by construction, not by care. The shared substrate falls only with a region's last environment.
+**Two workload accounts, however many regions a product runs in.** One environment lives in exactly one region; a workload holds as many regions as the product declares (`RD.SUPPORT.INFRA.017`). An environment owns only its own slices, so it tears down without touching a sibling — by construction, not by care. The shared substrate falls only with a region's last environment.
 
 ## The trust graph
 
@@ -89,7 +89,7 @@ governance  ◀──  everything     receives only, and can deploy nothing
 
 ## Realization is a target, never a value
 
-A provider entry always names a real provider. **The local realization binds none of them and stands the same declared resources up as containers — realization is a target a command is pointed at, never a value stored in a manifest** (`RD.INFRA.018`). **Local is the default and cloud is never implicit — the target that creates real accounts is the one somebody has to ask for by name.**
+A provider entry always names a real provider. **The local realization binds none of them and stands the same declared resources up as containers — realization is a target a command is pointed at, never a value stored in a manifest** (`RD.SUPPORT.INFRA.018`). **Local is the default and cloud is never implicit — the target that creates real accounts is the one somebody has to ask for by name.**
 
 | Layer | On a laptop | In the cloud |
 | --- | --- | --- |
@@ -104,7 +104,7 @@ A provider entry always names a real provider. **The local realization binds non
 
 ## An environment is derived — three things may vary
 
-**Only what an environment's own row declares may vary: its workload, its size, and its hosting** (`RD.INFRA.064`). If a difference between two environments cannot be written as one of those three, it is a defect in the design rather than a case for a special environment.
+**Only what an environment's own row declares may vary: its workload, its size, and its hosting** (`RD.SUPPORT.INFRA.064`). If a difference between two environments cannot be written as one of those three, it is a defect in the design rather than a case for a special environment.
 
 | Decides | Source |
 | --- | --- |
@@ -114,7 +114,7 @@ A provider entry always names a real provider. **The local realization binds non
 | how much capacity | the size, read within the workload |
 | where its engines run | the hosting — non-production only |
 
-**Invariants reach every environment, with no exception anywhere — MUST.** Encryption at rest, transport security, no publicly readable data stores, no long-lived credentials, mandatory tagging, audit trails, the application firewall — all of them, from the first apply. There is no *harden it before production* phase, and no template that varies any of it (`RD.INFRA.014`): anything a template would vary is either a workload concern or a security control that must not be optional anywhere. A control exercised only in production is a control nobody has tested.
+**Invariants reach every environment, with no exception anywhere — MUST.** Encryption at rest, transport security, no publicly readable data stores, no long-lived credentials, mandatory tagging, audit trails, the application firewall — all of them, from the first apply. There is no *harden it before production* phase, and no template that varies any of it (`RD.SUPPORT.INFRA.014`): anything a template would vary is either a workload concern or a security control that must not be optional anywhere. A control exercised only in production is a control nobody has tested.
 
 **Workload is posture and isolation, not a label.** A product has exactly two workloads, and each is its own account, its own governance, its own place in the trust graph, and its own reliability posture.
 
@@ -142,7 +142,7 @@ Five rungs rather than three, because a three-rung ladder collapses production-a
 
 ## What proves an estate change
 
-**A declaration is proven by rendering it against a target, never by calling a function and reading what comes back** (`RD.INFRA.097`). **The tiers are the apps ladder's own** — `SPTestTierType`, never a second enum that would drift from it (`RD.INFRA.102`) — and an estate node reuses a tier's name wherever its meaning is the same (`RD.INFRA.107`).
+**A declaration is proven by rendering it against a target, never by calling a function and reading what comes back** (`RD.SUPPORT.INFRA.097`). **The tiers are the apps ladder's own** — `SPTestTierType`, never a second enum that would drift from it (`RD.SUPPORT.INFRA.102`) — and an estate node reuses a tier's name wherever its meaning is the same (`RD.SUPPORT.INFRA.107`).
 
 | Tier | Stands on | Proves | Cannot prove |
 | --- | --- | --- | --- |
@@ -154,7 +154,7 @@ Five rungs rather than three, because a three-rung ladder collapses production-a
 
 **Two rungs sit outside the ladder, on purpose.** The build — the declaration parses, the tree matches its type, the manifest matches its contract — is a static gate, never proof, the same way a type check is not a test; `spnutils infra test` runs it first and it prints no case. A stand-up provisions against a real target and speaks for that target and for no other — never claim a layer works on the strength of a run that never touched the target in question. Where nothing has ever been applied against a target, say plainly that the tiers pass and the stand-up has not run.
 
-**Every estate package keeps its tests in the same tree**: one folder per owed tier under `tests/` — the folder naming the tier, the file's kind naming the engine — so a case sitting in the wrong folder is refused rather than counted. A harness reports cases, never only an exit code: `ok`, `not ok` or `skip`, the tier, the behaviour id, a title, through `helpers/case.sh`; `spnutils infra test` turns the lines into the run artifact apps write, the agent stamps the rows from it, and `spnutils infra release` refuses a node whose owed tier has no case or a failing one. A pipeline publishes the artifact and stops there; it never edits a document to say a run succeeded (`RD.INFRA.094` — every provisioning run names its own mode, and a rehearsal needs no credential).
+**Every estate package keeps its tests in the same tree**: one folder per owed tier under `tests/` — the folder naming the tier, the file's kind naming the engine — so a case sitting in the wrong folder is refused rather than counted. A harness reports cases, never only an exit code: `ok`, `not ok` or `skip`, the tier, the behaviour id, a title, through `helpers/case.sh`; `spnutils infra test` turns the lines into the run artifact apps write, the agent stamps the rows from it, and `spnutils infra release` refuses a node whose owed tier has no case or a failing one. A pipeline publishes the artifact and stops there; it never edits a document to say a run succeeded (`RD.SUPPORT.INFRA.094` — every provisioning run names its own mode, and a rehearsal needs no credential).
 
 ## What it makes checkable
 

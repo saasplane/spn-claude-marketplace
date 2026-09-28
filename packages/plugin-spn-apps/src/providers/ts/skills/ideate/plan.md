@@ -1,6 +1,6 @@
 # Planning in an APPS · TS node
 
-**This skill carries the stack's half of `DEVEX_IDEATE`, and nothing more.** How a requirement becomes `🔮 planned` rows, what a row holds and where the seats are is the skill's own — stated once, in `spn-devex`, which reads this file when the node's `sprepo.json` declares `TS`. **There is no `APPS_PLAN`**: `RD.DEVEX.062` folded planning into `ideate`, and the skill set is closed.
+**This skill carries the stack's half of `DEVEX_IDEATE`, and nothing more.** How a requirement becomes `🔮 planned` rows, what a row holds and where the seats are is the skill's own — stated once, in `spn-devex`, which reads this file when the node's `sprepo.json` declares `TS`. **There is no `APPS_PLAN`**: `RD.DEVEX.FUNCTION.062` folded planning into `ideate`, and the skill set is closed.
 
 What is here is only what a different language would answer differently.
 

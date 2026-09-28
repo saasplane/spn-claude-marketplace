@@ -4,7 +4,7 @@
 //     spn-devex behaviours coverage [--json] [root]
 //
 // It measures and never writes a page: a report is written by the agent and produced by no command
-// (the book's RD.DOCS.089). Every tier the repository owes appears, whether or not it ran, and the
+// (the book's RD.DEVEX.WORKSPACE.149). Every tier the repository owes appears, whether or not it ran, and the
 // same tree measures to the same bytes — the date is the newest run's, and the digest hashes the
 // measurement alone.
 
@@ -22,7 +22,7 @@ const isFile = (path: string): boolean => { try { return statSync(path).isFile()
 type Finding = { project: string; kind: null; severity: string; ftype: string; message: string };
 type TierState = "RAN" | "PARTIAL" | "NOT_RUN";
 
-/** Where the tests report lands in a repository's pocket, named by its kind (RD.DOCS.089). */
+/** Where the tests report lands in a repository's pocket, named by its kind (RD.DEVEX.WORKSPACE.149). */
 export const TESTS_REPORT = "docs/artifacts/reports/tests-report.html";
 
 const finding = (file: string, message: string): Finding =>
@@ -77,7 +77,7 @@ export function foundationAbsence(root: string): Record<string, unknown> | null 
     repository: name,
     measuredAt: null,
     absence:
-      `${name} declares FOUNDATION: its behaviour rows are promises, with no Status and no Tier (RD.APPS.129), ` +
+      `${name} declares FOUNDATION: its behaviour rows are promises, with no Status and no Tier (RD.SUPPORT.APPS.129), ` +
       `and it runs no proving tier. There is nothing to measure, so no tests report is owed — an empty one ` +
       `would read as a failure rather than as an absence.`,
     tiers: [],

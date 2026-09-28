@@ -4,7 +4,7 @@
      restate-drift.ts reports this copy when its source moves. -->
 # N{{n}} — {{the arc, named for the cycle it pays}}
 
-Status: **PROPOSED — waits on {{the card or the arc it follows}}.** Opened {{date}}.   <!-- The status is one of eight, and the set is closed (RD.DEVEX.058): PROPOSED · DECIDED · RUNNING · HELD — waits on Q<n> · PART-LANDED · LANDED · CARRIED — to <where> · DROPPED — <why>. LANDED, CARRIED and DROPPED are terminal. The set is defined in the workspace capability, § The arc; this comment cites it and states no rule of its own. Write the line exactly as `Status: **WORD ...**` — one spelling, because a reader that has to know two knows neither. --> {{One sentence: what this arc changes, and why it is one arc.}}
+Status: **PROPOSED — waits on {{the card or the arc it follows}}.** Opened {{date}}.   <!-- The status is one of eight, and the set is closed (RD.DEVEX.WORKSPACE.058): PROPOSED · DECIDED · RUNNING · HELD — waits on Q<n> · PART-LANDED · LANDED · CARRIED — to <where> · DROPPED — <why>. LANDED, CARRIED and DROPPED are terminal. The set is defined in the workspace capability, § The arc; this comment cites it and states no rule of its own. Write the line exactly as `Status: **WORD ...**` — one spelling, because a reader that has to know two knows neither. --> {{One sentence: what this arc changes, and why it is one arc.}}
 Repos: {{repo}} · {{repo}} — {{in what order, and why}}
 
 <!-- HELD is the state a scope change puts an arc in when it reaches what is planned: the card is on the page, the arc
@@ -42,12 +42,12 @@ Repos: {{repo}} · {{repo}} — {{in what order, and why}}
 | Restatements | `{{the refs and templates that cite any of the above}}` | {{…}} |
 
 ## The specification
-<!-- WHAT THE STEPS ACT ON, carried here or named by path (RD.DEVEX.064). A step that states a
+<!-- WHAT THE STEPS ACT ON, carried here or named by path (RD.DEVEX.WORKSPACE.064). A step that states a
      COUNT and not the members has left the specification where the next session cannot reach it,
      and a conversation is not a place. A move is a TABLE with unique targets. A step producing many
      files carries ONE WORKED EXAMPLE, because a brief without one produces placeholders.
      Too large for this section? It goes to notes/{{n}}-{{subject}}.tsv and a step names that path.
-     Carry NO COUNTS — RD.GOV.008. Name the set; let the reader count it. -->
+     Carry NO COUNTS — RD.DEVEX.WORKSPACE.162. Name the set; let the reader count it. -->
 
 {{The closed sets, the move table, the rules — whichever this arc acts on. Delete what does not
 apply; never delete the section, because an empty one is a claim that the steps act on nothing.}}

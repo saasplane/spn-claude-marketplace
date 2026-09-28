@@ -18,7 +18,7 @@ description: Realize the estate - bring a layer up, take it down, read its statu
 ## Two flags decide everything
 
 - **`--local` is the default; `--cloud` is never implicit.** The target that provisions real accounts must be named.
-- **Every `up` and `down` names its mode, and there is no default** (RD.INFRA.094). Say exactly one of `--plan` or `--apply`. Naming neither, or both, is refused. A command that plans when you forget a flag is a command doing another command's job.
+- **Every `up` and `down` names its mode, and there is no default** (RD.SUPPORT.INFRA.094). Say exactly one of `--plan` or `--apply`. Naming neither, or both, is refused. A command that plans when you forget a flag is a command doing another command's job.
 - **A cloud apply also takes `--approve`** — deliberately not the default.
 
 Run `--plan` first, hand the output to the `review` skill, and only then `--apply`.

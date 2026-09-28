@@ -13,22 +13,22 @@
 
 ## There is no environment token
 
-**Locally no `{env}` token exists in any name, because the machine is one environment and the local domain is the pin** (`RD.INFRA.052`). A cloud service hostname reads `{env}-{world}-{service}`; the same service locally reads `{world}-{service}.{lc-domain}`.
+**Locally no `{env}` token exists in any name, because the machine is one environment and the local domain is the pin** (`RD.SUPPORT.INFRA.052`). A cloud service hostname reads `{env}-{world}-{service}`; the same service locally reads `{world}-{service}.{lc-domain}`.
 
-**The world token still names what the service belongs to** — the platform's `{spc}`, a resource space's code, or a module's code. A module's namespace is the estate's and its service names are its own: `{module}-{service}.{lc-domain}` (`RD.INFRA.056`).
+**The world token still names what the service belongs to** — the platform's `{spc}`, a resource space's code, or a module's code. A module's namespace is the estate's and its service names are its own: `{module}-{service}.{lc-domain}` (`RD.SUPPORT.INFRA.056`).
 
 ## Hosts resolve to loopback, and the port carries the transport
 
-**Every local host resolves to `127.0.0.1`**, answered by the resolver the organization layer installs for every local domain and `lc-test`, so no host needs an `/etc/hosts` line, nothing is proxied and no engine protocol is intercepted. **A host the running platform creates carries no environment prefix here** — `acme.lc-spndemo.app`, never `in-dev-acme…`. Engines are named like every other service, and the derived port stays the transport distinguisher — `dmo-database.lc-spndemo.app:9210` (`RD.INFRA.079`).
+**Every local host resolves to `127.0.0.1`**, answered by the resolver the organization layer installs for every local domain and `lc-test`, so no host needs an `/etc/hosts` line, nothing is proxied and no engine protocol is intercepted. **A host the running platform creates carries no environment prefix here** — `acme.lc-spndemo.app`, never `in-dev-acme…`. Engines are named like every other service, and the derived port stays the transport distinguisher — `dmo-database.lc-spndemo.app:9210` (`RD.SUPPORT.INFRA.079`).
 
-**A space's engine ports derive** from the platform family's port plus one hundred for each space, the family's own secondary offsets riding along (`RD.INFRA.062`). The formula is realized identically in the blueprints render and in the CLI.
+**A space's engine ports derive** from the platform family's port plus one hundred for each space, the family's own secondary offsets riding along (`RD.SUPPORT.INFRA.062`). The formula is realized identically in the blueprints render and in the CLI.
 
 ## A declared domain and its local rendering join both ways
 
-**Each declared domain gets one `{lc-domain}`, its own certificates from the machine's root CA, and an answer from the local resolver** (`RD.INFRA.087` · `RD.INFRA.106`). A declared domain with no local rendering is refused, and so is a local rendering of a domain the platform never declared.
+**Each declared domain gets one `{lc-domain}`, its own certificates from the machine's root CA, and an answer from the local resolver** (`RD.SUPPORT.INFRA.087` · `RD.SUPPORT.INFRA.106`). A declared domain with no local rendering is refused, and so is a local rendering of a domain the platform never declared.
 
 ## The tenancy fixtures
 
-**A grammar cannot be tested; only a host that resolves can.** So the local realization derives numbered hosts for every surface a customer organization owns — `{app}{n}.{lc-domain}`, a surface coded `{root}-{suffix}` composed as `{root}{n}-{suffix}` — and a custom-domain half under `{spd-hyphenated}.lc-test` — `account1.spndemo-app.lc-test` — which the machine's resolver answers, so no fixture needs a hosts line (`RD.INFRA.082` · `RD.INFRA.106`).
+**A grammar cannot be tested; only a host that resolves can.** So the local realization derives numbered hosts for every surface a customer organization owns — `{app}{n}.{lc-domain}`, a surface coded `{root}-{suffix}` composed as `{root}{n}-{suffix}` — and a custom-domain half under `{spd-hyphenated}.lc-test` — `account1.spndemo-app.lc-test` — which the machine's resolver answers, so no fixture needs a hosts line (`RD.SUPPORT.INFRA.082` · `RD.SUPPORT.INFRA.106`).
 
 **The fixtures are derived and declared nowhere.** They stand at platform up, converge as applications register, and are removed whole at platform down. A surface no customer organization owns gets none.

@@ -25,7 +25,7 @@ Find the node root by `spinfrapkg.json` and read the type from `src/spestate.jso
 | --- | --- |
 | codes, regions, `networkIndex` values, environments, sizes, hosting, deploy triggers, schema rows, module rows, app grant rows, package refs, ports | derived names or addresses · discovered identifiers · secrets, ARNs, account ids · provider strings outside a cloud entry |
 
-- **`src/spestate.json` opens on `type`**, with `config` discriminated by its `mtype`. **`spinfrapkg.json` names the publishable artifact** — `name` · `version` (the semver) · `description` · `author` · `license` — and an infra tree holds no `package.json` (RD.INFRA.066).
+- **`src/spestate.json` opens on `type`**, with `config` discriminated by its `mtype`. **`spinfrapkg.json` names the publishable artifact** — `name` · `version` (the semver) · `description` · `author` · `license` — and an infra tree holds no `package.json` (RD.SUPPORT.INFRA.066).
 - **`networkIndex` is append-only, forever** — a freed index is never reused.
 - A module row's `source` is a locator: a path while iterating (`version: null`), a scoped package + semver once published. Keep `hosting` `null` unless there is a real pin to make.
 - **The `apps[]` rows are the cloud grant list** — deploy requires claim (`spkind.config.code`) ∧ grant (`kindCode`). Granting an app is a declaration change here, never anything in the app's own repo.
@@ -47,7 +47,7 @@ The code is a **purpose, never a product** — `idp`, not a vendor name — so s
 
 ## 4 · The identity-only manifest
 
-`src/spestate.json` is `{ "type": "MODULE", "config": null }`; `spinfrapkg.json` gives `name: "@{org}/infra-module-{code}"` with `version` the module's **semver**, plus `description` · `author` · `license` — and no `package.json` beside it (RD.INFRA.066). **Usage stays on the referencing `modules[]` row** — the module defines its variables; the declaring row values them. Nothing about a consumer ever enters the module.
+`src/spestate.json` is `{ "type": "MODULE", "config": null }`; `spinfrapkg.json` gives `name: "@{org}/infra-module-{code}"` with `version` the module's **semver**, plus `description` · `author` · `license` — and no `package.json` beside it (RD.SUPPORT.INFRA.066). **Usage stays on the referencing `modules[]` row** — the module defines its variables; the declaring row values them. Nothing about a consumer ever enters the module.
 
 ## 5 · Renderings derive from the tree
 

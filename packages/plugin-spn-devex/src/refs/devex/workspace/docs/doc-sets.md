@@ -16,7 +16,7 @@
 **Source of truth:** the corpus standard (`04-capabilities/01-devex/04-workspace/04-docs/`), with The Docs Tree construct (`02-constructs/01-devex/04-workspace/04-docs.md`) as the standing one-page view. The repository's `CONCEPT.md` sits above both as an outline: it names the domains and areas a tree divides by, and states no rule of its own. Read this file as a restatement of those chapters, adding none of its own. **The book governs**, so where the three disagree the standard wins and this file is regenerated.
 
 **A repository has ONE docs tree, and it sits at the repository root.** Its seats divide by the
-domains the repository's own concept names, never by the packages it ships (decision RD.DOCS.001). A
+domains the repository's own concept names, never by the packages it ships (decision RD.DEVEX.WORKSPACE.070). A
 node — an app, a package, a module — carries a `README.md` saying what it is and linking into the
 seats it realizes, and carries no seats of its own.
 
@@ -51,14 +51,14 @@ Documentation is not one place. Resolve which surface a change belongs to **befo
 | --- | --- | --- | --- | --- |
 | `CONCEPT.md` | **repository root**, beside `sprepo.json` | what the repo **is** — boundary, domains, surfaces, refusals | `ideate`, one agreed block at a time | the shape moves |
 | `README.md` | repository root | how to get in — identity, children map, doc map | scaffold, then by hand | the children change |
-| `README.md` | **node** root — package, app, module | this node in a paragraph, and links into the seats it realizes. About twenty-five lines, and **none of the house words** (RD.DOCS.021 · RD.DOCS.062) | scaffold, then by hand | the node's identity moves |
+| `README.md` | **node** root — package, app, module | this node in a paragraph, and links into the seats it realizes. About twenty-five lines, and **none of the house words** (RD.DEVEX.WORKSPACE.088 · RD.DEVEX.WORKSPACE.125) | scaffold, then by hand | the node's identity moves |
 | `docs/README.md` | the repository's one docs tree | the tree's face — the seats, and the map | generated map, hand-written identity | the file set changes |
 | seat face | `01-purpose` · `02-constructs` · `03-behaviors` · `04-capabilities` · `05-guides` | the fixed answer, distilled, plus the map below it | `FRAME`, then `develop` | the answer moves |
 | domain folder | beneath a seat, named for a domain the **concept** names | that domain's share of the seat's answer | `plan` lands rows, `develop` proves them | rows land or change |
 | capability chapter | `04-capabilities/<domain>/<package>/`, carrying the number of the **construct** it realizes | what this package does that the pattern does not | `develop` | the construct or the package moves |
 | `registers/` | pocket, **governing nodes only** | the node's own rules and decision log | on a decision | a rule is decided |
 | `artifacts/` | pocket, **authoring nodes only** | what the node authors — a moment captured | on request, never on initiative | someone asks |
-| **intent comment** | every contract method and exported component | why this exists, in one line, harvested into the symbol index | `develop` (decision RD.APPS.006) | the symbol's intent moves |
+| **intent comment** | every contract method and exported component | why this exists, in one line, harvested into the symbol index | `develop` (decision RD.SUPPORT.APPS.006) | the symbol's intent moves |
 
 **Three rules resolve almost every case.**
 
@@ -68,7 +68,7 @@ Documentation is not one place. Resolve which surface a change belongs to **befo
 
 ## Before the shape — `CONCEPT.md`
 
-**A concept belongs to a repo root, never to a node** (decision RD.DOCS.012) — nodes carry `README.md` alone. The repo's `CONCEPT.md` sits at the repository root and states what the repo *is* — its boundary, the sections its shape calls for, the shape drawn, and the open questions.
+**A concept belongs to a repo root, never to a node** (decision RD.DEVEX.WORKSPACE.080) — nodes carry `README.md` alone. The repo's `CONCEPT.md` sits at the repository root and states what the repo *is* — its boundary, the sections its shape calls for, the shape drawn, and the open questions.
 
 - **A root marker, not a corpus document.** No metadata block, no tag line — found by its fixed name, walked by no validator.
 - **It links only to the repo's `artifacts/` and to external sources — nothing else.** A concept sits above what realizes it, so it never links to a seat, a chapter, or a `README`. Cite a decision by id, never by link.
@@ -121,7 +121,7 @@ invents the vocabulary it needs, which is how one noun ends up meaning two thing
 Where a repository has nothing of its own to say in a seat, the face **states what the seat would
 hold** and **cites the repository that owns the answer** — a partner repository references the
 platform's constructs rather than copying them. That face is *generated*, because a citation is
-derivable (decision RD.DOCS.017).
+derivable (decision RD.DEVEX.WORKSPACE.085).
 
 A missing seat and an empty seat read identically from outside. Making the seat present and the
 answer a citation turns absence into a statement with an owner.
@@ -156,9 +156,9 @@ what you meet is a declaration rather than a gap you have to investigate.
 - **The code mirror survives, and it moved to the node.** Every node's `README.md` carries a
   generated list of its source folders with the chapter covering each, so *is this folder
   documented* is still a table rather than a hunt — asked where a developer is standing when they
-  ask it (decision RD.DOCS.078).
+  ask it (decision RD.DEVEX.WORKSPACE.138).
 - **`data-model.md` sits beside the migrations it mirrors** — in the realizing package that owns
-  `src/migrations` — and never in a half that stores nothing (decision RD.DOCS.074). A capability is
+  `src/migrations` — and never in a half that stores nothing (decision RD.DEVEX.WORKSPACE.134). A capability is
   realized by halves and only the server half stores, so that is still one data model per domain: a
   domain has one migrations folder, and placement follows storage. It holds what a migration knows —
   which contract term is stored in which table and column — and defines no term, because the words
@@ -170,7 +170,7 @@ what you meet is a declaration rather than a gap you have to investigate.
   one name, and neither can one domain folder hold both halves' realizations.
 - **Excluded by construction**: a private segment (anything under a `_`-prefixed path), a generated
   folder, build output, and `migrations/`. A migration's useful content is seeding and ordering,
-  which is vocabulary and belongs to the data model (decision RD.DOCS.018).
+  which is vocabulary and belongs to the data model (decision RD.DEVEX.WORKSPACE.086).
 
 Which makes the seat checkable in every direction:
 
@@ -203,7 +203,7 @@ every time — nothing there derives from a node's kind, because there are no no
 | the **source-folder index** | it is generated, never a list somebody maintains | it has **no node to sit on**, because a node's own `README.md` is where it is generated. That is honest rather than a gap: a folder no chapter covers is still reported against the whole tree, which is where that finding belongs |
 
 **The id is never relaxed.** A behaviour with no id cannot be cited, proven later, or found twice —
-and a repository that cannot run a tier today may ship a runner tomorrow (`RD.GOV.024`).
+and a repository that cannot run a tier today may ship a runner tomorrow (`RD.DEVEX.WORKSPACE.176`).
 
 ## What each seat holds
 
@@ -213,7 +213,7 @@ and a repository that cannot run a tier today may ship a runner tomorrow (`RD.GO
 | `01-purpose` | why the repository exists | explains and persuades. Carries **no rules** — normative language here is a defect. It answers four questions — the problem it ends, the payoff of solving that once, what you get, and who it is for — and the check reads for the four answers, never for a file count |
 | `02-constructs` | the model — one file per construct, under a folder per domain | contract terms: what a thing is, what it is made of, what it depends on, what it refuses. **A construct never appears before one it depends on**, and the face carries the order, generated from the declared dependencies and the concept's own sequence |
 | `03-behaviors` | what a person can do — **one file of rows per topic**, beside the construct of the same number, with `personas.md` | in the foundation a **promise**: `Id · Who · Does · Sees · Type`, `Type` reading `PROMISE`, and **no status at all**, because this book ships no code that could write one. In a built repository the row is **proven** and carries the same cells plus `Where`, `Tier`, `Status` and `Updated at`, with a `Names` cell naming the promise it fulfils. Written in the consumer's own words. **A behaviour belongs to the domain that would have to change if the behaviour changed**, which is what its id's prefix names |
-| `04-capabilities` | what must exist for that to be possible — in this book the standard for one topic; in a built repository **one chapter per construct per package that realizes it** | engineering content in the one voice (RD.DOCS.043), and **normative wherever a consumer can violate the statement** — the sequence, the guard, the reason a rule exists (RD.DOCS.034 · RD.DOCS.073; see the altitude note below) |
+| `04-capabilities` | what must exist for that to be possible — in this book the standard for one topic; in a built repository **one chapter per construct per package that realizes it** | engineering content in the one voice (RD.DEVEX.WORKSPACE.106), and **normative wherever a consumer can violate the statement** — the sequence, the guard, the reason a rule exists (RD.DEVEX.WORKSPACE.098 · RD.DEVEX.WORKSPACE.133; see the altitude note below) |
 | `05-guides` | how to use what was realized | task-shaped — install, mount, configure, run. It carries no id and nothing tests it; the face is the adoption path in phases, each naming the guides it takes |
 | `registers/` | the repository's own rules and decisions | lookup material, consulted rather than read start to end |
 | `artifacts/` | the overview and construct pages, and deliberate reports | authored source of truth. Nested folders allowed here and nowhere else; sub-folders carry no README |
@@ -249,7 +249,7 @@ product is not built. The two youngest report SOFT, because a new check ships SO
 glossary one decides whether the shape was worth adopting — a hand-maintained glossary moves drift
 rather than removing it.
 
-**A capability chapter is the spec the code it names realizes** (decisions RD.DOCS.034 · RD.DOCS.073). It is **one chapter per construct per package that realizes it**, under the construct's own domain and carrying its number — `01-iam/module-server-iam-ts/04-sign-in.md`. The per-group mirror it replaced — `cache.md`, `contract.md`, `app.md`, `entry.md`, `ui-*.md` and siblings — is retired: a package's folders are not the reader's question, and 98 of those mirrors ran to 5,000 words restating a pattern the stack's standard already states once. **A chapter has four sections and nothing else**, each one there because something would otherwise be copied into it:
+**A capability chapter is the spec the code it names realizes** (decisions RD.DEVEX.WORKSPACE.098 · RD.DEVEX.WORKSPACE.133). It is **one chapter per construct per package that realizes it**, under the construct's own domain and carrying its number — `01-iam/module-server-iam-ts/04-sign-in.md`. The per-group mirror it replaced — `cache.md`, `contract.md`, `app.md`, `entry.md`, `ui-*.md` and siblings — is retired: a package's folders are not the reader's question, and 98 of those mirrors ran to 5,000 words restating a pattern the stack's standard already states once. **A chapter has four sections and nothing else**, each one there because something would otherwise be copied into it:
 
 | Section | Holds |
 | --- | --- |
@@ -262,11 +262,11 @@ rather than removing it.
 
 **The spec treatment reaches chapters only.** A seat face is a **map** of what the repository contains — *where does what live*, not *what must this code do*. So is the `04-capabilities/README.md` face, which routes, and so is `data-model.md`, which is a glossary. The seat's job differs by what is being documented: a chapter of a construct yields a spec, an index or an orientation yields a map. **Seat tables are in scope for modality; record tables are not** — glossaries, behavior-row tables, data models, registries and proof-gap tables keep their form. Modality comes from the page, never from a sweeper.
 
-**`group` is the source axis; `area` is the top division of a seat.** A group is a published top-level source folder, and it is now the **symbol index's** vocabulary alone — the capabilities seat stopped sharing it the moment a chapter became named for a construct, and what carries the source-folder axis is the generated index on a node's own `README.md` (decision RD.DOCS.078). An **area** is a folder, and the same areas divide all three *What* seats alike, so one number names the model, the rows and the standard of one thing. **The foundation has four — `01-devex` · `02-support` · `03-platform` · `04-launchpad` — and it is the only repository that divides this way** (decision RD.DOCS.071); every other repository divides by domain with no area above it. Three rules bound the level: the concept names the areas, every seat that divides by domain divides the same way or none does, and **an area with no sub-areas holds its topic files directly** rather than a single child folder. **An area is a folder**, and `RD.DOCS.016` states it as one.
+**`group` is the source axis; `area` is the top division of a seat.** A group is a published top-level source folder, and it is now the **symbol index's** vocabulary alone — the capabilities seat stopped sharing it the moment a chapter became named for a construct, and what carries the source-folder axis is the generated index on a node's own `README.md` (decision RD.DEVEX.WORKSPACE.138). An **area** is a folder, and the same areas divide all three *What* seats alike, so one number names the model, the rows and the standard of one thing. **The foundation has four — `01-devex` · `02-support` · `03-platform` · `04-launchpad` — and it is the only repository that divides this way** (decision RD.DEVEX.WORKSPACE.131); every other repository divides by domain with no area above it. Three rules bound the level: the concept names the areas, every seat that divides by domain divides the same way or none does, and **an area with no sub-areas holds its topic files directly** rather than a single child folder. **An area is a folder**, and `RD.DEVEX.WORKSPACE.084` states it as one.
 
 ## The artifacts pocket — concept, overview, construct page
 
-The pocket holds what the node **authors** rather than derives, and its three authored kinds sit at three altitudes of one progression (decision RD.DOCS.039). **Each is earned separately, and none generates the next.**
+The pocket holds what the node **authors** rather than derives, and its three authored kinds sit at three altitudes of one progression (decision RD.DEVEX.WORKSPACE.102). **Each is earned separately, and none generates the next.**
 
 | Kind | Path | Holds | Earned when |
 | --- | --- | --- | --- |
@@ -282,7 +282,7 @@ The pocket holds what the node **authors** rather than derives, and its three au
 
 **An argument does not live here.** An approach document belongs to **the workstream that argues it**, in the workspace's planning centre, and it closes with that workstream. The pocket holds what the repository *states* and what somebody *measured*; where a design was weighed is the workstream's record. A pocket that also held the arguments made the two impossible to tell apart, which is how a stale argument came to be read as a statement of today.
 
-**The folder set is fixed, and adding one is a decision**: `overviews/`, `constructs/`, `reports/` and nothing else. A `resources/` folder for *what a document was written from* is refused by name: every such file is a file some seat needs, and **nothing in a pocket may be depended on** (decision RD.DOCS.078).
+**The folder set is fixed, and adding one is a decision**: `overviews/`, `constructs/`, `reports/` and nothing else. A `resources/` folder for *what a document was written from* is refused by name: every such file is a file some seat needs, and **nothing in a pocket may be depended on** (decision RD.DEVEX.WORKSPACE.138).
 
 ### A construct page has six sections, in one order
 
@@ -305,7 +305,7 @@ The pocket holds what the node **authors** rather than derives, and its three au
 
 **The three sections that carry the argument divide by question** — `Overview` answers why, `Model` answers what, and `Parts` carries the detail of that what, one subsection per piece the `Model` named. **`Terms` comes second because the `Model` uses those words and the `Overview` does not**, and **`Boundary` comes after the parts** because a reader can judge an edge only once they have seen the shape. **The opening above the first heading is a standfirst and a summary, and nothing else**: measured across a workspace, 117 of 117 constructs opened with prose no outline named and no check read, so the orientation stays there and everything that argues moves into `Overview`. `Relations` is retired: the metadata block's `dependsOn` already carries what it listed, one way and machine-readable, and a section restating a declared field is a second copy that drifts.
 
-**A construct types no proof — MUST** (decision RD.DOCS.072). What proves it is the behaviour rows at its own path: `02-constructs/<domain>/<name>.md` is proved by `03-behaviors/<domain>/<name>.md` and by nothing else. A row's `Status` is written by the run that proved it, so never write one. In this book the rows are promises and carry no status at all. What a run proved is read in the repository's `tests` report.
+**A construct types no proof — MUST** (decision RD.DEVEX.WORKSPACE.132). What proves it is the behaviour rows at its own path: `02-constructs/<domain>/<name>.md` is proved by `03-behaviors/<domain>/<name>.md` and by nothing else. A row's `Status` is written by the run that proved it, so never write one. In this book the rows are promises and carry no status at all. What a run proved is read in the repository's `tests` report.
 
 **A construct's status is rolled up from those same rows, and never typed.** Nothing started, or no rows at all, is 🔮 `PLANNING`. Every row `SUCCESS` and carrying a `Tier` is ✅ `DONE`. Anything between the two is 🚧 `IMPLEMENTING`. `MANUAL` counts as started and never as proven, because no run writes it. **A construct in a `FOUNDATION` repository carries no `status` key and no `Status:` chip** — its rows are promises, and a promise has no proof state. Where the mirrored behaviours file is missing altogether, the derivation reports it rather than stamping 🔮 `PLANNING`: no rows means nothing ran, and no file means nothing was measured.
 
@@ -328,7 +328,7 @@ Every page somebody writes by hand is copied from a template, and the templates 
 
 **Seven templates carry the page and seat-file shapes**: `hub-template.html` for the one hub a repository has, `overview-template.html` for one reading path, `construct-template.html` for a produced construct page, `approach-template.html` for a workstream's argument, `construct-seat-template.md` for the seat file an author actually writes, `capability-template.md` for one capability chapter, and `blocks-template.html` for nothing at all — it is the **source** of the sample-block section the four page templates carry.
 
-**They do not share a lifecycle** (decision RD.DOCS.021). Two describe a moment; one renders something live.
+**They do not share a lifecycle** (decision RD.DEVEX.WORKSPACE.088). Two describe a moment; one renders something live.
 
 | Kind | Produced | Its relation to today |
 | --- | --- | --- |
@@ -372,9 +372,9 @@ The marks above are for work in flight. `landed` · `carried` · `deferred` are 
 
 A register row records *what* was decided, never the options that lost or what they would have cost. That is why an approach carries its reasoning in full, and why `Open` cards run deeper than the body around them.
 
-**The suffix names the kind, and the set is closed** (decision RD.DOCS.040). The routing test is one question: *were options weighed and one chosen?* Yes → `-approach`. No → `-overview`. A document with no options, no recommendation and no accepted cost is an overview whichever folder holds it.
+**The suffix names the kind, and the set is closed** (decision RD.DEVEX.WORKSPACE.103). The routing test is one question: *were options weighed and one chosen?* Yes → `-approach`. No → `-overview`. A document with no options, no recommendation and no accepted cost is an overview whichever folder holds it.
 
-- **The overview set is the hub, one page per domain, and one more for every further reading path** (decision RD.DOCS.096). A reading path is a run of constructs somebody reads in order to decide one thing. **The first page in a domain is owed; every one after it is earned** — a hub with nothing beneath it dead-ends at the first click, so the middle rung exists wherever a domain has construct pages at all. `concept-overview.html` is the concept's readable HTML face, the hub, one per repository; `concept-<domain>-overview.html` is a domain's own face, linking that domain's construct pages and carrying its generated glossary.
+- **The overview set is the hub, one page per domain, and one more for every further reading path** (decision RD.DEVEX.WORKSPACE.154). A reading path is a run of constructs somebody reads in order to decide one thing. **The first page in a domain is owed; every one after it is earned** — a hub with nothing beneath it dead-ends at the first click, so the middle rung exists wherever a domain has construct pages at all. `concept-overview.html` is the concept's readable HTML face, the hub, one per repository; `concept-<domain>-overview.html` is a domain's own face, linking that domain's construct pages and carrying its generated glossary.
 - **Every construct the pocket holds is linked from the hub — MUST.** Prove it by listing both sets and diffing them, never by scanning the page. A hub section standing over no construct is a **declared gap**, which is the honest kind and what the next workstream picks up; a construct the hub does not link is an orphan.
 - **Keep reports under their own name** in `reports/`, as `<kind>-report.html`. **There are four kinds and the set is closed**. `audit` asks whether the repository is wired the way the standard says. `code` finds where the source departs from the stack's standards, and `docs` where the corpus departs from the docs standards. `tests` says what the tests have proved and what nothing has proved yet. Each one is replaced in place by the next report of its kind, so a pocket never holds six audits nobody will re-read. A report kept because the moment mattered — an incident, or what one release carried — is dated in its filename and never overwritten, and a fifth kind is a decision entry rather than a new filename. **A report is written by the agent and not produced by a command**: it reads the repository and fills the template, which is how it can name a fault no check could. **A source a seat cites is not the pocket's to hold**, and one sentence decides it: **nothing in a pocket may be depended on.** A pocket once carried a `resources/` folder for *what a document was written from* — and every such file was a file some seat needed, so every one was a seat depending on a pocket. It is gone, and a fact a seat needs lives in a seat: the node's *why* in `01-purpose/`, what consuming it observably does in `03-behaviors/`, its *how* in `05-guides/`. The same sentence keeps the templates with the chapters whose rules they restate, and `schema.sql` in the capabilities seat beside the `data-model.md` it is the authoritative form of (`Q88`).
 - **Nothing here is validated against current state.** An artifact records a moment, so a checker that flags one for disagreeing with today's tree has misread what it is looking at.
@@ -383,7 +383,7 @@ A register row records *what* was decided, never the options that lost or what t
 
 ### Steward, never manufacture
 
-**Coverage never forces an artifact into existence** (decision RD.DOCS.041). A concept section with no overview and no approach document has not needed one yet — a fact worth reading, not a gap worth filling. Four obligations, none of which generate content:
+**Coverage never forces an artifact into existence** (decision RD.DEVEX.WORKSPACE.104). A concept section with no overview and no approach document has not needed one yet — a fact worth reading, not a gap worth filling. Four obligations, none of which generate content:
 
 | Obligation | Fires when | Do |
 | --- | --- | --- |
@@ -400,7 +400,7 @@ A register row records *what* was decided, never the options that lost or what t
 
 **Markdown keeps its own grammar and HTML keeps the blocks.** A capability chapter stays markdown and is never produced as a page, so none of this reaches it. The split is stated in the book: `02-document.md` governs markdown, `05-artifacts.md` governs the page.
 
-**A block is a visual insert, not a section shape.** Normal prose needs no block. Reach for one when the content is *not* a paragraph, a list or a table — a rule the reader must not skim, a picture, a fixed list of doors, a comparison. **The set is closed**: `MUST` · `CATALOG` · `COMPARISON` · `GLOSSARY` · `CODE` · `DIFF` · `TREE` · `PROSE` · `CARDS` · `NEXT`, plus the figure kinds below, and a new kind is a decision rather than an invention. Every block and every figure kind is written out, in the spelling you actually type, in [`blocks.md`](blocks.md) beside this file — read that before authoring a document with figures in it, and read a page template beside it. **Do not open the HTML blocks template**: it is the *rendered* reference a person opens, it costs about 16,400 tokens, and three quarters of it is stylesheet, inline SVG and script that the renderer and the drawer produce for you (decision RD.DOCS.076). Every `dg` example in the markdown form is executed by the drawer's test suite, so an example you copy draws.
+**A block is a visual insert, not a section shape.** Normal prose needs no block. Reach for one when the content is *not* a paragraph, a list or a table — a rule the reader must not skim, a picture, a fixed list of doors, a comparison. **The set is closed**: `MUST` · `CATALOG` · `COMPARISON` · `GLOSSARY` · `CODE` · `DIFF` · `TREE` · `PROSE` · `CARDS` · `NEXT`, plus the figure kinds below, and a new kind is a decision rather than an invention. Every block and every figure kind is written out, in the spelling you actually type, in [`blocks.md`](blocks.md) beside this file — read that before authoring a document with figures in it, and read a page template beside it. **Do not open the HTML blocks template**: it is the *rendered* reference a person opens, it costs about 16,400 tokens, and three quarters of it is stylesheet, inline SVG and script that the renderer and the drawer produce for you (decision RD.DEVEX.WORKSPACE.136). Every `dg` example in the markdown form is executed by the drawer's test suite, so an example you copy draws.
 
 ### The figure kinds
 
@@ -417,7 +417,7 @@ Write the specification in a ```` ```dg ```` fence and the drawer computes every
 
 ### Drawing a `SYSTEM` figure for a module you are looking at
 
-`SYSTEM` is a constrained `MAP` (decision RD.DOCS.075), and it is the kind you will reach for most when documenting a repository. Derive it from the source rather than from a template:
+`SYSTEM` is a constrained `MAP` (decision RD.DEVEX.WORKSPACE.135), and it is the kind you will reach for most when documenting a repository. Derive it from the source rather than from a template:
 
 1. **The container is the module**, and its name is the module's own. Anything outside it is something the module talks to.
 2. **Read `entry/` for the doors.** Each door is its own box — `api`, `cli`, `queue` — and each is met by whatever knocks on it. **Draw the doors the module actually has**: a module with only `api` gets one door, and pretending otherwise draws a fiction.
@@ -437,7 +437,7 @@ Write the specification in a ```` ```dg ```` fence and the drawer computes every
 
 ## Metadata
 
-Every document opens with an invisible block holding **strict JSON**, marked `spn:doc`, followed by the title and a tag line rendered from it (decision RD.DOCS.014).
+Every document opens with an invisible block holding **strict JSON**, marked `spn:doc`, followed by the title and a tag line rendered from it (decision RD.DEVEX.WORKSPACE.082).
 
 ```markdown
 <!-- spn:doc
@@ -457,30 +457,30 @@ Every document opens with an invisible block holding **strict JSON**, marked `sp
 ```
 
 - `stages` is the one optional field — only where a document belongs to one DevEx stage, such as a guide.
-- **There is no `part` and no `altitude`.** Everything else is derived: the **seat** from the path and the **kind** from the node's manifest. The voice is one (RD.DOCS.031). The seat decides what a document carries, never its temperature.
-- **`lenses` are derived from the kind, not authored per page** (decision RD.DOCS.037) — one derivation, two clauses, because runtime says *where code runs* and `lenses` says *who reads it*. A kind you **build on** (support, module, app, client) derives from its declared runtime: `SERVER` → `SERVER_DEV`, `WEB` → `WEB_DEV`, `UNIVERSAL` → both. A kind that **serves building** — `TOOLCHAIN` and `APP_UTILITY`, and only those two — carries both whatever its runtime, because every builder uses it. Read the declared runtime, never parse the name. `ARCHITECT` is added by **seat**, never by kind. A node's doc face (`docs/README.md`) is the orientation page and carries it for every kind, leaf nodes included. The seat faces beneath it (purpose, constructs, behaviors, capabilities, guides, artifacts) carry the derived developer lenses alone. `ARCHITECT` there is authorship a scaffold never emits. The other six lenses are authored, never derived. A page MAY narrow the derived set where its subject genuinely serves one runtime, and MUST NOT widen it. **A scaffold template emits the derived set**, which is what makes generated pages compliant by construction.
+- **There is no `part` and no `altitude`.** Everything else is derived: the **seat** from the path and the **kind** from the node's manifest. The voice is one (RD.DEVEX.WORKSPACE.096). The seat decides what a document carries, never its temperature.
+- **`lenses` are derived from the kind, not authored per page** (decision RD.DEVEX.WORKSPACE.100) — one derivation, two clauses, because runtime says *where code runs* and `lenses` says *who reads it*. A kind you **build on** (support, module, app, client) derives from its declared runtime: `SERVER` → `SERVER_DEV`, `WEB` → `WEB_DEV`, `UNIVERSAL` → both. A kind that **serves building** — `TOOLCHAIN` and `APP_UTILITY`, and only those two — carries both whatever its runtime, because every builder uses it. Read the declared runtime, never parse the name. `ARCHITECT` is added by **seat**, never by kind. A node's doc face (`docs/README.md`) is the orientation page and carries it for every kind, leaf nodes included. The seat faces beneath it (purpose, constructs, behaviors, capabilities, guides, artifacts) carry the derived developer lenses alone. `ARCHITECT` there is authorship a scaffold never emits. The other six lenses are authored, never derived. A page MAY narrow the derived set where its subject genuinely serves one runtime, and MUST NOT widen it. **A scaffold template emits the derived set**, which is what makes generated pages compliant by construction.
 - `id` is identity and **never changes**, however the path does. The path is only its current address.
 - **Status is the state of what the document governs, never of the prose**: `DONE` ✅ · `IMPLEMENTING` 🚧 · `PLANNING` 🔮.
 
 ## One voice — the warm learning register
 
-The corpus speaks one voice (decision RD.DOCS.031, sharpened by RD.DOCS.043 and RD.DOCS.044): **every document is written for someone learning, while law keeps its force in every rule.** Writing or reviewing any doc, apply:
+The corpus speaks one voice (decision RD.DEVEX.WORKSPACE.096, sharpened by RD.DEVEX.WORKSPACE.106 and RD.DEVEX.WORKSPACE.107): **every document is written for someone learning, while law keeps its force in every rule.** Writing or reviewing any doc, apply:
 
 1. **Teach in build-up order** — show the thing, name it, then state its rule; the rule lands as the conclusion of something your reader now understands.
 2. **Talk to your reader** — second person, present tense, active voice; momentum over ceremony. Three moves get you there, and the sentence decides which one fits (below).
-3. **Every rule keeps its teeth** — exact terms, exact constraints, MUST-grammar wherever a statement is normative. Precision is part of the kindness. Force lives in the exact term and the MUST, never in a dense sentence: splitting a normative sentence changes neither (RD.DOCS.043).
+3. **Every rule keeps its teeth** — exact terms, exact constraints, MUST-grammar wherever a statement is normative. Precision is part of the kindness. Force lives in the exact term and the MUST, never in a dense sentence: splitting a normative sentence changes neither (RD.DEVEX.WORKSPACE.106).
 4. **The plain substrate** — one idea per sentence, and the rule stated literally before any story. No load-bearing metaphors, parables, aphorism-led paragraphs, or personification. Bold marks rules and terms, never emphasis; house terms glossed on first use per chapter.
 5. **The warmth budget** — at most one light aside per section, never inside a rule's own sentence; *conversational and friendly without being frivolous*.
 6. **Personas choose content, never temperature** — capabilities speak to engineers, behaviors to product personas; the lens picks the examples.
 7. **The register governs prose, never records** — behavior rows, decision/glossary rows, every table and diagram, contract blocks, and code samples keep their form untouched. A warmed record is a defect.
 8. **The depth guarantee** — a rewrite changes how sentences are written, never what the corpus contains. Every fact, constraint, edge case, table, and diagram survives; rewrites may add examples, never remove substance.
-9. **Artifacts take the voice** (decision RD.DOCS.043) — an approach, an overview and a report take the voice exactly as a seat does. The audience decides the examples and the depth, never the temperature. An HTML page is no exemption.
-10. **Register rows take the plain substrate** (decision RD.DOCS.043) — one clause a sentence, none past twenty-five words, and the decision column is the ruling and nothing else. A decision or glossary row keeps its exact terms and its MUST. No *you* and no aside: a row is still a record.
-11. **No idioms** (decision RD.DOCS.052) — an idiom means something its words do not say, so a reader whose first language is not English cannot guess it. Write the plain phrase instead: *ask me to continue*, never *say the word*. A house term the book defines is not an idiom, and `owes`, `carries`, `seat` and `rung` all stay. The fix is the plain phrase, never a shorter sentence. **Plain is not simplified** — a term can be looked up and an idiom cannot, so terms are not the target. One sentence may carry four of them. What must be plain is the language around them, and the exact term, the constraint and the MUST all survive the rewrite untouched.
+9. **Artifacts take the voice** (decision RD.DEVEX.WORKSPACE.106) — an approach, an overview and a report take the voice exactly as a seat does. The audience decides the examples and the depth, never the temperature. An HTML page is no exemption.
+10. **Register rows take the plain substrate** (decision RD.DEVEX.WORKSPACE.106) — one clause a sentence, none past twenty-five words, and the decision column is the ruling and nothing else. A decision or glossary row keeps its exact terms and its MUST. No *you* and no aside: a row is still a record.
+11. **No idioms** (decision RD.DEVEX.WORKSPACE.115) — an idiom means something its words do not say, so a reader whose first language is not English cannot guess it. Write the plain phrase instead: *ask me to continue*, never *say the word*. A house term the book defines is not an idiom, and `owes`, `carries`, `seat` and `rung` all stay. The fix is the plain phrase, never a shorter sentence. **Plain is not simplified** — a term can be looked up and an idiom cannot, so terms are not the target. One sentence may carry four of them. What must be plain is the language around them, and the exact term, the constraint and the MUST all survive the rewrite untouched.
 
 ### Reaching your reader — three moves
 
-**RD.DOCS.031 asked you to talk to your reader and named no mechanism, so RD.DOCS.044 names three.** Third person is not the fault. A third-person sentence carrying nothing for you is.
+**RD.DEVEX.WORKSPACE.096 asked you to talk to your reader and named no mechanism, so RD.DEVEX.WORKSPACE.107 names three.** Third person is not the fault. A third-person sentence carrying nothing for you is.
 
 | Move | Where it belongs | Reads like |
 | --- | --- | --- |
@@ -492,7 +492,7 @@ The corpus speaks one voice (decision RD.DOCS.031, sharpened by RD.DOCS.043 and 
 - **Never write an imperative on a sentence that names a bound party.** An imperative rebinds the rule from that party to you, which is a different rule. Most of the capabilities seat names a bound party, which is why the clause is the default.
 - **A rule is taught, not only stated.** Beside the rule, give the why — or the symptom that shows the rule was broken. A rule with neither is a line you memorize.
 
-**The bar is a share, and your seat sets it** (decision RD.DOCS.044). Count the prose sentences landing on you by any of the three moves, then divide by the sentences counted.
+**The bar is a share, and your seat sets it** (decision RD.DEVEX.WORKSPACE.107). Count the prose sentences landing on you by any of the three moves, then divide by the sentences counted.
 
 | Seat | Sentences that reach you |
 | --- | --- |
@@ -503,10 +503,10 @@ The corpus speaks one voice (decision RD.DOCS.031, sharpened by RD.DOCS.043 and 
 
 **Watch a share, never a count of occurrences.** Splitting a long sentence is what this standard asks of you, and splitting dilutes a count. So the number to compare before and after is the share.
 
-**Your own instruction surface is in scope** (decision RD.DOCS.031 · RD.DOCS.043 · RD.DOCS.044, stated
+**Your own instruction surface is in scope** (decision RD.DEVEX.WORKSPACE.096 · RD.DEVEX.WORKSPACE.106 · RD.DEVEX.WORKSPACE.107, stated
 at depth in the book's `01-devex/04-workspace/04-docs/01-corpus.md` § What the pattern binds). The voice reaches this book,
 the foundation's provider set, and these plugins — your skills, lenses, agent briefs and reference
-restatements. **It also reaches what you say and print at runtime** (decision RD.DOCS.052). A session
+restatements. **It also reaches what you say and print at runtime** (decision RD.DEVEX.WORKSPACE.115). A session
 banner, a hook's output and your own chat reply are all held to it. Nothing you write escapes
 the bar by not being a file. Layout is what those trees are free of, never how they read. The bars are identical
 everywhere; only the move differs. Say *you* on a page someone reads to learn. Use the **imperative**
@@ -515,30 +515,30 @@ warmer sentence would be less exact about what you must do, keep the sentence an
 under its share. A repo that merely consumes SaaS Plane keeps its own `providers/` folder out of
 scope.
 
-**On that surface, reach is the whole measure** (decision RD.DOCS.048). Two checks count only the
+**On that surface, reach is the whole measure** (decision RD.DEVEX.WORKSPACE.111). Two checks count only the
 typed word — one fires when a page never says *you*, the other when it says it fewer than once in
 twelve sentences. Neither can see an imperative, which is this surface's own move, so both read your
 instruction file as silent when it is anything but. On a provider chapter or a plugin instruction
 file, neither applies. Your reach share is what the checker measures, and it still binds — a page
 that truly reaches nobody is still caught.
 
-**A check reads how a phrase is used, never that it appeared** (decision RD.DOCS.049). You have to
+**A check reads how a phrase is used, never that it appeared** (decision RD.DEVEX.WORKSPACE.112). You have to
 quote the mistake a rule bans, and a domain term is sometimes spelled like an everyday word — *the
 reader tier* is a read facade, not your reader. Neither is a breach. Mark a counter-example as one,
 in italics or backticks, and the checker reads it as quotation. That is the same courtesy a register
 row already gets when it names *you* as a term.
 
-**The share is met honestly or not at all** (decision RD.DOCS.046). Appending a bare `for you` · `to you` · `on you` to a sentence you have otherwise left alone games the counter — it does not meet the share. The check strips the trailing phrase and asks whether what remains still reaches. If it does not, that phrase was carrying the sentence's whole claim on your reader, and it is a finding. It is graded RULE rather than BLOCK. A sentence like `stands them up for you` is real writing that ends the same way. Only you can tell the two apart. **Where a sentence cannot address your reader honestly, leave it as written and let the page sit under its share.** A page at its bar in mechanical prose is worse than one under it in good prose (decision RD.DEVEX.032).
+**The share is met honestly or not at all** (decision RD.DEVEX.WORKSPACE.109). Appending a bare `for you` · `to you` · `on you` to a sentence you have otherwise left alone games the counter — it does not meet the share. The check strips the trailing phrase and asks whether what remains still reaches. If it does not, that phrase was carrying the sentence's whole claim on your reader, and it is a finding. It is graded RULE rather than BLOCK. A sentence like `stands them up for you` is real writing that ends the same way. Only you can tell the two apart. **Where a sentence cannot address your reader honestly, leave it as written and let the page sit under its share.** A page at its bar in mechanical prose is worse than one under it in good prose (decision RD.DEVEX.AGENT.032).
 
-**No external style guide becomes a rule** (decision RD.DOCS.044). The construct is the corpus's own. Keep the reference measurements in the workspace as evidence, and never cite one as authority.
+**No external style guide becomes a rule** (decision RD.DEVEX.WORKSPACE.107). The construct is the corpus's own. Keep the reference measurements in the workspace as evidence, and never cite one as authority.
 
-**The measure** (decisions RD.DOCS.043 · RD.DOCS.044). The check reads the rule's numbers, never the corpus's own average. Over prose only: around fifteen words a sentence, few past twenty-five, none past thirty, *you* present, and your seat's share of reach. A sentence past thirty words is a finding. Prose that never says *you* is a finding, and that clause is the floor against silence — the share above is what you aim at. The fix is one of four moves — **split it · say *you* · define the term · land it on your reader** — never a shorter sentence. The `spn-devex` doc-check hook measures every watched document, and its sweep prints the rates a tranche moves. Reach is reported SOFT for now: the corpus is swept for length, not yet for reach.
+**The measure** (decisions RD.DEVEX.WORKSPACE.106 · RD.DEVEX.WORKSPACE.107). The check reads the rule's numbers, never the corpus's own average. Over prose only: around fifteen words a sentence, few past twenty-five, none past thirty, *you* present, and your seat's share of reach. A sentence past thirty words is a finding. Prose that never says *you* is a finding, and that clause is the floor against silence — the share above is what you aim at. The fix is one of four moves — **split it · say *you* · define the term · land it on your reader** — never a shorter sentence. The `spn-devex` doc-check hook measures every watched document, and its sweep prints the rates a tranche moves. Reach is reported SOFT for now: the corpus is swept for length, not yet for reach.
 
-**No document is exempt by age** (decision RD.DOCS.043). The corpus is swept in the row's order: pilot first, then the argued pages, the book, the stack docs, the register rows. Every diff is reviewed and nothing is removed. The labeled on-ramp form (`**What this is about:**` blocks) is retired; its content folds into a natural opening paragraph.
+**No document is exempt by age** (decision RD.DEVEX.WORKSPACE.106). The corpus is swept in the row's order: pilot first, then the argued pages, the book, the stack docs, the register rows. Every diff is reviewed and nothing is removed. The labeled on-ramp form (`**What this is about:**` blocks) is retired; its content folds into a natural opening paragraph.
 
 ## Documents lead code
 
-Work runs `FRAME` → `DESIGN` → `BUILD` → `PROVE`, and each pass is the next one's contract (decision RD.DOCS.013).
+Work runs `FRAME` → `DESIGN` → `BUILD` → `PROVE`, and each pass is the next one's contract (decision RD.DEVEX.WORKSPACE.081).
 
 | Pass | Convened | Produces | Leaves |
 | --- | --- | --- | --- |

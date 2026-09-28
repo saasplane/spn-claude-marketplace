@@ -111,8 +111,8 @@ This page answers where a suite sits, how it is found, and what it may not compu
 | --- | --- | --- |
 | the foundation's test construct § The test tree | the tier names, and what a passing suite may be read as saying | MUST |
 | the apps provider's `test` step | `tests/` sits at a project's root and never beside the source it proves | MUST |
-| `RD.GOV.024` | this repository is served with docs commands alone, which is why the plugins' own suites are its runner | MUST |
-| `RD.DEVEX.019` | a suite proves a restatement fires; it states no rule of its own | MUST |
+| `RD.DEVEX.WORKSPACE.176` | this repository is served with docs commands alone, which is why the plugins' own suites are its runner | MUST |
+| `RD.DEVEX.UTILS.019` | a suite proves a restatement fires; it states no rule of its own | MUST |
 | the foundation's `04-plugins/02-shape.md` | the staleness case, the parity case, the payload fixture, and the shared harness every plugin's tests owe once it builds | MUST |
 
 Try it: `node packages/plugin-spn-devex/tests/run.mjs`

@@ -4,8 +4,8 @@
     { "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md", "seen": "82d774b8" }
   ],
   "decisions": [
-    { "repo": "spn-foundation", "row": "RD.PLATFORM.033", "seen": "30d6bd2a" },
-    { "repo": "spn-foundation", "row": "RD.PLATFORM.034", "seen": "ffa52f07" }
+    { "repo": "spn-foundation", "row": "RD.PLATFORM.CORE.033", "seen": "30d6bd2a" },
+    { "repo": "spn-foundation", "row": "RD.PLATFORM.CORE.034", "seen": "ffa52f07" }
   ]
 }
 -->
@@ -14,7 +14,7 @@
 
 **For the agent adding a module, a state or a gate**, in any stack. You reach this file at the moment you write the gate, not afterwards. Get the answer wrong and you bake a product decision into code, gate a read, or mint a command nobody else uses. All three have happened in this estate, and each one is named below with the file it happened in.
 
-Source of truth: the foundation book's people-and-access chapter and decisions RD.PLATFORM.033 · RD.PLATFORM.034 in `spn-foundation`. This file restates them for use at the seat and adds no rule of its own. Where the two disagree, the book wins and this file is regenerated.
+Source of truth: the foundation book's people-and-access chapter and decisions RD.PLATFORM.CORE.033 · RD.PLATFORM.CORE.034 in `spn-foundation`. This file restates them for use at the seat and adds no rule of its own. Where the two disagree, the book wins and this file is regenerated.
 
 ## The first question
 
@@ -131,7 +131,7 @@ if (!SUBDOMAIN_OWNER_ORG_TYPES.has(org.orgType)) {
 }
 ```
 
-That set is a product decision — *which organizations may own a subdomain* — written as code. It is the exact shape RD.PLATFORM.033 forbids. The console cannot show it, a platform operator cannot change it, and the type means one thing here and another in the next module. The comment above it argued the product position at length, which is the tell: an argument about what customers get belongs in a cell.
+That set is a product decision — *which organizations may own a subdomain* — written as code. It is the exact shape RD.PLATFORM.CORE.033 forbids. The console cannot show it, a platform operator cannot change it, and the type means one thing here and another in the next module. The comment above it argued the product position at length, which is the tell: an argument about what customers get belongs in a cell.
 
 The fix folded the method under `IAM_MANAGE_APP_SITES` and deleted the set. A product that later sells subdomains to merchants flips a cell instead of buying a release.
 
