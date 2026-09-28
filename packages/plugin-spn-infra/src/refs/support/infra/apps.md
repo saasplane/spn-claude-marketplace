@@ -1,8 +1,14 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/02-constructs/02-support/02-infra/05-apps.md", "seen": "715a77e1" },
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/05-apps/", "seen": "d2d6364e" }
+    {
+      "path": "spn-foundation/docs/02-constructs/02-support/02-infra/05-apps.md",
+      "seen": "05f61ae7"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/05-apps/",
+      "seen": "d2d6364e"
+    }
   ]
 }
 -->

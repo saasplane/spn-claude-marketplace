@@ -1,7 +1,10 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/03-session.md", "seen": "106f550c" }
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/03-session.md",
+      "seen": "f1c5200d"
+    }
   ]
 }
 -->

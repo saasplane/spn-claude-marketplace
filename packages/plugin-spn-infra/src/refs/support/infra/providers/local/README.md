@@ -1,7 +1,10 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/README.md", "seen": "e29eabe8" }
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/README.md",
+      "seen": "e92d4918"
+    }
   ]
 }
 -->

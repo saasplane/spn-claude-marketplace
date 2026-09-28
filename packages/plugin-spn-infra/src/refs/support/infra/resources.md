@@ -1,8 +1,14 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/02-constructs/02-support/02-infra/04-resources.md", "seen": "6c8489d3" },
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/04-resources/", "seen": "b531496e" }
+    {
+      "path": "spn-foundation/docs/02-constructs/02-support/02-infra/04-resources.md",
+      "seen": "357148ad"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/04-resources/",
+      "seen": "89c82ea1"
+    }
   ]
 }
 -->
@@ -81,6 +87,12 @@ A module's resources are its own engine instances, in its own world, under the m
 ## Hosting and size are independent axes
 
 **Hosting selects the rendering family; the pair of workload and size selects the capacity inside it.** A large cluster-hosted database and an extra-small managed one are both expressible, because how much an engine must carry and where it runs are unrelated questions. Cluster hosting exists because a managed service charges for existing rather than for being used — a control plane, a broker floor, an instance hour all arrive before the first query. **Cluster hosting is refused under the `PROD` workload rather than overridden.** The refusal governs the engine families, not everything that runs: a module's own workload is pods in every environment, which is what a hosted vendor has always been.
+
+## A version is written the way its provider names it
+
+**An engine's declared `version` is the string its provider accepts, never a shorter one that reads the same to a person** — a version the provider refuses is found at apply, in the account, long after review. The contract fixes the form per engine: the database takes a major (`16`) or `major.minor`; the cache takes `major.minor` (`7.1`), because the managed caches refuse a bare major from 7 on; the queue takes `major.minor.patch`, or `major.minor.x` where the broker service names a line (`3.7.x`), because the managed broker refuses a two-part version. The contract refuses the wrong shape before a plan is attempted.
+
+**A `CLUSTER` engine runs the local realization's own image, at that image's own tag, and the declared version is the managed service's.** The database's tag agrees with the declared version; the cache's and the queue's need not — the cache's image carries the newest release of its major because no `7.1` is published upstream, and the queue's image is the one the local stack pins, which may lag the declared line. So a `CLUSTER` environment proves the engine family, and the managed version is proven only where it runs — the first apply against an account, never a plan.
 
 ## Storage declares a capability; its provider is derived
 

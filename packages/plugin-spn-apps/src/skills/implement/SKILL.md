@@ -1,11 +1,21 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md", "seen": "ebb9e28f" },
-    { "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md", "seen": "f5707087" }
+    {
+      "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
+      "seen": "636d41f6"
+    },
+    {
+      "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
+      "seen": "18cab28c"
+    }
   ],
   "decisions": [
-    { "repo": "spn-foundation", "row": "RD.SUPPORT.APPS.006", "seen": "bd83376e" }
+    {
+      "repo": "spn-foundation",
+      "row": "RD.SUPPORT.APPS.006",
+      "seen": "b4507306"
+    }
   ]
 }
 -->

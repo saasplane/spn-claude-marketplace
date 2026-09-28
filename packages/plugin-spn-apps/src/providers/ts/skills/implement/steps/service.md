@@ -1,11 +1,26 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/01-server/02-app/01-services.md", "seen": "3e68755d" },
-    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/01-server/02-app/02-repositories.md", "seen": "d147b9b0" },
-    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/06-service.md", "seen": "ecfe531e" },
-    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/07-data.md", "seen": "1607a602" },
-    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/03-structure.md", "seen": "731200fd" }
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/01-server/02-app/01-services.md",
+      "seen": "8e197811"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/01-server/02-app/02-repositories.md",
+      "seen": "d147b9b0"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/06-service.md",
+      "seen": "10177279"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/07-data.md",
+      "seen": "1607a602"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/03-structure.md",
+      "seen": "8285f6e8"
+    }
   ]
 }
 -->

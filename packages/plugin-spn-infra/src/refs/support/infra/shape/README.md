@@ -1,9 +1,18 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/02-constructs/02-support/02-infra/01-shape.md", "seen": "bb6588f9" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md", "seen": "358971e6" },
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/03-blueprints/01-layers.md", "seen": "a1cb123e" }
+    {
+      "path": "spn-foundation/docs/02-constructs/02-support/02-infra/01-shape.md",
+      "seen": "8d9b4633"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
+      "seen": "18cbd178"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/03-blueprints/01-layers.md",
+      "seen": "ec7d0930"
+    }
   ]
 }
 -->

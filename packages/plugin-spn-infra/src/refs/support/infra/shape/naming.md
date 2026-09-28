@@ -1,9 +1,20 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/01-shape/02-coordinates.md", "seen": "a9fd3d6e" },
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/06-modules/02-config.md", "section": "The published vocabulary", "seen": "27924f4c" },
-    { "path": "spn-foundation/docs/02-constructs/02-support/02-infra/06-modules.md", "section": "The rungs, and what a path may be", "seen": "24b787b2" }
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/01-shape/02-coordinates.md",
+      "seen": "eb7f83dd"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/06-modules/02-config.md",
+      "section": "The published vocabulary",
+      "seen": "58af6214"
+    },
+    {
+      "path": "spn-foundation/docs/02-constructs/02-support/02-infra/06-modules.md",
+      "section": "The rungs, and what a path may be",
+      "seen": "8efff768"
+    }
   ]
 }
 -->
@@ -25,7 +36,9 @@
 3. Use typed separators: `-` joins coordinates, `_` joins data-plane tokens, `/` nests. The substrate picks the rendering; coordinates and order never change.
 4. A coordinate drops **only inside a sealed substrate** (namespace, broker, database interior). A cloud account is not sealed — cloud resources always carry full coordinates.
 
-Worked examples: network `spn-dmo-in-dev` · NP cluster `spn-dmo-np-in` · bucket `spn-dmo-in-live-s3-docs` (every bucket composes `…-s3-{name}`) · KMS alias `spn-dmo-in-live`. More of them: IAM role `spn-dmo-in-dev-splt` · log group `/spn-dmo-in-dev/prd/splt` · namespace `in-dev-prd` · registry pair `spn-infra-public|-private`. Note the governance seats: `spn-mgmt` · `spn-internal-cc` · `spn-internal-log` · `spn-internal-audit`.
+Worked examples: network `spn-dmo-in-dev` · NP cluster `spn-dmo-np-in` · bucket `spn-dmo-in-live-s3-docs` (every bucket composes `…-s3-{name}`) · KMS alias `spn-dmo-in-live`. More of them: IAM role `spn-dmo-in-dev-splt` · log group `/spn-dmo-in-dev/prd/splt` · registry pair `spn-infra-public|-private`. Note the governance seats: `spn-mgmt` · `spn-internal-cc` · `spn-internal-log` · `spn-internal-audit`.
+
+**A namespace is the sealed substrate rule 4 names, so it drops `{env}` entirely — plain `{ns}`, never `{env}-{ns}`.** One cluster per environment already seals it, so the coordinate would be redundant rather than merely dropped: `prd` · `plt` · `vnd`, never `in-dev-prd`. A `CLUSTER`-hosted engine inside that namespace is one `StatefulSet` and one `Service`, named `{world}-{family}` — `dmo-database` · `sas-cache` · `dmo-storage` — because a world holds its own engines and the name already carries it.
 
 ## The DNS grammar — uniform `{env}`, no bare hostnames ever
 

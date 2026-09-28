@@ -1,8 +1,14 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/02-constructs/02-support/02-infra/03-blueprints.md", "seen": "92815ff5" },
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/03-blueprints/", "seen": "1038bc8e" }
+    {
+      "path": "spn-foundation/docs/02-constructs/02-support/02-infra/03-blueprints.md",
+      "seen": "70983e15"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/03-blueprints/",
+      "seen": "41bc7c2f"
+    }
   ]
 }
 -->
@@ -30,12 +36,14 @@ The command surface **resolves and drives**; the blueprint library **creates**. 
 | 0 | `GROUND` | company | nothing — it checks what was brought and discovers its coordinates |
 | 1 | `ORGANIZATION` | company | provider accounts, root guardrails, billing boundaries, and the output store as its first act |
 | 2 | `PLATFORM` | product | the product's containers, its two workload accounts, its control accounts and the trust graph between them, its policies, its zone — and what SaaS Plane installs into them: scanners, the runner fleet, and one observability stack per workload |
-| 3 | `ENVIRONMENT` | environment | in order — the network, then the resources that sit in it, then the compute beside them |
+| 3 | `ENVIRONMENT` | environment | in order — the network, then the resources that sit in it, then the compute beside them, then under `CLUSTER` the engines on that compute, and last each world's users and published facts |
 | 4 | `DEPLOYMENTS` | environment | what actually runs |
 
 **These five are the model's layer nouns — `GROUND`, never `BOOTSTRAP`.** `GROUND` has no principals of its own and rides the `organization` command noun; `DEPLOYMENTS` rides the `environment` command noun the same way, so the command surface speaks three nouns for five layers.
 
-**Ordering inside a layer is not a boundary.** `PLATFORM` builds its containers before its accounts before its policies; `ENVIRONMENT` builds its network before the resources that sit in it before the compute beside them. A sequence earns a boundary only where the two sides differ in blast radius or in cadence (`RD.SUPPORT.INFRA.024`). Everything inside one environment goes up together and comes down together.
+**Ordering inside a layer is not a boundary.** `PLATFORM` builds its containers before its accounts before its policies; `ENVIRONMENT` builds its network before the resources that sit in it before the compute beside them before the engines on it. A sequence earns a boundary only where the two sides differ in blast radius or in cadence (`RD.SUPPORT.INFRA.024`). Everything inside one environment goes up together and comes down together.
+
+**Under `CLUSTER`, the engines step is its own — never folded into resources or compute.** It cannot ride the resources step, which runs before any cluster exists; it cannot ride the compute step, because an engine holds data and an environment operation may remove compute while it refuses data — putting an engine there would put data where the removable part is; and it cannot ride the world rendering, because a world mints its users inside a running engine and publishes the engine's address, so the engine must already stand. The step reads the same declaration the resources step reads, and under `MANAGED` it stands nothing, because the provider's own services are the resources step's.
 
 A blueprint library is arranged the way the driver reads it: the seam first, then the provider, then the layer, then the step inside that layer. A second cloud arrives as a sibling folder rather than a change to every path.
 

@@ -1,7 +1,10 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/15-conformance.md", "seen": "c1d304c3" }
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/15-conformance.md",
+      "seen": "a3fa87db"
+    }
   ]
 }
 -->
