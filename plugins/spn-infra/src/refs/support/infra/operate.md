@@ -1,8 +1,8 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/02-constructs/02-support/02-infra/08-operate.md", "seen": "6a07cb06" },
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/08-operate/", "seen": "8a1e26e2" }
+    { "path": "spn-foundation/docs/02-constructs/02-support/02-infra/08-operate.md", "seen": "18c7aba0" },
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/08-operate/", "seen": "df620c8a" }
   ]
 }
 -->
@@ -19,7 +19,7 @@ A running estate owes what a deployment must derive rather than have authored, w
 | Promotion | `SPEstateDeployTagApproval.promotesFrom` | moving an already-proven artifact to the next environment, skipping no rung |
 | Health listener | — | the separate port a long-running process answers probes on, never the serving port |
 | Hostname seam | — | the one door that makes a hostname serve: it issues the certificate and binds it at the edge |
-| Web releases store | — | an environment's own store of immutable web releases, with one mutable configuration document |
+| Web releases store | — | an environment's own store of immutable web releases |
 | Declared state | — | what the manifests say should exist |
 | Actual state | — | what the provider holds right now |
 | Drift | — | a difference between declared and actual, reported rather than corrected without a decision |
@@ -36,7 +36,7 @@ Every field a deployment needs already lives somewhere a person reviewed. If you
 | the deployment's own row (`ns`, `expose`) | its namespace and its exposure — both **declared**, not derived |
 | the environment | the workload's posture, and the capacity its size resolves to |
 
-**A deployment type is the estate's word, mapped to a stack's run modes by that stack's adapter — one artifact, every way in.** An `API` serves behind an edge. A `PROCESSOR` consumes with no inbound surface at all. A `WEB` row ships a bundle with no process. Promotion moves them together, because they are one digest — an API and its processor can never version-skew against each other.
+**A deployment type is the estate's word, mapped to a stack's run modes by that stack's adapter — one artifact, every way in.** An `API` serves behind an edge. A `PROCESSOR` consumes with no inbound surface at all. A `WEB` row ships a bundle with no process. An `API` and its `PROCESSOR` are one digest, so promotion moves them together and they can never version-skew against each other.
 
 **There is no values file per environment.** A file per environment is a place for two environments to drift apart, so nothing of that shape exists to drift.
 
@@ -70,9 +70,11 @@ A long-running process serves its liveness and readiness surfaces from a **separ
 
 ## Build once, promote a digest
 
-An artifact is built exactly once, from one commit, and the same digest is what reaches production.
+An image is built exactly once, from one commit, and the same digest is what reaches production. That is true of every `API` and `PROCESSOR`.
 
-**A rebuild is a new artifact, and a new artifact invalidates every test that ran against the old one — MUST NOT rebuild per environment.** Tags are labels applied to a digest over time; they never change what the artifact is. So *what is running in production* gets a one-word answer, and that word traces to one commit, one build, one test run and one approval — the same chain the trust model states.
+**A rebuild is a new artifact, and a new artifact invalidates every test that ran against the old one — an image MUST NOT be rebuilt per environment.** Tags are labels applied to a digest over time; they never change what the artifact is. So *what is running in production* gets a one-word answer, and that word traces to one commit, one build, one test run and one approval — the same chain the trust model states.
+
+**A `WEB` bundle is the exception.** It carries its environment's values, built in (`RD.APPS.063`), so it is built once per environment. A web promotion moves a build rather than a name, and the bundle that passed non-production is not the bundle production runs.
 
 ## Promotion is declared, not worked out
 
@@ -106,13 +108,12 @@ A publicly exposed web deployment ships a bundle with no process, so its deliver
 
 ```text
 {app}/releases/{hash}/**     immutable — the whole build, one upload per release
-{app}/config.json            the runtime configuration document — the only object that changes
 ```
 
 | Act | What happens |
 | --- | --- |
-| **deploy** | copies the release into the environment's own store, verified by hash; writes the configuration document, repoints the distribution, invalidates only what changed |
-| **promote** | copies from the environment that proved the release |
+| **deploy** | copies the release into the environment's own store, verified by hash; repoints the distribution, invalidates only the short-lifetime class |
+| **promote** | builds the release again with the next environment's values, then deploys it |
 | **rollback** | repoints inside the environment's own history, with no other environment involved |
 
 Files that are publicly readable version by riding the release, so a rollback restores exactly the assets that shipped with that build. **Retention is declared, not accumulated** — the store keeps a stated number of releases, so the rollback window is a number somebody wrote down and growth is bounded by it.
@@ -121,7 +122,7 @@ The cache contract derives from the tree and is rendered twice, never configured
 
 ```text
 /_assets/*   immutable, cached indefinitely   only hashed names can exist there
-/*           short lifetime, invalidated      the entry document, public files, the config document
+/*           short lifetime, invalidated      the entry document, public files
 ```
 
 **No store spans workloads.** Each environment's edge fronts its own store, in its own account, under its own key — a web release reaches another environment only by promotion, never by a shared origin.
@@ -169,7 +170,7 @@ Operate an estate from its declarations, never from inference. Answer against **
 | a namespace named for a team | a blast-radius boundary was used as an org chart |
 | `PUBLIC` exposure outside the `PRD` namespace | the namespace ceiling was bypassed |
 | a `PROCESSOR` declaring anything but `INTERNAL` | a fact about the deployment was written as a choice |
-| an artifact rebuilt for an environment | the tested artifact is not the shipped one |
+| an image rebuilt for an environment | the tested artifact is not the shipped one |
 | a branch claimed by two environments | a merge fans out and running state has no single answer |
 | a tag promoted past a rung it never ran in | the path to production skipped a step |
 | a serving layer with an enumerated host list | a customer touchpoint became a release |

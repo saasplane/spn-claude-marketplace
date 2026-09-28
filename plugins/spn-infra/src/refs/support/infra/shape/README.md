@@ -2,7 +2,7 @@
 {
   "docs": [
     { "path": "spn-foundation/docs/02-constructs/02-support/02-infra/01-shape.md", "seen": "11465bdf" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md", "seen": "07a688b1" },
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md", "seen": "c9a9084f" },
     { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/03-blueprints/01-layers.md", "seen": "f8a5ffba" }
   ]
 }
@@ -56,7 +56,7 @@ The layers are nouns; each takes `plan · up · down · status`. Start them in o
 | `organization` | plan · up · down · status | the machine's trust bootstrap — the CA, its one trust prompt, the shared ingress; `--reset-certs` after CA loss | accounts, root guardrails, registry pairs, zones |
 | `platform` | plan · up · down · status | the platform's container group — engines + each module's local rendering; converges org prerequisites in place | containers, workload accounts, policies, zone, instruments |
 | `environment` | plan · up · down · status — `<env>`, **`--cloud` only** | **no local form exists** — the machine is one environment; targeting it locally is refused by name | network → resources → compute, in order |
-| `app` | up · down | the app's derived converge — schemas, certificates, a hosts entry, the ingress vhost and a web app's runtime document; app from the cwd, `-p` overrides | — (deploys ride the pipeline) |
+| `app` | up · down | the app's derived converge — schemas, certificates, a hosts entry and the ingress vhost; app from the cwd, `-p` overrides | — (deploys ride the pipeline) |
 
 **Every provisioning run names its mode, and there is no default** (RD.INFRA.094). `up` and `down` each take exactly one of `--plan` or `--apply`. A command that plans when you forget a flag is a command doing another command's job, and a default would decide the direction of the mistake for you.
 

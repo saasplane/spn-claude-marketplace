@@ -1,8 +1,8 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/02-constructs/02-support/01-apps/05-app.md", "seen": "9fa8eb7d" },
-    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/05-app/", "seen": "3d14c381" }
+    { "path": "spn-foundation/docs/02-constructs/02-support/01-apps/05-app.md", "seen": "f82fcbd1" },
+    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/05-app/", "seen": "b2bd0dec" }
   ]
 }
 -->
@@ -246,7 +246,7 @@ A web application asks the same two questions a server does — how does it come
 
 **Presentation is a boot phase, and only here** — style layers resolve by load order, so a correct set loaded in the wrong sequence is wrong in a way no single layer's own test catches. There is no migration step, because a web application owns no schema. There is **no module registration** — a web surface's modules are composed by its router, so composition happens at navigation rather than at startup. And configuration is already resolved when it starts, arriving as build-time values rather than being read — which is why a web surface cannot be reconfigured without rebuilding it.
 
-**Assembly is import order, not a phased boot.** The app manager assembles the typed app config and the web providers (logger, auth) at page load — the two runtime addresses it needs (`apiBaseUrl`, `authHubUrl`) arrive in the runtime configuration document fetched same-origin, beside the bundle. **Composition by import**: the app composes UI module packages by importing their pages and URL builders, the router mounts module screens lazily, and registering a module is an import plus a route entry — nothing else in the app knows it exists. **The shell is a module too** — the router, the composition root, the app context and navigation live in the application's own `boot` module, so the `src` root stays the frame. **One client**: every data call flows through the API client; a web app never hand-writes an HTTP client and never talks to storage directly. Sessions arrive through the platform's session transport; the app consumes it and never implements it.
+**Assembly is import order, not a phased boot.** The app manager assembles the typed app config and the web providers (logger, auth) at page load — the two addresses it needs (`apiBaseUrl`, `authHubUrl`) are built into the bundle, so nothing is fetched first. **Composition by import**: the app composes UI module packages by importing their pages and URL builders, the router mounts module screens lazily, and registering a module is an import plus a route entry — nothing else in the app knows it exists. **The shell is a module too** — the router, the composition root, the app context and navigation live in the application's own `boot` module, so the `src` root stays the frame. **One client**: every data call flows through the API client; a web app never hand-writes an HTTP client and never talks to storage directly. Sessions arrive through the platform's session transport; the app consumes it and never implements it.
 
 **Teardown is best-effort and cannot be awaited.** The exit signal fires both when a surface is closed and when it is navigated away and cached, so nothing may block on the work it starts. **A web surface never boots into a privileged state** — everything it can do it could do from a reload, so the guard is the server refusing the call, never the boot order.
 
@@ -261,7 +261,7 @@ public/   copies verbatim → dist root     stable names — the author's chrome
 
 `_assets/` is reserved so the cache contract can depend on only hashed names living there; `public/` is chrome — well-known files and small media — never product content, which belongs to the platform's own document store.
 
-**The bundle is environment-free.** No runtime fact is baked in, so the build happens once and its content hash is the release. A deployed bundle instead reads the runtime configuration document at load — written per environment by the deploy, carrying exactly the public-safe keys a page needs. **The document is public by definition**, so a secret-shaped value inside it is refused at composition. A deployed web application builds no image at all: its artifact is the bundle, whole, delivered as a copy into the environment's release store and a pointer move — never a second horizontal-scaling decision, because static serving scales by the host rather than by the app.
+**The bundle carries its environment.** It is built once per environment, and the two addresses a page needs are build-time values: one committed file per environment, holding no credentials, which a value from the shell or the pipeline overrides. **Everything built in is public by definition**, so a secret never reaches the bundle. A required value that is missing stops the page at start and names the key, rather than falling back to a plausible default. The cost is stated in `RD.APPS.063`: the bundle that passed non-production is not the bundle production runs. A deployed web application builds no image at all: its artifact is the bundle, whole, delivered as a copy into the environment's release store and a pointer move — never a second horizontal-scaling decision, because static serving scales by the host rather than by the app.
 
 ## What an application owns that a module never does
 

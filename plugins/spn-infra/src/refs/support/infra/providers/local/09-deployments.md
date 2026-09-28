@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/09-deployments.md", "seen": "e393e3f5" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/09-deployments.md", "seen": "f9d7b1d3" }
   ]
 }
 -->
@@ -25,7 +25,6 @@
 | a leaf certificate pair per served host | the machine's own certificate authority |
 | a hosts entry per served host, resolving to loopback | the local domain of the zone the row binds to |
 | one vhost file in the shared ingress directory | the proxy the organization layer stood |
-| a web application's runtime document | the composed environment for that deployment |
 
 **`spnutils infra domain register` routes one or more hosts through the same proxy**, which is how a customer-owned domain is exercised locally.
 
