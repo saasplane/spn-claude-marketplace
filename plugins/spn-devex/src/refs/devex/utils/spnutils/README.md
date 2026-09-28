@@ -2,7 +2,7 @@
 {
   "docs": [
     { "path": "spn-foundation/docs/02-constructs/01-devex/03-utils/01-spnutils.md", "seen": "b4f9de0b" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md", "seen": "04d58a37" }
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md", "seen": "dc585109" }
   ]
 }
 -->

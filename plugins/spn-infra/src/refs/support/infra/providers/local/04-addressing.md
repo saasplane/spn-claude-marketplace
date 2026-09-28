@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/04-addressing.md", "seen": "ee1e8558" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/04-addressing.md", "seen": "5e40d062" }
   ]
 }
 -->
@@ -19,7 +19,7 @@
 
 ## Hosts resolve to loopback, and the port carries the transport
 
-**Every local host resolves to `127.0.0.1`**, answered by the resolver the organization layer installs for the local domain and `lc-test`, so no host needs an `/etc/hosts` line, nothing is proxied and no engine protocol is intercepted. **A host the running platform creates carries no environment prefix here** — `acme.lc-spndemo.app`, never `in-dev-acme…`. Engines are named like every other service, and the derived port stays the transport distinguisher — `dmo-database.lc-spndemo.app:9210` (`RD.INFRA.079`).
+**Every local host resolves to `127.0.0.1`**, answered by the resolver the organization layer installs for every local domain and `lc-test`, so no host needs an `/etc/hosts` line, nothing is proxied and no engine protocol is intercepted. **A host the running platform creates carries no environment prefix here** — `acme.lc-spndemo.app`, never `in-dev-acme…`. Engines are named like every other service, and the derived port stays the transport distinguisher — `dmo-database.lc-spndemo.app:9210` (`RD.INFRA.079`).
 
 **A space's engine ports derive** from the platform family's port plus one hundred for each space, the family's own secondary offsets riding along (`RD.INFRA.062`). The formula is realized identically in the blueprints render and in the CLI.
 
@@ -29,6 +29,6 @@
 
 ## The tenancy fixtures
 
-**A grammar cannot be tested; only a host that resolves can.** So the local realization derives numbered hosts for every surface a customer organization owns — `{app}{n}.{lc-domain}`, a surface coded `{root}-{suffix}` composed as `{root}{n}-{suffix}` — and a custom-domain half under `{spd-hyphenated}.test`, reserved by RFC 6761 so it can neither resolve publicly nor shadow a real registration (`RD.INFRA.082`).
+**A grammar cannot be tested; only a host that resolves can.** So the local realization derives numbered hosts for every surface a customer organization owns — `{app}{n}.{lc-domain}`, a surface coded `{root}-{suffix}` composed as `{root}{n}-{suffix}` — and a custom-domain half under `{spd-hyphenated}.lc-test` — `account1.spndemo-app.lc-test` — which the machine's resolver answers, so no fixture needs a hosts line (`RD.INFRA.082` · `RD.INFRA.106`).
 
 **The fixtures are derived and declared nowhere.** They stand at platform up, converge as applications register, and are removed whole at platform down. A surface no customer organization owns gets none.

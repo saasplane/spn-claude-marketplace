@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/02-constructs/02-support/02-infra/08-operate.md", "seen": "a3897b34" },
+    { "path": "spn-foundation/docs/02-constructs/02-support/02-infra/08-operate.md", "seen": "b75b6979" },
     { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/08-operate/", "seen": "12b780c3" }
   ]
 }
@@ -18,7 +18,7 @@ A running estate owes what a deployment must derive rather than have authored, w
 | Trigger | `SPEstateDeploy` | what starts a deployment into one environment: a branch, an approved tag, or a person |
 | Promotion | `SPEstateDeployTagApproval.promotesFrom` | moving an already-proven artifact to the next environment, skipping no rung |
 | Health listener | — | the separate port a long-running process answers probes on, never the serving port |
-| Hostname seam | — | the one door that makes a hostname serve: it issues the certificate, binds it at the edge and writes the host's route |
+| Edge seam | — | the one door that makes a hostname serve: it issues the certificate, binds it at the edge and writes the host's route |
 | Web releases store | — | an environment's own store of immutable web releases |
 | Declared state | — | what the manifests say should exist |
 | Actual state | — | what the provider holds right now |
@@ -90,7 +90,7 @@ A branch **MUST** be claimed by at most one environment per platform — otherwi
 
 ## The serving contract is dynamic
 
-Routing is data: a new customer surface is a row, never a release. **A customer's hostname is issued and bound when the request to serve it arrives, through the hostname seam, and never by an apply** (`RD.INFRA.084`). The serving layer's certificate set changes as hosts are bound, not as infrastructure is applied. A customer subdomain rides the declared domain's wildcard certificate; a customer's own domain rides the certificate the seam issued for it.
+Routing is data: a new customer surface is a row, never a release. **A customer's hostname is issued and bound when the request to serve it arrives, through the edge seam, and never by an apply** (`RD.INFRA.084`). The serving layer's certificate set changes as hosts are bound, not as infrastructure is applied. A customer subdomain rides the declared domain's wildcard certificate; a customer's own domain rides the certificate the seam issued for it.
 
 **A host the system creates carries `{env}` in every cloud environment, production included, and none locally.** **The running platform writes routes and never DNS**, and a customer-owned domain's DNS is the customer's.
 
