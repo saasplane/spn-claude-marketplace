@@ -24,25 +24,25 @@ cd /opt/work/saasplane/code/spn-claude-marketplace
 node plugins/spn-devex/tests/run.mjs
 ```
 
-Every file named `t-*.mjs` beside the runner is a suite, and they run in name order. The output is one line per suite and a tally:
+Every file named `t-*.mjs` under `plugins/spn-devex/tests/unit/` is a suite, found by walking the folder rather than read from a list, and they run in path order. A suite sits at the path of the source file it proves, so the test for `src/scripts/checks/doc-check.ts` is `tests/unit/scripts/checks/t-doc-check.mjs`. The output is one line per suite and a tally:
 
 ```
-  ok    t-doc-check.mjs          all 18 passed
-  ok    t-docs.mjs               all 84 passed
-  ok    t-seats.mjs              all 86 passed
+  ok    unit/scripts/checks/t-doc-check.mjs all 24 passed
+  ok    unit/scripts/t-seats.mjs all 123 passed
+  ok    unit/scripts/tools/t-docs.mjs all 157 passed
 
-  13 suite(s) · 459 case(s) · all passing
-  0 case(s) carry a behaviour id -> docs/artifacts/reports/spn-tests.json
+  20 suite(s) · 758 case(s) · all passing
+  0 case(s) carry a behaviour id -> tests/.output/unit/spn-tests.json
 ```
 
-A suite whose last line is not `all N passed` is printed as `FAIL`, with its own last line beside it. The tally then names how many suites are failing rather than how many cases passed.
+A suite that exits non-zero, or whose last line does not count its passes, is printed as `FAIL`, with its own last line and its exit code beside it. The tally then names how many suites are failing rather than how many cases passed.
 
 ## Run one suite
 
 A suite is an ordinary program, so you run it directly while you iterate on the check it covers:
 
 ```bash
-node plugins/spn-devex/tests/t-doc-check.mjs
+node plugins/spn-devex/tests/unit/scripts/checks/t-doc-check.mjs
 ```
 
 On its own it prints every case — `PASS` or `FAIL`, then the title — under the heading of the behaviour being exercised. That is the level to work at while a check is moving, because the aggregate view drops everything but the last line.
@@ -53,8 +53,8 @@ On its own it prints every case — `PASS` or `FAIL`, then the title — under t
 
 | What you see | What it actually means |
 | --- | --- |
-| `all passing` in the tally | every suite's own last line reported a clean pass |
-| a `FAIL` line | that suite's last line was something else — including a crash, which reports as `CRASHED` |
+| `all passing` in the tally | every suite exited clean and its last line counted its passes |
+| a `FAIL` line | that suite exited non-zero or its last line counted nothing — a crash reports as `CRASHED` |
 | `N case(s) carry a behaviour id` | how many assertions spoke for a register row; the rest spoke only for themselves |
 | `py [not installed]` inside a case | the Python arm is gone, so only the TypeScript check ran |
 
@@ -64,7 +64,7 @@ On its own it prints every case — `PASS` or `FAIL`, then the title — under t
 
 ## What a run writes down
 
-Every run writes `docs/artifacts/reports/spn-tests.json`, whether or not anything carried an id. An empty result set is itself a fact about the run, and an absent file would read as a run that never happened.
+Every run writes `tests/.output/unit/spn-tests.json` at the repository root, whether or not anything carried an id. An empty result set is itself a fact about the run, and an absent file would read as a run that never happened.
 
 A case speaks for a behaviour row when its **title carries the row's id in brackets** — `[MKT.DOCS.01]`, for instance. The runner reads the id out of the title, and the case becomes a result under that id. A title with no id proves nothing to the register and is counted only in the tally, which is correct: a register row is a promise somebody made, not every assertion anybody wrote.
 

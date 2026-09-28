@@ -39,5 +39,5 @@ Every row below is declared and none is claimed: a run writes the last two cells
 
 | Retired | Re-issued as |
 | --- | --- |
-| `MKT.AGENT.01` – `MKT.AGENT.02` | `MKT.AGENTS.01` – `MKT.AGENTS.06`, in order |
-| `MKT.LENS.01` – `MKT.LENS.02` | `MKT.AGENTS.07` – `MKT.AGENTS.12`, in order |
+| `MKT.AGENT.01` – `MKT.AGENT.06` | `MKT.AGENTS.01` – `MKT.AGENTS.06`, in order |
+| `MKT.LENS.01` – `MKT.LENS.06` | `MKT.AGENTS.07` – `MKT.AGENTS.12`, in order |

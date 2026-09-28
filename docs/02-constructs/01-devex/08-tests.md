@@ -64,7 +64,7 @@ The tree sits at the plugin's root rather than beside the source, so a suite is 
 
 ### The mirror repeats the source's own path
 
-Under the tier, a suite sits at the path its source sits at inside the plugin. A check under `src/scripts/checks/` is proven under `unit/scripts/checks/`, and a provider's rule under `src/providers/<instance>/checks/_<subject>/` is proven under `unit/providers/<instance>/checks/_<subject>/`. Nothing maps one to the other: the path is the map.
+Under the tier, a suite sits at the path its source sits at inside the plugin. A check under `src/scripts/checks/` is proven under `unit/scripts/checks/`. A provider's rule is the one place the two paths differ: it lives under `src/providers/<instance>/scripts/checks/_<subject>/` and is proven under `unit/providers/<instance>/checks/_<subject>/`, without the provider's `scripts/` segment. Apart from that, nothing maps one to the other: the path is the map.
 
 ### The folders are the convention; the framework is not
 

@@ -29,13 +29,13 @@ domain, with no area above them, and a domain **is a plugin** — so the same th
 
 | Domain | Describes | Its constructs |
 | --- | --- | --- |
-| [`01-spn-devex`](docs/02-constructs/01-spn-devex/README.md) | the stack-agnostic plugin | the plugin set, the hook set, the loop events, the checks, the tools, the pages, the skills, the refs, the lenses, the agents |
-| [`02-spn-apps`](docs/02-constructs/02-spn-apps/README.md) | the apps domain, stack-agnostic with its stacks inside it | its checks by subject, its parsers per stack, its skills and refs |
-| [`03-spn-infra`](docs/02-constructs/03-spn-infra/README.md) | the estate plugin | the estate guard, its skills, its refs |
+| [`01-devex`](docs/02-constructs/01-devex/README.md) | `spn-devex`, the stack-agnostic plugin | plugin · hooks · agents · skills · scripts · refs · providers · tests |
+| [`02-apps`](docs/02-constructs/02-apps/README.md) | `spn-apps`, the apps domain, stack-agnostic with its stacks inside it | plugin · hooks · skills · scripts · refs · providers · tests |
+| [`03-infra`](docs/02-constructs/03-infra/README.md) | `spn-infra`, the estate plugin | plugin · hooks · skills · scripts · refs · providers · tests |
 
 Under [`04-capabilities/`](docs/04-capabilities/README.md) the level below a domain is the
 package that realizes it, and **here the package is the plugin itself** — so a domain holds
-exactly one folder of the same name, `01-spn-devex/spn-devex/`. That is the plugin tree mirrored:
+exactly one folder named for that plugin, `01-devex/spn-devex/`. That is the plugin tree mirrored:
 one chapter per construct, and the chapter names what the plugin actually ships.
 
 `docs/registers/` holds [`decisions.md`](docs/registers/decisions.md) alone.

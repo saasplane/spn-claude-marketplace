@@ -15,15 +15,18 @@
 
 You consult a pocket; you never read it through. That is why it carries no number, and why it sits outside the five seats the 📖 walk crosses in order.
 
-**The folder set is fixed**: `overviews/`, `constructs/`, `reports/` and nothing else. A folder here is earned, so this pocket carries only what this repository actually authors — today that is the concept hub, the construct pages produced from their seat files, and one report.
+**The folder set is fixed**: `overviews/`, `constructs/`, `reports/` and nothing else. A folder here is earned, so this pocket carries only what this repository actually authors — today that is the concept hub, one overview per domain, and the construct pages produced from their seat files.
 
 ## Overviews
 
-The hub gives [`CONCEPT.md`](../../CONCEPT.md) a readable face. It borrows the concept's own headings, in the concept's own order, and it stops well short of the concept's depth.
+The hub gives [`CONCEPT.md`](../../CONCEPT.md) a readable face. It borrows the concept's own headings, in the concept's own order, and it stops well short of the concept's depth. Below it, each domain has one overview, which takes that domain's constructs in reading order and links each construct page.
 
 | Document | Explains | Status |
 | --- | --- | --- |
-| [concept-overview](overviews/concept-overview.html) | the whole model — what the repository owns and what it refuses, the partner and the builder who hold different halves of it, the five instrument kinds it divides by, and why it declares no world | 🚧 |
+| [concept-overview](overviews/concept-overview.html) | the whole model — what the repository owns and what it refuses, the partner and the builder who hold different halves of it, the five instrument kinds it divides by, and why it declares `GENERAL` | 🚧 |
+| [concept-devex-overview](overviews/concept-devex-overview.html) | `spn-devex`, one folder at a time — what each folder a plugin can ship is for | — |
+| [concept-apps-overview](overviews/concept-apps-overview.html) | `spn-apps`, one folder at a time — and the one folder allowed to name a language | — |
+| [concept-infra-overview](overviews/concept-infra-overview.html) | `spn-infra`, one folder at a time — and the boundary that no folder changes a cloud | — |
 
 There is **one hub per repository**, and it is replaced in place as the concept moves. A hub section with no argument behind it carries a declared gap rather than reading as settled; when one is argued, the argument lands in the workstream that argued it and the section links to it.
 
@@ -31,13 +34,13 @@ There is **one hub per repository**, and it is replaced in place as the concept 
 
 One page per construct, **produced from its seat file and never edited by hand**. Edit the seat under [`02-constructs/`](../02-constructs/README.md) and produce the page again; a page that disagrees with its seat is a defect the audit reports.
 
-| Page | States |
+The pages sit in one folder per domain, mirroring the constructs seat, and each domain's overview links every page in it.
+
+| Folder | Holds the pages for |
 | --- | --- |
-| [Plugin Set](constructs/01-devex/01-plugin-construct.html) | what a plugin is, and what the set of them covers |
-| [Hook Set](constructs/01-devex/02-hooks-construct.html) | what a hook is, and when each fires |
-| [Skill Set](constructs/01-devex/04-skills-construct.html) | what a skill is, and what invoking one does |
-| [Ref Set](constructs/01-devex/06-refs-construct.html) | what a ref restates, and from which chapter |
-| [Agent Set](constructs/01-devex/03-agents-construct.html) | what an agent is, and which lens each carries |
+| [`constructs/01-devex/`](constructs/01-devex/) | `spn-devex` — plugin, hooks, agents, skills, scripts, refs, providers, tests |
+| [`constructs/02-apps/`](constructs/02-apps/) | `spn-apps` — plugin, hooks, skills, scripts, refs, providers, tests |
+| [`constructs/03-infra/`](constructs/03-infra/) | `spn-infra` — plugin, hooks, skills, scripts, refs, providers, tests |
 
 ## Reports
 

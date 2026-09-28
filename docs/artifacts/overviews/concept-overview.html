@@ -7,7 +7,7 @@
   "parentId": "concept",
   "title": "Concept",
   "lenses": ["ARCHITECT", "SERVER_DEV", "PARTNER"],
-  "summary": "The marketplace's model at reading depth: what it owns and what it refuses, the two readers who hold different halves of it, the five instrument kinds it divides by, and why it declares no world at all.",
+  "summary": "The marketplace's model at reading depth: what it owns and what it refuses, the two readers who hold different halves of it, the five instrument kinds it divides by, and why it declares GENERAL, the world with no stack in it.",
   "keywords": ["concept", "overview", "marketplace", "plugins", "hooks", "skills", "refs", "agents"]
 }
 -->
@@ -275,7 +275,7 @@
   rules and runs them at the moment somebody is working.</p>
   <div class="hero-meta">
     <span>3 plugins</span><span>5 instrument kinds</span>
-    <span>no sprepo.json</span><span>public, while the book is not</span>
+    <span>declares GENERAL</span><span>public, while the book is not</span>
   </div>
 </header>
 
@@ -426,7 +426,8 @@
 
   <h3 id="d1">devex &mdash; <code>spn-devex</code></h3>
   <p>The stack-agnostic plugin, and the one every repository loads. Its constructs are in
-  <a href="../../02-constructs/01-devex/README.md"><code>02-constructs/01-devex/</code></a>.</p>
+  <a href="../../02-constructs/01-devex/README.md"><code>02-constructs/01-devex/</code></a>, and
+  read one folder at a time in <a href="concept-devex-overview.html">the devex overview</a>.</p>
 
   <p>The risk in dividing by delivery is that somebody with a general question has to guess which
   plugin answers it. <strong>It does not arise, because a grammar shared by all three lives in
@@ -446,13 +447,15 @@
   of one stack and nowhere else, a tool over that stack's own register, and the skills that can
   only be said in its own words. A skill that is stack-agnostic stays in <code>spn-devex</code>
   and reaches a concrete step through a ref here, rather than being copied. Its constructs are in
-  <a href="../../02-constructs/02-apps/README.md"><code>02-constructs/02-apps/</code></a>.</p>
+  <a href="../../02-constructs/02-apps/README.md"><code>02-constructs/02-apps/</code></a>, and
+  read one folder at a time in <a href="concept-apps-overview.html">the apps overview</a>.</p>
 
   <h3 id="d3">infra &mdash; <code>spn-infra</code></h3>
   <p>The estate plugin. It holds what changes an estate: one shell script standing between an
   estate edit and the file it would write, the skills that change what an estate is, and the
   estate's own vocabulary restated for a reader who may never open the book. Its constructs are in
-  <a href="../../02-constructs/03-infra/README.md"><code>02-constructs/03-infra/</code></a>.</p>
+  <a href="../../02-constructs/03-infra/README.md"><code>02-constructs/03-infra/</code></a>, and
+  read one folder at a time in <a href="concept-infra-overview.html">the infra overview</a>.</p>
 </section>
 
 <!-- ─────────────────────────────────────────── 04 -->
@@ -546,7 +549,7 @@
       <td><a href="../../05-guides/01-install-the-plugins.md">the install guide</a>, which names
       the commands in order</td></tr>
     <tr><td>to prove the hooks still work</td>
-      <td><code>node plugins/spn-devex/hooks/tests/run.mjs</code>, the suite runner this
+      <td><code>node plugins/spn-devex/tests/run.mjs</code>, the suite runner this
       repository carries</td></tr>
     <tr><td>the rules themselves, rather than the code that runs them</td>
       <td>the foundation book. If you hold only this tree, the

@@ -36,4 +36,4 @@ An id is identity and is never reused, so a chapter that took over a promise re-
 
 | Retired | Re-issued under |
 | --- | --- |
-| ~~MKT.TSSKILL.01~~ … ~~MKT.TSSKILL.02~~ | `MKT.SKILLS.*` above |
+| ~~MKT.TSSKILL.01~~ … ~~MKT.TSSKILL.07~~ | `MKT.SKILLS.*` above |

@@ -41,5 +41,5 @@ Every row below is declared and none is claimed: a run writes the last two cells
 
 | Retired | Re-issued as |
 | --- | --- |
-| `MKT.HOOK.01` – `MKT.HOOK.02` | `MKT.HOOKS.01` – `MKT.HOOKS.07`, in order |
-| `MKT.LOOP.01` – `MKT.LOOP.02` | `MKT.HOOKS.08` – `MKT.HOOKS.14`, in order |
+| `MKT.HOOK.01` – `MKT.HOOK.07` | `MKT.HOOKS.01` – `MKT.HOOKS.07`, in order |
+| `MKT.LOOP.01` – `MKT.LOOP.07` | `MKT.HOOKS.08` – `MKT.HOOKS.14`, in order |

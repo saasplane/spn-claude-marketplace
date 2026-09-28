@@ -172,7 +172,7 @@
 <div class="page">
 
 <nav class="rail" id="rail">
-  <a class="home" href="../../../02-constructs/README.md">&larr; the model</a>
+  <a class="home" href="../../overviews/concept-devex-overview.html">&larr; spn-devex — The Stack-Agnostic Domain</a>
   <div class="rail-title">Tests — The Tier, the Mirror, and a Runner That Walks</div>
 </nav>
 <div class="wrap">
@@ -263,7 +263,7 @@
   <h3 id="what-the-folder-holds-and-the-two-tiers-">What the folder holds, and the two tiers that are absent</h3>
   <p><code>tests/</code> holds the runner, a <code>helpers/</code> folder for what every suite imports, and one folder per tier. Only <code>unit/</code> exists. <code>integration/</code> is absent because nothing in these plugins runs at that tier, and <code>setup/</code> is absent because the runner needs none. <strong>An absent folder says what is true; a folder standing empty to look complete teaches a reader that the tier works.</strong></p>
   <h3 id="the-mirror-repeats-the-source-s-own-path">The mirror repeats the source's own path</h3>
-  <p>Under the tier, a suite sits at the path its source sits at inside the plugin. A check under <code>src/scripts/checks/</code> is proven under <code>unit/scripts/checks/</code>, and a provider's rule under <code>src/providers/&lt;instance&gt;/checks/_&lt;subject&gt;/</code> is proven under <code>unit/providers/&lt;instance&gt;/checks/_&lt;subject&gt;/</code>. Nothing maps one to the other: the path is the map.</p>
+  <p>Under the tier, a suite sits at the path its source sits at inside the plugin. A check under <code>src/scripts/checks/</code> is proven under <code>unit/scripts/checks/</code>. A provider's rule is the one place the two paths differ: it lives under <code>src/providers/&lt;instance&gt;/scripts/checks/_&lt;subject&gt;/</code> and is proven under <code>unit/providers/&lt;instance&gt;/checks/_&lt;subject&gt;/</code>, without the provider's <code>scripts/</code> segment. Apart from that, nothing maps one to the other: the path is the map.</p>
   <h3 id="the-folders-are-the-convention-the-frame">The folders are the convention; the framework is not</h3>
   <p>The authoring stack's own test step names a framework as well as a tree, and only the tree is adopted here. These suites drive real hook processes through standard input and assert on what comes back out, so a framework would wrap a subprocess harness in another harness and buy nothing. <strong>The runner stays a plain <code>.mjs</code> file with no dependency</strong>, which is also what lets a partner run it with nothing installed.</p>
   <h3 id="nothing-counts-a-hop">Nothing counts a <code>..</code> hop</h3>

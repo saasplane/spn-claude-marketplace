@@ -1,27 +1,29 @@
 <!-- spn:doc
-{"id": "spn-devex-capabilities-ref-set", "variant": "capability", "title": "Ref in spn-devex", "lenses": ["VOICE", "ARCHITECT"], "status": "DONE", "realizes": ["ref-set"], "summary": "Eleven restatements a reader with no book checkout can still read in full, each stamped with the hash of what it last saw, and the one parser two different drift checks share.", "keywords": ["ref", "restates", "hash", "drift", "seen", "partner"]}
+{"id": "spn-devex-capabilities-ref-set", "variant": "capability", "title": "Ref in spn-devex", "lenses": ["VOICE", "ARCHITECT"], "status": "DONE", "realizes": ["ref-set"], "summary": "Restatements a reader with no book checkout can still read in full, filed by the part of the book they restate and each stamped with the hash of what it last saw, and the one parser two different drift checks share.", "keywords": ["ref", "restates", "hash", "drift", "seen", "partner"]}
 -->
 
 # Ref in spn-devex
 
 `For: Editor · Architect` · `Status: ✅ DONE` · `Realizes: Ref`
 
-Eleven markdown files sit directly under `plugins/spn-devex/refs/`, each restating part of the foundation book for a reader who may never open it. The eleven lens files under `refs/lenses/` are the same idea at a finer grain and have their own chapter. `spn-devex` also realizes the machinery: the block parser, and the tool that re-reads a stamped chapter and reports what moved. The one thing to know before writing one is that **a ref is a copy under a stamp**. It adds no rule; where it and the book disagree, the book wins and the ref is rewritten.
+The files under `plugins/spn-devex/src/refs/devex/` each restate part of the foundation book for a reader who may never open it. They are filed the way the book is: one folder per part restated — `agent` · `function` · `utils` · `workspace`. The lens files under `devex/agent/lenses/` are the same idea at a finer grain, and the agents chapter describes them. `spn-devex` also realizes the machinery: the block parser, and the tool that re-reads a stamped chapter and reports what moved. The one thing to know before writing one is that **a ref is a copy under a stamp**. It adds no rule; where it and the book disagree, the book wins and the ref is rewritten.
 
 ## Where
 
 | Part of the construct | Lives in | What it is |
 | --- | --- | --- |
-| The restatements | `plugins/spn-devex/refs/*.md` | eleven files: `blocks`, `commands`, `contract-rules`, `cross-repo`, `decision-cards`, `doc-sets`, `getting-started`, `intent`, `permission-vs-enablement`, `platform-worksheet`, `workstream-loop` |
+| The restatements | `plugins/spn-devex/src/refs/devex/` | one folder per part of the book restated: `agent` — plugins, skills and the lenses · `function` — the stages · `utils` — the CLI · `workspace` — the workspace, the workstream, what a repository declares, and the doc rules |
+| How the folder is arranged | `plugins/spn-devex/src/refs/README.md` | only domain folders at the top, and which files are authored, generated or copied |
+| The one generated ref | `plugins/spn-devex/src/refs/devex/utils/spnutils/commands.md` | written from the released CLI by `commands-ref.ts`, so it carries no stamp |
+| The copied templates | `plugins/spn-devex/src/refs/devex/workspace/docs/templates/` | copied byte for byte, because a template is copied rather than restated |
 | The block and its hash | `plugins/spn-devex/src/scripts/lib/restates.ts` | parsing, the hash, and the undeclared, unstamped and unread classification |
 | The comparison | `plugins/spn-devex/src/scripts/tools/restate-drift.ts` | every stamp re-read against a book handed to it |
-| The folder that mirrors the book | `plugins/spn-devex/src/refs/devex/` | one folder per part of the book restated: `agent` · `function` · `utils` · `workspace` |
 | A stamped block, as written | the first lines of `plugins/spn-devex/src/refs/devex/workspace/workspace.md` | the `spn:restates` comment: each chapter's path, an optional section, and its hash |
 
 ## Follows the pattern
 
 - The `spn:restates` block, the stamp and what drift means — [The Ref](../../../02-constructs/01-devex/06-refs.md)
-- How a tool is run and how it grades — [Tools in spn-devex](05-scripts.md)
+- How a tool is run and how it grades — [Scripts in spn-devex](05-scripts.md)
 
 ## Special handling
 

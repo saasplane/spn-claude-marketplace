@@ -163,5 +163,73 @@ const nocontract = tree("contract-none", "", false);
 mk(nocontract, "docs/04-capabilities/01-a/01-b/01-thing/x/01-one.md", "# One\n");
 one("a folder with no contract is left alone", !run(nocontract).includes("CONTRACT"));
 
+// ── the plugin-path question ──────────────────────────────────────────────────────────────────
+//
+// Nothing proved the docs against the plugins, so a doc could name a file the plugin stopped
+// shipping and read exactly like one naming a file it ships. `N85` found a fifth of them dead.
+//
+// Each fixture holds a real `plugins/` folder, because a repo without one is not this question's.
+
+/** A fixture with one real plugin file, `plugins/spn-x/src/scripts/checks/real.ts`. */
+function shelf(name, pageBody) {
+  const root = tree(name, pageBody, false);
+  mk(root, "plugins/spn-x/src/scripts/checks/real.ts", "// a check\n");
+  return root;
+}
+
+// 14 — a real path, rooted at `plugins/`, reports nothing.
+const real = shelf("path-real", "# A page\n\nThe check is `plugins/spn-x/src/scripts/checks/real.ts`.\n");
+one("a plugin path that exists is not reported", !run(real).includes("PATH "));
+
+// 15 — a dead path is reported, naming the path and the file and line naming it.
+const deadPath = shelf("path-dead",
+  "# A page\n\nThe check is `plugins/spn-x/src/scripts/checks/gone.ts`.\n");
+const deadOut = run(deadPath);
+one("a plugin path that does not exist is reported", /PATH\s+1 plugin path/.test(deadOut));
+one("the finding names the dead path and where it is named",
+  deadOut.includes("plugins/spn-x/src/scripts/checks/gone.ts — named in docs/02-constructs/a.md:3"));
+
+// 16 — a path inside a fence is an example, and is not read.
+const fenced = shelf("path-fenced",
+  "# A page\n\n```bash\nnode plugins/spn-x/src/scripts/checks/gone.ts\n```\n");
+one("a dead path inside a fence is an example, not a finding", !run(fenced).includes("PATH "));
+
+// 17 — a placeholder asks only for the folder before it.
+const shape = shelf("path-shape",
+  "# A page\n\nA rule lives at `plugins/spn-x/src/scripts/checks/<subject>.ts`, " +
+  "and not at `plugins/spn-x/src/providers/<cloud>/checks/`.\n");
+const shapeOut = run(shape);
+one("a placeholder under a real folder is not reported",
+  !shapeOut.includes("scripts/checks/<subject>.ts"));
+one("a placeholder under a missing folder is reported", shapeOut.includes("plugins/spn-x/src/providers/<cloud>/checks/ — named"));
+
+// 18 — the short form `<plugin>/src/…` counts when the plugin is real, and a lookalike does not.
+const short2 = shelf("path-short",
+  "# A page\n\nSee `spn-x/src/scripts/checks/gone.ts`, and `vendor/src/anything.ts`.\n");
+const shortOut = run(short2);
+one("a plugin path without its `plugins/` root is still read", shortOut.includes("plugins/spn-x/src/scripts/checks/gone.ts"));
+one("a `<word>/src/` naming no plugin is left alone", !shortOut.includes("vendor/src"));
+
+// 19 — a repository with no `plugins/` folder is not this question's business.
+const noShelf = tree("path-no-shelf", "# A page\n\nSee `plugins/spn-x/src/gone.ts`.\n", false);
+one("a repository with no plugins folder reports nothing", !run(noShelf).includes("PATH "));
+
+// 20 — an overview is read too, and the markup around a path is not part of it. A `<pre>` block is
+//      a page's fence; an escaped placeholder is still a placeholder.
+const page = shelf("path-page", "# A page\n");
+mk(page, "docs/artifacts/overviews/concept-overview.html",
+  "<p>Run <code>plugins/spn-x/src/scripts/checks/real.ts</code> and " +
+  "<code>plugins/spn-x/src/scripts/checks/&lt;subject&gt;.ts</code>, never " +
+  "<code>plugins/spn-x/hooks/run.mjs</code>.</p>\n<pre>plugins/spn-x/src/example.ts</pre>\n");
+const pageOut = run(page);
+one("a dead path on an overview is reported, without its markup",
+  pageOut.includes("plugins/spn-x/hooks/run.mjs — named in docs/artifacts/overviews/concept-overview.html:1"));
+one("a real path and an escaped placeholder on an overview are not", /PATH\s+1 plugin path/.test(pageOut));
+
+// 21 — a placeholder inside a segment keeps the segment whole, so it is asked of the folder above.
+const partSegment = shelf("path-part-segment",
+  "# A page\n\nA rule's suite sits at `plugins/spn-x/src/scripts/checks/_<subject>/`.\n");
+one("a placeholder inside a segment is not read as a truncated name", !run(partSegment).includes("PATH "));
+
 console.log(failed ? `${failed} of ${n} failed` : `all ${n} passed — coherence`);
 process.exit(failed ? 1 : 0);

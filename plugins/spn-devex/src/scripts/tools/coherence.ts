@@ -17,6 +17,7 @@
 //   HUB          does the readable face expand every section its concept states
 //   RESTATES     does a file still say what the chapter it restates says
 //   CITATION     does every `RD.<AREA>.<NNN>` cited anywhere resolve to a row that exists
+//   PATH         does every plugin path a document names resolve to something on disk
 //
 // NONE OF THEM ASKS WHETHER A ROW'S RULING IS TRUE of the documents it governs, and that is the
 // question worth most. It needs a row to name the surfaces stating it, which `06-registers.md` now
@@ -30,7 +31,7 @@
 //
 // Exit code is the number of findings.
 
-import { readdirSync, statSync } from "node:fs";
+import { existsSync, readdirSync, statSync } from "node:fs";
 import { basename, join, dirname, resolve } from "node:path";
 import { isDir, isFile, read } from "../lib/payload.ts";
 import { check as restatesCheck, parse as restatesParse, registerRows, undeclared } from "../lib/restates.ts";
@@ -476,12 +477,87 @@ function providerContracts(root: string): string[] {
   return [out];
 }
 
+/**
+ * PATH — does every plugin path a document names resolve to something on disk?
+ *
+ * **A doc naming a file the plugin no longer ships reads exactly like one naming a file it does.**
+ * `restate-drift` proves the refs against the book, and nothing proved the docs against the plugins,
+ * so one side stayed clean while the other rotted: `N85` measured a fifth of the plugin paths the
+ * marketplace docs named resolving to nothing, some for months.
+ *
+ * **WHAT COUNTS AS A PLUGIN PATH.** A path rooted at `plugins/<plugin>/`, or at `<plugin>/src/` or
+ * `<plugin>/tests/` where `<plugin>` is a folder `plugins/` really holds. A path written relative to
+ * a plugin — `scripts/checks/` inside a chapter — is not read: which plugin it means is an inference,
+ * and an inference that guesses wrong is worse than silence. A relative link is the link audit's.
+ *
+ * **A PLACEHOLDER IS A SHAPE, NOT A NAME.** Where a path carries `<instance>`, `{aws,gcp}`, `*` or `…`,
+ * the folder before it must exist and nothing after it is asked.
+ *
+ * **A FENCE IS AN EXAMPLE.** A path inside a code fence, or inside `<pre>` on a page, shows a shape
+ * rather than naming a file, so it is not read. Struck-through text is history and is skipped too.
+ *
+ * WHERE IT READS: every source `sourcesOf` reads, plus the hand-authored overviews. A construct page
+ * is produced from its seat file, which is read here, so reading the page too would report one
+ * dead path twice. **A repo with no `plugins/` folder is not this question's business**, because
+ * its docs can name a plugin path only as a fact about some other repository.
+ *
+ * SOFT. It is one of the questions `corpus.ts` reads rather than gates on, and it ships that way.
+ */
+// A path character, or a whole `<placeholder>` — escaped or not — so `_<subject>/` stays one segment
+// while the `</code>` after a path on a page ends it.
+const PATH_CHAR = String.raw`(?:[^\s\`'"()<>\]|&]|<[a-z][a-z-]*>|&lt;[a-z][a-z-]*&gt;)`;
+const PLUGIN_PATH = new RegExp(String.raw`(?<![\w/.-])(plugins\/[a-z0-9][a-z0-9-]*\/${PATH_CHAR}*|` +
+  String.raw`[a-z0-9][a-z0-9-]*\/(?:src|tests)(?:\/${PATH_CHAR}*)?)`, "g");
+const PLACEHOLDER = /[<{*…]|&lt;/;
+
+/** Blank a fence, a comment or struck text, keeping every newline so line numbers still count. */
+function blanked(text: string, pattern: RegExp): string {
+  return text.replace(pattern, (hit) => hit.replace(/[^\n]/g, " "));
+}
+
+function pluginPaths(root: string, sources: string[]): string[] {
+  const shelf = join(root, "plugins");
+  if (!isDir(shelf)) return [];                     // no plugins here — not this repo's question
+  const plugins = new Set(readdirSync(shelf).filter((entry) => isDir(join(shelf, entry))));
+  const overviews = join(root, "docs/artifacts/overviews");
+  const pages = isDir(overviews)
+    ? readdirSync(overviews).filter((e) => e.endsWith(".html")).sort().map((e) => `docs/artifacts/overviews/${e}`)
+    : [];
+
+  const dead: string[] = [];
+  for (const path of [...sources, ...pages]) {
+    let text = read(join(root, path));
+    for (const pattern of [/```[\s\S]*?```/g, /<pre[\s\S]*?<\/pre>/g, /<!--[\s\S]*?-->/g, HISTORICAL])
+      text = blanked(text, pattern);
+    text.split("\n").forEach((line, index) => {
+      for (const hit of line.matchAll(PLUGIN_PATH)) {
+        let named = hit[1].replace(/[.,:;]+$/, "");
+        if (!named.startsWith("plugins/")) {
+          if (!plugins.has(named.split("/")[0])) continue;  // `<word>/src/` that names no plugin
+          named = `plugins/${named}`;
+        }
+        // A placeholder: the folder before it must exist, and nothing after it is asked.
+        const cut = named.search(PLACEHOLDER);
+        const asked = cut < 0 ? named : named.slice(0, cut).replace(/[^/]*$/, "");
+        if (!existsSync(join(root, asked))) dead.push(`${named} — named in ${path}:${index + 1}`);
+      }
+    });
+  }
+  if (!dead.length) return [];
+  let out = `PATH        ${dead.length} plugin path(s) named in a document resolve to nothing.`;
+  out += "\n            A doc naming a file the plugin does not ship reads like one that does:";
+  for (const one of dead.slice(0, 10)) out += `\n              ${one}`;
+  if (dead.length > 10) out += `\n              … and ${dead.length - 10} more`;
+  return [out];
+}
+
 export function main(root: string): number {
   const sources = sourcesOf(root);
   const findings = [
     ...vocabulary(root, sources), ...rulings(root), ...ownership(root, sources),
     ...cardinality(root, sources), ...hub(root), ...restatementDrift(root),
     ...citations(root), ...capabilityChapters(root), ...providerContracts(root),
+    ...pluginPaths(root, sources),
   ];
   for (const finding of findings) { console.log(finding); console.log(); }
   const kinds = new Map<string, number>();

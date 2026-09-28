@@ -39,4 +39,4 @@ An id is a promise somebody already made, so a promise re-issued under a new con
 
 | Retired | Re-issued as |
 | --- | --- |
-| `MKT.GUARD.01` – `MKT.GUARD.02` | `MKT.SCRIPTS.36` – `MKT.SCRIPTS.43` |
+| `MKT.GUARD.01` – `MKT.GUARD.08` | `MKT.SCRIPTS.36` – `MKT.SCRIPTS.43` |

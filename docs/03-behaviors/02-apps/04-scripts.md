@@ -42,5 +42,5 @@ An id is identity and is never reused, so the chapter that took over these promi
 
 | Retired | Re-issued under |
 | --- | --- |
-| ~~MKT.TSCHECK.01~~ … ~~MKT.TSCHECK.02~~ | `MKT.SCRIPTS.*` above, and `MKT.PROVIDERS.*` for the promises a rule makes |
-| ~~MKT.TSTOOL.01~~ … ~~MKT.TSTOOL.02~~ | `MKT.SCRIPTS.*` above |
+| ~~MKT.TSCHECK.01~~ … ~~MKT.TSCHECK.07~~ | `MKT.SCRIPTS.*` above, and `MKT.PROVIDERS.*` for the promises a rule makes |
+| ~~MKT.TSTOOL.01~~ … ~~MKT.TSTOOL.07~~ | `MKT.SCRIPTS.*` above |

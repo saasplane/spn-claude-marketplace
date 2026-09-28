@@ -35,4 +35,4 @@ An id is a promise somebody already made, so a promise re-issued under a new con
 
 | Retired | Re-issued as |
 | --- | --- |
-| `MKT.EREF.01` – `MKT.EREF.02` | `MKT.REFS.17` – `MKT.REFS.23` |
+| `MKT.EREF.01` – `MKT.EREF.07` | `MKT.REFS.17` – `MKT.REFS.23` |
