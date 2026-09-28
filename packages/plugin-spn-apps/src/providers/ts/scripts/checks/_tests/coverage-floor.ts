@@ -63,13 +63,12 @@ export function run(input: ToolInput): Verdict {
   return verdict(path, source, null);
 }
 
-if (runAlone("coverage-floor.ts")) {
-  const argv = process.argv.slice(2);
-  if (argv.includes("--stdin")) {
-    const event = (await payload()) as Payload | null;
-    emit(event ? run(event.tool_input ?? {}) : null);
-    process.exit(0);
-  }
+/**
+ * The scan mode, argv (paths, never `--stdin`) to exit code. `commands/coverage/check.ts` calls
+ * this directly once it has found the stack — the same function this file's own guard below runs
+ * for the non-hook case, so a run through either door reads identically. One implementation only.
+ */
+export function scan(argv: string[]): number {
   let total = 0;
   for (const file of filesUnder(argv.length ? argv : ["."])) {
     if (!watched(file)) continue;
@@ -79,5 +78,15 @@ if (runAlone("coverage-floor.ts")) {
     }
   }
   console.log(`\n${total} finding(s) — an exclude with no reason`);
-  process.exit(total ? 1 : 0);
+  return total ? 1 : 0;
+}
+
+if (runAlone("coverage-floor.ts")) {
+  const argv = process.argv.slice(2);
+  if (argv.includes("--stdin")) {
+    const event = (await payload()) as Payload | null;
+    emit(event ? run(event.tool_input ?? {}) : null);
+    process.exit(0);
+  }
+  process.exit(scan(argv));
 }

@@ -137,13 +137,17 @@ export function raiseFloors(project: string): Outcome[] {
   return outcomes;
 }
 
-if (process.argv[1]?.endsWith("coverage-floor.ts")) {
-  const argv = process.argv.slice(2);
+/**
+ * The whole CLI, argv to exit code. `commands/coverage/floor.ts` calls this directly once it has
+ * found the stack — the same function this file's own guard below runs, so a run through either
+ * door reads and writes identically. One implementation only.
+ */
+export function cli(argv: string[]): number {
   const write = argv.includes("--write");
   const projects = argv.filter((a) => !a.startsWith("--"));
   if (projects.length === 0) {
     process.stderr.write("usage: coverage-floor.ts [--write] <project> …\n");
-    process.exit(2);
+    return 2;
   }
   let changed = 0;
   for (const project of projects) {
@@ -156,4 +160,9 @@ if (process.argv[1]?.endsWith("coverage-floor.ts")) {
     }
   }
   console.log(`\n${changed} floor(s) ${write ? "raised" : "would rise — pass --write"}`);
+  return 0;
+}
+
+if (process.argv[1]?.endsWith("coverage-floor.ts")) {
+  process.exit(cli(process.argv.slice(2)));
 }
