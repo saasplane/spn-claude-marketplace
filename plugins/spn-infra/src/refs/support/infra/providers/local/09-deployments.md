@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/09-deployments.md", "seen": "093f46b1" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/09-deployments.md", "seen": "53cdc81b" }
   ]
 }
 -->
@@ -27,7 +27,7 @@
 
 **No served host needs an `/etc/hosts` line** — the local resolver answers every local domain and `lc-test`.
 
-**`spnutils infra domain register <host> --app <app> --unprivileged` registers a host with the shared ingress and needs no privilege** (`RD.INFRA.106`): the vhost, a certificate the wildcard covers or the local CA mints, a reload. `infra domain unregister` removes it. **The local edge provider calls it for every route the running platform writes**, storing the route at `~/.spnutils/platforms/{org}/{spc}/routes/{host}.json`, as the cloud provider calls its vendor — so a tenant signed up locally loads at `https://acme.lc-spndemo.app` with no manual step. **A test picks its own customer domain under `lc-test`**, such as `shop.acme.lc-test`.
+**`spnutils infra domain register <host> --app <app>` registers a host with the shared ingress, needs no privilege and never writes `/etc/hosts`**; a host no local resolver answers is refused by name (`RD.INFRA.106`): the vhost, a certificate the wildcard covers or the local CA mints, a reload. `infra domain unregister` removes it. **The local edge provider calls it for every route the running platform writes**, storing the route at `~/.spnutils/platforms/{org}/{spc}/routes/{host}.json`, as the cloud provider calls its vendor — so a tenant signed up locally loads at `https://acme.lc-spndemo.app` with no manual step. **A test picks its own customer domain under `lc-test`**, such as `shop.acme.lc-test`.
 
 ## What runs, and what does not
 
