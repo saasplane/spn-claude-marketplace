@@ -10,3 +10,7 @@ __pycache__/
 # ── what a run proved, not what a person wrote: the suites in plugins/spn-devex/hooks/tests/
 #    write their artifact here, rewritten with a fresh timestamp on every run ──
 **/tests/.output/
+
+# ── the root build's dev dependencies (esbuild): installed by `pnpm install`, never shipped —
+#    a plugin's src/ imports only Node built-ins, and its dist/ bundles are committed ──
+node_modules/
