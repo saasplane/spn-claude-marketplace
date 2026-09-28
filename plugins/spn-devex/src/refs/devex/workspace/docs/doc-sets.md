@@ -3,9 +3,9 @@
   "docs": [
     { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/README.md", "seen": "c924071a" },
     { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "2f0bd1a1" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md", "seen": "304f6768" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md", "seen": "7c970245" },
-    { "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md", "seen": "2ddc68a7" },
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md", "seen": "a98553a1" },
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md", "seen": "58dd67e2" },
+    { "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md", "seen": "8398a6c6" },
     { "path": "spn-foundation/CONCEPT.md", "seen": "24dbbf45" }
   ]
 }
@@ -163,6 +163,7 @@ what you meet is a declaration rather than a gap you have to investigate.
   domain has one migrations folder, and placement follows storage. It holds what a migration knows —
   which contract term is stored in which table and column — and defines no term, because the words
   are the constructs' own. **A domain that stores nothing writes none at all.**
+- **A data model has three sections, in order**: `## Tables` (one row per table: `Table · Stores · The rule it keeps`), `## Indexes` (one row per index: `Index · Why it exists`, saying plainly when no query reads it), and an optional `## Seeds and order`. **A web half's `surface-map.md`** has one section per folder under `ui/`, each one table: `Surface · Kind · Contract term · What it is for`, where `Kind` is `page` · `component` · `widget` · `hook` and a surface is what the package's barrel exports. A wrong heading row is an outline finding.
 - **`schema.sql` sits beside the `data-model.md` it is the authoritative form of**, in the
   capabilities seat and not in a pocket: migrations mirror it verbatim, and a repository with nine
   storage-owning domains has nine of them (`Q88`, 2026-09-18). One pocket cannot hold nine files of
