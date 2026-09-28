@@ -270,8 +270,8 @@
   <p class="tagline">The foundation book <b>states</b>; this repository <b>delivers</b>. Every
   rule here is a restatement of a chapter somewhere else, and a rule invented here is a
   defect.</p>
-  <p class="standfirst">This is the public marketplace the SaaS Plane agent instruments are
-  shipped from: three plugins, five kinds of instrument, and the machinery that reads the
+  <p class="standfirst">This is the public marketplace that ships the instruments of the SaaS
+  Plane agent: three plugins, five kinds of instrument, and the machinery that reads the
   rules and runs them at the moment somebody is working.</p>
   <div class="hero-meta">
     <span>3 plugins</span><span>5 instrument kinds</span>
@@ -371,7 +371,8 @@
         <tr><td><strong>The builder</strong></td>
             <td>both trees, side by side in one workspace</td>
             <td>the drift checker is theirs. It is the only thing in the workspace that reads
-            across the two trees, and it is run here, before anything is published</td></tr>
+            across the two trees, and it is run here, before anything is published:
+            <code>node plugins/spn-devex/src/scripts/tools/restate-drift.ts</code></td></tr>
       </tbody>
     </table>
   </div>
@@ -423,6 +424,10 @@
     </table>
   </div>
 
+  <h3 id="d1">devex &mdash; <code>spn-devex</code></h3>
+  <p>The stack-agnostic plugin, and the one every repository loads. Its constructs are in
+  <a href="../../02-constructs/01-devex/README.md"><code>02-constructs/01-devex/</code></a>.</p>
+
   <p>The risk in dividing by delivery is that somebody with a general question has to guess which
   plugin answers it. <strong>It does not arise, because a grammar shared by all three lives in
   <code>spn-devex</code> and the stack plugins restate none of it.</strong> The same hook grammar
@@ -435,6 +440,19 @@
   the vocabulary the three domains are written in rather than a division of the tree — which is
   why you find <em>the hook set</em> as a chapter under <code>spn-devex</code> and never as a
   folder of its own.</p>
+
+  <h3 id="d2">apps &mdash; <code>spn-apps</code></h3>
+  <p>The TypeScript domain plugin. It holds what only a stack can say: a check whose rule is true
+  of one stack and nowhere else, a tool over that stack's own register, and the skills that can
+  only be said in its own words. A skill that is stack-agnostic stays in <code>spn-devex</code>
+  and reaches a concrete step through a ref here, rather than being copied. Its constructs are in
+  <a href="../../02-constructs/02-apps/README.md"><code>02-constructs/02-apps/</code></a>.</p>
+
+  <h3 id="d3">infra &mdash; <code>spn-infra</code></h3>
+  <p>The estate plugin. It holds what changes an estate: one shell script standing between an
+  estate edit and the file it would write, the skills that change what an estate is, and the
+  estate's own vocabulary restated for a reader who may never open the book. Its constructs are in
+  <a href="../../02-constructs/03-infra/README.md"><code>02-constructs/03-infra/</code></a>.</p>
 </section>
 
 <!-- ─────────────────────────────────────────── 04 -->
@@ -449,8 +467,8 @@
   <code>infra</code> commands refuse it by name.</p>
 
   <div class="pull">
-    <p>A docs tree is keyed to the <strong>tree</strong>, never to a manifest
-    (<code>Q107</code>, 2026-09-20). So a tool you run here must tolerate the absence of nodes
+    <p>A tool finds a docs tree by the <strong><code>docs/</code> folder on disk</strong>, never by
+    what a manifest declares (<code>Q107</code>, 2026-09-20). So a tool you run here must tolerate the absence of nodes
     rather than refuse the repository — and if one refuses you, that is the tool's defect and not this
     repository's.</p>
   </div>
@@ -461,8 +479,8 @@
   the folder it governs. Add a checker and write no mirror for it, and you have added a surface
   nobody documented — which is exactly what the coverage invariant is there to tell you.</p>
 
-  <p>One thing that absence does not excuse. The foundation book names some of these checkers
-  where a rule cites one, and four of them it does not name at all. Naming is not documenting:
+  <p>One thing that absence does not excuse. The foundation book names a checker only where one
+  of its rules cites that checker, and four checkers it does not name at all. Naming is not documenting:
   the rule belongs to the book, and the implementation belongs here.</p>
 </section>
 

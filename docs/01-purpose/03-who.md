@@ -21,7 +21,7 @@ You do not read this repository to use it. You install it, and then it is simply
 
 That is the shape of the relationship, and it changes what the audience means here. A hook you never invoke answers a write you were about to make. A skill you never open loads because the work matched it. A lens you have not heard of argues a review at a gate. So the thing you notice is not a document — it is that your session already knows your standards.
 
-Every engineering function meets them, because the standards are not a developer's alone. The people each behaviour row names are defined once in [personas](../03-behaviors/personas.md), and they come from the lens register rather than from this repository's imagination.
+Every engineering function meets them, because the standards are not a developer's alone. Each behaviour row in [03-behaviors](../03-behaviors/README.md) names the person who does the behaviour. Those people are defined once in [personas](../03-behaviors/personas.md), and they come from the lens register rather than from this repository's imagination.
 
 | You are | What reaches you | Where you meet it |
 | --- | --- | --- |
@@ -34,7 +34,7 @@ Every engineering function meets them, because the standards are not a developer
 
 ### Builder or partner — the same plugins, a different checkout
 
-Where you stand decides what you hold, and that is the one distinction worth carrying.
+What you hold depends on where you stand — beside the book or outside it — and that is the only difference between the two that matters here.
 
 - A **builder** holds this repository beside the book, as a folder in their own workspace. Their agent installs from that folder, so an edit here is something they can install and feel in the next window.
 - A **partner** holds neither. They build on a platform from outside the team that owns it, and they install from the published repository over the network. They report a standard that is wrong rather than editing one, because the copy they hold is replaced by the next install.
@@ -55,7 +55,7 @@ So the things this repository keeps stable are the things that program reads:
 | each plugin's `plugin.json` | the name and the version, which is what the installed path is keyed by |
 | the plugin folder itself | the tree the installed copy is compared against, entry for entry |
 
-**A count that has not moved is what makes a stale copy findable.** The version field names what is published rather than what you are editing, so the comparison rather than the number is what decides a reinstall. That is the whole reason the sync compares trees instead of trusting a version.
+**The version in `plugin.json` cannot find a stale copy on its own.** It names what is published, not what you are editing, so it does not move while you edit, and an edited plugin and its installed copy can carry the same version. So the file-by-file comparison decides a reinstall, not the version. That is the whole reason the sync compares trees instead of trusting a version.
 
 ## The builder who works in it
 

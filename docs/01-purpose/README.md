@@ -12,7 +12,7 @@
 
 `For: Architect` · `Status: ✅ DONE`
 
-**Why** — this seat answers why this repository exists — the problem it ends, the payoff of solving that once, what you get, and who it is for.
+**Why** — this seat answers why this repository exists, one question per page: the problem it ends and the payoff of solving that once in [01-why](01-why.md), what you get in [02-what](02-what.md), and who it is for in [03-who](03-who.md).
 
 This seat is written for somebody deciding whether to build on this repository, and it carries no rules: normative language in a purpose seat is a defect.
 

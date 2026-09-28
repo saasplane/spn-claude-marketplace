@@ -1,6 +1,6 @@
 # spn-claude-marketplace — Concept
 
-The public marketplace the SaaS Plane agent instruments are delivered from. **The foundation states;
+The public marketplace that delivers the instruments of the SaaS Plane agent. **The foundation states;
 this repository delivers.** Every rule here restates a chapter of the foundation book and adds none
 of its own — so what is genuinely this repository's is not the rules but the machinery: the code
 that reads them, the events it runs on, and the shape each instrument takes.
@@ -25,7 +25,8 @@ is the whole reason a ref restates a chapter instead of linking to one.
 If you are a **partner**, you hold this repository and not the book, so every citation you meet here
 names a chapter rather than linking to one. If you are a **builder**, you hold both, and the drift
 checker is yours: it is the only thing in the workspace that reads across the two trees, and you run
-it here, before you publish.
+it here, before you publish — `node plugins/spn-devex/src/scripts/tools/restate-drift.ts`, which finds
+a sibling `spn-foundation` checkout by itself or takes its path as the one argument.
 
 ## The domains it holds   `DRAFT`
 
@@ -48,10 +49,18 @@ The same hook grammar governs a check here and one in `spn-apps`, so a question 
 hook is* has one answer and one place: `spn-devex`'s hook set. A domain plugin's chapter says what its
 own checks decide, never what a check is.
 
-**That is what keeps the division by plugin from splitting a concept in three.** The risk in
-dividing by delivery is that a reader with a general question has to guess which plugin answers it.
-It does not arise, because the general answer is never in a domain plugin — it is in the one every
-repository loads.
+**That is what keeps the division by plugin from splitting one concept across three plugins.**
+Dividing by delivery has one risk: a reader with a general question, such as *what is a hook?*, might
+have to guess which plugin answers it. That risk does not arise here. A general answer is never in a
+domain plugin; it is in the one every repository loads — for the hook, in
+[`spn-devex`'s hooks construct](docs/02-constructs/01-devex/02-hooks.md).
+
+#### The five instrument kinds are a shape, not a seat
+
+**Plugin · hook · skill · ref · agent are what an instrument can be**, and every one of them is
+defined once, in `spn-devex`. They are a vocabulary the three domains are written in rather than a
+division of the tree — which is why you will find *the hook set* as a chapter under `spn-devex` and
+never as a folder of its own.
 
 ### apps
 
@@ -65,13 +74,6 @@ the skills that can only be said in its own words. **A skill that is stack-agnos
 what an estate is, and the estate's own vocabulary restated for a reader who may never open the
 book.
 
-### The five instrument kinds are a shape, not a seat
-
-**Plugin · hook · skill · ref · agent are what an instrument can be**, and every one of them is
-defined once, in `spn-devex`. They are a vocabulary the three domains are written in rather than a
-division of the tree — which is why you will find *the hook set* as a chapter under `spn-devex` and
-never as a folder of its own.
-
 ## The world it declares   `DRAFT`
 
 **This repository declares `GENERAL` in `sprepo.json`, which is a world with no stack in it.** A
@@ -81,8 +83,8 @@ on, and no estate declaration. It holds one docs tree and no nodes at all, so th
 commands refuse it by name.
 
 So a tool you run here must tolerate the absence of nodes rather than refuse the repository, and if
-one refuses you, that is the tool's defect and not this repository's. **A docs tree is keyed to the
-tree, never to a manifest** (`Q107`, 2026-09-20).
+one refuses you, that is the tool's defect and not this repository's. **A tool finds a docs tree by
+the `docs/` folder on disk, never by what a manifest declares** (`Q107`, 2026-09-20).
 
 ## `plugins/` is source   `DRAFT`
 
@@ -91,7 +93,7 @@ document per source folder that earns one, named for the folder it governs. When
 and write no mirror for it, you have added a surface nobody documented, and invariant 4 is what
 tells you so.
 
-**What the book covers and what it does not.** The book names some of these checkers where a rule
-cites one — and four of them, `contract-cycle`, `prose-triage`, `restate-drift` and `partner-shape`,
-it does not name at all. Naming is not documenting: the rule belongs to the book and the
+**What the book covers and what it does not.** The book names a checker under `plugins/` only where
+one of its rules cites that checker. Four checkers are not named in the book at all:
+`contract-cycle`, `prose-triage`, `restate-drift` and `partner-shape`. Naming is not documenting: the rule belongs to the book and the
 implementation belongs here.

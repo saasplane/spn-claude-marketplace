@@ -15,7 +15,7 @@
 
 SaaS Plane writes its rules down. They live in the foundation book, one chapter per subject, argued at length. And your agent session never opens that book. It reads what a runtime loaded for it when the window started. So a rule that lives only in a chapter reaches nobody at all, however well the chapter is written.
 
-This repository is the other half of that sentence. It carries the same rules as **instruments a runtime loads** — hooks, skills, reference cards, lenses and agent briefs — so the standard arrives in the session rather than waiting in a document.
+This repository closes that gap: the book is where a rule is written, and this repository is how the rule reaches your session. It carries the same rules as **instruments a runtime loads** — hooks, skills, reference cards, lenses and agent briefs — so the standard arrives in the session rather than waiting in a document.
 
 ## The problem it ends
 

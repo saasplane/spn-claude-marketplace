@@ -25,7 +25,7 @@ The marketplace ships three plugins. Which of them a repository loads follows fr
 | `spn-apps` | the TypeScript skills — new, implement, review, run, verify — their step files, and the write-time guards over enablement grammar, naming and what proves a change | an `APPS` repository claiming `TS` |
 | `spn-infra` | the estate skills, the manifest and naming cards, the estate laws, and the guard over secrets and account identifiers | an `INFRA` repository |
 
-**A plugin is how delivery is divided, and it is not how understanding is divided.** The same hook grammar governs a check in `spn-devex` and a check in `spn-apps`. So this repository's own documents divide by the kind of instrument, and you never have to work out which plugin answers a question before you can ask it.
+**A plugin is how delivery is divided, and it is not how understanding is divided.** The same hook grammar governs a check in `spn-devex` and a check in `spn-apps`. This repository's own documents do divide by plugin, one folder per plugin. But a general question — *what is a hook?* — is always answered in `spn-devex`, the plugin every repository loads, so you never have to work out which plugin answers a question before you can ask it.
 
 ## Five kinds of instrument
 

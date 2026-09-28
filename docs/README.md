@@ -12,7 +12,7 @@
 
 `For: Architect` · `Status: 🔮 PLANNING`
 
-The public marketplace the SaaS Plane agent instruments are delivered from. The foundation states the rules; this repository carries the machinery that reads them — and `plugins/` is source, so the capabilities seat mirrors it folder for folder.
+The public marketplace that delivers the instruments of the SaaS Plane agent. The foundation states the rules; this repository carries the machinery that reads them — and `plugins/` is source, so the capabilities seat mirrors it folder for folder.
 
 ## The map
 
@@ -26,5 +26,5 @@ The public marketplace the SaaS Plane agent instruments are delivered from. The 
 | [04-capabilities/](04-capabilities/README.md) | **What** — what must exist for those behaviours to be possible |
 | [05-guides/](05-guides/README.md) | **How** — how to use what was realized |
 
-The pockets are consulted rather than read, which is why they carry no number: `registers/` holds this repository's own rules and decisions, and [`artifacts/`](artifacts/README.md) holds its overview and construct pages and the reports somebody asked for.
+Two folders sit beside the seats. They are **pockets**: you look something up in a pocket rather than read it from start to end, which is why the pockets carry no number. `registers/` holds this repository's own rules and decisions, and [`artifacts/`](artifacts/README.md) holds its overview and construct pages and the reports somebody asked for.
 
