@@ -88,10 +88,11 @@ the `docs/` folder on disk, never by what a manifest declares** (`Q107`, 2026-09
 
 ## `plugins/` is source   `DRAFT`
 
-The capabilities seat mirrors it folder for folder, because that is what a capabilities seat is: one
-document per source folder that earns one, named for the folder it governs. When you add a checker
-and write no mirror for it, you have added a surface nobody documented, and invariant 4 is what
-tells you so.
+The capabilities seat is one chapter per construct, inside the one folder named for the plugin that
+ships it — `01-devex/spn-devex/`, `02-apps/spn-apps/`, `03-infra/spn-infra/`. Here the package **is**
+the plugin, so the domain holds exactly one such folder rather than one document per source folder.
+When you add a checker and write no chapter for it, you have added a surface nobody documented, and
+invariant 4 is what tells you so.
 
 **What the book covers and what it does not.** The book names a checker under `plugins/` only where
 one of its rules cites that checker. Four checkers are not named in the book at all:
