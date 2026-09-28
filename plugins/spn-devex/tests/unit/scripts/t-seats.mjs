@@ -699,7 +699,8 @@ console.log("\n=== `face` over a capability seat writes the chapters' own shape"
 
 console.log("\n=== the plugins' own run writes the two cells a run owns, and no others");
 {
-  const STATUS = resolve(PLUGIN, "src", "scripts", "tools", "behaviour-status.mjs");
+  // The one writer, run the way this repository's own runner runs it: the whole tier, one artifact.
+  const STATUS = resolve(PLUGIN, "src", "scripts", "tools", "behaviour-rows.ts");
   const results = (rows, tiers = ["UNIT"]) => {
     const f = join(BASE, `res${made}-${Math.random().toString(36).slice(2)}.json`);
     writeFileSync(f, JSON.stringify({ env: "local", tiers, ranAt: "2026-09-22T00:00:00.000Z", from: "t", results: rows }), "utf8");
@@ -707,7 +708,7 @@ console.log("\n=== the plugins' own run writes the two cells a run owns, and no 
   };
   const status = (root, file, extra = []) => {
     try {
-      return execFileSync(process.execPath, [STATUS, "--write", "--results", file, root], { encoding: "utf8" });
+      return execFileSync(process.execPath, [STATUS, "--write", "--reach", "repository", "--results", file, root], { encoding: "utf8" });
     } catch (e) { return String(e.stdout ?? "") + String(e.stderr ?? ""); }
   };
 
@@ -737,7 +738,9 @@ console.log("\n=== the plugins' own run writes the two cells a run owns, and no 
   one("a failing case makes the row FAILED, not absent", reg, (g) => /MKT\.DOCS\.02 \|.*\| FAILED \|/.test(g));
   one("MANUAL is never written over, even by a green case", reg, (g) => /MKT\.DOCS\.03 \|.*\| MANUAL \|/.test(g));
   one("a row in a tier this run did not cover is left alone", reg, (g) => /MKT\.DOCS\.04 \|.*\| PLANNED \|/.test(g));
-  one("a row in a covered tier that nothing reached becomes PENDING", reg, (g) => /MKT\.DOCS\.05 \|.*\| PENDING \|/.test(g));
+  // A row no result names has no case citing it any more, so it goes back to what a row is at
+  // birth — the book's rule, "delete a case and its row falls back to PLANNED".
+  one("a row in a covered tier that nothing named goes back to PLANNED", reg, (g) => /MKT\.DOCS\.05 \|.*\| PLANNED \|/.test(g));
   one("Updated at moves with the status", reg, has("2026-09-22T00:00:00.000Z"));
   one("a row nobody proved keeps the date it had", reg, (g) => !/MKT\.DOCS\.04 \|.*2026-09-22/.test(g));
 
@@ -746,7 +749,7 @@ console.log("\n=== the plugins' own run writes the two cells a run owns, and no 
   const before = readAt(ws2, "docs/03-behaviors/01-core/01-boot.md");
   let code = 0;
   try {
-    execFileSync(process.execPath, [STATUS, "--results", results([{ id: "MKT.DOCS.01", tier: "UNIT", status: "SUCCESS", title: "t" }]), ws2], { encoding: "utf8" });
+    execFileSync(process.execPath, [STATUS, "--reach", "repository", "--results", results([{ id: "MKT.DOCS.01", tier: "UNIT", status: "SUCCESS", title: "t" }]), ws2], { encoding: "utf8" });
   } catch (e) { code = e.status; }
   one("without --write nothing on disk changes", readAt(ws2, "docs/03-behaviors/01-core/01-boot.md"), before);
   one("and the exit code is the number of rows that would change", code, 1);

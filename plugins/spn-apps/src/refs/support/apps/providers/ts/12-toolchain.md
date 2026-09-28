@@ -21,4 +21,6 @@
 
 **A cached target names its inputs, and `default` alone is not enough.** A target with no dependency input ignores its dependencies entirely, so it replays a cached result after the thing it depends on changed. Probe a cache key with a real content change, never by touching a file.
 
+**A kind, tier, phase or mutation scope is named from `@saasplane/toolchain-ts/contract`, never typed as a string.** The toolchain declares the five vocabularies once, as frozen enums; the CLI restates them as TypeScript enums and a drift test holds the two together.
+
 **Root scripts are the repository's and are a different surface from a node's commands.** Reach for `spnutils apps check · test · format` before any `npx` or `pnpm` invocation.

@@ -105,13 +105,9 @@ A partial run that reset a whole register would make every status swing on every
 
 A status derived from a specification reports a case that exists as a case that ran. Crossing a route with a surface, or scanning a source tree for case titles, cannot see a case that was skipped or filtered out. So the writer reads the file the runner produced, and a row whose case never reached the runner says so.
 
-### Coverage is measured against actions, not routes
+### A row's gap is closed by the chain, not by a tool
 
-A route says where a screen lives and nothing about what can be done there. One settings route can carry several actions behind it, and counting routes reports that screen as covered while most of them have never been performed. Every published action is an interaction, whether a person performs it through a browser or another system performs it through the generated client, so the action surface is what a register is measured against.
-
-### An action is found by its declaration, never by a folder
-
-A glob naming one stack's folder shape missed a whole module whose home was an application rather than a package. The declaration itself is what makes something an action, so looking for the declaration needs no folder shape and finds a module wherever it is kept.
+A behaviour enters the product through its row: the row is written first, a case cites it, and the run's artifact stamps it. So no tool here compares what a service publishes against the rows. Every stack declares its actions its own way, and a comparison per stack is not worth a permanent check; code written outside the chain is answered in review.
 
 ### A generator writes a list nobody could keep by hand
 
@@ -124,7 +120,7 @@ This page answers what sits in this plugin's scripts folder and what each part m
 | Owns | Refuses | Who owns that instead |
 | --- | --- | --- |
 | resolving a write to the declared stack, the subject order, and the single process behind the entry | the payload, the verdict, the dispatcher's shape, and the exit code | [Hooks](../01-devex/02-hooks.md) |
-| finding a register by its header, the cells a run owns, and measuring coverage against the published action surface | that a tool is invoked by its own path and grades what it finds | [The Check](../01-devex/05-scripts.md) |
+| finding a register by its header, the cells a run owns, and checking the rows against the cases and the runs | that a tool is invoked by its own path and grades what it finds | [The Check](../01-devex/05-scripts.md) |
 | that nothing here names a stack | every rule that reads a language's own syntax, and the parse that feeds it | [Providers](06-providers.md) |
 | that a run speaks only for the tiers it covered | what a behaviour row must contain, and the grammar of its id | the foundation's document chapter |
 

@@ -19,9 +19,10 @@ The folder divides by what calls each file. `events/` holds the one process the 
 | The payload and verdict shapes | `plugins/spn-apps/src/scripts/lib/payload.ts` | this plugin's own copy, named as the core plugin names the same job |
 | What a run cost | `plugins/spn-apps/src/scripts/lib/timing.ts` | written only while the developer has asked for it, and never able to fail a gate |
 | The restatement hash | `plugins/spn-apps/src/scripts/lib/stamp.ts` | the `seen` value, spelled once per plugin and required to agree with the other copy |
-| What a register is | `plugins/spn-apps/src/scripts/lib/register.ts` | the behaviour headings, in order, and the test for one row |
-| The row writer | `plugins/spn-apps/src/scripts/tools/behaviour-rows.ts` | writes `Status` and `Updated at` from a run's own results file |
-| The action surface | `plugins/spn-apps/src/scripts/tools/action-coverage.ts` | every declared action, matched against the rows that claim it |
+| What a register is | `plugins/spn-apps/src/scripts/lib/register.ts` | the headings a register carries, each column found by its heading — this plugin's copy of the core plugin's file, held byte for byte to it |
+| The tiers each kind owes | `plugins/spn-apps/src/scripts/lib/kinds.ts` | the book's table of kind and owed tier, which tells a contract case from an integration one |
+| What a run left behind | `plugins/spn-apps/src/scripts/lib/runs.ts` | the walk the case reader uses; this plugin's copy of the core plugin's file |
+| The join check | `plugins/spn-apps/src/scripts/checks/behaviour-join.ts` | every row against every case title, in both directions |
 | The package table | `plugins/spn-apps/src/scripts/tools/library-catalogue.ts` | writes the list of published packages a node may depend on |
 
 ## Follows the pattern
@@ -68,23 +69,11 @@ The folder divides by what calls each file. `events/` holds the one process the 
 **What** — any table carrying the behaviour headings is a register, wherever in the repository it sits.
 **How** — the headings and the row test are one exported pair read by every tool that touches a register, because two tools parsing a table differently means one writes rows the other cannot see. `plugins/spn-apps/src/scripts/lib/register.ts`.
 
-### Two cells are the run's and the rest are a person's
+### The join is a repository gate, and the stack says where a case lives
 
-**Why** — *the kind of behaviour and the tier that proves it are decisions somebody made*, while the status and the moment it was found are what the last run saw. The two were one cell until they disagreed quietly, and a row whose case had stopped running still read as proven.
-**What** — the writer touches those two cells and copies every other one through untouched. A hand-written edit to either is a claim rather than a finding.
-**How** — a run updates only the rows declaring a tier it covered, and never writes over a row a person proves. That is why the tier is a person's cell: it is what a run matches itself against. `plugins/spn-apps/src/scripts/tools/behaviour-rows.ts`.
-
-### It reads the run's own artifact, never a specification
-
-**Why** — *a derived status reports a case that exists as a case that ran*. Crossing a route with a surface, or scanning a source tree for case titles, cannot see a case that was skipped or filtered out.
-**What** — the writer reads the file the runner produced, so a row whose case never reached the runner says so.
-**How** — the core plugin's own row writer reads the same artifact shape for this repository, which declares no stack at all. Same file, and `plugins/spn-devex/src/scripts/tools/behaviour-status.mjs`.
-
-### Coverage is measured against actions, not routes
-
-**Why** — *a route says where a screen lives and nothing about what can be done there*. One settings route can carry several actions behind it, and counting routes reports that screen as covered while most of them have never been performed.
-**What** — every published action is an interaction, whether a person performs it through a browser or another system performs it through the generated client. The tool reads the declared actions and the register's rows and compares them.
-**How** — an action is found by its own declaration rather than by a folder shape. The glob this replaced named one stack's folders and missed a whole module whose home was an application. `plugins/spn-apps/src/scripts/tools/action-coverage.ts`.
+**Why** — *a case that exists is not a case that ran*, and the join asks only the first question: does a case cite each `SUCCESS` row, and does each cited id name a row. It reads both sets whole, so it cannot be a check at the moment one file is written. Whether a run supports a row is the core plugin's proof check, and stamping a row is the core plugin's writer (the book's RD.DEVEX.071).
+**What** — the join names a `SUCCESS` row no case title cites, and a case title citing an id no row declares. It exits non-zero on a finding; `--report` prints the same and exits zero.
+**How** — where a case lives and how its title is written are the stack's, so the join imports `providers/<stack>/scripts/lib/cases.ts` by a composed path, the way the gate does. It reads rows through this plugin's copy of the core plugin's register grammar, which a case holds byte for byte to the original. `plugins/spn-apps/src/scripts/checks/behaviour-join.ts`, proven in `plugins/spn-apps/tests/unit/scripts/checks/t-behaviour-join.mjs`.
 
 ### One table is written by a command, because nobody could keep it by hand
 
@@ -97,7 +86,8 @@ The folder divides by what calls each file. `events/` holds the one process the 
 | Direction | With | What | Why |
 | --- | --- | --- | --- |
 | takes | this plugin's own providers | the parse and the rules for the declared stack | the gate resolves; the provider knows the language |
-| takes | a repository | its declared actions, its behaviour registers, and its test results file | the tools read the repository they are pointed at and hold no state |
+| takes | a repository | its behaviour registers, its case titles, its test results files, and each node's declared kind | the tools read the repository they are pointed at and hold no state |
+| takes | spn-foundation | the table of which tier each kind owes | a plugin imports nothing, so the table is restated with its source named |
 | takes | spn-devex | the shapes it names for the same jobs, copied rather than imported | the plugins install and version separately |
-| publishes | spn-devex | the artifact shape and the two-cell rule its own row writer follows | a stack repository and the marketplace report in one vocabulary |
+| takes | spn-devex | the register grammar and the run artifact reader, copied byte for byte | the join reads rows exactly as the one writer writes them |
 | publishes | a repository's own registers and refs | the status of the last run, and the table of packages a node may depend on | a finding is written down rather than remembered |

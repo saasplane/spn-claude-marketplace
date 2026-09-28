@@ -11,7 +11,7 @@
 // `spnutils` serves it with its docs verbs only and has no runner to write its behaviour rows.
 // These suites ARE its runner. Every case whose title carries a behaviour id in brackets —
 // `[MKT.DOCS.01]`, the book's rule that an id is carried by a test title — becomes a result, the
-// results become `tests/.output/unit/spn-tests.json`, and `behaviour-status.mjs` writes the
+// results become `tests/.output/unit/spn-tests.json`, and `behaviour-rows.ts` writes the
 // two cells a run owns. A case with no id in its title proves nothing to the register and is
 // counted only here, which is how it should be: a register row is a promise somebody made, not
 // every assertion anybody wrote.
@@ -81,7 +81,7 @@ console.log(`\n  ${suites.length} suite(s) · ${cases} case(s)` +
   (failed ? ` · ${failed} SUITE(S) FAILING` : " · all passing"));
 
 // THE ARTIFACT IS WRITTEN EVEN WHEN NO CASE CARRIES AN ID, because an empty result set is a fact
-// about the run — the register then says PENDING for rows this tier covers and nothing proved,
+// about the run — the register then says PLANNED for rows this tier covers and nothing named,
 // which is true and is what a reader needs. An absent file would read as *the run never happened*.
 //
 // IT IS A RUN'S OUTPUT AND NOT A DOCUMENT, so it lives where every other stack's runner puts one —
@@ -96,9 +96,10 @@ writeFileSync(artifact, `${JSON.stringify({
 console.log(`  ${results.length} case(s) carry a behaviour id -> ${artifact.slice(REPO.length + 1)}`);
 
 if (writeStatus) {
-  const tool = resolve(HERE, "..", "src", "scripts", "tools", "behaviour-status.mjs");
+  // This run is the whole of its tier here, so a row no case named any more goes back to PLANNED.
+  const tool = resolve(HERE, "..", "src", "scripts", "tools", "behaviour-rows.ts");
   try {
-    console.log(execFileSync(process.execPath, [tool, "--write", "--results", artifact, REPO], { encoding: "utf8" }));
+    console.log(execFileSync(process.execPath, [tool, "--write", "--reach", "repository", "--results", artifact, REPO], { encoding: "utf8" }));
   } catch (error) { console.log(String(error.stdout ?? "")); }
 }
 

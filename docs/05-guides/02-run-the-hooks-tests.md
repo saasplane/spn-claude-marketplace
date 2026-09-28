@@ -94,8 +94,8 @@ The suites pass in full and **no case carries a behaviour id yet**, so `--write-
 You can ask the writer what it would do without letting it write, by running it against the artifact directly:
 
 ```bash
-node plugins/spn-devex/src/scripts/tools/behaviour-status.mjs \
-  --results docs/artifacts/reports/spn-tests.json .
+node plugins/spn-devex/src/scripts/tools/behaviour-rows.ts \
+  --reach repository --results tests/.output/unit/spn-tests.json .
 ```
 
 It prints one line per row it would change, then a tally. With no `--write` it changes nothing.

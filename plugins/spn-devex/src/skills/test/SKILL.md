@@ -102,6 +102,19 @@ A test that proves a stated behavior should be traceable to it. Where the platfo
 - **Run journey tests on a quiesced system.** Building, provisioning, or resetting concurrently produces timeouts that read as failures and are not.
 - **A case that destroys a session runs where nothing else depends on that session.** Revoking a sign-in, logging out, revoking a device or changing a credential destroys the session other cases are working in, and worker isolation cannot help because the damage is server-side. Classify by what a case flips — nothing, its own throwaway data, a shared session, or global state — and let that decide both where it runs and when.
 
+## After a run: stamp the rows, then read them against the runs
+
+**`spnutils` runs a tier and writes `tests/.output/<tier>/spn-tests.json`, and never a row** (`RD.DEVEX.071`). What the run means for the documents is yours, through this plugin's scripts:
+
+```bash
+node "${CLAUDE_PLUGIN_ROOT}"/scripts/tools/behaviour-rows.ts .                  # what it would change
+node "${CLAUDE_PLUGIN_ROOT}"/scripts/tools/behaviour-rows.ts --write .          # Status and Updated at, from the run
+node "${CLAUDE_PLUGIN_ROOT}"/scripts/checks/behaviour-proof.ts .                # a SUCCESS row its tier's run contradicts
+node "${CLAUDE_PLUGIN_ROOT}"/scripts/tools/behaviour-coverage.ts --json .       # the tests report's measurement
+```
+
+The writer stamps a row only from a result at the row's own `Tier`, never writes over `MANUAL`, and leaves a row nothing named alone unless `--reach repository` says the artifacts are the whole of their tiers. It reads a register by its headings, so an eight-, nine- or ten-cell row is stamped alike. A stack's plugin adds what knows the stack — where a case lives, for the join, and the coverage floors.
+
 ## Lenses
 
 Wear `refs/lenses/qa.md` while writing tests. On every build's close, convene the `spn-panel` subagent with `qa`: a ✅ status with no test behind it stops the work.

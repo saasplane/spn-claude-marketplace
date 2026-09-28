@@ -29,7 +29,11 @@ Everything this plugin can execute sits under `plugins/spn-devex/src/scripts/`. 
 | The command surface | `plugins/spn-devex/src/scripts/tools/commands-ref.ts` | renders what the CLI says about itself into a ref |
 | The book's templates | `plugins/spn-devex/src/scripts/tools/templates-export.ts` | copies the shapes every repository writes to, so a partner has them |
 | A figure as a browser draws it | `plugins/spn-devex/src/scripts/tools/figure-render.ts` | the second reading of a drawing, beside the geometric one |
-| This repository's own rows | `plugins/spn-devex/src/scripts/tools/behaviour-status.mjs` | writes `Status` and `Updated at` from a run's artifact |
+| The row writer | `plugins/spn-devex/src/scripts/tools/behaviour-rows.ts` | the one writer of `Status` and `Updated at`, in every repository, from a run's own artifact |
+| The proof check | `plugins/spn-devex/src/scripts/checks/behaviour-proof.ts` | every `SUCCESS` row against the last run of its own tier |
+| The tests measurement | `plugins/spn-devex/src/scripts/tools/behaviour-coverage.ts` | every row joined to the last run of its tier, printed or handed over as `--json` |
+| What a register and a run are | `plugins/spn-devex/src/scripts/lib/register.ts`, `plugins/spn-devex/src/scripts/lib/runs.ts` | the headings a register carries, each column found by its heading, and every `spn-tests.json` read one way |
+| The tiers each kind owes | `plugins/spn-devex/src/scripts/lib/kinds.ts` | the book's table of kind and owed tier, restated because a plugin imports nothing |
 | The library both callers read | `plugins/spn-devex/src/scripts/lib/` | `render.ts` produces a page · `draw.ts` draws a figure · `figures.ts` checks one · `restates.ts` parses a stamp |
 
 ## Follows the pattern
@@ -123,11 +127,17 @@ Everything this plugin can execute sits under `plugins/spn-devex/src/scripts/`. 
 **What** — one tool renders the CLI's own help into a ref so an agent holds the command surface without asking, and it exists precisely because of that dependency. A check states the need as data instead and stats the binary.
 **How** — the generator declares what it needs and writes into a bounded region of the ref, leaving the argument above that region to a person. `plugins/spn-devex/src/scripts/tools/commands-ref.ts`.
 
-### This repository writes its own behaviour rows
+### One writer stamps every repository's rows
 
-**Why** — *the CLI serves a `GENERAL` repository with its docs commands only*, so no stack runner writes the rows here. The plugins' own suites know.
-**What** — only `Status` and `Updated at` are written, from the run's results file. A row whose tier no result covered is left as it was, and a row marked `MANUAL` is never written over.
-**How** — it reads the artifact shape the apps plugin's writer reads, so a stack repository and this one report in one vocabulary. `plugins/spn-devex/src/scripts/tools/behaviour-status.mjs`.
+**Why** — *rows are domain-neutral*. A stack repository, an estate repository and this one all carry registers, and `spnutils` writes the run artifact and never a row (the book's RD.DEVEX.071). One writer here serves all of them, so two writers can never disagree about a row's width or its rules.
+**What** — only `Status` and `Updated at` are written. A run speaks for the tiers it ran, and a result counts for a row only at the row's own `Tier`. `Updated at` is the newest run that named the row. `MANUAL` is never written over and a `PROMISE` row is never stamped. Rows nothing named are left alone unless `--reach repository` says the artifacts are the whole of their tiers; then they go back to `PLANNED`. `--results <file>` names the artifact to read, and without it every `spn-tests.json` under the root is read.
+**How** — a column is found by its heading, so an eight-, nine- or ten-cell register is stamped alike and keeps its width, and a file is rewritten only where a row changed. This repository's own runner, `plugins/spn-devex/tests/run.mjs`, calls it with its one artifact. `plugins/spn-devex/src/scripts/tools/behaviour-rows.ts`, proven in `plugins/spn-devex/tests/unit/scripts/tools/t-behaviour-rows.mjs`.
+
+### The proof and the measurement read the rows the writer stamps
+
+**Why** — *a case that exists is not a case that ran*, and a report is written by the agent and produced by no command (RD.DOCS.089).
+**What** — the proof check refuses a `SUCCESS` row the last run of its tier contradicts, never judging a tier no run spoke for or a `MANUAL` row. The measurement joins every row to the last run of its tier, lists every tier the repository owes with a reason where it did not run, and hands the result over as `--json`; an unchanged tree measures to the same bytes. A foundation repository gets an absence and no report.
+**How** — both read the one register grammar and the one artifact reader the writer reads. `plugins/spn-devex/src/scripts/checks/behaviour-proof.ts` and `plugins/spn-devex/src/scripts/tools/behaviour-coverage.ts`, proven in `plugins/spn-devex/tests/unit/scripts/checks/t-behaviour-proof.mjs` and `plugins/spn-devex/tests/unit/scripts/tools/t-behaviour-coverage.mjs`.
 
 ### A page is produced here, and its shape is stated in the book
 

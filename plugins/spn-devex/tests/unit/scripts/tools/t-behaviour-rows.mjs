@@ -5,7 +5,7 @@ import { PLUGIN } from "../../../helpers/harness.mjs";
 // REWRITES documents, so the bar is higher: every case asserts what changed AND that nothing else
 // did, because the failure worth fearing is a cell quietly moved in a file nobody was looking at.
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 
@@ -130,6 +130,104 @@ console.log("=== behaviour-rows — what it reports");
   const out = run(root);
   ok("a dry run says what it would change", out.includes("would change") && out.includes("SUCCESS → FAILED"));
   ok("and changes nothing", cells(doc, "IAM.LOGIN.01").status === "SUCCESS");
+}
+
+console.log("\n=== behaviour-rows — every width, read by heading");
+
+/** A register of any width, and an artifact beside it. */
+const standWith = (lines, artifactsByPath) => {
+  const root = mkdtempSync(join(tmpdir(), "rows-"));
+  kept.push(root);
+  const doc = join(root, "docs", "03-behaviors", "wide.md");
+  mkdirSync(dirname(doc), { recursive: true });
+  writeFileSync(doc, lines.join("\n") + "\n", "utf8");
+  for (const [path, body] of Object.entries(artifactsByPath)) {
+    const at = join(root, path);
+    mkdirSync(dirname(at), { recursive: true });
+    writeFileSync(at, JSON.stringify(body), "utf8");
+  }
+  return { root, doc };
+};
+
+/** One row's cells by heading, whatever the table's width. */
+const byHeading = (doc, id) => {
+  const lines = readFileSync(doc, "utf8").split("\n");
+  const header = lines.find((l) => /\|\s*Id\s*\|/.test(l)).trim().replace(/^\||\|$/g, "").split("|").map((x) => x.trim().toLowerCase());
+  const line = lines.find((l) => l.includes(`| ${id} |`));
+  const c = line.trim().replace(/^\||\|$/g, "").split("|").map((x) => x.trim());
+  return { status: c[header.indexOf("status")], at: c[header.indexOf("updated at")], width: c.length, line: line };
+};
+
+const CONTRACT_RUN = (results, ranAt = "2026-09-28T09:00:00Z") =>
+  ({ "apps/api/tests/.output/contract/spn-tests.json": { env: "local", tiers: ["CONTRACT"], ranAt, results } });
+
+{
+  const nine = [
+    "| Id | Who | Does | Sees | Type | Tier | Status | Updated at | Realizes |",
+    "| --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+    "| IAM.WIDE.01 | a person | signs in | the home page | POSITIVE | CONTRACT | PLANNED | — | account |",
+  ];
+  const { root, doc } = standWith(nine, CONTRACT_RUN([{ id: "IAM.WIDE.01", tier: "CONTRACT", status: "SUCCESS", title: "t" }]));
+  run(root, "--write");
+  const row = byHeading(doc, "IAM.WIDE.01");
+  ok("[MKT.SCRIPTS.48] a nine-cell row is stamped by heading", row.status === "SUCCESS" && row.at === "2026-09-28T09:00:00Z", row.line);
+  ok("[MKT.SCRIPTS.48] and keeps its nine cells, the last one as written", row.width === 9 && row.line.endsWith("| account |"));
+}
+
+{
+  const ten = [
+    "| Id | Who | Does | Sees | Where | Type | Tier | Status | Updated at | Names |",
+    "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+    "| IAM.TEN.01 | a person | signs in | the home page | service-api | POSITIVE | CONTRACT | PLANNED | — | FDN.LOGIN.01 |",
+  ];
+  const { root, doc } = standWith(ten, CONTRACT_RUN([{ id: "IAM.TEN.01", tier: "CONTRACT", status: "FAILED", title: "t" }]));
+  run(root, "--write");
+  const row = byHeading(doc, "IAM.TEN.01");
+  ok("[MKT.SCRIPTS.48] a ten-cell row, with Where before Type, is stamped by heading", row.status === "FAILED" && row.at === "2026-09-28T09:00:00Z", row.line);
+  ok("[MKT.SCRIPTS.48] and its Where and Names cells are copied through", row.width === 10 && row.line.includes("| service-api |") && row.line.endsWith("| FDN.LOGIN.01 |"));
+}
+
+console.log("\n=== behaviour-rows — the rules a writer keeps");
+
+{
+  const { root, doc } = stand([{ id: "IAM.LOGIN.02", tier: "UNIT", status: "SUCCESS", title: "t", detail: null }]);
+  run(root, "--write");
+  ok("[MKT.SCRIPTS.49] a result at another tier is not evidence for the row", cells(doc, "IAM.LOGIN.02").status === "PLANNED");
+}
+
+{
+  // Two runs of one tier, from two nodes. The newer one did not name the row, so it may not date it.
+  const eight = REGISTER.split("\n");
+  const { root, doc } = standWith(eight, {
+    "apps/api/tests/.output/contract/spn-tests.json":
+      { env: "local", tiers: ["CONTRACT"], ranAt: "2026-09-20T08:00:00Z", results: [{ id: "IAM.LOGIN.02", tier: "CONTRACT", status: "SUCCESS", title: "t" }] },
+    "apps/web/tests/.output/contract/spn-tests.json":
+      { env: "local", tiers: ["CONTRACT"], ranAt: "2026-09-28T08:00:00Z", results: [{ id: "IAM.OTHER.01", tier: "CONTRACT", status: "SUCCESS", title: "t" }] },
+  });
+  run(root, "--write");
+  ok("[MKT.SCRIPTS.50] the row is dated by the run that named it, not by a newer run that did not",
+     cells(doc, "IAM.LOGIN.02").at === "2026-09-20T08:00:00Z", JSON.stringify(cells(doc, "IAM.LOGIN.02")));
+}
+
+{
+  const promise = [
+    "| Id | Who | Does | Sees | Type | Tier | Status | Updated at |",
+    "| --- | --- | --- | --- | --- | --- | --- | --- |",
+    "| IAM.PROM.01 | a person | signs in | the home page | PROMISE | CONTRACT | PLANNED | — |",
+  ];
+  const { root, doc } = standWith(promise, CONTRACT_RUN([{ id: "IAM.PROM.01", tier: "CONTRACT", status: "SUCCESS", title: "t" }]));
+  run(root, "--write", "--reach", "repository");
+  ok("[MKT.SCRIPTS.51] a PROMISE row is never stamped", byHeading(doc, "IAM.PROM.01").status === "PLANNED");
+}
+
+{
+  const { root, doc } = stand([{ id: "IAM.LOGIN.02", tier: "CONTRACT", status: "SUCCESS", title: "t", detail: null }]);
+  run(root, "--write");
+  const first = statSync(doc).mtimeMs;
+  const before = readFileSync(doc, "utf8");
+  const second = run(root, "--write");
+  ok("a second run over the same artifact changes no row", second.includes("wrote 0 row(s)") && readFileSync(doc, "utf8") === before);
+  ok("and leaves the file's modified time where it was", statSync(doc).mtimeMs === first);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — behaviour-rows` : `\n  all ${total} passed — behaviour-rows`);

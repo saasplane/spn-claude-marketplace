@@ -11,7 +11,7 @@
 | Chapter | What it carries |
 | --- | --- |
 | [01 — Stack Checks](04-scripts.md) | Six write-time checks behind one dispatcher, reading a source file with the pending write already applied |
-| [02 — Stack Tools](04-scripts.md) | The action surface measured against what claims it, and the writer of two cells in a behaviour row |
+| [02 — Stack Tools](04-scripts.md) | The writer of two cells in a behaviour row, the join and proof checks over the rows, and the tests measurement |
 | [03 — Stack Skills](03-skills.md) | Five skills, one of them divided into seven ordered steps in contract-first order |
 | [04 — Stack Refs](05-refs.md) | One file: the planning layer for an `APPS` and TypeScript node |
 

@@ -27,4 +27,6 @@
 
 **An integration case skips itself when its service is unreachable**, and a skipped case proves nothing. Read the count, not the colour — and remember that a line reporter drops the artifacts that say *which* case skipped.
 
+**A case declares what it flips with `SPTestMutationScopeType` from `@saasplane/toolchain-ts/contract`**, and writes the tag with `mutationTag` from `@saasplane/toolchain-ts/test/axes.mjs` — the same module the phase configurations select by. A platform declares no scope of its own.
+
 **Run the tier that owns the rule you changed.** A change to a refusal needs the integration tier; unit passes straight over it.

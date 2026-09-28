@@ -40,7 +40,7 @@ description: Produce a report or an approach document into a node's artifacts po
 ### The traceability matrix reads the rows, and never derives them
 
 **The behaviour rows ARE the obligation** (decision `RD.APPS.081`). A row says what a persona can do; a case proves it by
-naming the row's id in its title; a run writes `Status` and `Updated at` back into the row. So this report **reads two
+naming the row's id in its title; after a run the agent's row writer stamps `Status` and `Updated at` into the row. So this report **reads two
 things and joins them** — the rows in `docs/03-behaviors/`, and what the last run of each tier actually reported.
 
 **It never works the obligation out for itself.** An earlier model derived what a screen owed from the shape of its path,
@@ -50,9 +50,8 @@ this report exists downstream of.
 **A run speaks for the tiers it ran and no others.** Say which tiers the numbers cover, in the report, every time. A row
 whose tier did not run is **unproved, not failing**, and those are different findings needing different work.
 
-**Two questions live next door and are not this one.** *Does an action exist that no row claims?* is
-`action-coverage`, which reads declared API actions against the rows. *Did the suite go green?* is the run itself. Folding
-either into this report is how a percentage gets back in.
+**A question lives next door and is not this one.** *Did the suite go green?* is the run itself, and folding it into this
+report is how a percentage gets back in.
 
 ## Format
 

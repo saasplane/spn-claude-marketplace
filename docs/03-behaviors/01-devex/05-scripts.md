@@ -5,7 +5,7 @@
   "title": "Behaviors — Scripts",
   "lenses": ["SERVER_DEV", "ARCHITECT"],
   "status": "PLANNING",
-  "summary": "What the scripts folder promises: an ordinary edit that pays almost nothing, a refusal that names its door, a bar taken from a rule rather than from the corpus, silence where an input is absent, an exit code carrying only refusals, and a page that is produced rather than typed.",
+  "summary": "What the scripts folder promises: an ordinary edit that pays almost nothing, a refusal that names its door, a bar taken from a rule rather than from the corpus, silence where an input is absent, an exit code carrying only refusals, a page that is produced rather than typed, one writer for every repository's rows, a proof read against the runs, and the tests measured tier by tier.",
   "keywords": ["script", "check", "tool", "silence", "exit code", "rows"]
 }
 -->
@@ -40,6 +40,19 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.18 | Architect | follow a link on a produced page and land where the seat file meant | Each relative link is re-expressed against the page's own folder as it is written | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.19 | Quality engineer | read a page's behaviour rows without them being typed into it | The rows are joined from the register beside the construct, and the seat file is not touched | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.20 | Architect | tell a generated region of a face from the prose around it | The region sits between markers naming what writes it | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.29 | Quality engineer | keep the cells a person decided after a run writes | Only the status and the moment it was found are written; every other cell is copied through | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.30 | Quality engineer | run one rung and leave the rows of the others as they were | A run updates only the rows declaring a tier it covered | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.31 | Quality engineer | keep a hand-checked row through every run | A row marked as checked by a person is never written over | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.32 | Quality engineer | tell a case that was skipped from a case that passed | The status comes from the runner's own results file rather than from a specification | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.48 | Quality engineer | stamp a register whose rows carry eight, nine or ten cells | The writer finds `Id`, `Tier`, `Status` and `Updated at` by their headings, so every width is stamped and keeps its width | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.49 | Quality engineer | have a row stamped only by a result at the row's own tier | A result proven at another tier is not read as evidence, and the row is left as it was | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.50 | Quality engineer | read on a row the moment of the run that named it | `Updated at` is the newest run that named the row, never a newer run that did not | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.51 | Quality engineer | keep a promise row out of every run | A row whose `Type` is `PROMISE` is never stamped | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.53 | Quality engineer | be refused a `SUCCESS` row the last run of its tier contradicts | The proof check exits non-zero, naming the row, what the run found and the artifact it read | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.54 | Quality engineer | run the proof check where a tier has not run | A row whose tier no artifact speaks for is counted as unspoken, and is never a finding | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.55 | Quality engineer | measure what the tests have proved, tier by tier | Every row is joined to the last run of its tier; a tier with no run reads `NOT_RUN` with its reason, never as a pass, and `--json` hands the measurement over | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.56 | Quality engineer | ask for the measurement in a foundation repository | The tool answers that the rows are promises with no status, and that no report is owed | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.57 | Quality engineer | measure an unchanged tree twice | Both measurements are the same bytes, with the same digest, and `report.current` says whether the page already carries it | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

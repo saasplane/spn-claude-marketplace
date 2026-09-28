@@ -133,11 +133,18 @@ specified path does not exist`, which reads as a broken command rather than a mi
 
 ## After a run: the rows say what it found
 
-A run leaves `tests/.output/<tier>/spn-tests.json` behind — every behaviour id its case titles carried, and what the runner actually did with each. Writing that into the registers is one command:
+A run leaves `tests/.output/<tier>/spn-tests.json` behind — every behaviour id its case titles carried, and what the runner actually did with each. **`spnutils` writes the artifact and never a row** (`RD.DEVEX.071`). Writing it into the registers is the **spn-devex** plugin's row writer, `scripts/tools/behaviour-rows.ts` in that plugin (cross-plugin pointer; it ships alongside this plugin), run the way its `test` skill runs it: first without `--write` to see what it would change, then with it. The same plugin's `scripts/checks/behaviour-proof.ts` then refuses a `SUCCESS` row the run of its tier contradicts.
+
+The join is this plugin's, because where a case lives is the stack's:
 
 ```bash
-node "${CLAUDE_PLUGIN_ROOT}"/hooks/tools/behaviour-rows.ts            # what it would change
-node "${CLAUDE_PLUGIN_ROOT}"/hooks/tools/behaviour-rows.ts --write
+node "${CLAUDE_PLUGIN_ROOT}"/scripts/checks/behaviour-join.ts .      # a SUCCESS row no case cites, a case citing no row
+```
+
+Where the run collected coverage, raise each project's floor to what it measured — it never lowers one:
+
+```bash
+node "${CLAUDE_PLUGIN_ROOT}"/providers/ts/scripts/tools/coverage-floor.ts --write <project>
 ```
 
 **Pass `--reach repository` only when the artifacts on disk ARE the whole of the tiers they name** — a full run of every node that owes them. Without it, a row no artifact mentioned is left exactly as it was. With it, such a row goes back to `PLANNED`, which is right after a complete run and wrong after a single node's: runs are per node and a register is per repository, so one node's journey run would otherwise reset another's rows.

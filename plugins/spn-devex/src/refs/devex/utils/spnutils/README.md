@@ -21,7 +21,7 @@ One CLI serves every stack. The group says *what kind of thing changes*, which i
 | Group | Changes | Never |
 | --- | --- | --- |
 | `repo` | the repository and its remote — creation, convergence to the standard, agent wiring | the content of code, tests, or docs |
-| `apps` | the apps domain's nodes — scaffolds, generated sources, conformance, release | repo settings or the estate |
+| `apps` | the apps domain's nodes — scaffolds, generated sources, conformance, a tier's run artifact, release | repo settings, the estate, or a document — rows, registers and reports are the agent's, through plugin scripts (`RD.DEVEX.071`) |
 | `infra` | the estate — layers, apps, config, estate packages; **local is the default realization, `--cloud` is asked for by name** | committed code |
 | `workspace` | the level above the repository — the floor's permission tiers, the plugin union, the machine env seat, and `.spndevex/` | anything inside a repository |
 

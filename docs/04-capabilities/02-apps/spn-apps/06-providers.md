@@ -23,6 +23,10 @@ One folder sits under `plugins/spn-apps/src/providers/`, named for the stack thi
 | The host assertion | `plugins/spn-apps/src/providers/ts/scripts/checks/_tests/host-assertion.ts` | an unanchored host pattern in a navigation assertion |
 | The assertion message | `plugins/spn-apps/src/providers/ts/scripts/checks/_tests/assertion-message.ts` | a journey assertion with nothing explaining an absence |
 | The coverage warnings | `plugins/spn-apps/src/providers/ts/scripts/checks/_tests/coverage.ts` | a route nothing exercises, a mutation nothing undoes, a doubled seam |
+| The coverage floor check | `plugins/spn-apps/src/providers/ts/scripts/checks/_tests/coverage-floor.ts` | a write that lowers a floor, or adds an exclude with no reason |
+| The coverage floor script | `plugins/spn-apps/src/providers/ts/scripts/tools/coverage-floor.ts` | raises each floor in a project's own configuration to what a run measured |
+| How a floor and its excludes are read | `plugins/spn-apps/src/providers/ts/scripts/lib/floors.ts` | one parse of a Jest or Vitest configuration, shared by the floor script and the floor check |
+| Where a case lives, and its title | `plugins/spn-apps/src/providers/ts/scripts/lib/cases.ts` | each tier's folder and file pattern, and the ids a case title cites, for the join |
 
 ## Follows the pattern
 
@@ -72,6 +76,12 @@ One folder sits under `plugins/spn-apps/src/providers/`, named for the stack thi
 **Why** — *a refusal on a rule still being designed teaches people to work around the hook*. The coverage model belongs to its own argument.
 **What** — the coverage findings warn and under-report on purpose; the grammar, naming, sequencing, cycle and host rules refuse, because each is settled and each names its own exception.
 **How** — the coverage file marks the function to replace when the model lands, and keeps its trigger and its message meanwhile. `plugins/spn-apps/src/providers/ts/scripts/checks/_tests/coverage.ts`.
+
+### A floor rises by script and never falls by hand
+
+**Why** — *without a ratchet, the cheapest way past a failing floor is to edit it down* (the book's RD.APPS.133). A number somebody typed is a number nobody measured, and an exclude with no reason cannot be told from code nobody wrote a case for.
+**What** — after a run that collected coverage, the script reads `coverage-summary.json` and raises each of the four numbers in `coverageThreshold.global` or `coverage.thresholds` to the measured value rounded down, with the date in a comment. A number above the measurement is left as it was, and the script says the run falls below it. The check refuses a write that lowers any of the four, and refuses a new `coveragePathIgnorePatterns` or `coverage.exclude` entry with no comment beside it. A Playwright configuration is never read.
+**How** — the script writes the file directly, so the check at the moment of a write sees only a person's edit. `plugins/spn-apps/src/providers/ts/scripts/tools/coverage-floor.ts` and `plugins/spn-apps/src/providers/ts/scripts/checks/_tests/coverage-floor.ts`, proven on fixtures in `plugins/spn-apps/tests/unit/providers/ts/tools/t-coverage-floor.mjs` and `plugins/spn-apps/tests/unit/providers/ts/checks/_tests/t-coverage-floor.mjs`.
 
 ### Two rules exist because a green run was lying
 
