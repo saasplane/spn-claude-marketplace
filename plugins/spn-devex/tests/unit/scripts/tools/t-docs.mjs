@@ -1430,6 +1430,47 @@ console.log("\n=== an escaped pipe inside a Terms cell stays one cell (found by 
     got, has("| [the matcher](hooks.md) | `Write\\|Edit` | the tool names an entry narrows to |"));
 }
 
+console.log("\n=== an authored page defines no selector its declared template does not (N25 step 6)");
+{
+  // THE REAL TEMPLATES, copied untouched. A fixture stylesheet would prove the reader agrees with
+  // the fixture; the figure this check exists to produce is measured against these files.
+  const templates = resolve(PLUGIN, "..", "..", "..",
+                            "spn-foundation", "docs", "04-capabilities", "01-devex",
+                            "04-workspace", "04-docs", "templates");
+  process.env.SPN_TEMPLATES = templates;
+  const overview = readFileSync(resolve(templates, "pages", "overview-template.html"), "utf8");
+  const hub = readFileSync(resolve(templates, "pages", "hub-template.html"), "utf8");
+  const invent = (page, css) => page.replace("</style>", `${css}\n</style>`);
+  const ws = repo({
+    "docs/artifacts/overviews/concept-core-overview.html": overview,
+    "docs/artifacts/overviews/concept-bad-overview.html": invent(overview, "  .invented-hero > .lede{margin:0}"),
+    "docs/artifacts/overviews/concept-media-overview.html":
+      invent(overview, "  @media (max-width:40rem){ .only-narrow, .tile{padding:0} }\n  @keyframes spin{from{opacity:0}to{opacity:1}}"),
+    "docs/artifacts/overviews/concept-overview.html": hub,
+    "docs/artifacts/overviews/concept-glyph-overview.html": invent(overview, "  .tile .glyph{float:right}"),
+    "docs/artifacts/overviews/concept-late-overview.html": overview + "\n<style>\n  .late-block{color:red}\n</style>\n",
+  });
+  const got = (p) => run(ws, ["audit", `docs/artifacts/overviews/${p}`]);
+
+  one("an untouched copy of the overview template is not reported", got("concept-core-overview.html"), lacks("SOFT selector"));
+  one("an untouched copy of the hub template is not reported", got("concept-overview.html"), lacks("SOFT selector"));
+  one("a page with an invented selector is reported, SOFT, naming it",
+    got("concept-bad-overview.html"), (g) => g.includes("SOFT selector") && g.includes("`.invented-hero>.lede`"));
+  // The copied template carries its placeholders, so other checks refuse it; the claim here is only
+  // that THIS check reports rather than refuses.
+  one("and it never refuses", got("concept-bad-overview.html"), (g) => g.includes("! SOFT selector") && !g.includes("RULE selector"));
+  one("a selector inside @media is read; one the template declares there is not reported",
+    got("concept-media-overview.html"), (g) => g.includes("defines 1 selector(s)") && g.includes("`.only-narrow`"));
+  one("a keyframe step is not a selector", got("concept-media-overview.html"), lacks("`from`"));
+  one("the hub's template blesses `.tile .glyph`, a domain overview's does not",
+    got("concept-glyph-overview.html"), has("`overview-template.html` does not — `.tile .glyph`"));
+  one("every style block is read, not only the first", got("concept-late-overview.html"), has("`.late-block`"));
+  one("the same page gives the same finding twice", got("concept-bad-overview.html"), (g) => g === got("concept-bad-overview.html"));
+  delete process.env.SPN_TEMPLATES;
+  one("with no template to read, nothing is reported rather than everything",
+    got("concept-bad-overview.html"), lacks("SOFT selector"));
+}
+
 console.log("\n=== a package face's Map names chapters, never the realization files beside them");
 {
   const root = repo({

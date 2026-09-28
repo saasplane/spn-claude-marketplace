@@ -853,6 +853,106 @@ function checkPalette(file: string, src: string, templates: string): Finding[] {
   return f;
 }
 
+/**
+ * The template an authored page declares, or null where the page is produced or declares none.
+ *
+ * THE VARIANT NAMES THE TEMPLATE, AND A HUB IS THE ONE OVERVIEW NAMED FOR NO DOMAIN. Both the hub and
+ * a domain overview declare `overview`; `hub-template.html` ships the id `concept-overview`, so the
+ * page a repository writes from it is `concept-overview.html` and every other overview came from
+ * `overview-template.html`. A construct page is produced, and `checkProduced` compares it whole.
+ */
+function declaredTemplate(file: string, block: any, templates: string): string | null {
+  if (!file.endsWith(".html")) return null;
+  const variant = block?.variant;
+  if (variant === "overview")
+    return join(templates, "pages", basename(file) === "concept-overview.html" ? "hub-template.html" : "overview-template.html");
+  if (variant === "report") return join(templates, "pages", "report-template.html");
+  if (variant === "approach") return join(templates, "workstream", "approach-template.html");
+  return null;
+}
+
+/**
+ * Every selector a page's stylesheets declare, in the order they first appear.
+ *
+ * EVERY `<style>` BLOCK, NEVER THE FIRST. Every template ships several, and the measurement this
+ * replaces once read only the first: it reported the template's own `.prose` and `.nextnav` as
+ * bespoke on forty pages, which was the extractor being measured rather than the corpus.
+ *
+ * A selector list splits at its top-level commas; whitespace and the spacing around a combinator
+ * are normalized, because `.a > .b` and `.a>.b` are one selector. A grouping at-rule — `@media`,
+ * `@supports` — is read through, since a rule inside one is still a rule the page declares. The
+ * body of `@keyframes` is skipped: `from` and `50%` are not selectors.
+ */
+function selectorsIn(src: string): string[] {
+  const seen = new Set<string>();
+  const splitTop = (prelude: string): string[] => {
+    const parts: string[] = [];
+    let depth = 0, current = "";
+    for (const ch of prelude) {
+      if (ch === "(" || ch === "[") depth += 1;
+      if (ch === ")" || ch === "]") depth -= 1;
+      if (ch === "," && depth === 0) { parts.push(current); current = ""; }
+      else current += ch;
+    }
+    parts.push(current);
+    return parts;
+  };
+  const walk = (css: string): void => {
+    let at = 0;
+    while (at < css.length) {
+      const open = css.indexOf("{", at);
+      if (open < 0) return;
+      const prelude = css.slice(at, open).replace(/[;}]/g, " ").trim();
+      let depth = 1, close = open + 1;
+      while (close < css.length && depth) {
+        if (css[close] === "{") depth += 1;
+        else if (css[close] === "}") depth -= 1;
+        close += 1;
+      }
+      const body = css.slice(open + 1, close - 1);
+      if (prelude.startsWith("@")) {
+        if (/^@(media|supports|layer|container)\b/.test(prelude)) walk(body);
+      } else {
+        for (const part of splitTop(prelude)) {
+          const selector = part.replace(/\s+/g, " ").replace(/\s*([>+~])\s*/g, "$1").trim();
+          if (selector) seen.add(selector);
+        }
+      }
+      at = close;
+    }
+  };
+  for (const m of src.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)) walk(m[1].replace(/\/\*[\s\S]*?\*\//g, ""));
+  return [...seen];
+}
+
+/**
+ * An authored page defines no selector the template it declares does not (N25 step 6).
+ *
+ * THE FIGURE WAS MEASURED BY HAND THREE TIMES AND GAVE THREE NUMBERS — 71, 79, 49 — because each
+ * measure was a new extractor, and one of them read only a page's first stylesheet. A number nobody
+ * can reproduce cannot close a step, so the reader is this check and the figure is its count.
+ *
+ * AGAINST THE TEMPLATE THE PAGE DECLARES, not the construct template for every page. The hub
+ * template blesses `.tile .glyph` and the approach template its `.card` set; measuring a hub
+ * against the construct template reports as bespoke a rule its own template ships.
+ *
+ * SOFT, because the check is new and the pages it names move to the standard blocks one by one.
+ * Only the direction a page ADDS is read: a template rule the page lacks is `checkFurniture`'s.
+ */
+function checkSelectors(file: string, src: string, block: any, templates: string): Finding[] {
+  const template = declaredTemplate(file, block, templates);
+  if (!template) return [];
+  let declared: Set<string>;
+  try { declared = new Set(selectorsIn(readFileSync(template, "utf8"))); }
+  catch { return []; }
+  if (!declared.size) return [];
+  const bespoke = selectorsIn(src).filter((s) => !declared.has(s));
+  if (!bespoke.length) return [];
+  return [{ check: "selector", grade: "SOFT", file, message:
+    `defines ${bespoke.length} selector(s) \`${basename(template)}\` does not — ${bespoke.map((s) => "`" + s + "`").join(" · ")}. ` +
+    "A page reaches for a standard block rather than styling its own" }];
+}
+
 function checkStyleBalance(file: string, src: string): Finding[] {
   const f: Finding[] = [];
   const blocks = [...src.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)];
@@ -3100,6 +3200,7 @@ function audit(paths: string[], workspace: string): Finding[] {
     findings.push(...checkConstructLink(p, src));
     findings.push(...checkFurniture(p, src, templates));
     findings.push(...checkPalette(p, src, templates));
+    findings.push(...checkSelectors(p, src, block, templates));
     findings.push(...checkGovernsMap(p, src));
     findings.push(...checkProof(p, src));
     findings.push(...checkBinds(p, src, block));
