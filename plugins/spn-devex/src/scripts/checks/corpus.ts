@@ -176,7 +176,7 @@ export function fingerprint(root: string, trees: string[], toolDir: string): str
   //
   // That is the same shape as `F1` above, seen from the other side. `F1` was a real finding that
   // stopped being reported; this was a fixed finding that would not stop.
-  const ref = join(toolDir, "..", "..", "refs", "commands.md");
+  const ref = join(toolDir, "..", "..", "refs", "devex", "utils", "spnutils", "commands.md");
   try { const st = statSync(ref); lines.push(`commands.md\t${st.size}\t${st.mtimeMs}`); }
   catch { lines.push("commands.md\tabsent"); }
   return createHash("sha256").update(lines.join("\n")).digest("hex");

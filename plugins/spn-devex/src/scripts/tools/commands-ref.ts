@@ -34,7 +34,7 @@ import { createHash } from "node:crypto";
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 
-const REF = resolve(dirname(new URL(import.meta.url).pathname), "..", "..", "refs", "commands.md");
+const REF = resolve(dirname(new URL(import.meta.url).pathname), "..", "..", "refs", "devex", "utils", "spnutils", "commands.md");
 const WHAT = "commands";
 const BEGIN = `<!-- spn:generated ${WHAT} — do not edit inside these markers; \`commands-ref.ts\` writes it -->`;
 const END = "<!-- /spn:generated -->";

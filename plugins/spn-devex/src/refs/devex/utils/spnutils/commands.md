@@ -5,7 +5,7 @@
 **Nothing here is written by hand.** A command added to the binary changes no document, so no hash would move and nothing would report a hand-written list going stale. That is why this one is produced.
 
 <!-- spn:generated commands — do not edit inside these markers; `commands-ref.ts` writes it -->
-Rendered from `spnutils 1.2.75` — the **released** CLI, which is what a partner holds.
+Rendered from `spnutils 1.2.77` — the **released** CLI, which is what a partner holds.
 Surface `d44f5c7f8b04` — the COMMANDS. A release that adds none leaves it unmoved, so the diff is the version line alone.
 
 #### `apps`

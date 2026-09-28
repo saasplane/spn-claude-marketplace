@@ -127,8 +127,8 @@ console.log("\n=== corpus — the trigger, against a known-bad corpus");
   // is relative to the TOOL directory — so a fixture proves it and the real `refs/` is left alone.
   const { fingerprint } = await import(CHECK);
   const root = fixture("commands-ref-input");
-  const tools = join(BASE, "plug", "hooks", "tools");
-  const refs = join(BASE, "plug", "refs");
+  const tools = join(BASE, "plug", "src", "scripts", "tools");
+  const refs = join(BASE, "plug", "src", "refs", "devex", "utils", "spnutils");
   mkdirSync(tools, { recursive: true });
   mkdirSync(refs, { recursive: true });
   const trees = [join(root, "repo-a", "docs")];
