@@ -1,7 +1,7 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/README.md", "seen": "61da1954" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/README.md", "seen": "7a380519" }
   ],
   "decisions": [
     "RD.APPS.086",
@@ -50,6 +50,7 @@
 - **Behaviour does not cross a harness's process boundary.** Where a component tier's harness drives the browser from another process, only data crosses. So behaviour a mount needs is defined in the build the browser runs. The case imports that module and drives it through serializable inputs alone. Most components need none of this, and the case keeps its own mount by default (`RD.APPS.099`).
 - **A red naming what no source declares is a stale build, not a defect.** A build cache keyed by file name outlives a rename, so it is cleared by the change that renamed, moved or deleted what it compiled (`RD.APPS.100`).
 - **A case that destroys a session runs where nothing else depends on that session.** Revoking a sign-in, logging out or changing a credential destroys the session other cases work in, and worker isolation cannot help because the damage is server-side (`RD.APPS.098`).
+- **Every project carries a code-coverage floor, measured rather than chosen, that the runner reads on every run and that rises and never falls** (`RD.APPS.133`). Code a case cannot reach is named, with its reason, in the exemptions file, never hidden by a lower number.
 
 ## What it never does
 

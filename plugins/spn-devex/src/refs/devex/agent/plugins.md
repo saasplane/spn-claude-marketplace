@@ -2,7 +2,7 @@
 {
   "docs": [
     { "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/04-plugins.md", "seen": "5092ce4d" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md", "seen": "cb521b23" }
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md", "seen": "82ccb043" }
   ]
 }
 -->
@@ -185,6 +185,8 @@ A session reads the installed cache, so changed files and unchanged behaviour is
 **Reloading in the middle means reloading twice**, and a half-reloaded session is one where you cannot tell which copy answered. Do every edit, release the tool if it moved, sync once, then take one fresh window.
 
 **A session cannot adopt its own new wiring, so the tool that changed it owes the handover — MUST.** The session that installs a plugin or re-mints a wiring level is the one session that will not read the result, and it is also the only one that knows what changed and why. A handover that reports only the fact is the failure this rule exists to prevent — told that the plugins updated, the next window starts from nothing and re-derives the work that produced the change. Carry the work itself, so the next window continues rather than restarts.
+
+**The sitting that changed the wiring finishes it before it offers a handover — MUST** (`RD.DEVEX.059`). A handover can be complete and still point at wiring nobody installed, and the next window then opens on the previous generation.
 
 **A partner's form of this is shorter and the order is identical**: check whether a newer version is published, install it, run the syncs, take a fresh window.
 

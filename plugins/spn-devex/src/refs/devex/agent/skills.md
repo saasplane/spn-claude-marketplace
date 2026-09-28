@@ -2,7 +2,7 @@
 {
   "docs": [
     { "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md", "seen": "ebb9e28f" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/02-skills/01-skills.md", "seen": "0038088c" }
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/02-skills/01-skills.md", "seen": "a00bf6b3" }
   ]
 }
 -->
@@ -45,3 +45,5 @@ plugins/spn-infra/src/skills/implement/   →  INFRA_IMPLEMENT
 **A stack-agnostic skill needing a concrete step reads a file the stack's own provider folder ships.** Copying the skill per stack is what the provider folders exist to prevent.
 
 **No plugin may name another plugin's file path.** A cross-plugin address is a name, never a path — a partner's install has no sibling directory to reach into.
+
+**A path written in a plugin file names a file the installed plugins carry — MUST** (`RD.DEVEX.070`). A path the install does not carry sends the agent to nothing, and it writes the rule it expected to find.

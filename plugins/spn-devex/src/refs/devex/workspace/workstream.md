@@ -2,7 +2,7 @@
 {
   "docs": [
     { "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md", "seen": "1d95cfde" },
-    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md", "seen": "b97cea60" },
+    { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md", "seen": "20991b2d" },
     { "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md", "seen": "2f0bd1a1" }
   ]
 }
@@ -105,6 +105,8 @@ document, so one workstream holds a driver change, an estate change and a plugin
 
 **A preview costs nothing to throw away.** Code written first makes the decision feel already taken,
 and it turns a question into a fait accompli.
+
+**A major release is agreed while the arc is planned — MUST** (`RD.DEVEX.069`). A minor or patch bump is released without asking. A major one is a card answered with the arc's other cards, and its go is a dated log line naming the version, so execution reads the record instead of stopping to ask.
 
 ## A go is written down, or it did not happen
 

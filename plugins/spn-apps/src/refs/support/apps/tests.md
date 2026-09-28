@@ -2,7 +2,7 @@
 {
   "docs": [
     { "path": "spn-foundation/docs/02-constructs/02-support/01-apps/06-tests.md", "seen": "298c01fb" },
-    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/", "seen": "a117babd" }
+    { "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/", "seen": "8c26e972" }
   ]
 }
 -->
@@ -153,6 +153,8 @@ A percentage is not the answer — it moves when a case is added and says nothin
 **A release gate is a named subset of the rows — MUST.** Absent that name, every case blocks a release in principle, which in practice means a red is waved through on judgement and the gate means nothing. Two exclusions, each excluded for a stated reason: anything requiring a real vendor round trip, because a vendor's outage is not a regression in the code; and what only a person can complete, such as a proof-of-person challenge, kept as a short list that is never claimed empty. A skipped case still leaves its row `PENDING` — a run reports the rows it did not reach as well as the ones it did.
 
 **The join is checked in both directions.** A cited id **MUST** exist — a case title naming a row no document declares resolves to nothing. A `SUCCESS` row **MUST** resolve to a case — review alone never enforces that. The pattern a scan reads ids with **MUST** match every id shape the registers actually use, a digit in a middle segment included, or the scan silently indexes part of the register and reports green over the rest.
+
+**A second number answers a different question: how much of the code does any suite execute at all.** Every project carries a code-coverage floor, measured rather than chosen, that the runner reads on every run and that rises and never falls (`RD.APPS.133`). It never decides a release on its own. Code no automatic case can reach is named, with its reason, in the exemptions file.
 
 ## Isolation, and reading a result honestly
 
