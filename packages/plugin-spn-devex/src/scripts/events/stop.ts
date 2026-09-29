@@ -12,6 +12,7 @@
 //   needs-you  a reply given while a card is open opens with **Needs you**
 //   hold       an arc whose status reads HELD must name a card that exists and is unanswered
 //   handover   a reply that says a new window is needed carries the seven fields
+//   welcome    a session's first turn opens with the welcome, word for word: the heading and its four lines
 //   corpus     the docs trees still answer the questions only a whole-corpus read can ask
 //
 // `corpus` is the newest and the odd one out: every other check here reads what the TURN wrote, and
@@ -35,7 +36,7 @@ import { STEP_ID, answeredNumbers, cardsOf, heldOn, isInProgress, markedAgo, ope
 import { TERMINAL } from "../checks/arc-status.ts";
 import { workspaceRoot } from "../lib/payload.ts";
 import { DEVEX, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { cacheState } from "./orientation.ts";
+import { cacheState, welcome } from "./orientation.ts";
 import { begin, span, end, tagsOf } from "../lib/timing.ts";
 
 type Warning = { check: string; message: string };
@@ -466,11 +467,18 @@ export function checkHold(root: string): Warning[] {
  * So a future or conditional mention is not a pass-on. A direction is.
  */
 const SESSION = /\b(?:new|fresh|another|next)\s+(?:window|session)\b|\bhand(?:ing)?\s+(?:this |it )?over\b/gi;
-const NOT_YET = /\b(?:will|would|'ll|once|after|when|going to|about to|then|may|might|could|if)\b[^.?!]{0,80}$/i;
+const NOT_YET = /\b(?:will|would|'ll|once|after|before|until|when|going to|about to|then|may|might|could|if)\b[^.?!]{0,80}$/i;
 // AND IT CAN FOLLOW, which the first cut missed. "a fresh window WOULD load the installed copy" is a
 // description of a consequence, and every conditional word in it sits after the phrase rather than
 // before. Looking only backwards refused a reply that was explaining what a build costs.
-const NOT_YET_AFTER = /^[^.?!]{0,60}\b(?:will|would|'ll|may|might|could|is going to)\b/i;
+const NOT_YET_AFTER = /^[^.?!]{0,60}\b(?:will|would|'ll|may|might|could|can|cannot|can't|is going to)\b/i;
+// AN ARC'S TITLE IS A NAME, NOT A DIRECTION. `N119 — the fresh window proves both repositories` is
+// what 008 calls an arc, so every honest status reply names it; a hit within a few words after an
+// `N<nn>` reference, on the same line and in the same table cell, is that title (N116 row 8, F3).
+const IN_AN_ARC_TITLE = /\bN\d{1,3}\b[^.?!|\n]{0,40}$/;
+// ANY WINDOW IS NOT A PARTICULAR ONE. "any fresh window here can read the log" says what every
+// window can see; a pass-on sends the work to one.
+const ANY_WINDOW = /\b(?:any|every|each)\s+$/i;
 // AND A COST IS NOT A DIRECTION, which the two guards above cannot see because they look for
 // conditional WORDS and a cost is a noun phrase. "one bump, the installs, one `agent-sync`, and a
 // fresh window" is a list of what a plugin cycle costs; it directs nobody to do anything, and this
@@ -518,6 +526,8 @@ export function passingOn(reply: string): boolean {
     if (NOT_YET.test(before) || NOT_YET_AFTER.test(after)) continue;
     if (A_COST_LIST.test(before)) continue;      // counted as a cost, not asked for
     if (ABOUT_THE_WORDS.test(before)) continue;  // explained, not directed
+    if (IN_AN_ARC_TITLE.test(before)) continue;  // an arc's name, not a direction
+    if (ANY_WINDOW.test(before)) continue;       // every window, not the next one
     return true;                                 // stated plainly: this is being passed on
   }
   return false;
@@ -910,6 +920,62 @@ export function checkArcToPage(root: string): Warning[] {
   return out;
 }
 
+// ---------------------------------------------------------------------------- welcome
+
+/** Markdown emphasis off and white space folded, so a line compares as the words a reader sees. */
+function plain(text: string): string {
+  return text.replace(/\*\*|__|(?<![\w*])\*(?!\s)|(?<!\s)\*(?![\w*])/g, "").replace(/^#+\s*/gm, "")
+    .replace(/\s+/g, " ").trim();
+}
+
+/**
+ * Every assistant text block of a session's first turn, joined — the transcript from its start to
+ * the first Stop. `last_assistant_message` is the turn's LAST text, and the welcome is its first.
+ */
+export function firstTurnText(transcript: string): string {
+  let raw = "";
+  try { raw = readFileSync(transcript, "utf8"); } catch { return ""; }
+  const texts: string[] = [];
+  for (const line of raw.split("\n")) {
+    if (!line.trim()) continue;
+    let entry: { type?: string; message?: { content?: unknown } };
+    try { entry = JSON.parse(line); } catch { continue; }
+    if (entry.type !== "assistant" || !Array.isArray(entry.message?.content)) continue;
+    for (const part of entry.message.content as Array<{ type?: string; text?: string }>)
+      if (part.type === "text" && part.text) texts.push(part.text);
+  }
+  return texts.join("\n\n");
+}
+
+/**
+ * The welcome's parts a first turn left out. The heading is matched by the words after the name,
+ * because the name is optional and the heading has a first-visit form; the four lines under it are
+ * matched whole, as text. A proof run (N116 row 8) met a heading alone, a line cut at its last
+ * sentence, and no welcome at all, each on a prompt that carried work — so a line counts only when
+ * every word of it is there.
+ */
+export function missingWelcome(text: string): string[] {
+  const said = plain(text);
+  const [, , tagline, , agent, , stages, , roles] = welcome(null, false).map(plain);
+  const missing: string[] = [];
+  if (!/Welcome back to SaaS Plane!|Glad you're here!/.test(said)) missing.push("the heading");
+  for (const [name, line] of [["the italic line", tagline], ["the 🤖 line", agent], ["the 🧭 line", stages], ["the 👥 line", roles]] as const)
+    if (!said.includes(line)) missing.push(name);
+  return missing;
+}
+
+/** A session's first turn that does not open with the whole welcome (02-agent/01-agent.md § The session opens on the ground). */
+export function checkWelcome(firstTurn: string): Warning[] {
+  if (!firstTurn.trim()) return [];
+  const missing = missingWelcome(firstTurn);
+  if (!missing.length) return [];
+  return [{ check: "welcome", message:
+    `This session's first reply left out ${missing.join(" · ")} of the welcome. The first reply opens with ` +
+    `the welcome word for word, whatever the prompt — a question and a pasted handover included — then ` +
+    `the status line, then the answer (RD.DEVEX.WORKSPACE.045). In some editors that reply is the only ` +
+    `place the developer sees it. Say it in full at the top of your next reply.` }];
+}
+
 // ---------------------------------------------------------------------------- the hook
 
 // MATCHES THE BUNDLED NAME TOO, BY EXACT BASENAME. This hook ships built as `dist/events/stop.mjs`,
@@ -950,6 +1016,8 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
     }
   }
   const repeated = event.stop_hook_active === true && (baseline?.fired ?? []).includes("handover");
+  // No baseline means this Stop ends the session's first turn: the one the welcome belongs to.
+  const firstTurn = !baseline && event.transcript_path && !event.agent_id ? firstTurnText(event.transcript_path) : "";
   const warnings = [
     ...span("stop-reply-shape", () => checkReplyShape(reply, cardsWaiting(root))),
     ...span("stop-arc-to-page", () => checkArcToPage(root)),
@@ -959,6 +1027,7 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
     // says this turn continues because a Stop hook spoke; where the handover check was what spoke,
     // the reply is its answer, and demanding the block a second time is the loop the developer met.
     ...span("stop-handover", () => repeated ? [] : checkHandover(reply, root)),
+    ...span("stop-welcome", () => checkWelcome(firstTurn)),
     ...span("stop-corpus", () => checkCorpus(root)),
   ];
   end();

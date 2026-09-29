@@ -462,15 +462,25 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
     tables.every((t) => !offer.message.includes(t)));
   says("the agent's context carries the same opening, then every table and the closing question",
     offer.context.startsWith(offer.message) && tables.every((t) => offer.context.includes(t)));
-  says("the note tells the agent to open with the welcome whatever the prompt, and to hold the tables",
-    offer.context.includes("Open your first reply with the welcome above, whatever the prompt, then the status line under it.")
+  says("the note tells the agent to open with the welcome word for word, and to hold the tables",
+    offer.context.includes("Open your first reply with the welcome above, word for word: the heading, the italic line, and the 🤖, 🧭 and 👥 lines, each whole.")
     && offer.context.includes("Show the tables only when asked"));
+  // N116 row 8, F1: a question and a pasted handover were the prompts that cut the welcome short.
+  says("the note names the two prompts that cut the welcome, and puts the answer after it",
+    offer.context.includes("a question and a pasted handover included: the prompt is answered after the welcome, never instead of it"));
+  says("known-bad: the loose wording the proof windows shortened is gone",
+    !offer.context.includes("Open your first reply with the welcome above, whatever the prompt, then the status line"));
+  // N116 row 8, F5: a handover window took over a row another window had marked in progress.
+  says("the pick-up line has one shape, after the status line",
+    offer.context.includes("under the status line, one line: *Picking up N<nn> — <the arc's title>, at row <n>: <what the row does>.*"));
+  says("a row marked in progress is left, its age said, and asked about",
+    offer.context.includes("If that row's State reads `in progress <time>`, another window may be on it: leave it, say how old the mark is, and ask before you touch it."));
 
   // Day zero opens on the same welcome, and its door follows.
   const zero = hook(fixture("day-zero-welcome", { ".spndevex/README.md": "state\n" }), "Dhruv");
   says("day zero opens on the first-visit welcome, then the door, and no status line",
     zero.message.startsWith(`# 👋 Welcome to SaaS Plane, Dhruv. Glad you're here!\n\n${BODY}\n\nThis folder is empty`)
-    && zero.context.includes("open your first reply with the welcome above, whatever the prompt"));
+    && zero.context.includes("open your first reply with the welcome above, word for word and whole, whatever the prompt"));
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

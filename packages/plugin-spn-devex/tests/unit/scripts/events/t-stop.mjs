@@ -600,6 +600,24 @@ console.log("\n=== the handover check — what counts as saying a window is need
     console.log(`  ${got === expected ? "PASS" : "FAIL"}  ${what} reads as ${expected ? "passing work on" : "not a pass-on"}`);
   }
 
+  // N116 ROW 8, F3 — A NAME AND A GENERAL STATEMENT ARE NOT A PASS-ON. A fresh-window proof run met
+  // all three in one evening: an arc titled after a fresh window, named in a status table and in
+  // prose; a status line saying what any window can read; and a gate named by when it runs.
+  for (const [what, reply, expected] of [
+    ["an arc's title in a table cell", "| N119 fresh window proves both repos | DECIDED | runs last |", false],
+    ["an arc's title in prose", "N119 the fresh window proves both repositories is DECIDED and runs last.", false],
+    ["an arc's title after a dash", "Then N119 \u2014 the fresh window proves both repositories.", false],
+    ["what any window can read", "Any fresh window here can read the N116 log, so the proof can see its own findings.", false],
+    ["a gate named by when it runs", "Only the main gate before the new window is left.", false],
+    ["known-bad: a direction after an arc name is still a direction", "N119 is next. Open a fresh window and paste the block.", true],
+    ["known-bad: a plain direction is still a direction", "Continue in a new window from row 8.", true],
+  ]) {
+    n += 1;
+    const got = passingOn(reply);
+    if (got !== expected) failed += 1;
+    console.log(`  ${got === expected ? "PASS" : "FAIL"}  ${what} reads as ${expected ? "passing work on" : "not a pass-on"}`);
+  }
+
   // A REPLY CARRYING THE OPEN CARD IS THE ANSWER THE CHECK ASKS FOR. It fired twice in a row on
   // replies that put `Q329` in full, demanding the card they carried.
   {
@@ -844,6 +862,45 @@ one("a card carrying its decision is not open, so the reply is not read for Need
   build("m13-needs-you-answered", { arcNames: ["N1-a-subject.md"],
     pageOpts: { cards: CARD.replace("<b>Decision:</b> &mdash;", "<b>Decision:</b> A, 2026-09-29."), names: ["N1-a-subject.md"] } }),
   "silent", { reply: "Row 6d landed.", parity: false, why: "a new check" });
+
+console.log("\n=== welcome — a session's first turn opens with the welcome, word for word (N116 row 8, F1)");
+{
+  const { missingWelcome, checkWelcome, firstTurnText } = await import("../../../../src/scripts/events/stop.ts");
+  const { welcome } = await import("../../../../src/scripts/events/orientation.ts");
+  const whole = welcome("Dhruv", false).join("\n");
+  const firstVisit = welcome("Dhruv", true).join("\n");
+  const cut = whole.replace(" Tell me whose view you need, and I'll bring it.", "");
+  const headingOnly = whole.split("\n")[0] + "\n\nLooking into how ports are picked.";
+  const plainText = whole.replace(/\*\*/g, "").replace(/^\*|\*$/gm, "").replace(/^# /, "");
+  for (const [what, got, expected] of [
+    ["the whole welcome, then the answer", missingWelcome(whole + "\n\n7 repos · 1 workstream open\n\nThe answer.").length, 0],
+    ["the first-visit heading counts", missingWelcome(firstVisit).length, 0],
+    ["the same words without the markdown emphasis count", missingWelcome(plainText).length, 0],
+    ["known-bad: a pasted handover answered with no welcome", missingWelcome("I'll start by reading the arc file.").join(","), "the heading,the italic line,the 🤖 line,the 🧭 line,the 👥 line"],
+    ["known-bad: a question answered under the heading alone", missingWelcome(headingOnly).length, 4],
+    ["known-bad: the 👥 line cut at its last sentence, emoji and all", missingWelcome(cut).join(","), "the 👥 line"],
+    ["no first turn read (no transcript) is silent", checkWelcome("").length, 0],
+    ["a cut welcome warns once, naming what is missing", checkWelcome(cut).map((w) => w.check + ":" + w.message.includes("the 👥 line")).join(), "welcome:true"],
+    ["an unreadable transcript reads as nothing", firstTurnText("/nonexistent/transcript.jsonl"), ""],
+  ]) { n += 1; const ok = got === expected; if (!ok) failed += 1;
+       console.log(`  ${ok ? "PASS" : "FAIL"}  ${what}${ok ? "" : ` — got ${got}, expected ${expected}`}`); }
+}
+
+console.log("\n=== welcome — the hook reads the first turn from the transcript, and only on the first Stop");
+{
+  const lines = (texts) => texts.map((text) => JSON.stringify({ type: "assistant", message: { content: [{ type: "text", text }] } })).join("\n") + "\n";
+  const { welcome } = await import("../../../../src/scripts/events/orientation.ts");
+  const root = build("f1-welcome", { arcNames: ["N1-a-subject.md"], pageOpts: { names: ["N1-a-subject.md"] } });
+  const bad = join(root, "bad.jsonl"), good = join(root, "good.jsonl");
+  writeFileSync(bad, lines(["I'll start by reading the arc file.", "Done."]), "utf8");
+  writeFileSync(good, lines([welcome("Dhruv", false).join("\n") + "\n\n7 repos", "Done."]), "utf8");
+  one("known-bad: a first turn with no welcome warns", root, "warns",
+    { says: "[welcome]", session: "f1-bad", extra: { transcript_path: bad }, parity: false, why: "a new check" });
+  one("a first turn that opens with the welcome is silent about it", root, "silent",
+    { session: "f1-good", extra: { transcript_path: good }, parity: false, why: "a new check" });
+  one("the second Stop of the same session is not read for the welcome", root, "silent",
+    { session: "f1-bad", extra: { transcript_path: bad }, parity: false, why: "a new check" });
+}
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

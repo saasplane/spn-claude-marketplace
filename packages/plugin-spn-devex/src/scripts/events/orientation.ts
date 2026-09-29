@@ -12,8 +12,10 @@
 //   SessionStart :  node orientation.ts --stdin   (the hook, from the event JSON on stdin)
 //   by hand      :  node orientation.ts [path]    (the same text on stdout, so you can read it)
 //
-// The first reply opens with the welcome and one status line, whatever the prompt — a session that
-// opens with a status dump reads like a build log. Three parts, in this order:
+// The first reply opens with the welcome, word for word, and one status line, whatever the prompt —
+// a question and a pasted handover included, since a prompt that carries work is exactly when an
+// agent cuts the welcome short. A session that opens with a status dump reads like a build log.
+// Three parts, in this order:
 //
 //   1. the welcome — a heading that greets you by name, the tagline, who the agent is, the eight
 //      stages and every role. The heading has two forms: a returning visit, and a first visit, which
@@ -479,7 +481,7 @@ function developerName(): string | null {
  * workspace with no workstream in any state, which the ground already says, so the plugin keeps no
  * state of its own to tell the two apart. With no name, the name's clause drops and nothing else.
  */
-function welcome(who: string | null, firstVisit: boolean): string[] {
+export function welcome(who: string | null, firstVisit: boolean): string[] {
   const name = who ? `, ${who}` : "";
   return [
     firstVisit
@@ -692,7 +694,7 @@ export function orient(root: string, cwd: string): [message: string, context: st
           "nothing rests on this window staying open. Say no and nothing is created.\n\n" +
           "Would you like to start a new platform?\n");
     const note = "\n---\nDay-0 mode: no sprepo.json under " + root + ". You have no code to read, " +
-      "so do not orient — open your first reply with the welcome above, whatever the prompt, then " +
+      "so do not orient — open your first reply with the welcome above, word for word and whole, whatever the prompt, then " +
       "load the `bootstrap` skill and walk it. " +
       (started
         ? "A day-0 walk is already open here: `" + relative(root, join(workstreamsDir(root, "open"), started.folder)) +
@@ -756,11 +758,17 @@ export function orient(root: string, cwd: string): [message: string, context: st
   const note = "\n---\nGround, read at load — the members, their law, and every workstream in all " +
     "three states. `open/` is available now, `backlog/` is parked behind a named " +
     "blocker, and `closed/` is the receipt. The number is an identity, never a " +
-    `priority. Rung ${level}: ${why}. Open your first reply with the welcome above, whatever the ` +
-    "prompt, then the status line under it. Show the tables only when asked (*where are we?*). " +
+    `priority. Rung ${level}: ${why}. Open your first reply with the welcome above, word for word: ` +
+    "the heading, the italic line, and the 🤖, 🧭 and 👥 lines, each whole. That holds whatever the " +
+    "prompt, a question and a pasted handover included: the prompt is answered after the welcome, " +
+    "never instead of it, and in some editors this reply is the only place the developer sees it. " +
+    "Then the status line under it. Show the tables only when asked (*where are we?*). " +
     "The closing question is asked ONLY when the developer's first message does not already " +
-    "say what to do. A handover block, an arc name, or any named next step replaces it — open " +
-    "with what you are picking up and the first thing you will do, never by asking again. " +
+    "say what to do. A handover block, an arc name, or any named next step replaces it — under " +
+    "the status line, one line: *Picking up N<nn> — <the arc's title>, at row <n>: <what the row " +
+    "does>.* Then the first thing you will do, never by asking again. If that row's State reads " +
+    "`in progress <time>`, another window may be on it: leave it, say how old the mark is, and " +
+    "ask before you touch it. " +
     "Never turn the rung into a menu. The standing offer " +
     "under that question appears only when exactly one workstream is open and no other " +
     "session is live here — so where you cannot see one, do not propose resuming " +
