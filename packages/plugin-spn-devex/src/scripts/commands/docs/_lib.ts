@@ -2339,13 +2339,17 @@ export function statusFor(seat: string, workspace: string, write: boolean): Find
  * The furniture: the template's first stylesheet, then every later stylesheet and every script,
  * taken from the template in its own order. The rail builder runs first, the fold and the anchor
  * links after it, so a script that reads a heading's text sees it before the anchor is appended.
+ *
+ * THE TEMPLATE'S FOOTER IS NOT FURNITURE. It is a note to the author who copies the template, and a
+ * produced page is read by somebody else, so the produced footer is empty. A seat carries no footer
+ * of its own today; when it does, it is rendered from the seat, never from the template.
  */
 export function furniture(templates: string): { style: string; scripts: string; footer: string } {
   const t = readFileSync(join(templates, "pages", "construct-template.html"), "utf8");
   const styles = [...t.matchAll(/<style>[\s\S]*?<\/style>/g)].map((m) => m[0]);
   const scripts = [...t.matchAll(/<script>[\s\S]*?<\/script>/g)].map((m) => m[0]);
   const foldStyle = styles.slice(1).join("\n\n");
-  const footer = t.match(/<footer>[\s\S]*?<\/footer>/)?.[0] ?? "<footer></footer>";
+  const footer = "";
   return {
     style: styles[0] ?? "",
     scripts: [scripts[0] ?? "", foldStyle, ...scripts.slice(1)].filter(Boolean).join("\n\n"),

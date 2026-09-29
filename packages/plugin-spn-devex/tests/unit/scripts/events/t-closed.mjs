@@ -120,6 +120,22 @@ one("a page's scope rows and the arcs' step rows are one plan",
   "mv .spndevex/workstreams/open/001-a-subject .spndevex/workstreams/closed/",
   "speaks", { says: "2 rows landed", parity: false, why: "the Python reads only a page" });
 
+// RD.DEVEX.WORKSPACE.184 — `in progress <time>` IS NOT LANDED. The gate refuses it before the move,
+// so a row found here was moved past the gate, and the line must not count it or cheer.
+{
+  const root = workspace("m7-cl-in-progress", {
+    ".spndevex/workstreams/closed/001-a-subject/arcs/N2-the-arc.md":
+      stepArc([["1", "spn-foundation", "✅ landed — `abc1234`"], ["2", "spn-support-ts", "in progress 2026-09-29 14:32 +05:30"]]),
+  });
+  const said = run("node", [`${HOOKS}/src/scripts/events/closed.ts`],
+    { tool_name: "Bash", cwd: root, tool_input: { command: "mv .spndevex/workstreams/open/001-a-subject .spndevex/workstreams/closed/" } }, root);
+  for (const [what, ok] of [
+    ["a row in progress is named as not landed", /1 row still marked in progress/.test(said)],
+    ["and it is not counted among the landed rows", /1 row landed/.test(said)],
+    ["and the scope is not called finished", !/Well done/.test(said)],
+  ]) { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${what}${ok ? "" : `\n        ts: ${said.slice(0, 250)}`}`); }
+}
+
 // KNOWN-BAD — every move that closed nothing and must stay silent.
 one("backlog moving into open is work starting, not finishing",
   build("cl-start", [["a", "spn-foundation", "&#x2705; landed"]], "backlog"),

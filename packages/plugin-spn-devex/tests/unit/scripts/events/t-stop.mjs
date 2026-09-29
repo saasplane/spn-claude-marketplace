@@ -639,6 +639,84 @@ console.log("\n=== handover — a reply answering the last finding is not judged
   ]) { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${what}`); }
 }
 
+console.log("\n=== handover — the template's fields, and a fence that quotes the template (Q333)");
+{
+  const { checkHandover, passingOn, fencesOf, quotesTemplate } = await import("../../../../src/scripts/events/stop.ts");
+  const ROOT = workspace("m7-stop-handover-template");
+  // THE TEMPLATE, FILLED IN. `Pins:` and `Live now / waits for the window:` are its fields, and a
+  // block carrying them is a whole handover.
+  const FILLED = ["```text",
+    "Continue workstream `008-plain-language`, arc `N116`, row 6, in a `spn-claude-marketplace` window.",
+    "Model: Opus 5.",
+    "Read first: `/w/arcs/N116-r2-the-devex-release.md` (fields, and row 6), `/w/notes/N116/plan.md`.",
+    "Pins: re-run the plan's stale check first — `git -C spn-claude-marketplace log 2f8c5a0..HEAD -- packages`.",
+    "State: rows 1, 1b ✅ landed; row 6 ◐ stopped — done the ref, not done the hook; rows 7, 8 not started.",
+    "Live now / waits for the window: the hook script is live · the skill waits for the window.",
+    "Done when: Commands row `plugin unit` → all passed.",
+    "Do not touch: the templates folder.",
+    "Open: none.",
+    "```"].join("\n");
+  // THE M1 FALSE POSITIVE: a `diff` preview of the template, whose own ```text lines sit inside it.
+  // A lazy pairing closes the outer fence at the first inner one and leaks the rest into the prose.
+  const DIFF = "Here is the template change for review.\n\n```diff\n+<!-- The handover: written into the arc's log -->\n+```text\n" +
+    "+Continue workstream `{{NNN-subject}}`, arc `N{{n}}`, row {{k}}, in a `{{repository}}` window.\n" +
+    "+Paste this block into a fresh window to continue.\n" +
+    "+Pins: re-run the plan's stale check first.\n+```\n```\n\nNothing is handed over; this is the preview only.";
+  // A CARD FENCE HOLDING `{{`: a template quoted for the reader, not filled in.
+  const CARD_FENCE = "The card the template asks for:\n\n```text\nQ{{n}} · {{summary}}\nOpen a new window once {{it}} is answered.\n```\n\nThat is the shape, not an answer.";
+
+  // VERIFY THE VERIFIER: the diff fixture really does leak under the lazy pairing it replaces.
+  n += 1;
+  const leaks = passingOn(DIFF.replace(/```[\s\S]*?```/g, " "));
+  if (!leaks) failed += 1;
+  console.log(`  ${leaks ? "PASS" : "FAIL"}  known bad: under the lazy fence pairing, the diff's leaked template lines read as a pass-on`);
+
+  for (const [what, got, expected] of [
+    ["the diff is read as one fence, its inner fences included", fencesOf(DIFF).length, 1],
+    ["a diff fence quotes a template", quotesTemplate(fencesOf(DIFF)[0]), true],
+    ["a fence holding {{ quotes a template", quotesTemplate(fencesOf(CARD_FENCE)[0]), true],
+    ["a filled-in block does not", quotesTemplate(fencesOf(FILLED)[0]), false],
+    ["a diff of the template is not a pass-on", passingOn(DIFF), false],
+    ["no [handover] finding on the diff preview", checkHandover(DIFF, ROOT).length, 0],
+    ["no [handover] finding on a card fence holding {{", checkHandover(CARD_FENCE, ROOT).length, 0],
+    ["the filled-in template, with Pins and Live now, is a whole handover", checkHandover(`Pick this up in a new window.\n\n${FILLED}`, ROOT).length, 0],
+  ]) {
+    n += 1;
+    const ok = got === expected;
+    if (!ok) failed += 1;
+    console.log(`  ${ok ? "PASS" : "FAIL"}  ${what}${ok ? "" : ` — got ${got}, expected ${expected}`}`);
+  }
+
+  // A PASS-ON WHOSE ONLY BLOCK IS THE UNFILLED TEMPLATE HAS NO HANDOVER, and is told so by the fields.
+  n += 1;
+  const unfilled = checkHandover("Pick this up in a new window.\n\n```text\nContinue workstream `{{NNN-subject}}`, arc `N{{n}}`.\nModel: {{Opus 5}}.\n```", ROOT);
+  const told = unfilled.length === 1 && /no handover block/.test(unfilled[0].message) && /Pins/.test(unfilled[0].message);
+  if (!told) failed += 1;
+  console.log(`  ${told ? "PASS" : "FAIL"}  a pass-on carrying only the unfilled template is told to fill in the template's fields`);
+}
+
+console.log("\n=== runnable — a row in progress is named with its age, never called runnable (RD.DEVEX.WORKSPACE.184)");
+{
+  const { checkRunnable, inProgressSteps, unfinishedSteps } = await import("../../../../src/scripts/events/stop.ts");
+  const MARKED = `# N3 — a subject\n\nStatus: **RUNNING — 2026-09-29.**\n\n## Steps\n\n` +
+    `| # | Repo | Altitude | What | Mechanism | Acceptance | State |\n| --- | --- | --- | --- | --- | --- | --- |\n` +
+    `| 1 | spn-foundation | DOCS | the chapter | by hand | audit | LANDED — \`abc1234\` |\n` +
+    `| 2 | spn-support-ts | CODE | the split check | by hand | its suite | in progress 2026-09-29 14:32 +05:30 |\n\n## Log\n\n- **2026-09-29 — go.**\n`;
+  const root = workspace("m7-stop-in-progress", {
+    ".spndevex/workstreams/open/001-a-subject/a-subject-approach.html": page({ cards: "", names: ["N3-a-subject.md"] }),
+    ".spndevex/workstreams/open/001-a-subject/arcs/N3-a-subject.md": MARKED,
+  });
+  const arcPath = join(root, ".spndevex/workstreams/open/001-a-subject/arcs/N3-a-subject.md");
+  const found = checkRunnable(root, Date.now() - 60_000, { [arcPath]: "a-different-hash" }, new Set([arcPath]));
+  const now = Date.parse("2026-09-29T12:00:00Z");
+  for (const [what, ok] of [
+    ["the row in progress is not an unfinished runnable step", unfinishedSteps(arcPath).length === 0],
+    ["it is named with its age", inProgressSteps(arcPath, now)[0] === "step 2 — the split check (marked 2 h 58 min ago)"],
+    ["the Stop hook names it as in progress", found.length === 1 && /marked in progress/.test(found[0].message) && /step 2/.test(found[0].message)],
+    ["and never calls it runnable", found.every((w) => !/stopped with runnable work/.test(w.message))],
+  ]) { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${what}${ok ? "" : `\n        ${JSON.stringify(found).slice(0, 300)}`}`); }
+}
+
 console.log("\n=== reply-shape — a sentence that reports an answer is not asking for one");
 {
   // It fired on a reply that had just told the developer their ALREADY ANSWERED card turned out to

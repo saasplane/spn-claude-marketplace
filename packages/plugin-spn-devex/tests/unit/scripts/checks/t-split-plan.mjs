@@ -176,6 +176,37 @@ one("a row started and put down refuses too", "close",
   move(".spndevex/workstreams/open/001-a-subject", ".spndevex/workstreams/closed/"),
   "deny", { says: "started and put down" });
 
+// RD.DEVEX.WORKSPACE.184 — `in progress <time>` is somebody's claim on a row, never a landing. It read
+// as `pending` before the mark existed, and `pending` closes with a note.
+one("a row still marked in progress refuses the close, and its age is named", "close",
+  buildArcs("m7-sp-in-progress", [...ARC_LANDED, ["4", "spn-platform-ts", "the proof", "in progress 2026-09-29 14:32 +05:30"]], { page: true }),
+  move(".spndevex/workstreams/open/001-a-subject", ".spndevex/workstreams/closed/"),
+  "deny", { says: "still marked in progress", parity: false, why: "the Python predates the mark" });
+
+{
+  const { stateOf, inProgressSince, markAge, markedAgo } = await import("../../../../src/scripts/checks/split-plan.ts");
+  const row = (state) => ({ label: "x", scope: "spn-foundation", state });
+  const now = Date.parse("2026-09-29T12:00:00Z");
+  for (const [what, got, expected] of [
+    ["the book's form reads as in progress", stateOf(row("in progress 2026-09-29 14:32 +05:30")), "in-progress"],
+    ["bold and a hyphen read the same", stateOf(row("**in-progress 2026-09-29 14:32 +05:30**")), "in-progress"],
+    ["landing replaces the mark", stateOf(row("✅ landed — `abc1234`")), "landed"],
+    ["a stop is still a stop", stateOf(row("◐ stopped — half done")), "stopped"],
+    ["a cell that only mentions progress is not the mark", stateOf(row("agreed; progress later")), "pending"],
+    ["the offset is honoured", inProgressSince("in progress 2026-09-29 14:32 +05:30")?.toISOString(), "2026-09-29T09:02:00.000Z"],
+    ["no offset reads as UTC", inProgressSince("in progress 2026-09-29 09:02")?.toISOString(), "2026-09-29T09:02:00.000Z"],
+    ["a mark with no time has no age", inProgressSince("in progress"), null],
+    ["the age in hours and minutes", markAge(new Date("2026-09-29T09:02:00Z"), now), "2 h 58 min"],
+    ["the age in days", markAge(new Date("2026-09-27T09:00:00Z"), now), "2 d 3 h"],
+    ["an unreadable time is said, not guessed", markedAgo("in progress soon", now), "marked at a time this check cannot read"],
+  ]) {
+    n += 1;
+    const ok = got === expected;
+    if (!ok) failed += 1;
+    console.log(`  ${ok ? "PASS" : "FAIL"}  ${what}${ok ? "" : ` — got ${got}, expected ${expected}`}`);
+  }
+}
+
 one("a page still saying it is running is stamped first", "close",
   build("sp-running", { eyebrow: "running" }),
   move(".spndevex/workstreams/open/001-a-subject", ".spndevex/workstreams/closed/"),

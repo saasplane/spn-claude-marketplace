@@ -36,7 +36,7 @@ import { checkReleaseGo, applies as releaseApplies } from "../checks/release-go.
 import { checkArcStatus, applies as arcStatusApplies } from "../checks/arc-status.ts";
 import { applies as commentsApply, checkComments } from "../checks/comment-check.ts";
 import { applies as mirrorApplies, checkMirror } from "../checks/mirror.ts";
-import { begin, end, span } from "../lib/timing.ts";
+import { begin, end, span, tagsOf } from "../lib/timing.ts";
 
 type Check = {
   name: string;
@@ -161,7 +161,7 @@ const payload = readPayload();
 // MEASURING IS FREE; WRITING IS THE COST. `begin` touches no filesystem, so the loop above always
 // times and always reports. What the window decides is whether any of it is ever written down —
 // which is the only part anybody pays for.
-begin({ event: "PreToolUse", tool: payload.tool_name ?? null, session: payload.session_id ?? null },
+begin({ event: "PreToolUse", tool: payload.tool_name ?? null, session: payload.session_id ?? null, ...tagsOf(payload) },
       payload.cwd ?? process.cwd());
 let verdict: Verdict = null;
 try { verdict = dispatch(payload); } catch { verdict = null; }   // never take the chain down

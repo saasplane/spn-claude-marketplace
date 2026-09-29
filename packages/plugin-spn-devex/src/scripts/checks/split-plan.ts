@@ -20,7 +20,8 @@
 //   documents-first :  a WARNING. You are writing an approach page into a repo's own pocket while the
 //                      open workstream that argues it still has rows that have not landed.
 //   close           :  a REFUSAL. Every row must be ACCOUNTED FOR, which is not the same as finished:
-//                      landed, carried and deferred all pass, and only a row nobody decided refuses.
+//                      landed, carried and deferred all pass; a row nobody decided, a row marked
+//                      `◐ stopped` and a row still `in progress <time>` refuse.
 //                      There is no override, and none is needed — recording the deferral is the way through.
 //
 //   sweep :  node split-plan.ts [path …]     (every open workstream's rows)
@@ -50,6 +51,11 @@ const ACCOUNTED = ["landed", "carried", "deferred"];
 // reason `✅` is: a cell reading `◐ 2026-09-08 …` strips to a date and would otherwise classify as
 // pending, which closes clean.
 const STOPPED = ["stopped", "◐"];
+// `in progress <date> <time> <offset>` is the row somebody is on right now (RD.DEVEX.WORKSPACE.184).
+// Landing replaces the mark. Until then the row is neither landed nor accounted for, so the close
+// refuses it like an empty or a stopped row, and the Stop hook names it with its age rather than
+// calling it runnable: a second window leaves it alone and asks the developer.
+const IN_PROGRESS = /^in[ -]progress\b/i;
 // A cell opens with a mark glyph before its word: ✅ landed, ↷ carried, ⊘ deferred. The word is what
 // carries the meaning, so the reader skips anything that is not a letter to find it.
 const LEAD = /^[^0-9a-z]+/i;
@@ -247,7 +253,44 @@ export function workstreamPlan(folders: string[], pages: string[]): Row[] {
 }
 
 /**
- * `empty` · `landed` · `carried` · `deferred` · `stopped` · `pending`.
+ * When an `in progress <date> <time> <offset>` mark was written, or `null` where the cell carries no
+ * such mark or its time cannot be read. The form is a report's measured time:
+ * `in progress 2026-09-29 14:32 +05:30`. A mark with no offset is read as UTC.
+ */
+export function inProgressSince(cell: string): Date | null {
+  const bare = flat(cell).replace(/[*_`]/g, "").trim().replace(LEAD, "");
+  if (!IN_PROGRESS.test(bare)) return null;
+  const m = bare.match(/(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2})(:\d{2})?\s*(Z|[+-]\d{2}:?\d{2})?/i);
+  if (!m) return null;
+  const offset = !m[4] || /^z$/i.test(m[4]) ? "Z" : m[4].includes(":") ? m[4] : `${m[4].slice(0, 3)}:${m[4].slice(3)}`;
+  const at = new Date(`${m[1]}T${m[2]}${m[3] ?? ":00"}${offset}`);
+  return Number.isNaN(at.getTime()) ? null : at;
+}
+
+/** Whether a State cell carries the in-progress mark, readable time or not. */
+export function isInProgress(cell: string): boolean {
+  return IN_PROGRESS.test(flat(cell).replace(/[*_`]/g, "").trim().replace(LEAD, ""));
+}
+
+/** How old a mark is, in the words a reader asks with: `3 h 5 min`, `2 d 4 h`, `under a minute`. */
+export function markAge(since: Date | null, now = Date.now()): string {
+  if (!since) return "an age this check cannot read";
+  const minutes = Math.max(0, Math.floor((now - since.getTime()) / 60_000));
+  if (minutes < 1) return "under a minute";
+  const days = Math.floor(minutes / 1440), hours = Math.floor((minutes % 1440) / 60), rest = minutes % 60;
+  if (days) return `${days} d${hours ? ` ${hours} h` : ""}`;
+  if (hours) return `${hours} h${rest ? ` ${rest} min` : ""}`;
+  return `${rest} min`;
+}
+
+/** `marked 3 h 5 min ago`, or what the reader is told when the mark's time cannot be read. */
+export function markedAgo(cell: string, now = Date.now()): string {
+  const since = inProgressSince(cell);
+  return since ? `marked ${markAge(since, now)} ago` : "marked at a time this check cannot read";
+}
+
+/**
+ * `empty` · `landed` · `carried` · `deferred` · `stopped` · `in-progress` · `pending`.
  *
  * The close accepts three of the six, so it has to tell them apart. `ACCOUNTED` named all three from
  * the first version and nothing read it. A row saying `carried` and a row saying `agreed` were one
@@ -269,6 +312,8 @@ export function stateOf(row: Row): string {
   // Read before `pending`, and by the glyph as well as the word, so a stop carrying a date rather
   // than the word is still a stop rather than a row that closes clean.
   if (startsWithAny(raw, STOPPED) || startsWithAny(state, STOPPED)) return "stopped";
+  // Somebody is on it now. Read before `pending`, which would let it close clean.
+  if (IN_PROGRESS.test(state)) return "in-progress";
   return "pending";
 }
 
@@ -395,7 +440,8 @@ export function sequencingResolved(root: string, subject: string, row: Row): boo
 }
 
 /**
- * Whether a row said what became of it. Three states do; `stopped`, `pending` and `empty` do not.
+ * Whether a row said what became of it. Three states do; `stopped`, `in-progress`, `pending` and
+ * `empty` do not.
  * `ACCOUNTED` is that set, and this is the one reader it has.
  */
 export function accounted(row: Row): boolean {
@@ -925,6 +971,7 @@ export function gateClose(payload: Payload): Verdict {
 
     const pending = rows.filter((row) => !accounted(row));
     const stopped = rows.filter((row) => stateOf(row) === "stopped");
+    const running = rows.filter((row) => stateOf(row) === "in-progress");
 
     // A CARRY THAT CANNOT LAND IS NOT ACCOUNTED FOR, whatever its cell says. This runs before the
     // undecided and stopped lists because it is the one fault a reader cannot see: the cell reads
@@ -1011,7 +1058,7 @@ export function gateClose(payload: Payload): Verdict {
       };
     }
 
-    if (!empty.length && !stopped.length) {
+    if (!empty.length && !stopped.length && !running.length) {
       // ACCOUNTED FOR IS THREE STATES, AND `accounted()` READS ALL THREE. It did not once: a row
       // naming its successor counted the same as one saying `🚧 agreed`, and closing `007` warned
       // about sixteen rows that had each been decided. What is left here is the real case — designed,
@@ -1040,7 +1087,16 @@ export function gateClose(payload: Payload): Verdict {
     const counts = [
       ...(empty.length ? [`${empty.length} row(s) nobody decided`] : []),
       ...(stopped.length ? [`${stopped.length} row(s) you started and stopped`] : []),
+      ...(running.length ? [`${running.length} row(s) still marked in progress`] : []),
     ];
+    // A ROW IN PROGRESS IS WORK SOMEBODY IS DOING NOW, or did and never marked landed. Either way the
+    // close cannot tell which, and the mark's age is what lets the developer decide (RD.DEVEX.WORKSPACE.184).
+    const runningBlock = running.length
+      ? `\n\nRows still marked in progress:\n` +
+        running.slice(0, 10).map((r) => `  - ${r.scope} — ${r.label.slice(0, 70)} (${markedAgo(r.state)})`).join("\n") +
+        `\n\nLanding replaces the mark with what the row reached and its commit. If the window that ` +
+        `marked it is gone, ask the developer before you take the row over.`
+      : "";
     const stoppedBlock = stopped.length
       ? `\n\nRows started and stopped:\n${stoppedListed}\n\nA stopped row is half an edit sitting ` +
         `in the tree, and only the agent that stopped it knows where. Finish the work and mark the ` +
@@ -1052,10 +1108,11 @@ export function gateClose(payload: Payload): Verdict {
       note: `Close gate — \`${subject}\` cannot close yet: ${counts.join(" and ")}.`,
       deny:
         `Denied: \`${subject}\` cannot close while its split plan holds a row nobody decided, or a ` +
-        `row somebody started and put down. The check is ACCOUNTED FOR, never finished — landed, ` +
+        `row somebody started and put down or is still on. The check is ACCOUNTED FOR, never finished — landed, ` +
         `carried and deferred all pass, and closing a scope with work pending is a normal act.\n` +
         (empty.length ? `Undecided rows:\n${listed}${more}` : "") +
         stoppedBlock +
+        runningBlock +
         (empty.length
           ? `\n\nGive each undecided row one of three states, in the plan's State column:\n` +
             `  landed   → the node that now holds the content, as a path\n` +
@@ -1085,7 +1142,7 @@ function sweep(roots: string[]): number {
       // SEQUENCING IS COUNTED APART FROM HANDOVER. A row pointing at a later arc of this same
       // workstream is not carried; it resolves through that arc, and counting it as accounted for is
       // how `pending 0` stood over ten rows of undone work.
-      const tally: Record<string, number> = { landed: 0, carried: 0, sequencing: 0, deferred: 0, stopped: 0, pending: 0, empty: 0 };
+      const tally: Record<string, number> = { landed: 0, carried: 0, sequencing: 0, deferred: 0, stopped: 0, "in-progress": 0, pending: 0, empty: 0 };
       for (const row of rows) {
         const state = stateOf(row);
         // A carried row pointing inside this workstream is sequencing, and it is reported as its own
@@ -1096,6 +1153,7 @@ function sweep(roots: string[]): number {
       console.log(
         `  ${subject}: ${rows.length} rows · landed ${tally.landed} · carried ${tally.carried} · ` +
         `sequencing ${tally.sequencing} · deferred ${tally.deferred} · stopped ${tally.stopped} · ` +
+        `in progress ${tally["in-progress"]} · ` +
         `pending ${tally.pending} · undecided ${tally.empty} · ${pages.length} page(s)`);
       for (const row of rows)
         if (stateOf(row) === "empty") console.log(`      undecided  ${row.scope} — ${row.label.slice(0, 70)}`);

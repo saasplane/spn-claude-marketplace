@@ -103,6 +103,22 @@ const lacks = (s) => (got) => !String(got).includes(s);
     one("the page carries every script the template has, not the first two", withThree,
         (g) => [...g.matchAll(/<script>[\s\S]*?<\/script>/g)].length ===
                [...bookTemplate.matchAll(/<script>[\s\S]*?<\/script>/g)].length + 1);
+    // THE TEMPLATE'S FOOTER IS A NOTE TO ITS AUTHOR, never furniture. Copied into every produced
+    // page, readers of 122 construct pages met "A template from workstream 008 · copy it …", and an
+    // edit to the note made every one of them stale at once. The template here carries a marked
+    // footer, so the case fails if any of it reaches the page.
+    const noted = mkdtempSync(join(tmpdir(), "spn-templates-"));
+    mkdirSync(join(noted, "pages"));
+    writeFileSync(join(noted, "pages", "construct-template.html"),
+      bookTemplate.replace(/<footer>[\s\S]*?<\/footer>/, "") +
+      "\n<footer>AUTHOR-NOTE: copy this template, keep the comments</footer>\n");
+    process.env.SPN_TEMPLATES = noted;
+    run(ws, ["page", "docs/02-constructs/01-core/thing.md"]);
+    const footed = readAt(ws, "docs/artifacts/constructs/01-core/thing-construct.html");
+    process.env.SPN_TEMPLATES = templates;
+    rmSync(noted, { recursive: true, force: true });
+    one("the template's author note never reaches a produced page", footed, (g) => !/AUTHOR-NOTE/.test(g) && !/<footer>/.test(g));
+    one("nor does the book template's own footer", page, (g) => !/A template from workstream/.test(g) && !/<footer>/.test(g));
     rmSync(more, { recursive: true, force: true });
 
     // A `\|` in a cell is a pipe the author wants shown. The splitter cut the cell in two and the

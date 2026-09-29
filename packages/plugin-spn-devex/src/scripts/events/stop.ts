@@ -28,15 +28,73 @@ import { closeSync, openSync, readFileSync, readSync, readdirSync, rmSync, statS
 import { basename, dirname, join } from "node:path";
 import { createHash } from "node:crypto";
 import { checkCorpus } from "../checks/corpus.ts";
-import { STEP_ID, answeredNumbers, cardsOf, openWorkstreams, stateOf, stepsOf, workstreamPlan } from "../checks/split-plan.ts";
+import { STEP_ID, answeredNumbers, cardsOf, isInProgress, markedAgo, openWorkstreams, stateOf, stepsOf,
+         workstreamPlan } from "../checks/split-plan.ts";
 import { TERMINAL } from "../checks/arc-status.ts";
 import { DEVEX, workspaceRoot } from "../lib/payload.ts";
 import { cacheState } from "./orientation.ts";
-import { begin, span, end } from "../lib/timing.ts";
+import { begin, span, end, tagsOf } from "../lib/timing.ts";
 
 type Warning = { check: string; message: string };
 
+// The fields the handover template carries (`templates/workstream/handover-template.md`). The first
+// eight are owed by every handover. `Pins:` and `Live now / waits for the window:` are the template's
+// too, and a block carrying them is read like any other; they are not demanded, because a stop that
+// is not a reload has nothing to say under the second.
 const HANDOVER_FIELDS = ["workstream", "arc", "model", "read first", "state", "done when", "do not touch", "open"];
+const HANDOVER_TEMPLATE_FIELDS = ["Continue workstream … arc … row", "Model", "Read first", "Pins", "State",
+  "Live now / waits for the window", "Done when", "Do not touch", "Open"];
+
+/** One fenced block of a reply: its info string (`diff`, `text`, or empty) and its body. */
+type Fence = { info: string; body: string; start: number; end: number };
+
+/**
+ * Every fenced block in a reply, read line by line the way markdown reads it.
+ *
+ * A FENCE CLOSES ONLY ON A LINE THAT IS A FENCE. A lazy ``` pairing closes a ```diff``` block at its
+ * first `+```text` line, so a diff of the handover template leaks the template's lines back into the
+ * prose, and the `[handover]` check reads a quotation as a direction. A block opens on a line of
+ * three or more backticks or tildes (up to three spaces in), and closes on a line of the same
+ * character at least as long, with nothing after it. A block never closed runs to the end.
+ */
+export function fencesOf(reply: string): Fence[] {
+  const out: Fence[] = [];
+  const lines = reply.split("\n");
+  let offset = 0;
+  let open: { mark: string; info: string; start: number; bodyStart: number } | null = null;
+  for (const line of lines) {
+    const next = offset + line.length + 1;
+    if (open === null) {
+      const m = line.match(/^ {0,3}(`{3,}|~{3,})\s*([^`\s]*)/);
+      if (m) open = { mark: m[1], info: m[2].toLowerCase(), start: offset, bodyStart: next };
+    } else {
+      const m = line.match(/^ {0,3}(`{3,}|~{3,})\s*$/);
+      if (m && m[1][0] === open.mark[0] && m[1].length >= open.mark.length) {
+        out.push({ info: open.info, body: reply.slice(open.bodyStart, offset), start: open.start, end: Math.min(next, reply.length) });
+        open = null;
+      }
+    }
+    offset = next;
+  }
+  if (open) out.push({ info: open.info, body: reply.slice(open.bodyStart), start: open.start, end: reply.length });
+  return out;
+}
+
+/** The reply with every fenced block replaced by a space. */
+export function withoutFences(reply: string): string {
+  let out = "", at = 0;
+  for (const fence of fencesOf(reply)) { out += reply.slice(at, fence.start) + " \n"; at = fence.end; }
+  return out + reply.slice(at);
+}
+
+/**
+ * A FENCE THAT QUOTES A TEMPLATE IS NOT A HANDOVER. A `diff` block is a change being previewed, and a
+ * block still holding `{{` placeholders is a template nobody filled in. Both are somebody's text
+ * about a handover, so neither is taken as the block the check asks for.
+ */
+export function quotesTemplate(fence: Fence): boolean {
+  return fence.info === "diff" || fence.body.includes("{{");
+}
 // A GLYPH IS UNAMBIGUOUS AND A WORD IS NOT, so the two are read differently.
 //
 // `landed`, `carried` and `deferred` are ordinary English. Read against a whole row joined into one
@@ -114,7 +172,11 @@ const NOT_RUNNABLE = new Set(["PROPOSED", "DECIDED", "HELD"]);
 
 const DEBUG = ".debug";
 
-/** The rows of an arc's own step table that are not yet done, or `null` where it has no `## Steps`. */
+/**
+ * The rows of an arc's own step table that are not yet done, or `null` where it has no `## Steps`.
+ * A row marked `in progress <time>` is left out: somebody is on it, so it is not runnable work
+ * (RD.DEVEX.WORKSPACE.184). `inProgressSteps` names those rows instead.
+ */
 export function unfinishedSteps(arc: string): string[] | null {
   const steps = stepsOf(read(arc));
   if (steps === null) return null;
@@ -124,7 +186,15 @@ export function unfinishedSteps(arc: string): string[] | null {
   // every cell is read as before.
   return steps
     .filter((step) => !isDone(step.state === null ? step.cells : [step.state]))
+    .filter((step) => step.state === null || !isInProgress(step.state))
     .map((step) => `step ${step.id} — ${step.what.slice(0, 70)}`);
+}
+
+/** The rows whose State cell reads `in progress <time>`, each with how old its mark is. */
+export function inProgressSteps(arc: string, now = Date.now()): string[] {
+  return (stepsOf(read(arc)) ?? [])
+    .filter((step) => step.state !== null && isInProgress(step.state))
+    .map((step) => `step ${step.id} — ${step.what.slice(0, 70)} (${markedAgo(step.state ?? "", now)})`);
 }
 
 /**
@@ -289,6 +359,17 @@ export function checkRunnable(root: string, since = 0, stepsAt: Record<string, s
       const now = stepHash(read(arc));
       if ((stepsAt[arc] ?? now) === now) continue;           // the record moved, the work did not
       const steps = unfinishedSteps(arc);
+      // A ROW IN PROGRESS IS NAMED WITH ITS AGE, NEVER CALLED RUNNABLE. The mark says somebody is on
+      // it; whether that is this sitting or a window that has gone, only the developer can say.
+      const claimed = inProgressSteps(arc);
+      if (claimed.length && !cards.length)
+        out.push({
+          check: "runnable",
+          message: `\`${basename(arc)}\` has ${claimed.length === 1 ? "a row" : `${claimed.length} rows`} marked in progress: ` +
+            `${claimed.join(" · ")}. If this sitting is on it, finish it and mark it landed with its commit, or mark ` +
+            `it \`◐ stopped\` with what was done. If another window marked it, leave it and ask the developer, ` +
+            `saying how old the mark is (02-workstream/01-workstream.md § A step row says where, at what altitude, and how).`,
+        });
       if (steps === null) {
         out.push({ check: "runnable", message: `\`${basename(arc)}\` reads ${status || "no status"} and has no \`## Steps\` table, so nothing can say whether work is left. Give it the step table the arc template carries.` });
         continue;
@@ -383,8 +464,7 @@ const OPENS_A_HANDOVER = /^[ \t]{0,3}(?:#{1,4}[ \t]*|\*\*)handover\b|^[ \t]{0,3}
  * wraps a direction as readily as a quotation, and taking it out would hide a real one.
  */
 export function unquoted(reply: string): string {
-  return reply
-    .replace(/```[\s\S]*?```/g, " ")
+  return withoutFences(reply)
     .replace(/`[^`\n]*`/g, " ")
     .replace(/^[ \t]{0,3}>.*$/gm, " ")
     .replace(/"[^"\n]*"/g, " ")
@@ -414,7 +494,7 @@ export function passingOn(reply: string): boolean {
  * has already done what the check would demand.
  */
 export function carriesCard(reply: string): boolean {
-  const prose = reply.replace(FENCE, " ");
+  const prose = withoutFences(reply);
   return NUMBERED.test(prose) && TABLE.test(prose) && LETTERED_ROW.test(prose);
 }
 
@@ -492,10 +572,10 @@ export function checkHandover(reply: string, root: string): Warning[] {
       `sitting into three windows (N39).` }];
   }
 
-  const fenced = [...reply.matchAll(/```[\s\S]*?```/g)].map((m) => m[0].toLowerCase());
+  const fenced = fencesOf(reply).filter((fence) => !quotesTemplate(fence)).map((fence) => fence.body.toLowerCase());
   const block = fenced.find((f) => /workstream/.test(f) && /arc/.test(f));
   if (!block)
-    return [{ check: "handover", message: "this reply passes work on to another session and carries no handover block. Give the seven fields in a fenced block — workstream, arc and step, model, read first, state, done when, do not touch, open — and write the same block into the arc's log." }];
+    return [{ check: "handover", message: `this reply passes work on to another session and carries no handover block. Fill in the handover template's fields in a fenced block — ${HANDOVER_TEMPLATE_FIELDS.join(" · ")} — with no \`{{…}}\` left, and write the same block into the arc's log.` }];
   const missing = HANDOVER_FIELDS.filter((f) => !block.includes(f));
   if (missing.length)
     return [{ check: "handover", message: `the handover block is missing ${missing.join(" · ")}. The next window starts from that block and has nothing else.` }];
@@ -679,9 +759,8 @@ const REPORTS = /\b(?:answered|decided|chose|chosen|settled|recorded)\b/i;
 //
 // Stripping fences does not weaken the real check: a card's options are a markdown TABLE, never a
 // fence, so every genuine card survives this unchanged.
-const FENCE = /```[\s\S]*?```/g;
 const asking = (reply: string) =>
-  ASKS.test(reply.replace(FENCE, " ").split(/(?<=[.!?\n])\s+/).filter((line) => !REPORTS.test(line)).join(" "));
+  ASKS.test(withoutFences(reply).split(/(?<=[.!?\n])\s+/).filter((line) => !REPORTS.test(line)).join(" "));
 
 // A markdown options table: a header row and the `| --- |` separator the grammar requires.
 const TABLE = /^\|.*\|\s*$\n^\|[\s:-]*\|[\s:|-]*$/m;
@@ -791,10 +870,10 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   const root = workspaceRoot(start || process.env.CLAUDE_PROJECT_DIR || process.cwd())
             ?? (start || process.env.CLAUDE_PROJECT_DIR || process.cwd());
 
-  let event: { session_id?: string; transcript_path?: string; stop_hook_active?: boolean } = {};
+  let event: { session_id?: string; transcript_path?: string; stop_hook_active?: boolean; agent_id?: string; cwd?: string } = {};
   try { event = JSON.parse(input || "{}") ?? {}; } catch { event = {}; }
   const session = String(event.session_id ?? "");
-  begin({ event: "Stop", tool: null, session: event.session_id ?? null }, root);
+  begin({ event: "Stop", tool: null, session: event.session_id ?? null, ...tagsOf(event) }, root);
   // THIS SESSION'S OWN BASELINE, and what its own tool calls wrote since it. The transcript is read
   // from where the last Stop left off, so a long session pays for its newest turn and not its whole
   // history. A first Stop reads nothing: there is no baseline to judge the writes against.

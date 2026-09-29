@@ -31,7 +31,7 @@
 import { basename, resolve } from "node:path";
 import { isDir, readPayload, runAlone, workspaceRoot, type Payload } from "../lib/payload.ts";
 import { closing, moves, stateOf, subjectFolders, subjectPages, workstreamPlan } from "../checks/split-plan.ts";
-import { begin, end, span } from "../lib/timing.ts";
+import { begin, end, span, tagsOf } from "../lib/timing.ts";
 
 const STRUCTURE = new Set(["workstreams", "sessions", "arcs", "open", "backlog", "closed", ""]);
 
@@ -63,6 +63,9 @@ export function closingMessage(payload: Payload): string | null {
     const landed = states.filter((s) => s === "landed").length;
     const carried = states.filter((s) => s === "carried").length;
     const deferred = states.filter((s) => s === "deferred").length;
+    // `in progress <time>` is never landed (RD.DEVEX.WORKSPACE.184). The close gate refuses such a
+    // row before the move, so one found here was moved past the gate, and the line says so.
+    const running = states.filter((s) => s === "in-progress").length;
 
     const tail = [
       ...(carried ? [`${carried} carried to a named successor`] : []),
@@ -72,6 +75,10 @@ export function closingMessage(payload: Payload): string | null {
     // `1 rows landed` is what the Python said, every time a scope closed with one row. This is the
     // line the developer asked for by name, so it reads as somebody wrote it.
     const rowWord = landed === 1 ? "row" : "rows";
+    if (running)
+      return `${subject} moved to closed/ with ${running} ${running === 1 ? "row" : "rows"} still marked ` +
+             `in progress, which ${running === 1 ? "is" : "are"} not landed. ${landed} ${rowWord} landed${rest}. ` +
+             `Land each one or say where it went before calling the scope finished.`;
     return `${subject} is closed. ${landed} ${rowWord} landed${rest} — that is a scope finished, ` +
            `recorded, and findable by whoever comes next. Well done.`;
   }
@@ -83,7 +90,7 @@ if (runAlone("closed.ts")) {
   // The whole run under one name, because these events fire a handful of times a session and the
   // breakdown would cost more attention than it buys. `PreToolUse` is the hot path, and it times
   // per check.
-  begin({ event: "PostToolUse", tool: payload.tool_name ?? null, session: payload.session_id ?? null },
+  begin({ event: "PostToolUse", tool: payload.tool_name ?? null, session: payload.session_id ?? null, ...tagsOf(payload) },
         payload.cwd ?? process.cwd());
   let message: string | null = null;
   try { message = span("closed", () => closingMessage(payload)); } catch { message = null; }
