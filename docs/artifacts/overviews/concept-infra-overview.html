@@ -9,7 +9,7 @@
     "INFRA",
     "ARCHITECT"
   ],
-  "summary": "spn-infra at reading depth — the plugin an estate repository loads, and what each of its folders holds: the manifest, the one wired moment, the skills, the write-time gate, the cards that restate the estate's words, the per-cloud providers, and the tests.",
+  "summary": "spn-infra is the plugin an estate repository loads, and this page reads it one folder at a time, around the one boundary every folder keeps.",
   "keywords": [
     "spn-infra",
     "overview",
@@ -227,12 +227,12 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
 <header class="masthead">
   <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Marketplace &nbsp;|&nbsp; spn-infra — The Estate Domain</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Overview</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">DevOps / SRE</span><span class="badge lens">Architect</span></span></span></div>
   <h1>Nothing in this plugin changes a cloud.</h1>
-  <p class="standfirst">The plugin an estate repository loads, read one folder at a time, around the one boundary every folder keeps.</p>
-  <p>An estate declaration says what infrastructure should exist, and some things must never appear in one: a credential, an account identifier a tool finds for itself, a cloud's own string outside the entry allowed to hold it. <code>spn-infra</code> catches those at the moment they are written, and explains the estate's words to a reader who may never open the book. This page takes each of its folders in turn and sends you to the page that states it in full.</p>
+  <p class="standfirst">spn-infra is the plugin an estate repository loads, and this page reads it one folder at a time, around the one boundary every folder keeps. Read it before you add a rule about what an estate declaration may contain, or when you want to know what this plugin catches and what it leaves to the tool. It takes each folder in turn and sends you to the page that states it in full.</p>
 </header>
 
 <section id="s0">
   <div class="sec-head"><h2>Overview</h2></div>
+  <p>An estate declaration says what infrastructure should exist, and some things must never appear in one: a credential, an account identifier a tool finds for itself, a cloud's own string outside the entry allowed to hold it. <code>spn-infra</code> catches those at the moment they are written, and explains the estate's words to a reader who may never open the book.</p>
   <p>This page is for a DevOps engineer or an architect working in an estate repository, and for anyone about to add a rule or a cloud to this plugin. It assumes you know what a plugin is; if you do not, the <a href="concept-devex-overview.html">spn-devex overview</a> comes first. After it you know where each estate rule is enforced, and what this plugin will never do for you.</p>
   <p><strong>The one thing to unlearn is that an estate plugin operates the estate.</strong> It does not. The gate refuses a bad write, the cards explain the vocabulary, and each skill names the command that does the work through the tool's own doors. A cloud is changed only by that tool, never by this plugin and never by a hand-run apply. This plugin ships no agents, and it has no chapter for them.</p>
   <p><strong>What you can decide after this page.</strong> Whether a rule you want is about the text of a declaration, and so belongs in the gate; whether it is the same on every cloud or belongs to one; and where its proof goes.</p>

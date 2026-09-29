@@ -6,7 +6,7 @@
   "lenses": ["ARCHITECT", "LEAD"],
   "status": "PLANNING",
   "dependsOn": [],
-  "summary": "The folder that carries a standard from this repository into a running session — its manifest, its entry in the marketplace list, the installed copy a session actually reads, and the version field that says which bytes those are.",
+  "summary": "A plugin carries one of this repository's standards into a running session, in one folder: its manifest, its entry in the marketplace list, the installed copy a session actually reads, and the version field that names which bytes those are.",
   "keywords": ["plugin", "marketplace", "manifest", "version", "install", "plugin root"]
 }
 -->
@@ -15,9 +15,11 @@
 
 `For: Architect · Engineering leader` · `Status: 🔮 PLANNING`
 
-A rule an agent cannot load is a rule it cannot follow, however well the rule is written. The plugin is the unit that carries a rule from this repository into a running session: one folder, one small manifest, one entry in a list this repository keeps by hand. Every other construct of this domain is a folder inside one, so this page names the container before the other pages name what sits in it.
+A plugin carries one of this repository's standards into a running session, in one folder: its manifest, its entry in the marketplace list, the installed copy a session actually reads, and the version field that names which bytes those are. Read this page before you edit a manifest, or when a change does not seem to take effect. It names the three files involved, then walks through what each one holds and how they connect.
 
 ## Overview
+
+A rule an agent cannot load is a rule it cannot follow, however well the rule is written. So this folder is one small manifest and one entry in a list this repository keeps by hand, and every other construct in this domain sits inside it as a folder of its own.
 
 The last of the three — the installed copy — is what costs people an afternoon. A session never reads this checkout. It reads an installed copy, and that copy is found by the plugin's name together with the version its manifest carries. So an edit here is not yet a change in behaviour, and a version that has not moved is a version whose installed copy an edit can sit silently behind.
 

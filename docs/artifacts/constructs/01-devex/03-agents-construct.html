@@ -1,7 +1,7 @@
 <meta charset="utf-8">
 <title>Agents — The Personas a Session Convenes, and the Lenses They Are Handed</title>
 <!-- spn:doc
-{"id":"agent-set","variant":"construct","title":"Agents — The Personas a Session Convenes, and the Lenses They Are Handed","lenses":["LEAD","ARCHITECT"],"status":"PLANNING","dependsOn":["plugin-set","ref-set"],"summary":"A named persona a session can call mid-turn — the frontmatter that decides when it answers, the authority its own file grants it, the reviewing viewpoint a parameterized brief is handed, and the one condition that viewpoint may block on.","keywords":["agent","brief","persona","lens","panel","authority"]}
+{"id":"agent-set","variant":"construct","title":"Agents — The Personas a Session Convenes, and the Lenses They Are Handed","lenses":["LEAD","ARCHITECT"],"status":"PLANNING","dependsOn":["plugin-set","ref-set"],"summary":"An agent here is a named persona a session can call in the middle of a turn, for a second, independent read on a change.","keywords":["agent","brief","persona","lens","panel","authority"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
 <style>
@@ -182,12 +182,13 @@
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
   <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Agents — The Personas a Session Convenes, and the Lenses They Are Handed</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Construct</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">Engineering leader</span><span class="badge lens">Architect</span></span><span class="st"><span class="lbl">Status:</span> <span class="badge status planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>Agents — The Personas a Session Convenes, and the Lenses They Are Handed</h1>
-  <p class="standfirst">The context that wrote a change has already agreed with every reason it gave itself. A brief is how a second, independent read arrives without opening a second window: a persona with its own name, convened mid-turn, carrying only what its own file grants it. A backend developer reads a change differently than a security reviewer does, and a lens is that difference written down — one file per engineering function, handed to a reviewing brief at the moment it is convened.</p>
+  <p class="standfirst">An agent here is a named persona a session can call in the middle of a turn, for a second, independent read on a change. Read this page before you write a new persona, or if you need to know what one is allowed to decide. It covers the file that decides when a persona answers, the authority its own file grants it, and the viewpoint — called a lens — it is handed when convened.</p>
 </header>
 
 <!-- 00 -->
 <section id="s0">
   <div class="sec-head"><h2>Overview</h2></div>
+  <p>The context that wrote a change has already agreed with every reason it gave itself. So a persona is convened with its own name in the middle of a turn, carrying only what its own file grants it — a second read without opening a second window. A backend developer reads a change differently than a security reviewer does, and a lens is that difference written down: one file per engineering function, handed to a reviewing brief at the moment it is convened.</p>
   <p>The thing to check first in any brief is its authority — what this persona may decide, and whether it may write anything at all. Some of that authority is bound by the frontmatter and some of it is only stated in the prose, and the two are not the same promise.</p>
   <p>A lens is where the rest of the authority comes from. <strong>A lens is an argument handed to one reviewer, not a reviewer of its own.</strong> The brief that reviews carries none of the viewpoints; it is given a name at the moment it is convened and reads that file before it says anything, and that file — rather than the brief — states what this convening may refuse and what it may only advise.</p>
   <p>This construct realizes the book's <code>01-devex/02-agent/01-agent</code>.</p>

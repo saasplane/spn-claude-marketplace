@@ -1,7 +1,7 @@
 <meta charset="utf-8">
 <title>Scripts — The Write-Time Gate and What Runs It</title>
 <!-- spn:doc
-{"id":"estate-guard","variant":"construct","title":"Scripts — The Write-Time Gate and What Runs It","lenses":["INFRA","TRUST"],"status":"PLANNING","dependsOn":["checks","estate-hooks"],"summary":"The three folders under this plugin's scripts tree — the dispatcher wired to every write, the gate that resolves which subjects judge it, and the rule bodies they run — the narrow set of things they know about, and the direction they fail in when the input cannot be read.","keywords":["scripts","dispatcher","subject","rule","secret","allow"]}
+{"id":"estate-guard","variant":"construct","title":"Scripts — The Write-Time Gate and What Runs It","lenses":["INFRA","TRUST"],"status":"PLANNING","dependsOn":["checks","estate-hooks"],"summary":"Scripts holds the gate that catches what must never appear in an estate declaration — a credential, an identifier a tool should discover for itself, a cloud provider's own string outside the one entry allowed to hold it — before it is written.","keywords":["scripts","dispatcher","subject","rule","secret","allow"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
 <style>
@@ -182,12 +182,13 @@
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
   <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Scripts — The Write-Time Gate and What Runs It</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Construct</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">DevOps / SRE</span><span class="badge lens">DevSecOps / Security</span></span><span class="st"><span class="lbl">Status:</span> <span class="badge status planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>Scripts — The Write-Time Gate and What Runs It</h1>
-  <p class="standfirst">An estate declaration says what infrastructure should exist. Things that must never appear in one — a credential, an identifier a tool discovers for itself, a provider's own string outside the entry that sanctions it — are cheap to catch at the moment somebody writes them and expensive to find later. This plugin's scripts tree is that catch: a dispatcher the wiring calls, a gate that works out which subjects have an opinion about the file, and a set of named rule bodies with nothing else between them and the text.</p>
+  <p class="standfirst">Scripts holds the gate that catches what must never appear in an estate declaration — a credential, an identifier a tool should discover for itself, a cloud provider's own string outside the one entry allowed to hold it — before it is written. Read this page before you add a new rule here, or when you want to know which file actually runs at write time. It explains the dispatcher the wiring calls, the gate that decides which rules have an opinion about a file, and the named rule bodies that check the text directly.</p>
 </header>
 
 <!-- 00 -->
 <section id="s0">
   <div class="sec-head"><h2>Overview</h2></div>
+  <p>An estate declaration says what infrastructure should exist, and things that must never appear in one are cheap to catch at the moment somebody writes them and expensive to find later.</p>
   <p>Read the direction it fails in before you read anything else. <strong>When the gate does not understand its input, it allows the call.</strong> A gate refusing whatever it cannot parse would deny far more than the things it actually knows about, and people would route around it, which leaves an estate with no gate at all.</p>
   <p>This construct realizes the book's <code>01-devex/02-agent/04-plugins</code>.</p>
 </section>

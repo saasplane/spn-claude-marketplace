@@ -6,7 +6,7 @@
   "lenses": ["ARCHITECT", "SERVER_DEV"],
   "status": "PLANNING",
   "dependsOn": ["apps-plugin", "hook-set"],
-  "summary": "What this plugin wires and why it wires so little — one moment, narrowed to the calls that change a file, behind a single entry whose dispatcher resolves what to run from the repository's own declaration rather than from a list.",
+  "summary": "This plugin wires exactly one moment of a session — the point where a file is about to change — because every rule it holds is about what a file contains.",
   "keywords": ["hook", "hooks.json", "PreToolUse", "matcher", "entry", "dispatch"]
 }
 -->
@@ -15,7 +15,7 @@
 
 `For: Architect · Backend developer` · `Status: 🔮 PLANNING`
 
-A plugin's wiring says which moments of a session it has an opinion about. This one has an opinion about exactly one, and the narrowness is the point: every rule this domain holds is about what a file contains, so the only moment worth claiming is the one where a file is about to change.
+This plugin wires exactly one moment of a session — the point where a file is about to change — because every rule it holds is about what a file contains. Read this page to see why one moment is enough here, and which calls that one moment covers. It explains the single wired entry and how its dispatcher decides what to run.
 
 ## Overview
 

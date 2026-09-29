@@ -6,7 +6,7 @@
   "lenses": ["QA", "SERVER_DEV"],
   "status": "PLANNING",
   "dependsOn": ["plugin-set", "checks"],
-  "summary": "The folder a plugin proves itself from — the tier that says what kind of proof a suite is, the mirror that says what it is proof of, the runner that finds every suite by walking rather than by a list, and the two tiers deliberately left absent.",
+  "summary": "Tests is the folder a plugin proves itself from, arranged so a reader can find the suite that covers a script just by following that script's own path.",
   "keywords": ["test", "suite", "tier", "mirror", "runner", "harness"]
 }
 -->
@@ -15,9 +15,11 @@
 
 `For: Quality engineer · Backend developer` · `Status: 🔮 PLANNING`
 
-A plugin is code, so it owes proof. What makes that proof its own construct rather than an implementation detail is where the files sit: a reader looking for the suite that covers a script should be able to derive its path from the script's path, without opening anything. This page names the tree that makes that true, and the two rules that keep it true after a move.
+Tests is the folder a plugin proves itself from, arranged so a reader can find the suite that covers a script just by following that script's own path. Read this page before you add a new suite, or when a test does not show up where you expected it. It explains the tier a suite belongs to — the level of proof it offers — and the mirror that says what it is proof of. It also says why two tiers are deliberately absent.
 
 ## Overview
+
+A plugin is code, so it owes proof, and what makes that proof its own construct rather than an implementation detail is where the files sit.
 
 The tree answers two questions in a fixed order. **The tier comes first and the mirror second**, because the tier answers *what kind of proof is this* and the mirror answers *of what*. Put the mirror first and a second tier for the same file has nowhere to go; put the tier first and an integration suite for a file that already has a unit suite lands at the same path under a different tier, without colliding.
 

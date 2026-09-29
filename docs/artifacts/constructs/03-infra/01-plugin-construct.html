@@ -1,7 +1,7 @@
 <meta charset="utf-8">
 <title>Plugin — spn-infra as a Delivery Unit</title>
 <!-- spn:doc
-{"id":"estate-plugin","variant":"construct","title":"Plugin — spn-infra as a Delivery Unit","lenses":["INFRA","ARCHITECT"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"The folder that carries the estate standard into a session — the manifest that names it, the description that decides whether a session loads it, and the version rule it shares with its two siblings.","keywords":["plugin","manifest","version","lockstep","description","INFRA"]}
+{"id":"estate-plugin","variant":"construct","title":"Plugin — spn-infra as a Delivery Unit","lenses":["INFRA","ARCHITECT"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"This plugin carries this repository's estate standard — the rules for the infrastructure a product runs on — into a session that is working on one, in one folder.","keywords":["plugin","manifest","version","lockstep","description","INFRA"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
 <style>
@@ -182,12 +182,13 @@
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
   <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Plugin — spn-infra as a Delivery Unit</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Construct</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">DevOps / SRE</span><span class="badge lens">Architect</span></span><span class="st"><span class="lbl">Status:</span> <span class="badge status planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>Plugin — spn-infra as a Delivery Unit</h1>
-  <p class="standfirst">A rule an agent never loads is a rule nobody follows. <code>spn-infra</code> is the folder that carries the estate standard from this repository into a session working on an estate: one manifest, one entry in the marketplace list, and a set of construct folders beneath it. This page names the container; every other page of this domain names something inside it.</p>
+  <p class="standfirst">This plugin carries this repository's estate standard — the rules for the infrastructure a product runs on — into a session that is working on one, in one folder. Read this page to see what this plugin claims about itself and when a session loads it. It explains the manifest, the marketplace entry, and the version rule it shares with its two sibling plugins.</p>
 </header>
 
 <!-- 00 -->
 <section id="s0">
   <div class="sec-head"><h2>Overview</h2></div>
+  <p>A rule an agent never loads is a rule nobody follows. <code>spn-infra</code> carries one manifest, one entry in the marketplace list, and a set of construct folders beneath it, and every other page of this domain names something inside that container.</p>
   <p>Two things about the manifest pull in opposite directions, and both are deliberate. <strong>The version is the set's and the identity is this plugin's own.</strong> The number moves with its two siblings whether or not anything here changed, so a reader comparing three numbers never has to wonder whether a release half-landed. The description belongs to <code>spn-infra</code> alone, and it is what a session matches against when it decides whether to load the plugin at all.</p>
   <p>This construct realizes the book's <code>01-devex/02-agent/04-plugins</code>.</p>
 </section>

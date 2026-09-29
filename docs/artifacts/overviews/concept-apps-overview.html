@@ -9,7 +9,7 @@
     "SERVER_DEV",
     "WEB_DEV"
   ],
-  "summary": "spn-apps at reading depth — the plugin an apps repository loads, and what each of its folders holds: the manifest, the one wired moment, the skills, the scripts, the refs, the provider that names the stack, and the tests.",
+  "summary": "spn-apps is the plugin an apps repository loads, and this page reads it one folder at a time, with the stack kept inside its own provider.",
   "keywords": [
     "spn-apps",
     "overview",
@@ -227,12 +227,12 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
 <header class="masthead">
   <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Marketplace &nbsp;|&nbsp; spn-apps — The TypeScript Stack Domain</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Overview</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">Backend developer</span><span class="badge lens">Web developer</span></span></span></div>
   <h1>Only one folder in this plugin may name a language.</h1>
-  <p class="standfirst">The plugin an apps repository loads, read one folder at a time, with the stack kept inside its provider.</p>
-  <p>An apps repository is held to rules about what its contracts, services and tests contain, and some of those rules can only be written for one language. <code>spn-apps</code> carries them. Each folder here is the same kind of instrument <code>spn-devex</code> defines, so this page says only what is different in this domain and sends you to the page that states it in full.</p>
+  <p class="standfirst">spn-apps is the plugin an apps repository loads, and this page reads it one folder at a time, with the stack kept inside its own provider. Read it before you add a rule that can only be written for one language, or when you want to know what is different here from the plugin every repository loads. It says only what differs in this domain, and sends you to the page that states each part in full.</p>
 </header>
 
 <section id="s0">
   <div class="sec-head"><h2>Overview</h2></div>
+  <p>An apps repository is held to rules about what its contracts, services and tests contain, and some of those rules can only be written for one language. <code>spn-apps</code> carries them. Each folder here is the same kind of instrument <code>spn-devex</code> defines.</p>
   <p>This page is for a backend or web developer working in an apps repository, and for anyone about to add a rule or a stack to this plugin. It assumes you know what a plugin is; if you do not, the <a href="concept-devex-overview.html">spn-devex overview</a> comes first. After it you know which folder a change to this plugin belongs in, and why most of the plugin never names a language.</p>
   <p><strong>The one thing to unlearn is that a stack plugin is written in its stack everywhere.</strong> Most of this plugin is stack-agnostic. The skills and the gate read which stack a node declares in its own <code>sprepo.json</code>, then load the stack's part from <code>providers/</code>. So adding a second stack is adding a folder, not editing a gate. This plugin ships no agents, and it has no chapter for them.</p>
   <p><strong>What you can decide after this page.</strong> Whether a rule you want to add is true of every stack or of one; which folder it then belongs in; and where its proof goes.</p>

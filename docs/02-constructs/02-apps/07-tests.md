@@ -6,7 +6,7 @@
   "lenses": ["QA", "SERVER_DEV"],
   "status": "PLANNING",
   "dependsOn": ["stack-checks", "apps-providers"],
-  "summary": "How this plugin proves itself — the tier first and the mirror second, an absent tier that says so by being absent, a runner that walks rather than lists, and the rule that nothing may count its own depth.",
+  "summary": "This plugin ships rules that other repositories are held to, so it owes proof of its own, carried in a Tests folder built the same way this domain asks every project it governs to build one.",
   "keywords": ["tests", "tier", "mirror", "runner", "harness", "discovery"]
 }
 -->
@@ -15,7 +15,7 @@
 
 `For: Quality engineer · Backend developer` · `Status: 🔮 PLANNING`
 
-This plugin ships rules that other people's repositories are held to, so it owes proof of its own. The folder that carries that proof follows the same convention this domain's provider asks of every node it governs — with one deliberate exception, stated below.
+This plugin ships rules that other repositories are held to, so it owes proof of its own, carried in a Tests folder built the same way this domain asks every project it governs to build one. Read this page before you add a new suite, or when you want to know why one level of proof is missing on purpose. It explains the one deliberate exception to that convention, and the rule that nothing here may count its own depth.
 
 ## Overview
 

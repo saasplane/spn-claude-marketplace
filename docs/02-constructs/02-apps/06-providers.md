@@ -6,7 +6,7 @@
   "lenses": ["ARCHITECT", "SERVER_DEV"],
   "status": "PLANNING",
   "dependsOn": ["provider-set", "stack-skills", "stack-checks"],
-  "summary": "The one folder in this plugin that knows a language — both halves, because for this domain the instance is the stack itself; the procedure a skill loads, the parse and the private rules a gate resolves into, and the folder named for the skill rather than for the plugin that ships it.",
+  "summary": "Providers is the one folder in this plugin allowed to name a language, holding everything that varies with the language a project is written in, one folder per stack.",
   "keywords": ["provider", "instance", "stack", "steps", "subject", "private"]
 }
 -->
@@ -15,7 +15,7 @@
 
 `For: Architect · Backend developer` · `Status: 🔮 PLANNING`
 
-Nothing else in this plugin may name a language. Everything that varies with the language a node is written in sits in one folder per stack, which is why adding a second stack is adding a folder rather than editing a gate.
+Providers is the one folder in this plugin allowed to name a language, holding everything that varies with the language a project is written in, one folder per stack. Read this page before you add a second stack, or when you want to know why adding one means adding a folder rather than editing a gate. It explains why this domain's provider always carries both halves, and how a skill and a gate each reach into it.
 
 ## Overview
 

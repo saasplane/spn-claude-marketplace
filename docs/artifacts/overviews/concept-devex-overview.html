@@ -9,7 +9,7 @@
     "ARCHITECT",
     "SERVER_DEV"
   ],
-  "summary": "spn-devex at reading depth — the plugin every repository loads, and what each folder a plugin can ship is for: the manifest, the hooks, the agents and the lenses they are handed, the skills, the scripts, the refs, the providers and the tests.",
+  "summary": "spn-devex is the plugin every SaaS Plane repository loads, and this page reads it one folder at a time, in the order the folders depend on each other.",
   "keywords": [
     "spn-devex",
     "overview",
@@ -229,12 +229,12 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
 <header class="masthead">
   <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Marketplace &nbsp;|&nbsp; spn-devex — The Stack-Agnostic Domain</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Overview</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">Architect</span><span class="badge lens">Backend developer</span></span></span></div>
   <h1>A plugin is a folder of instruments, and this one defines what each instrument is.</h1>
-  <p class="standfirst">The plugin every SaaS Plane repository loads, read one folder at a time, in the order the folders depend on each other.</p>
-  <p>A rule in the foundation book does nothing until something applies it while you work. <code>spn-devex</code> is where that happens for every repository, whatever world it declares. It is also the widest of the three plugins, so it is the place to learn what a plugin can hold at all. This page takes each folder a plugin can ship, says what it is for and what you would decide there, and sends you to the page that states it in full.</p>
+  <p class="standfirst">spn-devex is the plugin every SaaS Plane repository loads, and this page reads it one folder at a time, in the order the folders depend on each other. Read it before you decide where a new rule should run, or when you want to see what a plugin can hold at all. It takes each folder in turn, says what it is for and what you would decide there, and sends you to the page that states it in full.</p>
 </header>
 
 <section id="s0">
   <div class="sec-head"><h2>Overview</h2></div>
+  <p>A rule in the foundation book does nothing until something applies it while you work. <code>spn-devex</code> is where that happens for every repository, whatever world it declares. It is also the widest of the three plugins, so it is the place to learn what a plugin can hold at all.</p>
   <p>This page is for anyone about to change a plugin in this repository, or to read one: an architect deciding where a new rule should run, or a backend developer about to write a check. It assumes no earlier reading. After it you know which folder a piece of plugin code belongs in, what that folder promises, and which construct page to open next.</p>
   <p><strong>The one thing to unlearn is that a plugin makes rules.</strong> None of them does. Every rule is stated once, in a chapter of the foundation book, and a plugin carries instruments that read that rule and apply it at the moment somebody works. So each folder below is one kind of instrument, and each is defined once, here in <code>spn-devex</code>. The other two plugins use the same folder names and add what only their own domain can say. That is why a general question, such as <em>what is a hook?</em>, always has its answer in this domain.</p>
   <p><strong>What you can decide after this page.</strong> Which folder a new piece of plugin code belongs in; whether a rule you want to enforce should run at the moment a file is written, or only when somebody asks for a sweep; and what has to happen before an edit to a plugin is the code a session actually runs.</p>

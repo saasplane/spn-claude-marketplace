@@ -6,7 +6,7 @@
   "lenses": ["ARCHITECT", "LEAD"],
   "status": "PLANNING",
   "dependsOn": ["plugin-set"],
-  "summary": "A named unit of work a session can be asked for — a folder, a description matched against the work at hand, the instructions loaded once it matches, and the rule that a skill carries steps and never a rule of its own.",
+  "summary": "A skill is a named unit of work a session can be asked for — a folder holding a description that is matched against the work at hand, and the instructions that load only once that description matches.",
   "keywords": ["skill", "SKILL.md", "description", "match", "steps", "stage"]
 }
 -->
@@ -15,9 +15,11 @@
 
 `For: Architect · Engineering leader` · `Status: 🔮 PLANNING`
 
-Loading every rule this repository knows into every turn would drown the turn that needed one of them. A skill is how the loading is narrowed instead: a name, a sentence saying when it applies, and the instructions for doing that one thing, read only once the work at hand matches the sentence. This page names that shape.
+A skill is a named unit of work a session can be asked for — a folder holding a description that is matched against the work at hand, and the instructions that load only once that description matches. Read this page before you write a new skill, or when you want to know why one did not fire. It explains what a skill's description must do, and the rule that a skill carries steps and never a rule of its own.
 
 ## Overview
+
+Loading every rule this repository knows into every turn would drown the turn that needed one of them. So a skill narrows that: a name, a sentence saying when it applies, and the instructions for doing that one thing, read only once the work at hand matches the sentence.
 
 The sentence is the part people write wrongly. A description here is matched against what you are doing, never browsed by a person, so it states the class of ask it answers and the words a developer actually types. A description written as a catalogue entry is a skill that never fires.
 

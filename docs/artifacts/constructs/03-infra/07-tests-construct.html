@@ -1,7 +1,7 @@
 <meta charset="utf-8">
 <title>Tests — The Tier, the Mirror, and a Runner That Walks</title>
 <!-- spn:doc
-{"id":"estate-tests","variant":"construct","title":"Tests — The Tier, the Mirror, and a Runner That Walks","lenses":["INFRA","QA"],"status":"PLANNING","dependsOn":["tests","estate-guard","estate-providers"],"summary":"How this plugin proves its own gate — a tree named by tier and then by what a suite proves, a runner that walks rather than globs, a harness that finds the plugin root instead of counting it, and the absences that say what does not run here.","keywords":["test","tier","mirror","runner","harness","suite"]}
+{"id":"estate-tests","variant":"construct","title":"Tests — The Tier, the Mirror, and a Runner That Walks","lenses":["INFRA","QA"],"status":"PLANNING","dependsOn":["tests","estate-guard","estate-providers"],"summary":"This plugin proves its own gate — the rules that refuse a file — in a Tests folder arranged so moving a source file moves its test with it.","keywords":["test","tier","mirror","runner","harness","suite"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
 <style>
@@ -182,12 +182,13 @@
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
   <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Tests — The Tier, the Mirror, and a Runner That Walks</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Construct</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">DevOps / SRE</span><span class="badge lens">Quality engineer</span></span><span class="st"><span class="lbl">Status:</span> <span class="badge status planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>Tests — The Tier, the Mirror, and a Runner That Walks</h1>
-  <p class="standfirst">A gate nobody proves is a gate nobody can trust to be narrow. This plugin's refusals are regular expressions over text somebody is about to write, and a rule that is one character too greedy refuses correct files until somebody turns the whole gate off. So each rule is proven against what it must refuse <strong>and</strong> against what it must let through, and the tree those proofs sit in is arranged so that moving a source file moves its test with it.</p>
+  <p class="standfirst">This plugin proves its own gate — the rules that refuse a file — in a Tests folder arranged so moving a source file moves its test with it. Read this page before you add a new rule, or when you want to know what a rule must be proven against. It explains why each rule is checked both against what it must refuse <strong>and</strong> against what it must let through, and how the folder finds the plugin root instead of counting hops to it.</p>
 </header>
 
 <!-- 00 -->
 <section id="s0">
   <div class="sec-head"><h2>Overview</h2></div>
+  <p>A gate nobody proves is a gate nobody can trust to be narrow. This plugin's refusals are regular expressions over text somebody is about to write, and a rule that is one character too greedy refuses correct files until somebody turns the whole gate off.</p>
   <p><strong>The tier comes first and the mirror second.</strong> <code>unit/</code> answers <em>what kind of proof is this</em>, and the path under it answers <em>of what</em> by repeating the source file's own path. That order is what lets a second tier be added later without a collision: an integration suite for a file that already has a unit suite lands at the same path under a different tier.</p>
   <p>This construct realizes the book's <code>01-devex/02-agent/04-plugins</code>.</p>
 </section>

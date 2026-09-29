@@ -6,7 +6,7 @@
   "lenses": ["ARCHITECT", "LEAD"],
   "status": "PLANNING",
   "dependsOn": ["plugin-set"],
-  "summary": "The delivery unit of the apps domain — the identity its manifest claims, the description that is matched against the work at hand, the world a repository declares to earn it, and the version rule it shares with every other plugin in this marketplace.",
+  "summary": "This plugin is the one folder everything in the apps domain ships from, and the folder an install copies whole.",
   "keywords": ["plugin", "manifest", "identity", "description", "version", "lockstep"]
 }
 -->
@@ -15,7 +15,7 @@
 
 `For: Architect · Engineering leader` · `Status: 🔮 PLANNING`
 
-Everything this domain ships sits inside one folder, and that folder is what an install copies. This page names the container: what it claims about itself, who gets it, and what its version number means.
+This plugin is the one folder everything in the apps domain ships from, and the folder an install copies whole. Read this page to see what it claims about itself, who is entitled to load it, and what its version number means. It covers the manifest, the world that earns it, and the version rule it shares with the marketplace's other two plugins.
 
 ## Overview
 

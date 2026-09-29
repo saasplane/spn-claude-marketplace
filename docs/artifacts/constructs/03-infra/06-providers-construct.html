@@ -1,7 +1,7 @@
 <meta charset="utf-8">
 <title>Providers — One Folder per Cloud, Scripts Half Only</title>
 <!-- spn:doc
-{"id":"estate-providers","variant":"construct","title":"Providers — One Folder per Cloud, Scripts Half Only","lenses":["INFRA","ARCHITECT"],"status":"PLANNING","dependsOn":["provider-set","estate-guard"],"summary":"What this plugin puts in the providers construct — a scripts half per cloud and no skills half at all — why the authoring stack decides that, and how a cloud joins by adding a folder nothing has to be told about.","keywords":["provider","cloud","aws","gcp","scripts half","discovery"]}
+{"id":"estate-providers","variant":"construct","title":"Providers — One Folder per Cloud, Scripts Half Only","lenses":["INFRA","ARCHITECT"],"status":"PLANNING","dependsOn":["provider-set","estate-guard"],"summary":"This plugin serves every cloud an estate can run on, and everything that varies between clouds sits in one folder per cloud under Providers.","keywords":["provider","cloud","aws","gcp","scripts half","discovery"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
 <style>
@@ -182,7 +182,7 @@
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
   <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Providers — One Folder per Cloud, Scripts Half Only</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Construct</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">DevOps / SRE</span><span class="badge lens">Architect</span></span><span class="st"><span class="lbl">Status:</span> <span class="badge status planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>Providers — One Folder per Cloud, Scripts Half Only</h1>
-  <p class="standfirst">An estate runs on one cloud and the plugin serves them all. Everything that varies between clouds sits in <code>providers/</code>, one folder per cloud, so that admitting the next one is adding a folder rather than editing a gate. In this plugin those folders hold a scripts half and nothing else, and the reason is worth reading before the shape is.</p>
+  <p class="standfirst">This plugin serves every cloud an estate can run on, and everything that varies between clouds sits in one folder per cloud under <code>providers/</code>. Read this page before you add a new cloud, or when you want to know why these folders hold only scripts. It explains why adding a cloud means adding a folder rather than editing a gate, and what decides whether a folder also carries a skills half.</p>
 </header>
 
 <!-- 00 -->

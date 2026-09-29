@@ -6,7 +6,7 @@
   "lenses": ["SERVER_DEV", "WEB_DEV"],
   "status": "PLANNING",
   "dependsOn": ["apps-hooks", "checks"],
-  "summary": "Everything under this plugin's scripts folder — the gate that resolves a write to the declared stack without naming one, the process behind the single wired entry, the shared code both sides read, and the commands run by name over an apps repository's own registers.",
+  "summary": "Scripts holds everything this plugin executes, divided by what calls each file — the wiring, the gate the wiring asks, the tools a person or agent runs by typing their path, and the libraries the others read.",
   "keywords": ["gate", "subject", "dispatcher", "register", "action", "coverage"]
 }
 -->
@@ -15,7 +15,7 @@
 
 `For: Backend developer · Web developer` · `Status: 🔮 PLANNING`
 
-Everything this plugin executes sits in one folder, and the folder divides by what calls each file. The wiring calls one of them. The gate is asked by that one. Some are run by a person or an agent typing their path. The rest are libraries the others read.
+Scripts holds everything this plugin executes, divided by what calls each file — the wiring, the gate the wiring asks, the tools a person or agent runs by typing their path, and the libraries the others read. Read this page before you add a script here, or when you want to know which file runs a given command. It explains how the gate resolves a write to the declared stack without naming one, and what the commands over this domain's own registers do.
 
 ## Overview
 

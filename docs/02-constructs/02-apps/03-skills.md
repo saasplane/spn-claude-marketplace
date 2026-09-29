@@ -6,7 +6,7 @@
   "lenses": ["SERVER_DEV", "WEB_DEV"],
   "status": "PLANNING",
   "dependsOn": ["skill-set"],
-  "summary": "The skills the apps domain ships — what makes one belong to this domain, why the longest of them divides into ordered steps it does not hold itself, why a mode is an argument rather than a second folder, and the skill that is deliberately absent.",
+  "summary": "A skill belongs to this domain when it describes work on a piece of an apps repository — scaffolding a project, building a capability, running the suites, proving a package, or publishing the repository.",
   "keywords": ["skill", "steps", "mode", "classification", "stage", "absence"]
 }
 -->
@@ -15,9 +15,11 @@
 
 `For: Backend developer · Web developer` · `Status: 🔮 PLANNING`
 
-A skill belongs to this domain when the work it describes is work on an apps node: scaffolding a project, building a capability, running the suites, proving a package, publishing the repository. Each of those is a different walk, and each lives in one folder under this plugin's `skills/`.
+A skill belongs to this domain when it describes work on a piece of an apps repository — scaffolding a project, building a capability, running the suites, proving a package, or publishing the repository. Read this page before you add a new skill here, or when you want to know why one is missing. It explains why the longest skills read their steps from elsewhere, why a mode is an argument rather than a second folder, and which skill is deliberately absent.
 
 ## Overview
+
+Each of those is a different walk, and each lives in one folder under this plugin's `skills/`.
 
 The thing to check first is that **a skill here names no stack**. The steps of a build differ in every language, so the skill states the order and reads the step files from the provider the node's own `sprepo.json` declares. The second thing is the absence: **planning is not a skill of this domain.** The book's skill set is closed and folded planning into a stack-agnostic skill, so shipping one here would add a value the standard does not have, and two skills would then compete for the same ask.
 

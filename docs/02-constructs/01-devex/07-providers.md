@@ -6,7 +6,7 @@
   "lenses": ["ARCHITECT", "LEAD"],
   "status": "PLANNING",
   "dependsOn": ["plugin-set", "skill-set", "ref-set", "checks"],
-  "summary": "How a plugin admits a second stack or a second cloud without a gate being edited — the two halves a provider contributes, the rule that decides whether it contributes a skills half at all, and the line between what a provider states and what it does.",
+  "summary": "A provider is one folder per instance — one stack, or one cloud — holding everything about that instance that varies, inside a plugin that otherwise stays the same for every one of them.",
   "keywords": ["provider", "instance", "stack", "cloud", "gate", "plugin", "extension"]
 }
 -->
@@ -15,9 +15,11 @@
 
 `For: Architect · Engineering leader` · `Status: 🔮 PLANNING`
 
-A plugin that knows its stack by name is a plugin the second stack cannot join. The knowledge has to sit somewhere, so the question is never whether a plugin holds it but **which part of the plugin is allowed to**. A provider is the answer: one folder per instance, holding everything that varies, so that adding an instance is adding a folder rather than editing a gate.
+A provider is one folder per instance — one stack, or one cloud — holding everything about that instance that varies, inside a plugin that otherwise stays the same for every one of them. Read this page before you add a new stack or a new cloud, or when you are deciding where a piece of stack-specific knowledge belongs. It explains the two halves a provider can contribute, and where the line sits between what a provider states and what it does.
 
 ## Overview
+
+A plugin that knows its stack by name is a plugin the second stack cannot join. So the question is never whether a plugin holds that knowledge, but **which part of the plugin is allowed to** — and a provider is where it goes: adding an instance becomes adding a folder rather than editing a gate.
 
 The thing to check first is whether any gate names an instance. A gate that spells `ts` or `aws` has already decided which realization it serves, and the second one arrives as a special case of the first. Every gate reads the instance from the nearest `sprepo.json` and dispatches; nothing else about the instance reaches it.
 

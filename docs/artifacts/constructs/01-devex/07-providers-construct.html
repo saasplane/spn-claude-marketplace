@@ -1,7 +1,7 @@
 <meta charset="utf-8">
 <title>Providers — How a Plugin Is Extended Per Instance</title>
 <!-- spn:doc
-{"id":"provider-set","variant":"construct","title":"Providers — How a Plugin Is Extended Per Instance","lenses":["ARCHITECT","LEAD"],"status":"PLANNING","dependsOn":["plugin-set","skill-set","ref-set","checks"],"summary":"How a plugin admits a second stack or a second cloud without a gate being edited — the two halves a provider contributes, the rule that decides whether it contributes a skills half at all, and the line between what a provider states and what it does.","keywords":["provider","instance","stack","cloud","gate","plugin","extension"]}
+{"id":"provider-set","variant":"construct","title":"Providers — How a Plugin Is Extended Per Instance","lenses":["ARCHITECT","LEAD"],"status":"PLANNING","dependsOn":["plugin-set","skill-set","ref-set","checks"],"summary":"A provider is one folder per instance — one stack, or one cloud — holding everything about that instance that varies, inside a plugin that otherwise stays the same for every one of them.","keywords":["provider","instance","stack","cloud","gate","plugin","extension"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
 <style>
@@ -182,12 +182,13 @@
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
   <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Providers — How a Plugin Is Extended Per Instance</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Construct</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">Architect</span><span class="badge lens">Engineering leader</span></span><span class="st"><span class="lbl">Status:</span> <span class="badge status planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>Providers — How a Plugin Is Extended Per Instance</h1>
-  <p class="standfirst">A plugin that knows its stack by name is a plugin the second stack cannot join. The knowledge has to sit somewhere, so the question is never whether a plugin holds it but <strong>which part of the plugin is allowed to</strong>. A provider is the answer: one folder per instance, holding everything that varies, so that adding an instance is adding a folder rather than editing a gate.</p>
+  <p class="standfirst">A provider is one folder per instance — one stack, or one cloud — holding everything about that instance that varies, inside a plugin that otherwise stays the same for every one of them. Read this page before you add a new stack or a new cloud, or when you are deciding where a piece of stack-specific knowledge belongs. It explains the two halves a provider can contribute, and where the line sits between what a provider states and what it does.</p>
 </header>
 
 <!-- 00 -->
 <section id="s0">
   <div class="sec-head"><h2>Overview</h2></div>
+  <p>A plugin that knows its stack by name is a plugin the second stack cannot join. So the question is never whether a plugin holds that knowledge, but <strong>which part of the plugin is allowed to</strong> — and a provider is where it goes: adding an instance becomes adding a folder rather than editing a gate.</p>
   <p>The thing to check first is whether any gate names an instance. A gate that spells <code>ts</code> or <code>aws</code> has already decided which realization it serves, and the second one arrives as a special case of the first. Every gate reads the instance from the nearest <code>sprepo.json</code> and dispatches; nothing else about the instance reaches it.</p>
 </section>
 

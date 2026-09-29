@@ -6,7 +6,7 @@
   "lenses": ["INFRA", "ARCHITECT"],
   "status": "PLANNING",
   "dependsOn": ["provider-set", "estate-guard"],
-  "summary": "What this plugin puts in the providers construct — a scripts half per cloud and no skills half at all — why the authoring stack decides that, and how a cloud joins by adding a folder nothing has to be told about.",
+  "summary": "This plugin serves every cloud an estate can run on, and everything that varies between clouds sits in one folder per cloud under Providers.",
   "keywords": ["provider", "cloud", "aws", "gcp", "scripts half", "discovery"]
 }
 -->
@@ -15,7 +15,7 @@
 
 `For: DevOps / SRE · Architect` · `Status: 🔮 PLANNING`
 
-An estate runs on one cloud and the plugin serves them all. Everything that varies between clouds sits in `providers/`, one folder per cloud, so that admitting the next one is adding a folder rather than editing a gate. In this plugin those folders hold a scripts half and nothing else, and the reason is worth reading before the shape is.
+This plugin serves every cloud an estate can run on, and everything that varies between clouds sits in one folder per cloud under `providers/`. Read this page before you add a new cloud, or when you want to know why these folders hold only scripts. It explains why adding a cloud means adding a folder rather than editing a gate, and what decides whether a folder also carries a skills half.
 
 ## Overview
 

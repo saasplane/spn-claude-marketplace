@@ -6,7 +6,7 @@
   "lenses": ["SERVER_DEV", "ARCHITECT"],
   "status": "PLANNING",
   "dependsOn": ["hook-set"],
-  "summary": "The folder a plugin keeps its code in — the check a moment composes, the tool a person reaches by its own path, the shared library both read, and the rule that one question is decided by one file whichever of the two asks it.",
+  "summary": "Scripts is the one folder that holds everything a plugin can execute — the checks a hook composes, the tools a person reaches by typing their path, and the library code both sides read.",
   "keywords": ["script", "check", "tool", "applies", "finding", "grade"]
 }
 -->
@@ -15,7 +15,7 @@
 
 `For: Backend developer · Architect` · `Status: 🔮 PLANNING`
 
-Everything a plugin can execute lives in one folder. Some of it is called by a moment the runtime reaches, some of it is typed by a person who wants a whole tree read, and a good deal of it is the same code serving both. This page names what that folder holds, how each kind is reached, and the habits every file in it keeps.
+Scripts is the one folder that holds everything a plugin can execute — the checks a hook composes, the tools a person reaches by typing their path, and the library code both sides read. Read this page before you add a new script, or when you are not sure whether a rule belongs in a hook or in a tool. It explains how each kind is reached and the two habits every file in the folder keeps.
 
 ## Overview
 

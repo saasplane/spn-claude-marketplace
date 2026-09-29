@@ -6,7 +6,7 @@
   "lenses": ["INFRA", "QA"],
   "status": "PLANNING",
   "dependsOn": ["tests", "estate-guard", "estate-providers"],
-  "summary": "How this plugin proves its own gate — a tree named by tier and then by what a suite proves, a runner that walks rather than globs, a harness that finds the plugin root instead of counting it, and the absences that say what does not run here.",
+  "summary": "This plugin proves its own gate — the rules that refuse a file — in a Tests folder arranged so moving a source file moves its test with it.",
   "keywords": ["test", "tier", "mirror", "runner", "harness", "suite"]
 }
 -->
@@ -15,9 +15,11 @@
 
 `For: DevOps / SRE · Quality engineer` · `Status: 🔮 PLANNING`
 
-A gate nobody proves is a gate nobody can trust to be narrow. This plugin's refusals are regular expressions over text somebody is about to write, and a rule that is one character too greedy refuses correct files until somebody turns the whole gate off. So each rule is proven against what it must refuse **and** against what it must let through, and the tree those proofs sit in is arranged so that moving a source file moves its test with it.
+This plugin proves its own gate — the rules that refuse a file — in a Tests folder arranged so moving a source file moves its test with it. Read this page before you add a new rule, or when you want to know what a rule must be proven against. It explains why each rule is checked both against what it must refuse **and** against what it must let through, and how the folder finds the plugin root instead of counting hops to it.
 
 ## Overview
+
+A gate nobody proves is a gate nobody can trust to be narrow. This plugin's refusals are regular expressions over text somebody is about to write, and a rule that is one character too greedy refuses correct files until somebody turns the whole gate off.
 
 **The tier comes first and the mirror second.** `unit/` answers *what kind of proof is this*, and the path under it answers *of what* by repeating the source file's own path. That order is what lets a second tier be added later without a collision: an integration suite for a file that already has a unit suite lands at the same path under a different tier.
 

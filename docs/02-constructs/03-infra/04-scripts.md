@@ -6,7 +6,7 @@
   "lenses": ["INFRA", "TRUST"],
   "status": "PLANNING",
   "dependsOn": ["checks", "estate-hooks"],
-  "summary": "The three folders under this plugin's scripts tree — the dispatcher wired to every write, the gate that resolves which subjects judge it, and the rule bodies they run — the narrow set of things they know about, and the direction they fail in when the input cannot be read.",
+  "summary": "Scripts holds the gate that catches what must never appear in an estate declaration — a credential, an identifier a tool should discover for itself, a cloud provider's own string outside the one entry allowed to hold it — before it is written.",
   "keywords": ["scripts", "dispatcher", "subject", "rule", "secret", "allow"]
 }
 -->
@@ -15,9 +15,11 @@
 
 `For: DevOps / SRE · DevSecOps / Security` · `Status: 🔮 PLANNING`
 
-An estate declaration says what infrastructure should exist. Things that must never appear in one — a credential, an identifier a tool discovers for itself, a provider's own string outside the entry that sanctions it — are cheap to catch at the moment somebody writes them and expensive to find later. This plugin's scripts tree is that catch: a dispatcher the wiring calls, a gate that works out which subjects have an opinion about the file, and a set of named rule bodies with nothing else between them and the text.
+Scripts holds the gate that catches what must never appear in an estate declaration — a credential, an identifier a tool should discover for itself, a cloud provider's own string outside the one entry allowed to hold it — before it is written. Read this page before you add a new rule here, or when you want to know which file actually runs at write time. It explains the dispatcher the wiring calls, the gate that decides which rules have an opinion about a file, and the named rule bodies that check the text directly.
 
 ## Overview
+
+An estate declaration says what infrastructure should exist, and things that must never appear in one are cheap to catch at the moment somebody writes them and expensive to find later.
 
 Read the direction it fails in before you read anything else. **When the gate does not understand its input, it allows the call.** A gate refusing whatever it cannot parse would deny far more than the things it actually knows about, and people would route around it, which leaves an estate with no gate at all.
 

@@ -6,7 +6,7 @@
   "lenses": ["ARCHITECT", "SERVER_DEV"],
   "status": "PLANNING",
   "dependsOn": ["plugin-set"],
-  "summary": "Code a plugin wires to the moments a session offers — the file that declares the wiring, the four moments and the authority each one carries, the payload a hook is handed, the verdict it returns rather than prints, and the exit code that is always zero.",
+  "summary": "A hook is code a plugin wires to a moment a session offers, so the runtime calls it and the rule is asked again on every single call.",
   "keywords": ["hook", "hooks.json", "moment", "payload", "verdict", "dispatcher"]
 }
 -->
@@ -15,9 +15,11 @@
 
 `For: Architect · Backend developer` · `Status: 🔮 PLANNING`
 
-A rule that lives only in a document is read once, trusted from memory, and eventually broken by somebody who never opened that document. A hook is the answer this repository ships: code the runtime itself calls, at a moment it chooses, so the rule is asked again on every single call. This page names the whole frame — the moments a session offers, the wiring that claims one, the shapes a hook is handed and gives back, and the promises every hook here keeps.
+A hook is code a plugin wires to a moment a session offers, so the runtime calls it and the rule is asked again on every single call. Read this page to learn the whole frame a hook works inside: the file that declares the wiring, the moments a session offers, and the shape a hook is handed and hands back. The last section states the two promises every hook keeps.
 
 ## Overview
+
+A rule that lives only in a document is read once, trusted from memory, and then broken by somebody who never opened it. A hook is how this repository avoids that: it is code the runtime itself calls, at a moment it chooses, rather than a document somebody might skip.
 
 One sentence carries the model: **the moment decides the authority**. A call about to run is the only place a call can still be stopped. Every other moment arrives after the thing it might have objected to has already happened, so all it can do is speak.
 

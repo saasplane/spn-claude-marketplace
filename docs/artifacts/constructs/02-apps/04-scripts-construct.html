@@ -1,7 +1,7 @@
 <meta charset="utf-8">
 <title>Scripts — The Code This Plugin Runs</title>
 <!-- spn:doc
-{"id":"stack-checks","variant":"construct","title":"Scripts — The Code This Plugin Runs","lenses":["SERVER_DEV","WEB_DEV"],"status":"PLANNING","dependsOn":["apps-hooks","checks"],"summary":"Everything under this plugin's scripts folder — the gate that resolves a write to the declared stack without naming one, the process behind the single wired entry, the shared code both sides read, and the commands run by name over an apps repository's own registers.","keywords":["gate","subject","dispatcher","register","action","coverage"]}
+{"id":"stack-checks","variant":"construct","title":"Scripts — The Code This Plugin Runs","lenses":["SERVER_DEV","WEB_DEV"],"status":"PLANNING","dependsOn":["apps-hooks","checks"],"summary":"Scripts holds everything this plugin executes, divided by what calls each file — the wiring, the gate the wiring asks, the tools a person or agent runs by typing their path, and the libraries the others read.","keywords":["gate","subject","dispatcher","register","action","coverage"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
 <style>
@@ -182,7 +182,7 @@
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
   <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Scripts — The Code This Plugin Runs</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Construct</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">Backend developer</span><span class="badge lens">Web developer</span></span><span class="st"><span class="lbl">Status:</span> <span class="badge status planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>Scripts — The Code This Plugin Runs</h1>
-  <p class="standfirst">Everything this plugin executes sits in one folder, and the folder divides by what calls each file. The wiring calls one of them. The gate is asked by that one. Some are run by a person or an agent typing their path. The rest are libraries the others read.</p>
+  <p class="standfirst">Scripts holds everything this plugin executes, divided by what calls each file — the wiring, the gate the wiring asks, the tools a person or agent runs by typing their path, and the libraries the others read. Read this page before you add a script here, or when you want to know which file runs a given command. It explains how the gate resolves a write to the declared stack without naming one, and what the commands over this domain's own registers do.</p>
 </header>
 
 <!-- 00 -->
