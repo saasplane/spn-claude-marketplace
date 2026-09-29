@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/10-configuration.md",
-      "seen": "92f9176f"
+      "seen": "4fae3281"
     }
   ]
 }
@@ -44,7 +44,7 @@ APP_ENV / APP_MODE / NODE_ENV                 ← bootstrap, unprefixed
 
 **An application carries an `envs/` folder with one file per `APP_ENV` value**, loaded if it exists. The file is optional by design, because a cloud deployment reads real environment variables from the parameter store.
 
-- **The local file is generated against the application's local infrastructure registration**, and its ports follow the platform's port plan.
+- **The local file is generated against the application's local infrastructure registration**, and its ports come from the hundred local ports the platform declares (`RD.SUPPORT.INFRA.062`): the service's own port at `+30`–`39` from the range's first port, and its health port ten above it.
 - **The cloud file is the reference**: the same variable set with cloud-shaped values, documenting what a deployment must provide. It may declare reserved slots the loader does not read yet — treat those as names, not live configuration.
 - **A comment carries the rationale for every non-obvious value.**
 

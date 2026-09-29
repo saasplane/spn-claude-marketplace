@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/03-utils/01-spnutils.md",
-      "seen": "dc9e7f23"
+      "seen": "5e664b8a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "e61d18f5"
+      "seen": "6971df17"
     }
   ],
   "decisions": [
@@ -93,6 +93,12 @@ ship, and `validate` is the half that names what you still owe.
 `workspace` mints the folder, keeps its settings and plugins current, reports what is open, and
 turns the agent's own timing on or off. It needs no repository, so its commands are the one group a
 repository's `rules.md` does not list: `spnutils help --json` names them.
+
+**Each line `timings` records names the work it was spent on — MUST.** While recording is on, every
+hook check appends one line to `.spndevex/.debug/telemetry/hooks.jsonl`, carrying the `workstream`,
+`arc` and `order` read from the paths the tool call touches, and the `agent` when the hook's input
+carries one. A report in the plugin, not in `spnutils`, joins those lines to the Claude Code
+transcripts by `session` and prints the tokens spent per workstream, arc and order.
 
 **There is no command for opening a scope of work.** A workstream is a folder in one of three
 states; you make the folder, `status` lists what is open, and a write-time check holds the close

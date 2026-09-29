@@ -3,20 +3,20 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/01-workspace.md",
-      "seen": "ce1ddbae"
+      "seen": "b93f0932"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "7c725ca8"
+      "seen": "473a957b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "e61d18f5"
+      "seen": "6971df17"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "The agent is updated first, and reloaded before anything runs",
-      "seen": "46fd7a5f"
+      "seen": "c0ba7e1b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -26,7 +26,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",
       "section": "When an edit becomes behaviour",
-      "seen": "37aada54"
+      "seen": "71b232f2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
@@ -38,7 +38,7 @@
     {
       "repo": "spn-foundation",
       "row": "RD.DEVEX.WORKSPACE.058",
-      "seen": "5b84393c"
+      "seen": "1f6e8b76"
     },
     {
       "repo": "spn-foundation",
@@ -206,11 +206,15 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
     open/
       {NNN}-{subject}/                    being worked now
         {subject}-approach.html           yours: the argument, iterated while you read it
-        arcs/                             the agent's: steps, target, acceptance, depth
-        orders/                           one brief per delegated execution, and its report
-        notes/                            scratch, scoped to this subject
+        arcs/                             the agent's: one file per arc, its rows and its state
+        notes/N<nn>/                      one arc's work order
+          plan.md                         facts pinned to commits, anchors, commands, traps
+          samples/                        the previews the developer approved
+          scripts/                        what a mechanical row runs
+          orders/                         one brief per delegated execution, and its report
     closed/
       {NNN}-{subject}/                    the whole folder, once its plan is accounted for
+    .last-number                          the highest workstream number ever used
   .debug/                                 what the agent's own machinery says about itself
   README.md
 ```
@@ -219,7 +223,7 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
 
 **A workstream is never a Claude Code session.** Claude Code owns the window, and `SessionStart` is its hook. A workstream is a scope of work, and it outlives every window you open on it.
 
-**The number is an identity, never a priority.** You assign it once, in creation order, and nothing reuses or renumbers it. It rides along when the folder moves state, so a number reads the same wherever it sits. **A workstream holds one or more arcs**, and how many is the subject's business while you are planning. **A scope arriving mid-execution gets a new arc, always**, because an arc under execution is being read as a brief.
+**The number is an identity, never a priority.** You assign it once, in creation order, and nothing reuses or renumbers it. It rides along when the folder moves state, so a number reads the same wherever it sits. **A workstream holds one or more arcs**, and how many is the subject's business. **A new ask goes first into the arc that already owns its subject**, judged by what the arc changes and releases, and a new arc opens only when no arc owns it. Say which arc and which row took the ask. **A running step is never edited underneath**, because a session is following it as a brief.
 
 | The state | Holds | You arrive by |
 | --- | --- | --- |
@@ -229,11 +233,11 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
 
 | Inside a workstream | Written for | Lives | Ends as |
 | --- | --- | --- | --- |
-| the approach page | **you** — argued, corrected, re-read | while the subject is open | split by scope into repo documents, then kept as a receipt |
-| an arc | the agent — steps, target repo, acceptance, depth | until its steps tick | closed through the sweep |
+| the approach page | **you** — argued, corrected, re-read | while the subject is open | the argument, kept as a receipt once its arcs have moved the content into the documents that own it |
+| an arc | the agent — rows, each with its repository, its altitude, its check and its state | until its rows are accounted for | closed through the sweep |
 | an order | the agent — one delegated execution | until the child reports back | the report is appended, and it stays as the audit trail |
 
-**There is no workstream file, and adding one is a defect.** The folder name is the subject, its parent is the state, and the approach page already tracks the arcs. Anything a status file would hold is expressed by the tree, so a second copy only gives it somewhere to fall out of date. **The window is not tracked either** — Claude Code owns window identity, and a subject outlives any window.
+**There is no workstream file, and adding one is a defect.** The folder name is the subject, its parent is the state, and each arc file carries its own rows and status. Anything a status file would hold is expressed by the tree, so a second copy only gives it somewhere to fall out of date. **The window is not tracked either** — Claude Code owns window identity, and a subject outlives any window. Which workstream a window works on is context the agent holds from the conversation, and it is never written to disk.
 
 **A subject with an arc and no approach page is a valid shape**, not a gap. Nobody has argued it yet.
 
@@ -257,7 +261,7 @@ When a window opens, surface what is stale — a subject untouched across sittin
 | **crosses more than one repo** | the split plan is the only thing holding the halves in order |
 | **outlives one sitting** | the next window finds it by reading, never by remembering |
 
-**A new workstream takes the next free number across all three states.** Read `backlog/`, `open/` and `closed/` together, take the number after the highest, and never reuse one.
+**A new workstream takes the next free number across all three states.** Read `backlog/`, `open/` and `closed/` together, and `workstreams/.last-number` beside them. Take the number after the higher of the two, and never reuse one. That record is what lets a closed workstream be deleted without its number being given out again.
 
 ### Which state a new workstream starts in
 
@@ -372,17 +376,17 @@ When a window opens, surface what is stale — a subject untouched across sittin
 
 ## The two gates a workstream carries
 
-Both read one thing: the **split plan**, which is the approach page's `How` tables read by their **scope** column. You never write a separate plan — you filter by scope, and each repo's rows are what that repo's documents must say.
+Both read one thing: the **split plan**, which is the step rows of every arc read by their **Repo** column. You never write a separate plan — you filter by repository, and each repository's rows are what that repository must change.
 
 | Gate | Fires when | Verdict |
 | --- | --- | --- |
 | **documents first** | you write an approach page into a repo's own pocket while an open workstream's plan still has rows that have not landed | a **warning** naming the workstream. Getting ahead of the plan is sometimes right, so it never refuses |
-| **close** | a subject moves into `workstreams/closed/` | a **refusal** while any row is one nobody decided, or one somebody started and put down |
+| **close** | a subject moves into `workstreams/closed/` | a **refusal** while any row is one nobody decided, one somebody started and put down, or one still marked in progress |
 | **answered card** | you write while an approach page still asks a question its arc records as answered | a **warning** naming the card. Fold it into the section that now states it |
 
-**A seat page is where the split lands.** The workstream page is divided by scope into the documents that own each part, so a re-alignment row starts there and lives on the seat page afterwards. The workstream page then keeps it as a receipt.
+**The arcs carry the rows, and the approach page does not.** The page argues the change, and its `How` ends in a *Cycles* table with one row per arc, written from each arc's status line. Where the page and an arc disagree, the arc is right.
 
-**The split plan is both `How` tables, not one.** The gate reads any of them carrying a scope column and a state, so the documents a design obliges are held exactly as the pieces you build are. Park one in a note and no gate can see it.
+**The close gate reads every step row of every arc as one split plan**, so a documentation row is held exactly as a code row is. Park one in a note beside the page and no gate can see it.
 
 **The close gate checks that work is accounted for, never that it is finished.** Every row reaches one of three states, and all three pass:
 
@@ -391,7 +395,8 @@ Both read one thing: the **split plan**, which is the approach page's `How` tabl
 | `landed` | the content is in the node that owns it | `landed → spn-platform-ts/packages/module-server-iam-ts/docs/…` |
 | `carried` | it moves to a named successor scope, which is now open | `carried → captcha-foundation-concept` |
 | `deferred` | consciously parked, with an event somebody will notice | `deferred → the first consumer outside this repo` |
-| ⬜ | nobody decided. **The gate refuses it** | — |
+| empty | nobody decided. **The gate refuses it** | — |
+| `in progress` | somebody is on it now. **The gate refuses it** | `in progress 2026-09-29 14:32 +05:30` |
 | `◐ stopped` | begun and put down. **The gate refuses it too** — half an edit sits in the tree and only the agent that stopped knows where | `stopped → Q8 answered · did the chapter · left the row · unsafe decisions.md` |
 
 **A stopped row is finished, or split honestly.** The half that reached its node becomes a landed row, and the half that did not becomes a second row, carried or deferred. Never retype the mark and leave the done half unrecorded.
@@ -400,13 +405,13 @@ Both read one thing: the **split plan**, which is the approach page's `How` tabl
 
 ## An arc is the unit of cross-repo change
 
-Plan one change across repos as an **arc**: ordered steps, each naming its target repo, its outcome, its acceptance, and its **depth**.
+Plan one change across repos as an **arc**: ordered rows, one per step, each carrying **Repo · Altitude · What · Mechanism · Acceptance · State**. The rows run in chain order by repository, then by altitude (`DOCS` · `CODE` · `GENERATED` · `RELEASE` · `PROOF`). Each step also has a **depth**, which decides where it runs.
 
 | Step is… | Execute |
 | --- | --- |
 | **shallow** — mechanical once decided | inline, in the workspace window, under the target's law |
 | **deep** — needs the repo's full context | **delegate** to a child session rooted in the target repo, the step file as its brief; fold the result back. The developer keeps one window |
-| **absent** — the repo is not in this workspace | the step itself is the deliverable: an order in `orders/`, handed to whoever holds that repo |
+| **absent** — the repo is not in this workspace | the step itself is the deliverable: an order in the arc's `notes/N<nn>/orders/`, handed to whoever holds that repo |
 
 **The return path is unchanged.** Where work in any repo uncovers something contradicting the foundation, that comes home as a decision-register row. A convention corrected quietly in a sibling is a fork nobody declared.
 

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-apps/08-agent-surface.md",
-      "seen": "df8295b7"
+      "seen": "c68ccf85"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/08-agent-surface/",

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-infra/06-modules.md",
-      "seen": "3f7ab1f3"
+      "seen": "8e9264ae"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/06-modules/",
@@ -98,9 +98,9 @@ src/local/
 | `LI_DOMAIN` | the platform's local domain; the module composes its own host under it |
 | `LI_CERT_DIR` | the machine CA and shared certificates, read-only |
 | `LI_OUT_DIR` | a host directory the module writes `publish.env` into |
-| `LI_PORT_{NAME}` | one per port the row declares, derived by band |
+| `LI_PORT_{NAME}` | one per port the row declares, derived inside the platform's hundred local ports |
 
-**Ports are declared on the row, not the compose file** — usage lives on the referencing row, so two products may stand the same module at different ports without forking the package. **Readiness is the compose file's own** `healthcheck` plus `--wait`; a module that never becomes healthy fails by its own definition, and neither side writes a probe.
+**Ports are declared on the row, not the compose file** — usage lives on the referencing row, so two products may stand the same module at different ports without forking the package. On a machine, a module's port derives inside the hundred its platform declares, in the modules' own part of it (`+15`–`29`), in module-row order from `+15`, unless the row overrides it (`RD.SUPPORT.INFRA.062`). **Readiness is the compose file's own** `healthcheck` plus `--wait`; a module that never becomes healthy fails by its own definition, and neither side writes a probe.
 
 **Publishing runs the other way — Docker has no outputs primitive.** A module that mints something a consumer needs writes `KEY=value` into `publish.env` under `LI_OUT_DIR`; each line reaches the config plane as `{SPC}_{CODE}_{KEY}`. It is a file rather than a stream because facts are read far oftener than produced — status and the config plane read them without standing anything up, and a person can open the file directly. **Timing belongs to the module**: it writes when it has the value, not when something asks. A module that publishes nothing writes no file, and an application that needed a key still fails at boot naming it.
 

@@ -1,7 +1,10 @@
 <!-- spn:restates
 {
   "docs": [
-    { "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/aws/04-addressing.md", "seen": "cc974dff" }
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/aws/04-addressing.md",
+      "seen": "1858f706"
+    }
   ]
 }
 -->
@@ -53,6 +56,8 @@ data network   10.0.80.0/20                   in-uat
 ├─ 10.0.82.0/24    endpoints-a   VPC endpoints
 └─ 10.0.83.0/24    endpoints-b   VPC endpoints
 ```
+
+**How many availability zones is the environment profile's answer.** The drawing is an `NP` environment's two; `NP` at `XL` and every `PROD` environment take three, which adds a `-c` subnet to each tier.
 
 **Public subnets exist only in the apps VPC**, and hold exactly two kinds of thing: public load balancers and NAT gateways. **A workload never gets a public address.**
 

@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "636d41f6"
+      "seen": "efbbe76f"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
-      "seen": "8dbb15d3"
+      "seen": "e6cd18e5"
     }
   ]
 }
@@ -63,6 +63,8 @@ spnutils infra test [package]
 Every owed tier lives in its own folder under `tests/` — `contract/` · `unit/` · `integration/` — and `cloud/` is reserved, unwritten until the cloud tier lands. **The folder is the tier; the extension is the engine**: `*.sh` under `contract/` runs through bash; `*.test.mjs` under `unit/` runs under `node --test`; `*.tftest.hcl` under `unit/` or `integration/` plans under `tofu test`, mock providers only, plan-only, never an account. `integration/` also takes one `*.sh`, `acceptance.sh`, for the one render no test file can stage. A case sitting in the wrong folder, or written as the wrong kind of file, is refused at write time and at run time both — the full table is the foundation's `04-capabilities/02-support/02-infra/02-packages/02-tests.md`.
 
 **A harness reports cases, never only an exit code.** `ok`, `not ok` or `skip`, per `<TIER> <BEHAVIOUR-ID> <title>` — a harness that prints no case line has proven nothing, whatever it exits. A `skip` line is recorded `PENDING`, and a tier whose only cases were skipped reads as *no cases*, never as a pass.
+
+**The tier decides which cases carry an id** (`RD.DEVEX.FUNCTION.064`). At `CONTRACT` every case does. At `INTEGRATION` every case proving a guarantee does, and a case there with none is a finding. At `UNIT` only a case proving a `UNIT` row carries one; a case over a private rule names the rule instead, and it is counted and reported but stamps no row. **A row's tier equals the tier of the case that proves it**, because a run writes only the rows that declare the tier it ran. **A run over the whole repository fixes what keeps a row unproved** — a row whose tier is not its case's, a runner that wrote no result file, a case its tier binds that carries no id, a red case — runs that tier again, and only then writes its report, naming anything it could not fix and why.
 
 ## What green proves, and what it does not
 

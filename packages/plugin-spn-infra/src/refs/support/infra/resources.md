@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-infra/04-resources.md",
-      "seen": "357148ad"
+      "seen": "2d564375"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/04-resources/",
-      "seen": "89c82ea1"
+      "seen": "c6ea40fa"
     }
   ]
 }
@@ -76,13 +76,15 @@ export interface SPEstateSpace {
 
 **A space is per-need where the platform resources are total.** A family absent from a space is not stood at all. Its database family speaks the baseline's own grammar — the same `schemas` rows, the same `users` grant rows. A space owns no applications, no accounts, no domains; an application binds to one by the `space` key on its registration row, and an absent key means the platform resources answer. An application still declares no demand — selecting a space is passing a code.
 
+**On a machine, a space's engines take their ports from the hundred the platform declares, and nobody writes them** (`RD.SUPPORT.INFRA.062`). Space *i*, counting from zero in declaration order, takes the ten ports from `+70 + 10 × i`, with each family at the same offset it has in the platform's own engines. So a platform stands at most three spaces locally.
+
 **A space is one of two independent extension axes, and they never couple** (`RD.SUPPORT.INFRA.085`). A space extends by **data**; a service domain (bound by `serviceDomain`) extends by **face**. An application takes either, both or neither.
 
 **The platform's own resources are a preset composition of the same blueprint functions a space composes** — database, schema, user, topic, bucket. There is no privileged path a space cannot take, and no capability the baseline has that a space cannot ask for.
 
 ## A module owns its own world
 
-A module's resources are its own engine instances, in its own world, under the module's own purpose code — **never databases or schemas inside the platform's engines** (`RD.SUPPORT.INFRA.053`). A module that migrates itself is structurally the administrator of *something*, so it owns the whole world its administrator role reaches. **The estate standardizes the boundary — the world code, its host labels, a derived local port band, its placement, a private configuration seat, a ledger seat, and the standing guardrails — and never the interior.** Which resources a module stands, and how its blueprint stands them, is the module's own business. How a module reaches applications through the configuration plane is a separate topic, restated in the modules card.
+A module's resources are its own engine instances, in its own world, under the module's own purpose code — **never databases or schemas inside the platform's engines** (`RD.SUPPORT.INFRA.053`). A module that migrates itself is structurally the administrator of *something*, so it owns the whole world its administrator role reaches. **The estate standardizes the boundary — the world code, its host labels, the local ports it derives inside the platform's declared hundred, its placement, a private configuration seat, a ledger seat, and the standing guardrails — and never the interior.** Which resources a module stands, and how its blueprint stands them, is the module's own business. How a module reaches applications through the configuration plane is a separate topic, restated in the modules card.
 
 ## Hosting and size are independent axes
 

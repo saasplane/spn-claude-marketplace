@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "3487aa0b"
+      "seen": "05c18bc9"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -21,19 +21,19 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
-      "seen": "ac5af87d"
+      "seen": "a008e138"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
-      "seen": "d82008b3"
+      "seen": "98de6327"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md",
-      "seen": "ccae114d"
+      "seen": "2880f898"
     },
     {
       "path": "spn-foundation/CONCEPT.md",
-      "seen": "cf94a2b0"
+      "seen": "ecc1578d"
     }
   ],
   "decisions": [
@@ -434,19 +434,24 @@ Every page somebody writes by hand is copied from a template, and the templates 
 | **Approach** — an argument | on demand, when a design is argued | none is a defect. **Ahead** leads the code as a concept does, **level** means it landed, **behind** is a correct record of then |
 | **Overview** — a face | **maintained.** A workstream changing the model owes it | it **tracks its seat**. Drift from `CONCEPT.md` is a defect, and `coherence.py` reads it |
 
-**A suggestion is recorded before it is executed — MUST.** The developer instructs and corrects while the work runs, and each one is written down before it is acted on. An instruction becomes an arc step or a row on the approach page. A correction becomes a log line and a rewrite of the row it corrects. A question nobody can answer alone becomes an `Open` card, argued in the page rather than in chat. A session's context ends with the session, so anything held only there is work nobody can pick up.
+**A suggestion is recorded before it is executed — MUST.** The developer instructs and corrects while the work runs, and each one is written down before it is acted on. An instruction becomes a step row in the arc that owns it. A correction becomes a log line and a rewrite of the row it corrects. A question nobody can answer alone becomes an `Open` card, argued in the page rather than in chat. A session's context ends with the session, so anything held only there is work nobody can pick up.
 
-**A row carries its state while the work runs**, so the developer can see what they asked for that has not happened yet:
+**A row's State cell says what it reached while the work runs**, so the developer can see what they asked for that has not happened yet:
 
-| State | Means |
+| State cell | Means |
 | --- | --- |
-| ⬜ **raised** | it is written down. Nothing has been built |
-| 🚧 **agreed** | the approach is settled and the work is running |
-| ✅ **landed** | the content is in the node that owns it |
+| empty | the row is written down. Nothing has been built |
+| `in progress 2026-09-29 14:32 +05:30` | somebody started the row at that moment and is working on it now |
+| `◐ stopped` | somebody began the row and put it down, with what was done and what is unsafe to touch |
+| `✅ landed` | the change is in the repository that owns it, with the commit beside the word |
+| `↷ carried` | the work moved to another workstream, which is named |
+| `⊘ deferred` | the work is parked on purpose, with the event that brings it back |
 
-**A row you started and put down gets its own mark, and it is `◐ stopped`.** None of the three above fits: `🚧 agreed` says the work has not begun, and a bare cell says nobody decided it, while half an edit already sits in the tree. The mark carries four things, because only the agent who stopped knows any of them — `→` what has to happen before it resumes, `did` what already reached its node, `left` what did not, and `unsafe` what nobody may touch until it resumes.
+**A row that starts is marked `in progress` with the date, the time and its offset — MUST**, and landing replaces the mark with `✅ landed` and the commit.
 
-The marks above are for work in flight. `landed` · `carried` · `deferred` are what the close sweep asks of every row, and only the first is shared between them. **`carried` means the work LEAVES this workstream**, so it names a successor scope that can receive it — another workstream, in `open/` or `backlog/`. A row pointing at a later arc of its own workstream is **sequencing**, not a carry, and it resolves through that arc: landed once the arc lands, pending while it has not. **The close refuses a stopped row**, and that is the one place it differs from deferred: a deferred row was parked before anything was touched, and a stopped one was not. You finish the work and mark the row landed, or you split it in two — the half that reached its node becomes a landed row, and the half that did not becomes a second row, carried or deferred.
+**A row you started and put down gets its own mark, and it is `◐ stopped`.** None of the others fits: `in progress <time>` says somebody is on it now, and a bare cell says nobody has started it, while half an edit already sits in the tree. The mark carries four things, because only the agent who stopped knows any of them — `→` what has to happen before it resumes, `did` what already reached its node, `left` what did not, and `unsafe` what nobody may touch until it resumes.
+
+The last three are what the close sweep asks of every row, and an empty row, a row in progress and a stopped row all refuse the close. **`carried` means the work LEAVES this workstream**, so it names a successor scope that can receive it — another workstream, in `open/` or `backlog/`. A row pointing at a later arc of its own workstream is **sequencing**, not a carry, and it resolves through that arc: landed once the arc lands, pending while it has not. **The close refuses a stopped row**, and that is the one place it differs from deferred: a deferred row was parked before anything was touched, and a stopped one was not. You finish the work and mark the row landed, or you split it in two — the half that reached its node becomes a landed row, and the half that did not becomes a second row, carried or deferred.
 
 **Carry the face and the arguments inside the workstream that changes them**, rather than tidying them afterwards. A workstream runs concept → docs → code, so the model moves first and the face moves with it. Leave the face to a later pass and the hub states a model the code has already left. Expansion is earned the same way. Where implementing a workstream shows a section is too big to review in place, the face gains one then — that is when somebody has read it at depth.
 
@@ -554,7 +559,9 @@ Every document opens with an invisible block holding **strict JSON**, marked `sp
 `For: Architect · Backend developer` · `Status: ✅ DONE`
 ```
 
-- `stages` is the one optional field — only where a document belongs to one DevEx stage, such as a guide.
+- `stages` is optional — only where a document belongs to one DevEx stage, such as a guide.
+- **A construct's block keeps eight keys and no more**: `id`, `variant`, `title`, `subtitle`, `lenses`, `status`, `dependsOn` and `summary`. `subtitle` is the one plain sentence under the title, and `summary` is the Description's first sentence.
+- **A report adds `measuredAt`, a date and a time with its offset**, such as `2026-09-29T14:32+05:30`. It is the time of what was measured, never the time the page was written.
 - **There is no `part` and no `altitude`.** Everything else is derived: the **seat** from the path and the **kind** from the node's manifest. The voice is one (RD.DEVEX.WORKSPACE.096). The seat decides what a document carries, never its temperature.
 - **`lenses` are derived from the kind, not authored per page** (decision RD.DEVEX.WORKSPACE.100) — one derivation, two clauses, because runtime says *where code runs* and `lenses` says *who reads it*. A kind you **build on** (support, module, app, client) derives from its declared runtime: `SERVER` → `SERVER_DEV`, `WEB` → `WEB_DEV`, `UNIVERSAL` → both. A kind that **serves building** — `TOOLCHAIN` and `APP_UTILITY`, and only those two — carries both whatever its runtime, because every builder uses it. Read the declared runtime, never parse the name. `ARCHITECT` is added by **seat**, never by kind. A node's doc face (`docs/README.md`) is the orientation page and carries it for every kind, leaf nodes included. The seat faces beneath it (purpose, constructs, behaviors, capabilities, guides, artifacts) carry the derived developer lenses alone. `ARCHITECT` there is authorship a scaffold never emits. The other six lenses are authored, never derived. A page MAY narrow the derived set where its subject genuinely serves one runtime, and MUST NOT widen it. **A scaffold template emits the derived set**, which is what makes generated pages compliant by construction.
 - `id` is identity and **never changes**, however the path does. The path is only its current address.

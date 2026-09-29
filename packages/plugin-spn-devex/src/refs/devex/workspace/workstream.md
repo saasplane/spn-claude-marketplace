@@ -33,11 +33,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "7c725ca8"
+      "seen": "473a957b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "e1937d2e"
+      "seen": "3a9995e6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -61,7 +61,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "3487aa0b"
+      "seen": "05c18bc9"
     }
   ]
 }
@@ -299,7 +299,7 @@ document, so one workstream holds a driver change, an estate change and a plugin
 
 **So a step acting on a set carries the members, never the count.** *Sixteen questions*, *twenty-eight moves*, *nine rules* — a step that names the number and not the things has left the specification somewhere you cannot reach, and a conversation is not a place. **The failure looks exactly like success**: the arc reads complete, every step has a sentence, and you invent a different sixteen.
 
-**Where the set is too large for the step, it goes to `notes/<arc>-<subject>.<ext>` and the step names that path.** `notes/` is the workstream's **working papers**, not its scratch — the line between the two is that a step names a working paper by path, and nothing names scratch.
+**Where the set is too large for the step, it goes to `notes/N<nn>/<subject>.<ext>`, in that arc's own folder, and the step names that path.** `notes/` is the workstream's **working papers**, not its scratch — the line between the two is that a step names a working paper by path, and nothing names scratch.
 
 **Three rules follow.**
 

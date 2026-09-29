@@ -3,15 +3,15 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-infra/01-shape.md",
-      "seen": "8d9b4633"
+      "seen": "732aac4e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "e61d18f5"
+      "seen": "6971df17"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/03-blueprints/01-layers.md",
-      "seen": "ec7d0930"
+      "seen": "28906c3e"
     }
   ]
 }
@@ -100,6 +100,7 @@ The commands divide by **what is being changed**, never by who runs them. Each g
 | a cloud command with a missing layer below → **named refusal** | in the cloud each layer has its own principals; locally prerequisites converge in place instead |
 | an apply that ran from a checkout | an apply fetches the published version and applies *that* — a path ref resolves only where the sibling checkout exists, and deliberately not in CI |
 | a whole-estate command | "all layers" of an unstated subject is a context nothing can resolve |
+| an `<spc>` in an apps repository that differs from its `sprepo.json` pin | the platform is named on every platform-scoped command, and the repository already says which one it belongs to (`RD.DEVEX.UTILS.072`) |
 | `down` on stateful resources | teardown removes network and compute and **refuses its data** — destroying data is a separate act, named and confirmed separately; `--clean` runs only on an explicit instruction against a named target |
 | an unknown `${…}` reference at `config diff` or `config render` | one direction, one pass, resolved against the composed rungs — a literal `${…}` reaching a vendor is the failure this stops; credentials themselves never live in files, see `refs/laws.md` |
 | a release version already present in the registry pair | a published version is immutable — bump instead, never re-publish; the machine store keeps the same rule |

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/01-realization.md",
-      "seen": "9f7f9a1d"
+      "seen": "3af76774"
     }
   ]
 }
@@ -24,7 +24,7 @@
 
 **Local binds nothing, and that is why it names no account.** A `providers` block holds `scm`, `cloud` and `local`; `scm` and `cloud` carry an `mtype`, and `local` never does, because nothing is brought ([packages](../../packages.md)). `LOCAL` never appears in a provider list — it is a command target, never a manifest value.
 
-**What the local entry does carry is a footprint**: the platform's declared domains, its resource worlds, and its modules with their port overrides.
+**What the local entry does carry is a footprint**: the platform's declared domains, the hundred local ports it owns, its resource worlds, and its modules with their port overrides.
 
 ## What each layer renders
 

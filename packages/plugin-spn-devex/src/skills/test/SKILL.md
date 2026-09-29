@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "636d41f6"
+      "seen": "efbbe76f"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
-      "seen": "8dbb15d3"
+      "seen": "e6cd18e5"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
@@ -31,7 +31,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/13-tests.md",
-      "section": "Coverage \u2014 how the model is rendered here",
+      "section": "Coverage — how the model is rendered here",
       "seen": "4c041a0a"
     },
     {

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
-      "seen": "18cab28c"
+      "seen": "d3d654ab"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/04-develop.md",
@@ -32,7 +32,11 @@
 | `app` | hold the logic — authorization, transactions, the repository | be reached from outside its module |
 | `entry` | adapt one way in — `api` · `queue` · `cli` on the server, `ui` on the web | hold logic of its own |
 
-**Steps one to three are ordered by dependency and cannot be reordered.** Not a preference — the later steps read what the earlier ones generated.
+**Documents come first, because documents lead code (`RD.DEVEX.WORKSPACE.081`).** The seat says what will be true before any source is written, so the code is written against a page.
+
+**Steps two to four — contract, regenerate, implementation — are ordered by dependency and cannot be reordered.** Not a preference — the later steps read what the earlier ones generated.
+
+**A part runs all its documents, then all its source, then all its tests, then the run — never one function at a time.** Going function by function leaves code nobody has described and tests for half a shape.
 
 ## The rules that carry the weight
 

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/01-shape/02-coordinates.md",
-      "seen": "eb7f83dd"
+      "seen": "da45d266"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/06-modules/02-config.md",
@@ -56,7 +56,7 @@ custom domain      customer-owned               outside the zone, its own certif
 - **`{domain}` is the zone an app's row binds** — the platform domain `{spd}` unless the row carries a `serviceDomain` key naming one of the platform's service domains. Engine records, the documents host and the storage API belong to a **world**, and a world has no domain: they stay on `{spd}` however many service domains the platform declares.
 - **Every declared domain stands a public zone `{domain}` and a private zone `internal.{domain}`, and the private zone is always a child name — never the apex** (RD.SUPPORT.INFRA.086). A private zone takes precedence for its whole namespace inside every network it joins, so a private zone on the apex would make the platform's own public hosts unresolvable from inside the cluster.
 - **One world-marking rule covers every service hostname class** (RD.SUPPORT.INFRA.052): the world token is the platform's `{spc}`, a space's code, or a module's code — **no unmarked default world exists**. A space that stands its own engine gets its own records (`in-dev-sas-database…`), which is why unmarked records would be ambiguous, not merely inconsistent. The world token always matches the key prefix of the facts carrying the hostname.
-- **Locally** (RD.SUPPORT.INFRA.079): `{world}-{service}.{lc-domain}` for every service, engines included — `dmo-docs` · `sas-docs` · `idp-auth` · `dmo-database.lc-spndemo.app:9210` · `sas-cache.lc-spndemo.app:9311`. The machine's resolver answers the host with `127.0.0.1`, so nothing is proxied and no engine protocol is intercepted. The derived port stays the transport distinguisher, and the hostname carries the world. Server certificates are minted per `{world}-{family}`, so an engine presents a certificate for the name you dial.
+- **Locally** (RD.SUPPORT.INFRA.079): `{world}-{service}.{lc-domain}` for every service, engines included — `dmo-docs` · `sas-docs` · `idp-auth` · `dmo-database.lc-spndemo.app:9100` · `sas-cache.lc-spndemo.app:9171`. The machine's resolver answers the host with `127.0.0.1`, so nothing is proxied and no engine protocol is intercepted. The port stays the transport distinguisher, and the hostname carries the world; each port comes from the hundred the platform declares (RD.SUPPORT.INFRA.062, see `../providers/local/04-addressing.md`). Server certificates are minted per `{world}-{family}`, so an engine presents a certificate for the name you dial.
 - **Module namespaces are validated** (RD.SUPPORT.INFRA.056): no kindCode may equal a declared module code or begin with one plus a hyphen.
 - **Engine records**: the environment apply writes them into the private zone, pointing at whatever the hosting rendered. Use these names in published endpoint facts, **never provider hostnames** — an engine swap flips a record, and every consumer follows.
 - **PROD keeps `{env}` like every environment.** A bare name never exists as grammar, so published facts, config documents and minted URLs are env-pinned always.

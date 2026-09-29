@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "636d41f6"
+      "seen": "efbbe76f"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
-      "seen": "18cab28c"
+      "seen": "d3d654ab"
     }
   ]
 }
@@ -58,7 +58,7 @@ spnutils infra app down <package> [--clean]
 | `organization` | the machine's trust bootstrap — the CA, its one trust prompt, the shared ingress | accounts, root guardrails, registry pairs, zones |
 | `platform` | the container group — engines plus each module's local rendering; converges the org-local prerequisites first | containers, workload accounts, policies, zone, instruments |
 | `environment` | **no local form exists** — the machine is one environment, and targeting it locally is refused by name | network → resources → compute, in order |
-| `app` | the app's derived converge — schemas, certificates, a hosts entry, the ingress vhost | — deploys ride the pipeline |
+| `app` | the app's derived converge — schemas, certificates, the ingress vhost; no `/etc/hosts` line, because the local resolver answers every local domain | — deploys ride the pipeline |
 
 `--reset-certs` belongs to the local `organization up` and is for one situation: the machine CA was lost. `trust-ca` trusts that CA in the system keychain on its own — what `up` already does as part of its bootstrap.
 

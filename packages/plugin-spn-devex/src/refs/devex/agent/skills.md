@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "636d41f6"
+      "seen": "efbbe76f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/02-skills/01-skills.md",

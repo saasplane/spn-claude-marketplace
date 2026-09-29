@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-infra/05-apps.md",
-      "seen": "05f61ae7"
+      "seen": "70f98148"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/05-apps/",
@@ -116,9 +116,11 @@ export interface SPEstateAppDeploymentWeb extends SPEstateAppDeployment {
 
 A background worker (`SPEstateAppDeploymentProcessor`) declares its capacity and nothing else — **the absence of a subdomain is the statement**: it has no inbound surface to name, and resolve refuses anything but `INTERNAL` exposure on it.
 
-## Locally, none of this is read
+**Every port a deployment declares sits inside the hundred local ports its platform declares — MUST** (`RD.SUPPORT.INFRA.062`). An API's `port` sits at `+30`–`39` from the range's first port, in app-row order, and its `healthPort` is that port plus ten, at `+40`–`49`. A web deployment's `port` sits at `+50`–`69`, in app-row order. `spnutils infra validate` refuses a port outside the range, and a port in the wrong part of it. The same number is the port the deployment listens on in the cloud, so it is chosen once.
 
-**An application on a developer's machine is its own tree, and the estate is not consulted — MUST.** Its folder and its kind manifest say it exists; the row governs only what **deploys**. That separates the two lifecycles twice over: a new environment never needs a code release, and a new commit never touches the estate. Requiring a grant to run locally would put the estate between a developer and their own machine, protecting nothing — there is no shared surface to protect and no cost to bound.
+## Locally, only the port is read
+
+**An application on a developer's machine is its own tree, and the estate is not consulted about that — MUST.** Its folder and its kind manifest say it exists; the row governs only what **deploys**. The one fact a machine reads from a row is a deployment's declared port, so the local ingress sends the app's host to the port the app listens on. That separates the two lifecycles twice over: a new environment never needs a code release, and a new commit never touches the estate. Requiring a grant to run locally would put the estate between a developer and their own machine, protecting nothing — there is no shared surface to protect and no cost to bound.
 
 ## What it makes checkable
 
