@@ -301,16 +301,16 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
 
   const BODY = [
     "*The AI-native, DevEx-first Foundation for Building and Launching Secure, Scalable, Compliance-ready SaaS Platforms.*",
-    "",
+    "\n&nbsp;\n",
     "🤖 **I'm your DevEx agent.** Think of me as the engineering teammate who has read every standard in this workspace, so your time can go to the product.",
-    "",
+    "\n&nbsp;\n",
     "🧭 I work every stage of your engineering function with you: **Bootstrap** a repo, keep **Source Control** in order, **Ideate** and plan the change, **Develop** it, **Test** it, **Provision** the estate, **Deliver** it, and **Operate** what runs. Every stage has its standards and its proof, and I'll carry both for you.",
-    "",
+    "\n&nbsp;\n",
     "👥 I look at the work through every role on your team: engineering leader, business manager, product manager, architect, backend developer, web developer, quality engineer, operator, security engineer, partner and editor. Tell me whose view you need, and I'll bring it.",
   ].join("\n");
   /** The approved welcome under `heading`, then exactly one status line, and nothing else. */
-  const isWelcome = (message, heading) => message.startsWith(`${heading}\n\n${BODY}\n\n`)
-    && message.slice(`${heading}\n\n${BODY}\n\n`.length).split("\n").filter(Boolean).length === 1;
+  const isWelcome = (message, heading) => message.startsWith(`${heading}\n\n${BODY}\n\n&nbsp;\n\n`)
+    && message.slice(`${heading}\n\n${BODY}\n\n&nbsp;\n\n`.length).split("\n").filter(Boolean).length === 1;
   const statusOf = (message) => message.split("\n").filter(Boolean).at(-1);
 
   const home = (name) => {
@@ -463,7 +463,7 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
   says("the agent's context carries the same opening, then every table and the closing question",
     offer.context.startsWith(offer.message) && tables.every((t) => offer.context.includes(t)));
   says("the note tells the agent to open with the welcome word for word, and to hold the tables",
-    offer.context.includes("Open your first reply with the welcome above, word for word: the heading, the italic line, and the 🤖, 🧭 and 👥 lines, each whole.")
+    offer.context.includes("Open your first reply with the welcome above, word for word: the heading, the italic line, and the 🤖, 🧭 and 👥 lines, each whole, with the `&nbsp;` spacer line after the italic line and after each of the three.")
     && offer.context.includes("Show the tables only when asked"));
   // N116 row 8, F1: a question and a pasted handover were the prompts that cut the welcome short.
   says("the note names the two prompts that cut the welcome, and puts the answer after it",
@@ -481,7 +481,7 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
   // Day zero opens on the same welcome, and its door follows.
   const zero = hook(fixture("day-zero-welcome", { ".spndevex/README.md": "state\n" }), "Dhruv");
   says("day zero opens on the first-visit welcome, then the door, and no status line",
-    zero.message.startsWith(`# 👋 Welcome to SaaS Plane, Dhruv. Glad you're here!\n\n${BODY}\n\nThis folder is empty`)
+    zero.message.startsWith(`# 👋 Welcome to SaaS Plane, Dhruv. Glad you're here!\n\n${BODY}\n\n&nbsp;\n\nThis folder is empty`)
     && zero.context.includes("open your first reply with the welcome above, word for word and whole, whatever the prompt"));
 }
 

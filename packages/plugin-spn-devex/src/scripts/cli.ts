@@ -27,13 +27,12 @@ import { pathToFileURL } from "node:url";
 export type CommandModule = { describe: string; run: (args: string[]) => number | Promise<number> };
 
 const HERE = dirname(new URL(import.meta.url).pathname);
-// `commands/` ALWAYS SITS UNDER `scripts/`, never under `dist/` — the entry ships bundled to
-// `dist/cli.mjs`, but `commands/<group>/<action>.ts` stays real, unbundled source in the same `src/`
-// tree (`02-shape.md` § The tree), read here by its own relative path so a fresh action is reachable
-// the moment it exists, in either mode. `dirname(HERE)` is the plugin's `src/` whether this file is
-// running from `src/scripts/cli.ts` (HERE ends in `scripts`) or bundled to `src/dist/cli.mjs` (HERE
-// ends in `dist`), because both sit one level directly under `src/`.
-const COMMANDS = join(dirname(HERE), "scripts", "commands");
+// FROM SOURCE, `commands/<group>/<action>.ts` beside this file; BUNDLED, `dist/commands/<group>/<action>.mjs`
+// beside `dist/cli.mjs`. A command's source imports `plugin-support-lib` by a path that exists only in
+// the marketplace repository, so an installed plugin can run a command only from its bundle.
+const BUNDLED = basename(HERE) === "dist";
+const COMMANDS = join(HERE, "commands");
+const EXTENSION = BUNDLED ? ".mjs" : ".ts";
 const PLUGIN_NAME = "spn-devex";
 
 function isDir(path: string): boolean {
@@ -46,20 +45,20 @@ export function groups(): string[] {
   return readdirSync(COMMANDS).filter((entry) => !entry.startsWith("_") && isDir(join(COMMANDS, entry))).sort();
 }
 
-/** Every action of one group: a `.ts` file under its folder whose name does not start with `_`. */
+/** Every action of one group: a command file under its folder whose name does not start with `_`. */
 export function actionsOf(group: string): string[] {
   const dir = join(COMMANDS, group);
   if (!isDir(dir)) return [];
   return readdirSync(dir)
-    .filter((entry) => entry.endsWith(".ts") && !entry.startsWith("_"))
-    .map((entry) => entry.slice(0, -3))
+    .filter((entry) => entry.endsWith(EXTENSION) && !entry.startsWith("_"))
+    .map((entry) => entry.slice(0, -EXTENSION.length))
     .sort();
 }
 
 /** The module behind `<group> <action>`, or null where the file is not there. */
 async function load(group: string, action: string): Promise<CommandModule | null> {
   if (!actionsOf(group).includes(action)) return null;
-  const path = join(COMMANDS, group, `${action}.ts`);
+  const path = join(COMMANDS, group, `${action}${EXTENSION}`);
   return (await import(pathToFileURL(path).href)) as CommandModule;
 }
 

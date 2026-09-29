@@ -71,5 +71,19 @@ try {
   process.chdir(before);
 }
 
+console.log("\n=== an installed copy runs every command — the plugin's src/ alone, outside this repository");
+{
+  // The install copies the plugin's src/ and nothing beside it, so a command reaching plugin-support-lib
+  // by its repository path fails there with ERR_MODULE_NOT_FOUND. `help` loads every command.
+  const { cpSync } = await import("node:fs");
+  const { spawnSync } = await import("node:child_process");
+  const installed = mkdtempSync(join(tmpdir(), "installed-plugin-"));
+  cpSync(join(PLUGIN, "src"), installed, { recursive: true });
+  const run = spawnSync("node", [join(installed, "dist", "cli.mjs"), "help", "--json"], { encoding: "utf8", cwd: tmpdir() });
+  rmSync(installed, { recursive: true, force: true });
+  ok("every command loads from the installed copy", run.status === 0 && !run.stderr.includes("ERR_MODULE_NOT_FOUND"),
+    `${run.status} ${run.stderr.slice(0, 400)}`);
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — bundle parity` : `\n  all ${total} passed — bundle parity`);
 process.exit(failed ? 1 : 0);

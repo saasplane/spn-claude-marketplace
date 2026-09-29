@@ -27,14 +27,12 @@
 // hash and nothing else — so two builds of the same sources are byte-identical, which is the gate
 // this arc names: `node scripts/build-plugins.mjs` run twice must not move a single byte.
 //
-// COMMANDS STAY ON DISK, NEVER INLINED. `cli.ts` dispatches to `commands/<group>/<action>.ts` by a
-// dynamic `import()` built from a runtime path, not a literal esbuild can pattern-match into a glob
-// import — so bundling `cli.ts` type-strips and banners the dispatcher itself, and a command file is
-// still read and type-stripped by Node the moment it is actually invoked, exactly as it is from
-// source. `commands/` ships as ordinary `.ts` source beside `dist/` either way (`02-shape.md` § The
-// tree), so this is a deliberate choice, not a gap: the CLI is a developer-invoked tool, not the
-// per-tool-call hot path the events bundle for, and bundling every command whether it is ever called
-// or not would only make `cli.mjs` larger for runs that use one command out of dozens.
+// EVERY COMMAND SHIPS BUNDLED, ONE FILE PER COMMAND. `commands/<group>/<action>.ts` →
+// `dist/commands/<group>/<action>.mjs`, and the bundled `cli.mjs` dispatches there. A command file
+// imports `plugin-support-lib` by a path that exists only in this repository — five folders up — so
+// the unbundled source reached the installed plugin with its imports pointing outside it, and every
+// command failed with ERR_MODULE_NOT_FOUND in a fresh window (008 N119). One bundle per command
+// keeps `cli.mjs` the size of the dispatcher, so a run pays for the one command it calls.
 
 import * as esbuild from "esbuild";
 import { existsSync, mkdirSync, readdirSync, rmSync, statSync } from "node:fs";
@@ -60,12 +58,22 @@ const PLUGINS = named.length > 0 ? named : ALL_PLUGINS;
 function isFile(path) { try { return statSync(path).isFile(); } catch { return false; } }
 function isDir(path) { try { return statSync(path).isDirectory(); } catch { return false; } }
 
-/** `{ outName: absoluteSourcePath }` — `cli` (if the plugin ships one) plus every `events/<name>`. */
+/** `{ outName: absoluteSourcePath }` — `cli` (if the plugin ships one), every `commands/<group>/<action>`, and every `events/<name>`. */
 function entriesOf(pluginDir) {
   const scripts = join(pluginDir, "src", "scripts");
   const entries = {};
   const cli = join(scripts, "cli.ts");
   if (isFile(cli)) entries.cli = cli;
+  const commandsDir = join(scripts, "commands");
+  if (isDir(commandsDir)) {
+    for (const group of readdirSync(commandsDir).sort()) {
+      if (group.startsWith("_") || !isDir(join(commandsDir, group))) continue;
+      for (const file of readdirSync(join(commandsDir, group)).sort()) {
+        if (!file.endsWith(".ts") || file.startsWith("_")) continue;
+        entries[`commands/${group}/${file.slice(0, -3)}`] = join(commandsDir, group, file);
+      }
+    }
+  }
   const eventsDir = join(scripts, "events");
   if (isDir(eventsDir)) {
     for (const file of readdirSync(eventsDir).sort()) {

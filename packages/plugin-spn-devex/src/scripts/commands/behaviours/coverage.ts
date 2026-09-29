@@ -89,6 +89,40 @@ export function foundationAbsence(root: string): Record<string, unknown> | null 
   return { ...measured, digest: digestOf(measured), report: null };
 }
 
+/** Where a tier's cases sit under a node's `tests/`, and the file names that count as one. */
+const CASE_FOLDERS: Record<string, { folder: string; match: RegExp }> = {
+  UNIT: { folder: "unit", match: /\.(spec|test)\.tsx?$/ },
+  COMPONENT: { folder: "component", match: /\.ct\.spec\.tsx?$/ },
+  INTEGRATION: { folder: "integration", match: /\.int\.(spec|test)\.tsx?$/ },
+  CONTRACT: { folder: "integration", match: /\.int\.(spec|test)\.tsx?$/ },
+  JOURNEY: { folder: "journeys", match: /\.spec\.tsx?$/ },
+};
+
+/**
+ * The node whose run carries this node's cases, and the folder under its tier folder they sit in.
+ *
+ * A module an application owns keeps its cases in the COMPOSING APPLICATION's tree, under a folder
+ * named for the module, and the application's run executes them. Reading the module's own folder for
+ * an artifact reported every such module as unrun while its cases had just passed.
+ */
+export function carrierOf(node: string): { carrier: string; scope: string } {
+  const inApp = node.match(/^(.*)\/src\/modules\/([^/]+)$/);
+  return inApp === null ? { carrier: node, scope: "" } : { carrier: inApp[1], scope: inApp[2] };
+}
+
+/** Whether a node carries at least one case for this tier, on disk. */
+export function carriesCase(node: string, tier: string): boolean {
+  const surface = CASE_FOLDERS[tier];
+  if (surface === undefined) return false;
+  const { carrier, scope } = carrierOf(node);
+  const folder = join(carrier, "tests", surface.folder, scope);
+  if (!isDir(folder)) return false;
+  try {
+    return readdirSync(folder, { recursive: true, withFileTypes: true })
+      .some((entry) => entry.isFile() && surface.match.test(entry.name));
+  } catch { return false; }
+}
+
 /** The measurement for one repository. */
 export function measure(root: string): Record<string, unknown> {
   const nodes = nodesOf(root);
@@ -159,24 +193,38 @@ export function measure(root: string): Record<string, unknown> {
   const tiers = TIERS.filter((tier) => tierSet.has(tier)).map((tier) => {
     const owedByNames = [...owedByNode.entries()].filter(([, owed]) => owed.includes(tier)).map(([name]) => name);
     const ranBy = [...runsByNode.entries()].filter(([, found]) => found.some((run) => run.tiers.includes(tier))).map(([name]) => name);
-    const unrunBy = owedByNames.filter((name) => !ranBy.includes(name));
+    const nodeOf = new Map(nodes.map((node) => [nameOf(node), node]));
+    // A module an application owns is proved by the application's run, where its cases execute.
+    const ranThrough = (name: string): boolean => {
+      const node = nodeOf.get(name);
+      if (node === undefined) return false;
+      const { carrier, scope } = carrierOf(node);
+      return scope !== "" && ranBy.includes(nameOf(carrier)) && carriesCase(node, tier);
+    };
+    const pending = owedByNames.filter((name) => !ranBy.includes(name) && !ranThrough(name));
+    // Owed and never written is a different gap from written and never run, and it takes different work.
+    const noCase = pending.filter((name) => { const node = nodeOf.get(name); return node !== undefined && !carriesCase(node, tier); });
+    const unrunBy = pending.filter((name) => !noCase.includes(name));
     const runs = [...runsByNode.entries()].flatMap(([name, found]) => found
       .filter((run) => run.tiers.includes(tier))
       .map((run) => ({ node: name, file: run.from, ranAt: run.ranAt, results: run.results.length })));
     const rowCount = rows.filter((row) => row.tier === tier).length;
     const command = `\`spnutils apps test ${tier.toLowerCase()} <package>\``;
-    const state: TierState = runs.length === 0 ? "NOT_RUN" : unrunBy.length > 0 ? "PARTIAL" : "RAN";
+    const state: TierState = runs.length === 0 ? "NOT_RUN" : unrunBy.length + noCase.length > 0 ? "PARTIAL" : "RAN";
     const reason = state === "RAN"
       ? null
       : state === "PARTIAL"
-        ? `${unrunBy.length} of ${owedByNames.length} node(s) that owe it left no run artifact: ${unrunBy.join(" · ")}. ` +
-          `Their share of the ${rowCount} row(s) at this tier is unproved, not failing.`
+        ? [
+            unrunBy.length > 0 ? `${unrunBy.length} of ${owedByNames.length} node(s) that owe it carry cases and left no run artifact: ${unrunBy.join(" · ")}.` : null,
+            noCase.length > 0 ? `${noCase.length} of ${owedByNames.length} node(s) that owe it carry no case for it yet: ${noCase.join(" · ")}.` : null,
+            `Their share of the ${rowCount} row(s) at this tier is unproved, not failing.`,
+          ].filter((part) => part !== null).join(" ")
         : owedByNames.length === 0
           ? `no run artifact speaks for it, and no node's kind owes it — ${rowCount} row(s) declare it, so they are ` +
             `unproved until a node carrying this tier runs it with ${command}.`
           : `no node that owes it has left a run artifact (owed by ${owedByNames.join(" · ")}), so its ${rowCount} ` +
             `row(s) are unproved, not failing. ${command} leaves one.`;
-    return { tier: tier, state: state, owedBy: owedByNames, unrunBy: unrunBy, runs: runs, rows: rowCount, reason: reason };
+    return { tier: tier, state: state, owedBy: owedByNames, unrunBy: unrunBy, noCase: noCase, runs: runs, rows: rowCount, reason: reason };
   });
 
   const ranAt = newest(allRuns);

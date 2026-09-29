@@ -79,9 +79,29 @@ console.log("=== behaviour-coverage — tier by tier");
 
 {
   const root = repo({ ...APPS, ...node("packages/iam", "MODULE_SERVER"), ...node("packages/org", "MODULE_SERVER"),
+    "packages/org/tests/unit/org.spec.ts": "// a case\n",
     ...register(["IAM.LOGIN.01", "UNIT", "PLANNED"]), ...artifact("packages/iam", "UNIT", [["IAM.LOGIN.01", "SUCCESS"]]) });
   const unit = json(root).tiers.find((tier) => tier.tier === "UNIT");
   ok("a tier some owing nodes ran and some did not reads PARTIAL, naming the rest", unit?.state === "PARTIAL" && unit.unrunBy.includes("packages/org"), JSON.stringify(unit));
+}
+
+{
+  const root = repo({ ...APPS, ...node("packages/iam", "MODULE_SERVER"), ...node("packages/org", "MODULE_SERVER"),
+    ...register(["IAM.LOGIN.01", "UNIT", "PLANNED"]), ...artifact("packages/iam", "UNIT", [["IAM.LOGIN.01", "SUCCESS"]]) });
+  const unit = json(root).tiers.find((tier) => tier.tier === "UNIT");
+  ok("a node that owes the tier and carries no case for it is named as no case, not as unrun",
+    unit?.state === "PARTIAL" && unit.noCase.includes("packages/org") && !unit.unrunBy.includes("packages/org")
+      && (unit.reason ?? "").includes("carry no case"), JSON.stringify(unit));
+}
+
+{
+  // A module an application owns keeps its cases in the application's tree, and the application's run executes them.
+  const root = repo({ ...APPS, ...node("apps/service-ts", "APP_SERVER"), ...node("apps/service-ts/src/modules/order", "MODULE_SERVER"),
+    "apps/service-ts/tests/unit/order/order.spec.ts": "// a case\n",
+    ...register(["IAM.LOGIN.01", "UNIT", "PLANNED"]), ...artifact("apps/service-ts", "UNIT", [["IAM.LOGIN.01", "SUCCESS"]]) });
+  const unit = json(root).tiers.find((tier) => tier.tier === "UNIT");
+  ok("a module an application owns is proved by the application's run, where its cases sit",
+    !unit?.unrunBy.includes("apps/service-ts/src/modules/order") && !unit?.noCase.includes("apps/service-ts/src/modules/order"), JSON.stringify(unit));
 }
 
 {

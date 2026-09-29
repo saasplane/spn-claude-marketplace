@@ -480,7 +480,14 @@ function developerName(): string | null {
  * The welcome, word for word as it was approved. Only the heading varies: a first visit is a
  * workspace with no workstream in any state, which the ground already says, so the plugin keeps no
  * state of its own to tell the two apart. With no name, the name's clause drops and nothing else.
+ *
+ * The parts under the tagline are held apart by a spacer paragraph, not a blank line: VS Code's chat
+ * panel draws a blank line between paragraphs as almost no gap, so the four lines read as one block.
+ * The array keeps its shape — a part at every even index — because the stop hook reads the parts by
+ * position.
  */
+export const WELCOME_SPACER = "\n&nbsp;\n";
+
 export function welcome(who: string | null, firstVisit: boolean): string[] {
   const name = who ? `, ${who}` : "";
   return [
@@ -489,11 +496,11 @@ export function welcome(who: string | null, firstVisit: boolean): string[] {
       : `# 👋 Good to see you again${name}. Welcome back to SaaS Plane!`,
     "",
     "*The AI-native, DevEx-first Foundation for Building and Launching Secure, Scalable, Compliance-ready SaaS Platforms.*",
-    "",
+    WELCOME_SPACER,
     "🤖 **I'm your DevEx agent.** Think of me as the engineering teammate who has read every standard in this workspace, so your time can go to the product.",
-    "",
+    WELCOME_SPACER,
     "🧭 I work every stage of your engineering function with you: **Bootstrap** a repo, keep **Source Control** in order, **Ideate** and plan the change, **Develop** it, **Test** it, **Provision** the estate, **Deliver** it, and **Operate** what runs. Every stage has its standards and its proof, and I'll carry both for you.",
-    "",
+    WELCOME_SPACER,
     "👥 I look at the work through every role on your team: engineering leader, business manager, product manager, architect, backend developer, web developer, quality engineer, operator, security engineer, partner and editor. Tell me whose view you need, and I'll bring it.",
   ];
 }
@@ -670,7 +677,7 @@ export function orient(root: string, cwd: string): [message: string, context: st
   // how access control works — so a banner sourced from that book would render empty for the reader
   // who needs it most. Everything below the welcome is discovered, and the welcome alone is declared.
   const greeting = welcome(who, streams.length === 0);
-  const clean = (lines: string[]) => lines.map((line) => line.replace(/\s+$/, "")).join("\n");
+  const clean = (lines: string[]) => lines.map((line) => line.replace(/[ \t]+$/, "")).join("\n");
 
   if (!governed.length) {
     // A DAY-0 WALK IS RESUMED, NEVER RESTARTED. The answers land in a workstream before the first
@@ -678,7 +685,7 @@ export function orient(root: string, cwd: string): [message: string, context: st
     // already on disk. Offering the door again would ask somebody to name their organization twice
     // — and the second answer is the one that reaches the manifests.
     const started = streams.find((s) => s.state === "open" && s.subject === "new-platform");
-    const message = clean(greeting) + "\n\n" +
+    const message = clean(greeting) + "\n" + WELCOME_SPACER + "\n" +
       (started
         ? "You started a platform here and we did not finish. No repository exists yet, and " +
           "your answers are on disk where you left them — `" + relative(root, join(workstreamsDir(root, "open"), started.folder, ARCS)) +
@@ -723,7 +730,7 @@ export function orient(root: string, cwd: string): [message: string, context: st
     // Rung 4 is an ordinary session, and an ordinary session says nothing about its rung.
     rung: level < 4 ? `rung ${level}: ${why}` : null,
   });
-  const message = clean([...greeting, "", status]);
+  const message = clean([...greeting, WELCOME_SPACER, status]);
 
   // THE TABLES ARE FOR WHEN YOU ASK. A partner's first session opens on the welcome and one line, and
   // a table of repos tells them nothing about what this is or what the agent is for. The agent holds
@@ -759,7 +766,8 @@ export function orient(root: string, cwd: string): [message: string, context: st
     "three states. `open/` is available now, `backlog/` is parked behind a named " +
     "blocker, and `closed/` is the receipt. The number is an identity, never a " +
     `priority. Rung ${level}: ${why}. Open your first reply with the welcome above, word for word: ` +
-    "the heading, the italic line, and the 🤖, 🧭 and 👥 lines, each whole. That holds whatever the " +
+    "the heading, the italic line, and the 🤖, 🧭 and 👥 lines, each whole, with the `&nbsp;` spacer " +
+    "line after the italic line and after each of the three. That holds whatever the " +
     "prompt, a question and a pasted handover included: the prompt is answered after the welcome, " +
     "never instead of it, and in some editors this reply is the only place the developer sees it. " +
     "Then the status line under it. Show the tables only when asked (*where are we?*). " +

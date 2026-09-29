@@ -10,16 +10,16 @@
 // discovers the set by walking that folder rather than listing it by hand, so a command that exists
 // is reachable and nothing here can drift from what `commands/` actually holds.
 import { readdirSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { basename, join } from "node:path";
 import { pathToFileURL } from "node:url";
 
 const NAME = "spn-apps";
-// `commands/` ALWAYS SITS UNDER `scripts/`, never under `dist/` — this entry ships bundled to
-// `dist/cli.mjs`, but `commands/<group>/<action>.ts` stays real, unbundled source beside it in the
-// same `src/` tree (`02-shape.md` § The tree). `dirname(import.meta.dirname)` is the plugin's `src/`
-// whether this file runs from `src/scripts/cli.ts` or bundled to `src/dist/cli.mjs`, because both
-// sit one level directly under `src/`.
-const COMMANDS_DIR = resolve(dirname(import.meta.dirname), "scripts", "commands");
+// FROM SOURCE, `commands/<group>/<action>.ts` beside this file; BUNDLED, `dist/commands/<group>/<action>.mjs`
+// beside `dist/cli.mjs`. A command's source imports `plugin-support-lib` by a path that exists only in
+// the marketplace repository, so an installed plugin can run a command only from its bundle.
+const BUNDLED = basename(import.meta.dirname) === "dist";
+const COMMANDS_DIR = join(import.meta.dirname, "commands");
+const EXTENSION = BUNDLED ? ".mjs" : ".ts";
 
 type Command = { describe: string; run: (args: string[]) => number | Promise<number> };
 type Entry = { group: string; action: string; describe: string };
@@ -36,7 +36,7 @@ function discover(): { group: string; action: string }[] {
     let actions: string[] = [];
     try {
       actions = readdirSync(join(COMMANDS_DIR, group))
-        .filter((file) => file.endsWith(".ts")).map((file) => file.slice(0, -3)).sort();
+        .filter((file) => file.endsWith(EXTENSION) && !file.startsWith("_")).map((file) => file.slice(0, -EXTENSION.length)).sort();
     } catch { actions = []; }
     for (const action of actions) found.push({ group, action });
   }
@@ -45,12 +45,10 @@ function discover(): { group: string; action: string }[] {
 
 async function load(group: string, action: string): Promise<Command | null> {
   try {
-    // `pathToFileURL(COMMANDS_DIR)`, NEVER A BARE RELATIVE SPECIFIER. `./commands/…` resolves
-    // relative to wherever THIS file's own module URL is — `src/scripts/cli.ts` from source, but
-    // `src/dist/cli.mjs` once built, where a relative `./commands/` would mean `src/dist/commands/`,
-    // which does not exist. Going through `COMMANDS_DIR` keeps both modes pointed at the one real
-    // folder, `src/scripts/commands/`.
-    const module = await import(pathToFileURL(join(COMMANDS_DIR, group, `${action}.ts`)).href);
+    // `pathToFileURL(COMMANDS_DIR)`, NEVER A BARE RELATIVE SPECIFIER. A relative `./commands/…`
+    // resolves against this module's own URL, which a bundler may rewrite; the absolute folder is
+    // the one each mode actually ships.
+    const module = await import(pathToFileURL(join(COMMANDS_DIR, group, `${action}${EXTENSION}`)).href);
     if (typeof module.run !== "function") return null;
     return { describe: typeof module.describe === "string" ? module.describe : "", run: module.run };
   } catch {
