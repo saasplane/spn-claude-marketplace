@@ -11,7 +11,9 @@ names that stack.
 
 ## Nodes
 
-_No nodes, and that is what `GENERAL` declares — this repository holds one docs tree and no nodes at all. Nothing here declares a kind, and no `apps` or `infra` command acts on it._
+| Node | Declares | Version |
+| --- | --- | --- |
+| packages/plugin-spn-apps/tests/fixtures/repo/apps/api | APP_SERVER | — |
 
 ## Standing rules
 
