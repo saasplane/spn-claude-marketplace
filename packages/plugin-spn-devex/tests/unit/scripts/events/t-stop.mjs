@@ -59,7 +59,11 @@ const CARD = `  <div class="open">
     <div class="rec"><b>Recommended: A.</b> <b>Decision:</b> &mdash;</div>
   </div>`;
 
-const ARC = (extra = "") => `# Arc — a subject\n\nStatus: **RUNNING**\n\n## Steps\n\n| # | What | Where | How you would know |\n| --- | --- | --- | --- |\n| 1 | a thing | here | ✅ landed |\n\n## Log\n\n- **2026-09-19 — go.**\n${extra}`;
+// A reply given while a card is open opens with **Needs you** (RD.DEVEX.WORKSPACE.189), so every
+// case that expects silence over an open card opens its reply with it.
+const NEEDS = "## Needs you\n\nQ1 · a real question — it is on the approach page.\n\n## Progress\n\n";
+
+const ARC =(extra = "") => `# Arc — a subject\n\nStatus: **RUNNING**\n\n## Steps\n\n| # | What | Where | How you would know |\n| --- | --- | --- | --- |\n| 1 | a thing | here | ✅ landed |\n\n## Log\n\n- **2026-09-19 — go.**\n${extra}`;
 
 /** One workspace, with its arcs named either the old way or the way 008 actually names them. */
 function build(name, { arcNames, pageOpts = {}, arcExtra = "" }) {
@@ -167,7 +171,7 @@ const worked = (session) => ({ session, edit: reword });
 
 one("an unlanded step with the template's card open — runnable must stay quiet",
   runningWorkspace("stop-f16-open", CARD),
-  "silent", { ...worked("f16-open"), parity: false, why: "F16 — the Python read the template's `Decision:` marker as an answer" });
+  "silent", { ...worked("f16-open"), reply: NEEDS + "done", parity: false, why: "F16 — the Python read the template's `Decision:` marker as an answer" });
 
 const ANSWERED = CARD.replace("<b>Decision:</b> &mdash;", "<b>Decision:</b> A, 2026-09-19.");
 one("the same card once it carries a real decision — runnable speaks again",
@@ -410,7 +414,7 @@ console.log("\n=== stop — untouched");
 
 one("a page that names its arc, with an open card, and every step landed",
   build("stop-clean", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
-  "silent");
+  "silent", { reply: NEEDS + "done" });
 
 console.log("\n=== stop — reply-shape");
 
@@ -421,22 +425,22 @@ one("a reply asking for a lettered choice with no options table",
 
 one("the same choice, shown as a lettered table",
   build("stop-reply-good", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
-  "silent", { reply: "Q9 · which way\n\n**What** — the gate in stop.ts, one part checked or five.\n\n**Why** — what it costs to leave it: a half card passes.\n\n| | What it does | What it costs |\n| --- | --- | --- |\n| **A** | start now | the cycle |\n| **B** | wait | the delay |\n\nRecommended: A. Say A and I will start." });
+  "silent", { reply: NEEDS + "Q9 · which way\n\n**What** — the gate in stop.ts, one part checked or five.\n\n**Why** — what it costs to leave it: a half card passes.\n\n| | What it does | What it costs |\n| --- | --- | --- |\n| **A** | start now | the cycle |\n| **B** | wait | the delay |\n\nRecommended: A. Say A and I will start." });
 
 one("a reply that merely mentions a letter",
   build("stop-reply-plain", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
-  "silent", { reply: "Appendix A of the chapter covers it. Nothing is open." });
+  "silent", { reply: NEEDS + "Appendix A of the chapter covers it. Nothing else is open." });
 
 // F17 — `[A-D]` under an `i` flag matched the English article `a`, so an ordinary sentence containing
 // `choosing with a …` read as somebody naming option A. It fired on a reply that asked nothing.
 one("an article after a choosing word is not an option",
   build("stop-reply-article", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
-  "silent", { reply: "A caller sends an organization id of their own choosing with a sign-in, and it is ignored.",
+  "silent", { reply: NEEDS + "A caller sends an organization id of their own choosing with a sign-in, and it is ignored.",
               parity: false, why: F17 });
 
 one("the other articles that used to fire",
   build("stop-reply-articles", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
-  "silent", { reply: "Pick a file, select a row, and choose a tier. Nothing is open.",
+  "silent", { reply: NEEDS + "Pick a file, select a row, and choose a tier. Nothing else is open.",
               parity: false, why: F17 });
 
 // F18 — `option B` fired on a REFERENCE. Naming a superseded option in the past tense is not asking
@@ -444,7 +448,7 @@ one("the other articles that used to fire",
 // mentions a letter. Bold is not a presenting marker: emphasis wraps a reference just as readily.
 one("an option named in the past tense is a reference, not an ask",
   build("stop-reply-ref", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
-  "silent", { reply: "It was **option B**, which F has now replaced. Nothing is open.",
+  "silent", { reply: NEEDS + "It was **option B**, which F has now replaced. Nothing else is open.",
               parity: false, why: F18 });
 
 one("an option PRESENTED still asks",
@@ -466,7 +470,7 @@ one("a card cut to one sentence — the turn after",
 
 one("a card with every part is silent",
   build("stop-reply-whole", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
-  "silent", { reply: "Q256 · does the release go now\n\n**What** — spnutils 1.2.74, carrying N64 and N39 step 7.\n\n**Why** — what it costs to leave it: .spndevex has no history, which cost three status lines.\n\n| | Option | What it costs |\n| --- | --- | --- |\n| **A** | release now | two trains |\n| **B** | wait | open-ended |\n\nRecommended: A, because the wait is unbounded. Say A and I will release." });
+  "silent", { reply: NEEDS + "Q256 · does the release go now\n\n**What** — spnutils 1.2.74, carrying N64 and N39 step 7.\n\n**Why** — what it costs to leave it: .spndevex has no history, which cost three status lines.\n\n| | Option | What it costs |\n| --- | --- | --- |\n| **A** | release now | two trains |\n| **B** | wait | open-ended |\n\nRecommended: A, because the wait is unbounded. Say A and I will release." });
 
 // F19 — THE GATE REFUSED THE ONE REPLY SHAPE THE BOOK MAKES MANDATORY, on its first day. A handover
 // block names the cards a session leaves open, and naming one means writing its recommendation —
@@ -474,7 +478,7 @@ one("a card with every part is silent",
 // check read that as putting a decision. A fenced block is a quotation, not an ask.
 one("a handover block naming an open card's recommendation is not an ask",
   build("stop-reply-handover", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
-  "silent", { reply: "This session is retiring.\n\n```text\nContinue workstream `008-x`, arc `N69`, step 1.\nOpen: `Q259` — how much of the book the plugins must restate; the recommendation is D then A.\n```\n\nBoth releases are done." });
+  "silent", { reply: NEEDS + "This session is retiring.\n\n```text\nContinue workstream `008-x`, arc `N69`, step 1.\nOpen: `Q259` — how much of the book the plugins must restate; the recommendation is D then A.\n```\n\nBoth releases are done." });
 
 // The other half, and it is what stops the fix being a hole: an ask in PROSE, with a fence elsewhere
 // in the reply, still fires.
@@ -485,7 +489,7 @@ one("an ask outside the fence still fires, fence or no fence",
 
 one("a reply that asks nothing is still silent, whatever parts it lacks",
   build("stop-reply-noask", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
-  "silent", { reply: "Landed and committed. Nothing is open." });
+  "silent", { reply: NEEDS + "Landed and committed. Nothing else is open." });
 
 // F20 — A HANDOVER OVER AN OPEN CARD. The developer caught this twice in one session: the agent
 // offered a new window with two cards standing. A card's answer can change which arc runs next and
@@ -800,6 +804,46 @@ console.log("\n=== reply-shape — a sentence that reports an answer is not aski
   ]) { n += 1; const ok = checkReplyShape(reply).length === 1; if (!ok) failed += 1;
        console.log(`  ${ok ? "PASS" : "FAIL"}  reports — ${what}`); }
 }
+
+console.log("\n=== reply-shape — a reply given while a card is open opens with Needs you (RD.DEVEX.WORKSPACE.189)");
+{
+  const { checkReplyShape, opensWithNeedsYou } = await import("../../../../src/scripts/events/stop.ts");
+  const PROGRESS = "Row 6d landed: the reply check reads Needs you.\n\n```diff\n+ if (open.length && !opensWithNeedsYou(reply))\n```";
+  const needsYou = (reply, open) => checkReplyShape(reply, open).filter((warning) => warning.check === "needs-you");
+  for (const [what, got, expected] of [
+    ["an open card and no Needs you is reported", needsYou(PROGRESS, ["Q356"]).length, 1],
+    ["the finding names the open card", needsYou(PROGRESS, ["Q356"]).filter((w) => w.message.includes("Q356")).length, 1],
+    ["an open card with a Needs you heading first is clean", needsYou(`## Needs you\n\nQ356 · the card in full.\n\n## Progress\n\n${PROGRESS}`, ["Q356"]).length, 0],
+    ["an open card with a bold Needs you line first is clean", needsYou(`**Needs you:** Q356 · the card in full.\n\n${PROGRESS}`, ["Q356"]).length, 0],
+    ["blank lines before the heading do not count against it", needsYou(`\n\n### Needs you\n\nQ356.\n\n${PROGRESS}`, ["Q356"]).length, 0],
+    ["no card open is clean, with or without Needs you", needsYou(PROGRESS, []).length, 0],
+    ["the check is silent when no open cards are given", checkReplyShape(PROGRESS).length, 0],
+    ["known-bad: Needs you placed after the progress is reported", needsYou(`${PROGRESS}\n\n## Needs you\n\nQ356.`, ["Q356"]).length, 1],
+    ["known-bad: Needs you inside a fence at the top is reported", needsYou("```text\nNeeds you: Q356\n```\n\n" + PROGRESS, ["Q356"]).length, 1],
+    ["known-bad: a sentence that starts with the words is not the heading", needsYou("Needs your review later: row 6d.", ["Q356"]).length, 1],
+    ["opensWithNeedsYou reads the first non-blank line only", opensWithNeedsYou("Progress first.\n## Needs you") ? 1 : 0, 0],
+  ]) { n += 1; const ok = got === expected; if (!ok) failed += 1;
+       console.log(`  ${ok ? "PASS" : "FAIL"}  ${what}${ok ? "" : ` — got ${got}, expected ${expected}`}`); }
+}
+
+console.log("\n=== stop — the hook reads the open cards off the page for Needs you");
+
+one("known-bad: a reply over an open card that opens with progress",
+  build("m13-needs-you-bad", { arcNames: ["N1-a-subject.md"], pageOpts: { cards: CARD, names: ["N1-a-subject.md"] } }),
+  "warns", { says: "does not open with **Needs you**", reply: "Row 6d landed.\n\nQ1 is open on the page.", parity: false, why: "a new check" });
+
+one("the same reply opening with Needs you is silent",
+  build("m13-needs-you-good", { arcNames: ["N1-a-subject.md"], pageOpts: { cards: CARD, names: ["N1-a-subject.md"] } }),
+  "silent", { reply: NEEDS + "Row 6d landed.", parity: false, why: "a new check" });
+
+one("a reply with no card open is not read for Needs you",
+  build("m13-needs-you-none", { arcNames: ["N1-a-subject.md"], pageOpts: { cards: "", names: ["N1-a-subject.md"] } }),
+  "silent", { reply: "Row 6d landed.", parity: false, why: "a new check" });
+
+one("a card carrying its decision is not open, so the reply is not read for Needs you",
+  build("m13-needs-you-answered", { arcNames: ["N1-a-subject.md"],
+    pageOpts: { cards: CARD.replace("<b>Decision:</b> &mdash;", "<b>Decision:</b> A, 2026-09-29."), names: ["N1-a-subject.md"] } }),
+  "silent", { reply: "Row 6d landed.", parity: false, why: "a new check" });
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

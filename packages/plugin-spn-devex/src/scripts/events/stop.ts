@@ -832,16 +832,42 @@ function missingParts(reply: string): string[] {
   return out;
 }
 
-export function checkReplyShape(reply: string): Warning[] {
-  if (!asking(reply)) return [];
+// THE REPLY OPENS WITH WHAT NEEDS YOU (RD.DEVEX.WORKSPACE.189). While a card is open, the reply's
+// first non-blank line is `## Needs you`, `**Needs you**` or a plain `Needs you:` line. With no card
+// open the part is left out, so a reply is only read for it while a card is open.
+const NEEDS_YOU = /^[ \t]{0,3}(?:#{1,6}[ \t]*)?(?:\*\*|__)?[ \t]*Needs you\b/i;
+
+/** Whether the reply's first non-blank line is the **Needs you** heading or line. */
+export function opensWithNeedsYou(reply: string): boolean {
+  const first = reply.split("\n").find((line) => line.trim() !== "") ?? "";
+  return NEEDS_YOU.test(first);
+}
+
+/**
+ * The reply's shape: a decision it puts carries the whole card, and a reply given while a card is
+ * open opens with **Needs you**.
+ *
+ * @param open  the cards open on the approach pages; read from the workspace at `root` in the hook,
+ *              and empty when not given, so a reply is then read for the card's parts alone
+ */
+export function checkReplyShape(reply: string, open: string[] = []): Warning[] {
+  const out: Warning[] = [];
+  if (open.length && !opensWithNeedsYou(reply))
+    out.push({ check: "needs-you", message:
+      `A card is open — ${open.slice(0, 4).join(" · ")} — and the reply does not open with **Needs you**. ` +
+      `Every reply while work runs opens with what needs you, each open card in full in markdown, and ` +
+      `the progress comes after it — MUST (RD.DEVEX.WORKSPACE.189). A card under the progress is a ` +
+      `question the reader scrolls past while the work goes on.` });
+  if (!asking(reply)) return out;
   const missing = missingParts(reply);
-  if (!missing.length) return [];
-  return [{ check: "reply-shape", message:
+  if (!missing.length) return out;
+  out.push({ check: "reply-shape", message:
     "Your reply puts a decision and the card is not whole. Missing: " + missing.join(" · ") + ". " +
     "A card put to a person in chat follows the same layout a document uses — MUST — and it assumes " +
     "**no memory of this session**, because people decide days later (refs/devex/workspace/docs/decision-cards.md). " +
     "Write it in full in the reply, with the detail to decide from, and put the same card on the " +
-    "approach page." }];
+    "approach page." });
+  return out;
 }
 
 /** The four arc-to-page checks, as warnings. */
@@ -923,7 +949,7 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   }
   const repeated = event.stop_hook_active === true && (baseline?.fired ?? []).includes("handover");
   const warnings = [
-    ...span("stop-reply-shape", () => checkReplyShape(reply)),
+    ...span("stop-reply-shape", () => checkReplyShape(reply, cardsWaiting(root))),
     ...span("stop-arc-to-page", () => checkArcToPage(root)),
     ...span("stop-runnable", () => checkRunnable(root, baseline?.at ?? 0, baseline?.steps ?? {}, touched)),
     ...span("stop-hold", () => checkHold(root)),
