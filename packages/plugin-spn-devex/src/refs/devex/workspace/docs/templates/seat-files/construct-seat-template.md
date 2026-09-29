@@ -7,7 +7,7 @@
   "status": "PLANNING",
   "dependsOn": ["{{id}}"],
   "subtitle": "{{THE SUBTITLE, one plain sentence: the promise, what is true for you once this thing exists — \"Your work stays together in one folder, even after you close the window you started it in.\"}}",
-  "summary": "{{One sentence a newcomer understands.}}"
+  "summary": "{{The Description's first sentence, word for word.}}"
 }
 -->
 <!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The four page kinds · § The masthead, and the opening · § A construct's status is derived, never typed · 03-tree.md § What — constructs: the model, read in order
