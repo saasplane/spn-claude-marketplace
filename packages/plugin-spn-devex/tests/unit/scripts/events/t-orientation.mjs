@@ -85,8 +85,9 @@ const IN_WORKSPACE = existsSync(resolve(WORKSPACE, ".spndevex"));
 console.log(IN_WORKSPACE ? "\n=== orientation — the real workspace"
   : "\n=== orientation — the real workspace: not run, this copy sits outside one");
 if (IN_WORKSPACE) compare("this workspace, as a window actually sees it", `${WORKSPACE}`,
-  ["Welcome to SaaS Plane", "Your team's time belongs to your product.", `\`${WORKSPACE}\``,
-   "### Workstreams", "So — what are we building?"]);
+  ["Welcome back to SaaS Plane!", "🧭 I work every stage", `\`${WORKSPACE}\``,
+   "### Workstreams", "So — what are we building?"],
+  ["Your team's time belongs to your product.", "I am the DevEx agent"]);
 
 console.log("\n=== orientation — the states this workspace is not in");
 
@@ -278,6 +279,193 @@ console.log("\n=== orientation — the closing question is asked only when nothi
     text.includes("A handover block, an arc name, or any named next step replaces it"));
   says("and the standing-offer rule beside it is untouched",
     text.includes("The standing offer") && text.includes("do not propose resuming"));
+}
+
+// ── the welcome, and one status line (N116 row 6 item 2) ──
+//
+// THE WELCOME IS COMPARED WORD FOR WORD, because it is approved text and a paraphrase is a change
+// nobody reviewed. HOME is pointed at a fixture so the name the heading greets is chosen here rather
+// than read from whoever runs the suite, and so no real plugin cache reaches the status line.
+console.log("\n=== orientation — the welcome word for word, and one status line");
+{
+  const says = (label, ok) => {
+    n += 1;
+    if (!ok) failed += 1;
+    console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}`);
+  };
+
+  const BODY = [
+    "*The AI-native, DevEx-first Foundation for Building and Launching Secure, Scalable, Compliance-ready SaaS Platforms.*",
+    "",
+    "🤖 **I'm your DevEx agent.** Think of me as the engineering teammate who has read every standard in this workspace, so your time can go to the product.",
+    "",
+    "🧭 I work every stage of your engineering function with you: **Bootstrap** a repo, keep **Source Control** in order, **Ideate** and plan the change, **Develop** it, **Test** it, **Provision** the estate, **Deliver** it, and **Operate** what runs. Every stage has its standards and its proof, and I'll carry both for you.",
+    "",
+    "👥 I look at the work through every role on your team: engineering leader, business manager, product manager, architect, backend developer, web developer, quality engineer, operator, security engineer, partner and editor. Tell me whose view you need, and I'll bring it.",
+  ].join("\n");
+  /** The approved welcome under `heading`, then exactly one status line, and nothing else. */
+  const isWelcome = (message, heading) => message.startsWith(`${heading}\n\n${BODY}\n\n`)
+    && message.slice(`${heading}\n\n${BODY}\n\n`.length).split("\n").filter(Boolean).length === 1;
+  const statusOf = (message) => message.split("\n").filter(Boolean).at(-1);
+
+  const home = (name) => {
+    const dir = join(BASE, `home-${name ?? "anonymous"}`);
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, ".claude.json"),
+      JSON.stringify(name ? { oauthAccount: { displayName: `${name} Tester` } } : {}), "utf8");
+    return dir;
+  };
+  const hook = (root, name, script = `${HOOKS}/src/scripts/events/orientation.ts`) => {
+    try {
+      const out = execFileSync("node", [script, "--stdin"], {
+        input: JSON.stringify({ cwd: root, session_id: "t-orientation" }), encoding: "utf8", cwd: root,
+        env: { ...process.env, HOME: home(name), SPN_TELEMETRY: "off" }, maxBuffer: 16 * 1024 * 1024 });
+      const parsed = JSON.parse(out);
+      return { message: parsed.systemMessage, context: parsed.hookSpecificOutput.additionalContext };
+    } catch (e) { return { message: `ERROR ${e.stderr ?? e.message}`, context: "" }; }
+  };
+  const wired = JSON.stringify({ enabledPlugins: { "spn-devex@saasplane": true, "spn-apps@saasplane": true } });
+
+  // A first visit is a workspace with no workstream in any state, and nothing else decides it.
+  const first = fixture("first-visit", {
+    "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
+    "spn-app-ts/CONCEPT.md": "# concept\n",
+    "spn-app-ts/.claude/settings.json": wired,
+    "spn-infra/sprepo.json": repo("INFRA"),
+    "spn-infra/.claude/settings.json": JSON.stringify({ enabledPlugins: { "spn-devex@saasplane": true, "spn-infra@saasplane": true } }),
+    ".spndevex/README.md": "state\n",
+  });
+  const firstNamed = hook(first, "Dhruv");
+  says("a first visit greets by name with the first-visit heading, then the approved welcome",
+    isWelcome(firstNamed.message, "# 👋 Welcome to SaaS Plane, Dhruv. Glad you're here!"));
+  says("with no name, only the name's clause drops",
+    isWelcome(hook(first, null).message, "# 👋 Welcome to SaaS Plane. Glad you're here!"));
+
+  const returning = fixture("returning", {
+    "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
+    "spn-app-ts/CONCEPT.md": "# concept\n",
+    "spn-app-ts/.claude/settings.json": wired,
+    ".spndevex/workstreams/closed/041-finished/arcs/N1-a.md": "# arc\n",
+  });
+  says("any workstream, even a closed one, makes it a returning visit",
+    isWelcome(hook(returning, "Dhruv").message, "# 👋 Good to see you again, Dhruv. Welcome back to SaaS Plane!"));
+  says("a returning visit with no name drops only the name's clause",
+    isWelcome(hook(returning, null).message, "# 👋 Good to see you again. Welcome back to SaaS Plane!"));
+
+  // THE KNOWN-BAD CASE. The check above has to reject the welcome it replaced, or it proves nothing.
+  const OLD = "# Welcome to SaaS Plane, Dhruv! Good to see you 👋\n\n## Your team's time belongs to your product. 🚀\n\n"
+    + "**The AI-native, DevEx-first Foundation for Building and Launching Secure, Scalable, Compliance-ready SaaS Platforms.**\n\n"
+    + "🤖 **I am the DevEx agent** — think of me as your engineering brain for this platform, and I work on it with you.\n\n"
+    + "1 repo · 1 workstream open (042)";
+  says("the old welcome fails the same check, under either heading",
+    !isWelcome(OLD, "# Welcome to SaaS Plane, Dhruv! Good to see you 👋")
+    && !isWelcome(OLD, "# 👋 Good to see you again, Dhruv. Welcome back to SaaS Plane!"));
+  says("and no render carries a word of it",
+    [firstNamed.message, firstNamed.context].every((text) =>
+      !text.includes("Your team's time belongs to your product.") && !text.includes("I am the DevEx agent")
+      && !text.includes("Tell me what you want to build")));
+
+  // THE STATUS LINE: every part, each dropped at zero, and each clause on the same line.
+  const busy = fixture("status-busy", {
+    "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
+    "spn-app-ts/CONCEPT.md": "# concept\n",
+    "spn-app-ts/.claude/settings.json": wired,
+    "spn-app-py/sprepo.json": repo("APPS", { stack: "PY" }),
+    "spn-app-py/CONCEPT.md": "# concept\n",
+    "spn-app-py/.claude/settings.json": wired,
+    ".spndevex/workstreams/open/042-widget-pricing/arcs/N1-a.md": "# arc\n",
+    ".spndevex/workstreams/open/044-another/arcs/N1-a.md": "# arc\n",
+    ".spndevex/workstreams/backlog/043-parked/arcs/N1-a.md": "# arc\n",
+    ".spndevex/workstreams/closed/041-finished/arcs/N1-a.md": "# arc\n",
+  });
+  const plain = hook(busy, "Dhruv");
+  // Rung 3 here — the fixtures hold no nodes — so the rung clause is expected, and asserted apart.
+  says("the status line names repos, open workstreams by number and the backlog; closed is not a part",
+    statusOf(plain.message) === "2 repos · 2 workstreams open (042, 044) · 1 in backlog · rung 3: concept present, very few nodes below it");
+  says("a part at zero is dropped, and one of each reads in the singular",
+    statusOf(hook(returning, null).message) === "1 repo · rung 3: concept present, very few nodes below it");
+
+  const nodes = {};
+  for (const node of ["a", "b", "c"]) nodes[`spn-app-ts/apps/${node}/spkind.json`] = "{}";
+  const ordinary = fixture("status-ordinary", {
+    ...nodes,
+    "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
+    "spn-app-ts/CONCEPT.md": "# concept\n",
+    "spn-app-ts/.claude/settings.json": wired,
+    ".spndevex/workstreams/open/042-widget-pricing/arcs/N1-a.md": "# arc\n",
+  });
+  says("an ordinary session adds no clause at all",
+    statusOf(hook(ordinary, null).message) === "1 repo · 1 workstream open (042)");
+
+  const unwired = fixture("status-unwired", {
+    ...nodes,
+    "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
+    "spn-app-ts/CONCEPT.md": "# concept\n",
+    "spn-app-ts/.claude/settings.json": JSON.stringify({ enabledPlugins: { "spn-devex@saasplane": true } }),
+    ".spndevex/README.md": "state\n",
+  });
+  const unwiredOut = hook(unwired, null);
+  says("an unwired repository adds a clause to the same line",
+    statusOf(unwiredOut.message) === "1 repo · 1 unwired" && isWelcome(unwiredOut.message, "# 👋 Welcome to SaaS Plane. Glad you're here!"));
+  says("the stack claim selects no plugin: an APPS repo loading spn-apps is wired",
+    !statusOf(hook(ordinary, null).message).includes("unwired"));
+
+  const lower = fixture("status-lower-rung", {
+    "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
+    "spn-app-ts/.claude/settings.json": wired,
+    ".spndevex/README.md": "state\n",
+  });
+  const lowerOut = hook(lower, null);
+  says("a lower rung adds a clause, never a line",
+    statusOf(lowerOut.message) === "1 repo · rung 2: an APPS repo carries no CONCEPT.md — spn-app-ts"
+    && isWelcome(lowerOut.message, "# 👋 Welcome to SaaS Plane. Glad you're here!"));
+
+  // A STALE PLUGIN: a marketplace source whose bytes differ from the newest cached copy.
+  const stale = fixture("status-stale", {
+    ...nodes,
+    "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
+    "spn-app-ts/CONCEPT.md": "# concept\n",
+    "spn-app-ts/.claude/settings.json": wired,
+    "market/.claude-plugin/marketplace.json": JSON.stringify({ plugins: [{ name: "spn-devex", source: "./devex" }] }),
+    "market/devex/scripts/a.ts": "the source, edited after the install\n",
+    ".spndevex/README.md": "state\n",
+  });
+  mkdirSync(join(stale, ".claude"), { recursive: true });
+  writeFileSync(join(stale, ".claude", "settings.json"), JSON.stringify({
+    enabledPlugins: { "spn-devex@saasplane": true },
+    extraKnownMarketplaces: { saasplane: { source: { source: "directory", path: join(stale, "market") } } } }), "utf8");
+  const cached = join(home("Stale"), ".claude", "plugins", "cache", "saasplane", "spn-devex", "1.0.0", "scripts");
+  mkdirSync(cached, { recursive: true });
+  writeFileSync(join(cached, "a.ts"), "the install\n", "utf8");
+  const staleOut = hook(stale, "Stale");
+  says("a stale plugin adds a clause to the same line",
+    statusOf(staleOut.message) === "1 repo · cache stale — spn-devex"
+    && isWelcome(staleOut.message, "# 👋 Welcome to SaaS Plane, Stale. Glad you're here!"));
+
+  // A WINDOW BEHIND THE NEWEST INSTALL: the copy made by the case above, run as the hook.
+  const behindCopy = join(BASE, "pc", "plugins", "cache", "saasplane", "spn-devex", "0.0.1", "scripts", "events", "orientation.ts");
+  const behindOut = hook(ordinary, null, behindCopy);
+  says("a window running an older install adds a clause, and the full warning stays with the agent",
+    statusOf(behindOut.message) === "1 repo · 1 workstream open (042) · this window runs spn-devex 0.0.1, 9.9.9 is installed"
+    && behindOut.context.includes("take a fresh window") && !behindOut.message.includes("take a fresh window"));
+
+  // THE TABLES ARE FOR WHEN YOU ASK: in the agent's context, never in the developer's pane.
+  const tables = ["## The ground", "### Repositories", "| Repo | Law |", "### Workstreams", "So — what are we building?",
+    "Or ask me to continue 042 widget-pricing"];
+  const offer = hook(ordinary, null);
+  says("the developer's pane carries the welcome and the status line and no table",
+    tables.every((t) => !offer.message.includes(t)));
+  says("the agent's context carries the same opening, then every table and the closing question",
+    offer.context.startsWith(offer.message) && tables.every((t) => offer.context.includes(t)));
+  says("the note tells the agent to open with the welcome whatever the prompt, and to hold the tables",
+    offer.context.includes("Open your first reply with the welcome above, whatever the prompt, then the status line under it.")
+    && offer.context.includes("Show the tables only when asked"));
+
+  // Day zero opens on the same welcome, and its door follows.
+  const zero = hook(fixture("day-zero-welcome", { ".spndevex/README.md": "state\n" }), "Dhruv");
+  says("day zero opens on the first-visit welcome, then the door, and no status line",
+    zero.message.startsWith(`# 👋 Welcome to SaaS Plane, Dhruv. Glad you're here!\n\n${BODY}\n\nThis folder is empty`)
+    && zero.context.includes("open your first reply with the welcome above, whatever the prompt"));
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

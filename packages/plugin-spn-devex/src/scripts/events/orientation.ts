@@ -12,14 +12,22 @@
 //   SessionStart :  node orientation.ts --stdin   (the hook, from the event JSON on stdin)
 //   by hand      :  node orientation.ts [path]    (the same text on stdout, so you can read it)
 //
-// Three parts, in this order — a session that opens with a status dump reads like a build log:
+// The first reply opens with the welcome and one status line, whatever the prompt — a session that
+// opens with a status dump reads like a build log. Three parts, in this order:
 //
-//   1. a welcome
-//   2. the ground — the members, the law each carries, the wiring, and every workstream
-//   3. ONE open question, and never a typed list of options — you arrive with something in mind, and
-//      a leading question picks your subject for you. Beside it, and only when exactly one
-//      workstream is open and no second session is live under this root, a standing offer to carry
-//      that one on. Two offers is not a menu; three would be.
+//   1. the welcome — a heading that greets you by name, the tagline, who the agent is, the eight
+//      stages and every role. The heading has two forms: a returning visit, and a first visit, which
+//      is a workspace with no workstream in any state.
+//   2. ONE status line — the repositories, the open workstreams, the backlog, and the other windows
+//      open here, each part dropped when it is zero. Unwired repositories, a stale plugin or a rung
+//      below an ordinary session add a clause to the same line, never a second line.
+//   3. the tables, for when you ask — the members, the law each carries, the wiring, and every
+//      workstream — then ONE open question, never a typed list of options. Beside it, and only when
+//      exactly one workstream is open and no second session is live under this root, a standing
+//      offer to carry that one on. Two offers is not a menu; three would be.
+//
+// `systemMessage`, the developer's pane, carries parts 1 and 2. `additionalContext`, what the agent
+// reads, carries all three and the note that says how to use them.
 //
 // A workstream carries its state in its parent folder, so the three are read and shown together:
 // `open/` is available now, `backlog/` is parked, and `closed/` is the receipt. The number in the
@@ -41,13 +49,15 @@ import { homedir } from "node:os";
 import { basename, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { isDir, isFile, listdir, read, readPayload, runAlone, type Payload } from "../lib/payload.ts";
-import { begin, end, record } from "../lib/timing.ts";
+import { begin, end, record, tagsOf } from "../lib/timing.ts";
 
 const MARKETPLACE = "saasplane";
 const CORE = "spn-devex";
 // The derivation `repo agent-sync` already performs, from the manifest and nothing else. A repo with
-// no claim at all — the marketplace itself is one — falls back to the core plugin alone.
-const WORLD_PLUGINS: Record<string, string[]> = { FOUNDATION: [CORE], INFRA: [CORE, "spn-infra"] };
+// no claim at all — the marketplace itself is one — falls back to the core plugin alone. A stack is a
+// folder inside the domain plugin, so the stack claim selects no plugin (RD.DEVEX.AGENT.015).
+const WORLD_PLUGINS: Record<string, string[]> = {
+  FOUNDATION: [CORE], INFRA: [CORE, "spn-infra"], APPS: [CORE, "spn-apps"] };
 const SKIP = new Set(["node_modules", ".git", "dist", "build", ".nx", "coverage", ".output",
   "tool-results", "__pycache__", ".venv"]);
 const NODE_MANIFEST: Record<string, string> = { APPS: "spkind.json", INFRA: "spinfrapkg.json" };
@@ -168,8 +178,7 @@ function lawOf(path: string): { world: string | null; stack: string | null; pins
   return { world: manifest.type ?? null, stack: config.stack ?? null, pins };
 }
 
-function expectedPlugins(world: string | null, stack: string | null): string[] {
-  if (world === "APPS" && stack) return [CORE, `spn-apps-${stack.toLowerCase()}`];
+function expectedPlugins(world: string | null): string[] {
   return WORLD_PLUGINS[world ?? ""] ?? [CORE];
 }
 
@@ -356,7 +365,7 @@ function digest(path: string): string {
  * `RD.DEVEX.AGENT.057` puts the handover on the tool that changes the wiring. This is the other end of the
  * same rule: the window that cannot adopt its own new wiring can at least say so on the way in.
  */
-function loadedBehind(): string | null {
+function loadedBehind(): { plugin: string; loaded: string; newest: string } | null {
   let here: string;
   try { here = fileURLToPath(import.meta.url).replace(/\\/g, "/"); }
   catch { return null; }
@@ -372,8 +381,7 @@ function loadedBehind(): string | null {
   if (!versions.length) return null;
   const newest = versions.reduce((a, b) => (compareVersions(a, b) >= 0 ? a : b));
   if (compareVersions(newest, loaded) <= 0) return null;
-  return `⚠ this window loaded \`${plugin} ${loaded}\` and \`${newest}\` is installed — ` +
-    "it keeps the copy it started with, so take a fresh window before trusting a skill, a brief or a rule file";
+  return { plugin, loaded, newest };
 }
 
 /**
@@ -466,13 +474,47 @@ function developerName(): string | null {
 }
 
 /**
- * Small numbers spelled out, because a numeral mid-sentence reads like a status line and this
- * paragraph is the one place the session is talking to you rather than reporting.
+ * The welcome, word for word as it was approved. Only the heading varies: a first visit is a
+ * workspace with no workstream in any state, which the ground already says, so the plugin keeps no
+ * state of its own to tell the two apart. With no name, the name's clause drops and nothing else.
  */
-function spell(n: number): string {
-  const words = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
-    "ten", "eleven", "twelve"];
-  return n < words.length ? words[n] : String(n);
+function welcome(who: string | null, firstVisit: boolean): string[] {
+  const name = who ? `, ${who}` : "";
+  return [
+    firstVisit
+      ? `# 👋 Welcome to SaaS Plane${name}. Glad you're here!`
+      : `# 👋 Good to see you again${name}. Welcome back to SaaS Plane!`,
+    "",
+    "*The AI-native, DevEx-first Foundation for Building and Launching Secure, Scalable, Compliance-ready SaaS Platforms.*",
+    "",
+    "🤖 **I'm your DevEx agent.** Think of me as the engineering teammate who has read every standard in this workspace, so your time can go to the product.",
+    "",
+    "🧭 I work every stage of your engineering function with you: **Bootstrap** a repo, keep **Source Control** in order, **Ideate** and plan the change, **Develop** it, **Test** it, **Provision** the estate, **Deliver** it, and **Operate** what runs. Every stage has its standards and its proof, and I'll carry both for you.",
+    "",
+    "👥 I look at the work through every role on your team: engineering leader, business manager, product manager, architect, backend developer, web developer, quality engineer, operator, security engineer, partner and editor. Tell me whose view you need, and I'll bring it.",
+  ];
+}
+
+type Status = { repos: number; open: Workstream[]; backlog: number; others: number;
+                unwired: number; stale: string | null; behind: string | null; rung: string | null };
+
+/**
+ * The ground in one line. A part that is zero is dropped rather than printed as `0`, and a problem
+ * adds a clause to the same line — a second line is how a status line turns back into a dump.
+ */
+export function statusLine(s: Status): string {
+  const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+  const parts = [plural(s.repos, "repo", "repos")];
+  if (s.open.length)
+    parts.push(`${plural(s.open.length, "workstream", "workstreams")} open `
+      + `(${s.open.map((w) => w.number || w.subject).join(", ")})`);
+  if (s.backlog) parts.push(`${s.backlog} in backlog`);
+  if (s.others) parts.push(`${plural(s.others, "other window", "other windows")} open here`);
+  if (s.unwired) parts.push(`${s.unwired} unwired`);
+  if (s.stale) parts.push(s.stale);
+  if (s.behind) parts.push(s.behind);
+  if (s.rung) parts.push(s.rung);
+  return parts.join(" · ");
 }
 
 /**
@@ -585,13 +627,12 @@ function workstreamLines(streams: Workstream[]): string[] {
  * one workstream is how an approach page grows two authors, and a cheap check is worth more than the
  * convenience it costs.
  */
-function closingLines(root: string, streams: Workstream[]): string[] {
+function closingLines(streams: Workstream[], others: number): string[] {
   const ask = "So — what are we building?";
   const openNow = streams.filter((w) => w.state === "open");
   if (openNow.length !== 1) return ["", ask, ""];
   const only = openNow[0];
   const name = [only.number, only.subject].filter(Boolean).join(" ");
-  const others = sessionsHere(root);
   const offer = others
     ? `${name} is open, but ${others} other session${others > 1 ? "s are" : " is"} open in this ` +
       `workspace. I will not touch it unless you ask me to.`
@@ -604,10 +645,15 @@ function claim(repo: Repo): string {
   return repo.world + (repo.stack ? ` · ${repo.stack}` : "");
 }
 
-export function orient(root: string, cwd: string): [text: string, note: string] {
+/**
+ * The session's opening, as two strings: `message` is the developer's pane — the welcome and one
+ * status line — and `context` is what the agent reads — the same, then the tables, the closing
+ * question and the note.
+ */
+export function orient(root: string, cwd: string): [message: string, context: string] {
   const repos: Repo[] = members(root).map(([name, path]) => {
     const { world, stack, pins } = lawOf(path);
-    const want = expectedPlugins(world, stack);
+    const want = expectedPlugins(world);
     const have = enabledPlugins(path);
     return { name, path, world, stack, pins, want, have,
              wired: want.every((p) => have.has(p)), nodes: countNodes(path, world) };
@@ -616,6 +662,12 @@ export function orient(root: string, cwd: string): [text: string, note: string] 
   const governed = repos.filter((r) => r.world);
   const streams = workstreams(root);
   const [level, why] = rung(governed);
+  // THE WELCOME IS THE AGENT'S OWN, AND IT IS TYPED HERE ON PURPOSE. Do not read it from a repo. This
+  // plugin runs in a partner's workspace, where the foundation book is not a member and absence is
+  // how access control works — so a banner sourced from that book would render empty for the reader
+  // who needs it most. Everything below the welcome is discovered, and the welcome alone is declared.
+  const greeting = welcome(who, streams.length === 0);
+  const clean = (lines: string[]) => lines.map((line) => line.replace(/\s+$/, "")).join("\n");
 
   if (!governed.length) {
     // A DAY-0 WALK IS RESUMED, NEVER RESTARTED. The answers land in a workstream before the first
@@ -623,17 +675,7 @@ export function orient(root: string, cwd: string): [text: string, note: string] 
     // already on disk. Offering the door again would ask somebody to name their organization twice
     // — and the second answer is the one that reaches the manifests.
     const started = streams.find((s) => s.state === "open" && s.subject === "new-platform");
-    const text = `# Welcome to SaaS Plane${who ? ", " + who : ""}! Good to see you 👋\n\n` +
-      "## Your team's time belongs to your product. 🚀\n\n" +
-      "**The AI-native, DevEx-first Foundation for Building and Launching Secure, " +
-      "Scalable, Compliance-ready SaaS Platforms.**\n\n" +
-      "🤖 **I am the DevEx agent** — think of me as your engineering brain for this " +
-      "platform, and I work on it with you.\n\n" +
-      "I know the engineering workflows end to end: setting a repo up, shaping an idea, planning it, " +
-      "developing, testing, provisioning the estate, delivering a change, and operating " +
-      "what runs. Each has its own standards and its own proof, and I carry both. " +
-      "Architects, QA, ops and security each have a road here, not developers alone.\n\n" +
-      "&nbsp;\n\n" +
+    const message = clean(greeting) + "\n\n" +
       (started
         ? "You started a platform here and we did not finish. No repository exists yet, and " +
           "your answers are on disk where you left them — `.spndevex/workstreams/open/" +
@@ -649,7 +691,8 @@ export function orient(root: string, cwd: string): [text: string, note: string] 
           "nothing rests on this window staying open. Say no and nothing is created.\n\n" +
           "Would you like to start a new platform?\n");
     const note = "\n---\nDay-0 mode: no sprepo.json under " + root + ". You have no code to read, " +
-      "so do not orient — load the `bootstrap` skill and walk it. " +
+      "so do not orient — open your first reply with the welcome above, whatever the prompt, then " +
+      "load the `bootstrap` skill and walk it. " +
       (started
         ? "A day-0 walk is already open here: `.spndevex/workstreams/open/" + started.folder +
           "/`. Read its arc BEFORE you say anything. Resume at the first coordinate it does not " +
@@ -657,46 +700,38 @@ export function orient(root: string, cwd: string): [text: string, note: string] 
         : "Act 0 is the door above: ask, and run nothing until they answer. A no is a real " +
           "answer and this folder stays empty. On a yes, act 1 mints the workspace and act 2 " +
           "opens the workstream that holds the answers, before the first question is asked.\n");
-    return [text, note];
+    return [message, message + note];
   }
 
-  // A partner's first session opens here, and a table of repos tells them nothing about what this is
-  // or what the agent is for. Three short paragraphs, then the ground — never a fourth, because the
-  // header's own rule is that a session opening with a status dump reads like a build log.
-  //
-  // THE WELCOME IS THE AGENT'S OWN, AND IT IS TYPED HERE ON PURPOSE. Do not read it from a repo. This
-  // plugin runs in a partner's workspace, where the foundation book is not a member and absence is
-  // how access control works — so a banner sourced from that book would render empty for the reader
-  // who needs it most. Everything below the welcome is discovered, and the welcome alone is declared.
-  const lines: string[] = [
-    `# Welcome to SaaS Plane${who ? ", " + who : ""}! Good to see you 👋`,
-    "",
-    "## Your team's time belongs to your product. 🚀",
-    "",
-    "**The AI-native, DevEx-first Foundation for Building and Launching Secure, Scalable, Compliance-ready SaaS Platforms.**",
-    "",
-    "🤖 **I am the DevEx agent** — think of me as your engineering brain for this platform, and I work on it with you.",
-    "",
-    "I know the engineering workflows end to end: setting a repo up, shaping an idea, planning it, developing, testing, provisioning the estate, delivering a change, and operating what runs. Each has its own standards and its own proof, and I carry both. Architects, QA, ops and security each have a road here, not developers alone.",
-    "",
-    "### 💡 Tell me what you want to build",
-    "",
-    "Your idea can be rough. We shape it together first, then build it in four steps: the approach, the docs, the code, and the tests that prove it works.",
-    "",
-    `You have ${spell(repos.length)} repo${repos.length === 1 ? "" : "s"} here and one `
-      + "window. Every file follows its own rules, and finding them is my job. You just build.",
-    "",
-  ];
   const settings = readJson(join(root, ".claude", "settings.json")) ?? {};
   const floor = Object.entries(settings.enabledPlugins ?? {}).filter(([, on]) => on).map(([k]) => k);
   const plugins = [...new Set(floor.map((k) => k.split("@")[0]))].sort();
-  const head = plugins.length
-    ? `floor ${plugins.length} plugins · ${cacheState(root, plugins)}`
-    : "floor not minted — no plugins enabled here";
-  lines.push("## The ground", "",
-    `\`${root}\` · ${head}`);
+  const cache = plugins.length ? cacheState(root, plugins) : null;
   const behind = loadedBehind();
-  if (behind) lines.push("", behind);
+  const others = sessionsHere(root);
+  const status = statusLine({
+    repos: repos.length,
+    open: streams.filter((w) => w.state === "open"),
+    backlog: streams.filter((w) => w.state === "backlog").length,
+    others,
+    unwired: repos.filter((r) => !r.wired).length,
+    stale: cache?.startsWith("cache stale") ? cache : null,
+    behind: behind ? `this window runs ${behind.plugin} ${behind.loaded}, ${behind.newest} is installed` : null,
+    // Rung 4 is an ordinary session, and an ordinary session says nothing about its rung.
+    rung: level < 4 ? `rung ${level}: ${why}` : null,
+  });
+  const message = clean([...greeting, "", status]);
+
+  // THE TABLES ARE FOR WHEN YOU ASK. A partner's first session opens on the welcome and one line, and
+  // a table of repos tells them nothing about what this is or what the agent is for. The agent holds
+  // the tables so that *where are we?* is answered without a second read.
+  const head = plugins.length
+    ? `floor ${plugins.length} plugins · ${cache}`
+    : "floor not minted — no plugins enabled here";
+  const lines: string[] = ["## The ground", "", `\`${root}\` · ${head}`];
+  if (behind)
+    lines.push("", `⚠ this window loaded \`${behind.plugin} ${behind.loaded}\` and \`${behind.newest}\` is installed — ` +
+      "it keeps the copy it started with, so take a fresh window before trusting a skill, a brief or a rule file");
   if (resolve(cwd) !== root) lines.push("", `Rooted in \`${relative(root, resolve(cwd))}\`.`);
   lines.push("");
 
@@ -716,11 +751,12 @@ export function orient(root: string, cwd: string): [text: string, note: string] 
   lines.push("");
 
   lines.push(...workstreamLines(streams));
-  lines.push(...closingLines(root, streams));
+  lines.push(...closingLines(streams, others));
   const note = "\n---\nGround, read at load — the members, their law, and every workstream in all " +
     "three states. `open/` is available now, `backlog/` is parked behind a named " +
     "blocker, and `closed/` is the receipt. The number is an identity, never a " +
-    `priority. Rung ${level}: ${why}. Say hello with the welcome above, then this ground. ` +
+    `priority. Rung ${level}: ${why}. Open your first reply with the welcome above, whatever the ` +
+    "prompt, then the status line under it. Show the tables only when asked (*where are we?*). " +
     "The closing question is asked ONLY when the developer's first message does not already " +
     "say what to do. A handover block, an arc name, or any named next step replaces it — open " +
     "with what you are picking up and the first thing you will do, never by asking again. " +
@@ -728,7 +764,7 @@ export function orient(root: string, cwd: string): [text: string, note: string] 
     "under that question appears only when exactly one workstream is open and no other " +
     "session is live here — so where you cannot see one, do not propose resuming " +
     "anything.\n";
-  return [lines.map((line) => line.replace(/\s+$/, "")).join("\n"), note];
+  return [message, message + "\n\n" + clean(lines) + note];
 }
 
 if (runAlone("orientation.ts")) {
@@ -745,7 +781,7 @@ if (runAlone("orientation.ts")) {
   // `SessionStart` runs once, so its whole run is the useful number. `PreToolUse` is the hot path and
   // times per check instead.
   const started = performance.now();
-  begin({ event: "SessionStart", tool: null, session: payload.session_id ?? null }, cwd);
+  begin({ event: "SessionStart", tool: null, session: payload.session_id ?? null, ...tagsOf(payload) }, cwd);
   let result: [string, string] | null = null;
   try { result = orient(workspaceRootOf(cwd), cwd); }
   catch (err) {
@@ -754,13 +790,13 @@ if (runAlone("orientation.ts")) {
   record("orientation", performance.now() - started);
   end();
   if (result) {
-    const [text, note] = result;
+    const [message, context] = result;
     if (stdinMode)
-      // The same ground twice, and the agent's copy carries one line more: `systemMessage` is the
-      // developer's pane, `additionalContext` is what the agent reads and acts on.
-      console.log(JSON.stringify({ systemMessage: text,
-        hookSpecificOutput: { hookEventName: "SessionStart", additionalContext: text + note } }));
-    else console.log(text + note);
+      // `systemMessage` is the developer's pane: the welcome and one status line. `additionalContext`
+      // is what the agent reads and acts on: the same, then the tables and the note.
+      console.log(JSON.stringify({ systemMessage: message,
+        hookSpecificOutput: { hookEventName: "SessionStart", additionalContext: context } }));
+    else console.log(context);
   }
   process.exit(0);
 }
