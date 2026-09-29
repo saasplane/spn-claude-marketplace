@@ -284,12 +284,16 @@ function renderPageBody(opts: Parameters<typeof renderPage>[0]): { html: string;
   const statusPart = block.variant === "overview" || !block.status ? "" :
     `<span class="st"><span class="lbl">Status:</span> <span class="badge status ${String(block.status).toLowerCase()}">${STATUS_GLYPH[block.status] ?? ""} ${block.status}</span></span>`;
 
+  // The Subtitle is the seat block's `subtitle` field, one plain sentence under the title; the lead's
+  // first paragraph stays the Description (RD.DEVEX.WORKSPACE.187).
+  const subtitle = block.subtitle ? `  <p class="subtitle">${esc(String(block.subtitle))}</p>\n` : "";
+
   const masthead =
 `<header class="masthead">
   <!-- Rendered from the spn:doc block by \`docs.ts page\`. Never typed: a header that disagreed with its block is what this removes. -->
   <div class="eyebrow"><span class="line1">${opts.workspace} &nbsp;|&nbsp; ${opts.location} &nbsp;|&nbsp; ${esc(block.title)}</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">${type}</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience">${lensChips}</span>${statusPart}</span></div>
   <h1>${esc(block.title)}</h1>
-${lead}
+${subtitle}${lead}
 </header>`;
 
   const html = [

@@ -119,6 +119,20 @@ const lacks = (s) => (got) => !String(got).includes(s);
     rmSync(noted, { recursive: true, force: true });
     one("the template's author note never reaches a produced page", footed, (g) => !/AUTHOR-NOTE/.test(g) && !/<footer>/.test(g));
     one("nor does the book template's own footer", page, (g) => !/A template from workstream/.test(g) && !/<footer>/.test(g));
+
+    // THE SUBTITLE IS THE SEAT BLOCK'S `subtitle` FIELD (RD.DEVEX.WORKSPACE.187). A seat that moved its
+    // promise line into the field lost it from the page while the producer ignored the key, so the
+    // case writes a seat with one and a seat without, and reads both pages.
+    const seatSrc = readAt(ws, "docs/02-constructs/01-core/thing.md");
+    const withSub = seatSrc
+      .replace(/"id":\s*"([^"]+)"/, '"id": "$1-sub"')
+      .replace(/"title":/, '"subtitle": "One plain promise, under the title.",\n  "title":');
+    writeFileSync(join(ws, "docs/02-constructs/01-core/thing-sub.md"), withSub);
+    run(ws, ["page", "docs/02-constructs/01-core/thing-sub.md"]);
+    const subbed = readAt(ws, "docs/artifacts/constructs/01-core/thing-sub-construct.html");
+    one("a seat's subtitle is rendered under the title", subbed,
+      (g) => /<h1>[^<]*<\/h1>\s*<p class="subtitle">One plain promise, under the title.<\/p>/.test(g));
+    one("a seat without one renders no subtitle line", page, (g) => !/<p class="subtitle">/.test(g));
     rmSync(more, { recursive: true, force: true });
 
     // A `\|` in a cell is a pipe the author wants shown. The splitter cut the cell in two and the
