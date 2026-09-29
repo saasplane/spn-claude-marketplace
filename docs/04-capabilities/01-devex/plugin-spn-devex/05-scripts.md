@@ -21,6 +21,8 @@ Everything this plugin can execute sits under `packages/plugin-spn-devex/src/scr
 | The governing mirror | `packages/plugin-spn-devex/src/scripts/checks/mirror.ts` | names the capability document an edit belongs to |
 | A release nobody agreed to | `packages/plugin-spn-devex/src/scripts/checks/release-go.ts` | refuses the bump that cannot be taken back without a recorded go |
 | The two workstream gates | `packages/plugin-spn-devex/src/scripts/checks/split-plan.ts` | the documents-first warning, the close refusal, and the parser both read |
+| The workstream's Cycles | `packages/plugin-spn-devex/src/scripts/commands/docs/cycles.ts` | prints an approach page's Cycles table read from its arcs, run as `spn-devex docs cycles` |
+| What a workstream cost | `packages/plugin-spn-devex/src/scripts/commands/workspace/tokens.ts` | tokens per workstream, arc and order, joining hook telemetry to the session's transcripts, run as `spn-devex workspace tokens` |
 | The corpus commands | `packages/plugin-spn-devex/src/scripts/commands/docs/` | `audit` · `face` · `page` · `status` · `topics` · `coverage` · `figure`, one file per action, run as `spn-devex docs <action>` |
 | The corpus against itself | `packages/plugin-spn-devex/src/scripts/commands/docs/coherence.ts` | the questions answered only across documents, run as `spn-devex docs coherence` |
 | The book comparison | `packages/plugin-spn-devex/src/scripts/commands/restates/check.ts` | each restatement re-hashed against the chapter it names, run as `spn-devex restates check` |
@@ -48,7 +50,7 @@ Everything this plugin can execute sits under `packages/plugin-spn-devex/src/scr
 ### One entry, `<group> <action>`, dispatches every command
 
 **Why** — *sixteen tools reached by sixteen separate paths is a vocabulary that grows by one every time somebody adds a tool*, and a partner has no way to list what exists short of reading the folder. The foundation's `04-plugins/02-shape.md` states the alternative: one entry, `<group> <action>`, `help --json` listing every action as data.
-**What** — `cli.ts` lazily imports `commands/<group>/<action>.ts`, one file per action, each exporting `{ describe, run }`. This plugin's groups: `docs` (`audit` · `face` · `page` · `status` · `topics` · `coverage` · `prose` · `coherence` · `figure`) · `restates`, one action per `spn:restates` block kind — `docs` · `files` · `decisions` (the foundation's decision `RD.DEVEX.AGENT.072`) — plus `check`, running all three · `behaviours` (`stamp` · `check` · `coverage`) · `plugin` (`partner` · `paths` · `build` · `timings`). No `tools/` folder survives: every path that once named one now names a command.
+**What** — `cli.ts` lazily imports `commands/<group>/<action>.ts`, one file per action, each exporting `{ describe, run }`. This plugin's groups: `docs` (`audit` · `face` · `page` · `status` · `topics` · `coverage` · `prose` · `coherence` · `figure` · `cycles`) · `restates`, one action per `spn:restates` block kind — `docs` · `files` · `decisions` (the foundation's decision `RD.DEVEX.AGENT.072`) — plus `check`, running all three · `behaviours` (`stamp` · `check` · `coverage`) · `plugin` (`partner` · `paths` · `build` · `timings`) · `workspace` (`tokens`). No `tools/` folder survives: every path that once named one now names a command.
 **How** — a command is printed as `spn-devex docs audit`, never as a bare path — a file under `commands/` is reachable, or it is not there, and nothing outside that folder is dispatched.
 
 ### A check says which of its rules it carries
@@ -95,7 +97,19 @@ Everything this plugin can execute sits under `packages/plugin-spn-devex/src/scr
 
 **Why** — *closing a scope with work pending is good housekeeping*. What must not happen is a row nobody decided.
 **What** — landed, carried and deferred all pass, and only an undecided row refuses. There is no override: recording the deferral is the way through. The other gate in the same file warns when an approach page is written into a pocket while rows sit unlanded.
-**How** — the split plan is the approach page's `How` tables read by their scope column, and the dispatcher registers the two gates separately so anybody measuring the cost can tell which one swept the workspace. `packages/plugin-spn-devex/src/scripts/checks/split-plan.ts`.
+**How** — the split plan is read from the arcs' own step tables — `Repo` is the scope column and `State` is the state — and an approach page's older `How` tables, carrying a `Scope` column, are read the same way for a workstream argued before that shape. The dispatcher registers the two gates separately so anybody measuring the cost can tell which one swept the workspace. `packages/plugin-spn-devex/src/scripts/checks/split-plan.ts`.
+
+### Cycles is read from the arcs, and prints rather than writes
+
+**Why** — *a page a person typed drifts from the arcs it is meant to summarise*, and the close gate already reads the arcs for `split-plan.ts` — a second, hand-kept table would state the same fact twice.
+**What** — `docs cycles <workstream>` reads every file under the workstream's `arcs/` folder, and for each takes its heading, its status word, and the sentence that follows the status (or its `Decides` field where none follows), then prints the table an approach page's Cycles subsection carries: one row per arc, `Arc · What it does · Status`, in the order the arcs run. It writes no file — the agent pastes the rows, and `doc-check` compares a page's own table against this same reading.
+**How** — the longest status word is matched first, so `PART-LANDED` is never read as `LANDED`, and an arc whose status the set does not know is still printed, named by its file, rather than guessed at. `packages/plugin-spn-devex/src/scripts/commands/docs/cycles.ts`.
+
+### Tokens are joined by session, because a reply names no path
+
+**Why** — *a reply is written before the tool call that follows it*, so nothing on a transcript line says which workstream, arc or order paid for that reply.
+**What** — `workspace tokens` reads every tagged line the telemetry log carries, and every transcript the same session wrote — the main window's file and each subagent's file under it — counts each reply once by its `message.id`, and gives a reply the tag of the first tagged line at or after its own moment. A session carrying no tagged line at all is counted as untagged rather than guessed at.
+**How** — a workstream filter matches a number or a whole folder name, and `--json` hands over the same tree the printed report shows. `packages/plugin-spn-devex/src/scripts/commands/workspace/tokens.ts`.
 
 ### The document check is calibrated to the rule, never to the corpus
 
@@ -142,7 +156,7 @@ Everything this plugin can execute sits under `packages/plugin-spn-devex/src/scr
 ### A page is produced here, and its shape is stated in the book
 
 **Why** — *a page a person edited is a second source of truth*, and the edit survives until the next production run silently overwrites it. What a page is made of is not this folder's to decide either: the block vocabulary, the figure grammar and the furniture are the foundation's, and where the two disagree the chapter wins.
-**What** — `page` produces, `face` writes the generated regions of a face, `figures` measures every drawing, and `audit` re-renders the seat file with the same link rewriter and refuses any difference with one message: edit the seat file and produce it again. The renderer is a few hundred lines with no dependency, because a partner installs nothing to read a document. Every box in a figure is measured from its own text, so a connector lands on an edge and a label fits by construction, and the checker reads the drawn result rather than the specification — a figure authored as drawing by hand is exactly the one nothing measured.
+**What** — `page` produces, `face` writes the generated regions of a face, `figures` measures every drawing, and `audit` re-renders the seat file with the same link rewriter and refuses any difference with one message: edit the seat file and produce it again. The masthead's Subtitle is the seat's own `subtitle` field, one plain sentence rendered under the title; the produced footer is always empty, because a template's own footer is a note to whoever copies it and never furniture a reader should see. The renderer is a few hundred lines with no dependency, because a partner installs nothing to read a document. Every box in a figure is measured from its own text, so a connector lands on an edge and a label fits by construction, and the checker reads the drawn result rather than the specification — a figure authored as drawing by hand is exactly the one nothing measured.
 **How** — the pocket mirrors the seat folder for folder, so the pair is found by path alone; each relative link is re-expressed against the page's own location as it is written; and a page's behaviour rows are joined from the register beside it rather than typed into the seat file. Read `packages/plugin-spn-devex/src/scripts/commands/docs/page.ts`, then `packages/plugin-spn-devex/src/scripts/lib/render.ts`, `packages/plugin-spn-devex/src/scripts/lib/draw.ts` and `packages/plugin-spn-devex/src/scripts/lib/figures.ts`, against `spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md`.
 
 ## Between modules

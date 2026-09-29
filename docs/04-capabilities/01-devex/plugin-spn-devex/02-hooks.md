@@ -61,7 +61,7 @@
 
 **Why** — *the workspace is discovered, never declared*. A file naming the members in prose is wrong the first time somebody clones another repository, and a repository that is absent is not missing.
 **What** — nothing in the opening screen is typed. The script walks the root, reads each `sprepo.json` for the world and the stack claim, checks the wiring that claim implies, and lists every workstream in all three states. Where no manifest exists anywhere, it asks instead of reading and points at the `bootstrap` skill.
-**How** — three parts in a fixed order: a welcome, the ground, and exactly one open question. You arrive with a subject in mind, so a list of options would only talk you out of it. Every read is wrapped and the exit code is always zero, because this output is the session's first screen and a crash here is a window that opens on a stack trace. `packages/plugin-spn-devex/src/scripts/events/orientation.ts`.
+**How** — the first reply opens with the welcome, whatever the prompt, then **one status line** — `7 repos · 1 workstream open (008) · 3 other windows open here` — that drops any part reading zero and adds a clause, never a second line, for an unwired repository, a stale plugin, or a rung below an ordinary session. The tables of repositories and workstreams, and the one open question, are held back for when you ask: a reply opening on a table shows numbers before anybody asked for them. Every read is wrapped and the exit code is always zero, because this output is the session's first screen and a crash here is a window that opens on a stack trace. `packages/plugin-spn-devex/src/scripts/events/orientation.ts`.
 
 ### The close is congratulated after it lands, not before
 
@@ -72,14 +72,14 @@
 ### A turn that ends warns and never refuses
 
 **Why** — *the turn is already written*, and a refusal at that point would only lose it.
-**What** — three warnings: a turn ending while the running arc still has rows nothing blocks, an arc marked `HELD` that names no live card, and a reply announcing a new window without the handover fields.
-**How** — the runnable warning exists because reporting is not stopping; a milestone line belongs between steps, in the same turn as the next step. `packages/plugin-spn-devex/src/scripts/events/stop.ts`.
+**What** — warnings for a reply that puts a decision with the card's shape incomplete, an arc *this session* wrote to that still has runnable rows and no card open, an arc marked `HELD` that names no live card, a reply that passes work on while a card is open or the handover's seven fields are missing, and the corpus questions a whole-tree read still owes.
+**How** — `runnable` reads a baseline kept per session, under `.spndevex/.debug/stop/sessions/`, comparing each open arc's step-row hash against what this session last saw and reading its own transcript for which arcs it wrote — so an arc another window is executing never fires here. A status of `PROPOSED`, `DECIDED` or `HELD` is never runnable, whoever touched it, and a row already marked `in progress <date> <time> <offset>` is named with its age rather than counted as unfinished, because somebody may still be on it. `[handover]` strips fenced blocks, code spans, block quotes and quoted text before it looks for a phrase that passes work on, so a reply quoting the check's own words, or a `diff` block previewing a change, is never mistaken for one. `packages/plugin-spn-devex/src/scripts/events/stop.ts`.
 
 ### Measuring is free; writing is the cost
 
 **Why** — *telemetry must not make the gate slower*, and a gate that fails because timing failed is worse than a number nobody recorded.
-**What** — every run is timed. Whether any of it reaches disk is a switch the developer sets, and every path swallows its own errors.
-**How** — `begin` touches no filesystem; the switch is read at the moment of writing, under a fixed size cap. `packages/plugin-spn-devex/src/scripts/lib/timing.ts`.
+**What** — every run is timed, and each line also names the workstream, arc, order and agent the call belongs to, so a later reading can join a cost to the work that paid it without guessing from a path. Whether any of it reaches disk is a switch the developer sets, and every path swallows its own errors.
+**How** — `begin` touches no filesystem; the switch is read at the moment of writing, under a fixed size cap; `tagsOf` matches every string in a call's input against a workstream path and keeps the most specific match — an order over an arc over a bare workstream — reading the hook's own `agent_id` for which agent made the call. `packages/plugin-spn-devex/src/scripts/lib/timing.ts`.
 
 ## Between modules
 

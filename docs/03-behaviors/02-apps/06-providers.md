@@ -32,7 +32,12 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.PROVIDERS.17 | Web developer | be refused a navigation assertion whose host pattern could match inside a longer address | The host is compared as a parsed host, or the pattern is anchored | NEGATIVE | UNIT | PLANNED | — |
 | MKT.PROVIDERS.18 | Quality engineer | be warned rather than refused where the model behind a rule is still open | The coverage findings warn, and the file marks what to replace when the model lands | POSITIVE | UNIT | PLANNED | — |
 | MKT.PROVIDERS.19 | Backend developer | find the one home of a rule that is written in two places | The header names the command-line tool's own file, and the instruction to change it there first | POSITIVE | UNIT | PLANNED | — |
-| MKT.PROVIDERS.28 | Backend developer | have a project's coverage floor raised after a run without typing a number | The floor script sets each of the four numbers to the measured value rounded down, with the date in a comment beside it | POSITIVE | UNIT | PLANNED | — |
-| MKT.PROVIDERS.29 | Backend developer | run the floor script after a run that measured less than the floor | The floor is left as it was, and the script says the run falls below it | NEGATIVE | UNIT | PLANNED | — |
-| MKT.PROVIDERS.30 | Backend developer | be refused an edit that lowers a coverage floor | The check denies the write, naming each measure, the floor it had and the floor the edit would leave | NEGATIVE | UNIT | PLANNED | — |
 | MKT.PROVIDERS.31 | Backend developer | be refused an exclude that gives no reason | The check denies a new `coveragePathIgnorePatterns` or `coverage.exclude` entry with no comment beside it | NEGATIVE | UNIT | PLANNED | — |
+
+## Retired ids
+
+**A promise is re-issued under the construct that now makes it, and the id it used to carry is never reused.** The floor is gone: coverage is measured and reported, never enforced, and no ratchet raises a number nobody checked (`RD.SUPPORT.APPS.133`, amended 2026-09-29).
+
+| Retired | Re-issued as |
+| --- | --- |
+| `MKT.PROVIDERS.28` · `MKT.PROVIDERS.29` · `MKT.PROVIDERS.30` | none — the floor script, the raise and the write-time refusal are deleted; `MKT.PROVIDERS.31` above, the exclude's reason, is what survives |

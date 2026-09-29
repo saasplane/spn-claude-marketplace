@@ -37,7 +37,7 @@ The folder divides by what calls each file. `events/` holds the one process the 
 ### One entry, `<group> <action>`, dispatches under two groups
 
 **Why** — the foundation's `04-plugins/02-shape.md` states the target every plugin here realizes: one entry, `<group> <action>`, in place of a tool reached by typing its own path.
-**What** — `cli.ts` dispatches to `commands/<group>/<action>.ts`, one file per action. This plugin's two groups: `coverage` (`floor` · `check`, over the TS parts under `providers/ts`) and `library` (`catalogue`).
+**What** — `cli.ts` dispatches to `commands/<group>/<action>.ts`, one file per action. This plugin's two groups: `coverage` (`check`, over the TS parts under `providers/ts`) and `library` (`catalogue`).
 **How** — a command is printed as `spn-apps coverage check`, never as a bare path.
 
 ### The gate composes the provider path, and that is why a second stack costs no edit

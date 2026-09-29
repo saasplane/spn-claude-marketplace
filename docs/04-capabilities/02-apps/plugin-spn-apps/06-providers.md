@@ -23,9 +23,8 @@ One folder sits under `packages/plugin-spn-apps/src/providers/`, named for the s
 | The host assertion | `packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/host-assertion.ts` | an unanchored host pattern in a navigation assertion |
 | The assertion message | `packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/assertion-message.ts` | a journey assertion with nothing explaining an absence |
 | The coverage warnings | `packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/coverage.ts` | a route nothing exercises, a mutation nothing undoes, a doubled seam |
-| The coverage floor check | `packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/coverage-floor.ts` | a write that lowers a floor, or adds an exclude with no reason |
-| The coverage floor script | `packages/plugin-spn-apps/src/providers/ts/scripts/lib/coverage-floor.ts` | raises each floor in a project's own configuration to what a run measured |
-| How a floor and its excludes are read | `packages/plugin-spn-apps/src/providers/ts/scripts/lib/floors.ts` | one parse of a Jest or Vitest configuration, shared by the floor script and the floor check |
+| The coverage exclude check | `packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/coverage-excludes.ts` | refuses a new exclude with no comment giving its reason |
+| How an exclude is read | `packages/plugin-spn-apps/src/providers/ts/scripts/lib/coverage-excludes.ts` | one parse of a Jest or Vitest configuration's exclude list, and whether each entry carries a reason |
 | Where a case lives, and its title | `packages/plugin-spn-apps/src/providers/ts/scripts/lib/cases.ts` | each tier's folder and file pattern, and the ids a case title cites, for the join |
 
 ## Follows the pattern
@@ -77,11 +76,11 @@ One folder sits under `packages/plugin-spn-apps/src/providers/`, named for the s
 **What** — the coverage findings warn and under-report on purpose; the grammar, naming, sequencing, cycle and host rules refuse, because each is settled and each names its own exception.
 **How** — the coverage file marks the function to replace when the model lands, and keeps its trigger and its message meanwhile. `packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/coverage.ts`.
 
-### A floor rises by script and never falls by hand
+### An exclude carries its reason, and nothing else is enforced
 
-**Why** — *without a ratchet, the cheapest way past a failing floor is to edit it down* (the book's RD.SUPPORT.APPS.133). A number somebody typed is a number nobody measured, and an exclude with no reason cannot be told from code nobody wrote a case for.
-**What** — after a run that collected coverage, the script reads `coverage-summary.json` and raises each of the four numbers in `coverageThreshold.global` or `coverage.thresholds` to the measured value rounded down, with the date in a comment. A number above the measurement is left as it was, and the script says the run falls below it. The check refuses a write that lowers any of the four, and refuses a new `coveragePathIgnorePatterns` or `coverage.exclude` entry with no comment beside it. A Playwright configuration is never read.
-**How** — the script writes the file directly, so the check at the moment of a write sees only a person's edit. `packages/plugin-spn-apps/src/providers/ts/scripts/lib/coverage-floor.ts` and `packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/coverage-floor.ts`, proven on fixtures in `packages/plugin-spn-apps/tests/unit/providers/ts/lib/t-coverage-floor.mjs` and `packages/plugin-spn-apps/tests/unit/providers/ts/checks/_tests/t-coverage-floor.mjs`.
+**Why** — *code coverage is measured and reported, never enforced* (`RD.SUPPORT.APPS.133`, amended 2026-09-29 to drop the floor): a percentage used as a gate gets met the cheapest way, by lowering the number or by writing cases that run code without checking what it does.
+**What** — the one rule left reads no percentage at all. A Jest `coveragePathIgnorePatterns` entry or a Vitest `coverage.exclude` entry is refused only where it carries no comment, on its own line or the line above it, saying why that code cannot be reached by a case. An exclude already on disk is not this write's to answer for, and a Playwright configuration is never read.
+**How** — the check reads the file as it stood before the write and as the write would leave it, so only what the pending write adds is judged. `packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/coverage-excludes.ts` and `packages/plugin-spn-apps/src/providers/ts/scripts/lib/coverage-excludes.ts`, proven in `packages/plugin-spn-apps/tests/unit/providers/ts/checks/_tests/t-coverage-excludes.mjs`.
 
 ### Two rules exist because a green run was lying
 

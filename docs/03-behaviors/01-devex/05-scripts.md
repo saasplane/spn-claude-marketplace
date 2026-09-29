@@ -54,6 +54,9 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.56 | Quality engineer | ask for the measurement in a foundation repository | The tool answers that the rows are promises with no status, and that no report is owed | NEGATIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.57 | Quality engineer | measure an unchanged tree twice | Both measurements are the same bytes, with the same digest, and `report.current` says whether the page already carries it | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.59 | Partner / integrator | discover every command this plugin offers without reading source | `cli.ts help --json` lists every `<group> <action>` with its own description, and an unknown group or action is refused by name — proven in `tests/unit/scripts/t-cli.mjs` | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.63 | Engineering leader | read an approach page's Cycles table straight from the arcs | `docs cycles <workstream>` prints one row per arc — its name, its first sentence, and its status word — in the order the arcs run, naming any arc whose status the set does not know | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.64 | Engineering leader | see what a workstream cost in tokens, by arc and by order | `workspace tokens` joins the telemetry log to a session's transcripts by `session`, counting each reply once, and reports a session with no tagged line as untagged rather than guessing | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.65 | Editor | give a produced page a one-sentence promise under its title | The masthead's Subtitle is rendered from the seat's own `subtitle` field, and the produced footer is always empty | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

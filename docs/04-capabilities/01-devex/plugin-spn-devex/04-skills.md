@@ -50,6 +50,24 @@
 **What** — `report` produces a report or an approach document into a node's artifacts pocket only on request, and says so in its own description.
 **How** — the templates it fills are the book's, and the commands each one reads from come from the domain plugin. `packages/plugin-spn-devex/src/skills/report/SKILL.md`.
 
+### Every skill opens by pointing at the loop, never repeating it
+
+**Why** — *`spn-engineer.md` is an agent brief, and nothing loads an agent brief at session start*, so a loop rule written only there reached a session by accident, whenever that persona happened to be convened.
+**What** — how a session opens on the welcome and one status line, how it reads and routes each prompt, where a new ask goes, what a prompt does to a running arc, the front desk that dispatches batches to subagents, and the three shapes a reply closes in, all sit in one ref now, and every stage skill's opening paragraph points at it before doing anything else. `spn-engineer.md` keeps the persona and cites the same file rather than restating the loop.
+**How** — one entry line, worded alike, opens every `SKILL.md` under this folder and under `packages/plugin-spn-apps/src/skills/` and `packages/plugin-spn-infra/src/skills/`. `packages/plugin-spn-devex/src/skills/develop/SKILL.md:27`, citing `refs/devex/workspace/workstream.md`.
+
+### `develop` runs documents, then source, then tests, then run
+
+**Why** — *going part by part with no fixed order leaves you, at every moment, with code nobody has described and tests for half a shape* — the foundation's `01-function/04-develop.md` § Model states the rule this skill sequences.
+**What** — a part of a change runs all four stages before the next part starts: the doc seat first, so the code is written against a page rather than a page written to match the code; then the contract, the regeneration and the implementation; then the tests, at the tier that proves the change; then the checks and suites against that part's own acceptance.
+**How** — `packages/plugin-spn-devex/src/skills/develop/SKILL.md` § The loop.
+
+### `test` reports coverage and enforces none
+
+**Why** — *a percentage used as a gate gets met the cheapest way* — by lowering the number, or by writing cases that run code without checking what it does (`RD.SUPPORT.APPS.133`).
+**What** — the skill states coverage as measured and reported, never enforced: no configuration carries a threshold, an exclude carries its reason beside it, and a journey configuration collects none. It also carries the per-tier id rule — which cases must carry the id of the row they prove, and which may instead name a fixture or a private rule — and the full-run rule: a whole-repository run fixes a row proven at the wrong tier, a runner that wrote no result, a case with no id, or a red case, before the report is written.
+**How** — `packages/plugin-spn-devex/src/skills/test/SKILL.md` § Code coverage is reported, never enforced · § Which case carries an id.
+
 ### A skill names the command group, never the command
 
 **Why** — *the command belongs to the stack that realizes it*. A stack-agnostic skill naming a concrete command would be wrong in every repository that runs a different one.

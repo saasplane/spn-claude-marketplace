@@ -13,6 +13,7 @@ The files under `packages/plugin-spn-devex/src/refs/devex/` each restate part of
 | Part of the construct | Lives in | What it is |
 | --- | --- | --- |
 | The restatements | `packages/plugin-spn-devex/src/refs/devex/` | one folder per part of the book restated: `agent` — plugins, skills and the lenses · `function` — the stages · `utils` — the CLI · `workspace` — the workspace, the workstream, what a repository declares, and the doc rules |
+| The workstream loop | `packages/plugin-spn-devex/src/refs/devex/workspace/workstream.md` | how a session opens, reads a prompt, moves an arc through its states, and closes a reply — cited by every skill before it acts |
 | How the folder is arranged | `packages/plugin-spn-devex/src/refs/README.md` | only domain folders at the top, and which files are authored, generated or copied |
 | The CLI restated | `packages/plugin-spn-devex/src/refs/devex/utils/spnutils.md` | one file, merging what used to be a `README.md` and a separate `commands.md` — restated from the book's `01-spnutils.md` chapters through a `docs` citation, in its own words |
 | The copied templates | `packages/plugin-spn-devex/src/refs/devex/workspace/docs/templates/` | copied byte for byte, because a template is copied rather than restated |
@@ -50,6 +51,18 @@ The files under `packages/plugin-spn-devex/src/refs/devex/` each restate part of
 **Why** — *a `RESTATES:` line in a source file names a chapter and carries no hash*, so nothing can compare it. It tells a reader where the rule lives and warns nobody when it moves.
 **What** — every hook and tool in this plugin opens with such a line, and that is deliberate: the rule is that a change is made in the chapter first, then here, in the same change. The stamped block is what a drift run reads.
 **How** — compare the header of `packages/plugin-spn-devex/src/scripts/checks/doc-check.ts` with the block at the top of `packages/plugin-spn-devex/src/refs/devex/workspace/docs/doc-sets.md`.
+
+### The loop moved out of the unloaded agent, into a ref every skill cites
+
+**Why** — *nothing loads an agent brief at session start*, so a rule written only into `spn-engineer.md` reached a session by accident, whenever that persona happened to be convened.
+**What** — how a session opens on the welcome and one status line, how it reads and routes each prompt, where a new ask goes, what a prompt does to a running arc, the front desk that dispatches batches to subagents, and the three shapes a reply closes in, sit in `workstream.md` now; `spn-engineer.md` keeps only the persona and points at it.
+**How** — one entry line, cited by name, opens every stage skill in all three plugins. `packages/plugin-spn-devex/src/refs/devex/workspace/workstream.md`.
+
+### The masthead is three levels, and the page-writing refs restate it once
+
+**Why** — *the same rule stated in a rewriter's brief and in the page templates drifts the moment one changes*.
+**What** — every page opens on a Title, a Subtitle (one plain sentence, the seat's own `subtitle` field) and a Description (one paragraph, in the standfirst's place), all in plain language, none of them a number, a slogan, or a book word the same sentence does not explain.
+**How** — `doc-sets.md` § Every page opens on a masthead of three levels states which page kind carries which; `docs/blocks.md` § The masthead comes first, and it is three levels states the Subtitle field and where it is never written; `agent/lenses/voice.md` carries the same rule as the readability bar every prose rewrite is held to.
 
 ### A ref is loaded when something names it
 
