@@ -114,4 +114,4 @@ Destructive, and the local stack is frequently **shared**: `infra platform down 
 
 A seed or template migration edit only lands on a clean re-migrate. A warm database keeps the old row, so a seed change tested against a warm stack proves nothing about a fresh one.
 
-**The repo supplies the specifics.** Read ports, app names, vendor stacks, seeded principals, and host names from the repo being reset — its own `CLAUDE.md` documents them. This skill supplies the sequence; it never hardcodes one repo's instance of it.
+**The repo supplies the specifics.** Read ports, app names, vendor stacks, seeded principals, and host names from the repo being reset — its own docs document them: the reset guide, the estate manifests and the seed files. This skill supplies the sequence; it never hardcodes one repo's instance of it.

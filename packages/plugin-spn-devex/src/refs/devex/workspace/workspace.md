@@ -11,12 +11,12 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "18cbd178"
+      "seen": "e61d18f5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "The agent is updated first, and reloaded before anything runs",
-      "seen": "97526696"
+      "seen": "46fd7a5f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -79,9 +79,10 @@ A session opens on the **workspace folder** — the discovered set of sibling ch
 
 Follow this discipline, per file touched:
 
-1. **Resolve the law first.** Before editing a file, know which repo governs it — load that repo's `CLAUDE.md` and its generated `.claude/saasplane/rules.md` if you have not already this session, and follow those for those files.
+1. **Resolve the law first.** Before editing a file, know which repo governs it. That repo's `CLAUDE.md` loads the first time you work there and brings its concept, its docs map and its inventory; open the seat the task needs from the map.
 2. **Never carry one repo's conventions into another's files.** A convention right in one repo is frequently wrong in the next: one repo bans implementation identifiers, another is built from them. The manifest decides, not the file you edited last.
 3. **Doors hold everywhere.** A skill, rule or hook that declares a repo type or stack claim activates only where its declaration matches. An infra skill in a web repo refuses by name.
+4. **Never touch `~/.claude`.** A workspace wires itself through its own `.claude/`, and the machine's other Claude work stays untouched.
 
 Read across freely, in every direction — it needs no ceremony.
 
@@ -483,13 +484,13 @@ One constraint decides where every common rule lives. **A product repo built on 
 | Channel | Travels to a consumer? | Carries |
 | --- | --- | --- |
 | The **plugin**, installed from the marketplace | **yes** | every common rule — foundation doctrine and stack standards alike |
-| The repo's own `CLAUDE.md` | yes, it is that repo's file | only what is true of that one repo |
+| The repo's own `CLAUDE.md` | yes, generated in that repo | imports of that repo's concept, docs map and inventory |
 | The **generated inventory** beside it | yes, written locally | what this repo currently *contains*, never a rule |
 | A relative path into a sibling checkout | **no** | nothing a consumer can rely on |
 
 **Common rules are carried by the plugin, never by a link into a peer repo.** Cite by name any document that must be cited across repos, and let the plugin carry the substance.
 
-**The rule reaches every file that ships inside a repository, agent instruments included** (decision RD.DEVEX.WORKSPACE.099). A `CLAUDE.md` is walked by no validator, but it travels with its repo and is read where the siblings may be absent — so it cites by name too. **The workspace's own `CLAUDE.md` is the one exception**: the sibling checkouts are its subject, and it ships nowhere. And a repository's instruction file states what is true of that repository, never what other repositories may do.
+**The rule reaches every file that ships inside a repository, agent instruments included** (decision RD.DEVEX.WORKSPACE.099). A `CLAUDE.md` is walked by no validator, but it travels with its repo and is read where the siblings may be absent — so it cites by name too. The workspace's `CLAUDE.md` is generated too and names no checkout, so it needs no exception. And a repository's instruction file states what is true of that repository, never what other repositories may do.
 
 ## Skills are what a consumer acts on; the book is why
 
@@ -501,10 +502,10 @@ Guidance lives in three instrument layers, and they are not interchangeable: the
 | --- | --- | --- |
 | every repo on the backbone | the core plugin, as a `refs/` card | it must reach a consumer with no peers |
 | a stack, in any repo | that stack's plugin skills | same, scoped to the stack that ships it |
-| one repo only | that repo's `CLAUDE.md` | nobody else can act on it |
+| one repo only | that repo's own docs, which its `CLAUDE.md` imports or maps | nobody else can act on it |
 | what a repo currently contains | its generated inventory | it is a fact, not a rule, and it changes on install |
 
-**Do not restate a plugin rule in a repo's instruction file.** A rule written twice drifts. If a rule seems worth stating in more than one repo, that is the signal it belongs in the plugin instead.
+**Write nothing into a repo's `CLAUDE.md`: `agent-sync` owns it.** A fact about one repo goes into that repo's docs, and a rule for more than one repo goes into a plugin. A rule written twice drifts.
 
 ## What never crosses
 

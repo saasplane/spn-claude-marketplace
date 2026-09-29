@@ -23,7 +23,7 @@
     },
     {
       "path": "spn-foundation/CONCEPT.md",
-      "seen": "a6015043"
+      "seen": "cf94a2b0"
     }
   ]
 }

@@ -63,7 +63,7 @@ Each plugin folder carries one manifest at `.claude-plugin/plugin.json`, holding
 
 ### The version names what is published
 
-This repository releases at the version a plugin already carries, then moves the number. So the field answers *which bytes are installed*, and not *what am I building*. Each plugin counts on its own, following the marketplace's own convention of one version per plugin, and no file derives one number from another.
+This repository releases at the version a plugin already carries, then moves the number. So the field answers *which bytes are installed*, and not *what am I building*. The three plugins carry one version and move together: a release moves all three, changed or not (RD.DEVEX.007).
 
 ### The marketplace entry
 
