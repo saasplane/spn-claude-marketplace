@@ -98,6 +98,28 @@ one("the one spelling the Python did handle, so the port is held to it",
   "mv .spndevex/workstreams/open/001-a-subject .spndevex/workstreams/closed/001-a-subject",
   "speaks", { says: "1 row landed" });
 
+// THE SPLIT PLAN IS THE ARCS' STEP ROWS. A workstream written after that rule carries its plan in
+// each arc's `## Steps` table and may have no page at all, so the count comes from the arcs.
+const stepArc = (rows) => `# N2 — the arc\n\nStatus: **LANDED**\n\n## Steps\n\n` +
+  `| # | Repo | Altitude | What | Mechanism | Acceptance | State |\n| --- | --- | --- | --- | --- | --- | --- |\n` +
+  rows.map(([id, repo, state]) => `| ${id} | ${repo} | DOCS | a change | by hand | audit | ${state} |`).join("\n") + "\n\n## Log\n\n- **2026-09-29 — go.**\n";
+
+one("a close with no page counts the arcs' landed steps, dotted ones included",
+  workspace("m1-cl-arcs", {
+    ".spndevex/workstreams/closed/001-a-subject/arcs/N2-the-arc.md":
+      stepArc([["1", "spn-foundation", "✅ landed — `abc1234`"], ["3e.1", "spn-support-ts", "LANDED — `def5678`"], ["4", "spn-platform-ts", "⊘ deferred until asked"]]),
+  }),
+  "mv .spndevex/workstreams/open/001-a-subject .spndevex/workstreams/closed/",
+  "speaks", { says: "2 rows landed, and 1 deferred with its trigger", parity: false, why: "the Python reads only a page" });
+
+one("a page's scope rows and the arcs' step rows are one plan",
+  workspace("m1-cl-both", {
+    ".spndevex/workstreams/closed/001-a-subject/a-subject-approach.html": page([["a", "spn-foundation", "&#x2705; landed"]]),
+    ".spndevex/workstreams/closed/001-a-subject/arcs/N2-the-arc.md": stepArc([["1", "spn-support-ts", "✅ landed"]]),
+  }),
+  "mv .spndevex/workstreams/open/001-a-subject .spndevex/workstreams/closed/",
+  "speaks", { says: "2 rows landed", parity: false, why: "the Python reads only a page" });
+
 // KNOWN-BAD — every move that closed nothing and must stay silent.
 one("backlog moving into open is work starting, not finishing",
   build("cl-start", [["a", "spn-foundation", "&#x2705; landed"]], "backlog"),
@@ -112,6 +134,11 @@ one("an ordinary move inside a repository",
 one("a command that moves nothing",
   build("cl-nothing", [["a", "spn-foundation", "&#x2705; landed"]]),
   "git status --short",
+  "silent");
+
+one("a folder with neither a page nor a step table is not a scope finishing",
+  workspace("m1-cl-empty", { ".spndevex/workstreams/closed/001-a-subject/notes/a.md": "a note\n" }),
+  "mv .spndevex/workstreams/open/001-a-subject .spndevex/workstreams/closed/",
   "silent");
 
 one("a loose file moved into closed/ is not a scope finishing",

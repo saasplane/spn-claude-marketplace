@@ -92,6 +92,41 @@ function build(name, { eyebrow, rows = LANDED, cards = "", log = "", state = "op
   });
 }
 
+// THE SPLIT PLAN IS THE ARCS' STEP ROWS (RD.DEVEX.WORKSPACE.038, `05-artifacts.md` § The split plan
+// is the arcs' step rows). An arc's `## Steps` table carries Repo · Altitude · What · Mechanism ·
+// Acceptance · State, and the Repo column is the scope. Each row here is `[id, repo, what, state]`.
+const stepArc = (rows, { status = "LANDED", log = "" } = {}) => `# N2 — the arc
+
+Status: **${status}**
+
+| Field | This arc |
+| --- | --- |
+| **Decides** | what the steps do |
+
+## Steps
+
+| # | Repo | Altitude | What | Mechanism | Acceptance | State |
+| --- | --- | --- | --- | --- | --- | --- |
+${rows.map(([id, repo, what, state]) => `| ${id} | ${repo} | DOCS | ${what} | by hand | audit → 0 RULE | ${state} |`).join("\n")}
+
+## Log
+
+- **2026-09-29 — go.**
+${log}`;
+
+/** A workstream whose only split plan is its arc's step table; a page is added only where asked. */
+function buildArcs(name, rows, { page: withPage = false, log = "" } = {}) {
+  const folder = ".spndevex/workstreams/open/001-a-subject";
+  return workspace(name, {
+    [`${folder}/arcs/N2-the-arc.md`]: stepArc(rows, { log }),
+    ...(withPage ? { [`${folder}/a-subject-approach.html`]: `<div class="eyebrow">Workstream 001 &middot; closed</div>\n<h1>A subject</h1>\n` } : {}),
+    ".spndevex/workstreams/backlog/002-a-successor/a-successor-approach.html": "<h1>002</h1>\n",
+    "spn-support-ts/artifacts/approaches/keep.md": "placeholder\n",
+  });
+}
+
+const ARC_LANDED = [["1", "spn-foundation", "the chapter", "✅ landed — `abc1234`"], ["3e.1", "spn-support-ts", "the check", "LANDED — `def5678`"]];
+
 // ---------------------------------------------------------------- running the two gates
 
 function verdict(out) {
@@ -163,6 +198,52 @@ one("landed, carried and deferred all pass", "close",
 one("backlog moving into open is not a close", "close",
   build("sp-start", { rows: [...LANDED, ["the third", "spn-platform-ts", ""]], state: "backlog" }),
   move(".spndevex/workstreams/backlog/001-a-subject", ".spndevex/workstreams/open/"),
+  "silent");
+
+console.log("\n=== split-plan — the close gate reads the arcs' step rows");
+
+one("an arc step nobody decided refuses the close, named by arc and step", "close",
+  buildArcs("m1-sp-arc-undecided", [...ARC_LANDED, ["4b", "spn-platform-ts", "the third thing", ""]]),
+  move(".spndevex/workstreams/open/001-a-subject", ".spndevex/workstreams/closed/"),
+  "deny", { says: "N2 step 4b — the third thing", parity: false, why: "the Python reads only a page's scope tables" });
+
+// A DOTTED STEP IS A STEP. `3e.1` is how an arc splits a lettered step, and a reader taking only
+// `\d+[a-z]?` skipped it, so an undecided dotted row closed as green.
+one("a dotted step nobody decided refuses too", "close",
+  buildArcs("m1-sp-arc-dotted", [["1", "spn-foundation", "the chapter", "✅ landed"], ["3e.1", "spn-support-ts", "the split half", ""]]),
+  move(".spndevex/workstreams/open/001-a-subject", ".spndevex/workstreams/closed/"),
+  "deny", { says: "N2 step 3e.1", parity: false, why: "the Python reads only a page's scope tables" });
+
+one("every arc step landed, carried or deferred closes, with no page at all", "close",
+  buildArcs("m1-sp-arc-accounted", [...ARC_LANDED, ["4", "spn-platform-ts", "c", "⊘ deferred until a partner asks"], ["5", "spn-infra", "d", "↷ carried to 002-a-successor"]]),
+  move(".spndevex/workstreams/open/001-a-subject", ".spndevex/workstreams/closed/"),
+  "silent", { parity: false, why: "the Python finds no page and refuses" });
+
+// ONLY THE `## Steps` SECTION IS READ. A table in the log that happens to carry Repo and State is a
+// record, and reading it made an empty cell there refuse a close nothing was owed on.
+one("a Repo and State table outside the Steps section is not the plan", "close",
+  buildArcs("m1-sp-arc-logtable", ARC_LANDED, { log: "\n| Repo | State |\n| --- | --- |\n| spn-infra | |\n" }),
+  move(".spndevex/workstreams/open/001-a-subject", ".spndevex/workstreams/closed/"),
+  "silent", { parity: false, why: "the Python finds no page and refuses" });
+
+one("an arc with no step table and no page plan is refused, not passed", "close",
+  workspace("m1-sp-arc-noplan", { ".spndevex/workstreams/open/001-a-subject/arcs/N2-the-arc.md": arc() }),
+  move(".spndevex/workstreams/open/001-a-subject", ".spndevex/workstreams/closed/"),
+  "deny", { says: "step rows of the workstream's arcs" });
+
+one("a page stamped closed with its plan in the arcs closes", "close",
+  buildArcs("m1-sp-arc-page", ARC_LANDED, { page: true }),
+  move(".spndevex/workstreams/open/001-a-subject", ".spndevex/workstreams/closed/"),
+  "silent", { parity: false, why: "the Python reads only the page, which carries no scope table" });
+
+one("writing a seat page while an arc step naming that repo is not landed", "documents-first",
+  buildArcs("m1-sp-arc-seat", [["1", "spn-foundation", "the chapter", "✅ landed"], ["2", "spn-support-ts", "the check", ""]]),
+  { file_path: "spn-support-ts/artifacts/approaches/a-thing-approach.html", content: "<html></html>" },
+  "note", { says: "N2 step 2 — the check", parity: false, why: "the Python reads only a page's scope tables" });
+
+one("and the same write once every row naming it has landed", "documents-first",
+  buildArcs("m1-sp-arc-seat-landed", ARC_LANDED),
+  { file_path: "spn-support-ts/artifacts/approaches/a-thing-approach.html", content: "<html></html>" },
   "silent");
 
 console.log("\n=== split-plan — the documents-first gate, and finding F5");
@@ -375,20 +456,51 @@ fault("a carry naming no successor at all is refused", "⤵ carried", true);
 fault("a carry to a backlog workstream passes", "⤵ carried → 003-cloud-day-0", false);
 fault("an arc of this same workstream is not a carry", "⤵ carried → N15 step 8", false);
 
+// THE FOLDER IS THE STATE, so this is a directory listing rather than a guess. A fixture holds one
+// workstream in each state: the real workspace's `closed/` is emptied as workstreams are archived, and
+// a case that named `010` there failed the day the folder was cleared.
+const STATES_ROOT = workspace("m1-sp-states", {
+  ".spndevex/workstreams/open/008-plain-language/arcs/N1-a.md": "# N1\n",
+  ".spndevex/workstreams/closed/010-register-retrofit/arcs/N1-a.md": "# N1\n",
+  ".spndevex/workstreams/backlog/003-cloud-day-0/arcs/N1-a.md": "# N1\n",
+});
 function where(name, number, want) {
   n += 1;
-  const got = splitPlan.workstreamState(WORKSPACE, number);
+  const got = splitPlan.workstreamState(STATES_ROOT, number);
   const ok = got === want;
   if (!ok) failed += 1;
   console.log(`  ${ok ? "PASS" : "FAIL"}  ${name}\n        expect ${want} · got ${got}`);
 }
 
-// THE FOLDER IS THE STATE, so this is a directory listing rather than a guess. These read the real
-// workspace, which is what makes them worth running: a fixture would agree with whatever it invented.
 where("an open workstream reads open", "008", "open");
 where("a closed one reads closed", "010", "closed");
 where("a parked one reads backlog", "003", "backlog");
 where("a number nobody used reads nothing", "042", null);
+
+console.log("\n=== split-plan — reading an arc's step table");
+{
+  const check = (name, ok) => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${name}`); };
+  for (const id of ["1", "4b", "3e.1", "10a.2b"]) check(`\`${id}\` is a step id`, splitPlan.STEP_ID.test(id));
+  for (const id of ["#", "Field", "**Decides**", "3.", "a1"]) check(`\`${id}\` is not a step id`, !splitPlan.STEP_ID.test(splitPlan.stepId(id)));
+
+  const text = stepArc([["1", "spn-foundation", "the chapter", "✅ landed"], ["**3e.1**", "spn-support-ts", "the split half", ""]]);
+  const rows = splitPlan.arcRowsOf(text, "N2");
+  check("the Repo column is the scope", rows.length === 2 && rows[1].scope === "spn-support-ts");
+  check("a row's label is the arc, the step and its What — never the Repo cell",
+    rows[1].label === "N2 step 3e.1 — the split half");
+  check("the field table above the steps is not read", !rows.some((row) => /Decides/.test(row.label)));
+
+  const steps = splitPlan.stepsOf(text);
+  check("stepsOf finds What and State by header", steps?.[1].what === "the split half" && steps?.[1].state === "");
+  const older = "# N1\n\n## Steps\n\n| # | What | Where | How you would know |\n| --- | --- | --- | --- |\n| 1 | a thing | here | ✅ landed |\n";
+  const old = splitPlan.stepsOf(older);
+  check("an older table with no State column reads What and a null state", old?.[0].what === "a thing" && old?.[0].state === null);
+  check("an arc with no Steps section has no steps, which is not an empty table", splitPlan.stepsOf("# N1\n\n## Log\n") === null);
+
+  // A PAGE'S OWN `Repo` TABLE IS NOT A PLAN. Only an arc's step table reads Repo as the scope.
+  const pageTable = "<table><thead><tr><th>Repo</th><th>State</th></tr></thead><tbody><tr><td>spn-x</td><td></td></tr></tbody></table>";
+  check("a page table with Repo and State is not read as a split plan", splitPlan.rowsOf(pageTable, false).length === 0);
+}
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The approach document
-//           docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md § The workstream is a scope of work, not a window · § Documents first, and the order they are written in · § Retirement is close-or-graduate
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The approach document · § The split plan is the arcs' step rows, and Repo is the scope
+//           docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The workstream is a scope of work, not a window · § A step row says where, at what altitude, and how · § Documents first, and the order they are written in · § Retirement is close-or-graduate
 // The chapters are the source of truth. A rule change is edited there first, then here, in the same change.
 //
 // The two gates a workstream's split plan carries, and the parser both read it with. This script
@@ -10,10 +10,12 @@
 // is the folder it sits in. Only the move into `closed/` is a close. Moving `backlog/` into `open/` is
 // how work starts, so neither gate fires on it.
 //
-// THE SPLIT PLAN is not a section somebody writes. It is the `How` tables of an approach page read by
-// their SCOPE column — one row per piece or per document, each naming the node that owns it and the
-// state it has reached. A seat's page leaves the column out, so it carries no split plan and neither
-// gate has anything to hold it to.
+// THE SPLIT PLAN is not a section somebody writes. It is the step rows of the workstream's arcs — the
+// `## Steps` table of every file under `arcs/`, read by its REPO column, which is the scope, and its
+// STATE column (RD.DEVEX.WORKSPACE.038). A step id is a number with an optional letter and optional
+// dotted parts: `3`, `4b`, `3e.1`. An approach page written before that rule carried the plan as
+// `How` tables with a SCOPE column, and those tables are still read, so a workstream argued in the
+// older shape closes under the shape it was written in.
 //
 //   documents-first :  a WARNING. You are writing an approach page into a repo's own pocket while the
 //                      open workstream that argues it still has rows that have not landed.
@@ -130,26 +132,118 @@ function* mdTables(text: string): Generator<string[][]> {
 
 export type Row = { label: string; scope: string; state: string };
 
+/** A header cell as a name: emphasis and code marks gone, lower case. */
+const headerName = (cell: string): string => cell.replace(/[*_`]/g, "").trim().toLowerCase();
+
+/**
+ * A step id: a number, an optional letter, and optional dotted parts — `3`, `4b`, `3e.1`. An arc
+ * splits a step by lettering it and splits a lettered step by numbering after a dot, so a reader
+ * that took only `\d+[a-z]?` skipped every dotted row and read the step as not there.
+ */
+export const STEP_ID = /^\d+[a-z]?(?:\.\d+[a-z]?)*$/i;
+
+/** A step cell's id with its emphasis removed, so `**3e.1**` reads as `3e.1`. */
+export const stepId = (cell: string): string => cell.replace(/[*_`]/g, "").trim();
+
 /**
  * Every split-plan row in one document.
  *
- * A split-plan table is one carrying BOTH a `scope` header and a `state` header. Requiring both is
- * what keeps an arc's own step table — which has a state and no scope — out of a check it was never
- * written for.
+ * A split-plan table is one carrying BOTH a scope header and a `state` header. On an approach page
+ * the scope header is `scope`; in an arc's step table it is `repo`, and the caller names which one it
+ * reads, so a page's own `Repo` table is never taken for a plan. A step table's first column is the
+ * step id, so its label is `step <id> — <What>`: a label that read `3` named nothing a reader could find.
  */
-export function rowsOf(text: string, markdown: boolean): Row[] {
+export function rowsOf(text: string, markdown: boolean, scopeHeader = "scope"): Row[] {
   const out: Row[] = [];
   for (const table of markdown ? mdTables(text) : htmlTables(text)) {
-    const head = table[0].map((c) => c.toLowerCase());
-    const scopeAt = head.indexOf("scope");
+    const head = table[0].map(headerName);
+    const scopeAt = head.indexOf(scopeHeader);
     const stateAt = head.indexOf("state");
     if (scopeAt < 0 || stateAt < 0) continue;
+    const whatAt = head.indexOf("what");
+    const stepped = (head[0] === "#" || head[0] === "step") && whatAt > 0;
     for (const cells of table.slice(1)) {
       if (cells.length <= Math.max(scopeAt, stateAt)) continue;
-      out.push({ label: cells[0], scope: cells[scopeAt], state: cells[stateAt] });
+      if (stepped && !STEP_ID.test(stepId(cells[0]))) continue;     // a field row, not a step
+      const label = stepped ? `step ${stepId(cells[0])} — ${cells[whatAt]}` : cells[0];
+      out.push({ label, scope: cells[scopeAt], state: cells[stateAt] });
     }
   }
   return out;
+}
+
+// ---------------------------------------------------------------------------- the arcs' step rows
+
+/**
+ * The `## Steps` section of an arc, from its heading to the next `## ` heading, or `null` where the
+ * arc has none. Only this section is read, so a table in the log or the specification that happens
+ * to carry a Repo and a State column is never taken for a step.
+ */
+export function stepsSection(text: string): string | null {
+  const lines = text.split("\n");
+  const start = lines.findIndex((line) => /^##\s+Steps\b/i.test(line));
+  if (start < 0) return null;
+  const rest = lines.slice(start + 1);
+  const stop = rest.findIndex((line) => /^##\s/.test(line));
+  return (stop < 0 ? rest : rest.slice(0, stop)).join("\n");
+}
+
+export type Step = { id: string; what: string; state: string | null; cells: string[] };
+
+/**
+ * Every row of an arc's step table, with its What and State cells found BY HEADER.
+ *
+ * The step row is `# · Repo · Altitude · What · Mechanism · Acceptance · State`, so the second cell
+ * is the repository and not the step. A reader that printed `cells[1]` named a repository where it
+ * meant to name the work. An older arc's table carries `# · What · …` with no State column: `what`
+ * is still found by its header, and `state` is `null` so the caller knows no State cell exists.
+ */
+export function stepsOf(text: string): Step[] | null {
+  const section = stepsSection(text);
+  if (section === null) return null;
+  const out: Step[] = [];
+  for (const table of mdTables(section)) {
+    const head = table[0].map(headerName);
+    const whatAt = head.indexOf("what") > 0 ? head.indexOf("what") : 1;
+    const stateAt = head.indexOf("state");
+    for (const cells of table.slice(1)) {
+      const id = stepId(cells[0] ?? "");
+      if (!STEP_ID.test(id)) continue;
+      out.push({ id, what: cells[whatAt] ?? "", state: stateAt >= 0 ? cells[stateAt] ?? "" : null, cells });
+    }
+  }
+  return out;
+}
+
+/** An arc's short name for a label: `N116` from `N116-r2-the-devex-release.md`. */
+export function arcName(file: string): string {
+  const name = basename(file).replace(/\.md$/, "");
+  return /^N\d+[a-z]?/i.exec(name)?.[0] ?? name;
+}
+
+/** Every arc file of one workstream folder. */
+export function arcFiles(folder: string): string[] {
+  const dir = join(folder, "arcs");
+  if (!isDir(dir)) return [];
+  return listdir(dir).filter((name) => name.endsWith(".md")).sort().map((name) => join(dir, name));
+}
+
+/** The split-plan rows of one arc: its step rows, read by Repo and State, labelled with the arc. */
+export function arcRowsOf(text: string, arc: string): Row[] {
+  const section = stepsSection(text);
+  if (section === null) return [];
+  return rowsOf(section, true, "repo").map((row) => ({ ...row, label: `${arc} ${row.label}` }));
+}
+
+/**
+ * A workstream's whole split plan: the step rows of every arc in its folders, and the scope tables of
+ * any page written in the older shape. Each folder is read once, however many ways it was found.
+ */
+export function workstreamPlan(folders: string[], pages: string[]): Row[] {
+  const rows = pages.flatMap(planOf);
+  for (const folder of [...new Set(folders.map((f) => resolve(f)))])
+    for (const file of arcFiles(folder)) rows.push(...arcRowsOf(read(file), arcName(file)));
+  return rows;
 }
 
 /**
@@ -383,6 +477,21 @@ export function subjectPages(root: string, subject: string, source: string | nul
 }
 
 /**
+ * The folders that hold one subject, in any state — where its arcs sit. The source of a move comes
+ * first, because before the move that is the only place the subject is.
+ */
+export function subjectFolders(root: string, subject: string, source: string | null): string[] {
+  const out: string[] = [];
+  if (source && isDir(source)) out.push(resolve(source));
+  for (const state of STATES)
+    for (const base of stateFolders(root, state)) {
+      const candidate = resolve(join(base, subject));
+      if (isDir(candidate) && !out.includes(candidate)) out.push(candidate);
+    }
+  return out;
+}
+
+/**
  * Where this subject's workstream actually sits, so the warning names a folder you can open. Naming
  * the shape it does not have yet helps nobody.
  */
@@ -502,46 +611,19 @@ export function closing(destination: string): boolean {
 // Reported as a WARNING rather than a refusal. The page is mid-edit for exactly as long as it takes
 // to fold a card, and refusing a write during that would refuse the fix itself.
 
-// A card runs from its own `<h4 id="qN">` to the next one or the end of the section. Reading it by
-// the wrapping `<div class="open">` does not work: the card nests a `<div class="scroll">` table and
-// a `<div class="rec">`, so a non-greedy match ends at the first inner `</div>` and never sees the
+// ONE CARD SHAPE (RD.DEVEX.WORKSPACE.147). `approach-template.html` writes a card as
+// `<div class="open">` wrapping `<h4 id="q<n>">`, and this reader looks for the `h4` alone. The
+// `.open` block carries the amber edge that marks a card undecided, and the rail's count badge is
+// `s4.querySelectorAll('.open').length`, so a card written any other way is invisible to the page as
+// well as to this check. A `<tr id="q<n>">` is a row in an index of cards already settled, and a
+// `<div class="card" id="q<n>">` with an `h3` is neither; both are left unread on purpose, because
+// two spellings with one reader is the drift `Q185` option C was refused for.
+//
+// A card runs from its own `h4` to the next one or the end of the section. Reading it by the
+// wrapping `<div>` does not work: the card nests a `<div class="scroll">` table and a
+// `<div class="rec">`, so a non-greedy match ends at the first inner `</div>` and never sees the
 // decision. That is the shape of F5.
 const OPEN_SECTION = /<section id="s4"[\s\S]*?<\/section>/i;
-// A CARD IS A TABLE ROW, and it was a heading until Q185 was answered. `cardsOf` looked for
-// `<h4 id="q<n>">` and the pages had stopped writing it: measured 2026-09-23 across every workstream
-// page, `011` carried 23 headings, `015` carried one heading and ten rows, and the open workstream
-// carried NONE and 54 rows. The four checks that read cards were therefore reading a shape that
-// appears on no page they open — they walk `workstreams/open/` alone, so a closed workstream's
-// headings were never their input. Three of the four fail permissive, which is why going blind
-// looked like a clean corpus.
-//
-// THE HEADING FORM IS NOT KEPT AS A SECOND SPELLING. `Q185` option C was exactly that and was
-// refused: two spellings with one reader is the defect `RD.DEVEX.WORKSPACE.058` had removed from arc statuses
-// the day before, and it would make the drift permanent instead of ending it.
-// A CARD IS THE `h4` INSIDE ITS `.open` OR `.card` BLOCK, and `Q185` moved this to `<tr>` on a
-// measurement that counted the wrong thing. That measurement said `008` carried *0 headings and 54
-// table rows*, and concluded the row was the card. **Those rows were the ANSWERED INDEX** — a table
-// listing cards already settled — while the card itself is the block the template ships.
-//
-// THE TEMPLATE IS THE AUTHORITY HERE, not any page. `approach-template.html` writes an open card as
-// `<div class="open">` wrapping `<h4 id="qN">`, and a decided one as `<div class="card">` with the
-// same heading. Pages written before that template exists prove nothing either way, so this rests on
-// what the template ships and on what the page furniture needs.
-//
-// AND THE FURNITURE IS NOT DECORATION. `.open` carries the amber left edge that marks a card
-// undecided — the template says so in its own words, *undecided cards first, with an amber edge; a
-// decided card carries a green edge* — and the rail's count badge is literally
-// `s4.querySelectorAll('.open').length`. A card written as a row has no edge and leaves the rail
-// saying nothing is waiting, which is the opposite of true.
-//
-// THIS IS NOT THE TWO-SPELLING DRIFT `Q185` OPTION C WAS REFUSED FOR. The two shapes were never two
-// spellings of one thing: a `.open`/`.card` block is a CARD, and a `<tr id="qN">` is a ROW IN AN
-// INDEX of cards already settled. Conflating them is what produced the defect, and separating them
-// is what fixes it.
-//
-// AND THE PAGE'S OWN FURNITURE ALREADY DEPENDED ON THE BLOCK. `.open` carries the amber left edge
-// that marks a card undecided, and the rail's count badge is `s4.querySelectorAll('.open').length`.
-// A card written as a row loses both — no edge, and a rail that says nothing is waiting.
 const CARD_OPEN = /<h4[^>]*\bid="(q\d+)"[^>]*>/gi;
 const DECISION = /<b>\s*Decision:?\s*<\/b>([\s\S]{0,600})/i;
 // `answered` may sit either side of the number, because a log writes both ways.
@@ -608,15 +690,6 @@ export function cardsOf(page: string): Array<{ number: string; decided: boolean 
 }
 
 /**
- * One table row whole, counting nesting rather than stopping at the first `</tr>`.
- *
- * **A CARD CARRIES ITS OPTIONS AS A TABLE**, which the approach template has always said, so a card
- * row holds rows. A non-greedy `[\s\S]*?</tr>` cuts such a card off at its first option and reads
- * the rest of it as absent — and it passes on a page whose options happen to be written inline,
- * which is what the open workstream does today. Proven against a nested fixture rather than against
- * the page that got lucky.
- */
-/**
  * One card whole — from its own heading to the next card's, or to the end of the section.
  *
  * READING IT BY THE WRAPPING `<div>` DOES NOT WORK, and that is why this takes the heading as its
@@ -629,17 +702,6 @@ function cardAt(html: string, start: number): string {
   NEXT.lastIndex = start + 1;
   const next = NEXT.exec(html);
   return html.slice(start, next ? next.index : html.length);
-}
-
-function rowAt(html: string, start: number): string {
-  const TAG = /<(\/?)tr\b/gi;
-  TAG.lastIndex = start;
-  let depth = 0;
-  for (let m = TAG.exec(html); m; m = TAG.exec(html)) {
-    depth += m[1] ? -1 : 1;
-    if (depth === 0) return html.slice(start, html.indexOf(">", m.index) + 1);
-  }
-  return html.slice(start);
 }
 
 /**
@@ -729,7 +791,7 @@ export function gateDocumentsFirst(payload: Payload): Verdict {
     const repo = repoOf(seatRoot, target);
     if (!repo) continue;
     for (const [subject, pages] of [...openWorkstreams(seatRoot)].sort((a, b) => a[0].localeCompare(b[0]))) {
-      const rows = pages.flatMap(planOf);
+      const rows = workstreamPlan(subjectFolders(seatRoot, subject, null), pages);
       if (!rows.some((row) => namesRepo(row.scope, repo))) continue;
       const pending = rows.filter((row) => stateOf(row) !== "landed");
       if (!pending.length) continue;
@@ -821,6 +883,7 @@ export function gateClose(payload: Payload): Verdict {
     }
     if (!subject) continue;
     const pages = subjectPages(root, subject, source && isDir(source) ? source : null);
+    const folders = subjectFolders(root, subject, source && isDir(source) ? source : null);
 
     // THE STAMP, BEFORE THE ROWS. Closing moves a folder; a page that still says it is running keeps
     // telling every reader the work is live. It is one line to fix and invisible to a gate that only
@@ -838,7 +901,7 @@ export function gateClose(payload: Payload): Verdict {
           `meets first, and closing must change it as well as the folder.`,
       };
 
-    const rows = pages.flatMap(planOf);
+    const rows = workstreamPlan(folders, pages);
     const empty = rows.filter((row) => stateOf(row) === "empty");
     // A GATE MUST SAY WHAT IT DID NOT CHECK. These two states used to leave here together, and a page
     // that planned NOTHING closed exactly as green as a page accounting for everything.
@@ -848,16 +911,16 @@ export function gateClose(payload: Payload): Verdict {
         deny:
           `Denied: \`${subject}\` has no split plan, so this gate checked NOTHING — that is not ` +
           `the same as everything being accounted for, and it must not read the same.\n` +
-          `A split plan is a \`How\` table with a **Scope** column and a **State** column, one row ` +
-          `per construct. The gate reads those two and nothing else.\n\n` +
-          `Add the columns to the approach page's constructs table, then give each row one of ` +
-          `three states:\n` +
-          `  landed <path>   the node that now holds the content\n` +
-          `  carried         the successor scope that takes it on\n` +
-          `  deferred        the event that brings it back\n\n` +
-          `If this scope genuinely planned nothing, say so on the page in a one-row table rather ` +
-          `than by leaving the column out — an absent plan and a finished one are ` +
-          `indistinguishable to any reader, not just to this hook.`,
+          `The split plan is the step rows of the workstream's arcs: each arc's \`## Steps\` table, ` +
+          `with a **Repo** column and a **State** column (02-workstream/01-workstream.md § A step ` +
+          `row says where, at what altitude, and how). The gate reads those two and nothing else.\n\n` +
+          `Give each arc its step table, then give each row one of three states:\n` +
+          `  landed <commit>   what reached its node, and the commit that landed it\n` +
+          `  carried           the successor workstream that takes it on\n` +
+          `  deferred          the event that brings it back\n\n` +
+          `If this scope genuinely planned nothing, say so in a one-row step table rather than by ` +
+          `leaving the table out — an absent plan and a finished one are indistinguishable to any ` +
+          `reader, not just to this hook.`,
       };
 
     const pending = rows.filter((row) => !accounted(row));
@@ -925,7 +988,8 @@ export function gateClose(payload: Payload): Verdict {
     // a state nobody checked. An arc with NO status is left alone here, the same way `arc-status`
     // leaves it: a batch-shaped arc whose state has to be read is not pushed into a stamped word.
     const unfinished: string[] = [];
-    for (const dir of pages.map((f) => join(dirname(f), "arcs")).filter(isDir)) {
+    const arcDirs = [...new Set([...folders, ...pages.map(dirname)].map((f) => join(f, "arcs")))];
+    for (const dir of arcDirs.filter(isDir)) {
       for (const f of listdir(dir).filter((x) => x.endsWith(".md"))) {
         const st = statusIn(read(join(dir, f)));
         if (st && !TERMINAL.has(st)) unfinished.push(`  - ${f.replace(/\.md$/, "")} — ${st}`);
@@ -1013,11 +1077,11 @@ function sweep(roots: string[]): number {
     const streams = openWorkstreams(root);
     console.log(`${root}   ${streams.size} open`);
     for (const [subject, pages] of [...streams].sort((a, b) => a[0].localeCompare(b[0]))) {
-      if (!pages.length) {
-        console.log(`  ${subject}: no approach page — no split plan, and that is a valid shape`);
+      const rows = workstreamPlan(subjectFolders(root, subject, null), pages);
+      if (!rows.length) {
+        console.log(`  ${subject}: no arc carries a step table with Repo and State — no split plan yet`);
         continue;
       }
-      const rows = pages.flatMap(planOf);
       // SEQUENCING IS COUNTED APART FROM HANDOVER. A row pointing at a later arc of this same
       // workstream is not carried; it resolves through that arc, and counting it as accounted for is
       // how `pending 0` stood over ten rows of undone work.

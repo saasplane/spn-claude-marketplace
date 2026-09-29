@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md § Retirement is close-or-graduate.
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § Retirement is close-or-graduate.
 // The chapter is the source of truth. A rule change is edited there first, then here, in the same change.
 //
 // What gets said when a workstream closes.
@@ -12,7 +12,8 @@
 // to refuse, so congratulating from there would be congratulating something that has not happened and
 // might still fail. This fires after the folder has actually moved.
 //
-// WHAT IT SAYS. What landed, counted from the page's own split plan — not a generic well done. The
+// WHAT IT SAYS. What landed, counted from the workstream's own split plan — the step rows of its
+// arcs, and the scope tables of a page written in the older shape — not a generic well done. The
 // number is the work, and a line that names it is worth reading twice.
 //
 // PORTED FROM `hooks/scripts/closed.py`, WHICH HAD ALMOST NEVER SPOKEN. The Python took the subject
@@ -21,15 +22,15 @@
 // the subject out a second time. Finding F10 in this arc.
 //
 // The port takes the subject from the SOURCE, which is where the subject has always been, and speaks
-// only when that subject resolves to an approach page — so moving a loose file into `closed/` is not
-// congratulated as a finished scope.
+// only when that subject resolves to a workstream with a page or a split plan — so moving a loose
+// file into `closed/` is not congratulated as a finished scope.
 //
 // It reads `split-plan`'s parser, as the Python did, so the count here and the count the close gate
 // refused on are the same reading of the same table.
 
 import { basename, resolve } from "node:path";
 import { isDir, readPayload, runAlone, workspaceRoot, type Payload } from "../lib/payload.ts";
-import { closing, moves, planOf, stateOf, subjectPages } from "../checks/split-plan.ts";
+import { closing, moves, stateOf, subjectFolders, subjectPages, workstreamPlan } from "../checks/split-plan.ts";
 import { begin, end, span } from "../lib/timing.ts";
 
 const STRUCTURE = new Set(["workstreams", "sessions", "arcs", "open", "backlog", "closed", ""]);
@@ -52,12 +53,12 @@ export function closingMessage(payload: Payload): string | null {
 
     const from = resolve(cwd, source);
     const pages = subjectPages(root, subject, isDir(from) ? from : null);
+    const rows = workstreamPlan(subjectFolders(root, subject, isDir(from) ? from : null), pages);
     // A SCOPE, NOT ANY FILE. Moving a loose note into `closed/` is not a workstream finishing, and
-    // congratulating it would make the one moment that speaks mean nothing. A real close has a page:
-    // the close gate refuses one without a split plan, so by the time this fires there is one to read.
-    if (!pages.length) continue;
+    // congratulating it would make the one moment that speaks mean nothing. A real close has a split
+    // plan: the close gate refuses one without, so by the time this fires there is one to read.
+    if (!pages.length && !rows.length) continue;
 
-    const rows = pages.flatMap(planOf);
     const states = rows.map(stateOf);
     const landed = states.filter((s) => s === "landed").length;
     const carried = states.filter((s) => s === "carried").length;
