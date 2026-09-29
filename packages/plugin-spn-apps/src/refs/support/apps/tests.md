@@ -138,6 +138,16 @@ IAM.LOGIN.01 a person signs in with a password
 
 A title of the id alone hands a reader in a pipeline an identifier and no way to know what broke. **Write a case title that carries both, at every tier that binds an id** — the id for the scan to join against, the sentence for the person reading the framework's own page.
 
+**The tier decides which cases bind an id — MUST** (`RD.DEVEX.FUNCTION.064`). A tier that proves what a consumer or a person meets binds every case; a tier that proves the code's own inside binds only the cases that prove a row.
+
+| Tier | Which cases carry an id | What a case with no id names instead |
+| --- | --- | --- |
+| contract · component · journey | every case | nothing: a case with no id is a finding |
+| integration | every case proving a guarantee the integration tier owns, which in practice is every real case | a fixture or a helper's own check names what it checks |
+| unit | a case proving a row whose `Tier` is `UNIT` | a case over a private rule names the rule |
+
+**A row's `Tier` equals the tier of the case that proves it — MUST.** A run writes only the rows declaring the tier it ran, so a row declaring `CONTRACT` whose only case runs at integration is written by neither run and stays unproved. Where the two differ, read the case and correct the side that is wrong.
+
 ## Managing the case set
 
 - **A case belongs to the node whose claim it proves, and travels with it.** Delete a capability and delete its cases in the same change; a case outliving its subject fails for reasons nobody owns.
@@ -160,7 +170,7 @@ A percentage is not the answer — it moves when a case is added and says nothin
 
 **The join is checked in both directions.** A cited id **MUST** exist — a case title naming a row no document declares resolves to nothing. A `SUCCESS` row **MUST** resolve to a case — review alone never enforces that. The pattern a scan reads ids with **MUST** match every id shape the registers actually use, a digit in a middle segment included, or the scan silently indexes part of the register and reports green over the rest. **You run the check; `spnutils` never reads a row** (`RD.DEVEX.UTILS.071`) — this plugin's join check reads both directions, and the core plugin's proof check reads every `SUCCESS` row against the last run of its tier. **A case proving the toolchain's own machinery is not join evidence** — the join excludes every case found under a `TOOLCHAIN`-kind node, so a sample id in the toolchain's own suites is never read as an uncited row or an undeclared id.
 
-**A second number answers a different question: how much of the code does any suite execute at all.** Every project carries a code-coverage floor, measured rather than chosen, that the runner reads on every run and that rises and never falls (`RD.SUPPORT.APPS.133`). It never decides a release on its own. The floor sits in the test tool's own configuration — `coverageThreshold.global` or `coverage.thresholds` — and after a run that collects coverage this plugin's floor script sets it to what was measured, rounded down and dated. **A floor with no dated comment is a guess**, so its first measurement replaces it, up or down; once dated, the script only raises it, and the check refuses a hand edit that lowers it. Code no automatic case can reach is excluded with its reason in a comment beside the entry, and the check refuses an exclude with no reason. A journey configuration carries no floor.
+**A second number answers a different question: how much of the code does any suite execute at all.** That number is a percentage. It shows where code has no case, and it never decides anything on its own: **code coverage is measured and reported, never enforced — MUST** (`RD.SUPPORT.APPS.133`). A run that collects coverage prints its summary after the tests — lines, statements, functions and branches — and the test tool writes `coverage-summary.json` beside its report, so you can read the numbers again later. No configuration carries a threshold, and nothing fails a run on a percentage, because a percentage used as a gate gets met the cheapest way: by editing the number down, or by writing cases that run code without checking what it does. **An exclude carries its reason beside it — MUST.** Code no automatic case can reach, such as a proof-of-person challenge or a vendor round trip, is excluded with a comment on its entry saying why, so a reader can tell code that cannot be tested from code nobody tested; this plugin's check refuses an exclude with no reason. A journey configuration collects no coverage.
 
 ## Isolation, and reading a result honestly
 

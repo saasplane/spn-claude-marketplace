@@ -20,7 +20,7 @@
 
 **Libraries ship from the Support stage's infra half, one folder per provider instance, pinned by version in the estate declaration.** The package is `@saasplane/infra-blueprints` — by its own manifest, the layer modules the `spnutils infra` driver invokes, per provider category and instance.
 
-**The pin is the delivery.** A change in that package reaches an estate only when the organization is released carrying the new version, and `spnutils infra show` reads the pinned version rather than any working tree ([packages](../../packages.md)).
+**The pin is the delivery.** A change in that package reaches an estate only when the organization is released carrying the new version, and `spnutils infra show {spc}` reads the pinned version rather than any working tree ([packages](../../packages.md)).
 
 ## What the local target reads from it
 

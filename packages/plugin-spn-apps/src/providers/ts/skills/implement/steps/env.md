@@ -1,6 +1,6 @@
 # Step: env — where a key goes in an APPS · TS node
 
-**The stack's half of the docs step.** Closing the doc set is the same work in any language and is stated once, in the **spn-devex** plugin's `refs/doc-sets.md`. What a TypeScript repository's env files look like is not, and it is here.
+**The stack's half of the docs step.** Closing the doc set is the same work in any language and is stated once, in the **spn-devex** plugin's `refs/devex/workspace/docs/doc-sets.md`. What a TypeScript repository's env files look like is not, and it is here.
 
 A new module env variable (`{CODE}_{MOD}_*`) is documented where it lives: **the package's own `README.md`**, in its configuration matrix (depth in `docs/05-guides/README.md`). It is configuration rather than a contract term, so it goes in neither the data model nor a `Terms` table. It is also documented in the app's `envs/local.env`, under the module's banner comment. Committed env files carry **no secret values** — secrets appear empty with a required-in-shell annotation. Keep the env file's header key list in sync with what migrations actually read.
 

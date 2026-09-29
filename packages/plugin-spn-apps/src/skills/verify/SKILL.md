@@ -29,6 +29,8 @@ description: Prove SaaS Plane TS work is sound by running gates. Use when the as
 
 **Then decide the scope.** Every mode below is scoped to a project. When the ask does not name one and the workspace holds more than one, **ask: this app, this package, or all?** Never infer it from the last file edited or from what the branch changed — see the core plugin's `refs/commands.md`.
 
+**Then read the repository's Test and verify guide** — `docs/05-guides/*-test-and-verify.md`, linked from `.claude/saasplane/rules.md` under *How this repository is tested* (`RD.DEVEX.WORKSPACE.181`). It holds this repository's own sequence: the `~/.spnenv` keys a run reads, the steps in order, the clean reset and what to do when something fails. Follow its steps; never read the sequence out of `CLAUDE.md`, which states none. A repository with no guide says so in that section — then use the modes below and name the missing guide in your report.
+
 **Then pick the mode** — `package` | `app` | `reset`. `package` and `app` prove different things and neither substitutes for the other: `package` proves what was *written* conforms, `app` proves what is *running* works. Code green with a broken stack is a passing build of a broken product; a healthy stack with unvalidated code is a change nobody checked. After a change on a running stack, run `package` first, then `app`.
 
 ## Mode: package — conformance gates on what was written
@@ -63,9 +65,9 @@ No running stack required. Run the cheapest gate first, so a failure stops the r
 | Kind | `package` mode covers |
 | --- | --- |
 | `SUPPORT_*` · `MODULE_SERVER` | validator + barrel freshness, `validate`, build, check, unit tests |
-| `MODULE_WEB` | barrel freshness, `validate`, build, check, unit tests — e2e belongs to the app that mounts it |
+| `MODULE_WEB` | barrel freshness, `validate`, build, check, unit tests — journeys belong to the app that mounts it |
 | `APP_SERVER` | the above, plus migrations applying cleanly and the integration suite |
-| `APP_WEB` | the above, plus the production build and e2e |
+| `APP_WEB` | the above, plus the production build; journeys run in `app` mode |
 | `CLIENT_API` | regenerate from the live OpenAPI and diff — **a diff is the finding**, never a fix-up |
 | `APP_UTILITY` | build, check, tests |
 
@@ -78,7 +80,7 @@ Report per gate: the command run and its **actual output**. Report the test coun
 Read the ports and hosts from the pinned platform declaration's `apps[]` row — never assume them.
 
 1. **API up** — the service's OpenAPI endpoint returns 200. A 200 means boot, migrations, and module wiring all held.
-2. **Infra layers** — `spnutils infra platform status` and `spnutils infra organization status` report healthy.
+2. **Infra layers** — `spnutils infra platform status <spc>` and `spnutils infra organization status` report healthy. `<spc>` is the platform code `sprepo.json` pins (`RD.DEVEX.UTILS.072`).
 3. **Web apps respond** on their configured dev ports, or through the local proxy's vhosts.
 4. **Login proof**, where the repo seeds credentials — authenticate a seeded principal through its own site host and assert the session comes back active.
 5. **Exercise the changed flow end to end** through the real entry. Tests passing is not the exit criterion; the change working in the running app is.
@@ -95,23 +97,23 @@ For every kind except an app, there is no stack to tear down. Reset is `package`
 
 ### An app, in a repo whose `sprepo.json` pins a platform — the full cycle
 
-Destructive, and the local stack is frequently **shared**: `infra platform down --clean` wipes a database other work on the machine is using. **Run only on an explicit instruction, and only against a named target.**
+Destructive, and the local stack is frequently **shared**: `infra platform down <spc> --apply --clean` wipes a database other work on the machine is using. **Run only on an explicit instruction, and only against a named target.**
 
 1. **Regenerate and typecheck first** — never reset onto stale or broken code. Run the codegen commands for everything touched on the branch, then build to green. A stale barrel or a type error means the reset boots broken code and the whole cycle is wasted. **A green build does not cover `tests/`** — `nx build` compiles `src` only, so typecheck each test sibling too (`tsc --noEmit --pretty false -p tsconfig.test.json`, and `tsconfig.integration.json` where present); see `implement`'s `test` step, § Typechecking the tests themselves — `providers/{stack}/skills/implement/steps/test.md`.
 2. **Stop what is running** — the app and any stale watch or dev-server processes holding its ports.
-3. **Cycle the stack** — `spnutils infra app down` → `infra platform down --clean` → `infra platform up` → `infra app up`.
+3. **Cycle the stack** — `spnutils infra app down <package>` → `infra platform down <spc> --apply --clean` → `infra platform up <spc> --apply` → `infra app up <package>`.
 4. **Hosted-vendor modules cycle with the platform layer.** A vendor you run is a module row in the platform declaration, with no lifecycle of its own. Its state is wiped only by the same explicit `--clean`, never as an inferred side step.
 5. **Migrate** the clean database.
-6. **Seed and test** — run the suite that seeds, then the integration suite, then any e2e on a **quiesced** stack. Do not run a reset, a build, or a re-provision concurrently with e2e; the resulting timeouts read as failures and are not.
+6. **Seed and test** — run the suite that seeds, then the integration suite, then the journeys on a **quiesced** stack: `pnpm build test` → `pnpm start` → `spnutils apps test journey <node>`, with `--phase serialized` and `--phase window` as separate runs where the node carries those cases. Do not run a reset, a build, or a re-provision concurrently with a journey; the resulting timeouts read as failures and are not.
 7. **Write back what the run proved** — a full run is the one moment the documents can be brought current, so do it here and not by hand.
    - the **spn-devex** plugin's `spn-devex behaviours stamp --write --reach repository` writes `Status` and `Updated at` into every behaviour row the run's ids resolve to. **`--reach repository` is the caller saying these artifacts are the whole of these tiers**, which is true after a full run and false after any narrower one — it sends a row nothing cited back to `PLANNED`, so on a partial run it erases evidence that was true. Run it without the flag when you ran less than everything.
    - **Run the tiers through `spnutils apps test <tier>`.** Where a repository still consumes a published toolchain older than the derived-artifact change, any other door runs the suite and writes nothing — and with `--reach repository` set, that silence resets rows the run actually proved.
    - **Then check the rows against the evidence** — the **spn-devex** plugin's `spn-devex behaviours check .` refuses a `SUCCESS` row the run of its tier contradicts, and `node "${CLAUDE_PLUGIN_ROOT}"/scripts/checks/behaviour-join.ts .` names a `SUCCESS` row no case cites and a case citing an id no row declares. `spnutils` reads no row, so these are the gate.
-   - **Raise the coverage floors the run measured** — `node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs coverage floor --write <project>` for each project whose run collected coverage. It raises and never lowers.
+   - **Report the code coverage the run printed** — lines, statements, functions and branches, per project whose run collected it, read from its `coverage-summary.json`. It is reported, never enforced (`RD.SUPPORT.APPS.133`): no configuration carries a threshold and nothing fails on a percentage. `node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs coverage check <project>` names an exclude that gives no reason.
    - **Then produce the pages whose behaviours moved**: the `spn-devex:check` skill, asking it to produce the matching `02-constructs` seat page. A construct page joins its behaviours from the register, so writing statuses makes every page for a changed construct stale, and `docs.ts audit` reds until they are produced again.
    - **Last, the report** — the `TRACEABILITY_MATRIX` template through the `spn-devex:report` skill, into `docs/artifacts/reports/`. It is written by you from what you just read, never by a tool, and it names which tiers the run spoke for. The **spn-devex** plugin's `spn-devex behaviours coverage --json` hands you the measurement to write it from.
 8. **Finish** — stop what you started unless told to leave it running, and report the seeded credentials and the tally per suite.
 
 A seed or template migration edit only lands on a clean re-migrate. A warm database keeps the old row, so a seed change tested against a warm stack proves nothing about a fresh one.
 
-**The repo supplies the specifics.** Read ports, app names, vendor stacks, seeded principals, and host names from the repo being reset — its own docs document them: the reset guide, the estate manifests and the seed files. This skill supplies the sequence; it never hardcodes one repo's instance of it.
+**The repo supplies the specifics.** Read ports, app names, vendor stacks, seeded principals, and host names from the repo being reset — its Test and verify guide first (`docs/05-guides/*-test-and-verify.md`, § Clean reset and verify), then the estate manifests and the seed files. An apps repository's guide links to the estate repository's guide for the machine reset. Never `CLAUDE.md`. This skill supplies the shape of the sequence; it never hardcodes one repo's instance of it.

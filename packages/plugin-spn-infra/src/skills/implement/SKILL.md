@@ -81,14 +81,14 @@ On the consuming platform's `modules[]`: `code` · `layer` · `after` (a named s
 ```text
 spnutils infra validate module        # tree to type, manifest to contract
 spnutils infra test <package>         # the render harness — templates plan against fixtures
-spnutils infra platform up --plan     # the rendering, locally
+spnutils infra platform up <spc> --plan   # the rendering, locally
 ```
 
 **A cloud plan refuses the path-resolved ref by name — that is the correct gate**, not a failure to fix around; it opens when the pin exists. See the `verify` skill for what each green run proves.
 
 ## 9 · Release, then flip the pin
 
-Use the `release` skill (bump `version` in `spinfrapkg.json` → `spnutils infra release <package>`, to the org's registry pair). Then flip the consuming row: `source: "@{org}/infra-module-<code>"`, `version` a semver — and run `spnutils infra platform up --plan --cloud` to see the gate open. Refs flip at each consumer's own pace.
+Use the `release` skill (bump `version` in `spinfrapkg.json` → `spnutils infra release <package>`, to the org's registry pair). Then flip the consuming row: `source: "@{org}/infra-module-<code>"`, `version` a semver — and run `spnutils infra platform up <spc> --plan --cloud` to see the gate open. Refs flip at each consumer's own pace.
 
 ## Hand-off
 

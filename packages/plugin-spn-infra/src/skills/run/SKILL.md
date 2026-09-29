@@ -37,17 +37,19 @@ spnutils infra organization down [--cloud] --plan|--apply [--approve] [--clean]
 spnutils infra organization status [--cloud] [--json]
 spnutils infra organization trust-ca
 
-spnutils infra platform up   [--cloud] --plan|--apply [--approve] [--json]
-spnutils infra platform down [--cloud] --plan|--apply [--approve] [--clean]
-spnutils infra platform status [--cloud] [--json]
+spnutils infra platform up   <spc> [--cloud] --plan|--apply [--approve] [--json]
+spnutils infra platform down <spc> [--cloud] --plan|--apply [--approve] [--clean]
+spnutils infra platform status <spc> [--cloud] [--json]
 
-spnutils infra environment up   <env> --cloud --plan|--apply [--approve] [--json]
-spnutils infra environment down <env> --cloud --plan|--apply [--approve] [--clean]
-spnutils infra environment status <env> --cloud [--json]
+spnutils infra environment up   <spc> <env> --cloud --plan|--apply [--approve] [--json]
+spnutils infra environment down <spc> <env> --cloud --plan|--apply [--approve] [--clean]
+spnutils infra environment status <spc> <env> --cloud [--json]
 
 spnutils infra app up   <package>
 spnutils infra app down <package> [--clean]
 ```
+
+**A platform-scoped command names its platform first, as an argument** (`RD.DEVEX.UTILS.072`): `<spc>` comes straight after the verb, and `<env>` after it. No environment entry selects a platform. The organization layer takes none, because a repository has at most one organization. In an apps repository the `<spc>` is checked against the `sprepo.json` pin, and one that differs is refused.
 
 | Noun | Locally | In the cloud |
 | --- | --- | --- |
@@ -67,9 +69,9 @@ spnutils infra app down <package> [--clean]
 ## Reading what is running
 
 ```text
-spnutils infra show [--json]            # which declaration reaches here, and PINNED @ version per layer
-spnutils infra <layer> status [--cloud] # what is running
-spnutils infra logs [service] [--cloud] # tail the realization, optionally one service
+spnutils infra show <spc> [--json]                  # which declaration reaches here, and PINNED @ version per layer
+spnutils infra platform status <spc> [--cloud]      # what is running; organization status takes no <spc>
+spnutils infra logs <spc> [service] [--cloud]       # tail the realization, optionally one service
 ```
 
 When a layer will not come up, `show` first: a path ref that resolves on one machine and not in CI, or a pin that is not what you thought, explains more failures than the logs do.

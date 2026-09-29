@@ -5,7 +5,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
-// RUN THROUGH THE CLI, NOT THE COMMAND FILE DIRECTLY — see `commands/coverage/t-floor.mjs` for why.
+// RUN THROUGH THE CLI, NOT THE COMMAND FILE DIRECTLY — see `commands/coverage/t-check.mjs` for why.
 const CLI = resolve(import.meta.dirname, "..", "..", "..", "..", "..", "src", "scripts", "cli.ts");
 const kept = [];
 process.on("exit", () => { for (const d of kept) rmSync(d, { recursive: true, force: true }); });

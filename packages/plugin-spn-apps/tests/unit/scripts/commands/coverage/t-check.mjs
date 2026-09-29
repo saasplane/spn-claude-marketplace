@@ -1,12 +1,14 @@
 // `commands/coverage/check.ts` — thin: it picks the target's stack and forwards argv to that
-// stack's own `scan()`. The scan logic itself is `providers/ts/scripts/checks/_tests/coverage-floor.ts`'s
-// own suite (`tests/unit/providers/ts/checks/_tests/t-coverage-floor.mjs`), unchanged and not repeated here.
+// stack's own `scan()`. The scan logic itself is `providers/ts/scripts/checks/_tests/coverage-excludes.ts`'s
+// own suite (`tests/unit/providers/ts/checks/_tests/t-coverage-excludes.mjs`), unchanged and not repeated here.
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
-// RUN THROUGH THE CLI, NOT THE COMMAND FILE DIRECTLY — see `t-floor.mjs` for why.
+// RUN THROUGH THE CLI, NOT THE COMMAND FILE DIRECTLY. A command exports `{ describe, run }` for
+// the dispatcher to call; it carries no invocation guard of its own, the same as any other module
+// `cli.ts` lazy-imports.
 const CLI = resolve(import.meta.dirname, "..", "..", "..", "..", "..", "src", "scripts", "cli.ts");
 const kept = [];
 process.on("exit", () => { for (const d of kept) rmSync(d, { recursive: true, force: true }); });
@@ -34,7 +36,7 @@ console.log("=== coverage check command — the stack pick");
   kept.push(root);
   writeFileSync(join(root, "sprepo.json"), JSON.stringify({ type: "APPS", config: { mtype: "APPS", stack: "TS" } }));
   writeFileSync(join(root, "jest.config.cjs"),
-    "module.exports = {\n  displayName: 'x',\n  coverageDirectory: 'cov',\n  coveragePathIgnorePatterns: [\n    '/src/hard/',\n  ],\n  coverageThreshold: { global: { statements: 1, branches: 1, functions: 1, lines: 1 } },\n};\n");
+    "module.exports = {\n  displayName: 'x',\n  coverageDirectory: 'cov',\n  coveragePathIgnorePatterns: [\n    '/src/hard/',\n  ],\n};\n");
   const { out, code } = run(root);
   ok("a TS project's own sprepo.json is found, and the TS scan answers", out.includes("carries no comment giving its reason"), out);
   ok("a finding is a non-zero exit, same as the tool it forwards to", code === 1, out);
@@ -45,7 +47,7 @@ console.log("=== coverage check command — the stack pick");
   kept.push(root);
   writeFileSync(join(root, "sprepo.json"), JSON.stringify({ type: "APPS", config: { mtype: "APPS", stack: "TS" } }));
   writeFileSync(join(root, "jest.config.cjs"),
-    "module.exports = {\n  displayName: 'x',\n  coverageDirectory: 'cov',\n  coveragePathIgnorePatterns: [\n    '/src/ok/',  // a vendor round trip\n  ],\n  coverageThreshold: { global: { statements: 1, branches: 1, functions: 1, lines: 1 } },\n};\n");
+    "module.exports = {\n  displayName: 'x',\n  coverageDirectory: 'cov',\n  coveragePathIgnorePatterns: [\n    '/src/ok/',  // a vendor round trip\n  ],\n};\n");
   const { out, code } = run(root);
   ok("a reasoned exclude is silent, and exits clean", code === 0 && out.includes("0 finding(s)"), out);
 }

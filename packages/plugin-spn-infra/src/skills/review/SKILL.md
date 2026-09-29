@@ -37,7 +37,7 @@ Never present a raw JSON dump as the review, and never bury a choice inside a re
 
 - **Every resource in grammar form** — `{org}[-{spc}][-{env}]-{noun}` (`refs/support/infra/naming.md`, in this plugin). A name that cannot be composed is a defect, not a style issue.
 - **The full 12-tag set on every creation** — deny-on-missing holds; a resource planned without the set will be refused at apply, so flag it now.
-- **Where each layer's declaration resolved from** — `spnutils infra show`: PINNED @ version, or a path. A cloud plan must show pins.
+- **Where each layer's declaration resolved from** — `spnutils infra show <spc>`: PINNED @ version, or a path. A cloud plan must show pins.
 - **Exactly the declared scope, nothing more.** The organization plan names root + the internal seats (`cc` · `log` · `audit`) + the registry pairs + zones + guardrails — and nothing else. An environment plan builds network → resources → compute, in order. An unexplained extra resource blocks.
 - **The engine records** — `{env}-database` · `{env}-cache` · `{env}-queue` into `internal.{spd}` — on an environment plan, pointing at whatever the hosting rendered.
 

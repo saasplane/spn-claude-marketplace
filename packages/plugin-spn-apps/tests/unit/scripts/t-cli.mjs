@@ -30,8 +30,8 @@ console.log("=== cli — discovery and help");
 {
   const { out, code } = run("help");
   ok("exits clean", code === 0, out);
-  ok("names the plugin in every line", out.includes("spn-apps coverage floor") && out.includes("spn-apps coverage check") && out.includes("spn-apps library catalogue"), out);
-  ok("never a bare command with no plugin named", !/^\s*coverage floor/m.test(out), out);
+  ok("names the plugin in every line", out.includes("spn-apps coverage check") && out.includes("spn-apps library catalogue"), out);
+  ok("never a bare command with no plugin named", !/^\s*coverage check/m.test(out), out);
 }
 
 {
@@ -40,8 +40,8 @@ console.log("=== cli — discovery and help");
   let parsed;
   try { parsed = JSON.parse(out); } catch { parsed = null; }
   ok("is a JSON array", Array.isArray(parsed), out);
-  ok("lists every action as data, describe included", parsed?.some((e) => e.group === "coverage" && e.action === "floor" && e.describe.length > 0), out);
-  ok("carries exactly the commands folder holds — three", parsed?.length === 3, out);
+  ok("lists every action as data, describe included", parsed?.some((e) => e.group === "coverage" && e.action === "check" && e.describe.length > 0), out);
+  ok("carries exactly the commands folder holds — two", parsed?.length === 2, out);
 }
 
 {

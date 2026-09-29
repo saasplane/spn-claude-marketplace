@@ -31,7 +31,7 @@
 | Layer | Realized as | Brought up by |
 | --- | --- | --- |
 | Organization | the machine's trust bootstrap — the local certificate authority, its one trust prompt, the local resolver, the shared ingress | `spnutils infra organization up` |
-| Platform | the platform's container group from the pinned declaration — the engines, plus each installed module's local rendering | `spnutils infra platform up` |
+| Platform | the platform's container group from the pinned declaration — the engines, plus each installed module's local rendering | `spnutils infra platform up <spc>` |
 | Environment | **nothing** — the machine is one environment, so no local form exists and targeting it is refused by name | — |
 | Deployments | the applications in dev mode — schemas, certificates, the ingress vhost | `spnutils infra app up` |
 

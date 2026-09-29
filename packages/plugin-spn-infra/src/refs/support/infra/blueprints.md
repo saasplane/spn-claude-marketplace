@@ -179,4 +179,4 @@ Five rungs rather than three, because a three-rung ladder collapses production-a
 | a size letter compared across workloads | an absolute scale was assumed where none exists |
 | a component present in one environment and absent in its sibling | parity was broken by omission rather than by declaration |
 
-Try it: `spnutils infra platform plan` — a plan reaches no account, so it runs before any cloud credential exists.
+Try it: `spnutils infra platform up dmo --plan` — a plan reaches no account, so it runs before any cloud credential exists.

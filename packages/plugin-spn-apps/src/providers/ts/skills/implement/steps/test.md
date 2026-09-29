@@ -72,14 +72,22 @@ The suite runs `--runInBand` against a shared, stateful local DB (seeded platfor
 
 Never leave mutated: the platform org and its policies, org-TYPE/GLOBAL auth/data policies, seeded master data, system providers, DEFAULT notification configs, roles/apps, the platform owner, seeded app-sites. Do not rely on a later reset to clean up; a green run on a fresh DB does not prove hygiene — verify seed rows byte-identical before/after (dump, run, dump, diff).
 
-## Frontend E2E
+## Frontend journeys
 
-- Root Playwright suite (`pnpm test:e2e`) runs **after** the BE suite, on a quiesced stack (no concurrent resets/builds — they cause 504s and login-handoff timeouts). Consistent failure = regression; cold-stack handoff flakiness is environmental (confirm via snapshots).
+- The journey tier runs `pnpm build test` → `pnpm start` → `spnutils apps test journey <node>`, **after** the BE suite, on a quiesced stack (no concurrent resets/builds — they cause 504s and login-handoff timeouts). Consistent failure = regression; cold-stack handoff flakiness is environmental (confirm via snapshots).
 
 ## Fixture rules
 
 - **PII is allowed ONLY in `tests/` fixtures, never in `src/`.** Test personas must stay env-overridable; passwords are never hardcoded anywhere — always the env variable.
-- **Behavior ids in titles**: a contract-tier test proving a behavior row embeds its id (`<MOD>.<CAP>.<NN>`) in the test title, so docs↔tests coupling is greppable (foundation decision RD.DEVEX.FUNCTION.008). Internals-only tests are exempt. **Flip the row to ✅ only once its test has run and passed** — a case the runner merely collected proves nothing, and a case that skips itself is collected too.
+- **Behavior ids in titles — the tier decides which cases carry one** (foundation decision RD.DEVEX.FUNCTION.064, amending RD.DEVEX.FUNCTION.008). The id (`<MOD>.<CAP>.<NN>`) opens the case or `describe` title and the sentence follows it: `IAM.LOGIN.01 a person signs in with a password`.
+
+  | Tier | Which cases carry an id | A case with no id |
+  | --- | --- | --- |
+  | contract · component · journey | every case | is a finding |
+  | integration | every case proving a guarantee the integration tier owns — in practice every real case | a fixture or a helper's own check names what it checks |
+  | unit | a case proving a row whose `Tier` is `UNIT` | a case over a private rule names the rule |
+
+  **A row's `Tier` equals the tier of the case that proves it.** A run writes only the rows declaring the tier it ran, so a `CONTRACT` row whose only case runs at integration stays unproved. Where they differ, read the case and correct the side that is wrong. **Flip the row to ✅ only once its test has run and passed** — a case the runner merely collected proves nothing, and a case that skips itself is collected too.
 - Fixtures that construct jsonb-persisted contract objects must be updated in the same change as any required-field addition to those types.
 
 ## Commands
@@ -89,7 +97,7 @@ npx nx run-many -t test:unit --all   # every unit suite
 npx nx run <project>:test:unit       # one project
 npx nx run <client>:test:integration # the contract tier, against a live service
 pnpm --filter <project> test unit    # the same, through the node's own script
-pnpm test:e2e                       # root Playwright — the root is not an nx project
+spnutils apps test journey <node>   # the sweep; --phase serialized and --phase window are separate runs
 npx tsc --noEmit --pretty false -p <project>/tsconfig.test.json   # a suite's own typecheck
 ```
 

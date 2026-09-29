@@ -15,7 +15,7 @@
 
 **The coordinates still exist, and they still name every container.** Tags are the one sanctioned duplication in the model: the same coordinates a name composes, restated for the planes that filter but cannot parse. Locally the name itself is the answer, because you can read it.
 
-**When you want the resolved picture rather than a single name, ask the tool.** `spnutils infra show` resolves the declaration reaching the folder you are standing in and says where each layer came from. `spnutils infra logs` reaches the same realization by service.
+**When you want the resolved picture rather than a single name, ask the tool.** `spnutils infra show <spc>` resolves the declaration reaching the folder you are standing in and says where each layer came from. `spnutils infra logs <spc> [service]` reaches the same realization by service.
 
 ## Why this is a ruling rather than an absence
 

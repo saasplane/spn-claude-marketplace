@@ -132,4 +132,4 @@ A background worker (`SPEstateAppDeploymentProcessor`) declares its capacity and
 | exposure exceeding its namespace | an application granted itself reach the level above never allowed |
 | the estate consulted for a local run | the estate was put between a developer and their own machine, protecting nothing |
 
-Try it: `spnutils infra show` — it lists the applications a platform grants, without reaching any account.
+Try it: `spnutils infra show dmo` — it lists the applications a platform grants, without reaching any account.

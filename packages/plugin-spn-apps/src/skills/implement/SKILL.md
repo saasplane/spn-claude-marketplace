@@ -38,7 +38,7 @@ If the `ideate` skill ran, the design is already in the owning module's docs as 
 
 Gates before starting:
 
-- **Gate check.** Where the change adds or moves an authorization gate, settle what varies the answer before you write it. A rule that changes per person is a permission; per organization type, an enablement; per plan, billing. None substitutes for another, and an enablement never gates a read. `refs/permission-vs-enablement.md` in the **spn-devex** plugin carries the question, the grammar and the traps; this plugin's `hooks/scripts/enablement-grammar.py` refuses the checkable ones at write time.
+- **Gate check.** Where the change adds or moves an authorization gate, settle what varies the answer before you write it. A rule that changes per person is a permission; per organization type, an enablement; per plan, billing. None substitutes for another, and an enablement never gates a read. `refs/platform/core/tenancy/permission-vs-enablement.md` in this plugin carries the question, the grammar and the traps; this plugin's `providers/ts/scripts/checks/_src/enablement-grammar.ts` refuses the checkable ones at write time.
 - **Additive check.** If the change removes/renames/retypes a published field, changes a meaning, or tightens validation on an existing command field, it is **breaking**. Stop and reroute through the `ideate` skill (decision + versioning path). Additive by default is the rule, not a preference.
 - **Ownership check.** The change lands in the module that owns the capability (its package, or the app-owned module). Cross-module needs go through the other module's **contract** services — or a request queue for writes — never its internals.
 
@@ -64,13 +64,13 @@ Scope reads to what the step needs — the inventory tells you which packages ex
 | 4 | `queue` | listeners, `subscriberId` as a consumption contract, why the handler is ungated, consumer-side idempotency |
 | 5 | `ui` | `MODULE_WEB` plug-in points, hooks, permission gating (full-stack / FE-only) |
 | 6 | `test` | how this stack runs each tier. **Which tier a project owes is `DEVEX_TEST`'s**, and that skill carries the ladder |
-| 7 | `docs` | the doc set closes the change. **The seats, the two voices and the glossary are `refs/doc-sets.md` in the spn-devex plugin**; this stack's half is `env` — where a key goes in its env files |
+| 7 | `docs` | the doc set closes the change. **The seats, the two voices and the glossary are `refs/devex/workspace/docs/doc-sets.md` in the spn-devex plugin**; this stack's half is `env` — where a key goes in its env files |
 
 **A step file this stack does not ship is a step this stack does not walk.** A realization that is absent says so; nothing here stubs one.
 
-Order never changes; skip only what the classification skips. **Docs move with the steps, not after them.** The contract step updates `docs/04-capabilities/` rows and writes intent comments as it writes the surface. The test step embeds behavior ids in contract-tier test titles, and the docs step is the closing sweep that flips statuses. Regenerate at the marked points. Run `gen-validators` after any `contract/states/**` edit. Run `gen-barrel` after adding files to a lib package — never on apps or the API client. Regenerate the API client from the **running** service if routes or contracts changed before the FE consumes them.
+Order never changes; skip only what the classification skips. **Docs move with the steps, not after them.** The contract step updates `docs/04-capabilities/` rows and writes intent comments as it writes the surface. The test step writes behavior ids into case titles as each tier requires, and the docs step is the closing sweep that flips statuses. Regenerate at the marked points. Run `gen-validators` after any `contract/states/**` edit. Run `gen-barrel` after adding files to a lib package — never on apps or the API client. Regenerate the API client from the **running** service if routes or contracts changed before the FE consumes them.
 
-**The test step proves each claim once, at the level that owns it.** Pick the tier by what would break: a validation rule breaks in a unit, an authorization gate breaks against the real service, an outcome breaks end to end. A unit test for something that only fails when wired is a green proving nothing. A journey re-checking a rule the contract tier already decided is a slower copy of an answer you have. Contract-tier titles carry their behavior ids, which is what makes coverage readable later.
+**The test step proves each claim once, at the level that owns it.** Pick the tier by what would break: a validation rule breaks in a unit, an authorization gate breaks against the real service, an outcome breaks end to end. A unit test for something that only fails when wired is a green proving nothing. A journey re-checking a rule the contract tier already decided is a slower copy of an answer you have. **The tier decides which cases carry a behavior id** (`RD.DEVEX.FUNCTION.064`): every contract, component and journey case; every integration case proving a guarantee; a unit case only where it proves a row whose `Tier` is `UNIT`. A row's `Tier` equals the tier of the case that proves it. That is what makes the rows readable later.
 
 ## 4. Close
 
@@ -81,7 +81,7 @@ Order never changes; skip only what the classification skips. **Docs move with t
 
 ## Lenses
 
-The step files are the `server-dev` and `web-dev` lenses worn — they carry the same rules. Additionally wear the core plugin's `refs/lenses/trust.md` on any mutation and `refs/lenses/partner.md` on contract states. The close's review gates are the panel convened: `partner` when the published surface changed, `trust` when authorization, audit, or secrets moved, `qa` always.
+The step files are the `server-dev` and `web-dev` lenses worn — they carry the same rules. Additionally wear the spn-devex plugin's `refs/devex/agent/lenses/trust.md` on any mutation and `refs/devex/agent/lenses/partner.md` on contract states. The close's review gates are the panel convened: `partner` when the published surface changed, `trust` when authorization, audit, or secrets moved, `qa` always.
 
 ## Write code the capability generator can read
 

@@ -48,7 +48,7 @@ spnutils infra release <package> --local -y    # → the machine store, staged o
 
 ## 4 · After — pins flip at their own pace
 
-Consumers cite `{ package, version }` — the org's `blueprint` pin, a platform's `modules[].source` — and flip from path to pin per package, per the `implement` skill. An apply fetches the published version and applies *that*, never a checkout. `infra show` confirms PINNED @ version per layer.
+Consumers cite `{ package, version }` — the org's `blueprint` pin, a platform's `modules[].source` — and flip from path to pin per package, per the `implement` skill. An apply fetches the published version and applies *that*, never a checkout. `spnutils infra show <spc>` confirms PINNED @ version per layer.
 
 ## The line that holds
 

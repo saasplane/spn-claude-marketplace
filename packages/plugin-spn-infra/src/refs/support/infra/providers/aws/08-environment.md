@@ -12,7 +12,7 @@
 
 **Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/aws/08-environment.md`. Read this as the restatement; that node governs.
 
-**The command is `spnutils infra environment <env> up --cloud`.** The environment layer has **no local form** — the machine is one environment, and targeting it locally is refused by name. The runbook behind this names `cinfra env up`, which never shipped.
+**The command is `spnutils infra environment up <spc> <env> --cloud`.** The environment layer has **no local form** — the machine is one environment, and targeting it locally is refused by name. The runbook behind this names `cinfra env up`, which never shipped.
 
 ## The order is what makes it work
 

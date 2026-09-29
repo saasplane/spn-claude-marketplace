@@ -21,6 +21,8 @@ description: Run the estate's gates - spnutils infra validate for the build, spn
 
 **Green before any review is asked for.** These two commands are the whole of the mechanical gate; everything they do not cover is a judgment call and belongs to the `review` skill.
 
+**Read the repository's Test and verify guide first** — `docs/05-guides/*-test-and-verify.md`, linked from `.claude/saasplane/rules.md` under *How this repository is tested* (`RD.DEVEX.WORKSPACE.181`). It holds this estate's own sequence: the `~/.spnenv` keys a run reads, the steps in order, the clean reset of the machine, and what to do when something fails. Follow its steps; never read the sequence out of `CLAUDE.md`, which states none. A repository with no guide says so in that section — then use the loop below and name the missing guide in your report.
+
 ## The loop
 
 A node's behaviour rows open `PLANNED`. Proving one is not a separate errand from writing it:
@@ -73,7 +75,7 @@ Every owed tier lives in its own folder under `tests/` — `contract/` · `unit/
 
 ## The order
 
-Scaffold or edit → write the row `PLANNED` → the case, in its tier folder → `spnutils infra validate` → `spnutils infra test` → rows stamped → `spnutils infra <layer> up --plan` → hand the plan to the `review` skill → `--apply` → `release`. A step skipped is a step somebody else pays for.
+Scaffold or edit → write the row `PLANNED` → the case, in its tier folder → `spnutils infra validate` → `spnutils infra test` → rows stamped → `spnutils infra platform up <spc> --plan` (or the layer you changed: `organization up` takes no `<spc>`, `environment up <spc> <env>` takes both) → hand the plan to the `review` skill → `--apply` → `release`. A step skipped is a step somebody else pays for.
 
 ## Hand-off
 

@@ -12,7 +12,7 @@
 
 **Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/local/07-platform.md`. Read this as the restatement; that node governs.
 
-**`spnutils infra platform up` stands the platform's container group from the pinned declaration.** Nothing about it is a separate local model: the layer reads the same manifests the cloud layer reads, and the driver executes compose trees where the cloud runs the engine.
+**`spnutils infra platform up <spc>` stands the platform's container group from the pinned declaration.** Nothing about it is a separate local model: the layer reads the same manifests the cloud layer reads, and the driver executes compose trees where the cloud runs the engine.
 
 ## What it stands
 

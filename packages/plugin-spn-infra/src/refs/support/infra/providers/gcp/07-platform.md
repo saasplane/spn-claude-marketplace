@@ -11,7 +11,7 @@
 
 **Nothing stands up a platform on Google Cloud** — not its workload and control containers, not its trust graph, not its zone and wildcard certificate, and none of the instruments installed beside them.
 
-**What to do instead.** Bring a platform up on the [local realization](../local/07-platform.md) with `spnutils infra platform up`, which renders its container group on your machine from the pinned declaration. `up` and `down` each take exactly one of `--plan` or `--apply`, with no default, and `tofu apply` or `tofu destroy` is never hand-run.
+**What to do instead.** Bring a platform up on the [local realization](../local/07-platform.md) with `spnutils infra platform up <spc>`, which renders its container group on your machine from the pinned declaration. `up` and `down` each take exactly one of `--plan` or `--apply`, with no default, and `tofu apply` or `tofu destroy` is never hand-run.
 
 **Why this is a ruling rather than an absence.** What a platform layer stands up is the model's answer and the same on every cloud. A provider decides only how each part appears, so there is no Google Cloud platform design missing — there is code missing.
 

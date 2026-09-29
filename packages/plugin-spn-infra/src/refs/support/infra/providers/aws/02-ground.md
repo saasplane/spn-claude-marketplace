@@ -9,7 +9,7 @@
 
 **Source of truth:** the foundation's `docs/04-capabilities/02-support/02-infra/10-providers/aws/02-ground.md`. Read this as the restatement; that node governs.
 
-**The command surface is `spnutils infra <layer> … --cloud`**, with the layer nouns `organization` · `platform` · `environment`. The runbook behind this predates that surface and names `cinfra`, which never shipped, along with a three-step split of `org` · `cc` · `env`. **Read the steps; ignore the old command names wherever you meet them.**
+**The command surface is `spnutils infra <layer> <verb> … --cloud`**, with the layer nouns `organization` · `platform` · `environment`; a platform-scoped layer names its `<spc>` straight after the verb. The runbook behind this predates that surface and names `cinfra`, which never shipped, along with a three-step split of `org` · `cc` · `env`. **Read the steps; ignore the old command names wherever you meet them.**
 
 ## Why there is a manual minimum at all
 

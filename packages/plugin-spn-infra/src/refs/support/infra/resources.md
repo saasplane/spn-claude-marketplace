@@ -168,4 +168,4 @@ Not everything a platform runs is something SaaS Plane wrote, and third parties 
 | a caller naming a vendor's own API directly | the seam was bypassed and lock-in is now structural |
 | a module writing outside its tagged space | the identity scoping failed, and detachment can no longer be checked |
 
-Try it: `spnutils infra config render in-dev api` — it composes one application's environment and masks every secret.
+Try it: `spnutils infra config render dmo in-dev api` — it composes one application's environment and masks every secret.

@@ -147,10 +147,10 @@ The join is this plugin's, because where a case lives is the stack's:
 node "${CLAUDE_PLUGIN_ROOT}"/scripts/checks/behaviour-join.ts .      # a SUCCESS row no case cites, a case citing no row
 ```
 
-Where the run collected coverage, raise each project's floor to what it measured — it never lowers one:
+**Code coverage is read, never enforced** (`RD.SUPPORT.APPS.133`). A run that collects coverage prints its summary after the tests — lines, statements, functions and branches — and the test tool writes `coverage-summary.json` beside its report. Report those numbers as they are. No configuration carries a threshold, and nothing fails a run on a percentage. The one rule about coverage you check is that every exclude says why:
 
 ```bash
-node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs coverage floor --write <project>
+node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs coverage check <project>   # an exclude with no comment giving its reason
 ```
 
 **Pass `--reach repository` only when the artifacts on disk ARE the whole of the tiers they name** — a full run of every node that owes them. Without it, a row no artifact mentioned is left exactly as it was. With it, such a row goes back to `PLANNED`, which is right after a complete run and wrong after a single node's: runs are per node and a register is per repository, so one node's journey run would otherwise reset another's rows.
@@ -176,16 +176,25 @@ if you bypass the target, and reaching for `.ts` is the natural guess. It fails 
 module rather than a missing file, so you go looking at your jest setup instead of at the
 extension. Passing through the target is why you never have to know this.
 
-**The browser suite.** The workspace root is not an nx project, so Playwright stays a root script:
+**The browser suite runs in three steps, in this order:** build the test bundle, serve it, then run
+the journey tier against what is served.
 
 ```bash
-pnpm test:e2e                     # the whole sweep
-pnpm test:e2e -- --max-failures=5 # while diagnosing — a failing case pays its whole timeout
-pnpm test:e2e:report              # the last run's report
+pnpm build test                                          # 1. the bundle a browser drives, in development mode
+pnpm start                                               # 2. serve what the build produced
+spnutils apps test journey <node>                        # 3. the sweep, the default phase
+spnutils apps test journey <node> --phase serialized     #    the cases that flip a global or a session, one worker
+spnutils apps test journey <node> --phase window         #    the cases that wait out a window, one worker
+spnutils apps test journey <node> -- --max-failures=5    # while diagnosing — a failing case pays its whole timeout
 ```
 
-**Whole-repo unit runs.** `pnpm test:all` and `pnpm test:dev` are root scripts that wrap nx; either
-is fine, and `npx nx run-many -t test --all` is the same work.
+**A phase is an argument, never a file.** A node carries one journey configuration, and `--phase`
+sets `SPN_TEST_PHASE` for it; naming no phase runs the sweep. The command runs the configuration
+beside the node, or else the one at the repository root. Everything after `--` reaches Playwright
+untouched.
+
+**Whole-repo runs.** `pnpm test:all` is the root script that runs every tier each node owes or
+carries, across the repository.
 
 **Infrastructure.** Every layer goes through `spnutils infra`, never hand-rolled docker.
 
@@ -216,8 +225,8 @@ means a build value was missing and threw at boot, naming the key.
 
 ## Mode: local — start the platform stack (start only, no tests)
 
-1. **Organization layer** (once per machine — skip if already up): `spnutils infra organization up` — the machine's trust bootstrap: the local certificate authority, its one trust prompt, the shared ingress.
-2. **Platform layer**: `spnutils infra platform up` — this platform's container group (database, cache, queue, and each installed module's local rendering) from the pinned declaration. Check with `spnutils infra platform status`.
+1. **Organization layer** (once per machine — skip if already up): `spnutils infra organization up --apply` — the machine's trust bootstrap: the local certificate authority, its one trust prompt, the shared ingress. The organization layer takes no `<spc>`, because a repository has at most one organization.
+2. **Platform layer**: `spnutils infra platform up <spc> --apply` — this platform's container group (database, cache, queue, and each installed module's local rendering) from the pinned declaration. `<spc>` is the platform code `sprepo.json` pins, and a different one is refused (`RD.DEVEX.UTILS.072`). Check with `spnutils infra platform status <spc>`.
 3. **App layer** (per app, if not yet registered): `spnutils infra app up <app>` — schemas, per-schema roles, local TLS certificate, hosts entry, ingress vhost. No containers of its own.
 4. **Hosted-vendor modules** need no step of their own — a vendor you run is a module row in the platform declaration, and its local rendering comes up with the platform layer. There is no vendor command.
 5. **Start the service app**: `npx nx run <service>:dev`. It loads `local.env`, and its port and API-docs path come from the repo's own app env — read them rather than assume. On a fresh schema run `pnpm --filter <service> migrate up` first; it needs the platform-owner env variables sourced.
@@ -225,7 +234,7 @@ means a build value was missing and threw at boot, naming the key.
 
 Stop here — this mode starts things; it does not test or verify them. Hand off to the `verify` skill for health checks. Report what is up and on which ports/hosts.
 
-Notes: `spnutils infra platform down --clean` **wipes the shared local DB**. Never run it in this mode — that belongs to the reset macro in the `verify` skill, on explicit command only. Logs: `spnutils infra logs [service]`.
+Notes: `spnutils infra platform down <spc> --apply --clean` **wipes the shared local DB**. Never run it in this mode — that belongs to the reset macro in the `verify` skill, on explicit command only. Logs: `spnutils infra logs <spc> [service]`. To route one more host to a registered app, `spnutils infra domain register <spc> <host> --app <kind code>` — the app's port comes from its registration.
 
 ## Mode: tests
 
@@ -242,7 +251,7 @@ npx nx run-many -t test --all            # every unit suite
 2. If the contract changed since the client was generated: regenerate the client from the live service first.
 3. `npx nx run <client>:test:integration` — the target already carries the config and `--runInBand`.
 
-**FE E2E**: `pnpm test:e2e` (root Playwright) — after the BE suite, on a quiesced stack (no concurrent resets/builds), with the stack seeded.
+**FE journeys**: `pnpm build test` → `pnpm start` → `spnutils apps test journey <node>`, then `--phase serialized` and `--phase window` where the node carries those cases — after the BE suite, on a quiesced stack (no concurrent resets/builds), with the stack seeded.
 
 Codegen freshness comes before any suite. Run `spnutils apps gen-validators <pkg>` for packages with edited `contract/states/**`. Run `spnutils apps gen-barrel <pkg>` for lib packages that gained/lost files — never apps, never the API client.
 
