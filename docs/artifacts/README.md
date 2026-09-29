@@ -54,4 +54,4 @@ A report answers a question at a moment, and is **replaced in place** by the nex
 
 **Nor does a source a seat depends on.** Nothing in a pocket may be depended on — that is what makes a stale report safe to leave standing. A fact a seat needs lives in that seat.
 
-**Nor the plugins themselves.** They are the repository's work, not a description of it: [`plugins/`](../../plugins/) at the root is where they are authored and delivered.
+**Nor the plugins themselves.** They are the repository's work, not a description of it: [`packages/`](../../packages/) at the root is where they are authored and delivered, one `plugin-spn-*` folder each.
