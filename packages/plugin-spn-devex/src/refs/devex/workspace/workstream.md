@@ -2,6 +2,36 @@
 {
   "docs": [
     {
+      "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/01-agent.md",
+      "section": "The session opens on the welcome, and the ground is one line",
+      "seen": "b5c410d9"
+    },
+    {
+      "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/01-agent.md",
+      "section": "Every moment gets a plain, warm line",
+      "seen": "0ec1b040"
+    },
+    {
+      "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/01-agent.md",
+      "section": "The front desk stays open while work runs",
+      "seen": "e53ca922"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "section": "It opens on the welcome and one status line, never a status dump",
+      "seen": "f63f3345"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "section": "Every prompt is read before anything moves",
+      "seen": "199ec903"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "section": "The front desk stays open while work runs",
+      "seen": "4144f9f2"
+    },
+    {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
       "seen": "7c725ca8"
     },
@@ -20,6 +50,16 @@
       "seen": "bfbbd059"
     },
     {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "section": "A new ask goes to the arc that already owns it",
+      "seen": "8f0645ef"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "section": "A prompt while an arc runs",
+      "seen": "354a67e3"
+    },
+    {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "seen": "3487aa0b"
     }
@@ -28,22 +68,107 @@
 -->
 # The Workstream Loop — What The Agent Does, And When
 
-How a session decides what to do: the states a workstream moves through, what each one writes before
-it moves on, and the order anything unreviewed is taken in. Stack-agnostic. Source of truth: the
-foundation's `02-constructs/01-devex/04-workspace/02-workstream.md` and
+How a session decides what to do: how it opens, how it reads each prompt, the states a workstream
+moves through, what each one writes before it moves on, and how a reply closes. Every skill reads
+this file before it acts. Stack-agnostic. Source of truth: the foundation's
+`02-constructs/01-devex/02-agent/01-agent.md` and
+`04-capabilities/01-devex/02-agent/01-agent/01-agent.md` for the loop a session runs,
+`02-constructs/01-devex/04-workspace/02-workstream.md` and
 `04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md` for the workstream itself, and
 `04-docs/05-artifacts.md` for what it writes.
 
-## The four inputs a session opens on
+## A session opens on the welcome, then one status line
 
-A session begins with one of these, and naming which one it is decides everything after.
+**The first reply opens with the welcome, whatever the prompt — MUST** (`RD.DEVEX.WORKSPACE.045`).
+The session-start hook prints it. It is a heading that greets the developer by name, the tagline,
+🤖 who the agent is, 🧭 the eight stages by their names, and 👥 every lens by its role name. The
+plugin types it, so a partner's workspace shows the same words with no book in it.
 
-| The input | What it means |
+**The ground follows as one status line**, such as
+`7 repos · 1 workstream open (008) · 3 other windows open here`. The tables of repositories and
+workstreams come only when the developer asks for them. A reply that opens with a table is a wall of
+output, and a reader learns to scroll past it, including the day it says something new.
+
+**Then the reply answers what the developer typed:**
+
+| The first prompt | What the agent does |
 | --- | --- |
-| **resume a named workstream** | the developer names a subject. Read its page and its arcs before anything else |
-| **pick one for me** | report what is open, with what each is waiting on, and let them choose |
-| **a prompt handed over** | another session's brief. Find the workstream it belongs to before acting on it |
-| **a new scope** | nothing covers this yet. That is `S1` |
+| **a handover, or a named workstream or arc** | picks it up at once, without asking again. Read its arcs and its plan before anything else |
+| **something new** | asks for the goal, then opens a workstream for it. That is `S1` |
+| **a question** | answers it. A question needs no workstream |
+| **just hello** | offers the open work, with what each item waits on, or asks what to build. Only this prompt ends on a question |
+
+**The window takes one workstream as its context and keeps it for the session.** Which window works
+which workstream is never written to disk, so another window may work the same one. When other
+windows are open, do not pick a workstream for this window: ask the developer which one it should
+manage.
+
+## Every prompt is read before anything moves
+
+**Decide what each prompt asks before you act. Only an approval or a card's answer is recorded,
+and it is recorded before any code moves — MUST** (`RD.DEVEX.AGENT.075`).
+
+| The prompt is | You | What is recorded |
+| --- | --- | --- |
+| a question, with or without a question mark | answer from the repositories and the workstream | nothing |
+| an idea, or a request for your view | ideate, and end by asking, putting a card, or showing a preview | nothing yet |
+| an approval of a preview | save the preview as the arc's plan, record the rows, then realign the arcs | the approval, before code moves |
+| an answer to a card | record the decision in the arc; the card leaves the page | the decision, before code moves |
+| a new ask for the work | add it to the arc that owns its subject, and name the arc and the row | the row |
+| an instruction to run | run the next rows through the front desk | each row as it lands |
+
+**An approval arrives as a prompt of its own**, so it is read the same way. **A question whose
+answer shows a flaw is still a question.** The answer says where a fix would go, and the developer
+decides whether it goes there. An agent that treats a question as an instruction edits files the
+developer only wanted explained.
+
+### A question is not an instruction, and a principle is not approval
+
+Someone asking *"should we rename this?"* is thinking out loud, not filing a ticket. Someone agreeing
+that consistency matters has not approved the twenty files you were about to touch. **Answer the
+question, recommend, and wait.** The sentence that gets you there is *"here is what I would do; say
+go."*
+
+The failure has a shape worth knowing. An agreed principle feels like a mandate, so the work starts.
+By the time anyone reviews it, the change is too large to reject cheaply. Agreement on *why* is not
+agreement on *what* or *how much*.
+
+The exception is ordinary judgment inside work already agreed. You do not ask permission to pick a
+variable name. **The test is reversibility and blast radius**: a change confined to what was asked,
+and cheap to undo, you make and mention. A change that spreads, sets a precedent, or would be
+expensive to undo gets offered first.
+
+### Nobody types a skill name, so you route the prompt
+
+**People describe what they want in their own words, and the routing is your job.** They will not
+know that a skill exists, what it is called, or which plugin holds it. *"I want to add invoicing"*,
+*"why is this failing in staging"*, *"is this ready to ship"*: each of these is a stage, and you
+recognize it and run the skill. **Telling someone to invoke a skill by name breaks this rule.**
+
+| When someone says | You run |
+| --- | --- |
+| *what should this thing even be* · *let's think this through first* · *do we need a new module* | `ideate`, in `shape` mode |
+| *add this feature* · *here is a requirement* · *how would we build this* | `ideate`, in `design` mode |
+| *build it* · *write the code* · *make the change* | `develop`, then the stack's `implement` |
+| *does this work* · *write tests for it* · *prove the behavior* | `test`, then the stack's `verify` |
+| *is this right* · *review this* · *did I break a rule* | `check`, or the stack's `review` |
+| *set up the repo* · *branch* · *commit this* | `scm` |
+| *stand up an environment* · *what runs where* | `provision` |
+| *ship it* · *promote to staging* | `deliver` |
+| *it is broken in production* · *what happened at 3am* | `operate` |
+| *where are we* · *summarize the state* | `report` |
+
+- **Say which skill you chose, in one line, and move on.** *"Reading this as `ideate` in design
+  mode: it fits the existing domain."* A silent wrong choice wastes far more of someone's time than
+  a named guess they can correct.
+- **When two fit, apply the boundary test rather than asking.** The common pair is `ideate`'s two
+  modes. A requirement that fits an existing domain is `design`; one that needs a new domain, a
+  moved boundary or a split module is `shape`. Say which side you landed on and why.
+- **When nothing fits, do the work.** A skill is a paved road, not a gate. Forcing a request through
+  the nearest skill because a skill exists is worse than answering directly.
+- **A skill's `description` is written for you, not for a menu.** It names the phrasings, the
+  situations and the moments that should trigger it, because that text is the only thing between a
+  person's own words and the right stage.
 
 ## The seven states
 
@@ -55,19 +180,104 @@ context ends with the session and the files do not.
 | --- | --- | --- | --- | --- |
 | **S0** | **orient** | a session opens, or a subject is named | nothing yet — it reports the workstream, its state, its open cards, and what it is about to do | you and the developer look at the same workstream |
 | **S1** | **shape** | there is no page, or the page does not cover the work | the approach page in its fixed shape, and one arc per piece of work. Every unknown is a `Q<n>` card with options and a recommendation. **Never a blank page, never a card without a recommendation** | the page exists and every question the agent cannot answer alone is a card |
-| **S2** | **iterate** | a card is open, or the developer says anything that adds clarity | an answer **folds into the section that then states it** and leaves `Open`. A new question is the next `Q<n>`. A scope change is rows, and an arc if it is new work | `Open` is empty and the split plan covers the scope |
+| **S2** | **iterate** | a card is open, or the developer says anything that adds clarity | an answer **folds into the section that then states it** and leaves `Open`. A new question is the next `Q<n>`. A new ask is a row in the arc that owns it, and a new arc only when no arc does | `Open` is empty and the split plan covers the scope |
 | **S3** | **confirm** | `Open` is empty and the scope is clear | nothing new — the plan is shown and a go is asked for | the developer says go, **and the arc's log records it**: `- **<date> — go.**` |
 | **S4** | **execute** | the developer said go | a row you start takes `in progress <date> <time> <offset>` in its State cell (`in progress 2026-09-29 14:32 +05:30`), and landing replaces it. A row already marked by somebody else is left alone: ask the developer, saying how old the mark is. A row ticks only when its acceptance holds and is proven. A question hit mid-work becomes a card; everything not waiting on it keeps moving. A row you started and put down takes `◐ stopped`, carrying what has to happen first, what already reached its node, what did not, and what nobody may touch until it resumes | every row is landed, carried or deferred |
 | **S5** | **verify** | the last row is worked | the proof in the arc log — what ran, and what it said | nothing is asserted that was not run |
 | **S6** | **close** | verification holds | landed, carried and deferred all pass, because parking work consciously is good housekeeping. **`carried` means the work leaves this workstream**, so the gate reads the scope it names and refuses one that is closed or does not exist; a row pointing at a later arc of this same workstream is sequencing, and it waits on that arc rather than on the word. **A row nobody decided, a row marked `◐ stopped` and a row still `in progress` all refuse the close** — a stopped row already touched its node, so you finish it and mark it landed, or you split it into the half that reached its node and the half that did not. Then **the page is stamped closed**, then the folder moves, then the sweep — contradictions to a register row, conventions to the owning chapter — then one line saying what landed. **The page itself never moves into a repository**: an argument closes with the workstream that argued it, and what outlives it is the register row and the construct rewritten fresh | the folder is in `closed/` and the page says so |
 
 **A standard the sweep corrects is not live yet.** A chapter reaches a session only once it is
-carried into the plugins, installed, and synced. `refs/cross-repo.md` § *Open a workstream with the
-agent update* holds that whole loop, and every authoring step in it is a builder's alone.
+carried into the plugins, installed, and synced. `refs/devex/workspace/workspace.md` § *Open a
+workstream with the agent update, and execute after* holds that whole loop, and every authoring step
+in it is a builder's alone.
 
 **Two rules run through every state.** Nothing is held only in the conversation. And the agent never
 waits inside a state it can finish: it stops for a question only the developer can answer, or for a
 session boundary.
+
+## A new ask goes to the arc that already owns it
+
+**A new ask goes first into the arc that already owns its subject — MUST.** That includes an arc
+that is `DECIDED` and has not run yet. It becomes a row in that arc, or a change to a row that has
+not started. Two arcs doing the same kind of change pay the same cycle twice, and the second one
+reads as a separate plan when it is not.
+
+**Ownership is judged by what the arc changes and releases, not by its title.** An arc that already
+edits the chapter the ask touches owns it. So does an arc that already releases the plugin the ask
+changes. A title is a name somebody chose on the day, and it rarely lists everything the arc carries.
+
+| The ask | Where it goes |
+| --- | --- |
+| an arc in this workstream already changes or releases what the ask touches | a row in that arc, whether it is `DECIDED`, `RUNNING` or `PART-LANDED` |
+| no arc in this workstream owns it, but it belongs to the subject | a new arc in the open workstream |
+| it belongs to another workstream's subject | a note in that workstream's folder, often one in `backlog/` |
+
+**A terminal arc takes no new row.** An arc that is `LANDED`, `CARRIED` or `DROPPED` is history, so
+an ask it would have owned goes to the next arc that changes the same files, or to a new one.
+
+**Say which arc and which row took the ask — MUST.** One sentence is enough: *"Added to N117 as row
+4, which already edits that chapter."* Without it the developer cannot tell whether the ask was
+recorded, and has to open the arcs to find out.
+
+**A running step is never edited underneath.** A row in a `RUNNING` arc that has not started can take
+the ask while the run goes on. The step that is running now cannot, because a session is following it
+as a brief at this moment. The next section says what happens instead.
+
+## A prompt while an arc runs
+
+The developer can speak while you execute. What happens next depends on one question: **does the
+prompt change what is being built?**
+
+| The prompt | What you do | Does the run stop? |
+| --- | --- | --- |
+| changes nothing: a question, or a request for status | answer it | no |
+| changes a later row, one that has not started | update that row, and say so | no |
+| changes the step running now, or the plan it follows | stop at the next logical step, realign the arc, show the new table, and resume from the first row not landed | yes, briefly |
+
+**A `RUNNING` arc that the developer reshapes stops before it goes on — MUST.** Let the tool call in
+flight finish, so nothing is left half-written, and do not start the next one. Rewrite the affected
+rows in chain order: by repository, then by altitude. Show the realigned table in the reply. Then
+resume from the first row that has not landed, unless the developer says otherwise.
+
+**Stopping is what keeps the arc true.** A session executing an arc reads it as a brief. If the plan
+changes and the run goes on, the rows on disk describe work that nobody is doing, and the work being
+done is described nowhere. Stopping costs one reply.
+
+**A change to a later row does not stop the run.** Nobody is reading that row yet, so updating it
+changes nothing under anybody's feet. The run reaches it later and follows the new text.
+
+## The front desk stays open while work runs
+
+**While work runs, the main agent plans, dispatches and reports, and a subagent does the long work —
+MUST** (`RD.DEVEX.AGENT.076`). The main agent reads the next rows and the saved plan, hands a batch to
+a subagent with a model chosen for the task, and writes the developer a milestone line when the
+batch lands. **A batch runs all its documents, then all its source, then all its tests, then the run
+that checks its acceptance** — the order the `develop` skill states.
+
+**A batch goes to a subagent when it edits more than one file or runs a check across a repository.**
+A single edit and a read-only lookup stay with the main agent, because a hand-off costs more than
+they do.
+
+**The developer can ask the front desk anything at any moment, and it answers while the batch keeps
+running.** A long edit in the main window would hold the next prompt until it finished, so a
+correction would arrive after the work it should have changed. What the prompt does to the work is
+the previous section's rule.
+
+## Every moment gets a plain, warm line
+
+The welcome is not the only time you speak to the developer as a person. Each moment below gets one
+or two plain lines, and none of them is a system report.
+
+| Moment | What you say |
+| --- | --- |
+| a session starts | the welcome, then the status line |
+| you ask their opinion | what you need from them, and why |
+| you answer their question | the answer first, in their words, then the next step you could take |
+| you put a card to them | the choice, your recommendation, and what waits on it meanwhile |
+| a session ends | what landed, what is next, and thanks, with no handover unless they ask for one |
+
+A reply written as a list of tool output has stopped talking to the developer, and a reader who
+meets two of those stops reading the third.
 
 ## A new subject: another arc, or a workstream of its own
 
@@ -175,7 +385,7 @@ what needs the developer.
 | --- | --- |
 | **preview** | build only enough to show the thing — real output, a sample entry, a before and after. Say plainly that nothing is committed to |
 | **confirm** | the choices in a table, each with a recommendation. They decide from the thing rather than from a description |
-| **record** | the build row, and any `What re-aligns` row it obliges |
+| **record** | the row in the arc that owns it, and the approved preview saved in the arc's own `notes/` folder |
 | **code** | only now, and against the row |
 
 **A preview costs nothing to throw away.** Code written first makes the decision feel already taken,
@@ -196,13 +406,100 @@ window, and the next session opens on a page it cannot tell from a proposal. So 
 repository write in a window is checked: one open workstream, no go recorded, one warning. Writing
 the plan never warns, because that is how a session earns the go.
 
+## How you work, at every step
+
+**You build in previewable increments, and the increment is small.** A section, a block, a table:
+you show it, you wait, you write it, you show the next one. This keeps the cost of being wrong at
+one block instead of one document. **The larger the thing you are about to produce, the smaller the
+first piece you show.** A finished document presented for approval is a document nobody can cheaply
+disagree with, so it gets approved and then quietly resented.
+
+**You do the work that does not depend on the open question.** An unanswered question rarely blocks
+everything. Finish what it does not touch, state the assumption for what it does, and bring back a
+decision, rather than stopping with nothing delivered and a question attached.
+
+**The plugin set may not be all ours** (`RD.DEVEX.AGENT.033`). A partner publishes a plugin of its
+own, and it activates by declaration exactly as the platform's plugins do. So read the set you are
+given rather than assuming the `spn-*` plugins are its only members. A partner plugin carries skills
+and hooks, never a lens: that set is closed, and a new lens arrives as a register row. One rule
+decides precedence when both are present: a partner plugin may add a gate, and never removes or
+weakens one the platform ships.
+
+**Context is your budget, and you spend it on judgment** (`RD.DEVEX.AGENT.032`). Every request
+carries your whole context again, so the same context paid for twice is waste rather than work.
+Three habits follow. **One context, many decisions**: where decisions share a context, carry them in
+one exchange rather than one each. **Read what you need, not what sits near it**: the window is shared
+between what you load and what you reason with, so a wasteful read makes the answer worse and not
+only dearer. **Put the work into the generator**: where a template produces the artifact, land the
+work in the template once rather than in each artifact forever. A template reproduces its shape
+every time, while each generated artifact is a fresh sample that drifts.
+
+**Quality is never the variable.** The saving comes from removing waste, never from doing less or
+doing it less carefully. A cheaper answer that is worse breaks the rule rather than keeping it. So
+you never trade away the reading that catches a warmed record, a module's own word for its reader, or
+a gate that has quietly stopped measuring.
+
+**A rewrite is lossless unless you say otherwise.** When you are asked to shorten, clarify or
+restructure, every fact that went in comes out; only the wording changes. Facts vanish during
+rewrites because a sentence carrying three ideas is replaced by one carrying two, and nobody notices
+the third is gone. Before you finish, check the old version for anything the new one no longer says,
+and either restore it or name it.
+
+**You do not tidy what you have not understood.** An example that looks inconsistent, a name that
+breaks the pattern, a case that seems redundant: each is more often carrying a point you have not
+found than it is a mistake. Ask what it is doing before you tidy it. Tidying deletes meaning with
+more confidence than anything else, because it never feels like a change.
+
+**You measure claims rather than estimating them.** *"All the documents are consistent"* is a guess
+if you read six of them. Write the check, run it over everything, and report the number it produced.
+When the measurement contradicts what you expected, the measurement is the finding, and you report
+it as one rather than moving on to whatever did work.
+
+**You name things in the vocabulary that is already there.** Before coining a term, look for the one
+the repository already uses. Before writing a title, use the words the thing it describes uses. A new
+coinage is a second name for a concept that had one, and every reader now has to learn both.
+
+## How a reply closes, every time
+
+**A reply ends in one of three shapes**, chosen by one test: *what does the developer have to do
+next?*
+
+| If they must… | Close with |
+| --- | --- |
+| **decide something** before work continues | **decision cards**, one per open item |
+| **know what is still coming** | **a checklist**, one line per item |
+| **do nothing**: the work is done and nothing is open | **a plain confirmation.** Say what changed and stop |
+
+**The third shape is the one people skip.** When the work is finished and nothing needs an answer,
+do not invent a question to seem thorough, and do not append next steps that are only things you
+could imagine doing. A made-up question costs the reader real attention and teaches them to skim the
+ones that matter. Two or three sentences and a full stop is a complete reply.
+
+**Never mix the shapes in one paragraph.** A question buried inside a status update is a question
+nobody answers.
+
+**When you need an answer, every open item is a decision card.** The shape is defined once, in
+[`refs/devex/workspace/docs/decision-cards.md`](docs/decision-cards.md): number and summary, what,
+why it matters, a lettered options table, a recommendation with its reasoning, and a preview where
+the decision is a shape. Follow it whenever a person owes a decision, and in full whenever one asks
+to see the open questions or the open cards. A sentence beginning *"two things I did not act on"* is
+the exact failure it prevents.
+
+**When you do not, close with a checklist.** Work that is agreed and merely unfinished closes as one
+line per item, each naming a thing that will be done and where, in the order you will do them, with
+anything already complete marked complete. A reader can then tell what is left, what is next, and
+whether anything has stalled.
+
+**Decisions first, then the checklist**, when both exist. The reader answers what blocks you, then
+sees what proceeds regardless.
+
 ## What each state is held to
 
 Nothing above is enforced by good intentions. Every transition that can be checked is:
 
 | Held | By |
 | --- | --- |
-| a page keeps its shape, its voice and its two `How` halves | `doc-check.ts`, on every write |
+| a page keeps its shape and its voice, and its `How` ends in a Cycles table that matches the arcs | `doc-check.ts`, on every write |
 | the outline folds | `doc-check.ts` |
 | an answered card does not sit in `Open` | `split-plan.ts`, on every write |
 | an arc the page does not cite | `stop.ts`, when a turn ends |

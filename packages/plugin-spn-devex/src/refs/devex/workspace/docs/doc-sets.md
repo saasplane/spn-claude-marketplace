@@ -10,6 +10,16 @@
       "seen": "3487aa0b"
     },
     {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "section": "The masthead, and the opening",
+      "seen": "ee951acf"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "section": "The outline is fixed for an argument and borrowed for an explanation",
+      "seen": "2c6b68b6"
+    },
+    {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
       "seen": "ac5af87d"
     },
@@ -24,6 +34,23 @@
     {
       "path": "spn-foundation/CONCEPT.md",
       "seen": "cf94a2b0"
+    }
+  ],
+  "decisions": [
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.WORKSPACE.143",
+      "seen": "449130e9"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.WORKSPACE.182",
+      "seen": "f8987f2e"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.WORKSPACE.187",
+      "seen": "126e2b90"
     }
   ]
 }
@@ -321,13 +348,66 @@ The pocket holds what the node **authors** rather than derives, and its three au
 
 **Nothing new is needed to carry the pointer, because `Boundary` already does** — it is the section that says what this page does not answer and where that is answered.
 
-**The three sections that carry the argument divide by question** — `Overview` answers why, `Model` answers what, and `Parts` carries the detail of that what, one subsection per piece the `Model` named. **`Terms` comes second because the `Model` uses those words and the `Overview` does not**, and **`Boundary` comes after the parts** because a reader can judge an edge only once they have seen the shape. **The opening above the first heading is a standfirst and a summary, and nothing else**: measured across a workspace, 117 of 117 constructs opened with prose no outline named and no check read, so the orientation stays there and everything that argues moves into `Overview`. `Relations` is retired: the metadata block's `dependsOn` already carries what it listed, one way and machine-readable, and a section restating a declared field is a second copy that drifts.
+**The three sections that carry the argument divide by question** — `Overview` answers why, `Model` answers what, and `Parts` carries the detail of that what, one subsection per piece the `Model` named. **`Terms` comes second because the `Model` uses those words and the `Overview` does not**, and **`Boundary` comes after the parts** because a reader can judge an edge only once they have seen the shape. **The opening above the first heading is the masthead, and nothing else**: the Title, the Subtitle and the Description the next subsection states. Everything that argues moves into `Overview`. `Relations` is retired: the metadata block's `dependsOn` already carries what it listed, one way and machine-readable, and a section restating a declared field is a second copy that drifts.
 
 **A construct types no proof — MUST** (decision RD.DEVEX.WORKSPACE.132). What proves it is the behaviour rows at its own path: `02-constructs/<domain>/<name>.md` is proved by `03-behaviors/<domain>/<name>.md` and by nothing else. A row's `Status` is written by the run that proved it, so never write one. In this book the rows are promises and carry no status at all. What a run proved is read in the repository's `tests` report.
 
 **A construct's status is rolled up from those same rows, and never typed.** Nothing started, or no rows at all, is 🔮 `PLANNING`. Every row `SUCCESS` and carrying a `Tier` is ✅ `DONE`. Anything between the two is 🚧 `IMPLEMENTING`. `MANUAL` counts as started and never as proven, because no run writes it. **A construct in a `FOUNDATION` repository carries no `status` key and no `Status:` chip** — its rows are promises, and a promise has no proof state. Where the mirrored behaviours file is missing altogether, the derivation reports it rather than stamping 🔮 `PLANNING`: no rows means nothing ran, and no file means nothing was measured.
 
 **There is no length cap on a page and none on a part.** What decides whether a part should become a construct of its own is a judgement about the concept — does a reader meet this on its own, with its own actor? — never a line count.
+
+### Every page opens on a masthead of three levels
+
+**Every page kind has a masthead of three levels — the Title, the Subtitle and the Description, in
+that order — MUST** (decision RD.DEVEX.WORKSPACE.187). The Title names the page. The Subtitle says in
+one sentence what the thing is, or what the page decides. The Description is the opening: one
+paragraph that explains the page in everyday words. **The page's `summary` field is the
+Description's first sentence, word for word**, so search, an index and the agent read the sentence
+a reader meets first.
+
+| Level | Where it sits | Carries |
+| --- | --- | --- |
+| **Title** | the `h1` | what the page is called. A construct's is its own name, in full — *Estate Shape*, never *Shape*. An overview's is its benefit line |
+| **Subtitle** | `p.subtitle`, directly under the `h1`. In a construct seat it is the `subtitle` field of the `spn:doc` block, which `docs page` renders | one sentence, in plain language |
+| **Description** | one `p.standfirst`, directly under the Subtitle, and nothing after it in the masthead. In a construct seat it is the first lead paragraph, which `docs page` renders as the standfirst | the opening, one paragraph, in plain language |
+
+**What each level holds depends on the page kind:**
+
+| Page kind | Title | Subtitle (one plain sentence) | Description (one paragraph) |
+| --- | --- | --- | --- |
+| **hub** (`concept-overview.html`) | the benefit line | the what line | what the plane is · why read this page first · how it is laid out |
+| **repository overview** | the repository's benefit line | the repository's what line | what this repository holds · why read on · how it is laid out |
+| **concept overview** (`concept-*-overview.html`) | the area's benefit line | the area's what line | what this area covers · why read on · what the pages below cover |
+| **construct** | the construct's name | its one-line promise | what it is · why read this page · how the page runs |
+| **report** | its name and subject | the question it answers | what was counted, with no number · when to read it · how it is laid out |
+| **approach** | the page's name | the decision it plans | what changes · why read it · how the page runs |
+
+**Every level is plain language — MUST** (decisions RD.DEVEX.WORKSPACE.182 and
+RD.DEVEX.WORKSPACE.187). A reader lands on the page without knowing yet whether it is the one they
+need, and reads the Subtitle before the Description.
+
+- **Everyday words, in short sentences with one idea each.**
+- **No numbers, no slogan, and no figure of speech.** A figure of speech cannot be worked out from
+  its words by somebody reading English as a second language.
+- **No book word unless the same sentence explains it**: *behaviour*, *construct*, *lens*, *kind*,
+  *node*, *seat*, *tier*, *arc*, *estate* and *ring*.
+- **The argument goes in the first section**, below the first heading.
+
+**The Description is one paragraph, in the standfirst's place — MUST.** The first sentence says what
+the page is about, in everyday words. The second says why you would read it. At most two short
+sentences follow, on how the page is laid out, and there is no second paragraph. **A report's
+Description carries no number**: the count moves to `Summary` and to the `summary` field.
+
+**The one exception is the foundation's hub, whose Title and Subtitle are
+RD.DEVEX.WORKSPACE.143's, word for word.** No other page copies that pair's style, and the
+Description under it still says in everyday words what SaaS Plane is.
+
+**Show a new Title or Subtitle to the developer before you write it.** Both speak for the product,
+so they are the developer's call. Draft the line, show it, and write it only after a yes. A Subtitle
+that exists today moves into place only if it already passes the plain rule; otherwise draft it
+again. **Each page template's masthead comment carries the rule for its kind, the approved example,
+a poor example for each level and a short check** — copy the template, and read that comment as you
+fill it.
 
 ### The templates sit beside the chapters, in `templates/`
 
@@ -376,7 +456,7 @@ The marks above are for work in flight. `landed` · `carried` · `deferred` are 
 
 | | Outline | Carries `Open` / `Deferred`? |
 | --- | --- | --- |
-| **Approach** | **fixed** — `Terms?` → `Why` → `What` → `How` → `Open` → `Deferred` | yes — they are the argument's organs |
+| **Approach** | **fixed** — an opening paragraph, then `Why` → `What` → `How` → `Open` → `Deferred`, nothing else, in that order. There is no `Terms` section: a word the reader may not know is explained in brackets where it first appears | yes — they are the argument's organs |
 | **Overview** | **borrowed** — the headings of what it expands, in that thing's order | **no** — a question found while writing one is an approach waiting to be offered, or a register row |
 
 **An overview never invents a heading its source does not have.** Lining the two outlines up is what proves it expanded rather than restated. **A settled approach legitimately lacks `Open`** — the design closed — so a missing `Open` is not a routing signal. The skeleton is: **`Why` + `What` + `How` present means it argues.**

@@ -4,6 +4,16 @@
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
       "seen": "636d41f6"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "section": "The masthead, and the opening",
+      "seen": "ee951acf"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "section": "How ends in Cycles, and the arcs are the state",
+      "seen": "adce1608"
     }
   ]
 }
@@ -14,6 +24,8 @@ description: Produce a report or an approach document into a node's artifacts po
 ---
 
 # report — an answer to a question at a moment
+
+**Read [`refs/devex/workspace/workstream.md`](../../refs/devex/workspace/workstream.md) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
 
 **A report is written on request and never on initiative.** A report produced to fill a slot is an answer to a question nobody had. It costs the reader the time to work out that they did not need it. If nobody asked, do not write one.
 
@@ -35,10 +47,10 @@ description: Produce a report or an approach document into a node's artifacts po
 
 - **The artifacts pocket is earned.** A node that has never authored anything has no pocket; creating one is part of writing the first report into it.
 - **Nested folders are allowed here and nowhere else in a pocket**, and sub-folders carry **no `README.md`** — the pocket's own README says what the pocket holds.
-- **A report is not the pocket's only authored kind, and the neighbours are easy to confuse.** A report answers a question **at a moment** and carries an as-of. An **approach document** argues a design — options weighed, one chosen — at `docs/artifacts/approaches/<topic>-approach.html`, replaced in place while `Open` holds a card. An **overview** expands one `CONCEPT.md` section to reading depth at `docs/artifacts/overviews/<section>-overview.html`. The suffix set is closed (decisions RD.DEVEX.WORKSPACE.102 · RD.DEVEX.WORKSPACE.103). If what you are writing has no as-of, it is not a report — route it before writing.
-- **An approach document's `How` has two halves.** It says what is built and how it stays true, then names **what re-aligns** — every document the reasoning obliges, with its owner and state. A contradicted artifact appears there as *a register row names which side is wrong*, never as an edit. An empty table means the design obliges no document, which is rare, or that you stopped early.
-- **A page arguing a change across repos does not start in a pocket.** It lives in the workspace's open workstream — `.spndevex/workstreams/open/{NNN}-{subject}/` — while you argue it, and both `How` tables carry a **`Scope`** column naming the node each row belongs to. Filter by scope and you have the split plan. The page moves into the owning node's pocket once it is settled, and a row lands when its content is in the node that owns it.
-- **The `State` column is read by a gate, so fill it.** Closing a subject refuses while any row is one nobody decided; `landed`, `carried` and `deferred` all pass. The check is *accounted for*, never *finished*, so parking work is a recorded act rather than a blocked one.
+- **A report is not the pocket's only authored kind, and the neighbours are easy to confuse.** A report answers a question **at a moment** and carries an as-of. An **approach document** argues a design — options weighed, one chosen — and lives in the workstream that argues it, `.spndevex/workstreams/<state>/<NNN>-<subject>/<subject>-approach.html`, never in a pocket. It is replaced in place while `Open` holds a card. An **overview** expands one `CONCEPT.md` section to reading depth at `docs/artifacts/overviews/<section>-overview.html`. The suffix set is closed (decisions RD.DEVEX.WORKSPACE.102 · RD.DEVEX.WORKSPACE.103). If what you are writing has no as-of, it is not a report — route it before writing.
+- **An approach document's `How` ends in Cycles, and the arcs are the state.** `How` shows what each repository's files will say, one subsection per repository and kind of change, and its last subsection is *Cycles*: one row per arc, with Arc · What it does · Status, read from the arcs rather than typed. `spn-devex docs cycles` prints those rows. A table typed a second time on the page is wrong the first time an arc moves.
+- **The split plan is the arcs' step rows, never a table on the page.** Each row carries Repo · Altitude · What · Mechanism · Acceptance · State, and the Repo column is the scope: filter by repository and you have what its documents and code must take. The page itself never moves into a repository; it closes with its workstream.
+- **The `State` column is read by a gate, so fill it.** Closing a workstream refuses while any row is one nobody decided, is still `in progress`, or is `◐ stopped`; `landed`, `carried` and `deferred` all pass. The check is *accounted for*, never *finished*, so parking work is a recorded act rather than a blocked one.
 
 ### The traceability matrix reads the rows, and never derives them
 
@@ -60,17 +72,21 @@ report is how a percentage gets back in.
 
 **Reports and approach documents are HTML; everything in a seat is Markdown.** The split is by reader. A seat is read by a person *and* parsed by tooling, so it stays in the format both handle. An artifact here is read by a person only — often someone outside the repository, often on a screen where a wide table needs to scroll on its own. So it gets a format that can carry a diagram, a stepper, and a sticky outline.
 
-Every report opens with the same three things, in this order:
+**Every report opens on a masthead of three levels, and each level is plain language — MUST** (decisions RD.DEVEX.WORKSPACE.182 · RD.DEVEX.WORKSPACE.187). The report template carries the rule in its masthead comment, with a good and a poor example for each level; copy the template and read that comment as you fill it.
 
-1. **The question**, in one sentence — what was asked, not what was found.
-2. **The answer**, in one paragraph — the finding a reader who stops here should leave with.
-3. **When and against what** — the commit, the version, or the date the answer is true of. A report with no as-of is a report that cannot be superseded, because nobody can tell which is newer.
+1. **The Title** — the report's name and its subject.
+2. **The Subtitle** — one plain sentence: the question the report answers, what was asked rather than what was found.
+3. **The Description** — one paragraph: what was counted, **with no number**; when you would read it; then at most two short sentences on how the page is laid out. The count arrives before the reader knows what was counted, so it moves to `Summary`, the first section, and to the metadata block's `summary` field.
+
+Plain means everyday words, one idea a sentence, no slogan, no figure of speech, and no book word the same sentence does not explain. **Show a new Title or Subtitle to the developer before you write it**, because both speak for the product.
+
+**The header says when and against what** — the commit, the version, and `measuredAt`, a date and a time with its offset, such as `2026-09-29T14:32+05:30`, shown in the header as `Measured: 2026-09-29 14:32 +05:30`. It is the time of what was measured, never the time the page was written: a `tests` report stamps the newest run it read, and an `audit` or `docs` report stamps the moment it read the tree. A report with no as-of is a report that cannot be superseded, because nobody can tell which is newer.
 
 Then the body, and it obeys the corpus rules that apply everywhere. No changelog prose, no live counts outside a table that *is* the count, and no claim of a status the underlying documents deny.
 
 ## Voice
 
-**A report is prose, and it takes the one voice** (decisions RD.DEVEX.WORKSPACE.096 · RD.DEVEX.WORKSPACE.106). Write it to the person who asked: second person, present tense, around fifteen words a sentence. Define each house term where it first appears. Keep MUST wherever a sentence is normative; force lives in the exact term, never in a dense sentence. The tables stay records — a finding row, a count, a matrix keep their form and are never warmed. HTML is no exemption. Load `refs/doc-sets.md` § One voice before writing. The `spn-devex` doc-check hook measures the page as you write it. A sentence past thirty words is a finding, and so is a page that never says *you*.
+**A report is prose, and it takes the one voice** (decisions RD.DEVEX.WORKSPACE.096 · RD.DEVEX.WORKSPACE.106). Write it to the person who asked: second person, present tense, around fifteen words a sentence. Define each house term where it first appears. Keep MUST wherever a sentence is normative; force lives in the exact term, never in a dense sentence. The tables stay records — a finding row, a count, a matrix keep their form and are never warmed. HTML is no exemption. Load `refs/devex/workspace/docs/doc-sets.md` § One voice and § Every page opens on a masthead of three levels before writing. The `spn-devex` doc-check hook measures the page as you write it. A sentence past thirty words is a finding, and so is a page that never says *you*.
 
 ## How to produce one
 

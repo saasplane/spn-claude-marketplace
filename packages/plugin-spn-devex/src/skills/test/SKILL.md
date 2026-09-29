@@ -8,6 +8,53 @@
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
       "seen": "8dbb15d3"
+    },
+    {
+      "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
+      "section": "Which case carries an id",
+      "seen": "62048c29"
+    },
+    {
+      "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
+      "section": "What the phase owes when it closes",
+      "seen": "b5f3a6a3"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/README.md",
+      "section": "A case title carries the id and the sentence",
+      "seen": "9c154376"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/README.md",
+      "section": "Code coverage is reported, never enforced",
+      "seen": "300e384f"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/13-tests.md",
+      "section": "Coverage \u2014 how the model is rendered here",
+      "seen": "4c041a0a"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/02-packages/02-tests.md",
+      "section": "One entry, and one printer",
+      "seen": "d697a45a"
+    }
+  ],
+  "decisions": [
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.FUNCTION.064",
+      "seen": "554e4ba4"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.SUPPORT.APPS.133",
+      "seen": "25dc665f"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.WORKSPACE.181",
+      "seen": "0cde0770"
     }
   ]
 }
@@ -18,6 +65,10 @@ description: What proves a behaviour, at which tier, and what a passing suite do
 ---
 
 # test — proof, at the tier that means something
+
+**Read [`refs/devex/workspace/workstream.md`](../../refs/devex/workspace/workstream.md) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
+
+**Read the repository's *Test and verify* guide first — `docs/05-guides/*-test-and-verify.md` — and never `CLAUDE.md` for how to run anything** (`RD.DEVEX.WORKSPACE.181`). A repository that can run owes that guide: the keys the run reads, the numbered steps with their commands, what you should see, and what to do when a step fails. `CLAUDE.md` is generated and states nothing about running. The repository's `.claude/saasplane/rules.md` § How this repository is tested names the guide's path, or says there is none. Where there is none, say so in your report rather than guessing a sequence.
 
 **A behavior is a claim that someone can do something. A test is what makes the claim checkable.** A behavior nobody can prove is a wish, and a claim marked done without a test citing it is a status nobody verified.
 
@@ -98,7 +149,28 @@ A **double** stands in for a collaborator and belongs to the unit tier only; a *
 
 **In their own tree, never beside the code they test.** Co-located tests ship with the implementation or need an exclusion rule that then has to be maintained forever.
 
-A test that proves a stated behavior should be traceable to it. Where the platform records behaviors with identifiers, the test title carries the identifier. The claim and its proof can then be matched mechanically rather than by reading.
+## Which case carries an id
+
+**A case carries the id of the row it proves, and the tier decides which cases do — MUST** (`RD.DEVEX.FUNCTION.064`). The id opens the case's title and the sentence follows it — `IAM.LOGIN.01 a person signs in with a password` — because a person reading a failed run in cloud needs both what broke and what it means.
+
+| Tier | Which cases carry an id | What a case with no id names instead |
+| --- | --- | --- |
+| contract · component · journey | every case | nothing: each of these tiers proves what a consumer or a person meets, so a case with no id is a finding |
+| integration | every case proving a guarantee only the real resource can hold, which in practice is every real case | a fixture or a helper's own check names what it checks |
+| unit | a case proving a row whose `Tier` is `UNIT` | a case over a private rule names the rule, because nothing outside the node can see it |
+
+**A row's `Tier` equals the tier of the case that proves it — MUST.** A run writes only the rows that declare the tier it ran. So a row declaring one tier, whose only case runs at another, is written by neither run and never reads as proven. Where the two differ, read the case and correct the side that is wrong: change the row when the case proves it at the tier that owns the claim, and move the case when it sits in the wrong tier.
+
+**Where the id sits is the runner's to say**, and each runner has one place for it:
+
+| Runner | Where the id sits | Example |
+| --- | --- | --- |
+| Jest, Vitest, Playwright | the case title, or the `describe` title around it; a journey adds its phase tag to the same title | `IAM.LOGIN.01 a person signs in with a password` |
+| bash `*.sh`, in an estate package | the case line `helpers/case.sh` prints, `ok <TIER> <ID> <title>` | `ok CONTRACT PLT.DOMAIN.01 one local apex has one owner, and none is a cloud apex` |
+| node `*.test.mjs`, in an estate package | the test's name, opening with its tier and its id | `UNIT BLU.ROUTE.01 a tenant host is served from the environment its route names` |
+| `tofu test` `*.tftest.hcl` | the `run` block's name, with an underscore for each dot of the id | `MOD_SEAT_01_the_module_seat_plans_for_its_world` |
+
+**A case the tier binds that carries no id is a finding**, because it proves a row nobody can find.
 
 ## Data and isolation
 
@@ -119,12 +191,29 @@ node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs behaviours check .                    
 node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs behaviours coverage --json .          # the tests report's measurement
 ```
 
-The writer stamps a row only from a result at the row's own `Tier`, never writes over `MANUAL`, and leaves a row nothing named alone unless `--reach repository` says the artifacts are the whole of their tiers. It reads a register by its headings, so an eight-, nine- or ten-cell row is stamped alike. A stack's plugin adds what knows the stack — where a case lives, for the join, and the coverage floors.
+The writer stamps a row only from a result at the row's own `Tier`, never writes over `MANUAL`, and leaves a row nothing named alone unless `--reach repository` says the artifacts are the whole of their tiers. It reads a register by its headings, so an eight-, nine- or ten-cell row is stamped alike. A stack's plugin adds what knows the stack — where a case lives, for the join.
+
+## Code coverage is reported, never enforced
+
+**Code coverage is measured and reported, never enforced — MUST** (`RD.SUPPORT.APPS.133`). The rows answer *what was claimed and proven*; coverage answers a different question, *how much of the code does any suite run at all?* A run that collects it prints its summary — lines, statements, functions and branches — and the test tool writes `coverage-summary.json` beside its report.
+
+- **No configuration carries a threshold, and nothing fails a run on a percentage.** A percentage used as a gate gets met the cheapest way: by editing the number down, or by writing cases that run code without checking what it does.
+- **An exclude carries its reason beside it — MUST.** Code no automatic test can reach, such as a proof-of-person challenge or a vendor round trip, is excluded by name with a comment on the same entry saying why. A reader can then tell code that cannot be tested from code nobody tested.
+- **A journey configuration collects no coverage.** It drives a browser against a running stack, and a code-coverage number there measures nothing a person reads.
 
 ## Lenses
 
-Wear `refs/lenses/qa.md` while writing tests. On every build's close, convene the `spn-panel` subagent with `qa`: a ✅ status with no test behind it stops the work.
+Wear `refs/devex/agent/lenses/qa.md` while writing tests. On every build's close, convene the `spn-panel` subagent with `qa`: a ✅ status with no test behind it stops the work.
 
 ## Finish
 
 Report per tier: what ran, the count, and what failed with its actual output. Then state the honest coverage — which behaviors are now proven, which are asserted but unproven, and what tier would settle the difference.
+
+**A full-repository run fixes what keeps a row unproved before the report is written.** A run over the whole repository is not only a report. Each of these keeps a row unproved, and each one is the run's own work:
+
+- a row whose tier is not the tier of the case that proves it;
+- a runner that ran and wrote no result file, so its cases prove nothing;
+- a case its tier binds that carries no id;
+- a red case.
+
+Fix each one, run that tier again, and then write the report. Anything the run cannot fix is named in the report with the reason.

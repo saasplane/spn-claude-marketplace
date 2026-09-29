@@ -51,7 +51,7 @@ install nothing for that.
 | 4 | Settle the platform's coordinates — the intake worksheet, landing as the concept's coordinates section | the `ideate` skill | ✅ |
 | 5 | Decide what the platform is — `CONCEPT.md`: boundary, domains, surfaces; the scaffold at the next step reads it | the `ideate` skill | 🚧 |
 | 6 | Create the monorepo and its `sprepo.json` — the stack claim and the infra couplings | the `new` skill, for a platform | 🚧 |
-| 7 | Bring the platform up locally | `infra organization up` · `infra platform up` | ✅ |
+| 7 | Bring the platform up locally | `infra organization up` · `infra platform up <spc>` | ✅ |
 | 8 | Create the first app and register it | the `new` skill · `infra app up` | 🚧 |
 | 9 | First feature — plan, then build | the `ideate` skill → the `implement` skill | 🚧 |
 | 10 | Refresh the wiring after upgrades | `spnutils repo agent-sync` | ✅ |
@@ -70,9 +70,9 @@ ship with these plugins, beside this file:
 | What you are writing | Its shape |
 | --- | --- |
 | an approach page, to argue a piece of work | [`templates/workstream/approach-template.html`](../workspace/docs/templates/workstream/approach-template.html) |
-| a question you cannot answer alone | [`refs/decision-cards.md`](../workspace/docs/decision-cards.md) — it is a card, and a card is `div.open` wrapping an `h4` whose id is its number |
-| a construct, a domain face, an overview | [`refs/doc-sets.md`](../workspace/docs/doc-sets.md) |
-| the markdown and figures inside any of them | [`refs/blocks.md`](../workspace/docs/blocks.md) |
+| a question you cannot answer alone | [`refs/devex/workspace/docs/decision-cards.md`](../workspace/docs/decision-cards.md) — it is a card, and a card is `div.open` wrapping an `h4` whose id is its number |
+| a construct, a domain face, an overview | [`refs/devex/workspace/docs/doc-sets.md`](../workspace/docs/doc-sets.md) |
+| the markdown and figures inside any of them | [`refs/devex/workspace/docs/blocks.md`](../workspace/docs/blocks.md) |
 
 **Copy the template rather than writing a page from memory.** It carries the section order, the card
 shape and the furniture every check reads, and a page assembled by hand is a page that passes review

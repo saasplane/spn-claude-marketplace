@@ -19,6 +19,8 @@ description: How infrastructure appears for development - the layer order, what 
 
 # provision — layers, in order, from the declarations
 
+**Read [`refs/devex/workspace/workstream.md`](../../refs/devex/workspace/workstream.md) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
+
 **Nothing about a local stack is hardcoded by the caller.** Ports, hosts, schemas, and modules are read from the declarations the repo pins. That is what makes the same commands correct in every repo, and it is why a command that assumes a port is a bug even when it happens to work.
 
 ## The layers come up in order
@@ -50,7 +52,7 @@ Work down the layers, not across the symptoms:
 
 1. Is the layer below up, and does its own status command report healthy?
 2. Does the declaration actually carry what you expect — the port, the schema, the host?
-3. Is the value it needs set at all — a provider credential or a module fact in the machine seat, `~/.spnenv`? Test that the key is **set**, and never print or expand it (`refs/cross-repo.md` § The machine seat).
+3. Is the value it needs set at all — a provider credential or a module fact in the machine seat, `~/.spnenv`? Test that the key is **set**, and never print or expand it (`refs/devex/workspace/workspace.md` § The machine seat).
 4. Was the app layer ever registered for this app?
 5. Is something already holding the port — a stale watch process or a previous run?
 6. Only then look at the application's own logs.
@@ -66,5 +68,5 @@ Most failures that look like application errors are a layer that is not up or an
 
 ## Lenses
 
-Wear `refs/lenses/infra.md` throughout — a resource that is not declared in a manifest, or a name typed by hand, is the finding to raise before anything comes up.
+Wear `refs/devex/agent/lenses/infra.md` throughout — a resource that is not declared in a manifest, or a name typed by hand, is the finding to raise before anything comes up.
 

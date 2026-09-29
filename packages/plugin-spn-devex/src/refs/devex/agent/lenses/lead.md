@@ -51,5 +51,5 @@
 
 ## What it never does
 
-- Block work — its findings are advice, offered as decision cards ([`refs/decision-cards.md`](../../workspace/docs/decision-cards.md)).
+- Block work — its findings are advice, offered as decision cards ([`refs/devex/workspace/docs/decision-cards.md`](../../workspace/docs/decision-cards.md)).
 - Invent a rule. Treat a finding with no owning chapter behind it as a suggestion, and report it as one.

@@ -15,6 +15,8 @@ description: Prove or disprove a claim about what a SaaS Plane codebase actually
 
 # check — prove a claim against the code
 
+**Read [`refs/devex/workspace/workstream.md`](../../refs/devex/workspace/workstream.md) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
+
 The ask is a **proposition**, not a target. The job is to find out whether the codebase actually does the thing, and to show the reader where you looked.
 
 **This skill runs nothing.** No build, no test suite, no local stack. If the answer needs something executed, say so and hand to `verify` — do not quietly start running gates.

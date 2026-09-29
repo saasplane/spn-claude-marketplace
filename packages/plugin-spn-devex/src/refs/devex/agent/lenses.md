@@ -16,7 +16,7 @@
 
 **Source of truth:** the foundation's `02-constructs/01-devex/02-agent/03-lenses.md` and `04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md`. Read this as the restatement; the book governs.
 
-**The eleven lens files sit beside this one, in `refs/lenses/`.** This says what a lens *is* and what convening one may do — the files themselves say what each one checks.
+**The eleven lens files sit beside this one, in `refs/devex/agent/lenses/`.** This says what a lens *is* and what convening one may do — the files themselves say what each one checks.
 
 ## One file per engineering function
 

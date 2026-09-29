@@ -4,6 +4,11 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/README.md",
       "seen": "25e32509"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/README.md",
+      "section": "Code coverage is reported, never enforced",
+      "seen": "300e384f"
     }
   ],
   "decisions": [
@@ -21,6 +26,11 @@
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.120",
       "seen": "d489cd69"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.SUPPORT.APPS.133",
+      "seen": "25dc665f"
     }
   ]
 }
@@ -66,7 +76,7 @@
 - **Behaviour does not cross a harness's process boundary.** Where a component tier's harness drives the browser from another process, only data crosses. So behaviour a mount needs is defined in the build the browser runs. The case imports that module and drives it through serializable inputs alone. Most components need none of this, and the case keeps its own mount by default (`RD.SUPPORT.APPS.099`).
 - **A red naming what no source declares is a stale build, not a defect.** A build cache keyed by file name outlives a rename, so it is cleared by the change that renamed, moved or deleted what it compiled (`RD.SUPPORT.APPS.100`).
 - **A case that destroys a session runs where nothing else depends on that session.** Revoking a sign-in, logging out or changing a credential destroys the session other cases work in, and worker isolation cannot help because the damage is server-side (`RD.SUPPORT.APPS.098`).
-- **Every project carries a code-coverage floor, measured rather than chosen, in the test tool's own configuration, and it rises and never falls** (`RD.SUPPORT.APPS.133`). The agent's plugin script sets it after a run; nobody types the number. **A floor with no dated comment is a guess**, so its first measurement replaces it, up or down; once dated, the script only raises it and the check refuses a lowering. Code a case cannot reach is excluded with its reason in a comment beside the entry, never hidden by a lower number.
+- **Code coverage is reported, never enforced** (`RD.SUPPORT.APPS.133`). A run that collects it prints the summary and writes `coverage-summary.json`, and that number shows where code has no case. No configuration carries a threshold, and nothing fails a run on a percentage, because a percentage used as a gate gets met the cheapest way: by lowering the number, or by cases that run code without checking what it does. Proof is read from the behaviour rows, as actions owed against actions covered. Code a case cannot reach is excluded with its reason in a comment beside the entry, so a reader can tell code that cannot be tested from code nobody tested.
 
 ## What it never does
 

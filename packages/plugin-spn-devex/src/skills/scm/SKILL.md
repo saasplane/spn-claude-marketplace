@@ -28,6 +28,8 @@ description: The repository and project standard - what a project must declare, 
 
 # scm — one declaration decides the rest
 
+**Read [`refs/devex/workspace/workstream.md`](../../refs/devex/workspace/workstream.md) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
+
 **Every node declares exactly one kind, in `spkind.json` at its root, and everything derivable from that kind is never declared again.** Runtime, toolchain profile, structure, packaging, and whether the project publishes at all — all follow. A node without a kind is unfinished; a node that restates what its kind already implies has introduced a second source of truth. A folder with `spkind.json` **is** a node — which is how a module living inside an app is validated and scaffolded exactly like the packaged form. **A node carries `README.md` and no docs tree**: the seats live once, in the repository's own tree, and the node's README links into the ones it realizes.
 
 ## The kind decides, and it decides once
@@ -83,7 +85,7 @@ A repo is wired by `repo`; the folder the repos sit in is minted by `workspace`.
 | `workspace agent-sync` | brings the floor back to what the members imply | the workspace root |
 | `workspace status` | the orientation — members, world, wiring, every workstream, and any split-plan row still unlanded | reads only |
 
-**The machine seat sits one level above again: `~/.spnenv`, one file for every SaaS Plane value.** `init` and `sync` provision its **shape** — four marked regions, the producer and managed regions rewritten whole, the keep region laid out. **They derive no key.** You add a key when you build what needs it, and the developer supplies the value. The tool writes no shell profile, and you never edit one either. **Never print or expand a value from that file** — test that a key is set, and nothing more. Run `init` inside a scratch folder and it rewrites the real seat, so point `HOME` at a temp directory for a demo. Read `refs/cross-repo.md` § The machine seat for the regions, the layout and the namespacing rule.
+**The machine seat sits one level above again: `~/.spnenv`, one file for every SaaS Plane value.** `init` and `sync` provision its **shape** — four marked regions, the producer and managed regions rewritten whole, the keep region laid out. **They derive no key.** You add a key when you build what needs it, and the developer supplies the value. The tool writes no shell profile, and you never edit one either. **Never print or expand a value from that file** — test that a key is set, and nothing more. Run `init` inside a scratch folder and it rewrites the real seat, so point `HOME` at a temp directory for a demo. Read `refs/devex/workspace/workspace.md` § The machine seat for the regions, the layout and the namespacing rule.
 
 **There is no workstream command, and adding one is a defect.** Opening a subject is `mkdir`, listing what is open is what `status` already reports, and the close is a gate rather than a command.
 
@@ -106,7 +108,7 @@ A workstream is `.spndevex/workstreams/{state}/{NNN}-{subject}/`, and its state 
 
 **Moving `backlog/` to `open/` is how work starts.** It needs no ceremony, it is not a close, and no gate fires on it.
 
-**Then update the agent and reload before you execute anything — MUST** (RD.DEVEX.AGENT.049). Your own surfaces improve as the work does, so a workstream that executes first spends its whole scope acting on the surfaces the last one left. Read `refs/cross-repo.md` § *Open a workstream with the agent update* for the steps, the producer and partner forms, and the two gates a workstream carries.
+**Then update the agent and reload before you execute anything — MUST** (RD.DEVEX.AGENT.049). Your own surfaces improve as the work does, so a workstream that executes first spends its whole scope acting on the surfaces the last one left. Read `refs/devex/workspace/workspace.md` § *Open a workstream with the agent update* for the steps, the producer and partner forms, and the two gates a workstream carries.
 
 ## The lines that hold
 
@@ -126,5 +128,5 @@ A repository's own operations live in `tasks/` — one file per task, reached th
 
 ## Lenses
 
-Wear `refs/lenses/lead.md` when shaping repo standards and process — the paved road, the branch model, and the ladder are its checks.
+Wear `refs/devex/agent/lenses/lead.md` when shaping repo standards and process — the paved road, the branch model, and the ladder are its checks.
 

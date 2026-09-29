@@ -8,6 +8,16 @@
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/03-ideate.md",
       "seen": "2983688b"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "section": "The masthead, and the opening",
+      "seen": "ee951acf"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "section": "The outline is fixed for an argument and borrowed for an explanation",
+      "seen": "2c6b68b6"
     }
   ]
 }
@@ -18,6 +28,8 @@ description: Decide what a node IS, and design a requirement inside that shape -
 ---
 
 # ideate — decide the shape, one agreed section at a time
+
+**Read [`refs/devex/workspace/workstream.md`](../../refs/devex/workspace/workstream.md) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
 
 A boundary nobody decides still gets drawn: the first three features draw it, implicitly, and by the time anyone notices, moving it means moving everything built inside it. **That is how projects go wrong slowly** — in the twenty minutes nobody spent deciding what the thing is and, harder, what it deliberately is not.
 
@@ -42,7 +54,7 @@ Pick the mode from the argument — `shape` · `design` · `decision`. Where non
 1. **Restate the requirement** in one paragraph, in the asker's own words.
 2. **Classify it**: new capability · additive change to an existing contract · **breaking** change · pure fix. **A breaking change stops here** — reroute through the versioning path and record it in `decision` mode. A breaking change never rides in as a plan row.
 3. **Locate ownership** — which module owns the capability. Where none does, this is a scaffolding conversation first, and the ladder is *use → configure → generalize into the platform → build domain-specific*; descend only with a reason.
-4. **Write the rows**, into the repository's own docs tree, under the domain the module belongs to. **The seats, what each holds and the row grammar are `refs/doc-sets.md`** — read it there rather than from a copy. Where the node is in a declared stack, that stack's own planning notes are `providers/{stack}/skills/ideate/plan.md` in the domain plugin, and the stack comes from the nearest `sprepo.json`.
+4. **Write the rows**, into the repository's own docs tree, under the domain the module belongs to. **The seats, what each holds and the row grammar are `refs/devex/workspace/docs/doc-sets.md`** — read it there rather than from a copy. Where the node is in a declared stack, that stack's own planning notes are `providers/{stack}/skills/ideate/plan.md` in the domain plugin, and the stack comes from the nearest `sprepo.json`.
 
 ### Mode: decision — one register row
 
@@ -109,10 +121,18 @@ One section: **preview it, wait, then write it.** Never two at once, never the w
 
 ### 4 · Open
 
-Every unanswered question is a card with **real options and a recommendation**. A card with no options is a status update; a card with no recommendation makes the person do the analysis twice. **The shape is [`refs/decision-cards.md`](../../refs/devex/workspace/docs/decision-cards.md)** — the same one every open item uses, here and everywhere else.
+Every unanswered question is a card with **real options and a recommendation**. A card with no options is a status update; a card with no recommendation makes the person do the analysis twice. **The shape is [`refs/devex/workspace/docs/decision-cards.md`](../../refs/devex/workspace/docs/decision-cards.md)** — the same one every open item uses, here and everywhere else.
 
 - **The stage ends when the questions are answered, not when they run out.**
-- **An expansion is made on request, and which kind it is depends on what was asked.** A question too large for an Open card needs somewhere to be **argued** — that is an approach document, `artifacts/approaches/<topic>-approach.html`. A section too big to review in place needs somewhere to be **read** — that is an overview, `artifacts/overviews/<section>-overview.html`. A concept states shape, so someone wanting the detail is asking for the expansion, not for a longer concept. The routing test is whether options were weighed and one chosen (decisions RD.DEVEX.WORKSPACE.102 · RD.DEVEX.WORKSPACE.103). Either way the section names the file and the file names the section back. **Offer; never start one unasked**, and never write one to make a concept look finished. A concept whose sections have none is the normal case, not an incomplete one.
+- **An expansion is made on request, and which kind it is depends on what was asked.** A question too large for an Open card needs somewhere to be **argued** — that is an approach document, `<subject>-approach.html` in the open workstream's folder, never in a repository. A section too big to review in place needs somewhere to be **read** — that is an overview, `artifacts/overviews/<section>-overview.html`. A concept states shape, so someone wanting the detail is asking for the expansion, not for a longer concept. The routing test is whether options were weighed and one chosen (decisions RD.DEVEX.WORKSPACE.102 · RD.DEVEX.WORKSPACE.103). Either way the section names the file and the file names the section back. **Offer; never start one unasked**, and never write one to make a concept look finished. A concept whose sections have none is the normal case, not an incomplete one.
+- **An approach page or an overview opens on a masthead of three levels, and each is plain language — MUST** (decisions RD.DEVEX.WORKSPACE.182 · RD.DEVEX.WORKSPACE.187). Copy the page from its template, whose masthead comment carries the rule, a good and a poor example for each level, and a short check.
+
+  | Page | Title | Subtitle, one plain sentence | Description, one paragraph |
+  | --- | --- | --- | --- |
+  | approach | the page's name | the decision it plans | what changes · why read it · how the page runs |
+  | concept overview | the area's benefit line | the area's what line | what this area covers · why read on · what the pages below cover |
+
+  Plain means everyday words, one idea a sentence, no numbers, no slogan, no figure of speech, and no book word the same sentence does not explain. The argument starts in the first section: for an approach page that is `Why`, then `What`, `How`, `Open` and `Deferred`, with no `Terms` section. **Draft a new Title or Subtitle and show it to the developer before you write it**, because both speak for the product. The foundation hub's Title and Subtitle are the one exemption, fixed by `RD.DEVEX.WORKSPACE.143`.
 - A question deliberately not answered is **deferred with a trigger** — what would bring it back.
 
 ## The lenses you convene

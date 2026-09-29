@@ -19,6 +19,8 @@ description: Walk an empty folder to a platform running locally - the door first
 
 # bootstrap — an empty folder becomes a working workspace
 
+**Read [`refs/devex/workspace/workstream.md`](../../refs/devex/workspace/workstream.md) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
+
 Scan the workspace root, find no `sprepo.json` anywhere, and you are on day zero. You have no code to pattern-match against, and that is the condition this walk is written for. What you do have is the standards, the published packages, and the shape every platform here already takes.
 
 **Nothing in this walk is hand-made except the estate repository itself.** Every other file arrives from a command. If you find yourself opening an editor to create a manifest, stop. A command owns that file, and hand-writing it starts a workspace out of standard on day one.
@@ -59,16 +61,16 @@ Two repositories come out of this, and the estate one comes first. It carries a 
 | 9 | The platform repository | `repo create`, then `apps scaffold repo` | The scaffold takes both pins as arguments, so act 8 has to have happened |
 | 10 | Its concept, then its projects | the `ideate` skill, then `apps scaffold <kind>` | The concept decides which kinds exist. Scaffolding first is deciding by accident |
 | 11 | The provider keys | — you name them, they fill `~/.spnenv` | The provider registry fails fast at boot when a type or key is missing. A walk that ends in a running stack cannot defer this |
-| 12 | Bring the estate up | `spnutils infra organization up`, then `infra platform up` | The platform layer reads what the organization layer wrote |
+| 12 | Bring the estate up | `spnutils infra organization up`, then `infra platform up <spc>` | The platform layer reads what the organization layer wrote |
 | 13 | Run the stack, and say what they should see | the domain plugin's run skill | This is the acceptance. Day zero ends on a platform that answers, not on a filled arc |
 | 14 | Close the workstream | — move the folder to `closed/` | Both repositories exist and the concept is agreed, so the folder is a receipt |
 
 - **Act 6 is where day zero used to stop.** A partner's first repository is an estate repo, it carries no `package.json`, and that is precisely the case the wiring command refused. If you meet that refusal, say so plainly and name it as the known blocker rather than working around it by hand.
 - **A partner holds no marketplace checkout, and nothing has to be said about it.** The mode follows from where they are standing, so the same command wires the published source. Their plugins resolve from the published marketplace, and the book reaches them as a published rendering rather than a path they can open.
-- **Act 1 also writes the machine seat, `~/.spnenv`.** The command writes the file's **shape** — its markers, its managed defaults and an empty keep region. **It derives no key**, so a fresh partner file has nothing to fill in yet. A key arrives later, when you build what needs it, and you ask them for the value. Their own keys go in `spnutils:dev`, which no run reads or writes. Never print a value back — `refs/cross-repo.md` § The machine seat carries the rule.
+- **Act 1 also writes the machine seat, `~/.spnenv`.** The command writes the file's **shape** — its markers, its managed defaults and an empty keep region. **It derives no key**, so a fresh partner file has nothing to fill in yet. A key arrives later, when you build what needs it, and you ask them for the value. Their own keys go in `spnutils:dev`, which no run reads or writes. Never print a value back — `refs/devex/workspace/workspace.md` § The machine seat carries the rule.
 - **Act 10 is a conversation, not a generation.** Hand it to `ideate`, which agrees one block at a time. A concept you drafted whole is a concept nobody agreed to.
 - **Acts 11 to 13 are the acceptance, and they are what day zero is for.** A partner who has never seen this estate finishes the walk, runs the local stack, and sees the default SaaS Plane platform answer. Anything short of that is a form somebody filled in.
-- **Acts 12 and 13 go through the CLI's own doors.** `infra organization up` and `infra platform up` are the commands, and `tofu apply` is never hand-run, locally or anywhere else.
+- **Acts 12 and 13 go through the CLI's own doors.** `infra organization up` and `infra platform up <spc>` are the commands, and `tofu apply` is never hand-run, locally or anywhere else.
 - **Stop at the end of each act and say what it produced.** The developer is watching a workspace appear out of nothing, and a silent run of the whole walk gives them nothing to correct.
 
 ## Act 2 — the workstream that holds the answers
@@ -89,14 +91,14 @@ It opens in `open/` because nothing blocks it — the developer is in front of y
 
 ### The answers go in the arc, and the walk mints no approach page
 
-An approach page argues. The routing test in `refs/doc-sets.md` is one question — *were options weighed and one chosen?* — and on day zero nothing is weighed. The developer is telling you their organization's code, not choosing between two. So the coordinates are a record, and a record belongs in the arc.
+An approach page argues. The routing test in `refs/devex/workspace/docs/doc-sets.md` is one question — *were options weighed and one chosen?* — and on day zero nothing is weighed. The developer is telling you their organization's code, not choosing between two. So the coordinates are a record, and a record belongs in the arc.
 
 Two further reasons hold in a partner's folder, where this walk almost always runs:
 
 - **An approach page is hand-written HTML with a fixed shape** — a masthead naming its audience, a folding outline, and a `How` section carrying both its halves. The shape lives in a template inside `spn-foundation`, which a partner never checks out, and `docs.ts page` produces construct pages only. There is nothing for a partner to copy.
 - **A `.md` file under `.spndevex/` is state rather than corpus**, so `doc-check` leaves it alone. Nothing stands between the sentence the developer just said and the file it lands in.
 
-`refs/cross-repo.md` already blesses this shape: a subject with an arc and no approach page is valid, not a gap. **Where the developer asks for the argument written up, that is an ordinary page in an ordinary sitting** — offer it after act 4, and never let the walk wait on it.
+`refs/devex/workspace/workspace.md` already blesses this shape: a subject with an arc and no approach page is valid, not a gap. **Where the developer asks for the argument written up, that is an ordinary page in an ordinary sitting** — offer it after act 4, and never let the walk wait on it.
 
 ### The arc the walk writes
 
@@ -147,8 +149,7 @@ Filled at act 4, before anything is created, and read back for a yes.
 
 Compliance targets, the setup catalog beyond `dev`, and every environment after the
 first are real decisions, and none of them is needed to reach a running platform.
-`refs/platform-worksheet.md` holds those rows. They are settled inside the concept at
-act 10 and in the declarations after it.
+They are settled inside the concept at act 10 and in the declarations after it.
 
 The vendor integrations are not in this table either, and for a different reason: they
 are keys rather than coordinates. They are asked at act 11 and they never come near a
@@ -235,7 +236,7 @@ Get these wrong and you rename accounts, package scopes and every code prefix af
 - **Never fill an answer in for them.** A code you invented becomes the account address, the scope and the prefix, and it is expensive to take back. The legal entity, the owner's name and the cloud region are the ones an agent is most tempted to guess.
 - **The cloud region mapping is a choice, not a derivation.** `ap-south-1` does not follow from `in` by any rule this estate states. Somebody decided it, so somebody has to say it.
 - **The closest twin is the one people skip, and it earns the most.** A twin tells you which mechanisms transfer wholesale. Where this is their first platform there is no twin, and saying so beats inventing one.
-- **`refs/platform-worksheet.md` is where the questions come from**, and it is a template rather than a seat. It ships inside the plugin, so nothing can be written into it. Read it for what each row decides and what consumes each answer. Do not restate it here, and do not walk a partner through all seven of its sections — most of it is settled inside the concept at act 10 and in the declarations after that.
+- **The questions are the rows of the coordinates table above, and nothing else.** Its *What it decides* column says what consumes each answer. Do not walk a partner through every coordinate a platform will ever carry: the rest is settled inside the concept at act 10 and in the declarations after that.
 
 ## Act 4 — read back what they said, and what follows from it
 
@@ -251,7 +252,7 @@ Show every answered row as it now stands, and then show what you derived from it
 
 **The names are derived and read back, never typed.** `{spc}` is permanent — three lowercase letters, never renamed — and the repository name inherits that permanence. Showing it is how a wrong `{spc}` gets caught while it still costs nothing.
 
-**A go is written down or it did not happen.** Append it to the arc's log as a dated line, in the shape `refs/workstream-loop.md` carries:
+**A go is written down or it did not happen.** Append it to the arc's log as a dated line, in the shape `refs/devex/workspace/workstream.md` carries:
 
 ```md
 - **2026-09-22 — go.** The coordinates were read back and agreed. Acts 5 to 10 may run.
@@ -272,7 +273,7 @@ Then say which act runs next, and run it.
 3. **Point them at the machine seat** and stop. Their own keys go in the `spnutils:dev` region, which no run reads or writes.
 4. **Wait.** Then confirm what is set with `spnutils workspace status`, which reports key names and set-state.
 
-- **Never print a value back, and never read a region of that file onto the screen.** A transcript outlives the session that wrote it, and a printed credential is exposed from that moment. `refs/cross-repo.md` § The machine seat carries the rule.
+- **Never print a value back, and never read a region of that file onto the screen.** A transcript outlives the session that wrote it, and a printed credential is exposed from that moment. `refs/devex/workspace/workspace.md` § The machine seat carries the rule.
 - **Confirm presence, never content.** The status command answers *is it set* without answering *what is it*, which is the only question you need.
 - **A key they choose to skip is an answer.** Say which family will refuse to boot, and let them decide. Do not fill one in, and do not invent a test value.
 
@@ -282,8 +283,10 @@ Two commands, in order, because the platform layer reads what the organization l
 
 ```
 spnutils infra organization up
-spnutils infra platform up
+spnutils infra platform up <spc>
 ```
+
+`<spc>` is the platform's code, from the answer to question 5, and it comes straight after the verb (`RD.DEVEX.UTILS.072`). The organization layer takes none, because a repository has at most one organization. No environment entry selects a platform.
 
 - **The CLI's own doors, always.** `tofu apply` and `tofu destroy` are never hand-run — not in the cloud, and not locally either. This is the same rule act 9's `repo create` already follows, so nothing new is being excused here.
 - **Stop after each and say what it produced.** A partner watching an estate appear has no way to tell a slow layer from a stuck one unless you say.

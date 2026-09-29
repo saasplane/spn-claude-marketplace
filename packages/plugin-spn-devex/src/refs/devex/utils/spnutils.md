@@ -9,6 +9,18 @@
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
       "seen": "e61d18f5"
     }
+  ],
+  "decisions": [
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.WORKSPACE.180",
+      "seen": "f5c6cb20"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.UTILS.072",
+      "seen": "eb25b0de"
+    }
   ]
 }
 -->
@@ -19,6 +31,20 @@
 CLI exists and what it may never be asked to do, and `04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md`
 for every command's own signature. Where this ref and those disagree, the book wins and this file is
 rewritten.
+
+## The commands you run are listed in each repository, not here
+
+**This file lists no command by hand.** A list typed here drifts from the program the day a command
+gains an argument. Each repository's generated `.claude/saasplane/rules.md` carries § *Commands you
+run here*: the `spnutils` commands that repository's world and stack use, each with its arguments,
+read from the command tree itself (`RD.DEVEX.WORKSPACE.180`). `repo agent-sync` rewrites it, so it
+matches the installed release. Read it before you run a command in a repository.
+
+- **For every command, and every option**, run `spnutils help --json` or `spnutils <command> --help`.
+  Both answer from the assembled program, never from source text.
+- **`<x>` is required and `[x]` is optional**, in `rules.md` and in `help` alike.
+- **A command this file names in prose is an example of the grammar**, never its signature. The
+  signature is whatever `help` prints.
 
 ## Why one CLI
 
@@ -62,35 +88,17 @@ readers of one table cannot drift, two tables always will.
 an org name, a region. A placeholder is a state, not an error: a value that validates is a value you
 ship, and `validate` is the half that names what you still owe.
 
-```text
-spnutils apps scaffold repo --stack <stack> --organization <package[@version]> [--platform <package[@version]>]
-spnutils apps scaffold <kind> [-u --usecase <name>] [-c --code <CODE>]
-spnutils apps scaffold app-module --app <folder> [-u --usecase] [-c --code]
-spnutils apps validate [repo | app-module | <kind>] [-u --usecase <name>] [-a --app <folder>] [--json]
-
-spnutils infra scaffold repo | organization <ORG> | platform <SPC> | module <code>
-spnutils infra validate [repo | organization | platform | module] [--json]
-```
-
 ## `workspace` — the folder your day runs in
 
-```text
-spnutils workspace init            mint the floor: marketplace, plugin union, permission tiers
-spnutils workspace agent-sync      re-converge the floor, then repo agent-sync in every member
-spnutils workspace status [--json] the orientation — members, wiring, what each owes, open workstreams
-spnutils workspace timings [--on|--off]   what the agent's own machinery costs; off until asked
-```
+`workspace` mints the folder, keeps its settings and plugins current, reports what is open, and
+turns the agent's own timing on or off. It needs no repository, so its commands are the one group a
+repository's `rules.md` does not list: `spnutils help --json` names them.
 
 **There is no command for opening a scope of work.** A workstream is a folder in one of three
 states; you make the folder, `status` lists what is open, and a write-time check holds the close
 gate. A command refusing to move a folder is theatre — the agent can move the folder anyway.
 
 ## `repo` — the repository and its remote
-
-```text
-spnutils repo create <name> [--from <org-package>[@version]]
-spnutils repo agent-sync
-```
 
 `repo` means repository-level change — branches, protections, team access, agent wiring. Never the
 **content** of code, tests or documents, which is `apps`'s.
@@ -102,16 +110,6 @@ stack half runs only where the claim names that stack. A `∗`-door command reac
 is broken rather than fussy.
 
 ## `apps` — the apps domain's nodes
-
-```text
-spnutils apps gen-validators | gen-barrel | gen-labels | gen-symbols  [package]
-spnutils apps codegen api-client <package>     regenerates from the service's LIVE document
-spnutils apps build | check | format | clean  <package> [--json]
-spnutils apps test <tier> <package> [--json]
-spnutils apps dev | start | stop  <package> [--mode <mode>] [--json]
-spnutils apps migrate <up|down|list|pending|status|generate> <package>
-spnutils apps release [version] [--dry-run] [-y --approved] [--json]
-```
 
 The `gen-*` chain is never hand-edited: validators are what the API enforces, symbols and labels are
 what the agents read. `apps release` publishes every releasable project at one version, lockstep,
@@ -127,15 +125,12 @@ scripts.
 Layer nouns are the vocabulary: `organization` · `platform` · `environment` · `app`. **There is no
 whole-estate command**, because *all layers* of an unstated subject is a context nothing can resolve.
 
-```text
-spnutils infra organization | platform  plan | up | down | status  [--cloud] [--approve] […]
-spnutils infra environment  plan | up | down | status  <env> --cloud  [--approve]
-spnutils infra app up | down  [-p <package>] [--clean]
-spnutils infra domain register <host...> --app <app> | unregister <host>
-spnutils infra config set | get | list | export | import | diff | render  […]
-spnutils infra test [<package>]
-spnutils infra release <package> [<version>] [--local] [--dry-run] [-y --approved] [--json]
-```
+**A command names its platform as an argument, always and first — never through the environment**
+(`RD.DEVEX.UTILS.072`). Every platform-scoped command takes `<spc>` straight after its verb:
+`infra platform <verb> <spc>`, `infra environment <verb> <spc> <env>`, and the same for `config`,
+`show`, `logs`, `web` and `domain register`. The organization layer takes none, because a repository
+has at most one organization. In an apps repository the `<spc>` is checked against the
+`sprepo.json` pin, and one that differs is refused. No environment entry selects a platform.
 
 **Every provisioning run names its mode, and there is no default.** `up`/`down` take exactly one of
 `--plan`/`--apply` (or the flag pair the local form uses); naming neither or both is refused. A
@@ -145,11 +140,9 @@ account the estate **declared** — nothing in the driver names a vendor.
 
 ## `login` and `help`
 
-```text
-spnutils login          one sign-in: cloud session plus a short-lived token per registry endpoint
-spnutils help [--json]  every runnable command; --json gives it as data — path, intent, signature, args, options
-spnutils -v              this build, and the standards range it implements
-```
+`login` is one sign-in: a cloud session plus a short-lived token per registry endpoint. `help`
+lists every runnable command, and `--json` gives each one as data: its path, intent, signature,
+arguments and options. `-v` prints this build and the standards range it implements.
 
 `login` is declared, not yet realized — a conformance finding against the realization, recorded
 rather than dropped. Every installed tool answers `help` from the **assembled program**, never from
@@ -193,7 +186,7 @@ recomputing it; nothing else there should be.
 
 ## What this ref leaves to the book
 
-Every command's exact flag-by-flag signature and the reasoning behind it live in the capability
-chapter this ref restates — read that when a command refuses you and the sentence alone is not
-enough. The judgment layer's own shape (this agent, its skills, its lenses) is a different chapter,
+Every command's exact signature is `help`'s, and the repository's `rules.md` lists the ones used
+there. The reasoning behind each command lives in the capability chapter this ref restates — read
+that when a command refuses you and the sentence alone is not enough. The judgment layer's own shape (this agent, its skills, its lenses) is a different chapter,
 [Agent Plugins](../agent/plugins.md).

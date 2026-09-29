@@ -3,6 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "section": "The masthead, and the opening",
+      "seen": "ee951acf"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The blocks \u2014 what a page reaches for instead of prose",
       "seen": "0dd7f138"
     },
@@ -16,7 +21,7 @@
 -->
 # Blocks and figures, in the spelling you actually write
 
-**Source of truth:** the foundation's `04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md` — *The blocks* and *The figures*. This file restates them for an agent that ships without the book beside it; where the two disagree, the book wins.
+**Source of truth:** the foundation's `04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md` — *The masthead, and the opening*, *The blocks* and *The figures*. This file restates them for an agent that ships without the book beside it; where the two disagree, the book wins.
 
 **You write markdown.** `docs.ts page` produces the HTML, and the stylesheet the template ships
 supplies every border, background and colour. So this file is the whole vocabulary you need: what a
@@ -26,6 +31,24 @@ you can type, so do not open it (Q135, 2026-09-22).
 
 The rules behind this file are `05-artifacts.md § The blocks` and `§ The figures`. When the two
 disagree, the chapter wins and this file is wrong.
+
+## The masthead comes first, and it is three levels
+
+**A page opens on its Title, its Subtitle and its Description, and nothing else sits above the
+first heading.** In a construct seat you type them in three places:
+
+| Level | What you type in the seat | What it holds |
+| --- | --- | --- |
+| **Title** | the `# Title` line, matching the block's `title` | the construct's own name, in full |
+| **Subtitle** | a `subtitle` field in the `spn:doc` block. Never a paragraph in the body, because `docs page` reads the first lead paragraph as the Description | one plain sentence: the construct's one-line promise |
+| **Description** | the first paragraph after the tag line, and only one | what it is · why read this page · at most two short sentences on how the page runs |
+
+**All three are plain language** (`RD.DEVEX.WORKSPACE.182`, `RD.DEVEX.WORKSPACE.187`): everyday
+words, one idea a sentence, no numbers, no slogan, no figure of speech, and no book word the same
+sentence does not explain. The block's `summary` is the Description's first sentence, word for word.
+**Show a new Title or Subtitle to the developer before you write it.** The only exemption is the
+foundation hub's Title and Subtitle, fixed by `RD.DEVEX.WORKSPACE.143`. What each level holds on the
+other page kinds is [`doc-sets.md`](doc-sets.md) § Every page opens on a masthead of three levels.
 
 ## Most of a page is not a block
 
@@ -37,7 +60,7 @@ declares *the* block of a section.
 
 | What you are writing | What you type |
 | --- | --- |
-| an explanation, an argument, a part, the opening | a paragraph. Nothing else |
+| an explanation, an argument, a part, the Description | a paragraph. Nothing else |
 | a part, a sub-part | `### Title`, `#### Title` — `###` through `#####` all render |
 | a list where order does not matter | `- item` or `* item` |
 | a list where the order **is** the content | `1. item` — numbered lists render as numbered lists |

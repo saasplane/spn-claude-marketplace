@@ -19,6 +19,8 @@ description: How a change reaches a running setup - what must be true before a r
 
 # deliver — what must be true before it ships
 
+**Read [`refs/devex/workspace/workstream.md`](../../refs/devex/workspace/workstream.md) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
+
 **A release is a claim that the artifact and its sources agree.** Everything below exists to make that claim true rather than hopeful.
 
 ## The gates, in order
@@ -55,7 +57,7 @@ A change reaches a running setup by moving through setups, not by being rebuilt 
 
 ## Lenses
 
-Wear `refs/lenses/infra.md` and `refs/lenses/partner.md` — the release gates are where a surface reduction or an unversioned break is caught last and cheapest.
+Wear `refs/devex/agent/lenses/infra.md` and `refs/devex/agent/lenses/partner.md` — the release gates are where a surface reduction or an unversioned break is caught last and cheapest.
 
 ## Finish
 
