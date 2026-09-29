@@ -19,6 +19,8 @@ description: Review SaaS Plane TS changes against the standards. Use when the us
 
 # review — code and contract gates
 
+**Read `refs/devex/workspace/workstream.md` (spn-devex) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
+
 Pick the mode (`code` | `contract`); a change that touched `contract/states/**` or routes gets **both**, contract first. Review the diff, not the whole file; report findings as blocking / should-fix / nit, each with file:line and the rule it breaks. Gates are mechanical before they are human — naming, domain fit, and judgment start where the checklist stops.
 
 ## Mode: contract

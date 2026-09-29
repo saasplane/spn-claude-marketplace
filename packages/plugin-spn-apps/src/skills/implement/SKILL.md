@@ -26,6 +26,8 @@ description: THE requirement router for SaaS Plane TS repos. Use whenever the us
 
 # implement — classify, then walk the steps in order
 
+**Read `refs/devex/workspace/workstream.md` (spn-devex) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
+
 If the `ideate` skill ran, the design is already in the owning module's docs as `🔮 planned` rows (behaviors + capabilities) — read those rows back as the spec. Otherwise classify from the request directly.
 
 ## 1. Classify
@@ -68,7 +70,7 @@ Scope reads to what the step needs — the inventory tells you which packages ex
 
 **A step file this stack does not ship is a step this stack does not walk.** A realization that is absent says so; nothing here stubs one.
 
-Order never changes; skip only what the classification skips. **Docs move with the steps, not after them.** The contract step updates `docs/04-capabilities/` rows and writes intent comments as it writes the surface. The test step writes behavior ids into case titles as each tier requires, and the docs step is the closing sweep that flips statuses. Regenerate at the marked points. Run `gen-validators` after any `contract/states/**` edit. Run `gen-barrel` after adding files to a lib package — never on apps or the API client. Regenerate the API client from the **running** service if routes or contracts changed before the FE consumes them.
+Order never changes; skip only what the classification skips. **Documents lead code** (`RD.DEVEX.WORKSPACE.081`): before the contract step, the owning seat already says what will be true — the `🔮 planned` rows `ideate` wrote, or rows you write first when it did not run. A part runs its documents, then its source, then its tests, then the close's run, never one function at a time. **Docs move with the steps, not after them.** The contract step updates `docs/04-capabilities/` rows and writes intent comments as it writes the surface. The test step writes behavior ids into case titles as each tier requires, and the docs step is the closing sweep that flips statuses. Regenerate at the marked points. Run `gen-validators` after any `contract/states/**` edit. Run `gen-barrel` after adding files to a lib package — never on apps or the API client. Regenerate the API client from the **running** service if routes or contracts changed before the FE consumes them.
 
 **The test step proves each claim once, at the level that owns it.** Pick the tier by what would break: a validation rule breaks in a unit, an authorization gate breaks against the real service, an outcome breaks end to end. A unit test for something that only fails when wired is a green proving nothing. A journey re-checking a rule the contract tier already decided is a slower copy of an answer you have. **The tier decides which cases carry a behavior id** (`RD.DEVEX.FUNCTION.064`): every contract, component and journey case; every integration case proving a guarantee; a unit case only where it proves a row whose `Tier` is `UNIT`. A row's `Tier` equals the tier of the case that proves it. That is what makes the rows readable later.
 

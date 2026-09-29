@@ -19,6 +19,8 @@ description: Publish this repository's releasable projects, in lockstep, through
 
 # release — publish the repository, in lockstep
 
+**Read `refs/devex/workspace/workstream.md` (spn-devex) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
+
 `apps release` is a repository-scoped command. It never takes a package: every releasable
 project in the repository publishes together, at one version, or none of them do
 (`RD.SUPPORT.APPS.034`, `RD.SUPPORT.APPS.118`). Asking it for one project is refused by name — the CLI says so

@@ -19,6 +19,8 @@ description: Publishing an estate package - bump the version field in spinfrapkg
 
 # release — bump by review, publish whole, to the org's registry pair
 
+**Read `refs/devex/workspace/workstream.md` (spn-devex) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
+
 **A version is published once, then promoted.** The declaration gets the discipline an image already has: built once, promoted by name, recorded in resolved state.
 
 ## 1 · The bump is the reviewed act

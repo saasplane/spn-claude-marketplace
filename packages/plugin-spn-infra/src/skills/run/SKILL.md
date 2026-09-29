@@ -19,6 +19,8 @@ description: Realize the estate - bring a layer up, take it down, read its statu
 
 # run — layers as nouns, local by default
 
+**Read `refs/devex/workspace/workstream.md` (spn-devex) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
+
 **The layers are nouns and they come up in order** — `organization` → `platform` → `environment`, with `app` registered on top of a running local platform. A lower layer missing is the usual reason a higher one will not start. The estate model behind these commands is `refs/support/infra/shape.md`, in this plugin; read it rather than reasoning from the command names.
 
 ## Two flags decide everything

@@ -15,6 +15,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSy
 import { dirname, join, resolve, basename, relative } from "node:path";
 import { hrefForPage, renderPage } from "../../lib/render.ts";
 import { cardsOf } from "../../checks/split-plan.ts";
+import { masthead, type MastheadKind } from "../../checks/doc-check.ts";
 import { filesUnder as proseFilesUnder, paragraphs as proseParagraphs, score as proseScore } from "./prose.ts";
 
 import { withOffset } from "../../lib/clock.ts";
@@ -630,6 +631,14 @@ export function checkHeader(file: string, src: string, block: any): Finding[] {
   } else if (!text(statusChip[1]).includes(STATUS_WORD[block.status])) {
     add("RULE", `the status chip reads \`${text(statusChip[1])}\`; the block says \`${block.status}\``);
   }
+
+  // The masthead's three levels, from the one check the doc-check hook runs too, so the page an
+  // author saves and the page `docs audit` reads are judged by the same rule. The kind is the
+  // block's variant; a hub is the overview named `concept-overview.html`.
+  const kind: MastheadKind | null = basename(file) === "concept-overview.html" ? "hub"
+    : ["overview", "construct", "report", "approach"].includes(block.variant) ? block.variant : null;
+  for (const [grade, message] of masthead(file, src, kind))
+    f.push({ check: "masthead", grade: grade as Grade, file, message });
   return f;
 }
 

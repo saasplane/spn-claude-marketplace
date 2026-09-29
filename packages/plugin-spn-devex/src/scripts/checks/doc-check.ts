@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // RESTATES: the foundation book — 02-document.md rule 9 (RD.DEVEX.WORKSPACE.162), rules 11-12 (RD.DEVEX.WORKSPACE.096, the
 // one voice; RD.DEVEX.WORKSPACE.106, its reach and its measure; RD.DEVEX.WORKSPACE.107, the three moves that reach the
-// reader), 04-discipline.md § Voice discipline, 05-artifacts.md (the approach document, and How
-// ends in Cycles), 01-workstream.md § A step row says where, at what altitude, and how
+// reader), 04-discipline.md § Voice discipline, 05-artifacts.md (the masthead, the approach document,
+// and How ends in Cycles), 01-workstream.md § A step row says where, at what altitude, and how
 // (RD.DEVEX.WORKSPACE.183) and 06-registers.md § Writing a row. The chapters are the source of truth: a rule change is edited
 // there first, then here, in the same change. This script checks only what a script CAN check; the
 // register itself is judgement.
@@ -387,6 +387,116 @@ export function approachShape(text: string, exempt = false): Finding[] {
   if (!/<p\b[^>]*class="[^"]*\bstandfirst\b/i.test(text))
     out.push(["RULE", "has no opening — a standfirst and the one paragraph under it come before Why " +
       "(05-artifacts.md § The masthead, and the opening; RD.DEVEX.WORKSPACE.182) · start from the approach template"]);
+  return out;
+}
+
+// ---------------------------------------------------------------------------- the masthead
+
+// 05-artifacts.md § The masthead, and the opening (RD.DEVEX.WORKSPACE.187, RD.DEVEX.WORKSPACE.182).
+// The header holds the Title (`h1`), an optional Subtitle (`p.subtitle`) and the Description (one
+// `p.standfirst`), in that order, and nothing after the Description. Every masthead finding is SOFT
+// while the trees outside the foundation wait for their retrofit (N116 row 9); when every tree
+// audits clean, change SECOND_PARAGRAPH to RULE, because the chapter states that rule as MUST.
+const SECOND_PARAGRAPH = "SOFT";
+const MASTHEAD = "SOFT";
+const MASTHEAD_WHERE = "(05-artifacts.md § The masthead, and the opening; RD.DEVEX.WORKSPACE.187)";
+
+/** The page kinds the masthead rule binds, read from a page's file name. */
+export type MastheadKind = "hub" | "overview" | "construct" | "report" | "approach";
+export function mastheadKind(path: string): MastheadKind | null {
+  const base = basename(path);
+  if (base === "concept-overview.html") return "hub";
+  const suffix = /-(overview|construct|report|approach)\.html$/.exec(base);
+  return suffix ? suffix[1] as MastheadKind : null;
+}
+
+/** Text as a reader compares it: tags gone, entities resolved, curly apostrophes straight, spaces collapsed. */
+const spoken = (html: string): string => flat(html).replace(/[’‘]/g, "'").replace(/[“”]/g, '"');
+
+/**
+ * The foundation hub's Title and Subtitle, read from `RD.DEVEX.WORKSPACE.143` in the register that
+ * sits beside the page. Null, and the pair is not checked, where that register carries no such row
+ * (every other repository) or where no register is found at all (a partner's workspace).
+ * The row writes the Title in backticks and the Subtitle in italics after *reads*; the Subtitle
+ * opens a sentence on the page, so its first letter is raised and a full stop closes it.
+ */
+export function hubPair(path: string): { title: string; subtitle: string } | "unreadable" | null {
+  let folder = dirname(resolve(path));
+  for (;;) {
+    const register = join(folder, "registers", "decisions.md");
+    if (exists(register)) {
+      const row = /^\|\s*RD\.DEVEX\.WORKSPACE\.143\s*\|[^\n]*$/m.exec(read(register));
+      if (!row) return null;
+      const title = /`([^`\n]+)`/.exec(row[0])?.[1];
+      const statement = /\breads\s+\*([^*\n]+)\*/.exec(row[0])?.[1];
+      if (!title || !statement) return "unreadable";
+      const subtitle = statement.charAt(0).toUpperCase() + statement.slice(1);
+      return { title: spoken(title), subtitle: spoken(/[.!?]$/.test(subtitle) ? subtitle : subtitle + ".") };
+    }
+    const up = dirname(folder);
+    if (up === folder) return null;
+    folder = up;
+  }
+}
+
+/**
+ * The masthead of one page: `h1`, an optional `p.subtitle`, exactly one `p.standfirst`, in that
+ * order, and no other paragraph. Only a page with a `<header>` is read; a missing header is the
+ * header check's finding. An approach page's missing standfirst is `approachShape`'s RULE, so it is
+ * not reported twice here.
+ */
+export function masthead(path: string, text: string, kind: MastheadKind | null = mastheadKind(path)): Finding[] {
+  if (!kind) return [];
+  const header = /<header\b[^>]*>([\s\S]*?)<\/header>/i.exec(text.replace(/<!--[\s\S]*?-->/g, " "));
+  if (!header) return [];
+  const body = header[1];
+  const out: Finding[] = [];
+  const parts = [...body.matchAll(/<h1\b[^>]*>([\s\S]*?)<\/h1>|<p\b([^>]*)>([\s\S]*?)<\/p>/gi)].map((m) => {
+    if (m[1] !== undefined) return { role: "h1", html: m[1] };
+    const cls = /\bclass\s*=\s*"([^"]*)"/i.exec(m[2])?.[1] ?? "";
+    const role = /\bsubtitle\b/.test(cls) ? "subtitle" : /\bstandfirst\b/.test(cls) ? "standfirst" : "p";
+    return { role, html: m[3] };
+  });
+
+  const subtitles = parts.filter((p) => p.role === "subtitle");
+  const standfirsts = parts.filter((p) => p.role === "standfirst");
+  const paragraphs = parts.filter((p) => p.role !== "h1");
+  // One Subtitle and one Description are the header's whole allowance of paragraphs; anything past
+  // that is a second paragraph, whatever its class says it is.
+  const allowed = Math.min(subtitles.length, 1) + Math.min(standfirsts.length, 1);
+  if (paragraphs.length > allowed) {
+    const extra = paragraphs.length - allowed;
+    out.push([SECOND_PARAGRAPH, `the header carries ${extra} paragraph${extra > 1 ? "s" : ""} past the ` +
+      "Subtitle and the Description — the Description is one paragraph, and nothing follows it in the " +
+      `header ${MASTHEAD_WHERE} · fold the rest into the first section`]);
+  }
+  if (!standfirsts.length && kind !== "approach")
+    out.push([MASTHEAD, `the header has no Description — one \`p.standfirst\` under the Title and the Subtitle ${MASTHEAD_WHERE}`]);
+
+  const order = parts.map((p) => p.role);
+  const h1At = order.indexOf("h1"), subAt = order.indexOf("subtitle"), leadAt = order.indexOf("standfirst");
+  if (subAt >= 0 && (subAt < h1At || (leadAt >= 0 && subAt > leadAt)))
+    out.push([MASTHEAD, `the Subtitle is out of place — it sits directly under the \`h1\` and above the Description ${MASTHEAD_WHERE}`]);
+
+  if (subtitles.length) {
+    const count = spoken(subtitles[0].html).split(/(?<=[.!?])\s+(?=\S)/).filter((s) => words(s).length).length;
+    if (count > 1)
+      out.push([MASTHEAD, `the Subtitle runs to ${count} sentences — it is one sentence, in plain language ${MASTHEAD_WHERE}`]);
+  }
+
+  if (kind === "hub") {
+    const pair = hubPair(path);
+    if (pair === "unreadable")
+      out.push([MASTHEAD, "RD.DEVEX.WORKSPACE.143 is in the register and its Title or Subtitle could not be read from the row — " +
+        "the row writes the Title in backticks and the Subtitle in italics after *reads*"]);
+    else if (pair) {
+      const h1 = parts.find((p) => p.role === "h1");
+      if (!h1 || spoken(h1.html) !== pair.title)
+        out.push([MASTHEAD, `the foundation hub's Title is not RD.DEVEX.WORKSPACE.143's, word for word — "${pair.title}" ${MASTHEAD_WHERE}`]);
+      if (!subtitles.length || spoken(subtitles[0].html) !== pair.subtitle)
+        out.push([MASTHEAD, `the foundation hub's Subtitle is not RD.DEVEX.WORKSPACE.143's, word for word — "${pair.subtitle}" ${MASTHEAD_WHERE}`]);
+    }
+  }
   return out;
 }
 
@@ -996,6 +1106,8 @@ export function check(path: string, text: string, fragment = false): Finding[] {
   } else if (isOverview) {
     out.push(...overviewShape(text));
   }
+  // Workstream 008's own page keeps the shape it was written in, as it does for approachShape.
+  if (isHtml && !fragment && !(isApproach && exemptWorkstream(path))) out.push(...masthead(path, text));
 
   const sents = sentences(prose);
   if (!fragment || sents.length >= 5) out.push(...voice(prose, sents, kindOf(path), isOperative(path)));

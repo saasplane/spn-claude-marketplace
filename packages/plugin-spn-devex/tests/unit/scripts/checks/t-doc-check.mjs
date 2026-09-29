@@ -244,6 +244,82 @@ one("a rule may quote the mistake it bans",
   write(CHAPTER, "# A chapter\n\nYou never write *five decisions* into a sentence. You name the set by its rule.\n"),
   "silent");
 
+console.log("\n=== doc-check — the masthead: h1, an optional p.subtitle, one p.standfirst (RD.DEVEX.WORKSPACE.187)");
+
+// The same function `docs audit` runs, so a page is judged alike when it is saved and when it is audited.
+const CONSTRUCT = `${WORKSPACE}/spn-foundation/docs/artifacts/constructs/probe-construct.html`;
+const page = (inner) => `<!doctype html>
+<header class="masthead">
+  <div class="eyebrow"><span class="audience">Architect</span></div>
+${inner}
+</header>
+<section id="s0"><div class="sec-head"><h2>Overview</h2></div>
+  <p>You read this part when you need the core. You leave it knowing where each piece sits.</p>
+</section>
+`;
+const MAST = `  <h1>Probe</h1>\n  <p class="subtitle">You keep one place for the model.</p>\n  <p class="standfirst">This page covers the probe. Read it before you change it.</p>`;
+
+one("a construct masthead with h1, Subtitle and Description", write(CONSTRUCT, page(MAST)), "silent");
+one("a construct with no Subtitle — the Subtitle is optional",
+  write(CONSTRUCT, page(MAST.replace(/  <p class="subtitle">.*\n/, ""))), "silent");
+one("a second paragraph after the Description is SOFT until every tree is retrofitted (N116 row 9)",
+  write(CONSTRUCT, page(MAST + "\n  <p>You also read this, and it should be in the first section.</p>")),
+  "reports", "[SOFT] the header carries 1 paragraph past the Subtitle and the Description");
+one("two standfirsts are a second paragraph",
+  write(CONSTRUCT, page(MAST + `\n  <p class="standfirst">You read a second Description here.</p>`)),
+  "reports", "[SOFT] the header carries 1 paragraph");
+one("a Subtitle of two sentences is SOFT",
+  write(CONSTRUCT, page(MAST.replace("the model.</p>", "the model. You keep it there.</p>"))),
+  "reports", "[SOFT] the Subtitle runs to 2 sentences");
+one("a construct header with no Description is SOFT",
+  write(CONSTRUCT, page(MAST.replace(/\n  <p class="standfirst">.*/, ""))),
+  "reports", "[SOFT] the header has no Description");
+one("a Subtitle under the Description is out of place",
+  write(CONSTRUCT, page(`  <h1>Probe</h1>\n  <p class="standfirst">This page covers the probe. Read it before you change it.</p>\n  <p class="subtitle">You keep one place for the model.</p>`)),
+  "reports", "[SOFT] the Subtitle is out of place");
+// THE HUB CASES ARE HERMETIC. The pair is read from the register beside the page, so each case
+// builds its own workspace holding a stub RD.DEVEX.WORKSPACE.143 row, and the suite never depends
+// on what the real foundation's register says today.
+{
+  const HUB_WS = realpathSync(mkdtempSync(join(tmpdir(), "doc-check-hub-")));
+  try {
+    const hubIn = (repoName, register) => {
+      const docs = join(HUB_WS, repoName, "docs");
+      mkdirSync(join(docs, "artifacts", "overviews"), { recursive: true });
+      if (register !== null) {
+        mkdirSync(join(docs, "registers"), { recursive: true });
+        writeFileSync(join(docs, "registers", "decisions.md"),
+          "# Decisions\n\n| ID | Area | Decision | Why | When |\n| --- | --- | --- | --- | --- |\n" + register);
+      }
+      return join(docs, "artifacts", "overviews", "concept-overview.html");
+    };
+    const STUB = "| RD.DEVEX.WORKSPACE.143 | [docs](x.md) | **The punchline is `A stub title for the probe.`, and the " +
+      "statement beside it does not change.** The statement below it reads *the stub subtitle, read from the row*. | why | 2026-09 |\n";
+    const foundationHub = hubIn("spn-foundation", STUB);
+    const mast = (h1, sub) => page(`  <h1>${h1}</h1>\n  <p class="subtitle">${sub}</p>\n  <p class="standfirst">This page is where you start. Read it first.</p>`);
+
+    one("the foundation hub with the stub row's pair, word for word",
+      write(foundationHub, mast("A stub title for the probe.", "The stub subtitle, read from the row.")), "silent");
+    one("the foundation hub with a Title of its own",
+      write(foundationHub, mast("Ship it faster.", "The stub subtitle, read from the row.")),
+      "reports", "[SOFT] the foundation hub's Title is not RD.DEVEX.WORKSPACE.143's, word for word — \"A stub title for the probe.\"");
+    one("the foundation hub with a Subtitle of its own",
+      write(foundationHub, mast("A stub title for the probe.", "You build on one base.")),
+      "reports", "[SOFT] the foundation hub's Subtitle is not RD.DEVEX.WORKSPACE.143's");
+    one("a .143 row the check cannot read is said, never passed",
+      write(hubIn("spn-unreadable", "| RD.DEVEX.WORKSPACE.143 | a | no pair here | b | c |\n"), mast("x y z", "You build on one base.")),
+      "reports", "could not be read from the row");
+    one("another repository's hub, whose register has no .143 row, is not held to the pair",
+      write(hubIn("spn-support-ts", "| RD.SUPPORT.APPS.001 | a | b | c | d |\n"), mast("Ship it faster.", "You build on one base.")),
+      "silent");
+    one("a partner's workspace with no register at all skips the pair silently",
+      write(hubIn("partner-docs", null), mast("Ship it faster.", "You build on one base.")),
+      "silent");
+  } finally {
+    rmSync(HUB_WS, { recursive: true, force: true });
+  }
+}
+
 console.log("\n=== doc-check — the approach page: an opening, five sections, How ending in Cycles");
 
 // 05-artifacts.md § The approach document. The page is an opening, then Why > What > How > Open >

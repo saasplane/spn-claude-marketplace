@@ -19,6 +19,8 @@ description: Run the estate's gates - spnutils infra validate for the build, spn
 
 # verify — validate the build, test the tiers, stamp what proved them
 
+**Read `refs/devex/workspace/workstream.md` (spn-devex) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
+
 **Green before any review is asked for.** These two commands are the whole of the mechanical gate; everything they do not cover is a judgment call and belongs to the `review` skill.
 
 **Read the repository's Test and verify guide first** — `docs/05-guides/*-test-and-verify.md`, linked from `.claude/saasplane/rules.md` under *How this repository is tested* (`RD.DEVEX.WORKSPACE.181`). It holds this estate's own sequence: the `~/.spnenv` keys a run reads, the steps in order, the clean reset of the machine, and what to do when something fails. Follow its steps; never read the sequence out of `CLAUDE.md`, which states none. A repository with no guide says so in that section — then use the loop below and name the missing guide in your report.

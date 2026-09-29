@@ -19,6 +19,8 @@ description: Prove SaaS Plane TS work is sound by running gates. Use when the as
 
 # verify — run the gates against a target
 
+**Read `refs/devex/workspace/workstream.md` (spn-devex) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
+
 **First decide what was actually asked**, because developers say *verify* for two different jobs:
 
 | The object is… | Then… |
@@ -109,6 +111,7 @@ Destructive, and the local stack is frequently **shared**: `infra platform down 
    - the **spn-devex** plugin's `spn-devex behaviours stamp --write --reach repository` writes `Status` and `Updated at` into every behaviour row the run's ids resolve to. **`--reach repository` is the caller saying these artifacts are the whole of these tiers**, which is true after a full run and false after any narrower one — it sends a row nothing cited back to `PLANNED`, so on a partial run it erases evidence that was true. Run it without the flag when you ran less than everything.
    - **Run the tiers through `spnutils apps test <tier>`.** Where a repository still consumes a published toolchain older than the derived-artifact change, any other door runs the suite and writes nothing — and with `--reach repository` set, that silence resets rows the run actually proved.
    - **Then check the rows against the evidence** — the **spn-devex** plugin's `spn-devex behaviours check .` refuses a `SUCCESS` row the run of its tier contradicts, and `node "${CLAUDE_PLUGIN_ROOT}"/scripts/checks/behaviour-join.ts .` names a `SUCCESS` row no case cites and a case citing an id no row declares. `spnutils` reads no row, so these are the gate.
+   - **Fix what keeps a row unproved, before the report** (`RD.DEVEX.FUNCTION.064`). A full run is not only a report. A row whose tier is not the tier of the case that proves it, a runner that ran and wrote no result file, a case its tier binds that carries no id, and a red case are each the run's own work. Fix each one, run that tier again, and stamp again. Name anything you cannot fix in the report, with the reason.
    - **Report the code coverage the run printed** — lines, statements, functions and branches, per project whose run collected it, read from its `coverage-summary.json`. It is reported, never enforced (`RD.SUPPORT.APPS.133`): no configuration carries a threshold and nothing fails on a percentage. `node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs coverage check <project>` names an exclude that gives no reason.
    - **Then produce the pages whose behaviours moved**: the `spn-devex:check` skill, asking it to produce the matching `02-constructs` seat page. A construct page joins its behaviours from the register, so writing statuses makes every page for a changed construct stale, and `docs.ts audit` reds until they are produced again.
    - **Last, the report** — the `TRACEABILITY_MATRIX` template through the `spn-devex:report` skill, into `docs/artifacts/reports/`. It is written by you from what you just read, never by a tool, and it names which tiers the run spoke for. The **spn-devex** plugin's `spn-devex behaviours coverage --json` hands you the measurement to write it from.

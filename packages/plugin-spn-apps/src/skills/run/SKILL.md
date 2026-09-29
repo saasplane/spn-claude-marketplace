@@ -19,6 +19,8 @@ description: Start a SaaS Plane TS platform locally or run its test suites. Use 
 
 # run — local stack and test suites
 
+**Read `refs/devex/workspace/workstream.md` (spn-devex) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
+
 Pick the mode (`local` | `tests`). pnpm only — never npm/yarn. All infra goes through `spnutils infra`, driven by the platform declaration that `sprepo.json` pins and each app's row in it — never hand-rolled docker.
 
 ## The form — read this before you type a command

@@ -19,6 +19,8 @@ description: Scaffold SaaS Plane TS artifacts. Use when the user wants to create
 
 # new — scaffold by target
 
+**Read `refs/devex/workspace/workstream.md` (spn-devex) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
+
 Every node declares exactly **one kind**, in `spkind.json` at its root — `{ "kind": "<kind>", "config": null }`. The `config` field carries the mnemonic for module kinds and the app code for app kinds. Everything derivable from the kind (runtime, toolchain profile, structure profile) is never declared again. Scaffolds write the kind automatically; a project without it is unfinished.
 
 **Never invent layout.** `spnutils apps scaffold` writes the structure the kind requires, and `spnutils apps validate` reports where a project disagrees with its own kind. Run the scaffold, then the validator, rather than hand-building a folder tree. The stack is never typed: it comes from the repo's claim in `sprepo.json`. Where a workspace already holds a project of the same kind, match it; where it does not, the kind registry's structure profile is the authority. Keep tests under `tests/`, always — never in `src/`.

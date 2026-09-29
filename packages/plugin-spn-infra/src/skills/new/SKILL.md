@@ -19,6 +19,8 @@ description: Stand up a new estate node or a new estate repository with spnutils
 
 # new — scaffold the node, then let the validator judge it
 
+**Read `refs/devex/workspace/workstream.md` (spn-devex) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
+
 **Never hand-build an estate tree.** `spnutils infra scaffold` writes the tree each type prescribes, and `spnutils infra validate` reports where a tree disagrees with its own type. Scaffold, then validate — that pair is the whole of standing a node up. Read `refs/support/infra/packages.md`, in this plugin, for the four types and the two manifest files; read `refs/support/infra/naming.md` for the name grammar.
 
 ## Choose the type first

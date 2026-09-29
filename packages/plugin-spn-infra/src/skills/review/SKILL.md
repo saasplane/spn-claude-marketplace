@@ -19,6 +19,8 @@ description: Read an estate plan or a declaration diff back before anything appl
 
 # review — the plan is the review
 
+**Read `refs/devex/workspace/workstream.md` (spn-devex) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
+
 **Review plans from the checkout — unpublished changes must plan; merge publishes; an apply fetches the published version and applies that, never a checkout.** Treat the plan, therefore, as the one artifact a human judges. A plan comes from `spnutils infra <layer> up --plan` (add `--cloud` for the cloud form, `--json` for a machine-readable one); a teardown's plan comes from `down --plan`. Hold it to both lists below and give a named verdict.
 
 ## Mode: a declaration diff

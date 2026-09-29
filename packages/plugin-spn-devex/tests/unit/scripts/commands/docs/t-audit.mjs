@@ -867,6 +867,63 @@ console.log("\n=== an authored page defines no selector its declared template do
     got("concept-bad-overview.html"), lacks("SOFT selector"));
 }
 
+// ---------------------------------------------------------------- the masthead's three levels
+
+console.log("\n=== the masthead: h1, an optional p.subtitle, one p.standfirst, and nothing after it (RD.DEVEX.WORKSPACE.187)");
+{
+  const page = (inner, file = "concept-core-overview.html") => repo({
+    "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
+    [`docs/artifacts/overviews/${file}`]:
+      `<meta charset="utf-8">\n<title>Core</title>\n` +
+      block({ id: "o", variant: "overview", parentId: "concept", title: "Core", lenses: ["ARCHITECT"], summary: "s." }) +
+      `<header class="masthead">\n<!-- a comment <p>is not a paragraph</p> -->\n${inner}\n</header>\n<h2>Overview</h2>\n<p>x</p>`,
+  });
+  const audit = (inner, file) => run(page(inner, file), ["audit", `docs/artifacts/overviews/${file ?? "concept-core-overview.html"}`]);
+  const GOOD = `<h1>Know where you are.</h1>\n<p class="subtitle">The core is the part every other part reads.</p>\n<p class="standfirst">This page covers the core. Read it first.</p>`;
+
+  one("h1, one Subtitle and one Description draw no masthead finding", audit(GOOD), lacks("masthead"));
+  one("a Subtitle is optional", audit(GOOD.replace(/<p class="subtitle">.*<\/p>\n/, "")), lacks("masthead"));
+  one("a second paragraph after the Description is SOFT until every tree is retrofitted (N116 row 9)",
+    audit(GOOD + "\n<p>A second paragraph.</p>"), (g) => g.includes("! SOFT masthead") && g.includes("paragraph past the Subtitle"));
+  one("a second standfirst is a second paragraph, whatever its class says",
+    audit(GOOD + `\n<p class="standfirst">Another Description.</p>`), has("carries 1 paragraph past the Subtitle"));
+  one("a tagline beside the Subtitle is a second paragraph too",
+    audit(GOOD.replace("<p class=\"subtitle\">", "<p class=\"tagline\">A tagline.</p>\n<p class=\"subtitle\">")), (g) => g.includes("! SOFT masthead") && g.includes("paragraph past the Subtitle"));
+  one("a Subtitle of two sentences is SOFT",
+    audit(GOOD.replace("reads.</p>", "reads. It is small.</p>")), has("! SOFT masthead"));
+  one("and names the count", audit(GOOD.replace("reads.</p>", "reads. It is small.</p>")), has("runs to 2 sentences"));
+  one("a header with no Description is SOFT",
+    audit(GOOD.replace(/\n<p class="standfirst">.*<\/p>/, "")), has("has no Description"));
+  one("a Subtitle below the Description is out of place",
+    audit(`<h1>Know where you are.</h1>\n<p class="standfirst">This page covers the core.</p>\n<p class="subtitle">The core is the part every other part reads.</p>`),
+    has("the Subtitle is out of place"));
+  // The foundation hub's pair is read from RD.DEVEX.WORKSPACE.143 in the register beside the page;
+  // a register without that row (every other repository) leaves the hub's lines to the author.
+  one("a hub in a repository whose register has no .143 row is not held to the pair",
+    audit(GOOD, "concept-overview.html"), lacks("RD.DEVEX.WORKSPACE.143"));
+}
+{
+  const ROW = "| RD.DEVEX.WORKSPACE.143 | [docs](x.md) | **The punchline is `Only this probe's own title.`, and the statement beside it does not change.** " +
+    "The statement below it reads *the probe's own subtitle, read from the row*. | why | 2026-09 |\n";
+  const hub = (h1, sub, row = ROW) => repo({
+    "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
+    "docs/registers/decisions.md": "# Decisions\n\n| ID | Area | Decision | Why | When |\n| --- | --- | --- | --- | --- |\n" + row,
+    "docs/artifacts/overviews/concept-overview.html":
+      `<meta charset="utf-8">\n<title>Concept</title>\n` +
+      block({ id: "o", variant: "overview", parentId: "concept", title: "Concept", lenses: ["ARCHITECT"], summary: "s." }) +
+      `<header class="masthead">\n<h1>${h1}</h1>\n<p class="subtitle">${sub}</p>\n<p class="standfirst">This page is the start.</p>\n</header>\n<h2>Overview</h2>\n<p>x</p>`,
+  }, { type: "FOUNDATION" });
+  const audit = (...a) => run(hub(...a), ["audit", "docs/artifacts/overviews/concept-overview.html"]);
+  one("the hub's pair, word for word from the register's row, is silent",
+    audit("Only this probe&rsquo;s own title.", "The probe's own subtitle, read from the row."), lacks("RD.DEVEX.WORKSPACE.143"));
+  one("a hub Title that is not the row's is SOFT, and quotes the row",
+    audit("Your team's time belongs to your product.", "The probe's own subtitle, read from the row."),
+    (g) => g.includes("! SOFT masthead") && g.includes("Title is not RD.DEVEX.WORKSPACE.143's") && g.includes("Only this probe's own title."));
+  one("a hub Subtitle that is not the row's is SOFT",
+    audit("Only this probe's own title.", "A subtitle somebody typed."), has("Subtitle is not RD.DEVEX.WORKSPACE.143's"));
+  one("a .143 row the check cannot read is said, never passed",
+    audit("x", "y", "| RD.DEVEX.WORKSPACE.143 | a | no pair here | b | c |\n"), has("could not be read from the row"));
+}
 
 console.log(failed ? `\n  ${failed} of ${n} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

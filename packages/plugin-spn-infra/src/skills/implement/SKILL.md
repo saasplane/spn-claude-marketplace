@@ -19,6 +19,8 @@ description: Author an estate node - locate it, write the choices a person actua
 
 # implement — locate the node, write the choices, build the module
 
+**Read `refs/devex/workspace/workstream.md` (spn-devex) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
+
 **The estate declares; it never implements what it declares.** A change to what exists is an edit to a `src/spestate.json` (or a `spinfrapkg.json`), and the whole change must read back as the small set of choices it makes. Read `refs/support/infra/packages.md`, in this plugin, for the manifest shapes and the locator rules; `refs/support/infra/laws.md` for the lines no edit may cross; `refs/support/infra/modules.md` for what a module is and where it may attach.
 
 ## 1 · Locate the node
