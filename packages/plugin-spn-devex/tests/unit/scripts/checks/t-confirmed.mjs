@@ -10,6 +10,7 @@ import { workspace } from "../../../helpers/fixture.mjs";
 
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
+import { WORKSTREAMS } from "../../../../src/scripts/lib/docs-tree.ts";
 
 const HOOKS = PLUGIN;
 const SCRIPTS = resolve(HOOKS, "scripts");
@@ -35,7 +36,7 @@ const arc = (go) =>
 
 function build(name, go) {
   return workspace(name, {
-    ".spndevex/workstreams/open/001-a-subject/arcs/N1-something.md": arc(go),
+    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md`]: arc(go),
     "spn-support-ts/src/existing.ts": "export const x = 1;\n",
   });
 }
@@ -93,7 +94,7 @@ one("a repository write with no go recorded", { go: false, path: "spn-support-ts
 one("a write into a second repository, still no go", { go: false, path: "spn-platform-ts/src/a.ts" }, "note");
 // UNTOUCHED
 one("the same write once an arc logs a go", { go: true, path: "spn-support-ts/src/probe.ts" }, "silent");
-one("writing the plan itself is how a go is earned", { go: false, path: ".spndevex/workstreams/open/001-a-subject/arcs/N1-something.md" }, "silent");
+one("writing the plan itself is how a go is earned", { go: false, path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md` }, "silent");
 one("wiring the window is not executing the plan", { go: false, path: ".claude/settings.json" }, "silent");
 one("a Bash call carries no file_path", { go: false, tool: "Bash" }, "silent");
 

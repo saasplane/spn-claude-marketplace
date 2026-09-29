@@ -7,6 +7,7 @@ import { join } from "node:path";
 import { arcId, arcLabel, cycleOf, cyclesOf, statusLabel, statusWord, tableOf, workstreamFolder }
   from "../../../../../src/scripts/commands/docs/cycles.ts";
 import { main } from "../../../../../src/scripts/cli.ts";
+import { WORKSTREAMS } from "../../../../../src/scripts/lib/docs-tree.ts";
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -34,7 +35,7 @@ async function capture(argv, env = {}) {
 }
 
 const TMP = realpathSync(mkdtempSync(join(tmpdir(), "docs-cycles-")));
-const folder = join(TMP, ".spndevex", "workstreams", "backlog", "042-probe");
+const folder = join(TMP, ".spndevex", WORKSTREAMS, "backlog", "042-probe");
 const arcs = join(folder, "arcs");
 mkdirSync(arcs, { recursive: true });
 const put = (name, text) => writeFileSync(join(arcs, name), text);
@@ -113,7 +114,7 @@ try {
     const usage = await capture(["docs", "cycles"]);
     ok("no workstream named is a usage error", usage.code === 2 && usage.err.includes("usage"), usage.err);
 
-    const empty = join(TMP, ".spndevex", "workstreams", "open", "043-empty");
+    const empty = join(TMP, ".spndevex", WORKSTREAMS, "open", "043-empty");
     mkdirSync(join(empty, "arcs"), { recursive: true });
     const none = await capture(["docs", "cycles", empty]);
     ok("a workstream with no arcs exits 1", none.code === 1 && none.err.includes("has no arcs"), none.err);

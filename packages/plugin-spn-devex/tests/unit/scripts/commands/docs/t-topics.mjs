@@ -12,6 +12,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
+import { SEAT, TEMPLATES } from "../../../../../src/scripts/lib/docs-tree.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
 const BASE = mkdtempSync(join(tmpdir(), "t-docs-topics-"));
@@ -73,41 +74,41 @@ const lacks = (s) => (got) => !String(got).includes(s);
 console.log("=== a topic the constructs seat does not name is refused in the other two seats");
 {
   const good = {
-    "docs/02-constructs/README.md": doc({ id: "d", title: "Dictionary", lenses: ["ARCHITECT"], status: "PLANNING" }),
-    "docs/02-constructs/01-core/01-boot.md": seat("boot"),
-    "docs/03-behaviors/01-core/01-boot.md": register("b-boot", [["CORE.BOOT.01", "can boot", "UNIT", "PLANNED"]]),
-    "docs/04-capabilities/01-core/pkg-ts/01-boot.md": "# Boot\n\nWhere it lives.\n",
+    [`docs/${SEAT.constructs}/README.md`]: doc({ id: "d", title: "Dictionary", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    [`docs/${SEAT.constructs}/01-core/01-boot.md`]: seat("boot"),
+    [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: register("b-boot", [["CORE.BOOT.01", "can boot", "UNIT", "PLANNED"]]),
+    [`docs/${SEAT.capabilities}/01-core/pkg-ts/01-boot.md`]: "# Boot\n\nWhere it lives.\n",
   };
   one("a tree where all three seats name the same topic is clean",
       run(repo(good), ["topics", "."]), has("clean — 1 repository"));
 
   one("a numbered behaviours file naming no construct is a RULE",
-      run(repo({ ...good, "docs/03-behaviors/01-core/02-ghost.md": register("g", [["CORE.GHOST.01", "x", "UNIT", "PLANNED"]]) }), ["topics", "."]),
+      run(repo({ ...good, [`docs/${SEAT.behaviors}/01-core/02-ghost.md`]: register("g", [["CORE.GHOST.01", "x", "UNIT", "PLANNED"]]) }), ["topics", "."]),
       has("`ghost` is a numbered topic of the behaviours seat"));
 
   one("the same topic under a different domain is a RULE, not a pass",
-      run(repo({ ...good, "docs/03-behaviors/02-other/01-boot.md": register("b2", [["CORE.BOOT.02", "x", "UNIT", "PLANNED"]]) }), ["topics", "."]),
+      run(repo({ ...good, [`docs/${SEAT.behaviors}/02-other/01-boot.md`]: register("b2", [["CORE.BOOT.02", "x", "UNIT", "PLANNED"]]) }), ["topics", "."]),
       has("sits under `02-other` here and under `01-core` in the constructs seat"));
 
   one("a capability chapter naming no construct is a RULE",
-      run(repo({ ...good, "docs/04-capabilities/01-core/pkg-ts/02-ghost.md": "# Ghost\n" }), ["topics", "."]),
+      run(repo({ ...good, [`docs/${SEAT.capabilities}/01-core/pkg-ts/02-ghost.md`]: "# Ghost\n" }), ["topics", "."]),
       has("`ghost` is a numbered chapter of the capabilities seat"));
 
   one("an unnumbered file in either seat is not a topic and is not judged",
-      run(repo({ ...good, "docs/03-behaviors/01-core/personas.md": doc({ id: "p", title: "Personas", lenses: ["QA"], status: "PLANNING" }) }), ["topics", "."]),
+      run(repo({ ...good, [`docs/${SEAT.behaviors}/01-core/personas.md`]: doc({ id: "p", title: "Personas", lenses: ["QA"], status: "PLANNING" }) }), ["topics", "."]),
       has("clean — 1 repository"));
 
   // THE REGRESSION. Unnumbered constructs and numbered behaviours is the corpus mid-move, and the
   // first implementation called it clean because it had nothing to compare against.
   one("a tree whose constructs are not numbered yet is NOT reported clean",
       run(repo({
-        "docs/02-constructs/01-core/boot.md": seat("boot"),
-        "docs/03-behaviors/01-core/01-boot.md": register("b", [["CORE.BOOT.01", "can boot", "UNIT", "PLANNED"]]),
+        [`docs/${SEAT.constructs}/01-core/boot.md`]: seat("boot"),
+        [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: register("b", [["CORE.BOOT.01", "can boot", "UNIT", "PLANNED"]]),
       }), ["topics", "."]),
       (g) => /RULE/.test(g) && !/clean/.test(g));
 
   one("a repository with no constructs seat at all is silent, not noisy",
-      run(repo({ "docs/03-behaviors/01-core/01-boot.md": register("b", [["CORE.BOOT.01", "x", "UNIT", "PLANNED"]]) }), ["topics", "."]),
+      run(repo({ [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: register("b", [["CORE.BOOT.01", "x", "UNIT", "PLANNED"]]) }), ["topics", "."]),
       has("clean — 1 repository"));
 }
 
@@ -121,16 +122,16 @@ console.log("\n=== a topic name repeats across domains, and that is not drift");
   const two = {
     // One topic name, two domains, two ids — which is exactly what the corpus does: the infra
     // half's pages are `estate-*` so they cannot collide with the applications half's own.
-    "docs/02-constructs/01-apps/01-shape.md": seat("apps-shape"),
-    "docs/02-constructs/02-infra/01-shape.md": seat("estate-shape"),
-    "docs/03-behaviors/01-apps/01-shape.md": register("b1", [["APPS.SHAPE.01", "x", "UNIT", "PLANNED"]]),
-    "docs/03-behaviors/02-infra/01-shape.md": register("b2", [["INFRA.SHAPE.01", "y", "UNIT", "PLANNED"]]),
+    [`docs/${SEAT.constructs}/01-apps/01-shape.md`]: seat("apps-shape"),
+    [`docs/${SEAT.constructs}/02-infra/01-shape.md`]: seat("estate-shape"),
+    [`docs/${SEAT.behaviors}/01-apps/01-shape.md`]: register("b1", [["APPS.SHAPE.01", "x", "UNIT", "PLANNED"]]),
+    [`docs/${SEAT.behaviors}/02-infra/01-shape.md`]: register("b2", [["INFRA.SHAPE.01", "y", "UNIT", "PLANNED"]]),
   };
   one("one name in two domains, with a rows file under each, is clean",
       run(repo(two), ["topics", "."]), has("clean — 1 repository"));
 
   one("and a third domain nothing names is still a RULE",
-      run(repo({ ...two, "docs/03-behaviors/03-other/01-shape.md": register("b3", [["OTHER.SHAPE.01", "z", "UNIT", "PLANNED"]]) }), ["topics", "."]),
+      run(repo({ ...two, [`docs/${SEAT.behaviors}/03-other/01-shape.md`]: register("b3", [["OTHER.SHAPE.01", "z", "UNIT", "PLANNED"]]) }), ["topics", "."]),
       (g) => /`shape` sits under `03-other` here and under/.test(g) && /`01-apps`/.test(g) && /`02-infra`/.test(g));
 }
 
@@ -139,31 +140,31 @@ console.log("\n=== one id names one document");
   const doc2 = (id, title) => doc({ id, variant: "capability", title, lenses: ["SERVER_DEV"], status: "DONE" });
   one("two documents under one id are a RULE, and both are named",
       run(repo({
-        "docs/04-capabilities/01-core/pkg-ts/README.md": doc2("pkg-caps", "Capabilities — pkg-ts"),
-        "docs/04-capabilities/01-core/pkg-ts/01-boot.md": doc2("pkg-caps", "boot in pkg-ts"),
+        [`docs/${SEAT.capabilities}/01-core/pkg-ts/README.md`]: doc2("pkg-caps", "Capabilities — pkg-ts"),
+        [`docs/${SEAT.capabilities}/01-core/pkg-ts/01-boot.md`]: doc2("pkg-caps", "boot in pkg-ts"),
       }), ["topics", "."]),
       (g) => /`pkg-caps` is the id of 2 documents/.test(g) && (g.match(/RULE ids/g) ?? []).length === 2);
 
   one("a tree where every id is its own is clean",
       run(repo({
-        "docs/04-capabilities/01-core/pkg-ts/README.md": doc2("pkg-caps", "Capabilities — pkg-ts"),
-        "docs/04-capabilities/01-core/pkg-ts/01-boot.md": doc2("pkg-boot", "boot in pkg-ts"),
+        [`docs/${SEAT.capabilities}/01-core/pkg-ts/README.md`]: doc2("pkg-caps", "Capabilities — pkg-ts"),
+        [`docs/${SEAT.capabilities}/01-core/pkg-ts/01-boot.md`]: doc2("pkg-boot", "boot in pkg-ts"),
       }), ["topics", "."]),
       has("clean — 1 repository"));
 
   one("three documents under one id say three, not two",
       run(repo({
-        "docs/04-capabilities/01-core/a/README.md": doc2("same", "A"),
-        "docs/04-capabilities/01-core/b/README.md": doc2("same", "B"),
-        "docs/04-capabilities/01-core/c/README.md": doc2("same", "C"),
+        [`docs/${SEAT.capabilities}/01-core/a/README.md`]: doc2("same", "A"),
+        [`docs/${SEAT.capabilities}/01-core/b/README.md`]: doc2("same", "B"),
+        [`docs/${SEAT.capabilities}/01-core/c/README.md`]: doc2("same", "C"),
       }), ["topics", "."]),
       has("`same` is the id of 3 documents"));
 
   // A template carries a placeholder id and is excluded from every walk by folder, not per file.
   one("a template's placeholder id is not a collision",
       run(repo({
-        "docs/04-capabilities/01-core/pkg-ts/README.md": doc2("pkg-caps", "Capabilities — pkg-ts"),
-        "docs/04-capabilities/templates/capability-template.md": doc2("pkg-caps", "A template"),
+        [`docs/${SEAT.capabilities}/01-core/pkg-ts/README.md`]: doc2("pkg-caps", "Capabilities — pkg-ts"),
+        [`docs/${SEAT.capabilities}/${TEMPLATES}/capability-template.md`]: doc2("pkg-caps", "A template"),
       }), ["topics", "."]),
       has("clean — 1 repository"));
 }

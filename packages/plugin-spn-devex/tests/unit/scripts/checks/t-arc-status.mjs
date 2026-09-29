@@ -1,3 +1,4 @@
+import { WORKSTREAMS } from "../../../../src/scripts/lib/docs-tree.ts";
 // `arc-status` — an arc's status is one of eight (RD.DEVEX.WORKSPACE.058).
 //
 // BOTH DIRECTIONS ARE CASES, because a check that only ever speaks is the same defect as one that
@@ -7,7 +8,7 @@
 const { checkArcStatus, STATUSES, statusIn } = await import("../../../../src/scripts/checks/arc-status.ts");
 
 let n = 0, failed = 0;
-const ARC = "/w/.spndevex/workstreams/open/008-x/arcs/N1-a-subject.md";
+const ARC = `/w/.spndevex/${WORKSTREAMS}/open/008-x/arcs/N1-a-subject.md`;
 const verdict = (text, path = ARC) =>
   checkArcStatus({ tool_name: "Write", tool_input: { file_path: path, content: text } });
 
@@ -40,7 +41,7 @@ one("**Status: DONE", "# N1\n\n**Status: DONE 2026-09-23.**", "note");
 console.log("\n=== what it must never speak about");
 one("an edit that touches no status line", "# N1\n\nsome prose about the arc", "silent");
 one("a file outside an arcs/ folder", "Status: **DONE**", "silent", "/w/spn-foundation/docs/README.md");
-one("a note file beside the arcs", "Status: **DONE**", "silent", "/w/.spndevex/workstreams/open/008-x/notes/N-plan.md");
+one("a note file beside the arcs", "Status: **DONE**", "silent", `/w/.spndevex/${WORKSTREAMS}/open/008-x/notes/N-plan.md`);
 
 console.log("\n=== the reader itself");
 {

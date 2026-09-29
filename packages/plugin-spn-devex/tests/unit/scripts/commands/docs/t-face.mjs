@@ -13,6 +13,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, rmSync
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
+import { ARTIFACT, POCKET, RETIRED_ARTIFACT, SEAT, TEMPLATES } from "../../../../../src/scripts/lib/docs-tree.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
 const BASE = mkdtempSync(join(tmpdir(), "t-docs-face-"));
@@ -66,35 +67,35 @@ console.log("=== the tag line is rendered from the block, never typed");
 {
   const root = repo({
     "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
-    "docs/02-constructs/README.md": doc({ id: "d", title: "Dictionary", lenses: ["ARCHITECT"], status: "PLANNING" }),
-    "docs/02-constructs/01-core/README.md": doc({ id: "c", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    [`docs/${SEAT.constructs}/README.md`]: doc({ id: "d", title: "Dictionary", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    [`docs/${SEAT.constructs}/01-core/README.md`]: doc({ id: "c", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
     // What the whole corpus carried: the old label, and a status word that is not the enum's.
-    "docs/03-behaviors/README.md":
+    [`docs/${SEAT.behaviors}/README.md`]:
       doc({ id: "b", title: "Behaviors", lenses: ["SERVER_DEV", "QA"], status: "DONE" },
           "Prose under it.\n", "`Lenses: DevOps · everyone` · `Status: ✅ Implemented`"),
   });
   run(root, ["face", "docs"]);
-  const got = readAt(root, "docs/03-behaviors/README.md");
+  const got = readAt(root, `docs/${SEAT.behaviors}/README.md`);
   one("the label becomes For: and the actors come from the block",
     got, has("`For: Backend developer · Quality engineer`"));
   one("the status chip carries the enum word, not a synonym", got, has("`Status: ✅ DONE`"));
   one("the blank line between the tag line and the lead paragraph survives",
     got, has("`Status: ✅ DONE`\n\nProse under it."));
 
-  const before = readAt(root, "docs/03-behaviors/README.md");
+  const before = readAt(root, `docs/${SEAT.behaviors}/README.md`);
   run(root, ["face", "docs"]);
-  one("running it twice writes the same bytes", readAt(root, "docs/03-behaviors/README.md"), before);
+  one("running it twice writes the same bytes", readAt(root, `docs/${SEAT.behaviors}/README.md`), before);
 }
 
 {
   const root = repo({
     "CONCEPT.md": "# c\n",
-    "docs/03-behaviors/README.md":
+    [`docs/${SEAT.behaviors}/README.md`]:
       doc({ id: "b", title: "Behaviors", lenses: ["QA"], status: "DONE" }, "Lead.\n"),
   });
   run(root, ["face", "docs"]);
   one("a document with no tag line gets one under its title",
-    readAt(root, "docs/03-behaviors/README.md"),
+    readAt(root, `docs/${SEAT.behaviors}/README.md`),
     has(`# Behaviors\n\n\`For: Quality engineer\` · \`Status: ✅ DONE\`\n\nLead.`));
 }
 
@@ -102,13 +103,13 @@ console.log("=== the tag line is rendered from the block, never typed");
   // A chapter that teaches the document shape SHOWS one. Its example is content, not a tag line.
   const root = repo({
     "CONCEPT.md": "# c\n",
-    "docs/03-behaviors/README.md":
+    [`docs/${SEAT.behaviors}/README.md`]:
       doc({ id: "b", title: "Behaviors", lenses: ["QA"], status: "DONE" },
           "Lead.\n\n```text\n# An Example\n\n`For: Architect` · `Status: 🔮 PLANNING`\n```\n",
           "`For: Quality engineer` · `Status: ✅ DONE`"),
   });
   run(root, ["face", "docs"]);
-  const got = readAt(root, "docs/03-behaviors/README.md");
+  const got = readAt(root, `docs/${SEAT.behaviors}/README.md`);
   one("a tag line inside a fence is content and is left alone", got, has("`For: Architect` · `Status: 🔮 PLANNING`"));
   one("the real tag line is still the block's", got, has("`For: Quality engineer` · `Status: ✅ DONE`"));
 }
@@ -123,17 +124,17 @@ console.log("\n=== a domain face maps a construct nested under a level, not just
 {
   const root = repo({
     "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
-    "docs/02-constructs/README.md": doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
-    "docs/02-constructs/01-core/README.md": doc({ id: "c", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
-    "docs/02-constructs/01-core/loose.md":
+    [`docs/${SEAT.constructs}/README.md`]: doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    [`docs/${SEAT.constructs}/01-core/README.md`]: doc({ id: "c", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    [`docs/${SEAT.constructs}/01-core/loose.md`]:
       doc({ id: "loose", variant: "construct", parentId: "c", dependsOn: [], title: "Loose", lenses: ["ARCHITECT"], status: "PLANNING" }),
-    "docs/02-constructs/01-core/01-level/README.md": doc({ id: "lv", title: "Level", lenses: ["ARCHITECT"], status: "PLANNING" }),
-    "docs/02-constructs/01-core/01-level/nested.md":
+    [`docs/${SEAT.constructs}/01-core/01-level/README.md`]: doc({ id: "lv", title: "Level", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    [`docs/${SEAT.constructs}/01-core/01-level/nested.md`]:
       doc({ id: "nested", variant: "construct", parentId: "c", dependsOn: [], title: "Nested", lenses: ["ARCHITECT"], status: "PLANNING" }),
   });
   run(root, ["face", "docs"]);
   one("the DOMAIN's face maps everything below it, nested included",
-    readAt(root, "docs/02-constructs/01-core/README.md"), has("[Nested]"));
+    readAt(root, `docs/${SEAT.constructs}/01-core/README.md`), has("[Nested]"));
 }
 
 
@@ -163,24 +164,24 @@ const GROUPED = {
   // The concept names the groups at `##` and the domains inside them at `###`.
   "CONCEPT.md": "# c\n\n## SaaS Plane — Foundation   `REALIZED`\n\nWhat this stage realizes.\n\n" +
                 "### DevEx\n\nHow the function operates.\n\n### Docs\n\nHow the corpus is written.\n",
-  "docs/02-constructs/README.md": doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
-  "docs/02-constructs/01-foundation/README.md": doc({ id: "g", title: "Foundation", lenses: ["ARCHITECT"], status: "PLANNING" }),
-  "docs/02-constructs/01-foundation/01-devex/README.md": doc({ id: "dv", title: "DevEx", lenses: ["ARCHITECT"], status: "PLANNING" }),
-  "docs/02-constructs/01-foundation/02-docs/README.md": doc({ id: "dc", title: "Docs", lenses: ["ARCHITECT"], status: "PLANNING" }),
-  "docs/02-constructs/01-foundation/01-devex/agent.md":
+  [`docs/${SEAT.constructs}/README.md`]: doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
+  [`docs/${SEAT.constructs}/01-foundation/README.md`]: doc({ id: "g", title: "Foundation", lenses: ["ARCHITECT"], status: "PLANNING" }),
+  [`docs/${SEAT.constructs}/01-foundation/01-devex/README.md`]: doc({ id: "dv", title: "DevEx", lenses: ["ARCHITECT"], status: "PLANNING" }),
+  [`docs/${SEAT.constructs}/01-foundation/02-docs/README.md`]: doc({ id: "dc", title: "Docs", lenses: ["ARCHITECT"], status: "PLANNING" }),
+  [`docs/${SEAT.constructs}/01-foundation/01-devex/agent.md`]:
     doc({ id: "agent", variant: "construct", parentId: "c", dependsOn: [], title: "The Agent", lenses: ["ARCHITECT"], status: "PLANNING" }),
 };
 {
   const root = repo(GROUPED);
   const out = run(root, ["face", "docs"]);
-  one("a group two levels up still gets a face", out, has("02-constructs/01-foundation/README.md"));
-  one("and so does each domain under it", out, has("02-constructs/01-foundation/01-devex/README.md"));
+  one("a group two levels up still gets a face", out, has(`${SEAT.constructs}/01-foundation/README.md`));
+  one("and so does each domain under it", out, has(`${SEAT.constructs}/01-foundation/01-devex/README.md`));
   one("the group's face maps its domains, read from the concept's own sections",
-    readAt(root, "docs/02-constructs/01-foundation/README.md"), has("| [devex](01-devex/README.md) |"));
+    readAt(root, `docs/${SEAT.constructs}/01-foundation/README.md`), has("| [devex](01-devex/README.md) |"));
   one("the group's bridge is the concept's, not invented",
-    readAt(root, "docs/02-constructs/01-foundation/README.md"), has("What this stage realizes."));
+    readAt(root, `docs/${SEAT.constructs}/01-foundation/README.md`), has("What this stage realizes."));
   one("a domain's face lists its constructs",
-    readAt(root, "docs/02-constructs/01-foundation/01-devex/README.md"), has("[The Agent](agent.md)"));
+    readAt(root, `docs/${SEAT.constructs}/01-foundation/01-devex/README.md`), has("[The Agent](agent.md)"));
   one("a heading the reader needs and a folder cannot hold is stripped — `SaaS Plane —`, the chip",
     out, lacks("invariant 1"));
 }
@@ -196,7 +197,7 @@ const GROUPED = {
       "| Type | Purpose |\n| --- | --- |\n| `NODE` | anything that owns a doc set |\n\n" +
       "A second paragraph the face must not carry.\n") });
   run(root, ["face", "docs"]);
-  const face = readAt(root, "docs/02-constructs/01-foundation/02-docs/README.md");
+  const face = readAt(root, `docs/${SEAT.constructs}/01-foundation/02-docs/README.md`);
   one("a domain written as prose and tables still carries its opening paragraph",
     face, has("How the corpus is written."));
   one("and the face stops there — the table's own rows never reach it",
@@ -208,16 +209,16 @@ const GROUPED = {
   // A bridge is the CONCEPT's prose, and the concept sits at the repository root.
   const root = repo({ ...GROUPED,
     "CONCEPT.md": GROUPED["CONCEPT.md"].replace("How the function operates.",
-      "How the function operates, argued in [the page](docs/artifacts/approaches/a.html)."),
-    "docs/artifacts/approaches/a.html": "<p>x</p>\n" });
+      `How the function operates, argued in [the page](docs/${POCKET.artifacts}/${RETIRED_ARTIFACT.approaches}/a.html).`),
+    [`docs/${POCKET.artifacts}/${RETIRED_ARTIFACT.approaches}/a.html`]: "<p>x</p>\n" });
   run(root, ["face", "docs"]);
   one("a link inside a copied bridge is re-based onto the face that now carries it",
-    readAt(root, "docs/02-constructs/01-foundation/01-devex/README.md"),
-    has("](../../../artifacts/approaches/a.html)"));
+    readAt(root, `docs/${SEAT.constructs}/01-foundation/01-devex/README.md`),
+    has(`](../../../${POCKET.artifacts}/${RETIRED_ARTIFACT.approaches}/a.html)`));
 }
 {
   const root = repo({ ...GROUPED,
-    "docs/02-constructs/01-foundation/03-nobody-declared/README.md":
+    [`docs/${SEAT.constructs}/01-foundation/03-nobody-declared/README.md`]:
       doc({ id: "x", title: "Nobody", lenses: ["ARCHITECT"], status: "PLANNING" }) });
   one("a domain folder the concept does not name is invariant 1's finding",
     run(root, ["face", "docs", "--check"]), has("invariant 1"));
@@ -231,23 +232,23 @@ console.log("\n=== a concept may name its domains in a table");
   const root = repo({
     "CONCEPT.md": "# c\n\n## What the stack ships\n\n| Capability | Package |\n| --- | --- |\n" +
                   "| Contract | `@x/contract` |\n| Design system | `@x/ds` |\n",
-    "docs/02-constructs/README.md": doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
-    "docs/02-constructs/01-contract/README.md": doc({ id: "c1", title: "Contract", lenses: ["ARCHITECT"], status: "PLANNING" }),
-    "docs/02-constructs/06-design-system/README.md": doc({ id: "c2", title: "DS", lenses: ["WEB_DEV"], status: "PLANNING" }),
+    [`docs/${SEAT.constructs}/README.md`]: doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    [`docs/${SEAT.constructs}/01-contract/README.md`]: doc({ id: "c1", title: "Contract", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    [`docs/${SEAT.constructs}/06-design-system/README.md`]: doc({ id: "c2", title: "DS", lenses: ["WEB_DEV"], status: "PLANNING" }),
   });
   const out = run(root, ["face", "docs", "--check"]);
   one("a domain named only by a table row satisfies invariant 1", out, lacks("invariant 1"));
   run(root, ["face", "docs"]);
   one("and the row's remaining cells become the face's bridge",
-    readAt(root, "docs/02-constructs/01-contract/README.md"), has("@x/contract"));
+    readAt(root, `docs/${SEAT.constructs}/01-contract/README.md`), has("@x/contract"));
   one("a multi-word domain matches its folder — `Design system` is `06-design-system`",
-    readAt(root, "docs/02-constructs/06-design-system/README.md"), has("@x/ds"));
+    readAt(root, `docs/${SEAT.constructs}/06-design-system/README.md`), has("@x/ds"));
 }
 {
   const root = repo({
     "CONCEPT.md": "# c\n\n## What the stack ships\n\n| Capability | Package |\n| --- | --- |\n| Contract | `@x/contract` |\n",
-    "docs/02-constructs/README.md": doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
-    "docs/02-constructs/07-nobody-declared/README.md": doc({ id: "n", title: "N", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    [`docs/${SEAT.constructs}/README.md`]: doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    [`docs/${SEAT.constructs}/07-nobody-declared/README.md`]: doc({ id: "n", title: "N", lenses: ["ARCHITECT"], status: "PLANNING" }),
   });
   one("a domain no row and no heading names is still invariant 1's finding",
     run(root, ["face", "docs", "--check"]), has("invariant 1"));
@@ -256,25 +257,25 @@ console.log("\n=== a concept may name its domains in a table");
 
 // ---------------------------------------------------------------- what is never walked
 
-console.log("\n=== a seat's `templates/` is excluded by the folder, never per file");
+console.log(`\n=== a seat's \`${TEMPLATES}/\` is excluded by the folder, never per file`);
 {
   const root = repo({
     "CONCEPT.md": "# c\n",
-    "docs/04-capabilities/01-x/01-server/README.md":
+    [`docs/${SEAT.capabilities}/01-x/01-server/README.md`]:
       doc({ id: "f", title: "Face", lenses: ["SERVER_DEV"], status: "DONE" }, "Lead.\n",
           "`For: Backend developer` · `Status: ✅ DONE`"),
-    "docs/04-capabilities/01-x/01-server/app.md":
+    [`docs/${SEAT.capabilities}/01-x/01-server/app.md`]:
       doc({ id: "m", title: "App", lenses: ["SERVER_DEV"], status: "DONE" }, "Lead.\n",
           "`For: Backend developer` · `Status: ✅ DONE`"),
     // A template's block carries placeholders and it is a mirror of nothing.
-    "docs/04-capabilities/01-x/01-server/templates/a-template.md": "# {{NAME}}\n\nno block here.\n",
+    [`docs/${SEAT.capabilities}/01-x/01-server/${TEMPLATES}/a-template.md`]: "# {{NAME}}\n\nno block here.\n",
   });
   const out = run(root, ["face", "docs"]);
   one("a template is never taken for a mirror", out, lacks("a-template.md"));
   one("the real mirror still reaches the Map",
-    readAt(root, "docs/04-capabilities/01-x/01-server/README.md"), has("| [app.md](app.md) |"));
+    readAt(root, `docs/${SEAT.capabilities}/01-x/01-server/README.md`), has("| [app.md](app.md) |"));
   one("a template's own tag line is never written",
-    readAt(root, "docs/04-capabilities/01-x/01-server/templates/a-template.md"), "# {{NAME}}\n\nno block here.\n");
+    readAt(root, `docs/${SEAT.capabilities}/01-x/01-server/${TEMPLATES}/a-template.md`), "# {{NAME}}\n\nno block here.\n");
 }
 
 
@@ -287,9 +288,9 @@ console.log("\n=== the dictionary is generated from the constructs, never typed 
   // that read it is gone.
   const root = repo({
     "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
-    "docs/02-constructs/README.md": doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
-    "docs/02-constructs/01-core/README.md": doc({ id: "c", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
-    "docs/02-constructs/01-core/session.md":
+    [`docs/${SEAT.constructs}/README.md`]: doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    [`docs/${SEAT.constructs}/01-core/README.md`]: doc({ id: "c", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    [`docs/${SEAT.constructs}/01-core/session.md`]:
       doc({ id: "session", variant: "construct", parentId: "c", dependsOn: [], title: "Session", lenses: ["ARCHITECT"], status: "PLANNING" },
           "## Terms\n\n| Term | Contract term | What it means here |\n| --- | --- | --- |\n" +
           "| sign-in | `SPSession` | one person's live access to one app site |\n" +
@@ -297,14 +298,14 @@ console.log("\n=== the dictionary is generated from the constructs, never typed 
           "## Model\n\nx\n\n## Parts\n\nx\n\n## Boundary\n\nx\n\n" +
           "## Binds\n\n| where it lives today | |\n| --- | --- |\n| a | b |\n\n## Proof\n\nx\n",
           "`For: Architect` · `Status: 🔮 PLANNING`"),
-    "docs/04-capabilities/01-core/01-server/data-model.md":
+    [`docs/${SEAT.capabilities}/01-core/01-server/data-model.md`]:
       doc({ id: "dm", title: "Contract Terms", lenses: ["SERVER_DEV"], status: "DONE" },
           "| Table | Terms | Constraint |\n| --- | --- | --- |\n" +
           "| `sp_session` | `SPSession` | one row per live access |\n",
           "`For: Backend developer` · `Status: ✅ DONE`"),
   });
   run(root, ["face", "docs"]);
-  const domain = readAt(root, "docs/02-constructs/01-core/README.md");
+  const domain = readAt(root, `docs/${SEAT.constructs}/01-core/README.md`);
   one("a Terms row becomes a dictionary row on its own domain's face",
     domain, has("| [sign-in](session.md) | `SPSession` | one person's live access to one app site |"));
   one("the term is the link to the construct that declares it, and there is no fourth column",
@@ -318,7 +319,7 @@ console.log("\n=== the dictionary is generated from the constructs, never typed 
   one("and the table is three columns wide",
     domain, has("| Term | Contract term | What it means |"));
   one("the seat face carries the domain table and no dictionary",
-    readAt(root, "docs/02-constructs/README.md"), lacks("sign-in"));
+    readAt(root, `docs/${SEAT.constructs}/README.md`), lacks("sign-in"));
 }
 {
   // THE REGION THE OLD SHAPE LEFT BEHIND. A generated region nothing regenerates goes stale rather
@@ -330,17 +331,17 @@ console.log("\n=== the dictionary is generated from the constructs, never typed 
     "<!-- /spn:generated -->\n";
   const root = repo({
     "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
-    "docs/02-constructs/README.md":
+    [`docs/${SEAT.constructs}/README.md`]:
       doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }, "Some prose.\n\n" + stale),
-    "docs/02-constructs/01-core/README.md": doc({ id: "c", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    [`docs/${SEAT.constructs}/01-core/README.md`]: doc({ id: "c", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
   });
   const out = run(root, ["face", "docs"]);
-  const seat = readAt(root, "docs/02-constructs/README.md");
+  const seat = readAt(root, `docs/${SEAT.constructs}/README.md`);
   one("a dictionary left on a seat face by the old shape is removed", seat, lacks("Where it is stored"));
   one("and the markers go with it, so nothing invites an edit inside a region nobody writes",
     seat, lacks("spn:generated dictionary"));
   one("the author's own prose around it is untouched", seat, has("Some prose."));
-  one("and the run reports the file it rewrote", out, has("02-constructs/README.md"));
+  one("and the run reports the file it rewrote", out, has(`${SEAT.constructs}/README.md`));
 }
 
 console.log("\n=== the glossary is ordered the way a reader meets the words, not A-Z (Q233)");
@@ -355,17 +356,17 @@ console.log("\n=== the glossary is ordered the way a reader meets the words, not
     "## Binds\n\n| where it lives today | |\n| --- | --- |\n| a | b |\n\n## Proof\n\nx\n";
   const root = repo({
     "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
-    "docs/02-constructs/README.md": doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
-    "docs/02-constructs/01-core/README.md": doc({ id: "c", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
-    "docs/02-constructs/01-core/01-alpha.md":
+    [`docs/${SEAT.constructs}/README.md`]: doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    [`docs/${SEAT.constructs}/01-core/README.md`]: doc({ id: "c", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    [`docs/${SEAT.constructs}/01-core/01-alpha.md`]:
       doc({ id: "alpha", variant: "construct", parentId: "c", dependsOn: ["zebra"], title: "Alpha", lenses: ["ARCHITECT"], status: "PLANNING" },
           terms("apple"), "`For: Architect` · `Status: 🔮 PLANNING`"),
-    "docs/02-constructs/01-core/02-zebra.md":
+    [`docs/${SEAT.constructs}/01-core/02-zebra.md`]:
       doc({ id: "zebra", variant: "construct", parentId: "c", dependsOn: [], title: "Zebra", lenses: ["ARCHITECT"], status: "PLANNING" },
           terms("banana"), "`For: Architect` · `Status: 🔮 PLANNING`"),
   });
   run(root, ["face", "docs"]);
-  const domain = readAt(root, "docs/02-constructs/01-core/README.md");
+  const domain = readAt(root, `docs/${SEAT.constructs}/01-core/README.md`);
   const at = (needle) => domain.indexOf(needle);
   one("a construct contributes a heading row, so the grouping is visible rather than implied",
     domain, has("| **Zebra** | | |"));
@@ -377,9 +378,9 @@ console.log("\n=== the glossary is ordered the way a reader meets the words, not
 {
   const root = repo({
     "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
-    "docs/02-constructs/README.md": doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
-    "docs/02-constructs/01-core/README.md": doc({ id: "c", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
-    "docs/02-constructs/01-core/session.md":
+    [`docs/${SEAT.constructs}/README.md`]: doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    [`docs/${SEAT.constructs}/01-core/README.md`]: doc({ id: "c", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    [`docs/${SEAT.constructs}/01-core/session.md`]:
       doc({ id: "session", variant: "construct", parentId: "c", dependsOn: [], title: "Session", lenses: ["ARCHITECT"], status: "PLANNING" },
           "## Terms\n\n| Term | Contract term |\n| --- | --- |\n| sign-in | `SPSession` |\n",
           "`For: Architect` · `Status: 🔮 PLANNING`"),
@@ -393,22 +394,22 @@ console.log("\n=== a Map is a list of mirrors, so an authored seat has none");
 {
   const files = {
     "CONCEPT.md": "# c\n",
-    "docs/04-capabilities/README.md":
+    [`docs/${SEAT.capabilities}/README.md`]:
       doc({ id: "f", title: "Capabilities", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
           "`For: Architect` · `Status: ✅ DONE`"),
-    "docs/04-capabilities/01-chapter.md":
+    [`docs/${SEAT.capabilities}/01-chapter.md`]:
       doc({ id: "ch", title: "A Chapter", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
           "`For: Architect` · `Status: ✅ DONE`"),
   };
   const derived = repo(files);
   run(derived, ["face", "docs"]);
   one("where the seat is derived from source, the face carries a Contents table",
-    readAt(derived, "docs/04-capabilities/README.md"), has("spn:generated contents"));
+    readAt(derived, `docs/${SEAT.capabilities}/README.md`), has("spn:generated contents"));
 
   const authored = repo(files, { type: "FOUNDATION" });
   run(authored, ["face", "docs"]);
   one("where the seat is AUTHORED, no Contents table is invented — there is no src/ for a row to name",
-    readAt(authored, "docs/04-capabilities/README.md"), lacks("spn:generated contents"));
+    readAt(authored, `docs/${SEAT.capabilities}/README.md`), lacks("spn:generated contents"));
 }
 
 
@@ -422,48 +423,48 @@ console.log("\n=== a seat face lists the mirrors beside it, never the chapters t
   // concatenated onto the source root, naming a folder that has never existed.
   const root = repo({
     "CONCEPT.md": "# c\n",
-    "docs/04-capabilities/README.md":
+    [`docs/${SEAT.capabilities}/README.md`]:
       doc({ id: "f", title: "Capabilities", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
           "`For: Architect` · `Status: ✅ DONE`"),
-    "docs/04-capabilities/01-core/README.md":
+    [`docs/${SEAT.capabilities}/01-core/README.md`]:
       doc({ id: "dm", title: "Core", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
           "`For: Architect` · `Status: ✅ DONE`"),
-    "docs/04-capabilities/01-core/01-server/README.md":
+    [`docs/${SEAT.capabilities}/01-core/01-server/README.md`]:
       doc({ id: "pk", title: "Server", lenses: ["SERVER_DEV"], status: "DONE" }, "Lead.\n",
           "`For: Backend developer` · `Status: ✅ DONE`"),
-    "docs/04-capabilities/01-core/01-server/01-app.md":
+    [`docs/${SEAT.capabilities}/01-core/01-server/01-app.md`]:
       doc({ id: "ch", title: "App", lenses: ["SERVER_DEV"], status: "DONE" }, "Lead.\n",
           "`For: Backend developer` · `Status: ✅ DONE`"),
   });
   run(root, ["face", "docs"]);
-  const seat = readAt(root, "docs/04-capabilities/README.md");
+  const seat = readAt(root, `docs/${SEAT.capabilities}/README.md`);
   one("a chapter three levels down never reaches the seat's Map",
     seat, lacks("01-core/01-server/01-app"));
   one("and the seat says it carries no mirror rather than inventing one",
     seat, has("this layer carries no mirror yet"));
   one("the domain face between them says the same",
-    readAt(root, "docs/04-capabilities/01-core/README.md"), has("this layer carries no mirror yet"));
+    readAt(root, `docs/${SEAT.capabilities}/01-core/README.md`), has("this layer carries no mirror yet"));
   one("the package face still lists the chapter — the chapter branch is unchanged",
-    readAt(root, "docs/04-capabilities/01-core/01-server/README.md"), has("| [01-app.md](01-app.md) |"));
+    readAt(root, `docs/${SEAT.capabilities}/01-core/01-server/README.md`), has("| [01-app.md](01-app.md) |"));
 
   const before = seat;
   run(root, ["face", "docs"]);
-  one("running it twice writes the same bytes", readAt(root, "docs/04-capabilities/README.md"), before);
+  one("running it twice writes the same bytes", readAt(root, `docs/${SEAT.capabilities}/README.md`), before);
 }
 {
   // A mirror that IS a direct child still reaches the Map, and is still named for its folder.
   const root = repo({
     "CONCEPT.md": "# c\n",
-    "docs/04-capabilities/README.md":
+    [`docs/${SEAT.capabilities}/README.md`]:
       doc({ id: "f", title: "Capabilities", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
           "`For: Architect` · `Status: ✅ DONE`"),
-    "docs/04-capabilities/app.md":
+    [`docs/${SEAT.capabilities}/app.md`]:
       doc({ id: "m", title: "App", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
           "`For: Architect` · `Status: ✅ DONE`"),
   });
   run(root, ["face", "docs"]);
   one("a direct `.md` child is a mirror and names the folder it governs",
-    readAt(root, "docs/04-capabilities/README.md"), has("| [app.md](app.md) | `src/app/` |"));
+    readAt(root, `docs/${SEAT.capabilities}/README.md`), has("| [app.md](app.md) | `src/app/` |"));
 }
 
 
@@ -484,22 +485,22 @@ console.log("\n=== the domain's glossary lands on its overview too, in HTML (Q22
     '    <tbody><tr><td>sign-in</td><td>typed by hand</td></tr></tbody>\n  </table></div>';
   const root = repo({
     "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
-    "docs/02-constructs/README.md": doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
-    "docs/02-constructs/01-core/README.md": doc({ id: "c", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
-    "docs/02-constructs/01-core/session.md":
+    [`docs/${SEAT.constructs}/README.md`]: doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    [`docs/${SEAT.constructs}/01-core/README.md`]: doc({ id: "c", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    [`docs/${SEAT.constructs}/01-core/session.md`]:
       doc({ id: "session", variant: "construct", parentId: "c", dependsOn: [], title: "Session", lenses: ["ARCHITECT"], status: "PLANNING" },
           terms, "`For: Architect` · `Status: 🔮 PLANNING`"),
-    "docs/artifacts/overviews/concept-core-overview.html": ov(curated),
+    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-core-overview.html`]: ov(curated),
   });
   run(root, ["face", "docs"]);
-  const page = readAt(root, "docs/artifacts/overviews/concept-core-overview.html");
+  const page = readAt(root, `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-core-overview.html`);
 
   one("the overview gains a generated region, the first in any HTML page",
     page, has("spn:generated glossary"));
   one("and it carries the three columns the markdown face carries",
     page, has("<th>Term</th><th>Contract term</th><th>What it means</th>"));
   one("the term links to the construct PAGE, never the markdown seat (Q234)",
-    page, has('href="../constructs/01-core/session-construct.html"'));
+    page, has(`href="../${ARTIFACT.constructs}/01-core/session-construct.html"`));
   one("the hand-typed row is gone, because the region replaced the table",
     page, lacks("typed by hand"));
   one("the authored line above the table survives (Q231)",
@@ -509,7 +510,7 @@ console.log("\n=== the domain's glossary lands on its overview too, in HTML (Q22
 
   // A REGION IS ONLY TRUSTWORTHY IF A SECOND RUN WRITES THE SAME BYTES. The first run replaces a
   // curated table; the second has to find its own markers and land on the same page exactly.
-  const again = (() => { run(root, ["face", "docs"]); return readAt(root, "docs/artifacts/overviews/concept-core-overview.html"); })();
+  const again = (() => { run(root, ["face", "docs"]); return readAt(root, `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-core-overview.html`); })();
   one("and a second run writes the same bytes", again === page ? "same" : "DIFFERENT", has("same"));
 }
 
@@ -517,15 +518,15 @@ console.log("\n=== an escaped pipe inside a Terms cell stays one cell (found by 
 {
   const root = repo({
     "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
-    "docs/02-constructs/README.md": doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"] }),
-    "docs/02-constructs/01-core/README.md": doc({ id: "c", title: "Core", lenses: ["ARCHITECT"] }),
-    "docs/02-constructs/01-core/hooks.md":
+    [`docs/${SEAT.constructs}/README.md`]: doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"] }),
+    [`docs/${SEAT.constructs}/01-core/README.md`]: doc({ id: "c", title: "Core", lenses: ["ARCHITECT"] }),
+    [`docs/${SEAT.constructs}/01-core/hooks.md`]:
       doc({ id: "hooks", variant: "construct", dependsOn: [], title: "Hooks", lenses: ["ARCHITECT"] },
           "## Terms\n\n| Term | Contract term | What it means |\n| --- | --- | --- |\n" +
           "| the matcher | `Write\\|Edit` | the tool names an entry narrows to |\n"),
   });
   run(root, ["face", "docs"]);
-  const got = readAt(root, "docs/02-constructs/01-core/README.md");
+  const got = readAt(root, `docs/${SEAT.constructs}/01-core/README.md`);
   one("the contract term keeps its pipe and the meaning keeps its column",
     got, has("| [the matcher](hooks.md) | `Write\\|Edit` | the tool names an entry narrows to |"));
 }
@@ -534,15 +535,15 @@ console.log("\n=== a package face's Map names chapters, never the realization fi
 {
   const root = repo({
     "CONCEPT.md": "# c\n",
-    "docs/04-capabilities/01-core/module-web-core-ts/README.md":
+    [`docs/${SEAT.capabilities}/01-core/module-web-core-ts/README.md`]:
       doc({ id: "pk", title: "Web", lenses: ["WEB_DEV"], status: "DONE" }, "Lead.\n", "`For: Web developer` · `Status: ✅ DONE`"),
-    "docs/04-capabilities/01-core/module-web-core-ts/01-app.md":
+    [`docs/${SEAT.capabilities}/01-core/module-web-core-ts/01-app.md`]:
       doc({ id: "ch", title: "App", lenses: ["WEB_DEV"], status: "DONE" }, "Lead.\n", "`For: Web developer` · `Status: ✅ DONE`"),
-    "docs/04-capabilities/01-core/module-web-core-ts/surface-map.md":
+    [`docs/${SEAT.capabilities}/01-core/module-web-core-ts/surface-map.md`]:
       doc({ id: "sm", variant: "surface_map", title: "Surface Map", lenses: ["WEB_DEV"], status: "DONE" }, "x\n", "`For: Web developer` · `Status: ✅ DONE`"),
   });
   run(root, ["face", "docs"]);
-  const got = readAt(root, "docs/04-capabilities/01-core/module-web-core-ts/README.md");
+  const got = readAt(root, `docs/${SEAT.capabilities}/01-core/module-web-core-ts/README.md`);
   one("the chapter is in the Map", got, has("| [01-app.md](01-app.md) |"));
   one("the surface map is not a chapter", got, lacks("surface-map.md"));
 }

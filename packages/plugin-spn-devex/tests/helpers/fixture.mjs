@@ -1,9 +1,12 @@
 // A throwaway workspace on disk, so a gate can be run against a state this workspace is not in.
-// Built fresh per test and never inside `/opt/work` — the real workstreams stay untouched.
-import { mkdirSync, writeFileSync, rmSync } from "node:fs";
+// Built fresh per run in a temporary folder, never inside a real workspace — the real workstreams
+// stay untouched, and no run depends on another run's leftovers.
+import { mkdirSync, mkdtempSync, realpathSync, writeFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-export const BASE = "/private/tmp/claude-501/-opt-work-saasplane-code/ca4d9391-8043-477a-926d-fabfa4253bdf/scratchpad/fixtures";
+export const BASE = realpathSync(mkdtempSync(join(tmpdir(), "spn-devex-fixtures-")));
+process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
 
 /**
  * @param name      folder under fixtures/

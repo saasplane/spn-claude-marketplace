@@ -21,6 +21,7 @@ import { mkdirSync, writeFileSync, mkdtempSync, rmSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
+import { WORKSTREAMS } from "../../../../src/scripts/lib/docs-tree.ts";
 
 const CHECKS = resolve(PLUGIN, "src", "scripts", "checks");
 const { checkReleaseGo, commandCwd, isMajorBump } = await import(join(CHECKS, "release-go.ts"));
@@ -54,9 +55,9 @@ function repo(name, tag) {
 mkdirSync(join(BASE, "ws"), { recursive: true });
 const support = repo("spn-support-ts", "v1.2.67");
 const platform = repo("spn-platform-ts", "v0.1.0");
-mkdirSync(join(BASE, "ws", ".spndevex", "workstreams", "open", "008-x", "arcs"), { recursive: true });
+mkdirSync(join(BASE, "ws", ".spndevex", WORKSTREAMS, "open", "008-x", "arcs"), { recursive: true });
 
-const arcs = join(BASE, "ws", ".spndevex", "workstreams", "open", "008-x", "arcs");
+const arcs = join(BASE, "ws", ".spndevex", WORKSTREAMS, "open", "008-x", "arcs");
 writeFileSync(join(arcs, "N1-x.md"), "# N1\n\n## Log\n\n- **2026-09-23 — go.** Release this as 3.0.0.\n");
 
 const verdict = (command, cwd) => checkReleaseGo({ tool_name: "Bash", cwd: cwd, tool_input: { command: command } });

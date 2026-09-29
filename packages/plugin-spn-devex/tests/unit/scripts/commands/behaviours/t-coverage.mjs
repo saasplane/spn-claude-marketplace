@@ -5,6 +5,7 @@ import { execFileSync } from "node:child_process";
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
+import { POCKET, SEAT } from "../../../../../src/scripts/lib/docs-tree.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "commands", "behaviours", "coverage.ts");
 const kept = [];
@@ -34,7 +35,7 @@ const node = (dir, kind) => ({
   [`${dir}/spkind.json`]: `{"kind":"${kind}","config":{"mtype":"${kind}"}}`,
 });
 const register = (...rows) => ({
-  "docs/03-behaviors/iam.md": [
+  [`docs/${SEAT.behaviors}/iam.md`]: [
     "| Id | Who | Does | Sees | Type | Tier | Status | Updated at |",
     "| --- | --- | --- | --- | --- | --- | --- | --- |",
     ...rows.map(([id, tier, status, at = "—"]) => `| ${id} | a person | signs in | in | POSITIVE | ${tier} | ${status} | ${at} |`),
@@ -105,8 +106,8 @@ console.log("\n=== behaviour-coverage — an absence, and the same bytes twice")
   ok("[MKT.SCRIPTS.57] an unchanged tree measures to the same bytes", first === second);
   const digest = JSON.parse(first).digest;
   ok("[MKT.SCRIPTS.57] and a missing page is reported as not written", JSON.parse(first).report.exists === false);
-  mkdirSync(join(root, "docs", "artifacts", "reports"), { recursive: true });
-  writeFileSync(join(root, "docs", "artifacts", "reports", "tests-report.html"), `<p>digest ${digest}</p>`, "utf8");
+  mkdirSync(join(root, "docs", POCKET.artifacts, "reports"), { recursive: true });
+  writeFileSync(join(root, "docs", POCKET.artifacts, "reports", "tests-report.html"), `<p>digest ${digest}</p>`, "utf8");
   ok("[MKT.SCRIPTS.57] a page carrying the digest reads as current", json(root).report.current === true);
 }
 

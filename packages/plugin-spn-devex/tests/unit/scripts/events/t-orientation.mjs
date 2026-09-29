@@ -29,6 +29,7 @@ const hasPython = (name) => existsSync(resolve(SCRIPTS, name));
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { PLUGIN } from "../../../helpers/harness.mjs";
+import { WORKSTREAMS } from "../../../../src/scripts/lib/docs-tree.ts";
 
 // A THROWAWAY ROOT, MADE FRESH EACH RUN. This named a session scratchpad that no longer
 // exists on any other machine, so the suite passed only where it was written.
@@ -98,7 +99,7 @@ compare("day zero: no sprepo.json anywhere",
    // that said "I have five questions" opened the walk on a question nobody had agreed to answer.
    "Would you like to start a new platform?", "lands in a file as you give it",
    "open a workstream to hold your answers"],
-  ["workstreams", "wired", "So — what are we building?"]);
+  [WORKSTREAMS, "wired", "So — what are we building?"]);
 
 // THE WINDOW THAT CLOSES AFTER THE THIRD QUESTION. Still no sprepo.json, so this is still day 0 —
 // and offering the door again asks somebody to name their organization twice. The screen has to
@@ -107,7 +108,7 @@ compare("day zero resumed: a new-platform workstream is already open",
   fixture("day-zero-resumed", {
     "README.md": "nothing here yet\n",
     ".spndevex/README.md": "the workspace state, and no repo cloned yet\n",
-    ".spndevex/workstreams/open/001-new-platform/arcs/N1-estate-coordinates.md":
+    [`.spndevex/${WORKSTREAMS}/open/001-new-platform/arcs/N1-estate-coordinates.md`]:
       "| 1 | The organization's code, its name, and the mail domain | `acme` | … |\n",
   }),
   ["You started a platform here and we did not finish", "001-new-platform",
@@ -137,10 +138,10 @@ const one = compare("exactly one workstream open: the standing offer appears",
     "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
     "spn-app-ts/CONCEPT.md": "# concept\n",
     "spn-app-ts/.claude/settings.json": JSON.stringify({ enabledPlugins: { "spn-devex@saasplane": true, "spn-apps@saasplane": true } }),
-    ".spndevex/workstreams/open/042-widget-pricing/arcs/N1-a.md": "# arc\n",
-    ".spndevex/workstreams/open/042-widget-pricing/widget-pricing-approach.html": "<html></html>",
-    ".spndevex/workstreams/backlog/043-parked/arcs/N1-a.md": "# arc\n",
-    ".spndevex/workstreams/closed/041-finished/arcs/N1-a.md": "# arc\n",
+    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N1-a.md`]: "# arc\n",
+    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/widget-pricing-approach.html`]: "<html></html>",
+    [`.spndevex/${WORKSTREAMS}/backlog/043-parked/arcs/N1-a.md`]: "# arc\n",
+    [`.spndevex/${WORKSTREAMS}/closed/041-finished/arcs/N1-a.md`]: "# arc\n",
   }),
   ["Or ask me to continue 042 widget-pricing", "1 open · 1 backlog · 1 closed", "file://", "041-finished"]);
 
@@ -148,8 +149,8 @@ compare("two open: no offer is made, because naming one would be choosing for yo
   fixture("two-open", {
     "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
     "spn-app-ts/CONCEPT.md": "# concept\n",
-    ".spndevex/workstreams/open/042-widget-pricing/arcs/N1-a.md": "# arc\n",
-    ".spndevex/workstreams/open/044-another/arcs/N1-a.md": "# arc\n",
+    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N1-a.md`]: "# arc\n",
+    [`.spndevex/${WORKSTREAMS}/open/044-another/arcs/N1-a.md`]: "# arc\n",
   }),
   ["2 open"], ["Or ask me to continue"]);
 
@@ -345,7 +346,7 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
     "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
     "spn-app-ts/CONCEPT.md": "# concept\n",
     "spn-app-ts/.claude/settings.json": wired,
-    ".spndevex/workstreams/closed/041-finished/arcs/N1-a.md": "# arc\n",
+    [`.spndevex/${WORKSTREAMS}/closed/041-finished/arcs/N1-a.md`]: "# arc\n",
   });
   says("any workstream, even a closed one, makes it a returning visit",
     isWelcome(hook(returning, "Dhruv").message, "# 👋 Good to see you again, Dhruv. Welcome back to SaaS Plane!"));
@@ -373,10 +374,10 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
     "spn-app-py/sprepo.json": repo("APPS", { stack: "PY" }),
     "spn-app-py/CONCEPT.md": "# concept\n",
     "spn-app-py/.claude/settings.json": wired,
-    ".spndevex/workstreams/open/042-widget-pricing/arcs/N1-a.md": "# arc\n",
-    ".spndevex/workstreams/open/044-another/arcs/N1-a.md": "# arc\n",
-    ".spndevex/workstreams/backlog/043-parked/arcs/N1-a.md": "# arc\n",
-    ".spndevex/workstreams/closed/041-finished/arcs/N1-a.md": "# arc\n",
+    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N1-a.md`]: "# arc\n",
+    [`.spndevex/${WORKSTREAMS}/open/044-another/arcs/N1-a.md`]: "# arc\n",
+    [`.spndevex/${WORKSTREAMS}/backlog/043-parked/arcs/N1-a.md`]: "# arc\n",
+    [`.spndevex/${WORKSTREAMS}/closed/041-finished/arcs/N1-a.md`]: "# arc\n",
   });
   const plain = hook(busy, "Dhruv");
   // Rung 3 here — the fixtures hold no nodes — so the rung clause is expected, and asserted apart.
@@ -392,7 +393,7 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
     "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
     "spn-app-ts/CONCEPT.md": "# concept\n",
     "spn-app-ts/.claude/settings.json": wired,
-    ".spndevex/workstreams/open/042-widget-pricing/arcs/N1-a.md": "# arc\n",
+    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N1-a.md`]: "# arc\n",
   });
   says("an ordinary session adds no clause at all",
     statusOf(hook(ordinary, null).message) === "1 repo · 1 workstream open (042)");

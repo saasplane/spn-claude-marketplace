@@ -14,7 +14,8 @@
 
 import { basename, dirname, join, resolve } from "node:path";
 import { STATUSES } from "../../checks/arc-status.ts";
-import { DEVEX, isDir, isFile, listdir, read, workspaceRoot } from "../../lib/payload.ts";
+import { isDir, isFile, listdir, read, workspaceRoot } from "../../lib/payload.ts";
+import { WORKSTREAM_STATES, workstreamsDir } from "../../lib/docs-tree.ts";
 import { begin, end, record } from "../../lib/timing.ts";
 
 export const describe = "print a workstream's Cycles table from its arcs — one row per arc, with its status";
@@ -29,7 +30,6 @@ export type Cycle = {
   file: string;
 };
 
-const STATES = ["open", "backlog", "closed"];
 const MUST_CARRY = new Set(["HELD", "CARRIED", "DROPPED"]);
 // Longest word first, so `PART-LANDED` is never read as `LANDED`.
 const BY_LENGTH = [...STATUSES].sort((a, b) => b.length - a.length);
@@ -168,8 +168,8 @@ export function workstreamFolder(target: string, workspace: string | null): stri
   if (isDir(direct)) return direct;
   if (isFile(direct) && direct.endsWith("-approach.html")) return dirname(direct);
   if (!workspace) return null;
-  for (const state of STATES) {
-    const base = join(workspace, DEVEX, "workstreams", state);
+  for (const state of WORKSTREAM_STATES) {
+    const base = workstreamsDir(workspace, state);
     const found = listdir(base).find((entry) => entry === target || entry.startsWith(`${target}-`));
     if (found && isDir(join(base, found))) return join(base, found);
   }

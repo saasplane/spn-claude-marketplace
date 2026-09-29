@@ -34,6 +34,8 @@
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { basename, join, dirname, resolve } from "node:path";
 import { isDir, isFile, read } from "../../lib/payload.ts";
+import { ARTIFACT, DECISIONS, DOCS, POCKET, RETIRED_ARTIFACT, capabilitiesDir, constructsDir, decisionsRegister, docsOf,
+  hasSegment, hubPage, overviewsDir } from "../../lib/docs-tree.ts";
 import { DECISION_ID_SRC, check as restatesCheck, parse as restatesParse, registerRows, undeclared } from "../../lib/restates.ts";
 
 const DECISION_ID = new RegExp(DECISION_ID_SRC, "g");
@@ -198,7 +200,7 @@ function registerTableRows(text: string): Array<Map<string, string>> {
  * like every time it has appeared.
  */
 function rulings(root: string): string[] {
-  const register = join(root, "docs/registers/decisions.md");
+  const register = decisionsRegister(docsOf(root));
   if (!isFile(register)) return [];                // a repo earns a register; absence is not drift
   const split: Array<[number, string, string]> = [];
   const long: Array<[number, string]> = [];
@@ -235,7 +237,7 @@ function ownership(root: string, sources: string[]): string[] {
     // The concept may not cite a seat or a chapter at all — it links only outward (RD.DEVEX.WORKSPACE.080), so
     // it can never satisfy this check and is not in scope for it.
     if (path === "CONCEPT.md") continue;
-    if (path.includes("registers/decisions.md") || path.includes("/approaches/")) continue;
+    if (path.includes(`${POCKET.registers}/${DECISIONS}`) || hasSegment(path, RETIRED_ARTIFACT.approaches)) continue;
     // The whole bolded lead-in, not up to its first comma — truncating there collapses
     // "Plain sentences, whoever the reader is" to two words, which the filter then drops.
     for (const found of body(root, path).matchAll(/^(?:[-*]|\d+\.)\s+\*\*([^\n]{6,110}?)\*\*/gm)) {
@@ -281,7 +283,7 @@ function cardinality(root: string, sources: string[]): string[] {
   const pattern = new RegExp(`\\bthe ${WORDS} (${GROWABLE})\\b`, "gi");
   const out: string[] = [];
   for (const path of sources) {
-    if (path.includes("/approaches/") || path.includes("/reports/")) continue;  // point-in-time (RD.DEVEX.WORKSPACE.088)
+    if (hasSegment(path, RETIRED_ARTIFACT.approaches) || hasSegment(path, ARTIFACT.reports)) continue;  // point-in-time (RD.DEVEX.WORKSPACE.088)
     const text = body(root, path);
     for (const found of text.matchAll(pattern)) {
       const noun = found[1].toLowerCase().replace(/s+$/, "") + "s";
@@ -307,7 +309,7 @@ function cardinality(root: string, sources: string[]): string[] {
  */
 function hub(root: string): string[] {
   const concept = join(root, "CONCEPT.md");
-  const face = join(root, "docs/artifacts/overviews/concept-overview.html");
+  const face = hubPage(docsOf(root));
   if (!isFile(concept) || !isFile(face)) return [];   // a repo earns a face; absence is not drift
   const rendered = read(face).replace(/<[^>]+>/g, " ").toLowerCase();
   const missing: string[] = [];
@@ -337,7 +339,7 @@ function hub(root: string): string[] {
 function restatementDrift(root: string): string[] {
   const providers = markdownUnder(root, "providers").sort(byPathParts);
   if (!providers.length) return [];                 // no provider tree here; that is not drift
-  const known = registerRows(join(root, "docs/registers/decisions.md"));
+  const known = registerRows(decisionsRegister(docsOf(root)));
   const findings: string[] = [];
   for (const path of providers) {
     const [block, broken] = restatesParse(join(root, path));
@@ -378,7 +380,7 @@ function restatementDrift(root: string): string[] {
  * history. Rewriting it would state something that never happened.
  */
 function citations(root: string): string[] {
-  const register = join(root, "docs/registers/decisions.md");
+  const register = decisionsRegister(docsOf(root));
   const registerText = read(register);
   if (!registerText) return [];                    // no register here — not this repo's question
   const rows = new Set<string>();
@@ -431,8 +433,8 @@ function citations(root: string): string[] {
  * tree and says nothing.
  */
 function capabilityChapters(root: string): string[] {
-  const constructs = join(root, "docs/02-constructs");
-  const capabilities = join(root, "docs/04-capabilities");
+  const constructs = constructsDir(docsOf(root));
+  const capabilities = capabilitiesDir(docsOf(root));
   if (!isDir(constructs) || !isDir(capabilities)) return [];
 
   const owed: string[] = [];
@@ -489,7 +491,7 @@ function providerContracts(root: string): string[] {
     isDir(at) ? readdirSync(at).filter((e) => isDir(join(at, e))) : [];
 
   // Every `10-providers`-shaped folder in the capabilities seat, found rather than named.
-  const seat = join(root, "docs/04-capabilities");
+  const seat = capabilitiesDir(docsOf(root));
   if (!isDir(seat)) return [];
   for (const area of dirs(seat).sort())
     for (const group of dirs(join(seat, area)).sort())
@@ -579,9 +581,9 @@ function pluginPaths(root: string, sources: string[]): string[] {
     ? readdirSync(shelf).filter((entry) => entry.startsWith("plugin-") && isDir(join(shelf, entry)))
     : []);
   if (!plugins.size) return [];                     // no packages/plugin-* here — not this repo's question
-  const overviews = join(root, "docs/artifacts/overviews");
+  const overviews = overviewsDir(docsOf(root));
   const pages = isDir(overviews)
-    ? readdirSync(overviews).filter((e) => e.endsWith(".html")).sort().map((e) => `docs/artifacts/overviews/${e}`)
+    ? readdirSync(overviews).filter((e) => e.endsWith(".html")).sort().map((e) => join(overviewsDir(DOCS), e))
     : [];
 
   const dead: string[] = [];

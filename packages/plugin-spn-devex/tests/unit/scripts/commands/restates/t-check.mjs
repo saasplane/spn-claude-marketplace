@@ -16,6 +16,7 @@ import { createHash } from "node:crypto";
 import { mkdirSync, writeFileSync, mkdtempSync, realpathSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
+import { POCKET, SEAT } from "../../../../../src/scripts/lib/docs-tree.ts";
 
 const HOOKS = PLUGIN;
 const TOOL = join(HOOKS, "src", "scripts", "commands", "restates", "check.ts");
@@ -43,14 +44,14 @@ function one(label, ok) {
 const ws = join(BASE, "ws");
 const book = join(ws, "spn-foundation");
 const market = join(ws, "spn-claude-marketplace");
-mkdirSync(join(book, "docs", "registers"), { recursive: true });
-mkdirSync(join(book, "docs", "02-constructs"), { recursive: true });
+mkdirSync(join(book, "docs", POCKET.registers), { recursive: true });
+mkdirSync(join(book, "docs", SEAT.constructs), { recursive: true });
 mkdirSync(join(market, "packages", "plugin-spn-devex", "refs"), { recursive: true });
 writeFileSync(join(book, "CONCEPT.md"), "# concept\n");
-writeFileSync(join(book, "docs", "registers", "decisions.md"), "| # | Decision | Why | Date |\n| --- | --- | --- | --- |\n");
-writeFileSync(join(book, "docs", "02-constructs", "01-thing.md"), "# A thing\n\nIt is stated here, once.\n");
+writeFileSync(join(book, "docs", POCKET.registers, "decisions.md"), "| # | Decision | Why | Date |\n| --- | --- | --- | --- |\n");
+writeFileSync(join(book, "docs", SEAT.constructs, "01-thing.md"), "# A thing\n\nIt is stated here, once.\n");
 writeFileSync(join(market, "packages", "plugin-spn-devex", "refs", "thing.md"),
-  '<!-- spn:restates\n{\n  "docs": [\n    { "path": "spn-foundation/docs/02-constructs/01-thing.md", "seen": "deadbeef" }\n  ]\n}\n-->\n\n# Thing — quick reference\n');
+  `<!-- spn:restates\n{\n  "docs": [\n    { "path": "spn-foundation/docs/${SEAT.constructs}/01-thing.md", "seen": "deadbeef" }\n  ]\n}\n-->\n\n# Thing — quick reference\n`);
 
 console.log("\n=== it finds the plugins from the workspace, not only from the repository that holds them");
 
@@ -83,19 +84,19 @@ console.log("\n=== a stamp under packages/plugin-<name>/ is inside a plugin, not
   const ws2 = join(BASE, "ws2");
   const book2 = join(ws2, "spn-foundation");
   const market2 = join(ws2, "spn-claude-marketplace");
-  mkdirSync(join(book2, "docs", "registers"), { recursive: true });
-  mkdirSync(join(book2, "docs", "02-constructs"), { recursive: true });
+  mkdirSync(join(book2, "docs", POCKET.registers), { recursive: true });
+  mkdirSync(join(book2, "docs", SEAT.constructs), { recursive: true });
   mkdirSync(join(market2, "packages", "plugin-spn-devex", "refs"), { recursive: true });
   writeFileSync(join(book2, "CONCEPT.md"), "# concept\n");
-  writeFileSync(join(book2, "docs", "registers", "decisions.md"), "| # | Decision | Why | Date |\n| --- | --- | --- | --- |\n");
+  writeFileSync(join(book2, "docs", POCKET.registers, "decisions.md"), "| # | Decision | Why | Date |\n| --- | --- | --- | --- |\n");
   const thingBody = "# A thing\n\nIt is stated here, once.";
-  writeFileSync(join(book2, "docs", "02-constructs", "01-thing.md"), `${thingBody}\n`);
+  writeFileSync(join(book2, "docs", SEAT.constructs, "01-thing.md"), `${thingBody}\n`);
   // A CURRENT STAMP, so this fixture proves PLACEMENT alone and carries no unrelated DRIFT finding —
   // the same `normalize` + sha256-first-8-hex `seenHash` the library uses, over the cited section's
   // whole file (no trailing blank line, matching what `normalize` strips).
   const seen = createHash("sha256").update(thingBody, "utf8").digest("hex").slice(0, 8);
   writeFileSync(join(market2, "packages", "plugin-spn-devex", "refs", "thing.md"),
-    `<!-- spn:restates\n{\n  "docs": [\n    { "path": "spn-foundation/docs/02-constructs/01-thing.md", "seen": "${seen}" }\n  ]\n}\n-->\n\n# Thing — quick reference\n`);
+    `<!-- spn:restates\n{\n  "docs": [\n    { "path": "spn-foundation/docs/${SEAT.constructs}/01-thing.md", "seen": "${seen}" }\n  ]\n}\n-->\n\n# Thing — quick reference\n`);
 
   const out = run([book2], market2);
   one("a real plugin file under packages/plugin-<name>/ is not read as a stray stamp",

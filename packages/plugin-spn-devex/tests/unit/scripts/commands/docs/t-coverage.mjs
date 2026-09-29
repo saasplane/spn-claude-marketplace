@@ -16,6 +16,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
+import { SEAT } from "../../../../../src/scripts/lib/docs-tree.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
 const BASE = mkdtempSync(join(tmpdir(), "t-docs-coverage-"));
@@ -81,8 +82,8 @@ const personas = (actors) => doc(
 console.log("=== the two seats pair file for file, and the pairing is of PATHS");
 {
   const paired = {
-    "docs/02-constructs/01-core/01-boot.md": seat("boot"),
-    "docs/03-behaviors/01-core/01-boot.md": register("b", [["CORE.BOOT.01", "x", "UNIT", "PLANNED"]]),
+    [`docs/${SEAT.constructs}/01-core/01-boot.md`]: seat("boot"),
+    [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: register("b", [["CORE.BOOT.01", "x", "UNIT", "PLANNED"]]),
   };
   one("a construct with its behaviours file at the same path is clean",
       run(repo(paired), ["coverage", "."]), lacks("parity"));
@@ -91,53 +92,53 @@ console.log("=== the two seats pair file for file, and the pairing is of PATHS")
   // `spn-launchpad-ts`'s three carry none, because Surfaces and Web Shell settle declarations rather
   // than acts. A check requiring a row per file would fail them on day one.
   one("an empty behaviours file pairs, because parity is of paths and never of rows",
-      run(repo({ ...paired, "docs/03-behaviors/01-core/01-boot.md": register("b", []) }), ["coverage", "."]),
+      run(repo({ ...paired, [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: register("b", []) }), ["coverage", "."]),
       lacks("parity"));
 
   one("a construct with no behaviours file at its own path is reported",
-      run(repo({ "docs/02-constructs/01-core/01-boot.md": seat("boot"),
-                 "docs/03-behaviors/01-core/02-other.md": register("o", []) }), ["coverage", "."]),
-      has("no `03-behaviors/01-core/01-boot.md`"));
+      run(repo({ [`docs/${SEAT.constructs}/01-core/01-boot.md`]: seat("boot"),
+                 [`docs/${SEAT.behaviors}/01-core/02-other.md`]: register("o", []) }), ["coverage", "."]),
+      has(`no \`${SEAT.behaviors}/01-core/01-boot.md\``));
 
   one("and rows with no construct are reported the other way",
-      run(repo({ "docs/02-constructs/01-core/01-boot.md": seat("boot"),
-                 "docs/03-behaviors/01-core/01-boot.md": register("b", []),
-                 "docs/03-behaviors/01-core/02-ghost.md": register("g", []) }), ["coverage", "."]),
-      has("no `02-constructs/01-core/02-ghost.md`"));
+      run(repo({ [`docs/${SEAT.constructs}/01-core/01-boot.md`]: seat("boot"),
+                 [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: register("b", []),
+                 [`docs/${SEAT.behaviors}/01-core/02-ghost.md`]: register("g", []) }), ["coverage", "."]),
+      has(`no \`${SEAT.constructs}/01-core/02-ghost.md\``));
 
   one("the same file under a different domain is not the same path",
-      run(repo({ "docs/02-constructs/01-core/01-boot.md": seat("boot"),
-                 "docs/03-behaviors/02-other/01-boot.md": register("b", []) }), ["coverage", "."]),
-      (g) => /no `03-behaviors\/01-core\/01-boot.md`/.test(g) && /no `02-constructs\/02-other\/01-boot.md`/.test(g));
+      run(repo({ [`docs/${SEAT.constructs}/01-core/01-boot.md`]: seat("boot"),
+                 [`docs/${SEAT.behaviors}/02-other/01-boot.md`]: register("b", []) }), ["coverage", "."]),
+      (g) => g.includes(`no \`${SEAT.behaviors}/01-core/01-boot.md\``) && g.includes(`no \`${SEAT.constructs}/02-other/01-boot.md\``));
 
   one("a face and the personas table are not topics, and pair with nothing",
-      run(repo({ ...paired, "docs/03-behaviors/README.md": doc({ id: "f", variant: "behaviors", title: "F", lenses: ["QA"], status: "PLANNING" }),
-                 "docs/03-behaviors/personas.md": personas(["A person"]) }), ["coverage", "."]),
+      run(repo({ ...paired, [`docs/${SEAT.behaviors}/README.md`]: doc({ id: "f", variant: "behaviors", title: "F", lenses: ["QA"], status: "PLANNING" }),
+                 [`docs/${SEAT.behaviors}/personas.md`]: personas(["A person"]) }), ["coverage", "."]),
       lacks("parity"));
 
   // AN ABSENT SCAN AND AN ABSENT FINDING MUST NOT SHARE A VERDICT.
   one("a repository with no behaviours seat says so rather than reading clean",
-      run(repo({ "docs/02-constructs/01-core/01-boot.md": seat("boot"), "docs/04-capabilities/x/pkg-ts/a.md": "# a\n" }), ["coverage", "."]),
+      run(repo({ [`docs/${SEAT.constructs}/01-core/01-boot.md`]: seat("boot"), [`docs/${SEAT.capabilities}/x/pkg-ts/a.md`]: "# a\n" }), ["coverage", "."]),
       has("nothing was compared"));
 }
 
 console.log("\n=== a capability folder names a package, and every package has a folder");
 {
   const good = {
-    "docs/02-constructs/01-core/01-boot.md": seat("boot"),
-    "docs/03-behaviors/01-core/01-boot.md": register("b", []),
-    "docs/04-capabilities/01-core/pkg-ts/01-boot.md": "# Boot\n",
+    [`docs/${SEAT.constructs}/01-core/01-boot.md`]: seat("boot"),
+    [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: register("b", []),
+    [`docs/${SEAT.capabilities}/01-core/pkg-ts/01-boot.md`]: "# Boot\n",
     "packages/pkg-ts/spkind.json": kind,
   };
   one("a folder named after a real package is clean", run(repo(good), ["coverage", "."]), lacks("mirror"));
 
   one("a folder naming no package of this repository is reported",
-      run(repo({ ...good, "docs/04-capabilities/01-core/ghost-ts/01-boot.md": "# g\n" }), ["coverage", "."]),
+      run(repo({ ...good, [`docs/${SEAT.capabilities}/01-core/ghost-ts/01-boot.md`]: "# g\n" }), ["coverage", "."]),
       has("`ghost-ts` is a folder of the capabilities seat and no package"));
 
   one("a package with no folder is reported the other way",
       run(repo({ ...good, "packages/orphan-ts/spkind.json": kind }), ["coverage", "."]),
-      has("`orphan-ts` declares itself a package and `04-capabilities/` carries no folder"));
+      has(`\`orphan-ts\` declares itself a package and \`${SEAT.capabilities}/\` carries no folder`));
 
   // A MANIFEST SITS TWO LEVELS DOWN AND NO DEEPER. A module inside an app and a fixture estate under
   // `tests/` each declare something that is not a package of this repository.
@@ -155,14 +156,14 @@ console.log("\n=== a capability folder names a package, and every package has a 
   // folders are areas rather than packages. Judged this way it reported 129 correct constructs as
   // uncovered.
   one("a FOUNDATION repository is exempt",
-      run(repo({ "docs/04-capabilities/01-devex/04-workspace/04-docs.md": "# d\n" }, { type: "FOUNDATION" }), ["coverage", "."]),
+      run(repo({ [`docs/${SEAT.capabilities}/01-devex/04-workspace/04-docs.md`]: "# d\n" }, { type: "FOUNDATION" }), ["coverage", "."]),
       lacks("mirror"));
   one("and an APPS repository with the same shape is not",
-      run(repo({ "docs/04-capabilities/01-devex/04-workspace/04-docs.md": "# d\n", "packages/pkg-ts/spkind.json": kind }), ["coverage", "."]),
+      run(repo({ [`docs/${SEAT.capabilities}/01-devex/04-workspace/04-docs.md`]: "# d\n", "packages/pkg-ts/spkind.json": kind }), ["coverage", "."]),
       has("`04-workspace` is a folder of the capabilities seat and no package"));
 
   one("a repository declaring no package at all says so rather than reading clean",
-      run(repo({ "docs/04-capabilities/01-core/pkg-ts/01-boot.md": "# b\n" }), ["coverage", "."]),
+      run(repo({ [`docs/${SEAT.capabilities}/01-core/pkg-ts/01-boot.md`]: "# b\n" }), ["coverage", "."]),
       has("nothing in this repository declares a package"));
 }
 
@@ -173,9 +174,9 @@ console.log("\n=== every Who resolves to the personas table, and every persona i
     "| Id | Who | Does | Sees | Type | Tier | Status | Updated at |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n" +
     `| CORE.BOOT.01 | ${who} | can boot | a result | POSITIVE | UNIT | PLANNED | — |\n`);
   const tree = (who, actors) => ({
-    "docs/02-constructs/01-core/01-boot.md": seat("boot"),
-    "docs/03-behaviors/01-core/01-boot.md": rows(who),
-    "docs/03-behaviors/personas.md": personas(actors),
+    [`docs/${SEAT.constructs}/01-core/01-boot.md`]: seat("boot"),
+    [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: rows(who),
+    [`docs/${SEAT.behaviors}/personas.md`]: personas(actors),
   });
 
   one("a Who the table declares is clean",
@@ -203,21 +204,21 @@ console.log("\n=== every Who resolves to the personas table, and every persona i
   // THE RULE IS ANCHORED TO THE CELL, so a seat whose rows carry no Who owes no table. `spn-infra`
   // and `spn-support-infra` write `Observably · Where · Because`, with neither an id nor an actor.
   one("a seat whose rows carry no Who owes no personas table, and the absence is named",
-      run(repo({ "docs/02-constructs/01-core/01-boot.md": seat("boot"),
-                 "docs/03-behaviors/01-core/01-boot.md": doc(
+      run(repo({ [`docs/${SEAT.constructs}/01-core/01-boot.md`]: seat("boot"),
+                 [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: doc(
                    { id: "b", variant: "behaviors", title: "b", lenses: ["INFRA"], status: "PLANNING" },
                    "| Observably | Where | Because |\n| --- | --- | --- |\n| it stands | pkg | ground |\n") }),
           ["coverage", "."]),
       has("no row carrying a `Who`, so nothing was compared"));
 
   one("rows carrying a Who with no personas table beside them is a finding",
-      run(repo({ "docs/02-constructs/01-core/01-boot.md": seat("boot"),
-                 "docs/03-behaviors/01-core/01-boot.md": rows("A web developer") }), ["coverage", "."]),
+      run(repo({ [`docs/${SEAT.constructs}/01-core/01-boot.md`]: seat("boot"),
+                 [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: rows("A web developer") }), ["coverage", "."]),
       has("name a person and there is no `personas.md`"));
 
   one("the personas table's own explanatory tables are not read as actors",
       run(repo({ ...tree("A web developer", ["A web developer"]),
-                 "docs/03-behaviors/personas.md": personas(["A web developer"]) +
+                 [`docs/${SEAT.behaviors}/personas.md`]: personas(["A web developer"]) +
                    "\n| Why | What |\n| --- | --- |\n| because | a reason |\n" }), ["coverage", "."]),
       lacks("personas"));
 
@@ -225,14 +226,14 @@ console.log("\n=== every Who resolves to the personas table, and every persona i
   // three tools in one sitting read a worked example as live content — one of them rewrote its hashes.
   one("a personas table inside a fence is an example, not a declaration",
       run(repo({ ...tree("A web developer", ["A web developer"]),
-                 "docs/03-behaviors/personas.md": personas(["A web developer"]) +
+                 [`docs/${SEAT.behaviors}/personas.md`]: personas(["A web developer"]) +
                    "\n```markdown\n| Actor | Who they are | What the rows promise them |\n| --- | --- | --- |\n" +
                    "| **An example person** | somebody | an outcome |\n```\n" }), ["coverage", "."]),
       lacks("An example person"));
 
   one("and a Who inside a fence is an example too",
       run(repo({ ...tree("A web developer", ["A web developer"]),
-                 "docs/03-behaviors/01-core/01-boot.md": rows("A web developer") +
+                 [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: rows("A web developer") +
                    "\n```markdown\n| Id | Who | Does | Sees | Type | Tier | Status | Updated at |\n" +
                    "| --- | --- | --- | --- | --- | --- | --- | --- |\n" +
                    "| CORE.X.01 | An invented person | x | y | POSITIVE | UNIT | PLANNED | — |\n```\n" }), ["coverage", "."]),

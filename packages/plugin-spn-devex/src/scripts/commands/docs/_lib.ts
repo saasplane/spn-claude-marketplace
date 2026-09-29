@@ -19,6 +19,9 @@ import { masthead, type MastheadKind } from "../../checks/doc-check.ts";
 import { filesUnder as proseFilesUnder, paragraphs as proseParagraphs, score as proseScore } from "./prose.ts";
 
 import { withOffset } from "../../lib/clock.ts";
+import { ARTIFACT_FOLDERS, DEVEX_WORKSTREAMS, RETIRED_ARTIFACT, SEAT, SEATS, TEMPLATES, behaviorsDir, bookTemplatesDir,
+  capabilitiesDir, constructsDir, docsOf, inRetiredArtifact, inSeat, inTemplates, isProducedPage, mirrorPath,
+  overviewsDir, producedPageOf, retiredArtifactDir, seatOf, splitAtSeat } from "../../lib/docs-tree.ts";
 export type Grade = "RULE" | "SOFT";
 export type Finding = { check: string; grade: Grade; file: string; message: string };
 
@@ -224,15 +227,15 @@ export function checkBlock(file: string, src: string, block: any, err: string | 
   // weighs options and carries open cards, and a pocket holding both is how a stale argument comes
   // to be read as a statement of today.
   if (variant === "approach" && /(^|\/)docs\//.test(file.replace(/\\/g, "/")))
-    add("RULE", "an approach page belongs to the workstream that argues it, never to a repository's `docs/` — move it under `.spndevex/workstreams/`");
+    add("RULE", `an approach page belongs to the workstream that argues it, never to a repository's \`docs/\` — move it under \`${DEVEX_WORKSTREAMS}/\``);
 
   // THE POCKET'S FOLDER SET IS OVERVIEWS, CONSTRUCTS, REPORTS AND NOTHING ELSE. A `resources/`
   // folder held "what a document was written from" — and every such file is a file some seat needs,
   // so each one was a seat depending on a pocket, which is the one thing the pocket rule forbids.
   // 229 files had collected across five repositories, 187 cited by nothing at all. A fact a seat
   // needs lives in a seat.
-  if (/\/artifacts\/resources\//.test(file.replace(/\\/g, "/")))
-    add("RULE", "the pocket holds `overviews/`, `constructs/` and `reports/` — a fact a seat needs lives in a seat, never in `resources/`");
+  if (inRetiredArtifact(file, RETIRED_ARTIFACT.resources))
+    add("RULE", `the pocket holds ${ARTIFACT_FOLDERS.map((folder) => `\`${folder}/\``).join(", ").replace(/, ([^,]*)$/, " and $1")} — a fact a seat needs lives in a seat, never in \`${RETIRED_ARTIFACT.resources}/\``);
 
   // An overview describes, and a FOUNDATION construct states a standard; neither carries a status.
   // Every other page kind carries one. `carriesStatus` states why, in one place.
@@ -360,7 +363,7 @@ export function checkRealizationFile(file: string, src: string, block: any): Fin
   const kind = variant ?? want;
   if (!kind) return f;
 
-  const rel = file.replace(/\\/g, "/").split("/04-capabilities/")[1];
+  const rel = splitAtSeat(file, "capabilities")?.rel;
   if (kind === "data_model" && rel !== undefined && rel.split("/").length < 3)
     add("a data model sits beside the migrations it mirrors, in the package that owns `src/migrations` — at a domain's root it sits above the half that owns the storage (RD.DEVEX.WORKSPACE.134)");
 
@@ -1158,7 +1161,7 @@ export function checkProof(file: string, src: string): Finding[] {
     if (!(t.startsWith("|") && t.endsWith("|"))) continue;
     const names = t.slice(1, -1).split("|").map((c) => c.trim().toLowerCase());
     if (names.includes("id") && names.includes("status")) {
-      f.push({ check: "proof", grade: "RULE", file, message: "`Proof` carries a table of behaviour rows. The rows live in `03-behaviors/` — the register the test run writes — and the produced page joins them with the status of the last run (Q131). What is typed here is the checks a reader can run, or nothing" });
+      f.push({ check: "proof", grade: "RULE", file, message: "`Proof` carries a table of behaviour rows. The rows live in \`${SEAT.behaviors}/\` — the register the test run writes — and the produced page joins them with the status of the last run (Q131). What is typed here is the checks a reader can run, or nothing" });
       break;
     }
   }
@@ -1280,10 +1283,10 @@ export function domainFaceFor(file: string, block: any, workspace: string): stri
   const title = block?.title;
   if (!title) return null;
   let dir = dirname(resolve(file));
-  while (dir !== dirname(dir) && !existsSync(join(dir, "02-constructs"))) dir = dirname(dir);
-  const constructsDir = join(dir, "02-constructs");
-  if (!existsSync(constructsDir)) return null;
-  for (const d of constructFolders(constructsDir).filter((x) => isDomainFolder(constructsDir, x))) {
+  while (dir !== dirname(dir) && !existsSync(constructsDir(dir))) dir = dirname(dir);
+  const seat = constructsDir(dir);
+  if (!existsSync(seat)) return null;
+  for (const d of constructFolders(seat).filter((x) => isDomainFolder(seat, x))) {
     const face = join(d, "README.md");
     if (!existsSync(face)) continue;
     if (readBlock(readFileSync(face, "utf8")).block?.title === title) return d;
@@ -1386,9 +1389,9 @@ export function checkProduced(file: string, src: string, block: any, workspace: 
   // file it has nothing to compare: the substitution below is a no-op, so `seat === file`, and it
   // reported the seat as a page missing its own source. Saying nothing is the honest answer — the
   // page does not exist yet, and `docs.ts page` is what creates it.
-  if (!/\/artifacts\/constructs\/.*-construct\.html$/.test(file)) return [];
+  if (!isProducedPage(file)) return [];
   // The pocket mirrors the seat folder for folder, so the pair is found by path alone.
-  const seat = file.replace(/\/artifacts\/constructs\//, "/02-constructs/").replace(/-construct\.html$/, ".md");
+  const seat = seatOf(file);
   if (seat === file || !existsSync(seat))
     return [{ check: "produced", grade: "SOFT", file, message: "no seat file sits at the mirrored path, so this page cannot be compared with what it would be produced from" }];
   const seatSrc = readFileSync(seat, "utf8");
@@ -1676,7 +1679,7 @@ export function walkFiles(dir: string, keep: (p: string) => boolean, out: string
     // `templates/` is excluded BY THE FOLDER rather than per file (03-tree.md, *A seat may carry
     // `templates/`*). A template's block carries placeholders, it sits in no reading order, and it
     // is never a mirror of anything — so no walk of a seat may pick one up as a document.
-    if (e === "templates") continue;
+    if (e === TEMPLATES) continue;
     const p = join(dir, e);
     let st; try { st = statSync(p); } catch { continue; }
     if (st.isDirectory()) walkFiles(p, keep, out);
@@ -1773,7 +1776,7 @@ export function glossaryRows(domainDir: string): { rows: Array<Row & { group: st
 
 /** The produced page a construct seat becomes, so an HTML page links an HTML page (Q234). */
 export function pageForSeat(seat: string): string {
-  return seat.replace(/\\/g, "/").replace("/02-constructs/", "/artifacts/constructs/").replace(/\.md$/, "-construct.html");
+  return producedPageOf(seat);
 }
 
 /**
@@ -1785,13 +1788,13 @@ export function pageForSeat(seat: string): string {
  */
 export function overviewForDomain(domainDir: string): string | null {
   const dir = resolve(domainDir).replace(/\\/g, "/");
-  const at = dir.lastIndexOf("/02-constructs/");
-  if (at < 0) return null;
+  const split = splitAtSeat(dir, "constructs", "last");
+  if (!split) return null;
   const face = join(dir, "README.md");
   if (!existsSync(face)) return null;
   const title = readBlock(readFileSync(face, "utf8")).block?.title;
   if (!title) return null;
-  const overviews = join(dir.slice(0, at), "artifacts", "overviews");
+  const overviews = overviewsDir(split.docs);
   if (!existsSync(overviews)) return null;
   for (const f of readdirSync(overviews).filter((x) => x.endsWith(".html")).sort()) {
     const full = join(overviews, f);
@@ -1853,7 +1856,7 @@ export function buildMap(faceFile: string): { body: string; findings: Finding[] 
   const findings: Finding[] = [];
   const dir = dirname(faceFile);
   // A package folder is the level below a domain: `04-capabilities/<domain>/<package>/README.md`.
-  const rel = faceFile.replace(/\\/g, "/").split("/04-capabilities/")[1] ?? "";
+  const rel = splitAtSeat(faceFile, "capabilities")?.rel ?? "";
   if (rel.split("/").length >= 3) return buildChapterMap(faceFile);
   // WHERE THE SOURCE ROOT IS, READ FROM THE FACE RATHER THAN ASSUMED. A mirror is named for the
   // folder it governs, and almost every node roots that at `src/`. A repository whose source is
@@ -2063,8 +2066,8 @@ export function domainFaces(tree: string, concept: string | null): { faces: Map<
   const sections = concept ? conceptSections(concept) : new Map();
   const conceptDir = concept ? dirname(concept) : tree;
 
-  const constructsDir = join(tree, "02-constructs");
-  const folders = constructFolders(constructsDir);
+  const constructsSeat = constructsDir(tree);
+  const folders = constructFolders(constructsSeat);
 
   type Construct = { id: string; title: string; summary: string; deps: string[]; file: string };
   const constructsUnder = (dir: string): Construct[] => {
@@ -2084,7 +2087,7 @@ export function domainFaces(tree: string, concept: string | null): { faces: Map<
   };
 
   for (const dir of folders) {
-    const depth = relative(constructsDir, dir).split("/").length;
+    const depth = relative(constructsSeat, dir).split("/").length;
     const key = named(dir);
 
     // Invariant 1 asks the concept, and it asks it of a DOMAIN. A group is depth 1 and a domain is
@@ -2149,8 +2152,8 @@ export function face(tree: string, write: boolean): Finding[] {
   // ONE DICTIONARY PER DOMAIN, AND NONE ON THE SEAT. The seat face keeps the domain table it already
   // carries, and a reader who wants the words goes to the domain that decides their meaning
   // (`refs/doc-sets.md`, *It sits on the domain, not on the seat face*).
-  const constructsDir = join(tree, "02-constructs");
-  for (const dir of constructFolders(constructsDir).filter((d) => isDomainFolder(constructsDir, d))) {
+  const constructsSeat = constructsDir(tree);
+  for (const dir of constructFolders(constructsSeat).filter((d) => isDomainFolder(constructsSeat, d))) {
     const domainFace = join(dir, "README.md");
     if (!existsSync(domainFace)) {
       findings.push({ check: "face", grade: "SOFT", file: domainFace, message: "no domain face to write the glossary into" });
@@ -2178,7 +2181,7 @@ export function face(tree: string, write: boolean): Finding[] {
     }
   }
 
-  const seatFace = join(constructsDir, "README.md");
+  const seatFace = join(constructsSeat, "README.md");
   if (existsSync(seatFace)) {
     const before = readFileSync(seatFace, "utf8");
     const after = removeRegion(before, "glossary");
@@ -2210,7 +2213,7 @@ export function face(tree: string, write: boolean): Finding[] {
     catch { return false; }
   })();
 
-  for (const faceFile of authored ? [] : walkFiles(join(tree, "04-capabilities"), (p) => basename(p) === "README.md")) {
+  for (const faceFile of authored ? [] : walkFiles(capabilitiesDir(tree), (p) => basename(p) === "README.md")) {
     const { body, findings: mf } = buildMap(faceFile);
     findings.push(...mf);
     const before = readFileSync(faceFile, "utf8");
@@ -2270,11 +2273,8 @@ export function deriveStatus(rows: BehaviourRow[]): "PLANNING" | "IMPLEMENTING" 
  * An absent file is what path parity reports, and this returns null rather than guessing.
  */
 export function behavioursFor(seat: string): string | null {
-  const norm = seat.replace(/\\/g, "/");
-  const at = norm.indexOf("/02-constructs/");
-  if (at < 0) return null;
-  const mirrored = `${norm.slice(0, at)}/03-behaviors/${norm.slice(at + "/02-constructs/".length)}`;
-  return existsSync(mirrored) ? mirrored : null;
+  const mirrored = mirrorPath(seat, "constructs", "behaviors");
+  return mirrored !== null && existsSync(mirrored) ? mirrored : null;
 }
 
 /**
@@ -2317,7 +2317,7 @@ export function statusFor(seat: string, workspace: string, write: boolean): Find
     // rolls up to PLANNING. No file means the derivation has no input at all, so it claims nothing
     // and names what is missing — silently stamping PLANNING would read as a measurement.
     findings.push({ check: "status", grade: "SOFT", file: seat,
-      message: "no behaviours file at this construct's own path, so nothing rolls up — `03-behaviors/` mirrors `02-constructs/` file for file, and `docs.ts coverage` reports the pair" });
+      message: "no behaviours file at this construct's own path, so nothing rolls up — \`${SEAT.behaviors}/\` mirrors \`${SEAT.constructs}/\` file for file, and `docs.ts coverage` reports the pair" });
     console.log(`unread   ${shown} — no behaviours file at the mirrored path`);
     return findings;
   }
@@ -2410,11 +2410,10 @@ export function measuredNow(): string {
  * make the move impossible to check as it went. A fallback is reported, never silent.
  */
 export function registerFor(seat: string): { file: string; exact: boolean } | null {
-  const norm = seat.replace(/\\/g, "/");
-  const at = norm.indexOf("/02-constructs/");
-  if (at < 0) return null;
-  const rel = norm.slice(at + "/02-constructs/".length);
-  const root = `${norm.slice(0, at)}/03-behaviors/`;
+  const split = splitAtSeat(seat, "constructs");
+  if (!split) return null;
+  const rel = split.rel;
+  const root = `${behaviorsDir(split.docs)}/`;
   if (existsSync(root + rel)) return { file: root + rel, exact: true };
   const dir = rel.includes("/") ? rel.slice(0, rel.lastIndexOf("/")) : "";
   if (!dir) return null;
@@ -2474,15 +2473,15 @@ export function behaviourRows(file: string): BehaviourRow[] {
  */
 export function overviewAbove(seat: string, out: string): { href: string; label: string } | null {
   const seatPath = resolve(seat).replace(/\\/g, "/");
-  const at = seatPath.lastIndexOf("/02-constructs/");
-  if (at < 0) return null;
-  const constructsDir = seatPath.slice(0, at) + "/02-constructs";
+  const split = splitAtSeat(seatPath, "constructs", "last");
+  if (!split) return null;
+  const seatDir = constructsDir(split.docs);
 
   // The domain is the folder invariant 1 already tests for: depth 1 under the seat, or depth 2
   // where its parent is a group. Walk up from the seat until one of those is true.
   let dir = dirname(seatPath);
-  while (dir.startsWith(constructsDir) && dir !== constructsDir && !isDomainFolder(constructsDir, dir)) dir = dirname(dir);
-  if (dir === constructsDir || !dir.startsWith(constructsDir)) return null;
+  while (dir.startsWith(seatDir) && dir !== seatDir && !isDomainFolder(seatDir, dir)) dir = dirname(dir);
+  if (dir === seatDir || !dir.startsWith(seatDir)) return null;
 
   const face = join(dir, "README.md");
   if (!existsSync(face)) return null;
@@ -2490,7 +2489,7 @@ export function overviewAbove(seat: string, out: string): { href: string; label:
   const title = block?.title;
   if (!title) return null;
 
-  const overviews = join(seatPath.slice(0, at), "artifacts", "overviews");
+  const overviews = overviewsDir(split.docs);
   if (!existsSync(overviews)) return null;
   for (const f of readdirSync(overviews).filter((x) => x.endsWith(".html")).sort()) {
     const b = readBlock(readFileSync(join(overviews, f), "utf8")).block;
@@ -2507,7 +2506,7 @@ export function pageFor(seat: string, workspace: string, templates: string, writ
   // guides, data models, even a report — because the seat-to-page mapping below silently falls
   // through for a path with no `/02-constructs/` in it. Eighteen junk pages in one run, all of them
   // claiming to be constructs. A folder is a convenience for the caller, never a licence to produce.
-  if (!seat.replace(/\\/g, "/").includes("/02-constructs/")) return findings;
+  if (!inSeat(seat, "constructs")) return findings;
 
   const src = readFileSync(seat, "utf8");
   const { block, error } = readBlock(src);
@@ -2525,7 +2524,7 @@ export function pageFor(seat: string, workspace: string, templates: string, writ
   // It is computed BEFORE rendering because the body's links are re-expressed against it: the seat
   // writes `platform-grants.md` for a sibling, and beside the page that sibling is
   // `platform-grants-construct.html`.
-  const out = seat.replace(/\/02-constructs\//, "/artifacts/constructs/").replace(/\.md$/, "-construct.html");
+  const out = producedPageOf(seat);
 
   const { html, findings: rf } = renderPage({
     block, markdown, workspace: org, location, furniture: furniture(templates),
@@ -2569,7 +2568,7 @@ export function topicName(file: string): string | null {
  * only report noise — it gets obeyed.
  */
 export function constructTopics(repo: string): Map<string, Set<string>> {
-  const seat = join(repo, "docs", "02-constructs");
+  const seat = constructsDir(docsOf(repo));
   const out = new Map<string, Set<string>>();
   if (!existsSync(seat)) return out;
   for (const f of walkFiles(seat, (x) => x.endsWith(".md"))) {
@@ -2602,15 +2601,15 @@ export function topicsCheck(repo: string): Finding[] {
   // that reports clean because it found no rule to apply is worse than no check — it is a green light
   // over an unexamined tree. An absent seat is the one honest silence, and `constructTopics` already
   // gives it.
-  if (!existsSync(join(repo, "docs", "02-constructs"))) return f;
+  if (!existsSync(constructsDir(docsOf(repo)))) return f;
 
-  const behaviors = join(repo, "docs", "03-behaviors");
+  const behaviors = behaviorsDir(docsOf(repo));
   for (const file of existsSync(behaviors) ? walkFiles(behaviors, (x) => x.endsWith(".md")) : []) {
     const name = topicName(file);
     if (name === null) continue;
     const domains = named.get(name);
     if (domains === undefined) {
-      f.push({ check: "topics", grade: "RULE", file, message: `\`${name}\` is a numbered topic of the behaviours seat and \`02-constructs/\` names no such construct — the constructs name the topics and the other two seats follow (03-tree.md, *One outline, three seats*)` });
+      f.push({ check: "topics", grade: "RULE", file, message: `\`${name}\` is a numbered topic of the behaviours seat and \`${SEAT.constructs}/\` names no such construct — the constructs name the topics and the other two seats follow (03-tree.md, *One outline, three seats*)` });
       continue;
     }
     const here = relative(behaviors, dirname(file)).replace(/\\/g, "/");
@@ -2624,7 +2623,7 @@ export function topicsCheck(repo: string): Finding[] {
   // the folder carries it and the file's own number is a reading order within the topic. Judging
   // every numbered file by its own name reported 80 perfectly correct chapters of the book as
   // topics nobody had declared.
-  const caps = join(repo, "docs", "04-capabilities");
+  const caps = capabilitiesDir(docsOf(repo));
   for (const file of existsSync(caps) ? walkFiles(caps, (x) => x.endsWith(".md")) : []) {
     const name = topicName(file);
     if (name === null) continue;
@@ -2635,7 +2634,7 @@ export function topicsCheck(repo: string): Finding[] {
     const ancestors = relative(caps, dirname(file)).split(/[\\/]/).filter(Boolean);
     const viaFolder = ancestors.some((a) => /^\d\d-/.test(a) && named.has(a.replace(/^\d\d-/, "")));
     if (!named.has(name) && !viaFolder)
-      f.push({ check: "topics", grade: "RULE", file, message: `\`${name}\` is a numbered chapter of the capabilities seat, and neither it nor the topic folder it sits in is a construct \`02-constructs/\` names — a chapter realizes a construct or it is not a chapter (Q130)` });
+      f.push({ check: "topics", grade: "RULE", file, message: `\`${name}\` is a numbered chapter of the capabilities seat, and neither it nor the topic folder it sits in is a construct \`${SEAT.constructs}/\` names — a chapter realizes a construct or it is not a chapter (Q130)` });
   }
   return f;
 }
@@ -2722,22 +2721,22 @@ export function topicPaths(seat: string): string[] {
  */
 export function pathParity(repo: string): Finding[] {
   const f: Finding[] = [];
-  const constructs = join(repo, "docs", "02-constructs");
-  const behaviors = join(repo, "docs", "03-behaviors");
+  const constructs = constructsDir(docsOf(repo));
+  const behaviors = behaviorsDir(docsOf(repo));
   if (!existsSync(constructs)) return f;
   if (!existsSync(behaviors)) {
     f.push({ check: "parity", grade: "SOFT", file: constructs,
-      message: "the constructs seat is here and `03-behaviors/` is not, so nothing was compared — the two seats mirror each other file for file" });
+      message: `the constructs seat is here and \`${SEAT.behaviors}/\` is not, so nothing was compared — the two seats mirror each other file for file` });
     return f;
   }
   const here = topicPaths(constructs);
   const there = topicPaths(behaviors);
   for (const p of here) if (!there.includes(p))
     f.push({ check: "parity", grade: "SOFT", file: join(constructs, p),
-      message: `no \`03-behaviors/${p}\` — a construct's rows sit at the construct's own path, and a status is rolled up from them` });
+      message: `no \`${SEAT.behaviors}/${p}\` — a construct's rows sit at the construct's own path, and a status is rolled up from them` });
   for (const p of there) if (!here.includes(p))
     f.push({ check: "parity", grade: "SOFT", file: join(behaviors, p),
-      message: `no \`02-constructs/${p}\` — these rows prove a construct nothing declares` });
+      message: `no \`${SEAT.constructs}/${p}\` — these rows prove a construct nothing declares` });
   return f;
 }
 
@@ -2790,7 +2789,7 @@ export function packageIndex(repo: string): Set<string> {
  */
 export function capabilityMirror(repo: string, workspace: string): Finding[] {
   const f: Finding[] = [];
-  const caps = join(repo, "docs", "04-capabilities");
+  const caps = capabilitiesDir(docsOf(repo));
   if (!existsSync(caps)) return f;
   if (worldOf(caps) === "FOUNDATION") return f;
 
@@ -2816,7 +2815,7 @@ export function capabilityMirror(repo: string, workspace: string): Finding[] {
   for (const name of [...packages].sort())
     if (!mirrored.has(name))
       f.push({ check: "mirror", grade: "SOFT", file: caps,
-        message: `\`${name}\` declares itself a package and \`04-capabilities/\` carries no folder for it — either it realizes a construct nobody wrote down, or it is a package nobody documented (${relative(workspace, repo)})` });
+        message: `\`${name}\` declares itself a package and \`${SEAT.capabilities}/\` carries no folder for it — either it realizes a construct nobody wrote down, or it is a package nobody documented (${relative(workspace, repo)})` });
   return f;
 }
 
@@ -2865,7 +2864,7 @@ export function personasIn(file: string): Map<string, string> {
  */
 export function personaCoverage(repo: string): Finding[] {
   const f: Finding[] = [];
-  const behaviors = join(repo, "docs", "03-behaviors");
+  const behaviors = behaviorsDir(docsOf(repo));
   if (!existsSync(behaviors)) return f;
 
   const used = new Map<string, { shown: string; file: string }>();
@@ -2935,7 +2934,7 @@ export function gapReport(repo: string, workspace: string, asJson: boolean): num
   const name = basename(resolve(repo));
   const at = measuredNow();
 
-  const seats = ["01-purpose", "02-constructs", "03-behaviors", "04-capabilities", "05-guides"];
+  const seats = SEATS;
   const seatRows = seats.map((seat) => ({
     seat,
     present: existsSync(join(tree, seat, "README.md")),
@@ -2963,18 +2962,18 @@ export function gapReport(repo: string, workspace: string, asJson: boolean): num
   // What a domain OWES is what its concept section lists; what it HAS is the files under it.
   const conceptFile = join(repo, "CONCEPT.md");
   const sections = existsSync(conceptFile) ? conceptSections(conceptFile) : new Map();
-  const constructsDir = join(tree, "02-constructs");
-  const domainRows = constructFolders(constructsDir).filter((d) => !isGroup(d)).map((dir) => {
+  const constructsSeat = constructsDir(tree);
+  const domainRows = constructFolders(constructsSeat).filter((d) => !isGroup(d)).map((dir) => {
     const key = [...sections.keys()].find((k) => k === folderKey(basename(dir)));
     return {
-      domain: relative(constructsDir, dir),
+      domain: relative(constructsSeat, dir),
       named: Boolean(key),
       has: walkFiles(dir, (p) => p.endsWith(".md") && basename(p) !== "README.md").length,
       owed: key ? sections.get(key)!.lines.length : 0,
     };
   });
 
-  const approachDir = join(tree, "artifacts", "approaches");
+  const approachDir = retiredArtifactDir(tree, RETIRED_ARTIFACT.approaches);
   const approaches = existsSync(approachDir)
     ? readdirSync(approachDir).filter((f) => f.endsWith(".html")).sort() : [];
 
@@ -3044,7 +3043,7 @@ export function gapReport(repo: string, workspace: string, asJson: boolean): num
     "",
     approaches.length
       ? [`${approaches.length} approach page(s). Each argues one design and stays the record of the moment it was argued. Where a construct comes to carry its *What*, the page is retired rather than deleted.`, "",
-         ...approaches.map((a) => `- [${a.replace(/-approach\.html$/, "")}](../approaches/${a})`)].join("\n")
+         ...approaches.map((a) => `- [${a.replace(/-approach\.html$/, "")}](../${RETIRED_ARTIFACT.approaches}/${a})`)].join("\n")
       : "None.",
     "",
     "## Pages off the standard",
@@ -3137,7 +3136,7 @@ export function checkConstructLink(file: string, src: string): Finding[] {
   if (!file.endsWith(".html")) return [];
   const f: Finding[] = [];
   const seen = new Set<string>();
-  for (const m of src.matchAll(/href="([^"]*\/02-constructs\/[^"]*\.md)"/g)) {
+  for (const m of src.matchAll(new RegExp(`href="([^"]*\\/${SEAT.constructs}\\/[^"]*\\.md)"`, "g"))) {
     const href = m[1];
     if (basename(href.split("#")[0]) === "README.md") continue;
     if (seen.has(href)) continue;
@@ -3151,7 +3150,7 @@ export function checkConstructLink(file: string, src: string): Finding[] {
 }
 
 export function checkLinks(file: string, src: string): Finding[] {
-  if (file.replace(/\\/g, "/").includes("/templates/")) return [];
+  if (inTemplates(file)) return [];
   const f: Finding[] = [];
   const here = dirname(file);
   const seen = new Set<string>();
@@ -3186,7 +3185,7 @@ export function audit(paths: string[], workspace: string): Finding[] {
   // chapter, and the corpus is 339 of them.
   const realized = realizationIndex(workspace);
   const templates = process.env.SPN_TEMPLATES
-    ?? join(workspace, "spn-foundation", "docs", "04-capabilities", "01-devex", "04-workspace", "04-docs", "templates");
+    ?? bookTemplatesDir(join(workspace, "spn-foundation"));
   for (const p of paths) {
     const src = readFileSync(p, "utf8");
     const { block, error } = readBlock(src);

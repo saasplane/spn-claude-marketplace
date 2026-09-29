@@ -8,6 +8,7 @@ import { execFileSync } from "node:child_process";
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
+import { SEAT } from "../../../../../src/scripts/lib/docs-tree.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "commands", "behaviours", "stamp.ts");
 const kept = [];
@@ -36,7 +37,7 @@ const REGISTER = [
 const stand = (results, tiers = ["CONTRACT"], ranAt = "2026-09-20T09:00:00Z") => {
   const root = mkdtempSync(join(tmpdir(), "rows-"));
   kept.push(root);
-  const doc = join(root, "docs", "03-behaviors", "login.md");
+  const doc = join(root, "docs", SEAT.behaviors, "login.md");
   mkdirSync(dirname(doc), { recursive: true });
   writeFileSync(doc, REGISTER, "utf8");
   const artifact = join(root, "apps", "api", "tests", ".output", "contract", "spn-tests.json");
@@ -138,7 +139,7 @@ console.log("\n=== behaviour-rows — every width, read by heading");
 const standWith = (lines, artifactsByPath) => {
   const root = mkdtempSync(join(tmpdir(), "rows-"));
   kept.push(root);
-  const doc = join(root, "docs", "03-behaviors", "wide.md");
+  const doc = join(root, "docs", SEAT.behaviors, "wide.md");
   mkdirSync(dirname(doc), { recursive: true });
   writeFileSync(doc, lines.join("\n") + "\n", "utf8");
   for (const [path, body] of Object.entries(artifactsByPath)) {

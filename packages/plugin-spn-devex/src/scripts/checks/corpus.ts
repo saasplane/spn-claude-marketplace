@@ -44,6 +44,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { type Computed, hashFile, hashFiles, prune, type Source, verdictFor } from "../lib/corpus-cache.ts";
+import { bookTemplatesDir } from "../lib/docs-tree.ts";
 
 export type Warning = { check: string; message: string };
 
@@ -203,7 +204,7 @@ export function checkerHash(scripts = SCRIPTS, supportLib = SUPPORT_LIB): string
 /** The foundation's page templates. `audit` renders every produced page with them, in every tree. */
 function templatesDir(root: string): string {
   return process.env.SPN_TEMPLATES
-    ?? join(root, "spn-foundation", "docs", "04-capabilities", "01-devex", "04-workspace", "04-docs", "templates");
+    ?? bookTemplatesDir(join(root, "spn-foundation"));
 }
 
 /**

@@ -48,7 +48,8 @@ import { readdirSync, realpathSync, statSync } from "node:fs";
 import { homedir } from "node:os";
 import { basename, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
-import { isDir, isFile, listdir, read, readPayload, runAlone, type Payload } from "../lib/payload.ts";
+import { DEVEX, isDir, isFile, listdir, read, readPayload, runAlone, type Payload } from "../lib/payload.ts";
+import { ARCS, SESSIONS, WORKSTREAM_STATES, legacyWorkstreamsDir, workstreamsDir } from "../lib/docs-tree.ts";
 import { begin, end, record, tagsOf } from "../lib/timing.ts";
 
 const MARKETPLACE = "saasplane";
@@ -63,7 +64,7 @@ const SKIP = new Set(["node_modules", ".git", "dist", "build", ".nx", "coverage"
 const NODE_MANIFEST: Record<string, string> = { APPS: "spkind.json", INFRA: "spinfrapkg.json" };
 // The lifecycle, in the order a window reads it: what you can pick up, what is parked, what is done.
 // A workstream's state is its parent folder and nothing else.
-const STATES = ["open", "backlog", "closed"];
+const STATES = WORKSTREAM_STATES;
 const NUMBERED = /^(\d{1,4})-(.+)$/;
 
 function readJson(path: string): Record<string, any> | null {
@@ -268,11 +269,11 @@ type Workstream = { folder: string; number: string; subject: string; state: stri
  * as legacy.
  */
 export function workstreams(root: string): Workstream[] {
-  const devex = join(root, ".spndevex");
+  const devex = join(root, DEVEX);
   const found = new Map<string, Workstream>();
   for (const state of STATES)
-    for (const [base, legacy] of [[join(devex, "workstreams", state), ""],
-                                  [join(devex, "sessions", state), "sessions/"]] as const)
+    for (const [base, legacy] of [[workstreamsDir(root, state), ""],
+                                  [legacyWorkstreamsDir(root, state), `${SESSIONS}/`]] as const)
       for (const folder of listdir(base)) {
         const path = join(base, folder);
         if (!isDir(path) || found.has(folder)) continue;
@@ -503,10 +504,10 @@ type Status = { repos: number; open: Workstream[]; backlog: number; others: numb
  * adds a clause to the same line — a second line is how a status line turns back into a dump.
  */
 export function statusLine(s: Status): string {
-  const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`;
+  const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
   const parts = [plural(s.repos, "repo", "repos")];
   if (s.open.length)
-    parts.push(`${plural(s.open.length, "workstream", "workstreams")} open `
+    parts.push(`${plural(s.open.length, "workstream")} open `
       + `(${s.open.map((w) => w.number || w.subject).join(", ")})`);
   if (s.backlog) parts.push(`${s.backlog} in backlog`);
   if (s.others) parts.push(`${plural(s.others, "other window", "other windows")} open here`);
@@ -678,8 +679,8 @@ export function orient(root: string, cwd: string): [message: string, context: st
     const message = clean(greeting) + "\n\n" +
       (started
         ? "You started a platform here and we did not finish. No repository exists yet, and " +
-          "your answers are on disk where you left them — `.spndevex/workstreams/open/" +
-          started.folder + "/arcs/`.\n\n" +
+          "your answers are on disk where you left them — `" + relative(root, join(workstreamsDir(root, "open"), started.folder, ARCS)) +
+          "/`.\n\n" +
           "I will read what you already answered, tell you where we stopped, and pick up at the " +
           "next question. Nothing you decided is asked again.\n\n" +
           "Shall we carry on?\n"
@@ -694,7 +695,7 @@ export function orient(root: string, cwd: string): [message: string, context: st
       "so do not orient — open your first reply with the welcome above, whatever the prompt, then " +
       "load the `bootstrap` skill and walk it. " +
       (started
-        ? "A day-0 walk is already open here: `.spndevex/workstreams/open/" + started.folder +
+        ? "A day-0 walk is already open here: `" + relative(root, join(workstreamsDir(root, "open"), started.folder)) +
           "/`. Read its arc BEFORE you say anything. Resume at the first coordinate it does not " +
           "carry an answer for, and never ask again for one it holds.\n"
         : "Act 0 is the door above: ask, and run nothing until they answer. A no is a real " +

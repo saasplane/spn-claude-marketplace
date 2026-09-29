@@ -7,17 +7,23 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import { ARCS, capabilitiesDir, constructPagesDir, decisionsRegister, docsOf, hubPage, overviewsDir, registersDir,
+  workstreamsDir } from "../../../../src/scripts/lib/docs-tree.ts";
 
 const HOOKS = PLUGIN;
 const SCRIPTS = resolve(HOOKS, "scripts");
 const EVENTS = resolve(HOOKS, "src", "scripts", "events");
 
-// THESE SUITES ARE A BUILDER'S GATE, and they say so rather than pretending otherwise. Several cases
-// name real files in the surrounding workspace — a chapter, an approach page, this workstream's own
-// arcs — because what they prove is that the check agrees with the incumbent ON THE CORPUS, and a
-// corpus cannot be invented. A partner holds the plugin without the workspace and runs
-// `partner-shape.ts` instead, which needs nothing but the plugin itself.
-const WORKSPACE = resolve(HOOKS, "..", "..", "..");
+// EVERY PROBE SITS IN A TEMPORARY WORKSPACE. A probe path is the target of a simulated Write — the
+// check reads the content from the payload and the path only for where it sits — so a neutral
+// repository, `probe-repo`, stands in for any repository, and its paths are built through the same
+// layout module the check uses. Only a rule that holds for the foundation alone (the hub's `.143`
+// pair) names `spn-foundation`.
+const WORKSPACE = realpathSync(mkdtempSync(join(tmpdir(), "doc-check-probe-")));
+process.on("exit", () => rmSync(WORKSPACE, { recursive: true, force: true }));
+const PROBE_REPO = join(WORKSPACE, "probe-repo");
+const PROBE_DOCS = docsOf(PROBE_REPO);
+mkdirSync(join(WORKSPACE, ".spndevex"), { recursive: true });
 
 // THE PARITY ARM IS THE INCUMBENT, AND THE INCUMBENT IS GOING AWAY. Until the plugin reinstall
 // deletes `hooks/scripts/`, every case runs both implementations and requires them to agree. After
@@ -59,9 +65,22 @@ function one(label, payload, expect, says) {
 }
 
 const write = (path, content) => ({ tool_name: "Write", tool_input: { file_path: path, content } });
-const CHAPTER = `${WORKSPACE}/spn-foundation/docs/04-capabilities/01-foundation/02-docs/probe.md`;
-const APPROACH = `${WORKSPACE}/spn-foundation/artifacts/approaches/probe-approach.html`;
-const REGISTER = `${WORKSPACE}/spn-foundation/docs/registers/probe.md`;
+const CHAPTER = join(capabilitiesDir(PROBE_DOCS), "01-devex", "04-workspace", "04-docs", "probe.md");
+const REGISTER = join(registersDir(PROBE_DOCS), "probe.md");
+
+// An approach page lives in the workstream that argues it, beside its arcs, so the probe page is
+// compared with arcs on disk: N1 and N2, carrying the statuses the clean page's Cycles table reads.
+const arcFile = (id, name, status, rows = "") =>
+  `# ${id} — ${name}\n\nStatus: **${status} — 2026-09-29.** ${name}, in one sentence.\n\n## Steps\n\n` +
+  `| # | Repo | Altitude | What | Mechanism | Acceptance | State |\n| --- | --- | --- | --- | --- | --- | --- |\n${rows}`;
+const stream = (root, name) => {
+  const folder = join(workstreamsDir(root, "open"), name);
+  mkdirSync(join(folder, ARCS), { recursive: true });
+  writeFileSync(join(folder, ARCS, "N1-the-chapter.md"), arcFile("N1", "the chapter", "RUNNING"));
+  writeFileSync(join(folder, ARCS, "N2-the-check.md"), arcFile("N2", "the check", "DECIDED"));
+  return folder;
+};
+const APPROACH = join(stream(WORKSPACE, "041-probe"), "probe-approach.html");
 
 // A page that passes everything, used as the base for each known-bad mutation.
 const CLEAN = `<!doctype html>
@@ -133,12 +152,12 @@ one("an approach page with no Why, What or How",
   "reports", "carries no why + what + how");
 
 one("an overview carrying an argument's organs",
-  write(`${WORKSPACE}/spn-foundation/artifacts/overviews/probe-overview.html`,
+  write(join(overviewsDir(PROBE_DOCS), "probe-overview.html"),
     `<div class="eyebrow">Who this is for &middot; a reader</div><section><h2>Open</h2><p>You read it once and you know it.</p></section>`),
   "reports", "overview carries open");
 
 one("an approach page sitting in the overviews pocket",
-  write(`${WORKSPACE}/spn-foundation/artifacts/overviews/probe-approach.html`, CLEAN),
+  write(join(overviewsDir(PROBE_DOCS), "probe-approach.html"), CLEAN),
   "reports", "does not end -overview.html");
 
 one("an Open card carrying no options table",
@@ -219,24 +238,23 @@ one("the retired repository-letter form is not read as a register id",
   write(REGISTER, "# A register\n\n| id | ruling |\n| --- | --- |\n| RD.EVENTS.099 | Supersedes PD1 |\n"),
   "silent");
 
-// THIS ONE NEEDS A REAL NODE. The rule fires on a `CONCEPT.md` with an `spkind.json` beside it, and
-// the manifest is the workspace's, not something a fixture can stand in for. Run from a copy outside
-// a workspace — which is how the port is proven against a tree with no `hooks/scripts/` — the case
-// cannot run, and says so rather than failing.
-if (!existsSync(resolve(WORKSPACE, ".spndevex")))
-  console.log("  SKIP  a CONCEPT.md sitting beside a node manifest — this copy sits outside a workspace");
-else one("a CONCEPT.md sitting beside a node manifest",
-  write(`${WORKSPACE}/spn-platform-ts/apps/web-account-ts/CONCEPT.md`, "# A concept\n\nYou read it here.\n"),
+// The rule fires on a `CONCEPT.md` with a node manifest beside it and no `sprepo.json`, so the probe
+// node carries a fixture `spkind.json` on disk.
+const PROBE_NODE = join(PROBE_REPO, "apps", "probe-app");
+mkdirSync(PROBE_NODE, { recursive: true });
+writeFileSync(join(PROBE_NODE, "spkind.json"), `{ "kind": "APP_WEB", "name": "probe-app" }\n`);
+one("a CONCEPT.md sitting beside a node manifest",
+  write(join(PROBE_NODE, "CONCEPT.md"), "# A concept\n\nYou read it here.\n"),
   "reports", "belongs to a repo root");
 
 // UNTOUCHED — every shape that must stay writable.
 one("a well-formed approach page", write(APPROACH, CLEAN), "silent");
 
 one("a file the standard does not watch",
-  write(`${WORKSPACE}/spn-support-ts/src/thing.ts`, "export const x = 1;\n"), "silent");
+  write(join(PROBE_REPO, "src", "thing.ts"), "export const x = 1;\n"), "silent");
 
 one("an arc under .spndevex is state, not corpus",
-  write(`${WORKSPACE}/.spndevex/workstreams/open/008-plain-language/arcs/probe.md`,
+  write(join(workstreamsDir(WORKSPACE, "open"), "008-plain-probe", ARCS, "probe.md"),
     "# Arc\n\n" + Array.from({ length: 9 }, () => "The seat holds its own files and nothing else here.").join(" ")),
   "silent");
 
@@ -247,7 +265,7 @@ one("a rule may quote the mistake it bans",
 console.log("\n=== doc-check — the masthead: h1, an optional p.subtitle, one p.standfirst (RD.DEVEX.WORKSPACE.187)");
 
 // The same function `docs audit` runs, so a page is judged alike when it is saved and when it is audited.
-const CONSTRUCT = `${WORKSPACE}/spn-foundation/docs/artifacts/constructs/probe-construct.html`;
+const CONSTRUCT = join(constructPagesDir(PROBE_DOCS), "probe-construct.html");
 const page = (inner) => `<!doctype html>
 <header class="masthead">
   <div class="eyebrow"><span class="audience">Architect</span></div>
@@ -284,14 +302,14 @@ one("a Subtitle under the Description is out of place",
   const HUB_WS = realpathSync(mkdtempSync(join(tmpdir(), "doc-check-hub-")));
   try {
     const hubIn = (repoName, register) => {
-      const docs = join(HUB_WS, repoName, "docs");
-      mkdirSync(join(docs, "artifacts", "overviews"), { recursive: true });
+      const docs = docsOf(join(HUB_WS, repoName));
+      mkdirSync(overviewsDir(docs), { recursive: true });
       if (register !== null) {
-        mkdirSync(join(docs, "registers"), { recursive: true });
-        writeFileSync(join(docs, "registers", "decisions.md"),
+        mkdirSync(registersDir(docs), { recursive: true });
+        writeFileSync(decisionsRegister(docs),
           "# Decisions\n\n| ID | Area | Decision | Why | When |\n| --- | --- | --- | --- | --- |\n" + register);
       }
-      return join(docs, "artifacts", "overviews", "concept-overview.html");
+      return hubPage(docs);
     };
     const STUB = "| RD.DEVEX.WORKSPACE.143 | [docs](x.md) | **The punchline is `A stub title for the probe.`, and the " +
       "statement beside it does not change.** The statement below it reads *the stub subtitle, read from the row*. | why | 2026-09 |\n";
@@ -358,18 +376,8 @@ one("no opening — no standfirst above Why",
 // THE COMPARISON NEEDS REAL ARCS, so a workstream is built in a temporary folder: a page and its
 // arcs, in the layout `.spndevex/workstreams/<state>/<NNN>-<subject>/`.
 const TMP = realpathSync(mkdtempSync(join(tmpdir(), "doc-check-cycles-")));
-const arcFile = (id, name, status, rows = "") =>
-  `# ${id} — ${name}\n\nStatus: **${status} — 2026-09-29.** ${name}, in one sentence.\n\n## Steps\n\n` +
-  `| # | Repo | Altitude | What | Mechanism | Acceptance | State |\n| --- | --- | --- | --- | --- | --- | --- |\n${rows}`;
-const stream = (name) => {
-  const folder = join(TMP, ".spndevex", "workstreams", "open", name);
-  mkdirSync(join(folder, "arcs"), { recursive: true });
-  writeFileSync(join(folder, "arcs", "N1-the-chapter.md"), arcFile("N1", "the chapter", "RUNNING"));
-  writeFileSync(join(folder, "arcs", "N2-the-check.md"), arcFile("N2", "the check", "DECIDED"));
-  return folder;
-};
 try {
-  const home = stream("042-probe");
+  const home = stream(TMP, "042-probe");
   const page = join(home, "probe-approach.html");
 
   one("Cycles matching the arcs, row for row and status for status",
@@ -388,11 +396,11 @@ try {
     "reports", "lists N3");
 
   one("a status cell carrying its blocker still reads as its word",
-    write(join(stream("043-held"), "held-approach.html"), CLEAN.replace("<td>RUNNING</td>", "<td>RUNNING &middot; since today</td>")),
+    write(join(stream(TMP, "043-held"), "held-approach.html"), CLEAN.replace("<td>RUNNING</td>", "<td>RUNNING &middot; since today</td>")),
     "silent");
 
   // 008 is exempt by name: its page keeps the shape it was written in.
-  const exempt = stream("008-plain-probe");
+  const exempt = stream(TMP, "008-plain-probe");
   one("workstream 008's page — exempt by name from Terms and Cycles",
     write(join(exempt, "plain-probe-approach.html"),
       CLEAN.replace(HOW_TAIL, "").replace(`<section id="s1">`, `<section id="s0"><h2>Terms</h2><p>You read the words here.</p></section>\n<section id="s1">`)),
@@ -400,7 +408,7 @@ try {
 
   console.log("\n=== doc-check — an arc's step rows (SOFT)");
 
-  const arcs = join(home, "arcs");
+  const arcs = join(home, ARCS);
   const ordered = "| 1 | spn-foundation | DOCS | a | by hand | b | |\n| 2 | spn-support-ts | DOCS | a | by hand | b | |\n" +
     "| 3 | spn-support-ts | CODE | a | by hand | b | |\n| 4 | — | PROOF | a | command | b | |\n";
   one("rows in chain order, a `—` proof row last",
@@ -430,11 +438,11 @@ try {
     "reports", "carries no Repo column");
 
   one("an older 008 arc with no Repo column — exempt by name",
-    write(join(exempt, "arcs", "N50-older.md"), "# N50 — older\n\nStatus: **LANDED.**\n\n## Steps\n\n| # | What | State |\n| --- | --- | --- |\n| 1 | a | ✅ |\n"),
+    write(join(exempt, ARCS, "N50-older.md"), "# N50 — older\n\nStatus: **LANDED.**\n\n## Steps\n\n| # | What | State |\n| --- | --- | --- |\n| 1 | a | ✅ |\n"),
     "silent");
 
   one("a new 008 arc past the exemption still reports",
-    write(join(exempt, "arcs", "N121-newer.md"), "# N121 — newer\n\nStatus: **DECIDED.**\n\n## Steps\n\n| # | What | State |\n| --- | --- | --- |\n| 1 | a | |\n"),
+    write(join(exempt, ARCS, "N121-newer.md"), "# N121 — newer\n\nStatus: **DECIDED.**\n\n## Steps\n\n| # | What | State |\n| --- | --- | --- |\n| 1 | a | |\n"),
     "reports", "carries no Repo column");
 
   // An Edit carries only its replacement, and the table is judged whole: the edit is applied to the
@@ -450,10 +458,10 @@ try {
 
   // THE SWEEP READS ARCS TOO, and counts each one it scanned — a bad path reads `0 scanned`.
   n += 1;
-  const sweptHome = stream("044-sweep");
+  const sweptHome = stream(TMP, "044-sweep");
   writeFileSync(join(sweptHome, "sweep-approach.html"), CLEAN.replace("</tbody>",
     `<tr><td><strong>N4 &mdash; late docs</strong></td><td>x</td><td>DECIDED</td></tr></tbody>`));
-  writeFileSync(join(sweptHome, "arcs", "N4-late-docs.md"), arcFile("N4", "late docs", "DECIDED",
+  writeFileSync(join(sweptHome, ARCS, "N4-late-docs.md"), arcFile("N4", "late docs", "DECIDED",
     "| 1 | spn-support-ts | CODE | a | by hand | b | |\n| 2 | spn-support-ts | DOCS | a | by hand | b | |\n"));
   let out = "", code = 0;
   try { out = execFileSync("node", [`${HOOKS}/src/scripts/checks/doc-check.ts`, sweptHome], { encoding: "utf8", cwd: CWD }); }

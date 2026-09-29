@@ -42,6 +42,8 @@
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { basename, dirname, join, resolve, relative, sep } from "node:path";
 import { emit, readPayload, runAlone, unescape, type Payload, type Verdict } from "../lib/payload.ts";
+import { ARTIFACT, PLUGIN_TEMPLATES, POCKET, RETIRED_ARTIFACT, decisionsRegister, inArtifacts, isArcFile,
+         isRegister as inRegisters, workstreamDirOf } from "../lib/docs-tree.ts";
 import { cyclesOf, statusWord } from "../commands/docs/cycles.ts";
 
 export type Finding = [severity: string, message: string];
@@ -181,7 +183,7 @@ const REACH_BAR: Record<string, number> = { "artifact-html": 15, readme: 25, cha
 const REACH_MIN_N = 8;
 
 // RD.DEVEX.WORKSPACE.103 — the suffix names the kind, and the set is closed.
-const POCKET_KIND: Record<string, string> = { approaches: "-approach.html", overviews: "-overview.html" };
+const POCKET_KIND: Record<string, string> = { [RETIRED_ARTIFACT.approaches]: "-approach.html", [ARTIFACT.overviews]: "-overview.html" };
 const NODE_MANIFESTS = ["spkind.json", "spinfrapkg.json"];
 const SKIP = new Set(["node_modules", ".git", "dist", "build", "coverage", "tool-results", ".output", ".nx"]);
 
@@ -217,7 +219,7 @@ export function structural(path: string): Finding[] {
 
   // RD.DEVEX.WORKSPACE.103 — folder and suffix must agree.
   const parts = slashes(resolve(path)).split("/");
-  if (parts.includes("artifacts") && base.endsWith(".html")) {
+  if (parts.includes(POCKET.artifacts) && base.endsWith(".html")) {
     const pocket = parts[parts.length - 2];
     const want = POCKET_KIND[pocket];
     if (want && !base.endsWith(want)) {
@@ -235,7 +237,6 @@ export function structural(path: string): Finding[] {
 
 // An approach page lives in the workstream that argues it (05-artifacts.md § The approach document),
 // and its arcs sit beside it in `arcs/`. Only a page inside a workstream has arcs to compare against.
-const WORKSTREAM = /^(.*\/\.spndevex\/(?:workstreams|sessions)\/(?:open|backlog|closed)\/([^/]+))\//;
 // Workstream 008 is exempt by name: its page was written in the shape before this one, and it
 // closes under that shape (05-artifacts.md § The approach document). So are its arcs up to this
 // number (N116, D8): most predate the Repo · Altitude row, and 008 closes under the shape it has.
@@ -244,8 +245,7 @@ const EXEMPT_ARCS_THROUGH = 120;
 
 /** The workstream folder a path sits in, and its name, or null outside one. */
 export function workstreamOf(path: string): { folder: string; name: string } | null {
-  const found = WORKSTREAM.exec(slashes(resolve(path)));
-  return found ? { folder: found[1], name: found[2] } : null;
+  return workstreamDirOf(slashes(resolve(path)));
 }
 
 /** Whether the approach-page and arc-row rules skip this path because its workstream is 008. */
@@ -341,7 +341,7 @@ export function pageFurniture(text: string): Finding[] {
     "The outline does not fold. A rail listing every heading of every section is a wall in the shape " +
     "of an outline (05-artifacts.md, A page carries its own subsections) · append the rail-fold " +
     "block, verbatim, after this page's own rail builder — take it from the approach template, " +
-    "`refs/devex/workspace/docs/templates/workstream/approach-template.html`"]];
+    `\`${PLUGIN_TEMPLATES}/workstream/approach-template.html\``]];
 }
 
 /** The first word of every `<h2>`, lowercased — what decides a page's kind. */
@@ -367,7 +367,7 @@ export function approachShape(text: string, exempt = false): Finding[] {
   const missing = ["why", "what", "how"].filter((s) => !heads.includes(s));
   if (missing.length)
     return [["RULE", "carries no " + missing.join(" + ") + " — this explains rather than argues, so " +
-      "it is an overview: artifacts/overviews/<name>-overview.html (RD.DEVEX.WORKSPACE.102 / 040). An approach " +
+      `it is an overview: ${POCKET.artifacts}/${ARTIFACT.overviews}/<name>-overview.html (RD.DEVEX.WORKSPACE.102 / 040). An approach ` +
       "is an opening, then Why > What > How > Open > Deferred"]];
   if (exempt) return [];
 
@@ -423,7 +423,7 @@ const spoken = (html: string): string => flat(html).replace(/[’‘]/g, "'").re
 export function hubPair(path: string): { title: string; subtitle: string } | "unreadable" | null {
   let folder = dirname(resolve(path));
   for (;;) {
-    const register = join(folder, "registers", "decisions.md");
+    const register = decisionsRegister(folder);
     if (exists(register)) {
       const row = /^\|\s*RD\.DEVEX\.WORKSPACE\.143\s*\|[^\n]*$/m.exec(read(register));
       if (!row) return null;
@@ -511,7 +511,7 @@ const NO_REPO = new Set(["—", "–", "-", ""]);
 
 /** Any `.md` directly under a workstream's `arcs/`. */
 export function isArc(path: string): boolean {
-  return /\/\.spndevex\/(?:workstreams|sessions)\/[^/]+\/[^/]+\/arcs\/[^/]+\.md$/.test(slashes(resolve(path)));
+  return isArcFile(slashes(resolve(path)));
 }
 
 /** The markdown step table of an arc: the first table under `## Steps`, else the first headed `#`. */
@@ -879,7 +879,7 @@ export function voice(prose: string, sents: Sentence[], kind = "chapter", operat
  */
 export function isRegister(path: string): boolean {
   const p = slashes(resolve(path));
-  return p.endsWith(".md") && p.includes("/registers/") && basename(p) !== "README.md";
+  return inRegisters(p);
 }
 
 // 06-registers.md § A row states present truth, and carries no supersession — a row is never
@@ -1049,7 +1049,7 @@ export function watched(path: string): boolean {
   if (base.endsWith(".md") && p.includes("/.spndevex/")) return false;
   if (base.endsWith(".html"))
     return base.endsWith("-approach.html") || base.endsWith("-overview.html")
-        || p.includes("/artifacts/") || p.includes("/.spndevex/notes/");
+        || inArtifacts(p) || p.includes("/.spndevex/notes/");
   if (base === "README.md" || base === "CONCEPT.md") return true;
   if (!base.endsWith(".md")) return false;
   if (p.includes("/docs/")) return true;
@@ -1311,7 +1311,7 @@ export function checkDoc(payload: Payload): Verdict {
     : "";
   return { note: `Doc standard — ${subject} bars the book states:\n${body}${moves}${limits}` +
     "\n  Load `refs/devex/workspace/docs/doc-sets.md` (One voice / Every surface / The artifacts " +
-    "pocket) and, for an approach page, `refs/devex/workspace/docs/templates/workstream/approach-template.html`." };
+    `pocket) and, for an approach page, \`${PLUGIN_TEMPLATES}/workstream/approach-template.html\`.` };
 }
 
 // ---------------------------------------------------------------------------- the sweep

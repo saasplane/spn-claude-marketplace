@@ -17,7 +17,7 @@
 // `How` tables with a SCOPE column, and those tables are still read, so a workstream argued in the
 // older shape closes under the shape it was written in.
 //
-//   documents-first :  a WARNING. You are writing an approach page into a repo's own pocket while the
+//   documents-first :  a WARNING. You are writing an approach page into a member repo while the
 //                      open workstream that argues it still has rows that have not landed.
 //   close           :  a REFUSAL. Every row must be ACCOUNTED FOR, which is not the same as finished:
 //                      landed, carried and deferred all pass; a row nobody decided, a row marked
@@ -39,6 +39,8 @@ import { TERMINAL, statusIn } from "./arc-status.ts";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { DEVEX, emit, isDir, isFile, listdir, read, readPayload, runAlone, unescape, workspaceRoot,
          type Payload, type Verdict } from "../lib/payload.ts";
+import { APPROACH_SUFFIX, ARCS, SESSIONS, WORKSTREAM_STATES, WORKSTREAMS, legacyWorkstreamsDir, workstreamsDir,
+         type WorkstreamState } from "../lib/docs-tree.ts";
 
 // The state a row reaches. `landed` is the only one that satisfies the documents pass; all three
 // named states satisfy the close. A mark nobody wrote is what the close refuses.
@@ -64,8 +66,8 @@ const SKIP = new Set(["node_modules", ".git", "dist", "build", ".nx", "coverage"
 // The lifecycle. `open` is being worked, `backlog` is parked behind a named blocker, `closed` is
 // accounted for. The container is `workstreams/`; `sessions/` is the name it replaces, and a bare
 // `arcs/` is the shape before that. All three are read so a half-migrated workspace still parses.
-const STATES = ["open", "backlog", "closed"];
-const CONTAINERS = ["workstreams", "sessions", "arcs"];
+const STATES: readonly WorkstreamState[] = WORKSTREAM_STATES;
+const CONTAINERS = [WORKSTREAMS, SESSIONS, ARCS];
 // What a close looks like as a path: a closed folder of one of those containers, under the
 // workspace's own state. `backlog/` moving to `open/` matches nothing here, which is the point.
 const CLOSED = new RegExp(`/${DEVEX.replace(".", "\\.")}/(?:${CONTAINERS.join("|")})/closed(?:/|$)`);
@@ -472,9 +474,8 @@ function pagesIn(folder: string): string[] {
 }
 
 /** Where one state's workstreams sit, in every shape the workspace may be in. */
-function stateFolders(root: string, state: string): string[] {
-  const devex = join(root, DEVEX);
-  return [join(devex, "workstreams", state), join(devex, "sessions", state)];
+function stateFolders(root: string, state: WorkstreamState): string[] {
+  return [workstreamsDir(root, state), legacyWorkstreamsDir(root, state)];
 }
 
 /**
@@ -542,23 +543,25 @@ export function subjectFolders(root: string, subject: string, source: string | n
  * the shape it does not have yet helps nobody.
  */
 function home(root: string, subject: string): string {
-  for (const container of ["workstreams", "sessions"]) {
-    const folder = join(DEVEX, container, "open", subject);
+  for (const base of stateFolders(root, "open")) {
+    const folder = relative(root, join(base, subject));
     if (isDir(join(root, folder))) return `${folder}/`;
   }
-  const legacy = join(DEVEX, "arcs", `arc-${subject}.md`);
+  const legacy = join(DEVEX, ARCS, `arc-${subject}.md`);
   if (isFile(join(root, legacy))) return legacy;
-  return `${join(DEVEX, "workstreams", "open", subject)}/`;
+  return `${relative(root, join(workstreamsDir(root, "open"), subject))}/`;
 }
 
 /**
- * An approach page in a repository's own artifacts pocket — the seat a design lands in once it is
- * settled. A workstream's own page is not a seat: arguing it there is the point.
+ * An approach page written into a member repository. An approach page lives in the workstream that
+ * argues it and closes with it; no pocket of a repository holds one (05-artifacts.md § The approach
+ * document — a workstream's, never a repository's). A workstream's own page is where arguing it is
+ * the point.
  */
 function isRepoSeat(path: string): boolean {
   const normalized = slashes(resolve(path));
   if (normalized.includes(`/${DEVEX}/`)) return false;
-  return normalized.includes("/artifacts/") && normalized.endsWith("-approach.html");
+  return normalized.endsWith(APPROACH_SUFFIX);
 }
 
 /** The member repo a path sits in — the first segment under the workspace root. */
@@ -850,7 +853,7 @@ export function gateDocumentsFirst(payload: Payload): Verdict {
       return { note:
         `Documents-first — workstream \`${subject}\` still has rows that have not landed, and ` +
         `its split plan names ${repo}:\n${listed}${more}\n` +
-        `  You are writing ${basename(target)} into that repo's own pocket. While a subject is ` +
+        `  You are writing ${basename(target)} into that repo. While a subject is ` +
         `open the argument lives in the workstream — \`${home(seatRoot, subject)}\` — and lands ` +
         `in a seat once it is settled. Write the documents in scope order, highest scope first: ` +
         `the foundation before the repo, the repo before the seat, all of it before the code. If ` +

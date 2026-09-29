@@ -12,6 +12,7 @@ import { workspace } from "../../../helpers/fixture.mjs";
 
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
+import { WORKSTREAMS } from "../../../../src/scripts/lib/docs-tree.ts";
 
 const HOOKS = PLUGIN;
 const SCRIPTS = resolve(HOOKS, "scripts");
@@ -42,8 +43,8 @@ ${rows.map(([w, s, st]) => `    <tr><td>${w}</td><td>${s}</td><td>${st}</td></tr
 
 function build(name, rows, where = "closed") {
   return workspace(name, {
-    [`.spndevex/workstreams/${where}/001-a-subject/a-subject-approach.html`]: page(rows),
-    [`.spndevex/workstreams/${where}/001-a-subject/arcs/N1-x.md`]: "# Arc\n\n## Log\n\n- **2026-09-18 — go.**\n",
+    [`.spndevex/${WORKSTREAMS}/${where}/001-a-subject/a-subject-approach.html`]: page(rows),
+    [`.spndevex/${WORKSTREAMS}/${where}/001-a-subject/arcs/N1-x.md`]: "# Arc\n\n## Log\n\n- **2026-09-18 — go.**\n",
     "spn-support-ts/src/a.ts": "export const a = 1;\n",
   });
 }
@@ -80,22 +81,22 @@ const F10 = "the Python read the subject from the destination, so this spelling 
 // UNTOUCHED — a real close, counted from the page's own plan.
 one("a close counts what landed",
   build("cl-ok", [["a", "spn-foundation", "&#x2705; landed"], ["b", "spn-support-ts", "&#x2705; landed"], ["c", "spn-platform-ts", "&#x2705; landed"]]),
-  "mv .spndevex/workstreams/open/001-a-subject .spndevex/workstreams/closed/",
+  `mv .spndevex/${WORKSTREAMS}/open/001-a-subject .spndevex/${WORKSTREAMS}/closed/`,
   "speaks", { says: "3 rows landed", parity: false, why: F10 });
 
 one("carried and deferred are named beside what landed",
   build("cl-mixed", [["a", "spn-foundation", "&#x2705; landed"], ["b", "spn-support-ts", "&#x21B7; carried to N4"], ["c", "spn-platform-ts", "&#x2298; deferred until asked"]]),
-  "mv .spndevex/workstreams/open/001-a-subject .spndevex/workstreams/closed/",
+  `mv .spndevex/${WORKSTREAMS}/open/001-a-subject .spndevex/${WORKSTREAMS}/closed/`,
   "speaks", { says: "1 row landed, and 1 carried to a named successor and 1 deferred with its trigger", parity: false, why: F10 });
 
 one("git mv is the same act by another spelling",
   build("cl-gitmv", [["a", "spn-foundation", "&#x2705; landed"]]),
-  "git mv .spndevex/workstreams/open/001-a-subject .spndevex/workstreams/closed/",
+  `git mv .spndevex/${WORKSTREAMS}/open/001-a-subject .spndevex/${WORKSTREAMS}/closed/`,
   "speaks", { says: "1 row landed", parity: false, why: F10 });
 
 one("the one spelling the Python did handle, so the port is held to it",
   build("cl-spelled", [["a", "spn-foundation", "&#x2705; landed"]]),
-  "mv .spndevex/workstreams/open/001-a-subject .spndevex/workstreams/closed/001-a-subject",
+  `mv .spndevex/${WORKSTREAMS}/open/001-a-subject .spndevex/${WORKSTREAMS}/closed/001-a-subject`,
   "speaks", { says: "1 row landed" });
 
 // THE SPLIT PLAN IS THE ARCS' STEP ROWS. A workstream written after that rule carries its plan in
@@ -106,29 +107,29 @@ const stepArc = (rows) => `# N2 — the arc\n\nStatus: **LANDED**\n\n## Steps\n\
 
 one("a close with no page counts the arcs' landed steps, dotted ones included",
   workspace("m1-cl-arcs", {
-    ".spndevex/workstreams/closed/001-a-subject/arcs/N2-the-arc.md":
+    [`.spndevex/${WORKSTREAMS}/closed/001-a-subject/arcs/N2-the-arc.md`]:
       stepArc([["1", "spn-foundation", "✅ landed — `abc1234`"], ["3e.1", "spn-support-ts", "LANDED — `def5678`"], ["4", "spn-platform-ts", "⊘ deferred until asked"]]),
   }),
-  "mv .spndevex/workstreams/open/001-a-subject .spndevex/workstreams/closed/",
+  `mv .spndevex/${WORKSTREAMS}/open/001-a-subject .spndevex/${WORKSTREAMS}/closed/`,
   "speaks", { says: "2 rows landed, and 1 deferred with its trigger", parity: false, why: "the Python reads only a page" });
 
 one("a page's scope rows and the arcs' step rows are one plan",
   workspace("m1-cl-both", {
-    ".spndevex/workstreams/closed/001-a-subject/a-subject-approach.html": page([["a", "spn-foundation", "&#x2705; landed"]]),
-    ".spndevex/workstreams/closed/001-a-subject/arcs/N2-the-arc.md": stepArc([["1", "spn-support-ts", "✅ landed"]]),
+    [`.spndevex/${WORKSTREAMS}/closed/001-a-subject/a-subject-approach.html`]: page([["a", "spn-foundation", "&#x2705; landed"]]),
+    [`.spndevex/${WORKSTREAMS}/closed/001-a-subject/arcs/N2-the-arc.md`]: stepArc([["1", "spn-support-ts", "✅ landed"]]),
   }),
-  "mv .spndevex/workstreams/open/001-a-subject .spndevex/workstreams/closed/",
+  `mv .spndevex/${WORKSTREAMS}/open/001-a-subject .spndevex/${WORKSTREAMS}/closed/`,
   "speaks", { says: "2 rows landed", parity: false, why: "the Python reads only a page" });
 
 // RD.DEVEX.WORKSPACE.184 — `in progress <time>` IS NOT LANDED. The gate refuses it before the move,
 // so a row found here was moved past the gate, and the line must not count it or cheer.
 {
   const root = workspace("m7-cl-in-progress", {
-    ".spndevex/workstreams/closed/001-a-subject/arcs/N2-the-arc.md":
+    [`.spndevex/${WORKSTREAMS}/closed/001-a-subject/arcs/N2-the-arc.md`]:
       stepArc([["1", "spn-foundation", "✅ landed — `abc1234`"], ["2", "spn-support-ts", "in progress 2026-09-29 14:32 +05:30"]]),
   });
   const said = run("node", [`${HOOKS}/src/scripts/events/closed.ts`],
-    { tool_name: "Bash", cwd: root, tool_input: { command: "mv .spndevex/workstreams/open/001-a-subject .spndevex/workstreams/closed/" } }, root);
+    { tool_name: "Bash", cwd: root, tool_input: { command: `mv .spndevex/${WORKSTREAMS}/open/001-a-subject .spndevex/${WORKSTREAMS}/closed/` } }, root);
   for (const [what, ok] of [
     ["a row in progress is named as not landed", /1 row still marked in progress/.test(said)],
     ["and it is not counted among the landed rows", /1 row landed/.test(said)],
@@ -139,7 +140,7 @@ one("a page's scope rows and the arcs' step rows are one plan",
 // KNOWN-BAD — every move that closed nothing and must stay silent.
 one("backlog moving into open is work starting, not finishing",
   build("cl-start", [["a", "spn-foundation", "&#x2705; landed"]], "backlog"),
-  "mv .spndevex/workstreams/backlog/001-a-subject .spndevex/workstreams/open/",
+  `mv .spndevex/${WORKSTREAMS}/backlog/001-a-subject .spndevex/${WORKSTREAMS}/open/`,
   "silent");
 
 one("an ordinary move inside a repository",
@@ -153,13 +154,13 @@ one("a command that moves nothing",
   "silent");
 
 one("a folder with neither a page nor a step table is not a scope finishing",
-  workspace("m1-cl-empty", { ".spndevex/workstreams/closed/001-a-subject/notes/a.md": "a note\n" }),
-  "mv .spndevex/workstreams/open/001-a-subject .spndevex/workstreams/closed/",
+  workspace("m1-cl-empty", { [`.spndevex/${WORKSTREAMS}/closed/001-a-subject/notes/a.md`]: "a note\n" }),
+  `mv .spndevex/${WORKSTREAMS}/open/001-a-subject .spndevex/${WORKSTREAMS}/closed/`,
   "silent");
 
 one("a loose file moved into closed/ is not a scope finishing",
   build("cl-file", [["a", "spn-foundation", "&#x2705; landed"]]),
-  "mv notes.md .spndevex/workstreams/closed/",
+  `mv notes.md .spndevex/${WORKSTREAMS}/closed/`,
   "silent");
 
 console.log(failed ? `  ${failed} FAILED` : `  all ${n} passed`);

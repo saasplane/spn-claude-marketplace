@@ -30,10 +30,11 @@
 
 import { basename, resolve } from "node:path";
 import { isDir, readPayload, runAlone, workspaceRoot, type Payload } from "../lib/payload.ts";
+import { ARCS, SESSIONS, WORKSTREAM_STATES, WORKSTREAMS } from "../lib/docs-tree.ts";
 import { closing, moves, stateOf, subjectFolders, subjectPages, workstreamPlan } from "../checks/split-plan.ts";
 import { begin, end, span, tagsOf } from "../lib/timing.ts";
 
-const STRUCTURE = new Set(["workstreams", "sessions", "arcs", "open", "backlog", "closed", ""]);
+const STRUCTURE = new Set<string>([WORKSTREAMS, SESSIONS, ARCS, ...WORKSTREAM_STATES, ""]);
 
 /** The line a close earns, or nothing. */
 export function closingMessage(payload: Payload): string | null {

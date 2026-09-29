@@ -12,6 +12,7 @@ import { createHash } from "node:crypto";
 import { withOffset } from "../../lib/clock.ts";
 import { readdirSync, statSync } from "node:fs";
 import { basename, join, relative, resolve } from "node:path";
+import { DOCS, reportsDir } from "../../lib/docs-tree.ts";
 import { declaredRows } from "../../../../../plugin-support-lib/src/lib/register.ts";
 import { owedBy, TIERS } from "../../../../../plugin-support-lib/src/lib/kinds.ts";
 import { artifactPath, newest, read, readArtifact, worst } from "../../../../../plugin-support-lib/src/lib/runs.ts";
@@ -24,7 +25,7 @@ type Finding = { project: string; kind: null; severity: string; ftype: string; m
 type TierState = "RAN" | "PARTIAL" | "NOT_RUN";
 
 /** Where the tests report lands in a repository's pocket, named by its kind (RD.DEVEX.WORKSPACE.149). */
-export const TESTS_REPORT = "docs/artifacts/reports/tests-report.html";
+export const TESTS_REPORT = join(reportsDir(DOCS), "tests-report.html");
 
 const finding = (file: string, message: string): Finding =>
   ({ project: file, kind: null, severity: "WARN", ftype: "BEHAVIOUR_ROW", message: message });

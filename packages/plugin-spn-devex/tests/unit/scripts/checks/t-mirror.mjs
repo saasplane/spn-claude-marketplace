@@ -9,6 +9,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
+import { SEAT } from "../../../../src/scripts/lib/docs-tree.ts";
 
 const HOOKS = PLUGIN;
 
@@ -45,7 +46,7 @@ const face = (rows) =>
   "\n\n## Something else\n\n| File | Governs |\n| --- | --- |\n| [not-a-mirror.md](not-a-mirror.md) | [`src/app/`](../../src/app) |\n";
 
 // The face lives ONCE, in the repository's own tree, under the node's domain and layer.
-const FACE = "docs/04-capabilities/01-domain/01-server/README.md";
+const FACE = `docs/${SEAT.capabilities}/01-domain/01-server/README.md`;
 
 function said(root, path, session) {
   const payload = JSON.stringify({
@@ -128,10 +129,10 @@ console.log("\n=== mirror — once per mirror per session");
   // A README that reaches the capabilities SEAT as well as this node's own face inside it names two
   // true things, and only the deeper one carries this node's Map.
   const root = tree({ [FACE]: face([["app.md", "src/app/", "✅"]]), "pkg/src/app/A.ts": "x\n",
-    "docs/04-capabilities/README.md": "# Capabilities\n\nthe seat.\n" });
+    [`docs/${SEAT.capabilities}/README.md`]: "# Capabilities\n\nthe seat.\n" });
   writeFileSync(join(root, "pkg", "README.md"),
-    "# pkg\n\nThe [capabilities seat](../docs/04-capabilities/README.md), and " +
-    "[its own face](../docs/04-capabilities/01-domain/01-server/README.md).\n", "utf8");
+    `# pkg\n\nThe [capabilities seat](../docs/${SEAT.capabilities}/README.md), and ` +
+    `[its own face](../docs/${SEAT.capabilities}/01-domain/01-server/README.md).\n`, "utf8");
   one("the deepest capability link wins over the seat face above it",
     said(root, "pkg/src/app/A.ts", "deep1"), { expect: "names it", names: "app.md" });
 }
@@ -158,9 +159,9 @@ console.log("\n=== mirror — silent");
 }
 
 {
-  const root = tree({ [FACE]: face([["app.md", "src/app/", "✅"]]), "docs/04-capabilities/01-domain/01-server/app.md": "x\n" });
+  const root = tree({ [FACE]: face([["app.md", "src/app/", "✅"]]), [`docs/${SEAT.capabilities}/01-domain/01-server/app.md`]: "x\n" });
   one("an edit to the mirror itself, which is not under src/",
-    said(root, "docs/04-capabilities/01-domain/01-server/app.md", "s1"), { expect: "silent" });
+    said(root, `docs/${SEAT.capabilities}/01-domain/01-server/app.md`, "s1"), { expect: "silent" });
 }
 
 {

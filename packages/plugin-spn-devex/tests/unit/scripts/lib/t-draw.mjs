@@ -9,6 +9,7 @@
 // its own gate refuses is a defect, whichever half is wrong.
 import { draw, KINDS } from "../../../../src/scripts/lib/draw.ts";
 import { checkFigures } from "../../../../src/scripts/lib/figures.ts";
+import { SEAT } from "../../../../src/scripts/lib/docs-tree.ts";
 
 let n = 0, failed = 0;
 function one(name, got, want) {
@@ -55,8 +56,8 @@ const FIGURES = {
     links: [{ from: "v", to: "c" }, { from: "g", to: "p" }, { from: "g", to: "c" }],
   },
   "map — a nested box is containment": {
-    kind: "map", boxes: [{ id: "repo", label: "Repository" }, { id: "s1", label: "01-purpose", in: "repo" },
-      { id: "s2", label: "02-constructs", in: "repo" }, { id: "n", label: "Node", note: "README.md only" }],
+    kind: "map", boxes: [{ id: "repo", label: "Repository" }, { id: "s1", label: SEAT.purpose, in: "repo" },
+      { id: "s2", label: SEAT.constructs, in: "repo" }, { id: "n", label: "Node", note: "README.md only" }],
     links: [{ from: "n", to: "repo", label: "links into" }],
   },
   "map — nine groups wrap into rows rather than running off the canvas": {

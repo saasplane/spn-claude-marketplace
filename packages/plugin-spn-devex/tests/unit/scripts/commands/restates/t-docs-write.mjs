@@ -6,6 +6,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "nod
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { check, parse, sectionText, seenHash } from "../../../../../src/scripts/lib/restates.ts";
+import { SEAT, TEMPLATES } from "../../../../../src/scripts/lib/docs-tree.ts";
 
 let n = 0, failed = 0;
 const one = (label, got, want) => {
@@ -26,9 +27,9 @@ const write = (refPath) => {
 
 const workspace = join(BASE, "ws");
 mkdirSync(join(workspace, ".spndevex"), { recursive: true });
-mkdirSync(join(workspace, "spn-foundation", "docs", "02-constructs"), { recursive: true });
+mkdirSync(join(workspace, "spn-foundation", "docs", SEAT.constructs), { recursive: true });
 
-const CHAPTER = join(workspace, "spn-foundation", "docs", "02-constructs", "thing.md");
+const CHAPTER = join(workspace, "spn-foundation", "docs", SEAT.constructs, "thing.md");
 const chapterBody = [
   "# A thing",
   "",
@@ -48,8 +49,8 @@ console.log("=== known-bad first — a citation that cannot resolve is left as f
   const refPath = join(workspace, "bad.md");
   writeFileSync(refPath,
     '<!-- spn:restates\n{\n  "docs": [\n' +
-    '    { "path": "spn-foundation/docs/02-constructs/ghost.md", "seen": "deadbeef" },\n' +
-    '    { "path": "spn-foundation/docs/02-constructs/thing.md", "section": "No Such Heading", "seen": "deadbeef" }\n' +
+    `    { "path": "spn-foundation/docs/${SEAT.constructs}/ghost.md", "seen": "deadbeef" },\n` +
+    `    { "path": "spn-foundation/docs/${SEAT.constructs}/thing.md", "section": "No Such Heading", "seen": "deadbeef" }\n` +
     "  ]\n}\n-->\n\n# a ref\n");
   const before = readFileSync(refPath, "utf8");
   const result = write(refPath);
@@ -66,7 +67,7 @@ console.log("\n=== a section citation is hashed by its own section, never the wh
   const sectionHash = seenHash(sectionText(chapterBody, "First section"));
   writeFileSync(refPath,
     '<!-- spn:restates\n{\n  "docs": [\n' +
-    `    { "path": "spn-foundation/docs/02-constructs/thing.md", "section": "First section", "seen": "${sectionHash}" }\n` +
+    `    { "path": "spn-foundation/docs/${SEAT.constructs}/thing.md", "section": "First section", "seen": "${sectionHash}" }\n` +
     "  ]\n}\n-->\n\n# a ref\n\nProse untouched by the writer.\n");
 
   // KNOWN-BAD FIRST: editing the OTHER section leaves this citation's stamp current — if the hash
@@ -103,7 +104,7 @@ console.log("\n=== the writer touches only the ref named on the command line, ne
   const refB = join(workspace, "citer-b.md");
   const body = (marker) =>
     '<!-- spn:restates\n{\n  "docs": [\n' +
-    '    { "path": "spn-foundation/docs/02-constructs/thing.md", "seen": "deadbeef" }\n' +
+    `    { "path": "spn-foundation/docs/${SEAT.constructs}/thing.md", "seen": "deadbeef" }\n` +
     `  ]\n}\n-->\n\n# ${marker}\n`;
   writeFileSync(refA, body("citer A"));
   writeFileSync(refB, body("citer B"));
@@ -117,14 +118,14 @@ console.log("\n=== the writer touches only the ref named on the command line, ne
 
 console.log("\n=== a folder citation restamps by its tree hash, exactly as `check()` reads it");
 {
-  const folder = join(workspace, "spn-foundation", "docs", "04-capabilities", "01-devex", "templates");
+  const folder = join(workspace, "spn-foundation", "docs", SEAT.capabilities, "01-devex", "templates");
   mkdirSync(folder, { recursive: true });
   writeFileSync(join(folder, "one.md"), "one\n");
   writeFileSync(join(folder, "two.md"), "two\n");
   const refPath = join(workspace, "folder.md");
   writeFileSync(refPath,
     '<!-- spn:restates\n{\n  "docs": [\n' +
-    '    { "path": "spn-foundation/docs/04-capabilities/01-devex/templates", "seen": "deadbeef" }\n' +
+    `    { "path": "spn-foundation/docs/${SEAT.capabilities}/01-devex/${TEMPLATES}", "seen": "deadbeef" }\n` +
     "  ]\n}\n-->\n\n# a ref\n");
   const result = write(refPath);
   one("a folder citation restamps", result.out, (g) => /1 doc\(s\) restamped/.test(g));

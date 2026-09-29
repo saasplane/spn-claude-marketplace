@@ -9,6 +9,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, rmSync
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
+import { ARTIFACT, POCKET, RETIRED_ARTIFACT, SEAT, WORKSTREAMS, bookTemplatesDir } from "../../../../../src/scripts/lib/docs-tree.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
 const BASE = mkdtempSync(join(tmpdir(), "t-docs-audit-"));
@@ -119,14 +120,14 @@ const construct = (sections) =>
       "Lead.\n\n" + sections.map((h) => `## ${h}\n\n${SECTION_BODY[h] ?? `What ${h} says.`}\n`).join("\n"),
       "`For: Architect` · `Status: 🔮 PLANNING`");
 {
-  const root = repo({ "CONCEPT.md": "# c\n", "docs/02-constructs/x.md": construct(SECTIONS) });
+  const root = repo({ "CONCEPT.md": "# c\n", [`docs/${SEAT.constructs}/x.md`]: construct(SECTIONS) });
   one("a construct with every section, written as `##`, is clean",
-    run(root, ["audit", "docs/02-constructs/x.md"]), has("clean — 1 page"));
+    run(root, ["audit", `docs/${SEAT.constructs}/x.md`]), has("clean — 1 page"));
 }
 {
   const root = repo({ "CONCEPT.md": "# c\n",
-    "docs/02-constructs/x.md": construct(SECTIONS.filter((h) => h !== "Boundary")) });
-  const out = run(root, ["audit", "docs/02-constructs/x.md"]);
+    [`docs/${SEAT.constructs}/x.md`]: construct(SECTIONS.filter((h) => h !== "Boundary")) });
+  const out = run(root, ["audit", `docs/${SEAT.constructs}/x.md`]);
   one("a construct genuinely missing a section is still a finding", out, has("missing section: Boundary"));
   one("and it names only the one that is missing", out, lacks("missing section: Terms"));
 }
@@ -135,14 +136,14 @@ const construct = (sections) =>
   // out of `Binds` and takes `Proof` off the construct, and the sweep that edits the 122 pages is a
   // separate arc — so both shapes pass, and the order of the two is still the outline's.
   const root = repo({ "CONCEPT.md": "# c\n",
-    "docs/02-constructs/x.md": construct(["Overview", "Terms", "Model", "Parts", "Boundary"]) });
+    [`docs/${SEAT.constructs}/x.md`]: construct(["Overview", "Terms", "Model", "Parts", "Boundary"]) });
   one("a construct carrying neither Binds nor Proof is clean, which is the shape `E` leaves",
-    run(root, ["audit", "docs/02-constructs/x.md"]), has("clean — 1 page"));
+    run(root, ["audit", `docs/${SEAT.constructs}/x.md`]), has("clean — 1 page"));
 
   const swapped = repo({ "CONCEPT.md": "# c\n",
-    "docs/02-constructs/x.md": construct(["Overview", "Terms", "Model", "Parts", "Proof", "Boundary"]) });
+    [`docs/${SEAT.constructs}/x.md`]: construct(["Overview", "Terms", "Model", "Parts", "Proof", "Boundary"]) });
   one("an optional section out of place is still out of place",
-    run(swapped, ["audit", "docs/02-constructs/x.md"]), has("`Proof` comes before `Boundary`"));
+    run(swapped, ["audit", `docs/${SEAT.constructs}/x.md`]), has("`Proof` comes before `Boundary`"));
 }
 {
   // OVERVIEW IS REQUIRED, AND IT WAS OPTIONAL FOR ONE SITTING (N67). Adding a required section to
@@ -151,37 +152,37 @@ const construct = (sections) =>
   // has not moved is refused for lacking it. Optional is the state where both pass. These two cases
   // hold the end state — required, and first — so the middle state cannot be left behind by accident.
   const root = repo({ "CONCEPT.md": "# c\n",
-    "docs/02-constructs/x.md": construct(SECTIONS.filter((h) => h !== "Overview")) });
+    [`docs/${SEAT.constructs}/x.md`]: construct(SECTIONS.filter((h) => h !== "Overview")) });
   one("a construct with no Overview is refused, and named",
-    run(root, ["audit", "docs/02-constructs/x.md"]), has("missing section: Overview"));
+    run(root, ["audit", `docs/${SEAT.constructs}/x.md`]), has("missing section: Overview"));
 
   // Order matters as much as presence: Overview argues WHY and Terms defines the words the Model
   // uses, so a page that defines before it argues is a finding rather than a preference.
   const swapped = repo({ "CONCEPT.md": "# c\n",
-    "docs/02-constructs/x.md": construct(["Terms", "Overview", "Model", "Parts", "Boundary", "Binds", "Proof"]) });
+    [`docs/${SEAT.constructs}/x.md`]: construct(["Terms", "Overview", "Model", "Parts", "Boundary", "Binds", "Proof"]) });
   one("a construct that puts Terms before Overview is refused",
-    run(swapped, ["audit", "docs/02-constructs/x.md"]), has("`Terms` comes before `Overview`"));
+    run(swapped, ["audit", `docs/${SEAT.constructs}/x.md`]), has("`Terms` comes before `Overview`"));
 }
 {
   const v1 = doc({ id: "x", variant: "construct", parentId: "concept", dependsOn: [], title: "X", lenses: ["ARCHITECT"], status: "PLANNING" },
       "Lead.\n\n## Boundary\n\nb\n\n## Model\n\nm\n\n## Parts\n\np\n\n## Relations\n\nr\n\n" + SECTION_BODY.Binds + "\n## Proof\n\n" + SECTION_BODY.Proof,
       "`For: Architect` · `Status: 🔮 PLANNING`");
-  const out = run(repo({ "CONCEPT.md": "# c\n", "docs/02-constructs/x.md": v1 }), ["audit", "docs/02-constructs/x.md"]);
+  const out = run(repo({ "CONCEPT.md": "# c\n", [`docs/${SEAT.constructs}/x.md`]: v1 }), ["audit", `docs/${SEAT.constructs}/x.md`]);
   one("a v1-shaped construct is reported softly until N13 re-shapes it, never refused", out, (g) => /carries the v1 outline/.test(g) && !/missing section/.test(g));
 }
 {
   // A construct that SHOWS an outline in an example is not carrying that section.
   const root = repo({ "CONCEPT.md": "# c\n",
-    "docs/02-constructs/x.md": construct(SECTIONS.filter((h) => h !== "Boundary"))
+    [`docs/${SEAT.constructs}/x.md`]: construct(SECTIONS.filter((h) => h !== "Boundary"))
       .replace("## Binds", "```text\n## Boundary\n```\n\n## Binds") });
   one("a heading inside a fence does not satisfy the outline",
-    run(root, ["audit", "docs/02-constructs/x.md"]), has("missing section: Boundary"));
+    run(root, ["audit", `docs/${SEAT.constructs}/x.md`]), has("missing section: Boundary"));
 }
 {
   // `produced` compares a PAGE with the seat it would be produced from. A seat file is not a page.
-  const root = repo({ "CONCEPT.md": "# c\n", "docs/02-constructs/x.md": construct(SECTIONS) });
+  const root = repo({ "CONCEPT.md": "# c\n", [`docs/${SEAT.constructs}/x.md`]: construct(SECTIONS) });
   one("the produced check stays silent on a seat file, which has no page yet",
-    run(root, ["audit", "docs/02-constructs/x.md"]), lacks("no seat file sits at the mirrored path"));
+    run(root, ["audit", `docs/${SEAT.constructs}/x.md`]), lacks("no seat file sits at the mirrored path"));
 }
 
 
@@ -201,29 +202,29 @@ const overview = (sections) =>
 const CONCEPT_TREE = "# c\n\n## SaaS Plane — Foundation\n\nstage.\n\n### DevEx\n\nhow it runs.\n\n### Docs\n\nhow it is written.\n\n## Adoption\n\nlast.\n";
 {
   const root = repo({ "CONCEPT.md": CONCEPT_TREE,
-    "docs/artifacts/overviews/o.html": overview(["Overview", "DevEx", "Docs", "Glossary", "Where to go next"]) });
+    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/o.html`]: overview(["Overview", "DevEx", "Docs", "Glossary", "Where to go next"]) });
   one("a domain heading at `###` is a real heading, and the overview may borrow it",
-    run(root, ["audit", "docs/artifacts/overviews/o.html"]), lacks("no counterpart"));
+    run(root, ["audit", `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/o.html`]), lacks("no counterpart"));
 }
 {
   const root = repo({ "CONCEPT.md": CONCEPT_TREE,
-    "docs/artifacts/overviews/o.html": overview(["Overview", "DevEx", "Invented", "Glossary", "Where to go next"]) });
+    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/o.html`]: overview(["Overview", "DevEx", "Invented", "Glossary", "Where to go next"]) });
   one("a heading the concept does not have anywhere is still a finding",
-    run(root, ["audit", "docs/artifacts/overviews/o.html"]), has("Invented — an overview never invents"));
+    run(root, ["audit", `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/o.html`]), has("Invented — an overview never invents"));
 }
 {
   const root = repo({ "CONCEPT.md": CONCEPT_TREE,
-    "docs/artifacts/overviews/o.html": overview(["Overview", "Docs", "DevEx", "Glossary", "Where to go next"]) });
+    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/o.html`]: overview(["Overview", "Docs", "DevEx", "Glossary", "Where to go next"]) });
   one("and the source's order still binds across depths",
-    run(root, ["audit", "docs/artifacts/overviews/o.html"]), has("an overview holds its source's order"));
+    run(root, ["audit", `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/o.html`]), has("an overview holds its source's order"));
 }
 {
   // A concept that SHOWS an example page in a fenced block is not declaring those headings.
   const root = repo({
     "CONCEPT.md": CONCEPT_TREE + "\n```markdown\n## Fenced Heading\n```\n",
-    "docs/artifacts/overviews/o.html": overview(["Overview", "Fenced Heading", "Glossary", "Where to go next"]) });
+    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/o.html`]: overview(["Overview", "Fenced Heading", "Glossary", "Where to go next"]) });
   one("a heading inside a fence is not a heading the concept has",
-    run(root, ["audit", "docs/artifacts/overviews/o.html"]), has("Fenced Heading — an overview never invents"));
+    run(root, ["audit", `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/o.html`]), has("Fenced Heading — an overview never invents"));
 }
 
 
@@ -241,55 +242,55 @@ const withSections = (binds, proof) =>
 const BINDS_OK = "## Binds\n\n| Rule | What it decides | Weight |\n| --- | --- | --- |\n| `a.md` | x | MUST |\n\n| Repo | Node | What it realizes | State |\n| --- | --- | --- | --- |\n| R | n | x | planned |\n";
 const PROOF_OK = "## Proof\n\n| Check | Kind | What a green run shows |\n| --- | --- | --- |\n| `spnutils apps test` | gate | x |\n";
 {
-  const root = repo({ "CONCEPT.md": "# c\n", "docs/02-constructs/x.md": withSections(BINDS_OK, PROOF_OK) });
+  const root = repo({ "CONCEPT.md": "# c\n", [`docs/${SEAT.constructs}/x.md`]: withSections(BINDS_OK, PROOF_OK) });
   one("a construct with both tables and a real command is clean",
-    run(root, ["audit", "docs/02-constructs/x.md"]), has("clean"));
+    run(root, ["audit", `docs/${SEAT.constructs}/x.md`]), has("clean"));
 }
 {
   // ONE TABLE IS THE SHAPE `E` LEAVES BEHIND — the rules that hold the construct, and nothing about
   // where code sits. Demanding two would refuse every page the sweep touches.
   const one_table = "## Binds\n\n| Rule | What it decides | Weight |\n| --- | --- | --- |\n| `a.md` | x | MUST |\n";
-  const root = repo({ "CONCEPT.md": "# c\n", "docs/02-constructs/x.md": withSections(one_table, PROOF_OK) });
+  const root = repo({ "CONCEPT.md": "# c\n", [`docs/${SEAT.constructs}/x.md`]: withSections(one_table, PROOF_OK) });
   one("Binds carrying the rules table alone is clean",
-    run(root, ["audit", "docs/02-constructs/x.md"]), has("clean"));
+    run(root, ["audit", `docs/${SEAT.constructs}/x.md`]), has("clean"));
 }
 {
   const no_table = "## Binds\n\nThe rules are written down somewhere else.\n";
-  const root = repo({ "CONCEPT.md": "# c\n", "docs/02-constructs/x.md": withSections(no_table, PROOF_OK) });
+  const root = repo({ "CONCEPT.md": "# c\n", [`docs/${SEAT.constructs}/x.md`]: withSections(no_table, PROOF_OK) });
   one("Binds carrying no table at all is still a finding",
-    run(root, ["audit", "docs/02-constructs/x.md"]), has("Binds carries no table"));
+    run(root, ["audit", `docs/${SEAT.constructs}/x.md`]), has("Binds carries no table"));
 }
 {
   // A realization table with no row was invariant 6's RULE, and `E` removes the table it read.
   const no_row = "## Binds\n\n| Rule | What it decides | Weight |\n| --- | --- | --- |\n| `a.md` | x | MUST |\n\n| Repo | Node | What it realizes | State |\n| --- | --- | --- | --- |\n";
-  const root = repo({ "CONCEPT.md": "# c\n", "docs/02-constructs/x.md": withSections(no_row, PROOF_OK) });
+  const root = repo({ "CONCEPT.md": "# c\n", [`docs/${SEAT.constructs}/x.md`]: withSections(no_row, PROOF_OK) });
   one("an empty realization table is no longer a finding — `E` retires the row it demanded",
-    run(root, ["audit", "docs/02-constructs/x.md"]), has("clean"));
+    run(root, ["audit", `docs/${SEAT.constructs}/x.md`]), has("clean"));
 }
 {
   // THE `NODE` CELL IS NOT RESOLVED ANY MORE, and the case names the exact substring match that went:
   // `the estate declaration` used to resolve through a node called `estate`, so a cell naming a house
   // word read as checked. Nothing here resolves, and nothing here is reported.
   const loose = BINDS_OK.replace("| R | n | x | planned |", "| R | the estate declaration | x | done |");
-  const root = repo({ "CONCEPT.md": "# c\n", "docs/02-constructs/x.md": withSections(loose, PROOF_OK) });
+  const root = repo({ "CONCEPT.md": "# c\n", [`docs/${SEAT.constructs}/x.md`]: withSections(loose, PROOF_OK) });
   one("a `Node` cell is no longer resolved, loosely or at all",
-    run(root, ["audit", "docs/02-constructs/x.md"]), lacks("resolves to no node"));
+    run(root, ["audit", `docs/${SEAT.constructs}/x.md`]), lacks("resolves to no node"));
 }
 {
   const odd = BINDS_OK.replace("| R | n | x | planned |", "| R | n | x | nearly |");
-  const root = repo({ "CONCEPT.md": "# c\n", "docs/02-constructs/x.md": withSections(odd, PROOF_OK) });
+  const root = repo({ "CONCEPT.md": "# c\n", [`docs/${SEAT.constructs}/x.md`]: withSections(odd, PROOF_OK) });
   one("a realization state outside planned · partial · done is reported",
-    run(root, ["audit", "docs/02-constructs/x.md"]), has("planned · partial · done"));
+    run(root, ["audit", `docs/${SEAT.constructs}/x.md`]), has("planned · partial · done"));
 }
 {
   // A COMMAND IS WRITTEN AS CODE, and markdown's backticks are not part of the command.
   const spec = PROOF_OK.replace("`spnutils apps test`", "`some-thing.spec.ts`");
-  const root = repo({ "CONCEPT.md": "# c\n", "docs/02-constructs/x.md": withSections(BINDS_OK, spec) });
+  const root = repo({ "CONCEPT.md": "# c\n", [`docs/${SEAT.constructs}/x.md`]: withSections(BINDS_OK, spec) });
   one("a Proof row naming a spec file rather than a command is reported",
-    run(root, ["audit", "docs/02-constructs/x.md"]), has("may not name a command"));
-  const root2 = repo({ "CONCEPT.md": "# c\n", "docs/02-constructs/x.md": withSections(BINDS_OK, PROOF_OK) });
+    run(root, ["audit", `docs/${SEAT.constructs}/x.md`]), has("may not name a command"));
+  const root2 = repo({ "CONCEPT.md": "# c\n", [`docs/${SEAT.constructs}/x.md`]: withSections(BINDS_OK, PROOF_OK) });
   one("and a real command in backticks is NOT — the markers are stripped first",
-    run(root2, ["audit", "docs/02-constructs/x.md"]), lacks("may not name a command"));
+    run(root2, ["audit", `docs/${SEAT.constructs}/x.md`]), lacks("may not name a command"));
 }
 
 
@@ -328,13 +329,13 @@ console.log("\n=== a link is opened, rather than merely written");
   // none — fails.
   const root = repo({
     "CONCEPT.md": "# c\n",
-    "docs/02-constructs/01-here/01-here.md":
+    [`docs/${SEAT.constructs}/01-here/01-here.md`]:
       doc({ id: "l-here", title: "Here", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
           "`For: Architect` · `Status: ✅ DONE`") +
       "\nA link that [resolves](02-there.md), and one that [does not](03-gone.md).\n" +
       "\nA [heading on a page that exists](02-there.md#a-heading), and a [heading here](#a-heading).\n" +
       "\nAn [absolute one](https://example.com/x.md), and a [root-relative one](/docs/x.md).\n",
-    "docs/02-constructs/01-here/02-there.md":
+    [`docs/${SEAT.constructs}/01-here/02-there.md`]:
       doc({ id: "l-there", title: "There", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
           "`For: Architect` · `Status: ✅ DONE`"),
   });
@@ -354,7 +355,7 @@ console.log("\n=== a link is opened, rather than merely written");
   // shape today, which is why it is a fixture rather than a corpus case.
   const root = repo({
     "CONCEPT.md": "# c\n",
-    "docs/02-constructs/01-here/01-here.md":
+    [`docs/${SEAT.constructs}/01-here/01-here.md`]:
       doc({ id: "l-fence", title: "Fence", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
           "`For: Architect` · `Status: ✅ DONE`") +
       "\nA link is written like this:\n\n```md\nSee [the other page](99-nowhere.md).\n```\n" +
@@ -372,7 +373,7 @@ console.log("\n=== a Governs cell names a folder that exists, and the audit says
   // fails here.
   const root = repo({
     "CONCEPT.md": "# c\n",
-    "docs/04-capabilities/README.md":
+    [`docs/${SEAT.capabilities}/README.md`]:
       doc({ id: "f", title: "Capabilities", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
           "`For: Architect` · `Status: ✅ DONE`") +
       "\n<!-- spn:generated contents — do not edit inside these markers; `docs.ts face` writes it -->\n" +
@@ -383,10 +384,10 @@ console.log("\n=== a Governs cell names a folder that exists, and the audit says
     "src/app/index.ts": "export const a = 1;\n",
     // The Map's own links resolve, because a generated Map names files it walked. What is under test
     // is the Governs CELL, and a fixture whose links dangle would be reporting something else.
-    "docs/04-capabilities/app.md":
+    [`docs/${SEAT.capabilities}/app.md`]:
       doc({ id: "g-app", title: "App", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
           "`For: Architect` · `Status: ✅ DONE`"),
-    "docs/04-capabilities/ghost.md":
+    [`docs/${SEAT.capabilities}/ghost.md`]:
       doc({ id: "g-ghost", title: "Ghost", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
           "`For: Architect` · `Status: ✅ DONE`"),
   });
@@ -401,7 +402,7 @@ console.log("\n=== a Governs cell names a folder that exists, and the audit says
   // The same file with the dead row removed: the check stays quiet.
   const root = repo({
     "CONCEPT.md": "# c\n",
-    "docs/04-capabilities/README.md":
+    [`docs/${SEAT.capabilities}/README.md`]:
       doc({ id: "f", title: "Capabilities", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
           "`For: Architect` · `Status: ✅ DONE`") +
       "\n<!-- spn:generated contents — do not edit inside these markers; `docs.ts face` writes it -->\n" +
@@ -416,7 +417,7 @@ console.log("\n=== a Governs cell names a folder that exists, and the audit says
   // The empty Map the generator writes where a level has no mirror is not a dead cell.
   const root = repo({
     "CONCEPT.md": "# c\n",
-    "docs/04-capabilities/README.md":
+    [`docs/${SEAT.capabilities}/README.md`]:
       doc({ id: "f", title: "Capabilities", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
           "`For: Architect` · `Status: ✅ DONE`") +
       "\n<!-- spn:generated contents — do not edit inside these markers; `docs.ts face` writes it -->\n" +
@@ -433,7 +434,7 @@ console.log("\n=== a Governs cell names a folder that exists, and the audit says
   // path to anything that only tests for a slash. Only the generated region is judged.
   const root = repo({
     "CONCEPT.md": "# c\n",
-    "docs/04-capabilities/README.md":
+    [`docs/${SEAT.capabilities}/README.md`]:
       doc({ id: "f", title: "Capabilities", lenses: ["ARCHITECT"], status: "DONE" },
           "| Register | Governs | Status |\n| --- | --- | --- |\n" +
           "| [naming.md](naming.md) | auth/data policies with merged effective reads | ✅ |\n",
@@ -448,25 +449,25 @@ console.log("\n=== the gap scan measures and never fixes");
   const root = repo({
     "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n\n- **Session** — one person's live access\n",
     "docs/README.md": doc({ id: "f", title: "Docs", lenses: ["ARCHITECT"], status: "DONE" }, "x\n", "`For: Architect` · `Status: ✅ DONE`"),
-    "docs/01-purpose/README.md": doc({ id: "p", title: "Purpose", lenses: ["ARCHITECT"], status: "PLANNING" }, "x\n", "`For: Architect` · `Status: 🔮 PLANNING`"),
-    "docs/02-constructs/README.md": doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }, "x\n", "`For: Architect` · `Status: 🔮 PLANNING`"),
-    "docs/02-constructs/01-core/README.md": doc({ id: "c", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }, "x\n", "`For: Architect` · `Status: 🔮 PLANNING`"),
-    "docs/artifacts/approaches/a-approach.html": "<p>an argument</p>\n",
+    [`docs/${SEAT.purpose}/README.md`]: doc({ id: "p", title: "Purpose", lenses: ["ARCHITECT"], status: "PLANNING" }, "x\n", "`For: Architect` · `Status: 🔮 PLANNING`"),
+    [`docs/${SEAT.constructs}/README.md`]: doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }, "x\n", "`For: Architect` · `Status: 🔮 PLANNING`"),
+    [`docs/${SEAT.constructs}/01-core/README.md`]: doc({ id: "c", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }, "x\n", "`For: Architect` · `Status: 🔮 PLANNING`"),
+    [`docs/${POCKET.artifacts}/${RETIRED_ARTIFACT.approaches}/a-approach.html`]: "<p>an argument</p>\n",
     // A page with no metadata block: the finding the scan exists to count.
-    "docs/03-behaviors/README.md": "# Behaviors\n\nno block here.\n",
+    [`docs/${SEAT.behaviors}/README.md`]: "# Behaviors\n\nno block here.\n",
     // A node still carrying a tree: the shape the consolidation removed.
     "pkg/docs/README.md": "# stray\n",
   });
-  const before = readAt(root, "docs/03-behaviors/README.md");
+  const before = readAt(root, `docs/${SEAT.behaviors}/README.md`);
   const rep = run(root, ["audit", "--report", "."]);
 
   // THE MEASUREMENT IS A RETURN VALUE, NEVER A FILE (RD.DEVEX.WORKSPACE.149). A report is written by the agent
   // from what it read; a tool hands over what it measured and writes nothing into a pocket. Before
   // this, the scan wrote the only machine-authored page in a folder of authored ones, and rewrote
   // it on every run whether anybody had asked a question or not.
-  one("it writes nothing into the repository's pocket", absent(root, "docs/artifacts/reports/docs-audit.md"), true);
+  one("it writes nothing into the repository's pocket", absent(root, `docs/${POCKET.artifacts}/${ARTIFACT.reports}/docs-audit.md`), true);
   one("the measurement comes back to the caller", rep, has("still carry a docs tree"));
-  one("IT FIXES NOTHING IT MEASURES", readAt(root, "docs/03-behaviors/README.md"), before);
+  one("IT FIXES NOTHING IT MEASURES", readAt(root, `docs/${SEAT.behaviors}/README.md`), before);
   one("a node still carrying a docs tree is a finding", rep, has("still carry a docs tree"));
   one("a domain with nothing written in it is a DOMAIN, not a group", rep, has("`01-core`"));
   one("what the concept lists is what the domain owes", rep, (g) => /\| `01-core` \| ✅ \| 0 \| 1 \|/.test(g));
@@ -485,21 +486,21 @@ console.log("\n=== the gap scan measures and never fixes");
   // until the week somebody is busy.
   {
     const ws = repo({
-      "docs/artifacts/approaches/x-approach.html":
+      [`docs/${POCKET.artifacts}/${RETIRED_ARTIFACT.approaches}/x-approach.html`]:
         doc({ id: "x", variant: "approach", title: "X", lenses: ["ARCHITECT"], status: "PLANNING" },
             "<p>an argument</p>\n"),
     });
-    const got = run(ws, ["audit", "docs/artifacts/approaches/x-approach.html"]);
+    const got = run(ws, ["audit", `docs/${POCKET.artifacts}/${RETIRED_ARTIFACT.approaches}/x-approach.html`]);
     one("an approach page in a repository's docs is refused", got, has("belongs to the workstream"));
   }
   {
     // The same page under a workstream is exactly where it belongs, and must pass untouched.
     const ws = repo({
-      ".spndevex/workstreams/open/001-a/a-approach.html":
+      [`.spndevex/${WORKSTREAMS}/open/001-a/a-approach.html`]:
         doc({ id: "a", variant: "approach", title: "A", lenses: ["ARCHITECT"], status: "PLANNING" },
             "<p>an argument</p>\n"),
     });
-    const got = run(ws, ["audit", ".spndevex/workstreams/open/001-a/a-approach.html"]);
+    const got = run(ws, ["audit", `.spndevex/${WORKSTREAMS}/open/001-a/a-approach.html`]);
     one("the same page in a workstream is not", got, (g) => !/belongs to the workstream/.test(g));
   }
 
@@ -508,22 +509,22 @@ console.log("\n=== the gap scan measures and never fixes");
   // across five repositories, 187 of them cited by nothing.
   {
     const ws = repo({
-      "docs/artifacts/resources/packages/x/purpose.md":
+      [`docs/${POCKET.artifacts}/${RETIRED_ARTIFACT.resources}/packages/x/purpose.md`]:
         doc({ id: "xp", title: "Purpose — x", lenses: ["ARCHITECT"], status: "DONE" },
             "why x exists\n", "`For: Architect` · `Status: ✅ DONE`"),
     });
-    const got = run(ws, ["audit", "docs/artifacts/resources/packages/x/purpose.md"]);
+    const got = run(ws, ["audit", `docs/${POCKET.artifacts}/${RETIRED_ARTIFACT.resources}/packages/x/purpose.md`]);
     one("a file in the pocket's resources folder is refused", got, has("lives in a seat"));
   }
   {
     // The same file in the seat that owns it is exactly right, and must pass untouched.
     const ws = repo({
-      "docs/01-purpose/x.md":
+      [`docs/${SEAT.purpose}/x.md`]:
         doc({ id: "xp", title: "Purpose — x", lenses: ["ARCHITECT"], status: "DONE" },
             "why x exists\n", "`For: Architect` · `Status: ✅ DONE`"),
     });
-    const got = run(ws, ["audit", "docs/01-purpose/x.md"]);
-    one("the same file in 01-purpose is not", got, (g) => !/lives in a seat/.test(g));
+    const got = run(ws, ["audit", `docs/${SEAT.purpose}/x.md`]);
+    one(`the same file in ${SEAT.purpose} is not`, got, (g) => !/lives in a seat/.test(g));
   }
 
   one("and it names what it did NOT measure rather than reporting a zero",
@@ -552,10 +553,10 @@ console.log("=== a closed value is declared once, and agrees with what realizes 
     const root = repo({
       "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
       "packages/thing-ts/src/rungs.ts": SOURCE,
-      "docs/02-constructs/01-core/rungs.md": chapter("Rungs", "rungs", AGREES),
+      [`docs/${SEAT.constructs}/01-core/rungs.md`]: chapter("Rungs", "rungs", AGREES),
     });
     one("a declaration that matches the code it realizes is reported nowhere",
-      run(root, ["audit", "docs/02-constructs/01-core/rungs.md"]), lacks("vocabulary"));
+      run(root, ["audit", `docs/${SEAT.constructs}/01-core/rungs.md`]), lacks("vocabulary"));
   }
 
   {
@@ -564,10 +565,10 @@ console.log("=== a closed value is declared once, and agrees with what realizes 
     const root = repo({
       "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
       "packages/thing-ts/src/rungs.ts": SOURCE,
-      "docs/02-constructs/01-core/rungs.md": chapter("Rungs", "rungs",
+      [`docs/${SEAT.constructs}/01-core/rungs.md`]: chapter("Rungs", "rungs",
         "```ts\nexport enum SPRungType {\n  UNIT = 'UNIT',      // alone\n  WIRED = 'WIRED',    // against the real thing\n  BROWSED = 'BROWSED',// in a real browser\n}\n```"),
     });
-    const got = run(root, ["audit", "docs/02-constructs/01-core/rungs.md"]);
+    const got = run(root, ["audit", `docs/${SEAT.constructs}/01-core/rungs.md`]);
     one("a member the book names and the code lacks is reported", got, has("names BROWSED"));
     one("and the finding names the file that would have to change", got, has("src/rungs.ts"));
     one("neither side is called the wrong one", got, has("one of the two is wrong"));
@@ -579,10 +580,10 @@ console.log("=== a closed value is declared once, and agrees with what realizes 
     const root = repo({
       "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
       "packages/thing-ts/src/rungs.ts": "export enum SPRungType {\n  UNIT = 'UNIT',\n  WIRED = 'WIRED',\n  BROWSED = 'BROWSED',\n}\n",
-      "docs/02-constructs/01-core/rungs.md": chapter("Rungs", "rungs", AGREES),
+      [`docs/${SEAT.constructs}/01-core/rungs.md`]: chapter("Rungs", "rungs", AGREES),
     });
     one("a member the code carries and the book omits is reported",
-      run(root, ["audit", "docs/02-constructs/01-core/rungs.md"]), has("does not name BROWSED"));
+      run(root, ["audit", `docs/${SEAT.constructs}/01-core/rungs.md`]), has("does not name BROWSED"));
   }
 
   {
@@ -593,10 +594,10 @@ console.log("=== a closed value is declared once, and agrees with what realizes 
     const root = repo({
       "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
       "packages/thing-ts/src/rungs.ts": "export enum SPRungType { UNIT = 'UNIT' }\nexport enum SPOther {\n  ADM = 'ADM',\n  MIG = 'MIG',\n}\n",
-      "docs/02-constructs/01-core/rungs.md": chapter("Rungs", "rungs",
+      [`docs/${SEAT.constructs}/01-core/rungs.md`]: chapter("Rungs", "rungs",
         "```ts\nexport enum SPRungType { UNIT = 'UNIT' }  // alone\n\nexport enum SPOther {\n  ADM = 'ADM',  // administer\n  MIG = 'MIG',  // migrate\n}\n```"),
     });
-    const got = run(root, ["audit", "docs/02-constructs/01-core/rungs.md"]);
+    const got = run(root, ["audit", `docs/${SEAT.constructs}/01-core/rungs.md`]);
     one("a one-line enum does not swallow the enum after it", got, lacks("vocabulary"));
     one("and neither is accused of carrying the other's members", got, lacks("ADM"));
   }
@@ -606,10 +607,10 @@ console.log("=== a closed value is declared once, and agrees with what realizes 
     // book unable to lead anything.
     const root = repo({
       "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
-      "docs/02-constructs/01-core/rungs.md": chapter("Rungs", "rungs", AGREES),
+      [`docs/${SEAT.constructs}/01-core/rungs.md`]: chapter("Rungs", "rungs", AGREES),
     });
     one("a value no source realizes yet is reported nowhere",
-      run(root, ["audit", "docs/02-constructs/01-core/rungs.md"]), lacks("vocabulary"));
+      run(root, ["audit", `docs/${SEAT.constructs}/01-core/rungs.md`]), lacks("vocabulary"));
   }
 
   {
@@ -617,11 +618,11 @@ console.log("=== a closed value is declared once, and agrees with what realizes 
     // drift, which is what the rule exists to prevent.
     const root = repo({
       "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
-      "docs/02-constructs/01-core/rungs.md": chapter("Rungs", "rungs", AGREES),
-      "docs/02-constructs/01-core/again.md": chapter("Again", "again", AGREES),
+      [`docs/${SEAT.constructs}/01-core/rungs.md`]: chapter("Rungs", "rungs", AGREES),
+      [`docs/${SEAT.constructs}/01-core/again.md`]: chapter("Again", "again", AGREES),
     });
     one("one value declared in two chapters is reported",
-      run(root, ["audit", "docs/02-constructs/01-core/rungs.md", "docs/02-constructs/01-core/again.md"]),
+      run(root, ["audit", `docs/${SEAT.constructs}/01-core/rungs.md`, `docs/${SEAT.constructs}/01-core/again.md`]),
       has("is declared in 2 chapters"));
   }
 
@@ -629,11 +630,11 @@ console.log("=== a closed value is declared once, and agrees with what realizes 
     // Named in Terms, declared nowhere — the state 51 chapters were in when this was written.
     const root = repo({
       "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
-      "docs/02-constructs/01-core/rungs.md": chapter("Rungs", "rungs", "No declaration here.\n"),
-      "docs/02-constructs/01-core/other.md": chapter("Other", "other", "Nor here.\n"),
+      [`docs/${SEAT.constructs}/01-core/rungs.md`]: chapter("Rungs", "rungs", "No declaration here.\n"),
+      [`docs/${SEAT.constructs}/01-core/other.md`]: chapter("Other", "other", "Nor here.\n"),
     });
     one("a contract term no chapter declares is reported",
-      run(root, ["audit", "docs/02-constructs/01-core/rungs.md", "docs/02-constructs/01-core/other.md"]),
+      run(root, ["audit", `docs/${SEAT.constructs}/01-core/rungs.md`, `docs/${SEAT.constructs}/01-core/other.md`]),
       has("`SPRungType` is named as a contract term and no chapter declares"));
   }
 
@@ -643,15 +644,15 @@ console.log("=== a closed value is declared once, and agrees with what realizes 
     // found the day this check was written — each naming a vocabulary the contract had deleted.
     const root = repo({
       "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
-      "docs/02-constructs/01-core/rungs.md":
+      [`docs/${SEAT.constructs}/01-core/rungs.md`]:
         doc({ id: "rungs", parentId: "concept", title: "Rungs", variant: "construct", lenses: ["ARCHITECT"],
               status: "PLANNING", dependsOn: [] },
             "## Overview\n\nWhy it exists.\n\n## Terms\n\n| Term | Contract term | What it means |\n| --- | --- | --- |\n| Alone | `SPRungType.UNIT` | proven with nothing running |\n\n## Model\n\nThe model.\n\n## Parts\n\nNo declaration here.\n\n## Boundary\n\nIt stops here.\n\n## Binds\n\n| Rule | What it decides | Weight |\n| --- | --- | --- |\n| `RD.DEVEX.WORKSPACE.165` | one place | MUST |\n\n| Repo | Node | What it realizes | State |\n| --- | --- | --- | --- |\n| t | thing-ts | the enum | planned |\n\n## Proof\n\nNothing yet.\n",
             "`For: Architect` · `Status: 🔮 PLANNING`"),
-      "docs/02-constructs/01-core/other.md": chapter("Other", "other", "Nor here.\n"),
+      [`docs/${SEAT.constructs}/01-core/other.md`]: chapter("Other", "other", "Nor here.\n"),
     });
     one("a member reference names its type, and an undeclared one is reported",
-      run(root, ["audit", "docs/02-constructs/01-core/rungs.md", "docs/02-constructs/01-core/other.md"]),
+      run(root, ["audit", `docs/${SEAT.constructs}/01-core/rungs.md`, `docs/${SEAT.constructs}/01-core/other.md`]),
       has("`SPRungType` is named as a contract term"));
   }
 
@@ -659,10 +660,10 @@ console.log("=== a closed value is declared once, and agrees with what realizes 
     // One page cannot see the corpus, so it must not accuse another chapter of not existing.
     const root = repo({
       "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
-      "docs/02-constructs/01-core/rungs.md": chapter("Rungs", "rungs", "No declaration here.\n"),
+      [`docs/${SEAT.constructs}/01-core/rungs.md`]: chapter("Rungs", "rungs", "No declaration here.\n"),
     });
     one("one page audited alone never claims a value is undeclared",
-      run(root, ["audit", "docs/02-constructs/01-core/rungs.md"]), lacks("no chapter declares"));
+      run(root, ["audit", `docs/${SEAT.constructs}/01-core/rungs.md`]), lacks("no chapter declares"));
   }
 
   {
@@ -671,10 +672,10 @@ console.log("=== a closed value is declared once, and agrees with what realizes 
     const root = repo({
       "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
       "packages/thing-ts/src/rungs.ts": SOURCE,
-      "docs/02-constructs/01-core/rungs.md": chapter("Rungs", "rungs",
+      [`docs/${SEAT.constructs}/01-core/rungs.md`]: chapter("Rungs", "rungs",
         "```ts\nexport enum SPRungType {\n  UNIT = 'UNIT',  // alone\n}\n```"),
     });
-    const got = run(root, ["audit", "docs/02-constructs/01-core/rungs.md"]);
+    const got = run(root, ["audit", `docs/${SEAT.constructs}/01-core/rungs.md`]);
     one("a disagreement reports rather than refuses", got, has("SOFT vocabulary"));
     one("and it is counted among the soft findings", got, has("0 RULE, 1 SOFT"));
   }
@@ -691,16 +692,16 @@ console.log("\n=== a domain overview borrows from its DOMAIN, not from the conce
     "## Boundary\n\nx\n", "`For: Architect` · `Status: 🔮 PLANNING`");
   const tree = (sections) => ({
     "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
-    "docs/02-constructs/README.md": doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
-    "docs/02-constructs/01-core/README.md": doc({ id: "core", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
-    "docs/02-constructs/01-core/01-beta.md": seat("beta", "Beta", ["gamma"]),
-    "docs/02-constructs/01-core/02-gamma.md": seat("gamma", "Gamma", []),
-    "docs/artifacts/overviews/concept-core-overview.html":
+    [`docs/${SEAT.constructs}/README.md`]: doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    [`docs/${SEAT.constructs}/01-core/README.md`]: doc({ id: "core", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    [`docs/${SEAT.constructs}/01-core/01-beta.md`]: seat("beta", "Beta", ["gamma"]),
+    [`docs/${SEAT.constructs}/01-core/02-gamma.md`]: seat("gamma", "Gamma", []),
+    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-core-overview.html`]:
       `<meta charset="utf-8">\n<title>Core</title>\n` +
       block({ id: "o", variant: "overview", parentId: "concept", title: "Core", lenses: ["ARCHITECT"], summary: "s." }) +
       sections.map((h) => `<h2>${h}</h2>\n<p>x</p>`).join("\n"),
   });
-  const audit = (secs) => run(repo(tree(secs)), ["audit", "docs/artifacts/overviews/concept-core-overview.html"]);
+  const audit = (secs) => run(repo(tree(secs)), ["audit", `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-core-overview.html`]);
 
   // ASSERT ON THE FINDING UNDER TEST, never on the absence of every finding: this fixture carries
   // no `<header>`, so `checkHeader` fires on it and a bare `lacks("✗")` was failing for a reason
@@ -730,19 +731,19 @@ console.log("\n=== an HTML page links the HTML page, never the markdown seat (Q2
     `<h2>Overview</h2>\n<p>See <a href="${href}">it</a>.</p>\n<h2>Glossary</h2>\n<p>x</p>\n<h2>Where to go next</h2>\n<p>x</p>`;
   const mk = (href) => repo({
     "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
-    "docs/02-constructs/01-core/thing.md": "# Thing\n",
-    "docs/artifacts/overviews/o.html": page(href),
+    [`docs/${SEAT.constructs}/01-core/thing.md`]: "# Thing\n",
+    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/o.html`]: page(href),
   });
   one("a link to a construct SEAT is refused, and it names the page it should have used",
-    run(mk("../../02-constructs/01-core/thing.md"), ["audit", "docs/artifacts/overviews/o.html"]),
+    run(mk(`../../${SEAT.constructs}/01-core/thing.md`), ["audit", `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/o.html`]),
     has("thing-construct.html"));
   one("a link to the produced page is silent",
-    run(mk("../constructs/01-core/thing-construct.html"), ["audit", "docs/artifacts/overviews/o.html"]),
+    run(mk(`../${ARTIFACT.constructs}/01-core/thing-construct.html`), ["audit", `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/o.html`]),
     lacks("an HTML page links the HTML page"));
   // A SEAT README IS PRODUCED AS NO PAGE AT ALL, so a link to one has nowhere else to go. Refusing
   // it would be a gate demanding a file the generator never writes.
   one("a link to a seat README keeps its .md, because no page exists for it",
-    run(mk("../../02-constructs/README.md"), ["audit", "docs/artifacts/overviews/o.html"]),
+    run(mk(`../../${SEAT.constructs}/README.md`), ["audit", `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/o.html`]),
     lacks("an HTML page links the HTML page"));
 }
 
@@ -755,7 +756,7 @@ console.log("\n=== a data model is read against its fixed outline, and reports s
   const good = "The tables below mirror `src/migrations`.\n\n## Tables\n\n| Table | Stores | The rule it keeps |\n| --- | --- | --- |\n" +
     "| `sp_session` | `SPSession` | one row per live access |\n\n## Indexes\n\n| Index | Why it exists |\n| --- | --- |\n" +
     "| `sp_session_org_idx` | a sign-out ends every session of one organization |\n";
-  const at = "docs/04-capabilities/01-core/module-server-core-ts/data-model.md";
+  const at = `docs/${SEAT.capabilities}/01-core/module-server-core-ts/data-model.md`;
   const mk = (path, text) => repo({ "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n", [path]: text });
 
   one("a data model in the shape, beside its package, is clean",
@@ -773,7 +774,7 @@ console.log("\n=== a data model is read against its fixed outline, and reports s
     run(mk(at, dm(good + "\n## Seeds and order\n\nThe roles migration runs first.\n")), ["audit", at]), has("clean — 1 page"));
   one("a section the outline does not have is named",
     run(mk(at, dm(good + "\n## Environment Variables\n\nNone.\n")), ["audit", at]), has("the data_model outline does not have: Environment Variables"));
-  const root = "docs/04-capabilities/01-core/data-model.md";
+  const root = `docs/${SEAT.capabilities}/01-core/data-model.md`;
   one("a data model at a domain's root sits above the half that owns the storage",
     run(mk(root, dm(good)), ["audit", root]), has("at a domain's root it sits above the half that owns the storage"));
   const bare = doc({ id: "dm", title: "Contract Terms", lenses: ["SERVER_DEV"], status: "DONE" }, good, "`For: Backend developer` · `Status: ✅ DONE`");
@@ -790,7 +791,7 @@ console.log("\n=== a surface map carries one table per ui/ folder, and a surface
     "| `useIdentityFactors` | hook | `IdentityFactor` | reads the factors a person has |\n\n" +
     "## layout\n\n| Surface | Kind | Contract term | What it is for |\n| --- | --- | --- | --- |\n" +
     "| `DSButton` | component | — | a button |\n";
-  const at = "docs/04-capabilities/01-core/module-web-core-ts/surface-map.md";
+  const at = `docs/${SEAT.capabilities}/01-core/module-web-core-ts/surface-map.md`;
   const mk = (text) => repo({ "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n", [at]: text });
   one("a surface map in the shape is clean", run(mk(sm(good)), ["audit", at]), has("clean — 1 page"));
   one("a kind outside the four is named",
@@ -805,7 +806,7 @@ console.log("\n=== a generated column is read against its own heading (N37 step 
   const face = (region) => doc({ id: "c", title: "Core", lenses: ["ARCHITECT"] }, "Lead.\n\n" +
     "<!-- spn:generated glossary — do not edit inside these markers; `docs.ts face` writes it -->\n" + region + "<!-- /spn:generated -->\n",
     "`For: Architect`");
-  const at = "docs/02-constructs/01-core/README.md";
+  const at = `docs/${SEAT.constructs}/01-core/README.md`;
   const mk = (region) => repo({ "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n", [at]: face(region) });
   const good = "| Term | Contract term | What it means |\n| --- | --- | --- |\n| **Session** | | |\n" +
     "| [sign-in](session.md) | `SPSession` | one person's live access |\n| [device](session.md) | — | the client a session opened from |\n";
@@ -830,23 +831,21 @@ console.log("\n=== an authored page defines no selector its declared template do
 {
   // THE REAL TEMPLATES, copied untouched. A fixture stylesheet would prove the reader agrees with
   // the fixture; the figure this check exists to produce is measured against these files.
-  const templates = resolve(PLUGIN, "..", "..", "..",
-                            "spn-foundation", "docs", "04-capabilities", "01-devex",
-                            "04-workspace", "04-docs", "templates");
+  const templates = bookTemplatesDir(resolve(PLUGIN, "..", "..", "..", "spn-foundation"));
   process.env.SPN_TEMPLATES = templates;
   const overview = readFileSync(resolve(templates, "pages", "overview-template.html"), "utf8");
   const hub = readFileSync(resolve(templates, "pages", "hub-template.html"), "utf8");
   const invent = (page, css) => page.replace("</style>", `${css}\n</style>`);
   const ws = repo({
-    "docs/artifacts/overviews/concept-core-overview.html": overview,
-    "docs/artifacts/overviews/concept-bad-overview.html": invent(overview, "  .invented-hero > .lede{margin:0}"),
-    "docs/artifacts/overviews/concept-media-overview.html":
+    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-core-overview.html`]: overview,
+    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-bad-overview.html`]: invent(overview, "  .invented-hero > .lede{margin:0}"),
+    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-media-overview.html`]:
       invent(overview, "  @media (max-width:40rem){ .only-narrow, .tile{padding:0} }\n  @keyframes spin{from{opacity:0}to{opacity:1}}"),
-    "docs/artifacts/overviews/concept-overview.html": hub,
-    "docs/artifacts/overviews/concept-glyph-overview.html": invent(overview, "  .tile .glyph{float:right}"),
-    "docs/artifacts/overviews/concept-late-overview.html": overview + "\n<style>\n  .late-block{color:red}\n</style>\n",
+    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-overview.html`]: hub,
+    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-glyph-overview.html`]: invent(overview, "  .tile .glyph{float:right}"),
+    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-late-overview.html`]: overview + "\n<style>\n  .late-block{color:red}\n</style>\n",
   });
-  const got = (p) => run(ws, ["audit", `docs/artifacts/overviews/${p}`]);
+  const got = (p) => run(ws, ["audit", `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/${p}`]);
 
   one("an untouched copy of the overview template is not reported", got("concept-core-overview.html"), lacks("SOFT selector"));
   one("an untouched copy of the hub template is not reported", got("concept-overview.html"), lacks("SOFT selector"));
@@ -873,12 +872,12 @@ console.log("\n=== the masthead: h1, an optional p.subtitle, one p.standfirst, a
 {
   const page = (inner, file = "concept-core-overview.html") => repo({
     "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
-    [`docs/artifacts/overviews/${file}`]:
+    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/${file}`]:
       `<meta charset="utf-8">\n<title>Core</title>\n` +
       block({ id: "o", variant: "overview", parentId: "concept", title: "Core", lenses: ["ARCHITECT"], summary: "s." }) +
       `<header class="masthead">\n<!-- a comment <p>is not a paragraph</p> -->\n${inner}\n</header>\n<h2>Overview</h2>\n<p>x</p>`,
   });
-  const audit = (inner, file) => run(page(inner, file), ["audit", `docs/artifacts/overviews/${file ?? "concept-core-overview.html"}`]);
+  const audit = (inner, file) => run(page(inner, file), ["audit", `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/${file ?? "concept-core-overview.html"}`]);
   const GOOD = `<h1>Know where you are.</h1>\n<p class="subtitle">The core is the part every other part reads.</p>\n<p class="standfirst">This page covers the core. Read it first.</p>`;
 
   one("h1, one Subtitle and one Description draw no masthead finding", audit(GOOD), lacks("masthead"));
@@ -907,13 +906,13 @@ console.log("\n=== the masthead: h1, an optional p.subtitle, one p.standfirst, a
     "The statement below it reads *the probe's own subtitle, read from the row*. | why | 2026-09 |\n";
   const hub = (h1, sub, row = ROW) => repo({
     "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
-    "docs/registers/decisions.md": "# Decisions\n\n| ID | Area | Decision | Why | When |\n| --- | --- | --- | --- | --- |\n" + row,
-    "docs/artifacts/overviews/concept-overview.html":
+    [`docs/${POCKET.registers}/decisions.md`]: "# Decisions\n\n| ID | Area | Decision | Why | When |\n| --- | --- | --- | --- | --- |\n" + row,
+    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-overview.html`]:
       `<meta charset="utf-8">\n<title>Concept</title>\n` +
       block({ id: "o", variant: "overview", parentId: "concept", title: "Concept", lenses: ["ARCHITECT"], summary: "s." }) +
       `<header class="masthead">\n<h1>${h1}</h1>\n<p class="subtitle">${sub}</p>\n<p class="standfirst">This page is the start.</p>\n</header>\n<h2>Overview</h2>\n<p>x</p>`,
   }, { type: "FOUNDATION" });
-  const audit = (...a) => run(hub(...a), ["audit", "docs/artifacts/overviews/concept-overview.html"]);
+  const audit = (...a) => run(hub(...a), ["audit", `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-overview.html`]);
   one("the hub's pair, word for word from the register's row, is silent",
     audit("Only this probe&rsquo;s own title.", "The probe's own subtitle, read from the row."), lacks("RD.DEVEX.WORKSPACE.143"));
   one("a hub Title that is not the row's is SOFT, and quotes the row",

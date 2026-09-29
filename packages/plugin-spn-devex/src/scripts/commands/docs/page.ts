@@ -8,13 +8,14 @@
 
 import { basename, join, relative, resolve } from "node:path";
 import { begin, record, end } from "../../lib/timing.ts";
+import { bookTemplatesDir } from "../../lib/docs-tree.ts";
 import { pageFor, resolveWorkspace, seatPaths } from "./_lib.ts";
 
 export const describe = "produce each construct page from its seat file";
 
 function body(args: string[], workspace: string): number {
   const templates = process.env.SPN_TEMPLATES
-    ?? join(resolve(workspace), "spn-foundation", "docs", "04-capabilities", "01-devex", "04-workspace", "04-docs", "templates");
+    ?? bookTemplatesDir(join(resolve(workspace), "spn-foundation"));
   const check = args.includes("--check");
   const seats = seatPaths(args);
   const f = seats.flatMap((p) => pageFor(p, resolve(workspace), templates, !check));

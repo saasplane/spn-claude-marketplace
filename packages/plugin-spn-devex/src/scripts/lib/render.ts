@@ -10,11 +10,12 @@
 // closed — headings, paragraphs, tables, lists, fenced blocks — and a dependency would have to be
 // installed on a partner's machine to read a document.
 
-import { basename, dirname, relative, resolve } from "node:path";
+import { dirname, relative, resolve } from "node:path";
 import { existsSync } from "node:fs";
 
 import { draw, type Spec } from "./draw.ts";
 import { colour } from "./figures.ts";
+import { isSeatFile, producedPageOf } from "./docs-tree.ts";
 
 export type Finding = { message: string; line?: number };
 
@@ -65,8 +66,7 @@ export function hrefForPage(seat: string, out: string): (href: string) => string
     const frag = hash < 0 ? "" : href.slice(hash);
     if (!path) return href;
     let target = resolve(seatDir, path);
-    if (/\/02-constructs\/.*\.md$/.test(target) && basename(target) !== "README.md")
-      target = target.replace("/02-constructs/", "/artifacts/constructs/").replace(/\.md$/, "-construct.html");
+    if (isSeatFile(target)) target = producedPageOf(target);
     const rel = relative(outDir, target);
     return (rel.startsWith(".") ? rel : `./${rel}`) + frag;
   };

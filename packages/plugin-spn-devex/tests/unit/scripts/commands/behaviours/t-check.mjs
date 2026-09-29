@@ -7,6 +7,7 @@ import { execFileSync } from "node:child_process";
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
+import { SEAT } from "../../../../../src/scripts/lib/docs-tree.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "commands", "behaviours", "check.ts");
 const kept = [];
@@ -25,7 +26,7 @@ const repo = (rows, runs = []) => {
   kept.push(root);
   const write = (path, body) => { mkdirSync(dirname(join(root, path)), { recursive: true }); writeFileSync(join(root, path), body, "utf8"); };
   write("sprepo.json", '{"type":"APPS","config":{"mtype":"APPS","stack":"TS"}}\n');
-  write("docs/03-behaviors/login.md", [
+  write(`docs/${SEAT.behaviors}/login.md`, [
     "| Id | Who | Does | Sees | Type | Tier | Status | Updated at | Realizes |",
     "| --- | --- | --- | --- | --- | --- | --- | --- | --- |",
     ...rows.map(([id, tier, status, type = "POSITIVE"]) => `| ${id} | a person | signs in | in | ${type} | ${tier} | ${status} | — | account |`),

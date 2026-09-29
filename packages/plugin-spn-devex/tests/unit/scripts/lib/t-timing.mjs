@@ -6,6 +6,7 @@ import { join } from "node:path";
 import { LIB } from "../../../helpers/harness.mjs";
 import { workspace } from "../../../helpers/fixture.mjs";
 import { tagsOf } from "../../../../src/scripts/lib/timing.ts";
+import { WORKSTREAMS } from "../../../../src/scripts/lib/docs-tree.ts";
 
 let total = 0, failed = 0;
 const same = (label, got, expected) => {
@@ -15,7 +16,7 @@ const same = (label, got, expected) => {
   console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok ? "" : `\n        got ${JSON.stringify(got)}\n        expected ${JSON.stringify(expected)}`}`);
 };
 
-const WS = "/opt/work/saasplane/code/.spndevex/workstreams/open/008-plain-language";
+const WS = `/opt/work/saasplane/code/.spndevex/${WORKSTREAMS}/open/008-plain-language`;
 const tags = (workstream, arc, order, agent = null) => ({ workstream, arc, order, agent });
 
 console.log("=== tagsOf — the work a tool call touches");
@@ -35,7 +36,7 @@ same("a command is read for paths too, and the most specific wins",
   tagsOf({ tool_input: { command: `cat ${WS}/plain-language-approach.html '${WS}/arcs/N116-r2.md' && rg x ${WS}/notes/N116/orders/B5-state.md` } }),
   tags("008-plain-language", "N116", "B5-state"));
 same("backlog and closed are workstreams too",
-  tagsOf({ tool_input: { file_path: "/w/.spndevex/workstreams/closed/003-cloud-day-0/arcs/N2-x.md" } }),
+  tagsOf({ tool_input: { file_path: `/w/.spndevex/${WORKSTREAMS}/closed/003-cloud-day-0/arcs/N2-x.md` } }),
   tags("003-cloud-day-0", "N2", null));
 same("a relative arc path counts when the call runs inside a workstream",
   tagsOf({ cwd: WS, tool_input: { command: "sed -n 1,20p arcs/N116-r2-the-devex-release.md" } }),

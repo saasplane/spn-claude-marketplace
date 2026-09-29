@@ -29,6 +29,7 @@
 
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { basename, isAbsolute, join, relative, resolve } from "node:path";
+import { workstreamsDir } from "../lib/docs-tree.ts";
 import { DEVEX, emit, isDir, listdir, read, readPayload, runAlone, workspaceRoot,
          type Payload, type Verdict } from "../lib/payload.ts";
 
@@ -41,7 +42,7 @@ const GO = /^\s*-\s*\*\*\d{4}-\d{2}-\d{2}\s*[—-]\s*go\b/im;
 
 /** Every folder under `workstreams/open/`, which is the state that means available now. */
 function openWorkstreams(root: string): string[] {
-  const folder = join(root, DEVEX, "workstreams", "open");
+  const folder = workstreamsDir(root, "open");
   return listdir(folder).map((name) => join(folder, name)).filter(isDir);
 }
 

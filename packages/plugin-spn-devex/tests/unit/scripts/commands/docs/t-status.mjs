@@ -7,6 +7,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from "nod
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
+import { SEAT } from "../../../../../src/scripts/lib/docs-tree.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
 const BASE = mkdtempSync(join(tmpdir(), "t-docs-status-"));
@@ -69,18 +70,18 @@ console.log("=== a construct's status rolls up the behaviour rows at its own pat
   // THE KNOWN-BAD IS BAD IN THE DERIVATION'S OWN TERMS: the block claims a word the rows do not
   // carry. A generic wrong-looking page proves nothing here, because the only input is the rows.
   const tree = (rows, status = "PLANNING") => ({
-    "docs/02-constructs/01-core/01-boot.md":
+    [`docs/${SEAT.constructs}/01-core/01-boot.md`]:
       seat("c-boot").replace('"status": "PLANNING"', `"status": "${status}"`),
-    "docs/03-behaviors/01-core/01-boot.md": register("b-boot", rows),
+    [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: register("b-boot", rows),
   });
-  const derived = (root) => run(root, ["status", "--check", "docs/02-constructs/01-core/01-boot.md"]);
+  const derived = (root) => run(root, ["status", "--check", `docs/${SEAT.constructs}/01-core/01-boot.md`]);
 
   one("every row PLANNED derives PLANNING",
     derived(repo(tree([["CORE.BOOT.01", "x", "UNIT", "PLANNED"]]))), has("current") );
   // THE LINE SAYS WHAT IT READ. A derived word with no input named is a claim a reader cannot check.
   one("and the line names the row count and the file the rows came from",
     derived(repo(tree([["CORE.BOOT.01", "x", "UNIT", "PLANNED"]]))),
-    (g) => /PLANNING from 1 row\(s\) in /.test(g) && /03-behaviors\/01-core\/01-boot/.test(g));
+    (g) => /PLANNING from 1 row\(s\) in /.test(g) && g.includes(`${SEAT.behaviors}/01-core/01-boot`));
 
   one("a file with no rows at all derives PLANNING — an empty register is honest",
     derived(repo(tree([]))), has("PLANNING"));
@@ -108,8 +109,8 @@ console.log("=== a construct's status rolls up the behaviour rows at its own pat
   // A ROLL-UP OVER A FENCED EXAMPLE IS A ROLL-UP OVER SOMEBODY ELSE'S ROWS.
   one("a proven row inside a fence does not lift the status",
     derived(repo({
-      "docs/02-constructs/01-core/01-boot.md": seat("c-boot"),
-      "docs/03-behaviors/01-core/01-boot.md": register("b-boot", [["CORE.BOOT.01", "x", "UNIT", "PLANNED"]]) +
+      [`docs/${SEAT.constructs}/01-core/01-boot.md`]: seat("c-boot"),
+      [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: register("b-boot", [["CORE.BOOT.01", "x", "UNIT", "PLANNED"]]) +
         "\n```markdown\n| Id | Who | Does | Sees | Where | Type | Tier | Status | Updated at |\n" +
         "| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n" +
         "| CORE.BOOT.09 | A person | y | z | pkg-ts | POSITIVE | UNIT | SUCCESS | — |\n```\n",
@@ -122,11 +123,11 @@ console.log("=== a construct's status rolls up the behaviour rows at its own pat
   // THE REALIZATION TABLE IS NOT AN INPUT ANY MORE. A construct whose Binds says every row is done
   // still derives PLANNING when nothing has run — which is the whole point of `E`.
   const bindsDone = {
-    "docs/02-constructs/01-core/01-boot.md": seat("c-boot", {
+    [`docs/${SEAT.constructs}/01-core/01-boot.md`]: seat("c-boot", {
       binds: "| Repo | Node | What it realizes | State |\n| --- | --- | --- | --- |\n| t | pkg-ts | it | done |\n",
       proof: "| Check | Kind | What a green run shows |\n| --- | --- | --- |\n| `spnutils apps test` | gate | it |\n",
     }),
-    "docs/03-behaviors/01-core/01-boot.md": register("b-boot", [["CORE.BOOT.01", "x", "UNIT", "PLANNED"]]),
+    [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: register("b-boot", [["CORE.BOOT.01", "x", "UNIT", "PLANNED"]]),
   };
   one("a done realization row no longer lifts the status — only a run does",
     derived(repo(bindsDone)), has("current"));
@@ -134,15 +135,15 @@ console.log("=== a construct's status rolls up the behaviour rows at its own pat
   // AN ABSENT FILE AND AN EMPTY ONE ARE DIFFERENT ANSWERS, and stamping PLANNING for both would
   // report a measurement where there was no input.
   one("no behaviours file at the mirrored path claims nothing, and says so",
-    derived(repo({ "docs/02-constructs/01-core/01-boot.md": seat("c-boot") })),
+    derived(repo({ [`docs/${SEAT.constructs}/01-core/01-boot.md`]: seat("c-boot") })),
     (g) => /no behaviours file at this construct's own path/.test(g) && !/derive/.test(g));
 }
 
 console.log("\n=== a FOUNDATION construct derives no status at all");
 {
   const book = (extra = {}) => repo({
-    "docs/02-constructs/01-core/01-boot.md": seat("c-boot"),
-    "docs/03-behaviors/01-core/01-boot.md": doc(
+    [`docs/${SEAT.constructs}/01-core/01-boot.md`]: seat("c-boot"),
+    [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: doc(
       { id: "b-boot", variant: "behaviors", title: "b-boot", lenses: ["QA"], status: "PLANNING" },
       "| Id | Who | Does | Sees | Type |\n| --- | --- | --- | --- | --- |\n" +
       "| CORE.BOOT.01 | A person | can boot | a result | PROMISE |\n"),
@@ -151,49 +152,49 @@ console.log("\n=== a FOUNDATION construct derives no status at all");
 
   const root = book();
   one("the check names the word the page carries and nothing derives",
-    run(root, ["status", "--check", "docs/02-constructs/01-core/01-boot.md"]),
+    run(root, ["status", "--check", `docs/${SEAT.constructs}/01-core/01-boot.md`]),
     has("carries no `status`"));
 
-  run(root, ["status", "docs/02-constructs/01-core/01-boot.md"]);
-  const after = readAt(root, "docs/02-constructs/01-core/01-boot.md");
+  run(root, ["status", `docs/${SEAT.constructs}/01-core/01-boot.md`]);
+  const after = readAt(root, `docs/${SEAT.constructs}/01-core/01-boot.md`);
   one("a write strips the field from the block", after, lacks('"status"'));
   one("and strips the chip from the tag line", after, lacks("Status:"));
   one("and leaves the For line standing", after, has("`For: Architect`"));
-  one("running it again is quiet", run(root, ["status", "--check", "docs/02-constructs/01-core/01-boot.md"]),
+  one("running it again is quiet", run(root, ["status", "--check", `docs/${SEAT.constructs}/01-core/01-boot.md`]),
     lacks("carries no `status`"));
 
   // `status` AS THE FIRST KEY IS THE EDGE THE COMMA RULE EXISTS FOR. Taking the leading comma
   // unconditionally leaves `{ , "id": …` and the block stops parsing at all.
   const first = repo({
-    "docs/02-constructs/01-core/01-boot.md": "<!-- spn:doc\n" +
+    [`docs/${SEAT.constructs}/01-core/01-boot.md`]: "<!-- spn:doc\n" +
       JSON.stringify({ status: "PLANNING", id: "c-boot", variant: "construct", title: "c-boot",
                        lenses: ["ARCHITECT"], dependsOn: [], summary: "What c-boot is." }, null, 2) +
       "\n-->\n\n# c-boot\n\n`For: Architect` · `Status: 🔮 PLANNING`\n\n" +
       "## Overview\n\nwhy\n\n## Terms\n\nt\n\n## Model\n\nm\n\n## Parts\n\np\n\n## Boundary\n\nb\n",
-    "docs/03-behaviors/01-core/01-boot.md": register("b", []),
+    [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: register("b", []),
   }, { type: "FOUNDATION" });
-  run(first, ["status", "docs/02-constructs/01-core/01-boot.md"]);
+  run(first, ["status", `docs/${SEAT.constructs}/01-core/01-boot.md`]);
   one("stripping a leading `status` leaves a block that still parses",
-    run(first, ["audit", "docs/02-constructs/01-core/01-boot.md"]), lacks("spn:doc"));
-  one("and the field is gone", readAt(first, "docs/02-constructs/01-core/01-boot.md"), lacks('"status"'));
+    run(first, ["audit", `docs/${SEAT.constructs}/01-core/01-boot.md`]), lacks("spn:doc"));
+  one("and the field is gone", readAt(first, `docs/${SEAT.constructs}/01-core/01-boot.md`), lacks('"status"'));
 
   // THE AUDIT DOES NOT SAY IT TOO. `status` owns the fault and fixes it; reporting it from the block
   // check and from the header it renders put 204 findings on the book where there had been one.
   one("the audit stays out of it — one fault, one command",
-    run(book(), ["audit", "docs/02-constructs/01-core/01-boot.md"]), lacks("carries no `status`"));
+    run(book(), ["audit", `docs/${SEAT.constructs}/01-core/01-boot.md`]), lacks("carries no `status`"));
 
   // A CHIP THE BLOCK DOES NOT DECLARE IS A PAGE NOBODY RE-RENDERED, and that is the audit's fault.
-  const stale = repo({ "docs/02-constructs/01-core/01-boot.md":
+  const stale = repo({ [`docs/${SEAT.constructs}/01-core/01-boot.md`]:
     seat("c-boot").replace(/,?\s*"status": "PLANNING"/, "") }, { type: "FOUNDATION" });
   one("a chip left standing over a block with no status is refused",
-    run(stale, ["audit", "docs/02-constructs/01-core/01-boot.md"]),
+    run(stale, ["audit", `docs/${SEAT.constructs}/01-core/01-boot.md`]),
     has("the block declares no status"));
 
   // The same page in an APPS repository still derives a word — the world is what decides.
   one("the rule is the repository's world, not the file's shape",
-    run(repo({ "docs/02-constructs/01-core/01-boot.md": seat("c-boot"),
-               "docs/03-behaviors/01-core/01-boot.md": register("b", [["CORE.BOOT.01", "x", "UNIT", "SUCCESS"]]) }),
-        ["status", "--check", "docs/02-constructs/01-core/01-boot.md"]),
+    run(repo({ [`docs/${SEAT.constructs}/01-core/01-boot.md`]: seat("c-boot"),
+               [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: register("b", [["CORE.BOOT.01", "x", "UNIT", "SUCCESS"]]) }),
+        ["status", "--check", `docs/${SEAT.constructs}/01-core/01-boot.md`]),
     has("derive `DONE`"));
 }
 

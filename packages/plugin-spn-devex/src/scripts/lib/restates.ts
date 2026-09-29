@@ -51,6 +51,7 @@ import { createHash } from "node:crypto";
 import { readdirSync, statSync } from "node:fs";
 import { join, join as joinPath, resolve as resolvePath } from "node:path";
 import { isFile, read } from "./payload.ts";
+import { decisionsRegister, docsOf } from "./docs-tree.ts";
 
 const BLOCK = /<!--\s*spn:restates\s*(\{[\s\S]*?\})\s*-->/;
 /** The whole `spn:restates` comment, for a writer that replaces it with a re-serialized block. */
@@ -299,7 +300,7 @@ export function rowHash(register: string, row: string): string | null {
 
 /** Where a `decisions` citation's register lives — fixed, because every register sits at this path. */
 export function registerPath(workspace: string, repo: string): string {
-  return join(workspace, repo, "docs", "registers", "decisions.md");
+  return decisionsRegister(docsOf(join(workspace, repo)));
 }
 
 /**

@@ -8,11 +8,10 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, rmSyn
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
+import { ARTIFACT, POCKET, SEAT, bookTemplatesDir } from "../../../src/scripts/lib/docs-tree.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
-const TEMPLATES = resolve(PLUGIN, "..", "..", "..",
-                          "spn-foundation", "docs", "04-capabilities", "01-devex",
-                          "04-workspace", "04-docs", "templates");
+const TEMPLATES = bookTemplatesDir(resolve(PLUGIN, "..", "..", "..", "spn-foundation"));
 const BASE = mkdtempSync(join(tmpdir(), "t-seats-"));
 process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
 
@@ -79,18 +78,18 @@ console.log("\n=== the produced page is the seat, and no register row is joined 
   const rows = [["CORE.BOOT.01", "can boot a service", "UNIT", "PLANNED"],
                 ["CORE.BOOT.02", "sees a clean shutdown", "INTEGRATION", "DONE"]];
   const ws = repo({
-    "docs/02-constructs/01-core/01-boot.md": seat("boot"),
-    "docs/03-behaviors/01-core/01-boot.md": register("b", rows),
+    [`docs/${SEAT.constructs}/01-core/01-boot.md`]: seat("boot"),
+    [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: register("b", rows),
   });
-  const before = readAt(ws, "docs/02-constructs/01-core/01-boot.md");
-  const out = run(ws, ["page", "docs/02-constructs/01-core/01-boot.md"]);
-  const page = readAt(ws, "docs/artifacts/constructs/01-core/01-boot-construct.html");
+  const before = readAt(ws, `docs/${SEAT.constructs}/01-core/01-boot.md`);
+  const out = run(ws, ["page", `docs/${SEAT.constructs}/01-core/01-boot.md`]);
+  const page = readAt(ws, `docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/01-boot-construct.html`);
 
   one("no register row reaches the page", page,
       (g) => !g.includes("CORE.BOOT.01") && !g.includes("CORE.BOOT.02"));
   one("and no line claims rows were joined", page, lacks("joined from the register"));
   one("the seat file on disk is untouched by production",
-      readAt(ws, "docs/02-constructs/01-core/01-boot.md"), before);
+      readAt(ws, `docs/${SEAT.constructs}/01-core/01-boot.md`), before);
   one("producing the page raises no proof finding", out, lacks("proof"));
 
   // THE TWO HALVES MUST AGREE ABOUT WHAT THE PAGE IS. `checkProduced` renders the same markdown
@@ -101,7 +100,7 @@ console.log("\n=== the produced page is the seat, and no register row is joined 
   one("and a page that really was hand-edited still is", (() => {
         // The produced page is found rather than named: the renderer decides the file name, and a
         // test that hard-codes it fails for the wrong reason the day that changes.
-        const dir = join(ws, "docs/artifacts/constructs/01-core");
+        const dir = join(ws, `docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core`);
         const f = join(dir, readdirSync(dir).find((x) => x.endsWith(".html")));
         writeFileSync(f, `${readFileSync(f, "utf8")}\n<p>typed in by hand</p>\n`, "utf8");
         return run(ws, ["audit", "docs"]);
@@ -110,12 +109,12 @@ console.log("\n=== the produced page is the seat, and no register row is joined 
 
   // A domain-wide register is not joined either, and nothing reports a fallback that no longer exists.
   const ws2 = repo({
-    "docs/02-constructs/01-core/01-boot.md": seat("boot"),
-    "docs/03-behaviors/01-core/README.md": register("b", rows),
+    [`docs/${SEAT.constructs}/01-core/01-boot.md`]: seat("boot"),
+    [`docs/${SEAT.behaviors}/01-core/README.md`]: register("b", rows),
   });
-  const out2 = run(ws2, ["page", "docs/02-constructs/01-core/01-boot.md"]);
+  const out2 = run(ws2, ["page", `docs/${SEAT.constructs}/01-core/01-boot.md`]);
   one("a domain register reaches no page",
-      readAt(ws2, "docs/artifacts/constructs/01-core/01-boot-construct.html"), lacks("CORE.BOOT.01"));
+      readAt(ws2, `docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/01-boot-construct.html`), lacks("CORE.BOOT.01"));
   one("and no fallback is reported", out2, lacks("because this topic has no file of its own yet"));
 }
 
@@ -123,10 +122,10 @@ console.log("\n=== a behaviour row typed into a seat's Proof is refused");
 {
   const typed = "| Id | Who | Does | Sees | Type | Tier | Status | Updated at |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n| CORE.BOOT.01 | A person | boots | it booted | POSITIVE | UNIT | SUCCESS | — |\n";
   one("a register table in Proof is a RULE — the status lives in one place",
-      run(repo({ "docs/02-constructs/01-core/01-boot.md": seat("boot", { proof: typed }) }), ["audit", "docs"]),
+      run(repo({ [`docs/${SEAT.constructs}/01-core/01-boot.md`]: seat("boot", { proof: typed }) }), ["audit", "docs"]),
       has("`Proof` carries a table of behaviour rows"));
   one("a typed check table is untouched by that rule",
-      run(repo({ "docs/02-constructs/01-core/01-boot.md": seat("boot", {
+      run(repo({ [`docs/${SEAT.constructs}/01-core/01-boot.md`]: seat("boot", {
         proof: "| Check | Kind | What a green run shows |\n| --- | --- | --- |\n| `spnutils apps test unit` | gate | green |\n" }) }), ["audit", "docs"]),
       lacks("carries a table of behaviour rows"));
 }
@@ -139,14 +138,14 @@ console.log("\n=== `figures check` takes a folder, the way `audit` does");
   const page = (svg) => `<h1>p</h1>\n<figure><svg viewBox="0 0 100 60">${svg}</svg></figure>\n`;
   const clean = page('<rect x="10" y="10" width="40" height="20"/>');
   const ws = repo({
-    "docs/artifacts/constructs/01-core/a-construct.html": clean,
-    "docs/artifacts/constructs/01-core/b-construct.html": clean,
+    [`docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/a-construct.html`]: clean,
+    [`docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/b-construct.html`]: clean,
   });
-  const out = run(ws, ["figure", "check", "docs/artifacts/constructs"]);
+  const out = run(ws, ["figure", "check", `docs/${POCKET.artifacts}/${ARTIFACT.constructs}`]);
   one("a folder is every page under it, not a read of the directory", out, lacks("EISDIR"));
   one("and it says how many it judged", out, has("clean — 2 pages"));
   one("a path that is not there is named, not read",
-      run(repo({ "docs/README.md": "# x\n" }), ["figure", "check", "docs/artifacts"]),
+      run(repo({ "docs/README.md": "# x\n" }), ["figure", "check", `docs/${POCKET.artifacts}`]),
       (g) => /no such file or folder/.test(g) && !/ENOENT/.test(g));
   one("an empty folder says so rather than claiming clean",
       run(repo({ "docs/README.md": "# x\n" }, {}), ["figure", "check", "docs"]),
@@ -157,7 +156,7 @@ console.log("\n=== a section is found by its whole name, not by its first word")
 {
   const rows = "| Check | Kind | What a green run shows |\n| --- | --- | --- |\n| `spnutils apps test unit` | gate | green |\n";
   one("`Proof — how you check it` is the Proof section",
-      run(repo({ "docs/02-constructs/01-core/01-boot.md":
+      run(repo({ [`docs/${SEAT.constructs}/01-core/01-boot.md`]:
         seat("boot").replace("## Proof\n", "## Proof — how you check it\n").replace(/## Proof — how you check it\n\nWhat proves it\.\n\n\n/, `## Proof — how you check it\n\n${rows}`) }), ["audit", "docs"]),
       lacks("carries a table of behaviour rows"));
 
@@ -165,11 +164,11 @@ console.log("\n=== a section is found by its whole name, not by its first word")
   // Proof, its glossary rows were judged as proof rows — sixteen false findings on one page.
   const typed = "| Id | Who | Does | Sees | Type | Tier | Status | Updated at |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n| CORE.BOOT.01 | A person | boots | it booted | POSITIVE | UNIT | SUCCESS | — |\n";
   one("`Proof Tiers` is NOT the Proof section",
-      run(repo({ "docs/02-constructs/01-core/01-boot.md":
+      run(repo({ [`docs/${SEAT.constructs}/01-core/01-boot.md`]:
         seat("boot").replace("## Proof\n\nWhat proves it.\n\n\n", `## Proof Tiers\n\n${typed}`) }), ["audit", "docs"]),
       lacks("carries a table of behaviour rows"));
   one("and a real Proof section is still judged",
-      run(repo({ "docs/02-constructs/01-core/01-boot.md":
+      run(repo({ [`docs/${SEAT.constructs}/01-core/01-boot.md`]:
         seat("boot").replace("## Proof\n\nWhat proves it.\n\n\n", `## Proof\n\n${typed}`) }), ["audit", "docs"]),
       has("carries a table of behaviour rows"));
 }
@@ -186,16 +185,16 @@ console.log("\n=== a spec that draws nothing is a finding, not a silence");
   const good = '{ "kind": "map", "caption": "the two boxes and the link between them", "boxes": [{ "id": "a", "label": "A" }, { "id": "b", "label": "B" }], "links": [{ "from": "a", "to": "b", "label": "to" }] }';
 
   one("a seat whose spec draws is clean",
-      run(repo({ "docs/02-constructs/01-core/01-boot.md": withSpec(good) }), ["figure", "check", "docs"]),
+      run(repo({ [`docs/${SEAT.constructs}/01-core/01-boot.md`]: withSpec(good) }), ["figure", "check", "docs"]),
       has("clean — 1 page"));
   one("a retired kind is named, rather than silently drawing nothing",
-      run(repo({ "docs/02-constructs/01-core/01-boot.md": withSpec(good.replace('"map"', '"flow"')) }), ["figure", "check", "docs"]),
+      run(repo({ [`docs/${SEAT.constructs}/01-core/01-boot.md`]: withSpec(good.replace('"map"', '"flow"')) }), ["figure", "check", "docs"]),
       (g) => /spec1:/.test(g) && /flow/.test(g));
   one("a spec that is not valid JSON says so",
-      run(repo({ "docs/02-constructs/01-core/01-boot.md": withSpec('{ "kind": "map", oops }') }), ["figure", "check", "docs"]),
+      run(repo({ [`docs/${SEAT.constructs}/01-core/01-boot.md`]: withSpec('{ "kind": "map", oops }') }), ["figure", "check", "docs"]),
       has("not valid JSON"));
   one("and the finding names which spec on the page",
-      run(repo({ "docs/02-constructs/01-core/01-boot.md": withSpec(good) + "\n" + withSpec(good.replace('"map"', '"flow"')) }), ["figure", "check", "docs"]),
+      run(repo({ [`docs/${SEAT.constructs}/01-core/01-boot.md`]: withSpec(good) + "\n" + withSpec(good.replace('"map"', '"flow"')) }), ["figure", "check", "docs"]),
       has("spec2:"));
 }
 
@@ -211,7 +210,7 @@ console.log("\n=== a figure that says nothing about itself is refused");
   const mute = `{ "kind": "map", ${boxes} }`;
   const titled = `{ "kind": "map", "title": "a title", ${boxes} }`;
   const captioned = `{ "kind": "map", "caption": "what to notice", ${boxes} }`;
-  const at = (spec) => repo({ "docs/02-constructs/01-core/01-boot.md": withSpec(spec) });
+  const at = (spec) => repo({ [`docs/${SEAT.constructs}/01-core/01-boot.md`]: withSpec(spec) });
   // The exit CODE is half of what a SOFT means, and `run` above reports stdout alone.
   const statusOf = (root, args) => {
     try {
@@ -282,9 +281,9 @@ console.log("\n=== a code file's own RESTATES header is read, and a path that is
   // headers as broken; judging both by name would have hidden all nine renamed ones.
   const bookAt = join(BASE, `hbook${made += 1}`);
   for (const [rel, body] of Object.entries({
-    "docs/registers/decisions.md": "# decisions\n\n| RD.DEVEX.WORKSPACE.118 | a row |\n",
+    [`docs/${POCKET.registers}/decisions.md`]: "# decisions\n\n| RD.DEVEX.WORKSPACE.118 | a row |\n",
     "CONCEPT.md": "# c\n",
-    "docs/04-capabilities/01-devex/05-real.md": "# real\n",
+    [`docs/${SEAT.capabilities}/01-devex/05-real.md`]: "# real\n",
   })) {
     mkdirSync(join(bookAt, rel, ".."), { recursive: true });
     writeFileSync(join(bookAt, rel), body, "utf8");
@@ -295,9 +294,9 @@ console.log("\n=== a code file's own RESTATES header is read, and a path that is
     writeFileSync(join(pluginAt, rel), body, "utf8");
   };
   write("packages/plugin-spn-x/refs/a.md", "# a ref\n");
-  write("packages/plugin-spn-x/hooks/good.ts", "// RESTATES: docs/04-capabilities/01-devex/05-real.md § A part\n");
+  write("packages/plugin-spn-x/hooks/good.ts", `// RESTATES: docs/${SEAT.capabilities}/01-devex/05-real.md § A part\n`);
   write("packages/plugin-spn-x/hooks/bare.ts", "// RESTATES: 05-real.md § A part, named without a path\n");
-  write("packages/plugin-spn-x/hooks/bad.ts", "// RESTATES: docs/04-capabilities/01-gone/05-real.md § A part\n");
+  write("packages/plugin-spn-x/hooks/bad.ts", `// RESTATES: docs/${SEAT.capabilities}/01-gone/05-real.md § A part\n`);
   const drift = (args) => {
     try {
       return { out: execFileSync(process.execPath, [TOOL, "restates", "check", ...args],
@@ -326,7 +325,7 @@ console.log("\n=== a repository is never the book it restates");
   // their own repository's docs and reported 77 drifts that were not drift at all.
   const { findBook } = await import("../../../src/scripts/commands/restates/check.ts");
   const book = (name) => ({
-    [`${name}/docs/registers/decisions.md`]: "# decisions\n",
+    [`${name}/docs/${POCKET.registers}/decisions.md`]: "# decisions\n",
     [`${name}/CONCEPT.md`]: "# c\n",
   });
   const parent = join(BASE, `books${made += 1}`);
@@ -343,7 +342,7 @@ console.log("\n=== a repository is never the book it restates");
   // what a repository CARRIES, and a second book beside you is a candidate. What must never
   // happen is finding yourself.
   const alone = join(BASE, `alone${made += 1}`, "only");
-  for (const [rel, body] of Object.entries({ "docs/registers/decisions.md": "# d\n", "CONCEPT.md": "# c\n" })) {
+  for (const [rel, body] of Object.entries({ [`docs/${POCKET.registers}/decisions.md`]: "# d\n", "CONCEPT.md": "# c\n" })) {
     mkdirSync(join(alone, rel, ".."), { recursive: true });
     writeFileSync(join(alone, rel), body, "utf8");
   }
@@ -358,10 +357,10 @@ console.log("\n=== a code figure names a PATH; a bare file name is a term");
     "# C\n\n`For: Architect` · `Status: ✅ DONE`\n\n" +
     `<p>The manifest <code>${name}</code> declares it:</p>\n<pre>{ "kind": "MODULE_SERVER" }</pre>\n`;
   one("a bare file name is not read as a path to open",
-      run(repo({ "docs/artifacts/constructs/01-core/a-construct.html": withFig("spkind.json") }), ["audit", "docs"]),
+      run(repo({ [`docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/a-construct.html`]: withFig("spkind.json") }), ["audit", "docs"]),
       lacks("no such file exists"));
   one("a real path that is not there is still a RULE",
-      run(repo({ "docs/artifacts/constructs/01-core/a-construct.html": withFig("packages/gone/spkind.json") }), ["audit", "docs"]),
+      run(repo({ [`docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/a-construct.html`]: withFig("packages/gone/spkind.json") }), ["audit", "docs"]),
       has("a figure names `packages/gone/spkind.json`, and no such file exists"));
 }
 
@@ -380,15 +379,15 @@ console.log("\n=== `face` over a capability seat writes the chapters' own shape"
 
   const ws = repo({
     "CONCEPT.md": "# c\n",
-    "docs/02-constructs/01-core/01-boot.md": seat("boot"),
-    "docs/04-capabilities/README.md": face("Capabilities"),
-    "docs/04-capabilities/01-core/README.md": face("Capabilities — core"),
-    "docs/04-capabilities/01-core/pkg-ts/README.md": face("Capabilities — pkg-ts"),
-    "docs/04-capabilities/01-core/pkg-ts/01-boot.md": chapter("01-boot.md", "boot"),
-    "docs/04-capabilities/01-core/pkg-ts/02-log.md": chapter("02-log.md", "log"),
+    [`docs/${SEAT.constructs}/01-core/01-boot.md`]: seat("boot"),
+    [`docs/${SEAT.capabilities}/README.md`]: face("Capabilities"),
+    [`docs/${SEAT.capabilities}/01-core/README.md`]: face("Capabilities — core"),
+    [`docs/${SEAT.capabilities}/01-core/pkg-ts/README.md`]: face("Capabilities — pkg-ts"),
+    [`docs/${SEAT.capabilities}/01-core/pkg-ts/01-boot.md`]: chapter("01-boot.md", "boot"),
+    [`docs/${SEAT.capabilities}/01-core/pkg-ts/02-log.md`]: chapter("02-log.md", "log"),
   });
   run(ws, ["face", "docs"]);
-  const pkgFace = readAt(ws, "docs/04-capabilities/01-core/pkg-ts/README.md");
+  const pkgFace = readAt(ws, `docs/${SEAT.capabilities}/01-core/pkg-ts/README.md`);
 
   // A CHAPTER REALIZES A CONSTRUCT; IT GOVERNS NO SOURCE FOLDER. The mirror-per-folder Map derived
   // `src/01-boot/` from a chapter's file name and named a folder that does not exist.
@@ -400,15 +399,15 @@ console.log("\n=== `face` over a capability seat writes the chapters' own shape"
 
   // The bug a 6b agent found by probing rather than by trusting: the tag-line pattern ended at the
   // Status chip, so a `Realizes:` chip made it miss and write a SECOND tag line under the title.
-  const ch = readAt(ws, "docs/04-capabilities/01-core/pkg-ts/01-boot.md");
+  const ch = readAt(ws, `docs/${SEAT.capabilities}/01-core/pkg-ts/01-boot.md`);
   one("a chapter carrying a Realizes chip keeps exactly one tag line", ch,
       (g) => (g.match(/^`For:/gm) ?? []).length === 1);
   one("and the chip the author added survives the rewrite", ch, has("· `Realizes: boot`"));
-  one("running face twice writes the same bytes", (run(ws, ["face", "docs"]), readAt(ws, "docs/04-capabilities/01-core/pkg-ts/01-boot.md")), ch);
+  one("running face twice writes the same bytes", (run(ws, ["face", "docs"]), readAt(ws, `docs/${SEAT.capabilities}/01-core/pkg-ts/01-boot.md`)), ch);
 
   // A seat-level face is still the older shape, because it lists domains and not chapters.
   one("a seat face is not turned into a chapter list",
-      readAt(ws, "docs/04-capabilities/README.md"), lacks("| Chapter | Realizes |"));
+      readAt(ws, `docs/${SEAT.capabilities}/README.md`), lacks("| Chapter | Realizes |"));
 }
 
 // ---------------------------------------------------------------- the status a run writes (Q107)
@@ -435,7 +434,7 @@ console.log("\n=== the plugins' own run writes the two cells a run owns, and no 
     "| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n" +
     rows.map((r) => `| ${r[0]} | A person | does | sees | pkg | POSITIVE | ${r[1]} | ${r[2]} | ${r[3] ?? "—"} |\n`).join("");
 
-  const ws = repo({ "docs/03-behaviors/01-core/01-boot.md": nine([
+  const ws = repo({ [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: nine([
     ["MKT.DOCS.01", "UNIT", "PLANNED"],
     ["MKT.DOCS.02", "UNIT", "PLANNED"],
     ["MKT.DOCS.03", "UNIT", "MANUAL"],
@@ -447,7 +446,7 @@ console.log("\n=== the plugins' own run writes the two cells a run owns, and no 
     { id: "MKT.DOCS.02", tier: "UNIT", status: "FAILED", title: "[MKT.DOCS.02] it does not" },
     { id: "MKT.DOCS.03", tier: "UNIT", status: "SUCCESS", title: "[MKT.DOCS.03] a hand check" },
   ]));
-  const reg = readAt(ws, "docs/03-behaviors/01-core/01-boot.md");
+  const reg = readAt(ws, `docs/${SEAT.behaviors}/01-core/01-boot.md`);
   one("a nine-cell register is read, not skipped for its width", out, has("MKT.DOCS.01"));
   one("a proven row becomes SUCCESS", reg, (g) => /MKT\.DOCS\.01 \|.*\| SUCCESS \|/.test(g));
   one("a failing case makes the row FAILED, not absent", reg, (g) => /MKT\.DOCS\.02 \|.*\| FAILED \|/.test(g));
@@ -460,23 +459,23 @@ console.log("\n=== the plugins' own run writes the two cells a run owns, and no 
   one("a row nobody proved keeps the date it had", reg, (g) => !/MKT\.DOCS\.04 \|.*2026-09-22/.test(g));
 
   // Read-only by default, and the count is the exit code so a pipeline can gate on drift.
-  const ws2 = repo({ "docs/03-behaviors/01-core/01-boot.md": nine([["MKT.DOCS.01", "UNIT", "PLANNED"]]) });
-  const before = readAt(ws2, "docs/03-behaviors/01-core/01-boot.md");
+  const ws2 = repo({ [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: nine([["MKT.DOCS.01", "UNIT", "PLANNED"]]) });
+  const before = readAt(ws2, `docs/${SEAT.behaviors}/01-core/01-boot.md`);
   let code = 0;
   try {
     execFileSync(process.execPath, [TOOL, "behaviours", "stamp", "--reach", "repository", "--results", results([{ id: "MKT.DOCS.01", tier: "UNIT", status: "SUCCESS", title: "t" }]), ws2], { encoding: "utf8" });
   } catch (e) { code = e.status; }
-  one("without --write nothing on disk changes", readAt(ws2, "docs/03-behaviors/01-core/01-boot.md"), before);
+  one("without --write nothing on disk changes", readAt(ws2, `docs/${SEAT.behaviors}/01-core/01-boot.md`), before);
   one("and the exit code is the number of rows that would change", code, 1);
 
   // One red among several greens is a red row.
-  const ws3 = repo({ "docs/03-behaviors/01-core/01-boot.md": nine([["MKT.DOCS.01", "UNIT", "PLANNED"]]) });
+  const ws3 = repo({ [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: nine([["MKT.DOCS.01", "UNIT", "PLANNED"]]) });
   status(ws3, results([
     { id: "MKT.DOCS.01", tier: "UNIT", status: "SUCCESS", title: "a" },
     { id: "MKT.DOCS.01", tier: "UNIT", status: "FAILED", title: "b" },
   ]));
   one("a row proved by several cases is green only when every one of them is",
-      readAt(ws3, "docs/03-behaviors/01-core/01-boot.md"), (g) => /MKT\.DOCS\.01 \|.*\| FAILED \|/.test(g));
+      readAt(ws3, `docs/${SEAT.behaviors}/01-core/01-boot.md`), (g) => /MKT\.DOCS\.01 \|.*\| FAILED \|/.test(g));
 }
 
 console.log(failed ? `\n  ${failed} of ${n} FAILED` : `\n  all ${n} passed`);

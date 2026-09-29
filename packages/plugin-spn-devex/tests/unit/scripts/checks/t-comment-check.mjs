@@ -15,6 +15,7 @@ import { PLUGIN } from "../../../helpers/harness.mjs";
 
 import { execFileSync } from "node:child_process";
 import { resolve } from "node:path";
+import { SEAT } from "../../../../src/scripts/lib/docs-tree.ts";
 
 const CHECKS = resolve(PLUGIN, "src", "scripts", "checks");
 const FILE = "/repo/packages/module-server-iam-ts/src/app/services/SessionService.ts";
@@ -290,7 +291,7 @@ export declare const x: number;
 `});
 
 one("a markdown write is not a source write", {
-  expect: "silent", path: "/repo/docs/04-capabilities/README.md",
+  expect: "silent", path: `/repo/docs/${SEAT.capabilities}/README.md`,
   source: `
 // This used to be a regular expression.
 `});

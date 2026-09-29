@@ -34,7 +34,8 @@
 
 import { execFileSync } from "node:child_process";
 import { isAbsolute, join } from "node:path";
-import { DEVEX, isDir, listdir, read, workspaceRoot, type Payload, type Verdict } from "../lib/payload.ts";
+import { isDir, listdir, read, workspaceRoot, type Payload, type Verdict } from "../lib/payload.ts";
+import { ARCS, workstreamsDir } from "../lib/docs-tree.ts";
 
 /** `apps release 2.0.0` / `infra release 2.0.0`, however the CLI is spelled to get there. */
 const RELEASE = /\b(apps|infra)\s+release\b([^|;&]*)/;
@@ -105,9 +106,9 @@ export function isMajorBump(next: string, current: string): boolean {
 
 /** Whether any arc in any open workstream records a dated go naming this version. */
 export function goRecorded(root: string, version: string): boolean {
-  const open = join(root, DEVEX, "workstreams", "open");
+  const open = workstreamsDir(root, "open");
   for (const subject of listdir(open)) {
-    const arcs = join(open, subject, "arcs");
+    const arcs = join(open, subject, ARCS);
     if (!isDir(arcs)) continue;
     for (const name of listdir(arcs)) {
       if (!name.endsWith(".md")) continue;

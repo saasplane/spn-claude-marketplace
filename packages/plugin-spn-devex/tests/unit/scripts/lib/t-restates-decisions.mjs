@@ -9,6 +9,7 @@ import { execFileSync } from "node:child_process";
 import {
   check, parse, registerPath, rowHash, rowText, seenHash, undeclared,
 } from "../../../../src/scripts/lib/restates.ts";
+import { POCKET } from "../../../../src/scripts/lib/docs-tree.ts";
 
 let n = 0, failed = 0;
 const one = (label, got, want) => {
@@ -23,7 +24,7 @@ process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
 
 const workspace = join(BASE, "ws");
 const registerFile = registerPath(workspace, "spn-foundation");
-mkdirSync(join(workspace, "spn-foundation", "docs", "registers"), { recursive: true });
+mkdirSync(join(workspace, "spn-foundation", "docs", POCKET.registers), { recursive: true });
 const ROW_LINE = "| RD.SUPPORT.APPS.086 | Scaffold and validate read one profile | prevents two ideas of a node | 2026-09-01 |";
 writeFileSync(registerFile,
   "# Decisions\n\n| # | Decision | Why | Date |\n| --- | --- | --- | --- |\n" +
@@ -121,7 +122,7 @@ console.log("\n=== restates decisions --write — restamps after the developer's
 {
   const devexRoot = join(BASE, "devex-ws");
   mkdirSync(join(devexRoot, ".spndevex"), { recursive: true });
-  mkdirSync(join(devexRoot, "spn-foundation", "docs", "registers"), { recursive: true });
+  mkdirSync(join(devexRoot, "spn-foundation", "docs", POCKET.registers), { recursive: true });
   const reg = registerPath(devexRoot, "spn-foundation");
   writeFileSync(reg, `# Decisions\n\n${ROW_LINE}\n`);
   const refPath2 = join(devexRoot, "ref.md");

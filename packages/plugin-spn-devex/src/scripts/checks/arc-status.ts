@@ -36,6 +36,7 @@
 
 import { basename } from "node:path";
 import { unescape, type Payload, type Verdict } from "../lib/payload.ts";
+import { arcPathPattern } from "../lib/docs-tree.ts";
 
 /** The set, in the order the register states it. The last three are terminal. */
 export const STATUSES = ["PROPOSED", "DECIDED", "RUNNING", "HELD", "PART-LANDED", "LANDED", "CARRIED", "DROPPED"] as const;
@@ -47,8 +48,7 @@ const STATUS_LINE = /^\*{0,2}Status:?\*{0,2}\s*\*{0,2}\s*([A-Z][A-Z-]*)/m;
 
 /** Only an arc file, which is any `.md` directly under a workstream's `arcs/`. */
 export function applies(path: string, command: string): boolean {
-  return /\/workstreams\/[^/]+\/[^/]+\/arcs\/[^/]+\.md$/.test(path)
-      || /\/workstreams\/[^/]+\/[^/]+\/arcs\/[^/]+\.md/.test(command);
+  return arcPathPattern(true).test(path) || arcPathPattern(false).test(command);
 }
 
 /** The status an arc's text declares, or null. */

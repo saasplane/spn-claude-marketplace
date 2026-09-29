@@ -21,6 +21,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, writeFileSync, mkdtempSync, rmSync, renameSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { tmpdir } from "node:os";
+import { ARTIFACT, POCKET, SEAT } from "../../../../../src/scripts/lib/docs-tree.ts";
 
 const TOOL = join(PLUGIN, "src", "scripts", "commands", "docs", "coherence.ts");
 const BASE = mkdtempSync(join(tmpdir(), "t-coherence-"));
@@ -40,13 +41,13 @@ function run(root) {
 
 function tree(name, pageBody, withRegister = true) {
   const root = join(BASE, name);
-  mkdirSync(join(root, "docs", "registers"), { recursive: true });
-  mkdirSync(join(root, "docs", "02-constructs"), { recursive: true });
+  mkdirSync(join(root, "docs", POCKET.registers), { recursive: true });
+  mkdirSync(join(root, "docs", SEAT.constructs), { recursive: true });
   if (withRegister)
-    writeFileSync(join(root, "docs", "registers", "decisions.md"),
+    writeFileSync(join(root, "docs", POCKET.registers, "decisions.md"),
       "# Decisions\n\n| # | Decision | Why | Date |\n| --- | --- | --- | --- |\n" +
       "| RD.DEVEX.WORKSPACE.155 | A thing is so. | Because a fixture needs a row that exists. | 2026-09 |\n");
-  writeFileSync(join(root, "docs", "02-constructs", "a.md"), pageBody);
+  writeFileSync(join(root, "docs", SEAT.constructs, "a.md"), pageBody);
   return root;
 }
 
@@ -68,7 +69,7 @@ const dangling = tree("dangling",
 const out = run(dangling);
 one("a dangling id is reported", out.includes("CITATION"));
 one("the finding names the dangling id", out.includes("RD.GOV.999"));
-one("the finding names the file citing it", out.includes("docs/02-constructs/a.md"));
+one("the finding names the file citing it", out.includes(`docs/${SEAT.constructs}/a.md`));
 one("a resolving id in the same file is not reported", !out.includes("RD.DEVEX.WORKSPACE.155 —"));
 one("one dangling id counts as one", /CITATION\s+1 decision id\(s\)/.test(out));
 
@@ -92,8 +93,8 @@ one("a short id is not read as a citation", !run(partial).includes("CITATION"));
 // writes it, was never reached.
 function rulingTree(name, id) {
   const root = join(BASE, name);
-  mkdirSync(join(root, "docs", "registers"), { recursive: true });
-  writeFileSync(join(root, "docs", "registers", "decisions.md"),
+  mkdirSync(join(root, "docs", POCKET.registers), { recursive: true });
+  writeFileSync(join(root, "docs", POCKET.registers, "decisions.md"),
     "# Decisions\n\n| # | Construct | Decision | Why | Date |\n| --- | --- | --- | --- | --- |\n" +
     `| ${id} | ideate | **The opening claim states the ruling.** **A buried second ruling states ` +
     `its own complete claim right here.** | because a fixture needs a reason | 2026-09 |\n`);
@@ -111,8 +112,8 @@ one("a buried ruling under a four-part id is reported", run(rulingFour).includes
 // 7 — one ruling, nothing buried: the header read locates the real Decision cell rather than
 //     reporting on every row by construction.
 const rulingClean = join(BASE, "ruling-clean");
-mkdirSync(join(rulingClean, "docs", "registers"), { recursive: true });
-writeFileSync(join(rulingClean, "docs", "registers", "decisions.md"),
+mkdirSync(join(rulingClean, "docs", POCKET.registers), { recursive: true });
+writeFileSync(join(rulingClean, "docs", POCKET.registers, "decisions.md"),
   "# Decisions\n\n| # | Construct | Decision | Why | Date |\n| --- | --- | --- | --- | --- |\n" +
   "| RD.GOV.101 | ideate | A single plain ruling with nothing bolded past it. | because | 2026-09 |\n");
 one("a register with no buried ruling reports no RULING finding", !run(rulingClean).includes("RULING"));
@@ -129,33 +130,33 @@ one("a register with no buried ruling reports no RULING finding", !run(rulingCle
 
 // 5 — a construct whose chapter is a flat file is held.
 const flat = tree("flat", "", false);
-mk(flat, "docs/02-constructs/01-a/01-b/01-thing.md", "# Thing\n");
-mk(flat, "docs/04-capabilities/01-a/01-b/01-thing.md", "# Thing — the standard\n");
+mk(flat, `docs/${SEAT.constructs}/01-a/01-b/01-thing.md`, "# Thing\n");
+mk(flat, `docs/${SEAT.capabilities}/01-a/01-b/01-thing.md`, "# Thing — the standard\n");
 one("a chapter that is a flat file counts", !run(flat).includes("CHAPTER"));
 
 // 6 — a folder of chapters is held.
 const folder = tree("folder", "", false);
-mk(folder, "docs/02-constructs/01-a/01-b/01-thing.md", "# Thing\n");
-mk(folder, "docs/04-capabilities/01-a/01-b/01-thing/01-part.md", "# A part\n");
+mk(folder, `docs/${SEAT.constructs}/01-a/01-b/01-thing.md`, "# Thing\n");
+mk(folder, `docs/${SEAT.capabilities}/01-a/01-b/01-thing/01-part.md`, "# A part\n");
 one("a chapter that is a folder counts", !run(folder).includes("CHAPTER"));
 
 // 7 — a folder of FOLDERS is held. This is the shape that produced five false findings.
 const nested = tree("nested", "", false);
-mk(nested, "docs/02-constructs/01-a/01-b/01-thing.md", "# Thing\n");
-mk(nested, "docs/04-capabilities/01-a/01-b/01-thing/README.md", "# Thing\n");
-mk(nested, "docs/04-capabilities/01-a/01-b/01-thing/01-server/01-part.md", "# A part\n");
+mk(nested, `docs/${SEAT.constructs}/01-a/01-b/01-thing.md`, "# Thing\n");
+mk(nested, `docs/${SEAT.capabilities}/01-a/01-b/01-thing/README.md`, "# Thing\n");
+mk(nested, `docs/${SEAT.capabilities}/01-a/01-b/01-thing/01-server/01-part.md`, "# A part\n");
 one("a chapter nested a level down counts", !run(nested).includes("CHAPTER"));
 
 // 8 — AND THE CHECK STILL FIRES. A question that cannot be made to answer is not a question.
 const bare = tree("bare", "", false);
-mk(bare, "docs/02-constructs/01-a/01-b/01-thing.md", "# Thing\n");
-mk(bare, "docs/04-capabilities/01-a/01-b/README.md", "# The group\n");
+mk(bare, `docs/${SEAT.constructs}/01-a/01-b/01-thing.md`, "# Thing\n");
+mk(bare, `docs/${SEAT.capabilities}/01-a/01-b/README.md`, "# The group\n");
 one("a construct with no chapter anywhere is reported", run(bare).includes("CHAPTER"));
 
 // 9 — a face alone is not a chapter. This is what makes case 8 a real gap rather than a naming one.
 const faceOnly = tree("face-only", "", false);
-mk(faceOnly, "docs/02-constructs/01-a/01-b/01-thing.md", "# Thing\n");
-mk(faceOnly, "docs/04-capabilities/01-a/01-b/01-thing/README.md", "# Thing\n");
+mk(faceOnly, `docs/${SEAT.constructs}/01-a/01-b/01-thing.md`, "# Thing\n");
+mk(faceOnly, `docs/${SEAT.capabilities}/01-a/01-b/01-thing/README.md`, "# Thing\n");
 one("a folder holding only a face is not a chapter", run(faceOnly).includes("CHAPTER"));
 
 // ── the provider-contract question ────────────────────────────────────────────────────────────
@@ -174,28 +175,28 @@ const contract = (root, where, entries) =>
 
 // 10 — an instance answering every entry says nothing.
 const full = tree("contract-full", "", false);
-contract(full, "docs/04-capabilities/01-a/01-b/10-providers", ["01-one.md", "02-two.md"]);
-mk(full, "docs/04-capabilities/01-a/01-b/10-providers/x/01-one.md", "# One\n");
-mk(full, "docs/04-capabilities/01-a/01-b/10-providers/x/02-two.md", "# Two\n");
+contract(full, `docs/${SEAT.capabilities}/01-a/01-b/10-providers`, ["01-one.md", "02-two.md"]);
+mk(full, `docs/${SEAT.capabilities}/01-a/01-b/10-providers/x/01-one.md`, "# One\n");
+mk(full, `docs/${SEAT.capabilities}/01-a/01-b/10-providers/x/02-two.md`, "# Two\n");
 one("an instance answering every entry reports nothing", !run(full).includes("CONTRACT"));
 
 // 11 — a missing entry is reported, and named.
 const short = tree("contract-short", "", false);
-contract(short, "docs/04-capabilities/01-a/01-b/10-providers", ["01-one.md", "02-two.md"]);
-mk(short, "docs/04-capabilities/01-a/01-b/10-providers/x/01-one.md", "# One\n");
+contract(short, `docs/${SEAT.capabilities}/01-a/01-b/10-providers`, ["01-one.md", "02-two.md"]);
+mk(short, `docs/${SEAT.capabilities}/01-a/01-b/10-providers/x/01-one.md`, "# One\n");
 one("a missing entry is reported by name", run(short).includes("02-two.md"));
 
 // 12 — a file the contract does not ask for is reported too. It has either found a question the
 //      contract is missing, or been written somewhere nobody will look.
 const overfull = tree("contract-overfull", "", false);
-contract(overfull, "docs/04-capabilities/01-a/01-b/10-providers", ["01-one.md"]);
-mk(overfull, "docs/04-capabilities/01-a/01-b/10-providers/x/01-one.md", "# One\n");
-mk(overfull, "docs/04-capabilities/01-a/01-b/10-providers/x/99-invented.md", "# Invented\n");
+contract(overfull, `docs/${SEAT.capabilities}/01-a/01-b/10-providers`, ["01-one.md"]);
+mk(overfull, `docs/${SEAT.capabilities}/01-a/01-b/10-providers/x/01-one.md`, "# One\n");
+mk(overfull, `docs/${SEAT.capabilities}/01-a/01-b/10-providers/x/99-invented.md`, "# Invented\n");
 one("a file the contract does not ask for is reported", run(overfull).includes("99-invented.md"));
 
 // 13 — a folder with no contract beside it is not this question's business.
 const nocontract = tree("contract-none", "", false);
-mk(nocontract, "docs/04-capabilities/01-a/01-b/01-thing/x/01-one.md", "# One\n");
+mk(nocontract, `docs/${SEAT.capabilities}/01-a/01-b/01-thing/x/01-one.md`, "# One\n");
 one("a folder with no contract is left alone", !run(nocontract).includes("CONTRACT"));
 
 // ── the plugin-path question ──────────────────────────────────────────────────────────────────
@@ -226,7 +227,7 @@ const knownBadOut = run(knownBad);
 one("[known-bad] a dead path under the current layout is reported, not silently passed",
   /PATH\s+1 plugin path/.test(knownBadOut));
 one("[known-bad] the finding names the dead path and where it is named",
-  knownBadOut.includes("packages/plugin-spn-x/src/scripts/checks/gone.ts — named in docs/02-constructs/a.md:3"));
+  knownBadOut.includes(`packages/plugin-spn-x/src/scripts/checks/gone.ts — named in docs/${SEAT.constructs}/a.md:3`));
 
 // 15 — a real path, rooted at `packages/`, reports nothing.
 const real = shelf("path-real", "# A page\n\nThe check is `packages/plugin-spn-x/src/scripts/checks/real.ts`.\n");
@@ -238,7 +239,7 @@ const deadPath = shelf("path-dead",
 const deadOut = run(deadPath);
 one("a plugin path that does not exist is reported", /PATH\s+1 plugin path/.test(deadOut));
 one("the finding names the dead path and where it is named",
-  deadOut.includes("packages/plugin-spn-x/src/scripts/checks/gone.ts — named in docs/02-constructs/a.md:3"));
+  deadOut.includes(`packages/plugin-spn-x/src/scripts/checks/gone.ts — named in docs/${SEAT.constructs}/a.md:3`));
 
 // 17 — a path inside a fence is an example, and is not read.
 const fenced = shelf("path-fenced",
@@ -273,13 +274,13 @@ one("a repository with no packages/plugin-* folder reports nothing", !run(noShel
 // 21 — an overview is read too, and the markup around a path is not part of it. A `<pre>` block is
 //      a page's fence; an escaped placeholder is still a placeholder.
 const page = shelf("path-page", "# A page\n");
-mk(page, "docs/artifacts/overviews/concept-overview.html",
+mk(page, `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-overview.html`,
   "<p>Run <code>packages/plugin-spn-x/src/scripts/checks/real.ts</code> and " +
   "<code>packages/plugin-spn-x/src/scripts/checks/&lt;subject&gt;.ts</code>, never " +
   "<code>packages/plugin-spn-x/hooks/run.mjs</code>.</p>\n<pre>packages/plugin-spn-x/src/example.ts</pre>\n");
 const pageOut = run(page);
 one("a dead path on an overview is reported, without its markup",
-  pageOut.includes("packages/plugin-spn-x/hooks/run.mjs — named in docs/artifacts/overviews/concept-overview.html:1"));
+  pageOut.includes(`packages/plugin-spn-x/hooks/run.mjs — named in docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-overview.html:1`));
 one("a real path and an escaped placeholder on an overview are not", /PATH\s+1 plugin path/.test(pageOut));
 
 // 22 — a placeholder inside a segment keeps the segment whole, so it is asked of the folder above.

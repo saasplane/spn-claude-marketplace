@@ -32,6 +32,7 @@ import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import type { Payload, Verdict } from "../lib/payload.ts";
 import { DEVEX, read } from "../lib/payload.ts";
+import { SEAT } from "../lib/docs-tree.ts";
 
 const DEBUG = ".debug";
 const MIRROR = "mirror";
@@ -54,7 +55,7 @@ const MIRROR = "mirror";
 export function faceOf(node: string): string | null {
   const readme = read(join(node, "README.md"));
   if (!readme) return null;
-  const faces = [...readme.matchAll(/\]\(([^)\s]+04-capabilities\/[^)\s]*README\.md)\)/g)]
+  const faces = [...readme.matchAll(new RegExp(`\\]\\(([^)\\s]+${SEAT.capabilities}\\/[^)\\s]*README\\.md)\\)`, "g"))]
     .map((m) => resolve(node, m[1]))
     .filter((face) => existsSync(face))
     .sort((a, b) => b.split("/").length - a.split("/").length);

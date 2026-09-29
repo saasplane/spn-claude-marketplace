@@ -10,6 +10,7 @@ import { workspace } from "../../../helpers/fixture.mjs";
 
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve, join } from "node:path";
+import { WORKSTREAMS } from "../../../../src/scripts/lib/docs-tree.ts";
 
 const HOOKS = PLUGIN;
 const SCRIPTS = resolve(HOOKS, "scripts");
@@ -63,10 +64,10 @@ const ARC = (extra = "") => `# Arc — a subject\n\nStatus: **RUNNING**\n\n## St
 /** One workspace, with its arcs named either the old way or the way 008 actually names them. */
 function build(name, { arcNames, pageOpts = {}, arcExtra = "" }) {
   const files = {
-    ".spndevex/workstreams/open/001-a-subject/a-subject-approach.html": page(pageOpts),
+    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html`]: page(pageOpts),
   };
   for (const arc of arcNames)
-    files[`.spndevex/workstreams/open/001-a-subject/arcs/${arc}`] = ARC(arcExtra);
+    files[`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/${arc}`] = ARC(arcExtra);
   return workspace(name, files);
 }
 
@@ -118,7 +119,7 @@ one("a Q card written into an arc while the page shows none",
 
 one("an open workstream with arcs and no page at all",
   workspace("stop-pageless-old", {
-    ".spndevex/workstreams/open/001-a-subject/arcs/arc-a-subject.md": ARC(),
+    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/arc-a-subject.md`]: ARC(),
   }),
   "warns", { says: "An open workstream with arcs and no page" });
 
@@ -138,7 +139,7 @@ one("a Q card in an N-named arc while the page shows none",
   "warns", { says: "A card written into an arc", parity: false, why: F11 });
 
 one("an open workstream whose only arcs are N-named, and no page",
-  workspace("stop-pageless-new", { ".spndevex/workstreams/open/001-a-subject/arcs/N1-a-subject.md": ARC() }),
+  workspace("stop-pageless-new", { [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-a-subject.md`]: ARC() }),
   "warns", { says: "An open workstream with arcs and no page", parity: false, why: F11 });
 
 console.log("\n=== stop — F16: the template's own unanswered card must read as open");
@@ -150,14 +151,14 @@ const RUNNING = "# Arc — a subject\n\nStatus: **RUNNING**\n\n## Steps\n\n| # |
 
 function runningWorkspace(name, cards) {
   return workspace(name, {
-    ".spndevex/workstreams/open/001-a-subject/a-subject-approach.html":
+    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html`]:
       page({ cards, names: ["N1-a-subject.md"] }),
-    ".spndevex/workstreams/open/001-a-subject/arcs/N1-a-subject.md": RUNNING,
+    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-a-subject.md`]: RUNNING,
   });
 }
 
 // THE WORK A CASE DOES BETWEEN ITS TWO STOPS: step 1 of the arc reworded, so the step rows move.
-const ARC_AT = ".spndevex/workstreams/open/001-a-subject/arcs/N1-a-subject.md";
+const ARC_AT = `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-a-subject.md`;
 const reword = (root) => {
   const file = join(root, ARC_AT);
   writeFileSync(file, readFileSync(file, "utf8").replace("| 1 | a thing |", "| 1 | a thing, reworded |"), "utf8");
@@ -191,8 +192,8 @@ const PROSE_MENTIONS_MARK = RUNNING.replace(
   "| 2 | the gate that `N2` records as landed, and is not | here | ☐ raised |");
 one("a step whose own prose says `landed` is still an open step",
   workspace("stop-n90-word-in-prose", {
-    ".spndevex/workstreams/open/001-a-subject/a-subject-approach.html": page({ names: ["N1-a-subject.md"] }),
-    ".spndevex/workstreams/open/001-a-subject/arcs/N1-a-subject.md": PROSE_MENTIONS_MARK,
+    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html`]: page({ names: ["N1-a-subject.md"] }),
+    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-a-subject.md`]: PROSE_MENTIONS_MARK,
   }),
   "warns", { ...worked("n90-prose"), says: "no card is open", parity: false, why: "N90 step 6 — the reader could not tell a marker from a word" });
 
@@ -201,8 +202,8 @@ const WORD_AS_CELL = RUNNING.replace(
   "| 2 | another thing | here | landed 2026-09-27, `abc1234` |");
 one("a state cell reading `landed` with a date still counts as done",
   workspace("stop-n90-word-as-cell", {
-    ".spndevex/workstreams/open/001-a-subject/a-subject-approach.html": page({ names: ["N1-a-subject.md"] }),
-    ".spndevex/workstreams/open/001-a-subject/arcs/N1-a-subject.md": WORD_AS_CELL,
+    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html`]: page({ names: ["N1-a-subject.md"] }),
+    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-a-subject.md`]: WORD_AS_CELL,
   }),
   "silent", { ...worked("n90-cell"), parity: false, why: "N90 step 6 — the fix bounds where a word is read, it does not drop the word" });
 
@@ -216,8 +217,8 @@ console.log("\n=== runnable — N39 step 8: which arc is being executed is a fac
   const { checkRunnable } = await import("../../../../src/scripts/events/stop.ts");
   const OPEN_ARC = RUNNING.replace("Status: **RUNNING**", "**Status: OPEN \u2014 opened today**");
   const root = workspace("stop-runnable-touched", {
-    ".spndevex/workstreams/open/001-a-subject/a-subject-approach.html": page({ cards: "", names: ["N1-a-subject.md"] }),
-    ".spndevex/workstreams/open/001-a-subject/arcs/N1-a-subject.md": OPEN_ARC,
+    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html`]: page({ cards: "", names: ["N1-a-subject.md"] }),
+    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-a-subject.md`]: OPEN_ARC,
   });
   const past = Date.now() - 60_000, future = Date.now() + 60_000;
 
@@ -225,7 +226,7 @@ console.log("\n=== runnable — N39 step 8: which arc is being executed is a fac
   // the status line of five arcs made every one report as runnable work in the same turn, which is
   // five findings about arcs nobody touched the substance of. So a stale hash means the work moved,
   // a matching hash means only the record did, and an empty map means there is no baseline to judge by.
-  const arcPath = join(root, ".spndevex/workstreams/open/001-a-subject/arcs/N1-a-subject.md");
+  const arcPath = join(root, `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-a-subject.md`);
   const WORK_MOVED = { [arcPath]: "a-different-hash" };
 
   for (const [what, since, expected, baseline] of [
@@ -255,8 +256,8 @@ console.log("\n=== runnable — N39 step 8: which arc is being executed is a fac
   // baseline of this session's own, the word alone decides nothing.
   n += 1;
   const claimed = checkRunnable(workspace("stop-runnable-claimed", {
-    ".spndevex/workstreams/open/001-a-subject/a-subject-approach.html": page({ cards: "", names: ["N1-a-subject.md"] }),
-    ".spndevex/workstreams/open/001-a-subject/arcs/N1-a-subject.md": RUNNING,
+    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html`]: page({ cards: "", names: ["N1-a-subject.md"] }),
+    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-a-subject.md`]: RUNNING,
   }), 0).length === 0;
   if (!claimed) failed += 1;
   console.log(`  ${claimed ? "PASS" : "FAIL"}  an arc that SAYS RUNNING no longer fires on the word alone`);
@@ -264,8 +265,8 @@ console.log("\n=== runnable — N39 step 8: which arc is being executed is a fac
   // A LANDED ARC'S UNFINISHED ROWS ARE HISTORY. Editing one to add a log line must not report it.
   n += 1;
   const landed = checkRunnable(workspace("stop-runnable-landed", {
-    ".spndevex/workstreams/open/001-a-subject/a-subject-approach.html": page({ cards: "", names: ["N1-a-subject.md"] }),
-    ".spndevex/workstreams/open/001-a-subject/arcs/N1-a-subject.md": RUNNING.replace("Status: **RUNNING**", "**Status: LANDED 2026-09-23**"),
+    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html`]: page({ cards: "", names: ["N1-a-subject.md"] }),
+    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-a-subject.md`]: RUNNING.replace("Status: **RUNNING**", "**Status: LANDED 2026-09-23**"),
   }), past, WORK_MOVED).length === 0;
   if (!landed) failed += 1;
   console.log(`  ${landed ? "PASS" : "FAIL"}  a LANDED arc written this sitting is history, not work`);
@@ -297,10 +298,10 @@ console.log("\n=== runnable — scoped to the session, the step row read by head
     `| 3e.1 | spn-support-ts | CODE | the split check | by hand | its suite | |\n` +
     `| 4 | — | PROOF | the proof run | command | green | |\n\n## Log\n\n- **2026-09-29 — go.**\n`;
   const shaped = (name) => workspace(name, {
-    ".spndevex/workstreams/open/001-a-subject/a-subject-approach.html": page({ cards: "", names: ["N3-a-subject.md"] }),
-    ".spndevex/workstreams/open/001-a-subject/arcs/N3-a-subject.md": SHAPED,
+    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html`]: page({ cards: "", names: ["N3-a-subject.md"] }),
+    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N3-a-subject.md`]: SHAPED,
   });
-  const SHAPED_AT = ".spndevex/workstreams/open/001-a-subject/arcs/N3-a-subject.md";
+  const SHAPED_AT = `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N3-a-subject.md`;
   const touchStep = (root) => {
     const file = join(root, SHAPED_AT);
     writeFileSync(file, readFileSync(file, "utf8").replace("| the proof run |", "| the proof run, reworded |"), "utf8");
@@ -599,10 +600,10 @@ console.log("\n=== the handover check — what counts as saying a window is need
   // replies that put `Q329` in full, demanding the card they carried.
   {
     const CARDED = workspace("m1-stop-handover-card", {
-      ".spndevex/workstreams/open/001-a-subject/a-subject-approach.html":
+      [`.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html`]:
         `<div class="eyebrow">x</div><section id="s4"><div class="open"><h4 id="q329">Q329 &middot; which way</h4>` +
         `<div class="rec"><b>Decision:</b> &mdash;</div></div></section><p>N1-a.md</p>`,
-      ".spndevex/workstreams/open/001-a-subject/arcs/N1-a.md": "# N1\n",
+      [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-a.md`]: "# N1\n",
     });
     const reply = "Q329 · which way\n\n**What** — the gate.\n\n**Why** — what it costs to leave it.\n\n" +
       "| | Option | What it costs |\n| --- | --- | --- |\n| **A** | now | a cycle |\n| **B** | wait | a window |\n\n" +
@@ -703,10 +704,10 @@ console.log("\n=== runnable — a row in progress is named with its age, never c
     `| 1 | spn-foundation | DOCS | the chapter | by hand | audit | LANDED — \`abc1234\` |\n` +
     `| 2 | spn-support-ts | CODE | the split check | by hand | its suite | in progress 2026-09-29 14:32 +05:30 |\n\n## Log\n\n- **2026-09-29 — go.**\n`;
   const root = workspace("m7-stop-in-progress", {
-    ".spndevex/workstreams/open/001-a-subject/a-subject-approach.html": page({ cards: "", names: ["N3-a-subject.md"] }),
-    ".spndevex/workstreams/open/001-a-subject/arcs/N3-a-subject.md": MARKED,
+    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html`]: page({ cards: "", names: ["N3-a-subject.md"] }),
+    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N3-a-subject.md`]: MARKED,
   });
-  const arcPath = join(root, ".spndevex/workstreams/open/001-a-subject/arcs/N3-a-subject.md");
+  const arcPath = join(root, `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N3-a-subject.md`);
   const found = checkRunnable(root, Date.now() - 60_000, { [arcPath]: "a-different-hash" }, new Set([arcPath]));
   const now = Date.parse("2026-09-29T12:00:00Z");
   for (const [what, ok] of [

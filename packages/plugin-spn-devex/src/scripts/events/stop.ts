@@ -32,6 +32,7 @@ import { STEP_ID, answeredNumbers, cardsOf, isInProgress, markedAgo, openWorkstr
          workstreamPlan } from "../checks/split-plan.ts";
 import { TERMINAL } from "../checks/arc-status.ts";
 import { DEVEX, workspaceRoot } from "../lib/payload.ts";
+import { workstreamsDir } from "../lib/docs-tree.ts";
 import { cacheState } from "./orientation.ts";
 import { begin, span, end, tagsOf } from "../lib/timing.ts";
 
@@ -124,7 +125,7 @@ function read(p: string): string {
 }
 
 function openWorkstreamFolders(root: string): string[] {
-  const dir = join(root, ".spndevex", "workstreams", "open");
+  const dir = workstreamsDir(root, "open");
   try { return readdirSync(dir).map((d) => join(dir, d)).filter((d) => statSync(d).isDirectory()); }
   catch { return []; }
 }

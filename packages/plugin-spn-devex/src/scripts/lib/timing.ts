@@ -20,6 +20,7 @@
 
 import { appendFileSync, existsSync, mkdirSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
+import { workstreamPrefixSource } from "./docs-tree.ts";
 
 const DEVEX = ".spndevex", DEBUG = ".debug", SWITCH = "telemetry.on", FOLDER = "telemetry", LOG = "hooks.jsonl";
 const MAX_BYTES = 4 * 1024 * 1024;
@@ -45,7 +46,7 @@ function workspaceRoot(start: string): string | null {
 export type WorkTags = { workstream: string | null; arc: string | null; order: string | null; agent: string | null };
 
 // `.spndevex/workstreams/<state>/<NNN-subject>/` and whatever follows it inside that folder.
-const IN_WORKSTREAM = /\.spndevex\/workstreams\/(?:open|backlog|closed)\/(\d{3}-[A-Za-z0-9-]+)((?:\/[^\s'"`)\]|;&<>]*)?)/g;
+const IN_WORKSTREAM = new RegExp(`${workstreamPrefixSource()}(\\d{3}-[A-Za-z0-9-]+)((?:\\/[^\\s'"\`)\\]|;&<>]*)?)`, "g");
 // Inside one: `arcs/N<n>…` names the arc, `notes/N<n>/…` names it too, `notes/N<n>/orders/<order>…`
 // names the order as well.
 const ARC_FILE = /^\/arcs\/(N\d+[a-z]?)(?:[-.]|$)/i;

@@ -17,16 +17,15 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSy
 import { dirname, join, relative, resolve } from "node:path";
 
 import { seenHash, treeHash } from "../../lib/restates.ts";
+import { BOOK_TEMPLATES, PLUGIN_TEMPLATES } from "../../lib/docs-tree.ts";
 
-/** Where the book keeps them. One folder, four groups, and the groups are the book's own. */
-const BOOK_TEMPLATES = "docs/04-capabilities/01-devex/04-workspace/04-docs/templates";
 
 const HERE = dirname(new URL(import.meta.url).pathname);
 const PLUGIN = resolve(HERE, "..", "..", "..");
 // THE COPY SITS BESIDE THE REF THAT NAMES IT. `doc-sets.md` carries the `files` citation for this
 // folder, so a drift check reads one directory rather than two — the citation and the thing cited
 // are siblings (RD.DEVEX.AGENT.072).
-const OUT = join(PLUGIN, "refs", "devex", "workspace", "docs", "templates");
+const OUT = join(PLUGIN, PLUGIN_TEMPLATES);
 const INDEX = join(OUT, "README.md");
 /** The book's own generated index, beside the templates it lists. */
 const BOOK_INDEX = "index.md";
@@ -98,7 +97,7 @@ function renderIndex(book: string, names: string[]): string {
     "# The templates, as a partner has them",
     "",
     "**The book owns every file here and this folder is a copy.** They are byte-identical to",
-    "`spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/templates/`, and when the two",
+    `\`spn-foundation/${BOOK_TEMPLATES}/\`, and when the two`,
     "disagree the book wins. `restates files --write` writes them and `restates check` reports a copy",
     "that has fallen behind, so a builder's edit reaches every partner with the next plugin release",
     "rather than being discovered by somebody's first session going wrong.",
