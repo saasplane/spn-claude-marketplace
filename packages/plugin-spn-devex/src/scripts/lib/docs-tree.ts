@@ -44,14 +44,6 @@ export type Pocket = keyof typeof POCKET;
 export const ARTIFACT = { overviews: "overviews", constructs: "constructs", reports: "reports" } as const;
 export const ARTIFACT_FOLDERS: readonly string[] = Object.values(ARTIFACT);
 
-/**
- * Folders the book has taken out of the artifacts pocket. A check names them only to refuse them or
- * to report what is still left in one: an approach page belongs to its workstream, and a fact a
- * seat needs lives in a seat.
- */
-export const RETIRED_ARTIFACT = { approaches: "approaches", resources: "resources" } as const;
-export type RetiredArtifact = (typeof RETIRED_ARTIFACT)[keyof typeof RETIRED_ARTIFACT];
-
 /** The one folder a seat may hold that is not documents (03-tree.md § A seat may carry `templates/`). */
 export const TEMPLATES = "templates";
 
@@ -88,14 +80,16 @@ export function constructPagesDir(docs: string): string { return join(artifactsD
 export function reportsDir(docs: string): string { return join(artifactsDir(docs), ARTIFACT.reports); }
 /** The hub page of a docs tree. */
 export function hubPage(docs: string): string { return join(overviewsDir(docs), HUB); }
-/** A retired pocket folder, so a check can refuse it or count what is left in it. */
-export function retiredArtifactDir(docs: string, folder: RetiredArtifact): string {
-  return join(artifactsDir(docs), folder);
-}
-
-/** Whether a path sits in a retired pocket folder. */
-export function inRetiredArtifact(path: string, folder: RetiredArtifact): boolean {
-  return slashes(path).includes(`/${POCKET.artifacts}/${folder}/`);
+/**
+ * The folder a file sits in directly under a docs tree's artifacts pocket — `overviews` for
+ * `<repo>/docs/artifacts/overviews/01-x/a.html` — or `null` where the file is not inside a folder of
+ * that pocket. A check compares it with `ARTIFACT_FOLDERS`, because the pocket's folder set is fixed.
+ */
+export function artifactFolderOf(path: string): string | null {
+  const parts = slashes(path).split("/");
+  for (let at = 0; at + 3 < parts.length; at += 1)
+    if (parts[at] === DOCS && parts[at + 1] === POCKET.artifacts) return parts[at + 2] || null;
+  return null;
 }
 
 const segment = (name: string): string => `/${name}/`;

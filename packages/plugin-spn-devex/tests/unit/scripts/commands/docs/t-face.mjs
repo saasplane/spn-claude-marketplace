@@ -13,7 +13,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, rmSync
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
-import { ARTIFACT, POCKET, RETIRED_ARTIFACT, SEAT, TEMPLATES } from "../../../../../src/scripts/lib/docs-tree.ts";
+import { ARTIFACT, POCKET, SEAT, TEMPLATES } from "../../../../../src/scripts/lib/docs-tree.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
 const BASE = mkdtempSync(join(tmpdir(), "t-docs-face-"));
@@ -209,12 +209,12 @@ const GROUPED = {
   // A bridge is the CONCEPT's prose, and the concept sits at the repository root.
   const root = repo({ ...GROUPED,
     "CONCEPT.md": GROUPED["CONCEPT.md"].replace("How the function operates.",
-      `How the function operates, argued in [the page](docs/${POCKET.artifacts}/${RETIRED_ARTIFACT.approaches}/a.html).`),
-    [`docs/${POCKET.artifacts}/${RETIRED_ARTIFACT.approaches}/a.html`]: "<p>x</p>\n" });
+      `How the function operates, argued in [the page](docs/${POCKET.artifacts}/${ARTIFACT.reports}/a.html).`),
+    [`docs/${POCKET.artifacts}/${ARTIFACT.reports}/a.html`]: "<p>x</p>\n" });
   run(root, ["face", "docs"]);
   one("a link inside a copied bridge is re-based onto the face that now carries it",
     readAt(root, `docs/${SEAT.constructs}/01-foundation/01-devex/README.md`),
-    has(`](../../../${POCKET.artifacts}/${RETIRED_ARTIFACT.approaches}/a.html)`));
+    has(`](../../../${POCKET.artifacts}/${ARTIFACT.reports}/a.html)`));
 }
 {
   const root = repo({ ...GROUPED,

@@ -42,7 +42,7 @@
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { basename, dirname, join, resolve, relative, sep } from "node:path";
 import { emit, readPayload, runAlone, unescape, type Payload, type Verdict } from "../lib/payload.ts";
-import { ARTIFACT, PLUGIN_TEMPLATES, POCKET, RETIRED_ARTIFACT, decisionsRegister, inArtifacts, isArcFile,
+import { APPROACH_SUFFIX, ARTIFACT, PLUGIN_TEMPLATES, POCKET, decisionsRegister, inArtifacts, isArcFile,
          isRegister as inRegisters, workstreamDirOf } from "../lib/docs-tree.ts";
 import { cyclesOf, statusWord } from "../commands/docs/cycles.ts";
 
@@ -182,8 +182,9 @@ const NORMATIVE = /\b(?:MUST NOT|MUST|SHOULD NOT|SHOULD|MAY)\b/;
 const REACH_BAR: Record<string, number> = { "artifact-html": 15, readme: 25, chapter: 15, concept: 15 };
 const REACH_MIN_N = 8;
 
-// RD.DEVEX.WORKSPACE.103 — the suffix names the kind, and the set is closed.
-const POCKET_KIND: Record<string, string> = { [RETIRED_ARTIFACT.approaches]: "-approach.html", [ARTIFACT.overviews]: "-overview.html" };
+// RD.DEVEX.WORKSPACE.103 — the suffix names the kind, and the set is closed. An approach page lives
+// in its workstream, never in the pocket, so the one pocket folder with a fixed suffix is overviews.
+const POCKET_KIND: Record<string, string> = { [ARTIFACT.overviews]: "-overview.html" };
 const NODE_MANIFESTS = ["spkind.json", "spinfrapkg.json"];
 const SKIP = new Set(["node_modules", ".git", "dist", "build", "coverage", "tool-results", ".output", ".nx"]);
 
@@ -223,8 +224,7 @@ export function structural(path: string): Finding[] {
     const pocket = parts[parts.length - 2];
     const want = POCKET_KIND[pocket];
     if (want && !base.endsWith(want)) {
-      const other = Object.entries(POCKET_KIND).find(([f]) => f !== pocket)?.[1] ?? "";
-      const hint = base.endsWith(other)
+      const hint = base.endsWith(APPROACH_SUFFIX)
         ? " — an overview explains, an approach argues; the test is whether options were weighed and one chosen"
         : "";
       out.push(["BLOCK", `${base} sits in ${pocket}/ but does not end ${want} — RD.DEVEX.WORKSPACE.103: the suffix names the kind${hint}`]);

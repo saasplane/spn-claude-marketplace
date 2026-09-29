@@ -137,6 +137,21 @@ one("a page's scope rows and the arcs' step rows are one plan",
   ]) { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${what}${ok ? "" : `\n        ts: ${said.slice(0, 250)}`}`); }
 }
 
+// RD.DEVEX.WORKSPACE.188 — `⏸ held on Q<n>` IS NOT LANDED EITHER. The gate refuses it before the move
+// (the refusal is proved in `t-split-plan.mjs`), so a held row found here was moved past the gate.
+for (const [label, mark] of [["the book's form", "⏸ held on Q352"], ["the mark without its glyph", "held on Q352"]]) {
+  const root = workspace(`m11-cl-held-${mark.startsWith("held") ? "bare" : "glyph"}`, {
+    [`.spndevex/${WORKSTREAMS}/closed/001-a-subject/arcs/N2-the-arc.md`]:
+      stepArc([["1", "spn-foundation", "✅ landed — `abc1234`"], ["2", "spn-support-ts", mark]]),
+  });
+  const said = run("node", [`${HOOKS}/src/scripts/events/closed.ts`],
+    { tool_name: "Bash", cwd: root, tool_input: { command: `mv .spndevex/${WORKSTREAMS}/open/001-a-subject .spndevex/${WORKSTREAMS}/closed/` } }, root);
+  for (const [what, ok] of [
+    [`a held row is named as not landed (${label})`, /1 row held on a card/.test(said)],
+    [`and the scope is not called finished (${label})`, /1 row landed/.test(said) && !/Well done/.test(said)],
+  ]) { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${what}${ok ? "" : `\n        ts: ${said.slice(0, 250)}`}`); }
+}
+
 // KNOWN-BAD — every move that closed nothing and must stay silent.
 one("backlog moving into open is work starting, not finishing",
   build("cl-start", [["a", "spn-foundation", "&#x2705; landed"]], "backlog"),

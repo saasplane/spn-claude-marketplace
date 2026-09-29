@@ -10,7 +10,7 @@ import { SCRIPTS } from "../../../helpers/harness.mjs";
 import { layoutLiterals, literalsOf, scanTree } from "../../../helpers/layout-literals.mjs";
 import * as tree from "../../../../src/scripts/lib/docs-tree.ts";
 
-const { SEAT, SEATS, POCKET, ARTIFACT, RETIRED_ARTIFACT, TEMPLATES, WORKSTREAMS, DOCS } = tree;
+const { SEAT, SEATS, POCKET, ARTIFACT, ARTIFACT_FOLDERS, TEMPLATES, WORKSTREAMS, DOCS } = tree;
 
 let total = 0, failed = 0;
 const same = (label, got, expected) => {
@@ -23,8 +23,8 @@ const same = (label, got, expected) => {
 // What the check refuses, read from the module rather than typed here.
 const NAMES = {
   numbered: [...SEATS],
-  distinctive: [...Object.values(POCKET), ARTIFACT.overviews, RETIRED_ARTIFACT.approaches, WORKSTREAMS],
-  common: [ARTIFACT.constructs, ARTIFACT.reports, RETIRED_ARTIFACT.resources, TEMPLATES],
+  distinctive: [...Object.values(POCKET), ARTIFACT.overviews, WORKSTREAMS],
+  common: [ARTIFACT.constructs, ARTIFACT.reports, TEMPLATES],
 };
 
 // A probe repository in a temporary workspace. Nothing here is read from disk; the paths only have
@@ -64,9 +64,13 @@ same("a file outside any docs tree has none", tree.docsRootOf(join(REPO, "src", 
 same("the book's templates sit in its capabilities seat",
   tree.bookTemplatesDir(join(ROOT, "book")).startsWith(join(ROOT, "book", DOCS, SEAT.capabilities)) && tree.bookTemplatesDir(join(ROOT, "book")).endsWith(`/${TEMPLATES}`),
   true);
-same("a retired pocket folder is named only to refuse it",
-  [tree.inRetiredArtifact(join(tree.retiredArtifactDir(DOCS_TREE, RETIRED_ARTIFACT.resources), "x.md"), RETIRED_ARTIFACT.resources),
-   tree.inRetiredArtifact(PAGE, RETIRED_ARTIFACT.resources)], [true, false]);
+// A folder the pocket's fixed set does not name; the check reads the set, so any name will do.
+const NOT_A_POCKET_FOLDER = "probe-folder";
+same("a file names the pocket folder it sits in, and a folder outside the set is not in it",
+  [tree.artifactFolderOf(PAGE), tree.artifactFolderOf(join(tree.artifactsDir(DOCS_TREE), NOT_A_POCKET_FOLDER, "x.md")),
+   ARTIFACT_FOLDERS.includes(NOT_A_POCKET_FOLDER)], [ARTIFACT.constructs, NOT_A_POCKET_FOLDER, false]);
+same("a file at the pocket's top level, or outside the pocket, sits in no pocket folder",
+  [tree.artifactFolderOf(join(tree.artifactsDir(DOCS_TREE), tree.FACE)), tree.artifactFolderOf(SEAT_FILE)], [null, null]);
 
 console.log("\n=== the workstreams");
 const WORKSTREAM = join(tree.workstreamsDir(ROOT, "open"), "041-probe");

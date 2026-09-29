@@ -34,7 +34,7 @@
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { basename, join, dirname, resolve } from "node:path";
 import { isDir, isFile, read } from "../../lib/payload.ts";
-import { ARTIFACT, DECISIONS, DOCS, POCKET, RETIRED_ARTIFACT, capabilitiesDir, constructsDir, decisionsRegister, docsOf,
+import { ARTIFACT, DECISIONS, DOCS, POCKET, capabilitiesDir, constructsDir, decisionsRegister, docsOf,
   hasSegment, hubPage, overviewsDir } from "../../lib/docs-tree.ts";
 import { DECISION_ID_SRC, check as restatesCheck, parse as restatesParse, registerRows, undeclared } from "../../lib/restates.ts";
 
@@ -237,7 +237,7 @@ function ownership(root: string, sources: string[]): string[] {
     // The concept may not cite a seat or a chapter at all — it links only outward (RD.DEVEX.WORKSPACE.080), so
     // it can never satisfy this check and is not in scope for it.
     if (path === "CONCEPT.md") continue;
-    if (path.includes(`${POCKET.registers}/${DECISIONS}`) || hasSegment(path, RETIRED_ARTIFACT.approaches)) continue;
+    if (path.includes(`${POCKET.registers}/${DECISIONS}`)) continue;
     // The whole bolded lead-in, not up to its first comma — truncating there collapses
     // "Plain sentences, whoever the reader is" to two words, which the filter then drops.
     for (const found of body(root, path).matchAll(/^(?:[-*]|\d+\.)\s+\*\*([^\n]{6,110}?)\*\*/gm)) {
@@ -283,7 +283,7 @@ function cardinality(root: string, sources: string[]): string[] {
   const pattern = new RegExp(`\\bthe ${WORDS} (${GROWABLE})\\b`, "gi");
   const out: string[] = [];
   for (const path of sources) {
-    if (hasSegment(path, RETIRED_ARTIFACT.approaches) || hasSegment(path, ARTIFACT.reports)) continue;  // point-in-time (RD.DEVEX.WORKSPACE.088)
+    if (hasSegment(path, ARTIFACT.reports)) continue;  // point-in-time (RD.DEVEX.WORKSPACE.088)
     const text = body(root, path);
     for (const found of text.matchAll(pattern)) {
       const noun = found[1].toLowerCase().replace(/s+$/, "") + "s";

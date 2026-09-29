@@ -28,7 +28,7 @@ import { closeSync, openSync, readFileSync, readSync, readdirSync, rmSync, statS
 import { basename, dirname, join } from "node:path";
 import { createHash } from "node:crypto";
 import { checkCorpus } from "../checks/corpus.ts";
-import { STEP_ID, answeredNumbers, cardsOf, isInProgress, markedAgo, openWorkstreams, stateOf, stepsOf,
+import { STEP_ID, answeredNumbers, cardsOf, heldOn, isInProgress, markedAgo, openWorkstreams, stateOf, stepsOf,
          workstreamPlan } from "../checks/split-plan.ts";
 import { TERMINAL } from "../checks/arc-status.ts";
 import { DEVEX, workspaceRoot } from "../lib/payload.ts";
@@ -173,12 +173,23 @@ const NOT_RUNNABLE = new Set(["PROPOSED", "DECIDED", "HELD"]);
 
 const DEBUG = ".debug";
 
+/** The cards open on the approach page of the workstream an arc sits in (`<workstream>/arcs/<arc>`). */
+function openCardsOf(arc: string): Set<string> {
+  return new Set(pagesOf(dirname(dirname(arc))).flatMap(openCards));
+}
+
 /**
  * The rows of an arc's own step table that are not yet done, or `null` where it has no `## Steps`.
  * A row marked `in progress <time>` is left out: somebody is on it, so it is not runnable work
  * (RD.DEVEX.WORKSPACE.184). `inProgressSteps` names those rows instead.
+ *
+ * A row marked `⏸ held on Q<n>` is left out while card `Q<n>` is open, because the card's answer can
+ * change it (RD.DEVEX.WORKSPACE.188). Once the card is answered the row is runnable again, and its
+ * line says so: `step 7 was held on Q352, which is answered — …`.
+ *
+ * @param open  the card numbers open on the workstream's page; read from the page when not given
  */
-export function unfinishedSteps(arc: string): string[] | null {
+export function unfinishedSteps(arc: string, open: Set<string> = openCardsOf(arc)): string[] | null {
   const steps = stepsOf(read(arc));
   if (steps === null) return null;
   // THE STATE CELL IS READ WHERE THE TABLE HAS ONE. The step row carries What, Mechanism and
@@ -188,7 +199,18 @@ export function unfinishedSteps(arc: string): string[] | null {
   return steps
     .filter((step) => !isDone(step.state === null ? step.cells : [step.state]))
     .filter((step) => step.state === null || !isInProgress(step.state))
-    .map((step) => `step ${step.id} — ${step.what.slice(0, 70)}`);
+    .filter((step) => { const card = heldCard(step); return card === null || !open.has(card); })
+    .map((step) => {
+      const card = heldCard(step);
+      return card === null
+        ? `step ${step.id} — ${step.what.slice(0, 70)}`
+        : `step ${step.id} was held on ${card}, which is answered — ${step.what.slice(0, 70)}`;
+    });
+}
+
+/** The card a step's State cell holds it on, or `null`. A table with no State column holds nothing. */
+function heldCard(step: { state: string | null }): string | null {
+  return step.state === null ? null : heldOn(step.state);
 }
 
 /** The rows whose State cell reads `in progress <time>`, each with how old its mark is. */
@@ -359,7 +381,7 @@ export function checkRunnable(root: string, since = 0, stepsAt: Record<string, s
       // absent from the baseline was written after it, and that is not evidence of work either.
       const now = stepHash(read(arc));
       if ((stepsAt[arc] ?? now) === now) continue;           // the record moved, the work did not
-      const steps = unfinishedSteps(arc);
+      const steps = unfinishedSteps(arc, new Set(cards));
       // A ROW IN PROGRESS IS NAMED WITH ITS AGE, NEVER CALLED RUNNABLE. The mark says somebody is on
       // it; whether that is this sitting or a window that has gone, only the developer can say.
       const claimed = inProgressSteps(arc);

@@ -31,7 +31,7 @@
 import { basename, resolve } from "node:path";
 import { isDir, readPayload, runAlone, workspaceRoot, type Payload } from "../lib/payload.ts";
 import { ARCS, SESSIONS, WORKSTREAM_STATES, WORKSTREAMS } from "../lib/docs-tree.ts";
-import { closing, moves, stateOf, subjectFolders, subjectPages, workstreamPlan } from "../checks/split-plan.ts";
+import { HELD_STATE, closing, moves, stateOf, subjectFolders, subjectPages, workstreamPlan } from "../checks/split-plan.ts";
 import { begin, end, span, tagsOf } from "../lib/timing.ts";
 
 const STRUCTURE = new Set<string>([WORKSTREAMS, SESSIONS, ARCS, ...WORKSTREAM_STATES, ""]);
@@ -67,6 +67,9 @@ export function closingMessage(payload: Payload): string | null {
     // `in progress <time>` is never landed (RD.DEVEX.WORKSPACE.184). The close gate refuses such a
     // row before the move, so one found here was moved past the gate, and the line says so.
     const running = states.filter((s) => s === "in-progress").length;
+    // `⏸ held on Q<n>` waits on a card's answer (RD.DEVEX.WORKSPACE.188), and the gate refuses it the
+    // same way, so a held row found here was moved past the gate too.
+    const held = states.filter((s) => s === HELD_STATE).length;
 
     const tail = [
       ...(carried ? [`${carried} carried to a named successor`] : []),
@@ -76,9 +79,13 @@ export function closingMessage(payload: Payload): string | null {
     // `1 rows landed` is what the Python said, every time a scope closed with one row. This is the
     // line the developer asked for by name, so it reads as somebody wrote it.
     const rowWord = landed === 1 ? "row" : "rows";
-    if (running)
-      return `${subject} moved to closed/ with ${running} ${running === 1 ? "row" : "rows"} still marked ` +
-             `in progress, which ${running === 1 ? "is" : "are"} not landed. ${landed} ${rowWord} landed${rest}. ` +
+    const open = [
+      ...(running ? [`${running} ${running === 1 ? "row" : "rows"} still marked in progress`] : []),
+      ...(held ? [`${held} ${held === 1 ? "row" : "rows"} held on a card`] : []),
+    ];
+    if (open.length)
+      return `${subject} moved to closed/ with ${open.join(" and ")}, which ${running + held === 1 ? "is" : "are"} ` +
+             `not landed. ${landed} ${rowWord} landed${rest}. ` +
              `Land each one or say where it went before calling the scope finished.`;
     return `${subject} is closed. ${landed} ${rowWord} landed${rest} — that is a scope finished, ` +
            `recorded, and findable by whoever comes next. Well done.`;

@@ -7,6 +7,10 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "checks", "behaviour-join.ts");
+// The behaviours seat of a repository's docs tree, as spn-foundation
+// docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md § The five seats names it. This
+// plugin does not import spn-devex's `lib/docs-tree.ts`, so the seat is stated once here instead.
+const BEHAVIORS_SEAT = join("docs", "03-behaviors");
 const kept = [];
 process.on("exit", () => { for (const d of kept) rmSync(d, { recursive: true, force: true }); });
 
@@ -24,7 +28,7 @@ const repo = (rows, files = {}, stack = "TS") => {
   const all = {
     "sprepo.json": JSON.stringify({ type: "APPS", config: { mtype: "APPS", ...(stack ? { stack } : {}) } }),
     "apps/api/spkind.json": '{"kind":"APP_SERVER","config":{"mtype":"APP_SERVER","code":"api"}}',
-    "docs/03-behaviors/login.md": [
+    [join(BEHAVIORS_SEAT, "login.md")]: [
       "| Id | Who | Does | Sees | Type | Tier | Status | Updated at |",
       "| --- | --- | --- | --- | --- | --- | --- | --- |",
       ...rows.map(([id, status]) => `| ${id} | a person | signs in | in | POSITIVE | CONTRACT | ${status} | — |`),
@@ -80,7 +84,7 @@ console.log("\n=== behaviour-join — what it passes");
 
 {
   const { code } = run(repo([["IAM.LOGIN.01", "PLANNED"]], {
-    "docs/03-behaviors/other.md": "| Id | Behaviour | Status |\n| --- | --- | --- |\n| STK.CLI.01 | scaffold | ✅ |\n",
+    [join(BEHAVIORS_SEAT, "other.md")]: "| Id | Behaviour | Status |\n| --- | --- | --- |\n| STK.CLI.01 | scaffold | ✅ |\n",
     [CASE]: spec("[STK.CLI.01] a scaffolded module validates"),
   }));
   ok("an id declared in a table of another shape still counts as declared", code === 0, `exit ${code}`);

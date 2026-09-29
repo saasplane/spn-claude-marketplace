@@ -21,7 +21,7 @@
 //                      open workstream that argues it still has rows that have not landed.
 //   close           :  a REFUSAL. Every row must be ACCOUNTED FOR, which is not the same as finished:
 //                      landed, carried and deferred all pass; a row nobody decided, a row marked
-//                      `◐ stopped` and a row still `in progress <time>` refuse.
+//                      `◐ stopped`, a row still `in progress <time>` and a row `⏸ held on Q<n>` refuse.
 //                      There is no override, and none is needed — recording the deferral is the way through.
 //
 //   sweep :  node split-plan.ts [path …]     (every open workstream's rows)
@@ -58,6 +58,13 @@ const STOPPED = ["stopped", "◐"];
 // refuses it like an empty or a stopped row, and the Stop hook names it with its age rather than
 // calling it runnable: a second window leaves it alone and asks the developer.
 const IN_PROGRESS = /^in[ -]progress\b/i;
+// `⏸ held on Q<n>` is the row that waits for card `Q<n>`'s answer, because that answer can change it
+// (RD.DEVEX.WORKSPACE.188). It is not accounted for, so the close refuses it like a stopped row, and
+// the Stop hook leaves it out of the runnable rows while the card is open. The glyph is optional
+// because a hand-typed mark can drop it; `LEAD` strips it when it is there.
+const HELD = /^held on (q\d+)\b/i;
+/** The state `stateOf` gives a held row. Every reader of the row states names it through this. */
+export const HELD_STATE = "held";
 // A cell opens with a mark glyph before its word: ✅ landed, ↷ carried, ⊘ deferred. The word is what
 // carries the meaning, so the reader skips anything that is not a letter to find it.
 const LEAD = /^[^0-9a-z]+/i;
@@ -274,6 +281,12 @@ export function isInProgress(cell: string): boolean {
   return IN_PROGRESS.test(flat(cell).replace(/[*_`]/g, "").trim().replace(LEAD, ""));
 }
 
+/** The card a State cell reading `⏸ held on Q<n>` waits on, as `Q<n>`, or `null` where it is not held. */
+export function heldOn(cell: string): string | null {
+  const m = HELD.exec(flat(cell).replace(/[*_`]/g, "").trim().replace(LEAD, ""));
+  return m ? m[1].toUpperCase() : null;
+}
+
 /** How old a mark is, in the words a reader asks with: `3 h 5 min`, `2 d 4 h`, `under a minute`. */
 export function markAge(since: Date | null, now = Date.now()): string {
   if (!since) return "an age this check cannot read";
@@ -292,9 +305,9 @@ export function markedAgo(cell: string, now = Date.now()): string {
 }
 
 /**
- * `empty` · `landed` · `carried` · `deferred` · `stopped` · `in-progress` · `pending`.
+ * `empty` · `landed` · `carried` · `deferred` · `stopped` · `in-progress` · `held` · `pending`.
  *
- * The close accepts three of the six, so it has to tell them apart. `ACCOUNTED` named all three from
+ * The close accepts three of the eight, so it has to tell them apart. `ACCOUNTED` named all three from
  * the first version and nothing read it. A row saying `carried` and a row saying `agreed` were one
  * value, so the gate warned about rows that had named their successor. That teaches a reader that
  * marking a row changes nothing.
@@ -316,6 +329,8 @@ export function stateOf(row: Row): string {
   if (startsWithAny(raw, STOPPED) || startsWithAny(state, STOPPED)) return "stopped";
   // Somebody is on it now. Read before `pending`, which would let it close clean.
   if (IN_PROGRESS.test(state)) return "in-progress";
+  // Waits on a card. Read before `pending`, which would let it close clean.
+  if (heldOn(row.state) !== null) return HELD_STATE;
   return "pending";
 }
 
@@ -442,8 +457,8 @@ export function sequencingResolved(root: string, subject: string, row: Row): boo
 }
 
 /**
- * Whether a row said what became of it. Three states do; `stopped`, `in-progress`, `pending` and
- * `empty` do not.
+ * Whether a row said what became of it. Three states do; `stopped`, `in-progress`, `held`, `pending`
+ * and `empty` do not.
  * `ACCOUNTED` is that set, and this is the one reader it has.
  */
 export function accounted(row: Row): boolean {
@@ -975,6 +990,7 @@ export function gateClose(payload: Payload): Verdict {
     const pending = rows.filter((row) => !accounted(row));
     const stopped = rows.filter((row) => stateOf(row) === "stopped");
     const running = rows.filter((row) => stateOf(row) === "in-progress");
+    const held = rows.filter((row) => stateOf(row) === HELD_STATE);
 
     // A CARRY THAT CANNOT LAND IS NOT ACCOUNTED FOR, whatever its cell says. This runs before the
     // undecided and stopped lists because it is the one fault a reader cannot see: the cell reads
@@ -1061,7 +1077,7 @@ export function gateClose(payload: Payload): Verdict {
       };
     }
 
-    if (!empty.length && !stopped.length && !running.length) {
+    if (!empty.length && !stopped.length && !running.length && !held.length) {
       // ACCOUNTED FOR IS THREE STATES, AND `accounted()` READS ALL THREE. It did not once: a row
       // naming its successor counted the same as one saying `🚧 agreed`, and closing `007` warned
       // about sixteen rows that had each been decided. What is left here is the real case — designed,
@@ -1091,6 +1107,7 @@ export function gateClose(payload: Payload): Verdict {
       ...(empty.length ? [`${empty.length} row(s) nobody decided`] : []),
       ...(stopped.length ? [`${stopped.length} row(s) you started and stopped`] : []),
       ...(running.length ? [`${running.length} row(s) still marked in progress`] : []),
+      ...(held.length ? [`${held.length} row(s) held on a card`] : []),
     ];
     // A ROW IN PROGRESS IS WORK SOMEBODY IS DOING NOW, or did and never marked landed. Either way the
     // close cannot tell which, and the mark's age is what lets the developer decide (RD.DEVEX.WORKSPACE.184).
@@ -1099,6 +1116,13 @@ export function gateClose(payload: Payload): Verdict {
         running.slice(0, 10).map((r) => `  - ${r.scope} — ${r.label.slice(0, 70)} (${markedAgo(r.state)})`).join("\n") +
         `\n\nLanding replaces the mark with what the row reached and its commit. If the window that ` +
         `marked it is gone, ask the developer before you take the row over.`
+      : "";
+    // A HELD ROW WAITS ON A CARD'S ANSWER (RD.DEVEX.WORKSPACE.188). Closing over it would record a
+    // scope as finished while the question that can change it is still open.
+    const heldBlock = held.length
+      ? `\n\nRows held on a card:\n` +
+        held.slice(0, 10).map((r) => `  - ${r.scope} — ${r.label.slice(0, 70)} (waits on ${heldOn(r.state)})`).join("\n") +
+        `\n\nAnswer the card, record the answer, and run the row or mark it carried or deferred.`
       : "";
     const stoppedBlock = stopped.length
       ? `\n\nRows started and stopped:\n${stoppedListed}\n\nA stopped row is half an edit sitting ` +
@@ -1111,11 +1135,12 @@ export function gateClose(payload: Payload): Verdict {
       note: `Close gate — \`${subject}\` cannot close yet: ${counts.join(" and ")}.`,
       deny:
         `Denied: \`${subject}\` cannot close while its split plan holds a row nobody decided, or a ` +
-        `row somebody started and put down or is still on. The check is ACCOUNTED FOR, never finished — landed, ` +
+        `row somebody started and put down, is still on, or is held on a card. The check is ACCOUNTED FOR, never finished — landed, ` +
         `carried and deferred all pass, and closing a scope with work pending is a normal act.\n` +
         (empty.length ? `Undecided rows:\n${listed}${more}` : "") +
         stoppedBlock +
         runningBlock +
+        heldBlock +
         (empty.length
           ? `\n\nGive each undecided row one of three states, in the plan's State column:\n` +
             `  landed   → the node that now holds the content, as a path\n` +
@@ -1145,7 +1170,7 @@ function sweep(roots: string[]): number {
       // SEQUENCING IS COUNTED APART FROM HANDOVER. A row pointing at a later arc of this same
       // workstream is not carried; it resolves through that arc, and counting it as accounted for is
       // how `pending 0` stood over ten rows of undone work.
-      const tally: Record<string, number> = { landed: 0, carried: 0, sequencing: 0, deferred: 0, stopped: 0, "in-progress": 0, pending: 0, empty: 0 };
+      const tally: Record<string, number> = { landed: 0, carried: 0, sequencing: 0, deferred: 0, stopped: 0, "in-progress": 0, [HELD_STATE]: 0, pending: 0, empty: 0 };
       for (const row of rows) {
         const state = stateOf(row);
         // A carried row pointing inside this workstream is sequencing, and it is reported as its own
@@ -1156,7 +1181,7 @@ function sweep(roots: string[]): number {
       console.log(
         `  ${subject}: ${rows.length} rows · landed ${tally.landed} · carried ${tally.carried} · ` +
         `sequencing ${tally.sequencing} · deferred ${tally.deferred} · stopped ${tally.stopped} · ` +
-        `in progress ${tally["in-progress"]} · ` +
+        `in progress ${tally["in-progress"]} · held ${tally[HELD_STATE]} · ` +
         `pending ${tally.pending} · undecided ${tally.empty} · ${pages.length} page(s)`);
       for (const row of rows)
         if (stateOf(row) === "empty") console.log(`      undecided  ${row.scope} — ${row.label.slice(0, 70)}`);

@@ -184,8 +184,20 @@ one("a row still marked in progress refuses the close, and its age is named", "c
   move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
   "deny", { says: "still marked in progress", parity: false, why: "the Python predates the mark" });
 
+// RD.DEVEX.WORKSPACE.188 — `⏸ held on Q<n>` waits on a card's answer. It is not accounted for, so the
+// close refuses it as it refuses a stopped row, and names the card it waits on.
+one("a row held on a card refuses the close, and the card is named", "close",
+  buildArcs("m11-sp-held", [...ARC_LANDED, ["4", "spn-platform-ts", "the proof", "⏸ held on Q352"]], { page: true }),
+  move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
+  "deny", { says: "waits on Q352", parity: false, why: "the Python predates the mark" });
+
+one("the mark without its glyph refuses the same", "close",
+  buildArcs("m11-sp-held-bare", [...ARC_LANDED, ["4", "spn-platform-ts", "the proof", "held on Q352"]], { page: true }),
+  move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
+  "deny", { says: "held on a card", parity: false, why: "the Python predates the mark" });
+
 {
-  const { stateOf, inProgressSince, markAge, markedAgo } = await import("../../../../src/scripts/checks/split-plan.ts");
+  const { stateOf, heldOn, inProgressSince, markAge, markedAgo } = await import("../../../../src/scripts/checks/split-plan.ts");
   const row = (state) => ({ label: "x", scope: "spn-foundation", state });
   const now = Date.parse("2026-09-29T12:00:00Z");
   for (const [what, got, expected] of [
@@ -194,6 +206,10 @@ one("a row still marked in progress refuses the close, and its age is named", "c
     ["landing replaces the mark", stateOf(row("✅ landed — `abc1234`")), "landed"],
     ["a stop is still a stop", stateOf(row("◐ stopped — half done")), "stopped"],
     ["a cell that only mentions progress is not the mark", stateOf(row("agreed; progress later")), "pending"],
+    ["the book's held form reads as held", stateOf(row("⏸ held on Q352")), "held"],
+    ["a held mark without its glyph reads the same", stateOf(row("**held on Q352**")), "held"],
+    ["the card a held row waits on is named", heldOn("⏸ held on q352 — the answer can change it"), "Q352"],
+    ["a cell that only mentions holding is not the mark", stateOf(row("agreed; held the line on Q3")), "pending"],
     ["the offset is honoured", inProgressSince("in progress 2026-09-29 14:32 +05:30")?.toISOString(), "2026-09-29T09:02:00.000Z"],
     ["no offset reads as UTC", inProgressSince("in progress 2026-09-29 09:02")?.toISOString(), "2026-09-29T09:02:00.000Z"],
     ["a mark with no time has no age", inProgressSince("in progress"), null],

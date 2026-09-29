@@ -19,9 +19,9 @@ import { masthead, type MastheadKind } from "../../checks/doc-check.ts";
 import { filesUnder as proseFilesUnder, paragraphs as proseParagraphs, score as proseScore } from "./prose.ts";
 
 import { withOffset } from "../../lib/clock.ts";
-import { ARTIFACT_FOLDERS, DEVEX_WORKSTREAMS, RETIRED_ARTIFACT, SEAT, SEATS, TEMPLATES, behaviorsDir, bookTemplatesDir,
-  capabilitiesDir, constructsDir, docsOf, inRetiredArtifact, inSeat, inTemplates, isProducedPage, mirrorPath,
-  overviewsDir, producedPageOf, retiredArtifactDir, seatOf, splitAtSeat } from "../../lib/docs-tree.ts";
+import { ARTIFACT_FOLDERS, DEVEX_WORKSTREAMS, SEAT, SEATS, TEMPLATES, artifactFolderOf, behaviorsDir, bookTemplatesDir,
+  capabilitiesDir, constructsDir, docsOf, inSeat, inTemplates, isProducedPage, mirrorPath,
+  overviewsDir, producedPageOf, seatOf, splitAtSeat } from "../../lib/docs-tree.ts";
 export type Grade = "RULE" | "SOFT";
 export type Finding = { check: string; grade: Grade; file: string; message: string };
 
@@ -221,21 +221,20 @@ export function checkBlock(file: string, src: string, block: any, err: string | 
   if (variant && !VARIANTS.includes(variant)) add("RULE", `\`variant\` \`${variant}\` is not one of ${VARIANTS.join(" · ")}`);
 
   // AN ARGUMENT IS A WORKSTREAM'S, NEVER A REPOSITORY'S (05-artifacts.md § What the pocket holds).
-  // The pocket's folder set is fixed — overviews, constructs, reports, resources — so `approaches/`
-  // was never a legal folder, and the rule held only as long as somebody remembered it. Fifteen
-  // pages had accumulated before this fired. A repository states what is true now; an approach page
-  // weighs options and carries open cards, and a pocket holding both is how a stale argument comes
-  // to be read as a statement of today.
+  // A repository states what is true now; an approach page weighs options and carries open cards,
+  // and a docs tree holding both is how a stale argument comes to be read as a statement of today.
+  // Fifteen pages had accumulated in repositories before this fired.
   if (variant === "approach" && /(^|\/)docs\//.test(file.replace(/\\/g, "/")))
     add("RULE", `an approach page belongs to the workstream that argues it, never to a repository's \`docs/\` — move it under \`${DEVEX_WORKSTREAMS}/\``);
 
-  // THE POCKET'S FOLDER SET IS OVERVIEWS, CONSTRUCTS, REPORTS AND NOTHING ELSE. A `resources/`
-  // folder held "what a document was written from" — and every such file is a file some seat needs,
-  // so each one was a seat depending on a pocket, which is the one thing the pocket rule forbids.
-  // 229 files had collected across five repositories, 187 cited by nothing at all. A fact a seat
-  // needs lives in a seat.
-  if (inRetiredArtifact(file, RETIRED_ARTIFACT.resources))
-    add("RULE", `the pocket holds ${ARTIFACT_FOLDERS.map((folder) => `\`${folder}/\``).join(", ").replace(/, ([^,]*)$/, " and $1")} — a fact a seat needs lives in a seat, never in \`${RETIRED_ARTIFACT.resources}/\``);
+  // THE POCKET'S FOLDER SET IS OVERVIEWS, CONSTRUCTS, REPORTS AND NOTHING ELSE (05-artifacts.md
+  // § What the pocket holds). A file in any other folder of the pocket is a file some seat needs,
+  // so it is a seat depending on a pocket, which is the one thing the pocket rule forbids: 229 such
+  // files once collected across five repositories, 187 cited by nothing at all. A fact a seat needs
+  // lives in a seat.
+  const pocketFolder = artifactFolderOf(file);
+  if (pocketFolder !== null && !ARTIFACT_FOLDERS.includes(pocketFolder))
+    add("RULE", `the pocket holds ${ARTIFACT_FOLDERS.map((folder) => `\`${folder}/\``).join(", ").replace(/, ([^,]*)$/, " and $1")} — a fact a seat needs lives in a seat, never in \`${pocketFolder}/\``);
 
   // An overview describes, and a FOUNDATION construct states a standard; neither carries a status.
   // Every other page kind carries one. `carriesStatus` states why, in one place.
@@ -2973,10 +2972,6 @@ export function gapReport(repo: string, workspace: string, asJson: boolean): num
     };
   });
 
-  const approachDir = retiredArtifactDir(tree, RETIRED_ARTIFACT.approaches);
-  const approaches = existsSync(approachDir)
-    ? readdirSync(approachDir).filter((f) => f.endsWith(".html")).sort() : [];
-
   const pages = walkFiles(tree, (p) => p.endsWith(".md") || p.endsWith(".html"));
   const findings = audit(pages, workspace);
   const byCheck = new Map<string, number>();
@@ -3009,7 +3004,7 @@ export function gapReport(repo: string, workspace: string, asJson: boolean): num
     `  "title": "Docs Audit — ${name}",`,
     '  "lenses": ["ARCHITECT", "VOICE"],',
     '  "status": "DONE",',
-    `  "summary": "What this repository's corpus looks like on ${at}, measured against the landed standard — its seats, what each domain owes, the arguments still in its pocket, the pages off the standard, and the paragraphs a language pass would read."`,
+    `  "summary": "What this repository's corpus looks like on ${at}, measured against the landed standard — its seats, what each domain owes, the pages off the standard, and the paragraphs a language pass would read."`,
     "}",
     "-->",
     "",
@@ -3038,13 +3033,6 @@ export function gapReport(repo: string, workspace: string, asJson: boolean): num
     "",
     "> [!NOTE]",
     "> **Read a 0 in the last column as *unmeasured*, never as *owes nothing*.** A concept is given its one line per construct by `docs.ts face`, and it can only write that once the constructs exist. Until then the column reports the concept's own bullet lists, which most concepts do not yet carry.",
-    "",
-    "## The arguments still in the pocket",
-    "",
-    approaches.length
-      ? [`${approaches.length} approach page(s). Each argues one design and stays the record of the moment it was argued. Where a construct comes to carry its *What*, the page is retired rather than deleted.`, "",
-         ...approaches.map((a) => `- [${a.replace(/-approach\.html$/, "")}](../${RETIRED_ARTIFACT.approaches}/${a})`)].join("\n")
-      : "None.",
     "",
     "## Pages off the standard",
     "",
@@ -3087,7 +3075,6 @@ export function gapReport(repo: string, workspace: string, asJson: boolean): num
       seats: seatRows,
       nodeTrees: strays,
       domains: domainRows,
-      approaches: approaches,
       pageFindings: findings,
       proseCandidates: { total: totalFlagged, files: prose.length },
     }, null, 2));
@@ -3095,7 +3082,7 @@ export function gapReport(repo: string, workspace: string, asJson: boolean): num
   }
   console.log(body);
   console.error(`  seats ${seatRows.filter((r) => r.present).length}/5 · node trees ${strays.length} · domains ${domainRows.length}` +
-    ` · constructs ${domainRows.reduce((n, d) => n + d.has, 0)} · approaches ${approaches.length}` +
+    ` · constructs ${domainRows.reduce((n, d) => n + d.has, 0)}` +
     ` · page findings ${findings.length} · prose candidates ${totalFlagged} in ${prose.length} file(s)`);
   return 0;
 }

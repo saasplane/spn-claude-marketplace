@@ -718,6 +718,48 @@ console.log("\n=== runnable — a row in progress is named with its age, never c
   ]) { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${what}${ok ? "" : `\n        ${JSON.stringify(found).slice(0, 300)}`}`); }
 }
 
+console.log("\n=== runnable — a row held on an open card is not runnable, and is once the card is answered (RD.DEVEX.WORKSPACE.188)");
+{
+  const { unfinishedSteps } = await import("../../../../src/scripts/events/stop.ts");
+  const HELD_ARC = (mark) => `# N4 — a subject\n\nStatus: **RUNNING — 2026-09-29.**\n\n## Steps\n\n` +
+    `| # | Repo | Altitude | What | Mechanism | Acceptance | State |\n| --- | --- | --- | --- | --- | --- | --- |\n` +
+    `| 6 | spn-foundation | DOCS | the chapter | by hand | audit | LANDED — \`abc1234\` |\n` +
+    `| 7 | spn-support-ts | CODE | the split check | by hand | its suite | ${mark} |\n\n## Log\n\n- **2026-09-29 — go.**\n`;
+  // Card Q352 as the template writes it: open, then the same card carrying its decision.
+  const Q352 = (decision) => `  <div class="open">
+    <h4 id="q352">Q352 &middot; which way</h4>
+    <div class="scroll"><table><thead><tr><th></th><th>What</th></tr></thead>
+    <tbody><tr><td><strong>A</strong></td><td>one way</td></tr></tbody></table></div>
+    <div class="rec"><b>Recommended: A.</b> <b>Decision:</b> ${decision}</div>
+  </div>`;
+  const arcIn = (name, mark, decision) => {
+    const root = workspace(name, {
+      [`.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html`]: page({ cards: Q352(decision), names: ["N4-a-subject.md"] }),
+      [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N4-a-subject.md`]: HELD_ARC(mark),
+    });
+    return join(root, `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N4-a-subject.md`);
+  };
+  const OPEN = "&mdash;", ANSWERED = "A, 2026-09-29";
+  for (const [what, got, ok] of [
+    ["a row held on Q352 while Q352 is open is not runnable",
+      unfinishedSteps(arcIn("m11-held-open", "⏸ held on Q352", OPEN)), (steps) => steps.length === 0],
+    ["the same row, once Q352 is answered, is runnable and named",
+      unfinishedSteps(arcIn("m11-held-answered", "⏸ held on Q352", ANSWERED)),
+      (steps) => steps.length === 1 && steps[0].startsWith("step 7 was held on Q352, which is answered")],
+    ["the mark without its glyph is read the same while the card is open",
+      unfinishedSteps(arcIn("m11-held-bare-open", "held on Q352", OPEN)), (steps) => steps.length === 0],
+    ["and the same once the card is answered",
+      unfinishedSteps(arcIn("m11-held-bare-answered", "held on Q352", ANSWERED)),
+      (steps) => steps.length === 1 && steps[0].startsWith("step 7 was held on Q352, which is answered")],
+    ["a row held on a card the page does not carry open is runnable",
+      unfinishedSteps(arcIn("m11-held-other", "⏸ held on Q9", OPEN)),
+      (steps) => steps.length === 1 && steps[0].startsWith("step 7 was held on Q9")],
+    ["an unmarked row beside an open card is still an unfinished step",
+      unfinishedSteps(arcIn("m11-held-none", "", OPEN)), (steps) => steps.length === 1 && steps[0] === "step 7 — the split check"],
+  ]) { n += 1; const pass = ok(got ?? []); if (!pass) failed += 1;
+       console.log(`  ${pass ? "PASS" : "FAIL"}  ${what}${pass ? "" : `\n        ${JSON.stringify(got)}`}`); }
+}
+
 console.log("\n=== reply-shape — a sentence that reports an answer is not asking for one");
 {
   // It fired on a reply that had just told the developer their ALREADY ANSWERED card turned out to

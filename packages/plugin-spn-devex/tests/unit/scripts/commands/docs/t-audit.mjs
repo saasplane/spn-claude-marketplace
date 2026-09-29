@@ -9,7 +9,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, rmSync
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
-import { ARTIFACT, POCKET, RETIRED_ARTIFACT, SEAT, WORKSTREAMS, bookTemplatesDir } from "../../../../../src/scripts/lib/docs-tree.ts";
+import { ARTIFACT, POCKET, SEAT, WORKSTREAMS, bookTemplatesDir } from "../../../../../src/scripts/lib/docs-tree.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
 const BASE = mkdtempSync(join(tmpdir(), "t-docs-audit-"));
@@ -452,7 +452,6 @@ console.log("\n=== the gap scan measures and never fixes");
     [`docs/${SEAT.purpose}/README.md`]: doc({ id: "p", title: "Purpose", lenses: ["ARCHITECT"], status: "PLANNING" }, "x\n", "`For: Architect` · `Status: 🔮 PLANNING`"),
     [`docs/${SEAT.constructs}/README.md`]: doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }, "x\n", "`For: Architect` · `Status: 🔮 PLANNING`"),
     [`docs/${SEAT.constructs}/01-core/README.md`]: doc({ id: "c", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }, "x\n", "`For: Architect` · `Status: 🔮 PLANNING`"),
-    [`docs/${POCKET.artifacts}/${RETIRED_ARTIFACT.approaches}/a-approach.html`]: "<p>an argument</p>\n",
     // A page with no metadata block: the finding the scan exists to count.
     [`docs/${SEAT.behaviors}/README.md`]: "# Behaviors\n\nno block here.\n",
     // A node still carrying a tree: the shape the consolidation removed.
@@ -471,7 +470,8 @@ console.log("\n=== the gap scan measures and never fixes");
   one("a node still carrying a docs tree is a finding", rep, has("still carry a docs tree"));
   one("a domain with nothing written in it is a DOMAIN, not a group", rep, has("`01-core`"));
   one("what the concept lists is what the domain owes", rep, (g) => /\| `01-core` \| ✅ \| 0 \| 1 \|/.test(g));
-  one("the arguments still in the pocket are listed", rep, has("a-approach.html"));
+  // An approach page lives in its workstream, so the pocket holds no arguments to count.
+  one("the report counts no arguments in the pocket", rep, lacks("arguments still in the pocket"));
   one("a page with no block is counted", rep, has("block (RULE)"));
   one("--json hands the agent the same measurement as data",
     run(root, ["audit", "--report", ".", "--json"]), (g) => {
@@ -479,18 +479,17 @@ console.log("\n=== the gap scan measures and never fixes");
       catch { return false; }
     });
 
-  // AN ARGUMENT IS A WORKSTREAM'S, NEVER A REPOSITORY'S. The rule is old — 05-artifacts.md has
-  // always said "an argument does not live here", and the pocket's folder set never had an
-  // `approaches/` in it — but nothing checked it, so fifteen pages accumulated across three
-  // repositories before anybody counted. A rule a person has to remember is a rule that holds
-  // until the week somebody is busy.
+  // AN ARGUMENT IS A WORKSTREAM'S, NEVER A REPOSITORY'S. 05-artifacts.md has always said "an
+  // argument does not live here", but nothing checked it, so fifteen pages accumulated across three
+  // repositories before anybody counted. A rule a person has to remember is a rule that holds until
+  // the week somebody is busy. The page is refused wherever it sits in `docs/`, a pocket folder too.
   {
     const ws = repo({
-      [`docs/${POCKET.artifacts}/${RETIRED_ARTIFACT.approaches}/x-approach.html`]:
+      [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/x-approach.html`]:
         doc({ id: "x", variant: "approach", title: "X", lenses: ["ARCHITECT"], status: "PLANNING" },
             "<p>an argument</p>\n"),
     });
-    const got = run(ws, ["audit", `docs/${POCKET.artifacts}/${RETIRED_ARTIFACT.approaches}/x-approach.html`]);
+    const got = run(ws, ["audit", `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/x-approach.html`]);
     one("an approach page in a repository's docs is refused", got, has("belongs to the workstream"));
   }
   {
@@ -504,17 +503,18 @@ console.log("\n=== the gap scan measures and never fixes");
     one("the same page in a workstream is not", got, (g) => !/belongs to the workstream/.test(g));
   }
 
-  // The pocket's folder set is overviews, constructs and reports. `resources/` held "what a
-  // document was written from", and every such file was a seat depending on a pocket — 229 files
-  // across five repositories, 187 of them cited by nothing.
-  {
+  // The pocket's folder set is overviews, constructs and reports (05-artifacts.md § What the pocket
+  // holds). A folder the set does not name held "what a document was written from", and every such
+  // file was a seat depending on a pocket — 229 files across five repositories, 187 of them cited by
+  // nothing. The check reads the set, so any other name is refused the same way; two are probed.
+  for (const folder of ["resources", "notes"]) {
     const ws = repo({
-      [`docs/${POCKET.artifacts}/${RETIRED_ARTIFACT.resources}/packages/x/purpose.md`]:
+      [`docs/${POCKET.artifacts}/${folder}/packages/x/purpose.md`]:
         doc({ id: "xp", title: "Purpose — x", lenses: ["ARCHITECT"], status: "DONE" },
             "why x exists\n", "`For: Architect` · `Status: ✅ DONE`"),
     });
-    const got = run(ws, ["audit", `docs/${POCKET.artifacts}/${RETIRED_ARTIFACT.resources}/packages/x/purpose.md`]);
-    one("a file in the pocket's resources folder is refused", got, has("lives in a seat"));
+    const got = run(ws, ["audit", `docs/${POCKET.artifacts}/${folder}/packages/x/purpose.md`]);
+    one(`a file in a pocket folder outside the set (${folder}/) is refused`, got, has(`never in \`${folder}/\``));
   }
   {
     // The same file in the seat that owns it is exactly right, and must pass untouched.
@@ -525,6 +525,16 @@ console.log("\n=== the gap scan measures and never fixes");
     });
     const got = run(ws, ["audit", `docs/${SEAT.purpose}/x.md`]);
     one(`the same file in ${SEAT.purpose} is not`, got, (g) => !/lives in a seat/.test(g));
+  }
+  {
+    // A folder the set names is the pocket working as intended, and this rule stays quiet on it.
+    const ws = repo({
+      [`docs/${POCKET.artifacts}/${ARTIFACT.reports}/x.md`]:
+        doc({ id: "xr", title: "Report — x", lenses: ["ARCHITECT"], status: "DONE" },
+            "what x measured\n", "`For: Architect` · `Status: ✅ DONE`"),
+    });
+    const got = run(ws, ["audit", `docs/${POCKET.artifacts}/${ARTIFACT.reports}/x.md`]);
+    one(`a file in ${ARTIFACT.reports}/, a folder the set names, is not`, got, (g) => !/lives in a seat/.test(g));
   }
 
   one("and it names what it did NOT measure rather than reporting a zero",
