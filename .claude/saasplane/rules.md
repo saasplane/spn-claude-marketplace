@@ -17,7 +17,7 @@ names that stack.
 
 ## Commands you run here
 
-The `spnutils` groups this repository's world (`GENERAL`) uses — `repo` — read from the program itself. `<x>` is required, `[x]` is optional; `spnutils <command> --help` lists every option.
+The `spnutils` groups this repository's world (`GENERAL`) uses — `repo` — read from the program itself. `<x>` is required, `[x]` is optional; `spnutils <command> --help` lists every option. Where an argument or option takes a closed set of values, the line under the command lists them.
 
 - `spnutils repo agent-sync` — Converges this repo for SaaS Plane agents: the marketplace registration, the plugins its sprepo.json implies, the managed CLAUDE.md block and the generated rules beside it, and any installed plugin that has drifted from the marketplace. One path, whether the repo was wired before or not
 - `spnutils repo create <name>` — Create the repository in the bound SCM if absent, then converge it — branches, protections, team access
