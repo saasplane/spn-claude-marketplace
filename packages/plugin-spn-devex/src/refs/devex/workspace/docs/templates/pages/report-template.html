@@ -1,3 +1,8 @@
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § Reports and templates · § The four page kinds · § The masthead, and the opening · § The suffix names the kind · § One stylesheet, shipped with the template
+     and docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md § The readability bar
+     This file carries rules it does not own. The chapters above are the source of truth.
+     A rule change is edited there first, then here, in the same change. Never add a rule here.
+     restate-drift.ts reports this copy when its source moves. -->
 <!-- REPORT TEMPLATE. One shell for all four report kinds — AUDIT (the repository's wiring) · CODE (the source against
      the stack's standards) · DOCS (the corpus against the docs standards) · TESTS (what the tests have proved). The set
      is closed by RD.DEVEX.WORKSPACE.149; a fifth kind is a decision entry, never a new filename. The skeleton is the overview
@@ -6,7 +11,11 @@
      LANDS AT `docs/artifacts/reports/<kind>-report.html`, replaced in place — the name says what was measured and the
      suffix says what kind of document it is, so the folder reads without the book.
      A REPORT ANSWERS ONE QUESTION AT ONE MOMENT. `measuredAt` is what lets the next one supersede it: a page with no
-     as-of cannot be superseded, because nobody can tell which is newer. It carries a `status` like every other document,
+     as-of cannot be superseded, because nobody can tell which is newer. It is a date and a time with its offset
+     (2026-09-29T14:32+05:30), shown in the header as "Measured: 2026-09-29 14:32 +05:30", because the database keeps
+     UTC and a developer's machine keeps local time. It is the time of what was measured, never the clock when the page
+     was written: a TESTS report stamps the newest run it read, and a report that reads the tree itself (AUDIT, DOCS)
+     stamps the moment it read the tree. It carries a `status` like every other document,
      and that status is the state of WHAT IT MEASURED — never a claim about the page.
      WRITTEN BY THE AGENT through the report skill, never by a tool. The agent reads the repository, fills this skeleton
      from what it read, and every number on the page names where it was read from. A tool that needs to hand the agent a
@@ -26,17 +35,12 @@
          concrete faster than a definition does.
        · NAME A SET BY WHAT ITS MEMBERS DO, never by their labels: "the ones that check a screen, a published
          interface, several pieces working together, or a whole journey" rather than a list of tier names.
-     The test is rule 2's own: a reader who has never opened this book finishes the first paragraph knowing what the
-     number means. -->
-<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § Reports and templates · § The four page kinds · § The suffix names the kind · § One stylesheet, shipped with the template
-     and docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md § The readability bar
-     This file carries rules it does not own. The chapters above are the source of truth.
-     A rule change is edited there first, then here, in the same change. Never add a rule here.
-     restate-drift reports this copy when a source moves. -->
+     The test is rule 2's own: a reader who has never opened this book finishes the Summary knowing what the number
+     means. The opening carries no number at all: it says what was counted, and the count starts in the Summary. -->
 <meta charset="utf-8">
 <title>Report Template</title>
 <!-- spn:doc
-{"id": "{{repo}}-{{kind}}-report", "variant": "report", "reportType": "{{AUDIT|CODE|DOCS|TESTS}}", "title": "{{KIND, in plain words}}", "lenses": ["{{LENS}}"], "status": "{{the state of WHAT WAS MEASURED, never of this page — PLANNING · IMPLEMENTING · DONE}}", "measuredAt": "{{YYYY-MM-DD}}", "summary": "{{One sentence: what was measured and the one number that matters.}}", "keywords": ["report", "{{kind}}"]}
+{"id": "{{repo}}-{{kind}}-report", "variant": "report", "reportType": "{{AUDIT|CODE|DOCS|TESTS}}", "title": "{{KIND, in plain words}}", "lenses": ["{{LENS}}"], "status": "{{the state of WHAT WAS MEASURED, never of this page — PLANNING · IMPLEMENTING · DONE}}", "measuredAt": "{{YYYY-MM-DDTHH:MM±HH:MM}}", "summary": "{{One sentence: what was measured and the one number that matters.}}", "keywords": ["report", "{{kind}}"]}
 -->
 <style>
   :root {
@@ -98,6 +102,7 @@
   .tile .more{font-size:var(--sm);font-weight:600;text-decoration:none;align-self:flex-start}
   p > .more{font-weight:600;text-decoration:none}
   h1{font-family:var(--ui);font-size:var(--xxl);font-weight:700;letter-spacing:-.02em;line-height:1.15;text-wrap:balance;margin:0}
+  .subtitle{font-size:var(--lg);font-weight:600;line-height:1.4;color:var(--ink);text-wrap:balance;max-width:46rem;margin:.6rem 0 0}
   .standfirst{font-size:var(--lg);line-height:1.5;color:var(--slate);max-width:46rem}
   .sec-head{display:grid;grid-template-columns:1fr;align-items:baseline;gap:.5rem;border-top:2px solid var(--ink);padding-top:.7rem;margin-bottom:1.1rem}
   .sec-head .num{font-family:var(--mono);font-size:var(--sm);font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
@@ -297,7 +302,7 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
 <!-- AN OVERVIEW IS WRITTEN FOR A NEW USER'S ONBOARDING. Every overview — the hub and every path — assumes no earlier
   reading, says at the start who it is for and what the reader can do after it, explains each word on first use in words
   the reader already has, and tells a first-time reader what to unlearn. A returning reader loses nothing by that; a new
-  one is lost without it.
+  one is lost without it. -->
 <!-- THREE LEVELS OF PAGE, and this template is the middle one. The HUB (concept-overview.html) is one page per
   repository: the concept at reading depth — its narrative sections as they are, then one section per area with a
   paragraph per domain and a tile per overview below. A DOMAIN OVERVIEW covers one READING PATH: the topics a reader
@@ -305,8 +310,8 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
   one path has one page per path, and the domain's complexity decides the count, never a rule of one. The name says the
   path: concept-<area>-<domain>[-<path>]-overview.html. A built repository keeps the hub and earns a domain overview only
   where its tiles cannot carry the path. A CONSTRUCT PAGE is the full page, linked and never told here.
-  THE MASTHEAD, on every overview: the header names the page (Concept; Infra · Shape); the title is the promise, a short sentence a reader would say; the standfirst is one
-  line saying what the page covers; then a plain paragraph — the problem, what the page gives you, how to read it.
+  THE MASTHEAD, on a report, has three levels: the Title (the h1), the Subtitle (p.subtitle) and the Description (one
+  p.standfirst). The comment directly above the h1 says what each one holds and how to write it.
   A HEADING NEVER CARRIES A COUNT — "Apps — how to read it", never "Apps — two reading paths": a count changes, and the
   book's rule is that a set is named by its rule, never by its cardinality (RD.DEVEX.WORKSPACE.162).
   THE BOOK'S OWN JARGON is translated on an overview: say "the agent's viewpoint" and note once that the
@@ -327,15 +332,43 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
   block's title (the audit refuses the two apart). A report DOES carry a status chip: the block's `status` is the
   state of what was measured, never a claim about the page, and the chip renders that word — PLANNING where nothing
   has been measured yet, IMPLEMENTING where the measurement found gaps, DONE where it found none. -->
-  <div class="eyebrow"><span class="line1">{{WORKSPACE}} &nbsp;|&nbsp; {{REPOSITORY}} &nbsp;|&nbsp; {{KIND, in plain words}}</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Report</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">{{ROLE}}</span></span><span class="sep">|</span><span class="lbl">Measured:</span> <span class="badge">{{YYYY-MM-DD}}</span><span class="st"><span class="lbl">Status:</span> <span class="badge status implementing">&#x1F6A7; IMPLEMENTING</span></span></span></div>
+  <div class="eyebrow"><span class="line1">{{WORKSPACE}} &nbsp;|&nbsp; {{REPOSITORY}} &nbsp;|&nbsp; {{KIND, in plain words}}</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Report</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">{{ROLE}}</span></span><span class="sep">|</span><span class="lbl">Measured:</span> <span class="badge">{{YYYY-MM-DD HH:MM ±HH:MM}}</span><span class="st"><span class="lbl">Status:</span> <span class="badge status implementing">&#x1F6A7; IMPLEMENTING</span></span></span></div>
+  <!-- THE MASTHEAD, ON A REPORT (05-artifacts.md § The masthead, and the opening · RD.DEVEX.WORKSPACE.182 and .187).
+    Three levels, in this order, and every level is plain language: everyday words, short sentences, no figure of
+    speech, no slogan, no number, and no book word (behaviour, construct, lens, kind, node, seat, tier, arc, estate,
+    ring) unless the same sentence explains it. The count moves to the Summary and to the block's summary field. A new
+    Subtitle is drafted by the agent and written only after the developer approves it.
+    WHAT EACH LEVEL HOLDS
+      Title        the h1: the report's name and its subject, in plain words, equal to the block's title.
+      Subtitle     p.subtitle: the question the report answers, as one sentence.
+      Description  one p.standfirst, and nothing after it in the header. First sentence: what was counted, with no
+                   number. Second: when you would read it. Then at most two short sentences on how it is laid out.
+    GOOD, the tests report (spn-support-ts)
+      Title        "Tests report"
+      Subtitle     "Which of the things this repository promises are checked by a test that passed?"
+      Description  "This report shows which of the things this repository promises to do are checked by a test that
+                   passed, and which are not yet. Read it before a release, or when you want to know what is still
+                   unproven. The summary comes first, and each section below covers one area."
+    BAD, one per level
+      Title        "Proof or It Did Not Happen"  A slogan in place of the report's name and subject.
+      Subtitle     "Where the rubber meets the road for every promise."  A figure of speech; it asks no question.
+      Description  "72 of the 119 behaviours are proven at their tier."  Opens with a count, and two book words
+                   (behaviour, tier) that nothing explains.
+    CHECK BEFORE YOU SAVE, in order
+      1. The Description's first sentence says what was counted, in everyday words.
+      2. Its second sentence says when or why you would read the report.
+      3. No book word appears in any level unless the same sentence explains it.
+      4. No level carries a number; every count is in the Summary.
+      5. The Subtitle is one plain sentence, asked as a question.
+      6. Read the three levels aloud once, and rewrite any sentence you stumble on. -->
   <h1>{{KIND, in plain words}}</h1>
-  <p class="standfirst">{{One line that DEFINES the thing being counted and then counts it — what a reader is looking at, in words they already have.}}</p>
-  <p>{{A plain paragraph that teaches the model in passing: where these things are written down, how one gets proved, and ONE real example quoted from what you measured. Then why it was measured now, and what it does not cover.}}</p>
+  <p class="subtitle">{{THE SUBTITLE: the question this report answers, one plain sentence with no number.}}</p>
+  <p class="standfirst">{{THE DESCRIPTION, one paragraph: what was counted, in everyday words and with no number; when you would read it; then at most two short sentences on how the report is laid out.}}</p>
 </header>
 
 <section id="s0" data-block="reasons">
   <div class="sec-head"><h2>Summary</h2></div>
-  <p>{{The answer and the one number, in the words established above. A reader who stops here has the finding and needed no other page to understand it.}}</p>
+  <p>{{First teach the model in passing: where these things are written down, how one gets proved, and ONE real example quoted from what you measured. Then the answer and the one number, in those words, why it was measured now, and what it does not cover. A reader who stops here has the finding and needed no other page to understand it.}}</p>
   <p>{{What changed since the last run of this same report, where there was one — a report nobody can diff is a report nobody reads twice.}}</p>
 </section>
 
@@ -391,7 +424,7 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
 </div>
 
 <footer>
-  A template from workstream 008 &middot; copy it, keep the comments until the page is written, then delete them &middot; the rules live in the book; this file repeats them so you never write from memory &middot; every block and figure is shown once in <code>blocks-template.html</code>
+  A template &middot; copy it, keep the comments until the page is written, then delete them &middot; the rules live in the book; this file repeats them so you never write from memory &middot; every block and figure is shown once in <code>blocks-template.html</code>
 </footer>
 
 <script>

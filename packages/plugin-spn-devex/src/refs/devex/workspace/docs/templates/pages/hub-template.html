@@ -1,6 +1,8 @@
-<!-- PROPOSED v2 — workstream 008, N13, 2026-09-21. This copy is for review; the copy the book ships lives at
-     docs/04-capabilities/01-devex/04-workspace/04-docs/templates/pages/ and changes when N13 runs. What changed from v1, for every page kind:
-     no block numbers on the page or in its rail (a number orders a file, a heading is a name); the header keeps three
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The four page kinds · § The masthead, and the opening · § The blocks — what a page reaches for instead of prose · § The figures — what sits inside a block, and the closed set of them · § The overview set is fixed, and a name says its source · § The level rule — an overview covers one level
+     This file carries rules it does not own. The chapter above is the source of truth.
+     A rule change is edited there first, then here, in the same change. Never add a rule here.
+     restate-drift.ts reports this copy when its source moves. -->
+<!-- For every page kind: no block numbers on the page or in its rail (a number orders a file, a heading is a name); the header keeps three
      segments — workspace | repository | title — and the title carries its own context (Estate Shape, not Shape); Terms are
      capitalised concept names in the order a newcomer meets them; a contract is a code block with a comment per member;
      a list of keys with meanings is a table; an author's note (a comment) never reaches the page; there is no length cap;
@@ -19,14 +21,10 @@
      THE BLOCKS AND THE FIGURES ARE ONE VOCABULARY FOR EVERY PAGE KIND — approach, overview, construct. Any page uses any block
      kind (prose, table, list, code, figure, comparison, rule) and any figure kind wherever its content calls for it; the lists
      below are shared, not this page kind's own. Only the sections differ between kinds. -->
-<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The four page kinds · § The blocks · § The figures · § The overview set is fixed · § The level rule — an overview covers one level
-     This file carries rules it does not own. The chapter above is the source of truth.
-     A rule change is edited there first, then here, in the same change. Never add a rule here.
-     restate-drift.ts reports this copy when its source moves. -->
 <meta charset="utf-8">
 <title>Hub Template</title>
 <!-- spn:doc
-{"id": "concept-overview", "variant": "overview", "title": "Concept", "lenses": ["{{LENS}}"], "summary": "{{One sentence.}}"}
+{"id": "concept-overview", "variant": "overview", "title": "Concept", "lenses": ["{{LENS}}"], "summary": "{{One sentence — the standfirst, word for word.}}"}
 -->
 <style>
   :root {
@@ -89,6 +87,7 @@
   p > .more{font-weight:600;text-decoration:none}
   .tile .glyph{float:right;font-size:.8rem;margin-left:.4rem}
   h1{font-family:var(--ui);font-size:var(--xxl);font-weight:700;letter-spacing:-.02em;line-height:1.15;text-wrap:balance;margin:0}
+  .subtitle{font-size:var(--lg);font-weight:600;line-height:1.4;color:var(--ink);text-wrap:balance;max-width:46rem;margin:.6rem 0 0}
   .standfirst{font-size:var(--lg);line-height:1.5;color:var(--slate);max-width:46rem}
   .sec-head{display:grid;grid-template-columns:1fr;align-items:baseline;gap:.5rem;border-top:2px solid var(--ink);padding-top:.7rem;margin-bottom:1.1rem}
   .sec-head .num{font-family:var(--mono);font-size:var(--sm);font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
@@ -295,20 +294,49 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
   reader — and then one tile per reading path, linking that path's overview (in a built repository, one tile per
   construct, linking the construct page). Every section's content is blocks chosen by kind. The Glossary is generated
   from every Terms table. The middle level, one page per reading path, has its own template: overview-template.html.
-  THE MASTHEAD: the header names the page ("Concept"); the title is the promise, a short sentence a reader would say;
-  the standfirst is the tagline; then a plain paragraph — the problem every reader has, what this page gives them, how
-  to read it. Headings never carry a count. -->
+  THE MASTHEAD has three levels: the Title (the h1), the Subtitle (p.subtitle) and the Description (one p.standfirst).
+  The comment directly above the h1 says what each one holds and how to write it. The header above them names the page ("Concept").
+  Headings never carry a count. -->
 <header class="masthead">
 <!-- THE HEADER: three segments — {workspace} | {location} | Concept — and line 2 is Type and For. A hub has no status. -->
   <div class="eyebrow"><span class="line1">{{WORKSPACE}} &nbsp;|&nbsp; {{REPOSITORY}} &nbsp;|&nbsp; Concept</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Overview</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">{{ROLE}}</span><span class="badge lens">{{ROLE}}</span></span></span></div>
-  <h1>{{The promise, a short sentence a reader would say: "Your team's time belongs to your product."}}</h1>
-  <p class="standfirst">{{The tagline, or one line saying what this repository is.}}</p>
-  <p>{{The problem every reader has, what this page gives them, and how to read it.}}</p>
+  <!-- THE MASTHEAD, ON A HUB (05-artifacts.md § The masthead, and the opening · RD.DEVEX.WORKSPACE.182 and .187).
+    Three levels, in this order, and every level is plain language: everyday words, short sentences, no figure of
+    speech, no slogan, no number, and no book word (behaviour, construct, lens, kind, node, seat, tier, arc, estate,
+    ring) unless the same sentence explains it. The one exception is the foundation's hub: its Title and Subtitle are
+    RD.DEVEX.WORKSPACE.143's, word for word. A new Title or Subtitle is drafted by the agent and written only after
+    the developer approves it.
+    WHAT EACH LEVEL HOLDS
+      Title        the h1: the benefit line, the reader's gain, as a short sentence a reader would say.
+      Subtitle     p.subtitle: the what line, one sentence saying what the thing is (on the foundation, .143's words).
+      Description  one p.standfirst, and nothing after it in the header. First sentence: what the plane is. Second:
+                   why you read this page first. Then at most two short sentences on how the page is laid out.
+    GOOD, the foundation's hub
+      Title        "Your team's time belongs to your product."
+      Subtitle     "The AI-native, DevEx-first Foundation for Building and Launching Secure, Scalable, Compliance-ready SaaS Platforms."
+      Description  "SaaS Plane is a set of standards, tools and code libraries for building software that customers use
+                   over the internet. Read this page first to see how the parts fit together before you open any of
+                   them. Each area below links to the page that explains it in full."
+    BAD, one per level
+      Title        "Ship at warp speed."  A slogan and a figure of speech; it names no gain a reader can check.
+      Subtitle     "One plane, zero plumbing, infinite scale."  Figures of speech; it never says what the thing is.
+      Description  "Four areas and twelve domains, each a node with its own seats."  Opens with a count, and two
+                   book words (node, seat) that nothing explains.
+    CHECK BEFORE YOU SAVE, in order
+      1. The Description's first sentence says what the page is about, in everyday words.
+      2. Its second sentence says why you would read this page.
+      3. No book word appears in any level unless the same sentence explains it.
+      4. No level carries a number.
+      5. The Subtitle is one plain sentence; on the foundation's hub it is .143's, word for word.
+      6. Read the three levels aloud once, and rewrite any sentence you stumble on. -->
+  <h1>{{THE TITLE: the benefit line, the reader's gain, as a short sentence a reader would say.}}</h1>
+  <p class="subtitle">{{THE SUBTITLE: the what line, one plain sentence saying what the thing is.}}</p>
+  <p class="standfirst">{{THE DESCRIPTION, one paragraph: what the plane is, in everyday words; why you would read this page first; then at most two short sentences on how the page is laid out.}}</p>
 </header>
 
 <section id="s0" data-block="reasons">
   <div class="sec-head"><h2>Overview</h2></div>
-  <p>{{What the tagline promises, and how to read the page. Then one h3 per promise.}}</p>
+  <p>{{What the Subtitle promises, and how to read the page. Then one h3 per promise.}}</p>
   <h3 id="o1">{{Promise}}</h3>
   <p>{{The problem, the mechanism, what you can check.}}</p>
   <p><a class="more" href="#">Read {{the domain, by the name its heading carries}} &rarr;</a></p>
@@ -387,7 +415,7 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
 </div>
 
 <footer>
-  A template from workstream 008 &middot; copy it, keep the comments until the page is written, then delete them &middot; the rules live in the book; this file repeats them so you never write from memory &middot; every block and figure is shown once in <code>blocks-template.html</code>
+  A template &middot; copy it, keep the comments until the page is written, then delete them &middot; the rules live in the book; this file repeats them so you never write from memory &middot; every block and figure is shown once in <code>blocks-template.html</code>
 </footer>
 
 <script>

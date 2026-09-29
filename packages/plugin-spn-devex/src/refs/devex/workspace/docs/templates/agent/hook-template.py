@@ -1,4 +1,4 @@
-# RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md § Restatement discipline · 02-support/01-apps/07-comments/README.md § The check, and what each finding costs
+# RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md § Restatement discipline · docs/04-capabilities/02-support/01-apps/07-comments/README.md § The check, and what each finding costs
 #      This file carries rules it does not own. The chapter above is the source of truth.
 #      A rule change is edited there first, then here, in the same change. Never add a rule here.
 #      restate-drift.ts reports this copy when its source moves.

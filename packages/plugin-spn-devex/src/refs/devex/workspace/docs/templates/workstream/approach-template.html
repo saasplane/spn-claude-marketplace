@@ -1,30 +1,20 @@
-<!-- PROPOSED v2 — workstream 008, N13, 2026-09-21. This copy is for review; the copy the book ships lives at
-     docs/04-capabilities/01-devex/04-workspace/04-docs/templates/pages/ and changes when N13 runs. What changed from v1, for every page kind:
-     no block numbers on the page or in its rail (a number orders a file, a heading is a name); the header keeps three
-     segments — workspace | repository | title — and the title carries its own context (Estate Shape, not Shape); Terms are
-     capitalised concept names in the order a newcomer meets them; a contract is a code block with a comment per member;
-     a list of keys with meanings is a table; an author's note (a comment) never reaches the page; there is no length cap;
-     a one-way flow figure is a straight line, horizontal when it fits; every figure is reviewed by eye after it is produced.
-     THE SHAPE OF A SECTION, on every page kind: a section opens with its own overview — what you are looking at, in
-     prose — then a figure where seeing is faster, then its content as blocks. A subsection opens with its own overview,
-     then its details. On the hub a subsection's details are navigation: a "Read more" link under the subsection's
-     text opens the overview when the sub-area has one reading path, cards link the paths when it has several; a heading is
-     never a link.
-     A HEADING never carries a count (a count changes; a set is named by its rule) and is never a link. Numbers are for
-     files: a number orders a file in a tree, a title or heading is a name. Every section and subsection title carries
-     an ANCHOR LINK (the script at the end of this page adds it): shown on hover, it moves the address to the heading
-     and copies the full link, so a subsection can be shared. A "Realized:" line is its own light line and may
-     carry links. A card is a title, a description and a "Read more" link, the title clickable too; all the cards of one
-     subsection sit in one grid.
-     THE BLOCKS AND THE FIGURES ARE ONE VOCABULARY FOR EVERY PAGE KIND — approach, overview, construct. Any page uses any block
-     kind (prose, table, list, code, figure, comparison, rule) and any figure kind wherever its content calls for it; the lists
-     below are shared, not this page kind's own. Only the sections differ between kinds. -->
-<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The four page kinds · § The approach document — the six sections, the cards, and what an argument may not do
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The four page kinds · § The masthead, and the opening · § The approach document — a workstream's, never a repository's
      This file carries rules it does not own. The chapter above is the source of truth.
      A rule change is edited there first, then here, in the same change. Never add a rule here.
      restate-drift.ts reports this copy when its source moves. -->
+<!-- The approach page is written for
+     developers, and the agent's complexity lives in the workstream's arcs, notes and orders.
+     THE MASTHEAD has three levels: the Title (the h1), the Subtitle (p.subtitle) and the Description (one
+     p.standfirst). The comment directly above the h1 says what each one holds and how to write it.
+     THE SECTIONS: the masthead, then Why · What · How · Open · Deferred. There is no Terms section: a word is
+     explained in brackets where it first appears, and a word that belongs to the product belongs to its construct's own
+     Terms table, from which the glossary is generated.
+     HOW is per repository and per kind of change, each with the block that shows what the file will say, and it ends
+     with CYCLES: one row per arc, generated from each arc's own status line. Per-arc step tables, field lines, logs,
+     landed commits and a "what re-aligns" table do not appear on the page; they are the arcs'.
+     THE RAIL TITLE is the page's own name, the same words as the h1. -->
 <meta charset="utf-8">
-<title>Approach Template</title>
+<title>Approach Template v3</title>
 <!-- spn:doc
 {"id": "ws-{{NNN}}-{{slug}}", "variant": "approach", "title": "{{NNN}} - {{TITLE}}", "lenses": ["{{LENS}}"], "status": "PLANNING", "summary": "{{One sentence: what this workstream changes.}}", "keywords": ["{{…}}"]}
 -->
@@ -88,6 +78,7 @@
   .tile .more{font-size:var(--sm);font-weight:600;text-decoration:none;align-self:flex-start}
   p > .more{font-weight:600;text-decoration:none}
   h1{font-family:var(--ui);font-size:var(--xxl);font-weight:700;letter-spacing:-.02em;line-height:1.15;text-wrap:balance;margin:0}
+  .subtitle{font-size:var(--lg);font-weight:600;line-height:1.4;color:var(--ink);text-wrap:balance;max-width:46rem;margin:.6rem 0 0}
   .standfirst{font-size:var(--lg);line-height:1.5;color:var(--slate);max-width:46rem}
   .sec-head{display:grid;grid-template-columns:1fr;align-items:baseline;gap:.5rem;border-top:2px solid var(--ink);padding-top:.7rem;margin-bottom:1.1rem}
   .sec-head .num{font-family:var(--mono);font-size:var(--sm);font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
@@ -221,7 +212,7 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
   the h2/h3 pattern and the rail-fold style block; a page without them is off its template. -->
 <nav class="rail" id="rail">
   <a class="home" href="../../../../README.md">&larr; .spndevex</a>
-  <div class="rail-title">Outline</div>
+  <div class="rail-title">{{NNN}} - {{TITLE}}</div>
 </nav>
 <div class="wrap">
 
@@ -294,11 +285,12 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
   DIFF      what a file says today, and what it will say · a diff block, - today / + after, the path above it
             lives in an approach's What only. A construct or an overview states current truth, never a change
   ================================================================================================ -->
-<!-- THE ARCS. An arc is named for the cycle it pays: a release, a reinstall, a renumbering, a corpus pass, a gate
-  flip. Number arcs N1… in execution order. Each arc file carries the field table Altitude · Highest document ·
-  Lowest package · Design gate · Cycle it pays · What it must follow · Model, and says what done means before it
-  names a step. Each delegated execution gets an orders/ file. Deciding and proving are different arcs. A tool is
-  released, and a plugin reinstalled, from one arc only. -->
+<!-- THE ARCS. An arc is named for the cycle it pays and numbered N1… in execution order. The arc file is the
+  execution record: each step row carries Repo (the repository the step changes) · Altitude (DOCS · CODE, with its
+  tests · GENERATED · RELEASE · PROOF) · What (the files, before → after, or its plan's section) · Mechanism (by
+  hand · script · command · agents) · Acceptance · State. Rows run in chain order by repository, then by altitude.
+  An approved preview is saved in the arc's own folder, notes/N<nn>/ (plan.md, samples/, scripts/, orders/). The
+  arcs are the state: this page shows each arc once, as a row of Cycles. -->
 <header class="masthead">
 <!-- THE HEADER: two lines, six fields, separated by | . Nothing else goes here.
   Line 1 is identity and never changes:  {workspace} | {location} | {title}
@@ -318,21 +310,40 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
   Rendering: line 1 is small uppercase text. Line 2 is badges: the type plain, each role a chip, the status a
   colored badge at the far right carrying the book's glyph. Keep one .eyebrow div; the close gate reads it. -->
   <div class="eyebrow"><span class="line1">{{WORKSPACE}} &nbsp;|&nbsp; Workstream &nbsp;|&nbsp; {{NNN}} - {{TITLE}}</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Approach</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">{{ROLE}}</span><span class="badge lens">{{ROLE}}</span></span><span class="st"><span class="lbl">Status:</span> <span class="badge status planning">&#x1F52E; PLANNING</span></span></span></div>
+  <!-- THE MASTHEAD, ON AN APPROACH (05-artifacts.md § The masthead, and the opening · RD.DEVEX.WORKSPACE.182 and .187).
+    Three levels, in this order, and every level is plain language: everyday words, short sentences, no figure of
+    speech, no slogan, no project shorthand, no number, and no book word (behaviour, construct, lens, kind, node, seat,
+    tier, arc, estate, ring) unless the same sentence explains it. The workstream's number at the start of the h1 comes
+    from the folder's name and is not part of the Title. A new Subtitle is drafted by the agent and written only after the developer
+    approves it.
+    WHAT EACH LEVEL HOLDS
+      Title        the h1: the page's name, the same words as the rail title.
+      Subtitle     p.subtitle: the decision the page plans, as one sentence.
+      Description  one p.standfirst, and nothing after it in the header. First sentence: what changes. Second: why
+                   you would read it. Then at most two short sentences on how the page runs. The argument goes in Why.
+    GOOD, the plain-language approach (plain-language-approach.html)
+      Title        "Plain Language"
+      Subtitle     "Decides how every page in the book opens, and how the agent talks to you."
+      Description  "This page plans a change to how the book's pages open and to what the agent says when you open a
+                   new window. Read it before you review the work it lists. Why comes first, then what changes, then
+                   how the work runs."
+    BAD, one per level
+      Title        "Say It Straight"  A slogan in place of the page's name.
+      Subtitle     "N116 pays one cycle: R2 ships the loop, and every seat follows."  Project shorthand and a figure
+                   of speech; it never names the decision.
+      Description  "Nine arcs rewrite every seat's opening before the release."  Opens with a count, and two book
+                   words (arc, seat) that nothing explains.
+    CHECK BEFORE YOU SAVE, in order
+      1. The Description's first sentence says what changes, in everyday words.
+      2. Its second sentence says why you would read this page.
+      3. No book word or project shorthand appears in any level unless the same sentence explains it.
+      4. No number appears in the Subtitle or the Description.
+      5. The Subtitle is one plain sentence that names the decision.
+      6. Read the three levels aloud once, and rewrite any sentence you stumble on. -->
   <h1>{{NNN}} - {{TITLE}}</h1>
-  <p class="standfirst">{{LEAD}} &mdash; what this workstream changes, and why now. One or two paragraphs. The problem first, then the answer.</p>
+  <p class="subtitle">{{THE SUBTITLE: the decision this page plans, one plain sentence.}}</p>
+  <p class="standfirst">{{THE DESCRIPTION, one paragraph: what changes, in everyday words; why you would read this page; then at most two short sentences on how the page runs.}}</p>
 </header>
-
-<section id="s0" data-block="glossary">
-  <div class="sec-head"><h2>Terms &mdash; the words this page uses</h2></div>
-  <p>{{Why the Terms are here: each word below is used many times on this page.}}</p>
-  <div class="scroll"><table>
-    <thead><tr><th>Term</th><th>What it means on this page</th></tr></thead>
-    <tbody>
-      <tr><td>{{Term — capitalised, a concept name}}</td><td>{{one sentence, in plain words}}</td></tr>
-      <tr><td>{{term}}</td><td>{{&hellip;}} &mdash; five to eight rows; only words this page uses in a special sense</td></tr>
-    </tbody>
-  </table></div>
-</section>
 
 <section id="s1" data-block="reasons">
   <div class="sec-head"><h2>Why &mdash; {{the problem in one line}}</h2></div>
@@ -345,7 +356,7 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
 
 <section id="s2" data-block="reasons">
   <div class="sec-head"><h2>What &mdash; {{the decision in one line}}</h2></div>
-  <p>{{The decisions, each with its reason. Where only the owner can decide, say &ldquo;open in Q&lt;n&gt;&rdquo; and put the card in Open.}}</p>
+  <p>{{What changes in the product&rsquo;s purpose and model, construct by construct, each with its reason. Where only the owner can decide, say &ldquo;open in Q&lt;n&gt;&rdquo; and put the card in Open.}}</p>
   <h3 id="c0">The constructs this changes</h3>
   <p>This table comes first, before the argument, because the close sweep carries each row into the seat files. &ldquo;none&rdquo; is a valid row.</p>
   <div class="scroll"><table>
@@ -354,58 +365,34 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
       <tr><td>{{construct id}}</td><td>{{what changes in its seat file}}</td><td>&mdash; or &#x1F52E; proposed here</td><td>{{&#x1F52E; &middot; &#x1F6A7; &middot; &#x2705;}}</td></tr>
     </tbody>
   </table></div>
-  <h3 id="c1">{{Decision}}</h3>
-  <p>{{The decision, then why. Real values from the codebase, never made-up examples.}}</p>
+  <h3 id="c1">{{Construct &mdash; what changes in it}}</h3>
+  <p>{{The change, then why. Use whatever block shows it best: prose, a figure, a code block, a state table. Real values from the codebase, never made-up examples. Explain a word in brackets the first time it appears.}}</p>
   <p><code>{{path of the file that changes}}</code></p>
   <pre data-lang="diff"><span class="tk-del">- what the file says today</span>
 <span class="tk-add">+ what it will say</span></pre>
-  <h3 id="c2">{{Decision}}</h3>
+  <h3 id="c2">{{Construct &mdash; what changes in it}}</h3>
   <p>{{&hellip;}}</p>
 </section>
 
 <section id="s3" data-block="sequence">
-  <div class="sec-head"><h2>How &mdash; the cycles, the arcs in order, and every document that must change</h2></div>
-  <p>{{The order, and why it is this order: name the cycles first, then the arcs that pay them.}}</p>
-  <figure>
-<svg class="dg" viewBox="0 0 1100 120" width="1100" height="120" role="img" aria-label="The arcs in execution order, each named for the cycle it pays."><defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs><rect class="box" x="20" y="30" width="226" height="60" rx="3"/>
-<text class="l" x="30" y="54">N1 {{arc}}</text>
-<text class="n" x="30" y="74">{{cycle}}</text>
-<line class="c" x1="246" y1="60" x2="302" y2="60" marker-end="url(#ar)"/>
-<rect class="box" x="302" y="30" width="226" height="60" rx="3"/>
-<text class="l" x="314" y="54">N2 {{arc}}</text>
-<text class="n" x="314" y="74">{{cycle}}</text>
-<line class="c" x1="528" y1="60" x2="584" y2="60" marker-end="url(#ar)"/>
-<rect class="box" x="584" y="30" width="226" height="60" rx="3"/>
-<text class="l" x="596" y="54">N3 {{arc}}</text>
-<text class="n" x="596" y="74">{{cycle}}</text>
-<line class="c" x1="810" y1="60" x2="866" y2="60" marker-end="url(#ar)"/>
-<rect class="box" x="866" y="30" width="210" height="60" rx="3"/>
-<text class="l" x="878" y="54">N4 close</text>
-<text class="n" x="878" y="74">none</text></svg>
-  <figcaption>{{What to notice: which arcs run beside each other, and which one pays the expensive cycle.}}</figcaption>
-  </figure>
+  <div class="sec-head"><h2>How &mdash; {{what changes in each repository, in one line}}</h2></div>
+  <p>{{Which repositories change, in the order the work runs &mdash; the standard first, then what realizes it, then the tools. Each part below shows what its files will say; the steps, their checks and their logs are in the arcs.}}</p>
+  <h3 id="h1">{{repository}} &mdash; {{the kind of change}}</h3>
+  <p>{{One or two sentences, then the block that shows the change: a DIFF of a file, a TREE of a folder, a CODE block of a contract or a state with a comment per member, JSON with comments.}}</p>
+  <p><code>{{path of the file that changes}}</code></p>
+  <pre data-lang="diff"><span class="tk-del">- what the file says today</span>
+<span class="tk-add">+ what it will say</span></pre>
+  <h3 id="h2">{{repository}} &mdash; {{the kind of change}}</h3>
+  <pre data-lang="text">{{folder/
+&#x251C;&#x2500;&#x2500; what is added      +
+&#x2514;&#x2500;&#x2500; what is removed    &minus;}}</pre>
+  <h3 id="h9">Cycles &mdash; the arcs, in the order they run</h3>
+  <p>Generated from each arc&rsquo;s own status line, so it cannot drift. Everything the agent needs to execute &mdash; steps, mechanisms, checks, logs &mdash; is in the arc files.</p>
   <div class="scroll"><table>
-    <thead><tr><th>Cycle</th><th>What it costs</th><th>What drags it</th></tr></thead>
+    <thead><tr><th>Arc</th><th>What it does</th><th>Status</th></tr></thead>
     <tbody>
-      <tr><td>{{cycle}}</td><td>{{the release, the reinstall, the build&hellip;}}</td><td>{{the work that rides it}}</td></tr>
-    </tbody>
-  </table></div>
-  <h3 id="h1">N1 &mdash; {{Arc, named for the cycle it pays}}</h3>
-  <p><strong>Cycle it pays:</strong> {{&hellip;}} &middot; <strong>Must follow:</strong> {{&hellip;}} &middot; <strong>Model:</strong> {{Opus 5 for rules and reading; Sonnet 5 for batches; never Haiku}} &middot; <strong>Batches:</strong> waves of five &middot; <strong>Done when:</strong> {{&hellip;}} &middot; &rarr; <code>arcs/N1-{{slug}}.md</code></p>
-  <div class="scroll"><table>
-    <thead><tr><th>Work</th><th>Scope</th><th>How you would know it works</th><th>State</th></tr></thead>
-    <tbody>
-      <tr><td>{{what is built}}</td><td>{{repo &middot; path}}</td><td>{{the observable result}}</td><td>&#x2610; raised</td></tr>
-    </tbody>
-  </table></div>
-  <h3 id="h2">N2 &mdash; {{Arc}}</h3>
-  <p>{{&hellip;}}</p>
-  <h3 id="h9">What re-aligns &mdash; the documents that must change</h3>
-  <p>One row is a document, what changes inside it, and its state. The close gate reads every row.</p>
-  <div class="scroll"><table>
-    <thead><tr><th>Document</th><th>What changes inside it</th><th>Scope</th><th>State</th></tr></thead>
-    <tbody>
-      <tr><td><code>{{path}}</code></td><td>{{&hellip;}}</td><td>{{repo}}</td><td>&#x2610; raised</td></tr>
+      <tr><td><strong>N1 &mdash; {{Arc, named for the cycle it pays}}</strong></td><td>{{one line}}</td><td>{{PROPOSED &middot; DECIDED &middot; RUNNING &middot; HELD on Q&lt;n&gt; &middot; PART-LANDED &middot; LANDED &middot; CARRIED &middot; DROPPED}}</td></tr>
+      <tr><td><strong>N2 &mdash; {{Arc}}</strong></td><td>{{&hellip;}}</td><td>{{&hellip;}}</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -467,7 +454,7 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
 </div>
 
 <footer>
-  A template from workstream 008 &middot; copy it, keep the comments until the page is written, then delete them &middot; the rules live in the book; this file repeats them so you never write from memory &middot; every block and figure is shown once in <code>blocks-template.html</code>
+  The approach template, v3 &middot; for the workstreams after 008 &middot; the rules live in the book&rsquo;s <code>05-artifacts.md</code>; this file repeats them so you never write from memory &middot; every block and figure is shown once in <code>blocks-template.html</code>
 </footer>
 
 <script>

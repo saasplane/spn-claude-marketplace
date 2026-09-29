@@ -1,5 +1,5 @@
 <!-- restates: {{the chapters this role owns}} @ {{hash}} -->
-<!-- RESTATES: spn-foundation docs/02-constructs/01-devex/02-agent/03-lenses.md § Lenses
+<!-- RESTATES: spn-foundation docs/02-constructs/01-devex/02-agent/03-lenses.md § Actors, Lenses and Panels
      This file carries rules it does not own. The chapter above is the source of truth.
      A rule change is edited there first, then here, in the same change. Never add a rule here.
      restate-drift.ts reports this copy when its source moves. -->

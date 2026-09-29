@@ -6,49 +6,26 @@
   "lenses": ["{{LENS}}"],
   "status": "PLANNING",
   "dependsOn": ["{{id}}"],
+  "subtitle": "{{THE SUBTITLE, one plain sentence: the promise, what is true for you once this thing exists — \"Your work stays together in one folder, even after you close the window you started it in.\"}}",
   "summary": "{{One sentence a newcomer understands.}}"
 }
 -->
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The four page kinds · § The masthead, and the opening · § A construct's status is derived, never typed · 03-tree.md § What — constructs: the model, read in order
+     This file carries rules it does not own. The chapter above is the source of truth.
+     A rule change is edited there first, then here, in the same change. Never add a rule here.
+     restate-drift.ts reports this copy when its source moves. -->
 <!-- THE ONLY FILE AN AGENT AUTHORS for a construct. `docs.ts page` produces the HTML page from it — one block per
-     `##`, no block is forced and none is numbered. The block keeps seven keys: `id`, `variant`, `title`, `lenses`,
-     `status`, `dependsOn`, `summary`. `dependsOn` is the reading order and the only record of what this construct
+     `##`, no block is forced and none is numbered. The block keeps eight keys: `id`, `variant`, `title`, `lenses`,
+     `status`, `dependsOn`, `subtitle`, `summary`. `subtitle` is the page's Subtitle, the construct's one-line promise; `docs page`
+     renders it under the h1, and it is plain language, like the Description. `dependsOn` is the reading order and the only record of what this construct
      needs; the domain face renders it. `status` is rolled up by `docs.ts status` from the behaviour rows at this
      construct's own path — `03-behaviors/<same relative path>` — and is never typed. IN A `FOUNDATION` REPOSITORY THERE
-     IS NO `status` KEY AND NO `Status:` CHIP: those rows are promises, and a promise has no proof state.
-     RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The four page kinds · § A construct's status is derived, never typed · 03-tree.md § What — constructs
-     This file carries rules it does not own. The chapter above is the source of truth. Never add a rule here.
-
-     THE OPENING IS A STANDFIRST AND A SUMMARY, AND NOTHING ELSE. Measured across a workspace on 2026-09-24, 117 of
-     117 constructs opened with prose no outline named, no check read and no template held to a shape — a median of
-     195 words. A structure in every document of a corpus, declared nowhere, is the thing this order removes: the
-     orientation stays above the first heading and everything that argues moves into `Overview`.
-
-     SIX SECTIONS, IN THIS ORDER — Overview · Terms · Model · Parts · Boundary · Binds.
-     The three that carry the argument divide by question:
-       Overview  WHY this construct exists — the problem, and what changes because it does.
-       Model     WHAT it is — the whole shape, before any piece of it.
-       Parts     the detail of the What — one subsection per piece of the Model.
-     Terms sits between Overview and Model because the Model uses those words and the Overview does not need them.
-     Boundary is unchanged. BINDS IS THE RULES TABLE ALONE: which package builds this construct is answered by that
-     package's own capability chapter, and a construct claims no realization. THERE IS NO PROOF SECTION — what proves
-     a construct is the behaviour rows at its own path, and a run writes their status.
-
-     THERE IS STILL NO LENGTH CAP on any section. The concept decides how long its explanation is, and a page that is
-     long because its idea needs the room is right. What the opening gains is a JOB rather than a limit: it orients,
-     and everything that argues moves into Overview.
-
-     THE SHAPE OF A SECTION, unchanged. A section opens with its own overview, then a figure where seeing is faster,
-     then its content as blocks; a part opens with its own overview, then its details.
-     HEADINGS, unchanged. A heading never carries a count and is never a link; numbers are for file names.
-     THE VOICE, unchanged. Say why before what. Explain a word the first time it appears, in words the reader already
-     has. Simple words, no idioms. A table can hold facts; it cannot hold the explanation. -->
+     IS NO `status` KEY AND NO `Status:` CHIP: those rows are promises, and a promise has no proof state. -->
 # {{NAME — the subject in full, so the title stands alone: Estate Shape, not Shape; Kind Manifest, not Manifest.}}
 
 `For: {{Actor}} · {{Actor}}` · `Status: 🔮 PLANNING`
 
-{{THE PROMISE, in one line — the standfirst. What is true once this construct exists: "A repository is standardized at the moment it exists."}}
-
-{{THE SUMMARY — two or three sentences a newcomer understands: the problem, what this page gives you, and how to read it. This is the whole opening. Anything that argues belongs in Overview below.}}
+{{THE DESCRIPTION, one paragraph and the only one above Overview: what this thing is, in everyday words; why you would read this page; then at most two short sentences on how the page runs — "A workstream is a folder that holds one piece of work, from the first idea until you close it. Read this before you start a change that will take more than one working session. The page explains how the folder is named, how it moves between waiting, open and closed, and what is checked before you can close it." It is held to 05-artifacts.md § The masthead, and the opening, and construct-template.html's masthead comment carries the poor examples and the check to run before you save. The promise is the block's `subtitle`, never this paragraph. Anything that argues belongs in Overview below.}}
 
 ## Overview
 <!-- WHY THIS CONSTRUCT EXISTS. What went wrong without it, what it changes, and what a reader should expect to

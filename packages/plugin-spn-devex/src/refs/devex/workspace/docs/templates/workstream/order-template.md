@@ -1,33 +1,59 @@
-<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/01-workspace/01-workspace.md § The arc — a delegated execution
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The arc · § An arc carries its specification, or names the note that holds it · § An order is one delegated execution, and every order follows the same rules
      This file carries rules it does not own. The chapter above is the source of truth.
      A rule change is edited there first, then here, in the same change. Never add a rule here.
      restate-drift.ts reports this copy when its source moves. -->
-# Handover to {{the repository}} — {{the step}}
+<!-- AN ORDER IS ONE DELEGATED EXECUTION: a child session in this workspace, or a window of its own in another
+     repository. Every path is absolute, so either can resolve it. -->
+# Order {{nn}} — {{what this agent does}}
 
-**Run this in the repository's own window.** It loads that repository's `CLAUDE.md` and its plugins. The source of every decision below is workstream `{{NNN-subject}}`, arc `{{N{{n}}-….md}}` (steps {{a}} to {{b}}), and the approach page `{{subject}}-approach.html`.
+| | |
+| --- | --- |
+| **Repo** | `{{repo}}` · **Depth:** {{child here · own window}} · **Run from:** `{{absolute path}}` |
+| **Workstream** | `{{NNN-subject}}` · **Arc:** `{{absolute path to arcs/N<n>-….md}}`, rows {{k}} |
+| **Pinned** | `{{repo}}` @ `{{sha}}` — stale if `git -C {{repo}} log {{sha}}..HEAD -- <path>` lists a file you touch |
+| **Model** | {{Opus 5 · Sonnet 5}} |
+| **Read first** | `spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md` § An order is one delegated execution, and every order follows the same rules · `{{absolute path}}/orders/00-facts.md` (this arc's checkout, shared nodes, the gates you may run) · `{{absolute path}}/plan.md` § Traps, § Commands, § Rows {{k}} · the arc's Log |
 
-<!-- An order is one delegated execution: the brief half is written before the window opens, the report half when it closes.
-     Never widen it mid-execution; a new scope is a new arc. Copied from order-template.md. -->
+## What already exists
+
+{{The mechanism this order changes or sits beside, and its twin elsewhere. Read these files whole before writing.}}
 
 ## The outcome
-{{What is true when this order is done, in one paragraph, and the command that shows it.}}
 
-## The rule, as it already stands elsewhere
-{{Where the same rule is already enforced, name the file and say: read it whole before writing anything.}}
+{{What is true when this order is done, in one paragraph.}}
+
+## Files you own
+
+- `{{absolute path}}`
+
+Every other file belongs to another agent. If you must touch one, stop and say so in your report.
 
 ## Steps
-| # | What | How you would know it works |
-| --- | --- | --- |
-| 1 | {{…}} | {{…}} |
 
-## What this order never does
-- {{the boundary: files it does not touch, cycles it does not pay}}
+1. {{the step, exact enough to do without asking}}
+
+## Prove it
+
+| Check | Command | Before | After | Artifact |
+| --- | --- | --- | --- | --- |
+| {{from the plan's Commands table}} | `{{command}}` | {{exit · count}} | {{exit · count}} | `{{path}}` {{changes how}} |
+| known bad | {{the new case run against the unchanged code}} | — | {{red, and the line it prints}} | — |
+
+## Never
+
+{{What this order must not do beyond the rules: files it leaves alone, cycles it does not pay.}}
 
 ---
 
-## Report — written when the window closes
-| What landed | Commit | What did not, and why |
-| --- | --- | --- |
-| {{…}} | `{{sha}}` | {{…}} |
+## Report
 
-**Next card:** {{the question this order could not answer, as a Q<n> for the page, or "none"}}
+Written by: {{the agent's final message, saved here by the coordinator · the window's own close}}.
+
+| File | What changed | Commit |
+| --- | --- | --- |
+| `{{absolute path}}` | {{one line}} | `{{sha}}` · — (the coordinator commits) |
+
+**Diff:** `git -C {{repo}} diff --stat -- <the files you own>`, pasted as printed; it lists exactly the files above.
+**Gates run:** each as `command` → exit {{code}} · {{pass/fail/skipped}} · cache {{off · hit}}.
+**Register text for the coordinator:** {{rows, or none}}. **Found, not changed:** {{each with its file; the coordinator
+adds it to the plan's Findings table}}. **Needs the developer:** {{a card, or none}}.

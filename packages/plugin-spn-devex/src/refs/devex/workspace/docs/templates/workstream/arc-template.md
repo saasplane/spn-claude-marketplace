@@ -1,77 +1,58 @@
-<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The arc · § An arc is named for the cycle it pays · § A step names every surface the change reaches, and how you would know · § An arc carries its specification, or names the note that holds it
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The arc · § A step row says where, at what altitude, and how · § A step names every surface the change reaches, and how you would know · § A prompt while an arc runs · § An arc's status says which of eight states it is in
      This file carries rules it does not own. The chapter above is the source of truth.
      A rule change is edited there first, then here, in the same change. Never add a rule here.
      restate-drift.ts reports this copy when its source moves. -->
-# N{{n}} — {{the arc, named for the cycle it pays}}
+<!-- AN ARC IS THE INDEX AND THE STATE; ITS PLAN IS THE WORK ORDER. What each row changes, exactly, lives in
+     `notes/N<n>/plan.md`, pinned to commits. An arc is a plan, never an argument: no card lives here. A question
+     is a card on the approach page's Open; HELD names that card; a scope change is logged as a dated line.
+     Name the arc for the cycle it pays, never for its subject. -->
+# N{{n}} — {{the cycle it pays, named: "R: the support release that carries X"}}
 
-Status: **PROPOSED — waits on {{the card or the arc it follows}}.** Opened {{date}}.   <!-- The status is one of eight, and the set is closed (RD.DEVEX.WORKSPACE.058): PROPOSED · DECIDED · RUNNING · HELD — waits on Q<n> · PART-LANDED · LANDED · CARRIED — to <where> · DROPPED — <why>. LANDED, CARRIED and DROPPED are terminal. The set is defined in the workspace capability, § The arc; this comment cites it and states no rule of its own. Write the line exactly as `Status: **WORD ...**` — one spelling, because a reader that has to know two knows neither. --> {{One sentence: what this arc changes, and why it is one arc.}}
-Repos: {{repo}} · {{repo}} — {{in what order, and why}}
-
-<!-- HELD is the state a scope change puts an arc in when it reaches what is planned: the card is on the page, the arc
-     names it, and what changes under each option is written here; nothing in the arc runs until the card is answered,
-     and the log records the revision. An arc is a plan, never an argument: no card lives here — a question goes to the approach page's Open section.
-     Name the arc for the cycle it pays. Say what done means before you name a step. Log every instruction and correction
-     as a dated line. This file is copied from arc-template.md; keep the field rows, in this order. -->
+Status: **{{PROPOSED · DECIDED · RUNNING · HELD — waits on Q<n> · PART-LANDED · LANDED · CARRIED — to <where> · DROPPED — <why>}} — {{date}}.** {{One sentence: what this arc changes, and why it is one arc.}}
 
 | Field | This arc |
 | --- | --- |
-| **Altitude** | **{{what this arc decides, in one phrase.}}** {{What is true after it lands}} |
+| **Decides** | **{{what this arc decides, in one phrase}}.** {{What is true once it lands.}} |
 | **Highest document** | `{{repo}}` → `{{the document that must change first}}` |
 | **Lowest package** | `{{the deepest file or folder it touches}}` |
-| **Design gate** | {{the cards on the page that must be answered, or "passed"}} |
-| **Cycle it pays** | {{a book change · a spnutils release · a plugin reinstall · a renumbering · a corpus pass · a symbols regeneration · a gate flip · none}} |
-| **What it must follow** | N{{m}} — {{why}} |
-| **Model** | {{Opus 5 for rules and reading · Sonnet 5 for batches · never Haiku}} |
+| **Repos** | {{repo}} → {{repo}}: chain order, and why this order |
+| **Cycle it pays** | {{a book change · a support release · a plugin release and reinstall · a renumbering · a corpus pass · a symbols regeneration · a full verification}} (an arc with no cycle is a step on another arc) |
+| **What it must follow** | {{N<m> — why it must land first}}, or nothing |
+| **Design gate** | {{the cards that must be answered first: Q<n>}}, or passed |
+| **Green baseline** | {{the whole-repository gate}} at `{{sha}}`, {{date}}: {{its result line}} |
+| **Model** | Coordinator: {{Opus 5}}. Each order's model is in the plan's Orders table. |
+| **Page** | `{{subject}}-approach.html`: this arc's Cycles row, and the cards it owns ({{Q<n>}}) |
+| **Work order** | `notes/N{{n}}/plan.md` (pinned facts, commands, rows, orders) · `samples/` (approved previews) · `scripts/` · `orders/` (one brief and its report per agent) |
 
 ## What done means
-{{One paragraph: the observable state, and the command or check that shows it.}} An arc runs to this in one window unless a card blocks it; a milestone is reported between steps and never ends the turn while a row is runnable.
 
-## What this change reaches
-<!-- Name every surface before you name a step. A rename, an outline change, a contract change and a
-     new rule each reach a fixed set of surfaces — the chapter § A step names every surface the change
-     reaches lists them per kind. Delete the rows that do not apply; never delete the section. -->
-
-| Surface | This arc | Why it is reached |
-| --- | --- | --- |
-| Construct chapters | `{{repo}} → {{path}}` | {{…}} |
-| Behaviour rows | `{{repo}} → {{path}}` | {{…}} |
-| Capability chapters | `{{repo}} → {{path}}` | {{…}} |
-| Register rows | `{{ids}}` | {{…}} |
-| Source | `{{repo}} → {{path}}` | {{…}} |
-| Generated | `{{what regenerates, and by which command}}` | {{…}} |
-| Restatements | `{{the refs and templates that cite any of the above}}` | {{…}} |
-
-## The specification
-<!-- WHAT THE STEPS ACT ON, carried here or named by path (RD.DEVEX.WORKSPACE.064). A step that states a
-     COUNT and not the members has left the specification where the next session cannot reach it,
-     and a conversation is not a place. A move is a TABLE with unique targets. A step producing many
-     files carries ONE WORKED EXAMPLE, because a brief without one produces placeholders.
-     Too large for this section? It goes to notes/{{n}}-{{subject}}.tsv and a step names that path.
-     Carry NO COUNTS — RD.DEVEX.WORKSPACE.162. Name the set; let the reader count it. -->
-
-{{The closed sets, the move table, the rules — whichever this arc acts on. Delete what does not
-apply; never delete the section, because an empty one is a claim that the steps act on nothing.}}
-
-## Traps
-<!-- What is known to go wrong on this path, where somebody executing will meet it rather than in a
-     log they will not read first. A trap that cost one session costs the next one the same, and the
-     only thing that stops it is the sentence being in the way. -->
-
-- {{the trap, and what to do instead}}
+{{The state a person can observe once this lands, and the command from the plan's Commands table that shows it.}}
 
 ## Steps
-<!-- How you would know is a COMMAND or a COUNT, never a sentence. A check whose subject is the file
-     the step just wrote proves the write, not the rule — name a gate that had a reason to fail. -->
 
-| # | What | Where | How you would know it works |
-| --- | --- | --- | --- |
-| 1 | {{…}} | `{{repo · path}}` | `{{the command}}` → {{the count or exit code}} |
-| {{n}} | **Re-run what the earlier steps moved** | — | {{every gate above, green in one pass at the end}} |
+<!-- A ROW IS ONE REPOSITORY AT ONE ALTITUDE. Repo is the repository, or `—` for the workstream itself; Altitude is
+     DOCS · CODE (with its tests) · GENERATED · RELEASE · PROOF; rows run in chain order by repository, then by
+     altitude. What names the files, or "plan § k" — and every "plan § k" has that section. Mechanism is by hand ·
+     script · command · agents (order <nn>). Acceptance cites a row of the plan's Commands table and its count:
+     `command` → before → after — never a sentence. A GENERATED row's acceptance is "no diff on a second run".
+     A RELEASE row's acceptance names a consumer install (the published packages, no overrides), never only the
+     tool's version. A row inserted mid-run takes a letter suffix (4b). State follows the chapter: empty (not
+     started) · in progress <date> <time> <offset> (set when the row starts; landing replaces it) · ◐ stopped — <what was done, what is unsafe> · ✅ landed — `<commit>` — <the acceptance's result line> ·
+     ↷ carried — to <where> · ⊘ deferred — <why>. Row 0 is a precondition of RUNNING; the last row is never deleted. -->
+
+| # | Repo | Altitude | What | Mechanism | Acceptance | State |
+| --- | --- | --- | --- | --- | --- | --- |
+| 0 | — | DOCS | write `notes/N{{n}}/plan.md`: pins, what exists today, commands with their before, rows, orders | agents (order 00) | every plan row has Files, Fails before and Proof; every Commands row has its Before | |
+| 1 | {{repo}} | DOCS | plan § 1 | by hand | `{{Commands row}}` → {{before}} → {{after}} | |
+| 2 | {{repo}} | CODE | plan § 2 | agents (order 02) | `{{Commands row}}` → {{before}} → {{after}} | |
+| {{n}} | — | PROOF | re-run every gate above in one pass, cache off, after the last write; and the consumer install | command | each Commands row → its after, in one run | |
 
 ## Before you write LANDED
-{{The approach page is current: every row this arc owns reads landed, carried or deferred; every card it answered
-has left `Open` for the section that states it. The page is the state and this file is a log, so a developer who
-opens the page reads the truth without asking anybody. `11-workspace.md` § Every workstream document is current.}}
+
+Every row is ✅ landed, ↷ carried or ⊘ deferred, and none is ◐ stopped. The PROOF row's output is recorded, run with
+the cache off. Every card this arc answered has left the approach page's Open for the section that states it, and
+this arc's Cycles row reads LANDED. The landing is committed. The arcs are the state, and the page shows them.
 
 ## Log
-- **{{date}} — {{what was decided or corrected, and why}}.**
+
+- **{{date}} — {{what was decided or corrected, by whom, and why}}.**

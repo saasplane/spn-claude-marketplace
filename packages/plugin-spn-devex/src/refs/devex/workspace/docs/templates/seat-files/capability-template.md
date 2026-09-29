@@ -1,4 +1,8 @@
-<!-- PROPOSED v2 — workstream 008, N13, Q130, 2026-09-21. A capability chapter is what the architects hand the developers
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md § What — capabilities: the standard here, a chapter per construct everywhere else
+     This file carries rules it does not own. The chapter above is the source of truth.
+     A rule change is edited there first, then here, in the same change. Never add a rule here.
+     restate-drift.ts reports this copy when its source moves. -->
+<!-- A capability chapter is what the architects hand the developers
      so that a construct is implemented with clarity: the places, the patterns that apply unchanged, and the handling
      that is special to this construct. It is not a line-by-line mirror — the code's comments carry the line, the
      behaviours carry the proof, and a pattern is stated once in the stack's standard, never again here.
