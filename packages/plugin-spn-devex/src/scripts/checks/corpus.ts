@@ -44,7 +44,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { type Computed, hashFile, hashFiles, prune, type Source, verdictFor } from "../lib/corpus-cache.ts";
-import { bookTemplatesDir } from "../lib/docs-tree.ts";
+import { bookTemplatesDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 export type Warning = { check: string; message: string };
 

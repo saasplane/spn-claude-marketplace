@@ -9,7 +9,7 @@ import { execFileSync } from "node:child_process";
 import {
   check, parse, registerPath, rowHash, rowText, seenHash, undeclared,
 } from "../../../../src/scripts/lib/restates.ts";
-import { POCKET } from "../../../../src/scripts/lib/docs-tree.ts";
+import { POCKET } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 let n = 0, failed = 0;
 const one = (label, got, want) => {

@@ -15,7 +15,7 @@ import { PLUGIN } from "../../../helpers/harness.mjs";
 
 import { execFileSync } from "node:child_process";
 import { resolve } from "node:path";
-import { SEAT } from "../../../../src/scripts/lib/docs-tree.ts";
+import { SEAT } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 const CHECKS = resolve(PLUGIN, "src", "scripts", "checks");
 const FILE = "/repo/packages/module-server-iam-ts/src/app/services/SessionService.ts";

@@ -5,12 +5,11 @@ import { execFileSync } from "node:child_process";
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
+import { behaviorsDir, docsOf } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "checks", "behaviour-join.ts");
-// The behaviours seat of a repository's docs tree, as spn-foundation
-// docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md § The five seats names it. This
-// plugin does not import spn-devex's `lib/docs-tree.ts`, so the seat is stated once here instead.
-const BEHAVIORS_SEAT = join("docs", "03-behaviors");
+// The behaviours seat of a repository's docs tree, relative to the repository root.
+const BEHAVIORS_SEAT = behaviorsDir(docsOf(""));
 const kept = [];
 process.on("exit", () => { for (const d of kept) rmSync(d, { recursive: true, force: true }); });
 

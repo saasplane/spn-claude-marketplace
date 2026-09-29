@@ -8,7 +8,7 @@ import { existsSync, mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { ARCS, capabilitiesDir, constructPagesDir, decisionsRegister, docsOf, hubPage, overviewsDir, registersDir,
-  workstreamsDir } from "../../../../src/scripts/lib/docs-tree.ts";
+  workstreamsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 const HOOKS = PLUGIN;
 const SCRIPTS = resolve(HOOKS, "scripts");

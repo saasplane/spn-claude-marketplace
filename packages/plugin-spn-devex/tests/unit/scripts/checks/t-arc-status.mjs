@@ -1,4 +1,4 @@
-import { WORKSTREAMS } from "../../../../src/scripts/lib/docs-tree.ts";
+import { WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 // `arc-status` — an arc's status is one of eight (RD.DEVEX.WORKSPACE.058).
 //
 // BOTH DIRECTIONS ARE CASES, because a check that only ever speaks is the same defect as one that

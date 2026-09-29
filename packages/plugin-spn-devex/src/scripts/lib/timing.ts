@@ -20,7 +20,7 @@
 
 import { appendFileSync, existsSync, mkdirSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
-import { workstreamPrefixSource } from "./docs-tree.ts";
+import { workstreamPrefixSource } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 const DEVEX = ".spndevex", DEBUG = ".debug", SWITCH = "telemetry.on", FOLDER = "telemetry", LOG = "hooks.jsonl";
 const MAX_BYTES = 4 * 1024 * 1024;

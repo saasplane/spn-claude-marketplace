@@ -10,7 +10,7 @@ import { workspace } from "../../../helpers/fixture.mjs";
 
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve, join } from "node:path";
-import { WORKSTREAMS } from "../../../../src/scripts/lib/docs-tree.ts";
+import { WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 const HOOKS = PLUGIN;
 const SCRIPTS = resolve(HOOKS, "scripts");
@@ -751,9 +751,12 @@ console.log("\n=== runnable — a row held on an open card is not runnable, and 
     ["and the same once the card is answered",
       unfinishedSteps(arcIn("m11-held-bare-answered", "held on Q352", ANSWERED)),
       (steps) => steps.length === 1 && steps[0].startsWith("step 7 was held on Q352, which is answered")],
-    ["a row held on a card the page does not carry open is runnable",
+    ["a row held on a card the page does not carry at all is runnable, and says the card is not on the page",
       unfinishedSteps(arcIn("m11-held-other", "⏸ held on Q9", OPEN)),
-      (steps) => steps.length === 1 && steps[0].startsWith("step 7 was held on Q9")],
+      (steps) => steps.length === 1 && steps[0].startsWith("step 7 is held on Q9, which is not on the approach page")],
+    ["known-bad: a card missing from the page is never reported as answered",
+      unfinishedSteps(arcIn("m12-held-missing", "⏸ held on Q9", ANSWERED)),
+      (steps) => steps.length === 1 && !steps[0].includes("which is answered")],
     ["an unmarked row beside an open card is still an unfinished step",
       unfinishedSteps(arcIn("m11-held-none", "", OPEN)), (steps) => steps.length === 1 && steps[0] === "step 7 — the split check"],
   ]) { n += 1; const pass = ok(got ?? []); if (!pass) failed += 1;

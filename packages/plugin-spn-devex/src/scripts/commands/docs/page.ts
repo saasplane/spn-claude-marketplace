@@ -8,7 +8,7 @@
 
 import { basename, join, relative, resolve } from "node:path";
 import { begin, record, end } from "../../lib/timing.ts";
-import { bookTemplatesDir } from "../../lib/docs-tree.ts";
+import { bookTemplatesDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { pageFor, resolveWorkspace, seatPaths } from "./_lib.ts";
 
 export const describe = "produce each construct page from its seat file";

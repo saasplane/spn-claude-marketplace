@@ -7,7 +7,7 @@ import { join } from "node:path";
 import { arcId, arcLabel, cycleOf, cyclesOf, statusLabel, statusWord, tableOf, workstreamFolder }
   from "../../../../../src/scripts/commands/docs/cycles.ts";
 import { main } from "../../../../../src/scripts/cli.ts";
-import { WORKSTREAMS } from "../../../../../src/scripts/lib/docs-tree.ts";
+import { WORKSTREAMS } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {

@@ -21,7 +21,7 @@ import { mkdirSync, writeFileSync, mkdtempSync, rmSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
-import { WORKSTREAMS } from "../../../../src/scripts/lib/docs-tree.ts";
+import { WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 const CHECKS = resolve(PLUGIN, "src", "scripts", "checks");
 const { checkReleaseGo, commandCwd, isMajorBump } = await import(join(CHECKS, "release-go.ts"));

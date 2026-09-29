@@ -21,7 +21,7 @@ import { filesUnder as proseFilesUnder, paragraphs as proseParagraphs, score as 
 import { withOffset } from "../../lib/clock.ts";
 import { ARTIFACT_FOLDERS, DEVEX_WORKSTREAMS, SEAT, SEATS, TEMPLATES, artifactFolderOf, behaviorsDir, bookTemplatesDir,
   capabilitiesDir, constructsDir, docsOf, inSeat, inTemplates, isProducedPage, mirrorPath,
-  overviewsDir, producedPageOf, seatOf, splitAtSeat } from "../../lib/docs-tree.ts";
+  overviewsDir, producedPageOf, seatOf, splitAtSeat } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 export type Grade = "RULE" | "SOFT";
 export type Finding = { check: string; grade: Grade; file: string; message: string };
 
@@ -65,10 +65,10 @@ export const STATUS_WORD: Record<string, string> = { PLANNING: "PLANNING", IMPLE
  * (workstream 008, N13, 2026-09-21). Relations is gone: `dependsOn` in the block carries it.
  *
  * `order` IS THE ONLY PLACE THE SEQUENCE IS WRITTEN, and `optional` names which of those sections a
- * page may leave out. Required is derived from the two. The pair used to be `required` and
- * `optional` as separate lists, which meant the order of an optional section was declared nowhere —
- * the order check read every optional name as coming first, so a page carrying `Binds` last was
- * judged out of order by an outline that had no opinion about where `Binds` went.
+ * page may leave out. Required is derived from the two. Two separate lists, `required` and
+ * `optional`, would declare the order of an optional section nowhere: the order check would read
+ * every optional name as coming first, and judge a page carrying `Binds` last out of order by an
+ * outline that has no opinion about where `Binds` goes.
  */
 export const OUTLINE: Partial<Record<Variant, { order: string[]; optional: string[] }>> = {
   construct: {

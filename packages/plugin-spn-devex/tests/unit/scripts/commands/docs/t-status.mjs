@@ -7,7 +7,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, rmSync } from "nod
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
-import { SEAT } from "../../../../../src/scripts/lib/docs-tree.ts";
+import { SEAT } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
 const BASE = mkdtempSync(join(tmpdir(), "t-docs-status-"));

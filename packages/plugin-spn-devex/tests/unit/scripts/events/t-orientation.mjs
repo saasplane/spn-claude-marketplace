@@ -29,7 +29,7 @@ const hasPython = (name) => existsSync(resolve(SCRIPTS, name));
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { PLUGIN } from "../../../helpers/harness.mjs";
-import { WORKSTREAMS } from "../../../../src/scripts/lib/docs-tree.ts";
+import { WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 // A THROWAWAY ROOT, MADE FRESH EACH RUN. This named a session scratchpad that no longer
 // exists on any other machine, so the suite passed only where it was written.
@@ -219,6 +219,10 @@ console.log("\n=== a window says when it loaded wiring older than what is instal
   // The installed plugin IS `src/`, so the cache holds `scripts/` and not `hooks/` — the test
   // copies what a partner actually receives.
   cpSync(join(HOOKS, "src", "scripts"), join(cache, "0.0.1", "scripts"), { recursive: true });
+  // The scripts import the shared `plugin-support-lib/src/lib/` by relative path, and an install
+  // receives it bundled into `dist/`. The copy runs the `.ts` source, so the shared folder sits
+  // where that relative path lands, four levels above `scripts/events/`.
+  cpSync(join(HOOKS, "..", "plugin-support-lib", "src", "lib"), join(cache, "..", "plugin-support-lib", "src", "lib"), { recursive: true });
   const installed = join(cache, "0.0.1", "scripts", "events", "orientation.ts");
 
   const check = (label, text, must, mustNot = []) => {

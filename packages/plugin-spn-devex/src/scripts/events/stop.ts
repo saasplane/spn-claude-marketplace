@@ -31,8 +31,8 @@ import { checkCorpus } from "../checks/corpus.ts";
 import { STEP_ID, answeredNumbers, cardsOf, heldOn, isInProgress, markedAgo, openWorkstreams, stateOf, stepsOf,
          workstreamPlan } from "../checks/split-plan.ts";
 import { TERMINAL } from "../checks/arc-status.ts";
-import { DEVEX, workspaceRoot } from "../lib/payload.ts";
-import { workstreamsDir } from "../lib/docs-tree.ts";
+import { workspaceRoot } from "../lib/payload.ts";
+import { DEVEX, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { cacheState } from "./orientation.ts";
 import { begin, span, end, tagsOf } from "../lib/timing.ts";
 
@@ -178,6 +178,11 @@ function openCardsOf(arc: string): Set<string> {
   return new Set(pagesOf(dirname(dirname(arc))).flatMap(openCards));
 }
 
+/** Every card the approach page of an arc's workstream carries, open or answered. */
+function pageCardsOf(arc: string): Set<string> {
+  return new Set(pagesOf(dirname(dirname(arc))).flatMap((page) => cardsOf(page).map((card) => card.number)));
+}
+
 /**
  * The rows of an arc's own step table that are not yet done, or `null` where it has no `## Steps`.
  * A row marked `in progress <time>` is left out: somebody is on it, so it is not runnable work
@@ -185,11 +190,15 @@ function openCardsOf(arc: string): Set<string> {
  *
  * A row marked `⏸ held on Q<n>` is left out while card `Q<n>` is open, because the card's answer can
  * change it (RD.DEVEX.WORKSPACE.188). Once the card is answered the row is runnable again, and its
- * line says so: `step 7 was held on Q352, which is answered — …`.
+ * line says so: `step 7 was held on Q352, which is answered — …`. A row held on a card the page does
+ * not carry at all is runnable too, and its line names that instead: `step 7 is held on Q9, which is
+ * not on the approach page — …`.
  *
- * @param open  the card numbers open on the workstream's page; read from the page when not given
+ * @param open    the card numbers open on the workstream's page; read from the page when not given
+ * @param onPage  every card number the page carries, open or answered; read from the page when not given
  */
-export function unfinishedSteps(arc: string, open: Set<string> = openCardsOf(arc)): string[] | null {
+export function unfinishedSteps(arc: string, open: Set<string> = openCardsOf(arc),
+                                onPage: Set<string> = pageCardsOf(arc)): string[] | null {
   const steps = stepsOf(read(arc));
   if (steps === null) return null;
   // THE STATE CELL IS READ WHERE THE TABLE HAS ONE. The step row carries What, Mechanism and
@@ -202,9 +211,10 @@ export function unfinishedSteps(arc: string, open: Set<string> = openCardsOf(arc
     .filter((step) => { const card = heldCard(step); return card === null || !open.has(card); })
     .map((step) => {
       const card = heldCard(step);
-      return card === null
-        ? `step ${step.id} — ${step.what.slice(0, 70)}`
-        : `step ${step.id} was held on ${card}, which is answered — ${step.what.slice(0, 70)}`;
+      if (card === null) return `step ${step.id} — ${step.what.slice(0, 70)}`;
+      return onPage.has(card)
+        ? `step ${step.id} was held on ${card}, which is answered — ${step.what.slice(0, 70)}`
+        : `step ${step.id} is held on ${card}, which is not on the approach page — ${step.what.slice(0, 70)}`;
     });
 }
 

@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { LIB } from "../../../helpers/harness.mjs";
 import { workspace } from "../../../helpers/fixture.mjs";
 import { tagsOf } from "../../../../src/scripts/lib/timing.ts";
-import { WORKSTREAMS } from "../../../../src/scripts/lib/docs-tree.ts";
+import { WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 let total = 0, failed = 0;
 const same = (label, got, expected) => {

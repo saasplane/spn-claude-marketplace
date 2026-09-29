@@ -15,7 +15,7 @@ import { existsSync } from "node:fs";
 
 import { draw, type Spec } from "./draw.ts";
 import { colour } from "./figures.ts";
-import { isSeatFile, producedPageOf } from "./docs-tree.ts";
+import { isSeatFile, producedPageOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 export type Finding = { message: string; line?: number };
 

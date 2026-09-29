@@ -24,7 +24,7 @@
 import { lstatSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { isDir, isFile } from "../../lib/payload.ts";
-import { capabilitiesDir, decisionsRegister, docsOf } from "../../lib/docs-tree.ts";
+import { capabilitiesDir, decisionsRegister, docsOf } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { check, declaresASource, headerSources, nameIndex, namedSources, parse, resolveSource, undeclared } from "../../lib/restates.ts";
 
 const SKIP = new Set(["node_modules", ".git", "dist", "build", ".nx", "coverage", "__pycache__"]);

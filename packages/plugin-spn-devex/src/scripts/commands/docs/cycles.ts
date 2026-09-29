@@ -15,7 +15,7 @@
 import { basename, dirname, join, resolve } from "node:path";
 import { STATUSES } from "../../checks/arc-status.ts";
 import { isDir, isFile, listdir, read, workspaceRoot } from "../../lib/payload.ts";
-import { WORKSTREAM_STATES, workstreamsDir } from "../../lib/docs-tree.ts";
+import { WORKSTREAM_STATES, workstreamsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { begin, end, record } from "../../lib/timing.ts";
 
 export const describe = "print a workstream's Cycles table from its arcs — one row per arc, with its status";

@@ -6,7 +6,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "nod
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { check, parse, sectionText, seenHash } from "../../../../../src/scripts/lib/restates.ts";
-import { SEAT, TEMPLATES } from "../../../../../src/scripts/lib/docs-tree.ts";
+import { SEAT, TEMPLATES } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 let n = 0, failed = 0;
 const one = (label, got, want) => {

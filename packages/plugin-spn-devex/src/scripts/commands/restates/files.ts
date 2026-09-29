@@ -17,7 +17,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSy
 import { dirname, join, relative, resolve } from "node:path";
 
 import { seenHash, treeHash } from "../../lib/restates.ts";
-import { BOOK_TEMPLATES, PLUGIN_TEMPLATES } from "../../lib/docs-tree.ts";
+import { BOOK_TEMPLATES, PLUGIN_TEMPLATES } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 
 const HERE = dirname(new URL(import.meta.url).pathname);

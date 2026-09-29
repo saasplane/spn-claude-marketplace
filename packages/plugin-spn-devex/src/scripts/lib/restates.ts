@@ -51,7 +51,7 @@ import { createHash } from "node:crypto";
 import { readdirSync, statSync } from "node:fs";
 import { join, join as joinPath, resolve as resolvePath } from "node:path";
 import { isFile, read } from "./payload.ts";
-import { decisionsRegister, docsOf } from "./docs-tree.ts";
+import { decisionsRegister, docsOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 const BLOCK = /<!--\s*spn:restates\s*(\{[\s\S]*?\})\s*-->/;
 /** The whole `spn:restates` comment, for a writer that replaces it with a re-serialized block. */

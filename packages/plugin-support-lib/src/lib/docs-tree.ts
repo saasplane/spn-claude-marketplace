@@ -2,8 +2,9 @@
 //           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § What the pocket holds · § The approach document — a workstream's, never a repository's
 // The chapters are the source of truth; a rule change is edited there first, then here.
 //
-// The docs layout, stated once: every script builds and recognizes a docs path through this module.
-// The plugin's unit suite refuses a literal layout folder in any other script.
+// The docs layout, stated once: every plugin script builds and recognizes a docs path through this
+// module, which spn-devex, spn-apps and spn-infra each import by relative path. support-lib's unit
+// suite refuses a literal layout folder in any other script of any plugin.
 //
 // Two layouts meet here:
 //
@@ -17,7 +18,9 @@
 // Paths are compared with forward slashes.
 
 import { join, sep } from "node:path";
-import { DEVEX } from "./payload.ts";
+
+/** The workspace's working-state folder, at the workspace root. */
+export const DEVEX = ".spndevex";
 
 // ---------------------------------------------------------------------------- the docs tree
 

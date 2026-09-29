@@ -16,7 +16,7 @@ import { createHash } from "node:crypto";
 import { mkdirSync, writeFileSync, mkdtempSync, realpathSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
-import { POCKET, SEAT } from "../../../../../src/scripts/lib/docs-tree.ts";
+import { POCKET, SEAT } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 const HOOKS = PLUGIN;
 const TOOL = join(HOOKS, "src", "scripts", "commands", "restates", "check.ts");

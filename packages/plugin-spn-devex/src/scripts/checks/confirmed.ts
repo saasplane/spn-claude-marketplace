@@ -29,8 +29,8 @@
 
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { basename, isAbsolute, join, relative, resolve } from "node:path";
-import { workstreamsDir } from "../lib/docs-tree.ts";
-import { DEVEX, emit, isDir, listdir, read, readPayload, runAlone, workspaceRoot,
+import { DEVEX, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { emit, isDir, listdir, read, readPayload, runAlone, workspaceRoot,
          type Payload, type Verdict } from "../lib/payload.ts";
 
 const DEBUG = ".debug";

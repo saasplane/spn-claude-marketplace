@@ -9,7 +9,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
-import { SEAT } from "../../../../src/scripts/lib/docs-tree.ts";
+import { SEAT } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 const HOOKS = PLUGIN;
 

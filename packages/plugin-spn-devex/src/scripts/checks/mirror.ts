@@ -31,8 +31,8 @@
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import type { Payload, Verdict } from "../lib/payload.ts";
-import { DEVEX, read } from "../lib/payload.ts";
-import { SEAT } from "../lib/docs-tree.ts";
+import { read } from "../lib/payload.ts";
+import { DEVEX, SEAT } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 const DEBUG = ".debug";
 const MIRROR = "mirror";

@@ -36,7 +36,7 @@
 
 import { basename } from "node:path";
 import { unescape, type Payload, type Verdict } from "../lib/payload.ts";
-import { arcPathPattern } from "../lib/docs-tree.ts";
+import { arcPathPattern } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 /** The set, in the order the register states it. The last three are terminal. */
 export const STATUSES = ["PROPOSED", "DECIDED", "RUNNING", "HELD", "PART-LANDED", "LANDED", "CARRIED", "DROPPED"] as const;

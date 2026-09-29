@@ -35,7 +35,7 @@ import { existsSync, readdirSync, statSync } from "node:fs";
 import { basename, join, dirname, resolve } from "node:path";
 import { isDir, isFile, read } from "../../lib/payload.ts";
 import { ARTIFACT, DECISIONS, DOCS, POCKET, capabilitiesDir, constructsDir, decisionsRegister, docsOf,
-  hasSegment, hubPage, overviewsDir } from "../../lib/docs-tree.ts";
+  hasSegment, hubPage, overviewsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { DECISION_ID_SRC, check as restatesCheck, parse as restatesParse, registerRows, undeclared } from "../../lib/restates.ts";
 
 const DECISION_ID = new RegExp(DECISION_ID_SRC, "g");

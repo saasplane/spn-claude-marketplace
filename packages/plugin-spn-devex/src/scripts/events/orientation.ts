@@ -48,8 +48,8 @@ import { readdirSync, realpathSync, statSync } from "node:fs";
 import { homedir } from "node:os";
 import { basename, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
-import { DEVEX, isDir, isFile, listdir, read, readPayload, runAlone, type Payload } from "../lib/payload.ts";
-import { ARCS, SESSIONS, WORKSTREAM_STATES, legacyWorkstreamsDir, workstreamsDir } from "../lib/docs-tree.ts";
+import { isDir, isFile, listdir, read, readPayload, runAlone, type Payload } from "../lib/payload.ts";
+import { ARCS, DEVEX, SESSIONS, WORKSTREAM_STATES, legacyWorkstreamsDir, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { begin, end, record, tagsOf } from "../lib/timing.ts";
 
 const MARKETPLACE = "saasplane";

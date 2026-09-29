@@ -9,7 +9,7 @@
 // its own gate refuses is a defect, whichever half is wrong.
 import { draw, KINDS } from "../../../../src/scripts/lib/draw.ts";
 import { checkFigures } from "../../../../src/scripts/lib/figures.ts";
-import { SEAT } from "../../../../src/scripts/lib/docs-tree.ts";
+import { SEAT } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 let n = 0, failed = 0;
 function one(name, got, want) {

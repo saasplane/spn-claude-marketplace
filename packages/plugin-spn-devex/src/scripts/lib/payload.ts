@@ -12,8 +12,7 @@
 
 import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
-
-export const DEVEX = ".spndevex";
+import { DEVEX } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 export type ToolInput = {
   file_path?: string;

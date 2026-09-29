@@ -9,7 +9,7 @@ import { mkdirSync, mkdtempSync, realpathSync, writeFileSync, rmSync } from "nod
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { workspace } from "../../../helpers/fixture.mjs";
-import { ARCS, DEVEX_WORKSTREAMS, DOCS, SEAT, capabilitiesDir, docsOf, workstreamsDir } from "../../../../src/scripts/lib/docs-tree.ts";
+import { ARCS, DEVEX_WORKSTREAMS, DOCS, SEAT, capabilitiesDir, docsOf, workstreamsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";

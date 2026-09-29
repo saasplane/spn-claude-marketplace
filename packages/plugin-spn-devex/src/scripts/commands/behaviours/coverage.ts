@@ -12,7 +12,7 @@ import { createHash } from "node:crypto";
 import { withOffset } from "../../lib/clock.ts";
 import { readdirSync, statSync } from "node:fs";
 import { basename, join, relative, resolve } from "node:path";
-import { DOCS, reportsDir } from "../../lib/docs-tree.ts";
+import { DOCS, reportsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { declaredRows } from "../../../../../plugin-support-lib/src/lib/register.ts";
 import { owedBy, TIERS } from "../../../../../plugin-support-lib/src/lib/kinds.ts";
 import { artifactPath, newest, read, readArtifact, worst } from "../../../../../plugin-support-lib/src/lib/runs.ts";

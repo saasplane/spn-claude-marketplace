@@ -30,7 +30,7 @@
 
 import { basename, resolve } from "node:path";
 import { isDir, readPayload, runAlone, workspaceRoot, type Payload } from "../lib/payload.ts";
-import { ARCS, SESSIONS, WORKSTREAM_STATES, WORKSTREAMS } from "../lib/docs-tree.ts";
+import { ARCS, SESSIONS, WORKSTREAM_STATES, WORKSTREAMS } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { HELD_STATE, closing, moves, stateOf, subjectFolders, subjectPages, workstreamPlan } from "../checks/split-plan.ts";
 import { begin, end, span, tagsOf } from "../lib/timing.ts";
 

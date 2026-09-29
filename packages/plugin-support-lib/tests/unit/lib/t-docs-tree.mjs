@@ -1,14 +1,19 @@
 // `lib/docs-tree.ts` — the docs layout stated once, and the check that no other script spells it.
 //
 // The helpers are proved on paths built from the module's own names, so a folder the book moves is
-// one edit in the module and none here. The check reads every literal under `src/scripts/` with the
-// comments dropped: a comment may cite a chapter's path, and code may not build one by hand.
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+// one edit in the module and none here. The check reads every literal under each plugin's
+// `src/scripts/`, and under this folder's own `src/lib/`, with the comments dropped: a comment may
+// cite a chapter's path, and code may not build one by hand. The module is the one file exempt.
+import { existsSync, mkdtempSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
-import { SCRIPTS } from "../../../helpers/harness.mjs";
-import { layoutLiterals, literalsOf, scanTree } from "../../../helpers/layout-literals.mjs";
-import * as tree from "../../../../src/scripts/lib/docs-tree.ts";
+import { join, resolve } from "node:path";
+import { layoutLiterals, literalsOf, scanTree } from "../../helpers/layout-literals.mjs";
+import * as tree from "../../../src/lib/docs-tree.ts";
+
+// `tests/` SITS BESIDE `src/`, and this folder beside the plugins, so both are found by walking up.
+const HERE = resolve(import.meta.dirname, "..", "..", "..");
+const PACKAGES = resolve(HERE, "..");
+const MODULE = "docs-tree.ts";
 
 const { SEAT, SEATS, POCKET, ARTIFACT, ARTIFACT_FOLDERS, TEMPLATES, WORKSTREAMS, DOCS } = tree;
 
@@ -107,17 +112,28 @@ const scratch = mkdtempSync(join(tmpdir(), "docs-tree-"));
 try {
   mkdirSync(join(scratch, "lib"), { recursive: true });
   writeFileSync(join(scratch, "bad.ts"), `export const seat = "${DOCS}/${SEAT.behaviors}";\n`);
-  writeFileSync(join(scratch, "lib", "docs-tree.ts"), `export const SEAT = "${SEAT.behaviors}";\n`);
-  const bad = await scanTree(scratch, NAMES, ["lib/docs-tree.ts"]);
+  writeFileSync(join(scratch, "lib", MODULE), `export const SEAT = "${SEAT.behaviors}";\n`);
+  const bad = await scanTree(scratch, NAMES, [`lib/${MODULE}`]);
   same("known-bad tree: the offending file is named, and the module itself is exempt",
     bad.map((hit) => `${hit.file}:${hit.line} ${hit.name}`), [`bad.ts:1 ${SEAT.behaviors}`]);
 } finally {
   rmSync(scratch, { recursive: true, force: true });
 }
 
-const found = await scanTree(SCRIPTS, NAMES, ["lib/docs-tree.ts"]);
-same("no file under src/scripts other than lib/docs-tree.ts spells a layout folder",
-  found.map((hit) => `${hit.file}:${hit.line} [${hit.name}] ${hit.text.slice(0, 80)}`), []);
+// Every plugin beside this folder that carries scripts, found by walking rather than listed, so a
+// new plugin is scanned the day it lands.
+const PLUGINS = readdirSync(PACKAGES).sort()
+  .filter((name) => name.startsWith("plugin-spn-") && existsSync(join(PACKAGES, name, "src", "scripts")));
+same("the check scans spn-devex, spn-apps and spn-infra",
+  ["plugin-spn-devex", "plugin-spn-apps", "plugin-spn-infra"].every((name) => PLUGINS.includes(name)), true);
+for (const plugin of PLUGINS) {
+  const found = await scanTree(join(PACKAGES, plugin, "src", "scripts"), NAMES);
+  same(`no file under ${plugin}/src/scripts spells a layout folder`,
+    found.map((hit) => `${hit.file}:${hit.line} [${hit.name}] ${hit.text.slice(0, 80)}`), []);
+}
+const own = await scanTree(join(HERE, "src", "lib"), NAMES, [MODULE]);
+same(`no file under plugin-support-lib/src/lib other than ${MODULE} spells a layout folder`,
+  own.map((hit) => `${hit.file}:${hit.line} [${hit.name}] ${hit.text.slice(0, 80)}`), []);
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — docs-tree` : `\n  all ${total} passed — docs-tree`);
 process.exit(failed ? 1 : 0);

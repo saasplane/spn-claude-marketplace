@@ -43,7 +43,7 @@ import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { basename, dirname, join, resolve, relative, sep } from "node:path";
 import { emit, readPayload, runAlone, unescape, type Payload, type Verdict } from "../lib/payload.ts";
 import { APPROACH_SUFFIX, ARTIFACT, PLUGIN_TEMPLATES, POCKET, decisionsRegister, inArtifacts, isArcFile,
-         isRegister as inRegisters, workstreamDirOf } from "../lib/docs-tree.ts";
+         isRegister as inRegisters, workstreamDirOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { cyclesOf, statusWord } from "../commands/docs/cycles.ts";
 
 export type Finding = [severity: string, message: string];

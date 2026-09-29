@@ -12,7 +12,7 @@ import { workspace } from "../../../helpers/fixture.mjs";
 
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
-import { WORKSTREAMS } from "../../../../src/scripts/lib/docs-tree.ts";
+import { WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 const HOOKS = PLUGIN;
 const SCRIPTS = resolve(HOOKS, "scripts");

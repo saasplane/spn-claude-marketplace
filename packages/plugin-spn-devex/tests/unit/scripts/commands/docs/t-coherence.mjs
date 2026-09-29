@@ -21,7 +21,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, writeFileSync, mkdtempSync, rmSync, renameSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { tmpdir } from "node:os";
-import { ARTIFACT, POCKET, SEAT } from "../../../../../src/scripts/lib/docs-tree.ts";
+import { ARTIFACT, POCKET, SEAT } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 const TOOL = join(PLUGIN, "src", "scripts", "commands", "docs", "coherence.ts");
 const BASE = mkdtempSync(join(tmpdir(), "t-coherence-"));

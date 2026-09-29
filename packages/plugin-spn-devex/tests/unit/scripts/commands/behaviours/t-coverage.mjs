@@ -5,7 +5,7 @@ import { execFileSync } from "node:child_process";
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
-import { POCKET, SEAT } from "../../../../../src/scripts/lib/docs-tree.ts";
+import { POCKET, SEAT } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "commands", "behaviours", "coverage.ts");
 const kept = [];

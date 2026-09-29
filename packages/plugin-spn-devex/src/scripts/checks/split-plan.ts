@@ -37,10 +37,10 @@
 import { readdirSync, statSync } from "node:fs";
 import { TERMINAL, statusIn } from "./arc-status.ts";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
-import { DEVEX, emit, isDir, isFile, listdir, read, readPayload, runAlone, unescape, workspaceRoot,
+import { emit, isDir, isFile, listdir, read, readPayload, runAlone, unescape, workspaceRoot,
          type Payload, type Verdict } from "../lib/payload.ts";
-import { APPROACH_SUFFIX, ARCS, SESSIONS, WORKSTREAM_STATES, WORKSTREAMS, legacyWorkstreamsDir, workstreamsDir,
-         type WorkstreamState } from "../lib/docs-tree.ts";
+import { APPROACH_SUFFIX, ARCS, DEVEX, SESSIONS, WORKSTREAM_STATES, WORKSTREAMS, legacyWorkstreamsDir, workstreamsDir,
+         type WorkstreamState } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 // The state a row reaches. `landed` is the only one that satisfies the documents pass; all three
 // named states satisfy the close. A mark nobody wrote is what the close refuses.
@@ -887,8 +887,8 @@ const EYEBROW = /class="eyebrow"[^>]*>([\s\S]*?)<\/div>/i;
 // THE STATUS IS ONE FIELD OF THE MASTHEAD, AND THE GATE READS THAT FIELD. `05-artifacts.md` § The
 // approach document says the masthead CARRIES a status drawn from a closed set — the status is not
 // the whole line. Scanning the whole line for a finished word reads the title and the lens list as
-// though they were the status, so a page stamped `Status: PLANNING` under a title carrying the word
-// *complete* closed as green. Where a masthead labels its status, only what follows the label is
+// the status, so a page stamped `Status: PLANNING` under a title carrying the word *complete* would
+// close as green. Where a masthead labels its status, only what follows the label is
 // read; where it does not — the older pages trail `· closed` after the audience — the whole line is,
 // because there is no field to narrow to.
 const STATUS_FIELD = /\bstatus\s*:\s*([^|]*)$/i;
