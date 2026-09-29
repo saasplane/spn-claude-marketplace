@@ -1995,7 +1995,7 @@ export function readingOrder(constructs: { id: string; title: string; summary: s
 }
 
 /**
- * A link target moved from one document into another, re-based.
+ * A link written for one document, re-based for another document that carries the same prose.
  *
  * A face's bridge is the concept's own prose, and the concept sits at the repository root. Its
  * relative links resolve from there. Copied verbatim into `02-constructs/<group>/<domain>/README.md`
@@ -2189,8 +2189,8 @@ export function face(tree: string, write: boolean): Finding[] {
     findings.push({ check: "face", grade: "SOFT", file: seatFace, message: "no constructs seat face" });
   }
 
-  // THE DOMAIN FACE IS THE ONE PLACE A CONSTRUCT LIST IS GENERATED. The concept once carried the
-  // same list a second time, and it was the face's inventory wearing the concept's clothes: one
+  // THE DOMAIN FACE IS THE ONE PLACE A CONSTRUCT LIST IS GENERATED. The concept carries no second
+  // copy of it, because that copy would be the face's inventory wearing the concept's clothes: one
   // source, two generated homes, and a reader one click from the place whose whole job is to be
   // that list. A concept states the model at SHAPE depth — which domains exist and why the
   // repository divides that way — and a construct's summary is depth (MD10).
@@ -2238,9 +2238,9 @@ export function face(tree: string, write: boolean): Finding[] {
  * The status a set of behaviour rows rolls up to.
  *
  * A construct's status is what the runs say about the behaviours at its own path, and nothing else.
- * It used to be read from the *where it lives today* rows in `Binds` and from `Proof` — a table
+ * It is never read from the *where it lives today* rows in `Binds` or from `Proof` — a table
  * somebody typed about where code sits, which says where the work is rather than whether it works.
- * Decision `E` moves it to the rows, so the word changes when a run changes and at no other moment.
+ * Decision `E` reads it from the rows, so the word changes when a run changes and at no other moment.
  *
  * `PLANNED` is the author's mark and means nothing has run, so a file of `PLANNED` rows and a file of
  * no rows roll up the same way. **A file with no rows is honest** where the product is not built:

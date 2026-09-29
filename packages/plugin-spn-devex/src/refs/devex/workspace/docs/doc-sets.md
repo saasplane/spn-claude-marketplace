@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "05c18bc9"
+      "seen": "1ccfc845"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -443,6 +443,7 @@ Every page somebody writes by hand is copied from a template, and the templates 
 | empty | the row is written down. Nothing has been built |
 | `in progress 2026-09-29 14:32 +05:30` | somebody started the row at that moment and is working on it now |
 | `◐ stopped` | somebody began the row and put it down, with what was done and what is unsafe to touch |
+| `⏸ held on Q<n>` | the row waits for the answer to card `Q<n>`, because that answer can change it |
 | `✅ landed` | the change is in the repository that owns it, with the commit beside the word |
 | `↷ carried` | the work moved to another workstream, which is named |
 | `⊘ deferred` | the work is parked on purpose, with the event that brings it back |
@@ -451,7 +452,9 @@ Every page somebody writes by hand is copied from a template, and the templates 
 
 **A row you started and put down gets its own mark, and it is `◐ stopped`.** None of the others fits: `in progress <time>` says somebody is on it now, and a bare cell says nobody has started it, while half an edit already sits in the tree. The mark carries four things, because only the agent who stopped knows any of them — `→` what has to happen before it resumes, `did` what already reached its node, `left` what did not, and `unsafe` what nobody may touch until it resumes.
 
-The last three are what the close sweep asks of every row, and an empty row, a row in progress and a stopped row all refuse the close. **`carried` means the work LEAVES this workstream**, so it names a successor scope that can receive it — another workstream, in `open/` or `backlog/`. A row pointing at a later arc of its own workstream is **sequencing**, not a carry, and it resolves through that arc: landed once the arc lands, pending while it has not. **The close refuses a stopped row**, and that is the one place it differs from deferred: a deferred row was parked before anything was touched, and a stopped one was not. You finish the work and mark the row landed, or you split it in two — the half that reached its node becomes a landed row, and the half that did not becomes a second row, carried or deferred.
+**A row that only waits on a card's answer, with nothing half-done, is held rather than stopped.** It carries `⏸ held on Q<n>`, because nothing in it is unsafe to touch and the answer alone frees it (decision RD.DEVEX.WORKSPACE.188). A row that began and then met the question is stopped, and its `→` names the card. A held row is not runnable work while its card is open; when the card is answered, the answer is recorded, the mark goes, and the row runs again.
+
+The last three are what the close sweep asks of every row, and an empty row, a row in progress, a stopped row and a held row all refuse the close. **`carried` means the work LEAVES this workstream**, so it names a successor scope that can receive it — another workstream, in `open/` or `backlog/`. A row pointing at a later arc of its own workstream is **sequencing**, not a carry, and it resolves through that arc: landed once the arc lands, pending while it has not. **The close refuses a stopped row**, and that is the one place it differs from deferred: a deferred row was parked before anything was touched, and a stopped one was not. You finish the work and mark the row landed, or you split it in two — the half that reached its node becomes a landed row, and the half that did not becomes a second row, carried or deferred.
 
 **Carry the face and the arguments inside the workstream that changes them**, rather than tidying them afterwards. A workstream runs concept → docs → code, so the model moves first and the face moves with it. Leave the face to a later pass and the hub states a model the code has already left. Expansion is earned the same way. Where implementing a workstream shows a section is too big to review in place, the face gains one then — that is when somebody has read it at depth.
 

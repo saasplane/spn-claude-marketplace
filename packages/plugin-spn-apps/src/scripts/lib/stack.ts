@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-// RESTATES: `docs/02-constructs/01-devex/07-providers.md` — a gate
-// never names an instance. That chapter is the source of truth; this file states no rule of its own
-// and only performs the read it describes.
+// RESTATES: `docs/02-constructs/02-support/01-apps/10-providers.md` § The claim, and what grants it —
+// the stack sits in the repository's own `sprepo.json`; and RD.DEVEX.AGENT.066 — a gate never names
+// an instance. Those are the source of truth; this file states no rule of its own and only performs
+// the read it describes.
 //
 // **THE STACK IS THE NODE'S OWN**, read from the nearest `sprepo.json` — never typed on a command
 // and never guessed from a file extension. A gate that could name an instance is a gate somebody

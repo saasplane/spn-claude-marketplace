@@ -1,13 +1,15 @@
 #!/usr/bin/env node
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The arc · § A step row says where, at what altitude, and how · § Say what you opened, and know when to wait for the answer · § Stopping in the middle is a handover
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The arc · § A step row says where, at what altitude, and how · § Say what you opened, and know when to wait for the answer · § Stopping in the middle is a handover · § A prompt while an arc runs
 //           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The approach document
+//           docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md § The reply while work runs shows what needs you, then what moved
 // The chapters are the source of truth. A rule change is edited there first, then here, in the same change.
 //
 // The Stop checks. They read what the turn is about to leave behind, and warn — never refuse, because
 // the turn is already written and a refusal would only lose it.
 //
 //   runnable   a turn that ends while an arc THIS SESSION worked on still has rows to do, and nothing
-//              blocks them
+//              blocks them; a row `⏸ held on Q<n>` is not runnable while that card is open
+//   needs-you  a reply given while a card is open opens with **Needs you**
 //   hold       an arc whose status reads HELD must name a card that exists and is unanswered
 //   handover   a reply that says a new window is needed carries the seven fields
 //   corpus     the docs trees still answer the questions only a whole-corpus read can ask

@@ -4,7 +4,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The approach document — a workstream's, never a repository's",
-      "seen": "df646b80"
+      "seen": "1ba67487"
     }
   ]
 }
@@ -88,6 +88,17 @@ those numbers, so the page uses them rather than starting a second run.
 
 > Restates `01-devex/04-workspace/04-docs/05-artifacts.md` — *The approach document* → `Open`. Where the two
 > disagree, the chapter wins.
+
+## While a card is open
+
+**A row that only waits on a card's answer, with nothing half-done, is held rather than stopped.**
+It carries `⏸ held on Q<n>`, because nothing in it is unsafe to touch and the answer alone frees it
+(`RD.DEVEX.WORKSPACE.188`). A row that began and then met the question is `◐ stopped`, and its `→`
+names the card. Rows the answer cannot change keep running.
+
+**While work runs, every open card leads the reply**, in full and in markdown, under **Needs you**,
+before any progress (`RD.DEVEX.WORKSPACE.189`). `refs/devex/workspace/workstream.md` § *The reply
+while work runs shows what needs you, then what moved* holds that shape.
 
 ## Deferred
 

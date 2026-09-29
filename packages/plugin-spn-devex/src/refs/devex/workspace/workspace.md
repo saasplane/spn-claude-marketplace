@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "473a957b"
+      "seen": "7f83e36e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
@@ -214,7 +214,7 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
           orders/                         one brief per delegated execution, and its report
     closed/
       {NNN}-{subject}/                    the whole folder, once its plan is accounted for
-    .last-number                          the highest workstream number ever used
+    state.json                            `lastNumber`: the highest workstream number ever used
   .debug/                                 what the agent's own machinery says about itself
   README.md
 ```
@@ -261,7 +261,9 @@ When a window opens, surface what is stale — a subject untouched across sittin
 | **crosses more than one repo** | the split plan is the only thing holding the halves in order |
 | **outlives one sitting** | the next window finds it by reading, never by remembering |
 
-**A new workstream takes the next free number across all three states.** Read `backlog/`, `open/` and `closed/` together, and `workstreams/.last-number` beside them. Take the number after the higher of the two, and never reuse one. That record is what lets a closed workstream be deleted without its number being given out again.
+**A new workstream takes the next free number across all three states.** Read `backlog/`, `open/` and `closed/` together, and `lastNumber` in `workstreams/state.json` beside them. Take the number after the higher of the two, and never reuse one. That record is what lets a closed workstream be deleted without its number being given out again.
+
+**`workstreams/state.json` holds only what the folder tree cannot show — MUST** (`RD.DEVEX.WORKSPACE.190`). Today that is one key, `lastNumber`: once a closed folder is deleted, no folder carries the highest number any more. A value the tree already shows, such as which state a workstream is in or how many arcs it has, never goes in the file, and a new key is added only with the reason the tree cannot hold it. `spnutils workspace init` and `workspace agent-sync` move an older `workstreams/.last-number` into `state.json` and delete the old file.
 
 ### Which state a new workstream starts in
 
@@ -381,7 +383,7 @@ Both read one thing: the **split plan**, which is the step rows of every arc rea
 | Gate | Fires when | Verdict |
 | --- | --- | --- |
 | **documents first** | you write an approach page into a repo's own pocket while an open workstream's plan still has rows that have not landed | a **warning** naming the workstream. Getting ahead of the plan is sometimes right, so it never refuses |
-| **close** | a subject moves into `workstreams/closed/` | a **refusal** while any row is one nobody decided, one somebody started and put down, or one still marked in progress |
+| **close** | a subject moves into `workstreams/closed/` | a **refusal** while any row is one nobody decided, one somebody started and put down, one held on an open card, or one still marked in progress |
 | **answered card** | you write while an approach page still asks a question its arc records as answered | a **warning** naming the card. Fold it into the section that now states it |
 
 **The arcs carry the rows, and the approach page does not.** The page argues the change, and its `How` ends in a *Cycles* table with one row per arc, written from each arc's status line. Where the page and an arc disagree, the arc is right.
@@ -398,6 +400,7 @@ Both read one thing: the **split plan**, which is the step rows of every arc rea
 | empty | nobody decided. **The gate refuses it** | — |
 | `in progress` | somebody is on it now. **The gate refuses it** | `in progress 2026-09-29 14:32 +05:30` |
 | `◐ stopped` | begun and put down. **The gate refuses it too** — half an edit sits in the tree and only the agent that stopped knows where | `stopped → Q8 answered · did the chapter · left the row · unsafe decisions.md` |
+| `⏸ held on Q<n>` | waits for the answer to card `Q<n>`, because that answer can change it (`RD.DEVEX.WORKSPACE.188`). **The gate refuses it** | `⏸ held on Q12` |
 
 **A stopped row is finished, or split honestly.** The half that reached its node becomes a landed row, and the half that did not becomes a second row, carried or deferred. Never retype the mark and leave the done half unrecorded.
 

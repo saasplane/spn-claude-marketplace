@@ -12,7 +12,7 @@ Model: {{Opus 5 · Sonnet 5}}.
 Read first: `{{absolute path}}/arcs/N{{n}}-….md` (fields, and row {{k}}), `{{absolute path}}/notes/N{{n}}/plan.md`
   (§ Traps, § Commands, row {{k}}), then `{{the order or seat file being changed}}`.
 Pins: re-run the plan's stale check first — `git -C {{repo}} log {{sha}}..HEAD -- {{paths}}`.
-State: rows {{…}} ✅ landed; row {{c}} ◐ stopped — done {{…}}, not done {{…}}; rows {{…}} not started.
+State: rows {{…}} ✅ landed; row {{c}} ◐ stopped — done {{…}}, not done {{…}}; row {{h}} ⏸ held on Q{{n}}; rows {{…}} not started.
 Live now / waits for the window: {{what is installed and live · what only a new window reads — or "no reload"}}.
 Done when: Commands row `{{name}}` → {{Green after}}.
 Do not touch: {{files or cycles this window must leave alone}}.

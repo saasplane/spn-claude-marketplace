@@ -32,12 +32,17 @@
       "seen": "4144f9f2"
     },
     {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "section": "The reply while work runs shows what needs you, then what moved",
+      "seen": "b5194f14"
+    },
+    {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "473a957b"
+      "seen": "7f83e36e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "3a9995e6"
+      "seen": "c49a7d7a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -57,11 +62,11 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A prompt while an arc runs",
-      "seen": "354a67e3"
+      "seen": "fbd70fe0"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "05c18bc9"
+      "seen": "1ccfc845"
     }
   ]
 }
@@ -72,7 +77,8 @@ How a session decides what to do: how it opens, how it reads each prompt, the st
 moves through, what each one writes before it moves on, and how a reply closes. Every skill reads
 this file before it acts. Stack-agnostic. Source of truth: the foundation's
 `02-constructs/01-devex/02-agent/01-agent.md` and
-`04-capabilities/01-devex/02-agent/01-agent/01-agent.md` for the loop a session runs,
+`04-capabilities/01-devex/02-agent/01-agent/01-agent.md` for the loop a session runs and the reply
+it gives while work runs,
 `02-constructs/01-devex/04-workspace/02-workstream.md` and
 `04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md` for the workstream itself, and
 `04-docs/05-artifacts.md` for what it writes.
@@ -182,9 +188,9 @@ context ends with the session and the files do not.
 | **S1** | **shape** | there is no page, or the page does not cover the work | the approach page in its fixed shape, and one arc per piece of work. Every unknown is a `Q<n>` card with options and a recommendation. **Never a blank page, never a card without a recommendation** | the page exists and every question the agent cannot answer alone is a card |
 | **S2** | **iterate** | a card is open, or the developer says anything that adds clarity | an answer **folds into the section that then states it** and leaves `Open`. A new question is the next `Q<n>`. A new ask is a row in the arc that owns it, and a new arc only when no arc does | `Open` is empty and the split plan covers the scope |
 | **S3** | **confirm** | `Open` is empty and the scope is clear | nothing new — the plan is shown and a go is asked for | the developer says go, **and the arc's log records it**: `- **<date> — go.**` |
-| **S4** | **execute** | the developer said go | a row you start takes `in progress <date> <time> <offset>` in its State cell (`in progress 2026-09-29 14:32 +05:30`), and landing replaces it. A row already marked by somebody else is left alone: ask the developer, saying how old the mark is. A row ticks only when its acceptance holds and is proven. A question hit mid-work becomes a card; everything not waiting on it keeps moving. A row you started and put down takes `◐ stopped`, carrying what has to happen first, what already reached its node, what did not, and what nobody may touch until it resumes | every row is landed, carried or deferred |
+| **S4** | **execute** | the developer said go | a row you start takes `in progress <date> <time> <offset>` in its State cell (`in progress 2026-09-29 14:32 +05:30`), and landing replaces it. A row already marked by somebody else is left alone: ask the developer, saying how old the mark is. A row ticks only when its acceptance holds and is proven. A question hit mid-work becomes a card, and the rows its answer can change are held at `⏸ held on Q<n>`; everything the answer cannot touch keeps moving. A row you started and put down takes `◐ stopped`, carrying what has to happen first, what already reached its node, what did not, and what nobody may touch until it resumes | every row is landed, carried or deferred |
 | **S5** | **verify** | the last row is worked | the proof in the arc log — what ran, and what it said | nothing is asserted that was not run |
-| **S6** | **close** | verification holds | landed, carried and deferred all pass, because parking work consciously is good housekeeping. **`carried` means the work leaves this workstream**, so the gate reads the scope it names and refuses one that is closed or does not exist; a row pointing at a later arc of this same workstream is sequencing, and it waits on that arc rather than on the word. **A row nobody decided, a row marked `◐ stopped` and a row still `in progress` all refuse the close** — a stopped row already touched its node, so you finish it and mark it landed, or you split it into the half that reached its node and the half that did not. Then **the page is stamped closed**, then the folder moves, then the sweep — contradictions to a register row, conventions to the owning chapter — then one line saying what landed. **The page itself never moves into a repository**: an argument closes with the workstream that argued it, and what outlives it is the register row and the construct rewritten fresh | the folder is in `closed/` and the page says so |
+| **S6** | **close** | verification holds | landed, carried and deferred all pass, because parking work consciously is good housekeeping. **`carried` means the work leaves this workstream**, so the gate reads the scope it names and refuses one that is closed or does not exist; a row pointing at a later arc of this same workstream is sequencing, and it waits on that arc rather than on the word. **A row nobody decided, a row marked `◐ stopped`, a row `⏸ held on Q<n>` and a row still `in progress` all refuse the close** — a stopped row already touched its node, so you finish it and mark it landed, or you split it into the half that reached its node and the half that did not. Then **the page is stamped closed**, then the folder moves, then the sweep — contradictions to a register row, conventions to the owning chapter — then one line saying what landed. **The page itself never moves into a repository**: an argument closes with the workstream that argued it, and what outlives it is the register row and the construct rewritten fresh | the folder is in `closed/` and the page says so |
 
 **A standard the sweep corrects is not live yet.** A chapter reaches a session only once it is
 carried into the plugins, installed, and synced. `refs/devex/workspace/workspace.md` § *Open a
@@ -226,13 +232,33 @@ as a brief at this moment. The next section says what happens instead.
 ## A prompt while an arc runs
 
 The developer can speak while you execute. What happens next depends on one question: **does the
-prompt change what is being built?**
+prompt change what is being built, or open a question whose answer could?**
 
 | The prompt | What you do | Does the run stop? |
 | --- | --- | --- |
 | changes nothing: a question, or a request for status | answer it | no |
 | changes a later row, one that has not started | update that row, and say so | no |
 | changes the step running now, or the plan it follows | stop at the next logical step, realign the arc, show the new table, and resume from the first row not landed | yes, briefly |
+| opens a question whose answer can change a running or pending order | hold the rows the answer can change, write the card, help the developer reach an answer, record it, and resume | yes, for the rows the answer can change |
+
+**A question that can change the work stops the rows it can change — MUST** (`RD.DEVEX.WORKSPACE.188`).
+The question can come from three places: the developer's message, an open card on the approach page,
+or a design choice you meet in the middle of a step. The test is the one a card already uses: two
+answers lead to materially different work, and the choice is the developer's. When the answer can
+change an order that is running or still to run, you:
+
+1. let the tool call in flight finish, then stop the rows the answer can change;
+2. mark each of those rows `⏸ held on Q<n>`;
+3. write the card, and **help the developer think it through to an answer, instead of choosing one**;
+4. record the answer, then resume the held rows.
+
+**Rows the answer cannot touch keep running.** Holding them too would cost time and protect nothing,
+because no answer changes what they build.
+
+**The choice stays the developer's, even when you could make it.** A design choice taken alone in the
+middle of a step is a decision nobody made. The orders still to run build on it, so by the time the
+developer sees it, undoing it means undoing them too. Helping them reach the answer costs a few
+replies. Choosing costs the work built on the choice.
 
 **A `RUNNING` arc that the developer reshapes stops before it goes on — MUST.** Let the tool call in
 flight finish, so nothing is left half-written, and do not start the next one. Rewrite the affected
@@ -251,7 +277,7 @@ changes nothing under anybody's feet. The run reaches it later and follows the n
 **While work runs, the main agent plans, dispatches and reports, and a subagent does the long work —
 MUST** (`RD.DEVEX.AGENT.076`). The main agent reads the next rows and the saved plan, hands a batch to
 a subagent with a model chosen for the task, and writes the developer a milestone line when the
-batch lands. **A batch runs all its documents, then all its source, then all its tests, then the run
+batch lands, in the shape the next section states. **A batch runs all its documents, then all its source, then all its tests, then the run
 that checks its acceptance** — the order the `develop` skill states.
 
 **A batch goes to a subagent when it edits more than one file or runs a check across a repository.**
@@ -263,6 +289,28 @@ running.** A long edit in the main window would hold the next prompt until it fi
 correction would arrive after the work it should have changed. What the prompt does to the work is
 the previous section's rule.
 
+## The reply while work runs shows what needs you, then what moved
+
+**Every reply while work runs has one shape: what needs you comes first, then the progress — MUST**
+(`RD.DEVEX.WORKSPACE.189`). The milestone line between batches takes this shape too.
+
+| Part | What it holds |
+| --- | --- |
+| **Needs you** | each open card, in full, in markdown. It comes before anything else. With no card open, the part is left out |
+| **Progress** | one line per step that moved, then the diff that step made, trimmed to the lines that show the change, with one plain sentence on what the change does |
+
+**Agent reports, test and check output, and hook replies go to the arc's log, never the chat.** They
+are the record, and the log is where the record lives. In the chat they bury the one thing the
+developer must act on, which is the card.
+
+**The diff is how the developer follows the work.** A line that says *row 3 landed* asks them to
+trust it. The few lines that changed, with a sentence on what they do, let them check it in the time
+it takes to read them, the way they would read a change sent for review.
+
+**The rest is in the arc files and the approach page**, which already hold the state, so nothing
+else is built to show it: there is no separate status page. § *A prompt while an arc runs* says when
+a question holds the work.
+
 ## Every moment gets a plain, warm line
 
 The welcome is not the only time you speak to the developer as a person. Each moment below gets one
@@ -273,7 +321,7 @@ or two plain lines, and none of them is a system report.
 | a session starts | the welcome, then the status line |
 | you ask their opinion | what you need from them, and why |
 | you answer their question | the answer first, in their words, then the next step you could take |
-| you put a card to them | the choice, your recommendation, and what waits on it meanwhile |
+| you put a card to them | the whole card in markdown, under **Needs you**, and what it blocks; the page keeps the same card |
 | a session ends | what landed, what is next, and thanks, with no handover unless they ask for one |
 
 A reply written as a list of tool output has stopped talking to the developer, and a reader who
@@ -321,6 +369,7 @@ it, and so does the Stop hook.
 | empty | nobody has started it | refuses |
 | `in progress <date> <time> <offset>` | somebody is on it now, since that time (`RD.DEVEX.WORKSPACE.184`) | refuses |
 | `◐ stopped` | somebody began it and put it down, with what was done and what was not | refuses |
+| `⏸ held on Q<n>` | it waits for the answer to card `Q<n>`, because that answer can change it (`RD.DEVEX.WORKSPACE.188`) | refuses |
 | `landed` with the commit | it reached its node | passes |
 | `carried` with the scope | the work left this workstream | passes |
 | `deferred` with the trigger | it waits on a named event | passes |
@@ -329,6 +378,12 @@ it, and so does the Stop hook.
 windows and nothing expires the mark, so a second window never takes the row over on its own: it
 asks the developer, saying how old the mark is. A timestamp lets the developer tell a row somebody
 is on from one a closed window left behind.
+
+**A row that only waits on a card's answer, with nothing half-done, is held rather than stopped.**
+Nothing in it is unsafe to touch, and the answer alone frees it. A row that began and then met the
+question is `◐ stopped`, and its `→` names the card. **A held row is not runnable work while its
+card is open**: nobody picks it up, and no check reports it as waiting for somebody to start it. When
+the card is answered, the answer is recorded, the mark goes, and the row runs again.
 
 ## An order is one delegated execution, and every order follows the same rules
 
@@ -415,7 +470,7 @@ first piece you show.** A finished document presented for approval is a document
 disagree with, so it gets approved and then quietly resented.
 
 **You do the work that does not depend on the open question.** An unanswered question rarely blocks
-everything. Finish what it does not touch, state the assumption for what it does, and bring back a
+everything. Finish what it does not touch, hold the rows it can change, and bring back a
 decision, rather than stopping with nothing delivered and a question attached.
 
 **The plugin set may not be all ours** (`RD.DEVEX.AGENT.033`). A partner publishes a plugin of its
@@ -505,6 +560,8 @@ Nothing above is enforced by good intentions. Every transition that can be check
 | an arc the page does not cite | `stop.ts`, when a turn ends |
 | every row accounted for, and the page stamped, before a close — a row still `in progress` refuses | `split-plan.ts --gate close` |
 | a row in progress named with its age, never called runnable | `stop.ts`, when a turn ends |
+| a row held on an open card never called runnable | `stop.ts`, when a turn ends |
+| a reply given while a card is open opens with **Needs you** | `stop.ts`, when a turn ends |
 | what landed, said out loud | `closed.ts`, after the folder moves |
 | what the agent's own machinery costs | `timing.ts`, on every hook run |
 | a repository write with no go on record | `confirmed.ts`, on the first such write in a window |

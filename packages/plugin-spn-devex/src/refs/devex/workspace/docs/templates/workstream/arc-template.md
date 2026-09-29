@@ -1,4 +1,4 @@
-<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The arc · § A step row says where, at what altitude, and how · § A step names every surface the change reaches, and how you would know · § A prompt while an arc runs · § An arc's status says which of eight states it is in
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The arc · § A step row says where, at what altitude, and how · § A step names every surface the change reaches, and how you would know · § A suggestion is recorded before it is executed · § A prompt while an arc runs · § An arc's status says which of eight states it is in
      This file carries rules it does not own. The chapter above is the source of truth.
      A rule change is edited there first, then here, in the same change. Never add a rule here.
      restate-drift.ts reports this copy when its source moves. -->
@@ -37,7 +37,7 @@ Status: **{{PROPOSED · DECIDED · RUNNING · HELD — waits on Q<n> · PART-LAN
      `command` → before → after — never a sentence. A GENERATED row's acceptance is "no diff on a second run".
      A RELEASE row's acceptance names a consumer install (the published packages, no overrides), never only the
      tool's version. A row inserted mid-run takes a letter suffix (4b). State follows the chapter: empty (not
-     started) · in progress <date> <time> <offset> (set when the row starts; landing replaces it) · ◐ stopped — <what was done, what is unsafe> · ✅ landed — `<commit>` — <the acceptance's result line> ·
+     started) · in progress <date> <time> <offset> (set when the row starts; landing replaces it) · ◐ stopped — <what was done, what is unsafe> · ⏸ held on Q<n> (waits on that open card; not runnable until it is answered) · ✅ landed — `<commit>` — <the acceptance's result line> ·
      ↷ carried — to <where> · ⊘ deferred — <why>. Row 0 is a precondition of RUNNING; the last row is never deleted. -->
 
 | # | Repo | Altitude | What | Mechanism | Acceptance | State |
@@ -49,7 +49,7 @@ Status: **{{PROPOSED · DECIDED · RUNNING · HELD — waits on Q<n> · PART-LAN
 
 ## Before you write LANDED
 
-Every row is ✅ landed, ↷ carried or ⊘ deferred, and none is ◐ stopped. The PROOF row's output is recorded, run with
+Every row is ✅ landed, ↷ carried or ⊘ deferred, and none is ◐ stopped or ⏸ held. The PROOF row's output is recorded, run with
 the cache off. Every card this arc answered has left the approach page's Open for the section that states it, and
 this arc's Cycles row reads LANDED. The landing is committed. The arcs are the state, and the page shows them.
 
