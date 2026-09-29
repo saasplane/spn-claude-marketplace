@@ -48,7 +48,10 @@ const artifact = (dir, tier, results, ranAt = "2026-09-28T02:00:00Z") => ({
   }),
 });
 
-const measure = (root, ...args) => execFileSync("node", [TOOL, ...args, root], { encoding: "utf8" });
+// Pinned so the measured instant reads the same on any machine this suite runs on — the tool reports
+// the newest run in the LOCAL zone with its offset, and the local zone is otherwise whatever the host is.
+const measure = (root, ...args) => execFileSync("node", [TOOL, ...args, root],
+  { encoding: "utf8", env: { ...process.env, TZ: "Asia/Kolkata" } });
 const json = (root) => JSON.parse(measure(root, "--json"));
 
 console.log("=== behaviour-coverage — tier by tier");
@@ -69,7 +72,8 @@ console.log("=== behaviour-coverage — tier by tier");
   ok("[MKT.SCRIPTS.55] a row is joined to the last run of its tier", row?.found === "SUCCESS" && row?.tierRan === true, JSON.stringify(row));
   ok("a run the row does not carry yet reads as unstamped", row?.unstamped === true);
   ok("the tier reads RAN when every node that owes it ran it", result.tiers.find((tier) => tier.tier === "UNIT")?.state === "RAN");
-  ok("the measurement is dated by the newest run, not by the clock", result.measuredAt === "2026-09-28");
+  ok("the measurement is stamped by the newest run, not by the clock, in the local zone with its offset",
+    result.measuredAt === "2026-09-28T07:30+05:30", result.measuredAt);
 }
 
 {

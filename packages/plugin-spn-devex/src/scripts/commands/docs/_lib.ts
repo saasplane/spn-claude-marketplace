@@ -17,6 +17,7 @@ import { hrefForPage, renderPage } from "../../lib/render.ts";
 import { cardsOf } from "../../checks/split-plan.ts";
 import { filesUnder as proseFilesUnder, paragraphs as proseParagraphs, score as proseScore } from "./prose.ts";
 
+import { withOffset } from "../../lib/clock.ts";
 export type Grade = "RULE" | "SOFT";
 export type Finding = { check: string; grade: Grade; file: string; message: string };
 
@@ -2372,10 +2373,13 @@ export function locationOf(seat: string, workspace: string): string {
   return "—";
 }
 
-/** Today, on the clock the reader shares. `toISOString` is UTC, which is a day behind here. */
-export function today(): string {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+/**
+ * The instant this call is made, in the local zone with its offset — `2026-09-29T14:32+05:30`, never
+ * a bare UTC `Z`. An audit measures the tree at the moment it reads it, so this is what it stamps;
+ * `toISOString` is UTC, which reads as a different day on a machine east of Greenwich.
+ */
+export function measuredNow(): string {
+  return withOffset(new Date());
 }
 
 // ---------------------------------------------------------- the Proof join (Q131, opened by Q138)
@@ -2916,7 +2920,7 @@ export function gapReport(repo: string, workspace: string, asJson: boolean): num
   const tree = join(repo, "docs");
   if (!existsSync(tree)) { console.error(`${relative(workspace, repo)} has no docs/ tree`); return 2; }
   const name = basename(resolve(repo));
-  const at = today();
+  const at = measuredNow();
 
   const seats = ["01-purpose", "02-constructs", "03-behaviors", "04-capabilities", "05-guides"];
   const seatRows = seats.map((seat) => ({

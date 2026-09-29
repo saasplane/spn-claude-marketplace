@@ -5,10 +5,11 @@
 //
 // It measures and never writes a page: a report is written by the agent and produced by no command
 // (the book's RD.DEVEX.WORKSPACE.149). Every tier the repository owes appears, whether or not it ran, and the
-// same tree measures to the same bytes — the date is the newest run's, and the digest hashes the
-// measurement alone.
+// same tree measures to the same bytes — the instant is the newest run's, in the local zone with its
+// offset, and the digest hashes the measurement alone.
 
 import { createHash } from "node:crypto";
+import { withOffset } from "../../lib/clock.ts";
 import { readdirSync, statSync } from "node:fs";
 import { basename, join, relative, resolve } from "node:path";
 import { declaredRows } from "../../../../../plugin-support-lib/src/lib/register.ts";
@@ -180,7 +181,7 @@ export function measure(root: string): Record<string, unknown> {
   const ranAt = newest(allRuns);
   const measured = {
     repository: basename(root),
-    measuredAt: ranAt === null ? null : ranAt.slice(0, 10),
+    measuredAt: ranAt === null ? null : withOffset(new Date(ranAt)),
     absence: null,
     tiers: tiers,
     rows: rows,
