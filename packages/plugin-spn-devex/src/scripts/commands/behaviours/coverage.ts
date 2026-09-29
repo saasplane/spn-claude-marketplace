@@ -15,7 +15,7 @@ import { basename, join, relative, resolve } from "node:path";
 import { DOCS, reportsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { declaredRows } from "../../../../../plugin-support-lib/src/lib/register.ts";
 import { owedBy, TIERS } from "../../../../../plugin-support-lib/src/lib/kinds.ts";
-import { artifactPath, newest, read, readArtifact, worst } from "../../../../../plugin-support-lib/src/lib/runs.ts";
+import { artifactPaths, newest, read, readArtifact, worst } from "../../../../../plugin-support-lib/src/lib/runs.ts";
 import type { Run } from "../../../../../plugin-support-lib/src/lib/runs.ts";
 
 const isDir = (path: string): boolean => { try { return statSync(path).isDirectory(); } catch { return false; } };
@@ -134,14 +134,16 @@ export function measure(root: string): Record<string, unknown> {
   for (const node of nodes) {
     const found: Run[] = [];
     for (const tier of TIERS) {
-      const readOne = readArtifact(root, artifactPath(node, tier));
-      if (readOne === null) continue;
-      if ("finding" in readOne) {
-        findings.push({ project: readOne.finding.split(":")[0], kind: null, severity: "WARN", ftype: "BEHAVIOUR_PROOF",
-          message: `${readOne.finding.slice(readOne.finding.indexOf(":") + 2)} — until it matches, nothing can be read from this run.` });
-        continue;
+      for (const file of artifactPaths(node, tier)) {
+        const readOne = readArtifact(root, file);
+        if (readOne === null) continue;
+        if ("finding" in readOne) {
+          findings.push({ project: readOne.finding.split(":")[0], kind: null, severity: "WARN", ftype: "BEHAVIOUR_PROOF",
+            message: `${readOne.finding.slice(readOne.finding.indexOf(":") + 2)} — until it matches, nothing can be read from this run.` });
+          continue;
+        }
+        found.push(readOne.run);
       }
-      found.push(readOne.run);
     }
     runsByNode.set(nameOf(node), found);
   }

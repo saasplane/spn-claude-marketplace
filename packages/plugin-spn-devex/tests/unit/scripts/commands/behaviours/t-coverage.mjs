@@ -105,6 +105,18 @@ console.log("=== behaviour-coverage — tier by tier");
 }
 
 {
+  // Each journey phase keeps its own artifact, so a later phase never replaces what the sweep proved.
+  const sweep = artifact("apps/web", "JOURNEY", [["IAM.LOGIN.01", "SUCCESS"]]);
+  const serialized = { [`apps/web/tests/.output/journey/spn-tests.serialized.json`]: Object.values(artifact("apps/web", "JOURNEY", [["IAM.LOGIN.02", "SUCCESS"]]))[0] };
+  const root = repo({ ...APPS, ...node("apps/web", "APP_WEB"),
+    ...register(["IAM.LOGIN.01", "JOURNEY", "PLANNED"], ["IAM.LOGIN.02", "JOURNEY", "PLANNED"]), ...sweep, ...serialized });
+  const result = json(root);
+  const found = Object.fromEntries(result.rows.map((row) => [row.id, row.found]));
+  ok("a phase's own artifact is read beside the sweep's, and neither replaces the other",
+    found["IAM.LOGIN.01"] === "SUCCESS" && found["IAM.LOGIN.02"] === "SUCCESS", JSON.stringify(found));
+}
+
+{
   const root = repo({ ...APPS, ...register(["IAM.LOGIN.01", "UNITT", "PLANNED"]) });
   const result = json(root);
   ok("a Tier no vocabulary declares is a named finding", result.findings.some((one) => one.message.includes('Tier "UNITT"')), JSON.stringify(result.findings));

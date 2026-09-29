@@ -4,7 +4,7 @@
 // shared support-lib folder; spn-devex and spn-apps each import it by relative path.
 
 import { readdirSync, readFileSync, statSync } from "node:fs";
-import { dirname, join, relative } from "node:path";
+import { basename, dirname, join, relative } from "node:path";
 
 /** A file's text, or null. A file that cannot be read is never a finding. */
 export function read(path: string): string | null {
@@ -45,7 +45,7 @@ export function* walk(dir: string): Generator<string> {
   }
 }
 
-/** The node an artifact belongs to: `<node>/tests/.output/<tier>/spn-tests.json`. */
+/** The node an artifact belongs to: `<node>/tests/.output/<tier>/spn-tests[.<phase>].json`. */
 const nodeOf = (root: string, file: string): string =>
   relative(root, dirname(dirname(dirname(dirname(file))))).split("\\").join("/") || ".";
 
@@ -87,16 +87,31 @@ export function readArtifact(root: string, file: string): { run: Run } | { findi
   };
 }
 
+/**
+ * A run artifact's file name: `spn-tests.json` for a tier's whole run, `spn-tests.<phase>.json` for a
+ * journey phase other than the sweep. Each phase keeps its own file, so running one never replaces
+ * what another proved.
+ */
+export const ARTIFACT_FILE = /^spn-tests(\.[a-z]+)?\.json$/;
+
 /** Where a node's run of one tier writes its artifact — the path the toolchain's runner writes to. */
 export const artifactPath = (node: string, tier: string): string =>
   join(node, "tests", ".output", tier.toLowerCase(), "spn-tests.json");
+
+/** Every artifact a node's runs of one tier left: the whole run's, and one per journey phase. */
+export function artifactPaths(node: string, tier: string): string[] {
+  const dir = join(node, "tests", ".output", tier.toLowerCase());
+  let entries: string[];
+  try { entries = readdirSync(dir); } catch { return []; }
+  return entries.filter((entry) => ARTIFACT_FILE.test(entry)).sort().map((entry) => join(dir, entry));
+}
 
 /** Every run artifact under the root, with every malformed one named. */
 export function artifacts(root: string): { runs: Run[]; findings: string[] } {
   const runs: Run[] = [];
   const findings: string[] = [];
   for (const file of walk(root)) {
-    if (!file.endsWith("/spn-tests.json")) continue;
+    if (!ARTIFACT_FILE.test(basename(file))) continue;
     const read = readArtifact(root, file);
     if (read === null) continue;
     if ("finding" in read) findings.push(read.finding);
