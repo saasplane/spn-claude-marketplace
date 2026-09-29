@@ -4,8 +4,9 @@ import { PLUGIN } from "../../../helpers/harness.mjs";
 // files nobody is going to re-read.
 import { execFileSync } from "node:child_process";
 
-import { existsSync } from "node:fs";
-import { resolve } from "node:path";
+import { existsSync, mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
 
 const HOOKS = PLUGIN;
 const SCRIPTS = resolve(HOOKS, "scripts");
@@ -66,6 +67,8 @@ const REGISTER = `${WORKSPACE}/spn-foundation/docs/registers/probe.md`;
 const CLEAN = `<!doctype html>
 <div class="eyebrow">Who this is for &middot; the developer picking up this work</div>
 <h1>A subject</h1>
+<p class="standfirst">This page plans a change to where the model is written down.</p>
+<p>Read it to see what will change and why, before anything is built.</p>
 <section id="s1"><div class="sec-head"><h2>Why &mdash; the reason</h2></div>
   <p>You open this page when the model has no single home. You read it once and you know where each piece sits.</p>
   <p>Split it where it runs long. Say what you mean, and keep the reason beside the rule.</p>
@@ -74,9 +77,12 @@ const CLEAN = `<!doctype html>
   <p>You get one place for the model. You get one shape per page, and you get one plain voice.</p>
 </section>
 <section id="s3"><div class="sec-head"><h2>How &mdash; the order</h2></div>
-  <h3>What re-aligns</h3>
-  <table><thead><tr><th>What</th><th>Scope</th><th>State</th></tr></thead>
-  <tbody><tr><td>the chapter</td><td>spn-foundation</td><td>&#x2705; landed</td></tr></tbody></table>
+  <h3 id="h1">spn-foundation &mdash; the chapter</h3>
+  <p>You read the chapter first, and the code follows it.</p>
+  <h3 id="h9">Cycles &mdash; the arcs, in the order they run</h3>
+  <div class="scroll"><table><thead><tr><th>Arc</th><th>What it does</th><th>Status</th></tr></thead>
+  <tbody><tr><td><strong>N1 &mdash; the chapter</strong></td><td>the chapter says where the model sits</td><td>RUNNING</td></tr>
+  <tr><td><strong>N2 &mdash; the check</strong></td><td>a check reads the new shape</td><td>DECIDED</td></tr></tbody></table></div>
 </section>
 `;
 
@@ -237,6 +243,152 @@ one("an arc under .spndevex is state, not corpus",
 one("a rule may quote the mistake it bans",
   write(CHAPTER, "# A chapter\n\nYou never write *five decisions* into a sentence. You name the set by its rule.\n"),
   "silent");
+
+console.log("\n=== doc-check — the approach page: an opening, five sections, How ending in Cycles");
+
+// 05-artifacts.md § The approach document. The page is an opening, then Why > What > How > Open >
+// Deferred, nothing else; there is no Terms section; How's last subsection is Cycles.
+const HOW_TAIL = /<h3 id="h9">[\s\S]*?<\/table><\/div>\n/;
+
+one("How with no Cycles, only the retired What re-aligns",
+  write(APPROACH, CLEAN.replace(HOW_TAIL, `<h3>What re-aligns</h3>\n  <table><thead><tr><th>What</th><th>Scope</th><th>State</th></tr></thead><tbody><tr><td>x</td><td>y</td><td>z</td></tr></tbody></table>\n`)),
+  "reports", "does not end in Cycles");
+
+one("a subsection after Cycles",
+  write(APPROACH, CLEAN.replace("</section>\n`", "").replace(/<\/table><\/div>\n<\/section>/, `</table></div>\n  <h3 id="h10">Later &mdash; a note</h3>\n  <p>You read this after the table.</p>\n</section>`)),
+  "reports", "after Cycles");
+
+one("Cycles whose table has the wrong columns",
+  write(APPROACH, CLEAN.replace("<th>What it does</th>", "<th>Scope</th>")),
+  "reports", "Arc · What it does · Status");
+
+one("a Terms section — an approach page has none",
+  write(APPROACH, CLEAN.replace(`<section id="s1">`, `<section id="s0"><h2>Terms</h2><p>You read the words here.</p></section>\n<section id="s1">`)),
+  "reports", "carries a Terms section");
+
+one("a section outside the five",
+  write(APPROACH, CLEAN + `<section id="s6"><h2>Background &mdash; history</h2><p>You read the history here.</p></section>`),
+  "reports", "and nothing else");
+
+one("sections out of order",
+  write(APPROACH, CLEAN.replace(`<h2>What &mdash; the shape</h2>`, `<h2>Deferred &mdash; parked</h2>`)
+    + `<section id="s7"><h2>What &mdash; late</h2><p>You read it last.</p></section>`),
+  "reports", "the order is Why > What > How > Open > Deferred");
+
+one("no opening — no standfirst above Why",
+  write(APPROACH, CLEAN.replace(/<p class="standfirst">[^\n]*\n/, "")),
+  "reports", "has no opening");
+
+// THE COMPARISON NEEDS REAL ARCS, so a workstream is built in a temporary folder: a page and its
+// arcs, in the layout `.spndevex/workstreams/<state>/<NNN>-<subject>/`.
+const TMP = realpathSync(mkdtempSync(join(tmpdir(), "doc-check-cycles-")));
+const arcFile = (id, name, status, rows = "") =>
+  `# ${id} — ${name}\n\nStatus: **${status} — 2026-09-29.** ${name}, in one sentence.\n\n## Steps\n\n` +
+  `| # | Repo | Altitude | What | Mechanism | Acceptance | State |\n| --- | --- | --- | --- | --- | --- | --- |\n${rows}`;
+const stream = (name) => {
+  const folder = join(TMP, ".spndevex", "workstreams", "open", name);
+  mkdirSync(join(folder, "arcs"), { recursive: true });
+  writeFileSync(join(folder, "arcs", "N1-the-chapter.md"), arcFile("N1", "the chapter", "RUNNING"));
+  writeFileSync(join(folder, "arcs", "N2-the-check.md"), arcFile("N2", "the check", "DECIDED"));
+  return folder;
+};
+try {
+  const home = stream("042-probe");
+  const page = join(home, "probe-approach.html");
+
+  one("Cycles matching the arcs, row for row and status for status",
+    write(page, CLEAN), "silent");
+
+  one("a Cycles status the arc does not carry",
+    write(page, CLEAN.replace("<td>DECIDED</td>", "<td>RUNNING</td>")),
+    "reports", "N2 reads RUNNING and the arc reads DECIDED");
+
+  one("an arc with no row in Cycles",
+    write(page, CLEAN.replace(/\n  <tr><td><strong>N2[^\n]*/, "</tbody></table></div>")),
+    "reports", "has no row for N2");
+
+  one("a Cycles row naming no arc",
+    write(page, CLEAN.replace("</tbody>", `<tr><td><strong>N3 &mdash; typed by hand</strong></td><td>x</td><td>DECIDED</td></tr></tbody>`)),
+    "reports", "lists N3");
+
+  one("a status cell carrying its blocker still reads as its word",
+    write(join(stream("043-held"), "held-approach.html"), CLEAN.replace("<td>RUNNING</td>", "<td>RUNNING &middot; since today</td>")),
+    "silent");
+
+  // 008 is exempt by name: its page keeps the shape it was written in.
+  const exempt = stream("008-plain-probe");
+  one("workstream 008's page — exempt by name from Terms and Cycles",
+    write(join(exempt, "plain-probe-approach.html"),
+      CLEAN.replace(HOW_TAIL, "").replace(`<section id="s1">`, `<section id="s0"><h2>Terms</h2><p>You read the words here.</p></section>\n<section id="s1">`)),
+    "silent");
+
+  console.log("\n=== doc-check — an arc's step rows (SOFT)");
+
+  const arcs = join(home, "arcs");
+  const ordered = "| 1 | spn-foundation | DOCS | a | by hand | b | |\n| 2 | spn-support-ts | DOCS | a | by hand | b | |\n" +
+    "| 3 | spn-support-ts | CODE | a | by hand | b | |\n| 4 | — | PROOF | a | command | b | |\n";
+  one("rows in chain order, a `—` proof row last",
+    write(join(arcs, "N3-ordered.md"), arcFile("N3", "ordered", "DECIDED", ordered)), "silent");
+
+  one("DOCS after CODE inside one repository",
+    write(join(arcs, "N4-late-docs.md"), arcFile("N4", "late docs", "DECIDED",
+      "| 1 | spn-support-ts | CODE | a | by hand | b | |\n| 2 | spn-support-ts | DOCS | a | by hand | b | |\n")),
+    "reports", "row 2 is DOCS after CODE in spn-support-ts");
+
+  one("the foundation after another repository",
+    write(join(arcs, "N5-late-book.md"), arcFile("N5", "late book", "DECIDED",
+      "| 1 | spn-support-ts | DOCS | a | by hand | b | |\n| 2 | spn-foundation | DOCS | a | by hand | b | |\n")),
+    "reports", "the foundation comes first");
+
+  one("a repository that comes back after another",
+    write(join(arcs, "N6-back.md"), arcFile("N6", "back", "DECIDED",
+      "| 1 | spn-foundation | DOCS | a | by hand | b | |\n| 2 | spn-support-ts | DOCS | a | by hand | b | |\n| 3 | spn-foundation | CODE | a | by hand | b | |\n")),
+    "reports", "returns to spn-foundation");
+
+  one("a row with no altitude from the set",
+    write(join(arcs, "N7-bare.md"), arcFile("N7", "bare", "DECIDED", "| 1 | spn-foundation | DOCS → CODE | a | by hand | b | |\n")),
+    "reports", "carry no Repo, or no Altitude");
+
+  one("a step table with no Repo column",
+    write(join(arcs, "N8-old.md"), "# N8 — old\n\nStatus: **DECIDED.**\n\n## Steps\n\n| # | What | State |\n| --- | --- | --- |\n| 1 | a | |\n"),
+    "reports", "carries no Repo column");
+
+  one("an older 008 arc with no Repo column — exempt by name",
+    write(join(exempt, "arcs", "N50-older.md"), "# N50 — older\n\nStatus: **LANDED.**\n\n## Steps\n\n| # | What | State |\n| --- | --- | --- |\n| 1 | a | ✅ |\n"),
+    "silent");
+
+  one("a new 008 arc past the exemption still reports",
+    write(join(exempt, "arcs", "N121-newer.md"), "# N121 — newer\n\nStatus: **DECIDED.**\n\n## Steps\n\n| # | What | State |\n| --- | --- | --- |\n| 1 | a | |\n"),
+    "reports", "carries no Repo column");
+
+  // An Edit carries only its replacement, and the table is judged whole: the edit is applied to the
+  // arc on disk first.
+  const onDisk = join(arcs, "N9-edited.md");
+  writeFileSync(onDisk, arcFile("N9", "edited", "DECIDED", ordered));
+  one("an Edit that moves a row out of order — judged on the arc it leaves",
+    { tool_name: "Edit", tool_input: { file_path: onDisk,
+      old_string: "| 3 | spn-support-ts | CODE |", new_string: "| 3 | spn-foundation | CODE |" } },
+    "reports", "returns to spn-foundation");
+  one("an Edit that keeps the order", { tool_name: "Edit", tool_input: { file_path: onDisk,
+    old_string: "| 4 | — | PROOF |", new_string: "| 4 | — | PROOF | " } }, "silent");
+
+  // THE SWEEP READS ARCS TOO, and counts each one it scanned — a bad path reads `0 scanned`.
+  n += 1;
+  const sweptHome = stream("044-sweep");
+  writeFileSync(join(sweptHome, "sweep-approach.html"), CLEAN.replace("</tbody>",
+    `<tr><td><strong>N4 &mdash; late docs</strong></td><td>x</td><td>DECIDED</td></tr></tbody>`));
+  writeFileSync(join(sweptHome, "arcs", "N4-late-docs.md"), arcFile("N4", "late docs", "DECIDED",
+    "| 1 | spn-support-ts | CODE | a | by hand | b | |\n| 2 | spn-support-ts | DOCS | a | by hand | b | |\n"));
+  let out = "", code = 0;
+  try { out = execFileSync("node", [`${HOOKS}/src/scripts/checks/doc-check.ts`, sweptHome], { encoding: "utf8", cwd: CWD }); }
+  catch (e) { out = String(e.stdout ?? ""); code = e.status; }
+  const scanned = /(\d+) documents scanned/.exec(out)?.[1];
+  const swept = scanned === "4" && out.includes("N4-late-docs.md") && out.includes("[SOFT]") && code === 0;
+  if (!swept) failed += 1;
+  console.log(`  ${swept ? "PASS" : "FAIL"}  the sweep scans the page and every arc, and a SOFT keeps exit 0\n        scanned ${scanned} · exit ${code}${swept ? "" : `\n${out.slice(0, 600)}`}`);
+} finally {
+  rmSync(TMP, { recursive: true, force: true });
+}
 
 console.log("\n=== doc-check — every path a Bash command writes");
 {

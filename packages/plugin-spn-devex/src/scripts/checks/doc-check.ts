@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 // RESTATES: the foundation book — 02-document.md rule 9 (RD.DEVEX.WORKSPACE.162), rules 11-12 (RD.DEVEX.WORKSPACE.096, the
 // one voice; RD.DEVEX.WORKSPACE.106, its reach and its measure; RD.DEVEX.WORKSPACE.107, the three moves that reach the
-// reader), 04-discipline.md § Voice discipline, 05-artifacts.md (the approach document) and
-// 06-registers.md § Writing a row. The chapters are the source of truth: a rule change is edited
+// reader), 04-discipline.md § Voice discipline, 05-artifacts.md (the approach document, and How
+// ends in Cycles), 01-workstream.md § A step row says where, at what altitude, and how
+// (RD.DEVEX.WORKSPACE.183) and 06-registers.md § Writing a row. The chapters are the source of truth: a rule change is edited
 // there first, then here, in the same change. This script checks only what a script CAN check; the
 // register itself is judgement.
 //
@@ -41,6 +42,7 @@
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { basename, dirname, join, resolve, relative, sep } from "node:path";
 import { emit, readPayload, runAlone, unescape, type Payload, type Verdict } from "../lib/payload.ts";
+import { cyclesOf, statusWord } from "../commands/docs/cycles.ts";
 
 export type Finding = [severity: string, message: string];
 
@@ -229,16 +231,33 @@ export function structural(path: string): Finding[] {
   return out;
 }
 
-// 05-artifacts.md § `How` has two halves — what is built, and what re-aligns. The chapter names the
-// failure before it happens: *the document half is the one you are most likely to forget*.
-// Recognised two ways, because a page may name the heading or just carry the table.
-const HALF_HEADING = /<h[34]\b[^>]*>(?:(?!<\/h[34]>)[\s\S])*re-?align/i;
-// RULE since workstream 008 closed. It was SOFT for one reason and the reason has gone: fifty pages
-// would have fired the day it landed, and a gate nobody can get green is a gate everybody learns to
-// scroll past. Approach pages no longer sit in a repository at all — they live in the workstream
-// that argues them — and of the ten that exist, eight carry the heading. The two that do not are in
-// CLOSED workstreams, which are records of a moment and are never rewritten.
-const TWO_HALVES = "RULE";
+// ---------------------------------------------------------------------------- the approach page
+
+// An approach page lives in the workstream that argues it (05-artifacts.md § The approach document),
+// and its arcs sit beside it in `arcs/`. Only a page inside a workstream has arcs to compare against.
+const WORKSTREAM = /^(.*\/\.spndevex\/(?:workstreams|sessions)\/(?:open|backlog|closed)\/([^/]+))\//;
+// Workstream 008 is exempt by name: its page was written in the shape before this one, and it
+// closes under that shape (05-artifacts.md § The approach document). So are its arcs up to this
+// number (N116, D8): most predate the Repo · Altitude row, and 008 closes under the shape it has.
+const EXEMPT_WORKSTREAM = /^008-/;
+const EXEMPT_ARCS_THROUGH = 120;
+
+/** The workstream folder a path sits in, and its name, or null outside one. */
+export function workstreamOf(path: string): { folder: string; name: string } | null {
+  const found = WORKSTREAM.exec(slashes(resolve(path)));
+  return found ? { folder: found[1], name: found[2] } : null;
+}
+
+/** Whether the approach-page and arc-row rules skip this path because its workstream is 008. */
+function exemptWorkstream(path: string): boolean {
+  return EXEMPT_WORKSTREAM.test(workstreamOf(path)?.name ?? "");
+}
+
+// RULE, as the two-halves rule it replaces was. How ends in Cycles on every approach page; the
+// comparison with the arcs runs where the page sits in a workstream, which is where every approach
+// page now lives.
+const CYCLES = "RULE";
+const FURNITURE = "RULE";
 
 /** The body of one `<h2>` section, to the next `<h2>`. */
 function section(text: string, name: string): string | null {
@@ -247,30 +266,82 @@ function section(text: string, name: string): string | null {
   return found ? found[1] : null;
 }
 
-/** `How` owes two tables: what is built, and which documents the design obliges. */
-export function howHalves(text: string): Finding[] {
+/** A cell or heading as a person reads it — tags gone, entities resolved, whitespace collapsed. */
+const flat = (html: string): string => unescape(html.replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
+
+/** The key one Cycles row and one arc share: the arc number, or the name where there is none. */
+function cycleKey(label: string): string {
+  const id = /\bN\d+[a-z]?\b/i.exec(label);
+  if (id) return id[0].charAt(0).toUpperCase() + id[0].slice(1);
+  return label.toLowerCase().replace(/^arc\s*[—–:-]\s*/, "").replace(/\s+/g, " ").trim();
+}
+
+const listed = (keys: string[]) => keys.slice(0, 6).join(", ") + (keys.length > 6 ? ` and ${keys.length - 6} more` : "");
+
+/**
+ * 05-artifacts.md § `How` ends in Cycles, and the arcs are the state. How's last subsection is an
+ * `h3` named Cycles, whose table has Arc · What it does · Status. Inside a workstream the table has
+ * one row per arc in `arcs/`, and each row's status is the arc's own. `spn-devex docs cycles` prints
+ * the rows; this compares the page against the same reading.
+ */
+export function cyclesRule(path: string, text: string): Finding[] {
   const body = section(text, "How");
-  if (body === null) return [];
-  // THE TABLE COUNT WAS A FALSE NEGATIVE, and a large one. Allowing "two tables in How" let 22 pages
-  // pass that carry no re-alignment at all. The heading is the signal every page doing this right
-  // uses, and it is the only one that means what it says.
-  if (HALF_HEADING.test(body)) return [];
-  return [[TWO_HALVES,
-    "How carries one half. It says what is built and never which documents this reasoning obliges, " +
-    "so the second table is missing (05-artifacts.md, How has two halves) · add What re-aligns — one " +
-    "row per document, what re-aligns inside it, and its state. An empty one is worth saying out " +
-    "loud; a missing one usually means somebody stopped early"]];
+  if (body === null) return [];                                   // approachShape reports a missing How
+  const fix = "`spn-devex docs cycles <workstream>` prints the table from the arcs";
+  const subsections = [...body.matchAll(/<h3\b[^>]*>([\s\S]*?)<\/h3>/gi)];
+  const named = subsections.filter((m) => /^Cycles\b/i.test(flat(m[1]))).at(-1);
+  if (!named)
+    return [[CYCLES, "How does not end in Cycles — its last subsection is an h3 named Cycles, one row " +
+      `per arc with Arc · What it does · Status (05-artifacts.md § How ends in Cycles) · ${fix}`]];
+  if (named !== subsections.at(-1))
+    return [[CYCLES, `How carries "${flat(subsections.at(-1)![1])}" after Cycles — Cycles is How's last ` +
+      "subsection (05-artifacts.md § How ends in Cycles)"]];
+
+  const table = /<table\b[\s\S]*?<\/table>/i.exec(body.slice(named.index!))?.[0];
+  const header = table ? [...table.matchAll(/<th\b[^>]*>([\s\S]*?)<\/th>/gi)].map((m) => flat(m[1]).toLowerCase()) : [];
+  if (header.join(" · ") !== "arc · what it does · status")
+    return [[CYCLES, "Cycles carries no table with Arc · What it does · Status — one row per arc, from " +
+      `the arcs' status lines (05-artifacts.md § How ends in Cycles) · ${fix}`]];
+
+  const home = workstreamOf(path);
+  if (!home) return [];
+  const arcs = cyclesOf(home.folder);
+  const rows = [...(table!.match(/<tr\b[^>]*>[\s\S]*?<\/tr>/gi) ?? [])]
+    .map((row) => [...row.matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/gi)].map((m) => flat(m[1])))
+    .filter((cells) => cells.length >= 3);
+  const onPage = new Map(rows.map((cells) => [cycleKey(cells[0]), cells[2]]));
+  const inArcs = new Map(arcs.map((arc) => [arc.id ?? cycleKey(arc.name), arc]));
+
+  const out: Finding[] = [];
+  const missing = [...inArcs.keys()].filter((key) => !onPage.has(key));
+  if (missing.length)
+    out.push([CYCLES, `Cycles has no row for ${listed(missing)} — every arc in arcs/ is one row ` +
+      `(05-artifacts.md § How ends in Cycles) · ${fix}`]);
+  const unknown = [...onPage.keys()].filter((key) => !inArcs.has(key));
+  if (unknown.length)
+    out.push([CYCLES, `Cycles lists ${listed(unknown)}, and arcs/ holds no such arc — the table is read ` +
+      `from the arcs, never typed (05-artifacts.md § How ends in Cycles) · ${fix}`]);
+  const stale = [...onPage.entries()]
+    .filter(([key, cell]) => {
+      const arc = inArcs.get(key);
+      return arc?.status && statusWord(cell) !== arc.status;
+    })
+    .map(([key, cell]) => `${key} reads ${statusWord(cell) ?? `"${cell}"`} and the arc reads ${inArcs.get(key)!.status}`);
+  if (stale.length)
+    out.push([CYCLES, `Cycles disagrees with the arcs: ${listed(stale)} — the arcs are the state ` +
+      `(05-artifacts.md § How ends in Cycles) · ${fix}`]);
+  return out;
 }
 
 /** The chrome an approach page owes its reader, and the one part nothing checked. */
 export function pageFurniture(text: string): Finding[] {
   if (!text.includes('id="rail"') && !text.includes('id="rail-list"')) return [];  // no rail is a short page's right
   if (text.includes("rail-fold") || text.includes("sub-group")) return [];
-  return [[TWO_HALVES,
+  return [[FURNITURE,
     "The outline does not fold. A rail listing every heading of every section is a wall in the shape " +
     "of an outline (05-artifacts.md, A page carries its own subsections) · append the rail-fold " +
-    "block, verbatim, after this page's own rail builder — take it from any approach page in the " +
-    "foundation's artifacts pocket"]];
+    "block, verbatim, after this page's own rail builder — take it from the approach template, " +
+    "`refs/devex/workspace/docs/templates/workstream/approach-template.html`"]];
 }
 
 /** The first word of every `<h2>`, lowercased — what decides a page's kind. */
@@ -281,8 +352,14 @@ function headings(text: string): string[] {
     .map((h) => h.split(/\s+/)[0].replace(/[:—-]+$/, "").toLowerCase());
 }
 
-/** Why -> What -> How -> Open -> Deferred, Terms optional first (05-artifacts). */
-export function approachShape(text: string): Finding[] {
+const APPROACH_SECTIONS = ["why", "what", "how", "open", "deferred"];
+
+/**
+ * An opening, then Why -> What -> How -> Open -> Deferred, in that order and nothing else
+ * (05-artifacts.md § The approach document). `exempt` is workstream 008's page, which keeps the
+ * shape it was written in and is held only to the skeleton.
+ */
+export function approachShape(text: string, exempt = false): Finding[] {
   const heads = headings(text);
   if (!heads.length) return [];
   // The SKELETON decides the kind. A settled approach legitimately lacks Open, and a closed one lacks
@@ -291,8 +368,118 @@ export function approachShape(text: string): Finding[] {
   if (missing.length)
     return [["RULE", "carries no " + missing.join(" + ") + " — this explains rather than argues, so " +
       "it is an overview: artifacts/overviews/<name>-overview.html (RD.DEVEX.WORKSPACE.102 / 040). An approach " +
-      "is Why > What > How > Open > Deferred"]];
-  return [];
+      "is an opening, then Why > What > How > Open > Deferred"]];
+  if (exempt) return [];
+
+  const out: Finding[] = [];
+  const where = "(05-artifacts.md § The approach document)";
+  if (heads.includes("terms"))
+    out.push(["RULE", `carries a Terms section, and an approach page has none ${where} · explain a word ` +
+      "in brackets where it first appears; a word the product owns belongs in its construct's own Terms table"]);
+  const others = [...new Set(heads.filter((h) => h !== "terms" && !APPROACH_SECTIONS.includes(h)))];
+  if (others.length)
+    out.push(["RULE", `carries ${others.join(" + ")} — an approach page is an opening, then Why > What > ` +
+      `How > Open > Deferred, and nothing else ${where}`]);
+  const order = heads.filter((h) => APPROACH_SECTIONS.includes(h)).map((h) => APPROACH_SECTIONS.indexOf(h));
+  if (order.some((at, i) => i > 0 && at < order[i - 1]))
+    out.push(["RULE", `sections run ${heads.filter((h) => APPROACH_SECTIONS.includes(h)).join(" > ")} — ` +
+      `the order is Why > What > How > Open > Deferred ${where}`]);
+  if (!/<p\b[^>]*class="[^"]*\bstandfirst\b/i.test(text))
+    out.push(["RULE", "has no opening — a standfirst and the one paragraph under it come before Why " +
+      "(05-artifacts.md § The masthead, and the opening; RD.DEVEX.WORKSPACE.182) · start from the approach template"]);
+  return out;
+}
+
+// ---------------------------------------------------------------------------- an arc's step rows
+
+const ALTITUDES = ["DOCS", "CODE", "GENERATED", "RELEASE", "PROOF"];
+// SOFT, because it is new and an arc is state rather than corpus: it reports, and a person decides
+// whether the order is wrong or the arc is one of the exempt older ones (01-workstream.md § What it
+// makes checkable).
+const ARC_ROWS = "SOFT";
+const NO_REPO = new Set(["—", "–", "-", ""]);
+
+/** Any `.md` directly under a workstream's `arcs/`. */
+export function isArc(path: string): boolean {
+  return /\/\.spndevex\/(?:workstreams|sessions)\/[^/]+\/[^/]+\/arcs\/[^/]+\.md$/.test(slashes(resolve(path)));
+}
+
+/** The markdown step table of an arc: the first table under `## Steps`, else the first headed `#`. */
+function stepTable(text: string): string[][] | null {
+  const tables: Array<{ afterSteps: boolean; rows: string[][] }> = [];
+  let afterSteps = false;
+  let current: string[][] | null = null;
+  for (const line of text.split("\n")) {
+    const stripped = line.trim();
+    if (/^#{1,6}\s/.test(stripped)) afterSteps = /^##\s+Steps\b/i.test(stripped);
+    if (!stripped.startsWith("|")) { current = null; continue; }
+    if (TABLE_SEP.test(stripped)) continue;
+    const cells = stripped.replace(/^\|/, "").replace(/\|$/, "").split(/(?<!\\)\|/).map((c) => c.trim());
+    if (!current) { current = []; tables.push({ afterSteps, rows: current }); }
+    current.push(cells);
+  }
+  const chosen = tables.find((t) => t.afterSteps)
+    ?? tables.find((t) => t.rows[0]?.[0] === "#" && t.rows[0].some((c) => /^state$/i.test(c)));
+  return chosen && chosen.rows.length > 1 ? chosen.rows : null;
+}
+
+/** Whether an arc is one of 008's, exempt from the row rules by name (N116, D8). */
+function exemptArc(path: string): boolean {
+  if (!exemptWorkstream(path)) return false;
+  const number = /^N(\d+)/i.exec(basename(path));
+  return !number || Number(number[1]) <= EXEMPT_ARCS_THROUGH;
+}
+
+/**
+ * 01-workstream.md § A step row says where, at what altitude, and how (RD.DEVEX.WORKSPACE.183). Every
+ * row carries a Repo and an Altitude, and the rows run in chain order by repository, then by
+ * altitude. The chain between two stack repositories is judgement, so this reads what a script can:
+ * the foundation first, each repository's rows together, and DOCS · CODE · GENERATED · RELEASE ·
+ * PROOF inside each. A `—` row changes no repository and takes no place in the chain.
+ */
+export function arcSteps(path: string, text: string): Finding[] {
+  if (exemptArc(path)) return [];
+  const table = stepTable(text);
+  if (!table) return [];
+  const header = table[0].map((c) => c.replace(/[*`]/g, "").trim().toLowerCase());
+  const repoAt = header.indexOf("repo");
+  const altitudeAt = header.indexOf("altitude");
+  const where = "(01-workstream.md § A step row says where, at what altitude, and how; RD.DEVEX.WORKSPACE.183)";
+  if (repoAt < 0 || altitudeAt < 0)
+    return [[ARC_ROWS, `the step table carries no ${repoAt < 0 ? "Repo" : "Altitude"} ` +
+      `column — a row is # · Repo · Altitude · What · Mechanism · Acceptance · State ${where}`]];
+
+  const clean = (cell: string | undefined) => (cell ?? "").replace(/[*`]/g, "").trim();
+  const bare: string[] = [];
+  const disorder: string[] = [];
+  const seen = new Set<string>();
+  let repo: string | null = null;
+  let lastAltitude = -1;
+  for (const cells of table.slice(1)) {
+    const label = clean(cells[0]) || "?";
+    const rowRepo = clean(cells[repoAt]);
+    const altitude = ALTITUDES.indexOf(clean(cells[altitudeAt]).toUpperCase());
+    if (!rowRepo || altitude < 0) { bare.push(label); continue; }
+    if (NO_REPO.has(rowRepo)) continue;
+    if (rowRepo !== repo) {
+      if (seen.has(rowRepo)) disorder.push(`row ${label} returns to ${rowRepo} after ${repo}`);
+      else if (/\bspn-foundation\b/.test(rowRepo) && seen.size)
+        disorder.push(`row ${label} is spn-foundation after ${[...seen][0]} — the foundation comes first`);
+      seen.add(rowRepo);
+      repo = rowRepo;
+      lastAltitude = -1;
+    }
+    if (altitude < lastAltitude)
+      disorder.push(`row ${label} is ${ALTITUDES[altitude]} after ${ALTITUDES[lastAltitude]} in ${rowRepo}`);
+    lastAltitude = Math.max(lastAltitude, altitude);
+  }
+  const out: Finding[] = [];
+  if (bare.length)
+    out.push([ARC_ROWS, `row(s) ${listed(bare)} carry no Repo, or no Altitude from ${ALTITUDES.join(" · ")} ${where}`]);
+  if (disorder.length)
+    out.push([ARC_ROWS, `rows out of chain order: ${listed(disorder)} — rows run by repository, the ` +
+      `foundation first, then DOCS · CODE · GENERATED · RELEASE · PROOF inside each ${where}`]);
+  return out;
 }
 
 /** An overview borrows its outline and carries no argument organs (05-artifacts). */
@@ -781,6 +968,8 @@ export function kindOf(path: string): string {
  * five prose sentences.
  */
 export function check(path: string, text: string, fragment = false): Finding[] {
+  // An arc is state, not corpus: only its step rows are read, and only whole.
+  if (isArc(path)) return fragment ? [] : arcSteps(path, text);
   const isHtml = path.endsWith(".html");
   const isApproach = path.endsWith("-approach.html");
   const isOverview = path.endsWith("-overview.html");
@@ -798,8 +987,9 @@ export function check(path: string, text: string, fragment = false): Finding[] {
   }
   if (isApproach) {
     if (!fragment) {
-      out.push(...approachShape(text));
-      out.push(...howHalves(text));
+      const exempt = exemptWorkstream(path);
+      out.push(...approachShape(text, exempt));
+      if (!exempt) out.push(...cyclesRule(path, text));
       out.push(...pageFurniture(text));
     }
     out.push(...openCards(text));
@@ -955,7 +1145,21 @@ export function checkDoc(payload: Payload): Verdict {
   let plural = false;
   let fragment = false;
 
-  if (path) {
+  if (path && isArc(path)) {
+    // An Edit carries only its replacement, and a step table is judged whole. So the edit is applied
+    // to the file on disk, which is the text the arc will hold once the write lands.
+    const edit = supplied as typeof supplied & { old_string?: string; replace_all?: boolean };
+    let text = edit.content;
+    if (text === undefined && edit.new_string !== undefined && edit.old_string) {
+      const current = read(path);
+      if (!current.includes(edit.old_string)) return null;
+      text = edit.replace_all
+        ? current.split(edit.old_string).join(edit.new_string)
+        : current.replace(edit.old_string, () => edit.new_string!);
+    }
+    if (!text) return null;
+    found = check(path, text);
+  } else if (path) {
     if (!watched(path)) return null;
     fragment = supplied.content === undefined && supplied.new_string !== undefined;
     const text = supplied.content || supplied.new_string || "";
@@ -980,7 +1184,7 @@ export function checkDoc(payload: Payload): Verdict {
   const body = found.map(([sev, msg]) => `  - [${sev}] ${msg}`).join("\n");
   const moves = found.some(([, m]) => m.includes("RD.DOCS.04") || m.includes("RD.DEVEX.WORKSPACE.096"))
     ? "\n  The four moves: split it · say *you* · define the term · land it on your reader — never " +
-      "shorten (`refs/doc-sets.md` § One voice; decisions RD.DEVEX.WORKSPACE.106 · RD.DEVEX.WORKSPACE.107)."
+      "shorten (`refs/devex/workspace/docs/doc-sets.md` § One voice; decisions RD.DEVEX.WORKSPACE.106 · RD.DEVEX.WORKSPACE.107)."
     : "";
   const subject = plural ? "these files miss" : "this file misses";
   // A GATE MUST SAY WHAT IT DID NOT CHECK. On an Edit the hook sees the REPLACEMENT TEXT and not the
@@ -994,8 +1198,8 @@ export function checkDoc(payload: Payload): Verdict {
       "`node doc-check.ts <path>`."
     : "";
   return { note: `Doc standard — ${subject} bars the book states:\n${body}${moves}${limits}` +
-    "\n  Load `refs/doc-sets.md` (One voice / Every surface / The artifacts pocket) and the `plan` " +
-    "skill's approach-document section." };
+    "\n  Load `refs/devex/workspace/docs/doc-sets.md` (One voice / Every surface / The artifacts " +
+    "pocket) and, for an approach page, `refs/devex/workspace/docs/templates/workstream/approach-template.html`." };
 }
 
 // ---------------------------------------------------------------------------- the sweep
@@ -1015,7 +1219,7 @@ function* walk(roots: string[]): Generator<string> {
         let entryStat;
         try { entryStat = statSync(full); } catch { continue; }
         if (entryStat.isDirectory()) { if (!SKIP.has(entry)) stack.push(full); }
-        else if (watched(full)) yield full;
+        else if (watched(full) || isArc(full)) yield full;
       }
     }
   }
@@ -1061,6 +1265,17 @@ function sweep(roots: string[], summaryOnly: boolean): number {
       const text = read(path);
       files += 1;
       const found = check(path, text);
+      if (isArc(path)) {
+        // An arc is state: its findings are counted and printed, and it adds nothing to the rates.
+        if (!found.length) continue;
+        dirty += 1;
+        for (const [sev] of found) total[sev] += 1;
+        if (!summaryOnly) {
+          console.log(relative(process.cwd(), path));
+          for (const [sev, msg] of found) console.log(`   [${sev}] ${msg}`);
+        }
+        continue;
+      }
       const kind = kindOf(path);
       const s = stats[kind];
       s.files += 1;

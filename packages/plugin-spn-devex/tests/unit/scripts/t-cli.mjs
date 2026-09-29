@@ -35,6 +35,7 @@ console.log("=== cli — real groups and actions this plugin ships");
   ok("every group this plugin ships is discovered", ["behaviours", "docs", "plugin", "restates"].every((g) => gs.includes(g)), gs.join(","));
   const docsActions = actionsOf("docs");
   ok("a group's actions are its files, not a hand-kept list", docsActions.includes("audit") && docsActions.includes("coherence"));
+  ok("`docs cycles` is an action because its file exists", docsActions.includes("cycles"), docsActions.join(","));
   ok("a file starting with `_` is a shared helper, never an action", !docsActions.includes("_lib"), docsActions.join(","));
 }
 
@@ -46,6 +47,8 @@ console.log("\n=== cli — help lists every action as data");
   ok("carries this plugin's own name", parsed.plugin === "spn-devex");
   ok("every command carries a non-empty describe", parsed.commands.every((c) => typeof c.describe === "string" && c.describe.length > 0), JSON.stringify(parsed.commands.filter((c) => !c.describe)));
   ok("a command reads `<group> <action>`", parsed.commands.some((c) => c.command === "docs audit"));
+  ok("help lists `docs cycles` with its own describe",
+    parsed.commands.some((c) => c.command === "docs cycles" && /Cycles/.test(c.describe)));
 }
 
 console.log("\n=== cli — an unknown group or action refuses with the list, never a crash");
