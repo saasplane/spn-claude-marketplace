@@ -3,6 +3,7 @@
   "id": "apps-hooks",
   "variant": "construct",
   "title": "Hooks — One Moment, Because Every Rule Here Is About a File",
+  "subtitle": "One moment wired, because every rule here is about a file about to change.",
   "lenses": ["ARCHITECT", "SERVER_DEV"],
   "status": "PLANNING",
   "dependsOn": ["apps-plugin", "hook-set"],

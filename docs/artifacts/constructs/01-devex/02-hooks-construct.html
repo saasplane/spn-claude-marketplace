@@ -1,7 +1,7 @@
 <meta charset="utf-8">
 <title>Hooks — Code the Runtime Calls on Your Behalf</title>
 <!-- spn:doc
-{"id":"hook-set","variant":"construct","title":"Hooks — Code the Runtime Calls on Your Behalf","lenses":["ARCHITECT","SERVER_DEV"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"A hook is code a plugin wires to a moment a session offers, so the runtime calls it and the rule is asked again on every single call.","keywords":["hook","hooks.json","moment","payload","verdict","dispatcher"]}
+{"id":"hook-set","variant":"construct","title":"Hooks — Code the Runtime Calls on Your Behalf","subtitle":"A hook is how a rule gets asked again, every single time, instead of trusted from memory.","lenses":["ARCHITECT","SERVER_DEV"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"A hook is code a plugin wires to a moment a session offers, so the runtime calls it and the rule is asked again on every single call.","keywords":["hook","hooks.json","moment","payload","verdict","dispatcher"]}
 -->
 <!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
 <style>
@@ -182,6 +182,7 @@
   <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
   <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Hooks — Code the Runtime Calls on Your Behalf</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Construct</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">Architect</span><span class="badge lens">Backend developer</span></span><span class="st"><span class="lbl">Status:</span> <span class="badge status planning">&#x1F52E; PLANNING</span></span></span></div>
   <h1>Hooks — Code the Runtime Calls on Your Behalf</h1>
+  <p class="subtitle">A hook is how a rule gets asked again, every single time, instead of trusted from memory.</p>
   <p class="standfirst">A hook is code a plugin wires to a moment a session offers, so the runtime calls it and the rule is asked again on every single call. Read this page to learn the whole frame a hook works inside: the file that declares the wiring, the moments a session offers, and the shape a hook is handed and hands back. The last section states the two promises every hook keeps.</p>
 </header>
 

@@ -3,6 +3,7 @@
   "id": "estate-plugin",
   "variant": "construct",
   "title": "Plugin — spn-infra as a Delivery Unit",
+  "subtitle": "The one folder that carries this repository's infrastructure rules into a working session.",
   "lenses": ["INFRA", "ARCHITECT"],
   "status": "PLANNING",
   "dependsOn": ["plugin-set"],

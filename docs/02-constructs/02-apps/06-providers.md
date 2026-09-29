@@ -3,6 +3,7 @@
   "id": "apps-providers",
   "variant": "construct",
   "title": "Providers — Where the Stack Is Allowed to Be Named",
+  "subtitle": "The one folder where a language may be named at all.",
   "lenses": ["ARCHITECT", "SERVER_DEV"],
   "status": "PLANNING",
   "dependsOn": ["provider-set", "stack-skills", "stack-checks"],

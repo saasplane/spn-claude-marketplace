@@ -2,7 +2,8 @@
 {
   "id": "estate-tests",
   "variant": "construct",
-  "title": "Tests — The Tier, the Mirror, and a Runner That Walks",
+  "title": "Tests — How This Plugin Proves Its Own Gate",
+  "subtitle": "How this plugin proves the rules it refuses a bad file on.",
   "lenses": ["INFRA", "QA"],
   "status": "PLANNING",
   "dependsOn": ["tests", "estate-guard", "estate-providers"],
@@ -11,7 +12,7 @@
 }
 -->
 
-# Tests — The Tier, the Mirror, and a Runner That Walks
+# Tests — How This Plugin Proves Its Own Gate
 
 `For: DevOps / SRE · Quality engineer` · `Status: 🔮 PLANNING`
 

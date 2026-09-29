@@ -3,6 +3,7 @@
   "id": "ref-set",
   "variant": "construct",
   "title": "Refs — A Chapter, Restated and Stamped",
+  "subtitle": "A copy of a rule that says the moment it has fallen behind.",
   "lenses": ["VOICE", "ARCHITECT"],
   "status": "PLANNING",
   "dependsOn": ["plugin-set"],

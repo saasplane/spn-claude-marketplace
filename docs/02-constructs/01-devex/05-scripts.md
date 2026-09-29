@@ -3,6 +3,7 @@
   "id": "checks",
   "variant": "construct",
   "title": "Scripts — The Code a Plugin Ships, Wired or Reached by Name",
+  "subtitle": "Every file a plugin can run lives in one folder, sorted by what calls it.",
   "lenses": ["SERVER_DEV", "ARCHITECT"],
   "status": "PLANNING",
   "dependsOn": ["hook-set"],

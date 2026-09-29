@@ -3,6 +3,7 @@
   "id": "provider-set",
   "variant": "construct",
   "title": "Providers — How a Plugin Is Extended Per Instance",
+  "subtitle": "Everything that changes with a stack or a cloud lives in one folder, and nowhere else.",
   "lenses": ["ARCHITECT", "LEAD"],
   "status": "PLANNING",
   "dependsOn": ["plugin-set", "skill-set", "ref-set", "checks"],

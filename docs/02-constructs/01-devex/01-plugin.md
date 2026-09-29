@@ -3,6 +3,7 @@
   "id": "plugin-set",
   "variant": "construct",
   "title": "The Plugin — Delivery Unit of the Marketplace",
+  "subtitle": "One folder holds everything a rule needs to reach a running session.",
   "lenses": ["ARCHITECT", "LEAD"],
   "status": "PLANNING",
   "dependsOn": [],

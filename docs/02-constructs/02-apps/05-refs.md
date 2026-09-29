@@ -3,6 +3,7 @@
   "id": "stack-refs",
   "variant": "construct",
   "title": "Refs — The Book, Restated Inside the Plugin",
+  "subtitle": "The foundation book's rules, carried inside this plugin for a reader with no other copy.",
   "lenses": ["SERVER_DEV", "ARCHITECT"],
   "status": "PLANNING",
   "dependsOn": ["ref-set"],

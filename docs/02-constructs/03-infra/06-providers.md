@@ -3,6 +3,7 @@
   "id": "estate-providers",
   "variant": "construct",
   "title": "Providers — One Folder per Cloud, Scripts Half Only",
+  "subtitle": "One folder per cloud, holding only what changes between them.",
   "lenses": ["INFRA", "ARCHITECT"],
   "status": "PLANNING",
   "dependsOn": ["provider-set", "estate-guard"],

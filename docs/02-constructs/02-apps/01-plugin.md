@@ -3,6 +3,7 @@
   "id": "apps-plugin",
   "variant": "construct",
   "title": "The Plugin — What spn-apps Is, and When a Session Loads It",
+  "subtitle": "The one folder that makes spn-apps its own plugin, separate from every other.",
   "lenses": ["ARCHITECT", "LEAD"],
   "status": "PLANNING",
   "dependsOn": ["plugin-set"],

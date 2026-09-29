@@ -3,6 +3,7 @@
   "id": "skill-set",
   "variant": "construct",
   "title": "Skills — A Stage's Steps, Loaded on Match",
+  "subtitle": "A skill only loads when the work in front of you actually matches it.",
   "lenses": ["ARCHITECT", "LEAD"],
   "status": "PLANNING",
   "dependsOn": ["plugin-set"],

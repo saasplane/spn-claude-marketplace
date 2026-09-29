@@ -3,6 +3,7 @@
   "id": "estate-guard",
   "variant": "construct",
   "title": "Scripts — The Write-Time Gate and What Runs It",
+  "subtitle": "The gate that catches what should never be written into an infrastructure declaration.",
   "lenses": ["INFRA", "TRUST"],
   "status": "PLANNING",
   "dependsOn": ["checks", "estate-hooks"],

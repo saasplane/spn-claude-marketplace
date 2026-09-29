@@ -2,7 +2,8 @@
 {
   "id": "estate-skills",
   "variant": "construct",
-  "title": "Skills — The Doors an Estate Is Changed Through",
+  "title": "Skills — The Doors Infrastructure Is Changed Through",
+  "subtitle": "The commands that change what a piece of infrastructure declares itself to be.",
   "lenses": ["INFRA", "ARCHITECT"],
   "status": "PLANNING",
   "dependsOn": ["skill-set"],
@@ -11,7 +12,7 @@
 }
 -->
 
-# Skills — The Doors an Estate Is Changed Through
+# Skills — The Doors Infrastructure Is Changed Through
 
 `For: DevOps / SRE · Architect` · `Status: 🔮 PLANNING`
 

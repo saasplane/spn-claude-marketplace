@@ -3,6 +3,7 @@
   "id": "stack-checks",
   "variant": "construct",
   "title": "Scripts — The Code This Plugin Runs",
+  "subtitle": "Every file this plugin runs, sorted by what calls it and what stack it serves.",
   "lenses": ["SERVER_DEV", "WEB_DEV"],
   "status": "PLANNING",
   "dependsOn": ["apps-hooks", "checks"],

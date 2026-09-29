@@ -3,6 +3,7 @@
   "id": "hook-set",
   "variant": "construct",
   "title": "Hooks — Code the Runtime Calls on Your Behalf",
+  "subtitle": "A hook is how a rule gets asked again, every single time, instead of trusted from memory.",
   "lenses": ["ARCHITECT", "SERVER_DEV"],
   "status": "PLANNING",
   "dependsOn": ["plugin-set"],

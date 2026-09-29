@@ -3,6 +3,7 @@
   "id": "stack-skills",
   "variant": "construct",
   "title": "Skills — The Commands an Apps Repository Answers To",
+  "subtitle": "The commands an apps repository can be asked to run, one folder each.",
   "lenses": ["SERVER_DEV", "WEB_DEV"],
   "status": "PLANNING",
   "dependsOn": ["skill-set"],

@@ -2,7 +2,8 @@
 {
   "id": "tests",
   "variant": "construct",
-  "title": "Tests — The Tier, the Mirror, and a Runner That Walks",
+  "title": "Tests — How This Plugin Proves Itself",
+  "subtitle": "A suite sits at the same path as the file it proves, so nothing has to be searched for.",
   "lenses": ["QA", "SERVER_DEV"],
   "status": "PLANNING",
   "dependsOn": ["plugin-set", "checks"],
@@ -11,7 +12,7 @@
 }
 -->
 
-# Tests — The Tier, the Mirror, and a Runner That Walks
+# Tests — How This Plugin Proves Itself
 
 `For: Quality engineer · Backend developer` · `Status: 🔮 PLANNING`
 

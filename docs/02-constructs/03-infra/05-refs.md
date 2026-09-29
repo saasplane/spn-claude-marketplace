@@ -2,7 +2,8 @@
 {
   "id": "estate-refs",
   "variant": "construct",
-  "title": "Refs — The Estate's Vocabulary, Restated as Cards",
+  "title": "Refs — This Domain's Vocabulary, Restated as Cards",
+  "subtitle": "This domain's own words, explained for a reader who has never opened the book.",
   "lenses": ["INFRA", "ARCHITECT"],
   "status": "PLANNING",
   "dependsOn": ["ref-set"],
@@ -11,7 +12,7 @@
 }
 -->
 
-# Refs — The Estate's Vocabulary, Restated as Cards
+# Refs — This Domain's Vocabulary, Restated as Cards
 
 `For: DevOps / SRE · Architect` · `Status: 🔮 PLANNING`
 

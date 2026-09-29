@@ -2,7 +2,8 @@
 {
   "id": "agent-set",
   "variant": "construct",
-  "title": "Agents — The Personas a Session Convenes, and the Lenses They Are Handed",
+  "title": "Agents — The Personas a Session Convenes, and the Viewpoints They Are Handed",
+  "subtitle": "A second reader, convened for just one turn, who holds only what its own file grants it.",
   "lenses": ["LEAD", "ARCHITECT"],
   "status": "PLANNING",
   "dependsOn": ["plugin-set", "ref-set"],
@@ -11,7 +12,7 @@
 }
 -->
 
-# Agents — The Personas a Session Convenes, and the Lenses They Are Handed
+# Agents — The Personas a Session Convenes, and the Viewpoints They Are Handed
 
 `For: Engineering leader · Architect` · `Status: 🔮 PLANNING`
 

@@ -3,6 +3,7 @@
   "id": "apps-tests",
   "variant": "construct",
   "title": "Tests — The Stack's Own Folders, Without the Stack's Framework",
+  "subtitle": "How this plugin proves the rules it holds every other repository to.",
   "lenses": ["QA", "SERVER_DEV"],
   "status": "PLANNING",
   "dependsOn": ["stack-checks", "apps-providers"],

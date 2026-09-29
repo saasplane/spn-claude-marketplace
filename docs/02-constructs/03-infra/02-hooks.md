@@ -3,6 +3,7 @@
   "id": "estate-hooks",
   "variant": "construct",
   "title": "Hooks — One Moment, Every Write",
+  "subtitle": "One moment wired, because every rule here is about a file about to be written.",
   "lenses": ["INFRA", "TRUST"],
   "status": "PLANNING",
   "dependsOn": ["hook-set", "estate-plugin"],
