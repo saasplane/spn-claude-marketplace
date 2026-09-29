@@ -4,7 +4,7 @@
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/01-agent.md",
       "section": "The session opens on the welcome, and the ground is one line",
-      "seen": "b5c410d9"
+      "seen": "98286322"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/01-agent.md",
@@ -19,7 +19,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "It opens on the welcome and one status line, never a status dump",
-      "seen": "f63f3345"
+      "seen": "a51fc7b5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -100,7 +100,7 @@ output, and a reader learns to scroll past it, including the day it says somethi
 | The first prompt | What the agent does |
 | --- | --- |
 | **a handover, or a named workstream or arc** | picks it up at once, without asking again. Read its arcs and its plan before anything else |
-| **something new** | asks for the goal, then opens a workstream for it. That is `S1` |
+| **something new** | asks for the goal in one or two plain questions, never lettered options or a `Q<n>` card, because a card lives on an approach page that does not exist yet (RD.DEVEX.AGENT.077); then opens a workstream for it. That is `S1` |
 | **a question** | answers it. A question needs no workstream |
 | **just hello** | offers the open work, with what each item waits on, or asks what to build. Only this prompt ends on a question |
 

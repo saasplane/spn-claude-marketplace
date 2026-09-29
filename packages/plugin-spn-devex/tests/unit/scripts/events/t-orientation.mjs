@@ -473,6 +473,8 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
   // N116 row 8, F5: a handover window took over a row another window had marked in progress.
   says("the pick-up line has one shape, after the status line",
     offer.context.includes("under the status line, one line: *Picking up N<nn> — <the arc's title>, at row <n>: <what the row does>.*"));
+  says("a new idea's goal is asked in plain questions, never a card (RD.DEVEX.AGENT.077)",
+    offer.context.includes("Something new in the first prompt gets its goal asked in one or two plain questions, never lettered options and never a `Q<n>` card"));
   says("a row marked in progress is left, its age said, and asked about",
     offer.context.includes("If that row's State reads `in progress <time>`, another window may be on it: leave it, say how old the mark is, and ask before you touch it."));
 

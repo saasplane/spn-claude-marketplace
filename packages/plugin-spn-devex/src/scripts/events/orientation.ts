@@ -769,6 +769,8 @@ export function orient(root: string, cwd: string): [message: string, context: st
     "does>.* Then the first thing you will do, never by asking again. If that row's State reads " +
     "`in progress <time>`, another window may be on it: leave it, say how old the mark is, and " +
     "ask before you touch it. " +
+    "Something new in the first prompt gets its goal asked in one or two plain questions, never lettered " +
+    "options and never a `Q<n>` card: a card lives on the approach page, which does not exist yet. " +
     "Never turn the rung into a menu. The standing offer " +
     "under that question appears only when exactly one workstream is open and no other " +
     "session is live here — so where you cannot see one, do not propose resuming " +
