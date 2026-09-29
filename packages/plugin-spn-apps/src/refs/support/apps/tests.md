@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/",
-      "seen": "ebf68595"
+      "seen": "ccf95bc7"
     }
   ]
 }
@@ -49,7 +49,7 @@ Derive the tier — never debate it. A project's kind fixes its consumer, and th
 | `SUPPORT_SERVER` | unit · integration | integration where it fronts a real resource |
 | `SUPPORT_WEB` | unit · component | unit under a rendering harness, component in a real browser |
 | `MODULE_SERVER` | unit | ships no shell — its services need an application's configuration, resources and entries, so it cites the composing application's contract tier |
-| `MODULE_WEB` | unit | ships no shell on the other face — cites a journey of the composing application |
+| `MODULE_WEB` | unit | ships no shell on the other face — cites a journey of the composing application; may carry a component tier it does not owe, in `tests/component/`, with the scaffold's `playwright-ct.config.ts` (RD.SUPPORT.APPS.134) |
 | `APP_SERVER` | contract · journey | it is the runtime, so it owns the API face of every behaviour it composes |
 | `APP_WEB` | journey · component | it is the runtime, so it owns the UI face — actions, states, refusals, whether a screen is offered |
 | `APP_UTILITY` | unit · integration | integration is the invoked command, end to end |
