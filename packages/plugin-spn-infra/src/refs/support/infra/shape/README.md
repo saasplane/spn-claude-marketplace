@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "6971df17"
+      "seen": "81eda785"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/03-blueprints/01-layers.md",
@@ -69,7 +69,7 @@ The layers are nouns; each takes `up · down · status`, and `--plan` on `up` or
 
 **Every provisioning run names its mode, and there is no default** (RD.SUPPORT.INFRA.094). `up` and `down` each take exactly one of `--plan` or `--apply`. A command that plans when you forget a flag is a command doing another command's job, and a default would decide the direction of the mistake for you.
 
-Beside the layers: `logs <spc> [service]` · `show <spc>` (resolution per layer, incl. **PINNED @ version or a path**) · `trust-ca` (trust the machine's own CA — what the local `organization up` does as part of its bootstrap) · `domain register <spc> <host>|unregister` (register a host with the local proxy, `--app <kind code>`, needing no privilege and writing no `/etc/hosts` — what the local edge provider calls for every route, and what a test calls for its own `lc-test` domain) · the `config` commands (`set · get · list · export · import · diff · render` — the app plane only, never the ledger) · `web deploy|rollback <spc> <env> <app>` (a built bundle into the platform's own storage engine, and a landed release back onto the route — no separate store) · `scaffold repo|organization|platform|module` · `validate` · `test` · `release`.
+Beside the layers: `logs <spc> [service]` · `show <spc>` (resolution per layer, incl. **PINNED @ version or a path**) · `trust-ca` (trust the machine's own CA — what the local `organization up` does as part of its bootstrap) · `organization root-door [--remove]` (install the root door, one password: the resolver's files and the CA's removal then ask for nothing, and trust still asks; RD.DEVEX.UTILS.073) · `domain register <spc> <host>|unregister` (register a host with the local proxy, `--app <kind code>`, needing no privilege and writing no `/etc/hosts` — what the local edge provider calls for every route, and what a test calls for its own `lc-test` domain) · the `config` commands (`set · get · list · export · import · diff · render` — the app plane only, never the ledger) · `web deploy|rollback <spc> <env> <app>` (a built bundle into the platform's own storage engine, and a landed release back onto the route — no separate store) · `scaffold repo|organization|platform|module` · `validate` · `test` · `release`.
 
 ## Doors — who may run what, where
 
