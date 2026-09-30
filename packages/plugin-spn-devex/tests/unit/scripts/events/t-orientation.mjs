@@ -475,8 +475,13 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
     offer.context.includes("under the status line, one line: *Picking up N<nn> — <the arc's title>, at row <n>: <what the row does>.*"));
   // Q380 A: a window picking up a handover checks its model against the block's `model:` line first.
   says("a pasted handover's model is compared with the window's own before any action, and a mismatch names /model",
-    offer.context.includes("A handover block names a `model:`: compare it with the model your system prompt names before any action.")
-    && offer.context.includes("names both models and the `/model` command that switches, and nothing runs until the developer switches or says to go on"));
+    offer.context.includes("A handover block names a `model:` with a model and an effort: before any action, compare the model with the one your system prompt names")
+    && offer.context.includes("the `/model` command for the model")
+    && offer.context.includes("nothing runs until the developer switches or says to go on"));
+  // Q384 A: the effort is compared too, read from CLAUDE_EFFORT.
+  says("the effort is compared with CLAUDE_EFFORT, and a mismatch names claude --effort",
+    offer.context.includes("the effort with `CLAUDE_EFFORT`")
+    && offer.context.includes("a window started with `claude --effort <level>` for the effort"));
   says("a new idea's goal is asked in plain questions, never a card (RD.DEVEX.AGENT.077)",
     offer.context.includes("Something new in the first prompt gets its goal asked in one or two plain questions, never lettered options and never a `Q<n>` card"));
   says("a row marked in progress is left, its age said, and asked about",

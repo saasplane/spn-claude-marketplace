@@ -7,12 +7,12 @@
      says yes; a forced stop gives it at once.
      Nine lowercase labels, in this order. Every value starts in the column `do not touch:` sets; a value longer than
      about 100 characters wraps, and each continuation line is indented to the value column. No blank lines inside.
-     The window that picks this up compares its own model with `model:` before it acts, so name an exact model. -->
+     The window that picks this up compares its own model and effort with `model:` before it acts, so name an exact model and an effort. -->
 ```text
 continue:     workstream `{{NNN-subject}}`, arc `N{{n}}`, row {{k}}, in a `{{repository}}` window
               — or, after a plugin reload — open workstream `{{next NNN-subject}}`;
               `{{NNN-subject}}` N{{n}} waits on it
-model:        {{an exact model, such as Opus 5.5}}, effort {{high · medium}}
+model:        {{an exact model, such as Opus 5.5}}, effort {{low · medium · high · xhigh · max}}
 read first:   `{{absolute path}}/arcs/N{{n}}-….md` (fields, and row {{k}}),
               `{{absolute path}}/notes/N{{n}}/plan.md` (§ Traps, § Commands, row {{k}}), then
               `{{the order or seat file being changed}}`

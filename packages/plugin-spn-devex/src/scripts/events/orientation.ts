@@ -775,10 +775,11 @@ export function orient(root: string, cwd: string): [message: string, context: st
     "say what to do. A handover block, an arc name, or any named next step replaces it — under " +
     "the status line, one line: *Picking up N<nn> — <the arc's title>, at row <n>: <what the row " +
     "does>.* Then the first thing you will do, never by asking again. A handover block names a " +
-    "`model:`: compare it with the model your system prompt names before any action. On a mismatch, " +
-    "one line under the status line names both models and the `/model` command that switches, and " +
-    "nothing runs until the developer switches or says to go on; effort is not checked, because you " +
-    "cannot see it. If that row's State reads " +
+    "`model:` with a model and an effort: before any action, compare the model with the one your system " +
+    "prompt names, and the effort with `CLAUDE_EFFORT` (one shell call: `echo $CLAUDE_EFFORT`). On a " +
+    "mismatch, one line under the status line names both values and how to switch — the `/model` " +
+    "command for the model, a window started with `claude --effort <level>` for the effort — and " +
+    "nothing runs until the developer switches or says to go on. If that row's State reads " +
     "`in progress <time>`, another window may be on it: leave it, say how old the mark is, and " +
     "ask before you touch it. " +
     "Something new in the first prompt gets its goal asked in one or two plain questions, never lettered " +
