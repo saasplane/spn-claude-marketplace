@@ -73,9 +73,15 @@ function owesContract(node: string): boolean {
   try { return JSON.parse(readFileSync(manifest, "utf8"))?.kind === "APP_SERVER"; } catch { return false; }
 }
 
-/** The tier that binds an id for this file, or null when it is a unit or plain integration case. */
+/**
+ * The tier that binds an id for this file, or null when it is a unit or plain integration case.
+ *
+ * A `CLIENT_API`'s contract suite sits in `tests/contract/`. An `APP_SERVER`'s `tests/integration/`
+ * run reports under `CONTRACT`, the tier its kind owes.
+ */
 export function boundTier(root: string, file: string): BoundTier | null {
   const parts = relative(root, file).split(sep);
+  if (parts[parts.indexOf("tests") + 1] === "contract") return "CONTRACT";
   if (parts.includes("component")) return "COMPONENT";
   if (parts.includes("journeys")) return "JOURNEY";
   if (parts.includes("integration") && owesContract(nodeOf(root, file))) return "CONTRACT";

@@ -53,7 +53,7 @@ const WIRED = [
   { args: (tree: string) => ["docs", "audit", tree], label: "audit" },
   { args: (tree: string) => ["docs", "face", "--check", dirname(tree)], label: "face --check" },
   { args: (tree: string) => ["docs", "topics", dirname(tree)], label: "topics" },
-  { args: (tree: string) => ["docs", "coverage", dirname(tree)], label: "coverage" },
+  { args: (tree: string) => ["docs", "parity", dirname(tree)], label: "parity" },
 ];
 
 /**
@@ -215,7 +215,7 @@ function templatesDir(root: string): string {
  * foundation's templates (a template edit changes the verdict of trees that did not move).
  *
  * WHAT IS NOT IN IT, SAID HERE SO NOBODY INFERS THE KEY IS COMPLETE: the package sources `audit`
- * indexes for closed values and `coverage` mirrors, and the sibling-repository paths a figure names.
+ * indexes for closed values and `parity` mirrors, and the sibling-repository paths a figure names.
  * A change to those alone replays the stored verdict until the tree or the checker moves.
  *
  * Returns null when the tree holds more than `MAX_FILES` files, which runs it uncached.

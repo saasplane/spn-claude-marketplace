@@ -82,7 +82,7 @@ Read the first two before anything else. The plugin is the container, and the ho
 | **Scripts** | | |
 | [a check](05-scripts.md) | `Check` | a file a moment's dispatcher composes: it reads one call and returns a verdict |
 | [a finding](05-scripts.md) | `Finding` | one thing a run found: which question raised it, its grade, the file, and what a reader should do |
-| [a job](05-scripts.md) | — | one named unit of work inside a tool, such as `audit`, `page`, `topics` or `coverage` |
+| [a job](05-scripts.md) | — | one named unit of work inside a tool, such as `audit`, `page`, `topics` or `parity` |
 | [a refusal](05-scripts.md) | `deny` | the call is stopped, with the reason a reader is given |
 | [a script](05-scripts.md) | `scripts/` | one file a plugin ships under `checks/`, `events/`, `tools/` or `lib/`, named for what it decides or measures |
 | [a tool](05-scripts.md) | — | a file under `tools/` that nothing wires, reached by naming its own path |

@@ -1,5 +1,5 @@
 import { PLUGIN } from "../../../../helpers/harness.mjs";
-// `docs coverage` — three set checks, replacing a resolver (decision `E`): the constructs and
+// `docs parity` — three set checks, replacing a resolver (decision `E`): the constructs and
 // behaviours seats pair file for file by PATH, a capabilities folder names a real package and every
 // package has a folder, and every `Who` a row names resolves to the personas table and back. Split
 // out of `t-seats.mjs` (`N101` step 5), which carried every seat-shaped check in one file before the
@@ -19,7 +19,7 @@ import { execFileSync } from "node:child_process";
 import { SEAT } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
-const BASE = mkdtempSync(join(tmpdir(), "t-docs-coverage-"));
+const BASE = mkdtempSync(join(tmpdir(), "t-docs-set-"));
 process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
 
 let made = 0;
@@ -86,39 +86,39 @@ console.log("=== the two seats pair file for file, and the pairing is of PATHS")
     [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: register("b", [["CORE.BOOT.01", "x", "UNIT", "PLANNED"]]),
   };
   one("a construct with its behaviours file at the same path is clean",
-      run(repo(paired), ["coverage", "."]), lacks("parity"));
+      run(repo(paired), ["parity", "."]), lacks("parity"));
 
   // A BEHAVIOURS FILE WITH NO ROWS IS HONEST where the product is not built — two of
   // `spn-launchpad-ts`'s three carry none, because Surfaces and Web Shell settle declarations rather
   // than acts. A check requiring a row per file would fail them on day one.
   one("an empty behaviours file pairs, because parity is of paths and never of rows",
-      run(repo({ ...paired, [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: register("b", []) }), ["coverage", "."]),
+      run(repo({ ...paired, [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: register("b", []) }), ["parity", "."]),
       lacks("parity"));
 
   one("a construct with no behaviours file at its own path is reported",
       run(repo({ [`docs/${SEAT.constructs}/01-core/01-boot.md`]: seat("boot"),
-                 [`docs/${SEAT.behaviors}/01-core/02-other.md`]: register("o", []) }), ["coverage", "."]),
+                 [`docs/${SEAT.behaviors}/01-core/02-other.md`]: register("o", []) }), ["parity", "."]),
       has(`no \`${SEAT.behaviors}/01-core/01-boot.md\``));
 
   one("and rows with no construct are reported the other way",
       run(repo({ [`docs/${SEAT.constructs}/01-core/01-boot.md`]: seat("boot"),
                  [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: register("b", []),
-                 [`docs/${SEAT.behaviors}/01-core/02-ghost.md`]: register("g", []) }), ["coverage", "."]),
+                 [`docs/${SEAT.behaviors}/01-core/02-ghost.md`]: register("g", []) }), ["parity", "."]),
       has(`no \`${SEAT.constructs}/01-core/02-ghost.md\``));
 
   one("the same file under a different domain is not the same path",
       run(repo({ [`docs/${SEAT.constructs}/01-core/01-boot.md`]: seat("boot"),
-                 [`docs/${SEAT.behaviors}/02-other/01-boot.md`]: register("b", []) }), ["coverage", "."]),
+                 [`docs/${SEAT.behaviors}/02-other/01-boot.md`]: register("b", []) }), ["parity", "."]),
       (g) => g.includes(`no \`${SEAT.behaviors}/01-core/01-boot.md\``) && g.includes(`no \`${SEAT.constructs}/02-other/01-boot.md\``));
 
   one("a face and the personas table are not topics, and pair with nothing",
       run(repo({ ...paired, [`docs/${SEAT.behaviors}/README.md`]: doc({ id: "f", variant: "behaviors", title: "F", lenses: ["QA"], status: "PLANNING" }),
-                 [`docs/${SEAT.behaviors}/personas.md`]: personas(["A person"]) }), ["coverage", "."]),
+                 [`docs/${SEAT.behaviors}/personas.md`]: personas(["A person"]) }), ["parity", "."]),
       lacks("parity"));
 
   // AN ABSENT SCAN AND AN ABSENT FINDING MUST NOT SHARE A VERDICT.
   one("a repository with no behaviours seat says so rather than reading clean",
-      run(repo({ [`docs/${SEAT.constructs}/01-core/01-boot.md`]: seat("boot"), [`docs/${SEAT.capabilities}/x/pkg-ts/a.md`]: "# a\n" }), ["coverage", "."]),
+      run(repo({ [`docs/${SEAT.constructs}/01-core/01-boot.md`]: seat("boot"), [`docs/${SEAT.capabilities}/x/pkg-ts/a.md`]: "# a\n" }), ["parity", "."]),
       has("nothing was compared"));
 }
 
@@ -130,40 +130,40 @@ console.log("\n=== a capability folder names a package, and every package has a 
     [`docs/${SEAT.capabilities}/01-core/pkg-ts/01-boot.md`]: "# Boot\n",
     "packages/pkg-ts/spkind.json": kind,
   };
-  one("a folder named after a real package is clean", run(repo(good), ["coverage", "."]), lacks("mirror"));
+  one("a folder named after a real package is clean", run(repo(good), ["parity", "."]), lacks("mirror"));
 
   one("a folder naming no package of this repository is reported",
-      run(repo({ ...good, [`docs/${SEAT.capabilities}/01-core/ghost-ts/01-boot.md`]: "# g\n" }), ["coverage", "."]),
+      run(repo({ ...good, [`docs/${SEAT.capabilities}/01-core/ghost-ts/01-boot.md`]: "# g\n" }), ["parity", "."]),
       has("`ghost-ts` is a folder of the capabilities seat and no package"));
 
   one("a package with no folder is reported the other way",
-      run(repo({ ...good, "packages/orphan-ts/spkind.json": kind }), ["coverage", "."]),
+      run(repo({ ...good, "packages/orphan-ts/spkind.json": kind }), ["parity", "."]),
       has(`\`orphan-ts\` declares itself a package and \`${SEAT.capabilities}/\` carries no folder`));
 
   // A MANIFEST SITS TWO LEVELS DOWN AND NO DEEPER. A module inside an app and a fixture estate under
   // `tests/` each declare something that is not a package of this repository.
   one("a module inside a package is not a second package",
-      run(repo({ ...good, "packages/pkg-ts/src/modules/order/spkind.json": kind }), ["coverage", "."]),
+      run(repo({ ...good, "packages/pkg-ts/src/modules/order/spkind.json": kind }), ["parity", "."]),
       lacks("`order` declares itself a package"));
   one("and a fixture estate under tests is not one either",
-      run(repo({ ...good, "packages/pkg-ts/tests/fixtures/estate/packages/infra-x/spinfrapkg.json": "{}" }), ["coverage", "."]),
+      run(repo({ ...good, "packages/pkg-ts/tests/fixtures/estate/packages/infra-x/spinfrapkg.json": "{}" }), ["parity", "."]),
       lacks("`infra-x` declares itself a package"));
   one("a built copy under dist is not a second package",
-      run(repo({ ...good, "packages/pkg-ts/dist/spkind.json": kind }), ["coverage", "."]),
+      run(repo({ ...good, "packages/pkg-ts/dist/spkind.json": kind }), ["parity", "."]),
       lacks("`dist` declares itself a package"));
 
   // A BOOK MIRRORS NO PACKAGES. The foundation's capabilities seat is the standard per topic, and its
   // folders are areas rather than packages. Judged this way it reported 129 correct constructs as
   // uncovered.
   one("a FOUNDATION repository is exempt",
-      run(repo({ [`docs/${SEAT.capabilities}/01-devex/04-workspace/04-docs.md`]: "# d\n" }, { type: "FOUNDATION" }), ["coverage", "."]),
+      run(repo({ [`docs/${SEAT.capabilities}/01-devex/04-workspace/04-docs.md`]: "# d\n" }, { type: "FOUNDATION" }), ["parity", "."]),
       lacks("mirror"));
   one("and an APPS repository with the same shape is not",
-      run(repo({ [`docs/${SEAT.capabilities}/01-devex/04-workspace/04-docs.md`]: "# d\n", "packages/pkg-ts/spkind.json": kind }), ["coverage", "."]),
+      run(repo({ [`docs/${SEAT.capabilities}/01-devex/04-workspace/04-docs.md`]: "# d\n", "packages/pkg-ts/spkind.json": kind }), ["parity", "."]),
       has("`04-workspace` is a folder of the capabilities seat and no package"));
 
   one("a repository declaring no package at all says so rather than reading clean",
-      run(repo({ [`docs/${SEAT.capabilities}/01-core/pkg-ts/01-boot.md`]: "# b\n" }), ["coverage", "."]),
+      run(repo({ [`docs/${SEAT.capabilities}/01-core/pkg-ts/01-boot.md`]: "# b\n" }), ["parity", "."]),
       has("nothing in this repository declares a package"));
 }
 
@@ -180,25 +180,25 @@ console.log("\n=== every Who resolves to the personas table, and every persona i
   });
 
   one("a Who the table declares is clean",
-      run(repo(tree("A web developer", ["A web developer"])), ["coverage", "."]), lacks("personas"));
+      run(repo(tree("A web developer", ["A web developer"])), ["parity", "."]), lacks("personas"));
 
   // THE ARTICLE AND THE FORMATTING COME OFF, AND NOTHING ELSE DOES. `Service app` in the table and
   // `a service app` in a cell are the same person, and two repositories spell them those two ways.
   one("a leading article is not a different persona",
-      run(repo(tree("a service app", ["Service app"])), ["coverage", "."]), lacks("personas"));
+      run(repo(tree("a service app", ["Service app"])), ["parity", "."]), lacks("personas"));
 
   one("a Who nobody declared is reported",
-      run(repo(tree("A quality engineer", ["A web developer"])), ["coverage", "."]),
+      run(repo(tree("A quality engineer", ["A web developer"])), ["parity", "."]),
       has("`A quality engineer` is a `Who` and `personas.md` declares no such actor"));
 
   one("a persona no row names is reported the other way",
-      run(repo(tree("A web developer", ["A web developer", "An architect"])), ["coverage", "."]),
+      run(repo(tree("A web developer", ["A web developer", "An architect"])), ["parity", "."]),
       has("`An architect` is declared as a persona and no behaviour row names it"));
 
   // NO SUBSTRING. That looseness is exactly what the retired `Node` resolver did — and a `Who` of
   // *a module* matching a persona called *a module service* is the same mistake in a new place.
   one("a persona is matched whole, never as part of a longer one",
-      run(repo(tree("A module", ["A module service"])), ["coverage", "."]),
+      run(repo(tree("A module", ["A module service"])), ["parity", "."]),
       has("`A module` is a `Who` and `personas.md` declares no such actor"));
 
   // THE RULE IS ANCHORED TO THE CELL, so a seat whose rows carry no Who owes no table. `spn-infra`
@@ -208,18 +208,18 @@ console.log("\n=== every Who resolves to the personas table, and every persona i
                  [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: doc(
                    { id: "b", variant: "behaviors", title: "b", lenses: ["INFRA"], status: "PLANNING" },
                    "| Observably | Where | Because |\n| --- | --- | --- |\n| it stands | pkg | ground |\n") }),
-          ["coverage", "."]),
+          ["parity", "."]),
       has("no row carrying a `Who`, so nothing was compared"));
 
   one("rows carrying a Who with no personas table beside them is a finding",
       run(repo({ [`docs/${SEAT.constructs}/01-core/01-boot.md`]: seat("boot"),
-                 [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: rows("A web developer") }), ["coverage", "."]),
+                 [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: rows("A web developer") }), ["parity", "."]),
       has("name a person and there is no `personas.md`"));
 
   one("the personas table's own explanatory tables are not read as actors",
       run(repo({ ...tree("A web developer", ["A web developer"]),
                  [`docs/${SEAT.behaviors}/personas.md`]: personas(["A web developer"]) +
-                   "\n| Why | What |\n| --- | --- |\n| because | a reason |\n" }), ["coverage", "."]),
+                   "\n| Why | What |\n| --- | --- |\n| because | a reason |\n" }), ["parity", "."]),
       lacks("personas"));
 
   // EVERY PARSER OVER A TABLE IS FENCE-AWARE. A personas page teaching the table shape SHOWS one, and
@@ -228,7 +228,7 @@ console.log("\n=== every Who resolves to the personas table, and every persona i
       run(repo({ ...tree("A web developer", ["A web developer"]),
                  [`docs/${SEAT.behaviors}/personas.md`]: personas(["A web developer"]) +
                    "\n```markdown\n| Actor | Who they are | What the rows promise them |\n| --- | --- | --- |\n" +
-                   "| **An example person** | somebody | an outcome |\n```\n" }), ["coverage", "."]),
+                   "| **An example person** | somebody | an outcome |\n```\n" }), ["parity", "."]),
       lacks("An example person"));
 
   one("and a Who inside a fence is an example too",
@@ -236,14 +236,14 @@ console.log("\n=== every Who resolves to the personas table, and every persona i
                  [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: rows("A web developer") +
                    "\n```markdown\n| Id | Who | Does | Sees | Type | Tier | Status | Updated at |\n" +
                    "| --- | --- | --- | --- | --- | --- | --- | --- |\n" +
-                   "| CORE.X.01 | An invented person | x | y | POSITIVE | UNIT | PLANNED | — |\n```\n" }), ["coverage", "."]),
+                   "| CORE.X.01 | An invented person | x | y | POSITIVE | UNIT | PLANNED | — |\n```\n" }), ["parity", "."]),
       lacks("An invented person"));
 
   // EVERY NEW CHECK SHIPS SOFT. An agent once read a rule off a buggy check and renamed a page.
   one("every set-check finding is SOFT while the corpus crosses",
-      run(repo(tree("A quality engineer", ["A web developer"])), ["coverage", "."]),
+      run(repo(tree("A quality engineer", ["A web developer"])), ["parity", "."]),
       (g) => !/^. RULE /m.test(g) && /0 RULE/.test(g));
 }
 
-console.log(failed ? `\n  ${failed} of ${n} FAILED — docs coverage` : `\n  all ${n} passed — docs coverage`);
+console.log(failed ? `\n  ${failed} of ${n} FAILED — docs parity` : `\n  all ${n} passed — docs parity`);
 process.exit(failed ? 1 : 0);

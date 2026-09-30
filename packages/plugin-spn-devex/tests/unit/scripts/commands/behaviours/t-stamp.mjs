@@ -89,6 +89,18 @@ console.log("=== behaviour-rows — what it writes");
   ok("MANUAL is never written over", cells(doc, "IAM.LOGIN.04").status === "MANUAL");
 }
 
+{
+  // A repository's one root journey run: its artifact sits at the root, and it speaks for the JOURNEY rows it named.
+  const { root, doc } = stand([], ["CONTRACT"]);
+  const artifact = join(root, "tests", ".output", "journey", "spn-tests.json");
+  mkdirSync(dirname(artifact), { recursive: true });
+  writeFileSync(artifact, JSON.stringify({ env: "local", tiers: ["JOURNEY"], ranAt: "2026-09-21T09:00:00Z",
+    results: [{ id: "IAM.LOGIN.03", tier: "JOURNEY", status: "FAILED", title: "t", detail: "x" }] }), "utf8");
+  run(root, "--write");
+  ok("a root journey run's artifact stamps the JOURNEY row it named", cells(doc, "IAM.LOGIN.03").status === "FAILED"
+    && cells(doc, "IAM.LOGIN.03").at === "2026-09-21T09:00:00Z", JSON.stringify(cells(doc, "IAM.LOGIN.03")));
+}
+
 console.log("=== behaviour-rows — what it refuses to assume");
 
 {

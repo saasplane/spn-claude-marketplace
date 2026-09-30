@@ -44,6 +44,8 @@ put("tests/journeys/built.spec.ts", "import { ROWS } from '../helpers/table';\nf
 ok("an app server's integration folder is its contract tier", boundTier(root, join(root, "apps/api/tests/integration/login.int.spec.ts")), "CONTRACT");
 ok("known-bad: another kind's integration folder binds no id", boundTier(root, join(root, "packages/lib/tests/integration/cache.int.spec.ts")), null);
 ok("a unit case binds no id", boundTier(root, join(root, "packages/lib/tests/unit/x.spec.ts")), null);
+ok("a client's tests/contract/ folder is the contract tier", boundTier(root, join(root, "packages/client/tests/contract/iam/login.contract.spec.ts")), "CONTRACT");
+ok("known-bad: a unit case mirroring src/contract/ binds no id", boundTier(root, join(root, "packages/lib/tests/unit/contract/states.spec.ts")), null);
 const found = boundCases(root);
 ok("contract: two cases, one without an id", [found.get("CONTRACT").length, found.get("CONTRACT").filter((c) => !c.hasId).length], [2, 1]);
 ok("component: one case, no id", [found.get("COMPONENT").length, found.get("COMPONENT").filter((c) => !c.hasId).length], [1, 1]);

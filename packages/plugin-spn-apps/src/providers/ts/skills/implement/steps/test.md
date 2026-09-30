@@ -1,8 +1,8 @@
-# Step: test — unit + repo-level integration
+# Step: test — unit + the contract tier
 
 **Which tier a project owes is derived from its kind** — the `test` skill carries the ladder and the derivation; this step is how TypeScript runs each one. The service harness (test app, principal factory, substitutable providers, capturing log provider) ships in `@saasplane/support-service-ts` under `testing/` — never assemble a boot in a suite.
 
-Keep `tests/{unit, integration, helpers, setup}` at every project's root, **never co-located with source**; the repo root `tests/` holds only cross-app E2E suites (Playwright).
+Keep `tests/{unit, integration, helpers, setup}` at every project's root (and `tests/contract/` in a `CLIENT_API`), **never co-located with source**; the repo root `tests/` holds only cross-app E2E suites (Playwright).
 
 ## Before you write or fix a case
 
@@ -57,9 +57,9 @@ Two traps here, and both cost real time. Neither shows up as a normal test failu
 
 **The CT build cache is keyed by file name and survives a rename.** `playwright/.cache` holds `metainfo.json` and generated assets under the paths they had when built, and nothing invalidates them when you rename, move or delete a file the tier compiles. The build then fails resolving a module no source references — seen as `Could not resolve .../PrincipalFactorVerificationBadge` when every source file and the spec already said `IdentityFactorVerificationBadge`. **Clear `playwright/.cache` in the same change as the rename**; moving it aside with zero source edits turned a total build failure into a full run. One Vite build serves every spec, so a stale name takes down the whole tier, not one suite.
 
-## Repo-level integration (backend)
+## The contract tier (backend)
 
-- The BE integration suite lives with the **API client package** (`jest.config.integration.cjs`) and drives the **running** service through the API client — the same surface every real client uses. Run: service up, then `npx jest --config jest.config.integration.cjs --runInBand` from the client package.
+- The BE contract suite lives with the **API client package**, in `tests/contract/<mod>/*.contract.spec.ts` (`jest.config.contract.cjs`), and drives the **running** service through the generated client — the same surface every real client uses. Run: service up, then `npx nx run <client>:test:contract`. It fails when the service is unreachable, and its message names the command that starts it.
 - If the contract changed, regenerate the client from the live service **before** the suite — a stale API client tests the old surface.
 - **GET array commands have two wire forms** — test both `?ids=a` and `?ids=a&ids=b`.
 
@@ -95,7 +95,7 @@ Never leave mutated: the platform org and its policies, org-TYPE/GLOBAL auth/dat
 ```bash
 npx nx run-many -t test:unit --all   # every unit suite
 npx nx run <project>:test:unit       # one project
-npx nx run <client>:test:integration # the contract tier, against a live service
+npx nx run <client>:test:contract    # the contract tier, against a live service
 pnpm --filter <project> test unit    # the same, through the node's own script
 spnutils apps test journey <node>   # the sweep; --phase serialized and --phase window are separate runs
 npx tsc --noEmit --pretty false -p <project>/tsconfig.test.json   # a suite's own typecheck

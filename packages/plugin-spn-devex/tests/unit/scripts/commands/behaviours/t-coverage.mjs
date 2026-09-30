@@ -117,6 +117,53 @@ console.log("=== behaviour-coverage — tier by tier");
 }
 
 {
+  // A client's contract suite sits in tests/contract/, so a client with cases there and no run is unrun, not caseless.
+  const root = repo({ ...APPS, ...node("packages/client-api", "CLIENT_API"),
+    "packages/client-api/tests/contract/iam/login.contract.spec.ts": "// a case\n",
+    ...register(["IAM.LOGIN.01", "CONTRACT", "PLANNED"]) });
+  const contract = json(root).tiers.find((tier) => tier.tier === "CONTRACT");
+  ok("a CLIENT_API owes CONTRACT and its tests/contract/ cases count as carried",
+    contract?.owedBy.includes("packages/client-api") && !contract.noCase.includes("packages/client-api"), JSON.stringify(contract));
+}
+
+console.log("\n=== behaviour-coverage — one root journey run, credited to every application it drives");
+
+{
+  const root = repo({ ...APPS, "playwright.config.ts": "export default {};\n",
+    ...node("apps/web-a", "APP_WEB"), ...node("apps/web-b", "APP_WEB"), ...node("apps/web-c", "APP_WEB"),
+    "apps/web-a/tests/journeys/a.spec.ts": "test('[IAM.LOGIN.01] a person signs in', () => {});\n",
+    "tests/journeys/b.spec.ts": "import { ids } from '../../apps/web-b/src/test-data';\ntest('[IAM.LOGIN.02] a person signs up', () => {});\n",
+    "apps/web-c/tests/journeys/c.spec.ts": "test('[IAM.LOGIN.03] a person signs out', () => {});\n",
+    ...register(["IAM.LOGIN.01", "JOURNEY", "PLANNED"], ["IAM.LOGIN.02", "JOURNEY", "PLANNED"], ["IAM.LOGIN.03", "JOURNEY", "PLANNED"]),
+    ...artifact("apps/web-a", "JOURNEY", [["IAM.LOGIN.01", "SUCCESS"], ["IAM.LOGIN.02", "SUCCESS"]]) });
+  const journey = json(root).tiers.find((tier) => tier.tier === "JOURNEY");
+  ok("a root case reaching into an application's folder credits the root run to that application",
+    journey?.creditedTo.includes("apps/web-b") && !journey.unrunBy.includes("apps/web-b") && !journey.noCase.includes("apps/web-b"), JSON.stringify(journey));
+  ok("an application whose own journey ids the root run did not name stays unrun",
+    journey?.unrunBy.includes("apps/web-c") && !journey.creditedTo.includes("apps/web-c"), JSON.stringify(journey));
+}
+
+{
+  const root = repo({ ...APPS, ...node("apps/web-a", "APP_WEB"), ...node("apps/web-b", "APP_WEB"),
+    "apps/web-b/tests/journeys/b.spec.ts": "test('[IAM.LOGIN.01] a person signs in', () => {});\n",
+    ...register(["IAM.LOGIN.01", "JOURNEY", "PLANNED"]),
+    ...artifact(".", "JOURNEY", [["IAM.LOGIN.01", "SUCCESS"]]) });
+  const journey = json(root).tiers.find((tier) => tier.tier === "JOURNEY");
+  ok("an artifact at the repository root is a root run, credited to the application whose case it named",
+    journey?.creditedTo.includes("apps/web-b") && journey.state === "PARTIAL" && journey.noCase.includes("apps/web-a"), JSON.stringify(journey));
+}
+
+{
+  const root = repo({ ...APPS, ...node("apps/web-a", "APP_WEB"), ...node("apps/web-b", "APP_WEB"),
+    "apps/web-b/tests/journeys/b.spec.ts": "test('[IAM.LOGIN.01] a person signs in', () => {});\n",
+    ...register(["IAM.LOGIN.01", "JOURNEY", "PLANNED"]),
+    ...artifact("apps/web-a", "JOURNEY", [["IAM.LOGIN.01", "SUCCESS"]]) });
+  const journey = json(root).tiers.find((tier) => tier.tier === "JOURNEY");
+  ok("known-bad: with no root configuration, one application's run is never credited to another",
+    journey?.creditedTo.length === 0 && journey.unrunBy.includes("apps/web-b"), JSON.stringify(journey));
+}
+
+{
   const root = repo({ ...APPS, ...register(["IAM.LOGIN.01", "UNITT", "PLANNED"]) });
   const result = json(root);
   ok("a Tier no vocabulary declares is a named finding", result.findings.some((one) => one.message.includes('Tier "UNITT"')), JSON.stringify(result.findings));

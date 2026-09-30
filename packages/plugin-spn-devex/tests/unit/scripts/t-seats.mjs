@@ -1,7 +1,7 @@
 import { PLUGIN } from "../../helpers/harness.mjs";
 // The seat-shaped `docs` checks that are not their own command's whole file: the Proof join, the
 // Proof-carries-a-register-table refusal, `figures check`, a code file's own `// RESTATES:` header,
-// `findBook`, and `face` over a capability seat. `docs status` · `docs topics` · `docs coverage` each
+// `findBook`, and `face` over a capability seat. `docs status` · `docs topics` · `docs parity` each
 // moved to their own file beside this one (`N101` step 5) once the plugin ran through `cli.ts` — a
 // suite this size was one file only because `docs.ts` was one file too.
 import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, rmSync, existsSync } from "node:fs";

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/README.md",
-      "seen": "bb8d2f74"
+      "seen": "06a9c1e1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/README.md",
@@ -55,6 +55,7 @@
 - **A node may double a seam it owns, and nothing else.** That one rule decides where a case lives. A case reaching for a fake of something its node does not own is in the wrong repository, however green it runs.
 - **A module ships no shell, so it owes `UNIT` alone and cites the rest.** Its services need an application's configuration, resources and entries; its components need an application's providers, session and routing. A server module cites the composing application's `CONTRACT`, a web module cites its `JOURNEY`. A unit test may run in a browser where only paint can show the claim — that is still unit tier.
 - **An application owns both faces of every behavior it composes.** The API face through the published client at contract tier, the UI face in a browser at journey tier. Neither substitutes for the other: a hidden control in front of an open endpoint passes any test that looks at one alone.
+- **A service deploys no screen, so it owes no journey** (`RD.SUPPORT.APPS.135`). An `APP_SERVER` owes `CONTRACT` alone, proven through its published client against the live service. That client's suite (`CLIENT_API`) is the service's contract tier: it sits in `tests/contract/` and reports under `CONTRACT`, never `INTEGRATION`. A `SUPPORT_SERVER` owes `UNIT` and carries `INTEGRATION` where it fronts a resource. One journey run from the repository root is credited to every application whose surfaces it drives, so an application it drove is not a silent run.
 - **The workspace owns only what no single application can resolve** — a hand-off between two deployables, and nothing more.
 - **A support package owns the seam it invented**, so it proves every tier it reaches and may double at that seam. A library that creates runtimes proves a runtime can be created with it (`RD.SUPPORT.APPS.089`).
 - **Each claim is proven once, at the level that owns it** (`RD.SUPPORT.APPS.087`). A journey is never a slower copy of an answer the contract tier already gave.

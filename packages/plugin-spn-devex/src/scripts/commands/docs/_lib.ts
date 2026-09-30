@@ -6,7 +6,7 @@
 // The docs checks and builders themselves — every constant, reading helper and `check*` function the
 // `docs` group's actions call. A name starting with `_` is a shared-helper convention `cli.ts`
 // already skips when it discovers actions, so this file is never itself dispatched; `audit.ts`,
-// `face.ts`, `page.ts`, `status.ts`, `topics.ts` and `coverage.ts` each import what they need from
+// `face.ts`, `page.ts`, `status.ts`, `topics.ts` and `parity.ts` each import what they need from
 // here, and `figure.ts` imports `walkFiles` for its own `figures check|colour` wiring.
 //
 // Grades, per the N2 arc: RULE refuses, SOFT reports. N7 flips the SOFTs.
@@ -392,7 +392,7 @@ export function checkRealizationFile(file: string, src: string, block: any): Fin
  * THE CHECK THIS ARC WAS OPENED FOR: A GENERATED COLUMN IS READ AGAINST ITS OWN HEADING (N37 step 7).
  *
  * *Where it is stored* carried an environment variable on 64 rows and a status marker on 12, and
- * named a table on none of 252. `audit`, `face --check`, `topics` and `coverage` were all green over
+ * named a table on none of 252. `audit`, `face --check`, `topics` and `parity` were all green over
  * it, because each asked whether a document was well-formed and none asked whether a column meant
  * what its heading said. So every heading a generator writes has a reading of its values here, and
  * **a heading with no reading is itself a finding** — a column cannot ship without somebody saying
@@ -1241,7 +1241,7 @@ export function tablesIn(file: string, seg: string): string[][][] {
  * declared name anywhere inside the cell, or the cell anywhere inside a declared name, so
  * `docs/…/10-providers` resolved through `support` and *the estate declaration* through `estate` — loose
  * in the dangerous direction, because a cell that resolves to the wrong node reads as checked. `E`
- * removes the table the cell sits in, and the four set checks in `docs.ts coverage` compare whole paths.
+ * removes the table the cell sits in, and the four set checks in `docs parity` compare whole paths.
  *
  * ONE TABLE OR TWO, BOTH PASS. `E` leaves the rules table alone and takes the realization table out, and
  * the sweep that edits the 122 pages is a separate arc. Demanding two refuses every swept page; so the
@@ -2316,7 +2316,7 @@ export function statusFor(seat: string, workspace: string, write: boolean): Find
     // rolls up to PLANNING. No file means the derivation has no input at all, so it claims nothing
     // and names what is missing — silently stamping PLANNING would read as a measurement.
     findings.push({ check: "status", grade: "SOFT", file: seat,
-      message: "no behaviours file at this construct's own path, so nothing rolls up — \`${SEAT.behaviors}/\` mirrors \`${SEAT.constructs}/\` file for file, and `docs.ts coverage` reports the pair" });
+      message: "no behaviours file at this construct's own path, so nothing rolls up — \`${SEAT.behaviors}/\` mirrors \`${SEAT.constructs}/\` file for file, and `docs parity` reports the pair" });
     console.log(`unread   ${shown} — no behaviours file at the mirrored path`);
     return findings;
   }
@@ -2544,7 +2544,7 @@ export function pageFor(seat: string, workspace: string, templates: string, writ
   return findings;
 }
 
-// ------------------------------------------------- the topics check, and capability coverage
+// ------------------------------------------------- the topics check, and the parity checks
 
 /** A numbered document's topic name: `04-sign-in.md` is `sign-in`. Unnumbered files are not topics. */
 export function topicName(file: string): string | null {
@@ -2909,7 +2909,7 @@ export function personaCoverage(repo: string): Finding[] {
  * names a package passes on an empty seat; a check that every package has a chapter passes on a
  * repository with no packages. Only together do they say the seat and the code are the same shape.
  */
-export function coverageCheck(repo: string, workspace: string): Finding[] {
+export function parityCheck(repo: string, workspace: string): Finding[] {
   return [...pathParity(repo), ...capabilityMirror(repo, workspace), ...personaCoverage(repo)];
 }
 

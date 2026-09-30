@@ -40,7 +40,7 @@ This construct realizes the book's `01-devex/02-agent/01-agent`.
 | a finding | `Finding` | one thing a run found: which question raised it, its grade, the file, and what a reader should do |
 | the grade | `Grade` | how a finding is weighted — `RULE` refuses and `SOFT` reports |
 | the exit code | — | the count of refusals; a report alone leaves a run green |
-| a job | — | one named unit of work inside a tool, such as `audit`, `page`, `topics` or `coverage` |
+| a job | — | one named unit of work inside a tool, such as `audit`, `page`, `topics` or `parity` |
 | silence | — | the answer where the input a question needs is absent, which is a fact about the repository rather than a finding about it |
 
 ## Model

@@ -61,6 +61,13 @@ console.log("=== behaviours check — reaches the same judge as checks/behaviour
 }
 
 {
+  // A repository's one root journey run writes its artifact at the root or under the node that invoked it; both are read.
+  const { out, code } = run(repo([["IAM.LOGIN.01", "JOURNEY", "SUCCESS"]],
+    [{ node: ".", tier: "JOURNEY", results: [result("IAM.LOGIN.01", "JOURNEY", "FAILED")] }]));
+  ok("a root journey run's artifact is read and judged like any node's", code === 1 && out.includes("IAM.LOGIN.01") && out.includes("1 run(s) read"), out);
+}
+
+{
   const { out, code } = run(repo([], []));
   ok("a tree with no rows and no runs says it read nothing", code === 0 && out.includes("0 row(s)") && out.includes("0 run(s) read"), out);
 }

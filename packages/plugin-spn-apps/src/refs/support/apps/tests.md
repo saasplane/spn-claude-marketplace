@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-apps/06-tests.md",
-      "seen": "397660bc"
+      "seen": "dddeac86"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/",
-      "seen": "ccf95bc7"
+      "seen": "a821772a"
     }
   ]
 }
@@ -46,16 +46,18 @@ Derive the tier — never debate it. A project's kind fixes its consumer, and th
 | Kind | Owes | Why |
 | --- | --- | --- |
 | `SUPPORT_UNIVERSAL` | unit | runtime-free rules, proven under server unit regardless of which runtime later imports them |
-| `SUPPORT_SERVER` | unit · integration | integration where it fronts a real resource |
+| `SUPPORT_SERVER` | unit | it may **carry** integration where it fronts a real resource, and the kind does not owe it |
 | `SUPPORT_WEB` | unit · component | unit under a rendering harness, component in a real browser |
 | `MODULE_SERVER` | unit | ships no shell — its services need an application's configuration, resources and entries, so it cites the composing application's contract tier |
 | `MODULE_WEB` | unit | ships no shell on the other face — cites a journey of the composing application; may carry a component tier it does not owe, in `tests/component/`, with the scaffold's `playwright-ct.config.ts` (RD.SUPPORT.APPS.134) |
-| `APP_SERVER` | contract · journey | it is the runtime, so it owns the API face of every behaviour it composes |
+| `APP_SERVER` | contract | it is the runtime, so it owns the API face of every behaviour it composes · **no journey** — a journey is a person at a screen, and an `APP_SERVER` deploys none |
 | `APP_WEB` | journey · component | it is the runtime, so it owns the UI face — actions, states, refusals, whether a screen is offered |
 | `APP_UTILITY` | unit · integration | integration is the invoked command, end to end |
-| `CLIENT_API` | integration | against a running service — this suite **is** that service's contract tier |
+| `CLIENT_API` | contract | against a running service — the suite is its service's contract tier, sits in `tests/contract/` (the only kind that carries that folder, laid out by the service's modules), and reports under that name |
 
 **Read the owed set as a floor, never a ceiling.** A node carrying more than it owes is correct rather than in breach, and the tiers a node can actually run are the tiers it has cases for — if you derive from the ladder alone and delete a working suite that went beyond it, you have deleted proof the project actually had. **A tier declared with no cases behind it is a finding, not a pass.** A target naming a tier the node holds no cases for reports green every run, and every row resting on that tier reads as covered when it is not — either the node owes those cases and nobody wrote them, or the tier was declared by copying a sibling; the first is a gap, the second is a deletion, and neither is served by a green tick.
+
+**One journey run can meet several applications' journey tier.** Where a repository runs its journeys from one configuration at its root, that run's artifact is credited to every application whose surfaces its cases drive. An application's owed journey tier is met by that run, and a gate looks for the artifact where the run wrote it, not beside each application. The plugin's readers (`behaviours coverage`, and the tests report built from it) know a root run by a `playwright.config.*` at the repository root, or by an artifact at the root itself. Such a run drives an `APP_WEB` when an id it named at `JOURNEY` is written in one of that application's journey files. That file is a case beside the application, or a root case that reaches into its folder by path. `behaviours check` and `behaviours stamp` read every artifact under the root, so a root run's results reach the rows wherever the run wrote them.
 
 A repository root declares no kind, so a run asked from there collects only the scenarios that cross two deployables — the workspace's own cases are what no single application can resolve, such as signing in on one application and acting inside another.
 
@@ -157,7 +159,7 @@ A title of the id alone hands a reader in a pipeline an identifier and no way to
 
 ## Coverage: what a release-gating sweep must reach
 
-A percentage is not the answer — it moves when a case is added and says nothing about which case. **What a route owes is read from the behaviour rows that claim it.** An action is an interaction whichever way it is reached: a person reaches it through a browser, another system reaches it through the published client, so the published surface *is* the behaviour surface and a row is what both answer to.
+A percentage is not the answer — it moves when a case is added and says nothing about which case. What this section measures is the proved side of a repository's coverage: the `tests` report shows it row by row, and the `coverage` report sets it beside what is written and what is built, per package, per app and for the repository. **What a route owes is read from the behaviour rows that claim it.** An action is an interaction whichever way it is reached: a person reaches it through a browser, another system reaches it through the published client, so the published surface *is* the behaviour surface and a row is what both answer to.
 
 | Surface | Driven by | Proven at |
 | --- | --- | --- |

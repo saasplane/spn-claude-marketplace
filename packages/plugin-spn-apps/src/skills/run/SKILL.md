@@ -121,7 +121,7 @@ development bundle from a production one instead of guessing.
 | unit tests, one project | `npx nx run <p>:test:unit` |
 | unit tests, everywhere | `npx nx run-many -t test:unit --all` |
 | check everything | `npx nx run-many -t check --all` |
-| the contract suite | `npx nx run <client>:test:integration` |
+| the contract suite | `npx nx run <client>:test:contract` |
 | rebuild after a contract change | `pnpm --filter <client> codegen api-client` then `npx nx run-many -t build --all` |
 
 ## The four things nx does not own
@@ -247,11 +247,11 @@ npx nx run-many -t build -p '<touched>'   # the service for BE, ui packages / we
 npx nx run-many -t test --all            # every unit suite
 ```
 
-**BE integration** (drives the running service through the API client):
+**BE contract** (drives the running service through the API client):
 
 1. Service up with migrations applied (mode local, steps 1-5).
 2. If the contract changed since the client was generated: regenerate the client from the live service first.
-3. `npx nx run <client>:test:integration` — the target already carries the config and `--runInBand`.
+3. `npx nx run <client>:test:contract` — the target already carries `jest.config.contract.cjs` and `--runInBand`, and it fails when the service is unreachable, naming the command that starts it.
 
 **FE journeys**: `pnpm build test` → `pnpm start` → `spnutils apps test journey <node>`, then `--phase serialized` and `--phase window` where the node carries those cases — after the BE suite, on a quiesced stack (no concurrent resets/builds), with the stack seeded.
 

@@ -89,10 +89,11 @@ description: What proves a behaviour, at which tier, and what a passing suite do
 
 | The project is | Its consumer is | It owes |
 | --- | --- | --- |
-| A support package | Modules and apps | Every tier it reaches — unit, integration wherever it fronts a real resource, component where it owns web components. It invented its own seam, so it may double there |
+| A support package | Modules and apps | Unit, and component where it owns web components. It **carries** integration wherever it fronts a real resource, and the kind does not owe it. It invented its own seam, so it may double there |
 | A domain module | The composing application | **Unit alone.** It ships no shell, so a server module **cites** the composing application's contract and a web module **cites** its journey |
-| An application | People and other systems | **Both faces of what it composes** — contract through its entries, and journeys over its own surfaces |
-| An API client | Other systems | Integration against a running service — this **is** that service's contract tier |
+| A service application | Other systems, and the web applications that put it in front of people | **Contract** through its entries, and **no journey** — a journey is a person at a screen, and a service deploys none |
+| A web application | People | **Journeys** over its own surfaces, and **component** for its shell components. One journey run from the repository root is credited to every application whose surfaces it drives |
+| An API client | Other systems | **Contract** against a running service — its suite **is** that service's contract tier, sits in `tests/contract/`, and reports under that name |
 | A command-line tool | Operators and pipelines | Unit · integration of the invoked command |
 | The workspace | — | **Only what no single application can resolve** — a hand-off between two deployables, and nothing else |
 
@@ -191,7 +192,7 @@ node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs behaviours check .                    
 node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs behaviours coverage --json .          # the tests report's measurement
 ```
 
-The writer stamps a row only from a result at the row's own `Tier`, never writes over `MANUAL`, and leaves a row nothing named alone unless `--reach repository` says the artifacts are the whole of their tiers. It reads a register by its headings, so an eight-, nine- or ten-cell row is stamped alike. A stack's plugin adds what knows the stack — where a case lives, for the join.
+The writer stamps a row only from a result at the row's own `Tier`, never writes over `MANUAL`, and leaves a row nothing named alone unless `--reach repository` says the artifacts are the whole of their tiers. It reads a register by its headings, so an eight-, nine- or ten-cell row is stamped alike. A repository's one root journey run is read wherever it wrote its artifact. The measurement credits that run to every web application whose journey cases it named, so an application it drove is not reported as unrun (`RD.SUPPORT.APPS.135`). A stack's plugin adds what knows the stack — where a case lives, for the join.
 
 ## Code coverage is reported, never enforced
 

@@ -38,20 +38,20 @@ Then:
 
 ## Target: one of the supported kinds
 
-**A kind decides its test folders, so nothing is chosen when you scaffold.** `unit/` and `integration/` mirror `src/` path for path; `fixtures/`, `helpers/` and `setup/` are flat siblings any kind adds when it needs them. A folder a kind does not carry is not an omission to fill in.
+**A kind decides its test folders, so nothing is chosen when you scaffold.** `unit/` and `integration/` mirror `src/` path for path. A `CLIENT_API`'s `contract/` follows the service's modules, since those are what it drives. `fixtures/`, `helpers/` and `setup/` are flat siblings any kind adds when it needs them. A folder a kind does not carry is not an omission to fill in. (● where the tier exists, ○ if used.)
 
-| Kind | `unit/` | `component/` | `integration/` | journeys |
-| --- | :--: | :--: | :--: | :--: |
-| `TOOLCHAIN` | ● (`node:test`, mirrors `src/`) | — | — | — |
-| `SUPPORT_UNIVERSAL` | ● | — | — | — |
-| `SUPPORT_SERVER` | ● | — | ● | — |
-| `SUPPORT_WEB` | ● | ● | — | — |
-| `MODULE_SERVER` | ● | — | — | — |
-| `MODULE_WEB` | ● (jsdom, and a browser where only paint shows it) | — | — | cited from the composing app |
-| `APP_SERVER` | ● | — | ● | — |
-| `APP_WEB` | ● | ○ | — | ● over its own surfaces |
-| `CLIENT_API` | ● | — | ● (contract) | — |
-| `APP_UTILITY` | ● | — | ● | — |
+| Kind | `unit/` | `component/` | `integration/` | `contract/` | journeys |
+| --- | :--: | :--: | :--: | :--: | :--: |
+| `TOOLCHAIN` | ● (`node:test`, mirrors `src/`) | — | — | — | — |
+| `SUPPORT_UNIVERSAL` | ● | — | — | — | — |
+| `SUPPORT_SERVER` | ● | — | ○ | — | — |
+| `SUPPORT_WEB` | ● | ● | — | — | — |
+| `MODULE_SERVER` | ● | — | — | — | — |
+| `MODULE_WEB` | ● (jsdom, and a browser where only paint shows it) | — | — | — | cited from the composing app |
+| `APP_SERVER` | ● | — | ● | — | — |
+| `APP_WEB` | ● | ● | — | — | ● over its own surfaces |
+| `CLIENT_API` | ● | — | — | ● | — |
+| `APP_UTILITY` | ● | — | ● | — | — |
 
 **A domain module ships no shell, so it proves at unit and cites the application above it.** A server module cites the composing application's contract suite; a web module cites its journey. **An application owns both faces of what it composes**: the API face through its published client, the UI face in a browser. Neither substitutes for the other.
 

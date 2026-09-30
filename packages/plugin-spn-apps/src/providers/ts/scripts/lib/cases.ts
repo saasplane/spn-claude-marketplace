@@ -9,7 +9,6 @@
 import { dirname, join, relative } from "node:path";
 import { idsIn } from "../../../../../../plugin-support-lib/src/lib/register.ts";
 import { walk } from "../../../../../../plugin-support-lib/src/lib/runs.ts";
-import { owedBy } from "../../../../../../plugin-support-lib/src/lib/kinds.ts";
 import { read } from "../../../../scripts/lib/source.ts";
 
 /** One case title citing one behaviour id. */
@@ -20,6 +19,7 @@ const TIER_FOLDERS: ReadonlyArray<{ tier: string; folder: string; match: RegExp 
   { tier: "UNIT", folder: "/tests/unit/", match: /\.spec\.(tsx?|mjs)$/ },
   { tier: "COMPONENT", folder: "/tests/component/", match: /\.ct\.spec\.tsx$/ },
   { tier: "INTEGRATION", folder: "/tests/integration/", match: /\.int\.(spec|test)\.tsx?$/ },
+  { tier: "CONTRACT", folder: "/tests/contract/", match: /\.contract\.spec\.tsx?$/ },
   { tier: "JOURNEY", folder: "/tests/journeys/", match: /\.spec\.tsx?$/ },
 ];
 
@@ -44,15 +44,16 @@ function kindAbove(file: string, root: string): string | null {
 /**
  * The tier a case file sits at, or null for a file no runner collects.
  *
- * `tests/integration/` holds both the integration and the contract tier; the node's kind says which
- * one it means, and a kind owing neither means integration.
+ * A `CLIENT_API`'s contract suite sits in `tests/contract/`. An `APP_SERVER`'s `tests/integration/`
+ * run reports under `CONTRACT`, the tier its kind owes, so its cases are read at that tier; every
+ * other kind's `tests/integration/` is the integration tier.
  */
 function tierOf(file: string, root: string): string | null {
   const shown = file.split("\\").join("/");
   const found = TIER_FOLDERS.find((one) => shown.includes(one.folder) && one.match.test(shown));
   if (!found) return null;
   if (found.tier !== "INTEGRATION") return found.tier;
-  return owedBy(kindAbove(file, root)).includes("CONTRACT") ? "CONTRACT" : "INTEGRATION";
+  return kindAbove(file, root) === "APP_SERVER" ? "CONTRACT" : "INTEGRATION";
 }
 
 /** Every case under the root whose title cites a behaviour id, one entry per id cited. */

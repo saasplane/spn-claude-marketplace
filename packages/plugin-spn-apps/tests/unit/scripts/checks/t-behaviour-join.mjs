@@ -75,6 +75,14 @@ console.log("\n=== behaviour-join — what it passes");
 }
 
 {
+  const { out, code } = run(repo([["IAM.LOGIN.01", "SUCCESS"]], {
+    "packages/client-api/spkind.json": '{"kind":"CLIENT_API","config":{"mtype":"CLIENT_API"}}',
+    "packages/client-api/tests/contract/iam/login.contract.spec.ts": spec("[IAM.LOGIN.01] a person signs in"),
+  }));
+  ok("a CLIENT_API's contract case in tests/contract/ cites the row it names", code === 0 && out.includes("1 id(s) cited"), out);
+}
+
+{
   const { code } = run(repo([["IAM.LOGIN.01", "SUCCESS"]], {
     [CASE]: "it.skip('[IAM.LOGIN.01] a person signs in', () => {});\n",
   }));

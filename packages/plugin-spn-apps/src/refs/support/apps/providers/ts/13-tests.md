@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/13-tests.md",
-      "seen": "d06123cd"
+      "seen": "db4b073d"
     }
   ]
 }
@@ -28,7 +28,9 @@
 
 **Only Jest typechecks as it runs.** A type error that Jest would catch passes silently under the other runners, so a server package's red is not reproducible by running the web suite.
 
-**An integration case skips itself when its service is unreachable**, and a skipped case proves nothing. Read the count, not the colour — and remember that a line reporter drops the artifacts that say *which* case skipped.
+**The contract tier runs from the service's `CLIENT_API` package.** Its cases sit in `tests/contract/<mod>/*.contract.spec.ts`, laid out by the service's modules, and drive the generated client against a running service. `jest.config.contract.cjs` collects them, and the `test:contract` target runs them, which Nx never caches. `tests/integration/` holds resource-backed cases only.
+
+**A contract case fails when its service is unreachable**, and its message names the command that starts the service. A suite that returned early read as a pass and stamped rows nothing had run. Read the count, not the colour — and remember that a line reporter drops the artifacts that say *which* case skipped.
 
 **A case declares what it flips with `SPTestMutationScopeType` from `@saasplane/toolchain-ts/contract`**, and writes the tag with `mutationTag` from `@saasplane/toolchain-ts/test/axes.mjs` — the same module the phase configurations select by. A platform declares no scope of its own.
 

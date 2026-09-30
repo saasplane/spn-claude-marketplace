@@ -20,7 +20,7 @@ The folder divides by what calls each file. `events/` holds the one process the 
 | What a run cost | `packages/plugin-support-lib/src/lib/timing.ts` | written only while the developer has asked for it, and never able to fail a gate |
 | The restatement hash | `packages/plugin-spn-apps/src/scripts/lib/stamp.ts` | the `seen` value, spelled once per plugin and required to agree with the other copy |
 | What a register is | `packages/plugin-support-lib/src/lib/register.ts` | the headings a register carries, each column found by its heading, one copy in the shared support folder that every plugin reading a register imports |
-| The tiers each kind owes | `packages/plugin-support-lib/src/lib/kinds.ts` | the book's table of kind and owed tier, which tells a contract case from an integration one |
+| The tiers each kind owes | `packages/plugin-support-lib/src/lib/kinds.ts` | the book's table of kind and owed tier; a contract case is told from an integration one by its folder, `tests/contract/`, and by an `APP_SERVER`'s `tests/integration/` reporting under the tier its kind owes |
 | What a run left behind | `packages/plugin-support-lib/src/lib/runs.ts` | the walk the case reader uses, one copy in the shared support folder |
 | The join check | `packages/plugin-spn-apps/src/scripts/checks/behaviour-join.ts` | every row against every case title, in both directions |
 | The package table | `packages/plugin-spn-apps/src/scripts/commands/library/catalogue.ts` | writes the list of published packages a node may depend on |

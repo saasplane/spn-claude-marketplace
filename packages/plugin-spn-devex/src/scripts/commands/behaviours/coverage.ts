@@ -13,7 +13,7 @@ import { withOffset } from "../../lib/clock.ts";
 import { readdirSync, statSync } from "node:fs";
 import { basename, join, relative, resolve } from "node:path";
 import { DOCS, reportsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { declaredRows } from "../../../../../plugin-support-lib/src/lib/register.ts";
+import { declaredRows, idsIn } from "../../../../../plugin-support-lib/src/lib/register.ts";
 import { owedBy, TIERS } from "../../../../../plugin-support-lib/src/lib/kinds.ts";
 import { artifactPaths, newest, read, readArtifact, worst } from "../../../../../plugin-support-lib/src/lib/runs.ts";
 import type { Run } from "../../../../../plugin-support-lib/src/lib/runs.ts";
@@ -89,13 +89,20 @@ export function foundationAbsence(root: string): Record<string, unknown> | null 
   return { ...measured, digest: digestOf(measured), report: null };
 }
 
-/** Where a tier's cases sit under a node's `tests/`, and the file names that count as one. */
-const CASE_FOLDERS: Record<string, { folder: string; match: RegExp }> = {
-  UNIT: { folder: "unit", match: /\.(spec|test)\.tsx?$/ },
-  COMPONENT: { folder: "component", match: /\.ct\.spec\.tsx?$/ },
-  INTEGRATION: { folder: "integration", match: /\.int\.(spec|test)\.tsx?$/ },
-  CONTRACT: { folder: "integration", match: /\.int\.(spec|test)\.tsx?$/ },
-  JOURNEY: { folder: "journeys", match: /\.spec\.tsx?$/ },
+/**
+ * Where a tier's cases sit under a node's `tests/`, and the file names that count as one. A
+ * `CLIENT_API`'s contract suite sits in `contract/`; an `APP_SERVER`'s `integration/` run reports
+ * under `CONTRACT`, the tier its kind owes, so it is read there for that kind alone.
+ */
+const CASE_FOLDERS: Record<string, ReadonlyArray<{ folder: string; match: RegExp; kind?: string }>> = {
+  UNIT: [{ folder: "unit", match: /\.(spec|test)\.tsx?$/ }],
+  COMPONENT: [{ folder: "component", match: /\.ct\.spec\.tsx?$/ }],
+  INTEGRATION: [{ folder: "integration", match: /\.int\.(spec|test)\.tsx?$/ }],
+  CONTRACT: [
+    { folder: "contract", match: /\.contract\.spec\.tsx?$/ },
+    { folder: "integration", match: /\.int\.(spec|test)\.tsx?$/, kind: "APP_SERVER" },
+  ],
+  JOURNEY: [{ folder: "journeys", match: /\.spec\.tsx?$/ }],
 };
 
 /**
@@ -112,15 +119,62 @@ export function carrierOf(node: string): { carrier: string; scope: string } {
 
 /** Whether a node carries at least one case for this tier, on disk. */
 export function carriesCase(node: string, tier: string): boolean {
-  const surface = CASE_FOLDERS[tier];
-  if (surface === undefined) return false;
   const { carrier, scope } = carrierOf(node);
-  const folder = join(carrier, "tests", surface.folder, scope);
-  if (!isDir(folder)) return false;
+  const kind = kindOf(carrier);
+  return (CASE_FOLDERS[tier] ?? []).some((surface) => {
+    if (surface.kind !== undefined && surface.kind !== kind) return false;
+    const folder = join(carrier, "tests", surface.folder, scope);
+    if (!isDir(folder)) return false;
+    try {
+      return readdirSync(folder, { recursive: true, withFileTypes: true })
+        .some((entry) => entry.isFile() && surface.match.test(entry.name));
+    } catch { return false; }
+  });
+}
+
+/** A journey configuration at the repository root: `playwright.config.ts` and its phase files, never `playwright-ct`. */
+const ROOT_JOURNEY_CONFIG = /^playwright(\.[a-z]+)?\.config\.(ts|mts|cts|js|mjs|cjs)$/;
+
+/** Every journey case file under a folder's `tests/journeys/`. */
+const journeyFiles = (folder: string): string[] => {
+  const dir = join(folder, "tests", "journeys");
+  if (!isDir(dir)) return [];
   try {
-    return readdirSync(folder, { recursive: true, withFileTypes: true })
-      .some((entry) => entry.isFile() && surface.match.test(entry.name));
-  } catch { return false; }
+    return readdirSync(dir, { recursive: true, withFileTypes: true })
+      .filter((entry) => entry.isFile() && CASE_FOLDERS.JOURNEY[0].match.test(entry.name))
+      .map((entry) => join(entry.parentPath, entry.name));
+  } catch { return []; }
+};
+
+/**
+ * The web applications a repository's one root journey run drives (RD.SUPPORT.APPS.135).
+ *
+ * A repository runs its journeys from one root configuration when a `playwright.config.*` sits at its
+ * root, or when a journey artifact sits at the root itself. That run writes its artifact under
+ * whichever node invoked it, and it collects every journey in the repository. It drives an
+ * `APP_WEB` when an id the run named at `JOURNEY` is written in one of that application's journey
+ * files: a case file beside it (`<app>/tests/journeys/`), or a root case file (`tests/journeys/`)
+ * that reaches into the application's own folder by path, the way a case imports the test handles
+ * a screen carries. Both are read from files that already exist; nothing new is declared.
+ */
+export function drivenByRootRun(root: string, nodes: string[], runsByNode: Map<string, Run[]>): string[] {
+  const nameOf = (node: string): string => relative(root, node).split("\\").join("/") || ".";
+  let rootConfig = false;
+  try { rootConfig = readdirSync(root).some((entry) => ROOT_JOURNEY_CONFIG.test(entry)); } catch { rootConfig = false; }
+  const journeyRuns = [...runsByNode.entries()]
+    .filter(([name]) => rootConfig || name === ".")
+    .flatMap(([, found]) => found.filter((run) => run.tiers.includes("JOURNEY")));
+  if (journeyRuns.length === 0) return [];
+  const named = new Set(journeyRuns.flatMap((run) => run.results.filter((result) => result.tier === "JOURNEY").map((result) => result.id)));
+  const rootCases = journeyFiles(root).map((file) => read(file) ?? "");
+  return nodes
+    .filter((node) => node !== root && kindOf(node) === "APP_WEB")
+    .filter((node) => {
+      const reach = `${nameOf(node)}/`;
+      const texts = [...journeyFiles(node).map((file) => read(file) ?? ""), ...rootCases.filter((text) => text.includes(reach))];
+      return texts.some((text) => idsIn(text).some((id) => named.has(id)));
+    })
+    .map(nameOf);
 }
 
 /** The measurement for one repository. */
@@ -148,6 +202,7 @@ export function measure(root: string): Record<string, unknown> {
     runsByNode.set(nameOf(node), found);
   }
   const allRuns = [...runsByNode.values()].flat();
+  const driven = drivenByRootRun(root, nodes, runsByNode);
   const owedByNode = new Map(nodes.map((node) => [nameOf(node), owedBy(kindOf(node))]));
 
   const measurable = declared.filter((row) => {
@@ -195,6 +250,8 @@ export function measure(root: string): Record<string, unknown> {
   const tiers = TIERS.filter((tier) => tierSet.has(tier)).map((tier) => {
     const owedByNames = [...owedByNode.entries()].filter(([, owed]) => owed.includes(tier)).map(([name]) => name);
     const ranBy = [...runsByNode.entries()].filter(([, found]) => found.some((run) => run.tiers.includes(tier))).map(([name]) => name);
+    // A repository's one root journey run meets the journey tier of every application it drives.
+    const creditedTo = tier === "JOURNEY" ? driven.filter((name) => !ranBy.includes(name)) : [];
     const nodeOf = new Map(nodes.map((node) => [nameOf(node), node]));
     // A module an application owns is proved by the application's run, where its cases execute.
     const ranThrough = (name: string): boolean => {
@@ -203,7 +260,7 @@ export function measure(root: string): Record<string, unknown> {
       const { carrier, scope } = carrierOf(node);
       return scope !== "" && ranBy.includes(nameOf(carrier)) && carriesCase(node, tier);
     };
-    const pending = owedByNames.filter((name) => !ranBy.includes(name) && !ranThrough(name));
+    const pending = owedByNames.filter((name) => !ranBy.includes(name) && !creditedTo.includes(name) && !ranThrough(name));
     // Owed and never written is a different gap from written and never run, and it takes different work.
     const noCase = pending.filter((name) => { const node = nodeOf.get(name); return node !== undefined && !carriesCase(node, tier); });
     const unrunBy = pending.filter((name) => !noCase.includes(name));
@@ -226,7 +283,7 @@ export function measure(root: string): Record<string, unknown> {
             `unproved until a node carrying this tier runs it with ${command}.`
           : `no node that owes it has left a run artifact (owed by ${owedByNames.join(" · ")}), so its ${rowCount} ` +
             `row(s) are unproved, not failing. ${command} leaves one.`;
-    return { tier: tier, state: state, owedBy: owedByNames, unrunBy: unrunBy, noCase: noCase, runs: runs, rows: rowCount, reason: reason };
+    return { tier: tier, state: state, owedBy: owedByNames, unrunBy: unrunBy, noCase: noCase, creditedTo: creditedTo, runs: runs, rows: rowCount, reason: reason };
   });
 
   const ranAt = newest(allRuns);
@@ -251,7 +308,8 @@ export function describeResult(result: Record<string, any>): string[] {
     (result.measuredAt === null ? "no run artifact on disk" : `newest run ${result.measuredAt}`),
   ];
   for (const tier of result.tiers) {
-    const ran = tier.runs.length === 0 ? "" : ` · ${tier.runs.length} artifact(s)`;
+    const ran = (tier.runs.length === 0 ? "" : ` · ${tier.runs.length} artifact(s)`) +
+      (tier.creditedTo.length === 0 ? "" : ` · the root run credited to ${tier.creditedTo.join(" · ")}`);
     lines.push(`  ${tier.tier.padEnd(11)} ${tier.state.padEnd(7)} ${tier.rows} row(s)${ran}` +
       (tier.reason === null ? "" : ` — ${tier.state === "NOT_RUN" ? "not run: " : ""}${tier.reason}`));
   }
