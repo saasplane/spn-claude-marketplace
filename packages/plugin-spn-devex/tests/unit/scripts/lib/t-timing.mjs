@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { LIB } from "../../../helpers/harness.mjs";
 import { workspace } from "../../../helpers/fixture.mjs";
-import { tagsOf } from "../../../../src/scripts/lib/timing.ts";
+import { tagsOf, commandFacts } from "../../../../src/scripts/lib/timing.ts";
 import { WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 let total = 0, failed = 0;
@@ -72,6 +72,24 @@ console.log("\n=== the writer — the tags reach the line");
   same("every line carries the four fields", lines.every((l) => "workstream" in l && "arc" in l && "order" in l && "agent" in l), true);
   same("with the call's work and agent", [first.workstream, first.arc, first.order, first.agent, first.session],
     ["008-plain-language", "N116", null, "ag1", "s1"]);
+}
+
+
+console.log("=== commandFacts — a command run through the shell has no hook payload");
+{
+  const saved = { id: process.env.CLAUDE_CODE_SESSION_ID, old: process.env.CLAUDE_SESSION_ID, cwd: process.cwd() };
+  process.env.CLAUDE_CODE_SESSION_ID = "sess-42";
+  delete process.env.CLAUDE_SESSION_ID;
+  const facts = commandFacts(["audit", `${WS}/notes/N120/orders/B1-marketplace-coverage.md`]);
+  same("the session comes from CLAUDE_CODE_SESSION_ID, the variable Claude Code exports", facts.session, "sess-42");
+  same("the work comes from the command's own arguments", [facts.workstream, facts.arc, facts.order],
+    ["008-plain-language", "N120", "B1-marketplace-coverage"]);
+  same("a command's line is marked as one", [facts.event, facts.tool], ["command", null]);
+  delete process.env.CLAUDE_CODE_SESSION_ID;
+  same("no session exported reads as null, never a guess", commandFacts(["audit", "docs"]).session, null);
+  same("a command touching no workstream path carries null tags", commandFacts(["audit", "docs"]).workstream, null);
+  if (saved.id !== undefined) process.env.CLAUDE_CODE_SESSION_ID = saved.id;
+  if (saved.old !== undefined) process.env.CLAUDE_SESSION_ID = saved.old;
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — timing` : `\n  all ${total} passed — timing`);

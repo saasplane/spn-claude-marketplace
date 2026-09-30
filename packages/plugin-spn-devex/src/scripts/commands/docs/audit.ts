@@ -11,7 +11,7 @@
 
 import { statSync } from "node:fs";
 import { basename, resolve, relative } from "node:path";
-import { begin, record, end } from "../../lib/timing.ts";
+import { begin, record, end, commandFacts } from "../../lib/timing.ts";
 import { audit, gapReport, resolveWorkspace, walkFiles } from "./_lib.ts";
 
 export const describe = "the invariants a page must hold, over one path or many — the whole audit, plus --report's gap scan";
@@ -50,7 +50,7 @@ function body(args: string[], workspace: string): number {
 export function run(args: string[]): number {
   const workspace = resolveWorkspace();
   const startedAt = performance.now();
-  begin({ event: process.env.CLAUDE_HOOK_EVENT ?? "command", tool: null, session: process.env.CLAUDE_SESSION_ID ?? null }, workspace);
+  begin(commandFacts(args), workspace);
   const code = body(args, workspace);
   record("docs-audit", performance.now() - startedAt);
   end();

@@ -19,7 +19,7 @@ import { existsSync, readFileSync, statSync } from "node:fs";
 import { basename, dirname, extname, join, relative, resolve } from "node:path";
 import { checkFigures, colour, stripSpans } from "../../lib/figures.ts";
 import { draw } from "../../lib/draw.ts";
-import { begin, record, end } from "../../lib/timing.ts";
+import { begin, record, end, commandFacts } from "../../lib/timing.ts";
 import { resolveWorkspace, walkFiles } from "./_lib.ts";
 
 export const describe = "figure check|colour: a spec's own geometry against the page · figure <path…>: what a browser paints";
@@ -231,7 +231,7 @@ async function renderCli(files: string[]): Promise<number> {
 export async function run(args: string[]): Promise<number> {
   const workspace = resolveWorkspace();
   const startedAt = performance.now();
-  begin({ event: process.env.CLAUDE_HOOK_EVENT ?? "command", tool: null, session: process.env.CLAUDE_SESSION_ID ?? null }, workspace);
+  begin(commandFacts(args), workspace);
   const [sub, ...rest] = args;
   const code = sub === "check" || sub === "colour"
     ? geometryCli(sub, rest, workspace)

@@ -7,7 +7,7 @@
 //   spn-devex docs face <docs-tree> [--check]
 
 import { basename, relative, resolve } from "node:path";
-import { begin, record, end } from "../../lib/timing.ts";
+import { begin, record, end, commandFacts } from "../../lib/timing.ts";
 import { face, resolveWorkspace } from "./_lib.ts";
 
 export const describe = "write what is generated, between markers — the domain glossary, the maps, the tag lines";
@@ -22,7 +22,7 @@ function body(args: string[], workspace: string): number {
 export function run(args: string[]): number {
   const workspace = resolveWorkspace();
   const startedAt = performance.now();
-  begin({ event: process.env.CLAUDE_HOOK_EVENT ?? "command", tool: null, session: process.env.CLAUDE_SESSION_ID ?? null }, workspace);
+  begin(commandFacts(args), workspace);
   const code = body(args, workspace);
   record("docs-face", performance.now() - startedAt);
   end();

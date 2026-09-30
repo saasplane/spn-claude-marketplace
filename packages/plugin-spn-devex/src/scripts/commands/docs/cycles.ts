@@ -16,7 +16,7 @@ import { basename, dirname, join, resolve } from "node:path";
 import { STATUSES } from "../../checks/arc-status.ts";
 import { isDir, isFile, listdir, read, workspaceRoot } from "../../lib/payload.ts";
 import { WORKSTREAM_STATES, workstreamsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { begin, end, record } from "../../lib/timing.ts";
+import { begin, end, record, commandFacts } from "../../lib/timing.ts";
 
 export const describe = "print a workstream's Cycles table from its arcs — one row per arc, with its status";
 
@@ -204,7 +204,7 @@ function body(args: string[], workspace: string | null): number {
 export function run(args: string[]): number {
   const workspace = process.env.SPN_WORKSPACE ?? workspaceRoot(process.cwd());
   const startedAt = performance.now();
-  begin({ event: process.env.CLAUDE_HOOK_EVENT ?? "command", tool: null, session: process.env.CLAUDE_SESSION_ID ?? null }, workspace ?? undefined);
+  begin(commandFacts(args), workspace ?? undefined);
   const code = body(args, workspace);
   record("docs-cycles", performance.now() - startedAt);
   end();

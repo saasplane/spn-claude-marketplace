@@ -7,7 +7,7 @@
 //   spn-devex docs parity <repo…>
 
 import { basename, relative, resolve } from "node:path";
-import { begin, record, end } from "../../lib/timing.ts";
+import { begin, record, end, commandFacts } from "../../lib/timing.ts";
 import { parityCheck, resolveWorkspace } from "./_lib.ts";
 
 export const describe = "the parity checks — the two seats pair, a chapter folder names a package, a Who names a persona";
@@ -25,7 +25,7 @@ function body(args: string[], workspace: string): number {
 export function run(args: string[]): number {
   const workspace = resolveWorkspace();
   const startedAt = performance.now();
-  begin({ event: process.env.CLAUDE_HOOK_EVENT ?? "command", tool: null, session: process.env.CLAUDE_SESSION_ID ?? null }, workspace);
+  begin(commandFacts(args), workspace);
   const code = body(args, workspace);
   record("docs-parity", performance.now() - startedAt);
   end();

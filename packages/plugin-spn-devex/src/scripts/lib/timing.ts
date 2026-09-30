@@ -100,6 +100,19 @@ export function tagsOf(payload: { tool_input?: unknown; cwd?: string; agent_id?:
   } catch { return none; }
 }
 
+/**
+ * The facts a command's line carries. A command is run by the agent through the shell, so it has no
+ * hook payload: its session comes from `CLAUDE_CODE_SESSION_ID`, the variable Claude Code exports to
+ * every command it runs, and its workstream, arc and order from the paths in its own arguments and the
+ * folder it runs in, read by the same `tagsOf` a hook uses. Never throws.
+ */
+export function commandFacts(args: string[]): Record<string, unknown> {
+  const session = process.env.CLAUDE_CODE_SESSION_ID || null;
+  let tags: WorkTags = { workstream: null, arc: null, order: null, agent: null };
+  try { tags = tagsOf({ tool_input: { command: args.join(" ") }, cwd: process.cwd() }); } catch { /* ignore */ }
+  return { event: process.env.CLAUDE_HOOK_EVENT ?? "command", tool: null, session, ...tags };
+}
+
 /** Arm the recorder. Touches no filesystem beyond the walk, and never throws. */
 export function begin(facts: Record<string, unknown> = {}, start?: string): void {
   try {
