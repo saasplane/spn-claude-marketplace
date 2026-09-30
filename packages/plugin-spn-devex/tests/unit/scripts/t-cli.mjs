@@ -32,7 +32,7 @@ async function capture(argv) {
 console.log("=== cli — real groups and actions this plugin ships");
 {
   const gs = groups();
-  ok("every group this plugin ships is discovered", ["behaviours", "docs", "plugin", "restates"].every((g) => gs.includes(g)), gs.join(","));
+  ok("every group this plugin ships is discovered", ["behaviours", "coverage", "docs", "plugin", "restates"].every((g) => gs.includes(g)), gs.join(","));
   const docsActions = actionsOf("docs");
   ok("a group's actions are its files, not a hand-kept list", docsActions.includes("audit") && docsActions.includes("coherence"));
   ok("`docs cycles` is an action because its file exists", docsActions.includes("cycles"), docsActions.join(","));

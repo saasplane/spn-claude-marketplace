@@ -4,12 +4,12 @@
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/01-agent.md",
       "section": "The session opens on the welcome, and the ground is one line",
-      "seen": "98286322"
+      "seen": "0a774001"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/01-agent.md",
       "section": "Every moment gets a plain, warm line",
-      "seen": "0ec1b040"
+      "seen": "47737b26"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/01-agent.md",
@@ -66,7 +66,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "1ccfc845"
+      "seen": "9f3e5019"
     }
   ]
 }

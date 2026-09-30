@@ -3,9 +3,10 @@
      This file carries rules it does not own. The chapters above are the source of truth.
      A rule change is edited there first, then here, in the same change. Never add a rule here.
      restate-drift.ts reports this copy when its source moves. -->
-<!-- REPORT TEMPLATE. One shell for all four report kinds — AUDIT (the repository's wiring) · CODE (the source against
-     the stack's standards) · DOCS (the corpus against the docs standards) · TESTS (what the tests have proved). The set
-     is closed by RD.DEVEX.WORKSPACE.149; a fifth kind is a decision entry, never a new filename. The skeleton is the overview
+<!-- REPORT TEMPLATE. One shell for all five report kinds — AUDIT (the repository's wiring) · CODE (the source against
+     the stack's standards) · DOCS (the corpus against the docs standards) · TESTS (what the tests have proved) ·
+     COVERAGE (how much is written, built and proved). The set is closed by RD.DEVEX.WORKSPACE.149; a new kind is a
+     decision entry, never a new filename. The skeleton is the overview
      template's, so a report reads like every other page a developer opens; only the five sections below differ, and
      only the Findings columns differ per kind.
      LANDS AT `docs/artifacts/reports/<kind>-report.html`, replaced in place — the name says what was measured and the
@@ -14,8 +15,8 @@
      as-of cannot be superseded, because nobody can tell which is newer. It is a date and a time with its offset
      (2026-09-29T14:32+05:30), shown in the header as "Measured: 2026-09-29 14:32 +05:30", because the database keeps
      UTC and a developer's machine keeps local time. It is the time of what was measured, never the clock when the page
-     was written: a TESTS report stamps the newest run it read, and a report that reads the tree itself (AUDIT, DOCS)
-     stamps the moment it read the tree. It carries a `status` like every other document,
+     was written: a TESTS report stamps the newest run it read, and a report that reads the tree itself (AUDIT, DOCS,
+     COVERAGE) stamps the moment it read the tree. It carries a `status` like every other document,
      and that status is the state of WHAT IT MEASURED — never a claim about the page.
      WRITTEN BY THE AGENT through the report skill, never by a tool. The agent reads the repository, fills this skeleton
      from what it read, and every number on the page names where it was read from. A tool that needs to hand the agent a
@@ -40,7 +41,7 @@
 <meta charset="utf-8">
 <title>Report Template</title>
 <!-- spn:doc
-{"id": "{{repo}}-{{kind}}-report", "variant": "report", "reportType": "{{AUDIT|CODE|DOCS|TESTS}}", "title": "{{KIND, in plain words}}", "lenses": ["{{LENS}}"], "status": "{{the state of WHAT WAS MEASURED, never of this page — PLANNING · IMPLEMENTING · DONE}}", "measuredAt": "{{YYYY-MM-DDTHH:MM±HH:MM}}", "summary": "{{The Description's first sentence, word for word.}}", "keywords": ["report", "{{kind}}"]}
+{"id": "{{repo}}-{{kind}}-report", "variant": "report", "reportType": "{{AUDIT|CODE|DOCS|TESTS|COVERAGE}}", "title": "{{KIND, in plain words}}", "lenses": ["{{LENS}}"], "status": "{{the state of WHAT WAS MEASURED, never of this page — PLANNING · IMPLEMENTING · DONE}}", "measuredAt": "{{YYYY-MM-DDTHH:MM±HH:MM}}", "summary": "{{The Description's first sentence, word for word.}}", "keywords": ["report", "{{kind}}"]}
 -->
 <style>
   :root {
@@ -359,9 +360,11 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
 <section id="s2" data-block="must">
   <div class="sec-head"><h2>Findings</h2></div>
   <p>{{What the measurement says, worst first. A finding names where it is, so it can be acted on without a hunt.}}</p>
-  <!-- THE COLUMNS ARE THE ONE THING A KIND CHANGES. A coverage or traceability report reads
-       Row · Claim · Tier · Status · Proven by. An audit reads # · Finding · Where · Grade. Keep whichever
-       the kind needs and delete the other; do not carry both. -->
+  <!-- THE COLUMNS ARE THE ONE THING A KIND CHANGES. A tests report reads Row · Claim · Tier · Status ·
+       Proven by. An audit reads # · Finding · Where · Grade. A coverage report lists no row: it reads
+       Level · Written · Built · Proved · Stated, not built · Built, not stated · Built, not proved — the
+       repository first, then one table by package and one by app — and names the unit beside Built
+       (constructs, not rows). Keep whichever the kind needs and delete the others; do not carry two. -->
   <div class="scroll"><table>
     <thead><tr><th>#</th><th>Finding</th><th>Where</th><th>Grade</th></tr></thead>
     <tbody>

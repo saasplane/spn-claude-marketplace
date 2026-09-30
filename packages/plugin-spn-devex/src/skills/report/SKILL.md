@@ -14,6 +14,16 @@
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "How ends in Cycles, and the arcs are the state",
       "seen": "adce1608"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "section": "Reports and templates",
+      "seen": "adb7351e"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "section": "The coverage report — written, built and proved",
+      "seen": "f9419b87"
     }
   ]
 }
@@ -37,13 +47,14 @@ description: Produce a report or an approach document into a node's artifacts po
 | **`code`** | where the **source** departs from the stack's standards — naming, structure, the patterns a kind owes | the stack's provider files |
 | **`docs`** | where the **corpus** departs from the docs standards — a missing seat, a page off its template, a term used two ways | the docs chapters |
 | **`tests`** | what the tests have **proved**, and what nothing has proved yet | the behaviour rows, joined to what the last run reported |
+| **`coverage`** | how much of the repository is **written, built and proved**, and the gaps between the three | the behaviour rows, each capability chapter's `## Where` table checked against `src/`, and the `tests` report |
 
-**All four are superseded** — the next one replaces it in place, so a pocket never holds six audits nobody will re-read. The set is closed (decision `RD.DEVEX.WORKSPACE.149`); a fifth kind is a decision entry rather than a new filename.
+**All five are superseded** — the next one replaces it in place, so a pocket never holds six audits nobody will re-read. The set is closed (decision `RD.DEVEX.WORKSPACE.149`); a sixth kind is a decision entry rather than a new filename.
 
 
 ## Where it lands
 
-`<node>/docs/artifacts/reports/<kind>-report.html` — `audit-report.html`, `code-report.html`, `docs-report.html`, `tests-report.html`. The suffix is the page kind and the name is what it measures, so the folder reads without this skill.
+`<node>/docs/artifacts/reports/<kind>-report.html` — `audit-report.html`, `code-report.html`, `docs-report.html`, `tests-report.html`, `coverage-report.html`. The suffix is the page kind and the name is what it measures, so the folder reads without this skill.
 
 - **The artifacts pocket is earned.** A node that has never authored anything has no pocket; creating one is part of writing the first report into it.
 - **Nested folders are allowed here and nowhere else in a pocket**, and sub-folders carry **no `README.md`** — the pocket's own README says what the pocket holds.
@@ -68,6 +79,24 @@ whose tier did not run is **unproved, not failing**, and those are different fin
 **A question lives next door and is not this one.** *Did the suite go green?* is the run itself, and folding it into this
 report is how a percentage gets back in.
 
+### The coverage report rolls up, and never lists a row
+
+**It answers one plain question: how much of this repository is finished?** It answers from the sides written, built and proved, and the gaps between them are what a reader acts on (decision `RD.DEVEX.WORKSPACE.191`).
+
+**The numbers come from one command, and you write the page.** Run `spn-devex coverage measure <repo> --json` and write `coverage-report.html` from what it returns, beside `tests-report.html`. The command never writes the page. Stamp `measuredAt` with the moment the command read the tree, which is the `measuredAt` it returns. Put its `digest` in the page, so the next run can tell whether the page is current.
+
+**Name the unit beside every number, because the sides count different things.** Written counts behaviour rows and constructs. Built counts constructs, never rows: a construct is built in a package when its capability chapter there exists and every `## Where` path resolves. Proved counts rows at `SUCCESS` at their own tier. *Stated, not built* counts constructs, *built, not stated* counts seats in `src/`, and *built, not proved* counts rows. Never set a count of rows beside a count of constructs as if they were one scale.
+
+**The page has these sections, in this order**, the shape the developer approved for N120:
+
+1. **Summary** — define a behaviour and the sides in plain words before any number. Then give the repository's written, built and proved numbers as tiles, each with its unit, and one sentence naming the gaps.
+2. **What was measured** — one row per side and per gap: what it is counted from, and the command that measured it.
+3. **Findings** — the repository first, then one table by package and one by app. Each table reads Level · Kind · Written · Built · Proved · Stated, not built · Built, not stated · Built, not proved. A package's rows are the rows of the constructs its chapters realize, so a construct two packages realize is counted in both and once for the repository. Say so under the table.
+4. **What to do** — one row per gap: where it is largest, and what closes it. A path that resolves to nothing is closed by building it or correcting the chapter. A seat no row names is closed by the chapter or the Where row that states it. A row that is not proved is closed by the case that proves it.
+5. **What this did not look at** — a count says how much, never how well. Line coverage is printed by each run and is not counted here.
+
+**Never list rows or seats one by one.** The `tests` report keeps every row and every case, so link it for the proved detail. The measurement's lists of paths and seats are for you, to choose what the What to do section names first. They are not a table on the page.
+
 ## Format
 
 **Reports and approach documents are HTML; everything in a seat is Markdown.** The split is by reader. A seat is read by a person *and* parsed by tooling, so it stays in the format both handle. An artifact here is read by a person only — often someone outside the repository, often on a screen where a wide table needs to scroll on its own. So it gets a format that can carry a diagram, a stepper, and a sticky outline.
@@ -80,7 +109,7 @@ report is how a percentage gets back in.
 
 Plain means everyday words, one idea a sentence, no slogan, no figure of speech, and no book word the same sentence does not explain. **Show a new Title or Subtitle to the developer before you write it**, because both speak for the product.
 
-**The header says when and against what** — the commit, the version, and `measuredAt`, a date and a time with its offset, such as `2026-09-29T14:32+05:30`, shown in the header as `Measured: 2026-09-29 14:32 +05:30`. It is the time of what was measured, never the time the page was written: a `tests` report stamps the newest run it read, and an `audit` or `docs` report stamps the moment it read the tree. A report with no as-of is a report that cannot be superseded, because nobody can tell which is newer.
+**The header says when and against what** — the commit, the version, and `measuredAt`, a date and a time with its offset, such as `2026-09-29T14:32+05:30`, shown in the header as `Measured: 2026-09-29 14:32 +05:30`. It is the time of what was measured, never the time the page was written: a `tests` report stamps the newest run it read, and an `audit`, `docs` or `coverage` report stamps the moment it read the tree. A report with no as-of is a report that cannot be superseded, because nobody can tell which is newer.
 
 Then the body, and it obeys the corpus rules that apply everywhere. No changelog prose, no live counts outside a table that *is* the count, and no claim of a status the underlying documents deny.
 

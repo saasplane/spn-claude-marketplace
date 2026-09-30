@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/03-structure.md",
-      "seen": "8285f6e8"
+      "seen": "970c27b2"
     }
   ]
 }
@@ -120,6 +120,23 @@ apps/<app>-ts/src/
 ## Side effects
 
 **No package declares a `sideEffects` field**, so bundlers assume every module may have one. A blanket `"sideEffects": false` would let a bundler drop the design system's CSS imports. Scope it instead: `{ "sideEffects": ["*.css"] }`.
+
+## What a Where row may name
+
+**A capability chapter's `## Where` table declares the code that realizes its construct**, and `spn-devex coverage measure` checks every path in it against `src/`. A row names a seat: a file, or a folder that is one seat of the kind, and a seat folder covers its tree.
+
+| Kind | A Where path is read from | Its seats |
+| --- | --- | --- |
+| `MODULE_SERVER` | the package folder, so a path begins `src/` | each file under `src/app/services/`, `src/app/repositories/`, `src/app/entities/`, `src/app/utils/`, `src/entry/api/controllers/`, `src/entry/queue/listeners/` and `src/contract/states/` · each feature folder under `src/app/support/` · the wiring files at the top of `src/` · the folder `src/migrations/` |
+| `MODULE_WEB` | its `entry/ui/` folder, so a path begins `pages/`, `hooks/` or `components/` | each feature folder under `pages/`, `hooks/` and `components/` · each folder under `utils/`, and each file directly in it · the folder `routes/` · each widget under `widgets/` |
+| `SUPPORT_WEB` | the package folder | each group folder under `src/ui/components/` · the folders `src/ui/boot/`, `core/`, `hooks/`, `managers/`, `utils/` and `widgets/` · `src/assets/` · every other folder directly under `src/` |
+| `SUPPORT_SERVER` · `SUPPORT_UNIVERSAL` | the package folder | each file under `src/contract/states/`, or a group folder beneath it · with the `contract` / `app` / `entry` triad, each feature folder under `src/app/` and each transport folder under `src/entry/` · every other folder directly under `src/` |
+| `CLIENT_API` | the package folder | `src/index.ts`, the hand-kept barrel, and nothing under `src/generated/` |
+| `TOOLCHAIN` | the package folder | each tool folder directly under `src/` |
+| `APP_SERVER` · `APP_WEB` | the app folder, so a path begins `src/` | the bootstrap files at the top of `src/` · each module under `src/modules/`, read by its own kind's seats. Naming the module folder whole declares its whole tree |
+| `APP_UTILITY` | the app folder | each file under `src/app/services/` and `src/contract/states/` · each feature folder under `src/app/support/` · each transport folder under `src/entry/` · the bootstrap files at the top of `src/` |
+
+**A file row always declares that file. A row naming `src/` or a layer folder, such as `src/app/services/` or `src/ui/components/`, declares nothing**, and the coverage report names it. **Generated code is never a seat**: a `generated/` or `validators/` folder, and a package's generated root barrel. A private folder directly under `src/`, such as a vendored `_shadcn/`, is a seat of its own.
 
 ## Where new code goes
 

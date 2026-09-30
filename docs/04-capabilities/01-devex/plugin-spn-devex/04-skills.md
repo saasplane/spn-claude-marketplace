@@ -48,7 +48,7 @@
 
 **Why** — *a report is an artifact somebody has to read and maintain*, and a report nobody asked for is work created rather than work done.
 **What** — `report` produces a report or an approach document into a node's artifacts pocket only on request, and says so in its own description.
-**How** — the templates it fills are the book's, and the commands each one reads from come from the domain plugin. `packages/plugin-spn-devex/src/skills/report/SKILL.md`.
+**How** — the templates it fills are the book's, and the commands each one reads from come from the domain plugin. The `coverage` template is the exception, because its measurement is stack-agnostic: it reads `spn-devex coverage measure <repo> --json` and links the `tests` report for the proved detail. `packages/plugin-spn-devex/src/skills/report/SKILL.md`.
 
 ### Every skill opens by pointing at the loop, never repeating it
 

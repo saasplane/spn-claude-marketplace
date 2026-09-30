@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
-      "seen": "e6cd18e5"
+      "seen": "3ba37080"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
@@ -183,7 +183,7 @@ A **double** stands in for a collaborator and belongs to the unit tier only; a *
 
 ## After a run: stamp the rows, then read them against the runs
 
-**`spnutils` runs a tier and writes `tests/.output/<tier>/spn-tests.json`, and never a row** (`RD.DEVEX.UTILS.071`). What the run means for the documents is yours, through this plugin's scripts:
+**`spnutils` runs a tier and writes `tests/.output/<tier>/spn-tests.json`, and never a row** (`RD.DEVEX.UTILS.071`). A journey phase other than the sweep writes its own `spn-tests.<phase>.json` beside it, so one phase never replaces what another proved, and every script below reads both. What the run means for the documents is yours, through this plugin's scripts:
 
 ```bash
 node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs behaviours stamp .                    # what it would change

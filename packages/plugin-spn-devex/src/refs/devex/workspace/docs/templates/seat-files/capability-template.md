@@ -1,4 +1,4 @@
-<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md § What — capabilities: the standard here, a chapter per construct everywhere else
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md § What — capabilities: the standard here, a chapter per construct everywhere else · § What a Where row declares
      This file carries rules it does not own. The chapter above is the source of truth.
      A rule change is edited there first, then here, in the same change. Never add a rule here.
      restate-drift.ts reports this copy when its source moves. -->
@@ -18,11 +18,11 @@
 
 `For: <Backend|Web> developer` · `Status: ✅ DONE` · `Realizes: <Construct>`
 
-<One paragraph. What of the construct this package realizes — which Parts — and what a developer should know before opening the code: the one or two decisions that are not the pattern. A newcomer reads this and knows where to start.>
+<One paragraph. What of the construct this package realizes — which Parts — and what a developer should know before opening the code: the decisions that are not the pattern. A newcomer reads this and knows where to start.>
 
 ## Where
 
-<A table, one row per place the construct lives in this package. Short. This is the map a developer opens the code with. It can be generated later from a tag in the code.>
+<A table, one row per place the construct lives in this package. Short. This is the map a developer opens the code with, and the only place the chapter declares code: the coverage report checks every path against src/. A row names a file, or a folder that is one seat of the package's kind; src/ or a layer folder declares nothing. A web module's paths start at its entry/ui/ folder. It is written by hand and checked against the code, never generated from it.>
 
 | Part of the construct | Lives in | What it is |
 | --- | --- | --- |

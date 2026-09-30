@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/04-plugins.md",
-      "seen": "416e57a0"
+      "seen": "730ad38b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
@@ -116,7 +116,7 @@ Plugins are named `spn-devex` plus `spn-<domain>`, mirroring the providers tree,
 
 **There are three plugins, one per domain, and the set is closed.** `spn-devex` installs in every repository. `spn-apps` acts on the nodes an apps repository declares. `spn-infra` acts on the estate.
 
-**A stack or a cloud is a folder inside the plugin that owns its domain — `refs/providers/<name>/` and `scripts/providers/<name>/` — never a plugin of its own.** The domain is the plugin, and the stack or provider is a folder beneath it.
+**A stack or a cloud is a `providers/<name>/` folder inside the plugin that owns its domain — `spn-apps`'s `providers/ts/`, `spn-infra`'s `providers/aws/` — never a plugin of its own.** The domain is the plugin, and the stack or provider is a folder beneath it.
 
 **The reason is that a domain's rules are the stable half and a stack's spelling is the volatile half.** Writing TypeScript and writing Python are different acts, so each needs its own parser and its own steps — but the rule they are checking is the same rule, and stating it once means a second stack joins by adding a folder rather than by copying a plugin. Authoring an estate declaration is the same act on every cloud, because the declaration is provider-agnostic, so a new cloud is a blueprint library and a provider folder with no skill of its own.
 
