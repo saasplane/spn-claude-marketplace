@@ -42,7 +42,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "c49a7d7a"
+      "seen": "ebf718c4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -99,7 +99,7 @@ output, and a reader learns to scroll past it, including the day it says somethi
 
 | The first prompt | What the agent does |
 | --- | --- |
-| **a handover, or a named workstream or arc** | picks it up at once, without asking again. Read its arcs and its plan before anything else |
+| **a handover, or a named workstream or arc** | picks it up at once, without asking again. **A handover's `model:` line is checked first — MUST**: compare it with the model your system prompt names, and on a mismatch open the reply with one line naming both models and the `/model` command that switches, then run nothing until the developer switches or says to go on. Effort is not checked, because you cannot see it. Then read its arcs and its plan before anything else |
 | **something new** | asks for the goal in one or two plain questions, never lettered options or a `Q<n>` card, because a card lives on an approach page that does not exist yet (RD.DEVEX.AGENT.077); then opens a workstream for it. That is `S1` |
 | **a question** | answers it. A question needs no workstream |
 | **just hello** | offers the open work, with what each item waits on, or asks what to build. Only this prompt ends on a question |
@@ -562,6 +562,7 @@ Nothing above is enforced by good intentions. Every transition that can be check
 | a row in progress named with its age, never called runnable | `stop.ts`, when a turn ends |
 | a row held on an open card never called runnable | `stop.ts`, when a turn ends |
 | a reply given while a card is open opens with **Needs you** | `stop.ts`, when a turn ends |
+| a reply that passes work on carries a handover block with all nine labels and no `{{…}}` left | `stop.ts`, when a turn ends |
 | what landed, said out loud | `closed.ts`, after the folder moves |
 | what the agent's own machinery costs | `timing.ts`, on every hook run |
 | a repository write with no go on record | `confirmed.ts`, on the first such write in a window |

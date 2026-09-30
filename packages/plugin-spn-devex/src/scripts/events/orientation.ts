@@ -774,7 +774,11 @@ export function orient(root: string, cwd: string): [message: string, context: st
     "The closing question is asked ONLY when the developer's first message does not already " +
     "say what to do. A handover block, an arc name, or any named next step replaces it — under " +
     "the status line, one line: *Picking up N<nn> — <the arc's title>, at row <n>: <what the row " +
-    "does>.* Then the first thing you will do, never by asking again. If that row's State reads " +
+    "does>.* Then the first thing you will do, never by asking again. A handover block names a " +
+    "`model:`: compare it with the model your system prompt names before any action. On a mismatch, " +
+    "one line under the status line names both models and the `/model` command that switches, and " +
+    "nothing runs until the developer switches or says to go on; effort is not checked, because you " +
+    "cannot see it. If that row's State reads " +
     "`in progress <time>`, another window may be on it: leave it, say how old the mark is, and " +
     "ask before you touch it. " +
     "Something new in the first prompt gets its goal asked in one or two plain questions, never lettered " +

@@ -478,7 +478,7 @@ one("a card with every part is silent",
 // check read that as putting a decision. A fenced block is a quotation, not an ask.
 one("a handover block naming an open card's recommendation is not an ask",
   build("stop-reply-handover", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
-  "silent", { reply: NEEDS + "This session is retiring.\n\n```text\nContinue workstream `008-x`, arc `N69`, step 1.\nOpen: `Q259` — how much of the book the plugins must restate; the recommendation is D then A.\n```\n\nBoth releases are done." });
+  "silent", { reply: NEEDS + "This session is retiring.\n\n```text\ncontinue:     workstream `008-x`, arc `N69`, step 1\nopen:         `Q259` — how much of the book the plugins must restate; the recommendation is D then A.\n```\n\nBoth releases are done." });
 
 // The other half, and it is what stops the fix being a hole: an ask in PROSE, with a fence elsewhere
 // in the reply, still fires.
@@ -498,7 +498,7 @@ one("a reply that asks nothing is still silent, whatever parts it lacks",
 one("a handover offered while a card is open is refused, and the card is named",
   build("stop-handover-open-card", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
   "warns", { says: "Answer first, then hand over",
-             reply: "Pick this up in a new window.\n```\nworkstream: 001\narc and step: N1 step 1\nmodel: Opus 5\nread first: the page\nstate: clean\ndone when: it lands\ndo not touch: closed\nopen: none\n```" });
+             reply: "Pick this up in a new window.\n```\ncontinue: workstream 001-a-subject, arc N1, step 1\nmodel: Opus 5.5\nread first: the page\npins: spn-foundation abc1234\nstate: clean\nlive now: no reload\ndone when: it lands\ndo not touch: closed\nopen: none\n```" });
 
 console.log("\n=== the handover check — what counts as saying a window is needed");
 {
@@ -509,9 +509,10 @@ console.log("\n=== the handover check — what counts as saying a window is need
   // and what must stay quiet.
   const { checkHandover, passingOn } = await import("../../../../src/scripts/events/stop.ts");
   const ROOT = workspace("stop-handover-wiring");
-  const BLOCK = ["```", "workstream: 008", "arc and step: N13 step 4", "model: Opus 5",
-    "read first: the arc", "state: green", "done when: it lands", "do not touch: Q115",
-    "open: Q138", "```"].join("\n");
+  const BLOCK = ["```", "continue:     workstream `008-plain-language`, arc `N13`, step 4",
+    "model:        Opus 5.5", "read first:   the arc", "pins:         spn-foundation abc1234",
+    "state:        green", "live now:     no reload", "done when:    it lands",
+    "do not touch: Q115", "open:         Q138", "```"].join("\n");
   // ROOT IS PASSED EXPLICITLY. Calling with one argument leaves `root` undefined, the wiring read
   // throws, and the whole install precondition is skipped in silence — a suite that would pass
   // whether or not the half exists. The fixture root has no plugin cache, so the wiring reads
@@ -589,7 +590,7 @@ console.log("\n=== the handover check — what counts as saying a window is need
     ["the phrase in italics", "It fired on *start a fresh session* again.", false],
     ["the phrase in a fence", "It read this:\n\n```\nOpen a new window.\n```\n\nNothing is handed over.", false],
     ["an explanation of what it matched", "The hook fired on the words new window in my last reply.", false],
-    ["a sentence that begins with the noun", "Handover blocks carry seven fields, and this reply needs none.", false],
+    ["a sentence that begins with the noun", "Handover blocks carry nine labelled lines, and this reply needs none.", false],
     ["a direction in bold is still a direction", "**Open a new window** and paste the block below.", true],
     ["a direction beside a quotation is still a direction", 'The check said "nothing". Open a new window and paste the block.', true],
     ["a labelled line opens one", "Handover: the fields follow.", true],
@@ -639,8 +640,9 @@ console.log("\n=== the handover check — what counts as saying a window is need
     console.log(`  ${still ? "PASS" : "FAIL"}  the same direction without the card is still told to answer first`);
   }
 
-  const short = checkHandover("Pick this up in a new window.\n```\nworkstream: 008\narc and step: N13\n```", ROOT);
-  const named = short.length === 1 && /model/.test(short[0].message) && /open/.test(short[0].message);
+  const short = checkHandover("Pick this up in a new window.\n```\ncontinue: workstream 008-plain-language, arc N13\n```", ROOT);
+  const named = short.length === 1 && /`model:`/.test(short[0].message) && /`open:`/.test(short[0].message)
+    && !/missing[^.]*`continue:`/.test(short[0].message);
   if (!named) failed += 1;
   console.log(`  ${named ? "PASS" : "FAIL"}  a short block is told which fields it is missing`);
 }
@@ -666,9 +668,26 @@ console.log("\n=== handover — the template's fields, and a fence that quotes t
 {
   const { checkHandover, passingOn, fencesOf, quotesTemplate } = await import("../../../../src/scripts/events/stop.ts");
   const ROOT = workspace("m7-stop-handover-template");
-  // THE TEMPLATE, FILLED IN. `Pins:` and `Live now / waits for the window:` are its fields, and a
-  // block carrying them is a whole handover.
+  // THE TEMPLATE, FILLED IN, in the chapter's layout: nine lowercase labels, every value in the
+  // column `do not touch:` sets, and a long value wrapped with its continuation under the value.
   const FILLED = ["```text",
+    "continue:     workstream `008-plain-language`, arc `N116`, row 6, in a `spn-claude-marketplace`",
+    "              window",
+    "model:        Opus 5.5, effort high",
+    "read first:   `/w/arcs/N116-r2-the-devex-release.md` (fields, and row 6),",
+    "              `/w/notes/N116/plan.md`",
+    "pins:         spn-claude-marketplace 2f8c5a0 · spn-foundation 907b11f; re-run the plan's stale",
+    "              check first — `git -C spn-claude-marketplace log 2f8c5a0..HEAD -- packages`",
+    "state:        rows 1, 1b ✅ landed; row 6 ◐ stopped — done the ref, not done the hook; rows 7, 8",
+    "              not started",
+    "live now:     the hook script is live · waits for the window: the skill",
+    "done when:    Commands row `plugin unit` → all passed",
+    "do not touch: the templates folder",
+    "open:         none",
+    "```"].join("\n");
+  const withoutLabel = (label) => FILLED.split("\n").filter((line) => !line.startsWith(`${label}:`)).join("\n");
+  // THE SENTENCE FORM THE LAYOUT REPLACES. It carries every word the old check looked for, and no label.
+  const SENTENCE = ["```text",
     "Continue workstream `008-plain-language`, arc `N116`, row 6, in a `spn-claude-marketplace` window.",
     "Model: Opus 5.",
     "Read first: `/w/arcs/N116-r2-the-devex-release.md` (fields, and row 6), `/w/notes/N116/plan.md`.",
@@ -702,7 +721,7 @@ console.log("\n=== handover — the template's fields, and a fence that quotes t
     ["a diff of the template is not a pass-on", passingOn(DIFF), false],
     ["no [handover] finding on the diff preview", checkHandover(DIFF, ROOT).length, 0],
     ["no [handover] finding on a card fence holding {{", checkHandover(CARD_FENCE, ROOT).length, 0],
-    ["the filled-in template, with Pins and Live now, is a whole handover", checkHandover(`Pick this up in a new window.\n\n${FILLED}`, ROOT).length, 0],
+    ["the filled-in template, in the aligned layout with wrapped values, is a whole handover", checkHandover(`Pick this up in a new window.\n\n${FILLED}`, ROOT).length, 0],
   ]) {
     n += 1;
     const ok = got === expected;
@@ -710,12 +729,48 @@ console.log("\n=== handover — the template's fields, and a fence that quotes t
     console.log(`  ${ok ? "PASS" : "FAIL"}  ${what}${ok ? "" : ` — got ${got}, expected ${expected}`}`);
   }
 
-  // A PASS-ON WHOSE ONLY BLOCK IS THE UNFILLED TEMPLATE HAS NO HANDOVER, and is told so by the fields.
+  // A PASS-ON WHOSE ONLY BLOCK STILL HOLDS PLACEHOLDERS HAS NO HANDOVER, and is told so.
   n += 1;
-  const unfilled = checkHandover("Pick this up in a new window.\n\n```text\nContinue workstream `{{NNN-subject}}`, arc `N{{n}}`.\nModel: {{Opus 5}}.\n```", ROOT);
-  const told = unfilled.length === 1 && /no handover block/.test(unfilled[0].message) && /Pins/.test(unfilled[0].message);
+  const unfilled = checkHandover("Pick this up in a new window.\n\n" +
+    FILLED.replace("`N116`", "`N{{n}}`"), ROOT);
+  const told = unfilled.length === 1 && /\{\{…\}\}` placeholders/.test(unfilled[0].message) && /pins:/.test(unfilled[0].message);
   if (!told) failed += 1;
-  console.log(`  ${told ? "PASS" : "FAIL"}  a pass-on carrying only the unfilled template is told to fill in the template's fields`);
+  console.log(`  ${told ? "PASS" : "FAIL"}  a block with a {{…}} left is refused, and told to fill in every label`);
+
+  // EACH LABEL IS OWED. A block missing one is refused, and the refusal names the label it lacks.
+  for (const label of ["continue", "pins", "live now", "open"]) {
+    n += 1;
+    const got = checkHandover(`Pick this up in a new window.\n\n${withoutLabel(label)}`, ROOT);
+    const ok = got.length === 1 && new RegExp(`missing \`${label}:\``).test(got[0].message);
+    if (!ok) failed += 1;
+    console.log(`  ${ok ? "PASS" : "FAIL"}  a block missing \`${label}:\` is refused, naming it${ok ? "" : ` — got ${JSON.stringify(got)}`}`);
+  }
+
+  // NO LEGACY: the sentence form is refused as a block missing every label.
+  n += 1;
+  const sentence = checkHandover(`Pick this up in a new window.\n\n${SENTENCE}`, ROOT);
+  const refused = sentence.length === 1 && /missing `continue:` · `model:`/.test(sentence[0].message) && /`open:`/.test(sentence[0].message);
+  if (!refused) failed += 1;
+  console.log(`  ${refused ? "PASS" : "FAIL"}  the old sentence form is refused, naming the labels it lacks${refused ? "" : ` — got ${JSON.stringify(sentence)}`}`);
+
+  // A LABEL IN CAPITALS IS NOT THE LABEL. The chapter fixes them lowercase.
+  n += 1;
+  const upper = checkHandover(`Pick this up in a new window.\n\n${FILLED.replace("\nmodel:", "\nModel:")}`, ROOT);
+  const caseKept = upper.length === 1 && /missing `model:`/.test(upper[0].message);
+  if (!caseKept) failed += 1;
+  console.log(`  ${caseKept ? "PASS" : "FAIL"}  \`Model:\` in capitals does not count as \`model:\``);
+
+  // `continue:` CARRIES THE WORKSTREAM AND THE ARC.
+  for (const [what, from, to, says] of [
+    ["no arc", "arc `N116`, ", "", /names no arc/],
+    ["no workstream", "workstream `008-plain-language`, ", "", /names no workstream/],
+  ]) {
+    n += 1;
+    const got = checkHandover(`Pick this up in a new window.\n\n${FILLED.replace(from, to)}`, ROOT);
+    const ok = got.length === 1 && says.test(got[0].message);
+    if (!ok) failed += 1;
+    console.log(`  ${ok ? "PASS" : "FAIL"}  a \`continue:\` line with ${what} is refused${ok ? "" : ` — got ${JSON.stringify(got)}`}`);
+  }
 }
 
 console.log("\n=== runnable — a row in progress is named with its age, never called runnable (RD.DEVEX.WORKSPACE.184)");

@@ -473,6 +473,10 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
   // N116 row 8, F5: a handover window took over a row another window had marked in progress.
   says("the pick-up line has one shape, after the status line",
     offer.context.includes("under the status line, one line: *Picking up N<nn> — <the arc's title>, at row <n>: <what the row does>.*"));
+  // Q380 A: a window picking up a handover checks its model against the block's `model:` line first.
+  says("a pasted handover's model is compared with the window's own before any action, and a mismatch names /model",
+    offer.context.includes("A handover block names a `model:`: compare it with the model your system prompt names before any action.")
+    && offer.context.includes("names both models and the `/model` command that switches, and nothing runs until the developer switches or says to go on"));
   says("a new idea's goal is asked in plain questions, never a card (RD.DEVEX.AGENT.077)",
     offer.context.includes("Something new in the first prompt gets its goal asked in one or two plain questions, never lettered options and never a `Q<n>` card"));
   says("a row marked in progress is left, its age said, and asked about",

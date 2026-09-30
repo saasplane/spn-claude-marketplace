@@ -11,7 +11,7 @@
 //              blocks them; a row `⏸ held on Q<n>` is not runnable while that card is open
 //   needs-you  a reply given while a card is open opens with **Needs you**
 //   hold       an arc whose status reads HELD must name a card that exists and is unanswered
-//   handover   a reply that says a new window is needed carries the seven fields
+//   handover   a reply that says a new window is needed carries the nine labelled lines
 //   welcome    a session's first turn opens with the welcome, word for word: the heading and its four lines
 //   corpus     the docs trees still answer the questions only a whole-corpus read can ask
 //
@@ -41,13 +41,43 @@ import { begin, span, end, tagsOf } from "../lib/timing.ts";
 
 type Warning = { check: string; message: string };
 
-// The fields the handover template carries (`templates/workstream/handover-template.md`). The first
-// eight are owed by every handover. `Pins:` and `Live now / waits for the window:` are the template's
-// too, and a block carrying them is read like any other; they are not demanded, because a stop that
-// is not a reload has nothing to say under the second.
-const HANDOVER_FIELDS = ["workstream", "arc", "model", "read first", "state", "done when", "do not touch", "open"];
-const HANDOVER_TEMPLATE_FIELDS = ["Continue workstream … arc … row", "Model", "Read first", "Pins", "State",
-  "Live now / waits for the window", "Done when", "Do not touch", "Open"];
+// The labels the handover template carries (`templates/workstream/handover-template.md`), in its
+// order. Every handover owes all nine: a line that has nothing to say still says so (`no reload`,
+// `none`), because a label left out cannot be told from a label forgotten. A label counts only where
+// it opens a line, lowercase, with its colon, which is the layout the chapter states; the sentence
+// form (`Continue workstream …`, `Model: …`) names none of them and is refused as a block missing
+// all nine.
+const HANDOVER_LABELS = ["continue", "model", "read first", "pins", "state", "live now", "done when",
+  "do not touch", "open"];
+const HANDOVER_LABEL_LINE = new RegExp(`^(${HANDOVER_LABELS.join("|")}):(.*)$`);
+// `continue:` must carry the workstream (`008-plain-language`) and the arc (`N119`), because the next
+// window finds everything else from those two.
+const WORKSTREAM_NAME = /\b\d{3}-[a-z0-9][a-z0-9-]*/;
+const ARC_NAME = /\bN\d+\b/;
+
+/**
+ * The labelled lines of a handover block, each with its value. A line that starts with whitespace
+ * continues the value above it; any other line that is not a label is ignored.
+ */
+export function handoverLines(body: string): Map<string, string> {
+  const out = new Map<string, string>();
+  let last: string | null = null;
+  for (const line of body.split("\n")) {
+    const m = line.match(HANDOVER_LABEL_LINE);
+    if (m) { last = m[1]; out.set(last, m[2].trim()); continue; }
+    if (last !== null && /^\s+\S/.test(line)) out.set(last, `${out.get(last)} ${line.trim()}`);
+    else last = null;
+  }
+  return out;
+}
+
+/**
+ * Whether a fence body is shaped as a handover: two of its labels or more, or the sentence form they
+ * replace. One label alone is too little — `state:` opens many a status block that hands nothing on.
+ */
+function looksLikeHandover(body: string): boolean {
+  return handoverLines(body).size >= 2 || (/workstream/i.test(body) && /\barc\b/i.test(body));
+}
 
 /** One fenced block of a reply: its info string (`diff`, `text`, or empty) and its body. */
 type Fence = { info: string; body: string; start: number; end: number };
@@ -617,13 +647,20 @@ export function checkHandover(reply: string, root: string): Warning[] {
       `sitting into three windows (N39).` }];
   }
 
-  const fenced = fencesOf(reply).filter((fence) => !quotesTemplate(fence)).map((fence) => fence.body.toLowerCase());
-  const block = fenced.find((f) => /workstream/.test(f) && /arc/.test(f));
+  const labels = HANDOVER_LABELS.map((label) => `${label}:`).join(" · ");
+  const shaped = fencesOf(reply).filter((fence) => fence.info !== "diff" && looksLikeHandover(fence.body));
+  const block = shaped.find((fence) => !quotesTemplate(fence));
+  if (!block && shaped.length)
+    return [{ check: "handover", message: `the handover block still holds \`{{…}}\` placeholders. Fill in every one — ${labels} — and write the same block into the arc's log.` }];
   if (!block)
-    return [{ check: "handover", message: `this reply passes work on to another session and carries no handover block. Fill in the handover template's fields in a fenced block — ${HANDOVER_TEMPLATE_FIELDS.join(" · ")} — with no \`{{…}}\` left, and write the same block into the arc's log.` }];
-  const missing = HANDOVER_FIELDS.filter((f) => !block.includes(f));
+    return [{ check: "handover", message: `this reply passes work on to another session and carries no handover block. Fill in the handover template in a fenced block — ${labels}, one per line, each value starting in the column \`do not touch:\` sets — with no \`{{…}}\` left, and write the same block into the arc's log.` }];
+  const lines = handoverLines(block.body);
+  const missing = HANDOVER_LABELS.filter((label) => !lines.has(label));
   if (missing.length)
-    return [{ check: "handover", message: `the handover block is missing ${missing.join(" · ")}. The next window starts from that block and has nothing else.` }];
+    return [{ check: "handover", message: `the handover block is missing ${missing.map((label) => `\`${label}:\``).join(" · ")}. Each label opens its own line, lowercase, in this order: ${labels}. The next window starts from that block and has nothing else.` }];
+  const next = lines.get("continue") ?? "";
+  if (!WORKSTREAM_NAME.test(next) || !ARC_NAME.test(next))
+    return [{ check: "handover", message: `the handover block's \`continue:\` line names no ${WORKSTREAM_NAME.test(next) ? "arc (\`N<n>\`)" : "workstream (\`NNN-subject\`)"}. The next window finds everything else from those two.` }];
   return [];
 }
 

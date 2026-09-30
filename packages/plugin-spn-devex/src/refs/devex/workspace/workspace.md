@@ -246,7 +246,7 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
 - **Closing a window costs nothing. Closing a scope is a check.** Moving `open/x` to `closed/x` is the one deliberate act in the loop, and the close gate below decides whether it may happen.
 - **A close ends the session, and names the scope that runs next.** The number never chooses it, so the close says which open scope to run and why, what it freed for the others, and what it carried to whom.
 - **A stop is a handover too.** Where you cannot finish, the question becomes the next `Q<n>` card and every row's state is written down. The prompt the next window starts from is recorded, because no file otherwise holds it.
-- **The handover goes in the arc and in the reply, as markdown**, and **the prompt itself is a fenced code block**. A fence carries a copy control; a blockquote reads the same and cannot be copied in one action.
+- **The handover goes in the arc and in the reply, as markdown**, and **the prompt itself is a fenced code block** of nine aligned labelled lines, copied from `handover-template.md`. A fence carries a copy control; a blockquote reads the same and cannot be copied in one action.
 - **Execution starts when the page, the arc and the notes are all current**, never when the one you touched last is.
 
 When a window opens, surface what is stale — a subject untouched across sittings, an order nobody ran. Nothing has its permanent home in `.spndevex/`: everything there is on its way somewhere, and anything that stops moving is a decision nobody took.
