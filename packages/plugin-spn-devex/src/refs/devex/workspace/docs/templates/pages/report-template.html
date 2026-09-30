@@ -102,6 +102,15 @@
   .tile h4 a:hover{color:var(--accent)}
   .tile p{font-size:var(--sm);color:var(--slate);margin:0 0 .6rem;max-width:none;flex:1}
   .tile .more{font-size:var(--sm);font-weight:600;text-decoration:none;align-self:flex-start}
+  /* The sides of a measurement: a big number, its unit, and a bar for its share. A coverage report's
+     Summary uses one per side (written, built, proved). */
+  .sides{display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:.8rem;margin:1.2rem 0}
+  .side{border:1px solid var(--rule);background:var(--card);border-radius:3px;padding:.9rem 1rem;display:flex;flex-direction:column;gap:.35rem}
+  .side .lbl{font-family:var(--mono);font-size:var(--xs);letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+  .side .big{font-size:1.8rem;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink);line-height:1.1}
+  .side .of{font-size:var(--sm);color:var(--slate)}
+  .bar{height:.5rem;border-radius:999px;background:var(--rule);overflow:hidden}
+  .bar i{display:block;height:100%;background:var(--accent)}
   p > .more{font-weight:600;text-decoration:none}
   h1{font-family:var(--ui);font-size:var(--xxl);font-weight:700;letter-spacing:-.02em;line-height:1.15;text-wrap:balance;margin:0}
   .subtitle{font-size:var(--lg);line-height:1.5;color:var(--slate);max-width:46rem;margin:0}
