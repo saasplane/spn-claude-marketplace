@@ -17,6 +17,8 @@
 
 **Source of truth:** the foundation book's module server seats (`02-support/01-apps/03-module/01-server` — contract · app · entry), the comments group (`02-support/01-apps/07-comments`), and the platform pattern catalog (conformance requirement 5). This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated. Find the stack-concrete detail in the stack's step files; this lens is the stack-agnostic half.
 
+**Judged against, beside the book:** HTTP semantics (RFC 9110) for methods, status codes and idempotency, and the twelve-factor app for configuration and processes. A server option is weighed against the semantics a client already relies on.
+
 **Worn** while writing server code — contract, service, entry. Not convened; it *is* the writing.
 
 ## What it checks

@@ -2,6 +2,7 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The arc · § A step row says where, at what altitude, and how · § Say what you opened, and know when to wait for the answer · § Stopping in the middle is a handover · § A prompt while an arc runs
 //           docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The approach document
 //           docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md § The reply while work runs shows what needs you, then what moved
+//           docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § A card is only for what the rules leave open
 // The chapters are the source of truth. A rule change is edited there first, then here, in the same change.
 //
 // The Stop checks. They read what the turn is about to leave behind, and warn — never refuse, because
@@ -9,7 +10,10 @@
 //
 //   runnable   a turn that ends while an arc THIS SESSION worked on still has rows to do, and nothing
 //              blocks them; a row `⏸ held on Q<n>` is not runnable while that card is open
-//   needs-you  a reply given while a card is open opens with **Needs you**
+//   needs-you  a reply given while a card is open opens with **Needs you**: a card raised this turn in
+//              full there, once, and every card still open from an earlier reply named in one line
+//   notes      an answer logged in an arc lands in that arc's notes (spec, plan, samples) the same turn
+//   carried    a proposed arc never carries a review point to a later step of itself
 //   hold       an arc whose status reads HELD must name a card that exists and is unanswered
 //   handover   a reply that says a new window is needed carries the nine labelled lines
 //   welcome    a session's first turn opens with the welcome, word for word: the heading and its four lines
@@ -308,7 +312,15 @@ export function stepHash(text: string): string {
  * **IT CANNOT USE `git`.** The workstream folder lives at the workspace root, which is not a
  * repository, so `git show HEAD:./arc.md` fails there for every arc.
  */
-export type Baseline = { at: number; steps: Record<string, string>; transcriptAt?: number; fired?: string[] };
+export type Baseline = { at: number; steps: Record<string, string>; transcriptAt?: number; fired?: string[];
+                         cards?: string[]; arcs?: Record<string, ArcMark> };
+
+/**
+ * What one arc looked like at a Stop, for the `notes` and `carried` checks: a short hash of each of
+ * its log entries, a signature of its notes (the spec, the plan and the samples under
+ * `notes/N<nn>/`), and its status word.
+ */
+export type ArcMark = { log: string[]; notes: string; status: string };
 
 const sessionKey = (id: string): string => (id || "").replace(/[^A-Za-z0-9_-]/g, "").slice(0, 80) || "_";
 const sessionsDir = (root: string): string => join(root, DEVEX, DEBUG, "stop", "sessions");
@@ -379,6 +391,116 @@ export function arcsTouched(transcript: string, from: number, arcs: string[]): {
   }
   const touched = new Set(arcs.filter((arc) => written.some((input) => input.includes(arc) || input.includes(basename(arc)))));
   return { touched, size };
+}
+
+// ---------------------------------------------------------------------------- notes and carried
+
+/** The top-level entries of an arc's `## Log`, each a line beginning `- `. */
+export function logEntries(text: string): string[] {
+  const at = text.search(/^##[ \t]+Log\b/m);
+  if (at < 0) return [];
+  const body = text.slice(at).split("\n").slice(1);
+  const out: string[] = [];
+  for (const line of body) {
+    if (/^##[ \t]/.test(line)) break;
+    if (/^- /.test(line)) out.push(line.trim());
+  }
+  return out;
+}
+
+const entryHash = (line: string): string => createHash("sha256").update(line).digest("hex").slice(0, 10);
+
+/**
+ * The files an arc's notes hold that an answer must land in: `notes/N<nn>/spec.md`, `plan.md`, and
+ * everything under `samples/`. Orders and scratch are not the spec, so they are left out.
+ */
+export function notesFiles(arc: string): string[] {
+  const id = basename(arc).match(/^(N\d+[a-z]?)(?:[-.]|$)/i)?.[1];
+  if (!id) return [];
+  const folder = join(dirname(dirname(arc)), "notes", id);
+  const out: string[] = [];
+  for (const name of ["spec.md", "plan.md"]) {
+    try { if (statSync(join(folder, name)).isFile()) out.push(join(folder, name)); } catch { /* absent */ }
+  }
+  const walk = (dir: string): void => {
+    let entries: string[];
+    try { entries = readdirSync(dir).sort(); } catch { return; }
+    for (const entry of entries) {
+      const full = join(dir, entry);
+      try { if (statSync(full).isDirectory()) walk(full); else out.push(full); } catch { /* next */ }
+    }
+  };
+  walk(join(folder, "samples"));
+  return out;
+}
+
+/** A signature of the notes files: each one's path, size and time, so reading it costs a stat each. */
+function notesSignature(files: string[]): string {
+  return createHash("sha256").update(files.map((file) => {
+    try { const stat = statSync(file); return `${file}\u0000${stat.size}\u0000${stat.mtimeMs}`; } catch { return file; }
+  }).join("\n")).digest("hex").slice(0, 12);
+}
+
+/** Every open arc's mark at this Stop. */
+export function arcMarks(root: string): Record<string, ArcMark> {
+  const out: Record<string, ArcMark> = {};
+  for (const arc of openArcs(root)) {
+    const text = read(arc);
+    out[arc] = { log: logEntries(text).map(entryHash), notes: notesSignature(notesFiles(arc)), status: statusOf(arc) };
+  }
+  return out;
+}
+
+// AN ENTRY THAT RECORDS AN ANSWER OR A REVIEW POINT: a card answered (`Q396 B`, `Q401 revised`), an
+// `update`, or the developer quoted. A `go.`, a landing or the agent's own decision is not one.
+const RECORDS_AN_ANSWER = /\bQ\d+\s+(?:[A-D]\b|revised\b|answered\b)|\bupdates?\b|\breview points?\b|\(the developer\b/i;
+const CARRIED_FORWARD = /\bcarried\b[^.;]{0,40}\bto\s+(?:step|row)\s+\d/i;
+
+/**
+ * The `notes` and `carried` checks (RD.DEVEX.WORKSPACE.193), over the arcs whose log gained entries
+ * since this session's last Stop.
+ *
+ * `notes`: an entry that records an answer or a review point, in an arc whose `notes/N<nn>/` holds a
+ * spec, a plan or samples, when none of those files changed. The answer lands in the card, the arc
+ * and the notes in the same turn; a spec left as it was is what the next reader plans from.
+ *
+ * `carried`: an entry saying a point is carried to a later step, in an arc that was PROPOSED. Nothing
+ * is built on its spec yet, so the point changes the spec now.
+ *
+ * @param before   each arc's mark at this session's last Stop; nothing is judged without one
+ * @param touched  the arcs this session wrote, from its transcript; `null` reads every arc
+ */
+export function checkNotesLanded(root: string, before: Record<string, ArcMark> | undefined,
+                                 touched: Set<string> | null = null): Warning[] {
+  if (!before) return [];
+  const out: Warning[] = [];
+  for (const arc of openArcs(root)) {
+    const was = before[arc];
+    if (!was) continue;
+    if (touched && !touched.has(arc)) continue;
+    const text = read(arc);
+    const seen = new Set(was.log);
+    const added = logEntries(text).filter((line) => !seen.has(entryHash(line)));
+    if (!added.length) continue;
+    const files = notesFiles(arc);
+    if (files.length && added.some((line) => RECORDS_AN_ANSWER.test(line)) && notesSignature(files) === was.notes) {
+      const shown = files.filter((file) => !file.includes("/samples/")).map((file) => file.slice(file.indexOf("/notes/") + 1));
+      if (files.some((file) => file.includes("/samples/"))) shown.push(`${files[0].slice(files[0].indexOf("/notes/") + 1).replace(/\/[^/]+$/, "")}/samples/`);
+      out.push({ check: "notes", message:
+        `\`${basename(arc)}\` logged an answer this turn and its notes did not move — ${shown.join(" · ")}. ` +
+        `An answer, or any review point, lands in the same turn in the card, in the arc (a log line and every ` +
+        `row it changes) and in the arc's notes: the spec, the plan and any sample they name — MUST ` +
+        `(RD.DEVEX.WORKSPACE.193). Bring the notes the answer changes up to date now, and name them in the ` +
+        `log line.` });
+    }
+    const status = statusOf(arc);
+    if ((was.status === "PROPOSED" || status === "PROPOSED") && added.some((line) => CARRIED_FORWARD.test(line)))
+      out.push({ check: "carried", message:
+        `\`${basename(arc)}\` is PROPOSED and its log carries a review point to a later step of itself. A proposed ` +
+        `arc never does: nothing is built on its spec yet, so the point changes the spec now (RD.DEVEX.WORKSPACE.193). ` +
+        `Write it into the spec and the plan this turn.` });
+  }
+  return out;
 }
 
 /** Every arc file of every open workstream. */
@@ -885,6 +1007,9 @@ function missingParts(reply: string): string[] {
 // first non-blank line is `## Needs you`, `**Needs you**` or a plain `Needs you:` line. With no card
 // open the part is left out, so a reply is only read for it while a card is open.
 const NEEDS_YOU = /^[ \t]{0,3}(?:#{1,6}[ \t]*)?(?:\*\*|__)?[ \t]*Needs you\b/i;
+// WHERE THE NEEDS YOU PART ENDS: the progress heading, or a rule. A card's own `### Q<n>` heading sits
+// inside the part, so a heading ends it only when it names the progress.
+const PART_ENDS = /^[ \t]{0,3}(?:(?:#{1,6}[ \t]*|\*\*|__)[ \t]*(?:Progress|What moved)\b|(?:-{3,}|\*{3,}|_{3,})[ \t]*$)/i;
 
 /** Whether the reply's first non-blank line is the **Needs you** heading or line. */
 export function opensWithNeedsYou(reply: string): boolean {
@@ -893,20 +1018,68 @@ export function opensWithNeedsYou(reply: string): boolean {
 }
 
 /**
- * The reply's shape: a decision it puts carries the whole card, and a reply given while a card is
- * open opens with **Needs you**.
- *
- * @param open  the cards open on the approach pages; read from the workspace at `root` in the hook,
- *              and empty when not given, so a reply is then read for the card's parts alone
+ * The reply's **Needs you** part: from its opening line to the progress heading or a rule, fences
+ * set aside. Empty where the reply does not open with it.
  */
-export function checkReplyShape(reply: string, open: string[] = []): Warning[] {
+export function needsYouPart(reply: string): string {
+  if (!opensWithNeedsYou(reply)) return "";
+  const lines = withoutFences(reply).split("\n");
+  const start = lines.findIndex((line) => line.trim() !== "");
+  const out: string[] = [];
+  for (let at = start; at < lines.length; at += 1) {
+    if (at > start && PART_ENDS.test(lines[at])) break;
+    out.push(lines[at]);
+  }
+  return out.join("\n");
+}
+
+/** Whether a stretch of text puts card `card` in full: its number and a lettered options table. */
+function putsInFull(text: string, card: string): boolean {
+  return namesCard(text, card) && TABLE.test(text) && LETTERED_ROW.test(text);
+}
+
+/**
+ * The reply's shape: a decision it puts carries the whole card, and a reply given while a card is
+ * open opens with **Needs you**, which holds each card this turn raised in full, once, and names
+ * every card still open from an earlier reply in one line (RD.DEVEX.WORKSPACE.189).
+ *
+ * A CARD IS PUT IN FULL ONCE. This asked for every open card in full in every reply, and one card
+ * was repeated five or six times; one reply carried it twice, once in its body and once at the top
+ * where this check then asked for it. Only a card the turn raised is asked for whole, and only at
+ * the top; an older card is a line naming it.
+ *
+ * @param open    the cards open on the approach pages; read from the workspace at `root` in the hook,
+ *                and empty when not given, so a reply is then read for the card's parts alone
+ * @param raised  the open cards this turn raised — open now and not open at the session's last Stop;
+ *                empty when there is no last Stop to compare with, and then every card is an older one
+ */
+export function checkReplyShape(reply: string, open: string[] = [], raised: string[] = []): Warning[] {
   const out: Warning[] = [];
+  const fresh = open.filter((card) => raised.includes(card));
+  const older = open.filter((card) => !raised.includes(card));
+  const oneLine = "each card still open from an earlier reply is one line — its number, its question, and where it is";
   if (open.length && !opensWithNeedsYou(reply))
     out.push({ check: "needs-you", message:
       `A card is open — ${open.slice(0, 4).join(" · ")} — and the reply does not open with **Needs you**. ` +
-      `Every reply while work runs opens with what needs you, each open card in full in markdown, and ` +
-      `the progress comes after it — MUST (RD.DEVEX.WORKSPACE.189). A card under the progress is a ` +
-      `question the reader scrolls past while the work goes on.` });
+      `Every reply while work runs opens with what needs you, then the progress — MUST (RD.DEVEX.WORKSPACE.189). ` +
+      (fresh.length ? `A card raised in this reply goes there in full once (${fresh.join(" · ")}); ` : "") +
+      `${oneLine}. Do not repeat a card already put in full.` });
+  else if (open.length) {
+    const part = needsYouPart(reply);
+    const notWhole = fresh.filter((card) => !putsInFull(part, card));
+    if (notWhole.length)
+      out.push({ check: "needs-you", message:
+        `${notWhole.join(" · ")} ${notWhole.length > 1 ? "were" : "was"} raised in this reply and ${notWhole.length > 1 ? "are" : "is"} not ` +
+        `in full under **Needs you** at its top. A card is put in full once, at the top of the reply that raises it, and ` +
+        `never again in its body — MUST (RD.DEVEX.WORKSPACE.189). Do not repeat it now: from your next reply it is ` +
+        `one line — its number, its question, and where it is — and the full card stays on the approach page.` });
+    const unnamed = older.filter((card) => !namesCard(part, card));
+    if (unnamed.length)
+      out.push({ check: "needs-you", message:
+        `${unnamed.slice(0, 4).join(" · ")} ${unnamed.length > 1 ? "are" : "is"} still open and the **Needs you** part does not ` +
+        `name ${unnamed.length > 1 ? "them" : "it"}. ${oneLine[0].toUpperCase()}${oneLine.slice(1)}, before the progress — ` +
+        `MUST (RD.DEVEX.WORKSPACE.189). Never the full card again: that stays on the approach page.` });
+  }
   if (!asking(reply)) return out;
   const missing = missingParts(reply);
   if (!missing.length) return out;
@@ -1055,8 +1228,11 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   const repeated = event.stop_hook_active === true && (baseline?.fired ?? []).includes("handover");
   // No baseline means this Stop ends the session's first turn: the one the welcome belongs to.
   const firstTurn = !baseline && event.transcript_path && !event.agent_id ? firstTurnText(event.transcript_path) : "";
+  const waiting = span("stop-cards", () => cardsWaiting(root));
   const warnings = [
-    ...span("stop-reply-shape", () => checkReplyShape(reply, cardsWaiting(root))),
+    ...span("stop-reply-shape", () => checkReplyShape(reply, waiting,
+      baseline?.cards ? waiting.filter((card) => !baseline.cards!.includes(card)) : [])),
+    ...span("stop-notes", () => checkNotesLanded(root, baseline?.arcs, touched)),
     ...span("stop-arc-to-page", () => checkArcToPage(root)),
     ...span("stop-runnable", () => checkRunnable(root, baseline?.at ?? 0, baseline?.steps ?? {}, touched)),
     ...span("stop-hold", () => checkHold(root)),
@@ -1070,7 +1246,8 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   end();
   // AFTER the checks, never before: they compare against this and would compare against now.
   writeBaseline(root, session, { at: Date.now(), steps: currentSteps(root), transcriptAt,
-                                 fired: warnings.map((warning) => warning.check) });
+                                 fired: warnings.map((warning) => warning.check), cards: waiting,
+                                 arcs: arcMarks(root) });
   if (warnings.length) {
     console.error(warnings.map((w) => `[${w.check}] ${w.message}`).join("\n\n"));
     process.exit(2);   // a Stop hook's non-zero is how the message reaches the turn

@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md",
-      "seen": "65c6288d"
+      "seen": "d52b9ef3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
-      "seen": "243babdc"
+      "seen": "6ea0b5c2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
@@ -16,7 +16,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The masthead, and the opening",
-      "seen": "ee951acf"
+      "seen": "4fe3fa2f"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "section": "The words a report uses",
+      "seen": "f2b64ff8"
     }
   ],
   "decisions": [
@@ -93,7 +98,7 @@
     {
       "repo": "spn-foundation",
       "row": "RD.DEVEX.WORKSPACE.182",
-      "seen": "f8987f2e"
+      "seen": "926c1ff2"
     },
     {
       "repo": "spn-foundation",
@@ -108,9 +113,13 @@
 
 **Source of truth:** the foundation book's readability bar (`01-devex/04-workspace/04-docs/01-corpus`), the document block, its tag line and the behaviour row (`01-devex/04-workspace/04-docs/02-document`), the voice, upkeep and counting discipline checks (`01-devex/04-workspace/04-docs/04-discipline`), and the masthead and the opening (`01-devex/04-workspace/04-docs/05-artifacts.md`) — decisions RD.DEVEX.WORKSPACE.096, RD.DEVEX.WORKSPACE.106, RD.DEVEX.WORKSPACE.107, RD.DEVEX.WORKSPACE.115, RD.DEVEX.WORKSPACE.123, RD.DEVEX.WORKSPACE.125, RD.DEVEX.WORKSPACE.128, RD.DEVEX.WORKSPACE.131, RD.DEVEX.WORKSPACE.132, RD.DEVEX.WORKSPACE.142, RD.DEVEX.WORKSPACE.144, RD.DEVEX.WORKSPACE.146, RD.DEVEX.WORKSPACE.143, RD.DEVEX.WORKSPACE.182, RD.DEVEX.WORKSPACE.187 and RD.DEVEX.AGENT.032. This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
 
+**Judged against, beside the book:** plain-language practice as ISO 24495-1 and the US Federal Plain Language Guidelines state it. A wording option is weighed against the reader who has English as a second language.
+
 **Worn** while writing. **Convened** over any document before it lands. **Advises — and blocks a page that misses its seat bar.**
 
 ## What it checks
+
+**The seven rules of the readability bar are stated in the chapter and in no template**; this lens and the writing skills restate them, so you read them here before you write a page, never in a template's comment.
 
 - **Read it aloud.** A sentence awkward when spoken is a sentence to split. Split it — never shorten it, because force lives in the exact term and the MUST.
 - **Ask what you are trying to say**, then check the page says that. A paragraph you cannot summarize in one line has not decided its point yet.
@@ -122,7 +131,8 @@
 - **The house words are for the people who need them, and a node `README.md` uses none of them** (RD.DEVEX.WORKSPACE.125). *Seam*, *mirror*, *realize*, *face* and *construct* are this book's own words. A developer opening a package for the first time should not have to learn five of them to read its first page. So a node README and a behaviour area use none, and a construct or a mirror **defines each one where it is first met**.
 - **A term names its area, and a generic word is not a name — MUST** (RD.DEVEX.WORKSPACE.146). A word that could belong to any area tells the reader nothing about which one is meant, and one word used by two areas makes both unreadable. So the first choice is the word that is true for the area: `spnutils` ships **commands**, so they are commands. **A second word is used only where the first collides head-on** — the things coverage measures are also commands in plain English, and `Command` already names the contract's own write shapes, so coverage takes **action**. An incidental overlap is not a collision: `Action` in the notifications module is domain-prefixed every time it appears, so `CoverageAction` sits beside `NtfAction` the way any two domain-prefixed names do. **What this rule ends is the bare generic word** — the corpus used *verb* for the CLI's commands and for the coverage model at once, and neither reader could tell which was meant.
 - **A construct is prose, and a developer reads it to Parts and stops.** Overview, Terms, Model, Parts, Boundary, Binds, in that order: Overview first because it argues why in the reader's own words, Terms second because the model uses those words, Boundary after the parts because an edge is judged once the shape is seen. Above the first heading sits the masthead and nothing else — anything that argues belongs in Overview. A section is a container; its content is blocks chosen by kind. Binds is the rules that hold it and nothing else, and it is for the architect and the agent. **A construct types no proof**: what proves it is the behaviour rows at its own path, and its status is rolled up from them rather than typed.
-- **The masthead is three levels, and all three are plain language — MUST** (RD.DEVEX.WORKSPACE.187 · RD.DEVEX.WORKSPACE.182). The Title is the `h1`, the Subtitle is one sentence under it, and the Description is one paragraph in the standfirst's place: what the page is about in everyday words, why you would read it, then at most two short sentences on how it is laid out. Read each level for a number, a slogan, a figure of speech, or a book word — *behaviour*, *construct*, *lens*, *kind*, *node*, *seat*, *tier*, *arc*, *estate*, *ring* — that the same sentence does not explain; each is a finding. A report's Description names what was counted and carries no count. **The one exemption is the foundation hub's Title and Subtitle**, fixed word for word by RD.DEVEX.WORKSPACE.143. A new Title or Subtitle the developer has not approved is a finding too, because both speak for the product.
+- **The masthead is three levels, and all three are plain language — MUST** (RD.DEVEX.WORKSPACE.187 · RD.DEVEX.WORKSPACE.182). The Title is the `h1`, the Subtitle is one sentence under it, and the Description is one paragraph in the standfirst's place: what the page is about in everyday words, why you would read it, then at most two short sentences on how it is laid out. Read each level for a number, a slogan, a figure of speech, or a book word — *behaviour*, *construct*, *lens*, *kind*, *node*, *seat*, *tier*, *arc*, *estate*, *ring* — that the same sentence does not explain; each is a finding. A report's Description names what was counted and carries no count, and its Title is the report's name while its Subtitle is the question, naming the repository by its folder name. An approach page's masthead carries no project shorthand (an arc number, a question number or a release name the sentence does not explain), and the workstream number that opens its `h1` is not part of the Title. Hold a masthead against the approved one for its kind, the poor examples and the check before saving, in `refs/devex/workspace/docs/doc-sets.md` § Every page opens on a masthead of three levels; a page template carries none of them. **The one exemption is the foundation hub's Title and Subtitle**, fixed word for word by RD.DEVEX.WORKSPACE.143. A new Title or Subtitle the developer has not approved is a finding too, because both speak for the product.
+- **A report uses plain words, because developers and leaders read it who have not learned the book's — MUST.** *Docs folder* for a seat, *design topic* for a construct, *project type* for a kind, *worked out from* for derive, *implement* for realize, *folder* for pocket, *test* for a case, *a test level the project type owes* for an owed tier, and *behaviour* defined once as something the code promises to do. The book's term stays only in `code`, where a reader would search for it. The Summary's opening sentence stays under about twenty words with one fact a sentence, a word is defined only where the page must use it, no sentence narrates the page's own order, and the tables keep their column names (PASS, WARN, FAIL, the status values, Written, Built, Proved). The unit is defined before it is counted, one real member of what was counted is quoted, and a set is named by what its members do, never by their labels. A house word in a report's prose is a finding.
 - **A behaviour row is a record with a shape, and two of its cells are not yours to write** (RD.DEVEX.WORKSPACE.128 · RD.DEVEX.WORKSPACE.139). The row is `Id · Who · Does · Sees · Where · Type · Tier · Status · Updated at`, plus `Names` where it fulfils a promise. **The count is not stated here**: there are three widths and `02-document.md` is the only place that gives them, because a number repeated is a number that will be wrong somewhere. The rest are declared by hand: what the behaviour is, what realizes it (`Where`), whether it states something a person can do, something they are refused or something the standards promise (`Type`), the tier that will prove it (`Tier`), and the foundation promise it fulfils (`Names`). The agent writes `Status` and `Updated at` from a run. Read `Does` for the arrangement and the action in one clause, with no service, no table and no type in it; read `Sees` for the outcome, which is **never empty**. **A status is a reading and never a claim** — the retired `Proven` cell put a claim where a reading belonged, and the word is the value while the icon is only the rendering.
 - **A foundation row is a promise of five cells, and a built repository's row carries all ten** (RD.DEVEX.WORKSPACE.131 · RD.DEVEX.WORKSPACE.132). A promise is `Id · Who · Does · Sees · Type`, with `Type` reading `PROMISE` — the generic behaviour of an area that the standards make possible, written in the actor's own words, whether or not anything fulfils it yet. It carries no `Where`, no `Tier`, no `Status` and no `Updated at`, because the foundation ships no code and nothing could ever write them, and **a foundation row claiming a status is refused**. A row in a built repository carries every cell, and its `Names` cell holds the foundation id it delivers. A promise nothing fulfils is not a gap; it is the standard saying what it expects.
 - **A persona is who or what the rows speak for, and the audience is a different set.** `01-purpose` answers who benefits from the repository — the people who read it and work in it. A `Who` cell answers whose behaviour a row states. **Copying the purpose seat's list into `personas.md` is the mistake to know about**, because the two sets overlap often enough to look interchangeable and are not: a support repository's personas include *a developer* precisely because a framework's consumer is a developer, while a repository whose applications carry no product behaviour has system actors and no people at all. **The test that settles it is the source column**, and it holds for all three kinds: every persona names the construct that defines it, and an actor no construct defines is either audience — which belongs in `01-purpose` — or a behaviour stated in the wrong repository. Every `Who` resolves to that one table, and a persona is invented nowhere else.

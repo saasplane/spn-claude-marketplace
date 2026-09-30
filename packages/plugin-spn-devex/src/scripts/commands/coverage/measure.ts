@@ -108,10 +108,12 @@ type Level = {
   builtNotStated: { count: number; proved: number; seats: Array<{ seat: string; proved: boolean }> };
   builtNotProved: { count: number; ids: string[] };
   declaresNothing: Array<{ chapter: string; path: string }>;
+  manual: Array<{ id: string; file: string }>;
 };
 
 /** One row of the Repository table: a domain, or the behaviours about the whole repository. */
-type Rows = { written: { rows: number }; built: { rows: number }; proved: { rows: number }; notBuilt: { rows: number }; notProved: { rows: number } };
+type Rows = { written: { rows: number }; built: { rows: number }; proved: { rows: number }; notBuilt: { rows: number }; notProved: { rows: number };
+              manual: Array<{ id: string; file: string }> };
 
 /** A repository whose type is FOUNDATION: its rows are promises, so there is nothing built or proved to count. */
 export function foundationAbsence(root: string): Record<string, unknown> | null {
@@ -137,16 +139,26 @@ export function measure(root: string): Record<string, unknown> {
   const tests = measureTests(root) as { rows: Array<{ id: string; file: string; status: string | null; found: string | null }>; digest: string; measuredAt: string | null };
   const isProved = (row: { status: string | null; found: string | null }): boolean => (row.found ?? row.status) === "SUCCESS";
 
+  // A MANUAL row counts in none of the numbers (05-artifacts.md § The coverage report): a person proves
+  // it by the repository's browser guide and no run records it, so counted it would read as Not proved.
+  // Each level lists its own as `manual` instead.
+  const counted = tests.rows.filter((row) => row.status !== "MANUAL");
+  const manualOf = (rows: typeof tests.rows) => rows.filter((row) => row.status === "MANUAL").map((row) => ({ id: row.id, file: row.file }));
+  const manualRowsOf = new Map<string, typeof tests.rows>();
+
   // Written: the rows at each construct's own path.
   const rowsOf = new Map<string, typeof tests.rows>();
   for (const row of tests.rows) {
     const key = constructKeyOf(row.file);
-    if (key !== null) rowsOf.set(key, [...(rowsOf.get(key) ?? []), row]);
+    if (key === null) continue;
+    if (row.status === "MANUAL") manualRowsOf.set(key, [...(manualRowsOf.get(key) ?? []), row]);
+    else rowsOf.set(key, [...(rowsOf.get(key) ?? []), row]);
   }
 
   // The levels: each project under `apps/` and `packages/` that declares a kind.
   const levels = nodesOf(root).filter((node) => /^(apps|packages)\/[^/]+$/.test(nameOf(node)));
-  const { constructs, chapters, seatsByNode, stated, declaresNothing, findings, built: repoBuilt } = readChapters(root, rowsOf.keys(), levels);
+  const { constructs, chapters, seatsByNode, stated, declaresNothing, findings, built: repoBuilt } =
+    readChapters(root, new Set([...rowsOf.keys(), ...manualRowsOf.keys()]), levels);
 
   const levelOf = (node: string): Level => {
     const kind = kindOf(node);
@@ -170,6 +182,7 @@ export function measure(root: string): Record<string, unknown> {
       builtNotStated: { count: unstated.length, proved: unstated.filter((one) => one.proved).length, seats: unstated },
       builtNotProved: { count: builtRows.filter((row) => !isProved(row)).length, ids: builtRows.filter((row) => !isProved(row)).map((row) => row.id) },
       declaresNothing: declaresNothing.get(node)!,
+      manual: manualOf(owned.flatMap((construct) => manualRowsOf.get(construct) ?? [])),
     };
   };
 
@@ -189,24 +202,27 @@ export function measure(root: string): Record<string, unknown> {
       : [{ construct, chapter: null, reason: "the construct has rows and no capability chapter in any package or app" }]);
   const builtRows = repoBuilt.flatMap((construct) => rowsOf.get(construct) ?? []);
   const repositoryLevel = {
-    written: { rows: tests.rows.length, constructs: written.length },
+    written: { rows: counted.length, constructs: written.length },
     built: { rows: builtRows.length, constructs: repoBuilt.length },
-    proved: { rows: tests.rows.filter(isProved).length },
+    proved: { rows: counted.filter(isProved).length },
     statedNotBuilt: { count: written.length - repoBuilt.length, items: repoItems },
     builtNotStated: { count: all.reduce((sum, level) => sum + level.builtNotStated.count, 0), proved: all.reduce((sum, level) => sum + level.builtNotStated.proved, 0) },
     builtNotProved: { count: builtRows.filter((row) => !isProved(row)).length },
-    repositoryRows: tests.rows.filter((row) => constructKeyOf(row.file) === null).length,
+    repositoryRows: counted.filter((row) => constructKeyOf(row.file) === null).length,
+    manual: manualOf(tests.rows),
   };
 
   // The Repository table: one row per domain, then the behaviours about the whole repository, which
   // belong to no design topic and so are never built. Not built and Not proved are Written less each.
   const isBuilt = (row: { file: string }): boolean => { const key = constructKeyOf(row.file); return key !== null && repoBuilt.includes(key); };
-  const rowsIn = (rows: typeof tests.rows): Rows => {
+  const rowsIn = (all: typeof tests.rows): Rows => {
+    const rows = all.filter((row) => row.status !== "MANUAL");
     const builtHere = rows.filter(isBuilt).length;
     const provedHere = rows.filter(isProved).length;
     return {
       written: { rows: rows.length }, built: { rows: builtHere }, proved: { rows: provedHere },
       notBuilt: { rows: rows.length - builtHere }, notProved: { rows: rows.length - provedHere },
+      manual: manualOf(all),
     };
   };
   const domains = domainsOf(root, tests.rows.map((row) => domainOf(row.file)).filter((one): one is string => one !== null)).map((domain) => {
@@ -262,7 +278,7 @@ export function describeResult(result: Record<string, any>): string[] {
   const lines = [
     `${result.repository} — written, built and proved, measured ${result.measuredAt}`,
     `  units: written in ${result.units.written} · built in ${result.units.built} · proved in ${result.units.proved} · ` +
-    `stated, not built in ${result.units.statedNotBuilt} · built, not stated in ${result.units.builtNotStated} · built, not proved in ${result.units.builtNotProved}`,
+    `not written in ${result.units.builtNotStated} · not built in ${result.units.statedNotBuilt} · not proved in ${result.units.builtNotProved}`,
     ...table.map((row) => `  ${row.map((cell, column) => column < 2 ? cell.padEnd(widths[column]) : cell.padStart(widths[column])).join("  ")}`),
   ];
   const rowsLine = (label: string, one: any): string =>
@@ -271,8 +287,8 @@ export function describeResult(result: Record<string, any>): string[] {
   lines.push(rowsLine("the whole repository", result.wholeRepository));
   const total = result.repositoryLevel;
   lines.push(`  totals: ${total.written.rows} rows in ${total.written.constructs} constructs written · ${total.built.rows} rows built, ` +
-    `in ${total.built.constructs} constructs · ${total.proved.rows} rows proved · ${total.statedNotBuilt.count} stated, not built · ` +
-    `${total.builtNotStated.count} seats built, not stated (${total.builtNotStated.proved} proved) · ${total.builtNotProved.count} rows built, not proved`);
+    `in ${total.built.constructs} constructs · ${total.proved.rows} rows proved · ${total.builtNotStated.count} not written (${total.builtNotStated.proved} of them proved) · ` +
+    `${total.statedNotBuilt.count} not built · ${total.builtNotProved.count} not proved`);
   for (const one of result.findings) lines.push(`  ${one.file}: ${one.message}`);
   lines.push(`  ${result.report.path} — ${!result.report.exists ? "not written yet" : result.report.current ? "current, nothing to write" : "stale"} · ${result.digest}`);
   return lines;

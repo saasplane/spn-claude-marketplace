@@ -1,58 +1,21 @@
-<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § Reports and templates · § The four page kinds · § The masthead, and the opening · § The suffix names the kind · § One stylesheet, shipped with the template
-     and docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The header — two lines, six fields, produced from the block
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § Reports and templates · § The header and the five sections · § Findings in a report · § Records in a report · § Recommendations in a report · § Who decides · § How a report looks, and where it goes · § The words a report uses · § The coverage report — written, built and proved, and the four report types after it
+     and docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The masthead, and the opening · § The suffix names the kind · § The header — two lines, six fields, produced from the block · § The blocks — what a page reaches for instead of prose · § The figures — what sits inside a block, and the closed set of them · § One stylesheet, shipped with the template · § The page itself — its outline, its rail, its width and its furniture
+     and docs/02-constructs/01-devex/04-workspace/05-report.md (The Report: what a report is)
      and docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md § Metadata
      and docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md § The readability bar
-     This file carries rules it does not own. The chapters above are the source of truth.
-     A rule change is edited there first, then here, in the same change. Never add a rule here.
-     restate-drift.ts reports this copy when its source moves. -->
-<!-- REPORT TEMPLATE. One shell for all five report kinds — AUDIT (the repository's wiring) · CODE (the source against
-     the stack's standards) · DOCS (the corpus against the docs standards) · TESTS (what the tests have proved) ·
-     COVERAGE (how much is written, built and proved). The set is closed by RD.DEVEX.WORKSPACE.149; a new kind is a
-     decision entry, never a new filename. The skeleton is the overview
-     template's, so a report reads like every other page a developer opens; only the five sections below differ, and
-     only the Findings columns differ per kind.
-     LANDS AT `docs/artifacts/reports/<kind>-report.html`, replaced in place — the name says what was measured and the
-     suffix says what kind of document it is, so the folder reads without the book.
-     A REPORT ANSWERS ONE QUESTION AT ONE MOMENT, SO IT IS A SNAPSHOT AND CARRIES NO STATUS — no `status` key in the
-     block and no status chip in the header (RD.DEVEX.WORKSPACE.192). The Summary says in a sentence what was found.
-     `generatedAt` is what lets the next one supersede it: a page with no as-of cannot be superseded, because nobody
-     can tell which is newer. It is the moment the page was generated, as a date and a time with its offset
-     (2026-09-29T14:32+05:30), because the database keeps UTC and a developer's machine keeps local time. The header
-     shows it as "Generated:" in the reader's own time zone and format: the value sits in the `datetime` attribute of
-     the `<time>` element, the script at the end of the page renders it, and where no script runs the value shows as
-     written. A report that reads the tree itself (AUDIT, CODE, DOCS, COVERAGE) is generated in the same moment it
-     measures. A TESTS report reads test runs that can be older, so it also carries `measuredAt`, the newest run it
-     read, and states that time in "What was measured", never in the header. No other report carries `measuredAt`.
-     WRITTEN BY THE AGENT through the report skill, never by a tool. The agent reads the repository, fills this skeleton
-     from what it read, and every number on the page names where it was read from. A tool that needs to hand the agent a
-     measurement gives it `--json` on stdout; it never writes into a developer's pocket.
-     LIFECYCLE. A `superseded` kind is replaced in place, so a pocket never accumulates six audits nobody re-reads. A
-     `kept` kind is dated in its filename and never overwritten. The report skill's table says which is which.
-     WHAT IT NEVER DOES. It never fixes what it found, and it never says a thing is fine because it did not look at it —
-     the last section is where the boundary is stated, and it is not optional.
-     THE READABILITY BAR GOVERNS THIS PAGE LIKE EVERY OTHER — its seven rules are at the head of this file and
-     `01-corpus.md` owns them. Rule 2 is the one a report breaks most: explain a term the first time it appears, and
-     assume an engineer who has never seen this vocabulary. A report is opened by a developer who wants a number, not
-     by somebody who already knows the platform's words.
-     THREE THINGS A REPORT IN PARTICULAR HAS TO DO, which are that bar applied to a page made of counts:
-       · DEFINE THE UNIT BEFORE YOU COUNT IT. "This repository writes down 58 things it should be able to do" comes
-         before "16 are tested" — a reader cannot picture a count of something they have not met.
-       · QUOTE ONE REAL MEMBER of whatever you counted, from the thing you measured. An example makes an abstraction
-         concrete faster than a definition does.
-       · NAME A SET BY WHAT ITS MEMBERS DO, never by their labels: "the ones that check a screen, a published
-         interface, several pieces working together, or a whole journey" rather than a list of tier names.
-     The test is rule 2's own: a reader who has never opened this book finishes the Summary knowing what the number
-     means. The opening carries no number at all: it says what was counted, and the count starts in the Summary. -->
+     This file holds the structure and styling of a report, one shell for all five report types, and states no
+     rule: the five sections in order with their ids, the slots an author fills, and the stylesheet and scripts.
+     The sections above state every rule for writing a report, and what each report type fills in. -->
 <meta charset="utf-8">
 <title>Report Template</title>
 <!-- spn:doc
-{"id": "{{repo}}-{{kind}}-report", "variant": "report", "reportType": "{{AUDIT|CODE|DOCS|TESTS|COVERAGE}}", "title": "{{KIND, in plain words}}", "lenses": ["{{LENS}}"], "generatedAt": "{{YYYY-MM-DDTHH:MM±HH:MM, the moment this page was written}}", "measuredAt": "{{TESTS only, the newest run read — delete the key on every other kind}}", "summary": "{{The Description's first sentence, word for word.}}", "keywords": ["report", "{{kind}}"]}
+{"id": "{{repo}}-{{type}}-report", "variant": "report", "repository": "{{repo}}", "reportType": "{{AUDIT|CODE|DOCS|TESTS|COVERAGE}}", "title": "{{REPORT TYPE, in plain words}}", "lenses": ["{{LENS}}"], "generatedAt": "{{YYYY-MM-DDTHH:MM±HH:MM, the moment this page was written}}", "measuredAt": "{{TESTS only, the newest run read — delete the key on every other report type}}", "summary": "{{The Description's first sentence, word for word.}}", "keywords": ["report", "{{type}}"]}
 -->
 <style>
   :root {
     --paper:#edf0f3; --card:#f7f9fb; --ink:#141920; --slate:#48525f; --faint:#7c8794;
     --rule:#d2d9e0; --accent:#2f4e7a; --accent-soft:#e0e8f4;
-    --gap:#8f5714; --gap-soft:#f7ecda; --ok:#2a6459; --ok-soft:#dcece8;
+    --gap:#8f5714; --gap-soft:#f7ecda; --ok:#2a6459; --ok-soft:#dcece8; --fail:#a63d3d; --fail-soft:#f6e1e1;
     --ui:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
     --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
     --xs:0.76rem; --sm:0.85rem; --md:0.97rem; --lg:1.32rem; --xl:1.62rem; --xxl:2.5rem;
@@ -61,11 +24,11 @@
   @media (prefers-color-scheme:dark){
     :root:not([data-theme="light"]){ --paper:#0f1318; --card:#171d24; --ink:#e3e8ee; --slate:#a3adb9; --faint:#6f7986;
       --rule:#242d37; --accent:#86a9da; --accent-soft:#18232f;
-      --gap:#d59d4f; --gap-soft:#2a2113; --ok:#5db3a4; --ok-soft:#14251f; --tk-k:#c9a3ee; --tk-s:#7fc9b6; --tk-c:#6f7986; --tk-t:#86a9da; --tk-n:#d59d4f; --tk-add:#5db3a4; --tk-del:#e08a8a; }
+      --gap:#d59d4f; --gap-soft:#2a2113; --ok:#5db3a4; --ok-soft:#14251f; --fail:#e08a8a; --fail-soft:#2b1818; --tk-k:#c9a3ee; --tk-s:#7fc9b6; --tk-c:#6f7986; --tk-t:#86a9da; --tk-n:#d59d4f; --tk-add:#5db3a4; --tk-del:#e08a8a; }
   }
   :root[data-theme="dark"]{ --paper:#0f1318; --card:#171d24; --ink:#e3e8ee; --slate:#a3adb9; --faint:#6f7986;
     --rule:#242d37; --accent:#86a9da; --accent-soft:#18232f;
-    --gap:#d59d4f; --gap-soft:#2a2113; --ok:#5db3a4; --ok-soft:#14251f; --tk-k:#c9a3ee; --tk-s:#7fc9b6; --tk-c:#6f7986; --tk-t:#86a9da; --tk-n:#d59d4f; --tk-add:#5db3a4; --tk-del:#e08a8a; }
+    --gap:#d59d4f; --gap-soft:#2a2113; --ok:#5db3a4; --ok-soft:#14251f; --fail:#e08a8a; --fail-soft:#2b1818; --tk-k:#c9a3ee; --tk-s:#7fc9b6; --tk-c:#6f7986; --tk-t:#86a9da; --tk-n:#d59d4f; --tk-add:#5db3a4; --tk-del:#e08a8a; }
   *{box-sizing:border-box}
   body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--ui);font-size:1rem;line-height:1.6;-webkit-font-smoothing:antialiased}
   p{margin:0 0 1rem;max-width:58rem}
@@ -102,13 +65,17 @@
   .tile h4 a:hover{color:var(--accent)}
   .tile p{font-size:var(--sm);color:var(--slate);margin:0 0 .6rem;max-width:none;flex:1}
   .tile .more{font-size:var(--sm);font-weight:600;text-decoration:none;align-self:flex-start}
-  /* The sides of a measurement: a big number, its unit, and a bar for its share. A coverage report's
-     Summary uses one per side (written, built, proved). */
+  /* The Summary's tiles */
   .sides{display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:.8rem;margin:1.2rem 0}
   .side{border:1px solid var(--rule);background:var(--card);border-radius:3px;padding:.9rem 1rem;display:flex;flex-direction:column;gap:.35rem}
   .side .lbl{font-family:var(--mono);font-size:var(--xs);letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
-  .side .big{font-size:1.8rem;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink);line-height:1.1}
+  .side .big{font-family:var(--ui);font-size:1.8rem;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink);line-height:1.1}
+  .side .big .tot{font-weight:400;color:var(--slate)}
   .side .of{font-size:var(--sm);color:var(--slate)}
+  .side .side-num{display:flex;align-items:baseline;justify-content:space-between;gap:.5rem}
+  .side .pct{font-family:var(--mono);font-size:var(--sm);font-weight:650;color:var(--slate);font-variant-numeric:tabular-nums}
+  .method > :not(summary){margin:0 1rem 1rem}
+  .method > .scroll{margin-top:.2rem}
   .bar{height:.5rem;border-radius:999px;background:var(--rule);overflow:hidden}
   .bar i{display:block;height:100%;background:var(--accent)}
   p > .more{font-weight:600;text-decoration:none}
@@ -122,6 +89,13 @@
   h4{font-family:var(--ui);font-size:var(--md);margin:0 0 .5rem;color:var(--ink)}
   .scroll{overflow-x:auto;border:1px solid var(--rule);border-radius:3px;background:var(--card);margin:1.6rem 0}
   table{border-collapse:collapse;width:100%;font-family:var(--ui);font-size:var(--sm);min-width:34rem}
+  td .sub{display:block;margin-top:.4rem;font-size:var(--xs);color:var(--slate)}
+  td .sub b{font-weight:650;color:var(--ink)}
+  td .sl{display:block;margin-top:.3rem;font-family:var(--mono);font-size:var(--xs);font-weight:400;color:var(--faint)}
+  table.grid{table-layout:fixed;min-width:52rem}
+  table.grid th.num-cell,table.grid td.num-cell{padding-left:.5rem;padding-right:.6rem}
+  table.grid th{white-space:nowrap}
+  table.grid td{overflow-wrap:anywhere}
   .scroll table{table-layout:auto}
   th{text-align:left;font-family:var(--mono);font-size:var(--xs);letter-spacing:.07em;text-transform:uppercase;color:var(--faint);font-weight:650;padding:.6rem .8rem;border-bottom:1px solid var(--rule)}
   td{padding:.6rem .8rem;border-bottom:1px solid var(--rule);vertical-align:top;color:var(--slate)}
@@ -134,13 +108,8 @@
   pre{background:var(--card);border:1px solid var(--rule);border-radius:3px;padding:.9rem 1.1rem;margin:1.6rem 0;overflow-x:auto;font-family:var(--mono);font-size:var(--sm);line-height:1.55;color:var(--slate);max-width:100%}
   pre code{font-size:inherit}
   pre .tk-k{color:var(--tk-k);font-weight:600} pre .tk-s{color:var(--tk-s)} pre .tk-c{color:var(--tk-c);font-style:italic} pre .tk-t{color:var(--tk-t)} pre .tk-n{color:var(--tk-n)} pre .tk-add{color:var(--tk-add)} pre .tk-del{color:var(--tk-del)} pre .tk-cmd{color:var(--tk-t);font-weight:600}
-  /* A FIGURE RUNS EDGE TO EDGE. It takes no padding, border or background of its own: the section
-     already provides the page's padding, and the drawing's own containers are its frame. That is the
-     opposite of a PROSE panel, which carries all three. A figure is also not held to the prose
-     measure — 58rem is for a sentence, and a drawing is not read a line at a time. */
-  /* ONE VERTICAL RHYTHM. A paragraph keeps its 1rem; every block gets 1.6rem above and below, and a
-     figure 2.4rem — it is the largest thing on a page, and it needs the air to read as one unit rather
-     than as something the paragraph above it is still saying. Margins collapse, so the larger wins. */
+  /* A figure */
+
   figure{margin:2.4rem 0;padding:0;border:0;background:none}
   figure svg{display:block;width:auto;max-width:100%;height:auto;margin-inline:auto}
   figcaption{font-family:var(--ui);font-size:var(--xs);color:var(--faint);margin-top:.5rem;max-width:none}
@@ -152,10 +121,7 @@
   .dg .l{font-family:var(--ui);font-size:12px;fill:var(--ink)}
   .dg .s{font-family:var(--mono);font-size:11px;fill:var(--slate)}
   .dg .n{font-family:var(--ui);font-size:11px;fill:var(--faint)}
-  /* The arrowhead is a marker filled with `currentColor`, and a marker resolves that against
-     its own inherited colour rather than the path that references it. With nothing setting
-     `color` on the figure, every connector drew a blue line ending in a black head. Setting it
-     on `.dg` makes the head take the line's colour, and the marker needs no change. */
+  /* Arrowheads take the line's colour */
   .dg{color:var(--accent)}
   .dg .c{stroke:var(--accent);stroke-width:1.6;fill:none}
   .pull{border-left:2px solid var(--accent);background:var(--accent-soft);padding:1rem 1.2rem;margin:1.6rem 0;border-radius:0 3px 3px 0}
@@ -177,39 +143,25 @@
     .rail a.on{border-left:none}
   }
 
-  /* THE OUTLINE HAS TWO LEVELS, AND THEY DIFFER ON THREE AXES — size, weight and colour together.
-     One axis is not enough at rail size: a single step reads as noise rather than as a level, and
-     the two collapse into each other. Nothing in an outline sits on --faint either, because that is
-     the token for text a reader is meant to skim past and an outline is what they navigate by. */
+  /* The rail: two levels */
   .rail a:not(.sub):not(.home){font-size:.88rem;font-weight:400;color:var(--ink);letter-spacing:-.005em}
   .rail a.sub{font-size:.78rem;font-weight:400;color:var(--slate)}
   .rail .rail-title{color:var(--slate)}
 
-  /* ONE LEFT EDGE FOR BOTH LEVELS. An indent repeats what the fold already says, and it costs the
-     longer labels a wrapped line. Both are stated in one rule: setting only the subsection's
-     padding leaves it outdented past its own section, because another rule still sets the
-     section's. */
+  /* The rail: one left edge */
   .rail a:not(.home), .rail a.sub{padding-left:.6rem}
 
-  /* EVERYTHING ON THE RIGHT SITS ON THE LABEL'S CENTRE LINE. The row is a flex line, and its
-     default is to stretch, so a chevron or a count badge beside a label that wrapped to two lines
-     was pinned to the top of the row rather than level with it. */
+  /* The rail: marks level with the label */
   .rail a{align-items:center}
   .rail .count{align-self:center}
 
-  /* WEIGHT AND COLOUR MARK WHERE YOU ARE, NEVER WHAT A LEVEL IS. The notch is an inset shadow and
-     not a border: a border changes the box, so a label would jump sideways by the notch's width the
-     moment it became current. These are restated at matching specificity because the level rules
-     above are more specific than `.rail a.on`, and would otherwise strip the selected state. */
+  /* The rail: the current entry */
   .rail a.on:not(.sub):not(.home){font-weight:650;color:var(--accent);box-shadow:inset 1.5px 0 0 var(--accent)}
   .rail a.on.sub{color:var(--accent);box-shadow:inset 1.5px 0 0 var(--accent)}
   .rail a:not(.sub):not(.home):hover{color:var(--accent)}
   .rail a.sub:hover{color:var(--ink)}
 
-  /* THE DISCLOSURE IS A CHEVRON, DRAWN RATHER THAN TYPED. A glyph ties the mark to whatever font
-     is resolved and to that font's own idea of weight and baseline; two borders on a rotated box
-     are the same shape at every size and inherit the row's colour. Right means closed, down means
-     open, and only the chevron turns — the box around it stays put so the hit target never moves. */
+  /* The rail: the fold chevron */
   .rail a .caret{margin-left:auto;flex:none;width:1.35rem;height:1.35rem;display:grid;place-items:center;
     color:var(--faint);border-radius:3px;transform:none}
   .rail a .caret::before{content:"";width:.32rem;height:.32rem;border-right:1.5px solid currentColor;
@@ -220,200 +172,306 @@
   @media (prefers-reduced-motion:reduce){.rail a .caret::before{transition:none}}
 </style>
 <style>
-/* anchor links: a section or subsection title carries a link to itself — small, grey, set off from the title; copied on click */
+/* Heading anchor links */
 a.anchor{display:inline-block;margin-left:.6em;font-family:var(--mono);font-size:.55em;font-weight:400;line-height:1;color:var(--slate,#6b7280);text-decoration:none;opacity:.35;transition:opacity .15s;vertical-align:middle;position:relative;top:-.1em}
 .sec-head:hover a.anchor,h3[id]:hover a.anchor,a.anchor:hover,a.anchor:focus,a.anchor.copied{opacity:1}
 a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7d4a);margin-left:.3em}
 </style>
+<style>
+  /* The report's own parts */
 
+  /* The verdict */
+  .verdict{font-size:var(--lg);line-height:1.45;color:var(--ink);font-weight:500;max-width:52rem;margin:0 0 1rem}
+  .terms{font-size:var(--sm);color:var(--slate)}
+
+  /* A tile's bar colours */
+  .bar i.ok{background:var(--ok)}
+  .bar i.gap{background:var(--gap)}
+  .bar i.fail{background:var(--fail)}
+
+  /* The breakdown bar */
+  .breakdown{margin:1.4rem 0 1.2rem}
+  .bd-title{font-family:var(--mono);font-size:var(--xs);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:0 0 .45rem}
+  .bd-bar{display:flex;gap:2px;height:1.15rem;border-radius:4px;overflow:hidden;background:var(--paper)}
+  .bd-seg{flex:0 1 0;min-width:.45rem;height:100%}
+  .bd-legend{display:flex;flex-wrap:wrap;gap:.35rem 1.3rem;list-style:none;margin:.65rem 0 0;padding:0;font-size:var(--sm);color:var(--slate)}
+  .bd-legend li{display:inline-flex;align-items:center;gap:.45rem}
+  .bd-legend b{color:var(--ink);font-variant-numeric:tabular-nums}
+  .bd-key{display:inline-block;width:.85rem;height:.85rem;border-radius:2px;flex:none}
+  .st-ok{background:var(--ok)}
+  .st-fail{background:var(--fail)}
+  .st-warn{background:repeating-linear-gradient(45deg,var(--gap) 0 3px,var(--gap-soft) 3px 5px)}
+  .st-none{background:repeating-linear-gradient(135deg,var(--faint) 0 2px,var(--card) 2px 5px);box-shadow:inset 0 0 0 1px var(--faint)}
+  .st-base{background:var(--accent)}
+
+  /* Top gaps */
+  .top-gaps{margin:.4rem 0 0;padding-left:2.2rem;max-width:58rem}
+  .top-gaps li{margin:0 0 .35rem;padding-left:.2rem}
+  .top-gaps li::marker{font-family:var(--mono);font-weight:700;color:var(--gap)}
+
+  /* Measured: the scope list */
+  .scope{list-style:none;margin:0 0 1rem;padding:0;max-width:58rem}
+  .scope li{padding:.3rem 0;border-bottom:1px dashed var(--rule)}
+  .scope li:last-child{border-bottom:none}
+  .scope .k{display:inline-block;min-width:8.5rem;font-family:var(--mono);font-size:var(--xs);letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+
+  /* Findings: gap, failure and total cells */
+  td.gap{background:var(--gap-soft);color:var(--gap);font-weight:650}
+  td.fail{background:var(--fail-soft);color:var(--fail);font-weight:650}
+  td.done{color:var(--ok);font-weight:650}
+  tr.total td{border-top:2px solid var(--ink);color:var(--ink);font-weight:650}
+  tr.total td.gap,tr.total td.fail{border-top-color:var(--ink)}
+  .units{font-size:var(--sm);color:var(--slate)}
+
+  /* Records */
+  .rec-group{border:1px solid var(--rule);border-radius:3px;background:var(--card);margin:.6rem 0}
+  .rec-group > summary{cursor:pointer;list-style:none;display:flex;flex-wrap:wrap;align-items:center;gap:.35rem .7rem;padding:.7rem 1rem;font-size:var(--sm);color:var(--ink)}
+  .rec-group > summary::-webkit-details-marker{display:none}
+  .rec-group > summary::before{content:"";width:.4rem;height:.4rem;border-right:1.5px solid var(--faint);border-bottom:1.5px solid var(--faint);transform:rotate(-45deg);transition:transform .15s ease;flex:none}
+  .rec-group[open] > summary::before{transform:rotate(45deg)}
+  .rec-group > summary:hover .rec-name{color:var(--accent)}
+  .rec-group > summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .rec-name{font-weight:600;min-width:0;overflow-wrap:anywhere}
+  .rec-count{font-family:var(--mono);font-size:var(--xs);background:var(--gap-soft);color:var(--gap);border-radius:2px;padding:.05rem .4rem;font-weight:650;white-space:nowrap}
+  .rec-worst{font-family:var(--mono);font-size:var(--xs);letter-spacing:.06em;text-transform:uppercase;color:var(--slate)}
+  /* A group's decider mix, and a second level of groups */
+  .rec-mix{font-size:var(--xs);color:var(--slate)}
+  .rec-subs{border-top:1px solid var(--rule);padding:.15rem 0 .45rem}
+  .rec-subs > .rec-group{margin:.45rem .75rem}
+  /* The severity dot */
+  .sev{display:inline-block;width:.62rem;height:.62rem;border-radius:50%;flex:none;background:none;box-shadow:inset 0 0 0 1.5px var(--faint)}
+  .sev.fail{background:var(--fail);box-shadow:none}
+  .sev.gap{background:var(--gap);box-shadow:none}
+  .records{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
+  .record{display:grid;grid-template-columns:.62rem minmax(0,1fr);column-gap:.8rem;padding:.65rem 1rem;border-bottom:1px solid var(--rule)}
+  .record:last-child{border-bottom:none}
+  .record > .sev{grid-row:1 / span 3;margin-top:.3rem}
+  .record .loc{grid-column:2;font-family:var(--mono);font-size:var(--xs);color:var(--ink);overflow-wrap:anywhere;word-break:break-word}
+  .record .loc code{font-size:inherit}
+  .record .what{grid-column:2;margin:.2rem 0 0;font-size:var(--sm);color:var(--ink);max-width:58rem;overflow-wrap:anywhere}
+  .record .meta{grid-column:2;margin:.15rem 0 0;font-size:var(--xs);color:var(--slate);overflow-wrap:anywhere}
+  .record .meta code{font-size:inherit}
+  @media (prefers-reduced-motion:reduce){.rec-group > summary::before{transition:none}}
+
+  /* A record's id and its decider */
+  .rec-id{font-family:var(--mono);font-size:var(--xs);color:var(--slate);margin-right:.55rem;white-space:nowrap}
+  .record .by{grid-column:2;margin:.2rem 0 0;font-size:var(--xs);color:var(--slate);overflow-wrap:anywhere}
+  .decider{display:inline-block;font-family:var(--mono);font-size:var(--xs);letter-spacing:.03em;line-height:1.5;border-radius:2px;padding:0 .4rem;border:1px solid var(--rule);color:var(--slate);background:var(--card);white-space:nowrap}
+  .decider.flag{border-color:var(--gap);color:var(--gap)}
+  .decider.dev{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);font-weight:650}
+
+  /* Recommendations */
+  .rec-because{font-size:var(--sm);color:var(--slate)}
+  .open .opts{margin:.2rem 0 .4rem;padding-left:1.2rem;font-size:var(--sm);color:var(--slate)}
+  .open .opts li{margin:0 0 .2rem}
+
+  /* Apps with module rows */
+  tr.proj td{color:var(--ink)}
+  tr.proj td:first-child{font-weight:650}
+  tr.mod td:first-child{padding-left:2.2rem}
+
+  /* A state matrix */
+  td.st{text-align:center;font-family:var(--mono);font-size:var(--xs);font-weight:650;white-space:nowrap}
+  td.st.pass{color:var(--ok);background:var(--ok-soft)}
+  td.st.warn{color:var(--gap);background:var(--gap-soft)}
+  td.st.fail{color:var(--fail);background:var(--fail-soft)}
+  td.st.none{color:var(--faint);font-weight:400}
+  td.st .s{display:block;font-weight:400;white-space:normal}
+
+  /* Long paths wrap */
+  p code,li code{overflow-wrap:anywhere}
+  footer{max-width:min(98vw,80rem);margin:0 auto;padding:1.3rem 16px 3rem}
+
+  /* Phone width */
+  @media (max-width:40rem){
+    .page{padding:1.25rem 16px 4rem;max-width:100%}
+    h1{font-size:1.9rem}
+    .subtitle,.verdict{font-size:1.1rem}
+    .sides{grid-template-columns:repeat(auto-fit,minmax(min(100%,9.5rem),1fr))}
+    .side .big{font-size:1.5rem}
+    .scope .k{display:block;min-width:0}
+    .rec-group > summary,.record{padding-left:.75rem;padding-right:.75rem}
+  }
+
+  /* Print */
+  @media print{
+    :root:root:root{--paper:#fff; --card:#fff; --ink:#141920; --slate:#48525f; --faint:#7c8794;
+      --rule:#d2d9e0; --accent:#2f4e7a; --accent-soft:#e0e8f4;
+      --gap:#8f5714; --gap-soft:#f7ecda; --ok:#2a6459; --ok-soft:#dcece8; --fail:#a63d3d; --fail-soft:#f6e1e1}
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    body{background:#fff;font-size:10.5pt}
+    .rail,a.anchor{display:none !important}
+    .page{display:block;max-width:none;padding:0;margin:0}
+    .wrap{display:block}
+    .wrap > section{break-before:page;margin:0}
+    .wrap > section:first-of-type{break-before:auto;margin-top:1.6rem}
+    .scroll{overflow:visible;border-color:var(--rule)}
+    table{min-width:0}
+    tr,.side,.breakdown,.top-gaps li{break-inside:avoid}
+    h2,h3{break-after:avoid}
+    .rec-group{background:none}
+    .rec-group > summary::before{display:none}
+    .rec-group::details-content{content-visibility:visible;display:block}
+    .record{break-inside:avoid}
+    .open{break-inside:avoid}
+    footer{padding:1rem 0 0}
+  }
+</style>
 
 <div class="page">
 
-<!-- THE RAIL. Nothing in the rail is written by hand. Two scripts at the end of the page build it from the
-  content: every <section id> becomes an entry, named from its h2 — never numbered: a number orders a file in a tree, a heading is a name (the text
-  before the em dash, so name sections with a plain word first); every <h3 id> inside a section becomes a
-  sub-entry; the Open section shows its card count. Sub-entries fold under their section, open where the reader
-  is, with a caret at the far right to pin one open. The rail follows the scroll. Keep the ids and
-  the h2/h3 pattern and the rail-fold style block; a page without them is off its template. -->
 <nav class="rail" id="rail">
-  <a class="home" href="../../../../README.md">&larr; .spndevex</a>
+  <a class="home" href="../README.md">&larr; Artifacts</a>
   <div class="rail-title">{{PAGE NAME &mdash; the block's title, the third segment of the header line}}</div>
 </nav>
 <div class="wrap">
 
-<!-- ================================================================================================
-  THE WRITING RULES, read before you write a word. Every page kind carries these.
-  1. Say why before what. Open with the problem, then give the answer.
-  2. Explain a term the first time it appears, then use it. Never make the reader guess.
-  3. Use simple words: a word the reader can look up. No idioms, no metaphors, no wordplay.
-  4. One idea at a time. A sentence may be long when the idea needs it. Never cut the link between
-     two ideas to make a sentence shorter; a reader has to connect the dots.
-  5. Carry the source's facts and its terms. Never its phrasing.
-  6. Keep the reasoning. A plain page still explains why. It drops decoration, not connections.
-  7. Close a section with where to go next: a page to read or a command to run.
-  ================================================================================================ -->
-<!-- ================================================================================================
-  THE BLOCKS. MOST OF A PAGE IS NOT A BLOCK. Paragraphs, lists, numbered steps and subheadings are what a
-  section is made of; write them plainly and label them as nothing. A BLOCK is what you drop into that writing
-  when a piece of content must not read as prose — it carries a border, a background or a form of its own, so a
-  reader sees it is different before reading a word of it. ONE SECTION OR SUBSECTION HOLDS NORMAL TEXT AND AS
-  MANY BLOCKS AS IT NEEDS: none, one, or several. Nothing declares "the" block of a section.
-
-  WHAT YOU ARE WRITING, AND WHAT IT EARNS — read down, stop at the first row that matches.
-    an explanation, an argument, a part, the opening  → nothing: paragraphs, a list, a subheading
-    a rule somebody has to follow                     → MUST, in a callout, then the command that enforces it
-    a set of named things, no order between them      → CATALOG, a tile each
-    things side by side, or which to choose when      → COMPARISON, a table
-    a record: ids, rows, statuses, terms              → a table; GLOSSARY where the record is this page's words
-    a literal: a contract, a manifest, a command      → CODE, tagged with its language
-    what a file says today and what it will say       → DIFF, on an approach page only
-    a hierarchy easier read than drawn                → TREE, a plain text block
-    a shape: parts, steps, participants, data, estate → a FIGURE of the matching kind
-    a passage that must stand apart from the page     → PROSE, the markdown panel
-    several pages a reader might go to next           → CARDS
-    the two pages either side of this one             → NEXT, small: a title and a direction
-
-  The choice is a judgement about the content, and no rule can make it for you: the same subject is a table on
-  one page and a figure on another. What the list removes is the guessing — name what you are writing first.
-
-  A BLOCK THAT IS NEITHER NORMAL TEXT NOR A RECORD CARRIES A FORM. Normal text is paragraphs; a record is a
-  table, which already arrives as a bordered card. Everything else: MUST is the accent callout, CATALOG is
-  tiles, PROSE is a panel with its own border and colours, CODE/TREE/DIFF are code blocks, a figure is drawn,
-  CARDS is a grid of doors, NEXT is two small cards, and a quote is set apart. The forms come from the
-  stylesheet this template ships, never from markup you invent — that is what keeps a page renderable with no
-  library, in both themes, offline.
-  ================================================================================================ -->
-<!-- ================================================================================================
-  THE FIGURES, a closed set. A figure sits inside a block. Every figure has a sentence before it
-  (what you are looking at) and a figcaption after it (what to notice). In the markdown seat file a
-  figure is a mermaid block; on this page it is inline SVG in the .dg grammar, so the page needs no
-  network and no library. Labels fit their boxes; a connector ends on a box; a path keeps 16 px from the edge and
-  from any box it does not end on, and a return path runs in its own lane below the boxes, with its label.
-  FLOW      steps in order · flowchart left to right, a box per step, an arrow means "then", a diamond is a choice
-            lives in SEQUENCE · an approach's How · a construct's Parts when a part is a procedure
-  MAP       groups and what connects them · a box is a group, an arrow is what flows, a subgraph is containment
-            lives in MAP · a construct's Model when the construct is a structure
-  TREE      a hierarchy · top-down, or a plain-text tree in a code block for a folder layout
-            lives in MAP · a construct's Model when the construct is a hierarchy
-  SEQUENCE  who talks to whom, in what order · one lifeline per participant, time running down, one arrow per
-            message with its own label, a dashed arrow for a reply. Use it instead of FLOW whenever more than one
-            party acts and WHO acted is the thing to see: a FLOW shows what happens next, a SEQUENCE shows who said it
-            lives in a construct's Parts · REASONS when a claim is about a process
-  STATE     the states a thing can be in · an arrow names the event that moves it
-            lives in a construct's Model when it is a lifecycle · Parts for a part with states · an approach's What when it changes a vocabulary
-  ENTITIES  a data model and its relations · the subject at the centre, what points at it on one side and what it
-            points at on the other, every relation line carrying its cardinality
-            lives in a construct's Model when the construct is data · Parts for one part's records
-  CODE      a contract, a state, a manifest, a command and its output · a fenced block with its language, real values,
-            the path above it when copied from a file (the audit checks it still matches)
-            lives in EXAMPLE · MUST (the action) · a construct's Parts or Binds · an approach's What
-  DIFF      what a file says today, and what it will say · a diff block, - today / + after, the path above it
-            lives in an approach's What only. A construct or an overview states current truth, never a change
-  ================================================================================================ -->
 <header class="masthead">
-<!-- THE HEADER: the breadcrumb — {workspace} | {repository} | {page name} — then two lines (RD.DEVEX.WORKSPACE.192).
-  Line one is Type and For. Line two is Generated and Commit: the block's `generatedAt`, in the `<time>` element's
-  `datetime` and as its text, and the short hash of the commit the report read. A report shows NO status chip: it is
-  a snapshot, and the Summary says what was found. The `<h1>` is the block's title, in plain words — the kind,
-  exactly as every other page kind's `<h1>` equals its block's title (the audit refuses the two apart). -->
-  <div class="eyebrow"><span class="line1">{{WORKSPACE}} &nbsp;|&nbsp; {{REPOSITORY}} &nbsp;|&nbsp; {{KIND, in plain words}}</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Report</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">{{ROLE}}</span></span></span><span class="line"><span class="lbl">Generated:</span> <span class="badge when"><time class="local" datetime="{{YYYY-MM-DDTHH:MM±HH:MM}}">{{YYYY-MM-DDTHH:MM±HH:MM}}</time></span><span class="sep">|</span><span class="lbl">Commit:</span> <span class="badge when">{{short sha}}</span></span></div>
-  <!-- THE MASTHEAD, ON A REPORT (05-artifacts.md § The masthead, and the opening · RD.DEVEX.WORKSPACE.182 and .187).
-    Three levels, in this order, and every level is plain language: everyday words, short sentences, no figure of
-    speech, no slogan, no number, and no book word (behaviour, construct, lens, kind, node, seat, tier, arc, estate,
-    ring) unless the same sentence explains it. The count moves to the Summary and to the block's summary field. A new
-    Subtitle is drafted by the agent and written only after the developer approves it.
-    WHAT EACH LEVEL HOLDS
-      Title        the h1: the report's name and its subject, in plain words, equal to the block's title.
-      Subtitle     p.subtitle: the question the report answers, as one sentence.
-      Description  one p.standfirst, and nothing after it in the header. First sentence: what was counted, with no
-                   number. Second: when you would read it. Then at most two short sentences on how it is laid out.
-    GOOD, the tests report (spn-support-ts)
-      Title        "Tests report"
-      Subtitle     "Which of the things this repository promises are checked by a test that passed?"
-      Description  "This report shows which of the things this repository promises to do are checked by a test that
-                   passed, and which are not yet. Read it before a release, or when you want to know what is still
-                   unproven. The summary comes first, and each section below covers one area."
-    THE APPROVED SUBTITLES, one per kind, copied word for word
-      TESTS        "Which of the things this repository promises are checked by a test that passed?"
-      COVERAGE     "How much of this repository is written, built and proved?"
-    BAD, one per level
-      Title        "Proof or It Did Not Happen"  A slogan in place of the report's name and subject.
-      Subtitle     "Where the rubber meets the road for every promise."  A figure of speech; it asks no question.
-      Description  "72 of the 119 behaviours are proven at their tier."  Opens with a count, and two book words
-                   (behaviour, tier) that nothing explains.
-    CHECK BEFORE YOU SAVE, in order
-      1. The Description's first sentence says what was counted, in everyday words.
-      2. Its second sentence says when or why you would read the report.
-      3. No book word appears in any level unless the same sentence explains it.
-      4. No level carries a number; every count is in the Summary.
-      5. The Subtitle is one plain sentence, asked as a question.
-      6. Read the three levels aloud once, and rewrite any sentence you stumble on. -->
-  <h1>{{KIND, in plain words}}</h1>
-  <p class="subtitle">{{THE SUBTITLE: the question this report answers, one plain sentence with no number.}}</p>
-  <p class="standfirst">{{THE DESCRIPTION, one paragraph: what was counted, in everyday words and with no number; when you would read it; then at most two short sentences on how the report is laid out.}}</p>
+  <div class="eyebrow"><span class="line1">{{WORKSPACE}} &nbsp;|&nbsp; {{REPOSITORY}} &nbsp;|&nbsp; {{REPORT TYPE, in plain words}}</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Report</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">{{ROLE}}</span></span></span><span class="line"><span class="lbl">Repo:</span> <span class="badge when">{{repo}}</span><span class="sep">|</span><span class="lbl">Commit:</span> <span class="badge when">{{short sha}}</span><span class="sep">|</span><span class="lbl">Generated:</span> <span class="badge when"><time class="local" datetime="{{YYYY-MM-DDTHH:MM±HH:MM}}">{{YYYY-MM-DDTHH:MM±HH:MM}}</time></span></span></div>
+  <h1>{{REPORT TYPE, in plain words}}</h1>
+  <p class="subtitle">{{THE SUBTITLE: the report type's approved question, with the repository's folder name}}</p>
+  <p class="standfirst">{{THE DESCRIPTION, one paragraph: what was counted, in everyday words and with no number; then when you would read it.}}</p>
 </header>
 
 <section id="s0" data-block="reasons">
   <div class="sec-head"><h2>Summary</h2></div>
-  <p>{{First teach the model in passing: where these things are written down, how one gets proved, and ONE real example quoted from what you measured. Then the answer and the one number, in those words, why it was measured now, and what it does not cover. A reader who stops here has the finding and needed no other page to understand it.}}</p>
-  <p>{{What changed since the last run of this same report, where there was one — a report nobody can diff is a report nobody reads twice.}}</p>
+  <p class="verdict">{{THE VERDICT: one sentence answering the Subtitle, with the headline number and its unit, and how many records need your decision.}}</p>
+  <p class="terms">{{The words the tiles use, each explained, and one real member quoted from what you measured.}}</p>
+  <div class="sides">
+    <div class="side"><span class="lbl">{{Side}}</span><div class="side-num"><span class="big">{{n}}<span class="tot"> / {{N}}</span></span><span class="pct">{{share, whole}}%</span></div><div class="bar"><i style="width:{{share}}%"></i></div></div>
+    <div class="side"><span class="lbl">{{Side}}</span><div class="side-num"><span class="big">{{n}}<span class="tot"> / {{N}}</span></span><span class="pct">{{share, whole}}%</span></div><div class="bar"><i class="ok" style="width:100%"></i></div></div>
+    <div class="side"><span class="lbl">{{Gap}}</span><div class="side-num"><span class="big">{{n}}<span class="tot"> / {{N}}</span></span><span class="pct">{{share, whole}}%</span></div><div class="bar"><i class="gap" style="width:{{share}}%"></i></div></div>
+  </div>
+  <div class="breakdown">
+    <p class="bd-title">{{What the bar splits, and its unit: "The 32 checks, by result"}}</p>
+    <div class="bd-bar" role="img" aria-label="{{every state and its count, in words}}">
+      <span class="bd-seg st-ok" style="flex-grow:{{n}}" title="{{State}}: {{n}} {{units}}"></span>
+      <span class="bd-seg st-warn" style="flex-grow:{{n}}" title="{{State}}: {{n}} {{units}}"></span>
+      <span class="bd-seg st-fail" style="flex-grow:{{n}}" title="{{State}}: {{n}} {{units}}"></span>
+    </div>
+    <ul class="bd-legend">
+      <li><i class="bd-key st-ok"></i>{{PASS}} <b>{{n}}</b></li>
+      <li><i class="bd-key st-warn"></i>{{WARN}} <b>{{n}}</b></li>
+      <li><i class="bd-key st-fail"></i>{{FAIL}} <b>{{n}}</b></li>
+    </ul>
+  </div>
+  <h3 id="top-gaps">Top gaps</h3>
+  <ol class="top-gaps">
+    <li>{{The largest gap: its count, its unit, where it sits.}}</li>
+    <li>{{The second.}}</li>
+    <li>{{The third.}}</li>
+  </ol>
 </section>
 
-<section id="s1" data-block="reasons">
-  <div class="sec-head"><h2>What was measured</h2></div>
-  <p>{{What was read, and by what. Every row names its source, so a reader can re-run it and get the same answer. A TESTS report states here the time of the newest run it read, its `measuredAt`.}}</p>
-  <div class="scroll"><table>
-    <thead><tr><th>Measure</th><th>Value</th><th>Read from</th></tr></thead>
+<section id="s1" data-block="must">
+  <div class="sec-head"><h2>Findings</h2></div>
+  <p>{{At most one plain sentence: the question this section answers. Never the order of the tables: the rail shows it.}}</p>
+  <h3 id="{{axis-id}}">{{By axis}}</h3>
+  <div class="scroll"><table class="grid" style="min-width:34rem"><colgroup><col><col style="width:5.5rem"><col style="width:5.5rem"><col style="width:5.5rem"><col style="width:5.5rem"></colgroup>
+    <thead><tr><th>{{Axis}}</th><th class="num-cell">Checks</th><th class="num-cell">PASS</th><th class="num-cell">WARN</th><th class="num-cell">FAIL</th></tr></thead>
     <tbody>
-      <tr><td>{{&hellip;}}</td><td>{{&hellip;}}</td><td><code>{{command or path}}</code></td></tr>
+      <tr><td><strong>{{worst item}}</strong></td><td class="num-cell">{{n}}</td><td class="num-cell">{{n}}</td><td class="num-cell gap">{{n}}</td><td class="num-cell fail">{{n}}</td></tr>
+      <tr><td><strong>{{next item}}</strong></td><td class="num-cell">{{n}}</td><td class="num-cell done">{{n}}</td><td class="num-cell">0</td><td class="num-cell">0</td></tr>
+      <tr class="total"><td>Total</td><td class="num-cell">{{n}}</td><td class="num-cell">{{n}}</td><td class="num-cell gap">{{n}}</td><td class="num-cell fail">{{n}}</td></tr>
     </tbody>
   </table></div>
+  <p class="units">{{One sentence naming each column's unit.}}</p>
+  <h3 id="repo">Repository</h3>
+  <p>{{The Repository table: one row per domain in the docs tree&rsquo;s order, the whole-repository row, then the total; Name, then the spine&rsquo;s counts, with no Project type column.}}</p>
+  <h3 id="apps">Apps</h3>
+  <div class="scroll"><table class="grid" style="min-width:34rem"><colgroup><col><col style="width:5.5rem"><col style="width:5.5rem"><col style="width:5.5rem"><col style="width:5.5rem"></colgroup>
+    <thead><tr><th>Name</th><th class="num-cell">Checks</th><th class="num-cell">PASS</th><th class="num-cell">WARN</th><th class="num-cell">FAIL</th></tr></thead>
+    <tbody>
+      <tr><td><strong>{{app}}</strong><span class="sl">{{PROJECT TYPE}}</span></td><td class="num-cell">{{n}}</td><td class="num-cell">{{n}}</td><td class="num-cell gap">{{n}}</td><td class="num-cell">0</td></tr>
+      <tr class="mod"><td><strong>{{module}}</strong><span class="sl">{{PROJECT TYPE}}</span></td><td class="num-cell">{{n}}</td><td class="num-cell">{{n}}</td><td class="num-cell gap">{{n}}</td><td class="num-cell">0</td></tr>
+    </tbody>
+    <tbody>
+      <tr class="total"><td>{{All n apps}}</td><td class="num-cell">{{n}}</td><td class="num-cell">{{n}}</td><td class="num-cell gap">{{n}}</td><td class="num-cell">0</td></tr>
+    </tbody>
+  </table></div>
+  <h3 id="packages">Packages</h3>
+  <p>{{The Packages table, one level, with the same columns.}}</p>
+  <p class="units">{{The units, then the totals rule: each table totals its own level, and what spans several owners is counted in each owner and once at the repository level.}}</p>
 </section>
 
 <section id="s2" data-block="must">
-  <div class="sec-head"><h2>Findings</h2></div>
-  <p>{{What the measurement says, worst first. A finding names where it is, so it can be acted on without a hunt.}}</p>
-  <!-- THE COLUMNS ARE THE ONE THING A KIND CHANGES. A tests report reads Row · Claim · Tier · Status ·
-       Proven by. An audit reads # · Finding · Where · Grade. A coverage report lists no row: it reads
-       Level · Written · Built · Proved · Stated, not built · Built, not stated · Built, not proved — the
-       repository first, then one table by package and one by app — and names the unit beside Built
-       (constructs, not rows). Keep whichever the kind needs and delete the others; do not carry two. -->
-  <div class="scroll"><table>
-    <thead><tr><th>#</th><th>Finding</th><th>Where</th><th>Grade</th></tr></thead>
+  <div class="sec-head"><h2>Records</h2></div>
+  <p>{{One sentence: what each record is, and which finding it sits behind.}}</p>
+  <details class="rec-group">
+    <summary><span class="sev fail" role="img" title="{{worst state}}" aria-label="{{worst state}}"></span><span class="rec-name">{{the cause, in the Findings&rsquo; own words}}</span><span class="rec-count">{{n}} {{units}}</span><span class="rec-worst">{{worst state}}</span><span class="rec-mix">{{Agent n &middot; Developer n}}</span></summary>
+    <ul class="records">
+      <li class="record" data-id="{{KIND.GROUP.001}}" data-rule="{{rule}}" data-severity="{{FAIL}}" data-decider="{{agent}}" data-location="{{file:line}}"><span class="sev fail" role="img" title="{{state}}" aria-label="{{state}}"></span><div class="loc"><span class="rec-id">{{KIND.GROUP.001}}</span>{{file:line, page:line, row id, or check name and file}}</div><div class="what">{{One plain sentence: what was found.}}</div><div class="meta">{{the report type&rsquo;s pair}}</div><div class="by">Decided by <span class="decider">Agent</span> because {{the rule that lets the agent act}}</div></li>
+    </ul>
+  </details>
+  <details class="rec-group">
+    <summary><span class="sev gap" role="img" title="{{worst state}}" aria-label="{{worst state}}"></span><span class="rec-name">{{the next cause, with more than about 20 items}}</span><span class="rec-count">{{n}} {{units}}</span><span class="rec-worst">{{worst state}}</span><span class="rec-mix">{{Agent n &middot; Developer n}}</span></summary>
+    <div class="rec-subs">
+    <details class="rec-group">
+      <summary><span class="sev gap" role="img" title="{{worst state}}" aria-label="{{worst state}}"></span><span class="rec-name">{{where it happens}}</span><span class="rec-count">{{n}} {{units}}</span><span class="rec-worst">{{worst state}}</span><span class="rec-mix">{{Developer n}}</span></summary>
+    <ul class="records">
+      <li class="record" data-id="{{KIND.GROUP.001}}" data-rule="{{rule}}" data-severity="{{WARN}}" data-decider="{{developer}}" data-location="{{file:line}}"><span class="sev gap" role="img" title="{{state}}" aria-label="{{state}}"></span><div class="loc"><span class="rec-id">{{KIND.GROUP.001}}</span>{{&hellip;}}</div><div class="what">{{&hellip;}}</div><div class="meta">{{&hellip;}}</div><div class="by">Decided by <span class="decider dev">Developer</span> because {{why it needs the developer}}</div></li>
+    </ul>
+    </details>
+    </div>
+  </details>
+</section>
+
+<section id="s3" data-block="reasons">
+  <div class="sec-head"><h2>Measured</h2></div>
+  <h3 id="scope">Scope</h3>
+  <p>{{One sentence: what was read, and which trees or packages; the run-time window where it differs from Generated. The header already carries the repository, the commit and the Generated time, so Scope never repeats them.}}</p>
+  <h3 id="measure-again">Measure again</h3>
+  <pre><code>{{the one or two commands to rerun}}</code></pre>
+  <p>{{The digest to compare, or why there is none.}}</p>
+  <details class="rec-group method">
+    <summary><span class="rec-name">How each number was produced ({{n}} steps)</span></summary>
+    <div class="scroll"><table class="grid"><colgroup><col style="width:30%"><col style="width:22%"><col style="width:28%"><col style="width:20%"></colgroup>
+      <thead><tr><th>Step</th><th>Read from</th><th>Command</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr><td>{{1. what this step did}}</td><td><code>{{path}}</code></td><td><code>{{command}}</code></td><td>{{number and unit}}</td></tr>
+      </tbody>
+    </table></div>
+    <p><strong>Who decides.</strong> {{The rule that set each record&rsquo;s Decided by: Agent, Agent flagged, or Developer, with the reason for each, as the docs standard states it.}}</p>
+  </details>
+  <h3 id="not-looked-at">Not looked at</h3>
+  <ul>
+    <li><strong>{{What was left out.}}</strong> {{Why, and what a clean result therefore does not prove.}}</li>
+  </ul>
+</section>
+
+<section id="s4" data-block="next">
+  <div class="sec-head"><h2>Recommendations</h2></div>
+  <p>{{One sentence: this report changes nothing, and how to check the result after a change.}}</p>
+  <h3 id="agent">The agent closes these</h3>
+  <div class="scroll"><table class="grid"><colgroup><col style="width:6%"><col style="width:46%"><col style="width:24%"><col style="width:24%"></colgroup>
+    <thead><tr><th>#</th><th>Recommendation</th><th>Closes</th><th>Done when</th></tr></thead>
     <tbody>
-      <tr><td>1</td><td>{{&hellip;}}</td><td><code>{{path}}</code></td><td>BLOCK &middot; RULE &middot; SOFT</td></tr>
+      <tr><td class="num-cell">1</td><td><strong>{{Verb first.}}</strong> {{What to change, and the command or file.}}<span class="sub"><b>Why:</b> {{the rule that allows it}}</span></td><td>{{the gap, how much, the unit; the record ids}}<span class="sub"><b>Owner:</b> {{role, package or path}}</span></td><td>{{a condition a person can check}}</td></tr>
     </tbody>
   </table></div>
-</section>
-
-<section id="s3" data-block="next">
-  <div class="sec-head"><h2>What to do</h2></div>
-  <p>{{One row per action, each owned and each with a condition a person can check. A report that ends at findings leaves the work to memory.}}</p>
-  <div class="scroll"><table>
-    <thead><tr><th>Action</th><th>Owned by</th><th>Done when</th></tr></thead>
+  <h3 id="agent-flagged">The agent closes these and flags them</h3>
+  <div class="scroll"><table class="grid"><colgroup><col style="width:6%"><col style="width:46%"><col style="width:24%"><col style="width:24%"></colgroup>
+    <thead><tr><th>#</th><th>Recommendation</th><th>Closes</th><th>Done when</th></tr></thead>
     <tbody>
-      <tr><td>{{&hellip;}}</td><td>{{&hellip;}}</td><td>{{&hellip;}}</td></tr>
+      <tr><td class="num-cell">1</td><td><strong>{{Verb first.}}</strong> {{What to change.}}<span class="sub"><b>Why:</b> {{why the developer should see it}}</span></td><td>{{&hellip;}}<span class="sub"><b>Owner:</b> {{&hellip;}}</span></td><td>{{&hellip;}}</td></tr>
     </tbody>
   </table></div>
+  <h3 id="needs-you">Needs you: {{n}} records, in {{d}} decisions</h3>
+  <div class="open">
+    <h4>{{The decision, as a question}}</h4>
+    <span class="k">What</span><p>{{what is found, with its count and the record ids}}</p>
+    <span class="k">Why it needs you</span><p><span class="decider dev">Developer</span> {{because: the book does not decide it, a consumer breaks, or it is a release}}</p>
+    <span class="k">Options</span>
+    <ol class="opts"><li>{{Option A, and what it costs}}</li><li>{{Option B, and what it costs}}</li></ol>
+    <p class="rec"><b>The agent would take</b> {{the option, and why}}</p>
+  </div>
 </section>
-
-<section id="s4" data-block="reasons">
-  <div class="sec-head"><h2>What this did not look at</h2></div>
-  <p><strong>{{Say it plainly, and never leave this empty.}}</strong> {{What was out of scope, what could not be read, and what a clean result here therefore does not prove. A clean result mistaken for a scope it never had is the one way a report does harm.}}</p>
-</section>
-
-
-
-<!-- THE BLOCKS AND THE FIGURES ARE SHOWN ONCE, in templates/blocks-template.html — normal content first,
-     then every block and every figure kind rendered. It is a reference you consult while writing, not a section
-     you copy: the chooser above tells you which block a piece of content earns, and that page shows you what
-     each one looks like. Open it beside this template. -->
 
 </div>
 </div>
 
 <footer>
-  A template &middot; copy it, keep the comments until the page is written, then delete them &middot; the rules live in the book; this file repeats them so you never write from memory &middot; every block and figure is shown once in <code>blocks-template.html</code>
+  A template &middot; copy it and fill the slots &middot; the rules for this page are in <code>05-artifacts.md</code> &middot; every block and figure is shown once in <code>blocks-template.html</code>
 </footer>
 
 <script>
@@ -438,11 +496,6 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
 })();
 </script>
 
-<!-- rail-fold: subsections collapse under their section, the caret sits at the far right and only
-     where a group exists, and a group the reader has not pinned follows the scroll. This is the
-     shape 009 landed and the developer confirmed; it is applied here as a block appended AFTER the
-     page's own rail builder, because the corpus has two builders and one transform covers both.
-     05-artifacts.md § A page carries its own subsections. -->
 <style>
   .rail .sub-group{display:block}
   .rail.js .sub-group{display:none}
@@ -451,12 +504,11 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
   .rail a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 </style>
 <style>
-  /* a quote is a sentence set apart — a rule stated in full, or a line from the source the page is about */
+  /* A quote */
   blockquote{margin:1.6rem 0;padding:.2rem 0 .2rem 1.1rem;border-left:2px solid var(--rule);color:var(--slate)}
   blockquote p{margin:0;max-width:none}
   .tile .s{margin-top:.45rem}
-  /* PROSE — the markdown block. Its own border, background and text colour, so a passage of ordinary
-     markdown reads as a block the page chose rather than as the page's own voice continuing. */
+  /* PROSE, the markdown panel */
   .prose{border:1px solid var(--rule);background:var(--card);color:var(--slate);border-radius:3px;
     padding:1.1rem 1.3rem;margin:1.6rem 0}
   .prose > :first-child{margin-top:0}
@@ -465,7 +517,7 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
   .prose strong,.prose h4{color:var(--ink)}
   .prose code{color:var(--ink)}
   .prose blockquote{border-left-color:var(--accent);margin:1rem 0}
-  /* NEXT — small on purpose: a title and a direction, nothing else */
+  /* NEXT */
   .nextnav{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.7rem;margin:1.6rem 0}
   .nextnav-card{display:flex;flex-direction:column;gap:.15rem;border:1px solid var(--rule);background:var(--card);
     border-radius:3px;padding:.65rem .85rem;text-decoration:none;min-width:0}

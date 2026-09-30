@@ -918,6 +918,95 @@ one("a card carrying its decision is not open, so the reply is not read for Need
     pageOpts: { cards: CARD.replace("<b>Decision:</b> &mdash;", "<b>Decision:</b> A, 2026-09-29."), names: ["N1-a-subject.md"] } }),
   "silent", { reply: "Row 6d landed.", parity: false, why: "a new check" });
 
+console.log("\n=== 2m — a card is put in full once, at the top of the reply that raises it, then named in one line (RD.DEVEX.WORKSPACE.189)");
+{
+  const { checkReplyShape } = await import("../../../../src/scripts/events/stop.ts");
+  const PROGRESS = "## Progress\n\nRow 2m landed: the reply check reads a raised card once.";
+  const FULL = (card) => `### ${card} · which way does the drawer go?\n\n**What** — the drawer in \`shell.tsx:40\`, kept or moved.\n\n` +
+    `**Why** — the choice is yours: it changes what a user sees.\n\n| | Option | Trade-off |\n| --- | --- | --- |\n` +
+    `| **A** | keep it | nothing moves |\n| **B** | move it | a sweep of six screens |\n\nRecommendation: A, because nothing breaks.`;
+  const needsYou = (reply, open, raised) => checkReplyShape(reply, open, raised).filter((warning) => warning.check === "needs-you");
+  for (const [what, got, expected] of [
+    ["2m: a card raised this turn, in full under Needs you at the top, is clean",
+      needsYou(`## Needs you\n\n${FULL("Q404")}\n\n${PROGRESS}`, ["Q404"], ["Q404"]).length, 0],
+    ["2m: a card raised this turn and named only in one line is reported",
+      needsYou(`## Needs you\n\nQ404 · which way does the drawer go? — on the approach page.\n\n${PROGRESS}`, ["Q404"], ["Q404"]).length, 1],
+    ["2m: a card raised in the body, under the progress, is reported",
+      needsYou(`## Needs you\n\nQ401 · still open — on the page.\n\n${PROGRESS}\n\n${FULL("Q404")}`, ["Q401", "Q404"], ["Q404"]).length, 1],
+    ["2m: the finding for a raised card says it goes in full once, at the top, and is not repeated now",
+      needsYou(`## Needs you\n\nQ404 · one line.\n\n${PROGRESS}`, ["Q404"], ["Q404"]).filter((w) => /in full once/.test(w.message) && /one line/.test(w.message)).length, 1],
+    ["2m: a card open from an earlier reply, named in one line, is clean",
+      needsYou(`## Needs you\n\nQ401 · which way does the drawer go? — on the approach page.\n\n${PROGRESS}`, ["Q401"], []).length, 0],
+    ["2m: a card open from an earlier reply that the Needs you part never names is reported",
+      needsYou(`## Needs you\n\nQ402 · another question — on the page.\n\n${PROGRESS}`, ["Q401", "Q402"], []).length, 1],
+    ["2m: an older card named only in the progress is not named under Needs you",
+      needsYou(`## Needs you\n\nQ402 · another question.\n\n${PROGRESS} It waits on Q401.`, ["Q401", "Q402"], []).filter((w) => w.message.includes("Q401")).length, 1],
+    ["2m: the finding for an older card asks for one line, never the full card",
+      needsYou(`## Needs you\n\nQ402 · another.\n\n${PROGRESS}`, ["Q401", "Q402"], []).filter((w) => /one line/.test(w.message) && !/each open card in full/.test(w.message)).length, 1],
+    ["2m: the finding for a reply with no Needs you says one line for a card already put",
+      needsYou("Row 2m landed.", ["Q401"], []).filter((w) => /one line/.test(w.message) && !/each open card in full/.test(w.message)).length, 1],
+  ]) { n += 1; const ok = got === expected; if (!ok) failed += 1;
+       console.log(`  ${ok ? "PASS" : "FAIL"}  ${what}${ok ? "" : ` — got ${got}, expected ${expected}`}`); }
+}
+
+console.log("\n=== 2m — the hook knows which card this turn raised, from the session's last Stop");
+{
+  const FULL_Q1 = "## Needs you\n\n### Q1 · a real question\n\n**What** — the drawer, kept or moved.\n\n**Why** — it changes what a user sees.\n\n" +
+    "| | Option | Trade-off |\n| --- | --- | --- |\n| **A** | one way | nothing |\n| **B** | another | a sweep |\n\nRecommendation: A.\n\n## Progress\n\nRow 1 landed.";
+  const ONE_LINE_Q1 = NEEDS + "Row 1 landed.";
+  const raise = (root) => {
+    const pagePath = join(root, `.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html`);
+    writeFileSync(pagePath, page({ cards: CARD, names: ["N1-a-subject.md"] }), "utf8");
+  };
+  const fresh = (name) => build(name, { arcNames: ["N1-a-subject.md"], pageOpts: { cards: "", names: ["N1-a-subject.md"] } });
+  one("2m: a card that appeared this turn, named in one line only, warns",
+    fresh("m2m-raised-line"), "warns", { says: "in full once", session: "m2m-a", edit: raise, reply: ONE_LINE_Q1, parity: false, why: "2m" });
+  one("2m: a card that appeared this turn, put in full at the top, is silent",
+    fresh("m2m-raised-full"), "silent", { session: "m2m-b", edit: raise, reply: FULL_Q1, parity: false, why: "2m" });
+  const already = build("m2m-older", { arcNames: ["N1-a-subject.md"], pageOpts: { cards: CARD, names: ["N1-a-subject.md"] } });
+  one("2m: a card already open at the last Stop is accepted in one line",
+    already, "silent", { session: "m2m-c", edit: () => {}, reply: ONE_LINE_Q1, parity: false, why: "2m" });
+}
+
+console.log("\n=== 2n — an answer lands in the arc's notes in the same turn (RD.DEVEX.WORKSPACE.193)");
+{
+  // N122's OWN HISTORY, word for word from its log: the developer's answer was logged, two review
+  // points were carried to step 4, and `notes/N122/spec.md` did not move until the developer asked
+  // why (the log's next-but-three line names the miss).
+  const N122_ANSWER = "- **2026-09-30 — step 3 DONE; N122 DECIDED; Q396 B** (the developer: *\"done with N122 samples changes\"*). " +
+    "The samples are approved as they are. Two points raised in the last review are **carried to step 4**, where the book is written.\n";
+  const WS = `.spndevex/${WORKSTREAMS}/open/001-a-subject`;
+  const arcN122 = (status) => `# N122 — one report structure\n\nStatus: **${status}**\n\n## Steps\n\n| # | What | Where | How you would know |\n| --- | --- | --- | --- |\n| 1 | a thing | here | ✅ landed |\n\n## Log\n\n- **2026-09-29 — opened.**\n`;
+  const withNotes = (name, status = "RUNNING") => workspace(name, {
+    [`${WS}/a-subject-approach.html`]: page({ names: ["N122-one-report-structure.md"] }),
+    [`${WS}/arcs/N122-one-report-structure.md`]: arcN122(status),
+    [`${WS}/notes/N122/spec.md`]: "# N122 — the report specification\n\nThe audit report checks wiring.\n",
+    [`${WS}/notes/N122/plan.md`]: "# N122 — plan\n",
+  });
+  const logAnswer = (root) => { const arc = join(root, WS, "arcs", "N122-one-report-structure.md");
+    writeFileSync(arc, readFileSync(arc, "utf8") + N122_ANSWER, "utf8"); };
+  const moveSpec = (root) => { logAnswer(root); const spec = join(root, WS, "notes", "N122", "spec.md");
+    writeFileSync(spec, readFileSync(spec, "utf8").replace("wiring", "setup only, and never a finding another report owns"), "utf8"); };
+  one("2n: N122's own history — an answer logged and the spec unchanged — warns, naming the notes",
+    withNotes("m2n-red"), "warns", { says: "notes/N122/spec.md", session: "m2n-a", edit: logAnswer, parity: false, why: "2n" });
+  one("2n: the same answer with the spec moved in the same turn is silent",
+    withNotes("m2n-green"), "silent", { session: "m2n-b", edit: moveSpec, parity: false, why: "2n" });
+  one("2n: an arc with no notes owes none",
+    workspace("m2n-nonotes", { [`${WS}/a-subject-approach.html`]: page({ names: ["N122-one-report-structure.md"] }),
+      [`${WS}/arcs/N122-one-report-structure.md`]: arcN122("RUNNING") }),
+    "silent", { session: "m2n-c", edit: logAnswer, parity: false, why: "2n" });
+  one("2n: a log line that records no answer owes the notes nothing",
+    withNotes("m2n-plain"), "silent", { session: "m2n-d", parity: false, why: "2n",
+      edit: (root) => { const arc = join(root, WS, "arcs", "N122-one-report-structure.md");
+        writeFileSync(arc, readFileSync(arc, "utf8") + "- **2026-09-30 — go.**\n", "utf8"); } });
+  one("2n: the first Stop of a session has no baseline, so it is silent",
+    (() => { const root = withNotes("m2n-first"); logAnswer(root); return root; })(), "silent", { session: "m2n-e", parity: false, why: "2n" });
+  one("2n: a proposed arc that carries a review point to a later step of itself is flagged",
+    withNotes("m2n-carried", "PROPOSED"), "warns", { says: "[carried]", session: "m2n-f", edit: moveSpec, parity: false, why: "2n" });
+  one("2n: a running arc carrying a point to a later step is not flagged",
+    withNotes("m2n-carried-running", "RUNNING"), "silent", { session: "m2n-g", edit: moveSpec, parity: false, why: "2n" });
+}
+
 console.log("\n=== welcome — a session's first turn opens with the welcome, word for word (N116 row 8, F1)");
 {
   const { missingWelcome, checkWelcome, firstTurnText } = await import("../../../../src/scripts/events/stop.ts");

@@ -40,6 +40,8 @@
 
 **Source of truth:** the tests group (`04-capabilities/02-support/01-apps/06-tests`) — the tier ladder, the tiers each kind owes, where a case lives, its scope, its setup, and what a run owes — and decisions `RD.SUPPORT.APPS.086`–`089`, `RD.SUPPORT.APPS.119` and `RD.SUPPORT.APPS.120`. Read this file as a restatement of those rules, adding none of its own; where they disagree, the book wins and this file is regenerated.
 
+**Judged against, beside the book:** test design: the test pyramid for which tier proves what, and the test-design techniques — equivalence partitioning, boundary values, decision tables and state transitions (ISTQB). A test option is weighed against the technique that finds the most faults for its cost.
+
 **Worn** while writing tests. **Convened** on every build. **Blocks:** a `SUCCESS` status with no case behind it.
 
 ## What it checks

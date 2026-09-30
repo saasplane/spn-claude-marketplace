@@ -199,8 +199,19 @@ const plainTier = (tier: string): string => tier.charAt(0) + tier.slice(1).toLow
 const listed = (words: string[]): string =>
   words.length <= 1 ? words.join("") : `${words.slice(0, -1).join(", ")} and ${words[words.length - 1]}`;
 
-/** The row statuses a Repository row counts, each always present so a zero reads as counted. */
-const STATUS_WORDS = ["SUCCESS", "FAILED", "PENDING", "PLANNED", "MANUAL"] as const;
+/**
+ * The row statuses a Repository row counts, each always present so a zero reads as counted. A `MANUAL`
+ * row counts in none of the numbers (05-artifacts.md § The tests report): a person proves it by the
+ * repository's browser guide, so it is listed as `manual` beside the counts, and the four sum to Written.
+ */
+const STATUS_WORDS = ["SUCCESS", "FAILED", "PENDING", "PLANNED"] as const;
+
+/** Whether a row is proved by a person rather than by a run. */
+const isManual = (row: { status: string | null }): boolean => row.status === "MANUAL";
+
+/** The `MANUAL` rows of a group, as the report lists them. */
+const manualOf = (group: Array<{ id: string; file: string; status: string | null }>) =>
+  group.filter(isManual).map((row) => ({ id: row.id, file: row.file }));
 
 /** One problem with the tests themselves, as the report's Run health table names it (N122 spec § Tests). */
 type Health = { problem: string; count: number; where: string; fix: string; items: Array<Record<string, unknown>> };
@@ -297,7 +308,7 @@ export function measure(root: string): Record<string, unknown> {
     const runs = [...runsByNode.entries()].flatMap(([name, found]) => found
       .filter((run) => run.tiers.includes(tier))
       .map((run) => ({ node: name, file: run.from, ranAt: run.ranAt, results: run.results.length })));
-    const rowCount = rows.filter((row) => row.tier === tier).length;
+    const rowCount = rows.filter((row) => row.tier === tier && !isManual(row)).length;
     const command = `\`spnutils apps test ${tier.toLowerCase()} <package>\``;
     const state: TierState = runs.length === 0 ? "NOT_RUN" : unrunBy.length + noCase.length > 0 ? "PARTIAL" : "RAN";
     const reason = state === "RAN"
@@ -321,14 +332,18 @@ export function measure(root: string): Record<string, unknown> {
   // never disagree on it. A behaviour about the whole repository has no design topic and is never built.
   const levels = nodes.filter((node) => /^(apps|packages)\/[^/]+$/.test(nameOf(node)));
   const builtKeys = new Set(readChapters(root, rows.map((row) => constructKeyOf(row.file)).filter((key): key is string => key !== null), levels).built);
-  const tally = (group: typeof rows) => ({
-    written: group.length,
-    built: group.filter((row) => { const key = constructKeyOf(row.file); return key !== null && builtKeys.has(key); }).length,
-    status: {
-      ...Object.fromEntries(STATUS_WORDS.map((word) => [word, group.filter((row) => row.status === word).length])),
-      unreadable: group.filter((row) => row.status === null).length,
-    },
-  });
+  const tally = (all: typeof rows) => {
+    const group = all.filter((row) => !isManual(row));
+    return {
+      written: group.length,
+      built: group.filter((row) => { const key = constructKeyOf(row.file); return key !== null && builtKeys.has(key); }).length,
+      status: {
+        ...Object.fromEntries(STATUS_WORDS.map((word) => [word, group.filter((row) => row.status === word).length])),
+        unreadable: group.filter((row) => row.status === null).length,
+      },
+      manual: manualOf(all),
+    };
+  };
   const domains = domainsOf(root, rows.map((row) => domainOf(row.file)).filter((one): one is string => one !== null))
     .map((domain) => ({ domain, name: domainName(root, domain), ...tally(rows.filter((row) => domainOf(row.file) === domain)) }));
   const aboutTheRepository = rows.filter((row) => domainOf(row.file) === null);
@@ -426,6 +441,7 @@ export function measure(root: string): Record<string, unknown> {
     rows: rows,
     domains: domains,
     wholeRepository: wholeRepository,
+    manual: [...domains.flatMap((domain) => domain.manual), ...wholeRepository.manual],
     health: health,
     findings: findings,
   };
@@ -449,14 +465,16 @@ export function describeResult(result: Record<string, any>): string[] {
       (tier.reason === null ? "" : ` — ${tier.state === "NOT_RUN" ? "not run: " : ""}${tier.reason}`));
   }
   const byStatus = new Map<string, number>();
-  for (const row of result.rows) byStatus.set(row.status ?? "unreadable", (byStatus.get(row.status ?? "unreadable") ?? 0) + 1);
+  const counted = result.rows.filter((row: any) => row.status !== "MANUAL");
+  for (const row of counted) byStatus.set(row.status ?? "unreadable", (byStatus.get(row.status ?? "unreadable") ?? 0) + 1);
   const counts = [...byStatus.entries()].sort().map(([word, count]) => `${word} ${count}`).join(" · ");
-  lines.push(`  rows ${result.rows.length}${counts === "" ? "" : ` — ${counts}`}`);
+  lines.push(`  rows ${counted.length}${counts === "" ? "" : ` — ${counts}`}` +
+    (result.manual.length === 0 ? "" : ` · ${result.manual.length} proved by hand, counted in none of these`));
   lines.push(`  not run: ${result.rows.filter((row: any) => row.tier !== null && !row.tierRan).length} row(s) whose tier no ` +
     `artifact speaks for · no tier: ${result.rows.filter((row: any) => row.tier === null).length} row(s) no run can reach`);
   lines.push(`  unstamped: ${result.rows.filter((row: any) => row.unstamped).length} row(s) a run named that do not carry what it found`);
   const rowsLine = (label: string, one: any): string =>
-    `  ${label}: ${one.written} written · ${one.built} built · ${STATUS_WORDS.slice(0, 4).map((word) => `${word} ${one.status[word]}`).join(" · ")}`;
+    `  ${label}: ${one.written} written · ${one.built} built · ${STATUS_WORDS.map((word) => `${word} ${one.status[word]}`).join(" · ")}`;
   for (const domain of result.domains) lines.push(rowsLine(`domain ${domain.domain} (${domain.name})`, domain));
   lines.push(rowsLine("the whole repository", result.wholeRepository));
   for (const one of result.health) if (one.count > 0) lines.push(`  health: ${one.problem} — ${one.count} · ${one.where}`);

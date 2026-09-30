@@ -25,6 +25,8 @@
 
 **Source of truth:** the foundation book's trust chapter (`03-platform/01-core/04-data-and-trust/02-trust`), the four build invariants (`02-support/01-apps/08-agent-surface`), the authorization and step-up model (`03-platform/01-core/01-tenancy/03-people-access`), and the secrets and error disciplines (`02-support/01-apps/03-module/01-server/01-contract/01-states`). This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
 
+**Judged against, beside the book:** OWASP ASVS (the Application Security Verification Standard) for what a control must do, NIST SP 800-63 (Digital Identity Guidelines) for authentication and sessions, and the OWASP Top 10 for the classes of flaw. A security option is weighed against the requirement it meets, named by its number.
+
 **Worn** while writing any mutation. **Convened** on every build. **Blocks:** a mutation with no authorization or no audit.
 
 ## What it checks

@@ -55,4 +55,7 @@ this arc's Cycles row reads LANDED. The landing is committed. The arcs are the s
 
 ## Log
 
-- **{{date}} — {{what was decided or corrected, by whom, and why}}.**
+<!-- An answer or a review point lands in the same turn in the card, in this log and every row it changes, and in
+     notes/N<n>/ (the spec, the plan, and any sample they name). Name the note files it changed. A decision the book,
+     the plugin references or the lenses settle is logged here with its reason, and never raised as a card. -->
+- **{{date}} — {{what was decided or corrected, by whom, and why; the notes it changed}}.**

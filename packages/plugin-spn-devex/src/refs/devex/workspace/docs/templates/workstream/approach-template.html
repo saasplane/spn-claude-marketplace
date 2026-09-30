@@ -1,18 +1,9 @@
-<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The four page kinds · § The masthead, and the opening · § The approach document — a workstream's, never a repository's
-     This file carries rules it does not own. The chapter above is the source of truth.
-     A rule change is edited there first, then here, in the same change. Never add a rule here.
-     restate-drift.ts reports this copy when its source moves. -->
-<!-- The approach page is written for
-     developers, and the agent's complexity lives in the workstream's arcs, notes and orders.
-     THE MASTHEAD has three levels: the Title (the h1), the Subtitle (p.subtitle) and the Description (one
-     p.standfirst). The comment directly above the h1 says what each one holds and how to write it.
-     THE SECTIONS: the masthead, then Why · What · How · Open · Deferred. There is no Terms section: a word is
-     explained in brackets where it first appears, and a word that belongs to the product belongs to its construct's own
-     Terms table, from which the glossary is generated.
-     HOW is per repository and per kind of change, each with the block that shows what the file will say, and it ends
-     with CYCLES: one row per arc, generated from each arc's own status line. Per-arc step tables, field lines, logs,
-     landed commits and a "what re-aligns" table do not appear on the page; they are the arcs'.
-     THE RAIL TITLE is the page's name: the block's title, the third segment of the header line. -->
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The four page kinds · § The masthead, and the opening · § The shape of a section, on every page kind · § How a page hands a reader on · § The templates — five pages, and the two seat files behind them · § The header — two lines, six fields, produced from the block · § The blocks — what a page reaches for instead of prose · § The figures — what sits inside a block, and the closed set of them · § The outline is fixed for an argument and borrowed for an explanation · § Depth is decided by where else the detail lives · § The suffix names the kind · § The approach document — a workstream's, never a repository's · § One stylesheet, shipped with the template · § The page itself — its outline, its rail, its width and its furniture
+     and docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The arc · § A suggestion is recorded before it is executed
+     and docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md § The readability bar
+     This file holds the structure and styling of a workstream's approach page and states no rule: the sections
+     in order with their ids, the card's markup, the slots an author fills, and the stylesheet. The sections
+     above state every rule for writing the page. -->
 <meta charset="utf-8">
 <title>Approach Template v3</title>
 <!-- spn:doc
@@ -99,13 +90,8 @@
   pre{background:var(--card);border:1px solid var(--rule);border-radius:3px;padding:.9rem 1.1rem;margin:1.6rem 0;overflow-x:auto;font-family:var(--mono);font-size:var(--sm);line-height:1.55;color:var(--slate);max-width:100%}
   pre code{font-size:inherit}
   pre .tk-k{color:var(--tk-k);font-weight:600} pre .tk-s{color:var(--tk-s)} pre .tk-c{color:var(--tk-c);font-style:italic} pre .tk-t{color:var(--tk-t)} pre .tk-n{color:var(--tk-n)} pre .tk-add{color:var(--tk-add)} pre .tk-del{color:var(--tk-del)} pre .tk-cmd{color:var(--tk-t);font-weight:600}
-  /* A FIGURE RUNS EDGE TO EDGE. It takes no padding, border or background of its own: the section
-     already provides the page's padding, and the drawing's own containers are its frame. That is the
-     opposite of a PROSE panel, which carries all three. A figure is also not held to the prose
-     measure — 58rem is for a sentence, and a drawing is not read a line at a time. */
-  /* ONE VERTICAL RHYTHM. A paragraph keeps its 1rem; every block gets 1.6rem above and below, and a
-     figure 2.4rem — it is the largest thing on a page, and it needs the air to read as one unit rather
-     than as something the paragraph above it is still saying. Margins collapse, so the larger wins. */
+  /* A figure */
+
   figure{margin:2.4rem 0;padding:0;border:0;background:none}
   figure svg{display:block;width:auto;max-width:100%;height:auto;margin-inline:auto}
   figcaption{font-family:var(--ui);font-size:var(--xs);color:var(--faint);margin-top:.5rem;max-width:none}
@@ -117,19 +103,14 @@
   .dg .l{font-family:var(--ui);font-size:12px;fill:var(--ink)}
   .dg .s{font-family:var(--mono);font-size:11px;fill:var(--slate)}
   .dg .n{font-family:var(--ui);font-size:11px;fill:var(--faint)}
-  /* The arrowhead is a marker filled with `currentColor`, and a marker resolves that against
-     its own inherited colour rather than the path that references it. With nothing setting
-     `color` on the figure, every connector drew a blue line ending in a black head. Setting it
-     on `.dg` makes the head take the line's colour, and the marker needs no change. */
+  /* Arrowheads take the line's colour */
   .dg{color:var(--accent)}
   .dg .c{stroke:var(--accent);stroke-width:1.6;fill:none}
   .pull{border-left:2px solid var(--accent);background:var(--accent-soft);padding:1rem 1.2rem;margin:1.6rem 0;border-radius:0 3px 3px 0}
   .pull .label{display:block;font-family:var(--ui);font-size:var(--xs);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.3rem}
   .pull p{margin:0;max-width:none}
   .open{background:var(--card);border:1px solid var(--rule);border-left:2px solid var(--gap);border-radius:0 3px 3px 0;padding:1.1rem 1.25rem;margin-bottom:.9rem}
-  /* A DECIDED card is the same card with a green edge. Both exist because a page carries answered and
-     unanswered cards at once, and the edge is what tells them apart at a glance. Without `.card` an
-     answered card rendered as bare text, which is how a decided question read as prose nobody had settled. */
+  /* .card, the green-edged card */
   .card{background:var(--card);border:1px solid var(--rule);border-left:2px solid var(--ok);border-radius:0 3px 3px 0;padding:1.1rem 1.25rem;margin-bottom:.9rem}
   .card h4{font-size:var(--md)}
   .card .k{font-family:var(--mono);font-size:var(--xs);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);display:block;margin:.6rem 0 .2rem}
@@ -152,39 +133,25 @@
     .rail a.on{border-left:none}
   }
 
-  /* THE OUTLINE HAS TWO LEVELS, AND THEY DIFFER ON THREE AXES — size, weight and colour together.
-     One axis is not enough at rail size: a single step reads as noise rather than as a level, and
-     the two collapse into each other. Nothing in an outline sits on --faint either, because that is
-     the token for text a reader is meant to skim past and an outline is what they navigate by. */
+  /* The rail: two levels */
   .rail a:not(.sub):not(.home){font-size:.88rem;font-weight:400;color:var(--ink);letter-spacing:-.005em}
   .rail a.sub{font-size:.78rem;font-weight:400;color:var(--slate)}
   .rail .rail-title{color:var(--slate)}
 
-  /* ONE LEFT EDGE FOR BOTH LEVELS. An indent repeats what the fold already says, and it costs the
-     longer labels a wrapped line. Both are stated in one rule: setting only the subsection's
-     padding leaves it outdented past its own section, because another rule still sets the
-     section's. */
+  /* The rail: one left edge */
   .rail a:not(.home), .rail a.sub{padding-left:.6rem}
 
-  /* EVERYTHING ON THE RIGHT SITS ON THE LABEL'S CENTRE LINE. The row is a flex line, and its
-     default is to stretch, so a chevron or a count badge beside a label that wrapped to two lines
-     was pinned to the top of the row rather than level with it. */
+  /* The rail: marks level with the label */
   .rail a{align-items:center}
   .rail .count{align-self:center}
 
-  /* WEIGHT AND COLOUR MARK WHERE YOU ARE, NEVER WHAT A LEVEL IS. The notch is an inset shadow and
-     not a border: a border changes the box, so a label would jump sideways by the notch's width the
-     moment it became current. These are restated at matching specificity because the level rules
-     above are more specific than `.rail a.on`, and would otherwise strip the selected state. */
+  /* The rail: the current entry */
   .rail a.on:not(.sub):not(.home){font-weight:650;color:var(--accent);box-shadow:inset 1.5px 0 0 var(--accent)}
   .rail a.on.sub{color:var(--accent);box-shadow:inset 1.5px 0 0 var(--accent)}
   .rail a:not(.sub):not(.home):hover{color:var(--accent)}
   .rail a.sub:hover{color:var(--ink)}
 
-  /* THE DISCLOSURE IS A CHEVRON, DRAWN RATHER THAN TYPED. A glyph ties the mark to whatever font
-     is resolved and to that font's own idea of weight and baseline; two borders on a rotated box
-     are the same shape at every size and inherit the row's colour. Right means closed, down means
-     open, and only the chevron turns — the box around it stays put so the hit target never moves. */
+  /* The rail: the fold chevron */
   .rail a .caret{margin-left:auto;flex:none;width:1.35rem;height:1.35rem;display:grid;place-items:center;
     color:var(--faint);border-radius:3px;transform:none}
   .rail a .caret::before{content:"";width:.32rem;height:.32rem;border-right:1.5px solid currentColor;
@@ -195,170 +162,40 @@
   @media (prefers-reduced-motion:reduce){.rail a .caret::before{transition:none}}
 </style>
 <style>
-/* anchor links: a section or subsection title carries a link to itself — small, grey, set off from the title; copied on click */
+/* Heading anchor links */
 a.anchor{display:inline-block;margin-left:.6em;font-family:var(--mono);font-size:.55em;font-weight:400;line-height:1;color:var(--slate,#6b7280);text-decoration:none;opacity:.35;transition:opacity .15s;vertical-align:middle;position:relative;top:-.1em}
 .sec-head:hover a.anchor,h3[id]:hover a.anchor,a.anchor:hover,a.anchor:focus,a.anchor.copied{opacity:1}
 a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7d4a);margin-left:.3em}
 </style>
 
-
 <div class="page">
 
-<!-- THE RAIL. Nothing in the rail is written by hand. Two scripts at the end of the page build it from the
-  content: every <section id> becomes an entry, named from its h2 — never numbered: a number orders a file in a tree, a heading is a name (the text
-  before the em dash, so name sections with a plain word first); every <h3 id> inside a section becomes a
-  sub-entry; the Open section shows its card count. Sub-entries fold under their section, open where the reader
-  is, with a caret at the far right to pin one open. The rail follows the scroll. Keep the ids and
-  the h2/h3 pattern and the rail-fold style block; a page without them is off its template. -->
 <nav class="rail" id="rail">
   <a class="home" href="../../../../README.md">&larr; .spndevex</a>
   <div class="rail-title">{{NNN}} - {{TITLE}}</div>
 </nav>
 <div class="wrap">
 
-<!-- ================================================================================================
-  THE WRITING RULES, read before you write a word. Every page kind carries these.
-  1. Say why before what. Open with the problem, then give the answer.
-  2. Explain a term the first time it appears, then use it. Never make the reader guess.
-  3. Use simple words: a word the reader can look up. No idioms, no metaphors, no wordplay.
-  4. One idea at a time. A sentence may be long when the idea needs it. Never cut the link between
-     two ideas to make a sentence shorter; a reader has to connect the dots.
-  5. Carry the source's facts and its terms. Never its phrasing.
-  6. Keep the reasoning. A plain page still explains why. It drops decoration, not connections.
-  7. Close a section with where to go next: a page to read or a command to run.
-  ================================================================================================ -->
-<!-- ================================================================================================
-  THE BLOCKS. MOST OF A PAGE IS NOT A BLOCK. Paragraphs, lists, numbered steps and subheadings are what a
-  section is made of; write them plainly and label them as nothing. A BLOCK is what you drop into that writing
-  when a piece of content must not read as prose — it carries a border, a background or a form of its own, so a
-  reader sees it is different before reading a word of it. ONE SECTION OR SUBSECTION HOLDS NORMAL TEXT AND AS
-  MANY BLOCKS AS IT NEEDS: none, one, or several. Nothing declares "the" block of a section.
-
-  WHAT YOU ARE WRITING, AND WHAT IT EARNS — read down, stop at the first row that matches.
-    an explanation, an argument, a part, the opening  → nothing: paragraphs, a list, a subheading
-    a rule somebody has to follow                     → MUST, in a callout, then the command that enforces it
-    a set of named things, no order between them      → CATALOG, a tile each
-    things side by side, or which to choose when      → COMPARISON, a table
-    a record: ids, rows, statuses, terms              → a table; GLOSSARY where the record is this page's words
-    a literal: a contract, a manifest, a command      → CODE, tagged with its language
-    what a file says today and what it will say       → DIFF, on an approach page only
-    a hierarchy easier read than drawn                → TREE, a plain text block
-    a shape: parts, steps, participants, data, estate → a FIGURE of the matching kind
-    a passage that must stand apart from the page     → PROSE, the markdown panel
-    several pages a reader might go to next           → CARDS
-    the two pages either side of this one             → NEXT, small: a title and a direction
-
-  The choice is a judgement about the content, and no rule can make it for you: the same subject is a table on
-  one page and a figure on another. What the list removes is the guessing — name what you are writing first.
-
-  A BLOCK THAT IS NEITHER NORMAL TEXT NOR A RECORD CARRIES A FORM. Normal text is paragraphs; a record is a
-  table, which already arrives as a bordered card. Everything else: MUST is the accent callout, CATALOG is
-  tiles, PROSE is a panel with its own border and colours, CODE/TREE/DIFF are code blocks, a figure is drawn,
-  CARDS is a grid of doors, NEXT is two small cards, and a quote is set apart. The forms come from the
-  stylesheet this template ships, never from markup you invent — that is what keeps a page renderable with no
-  library, in both themes, offline.
-  ================================================================================================ -->
-<!-- ================================================================================================
-  THE FIGURES, a closed set. A figure sits inside a block. Every figure has a sentence before it
-  (what you are looking at) and a figcaption after it (what to notice). In the markdown seat file a
-  figure is a mermaid block; on this page it is inline SVG in the .dg grammar, so the page needs no
-  network and no library. Labels fit their boxes; a connector ends on a box; a path keeps 16 px from the edge and
-  from any box it does not end on, and a return path runs in its own lane below the boxes, with its label.
-  FLOW      steps in order · flowchart left to right, a box per step, an arrow means "then", a diamond is a choice
-            lives in SEQUENCE · an approach's How · a construct's Parts when a part is a procedure
-  MAP       groups and what connects them · a box is a group, an arrow is what flows, a subgraph is containment
-            lives in MAP · a construct's Model when the construct is a structure
-  TREE      a hierarchy · top-down, or a plain-text tree in a code block for a folder layout
-            lives in MAP · a construct's Model when the construct is a hierarchy
-  SEQUENCE  who talks to whom, in what order · one lifeline per participant, time running down, one arrow per
-            message with its own label, a dashed arrow for a reply. Use it instead of FLOW whenever more than one
-            party acts and WHO acted is the thing to see: a FLOW shows what happens next, a SEQUENCE shows who said it
-            lives in a construct's Parts · REASONS when a claim is about a process
-  STATE     the states a thing can be in · an arrow names the event that moves it
-            lives in a construct's Model when it is a lifecycle · Parts for a part with states · an approach's What when it changes a vocabulary
-  ENTITIES  a data model and its relations · the subject at the centre, what points at it on one side and what it
-            points at on the other, every relation line carrying its cardinality
-            lives in a construct's Model when the construct is data · Parts for one part's records
-  CODE      a contract, a state, a manifest, a command and its output · a fenced block with its language, real values,
-            the path above it when copied from a file (the audit checks it still matches)
-            lives in EXAMPLE · MUST (the action) · a construct's Parts or Binds · an approach's What
-  DIFF      what a file says today, and what it will say · a diff block, - today / + after, the path above it
-            lives in an approach's What only. A construct or an overview states current truth, never a change
-  ================================================================================================ -->
-<!-- THE ARCS. An arc is named for the cycle it pays and numbered N1… in execution order. The arc file is the
-  execution record: each step row carries Repo (the repository the step changes) · Altitude (DOCS · CODE, with its
-  tests · GENERATED · RELEASE · PROOF) · What (the files, before → after, or its plan's section) · Mechanism (by
-  hand · script · command · agents) · Acceptance · State. Rows run in chain order by repository, then by altitude.
-  An approved preview is saved in the arc's own folder, notes/N<nn>/ (plan.md, samples/, scripts/, orders/). The
-  arcs are the state: this page shows each arc once, as a row of Cycles. -->
 <header class="masthead">
-<!-- THE HEADER: two lines, six fields, separated by | . Nothing else goes here.
-  Line 1 is identity and never changes:  {workspace} | {location} | {title}
-    workspace  the organization: SaaS Plane here, a partner's organization name in theirs
-    location   declared names, never folders. "Workstream" for a page in the planning center; the repository's
-               name for a root page (Foundation, Platform); "Repo - Node" for a package, app or estate package
-               (Platform - Organizations, Estate - SPN Demo)
-    title      the page's own name, the same as its h1
-  Line 2 is state:  Type: … | For: … | Status: …
-    type       Approach · Overview · Construct, equal to the meta block's variant and the file name's suffix
-    for        the people this page is written for, by role, from the meta block's lenses (LEAD Engineering leader ·
-               BUSINESS Business manager · PRODUCT Product manager · ARCHITECT Architect · SERVER_DEV Backend developer ·
-               WEB_DEV Web developer · QA Quality engineer · INFRA DevOps / SRE · TRUST DevSecOps / Security ·
-               PARTNER Partner / integrator · VOICE Editor). Never who wrote the page; the agent is never listed
-    status     🔮 PLANNING · 🚧 IMPLEMENTING · ✅ DONE, read from this document and never from a workstream.
-               An overview has no status slot.
-  Rendering: line 1 is small uppercase text. Line 2 is badges: the type plain, each role a chip, the status a
-  colored badge at the far right carrying the book's glyph. Keep one .eyebrow div; the close gate reads it. -->
   <div class="eyebrow"><span class="line1">{{WORKSPACE}} &nbsp;|&nbsp; Workstream &nbsp;|&nbsp; {{NNN}} - {{TITLE}}</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Approach</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">{{ROLE}}</span><span class="badge lens">{{ROLE}}</span></span><span class="st"><span class="lbl">Status:</span> <span class="badge status planning">&#x1F52E; PLANNING</span></span></span></div>
-  <!-- THE MASTHEAD, ON AN APPROACH (05-artifacts.md § The masthead, and the opening · RD.DEVEX.WORKSPACE.182 and .187).
-    Three levels, in this order, and every level is plain language: everyday words, short sentences, no figure of
-    speech, no slogan, no project shorthand, no number, and no book word (behaviour, construct, lens, kind, node, seat,
-    tier, arc, estate, ring) unless the same sentence explains it. The workstream's number at the start of the h1 comes
-    from the folder's name and is not part of the Title. A new Subtitle is drafted by the agent and written only after the developer
-    approves it.
-    WHAT EACH LEVEL HOLDS
-      Title        the h1: the page's name, the same words as the rail title.
-      Subtitle     p.subtitle: the decision the page plans, as one sentence.
-      Description  one p.standfirst, and nothing after it in the header. First sentence: what changes. Second: why
-                   you would read it. Then at most two short sentences on how the page runs. The argument goes in Why.
-    GOOD, the plain-language approach (plain-language-approach.html)
-      Title        "Plain Language"
-      Subtitle     "Decides how every page in the book opens, and how the agent talks to you."
-      Description  "This page plans a change to how the book's pages open and to what the agent says when you open a
-                   new window. Read it before you review the work it lists. Why comes first, then what changes, then
-                   how the work runs."
-    BAD, one per level
-      Title        "Say It Straight"  A slogan in place of the page's name.
-      Subtitle     "N116 pays one cycle: R2 ships the loop, and every seat follows."  Project shorthand and a figure
-                   of speech; it never names the decision.
-      Description  "Nine arcs rewrite every seat's opening before the release."  Opens with a count, and two book
-                   words (arc, seat) that nothing explains.
-    CHECK BEFORE YOU SAVE, in order
-      1. The Description's first sentence says what changes, in everyday words.
-      2. Its second sentence says why you would read this page.
-      3. No book word or project shorthand appears in any level unless the same sentence explains it.
-      4. No number appears in the Subtitle or the Description.
-      5. The Subtitle is one plain sentence that names the decision.
-      6. Read the three levels aloud once, and rewrite any sentence you stumble on. -->
   <h1>{{NNN}} - {{TITLE}}</h1>
   <p class="subtitle">{{THE SUBTITLE: the decision this page plans, one plain sentence.}}</p>
-  <p class="standfirst">{{THE DESCRIPTION, one paragraph: what changes, in everyday words; why you would read this page; then at most two short sentences on how the page runs.}}</p>
+  <p class="standfirst">{{THE DESCRIPTION, one paragraph: what changes, why you would read this page, and how the page runs.}}</p>
 </header>
 
 <section id="s1" data-block="reasons">
   <div class="sec-head"><h2>Why &mdash; {{the problem in one line}}</h2></div>
-  <p>{{The problem, with the evidence: numbers, files, dates. Every claim links what it read.}}</p>
+  <p>{{The problem, and the evidence for it.}}</p>
   <h3 id="w1">{{Finding}}</h3>
-  <p>{{What is wrong, measured. One h3 per finding.}}</p>
+  <p>{{What is wrong, measured.}}</p>
   <h3 id="w2">{{Finding}}</h3>
   <p>{{&hellip;}}</p>
 </section>
 
 <section id="s2" data-block="reasons">
   <div class="sec-head"><h2>What &mdash; {{the decision in one line}}</h2></div>
-  <p>{{What changes in the product&rsquo;s purpose and model, construct by construct, each with its reason. Where only the owner can decide, say &ldquo;open in Q&lt;n&gt;&rdquo; and put the card in Open.}}</p>
+  <p>{{What changes in the product&rsquo;s purpose and model, construct by construct, each with its reason.}}</p>
   <h3 id="c0">The constructs this changes</h3>
-  <p>This table comes first, before the argument, because the close sweep carries each row into the seat files. &ldquo;none&rdquo; is a valid row.</p>
   <div class="scroll"><table>
     <thead><tr><th>Construct</th><th>What changes</th><th>New?</th><th>Status after</th></tr></thead>
     <tbody>
@@ -366,7 +203,7 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
     </tbody>
   </table></div>
   <h3 id="c1">{{Construct &mdash; what changes in it}}</h3>
-  <p>{{The change, then why. Use whatever block shows it best: prose, a figure, a code block, a state table. Real values from the codebase, never made-up examples. Explain a word in brackets the first time it appears.}}</p>
+  <p>{{The change, then why, with the block that shows it.}}</p>
   <p><code>{{path of the file that changes}}</code></p>
   <pre data-lang="diff"><span class="tk-del">- what the file says today</span>
 <span class="tk-add">+ what it will say</span></pre>
@@ -376,9 +213,9 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
 
 <section id="s3" data-block="sequence">
   <div class="sec-head"><h2>How &mdash; {{what changes in each repository, in one line}}</h2></div>
-  <p>{{Which repositories change, in the order the work runs &mdash; the standard first, then what realizes it, then the tools. Each part below shows what its files will say; the steps, their checks and their logs are in the arcs.}}</p>
+  <p>{{Which repositories change, in the order the work runs.}}</p>
   <h3 id="h1">{{repository}} &mdash; {{the kind of change}}</h3>
-  <p>{{One or two sentences, then the block that shows the change: a DIFF of a file, a TREE of a folder, a CODE block of a contract or a state with a comment per member, JSON with comments.}}</p>
+  <p>{{What changes in this repository, then the block that shows it.}}</p>
   <p><code>{{path of the file that changes}}</code></p>
   <pre data-lang="diff"><span class="tk-del">- what the file says today</span>
 <span class="tk-add">+ what it will say</span></pre>
@@ -387,7 +224,6 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
 &#x251C;&#x2500;&#x2500; what is added      +
 &#x2514;&#x2500;&#x2500; what is removed    &minus;}}</pre>
   <h3 id="h9">Cycles &mdash; the arcs, in the order they run</h3>
-  <p>Generated from each arc&rsquo;s own status line, so it cannot drift. Everything the agent needs to execute &mdash; steps, mechanisms, checks, logs &mdash; is in the arc files.</p>
   <div class="scroll"><table>
     <thead><tr><th>Arc</th><th>What it does</th><th>Status</th></tr></thead>
     <tbody>
@@ -399,41 +235,27 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
 
 <section id="s4" data-block="reasons">
   <div class="sec-head"><h2>Open &mdash; Q{{n}} &middot; Q{{n}}</h2></div>
-  <p>Every question you cannot answer alone lives here, never in an arc. Numbers never restart and never repeat. <strong>A card is a <code>div.open</code> wrapping an <code>h4</code> whose id is its number</strong> &mdash; that is what every check reading this page looks for, what gives an undecided card its amber edge, and what the rail counts to show how many are waiting. A card written any other way is a card no gate can see and no reader can count.</p>
-  <p><strong>A card assumes no memory of the session that wrote it</strong>, because people decide days later. It carries what led to the question, what is true today, and what happens if nothing is decided.</p>
   <div class="open">
     <h4 id="q{{n}}">Q{{n}} &middot; {{The question, as a noun phrase naming the choice}}</h4>
     <span class="k">What</span>
-    <p>{{The change concretely &mdash; the file, the rule, the before and after. Names and counts, not adjectives.}}</p>
+    <p>{{The change: the file, the rule, the before and after.}}</p>
     <span class="k">Why it matters</span>
-    <p>{{What it costs to leave it alone: the failure it causes, and what is blocked until it is answered. Never &ldquo;for consistency&rdquo;.}}</p>
+    <p>{{What it costs to leave it alone, and what is blocked until it is answered.}}</p>
     <span class="k">Options</span>
     <div class="scroll"><table>
       <thead><tr><th></th><th>What it does</th><th>What it costs</th></tr></thead>
       <tbody>
-        <tr><td><strong>A</strong></td><td>{{&hellip;}}</td><td>{{the trade-off, concretely &mdash; &ldquo;one file instead of twenty, at the cost of a second name for one concept&rdquo;, never &ldquo;simpler&rdquo;}}</td></tr>
+        <tr><td><strong>A</strong></td><td>{{&hellip;}}</td><td>{{the trade-off}}</td></tr>
         <tr><td><strong>B</strong></td><td>{{&hellip;}}</td><td>{{&hellip;}}</td></tr>
-        <tr><td><strong>C</strong></td><td>{{leave it as it is, wherever that is viable}}</td><td>{{what that costs}}</td></tr>
+        <tr><td><strong>C</strong></td><td>{{leave it as it is}}</td><td>{{what that costs}}</td></tr>
       </tbody>
     </table></div>
-    <div class="rec"><b>Recommended: {{A}}.</b> {{The reason it wins, in two sentences.}}</div>
+    <div class="rec"><b>Recommended: {{A}}.</b> {{the reason it wins}}</div>
   </div>
-  <!-- A CARD CARRIES A RECOMMENDATION AND NO DECISION. There is no `Decision:` field here, and the card
-       grammar never had one: the six parts are the number and summary, What, Why, Options, Recommendation
-       and Preview. A decision field only made sense while an answered card stayed on the page, and one did
-       not — see the note below. **A card on a page is an open card**, so a field announcing that it is open
-       says nothing, and a field left empty is a blank somebody feels they should fill. -->
-  <!-- AN ANSWERED CARD STOPS EXISTING. There is no decided-card block here on purpose: once a question is
-       settled it is no longer a question, so its answer is written into the section that now states it —
-       `Why` where it settles a reason, `What` where it settles a shape, `How` where it settles an execution
-       choice — and the card leaves. Its number is never reused, so the gap in the run is the record that you
-       settled it, and its argument is kept whole in the workstream's notes and in the arc that executes it.
-       Keeping answered cards is what put a hundred of them on one page and left two shapes for one thing. -->
 </section>
 
 <section id="s5" data-block="comparison">
   <div class="sec-head"><h2>Deferred &mdash; parked, each with the event that brings it back</h2></div>
-  <p>A deferred item keeps its reasoning and adds the one event that brings it back. <em>Later</em> is not an event.</p>
   <div class="scroll"><table>
     <thead><tr><th>Item</th><th>Why not now</th><th>What brings it back</th></tr></thead>
     <tbody>
@@ -442,19 +264,11 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
   </table></div>
 </section>
 
-
-
-
-<!-- THE BLOCKS AND THE FIGURES ARE SHOWN ONCE, in templates/blocks-template.html — normal content first,
-     then every block and every figure kind rendered. It is a reference you consult while writing, not a section
-     you copy: the chooser above tells you which block a piece of content earns, and that page shows you what
-     each one looks like. Open it beside this template. -->
-
 </div>
 </div>
 
 <footer>
-  The approach template, v3 &middot; for the workstreams after 008 &middot; the rules live in the book&rsquo;s <code>05-artifacts.md</code>; this file repeats them so you never write from memory &middot; every block and figure is shown once in <code>blocks-template.html</code>
+  The approach template &middot; for the workstreams after 008 &middot; copy it and fill the slots &middot; the rules for this page are in <code>05-artifacts.md</code> and <code>01-workstream.md</code> &middot; every block and figure is shown once in <code>blocks-template.html</code>
 </footer>
 
 <script>
@@ -479,11 +293,6 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
 })();
 </script>
 
-<!-- rail-fold: subsections collapse under their section, the caret sits at the far right and only
-     where a group exists, and a group the reader has not pinned follows the scroll. This is the
-     shape 009 landed and the developer confirmed; it is applied here as a block appended AFTER the
-     page's own rail builder, because the corpus has two builders and one transform covers both.
-     05-artifacts.md § A page carries its own subsections. -->
 <style>
   .rail .sub-group{display:block}
   .rail.js .sub-group{display:none}
@@ -492,12 +301,11 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
   .rail a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 </style>
 <style>
-  /* a quote is a sentence set apart — a rule stated in full, or a line from the source the page is about */
+  /* A quote */
   blockquote{margin:1.6rem 0;padding:.2rem 0 .2rem 1.1rem;border-left:2px solid var(--rule);color:var(--slate)}
   blockquote p{margin:0;max-width:none}
   .tile .s{margin-top:.45rem}
-  /* PROSE — the markdown block. Its own border, background and text colour, so a passage of ordinary
-     markdown reads as a block the page chose rather than as the page's own voice continuing. */
+  /* PROSE, the markdown panel */
   .prose{border:1px solid var(--rule);background:var(--card);color:var(--slate);border-radius:3px;
     padding:1.1rem 1.3rem;margin:1.6rem 0}
   .prose > :first-child{margin-top:0}
@@ -506,7 +314,7 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
   .prose strong,.prose h4{color:var(--ink)}
   .prose code{color:var(--ink)}
   .prose blockquote{border-left-color:var(--accent);margin:1rem 0}
-  /* NEXT — small on purpose: a title and a direction, nothing else */
+  /* NEXT */
   .nextnav{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.7rem;margin:1.6rem 0}
   .nextnav-card{display:flex;flex-direction:column;gap:.15rem;border:1px solid var(--rule);background:var(--card);
     border-radius:3px;padding:.65rem .85rem;text-decoration:none;min-width:0}

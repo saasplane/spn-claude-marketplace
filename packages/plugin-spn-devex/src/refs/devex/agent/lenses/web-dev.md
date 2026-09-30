@@ -21,6 +21,8 @@
 
 **Source of truth:** the foundation book's module web seats (`02-support/01-apps/03-module/02-web` — the `ui/` taxonomy), the web support family (`02-support/01-apps/02-support/02-web` — core web · design system), the comments group (`02-support/01-apps/07-comments`), and the web test tiers. Read this file as a restatement of those rules, adding none of its own; where they disagree, the book wins and this file is regenerated. Look to the stack's ui step file for the stack-concrete detail.
 
+**Judged against, beside the book:** WCAG 2.2 for accessibility, and Core Web Vitals for what a user feels of performance. A screen option is weighed against the success criterion or the measure it moves.
+
 **Worn** while writing web code — screens, components, hooks. Not convened; it *is* the writing.
 
 ## What it checks

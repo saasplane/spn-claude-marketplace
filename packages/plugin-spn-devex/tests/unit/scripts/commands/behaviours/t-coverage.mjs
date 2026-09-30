@@ -242,6 +242,30 @@ const whereChapter = (domain, pkg, name, path) => ({
       && JSON.stringify(result.wholeRepository.files) === `["docs/${SEAT.behaviors}/README.md"]`, JSON.stringify(result.wholeRepository));
 }
 
+console.log("\n=== behaviour-coverage — a MANUAL row counts in none of the numbers (N122 5.3e)");
+
+{
+  const root = repo({ ...APPS, ...node("packages/store", "MODULE_SERVER"),
+    "packages/store/src/app/services/StoreService.ts": "export const value = 1;\n",
+    ...rowsAt("01-core/01-store.md", ["COR.STORE.01", "UNIT", "SUCCESS"], ["COR.STORE.02", "UNIT", "PLANNED"], ["COR.STORE.03", "JOURNEY", "MANUAL"]),
+    ...whereChapter("01-core", "store", "01-store", "src/app/services/StoreService.ts"),
+    ...rowsAt("README.md", ["COR.REPO.01", "UNIT", "PENDING"], ["COR.REPO.02", "JOURNEY", "MANUAL"]) });
+  const result = json(root);
+  const core = (result.domains ?? []).find((one) => one.domain === "01-core");
+  const sum = (one) => ["SUCCESS", "FAILED", "PENDING", "PLANNED"].reduce((total, word) => total + (one?.status?.[word] ?? 0), 0);
+  ok("5.3e: a domain's Written and Built leave the MANUAL row out", core?.written === 2 && core.built === 2, JSON.stringify(core));
+  ok("5.3e: the four statuses sum to Written again", sum(core) === core?.written && sum(result.wholeRepository) === result.wholeRepository?.written,
+    JSON.stringify([core?.status, result.wholeRepository?.status]));
+  ok("5.3e: a domain lists its MANUAL rows as manual: [{ id, file }]",
+    JSON.stringify(core?.manual) === JSON.stringify([{ id: "COR.STORE.03", file: `docs/${SEAT.behaviors}/01-core/01-store.md` }]), JSON.stringify(core?.manual));
+  ok("5.3e: the whole-repository row leaves its MANUAL row out and lists it",
+    result.wholeRepository?.written === 1 && JSON.stringify(result.wholeRepository?.manual) === JSON.stringify([{ id: "COR.REPO.02", file: `docs/${SEAT.behaviors}/README.md` }]),
+    JSON.stringify(result.wholeRepository));
+  const journey = (result.tiers ?? []).find((one) => one.tier === "JOURNEY");
+  ok("5.3e: a tier's row count leaves MANUAL rows out", (journey?.rows ?? 0) === 0, JSON.stringify(journey));
+  ok("5.3e: the measurement lists every MANUAL row once", (result.manual ?? []).map((one) => one.id).join(",") === "COR.STORE.03,COR.REPO.02", JSON.stringify(result.manual));
+}
+
 console.log("\n=== behaviour-coverage — Run health in the report's plain words (N122 5.3c)");
 
 {

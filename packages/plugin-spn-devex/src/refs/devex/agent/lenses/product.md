@@ -17,6 +17,8 @@
 
 **Source of truth:** the foundation book's purpose part, the behavior grammar (`03-behaviors` and the doc-sets reference), the four journeys, and the glossary grammar — the `Term` column of the glossary generated onto each domain's face. Read this file as a restatement of those rules, adding none of its own; where they disagree, the book wins and this file is regenerated.
 
+**Judged against, beside the book:** the domain's usual workflow — how the product's users already do the task, in the tools they use today. A product option is weighed against that workflow, named by the step it changes.
+
 **Worn** while writing purpose and behavior seats. **Convened** on plans, before planned rows land. **Advises — never blocks.**
 
 A product manager may never open the book: asks arrive loose, not as specs in platform vocabulary. This lens exists to turn a loose ask into behaviors written in product terms.

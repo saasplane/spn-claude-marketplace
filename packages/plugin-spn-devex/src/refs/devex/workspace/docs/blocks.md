@@ -4,7 +4,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The masthead, and the opening",
-      "seen": "ee951acf"
+      "seen": "4fe3fa2f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -14,7 +14,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The figures \u2014 what sits inside a block, and the closed set of them",
-      "seen": "fa46b3d7"
+      "seen": "8a447dae"
     }
   ]
 }
@@ -106,6 +106,13 @@ A **link** takes `from` · `to` · `label` · `dashed` · `card` (its cardinalit
 the contract: `24` between unconnected shapes and parallel runs, `56` where a connector joins two
 boxes, `16` of padding, `36` of minimum visible shaft, `8` of clear air around every label. Drawing
 one figure by hand took more than twenty rounds against that check.
+
+**A one-way chain is drawn as a straight line, and horizontal when it fits.** Nothing in it turns
+back, so a bend would show a turn that is not there.
+
+**Every figure is looked at by eye once the page is produced, and the verdict is written down.** The
+check reads the geometry; only a person reading the page sees whether the figure is laid out well
+and can be read.
 
 ### The kinds
 

@@ -784,6 +784,9 @@ export function orient(root: string, cwd: string): [message: string, context: st
     "ask before you touch it. " +
     "Something new in the first prompt gets its goal asked in one or two plain questions, never lettered " +
     "options and never a `Q<n>` card: a card lives on the approach page, which does not exist yet. " +
+    "Publish nothing unless the developer asks (RD.DEVEX.WORKSPACE.117): an approach page, a sample or a " +
+    "report stays where it was written, and you hand it over as the full path to the file, to open in a " +
+    "browser. That holds over a publishing tool's own default to publish without being asked. " +
     "Never turn the rung into a menu. The standing offer " +
     "under that question appears only when exactly one workstream is open and no other " +
     "session is live here — so where you cannot see one, do not propose resuming " +

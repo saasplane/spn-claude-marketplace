@@ -334,6 +334,34 @@ const repositoryRow = (id, status) => ({
     measure(root).includes("2 rows built") && measure(root).includes("domain 02-web (Web)"), measure(root));
 }
 
+console.log("=== coverage measure — a MANUAL row counts in none of the numbers (N122 5.3e)");
+
+{
+  const root = repo({
+    ...APPS, ...node("packages/store", "MODULE_SERVER"), ...code("packages/store/src/app/services/StoreService.ts"),
+    ...constructIn("01-core", "01-store", ["COR.STORE.01", "SUCCESS"], ["COR.STORE.02", "PLANNED"], ["COR.STORE.03", "MANUAL"]),
+    ...chapterIn("01-core", "store", "01-store", "src/app/services/StoreService.ts"),
+    ...repositoryRow("COR.REPO.01", "MANUAL"),
+  });
+  const result = json(root);
+  const store = levelOf(result, "packages/store");
+  const core = (result.domains ?? []).find((one) => one.domain === "01-core");
+  const file = `docs/${SEAT.behaviors}/01-core/01-store.md`;
+  ok("5.3e: a level's Written, Built and Proved leave the MANUAL row out, so it is never Not proved",
+    store?.written.rows === 2 && store.built.rows === 2 && store.proved.rows === 1 && store.builtNotProved.count === 1, JSON.stringify(store));
+  ok("5.3e: a level lists its MANUAL rows as manual: [{ id, file }]",
+    JSON.stringify(store?.manual) === JSON.stringify([{ id: "COR.STORE.03", file }]), JSON.stringify(store?.manual));
+  ok("5.3e: a domain leaves the MANUAL row out of every count and lists it",
+    core?.written.rows === 2 && core.notProved.rows === 1 && JSON.stringify(core.manual) === JSON.stringify([{ id: "COR.STORE.03", file }]), JSON.stringify(core));
+  ok("5.3e: the whole-repository row leaves its MANUAL row out and lists it",
+    result.wholeRepository?.written.rows === 0 && result.wholeRepository.notProved.rows === 0
+      && JSON.stringify(result.wholeRepository.manual) === JSON.stringify([{ id: "COR.REPO.01", file: `docs/${SEAT.behaviors}/README.md` }]),
+    JSON.stringify(result.wholeRepository));
+  ok("5.3e: the repository counts no MANUAL row and lists both",
+    result.repositoryLevel.written.rows === 2 && result.repositoryLevel.builtNotProved.count === 1
+      && (result.repositoryLevel.manual ?? []).map((one) => one.id).join(",") === "COR.REPO.01,COR.STORE.03", JSON.stringify(result.repositoryLevel));
+}
+
 console.log("=== coverage measure — the answer as a whole");
 
 {

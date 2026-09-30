@@ -1,7 +1,7 @@
 // `lib/timing.ts` — each telemetry line says which work it belongs to (RD.DEVEX.WORKSPACE.185):
 // `workstream`, `arc` and `order` from the paths the tool call touches, `agent` from the hook input.
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { LIB } from "../../../helpers/harness.mjs";
 import { workspace } from "../../../helpers/fixture.mjs";
@@ -74,6 +74,53 @@ console.log("\n=== the writer — the tags reach the line");
     ["008-plain-language", "N116", null, "ag1", "s1"]);
 }
 
+
+console.log("\n=== 2o — the tags carry forward to a call that touches no workstream path");
+{
+  const root = workspace("m2o-carry", { ".spndevex/.debug/telemetry.on": "on\n" });
+  const env = { ...process.env };
+  delete env.SPN_TELEMETRY;
+  const ORDER = `${WS}/notes/N122/orders/H-marketplace.md`;
+  const call = (payload) => execFileSync("node", ["--input-type=module", "-e", `
+    import { begin, end, record, tagsOf } from ${JSON.stringify(join(LIB, "timing.ts"))};
+    const payload = ${JSON.stringify(payload)};
+    begin({ event: "PreToolUse", tool: "Read", session: payload.session_id, ...tagsOf(payload) }, ${JSON.stringify(root)});
+    record("a-check", 1);
+    end();`], { env, encoding: "utf8" });
+  const repoFile = { file_path: "/opt/work/saasplane/code/spn-claude-marketplace/packages/plugin-spn-devex/src/scripts/lib/timing.ts" };
+  call({ session_id: "s2o", agent_id: "lane-h", tool_input: { file_path: ORDER } });
+  call({ session_id: "s2o", agent_id: "lane-h", tool_input: repoFile });
+  call({ session_id: "s2o", agent_id: "lane-g", tool_input: repoFile });
+  call({ session_id: "s2o", tool_input: repoFile });
+  call({ session_id: "s2o", agent_id: "lane-h", tool_input: { file_path: `${WS}/notes/N122/spec.md` } });
+  call({ session_id: "s2o", agent_id: "lane-h", tool_input: repoFile });
+  call({ session_id: "s2o", agent_id: "lane-h", tool_input: { file_path: `${WS}/arcs/N8-the-workstream-closes.md` } });
+  call({ session_id: "s2o", agent_id: "lane-h", tool_input: repoFile });
+  call({ session_id: "other", agent_id: "lane-h", tool_input: repoFile });
+  const rows = readFileSync(join(root, ".spndevex", ".debug", "telemetry", "hooks.jsonl"), "utf8").trim().split("\n")
+    .map((l) => JSON.parse(l)).filter((row) => row.script === "a-check").map((row) => [row.workstream, row.arc, row.order]);
+  same("2o: a lane's call after reading its order carries the order's workstream, arc and order", rows[1],
+    ["008-plain-language", "N122", "H-marketplace"]);
+  same("2o: another agent in the same session does not inherit the lane's tags", rows[2], [null, null, null]);
+  same("2o: the main window (no agent) does not inherit a lane's tags", rows[3], [null, null, null]);
+  same("2o: a call inside the same arc keeps the order it carries", rows[4], ["008-plain-language", "N122", "H-marketplace"]);
+  same("2o: and the untagged call after it still carries the order", rows[5], ["008-plain-language", "N122", "H-marketplace"]);
+  same("2o: a call that names other work replaces the tags", rows[6], ["008-plain-language", "N8", null]);
+  same("2o: and the untagged call after it carries the new work", rows[7], ["008-plain-language", "N8", null]);
+  same("2o: another session inherits nothing", rows[8], [null, null, null]);
+}
+{
+  const root = workspace("m2o-off", {});
+  const env = { ...process.env };
+  delete env.SPN_TELEMETRY;
+  execFileSync("node", ["--input-type=module", "-e", `
+    import { begin, end, record, tagsOf } from ${JSON.stringify(join(LIB, "timing.ts"))};
+    const payload = { session_id: "s", tool_input: { file_path: ${JSON.stringify(`${WS}/arcs/N116-x.md`)} } };
+    begin({ event: "PreToolUse", tool: "Read", session: "s", ...tagsOf(payload) }, ${JSON.stringify(root)});
+    record("a-check", 1);
+    end();`], { env, encoding: "utf8" });
+  same("2o: with telemetry off, no tag state is written", existsSync(join(root, ".spndevex", ".debug", "telemetry")), false);
+}
 
 console.log("=== commandFacts — a command run through the shell has no hook payload");
 {

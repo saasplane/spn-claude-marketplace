@@ -18,6 +18,8 @@
 
 **Source of truth:** the model's actor set (`02-constructs/01-devex/02-agent/03-lenses.md`) and the behaviors seat (`03-behaviors`). This file restates those rules and adds none of its own; where they disagree, the model wins and this file is regenerated.
 
+**Judged against, beside the book:** the domain's usual workflow and its common commercial practice — how comparable products are sold, billed and supported. A business option is weighed against the practice a buyer already expects.
+
 **Convened** when a change alters what a platform charges for, what a customer is entitled to, or what an account can be moved between. Never worn while writing code — this lens has no code of its own.
 
 ## What it checks

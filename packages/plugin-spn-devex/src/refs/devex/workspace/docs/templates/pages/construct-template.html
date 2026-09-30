@@ -1,28 +1,8 @@
-<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The four page kinds · § The masthead, and the opening · § A construct's six sections, in one order · § A construct types no proof, and its rows sit at its own path · § The header — two lines, six fields, produced from the block · § A construct's status is derived, never typed
-     This file carries rules it does not own. The chapter above is the source of truth.
-     A rule change is edited there first, then here, in the same change. Never add a rule here.
-     restate-drift.ts reports this copy when its source moves. -->
-<!-- For every page kind: no block numbers on the page or in its rail (a number orders a file, a heading is a name); the header keeps three
-     segments — workspace | repository | title — and the title carries its own context (Estate Shape, not Shape); Terms are
-     capitalised concept names in the order a newcomer meets them; a contract is a code block with a comment per member;
-     a list of keys with meanings is a table; an author's note (a comment) never reaches the page; there is no length cap;
-     a one-way flow figure is a straight line, horizontal when it fits; every figure is reviewed by eye after it is produced.
-     A CONSTRUCT TYPES NO PROOF: what proves it is the behaviour rows at its own path, 03-behaviors/<same relative path>,
-     and a run writes their status. Status is never in the markdown — docs.ts status rolls it up from those rows.
-     THE SHAPE OF A SECTION, on every page kind: a section opens with its own overview — what you are looking at, in
-     prose — then a figure where seeing is faster, then its content as blocks. A subsection opens with its own overview,
-     then its details. On the hub a subsection's details are navigation: one door under the subsection's
-     text opens the overview — named by what it opens, never "read more" — when the sub-area has one reading path, cards link the paths when it has several; a heading is
-     never a link.
-     A HEADING never carries a count (a count changes; a set is named by its rule) and is never a link. Numbers are for
-     files: a number orders a file in a tree, a title or heading is a name. Every section and subsection title carries
-     an ANCHOR LINK (the script at the end of this page adds it): shown on hover, it moves the address to the heading
-     and copies the full link, so a subsection can be shared. A "Read X →" link is the block's own `.more` and may
-     carry links. A card is a title, a description and a "Read more" link, the title clickable too; all the cards of one
-     subsection sit in one grid.
-     THE BLOCKS AND THE FIGURES ARE ONE VOCABULARY FOR EVERY PAGE KIND — approach, overview, construct. Any page uses any block
-     kind (prose, table, list, code, figure, comparison, rule) and any figure kind wherever its content calls for it; the lists
-     below are shared, not this page kind's own. Only the sections differ between kinds. -->
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The four page kinds · § A construct's six sections, in one order · § A construct types no proof, and its rows sit at its own path · § The masthead, and the opening · § The Terms table, and what is not a Term · § The shape of a section, on every page kind · § How a page hands a reader on · § The templates — five pages, and the two seat files behind them · § The header — two lines, six fields, produced from the block · § A construct's status is derived, never typed · § The blocks — what a page reaches for instead of prose · § The figures — what sits inside a block, and the closed set of them · § One stylesheet, shipped with the template · § The page itself — its outline, its rail, its width and its furniture
+     and docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md § The readability bar
+     This file holds the structure and styling of a construct page and states no rule: the sections in order
+     with their ids, the slots, and the stylesheet and scripts, which `docs page` copies into every page it
+     produces from a seat file. The sections above state every rule for writing the page. -->
 <meta charset="utf-8">
 <title>Construct Template</title>
 <!-- spn:doc
@@ -201,168 +181,21 @@ a.anchor{display:inline-block;margin-left:.6em;font-family:var(--mono);font-size
 a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7d4a);margin-left:.3em}
 </style>
 
-
 <div class="page">
 
-<!-- THE RAIL. Nothing in the rail is written by hand. Two scripts at the end of the page build it from the
-  content: every <section id> becomes an entry, named from its h2 — never numbered: a number orders a file in a tree, a heading is a name (the text
-  before the em dash, so name sections with a plain word first); every <h3 id> inside a section becomes a
-  sub-entry; the Open section shows its card count. Sub-entries fold under their section, open where the reader
-  is, with a caret at the far right to pin one open. The rail follows the scroll. Keep the ids and
-  the h2/h3 pattern and the rail-fold style block; a page without them is off its template. -->
 <nav class="rail" id="rail">
   <a class="home" href="../../../../README.md">&larr; .spndevex</a>
   <div class="rail-title">{{PAGE NAME &mdash; the block's title, the third segment of the header line}}</div>
 </nav>
 <div class="wrap">
 
-<!-- ================================================================================================
-  THE WRITING RULES, read before you write a word. Every page kind carries these.
-  1. Say why before what. Open with the problem, then give the answer.
-  2. Explain a term the first time it appears, then use it. Never make the reader guess.
-  3. Use simple words: a word the reader can look up. No idioms, no metaphors, no wordplay.
-  4. One idea at a time. A sentence may be long when the idea needs it. Never cut the link between
-     two ideas to make a sentence shorter; a reader has to connect the dots.
-  5. Carry the source's facts and its terms. Never its phrasing.
-  6. Keep the reasoning. A plain page still explains why. It drops decoration, not connections.
-  7. Close a section with where to go next: a page to read or a command to run.
-  ================================================================================================ -->
-<!-- ================================================================================================
-  THE BLOCKS. MOST OF A PAGE IS NOT A BLOCK. Paragraphs, lists, numbered steps and subheadings are what a
-  section is made of; write them plainly and label them as nothing. A BLOCK is what you drop into that writing
-  when a piece of content must not read as prose — it carries a border, a background or a form of its own, so a
-  reader sees it is different before reading a word of it. ONE SECTION OR SUBSECTION HOLDS NORMAL TEXT AND AS
-  MANY BLOCKS AS IT NEEDS: none, one, or several. Nothing declares "the" block of a section.
-
-  WHAT YOU ARE WRITING, AND WHAT IT EARNS — read down, stop at the first row that matches.
-    an explanation, an argument, a part, the opening  → nothing: paragraphs, a list, a subheading
-    a rule somebody has to follow                     → MUST, in a callout, then the command that enforces it
-    a set of named things, no order between them      → CATALOG, a tile each
-    things side by side, or which to choose when      → COMPARISON, a table
-    a record: ids, rows, statuses, terms              → a table; GLOSSARY where the record is this page's words
-    a literal: a contract, a manifest, a command      → CODE, tagged with its language
-    what a file says today and what it will say       → DIFF, on an approach page only
-    a hierarchy easier read than drawn                → TREE, a plain text block
-    a shape: parts, steps, participants, data, estate → a FIGURE of the matching kind
-    a passage that must stand apart from the page     → PROSE, the markdown panel
-    several pages a reader might go to next           → CARDS
-    the two pages either side of this one             → NEXT, small: a title and a direction
-
-  The choice is a judgement about the content, and no rule can make it for you: the same subject is a table on
-  one page and a figure on another. What the list removes is the guessing — name what you are writing first.
-
-  A BLOCK THAT IS NEITHER NORMAL TEXT NOR A RECORD CARRIES A FORM. Normal text is paragraphs; a record is a
-  table, which already arrives as a bordered card. Everything else: MUST is the accent callout, CATALOG is
-  tiles, PROSE is a panel with its own border and colours, CODE/TREE/DIFF are code blocks, a figure is drawn,
-  CARDS is a grid of doors, NEXT is two small cards, and a quote is set apart. The forms come from the
-  stylesheet this template ships, never from markup you invent — that is what keeps a page renderable with no
-  library, in both themes, offline.
-  ================================================================================================ -->
-<!-- ================================================================================================
-  THE FIGURES, a closed set. A figure sits inside a block. Every figure has a sentence before it
-  (what you are looking at) and a figcaption after it (what to notice). In the markdown seat file a
-  figure is a mermaid block; on this page it is inline SVG in the .dg grammar, so the page needs no
-  network and no library. Labels fit their boxes; a connector ends on a box; a path keeps 16 px from the edge and
-  from any box it does not end on, and a return path runs in its own lane below the boxes, with its label.
-  FLOW      steps in order · flowchart left to right, a box per step, an arrow means "then", a diamond is a choice
-            lives in SEQUENCE · an approach's How · a construct's Parts when a part is a procedure
-  MAP       groups and what connects them · a box is a group, an arrow is what flows, a subgraph is containment
-            lives in MAP · a construct's Model when the construct is a structure
-  TREE      a hierarchy · top-down, or a plain-text tree in a code block for a folder layout
-            lives in MAP · a construct's Model when the construct is a hierarchy
-  SEQUENCE  who talks to whom, in what order · one lifeline per participant, time running down, one arrow per
-            message with its own label, a dashed arrow for a reply. Use it instead of FLOW whenever more than one
-            party acts and WHO acted is the thing to see: a FLOW shows what happens next, a SEQUENCE shows who said it
-            lives in a construct's Parts · REASONS when a claim is about a process
-  STATE     the states a thing can be in · an arrow names the event that moves it
-            lives in a construct's Model when it is a lifecycle · Parts for a part with states · an approach's What when it changes a vocabulary
-  ENTITIES  a data model and its relations · the subject at the centre, what points at it on one side and what it
-            points at on the other, every relation line carrying its cardinality
-            lives in a construct's Model when the construct is data · Parts for one part's records
-  CODE      a contract, a state, a manifest, a command and its output · a fenced block with its language, real values,
-            the path above it when copied from a file (the audit checks it still matches)
-            lives in EXAMPLE · MUST (the action) · a construct's Parts or Binds · an approach's What
-  DIFF      what a file says today, and what it will say · a diff block, - today / + after, the path above it
-            lives in an approach's What only. A construct or an overview states current truth, never a change
-  ================================================================================================ -->
-<!-- THE CONSTRUCT. This file is the SPECIFICATION of a produced page, not something an agent copies: the agent authors
-  docs/02-constructs/…/{{NN}}-{{slug}}.md and docs.ts page produces the page from it — the body from the markdown, each figure
-  from its dg spec, then this furniture. A page is never edited by hand. The audit checks a page equals what page produces,
-  the six h2 are in order, dependsOn is acyclic, and a pathed CODE figure still matches its file.
-  THE MASTHEAD has three levels: the Title (the h1), the Subtitle (p.subtitle) and the Description (one p.standfirst).
-  The comment directly above the h1 says what each one holds and how to write it.
-  THE SIX SECTIONS, in this order and no other: Overview · Terms · Model · Parts · Boundary · Binds, under the masthead.
-  Nothing else is fixed and nothing has a length cap: the concept decides.
-  TERMS come first because the model uses the words. A Term is a word SaaS Plane gives a meaning to — a contract term or a
-  word of its own (Estate, Ring) — never a word every engineer already has (a tag, a database). Written as a concept name:
-  capitalised, no article. Rows in the order a newcomer meets them: the whole, then how it is declared, then its parts.
-  Each row is a definition the reader understands on that line.
-  A SECTION IS A CONTAINER, AND ITS CONTENT IS BLOCKS. At every level — the Model, a Part, a sub-part — what you write
-  is a sequence of blocks, and each block has a kind from THE BLOCKS above: prose that argues (REASONS), a fixed list
-  (CATALOG), steps (SEQUENCE), things side by side (COMPARISON), a rule (MUST), something faster seen (EXAMPLE, with a
-  figure or a code block inside it). The agent chooses the kind by what it is explaining, by the chapter's own test, and
-  nothing here prescribes which kinds a section holds. So the Model opens with an overview in prose and then holds
-  whatever blocks the model needs: a figure if the shape is faster seen, a contract as a code block with a comment per
-  member only when the model has a contract, a table only when there is a list. A Part is the same: one h3, h4 inside,
-  blocks chosen by content. A list of keys with meanings is a CATALOG table, never a code block; no Where line — which
-  package builds this is its own capability chapter's answer. BOUNDARY comes after the parts, as plain prose: what this
-  page does not answer and where that is answered. BINDS: the rules that hold it, and nothing else. THERE IS NO PROOF
-  SECTION. STATUS is never typed; docs.ts status rolls it up from the behaviour rows at this construct's own path.
-  THE FIGURE: a structure → MAP · a hierarchy → TREE · a lifecycle → STATE · data → ENTITIES · a procedure → FLOW. A map
-  flows one way; a one-way chain is drawn as a straight line. After the page is produced, every figure is looked at by eye
-  for layout and readability, and the verdict written down. An author's note in the seat file (a comment) never reaches
-  the page. No cards: a question found here becomes a workstream card. -->
 <header class="masthead">
-<!-- THE HEADER: two lines, six fields, separated by | . Nothing else goes here.
-  Line 1 is identity and never changes:  {workspace} | {location} | {page name}   — three segments, no more
-    workspace  the organization: SaaS Plane here, a partner's organization name in theirs
-    location   declared names, never folders: the repository's name (Foundation, Platform) or "Repo - Node"
-    page name  the construct's name, carrying its subject in full: Estate Shape, not Shape. On a construct it equals the h1;
-               on an overview the h1 is a promise and the header stays the short name
-  Line 2 is state:  Type: … | For: … | Status: …
-    type       Construct · for: the roles from the meta block's lenses · status: 🔮 PLANNING · 🚧 IMPLEMENTING · ✅ DONE, derived -->
   <div class="eyebrow"><span class="line1">{{WORKSPACE}} &nbsp;|&nbsp; {{LOCATION}} &nbsp;|&nbsp; {{NAME}}</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Construct</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">{{ROLE}}</span><span class="badge lens">{{ROLE}}</span></span><span class="st"><span class="lbl">Status:</span> <span class="badge status implementing">&#x1F6A7; IMPLEMENTING</span></span></span></div>
-  <!-- THE MASTHEAD, ON A CONSTRUCT (05-artifacts.md § The masthead, and the opening · RD.DEVEX.WORKSPACE.182 and .187).
-    The seat file is where it is written: the Title is its `#` line, the Subtitle is the `subtitle` field of its
-    spn:doc block, and the Description is its first lead paragraph, the only one. `docs page` renders all three. Three
-    levels, in this order, and every level is plain language: everyday words, short sentences, no figure of speech, no
-    slogan, no number, and no book word (behaviour, construct, lens, kind, node, seat, tier, arc, estate, ring) unless
-    the same sentence explains it. A new Subtitle is drafted by the agent and written only after the developer
-    approves it.
-    WHAT EACH LEVEL HOLDS
-      Title        the h1: the construct's name, in full, so it stands alone (Estate Shape, never Shape).
-      Subtitle     p.subtitle: its one-line promise, what is true for you once this thing exists. One sentence.
-      Description  one p.standfirst, and nothing after it in the header. First sentence: what it is. Second: why you
-                   would read this page. Then at most two short sentences on how the page runs. The argument goes in
-                   Overview.
-    GOOD, the workstream construct
-      Title        "The Workstream"
-      Subtitle     "Your work stays together in one folder, even after you close the window you started it in."
-      Description  "A workstream is a folder that holds one piece of work, from the first idea until you close it.
-                   Read this before you start a change that will take more than one working session. The page
-                   explains how the folder is named, how it moves between waiting, open and closed, and what is
-                   checked before you can close it."
-    BAD, one per level
-      Title        "Work That Outlives the Window"  A slogan in place of the construct's name.
-      Subtitle     "A scope of work, not a window: the log records, and the page decides."  A figure of speech;
-                   it promises nothing a new reader can use.
-      Description  "Arcs, orders and samples sit together here until the close gate passes."  Opens with a book
-                   word (arc) that nothing explains, and never says why you would read on.
-    CHECK BEFORE YOU SAVE, in order
-      1. The Description's first sentence says what this thing is, in everyday words.
-      2. Its second sentence says why you would read this page.
-      3. No book word appears in any level unless the same sentence explains it.
-      4. No level carries a number.
-      5. The Subtitle is one plain sentence.
-      6. Read the three levels aloud once, and rewrite any sentence you stumble on. -->
   <h1>{{NAME}}</h1>
   <p class="subtitle">{{THE SUBTITLE: the promise, one plain sentence, from the seat block's subtitle field.}}</p>
   <p class="standfirst">{{THE DESCRIPTION, one paragraph, from the seat file's first lead paragraph: what this thing is, in everyday words; why you would read this page; then at most two short sentences on how the page runs.}}</p>
 </header>
 
-<!-- WHY THIS CONSTRUCT EXISTS, and the first of the three questions the page answers in order:
-     Overview why · Model what · Parts the detail of the what. It argues; it does not describe the
-     shape, because two descriptions of one thing disagree the first time either is edited. -->
 <section id="s0" data-block="reasons">
   <div class="sec-head"><h2>Overview</h2></div>
   <p>{{THE PROBLEM, in the reader's own terms, before any SaaS Plane word is used to solve it.}}</p>
@@ -429,21 +262,14 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
     <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
     <tbody><tr><td><code>{{chapter or RD.X.NNN}}</code></td><td>{{&hellip;}}</td><td>MUST</td></tr></tbody>
   </table></div>
-  <!-- ONE TABLE. Which package builds this construct is answered by that package's own capability chapter, and
-       04-capabilities/<domain>/<package>/ is the claim a check reads. A construct claims no realization. -->
   <p>Try it: <code>{{one command a reader can run}}</code></p>
 </section>
-
-<!-- THE BLOCKS AND THE FIGURES ARE SHOWN ONCE, in templates/blocks-template.html — normal content first,
-     then every block and every figure kind rendered. It is a reference you consult while writing, not a section
-     you copy: the chooser above tells you which block a piece of content earns, and that page shows you what
-     each one looks like. Open it beside this template. -->
 
 </div>
 </div>
 
 <footer>
-  A template &middot; copy it, keep the comments until the page is written, then delete them &middot; the rules live in the book; this file repeats them so you never write from memory &middot; every block and figure is shown once in <code>blocks-template.html</code>
+  A template &middot; <code>docs page</code> produces the page from its seat file &middot; the rules for this page are in <code>05-artifacts.md</code> &middot; every block and figure is shown once in <code>blocks-template.html</code>
 </footer>
 
 <script>
@@ -468,11 +294,6 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
 })();
 </script>
 
-<!-- rail-fold: subsections collapse under their section, the caret sits at the far right and only
-     where a group exists, and a group the reader has not pinned follows the scroll. This is the
-     shape 009 landed and the developer confirmed; it is applied here as a block appended AFTER the
-     page's own rail builder, because the corpus has two builders and one transform covers both.
-     05-artifacts.md § A page carries its own subsections. -->
 <style>
   .rail .sub-group{display:block}
   .rail.js .sub-group{display:none}

@@ -25,6 +25,8 @@
 
 **Source of truth:** the foundation book's saas model (`03-platform`), and the shape and module groups (`02-support/01-apps/01-shape` · `03-module`). Also the contract states standard including its evolution classification, and the glossary grammar — the `Contract term` column of the glossary generated onto each domain's face. This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
 
+**Judged against, beside the book:** design patterns, as *Design Patterns* (Gamma, Helm, Johnson and Vlissides), Fowler's *Patterns of Enterprise Application Architecture* and Evans' *Domain-Driven Design* state them, and the domain's usual workflow. A design option is weighed against the pattern it resembles, named.
+
 **Worn** while designing. **Convened** when a module boundary moves, and over any design before its rows land. **Blocks:** a new mechanism reachable from more than one module, with no decision entry naming what it was weighed against. Below that threshold it advises, and flags anything that needs a decision entry.
 
 ## What it checks

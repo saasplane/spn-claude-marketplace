@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "7b1165c9"
+      "seen": "80f4795e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/03-blueprints/01-layers.md",
@@ -62,7 +62,7 @@ The layers are nouns; each takes `up · down · status`, and `--plan` on `up` or
 
 | Noun | Commands | Locally | In the cloud |
 | --- | --- | --- | --- |
-| `organization` | up · down · status | the machine's trust bootstrap — the CA, its one trust prompt, the local resolver, the shared ingress, and the root door that `up` installs once so the resolver's files and the CA's removal ask for nothing (RD.DEVEX.UTILS.073); `--reset-certs` after CA loss | accounts, root guardrails, registry pairs, zones |
+| `organization` | up · down · status | the machine's trust bootstrap — the CA, its one trust prompt, the local resolver, the shared ingress, and the root door that `up` installs once so the resolver's files ask for nothing (RD.DEVEX.UTILS.073); `down --clean` keeps the CA and its trust, so the next `up` asks for nothing, and `up --reset-certs` replaces the CA on purpose | accounts, root guardrails, registry pairs, zones |
 | `platform` | up · down · status — `<spc>` | the platform's container group — engines + each module's local rendering + every stored route registered with the ingress; converges org prerequisites in place | containers, workload accounts, policies, zone, instruments, the tenant edge and its route store |
 | `environment` | up · down · status — `<spc> <env>`, **`--cloud` only** | **no local form exists** — the machine is one environment; targeting it locally is refused by name | network → resources → compute, in order |
 | `app` | up · down | the app's derived converge — schemas, certificates and the ingress vhost; app from the cwd, `-p` overrides | — (deploys ride the pipeline) |

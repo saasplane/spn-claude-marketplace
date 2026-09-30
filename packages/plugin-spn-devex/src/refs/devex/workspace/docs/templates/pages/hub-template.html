@@ -1,26 +1,8 @@
-<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The four page kinds · § The masthead, and the opening · § The blocks — what a page reaches for instead of prose · § The figures — what sits inside a block, and the closed set of them · § The overview set is fixed, and a name says its source · § The level rule — an overview covers one level
-     This file carries rules it does not own. The chapter above is the source of truth.
-     A rule change is edited there first, then here, in the same change. Never add a rule here.
-     restate-drift.ts reports this copy when its source moves. -->
-<!-- For every page kind: no block numbers on the page or in its rail (a number orders a file, a heading is a name); the header keeps three
-     segments — workspace | repository | title — and the title carries its own context (Estate Shape, not Shape); Terms are
-     capitalised concept names in the order a newcomer meets them; a contract is a code block with a comment per member;
-     a list of keys with meanings is a table; an author's note (a comment) never reaches the page; there is no length cap;
-     a one-way flow figure is a straight line, horizontal when it fits; every figure is reviewed by eye after it is produced.
-     THE SHAPE OF A SECTION, on every page kind: a section opens with its own overview — what you are looking at, in
-     prose — then a figure where seeing is faster, then its content as blocks. A subsection opens with its own overview,
-     then its details. On the hub a subsection's details are navigation: one door under the subsection's
-     text opens the overview — named by what it opens, never "read more" — when the sub-area has one reading path, cards link the paths when it has several; a heading is
-     never a link.
-     A HEADING never carries a count (a count changes; a set is named by its rule) and is never a link. Numbers are for
-     files: a number orders a file in a tree, a title or heading is a name. Every section and subsection title carries
-     an ANCHOR LINK (the script at the end of this page adds it): shown on hover, it moves the address to the heading
-     and copies the full link, so a subsection can be shared. A "Read X →" link is the block's own `.more` and may
-     carry links. A card is a title, a description and a "Read more" link, the title clickable too; all the cards of one
-     subsection sit in one grid.
-     THE BLOCKS AND THE FIGURES ARE ONE VOCABULARY FOR EVERY PAGE KIND — approach, overview, construct. Any page uses any block
-     kind (prose, table, list, code, figure, comparison, rule) and any figure kind wherever its content calls for it; the lists
-     below are shared, not this page kind's own. Only the sections differ between kinds. -->
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The four page kinds · § The masthead, and the opening · § The shape of a section, on every page kind · § How a page hands a reader on · § The templates — five pages, and the two seat files behind them · § The header — two lines, six fields, produced from the block · § The blocks — what a page reaches for instead of prose · § The figures — what sits inside a block, and the closed set of them · § The overview set is fixed, and a name says its source · § The level rule — an overview covers one level · § What an overview and a hub hold, section by section · § One stylesheet, shipped with the template · § The overview is the hub, and the constructs are its spokes · § The page itself — its outline, its rail, its width and its furniture
+     and docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md § The readability bar
+     This file holds the structure and styling of a repository's hub and states no rule: the sections in order
+     with their ids, the slots an author fills, and the stylesheet. The sections above state every rule for
+     writing the page. -->
 <meta charset="utf-8">
 <title>Hub Template</title>
 <!-- spn:doc
@@ -108,13 +90,8 @@
   pre{background:var(--card);border:1px solid var(--rule);border-radius:3px;padding:.9rem 1.1rem;margin:1.6rem 0;overflow-x:auto;font-family:var(--mono);font-size:var(--sm);line-height:1.55;color:var(--slate);max-width:100%}
   pre code{font-size:inherit}
   pre .tk-k{color:var(--tk-k);font-weight:600} pre .tk-s{color:var(--tk-s)} pre .tk-c{color:var(--tk-c);font-style:italic} pre .tk-t{color:var(--tk-t)} pre .tk-n{color:var(--tk-n)} pre .tk-add{color:var(--tk-add)} pre .tk-del{color:var(--tk-del)} pre .tk-cmd{color:var(--tk-t);font-weight:600}
-  /* A FIGURE RUNS EDGE TO EDGE. It takes no padding, border or background of its own: the section
-     already provides the page's padding, and the drawing's own containers are its frame. That is the
-     opposite of a PROSE panel, which carries all three. A figure is also not held to the prose
-     measure — 58rem is for a sentence, and a drawing is not read a line at a time. */
-  /* ONE VERTICAL RHYTHM. A paragraph keeps its 1rem; every block gets 1.6rem above and below, and a
-     figure 2.4rem — it is the largest thing on a page, and it needs the air to read as one unit rather
-     than as something the paragraph above it is still saying. Margins collapse, so the larger wins. */
+  /* A figure */
+
   figure{margin:2.4rem 0;padding:0;border:0;background:none}
   figure svg{display:block;width:auto;max-width:100%;height:auto;margin-inline:auto}
   figcaption{font-family:var(--ui);font-size:var(--xs);color:var(--faint);margin-top:.5rem;max-width:none}
@@ -126,10 +103,7 @@
   .dg .l{font-family:var(--ui);font-size:12px;fill:var(--ink)}
   .dg .s{font-family:var(--mono);font-size:11px;fill:var(--slate)}
   .dg .n{font-family:var(--ui);font-size:11px;fill:var(--faint)}
-  /* The arrowhead is a marker filled with `currentColor`, and a marker resolves that against
-     its own inherited colour rather than the path that references it. With nothing setting
-     `color` on the figure, every connector drew a blue line ending in a black head. Setting it
-     on `.dg` makes the head take the line's colour, and the marker needs no change. */
+  /* Arrowheads take the line's colour */
   .dg{color:var(--accent)}
   .dg .c{stroke:var(--accent);stroke-width:1.6;fill:none}
   .pull{border-left:2px solid var(--accent);background:var(--accent-soft);padding:1rem 1.2rem;margin:1.6rem 0;border-radius:0 3px 3px 0}
@@ -151,39 +125,25 @@
     .rail a.on{border-left:none}
   }
 
-  /* THE OUTLINE HAS TWO LEVELS, AND THEY DIFFER ON THREE AXES — size, weight and colour together.
-     One axis is not enough at rail size: a single step reads as noise rather than as a level, and
-     the two collapse into each other. Nothing in an outline sits on --faint either, because that is
-     the token for text a reader is meant to skim past and an outline is what they navigate by. */
+  /* The rail: two levels */
   .rail a:not(.sub):not(.home){font-size:.88rem;font-weight:400;color:var(--ink);letter-spacing:-.005em}
   .rail a.sub{font-size:.78rem;font-weight:400;color:var(--slate)}
   .rail .rail-title{color:var(--slate)}
 
-  /* ONE LEFT EDGE FOR BOTH LEVELS. An indent repeats what the fold already says, and it costs the
-     longer labels a wrapped line. Both are stated in one rule: setting only the subsection's
-     padding leaves it outdented past its own section, because another rule still sets the
-     section's. */
+  /* The rail: one left edge */
   .rail a:not(.home), .rail a.sub{padding-left:.6rem}
 
-  /* EVERYTHING ON THE RIGHT SITS ON THE LABEL'S CENTRE LINE. The row is a flex line, and its
-     default is to stretch, so a chevron or a count badge beside a label that wrapped to two lines
-     was pinned to the top of the row rather than level with it. */
+  /* The rail: marks level with the label */
   .rail a{align-items:center}
   .rail .count{align-self:center}
 
-  /* WEIGHT AND COLOUR MARK WHERE YOU ARE, NEVER WHAT A LEVEL IS. The notch is an inset shadow and
-     not a border: a border changes the box, so a label would jump sideways by the notch's width the
-     moment it became current. These are restated at matching specificity because the level rules
-     above are more specific than `.rail a.on`, and would otherwise strip the selected state. */
+  /* The rail: the current entry */
   .rail a.on:not(.sub):not(.home){font-weight:650;color:var(--accent);box-shadow:inset 1.5px 0 0 var(--accent)}
   .rail a.on.sub{color:var(--accent);box-shadow:inset 1.5px 0 0 var(--accent)}
   .rail a:not(.sub):not(.home):hover{color:var(--accent)}
   .rail a.sub:hover{color:var(--ink)}
 
-  /* THE DISCLOSURE IS A CHEVRON, DRAWN RATHER THAN TYPED. A glyph ties the mark to whatever font
-     is resolved and to that font's own idea of weight and baseline; two borders on a rotated box
-     are the same shape at every size and inherit the row's colour. Right means closed, down means
-     open, and only the chevron turns — the box around it stays put so the hit target never moves. */
+  /* The rail: the fold chevron */
   .rail a .caret{margin-left:auto;flex:none;width:1.35rem;height:1.35rem;display:grid;place-items:center;
     color:var(--faint);border-radius:3px;transform:none}
   .rail a .caret::before{content:"";width:.32rem;height:.32rem;border-right:1.5px solid currentColor;
@@ -194,141 +154,22 @@
   @media (prefers-reduced-motion:reduce){.rail a .caret::before{transition:none}}
 </style>
 <style>
-/* anchor links: a section or subsection title carries a link to itself — small, grey, set off from the title; copied on click */
+/* Heading anchor links */
 a.anchor{display:inline-block;margin-left:.6em;font-family:var(--mono);font-size:.55em;font-weight:400;line-height:1;color:var(--slate,#6b7280);text-decoration:none;opacity:.35;transition:opacity .15s;vertical-align:middle;position:relative;top:-.1em}
 .sec-head:hover a.anchor,h3[id]:hover a.anchor,a.anchor:hover,a.anchor:focus,a.anchor.copied{opacity:1}
 a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7d4a);margin-left:.3em}
 </style>
 
-
 <div class="page">
 
-<!-- THE RAIL. Nothing in the rail is written by hand. Two scripts at the end of the page build it from the
-  content: every <section id> becomes an entry, named from its h2 — never numbered: a number orders a file in a tree, a heading is a name (the text
-  before the em dash, so name sections with a plain word first); every <h3 id> inside a section becomes a
-  sub-entry; the Open section shows its card count. Sub-entries fold under their section, open where the reader
-  is, with a caret at the far right to pin one open. The rail follows the scroll. Keep the ids and
-  the h2/h3 pattern and the rail-fold style block; a page without them is off its template. -->
 <nav class="rail" id="rail">
   <a class="home" href="../../../../README.md">&larr; .spndevex</a>
   <div class="rail-title">{{REPOSITORY NAME: Foundation &mdash; the second segment of the header line; the hub is the one page whose rail names its repository}}</div>
 </nav>
 <div class="wrap">
 
-<!-- ================================================================================================
-  THE WRITING RULES, read before you write a word. Every page kind carries these.
-  1. Say why before what. Open with the problem, then give the answer.
-  2. Explain a term the first time it appears, then use it. Never make the reader guess.
-  3. Use simple words: a word the reader can look up. No idioms, no metaphors, no wordplay.
-  4. One idea at a time. A sentence may be long when the idea needs it. Never cut the link between
-     two ideas to make a sentence shorter; a reader has to connect the dots.
-  5. Carry the source's facts and its terms. Never its phrasing.
-  6. Keep the reasoning. A plain page still explains why. It drops decoration, not connections.
-  7. Close a section with where to go next: a page to read or a command to run.
-  ================================================================================================ -->
-<!-- ================================================================================================
-  THE BLOCKS. MOST OF A PAGE IS NOT A BLOCK. Paragraphs, lists, numbered steps and subheadings are what a
-  section is made of; write them plainly and label them as nothing. A BLOCK is what you drop into that writing
-  when a piece of content must not read as prose — it carries a border, a background or a form of its own, so a
-  reader sees it is different before reading a word of it. ONE SECTION OR SUBSECTION HOLDS NORMAL TEXT AND AS
-  MANY BLOCKS AS IT NEEDS: none, one, or several. Nothing declares "the" block of a section.
-
-  WHAT YOU ARE WRITING, AND WHAT IT EARNS — read down, stop at the first row that matches.
-    an explanation, an argument, a part, the opening  → nothing: paragraphs, a list, a subheading
-    a rule somebody has to follow                     → MUST, in a callout, then the command that enforces it
-    a set of named things, no order between them      → CATALOG, a tile each
-    things side by side, or which to choose when      → COMPARISON, a table
-    a record: ids, rows, statuses, terms              → a table; GLOSSARY where the record is this page's words
-    a literal: a contract, a manifest, a command      → CODE, tagged with its language
-    what a file says today and what it will say       → DIFF, on an approach page only
-    a hierarchy easier read than drawn                → TREE, a plain text block
-    a shape: parts, steps, participants, data, estate → a FIGURE of the matching kind
-    a passage that must stand apart from the page     → PROSE, the markdown panel
-    several pages a reader might go to next           → CARDS
-    the two pages either side of this one             → NEXT, small: a title and a direction
-
-  The choice is a judgement about the content, and no rule can make it for you: the same subject is a table on
-  one page and a figure on another. What the list removes is the guessing — name what you are writing first.
-
-  A BLOCK THAT IS NEITHER NORMAL TEXT NOR A RECORD CARRIES A FORM. Normal text is paragraphs; a record is a
-  table, which already arrives as a bordered card. Everything else: MUST is the accent callout, CATALOG is
-  tiles, PROSE is a panel with its own border and colours, CODE/TREE/DIFF are code blocks, a figure is drawn,
-  CARDS is a grid of doors, NEXT is two small cards, and a quote is set apart. The forms come from the
-  stylesheet this template ships, never from markup you invent — that is what keeps a page renderable with no
-  library, in both themes, offline.
-  ================================================================================================ -->
-<!-- ================================================================================================
-  THE FIGURES, a closed set. A figure sits inside a block. Every figure has a sentence before it
-  (what you are looking at) and a figcaption after it (what to notice). In the markdown seat file a
-  figure is a mermaid block; on this page it is inline SVG in the .dg grammar, so the page needs no
-  network and no library. Labels fit their boxes; a connector ends on a box; a path keeps 16 px from the edge and
-  from any box it does not end on, and a return path runs in its own lane below the boxes, with its label.
-  FLOW      steps in order · flowchart left to right, a box per step, an arrow means "then", a diamond is a choice
-            lives in SEQUENCE · an approach's How · a construct's Parts when a part is a procedure
-  MAP       groups and what connects them · a box is a group, an arrow is what flows, a subgraph is containment
-            lives in MAP · a construct's Model when the construct is a structure
-  TREE      a hierarchy · top-down, or a plain-text tree in a code block for a folder layout
-            lives in MAP · a construct's Model when the construct is a hierarchy
-  SEQUENCE  who talks to whom, in what order · one lifeline per participant, time running down, one arrow per
-            message with its own label, a dashed arrow for a reply. Use it instead of FLOW whenever more than one
-            party acts and WHO acted is the thing to see: a FLOW shows what happens next, a SEQUENCE shows who said it
-            lives in a construct's Parts · REASONS when a claim is about a process
-  STATE     the states a thing can be in · an arrow names the event that moves it
-            lives in a construct's Model when it is a lifecycle · Parts for a part with states · an approach's What when it changes a vocabulary
-  ENTITIES  a data model and its relations · the subject at the centre, what points at it on one side and what it
-            points at on the other, every relation line carrying its cardinality
-            lives in a construct's Model when the construct is data · Parts for one part's records
-  CODE      a contract, a state, a manifest, a command and its output · a fenced block with its language, real values,
-            the path above it when copied from a file (the audit checks it still matches)
-            lives in EXAMPLE · MUST (the action) · a construct's Parts or Binds · an approach's What
-  DIFF      what a file says today, and what it will say · a diff block, - today / + after, the path above it
-            lives in an approach's What only. A construct or an overview states current truth, never a change
-  ================================================================================================ -->
-<!-- AN OVERVIEW IS WRITTEN FOR A NEW USER'S ONBOARDING. Every overview — the hub and every path — assumes no earlier
-  reading, says at the start who it is for and what the reader can do after it, explains each word on first use in words
-  the reader already has, and tells a first-time reader what to unlearn. A returning reader loses nothing by that; a new
-  one is lost without it.
-<!-- THE HUB — one per repository, the first of the three page levels. It is the concept at reading depth: the concept's
-  narrative sections as they are, explained with their figures; then one section per area, which explains the area
-  before it hands out tiles — what it is, why it divides as it does, who reads it, "how to read it" for a first-time
-  reader — and then one tile per reading path, linking that path's overview (in a built repository, one tile per
-  construct, linking the construct page). Every section's content is blocks chosen by kind. The Glossary is generated
-  from every Terms table. The middle level, one page per reading path, has its own template: overview-template.html.
-  THE MASTHEAD has three levels: the Title (the h1), the Subtitle (p.subtitle) and the Description (one p.standfirst).
-  The comment directly above the h1 says what each one holds and how to write it. The header above them names the page ("Concept").
-  Headings never carry a count. -->
 <header class="masthead">
-<!-- THE HEADER: three segments — {workspace} | {location} | Concept — and line 2 is Type and For. A hub has no status. -->
   <div class="eyebrow"><span class="line1">{{WORKSPACE}} &nbsp;|&nbsp; {{REPOSITORY}} &nbsp;|&nbsp; Concept</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Overview</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">{{ROLE}}</span><span class="badge lens">{{ROLE}}</span></span></span></div>
-  <!-- THE MASTHEAD, ON A HUB (05-artifacts.md § The masthead, and the opening · RD.DEVEX.WORKSPACE.182 and .187).
-    Three levels, in this order, and every level is plain language: everyday words, short sentences, no figure of
-    speech, no slogan, no number, and no book word (behaviour, construct, lens, kind, node, seat, tier, arc, estate,
-    ring) unless the same sentence explains it. The one exception is the foundation's hub: its Title and Subtitle are
-    RD.DEVEX.WORKSPACE.143's, word for word. A new Title or Subtitle is drafted by the agent and written only after
-    the developer approves it.
-    WHAT EACH LEVEL HOLDS
-      Title        the h1: the benefit line, the reader's gain, as a short sentence a reader would say.
-      Subtitle     p.subtitle: the what line, one sentence saying what the thing is (on the foundation, .143's words).
-      Description  one p.standfirst, and nothing after it in the header. First sentence: what the plane is. Second:
-                   why you read this page first. Then at most two short sentences on how the page is laid out.
-    GOOD, the foundation's hub
-      Title        "Your team's time belongs to your product."
-      Subtitle     "The AI-native, DevEx-first Foundation for Building and Launching Secure, Scalable, Compliance-ready SaaS Platforms."
-      Description  "SaaS Plane is a set of standards, tools and code libraries for building software that customers use
-                   over the internet. Read this page first to see how the parts fit together before you open any of
-                   them. Each area below links to the page that explains it in full."
-    BAD, one per level
-      Title        "Ship at warp speed."  A slogan and a figure of speech; it names no gain a reader can check.
-      Subtitle     "One plane, zero plumbing, infinite scale."  Figures of speech; it never says what the thing is.
-      Description  "Four areas and twelve domains, each a node with its own seats."  Opens with a count, and two
-                   book words (node, seat) that nothing explains.
-    CHECK BEFORE YOU SAVE, in order
-      1. The Description's first sentence says what the page is about, in everyday words.
-      2. Its second sentence says why you would read this page.
-      3. No book word appears in any level unless the same sentence explains it.
-      4. No level carries a number.
-      5. The Subtitle is one plain sentence; on the foundation's hub it is .143's, word for word.
-      6. Read the three levels aloud once, and rewrite any sentence you stumble on. -->
   <h1>{{THE TITLE: the benefit line, the reader's gain, as a short sentence a reader would say.}}</h1>
   <p class="subtitle">{{THE SUBTITLE: the what line, one plain sentence saying what the thing is.}}</p>
   <p class="standfirst">{{THE DESCRIPTION, one paragraph: what the plane is, in everyday words; why you would read this page first; then at most two short sentences on how the page is laid out.}}</p>
@@ -368,8 +209,6 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
   <p>{{What the sub-area is, explained once, here and nowhere else in the section.}}</p>
   <p><strong>How to read it.</strong> {{For a first-time reader: the one thing to know or unlearn; when to read it; what you can decide after it.}}</p>
   <p><a class="more" href="#">Read {{the sub-area, by the name its heading carries}} &rarr;</a></p>
-  <!-- When the sub-area has ONE reading path: no card; one door under its text opens the overview, named by
-       the words the heading already carries. A heading is never a link. -->
   <h3 id="a2">{{Sub-area with several reading paths}} &mdash; {{what it is}}</h3>
   <p>{{What it is, once. Then how to read it, naming each path and when you read it. Then one tile per path, because a heading can link only one page.}}</p>
   <div class="tiles">
@@ -381,14 +220,6 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
 <section id="s8" data-block="glossary">
   <div class="sec-head"><h2>Glossary</h2></div>
   <p>{{The words this page gives a meaning to — the repository's own, written by hand.}}</p>
-  <!-- A HUB'S GLOSSARY IS AUTHORED, AND IT IS TWO COLUMNS. The generated three-column one is per
-       DOMAIN and sits on the domain's face and its overview (`RD.DEVEX.WORKSPACE.150`); a repository-wide join
-       was removed from every seat face because a region nothing regenerates goes stale rather than
-       standing still. There is no `From` column: the term links to the page that defines it.
-       AND NO CONTRACT TERM COLUMN. A hub names the book's own structural words — stage, area,
-       domain, construct, behaviour, capability, seam — and MEASURED, 9 of the foundation hub's 11
-       carry no contract term at all. A column that would be a dash on four rows in five is the
-       defect `N37` found, one page over. -->
   <div class="scroll"><table>
     <thead><tr><th>Term</th><th>What it means</th></tr></thead>
     <tbody><tr><td>{{Estate}}</td><td>{{&hellip;}}</td></tr></tbody>
@@ -405,17 +236,11 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
   </ul>
 </section>
 
-
-<!-- THE BLOCKS AND THE FIGURES ARE SHOWN ONCE, in templates/blocks-template.html — normal content first,
-     then every block and every figure kind rendered. It is a reference you consult while writing, not a section
-     you copy: the chooser above tells you which block a piece of content earns, and that page shows you what
-     each one looks like. Open it beside this template. -->
-
 </div>
 </div>
 
 <footer>
-  A template &middot; copy it, keep the comments until the page is written, then delete them &middot; the rules live in the book; this file repeats them so you never write from memory &middot; every block and figure is shown once in <code>blocks-template.html</code>
+  A template &middot; copy it and fill the slots &middot; the rules for this page are in <code>05-artifacts.md</code> &middot; every block and figure is shown once in <code>blocks-template.html</code>
 </footer>
 
 <script>
@@ -440,11 +265,6 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
 })();
 </script>
 
-<!-- rail-fold: subsections collapse under their section, the caret sits at the far right and only
-     where a group exists, and a group the reader has not pinned follows the scroll. This is the
-     shape 009 landed and the developer confirmed; it is applied here as a block appended AFTER the
-     page's own rail builder, because the corpus has two builders and one transform covers both.
-     05-artifacts.md § A page carries its own subsections. -->
 <style>
   .rail .sub-group{display:block}
   .rail.js .sub-group{display:none}
@@ -453,12 +273,11 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
   .rail a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 </style>
 <style>
-  /* a quote is a sentence set apart — a rule stated in full, or a line from the source the page is about */
+  /* A quote */
   blockquote{margin:1.6rem 0;padding:.2rem 0 .2rem 1.1rem;border-left:2px solid var(--rule);color:var(--slate)}
   blockquote p{margin:0;max-width:none}
   .tile .s{margin-top:.45rem}
-  /* PROSE — the markdown block. Its own border, background and text colour, so a passage of ordinary
-     markdown reads as a block the page chose rather than as the page's own voice continuing. */
+  /* PROSE, the markdown panel */
   .prose{border:1px solid var(--rule);background:var(--card);color:var(--slate);border-radius:3px;
     padding:1.1rem 1.3rem;margin:1.6rem 0}
   .prose > :first-child{margin-top:0}
@@ -467,7 +286,7 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
   .prose strong,.prose h4{color:var(--ink)}
   .prose code{color:var(--ink)}
   .prose blockquote{border-left-color:var(--accent);margin:1rem 0}
-  /* NEXT — small on purpose: a title and a direction, nothing else */
+  /* NEXT */
   .nextnav{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.7rem;margin:1.6rem 0}
   .nextnav-card{display:flex;flex-direction:column;gap:.15rem;border:1px solid var(--rule);background:var(--card);
     border-radius:3px;padding:.65rem .85rem;text-decoration:none;min-width:0}

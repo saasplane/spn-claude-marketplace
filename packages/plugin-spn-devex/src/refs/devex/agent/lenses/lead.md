@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md",
-      "seen": "65c6288d"
+      "seen": "d52b9ef3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/03-surfaces/03-service-namespaces.md",
@@ -36,6 +36,8 @@
 # Lens — `LEAD` (Engineering leader)
 
 **Source of truth:** the foundation book's purpose part, the paved-road doctrine and repo standard (`04-capabilities/README` · `01-devex/01-function/02-scm`), and the configuration-over-customization ladder (`03-platform/01-core/03-surfaces/03-service-namespaces`). The readability check restates the corpus standard's readability bar (`01-devex/04-workspace/04-docs/01-corpus`). Read this file as a restatement of those rules, adding none of its own; where they disagree, the book wins and this file is regenerated.
+
+**Judged against, beside the book:** the four DORA delivery measures (deployment frequency, lead time for changes, change failure rate, time to restore) for what a process change costs, and the domain's usual workflow for scope. A process option is weighed against the measure it moves.
 
 **Worn** while shaping repo standards and process. **Convened** on scope and fit questions. **Advises — never blocks.**
 

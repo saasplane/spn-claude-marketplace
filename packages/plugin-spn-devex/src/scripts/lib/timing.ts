@@ -13,16 +13,19 @@
 // EACH LINE SAYS WHICH WORK IT BELONGS TO (RD.DEVEX.WORKSPACE.185). `workstream`, `arc` and `order`
 // are read from the paths the tool call touches, and `agent` from the hook input when it carries one,
 // so `workspace tokens` joins a transcript to its work by `session` rather than guessing from paths
-// afterwards. A call that touches no workstream path carries `null` in all three.
+// afterwards. A call that touches no workstream path inherits the tags its session and agent last carried (`carryTags`).
 //
 // A TOOL MUST NEVER FAIL BECAUSE TIMING FAILED. Every path here swallows its own errors: a gate that
 // refuses to run is infinitely more expensive than a number nobody recorded.
 
-import { appendFileSync, existsSync, mkdirSync, statSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { workstreamPrefixSource } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 const DEVEX = ".spndevex", DEBUG = ".debug", SWITCH = "telemetry.on", FOLDER = "telemetry", LOG = "hooks.jsonl";
+const CARRIED = "tags.json";
+// A session's carried tags are kept this long after its last tagged call, then dropped when the file is written.
+const KEEP_MS = 14 * 24 * 3600 * 1000;
 const MAX_BYTES = 4 * 1024 * 1024;
 
 type Span = { script: string; ms: number };
@@ -113,6 +116,47 @@ export function commandFacts(args: string[]): Record<string, unknown> {
   return { event: process.env.CLAUDE_HOOK_EVENT ?? "command", tool: null, session, ...tags };
 }
 
+type Work = { workstream: string | null; arc: string | null; order: string | null };
+type Carried = Record<string, Work & { at: number }>;
+
+/**
+ * The work a line is written under: its own tags, or the ones carried from the same session and
+ * agent's last tagged call (RD.DEVEX.WORKSPACE.185).
+ *
+ * - **A call that touches no workstream path inherits** the carried tags.
+ * - **A call inside the carried work keeps what it does not name**: the same workstream, and the same
+ *   arc where it names one, fills in the carried arc and order. A lane reading its arc's spec is
+ *   still working its order.
+ * - **A call that names other work replaces them.**
+ *
+ * The carried tags are written back whenever they change. Keyed by session and agent, so a lane never
+ * lends its tags to the main window or to another lane. With no session there is nothing to key on,
+ * and the call's own tags stand.
+ */
+export function carryTags(dir: string, facts: Record<string, unknown>): Work {
+  const own: Work = { workstream: (facts.workstream as string) ?? null, arc: (facts.arc as string) ?? null,
+                      order: (facts.order as string) ?? null };
+  const session = typeof facts.session === "string" && facts.session ? facts.session : null;
+  if (!session) return own;
+  const key = `${session}|${typeof facts.agent === "string" && facts.agent ? facts.agent : "main"}`;
+  const path = join(dir, CARRIED);
+  let carried: Carried = {};
+  try { carried = JSON.parse(readFileSync(path, "utf8")) ?? {}; } catch { carried = {}; }
+  const was = carried[key];
+  let work: Work;
+  if (!own.workstream) work = was ? { workstream: was.workstream, arc: was.arc, order: was.order } : own;
+  else if (was && was.workstream === own.workstream && (!own.arc || own.arc === was.arc) && (!own.order || own.order === was.order))
+    work = { workstream: own.workstream, arc: own.arc ?? was.arc, order: own.order ?? was.order };
+  else work = own;
+  if (work.workstream && (!was || was.workstream !== work.workstream || was.arc !== work.arc || was.order !== work.order)) {
+    const now = Date.now();
+    for (const [name, entry] of Object.entries(carried)) if (!entry || now - (entry.at ?? 0) > KEEP_MS) delete carried[name];
+    carried[key] = { ...work, at: now };
+    try { writeFileSync(path, JSON.stringify(carried), "utf8"); } catch { /* a tool never fails because timing failed */ }
+  }
+  return work;
+}
+
 /** Arm the recorder. Touches no filesystem beyond the walk, and never throws. */
 export function begin(facts: Record<string, unknown> = {}, start?: string): void {
   try {
@@ -152,6 +196,9 @@ export function end(): void {
     // A log nobody prunes becomes a cost of its own. Rewritten from empty past the cap.
     try { if (existsSync(log) && statSync(log).size > MAX_BYTES) writeFileSync(log, ""); } catch { /* ignore */ }
 
+    let work: Work = { workstream: (state.facts.workstream as string) ?? null, arc: (state.facts.arc as string) ?? null,
+                       order: (state.facts.order as string) ?? null };
+    try { work = carryTags(dir, state.facts); } catch { /* the call's own tags stand */ }
     const at = new Date().toISOString().slice(0, 19);
     // The whole process, Node start to here. Startup, TypeScript loading and the imports are most of
     // a hook's cost, and no span inside a check can see them.
@@ -160,8 +207,8 @@ export function end(): void {
       script: s.script, ms: s.ms,
       event: state.facts.event ?? null, tool: state.facts.tool ?? null,
       session: state.facts.session ?? null, at, pid: process.pid,
-      workstream: state.facts.workstream ?? null, arc: state.facts.arc ?? null,
-      order: state.facts.order ?? null, agent: state.facts.agent ?? null,
+      workstream: work.workstream, arc: work.arc,
+      order: work.order, agent: state.facts.agent ?? null,
     }));
     appendFileSync(log, lines.join("\n") + "\n");
     state.spans = [];

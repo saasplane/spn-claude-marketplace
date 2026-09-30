@@ -12,7 +12,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The masthead, and the opening",
-      "seen": "ee951acf"
+      "seen": "4fe3fa2f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -125,7 +125,7 @@ Every unanswered question is a card with **real options and a recommendation**. 
 
 - **The stage ends when the questions are answered, not when they run out.**
 - **An expansion is made on request, and which kind it is depends on what was asked.** A question too large for an Open card needs somewhere to be **argued** — that is an approach document, `<subject>-approach.html` in the open workstream's folder, never in a repository. A section too big to review in place needs somewhere to be **read** — that is an overview, `artifacts/overviews/<section>-overview.html`. A concept states shape, so someone wanting the detail is asking for the expansion, not for a longer concept. The routing test is whether options were weighed and one chosen (decisions RD.DEVEX.WORKSPACE.102 · RD.DEVEX.WORKSPACE.103). Either way the section names the file and the file names the section back. **Offer; never start one unasked**, and never write one to make a concept look finished. A concept whose sections have none is the normal case, not an incomplete one.
-- **An approach page or an overview opens on a masthead of three levels, and each is plain language — MUST** (decisions RD.DEVEX.WORKSPACE.182 · RD.DEVEX.WORKSPACE.187). Copy the page from its template, whose masthead comment carries the rule, a good and a poor example for each level, and a short check.
+- **An approach page or an overview opens on a masthead of three levels, and each is plain language — MUST** (decisions RD.DEVEX.WORKSPACE.182 · RD.DEVEX.WORKSPACE.187). Copy the page from its template, which holds only the page's structure and styling. The approved masthead for each kind, a poor example for each level and the check before saving are in [`refs/devex/workspace/docs/doc-sets.md`](../../refs/devex/workspace/docs/doc-sets.md) § Every page opens on a masthead of three levels. An approach page's masthead carries no project shorthand — an arc number, a question number or a release name the sentence does not explain — and the workstream number that opens its `h1` is not part of the Title.
 
   | Page | Title | Subtitle, one plain sentence | Description, one paragraph |
   | --- | --- | --- | --- |

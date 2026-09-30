@@ -4,7 +4,17 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The approach document — a workstream's, never a repository's",
-      "seen": "1ba67487"
+      "seen": "2626a831"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
+      "section": "A card is only for what the rules leave open",
+      "seen": "878fff28"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "section": "The reply while work runs shows what needs you, then what moved",
+      "seen": "4f2eb5c6"
     }
   ]
 }
@@ -45,20 +55,46 @@ mixed into one paragraph, because a question buried in a status update is a ques
 answers. And never invent a card to look thorough: a manufactured question costs real
 attention and teaches the reader to skim the ones that matter.
 
+## A card is only for what the rules leave open
+
+**Decide what the book, the plugin references and the lenses settle, and put a card only for what
+they leave open — MUST** (`RD.DEVEX.WORKSPACE.193`). Before raising a card, read what exists: the
+code, the book, the plugin references, the lenses and the arcs. What they settle, you decide: log the
+decision and its reason in the arc, and name it to the developer in one line. A question the book
+already answers costs the developer's attention for nothing.
+
+**A question reaches the developer for one of three reasons, and for no other:**
+
+| Reason | What it covers |
+| --- | --- |
+| **a boundary shifts** | the scope of an arc or a workstream, a published contract or interface, the security or trust posture, deleting data, cost or infrastructure, what a user sees |
+| **information is missing** | a fact that no reading and no measurement can supply |
+| **the choice is people's** | priority, taste, business direction |
+
 ## The card
 
 | Part | What it carries |
 | --- | --- |
 | **Number + summary** | Numbered **`Q<n>`**, and the numbering is **stable across the whole exchange** — Q3 is Q3 in the question, the discussion, the answer and the page that later states it. One prefix, because a corpus that has used `O1`, `D1`, bare `1` and a trailing `card D58` costs the reader a guess before they can reply. The summary names the **choice**, not the topic |
-| **What** | The change concretely — the file, the rule, the before → after |
-| **Why** | What it costs to leave as is: the failure it causes. Never *"for consistency"* |
+| **What** | The change concretely — the file, the rule, the before → after, in names and counts, not adjectives. It starts from what exists, with the file and the line |
+| **Why** | Which of the three reasons makes the choice the developer's, and what it costs to leave as is: the failure it causes. Never *"for consistency"* |
 | **Options** | A **table**: lettered, trade-off in its own column. *"Leave it"* is a real option wherever viable, with its cost stated |
-| **→ Recommendation** | One option, carrying the reason it wins |
+| **→ Recommendation** | One option, carrying the reason it wins, and citing what decides it |
 | **Preview** | Where the decision is a shape — an outline, a tree, a sample row, a code fragment — inline. A reader who must ask *"show me"* was handed an undecidable card |
+
+**A card on the page is an open card, so it carries a recommendation and no `Decision` field.** A
+field saying the card is open says nothing, and a field left empty is a blank somebody feels they
+should fill. An answered card leaves the page: its answer folds into the section that then states it.
 
 **Options are a table.** Lettered, one row each, the trade-off in its own column. Prose
 alternatives cannot be scanned and cannot be answered by reference — and in markdown the
 `| --- |` separator row is required, or the block renders as literal text.
+
+**A design question is filled as an expert would fill it.** Each option's trade-off is set against
+the book, against industry practice with a named source — OWASP ASVS, NIST 800-63, the twelve-factor
+app, a pattern's own literature — and against the domain's usual workflow. Each lens names the
+references it judges against (`refs/devex/agent/lenses/`), so the lens that owns the question says
+which source to cite.
 
 **Trade-offs are concrete or absent.** *"Simpler"* is not one; *"one file to change instead of
 twenty, at the cost of a second name for one concept"* is.
@@ -96,9 +132,16 @@ It carries `⏸ held on Q<n>`, because nothing in it is unsafe to touch and the 
 (`RD.DEVEX.WORKSPACE.188`). A row that began and then met the question is `◐ stopped`, and its `→`
 names the card. Rows the answer cannot change keep running.
 
-**While work runs, every open card leads the reply**, in full and in markdown, under **Needs you**,
-before any progress (`RD.DEVEX.WORKSPACE.189`). `refs/devex/workspace/workstream.md` § *The reply
-while work runs shows what needs you, then what moved* holds that shape.
+**A card is shown in full once, at the top of the reply that raises it — MUST**
+(`RD.DEVEX.WORKSPACE.189`). It goes under **Needs you** at the start of that reply, in markdown, and
+never again in the body of the same reply. While it stays open, each later reply names it in one line
+— its number, its question, and where it is — before the progress. The full card stays on the
+approach page. `refs/devex/workspace/workstream.md` § *The reply while work runs shows what needs you,
+then what moved* holds that shape.
+
+**An answer lands in the arc's notes in the same turn — MUST** (`RD.DEVEX.WORKSPACE.193`): in the
+card, answered and folded; in the arc, as a log line and a change to every row it affects; and in the
+arc's notes — its spec, its plan, and any sample they name.
 
 ## Deferred
 
@@ -112,4 +155,5 @@ Write to a colleague. Full sentences in **What** and **Why**; tables where thing
 A wall of clipped fragments is not dense, it is unreadable — it makes the reader rebuild the
 sentences the writer declined to write.
 
-**Never close your own question.** Draft options and recommend; a person decides.
+**Never close your own question.** Draft options and recommend; a person decides. A question the
+rules settle never becomes a card in the first place: you decide it and log why.

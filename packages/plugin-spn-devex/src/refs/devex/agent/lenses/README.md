@@ -4,6 +4,19 @@
 
 **This folder is the `03-lenses` construct**, restated. The construct says what a lens *is*; the files say what each one *checks*.
 
+## Decide what they settle, and ask only what they leave open
+
+**The agent decides what the book, the plugin references and the lenses settle — MUST**
+(`RD.DEVEX.WORKSPACE.193`). A lens is one of the three, so a finding a lens settles is decided and
+logged with its reason, never raised as a card. A card is only for what they leave open: a boundary
+that shifts, information nobody can read or measure, or a choice that is people's
+(`refs/devex/workspace/workstream.md` § A card is only for what the rules leave open).
+
+**Each lens names the references it judges against, beside the book**, in its *Judged against*
+line. When a design question does reach the developer, each option's trade-off is set against the
+book and against the named source of the lens that owns the question — so the card cites a practice
+by name rather than an opinion.
+
 ## Two different acts
 
 **Wearing a lens while writing makes the work better, and is never a review.** The context that drafted something already agrees with its own reasoning, so a lens that is only ever worn has reviewed nothing.

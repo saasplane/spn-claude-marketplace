@@ -11,7 +11,7 @@ import { join } from "node:path";
 import { workspace } from "../../../helpers/fixture.mjs";
 import { ARCS, DEVEX_WORKSTREAMS, DOCS, SEAT, capabilitiesDir, docsOf, workstreamsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
 const HOOKS = PLUGIN;
@@ -161,6 +161,35 @@ one("reading a source file", { tool_name: "Read", tool_input: { file_path: `${WO
 one("editing an ordinary source file",
   { tool_name: "Edit", tool_input: { file_path: join(PROBE_REPO, "src", "thing.ts"), new_string: "export const x = 2;" } }, "silent");
 one("a malformed payload allows", {}, "silent");
+
+console.log("\n=== 2l — a publish is met by a reminder, never a refusal (RD.DEVEX.WORKSPACE.117)");
+
+const APPROACH = join(WORKSPACE, ".spndevex", "workstreams", "open", "041-probe", "probe-approach.html");
+one("2l: publishing an approach page reminds that nothing is published unless the developer asks",
+  { tool_name: "Artifact", tool_input: { file_path: APPROACH, icon: "plan" } }, "note",
+  { says: "unless the developer asks", parity: false, why: "a new check" });
+one("2l: the reminder names the full path to hand over instead",
+  { tool_name: "Artifact", tool_input: { action: "publish", file_path: APPROACH } }, "note",
+  { says: APPROACH, parity: false, why: "a new check" });
+one("2l: a publish of a report reminds too",
+  { tool_name: "Artifact", tool_input: { file_path: join(PROBE_REPO, "docs", "artifacts", "reports", "coverage-report.html") } }, "note",
+  { says: "RD.DEVEX.WORKSPACE.117", parity: false, why: "a new check" });
+one("2l: reading an artifact is not a publish, so it is silent",
+  { tool_name: "Artifact", tool_input: { action: "read", url: "https://claude.ai/artifact/x" } }, "silent",
+  { parity: false, why: "a new check" });
+one("2l: listing artifacts is silent",
+  { tool_name: "Artifact", tool_input: { action: "list" } }, "silent", { parity: false, why: "a new check" });
+one("2l: an asset upload to a page already published is silent",
+  { tool_name: "Artifact", tool_input: { url: "https://claude.ai/artifact/x", asset: true, file_path: "/tmp/a.png" } }, "silent",
+  { parity: false, why: "a new check" });
+{
+  n += 1;
+  const hooks = JSON.parse(readFileSync(resolve(HOOKS, "src", "hooks", "hooks.json"), "utf8"));
+  const matchers = (hooks.hooks.PreToolUse ?? []).map((entry) => entry.matcher ?? "");
+  const ok = matchers.some((matcher) => new RegExp(`^(?:${matcher})$`).test("Artifact"));
+  if (!ok) failed += 1;
+  console.log(`  ${ok ? "PASS" : "FAIL"}  2l: hooks.json routes the Artifact tool through PreToolUse\n        matchers ${JSON.stringify(matchers)}`);
+}
 
 console.log("\n=== pretooluse — the chain's cost per call");
 {

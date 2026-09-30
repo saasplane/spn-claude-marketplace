@@ -36,6 +36,7 @@ import { checkReleaseGo, applies as releaseApplies } from "../checks/release-go.
 import { checkArcStatus, applies as arcStatusApplies } from "../checks/arc-status.ts";
 import { applies as commentsApply, checkComments } from "../checks/comment-check.ts";
 import { applies as mirrorApplies, checkMirror } from "../checks/mirror.ts";
+import { PUBLISHER, checkPublish } from "../checks/publish.ts";
 import { begin, end, span, tagsOf } from "../lib/timing.ts";
 
 type Check = {
@@ -131,6 +132,12 @@ function writtenPaths(payload: Payload): string[] {
 
 export function dispatch(payload: Payload): Verdict {
   const supplied = payload.tool_input ?? {};
+
+  // A PUBLISH WRITES NO FILE HERE, so no other check has anything to read in it. It gets the one
+  // reminder (RD.DEVEX.WORKSPACE.117) and nothing else.
+  if (payload.tool_name === PUBLISHER) {
+    try { return span("publish", () => checkPublish(payload)); } catch { return null; }
+  }
 
   // The generated-file guard runs first: it is the cheapest refusal there is, and it needs no
   // workspace walk to decide.

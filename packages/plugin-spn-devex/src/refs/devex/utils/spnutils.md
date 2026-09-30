@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "7b1165c9"
+      "seen": "80f4795e"
     }
   ],
   "decisions": [
@@ -97,7 +97,9 @@ repository's `rules.md` does not list: `spnutils help --json` names them.
 **Each line `timings` records names the work it was spent on — MUST.** While recording is on, every
 hook check appends one line to `.spndevex/.debug/telemetry/hooks.jsonl`, carrying the `workstream`,
 `arc` and `order` read from the paths the tool call touches, and the `agent` when the hook's input
-carries one. A report in the plugin, not in `spnutils`, joins those lines to the Claude Code
+carries one. **The tags carry forward**: per session and agent, the last tagged call's tags are kept
+beside the log, a call that touches no workstream path inherits them, and a call that names other work
+replaces them. A report in the plugin, not in `spnutils`, joins those lines to the Claude Code
 transcripts by `session` and prints the tokens spent per workstream, arc and order.
 
 **There is no command for opening a scope of work.** A workstream is a folder in one of three

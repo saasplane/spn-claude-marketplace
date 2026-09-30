@@ -14,11 +14,11 @@
 | --- | --- | --- |
 | The event wiring | `packages/plugin-spn-devex/src/hooks/hooks.json` | four entries, one per moment, each naming a script and a timeout |
 | The window opening | `packages/plugin-spn-devex/src/scripts/events/orientation.ts` | `SessionStart`, on `startup`, `resume` or `clear` |
-| A call about to run | `packages/plugin-spn-devex/src/scripts/events/pretooluse.ts` | `PreToolUse`, matching `Read`, `Write`, `Edit`, `Bash`, `Grep`, `Glob` and `NotebookRead`, and the dispatcher behind it |
+| A call about to run | `packages/plugin-spn-devex/src/scripts/events/pretooluse.ts` | `PreToolUse`, matching `Read`, `Write`, `Edit`, `Bash`, `Grep`, `Glob`, `NotebookRead` and `Artifact`, and the dispatcher behind it |
 | A shell command that finished | `packages/plugin-spn-devex/src/scripts/events/closed.ts` | `PostToolUse`, matching `Bash` |
 | A turn about to end | `packages/plugin-spn-devex/src/scripts/events/stop.ts` | `Stop`, with no matcher |
 | The verdict and the payload | `packages/plugin-spn-devex/src/scripts/lib/payload.ts` | the `Payload` and `Verdict` types, `readPayload`, `emit`, `runAlone` |
-| What a run cost | `packages/plugin-spn-devex/src/scripts/lib/timing.ts` | one span per check, written only when the developer asked for it |
+| What a run cost | `packages/plugin-spn-devex/src/scripts/lib/timing.ts` | one span per check, written only when the developer asked for it, and the tags each session and agent carries forward in `telemetry/tags.json` |
 
 ## Follows the pattern
 
@@ -51,6 +51,12 @@
 **What** — `hooks.json` names `dist/events/*.mjs`, never `scripts/events/*.ts`. Measured on this machine, 2026-09-28: `PreToolUse` fell from 63 ms to 26 ms.
 **How** — `pnpm build:plugins` at the marketplace root rebuilds every plugin once; `pnpm build:plugins:watch` rebuilds on every source change while editing a hook; `spn-devex plugin build` runs the same script from inside any plugin checkout. An edit to a hook's source is not live until the next rebuild — `tests/unit/t-dist-current.mjs` refuses a bundle older than its sources, so an unrebuilt edit fails the suite by name rather than running silently stale. `packages/plugin-spn-devex/src/hooks/hooks.json`, `packages/plugin-spn-devex/src/scripts/commands/plugin/build.ts`.
 
+### A publish is reminded, never refused
+
+**Why** — *the agent publishes no page unless the developer asks* (RD.DEVEX.WORKSPACE.117), and the habit came from the publishing tool's own default, which a rule in a reference file loses to at the moment of the call. The hook cannot know whether the developer asked.
+**What** — `hooks.json` routes the `Artifact` tool through `PreToolUse`. A call that publishes a page — no action, or `publish`, and not an asset upload to a page already published — gets one note stating the rule and the full path to hand over instead, and the call goes ahead. No other check reads a publish, because it writes no file here.
+**How** — `dispatch` returns the note before the check list. `packages/plugin-spn-devex/src/scripts/checks/publish.ts`.
+
 ### The first refusal is the answer; advice adds up
 
 **Why** — *a refusal ends the call, so anything after it is noise*, while two pieces of advice are worth more than one.
@@ -72,14 +78,14 @@
 ### A turn that ends warns and never refuses
 
 **Why** — *the turn is already written*, and a refusal at that point would only lose it.
-**What** — warnings for a reply that puts a decision with the card's shape incomplete, an arc *this session* wrote to that still has runnable rows and no card open, an arc marked `HELD` that names no live card, a reply that passes work on while a card is open or the handover's seven fields are missing, and the corpus questions a whole-tree read still owes.
-**How** — `runnable` reads a baseline kept per session, under `.spndevex/.debug/stop/sessions/`, comparing each open arc's step-row hash against what this session last saw and reading its own transcript for which arcs it wrote — so an arc another window is executing never fires here. A status of `PROPOSED`, `DECIDED` or `HELD` is never runnable, whoever touched it, and a row already marked `in progress <date> <time> <offset>` is named with its age rather than counted as unfinished, because somebody may still be on it. `[handover]` strips fenced blocks, code spans, block quotes and quoted text before it looks for a phrase that passes work on, so a reply quoting the check's own words, or a `diff` block previewing a change, is never mistaken for one. `packages/plugin-spn-devex/src/scripts/events/stop.ts`.
+**What** — warnings for a reply that puts a decision with the card's shape incomplete, a reply over an open card that does not open with **Needs you** — a card this turn raised in full there once, and every card open from an earlier reply named in one line (RD.DEVEX.WORKSPACE.189) — an answer logged in an arc whose notes (spec, plan, samples) did not move in the same turn, a proposed arc carrying a review point to a later step of itself (RD.DEVEX.WORKSPACE.193), an arc *this session* wrote to that still has runnable rows and no card open, an arc marked `HELD` that names no live card, a reply that passes work on while a card is open or the handover's seven fields are missing, and the corpus questions a whole-tree read still owes.
+**How** — the baseline also keeps the cards open at the session's last Stop, so a card open now and not then is the one this turn raised, and each open arc's log entries (hashed), its notes' size and time, and its status, so a new log entry recording an answer is judged against notes that did or did not move. `runnable` reads a baseline kept per session, under `.spndevex/.debug/stop/sessions/`, comparing each open arc's step-row hash against what this session last saw and reading its own transcript for which arcs it wrote — so an arc another window is executing never fires here. A status of `PROPOSED`, `DECIDED` or `HELD` is never runnable, whoever touched it, and a row already marked `in progress <date> <time> <offset>` is named with its age rather than counted as unfinished, because somebody may still be on it. `[handover]` strips fenced blocks, code spans, block quotes and quoted text before it looks for a phrase that passes work on, so a reply quoting the check's own words, or a `diff` block previewing a change, is never mistaken for one. `packages/plugin-spn-devex/src/scripts/events/stop.ts`.
 
 ### Measuring is free; writing is the cost
 
 **Why** — *telemetry must not make the gate slower*, and a gate that fails because timing failed is worse than a number nobody recorded.
 **What** — every run is timed, and each line also names the workstream, arc, order and agent the call belongs to, so a later reading can join a cost to the work that paid it without guessing from a path. Whether any of it reaches disk is a switch the developer sets, and every path swallows its own errors.
-**How** — `begin` touches no filesystem; the switch is read at the moment of writing, under a fixed size cap; `tagsOf` matches every string in a call's input against a workstream path and keeps the most specific match — an order over an arc over a bare workstream — reading the hook's own `agent_id` for which agent made the call. `packages/plugin-spn-devex/src/scripts/lib/timing.ts`.
+**How** — `begin` touches no filesystem; the switch is read at the moment of writing, under a fixed size cap; `tagsOf` matches every string in a call's input against a workstream path and keeps the most specific match — an order over an arc over a bare workstream — reading the hook's own `agent_id` for which agent made the call. **The tags carry forward** (RD.DEVEX.WORKSPACE.185): per session and agent, the last tagged call's tags sit in `telemetry/tags.json`, written only while the switch is on; a call that touches no workstream path inherits them, a call inside the same work keeps what it does not name, and a call that names other work replaces them. `packages/plugin-spn-devex/src/scripts/lib/timing.ts`, `carryTags`.
 
 ## Between modules
 

@@ -37,6 +37,8 @@
 
 **Source of truth:** the foundation book's infra design of record (`02-support/02-infra` — boundaries, manifests, the two-realization doctrine) and the delivery standard (devex `01-function/02-scm` · `01-function/07-deliver` · `03-utils/01-spnutils/02-delivery`). This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
 
+**Judged against, beside the book:** the twelve-factor app for configuration, processes and environments, and SRE practice as Google's *Site Reliability Engineering* states it for reliability, alerting and rollout. An estate option is weighed against the factor or practice it keeps or breaks.
+
 **Worn** while touching manifests and configuration. **Convened** when a change makes a resource appear. **Advises — never blocks** (its convened mode over a real cloud estate is deferred until one runs).
 
 ## What it checks

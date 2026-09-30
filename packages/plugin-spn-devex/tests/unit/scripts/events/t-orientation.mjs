@@ -486,6 +486,12 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
     !offer.context.includes("CLAUDE_EFFORT") && !offer.context.includes("claude --effort"));
   says("2h: the effort on the model: line is a note for the developer to set in the picker",
     offer.context.includes("The effort on that line is a note for the developer to set in the picker, and nothing compares it."));
+  // N8 row 2l: the agent publishes no page unless the developer asks, and hands over a full path.
+  says("2l: the session note says nothing is published unless the developer asks, and a page is handed over as its full path",
+    offer.context.includes("Publish nothing unless the developer asks") && offer.context.includes("full path") &&
+    offer.context.includes("RD.DEVEX.WORKSPACE.117"));
+  says("2l: the note says this overrides a publishing tool's own default",
+    offer.context.includes("a publishing tool's own default"));
   says("a new idea's goal is asked in plain questions, never a card (RD.DEVEX.AGENT.077)",
     offer.context.includes("Something new in the first prompt gets its goal asked in one or two plain questions, never lettered options and never a `Q<n>` card"));
   says("a row marked in progress is left, its age said, and asked about",

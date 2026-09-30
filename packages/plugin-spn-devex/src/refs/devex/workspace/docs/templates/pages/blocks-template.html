@@ -1,7 +1,6 @@
-<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The blocks — what a page reaches for instead of prose · § The figures — what sits inside a block, and the closed set of them
-     This file carries rules it does not own. The chapter above is the source of truth.
-     A rule change is edited there first, then here, in the same change. Never add a rule here.
-     restate-drift.ts reports this copy when its source moves. -->
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The templates — five pages, and the two seat files behind them · § The blocks are an HTML vocabulary; markdown keeps its own · § The blocks — what a page reaches for instead of prose · § The figures — what sits inside a block, and the closed set of them · § One stylesheet, shipped with the template
+     This file shows every block and every figure kind rendered, beside a page template, and states no rule.
+     The sections above state when a page reaches for each one. -->
 <title>Every Block, Once</title>
 <style>
   :root {
@@ -83,13 +82,8 @@
   pre{background:var(--card);border:1px solid var(--rule);border-radius:3px;padding:.9rem 1.1rem;margin:1.6rem 0;overflow-x:auto;font-family:var(--mono);font-size:var(--sm);line-height:1.55;color:var(--slate);max-width:100%}
   pre code{font-size:inherit}
   pre .tk-k{color:var(--tk-k);font-weight:600} pre .tk-s{color:var(--tk-s)} pre .tk-c{color:var(--tk-c);font-style:italic} pre .tk-t{color:var(--tk-t)} pre .tk-n{color:var(--tk-n)} pre .tk-add{color:var(--tk-add)} pre .tk-del{color:var(--tk-del)} pre .tk-cmd{color:var(--tk-t);font-weight:600}
-  /* A FIGURE RUNS EDGE TO EDGE. It takes no padding, border or background of its own: the section
-     already provides the page's padding, and the drawing's own containers are its frame. That is the
-     opposite of a PROSE panel, which carries all three. A figure is also not held to the prose
-     measure — 58rem is for a sentence, and a drawing is not read a line at a time. */
-  /* ONE VERTICAL RHYTHM. A paragraph keeps its 1rem; every block gets 1.6rem above and below, and a
-     figure 2.4rem — it is the largest thing on a page, and it needs the air to read as one unit rather
-     than as something the paragraph above it is still saying. Margins collapse, so the larger wins. */
+  /* A figure */
+
   figure{margin:2.4rem 0;padding:0;border:0;background:none}
   figure svg{display:block;width:auto;max-width:100%;height:auto;margin-inline:auto}
   figcaption{font-family:var(--ui);font-size:var(--xs);color:var(--faint);margin-top:.5rem;max-width:none}
@@ -101,10 +95,7 @@
   .dg .l{font-family:var(--ui);font-size:12px;fill:var(--ink)}
   .dg .s{font-family:var(--mono);font-size:11px;fill:var(--slate)}
   .dg .n{font-family:var(--ui);font-size:11px;fill:var(--faint)}
-  /* The arrowhead is a marker filled with `currentColor`, and a marker resolves that against
-     its own inherited colour rather than the path that references it. With nothing setting
-     `color` on the figure, every connector drew a blue line ending in a black head. Setting it
-     on `.dg` makes the head take the line's colour, and the marker needs no change. */
+  /* Arrowheads take the line's colour */
   .dg{color:var(--accent)}
   .dg .c{stroke:var(--accent);stroke-width:1.6;fill:none}
   .pull{border-left:2px solid var(--accent);background:var(--accent-soft);padding:1rem 1.2rem;margin:1.6rem 0;border-radius:0 3px 3px 0}
@@ -126,39 +117,25 @@
     .rail a.on{border-left:none}
   }
 
-  /* THE OUTLINE HAS TWO LEVELS, AND THEY DIFFER ON THREE AXES — size, weight and colour together.
-     One axis is not enough at rail size: a single step reads as noise rather than as a level, and
-     the two collapse into each other. Nothing in an outline sits on --faint either, because that is
-     the token for text a reader is meant to skim past and an outline is what they navigate by. */
+  /* The rail: two levels */
   .rail a:not(.sub):not(.home){font-size:.88rem;font-weight:400;color:var(--ink);letter-spacing:-.005em}
   .rail a.sub{font-size:.78rem;font-weight:400;color:var(--slate)}
   .rail .rail-title{color:var(--slate)}
 
-  /* ONE LEFT EDGE FOR BOTH LEVELS. An indent repeats what the fold already says, and it costs the
-     longer labels a wrapped line. Both are stated in one rule: setting only the subsection's
-     padding leaves it outdented past its own section, because another rule still sets the
-     section's. */
+  /* The rail: one left edge */
   .rail a:not(.home), .rail a.sub{padding-left:.6rem}
 
-  /* EVERYTHING ON THE RIGHT SITS ON THE LABEL'S CENTRE LINE. The row is a flex line, and its
-     default is to stretch, so a chevron or a count badge beside a label that wrapped to two lines
-     was pinned to the top of the row rather than level with it. */
+  /* The rail: marks level with the label */
   .rail a{align-items:center}
   .rail .count{align-self:center}
 
-  /* WEIGHT AND COLOUR MARK WHERE YOU ARE, NEVER WHAT A LEVEL IS. The notch is an inset shadow and
-     not a border: a border changes the box, so a label would jump sideways by the notch's width the
-     moment it became current. These are restated at matching specificity because the level rules
-     above are more specific than `.rail a.on`, and would otherwise strip the selected state. */
+  /* The rail: the current entry */
   .rail a.on:not(.sub):not(.home){font-weight:650;color:var(--accent);box-shadow:inset 1.5px 0 0 var(--accent)}
   .rail a.on.sub{color:var(--accent);box-shadow:inset 1.5px 0 0 var(--accent)}
   .rail a:not(.sub):not(.home):hover{color:var(--accent)}
   .rail a.sub:hover{color:var(--ink)}
 
-  /* THE DISCLOSURE IS A CHEVRON, DRAWN RATHER THAN TYPED. A glyph ties the mark to whatever font
-     is resolved and to that font's own idea of weight and baseline; two borders on a rotated box
-     are the same shape at every size and inherit the row's colour. Right means closed, down means
-     open, and only the chevron turns — the box around it stays put so the hit target never moves. */
+  /* The rail: the fold chevron */
   .rail a .caret{margin-left:auto;flex:none;width:1.35rem;height:1.35rem;display:grid;place-items:center;
     color:var(--faint);border-radius:3px;transform:none}
   .rail a .caret::before{content:"";width:.32rem;height:.32rem;border-right:1.5px solid currentColor;
@@ -169,7 +146,7 @@
   @media (prefers-reduced-motion:reduce){.rail a .caret::before{transition:none}}
 </style>
 <style>
-/* anchor links: a section or subsection title carries a link to itself — small, grey, set off from the title; copied on click */
+/* Heading anchor links */
 a.anchor{display:inline-block;margin-left:.6em;font-family:var(--mono);font-size:.55em;font-weight:400;line-height:1;color:var(--slate,#6b7280);text-decoration:none;opacity:.35;transition:opacity .15s;vertical-align:middle;position:relative;top:-.1em}
 .sec-head:hover a.anchor,h3[id]:hover a.anchor,a.anchor:hover,a.anchor:focus,a.anchor.copied{opacity:1}
 a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7d4a);margin-left:.3em}
@@ -182,12 +159,11 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
   .rail a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 </style>
 <style>
-  /* a quote is a sentence set apart — a rule stated in full, or a line from the source the page is about */
+  /* A quote */
   blockquote{margin:1.6rem 0;padding:.2rem 0 .2rem 1.1rem;border-left:2px solid var(--rule);color:var(--slate)}
   blockquote p{margin:0;max-width:none}
   .tile .s{margin-top:.45rem}
-  /* PROSE — the markdown block. Its own border, background and text colour, so a passage of ordinary
-     markdown reads as a block the page chose rather than as the page's own voice continuing. */
+  /* PROSE, the markdown panel */
   .prose{border:1px solid var(--rule);background:var(--card);color:var(--slate);border-radius:3px;
     padding:1.1rem 1.3rem;margin:1.6rem 0}
   .prose > :first-child{margin-top:0}
@@ -196,7 +172,7 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
   .prose strong,.prose h4{color:var(--ink)}
   .prose code{color:var(--ink)}
   .prose blockquote{border-left-color:var(--accent);margin:1rem 0}
-  /* NEXT — small on purpose: a title and a direction, nothing else */
+  /* NEXT */
   .nextnav{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.7rem;margin:1.6rem 0}
   .nextnav-card{display:flex;flex-direction:column;gap:.15rem;border:1px solid var(--rule);background:var(--card);
     border-radius:3px;padding:.65rem .85rem;text-decoration:none;min-width:0}
@@ -206,23 +182,6 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
   .nextnav-card:hover .ttl{color:var(--accent)}
   .nextnav-card.next{text-align:right}
 </style>
-<!-- THE BLOCKS: the one page that shows every block and every
-     figure kind, rendered. It is a REFERENCE you consult while writing, never a file you copy.
-
-     WRITING A PAGE TAKES TWO FILES. The PAGE TEMPLATE for the kind you are writing — hub, overview, construct or
-     approach — carries what differs between kinds: the masthead, the sections and their order, the rules that kind
-     answers to. THIS FILE carries what is the same for all of them: normal content, and the blocks. Open both.
-     Fill the page template's sections with normal writing, and reach for a block where the chooser in that
-     template says the content earns one.
-
-     THIS IS AN HTML VOCABULARY. A seat file is markdown and keeps markdown's own components — a table, a fenced
-     block with its language, a list, a quote, an alert, a `dg` fence for a figure. An author writing markdown
-     never names a block. `docs.ts page` reads those components and gives each one the form shown below, which is
-     why the vocabulary can grow without editing a single seat file.
-
-     MOST OF A PAGE IS NOT A BLOCK. Paragraphs, lists, numbered steps and subheadings are what a section is made
-     of; a block is what you drop into that writing when a piece of content must not read as prose. One section or
-     subsection holds normal text and as many blocks as it needs — none, one, or several. -->
 <div class="page">
 <nav class="rail" id="rail">
   <a class="home" href="../../../../README.md">&larr; .spndevex</a>
@@ -233,7 +192,7 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
 <header class="masthead">
   <div class="eyebrow"><div class="line line1">SaaS Plane &middot; Foundation &middot; Blocks</div></div>
   <h1>Every Block, Once</h1>
-  <p class="standfirst">The one source of the sample-block section every page template carries &mdash; each block kind and each figure kind shown once, so an author can see the whole vocabulary before choosing.</p>
+  <p class="standfirst">This page shows every block and every figure kind a page can use, each one once, as it looks on a finished page. Open it beside a page template when you choose how to show a piece of content.</p>
   <p>Writing a page takes two files: the <strong>page template</strong> for the kind you are writing, which carries its masthead and its sections, and <strong>this page</strong>, which carries what every kind shares. Open both. This is a reference you consult, never a file you copy &mdash; and it is an HTML vocabulary: a markdown seat file keeps markdown's own components, and the renderer gives each one the form you see here.</p>
 </header>
 
@@ -255,7 +214,7 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
 </section>
 
 <section id="blocks" data-block="example">
-  <div class="sec-head"><h2>Every block, once &mdash; delete when the page is written</h2></div>
+  <div class="sec-head"><h2>Every block, once &mdash; what each one looks like</h2></div>
   <p>Each one below is a <strong>block</strong>: it carries a border, a background or a form of its own, so a reader sees it is not the surrounding prose before reading a word of it. Use one when the content is a rule, a set, a comparison, a literal, a shape, or a passage that belongs in its own panel.</p>
   <h3 id="b-prose">PROSE &mdash; the markdown block</h3>
   <p>{{A passage that explains. Use it wherever the content is plain writing and no other block fits: <strong>REASONS</strong> is for prose that makes a claim and gives grounds, and this is for prose that simply teaches. It carries its own border, background and text colour, so it reads as a block the page chose rather than as the page's own voice continuing. Everything markdown gives you renders inside it.}}</p>
@@ -713,7 +672,7 @@ spnutils repo agent-sync</pre>
   <pre data-lang="diff"><span class="tk-del">- what the file says today</span>
 <span class="tk-add">+ what it will say</span></pre>
   <h3 id="b-glossary">GLOSSARY &mdash; the words, in the order a reader meets them</h3>
-  <p class="s">On a <strong>domain overview</strong> this region is generated by <code>docs.ts face</code> from the constructs' <code>Terms</code> tables, grouped by construct in the domain's reading order. On a <strong>hub</strong> it is written by hand and carries <strong>two</strong> columns: a hub names the book's own structural words, and 9 of the foundation hub's 11 have no contract term at all.</p>
+  <p class="s">On a <strong>domain overview</strong> this region is generated by <code>docs face</code> from the constructs' <code>Terms</code> tables, grouped by construct in the domain's reading order. On a <strong>hub</strong> it is written by hand and carries <strong>two</strong> columns: a hub names the book's own structural words, and 9 of the foundation hub's 11 have no contract term at all.</p>
   <div class="scroll"><table>
     <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
     <tbody><tr><td>{{Estate}}</td><td><code>{{SPEstate}}</code></td><td>{{a definition the reader understands on this line}}</td></tr></tbody>

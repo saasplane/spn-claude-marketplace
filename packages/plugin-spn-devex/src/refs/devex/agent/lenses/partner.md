@@ -21,6 +21,8 @@
 
 **Source of truth:** the foundation book's evolution classification (`02-support/01-apps/03-module/01-server/01-contract/01-states`, "Evolution — the change classification"), the intent standard (`02-support/01-apps/07-comments/01-intent`), and the generated surface (`02-support/01-apps/08-agent-surface`). Find the review procedure in the contract-rules reference beside this file. This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
 
+**Judged against, beside the book:** Semantic Versioning for what a release number promises, and the deprecation practice of published interfaces — announce, run both, then remove. A contract option is weighed against the promise a partner already built on.
+
 **Worn** while writing contracts. **Convened** when the published surface changes. **Blocks:** a breaking change with no version and migration path.
 
 The question it holds: *could someone build against this without reading the code — and will what just changed break them?*
