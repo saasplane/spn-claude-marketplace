@@ -196,8 +196,8 @@ each writes its own `<run>.<phase>.json`, and the stamp reads them all. The comm
 beside the node, or else the one at the repository root. Everything after `--` reaches Playwright
 untouched when you run `spn-test` through the node's own script; `spnutils apps test` does not pass it on yet.
 
-**Whole-repo runs.** `pnpm test:all` is the root script that runs every tier each node owes or
-carries, across the repository.
+**Whole-repo runs.** `pnpm test:all --run=<run>` is the root script that runs every tier each node owes or
+carries, across the repository, every tier under that one run name.
 
 **Infrastructure.** Every layer goes through `spnutils infra`, never hand-rolled docker.
 

@@ -17,7 +17,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "Reports and templates",
-      "seen": "67ec7d9a"
+      "seen": "c8455efd"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -242,7 +242,7 @@ Developers and leaders who have not learned the book's words read a report, so i
 | **Findings** | **By tier**: Tier · Runs · Written · Built · SUCCESS · FAILED · PENDING · PLANNED, from the command's `tiers` · **Repository** by domain → **Apps** → **Packages**: Name · Written · Built · SUCCESS · FAILED · PENDING · PLANNED |
 | **Records** | level 1 the status — FAILED → PENDING → PLANNED; level 2 the tier. An item is the row id, its claim, its tier, its status and the run it cites |
 
-**The tests report reads the stamped rows only**: each row's `Status`, and the run its `Updated at` names. It opens no run file, so what it counts is what the stamp wrote; the command's `tiers[].runs` lists the runs each tier's rows cite, and *Runs* is their count. **The statuses sum to Written**, and Built counts behaviours whose design topic is built, the same as the coverage report. **A `MANUAL` row counts in none of the numbers — MUST**, so the four statuses still add up to Written: the command lists them as `manual` per domain and in total, and you show them as the coverage report does, in one line under Findings and the Records group **Proved by hand**. By tier has no *Last run* column: when each tier ran is stated under Measured. An Apps or Packages name cell's second line is the project type, then ` - `, then the tiers it ran, never a count. **A run speaks for the tiers it ran and no others**: a behaviour whose tier did not run is unproved, not failing.
+**The tests report reads the stamped rows only**: each row's `Status`, and the run its `Updated at` names. It opens no run file, so what it counts is what the stamp wrote; the command's `tiers[].runs` lists the runs each tier's rows cite, and *Runs* is their count. **The statuses sum to Written**, and Built counts behaviours whose design topic is built, the same as the coverage report. **A `MANUAL` row counts in none of the numbers — MUST**, so the four statuses still add up to Written: the command lists them as `manual` per domain and in total, and you show them as the coverage report does, in one line under Findings and the Records group **Proved by hand**. By tier has no *Last run* column: when each tier ran is stated under Measured. An Apps or Packages name cell's second line is the project type, then ` - `, then the tiers its stamped rows name, never a count. **A run speaks for the tiers it ran and no others**: a behaviour whose tier did not run is unproved, not failing.
 
 ### Audit — is the repository set up the way the standard says?
 
