@@ -776,10 +776,10 @@ export function orient(root: string, cwd: string): [message: string, context: st
     "the status line, one line: *Picking up N<nn> — <the arc's title>, at row <n>: <what the row " +
     "does>.* Then the first thing you will do, never by asking again. A handover block names a " +
     "`model:` with a model and an effort: before any action, compare the model with the one your system " +
-    "prompt names, and the effort with `CLAUDE_EFFORT` (one shell call: `echo $CLAUDE_EFFORT`). On a " +
-    "mismatch, one line under the status line names both values and how to switch — the `/model` " +
-    "command for the model, a window started with `claude --effort <level>` for the effort — and " +
-    "nothing runs until the developer switches or says to go on. If that row's State reads " +
+    "prompt names. On a mismatch, one line under the status line names both models and how to switch — " +
+    "the model picker or the `/model` command — and nothing runs until the developer switches or says " +
+    "to go on. The effort on that line is a note for the developer to set in the picker, and nothing " +
+    "compares it. If that row's State reads " +
     "`in progress <time>`, another window may be on it: leave it, say how old the mark is, and " +
     "ask before you touch it. " +
     "Something new in the first prompt gets its goal asked in one or two plain questions, never lettered " +

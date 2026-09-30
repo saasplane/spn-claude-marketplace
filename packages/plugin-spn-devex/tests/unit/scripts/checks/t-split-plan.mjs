@@ -316,6 +316,39 @@ one("a number in a code span is an example, not a record", "documents-first",
   { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md`, content: "x" },
   "silent");
 
+// N8 row 2k (Q389 A): THE READER REFUSES A CARD IN THE WRONG SHAPE. It found a card only by its `h4`,
+// so a `div.card` with an `h3` in `Open` was never read: 008's Open held 35 answered cards and one
+// open one in the decided shape, the page showed them green, and the rail counted 0.
+const decidedShape = (n) => `  <div class="card" id="q${n}">
+    <h3>Q${n} &middot; a question written in the decided shape</h3>
+    <p>What is being decided.</p>
+  </div>
+`;
+one("2k: a div.card with an h3 in Open is refused, naming the card and the book's shape", "documents-first",
+  build("sp-2k-card", { cards: decidedShape(88) }),
+  { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md`, content: "x" },
+  "note", { says: "not in the open-card shape — Q88 in a-subject-approach.html (a `div.card`", parity: false, why: "the Python never read the wrapper" });
+
+one("2k: an h4 card wrapped in a div.card is refused too", "documents-first",
+  build("sp-2k-h4-card", { cards: card(88, "&mdash;").replace('<div class="open">', '<div class="card">') }),
+  { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md`, content: "x" },
+  "note", { says: "Q88 in a-subject-approach.html (an `h4` inside a `div.card`", parity: false, why: "the Python never read the wrapper" });
+
+one("2k: the refusal states the book's shape and cites RD.DEVEX.WORKSPACE.147", "documents-first",
+  build("sp-2k-rule", { cards: decidedShape(88) }),
+  { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md`, content: "x" },
+  "note", { says: 'An open card is a `<div class="open">` wrapping `<h4 id="q<n>">` (RD.DEVEX.WORKSPACE.147)', parity: false, why: "the Python never read the wrapper" });
+
+one("2k: a div.open + h4 open card passes", "documents-first",
+  build("sp-2k-open", { cards: card(88, "&mdash;") + card(89, "&mdash;") }),
+  { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md`, content: "x" },
+  "silent");
+
+one("2k: an answered h4 card is still refused as today", "documents-first",
+  build("sp-2k-answered", { cards: card(88, "<strong>B.</strong> The other way.") }),
+  { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md`, content: "x" },
+  "note", { says: "Q88 in a-subject-approach.html (the card carries its own decision)", parity: false, why: "this is the defect F5 names — the Python reads only the arcs" });
+
 one("writing a seat page while the workstream's rows still pend", "documents-first",
   build("sp-seat", { rows: [["the chapter", "spn-foundation", "&#x2705; landed"], ["the check", "probe-repo", ""]] }),
   { file_path: join(docsOf("probe-repo"), "a-thing-approach.html"), content: "<html></html>" },
@@ -485,9 +518,18 @@ carry("a numbered scope is a handover", "⤵ carried → 003-cloud-day-0", "work
 carry("and so is one naming a phase inside it", "⤵ carried → 010 Phase 3 owns the split", "workstream");
 carry("a cell naming nothing names no successor", "⤵ carried", "unnamed");
 
+// THE FOLDER IS THE STATE, so this is a directory listing rather than a guess. A fixture holds one
+// workstream in each state: the real workspace's `closed/` is emptied as workstreams are archived and
+// its `backlog/` is refolded, so a case naming a real workstream fails the day that folder moves.
+const STATES_ROOT = workspace("m1-sp-states", {
+  [`.spndevex/${WORKSTREAMS}/open/008-plain-language/arcs/N1-a.md`]: "# N1\n",
+  [`.spndevex/${WORKSTREAMS}/closed/010-register-retrofit/arcs/N1-a.md`]: "# N1\n",
+  [`.spndevex/${WORKSTREAMS}/backlog/003-cloud-day-0/arcs/N1-a.md`]: "# N1\n",
+});
+
 function fault(name, state, shouldRefuse) {
   n += 1;
-  const got = splitPlan.carryFault(WORKSPACE, carried(state));
+  const got = splitPlan.carryFault(STATES_ROOT, carried(state));
   const ok = shouldRefuse ? got !== null : got === null;
   if (!ok) failed += 1;
   console.log(`  ${ok ? "PASS" : "FAIL"}  ${name}\n        expect ${shouldRefuse ? "a fault" : "silent"} · got ${got ?? "silent"}`);
@@ -504,14 +546,6 @@ fault("a carry naming no successor at all is refused", "⤵ carried", true);
 fault("a carry to a backlog workstream passes", "⤵ carried → 003-cloud-day-0", false);
 fault("an arc of this same workstream is not a carry", "⤵ carried → N15 step 8", false);
 
-// THE FOLDER IS THE STATE, so this is a directory listing rather than a guess. A fixture holds one
-// workstream in each state: the real workspace's `closed/` is emptied as workstreams are archived, and
-// a case that named `010` there failed the day the folder was cleared.
-const STATES_ROOT = workspace("m1-sp-states", {
-  [`.spndevex/${WORKSTREAMS}/open/008-plain-language/arcs/N1-a.md`]: "# N1\n",
-  [`.spndevex/${WORKSTREAMS}/closed/010-register-retrofit/arcs/N1-a.md`]: "# N1\n",
-  [`.spndevex/${WORKSTREAMS}/backlog/003-cloud-day-0/arcs/N1-a.md`]: "# N1\n",
-});
 function where(name, number, want) {
   n += 1;
   const got = splitPlan.workstreamState(STATES_ROOT, number);

@@ -476,12 +476,16 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
   // Q380 A: a window picking up a handover checks its model against the block's `model:` line first.
   says("a pasted handover's model is compared with the window's own before any action, and a mismatch names /model",
     offer.context.includes("A handover block names a `model:` with a model and an effort: before any action, compare the model with the one your system prompt names")
-    && offer.context.includes("the `/model` command for the model")
     && offer.context.includes("nothing runs until the developer switches or says to go on"));
-  // Q384 A: the effort is compared too, read from CLAUDE_EFFORT.
-  says("the effort is compared with CLAUDE_EFFORT, and a mismatch names claude --effort",
-    offer.context.includes("the effort with `CLAUDE_EFFORT`")
-    && offer.context.includes("a window started with `claude --effort <level>` for the effort"));
+  // N8 row 2h (Q384 reversed A → C): the check compares the model only. In the VS Code extension the
+  // picker read High while `CLAUDE_EFFORT` read `medium`, so comparing effort stopped a window that was
+  // set correctly, and its remedy named a terminal nobody here uses.
+  says("2h: a model mismatch names the picker or /model as the way to switch",
+    offer.context.includes("names both models and how to switch — the model picker or the `/model` command"));
+  says("2h: a handover's effort is never compared — no CLAUDE_EFFORT read, no claude --effort remedy",
+    !offer.context.includes("CLAUDE_EFFORT") && !offer.context.includes("claude --effort"));
+  says("2h: the effort on the model: line is a note for the developer to set in the picker",
+    offer.context.includes("The effort on that line is a note for the developer to set in the picker, and nothing compares it."));
   says("a new idea's goal is asked in plain questions, never a card (RD.DEVEX.AGENT.077)",
     offer.context.includes("Something new in the first prompt gets its goal asked in one or two plain questions, never lettered options and never a `Q<n>` card"));
   says("a row marked in progress is left, its age said, and asked about",

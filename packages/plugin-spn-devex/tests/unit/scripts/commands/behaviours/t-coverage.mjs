@@ -198,6 +198,89 @@ console.log("\n=== behaviour-coverage — one root journey run, credited to ever
   ok("a Tier no vocabulary declares is a named finding", result.findings.some((one) => one.message.includes('Tier "UNITT"')), JSON.stringify(result.findings));
 }
 
+console.log("\n=== behaviour-coverage — the domains, with Built in behaviours (N122 5.3d)");
+
+/** Rows `[id, tier, status]` in one behaviours file, at a path under the seat. */
+const rowsAt = (path, ...rows) => ({
+  [`docs/${SEAT.behaviors}/${path}`]: [
+    "| Id | Who | Does | Sees | Type | Tier | Status | Updated at |",
+    "| --- | --- | --- | --- | --- | --- | --- | --- |",
+    ...rows.map(([id, tier, status]) => `| ${id} | a person | acts | a result | POSITIVE | ${tier} | ${status} | — |`),
+    "",
+  ].join("\n"),
+});
+const whereChapter = (domain, pkg, name, path) => ({
+  [`docs/${SEAT.constructs}/${domain}/${name}.md`]: `# ${name}\n`,
+  [`docs/${SEAT.capabilities}/${domain}/${pkg}/${name}.md`]: [
+    `# ${name} in ${pkg}`, "", "## Where", "", "| Part | Lives in | What it is |", "| --- | --- | --- |",
+    `| a part | \`${path}\` | what it is |`, "",
+  ].join("\n"),
+});
+
+{
+  const root = repo({ ...APPS, ...node("packages/store", "MODULE_SERVER"), ...node("packages/web", "MODULE_SERVER"),
+    "packages/store/src/app/services/StoreService.ts": "export const value = 1;\n",
+    "packages/web/src/app/services/PageService.ts": "export const value = 1;\n",
+    ...rowsAt("01-core/01-store.md", ["COR.STORE.01", "UNIT", "SUCCESS"], ["COR.STORE.02", "UNIT", "PLANNED"]),
+    ...whereChapter("01-core", "store", "01-store", "src/app/services/StoreService.ts"),
+    ...rowsAt("02-web/01-page.md", ["WEB.PAGE.01", "UNIT", "FAILED"]),
+    ...whereChapter("02-web", "web", "01-page", "src/app/services/Missing.ts"),
+    [`docs/${SEAT.behaviors}/02-web/README.md`]: "# Behaviors — Web\n",
+    ...rowsAt("README.md", ["COR.REPO.01", "UNIT", "PENDING"]) });
+  const result = json(root);
+  const domains = Object.fromEntries((result.domains ?? []).map((one) => [one.domain, one]));
+  ok("5.3d: the tests measurement groups behaviours by domain, in the docs tree's order, named by the README's title",
+    JSON.stringify((result.domains ?? []).map((one) => [one.domain, one.name])) === '[["01-core","core"],["02-web","Web"]]', JSON.stringify(result.domains));
+  const core = domains["01-core"];
+  ok("5.3d: a domain carries Written, Built in behaviours, and the four statuses, which sum to Written",
+    core?.written === 2 && core.built === 2 && core.status.SUCCESS === 1 && core.status.PLANNED === 1
+      && core.status.FAILED === 0 && core.status.PENDING === 0, JSON.stringify(core));
+  ok("5.3d: a behaviour whose design topic is not built is written and not built",
+    domains["02-web"]?.written === 1 && domains["02-web"].built === 0 && domains["02-web"].status.FAILED === 1, JSON.stringify(domains["02-web"]));
+  ok("5.3d: the whole-repository row holds the README's behaviours, never built",
+    result.wholeRepository?.written === 1 && result.wholeRepository.built === 0 && result.wholeRepository.status.PENDING === 1
+      && JSON.stringify(result.wholeRepository.files) === `["docs/${SEAT.behaviors}/README.md"]`, JSON.stringify(result.wholeRepository));
+}
+
+console.log("\n=== behaviour-coverage — Run health in the report's plain words (N122 5.3c)");
+
+{
+  const root = repo({ ...APPS, ...node("packages/iam", "MODULE_SERVER"), ...node("packages/org", "MODULE_SERVER"),
+    ...node("apps/web", "APP_WEB"), ...node("apps/web/src/modules/home", "MODULE_WEB"), ...node("apps/web/src/modules/list", "MODULE_WEB"),
+    "packages/iam/tests/unit/iam.spec.ts": "// a case\n",
+    "apps/web/tests/journeys/a.spec.ts": "// a case\n", "apps/web/tests/component/a.ct.spec.ts": "// a case\n",
+    ...register(["IAM.LOGIN.01", "UNIT", "SUCCESS"], ["IAM.LOGIN.02", "INTEGRATION", "PLANNED"]),
+    ...artifact("packages/iam", "UNIT", [["IAM.LOGIN.01", "SUCCESS"], ["NOPE.GHOST.01", "SUCCESS"], ["IAM.LOGIN.02", "SUCCESS"]]) });
+  const result = json(root);
+  const health = Object.fromEntries((result.health ?? []).map((one) => [one.problem, one]));
+  const owed = health["A project owes a test level and has no test there"];
+  ok("5.3c: an owed level with no test is named in plain words, with a count, where and what fixes it",
+    owed?.count === 3 && owed.where === "web: 2 modules · org. All at Unit."
+      && owed.fix === "Write one test at the owed level in each project listed. Their project types, MODULE_SERVER and MODULE_WEB, owe that level.",
+    JSON.stringify(owed));
+  const unknown = health["A test names an id that no behaviour has"];
+  ok("5.3c: a test naming an id no behaviour has is counted by id, with where and the fix",
+    unknown?.count === 1 && unknown.where === "iam, Unit" && JSON.stringify(unknown.items) === '[{"node":"packages/iam","tier":"UNIT","ids":["NOPE.GHOST.01"]}]'
+      && unknown.fix === "Rename each id to the behaviour it proves, or remove it from the test. Until then these tests prove nothing here.",
+    JSON.stringify(unknown));
+  const other = health["A test names a behaviour written for another level"];
+  ok("5.3c: a test naming a behaviour written for another level names the level it was written for",
+    other?.count === 1 && other.where === "iam, Unit"
+      && JSON.stringify(other.items) === '[{"node":"packages/iam","tier":"UNIT","declaredAt":"INTEGRATION","ids":["IAM.LOGIN.02"]}]'
+      && other.fix === "Move the id to a test at the level the behaviour names, or change the level in the behaviour. Until then these tests do not count.",
+    JSON.stringify(other));
+  ok("5.3c: the three problems are listed in the report's order", JSON.stringify((result.health ?? []).map((one) => one.problem)) === JSON.stringify([
+    "A project owes a test level and has no test there", "A test names an id that no behaviour has", "A test names a behaviour written for another level"]));
+  ok("5.3c: the plain reading prints each problem with its count", measure(root).includes("health: A test names an id that no behaviour has — 1 · iam, Unit"), measure(root));
+}
+
+{
+  const root = repo({ ...APPS, ...node("packages/iam", "MODULE_SERVER"),
+    ...register(["IAM.LOGIN.01", "UNIT", "SUCCESS"]), ...artifact("packages/iam", "UNIT", [["IAM.LOGIN.01", "SUCCESS"]]) });
+  const counts = (json(root).health ?? []).map((one) => one.count);
+  ok("5.3c: a healthy run lists each problem at 0, so none reads as unchecked", JSON.stringify(counts) === "[0,0,0]", JSON.stringify(json(root).health));
+}
+
 console.log("\n=== behaviour-coverage — an absence, and the same bytes twice");
 
 {

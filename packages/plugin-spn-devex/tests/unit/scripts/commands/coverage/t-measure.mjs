@@ -87,7 +87,7 @@ console.log("=== coverage measure — the three sides");
     result.repositoryLevel.written.rows === 3 && result.repositoryLevel.proved.rows === 2 && result.repositoryLevel.repositoryRows === 1,
     JSON.stringify(result.repositoryLevel));
   ok("each side names its unit, so rows are never compared with constructs",
-    result.units.built === "constructs" && result.units.proved === "behaviour rows" && result.units.builtNotStated === "seats in src/", JSON.stringify(result.units));
+    result.units.built === "behaviour rows · constructs" && result.units.proved === "behaviour rows" && result.units.builtNotStated === "seats in src/", JSON.stringify(result.units));
   ok("a package and an app are measured apart", result.packages.length === 1 && result.apps.length === 0);
 }
 
@@ -267,6 +267,71 @@ console.log("=== coverage measure — what a Where row declares");
   const store = levelOf(json(root), "packages/store");
   ok("a bare name in a cell is the sibling of the path before it, and an ellipsis is a wildcard",
     store?.built.constructs === 1 && store?.statedNotBuilt.count === 0, JSON.stringify(store?.statedNotBuilt));
+}
+
+console.log("=== coverage measure — Built in behaviours, and the domains (N122 5.3b, 5.3d)");
+
+/** A construct seat file and its rows in a named domain folder, each row `[id, status]`. */
+const constructIn = (domain, name, ...rows) => ({
+  [`docs/${SEAT.constructs}/${domain}/${name}.md`]: `# ${name}\n`,
+  [`docs/${SEAT.behaviors}/${domain}/${name}.md`]: [
+    "| Id | Who | Does | Sees | Type | Tier | Status | Updated at |",
+    "| --- | --- | --- | --- | --- | --- | --- | --- |",
+    ...rows.map(([id, status]) => `| ${id} | a person | acts | a result | POSITIVE | UNIT | ${status} | — |`),
+    "",
+  ].join("\n"),
+});
+const chapterIn = (domain, pkg, name, ...paths) => Object.fromEntries(Object.entries(chapter(pkg, name, ...paths))
+  .map(([path, body]) => [path.replace(`/01-core/`, `/${domain}/`), body]));
+const repositoryRow = (id, status) => ({
+  [`docs/${SEAT.behaviors}/README.md`]: [
+    "| Id | Who | Does | Sees | Type | Tier | Status | Updated at |",
+    "| --- | --- | --- | --- | --- | --- | --- | --- |",
+    `| ${id} | a person | clones it | it builds | POSITIVE | UNIT | ${status} | — |`, "",
+  ].join("\n"),
+});
+
+{
+  const root = repo({
+    ...APPS, ...node("packages/store", "MODULE_SERVER"), ...node("packages/web", "MODULE_SERVER"),
+    ...code("packages/store/src/app/services/StoreService.ts"), ...code("packages/web/src/app/services/PageService.ts"),
+    ...constructIn("01-core", "01-store", ["COR.STORE.01", "SUCCESS"], ["COR.STORE.02", "PLANNED"]),
+    ...chapterIn("01-core", "store", "01-store", "src/app/services/StoreService.ts"),
+    ...constructIn("02-web", "01-page", ["WEB.PAGE.01", "SUCCESS"]),
+    ...chapterIn("02-web", "web", "01-page", "src/app/services/Missing.ts"),
+    [`docs/${SEAT.behaviors}/02-web/README.md`]: "# Behaviors — Web\n",
+    ...repositoryRow("COR.REPO.01", "SUCCESS"),
+  });
+  const result = json(root);
+  const store = levelOf(result, "packages/store");
+  const web = levelOf(result, "packages/web");
+  ok("5.3b: a level's Built counts the behaviours whose design topic is built",
+    store?.built.rows === 2 && web?.built.rows === 0 && store?.built.constructs === 1, JSON.stringify([store?.built, web?.built]));
+  ok("5.3b: the repository's Built counts behaviours too, and a whole-repository behaviour is never built",
+    result.repositoryLevel.built.rows === 2 && result.repositoryLevel.written.rows === 4, JSON.stringify(result.repositoryLevel));
+  ok("5.3b: the unit of Built names behaviours as well as design topics", result.units.built === "behaviour rows · constructs", JSON.stringify(result.units));
+
+  const domains = Object.fromEntries((result.domains ?? []).map((one) => [one.domain, one]));
+  ok("5.3d: one row per domain folder under 03-behaviors/, in the docs tree's order",
+    JSON.stringify((result.domains ?? []).map((one) => one.domain)) === '["01-core","02-web"]', JSON.stringify(result.domains));
+  ok("5.3d: a domain is named by its README's title, or by its folder without the number",
+    domains["02-web"]?.name === "Web" && domains["01-core"]?.name === "core", JSON.stringify(result.domains));
+  const core = domains["01-core"];
+  ok("5.3d: a built domain counts Written, Built and Proved in behaviours, and the gaps are Written less each",
+    core?.written.rows === 2 && core.built.rows === 2 && core.proved.rows === 1 && core.notBuilt.rows === 0 && core.notProved.rows === 1
+      && core.written.constructs === 1 && core.built.constructs === 1, JSON.stringify(core));
+  const page = domains["02-web"];
+  ok("5.3d: a domain whose design topic is not built counts its behaviours as not built, even a proved one",
+    page?.written.rows === 1 && page.built.rows === 0 && page.proved.rows === 1 && page.notBuilt.rows === 1 && page.notProved.rows === 0, JSON.stringify(page));
+  const whole = result.wholeRepository;
+  ok("5.3d: the whole-repository row holds the behaviours no domain holds, none of them built",
+    whole?.written.rows === 1 && whole.built.rows === 0 && whole.proved.rows === 1 && whole.notBuilt.rows === 1
+      && JSON.stringify(whole.files) === `["docs/${SEAT.behaviors}/README.md"]`, JSON.stringify(whole));
+  ok("5.3d: the domains and the whole-repository row add up to the repository",
+    (result.domains ?? []).reduce((sum, one) => sum + one.written.rows, 0) + (whole?.written.rows ?? 0) === result.repositoryLevel.written.rows
+      && (result.domains ?? []).reduce((sum, one) => sum + one.built.rows, 0) === result.repositoryLevel.built.rows);
+  ok("5.3d: the plain reading prints Built in behaviours and a line per domain",
+    measure(root).includes("2 rows built") && measure(root).includes("domain 02-web (Web)"), measure(root));
 }
 
 console.log("=== coverage measure — the answer as a whole");

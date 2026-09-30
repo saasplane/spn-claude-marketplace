@@ -679,9 +679,10 @@ export function closing(destination: string): boolean {
 // `<div class="open">` wrapping `<h4 id="q<n>">`, and this reader looks for the `h4` alone. The
 // `.open` block carries the amber edge that marks a card undecided, and the rail's count badge is
 // `s4.querySelectorAll('.open').length`, so a card written any other way is invisible to the page as
-// well as to this check. A `<tr id="q<n>">` is a row in an index of cards already settled, and a
-// `<div class="card" id="q<n>">` with an `h3` is neither; both are left unread on purpose, because
-// two spellings with one reader is the drift `Q185` option C was refused for.
+// well as to this check. So ANY OTHER `id="q<n>"` IN `Open` IS REFUSED rather than read (Q389 A):
+// `div.card` is the green decided shape, and a card inside one escapes the rail's count. A second
+// spelling is never read as a card, because two spellings with one reader is the drift `Q185`
+// option C was refused for.
 //
 // A card runs from its own `h4` to the next one or the end of the section. Reading it by the
 // wrapping `<div>` does not work: the card nests a `<div class="scroll">` table and a
@@ -768,6 +769,44 @@ function cardAt(html: string, start: number): string {
   return html.slice(start, next ? next.index : html.length);
 }
 
+/** Every element in `Open` carrying `id="q<n>"`, with its tag, and a `<div>` open or close tag. */
+const CARD_ID = /<([a-z][a-z0-9]*)\b[^>]*\bid="(q\d+)"[^>]*>/gi;
+const DIV_TAG = /<div\b([^>]*)>|<\/div\s*>/gi;
+
+/** The class list of the `<div>` a position sits directly inside, or null where it sits in none. */
+function enclosingDivClass(html: string, at: number): string | null {
+  const open: string[] = [];
+  DIV_TAG.lastIndex = 0;
+  for (let m = DIV_TAG.exec(html); m && m.index < at; m = DIV_TAG.exec(html)) {
+    if (m[0].startsWith("</")) open.pop();
+    else open.push(/\bclass="([^"]*)"/i.exec(m[1])?.[1] ?? "");
+  }
+  return open.length ? open[open.length - 1] : null;
+}
+
+/**
+ * Each `id="q<n>"` in a page's `Open` section that is not an open card — an `h4` directly inside a
+ * `div.open` — with the shape it was written in instead.
+ */
+export function misshapenCards(page: string): Array<{ number: string; shape: string }> {
+  const section = OPEN_SECTION.exec(read(page));
+  if (!section) return [];
+  const html = section[0];
+  const out: Array<{ number: string; shape: string }> = [];
+  CARD_ID.lastIndex = 0;
+  for (let m = CARD_ID.exec(html); m; m = CARD_ID.exec(html)) {
+    const tag = m[1].toLowerCase();
+    const wrapper = tag === "div" ? /\bclass="([^"]*)"/i.exec(m[0])?.[1] ?? "" : enclosingDivClass(html, m.index);
+    const classes = (wrapper ?? "").split(/\s+/);
+    if (tag === "h4" && classes.includes("open")) continue;
+    const shape = tag === "h4"
+      ? `an \`h4\` inside ${wrapper === null ? "no `div`" : classes.includes("card") ? "a `div.card`" : `a \`div.${classes.filter(Boolean).join(".") || "div"}\``}`
+      : tag === "div" && classes.includes("card") ? "a `div.card`" : `a \`${tag}\``;
+    out.push({ number: m[2].toUpperCase(), shape });
+  }
+  return out;
+}
+
 /**
  * Cards still in `Open` that are already answered — by an arc's log, or by the card's own decision.
  * The second source is finding F5: the page is the record, and a check that reads only the log
@@ -840,6 +879,17 @@ export function gateDocumentsFirst(payload: Payload): Verdict {
           `somebody has already settled. Fold each one into the section that now states it, and ` +
           `take it out of \`Open\`: an answered question is never an entry with the answer ` +
           `written beside it (05-artifacts.md, The approach document).` };
+      }
+      const misshapen = pages.flatMap((page) => misshapenCards(page).map((card) => ({ page: basename(page), ...card })));
+      if (misshapen.length) {
+        const named = misshapen.slice(0, 6).map((card) => `${card.number} in ${card.page} (${card.shape})`).join(" · ");
+        const more = misshapen.length > 6 ? ` and ${misshapen.length - 6} more` : "";
+        return { note:
+          `A card in \`Open\` is not in the open-card shape — ${named}${more}. An open card is a ` +
+          `\`<div class="open">\` wrapping \`<h4 id="q<n>">\` (RD.DEVEX.WORKSPACE.147); \`div.card\` is ` +
+          `the decided shape, so the page shows the question as settled and the rail does not count ` +
+          `it. Fold an answered card into the section that states its decision, and rewrite a ` +
+          `question still open in the open shape (05-artifacts.md, A card).` };
       }
     }
   }

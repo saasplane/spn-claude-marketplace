@@ -17,6 +17,7 @@ import { declaredRows, idsIn } from "../../../../../plugin-support-lib/src/lib/r
 import { owedBy, TIERS } from "../../../../../plugin-support-lib/src/lib/kinds.ts";
 import { artifactPaths, newest, read, readArtifact, worst } from "../../../../../plugin-support-lib/src/lib/runs.ts";
 import type { Run } from "../../../../../plugin-support-lib/src/lib/runs.ts";
+import { constructKeyOf, domainName, domainOf, domainsOf, readChapters } from "../coverage/_join.ts";
 
 const isDir = (path: string): boolean => { try { return statSync(path).isDirectory(); } catch { return false; } };
 const isFile = (path: string): boolean => { try { return statSync(path).isFile(); } catch { return false; } };
@@ -84,6 +85,9 @@ export function foundationAbsence(root: string): Record<string, unknown> | null 
       `would read as a failure rather than as an absence.`,
     tiers: [],
     rows: [],
+    domains: [],
+    wholeRepository: null,
+    health: [],
     findings: [],
   };
   return { ...measured, digest: digestOf(measured), report: null };
@@ -187,6 +191,19 @@ export function creditedByClientRun(root: string, nodes: string[], ranBy: string
   if (!clientRan) return [];
   return nodes.filter((node) => kindOf(node) === "APP_SERVER").map(nameOf);
 }
+
+/** A tier as a report writes it: `UNIT` → `Unit`. */
+const plainTier = (tier: string): string => tier.charAt(0) + tier.slice(1).toLowerCase();
+
+/** Words joined as a sentence lists them: `a`, `a and b`, `a, b and c`. */
+const listed = (words: string[]): string =>
+  words.length <= 1 ? words.join("") : `${words.slice(0, -1).join(", ")} and ${words[words.length - 1]}`;
+
+/** The row statuses a Repository row counts, each always present so a zero reads as counted. */
+const STATUS_WORDS = ["SUCCESS", "FAILED", "PENDING", "PLANNED", "MANUAL"] as const;
+
+/** One problem with the tests themselves, as the report's Run health table names it (N122 spec § Tests). */
+type Health = { problem: string; count: number; where: string; fix: string; items: Array<Record<string, unknown>> };
 
 /** The measurement for one repository. */
 export function measure(root: string): Record<string, unknown> {
@@ -299,6 +316,107 @@ export function measure(root: string): Record<string, unknown> {
     return { tier: tier, state: state, owedBy: owedByNames, unrunBy: unrunBy, noCase: noCase, creditedTo: creditedTo, runs: runs, rows: rowCount, reason: reason };
   });
 
+  // THE REPOSITORY TABLE, BY DOMAIN. Built is the coverage report's own: a behaviour whose design
+  // topic is built, read from the same capability chapters by the same join, so the two reports can
+  // never disagree on it. A behaviour about the whole repository has no design topic and is never built.
+  const levels = nodes.filter((node) => /^(apps|packages)\/[^/]+$/.test(nameOf(node)));
+  const builtKeys = new Set(readChapters(root, rows.map((row) => constructKeyOf(row.file)).filter((key): key is string => key !== null), levels).built);
+  const tally = (group: typeof rows) => ({
+    written: group.length,
+    built: group.filter((row) => { const key = constructKeyOf(row.file); return key !== null && builtKeys.has(key); }).length,
+    status: {
+      ...Object.fromEntries(STATUS_WORDS.map((word) => [word, group.filter((row) => row.status === word).length])),
+      unreadable: group.filter((row) => row.status === null).length,
+    },
+  });
+  const domains = domainsOf(root, rows.map((row) => domainOf(row.file)).filter((one): one is string => one !== null))
+    .map((domain) => ({ domain, name: domainName(root, domain), ...tally(rows.filter((row) => domainOf(row.file) === domain)) }));
+  const aboutTheRepository = rows.filter((row) => domainOf(row.file) === null);
+  const wholeRepository = { files: [...new Set(aboutTheRepository.map((row) => row.file))].sort(), ...tally(aboutTheRepository) };
+
+  // RUN HEALTH: problems with the tests themselves, one entry per kind, in the report's plain words.
+  const projectOf = (name: string): string => { const { carrier } = carrierOf(name); return carrier === "." ? basename(root) : basename(carrier); };
+  const tierOrder = (tier: string): number => TIERS.indexOf(tier);
+  const byCount = (left: [string, number], right: [string, number]): number => right[1] - left[1] || left[0].localeCompare(right[0]);
+
+  const owedItems = tiers.flatMap((tier) => tier.noCase.map((name) => ({ node: name, tier: tier.tier, kind: owedByNode.has(name) ? kindOf(join(root, name)) : null })))
+    .sort((left, right) => left.node.localeCompare(right.node) || tierOrder(left.tier) - tierOrder(right.tier));
+  const owedWhere = (): string => {
+    if (owedItems.length === 0) return "";
+    const perProject = new Map<string, { self: boolean; modules: number }>();
+    for (const item of owedItems) {
+      const one = perProject.get(projectOf(item.node)) ?? { self: false, modules: 0 };
+      if (carrierOf(item.node).scope === "") one.self = true; else one.modules += 1;
+      perProject.set(projectOf(item.node), one);
+    }
+    const parts = [...perProject.entries()].map(([project, one]) => [project, (one.self ? 1 : 0) + one.modules] as [string, number]).sort(byCount)
+      .map(([project]) => {
+        const one = perProject.get(project)!;
+        const modules = `${one.modules} module${one.modules === 1 ? "" : "s"}`;
+        return one.modules === 0 ? project : one.self ? `${project}: itself and ${modules}` : `${project}: ${modules}`;
+      });
+    const levelsOwed = [...new Set(owedItems.map((item) => item.tier))].sort((left, right) => tierOrder(left) - tierOrder(right)).map(plainTier);
+    const at = levelsOwed.length === 1 ? `${owedItems.length > 1 ? "All at" : "At"} ${levelsOwed[0]}.` : `At ${listed(levelsOwed)}.`;
+    return `${parts.join(" · ")}. ${at}`;
+  };
+  const kinds = [...new Set(owedItems.map((item) => item.kind).filter((kind): kind is string => kind !== null))].sort();
+
+  const declaredTiers = new Map<string, Set<string>>();
+  for (const row of declared) declaredTiers.set(row.id, (declaredTiers.get(row.id) ?? new Set<string>()).add(row.tier));
+  const unknown = new Map<string, { node: string; tier: string; ids: Set<string> }>();
+  const elsewhere = new Map<string, { node: string; tier: string; declaredAt: string; ids: Set<string> }>();
+  for (const [name, found] of runsByNode) {
+    for (const result of found.flatMap((run) => run.results)) {
+      const at = declaredTiers.get(result.id);
+      if (at === undefined) {
+        const key = `${name}|${result.tier}`;
+        (unknown.get(key) ?? unknown.set(key, { node: name, tier: result.tier, ids: new Set() }).get(key)!).ids.add(result.id);
+        continue;
+      }
+      const own = [...at].filter((tier) => TIERS.includes(tier)).sort((left, right) => tierOrder(left) - tierOrder(right));
+      if (own.length === 0 || own.includes(result.tier)) continue;
+      const key = `${name}|${result.tier}|${own[0]}`;
+      (elsewhere.get(key) ?? elsewhere.set(key, { node: name, tier: result.tier, declaredAt: own[0], ids: new Set() }).get(key)!).ids.add(result.id);
+    }
+  }
+  const idItems = <T extends { node: string; tier: string; ids: Set<string> }>(groups: Map<string, T>) => [...groups.values()]
+    .sort((left, right) => left.node.localeCompare(right.node) || tierOrder(left.tier) - tierOrder(right.tier))
+    .map((group) => ({ ...group, ids: [...group.ids].sort() }));
+  const idsWhere = (items: Array<{ node: string; tier: string; ids: string[] }>): string => {
+    const perProject = new Map<string, { ids: number; tiers: Set<string> }>();
+    for (const item of items) {
+      const one = perProject.get(projectOf(item.node)) ?? { ids: 0, tiers: new Set<string>() };
+      one.ids += item.ids.length;
+      one.tiers.add(item.tier);
+      perProject.set(projectOf(item.node), one);
+    }
+    const levelsOf = (one: { tiers: Set<string> }): string => listed([...one.tiers].sort((left, right) => tierOrder(left) - tierOrder(right)).map(plainTier));
+    const ranked = [...perProject.entries()].map(([project, one]) => [project, one.ids] as [string, number]).sort(byCount);
+    if (ranked.length === 1) return `${ranked[0][0]}, ${levelsOf(perProject.get(ranked[0][0])!)}`;
+    return ranked.map(([project, count]) => `${project}: ${count} id${count === 1 ? "" : "s"}, ${levelsOf(perProject.get(project)!)}`).join(" · ");
+  };
+  const unknownItems = idItems(unknown);
+  const elsewhereItems = idItems(elsewhere);
+  const idCount = (items: Array<{ ids: string[] }>): number => items.reduce((sum, item) => sum + item.ids.length, 0);
+  const health: Health[] = [
+    {
+      problem: "A project owes a test level and has no test there", count: owedItems.length, where: owedWhere(),
+      fix: "Write one test at the owed level in each project listed." + (kinds.length === 0 ? ""
+        : kinds.length === 1 ? ` Its project type, ${kinds[0]}, owes that level.` : ` Their project types, ${listed(kinds)}, owe that level.`),
+      items: owedItems,
+    },
+    {
+      problem: "A test names an id that no behaviour has", count: idCount(unknownItems), where: unknownItems.length ? idsWhere(unknownItems) : "",
+      fix: "Rename each id to the behaviour it proves, or remove it from the test. Until then these tests prove nothing here.",
+      items: unknownItems,
+    },
+    {
+      problem: "A test names a behaviour written for another level", count: idCount(elsewhereItems), where: elsewhereItems.length ? idsWhere(elsewhereItems) : "",
+      fix: "Move the id to a test at the level the behaviour names, or change the level in the behaviour. Until then these tests do not count.",
+      items: elsewhereItems,
+    },
+  ];
+
   const ranAt = newest(allRuns);
   const measured = {
     repository: basename(root),
@@ -306,6 +424,9 @@ export function measure(root: string): Record<string, unknown> {
     absence: null,
     tiers: tiers,
     rows: rows,
+    domains: domains,
+    wholeRepository: wholeRepository,
+    health: health,
     findings: findings,
   };
   const digest = digestOf(measured);
@@ -334,6 +455,11 @@ export function describeResult(result: Record<string, any>): string[] {
   lines.push(`  not run: ${result.rows.filter((row: any) => row.tier !== null && !row.tierRan).length} row(s) whose tier no ` +
     `artifact speaks for · no tier: ${result.rows.filter((row: any) => row.tier === null).length} row(s) no run can reach`);
   lines.push(`  unstamped: ${result.rows.filter((row: any) => row.unstamped).length} row(s) a run named that do not carry what it found`);
+  const rowsLine = (label: string, one: any): string =>
+    `  ${label}: ${one.written} written · ${one.built} built · ${STATUS_WORDS.slice(0, 4).map((word) => `${word} ${one.status[word]}`).join(" · ")}`;
+  for (const domain of result.domains) lines.push(rowsLine(`domain ${domain.domain} (${domain.name})`, domain));
+  lines.push(rowsLine("the whole repository", result.wholeRepository));
+  for (const one of result.health) if (one.count > 0) lines.push(`  health: ${one.problem} — ${one.count} · ${one.where}`);
   for (const one of result.findings) lines.push(`  ${one.ftype} ${one.project} ${one.message}`);
   if (result.report !== null) {
     lines.push(`  ${result.report.path} — ` +
