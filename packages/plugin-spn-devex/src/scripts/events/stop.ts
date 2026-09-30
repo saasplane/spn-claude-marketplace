@@ -41,7 +41,7 @@ import { TERMINAL } from "../checks/arc-status.ts";
 import { workspaceRoot } from "../lib/payload.ts";
 import { DEVEX, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { cacheState, welcome } from "./orientation.ts";
-import { begin, span, end, tagsOf } from "../lib/timing.ts";
+import { begin, span, end, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
 
 type Warning = { check: string; message: string };
 
@@ -1210,7 +1210,8 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   let event: { session_id?: string; transcript_path?: string; stop_hook_active?: boolean; agent_id?: string; cwd?: string } = {};
   try { event = JSON.parse(input || "{}") ?? {}; } catch { event = {}; }
   const session = String(event.session_id ?? "");
-  begin({ event: "Stop", tool: null, session: event.session_id ?? null, ...tagsOf(event) }, root);
+  begin({ script: "spn-devex", event: "Stop", tool: null, session: event.session_id ?? null, ...tagsOf(event),
+          process: { group: "events", action: "stop" } }, root);
   // THIS SESSION'S OWN BASELINE, and what its own tool calls wrote since it. The transcript is read
   // from where the last Stop left off, so a long session pays for its newest turn and not its whole
   // history. A first Stop reads nothing: there is no baseline to judge the writes against.
@@ -1228,20 +1229,20 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   const repeated = event.stop_hook_active === true && (baseline?.fired ?? []).includes("handover");
   // No baseline means this Stop ends the session's first turn: the one the welcome belongs to.
   const firstTurn = !baseline && event.transcript_path && !event.agent_id ? firstTurnText(event.transcript_path) : "";
-  const waiting = span("stop-cards", () => cardsWaiting(root));
+  const waiting = span({ group: "stop", action: "cards" }, () => cardsWaiting(root));
   const warnings = [
-    ...span("stop-reply-shape", () => checkReplyShape(reply, waiting,
+    ...span({ group: "stop", action: "reply-shape" }, () => checkReplyShape(reply, waiting,
       baseline?.cards ? waiting.filter((card) => !baseline.cards!.includes(card)) : [])),
-    ...span("stop-notes", () => checkNotesLanded(root, baseline?.arcs, touched)),
-    ...span("stop-arc-to-page", () => checkArcToPage(root)),
-    ...span("stop-runnable", () => checkRunnable(root, baseline?.at ?? 0, baseline?.steps ?? {}, touched)),
-    ...span("stop-hold", () => checkHold(root)),
+    ...span({ group: "stop", action: "notes" }, () => checkNotesLanded(root, baseline?.arcs, touched)),
+    ...span({ group: "stop", action: "arc-to-page" }, () => checkArcToPage(root)),
+    ...span({ group: "stop", action: "runnable" }, () => checkRunnable(root, baseline?.at ?? 0, baseline?.steps ?? {}, touched)),
+    ...span({ group: "stop", action: "hold" }, () => checkHold(root)),
     // A REPLY ANSWERING THE LAST FINDING IS NOT JUDGED BY THE SAME CHECK AGAIN. `stop_hook_active`
     // says this turn continues because a Stop hook spoke; where the handover check was what spoke,
     // the reply is its answer, and demanding the block a second time is the loop the developer met.
-    ...span("stop-handover", () => repeated ? [] : checkHandover(reply, root)),
-    ...span("stop-welcome", () => checkWelcome(firstTurn)),
-    ...span("stop-corpus", () => checkCorpus(root)),
+    ...span({ group: "stop", action: "handover" }, () => repeated ? [] : checkHandover(reply, root)),
+    ...span({ group: "stop", action: "welcome" }, () => checkWelcome(firstTurn)),
+    ...span({ group: "stop", action: "corpus" }, () => checkCorpus(root)),
   ];
   end();
   // AFTER the checks, never before: they compare against this and would compare against now.

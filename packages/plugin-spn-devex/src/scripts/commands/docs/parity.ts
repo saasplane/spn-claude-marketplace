@@ -7,7 +7,7 @@
 //   spn-devex docs parity <repo…>
 
 import { basename, relative, resolve } from "node:path";
-import { begin, record, end, commandFacts } from "../../lib/timing.ts";
+import { argsText, begin, commandFacts, end, record } from "../../../../../plugin-support-lib/src/lib/timing.ts";
 import { parityCheck, resolveWorkspace } from "./_lib.ts";
 
 export const describe = "the parity checks — the two seats pair, a chapter folder names a package, a Who names a persona";
@@ -25,10 +25,10 @@ function body(args: string[], workspace: string): number {
 export function run(args: string[]): number {
   const workspace = resolveWorkspace();
   const startedAt = performance.now();
-  begin(commandFacts(args), workspace);
+  begin(commandFacts("spn-devex", args), workspace);
   const code = body(args, workspace);
-  record("docs-parity", performance.now() - startedAt);
-  end();
+  record({ group: "docs", action: "parity", args: argsText(args) }, performance.now() - startedAt, code);
+  end(code);
   return code;
 }
 

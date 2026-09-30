@@ -22,6 +22,7 @@ export type ToolInput = {
   path?: string;
   pattern?: string;
   glob?: string;
+  run_in_background?: boolean;
 };
 
 export type Payload = {
@@ -30,6 +31,15 @@ export type Payload = {
   cwd?: string;
   session_id?: string;
   last_assistant_message?: string;
+  hook_event_name?: string;
+  /** The call a `PreToolUse` and its `PostToolUse` or `PostToolUseFailure` share. */
+  tool_use_id?: string;
+  /** What the tool returned, on `PostToolUse`. */
+  tool_response?: unknown;
+  /** Why the call failed, on `PostToolUseFailure`. */
+  error?: string;
+  /** The subagent that made the call; absent in the main window. */
+  agent_id?: string;
 };
 
 /** What a check decided. `deny` refuses the call; `note` is advice the turn reads. */

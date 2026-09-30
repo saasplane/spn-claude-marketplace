@@ -31,14 +31,14 @@
 // PreToolUse chain removes every other gate with it, which is worse than any single miss.
 
 import type { Payload, Verdict } from "../../../../plugin-support-lib/src/lib/payload.ts";
-import { begin, span, end as endTiming } from "../../../../plugin-support-lib/src/lib/timing.ts";
+import { begin, span, end as endTiming, tagsOf, type SpanName } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { emit, payload } from "../../../../plugin-support-lib/src/lib/payload.ts";
 import { subjectsFor } from "../checks/subjects.ts";
 
 // THE SUBJECTS ARE RESOLVED PER WRITE, not held in a module-level list, because which provider
 // answers is a fact about the file being written rather than about this plugin. A workspace holding
 // two stacks gets each one's rules on its own files, from one installed plugin.
-export async function dispatch(event: Payload, span: <T>(name: string, fn: () => T) => T): Promise<Verdict> {
+export async function dispatch(event: Payload, span: <T>(name: SpanName, fn: () => T) => T): Promise<Verdict> {
   const supplied = event.tool_input ?? {};
   if (!supplied.file_path) return null;            // every rule here reads a path
   const notes: string[] = [];
@@ -46,7 +46,7 @@ export async function dispatch(event: Payload, span: <T>(name: string, fn: () =>
     let verdict: Verdict = null;
     // A SUBJECT THAT THROWS IS SKIPPED, NEVER FATAL. A gate that crashes the PreToolUse chain
     // removes every other gate with it, which is worse than any single miss.
-    try { verdict = await span(subject.name, () => subject.validate(supplied)); }
+    try { verdict = await span({ group: subject.group, action: subject.action }, () => subject.validate(supplied)); }
     catch { continue; }
     if (!verdict) continue;
     if (verdict.deny) return verdict;               // the first refusal is the answer
@@ -65,7 +65,8 @@ const event = await payload();
 // separately, a partner may hold either without the other, and the installed cache puts a version
 // directory between a plugin and its files — so reaching across resolves at runtime, and a resolve
 // that misses returns the working pass-through, which is silence wearing the shape of success.
-begin({ event: "PreToolUse", tool: event?.tool_name ?? null, session: event?.session_id ?? null },
+begin({ script: "spn-apps", event: "PreToolUse", tool: event?.tool_name ?? null, session: event?.session_id ?? null,
+        ...tagsOf(event), process: { group: "events", action: "pretooluse" } },
       event?.cwd ?? process.cwd());
 let verdict: Verdict = null;
 try { verdict = event ? await dispatch(event, span) : null; } catch { verdict = null; }

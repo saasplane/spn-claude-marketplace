@@ -12,13 +12,14 @@
 
 | Part of the construct | Lives in | What it is |
 | --- | --- | --- |
-| The event wiring | `packages/plugin-spn-devex/src/hooks/hooks.json` | four entries, one per moment, each naming a script and a timeout |
+| The event wiring | `packages/plugin-spn-devex/src/hooks/hooks.json` | five entries, one per moment plus `PostToolUseFailure` for Bash, each naming a script and a timeout |
 | The window opening | `packages/plugin-spn-devex/src/scripts/events/orientation.ts` | `SessionStart`, on `startup`, `resume` or `clear` |
 | A call about to run | `packages/plugin-spn-devex/src/scripts/events/pretooluse.ts` | `PreToolUse`, matching `Read`, `Write`, `Edit`, `Bash`, `Grep`, `Glob`, `NotebookRead` and `Artifact`, and the dispatcher behind it |
-| A shell command that finished | `packages/plugin-spn-devex/src/scripts/events/closed.ts` | `PostToolUse`, matching `Bash` |
+| A shell command that finished | `packages/plugin-spn-devex/src/scripts/events/closed.ts` | `PostToolUse` and `PostToolUseFailure`, matching `Bash` |
 | A turn about to end | `packages/plugin-spn-devex/src/scripts/events/stop.ts` | `Stop`, with no matcher |
 | The verdict and the payload | `packages/plugin-spn-devex/src/scripts/lib/payload.ts` | the `Payload` and `Verdict` types, `readPayload`, `emit`, `runAlone` |
-| What a run cost | `packages/plugin-spn-devex/src/scripts/lib/timing.ts` | one span per check, written only when the developer asked for it, and the tags each session and agent carries forward in `telemetry/tags.json` |
+| What a run cost | `packages/plugin-support-lib/src/lib/timing.ts` | one line per check, in the shape every plugin writes, only when the developer asked for it, and the tags each session and agent carries forward in `telemetry/tags.json` |
+| What a Bash command cost | `packages/plugin-spn-devex/src/scripts/lib/command-reader.ts` · `lib/bash-timing.ts` | the command read into the programs it runs, and the start file the hooks before and after the call pair on |
 
 ## Follows the pattern
 
@@ -84,8 +85,8 @@
 ### Measuring is free; writing is the cost
 
 **Why** — *telemetry must not make the gate slower*, and a gate that fails because timing failed is worse than a number nobody recorded.
-**What** — every run is timed, and each line also names the workstream, arc, order and agent the call belongs to, so a later reading can join a cost to the work that paid it without guessing from a path. Whether any of it reaches disk is a switch the developer sets, and every path swallows its own errors.
-**How** — `begin` touches no filesystem; the switch is read at the moment of writing, under a fixed size cap; `tagsOf` matches every string in a call's input against a workstream path and keeps the most specific match — an order over an arc over a bare workstream — reading the hook's own `agent_id` for which agent made the call. **The tags carry forward** (RD.DEVEX.WORKSPACE.185): per session and agent, the last tagged call's tags sit in `telemetry/tags.json`, written only while the switch is on; a call that touches no workstream path inherits them, a call inside the same work keeps what it does not name, and a call that names other work replaces them. `packages/plugin-spn-devex/src/scripts/lib/timing.ts`, `carryTags`.
+**What** — every run is timed, and so is each Bash command the agent runs through a program the filter names. Every line has one shape — the program or plugin, up to three levels below it, the arguments, the time, the exit code, the repository and a UTC time — and names the workstream, arc, order and agent the call belongs to, so a later reading can join a cost to the work that paid it without guessing from a path. Whether any of it reaches disk is a switch the developer sets, and every path swallows its own errors.
+**How** — `begin` touches no filesystem; the switch is read at the moment of writing, under a fixed size cap; `tagsOf` matches every string in a call's input against a workstream path and keeps the most specific match — an order over an arc over a bare workstream — reading the hook's own `agent_id` for which agent made the call. **The tags carry forward** (RD.DEVEX.WORKSPACE.185): per session and agent, the last tagged call's tags sit in `telemetry/tags.json`, written only while the switch is on; a call that touches no workstream path inherits them, a call inside the same work keeps what it does not name, and a call that names other work replaces them. **A Bash command is paired on its `tool_use_id`**: `PreToolUse` writes `telemetry/pending/<tool_use_id>.json` for a matched command while the switch is on, and `PostToolUse` or `PostToolUseFailure` reads it, writes one line per program with the whole call's time and exit code, and removes it; a start file older than a day is removed when the next one is written. The programs are `spnutils`, the plugin CLIs, `nx`, `git` and `docker`, and `.spndevex/.debug/telemetry/filter.json` adds or removes them. `packages/plugin-support-lib/src/lib/timing.ts`, `carryTags`; `packages/plugin-spn-devex/src/scripts/lib/bash-timing.ts`.
 
 ## Between modules
 

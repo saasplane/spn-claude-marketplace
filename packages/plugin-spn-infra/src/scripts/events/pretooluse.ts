@@ -8,13 +8,13 @@
 // that refuses what it does not understand teaches people to work around it.
 
 import { emit, payload, type Payload, type ToolInput, type Verdict } from "../../../../plugin-support-lib/src/lib/payload.ts";
-import { begin, span, end as endTiming } from "../../../../plugin-support-lib/src/lib/timing.ts";
+import { begin, span, end as endTiming, tagsOf, type SpanName } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { subjects, pathOnly, written } from "../checks/subjects.ts";
 
 // THE SUBJECTS ARE RESOLVED PER WRITE rather than held in a module-level list, because which
 // providers exist is read from the folder rather than written here. The set is the same every
 // time in practice; what changes is that adding a cloud needs no edit to this file or its gate.
-export async function dispatch(event: Payload, time: <T>(name: string, fn: () => T) => T): Promise<Verdict> {
+export async function dispatch(event: Payload, time: <T>(name: SpanName, fn: () => T) => T): Promise<Verdict> {
   const supplied: ToolInput = event.tool_input ?? {};
   const path = supplied.file_path;
   if (!path) return null;                          // every rule here is about a file
@@ -28,7 +28,7 @@ export async function dispatch(event: Payload, time: <T>(name: string, fn: () =>
     let verdict: Verdict = null;
     // A SUBJECT THAT THROWS IS SKIPPED, NEVER FATAL. A gate that crashes the PreToolUse chain
     // removes every other gate with it, which is worse than any single miss.
-    try { verdict = time(subject.name, () => subject.validate(path, text)); }
+    try { verdict = time({ group: subject.group, action: subject.action }, () => subject.validate(path, text)); }
     catch { continue; }
     if (verdict?.deny) return verdict;             // first deny wins
   }
@@ -38,7 +38,8 @@ export async function dispatch(event: Payload, time: <T>(name: string, fn: () =>
 const event = await payload();
 // MEASURING IS FREE; WRITING IS THE COST. `begin` touches no filesystem, so the loop always times
 // and always reports. What the window decides is whether any of it is ever written down.
-begin({ event: "PreToolUse", tool: event?.tool_name ?? null, session: event?.session_id ?? null },
+begin({ script: "spn-infra", event: "PreToolUse", tool: event?.tool_name ?? null, session: event?.session_id ?? null,
+        ...tagsOf(event), process: { group: "events", action: "pretooluse" } },
       event?.cwd ?? process.cwd());
 let verdict: Verdict = null;
 try { verdict = event ? await dispatch(event, span) : null; } catch { verdict = null; }

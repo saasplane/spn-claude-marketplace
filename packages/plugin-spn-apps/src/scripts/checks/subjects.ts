@@ -20,7 +20,13 @@ import type { ToolInput, Verdict } from "../../../../plugin-support-lib/src/lib/
 import { stackOf } from "../lib/stack.ts";
 
 /** One subject, parsed once by the stack's own validator. */
-export type Subject = { name: string; validate: (input: ToolInput) => Verdict | Promise<Verdict> };
+export type Subject = {
+  name: string;
+  /** The subject and the stack that answers it, as the telemetry line's group and action (`src` › `ts`). */
+  group: string;
+  action: string;
+  validate: (input: ToolInput) => Verdict | Promise<Verdict>;
+};
 
 /**
  * The subjects an apps node has, cheapest first.
@@ -45,7 +51,8 @@ export async function subjectsFor(path: string): Promise<Subject[]> {
   for (const name of SUBJECT_NAMES) {
     try {
       const module = await import(`../../providers/${stack}/scripts/checks/${name}.ts`);
-      if (typeof module.validate === "function") subjects.push({ name: `${name}:${stack}`, validate: module.validate });
+      if (typeof module.validate === "function")
+        subjects.push({ name: `${name}:${stack}`, group: name, action: stack, validate: module.validate });
     } catch {
       // A subject a provider does not ship is a subject that does not run here.
     }

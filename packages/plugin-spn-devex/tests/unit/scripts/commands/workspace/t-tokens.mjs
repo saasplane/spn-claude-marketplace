@@ -19,9 +19,10 @@ const ok = (label, condition, detail = "") => {
   console.log(`  FAIL  ${label}${detail ? `\n        ${detail}` : ""}`);
 };
 
+// The line in the one shape every writer uses, `at` in UTC ending in Z (RD.DEVEX.WORKSPACE.185).
 const line = (session, at, tags = {}, agent = null) => JSON.stringify({
-  script: "process", ms: 30, event: "PreToolUse", tool: "Read", session, at, pid: 1,
-  workstream: null, arc: null, order: null, agent, ...tags,
+  script: "spn-devex", group: "events", subgroup: null, action: "pretooluse", args: null, event: "PreToolUse", tool: "Read",
+  ms: 30, exit: null, at: `${at}Z`, repo: null, pid: 1, session, agent, workstream: null, arc: null, order: null, ...tags,
 });
 const reply = (id, session, timestamp, usage, agentId) => JSON.stringify({
   type: "assistant", sessionId: session, timestamp, ...(agentId ? { agentId, isSidechain: true } : {}),

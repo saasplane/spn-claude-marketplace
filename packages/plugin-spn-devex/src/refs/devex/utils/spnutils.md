@@ -95,9 +95,14 @@ turns the agent's own timing on or off. It needs no repository, so its commands 
 repository's `rules.md` does not list: `spnutils help --json` names them.
 
 **Each line `timings` records names the work it was spent on — MUST.** While recording is on, every
-hook check appends one line to `.spndevex/.debug/telemetry/hooks.jsonl`, carrying the `workstream`,
-`arc` and `order` read from the paths the tool call touches, and the `agent` when the hook's input
-carries one. **The tags carry forward**: per session and agent, the last tagged call's tags are kept
+hook check and every plugin command appends one line to `.spndevex/.debug/telemetry/hooks.jsonl`, and
+so does each Bash command the agent runs through a program the filter names (by default `spnutils`,
+the plugin CLIs, `nx`, `git` and `docker`; `.spndevex/.debug/telemetry/filter.json` adds or removes
+programs). The line carries `script` (the program or plugin), `group`, `subgroup` and `action` (up to
+three levels, null where unused), `args` (what was typed after the action, with a secret-looking
+option's value written as `***`), `event`, `tool`, `ms`, `exit`, `at` in UTC ending in `Z`, `repo` and
+`pid`, then the `workstream`, `arc` and `order` read from the paths the tool call touches, and the
+`agent` when the hook's input carries one. **The tags carry forward**: per session and agent, the last tagged call's tags are kept
 beside the log, a call that touches no workstream path inherits them, and a call that names other work
 replaces them. A report in the plugin, not in `spnutils`, joins those lines to the Claude Code
 transcripts by `session` and prints the tokens spent per workstream, arc and order.

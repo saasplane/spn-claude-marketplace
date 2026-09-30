@@ -37,10 +37,12 @@ import { checkArcStatus, applies as arcStatusApplies } from "../checks/arc-statu
 import { applies as commentsApply, checkComments } from "../checks/comment-check.ts";
 import { applies as mirrorApplies, checkMirror } from "../checks/mirror.ts";
 import { PUBLISHER, checkPublish } from "../checks/publish.ts";
-import { begin, end, span, tagsOf } from "../lib/timing.ts";
+import { begin, end, span, tagsOf, type SpanName } from "../../../../plugin-support-lib/src/lib/timing.ts";
+import { startCommand } from "../lib/bash-timing.ts";
 
 type Check = {
-  name: string;
+  /** The check file, and the check inside it: `split-plan` › `close`. A file with one check names it twice. */
+  name: SpanName;
   run: (payload: Payload) => Verdict;
   /** What this check could possibly have an opinion about, decided from the path or command alone. */
   applies: (path: string, command: string) => boolean;
@@ -56,31 +58,31 @@ const PROSE_SUFFIXES = [".md", ".html"];
 // ~8 ms loading a module; here every check is imported once when the process starts. What it still
 // saves is the check's own work, which is the same saving by a shorter route.
 const CHECKS: Check[] = [
-  { name: "env-seat", run: checkEnvSeat, needs: ["command", "file_path"], applies: () => true },
-  { name: "doc-check", run: checkDoc, needs: ["command", "file_path"],
+  { name: { group: "env-seat", action: "env-seat" }, run: checkEnvSeat, needs: ["command", "file_path"], applies: () => true },
+  { name: { group: "doc-check", action: "doc-check" }, run: checkDoc, needs: ["command", "file_path"],
     applies: (path, command) => PROSE_SUFFIXES.some((s) => path.endsWith(s) || command.includes(s)) },
   // Its workspace sweep is the point: an answered card must be caught on ANY write. What it cannot
   // matter to is a call that writes nothing at all. Both gates carry their own fast path as well.
-  { name: "split-plan.documents-first", run: gateDocumentsFirst, needs: ["command", "file_path"],
+  { name: { group: "split-plan", action: "documents-first" }, run: gateDocumentsFirst, needs: ["command", "file_path"],
     applies: (path, command) => Boolean(path || command) },
-  { name: "split-plan.close", run: gateClose, needs: ["command"],
+  { name: { group: "split-plan", action: "close" }, run: gateClose, needs: ["command"],
     applies: (path, command) => Boolean(path || command) },
-  { name: "confirmed", run: checkConfirmed, needs: ["file_path"], applies: () => true },
+  { name: { group: "confirmed", action: "confirmed" }, run: checkConfirmed, needs: ["file_path"], applies: () => true },
   // BEFORE the workspace walks below it, because a release is the one call in this list that cannot
   // be taken back. Its fast path is a regular expression over the command, so every edit pays that
   // and stops.
-  { name: "release-go", run: checkReleaseGo, needs: ["command"],
+  { name: { group: "release-go", action: "release-go" }, run: checkReleaseGo, needs: ["command"],
     applies: (path, command) => releaseApplies(path, command) },
   // It reads the fragment it was handed and opens no file, so its whole cost is the path test above
   // it and a pass over the text being written.
   // Its fast path is one regular expression over the path, so every write outside an `arcs/` folder
   // pays that and stops.
-  { name: "arc-status", run: checkArcStatus, needs: ["command", "file_path"],
+  { name: { group: "arc-status", action: "arc-status" }, run: checkArcStatus, needs: ["command", "file_path"],
     applies: (path, command) => arcStatusApplies(path, command) },
-  { name: "comment-check", run: checkComments, needs: ["file_path"], applies: (path) => commentsApply(path) },
+  { name: { group: "comment-check", action: "comment-check" }, run: checkComments, needs: ["file_path"], applies: (path) => commentsApply(path) },
   // LAST, BECAUSE IT IS THE ONLY ONE THAT READS A DOCS TREE. Its fast path is a substring of the
   // path, so an edit outside any `src/` pays that and stops; an edit inside one reads a single face.
-  { name: "mirror", run: checkMirror, needs: ["file_path"], applies: (path) => mirrorApplies(path) },
+  { name: { group: "mirror", action: "mirror" }, run: checkMirror, needs: ["file_path"], applies: (path) => mirrorApplies(path) },
 ];
 
 const REGEN_HINT =
@@ -136,7 +138,7 @@ export function dispatch(payload: Payload): Verdict {
   // A PUBLISH WRITES NO FILE HERE, so no other check has anything to read in it. It gets the one
   // reminder (RD.DEVEX.WORKSPACE.117) and nothing else.
   if (payload.tool_name === PUBLISHER) {
-    try { return span("publish", () => checkPublish(payload)); } catch { return null; }
+    try { return span({ group: "publish", action: "publish" }, () => checkPublish(payload)); } catch { return null; }
   }
 
   // The generated-file guard runs first: it is the cheapest refusal there is, and it needs no
@@ -152,8 +154,8 @@ export function dispatch(payload: Payload): Verdict {
   for (const check of CHECKS) {
     if (!check.applies(path, command)) continue;
     if (!check.needs.some((key) => supplied[key])) continue;
-    // Named `module.function` so the two `split-plan` gates are told apart — one sweeps the workspace
-    // and one reads a path, and an optimisation needs to know which is costing.
+    // Named file › check so the two `split-plan` gates are told apart — one sweeps the workspace and
+    // one reads a path, and an optimisation needs to know which is costing.
     let verdict: Verdict = null;
     try { verdict = span(check.name, () => check.run(payload)); }
     catch { continue; }                             // a check that throws is skipped, never fatal
@@ -168,10 +170,14 @@ const payload = readPayload();
 // MEASURING IS FREE; WRITING IS THE COST. `begin` touches no filesystem, so the loop above always
 // times and always reports. What the window decides is whether any of it is ever written down —
 // which is the only part anybody pays for.
-begin({ event: "PreToolUse", tool: payload.tool_name ?? null, session: payload.session_id ?? null, ...tagsOf(payload) },
+begin({ script: "spn-devex", event: "PreToolUse", tool: payload.tool_name ?? null, session: payload.session_id ?? null,
+        ...tagsOf(payload), process: { group: "events", action: "pretooluse" } },
       payload.cwd ?? process.cwd());
 let verdict: Verdict = null;
 try { verdict = dispatch(payload); } catch { verdict = null; }   // never take the chain down
+// A BASH COMMAND THIS HOOK LETS THROUGH IS TIMED: the start file its `PostToolUse` pairs with. A
+// refused call never runs, so it gets none.
+if (!verdict?.deny) startCommand(payload);
 end();
 emit(verdict);
 process.exit(0);

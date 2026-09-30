@@ -52,7 +52,7 @@ import { basename, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { isDir, isFile, listdir, read, readPayload, runAlone, type Payload } from "../lib/payload.ts";
 import { ARCS, DEVEX, SESSIONS, WORKSTREAM_STATES, legacyWorkstreamsDir, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { begin, end, record, tagsOf } from "../lib/timing.ts";
+import { begin, end, record, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
 
 const MARKETPLACE = "saasplane";
 const CORE = "spn-devex";
@@ -808,13 +808,14 @@ if (runAlone("orientation.ts")) {
   // `SessionStart` runs once, so its whole run is the useful number. `PreToolUse` is the hot path and
   // times per check instead.
   const started = performance.now();
-  begin({ event: "SessionStart", tool: null, session: payload.session_id ?? null, ...tagsOf(payload) }, cwd);
+  begin({ script: "spn-devex", event: "SessionStart", tool: null, session: payload.session_id ?? null, ...tagsOf(payload),
+          process: { group: "events", action: "orientation" } }, cwd);
   let result: [string, string] | null = null;
   try { result = orient(workspaceRootOf(cwd), cwd); }
   catch (err) {
     if (!stdinMode) console.error(`orientation unavailable: ${err}`);
   }
-  record("orientation", performance.now() - started);
+  record({ group: "orientation", action: "orientation" }, performance.now() - started);
   end();
   if (result) {
     const [message, context] = result;

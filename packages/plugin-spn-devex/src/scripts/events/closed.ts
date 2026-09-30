@@ -27,12 +27,17 @@
 //
 // It reads `split-plan`'s parser, as the Python did, so the count here and the count the close gate
 // refused on are the same reading of the same table.
+//
+// IT ALSO CLOSES A TIMED BASH COMMAND. `hooks.json` runs this entry on `PostToolUse` and on
+// `PostToolUseFailure` for Bash, and both write the command's telemetry line (`lib/bash-timing.ts`).
+// A failed call only writes that line: a move that failed closed nothing, so nothing is said.
 
 import { basename, resolve } from "node:path";
 import { isDir, readPayload, runAlone, workspaceRoot, type Payload } from "../lib/payload.ts";
 import { ARCS, SESSIONS, WORKSTREAM_STATES, WORKSTREAMS } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { HELD_STATE, closing, moves, stateOf, subjectFolders, subjectPages, workstreamPlan } from "../checks/split-plan.ts";
-import { begin, end, span, tagsOf } from "../lib/timing.ts";
+import { begin, end, span, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
+import { finishCommand } from "../lib/bash-timing.ts";
 
 const STRUCTURE = new Set<string>([WORKSTREAMS, SESSIONS, ARCS, ...WORKSTREAM_STATES, ""]);
 
@@ -95,13 +100,18 @@ export function closingMessage(payload: Payload): string | null {
 
 if (runAlone("closed.ts")) {
   const payload = readPayload();
+  const failed = payload.hook_event_name === "PostToolUseFailure";
   // The whole run under one name, because these events fire a handful of times a session and the
   // breakdown would cost more attention than it buys. `PreToolUse` is the hot path, and it times
   // per check.
-  begin({ event: "PostToolUse", tool: payload.tool_name ?? null, session: payload.session_id ?? null, ...tagsOf(payload) },
+  begin({ script: "spn-devex", event: failed ? "PostToolUseFailure" : "PostToolUse", tool: payload.tool_name ?? null,
+          session: payload.session_id ?? null, ...tagsOf(payload), process: { group: "events", action: "closed" } },
         payload.cwd ?? process.cwd());
   let message: string | null = null;
-  try { message = span("closed", () => closingMessage(payload)); } catch { message = null; }
+  if (!failed) {
+    try { message = span({ group: "closed", action: "closed" }, () => closingMessage(payload)); } catch { message = null; }
+  }
+  finishCommand(payload, failed);
   end();
   if (message) console.log(JSON.stringify({ systemMessage: message }));
   process.exit(0);

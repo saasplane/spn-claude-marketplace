@@ -1,5 +1,5 @@
-// `plugin timings` — the per-script median read back from the telemetry log, which is the number
-// `N101` measured to justify a pre-built bundle over a `.ts` source.
+// `plugin timings` — the telemetry log read back, grouped by `script` › `group` › `subgroup` ›
+// `action`: runs, total, median, p95, slowest and failures per row (RD.DEVEX.WORKSPACE.185, N8 row 2p).
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -16,20 +16,36 @@ const ok = (label, condition, detail = "") => {
   console.log(`  FAIL  ${label}${detail ? `\n        ${detail}` : ""}`);
 };
 
-console.log("=== plugin timings — summarize() computes the median, not the mean");
+const line = (script, group, subgroup, action, ms, exit = null, at = "2026-10-01T00:00:00Z") =>
+  ({ script, group, subgroup, action, args: null, ms, exit, at });
+
+console.log("=== plugin timings — summarize() groups by script › group › subgroup › action");
 {
   const spans = [
-    { script: "docs-audit", ms: 10, at: "2026-09-28T00:00:00" },
-    { script: "docs-audit", ms: 20, at: "2026-09-28T00:00:01" },
-    { script: "docs-audit", ms: 300, at: "2026-09-28T00:00:02" }, // one outlier must not drag a mean up
-    { script: "docs-face", ms: 5, at: "2026-09-28T00:00:00" },
+    line("spnutils", "infra", "platform", "up", 58000, 0),
+    line("spnutils", "infra", "platform", "up", 62000, 1),
+    line("spnutils", "infra", "platform", "down", 9000, 0),
+    line("spnutils", "apps", null, "test", 10, 0),
+    line("spnutils", "apps", null, "test", 20, 0),
+    line("spnutils", "apps", null, "test", 300, 2),   // one outlier must not drag the median up
+    line("spn-devex", "split-plan", null, "close", 0.2),
+    line("spn-devex", "split-plan", null, "documents-first", 53),
   ];
   const rows = summarize(spans);
-  const audit = rows.find((r) => r.script === "docs-audit");
-  ok("the median of 10, 20, 300 is 20 — the outlier does not move it", audit.medianMs === 20, JSON.stringify(audit));
-  ok("each script name is its own row", rows.length === 2, JSON.stringify(rows));
-  ok("the costliest script sorts first", rows[0].script === "docs-audit");
-  ok("a run count is carried per script", audit.runs === 3);
+  const key = (row) => [row.script, row.group, row.subgroup, row.action].join(" ");
+  const up = rows.find((r) => key(r) === "spnutils infra platform up");
+  const test = rows.find((r) => key(r) === "spnutils apps  test");
+  ok("each script › group › subgroup › action is its own row", rows.length === 5, JSON.stringify(rows.map(key)));
+  ok("two levels apart are two rows (platform up, platform down)", rows.some((r) => key(r) === "spnutils infra platform down"));
+  ok("runs and total are carried per row", up.runs === 2 && up.totalMs === 120000, JSON.stringify(up));
+  ok("the median of 10, 20, 300 is 20 — the outlier does not move it", test.medianMs === 20, JSON.stringify(test));
+  ok("p95 and slowest read the tail", test.p95Ms === 300 && test.slowestMs === 300, JSON.stringify(test));
+  ok("failures count a non-zero exit, and a hook check's null exit is no failure",
+    up.failures === 1 && test.failures === 1 && rows.filter((r) => r.script === "spn-devex").every((r) => r.failures === 0),
+    JSON.stringify(rows));
+  ok("the rows of one script sit together, the costliest script first",
+    rows.map((r) => r.script).join(",") === "spnutils,spnutils,spnutils,spn-devex,spn-devex", JSON.stringify(rows.map(key)));
+  ok("inside a script the costliest row comes first", key(rows[0]) === "spnutils infra platform up", key(rows[0]));
 }
 
 console.log("\n=== plugin timings — reads a real log on disk, and is quiet with none");
@@ -42,15 +58,21 @@ console.log("\n=== plugin timings — reads a real log on disk, and is quiet wit
     const dir = join(root, ".spndevex", ".debug", "telemetry");
     mkdirSync(dir, { recursive: true });
     const lines = [
-      JSON.stringify({ script: "pretooluse", ms: 77, at: "2026-09-28T00:00:00" }),
-      JSON.stringify({ script: "pretooluse", ms: 28, at: "2026-09-28T00:00:01" }),
+      JSON.stringify(line("spn-devex", "events", null, "pretooluse", 77)),
+      JSON.stringify(line("spn-devex", "events", null, "pretooluse", 28)),
+      // A line written before the levels existed still reads, under its script alone.
+      JSON.stringify({ script: "docs-audit", ms: 5, at: "2026-09-28T00:00:00" }),
       "{ not json — a torn line from a truncated write",
     ].join("\n");
     writeFileSync(join(dir, "hooks.jsonl"), lines + "\n", "utf8");
     const out = execFileSync("node", [TOOL, "--json", root], { encoding: "utf8" });
     const parsed = JSON.parse(out);
-    ok("the torn line is skipped, not a crash, and the two good ones are read", parsed.spans === 2, out);
-    ok("the JSON form carries the same median", parsed.rows[0].medianMs === 52.5, out);
+    ok("the torn line is skipped, not a crash, and the three good ones are read", parsed.spans === 3, out);
+    const events = parsed.rows.find((r) => r.group === "events");
+    ok("the JSON form carries the same median", events?.medianMs === 52.5, out);
+    const text = execFileSync("node", [TOOL, root], { encoding: "utf8" });
+    ok("the reading names each level and each column", /spn-devex/.test(text) && /events pretooluse/.test(text)
+      && /Runs/.test(text) && /Total/.test(text) && /p95/.test(text) && /Slowest/.test(text) && /Failures/.test(text), text);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

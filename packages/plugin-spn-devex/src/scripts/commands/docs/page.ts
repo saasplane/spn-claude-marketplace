@@ -7,7 +7,7 @@
 //   spn-devex docs page <seat.md…> [--check]
 
 import { basename, join, relative, resolve } from "node:path";
-import { begin, record, end, commandFacts } from "../../lib/timing.ts";
+import { argsText, begin, commandFacts, end, record } from "../../../../../plugin-support-lib/src/lib/timing.ts";
 import { bookTemplatesDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { pageFor, resolveWorkspace, seatPaths } from "./_lib.ts";
 
@@ -26,10 +26,10 @@ function body(args: string[], workspace: string): number {
 export function run(args: string[]): number {
   const workspace = resolveWorkspace();
   const startedAt = performance.now();
-  begin(commandFacts(args), workspace);
+  begin(commandFacts("spn-devex", args), workspace);
   const code = body(args, workspace);
-  record("docs-page", performance.now() - startedAt);
-  end();
+  record({ group: "docs", action: "page", args: argsText(args) }, performance.now() - startedAt, code);
+  end(code);
   return code;
 }
 

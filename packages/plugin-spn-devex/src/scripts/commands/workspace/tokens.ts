@@ -9,7 +9,7 @@
 //
 // THE JOIN IS BY SESSION, NEVER BY GUESSING. Each hook telemetry line in
 // `.spndevex/.debug/telemetry/hooks.jsonl` carries `session`, and `workstream`, `arc`, `order` and
-// `agent` where the tool call touched a workstream path (`lib/timing.ts`). The Claude Code transcripts
+// `agent` where the tool call touched a workstream path (`plugin-support-lib/src/lib/timing.ts`). The Claude Code transcripts
 // sit in `~/.claude/projects/<the workspace's project folder>/`: `<session>.jsonl` for the main
 // window, and `<session>/subagents/**/*.jsonl` for each agent it launched.
 //
@@ -90,7 +90,9 @@ export function readTelemetry(root: string): TelemetryLine[] {
     try {
       const parsed = JSON.parse(line) as Record<string, unknown>;
       if (typeof parsed.session !== "string" || !parsed.session) return;
-      const at = Date.parse(`${String(parsed.at ?? "")}Z`);
+      // `at` is UTC ending in Z; a line written before the zone was added carries none, and is UTC too.
+      const written = String(parsed.at ?? "");
+      const at = Date.parse(/(?:Z|[+-]\d\d:\d\d)$/.test(written) ? written : `${written}Z`);
       if (Number.isNaN(at)) return;
       const text = (value: unknown) => (typeof value === "string" && value ? value : null);
       out.push({ session: parsed.session, agent: text(parsed.agent), at,

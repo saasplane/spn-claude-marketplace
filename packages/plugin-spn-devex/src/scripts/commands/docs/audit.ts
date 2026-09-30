@@ -11,7 +11,7 @@
 
 import { statSync } from "node:fs";
 import { basename, resolve, relative } from "node:path";
-import { begin, record, end, commandFacts } from "../../lib/timing.ts";
+import { argsText, begin, commandFacts, end, record } from "../../../../../plugin-support-lib/src/lib/timing.ts";
 import { audit, gapReport, resolveWorkspace, walkFiles } from "./_lib.ts";
 
 export const describe = "the invariants a page must hold, over one path or many — the whole audit, plus --report's gap scan";
@@ -50,10 +50,10 @@ function body(args: string[], workspace: string): number {
 export function run(args: string[]): number {
   const workspace = resolveWorkspace();
   const startedAt = performance.now();
-  begin(commandFacts(args), workspace);
+  begin(commandFacts("spn-devex", args), workspace);
   const code = body(args, workspace);
-  record("docs-audit", performance.now() - startedAt);
-  end();
+  record({ group: "docs", action: "audit", args: argsText(args) }, performance.now() - startedAt, code);
+  end(code);
   return code;
 }
 

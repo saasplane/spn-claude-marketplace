@@ -8,7 +8,7 @@
 //   spn-devex docs status <seat.md…> [--check]
 
 import { basename, relative, resolve } from "node:path";
-import { begin, record, end, commandFacts } from "../../lib/timing.ts";
+import { argsText, begin, commandFacts, end, record } from "../../../../../plugin-support-lib/src/lib/timing.ts";
 import { resolveWorkspace, seatPaths, statusFor } from "./_lib.ts";
 
 export const describe = "roll the behaviour rows at a construct's own path up into its status";
@@ -24,10 +24,10 @@ function body(args: string[], workspace: string): number {
 export function run(args: string[]): number {
   const workspace = resolveWorkspace();
   const startedAt = performance.now();
-  begin(commandFacts(args), workspace);
+  begin(commandFacts("spn-devex", args), workspace);
   const code = body(args, workspace);
-  record("docs-status", performance.now() - startedAt);
-  end();
+  record({ group: "docs", action: "status", args: argsText(args) }, performance.now() - startedAt, code);
+  end(code);
   return code;
 }
 

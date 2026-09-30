@@ -19,7 +19,7 @@ import { existsSync, readFileSync, statSync } from "node:fs";
 import { basename, dirname, extname, join, relative, resolve } from "node:path";
 import { checkFigures, colour, stripSpans } from "../../lib/figures.ts";
 import { draw } from "../../lib/draw.ts";
-import { begin, record, end, commandFacts } from "../../lib/timing.ts";
+import { argsText, begin, commandFacts, end, record } from "../../../../../plugin-support-lib/src/lib/timing.ts";
 import { resolveWorkspace, walkFiles } from "./_lib.ts";
 
 export const describe = "figure check|colour: a spec's own geometry against the page · figure <path…>: what a browser paints";
@@ -231,13 +231,13 @@ async function renderCli(files: string[]): Promise<number> {
 export async function run(args: string[]): Promise<number> {
   const workspace = resolveWorkspace();
   const startedAt = performance.now();
-  begin(commandFacts(args), workspace);
+  begin(commandFacts("spn-devex", args), workspace);
   const [sub, ...rest] = args;
   const code = sub === "check" || sub === "colour"
     ? geometryCli(sub, rest, workspace)
     : await renderCli(args.filter((a) => !a.startsWith("-")));
-  record("docs-figure", performance.now() - startedAt);
-  end();
+  record({ group: "docs", action: "figure", args: argsText(args) }, performance.now() - startedAt, code);
+  end(code);
   return code;
 }
 

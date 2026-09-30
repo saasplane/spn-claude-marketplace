@@ -26,7 +26,13 @@ import { validate as testTreeShape } from "../lib/test-file-outside-tier-folder.
 import { validate as harnessManifestIdentity } from "../lib/harness-reimplements-manifest-identity.ts";
 
 /** One subject, parsed once per provider that has an opinion about it. */
-export type Subject = { name: string; validate: (path: string, text: string) => Verdict };
+export type Subject = {
+  name: string;
+  /** The subject and the cloud that answers it, as the telemetry line's group and action (`manifest` › `aws`). */
+  group: string;
+  action: string;
+  validate: (path: string, text: string) => Verdict;
+};
 
 /**
  * The subjects an estate node has, in the order a person would want to hear about them.
@@ -40,8 +46,9 @@ export const SUBJECT_NAMES = ["rendering", "manifest"] as const;
 
 /** The cloud-free subjects, run once regardless of which provider folders exist. */
 const CORE_SUBJECTS: Subject[] = [
-  { name: "test-tree-shape", validate: testTreeShape },
-  { name: "harness-manifest-identity", validate: harnessManifestIdentity },
+  { name: "test-tree-shape", group: "test-tree-shape", action: "test-tree-shape", validate: testTreeShape },
+  { name: "harness-manifest-identity", group: "harness-manifest-identity", action: "harness-manifest-identity",
+    validate: harnessManifestIdentity },
 ];
 
 /**
@@ -92,7 +99,8 @@ export async function subjects(): Promise<Subject[]> {
     for (const instance of instances()) {
       try {
         const module = await import(join(PROVIDERS, instance, "scripts", "checks", `${name}.ts`));
-        if (typeof module.validate === "function") found.push({ name: `${name}:${instance}`, validate: module.validate });
+        if (typeof module.validate === "function")
+          found.push({ name: `${name}:${instance}`, group: name, action: instance, validate: module.validate });
       } catch {
         // A subject a provider does not ship is a subject that does not run for that cloud.
       }
