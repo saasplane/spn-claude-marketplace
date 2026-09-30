@@ -1,4 +1,6 @@
 <!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § Reports and templates · § The four page kinds · § The masthead, and the opening · § The suffix names the kind · § One stylesheet, shipped with the template
+     and docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The header — two lines, six fields, produced from the block
+     and docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md § Metadata
      and docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md § The readability bar
      This file carries rules it does not own. The chapters above are the source of truth.
      A rule change is edited there first, then here, in the same change. Never add a rule here.
@@ -11,13 +13,16 @@
      only the Findings columns differ per kind.
      LANDS AT `docs/artifacts/reports/<kind>-report.html`, replaced in place — the name says what was measured and the
      suffix says what kind of document it is, so the folder reads without the book.
-     A REPORT ANSWERS ONE QUESTION AT ONE MOMENT. `measuredAt` is what lets the next one supersede it: a page with no
-     as-of cannot be superseded, because nobody can tell which is newer. It is a date and a time with its offset
-     (2026-09-29T14:32+05:30), shown in the header as "Measured: 2026-09-29 14:32 +05:30", because the database keeps
-     UTC and a developer's machine keeps local time. It is the time of what was measured, never the clock when the page
-     was written: a TESTS report stamps the newest run it read, and a report that reads the tree itself (AUDIT, DOCS,
-     COVERAGE) stamps the moment it read the tree. It carries a `status` like every other document,
-     and that status is the state of WHAT IT MEASURED — never a claim about the page.
+     A REPORT ANSWERS ONE QUESTION AT ONE MOMENT, SO IT IS A SNAPSHOT AND CARRIES NO STATUS — no `status` key in the
+     block and no status chip in the header (RD.DEVEX.WORKSPACE.192). The Summary says in a sentence what was found.
+     `generatedAt` is what lets the next one supersede it: a page with no as-of cannot be superseded, because nobody
+     can tell which is newer. It is the moment the page was generated, as a date and a time with its offset
+     (2026-09-29T14:32+05:30), because the database keeps UTC and a developer's machine keeps local time. The header
+     shows it as "Generated:" in the reader's own time zone and format: the value sits in the `datetime` attribute of
+     the `<time>` element, the script at the end of the page renders it, and where no script runs the value shows as
+     written. A report that reads the tree itself (AUDIT, CODE, DOCS, COVERAGE) is generated in the same moment it
+     measures. A TESTS report reads test runs that can be older, so it also carries `measuredAt`, the newest run it
+     read, and states that time in "What was measured", never in the header. No other report carries `measuredAt`.
      WRITTEN BY THE AGENT through the report skill, never by a tool. The agent reads the repository, fills this skeleton
      from what it read, and every number on the page names where it was read from. A tool that needs to hand the agent a
      measurement gives it `--json` on stdout; it never writes into a developer's pocket.
@@ -41,7 +46,7 @@
 <meta charset="utf-8">
 <title>Report Template</title>
 <!-- spn:doc
-{"id": "{{repo}}-{{kind}}-report", "variant": "report", "reportType": "{{AUDIT|CODE|DOCS|TESTS|COVERAGE}}", "title": "{{KIND, in plain words}}", "lenses": ["{{LENS}}"], "status": "{{the state of WHAT WAS MEASURED, never of this page — PLANNING · IMPLEMENTING · DONE}}", "measuredAt": "{{YYYY-MM-DDTHH:MM±HH:MM}}", "summary": "{{The Description's first sentence, word for word.}}", "keywords": ["report", "{{kind}}"]}
+{"id": "{{repo}}-{{kind}}-report", "variant": "report", "reportType": "{{AUDIT|CODE|DOCS|TESTS|COVERAGE}}", "title": "{{KIND, in plain words}}", "lenses": ["{{LENS}}"], "generatedAt": "{{YYYY-MM-DDTHH:MM±HH:MM, the moment this page was written}}", "measuredAt": "{{TESTS only, the newest run read — delete the key on every other kind}}", "summary": "{{The Description's first sentence, word for word.}}", "keywords": ["report", "{{kind}}"]}
 -->
 <style>
   :root {
@@ -85,15 +90,11 @@
   .eyebrow .sep{color:var(--rule);font-weight:300}
   .eyebrow .line1{letter-spacing:.15em;text-transform:uppercase;font-weight:650;color:var(--faint);line-height:1.7}
   .eyebrow .lbl{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
-  .eyebrow .st{margin-left:auto;display:inline-flex;align-items:center;gap:.4rem}
   .eyebrow .audience{display:inline-flex;flex-wrap:wrap;align-items:center;gap:.45rem}
   .badge{display:inline-flex;align-items:center;gap:.35rem;padding:.1rem .6rem;border-radius:999px;border:1px solid var(--rule);background:var(--card);font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--slate);line-height:1.7;white-space:nowrap}
   .badge.type{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);font-weight:650}
   .badge.lens{font-family:var(--ui);font-size:.74rem;letter-spacing:0;text-transform:none}
-  .badge.status{font-weight:700}
-  .badge.status.planning{border-color:var(--gap);color:var(--gap);background:var(--gap-soft)}
-  .badge.status.implementing{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
-  .badge.status.done{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
+  .badge.when{text-transform:none;letter-spacing:0}
   .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(18rem,1fr));gap:.8rem;margin:1.6rem 0}
   .tile{display:flex;flex-direction:column;border:1px solid var(--rule);background:var(--card);border-radius:3px;padding:.85rem 1rem;min-width:0}
   .tile h4{margin:0 0 .35rem;font-size:var(--md)}
@@ -301,12 +302,12 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
             lives in an approach's What only. A construct or an overview states current truth, never a change
   ================================================================================================ -->
 <header class="masthead">
-<!-- THE HEADER: three segments — {workspace} | {repository} | {page name}. Line 2 is Type, For, MEASURED and Status.
-  The `<h1>` is the block's title, in plain words — the kind, exactly as every other page kind's `<h1>` equals its
-  block's title (the audit refuses the two apart). A report DOES carry a status chip: the block's `status` is the
-  state of what was measured, never a claim about the page, and the chip renders that word — PLANNING where nothing
-  has been measured yet, IMPLEMENTING where the measurement found gaps, DONE where it found none. -->
-  <div class="eyebrow"><span class="line1">{{WORKSPACE}} &nbsp;|&nbsp; {{REPOSITORY}} &nbsp;|&nbsp; {{KIND, in plain words}}</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Report</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">{{ROLE}}</span></span><span class="sep">|</span><span class="lbl">Measured:</span> <span class="badge">{{YYYY-MM-DD HH:MM ±HH:MM}}</span><span class="st"><span class="lbl">Status:</span> <span class="badge status implementing">&#x1F6A7; IMPLEMENTING</span></span></span></div>
+<!-- THE HEADER: the breadcrumb — {workspace} | {repository} | {page name} — then two lines (RD.DEVEX.WORKSPACE.192).
+  Line one is Type and For. Line two is Generated and Commit: the block's `generatedAt`, in the `<time>` element's
+  `datetime` and as its text, and the short hash of the commit the report read. A report shows NO status chip: it is
+  a snapshot, and the Summary says what was found. The `<h1>` is the block's title, in plain words — the kind,
+  exactly as every other page kind's `<h1>` equals its block's title (the audit refuses the two apart). -->
+  <div class="eyebrow"><span class="line1">{{WORKSPACE}} &nbsp;|&nbsp; {{REPOSITORY}} &nbsp;|&nbsp; {{KIND, in plain words}}</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Report</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">{{ROLE}}</span></span></span><span class="line"><span class="lbl">Generated:</span> <span class="badge when"><time class="local" datetime="{{YYYY-MM-DDTHH:MM±HH:MM}}">{{YYYY-MM-DDTHH:MM±HH:MM}}</time></span><span class="sep">|</span><span class="lbl">Commit:</span> <span class="badge when">{{short sha}}</span></span></div>
   <!-- THE MASTHEAD, ON A REPORT (05-artifacts.md § The masthead, and the opening · RD.DEVEX.WORKSPACE.182 and .187).
     Three levels, in this order, and every level is plain language: everyday words, short sentences, no figure of
     speech, no slogan, no number, and no book word (behaviour, construct, lens, kind, node, seat, tier, arc, estate,
@@ -323,6 +324,9 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
       Description  "This report shows which of the things this repository promises to do are checked by a test that
                    passed, and which are not yet. Read it before a release, or when you want to know what is still
                    unproven. The summary comes first, and each section below covers one area."
+    THE APPROVED SUBTITLES, one per kind, copied word for word
+      TESTS        "Which of the things this repository promises are checked by a test that passed?"
+      COVERAGE     "How much of this repository is written, built and proved?"
     BAD, one per level
       Title        "Proof or It Did Not Happen"  A slogan in place of the report's name and subject.
       Subtitle     "Where the rubber meets the road for every promise."  A figure of speech; it asks no question.
@@ -348,7 +352,7 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
 
 <section id="s1" data-block="reasons">
   <div class="sec-head"><h2>What was measured</h2></div>
-  <p>{{What was read, and by what. Every row names its source, so a reader can re-run it and get the same answer.}}</p>
+  <p>{{What was read, and by what. Every row names its source, so a reader can re-run it and get the same answer. A TESTS report states here the time of the newest run it read, its `measuredAt`.}}</p>
   <div class="scroll"><table>
     <thead><tr><th>Measure</th><th>Value</th><th>Read from</th></tr></thead>
     <tbody>
@@ -562,5 +566,20 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
     attach(h2,s.id);
   });
   Array.prototype.forEach.call(document.querySelectorAll('h3[id]'),function(h){attach(h,h.id);});
+})();
+</script>
+<script>
+/* Generated: shows in the reader's own time zone and format. The page keeps the moment with its offset in the
+   `datetime` attribute; this renders it with the reader's locale and zone, and keeps the stored value as the
+   tooltip. Where no script runs, or the value cannot be read, the stored value stays as written. */
+(function(){
+  Array.prototype.forEach.call(document.querySelectorAll('time.local[datetime]'),function(t){
+    var stored=t.getAttribute('datetime'),at=new Date(stored);
+    if(isNaN(at.getTime()))return;
+    try{
+      t.textContent=new Intl.DateTimeFormat(undefined,{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',timeZoneName:'short'}).format(at);
+      t.title=stored;
+    }catch(e){}
+  });
 })();
 </script>

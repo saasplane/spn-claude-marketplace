@@ -876,6 +876,63 @@ console.log("\n=== an authored page defines no selector its declared template do
     got("concept-bad-overview.html"), lacks("SOFT selector"));
 }
 
+console.log("\n=== a report is a snapshot: no status, and its header says Generated and Commit (RD.DEVEX.WORKSPACE.192)");
+{
+  // THE REAL TEMPLATE'S SCRIPTS, because the furniture check compares a report with its own
+  // template, and a fixture script would prove only that the check agrees with the fixture.
+  const templates = bookTemplatesDir(resolve(PLUGIN, "..", "..", "..", "spn-foundation"));
+  const reportTemplate = readFileSync(resolve(templates, "pages", "report-template.html"), "utf8");
+  const constructTemplate = readFileSync(resolve(templates, "pages", "construct-template.html"), "utf8");
+  const scriptsOf = (t) => (t.match(/<script\b[^>]*>[\s\S]*?<\/script>/g) ?? []).join("\n");
+  const at = `docs/${POCKET.artifacts}/${ARTIFACT.reports}/coverage-report.html`;
+  const good = { id: "t-coverage-report", variant: "report", reportType: "COVERAGE", title: "Coverage report",
+    lenses: ["QA"], generatedAt: "2026-09-30T12:57+05:30", summary: "What was counted.", keywords: ["report"] };
+  const line2 = (datetime, cls = "local") =>
+    `<span class="line"><span class="lbl">Generated:</span> <span class="badge when"><time class="${cls}" datetime="${datetime}">${datetime}</time></span>` +
+    `<span class="sep">|</span><span class="lbl">Commit:</span> <span class="badge when">e549cfaa</span></span>`;
+  const page = (o, { second = line2(o.generatedAt), chip = "", scripts = scriptsOf(reportTemplate) } = {}) =>
+    block(o) + `<nav class="rail" id="rail"></nav>\n<header class="masthead">\n` +
+    `<div class="eyebrow"><span class="line1">SaaS Plane | t | ${o.title}</span>` +
+    `<span class="line"><span class="lbl">Type:</span> <span class="badge type">Report</span><span class="sep">|</span>` +
+    `<span class="lbl">For:</span> <span class="audience"><span class="badge lens">Quality engineer</span></span>${chip}</span>${second}</div>\n` +
+    `<h1>${o.title}</h1>\n<p class="subtitle">How much of this repository is written, built and proved?</p>\n` +
+    `<p class="standfirst">What was counted.</p>\n</header>\n${scripts}\n`;
+  const audit = (text) => {
+    process.env.SPN_TEMPLATES = templates;
+    try { return run(repo({ "CONCEPT.md": "# c\n", [at]: text }), ["audit", at]); }
+    finally { delete process.env.SPN_TEMPLATES; }
+  };
+  const mine = /a report carries|a report shows|Generated|no Commit|only a `tests` report|`measuredAt` is|furniture/;
+
+  const clean = audit(page(good));
+  one("a report with no status, a Generated moment and a Commit draws none of these findings",
+    clean, (g) => !g.split("\n").some((l) => /RULE/.test(l) && mine.test(l)));
+  one("a report block carrying `status` is refused",
+    audit(page({ ...good, status: "IMPLEMENTING" })), has("a report carries no `status`"));
+  one("a report header showing a status chip is refused",
+    audit(page(good, { chip: `<span class="lbl">Status:</span> <span class="badge status implementing">&#x1F6A7; IMPLEMENTING</span>` })),
+    has("a report shows no status chip"));
+  one("a report with no `generatedAt` is refused",
+    audit(page((({ generatedAt, ...rest }) => rest)(good), { second: line2("2026-09-30T12:57+05:30") })), has("a report carries `generatedAt`"));
+  one("a `generatedAt` with no time and offset is refused",
+    audit(page({ ...good, generatedAt: "2026-09-30" })), has("a report carries `generatedAt`"));
+  one("a header moment that is not the block's is refused",
+    audit(page(good, { second: line2("2026-09-29T09:00+05:30") })), has("Generated reads `2026-09-29T09:00+05:30`"));
+  one("a Generated `<time>` the script cannot find is refused",
+    audit(page(good, { second: line2(good.generatedAt, "stamp") })), has("carries `class=\"local\"`"));
+  one("a header with no Generated line is refused",
+    audit(page(good, { second: "" })), has("no Generated line"));
+  one("a header with no Commit is refused",
+    audit(page(good, { second: line2(good.generatedAt).replace(/<span class="sep">\|<\/span><span class="lbl">Commit:[\s\S]*?e549cfaa<\/span>/, "") })),
+    has("no Commit"));
+  one("`measuredAt` on a coverage report is refused",
+    audit(page({ ...good, measuredAt: "2026-09-30T12:44+05:30" })), has("only a `tests` report carries `measuredAt`"));
+  one("`measuredAt` on a tests report is its newest run, and passes",
+    audit(page({ ...good, reportType: "TESTS", measuredAt: "2026-09-30T12:44+05:30" })), lacks("carries `measuredAt`"));
+  one("a report carrying only the construct template's scripts is off its own template",
+    audit(page(good, { scripts: scriptsOf(constructTemplate) })), has("this page's scripts are not the template's"));
+}
+
 // ---------------------------------------------------------------- the masthead's three levels
 
 console.log("\n=== the masthead: h1, an optional p.subtitle, one p.standfirst, and nothing after it (RD.DEVEX.WORKSPACE.187)");

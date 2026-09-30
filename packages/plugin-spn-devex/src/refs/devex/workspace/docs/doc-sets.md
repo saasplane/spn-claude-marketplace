@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "9f3e5019"
+      "seen": "db157473"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -25,7 +25,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
-      "seen": "d954835e"
+      "seen": "243babdc"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md",
@@ -566,11 +566,11 @@ Every document opens with an invisible block holding **strict JSON**, marked `sp
 
 - `stages` is optional — only where a document belongs to one DevEx stage, such as a guide.
 - **A construct's block keeps eight keys and no more**: `id`, `variant`, `title`, `subtitle`, `lenses`, `status`, `dependsOn` and `summary`. `subtitle` is the one plain sentence under the title, and `summary` is the Description's first sentence.
-- **A report adds `measuredAt`, a date and a time with its offset**, such as `2026-09-29T14:32+05:30`. It is the time of what was measured, never the time the page was written.
+- **A report carries no `status`, and adds `reportType` and `generatedAt`** (RD.DEVEX.WORKSPACE.192). A report is a snapshot, so neither its block nor its header carries a status. `generatedAt` is the moment the page was generated, a date and a time with its offset, such as `2026-09-30T12:57+05:30`; the header shows it as `Generated:` in the reader's own time zone and format, beside `Commit:`. A `tests` report also carries `measuredAt`, the newest test run it read, stated in *What was measured* and never in the header. No other report carries `measuredAt`.
 - **There is no `part` and no `altitude`.** Everything else is derived: the **seat** from the path and the **kind** from the node's manifest. The voice is one (RD.DEVEX.WORKSPACE.096). The seat decides what a document carries, never its temperature.
 - **`lenses` are derived from the kind, not authored per page** (decision RD.DEVEX.WORKSPACE.100) — one derivation, two clauses, because runtime says *where code runs* and `lenses` says *who reads it*. A kind you **build on** (support, module, app, client) derives from its declared runtime: `SERVER` → `SERVER_DEV`, `WEB` → `WEB_DEV`, `UNIVERSAL` → both. A kind that **serves building** — `TOOLCHAIN` and `APP_UTILITY`, and only those two — carries both whatever its runtime, because every builder uses it. Read the declared runtime, never parse the name. `ARCHITECT` is added by **seat**, never by kind. A node's doc face (`docs/README.md`) is the orientation page and carries it for every kind, leaf nodes included. The seat faces beneath it (purpose, constructs, behaviors, capabilities, guides, artifacts) carry the derived developer lenses alone. `ARCHITECT` there is authorship a scaffold never emits. The other six lenses are authored, never derived. A page MAY narrow the derived set where its subject genuinely serves one runtime, and MUST NOT widen it. **A scaffold template emits the derived set**, which is what makes generated pages compliant by construction.
 - `id` is identity and **never changes**, however the path does. The path is only its current address.
-- **Status is the state of what the document governs, never of the prose**: `DONE` ✅ · `IMPLEMENTING` 🚧 · `PLANNING` 🔮.
+- **Status is the state of what the document governs, never of the prose**: `DONE` ✅ · `IMPLEMENTING` 🚧 · `PLANNING` 🔮. An overview, a construct in a `FOUNDATION` repository and a report carry none.
 
 ## One voice — the warm learning register
 

@@ -18,12 +18,17 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "Reports and templates",
-      "seen": "adb7351e"
+      "seen": "001421d8"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
+      "section": "The header — two lines, six fields, produced from the block",
+      "seen": "ba60f8f3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The coverage report — written, built and proved",
-      "seen": "f9419b87"
+      "seen": "c4cb305e"
     }
   ]
 }
@@ -79,11 +84,17 @@ whose tier did not run is **unproved, not failing**, and those are different fin
 **A question lives next door and is not this one.** *Did the suite go green?* is the run itself, and folding it into this
 report is how a percentage gets back in.
 
+**The numbers come from one command.** Run `spn-devex behaviours coverage <repo> --json` and write `tests-report.html` from
+what it returns. Put its `digest` in the page, so the next run can tell whether the page is current. **The runs it read can
+be older than the page**, so the block carries two times: `generatedAt`, the moment you write the page, and `measuredAt`,
+the newest run the command read, which it returns as `measuredAt`. The header shows `generatedAt`. The run's time is
+stated in *What was measured*, never in the header.
+
 ### The coverage report rolls up, and never lists a row
 
 **It answers one plain question: how much of this repository is finished?** It answers from the sides written, built and proved, and the gaps between them are what a reader acts on (decision `RD.DEVEX.WORKSPACE.191`).
 
-**The numbers come from one command, and you write the page.** Run `spn-devex coverage measure <repo> --json` and write `coverage-report.html` from what it returns, beside `tests-report.html`. The command never writes the page. Stamp `measuredAt` with the moment the command read the tree, which is the `measuredAt` it returns. Put its `digest` in the page, so the next run can tell whether the page is current.
+**The numbers come from one command, and you write the page.** Run `spn-devex coverage measure <repo> --json` and write `coverage-report.html` from what it returns, beside `tests-report.html`. The command never writes the page. Stamp the block's `generatedAt` with the `measuredAt` it returns: a coverage report is written in the sitting that reads the tree, so the two are one moment. The block carries no `measuredAt` key; only a `tests` report does. Put its `digest` in the page, so the next run can tell whether the page is current.
 
 **Name the unit beside every number, because the sides count different things.** Written counts behaviour rows and constructs. Built counts constructs, never rows: a construct is built in a package when its capability chapter there exists and every `## Where` path resolves. Proved counts rows at `SUCCESS` at their own tier. *Stated, not built* counts constructs, *built, not stated* counts seats in `src/`, and *built, not proved* counts rows. Never set a count of rows beside a count of constructs as if they were one scale.
 
@@ -109,7 +120,9 @@ report is how a percentage gets back in.
 
 Plain means everyday words, one idea a sentence, no slogan, no figure of speech, and no book word the same sentence does not explain. **Show a new Title or Subtitle to the developer before you write it**, because both speak for the product.
 
-**The header says when and against what** — the commit, the version, and `measuredAt`, a date and a time with its offset, such as `2026-09-29T14:32+05:30`, shown in the header as `Measured: 2026-09-29 14:32 +05:30`. It is the time of what was measured, never the time the page was written: a `tests` report stamps the newest run it read, and an `audit`, `docs` or `coverage` report stamps the moment it read the tree. A report with no as-of is a report that cannot be superseded, because nobody can tell which is newer.
+**A report is a snapshot, so it carries no status — MUST** (decision `RD.DEVEX.WORKSPACE.192`). Its block has no `status` key and its header shows no status chip. The Summary says in a sentence what was found. `docs audit` refuses a report that carries either.
+
+**The header says when and against what, in two lines under the breadcrumb**: `Type: Report | For: …`, then `Generated: … | Commit: …`. `generatedAt` is the moment the page was generated, a date and a time with its offset, such as `2026-09-30T12:57+05:30`. The header keeps it in a `<time class="local" datetime="…">` element, and the template's script shows it in the reader's own time zone and format. Where no script runs, the value shows as written, so write the same value as the element's text. Commit is the short hash of the commit the report read. For an `audit`, `code`, `docs` or `coverage` report the page is generated in the moment it measures. A `tests` report reads runs that can be older, so it also carries `measuredAt`, the newest run it read, stated in *What was measured*. A report with no as-of cannot be superseded, because nobody can tell which is newer.
 
 Then the body, and it obeys the corpus rules that apply everywhere. No changelog prose, no live counts outside a table that *is* the count, and no claim of a status the underlying documents deny.
 

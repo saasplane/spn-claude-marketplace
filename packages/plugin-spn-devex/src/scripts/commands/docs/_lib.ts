@@ -206,6 +206,17 @@ export function sections(file: string, src: string, tag: "h1" | "h2" | "h3"): st
 
 // ---------------------------------------------------------------------------- the checks
 
+/**
+ * A moment as a report stamps it: a date, a time and the offset, such as `2026-09-30T12:57+05:30`.
+ * A date alone cannot order two reports of one day, and a time with no offset is read differently
+ * by the UTC database and a developer's machine.
+ */
+export function isMoment(value: unknown): boolean {
+  if (typeof value !== "string") return false;
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?(Z|[+-]\d{2}:\d{2})$/.test(value)) return false;
+  return !Number.isNaN(new Date(value).getTime());
+}
+
 export function checkBlock(file: string, src: string, block: any, err: string | null): Finding[] {
   const f: Finding[] = [];
   const add = (grade: Grade, message: string) => f.push({ check: "block", grade, file, message });
@@ -236,8 +247,9 @@ export function checkBlock(file: string, src: string, block: any, err: string | 
   if (pocketFolder !== null && !ARTIFACT_FOLDERS.includes(pocketFolder))
     add("RULE", `the pocket holds ${ARTIFACT_FOLDERS.map((folder) => `\`${folder}/\``).join(", ").replace(/, ([^,]*)$/, " and $1")} — a fact a seat needs lives in a seat, never in \`${pocketFolder}/\``);
 
-  // An overview describes, and a FOUNDATION construct states a standard; neither carries a status.
-  // Every other page kind carries one. `carriesStatus` states why, in one place.
+  // An overview describes, a FOUNDATION construct states a standard, and a report is a snapshot;
+  // none of the three carries a status. Every other page kind carries one. `carriesStatus` states
+  // why, in one place, and the report's own keys are checked below.
   //
   // A FOUNDATION CONSTRUCT STILL CARRYING THE WORD IS `docs.ts status`'s FINDING, NOT THIS ONE. That
   // command derives the status and strips it where nothing is derived, so it both reports the fault
@@ -248,6 +260,22 @@ export function checkBlock(file: string, src: string, block: any, err: string | 
     if ("status" in block) add("RULE", "an overview carries no `status` — a face is either current or a defect");
   } else if (carriesStatus(file, block) && !(block.status in STATUS_WORD)) {
     add("RULE", "`status` must be PLANNING · IMPLEMENTING · DONE");
+  }
+
+  // A REPORT CARRIES NO STATUS AND SAYS WHEN IT WAS GENERATED (02-document.md § Metadata,
+  // RD.DEVEX.WORKSPACE.192). `generatedAt` is what lets the next report supersede this one. Only a
+  // tests report adds `measuredAt`, because only its runs can be older than the page.
+  if (variant === "report") {
+    if ("status" in block)
+      add("RULE", "a report carries no `status` — it is a snapshot, and its Summary says what was found (RD.DEVEX.WORKSPACE.192)");
+    if (!isMoment(block.generatedAt))
+      add("RULE", "a report carries `generatedAt`, the moment the page was generated, as a date and a time with its offset — `2026-09-30T12:57+05:30`");
+    if ("measuredAt" in block) {
+      if (block.reportType !== "TESTS")
+        add("RULE", "only a `tests` report carries `measuredAt` — every other report is generated in the moment it measures, and `generatedAt` says when");
+      else if (!isMoment(block.measuredAt))
+        add("RULE", "`measuredAt` is the newest run the tests report read, as a date and a time with its offset — `2026-09-30T12:44+05:30`");
+    }
   }
 
   if (variant === "construct") {
@@ -624,7 +652,26 @@ export function checkHeader(file: string, src: string, block: any): Finding[] {
 
   // Status: the chip carries the enum word; a face and a FOUNDATION construct have no chip at all.
   const statusChip = h.match(/class="badge status[^"]*"[^>]*>([\s\S]*?)<\/span>/);
-  if (!carriesStatus(file, block)) {
+  if (block.variant === "report") {
+    // A REPORT'S HEADER IS TWO LINES UNDER THE BREADCRUMB (05-artifacts.md § The header,
+    // RD.DEVEX.WORKSPACE.192): Type and For, then Generated and Commit. Read with the comments
+    // removed, because the template explains the lines inside the header itself.
+    const shown = h.replace(/<!--[\s\S]*?-->/g, " ");
+    if (statusChip || /\bStatus:/.test(shown))
+      add("RULE", "a report shows no status chip — it is a snapshot, and its Summary says what was found (RD.DEVEX.WORKSPACE.192)");
+    const time = shown.match(/<time\b([^>]*)>/);
+    const datetime = time ? /\bdatetime="([^"]*)"/.exec(time[1])?.[1] : undefined;
+    if (!/>\s*Generated:\s*</.test(shown) || datetime === undefined)
+      add("RULE", "no Generated line — `Generated:` and a `<time class=\"local\" datetime=\"…\">` holding the block's `generatedAt`");
+    else {
+      if (datetime !== block.generatedAt)
+        add("RULE", `Generated reads \`${datetime}\`; the block's \`generatedAt\` is \`${block.generatedAt}\``);
+      if (!/\bclass="[^"]*\blocal\b/.test(time![1]))
+        add("RULE", "the Generated `<time>` carries `class=\"local\"` — the template's script renders only that element in the reader's own time zone");
+    }
+    if (!/>\s*Commit:\s*</.test(shown))
+      add("RULE", "no Commit — a report names the commit it read, beside Generated");
+  } else if (!carriesStatus(file, block)) {
     if (statusChip && (block.variant === "overview" || !("status" in block)))
       add("RULE", block.variant === "overview" ? "an overview shows no status chip"
         : "a status chip is here and the block declares no status — produce the page again from its seat file");
@@ -778,12 +825,16 @@ export function folderTree(dir: string): string[] {
  * is not a choice — it falls back to whatever the light block said. A DIFFERENT VALUE IS a choice,
  * because the palette is the one part of the furniture a repository is allowed to set for itself.
  */
-export function checkFurniture(file: string, src: string, templates: string): Finding[] {
+export function checkFurniture(file: string, src: string, templates: string, block: any = null): Finding[] {
   if (!src.includes('id="rail"')) return [];
   const flatten = (t: string): string[] =>
     (t.match(/<script\b[^>]*>[\s\S]*?<\/script>/g) ?? []).map((x) => x.replace(/\s+/g, " ").trim()).sort();
+  // A REPORT CARRIES ONE SCRIPT MORE: the one that shows Generated in the reader's own time zone
+  // (RD.DEVEX.WORKSPACE.192). So a report is compared with its own template, and every other page
+  // with the construct template's rail builder, fold and heading anchor.
+  const from = block?.variant === "report" ? "report-template.html" : "construct-template.html";
   let want: string[];
-  try { want = flatten(readFileSync(join(templates, "pages", "construct-template.html"), "utf8")); }
+  try { want = flatten(readFileSync(join(templates, "pages", from), "utf8")); }
   catch { return []; }
   if (!want.length) return [];
   const have = flatten(src);
@@ -1095,14 +1146,19 @@ export function worldOf(file: string): string | null {
 /**
  * Whether this document's block carries a `status` at all.
  *
- * TWO KINDS CARRY NONE, and the reason is the same one twice. An overview describes, so a face is
- * either current or a defect. A FOUNDATION repository's construct states a standard, and its
- * behaviour rows are `PROMISE` — five columns, no `Status` and no `Tier` — so there is no run to roll
- * up and no proof state to name. A word written there would be a claim somebody typed once, which is
- * exactly what `05-artifacts.md` § *A construct's status is derived, never typed* forbids.
+ * THREE KINDS CARRY NONE. An overview describes, so a face is either current or a defect. A
+ * FOUNDATION repository's construct states a standard, and its behaviour rows are `PROMISE` — five
+ * columns, no `Status` and no `Tier` — so there is no run to roll up and no proof state to name. A
+ * word written there would be a claim somebody typed once, which is exactly what `05-artifacts.md`
+ * § *A construct's status is derived, never typed* forbids. A report is a snapshot, and the next run
+ * replaces it rather than moving it through states.
  */
 export function carriesStatus(file: string, block: any): boolean {
   if (block?.variant === "overview") return false;
+  // A REPORT IS A SNAPSHOT (RD.DEVEX.WORKSPACE.192). It is true of one moment and the next run
+  // replaces it, so it has no states to move through. A chip on the first coverage page read
+  // IMPLEMENTING, and readers took the page to be unfinished when the repository had gaps.
+  if (block?.variant === "report") return false;
   if (block?.variant === "construct" && worldOf(file) === "FOUNDATION") return false;
   return true;
 }
@@ -3003,14 +3059,15 @@ export function gapReport(repo: string, workspace: string, asJson: boolean): num
     `  "id": "${name}-docs-audit",`,
     `  "title": "Docs Audit — ${name}",`,
     '  "lenses": ["ARCHITECT", "VOICE"],',
-    '  "status": "DONE",',
+    `  "generatedAt": "${at}",`,
     `  "summary": "What this repository's corpus looks like on ${at}, measured against the landed standard — its seats, what each domain owes, the pages off the standard, and the paragraphs a language pass would read."`,
     "}",
     "-->",
     "",
     `# Docs Audit — ${name}`,
     "",
-    "`For: Architect · Editor` · `Status: ✅ DONE`",
+    // A report is a snapshot and carries no status (RD.DEVEX.WORKSPACE.192).
+    "`For: Architect · Editor`",
     "",
     `Measured ${at}. **Nothing here was fixed while it was counted** — a scan that edits as it goes cannot be trusted as a measure, so this audit writes one file and touches nothing else.`,
     "",
@@ -3190,7 +3247,7 @@ export function audit(paths: string[], workspace: string): Finding[] {
     findings.push(...checkStyleBalance(p, src));
     findings.push(...checkLinks(p, src));
     findings.push(...checkConstructLink(p, src));
-    findings.push(...checkFurniture(p, src, templates));
+    findings.push(...checkFurniture(p, src, templates, block));
     findings.push(...checkPalette(p, src, templates));
     findings.push(...checkSelectors(p, src, block, templates));
     findings.push(...checkGovernsMap(p, src));

@@ -263,7 +263,7 @@ export function workstreamPlan(folders: string[], pages: string[]): Row[] {
 
 /**
  * When an `in progress <date> <time> <offset>` mark was written, or `null` where the cell carries no
- * such mark or its time cannot be read. The form is a report's measured time:
+ * such mark or its time cannot be read. The form is the date, the time and the offset:
  * `in progress 2026-09-29 14:32 +05:30`. A mark with no offset is read as UTC.
  */
 export function inProgressSince(cell: string): Date | null {
