@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/07-comments/",
-      "seen": "ae8ebd4f"
+      "seen": "95d8dfbe"
     }
   ]
 }
@@ -88,16 +88,16 @@ Describe a symbol on the declaration that **owns** the meaning. Everything downs
 
 An implementation is not a repetition of its contract — it is a different fact. The contract states the outcome; the class states **with what**, which is exactly what a caller choosing between two of them needs. Describe an implementation only when the mechanism is worth knowing. Where a contract has one implementation and the realization adds nothing, say nothing — the contract already answered.
 
-## Required where something decides; optional where a name already carries it
+## Required on every published declaration; short where a name already carries it
 
-| Required — a missing one is a defect | Optional — write it when it adds something | Never |
+| Required — a missing one is a defect | One plain line is enough | Never |
 | --- | --- | --- |
-| a service and each of its operations | a state, a type, a config binding | a repository |
-| a component, a hook, a page | an enum whose members explain themselves | a controller, a listener |
+| a service and each of its operations | a state, a type, a config binding whose name already carries it (`RD.SUPPORT.APPS.137`) | a repository |
+| a component, a hook, a page | an enum whose members explain themselves — the enum's line, no member lines | a controller, a listener |
 | every error code and permission code member | | |
 | every Command member — these become tool input fields | | |
 
-A blanket requirement would produce `/** Creates a group. */` over `createGroup` on every method, whether or not it has anything to say. **Filler is worse than absence, because it looks like information.**
+A line that restates the name — `/** Creates a group. */` over `createGroup` — is filler, and **filler is worse than absence, because it looks like information.** Where the name already carries the meaning, the line says what the name cannot: what the shape is for, or what a caller does with it.
 
 ## The seam tags: the half of the contract a signature cannot carry
 

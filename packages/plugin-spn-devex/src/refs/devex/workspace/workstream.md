@@ -42,7 +42,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "15039bb4"
+      "seen": "77ed8de9"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -99,7 +99,7 @@ output, and a reader learns to scroll past it, including the day it says somethi
 
 | The first prompt | What the agent does |
 | --- | --- |
-| **a handover, or a named workstream or arc** | picks it up at once, without asking again. **A handover's `model:` line is checked first — MUST**: compare its model with the one your system prompt names, and on a mismatch open the reply with one line naming both models and saying to switch with the model picker, then run nothing until the developer switches or says to go on. **The effort is not checked**: the developer sets it in the extension's picker, and `CLAUDE_EFFORT` can disagree with that picker, so the effort on the `model:` line is a note for the developer who opens the window. Then read its arcs and its plan before anything else |
+| **a handover, or a named workstream or arc** | picks it up at once, without asking again. **A handover's `model:` line is checked first — MUST** (`RD.DEVEX.WORKSPACE.196`): compare its model with the one your system prompt names, and on a mismatch open the reply with one line naming both models and saying to switch with the model picker, then run nothing until the developer switches or says to go on. **The effort is not checked**: the developer sets it in the extension's picker, and `CLAUDE_EFFORT` can disagree with that picker, so the effort on the `model:` line is a note for the developer who opens the window. Then read its arcs and its plan before anything else |
 | **something new** | asks for the goal in one or two plain questions, never lettered options or a `Q<n>` card, because a card lives on an approach page that does not exist yet (RD.DEVEX.AGENT.077); then opens a workstream for it. That is `S1` |
 | **a question** | answers it. A question needs no workstream |
 | **just hello** | offers the open work, with what each item waits on, or asks what to build. Only this prompt ends on a question |

@@ -26,7 +26,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",
       "section": "When an edit becomes behaviour",
-      "seen": "71b232f2"
+      "seen": "b1bdbbce"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md",
@@ -292,6 +292,8 @@ When a window opens, surface what is stale — a subject untouched across sittin
 **Agent setup is three repositories, never one.** The foundation states the rule, `spnutils` realizes the floor and the commands, and the marketplace restates it. A pass that edits the plugins and stops has changed a restatement and left its source standing. That is how a rule ends up somewhere a partner can never read it.
 
 **Nothing you edit is live before the install.** You read the installed plugin cache, so changing the concept, the chapters, the registers, the providers and the plugins leaves changed files and unchanged behaviour. Skills, agent briefs, reference files and `hooks.json` need a fresh window on top of the install. A hook **script** is the one exception, and it reloads on its next run.
+
+**A registration and the file it names change in one act.** A window reads `hooks.json` once, at session start, and keeps calling the files it named then. A `PreToolUse` hook that cannot start refuses every tool, `Write` included, so the window cannot repair itself. Never move or delete a hook file a live window still names: do it in the same act as the install that names its replacement, with no other window open.
 
 ### First, settle which mode you are in
 

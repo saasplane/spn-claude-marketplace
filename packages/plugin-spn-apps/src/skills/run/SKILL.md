@@ -85,8 +85,9 @@ below is what it produces today, and a kind added later needs no row of its own.
 | `migrate` | what owns a schema | `pnpm migrate up` · `down` · `list` · `pending` · `status` · `generate` |
 | `codegen` | `CLIENT_API` | `pnpm codegen api-client` |
 
-**`lint`, `prettier`, `test:<tier>`, `build:test`, `preview` and `release:verified` are retired
-spellings.** `lint` and `prettier` were second names for `check` and `format`; `preview` was `start`
+**As `package.json` scripts, `lint`, `prettier`, `test:<tier>`, `build:test`, `preview` and
+`release:verified` are retired spellings.** `test:<tier>` remains only as the inferred nx target
+above, which no node declares. `lint` and `prettier` were second names for `check` and `format`; `preview` was `start`
 under another name; the rest spelled a variant as a command. A node still carrying one has not been
 swept yet — read it as drift, not as a target to use.
 

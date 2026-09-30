@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/07-comments/01-intent.md",
-      "seen": "b1eb9cfb"
+      "seen": "901e5d1e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/08-agent-surface/README.md",
