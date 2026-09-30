@@ -126,6 +126,35 @@ console.log("=== behaviour-coverage — tier by tier");
     contract?.owedBy.includes("packages/client-api") && !contract.noCase.includes("packages/client-api"), JSON.stringify(contract));
 }
 
+console.log("\n=== behaviour-coverage — a client's contract run, credited to the service it mirrors (RD.SUPPORT.APPS.135)");
+
+{
+  // The client's suite against the running service IS the service's contract tier, so the client's
+  // run meets it for the service; the service's own tests/integration/ cases are integration.
+  const root = repo({ ...APPS, ...node("apps/service-ts", "APP_SERVER"), ...node("packages/client-api", "CLIENT_API"),
+    "apps/service-ts/tests/integration/boot.int.spec.ts": "// an integration case\n",
+    "packages/client-api/tests/contract/iam/login.contract.spec.ts": "// a case\n",
+    ...register(["IAM.LOGIN.01", "CONTRACT", "PLANNED"]),
+    ...artifact("packages/client-api", "CONTRACT", [["IAM.LOGIN.01", "SUCCESS"]]) });
+  const result = json(root);
+  const contract = result.tiers.find((tier) => tier.tier === "CONTRACT");
+  ok("a CLIENT_API's contract run is credited to the APP_SERVER, and the tier reads RAN",
+    contract?.state === "RAN" && contract.creditedTo.includes("apps/service-ts") && !contract.unrunBy.includes("apps/service-ts"), JSON.stringify(contract));
+  ok("the terminal line names the client run it credited", measure(root).includes("a client's contract run credited to apps/service-ts"), measure(root));
+}
+
+{
+  const root = repo({ ...APPS, ...node("apps/service-ts", "APP_SERVER"), ...node("packages/client-api", "CLIENT_API"),
+    "apps/service-ts/tests/integration/boot.int.spec.ts": "// an integration case\n",
+    "packages/client-api/tests/contract/iam/login.contract.spec.ts": "// a case\n",
+    ...register(["IAM.LOGIN.01", "CONTRACT", "PLANNED"]) });
+  const contract = json(root).tiers.find((tier) => tier.tier === "CONTRACT");
+  ok("known-bad: a client that carries contract cases and left no run credits nothing",
+    contract?.state === "NOT_RUN" && contract.creditedTo.length === 0, JSON.stringify(contract));
+  ok("known-bad: an APP_SERVER's tests/integration/ cases are not contract cases",
+    contract?.noCase.includes("apps/service-ts") && !contract.unrunBy.includes("apps/service-ts"), JSON.stringify(contract));
+}
+
 console.log("\n=== behaviour-coverage — one root journey run, credited to every application it drives");
 
 {

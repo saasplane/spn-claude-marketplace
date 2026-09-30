@@ -90,18 +90,15 @@ export function foundationAbsence(root: string): Record<string, unknown> | null 
 }
 
 /**
- * Where a tier's cases sit under a node's `tests/`, and the file names that count as one. A
- * `CLIENT_API`'s contract suite sits in `contract/`; an `APP_SERVER`'s `integration/` run reports
- * under `CONTRACT`, the tier its kind owes, so it is read there for that kind alone.
+ * Where a tier's cases sit under a node's `tests/`, and the file names that count as one. Every tier
+ * keeps a folder of its own, so one case file never reads as two tiers: a `CLIENT_API`'s contract
+ * suite sits in `contract/`, and an `APP_SERVER`'s `integration/` cases are integration cases.
  */
-const CASE_FOLDERS: Record<string, ReadonlyArray<{ folder: string; match: RegExp; kind?: string }>> = {
+const CASE_FOLDERS: Record<string, ReadonlyArray<{ folder: string; match: RegExp }>> = {
   UNIT: [{ folder: "unit", match: /\.(spec|test)\.tsx?$/ }],
   COMPONENT: [{ folder: "component", match: /\.ct\.spec\.tsx?$/ }],
   INTEGRATION: [{ folder: "integration", match: /\.int\.(spec|test)\.tsx?$/ }],
-  CONTRACT: [
-    { folder: "contract", match: /\.contract\.spec\.tsx?$/ },
-    { folder: "integration", match: /\.int\.(spec|test)\.tsx?$/, kind: "APP_SERVER" },
-  ],
+  CONTRACT: [{ folder: "contract", match: /\.contract\.spec\.tsx?$/ }],
   JOURNEY: [{ folder: "journeys", match: /\.spec\.tsx?$/ }],
 };
 
@@ -120,9 +117,7 @@ export function carrierOf(node: string): { carrier: string; scope: string } {
 /** Whether a node carries at least one case for this tier, on disk. */
 export function carriesCase(node: string, tier: string): boolean {
   const { carrier, scope } = carrierOf(node);
-  const kind = kindOf(carrier);
   return (CASE_FOLDERS[tier] ?? []).some((surface) => {
-    if (surface.kind !== undefined && surface.kind !== kind) return false;
     const folder = join(carrier, "tests", surface.folder, scope);
     if (!isDir(folder)) return false;
     try {
@@ -175,6 +170,22 @@ export function drivenByRootRun(root: string, nodes: string[], runsByNode: Map<s
       return texts.some((text) => idsIn(text).some((id) => named.has(id)));
     })
     .map(nameOf);
+}
+
+/**
+ * The services a client's contract run speaks for (RD.SUPPORT.APPS.135).
+ *
+ * An `APP_SERVER` carries no contract suite of its own: the `CLIENT_API` beside it drives the running
+ * service through the generated client, and that suite IS the service's contract tier. So a contract
+ * run left by any `CLIENT_API` in the repository meets the tier for every `APP_SERVER` in it, which
+ * is the rule `apps validate` applies to the cases on disk. Nothing declares which client belongs to
+ * which service, so the credit is repository-wide.
+ */
+export function creditedByClientRun(root: string, nodes: string[], ranBy: string[]): string[] {
+  const nameOf = (node: string): string => relative(root, node).split("\\").join("/") || ".";
+  const clientRan = nodes.some((node) => kindOf(node) === "CLIENT_API" && ranBy.includes(nameOf(node)));
+  if (!clientRan) return [];
+  return nodes.filter((node) => kindOf(node) === "APP_SERVER").map(nameOf);
 }
 
 /** The measurement for one repository. */
@@ -250,8 +261,10 @@ export function measure(root: string): Record<string, unknown> {
   const tiers = TIERS.filter((tier) => tierSet.has(tier)).map((tier) => {
     const owedByNames = [...owedByNode.entries()].filter(([, owed]) => owed.includes(tier)).map(([name]) => name);
     const ranBy = [...runsByNode.entries()].filter(([, found]) => found.some((run) => run.tiers.includes(tier))).map(([name]) => name);
-    // A repository's one root journey run meets the journey tier of every application it drives.
-    const creditedTo = tier === "JOURNEY" ? driven.filter((name) => !ranBy.includes(name)) : [];
+    // A repository's one root journey run meets the journey tier of every application it drives, and a
+    // client's contract run meets the contract tier of the service it mirrors.
+    const credited = tier === "JOURNEY" ? driven : tier === "CONTRACT" ? creditedByClientRun(root, nodes, ranBy) : [];
+    const creditedTo = credited.filter((name) => !ranBy.includes(name));
     const nodeOf = new Map(nodes.map((node) => [nameOf(node), node]));
     // A module an application owns is proved by the application's run, where its cases execute.
     const ranThrough = (name: string): boolean => {
@@ -309,7 +322,8 @@ export function describeResult(result: Record<string, any>): string[] {
   ];
   for (const tier of result.tiers) {
     const ran = (tier.runs.length === 0 ? "" : ` · ${tier.runs.length} artifact(s)`) +
-      (tier.creditedTo.length === 0 ? "" : ` · the root run credited to ${tier.creditedTo.join(" · ")}`);
+      (tier.creditedTo.length === 0 ? "" :
+        ` · ${tier.tier === "CONTRACT" ? "a client's contract run" : "the root run"} credited to ${tier.creditedTo.join(" · ")}`);
     lines.push(`  ${tier.tier.padEnd(11)} ${tier.state.padEnd(7)} ${tier.rows} row(s)${ran}` +
       (tier.reason === null ? "" : ` — ${tier.state === "NOT_RUN" ? "not run: " : ""}${tier.reason}`));
   }

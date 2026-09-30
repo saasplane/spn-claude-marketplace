@@ -60,31 +60,17 @@ export function casesIn(text: string, tableWritesAnId = false): { title: string;
   return out;
 }
 
-/** The node a test file belongs to: `apps/<x>` or `packages/<x>`, else the repository root. */
-function nodeOf(root: string, file: string): string {
-  const parts = relative(root, file).split(sep);
-  return parts[0] === "apps" || parts[0] === "packages" ? join(root, parts[0], parts[1]) : root;
-}
-
-/** Whether a node's kind owes the contract tier: an application server is proven through its entries. */
-function owesContract(node: string): boolean {
-  const manifest = join(node, "spkind.json");
-  if (!existsSync(manifest)) return false;
-  try { return JSON.parse(readFileSync(manifest, "utf8"))?.kind === "APP_SERVER"; } catch { return false; }
-}
-
 /**
- * The tier that binds an id for this file, or null when it is a unit or plain integration case.
+ * The tier that binds an id for this file, or null when it is a unit or integration case.
  *
- * A `CLIENT_API`'s contract suite sits in `tests/contract/`. An `APP_SERVER`'s `tests/integration/`
- * run reports under `CONTRACT`, the tier its kind owes.
+ * Every tier keeps a folder of its own: a `CLIENT_API`'s contract suite sits in `tests/contract/`,
+ * and an `APP_SERVER`'s `tests/integration/` cases are integration cases, which bind no id.
  */
 export function boundTier(root: string, file: string): BoundTier | null {
   const parts = relative(root, file).split(sep);
   if (parts[parts.indexOf("tests") + 1] === "contract") return "CONTRACT";
   if (parts.includes("component")) return "COMPONENT";
   if (parts.includes("journeys")) return "JOURNEY";
-  if (parts.includes("integration") && owesContract(nodeOf(root, file))) return "CONTRACT";
   return null;
 }
 
