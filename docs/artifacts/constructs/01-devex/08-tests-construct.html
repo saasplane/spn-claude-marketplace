@@ -274,7 +274,7 @@
   <h3 id="a-suite-is-found-by-a-walk-never-by-a-li">A suite is found by a walk, never by a list</h3>
   <p>The runner walks the tier and runs every file it finds. A list would be a second place a new suite has to be added, and the suite nobody added to it is the one that silently never runs.</p>
   <h3 id="a-case-that-carries-a-behaviour-id-becom">A case that carries a behaviour id becomes that row's result</h3>
-  <p>This repository declares no stack, so no stack runner writes its behaviour rows. The suites are the runner instead: a case whose title carries a row's id writes that row's result into the run's own artifact, and a tool reads the artifact and fills the two cells a run owns. A row no case reached is left saying so.</p>
+  <p>This repository declares no stack, so no stack runner writes its behaviour rows. The suites are the runner instead: a case whose title carries a row's id writes that row's result into the file of the run its caller named, and a tool told that run's name reads the file and fills the two cells a run owns. A row no case reached is left saying so.</p>
   <h3 id="what-a-suite-proves-is-the-shipping-shap">What a suite proves is the shipping shape</h3>
   <p>A suite runs the script the way a moment runs it — as a process, handed a payload on standard input, read back from standard output — rather than importing a function and calling it. A gate that passes when imported and fails when spawned is a gate that has never been proven, and both spellings exist in the folder it is asked about.</p>
   <h3 id="the-payload-a-case-replays-sits-beside-t">The payload a case replays sits beside the suites, once per event</h3>

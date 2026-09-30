@@ -125,7 +125,7 @@ Handing a whole corpus to a rewriting pass is the expensive way to improve it, a
 
 ### A tool that writes rather than reports
 
-One tool here writes. It reads a run's own results file and puts what the run found into the cells a run owns, leaving every other cell exactly as it was. It exists because this repository declares no stack, so no stack runner writes its rows, and only the plugins' own suites know.
+One tool here writes. It reads the files of the one run it is told to read and puts what the run found into the cells a run owns, leaving every other cell exactly as it was. It exists because this repository declares no stack, so no stack runner writes its rows, and only the plugins' own suites know.
 
 ### A tool produces the pages, and the page's own shape belongs to the book
 

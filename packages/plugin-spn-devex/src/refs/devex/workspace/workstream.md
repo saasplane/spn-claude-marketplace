@@ -38,11 +38,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "6f17499d"
+      "seen": "d1e5a22d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "ba0e59c6"
+      "seen": "15039bb4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -66,7 +66,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "5fbe98e2"
+      "seen": "ada254d4"
     }
   ]
 }
@@ -288,6 +288,18 @@ changes. What they settle, you decide. Log the decision and its reason in the ar
 developer in one line. A question the developer must answer costs their attention, and a question the
 book already answers costs it for nothing.
 
+**Get the construct right, not every feature — MUST** (`RD.DEVEX.WORKSPACE.194`). While you shape a
+change, propose the constructs the ask needs and their patterns, correct on their own, and stop there.
+What those constructs make possible later goes in one line, *later, not now*, and never into the
+construct or into an option. The developer widens it when they want to. A construct that is right can
+carry features later, and features built on a wrong one have to be undone with it.
+
+**Opinion or question — MUST** (`RD.DEVEX.WORKSPACE.195`). While no arc row owns the subject, ask the
+developer for an opinion: `O<n>`, in chat only, numbered per window, never written to a file, and no
+hook reads it. Each opinion carries the question, lettered options and the one you lean to, with why.
+Once the answer settles the shape, write the arc row, and anything still open becomes the page's next
+`Q<n>` card, on the page, which the hooks check ([a number is a promise](#ideating-is-free-executing-is-not-a-number-is-a-promise)).
+
 **A question reaches the developer for one of three reasons, and for no other — MUST.**
 
 | Reason | What it covers |
@@ -499,7 +511,7 @@ what needs the developer.
 
 **From the first edit, a step must already exist.** Any edit. **Size does not excuse it and neither does approval** — a yes in conversation authorises the change, never the record. The disguise is the one-word fix the developer has already agreed to: it does not feel like a change, and it leaves the identical hole. A session later the file differs from `HEAD` and nothing says why.
 
-**Writing `Q<n>` asserts the card is already on the approach page.** The number is a claim about the record, so do not spend one before the arc exists. Where the shape is still moving, **ask in prose** — prose questions are free — or ask the developer to open the arc.
+**Writing `Q<n>` asserts the card is already on the approach page.** The number is a claim about the record, so do not spend one before the arc exists. Where the shape is still moving, **ask in prose** — an opinion, `O<n>`, in chat, which is free ([opinion or question](#a-card-is-only-for-what-the-rules-leave-open)) — or ask the developer to open the arc.
 
 **That escape is what makes the rule followable.** Mid-ideation you often cannot write the arc, because the subject has not settled. Stop numbering until it has. Never keep numbering and reconcile the page afterwards: a page reconciled later records the destination and throws away every turn that reached it.
 

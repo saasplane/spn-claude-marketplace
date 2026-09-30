@@ -48,7 +48,7 @@ console.log("\n=== 5.1 — each report type: its command, its tables and its rec
 const TYPES = {
   "Coverage": [/spn-devex coverage measure <repo> --json/, /Name · Written · Built · Proved · Not written · Not built · Not proved/, /level 1 the gap/,
     /A `MANUAL` row counts in none of the numbers — MUST[\s\S]*Proved by hand/],
-  "Tests": [/spn-devex behaviours coverage <repo> --json/, /Tier · Runs · Written · Built · SUCCESS · FAILED · PENDING · PLANNED/, /Problem · Count · Where · What fixes it/, /level 1 the status/,
+  "Tests": [/spn-devex behaviours coverage <repo> --json/, /Tier · Runs · Written · Built · SUCCESS · FAILED · PENDING · PLANNED/, /The tests report reads the stamped rows only/, /level 1 the status/,
     /A `MANUAL` row counts in none of the numbers — MUST[\s\S]*Proved by hand/],
   "Audit": [/spnutils apps validate repo/, /Plugin · Declared · Installed · Source · State/, /setup only — MUST/, /level 1 the area/],
   "Code": [/spnutils apps check <package>/, /Group · Checks · PASS · WARN · FAIL/, /Lint is one check per package/, /level 1 the rule group/],

@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
-      "seen": "3ba37080"
+      "seen": "020faf26"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
@@ -17,7 +17,7 @@
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
       "section": "What the phase owes when it closes",
-      "seen": "b5f3a6a3"
+      "seen": "8f12c198"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/README.md",
@@ -32,7 +32,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/13-tests.md",
       "section": "Coverage — how the model is rendered here",
-      "seen": "4c041a0a"
+      "seen": "e1089233"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/02-packages/02-tests.md",
@@ -183,16 +183,16 @@ A **double** stands in for a collaborator and belongs to the unit tier only; a *
 
 ## After a run: stamp the rows, then read them against the runs
 
-**`spnutils` runs a tier and writes `tests/.output/<tier>/spn-tests.json`, and never a row** (`RD.DEVEX.UTILS.071`). A journey phase other than the sweep writes its own `spn-tests.<phase>.json` beside it, so one phase never replaces what another proved, and every script below reads both. What the run means for the documents is yours, through this plugin's scripts:
+**Every run is named, and `spnutils` runs a tier and writes that run's file, never a row** (`RD.DEVEX.UTILS.071`). Choose one name for the sitting, such as `full-1001`, and give it to every test command: `spnutils apps test <tier> <run> <package>`, `spnutils infra test <run> [package]`. The run writes `tests/.output/<tier>/runs/<run>.json`, and a journey phase writes `<run>.<phase>.json`, so one run name never overwrites itself across phases. A reused name replaces that one file and no other, and each tier keeps its 20 newest. What the run means for the documents is yours, through this plugin's scripts:
 
 ```bash
-node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs behaviours stamp .                    # what it would change
-node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs behaviours stamp --write .            # Status and Updated at, from the run
-node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs behaviours check .                    # a SUCCESS row its tier's run contradicts
+node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs behaviours stamp <run> .              # what it would change
+node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs behaviours stamp <run> . --write      # Status and Updated at, from that run
+node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs behaviours check .                    # a SUCCESS row the run it cites contradicts
 node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs behaviours coverage --json .          # the tests report's measurement
 ```
 
-The writer stamps a row only from a result at the row's own `Tier`, never writes over `MANUAL`, and leaves a row nothing named alone unless `--reach repository` says the artifacts are the whole of their tiers. It reads a register by its headings, so an eight-, nine- or ten-cell row is stamped alike. A repository's one root journey run is read wherever it wrote its artifact. The measurement credits that run to every web application whose journey cases it named, so an application it drove is not reported as unrun (`RD.SUPPORT.APPS.135`). A stack's plugin adds what knows the stack — where a case lives, for the join.
+The writer reads only the run you name, `<run>.json` and every `<run>.<phase>.json` in every node, and refuses a stamp that names none, listing the newest runs it found. It writes `Updated at` as `<time> · <run>`, so a row names the run that proved it. It stamps a row only from a result at the row's own `Tier`, never writes over `MANUAL`, and leaves a row the run did not mention alone unless `--reach repository` says the run is the whole of its tiers. It reads a register by its headings, so an eight-, nine- or ten-cell row is stamped alike. A repository's one root journey run is read wherever it wrote its file, so the rows of every web application it drove are stamped from it (`RD.SUPPORT.APPS.135`). The proof check reads each `SUCCESS` row against the run its `Updated at` cites; a row citing a run whose file is not on disk is counted, never judged. The coverage measurement and the reports read the stamped rows only, and open no run file. A stack's plugin adds what knows the stack — where a case lives, for the join.
 
 ## Code coverage is reported, never enforced
 
@@ -213,7 +213,7 @@ Report per tier: what ran, the count, and what failed with its actual output. Th
 **A full-repository run fixes what keeps a row unproved before the report is written.** A run over the whole repository is not only a report. Each of these keeps a row unproved, and each one is the run's own work:
 
 - a row whose tier is not the tier of the case that proves it;
-- a runner that ran and wrote no result file, so its cases prove nothing;
+- a runner that ran and wrote no run file, so its cases prove nothing;
 - a case its tier binds that carries no id;
 - a red case.
 

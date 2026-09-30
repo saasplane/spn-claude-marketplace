@@ -7,14 +7,14 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/05-test.md",
-      "seen": "3ba37080"
+      "seen": "020faf26"
     }
   ]
 }
 -->
 ---
 name: verify
-description: Run the estate's gates - spnutils infra validate for the build, spnutils infra test for the tiers a node's kind owes - stamp the rows a run proved, and say honestly what a green run proves. Use before asking for any review, after a scaffold or a declaration edit, and whenever a claim is made that an estate node is sound. Not for bringing a layer up (run skill) and not for judging a plan's contents (review skill).
+description: Run the estate's gates - spnutils infra validate for the build, spnutils infra test <run> for the tiers a node's kind owes - stamp the rows a run proved, and say honestly what a green run proves. Use before asking for any review, after a scaffold or a declaration edit, and whenever a claim is made that an estate node is sound. Not for bringing a layer up (run skill) and not for judging a plan's contents (review skill).
 ---
 
 # verify — validate the build, test the tiers, stamp what proved them
@@ -31,9 +31,9 @@ A node's behaviour rows open `PLANNED`. Proving one is not a separate errand fro
 
 1. **Write the row before the case.** A case with no row to cite proves nothing a reader can act on.
 2. **One case line, or one `tofu test` run, per row — in the tier folder that owns it.** The folder says the tier; the file's kind says the engine. A `*.sh` case prints `ok <TIER> <ID> <title>` through `helpers/case.sh`; a `*.tftest.hcl` run is named for its id (`PLT_ZONE_01_<title>` proves `PLT.ZONE.01`).
-3. **`spnutils infra test`** runs the node's build, then its cases, then its `*.tftest.hcl` files under `tofu test`, and writes `tests/.output/<tier>/spn-tests.json` per tier — one artifact, never a document a person edits by hand.
-4. **The agent stamps the rows the run proved**, with the same writer and the same rules as an application's: a run speaks only for the tiers it ran, and a row marked `MANUAL` is never overwritten.
-5. **`spnutils infra release`** refuses a node whose kind owes a tier with no case, or any case that fails. There is no flag that skips the harness.
+3. **`spnutils infra test <run>`** runs the node's build, then its cases, then its `*.tftest.hcl` files under `tofu test`, and writes `tests/.output/<tier>/runs/<run>.json` per tier — one file per run under the name you give, never a document a person edits by hand. The name is required; a reused name replaces that one file, and each tier keeps its 20 newest.
+4. **The agent stamps the rows the run proved**, with the same writer and the same rules as an application's: `spn-devex behaviours stamp <run> . --write` reads only that run, writes `Updated at` as `<time> · <run>`, speaks only for the tiers it ran, and never overwrites a row marked `MANUAL`.
+5. **`spnutils infra release`** runs its tests as a run named `release-<version>`, such as `release-0.4.1`, and refuses a node whose kind owes a tier with no case, or any case that fails. There is no flag that skips the harness.
 
 ## validate — the build, before any tier
 
@@ -48,10 +48,10 @@ This is the build, not a tier: it checks the tree against what the type prescrib
 ## test — the tiers the node's kind owes
 
 ```text
-spnutils infra test [package]
+spnutils infra test <run> [package]
 ```
 
-`package` is one node folder under `packages/`; omit it for every node. **A node owes the tiers its kind fixes, and no node chooses its own**:
+`run` is the name you give this run, such as `full-1001`, and names the file it writes. `package` is one node folder under `packages/`; omit it for every node. **A node owes the tiers its kind fixes, and no node chooses its own**:
 
 | Kind | Owes | Because |
 | --- | --- | --- |
@@ -79,7 +79,7 @@ Every owed tier lives in its own folder under `tests/` — `contract/` · `unit/
 
 ## The order
 
-Scaffold or edit → write the row `PLANNED` → the case, in its tier folder → `spnutils infra validate` → `spnutils infra test` → rows stamped → `spnutils infra platform up <spc> --plan` (or the layer you changed: `organization up` takes no `<spc>`, `environment up <spc> <env>` takes both) → hand the plan to the `review` skill → `--apply` → `release`. A step skipped is a step somebody else pays for.
+Scaffold or edit → write the row `PLANNED` → the case, in its tier folder → `spnutils infra validate` → `spnutils infra test <run>` → rows stamped from that run → `spnutils infra platform up <spc> --plan` (or the layer you changed: `organization up` takes no `<spc>`, `environment up <spc> <env>` takes both) → hand the plan to the `review` skill → `--apply` → `release`. A step skipped is a step somebody else pays for.
 
 ## Hand-off
 

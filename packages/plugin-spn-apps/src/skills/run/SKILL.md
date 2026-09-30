@@ -141,7 +141,7 @@ specified path does not exist`, which reads as a broken command rather than a mi
 
 ## After a run: the rows say what it found
 
-A run leaves `tests/.output/<tier>/spn-tests.json` behind — every behaviour id its case titles carried, and what the runner actually did with each. **`spnutils` writes the artifact and never a row** (`RD.DEVEX.UTILS.071`). Writing it into the registers is the **spn-devex** plugin's row writer, `spn-devex behaviours stamp` in that plugin (cross-plugin pointer; it ships alongside this plugin), run the way its `test` skill runs it: first without `--write` to see what it would change, then with it. The same plugin's `spn-devex behaviours check` then refuses a `SUCCESS` row the run of its tier contradicts.
+Every run is named by its caller, and leaves `tests/.output/<tier>/runs/<run>.json` behind — or `<run>.<phase>.json` for a journey phase — with every behaviour id its case titles carried, and what the runner actually did with each. **`spnutils` writes the run file and never a row** (`RD.DEVEX.UTILS.071`). Writing it into the registers is the **spn-devex** plugin's row writer, `spn-devex behaviours stamp <run> <repo>` in that plugin (cross-plugin pointer; it ships alongside this plugin), run the way its `test` skill runs it: first without `--write` to see what it would change, then with it. It reads only the run you name, and writes `Updated at` as `<time> · <run>`. The same plugin's `spn-devex behaviours check` then refuses a `SUCCESS` row the run it cites contradicts.
 
 The join is this plugin's, because where a case lives is the stack's:
 
@@ -155,7 +155,7 @@ node "${CLAUDE_PLUGIN_ROOT}"/scripts/checks/behaviour-join.ts .      # a SUCCESS
 node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs coverage check <project>   # an exclude with no comment giving its reason
 ```
 
-**Pass `--reach repository` only when the artifacts on disk ARE the whole of the tiers they name** — a full run of every node that owes them. Without it, a row no artifact mentioned is left exactly as it was. With it, such a row goes back to `PLANNED`, which is right after a complete run and wrong after a single node's: runs are per node and a register is per repository, so one node's journey run would otherwise reset another's rows.
+**Pass `--reach repository` only when the run you name IS the whole of the tiers it names** — a full run of every node that owes them, under one name. Without it, a row the run did not mention is left exactly as it was. With it, such a row goes back to `PLANNED`, which is right after a complete run and wrong after a single node's: runs are per node and a register is per repository, so one node's journey run would otherwise reset another's rows.
 
 | It writes | It never writes |
 | --- | --- |
@@ -168,9 +168,9 @@ A hand edit to `Status` or `Updated at` is a claim rather than a finding, and th
 it rather than going under it — everything after `--` reaches the runner:
 
 ```bash
-npx nx run <project>:test:unit -- <file>               # one unit file
-npx nx run <project>:test:integration -- <file>        # one integration file
-npx nx run <project>:test:unit -- --listTests          # what would run, without running it
+npx nx run <project>:test:unit --run <run> -- <file>          # one unit file
+npx nx run <project>:test:integration --run <run> -- <file>   # one integration file
+npx nx run <project>:test:unit --run <run> -- --listTests     # what would run, without running it
 ```
 
 **The integration config is `jest.config.integration.cjs`, never `.ts`** — you only meet the name
@@ -184,16 +184,17 @@ the journey tier against what is served.
 ```bash
 pnpm build test                                          # 1. the bundle a browser drives, in development mode
 pnpm start                                               # 2. serve what the build produced
-spnutils apps test journey <node>                        # 3. the sweep, the default phase
-spnutils apps test journey <node> --phase serialized     #    the cases that flip a global or a session, one worker
-spnutils apps test journey <node> --phase window         #    the cases that wait out a window, one worker
-spnutils apps test journey <node> -- --max-failures=5    # while diagnosing — a failing case pays its whole timeout
+spnutils apps test journey <run> <node>                        # 3. the sweep, the default phase
+spnutils apps test journey <run> <node> --phase serialized     #    the cases that flip a global or a session, one worker
+spnutils apps test journey <run> <node> --phase window         #    the cases that wait out a window, one worker
+pnpm test journey <run> -- --max-failures=5                    # in the node, while diagnosing — a failing case pays its whole timeout
 ```
 
 **A phase is an argument, never a file.** A node carries one journey configuration, and `--phase`
-sets `SPN_TEST_PHASE` for it; naming no phase runs the sweep. The command runs the configuration
+sets `SPN_TEST_PHASE` for it; naming no phase runs the sweep. Give every phase the same run name:
+each writes its own `<run>.<phase>.json`, and the stamp reads them all. The command runs the configuration
 beside the node, or else the one at the repository root. Everything after `--` reaches Playwright
-untouched.
+untouched when you run `spn-test` through the node's own script; `spnutils apps test` does not pass it on yet.
 
 **Whole-repo runs.** `pnpm test:all` is the root script that runs every tier each node owes or
 carries, across the repository.
@@ -244,16 +245,16 @@ Typecheck first, then the suites — a type error makes every later result noise
 
 ```bash
 npx nx run-many -t build -p '<touched>'   # the service for BE, ui packages / web apps for FE
-npx nx run-many -t test --all            # every unit suite
+npx nx run-many -t test:unit --all --run <run>   # every unit suite, under one run name
 ```
 
 **BE contract** (drives the running service through the API client):
 
 1. Service up with migrations applied (mode local, steps 1-5).
 2. If the contract changed since the client was generated: regenerate the client from the live service first.
-3. `npx nx run <client>:test:contract` — the target already carries `jest.config.contract.cjs` and `--runInBand`, and it fails when the service is unreachable, naming the command that starts it.
+3. `npx nx run <client>:test:contract --run <run>` — the target already carries `jest.config.contract.cjs` and `--runInBand`, and it fails when the service is unreachable, naming the command that starts it.
 
-**FE journeys**: `pnpm build test` → `pnpm start` → `spnutils apps test journey <node>`, then `--phase serialized` and `--phase window` where the node carries those cases — after the BE suite, on a quiesced stack (no concurrent resets/builds), with the stack seeded.
+**FE journeys**: `pnpm build test` → `pnpm start` → `spnutils apps test journey <run> <node>`, then `--phase serialized` and `--phase window` under the same run name where the node carries those cases — after the BE suite, on a quiesced stack (no concurrent resets/builds), with the stack seeded.
 
 Codegen freshness comes before any suite. Run `spnutils apps gen-validators <pkg>` for packages with edited `contract/states/**`. Run `spnutils apps gen-barrel <pkg>` for lib packages that gained/lost files — never apps, never the API client.
 

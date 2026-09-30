@@ -9,7 +9,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A card is only for what the rules leave open",
-      "seen": "878fff28"
+      "seen": "e72db838"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -63,6 +63,15 @@ code, the book, the plugin references, the lenses and the arcs. What they settle
 decision and its reason in the arc, and name it to the developer in one line. A question the book
 already answers costs the developer's attention for nothing.
 
+**Get the construct right, not every feature — MUST** (`RD.DEVEX.WORKSPACE.194`). While you shape a
+change, propose the constructs the ask needs and their patterns, correct on their own, and stop there.
+What they make possible later is one line, *later, not now*, never a construct or an option of its own.
+
+**Opinion or question — MUST** (`RD.DEVEX.WORKSPACE.195`). While no arc row owns the subject, ask for an
+opinion, `O<n>`: in chat only, numbered per window, never written to a file, and read by no hook, with
+the question, lettered options and the one you lean to. Once the answer settles the shape, the arc row
+is written, and anything still open becomes the page's next `Q<n>` card, in the shape below.
+
 **A question reaches the developer for one of three reasons, and for no other:**
 
 | Reason | What it covers |
@@ -75,7 +84,7 @@ already answers costs the developer's attention for nothing.
 
 | Part | What it carries |
 | --- | --- |
-| **Number + summary** | Numbered **`Q<n>`**, and the numbering is **stable across the whole exchange** — Q3 is Q3 in the question, the discussion, the answer and the page that later states it. One prefix, because a corpus that has used `O1`, `D1`, bare `1` and a trailing `card D58` costs the reader a guess before they can reply. The summary names the **choice**, not the topic |
+| **Number + summary** | Numbered **`Q<n>`**, and the numbering is **stable across the whole exchange** — Q3 is Q3 in the question, the discussion, the answer and the page that later states it. One prefix, because a corpus that has used `O1`, `D1`, bare `1` and a trailing `card D58` costs the reader a guess before they can reply. An `O<n>` opinion asked in chat before an arc row exists is not a card and never reaches a page. The summary names the **choice**, not the topic |
 | **What** | The change concretely — the file, the rule, the before → after, in names and counts, not adjectives. It starts from what exists, with the file and the line |
 | **Why** | Which of the three reasons makes the choice the developer's, and what it costs to leave as is: the failure it causes. Never *"for consistency"* |
 | **Options** | A **table**: lettered, trade-off in its own column. *"Leave it"* is a real option wherever viable, with its cost stated |

@@ -34,21 +34,43 @@ const REGISTER = [
   "",
 ].join("\n");
 
-const stand = (results, tiers = ["CONTRACT"], ranAt = "2026-09-20T09:00:00Z") => {
+/** A run file's body, in the shape the toolchain's runner writes. */
+const runBody = (run, tier, results, ranAt = "2026-09-20T09:00:00Z", phase = null) =>
+  JSON.stringify({ run, tier, phase, ranAt, env: "local", results });
+
+/** Where a node's run of one tier writes under a name. */
+const runPath = (node, tier, run, phase = null) =>
+  `${node}/tests/.output/${tier.toLowerCase()}/runs/${phase === null ? run : `${run}.${phase}`}.json`;
+
+const stand = (results, tier = "CONTRACT", ranAt = "2026-09-20T09:00:00Z", name = "r1") => {
   const root = mkdtempSync(join(tmpdir(), "rows-"));
   kept.push(root);
   const doc = join(root, "docs", SEAT.behaviors, "login.md");
   mkdirSync(dirname(doc), { recursive: true });
   writeFileSync(doc, REGISTER, "utf8");
-  const artifact = join(root, "apps", "api", "tests", ".output", "contract", "spn-tests.json");
-  mkdirSync(dirname(artifact), { recursive: true });
-  writeFileSync(artifact, JSON.stringify({ env: "local", tiers, ranAt, results }), "utf8");
+  const file = join(root, runPath("apps/api", tier, name));
+  mkdirSync(dirname(file), { recursive: true });
+  writeFileSync(file, runBody(name, tier, results, ranAt), "utf8");
   return { root, doc };
 };
 
-const run = (root, ...args) => {
-  try { return execFileSync("node", [TOOL, ...args, "."], { cwd: root, encoding: "utf8" }); }
+/** A further run file beside what `stand` wrote. */
+const add = (root, path, body) => {
+  mkdirSync(dirname(join(root, path)), { recursive: true });
+  writeFileSync(join(root, path), body, "utf8");
+};
+
+/** The tool, told to read run `r1` unless a case names another first. */
+const runNamed = (root, name, ...args) => {
+  try { return execFileSync("node", [TOOL, ...(name === null ? [] : [name]), ...args, "."], { cwd: root, encoding: "utf8" }); }
   catch (e) { return `${e.stdout ?? ""}${e.stderr ?? ""}`; }
+};
+const run = (root, ...args) => runNamed(root, "r1", ...args);
+
+/** The tool's exit code and everything it printed. */
+const runCode = (root, argv) => {
+  try { return { out: execFileSync("node", [TOOL, ...argv], { cwd: root, encoding: "utf8" }), code: 0 }; }
+  catch (e) { return { out: `${e.stdout ?? ""}${e.stderr ?? ""}`, code: e.status ?? -1 }; }
 };
 
 /** One row's Tier, Status and Updated at, so a case asserts cells rather than substrings. */
@@ -66,7 +88,8 @@ console.log("=== behaviour-rows — what it writes");
   const { root, doc } = stand([{ id: "IAM.LOGIN.01", tier: "CONTRACT", status: "FAILED", title: "t", detail: "x" }]);
   run(root, "--write");
   ok("a run's finding reaches the row", cells(doc, "IAM.LOGIN.01").status === "FAILED");
-  ok("and stamps the run's own instant", cells(doc, "IAM.LOGIN.01").at === "2026-09-20T09:00:00Z");
+  ok("[MKT.SCRIPTS.75] and stamps the run's own instant and its name", cells(doc, "IAM.LOGIN.01").at === "2026-09-20T09:00:00Z · r1",
+     cells(doc, "IAM.LOGIN.01").at);
   ok("a row of another tier is untouched", cells(doc, "IAM.LOGIN.03").at === "2026-09-19T04:31:22Z");
   ok("the row keeps its eight cells", cells(doc, "IAM.LOGIN.01").width === 8);
 }
@@ -90,15 +113,13 @@ console.log("=== behaviour-rows — what it writes");
 }
 
 {
-  // A repository's one root journey run: its artifact sits at the root, and it speaks for the JOURNEY rows it named.
-  const { root, doc } = stand([], ["CONTRACT"]);
-  const artifact = join(root, "tests", ".output", "journey", "spn-tests.json");
-  mkdirSync(dirname(artifact), { recursive: true });
-  writeFileSync(artifact, JSON.stringify({ env: "local", tiers: ["JOURNEY"], ranAt: "2026-09-21T09:00:00Z",
-    results: [{ id: "IAM.LOGIN.03", tier: "JOURNEY", status: "FAILED", title: "t", detail: "x" }] }), "utf8");
+  // A repository's one root journey run: its file sits at the root, and it speaks for the JOURNEY rows it named.
+  const { root, doc } = stand([], "CONTRACT");
+  add(root, runPath(".", "JOURNEY", "r1"), runBody("r1", "JOURNEY",
+    [{ id: "IAM.LOGIN.03", tier: "JOURNEY", status: "FAILED", title: "t", detail: "x" }], "2026-09-21T09:00:00Z"));
   run(root, "--write");
-  ok("a root journey run's artifact stamps the JOURNEY row it named", cells(doc, "IAM.LOGIN.03").status === "FAILED"
-    && cells(doc, "IAM.LOGIN.03").at === "2026-09-21T09:00:00Z", JSON.stringify(cells(doc, "IAM.LOGIN.03")));
+  ok("a root journey run's file stamps the JOURNEY row it named", cells(doc, "IAM.LOGIN.03").status === "FAILED"
+    && cells(doc, "IAM.LOGIN.03").at === "2026-09-21T09:00:00Z · r1", JSON.stringify(cells(doc, "IAM.LOGIN.03")));
 }
 
 console.log("=== behaviour-rows — what it refuses to assume");
@@ -123,7 +144,7 @@ console.log("=== behaviour-rows — what it refuses to assume");
 }
 
 {
-  const { root, doc } = stand([], ["CONTRACT"]);
+  const { root, doc } = stand([], "CONTRACT");
   run(root, "--write", "--reach", "repository");
   ok("a tier that ran and matched nothing resets its rows", cells(doc, "IAM.LOGIN.01").status === "PLANNED");
   ok("and clears the instant with it", cells(doc, "IAM.LOGIN.01").at === "");
@@ -172,7 +193,7 @@ const byHeading = (doc, id) => {
 };
 
 const CONTRACT_RUN = (results, ranAt = "2026-09-28T09:00:00Z") =>
-  ({ "apps/api/tests/.output/contract/spn-tests.json": { env: "local", tiers: ["CONTRACT"], ranAt, results } });
+  ({ [runPath("apps/api", "CONTRACT", "r1")]: { run: "r1", tier: "CONTRACT", phase: null, ranAt, env: "local", results } });
 
 {
   const nine = [
@@ -183,7 +204,7 @@ const CONTRACT_RUN = (results, ranAt = "2026-09-28T09:00:00Z") =>
   const { root, doc } = standWith(nine, CONTRACT_RUN([{ id: "IAM.WIDE.01", tier: "CONTRACT", status: "SUCCESS", title: "t" }]));
   run(root, "--write");
   const row = byHeading(doc, "IAM.WIDE.01");
-  ok("[MKT.SCRIPTS.48] a nine-cell row is stamped by heading", row.status === "SUCCESS" && row.at === "2026-09-28T09:00:00Z", row.line);
+  ok("[MKT.SCRIPTS.48] a nine-cell row is stamped by heading", row.status === "SUCCESS" && row.at === "2026-09-28T09:00:00Z · r1", row.line);
   ok("[MKT.SCRIPTS.48] and keeps its nine cells, the last one as written", row.width === 9 && row.line.endsWith("| account |"));
 }
 
@@ -196,7 +217,7 @@ const CONTRACT_RUN = (results, ranAt = "2026-09-28T09:00:00Z") =>
   const { root, doc } = standWith(ten, CONTRACT_RUN([{ id: "IAM.TEN.01", tier: "CONTRACT", status: "FAILED", title: "t" }]));
   run(root, "--write");
   const row = byHeading(doc, "IAM.TEN.01");
-  ok("[MKT.SCRIPTS.48] a ten-cell row, with Where before Type, is stamped by heading", row.status === "FAILED" && row.at === "2026-09-28T09:00:00Z", row.line);
+  ok("[MKT.SCRIPTS.48] a ten-cell row, with Where before Type, is stamped by heading", row.status === "FAILED" && row.at === "2026-09-28T09:00:00Z · r1", row.line);
   ok("[MKT.SCRIPTS.48] and its Where and Names cells are copied through", row.width === 10 && row.line.includes("| service-api |") && row.line.endsWith("| FDN.LOGIN.01 |"));
 }
 
@@ -212,14 +233,14 @@ console.log("\n=== behaviour-rows — the rules a writer keeps");
   // Two runs of one tier, from two nodes. The newer one did not name the row, so it may not date it.
   const eight = REGISTER.split("\n");
   const { root, doc } = standWith(eight, {
-    "apps/api/tests/.output/contract/spn-tests.json":
-      { env: "local", tiers: ["CONTRACT"], ranAt: "2026-09-20T08:00:00Z", results: [{ id: "IAM.LOGIN.02", tier: "CONTRACT", status: "SUCCESS", title: "t" }] },
-    "apps/web/tests/.output/contract/spn-tests.json":
-      { env: "local", tiers: ["CONTRACT"], ranAt: "2026-09-28T08:00:00Z", results: [{ id: "IAM.OTHER.01", tier: "CONTRACT", status: "SUCCESS", title: "t" }] },
+    [runPath("apps/api", "CONTRACT", "r1")]:
+      { run: "r1", tier: "CONTRACT", phase: null, env: "local", ranAt: "2026-09-20T08:00:00Z", results: [{ id: "IAM.LOGIN.02", tier: "CONTRACT", status: "SUCCESS", title: "t" }] },
+    [runPath("apps/web", "CONTRACT", "r1")]:
+      { run: "r1", tier: "CONTRACT", phase: null, env: "local", ranAt: "2026-09-28T08:00:00Z", results: [{ id: "IAM.OTHER.01", tier: "CONTRACT", status: "SUCCESS", title: "t" }] },
   });
   run(root, "--write");
-  ok("[MKT.SCRIPTS.50] the row is dated by the run that named it, not by a newer run that did not",
-     cells(doc, "IAM.LOGIN.02").at === "2026-09-20T08:00:00Z", JSON.stringify(cells(doc, "IAM.LOGIN.02")));
+  ok("[MKT.SCRIPTS.50] the row is dated by the file that named it, not by a newer file of the run that did not",
+     cells(doc, "IAM.LOGIN.02").at === "2026-09-20T08:00:00Z · r1", JSON.stringify(cells(doc, "IAM.LOGIN.02")));
 }
 
 {
@@ -239,8 +260,76 @@ console.log("\n=== behaviour-rows — the rules a writer keeps");
   const first = statSync(doc).mtimeMs;
   const before = readFileSync(doc, "utf8");
   const second = run(root, "--write");
-  ok("a second run over the same artifact changes no row", second.includes("wrote 0 row(s)") && readFileSync(doc, "utf8") === before);
+  ok("a second stamp from the same run changes no row", second.includes("wrote 0 row(s)") && readFileSync(doc, "utf8") === before);
   ok("and leaves the file's modified time where it was", statSync(doc).mtimeMs === first);
+}
+
+
+console.log("\n=== behaviour-rows — the run is named, and only that run is read");
+
+{
+  const { root, doc } = stand(PASSED);
+  add(root, runPath("apps/web", "CONTRACT", "r2"), runBody("r2", "CONTRACT", PASSED, "2026-09-22T09:00:00Z"));
+  const before = readFileSync(doc, "utf8");
+  const { out, code } = runCode(root, ["--write", "."]);
+  ok("[MKT.SCRIPTS.73] a stamp without a run name is refused", code !== 0 && readFileSync(doc, "utf8") === before, `exit ${code}\n${out}`);
+  ok("[MKT.SCRIPTS.73] and the refusal names the newest runs it found, newest first",
+     out.includes("r2") && out.includes("r1") && out.indexOf("r2") < out.indexOf("r1"), out);
+}
+
+{
+  const { root, doc } = stand(PASSED);
+  const before = readFileSync(doc, "utf8");
+  const { out, code } = runCode(root, ["nope-1", "--write", "."]);
+  ok("[MKT.SCRIPTS.73] a run name nothing on disk carries is refused, naming the runs that exist",
+     code !== 0 && out.includes("nope-1") && out.includes("r1") && readFileSync(doc, "utf8") === before, `exit ${code}\n${out}`);
+}
+
+{
+  const { root } = stand(PASSED);
+  const { out, code } = runCode(root, ["r1", "--results", "x.json", "."]);
+  ok("an option the stamp does not take is refused by name, never read as the repository", code !== 0 && out.includes("--results"), `exit ${code}\n${out}`);
+}
+
+{
+  // Two runs of the same tier on disk: the stamp reads the one it is told to, and never the other.
+  const { root, doc } = stand([{ id: "IAM.LOGIN.01", tier: "CONTRACT", status: "FAILED", title: "t", detail: "x" }]);
+  add(root, runPath("apps/api", "CONTRACT", "r2"), runBody("r2", "CONTRACT", PASSED, "2026-09-22T09:00:00Z"));
+  runNamed(root, "r2", "--write");
+  ok("[MKT.SCRIPTS.74] a stamp reads only the run it names", cells(doc, "IAM.LOGIN.01").status === "SUCCESS"
+    && cells(doc, "IAM.LOGIN.01").at === "2026-09-22T09:00:00Z · r2", JSON.stringify(cells(doc, "IAM.LOGIN.01")));
+  runNamed(root, "r1", "--write");
+  ok("[MKT.SCRIPTS.74] and the other name reads the other run", cells(doc, "IAM.LOGIN.01").status === "FAILED"
+    && cells(doc, "IAM.LOGIN.01").at === "2026-09-20T09:00:00Z · r1", JSON.stringify(cells(doc, "IAM.LOGIN.01")));
+}
+
+{
+  // A phased run writes <run>.<phase>.json; the stamp reads it beside <run>.json.
+  const { root, doc } = stand(PASSED);
+  add(root, runPath("apps/web", "JOURNEY", "r1", "serialized"), runBody("r1", "JOURNEY",
+    [{ id: "IAM.LOGIN.03", tier: "JOURNEY", status: "FAILED", title: "t", detail: "x" }], "2026-09-21T09:00:00Z", "SERIALIZED"));
+  runNamed(root, "r1", "--write");
+  ok("[MKT.SCRIPTS.74] a phase's file of the named run is read beside the run's own",
+     cells(doc, "IAM.LOGIN.03").status === "FAILED" && cells(doc, "IAM.LOGIN.03").at === "2026-09-21T09:00:00Z · r1"
+       && cells(doc, "IAM.LOGIN.01").at === "2026-09-20T09:00:00Z · r1", JSON.stringify([cells(doc, "IAM.LOGIN.03"), cells(doc, "IAM.LOGIN.01")]));
+}
+
+{
+  // `r1.x.json` looks like a phase of r1 by its name, but its own run field says it is run r1.x.
+  const { root, doc } = stand(PASSED);
+  add(root, runPath("apps/web", "JOURNEY", "r1.x"), runBody("r1.x", "JOURNEY",
+    [{ id: "IAM.LOGIN.03", tier: "JOURNEY", status: "FAILED", title: "t", detail: "x" }], "2026-09-21T09:00:00Z"));
+  runNamed(root, "r1", "--write");
+  ok("[MKT.SCRIPTS.74] a run whose name only starts with the named one is not read",
+     cells(doc, "IAM.LOGIN.03").status === "SUCCESS" && cells(doc, "IAM.LOGIN.03").at === "2026-09-19T04:31:22Z", JSON.stringify(cells(doc, "IAM.LOGIN.03")));
+}
+
+{
+  const { root, doc } = stand([], "CONTRACT");
+  add(root, runPath("apps/api", "CONTRACT", "r2"), runBody("r2", "CONTRACT", PASSED, "2026-09-22T09:00:00Z"));
+  runNamed(root, "r2", "--write", "--reach", "repository");
+  ok("--reach repository reads over the named run alone: what it named keeps its finding",
+     cells(doc, "IAM.LOGIN.01").status === "SUCCESS" && cells(doc, "IAM.LOGIN.01").at === "2026-09-22T09:00:00Z · r2", JSON.stringify(cells(doc, "IAM.LOGIN.01")));
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — behaviour-rows` : `\n  all ${total} passed — behaviour-rows`);

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/13-tests.md",
-      "seen": "db4b073d"
+      "seen": "44f5a899"
     }
   ]
 }
@@ -35,3 +35,5 @@
 **A case declares what it flips with `SPTestMutationScopeType` from `@saasplane/toolchain-ts/contract`**, and writes the tag with `mutationTag` from `@saasplane/toolchain-ts/test/axes.mjs` — the same module the phase configurations select by. A platform declares no scope of its own.
 
 **Run the tier that owns the rule you changed.** A change to a refusal needs the integration tier; unit passes straight over it.
+
+**Every run is named, and leaves a file of that name.** `spnutils apps test <tier> <run> <package>` (or `pnpm test <tier> <run>` inside the node) writes `tests/.output/<tier>/runs/<run>.json`; a journey phase writes `<run>.<phase>.json`. A reused name replaces that one file, and each tier keeps its 20 newest. The runner's raw report is deleted once it is folded in. Give every tier of one sitting the same name, then stamp with `spn-devex behaviours stamp <run> <repo> --write`.

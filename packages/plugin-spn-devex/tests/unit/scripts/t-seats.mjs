@@ -414,15 +414,16 @@ console.log("\n=== `face` over a capability seat writes the chapters' own shape"
 
 console.log("\n=== the plugins' own run writes the two cells a run owns, and no others");
 {
-  // The one writer, run the way this repository's own runner runs it: the whole tier, one artifact.
-  const results = (rows, tiers = ["UNIT"]) => {
-    const f = join(BASE, `res${made}-${Math.random().toString(36).slice(2)}.json`);
-    writeFileSync(f, JSON.stringify({ env: "local", tiers, ranAt: "2026-09-22T00:00:00.000Z", from: "t", results: rows }), "utf8");
-    return f;
+  // The one writer, run the way this repository's own runner runs it: the whole tier, one named run.
+  const results = (root, rows, tier = "UNIT") => {
+    const f = join(root, "tests", ".output", tier.toLowerCase(), "runs", "q1.json");
+    mkdirSync(dirname(f), { recursive: true });
+    writeFileSync(f, JSON.stringify({ run: "q1", tier, phase: null, ranAt: "2026-09-22T00:00:00Z", env: "local", results: rows }), "utf8");
+    return "q1";
   };
-  const status = (root, file, extra = []) => {
+  const status = (root, run) => {
     try {
-      return execFileSync(process.execPath, [TOOL, "behaviours", "stamp", "--write", "--reach", "repository", "--results", file, root], { encoding: "utf8" });
+      return execFileSync(process.execPath, [TOOL, "behaviours", "stamp", run, root, "--write", "--reach", "repository"], { encoding: "utf8" });
     } catch (e) { return String(e.stdout ?? "") + String(e.stderr ?? ""); }
   };
 
@@ -441,7 +442,7 @@ console.log("\n=== the plugins' own run writes the two cells a run owns, and no 
     ["MKT.DOCS.04", "JOURNEY", "PLANNED"],
     ["MKT.DOCS.05", "UNIT", "SUCCESS", "2026-01-01T00:00:00.000Z"],
   ]) });
-  const out = status(ws, results([
+  const out = status(ws, results(ws, [
     { id: "MKT.DOCS.01", tier: "UNIT", status: "SUCCESS", title: "[MKT.DOCS.01] it works" },
     { id: "MKT.DOCS.02", tier: "UNIT", status: "FAILED", title: "[MKT.DOCS.02] it does not" },
     { id: "MKT.DOCS.03", tier: "UNIT", status: "SUCCESS", title: "[MKT.DOCS.03] a hand check" },
@@ -455,7 +456,7 @@ console.log("\n=== the plugins' own run writes the two cells a run owns, and no 
   // A row no result names has no case citing it any more, so it goes back to what a row is at
   // birth — the book's rule, "delete a case and its row falls back to PLANNED".
   one("a row in a covered tier that nothing named goes back to PLANNED", reg, (g) => /MKT\.DOCS\.05 \|.*\| PLANNED \|/.test(g));
-  one("Updated at moves with the status", reg, has("2026-09-22T00:00:00.000Z"));
+  one("Updated at moves with the status, and names the run", reg, has("2026-09-22T00:00:00Z · q1"));
   one("a row nobody proved keeps the date it had", reg, (g) => !/MKT\.DOCS\.04 \|.*2026-09-22/.test(g));
 
   // Read-only by default, and the count is the exit code so a pipeline can gate on drift.
@@ -463,14 +464,14 @@ console.log("\n=== the plugins' own run writes the two cells a run owns, and no 
   const before = readAt(ws2, `docs/${SEAT.behaviors}/01-core/01-boot.md`);
   let code = 0;
   try {
-    execFileSync(process.execPath, [TOOL, "behaviours", "stamp", "--reach", "repository", "--results", results([{ id: "MKT.DOCS.01", tier: "UNIT", status: "SUCCESS", title: "t" }]), ws2], { encoding: "utf8" });
+    execFileSync(process.execPath, [TOOL, "behaviours", "stamp", results(ws2, [{ id: "MKT.DOCS.01", tier: "UNIT", status: "SUCCESS", title: "t" }]), ws2, "--reach", "repository"], { encoding: "utf8" });
   } catch (e) { code = e.status; }
   one("without --write nothing on disk changes", readAt(ws2, `docs/${SEAT.behaviors}/01-core/01-boot.md`), before);
   one("and the exit code is the number of rows that would change", code, 1);
 
   // One red among several greens is a red row.
   const ws3 = repo({ [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: nine([["MKT.DOCS.01", "UNIT", "PLANNED"]]) });
-  status(ws3, results([
+  status(ws3, results(ws3, [
     { id: "MKT.DOCS.01", tier: "UNIT", status: "SUCCESS", title: "a" },
     { id: "MKT.DOCS.01", tier: "UNIT", status: "FAILED", title: "b" },
   ]));

@@ -53,7 +53,7 @@ Pick the mode from the argument — `shape` · `design` · `decision`. Where non
 
 1. **Restate the requirement** in one paragraph, in the asker's own words.
 2. **Classify it**: new capability · additive change to an existing contract · **breaking** change · pure fix. **A breaking change stops here** — reroute through the versioning path and record it in `decision` mode. A breaking change never rides in as a plan row.
-3. **Locate ownership** — which module owns the capability. Where none does, this is a scaffolding conversation first, and the ladder is *use → configure → generalize into the platform → build domain-specific*; descend only with a reason.
+3. **Locate ownership** — which module owns the capability. Where none does, this is a scaffolding conversation first, and the ladder is *use → configure → generalize into the platform → build domain-specific*; descend only with a reason. Then propose **the construct the ask needs, and no more** (`RD.DEVEX.WORKSPACE.194`): its patterns, correct on their own. What it makes possible later is one line, *later, not now*, never a row or an option. Until an arc row owns the subject, put what you need decided as an opinion in chat, `O<n>`, with lettered options and your lean (`RD.DEVEX.WORKSPACE.195`).
 4. **Write the rows**, into the repository's own docs tree, under the domain the module belongs to. **The seats, what each holds and the row grammar are `refs/devex/workspace/docs/doc-sets.md`** — read it there rather than from a copy. Where the node is in a declared stack, that stack's own planning notes are `providers/{stack}/skills/ideate/plan.md` in the domain plugin, and the stack comes from the nearest `sprepo.json`.
 
 ### Mode: decision — one register row

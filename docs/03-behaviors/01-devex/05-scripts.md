@@ -32,7 +32,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.10 | Backend developer | read a run as a list and a pipeline read it as a number | Every finding carries its grade, and only the refusals are counted into the exit code | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.11 | Partner / integrator | prove every script still works in a repository carrying only the plugins | A repository of that shape is built, every script is run against it, and a crash is the only failure | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.12 | Editor | get the paragraphs worth a rewrite rather than a whole corpus | The candidates a pattern can recognise are reported, and a ledger lets a long sweep resume | POSITIVE | UNIT | PLANNED | — |
-| MKT.SCRIPTS.13 | Quality engineer | have this repository's own rows written from its own suites | The run's results file is read, and only the cells a run owns are written | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.13 | Quality engineer | have this repository's own rows written from its own suites | The file of the run the caller named is read, and only the cells a run owns are written | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.14 | Editor | write markdown and never HTML | The page is produced from the seat file, header and furniture included | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.15 | Architect | have a hand edit to a page found rather than inherited | The audit produces the page again and refuses any difference, naming the seat file to edit | NEGATIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.16 | Partner / integrator | read a produced page with nothing installed | The renderer covers the seat file's closed grammar and pulls in no dependency | POSITIVE | UNIT | PLANNED | — |
@@ -48,9 +48,9 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.49 | Quality engineer | have a row stamped only by a result at the row's own tier | A result proven at another tier is not read as evidence, and the row is left as it was | NEGATIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.50 | Quality engineer | read on a row the moment of the run that named it | `Updated at` is the newest run that named the row, never a newer run that did not | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.51 | Quality engineer | keep a promise row out of every run | A row whose `Type` is `PROMISE` is never stamped | NEGATIVE | UNIT | PLANNED | — |
-| MKT.SCRIPTS.53 | Quality engineer | be refused a `SUCCESS` row the last run of its tier contradicts | The proof check exits non-zero, naming the row, what the run found and the artifact it read | NEGATIVE | UNIT | PLANNED | — |
-| MKT.SCRIPTS.54 | Quality engineer | run the proof check where a tier has not run | A row whose tier no artifact speaks for is counted as unspoken, and is never a finding | NEGATIVE | UNIT | PLANNED | — |
-| MKT.SCRIPTS.55 | Quality engineer | measure what the tests have proved, tier by tier | Every row is joined to the last run of its tier; a tier with no run reads `NOT_RUN` with its reason, never as a pass, and `--json` hands the measurement over | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.53 | Quality engineer | be refused a `SUCCESS` row the run it cites contradicts | The proof check exits non-zero, naming the row, what the run found and the run file it read | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.54 | Quality engineer | run the proof check where the run a row cites is not on disk | A row whose cited run left no file at its tier is counted, and is never a finding | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.55 | Quality engineer | measure what the tests have proved, tier by tier | Every row is read from its own stamped `Status` and the run its `Updated at` cites; each tier lists the runs its rows cite and counts its rows by status, and `--json` hands the measurement over | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.56 | Quality engineer | ask for the measurement in a foundation repository | The tool answers that the rows are promises with no status, and that no report is owed | NEGATIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.57 | Quality engineer | measure an unchanged tree twice | Both measurements are the same bytes, with the same digest, and `report.current` says whether the page already carries it | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.59 | Partner / integrator | discover every command this plugin offers without reading source | `cli.ts help --json` lists every `<group> <action>` with its own description, and an unknown group or action is refused by name — proven in `tests/unit/scripts/t-cli.mjs` | POSITIVE | UNIT | PLANNED | — |
@@ -64,6 +64,12 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.70 | Architect | declare a whole feature folder or module with one row | A row naming a seat folder, a file inside it, or an app's module folder states every seat in that tree | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.71 | Engineering leader | ask how much of a repository is written, built and proved | `coverage measure` counts rows and constructs written, constructs built and rows proved, per package, per app and for the repository, each number with its unit | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.72 | Engineering leader | measure coverage without generated code counted as a gap | A `generated/` or `validators/` folder and a package's root barrel are never seats, and a Where row naming one declares nothing | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.73 | Quality engineer | be refused a stamp that names no run | The stamp exits non-zero, changes no row, and names the newest runs on disk, newest first | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.74 | Quality engineer | stamp the rows from one named run while other runs sit beside it | Only that run's files are read — `<run>.json` and every `<run>.<phase>.json` in every node — and no other run's | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.75 | Quality engineer | read on a row which run proved it | `Updated at` reads the run's instant, then ` · `, then the run's name | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.76 | Quality engineer | have a `SUCCESS` row judged by the run it cites | The proof check reads that run's files and no other run, whatever a newer run found | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.77 | Engineering leader | measure tests and coverage from what the stamp wrote | A run file on disk changes nothing either measurement says: both read the stamped rows only | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.78 | Quality engineer | have a behaviour id with a seven-letter domain read like any other | An id whose domain has seven letters, such as `COMPOSE.BUILD.*` or `SERVICE.*`, is read by every row and case reader | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

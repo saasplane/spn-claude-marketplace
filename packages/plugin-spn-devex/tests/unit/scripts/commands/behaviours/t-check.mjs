@@ -29,12 +29,12 @@ const repo = (rows, runs = []) => {
   write(`docs/${SEAT.behaviors}/login.md`, [
     "| Id | Who | Does | Sees | Type | Tier | Status | Updated at | Realizes |",
     "| --- | --- | --- | --- | --- | --- | --- | --- | --- |",
-    ...rows.map(([id, tier, status, type = "POSITIVE"]) => `| ${id} | a person | signs in | in | ${type} | ${tier} | ${status} | — | account |`),
+    ...rows.map(([id, tier, status, type = "POSITIVE"]) => `| ${id} | a person | signs in | in | ${type} | ${tier} | ${status} | 2026-09-28T09:00:00Z · r1 | account |`),
     "",
   ].join("\n"));
   for (const { node = "apps/api", tier, results } of runs) {
-    write(`${node}/tests/.output/${tier.toLowerCase()}/spn-tests.json`,
-      JSON.stringify({ env: "local", tiers: [tier], ranAt: "2026-09-28T09:00:00Z", results }));
+    write(`${node}/tests/.output/${tier.toLowerCase()}/runs/r1.json`,
+      JSON.stringify({ run: "r1", tier, phase: null, ranAt: "2026-09-28T09:00:00Z", env: "local", results }));
   }
   return root;
 };
@@ -61,15 +61,15 @@ console.log("=== behaviours check — reaches the same judge as checks/behaviour
 }
 
 {
-  // A repository's one root journey run writes its artifact at the root or under the node that invoked it; both are read.
+  // A repository's one root journey run writes its file at the root or under the node that invoked it; both are read.
   const { out, code } = run(repo([["IAM.LOGIN.01", "JOURNEY", "SUCCESS"]],
     [{ node: ".", tier: "JOURNEY", results: [result("IAM.LOGIN.01", "JOURNEY", "FAILED")] }]));
-  ok("a root journey run's artifact is read and judged like any node's", code === 1 && out.includes("IAM.LOGIN.01") && out.includes("1 run(s) read"), out);
+  ok("[MKT.SCRIPTS.76] a root journey run's file is read and judged like any node's", code === 1 && out.includes("IAM.LOGIN.01") && out.includes("1 run file(s) read"), out);
 }
 
 {
   const { out, code } = run(repo([], []));
-  ok("a tree with no rows and no runs says it read nothing", code === 0 && out.includes("0 row(s)") && out.includes("0 run(s) read"), out);
+  ok("a tree with no rows and no runs says it read nothing", code === 0 && out.includes("0 row(s)") && out.includes("0 run file(s) read"), out);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — behaviours check` : `\n  all ${total} passed — behaviours check`);

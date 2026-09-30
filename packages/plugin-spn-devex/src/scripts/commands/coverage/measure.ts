@@ -135,9 +135,9 @@ export function foundationAbsence(root: string): Record<string, unknown> | null 
 export function measure(root: string): Record<string, unknown> {
   const nameOf = (node: string): string => slashes(relative(root, node)) || ".";
 
-  // Proved: the tests report's own join.
-  const tests = measureTests(root) as { rows: Array<{ id: string; file: string; status: string | null; found: string | null }>; digest: string; measuredAt: string | null };
-  const isProved = (row: { status: string | null; found: string | null }): boolean => (row.found ?? row.status) === "SUCCESS";
+  // Proved: the rows the stamp wrote SUCCESS, read as the tests report reads them; no run file is opened.
+  const tests = measureTests(root) as { rows: Array<{ id: string; file: string; status: string | null }>; digest: string; measuredAt: string | null };
+  const isProved = (row: { status: string | null }): boolean => row.status === "SUCCESS";
 
   // A MANUAL row counts in none of the numbers (05-artifacts.md § The coverage report): a person proves
   // it by the repository's browser guide and no run records it, so counted it would read as Not proved.

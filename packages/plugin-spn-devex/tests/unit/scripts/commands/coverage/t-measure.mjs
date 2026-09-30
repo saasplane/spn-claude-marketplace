@@ -104,6 +104,23 @@ console.log("=== coverage measure — the three sides");
     store?.built.constructs === 1 && store?.written.rows === 1, JSON.stringify(store));
 }
 
+
+{
+  // A run file that disagrees with the rows: Proved is still what the stamp wrote into them.
+  const root = repo({
+    ...APPS, ...node("packages/store", "MODULE_SERVER"), ...code("packages/store/src/app/services/StoreService.ts"),
+    ...construct("01-store", ["COR.STORE.01", "SUCCESS"], ["COR.STORE.02", "PLANNED"]),
+    ...chapter("store", "01-store", "src/app/services/StoreService.ts"),
+    "packages/store/tests/.output/unit/runs/full-9.json": JSON.stringify({ run: "full-9", tier: "UNIT", phase: null,
+      ranAt: "2026-09-29T02:00:00Z", env: "local", results: [
+        { id: "COR.STORE.01", tier: "UNIT", status: "FAILED", title: "t", detail: null },
+        { id: "COR.STORE.02", tier: "UNIT", status: "SUCCESS", title: "t", detail: null }] }),
+  });
+  const store = levelOf(json(root), "packages/store");
+  ok("[MKT.SCRIPTS.77] Proved counts the rows the stamp wrote SUCCESS, and a run file on disk changes nothing",
+    store?.proved.rows === 1 && store.builtNotProved.ids.join(",") === "COR.STORE.02", JSON.stringify(store?.proved));
+}
+
 console.log("=== coverage measure — stated, not built");
 
 {

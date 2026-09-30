@@ -1,24 +1,25 @@
 #!/usr/bin/env node
 // Every suite in this folder, in one command.
 //
-//     node run.mjs [--write-status]
+//     node run.mjs [<run>] [--write-status]
 //
 // Each suite runs both the TypeScript check and the Python it replaced, and requires them to agree
 // unless the case names a reason not to. Once the plugin reinstall deletes `hooks/scripts/`, the
 // Python arm stops running and each case still asserts its own expectation.
 //
-// **And the run writes down what it proved (Q107).** The marketplace is a GENERAL repository, so
-// `spnutils` serves it with its docs verbs only and has no runner to write its behaviour rows.
+// **And a named run writes down what it proved (Q107).** The marketplace is a GENERAL repository,
+// so `spnutils` serves it with its docs verbs only and has no runner to write its behaviour rows.
 // These suites ARE its runner. Every case whose title carries a behaviour id in brackets —
-// `[MKT.DOCS.01]`, the book's rule that an id is carried by a test title — becomes a result, the
-// results become `tests/.output/unit/spn-tests.json`, and `behaviour-rows.ts` writes the
-// two cells a run owns. A case with no id in its title proves nothing to the register and is
-// counted only here, which is how it should be: a register row is a promise somebody made, not
-// every assertion anybody wrote.
+// `[MKT.DOCS.01]`, the book's rule that an id is carried by a test title — becomes a result. Given a
+// run name, the results become `tests/.output/unit/runs/<run>.json`, the file every stack's runner
+// writes (RD.DEVEX.UTILS.071), and `--write-status` stamps the rows from that run. Given none, the
+// suites run and no run file is written, because a reader is always told which run to read. A case
+// with no id in its title proves nothing to the register and is counted only here.
 
 import { execFileSync } from "node:child_process";
-import { mkdirSync, readdirSync, statSync, writeFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
+import { readdirSync, statSync } from "node:fs";
+import { resolve } from "node:path";
+import { RUN_NAME, writeRunFile } from "./helpers/run-file.mjs";
 
 // Every hook a case launches inherits this, so a test run never writes into the workspace's
 // telemetry log, where its records would read as the developer's own tool calls.
@@ -39,6 +40,16 @@ const suites = walk(HERE)
   .map((f) => f.slice(HERE.length + 1))
   .sort();
 const writeStatus = process.argv.includes("--write-status");
+// The run's name, chosen by the caller: the first word that is not an option.
+const runName = process.argv.slice(2).find((arg) => !arg.startsWith("--")) ?? null;
+if (runName !== null && !RUN_NAME.test(runName)) {
+  console.error(`'${runName}' is not a run name: a letter or digit first, then letters, digits, dots, dashes and underscores.`);
+  process.exit(2);
+}
+if (writeStatus && runName === null) {
+  console.error("--write-status stamps the rows from a named run. Usage: node run.mjs <run> --write-status");
+  process.exit(2);
+}
 
 // The tier these suites run at. They exercise one unit — a check, a drawer, a renderer — against a
 // fixture, with no service and no browser, so they speak for `UNIT` rows and for nothing else.
@@ -80,26 +91,22 @@ for (const suite of suites) {
 console.log(`\n  ${suites.length} suite(s) · ${cases} case(s)` +
   (failed ? ` · ${failed} SUITE(S) FAILING` : " · all passing"));
 
-// THE ARTIFACT IS WRITTEN EVEN WHEN NO CASE CARRIES AN ID, because an empty result set is a fact
-// about the run — the register then says PLANNED for rows this tier covers and nothing named,
-// which is true and is what a reader needs. An absent file would read as *the run never happened*.
-//
-// IT IS A RUN'S OUTPUT AND NOT A DOCUMENT, so it lives where every other stack's runner puts one —
-// `tests/.output/<tier>/spn-tests.json`, the path `spn-test.mjs` derives. The pocket beside it
-// holds pages a person wrote (RD.DEVEX.WORKSPACE.149); a file rewritten by every run is not one, and while it
-// sat there a suite run reported a changed tree on its timestamp alone, which a release refuses.
-const artifact = resolve(REPO, "tests", ".output", TIER.toLowerCase(), "spn-tests.json");
-mkdirSync(dirname(artifact), { recursive: true });
-writeFileSync(artifact, `${JSON.stringify({
-  env: "local", tiers: [TIER], ranAt: new Date().toISOString(), from: "packages/plugin-spn-devex/tests/run.mjs", results,
-}, null, 2)}\n`, "utf8");
-console.log(`  ${results.length} case(s) carry a behaviour id -> ${artifact.slice(REPO.length + 1)}`);
+// THE RUN FILE IS WRITTEN EVEN WHEN NO CASE CARRIES AN ID, because an empty result set is a fact
+// about the run — the register then says PLANNED for rows this tier covers and nothing named, which is
+// true and is what a reader needs. It lives where every other stack's runner puts one, beside the
+// pocket and never in it (RD.DEVEX.WORKSPACE.149): a file rewritten by every run is not a document.
+if (runName !== null) {
+  const file = writeRunFile(REPO, runName, TIER, results);
+  console.log(`  ${results.length} case(s) carry a behaviour id -> ${file.slice(REPO.length + 1)}`);
+} else {
+  console.log("  no run name given, so no run file was written — name one to leave what this run proved: node run.mjs <run>");
+}
 
 if (writeStatus) {
   // This run is the whole of its tier here, so a row no case named any more goes back to PLANNED.
   const cli = resolve(HERE, "..", "src", "scripts", "cli.ts");
   try {
-    console.log(execFileSync(process.execPath, [cli, "behaviours", "stamp", "--write", "--reach", "repository", "--results", artifact, REPO], { encoding: "utf8" }));
+    console.log(execFileSync(process.execPath, [cli, "behaviours", "stamp", runName, REPO, "--write", "--reach", "repository"], { encoding: "utf8" }));
   } catch (error) { console.log(String(error.stdout ?? "")); }
 }
 

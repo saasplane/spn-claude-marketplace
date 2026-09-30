@@ -17,7 +17,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "Reports and templates",
-      "seen": "fb4aedea"
+      "seen": "67ec7d9a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -92,7 +92,7 @@ Repo: <folder name> | Commit: <short hash> | Generated: <time>
 - **Description**: one paragraph saying what was counted, **with no number**, and when you would read it.
 - **Generated** is `generatedAt`, a date and a time with its offset (`2026-09-30T12:57+05:30`), in a `<time class="local" datetime="…">` element whose text is the same value; the template's script shows it in the reader's own time zone.
 - **No status, and no comparison with an earlier report — MUST** (decision `RD.DEVEX.WORKSPACE.192`). A report is a snapshot, and Generated says when its numbers were true. `docs audit` refuses a report that carries a status.
-- **The metadata block** carries `id`, `variant` (`report`), `reportType`, `title`, `repository`, `generatedAt`, `summary` and `keywords`. A `tests` report also carries `measuredAt`, the newest run it read, stated in Measured and never in the header.
+- **The metadata block** carries `id`, `variant` (`report`), `reportType`, `title`, `repository`, `generatedAt`, `summary` and `keywords`. A `tests` report also carries `measuredAt`, the newest `Updated at` among the rows it read, stated in Measured and never in the header.
 
 **Each report type has one approved Subtitle**, copied word for word with `{repo}` replaced by the repository's folder name:
 
@@ -139,7 +139,7 @@ Every section fits about one screen, and Records is folded so it never swamps th
 - **The owner tables carry only the report type's states.** Anything else lives in an axis table or in Records.
 - **A name cell has two levels, never three — MUST**: a bold title, and at most one second line in `<span class="sl">`. The second line starts with the project type, never a column, and joins a second fact with ` - ` (`SUPPORT_WEB - unit · component`). **A second line describes; it never counts.** A project's name is the bold title, never a `code` chip.
 - **Every table is worst row first**, except the tables in the docs tree's order, and has a **total row**, marks its gap cells, and carries **one sentence naming its units**. A gap cell holds a number above 0 in a gap column, or a state that is not done, and a failing cell carries the stronger mark. Under the owner tables, one sentence states **the totals rule**: each table totals its own level, and anything that spans several owners is counted in each owner and once at repository level.
-- **Tables with the same columns have the same widths — MUST.** Each is a `table.grid` with a `<colgroup>`: name and text columns first, counts last. Count columns are one fixed width per report — coverage `7rem`, tests `5.5rem`, audit and code `5.5rem`, docs `7.5rem` — and the name column takes the rest. Text tables keep percent widths: Run health 30 · 10 · 28 · 32, the docs Rules table 64 · 18 · 18, Measure again 30 · 22 · 28 · 20, Recommendations 6 · 46 · 24 · 24. **A column heading never wraps.** A grid's minimum width is its count columns plus `12rem`.
+- **Tables with the same columns have the same widths — MUST.** Each is a `table.grid` with a `<colgroup>`: name and text columns first, counts last. Count columns are one fixed width per report — coverage `7rem`, tests `5.5rem`, audit and code `5.5rem`, docs `7.5rem` — and the name column takes the rest. Text tables keep percent widths: the docs Rules table 64 · 18 · 18, Measure again 30 · 22 · 28 · 20, Recommendations 6 · 46 · 24 · 24. **A column heading never wraps.** A grid's minimum width is its count columns plus `12rem`.
 
 ### Records — list items, never a table — MUST
 
@@ -236,13 +236,13 @@ Developers and leaders who have not learned the book's words read a report, so i
 
 | Part | What you write |
 | --- | --- |
-| **Measure** | `spn-devex behaviours coverage <repo> --json`, its `digest`, and `measuredAt` — the newest run it read, which can be older than the page |
-| **Tiles** | **SUCCESS · FAILED · PENDING · PLANNED**, each x / y of all written behaviours, with a one-line key under the breakdown bar: SUCCESS, the last run of the behaviour's own test level passed; FAILED; PENDING, the test exists and was skipped or has not run; PLANNED, no test names it |
+| **Measure** | `spn-devex behaviours coverage <repo> --json`, its `digest`, and `measuredAt` — the newest `Updated at` among the rows it read, which can be older than the page |
+| **Tiles** | **SUCCESS · FAILED · PENDING · PLANNED**, each x / y of all written behaviours, with a one-line key under the breakdown bar: SUCCESS, the run the behaviour cites, at its own test level, passed; FAILED; PENDING, the test exists and was skipped or has not run; PLANNED, no test names it |
 | **Breakdown bar** | behaviours: SUCCESS · FAILED · PENDING · PLANNED |
-| **Findings** | **By tier**: Tier · Runs · Written · Built · SUCCESS · FAILED · PENDING · PLANNED · **Run health**: one line per kind of problem — Problem · Count · Where · What fixes it — and a total line, from the command's `health` · **Repository** by domain → **Apps** → **Packages**: Name · Written · Built · SUCCESS · FAILED · PENDING · PLANNED |
-| **Records** | level 1 the status — FAILED → PENDING → PLANNED, then Run health (group `r-health`, level 2 by problem); level 2 the tier. An item is the row id, its claim, its tier, its status and its last run |
+| **Findings** | **By tier**: Tier · Runs · Written · Built · SUCCESS · FAILED · PENDING · PLANNED, from the command's `tiers` · **Repository** by domain → **Apps** → **Packages**: Name · Written · Built · SUCCESS · FAILED · PENDING · PLANNED |
+| **Records** | level 1 the status — FAILED → PENDING → PLANNED; level 2 the tier. An item is the row id, its claim, its tier, its status and the run it cites |
 
-**The statuses sum to Written**, and Built counts behaviours whose design topic is built, the same as the coverage report. **A `MANUAL` row counts in none of the numbers — MUST**, so the four statuses still add up to Written: the command lists them as `manual` per domain and in total, and you show them as the coverage report does, in one line under Findings and the Records group **Proved by hand**. By tier has no *Last run* column: when each tier ran is stated under Measured. An Apps or Packages name cell's second line is the project type, then ` - `, then the tiers it ran, never a count. **A run speaks for the tiers it ran and no others**: a behaviour whose tier did not run is unproved, not failing.
+**The tests report reads the stamped rows only**: each row's `Status`, and the run its `Updated at` names. It opens no run file, so what it counts is what the stamp wrote; the command's `tiers[].runs` lists the runs each tier's rows cite, and *Runs* is their count. **The statuses sum to Written**, and Built counts behaviours whose design topic is built, the same as the coverage report. **A `MANUAL` row counts in none of the numbers — MUST**, so the four statuses still add up to Written: the command lists them as `manual` per domain and in total, and you show them as the coverage report does, in one line under Findings and the Records group **Proved by hand**. By tier has no *Last run* column: when each tier ran is stated under Measured. An Apps or Packages name cell's second line is the project type, then ` - `, then the tiers it ran, never a count. **A run speaks for the tiers it ran and no others**: a behaviour whose tier did not run is unproved, not failing.
 
 ### Audit — is the repository set up the way the standard says?
 

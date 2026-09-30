@@ -20,7 +20,7 @@ Twenty suites drive the real scripts as processes, feeding each one an event on 
 | Commands | `packages/plugin-spn-devex/tests/unit/scripts/commands/` | one folder per `<group>`, one suite per action, plus `t-cli.mjs` for the dispatcher itself |
 | Libraries | `packages/plugin-spn-devex/tests/unit/scripts/lib/` | the shared computations a command and a check both read |
 | The corpus-shape suite | `packages/plugin-spn-devex/tests/unit/scripts/t-seats.mjs` | a whole-tree property rather than one file's behaviour |
-| What fills a row from a run | `packages/plugin-spn-devex/src/scripts/commands/behaviours/stamp.ts` | reads the run's own artifact and writes the two cells a run owns into each row a case's title names |
+| What fills a row from a run | `packages/plugin-spn-devex/src/scripts/commands/behaviours/stamp.ts` | reads the file of the run it is told to read, `tests/.output/unit/runs/<run>.json`, and writes the two cells a run owns into each row a case's title names |
 
 ## Follows the pattern
 

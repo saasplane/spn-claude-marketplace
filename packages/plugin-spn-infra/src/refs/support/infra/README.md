@@ -19,7 +19,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/02-packages/01-manifests.md",
       "section": "One packages declaration; the registry derives",
-      "seen": "2ebd3584"
+      "seen": "f5cb3b14"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/04-resources/02-vendors.md",

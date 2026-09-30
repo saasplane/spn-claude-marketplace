@@ -74,7 +74,7 @@ Never leave mutated: the platform org and its policies, org-TYPE/GLOBAL auth/dat
 
 ## Frontend journeys
 
-- The journey tier runs `pnpm build test` → `pnpm start` → `spnutils apps test journey <node>`, **after** the BE suite, on a quiesced stack (no concurrent resets/builds — they cause 504s and login-handoff timeouts). Consistent failure = regression; cold-stack handoff flakiness is environmental (confirm via snapshots).
+- The journey tier runs `pnpm build test` → `pnpm start` → `spnutils apps test journey <run> <node>`, **after** the BE suite, on a quiesced stack (no concurrent resets/builds — they cause 504s and login-handoff timeouts). Consistent failure = regression; cold-stack handoff flakiness is environmental (confirm via snapshots).
 
 ## Fixture rules
 
@@ -93,11 +93,11 @@ Never leave mutated: the platform org and its policies, org-TYPE/GLOBAL auth/dat
 ## Commands
 
 ```bash
-npx nx run-many -t test:unit --all   # every unit suite
-npx nx run <project>:test:unit       # one project
-npx nx run <client>:test:contract    # the contract tier, against a live service
-pnpm --filter <project> test unit    # the same, through the node's own script
-spnutils apps test journey <node>   # the sweep; --phase serialized and --phase window are separate runs
+npx nx run-many -t test:unit --all --run <run>   # every unit suite, under one run name
+npx nx run <project>:test:unit --run <run>       # one project
+npx nx run <client>:test:contract --run <run>    # the contract tier, against a live service
+pnpm --filter <project> test unit <run>          # the same, through the node's own script
+spnutils apps test journey <run> <node>          # the sweep; --phase serialized and --phase window are separate runs under the same name
 npx tsc --noEmit --pretty false -p <project>/tsconfig.test.json   # a suite's own typecheck
 ```
 

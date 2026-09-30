@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/03-blueprints/",
-      "seen": "d7daf437"
+      "seen": "1a2ca85d"
     }
   ]
 }
@@ -160,9 +160,9 @@ Five rungs rather than three, because a three-rung ladder collapses production-a
 
 **A node owes the tiers its kind fixes, and no node chooses its own.** The blueprints (`SUPPORT`) owe all three — they derive, declare an interface and render. An `ORGANIZATION`, a `PLATFORM` and a `MODULE` owe `CONTRACT` and `INTEGRATION`: the ground and organization layers render an organization's declaration from a seat of its own; the platform layer renders a platform's declaration once, and the environment and deployments layers again per declared environment; the estate stands a seat for a module's world. A declaration's integration runs under `tofu test`, planning the pinned blueprints with mock providers, and each run's name carries the behaviour id it proves.
 
-**Two rungs sit outside the ladder, on purpose.** The build — the declaration parses, the tree matches its type, the manifest matches its contract — is a static gate, never proof, the same way a type check is not a test; `spnutils infra test` runs it first and it prints no case. A stand-up provisions against a real target and speaks for that target and for no other — never claim a layer works on the strength of a run that never touched the target in question. Where nothing has ever been applied against a target, say plainly that the tiers pass and the stand-up has not run.
+**Two rungs sit outside the ladder, on purpose.** The build — the declaration parses, the tree matches its type, the manifest matches its contract — is a static gate, never proof, the same way a type check is not a test; `spnutils infra test <run>` runs it first and it prints no case. A stand-up provisions against a real target and speaks for that target and for no other — never claim a layer works on the strength of a run that never touched the target in question. Where nothing has ever been applied against a target, say plainly that the tiers pass and the stand-up has not run.
 
-**Every estate package keeps its tests in the same tree**: one folder per owed tier under `tests/` — the folder naming the tier, the file's kind naming the engine — so a case sitting in the wrong folder is refused rather than counted. A harness reports cases, never only an exit code: `ok`, `not ok` or `skip`, the tier, the behaviour id, a title, through `helpers/case.sh`; `spnutils infra test` turns the lines into the run artifact apps write, the agent stamps the rows from it, and `spnutils infra release` refuses a node whose owed tier has no case or a failing one. A pipeline publishes the artifact and stops there; it never edits a document to say a run succeeded (`RD.SUPPORT.INFRA.094` — every provisioning run names its own mode, and a rehearsal needs no credential).
+**Every estate package keeps its tests in the same tree**: one folder per owed tier under `tests/` — the folder naming the tier, the file's kind naming the engine — so a case sitting in the wrong folder is refused rather than counted. A harness reports cases, never only an exit code: `ok`, `not ok` or `skip`, the tier, the behaviour id, a title, through `helpers/case.sh`; `spnutils infra test <run>` turns the lines into run files, one per tier at `tests/.output/<tier>/runs/<run>.json`, in the shape apps write; the agent stamps the rows from the run it names, and `spnutils infra release` names its own test run `release-<version>`, such as `release-0.4.1`, and refuses a node whose owed tier has no case or a failing one. A pipeline publishes the run file and stops there; it never edits a document to say a run succeeded (`RD.SUPPORT.INFRA.094` — every provisioning run names its own mode, and a rehearsal needs no credential).
 
 ## What it makes checkable
 

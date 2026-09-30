@@ -83,7 +83,7 @@ The runner walks the tier and runs every file it finds. A list would be a second
 
 ### A case that carries a behaviour id becomes that row's result
 
-This repository declares no stack, so no stack runner writes its behaviour rows. The suites are the runner instead: a case whose title carries a row's id writes that row's result into the run's own artifact, and a tool reads the artifact and fills the two cells a run owns. A row no case reached is left saying so.
+This repository declares no stack, so no stack runner writes its behaviour rows. The suites are the runner instead: a case whose title carries a row's id writes that row's result into the file of the run its caller named, and a tool told that run's name reads the file and fills the two cells a run owns. A row no case reached is left saying so.
 
 ### What a suite proves is the shipping shape
 

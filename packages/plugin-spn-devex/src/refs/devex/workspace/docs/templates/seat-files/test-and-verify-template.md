@@ -56,13 +56,13 @@ for k in <KEY_ONE> <KEY_TWO>; do [[ -n ${(P)k} ]] && echo "$k set" || echo "$k M
 
 <Continue until the whole repository has run. When a step writes something a later step reads, say so in both steps. When the run needs a server stopped or restarted in another mode, make that its own step.>
 
-<One command per line, never a loop. Say which lines are independent — the reader may run them in separate terminals at once — and which must run in order, and why: they share a database, or one uses what another made.>
+<One command per line, never a loop. Say which lines are independent — the reader may run them in separate terminals at once — and which must run in order, and why: they share a database, or one uses what another made. Every test command carries the same run name, such as `full-1001`, so the agent can stamp the whole run under that one name.>
 
 <A server gets a block of its own, because it takes a terminal of its own. Say which port it holds, and give the check that shows it is ready as its own block.>
 
 ## Step N — Stop the servers and record what the run proved
 
-<The last step. What to stop, and how. Then say that each run left a result file in its project's tests/.output/ folder, and that the agent stamps the behaviour rows and replaces the tests report from those files when you ask it to.>
+<The last step. What to stop, and how. Then say that each run left a file named for the run in its project's tests/.output/<tier>/runs/ folder, and that when you ask, the agent stamps the behaviour rows from the run you name and replaces the tests report from those rows.>
 
 ## Clean reset and verify
 

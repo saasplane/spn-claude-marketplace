@@ -100,12 +100,14 @@ export const statusOf = (row: RegisterRow): string =>
   cellValue(row, "status").replace(/[✅❌⏳🔮👤🚧]/gu, "").trim().toUpperCase();
 
 /**
- * A behaviour id as the registers spell it, and as a case title cites one.
+ * A behaviour id as the registers spell it, and as a case title cites one: `DOMAIN.AREA.NN`.
  *
- * The middle segment admits a digit after its first letter, because `WEB.A11Y.01` is a row this
- * estate declares. `RD.` and `PD.` are the book's register ids, which titles cite and no row declares.
+ * The domain is two to seven letters, so `COMPOSE.BUILD.01` and `SERVICE.HEALTH.01` are read. The
+ * middle segment admits a digit after its first letter, because `WEB.A11Y.01` is a row this estate
+ * declares. `RD.` and `PD.` are the book's register ids, which titles cite and no row declares, and
+ * nothing is read from inside one: an id never follows a letter, a digit or a dot.
  */
-export const BEHAVIOUR_ID = /\b(?!RD\.|PD\.)([A-Z]{2,6}\.[A-Z][A-Z0-9]*\.\d+)\b/g;
+export const BEHAVIOUR_ID = /(?<![A-Za-z0-9.])(?!RD\.|PD\.)([A-Z]{2,7}\.[A-Z][A-Z0-9]*\.\d+)\b/g;
 
 /** Every behaviour id a piece of text cites. */
 export const idsIn = (text: string): string[] => [...text.matchAll(BEHAVIOUR_ID)].map((match) => match[1]);

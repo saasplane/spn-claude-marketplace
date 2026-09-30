@@ -83,7 +83,7 @@ On the consuming platform's `modules[]`: `code` · `layer` · `after` (a named s
 
 ```text
 spnutils infra validate module        # tree to type, manifest to contract
-spnutils infra test <package>         # the render harness — templates plan against fixtures
+spnutils infra test <run> <package>   # the render harness — templates plan against fixtures
 spnutils infra platform up <spc> --plan   # the rendering, locally
 ```
 

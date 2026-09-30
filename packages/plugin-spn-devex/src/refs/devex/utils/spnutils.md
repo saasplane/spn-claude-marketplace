@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/03-utils/01-spnutils.md",
-      "seen": "5e664b8a"
+      "seen": "959da92e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "80f4795e"
+      "seen": "375d374b"
     }
   ],
   "decisions": [
@@ -128,10 +128,15 @@ The `gen-*` chain is never hand-edited: validators are what the API enforces, sy
 what the agents read. `apps release` publishes every releasable project at one version, lockstep,
 routed by each package's own scope.
 
-**`spnutils` never reads or writes a document — MUST** (`RD.DEVEX.UTILS.071`). `apps test` runs a tier and
-writes the run artifact and nothing else; what that run means for the documents — stamping `Status`
-and `Updated at`, the join and proof checks, coverage — is the agent's own work, through plugin
-scripts.
+**`spnutils` never reads or writes a document — MUST** (`RD.DEVEX.UTILS.071`). `apps test <tier> <run>
+<package>` runs a tier and writes that run's file, `tests/.output/<tier>/runs/<run>.json`, and nothing
+else; `infra test <run> [package]` does the same for the estate. **The caller names every run, and the
+name is required**: build one while you work, such as `full-1001`, and give every tier of one sitting
+the same name. A reused name replaces that one file, and each tier keeps its 20 newest. What that run
+means for the documents is the agent's own work, through plugin scripts: `spn-devex behaviours stamp
+<run> <repo>` reads only that run's files and writes `Status` and `Updated at` as `<time> · <run>`,
+the proof check reads each row against the run it cites, and coverage and the reports read the stamped
+rows only.
 
 ## `infra` — the estate
 
