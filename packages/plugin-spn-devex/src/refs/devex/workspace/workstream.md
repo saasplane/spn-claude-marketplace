@@ -38,11 +38,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "cb091991"
+      "seen": "d25f8ce2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "c1f3a9d0"
+      "seen": "66bc4cd2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -66,7 +66,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "b806f3a9"
+      "seen": "b86c3be4"
     }
   ]
 }
@@ -561,7 +561,8 @@ A preview written as a page is copied from `approach-preview-template.html`, nam
 `<subject>-preview.html`, and lives in `notes/N<nnn>/previews/`. A sample is a real file of the kind
 the work produces — a template, a report, a document. It keeps its own format and its own name, lives
 in `notes/N<nnn>/samples/`, and is never written in the preview layout. Make a sample only when the
-work produces such a file. Each one is *under review*, *approved* or *superseded*; list it in the arc's
+work produces such a file. Each one reads `PROPOSED` until the developer answers and `DECIDED` after. Remove one that a later one
+replaces, and say so in the arc's log. List each in the arc's
 `## Previews` table with its kind and its state, and link it from the approach page. Writing the first
 one opens the arc as `PROPOSED`.
 
@@ -683,7 +684,9 @@ number and the subject, so the file name repeats neither. A workstream that clos
 status, the Cycles table with its previews, and the heading of `Open`. Run
 `spn-devex docs cycles --write <workstream folder>` after any change to an arc's status, its first
 line or its `## Previews` table. The header's status reads `PLANNING` while no arc is past `DECIDED`,
-`IMPLEMENTING` once an arc runs or has landed, and `DONE` when the workstream closes.
+`IMPLEMENTING` once an arc runs or has landed, and `DONE` when the workstream closes. The heading of
+`Open` reads `Open — Q<n> · Q<n>`, each open card by its number. With no card open it reads
+`Open — no card is open`.
 
 **The rest of the page is yours to bring current in the same turn — MUST.** A new arc, or a scope that
 grew, owes the page its `Why`, its `What` and its `How`, and a Subtitle and a Description that still
@@ -711,7 +714,7 @@ browser.
 
 | The page is | It lives in | Handed over as |
 | --- | --- | --- |
-| an approach page, or a preview or a sample under review | the workstream's folder under `.spndevex/workstreams/`, in no repository | its full path |
+| an approach page, or a proposed preview or sample | the workstream's folder under `.spndevex/workstreams/`, in no repository | its full path |
 | a report, or any other page in a repository | the repository's pocket, committed | its full path |
 
 **Publishing is the developer's call, because a published copy is one more thing somebody has to

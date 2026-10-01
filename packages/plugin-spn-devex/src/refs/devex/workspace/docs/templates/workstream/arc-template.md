@@ -27,12 +27,12 @@ Status: **{{PROPOSED · DECIDED · RUNNING · HELD — waits on Q<n> · PART-LAN
 
 ## Previews
 
-<!-- One row per preview and per sample of this arc. Kind is `preview` or `sample`. State is `under review`,
-     `approved <date>` or `superseded by <file>`. With none, the table is replaced by the one word `None.` -->
+<!-- One row per preview and per sample of this arc. Kind is `preview` or `sample`. State is `proposed` or
+     `decided <date>`. A preview that a later one replaces is removed, and the log says so. With none, the table is replaced by the one word `None.` -->
 
 | File | Kind | Shows | State |
 | --- | --- | --- | --- |
-| [`{{subject}}-preview.html`](../notes/N{{nnn}}/previews/{{subject}}-preview.html) | preview | {{what it shows, in one line}} | under review |
+| [`{{subject}}-preview.html`](../notes/N{{nnn}}/previews/{{subject}}-preview.html) | preview | {{what it shows, in one line}} | proposed |
 
 ## What done means
 

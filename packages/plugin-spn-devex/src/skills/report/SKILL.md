@@ -27,7 +27,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "Nothing is published unless the developer asks",
-      "seen": "9381571f"
+      "seen": "412b7cba"
     }
   ]
 }

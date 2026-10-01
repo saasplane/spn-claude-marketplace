@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "44f0c76c"
+      "seen": "af67eaa5"
     }
   ],
   "decisions": [
@@ -102,7 +102,8 @@ programs). The line carries `script` (the program or plugin), `group`, `subgroup
 three levels, null where unused), `args` (what was typed after the action, with a secret-looking
 option's value written as `***`), `event`, `tool`, `ms`, `exit`, `at` in UTC ending in `Z`, `repo` and
 `pid`, then the `workstream`, `arc` and `order` read from the paths the tool call touches, and the
-`agent` when the hook's input carries one. **The tags carry forward**: per session and agent, the last tagged call's tags are kept
+`agent` when the hook's input carries one. A Bash call that ran more than one program writes one line,
+named for the first program the filter picks, with `programs`, the count it ran. **The tags carry forward**: per session and agent, the last tagged call's tags are kept
 beside the log, a call that touches no workstream path inherits them, and a call that names other work
 replaces them. A report in the plugin, not in `spnutils`, joins those lines to the Claude Code
 transcripts by `session` and prints the tokens spent per workstream, arc and order.

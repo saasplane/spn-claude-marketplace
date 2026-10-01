@@ -7,11 +7,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "cb091991"
+      "seen": "d25f8ce2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "44f0c76c"
+      "seen": "af67eaa5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -209,7 +209,7 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
         arcs/                             the agent's: one file per arc, N<nnn>-<subject>.md, its rows and its state
         notes/N<nnn>/                     one arc's work order
           plan.md                         facts pinned to commits, anchors, commands, traps
-          previews/                       the pages that explain a change, under review or approved
+          previews/                       the pages that explain a change, proposed or decided
           samples/                        real files of the kind the work produces, each in its own format
           scripts/                        what a mechanical row runs
           orders/                         one brief per delegated execution, and its report

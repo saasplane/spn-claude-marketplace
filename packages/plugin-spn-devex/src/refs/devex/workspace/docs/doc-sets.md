@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "b806f3a9"
+      "seen": "b86c3be4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -25,7 +25,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
-      "seen": "a6fa2137"
+      "seen": "811b3bf2"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md",
@@ -672,7 +672,7 @@ Every document opens with an invisible block holding **strict JSON**, marked `sp
 
 - `stages` is optional — only where a document belongs to one DevEx stage, such as a guide.
 - **A construct's block keeps eight keys and no more**: `id`, `variant`, `title`, `subtitle`, `lenses`, `status`, `dependsOn` and `summary`. `subtitle` is the one plain sentence under the title, and `summary` is the Description's first sentence.
-- **A report carries no `status`, and adds `reportType`, `repository` and `generatedAt`** (RD.DEVEX.WORKSPACE.192). `reportType` is one `SPDocReportType` value: `COVERAGE` · `TESTS` · `AUDIT` · `CODE` · `DOCS`. `repository` is the repository it measured, by its folder name, and the header shows it as `Repo:`. A report is a snapshot, so neither its block nor its header carries a status, and it makes no comparison with an earlier report. `generatedAt` is the moment the page was generated, a date and a time with its offset, such as `2026-09-30T12:57+05:30`; the header's second line reads `Repo: … | Commit: … | Generated: …`, with Generated in the reader's own time zone and format. A `tests` report also carries `measuredAt`, the newest `Updated at` among the rows it read, stated in *Measured* and never in the header. No other report carries `measuredAt`.
+- **A report carries no `status`, and adds `reportType`, `repository` and `generatedAt`** (RD.DEVEX.WORKSPACE.192). `reportType` is one `SPDocReportType` value: `COVERAGE` · `TESTS` · `AUDIT` · `CODE` · `DOCS`. `repository` is the repository it measured, by its folder name, and the header shows it as `Repo:`. A report is a snapshot, so neither its block nor its header carries a status, and it makes no comparison with an earlier report. `generatedAt` is the moment the page was generated, a date and a time with its offset, such as `2026-09-30T12:57+05:30`; the header's second line reads `Repo: … | Commit: … | Generated: …`, with Generated in the reader's own time zone and format. A `tests` report also carries `measuredAt`, the newest `Updated at` among the rows it read, stated in *Measured* and never in the header. No other report carries `measuredAt`. A `tests` report with no stamped run leaves `measuredAt` out of its block, and says in *Measured* that no run is stamped. It never writes `null`.
 - **There is no `part` and no `altitude`.** Everything else is derived: the **seat** from the path and the **kind** from the node's manifest. The voice is one (RD.DEVEX.WORKSPACE.096). The seat decides what a document carries, never its temperature.
 - **`lenses` are derived from the kind, not authored per page** (decision RD.DEVEX.WORKSPACE.100) — one derivation, two clauses, because runtime says *where code runs* and `lenses` says *who reads it*. A kind you **build on** (support, module, app, client) derives from its declared runtime: `SERVER` → `SERVER_DEV`, `WEB` → `WEB_DEV`, `UNIVERSAL` → both. A kind that **serves building** — `TOOLCHAIN` and `APP_UTILITY`, and only those two — carries both whatever its runtime, because every builder uses it. Read the declared runtime, never parse the name. `ARCHITECT` is added by **seat**, never by kind. A node's doc face (`docs/README.md`) is the orientation page and carries it for every kind, leaf nodes included. The seat faces beneath it (purpose, constructs, behaviors, capabilities, guides, artifacts) carry the derived developer lenses alone. `ARCHITECT` there is authorship a scaffold never emits. The other six lenses are authored, never derived. A page MAY narrow the derived set where its subject genuinely serves one runtime, and MUST NOT widen it. **A scaffold template emits the derived set**, which is what makes generated pages compliant by construction.
 - `id` is identity and **never changes**, however the path does. The path is only its current address.
