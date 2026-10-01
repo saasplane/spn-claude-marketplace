@@ -4,7 +4,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The approach document — a workstream's, never a repository's",
-      "seen": "fb50860c"
+      "seen": "bb4e1a02"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -96,6 +96,17 @@ is written, and anything still open becomes the page's next `Q<n>` card, in the 
 **A card on the page is an open card, so it carries a recommendation and no `Decision` field.** A
 field saying the card is open says nothing, and a field left empty is a blank somebody feels they
 should fill. An answered card leaves the page: its answer folds into the section that then states it.
+
+**On the page, a card is a `div.sds-open` wrapping an `h4` whose `id` is its number, and that is the
+one shape — MUST** (`RD.DEVEX.WORKSPACE.147`, `RD.DEVEX.WORKSPACE.216`). The markup is
+`<div class="sds-open"><h4 id="q<n>">`. The number is lower case in the `id`, and it is written
+`Q<n>` for a reader. Each part's label is a `span.sds-key`, the options are a table inside the card,
+and the recommendation is a `div.sds-recommended`. A decided card is a `div.sds-card`. The checks
+find an open card by this shape and by nothing else. So a card written in another shape makes a page
+look as if it has no questions.
+
+**A page that has not moved to the shared stylesheet still holds the earlier names**, `div.open` and
+`div.card`, with no prefix. The checks read both forms until every page has moved.
 
 **Options are a table.** Lettered, one row each, the trade-off in its own column. Prose
 alternatives cannot be scanned and cannot be answered by reference — and in markdown the

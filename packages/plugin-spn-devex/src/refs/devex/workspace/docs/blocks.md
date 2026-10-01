@@ -4,17 +4,17 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The masthead, and the opening",
-      "seen": "08c0d45d"
+      "seen": "de892b27"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The blocks — what a page reaches for instead of prose",
-      "seen": "0dd7f138"
+      "seen": "95e1ebbb"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The figures — what sits inside a block, and the closed set of them",
-      "seen": "8a447dae"
+      "seen": "6bfb2106"
     }
   ]
 }
@@ -23,11 +23,12 @@
 
 **Source of truth:** the foundation's `04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md` — *The masthead, and the opening*, *The blocks* and *The figures*. This file restates them for an agent that ships without the book beside it; where the two disagree, the book wins.
 
-**You write markdown.** `docs.ts page` produces the HTML, and the stylesheet the template ships
-supplies every border, background and colour. So this file is the whole vocabulary you need: what a
-block is *typed as* in a seat file. The HTML blocks template is the **rendered** reference a person
-opens to see what a block looks like — reading it costs about 16,400 tokens and tells you nothing
-you can type, so do not open it (Q135, 2026-09-22).
+**You write markdown.** `docs.ts page` produces the HTML, and the shared stylesheet that every page
+links supplies every border, background and colour. That gives a block the same form on every page
+and in both themes, so you never add styling to a page. So this file is the whole vocabulary you
+need: what a block is *typed as* in a seat file. The HTML blocks template is the **rendered**
+reference a person opens to see what a block looks like. It is much larger than this file and tells
+you nothing you can type, so do not open it (Q135, 2026-09-22).
 
 The rules behind this file are `05-artifacts.md § The blocks` and `§ The figures`. When the two
 disagree, the chapter wins and this file is wrong.

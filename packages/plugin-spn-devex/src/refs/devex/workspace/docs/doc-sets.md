@@ -7,12 +7,12 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "e4416974"
+      "seen": "f79c0389"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The masthead, and the opening",
-      "seen": "08c0d45d"
+      "seen": "de892b27"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -329,7 +329,18 @@ The pocket holds what the node **authors** rather than derives, and its three au
 
 **An argument does not live here.** An approach document belongs to **the workstream that argues it**, in the workspace's planning centre, and it closes with that workstream. The pocket holds what the repository *states* and what somebody *measured*; where a design was weighed is the workstream's record. A pocket that also held the arguments made the two impossible to tell apart, which is how a stale argument came to be read as a statement of today.
 
-**The folder set is fixed, and adding one is a decision**: `overviews/`, `constructs/`, `reports/` and nothing else. A `resources/` folder for *what a document was written from* is refused by name: every such file is a file some seat needs, and **nothing in a pocket may be depended on** (decision RD.DEVEX.WORKSPACE.138).
+**Two more kinds of page are produced by a command, and nobody writes them by hand** (decisions RD.DEVEX.WORKSPACE.218 and RD.DEVEX.WORKSPACE.219). Each is produced from its source and equals that source, as a construct page does.
+
+| Kind | Path | Produced by | Produced from |
+| --- | --- | --- | --- |
+| **Guide page** | `artifacts/guides/<name>-guide.html` | `docs guide <guide.md>` | the guide's markdown in `05-guides/`, and `guide-template.html` |
+| **The index of artifacts** | `artifacts/index.html` | `docs index <repository>` | the pages on disk, and `artifact-index-template.html` |
+
+**Every repository has its getting-started guide and its test-and-verify guide as a page.** A newcomer needs these before any other guide: the first says how to start, and the second says how to check that a change works. Every other guide stays markdown, unless a developer asks for it as a page. A guide page is stages, and a stage is steps. A step holds why, the command and what you see, in that order. The stylesheet numbers the steps, so nobody types a number. A guide page has no status. Where `docs guide` finds no step in a guide, it reports the guide and writes nothing.
+
+**The index opens every page of a repository from one place.** A tree of the pages sits on the left, in the groups Docs, Guides and Reports, and a group that holds nothing is left out. The pages open in tabs on the right. The index has no masthead and no header line, because it is a frame around other pages. `docs index` refuses a repository that has no `docs/artifacts`. The hub stays the page you read first: it explains the model, and the index is where you look for one file among all of them.
+
+**The folder set is fixed, and adding one is a decision**: `overviews/`, `constructs/`, `guides/`, `reports/` and nothing else, beside the one `index.html`. A `resources/` folder for *what a document was written from* is refused by name: every such file is a file some seat needs, and **nothing in a pocket may be depended on** (decision RD.DEVEX.WORKSPACE.138).
 
 ### A construct page has six sections, in one order
 
@@ -370,8 +381,8 @@ a reader meets first.
 | Level | Where it sits | Carries |
 | --- | --- | --- |
 | **Title** | the `h1` | what the page is called. A construct's is its own name, in full — *Estate Shape*, never *Shape*. An overview's is its benefit line |
-| **Subtitle** | `p.subtitle`, directly under the `h1`. In a construct seat it is the `subtitle` field of the `spn:doc` block, which `docs page` renders | one sentence, in plain language |
-| **Description** | one `p.standfirst`, directly under the Subtitle, and nothing after it in the masthead. In a construct seat it is the first lead paragraph, which `docs page` renders as the standfirst | the opening, one paragraph, in plain language |
+| **Subtitle** | `p.sds-subtitle`, directly under the `h1`. In a construct seat it is the `subtitle` field of the `spn:doc` block, which `docs page` renders | one sentence, in plain language |
+| **Description** | one `p.sds-standfirst`, directly under the Subtitle, and nothing after it in the masthead. In a construct seat it is the first lead paragraph, which `docs page` renders as the standfirst | the opening, one paragraph, in plain language |
 
 **What each level holds depends on the page kind:**
 
@@ -417,9 +428,10 @@ number or a release name, such as *N116* or *R2*, that the same sentence does no
 workstream's number that opens its `h1` comes from the folder's name, and it is not part of the
 Title: the Title is the page's name, the same words as the rail title.
 
-**A page template holds only its structure and styling — MUST** (decision RD.DEVEX.WORKSPACE.182).
+**A page template holds only its structure — MUST** (decision RD.DEVEX.WORKSPACE.182).
 Its sections in order with their ids, the slots an author fills (`{{…}}`), the blocks it may reach
-for, its stylesheet, and one comment at the top naming the chapter sections that govern it. **The
+for, the two lines that load the shared stylesheet and script, and one comment at the top naming the
+chapter sections that govern it. **The
 rules for filling it are stated here and in the chapter, never in the template** — what each level
 holds, the approved mastheads, the poor examples and the check before saving. A rule written into a
 template is a second copy that a reader takes for that kind's rule alone.
@@ -473,11 +485,11 @@ kind: a good example beside a poor one shows the difference faster than the rule
 
 ### The templates sit beside the chapters, in `templates/`
 
-Every page somebody writes by hand is copied from a template, and the templates live in the docs domain's own `templates/` folder — beside the chapters that state their rules. **A template holds a page's shape — its sections, its slots and its styling — and no rule**, so a rule is stated in one place only. **A seat may hold that one folder that is not documents.** It is unnumbered, because you consult a template rather than reading the set in order, and it is excluded from the document checks **by the folder rather than per file**: a per-file exemption is a hole, and a named folder is a rule. **Each template names the chapter sections that govern it**, at the top of the file; a change to a template's shape is edited in the template, and `restates files` reports a plugin copy that has fallen behind it.
+Every page somebody writes by hand is copied from a template, and the templates live in the docs domain's own `templates/` folder — beside the chapters that state their rules. **A template holds a page's shape — its sections, its slots and the two lines that load the shared stylesheet and script — and no rule**, so a rule is stated in one place only. **A seat may hold that one folder that is not documents.** It is unnumbered, because you consult a template rather than reading the set in order, and it is excluded from the document checks **by the folder rather than per file**: a per-file exemption is a hole, and a named folder is a rule. **Each template names the chapter sections that govern it**, at the top of the file; a change to a template's shape is edited in the template, and `restates files` reports a plugin copy that has fallen behind it.
 
 | Folder | Holds | Shapes |
 | --- | --- | --- |
-| `templates/pages/` | `hub-template.html` · `overview-template.html` · `construct-template.html` · `report-template.html` · `blocks-template.html` | the page kinds a repository has — hub, overview, construct — and the report; the blocks template shows every block and figure kind rendered |
+| `templates/pages/` | `hub-template.html` · `overview-template.html` · `construct-template.html` · `guide-template.html` · `artifact-index-template.html` · `report-template.html` · `blocks-template.html` | the page kinds a repository has — hub, overview, construct, guide and the index of artifacts — and the report; the blocks template shows every block and figure kind rendered |
 | `templates/seat-files/` | `construct-seat-template.md` · `schema-template.sql` | what an author writes *inside* a seat: the markdown a construct page is produced from, and the authoritative data model |
 | `templates/workstream/` | `approach-template.html` · `approach-preview-template.html` · `arc-template.md` · `order-template.md` · `handover-template.md` | the workstream's own files. **The approach document is here because an argument is a workstream's**, never a repository's |
 | `templates/agent/` | `skill-template.md` · `agent-template.md` · `lens-template.md` · `ref-template.md` · `hook-template.ts` | the agent's own files — hand-written too, and a kind with no template gets written from the last one its author happened to see |
@@ -486,7 +498,7 @@ Every page somebody writes by hand is copied from a template, and the templates 
 
 **A scaffold beats a template, a template beats a document, and a document beats a conversation.** Where the CLI creates a file, that scaffold *is* the template and none is kept in the book — a seat face, a behaviour file, a capability chapter and the glossary are all made that way.
 
-**The page templates, and the seat files behind them**: `hub-template.html` for the one hub a repository has, `overview-template.html` for one reading path or the hub of a repository other than the foundation, `construct-template.html` for a produced construct page (`docs page` copies its stylesheet and scripts into every page it produces), `approach-template.html` for a workstream's argument, `approach-preview-template.html` for a preview page in a workstream, and `report-template.html` for a report — one shell for all five report types. `construct-seat-template.md` is the seat file an author actually writes, and `capability-template.md` one capability chapter. `blocks-template.html` is copied into nothing: it shows every block and every figure kind rendered, and you consult it beside a page template.
+**The page templates, and the seat files behind them**: `hub-template.html` for the one hub a repository has, `overview-template.html` for one reading path or the hub of a repository other than the foundation, `construct-template.html` for a produced construct page (`docs page` copies its two lines that load the shared stylesheet and script into every page it produces), `guide-template.html` for a guide page that `docs guide` produces, `artifact-index-template.html` for the index that `docs index` produces, `approach-template.html` for a workstream's argument, `approach-preview-template.html` for a preview page in a workstream, and `report-template.html` for a report — one shell for all five report types. `construct-seat-template.md` is the seat file an author actually writes, and `capability-template.md` one capability chapter. `blocks-template.html` is copied into nothing: it shows every block and every figure kind rendered, and you consult it beside a page template. **A hub has no link above its rail** (decision RD.DEVEX.WORKSPACE.220): it is the root, so no page sits above it for a link to lead back to.
 
 **The rules every page kind shares are stated once, in the chapter, and no template repeats them**: headings carry no count and are never links, numbers are for file names, the book's own words are translated, and a card is a title, a description and a *Read more*. **The book's own words are translated on every page a newcomer reads**: say *the agent's viewpoint*, and note once that the book calls it a lens. A word a first-time reader cannot guess is explained where it first appears, or replaced by the plain word. A count is never an explanation: *the eight phases* tells a newcomer nothing, so say what the phases are. A door is a *Read …* line under the text, naming what it opens in the words the heading already carries — *Read Agent →*. A card that carries an action — a link or a button — keeps it at the card's bottom edge: the cards of one row are as tall as the tallest, so the actions line up however long the text above each one is.
 
@@ -542,7 +554,7 @@ The last three are what the close sweep asks of every row, and an empty row, a r
 
 A register row records *what* was decided, never the options that lost or what they would have cost. That is why an approach carries its reasoning in full, and why `Open` cards run deeper than the body around them.
 
-**The suffix names the kind, and the set is closed** (decision RD.DEVEX.WORKSPACE.103). The routing test is one question: *were options weighed and one chosen?* Yes → `-approach`. No → `-overview`. A document with no options, no recommendation and no accepted cost is an overview whichever folder holds it.
+**The suffix names the kind, and the set is closed** (decision RD.DEVEX.WORKSPACE.103). It is `-overview.html`, `-construct.html`, `-approach.html`, `-report.html`, `-preview.html` and `-guide.html`, and nothing else. A suffix equals the metadata block's `variant`. The index of artifacts is named `index.html`, with no suffix, and its variant is `index`. The routing test is one question: *were options weighed and one chosen?* Yes → `-approach`. No → `-overview`. A document with no options, no recommendation and no accepted cost is an overview whichever folder holds it.
 
 - **The overview set is the hub, one page per domain, and one more for every further reading path** (decision RD.DEVEX.WORKSPACE.154). A reading path is a run of constructs somebody reads in order to decide one thing. **The first page in a domain is owed; every one after it is earned** — a hub with nothing beneath it dead-ends at the first click, so the middle rung exists wherever a domain has construct pages at all. `concept-overview.html` is the concept's readable HTML face, the hub, one per repository; `concept-<domain>-overview.html` is a domain's own face: it gives each of that domain's topics a section of its own, which summarizes the construct and ends in one door to its construct page, and it carries the domain's generated glossary (§ What an overview and a hub hold, section by section).
 - **Every construct the pocket holds is linked from the hub — MUST.** Prove it by listing both sets and diffing them, never by scanning the page. A hub section standing over no construct is a **declared gap**, which is the honest kind and what the next workstream picks up; a construct the hub does not link is an orphan.
@@ -595,6 +607,57 @@ the rail, which is why a template ships every section and subsection with one. *
 `8px` on every page, at every width, except a report at phone width (`40rem` and below), which takes
 `16px`.**
 
+### Every page links one shared stylesheet, in one version
+
+**Every page links one shared stylesheet and one shared script, and holds no styles of its own —
+MUST** (decision RD.DEVEX.WORKSPACE.214). The stylesheet is `sds-docs.css`, and the script is
+`sds-docs.js`. Between them they carry the colours in both themes, the outline rail, the fold, the
+badges and the link on each heading. A page that holds a copy of its styles keeps the faults of the
+day it was written. With one shared file, a fault is fixed once, for every page that links the file.
+
+**A stored page links one version by its address, in two lines.** A stored page is one that sits in a
+repository or in a workstream's folder. The stylesheet's line sits at the top of the page, and the
+script's line sits at its end.
+
+```html
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.0.0/sds-docs.css">
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.0.0/sds-docs.js"></script>
+```
+
+- **It holds no `<style>` block and no inline script.** `docs audit` refuses a page that holds either,
+  and the check on a page refuses a link to a version that nobody cut.
+- **A version is a folder that never changes.** `docs sds cut <version>` writes it, and it refuses a
+  version that exists. A change to the styles is a new version, and
+  `docs sds repoint <version> <folder>` moves every page under a folder to it.
+- **That address is the one hosted address a page may hold.** Every link from one page to another
+  stays relative.
+- **A stored page needs the network once.** Your browser fetches the shared files the first time you
+  open a page of that version.
+
+**A published page carries its version's styles inside it — MUST** (decision
+RD.DEVEX.WORKSPACE.215). The publishing host does not load a stylesheet from the version's address,
+so a published page that links out arrives with no styling. `docs sds bundle <page>` writes a copy
+beside the page, named `<page>.bundled.html`, with the stylesheet and the script inside it. You
+publish the copy, and the stored page keeps its two lines. The check before a publish refuses a page
+that links a stylesheet from outside, and it names the command. **A page that somebody reads with no
+network is bundled the same way**, so send the bundled copy to a reader who is offline.
+
+**Every class and every token of ours opens with `sds-` — MUST** (decision RD.DEVEX.WORKSPACE.216).
+One search for `sds-` finds every name of ours in a page, and no name of ours meets a Tailwind
+utility. A name is a whole word: `sds-key`, never `sds-k`. A state that a script sets opens with
+`is-` or `has-`, such as `sds-is-current`. A result takes a status word. So the Subtitle is
+`p.sds-subtitle`, the Description is `p.sds-standfirst`, an open card is `div.sds-open`, and a decided
+card is `div.sds-card`. `blocks-template.html` shows every class rendered.
+
+**A status is a set of classes of its own, and never a tone of the palette** (decision
+RD.DEVEX.WORKSPACE.217). The statuses are `sds-info`, `sds-success`, `sds-warning` and `sds-error`,
+and one of them on a badge or a callout says how a thing stands. The palette's tones are blue,
+green, amber, red, violet, cyan, pink, olive, orange and grey. They are for a drawing or a chart,
+each is one class such as `sds-tone-violet`, and a tone carries no meaning. A
+chart takes its series from violet, cyan, pink and olive first, so that a red line is not read as an
+error. **No page declares a token of its own.** A repository that needs other colours asks for a
+version of the stylesheet that has them.
+
 ### Steward, never manufacture
 
 **Coverage never forces an artifact into existence** (decision RD.DEVEX.WORKSPACE.104). A concept section with no overview and no approach document has not needed one yet — a fact worth reading, not a gap worth filling. Four obligations, none of which generate content:
@@ -614,7 +677,7 @@ the rail, which is why a template ships every section and subsection with one. *
 
 **Markdown keeps its own grammar and HTML keeps the blocks.** A capability chapter stays markdown and is never produced as a page, so none of this reaches it. The split is stated in the book: `02-document.md` governs markdown, `05-artifacts.md` governs the page.
 
-**A block is a visual insert, not a section shape.** Normal prose needs no block. Reach for one when the content is *not* a paragraph, a list or a table — a rule the reader must not skim, a picture, a fixed list of doors, a comparison. **The set is closed**: `MUST` · `CATALOG` · `COMPARISON` · `GLOSSARY` · `CODE` · `DIFF` · `TREE` · `PROSE` · `CARDS` · `NEXT`, plus the figure kinds below, and a new kind is a decision rather than an invention. Every block and every figure kind is written out, in the spelling you actually type, in [`blocks.md`](blocks.md) beside this file — read that before authoring a document with figures in it, and read a page template beside it. **Do not open the HTML blocks template**: it is the *rendered* reference a person opens, it costs about 16,400 tokens, and three quarters of it is stylesheet, inline SVG and script that the renderer and the drawer produce for you (decision RD.DEVEX.WORKSPACE.136). Every `dg` example in the markdown form is executed by the drawer's test suite, so an example you copy draws.
+**A block is a visual insert, not a section shape.** Normal prose needs no block. Reach for one when the content is *not* a paragraph, a list or a table — a rule the reader must not skim, a picture, a fixed list of doors, a comparison. **The set is closed**: `MUST` · `CATALOG` · `COMPARISON` · `GLOSSARY` · `CODE` · `DIFF` · `TREE` · `PROSE` · `CARDS` · `NEXT`, plus the figure kinds below, and a new kind is a decision rather than an invention. Every block and every figure kind is written out, in the spelling you actually type, in [`blocks.md`](blocks.md) beside this file — read that before authoring a document with figures in it, and read a page template beside it. **Do not open the HTML blocks template**: it is the *rendered* reference a person opens. It is much larger than the markdown form, and most of it is markup and inline SVG that the renderer and the drawer produce for you (decision RD.DEVEX.WORKSPACE.136). Every `dg` example in the markdown form is executed by the drawer's test suite, so an example you copy draws.
 
 ### The figure kinds
 

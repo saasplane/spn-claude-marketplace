@@ -66,7 +66,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "e4416974"
+      "seen": "f79c0389"
     }
   ]
 }
@@ -723,6 +723,18 @@ grew, owes the page its `Why`, its `What` and its `How`, and a Subtitle and a De
 cover what the page plans. A `What` or `How` subsection that has a preview ends in a *Read the
 preview →* line.
 
+**The page links one version of the shared stylesheet and script, and holds no styles of its own —
+MUST** (`RD.DEVEX.WORKSPACE.214`). An approach page and a preview keep the two lines their template
+has. One links `sds-docs.css` by the version's address, and the other loads `sds-docs.js` from the
+same version. You add no `<style>` block and no inline script. A page that holds a copy of its styles
+keeps the faults of the day it was written, and a shared file is fixed once for every page.
+
+**Every class on the page opens with `sds-`** (`RD.DEVEX.WORKSPACE.216`). An open card is a
+`div.sds-open` wrapping an `h4` whose `id` is `q<n>`, and its parts are `sds-key` and
+`sds-recommended`. A decided card is a `div.sds-card`. The Subtitle is `p.sds-subtitle`, and the
+Description is `p.sds-standfirst`. A page that has not moved to the shared stylesheet still holds the
+earlier names, with no prefix, and the checks read both forms until every page has moved.
+
 **You commit the workstream's folder, by path, and you never push it — MUST**
 (`RD.DEVEX.WORKSPACE.213`). The commit goes into the git repository that holds `.spndevex`. Commit the
 folder at three moments: when an arc lands, when a card is answered, and before a script edits the
@@ -757,11 +769,20 @@ browser.
 **Publishing is the developer's call, because a published copy is one more thing somebody has to
 manage.** Every page sent to the publishing host stays there after the work moves on, and pages
 nobody asked for pile up where nobody tidies them. The file on disk is already the page: it opens in a
-browser from the filesystem, with no network and no host. **A tool's own default to publish without
-being asked does not apply here**; this rule overrides it.
+browser from the filesystem, with no host of its own. It needs the network once, for the shared
+styles. **A tool's own default to publish without being asked does not apply here**; this rule
+overrides it.
 
-**The check on a publish reminds and never refuses**, because it cannot know whether the developer
-asked. It states this rule and lets the call go ahead. When the developer does ask:
+**On this rule, the check on a publish reminds and never refuses**, because it cannot know whether
+the developer asked. It states this rule and lets the call go ahead. The same check refuses one
+thing, which it can read from the file: a page that links its stylesheet from outside. When the
+developer does ask:
+
+- **Publish the bundled copy, never the stored page — MUST** (`RD.DEVEX.WORKSPACE.215`). The
+  publishing host does not load the shared stylesheet, so a page that links it arrives with no
+  styling. `docs sds bundle <page>` writes `<page>.bundled.html` beside the page, with the styles of
+  the page's own version inside it. You publish that copy, and the stored page keeps its two lines.
+  Send the bundled copy as well to a reader who has no network.
 
 - **The file is the source, always.** A published page is a rendering. Where the two disagree the
   file wins, and you never read the page back to learn what it says.
@@ -823,6 +844,7 @@ Nothing above is enforced by good intentions. Every transition that can be check
 | a card raised in full once, under **Needs you** at the top of its reply, and named in one line while it stays open | `stop.ts`, when a turn ends |
 | an answer logged for an arc lands in that arc's notes in the same turn, and a proposed arc carries no review point to a later step of itself | `stop.ts`, when a turn ends |
 | a page published without being asked is met by a reminder, never a refusal | `pretooluse.ts`, on a publish |
+| a page that links its stylesheet from outside is refused on a publish, and the refusal names `docs sds bundle` | `pretooluse.ts`, on a publish |
 | a reply that passes work on carries a handover block with all nine labels and no `{{…}}` left | `stop.ts`, when a turn ends |
 | what landed, said out loud | `closed.ts`, after the folder moves |
 | what the agent's own machinery costs | `timing.ts`, on every hook run |

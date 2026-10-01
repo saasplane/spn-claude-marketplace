@@ -12,22 +12,22 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The masthead, and the opening",
-      "seen": "08c0d45d"
+      "seen": "de892b27"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "Reports and templates",
-      "seen": "dd9b7397"
+      "seen": "b67b1441"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The header — two lines, six fields, produced from the block",
-      "seen": "9ece45d3"
+      "seen": "be7657de"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "Nothing is published unless the developer asks",
-      "seen": "412b7cba"
+      "seen": "500e5386"
     }
   ]
 }
@@ -71,12 +71,18 @@ The block names the type with one `SPDocReportType` value: `COVERAGE` · `TESTS`
 
 **Never publish a report unless the developer asks — MUST** (decision `RD.DEVEX.WORKSPACE.117`). Hand it over as the **full path** to the file, which the developer opens in a browser. A publishing tool's own default to publish without being asked does not apply. When the developer does ask, the file stays the source, and you hand the URL back with the full path beside it.
 
+**You publish the bundled copy, never the stored page — MUST** (decision `RD.DEVEX.WORKSPACE.215`). The publishing host does not load the shared stylesheet, so a page that links it arrives with no styling. Run `spn-devex docs sds bundle <page>`, which writes `<page>.bundled.html` beside the page with the styles inside it, and publish that copy. The check before a publish refuses a page that links a stylesheet from outside. Send the bundled copy as well to a reader who has no network.
+
 - **The artifacts folder is earned.** A repository that has never had a page written has no `docs/artifacts/`; writing the first report creates it. Nested folders are allowed there, and they carry no `README.md`.
 - **A report is not an approach document.** An approach page argues a design and lives in its workstream folder; the `ideate` skill writes it. If what you are writing weighs options and chooses one, it is not a report.
 
 ## Copy the template, then fill it
 
-**Start from `refs/devex/workspace/docs/templates/pages/report-template.html`.** It holds only the page's structure and styling — its sections with their ids, the slots you fill, its stylesheet and its one small script (the Generated time and the outline) — and no rule (decision `RD.DEVEX.WORKSPACE.182`). Every rule for filling it is in this skill. Keep its class names: `docs audit` checks every selector the page uses against the template's stylesheet.
+**Start from `refs/devex/workspace/docs/templates/pages/report-template.html`.** It holds only the page's structure — its sections with their ids, the slots you fill, and the two lines that load the shared stylesheet and script — and no rule (decision `RD.DEVEX.WORKSPACE.182`). Every rule for filling it is in this skill.
+
+**The page you write links the shared files, and holds no styles of its own — MUST** (decision `RD.DEVEX.WORKSPACE.214`). The copy keeps the template's two lines: one links one version of `sds-docs.css` by its address, and the other loads `sds-docs.js` from the same version. The stylesheet gives the report its forms in both themes. The script shows the Generated time and builds the outline. You add no `<style>` block and no inline script, and `docs audit` refuses a page that holds either. A `style` attribute stays only where the template has one, such as the width of a column.
+
+**Keep the template's class names, and every one opens with `sds-`** (decision `RD.DEVEX.WORKSPACE.216`). A class the shared stylesheet does not hold has no form, so never invent one. A result takes one of the status classes: `sds-success`, `sds-warning` or `sds-error` (decision `RD.DEVEX.WORKSPACE.217`).
 
 **A report is written by you, not produced by a command.** No tool renders it. You run the measuring commands, decide what is worth saying, and fill the template — which is how a report can name a fault no check could.
 
@@ -90,7 +96,7 @@ Repo: <folder name> | Commit: <short hash> | Generated: <time>
 - **Title**: the report's name, such as *Coverage report*.
 - **Subtitle**: the question, naming the repository by its folder name — *How much of spn-support-ts is written, built and proved?*
 - **Description**: one paragraph saying what was counted, **with no number**, and when you would read it.
-- **Generated** is `generatedAt`, a date and a time with its offset (`2026-09-30T12:57+05:30`), in a `<time class="local" datetime="…">` element whose text is the same value; the template's script shows it in the reader's own time zone.
+- **Generated** is `generatedAt`, a date and a time with its offset (`2026-09-30T12:57+05:30`), in a `<time class="sds-local" datetime="…">` element whose text is the same value; the shared script shows it in the reader's own time zone.
 - **No status, and no comparison with an earlier report — MUST** (decision `RD.DEVEX.WORKSPACE.192`). A report is a snapshot, and Generated says when its numbers were true. `docs audit` refuses a report that carries a status.
 - **The metadata block** carries `id`, `variant` (`report`), `reportType`, `title`, `repository`, `generatedAt`, `summary` and `keywords`. A `tests` report also carries `measuredAt`, the newest `Updated at` among the rows it read, stated in Measured and never in the header. Where no row cites a run, the block leaves `measuredAt` out and Measured says that no run is stamped; `docs audit` refuses the key written as `null`.
 
@@ -137,15 +143,15 @@ Every section fits about one screen, and Records is folded so it never swamps th
 - **Repository has one row per domain** — the folders under `02-constructs/` and `03-behaviors/` — **in the docs tree's order**, then the whole-repository row, then the total. It is not sorted worst first. It has **no Project type column and no design topics column**: its columns are Name, then the report type's counts, and a column only a project can have is left out or shows —.
 - **Apps and Packages share the same columns.** Apps has one row per app and no module rows; a module's behaviours and checks count in its app, and a module-level gap shows in Records. **Only the code report keeps module rows**, because each module has violations of its own.
 - **The owner tables carry only the report type's states.** Anything else lives in an axis table or in Records.
-- **A name cell has two levels, never three — MUST**: a bold title, and at most one second line in `<span class="sl">`. The second line starts with the project type, never a column, and joins a second fact with ` - ` (`SUPPORT_WEB - unit · component`). **A second line describes; it never counts.** A project's name is the bold title, never a `code` chip.
+- **A name cell has two levels, never three — MUST**: a bold title, and at most one second line in `<span class="sds-sub-line">`. The second line starts with the project type, never a column, and joins a second fact with ` - ` (`SUPPORT_WEB - unit · component`). **A second line describes; it never counts.** A project's name is the bold title, never a `code` chip.
 - **Every table is worst row first**, except the tables in the docs tree's order, and has a **total row**, marks its gap cells, and carries **one sentence naming its units**. A gap cell holds a number above 0 in a gap column, or a state that is not done, and a failing cell carries the stronger mark. Under the owner tables, one sentence states **the totals rule**: each table totals its own level, and anything that spans several owners is counted in each owner and once at repository level.
-- **Tables with the same columns have the same widths — MUST.** Each is a `table.grid` with a `<colgroup>`: name and text columns first, counts last. Count columns are one fixed width per report — coverage `7rem`, tests `5.5rem`, audit and code `5.5rem`, docs `7.5rem` — and the name column takes the rest. Text tables keep percent widths: the docs Rules table 64 · 18 · 18, Measure again 30 · 22 · 28 · 20, Recommendations 6 · 46 · 24 · 24. **A column heading never wraps.** A grid's minimum width is its count columns plus `12rem`.
+- **Tables with the same columns have the same widths — MUST.** Each is a `table.sds-grid` with a `<colgroup>`: name and text columns first, counts last. Count columns are one fixed width per report — coverage `7rem`, tests `5.5rem`, audit and code `5.5rem`, docs `7.5rem` — and the name column takes the rest. Text tables keep percent widths: the docs Rules table 64 · 18 · 18, Measure again 30 · 22 · 28 · 20, Recommendations 6 · 46 · 24 · 24. **A column heading never wraps.** A grid's minimum width is its count columns plus `12rem`.
 
 ### Records — list items, never a table — MUST
 
-- **One `<details class="rec-group">` per cause**, closed on screen, worst group first — every FAIL group before every WARN group, and FAILED before PENDING before PLANNED on the tests report — and within one grade the larger group first. **Level 1 is the cause**, the thing one fix closes. **Level 2 is where it happens**, added when a group holds more than about twenty items. Items are worst first, and every item is listed, with none cut.
+- **One `<details class="sds-record-group">` per cause**, closed on screen, worst group first — every FAIL group before every WARN group, and FAILED before PENDING before PLANNED on the tests report — and within one grade the larger group first. **Level 1 is the cause**, the thing one fix closes. **Level 2 is where it happens**, added when a group holds more than about twenty items. Items are worst first, and every item is listed, with none cut.
 - **The group's summary line**: the cause in the Findings' own words · the count with its unit · the worst state · the Decided by mix, leaving out a decider at 0 — *Naming · 175 · WARN · Agent 150 · Developer 25*.
-- **An item** (`<li class="record">`) is a state dot, the location in code type, one plain sentence, and a small second line. The dot is filled in the failure colour for the worst state, filled in the gap colour for the middle one, and an empty ring for the least, so its shape carries the grade as well as its colour; the grade is also its accessible name.
+- **An item** (`<li class="sds-record">`) is a state dot, the location in code type, one plain sentence, and a small second line. The dot is filled in the failure colour for the worst state, filled in the gap colour for the middle one, and an empty ring for the least, so its shape carries the grade as well as its colour; the grade is also its accessible name.
 - **Every item has a stable id** `<KIND>.<GROUP>.<nnn>` (`CODE.HIST.047`), a **Decided by** value with its reason, and the data attributes `data-id`, `data-rule`, `data-severity`, `data-decider` (`agent`, `agent-flagged` or `developer`) and `data-location`, so you can read the list back without parsing sentences.
 - **Every group prints open.**
 - **One item per file inside a group** (`RD.DEVEX.WORKSPACE.208`). Where one cause occurs many times in one file, the item names the file once, with the count and the first line it occurs on. Never one item per occurrence.
@@ -287,7 +293,7 @@ Developers and leaders who have not learned the book's words read a report, so i
 ## How it looks
 
 - **Worst first everywhere, green only for what is done, and every number carries its unit.**
-- **Charts are static SVG or CSS written into the page**, with no script and no library. They read in both themes and they print. No pie chart, donut, Pareto chart or status grid, and every value a chart draws is also written as a number beside it.
+- **Charts are static SVG or plain markup written into the page**, which the shared stylesheet styles, with no script and no library. They read in both themes and they print. No pie chart, donut, Pareto chart or status grid, and every value a chart draws is also written as a number beside it.
 - **At phone width, `40rem` and below, there is no sideways page scroll**; a wide table scrolls inside its own box, and the side gutter is `16px` rather than the `8px` every page has above that width.
 - **In print**, page 1 holds the header and the Summary, every later section starts a new page, the rail is hidden, Records prints open, and the page prints in the light theme with its colours kept.
 
