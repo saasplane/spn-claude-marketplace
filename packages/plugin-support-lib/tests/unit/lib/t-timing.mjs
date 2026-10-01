@@ -60,6 +60,26 @@ same("an arc file names the workstream and the arc",
 same("an arc's notes name the arc",
   tagsOf({ tool_input: { file_path: `${WS}/notes/N116/plan.md` } }),
   tags("008-plain-language", "N116", null));
+// AN ARC NUMBERED IN THREE DIGITS, as `N001-book-change.md` and `notes/N001/` write it, keeps its
+// zeros: the arc file, a preview, a sample and an order all name the same arc.
+same("a three-digit arc file names its arc with its zeros",
+  tagsOf({ tool_input: { file_path: `${WS}/arcs/N001-book-change.md` } }),
+  tags("008-plain-language", "N001", null));
+same("a preview under notes/N001/previews/ names the arc",
+  tagsOf({ tool_input: { file_path: `${WS}/notes/N001/previews/sample1-preview.html` } }),
+  tags("008-plain-language", "N001", null));
+same("a sample under notes/N001/samples/ names the arc",
+  tagsOf({ tool_input: { file_path: `${WS}/notes/N001/samples/close-message.md` } }),
+  tags("008-plain-language", "N001", null));
+same("an order under notes/N001/orders/ names the arc and the order",
+  tagsOf({ tool_input: { file_path: `${WS}/notes/N001/orders/B1-book.md` } }),
+  tags("008-plain-language", "N001", "B1-book"));
+same("a relative three-digit arc path, from inside the workstream, names the arc",
+  tagsOf({ cwd: WS, tool_input: { command: "sed -n 1,20p arcs/N001-book-change.md" } }),
+  tags("008-plain-language", "N001", null));
+same("a one-digit and a two-digit arc still name theirs",
+  [tagsOf({ tool_input: { file_path: `${WS}/arcs/N1-a.md` } }).arc, tagsOf({ tool_input: { file_path: `${WS}/notes/N15/plan.md` } }).arc],
+  ["N1", "N15"]);
 same("the approach page names the workstream alone",
   tagsOf({ tool_input: { file_path: `${WS}/plain-language-approach.html` } }),
   tags("008-plain-language", null, null));

@@ -43,6 +43,18 @@ one("an edit that touches no status line", "# N1\n\nsome prose about the arc", "
 one("a file outside an arcs/ folder", "Status: **DONE**", "silent", "/w/spn-foundation/docs/README.md");
 one("a note file beside the arcs", "Status: **DONE**", "silent", `/w/.spndevex/${WORKSTREAMS}/open/008-x/notes/N-plan.md`);
 
+console.log("\n=== an arc file named with three digits is read as an arc file");
+{
+  const THREE = `/w/.spndevex/${WORKSTREAMS}/open/020-x/arcs/N001-book-change.md`;
+  one("a word off the set in N001-book-change.md", "# N001\n\nStatus: **DONE — a line.**", "note", THREE);
+  one("a word of the set in N001-book-change.md", "# N001\n\nStatus: **PROPOSED — a line.**", "silent", THREE);
+  one("a file under notes/N001/ is not an arc file", "Status: **DONE**", "silent", `/w/.spndevex/${WORKSTREAMS}/open/020-x/notes/N001/plan.md`);
+  n += 1;
+  const named = (verdict("# N001\n\nStatus: **DONE**", THREE)?.deny ?? "").includes("`N001-book-change.md`");
+  if (!named) failed += 1;
+  console.log(`  ${named ? "PASS" : "FAIL"}  the refusal names the arc file`);
+}
+
 console.log("\n=== the reader itself");
 {
   n += 1;

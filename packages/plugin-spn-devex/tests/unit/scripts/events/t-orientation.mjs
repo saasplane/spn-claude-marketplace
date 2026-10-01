@@ -145,6 +145,21 @@ const one = compare("exactly one workstream open: the standing offer appears",
   }),
   ["Or ask me to continue 042 widget-pricing", "1 open · 1 backlog · 1 closed", "file://", "041-finished"]);
 
+// ARC FILES NAMED WITH THREE DIGITS ARE COUNTED AS ARCS, beside one named with one digit. The notes
+// folder `notes/N001/` holds no arc, whatever sits in it.
+compare("arc files named N001 and N002 are counted, and files under notes/N001/ are not",
+  fixture("three-digit-arcs", {
+    "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
+    "spn-app-ts/CONCEPT.md": "# concept\n",
+    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N001-book-change.md`]: "# arc\n",
+    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N002-support-release.md`]: "# arc\n",
+    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N3-an-older-name.md`]: "# arc\n",
+    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/notes/N001/plan.md`]: "# plan\n",
+    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/notes/N001/samples/close-message.md`]: "Closing.\n",
+    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/approach.html`]: "<html></html>",
+  }),
+  ["| 3 |"]);
+
 compare("two open: no offer is made, because naming one would be choosing for you",
   fixture("two-open", {
     "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),

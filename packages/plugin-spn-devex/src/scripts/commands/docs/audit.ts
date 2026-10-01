@@ -12,7 +12,7 @@
 import { statSync } from "node:fs";
 import { basename, resolve, relative } from "node:path";
 import { argsText, begin, commandFacts, end, record } from "../../../../../plugin-support-lib/src/lib/timing.ts";
-import { audit, gapReport, resolveWorkspace, walkFiles } from "./_lib.ts";
+import { audit, gapReport, isAuditedPage, resolveWorkspace, walkFiles } from "./_lib.ts";
 
 export const describe = "the invariants a page must hold, over one path or many — the whole audit, plus --report's gap scan";
 
@@ -31,12 +31,19 @@ function body(args: string[], workspace: string): number {
   // A PATH IS A FILE OR A FOLDER. Given a folder this means every document under it, which is what
   // anyone typing one meant, and the walk is the same one `face` uses, so `templates/` is skipped by
   // the rule that already exists.
-  const pages = args.flatMap((p) => {
+  // A SAMPLE AND A TEMPLATE ARE NOT PAGES. A file under a workstream's `samples/` is in its own
+  // format, and a template carries placeholders, so neither is audited or counted.
+  const named = args.flatMap((p) => {
     const full = resolve(p);
     let st; try { st = statSync(full); } catch { return [full]; }
     return st.isDirectory() ? walkFiles(full, (f) => f.endsWith(".md") || f.endsWith(".html")) : [full];
   });
-  if (!pages.length) { console.log("no document under that path"); return 0; }
+  const pages = named.filter(isAuditedPage);
+  if (!pages.length) {
+    console.log(named.length ? "no page under that path — a sample and a template are not audited as pages"
+      : "no document under that path");
+    return 0;
+  }
 
   const found = audit(pages, resolve(workspace));
   const rule = found.filter((f) => f.grade === "RULE");

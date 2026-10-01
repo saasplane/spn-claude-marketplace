@@ -4,7 +4,7 @@
 import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { arcId, arcLabel, cycleOf, cyclesOf, statusLabel, statusWord, tableOf, workstreamFolder }
+import { arcCell, arcId, arcLabel, cycleOf, cyclesOf, previewsCell, previewsOf, statusLabel, statusWord, tableOf, workstreamFolder }
   from "../../../../../src/scripts/commands/docs/cycles.ts";
 import { main } from "../../../../../src/scripts/cli.ts";
 import { WORKSTREAMS } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
@@ -46,6 +46,12 @@ put("N1-the-chapter.md", "# `N1` — the chapter\n\nStatus: **RUNNING — 2026-0
 put("N10-the-release.md", "# N10 — the release\n\nStatus: **HELD — waits on Q7.** Opened\n2026-09-29. The plugins ship once.\n");
 put("N1a-a-brief.md", "# Arc 1a — a brief\n\nStatus: **CARRIED → `N98` steps 1-2** — 2026-09-27.\n\n| Field | This arc |\n| --- | --- |\n| **Decides** | **The brief moves on.** Nothing else. |\n");
 put("N3-part.md", "# N3 — part of it\n\nStatus: **PART-LANDED — 2026-09-29.** Half the rows landed.\n");
+// An arc's Previews section: a table of previews and samples, or the one line `None.`.
+const PREVIEWS = "## Previews\n\n| File | Kind | Shows | State |\n| --- | --- | --- | --- |\n" +
+  "| [`layout-preview.html`](../notes/N010/previews/layout-preview.html) | preview | how the page is laid out | under review |\n" +
+  "| [`close_message.md`](../notes/N010/samples/close_message.md) | sample | what the agent says at a close | approved 2026-10-01 |\n" +
+  "| [`first-preview.html`](../notes/N010/previews/first-preview.html) | preview | the first layout | superseded — 2026-09-30, by the second |\n\n" +
+  "## What done means\n\n| File | Kind | State |\n| --- | --- | --- |\n| not-a-preview.md | sample | approved |\n";
 put("arc-legacy.md", "# Arc — a legacy arc with no number\n\nStatus: **OPEN** · Prepared: 2026-08-31\n");
 
 try {
@@ -56,6 +62,12 @@ try {
     ok("a word outside the set reads as none", statusWord("OPEN") === null);
     ok("the arc number comes from the file name", arcId("N7-N8-flip-and-close.md") === "N7" && arcId("N1a-x.md") === "N1a");
     ok("a file with no number has none", arcId("arc-legacy.md") === null);
+    ok("a three-digit number is read whole, and a one- or two-digit one still is",
+      arcId("N001-book-change.md") === "N001" && arcId("N120-the-release.md") === "N120" && arcId("N15-x.md") === "N15" && arcId("N1.md") === "N1",
+      [arcId("N001-book-change.md"), arcId("N120-the-release.md"), arcId("N15-x.md"), arcId("N1.md")].join(","));
+    const numbered = cycleOf(join(arcs, "N001-book-change.md"), "# N001 — the book change\n\nStatus: **PROPOSED — 2026-10-01.** This arc writes the rule.\n");
+    ok("a three-digit arc's label keeps its digits, and its heading's number is not repeated in the name",
+      arcLabel(numbered) === "N001 — the book change" && numbered.name === "the book change", arcLabel(numbered));
 
     const two = cycleOf(join(arcs, "N2-the-check.md"), "# N2 — the check\n\nStatus: **DECIDED — waits on N1.** Opened 2026-09-29.   <!-- c --> A check reads the new shape. It runs after N1.\n");
     ok("the name is the heading without its number", two.name === "the check", two.name);
@@ -79,12 +91,42 @@ try {
     ok("a folder with no arcs/ has no Cycles", cyclesOf(TMP).length === 0);
   }
 
+  console.log("\n=== docs cycles — an arc's Previews table");
+  {
+    const listed = previewsOf(PREVIEWS);
+    ok("one entry per row of the Previews table, and no row of a later section's table", listed.length === 3, JSON.stringify(listed));
+    ok("a link written from arcs/ is stated from the workstream folder",
+      listed[0].href === "notes/N010/previews/layout-preview.html", listed[0].href);
+    ok("the file name keeps every character of the link's target", listed[1].name === "close_message.md", listed[1].name);
+    ok("the kind is the row's own", listed.map((preview) => preview.kind).join(",") === "preview,sample,preview");
+    ok("the state is the words before any date",
+      listed.map((preview) => preview.state).join(",") === "under review,approved,superseded", listed.map((preview) => preview.state).join(","));
+    ok("a section reading None. has no entries", previewsOf("# N2\n\n## Previews\n\nNone.\n\n## Steps\n").length === 0);
+    ok("an arc with no Previews section has no entries", previewsOf("# N2\n\n## Steps\n\n| File | Kind | State |\n| --- | --- | --- |\n| a.md | sample | approved |\n").length === 0);
+    const unlinked = previewsOf("## Previews\n\n| File | Kind | Shows | State |\n| --- | --- | --- | --- |\n| `plan.md` | sample | the plan | under review |\n");
+    ok("a File cell with no link is named and links nothing", unlinked[0].name === "plan.md" && unlinked[0].href === null, JSON.stringify(unlinked));
+
+    const none = cycleOf(join(arcs, "N2-the-check.md"), "# N2 — the check\n\nStatus: **DECIDED**\n\n## Previews\n\nNone.\n");
+    ok("the Previews cell of an arc with none is a dash", previewsCell(none) === "&mdash;", previewsCell(none));
+    const held = cycleOf(join(arcs, "N010-the-release.md"), `# N010 — the release\n\nStatus: **RUNNING**\n\n${PREVIEWS}`);
+    ok("the Previews cell lists each file as a link, its kind and its state, one per line",
+      previewsCell(held) === `<a href="notes/N010/previews/layout-preview.html">layout-preview.html</a> &middot; preview &middot; under review<br>` +
+        `<a href="notes/N010/samples/close_message.md">close_message.md</a> &middot; sample &middot; approved<br>` +
+        `<a href="notes/N010/previews/first-preview.html">first-preview.html</a> &middot; preview &middot; superseded`, previewsCell(held));
+    ok("the Arc cell is the label in bold, then the arc's file as a link from the page",
+      arcCell(held) === `<strong>N010 &mdash; the release</strong><br><a class="s" href="arcs/N010-the-release.md">arcs/N010-the-release.md</a>`, arcCell(held));
+  }
+
   console.log("\n=== docs cycles — the table the approach template carries");
   {
     const table = tableOf(cyclesOf(folder));
-    ok("the header is Arc · What it does · Status", table.includes("<thead><tr><th>Arc</th><th>What it does</th><th>Status</th></tr></thead>"));
+    ok("the header is Arc · What it does · Status · Previews",
+      table.includes("<thead><tr><th>Arc</th><th>What it does</th><th>Status</th><th>Previews</th></tr></thead>"));
     ok("a row is escaped HTML in the template's shape",
-      table.includes("<tr><td><strong>N10 &mdash; the release</strong></td><td>The plugins ship once.</td><td>HELD &middot; waits on Q7</td></tr>"), table);
+      table.includes(`<tr><td><strong>N10 &mdash; the release</strong><br><a class="s" href="arcs/N10-the-release.md">arcs/N10-the-release.md</a></td>` +
+        "<td>The plugins ship once.</td><td>HELD &middot; waits on Q7</td><td>&mdash;</td></tr>"), table);
+    ok("an arc with no number still links its file",
+      table.includes(`<strong>a legacy arc with no number</strong><br><a class="s" href="arcs/arc-legacy.md">arcs/arc-legacy.md</a>`), table);
   }
 
   console.log("\n=== docs cycles — naming the workstream");
@@ -109,6 +151,7 @@ try {
     let rows = [];
     try { rows = JSON.parse(json.out); } catch { /* reported below */ }
     ok("--json prints one object per arc", json.code === 0 && rows.length === 6 && rows[0].arc === "N1 — the chapter", json.out.slice(0, 200));
+    ok("--json names each arc's file and lists its previews", rows[0]?.file === "N1-the-chapter.md" && Array.isArray(rows[0]?.previews), json.out.slice(0, 200));
 
     const missing = await capture(["docs", "cycles", "999"], { SPN_WORKSPACE: TMP });
     ok("an unknown workstream exits 2 and says how to name one", missing.code === 2 && missing.err.includes("no workstream"), missing.err);

@@ -80,11 +80,11 @@ const arc = (log = "", status = "LANDED") =>
 
 const LANDED = [["the chapter", "spn-foundation", "&#x2705; landed"], ["the check", "probe-repo", "&#x2705; landed"]];
 
-function build(name, { eyebrow, rows = LANDED, cards = "", log = "", state = "open", arcStatus = "LANDED" } = {}) {
+function build(name, { eyebrow, rows = LANDED, cards = "", log = "", state = "open", arcStatus = "LANDED", arcFile = "N1-something.md" } = {}) {
   const folder = `.spndevex/${WORKSTREAMS}/${state}/001-a-subject`;
   return workspace(name, {
     [`${folder}/a-subject-approach.html`]: page({ eyebrow, rows, cards }),
-    [`${folder}/arcs/N1-something.md`]: arc(log, arcStatus),
+    [`${folder}/arcs/${arcFile}`]: arc(log, arcStatus),
     // A SIBLING SCOPE, SO A CARRY HAS SOMEWHERE REAL TO POINT. `carried` means the work leaves this
     // workstream, and the gate reads the folder to see whether the named scope can receive it — so a
     // tree holding one workstream can only ever test a carry that fails.
@@ -465,6 +465,19 @@ one("and it closes once that arc has landed", "close",
   move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
   "silent");
 
+// THE SAME TWO, WITH THE ARC NAMED IN THREE DIGITS: the row says `N001` and the file is
+// `N001-something.md`, so the gate finds the arc and reads its status.
+one("a row waiting on a three-digit arc of its own workstream is refused", "close",
+  build("sp-sequencing-3", { arcFile: "N001-something.md", arcStatus: "RUNNING", rows: [["a", "spn-foundation", "&#x2705; landed"], ["b", "probe-repo", "&#x21B7; carried &rarr; N001 step 2"]] }),
+  move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
+  "deny", { says: "waits on N001 (RUNNING)" });
+
+one("and it closes once that three-digit arc has landed", "close",
+  build("sp-sequencing-3-landed", { arcFile: "N001-something.md", arcStatus: "LANDED",
+    rows: [["a", "spn-foundation", "&#x2705; landed"], ["b", "probe-repo", "&#x21B7; carried &rarr; N001 step 2"]] }),
+  move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
+  "silent");
+
 // ---------------------------------------------------------------- every arc must be finished
 //
 // NOTHING CHECKED THIS UNTIL N66 STEP 7. The gate read arc statuses only to resolve sequencing ROWS
@@ -514,6 +527,18 @@ carry("and so is one naming a step", "⤵ carried → N15 step 8", "own-arc");
 // THE ARC TEST RUNS FIRST FOR THIS CASE. An arc path holds digits a workstream matcher reads as a
 // number, so asking `which workstream` first turned every `arcs/N15-….md` into a handover.
 carry("an arc named by its file path is still sequencing", "⤵ carried → arcs/N15-what-the-final-shape-left-owed.md step 8", "own-arc");
+// AN ARC NUMBERED IN THREE DIGITS IS STILL AN ARC. `N001` carries the three digits a workstream
+// number has, so it is the case where reading the workstream first would name the wrong scope.
+carry("a three-digit arc number is this workstream's own sequencing", "⤵ carried → N001 step 2", "own-arc");
+carry("and so is a three-digit arc named by its file path", "⤵ carried → arcs/N001-book-change.md step 8", "own-arc");
+{
+  n += 1;
+  const names = ["N001-book-change.md", "N15-what-the-final-shape-left-owed.md", "N1-something.md", "N1a-a-brief.md"].map(splitPlan.arcName).join(",");
+  const target = splitPlan.carryTarget(carried("⤵ carried → arcs/N001-book-change.md step 8")).name;
+  const ok = names === "N001,N15,N1,N1a" && target === "N001";
+  if (!ok) failed += 1;
+  console.log(`  ${ok ? "PASS" : "FAIL"}  an arc's short name keeps the digits its file name writes\n        names ${names} · carry target ${target}`);
+}
 carry("a numbered scope is a handover", "⤵ carried → 003-cloud-day-0", "workstream");
 carry("and so is one naming a phase inside it", "⤵ carried → 010 Phase 3 owns the split", "workstream");
 carry("a cell naming nothing names no successor", "⤵ carried", "unnamed");

@@ -21,7 +21,7 @@ import { filesUnder as proseFilesUnder, paragraphs as proseParagraphs, score as 
 import { withOffset } from "../../lib/clock.ts";
 import { ARTIFACT_FOLDERS, DEVEX_WORKSTREAMS, SEAT, SEATS, TEMPLATES, artifactFolderOf, behaviorsDir, bookTemplatesDir,
   capabilitiesDir, constructsDir, docsOf, inSeat, inTemplates, isProducedPage, mirrorPath,
-  overviewsDir, producedPageOf, seatOf, splitAtSeat } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+  overviewsDir, producedPageOf, seatOf, splitAtSeat, workstreamDirOf } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 export type Grade = "RULE" | "SOFT";
 export type Finding = { check: string; grade: Grade; file: string; message: string };
 
@@ -45,9 +45,16 @@ export type Finding = { check: string; grade: Grade; file: string; message: stri
 // stated in `03-tree.md` § *A capability is realized by halves*. A new check ships SOFT, so the
 // files are brought to the shape by the pass that rewrites them rather than refused by a gate that
 // arrived first. FACE, ROUTE_MAP and REGISTER still have none, for the reason above.
+//
+// A PREVIEW is a page a workstream shows the developer before the work is built. It sits in
+// `notes/N<nnn>/previews/`, its file name ends `-preview.html`, and it is written from
+// `workstream/approach-preview-template.html`. It carries no fixed outline.
 export const VARIANTS = ["approach", "overview", "construct", "behaviors", "capability", "report",
-                  "face", "data_model", "surface_map", "route_map", "register"] as const;
+                  "face", "data_model", "surface_map", "route_map", "register", "preview"] as const;
 export type Variant = (typeof VARIANTS)[number];
+
+/** The states a preview's State chip shows, as the preview template writes them. */
+export const PREVIEW_STATES = ["UNDER REVIEW", "APPROVED", "SUPERSEDED"];
 
 /** The lens register, as the document chapter's table renders each value for a reader. */
 export const LENS_LABEL: Record<string, string> = {
@@ -644,9 +651,11 @@ export function checkHeader(file: string, src: string, block: any): Finding[] {
   }
 
   // For: the lenses, rendered as labels, in the block's order. Never who wrote the page.
+  // A preview's header names its arc and its Shown date where every other page names its readers,
+  // so its template carries no For chips and none are compared.
   const chips = [...h.matchAll(/class="badge lens"[^>]*>([\s\S]*?)<\/span>/g)].map((m) => text(m[1]));
   const wantChips = (block.lenses ?? []).map((l: string) => LENS_LABEL[l]).filter(Boolean);
-  if (chips.join(" · ") !== wantChips.join(" · "))
+  if (block.variant !== "preview" && chips.join(" · ") !== wantChips.join(" · "))
     add("RULE", `For reads \`${chips.join(" · ")}\`; the block's lenses render as \`${wantChips.join(" · ")}\``);
   if (/\bLenses:/.test(h)) add("RULE", "the tag line reads `For:`, never `Lenses:`");
 
@@ -671,6 +680,13 @@ export function checkHeader(file: string, src: string, block: any): Finding[] {
     }
     if (!/>\s*Commit:\s*</.test(shown))
       add("RULE", "no Commit — a report names the commit it read, beside Generated");
+  } else if (block.variant === "preview") {
+    // A PREVIEW'S CHIP IS THE STATE OF ITS REVIEW, never the block's `status`. The block's word says
+    // how far the workstream's page has come; the chip says whether the developer has judged this
+    // preview, so the two are not compared.
+    if (!statusChip) add("RULE", `no State chip — a preview shows ${PREVIEW_STATES.join(" · ")}`);
+    else if (!PREVIEW_STATES.includes(text(statusChip[1])))
+      add("RULE", `the State chip reads \`${text(statusChip[1])}\`; a preview shows ${PREVIEW_STATES.join(" · ")}`);
   } else if (!carriesStatus(file, block)) {
     if (statusChip && (block.variant === "overview" || !("status" in block)))
       add("RULE", block.variant === "overview" ? "an overview shows no status chip"
@@ -685,7 +701,7 @@ export function checkHeader(file: string, src: string, block: any): Finding[] {
   // author saves and the page `docs audit` reads are judged by the same rule. The kind is the
   // block's variant; a hub is the overview named `concept-overview.html`.
   const kind: MastheadKind | null = basename(file) === "concept-overview.html" ? "hub"
-    : ["overview", "construct", "report", "approach"].includes(block.variant) ? block.variant : null;
+    : ["overview", "construct", "report", "approach", "preview"].includes(block.variant) ? block.variant : null;
   for (const [grade, message] of masthead(file, src, kind))
     f.push({ check: "masthead", grade: grade as Grade, file, message });
   return f;
@@ -830,11 +846,14 @@ export function checkFurniture(file: string, src: string, templates: string, blo
   const flatten = (t: string): string[] =>
     (t.match(/<script\b[^>]*>[\s\S]*?<\/script>/g) ?? []).map((x) => x.replace(/\s+/g, " ").trim()).sort();
   // A REPORT CARRIES ONE SCRIPT MORE: the one that shows Generated in the reader's own time zone
-  // (RD.DEVEX.WORKSPACE.192). So a report is compared with its own template, and every other page
-  // with the construct template's rail builder, fold and heading anchor.
-  const from = block?.variant === "report" ? "report-template.html" : "construct-template.html";
+  // (RD.DEVEX.WORKSPACE.192). So a report is compared with its own template, a preview with the
+  // preview template, and every other page with the construct template's rail builder, fold and
+  // heading anchor.
+  const from = block?.variant === "report" ? join("pages", "report-template.html")
+    : block?.variant === "preview" ? join("workstream", PREVIEW_TEMPLATE)
+    : join("pages", "construct-template.html");
   let want: string[];
-  try { want = flatten(readFileSync(join(templates, "pages", from), "utf8")); }
+  try { want = flatten(readFileSync(join(templates, from), "utf8")); }
   catch { return []; }
   if (!want.length) return [];
   const have = flatten(src);
@@ -905,6 +924,9 @@ export function checkPalette(file: string, src: string, templates: string): Find
   return f;
 }
 
+/** The template a preview page is written from, under the templates' `workstream/` folder. */
+export const PREVIEW_TEMPLATE = "approach-preview-template.html";
+
 /**
  * The template an authored page declares, or null where the page is produced or declares none.
  *
@@ -920,6 +942,7 @@ export function declaredTemplate(file: string, block: any, templates: string): s
     return join(templates, "pages", basename(file) === "concept-overview.html" ? "hub-template.html" : "overview-template.html");
   if (variant === "report") return join(templates, "pages", "report-template.html");
   if (variant === "approach") return join(templates, "workstream", "approach-template.html");
+  if (variant === "preview") return join(templates, "workstream", PREVIEW_TEMPLATE);
   return null;
 }
 
@@ -3221,6 +3244,20 @@ export function checkLinks(file: string, src: string): Finding[] {
   return f;
 }
 
+/**
+ * Whether the audit reads a path as a page. Two kinds of file are not pages. A file under a
+ * workstream's `samples/` is a real file of the kind the work produces, in its own format. A template,
+ * which is any file under `templates/` or one named `<name>-template.<ext>`, carries placeholders
+ * where a page carries its content.
+ */
+export function isAuditedPage(path: string): boolean {
+  const norm = path.replace(/\\/g, "/");
+  if (inTemplates(norm) || /-template\.[a-z]+$/i.test(basename(norm))) return false;
+  const workstream = workstreamDirOf(norm);
+  if (workstream && norm.slice(workstream.folder.length).split("/").includes("samples")) return false;
+  return true;
+}
+
 export function audit(paths: string[], workspace: string): Finding[] {
   const findings: Finding[] = [];
   const blocks = new Map<string, any>();
@@ -3231,6 +3268,7 @@ export function audit(paths: string[], workspace: string): Finding[] {
   const templates = process.env.SPN_TEMPLATES
     ?? bookTemplatesDir(join(workspace, "spn-foundation"));
   for (const p of paths) {
+    if (!isAuditedPage(p)) continue;
     const src = readFileSync(p, "utf8");
     const { block, error } = readBlock(src);
     blocks.set(p, block);

@@ -44,7 +44,7 @@ import { basename, dirname, join, resolve, relative, sep } from "node:path";
 import { emit, readPayload, runAlone, unescape, type Payload, type Verdict } from "../lib/payload.ts";
 import { APPROACH_SUFFIX, ARTIFACT, PLUGIN_TEMPLATES, POCKET, decisionsRegister, inArtifacts, isApproachPage, isArcFile,
          isRegister as inRegisters, workstreamDirOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { cyclesOf, statusWord } from "../commands/docs/cycles.ts";
+import { CYCLES_COLUMNS, arcHref, arcLabel, cyclesOf, previewsCell, statusWord } from "../commands/docs/cycles.ts";
 
 export type Finding = [severity: string, message: string];
 
@@ -278,11 +278,34 @@ function cycleKey(label: string): string {
 
 const listed = (keys: string[]) => keys.slice(0, 6).join(", ") + (keys.length > 6 ? ` and ${keys.length - 6} more` : "");
 
+// The header of the Cycles table, as a page writes it, and the same header with no Previews column,
+// which a closed workstream keeps.
+const CYCLES_HEADER = CYCLES_COLUMNS.join(" · ");
+const CYCLES_HEADER_NO_PREVIEWS = CYCLES_COLUMNS.slice(0, 3).join(" · ");
+
+/** Every link in a cell, in order: where it points and the text it shows. */
+function anchorsOf(html: string): Array<{ href: string; text: string }> {
+  return [...html.matchAll(/<a\b[^>]*\bhref="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi)]
+    .map((found) => ({ href: unescape(found[1]), text: flat(found[2]) }));
+}
+
+/** A cell with its links taken out, as a person reads the rest. */
+const withoutAnchors = (html: string): string => flat(html.replace(/<a\b[\s\S]*?<\/a>/gi, " "));
+
+/** Whether a path sits in a closed workstream, whose page keeps the table it closed with. */
+function inClosedWorkstream(path: string): boolean {
+  const home = workstreamOf(path);
+  return home !== null && basename(dirname(home.folder)) === "closed";
+}
+
 /**
  * 05-artifacts.md § `How` ends in Cycles, and the arcs are the state. How's last subsection is an
- * `h3` named Cycles, whose table has Arc · What it does · Status. Inside a workstream the table has
- * one row per arc in `arcs/`, and each row's status is the arc's own. `spn-devex docs cycles` prints
- * the rows; this compares the page against the same reading.
+ * `h3` named Cycles, whose table has Arc · What it does · Status · Previews. Inside a workstream the
+ * table has one row per arc in `arcs/`, in the order a person chooses, and each row is the arc's own:
+ * its name, the link to its file, its line, its status, and the previews and samples its `## Previews`
+ * table lists. `spn-devex docs cycles` prints the rows; this compares the page against the same
+ * reading. A page in a closed workstream may carry the table with no Previews column, and then only
+ * its rows and their statuses are compared.
  */
 export function cyclesRule(path: string, text: string): Finding[] {
   const body = section(text, "How");
@@ -292,24 +315,31 @@ export function cyclesRule(path: string, text: string): Finding[] {
   const named = subsections.filter((m) => /^Cycles\b/i.test(flat(m[1]))).at(-1);
   if (!named)
     return [[CYCLES, "How does not end in Cycles — its last subsection is an h3 named Cycles, one row " +
-      `per arc with Arc · What it does · Status (05-artifacts.md § How ends in Cycles) · ${fix}`]];
+      `per arc with ${CYCLES_HEADER} (05-artifacts.md § How ends in Cycles) · ${fix}`]];
   if (named !== subsections.at(-1))
     return [[CYCLES, `How carries "${flat(subsections.at(-1)![1])}" after Cycles — Cycles is How's last ` +
       "subsection (05-artifacts.md § How ends in Cycles)"]];
 
   const table = /<table\b[\s\S]*?<\/table>/i.exec(body.slice(named.index!))?.[0];
   const header = table ? [...table.matchAll(/<th\b[^>]*>([\s\S]*?)<\/th>/gi)].map((m) => flat(m[1]).toLowerCase()) : [];
-  if (header.join(" · ") !== "arc · what it does · status")
-    return [[CYCLES, "Cycles carries no table with Arc · What it does · Status — one row per arc, from " +
-      `the arcs' status lines (05-artifacts.md § How ends in Cycles) · ${fix}`]];
+  const columns = header.join(" · ");
+  const withPreviews = columns === CYCLES_HEADER.toLowerCase();
+  if (!withPreviews && columns !== CYCLES_HEADER_NO_PREVIEWS.toLowerCase())
+    return [[CYCLES, `Cycles carries no table with ${CYCLES_HEADER} — one row per arc, from ` +
+      `the arcs' status lines and their Previews tables (05-artifacts.md § How ends in Cycles) · ${fix}`]];
 
   const home = workstreamOf(path);
   if (!home) return [];
+  if (!withPreviews && !inClosedWorkstream(path))
+    return [[CYCLES, `Cycles carries ${CYCLES_HEADER_NO_PREVIEWS} and no Previews column — each row links ` +
+      "its arc file and lists that arc's previews and samples (05-artifacts.md § How ends in Cycles) · " +
+      "run `spn-devex docs cycles <workstream>` and replace the table with the one it prints"]];
+
   const arcs = cyclesOf(home.folder);
   const rows = [...(table!.match(/<tr\b[^>]*>[\s\S]*?<\/tr>/gi) ?? [])]
-    .map((row) => [...row.matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/gi)].map((m) => flat(m[1])))
+    .map((row) => [...row.matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/gi)].map((m) => m[1]))
     .filter((cells) => cells.length >= 3);
-  const onPage = new Map(rows.map((cells) => [cycleKey(cells[0]), cells[2]]));
+  const onPage = new Map(rows.map((cells) => [cycleKey(withoutAnchors(cells[0])), cells]));
   const inArcs = new Map(arcs.map((arc) => [arc.id ?? cycleKey(arc.name), arc]));
 
   const out: Finding[] = [];
@@ -321,12 +351,28 @@ export function cyclesRule(path: string, text: string): Finding[] {
   if (unknown.length)
     out.push([CYCLES, `Cycles lists ${listed(unknown)}, and arcs/ holds no such arc — the table is read ` +
       `from the arcs, never typed (05-artifacts.md § How ends in Cycles) · ${fix}`]);
-  const stale = [...onPage.entries()]
-    .filter(([key, cell]) => {
-      const arc = inArcs.get(key);
-      return arc?.status && statusWord(cell) !== arc.status;
-    })
-    .map(([key, cell]) => `${key} reads ${statusWord(cell) ?? `"${cell}"`} and the arc reads ${inArcs.get(key)!.status}`);
+
+  // Rows are matched by arc, never by position: the page lists arcs in the order they run.
+  const stale: string[] = [];
+  for (const [key, cells] of onPage) {
+    const arc = inArcs.get(key);
+    if (!arc) continue;
+    const status = flat(cells[2]);
+    if (arc.status && statusWord(status) !== arc.status)
+      stale.push(`${key} reads ${statusWord(status) ?? `"${status}"`} and the arc reads ${arc.status}`);
+    if (!withPreviews) continue;
+    if (withoutAnchors(cells[0]) !== arcLabel(arc).replace(/\s+/g, " ").trim())
+      stale.push(`${key} is named "${withoutAnchors(cells[0])}" and the arc is "${arcLabel(arc)}"`);
+    const href = arcHref(arc);
+    if (!anchorsOf(cells[0]).some((anchor) => anchor.href === href && anchor.text === href))
+      stale.push(`${key} does not link its arc file as ${href}`);
+    if (flat(cells[1]) !== arc.does.replace(/\s+/g, " ").trim())
+      stale.push(`${key}'s What it does is not the arc's own line`);
+    const previews = previewsCell(arc);
+    const linked = (html: string) => anchorsOf(html).map((anchor) => anchor.href).join(" ");
+    if (flat(cells[3] ?? "") !== flat(previews) || linked(cells[3] ?? "") !== linked(previews))
+      stale.push(`${key}'s Previews cell is not what the arc's Previews table lists`);
+  }
   if (stale.length)
     out.push([CYCLES, `Cycles disagrees with the arcs: ${listed(stale)} — the arcs are the state ` +
       `(05-artifacts.md § How ends in Cycles) · ${fix}`]);
@@ -402,11 +448,11 @@ const MASTHEAD = "SOFT";
 const MASTHEAD_WHERE = "(05-artifacts.md § The masthead, and the opening; RD.DEVEX.WORKSPACE.187)";
 
 /** The page kinds the masthead rule binds, read from a page's file name. */
-export type MastheadKind = "hub" | "overview" | "construct" | "report" | "approach";
+export type MastheadKind = "hub" | "overview" | "construct" | "report" | "approach" | "preview";
 export function mastheadKind(path: string): MastheadKind | null {
   const base = basename(path);
   if (base === "concept-overview.html") return "hub";
-  const suffix = /-(overview|construct|report|approach)\.html$/.exec(base);
+  const suffix = /-(overview|construct|report|approach|preview)\.html$/.exec(base);
   return suffix ? suffix[1] as MastheadKind : null;
 }
 

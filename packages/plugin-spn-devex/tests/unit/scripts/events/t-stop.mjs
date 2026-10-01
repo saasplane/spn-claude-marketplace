@@ -787,6 +787,14 @@ console.log("\n=== handover — the template's fields, and a fence that quotes t
     if (!ok) failed += 1;
     console.log(`  ${ok ? "PASS" : "FAIL"}  a \`continue:\` line with ${what} is refused${ok ? "" : ` — got ${JSON.stringify(got)}`}`);
   }
+  // THE ARC IS NAMED WITH THE DIGITS ITS FILE WRITES: three, two or one.
+  for (const arc of ["N001", "N15", "N1"]) {
+    n += 1;
+    const got = checkHandover(`Pick this up in a new window.\n\n${FILLED.replace("`N116`", `\`${arc}\``)}`, ROOT);
+    const ok = got.length === 0;
+    if (!ok) failed += 1;
+    console.log(`  ${ok ? "PASS" : "FAIL"}  a \`continue:\` line naming arc ${arc} is a whole handover${ok ? "" : ` — got ${JSON.stringify(got)}`}`);
+  }
 }
 
 console.log("\n=== runnable — a row in progress is named with its age, never called runnable (RD.DEVEX.WORKSPACE.184)");
@@ -1021,6 +1029,33 @@ console.log("\n=== 2n — an answer lands in the arc's notes in the same turn (R
     withNotes("m2n-carried", "PROPOSED"), "warns", { says: "[carried]", session: "m2n-f", edit: moveSpec, parity: false, why: "2n" });
   one("2n: a running arc carrying a point to a later step is not flagged",
     withNotes("m2n-carried-running", "RUNNING"), "silent", { session: "m2n-g", edit: moveSpec, parity: false, why: "2n" });
+
+  // THE TWO REVIEWED FOLDERS, `previews/` AND `samples/`, each with an arc numbered in one digit and
+  // in three. The arc holds no spec and no plan, so the folder is the only notes it has.
+  const ANSWER = "- **2026-10-01 — Q7 B** (the developer: *\"the second layout\"*). The preview is approved as it is.\n";
+  const reviewed = (name, arcId, folder, file) => workspace(name, {
+    [`${WS}/approach.html`]: page({ names: [`${arcId}-a-subject.md`] }),
+    [`${WS}/arcs/${arcId}-a-subject.md`]: arcN122("RUNNING"),
+    [`${WS}/notes/${arcId}/${folder}/${file}`]: "the first layout\n",
+  });
+  const answerOnly = (arcId) => (root) => { const arc = join(root, WS, "arcs", `${arcId}-a-subject.md`);
+    writeFileSync(arc, readFileSync(arc, "utf8") + ANSWER, "utf8"); };
+  const answerAndMove = (arcId, folder, file) => (root) => { answerOnly(arcId)(root);
+    writeFileSync(join(root, WS, "notes", arcId, folder, file), "the second layout, as the developer chose\n", "utf8"); };
+  for (const [arcId, folder, file, tag] of [
+    ["N1", "previews", "layout-preview.html", "p1"], ["N001", "previews", "layout-preview.html", "p3"],
+    ["N1", "samples", "close-message.md", "s1"], ["N001", "samples", "close-message.md", "s3"],
+  ]) {
+    one(`2n: an answer logged in ${arcId} with its ${folder}/ file unchanged warns, naming the folder`,
+      reviewed(`m2n-${tag}-red`, arcId, folder, file), "warns",
+      { says: `notes/${arcId}/${folder}/`, session: `m2n-${tag}-a`, edit: answerOnly(arcId), parity: false, why: "2n" });
+    one(`2n: the same answer with the ${arcId} ${folder}/ file moved in the same turn is silent`,
+      reviewed(`m2n-${tag}-green`, arcId, folder, file), "silent",
+      { session: `m2n-${tag}-b`, edit: answerAndMove(arcId, folder, file), parity: false, why: "2n" });
+  }
+  one("2n: a file in a notes folder that is neither previews/ nor samples/ is not the arc's notes",
+    reviewed("m2n-scripts", "N001", "scripts", "rename.sh"), "silent",
+    { session: "m2n-scripts-a", edit: answerOnly("N001"), parity: false, why: "2n" });
 }
 
 console.log("\n=== welcome — a session's first turn opens with the welcome, word for word (N116 row 8, F1)");

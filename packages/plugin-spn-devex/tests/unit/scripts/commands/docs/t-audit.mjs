@@ -991,5 +991,92 @@ console.log("\n=== the masthead: h1, an optional p.subtitle, one p.standfirst, a
     audit("x", "y", "| RD.DEVEX.WORKSPACE.143 | a | no pair here | b | c |\n"), has("could not be read from the row"));
 }
 
+// ---------------------------------------------------------------- a preview page
+
+console.log("\n=== a preview page: variant `preview`, its own title, a State chip, and the preview template's furniture");
+{
+  // THE REAL TEMPLATE'S STYLES AND SCRIPTS, so a clean case is clean against what the book ships.
+  const templates = bookTemplatesDir(resolve(PLUGIN, "..", "..", "..", "spn-foundation"));
+  const previewTemplate = readFileSync(resolve(templates, "workstream", "approach-preview-template.html"), "utf8");
+  const reportTemplate = readFileSync(resolve(templates, "pages", "report-template.html"), "utf8");
+  const stylesOf = (t) => (t.match(/<style\b[^>]*>[\s\S]*?<\/style>/g) ?? []).join("\n");
+  const scriptsOf = (t) => (t.match(/<script\b[^>]*>[\s\S]*?<\/script>/g) ?? []).join("\n");
+  const notes = `.spndevex/${WORKSTREAMS}/open/001-a/notes/N001`;
+  const at = `${notes}/previews/layout-preview.html`;
+  const good = { id: "ws-001-a-layout", variant: "preview", title: "Layout", lenses: ["ARCHITECT"], status: "PLANNING",
+    summary: "This page shows the layout.", keywords: ["preview"] };
+  const state = (word) => `<span class="st"><span class="lbl">State:</span> <span class="badge status review">${word}</span></span>`;
+  const page = (o, { chip = state("UNDER REVIEW"), named = o.title, heading = o.title, styles = stylesOf(previewTemplate),
+                     scripts = scriptsOf(previewTemplate) } = {}) =>
+    block(o) + `${styles}\n<nav class="rail" id="rail"></nav>\n<header class="masthead">\n` +
+    `<div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Workstream 001 &nbsp;|&nbsp; ${named}</span>` +
+    `<span class="line"><span class="lbl">Type:</span> <span class="badge type">Preview</span><span class="sep">|</span>` +
+    `<span class="lbl">Arc:</span> <span class="badge">N001</span><span class="sep">|</span>` +
+    `<span class="lbl">Shown:</span> <span class="badge">2026-10-01</span>${chip}</span></div>\n` +
+    `<h1>${heading}</h1>\n<p class="subtitle">Decides how the page is laid out.</p>\n` +
+    `<p class="standfirst">This page shows the layout.</p>\n</header>\n${scripts}\n`;
+  const audit = (files, target = at, from = templates) => {
+    process.env.SPN_TEMPLATES = from;
+    try { return run(repo(files), ["audit", target]); }
+    finally { delete process.env.SPN_TEMPLATES; }
+  };
+
+  one("a preview written from the template is clean, with no For chips and a block status the chip does not repeat",
+    audit({ [at]: page(good) }), has("clean — 1 page"));
+  for (const word of ["APPROVED", "SUPERSEDED"])
+    one(`a State chip reading ${word} is not compared with the block's PLANNING`,
+      audit({ [at]: page(good, { chip: state(word) }) }), has("clean — 1 page"));
+  one("known-bad: a State chip carrying a status word is refused",
+    audit({ [at]: page(good, { chip: state("&#x1F52E; PLANNING") }) }), has("the State chip reads"));
+  one("known-bad: a preview with no State chip is refused",
+    audit({ [at]: page(good, { chip: "" }) }), has("no State chip"));
+  one("known-bad: a header line whose third part is not the preview's title is refused",
+    audit({ [at]: page(good, { named: "001 - A" }) }), has("the header title `001 - A` is not the block's `Layout`"));
+  one("known-bad: an `<h1>` that is not the preview's title is refused",
+    audit({ [at]: page(good, { heading: "001 - A" }) }), has("the `<h1>` `001 - A` is not the block's `Layout`"));
+  one("known-bad: scripts that are not the preview template's are refused",
+    audit({ [at]: page(good, { scripts: scriptsOf(reportTemplate) }) }), has("this page's scripts are not the template's"));
+  one("known-bad: a selector the preview template does not declare is named against that template",
+    audit({ [at]: page(good, { styles: stylesOf(previewTemplate) + "\n<style>.mine{color:red}</style>" }) }),
+    has("`approach-preview-template.html` does not — `.mine`"));
+
+  // THE NAME AND THE VARIANT AGREE: a file ending `-preview.html` declares `preview`, and only such a file does.
+  one("known-bad: a file ending -preview.html that declares another variant is reported",
+    audit({ [at]: page({ ...good, variant: "approach" }) }), has("the file name does not end `-approach.html`"));
+  one("known-bad: a file declaring `preview` under another name is reported",
+    audit({ [`${notes}/previews/layout-page.html`]: page(good) }, `${notes}/previews/layout-page.html`),
+    has("the file name does not end `-preview.html`"));
+
+  // WHICH TEMPLATE THE FURNITURE IS READ FROM, proven with a templates folder whose three templates
+  // each carry a script of their own, because the book's three carry the same scripts today.
+  const own = mkdtempSync(join(BASE, "templates-"));
+  const script = (name) => `<script>/* ${name} */</script>`;
+  mkdirSync(join(own, "pages"), { recursive: true });
+  mkdirSync(join(own, "workstream"), { recursive: true });
+  writeFileSync(join(own, "pages", "construct-template.html"), script("construct"));
+  writeFileSync(join(own, "workstream", "approach-template.html"), script("approach"));
+  writeFileSync(join(own, "workstream", "approach-preview-template.html"), script("preview"));
+  one("a preview carrying the preview template's scripts draws no furniture finding",
+    audit({ [at]: page(good, { scripts: script("preview") }) }, at, own), lacks("furniture"));
+  one("known-bad: a preview carrying the construct template's scripts is off its own template",
+    audit({ [at]: page(good, { scripts: script("construct") }) }, at, own), has("this page's scripts are not the template's"));
+
+  // A SAMPLE AND A TEMPLATE ARE NOT PAGES. The same broken file is refused under `previews/` and
+  // left alone under `samples/`.
+  const broken = "<h1>No block, no header</h1>\n";
+  one("known-bad: a file with no block under previews/ is refused",
+    audit({ [`${notes}/previews/broken-preview.html`]: broken }, `${notes}/previews/broken-preview.html`), has("RULE"));
+  one("the same file under samples/ is not audited as a page",
+    audit({ [`${notes}/samples/broken-preview.html`]: broken }, `${notes}/samples/broken-preview.html`),
+    (got) => has("a sample and a template are not audited as pages")(got) && lacks("RULE")(got));
+  one("a template file is not audited as a page, wherever it sits",
+    audit({ [`${notes}/previews/approach-preview-template.html`]: previewTemplate }, `${notes}/previews/approach-preview-template.html`),
+    (got) => has("a sample and a template are not audited as pages")(got) && lacks("RULE")(got));
+  one("a notes folder is audited for its previews alone — the sample and the template beside it are not counted",
+    audit({ [at]: page(good), [`${notes}/samples/broken-preview.html`]: broken, [`${notes}/samples/close-message.md`]: "Closing.\n",
+            [`${notes}/samples/approach-preview-template.html`]: previewTemplate }, notes),
+    has("clean — 1 page"));
+}
+
 console.log(failed ? `\n  ${failed} of ${n} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

@@ -73,8 +73,8 @@ const REGISTER = join(registersDir(PROBE_DOCS), "probe.md");
 const arcFile = (id, name, status, rows = "") =>
   `# ${id} — ${name}\n\nStatus: **${status} — 2026-09-29.** ${name}, in one sentence.\n\n## Steps\n\n` +
   `| # | Repo | Altitude | What | Mechanism | Acceptance | State |\n| --- | --- | --- | --- | --- | --- | --- |\n${rows}`;
-const stream = (root, name) => {
-  const folder = join(workstreamsDir(root, "open"), name);
+const stream = (root, name, state = "open") => {
+  const folder = join(workstreamsDir(root, state), name);
   mkdirSync(join(folder, ARCS), { recursive: true });
   writeFileSync(join(folder, ARCS, "N1-the-chapter.md"), arcFile("N1", "the chapter", "RUNNING"));
   writeFileSync(join(folder, ARCS, "N2-the-check.md"), arcFile("N2", "the check", "DECIDED"));
@@ -99,11 +99,17 @@ const CLEAN = `<!doctype html>
   <h3 id="h1">spn-foundation &mdash; the chapter</h3>
   <p>You read the chapter first, and the code follows it.</p>
   <h3 id="h9">Cycles &mdash; the arcs, in the order they run</h3>
-  <div class="scroll"><table><thead><tr><th>Arc</th><th>What it does</th><th>Status</th></tr></thead>
-  <tbody><tr><td><strong>N1 &mdash; the chapter</strong></td><td>the chapter says where the model sits</td><td>RUNNING</td></tr>
-  <tr><td><strong>N2 &mdash; the check</strong></td><td>a check reads the new shape</td><td>DECIDED</td></tr></tbody></table></div>
+  <div class="scroll"><table><thead><tr><th>Arc</th><th>What it does</th><th>Status</th><th>Previews</th></tr></thead>
+  <tbody><tr><td><strong>N1 &mdash; the chapter</strong><br><a class="s" href="arcs/N1-the-chapter.md">arcs/N1-the-chapter.md</a></td><td>the chapter, in one sentence.</td><td>RUNNING</td><td>&mdash;</td></tr>
+  <tr><td><strong>N2 &mdash; the check</strong><br><a class="s" href="arcs/N2-the-check.md">arcs/N2-the-check.md</a></td><td>the check, in one sentence.</td><td>DECIDED</td><td>&mdash;</td></tr></tbody></table></div>
 </section>
 `;
+
+// The same page with the Cycles table a closed workstream keeps: three columns, no file link.
+const NO_PREVIEWS = CLEAN
+  .replace("<th>Previews</th>", "")
+  .replace(/<br><a class="s"[^>]*>[^<]*<\/a>/g, "")
+  .replace(/<td>&mdash;<\/td><\/tr>/g, "</tr>");
 
 console.log("\n=== doc-check — the fixtures");
 
@@ -399,6 +405,74 @@ try {
     write(join(stream(TMP, "043-held"), "held-approach.html"), CLEAN.replace("<td>RUNNING</td>", "<td>RUNNING &middot; since today</td>")),
     "silent");
 
+  one("the same rows in another order — a person chooses the order the arcs run in",
+    write(page, CLEAN.replace(/(<tbody>)(<tr>[^\n]*)\n  (<tr>[\s\S]*?<\/tr>)(<\/tbody>)/, "$1$3\n  $2$4")),
+    "silent");
+
+  one("a row whose Arc cell links no file",
+    write(page, CLEAN.replace(`<br><a class="s" href="arcs/N2-the-check.md">arcs/N2-the-check.md</a>`, "")),
+    "reports", "N2 does not link its arc file as arcs/N2-the-check.md");
+
+  one("a row whose Arc cell links another arc's file",
+    write(page, CLEAN.replace(`href="arcs/N2-the-check.md"`, `href="arcs/N1-the-chapter.md"`)),
+    "reports", "N2 does not link its arc file as arcs/N2-the-check.md");
+
+  one("a row named differently from its arc's heading",
+    write(page, CLEAN.replace("N2 &mdash; the check</strong>", "N2 &mdash; the gate</strong>")),
+    "reports", `N2 is named "N2 — the gate" and the arc is "N2 — the check"`);
+
+  one("a What it does cell typed by hand",
+    write(page, CLEAN.replace("the check, in one sentence.", "a check reads the new shape")),
+    "reports", "N2's What it does is not the arc's own line");
+
+  one("a Previews cell listing a file the arc does not",
+    write(page, CLEAN.replace("<td>DECIDED</td><td>&mdash;</td>",
+      `<td>DECIDED</td><td><a href="notes/N2/previews/layout-preview.html">layout-preview.html</a> &middot; preview &middot; under review</td>`)),
+    "reports", "N2's Previews cell is not what the arc's Previews table lists");
+
+  // THE TABLE WITH NO PREVIEWS COLUMN, in each of the three states. A workstream being worked or
+  // parked is told to print the table again; a closed one stays as it was written.
+  one("three columns in an open workstream — told to run the command",
+    write(page, NO_PREVIEWS), "reports", "run `spn-devex docs cycles <workstream>`");
+  one("three columns in a backlog workstream — told to run the command",
+    write(join(stream(TMP, "045-parked", "backlog"), "approach.html"), NO_PREVIEWS),
+    "reports", "no Previews column");
+  const closedPage = join(stream(TMP, "046-done", "closed"), "done-approach.html");
+  one("three columns in a closed workstream — never judged for the column",
+    write(closedPage, NO_PREVIEWS), "silent");
+  one("three columns in a closed workstream — a status the arc does not carry is still reported",
+    write(closedPage, NO_PREVIEWS.replace("<td>DECIDED</td>", "<td>RUNNING</td>")),
+    "reports", "N2 reads RUNNING and the arc reads DECIDED");
+  one("four columns in a closed workstream, matching its arcs",
+    write(closedPage, CLEAN), "silent");
+
+  // AN ARC NUMBERED IN THREE DIGITS, WITH A PREVIEWS TABLE: a preview, a sample with a dated state,
+  // and a link written from `arcs/`, which the page states from the workstream folder.
+  const previewed = join(workstreamsDir(TMP, "open"), "047-previewed");
+  mkdirSync(join(previewed, ARCS), { recursive: true });
+  writeFileSync(join(previewed, ARCS, "N001-the-chapter.md"), arcFile("N001", "the chapter", "RUNNING").replace("## Steps",
+    "## Previews\n\n| File | Kind | Shows | State |\n| --- | --- | --- | --- |\n" +
+    "| [`layout-preview.html`](../notes/N001/previews/layout-preview.html) | preview | how the page is laid out | under review |\n" +
+    "| [`close-message.md`](../notes/N001/samples/close-message.md) | sample | what the agent says at a close | approved 2026-10-01 |\n\n## Steps"));
+  writeFileSync(join(previewed, ARCS, "N002-the-check.md"), arcFile("N002", "the check", "DECIDED").replace("## Steps", "## Previews\n\nNone.\n\n## Steps"));
+  const PREVIEWS_CELL = `<a href="notes/N001/previews/layout-preview.html">layout-preview.html</a> &middot; preview &middot; under review<br>` +
+    `<a href="notes/N001/samples/close-message.md">close-message.md</a> &middot; sample &middot; approved`;
+  const PREVIEWED = CLEAN.replace(/N1-the-chapter/g, "N001-the-chapter").replace(/N2-the-check/g, "N002-the-check")
+    .replace("N1 &mdash;", "N001 &mdash;").replace("N2 &mdash;", "N002 &mdash;")
+    .replace("<td>RUNNING</td><td>&mdash;</td>", `<td>RUNNING</td><td>${PREVIEWS_CELL}</td>`);
+  const previewedPage = join(previewed, "approach.html");
+  one("three-digit arcs, and a Previews cell matching the arc's Previews table",
+    write(previewedPage, PREVIEWED), "silent");
+  one("a Previews cell left as a dash while the arc lists two files",
+    write(previewedPage, PREVIEWED.replace(PREVIEWS_CELL, "&mdash;")),
+    "reports", "N001's Previews cell is not what the arc's Previews table lists");
+  one("a Previews cell whose state is not the arc's",
+    write(previewedPage, PREVIEWED.replace("preview &middot; under review", "preview &middot; approved")),
+    "reports", "N001's Previews cell is not what the arc's Previews table lists");
+  one("a Previews cell whose link is written from arcs/ rather than from the page",
+    write(previewedPage, PREVIEWED.replace(`href="notes/N001/previews/`, `href="../notes/N001/previews/`)),
+    "reports", "N001's Previews cell is not what the arc's Previews table lists");
+
   // 008 is exempt by name: its page keeps the shape it was written in.
   const exempt = stream(TMP, "008-plain-probe");
   one("workstream 008's page — exempt by name from Terms and Cycles",
@@ -460,7 +534,8 @@ try {
   n += 1;
   const sweptHome = stream(TMP, "044-sweep");
   writeFileSync(join(sweptHome, "sweep-approach.html"), CLEAN.replace("</tbody>",
-    `<tr><td><strong>N4 &mdash; late docs</strong></td><td>x</td><td>DECIDED</td></tr></tbody>`));
+    `<tr><td><strong>N4 &mdash; late docs</strong><br><a class="s" href="arcs/N4-late-docs.md">arcs/N4-late-docs.md</a></td>` +
+    `<td>late docs, in one sentence.</td><td>DECIDED</td><td>&mdash;</td></tr></tbody>`));
   writeFileSync(join(sweptHome, ARCS, "N4-late-docs.md"), arcFile("N4", "late docs", "DECIDED",
     "| 1 | spn-support-ts | CODE | a | by hand | b | |\n| 2 | spn-support-ts | DOCS | a | by hand | b | |\n"));
   let out = "", code = 0;

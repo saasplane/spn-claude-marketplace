@@ -12,7 +12,7 @@
 //              blocks them; a row `⏸ held on Q<n>` is not runnable while that card is open
 //   needs-you  a reply given while a card is open opens with **Needs you**: a card raised this turn in
 //              full there, once, and every card still open from an earlier reply named in one line
-//   notes      an answer logged in an arc lands in that arc's notes (spec, plan, samples) the same turn
+//   notes      an answer logged in an arc lands in that arc's notes (spec, plan, previews, samples) the same turn
 //   carried    a proposed arc never carries a review point to a later step of itself
 //   hold       an arc whose status reads HELD must name a card that exists and is unanswered
 //   handover   a reply that says a new window is needed carries the nine labelled lines
@@ -323,8 +323,8 @@ export type Baseline = { at: number; steps: Record<string, string>; transcriptAt
 
 /**
  * What one arc looked like at a Stop, for the `notes` and `carried` checks: a short hash of each of
- * its log entries, a signature of its notes (the spec, the plan and the samples under
- * `notes/N<nn>/`), and its status word.
+ * its log entries, a signature of its notes (the spec, the plan, the previews and the samples under
+ * `notes/N<nnn>/`), and its status word.
  */
 export type ArcMark = { log: string[]; notes: string; status: string };
 
@@ -453,9 +453,14 @@ export function logEntries(text: string): string[] {
 
 const entryHash = (line: string): string => createHash("sha256").update(line).digest("hex").slice(0, 10);
 
+// The two folders of an arc's notes the developer reviews: `previews/` holds the preview pages, and
+// `samples/` holds real files of the kind the work produces.
+const REVIEWED_FOLDERS = ["previews", "samples"];
+
 /**
- * The files an arc's notes hold that an answer must land in: `notes/N<nn>/spec.md`, `plan.md`, and
- * everything under `samples/`. Orders and scratch are not the spec, so they are left out.
+ * The files an arc's notes hold that an answer must land in: `notes/N<nnn>/spec.md`, `plan.md`, and
+ * everything under `previews/` and `samples/`. Orders and scratch are not the spec, so they are left
+ * out. The arc number is read as the file name writes it, with one, two or three digits.
  */
 export function notesFiles(arc: string): string[] {
   const id = basename(arc).match(/^(N\d+[a-z]?)(?:[-.]|$)/i)?.[1];
@@ -473,7 +478,7 @@ export function notesFiles(arc: string): string[] {
       try { if (statSync(full).isDirectory()) walk(full); else out.push(full); } catch { /* next */ }
     }
   };
-  walk(join(folder, "samples"));
+  for (const reviewed of REVIEWED_FOLDERS) walk(join(folder, reviewed));
   return out;
 }
 
@@ -503,8 +508,8 @@ const CARRIED_FORWARD = /\bcarried\b[^.;]{0,40}\bto\s+(?:step|row)\s+\d/i;
  * The `notes` and `carried` checks (RD.DEVEX.WORKSPACE.193), over the arcs whose log gained entries
  * since this session's last Stop.
  *
- * `notes`: an entry that records an answer or a review point, in an arc whose `notes/N<nn>/` holds a
- * spec, a plan or samples, when none of those files changed. The answer lands in the card, the arc
+ * `notes`: an entry that records an answer or a review point, in an arc whose `notes/N<nnn>/` holds a
+ * spec, a plan, previews or samples, when none of those files changed. The answer lands in the card, the arc
  * and the notes in the same turn; a spec left as it was is what the next reader plans from.
  *
  * `carried`: an entry saying a point is carried to a later step, in an arc that was PROPOSED. Nothing
@@ -527,12 +532,18 @@ export function checkNotesLanded(root: string, before: Record<string, ArcMark> |
     if (!added.length) continue;
     const files = notesFiles(arc);
     if (files.length && added.some((line) => RECORDS_AN_ANSWER.test(line)) && notesSignature(files) === was.notes) {
-      const shown = files.filter((file) => !file.includes("/samples/")).map((file) => file.slice(file.indexOf("/notes/") + 1));
-      if (files.some((file) => file.includes("/samples/"))) shown.push(`${files[0].slice(files[0].indexOf("/notes/") + 1).replace(/\/[^/]+$/, "")}/samples/`);
+      // A spec and a plan are named by file; a reviewed folder is named once, whatever it holds.
+      const fromNotes = (file: string): string => file.slice(file.indexOf("/notes/") + 1);
+      const folderOf = (file: string): string | undefined => REVIEWED_FOLDERS.find((reviewed) => file.includes(`/${reviewed}/`));
+      const shown = files.filter((file) => !folderOf(file)).map(fromNotes);
+      for (const reviewed of REVIEWED_FOLDERS) {
+        const inside = files.find((file) => folderOf(file) === reviewed);
+        if (inside) shown.push(fromNotes(inside).slice(0, fromNotes(inside).indexOf(`/${reviewed}/`)) + `/${reviewed}/`);
+      }
       out.push({ check: "notes", message:
         `\`${basename(arc)}\` logged an answer this turn and its notes did not move — ${shown.join(" · ")}. ` +
         `An answer, or any review point, lands in the same turn in the card, in the arc (a log line and every ` +
-        `row it changes) and in the arc's notes: the spec, the plan and any sample they name — MUST ` +
+        `row it changes) and in the arc's notes: the spec, the plan and any preview or sample they name — MUST ` +
         `(RD.DEVEX.WORKSPACE.193). Bring the notes the answer changes up to date now, and name them in the ` +
         `log line.` });
     }
