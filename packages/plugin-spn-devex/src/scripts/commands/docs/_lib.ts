@@ -20,7 +20,7 @@ import { masthead, type MastheadKind } from "../../checks/doc-check.ts";
 import { filesUnder as proseFilesUnder, paragraphs as proseParagraphs, score as proseScore } from "./prose.ts";
 
 import { withOffset } from "../../lib/clock.ts";
-import { ARTIFACT_FOLDERS, ARTIFACT_INDEX, DEVEX_WORKSTREAMS, DOCS, FACE, POCKET, SEAT, SEATS, TEMPLATES, artifactFolderOf,
+import { GUIDE_PAGE_SUFFIX, ARTIFACT_FOLDERS, ARTIFACT_INDEX, DEVEX_WORKSTREAMS, DOCS, FACE, POCKET, SEAT, SEATS, TEMPLATES, artifactFolderOf,
   behaviorsDir, bookTemplatesDir, capabilitiesDir, constructsDir, docsOf, inSeat, inTemplates, isProducedPage, mirrorPath,
   overviewsDir, producedPageOf, seatOf, splitAtSeat, workstreamDirOf } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, PAGE_SCRIPT, SERVED_FILES, STYLESHEET, cutVersions, linksSharedStyles,
@@ -1010,6 +1010,9 @@ export function checkCodeFigures(file: string, src: string, root: string): Findi
     // A DIFF SHOWS A CHANGE, so it never matches the file its caption names. A page writes one as
     // `<pre data-lang="diff">`, and such a block is not a figure copied from a file.
     if (/\bdata-lang="diff"/.test(attributes)) continue;
+    // A STEP'S BLOCK IS A COMMAND TO TYPE. On a guide page the sentence above a command often names the
+    // script the command runs, and the block is never a copy of that script.
+    if (file.endsWith(GUIDE_PAGE_SUFFIX) && /\bdata-lang="(?:bash|sh|shell|zsh)"/.test(attributes)) continue;
     // A PATHED FIGURE NAMES A PATH. A bare file name is a TERM — the book's whole job is to
     // describe `spkind.json`, and refusing the chapter for not containing one gets it exactly
     // backwards: a standard names the file a stack has, and has none of them itself. The rule's

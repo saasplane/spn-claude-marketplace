@@ -1299,6 +1299,12 @@ console.log("\n=== a figure is read for what it claims: a diff is no copy, and a
     said(checkCodeFigures("p.html", figure(' data-lang="diff"'), root)), "");
   one("[MKT.SCRIPTS.89] known-bad: the same lines in a plain block are a copied figure that no longer matches",
     said(checkCodeFigures("p.html", figure(""), root)), has("codefig the figure copied from `repo-a/src/cli.ts` no longer matches"));
+  // A guide page's step names the script its command runs, and the block is the command, never a copy.
+  const command = `<p>Each package's <code>tests/run.sh</code> runs the build:</p>\n<pre data-lang="bash">bash packages/alpha/tests/run.sh</pre>`;
+  one("[MKT.SCRIPTS.106] a command block on a guide page is not a figure copied from the script its sentence names",
+    said(checkCodeFigures("docs/artifacts/guides/stand-it-up-guide.html", command, root)), "");
+  one("[MKT.SCRIPTS.106] known-bad: the same block on a page of another kind names a file that is not there",
+    said(checkCodeFigures("p.html", command, root)), has("codefig a figure names `tests/run.sh`, and no such file exists"));
 
   const tree = "<pre>N006/\n├── previews/\n└── orders/</pre>";
   const earlier = "<p>The code sits in <code>repo-a/packages/</code>.</p>\n<h3>Another subsection</h3>\n<p>Its notes folder looks like this.</p>\n" + tree;
