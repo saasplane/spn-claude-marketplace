@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/",
-      "seen": "24d4bd12"
+      "seen": "ef01bc53"
     }
   ]
 }
@@ -151,18 +151,23 @@ An entity's join keys and a pure function's signature are stable by construction
 | --- | --- | --- |
 | **Manager** | a class that runs a lifecycle, such as create, start, stop and sync, or that owns the providers of a seam | the top of the area |
 | **Provider** | a class that implements a seam's interface for one vendor or one stack | the area's `providers/` folder |
-| **Simple class** | a class with one job and no seam: a reader, a store, a checker, a parser | the top of the area |
-| **Util** | a pure function: values in, values out | the area's `utils/` folder, in a file named for its subject |
+| **Simple class** | a class that holds values through its constructor and uses them across its methods, and is neither a manager nor a provider | the top of the area |
+| **Util** | an independent function: input in, output out. It works by itself or through other utils | the area's `utils/` folder, in a file named for its subject |
 | **Types** | the area's interfaces and types, a seam's interface included | the area's one types file |
 | **Constants** | the area's constants | the area's one constants file |
 
-A **seam** is one interface with an implementation behind it for each vendor or stack. A service calls a manager or a util, and only a manager reaches a provider.
+A **seam** is one interface with an implementation behind it for each vendor or stack. A service calls a manager or a util. A provider is built by a service or by a manager. A util calls other utils. It never builds a provider, and never calls a service or a manager.
 
-- **Write a function that reads a file, runs a command or reads the environment as a method of a class, never as a util.** A util is then safe to call from anywhere, and you test it with plain values.
-- **Export one class from a class file, and nothing else.** A file named for a class promises that class to every file that imports it.
-- **Never name a provider from a service. The manager picks it.** You then add or swap a provider by changing one manager. A class that abstracts a vendor follows the provider seam: one interface, an `mtype`-selected implementation per vendor, configuration as data.
+- **Write a util as an independent function: input in, output out.** It is a low-level building block that works by itself or by calling other utils. It may read a file, run a command or read the environment. Never call a service or a manager from a util, and never build a provider in one. A util builds no class of the area and calls none, a simple class included. Keep a helper that only one util file uses private to that file.
+- **Let a util read the app's global object where it needs to**: the app's configuration, and a provider the app set up at boot, such as the logger. The object is a standard every app has, so a util of the module's own `app/utils/` may read it too. That is using what the app already holds, not building a provider. Through that object a util still never reaches a service or a manager.
+- **Do not read a support area's utils as the module's own `app/utils/`.** A util of `app/utils/` reads no file, runs no command and reaches no resource, and that folder is published. A util of a support area is internal, like everything in support.
+- **Make a class only for a lifecycle, or for values held through its constructor and used across its methods.** A simple class is right for the second reason: an object holds values, and several of its methods use them.
+- **Never make a class only to hold functions.** Here is the test. A class that has no constructor, extends no class, implements no interface and holds only functions is a group of static functions. That is a util module. Write it as one file in the area's `utils/` folder that holds those functions, the private ones too, and never as a class.
+- **Make a function a method only where it is part of a manager's or a provider's own job**: a step of its lifecycle, or work on the values or the providers the object holds. A method of a simple class uses the values that class holds. Every other function is a util.
+- **Export one class from a class file, and nothing else.** A file named for a class promises that class to every file that imports it. Move a function a class file would export to the area's utils.
+- **Pick a provider where the knowledge to pick it is**: in a manager that owns the seam, or in the service itself. Think of a service that processes a file. It reads the file's type, and builds the parser for that type. The value that decides arrives with the call, so nothing at boot could have picked the parser. A util never builds a provider. A class that abstracts a vendor follows the provider seam: one interface, an `mtype`-selected implementation per vendor, configuration as data.
 - **Give every class and every exported type its area as a prefix**: the area, then the subject, then the word for its kind, such as manager, store or reader. A provider ends with its vendor or its stack. A sub-area uses its own name, in the singular, and never the parent's before it. A seam's interface carries the area too, and the seam's subject where an area has more than one seam. An area declares its prefix, and it may be a short code where the area's name is long; the app states each area's prefix once. In a module the module's code is the prefix, and the area follows it only where the module's support holds more than one area.
-- **Build a class as an object.** A manager and a provider hold their own state, and a static method never stands in for a function. A function a class file would export goes to the area's utils where it is pure, and becomes a method where it is not.
+- **Build a class as an object.** A manager and a provider hold their own state, and a static method never stands in for a function.
 - **Put the tests in the same areas**: one folder for each area, under the area's own name.
 
 How a kind is declared, and what its file is called, belong to the stack. For TypeScript, read `providers/ts/03-structure.md` and `providers/ts/02-naming.md` in this same plugin.

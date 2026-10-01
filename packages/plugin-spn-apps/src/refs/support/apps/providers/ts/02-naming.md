@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/02-naming.md",
-      "seen": "ef2d4538"
+      "seen": "4bfe7cb9"
     }
   ]
 }
@@ -50,7 +50,7 @@
 
 **Declaring a type is not what classifies a file.** Any file may carry the interfaces and enums it needs. What decides the name is the count and kind of a file's *value* exports.
 
-**`utils` says what the code is, never what it is about**, so it works at either level: a `utils.ts` beside the feature it serves, or a `utils/` folder of domain-named module files. Pure is the whole contract — inputs in, value out, nothing held and nothing outside the function touched. A helper that needs state is a class with a file of its own.
+**`utils` says what the code is, never what it is about**, so it works at either level: a `utils.ts` beside the feature it serves, or a `utils/` folder of domain-named module files. Pure is the whole contract — inputs in, value out, nothing held and nothing outside the function touched but the shared `app` object. A util may read `app.config` and log through `app.providers.logger`, because every app has both. A helper that needs state is a class with a file of its own. The `utils/` folder of a support area has a wider contract: a function there may also read a file, run a command or read the environment.
 
 ### `index.ts` does not mean one thing
 
@@ -100,7 +100,13 @@
 
 **In a module, the module code is the prefix.** The area follows it only where the module's support holds more than one area: `<MOD><Area><Subject><Kind>`.
 
-**Build a class with `new`; a `static` method never stands in for a function.** A function a class file would export goes to the area's `utils/` where it is pure.
+**Build a class with `new`; a `static` method never stands in for a function.** A function a class file would export goes to the area's `utils/`.
+
+**A class with no `constructor`, no `extends` and no `implements`, that holds only functions, is a util module.** Write it as one `utils/<subject>.ts` file that holds its functions, the private ones too, and never as a class.
+
+**A util's function may read a file, run a command or read the environment.** It never calls a service or a manager, and never builds a provider. So a util file imports no class file from its own `src/`. It may read the shared `app` object: `app.config`, and a provider set up at boot, such as `app.providers.logger`.
+
+**Build a provider where the knowledge to pick it is**: in a manager that owns the seam, or in the service itself. A service that processes a file reads the file's MIME type and builds `ParserProviderCSV` or `ParserProviderJSON`, both behind `IParserProvider`. The type arrives with the call, so nothing at boot could have picked the parser.
 
 **Enums are PascalCase with a `Type` suffix, always.** In `contract/states/` the enum key is `UPPER_SNAKE_CASE` matching its string value, never a PascalCase key. Values are strings, never numeric.
 

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/03-structure.md",
-      "seen": "d9bb05ab"
+      "seen": "683253b2"
     }
   ]
 }
@@ -71,9 +71,10 @@ packages/<name>/
 
 - **`app/services/`, `app/repositories/` and `app/entities/` hold classes only** — one class per file, named after the class. A helper one class needs is a private method; a helper several need goes to `app/utils/` or an installed support package.
 - **`app/support/` is the internal toolkit of a module or an app, organized by area and then by kind of file.** It is the one area of `app/` organized by feature before role. An area is a kebab-case folder named with a full word, and no file sits directly in `support/`. The kinds are `module/README.md` in this plugin; each has a TypeScript form:
-  - **A manager or a simple class** is one class in a file named for it, at the top of its area: `ingress/IngressManager.ts`, `kind/KindManifestStore.ts`. The file exports that class and nothing else.
-  - **A provider** is `providers/<Area>Provider<Vendor>.ts`, and it implements the seam's interface: `ingress/providers/IngressProviderNginx.ts`.
-  - **A util** sits in `utils/<subject>.ts`, a kebab-case module file with several exports: `ingress/utils/registration.ts`. Every function in it is pure. A function that reads a file, runs a command or reads the environment is a method of a class.
+  - **A manager or a simple class** is one class in a file named for it, at the top of its area: `ingress/IngressManager.ts`, `kind/KindManifestStore.ts`. The file exports that class and nothing else. A simple class holds values through its `constructor` and uses them across its methods.
+  - **A provider** is `providers/<Area>Provider<Vendor>.ts`, and it implements the seam's interface: `ingress/providers/IngressProviderNginx.ts`. Build it with `new` where the knowledge to pick it is: in a manager or in the service itself.
+  - **A util** sits in `utils/<subject>.ts`, a kebab-case module file with several exports: `ingress/utils/registration.ts`. A function in it may read a file, run a command or read the environment. A helper that only that file uses stays a private function of that file. A util never calls a service or a manager, and never builds a provider. So a util file never imports a class file. Of the files in its own `src/`, it imports only other util files, an `interface.ts`, a `constants.ts` and the contract. A util may read the shared `app` object of `@saasplane/support-ts`, or the app's typed reference to it: `app.config`, and a provider the app set up at boot, such as `app.providers.logger`. It never reaches a service or a manager through that object.
+  - **Never write a class with no `constructor`, no `extends` and no `implements`, that holds only functions.** It is a group of static functions, so it is a util module: one `utils/<subject>.ts` file that holds its functions, the private ones too.
   - **The area's types** sit in its `interface.ts`, and a seam's interface sits there with them.
   - **The area's constants** sit in its `constants.ts`.
 

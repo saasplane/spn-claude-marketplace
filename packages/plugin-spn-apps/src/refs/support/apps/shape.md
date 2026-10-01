@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-apps/01-shape.md",
-      "seen": "b4cc03eb"
+      "seen": "e3feaa2a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/01-shape/",
@@ -31,7 +31,7 @@ Before you touch a node's folders, find its kind. A node declares one fact about
 | Mnemonic | `code` | the 2–4 letter word a module declares, inherited by every class, permission and configuration key it owns |
 | App code | `code` | the word an application declares, naming the claim the estate's own rows grant it |
 | Layer | — | one of `contract`, `app`, `entry` — the three standard folders a contract-publishing node is built from |
-| Util | — | a function that takes input and gives output, needing nothing else in order to run |
+| Util | — | a function that takes input and gives output, needing only its input and the app's global object in order to run |
 | App-owned module | — | a module living inside an application's own folder instead of as its own project, carrying the same kind, layers and documents as the packaged form |
 
 ## The ten kinds
