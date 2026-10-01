@@ -1,5 +1,5 @@
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The figures · § A connector is a claim
-//           § One stylesheet, shipped with the template
+//           § One stylesheet, served in versions
 // The chapter is the source of truth. A rule change is edited there first, then here, in the same change.
 //
 //   check    labels fit their boxes; every connector starts and ends on a box edge or on another
@@ -11,7 +11,9 @@
 // seven pages — and checked against it rather than trusted.
 
 /** The measure, at the drawn scale: pixels per character, by text class. */
-const PX: Record<string, number> = { t: 7.6, l: 7.0, s: 6.6, n: 6.4 };
+const PX: Record<string, number> = { "sds-title": 7.6, "sds-label": 7.0, "sds-code": 6.6, "sds-note": 6.4 };
+/** A path that is a connector: its `class` holds `sds-connector`, alone or beside a tone or `sds-lifeline`. */
+const CONNECTOR = /\bclass="(?:[^"]*\s)?sds-connector(?:\s[^"]*)?"/;
 const EDGE = 8, JOIN_TOL = 6, BOX_TOL = 4;
 // A connector needs shaft a reader can see, and a label on it needs room to sit in. Both were rules
 // nothing enforced: the chapter has asked for 36 of visible shaft since it was written, and a label
@@ -227,7 +229,7 @@ export function checkFigures(src: string): FigureFinding[] {
         const a = Math.abs(q[1][0] - cx), b = Math.abs(q[0][1] - cy);
         if (a > 1 && b > 1) diamonds.push([cx, cy, a, b]);
       }
-      if (!at.includes('class="c')) continue;
+      if (!CONNECTOR.test(at)) continue;
       const exempt = /lifeline|axis|curve/.test(at);
       for (const sp of parts) if (!sp.closed && sp.pts.length >= 2) conns.push({ pts: sp.pts, exempt });
     }
@@ -367,13 +369,13 @@ export function checkFigures(src: string): FigureFinding[] {
     }
 
     // Every label, measured, so one can be compared with another and with the boxes it is NOT in.
-    const HGT: Record<string, number> = { t: 13, l: 12, s: 11, n: 11 };
+    const HGT: Record<string, number> = { "sds-title": 13, "sds-label": 12, "sds-code": 11, "sds-note": 11 };
     const placed: { r: Rect; txt: string }[] = [];
     const overlap = (a: Rect, b: Rect): [number, number] =>
       [Math.min(a[0] + a[2], b[0] + b[2]) - Math.max(a[0], b[0]),
        Math.min(a[1] + a[3], b[1] + b[3]) - Math.max(a[1], b[1])];
 
-    for (const m of svg.matchAll(/<text class="(\w+)"[^>]*x="([\d.]+)" y="([\d.]+)"[^>]*>([\s\S]*?)<\/text>/g)) {
+    for (const m of svg.matchAll(/<text class="([\w-]+)"[^>]*x="([\d.]+)" y="([\d.]+)"[^>]*>([\s\S]*?)<\/text>/g)) {
       const cls = m[1], x = Number(m[2]), y = Number(m[3]), txt = unescape(m[4]);
       const w = txt.length * (PX[cls] ?? 7);
       const lh = HGT[cls] ?? 12;
@@ -492,8 +494,8 @@ export function colour(code: string, lang: string): string {
 
   if (lang === "diff")
     return code.split("\n").map((l) =>
-      l.startsWith("+") ? `<span class="tk-add">${HTML_ESC(l)}</span>`
-      : l.startsWith("-") ? `<span class="tk-del">${HTML_ESC(l)}</span>`
+      l.startsWith("+") ? `<span class="sds-tk-add">${HTML_ESC(l)}</span>`
+      : l.startsWith("-") ? `<span class="sds-tk-del">${HTML_ESC(l)}</span>`
       : HTML_ESC(l)).join("\n");
 
   // Comments and strings are taken out first, so a keyword inside one is never coloured as code.
@@ -516,7 +518,7 @@ export function colour(code: string, lang: string): string {
 
   // EVERY span becomes a placeholder, not just the comments and strings. Inserting markup and then
   // running another pass over it is how a highlighter colours its own output: the TypeScript keyword
-  // list carries `class`, so the keyword pass wrapped the `class` inside a `<span class="tk-n">` it
+  // list carries `class`, so the keyword pass wrapped the `class` inside a `<span class="sds-tk-n">` it
   // had just written. The round-trip test is what caught it.
   const keep = (cls: string, escaped: string) => {
     held.push(`<span class="${cls}">${escaped}</span>`);
@@ -524,16 +526,16 @@ export function colour(code: string, lang: string): string {
   };
 
   let out = code;
-  if (spec.comment) out = out.replace(spec.comment, (m) => hold("tk-c", m));
-  out = out.replace(/'[^'\n]*'|"[^"\n]*"|`[^`\n]*`/g, (m) => hold("tk-s", m));
+  if (spec.comment) out = out.replace(spec.comment, (m) => hold("sds-tk-c", m));
+  out = out.replace(/'[^'\n]*'|"[^"\n]*"|`[^`\n]*`/g, (m) => hold("sds-tk-s", m));
 
   out = HTML_ESC(out);
-  out = out.replace(/\b\d+(?:\.\d+)?\b/g, (m) => keep("tk-n", m));
+  out = out.replace(/\b\d+(?:\.\d+)?\b/g, (m) => keep("sds-tk-n", m));
   if (spec.keywords?.length) {
     const kw = new RegExp(`\\b(${spec.keywords.map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})\\b`, "g");
-    out = out.replace(kw, (m) => keep("tk-k", m));
+    out = out.replace(kw, (m) => keep("sds-tk-k", m));
   }
-  if (spec.type) out = out.replace(spec.type, (m) => keep("tk-t", m));
+  if (spec.type) out = out.replace(spec.type, (m) => keep("sds-tk-t", m));
 
   return out.replace(new RegExp(`${SEP}([a-z]+)${SEP}`, "g"), (_, k: string) => {
     let i = 0;
@@ -545,6 +547,6 @@ export function colour(code: string, lang: string): string {
 /** The audit's half: the raw text of a coloured block must equal what the author wrote. */
 export function stripSpans(html: string): string {
   // `&amp;` is unescaped LAST. Doing it first turns an author's literal `&lt;` into `<`.
-  return html.replace(/<span class="tk-[a-z]+">/g, "").replace(/<\/span>/g, "")
+  return html.replace(/<span class="sds-tk-[a-z]+">/g, "").replace(/<\/span>/g, "")
     .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
 }

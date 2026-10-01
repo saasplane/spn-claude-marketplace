@@ -10,6 +10,7 @@ import { workspace } from "../../../helpers/fixture.mjs";
 import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { WORKSTREAMS, docsOf } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { OWN_COPY, linesFor } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 
 const HOOKS = PLUGIN;
 const SCRIPTS = resolve(HOOKS, "scripts");
@@ -31,7 +32,30 @@ const hasPython = (name) => existsSync(resolve(SCRIPTS, name));
 
 // ---------------------------------------------------------------- page and arc builders
 
+// A page in the shared form links one version of the shared stylesheet, and every class of it opens
+// with `sds-`. `STYLES` is that link, as a stored page carries it.
+const STYLES = linesFor("1.0.0").stylesheet;
 const page = ({ eyebrow = "closed", rows = [], cards = "" }) => `<!doctype html>
+${STYLES}
+<div class="sds-eyebrow">Workstream 001 &middot; ${eyebrow}</div>
+<h1>A subject</h1>
+<section id="s3"><div class="sds-section-head"><h2>How</h2></div>
+  <table>
+    <thead><tr><th>What</th><th>Scope</th><th>State</th></tr></thead>
+    <tbody>
+${rows.map(([what, scope, state]) => `      <tr><td>${what}</td><td>${scope}</td><td>${state}</td></tr>`).join("\n")}
+    </tbody>
+  </table>
+</section>
+<section id="s4"><div class="sds-section-head"><h2>Open</h2></div>
+${cards}
+</section>
+`;
+
+// A page that links no shared stylesheet: it holds its own copy of the styles, and the class names
+// that copy uses. No gate reads a class of it.
+const ownPage = ({ eyebrow = "closed", rows = [], cards = "" }) => `<!doctype html>
+<style>.eyebrow{font-size:.8rem} .open{border-left:2px solid orange} .card{border-left:2px solid green}</style>
 <div class="eyebrow">Workstream 001 &middot; ${eyebrow}</div>
 <h1>A subject</h1>
 <section id="s3"><div class="sec-head"><h2>How</h2></div>
@@ -51,21 +75,24 @@ ${cards}
 // that stops at the first `</tr>` cuts the card off at its first option, and passes on a page whose
 // options are written inline. The nesting is the case worth having.
 // THE FIXTURE IS THE TEMPLATE'S CARD, not a row. `approach-template.html` writes an open card as
-// `<div class="open">` wrapping `<h4 id="qN">`, and the page's own furniture depends on it: `.open`
-// carries the amber left edge that marks a card undecided, and the rail's count badge is
-// `s4.querySelectorAll('.open').length`. A fixture shaped any other way tests a page nobody writes.
-const card = (n, decision) => `  <div class="open">
+// `<div class="sds-open">` wrapping `<h4 id="qN">`, and the page's own furniture depends on it:
+// `.sds-open` carries the amber left edge that marks a card undecided, and the rail's count badge is
+// `s4.querySelectorAll('.sds-open').length`. A fixture shaped any other way tests a page nobody writes.
+const card = (n, decision) => `  <div class="sds-open">
     <h4 id="q${n}">Q${n} &middot; a question only the developer can settle</h4>
-    <span class="k">What</span>
+    <span class="sds-key">What</span>
     <p>What is being decided.</p>
-    <span class="k">Options</span>
-    <div class="scroll"><table>
+    <span class="sds-key">Options</span>
+    <div class="sds-scroll"><table>
       <thead><tr><th></th><th>What it does</th></tr></thead>
       <tbody><tr><td><strong>A</strong></td><td>one way</td></tr><tr><td><strong>B</strong></td><td>the other</td></tr></tbody>
     </table></div>
-    <div class="rec"><b>Recommended: A.</b> Because of the reason. <b>Decision:</b> ${decision}</div>
+    <div class="sds-recommended"><b>Recommended: A.</b> Because of the reason. <b>Decision:</b> ${decision}</div>
   </div>
 `;
+// The same card as a page with its own copy of the styles writes it.
+const ownCard = (n, decision) => card(n, decision).replace(/class="sds-(open|scroll)"/g, 'class="$1"')
+  .replace(/class="sds-key"/g, 'class="k"').replace('class="sds-recommended"', 'class="rec"');
 
 // THE STATUS IS A PARAMETER because a sequencing row resolves through it: only a terminal word means
 // the arc is finished, and `RUNNING` is one of the words that means work is left.
@@ -80,10 +107,10 @@ const arc = (log = "", status = "LANDED") =>
 
 const LANDED = [["the chapter", "spn-foundation", "&#x2705; landed"], ["the check", "probe-repo", "&#x2705; landed"]];
 
-function build(name, { eyebrow, rows = LANDED, cards = "", log = "", state = "open", arcStatus = "LANDED", arcFile = "N1-something.md" } = {}) {
+function build(name, { eyebrow, rows = LANDED, cards = "", log = "", state = "open", arcStatus = "LANDED", arcFile = "N1-something.md", form = page } = {}) {
   const folder = `.spndevex/${WORKSTREAMS}/${state}/001-a-subject`;
   return workspace(name, {
-    [`${folder}/a-subject-approach.html`]: page({ eyebrow, rows, cards }),
+    [`${folder}/a-subject-approach.html`]: form({ eyebrow, rows, cards }),
     [`${folder}/arcs/${arcFile}`]: arc(log, arcStatus),
     // A SIBLING SCOPE, SO A CARRY HAS SOMEWHERE REAL TO POINT. `carried` means the work leaves this
     // workstream, and the gate reads the folder to see whether the named scope can receive it — so a
@@ -120,7 +147,7 @@ function buildArcs(name, rows, { page: withPage = false, log = "" } = {}) {
   const folder = `.spndevex/${WORKSTREAMS}/open/001-a-subject`;
   return workspace(name, {
     [`${folder}/arcs/N2-the-arc.md`]: stepArc(rows, { log }),
-    ...(withPage ? { [`${folder}/a-subject-approach.html`]: `<div class="eyebrow">Workstream 001 &middot; closed</div>\n<h1>A subject</h1>\n` } : {}),
+    ...(withPage ? { [`${folder}/a-subject-approach.html`]: `${STYLES}\n<div class="sds-eyebrow">Workstream 001 &middot; closed</div>\n<h1>A subject</h1>\n` } : {}),
     [`.spndevex/${WORKSTREAMS}/backlog/002-a-successor/a-successor-approach.html`]: "<h1>002</h1>\n",
     "probe-repo/README.md": "# probe-repo\n",
   });
@@ -232,7 +259,7 @@ one("a page still saying it is running is stamped first", "close",
 one("no split plan at all is refused, not passed", "close",
   workspace("sp-noplan", {
     [`.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html`]:
-      `<div class="eyebrow">Workstream 001 &middot; closed</div><section id="s3"><table><thead><tr><th>What</th></tr></thead><tbody><tr><td>a thing</td></tr></tbody></table></section>`,
+      `${STYLES}<div class="sds-eyebrow">Workstream 001 &middot; closed</div><section id="s3"><table><thead><tr><th>What</th></tr></thead><tbody><tr><td>a thing</td></tr></tbody></table></section>`,
     [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md`]: arc(),
   }),
   move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`),
@@ -317,29 +344,29 @@ one("a number in a code span is an example, not a record", "documents-first",
   "silent");
 
 // N8 row 2k (Q389 A): THE READER REFUSES A CARD IN THE WRONG SHAPE. It found a card only by its `h4`,
-// so a `div.card` with an `h3` in `Open` was never read: 008's Open held 35 answered cards and one
+// so a `div.sds-card` with an `h3` in `Open` was never read: 008's Open held 35 answered cards and one
 // open one in the decided shape, the page showed them green, and the rail counted 0.
-const decidedShape = (n) => `  <div class="card" id="q${n}">
+const decidedShape = (n) => `  <div class="sds-card" id="q${n}">
     <h3>Q${n} &middot; a question written in the decided shape</h3>
     <p>What is being decided.</p>
   </div>
 `;
-one("2k: a div.card with an h3 in Open is refused, naming the card and the book's shape", "documents-first",
+one("2k: a div.sds-card with an h3 in Open is refused, naming the card and the book's shape", "documents-first",
   build("sp-2k-card", { cards: decidedShape(88) }),
   { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md`, content: "x" },
-  "note", { says: "not in the open-card shape — Q88 in a-subject-approach.html (a `div.card`", parity: false, why: "the Python never read the wrapper" });
+  "note", { says: "not in the open-card shape — Q88 in a-subject-approach.html (a `div.sds-card`", parity: false, why: "the Python never read the wrapper" });
 
-one("2k: an h4 card wrapped in a div.card is refused too", "documents-first",
-  build("sp-2k-h4-card", { cards: card(88, "&mdash;").replace('<div class="open">', '<div class="card">') }),
+one("2k: an h4 card wrapped in a div.sds-card is refused too", "documents-first",
+  build("sp-2k-h4-card", { cards: card(88, "&mdash;").replace('<div class="sds-open">', '<div class="sds-card">') }),
   { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md`, content: "x" },
-  "note", { says: "Q88 in a-subject-approach.html (an `h4` inside a `div.card`", parity: false, why: "the Python never read the wrapper" });
+  "note", { says: "Q88 in a-subject-approach.html (an `h4` inside a `div.sds-card`", parity: false, why: "the Python never read the wrapper" });
 
 one("2k: the refusal states the book's shape and cites RD.DEVEX.WORKSPACE.147", "documents-first",
   build("sp-2k-rule", { cards: decidedShape(88) }),
   { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md`, content: "x" },
-  "note", { says: 'An open card is a `<div class="open">` wrapping `<h4 id="q<n>">` (RD.DEVEX.WORKSPACE.147)', parity: false, why: "the Python never read the wrapper" });
+  "note", { says: 'An open card is a `<div class="sds-open">` wrapping `<h4 id="q<n>">` (RD.DEVEX.WORKSPACE.147)', parity: false, why: "the Python never read the wrapper" });
 
-one("2k: a div.open + h4 open card passes", "documents-first",
+one("2k: a div.sds-open + h4 open card passes", "documents-first",
   build("sp-2k-open", { cards: card(88, "&mdash;") + card(89, "&mdash;") }),
   { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md`, content: "x" },
   "silent");
@@ -701,13 +728,62 @@ console.log("\n=== split-plan — a carry with its date before the arrow still n
 console.log("\n=== split-plan — the header's status field, and the cards of a page's Open");
 {
   const check = (name, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${name}${ok || !detail ? "" : `\n        ${detail}`}`); };
-  const labelled = `<div class="eyebrow"><span>SaaS Plane | Workstream | 020</span><span class="st"><span class="lbl">Status:</span> <span class="badge status implementing">&#x1F6A7; IMPLEMENTING</span></span></div>`;
+  const labelled = `<div class="sds-eyebrow"><span>SaaS Plane | Workstream | 020</span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-implementing">&#x1F6A7; IMPLEMENTING</span></span></div>`;
   check("the status field is what follows the label", splitPlan.mastheadStatus(labelled) === "🚧 IMPLEMENTING", splitPlan.mastheadStatus(labelled));
-  check("a header that labels no status has no field", splitPlan.mastheadStatus(`<div class="eyebrow">Workstream 001 &middot; closed</div>`) === null);
+  check("a header that labels no status has no field", splitPlan.mastheadStatus(`<div class="sds-eyebrow">Workstream 001 &middot; closed</div>`) === null);
   check("a page with no header has none", splitPlan.mastheadStatus("<h1>x</h1>") === null);
   const cards = splitPlan.cardsIn(page({ cards: card(3, "&mdash;") + card(4, "A, 2026-09-19") }));
   check("the cards of Open are read from a page's text, each with whether it carries its decision",
     cards.map((one) => `${one.number}:${one.decided}`).join(",") === "Q3:false,Q4:true", JSON.stringify(cards));
+}
+
+console.log("\n=== split-plan — a page that holds its own copy of the styles");
+{
+  const ARC = `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md`;
+  const CLOSE = move(`.spndevex/${WORKSTREAMS}/open/001-a-subject`, `.spndevex/${WORKSTREAMS}/closed/`);
+  const check = (name, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${name}${ok || !detail ? "" : `\n        ${detail}`}`); };
+
+  // KNOWN-BAD FOR A READER OF THE SHARED NAMES: every card of this page is a `div.open`, which is the
+  // name its own copy of the styles uses. Read by the shared names it would be `not in the open-card shape`.
+  const unmoved = build("sp-own-copy", { form: ownPage, cards: ownCard(88, "&mdash;") + ownCard(89, "&mdash;") });
+  const payload = { tool_name: "Write", cwd: unmoved, tool_input: { file_path: ARC, content: "x" } };
+  const [gave, said] = ts("documents-first", payload, unmoved);
+  check("[MKT.SCRIPTS.108] the gate names a page with its own copy once, as a SOFT line with what to do",
+    gave === "note" && said.split(OWN_COPY).length - 1 === 1 && said.startsWith(`[SOFT] \`.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html\``), said);
+  check("[MKT.SCRIPTS.108] and reads no class of it: no card is reported as out of shape",
+    !said.includes("open-card shape") && !said.includes("div."), said);
+  const lines = splitPlan.ownCopyLines(unmoved, [join(unmoved, `.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html`)]);
+  check("[MKT.SCRIPTS.108] the line is the page's path from the workspace, then OWN_COPY", lines.length === 1 && lines[0].endsWith(`${OWN_COPY}.`), JSON.stringify(lines));
+  check("[MKT.SCRIPTS.108] the shape of a card on such a page is not judged",
+    splitPlan.misshapenCards(join(unmoved, `.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html`)).length === 0);
+
+  one("[MKT.SCRIPTS.108] a call that names the plan and not that workstream is not told about its page", "documents-first",
+    unmoved, { command: `ls .spndevex/${WORKSTREAMS}/open` }, "silent", { parity: false, why: "the Python knows no shared stylesheet" });
+
+  one("[MKT.SCRIPTS.108] a write of the page itself is left to doc-check, so one call does not name the page twice", "documents-first",
+    unmoved, { file_path: join(unmoved, `.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html`), content: "<h1>x</h1>" },
+    "silent", { parity: false, why: "the Python knows no shared stylesheet" });
+
+  one("[MKT.SCRIPTS.108] a card answered on such a page is still found, because a card is read by its id", "documents-first",
+    build("sp-own-copy-answered", { form: ownPage, cards: ownCard(88, "<strong>B.</strong> The other way.") }),
+    { file_path: ARC, content: "x" }, "note", { says: "Q88 in a-subject-approach.html (the card carries its own decision)", parity: false, why: "the Python knows no shared stylesheet" });
+
+  // UNTOUCHED: the same cards on a page in the shared form draw no line at all.
+  one("[MKT.SCRIPTS.108] untouched: a page in the shared form is not named", "documents-first",
+    build("sp-shared-form", { cards: card(88, "&mdash;") }), { file_path: ARC, content: "x" }, "silent");
+
+  // The close gate does not read the header of such a page, so `running` in it refuses nothing.
+  const closing = build("sp-own-copy-close", { form: ownPage, eyebrow: "Status: &#x1F6A7; IMPLEMENTING" });
+  const [closed, closeSaid] = ts("close", { tool_name: "Bash", cwd: closing, tool_input: CLOSE }, closing);
+  check("[MKT.SCRIPTS.108] the close gate reads no header of such a page, and names the page once",
+    closed === "note" && closeSaid.split(OWN_COPY).length - 1 === 1 && !closeSaid.includes("does not say it is closed"), `${closed} · ${closeSaid}`);
+  one("[MKT.SCRIPTS.108] untouched: the same header on a page in the shared form still refuses the close", "close",
+    build("sp-shared-running", { eyebrow: "Status: &#x1F6A7; IMPLEMENTING" }), CLOSE, "deny", { says: "does not say it is closed" });
+
+  // A page under `closed/` is never named.
+  const shut = build("sp-own-copy-closed", { form: ownPage, state: "closed" });
+  check("[MKT.SCRIPTS.108] a page under closed/ is never named",
+    splitPlan.ownCopyLines(shut, [join(shut, `.spndevex/${WORKSTREAMS}/closed/001-a-subject/a-subject-approach.html`)]).length === 0);
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

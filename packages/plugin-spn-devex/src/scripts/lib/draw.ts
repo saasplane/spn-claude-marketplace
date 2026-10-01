@@ -96,13 +96,13 @@ function fit(body: string[]): { x0: number; y0: number; w: number; h: number } {
     { const [cx, cy, rx, ry] = m.slice(1).map(Number); see(cx - rx, cy - ry); see(cx + rx, cy + ry); }
   // Text is measured from the same character widths the figure check measures it by, and a baseline
   // sits below its own line, so the box runs upward from `y`.
-  for (const m of src.matchAll(/<text class="(\w+)" x="(-?[\d.]+)" y="(-?[\d.]+)">([\s\S]*?)<\/text>/g)) {
+  for (const m of src.matchAll(/<text class="([\w-]+)" x="(-?[\d.]+)" y="(-?[\d.]+)">([\s\S]*?)<\/text>/g)) {
     const cls = m[1], x = Number(m[2]), y = Number(m[3]);
-    const w = m[4].replace(/&[a-z]+;/g, " ").length * (cls === "t" ? W_TITLE : cls === "l" ? W_LABEL : W_NOTE);
+    const w = m[4].replace(/&[a-z]+;/g, " ").length * (cls === "sds-title" ? W_TITLE : cls === "sds-label" ? W_LABEL : W_NOTE);
     see(x, y - 13); see(x + w, y + 3);
   }
   for (const m of src.matchAll(/<path[^>]*\sd="([^"]+)"/g)) {
-    const conn = m[0].includes('class="c');
+    const conn = m[0].includes('class="sds-connector');
     let x = 0, y = 0;
     for (const [, c, u, v] of m[1].matchAll(/([MLHV])\s*(-?[\d.]+)(?:\s+(-?[\d.]+))?/g)) {
       const a = Number(u);
@@ -125,7 +125,7 @@ function svgOf(body: string[], label: string): string {
     // 1100, so its text rendered at twice the size of the figure above it and the drawing stood
     // 1650px tall. The cap is the figure's own width, inline so it beats the stylesheet, and
     // `width:100%` still shrinks it on a narrow screen (2026-09-22, found on the Sign-in sample).
-    `<svg class="dg" viewBox="${x0} ${y0} ${w} ${h}" style="max-width:${w}px" role="img" aria-label="${esc(spoken(label))}">`,
+    `<svg class="sds-drawing" viewBox="${x0} ${y0} ${w} ${h}" style="max-width:${w}px" role="img" aria-label="${esc(spoken(label))}">`,
     `  <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>`,
     ...body,
     `</svg>`,
@@ -241,7 +241,7 @@ function placeLabels(pending: Pending[], verticals: Vert[], margin: number, widt
     // A placer that invents room it does not have hides the crowding instead of fixing it.
     const at = best ?? { x: p.x, y: p.y };
     settled.push({ x: at.x, y: at.y, w: p.w });
-    return `  <text class="n" x="${Math.round(at.x)}" y="${Math.round(at.y)}">${esc(p.txt)}</text>`;
+    return `  <text class="sds-note" x="${Math.round(at.x)}" y="${Math.round(at.y)}">${esc(p.txt)}</text>`;
   });
 }
 
@@ -275,18 +275,19 @@ function boxWidth(b: Box): number {
 }
 const boxHeight = (b: Box) => (b.note ? H_TWO : H_ONE);
 
+/** The classes of a box: the spec's `em` is the blue tone, `warn` the amber one, and `off` a box that is absent. */
 function boxClass(b: Box): string {
-  if (b.em) return "box em";
-  if (b.warn) return "box warn";
-  if (b.off) return "box off";
-  return "box";
+  if (b.em) return "sds-box sds-tone-blue";
+  if (b.warn) return "sds-box sds-tone-amber";
+  if (b.off) return "sds-box sds-absent";
+  return "sds-box";
 }
 
 function rect(b: Box, x: number, y: number, w: number, h: number): string {
   const cy = b.note ? y + 26 : y + h / 2 + 4;
   const out = [`  <rect class="${boxClass(b)}" x="${x}" y="${y}" width="${w}" height="${h}" rx="3"/>`,
-               `  <text class="l" x="${x + PAD_X}" y="${cy}">${esc(b.label)}</text>`];
-  if (b.note) out.push(`  <text class="n" x="${x + PAD_X}" y="${cy + 19}">${esc(b.note)}</text>`);
+               `  <text class="sds-label" x="${x + PAD_X}" y="${cy}">${esc(b.label)}</text>`];
+  if (b.note) out.push(`  <text class="sds-note" x="${x + PAD_X}" y="${cy + 19}">${esc(b.note)}</text>`);
   return out.join("\n");
 }
 
@@ -393,7 +394,7 @@ function drawEntities(spec: Spec): { svg: string; findings: string[] } {
     const mid = x1 + ((x2 - x1) * (i + 1)) / (n + 1);
     const dash = l.dashed ? ' stroke-dasharray="5 4"' : "";
     const dPath = `M${x1} ${y1} H${mid} V${y2} H${x2}`;
-    out.push(`  <path class="c" d="${dPath}"${dash} marker-end="url(#ar)"/>`);
+    out.push(`  <path class="sds-connector" d="${dPath}"${dash} marker-end="url(#ar)"/>`);
     eVerts.push(...vertsOf(dPath, pathId)); eHorz.push(...horzOf(dPath, pathId));
     // EVERY RELATION LINE CARRIES ITS CARDINALITY, which is what the chapter asks of this kind and
     // what the drawer had no field for: an ER diagram whose lines say only *belongs to* leaves the
@@ -450,7 +451,7 @@ function drawChain(spec: Spec): { svg: string; findings: string[] } {
   let x = margin;
   boxes.forEach((b, i) => {
     out.push(rect(b, x, margin, widths[i], h));
-    if (i < boxes.length - 1) out.push(`  <path class="c" d="M${x + widths[i]} ${margin + h / 2} H${x + widths[i] + gap}" marker-end="url(#ar)"/>`);
+    if (i < boxes.length - 1) out.push(`  <path class="sds-connector" d="M${x + widths[i]} ${margin + h / 2} H${x + widths[i] + gap}" marker-end="url(#ar)"/>`);
     x += widths[i] + gap;
   });
   return {
@@ -497,8 +498,8 @@ const BAR = 22, POINT = 40, TAPER = 12;
  * around it wrong, and wrong in the direction that passes. So the drawer computes the left edge
  * itself from the same character width the check uses, and the two halves agree by construction.
  */
-function centred(cls: "l" | "n", txt: string, cx: number, y: number): string {
-  const w = txt.length * (cls === "l" ? W_LABEL : W_NOTE);
+function centred(cls: "sds-label" | "sds-note", txt: string, cx: number, y: number): string {
+  const w = txt.length * (cls === "sds-label" ? W_LABEL : W_NOTE);
   return `  <text class="${cls}" x="${Math.round(cx - w / 2)}" y="${y}">${esc(txt)}</text>`;
 }
 
@@ -590,7 +591,7 @@ function mapRect(b: Box, x: number, y: number, w: number, h: number): string {
       // A client: a frame with a title bar. The bar is marked a curve so the figure check reads it
       // as part of the picture rather than as a connector starting and ending on nothing.
       body.push(`  <rect class="${cls}" x="${x}" y="${y}" width="${w}" height="${h}" rx="3"/>`,
-                `  <path class="c" data-role="curve" d="M${x} ${y + BAR} H${x + w}"/>`);
+                `  <path class="sds-connector" data-role="curve" d="M${x} ${y + BAR} H${x + w}"/>`);
       textTop = y + BAR + 24; textMid = y + BAR + (h - BAR) / 2 + 4; centre = false;
       break;
     case "chevron":
@@ -613,13 +614,13 @@ function mapRect(b: Box, x: number, y: number, w: number, h: number): string {
   }
 
   if (!b.note) {
-    body.push(centre ? centred("l", b.label, cx, textMid) : `  <text class="l" x="${x + PAD_X}" y="${textMid}">${esc(b.label)}</text>`);
+    body.push(centre ? centred("sds-label",b.label, cx, textMid) : `  <text class="sds-label" x="${x + PAD_X}" y="${textMid}">${esc(b.label)}</text>`);
     return body.join("\n");
   }
-  body.push(centre ? centred("l", b.label, cx, textTop) : `  <text class="l" x="${x + PAD_X}" y="${textTop}">${esc(b.label)}</text>`);
+  body.push(centre ? centred("sds-label",b.label, cx, textTop) : `  <text class="sds-label" x="${x + PAD_X}" y="${textTop}">${esc(b.label)}</text>`);
   wrapNote(b.note).forEach((line, i) => body.push(
-    centre ? centred("n", line, cx, textTop + 19 * (i + 1))
-           : `  <text class="n" x="${x + PAD_X}" y="${textTop + 19 + 19 * i}">${esc(line)}</text>`));
+    centre ? centred("sds-note",line, cx, textTop + 19 * (i + 1))
+           : `  <text class="sds-note" x="${x + PAD_X}" y="${textTop + 19 + 19 * i}">${esc(line)}</text>`));
   return body.join("\n");
 }
 
@@ -761,8 +762,8 @@ function drawMap(spec: Spec, opts: { downward?: boolean } = {}): { svg: string; 
             if (i < boxes.length - 1) {
               const l = linkOf(order[i], order[i + 1]);
               const x1 = x + ws[i], x2 = x1 + gaps[i], cy = y + h / 2;
-              out.push(`  <path class="c" d="M${x1} ${cy} H${x2}"${l?.dashed ? ' stroke-dasharray="5 4"' : ""} marker-end="url(#ar)"/>`);
-              if (l?.label) out.push(`  <text class="n" x="${Math.round(x1 + (gaps[i] - labelW(i)) / 2)}" y="${cy - 8}">${esc(l.label)}</text>`);
+              out.push(`  <path class="sds-connector" d="M${x1} ${cy} H${x2}"${l?.dashed ? ' stroke-dasharray="5 4"' : ""} marker-end="url(#ar)"/>`);
+              if (l?.label) out.push(`  <text class="sds-note" x="${Math.round(x1 + (gaps[i] - labelW(i)) / 2)}" y="${cy - 8}">${esc(l.label)}</text>`);
               x = x2;
             }
           });
@@ -777,8 +778,8 @@ function drawMap(spec: Spec, opts: { downward?: boolean } = {}): { svg: string; 
             if (i < boxes.length - 1) {
               const l = linkOf(order[i], order[i + 1]);
               const cx = x + w / 2, y1 = y + hs[i], y2 = y1 + GAP_V;
-              out.push(`  <path class="c" d="M${cx} ${y1} V${y2}"${l?.dashed ? ' stroke-dasharray="5 4"' : ""} marker-end="url(#ar)"/>`);
-              if (l?.label) out.push(`  <text class="n" x="${cx + 10}" y="${y1 + GAP_V / 2 + 4}">${esc(l.label)}</text>`);
+              out.push(`  <path class="sds-connector" d="M${cx} ${y1} V${y2}"${l?.dashed ? ' stroke-dasharray="5 4"' : ""} marker-end="url(#ar)"/>`);
+              if (l?.label) out.push(`  <text class="sds-note" x="${cx + 10}" y="${y1 + GAP_V / 2 + 4}">${esc(l.label)}</text>`);
               y = y2;
             }
           });
@@ -824,7 +825,7 @@ function drawMap(spec: Spec, opts: { downward?: boolean } = {}): { svg: string; 
     at.set(b.id, { x, y, w, h, row });
     if (!inner.length) { out.push(mapRect(b, x, y, w, h)); return; }
     out.push(`  <rect class="${boxClass(b)}" x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="none"/>`);
-    out.push(`  <text class="l" x="${x + PAD_IN}" y="${y + 22}">${esc(b.label)}</text>`);
+    out.push(`  <text class="sds-label" x="${x + PAD_IN}" y="${y + 22}">${esc(b.label)}</text>`);
     let cy = y + HEAD;
     for (const c of inner) { const ch = outerH(c); place(c, x + PAD_IN, cy, w - PAD_IN * 2, ch, row); cy += ch + 10; }
   };
@@ -1092,7 +1093,7 @@ function drawMap(spec: Spec, opts: { downward?: boolean } = {}): { svg: string; 
       d = parts.join(" ");
       if (l.label) label = labelAt(a.row - 1, (runFrom + sideX) / 2, w, runY - LABEL_GAP);
     }
-    out.push(`  <path class="c" d="${d}"${dash} marker-end="url(#ar)"/>`);
+    out.push(`  <path class="sds-connector" d="${d}"${dash} marker-end="url(#ar)"/>`);
     horizontals.push(...horzOf(d, pathId));
     if (label && l.label) { verticals.push(...vertsOf(d, pathId)); pending.push({ ...label, w, txt: l.label, path: pathId }); }
     else verticals.push(...vertsOf(d, pathId));
@@ -1210,19 +1211,19 @@ function drawSystem(spec: Spec): { svg: string; findings: string[] } {
   const modH = y - GAP_LINKED + PAD_IN - margin;
 
   // RULE 1 — one outermost container, and it is the thing being described.
-  body.push(`  <rect class="box off" x="${modX}" y="${margin}" width="${modW}" height="${modH}" rx="3" fill="none"/>`);
-  body.push(`  <text class="t" x="${modX + PAD_IN}" y="${margin + 26}">${esc(spec.title ?? "the system")}</text>`);
+  body.push(`  <rect class="sds-box sds-absent" x="${modX}" y="${margin}" width="${modW}" height="${modH}" rx="3" fill="none"/>`);
+  body.push(`  <text class="sds-title" x="${modX + PAD_IN}" y="${margin + 26}">${esc(spec.title ?? "the system")}</text>`);
   layers.forEach((layer, i) => {
     const { y: ly, h: lh } = layerAt[i];
-    body.push(`  <rect class="box off" x="${modX + PAD_IN}" y="${ly}" width="${layerW}" height="${lh}" rx="3" fill="none"/>`);
-    body.push(`  <text class="t" x="${modX + PAD_IN * 2}" y="${ly + 24}">${esc(layer.name)}</text>`);
+    body.push(`  <rect class="sds-box sds-absent" x="${modX + PAD_IN}" y="${ly}" width="${layerW}" height="${lh}" rx="3" fill="none"/>`);
+    body.push(`  <text class="sds-title" x="${modX + PAD_IN * 2}" y="${ly + 24}">${esc(layer.name)}</text>`);
     for (const b of layer.boxes) { const p = at.get(b.id)!; body.push(mapRect(b, p.x, p.y, p.w, p.h)); }
   });
 
   // RULE 2 — the layers run one way, the direction a call travels, and the arrow between them says so.
   for (let i = 0; i + 1 < layers.length; i++) {
     const a = layerAt[i], b = layerAt[i + 1];
-    body.push(`  <path class="c" d="M${modX + modW / 2} ${a.y + a.h} V${b.y}" marker-end="url(#ar)"/>`);
+    body.push(`  <path class="sds-connector" d="M${modX + modW / 2} ${a.y + a.h} V${b.y}" marker-end="url(#ar)"/>`);
   }
 
   // An outside box is centred on what it connects to, then pushed down to keep the grid's own gap.
@@ -1372,7 +1373,7 @@ function drawSystem(spec: Spec): { svg: string; findings: string[] } {
       const stop = isOut.has(l.to) ? x2 : modX;
       lx2 = x1 + (stop - x1 - w) / 2; ly2 = Math.min(y1, y2) - LABEL_GAP;
     }
-    body.push(`  <path class="c" d="${d}"${dash} marker-end="url(#ar)"/>`);
+    body.push(`  <path class="sds-connector" d="${d}"${dash} marker-end="url(#ar)"/>`);
     verticals.push(...vertsOf(d, pathId));
     if (l.label) pending.push({ x: Math.round(lx2), y: Math.round(ly2), w, txt: l.label, path: pathId });
   }
@@ -1431,7 +1432,7 @@ function drawSequence(spec: Spec): { svg: string; findings: string[] } {
   parts.forEach((b, i) => {
     xs.push(x + ws[i] / 2);
     out.push(`  <rect class="${boxClass(b)}" x="${x}" y="${margin}" width="${ws[i]}" height="${HEAD_H}" rx="3"/>`);
-    out.push(centred("l", b.label, x + ws[i] / 2, margin + HEAD_H / 2 + 4));
+    out.push(centred("sds-label",b.label, x + ws[i] / 2, margin + HEAD_H / 2 + 4));
     x += ws[i] + (gaps[i] ?? 0);
   });
 
@@ -1442,20 +1443,20 @@ function drawSequence(spec: Spec): { svg: string; findings: string[] } {
     if (m.from === m.to) {
       // A PARTICIPANT SPEAKING TO ITSELF is a loop off its own lifeline and back, because an arrow
       // from a line to the same line has nowhere to be and no length a reader could see.
-      out.push(`  <path class="c" d="M${a} ${y} H${a + SELF_W} V${y + SELF_H} H${a}"${dash} marker-end="url(#ar)"/>`);
-      if (m.label) out.push(`  <text class="n" x="${Math.round(a + SELF_W + LABEL_GAP)}" y="${y + SELF_H / 2 + 4}">${esc(m.label)}</text>`);
+      out.push(`  <path class="sds-connector" d="M${a} ${y} H${a + SELF_W} V${y + SELF_H} H${a}"${dash} marker-end="url(#ar)"/>`);
+      if (m.label) out.push(`  <text class="sds-note" x="${Math.round(a + SELF_W + LABEL_GAP)}" y="${y + SELF_H / 2 + 4}">${esc(m.label)}</text>`);
       y += SELF_H + PITCH;
       continue;
     }
-    out.push(`  <path class="c" d="M${a} ${y} H${b}"${dash} marker-end="url(#ar)"/>`);
-    if (m.label) out.push(centred("n", m.label, (a + b) / 2, y - LABEL_GAP));
+    out.push(`  <path class="sds-connector" d="M${a} ${y} H${b}"${dash} marker-end="url(#ar)"/>`);
+    if (m.label) out.push(centred("sds-note",m.label, (a + b) / 2, y - LABEL_GAP));
     y += PITCH;
   }
 
   // The lifelines are drawn last so they run the full height, and they run on past the last message.
   const foot = y - PITCH + TAIL;
   parts.forEach((_, i) => out.push(
-    `  <path class="c lifeline" d="M${xs[i]} ${margin + HEAD_H} V${foot}" stroke-dasharray="3 5"/>`));
+    `  <path class="sds-connector sds-lifeline" d="M${xs[i]} ${margin + HEAD_H} V${foot}" stroke-dasharray="3 5"/>`));
 
   return { svg: svgOf(out, spec.title ?? spec.caption ?? "sequence diagram"), findings };
 }

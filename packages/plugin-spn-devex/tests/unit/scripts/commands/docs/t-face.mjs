@@ -14,6 +14,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
 import { ARTIFACT, POCKET, SEAT, TEMPLATES } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { OWN_COPY, linesFor } from "../../../../../../plugin-support-lib/src/lib/page-styles.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
 const BASE = mkdtempSync(join(tmpdir(), "t-docs-face-"));
@@ -474,24 +475,29 @@ console.log("\n=== the domain's glossary lands on its overview too, in HTML (Q22
     "| sign-in | `SPSession` | one person's live access |\n\n" +
     "## Model\n\nx\n\n## Parts\n\nx\n\n## Boundary\n\nx\n\n" +
     "## Binds\n\n| where it lives today | |\n| --- | --- |\n| a | b |\n\n## Proof\n\nx\n";
-  const ov = (inner) =>
+  // An overview in the shared form by default: the line that links the shared stylesheet, and the
+  // shared names. `own` gives the page its own copy of the styles and the names that copy used.
+  const ov = (inner, { own = false } = {}) =>
     `<meta charset="utf-8">\n<title>Core</title>\n` +
     block({ id: "o", variant: "overview", parentId: "concept", title: "Core", lenses: ["ARCHITECT"], summary: "s." }) +
+    (own ? "<style>.scroll{overflow:auto}</style>\n" : `${linesFor("1.0.0").stylesheet}\n`) +
     `<h2>Overview</h2>\n<p>x</p>\n` +
-    `<section id="s1" data-block="glossary">\n  <div class="sec-head"><h2>Glossary</h2></div>\n` +
+    `<section id="s1" data-block="glossary">\n  <div class="${own ? "sec-head" : "sds-section-head"}"><h2>Glossary</h2></div>\n` +
     `  <p>The authored line above the table.</p>\n${inner}\n</section>\n` +
     `<h2>Where to go next</h2>\n<p>x</p>`;
-  const curated = '  <div class="scroll"><table>\n    <thead><tr><th>Term</th><th>What it means</th></tr></thead>\n' +
+  const table = (scroll) => `  <div class="${scroll}"><table>\n    <thead><tr><th>Term</th><th>What it means</th></tr></thead>\n` +
     '    <tbody><tr><td>sign-in</td><td>typed by hand</td></tr></tbody>\n  </table></div>';
-  const root = repo({
+  const curated = table("sds-scroll");
+  const tree = (overview) => ({
     "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
     [`docs/${SEAT.constructs}/README.md`]: doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
     [`docs/${SEAT.constructs}/01-core/README.md`]: doc({ id: "c", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
     [`docs/${SEAT.constructs}/01-core/session.md`]:
       doc({ id: "session", variant: "construct", parentId: "c", dependsOn: [], title: "Session", lenses: ["ARCHITECT"], status: "PLANNING" },
           terms, "`For: Architect` · `Status: 🔮 PLANNING`"),
-    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-core-overview.html`]: ov(curated),
+    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-core-overview.html`]: overview,
   });
+  const root = repo(tree(ov(curated)));
   run(root, ["face", "docs"]);
   const page = readAt(root, `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-core-overview.html`);
 
@@ -512,6 +518,24 @@ console.log("\n=== the domain's glossary lands on its overview too, in HTML (Q22
   // curated table; the second has to find its own markers and land on the same page exactly.
   const again = (() => { run(root, ["face", "docs"]); return readAt(root, `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-core-overview.html`); })();
   one("and a second run writes the same bytes", again === page ? "same" : "DIFFERENT", has("same"));
+  one("the glossary is written with the shared stylesheet's names", page,
+    (g) => g.includes('<div class="sds-scroll"><table class="sds-glossary">') && g.includes('<tr class="sds-group">'));
+  one("and with no class of its own making: every class in the region opens with `sds-`",
+    page.slice(page.indexOf("spn:generated glossary")),
+    (g) => [...g.matchAll(/class="([^"]+)"/g)].flatMap((found) => found[1].split(" ")).every((name) => name.startsWith("sds-")));
+
+  // AN OVERVIEW THAT LINKS NO SHARED STYLESHEET HOLDS ITS OWN COPY, with the names that copy used.
+  // The glossary is written with the shared names, so it is not written into such a page: the page
+  // is named once, and its bytes stay as they are.
+  const own = ov(table("scroll"), { own: true });
+  const ownRoot = repo(tree(own));
+  const said = run(ownRoot, ["face", "docs"]);
+  one("[MKT.SCRIPTS.108] `docs face` names an overview that holds its own copy once, SOFT, with the text every command uses",
+    said, (g) => (g.match(/! SOFT styles/g) ?? []).length === 1 && g.includes(OWN_COPY));
+  one("[MKT.SCRIPTS.108] and writes nothing into it",
+    readAt(ownRoot, `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-core-overview.html`), own);
+  one("[MKT.SCRIPTS.108] the markdown face beside it still gains its glossary, because a face is no page",
+    readAt(ownRoot, `docs/${SEAT.constructs}/01-core/README.md`), has("spn:generated glossary"));
 }
 
 console.log("\n=== an escaped pipe inside a Terms cell stays one cell (found by the column check)");

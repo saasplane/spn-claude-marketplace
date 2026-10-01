@@ -19,6 +19,8 @@ export const PAGE_SCRIPT = "sds-docs.js";
 export const INDEX_SCRIPT = "sds-index.js";
 /** The files one version serves, in the order `versions.json` lists them. */
 export const SERVED_FILES: readonly string[] = Object.freeze([STYLESHEET, PAGE_SCRIPT, INDEX_SCRIPT]);
+/** What the file name of a page's bundled copy ends in. A bundled copy is not a page of the tree. */
+export const BUNDLED_SUFFIX = ".bundled.html";
 /** The prefix of every class and token of the shared stylesheet. */
 export const PREFIX = "sds-";
 

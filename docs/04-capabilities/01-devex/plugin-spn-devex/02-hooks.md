@@ -52,11 +52,17 @@
 **What** — `hooks.json` names `dist/events/*.mjs`, never `scripts/events/*.ts`. Measured on this machine, 2026-09-28: `PreToolUse` fell from 63 ms to 26 ms.
 **How** — `pnpm build:plugins` at the marketplace root rebuilds every plugin once; `pnpm build:plugins:watch` rebuilds on every source change while editing a hook; `spn-devex plugin build` runs the same script from inside any plugin checkout. An edit to a hook's source is not live until the next rebuild — `tests/unit/t-dist-current.mjs` refuses a bundle older than its sources, so an unrebuilt edit fails the suite by name rather than running silently stale. The hash of a bundle's sources follows each import inside the shared support folder. So an edit to a shared file that only another shared file imports still marks every bundle that reaches it as stale. `packages/plugin-spn-devex/src/hooks/hooks.json`, `packages/plugin-spn-devex/src/scripts/commands/plugin/build.ts`, `scripts/lib/source-hash.mjs`.
 
-### A publish is reminded, never refused
+### A publish is reminded, and refused only where the page links its styles from outside
 
 **Why** — *the agent publishes no page unless the developer asks* (RD.DEVEX.WORKSPACE.117), and the habit came from the publishing tool's own default, which a rule in a reference file loses to at the moment of the call. The hook cannot know whether the developer asked.
-**What** — `hooks.json` routes the `Artifact` tool through `PreToolUse`. A call that publishes a page — no action, or `publish`, and not an asset upload to a page already published — gets one note stating the rule and the full path to hand over instead, and the call goes ahead. No other check reads a publish, because it writes no file here.
-**How** — `dispatch` returns the note before the check list. `packages/plugin-spn-devex/src/scripts/checks/publish.ts`.
+**What** — `hooks.json` routes the `Artifact` tool through `PreToolUse`. A call that publishes a page — no action, or `publish`, and not an asset upload to a page already published — gets one note stating the rule and the full path to hand over instead, and the call goes ahead. One thing is refused, because the check can read it from the file: a page that loads a stylesheet or a script from an address a published page may not load. The refusal names `spn-devex docs sds bundle <page>` and the copy to publish, `<name>.bundled.html` (RD.DEVEX.WORKSPACE.215). A file that cannot be read is reminded and not refused.
+**How** — `dispatch` returns the note, or the refusal, before the check list. `packages/plugin-spn-devex/src/scripts/checks/publish.ts`, proven in `packages/plugin-spn-devex/tests/unit/scripts/checks/t-publish.mjs`.
+
+### A page links a version that was cut
+
+**Why** — *a stored page links one version by its address* (RD.DEVEX.WORKSPACE.214), and a page that links a version nobody cut shows no styling at all.
+**What** — a write of a page that links the shared stylesheet is refused where its version is not in `versions.json`, and the message names the version and the versions that exist. A page that links no shared stylesheet gets one SOFT line, and no finding about a card or a status, because no class of it is read.
+**How** — the check reads `versions.json` in the plugin's `styles/` folder, which sits beside `dist/` in an installed plugin. `packages/plugin-spn-devex/src/scripts/checks/doc-check.ts`.
 
 ### The first refusal is the answer; advice adds up
 

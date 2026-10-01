@@ -20,7 +20,8 @@ import { basename, dirname, extname, join, relative, resolve } from "node:path";
 import { checkFigures, colour, stripSpans } from "../../lib/figures.ts";
 import { draw } from "../../lib/draw.ts";
 import { argsText, begin, commandFacts, end, record } from "../../../../../plugin-support-lib/src/lib/timing.ts";
-import { resolveWorkspace, walkFiles } from "./_lib.ts";
+import { OWN_COPY, cutVersions, linesFor, newestVersion } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
+import { holdsOwnCopy, inClosedWorkstream, resolveWorkspace, stylesFolder, walkFiles } from "./_lib.ts";
 
 export const describe = "figure check|colour: a spec's own geometry against the page · figure <path…>: what a browser paints";
 
@@ -53,6 +54,13 @@ function geometryCli(sub: string, args: string[], workspace: string): number {
     let soft = 0;
     for (const f of files) {
       const src = readFileSync(f, "utf8");
+      // A DRAWING IS READ BY THE SHARED STYLESHEET'S CLASS NAMES. A page that links no shared
+      // stylesheet holds other names, so it is named once and its drawings are not read. A page of
+      // a closed workstream is not named either.
+      if (holdsOwnCopy(f, src)) {
+        if (!inClosedWorkstream(f)) { soft += 1; console.log(`! SOFT styles    ${relative(workspace, f)}\n         ${OWN_COPY}`); }
+        continue;
+      }
       // A SPEC THAT DRAWS NOTHING IS INVISIBLE TO THE REST OF THIS CHECK, which judges the SVGs a
       // page HAS. Eight foundation seats asked for the retired `flow`; the drawer refuses it, the
       // renderer then emits no figure element at all, and seven of those pages carried no figure
@@ -104,6 +112,12 @@ function geometryCli(sub: string, args: string[], workspace: string): number {
     let bad = 0;
     for (const f of files) {
       const src = readFileSync(f, "utf8");
+      // The colouring is spans that carry the shared stylesheet's class names, so a page that links
+      // no shared stylesheet is named once and its blocks are not read.
+      if (holdsOwnCopy(f, src)) {
+        if (!inClosedWorkstream(f)) console.log(`! SOFT styles    ${relative(workspace, f)}\n         ${OWN_COPY}`);
+        continue;
+      }
       for (const m of src.matchAll(/<pre data-lang="([a-z]+)">([\s\S]*?)<\/pre>/g)) {
         const round = colour(stripSpans(m[2]), m[1]);
         if (round !== m[2]) { bad++; console.log(`✗ RULE figure    ${relative(workspace, f)}\n         a \`${m[1]}\` block's colouring is not what \`figures colour\` produces from its own text`); }
@@ -119,20 +133,16 @@ function geometryCli(sub: string, args: string[], workspace: string): number {
 
 // ---------------------------------------------------------------------------- browser render
 
-/** The stylesheet a `dg` figure is drawn against, in the theme a reader is most likely to be in. */
-const CSS = `
- body{margin:0;background:#0f1318;padding:20px}
- svg{display:block;width:auto;max-width:none;height:auto}
- .dg{color:#86a9da}
- .dg .box{fill:#171d24;stroke:#242d37;stroke-width:1.5}
- .dg .box.off{fill:none;stroke:#242d37;stroke-width:1.5;stroke-dasharray:5 4}
- .dg .box.em{fill:#18232f;stroke:#86a9da;stroke-width:1.5}
- .dg .box.warn{fill:#2a2113;stroke:#d59d4f;stroke-width:1.5}
- .dg .t{font:650 13px ui-sans-serif,sans-serif;fill:#e3e8ee}
- .dg .l{font:12px ui-sans-serif,sans-serif;fill:#e3e8ee}
- .dg .s{font:11px ui-monospace,monospace;fill:#a3adb9}
- .dg .n{font:11px ui-sans-serif,sans-serif;fill:#6f7986}
- .dg .c{stroke:#86a9da;stroke-width:1.6;fill:none}`;
+/**
+ * The line that links the newest version of the shared stylesheet. A drawing that stands alone is
+ * wrapped in a page that carries this line, so the browser draws it with the same styles a page
+ * gives it. Null where no version is listed.
+ */
+function stylesheetLine(): string | null {
+  const styles = stylesFolder();
+  const newest = styles === null ? null : newestVersion(Object.keys(cutVersions(styles)));
+  return newest === null ? null : linesFor(newest).stylesheet;
+}
 
 /** Where the global install lives today. `null` where there is none, which is not an error. */
 function playwrightPath(): string | null {
@@ -204,10 +214,14 @@ async function renderCli(files: string[]): Promise<number> {
   const { chromium } = await import(entry);
   const browser = await chromium.launch();
   let findings = 0;
+  const stylesheet = stylesheetLine();
+  if (stylesheet === null && files.some((file) => extname(file) === ".svg"))
+    console.log("No version of the shared stylesheet is listed, so a bare drawing is rendered with no styling.");
   for (const file of files) {
     const body = readFileSync(file, "utf8");
-    // A bare `.svg` is wrapped; a page is loaded whole, so its own stylesheet wins over the fallback.
-    const html = extname(file) === ".svg" ? `<style>${CSS}</style>${body}` : body;
+    // A bare `.svg` is wrapped in a page that links the shared stylesheet; a page is loaded whole,
+    // with the stylesheet it links itself.
+    const html = extname(file) === ".svg" ? `${stylesheet ?? ""}\n${body}` : body;
     const page = await browser.newPage({ deviceScaleFactor: 2 });
     await page.setContent(html);
     const svg = await page.$("svg");

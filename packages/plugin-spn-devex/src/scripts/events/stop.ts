@@ -17,6 +17,7 @@
 //   hold       an arc whose status reads HELD must name a card that exists and is unanswered
 //   handover   a reply that says a new window is needed carries the nine labelled lines, in one column
 //   page-stale an arc this session wrote left its workstream's page behind the arcs
+//   own-copy   a page of this session's workstreams links no shared stylesheet; said once in a session
 //   arc-landed an arc this session wrote reached LANDED with a row nobody accounted for
 //   welcome    a session's first turn opens with the welcome, word for word: the heading and its four lines
 //   corpus     the docs trees still answer the questions only a whole-corpus read can ask
@@ -43,8 +44,8 @@ import { closeSync, openSync, readFileSync, readSync, readdirSync, rmSync, statS
 import { basename, dirname, join } from "node:path";
 import { createHash } from "node:crypto";
 import { checkCorpus } from "../checks/corpus.ts";
-import { STEP_ID, accounted, answeredNumbers, arcName, arcRowsOf, cardsOf, carryFault, heldOn, isInProgress, markedAgo,
-         miscountLines, openWorkstreams, reportLines, stateOf, stepsOf, tickLands, workstreamPlan } from "../checks/split-plan.ts";
+import { STEP_ID, accounted, answeredNumbers, arcName, arcRowsOf, cardsOf, carryFault, heldOn, holdsOwnCopy, isInProgress, markedAgo,
+         miscountLines, openWorkstreams, ownCopyLines, reportLines, stateOf, stepsOf, tickLands, workstreamPlan } from "../checks/split-plan.ts";
 import { cyclesRule, exemptWorkstream, headerRule, openHeadingRule } from "../checks/doc-check.ts";
 import { cyclesTableAt } from "../commands/docs/cycles.ts";
 import { TERMINAL } from "../checks/arc-status.ts";
@@ -379,7 +380,9 @@ export function stepHash(text: string): string {
  * repository, so `git show HEAD:./arc.md` fails there for every arc.
  */
 export type Baseline = { at: number; steps: Record<string, string>; transcriptAt?: number; fired?: string[];
-                         cards?: string[]; arcs?: Record<string, ArcMark>; workstreams?: string[] };
+                         cards?: string[]; arcs?: Record<string, ArcMark>; workstreams?: string[];
+                         /** The pages this session was already told hold their own copy of the styles. */
+                         ownCopy?: string[] };
 
 /**
  * What one arc looked like at a Stop, for the `notes` and `carried` checks: a short hash of each of
@@ -937,9 +940,17 @@ function namesCard(text: string, card: string): boolean {
   return new RegExp(`\\b${card}\\b`, "i").test(text);
 }
 
-/** Whether a page carries at least one card in the card pattern. */
+/** Whether a page carries at least one card in the card pattern, which is a `div.sds-open`. */
 function hasOpenCard(text: string): boolean {
-  return /<div\b[^>]*class="[^"]*\bopen\b[^"]*"/i.test(text);
+  return /<div\b[^>]*class="(?:[^"]*\s)?sds-open(?:\s[^"]*)?"/i.test(text);
+}
+
+/**
+ * Whether the card pattern can be read from these pages. The pattern is a class of the shared
+ * stylesheet, and no class is read of a page that holds its own copy of the styles.
+ */
+function cardPatternReadable(pages: string[]): boolean {
+  return !pages.some(holdsOwnCopy);
 }
 
 /** The open workstreams that have a page, as subject → its pages. */
@@ -1000,6 +1011,7 @@ export function pagelessWorkstreams(root: string, mine: Set<string> | null = nul
 export function stopsWithEmptyOpen(root: string, mine: Set<string> | null = null): Array<[string, string]> {
   const out: Array<[string, string]> = [];
   for (const [subject, pages] of argued(root, mine)) {
+    if (!cardPatternReadable(pages)) continue;
     const text = pages.map(read).join(" ");
     const waiting = workstreamPlan([dirname(pages[0])], pages).filter((row) => stateOf(row) === "stopped");
     if (waiting.length && !hasOpenCard(text)) out.push([subject, waiting[0].label]);
@@ -1024,6 +1036,7 @@ export function stopsWithEmptyOpen(root: string, mine: Set<string> | null = null
 export function cardsInArcs(root: string, mine: Set<string> | null = null): Array<[string, string, string]> {
   const out: Array<[string, string, string]> = [];
   for (const [subject, pages] of argued(root, mine)) {
+    if (!cardPatternReadable(pages)) continue;
     const pageText = pages.map(read).join(" ");
     if (hasOpenCard(pageText)) continue;
     for (const arc of arcsOf(dirname(pages[0]))) {
@@ -1266,7 +1279,8 @@ export function checkArcToPage(root: string, mine: Set<string> | null = null): W
  * the arcs decide are the Cycles table, the header's status and the heading of `Open`. The write-time
  * check sees them only when the whole page is written, so an arc that moves leaves the page behind
  * and this is where it is said. A page with no Cycles table is left alone, because the command named
- * here has nothing to write on it.
+ * here has nothing to write on it. So is a page that holds its own copy of the styles, which that
+ * command refuses.
  *
  * @param touched  the arcs this session's own tool calls wrote since its last Stop; `null` where that
  *                 is not known, and then nothing is compared
@@ -1278,7 +1292,7 @@ export function checkPageCurrent(touched: Set<string> | null): Warning[] {
     const parts = new Set<string>();
     for (const page of pagesOf(folder)) {
       const text = read(page);
-      if (exemptWorkstream(page) || !cyclesTableAt(text)) continue;
+      if (exemptWorkstream(page) || holdsOwnCopy(page) || !cyclesTableAt(text)) continue;
       if (cyclesRule(page, text).length) parts.add("the Cycles table");
       if (headerRule(page, text).length) parts.add("the header's status");
       if (openHeadingRule(page, text).length) parts.add("the heading of `Open`");
@@ -1293,6 +1307,33 @@ export function checkPageCurrent(touched: Set<string> | null): Warning[] {
     behind.map((one) => `\`spn-devex docs cycles ${one.workstream} --write\``).join(" and ") +
     `, which writes the header's status, the Cycles table and the heading of \`Open\` from the arcs. The rest ` +
     `of the page is yours to bring current in the same turn (05-artifacts.md § How ends in Cycles).` }];
+}
+
+// ---------------------------------------------------------------------------- a page with its own copy of the styles
+
+/**
+ * The pages of the open workstreams this session reads that hold their own copy of the styles, each
+ * as the line that names it: its path from the workspace, then `OWN_COPY`.
+ */
+export function ownCopyPages(root: string, mine: Set<string> | null = null): string[] {
+  return argued(root, mine).flatMap(([, pages]) => ownCopyLines(root, pages));
+}
+
+/**
+ * One warning for the pages that hold their own copy of the styles and were not named in this
+ * session before. Such a page is read by its `id`s alone, so the checks on the shape of a card and on
+ * the header's status say nothing about it, and this is where the developer is told why.
+ *
+ * @param told  the lines this session was given at an earlier Stop; a page is named once in a session
+ */
+export function checkOwnCopy(root: string, mine: Set<string> | null = null, told: string[] = []): Warning[] {
+  const fresh = ownCopyPages(root, mine).filter((line) => !told.includes(line));
+  if (!fresh.length) return [];
+  return [{ check: "own-copy", message:
+    `[SOFT] ${fresh.join("\n[SOFT] ")}\n` +
+    `Until such a page links \`sds-docs.css\`, its cards are read by their \`id\`, and the shape of a card, ` +
+    `the header's status and the parts that \`docs cycles --write\` writes are not checked. Each page is ` +
+    `named once in a session.` }];
 }
 
 /**
@@ -1445,6 +1486,7 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
     ...span({ group: "stop", action: "notes" }, () => checkNotesLanded(root, baseline?.arcs, touched)),
     ...span({ group: "stop", action: "arc-to-page" }, () => checkArcToPage(root, mine)),
     ...span({ group: "stop", action: "page-stale" }, () => checkPageCurrent(wrote)),
+    ...span({ group: "stop", action: "own-copy" }, () => checkOwnCopy(root, mine, baseline?.ownCopy ?? [])),
     ...span({ group: "stop", action: "arc-landed" }, () => checkArcLanded(root, baseline?.arcs, wrote)),
     ...span({ group: "stop", action: "runnable" }, () => checkRunnable(root, baseline?.at ?? 0, baseline?.steps ?? {}, touched)),
     ...span({ group: "stop", action: "hold" }, () => checkHold(root, mine)),
@@ -1453,6 +1495,9 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
     ...span({ group: "stop", action: "corpus" }, () => checkCorpus(root)),
   ];
   const warnings = found.filter((warning) => !spoken.has(warning.check));
+  // A page is named once in a session, so the pages named now join the ones named before.
+  const ownCopyTold = [...new Set([...(baseline?.ownCopy ?? []),
+    ...(warnings.some((warning) => warning.check === "own-copy") ? ownCopyPages(root, mine) : [])])];
   end();
   // AFTER the checks, never before: they compare against this and would compare against now. `fired`
   // keeps what spoke earlier in this turn beside what spoke now, so a third reply is not judged by
@@ -1460,7 +1505,7 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   writeBaseline(root, session, { at: Date.now(), steps: currentSteps(root), transcriptAt,
                                  fired: [...new Set([...spoken, ...warnings.map((warning) => warning.check)])],
                                  cards: waiting, arcs: arcMarks(root),
-                                 workstreams: mine ? [...mine] : baseline?.workstreams });
+                                 workstreams: mine ? [...mine] : baseline?.workstreams, ownCopy: ownCopyTold });
   if (warnings.length) {
     console.error(warnings.map((w) => `[${w.check}] ${w.message}`).join("\n\n"));
     process.exit(2);   // a Stop hook's non-zero is how the message reaches the turn

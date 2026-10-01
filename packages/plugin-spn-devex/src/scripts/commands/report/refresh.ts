@@ -14,6 +14,7 @@
 import { readFileSync, statSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { withOffset } from "../../lib/clock.ts";
+import { OWN_COPY, linksSharedStyles } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { foundationAbsence as testsAbsence, measure as measureTests } from "../behaviours/coverage.ts";
 import { foundationAbsence as coverageAbsence, levelRows, measure as measureCoverage } from "../coverage/measure.ts";
 
@@ -231,26 +232,26 @@ const shareOf = (count: number, of: number): string => {
 const widthOf = (count: number, of: number): string =>
   of === 0 || count === 0 ? "0%" : count === of ? "100%" : `${((count / of) * 100).toFixed(1)}%`;
 
-/** The tiles: each `div.side`, found by its label, from its opening to the next tile or the end of the row of tiles. */
+/** The tiles: each `div.sds-side`, found by its label, from its opening to the next tile or the end of the row of tiles. */
 function writeTiles(page: string, tiles: Numbers["tiles"]): Written {
   const unplaced: string[] = [];
   const seen = new Set<string>();
   let placed = 0;
-  const out = page.replace(/<div class="side"><span class="lbl">([^<]*)<\/span>[\s\S]*?(?=\s*<div class="side">|\s*<\/div>\s*<div class="breakdown">|\s*<\/div>\s*<h3|\s*<\/div>\s*<\/section>)/g, (tile, label: string) => {
+  const out = page.replace(/<div class="sds-side"><span class="sds-label">([^<]*)<\/span>[\s\S]*?(?=\s*<div class="sds-side">|\s*<\/div>\s*<div class="sds-breakdown">|\s*<\/div>\s*<h3|\s*<\/div>\s*<\/section>)/g, (tile, label: string) => {
     const measured = tiles.find((one) => one.label === shown(label));
     if (measured === undefined) { unplaced.push(`the tile \`${shown(label)}\` is on the page, and the measurement returns no such count`); return tile; }
     seen.add(measured.label);
     placed += 1;
     const { count, of } = measured;
-    let next = tile.replace(/(<span class="big">)[^<]*(<span class="tot">)[^<]*(<\/span>)/, (_all, open: string, tot: string, close: string) =>
-      `${open}${written(count)}${tot} / ${of === null ? "" : written(of)}${close}`);
-    if (next === tile) next = tile.replace(/(<span class="big">)[^<]*(<\/span>)/, `$1${written(count)}$2`);
+    let next = tile.replace(/(<span class="sds-big">)[^<]*(<span class="sds-total">)[^<]*(<\/span>)/, (_all, open: string, total: string, close: string) =>
+      `${open}${written(count)}${total} / ${of === null ? "" : written(of)}${close}`);
+    if (next === tile) next = tile.replace(/(<span class="sds-big">)[^<]*(<\/span>)/, `$1${written(count)}$2`);
     if (of === null) return next;
-    next = next.replace(/(<span class="pct">)[^<]*(<\/span>)/, `$1${shareOf(count, of)}$2`);
+    next = next.replace(/(<span class="sds-percent">)[^<]*(<\/span>)/, `$1${shareOf(count, of)}$2`);
     // A bar is green only for a measure that is done. A tile that counts a gap or a failure keeps its colour.
     return next.replace(/<i(?: class="([^"]*)")? style="width:[^"]*">/, (_all, marks: string | undefined) => {
-      const kept = (marks ?? "").split(/\s+/).filter((mark) => mark !== "" && mark !== "ok");
-      if (!kept.includes("gap") && !kept.includes("fail") && count === of && of > 0) kept.push("ok");
+      const kept = (marks ?? "").split(/\s+/).filter((mark) => mark !== "" && mark !== "sds-success");
+      if (!kept.includes("sds-warning") && !kept.includes("sds-error") && count === of && of > 0) kept.push("sds-success");
       return `<i${kept.length ? ` class="${kept.join(" ")}"` : ""} style="width:${widthOf(count, of)}">`;
     });
   });
@@ -261,7 +262,7 @@ function writeTiles(page: string, tiles: Numbers["tiles"]): Written {
 /** The breakdown: each legend entry's count, then the bar rebuilt from the legend, one segment for each state above 0. */
 function writeBreakdown(page: string, states: Numbers["states"]): Written {
   const unplaced: string[] = [];
-  const from = page.indexOf('<div class="breakdown">');
+  const from = page.indexOf('<div class="sds-breakdown">');
   if (from < 0) return { page: page, placed: 0, unplaced: ["the page has no breakdown bar"] };
   const end = page.indexOf("</ul>", from);
   if (end < 0) return { page: page, placed: 0, unplaced: ["the breakdown has no legend, so its bar cannot be rebuilt"] };
@@ -269,7 +270,7 @@ function writeBreakdown(page: string, states: Numbers["states"]): Written {
 
   const keys = new Map<string, string>();
   const seen = new Set<string>();
-  region = region.replace(/(<li><i class="bd-key ([^"]*)"><\/i>)([^<]*?)(\s*<b>)[^<]*(<\/b>)/g, (entry, open: string, key: string, label: string, bold: string, close: string) => {
+  region = region.replace(/(<li><i class="sds-breakdown-key ([^"]*)"><\/i>)([^<]*?)(\s*<b>)[^<]*(<\/b>)/g, (entry, open: string, key: string, label: string, bold: string, close: string) => {
     const measured = states.find((one) => one.label === shown(label));
     if (measured === undefined) { unplaced.push(`the legend entry \`${shown(label)}\` is on the page, and the measurement returns no such state`); return entry; }
     seen.add(measured.label);
@@ -278,10 +279,10 @@ function writeBreakdown(page: string, states: Numbers["states"]): Written {
   });
   for (const state of states) if (!seen.has(state.label)) unplaced.push(`the legend has no entry \`${state.label}\` — ${written(state.count)}`);
 
-  region = region.replace(/(<div class="bd-bar"[^>]*>)([\s\S]*?)(\n?[ \t]*<\/div>)/, (_all, open: string, inner: string, close: string) => {
+  region = region.replace(/(<div class="sds-breakdown-bar"[^>]*>)([\s\S]*?)(\n?[ \t]*<\/div>)/, (_all, open: string, inner: string, close: string) => {
     const indent = /\n([ \t]*)<span/.exec(inner)?.[1] ?? `${/\n([ \t]*)<\/div>/.exec(close)?.[1] ?? "    "}  `;
     const segments = states.filter((state) => state.count > 0 && keys.has(state.label)).map((state) =>
-      `\n${indent}<span class="bd-seg ${keys.get(state.label)}" style="flex-grow:${state.count}" ` +
+      `\n${indent}<span class="sds-breakdown-segment ${keys.get(state.label)}" style="flex-grow:${state.count}" ` +
       `title="${state.label}: ${written(state.count)} behaviour${state.count === 1 ? "" : "s"}"></span>`);
     const label = states.map((state) => `${state.label} ${written(state.count)}`).join(", ");
     return `${open.replace(/aria-label="[^"]*"/, `aria-label="${label}"`)}${segments.join("")}${close.startsWith("\n") ? close : `\n${close}`}`;
@@ -289,13 +290,16 @@ function writeBreakdown(page: string, states: Numbers["states"]): Written {
   return { page: page.slice(0, from) + region + page.slice(end), placed: seen.size, unplaced: unplaced };
 }
 
-/** The class a count cell carries: a gap or a failure above 0 is marked, and `done` stays only on a count that is the whole. */
+/**
+ * The class a count cell carries: a gap above 0 is `sds-warning`, a failure above 0 is `sds-error`,
+ * and `sds-success` stays only on a count that is the whole.
+ */
 function cellClass(column: string, count: number, whole: number | null | undefined, marks: string): string {
-  const kept = marks.split(/\s+/).filter((mark) => mark !== "" && mark !== "gap" && mark !== "fail");
-  if (FAIL_COLUMNS.has(column) && count > 0) kept.push("fail");
-  else if (GAP_COLUMNS.has(column) && count > 0) kept.push("gap");
-  const done = kept.includes("done") && typeof whole === "number" && whole > 0 && count === whole;
-  return [...kept.filter((mark) => mark !== "done"), ...(done ? ["done"] : [])].join(" ");
+  const kept = marks.split(/\s+/).filter((mark) => mark !== "" && mark !== "sds-warning" && mark !== "sds-error");
+  if (FAIL_COLUMNS.has(column) && count > 0) kept.push("sds-error");
+  else if (GAP_COLUMNS.has(column) && count > 0) kept.push("sds-warning");
+  const isWhole = kept.includes("sds-success") && typeof whole === "number" && whole > 0 && count === whole;
+  return [...kept.filter((mark) => mark !== "sds-success"), ...(isWhole ? ["sds-success"] : [])].join(" ");
 }
 
 /** One row with its count cells rewritten. A cell that holds a dash, and a column the counts do not name, stay as they are. */
@@ -308,7 +312,7 @@ function writeRow(row: string, columns: string[], counts: Counts): { row: string
     const count = column === undefined ? undefined : counts[column];
     if (at === 1 || count === undefined || count === null || /^(?:—|–|-|&mdash;)$/.test(inner.trim())) return cell;
     cells += 1;
-    const marks = /\bclass="([^"]*)"/.exec(attributes)?.[1] ?? "num-cell";
+    const marks = /\bclass="([^"]*)"/.exec(attributes)?.[1] ?? "sds-number-cell";
     return `<td class="${cellClass(column, count, counts.Written, marks)}">${written(count)}</td>`;
   });
   return { row: next, cells: cells };
@@ -334,14 +338,14 @@ function writeTable(page: string, table: Numbers["tables"][number]): Written {
   let placed = 0;
   const next = found[0].replace(/<tr\b([^>]*)>([\s\S]*?)<\/tr>/g, (row, attributes: string, inner: string) => {
     if (/<th\b/.test(inner)) return row;
-    if (/\bclass="[^"]*\btotal\b/.test(attributes)) {
+    if (/\bclass="(?:[^"]*\s)?sds-total(?:\s[^"]*)?"/.test(attributes)) {
       const total = writeRow(row, columns, table.total);
       placed += total.cells;
       return total.row;
     }
     const first = /<td\b[^>]*>([\s\S]*?)<\/td>/.exec(inner)?.[1] ?? "";
-    const name = shown(/<strong>([\s\S]*?)<\/strong>/.exec(first)?.[1] ?? first.replace(/<span class="sl">[\s\S]*?<\/span>/, ""));
-    const second = shown(/<span class="sl">([\s\S]*?)<\/span>/.exec(first)?.[1] ?? "");
+    const name = shown(/<strong>([\s\S]*?)<\/strong>/.exec(first)?.[1] ?? first.replace(/<span class="sds-sub-line">[\s\S]*?<\/span>/, ""));
+    const second = shown(/<span class="sds-sub-line">([\s\S]*?)<\/span>/.exec(first)?.[1] ?? "");
     const measured = table.rows.find((one) => !seen.has(one) && one.matches(name, second));
     if (measured === undefined) {
       unplaced.push(`${table.heading}: the row \`${name}\` is on the page, and the measurement returns no such row`);
@@ -408,6 +412,9 @@ export function run(args: string[]): number {
   }
   if (!REFRESHED.includes(type))
     return refused(`${named}: the block's \`reportType\` reads \`${type}\`, and this command refreshes ${REFRESHED.map((one) => `\`${one}\``).join(" and ")}`);
+  // Every class read and written below is a name of the shared stylesheet (05-artifacts.md § One
+  // stylesheet, served in versions). A page that links none holds its own class names, so it is refused.
+  if (!linksSharedStyles(page)) return refused(`${named}: ${OWN_COPY}. Nothing was written.`);
 
   const root = repositoryOf(path);
   if (root === null) return refused(`${named}: no \`sprepo.json\` at or above the page, so there is no repository to measure`);

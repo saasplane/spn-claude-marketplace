@@ -53,7 +53,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.HOOKS.44 | Engineering leader | have a failed call made by a child agent closed like any other | The call's line carries its exit code and the agent, and its start file is removed | POSITIVE | UNIT | PLANNED | — |
 | MKT.HOOKS.45 | Editor | be refused a page that links a version nobody cut | The write is refused, and the message names the version the page links and the versions that exist | NEGATIVE | UNIT | PLANNED | — |
 | MKT.HOOKS.46 | Editor | be refused a publish of a page that links its styles from outside | The publish is refused, and the message names `docs sds bundle` and the copy to publish instead | NEGATIVE | UNIT | PLANNED | — |
-| MKT.HOOKS.47 | Editor | write the version's address into a page and get no finding for it | The link check allows the address of the shared stylesheet and script, and still reports any other hosted address | POSITIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.47 | Editor | write the version's address into a page and get no finding for it | The check accepts a page that links a version which was cut, and says nothing about its address | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

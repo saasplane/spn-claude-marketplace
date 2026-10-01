@@ -1,10 +1,11 @@
-// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The header · § The blocks
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The header · § The blocks · § One stylesheet, served in versions
 //           docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md § Metadata
 // The chapters are the source of truth. A rule change is edited there first, then here, in the same change.
 //
 // The page, produced from the seat file. The agent authors the markdown; this writes the HTML —
 // the body from the markdown, each figure drawn from its spec, then the furniture. So a page is
 // never hand-edited, and the header can never disagree with the block it is rendered from.
+// Every class it writes opens with `sds-`, and the furniture is the two lines that load the shared files.
 //
 // It is deliberately a small renderer rather than a markdown library: the seat file's grammar is
 // closed — headings, paragraphs, tables, lists, fenced blocks — and a dependency would have to be
@@ -100,7 +101,7 @@ function table(lines: string[]): string {
   const rows = lines.slice(2).map(cells);
   const th = head.map((c) => `<th>${inline(c)}</th>`).join("");
   const tb = rows.map((r) => `<tr>${r.map((c) => `<td>${inline(c)}</td>`).join("")}</tr>`).join("\n      ");
-  return `  <div class="scroll"><table>\n    <thead><tr>${th}</tr></thead>\n    <tbody>\n      ${tb}\n    </tbody>\n  </table></div>`;
+  return `  <div class="sds-scroll"><table>\n    <thead><tr>${th}</tr></thead>\n    <tbody>\n      ${tb}\n    </tbody>\n  </table></div>`;
 }
 
 function anchorOf(text: string): string {
@@ -195,7 +196,7 @@ function renderBody(lines: string[], findings: Finding[]): string {
       flush();
       const q: string[] = [];
       while (i < lines.length && /^>\s?/.test(lines[i])) q.push(lines[i++].replace(/^>\s?/, ""));
-      out.push(`  <div class="pull"><p>${inline(q.join(" "))}</p></div>`);
+      out.push(`  <div class="sds-pull"><p>${inline(q.join(" "))}</p></div>`);
       continue;
     }
     if (!l.trim()) { flush(); i++; continue; }
@@ -211,7 +212,8 @@ export function renderPage(opts: {
   markdown: string;
   workspace: string;
   location: string;
-  furniture: { style: string; scripts: string; footer: string };
+  /** The line that links the shared stylesheet, the line that loads the shared script, and the footer. */
+  furniture: { stylesheet: string; script: string; footer: string };
   /** Given a seat file's href, the one the produced page should carry. Identity when omitted. */
   link?: (href: string) => string;
   /**
@@ -248,7 +250,7 @@ function renderPageBody(opts: Parameters<typeof renderPage>[0]): { html: string;
   // The first lead paragraph is the standfirst — the page's promise in one line — and the ones after it
   // are the summary. Rendering the first with the standfirst class is what gives a construct the same
   // masthead rhythm as an overview (the developer's rule, 2026-09-21).
-  const lead = renderBody(leadLines, findings).replace(/^(\s*)<p>/, "$1<p class=\"standfirst\">");
+  const lead = renderBody(leadLines, findings).replace(/^(\s*)<p>/, "$1<p class=\"sds-standfirst\">");
 
   const sections: string[] = [];
   if (firstSection >= 0) {
@@ -271,27 +273,27 @@ function renderPageBody(opts: Parameters<typeof renderPage>[0]): { html: string;
         `<section id="s${s}">\n` +
         // A number orders a file in a tree; a heading is a name. The section head carries no number
         // on the page and none in the rail (the developer's rule, 2026-09-21).
-        `  <div class="sec-head"><h2>${inline(heading)}</h2></div>\n` +
+        `  <div class="sds-section-head"><h2>${inline(heading)}</h2></div>\n` +
         renderBody(body, findings) + `\n</section>`);
     }
   }
 
   const lensChips = (block.lenses ?? []).map((l: string) => {
     if (!LENS_LABEL[l]) findings.push({ message: `\`${l}\` is not a lens` });
-    return `<span class="badge lens">${LENS_LABEL[l] ?? l}</span>`;
+    return `<span class="sds-badge sds-lens">${LENS_LABEL[l] ?? l}</span>`;
   }).join("");
   const type = block.variant ? block.variant.charAt(0).toUpperCase() + block.variant.slice(1) : "";
   const statusPart = block.variant === "overview" || !block.status ? "" :
-    `<span class="st"><span class="lbl">Status:</span> <span class="badge status ${String(block.status).toLowerCase()}">${STATUS_GLYPH[block.status] ?? ""} ${block.status}</span></span>`;
+    `<span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-${String(block.status).toLowerCase()}">${STATUS_GLYPH[block.status] ?? ""} ${block.status}</span></span>`;
 
   // The Subtitle is the seat block's `subtitle` field, one plain sentence under the title; the lead's
   // first paragraph stays the Description (RD.DEVEX.WORKSPACE.187).
-  const subtitle = block.subtitle ? `  <p class="subtitle">${esc(String(block.subtitle))}</p>\n` : "";
+  const subtitle = block.subtitle ? `  <p class="sds-subtitle">${esc(String(block.subtitle))}</p>\n` : "";
 
   const masthead =
-`<header class="masthead">
+`<header class="sds-masthead">
   <!-- Rendered from the spn:doc block by \`docs.ts page\`. Never typed: a header that disagreed with its block is what this removes. -->
-  <div class="eyebrow"><span class="line1">${opts.workspace} &nbsp;|&nbsp; ${opts.location} &nbsp;|&nbsp; ${esc(block.title)}</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">${type}</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience">${lensChips}</span>${statusPart}</span></div>
+  <div class="sds-eyebrow"><span class="sds-line1">${opts.workspace} &nbsp;|&nbsp; ${opts.location} &nbsp;|&nbsp; ${esc(block.title)}</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">${type}</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience">${lensChips}</span>${statusPart}</span></div>
   <h1>${esc(block.title)}</h1>
 ${subtitle}${lead}
 </header>`;
@@ -301,24 +303,24 @@ ${subtitle}${lead}
     `<title>${esc(block.title)}</title>`,
     `<!-- spn:doc\n${JSON.stringify(block)}\n-->`,
     `<!-- Produced by \`docs.ts page\` from the seat file. Never edit this page: edit the seat file and produce it again. -->`,
-    opts.furniture.style,
-    `<div class="page">`,
+    opts.furniture.stylesheet,
+    `<div class="sds-page">`,
     ``,
-    `<nav class="rail" id="rail">`,
+    `<nav class="sds-rail" id="rail">`,
     // THE WAY BACK NAMES WHERE IT GOES (Q238). Where the caller resolved the page above this one
     // — a construct's domain overview — that page is named. Where it could not, the constructs
     // seat's own face stands: the seat file sits one level under it, so `../README.md` is the link
     // an author would write, re-expressed for the page's folder by the same rewriter the body uses.
     opts.home
-      ? `  <a class="home" href="${opts.home.href}">&larr; ${esc(opts.home.label)}</a>`
-      : `  <a class="home" href="${rewriteHref("../README.md")}">&larr; the model</a>`,
+      ? `  <a class="sds-home" href="${opts.home.href}">&larr; ${esc(opts.home.label)}</a>`
+      : `  <a class="sds-home" href="${rewriteHref("../README.md")}">&larr; the model</a>`,
     // THE RAIL CARRIES THE PAGE'S OWN NAME, NOT THE WORD `Outline` (Q239). A reader already knows a
     // rail is an outline — it is a list of this page's headings sitting beside them. What the label
     // can add is WHOSE, which is the one thing the rail does not say once the masthead has scrolled
     // away. 157 of 157 pages said `Outline`, and `blocks-template.html` already said `Blocks`.
-    `  <div class="rail-title">${esc(String(block.title ?? "Outline"))}</div>`,
+    `  <div class="sds-rail-title">${esc(String(block.title ?? "Outline"))}</div>`,
     `</nav>`,
-    `<div class="wrap">`,
+    `<div class="sds-wrap">`,
     ``,
     masthead,
     ``,
@@ -329,7 +331,7 @@ ${subtitle}${lead}
     `</div>`,
     `</div>`,
     ``,
-    opts.furniture.scripts,
+    opts.furniture.script,
     ``,
   ].join("\n");
 

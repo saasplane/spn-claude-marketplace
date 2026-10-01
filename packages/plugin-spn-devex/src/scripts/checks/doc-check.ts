@@ -3,9 +3,14 @@
 // one voice; RD.DEVEX.WORKSPACE.106, its reach and its measure; RD.DEVEX.WORKSPACE.107, the three moves that reach the
 // reader), 04-discipline.md § Voice discipline, 05-artifacts.md (the masthead, the approach document,
 // and How ends in Cycles), 01-workstream.md § A step row says where, at what altitude, and how
-// (RD.DEVEX.WORKSPACE.183) and 06-registers.md § Writing a row. The chapters are the source of truth: a rule change is edited
+// (RD.DEVEX.WORKSPACE.183), 05-artifacts.md § One stylesheet, served in versions (RD.DEVEX.WORKSPACE.214)
+// and 06-registers.md § Writing a row. The chapters are the source of truth: a rule change is edited
 // there first, then here, in the same change. This script checks only what a script CAN check; the
 // register itself is judgement.
+//
+// EVERY CLASS READ HERE IS A NAME OF THE SHARED STYLESHEET. A page that links no shared stylesheet
+// holds its own copy of the styles: its prose and its path are read, its markup is not, and it draws
+// one SOFT finding that says how to move it.
 //
 // Calibrated to the rule, never to the corpus (RD.DEVEX.WORKSPACE.106: the check reads the row's numbers, never
 // the corpus's own average). Over prose only — records are exempt, headings and derived chrome are
@@ -41,9 +46,11 @@
 
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { basename, dirname, join, resolve, relative, sep } from "node:path";
+import { fileURLToPath } from "node:url";
 import { emit, readPayload, runAlone, unescape, type Payload, type Verdict } from "../lib/payload.ts";
-import { APPROACH_SUFFIX, ARTIFACT, PLUGIN_TEMPLATES, POCKET, decisionsRegister, inArtifacts, isApproachPage, isArcFile,
+import { GUIDE_PAGE_SUFFIX, APPROACH_SUFFIX, ARTIFACT, PLUGIN_TEMPLATES, POCKET, decisionsRegister, inArtifacts, isApproachPage, isArcFile,
          isRegister as inRegisters, workstreamDirOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { BUNDLED_SUFFIX, OWN_COPY, PAGE_SCRIPT, SERVED_FILES, cutVersions, linksSharedStyles, stylesDir } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { CYCLES_COLUMNS, cyclesOf, headerStatusRule, openHeadingFor, openHeadingOf, previewLinkForm, previewsOf, tableColumns,
          tableDifferences } from "../commands/docs/cycles.ts";
 
@@ -185,7 +192,7 @@ const REACH_MIN_N = 8;
 
 // RD.DEVEX.WORKSPACE.103 — the suffix names the kind, and the set is closed. An approach page lives
 // in its workstream, never in the pocket, so the one pocket folder with a fixed suffix is overviews.
-const POCKET_KIND: Record<string, string> = { [ARTIFACT.overviews]: "-overview.html" };
+const POCKET_KIND: Record<string, string> = { [ARTIFACT.overviews]: "-overview.html", [ARTIFACT.guides]: GUIDE_PAGE_SUFFIX };
 const NODE_MANIFESTS = ["spkind.json", "spinfrapkg.json"];
 const SKIP = new Set(["node_modules", ".git", "dist", "build", "coverage", "tool-results", ".output", ".nx"]);
 
@@ -219,7 +226,9 @@ export function structural(path: string): Finding[] {
         "never as a file at the node"]);
   }
 
-  // RD.DEVEX.WORKSPACE.103 — folder and suffix must agree.
+  // RD.DEVEX.WORKSPACE.103 — folder and suffix must agree. A page under `guides/` ends `-guide.html`
+  // (RD.DEVEX.WORKSPACE.218). The index of artifacts sits directly in the pocket and has no suffix
+  // (RD.DEVEX.WORKSPACE.219), so it is held to none.
   const parts = slashes(resolve(path)).split("/");
   if (parts.includes(POCKET.artifacts) && base.endsWith(".html")) {
     const pocket = parts[parts.length - 2];
@@ -370,14 +379,20 @@ export function openHeadingRule(path: string, text: string): Finding[] {
     `(05-artifacts.md § How ends in Cycles; RD.DEVEX.WORKSPACE.204) · ${WRITES_THE_PAGE}`]];
 }
 
-/** The chrome an approach page owes its reader, and the one part nothing checked. */
+/** A page's line that loads the shared script, which builds the rail and folds it. */
+const LOADS_PAGE_SCRIPT = new RegExp(`<script\\b[^>]*\\bsrc="[^"]*${PAGE_SCRIPT.replace(".", "\\.")}"`, "i");
+
+/**
+ * The chrome an approach page owes its reader. The shared script builds the rail from the headings
+ * and folds it, so a page that carries a rail and loads no shared script shows an empty outline.
+ */
 export function pageFurniture(text: string): Finding[] {
-  if (!text.includes('id="rail"') && !text.includes('id="rail-list"')) return [];  // no rail is a short page's right
-  if (text.includes("rail-fold") || text.includes("sub-group")) return [];
+  if (!text.includes('id="rail"')) return [];                    // no rail is a short page's right
+  if (LOADS_PAGE_SCRIPT.test(text)) return [];
   return [[FURNITURE,
-    "The outline does not fold. A rail listing every heading of every section is a wall in the shape " +
-    "of an outline (05-artifacts.md, A page carries its own subsections) · append the rail-fold " +
-    "block, verbatim, after this page's own rail builder — take it from the approach template, " +
+    `The outline is not built and does not fold: the page carries a rail and loads no \`${PAGE_SCRIPT}\`. ` +
+    "The shared script builds the rail from the headings and folds it (05-artifacts.md, The page itself) · " +
+    "add the script's line at the end of the page — take it from the approach template, " +
     `\`${PLUGIN_TEMPLATES}/workstream/approach-template.html\``]];
 }
 
@@ -421,8 +436,8 @@ export function approachShape(text: string, exempt = false): Finding[] {
   if (order.some((at, i) => i > 0 && at < order[i - 1]))
     out.push(["RULE", `sections run ${heads.filter((h) => APPROACH_SECTIONS.includes(h)).join(" > ")} — ` +
       `the order is Why > What > How > Open > Deferred ${where}`]);
-  if (!/<p\b[^>]*class="[^"]*\bstandfirst\b/i.test(text))
-    out.push(["RULE", "has no opening — a standfirst and the one paragraph under it come before Why " +
+  if (!/<p\b[^>]*class="(?:[^"]*\s)?sds-standfirst(?:\s[^"]*)?"/i.test(text))
+    out.push(["RULE", "has no opening — one `p.sds-standfirst` in the header comes before Why " +
       "(05-artifacts.md § The masthead, and the opening; RD.DEVEX.WORKSPACE.182) · start from the approach template"]);
   return out;
 }
@@ -430,15 +445,19 @@ export function approachShape(text: string, exempt = false): Finding[] {
 // ---------------------------------------------------------------------------- the masthead
 
 // 05-artifacts.md § The masthead, and the opening (RD.DEVEX.WORKSPACE.187, RD.DEVEX.WORKSPACE.182).
-// The header holds the Title (`h1`), an optional Subtitle (`p.subtitle`) and the Description (one
-// `p.standfirst`), in that order, and nothing after the Description. Every masthead finding is SOFT
+// The header holds the Title (`h1`), an optional Subtitle (`p.sds-subtitle`) and the Description (one
+// `p.sds-standfirst`), in that order, and nothing after the Description. Every masthead finding is SOFT
 // while the trees outside the foundation wait for their retrofit (N116 row 9); when every tree
 // audits clean, change SECOND_PARAGRAPH to RULE, because the chapter states that rule as MUST.
 const SECOND_PARAGRAPH = "SOFT";
 const MASTHEAD = "SOFT";
 const MASTHEAD_WHERE = "(05-artifacts.md § The masthead, and the opening; RD.DEVEX.WORKSPACE.187)";
 
-/** The page kinds the masthead rule binds, read from a page's file name. */
+/**
+ * The page kinds the masthead rule binds, read from a page's file name. The index of artifacts has
+ * no masthead, no Subtitle and no Description, and a guide page's file name names no kind of this
+ * set, so the rule reads neither.
+ */
 export type MastheadKind = "hub" | "overview" | "construct" | "report" | "approach" | "preview";
 export function mastheadKind(path: string): MastheadKind | null {
   const base = basename(path);
@@ -477,7 +496,7 @@ export function hubPair(path: string): { title: string; subtitle: string } | "un
 }
 
 /**
- * The masthead of one page: `h1`, an optional `p.subtitle`, exactly one `p.standfirst`, in that
+ * The masthead of one page: `h1`, an optional `p.sds-subtitle`, exactly one `p.sds-standfirst`, in that
  * order, and no other paragraph. Only a page with a `<header>` is read; a missing header is the
  * header check's finding. An approach page's missing standfirst is `approachShape`'s RULE, so it is
  * not reported twice here.
@@ -490,8 +509,8 @@ export function masthead(path: string, text: string, kind: MastheadKind | null =
   const out: Finding[] = [];
   const parts = [...body.matchAll(/<h1\b[^>]*>([\s\S]*?)<\/h1>|<p\b([^>]*)>([\s\S]*?)<\/p>/gi)].map((m) => {
     if (m[1] !== undefined) return { role: "h1", html: m[1] };
-    const cls = /\bclass\s*=\s*"([^"]*)"/i.exec(m[2])?.[1] ?? "";
-    const role = /\bsubtitle\b/.test(cls) ? "subtitle" : /\bstandfirst\b/.test(cls) ? "standfirst" : "p";
+    const classes = (/\bclass\s*=\s*"([^"]*)"/i.exec(m[2])?.[1] ?? "").split(/\s+/);
+    const role = classes.includes("sds-subtitle") ? "subtitle" : classes.includes("sds-standfirst") ? "standfirst" : "p";
     return { role, html: m[3] };
   });
 
@@ -508,7 +527,7 @@ export function masthead(path: string, text: string, kind: MastheadKind | null =
       `header ${MASTHEAD_WHERE} · fold the rest into the first section`]);
   }
   if (!standfirsts.length && kind !== "approach")
-    out.push([MASTHEAD, `the header has no Description — one \`p.standfirst\` under the Title and the Subtitle ${MASTHEAD_WHERE}`]);
+    out.push([MASTHEAD, `the header has no Description — one \`p.sds-standfirst\` under the Title and the Subtitle ${MASTHEAD_WHERE}`]);
 
   const order = parts.map((p) => p.role);
   const h1At = order.indexOf("h1"), subAt = order.indexOf("subtitle"), leadAt = order.indexOf("standfirst");
@@ -665,7 +684,7 @@ export function overviewShape(text: string): Finding[] {
 }
 
 /**
- * Each `<div class="open">` with its own matching close, nesting counted.
+ * Each `<div class="sds-open">` with its own matching close, nesting counted.
  *
  * THE BLIND SPOT THIS CLOSES. Splitting the section on headings alone left the LAST card's chunk
  * running to the end of the section, so it borrowed whatever came after it. On the 009 page a card
@@ -674,7 +693,7 @@ export function overviewShape(text: string): Finding[] {
  */
 function cardDivs(body: string): string[] {
   const out: string[] = [];
-  for (const opening of body.matchAll(/<div\b[^>]*class="[^"]*\bopen\b[^"]*"[^>]*>/gi)) {
+  for (const opening of body.matchAll(/<div\b[^>]*class="(?:[^"]*\s)?sds-open(?:\s[^"]*)?"[^>]*>/gi)) {
     const from = opening.index! + opening[0].length;
     let depth = 1;
     let at = from;
@@ -689,7 +708,7 @@ function cardDivs(body: string): string[] {
 
 /**
  * Cards are h3 OR h4 — the corpus uses h4, and both read as a card to a person. Where the page marks
- * its cards with `<div class="open">` those bounds win, because they are what the writer actually
+ * its cards with `<div class="sds-open">` those bounds win, because they are what the writer actually
  * drew. The heading split is the fallback for a page that does not.
  */
 function cards(body: string): Array<[string, string]> {
@@ -1102,12 +1121,14 @@ export function isOperative(path: string): boolean {
  * CONCEPT.md, every .html under artifacts/, an approach or overview page anywhere, and .html under
  * .spndevex/notes/. A scaffold template counts as the file it writes. Not .md under .spndevex/ —
  * arcs, orders and notes are state, not corpus — and nothing under a build or dependency directory.
+ * Not a page's bundled copy either: it is a copy made to publish, and its page is what is read.
  */
 export function watched(path: string): boolean {
   const p = slashes(resolve(asWritten(path)));
   const parts = p.split("/");
   if (parts.slice(0, -1).some((d) => SKIP.has(d))) return false;
   const base = parts[parts.length - 1];
+  if (base.endsWith(BUNDLED_SUFFIX)) return false;
   if (base.endsWith(".md") && p.includes("/.spndevex/")) return false;
   if (base.endsWith(".html"))
     return isApproachPage(base) || base.endsWith("-overview.html")
@@ -1132,21 +1153,85 @@ export function kindOf(path: string): string {
   return "chapter";
 }
 
+// ---------------------------------------------------------------------------- the shared styles
+
+// 05-artifacts.md § What a stored page carries, and what a published one carries: the check on a page
+// refuses a link to a version that nobody cut. The finding carries the words below, and the hook
+// reads them to tell the one finding it refuses a write for.
+const UNCUT = "links a version of the shared styles that nobody cut";
+
+/** A link or a script of a page that loads one of the served files: everything before the file's name. */
+const SERVED_LINK = new RegExp(
+  `\\b(?:href|src)="([^"]*)(?:${SERVED_FILES.map((file) => file.replace(/\./g, "\\.")).join("|")})"`, "gi");
+/** A version as the last folder of an address or a path: `…/1.0.0/`. */
+const VERSION_FOLDER = /(?:^|\/)(\d+\.\d+\.\d+)\/$/;
+
+/** The plugin's `styles/` folder, found from this file: `src/styles/` from source, beside `dist/` when installed. */
+function ownStylesDir(): string | null {
+  try { return stylesDir(fileURLToPath(import.meta.url)); } catch { return null; }
+}
+
+/**
+ * Each version a page links that `versions.json` does not hold, as one RULE finding that names the
+ * version and the versions that exist. A page that names no version draws none, and neither does
+ * any page where `versions.json` cannot be found, because then nothing says which versions exist.
+ *
+ * @param styles  the folder that holds `versions.json`; found from the plugin's own files when not given
+ */
+export function uncutVersions(text: string, styles: string | null = ownStylesDir()): Finding[] {
+  if (styles === null) return [];
+  const cut = Object.keys(cutVersions(styles));
+  if (!cut.length) return [];
+  const linked = [...text.matchAll(SERVED_LINK)].map((found) => VERSION_FOLDER.exec(found[1])?.[1])
+    .filter((version): version is string => version !== undefined);
+  return [...new Set(linked)].filter((version) => !cut.includes(version)).map((version): Finding =>
+    ["RULE", `the page ${UNCUT}: \`${version}\`. \`versions.json\` holds ${cut.map((one) => `\`${one}\``).join(" · ")}. ` +
+      `Link a version that exists, or cut this one first with \`spn-devex docs sds cut ${version}\` ` +
+      "(05-artifacts.md § One stylesheet, served in versions)"]);
+}
+
+/**
+ * Whether a page holds its own copy of the styles: its text links no shared stylesheet. A fragment
+ * carries no link of its own, so the page on disk answers for it, and a fragment of a page that is
+ * not on disk is read as one of a page in the shared form.
+ */
+function holdsOwnCopy(path: string, text: string, fragment: boolean): boolean {
+  if (linksSharedStyles(text)) return false;
+  if (!fragment) return true;
+  const stored = read(path);
+  return stored !== "" && !linksSharedStyles(stored);
+}
+
 // ---------------------------------------------------------------------------- one file
 
 /**
  * All findings for one file. A fragment is an Edit's new_string: path-based structure still applies,
  * the whole-document shape checks do not, and the prose measure runs only once the fragment carries
  * five prose sentences.
+ *
+ * A page that holds its own copy of the styles is named once, as a SOFT finding with `OWN_COPY`. Its
+ * path and its prose are still read, and its markup is not. Such a page under a workstream's
+ * `closed/` folder is not read at all, and neither is a page's bundled copy.
  */
 export function check(path: string, text: string, fragment = false): Finding[] {
   // An arc is state, not corpus: only its step rows and its Previews rows are read, and only whole.
   if (isArc(path)) return fragment ? [] : [...arcSteps(path, text), ...arcPreviews(path, text)];
+  // A bundled copy carries its page's styles inside it, to be published. Its page is what is read.
+  if (path.endsWith(BUNDLED_SUFFIX)) return [];
   const isHtml = path.endsWith(".html");
+  if (isHtml && holdsOwnCopy(path, text, fragment)) {
+    if (inClosedWorkstream(path)) return [];
+    const ownProse = proseOf(text, true);
+    const ownSentences = sentences(ownProse);
+    const found: Finding[] = [...structural(path), ["SOFT", OWN_COPY]];
+    if (!fragment || ownSentences.length >= 5) found.push(...voice(ownProse, ownSentences, kindOf(path), isOperative(path)));
+    return found;
+  }
   const isApproach = isApproachPage(path);
   const isOverview = path.endsWith("-overview.html");
   const prose = proseOf(text, isHtml);
   const out: Finding[] = structural(path);
+  if (isHtml) out.push(...uncutVersions(text));
 
   if ((isApproach || isOverview) && !fragment) {
     if (!/who this is for|audience/i.test(text))
@@ -1370,9 +1455,15 @@ export function checkDoc(payload: Payload): Verdict {
       "and a paragraph's opening sentence is not a fragment's. Sweep the whole file to reach those: " +
       "`node doc-check.ts <path>`."
     : "";
-  return { note: `Doc standard — ${subject} bars the book states:\n${body}${moves}${limits}` +
+  const note = `Doc standard — ${subject} bars the book states:\n${body}${moves}${limits}` +
     "\n  Load `refs/devex/workspace/docs/doc-sets.md` (One voice / Every surface / The artifacts " +
-    `pocket) and, for an approach page, \`${PLUGIN_TEMPLATES}/workstream/approach-template.html\`.` };
+    `pocket) and, for an approach page, \`${PLUGIN_TEMPLATES}/workstream/approach-template.html\`.`;
+  // THE ONE FINDING THIS HOOK REFUSES A WRITE FOR. A page that links a version nobody cut loads no
+  // styles at all, and every other finding here is advice about a page a reader can still open.
+  const uncut = found.filter(([, message]) => message.includes(UNCUT));
+  if (uncut.length)
+    return { deny: `Denied: ${uncut.map(([, message]) => message).join(" · ")}`, note };
+  return { note };
 }
 
 // ---------------------------------------------------------------------------- the sweep

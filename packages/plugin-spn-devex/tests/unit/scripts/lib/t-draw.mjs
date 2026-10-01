@@ -74,7 +74,7 @@ for (const [name, spec] of Object.entries(FIGURES)) {
 {
   const flat = judge(FIGURES["map — a one-way chain that fits is one horizontal line"]).svg;
   one("a chain that fits has every box on one y", flat, (g) => new Set([...g.matchAll(/<rect[^>]* y="([\d.]+)"/g)].map((m) => m[1])).size === 1);
-  one("and every link is a single horizontal segment", flat, (g) => [...g.matchAll(/<path class="c" d="([^"]+)"/g)].every((m) => /^M[\d.]+ [\d.]+ H[\d.]+$/.test(m[1])));
+  one("and every link is a single horizontal segment", flat, (g) => [...g.matchAll(/<path class="sds-connector" d="([^"]+)"/g)].every((m) => /^M[\d.]+ [\d.]+ H[\d.]+$/.test(m[1])));
   const branch = judge(FIGURES["map — a branch keeps every link, laid in rows"]).svg;
   one("a flow with a branch draws all four links", branch, (g) => (g.match(/marker-end/g) ?? []).length === 4);
   one("and its boxes sit in more than one row", branch, (g) => new Set([...g.matchAll(/<rect[^>]* y="([\d.]+)"/g)].map((m) => m[1])).size > 1);
@@ -83,9 +83,9 @@ for (const [name, spec] of Object.entries(FIGURES)) {
   one("and is no wider than the canvas", wide, (g) => Number(g.match(/viewBox="0 0 (\d+)/)[1]) <= 1100);
   const tall = judge(FIGURES["map — a one-way chain too wide for the canvas is one vertical line"]).svg;
   one("a chain too wide has every box on one x", tall, (g) => new Set([...g.matchAll(/<rect[^>]* x="([\d.]+)"/g)].map((m) => m[1])).size === 1);
-  one("and every link is a single vertical segment", tall, (g) => [...g.matchAll(/<path class="c" d="([^"]+)"/g)].every((m) => /^M[\d.]+ [\d.]+ V[\d.]+$/.test(m[1])));
+  one("and every link is a single vertical segment", tall, (g) => [...g.matchAll(/<path class="sds-connector" d="([^"]+)"/g)].every((m) => /^M[\d.]+ [\d.]+ V[\d.]+$/.test(m[1])));
   const ordered = judge(FIGURES["map — rows are ordered so links do not cross"]).svg;
-  const xOf = (label) => Number(ordered.match(new RegExp(`<text class="l" x="([\\d.]+)" y="[\\d.]+">${label}<`))[1]);
+  const xOf = (label) => Number(ordered.match(new RegExp(`<text class="sds-label" x="([\\d.]+)" y="[\\d.]+">${label}<`))[1]);
   // Two orders are crossing-free (Ground first or Vocabulary first); what must hold is that the
   // rows agree, so the one link that could cross another does not.
   one("the two rows are ordered the same way, so no run crosses another", ordered, () => (xOf("Ground") < xOf("Vocabulary")) === (xOf("Providers") < xOf("Coordinates")));
@@ -136,7 +136,7 @@ console.log("\n=== the map drawer keeps the three rules it was found breaking");
     boxes: [{ id: "a", label: "Contract", note: "the shared surface" }, { id: "b", label: "App" }, { id: "c", label: "Entry" }],
     links: [{ from: "a", to: "b", label: "types" }, { from: "b", to: "c" }] });
   const rects = [...svg.matchAll(/<rect[^>]*y="([\d.]+)"[^>]*height="([\d.]+)"/g)].map((m) => [Number(m[1]), Number(m[2])]);
-  const runs = [...svg.matchAll(/<path class="c" d="M[\d.]+ ([\d.]+) H/g)].map((m) => Number(m[1]));
+  const runs = [...svg.matchAll(/<path class="sds-connector" d="M[\d.]+ ([\d.]+) H/g)].map((m) => Number(m[1]));
   one("a row of unequal boxes shares one centre line, so a lone arrow is straight",
     rects.map(([y, h]) => y + h / 2), (mids) => new Set(mids).size === 1 && runs.every((r) => r === mids[0]));
 }
@@ -147,7 +147,7 @@ console.log("\n=== the map drawer keeps the three rules it was found breaking");
     boxes: [{ id: "v", label: "Vocabulary" }, { id: "g", label: "Ground" }, { id: "p", label: "Providers" }, { id: "c", label: "Coordinates" }],
     links: [{ from: "v", to: "c" }, { from: "g", to: "p" }, { from: "g", to: "c" }] });
   const verts = [];
-  [...svg.matchAll(/<path class="c" d="([^"]+)"/g)].forEach((m, k) => {
+  [...svg.matchAll(/<path class="sds-connector" d="([^"]+)"/g)].forEach((m, k) => {
     let x = 0, y = 0;
     for (const [, cmd, u, v] of m[1].matchAll(/([MHV])\s*(-?[\d.]+)(?:\s+(-?[\d.]+))?/g)) {
       const a = Number(u);
@@ -173,7 +173,7 @@ console.log("\n=== the map drawer keeps the three rules it was found breaking");
     links: [{ from: "b0", to: "b8", label: "depends on" }] });
   const rows = [...svg.matchAll(/<rect[^>]*y="([\d.]+)"[^>]*height="([\d.]+)"/g)].map((m) => [Number(m[1]), Number(m[2])]);
   const top = rows[0];
-  const d = svg.match(/<path class="c" d="([^"]+)"/)[1];
+  const d = svg.match(/<path class="sds-connector" d="([^"]+)"/)[1];
   one("a skipping link out of a box that is not last in its row drops below the row before it travels",
     d, (g) => /^M[\d.]+ ([\d.]+) V([\d.]+) H/.test(g)
       && Number(/^M[\d.]+ ([\d.]+)/.exec(g)[1]) >= top[0] + top[1]);
@@ -194,13 +194,13 @@ console.log("\n=== FLOWCHART — the standard shapes, and the path runs down the
   one("`flowchart` is a kind the book names, and a helper draws it", KINDS, (k) => k.includes("flowchart"));
   one("the ends of the path are terminators — a rect rounded to a half its own height",
     r.svg, (g) => (g.match(/<rect[^>]*height="44"[^>]*rx="22"/g) ?? []).length === 2);
-  one("a box with two ways out is drawn as a diamond", r.svg, (g) => /<path class="box" d="M[\d.]+ [\d.]+ L[\d.]+ [\d.]+ L[\d.]+ [\d.]+ L[\d.]+ [\d.]+ Z"/.test(g));
+  one("a box with two ways out is drawn as a diamond", r.svg, (g) => /<path class="sds-box" d="M[\d.]+ [\d.]+ L[\d.]+ [\d.]+ L[\d.]+ [\d.]+ L[\d.]+ [\d.]+ Z"/.test(g));
   one("a store carries a cap, and its body is a rect the check can measure",
-    r.svg, (g) => /<ellipse class="box"/.test(g) && /<rect class="box"[^>]*\/>\n  <ellipse/.test(g));
+    r.svg, (g) => /<ellipse class="sds-box"/.test(g) && /<rect class="sds-box"[^>]*\/>\n  <ellipse/.test(g));
   // Inference gives `c` a diamond because it has two ways out; naming a shape must overrule that.
   one("a named shape always wins over the inferred one",
     draw({ ...spec, boxes: spec.boxes.map((b) => (b.id === "c" ? { ...b, shape: "process" } : b)) }).svg,
-    (g) => !/<path class="box" d="M[\d.]+ [\d.]+ L/.test(g));
+    (g) => !/<path class="sds-box" d="M[\d.]+ [\d.]+ L/.test(g));
   one("a branch out of a decision with no answer on it is a finding",
     draw({ ...spec, links: spec.links.map((l) => (l.label === "no" ? { from: l.from, to: l.to } : l)) }).findings,
     says("leaves a decision with no answer"));
@@ -227,8 +227,8 @@ console.log("\n=== a figure hugs its own content");
     for (const m of body.matchAll(/<rect[^>]* x="(-?[\d.]+)"[^>]* width="([\d.]+)"/g)) xs.push(Number(m[1]), Number(m[1]) + Number(m[2]));
     for (const m of body.matchAll(/<ellipse[^>]* cx="(-?[\d.]+)" cy="(-?[\d.]+)" rx="([\d.]+)"/g)) xs.push(Number(m[1]) - Number(m[3]), Number(m[1]) + Number(m[3]));
     // The same three character widths the drawer measures by and the figure check judges by.
-    const PX = { t: 7.6, l: 7.0, s: 6.6, n: 6.4 };
-    for (const m of body.matchAll(/<text class="(\w+)" x="(-?[\d.]+)"[^>]*>([\s\S]*?)<\/text>/g))
+    const PX = { "sds-title": 7.6, "sds-label": 7.0, "sds-code": 6.6, "sds-note": 6.4 };
+    for (const m of body.matchAll(/<text class="([\w-]+)" x="(-?[\d.]+)"[^>]*>([\s\S]*?)<\/text>/g))
       xs.push(Number(m[2]), Number(m[2]) + m[3].replace(/&[a-z]+;/g, " ").length * (PX[m[1]] ?? 7));
     for (const m of body.matchAll(/<path[^>]* d="([^"]+)"/g)) {
       for (const [, c, u] of m[1].matchAll(/([MLHV])\s*(-?[\d.]+)/g)) if (c !== "V") xs.push(Number(u));
@@ -270,12 +270,12 @@ console.log("\n=== SYSTEM — one drawer for server, web and estate");
   one("`system` is a kind the book names, and a helper draws it", KINDS, (k) => k.includes("system"));
   one("there is one outermost container, and it is the thing described",
     r.svg, (g) => g.includes(`>modules/project<`));
-  one("a store is drawn as a cylinder", r.svg, (g) => /<ellipse class="box"/.test(g));
+  one("a store is drawn as a cylinder", r.svg, (g) => /<ellipse class="sds-box"/.test(g));
   one("a client is drawn as a window — a frame with a title bar",
     r.svg, (g) => /data-role="curve"/.test(g));
-  one("a way in is drawn as a chevron", r.svg, (g) => /<path class="box" d="M[\d.]+ [\d.]+ H[\d.]+ L[\d.]+ [\d.]+ L[\d.]+ [\d.]+ H[\d.]+ Z"/.test(g));
+  one("a way in is drawn as a chevron", r.svg, (g) => /<path class="sds-box" d="M[\d.]+ [\d.]+ H[\d.]+ L[\d.]+ [\d.]+ L[\d.]+ [\d.]+ H[\d.]+ Z"/.test(g));
   one("the layers are joined one way, in the direction a call travels",
-    r.svg, (g) => (g.match(/<path class="c" d="M[\d.]+ [\d.]+ V[\d.]+" marker-end/g) ?? []).length === 2);
+    r.svg, (g) => (g.match(/<path class="sds-connector" d="M[\d.]+ [\d.]+ V[\d.]+" marker-end/g) ?? []).length === 2);
 
   // WEB AND ESTATE ARE THE SAME SHAPE, which is the claim the kind makes rather than an illustration
   // of it. Both were drawn from their own source and both found faults the server figure had not.
@@ -320,15 +320,15 @@ console.log("\n=== the figure check learned about ellipses, and is still able to
   // VERIFY THE VERIFIER. Two rules were relaxed so a connector could land on a cylinder's cap and on
   // a queue's end. A relaxed rule that can no longer fail is worse than the fault it was hiding, so
   // each is shown a figure that genuinely breaks it.
-  const wrap = (body) => `<svg class="dg" viewBox="0 0 400 200" role="img" aria-label="x">${body}</svg>`;
-  const cyl = `<rect class="box" x="40" y="60" width="120" height="60" rx="3"/><ellipse class="box" cx="100" cy="60" rx="60" ry="13"/>`;
+  const wrap = (body) => `<svg class="sds-drawing" viewBox="0 0 400 200" role="img" aria-label="x">${body}</svg>`;
+  const cyl = `<rect class="sds-box" x="40" y="60" width="120" height="60" rx="3"/><ellipse class="sds-box" cx="100" cy="60" rx="60" ry="13"/>`;
   one("a connector landing on a cylinder's cap is accepted",
-    checkFigures(wrap(`${cyl}<rect class="box" x="240" y="60" width="100" height="60" rx="3"/><path class="c" d="M240 90 H160"/>`)), none);
+    checkFigures(wrap(`${cyl}<rect class="sds-box" x="240" y="60" width="100" height="60" rx="3"/><path class="sds-connector" d="M240 90 H160"/>`)), none);
   one("but one stopping in the air beside the cap is still reported",
-    checkFigures(wrap(`${cyl}<rect class="box" x="240" y="60" width="100" height="60" rx="3"/><path class="c" d="M240 30 H185"/>`)),
+    checkFigures(wrap(`${cyl}<rect class="sds-box" x="240" y="60" width="100" height="60" rx="3"/><path class="sds-connector" d="M240 30 H185"/>`)),
     says("empty space"));
   one("and a line crowding a cylinder it never touches is still reported",
-    checkFigures(wrap(`${cyl}<rect class="box" x="240" y="60" width="100" height="60" rx="3"/><path class="c" d="M240 132 H40"/>`)),
+    checkFigures(wrap(`${cyl}<rect class="sds-box" x="240" y="60" width="100" height="60" rx="3"/><path class="sds-connector" d="M240 132 H40"/>`)),
     says("clear air to every shape it merely goes by"));
 }
 
@@ -417,7 +417,7 @@ console.log("\n=== ENTITIES — every relation line says one or many");
 
   // The placer may move a label to a neighbouring band; it may never move it out of the picture.
   // A FIGURE HUGS ITS CONTENT, so its viewBox has an origin of its own and is not `0 0 w h`.
-  const ys = [...r.svg.matchAll(/<text class="n"[^>]*y="([\d.]+)"/g)].map((m) => Number(m[1]));
+  const ys = [...r.svg.matchAll(/<text class="sds-note"[^>]*y="([\d.]+)"/g)].map((m) => Number(m[1]));
   const vb = /viewBox="([\d.-]+) ([\d.-]+) ([\d.-]+) ([\d.-]+)"/.exec(r.svg).slice(1).map(Number);
   one("no label is placed outside the figure's own box", ys,
       (g) => g.length > 0 && g.every((y) => y >= vb[1] && y <= vb[1] + vb[3]));
@@ -429,9 +429,9 @@ console.log("\n=== a decision holds only the rectangle inscribed in it");
   // outside every containment rule. The Sign-in flowchart shipped with "The organization judges"
   // wider than its diamond and the note's last line outside the shape, and the check called the
   // page clean (found by the developer on the published sample, 2026-09-22).
-  const diamond = (a, b) => `<path class="box" d="M200 ${100 - b} L${200 + a} 100 L200 ${100 + b} L${200 - a} 100 Z"/>`;
-  const label = (txt, y) => `<text class="l" x="${200 - txt.length * 3.5}" y="${y}">${txt}</text>`;
-  const svgOf = (body) => `<svg class="dg" viewBox="0 0 400 200" role="img" aria-label="x">${body}</svg>`;
+  const diamond = (a, b) => `<path class="sds-box" d="M200 ${100 - b} L${200 + a} 100 L200 ${100 + b} L${200 - a} 100 Z"/>`;
+  const label = (txt, y) => `<text class="sds-label" x="${200 - txt.length * 3.5}" y="${y}">${txt}</text>`;
+  const svgOf = (body) => `<svg class="sds-drawing" viewBox="0 0 400 200" role="img" aria-label="x">${body}</svg>`;
   const says = (s) => (got) => JSON.stringify(got).includes(s);
 
   one("a label that overruns its diamond is reported",
@@ -507,6 +507,49 @@ console.log("\n=== the label a screen reader is given is spoken, not rendered");
       "The ledger sits apart, because it is not a resource.");
   one("and an ampersand is still escaped, because the label is an attribute",
       labelOf({ kind: "map", caption: "Plan & prove.", boxes }), "Plan &amp; prove.");
+}
+
+console.log("\n=== a drawing carries the shared stylesheet's class names, and no other");
+{
+  const tones = draw({ kind: "map", caption: "Three boxes, one of each mark.",
+    boxes: [{ id: "a", label: "Marked", em: true }, { id: "b", label: "Warned", warn: true }, { id: "c", label: "Absent", off: true }] }).svg;
+  one("the drawing itself is `sds-drawing`", tones, (g) => g.startsWith('<svg class="sds-drawing" '));
+  one("a box marked `em` takes the blue tone", tones, (g) => g.includes('<rect class="sds-box sds-tone-blue"'));
+  one("a box marked `warn` takes the amber tone", tones, (g) => g.includes('<rect class="sds-box sds-tone-amber"'));
+  one("a box marked `off` is `sds-absent`", tones, (g) => g.includes('<rect class="sds-box sds-absent"'));
+  one("a box's label is `sds-label`", tones, (g) => />Marked<\/text>/.test(g) && /<text class="sds-label"[^>]*>Marked</.test(g));
+
+  const sequence = draw({ kind: "sequence", caption: "One call and its answer.",
+    boxes: [{ id: "a", label: "Caller" }, { id: "b", label: "Service" }],
+    links: [{ from: "a", to: "b", label: "asks" }, { from: "b", to: "a", label: "answers", dashed: true }] }).svg;
+  one("a lifeline keeps its name beside the connector's: `sds-connector sds-lifeline`",
+    sequence, (g) => (g.match(/<path class="sds-connector sds-lifeline" /g) ?? []).length === 2);
+  one("and the figure check still reads a lifeline as background, never as a connector that ends in the air",
+    checkFigures(sequence), none);
+  one("a message's label is `sds-note`", sequence, (g) => /<text class="sds-note"[^>]*>asks</.test(g));
+
+  // Every figure of this suite is drawn and every class of each is collected, so a name without the
+  // prefix fails here whichever drawer wrote it.
+  const system = draw({ kind: "system", title: "modules/project", caption: "One layer, and the store it reads.",
+    layers: [{ name: "service", boxes: [{ id: "s", label: "ProjectService" }] }],
+    outside: [{ id: "db", label: "Database", as: "store" }], links: [{ from: "s", to: "db", label: "reads" }] }).svg;
+  one("a system's boundary is named by `sds-title`", system, (g) => /<text class="sds-title"[^>]*>modules\/project</.test(g));
+
+  const classes = new Set();
+  for (const svg of [...Object.values(FIGURES).map((spec) => draw(spec).svg), tones, sequence, system])
+    for (const found of svg.matchAll(/class="([^"]+)"/g)) for (const name of found[1].split(" ")) classes.add(name);
+  one("every class a drawer writes opens with `sds-`", [...classes].filter((name) => !name.startsWith("sds-")), none);
+  one("and the set holds the names the drawers are built from",
+    ["sds-drawing", "sds-box", "sds-connector", "sds-label", "sds-note", "sds-title", "sds-lifeline", "sds-tone-blue", "sds-tone-amber", "sds-absent"]
+      .filter((name) => !classes.has(name)), none);
+
+  // VERIFY THE VERIFIER: the check reads a connector by the shared name alone, so a path that
+  // carries another name is not a connector to it, and the same path with the shared name is.
+  const wrap = (name) => `<svg class="sds-drawing" viewBox="0 0 400 200" role="img" aria-label="x">` +
+    `<rect class="sds-box" x="40" y="60" width="100" height="60" rx="3"/><path class="${name}" d="M240 30 H185"/></svg>`;
+  one("known-bad: a connector that ends in the air is reported when it carries the shared name",
+    checkFigures(wrap("sds-connector")), says("empty space"));
+  one("a path with any other class is not read as a connector", checkFigures(wrap("mine")), none);
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

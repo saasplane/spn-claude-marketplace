@@ -13,15 +13,18 @@
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync } from "node:fs";
 import { dirname, join, resolve, basename, relative } from "node:path";
+import { fileURLToPath } from "node:url";
 import { hrefForPage, renderPage } from "../../lib/render.ts";
 import { cardsOf } from "../../checks/split-plan.ts";
 import { masthead, type MastheadKind } from "../../checks/doc-check.ts";
 import { filesUnder as proseFilesUnder, paragraphs as proseParagraphs, score as proseScore } from "./prose.ts";
 
 import { withOffset } from "../../lib/clock.ts";
-import { ARTIFACT_FOLDERS, DEVEX_WORKSTREAMS, SEAT, SEATS, TEMPLATES, artifactFolderOf, behaviorsDir, bookTemplatesDir,
-  capabilitiesDir, constructsDir, docsOf, inSeat, inTemplates, isProducedPage, mirrorPath,
+import { ARTIFACT_FOLDERS, ARTIFACT_INDEX, DEVEX_WORKSTREAMS, DOCS, FACE, POCKET, SEAT, SEATS, TEMPLATES, artifactFolderOf,
+  behaviorsDir, bookTemplatesDir, capabilitiesDir, constructsDir, docsOf, inSeat, inTemplates, isProducedPage, mirrorPath,
   overviewsDir, producedPageOf, seatOf, splitAtSeat, workstreamDirOf } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { OWN_COPY, PAGE_SCRIPT, SERVED_FILES, STYLESHEET, cutVersions, linksSharedStyles,
+  stylesDir, BUNDLED_SUFFIX } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 export type Grade = "RULE" | "SOFT";
 export type Finding = { check: string; grade: Grade; file: string; message: string };
 
@@ -49,8 +52,13 @@ export type Finding = { check: string; grade: Grade; file: string; message: stri
 // A PREVIEW is a page a workstream shows the developer before the work is built. It sits in
 // `notes/N<nnn>/previews/`, its file name ends `-preview.html`, and it is written from
 // `workstream/approach-preview-template.html`. It carries no fixed outline.
+/**
+ * The kinds a document's block may declare. `guide` and `index` are the two produced pages beside
+ * a construct page (05-artifacts.md § The guide page, § The index of artifacts).
+ */
 export const VARIANTS = ["approach", "overview", "construct", "behaviors", "capability", "report",
-                  "face", "data_model", "surface_map", "route_map", "register", "preview"] as const;
+                  "face", "data_model", "surface_map", "route_map", "register", "preview",
+                  "guide", "index"] as const;
 export type Variant = (typeof VARIANTS)[number];
 
 /** The words a preview's Status chip shows, as the preview template writes them: the arc's own two. */
@@ -224,6 +232,12 @@ export function isMoment(value: unknown): boolean {
   return !Number.isNaN(new Date(value).getTime());
 }
 
+/** Whether a file sits directly in a docs tree's artifacts pocket, in no folder of it. */
+export function directlyInPocket(file: string): boolean {
+  const parts = file.replace(/\\/g, "/").split("/");
+  return parts.length >= 3 && parts.at(-3) === DOCS && parts.at(-2) === POCKET.artifacts;
+}
+
 export function checkBlock(file: string, src: string, block: any, err: string | null): Finding[] {
   const f: Finding[] = [];
   const add = (grade: Grade, message: string) => f.push({ check: "block", grade, file, message });
@@ -232,10 +246,13 @@ export function checkBlock(file: string, src: string, block: any, err: string | 
   for (const key of ["id", "title", "summary"]) {
     if (typeof block[key] !== "string" || !block[key].trim()) add("RULE", `\`${key}\` is missing or empty`);
   }
-  if (!Array.isArray(block.lenses) || block.lenses.length === 0) add("RULE", "`lenses` is missing or empty");
+  const variant: Variant | undefined = block.variant;
+  // THE INDEX NAMES NO READER. It is a frame around the other pages, and each page it opens carries
+  // its own lenses, so `lenses` is asked of every kind but the index.
+  if (variant === "index" && block.lenses === undefined) { /* an index has no lenses */ }
+  else if (!Array.isArray(block.lenses) || block.lenses.length === 0) add("RULE", "`lenses` is missing or empty");
   else for (const l of block.lenses) if (!(l in LENS_LABEL)) add("RULE", `\`${l}\` is not a lens`);
 
-  const variant: Variant | undefined = block.variant;
   if (variant && !VARIANTS.includes(variant)) add("RULE", `\`variant\` \`${variant}\` is not one of ${VARIANTS.join(" · ")}`);
 
   // AN ARGUMENT IS A WORKSTREAM'S, NEVER A REPOSITORY'S (05-artifacts.md § What the pocket holds).
@@ -245,14 +262,21 @@ export function checkBlock(file: string, src: string, block: any, err: string | 
   if (variant === "approach" && /(^|\/)docs\//.test(file.replace(/\\/g, "/")))
     add("RULE", `an approach page belongs to the workstream that argues it, never to a repository's \`docs/\` — move it under \`${DEVEX_WORKSTREAMS}/\``);
 
-  // THE POCKET'S FOLDER SET IS OVERVIEWS, CONSTRUCTS, REPORTS AND NOTHING ELSE (05-artifacts.md
-  // § What the pocket holds). A file in any other folder of the pocket is a file some seat needs,
-  // so it is a seat depending on a pocket, which is the one thing the pocket rule forbids: 229 such
-  // files once collected across five repositories, 187 cited by nothing at all. A fact a seat needs
-  // lives in a seat.
+  // THE POCKET'S FOLDER SET IS FIXED: OVERVIEWS, CONSTRUCTS, GUIDES, REPORTS AND NOTHING ELSE
+  // (05-artifacts.md § What the pocket holds). A file in any other folder of the pocket is a file
+  // some seat needs, so it is a seat depending on a pocket, which is the one thing the pocket rule
+  // forbids. A fact a seat needs lives in a seat.
   const pocketFolder = artifactFolderOf(file);
   if (pocketFolder !== null && !ARTIFACT_FOLDERS.includes(pocketFolder))
     add("RULE", `the pocket holds ${ARTIFACT_FOLDERS.map((folder) => `\`${folder}/\``).join(", ").replace(/, ([^,]*)$/, " and $1")} — a fact a seat needs lives in a seat, never in \`${pocketFolder}/\``);
+
+  // BESIDE ITS FOLDERS THE POCKET HOLDS ITS FACE AND ONE PAGE, THE INDEX. Every other page sits in
+  // the folder of its kind, and the index sits nowhere but directly in the pocket.
+  const direct = directlyInPocket(file);
+  if (direct && ![FACE, ARTIFACT_INDEX].includes(basename(file)))
+    add("RULE", `\`${ARTIFACT_INDEX}\` is the one page that sits directly in the pocket — this file belongs in ${ARTIFACT_FOLDERS.map((folder) => `\`${folder}/\``).join(", ").replace(/, ([^,]*)$/, " or $1")}`);
+  if (variant === "index" && !(direct && basename(file) === ARTIFACT_INDEX))
+    add("RULE", `a repository has one index, and it is \`${DOCS}/${POCKET.artifacts}/${ARTIFACT_INDEX}\` — \`docs index\` writes it there`);
 
   // An overview describes, a FOUNDATION construct states a standard, and a report is a snapshot;
   // none of the three carries a status. Every other page kind carries one. `carriesStatus` states
@@ -620,13 +644,22 @@ export function checkHeader(file: string, src: string, block: any): Finding[] {
   // reports every markdown document in the corpus as malformed, which is what it was doing.
   if (!file.endsWith(".html")) return checkSeatHeader(file, src, block);
 
+  // THE INDEX HAS NO HEADER LINE AND NO MASTHEAD (05-artifacts.md § The index of artifacts). It is a
+  // frame around other pages, and each page it opens carries its own, so nothing here is asked of it.
+  if (block.variant === "index") return f;
+
   const head = src.match(/<header[\s\S]*?<\/header>/);
   if (!head) { add("RULE", "no `<header>` — every page opens with the two-line header"); return f; }
   const h = head[0];
 
-  const line1 = h.match(/class="line1"[^>]*>([\s\S]*?)<\/span>/);
-  if (!line1) add("RULE", "no identity line — `{workspace} | {location} | {title}`");
-  else {
+  // A HEADER'S FIELDS ARE FOUND BY THE SHARED STYLESHEET'S CLASS NAMES, and by no other. A page that
+  // links no shared stylesheet holds the names of its own copy, so only what its header says with
+  // no class is read: its `<h1>`, its file name and the word before its lenses.
+  const shared = !holdsOwnCopy(file, src);
+
+  const line1 = h.match(/class="sds-line1"[^>]*>([\s\S]*?)<\/span>/);
+  if (shared && !line1) add("RULE", "no identity line — `{workspace} | {location} | {title}`");
+  else if (shared && line1) {
     const parts = text(line1[1]).split("|").map((p) => p.trim()).filter(Boolean);
     if (parts.length !== 3) add("RULE", `the identity line carries ${parts.length} fields, not three`);
     else if (parts[2] !== text(block.title)) add("RULE", `the header title \`${parts[2]}\` is not the block's \`${block.title}\``);
@@ -643,11 +676,11 @@ export function checkHeader(file: string, src: string, block: any): Finding[] {
     add("RULE", `the \`<h1>\` \`${h1[0]}\` is not the block's \`${block.title}\``);
 
   // Type equals the block's variant, and the file name's suffix.
-  const typeBadge = h.match(/class="badge type"[^>]*>([\s\S]*?)<\/span>/);
+  const typeBadge = h.match(/class="sds-badge sds-type"[^>]*>([\s\S]*?)<\/span>/);
   if (block.variant) {
     const want = block.variant.charAt(0).toUpperCase() + block.variant.slice(1);
-    if (!typeBadge) add("RULE", "no Type chip");
-    else if (text(typeBadge[1]) !== want) add("RULE", `Type reads \`${text(typeBadge[1])}\`; the block's variant is \`${block.variant}\``);
+    if (shared && !typeBadge) add("RULE", "no Type chip");
+    else if (shared && typeBadge && text(typeBadge[1]) !== want) add("RULE", `Type reads \`${text(typeBadge[1])}\`; the block's variant is \`${block.variant}\``);
     const suffix = basename(file).replace(/\.html$/, "").split("-").pop();
     if (suffix !== block.variant && !basename(file).includes(`-${block.variant}.`))
       add("SOFT", `the file name does not end \`-${block.variant}.html\``);
@@ -656,14 +689,15 @@ export function checkHeader(file: string, src: string, block: any): Finding[] {
   // For: the lenses, rendered as labels, in the block's order. Never who wrote the page.
   // A preview's header names its arc and its Shown date where every other page names its readers,
   // so its template carries no For chips and none are compared.
-  const chips = [...h.matchAll(/class="badge lens"[^>]*>([\s\S]*?)<\/span>/g)].map((m) => text(m[1]));
+  const chips = [...h.matchAll(/class="sds-badge sds-lens"[^>]*>([\s\S]*?)<\/span>/g)].map((m) => text(m[1]));
   const wantChips = (block.lenses ?? []).map((l: string) => LENS_LABEL[l]).filter(Boolean);
-  if (block.variant !== "preview" && chips.join(" · ") !== wantChips.join(" · "))
+  if (shared && block.variant !== "preview" && chips.join(" · ") !== wantChips.join(" · "))
     add("RULE", `For reads \`${chips.join(" · ")}\`; the block's lenses render as \`${wantChips.join(" · ")}\``);
   if (/\bLenses:/.test(h)) add("RULE", "the tag line reads `For:`, never `Lenses:`");
+  if (!shared) return f;
 
   // Status: the chip carries the enum word; a face and a FOUNDATION construct have no chip at all.
-  const statusChip = h.match(/class="badge status[^"]*"[^>]*>([\s\S]*?)<\/span>/);
+  const statusChip = h.match(/class="sds-badge sds-status[^"]*"[^>]*>([\s\S]*?)<\/span>/);
   if (block.variant === "report") {
     // A REPORT'S HEADER IS TWO LINES UNDER THE BREADCRUMB (05-artifacts.md § The header,
     // RD.DEVEX.WORKSPACE.192): Type and For, then Generated and Commit. Read with the comments
@@ -674,12 +708,12 @@ export function checkHeader(file: string, src: string, block: any): Finding[] {
     const time = shown.match(/<time\b([^>]*)>/);
     const datetime = time ? /\bdatetime="([^"]*)"/.exec(time[1])?.[1] : undefined;
     if (!/>\s*Generated:\s*</.test(shown) || datetime === undefined)
-      add("RULE", "no Generated line — `Generated:` and a `<time class=\"local\" datetime=\"…\">` holding the block's `generatedAt`");
+      add("RULE", "no Generated line — `Generated:` and a `<time class=\"sds-local\" datetime=\"…\">` holding the block's `generatedAt`");
     else {
       if (datetime !== block.generatedAt)
         add("RULE", `Generated reads \`${datetime}\`; the block's \`generatedAt\` is \`${block.generatedAt}\``);
-      if (!/\bclass="[^"]*\blocal\b/.test(time![1]))
-        add("RULE", "the Generated `<time>` carries `class=\"local\"` — the template's script renders only that element in the reader's own time zone");
+      if (!/\bclass="(?:[^"]*\s)?sds-local(?:\s[^"]*)?"/.test(time![1]))
+        add("RULE", "the Generated `<time>` carries `class=\"sds-local\"` — the shared script renders only that element in the reader's own time zone");
     }
     if (!/>\s*Commit:\s*</.test(shown))
       add("RULE", "no Commit — a report names the commit it read, beside Generated");
@@ -712,8 +746,10 @@ export function checkHeader(file: string, src: string, block: any): Finding[] {
 
 export function checkCards(file: string, src: string, block: any): Finding[] {
   const f: Finding[] = [];
+  // A card is found by its class, and a page that links no shared stylesheet holds other names.
+  if (holdsOwnCopy(file, src)) return f;
   const variant = block?.variant;
-  const opens = [...src.matchAll(/<div class="open">/g)];
+  const opens = [...src.matchAll(/<div class="sds-open">/g)];
 
   // A construct and an overview carry no cards at all — the status word says how settled it is.
   if (opens.length && (variant === "construct" || variant === "overview"))
@@ -721,13 +757,13 @@ export function checkCards(file: string, src: string, block: any): Finding[] {
 
   // A card never contains another. Whole-file tag balance cannot see this (finding F6).
   let depth = 0, nested = 0;
-  for (const m of src.matchAll(/<div class="open">|<div\b|<\/div>/g)) {
+  for (const m of src.matchAll(/<div class="sds-open">|<div\b|<\/div>/g)) {
     const t = m[0];
-    if (t === '<div class="open">') { if (depth > 0) nested++; depth++; }
+    if (t === '<div class="sds-open">') { if (depth > 0) nested++; depth++; }
     else if (t.startsWith("<div")) { if (depth > 0) depth++; }
     else if (depth > 0) depth--;
   }
-  if (nested) f.push({ check: "cards", grade: "RULE", file, message: `${nested} card${nested > 1 ? "s are" : " is"} nested inside another; a \`.open\` div was left unclosed` });
+  if (nested) f.push({ check: "cards", grade: "RULE", file, message: `${nested} card${nested > 1 ? "s are" : " is"} nested inside another; a \`.sds-open\` div was left unclosed` });
 
   // An answered card does not sit in `Open` — the page is the record, not the arc (finding F5).
   //
@@ -799,17 +835,62 @@ export function folderTree(dir: string): string[] {
 }
 
 /**
- * A figure that names a DIRECTORY draws that directory's folders, and the audit compares them.
- *
- * This is the same promise the pathed-file figure makes, and the reason it was widened is a page
- * that said *that is what makes the shape checkable on sight* while drawing one skeleton of ten and
- * describing the other nine in a paragraph. A described folder set is a second source: it was wrong
- * about a `SUPPORT_WEB` package the day it was measured, and nothing could have caught it.
- *
- * BOTH DIRECTIONS, because one direction is the weaker half of the promise. A folder drawn that
- * does not exist misleads a reader following the page; a folder that exists and is not drawn is how
- * the page silently falls behind the code it describes. Only the second one happens by itself.
+ * Whether a file is an html page that links no shared stylesheet. Such a page holds its own copy of
+ * the styles and the class names that copy used, so no check reads a class of it. A bundled copy,
+ * `<page>.bundled.html`, is not such a page: it holds the shared styles and the shared names.
  */
+export function holdsOwnCopy(file: string, src: string): boolean {
+  return file.endsWith(".html") && !file.endsWith(BUNDLED_SUFFIX) && !linksSharedStyles(src);
+}
+
+/**
+ * Whether a page sits under a workstream's `closed/` folder. A closed argument stays as it is
+ * rendered, so its styles are never checked (05-artifacts.md § The page itself).
+ */
+export function inClosedWorkstream(file: string): boolean {
+  return file.replace(/\\/g, "/").includes(`/${DEVEX_WORKSTREAMS}/closed/`);
+}
+
+/**
+ * The folder that lists each version of the shared styles in its `versions.json`. `SPN_STYLES`
+ * names it; without that it is the plugin's own `styles/` folder. Null where neither is found.
+ */
+export function stylesFolder(): string | null {
+  return process.env.SPN_STYLES ?? stylesDir(fileURLToPath(import.meta.url));
+}
+
+/** The version named by each `<link>` and `<script>` of a page that loads one of the served files. */
+const SERVED_VERSION = new RegExp(
+  `<(?:link|script)\\b[^>]*\\b(?:href|src)="(?:[^"]*/)?(\\d+\\.\\d+\\.\\d+)/(?:${SERVED_FILES.map((served) => served.replace(/\./g, "\\.")).join("|")})"`, "gi");
+
+/**
+ * A page's furniture is the shared stylesheet's and the shared script's (05-artifacts.md § The page
+ * itself, RD.DEVEX.WORKSPACE.214).
+ *
+ * A PAGE THAT LINKS THE SHARED STYLESHEET IS HELD TO ONE THING: each version its two lines name is
+ * a version that exists. `versions.json` lists them. A line that loads from a folder beside the
+ * page names no version, so there is nothing to compare. A `<style>` block of the page's own draws
+ * no finding, because a page may add a style for a case the shared classes do not cover. A
+ * `<script type="application/json">` draws none either, because data is not furniture.
+ *
+ * A PAGE THAT LINKS NO SHARED STYLESHEET IS NAMED ONCE, SOFT, with the text every command uses for
+ * it. Nothing else is said about its styles, its class names or how it is produced.
+ */
+export function checkFurniture(file: string, src: string): Finding[] {
+  if (!file.endsWith(".html") || inClosedWorkstream(file)) return [];
+  if (!linksSharedStyles(src)) return [{ check: "styles", grade: "SOFT", file, message: OWN_COPY }];
+  const named = [...new Set([...src.matchAll(SERVED_VERSION)].map((found) => found[1]))];
+  const styles = stylesFolder();
+  if (!named.length || styles === null) return [];
+  const versions = Object.keys(cutVersions(styles));
+  const absent = named.filter((version) => !versions.includes(version));
+  if (!absent.length) return [];
+  return [{ check: "furniture", grade: "RULE", file, message:
+    `this page links version ${absent.map((version) => "`" + version + "`").join(" · ")} of the shared styles, and no such version exists. ` +
+    `The versions that exist: ${versions.map((version) => "`" + version + "`").join(" · ") || "none"}. ` +
+    "Link one of them, or cut the version with `docs sds cut` (05-artifacts.md, One stylesheet, served in versions)" }];
+}
+
 /**
  * A page's stylesheet closes every brace it opens.
  *
@@ -821,217 +902,8 @@ export function folderTree(dir: string): string[] {
  *
  * Comments are removed first, because a brace inside one is text rather than structure.
  */
-/**
- * A page carries the furniture its template carries.
- *
- * A PRODUCED PAGE IS COMPARED TO ITS SEAT AND A HAND-WRITTEN ONE TO NOTHING. `checkProduced` takes
- * the stylesheet and the scripts from `construct-template.html` and refuses any difference — but an
- * overview, a hub, an approach page and every sample is authored by hand, so each one carries
- * whichever furniture was current on the day somebody wrote it.
- *
- * Four drifts were found in a single sitting, every one by looking at a page in a browser: a rail
- * that would not fold, a chevron drawn twice, a number beside every rail entry, and headings with
- * no copy-link. One cohort of pages, one generation behind, and nothing that could say so.
- *
- * The scripts are what is compared, because they are the behaviour: the rail builder, the fold, and
- * the anchor that makes a heading shareable. Whitespace is normalized, because a re-indent is not a
- * change in what the page does.
- *
- * THE PALETTE IS COMPARED BY TOKEN NAME AND NEVER BY COLOUR. Fourteen pages defined the seven
- * code-colour tokens in their light block and in neither dark one, so every code figure on them
- * kept light-mode syntax colours on a near-black ground; four guarded the system-dark block with a
- * bare `:root`, which a reader who had explicitly chosen light could not override. A missing token
- * is not a choice — it falls back to whatever the light block said. A DIFFERENT VALUE IS a choice,
- * because the palette is the one part of the furniture a repository is allowed to set for itself.
- */
-export function checkFurniture(file: string, src: string, templates: string, block: any = null): Finding[] {
-  if (!src.includes('id="rail"')) return [];
-  const flatten = (t: string): string[] =>
-    (t.match(/<script\b[^>]*>[\s\S]*?<\/script>/g) ?? []).map((x) => x.replace(/\s+/g, " ").trim()).sort();
-  // A REPORT CARRIES ONE SCRIPT MORE: the one that shows Generated in the reader's own time zone
-  // (RD.DEVEX.WORKSPACE.192). So a report is compared with its own template, a preview with the
-  // preview template, and every other page with the construct template's rail builder, fold and
-  // heading anchor.
-  const from = block?.variant === "report" ? join("pages", "report-template.html")
-    : block?.variant === "preview" ? join("workstream", PREVIEW_TEMPLATE)
-    : join("pages", "construct-template.html");
-  let want: string[];
-  try { want = flatten(readFileSync(join(templates, from), "utf8")); }
-  catch { return []; }
-  if (!want.length) return [];
-  const have = flatten(src);
-  if (have.length === want.length && have.every((h, i) => h === want[i])) return [];
-  const missing = want.filter((w) => !have.includes(w)).length;
-  const extra = have.filter((h) => !want.includes(h)).length;
-  return [{ check: "furniture", grade: "RULE", file, message:
-    `this page's scripts are not the template's — ${missing} missing, ${extra} it does not share. ` +
-    "A page carrying a rail carries the rail builder, the fold and the heading anchor as the template ships them" }];
-}
-
-/** The three palette blocks, in the order a browser resolves them. */
-export const PALETTES: ReadonlyArray<readonly [string, string]> = [
-  [":root", "the light palette"],
-  [':root:not([data-theme="light"])', "the palette a dark system gets"],
-  [':root[data-theme="dark"]', "the palette an explicit dark choice gets"],
-];
-
-/**
- * Every `--token:` declared in the rule with this exact selector, or null when there is no such rule.
- *
- * THE EARLIER OF THE TWO SPELLINGS WINS, never the braced one by preference. Trying `:root{` before
- * `:root {` made the check read a *later* block as the light palette on a page whose dark rule had
- * lost its `:not([data-theme="light"])` guard — and it then reported nine light tokens missing,
- * which was the tool matching the wrong rule rather than the page lacking anything.
- */
-export function paletteTokens(src: string, selector: string): Set<string> | null {
-  const tight = src.indexOf(selector + "{");
-  const loose = src.indexOf(selector + " {");
-  const at = tight < 0 ? loose : loose < 0 ? tight : Math.min(tight, loose);
-  if (at < 0) return null;
-  const open = src.indexOf("{", at);
-  const close = src.indexOf("}", open);
-  if (open < 0 || close < 0) return null;
-  return new Set([...src.slice(open + 1, close).matchAll(/(--[a-z0-9-]+)\s*:/g)].map((m) => m[1]));
-}
-
-/**
- * A page's palette declares every token the template declares, in all three of its blocks.
- *
- * Separate from `checkFurniture` because the remedy is different. A stale script is replaced with
- * the template's; a short palette is filled with the tokens it lacks, and the colours the page
- * already sets are left exactly as they are.
- */
-export function checkPalette(file: string, src: string, templates: string): Finding[] {
-  if (!src.includes('id="rail"')) return [];
-  let tpl: string;
-  try { tpl = readFileSync(join(templates, "pages", "construct-template.html"), "utf8"); }
-  catch { return []; }
-  const f: Finding[] = [];
-  for (const [selector, plain] of PALETTES) {
-    const want = paletteTokens(tpl, selector);
-    if (!want?.size) continue;
-    const have = paletteTokens(src, selector);
-    if (have === null) {
-      f.push({ check: "palette", grade: "RULE", file, message:
-        `there is no \`${selector}\` rule, so ${plain} is missing entirely. ` +
-        "Without it a reader's explicit theme choice loses to whatever their system is set to" });
-      continue;
-    }
-    const short = [...want].filter((t) => !have.has(t));
-    if (!short.length) continue;
-    f.push({ check: "palette", grade: "RULE", file, message:
-      `${plain} declares ${short.length} token(s) fewer than the template — ${short.join(", ")}. ` +
-      "A token the page does not set falls back to the light value, which on a dark ground is unreadable. " +
-      "Add the names; the colours a page already sets are its own" });
-  }
-  return f;
-}
-
-/** The template a preview page is written from, under the templates' `workstream/` folder. */
-export const PREVIEW_TEMPLATE = "approach-preview-template.html";
-
-/**
- * The template an authored page declares, or null where the page is produced or declares none.
- *
- * THE VARIANT NAMES THE TEMPLATE, AND A HUB IS THE ONE OVERVIEW NAMED FOR NO DOMAIN. Both the hub and
- * a domain overview declare `overview`; `hub-template.html` ships the id `concept-overview`, so the
- * page a repository writes from it is `concept-overview.html` and every other overview came from
- * `overview-template.html`. A construct page is produced, and `checkProduced` compares it whole.
- */
-export function declaredTemplate(file: string, block: any, templates: string): string | null {
-  if (!file.endsWith(".html")) return null;
-  const variant = block?.variant;
-  if (variant === "overview")
-    return join(templates, "pages", basename(file) === "concept-overview.html" ? "hub-template.html" : "overview-template.html");
-  if (variant === "report") return join(templates, "pages", "report-template.html");
-  if (variant === "approach") return join(templates, "workstream", "approach-template.html");
-  if (variant === "preview") return join(templates, "workstream", PREVIEW_TEMPLATE);
-  return null;
-}
-
-/**
- * Every selector a page's stylesheets declare, in the order they first appear.
- *
- * EVERY `<style>` BLOCK, NEVER THE FIRST. Every template ships several, and the measurement this
- * replaces once read only the first: it reported the template's own `.prose` and `.nextnav` as
- * bespoke on forty pages, which was the extractor being measured rather than the corpus.
- *
- * A selector list splits at its top-level commas; whitespace and the spacing around a combinator
- * are normalized, because `.a > .b` and `.a>.b` are one selector. A grouping at-rule — `@media`,
- * `@supports` — is read through, since a rule inside one is still a rule the page declares. The
- * body of `@keyframes` is skipped: `from` and `50%` are not selectors.
- */
-export function selectorsIn(src: string): string[] {
-  const seen = new Set<string>();
-  const splitTop = (prelude: string): string[] => {
-    const parts: string[] = [];
-    let depth = 0, current = "";
-    for (const ch of prelude) {
-      if (ch === "(" || ch === "[") depth += 1;
-      if (ch === ")" || ch === "]") depth -= 1;
-      if (ch === "," && depth === 0) { parts.push(current); current = ""; }
-      else current += ch;
-    }
-    parts.push(current);
-    return parts;
-  };
-  const walk = (css: string): void => {
-    let at = 0;
-    while (at < css.length) {
-      const open = css.indexOf("{", at);
-      if (open < 0) return;
-      const prelude = css.slice(at, open).replace(/[;}]/g, " ").trim();
-      let depth = 1, close = open + 1;
-      while (close < css.length && depth) {
-        if (css[close] === "{") depth += 1;
-        else if (css[close] === "}") depth -= 1;
-        close += 1;
-      }
-      const body = css.slice(open + 1, close - 1);
-      if (prelude.startsWith("@")) {
-        if (/^@(media|supports|layer|container)\b/.test(prelude)) walk(body);
-      } else {
-        for (const part of splitTop(prelude)) {
-          const selector = part.replace(/\s+/g, " ").replace(/\s*([>+~])\s*/g, "$1").trim();
-          if (selector) seen.add(selector);
-        }
-      }
-      at = close;
-    }
-  };
-  for (const m of src.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)) walk(m[1].replace(/\/\*[\s\S]*?\*\//g, ""));
-  return [...seen];
-}
-
-/**
- * An authored page defines no selector the template it declares does not (N25 step 6).
- *
- * THE FIGURE WAS MEASURED BY HAND THREE TIMES AND GAVE THREE NUMBERS — 71, 79, 49 — because each
- * measure was a new extractor, and one of them read only a page's first stylesheet. A number nobody
- * can reproduce cannot close a step, so the reader is this check and the figure is its count.
- *
- * AGAINST THE TEMPLATE THE PAGE DECLARES, not the construct template for every page. The hub
- * template blesses `.tile .glyph` and the approach template its `.card` set; measuring a hub
- * against the construct template reports as bespoke a rule its own template ships.
- *
- * SOFT, because the check is new and the pages it names move to the standard blocks one by one.
- * Only the direction a page ADDS is read: a template rule the page lacks is `checkFurniture`'s.
- */
-export function checkSelectors(file: string, src: string, block: any, templates: string): Finding[] {
-  const template = declaredTemplate(file, block, templates);
-  if (!template) return [];
-  let declared: Set<string>;
-  try { declared = new Set(selectorsIn(readFileSync(template, "utf8"))); }
-  catch { return []; }
-  if (!declared.size) return [];
-  const bespoke = selectorsIn(src).filter((s) => !declared.has(s));
-  if (!bespoke.length) return [];
-  return [{ check: "selector", grade: "SOFT", file, message:
-    `defines ${bespoke.length} selector(s) \`${basename(template)}\` does not — ${bespoke.map((s) => "`" + s + "`").join(" · ")}. ` +
-    "A page reaches for a standard block rather than styling its own" }];
-}
-
 export function checkStyleBalance(file: string, src: string): Finding[] {
+  if (holdsOwnCopy(file, src)) return [];
   const f: Finding[] = [];
   const blocks = [...src.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)];
   blocks.forEach((m, i) => {
@@ -1046,6 +918,18 @@ export function checkStyleBalance(file: string, src: string): Finding[] {
   return f;
 }
 
+/**
+ * A figure that names a DIRECTORY draws that directory's folders, and the audit compares them.
+ *
+ * This is the same promise the pathed-file figure makes, and the reason it was widened is a page
+ * that said *that is what makes the shape checkable on sight* while drawing one skeleton of ten and
+ * describing the other nine in a paragraph. A described folder set is a second source: it was wrong
+ * about a `SUPPORT_WEB` package the day it was measured, and nothing could have caught it.
+ *
+ * BOTH DIRECTIONS, because one direction is the weaker half of the promise. A folder drawn that
+ * does not exist misleads a reader following the page; a folder that exists and is not drawn is how
+ * the page silently falls behind the code it describes. Only the second one happens by itself.
+ */
 export function checkTreeFigures(file: string, src: string, root: string): Finding[] {
   const f: Finding[] = [];
   // THE PARAGRAPH BEFORE A TREE NAMES ITS FOLDER, and the path is the LAST `<code>` in it.
@@ -1192,6 +1076,9 @@ export function carriesStatus(file: string, block: any): boolean {
   // IMPLEMENTING, and readers took the page to be unfinished when the repository had gaps.
   if (block?.variant === "report") return false;
   if (block?.variant === "construct" && worldOf(file) === "FOUNDATION") return false;
+  // A GUIDE PAGE AND THE INDEX ARE PRODUCED FROM A SOURCE, and neither has a state of its own
+  // (05-artifacts.md § The guide page). The guide's markdown keeps the status it has.
+  if ((block?.variant === "guide" || block?.variant === "index") && file.endsWith(".html")) return false;
   return true;
 }
 
@@ -1477,6 +1364,9 @@ export function checkProduced(file: string, src: string, block: any, workspace: 
   // reported the seat as a page missing its own source. Saying nothing is the honest answer — the
   // page does not exist yet, and `docs.ts page` is what creates it.
   if (!isProducedPage(file)) return [];
+  // A page that links no shared stylesheet is named once, by the furniture check, and `docs page`
+  // is what moves it. Comparing it here would say the same thing a second time.
+  if (holdsOwnCopy(file, src)) return [];
   // The pocket mirrors the seat folder for folder, so the pair is found by path alone.
   const seat = seatOf(file);
   if (seat === file || !existsSync(seat))
@@ -1922,13 +1812,13 @@ export function buildGlossaryHtml(domainDir: string, overviewFile: string): { bo
   // `\|` is markdown's way to keep a pipe inside a cell; HTML has no such need, so the pipe is bare.
   const cell = (x: string) => esc(x.replace(/\\\|/g, "|")).replace(/`([^`]*)`/g, "<code>$1</code>");
   const out = [
-    '  <div class="scroll"><table class="gloss">',
+    '  <div class="sds-scroll"><table class="sds-glossary">',
     "    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>",
     "    <tbody>",
   ];
   let group: string | null = null;
   for (const r of rows) {
-    if (r.group !== group) { out.push(`      <tr class="grp"><td colspan="3">${esc(r.group)}</td></tr>`); group = r.group; }
+    if (r.group !== group) { out.push(`      <tr class="sds-group"><td colspan="3">${esc(r.group)}</td></tr>`); group = r.group; }
     const href = relative(dirname(overviewFile), pageForSeat(r.file));
     const term = r.term && r.term !== "—" ? `<a href="${href}">${esc(r.term)}</a>` : esc(r.term);
     out.push(`      <tr><td>${term}</td><td>${cell(r.contract)}</td><td>${cell(r.means)}</td></tr>`);
@@ -2250,7 +2140,7 @@ export function placeGlossary(src: string, body: string): string | null {
     if (j < 0) return null;
     next = sec.slice(0, i) + `${begin}\n${body}\n  ${END}` + sec.slice(j + END.length);
   } else {
-    const t = sec.match(/[ \t]*<div class="scroll"><table>[\s\S]*?<\/table><\/div>/);
+    const t = sec.match(/[ \t]*<div class="sds-scroll"><table>[\s\S]*?<\/table><\/div>/);
     if (!t) return null;
     next = sec.replace(t[0], `  ${begin}\n${body}\n  ${END}`);
   }
@@ -2286,8 +2176,14 @@ export function face(tree: string, write: boolean): Finding[] {
     if (overview) {
       const { body: html } = buildGlossaryHtml(dir, overview);
       const ovBefore = readFileSync(overview, "utf8");
-      const ovAfter = placeGlossary(ovBefore, html);
-      if (ovAfter === null)
+      // THE GLOSSARY IS WRITTEN WITH THE SHARED STYLESHEET'S CLASS NAMES, so it goes only into an
+      // overview that links the shared stylesheet. An overview that links none is named once, with
+      // the text every command uses, and nothing is written into it.
+      const ownCopy = holdsOwnCopy(overview, ovBefore);
+      const ovAfter = ownCopy ? ovBefore : placeGlossary(ovBefore, html);
+      if (ownCopy)
+        findings.push({ check: "styles", grade: "SOFT", file: overview, message: OWN_COPY });
+      else if (ovAfter === null)
         findings.push({ check: "face", grade: "SOFT", file: overview, message: "this domain's overview has no `Glossary` section with a table in it, so the domain's glossary has nowhere to land" });
       else if (ovAfter !== ovBefore) { if (write) writeFileSync(overview, ovAfter); touched.push(relative(tree, overview)); }
     }
@@ -2460,25 +2356,27 @@ export function statusFor(seat: string, workspace: string, write: boolean, say: 
 // ---------------------------------------------------------------------------- page
 
 /**
- * The furniture: the template's first stylesheet, then every later stylesheet and every script,
- * taken from the template in its own order. The rail builder runs first, the fold and the anchor
- * links after it, so a script that reads a heading's text sees it before the anchor is appended.
+ * The furniture: the two lines of the construct template that load the shared files. The first is
+ * the line that links `sds-docs.css`, and the second is the line that loads `sds-docs.js`. A
+ * produced page carries those two lines and nothing else of the template's: no `<style>` block and
+ * no script with code (05-artifacts.md § What a stored page carries).
+ *
+ * A TEMPLATE THAT LACKS EITHER LINE IS REFUSED, because a page produced from it would link no
+ * shared file and would show its text with no styling.
  *
  * THE TEMPLATE'S FOOTER IS NOT FURNITURE. It is a note to the author who copies the template, and a
  * produced page is read by somebody else, so the produced footer is empty. A seat carries no footer
  * of its own today; when it does, it is rendered from the seat, never from the template.
  */
-export function furniture(templates: string): { style: string; scripts: string; footer: string } {
-  const t = readFileSync(join(templates, "pages", "construct-template.html"), "utf8");
-  const styles = [...t.matchAll(/<style>[\s\S]*?<\/style>/g)].map((m) => m[0]);
-  const scripts = [...t.matchAll(/<script>[\s\S]*?<\/script>/g)].map((m) => m[0]);
-  const foldStyle = styles.slice(1).join("\n\n");
-  const footer = "";
-  return {
-    style: styles[0] ?? "",
-    scripts: [scripts[0] ?? "", foldStyle, ...scripts.slice(1)].filter(Boolean).join("\n\n"),
-    footer,
-  };
+export function furniture(templates: string): { stylesheet: string; script: string; footer: string } {
+  const template = readFileSync(join(templates, "pages", "construct-template.html"), "utf8");
+  const named = (file: string): string => file.replace(/\./g, "\\.");
+  const stylesheet = new RegExp(`<link\\b[^>]*\\bhref="[^"]*${named(STYLESHEET)}"[^>]*>`, "i").exec(template)?.[0];
+  const script = new RegExp(`<script\\b[^>]*\\bsrc="[^"]*${named(PAGE_SCRIPT)}"[^>]*>\\s*</script>`, "i").exec(template)?.[0];
+  if (!stylesheet || !script)
+    throw new Error(`\`construct-template.html\` holds no line that loads \`${stylesheet ? PAGE_SCRIPT : STYLESHEET}\`, ` +
+      "so a page produced from it would link no shared file (05-artifacts.md, One stylesheet, served in versions)");
+  return { stylesheet, script, footer: "" };
 }
 
 /** The location field: a declared name, never a folder. */
@@ -2641,8 +2539,12 @@ export function pageFor(seat: string, workspace: string, templates: string, writ
   // `platform-grants-construct.html`.
   const out = producedPageOf(seat);
 
+  let lines: ReturnType<typeof furniture>;
+  try { lines = furniture(templates); }
+  catch (error) { findings.push({ check: "page", grade: "RULE", file: seat, message: (error as Error).message }); return findings; }
+
   const { html, findings: rf } = renderPage({
-    block, markdown, workspace: org, location, furniture: furniture(templates),
+    block, markdown, workspace: org, location, furniture: lines,
     link: hrefForPage(seat, out),
     home: overviewAbove(seat, out) ?? undefined,
   });
@@ -2653,6 +2555,11 @@ export function pageFor(seat: string, workspace: string, templates: string, writ
     mkdirSync(dirname(out), { recursive: true });
     writeFileSync(out, html);
     console.log(`${before ? "rewrote " : "wrote   "} ${relative(workspace, out)}`);
+  } else if (before && holdsOwnCopy(out, before)) {
+    // THE PAGE ON DISK LINKS NO SHARED STYLESHEET, so it is named once, the way every command names
+    // such a page, and its markup is not compared. Running this command without `--check` is what
+    // moves it: the page is produced again, with the two lines that load the shared files.
+    findings.push({ check: "styles", grade: "SOFT", file: out, message: OWN_COPY });
   } else {
     findings.push({ check: "page", grade: "RULE", file: out,
       message: before ? "this page is not what `docs.ts page` produces from its seat file — it was edited by hand, or the seat file moved on" : "no page has been produced from this seat file yet" });
@@ -3282,14 +3189,16 @@ export function checkLinks(file: string, src: string): Finding[] {
 }
 
 /**
- * Whether the audit reads a path as a page. Two kinds of file are not pages. A file under a
+ * Whether the audit reads a path as a page. Three kinds of file are not pages. A file under a
  * workstream's `samples/` is a real file of the kind the work produces, in its own format. A template,
  * which is any file under `templates/` or one named `<name>-template.<ext>`, carries placeholders
- * where a page carries its content.
+ * where a page carries its content. A bundled copy, `<page>.bundled.html`, is a page with its styles
+ * inside it, written to be published, and the page it copies is the one the tree holds.
  */
 export function isAuditedPage(path: string): boolean {
   const norm = path.replace(/\\/g, "/");
   if (inTemplates(norm) || /-template\.[a-z]+$/i.test(basename(norm))) return false;
+  if (norm.endsWith(BUNDLED_SUFFIX)) return false;
   const workstream = workstreamDirOf(norm);
   if (workstream && norm.slice(workstream.folder.length).split("/").includes("samples")) return false;
   return true;
@@ -3322,9 +3231,7 @@ export function audit(paths: string[], workspace: string): Finding[] {
     findings.push(...checkStyleBalance(p, src));
     findings.push(...checkLinks(p, src));
     findings.push(...checkConstructLink(p, src));
-    findings.push(...checkFurniture(p, src, templates, block));
-    findings.push(...checkPalette(p, src, templates));
-    findings.push(...checkSelectors(p, src, block, templates));
+    findings.push(...checkFurniture(p, src));
     findings.push(...checkGovernsMap(p, src));
     findings.push(...checkProof(p, src));
     findings.push(...checkBinds(p, src, block));

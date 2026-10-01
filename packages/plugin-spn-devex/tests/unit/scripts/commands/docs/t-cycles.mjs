@@ -9,6 +9,7 @@ import { arcCell, arcId, arcLabel, cycleOf, cyclesOf, previewsCell, previewsOf, 
 import * as cyclesModule from "../../../../../src/scripts/commands/docs/cycles.ts";
 import { main } from "../../../../../src/scripts/cli.ts";
 import { WORKSTREAMS } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { OWN_COPY, linesFor } from "../../../../../../plugin-support-lib/src/lib/page-styles.ts";
 
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
@@ -115,7 +116,7 @@ try {
         `<a href="notes/N010/samples/close_message.md">close_message.md</a> &middot; sample &middot; decided<br>` +
         `<a href="notes/N010/previews/first-preview.html">first-preview.html</a> &middot; preview &middot; decided`, previewsCell(held));
     ok("the Arc cell is the label in bold, then the arc's file as a link from the page",
-      arcCell(held) === `<strong>N010 &mdash; the release</strong><br><a class="s" href="arcs/N010-the-release.md">arcs/N010-the-release.md</a>`, arcCell(held));
+      arcCell(held) === `<strong>N010 &mdash; the release</strong><br><a class="sds-small" href="arcs/N010-the-release.md">arcs/N010-the-release.md</a>`, arcCell(held));
   }
 
   console.log("\n=== docs cycles — the table the approach template carries");
@@ -124,10 +125,10 @@ try {
     ok("the header is Arc · What it does · Status · Previews",
       table.includes("<thead><tr><th>Arc</th><th>What it does</th><th>Status</th><th>Previews</th></tr></thead>"));
     ok("a row is escaped HTML in the template's shape",
-      table.includes(`<tr><td><strong>N10 &mdash; the release</strong><br><a class="s" href="arcs/N10-the-release.md">arcs/N10-the-release.md</a></td>` +
+      table.includes(`<tr><td><strong>N10 &mdash; the release</strong><br><a class="sds-small" href="arcs/N10-the-release.md">arcs/N10-the-release.md</a></td>` +
         "<td>The plugins ship once.</td><td>HELD &middot; waits on Q7</td><td>&mdash;</td></tr>"), table);
     ok("an arc with no number still links its file",
-      table.includes(`<strong>a legacy arc with no number</strong><br><a class="s" href="arcs/arc-legacy.md">arcs/arc-legacy.md</a>`), table);
+      table.includes(`<strong>a legacy arc with no number</strong><br><a class="sds-small" href="arcs/arc-legacy.md">arcs/arc-legacy.md</a>`), table);
   }
 
   console.log("\n=== docs cycles — naming the workstream");
@@ -186,13 +187,13 @@ try {
 
   console.log("\n=== docs cycles — the header's status follows the arcs");
   {
-    const header = (word, glyph) => `<div class="eyebrow"><span class="line1">Workstream</span><span class="st"><span class="lbl">Status:</span> ` +
-      `<span class="badge status ${word.toLowerCase()}">${glyph} ${word}</span></span></div>`;
+    const header = (word, glyph) => `<div class="sds-eyebrow"><span class="sds-line1">Workstream</span><span class="sds-state"><span class="sds-label">Status:</span> ` +
+      `<span class="sds-badge sds-status sds-${word.toLowerCase()}">${glyph} ${word}</span></span></div>`;
     const arcAt = (status) => ({ id: "N1", name: "x", does: "", status, detail: "", file: "N1-x.md", previews: [] });
     const open = join(TMP, ".spndevex", WORKSTREAMS, "open", "045-status");
     const closed = join(TMP, ".spndevex", WORKSTREAMS, "closed", "046-status");
     ok("the word a header shows is read from its labelled status field",
-      cyclesModule.headerStatusOf(header("IMPLEMENTING", "&#x1F6A7;")) === "IMPLEMENTING" && cyclesModule.headerStatusOf(`<div class="eyebrow">Workstream 001 &middot; running</div>`) === null);
+      cyclesModule.headerStatusOf(header("IMPLEMENTING", "&#x1F6A7;")) === "IMPLEMENTING" && cyclesModule.headerStatusOf(`<div class="sds-eyebrow">Workstream 001 &middot; running</div>`) === null);
     for (const [what, statuses, expected] of [
       ["PLANNING while no arc is past DECIDED", ["PROPOSED", "DECIDED", null], "PLANNING"],
       ["IMPLEMENTING once an arc runs", ["DECIDED", "RUNNING"], "IMPLEMENTING"],
@@ -208,7 +209,7 @@ try {
     ok("[MKT.HOOKS.40] IMPLEMENTING over a running arc agrees", cyclesModule.headerStatusRule(open, header("IMPLEMENTING", "&#x1F6A7;"), [arcAt("RUNNING")]) === null);
     ok("[MKT.HOOKS.40] a closed page reading DONE agrees", cyclesModule.headerStatusRule(closed, header("DONE", "&#x2705;"), [arcAt("LANDED")]) === null);
     ok("[MKT.HOOKS.40] a header that labels no status is not judged",
-      cyclesModule.headerStatusRule(open, `<div class="eyebrow">Workstream 001 &middot; running</div>`, [arcAt("RUNNING")]) === null);
+      cyclesModule.headerStatusRule(open, `<div class="sds-eyebrow">Workstream 001 &middot; running</div>`, [arcAt("RUNNING")]) === null);
     ok("[MKT.HOOKS.40] DONE in open/ agrees once every arc is terminal, which is the stamp the close asks for first",
       cyclesModule.headerStatusRule(open, header("DONE", "&#x2705;"), [arcAt("LANDED"), arcAt("DROPPED")]) === null);
     ok("[MKT.HOOKS.40] known-bad: DONE in open/ while an arc still runs",
@@ -219,28 +220,31 @@ try {
   {
     const { cyclesRule, headerRule, openHeadingRule } = await import("../../../../../src/scripts/checks/doc-check.ts");
     const count = (text, piece) => text.split(piece).length - 1;
-    const CARD = (number) => `  <div class="open">\n    <h4 id="q${number}">Q${number} &middot; a question</h4>\n    <div class="rec"><b>Recommended: A.</b> <b>Decision:</b> &mdash;</div>\n  </div>`;
+    const CARD = (number) => `  <div class="sds-open">\n    <h4 id="q${number}">Q${number} &middot; a question</h4>\n    <div class="sds-recommended"><b>Recommended: A.</b> <b>Decision:</b> &mdash;</div>\n  </div>`;
+    // A page in the shared form: it links one version of the shared stylesheet, and every class opens with `sds-`.
     const PAGE = ({ status = "PLANNING", glyph = "&#x1F52E;", cyclesBody, open = "Open &mdash; no card is open", cards = "" }) => `<!doctype html>
-<header class="masthead">
-  <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Workstream &nbsp;|&nbsp; 050 - Write</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Approach</span><span class="st"><span class="lbl">Status:</span> <span class="badge status ${status.toLowerCase()}">${glyph} ${status}</span></span></span></div>
+${linesFor("1.0.0").stylesheet}
+<header class="sds-masthead">
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Workstream &nbsp;|&nbsp; 050 - Write</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Approach</span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-${status.toLowerCase()}">${glyph} ${status}</span></span></span></div>
   <h1>A subject</h1>
 </header>
-<section id="s2"><div class="sec-head"><h2>What &mdash; the shape</h2></div>
-  <div class="scroll"><table><thead><tr><th>Part</th><th>Says</th></tr></thead><tbody><tr><td>one</td><td>a table that is not Cycles</td></tr></tbody></table></div>
+<section id="s2"><div class="sds-section-head"><h2>What &mdash; the shape</h2></div>
+  <div class="sds-scroll"><table><thead><tr><th>Part</th><th>Says</th></tr></thead><tbody><tr><td>one</td><td>a table that is not Cycles</td></tr></tbody></table></div>
 </section>
-<section id="s3"><div class="sec-head"><h2>How &mdash; the order</h2></div>
+<section id="s3"><div class="sds-section-head"><h2>How &mdash; the order</h2></div>
   <h3 id="h1">spn-foundation &mdash; the chapter</h3>
   <p>The chapter first.</p>
 ${cyclesBody}
 </section>
-<section id="s4"><div class="sec-head"><h2>${open}</h2></div>
+<section id="s4"><div class="sds-section-head"><h2>${open}</h2></div>
 ${cards}
 </section>
-<section id="s5"><div class="sec-head"><h2>Deferred &mdash; parked</h2></div></section>
+<section id="s5"><div class="sds-section-head"><h2>Deferred &mdash; parked</h2></div></section>
+${linesFor("1.0.0").script}
 `;
     const CYCLES_H3 = `  <h3 id="h9">Cycles &mdash; the arcs, in the order they run</h3>\n`;
-    const OLD_TABLE = `  <div class="scroll"><table><thead><tr><th>Arc</th><th>What it does</th><th>Status</th><th>Previews</th></tr></thead>\n` +
-      `  <tbody><tr><td><strong>N1 &mdash; the chapter</strong><br><a class="s" href="arcs/N1-the-chapter.md">arcs/N1-the-chapter.md</a></td><td>The chapter says where the model sits.</td><td>PROPOSED</td><td>&mdash;</td></tr></tbody></table></div>`;
+    const OLD_TABLE = `  <div class="sds-scroll"><table><thead><tr><th>Arc</th><th>What it does</th><th>Status</th><th>Previews</th></tr></thead>\n` +
+      `  <tbody><tr><td><strong>N1 &mdash; the chapter</strong><br><a class="sds-small" href="arcs/N1-the-chapter.md">arcs/N1-the-chapter.md</a></td><td>The chapter says where the model sits.</td><td>PROPOSED</td><td>&mdash;</td></tr></tbody></table></div>`;
     const build = (state, name, page) => {
       const home = join(TMP, ".spndevex", WORKSTREAMS, state, name);
       mkdirSync(join(home, "arcs"), { recursive: true });
@@ -263,11 +267,11 @@ ${cards}
       wrote.code === 0 && /the header's status/.test(wrote.out) && /the Cycles table/.test(wrote.out) && /the heading of Open/.test(wrote.out), `${wrote.code} ${wrote.out} ${wrote.err}`);
     ok("[MKT.SCRIPTS.79] after it, the Cycles table is the arcs'", cyclesRule(page, after).length === 0, JSON.stringify(cyclesRule(page, after)));
     ok("[MKT.SCRIPTS.79] the header's status is written with its class, its glyph and its word",
-      after.includes(`<span class="badge status implementing">&#x1F6A7; IMPLEMENTING</span>`) && headerRule(page, after).length === 0);
+      after.includes(`<span class="sds-badge sds-status sds-implementing">&#x1F6A7; IMPLEMENTING</span>`) && headerRule(page, after).length === 0);
     ok("[MKT.SCRIPTS.79] the heading of Open names each open card by its number",
       after.includes("<h2>Open &mdash; Q3</h2>") && openHeadingRule(page, after).length === 0);
     ok("[MKT.SCRIPTS.79] one table, one badge and one heading are replaced, each exactly once",
-      count(after, "<table") === count(before, "<table") && count(after, "badge status") === 1 && count(after, "<h2") === count(before, "<h2") &&
+      count(after, "<table") === count(before, "<table") && count(after, "sds-badge sds-status") === 1 && count(after, "<h2") === count(before, "<h2") &&
       count(after, "<th>Arc</th>") === 1 && after.includes("a table that is not Cycles") && after.includes("<h2>Deferred &mdash; parked</h2>"));
     ok("[MKT.SCRIPTS.79] it adds no generated marker to the page", !after.includes("spn:generated"));
     const writtenAt = stamp(page);
@@ -291,7 +295,7 @@ ${cards}
       readFileSync(join(quiet, "approach.html"), "utf8").includes("<h2>Open &mdash; no card is open</h2>"));
 
     // The rows keep the order the page lists them in: N2 first here, and its stale status is what is written.
-    const N2_FIRST = OLD_TABLE.replace("<tbody><tr>", `<tbody><tr><td><strong>N2 &mdash; the check</strong><br><a class="s" href="arcs/N2-the-check.md">arcs/N2-the-check.md</a></td>` +
+    const N2_FIRST = OLD_TABLE.replace("<tbody><tr>", `<tbody><tr><td><strong>N2 &mdash; the check</strong><br><a class="sds-small" href="arcs/N2-the-check.md">arcs/N2-the-check.md</a></td>` +
       `<td>A check reads the new shape.</td><td>PROPOSED</td><td>&mdash;</td></tr>\n  <tr>`);
     const ordered = build("open", "056-ordered", PAGE({ status: "IMPLEMENTING", glyph: "&#x1F6A7;", cyclesBody: CYCLES_H3 + N2_FIRST }));
     await capture(["docs", "cycles", ordered, "--write"]);
@@ -325,6 +329,49 @@ ${cards}
     const plain = await capture(["docs", "cycles", printed]);
     ok("[MKT.SCRIPTS.79] with no option the command prints the table and writes no file",
       plain.code === 0 && plain.out.includes("<th>Arc</th>") && readFileSync(join(printed, "approach.html"), "utf8") === printedText);
+  }
+
+  console.log("\n=== docs cycles --write — a page that holds its own copy of the styles is refused");
+  {
+    // KNOWN-BAD: the page links no shared stylesheet. Its header, its table and its card use the class
+    // names of its own copy, and all three parts are stale against the arcs.
+    const OWN_PAGE = `<!doctype html>
+<style>.eyebrow{font-size:.8rem} .badge{border-radius:3px} .scroll{overflow-x:auto} .open{border-left:2px solid orange}</style>
+<header class="masthead">
+  <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Workstream &nbsp;|&nbsp; 057 - Own copy</span><span class="st"><span class="lbl">Status:</span> <span class="badge status planning">&#x1F52E; PLANNING</span></span></div>
+  <h1>A subject</h1>
+</header>
+<section id="s3"><div class="sec-head"><h2>How &mdash; the order</h2></div>
+  <h3 id="h9">Cycles &mdash; the arcs, in the order they run</h3>
+  <div class="scroll"><table><thead><tr><th>Arc</th><th>What it does</th><th>Status</th><th>Previews</th></tr></thead>
+  <tbody><tr><td><strong>N1 &mdash; the chapter</strong><br><a class="s" href="arcs/N1-the-chapter.md">arcs/N1-the-chapter.md</a></td><td>The chapter says where the model sits.</td><td>PROPOSED</td><td>&mdash;</td></tr></tbody></table></div>
+</section>
+<section id="s4"><div class="sec-head"><h2>Open &mdash; no card is open</h2></div>
+  <div class="open">\n    <h4 id="q3">Q3 &middot; a question</h4>\n    <div class="rec"><b>Recommended: A.</b> <b>Decision:</b> &mdash;</div>\n  </div>
+</section>
+`;
+    const place = (state, name) => {
+      const home = join(TMP, ".spndevex", WORKSTREAMS, state, name);
+      mkdirSync(join(home, "arcs"), { recursive: true });
+      writeFileSync(join(home, "arcs", "N1-the-chapter.md"), "# N1 — the chapter\n\nStatus: **RUNNING — 2026-10-01.** The chapter says where the model sits.\n");
+      writeFileSync(join(home, "approach.html"), OWN_PAGE);
+      return home;
+    };
+    const own = place("open", "057-own-copy");
+    const refused = await capture(["docs", "cycles", own, "--write"]);
+    ok("[MKT.SCRIPTS.108] --write refuses a page that holds its own copy: exit 1, and the message says how to move it",
+      refused.code === 1 && refused.err.includes(`approach.html: ${OWN_COPY}`) && refused.err.split(OWN_COPY).length - 1 === 1, `${refused.code} ${refused.err}`);
+    ok("[MKT.SCRIPTS.108] and it writes nothing: the page keeps every byte", readFileSync(join(own, "approach.html"), "utf8") === OWN_PAGE);
+    ok("[MKT.SCRIPTS.108] it names no part of the page, because it read no class of it",
+      !/status badge|Cycles table to write|wrote/.test(refused.err + refused.out), refused.err + refused.out);
+    const printed = await capture(["docs", "cycles", own]);
+    ok("[MKT.SCRIPTS.108] with no option the table is still printed from the arcs, in the shared names",
+      printed.code === 0 && printed.out.includes(`<div class="sds-scroll"><table>`) && printed.out.includes(`<a class="sds-small" href="arcs/N1-the-chapter.md">`), printed.out);
+    // A page under `closed/` is never read, so it is neither refused nor written.
+    const shut = place("closed", "058-own-copy-closed");
+    const kept = await capture(["docs", "cycles", shut, "--write"]);
+    ok("[MKT.SCRIPTS.108] a page under closed/ is not read: exit 0, no word about its styles, and no write",
+      kept.code === 0 && !kept.err.includes(OWN_COPY) && readFileSync(join(shut, "approach.html"), "utf8") === OWN_PAGE, `${kept.code} ${kept.out} ${kept.err}`);
   }
 } finally {
   rmSync(TMP, { recursive: true, force: true });

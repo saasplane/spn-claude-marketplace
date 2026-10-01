@@ -9,6 +9,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
 import { ARTIFACT, POCKET, SEAT, bookTemplatesDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { linesFor } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
 const TEMPLATES = bookTemplatesDir(resolve(PLUGIN, "..", "..", "..", "spn-foundation"));
@@ -135,8 +136,9 @@ console.log("\n=== `figures check` takes a folder, the way `audit` does");
   // Given a folder it read the directory itself and died on EISDIR with a raw stack trace, which
   // reads as the tool being broken rather than as the argument being a folder. Found by a step 7
   // agent, which then ran it per file and said so rather than reporting the crash as a green.
-  const page = (svg) => `<h1>p</h1>\n<figure><svg viewBox="0 0 100 60">${svg}</svg></figure>\n`;
-  const clean = page('<rect x="10" y="10" width="40" height="20"/>');
+  // A page in the shared form: the check reads a drawing only on a page that links the shared stylesheet.
+  const page = (svg) => `${linesFor("1.0.0").stylesheet}\n<h1>p</h1>\n<figure><svg class="sds-drawing" viewBox="0 0 100 60">${svg}</svg></figure>\n`;
+  const clean = page('<rect class="sds-box" x="10" y="10" width="40" height="20"/>');
   const ws = repo({
     [`docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/a-construct.html`]: clean,
     [`docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/b-construct.html`]: clean,
@@ -354,7 +356,7 @@ console.log("\n=== a code figure names a PATH; a bare file name is a term");
 {
   const withFig = (name) =>
     "<!-- spn:doc\n" + JSON.stringify({ id: "c", variant: "construct", title: "C", lenses: ["ARCHITECT"], status: "DONE", summary: "s" }) + "\n-->\n\n" +
-    "# C\n\n`For: Architect` · `Status: ✅ DONE`\n\n" +
+    "# C\n\n`For: Architect` · `Status: ✅ DONE`\n\n" + linesFor("1.0.0").stylesheet + "\n" +
     `<p>The manifest <code>${name}</code> declares it:</p>\n<pre>{ "kind": "MODULE_SERVER" }</pre>\n`;
   one("a bare file name is not read as a path to open",
       run(repo({ [`docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/a-construct.html`]: withFig("spkind.json") }), ["audit", "docs"]),

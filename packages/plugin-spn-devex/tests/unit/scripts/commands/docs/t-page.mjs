@@ -10,6 +10,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
 import { ARTIFACT, POCKET, SEAT, bookTemplatesDir } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { OWN_COPY, linksSharedStyles, sharedStyles } from "../../../../../../plugin-support-lib/src/lib/page-styles.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
 const BASE = mkdtempSync(join(tmpdir(), "t-docs-page-"));
@@ -84,24 +85,67 @@ const lacks = (s) => (got) => !String(got).includes(s);
     one("a link out of the seat tree is re-based for the page's depth", page,
         has(`href="../../../${SEAT.capabilities}/x.md"`));
     one("the rail's home link is re-based too, not shipped as `../README.md`", page,
-        (g) => g.includes(`class="home" href="../../../${SEAT.constructs}/README.md"`));
+        (g) => g.includes(`class="sds-home" href="../../../${SEAT.constructs}/README.md"`));
     one("and the page it produced is the page the audit expects", run(ws, ["audit", "docs"]),
         (g) => !/produced/.test(g));
-    // Every script of the template ships, in the template's order: the rail builder, the fold,
-    // and whatever the template adds after them (the anchor links, once the templates carry them).
+    // A PRODUCED PAGE CARRIES THE TEMPLATE'S TWO LINES, AND NOTHING ELSE OF ITS FURNITURE. The line
+    // that links the shared stylesheet sits above the page, and the line that loads the shared
+    // script closes it. Both are read from the book's own template, so the version is the book's.
     const bookTemplate = readFileSync(resolve(templates, "pages", "construct-template.html"), "utf8");
+    const linkLine = bookTemplate.match(/<link\b[^>]*sds-docs\.css"[^>]*>/)[0];
+    const scriptLine = bookTemplate.match(/<script\b[^>]*sds-docs\.js"[^>]*><\/script>/)[0];
+    const pagePath = `docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/thing-construct.html`;
+    const seatPath = `docs/${SEAT.constructs}/01-core/thing.md`;
+    one("a section head carries no number — a heading is a name", page, (g) => !/class="sds-number"/.test(g));
+    one("the template's line names a version at the served address", sharedStyles(linkLine),
+        (g) => g !== null && g.served === true && /^\d+\.\d+\.\d+$/.test(g.version ?? ""));
+    one("the page links the shared stylesheet with the template's own line, above the page", page,
+        has(`${linkLine}\n<div class="sds-page">`));
+    one("and the template's line that loads the shared script closes it", page, (g) => g.trimEnd().endsWith(scriptLine));
+    one("a produced page holds no `<style>` block", page, lacks("<style"));
+    one("and no script with code: its one script is the line that loads the shared file", page,
+        (g) => { const scripts = [...g.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)]; return scripts.length === 1 && scripts[0][1].trim() === ""; });
+    one("every class the producer writes opens with `sds-`", page,
+        (g) => { const names = [...g.matchAll(/class="([^"]+)"/g)].flatMap((found) => found[1].split(" ")); return names.length > 10 && names.every((name) => name.startsWith("sds-")); });
+
+    // A template that also holds a style block and a script with code gives the same page: the two
+    // lines are taken, and nothing else.
     const more = mkdtempSync(join(tmpdir(), "spn-templates-"));
     mkdirSync(join(more, "pages"));
     writeFileSync(join(more, "pages", "construct-template.html"),
-                  bookTemplate + "\n<script>/* a third script: the anchor links */</script>\n");
+                  bookTemplate + "\n<style>.mine{color:red}</style>\n<script>/* a script with code */</script>\n");
     process.env.SPN_TEMPLATES = more;
-    run(ws, ["page", `docs/${SEAT.constructs}/01-core/thing.md`]);
-    const withThree = readAt(ws, `docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/thing-construct.html`);
+    run(ws, ["page", seatPath]);
+    one("a style block and a script with code in the template never reach a produced page", readAt(ws, pagePath), page);
+
+    // KNOWN-BAD: a template with no line that loads the shared stylesheet. A page produced from it
+    // would link no shared file, so the command refuses and the page on disk stays as it is.
+    writeFileSync(join(more, "pages", "construct-template.html"), bookTemplate.replace(linkLine, ""));
+    const refused = run(ws, ["page", seatPath]);
+    one("known-bad: a template with no line that loads the shared stylesheet is refused, and the finding names the file",
+        refused, (g) => g.includes("RULE page") && g.includes("holds no line that loads `sds-docs.css`"));
+    one("and nothing is written: the page on disk is the page it was", readAt(ws, pagePath), page);
     process.env.SPN_TEMPLATES = templates;
-    one("a section head carries no number — a heading is a name", page, (g) => !/class="num"/.test(g));
-    one("the page carries every script the template has, not the first two", withThree,
-        (g) => [...g.matchAll(/<script>[\s\S]*?<\/script>/g)].length ===
-               [...bookTemplate.matchAll(/<script>[\s\S]*?<\/script>/g)].length + 1);
+    rmSync(more, { recursive: true, force: true });
+
+    // A PAGE ON DISK THAT LINKS NO SHARED STYLESHEET HOLDS ITS OWN COPY OF THE STYLES. `--check` names
+    // it once and compares none of its markup; the command without `--check` is what moves it.
+    const ownCopy = '<meta charset="utf-8">\n<style>.badge{color:red}</style>\n<div class="page"><span class="badge">x</span></div>\n';
+    writeFileSync(join(ws, pagePath), ownCopy);
+    const named = run(ws, ["page", seatPath, "--check"]);
+    one("[MKT.SCRIPTS.108] `docs page --check` names a page that holds its own copy once, SOFT, with the text every command uses",
+        named, (g) => (g.match(/! SOFT styles/g) ?? []).length === 1 && g.includes(OWN_COPY));
+    one("[MKT.SCRIPTS.108] and it says nothing else about that page: no refusal, and no `edited by hand`",
+        named, (g) => !g.includes("RULE") && !g.includes("edited by hand"));
+    one("[MKT.SCRIPTS.108] `--check` writes nothing into it", readAt(ws, pagePath), ownCopy);
+    run(ws, ["page", seatPath]);
+    one("[MKT.SCRIPTS.108] `docs page` moves it: the page produced again links the shared stylesheet",
+        readAt(ws, pagePath), (g) => g === page && linksSharedStyles(g));
+    writeFileSync(join(ws, pagePath), page.replace("<h1>", "<h1>Edited "));
+    one("known-bad: a page in the shared form that was edited by hand is still refused by `--check`",
+        run(ws, ["page", seatPath, "--check"]), (g) => g.includes("RULE page") && g.includes("edited by hand") && !g.includes("SOFT styles"));
+    run(ws, ["page", seatPath]);
+
     // THE TEMPLATE'S FOOTER IS A NOTE TO ITS AUTHOR, never furniture. Copied into every produced
     // page, readers of 122 construct pages met "A template from workstream 008 · copy it …", and an
     // edit to the note made every one of them stale at once. The template here carries a marked
@@ -130,9 +174,8 @@ const lacks = (s) => (got) => !String(got).includes(s);
     run(ws, ["page", `docs/${SEAT.constructs}/01-core/thing-sub.md`]);
     const subbed = readAt(ws, `docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/thing-sub-construct.html`);
     one("a seat's subtitle is rendered under the title", subbed,
-      (g) => /<h1>[^<]*<\/h1>\s*<p class="subtitle">One plain promise, under the title.<\/p>/.test(g));
-    one("a seat without one renders no subtitle line", page, (g) => !/<p class="subtitle">/.test(g));
-    rmSync(more, { recursive: true, force: true });
+      (g) => /<h1>[^<]*<\/h1>\s*<p class="sds-subtitle">One plain promise, under the title.<\/p>/.test(g));
+    one("a seat without one renders no subtitle line", page, (g) => !/<p class="sds-subtitle">/.test(g));
 
     // A `\|` in a cell is a pipe the author wants shown. The splitter cut the cell in two and the
     // reader saw a five-column row in a three-column table (N13's sample, 2026-09-21). And a `####`
@@ -152,7 +195,7 @@ const lacks = (s) => (got) => !String(got).includes(s);
       "The promise, in one line.\n\nThe summary paragraph.\n\n## Boundary\n\nx\n"));
     run(ws, ["page", `docs/${SEAT.constructs}/01-core/thing.md`]);
     const page4 = readAt(ws, `docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/thing-construct.html`);
-    one("the first lead paragraph is the standfirst, the rest are the summary", page4, (g) => /<p class="standfirst">The promise, in one line\.<\/p>\s*<p>The summary paragraph\.<\/p>/.test(g));
+    one("the first lead paragraph is the standfirst, the rest are the summary", page4, (g) => /<p class="sds-standfirst">The promise, in one line\.<\/p>\s*<p>The summary paragraph\.<\/p>/.test(g));
 
     // A NUMBERED LIST IS A LIST. There was no case for `1.`, so it fell through to the paragraph path
     // and the reader met one run-on paragraph beginning with the characters `1.` — the order, which is
@@ -197,8 +240,8 @@ console.log("\n=== the rail names the page, and the way back names where it goes
   const page = readAt(ws, `docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/thing-construct.html`);
 
   one("the rail carries the page's own name, not the word Outline",
-    page, has('<div class="rail-title">The Thing Itself</div>'));
-  one("and never the word it replaced", page, lacks('<div class="rail-title">Outline</div>'));
+    page, has('<div class="sds-rail-title">The Thing Itself</div>'));
+  one("and never the word it replaced", page, lacks('<div class="sds-rail-title">Outline</div>'));
   one("the way back reaches the domain's overview, found by its title alone",
     page, has(`href="../../${ARTIFACT.overviews}/concept-anything-at-all-overview.html"`));
   one("and it names the domain rather than a category", page, has("&larr; Core"));

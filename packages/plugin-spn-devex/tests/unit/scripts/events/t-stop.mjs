@@ -11,6 +11,7 @@ import { workspace } from "../../../helpers/fixture.mjs";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve, join } from "node:path";
 import { WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { OWN_COPY, linesFor } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 
 const HOOKS = PLUGIN;
 const SCRIPTS = resolve(HOOKS, "scripts");
@@ -30,33 +31,37 @@ const WORKSPACE = resolve(HOOKS, "..", "..", "..");
 const hasPython = (name) => existsSync(resolve(SCRIPTS, name));
 
 
+// A page in the shared form links one version of the shared stylesheet, and every class of it opens
+// with `sds-`. `STYLES` is that link, as a stored page carries it.
+const STYLES = linesFor("1.0.0").stylesheet;
 const page = ({ rows = [["a thing", "spn-foundation", "&#x2705; landed"]], cards = "", names = [], settled = [] }) => `<!doctype html>
-<div class="eyebrow">Workstream 001 &middot; running</div>
-<section id="s3"><div class="sec-head"><h2>How</h2></div>
+${STYLES}
+<div class="sds-eyebrow">Workstream 001 &middot; running</div>
+<section id="s3"><div class="sds-section-head"><h2>How</h2></div>
   <table><thead><tr><th>What</th><th>Scope</th><th>State</th></tr></thead>
   <tbody>
 ${rows.map(([w, s, st]) => `    <tr><td>${w}</td><td>${s}</td><td>${st}</td></tr>`).join("\n")}
   </tbody></table>
   ${names.map((n) => `<p>The argument behind it is in <code>${n}</code>.</p>`).join("\n  ")}
 </section>
-<section id="s6"><div class="sec-head"><h2>Settled already</h2></div>
+<section id="s6"><div class="sds-section-head"><h2>Settled already</h2></div>
   <table><tbody>
 ${settled.map((c) => `    <tr><td>${c} &middot; a question</td><td>Answered B, 2026-09-09</td></tr>`).join("\n")}
   </tbody></table>
 </section>
-<section id="s4"><div class="sec-head"><h2>Open</h2></div>
+<section id="s4"><div class="sds-section-head"><h2>Open</h2></div>
 ${cards}
 </section>`;
 
 // A CARD IS A TABLE ROW (Q185), options nested, so the reader is exercised on the shape that breaks
 // a first-`</tr>` match rather than on the inline shape that happens to survive one.
-// The template's open card: `<div class="open">` wrapping `<h4 id="qN">`. The page's amber edge and
-// the rail's count badge both key on `.open`, so a card written as a row loses both.
-const CARD = `  <div class="open">
+// The template's open card: `<div class="sds-open">` wrapping `<h4 id="qN">`. The page's amber edge and
+// the rail's count badge both key on `.sds-open`, so a card written as a row loses both.
+const CARD = `  <div class="sds-open">
     <h4 id="q1">Q1 &middot; a real question</h4>
-    <div class="scroll"><table><thead><tr><th></th><th>What</th></tr></thead>
+    <div class="sds-scroll"><table><thead><tr><th></th><th>What</th></tr></thead>
     <tbody><tr><td><strong>A</strong></td><td>one way</td></tr></tbody></table></div>
-    <div class="rec"><b>Recommended: A.</b> <b>Decision:</b> &mdash;</div>
+    <div class="sds-recommended"><b>Recommended: A.</b> <b>Decision:</b> &mdash;</div>
   </div>`;
 
 // A reply given while a card is open opens with **Needs you** (RD.DEVEX.WORKSPACE.189), so every
@@ -640,8 +645,8 @@ console.log("\n=== the handover check — what counts as saying a window is need
   {
     const CARDED = workspace("m1-stop-handover-card", {
       [`.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html`]:
-        `<div class="eyebrow">x</div><section id="s4"><div class="open"><h4 id="q329">Q329 &middot; which way</h4>` +
-        `<div class="rec"><b>Decision:</b> &mdash;</div></div></section><p>N1-a.md</p>`,
+        `${STYLES}<div class="sds-eyebrow">x</div><section id="s4"><div class="sds-open"><h4 id="q329">Q329 &middot; which way</h4>` +
+        `<div class="sds-recommended"><b>Decision:</b> &mdash;</div></div></section><p>N1-a.md</p>`,
       [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-a.md`]: "# N1\n",
     });
     const reply = "Q329 · which way\n\n**What** — the gate.\n\n**Why** — what it costs to leave it.\n\n" +
@@ -827,11 +832,11 @@ console.log("\n=== runnable — a row held on an open card is not runnable, and 
     `| 6 | spn-foundation | DOCS | the chapter | by hand | audit | LANDED — \`abc1234\` |\n` +
     `| 7 | spn-support-ts | CODE | the split check | by hand | its suite | ${mark} |\n\n## Log\n\n- **2026-09-29 — go.**\n`;
   // Card Q352 as the template writes it: open, then the same card carrying its decision.
-  const Q352 = (decision) => `  <div class="open">
+  const Q352 = (decision) => `  <div class="sds-open">
     <h4 id="q352">Q352 &middot; which way</h4>
-    <div class="scroll"><table><thead><tr><th></th><th>What</th></tr></thead>
+    <div class="sds-scroll"><table><thead><tr><th></th><th>What</th></tr></thead>
     <tbody><tr><td><strong>A</strong></td><td>one way</td></tr></tbody></table></div>
-    <div class="rec"><b>Recommended: A.</b> <b>Decision:</b> ${decision}</div>
+    <div class="sds-recommended"><b>Recommended: A.</b> <b>Decision:</b> ${decision}</div>
   </div>`;
   const arcIn = (name, mark, decision) => {
     const root = workspace(name, {
@@ -1298,12 +1303,13 @@ console.log("\n=== stop — a page left stale by an arc this session wrote, and 
     `| 2 | spn-support-ts | CODE | the check | by hand | its suite | ${state} |\n\n## Log\n\n- **2026-10-01 — go.**\n`;
   // A page in the approach template's shape: a labelled status, How ending in Cycles, and Open.
   const pageFor = (folder, status, glyph) => `<!doctype html>
-<div class="eyebrow"><span class="line1">Workstream</span><span class="st"><span class="lbl">Status:</span> <span class="badge status ${status.toLowerCase()}">${glyph} ${status}</span></span></div>
-<section id="s3"><div class="sec-head"><h2>How &mdash; the order</h2></div>
+${STYLES}
+<div class="sds-eyebrow"><span class="sds-line1">Workstream</span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-${status.toLowerCase()}">${glyph} ${status}</span></span></div>
+<section id="s3"><div class="sds-section-head"><h2>How &mdash; the order</h2></div>
   <h3 id="h9">Cycles &mdash; the arcs, in the order they run</h3>
 ${tableOf(cyclesOf(folder))}
 </section>
-<section id="s4"><div class="sec-head"><h2>Open &mdash; no card is open</h2></div>
+<section id="s4"><div class="sds-section-head"><h2>Open &mdash; no card is open</h2></div>
 </section>
 `;
   /** A workspace whose page is current for an arc at `status`, and a transcript that has only read the arc. */
@@ -1419,6 +1425,62 @@ ${tableOf(cyclesOf(folder))}
     stop(built, "h-reader");
     move(built, "LANDED", "", false);
     check("[MKT.HOOKS.36] an arc another window landed is not this session's to hear about", !/\[arc-landed\]/.test(stop(built, "h-reader")));
+  }
+
+  console.log("\n=== stop — a page that holds its own copy of the styles");
+  const { checkOwnCopy, ownCopyPages } = await import("../../../../src/scripts/events/stop.ts");
+  // A page as it was written before the shared stylesheet: it links nothing, it carries a style block,
+  // and its classes have no prefix. Its one card is a `div.open`, the name its own copy uses.
+  const OLD_CARD = `  <div class="open">\n    <h4 id="q1">Q1 &middot; a real question</h4>\n    <div class="rec"><b>Recommended: A.</b> <b>Decision:</b> &mdash;</div>\n  </div>\n`;
+  const ownPageFor = (folder, status, glyph) => pageFor(folder, status, glyph)
+    .replace(STYLES, "<style>.eyebrow{font-size:.8rem} .open{border-left:2px solid orange}</style>").replace(/sds-/g, "")
+    .replace(`no card is open</h2></div>\n`, `no card is open</h2></div>\n${OLD_CARD}`);
+  const HALF = "◐ stopped — half of it is written";
+  const buildOwn = (name, form = ownPageFor) => {
+    const built = build(name, "RUNNING", "");
+    writeFileSync(built.page, form(join(built.root, A), "PLANNING", "&#x1F52E;"));
+    return built;
+  };
+  // KNOWN-BAD FOR A READER OF THE SHARED NAMES: a row is stopped, the header reads PLANNING over a
+  // running arc, and the page's only card is a `div.open`. Read by the shared names the page has no
+  // card, so `stopped-no-card` would speak; read as the page-stale check reads, its header is stale.
+  {
+    const built = buildOwn("n008-stop-own-copy");
+    const text = readFileSync(built.page, "utf8");
+    check("the fixture links no shared stylesheet and holds no shared name", !text.includes("sds-") && text.includes("<style>") && text.includes(`<div class="open">`));
+    const first = stop(built, "o-own");
+    check("a session that wrote nothing to the workstream is told nothing about its page", !/\[own-copy\]/.test(first), first);
+    move(built, "RUNNING", HALF);
+    const out = stop(built, "o-own");
+    check("[MKT.SCRIPTS.108] the Stop hook names a page with its own copy once, as a SOFT line with what to do",
+      count(out, "[own-copy]") === 1 && count(out, OWN_COPY) === 1 && out.includes(`[SOFT] \`${A}/approach.html\`: ${OWN_COPY}`), out);
+    check("[MKT.SCRIPTS.108] it reads no class of the page: it does not say that Open carries no card", !/\[stopped-no-card\]/.test(out) && !/\[cards-in-arcs\]/.test(out), out);
+    check("[MKT.SCRIPTS.108] and it does not name the command that refuses such a page", !/\[page-stale\]/.test(out), out);
+    check("[MKT.SCRIPTS.108] the card of such a page is still read by its id, so the reply is still asked to open with Needs you",
+      /\[needs-you\] A card is open — Q1/.test(out), out);
+    const again = stop(built, "o-own");
+    check("[MKT.SCRIPTS.108] the page is named once in a session: the next Stop does not name it again", !/\[own-copy\]/.test(again), again);
+    check("[MKT.SCRIPTS.108] another session that writes to the workstream is told once too",
+      count(run("node", [HOOK], { cwd: built.root, last_assistant_message: "done", session_id: "o-other" }, built.root), "[own-copy]") === 1);
+  }
+  // UNTOUCHED: the same workstream with its page in the shared form, and the same card as a `div.sds-open`.
+  {
+    const shared = (folder, status, glyph) => pageFor(folder, status, glyph).replace(`no card is open</h2></div>\n`, `no card is open</h2></div>\n${CARD}\n`);
+    const built = buildOwn("n008-stop-shared-form", shared);
+    stop(built, "o-shared");
+    move(built, "RUNNING", HALF);
+    const out = stop(built, "o-shared");
+    check("[MKT.SCRIPTS.108] untouched: a page in the shared form is not named", !/\[own-copy\]/.test(out) && !out.includes(OWN_COPY), out);
+    check("[MKT.SCRIPTS.108] untouched: and it is read, so its stale header is said", count(out, "[page-stale]") === 1 && out.includes("the header's status"), out);
+    check("[MKT.SCRIPTS.108] untouched: its `div.sds-open` card is seen, so a stopped row is not reported as having no card", !/\[stopped-no-card\]/.test(out), out);
+  }
+  // The same reading, asked of the function: the lines it names, and the ones a session was told before.
+  {
+    const built = buildOwn("n008-stop-own-copy-lines");
+    const lines = ownCopyPages(built.root);
+    check("[MKT.SCRIPTS.108] the line is the page's path from the workspace, then OWN_COPY", lines.length === 1 && lines[0] === `\`${A}/approach.html\`: ${OWN_COPY}.`, JSON.stringify(lines));
+    check("[MKT.SCRIPTS.108] a workstream that is not this session's is not read", ownCopyPages(built.root, new Set(["002-b-subject"])).length === 0);
+    check("[MKT.SCRIPTS.108] a page the session was told about before draws no warning", checkOwnCopy(built.root, null, lines).length === 0 && checkOwnCopy(built.root, null, []).length === 1);
   }
 }
 

@@ -44,7 +44,7 @@ export const POCKET = { registers: "registers", artifacts: "artifacts" } as cons
 export type Pocket = keyof typeof POCKET;
 
 /** The artifacts pocket's folder set, which is fixed (05-artifacts.md § What the pocket holds). */
-export const ARTIFACT = { overviews: "overviews", constructs: "constructs", reports: "reports" } as const;
+export const ARTIFACT = { overviews: "overviews", constructs: "constructs", guides: "guides", reports: "reports" } as const;
 export const ARTIFACT_FOLDERS: readonly string[] = Object.values(ARTIFACT);
 
 /** The one folder a seat may hold that is not documents (03-tree.md § A seat may carry `templates/`). */
@@ -56,6 +56,10 @@ export const FACE = "README.md";
 export const DECISIONS = "decisions.md";
 /** What a construct page's file name ends in, beside the seat file's stem. */
 export const CONSTRUCT_PAGE_SUFFIX = "-construct.html";
+/** What a guide page's file name ends in. */
+export const GUIDE_PAGE_SUFFIX = "-guide.html";
+/** The index of artifacts: one per repository, directly in the pocket. */
+export const ARTIFACT_INDEX = "index.html";
 /** The hub: one per repository, the entry point of the overviews. */
 export const HUB = "concept-overview.html";
 
@@ -81,6 +85,10 @@ export function overviewsDir(docs: string): string { return join(artifactsDir(do
 /** Where construct pages sit: the pocket folder that mirrors the constructs seat folder for folder. */
 export function constructPagesDir(docs: string): string { return join(artifactsDir(docs), ARTIFACT.constructs); }
 export function reportsDir(docs: string): string { return join(artifactsDir(docs), ARTIFACT.reports); }
+/** Where guide pages sit: the pocket folder that holds each guide produced as a page. */
+export function guidePagesDir(docs: string): string { return join(artifactsDir(docs), ARTIFACT.guides); }
+/** The index of artifacts of a docs tree. */
+export function artifactIndex(docs: string): string { return join(artifactsDir(docs), ARTIFACT_INDEX); }
 /** The hub page of a docs tree. */
 export function hubPage(docs: string): string { return join(overviewsDir(docs), HUB); }
 /**

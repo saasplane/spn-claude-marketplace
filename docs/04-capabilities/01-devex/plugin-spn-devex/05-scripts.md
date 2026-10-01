@@ -42,6 +42,10 @@ Everything this plugin can execute sits under `packages/plugin-spn-devex/src/scr
 | What a register and a run are | `packages/plugin-support-lib/src/lib/register.ts`, `packages/plugin-support-lib/src/lib/runs.ts` | the headings a register carries, each column found by its heading, a behaviour id with a first part of two to seven letters, and the files of one named run, `tests/.output/<tier>/runs/<run>.json` and every `<run>.<phase>.json`, read one way — shared with `spn-apps`, so it lives in the plain support folder rather than one plugin |
 | The tiers each kind owes | `packages/plugin-support-lib/src/lib/kinds.ts` | the book's table of kind and owed tier, restated because a plugin imports nothing |
 | The library both callers read | `packages/plugin-spn-devex/src/scripts/lib/` | `render.ts` produces a page · `draw.ts` draws a figure · `figures.ts` checks one · `restates.ts` parses a stamp |
+| The versions of the page styles | `packages/plugin-spn-devex/src/scripts/commands/docs/sds.ts` | cuts a version, moves pages to one, and writes a page's bundled copy, run as `spn-devex docs sds cut`, `repoint` and `bundle` |
+| The index of artifacts | `packages/plugin-spn-devex/src/scripts/commands/docs/index.ts` | writes a repository's `docs/artifacts/index.html` from the pages on disk, run as `spn-devex docs index <repository>` |
+| A guide's page | `packages/plugin-spn-devex/src/scripts/commands/docs/guide.ts` | writes a guide's page from its markdown, run as `spn-devex docs guide <guide.md>` |
+| What a page links | `packages/plugin-support-lib/src/lib/page-styles.ts` | the address of the shared files, whether a page links them and in which version, and the versions that were cut |
 | The shared page styles | `packages/plugin-spn-devex/src/styles/`, `scripts/build-styles.mjs`, `public/assets/docs/` | the source of the one stylesheet and the two scripts every page loads, the command that builds the stylesheet, and one folder for each version that was cut |
 
 ## Follows the pattern
@@ -219,6 +223,24 @@ Everything this plugin can execute sits under `packages/plugin-spn-devex/src/scr
 **Why** — *every page links one version of the shared stylesheet and script* (RD.DEVEX.WORKSPACE.214). A page that held its own copy of the styles fell behind alone, so the styles have one source, and this repository is public, so it can serve them.
 **What** — `packages/plugin-spn-devex/src/styles/` holds the source: `sds-docs.src.css`, in which our tokens are Tailwind's theme, and the two scripts, `sds-docs.js` and `sds-index.js`. `node scripts/build-styles.mjs` builds `sds-docs.css` beside the source, and with `--check` it exits 1 where the built file differs from a fresh build. `public/assets/docs/<version>/` holds the three served files of one version, and `versions.json` lists each version with the hash of each file. The workflow `.github/workflows/pages.yml` serves `public/` when `develop` is pushed.
 **How** — Tailwind is a development dependency of the repository's root, pinned to one version beside esbuild. An installed plugin holds the built file and never runs the tool. The tool writes no time into the file, so two builds are the same bytes. A version's folder is never edited: the case reads each file's hash from `versions.json` and fails where a served file has changed. `packages/plugin-spn-devex/tests/unit/t-styles-current.mjs`.
+
+### A version is cut, pages move to it, and a page is bundled
+
+**Why** — *a version is a folder that never changes*, and *a published page carries its version's styles inside it* (RD.DEVEX.WORKSPACE.214, RD.DEVEX.WORKSPACE.215). A person who copied the files by hand could change a version that pages already link.
+**What** — `docs sds cut <version>` copies the three served files into `public/assets/docs/<version>/` and lists the version in `versions.json` with the hash of each file. It refuses a version that exists. `docs sds repoint <version> <folder>` rewrites the version in each page's lines that load a shared file, and in no other text of the page. It refuses a version that was never cut. `docs sds bundle <page>` writes `<name>.bundled.html` beside the page, with that version's stylesheet and scripts inside it. It refuses a page that links no shared stylesheet.
+**How** — `cut` runs in this repository alone, because only it holds `public/`. `bundle` reads the version's files from `--assets`, else from a marketplace checkout beside the workspace's repositories, else from the address. A page's own style block is kept as it is. `packages/plugin-spn-devex/src/scripts/commands/docs/sds.ts`, proven in `packages/plugin-spn-devex/tests/unit/scripts/commands/docs/t-sds.mjs`.
+
+### The index and a guide's page are produced, never typed
+
+**Why** — *each repository's artifacts open from one page*, and *two guides are a page in every repository* (RD.DEVEX.WORKSPACE.218, RD.DEVEX.WORKSPACE.219). A list of pages typed by hand is behind as soon as a page is added.
+**What** — `docs index <repository>` writes `docs/artifacts/index.html` from the pages on disk: the groups Docs, Guides and Reports, with an empty group left out. With `--check` it lists each page the tree lacks and each entry that has no page. `docs guide <guide.md>` writes the guide's page: its stages, and steps that number themselves. A heading that opens with *Step*, a number and a dash is a step. Where it finds no step, it names the guide and writes no page.
+**How** — each fills the book's template and links the newest version that was cut. The index reads a page's block, its title, its path and its links, and never a class. `packages/plugin-spn-devex/src/scripts/commands/docs/index.ts` and `guide.ts`, with what they share in `_pages.ts`, proven in `t-index.mjs` and `t-guide.mjs` beside the suite above.
+
+### Every script knows one set of class names
+
+**Why** — *every class of the shared stylesheet opens with `sds-`* (RD.DEVEX.WORKSPACE.216), and a page finds its styles by those names alone. A script that knew a second set of names would keep the earlier ones alive.
+**What** — each command and check that reads a page reads the shared stylesheet's class names, and writes no other. A page that links no shared stylesheet holds its own copy of the styles: it is named once, as SOFT, and no class of it is read. A command that writes into a page refuses such a page. A page may add one style block of its own, and no script reads a class the page defines itself.
+**How** — each asks `linksSharedStyles` before it reads a class. `docs audit` holds a page to a version that `versions.json` lists, and knows the variants `guide` and `index`. `packages/plugin-support-lib/src/lib/page-styles.ts`, proven in `packages/plugin-support-lib/tests/unit/lib/t-page-styles.mjs` and in `t-audit.mjs`.
 
 ## Between modules
 

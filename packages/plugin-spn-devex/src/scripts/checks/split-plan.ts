@@ -32,8 +32,12 @@
 // was spent on `Bash`, at a median of 10.24 ms per call whatever the command said. It broke the rule
 // this arc states: a hook reads the file that changed and nothing else. See § the fast path below.
 //
-// It also carries finding F5's fix: a card answered ON THE PAGE, in its own `rec` block, was invisible
-// to a check that read only the arcs. Four cards sat in `Open` answered for a day.
+// It also carries finding F5's fix: a card answered ON THE PAGE, in its own `sds-recommended` block,
+// was invisible to a check that read only the arcs. Four cards sat in `Open` answered for a day.
+//
+// EVERY CLASS READ HERE IS A NAME OF THE SHARED STYLESHEET (05-artifacts.md § One stylesheet, served
+// in versions). No class is read of a page that links no shared stylesheet: its cards are read by
+// their `id`, its header is not read, and the gate names the page once with `OWN_COPY`.
 
 import { readdirSync, statSync } from "node:fs";
 import { TERMINAL, statusIn } from "./arc-status.ts";
@@ -42,6 +46,7 @@ import { emit, isDir, isFile, listdir, read, readPayload, runAlone, unescape, wo
          type Payload, type Verdict } from "../lib/payload.ts";
 import { APPROACH_SUFFIX, ARCS, DEVEX, SESSIONS, WORKSTREAM_STATES, WORKSTREAMS, isApproachPage, legacyWorkstreamsDir, workstreamsDir,
          type WorkstreamState } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { OWN_COPY, linksSharedStyles } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 
 // The state a row reaches. `landed` is the only one that satisfies the documents pass; all three
 // named states satisfy the close. A mark nobody wrote is what the close refuses.
@@ -701,8 +706,8 @@ export function closing(destination: string): boolean {
 // THE PAGE ALONE CANNOT TELL whether a card is answered from the log, so this reads the arc beside it.
 // An arc logs an answer by naming the number — `Q3 to Q7 answered`, `Q13 answered C`.
 //
-// AND THE PAGE CAN SAY SO ITSELF, which is finding F5. A card whose own `rec` block carries a
-// `Decision:` with an answer in it has been answered ON THE PAGE, and the arc may never mention it.
+// AND THE PAGE CAN SAY SO ITSELF, which is finding F5. A card whose own `sds-recommended` block carries
+// a `Decision:` with an answer in it has been answered ON THE PAGE, and the arc may never mention it.
 // `answered_numbers()` read only the arcs, so four cards sat in `Open` answered for a day and the
 // developer found them by opening the published page. The check trusted the log and not the record,
 // and the page IS the record.
@@ -711,18 +716,18 @@ export function closing(destination: string): boolean {
 // to fold a card, and refusing a write during that would refuse the fix itself.
 
 // ONE CARD SHAPE (RD.DEVEX.WORKSPACE.147). `approach-template.html` writes a card as
-// `<div class="open">` wrapping `<h4 id="q<n>">`, and this reader looks for the `h4` alone. The
-// `.open` block carries the amber edge that marks a card undecided, and the rail's count badge is
-// `s4.querySelectorAll('.open').length`, so a card written any other way is invisible to the page as
-// well as to this check. So ANY OTHER `id="q<n>"` IN `Open` IS REFUSED rather than read (Q389 A):
-// `div.card` is the green decided shape, and a card inside one escapes the rail's count. A second
+// `<div class="sds-open">` wrapping `<h4 id="q<n>">`, and this reader looks for the `h4` alone. The
+// `.sds-open` block carries the amber edge that marks a card undecided, and the rail's count badge is
+// `s4.querySelectorAll('.sds-open').length`, so a card written any other way is invisible to the page
+// as well as to this check. So ANY OTHER `id="q<n>"` IN `Open` IS REFUSED rather than read (Q389 A):
+// `div.sds-card` is the green decided shape, and a card inside one escapes the rail's count. A second
 // spelling is never read as a card, because two spellings with one reader is the drift `Q185`
 // option C was refused for.
 //
 // A card runs from its own `h4` to the next one or the end of the section. Reading it by the
-// wrapping `<div>` does not work: the card nests a `<div class="scroll">` table and a
-// `<div class="rec">`, so a non-greedy match ends at the first inner `</div>` and never sees the
-// decision. That is the shape of F5.
+// wrapping `<div>` does not work: the card nests a `<div class="sds-scroll">` table and a
+// `<div class="sds-recommended">`, so a non-greedy match ends at the first inner `</div>` and never
+// sees the decision. That is the shape of F5.
 const OPEN_SECTION = /<section id="s4"[\s\S]*?<\/section>/i;
 const CARD_OPEN = /<h4[^>]*\bid="(q\d+)"[^>]*>/gi;
 const DECISION = /<b>\s*Decision:?\s*<\/b>([\s\S]{0,600})/i;
@@ -798,9 +803,9 @@ export function cardsIn(text: string): Array<{ number: string; decided: boolean 
  * One card whole — from its own heading to the next card's, or to the end of the section.
  *
  * READING IT BY THE WRAPPING `<div>` DOES NOT WORK, and that is why this takes the heading as its
- * anchor: a card nests a `<div class="scroll">` around its options table and a `<div class="rec">`
- * around its recommendation, so a non-greedy match on the wrapper stops at the first inner `</div>`
- * and never reaches the decision. The heading-to-heading span has no such hole.
+ * anchor: a card nests a `<div class="sds-scroll">` around its options table and a
+ * `<div class="sds-recommended">` around its recommendation, so a non-greedy match on the wrapper stops
+ * at the first inner `</div>` and never reaches the decision. The heading-to-heading span has no such hole.
  */
 function cardAt(html: string, start: number): string {
   const NEXT = /<h4[^>]*\bid="q\d+"[^>]*>/gi;
@@ -824,12 +829,35 @@ function enclosingDivClass(html: string, at: number): string | null {
   return open.length ? open[open.length - 1] : null;
 }
 
+/** Whether a page holds its own copy of the styles: a file that can be read and links no shared stylesheet. */
+export function holdsOwnCopy(page: string): boolean {
+  const text = read(page);
+  return text !== "" && !linksSharedStyles(text);
+}
+
+/**
+ * One line for each of these pages that holds its own copy of the styles: the page's path from the
+ * workspace, then `OWN_COPY`. A page under a `closed/` folder is never named. Empty where every page
+ * links the shared stylesheet.
+ */
+export function ownCopyLines(root: string, pages: string[]): string[] {
+  return pages.filter((page) => !closing(page) && holdsOwnCopy(page))
+    .map((page) => `\`${slashes(relative(root, page))}\`: ${OWN_COPY}.`);
+}
+
+// What a gate adds under the lines of `ownCopyLines`, so a reader knows what was left unread.
+const OWN_COPY_UNREAD = "Until such a page links `sds-docs.css`, its cards are read by their `id`, and " +
+  "the shape of a card and the header's status are not checked.";
+
 /**
  * Each `id="q<n>"` in a page's `Open` section that is not an open card — an `h4` directly inside a
- * `div.open` — with the shape it was written in instead.
+ * `div.sds-open` — with the shape it was written in instead. A page that holds its own copy of the
+ * styles has none: a shape is told by a class, and no class of such a page is read.
  */
 export function misshapenCards(page: string): Array<{ number: string; shape: string }> {
-  const section = OPEN_SECTION.exec(read(page));
+  const text = read(page);
+  if (!linksSharedStyles(text)) return [];
+  const section = OPEN_SECTION.exec(text);
   if (!section) return [];
   const html = section[0];
   const out: Array<{ number: string; shape: string }> = [];
@@ -838,10 +866,10 @@ export function misshapenCards(page: string): Array<{ number: string; shape: str
     const tag = m[1].toLowerCase();
     const wrapper = tag === "div" ? /\bclass="([^"]*)"/i.exec(m[0])?.[1] ?? "" : enclosingDivClass(html, m.index);
     const classes = (wrapper ?? "").split(/\s+/);
-    if (tag === "h4" && classes.includes("open")) continue;
+    if (tag === "h4" && classes.includes("sds-open")) continue;
     const shape = tag === "h4"
-      ? `an \`h4\` inside ${wrapper === null ? "no `div`" : classes.includes("card") ? "a `div.card`" : `a \`div.${classes.filter(Boolean).join(".") || "div"}\``}`
-      : tag === "div" && classes.includes("card") ? "a `div.card`" : `a \`${tag}\``;
+      ? `an \`h4\` inside ${wrapper === null ? "no `div`" : classes.includes("sds-card") ? "a `div.sds-card`" : `a \`div.${classes.filter(Boolean).join(".") || "div"}\``}`
+      : tag === "div" && classes.includes("sds-card") ? "a `div.sds-card`" : `a \`${tag}\``;
     out.push({ number: m[2].toUpperCase(), shape });
   }
   return out;
@@ -926,7 +954,7 @@ export function gateDocumentsFirst(payload: Payload): Verdict {
         const more = misshapen.length > 6 ? ` and ${misshapen.length - 6} more` : "";
         return { note:
           `A card in \`Open\` is not in the open-card shape — ${named}${more}. An open card is a ` +
-          `\`<div class="open">\` wrapping \`<h4 id="q<n>">\` (RD.DEVEX.WORKSPACE.147); \`div.card\` is ` +
+          `\`<div class="sds-open">\` wrapping \`<h4 id="q<n>">\` (RD.DEVEX.WORKSPACE.147); \`div.sds-card\` is ` +
           `the decided shape, so the page shows the question as settled and the rail does not count ` +
           `it. Fold an answered card into the section that states its decision, and rewrite a ` +
           `question still open in the open shape (05-artifacts.md, A card).` };
@@ -965,6 +993,19 @@ export function gateDocumentsFirst(payload: Payload): Verdict {
         `this page IS the landing, say so and land the row.` };
     }
   }
+
+  // A PAGE THAT HOLDS ITS OWN COPY OF THE STYLES IS NAMED, where this call names its workstream. The
+  // gate reads every open workstream on every call, so a page of a workstream the call does not name
+  // is left unsaid, and no class of it is read either way. The page the call itself writes is
+  // `doc-check`'s to name, so one call never says it twice.
+  if (root) {
+    const subject = subjectText(payload);
+    const written = supplied.file_path ? resolve(cwd, supplied.file_path) : null;
+    const unmoved = [...openWorkstreams(root)].sort((a, b) => a[0].localeCompare(b[0]))
+      .filter(([name]) => subject.includes(name))
+      .flatMap(([, pages]) => ownCopyLines(root, pages.filter((page) => resolve(page) !== written)));
+    if (unmoved.length) return { note: `[SOFT] ${unmoved.join("\n[SOFT] ")}\n${OWN_COPY_UNREAD}` };
+  }
   return null;
 }
 
@@ -973,7 +1014,7 @@ export function gateDocumentsFirst(payload: Payload): Verdict {
 // The masthead line a reader meets first. A folder in `closed/` whose page still says it is running
 // tells everyone who opens the page — rather than the folder — that the work is live. `010` sat that
 // way until the developer noticed it, and this gate passed it: it read rows, and nobody reads rows first.
-const EYEBROW = /class="eyebrow"[^>]*>([\s\S]*?)<\/div>/i;
+const EYEBROW = /class="sds-eyebrow"[^>]*>([\s\S]*?)<\/div>/i;
 // THE STATUS IS ONE FIELD OF THE MASTHEAD, AND THE GATE READS THAT FIELD. `05-artifacts.md` § The
 // approach document says the masthead CARRIES a status drawn from a closed set — the status is not
 // the whole line. Scanning the whole line for a finished word reads the title and the lens list as
@@ -1006,9 +1047,13 @@ export function mastheadStatus(text: string): string | null {
   return STATUS_FIELD.exec(flat(found[1]))?.[1].trim() ?? null;
 }
 
-/** Whether the page's own masthead says the work is finished. */
+/**
+ * Whether the page's own masthead says the work is finished. The header line of a page that holds
+ * its own copy of the styles is not read, so such a page is not a finding here.
+ */
 function saysItIsClosed(page: string): boolean {
   const text = read(page);
+  if (!linksSharedStyles(text)) return true;
   const found = EYEBROW.exec(text);
   if (found === null) return true;                  // no masthead to read is not a finding
   return FINISHED.test(mastheadStatus(text) ?? flat(found[1]));
@@ -1034,6 +1079,9 @@ export function gateClose(payload: Payload): Verdict {
     if (closing(full) && !isApproachPage(full)) candidates.push([null, full]);
   }
 
+  // The pages this close did not read the header of, because each holds its own copy of the styles.
+  const unmoved: string[] = [];
+  const unmovedNote = (): string => `[SOFT] ${unmoved.join("\n[SOFT] ")}\n${OWN_COPY_UNREAD}`;
   for (const [source, destination] of candidates) {
     const root = workspaceRoot(destination) ?? workspaceRoot(cwd);
     if (!root) continue;
@@ -1063,6 +1111,7 @@ export function gateClose(payload: Payload): Verdict {
           `Denied: ${subject}'s page does not say it is closed. The masthead is what a reader ` +
           `meets first, and closing must change it as well as the folder.`,
       };
+    unmoved.push(...ownCopyLines(root, pages).filter((line) => !unmoved.includes(line)));
 
     const rows = workstreamPlan(folders, pages);
     const empty = rows.filter((row) => stateOf(row) === "empty");
@@ -1191,7 +1240,7 @@ export function gateClose(payload: Payload): Verdict {
           `Each one says somebody decided something and not what happened to it. If the work moves ` +
           `on, mark it carried and name the scope; if it waits, mark it deferred and name the ` +
           `trigger. Closing with work pending is ordinary — closing without saying where it went ` +
-          `is what nobody can follow.` };
+          `is what nobody can follow.` + (unmoved.length ? `\n\n${unmovedNote()}` : "") };
       }
       continue;
     }
@@ -1250,7 +1299,7 @@ export function gateClose(payload: Payload): Verdict {
         `a later scope needs to find.`,
     };
   }
-  return null;
+  return unmoved.length ? { note: unmovedNote() } : null;
 }
 
 // ---------------------------------------------------------------------------- the sweep

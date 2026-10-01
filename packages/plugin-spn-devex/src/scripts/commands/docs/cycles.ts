@@ -15,6 +15,9 @@
 // With no option it writes no file. With `--write` it writes the parts of the page that the arcs
 // decide (RD.DEVEX.WORKSPACE.204): the header's status, the Cycles table and the heading of `Open`.
 // `doc-check` compares a page with the same reading, through `tableDifferences` and `headerStatusRule`.
+//
+// Every class it reads and writes is a name of the shared stylesheet (05-artifacts.md § One stylesheet,
+// served in versions). A page that links no shared stylesheet is refused by `--write`, and not written.
 
 import { writeFileSync } from "node:fs";
 import { basename, dirname, join, posix, relative, resolve } from "node:path";
@@ -22,6 +25,7 @@ import { STATUSES, TERMINAL, pastDecided } from "../../checks/arc-status.ts";
 import { cardsIn, mastheadStatus } from "../../checks/split-plan.ts";
 import { isDir, isFile, listdir, read, unescape, workspaceRoot } from "../../lib/payload.ts";
 import { ARCS, WORKSTREAM_STATES, isApproachPage, workstreamsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { OWN_COPY, linksSharedStyles } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { argsText, begin, commandFacts, end, record } from "../../../../../plugin-support-lib/src/lib/timing.ts";
 
 export const describe = "print a workstream's Cycles table from its arcs — one row per arc, with its file, its status and its previews; --write puts the parts the arcs decide into the page";
@@ -228,7 +232,7 @@ export function arcHref(cycle: Cycle): string {
 /** The Arc cell's HTML: the label in bold, then the arc's file as a link from the page. */
 export function arcCell(cycle: Cycle): string {
   const href = arcHref(cycle);
-  return `<strong>${escape(arcLabel(cycle))}</strong><br><a class="s" href="${attribute(href)}">${escape(href)}</a>`;
+  return `<strong>${escape(arcLabel(cycle))}</strong><br><a class="sds-small" href="${attribute(href)}">${escape(href)}</a>`;
 }
 
 /**
@@ -255,7 +259,7 @@ export function tableOf(cycles: Cycle[]): string {
   const rows = cycles.map((cycle) =>
     `      <tr>${rowCells(cycle).map((cell) => `<td>${cell}</td>`).join("")}</tr>`);
   return [
-    `  <div class="scroll"><table>`,
+    `  <div class="sds-scroll"><table>`,
     `    <thead><tr>${CYCLES_COLUMNS.map((column) => `<th>${column}</th>`).join("")}</tr></thead>`,
     `    <tbody>`,
     ...rows,
@@ -360,9 +364,9 @@ export function cyclesTableAt(text: string): { from: number; to: number } | null
 // The three words a workstream page's header shows, each with the class and the glyph the approach
 // template writes its badge with (`templates/workstream/approach-template.html`).
 export const HEADER_STATUSES = {
-  PLANNING: { badge: "planning", glyph: "&#x1F52E;" },
-  IMPLEMENTING: { badge: "implementing", glyph: "&#x1F6A7;" },
-  DONE: { badge: "done", glyph: "&#x2705;" },
+  PLANNING: { badge: "sds-planning", glyph: "&#x1F52E;" },
+  IMPLEMENTING: { badge: "sds-implementing", glyph: "&#x1F6A7;" },
+  DONE: { badge: "sds-done", glyph: "&#x2705;" },
 } as const;
 export type HeaderStatus = keyof typeof HEADER_STATUSES;
 const HEADER_WORDS = Object.keys(HEADER_STATUSES) as HeaderStatus[];
@@ -447,15 +451,15 @@ export function producedPage(folder: string, text: string, cycles: Cycle[] = cyc
 
   const status = headerStatusRule(folder, out, cycles);
   if (status) {
-    const header = out.indexOf('class="eyebrow"');
-    const badge = /<span\b[^>]*\bclass="badge status\b[^"]*"[^>]*>[\s\S]*?<\/span>/i.exec(out.slice(Math.max(header, 0)));
+    const header = out.indexOf('class="sds-eyebrow"');
+    const badge = /<span\b[^>]*\bclass="sds-badge sds-status\b[^"]*"[^>]*>[\s\S]*?<\/span>/i.exec(out.slice(Math.max(header, 0)));
     const ends = out.indexOf("</div>", Math.max(header, 0));
     if (header < 0 || !badge || (ends >= 0 && header + badge.index > ends))
       skipped.push(`${PRODUCED_PARTS.status} reads ${status.shows} and the arcs give ${status.gives}, and the header holds no status badge to write`);
     else {
       const { badge: name, glyph } = HEADER_STATUSES[status.gives];
       splice({ from: header + badge.index, to: header + badge.index + badge[0].length },
-        `<span class="badge status ${name}">${glyph} ${status.gives}</span>`);
+        `<span class="sds-badge sds-status ${name}">${glyph} ${status.gives}</span>`);
       wrote.push(PRODUCED_PARTS.status);
     }
   }
@@ -471,7 +475,7 @@ export function producedPage(folder: string, text: string, cycles: Cycle[] = cyc
     const listed = [...tableRows(current).keys()].filter((key) => inArcs.has(key));
     const ordered = [...listed.map((key) => inArcs.get(key)!),
                      ...[...inArcs].filter(([key]) => !listed.includes(key)).map(([, cycle]) => cycle)];
-    splice(table, tableOf(ordered).replace(/^\s*<div class="scroll">/, "").replace(/<\/div>$/, ""));
+    splice(table, tableOf(ordered).replace(/^\s*<div class="sds-scroll">/, "").replace(/<\/div>$/, ""));
     wrote.push(PRODUCED_PARTS.table);
   }
 
@@ -503,7 +507,8 @@ export function workstreamFolder(target: string, workspace: string | null): stri
 
 /**
  * `--write`: bring each approach page of the folder current, or the one page the argument names. A
- * page that is already current is not written, so its bytes and its time stay as they are.
+ * page that is already current is not written, so its bytes and its time stay as they are. A page
+ * that links no shared stylesheet is refused with `OWN_COPY`, and no class of it is read.
  */
 function writePages(folder: string, target: string, cycles: Cycle[]): number {
   const named = resolve(target);
@@ -519,6 +524,11 @@ function writePages(folder: string, target: string, cycles: Cycle[]): number {
   for (const page of pages) {
     const shown = relative(dirname(folder), page);
     const text = read(page);
+    if (!linksSharedStyles(text)) {
+      console.error(`${shown}: ${OWN_COPY}. Nothing was written.`);
+      code = 1;
+      continue;
+    }
     const produced = producedPage(folder, text, cycles);
     if (!produced) {
       console.error(`${shown} has no Cycles table to write — How ends in an h3 named Cycles, with a table under it ` +

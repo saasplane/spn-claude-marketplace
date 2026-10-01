@@ -10,6 +10,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { workspace } from "../../../helpers/fixture.mjs";
 import { ARCS, DEVEX_WORKSTREAMS, DOCS, SEAT, capabilitiesDir, docsOf, workstreamsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { linesFor } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -92,7 +93,7 @@ one("generated build output is refused too",
   // split-plan's close gate, through the chain.
   const root = workspace("dispatch-close", {
     [join(DEVEX_WORKSTREAMS, "open", "001-a-subject", "a-subject-approach.html")]:
-      `<div class="eyebrow">Workstream 001 &middot; closed</div><section id="s3"><table>
+      `${linesFor("1.0.0").stylesheet}<div class="sds-eyebrow">Workstream 001 &middot; closed</div><section id="s3"><table>
         <thead><tr><th>What</th><th>Scope</th><th>State</th></tr></thead>
         <tbody><tr><td>a</td><td>spn-foundation</td><td></td></tr></tbody></table></section>`,
     [join(DEVEX_WORKSTREAMS, "open", "001-a-subject", ARCS, "N1-x.md")]: "# Arc\n\n## Log\n\n- **2026-09-18 — go.**\n",
@@ -236,7 +237,7 @@ one("editing an ordinary source file",
   { tool_name: "Edit", tool_input: { file_path: join(PROBE_REPO, "src", "thing.ts"), new_string: "export const x = 2;" } }, "silent");
 one("a malformed payload allows", {}, "silent");
 
-console.log("\n=== 2l — a publish is met by a reminder, never a refusal (RD.DEVEX.WORKSPACE.117)");
+console.log("\n=== 2l — a publish is met by a reminder (RD.DEVEX.WORKSPACE.117), and refused for a page that loads its styles from outside (RD.DEVEX.WORKSPACE.215)");
 
 const APPROACH = join(WORKSPACE, ".spndevex", "workstreams", "open", "041-probe", "probe-approach.html");
 one("2l: publishing an approach page reminds that nothing is published unless the developer asks",
@@ -256,6 +257,26 @@ one("2l: listing artifacts is silent",
 one("2l: an asset upload to a page already published is silent",
   { tool_name: "Artifact", tool_input: { url: "https://claude.ai/artifact/x", asset: true, file_path: "/tmp/a.png" } }, "silent",
   { parity: false, why: "a new check" });
+{
+  // KNOWN-BAD: a stored page, which loads its version's stylesheet and script from the shared address.
+  const reports = join(PROBE_REPO, "docs", "artifacts", "reports");
+  mkdirSync(reports, { recursive: true });
+  const stored = join(reports, "tests-report.html");
+  const BODY = `<header class="sds-masthead"><h1>Tests report</h1></header>\n<section id="s0"><p>You read it once.</p></section>\n`;
+  writeFileSync(stored, `<!doctype html>\n${linesFor("1.0.0").stylesheet}\n${BODY}${linesFor("1.0.0").script}\n`);
+  one("[MKT.HOOKS.46] known-bad: a publish of a page that links the shared address is refused through the chain",
+    { tool_name: "Artifact", tool_input: { file_path: stored, icon: "chart" } }, "deny",
+    { says: `spn-devex docs sds bundle ${stored}`, parity: false, why: "a new check" });
+  one("[MKT.HOOKS.46] and the refusal names the copy to publish instead",
+    { tool_name: "Artifact", tool_input: { action: "publish", file_path: stored } }, "deny",
+    { says: join(reports, "tests-report.bundled.html"), parity: false, why: "a new check" });
+  // UNTOUCHED: the bundled copy carries its styles and its script inside it.
+  const bundled = join(reports, "tests-report.bundled.html");
+  writeFileSync(bundled, `<!doctype html>\n<style>.sds-masthead{margin:0}</style>\n${BODY}<script>document.documentElement.classList.add("sds-has-script");</script>\n`);
+  one("[MKT.HOOKS.46] untouched: the bundled copy is reminded and not refused",
+    { tool_name: "Artifact", tool_input: { file_path: bundled } }, "note",
+    { says: "unless the developer asks", parity: false, why: "a new check" });
+}
 {
   n += 1;
   const hooks = JSON.parse(readFileSync(resolve(HOOKS, "src", "hooks", "hooks.json"), "utf8"));

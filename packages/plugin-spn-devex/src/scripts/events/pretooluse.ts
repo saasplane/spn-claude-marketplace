@@ -200,7 +200,8 @@ export function dispatch(payload: Payload): Verdict {
   const supplied = payload.tool_input ?? {};
 
   // A PUBLISH WRITES NO FILE HERE, so no other check has anything to read in it. It gets the one
-  // reminder (RD.DEVEX.WORKSPACE.117) and nothing else.
+  // reminder (RD.DEVEX.WORKSPACE.117), and a refusal where the page it names loads its styles from
+  // outside (RD.DEVEX.WORKSPACE.215). The refusal leaves here as any other check's does.
   if (payload.tool_name === PUBLISHER) {
     try { return span({ group: "publish", action: "publish" }, () => checkPublish(payload)); } catch { return null; }
   }

@@ -7,8 +7,9 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { ARCS, capabilitiesDir, constructPagesDir, decisionsRegister, docsOf, hubPage, overviewsDir, registersDir,
+import { ARCS, artifactIndex, capabilitiesDir, constructPagesDir, decisionsRegister, docsOf, guidePagesDir, hubPage, overviewsDir, registersDir,
   workstreamsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { OWN_COPY, STYLES_ADDRESS, linesFor } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 
 const HOOKS = PLUGIN;
 const SCRIPTS = resolve(HOOKS, "scripts");
@@ -82,33 +83,38 @@ const stream = (root, name, state = "open") => {
 };
 const APPROACH = join(stream(WORKSPACE, "041-probe"), "probe-approach.html");
 
-// A page that passes everything, used as the base for each known-bad mutation.
+// The two lines a stored page carries: the shared stylesheet's, and the shared script's.
+const STYLES = linesFor("1.0.0");
+
+// A page that passes everything, used as the base for each known-bad mutation. It is in the shared
+// form: it links one version of the shared stylesheet, and every class of it opens with `sds-`.
 const CLEAN = `<!doctype html>
-<div class="eyebrow">Who this is for &middot; the developer picking up this work</div>
+${STYLES.stylesheet}
+<div class="sds-eyebrow">Who this is for &middot; the developer picking up this work</div>
 <h1>A subject</h1>
-<p class="standfirst">This page plans a change to where the model is written down.</p>
+<p class="sds-standfirst">This page plans a change to where the model is written down.</p>
 <p>Read it to see what will change and why, before anything is built.</p>
-<section id="s1"><div class="sec-head"><h2>Why &mdash; the reason</h2></div>
+<section id="s1"><div class="sds-section-head"><h2>Why &mdash; the reason</h2></div>
   <p>You open this page when the model has no single home. You read it once and you know where each piece sits.</p>
   <p>Split it where it runs long. Say what you mean, and keep the reason beside the rule.</p>
 </section>
-<section id="s2"><div class="sec-head"><h2>What &mdash; the shape</h2></div>
+<section id="s2"><div class="sds-section-head"><h2>What &mdash; the shape</h2></div>
   <p>You get one place for the model. You get one shape per page, and you get one plain voice.</p>
 </section>
-<section id="s3"><div class="sec-head"><h2>How &mdash; the order</h2></div>
+<section id="s3"><div class="sds-section-head"><h2>How &mdash; the order</h2></div>
   <h3 id="h1">spn-foundation &mdash; the chapter</h3>
   <p>You read the chapter first, and the code follows it.</p>
   <h3 id="h9">Cycles &mdash; the arcs, in the order they run</h3>
-  <div class="scroll"><table><thead><tr><th>Arc</th><th>What it does</th><th>Status</th><th>Previews</th></tr></thead>
-  <tbody><tr><td><strong>N1 &mdash; the chapter</strong><br><a class="s" href="arcs/N1-the-chapter.md">arcs/N1-the-chapter.md</a></td><td>the chapter, in one sentence.</td><td>RUNNING</td><td>&mdash;</td></tr>
-  <tr><td><strong>N2 &mdash; the check</strong><br><a class="s" href="arcs/N2-the-check.md">arcs/N2-the-check.md</a></td><td>the check, in one sentence.</td><td>DECIDED</td><td>&mdash;</td></tr></tbody></table></div>
+  <div class="sds-scroll"><table><thead><tr><th>Arc</th><th>What it does</th><th>Status</th><th>Previews</th></tr></thead>
+  <tbody><tr><td><strong>N1 &mdash; the chapter</strong><br><a class="sds-small" href="arcs/N1-the-chapter.md">arcs/N1-the-chapter.md</a></td><td>the chapter, in one sentence.</td><td>RUNNING</td><td>&mdash;</td></tr>
+  <tr><td><strong>N2 &mdash; the check</strong><br><a class="sds-small" href="arcs/N2-the-check.md">arcs/N2-the-check.md</a></td><td>the check, in one sentence.</td><td>DECIDED</td><td>&mdash;</td></tr></tbody></table></div>
 </section>
 `;
 
 // The same page with the Cycles table a closed workstream keeps: three columns, no file link.
 const NO_PREVIEWS = CLEAN
   .replace("<th>Previews</th>", "")
-  .replace(/<br><a class="s"[^>]*>[^<]*<\/a>/g, "")
+  .replace(/<br><a class="sds-small"[^>]*>[^<]*<\/a>/g, "")
   .replace(/<td>&mdash;<\/td><\/tr>/g, "</tr>");
 
 console.log("\n=== doc-check — the fixtures");
@@ -154,12 +160,12 @@ one("prose that never says you draws no finding — neither the count nor the sh
   "silent");
 
 one("an approach page with no Why, What or How",
-  write(APPROACH, `<div class="eyebrow">Who this is for &middot; a reader</div><section><h2>Background</h2><p>You read it once and you know it.</p></section>`),
+  write(APPROACH, `${STYLES.stylesheet}<div class="sds-eyebrow">Who this is for &middot; a reader</div><section><h2>Background</h2><p>You read it once and you know it.</p></section>`),
   "reports", "carries no why + what + how");
 
 one("an overview carrying an argument's organs",
   write(join(overviewsDir(PROBE_DOCS), "probe-overview.html"),
-    `<div class="eyebrow">Who this is for &middot; a reader</div><section><h2>Open</h2><p>You read it once and you know it.</p></section>`),
+    `${STYLES.stylesheet}<div class="sds-eyebrow">Who this is for &middot; a reader</div><section><h2>Open</h2><p>You read it once and you know it.</p></section>`),
   "reports", "overview carries open");
 
 one("an approach page sitting in the overviews pocket",
@@ -167,11 +173,11 @@ one("an approach page sitting in the overviews pocket",
   "reports", "does not end -overview.html");
 
 one("an Open card carrying no options table",
-  write(APPROACH, CLEAN + `<section id="s4"><h2>Open</h2><div class="open"><h4 id="q1">Q1 &middot; a question</h4><p>You decide it yourself.</p></div></section>`),
+  write(APPROACH, CLEAN + `<section id="s4"><h2>Open</h2><div class="sds-open"><h4 id="q1">Q1 &middot; a question</h4><p>You decide it yourself.</p></div></section>`),
   "reports", "carries no options table");
 
 one("a Deferred card naming no trigger",
-  write(APPROACH, CLEAN + `<section id="s5"><h2>Deferred</h2><div class="open"><h4 id="q2">Q2 &middot; a parked thing</h4><p>You leave this one alone.</p></div></section>`),
+  write(APPROACH, CLEAN + `<section id="s5"><h2>Deferred</h2><div class="sds-open"><h4 id="q2">Q2 &middot; a parked thing</h4><p>You leave this one alone.</p></div></section>`),
   "reports", "names no trigger");
 
 one("a register row that says you",
@@ -268,38 +274,41 @@ one("a rule may quote the mistake it bans",
   write(CHAPTER, "# A chapter\n\nYou never write *five decisions* into a sentence. You name the set by its rule.\n"),
   "silent");
 
-console.log("\n=== doc-check — the masthead: h1, an optional p.subtitle, one p.standfirst (RD.DEVEX.WORKSPACE.187)");
+console.log("\n=== doc-check — the masthead: h1, an optional p.sds-subtitle, one p.sds-standfirst (RD.DEVEX.WORKSPACE.187)");
 
 // The same function `docs audit` runs, so a page is judged alike when it is saved and when it is audited.
 const CONSTRUCT = join(constructPagesDir(PROBE_DOCS), "probe-construct.html");
 const page = (inner) => `<!doctype html>
-<header class="masthead">
-  <div class="eyebrow"><span class="audience">Architect</span></div>
+${STYLES.stylesheet}
+<header class="sds-masthead">
+  <div class="sds-eyebrow"><span class="sds-audience">Architect</span></div>
 ${inner}
 </header>
-<section id="s0"><div class="sec-head"><h2>Overview</h2></div>
+<section id="s0"><div class="sds-section-head"><h2>Overview</h2></div>
   <p>You read this part when you need the core. You leave it knowing where each piece sits.</p>
 </section>
 `;
-const MAST = `  <h1>Probe</h1>\n  <p class="subtitle">You keep one place for the model.</p>\n  <p class="standfirst">This page covers the probe. Read it before you change it.</p>`;
+// The same builder under a name the cases further down can reach, where `page` names a file.
+const constructPage = (inner) => page(inner);
+const MAST = `  <h1>Probe</h1>\n  <p class="sds-subtitle">You keep one place for the model.</p>\n  <p class="sds-standfirst">This page covers the probe. Read it before you change it.</p>`;
 
 one("a construct masthead with h1, Subtitle and Description", write(CONSTRUCT, page(MAST)), "silent");
 one("a construct with no Subtitle — the Subtitle is optional",
-  write(CONSTRUCT, page(MAST.replace(/  <p class="subtitle">.*\n/, ""))), "silent");
+  write(CONSTRUCT, page(MAST.replace(/  <p class="sds-subtitle">.*\n/, ""))), "silent");
 one("a second paragraph after the Description is SOFT until every tree is retrofitted (N116 row 9)",
   write(CONSTRUCT, page(MAST + "\n  <p>You also read this, and it should be in the first section.</p>")),
   "reports", "[SOFT] the header carries 1 paragraph past the Subtitle and the Description");
 one("two standfirsts are a second paragraph",
-  write(CONSTRUCT, page(MAST + `\n  <p class="standfirst">You read a second Description here.</p>`)),
+  write(CONSTRUCT, page(MAST + `\n  <p class="sds-standfirst">You read a second Description here.</p>`)),
   "reports", "[SOFT] the header carries 1 paragraph");
 one("a Subtitle of two sentences is SOFT",
   write(CONSTRUCT, page(MAST.replace("the model.</p>", "the model. You keep it there.</p>"))),
   "reports", "[SOFT] the Subtitle runs to 2 sentences");
 one("a construct header with no Description is SOFT",
-  write(CONSTRUCT, page(MAST.replace(/\n  <p class="standfirst">.*/, ""))),
+  write(CONSTRUCT, page(MAST.replace(/\n  <p class="sds-standfirst">.*/, ""))),
   "reports", "[SOFT] the header has no Description");
 one("a Subtitle under the Description is out of place",
-  write(CONSTRUCT, page(`  <h1>Probe</h1>\n  <p class="standfirst">This page covers the probe. Read it before you change it.</p>\n  <p class="subtitle">You keep one place for the model.</p>`)),
+  write(CONSTRUCT, page(`  <h1>Probe</h1>\n  <p class="sds-standfirst">This page covers the probe. Read it before you change it.</p>\n  <p class="sds-subtitle">You keep one place for the model.</p>`)),
   "reports", "[SOFT] the Subtitle is out of place");
 // THE HUB CASES ARE HERMETIC. The pair is read from the register beside the page, so each case
 // builds its own workspace holding a stub RD.DEVEX.WORKSPACE.143 row, and the suite never depends
@@ -320,7 +329,7 @@ one("a Subtitle under the Description is out of place",
     const STUB = "| RD.DEVEX.WORKSPACE.143 | [docs](x.md) | **The punchline is `A stub title for the probe.`, and the " +
       "statement beside it does not change.** The statement below it reads *the stub subtitle, read from the row*. | why | 2026-09 |\n";
     const foundationHub = hubIn("spn-foundation", STUB);
-    const mast = (h1, sub) => page(`  <h1>${h1}</h1>\n  <p class="subtitle">${sub}</p>\n  <p class="standfirst">This page is where you start. Read it first.</p>`);
+    const mast = (h1, sub) => page(`  <h1>${h1}</h1>\n  <p class="sds-subtitle">${sub}</p>\n  <p class="sds-standfirst">This page is where you start. Read it first.</p>`);
 
     one("the foundation hub with the stub row's pair, word for word",
       write(foundationHub, mast("A stub title for the probe.", "The stub subtitle, read from the row.")), "silent");
@@ -376,7 +385,7 @@ one("sections out of order",
   "reports", "the order is Why > What > How > Open > Deferred");
 
 one("no opening — no standfirst above Why",
-  write(APPROACH, CLEAN.replace(/<p class="standfirst">[^\n]*\n/, "")),
+  write(APPROACH, CLEAN.replace(/<p class="sds-standfirst">[^\n]*\n/, "")),
   "reports", "has no opening");
 
 // THE COMPARISON NEEDS REAL ARCS, so a workstream is built in a temporary folder: a page and its
@@ -410,7 +419,7 @@ try {
     "silent");
 
   one("a row whose Arc cell links no file",
-    write(page, CLEAN.replace(`<br><a class="s" href="arcs/N2-the-check.md">arcs/N2-the-check.md</a>`, "")),
+    write(page, CLEAN.replace(`<br><a class="sds-small" href="arcs/N2-the-check.md">arcs/N2-the-check.md</a>`, "")),
     "reports", "N2 does not link its arc file as arcs/N2-the-check.md");
 
   one("a row whose Arc cell links another arc's file",
@@ -579,9 +588,9 @@ try {
   console.log("\n=== doc-check — the header's status against the arcs, when the whole page is written");
 
   // The header line as the approach template writes it: the status in its own labelled badge.
-  const withStatus = (text, word, glyph = "&#x1F52E;") => text.replace(/<div class="eyebrow">[^\n]*<\/div>/,
-    `<div class="eyebrow"><span class="line1">Who this is for &middot; the developer</span><span class="st"><span class="lbl">Status:</span> ` +
-    `<span class="badge status ${word.toLowerCase()}">${glyph} ${word}</span></span></div>`);
+  const withStatus = (text, word, glyph = "&#x1F52E;") => text.replace(/<div class="sds-eyebrow">[^\n]*<\/div>/,
+    `<div class="sds-eyebrow"><span class="sds-line1">Who this is for &middot; the developer</span><span class="sds-state"><span class="sds-label">Status:</span> ` +
+    `<span class="sds-badge sds-status sds-${word.toLowerCase()}">${glyph} ${word}</span></span></div>`);
   // A workstream of its own, holding N1 at RUNNING and N2 at DECIDED, so the arcs give IMPLEMENTING.
   const statusPage = join(stream(TMP, "050-status"), "approach.html");
   one("[MKT.HOOKS.40] known-bad: a page reading PLANNING while an arc runs — both words are named",
@@ -627,7 +636,7 @@ try {
   n += 1;
   const sweptHome = stream(TMP, "044-sweep");
   writeFileSync(join(sweptHome, "sweep-approach.html"), CLEAN.replace("</tbody>",
-    `<tr><td><strong>N4 &mdash; late docs</strong><br><a class="s" href="arcs/N4-late-docs.md">arcs/N4-late-docs.md</a></td>` +
+    `<tr><td><strong>N4 &mdash; late docs</strong><br><a class="sds-small" href="arcs/N4-late-docs.md">arcs/N4-late-docs.md</a></td>` +
     `<td>late docs, in one sentence.</td><td>DECIDED</td><td>&mdash;</td></tr></tbody>`));
   writeFileSync(join(sweptHome, ARCS, "N4-late-docs.md"), arcFile("N4", "late docs", "DECIDED",
     "| 1 | spn-support-ts | CODE | a | by hand | b | |\n| 2 | spn-support-ts | DOCS | a | by hand | b | |\n"));
@@ -638,6 +647,126 @@ try {
   const swept = scanned === "4" && out.includes("N4-late-docs.md") && out.includes("[SOFT]") && code === 0;
   if (!swept) failed += 1;
   console.log(`  ${swept ? "PASS" : "FAIL"}  the sweep scans the page and every arc, and a SOFT keeps exit 0\n        scanned ${scanned} · exit ${code}${swept ? "" : `\n${out.slice(0, 600)}`}`);
+
+  console.log("\n=== doc-check — a page that holds its own copy of the styles");
+
+  const { check, uncutVersions } = await import("../../../../src/scripts/checks/doc-check.ts");
+  const tell = (label, ok, detail = "") => {
+    n += 1;
+    if (!ok) failed += 1;
+    console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${detail}`}`);
+  };
+  // KNOWN-BAD FOR A READER OF THE SHARED NAMES: the clean page as it was written before the shared
+  // stylesheet. It links nothing, it carries a style block, and its classes have no prefix. Read by
+  // the shared names it has no opening and no card in the open shape.
+  const OWN = CLEAN.replace(`${STYLES.stylesheet}\n`, "<style>.eyebrow{font-size:.8rem} .standfirst{font-size:1.2rem} .open{border-left:2px solid orange}</style>\n")
+    .replace(/class="sds-section-head"/g, 'class="sec-head"').replace(/class="sds-small"/g, 'class="s"').replace(/class="sds-/g, 'class="')
+    + `<section id="s4"><div class="sec-head"><h2>Open &mdash; Q1</h2></div><div class="open"><h4 id="q1">Q1 &middot; a question</h4><p>You decide it yourself.</p></div></section>\n`;
+  const ownHome = stream(TMP, "060-own-copy");
+  const ownPage = join(ownHome, "approach.html");
+  const found = check(ownPage, OWN);
+  tell("the fixture links no shared stylesheet and holds no shared name", !OWN.includes("sds-") && OWN.includes("<style>"));
+  tell("[MKT.SCRIPTS.108] a page with its own copy draws one SOFT finding, which says how to move it",
+    found.length === 1 && found[0][0] === "SOFT" && found[0][1] === OWN_COPY, JSON.stringify(found));
+  one("[MKT.SCRIPTS.108] and the hook says that one line when the page is written", write(ownPage, OWN), "reports", `[SOFT] ${OWN_COPY}`);
+  const stale = check(ownPage, OWN.replace("<td>RUNNING</td>", "<td>PROPOSED</td>").replace(/<p class="standfirst">[^\n]*\n/, ""));
+  tell("[MKT.SCRIPTS.108] no markup of it is read: a stale table, a missing opening and a card with no options draw nothing",
+    stale.length === 1 && stale[0][1] === OWN_COPY, JSON.stringify(stale));
+  tell("[MKT.SCRIPTS.108] untouched: the same page in the shared form is read, and its card with no options is reported",
+    check(ownPage, CLEAN + `<section id="s4"><div class="sds-section-head"><h2>Open &mdash; Q1</h2></div><div class="sds-open"><h4 id="q1">Q1 &middot; a question</h4><p>You decide it yourself.</p></div></section>`)
+      .some(([severity, message]) => severity === "RULE" && message.includes("carries no options table")));
+  const proseOnly = check(ownPage, OWN.replace("You get one place for the model.", "You get it out of the box."));
+  tell("[MKT.SCRIPTS.108] its prose is still read: an idiom is reported beside the one line",
+    proseOnly.filter(([, message]) => message === OWN_COPY).length === 1 && proseOnly.some(([, message]) => /idiom/i.test(message)), JSON.stringify(proseOnly));
+  tell("[MKT.SCRIPTS.108] a page with its own copy under closed/ is not read at all",
+    check(join(stream(TMP, "061-own-copy-closed", "closed"), "approach.html"), OWN).length === 0);
+  // An Edit carries only its replacement, so the page on disk says which form the page is in.
+  writeFileSync(ownPage, OWN);
+  one("[MKT.SCRIPTS.108] an Edit of a page that holds its own copy on disk draws the one line",
+    { tool_name: "Edit", tool_input: { file_path: ownPage, old_string: "<h1>A subject</h1>", new_string: "<h1>Another subject</h1>" } },
+    "reports", `[SOFT] ${OWN_COPY}`);
+  const sharedOnDisk = join(stream(TMP, "062-shared"), "approach.html");
+  writeFileSync(sharedOnDisk, CLEAN);
+  one("[MKT.SCRIPTS.108] untouched: the same Edit of a page in the shared form is silent",
+    { tool_name: "Edit", tool_input: { file_path: sharedOnDisk, old_string: "<h1>A subject</h1>", new_string: "<h1>Another subject</h1>" } }, "silent");
+
+  console.log("\n=== doc-check — a page links a version that was cut, and its rail is the shared script's");
+
+  /** The whole verdict of the hook for one payload: whether it refuses, the reason, and the note. */
+  const verdict = (payload) => {
+    const out = execFileSync("node", [`${HOOKS}/src/scripts/checks/doc-check.ts`, "--stdin"], { input: JSON.stringify(payload), encoding: "utf8", cwd: CWD }).trim();
+    if (!out) return { refused: false, reason: "", note: "" };
+    const specific = JSON.parse(out.split("\n").filter(Boolean).at(-1)).hookSpecificOutput ?? {};
+    return { refused: specific.permissionDecision === "deny", reason: specific.permissionDecisionReason ?? "", note: specific.additionalContext ?? "" };
+  };
+  const CONSTRUCT_PAGE = constructPage(MAST);
+  // KNOWN-BAD: the two lines name version 9.9.9, and `versions.json` holds 1.0.0 alone.
+  const UNCUT_PAGE = CONSTRUCT_PAGE.split("/1.0.0/").join("/9.9.9/");
+  const refusal = verdict(write(CONSTRUCT, UNCUT_PAGE));
+  tell("[MKT.HOOKS.45] known-bad: a write of a page that links a version nobody cut is refused",
+    refusal.refused && UNCUT_PAGE.includes(`${STYLES_ADDRESS}9.9.9/sds-docs.css`), JSON.stringify(refusal));
+  tell("[MKT.HOOKS.45] the refusal names the version the page links and the versions that exist",
+    refusal.reason.includes("`9.9.9`") && refusal.reason.includes("`versions.json` holds `1.0.0`") && refusal.note.includes("[RULE]"), refusal.reason);
+  tell("[MKT.HOOKS.45] untouched: the same page linking the version that was cut is not refused, and draws no finding",
+    !verdict(write(CONSTRUCT, CONSTRUCT_PAGE)).refused && verdict(write(CONSTRUCT, CONSTRUCT_PAGE)).note === "");
+  const editedLink = verdict({ tool_name: "Edit", tool_input: { file_path: sharedOnDisk, old_string: STYLES.stylesheet, new_string: linesFor("9.9.9").stylesheet } });
+  tell("[MKT.HOOKS.45] an Edit that changes the link to a version nobody cut is refused too", editedLink.refused && editedLink.reason.includes("`9.9.9`"), JSON.stringify(editedLink));
+  // The versions that exist are read from `versions.json`, so the finding lists what that file holds.
+  const stylesFixture = join(TMP, "styles");
+  mkdirSync(stylesFixture, { recursive: true });
+  writeFileSync(join(stylesFixture, "versions.json"), JSON.stringify({ "1.0.0": {}, "1.1.0": {} }));
+  const scriptAlone = `${STYLES.stylesheet}\n<p>You read it.</p>\n${linesFor("2.0.0").script}`;
+  const listed = uncutVersions(scriptAlone, stylesFixture);
+  tell("[MKT.HOOKS.45] a script line that names a version nobody cut is found, and each version that exists is listed",
+    listed.length === 1 && listed[0][0] === "RULE" && listed[0][1].includes("`2.0.0`") && listed[0][1].includes("`1.0.0` · `1.1.0`"), JSON.stringify(listed));
+  tell("[MKT.HOOKS.45] a page whose link names no version, as a sample's does, draws none",
+    uncutVersions(`<link rel="stylesheet" href="../assets/sds-docs.css">`, stylesFixture).length === 0);
+  tell("[MKT.HOOKS.45] where no `versions.json` is found nothing says which versions exist, so nothing is reported",
+    uncutVersions(UNCUT_PAGE, null).length === 0 && uncutVersions(UNCUT_PAGE, join(TMP, "no-such-folder")).length === 0);
+
+  // doc-check holds no check on a hosted address, so only the first half of the row has a case here.
+  one("[MKT.HOOKS.47] the address of the version a page links draws no finding",
+    write(CONSTRUCT, constructPage(MAST) + `${STYLES.script}\n`), "silent");
+
+  console.log("\n=== doc-check — the two produced kinds of page, and a page's bundled copy");
+
+  // A guide page as `docs guide` writes it: a header line with no status, a Title, a Description, its
+  // stages and its steps. It sits in `guides/`, and its name ends `-guide.html`.
+  const GUIDE = `<!doctype html>\n${STYLES.stylesheet}\n<nav class="sds-rail" id="rail"></nav>\n<header class="sds-masthead">\n` +
+    `  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Probe &nbsp;|&nbsp; Getting Started</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Guide</span></span></div>\n` +
+    `  <h1>Getting Started</h1>\n  <p class="sds-standfirst">You go from a clone to a running service. Read it on your first day.</p>\n</header>\n` +
+    `<section id="s1"><div class="sds-section-head"><h2>The machine is ready</h2></div>\n  <p>You install the tools once, and you check them once.</p>\n` +
+    `  <div class="sds-step"><h3 id="h1">Install the toolchain</h3><p>You need it before any other step.</p><pre>spnutils setup</pre><p>You see one line for each tool.</p></div>\n</section>\n${STYLES.script}\n`;
+  const guidePage = join(guidePagesDir(PROBE_DOCS), "getting-started-guide.html");
+  one("a guide page under artifacts/guides/ is in its place, and draws no finding", write(guidePage, GUIDE), "silent");
+  one("a page under artifacts/guides/ whose name does not end -guide.html",
+    write(join(guidePagesDir(PROBE_DOCS), "getting-started.html"), GUIDE), "reports", "does not end -guide.html");
+  // The index of artifacts as `docs index` writes it: no header, no Title, no Description, and its own script.
+  const INDEX = `<!doctype html>\n<title>Probe Artifacts</title>\n${STYLES.stylesheet}\n<div class="sds-index" id="index">\n` +
+    `  <aside class="sds-index-side" id="index-side"><nav class="sds-tree" id="index-tree" aria-label="Pages"></nav>\n` +
+    `    <noscript><p class="sds-index-note">This index needs its script to list the pages.</p></noscript></aside>\n` +
+    `  <main class="sds-index-main"><div class="sds-tabs" id="index-tabs"></div><div class="sds-panes" id="index-panes"></div></main>\n</div>\n` +
+    `<script type="application/json" id="index-data">{"base": "", "groups": []}</script>\n${linesFor("1.0.0", "sds-index.js").script}\n`;
+  one("the index of artifacts, directly in the pocket, is in its place: no check of a masthead, a Subtitle or a Description reads it",
+    write(artifactIndex(PROBE_DOCS), INDEX), "silent");
+  tell("neither page is held to a suffix or to a masthead, and both are still read",
+    check(guidePage, GUIDE).length === 0 && check(artifactIndex(PROBE_DOCS), INDEX).length === 0
+      && check(guidePage, GUIDE.split("/1.0.0/").join("/9.9.9/")).some(([, message]) => message.includes("`9.9.9`"))
+      && check(artifactIndex(PROBE_DOCS), INDEX.split("/1.0.0/").join("/9.9.9/")).some(([, message]) => message.includes("`9.9.9`")));
+  // A bundled copy carries its styles inside it and links nothing. KNOWN-BAD without the rule: read as a
+  // page, it holds its own copy, and beside an overview its name does not end `-overview.html`.
+  const BUNDLED = `<!doctype html>\n<style>.sds-masthead{margin:0}</style>\n<header class="sds-masthead"><h1>Probe</h1></header>\n<p>You read it with no network.</p>\n`;
+  one("a page's bundled copy is not read: it is a copy made to publish",
+    write(join(overviewsDir(PROBE_DOCS), "probe-overview.bundled.html"), BUNDLED), "silent");
+  tell("known-bad: the same text under a page's own name is read, and is told it holds its own copy",
+    check(join(overviewsDir(PROBE_DOCS), "probe-overview.html"), BUNDLED).some(([, message]) => message === OWN_COPY)
+      && check(join(overviewsDir(PROBE_DOCS), "probe-overview.bundled.html"), BUNDLED).length === 0);
+
+  const RAIL = `<nav class="sds-rail" id="rail"></nav>\n`;
+  one("known-bad: a page that carries a rail and loads no shared script is told its outline is not built",
+    write(statusPage, withStatus(CLEAN, "IMPLEMENTING", "&#x1F6A7;") + RAIL), "reports", "carries a rail and loads no `sds-docs.js`");
+  one("untouched: the same page with the shared script's line is silent",
+    write(statusPage, withStatus(CLEAN, "IMPLEMENTING", "&#x1F6A7;") + RAIL + `${STYLES.script}\n`), "silent");
 } finally {
   rmSync(TMP, { recursive: true, force: true });
 }

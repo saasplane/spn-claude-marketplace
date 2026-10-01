@@ -31,8 +31,9 @@ function body(args: string[], workspace: string): number {
   // A PATH IS A FILE OR A FOLDER. Given a folder this means every document under it, which is what
   // anyone typing one meant, and the walk is the same one `face` uses, so `templates/` is skipped by
   // the rule that already exists.
-  // A SAMPLE AND A TEMPLATE ARE NOT PAGES. A file under a workstream's `samples/` is in its own
-  // format, and a template carries placeholders, so neither is audited or counted.
+  // A SAMPLE, A TEMPLATE AND A BUNDLED COPY ARE NOT PAGES. A file under a workstream's `samples/` is
+  // in its own format, a template carries placeholders, and a `<page>.bundled.html` is a copy of a
+  // page that the tree already holds, so none of them is audited or counted.
   const named = args.flatMap((p) => {
     const full = resolve(p);
     let st; try { st = statSync(full); } catch { return [full]; }
@@ -40,7 +41,7 @@ function body(args: string[], workspace: string): number {
   });
   const pages = named.filter(isAuditedPage);
   if (!pages.length) {
-    console.log(named.length ? "no page under that path — a sample and a template are not audited as pages"
+    console.log(named.length ? "no page under that path — a sample, a template and a bundled copy are not audited as pages"
       : "no document under that path");
     return 0;
   }

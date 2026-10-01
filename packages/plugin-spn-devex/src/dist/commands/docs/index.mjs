@@ -14,14 +14,8 @@ var __export = (target, all) => {
 
 // packages/plugin-support-lib/src/lib/docs-tree.ts
 import { join, sep } from "node:path";
-function seatDir(docs, seat) {
-  return join(docs, SEAT[seat]);
-}
-function constructsDir(docs) {
-  return seatDir(docs, "constructs");
-}
-function capabilitiesDir(docs) {
-  return seatDir(docs, "capabilities");
+function docsOf(repo) {
+  return join(repo, DOCS);
 }
 function pocketDir(docs, pocket) {
   return join(docs, POCKET[pocket]);
@@ -38,25 +32,30 @@ function artifactsDir(docs) {
 function overviewsDir(docs) {
   return join(artifactsDir(docs), ARTIFACT.overviews);
 }
+function constructPagesDir(docs) {
+  return join(artifactsDir(docs), ARTIFACT.constructs);
+}
+function reportsDir(docs) {
+  return join(artifactsDir(docs), ARTIFACT.reports);
+}
+function guidePagesDir(docs) {
+  return join(artifactsDir(docs), ARTIFACT.guides);
+}
+function artifactIndex(docs) {
+  return join(artifactsDir(docs), ARTIFACT_INDEX);
+}
 function hasSegment(path, name) {
   return slashes(path).includes(segment(name));
 }
 function inArtifacts(path) {
   return hasSegment(path, POCKET.artifacts);
 }
-function splitAtSeat(path, seat, from = "first") {
-  const norm = slashes(path);
-  const mark = segment(SEAT[seat]);
-  const at = from === "first" ? norm.indexOf(mark) : norm.lastIndexOf(mark);
-  if (at < 0) return null;
-  return { docs: norm.slice(0, at), rel: norm.slice(at + mark.length) };
-}
-function producedPageOf(seatFile) {
-  return slashes(seatFile).replace(segment(SEAT.constructs), segment(`${POCKET.artifacts}/${ARTIFACT.constructs}`)).replace(/\.md$/, CONSTRUCT_PAGE_SUFFIX);
-}
 function isRegister(path) {
   const norm = slashes(path);
   return norm.endsWith(".md") && norm.includes(segment(POCKET.registers)) && !norm.endsWith(`/${FACE}`);
+}
+function bookTemplatesDir(foundation) {
+  return join(foundation, BOOK_TEMPLATES);
 }
 function isApproachPage(path) {
   const name = slashes(path).split("/").pop() ?? "";
@@ -82,7 +81,7 @@ function isArcFile(path) {
 function arcPathPattern(anchored) {
   return new RegExp(`\\/${WORKSTREAMS}\\/[^/]+\\/[^/]+\\/${ARCS}\\/[^/]+\\.md${anchored ? "$" : ""}`);
 }
-var DEVEX, DOCS, SEAT, SEATS, POCKET, ARTIFACT, ARTIFACT_FOLDERS, TEMPLATES, FACE, DECISIONS, CONSTRUCT_PAGE_SUFFIX, GUIDE_PAGE_SUFFIX, slashes, segment, BOOK_TEMPLATES, PLUGIN_TEMPLATES, WORKSTREAMS, DEVEX_WORKSTREAMS, SESSIONS, WORKSTREAM_STATES, ARCS, APPROACH_SUFFIX, APPROACH_PAGE, escape, STATE_GROUP;
+var DEVEX, DOCS, SEAT, SEATS, POCKET, ARTIFACT, ARTIFACT_FOLDERS, TEMPLATES, FACE, DECISIONS, GUIDE_PAGE_SUFFIX, ARTIFACT_INDEX, HUB, slashes, segment, BOOK_TEMPLATES, PLUGIN_TEMPLATES, WORKSTREAMS, DEVEX_WORKSTREAMS, SESSIONS, WORKSTREAM_STATES, ARCS, APPROACH_SUFFIX, APPROACH_PAGE, escape, STATE_GROUP;
 var init_docs_tree = __esm({
   "packages/plugin-support-lib/src/lib/docs-tree.ts"() {
     DEVEX = ".spndevex";
@@ -101,8 +100,9 @@ var init_docs_tree = __esm({
     TEMPLATES = "templates";
     FACE = "README.md";
     DECISIONS = "decisions.md";
-    CONSTRUCT_PAGE_SUFFIX = "-construct.html";
     GUIDE_PAGE_SUFFIX = "-guide.html";
+    ARTIFACT_INDEX = "index.html";
+    HUB = "concept-overview.html";
     slashes = (path) => path.split(sep).join("/").replace(/\\/g, "/");
     segment = (name) => `/${name}/`;
     BOOK_TEMPLATES = [DOCS, SEAT.capabilities, "01-devex", "04-workspace", "04-docs", TEMPLATES].join("/");
@@ -132,14 +132,14 @@ __export(payload_exports, {
   unescape: () => unescape,
   workspaceRoot: () => workspaceRoot2
 });
-import { readFileSync as readFileSync2, existsSync as existsSync2, readdirSync, statSync as statSync2 } from "node:fs";
-import { basename, dirname as dirname2, join as join3, resolve as resolve2 } from "node:path";
+import { readFileSync as readFileSync3, existsSync as existsSync3, readdirSync, statSync as statSync2 } from "node:fs";
+import { basename, dirname as dirname3, join as join4, resolve as resolve2 } from "node:path";
 function unescape(text2) {
   return text2.replace(/&#x([0-9a-f]+);/gi, (_, code) => String.fromCodePoint(parseInt(code, 16))).replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number(code))).replace(/&([a-z][a-z0-9]*);/gi, (whole, name) => ENTITIES[name.toLowerCase()] ?? whole);
 }
 function read(path) {
   try {
-    return readFileSync2(path, "utf8");
+    return readFileSync3(path, "utf8");
   } catch {
     return "";
   }
@@ -148,8 +148,8 @@ function workspaceRoot2(start) {
   try {
     let path = resolve2(start);
     for (; ; ) {
-      if (existsSync2(join3(path, DEVEX)) && statSync2(join3(path, DEVEX)).isDirectory()) return path;
-      const up = dirname2(path);
+      if (existsSync3(join4(path, DEVEX)) && statSync2(join4(path, DEVEX)).isDirectory()) return path;
+      const up = dirname3(path);
       if (up === path) return null;
       path = up;
     }
@@ -180,7 +180,7 @@ function isFile(path) {
 }
 function readPayload() {
   try {
-    return JSON.parse(readFileSync2(0, "utf8") || "{}");
+    return JSON.parse(readFileSync3(0, "utf8") || "{}");
   } catch {
     return {};
   }
@@ -255,8 +255,9 @@ var init_payload = __esm({
   }
 });
 
-// packages/plugin-spn-devex/src/scripts/commands/docs/face.ts
-import { basename as basename8, relative as relative6, resolve as resolve8 } from "node:path";
+// packages/plugin-spn-devex/src/scripts/commands/docs/index.ts
+import { existsSync as existsSync7, readFileSync as readFileSync8, readdirSync as readdirSync6, statSync as statSync7 } from "node:fs";
+import { basename as basename8, dirname as dirname9, join as join11, relative as relative7, resolve as resolve8, sep as sep5 } from "node:path";
 
 // packages/plugin-support-lib/src/lib/timing.ts
 init_docs_tree();
@@ -493,6 +494,55 @@ function end(exit = null, always = false) {
     state.spans = [];
   } catch {
   }
+}
+
+// packages/plugin-spn-devex/src/scripts/commands/docs/index.ts
+init_docs_tree();
+
+// packages/plugin-support-lib/src/lib/page-styles.ts
+import { existsSync as existsSync2, readFileSync as readFileSync2 } from "node:fs";
+import { dirname as dirname2, join as join3 } from "node:path";
+var STYLES_ADDRESS = "https://saasplane.github.io/spn-claude-marketplace/assets/docs/";
+var STYLESHEET = "sds-docs.css";
+var PAGE_SCRIPT = "sds-docs.js";
+var INDEX_SCRIPT = "sds-index.js";
+var SERVED_FILES = Object.freeze([STYLESHEET, PAGE_SCRIPT, INDEX_SCRIPT]);
+var BUNDLED_SUFFIX = ".bundled.html";
+var STYLESHEET_LINK = /<link\b[^>]*\bhref="([^"]*)sds-docs\.css"[^>]*>/i;
+var VERSION_FOLDER = /(?:^|\/)(\d+\.\d+\.\d+)\/$/;
+function sharedStyles(html) {
+  const folder = STYLESHEET_LINK.exec(html)?.[1];
+  if (folder === void 0) return null;
+  return { folder, version: VERSION_FOLDER.exec(folder)?.[1] ?? null, served: folder.startsWith(STYLES_ADDRESS) };
+}
+function linksSharedStyles(html) {
+  return sharedStyles(html) !== null;
+}
+var OWN_COPY = "this page links no shared stylesheet: it holds its own copy of the styles, and the class names that copy used. Produce it again with `docs page`, or copy it from its template, so it links `sds-docs.css` (05-artifacts.md, One stylesheet, served in versions)";
+function linesFor(version, script = PAGE_SCRIPT) {
+  return {
+    stylesheet: `<link rel="stylesheet" href="${STYLES_ADDRESS}${version}/${STYLESHEET}">`,
+    script: `<script src="${STYLES_ADDRESS}${version}/${script}"></script>`
+  };
+}
+function stylesDir(from) {
+  for (let at = dirname2(from), last = ""; at !== last; last = at, at = dirname2(at)) {
+    if (existsSync2(join3(at, "styles", "versions.json"))) return join3(at, "styles");
+  }
+  return null;
+}
+function cutVersions(styles) {
+  const file = join3(styles, "versions.json");
+  if (!existsSync2(file)) return {};
+  return JSON.parse(readFileSync2(file, "utf8"));
+}
+function newestVersion(versions) {
+  const parts = (version) => version.split(".").map(Number);
+  const ordered = [...versions].sort((one, two) => {
+    const a = parts(one), b = parts(two);
+    return a[0] - b[0] || a[1] - b[1] || a[2] - b[2];
+  });
+  return ordered.at(-1) ?? null;
 }
 
 // packages/plugin-spn-devex/src/scripts/commands/docs/_lib.ts
@@ -1141,7 +1191,7 @@ function drawMap(spec, opts = {}) {
   }
   const out = [];
   const at = /* @__PURE__ */ new Map();
-  const place = (b, x, y2, w, h, row) => {
+  const place2 = (b, x, y2, w, h, row) => {
     const inner = kids.get(b.id) ?? [];
     at.set(b.id, { x, y: y2, w, h, row });
     if (!inner.length) {
@@ -1153,7 +1203,7 @@ function drawMap(spec, opts = {}) {
     let cy = y2 + HEAD;
     for (const c of inner) {
       const ch = outerH(c);
-      place(c, x + PAD_IN, cy, w - PAD_IN * 2, ch, row);
+      place2(c, x + PAD_IN, cy, w - PAD_IN * 2, ch, row);
       cy += ch + 10;
     }
   };
@@ -1212,7 +1262,7 @@ function drawMap(spec, opts = {}) {
     rowBottom.push(y + rh);
     for (const b of row) {
       const w = outerW(b);
-      place(b, x, y, w, outerH(b), i);
+      place2(b, x, y, w, outerH(b), i);
       x += w + gapX;
     }
     y += rh + (i < rows2.length - 1 ? gapAfter(i) : 0);
@@ -1757,40 +1807,6 @@ if (process.argv[1]?.endsWith("arc-status.ts")) {
 init_payload();
 init_docs_tree();
 import { basename as basename3, dirname as dirname4, isAbsolute as isAbsolute2, join as join5, relative as relative2, resolve as resolve3, sep as sep3 } from "node:path";
-
-// packages/plugin-support-lib/src/lib/page-styles.ts
-import { existsSync as existsSync3, readFileSync as readFileSync3 } from "node:fs";
-import { dirname as dirname3, join as join4 } from "node:path";
-var STYLES_ADDRESS = "https://saasplane.github.io/spn-claude-marketplace/assets/docs/";
-var STYLESHEET = "sds-docs.css";
-var PAGE_SCRIPT = "sds-docs.js";
-var INDEX_SCRIPT = "sds-index.js";
-var SERVED_FILES = Object.freeze([STYLESHEET, PAGE_SCRIPT, INDEX_SCRIPT]);
-var BUNDLED_SUFFIX = ".bundled.html";
-var STYLESHEET_LINK = /<link\b[^>]*\bhref="([^"]*)sds-docs\.css"[^>]*>/i;
-var VERSION_FOLDER = /(?:^|\/)(\d+\.\d+\.\d+)\/$/;
-function sharedStyles(html) {
-  const folder = STYLESHEET_LINK.exec(html)?.[1];
-  if (folder === void 0) return null;
-  return { folder, version: VERSION_FOLDER.exec(folder)?.[1] ?? null, served: folder.startsWith(STYLES_ADDRESS) };
-}
-function linksSharedStyles(html) {
-  return sharedStyles(html) !== null;
-}
-var OWN_COPY = "this page links no shared stylesheet: it holds its own copy of the styles, and the class names that copy used. Produce it again with `docs page`, or copy it from its template, so it links `sds-docs.css` (05-artifacts.md, One stylesheet, served in versions)";
-function stylesDir(from) {
-  for (let at = dirname3(from), last = ""; at !== last; last = at, at = dirname3(at)) {
-    if (existsSync3(join4(at, "styles", "versions.json"))) return join4(at, "styles");
-  }
-  return null;
-}
-function cutVersions(styles) {
-  const file = join4(styles, "versions.json");
-  if (!existsSync3(file)) return {};
-  return JSON.parse(readFileSync3(file, "utf8"));
-}
-
-// packages/plugin-spn-devex/src/scripts/checks/split-plan.ts
 var UNDECIDED = /* @__PURE__ */ new Set(["", "-", "--", "?", "\u2B1C", "\u2610", "[ ]", "tbd", "todo", "open", "unknown"]);
 var LANDED = ["landed", "done", "shipped"];
 var TICK = "\u2705";
@@ -1912,9 +1928,9 @@ function workstreamPlan(folders, pages) {
   return rows2;
 }
 function inProgressSince(cell) {
-  const bare = flat(cell).replace(/[*_`]/g, "").trim().replace(LEAD, "");
-  if (!IN_PROGRESS.test(bare)) return null;
-  const m = bare.match(/(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2})(:\d{2})?\s*(Z|[+-]\d{2}:?\d{2})?/i);
+  const bare2 = flat(cell).replace(/[*_`]/g, "").trim().replace(LEAD, "");
+  if (!IN_PROGRESS.test(bare2)) return null;
+  const m = bare2.match(/(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2})(:\d{2})?\s*(Z|[+-]\d{2}:?\d{2})?/i);
   if (!m) return null;
   const offset = !m[4] || /^z$/i.test(m[4]) ? "Z" : m[4].includes(":") ? m[4] : `${m[4].slice(0, 3)}:${m[4].slice(3)}`;
   const at = /* @__PURE__ */ new Date(`${m[1]}T${m[2]}${m[3] ?? ":00"}${offset}`);
@@ -2166,10 +2182,10 @@ function moves(command) {
     let args = tokens.slice(1);
     if (verb === "git" && args.length && args[0] === "mv") args = args.slice(1);
     else if (!MOVERS.has(verb)) continue;
-    const operands = args.filter((a) => !a.startsWith("-"));
-    if (operands.length >= 2)
-      for (const source of operands.slice(0, -1))
-        out.push([source.replace(/\/+$/, ""), operands[operands.length - 1]]);
+    const operands2 = args.filter((a) => !a.startsWith("-"));
+    if (operands2.length >= 2)
+      for (const source of operands2.slice(0, -1))
+        out.push([source.replace(/\/+$/, ""), operands2[operands2.length - 1]]);
   }
   return out;
 }
@@ -3337,7 +3353,7 @@ function arcSteps(path, text2) {
   if (repoAt < 0 || altitudeAt < 0)
     return [[ARC_ROWS, `the step table carries no ${repoAt < 0 ? "Repo" : "Altitude"} column \u2014 a row is # \xB7 Repo \xB7 Altitude \xB7 What \xB7 Mechanism \xB7 Acceptance \xB7 State ${where}`]];
   const clean = (cell) => (cell ?? "").replace(/[*`]/g, "").trim();
-  const bare = [];
+  const bare2 = [];
   const disorder = [];
   const miscounted = [];
   const seen = /* @__PURE__ */ new Set();
@@ -3352,7 +3368,7 @@ function arcSteps(path, text2) {
     const rowRepo = clean(cells[repoAt]);
     const altitude = ALTITUDES.indexOf(clean(cells[altitudeAt]).toUpperCase());
     if (!rowRepo || altitude < 0) {
-      bare.push(label);
+      bare2.push(label);
       continue;
     }
     if (NO_REPO.has(rowRepo)) continue;
@@ -3371,8 +3387,8 @@ function arcSteps(path, text2) {
   const out = [];
   if (miscounted.length)
     out.push([ARC_ROWS, `${listed(miscounted)} \u2014 a row with a wrong cell count is read one cell to the left, so its State is not the cell you wrote. Write a pipe inside a cell with a backslash before it (\`\\|\`), and give the row one cell for each heading ${where}`]);
-  if (bare.length)
-    out.push([ARC_ROWS, `row(s) ${listed(bare)} carry no Repo, or no Altitude from ${ALTITUDES.join(" \xB7 ")} ${where}`]);
+  if (bare2.length)
+    out.push([ARC_ROWS, `row(s) ${listed(bare2)} carry no Repo, or no Altitude from ${ALTITUDES.join(" \xB7 ")} ${where}`]);
   if (disorder.length)
     out.push([ARC_ROWS, `rows out of chain order: ${listed(disorder)} \u2014 rows run by repository, the foundation first, then DOCS \xB7 CODE \xB7 GENERATED \xB7 RELEASE \xB7 PROOF inside each ${where}`]);
   return out;
@@ -3772,8 +3788,8 @@ function argvWrites(head) {
     if (cmd === "sed") {
       out.push(...sedFiles(args).map((f) => [f, "inplace"]));
     } else if (["cp", "mv", "install", "rsync"].includes(cmd)) {
-      const operands = args.filter((a) => !a.startsWith("-"));
-      if (operands.length >= 2) out.push([operands[operands.length - 1], "copy"]);
+      const operands2 = args.filter((a) => !a.startsWith("-"));
+      if (operands2.length >= 2) out.push([operands2[operands2.length - 1], "copy"]);
     }
   }
   return out;
@@ -3825,7 +3841,7 @@ function shlexSplit2(segment2) {
   return out;
 }
 function bashWrites(command) {
-  const bare = (s) => s.trim().replace(/^['"]|['"]$/g, "");
+  const bare2 = (s) => s.trim().replace(/^['"]|['"]$/g, "");
   const out = [];
   const lines = command.split("\n");
   let i = 0;
@@ -3835,8 +3851,8 @@ function bashWrites(command) {
     const delimiters = [...line.matchAll(HEREDOC)].map((m) => m[2]);
     const head = line.replace(HEREDOC, " ");
     const targets = [
-      ...[...head.matchAll(REDIRECT)].map((m) => [bare(m[2]), m[1] === ">>", "redirect"]),
-      ...[...head.matchAll(TEE)].map((m) => [bare(m[1]), head.includes(" -a "), "tee"])
+      ...[...head.matchAll(REDIRECT)].map((m) => [bare2(m[2]), m[1] === ">>", "redirect"]),
+      ...[...head.matchAll(TEE)].map((m) => [bare2(m[1]), head.includes(" -a "), "tee"])
     ];
     const bodies = [];
     for (const d of delimiters) {
@@ -3849,7 +3865,7 @@ function bashWrites(command) {
       bodies.push(body3.join("\n"));
     }
     targets.forEach(([target, append, how], n) => out.push([target, n < bodies.length ? bodies[n] : null, append, how]));
-    for (const [target, how] of argvWrites(head)) out.push([bare(target), null, how === "inplace", how]);
+    for (const [target, how] of argvWrites(head)) out.push([bare2(target), null, how === "inplace", how]);
   }
   return out;
 }
@@ -4317,592 +4333,31 @@ if (process.argv[1] && basename6(process.argv[1]) === "prose.ts")
 
 // packages/plugin-spn-devex/src/scripts/commands/docs/_lib.ts
 init_docs_tree();
-var LENS_LABEL = {
-  LEAD: "Engineering leader",
-  BUSINESS: "Business manager",
-  PRODUCT: "Product manager",
-  ARCHITECT: "Architect",
-  SERVER_DEV: "Backend developer",
-  WEB_DEV: "Web developer",
-  QA: "Quality engineer",
-  INFRA: "DevOps / SRE",
-  TRUST: "DevSecOps / Security",
-  PARTNER: "Partner / integrator",
-  VOICE: "Editor"
-};
-var STATUS_WORD = { PLANNING: "PLANNING", IMPLEMENTING: "IMPLEMENTING", DONE: "DONE" };
 function text(html) {
   return html.replace(/<[^>]+>/g, "").replace(/&mdash;/g, "\u2014").replace(/&middot;/g, "\xB7").replace(/&ndash;/g, "\u2013").replace(/&rarr;/g, "\u2192").replace(/&larr;/g, "\u2190").replace(/&hellip;/g, "\u2026").replace(/&rsquo;/g, "\u2019").replace(/&lsquo;/g, "\u2018").replace(/&ldquo;/g, "\u201C").replace(/&rdquo;/g, "\u201D").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&#x([0-9A-Fa-f]+);/g, (_, h) => String.fromCodePoint(parseInt(h, 16))).replace(/\s+/g, " ").trim();
-}
-function sectionName(heading) {
-  return text(heading).split(/\s+[—–-]\s+/)[0].trim();
-}
-function readBlock(src) {
-  const mentions = outsideFences(src).replace(/`[^`\n]*`/g, (s) => " ".repeat(s.length));
-  const m = mentions.match(/<!--\s*spn:doc\s*([\s\S]*?)-->/);
-  if (!m) return { block: null, error: "no spn:doc block" };
-  try {
-    return { block: JSON.parse(m[1].trim()), error: null };
-  } catch (e) {
-    return { block: null, error: `spn:doc is not strict JSON \u2014 ${e.message}` };
-  }
-}
-function outsideFences(src) {
-  return src.replace(/^(```|~~~)[^\n]*\n[\s\S]*?^\1[^\n]*$/gm, (m) => m.replace(/[^\n]/g, " "));
-}
-function tagStatus(status) {
-  const icon = { DONE: "\u2705", IMPLEMENTING: "\u{1F6A7}", PLANNING: "\u{1F52E}" };
-  return `${icon[status] ?? "\u{1F52E}"} ${STATUS_WORD[status] ?? "PLANNING"}`;
-}
-function tagLine(file, block) {
-  const actors = (block.lenses ?? []).map((l) => LENS_LABEL[l]).filter(Boolean).join(" \xB7 ");
-  const forPart = `\`For: ${actors}\``;
-  return carriesStatus(file, block) ? `${forPart} \xB7 \`Status: ${tagStatus(block.status)}\`` : forPart;
-}
-function writeTagLines(tree, write2) {
-  const findings = [];
-  const touched = [];
-  for (const file of walkFiles(tree, (p) => p.endsWith(".md"))) {
-    const before = readFileSync6(file, "utf8");
-    const { block } = readBlock(before);
-    if (!block || !block.lenses?.length) continue;
-    if (carriesStatus(file, block) && !(block.status in STATUS_WORD)) continue;
-    const want = tagLine(file, block);
-    const bare = outsideFences(before);
-    const TAG = /^`(?:For|Lenses):[^`\n]*`(?:[ \t]*·[ \t]*`Status:[^`\n]*`)?((?:[ \t]*·[ \t]*`[^`\n]*`)*)[ \t]*$/m;
-    let after;
-    const at = bare.match(TAG);
-    if (at) {
-      after = before.slice(0, at.index) + want + (at[1] ?? "") + before.slice(at.index + at[0].length);
-    } else {
-      const h1 = [...bare.matchAll(/^#\s+.+$/gm)];
-      if (h1.length !== 1) {
-        findings.push({ check: "face", grade: "SOFT", file, message: "no tag line and no single `#` title to render one under" });
-        continue;
-      }
-      const at2 = h1[0].index + h1[0][0].length;
-      after = before.slice(0, at2) + `
-
-${want}` + before.slice(at2);
-    }
-    if (after !== before) {
-      if (write2) writeFileSync3(file, after);
-      touched.push(relative5(tree, file));
-    }
-  }
-  return { touched, findings };
-}
-function holdsOwnCopy3(file, src) {
-  return file.endsWith(".html") && !file.endsWith(BUNDLED_SUFFIX) && !linksSharedStyles(src);
 }
 var SERVED_VERSION = new RegExp(
   `<(?:link|script)\\b[^>]*\\b(?:href|src)="(?:[^"]*/)?(\\d+\\.\\d+\\.\\d+)/(?:${SERVED_FILES.map((served) => served.replace(/\./g, "\\.")).join("|")})"`,
   "gi"
 );
-function repoOf3(file) {
-  let dir = dirname7(resolve7(file));
-  for (; ; ) {
-    if (existsSync5(join9(dir, "sprepo.json"))) return dir;
+function locationOf(seat, workspace) {
+  let dir = dirname7(resolve7(seat));
+  for (let i = 0; i < 8; i++) {
+    for (const m of ["sprepo.json", "spkind.json"]) {
+      const f = join9(dir, m);
+      if (existsSync5(f)) {
+        try {
+          const j = JSON.parse(readFileSync6(f, "utf8"));
+          if (typeof j.name === "string" && j.name) return j.name;
+        } catch {
+        }
+      }
+    }
     const up = dirname7(dir);
-    if (up === dir) return null;
+    if (up === dir) break;
     dir = up;
   }
-}
-function worldOf(file) {
-  const repo = repoOf3(file);
-  if (!repo) return null;
-  try {
-    return JSON.parse(readFileSync6(join9(repo, "sprepo.json"), "utf8")).type ?? null;
-  } catch {
-    return null;
-  }
-}
-function carriesStatus(file, block) {
-  if (block?.variant === "overview") return false;
-  if (block?.variant === "report") return false;
-  if (block?.variant === "construct" && worldOf(file) === "FOUNDATION") return false;
-  if ((block?.variant === "guide" || block?.variant === "index") && file.endsWith(".html")) return false;
-  return true;
-}
-var BEGIN = (what) => `<!-- spn:generated ${what} \u2014 do not edit inside these markers; \`docs.ts face\` writes it -->`;
-var END = "<!-- /spn:generated -->";
-function replaceRegion(src, what, body3) {
-  const begin2 = BEGIN(what);
-  const i = src.indexOf(begin2);
-  if (i < 0) return src.trimEnd() + `
-
-${begin2}
-${body3}
-${END}
-`;
-  const j = src.indexOf(END, i);
-  if (j < 0) return src.trimEnd() + `
-
-${begin2}
-${body3}
-${END}
-`;
-  return src.slice(0, i) + `${begin2}
-${body3}
-${END}` + src.slice(j + END.length);
-}
-function removeRegion(src, what) {
-  const begin2 = BEGIN(what);
-  const i = src.indexOf(begin2);
-  if (i < 0) return src;
-  const j = src.indexOf(END, i);
-  if (j < 0) return src;
-  return (src.slice(0, i).trimEnd() + "\n" + src.slice(j + END.length).replace(/^\n+/, "\n")).trimEnd() + "\n";
-}
-function mdRows(block) {
-  return block.split("\n").filter((l) => l.trim().startsWith("|") && !/^\s*\|[\s:|-]+\|\s*$/.test(l)).map((l) => l.trim().replace(/^\|/, "").replace(/(?<!\\)\|$/, "").split(/(?<!\\)\|/).map((c) => c.trim())).slice(1);
-}
-function sectionBody(src, heading) {
-  const lines = src.split("\n");
-  const i = lines.findIndex((l) => /^##\s/.test(l) && heading.test(l));
-  if (i < 0) return null;
-  const j = lines.findIndex((l, k) => k > i && /^##\s/.test(l));
-  return lines.slice(i + 1, j < 0 ? void 0 : j).join("\n");
-}
-function walkFiles(dir, keep, out = []) {
-  let entries;
-  try {
-    entries = readdirSync5(dir);
-  } catch {
-    return out;
-  }
-  for (const e of entries) {
-    if (e === "node_modules" || e === ".git" || e === "dist") continue;
-    if (e === TEMPLATES) continue;
-    const p = join9(dir, e);
-    let st;
-    try {
-      st = statSync6(p);
-    } catch {
-      continue;
-    }
-    if (st.isDirectory()) walkFiles(p, keep, out);
-    else if (keep(p)) out.push(p);
-  }
-  return out;
-}
-function directFiles(dir, keep) {
-  let entries;
-  try {
-    entries = readdirSync5(dir);
-  } catch {
-    return [];
-  }
-  const out = [];
-  for (const e of entries) {
-    const p = join9(dir, e);
-    let st;
-    try {
-      st = statSync6(p);
-    } catch {
-      continue;
-    }
-    if (st.isDirectory()) continue;
-    if (keep(p)) out.push(p);
-  }
-  return out;
-}
-function glossaryRows(domainDir) {
-  const findings = [];
-  const rows2 = [];
-  const constructs = [];
-  for (const file of walkFiles(domainDir, (p) => p.endsWith(".md") && basename7(p) !== "README.md")) {
-    const src = readFileSync6(file, "utf8");
-    const { block } = readBlock(src);
-    if (block?.id) constructs.push({ id: block.id, title: block.title, summary: block.summary, deps: block.dependsOn ?? [], file });
-    const body3 = sectionBody(src, /Terms\b/);
-    if (!body3) continue;
-    const cells = mdRows(body3);
-    if (cells.length && cells[0].length < 3) {
-      findings.push({ check: "face", grade: "RULE", file, message: "the `Terms` table has two columns; the glossary needs the consumer's word, the contract term and the meaning (03-tree.md, the glossary's three sources)" });
-      continue;
-    }
-    for (const c of cells) rows2.push({ term: c[0], contract: c[1], means: c[2], file });
-  }
-  const order = new Map(readingOrder(constructs).map((c, i) => [c.file, i]));
-  const label = new Map(constructs.map((c) => [c.file, sectionName(c.title)]));
-  const rank = (f) => order.get(f) ?? Number.MAX_SAFE_INTEGER;
-  rows2.sort((a, b) => rank(a.file) - rank(b.file) || a.term.localeCompare(b.term));
-  return { rows: rows2.map((r) => ({ ...r, group: label.get(r.file) ?? basename7(r.file, ".md") })), findings };
-}
-function pageForSeat(seat) {
-  return producedPageOf(seat);
-}
-function overviewForDomain(domainDir) {
-  const dir = resolve7(domainDir).replace(/\\/g, "/");
-  const split = splitAtSeat(dir, "constructs", "last");
-  if (!split) return null;
-  const face2 = join9(dir, "README.md");
-  if (!existsSync5(face2)) return null;
-  const title = readBlock(readFileSync6(face2, "utf8")).block?.title;
-  if (!title) return null;
-  const overviews = overviewsDir(split.docs);
-  if (!existsSync5(overviews)) return null;
-  for (const f of readdirSync5(overviews).filter((x) => x.endsWith(".html")).sort()) {
-    const full = join9(overviews, f);
-    if (readBlock(readFileSync6(full, "utf8")).block?.title === title) return full;
-  }
-  return null;
-}
-function buildGlossaryHtml(domainDir, overviewFile) {
-  const { rows: rows2, findings } = glossaryRows(domainDir);
-  const esc2 = (x) => x.replace(/&(?![a-zA-Z#][a-zA-Z0-9]*;)/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  const cell = (x) => esc2(x.replace(/\\\|/g, "|")).replace(/`([^`]*)`/g, "<code>$1</code>");
-  const out = [
-    '  <div class="sds-scroll"><table class="sds-glossary">',
-    "    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>",
-    "    <tbody>"
-  ];
-  let group = null;
-  for (const r of rows2) {
-    if (r.group !== group) {
-      out.push(`      <tr class="sds-group"><td colspan="3">${esc2(r.group)}</td></tr>`);
-      group = r.group;
-    }
-    const href = relative5(dirname7(overviewFile), pageForSeat(r.file));
-    const term = r.term && r.term !== "\u2014" ? `<a href="${href}">${esc2(r.term)}</a>` : esc2(r.term);
-    out.push(`      <tr><td>${term}</td><td>${cell(r.contract)}</td><td>${cell(r.means)}</td></tr>`);
-  }
-  if (!rows2.length) out.push("      <tr><td>&mdash;</td><td>&mdash;</td><td>no construct in this domain carries a <code>Terms</code> table yet</td></tr>");
-  out.push("    </tbody>", "  </table></div>");
-  return { body: out.join("\n"), findings };
-}
-function buildGlossary(domainDir, faceFile) {
-  const { rows: rows2, findings } = glossaryRows(domainDir);
-  const lines = ["## Glossary", "", "| Term | Contract term | What it means |", "| --- | --- | --- |"];
-  let group = null;
-  for (const r of rows2) {
-    if (r.group !== group) {
-      lines.push(`| **${r.group}** | | |`);
-      group = r.group;
-    }
-    const target = relative5(dirname7(faceFile), r.file);
-    const term = r.term && r.term !== "\u2014" ? `[${r.term}](${target})` : r.term;
-    lines.push(`| ${term} | ${r.contract} | ${r.means} |`);
-  }
-  if (!rows2.length) lines.push("| \u2014 | \u2014 | no construct in this domain carries a `Terms` table yet |");
-  return { body: lines.join("\n"), findings };
-}
-function buildMap(faceFile) {
-  const findings = [];
-  const dir = dirname7(faceFile);
-  const rel = splitAtSeat(faceFile, "capabilities")?.rel ?? "";
-  if (rel.split("/").length >= 3) return buildChapterMap(faceFile);
-  const { block: faceBlock } = readBlock(readFileSync6(faceFile, "utf8"));
-  const root = (faceBlock?.governs ?? "src").replace(/\/+$/, "");
-  const mirrors = directFiles(dir, (p) => p.endsWith(".md") && basename7(p) !== "README.md" && basename7(p) !== "data-model.md").sort((a, b) => a.localeCompare(b));
-  const glyph = { DONE: "\u2705", IMPLEMENTING: "\u{1F6A7}", PLANNING: "\u{1F52E}" };
-  const lines = ["| File | Governs | Carries | Status |", "| --- | --- | --- | --- |"];
-  for (const m of mirrors) {
-    const rel2 = relative5(dir, m);
-    const { block } = readBlock(readFileSync6(m, "utf8"));
-    if (!block) {
-      findings.push({ check: "face", grade: "RULE", file: m, message: "a mirror with no `spn:doc` block cannot be put in the Map" });
-      continue;
-    }
-    const governs = `${root}/${rel2.replace(/\.md$/, "")}/`;
-    lines.push(`| [${rel2}](${rel2}) | \`${governs}\` | ${block.summary} | ${glyph[block.status] ?? "\u{1F52E}"} |`);
-  }
-  if (mirrors.length === 0) lines.push("| \u2014 | \u2014 | this layer carries no mirror yet | \u{1F52E} |");
-  return { body: lines.join("\n"), findings };
-}
-function buildChapterMap(faceFile) {
-  const findings = [];
-  const dir = dirname7(faceFile);
-  const chapters = walkFiles(dir, (p) => p.endsWith(".md") && !["README.md", "data-model.md", "surface-map.md"].includes(basename7(p))).sort((a, b) => a.localeCompare(b));
-  const glyph = { DONE: "\u2705", IMPLEMENTING: "\u{1F6A7}", PLANNING: "\u{1F52E}" };
-  const lines = ["| Chapter | Realizes | Carries | Status |", "| --- | --- | --- | --- |"];
-  for (const m of chapters) {
-    const name = relative5(dir, m);
-    const { block } = readBlock(readFileSync6(m, "utf8"));
-    if (!block) {
-      findings.push({ check: "face", grade: "RULE", file: m, message: "a chapter with no `spn:doc` block cannot be put in the Map" });
-      continue;
-    }
-    const realizes = (block.realizes ?? [])[0] ?? name.replace(/\.md$/, "").replace(/^\d\d-/, "");
-    lines.push(`| [${name}](${name}) | \`${realizes}\` | ${block.summary} | ${glyph[block.status] ?? "\u{1F52E}"} |`);
-  }
-  if (!chapters.length) lines.push("| \u2014 | \u2014 | this package realizes no construct yet | \u{1F52E} |");
-  return { body: lines.join("\n"), findings };
-}
-function conceptSections(concept) {
-  const out = /* @__PURE__ */ new Map();
-  const lines = readFileSync6(concept, "utf8").split("\n");
-  let name = null, bridge = [], items = [];
-  let closed = false;
-  const flush = () => {
-    if (name && !out.has(name)) out.set(name, { bridge: bridge.join(" ").trim(), lines: items });
-  };
-  for (const l of lines) {
-    if (/^###?\s/.test(l)) {
-      flush();
-      name = sectionKey(l.replace(/^###?\s*/, ""));
-      bridge = [];
-      items = [];
-      closed = false;
-      continue;
-    }
-    if (name === null) continue;
-    if (/^[-*]\s/.test(l)) {
-      items.push(l.replace(/^[-*]\s*/, ""));
-      continue;
-    }
-    if (!l.trim()) {
-      if (bridge.length) closed = true;
-      continue;
-    }
-    if (/^#{4,}\s/.test(l) || l.trim().startsWith("|") || l.trim().startsWith("```")) {
-      closed = true;
-      continue;
-    }
-    if (!items.length && !closed) bridge.push(l.trim());
-  }
-  flush();
-  for (const l of lines) {
-    const cells = l.trim().startsWith("|") ? l.split("|").slice(1, -1).map((c) => c.trim()) : null;
-    if (!cells || cells.length < 2 || /^[\s:|-]+$/.test(cells.join(""))) continue;
-    const key = sectionKey(cells[0]);
-    if (!key || out.has(key)) continue;
-    out.set(key, { bridge: cells.slice(1).filter(Boolean).join(" \u2014 "), lines: [] });
-  }
-  return out;
-}
-function sectionKey(heading) {
-  return heading.replace(/`[^`]*`/g, "").replace(/^SaaS Plane\s*[—–-]\s*/i, "").replace(/^(?:The|A|An)\s+/i, "").replace(/\s*&\s*/g, "-and-").trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-}
-function folderKey(folder) {
-  return folder.replace(/^\d+-/, "").toLowerCase();
-}
-function readingOrder(constructs) {
-  const byId = new Map(constructs.map((c) => [c.id, c]));
-  const done = /* @__PURE__ */ new Set(), out = [];
-  const visit = (c, trail) => {
-    if (done.has(c.id) || trail.has(c.id)) return;
-    trail.add(c.id);
-    for (const d of c.deps) {
-      const dep = byId.get(d);
-      if (dep) visit(dep, trail);
-    }
-    trail.delete(c.id);
-    if (!done.has(c.id)) {
-      done.add(c.id);
-      out.push(c);
-    }
-  };
-  for (const c of constructs) visit(c, /* @__PURE__ */ new Set());
-  return out;
-}
-function rebase(body3, fromDir, toDir) {
-  return body3.replace(/\]\(([^)\s]+)\)/g, (whole, target) => {
-    if (/^(?:https?:|mailto:|#|\/)/.test(target)) return whole;
-    const [path, hash] = target.split(/(?=#)/);
-    if (!path) return whole;
-    return `](${relative5(toDir, resolve7(fromDir, path))}${hash ?? ""})`;
-  });
-}
-function constructFolders(root) {
-  const out = [];
-  const walk2 = (dir) => {
-    let entries;
-    try {
-      entries = readdirSync5(dir);
-    } catch {
-      return;
-    }
-    for (const e of entries) {
-      const p = join9(dir, e);
-      if (!statSync6(p).isDirectory()) continue;
-      out.push(p);
-      walk2(p);
-    }
-  };
-  walk2(root);
-  return out;
-}
-function isGroup(dir) {
-  try {
-    const entries = readdirSync5(dir);
-    if (!entries.some((e) => {
-      try {
-        return statSync6(join9(dir, e)).isDirectory();
-      } catch {
-        return false;
-      }
-    })) return false;
-    return !entries.some((e) => e.endsWith(".md") && e !== "README.md");
-  } catch {
-    return false;
-  }
-}
-function isDomainFolder(constructsDir2, dir) {
-  if (isGroup(dir)) return false;
-  const depth2 = relative5(constructsDir2, dir).split("/").length;
-  return depth2 === 1 || depth2 === 2 && isGroup(dirname7(dir));
-}
-function domainFaces(tree, concept) {
-  const findings = [];
-  const faces = /* @__PURE__ */ new Map();
-  const sections = concept ? conceptSections(concept) : /* @__PURE__ */ new Map();
-  const conceptDir = concept ? dirname7(concept) : tree;
-  const constructsSeat = constructsDir(tree);
-  const folders = constructFolders(constructsSeat);
-  const constructsUnder = (dir) => {
-    const out = [];
-    for (const f of walkFiles(dir, (p) => p.endsWith(".md") && basename7(p) !== "README.md")) {
-      const { block } = readBlock(readFileSync6(f, "utf8"));
-      if (!block) continue;
-      out.push({ id: block.id, title: block.title, summary: block.summary, deps: block.dependsOn ?? [], file: f });
-    }
-    return out;
-  };
-  const named = (dir) => {
-    const key = folderKey(basename7(dir));
-    return [...sections.keys()].find((k) => k === key) ?? null;
-  };
-  for (const dir of folders) {
-    const depth2 = relative5(constructsSeat, dir).split("/").length;
-    const key = named(dir);
-    const isDomainOrGroup = depth2 === 1 || depth2 === 2 && isGroup(dirname7(dir));
-    if (!key && concept && isDomainOrGroup) {
-      findings.push({ check: "face", grade: "RULE", file: dir, message: `the concept names no section \`${folderKey(basename7(dir))}\`, and a domain folder exists only where the concept names that domain (invariant 1)` });
-    }
-    const bridge = key ? rebase(sections.get(key).bridge, conceptDir, dir) : "";
-    const body3 = isGroup(dir) ? [
-      bridge,
-      "",
-      "| Domain | What it holds |",
-      "| --- | --- |",
-      ...readdirSync5(dir).filter((e) => {
-        try {
-          return statSync6(join9(dir, e)).isDirectory();
-        } catch {
-          return false;
-        }
-      }).sort().map((e) => {
-        const k = named(join9(dir, e));
-        return `| [${k ?? folderKey(e)}](${e}/README.md) | ${k ? rebase(sections.get(k).bridge.split(". ")[0], conceptDir, dir) : "\u2014"} |`;
-      })
-    ] : [
-      bridge,
-      "",
-      "| Construct | What it is |",
-      "| --- | --- |",
-      ...readingOrder(constructsUnder(dir)).map((c) => `| [${c.title}](${relative5(dir, c.file)}) | ${c.summary} |`)
-    ];
-    faces.set(join9(dir, "README.md"), body3.filter((l, i) => !(i === 0 && !l)).join("\n"));
-  }
-  return { faces, findings };
-}
-function placeGlossary(src, body3) {
-  const m = src.match(/<section[^>]*data-block="glossary"[^>]*>[\s\S]*?<\/section>/);
-  if (!m) return null;
-  const sec = m[0];
-  const begin2 = BEGIN("glossary-html");
-  const i = sec.indexOf(begin2);
-  let next;
-  if (i >= 0) {
-    const j = sec.indexOf(END, i);
-    if (j < 0) return null;
-    next = sec.slice(0, i) + `${begin2}
-${body3}
-  ${END}` + sec.slice(j + END.length);
-  } else {
-    const t = sec.match(/[ \t]*<div class="sds-scroll"><table>[\s\S]*?<\/table><\/div>/);
-    if (!t) return null;
-    next = sec.replace(t[0], `  ${begin2}
-${body3}
-  ${END}`);
-  }
-  return src.replace(sec, next);
-}
-function face(tree, write2) {
-  const findings = [];
-  const touched = [];
-  const constructsSeat = constructsDir(tree);
-  for (const dir of constructFolders(constructsSeat).filter((d) => isDomainFolder(constructsSeat, d))) {
-    const domainFace = join9(dir, "README.md");
-    if (!existsSync5(domainFace)) {
-      findings.push({ check: "face", grade: "SOFT", file: domainFace, message: "no domain face to write the glossary into" });
-      continue;
-    }
-    const { body: body3, findings: df } = buildGlossary(dir, domainFace);
-    findings.push(...df);
-    const before = readFileSync6(domainFace, "utf8");
-    const after = replaceRegion(before, "glossary", body3);
-    if (after !== before) {
-      if (write2) writeFileSync3(domainFace, after);
-      touched.push(relative5(tree, domainFace));
-    }
-    const overview = overviewForDomain(dir);
-    if (overview) {
-      const { body: html } = buildGlossaryHtml(dir, overview);
-      const ovBefore = readFileSync6(overview, "utf8");
-      const ownCopy = holdsOwnCopy3(overview, ovBefore);
-      const ovAfter = ownCopy ? ovBefore : placeGlossary(ovBefore, html);
-      if (ownCopy)
-        findings.push({ check: "styles", grade: "SOFT", file: overview, message: OWN_COPY });
-      else if (ovAfter === null)
-        findings.push({ check: "face", grade: "SOFT", file: overview, message: "this domain's overview has no `Glossary` section with a table in it, so the domain's glossary has nowhere to land" });
-      else if (ovAfter !== ovBefore) {
-        if (write2) writeFileSync3(overview, ovAfter);
-        touched.push(relative5(tree, overview));
-      }
-    }
-  }
-  const seatFace = join9(constructsSeat, "README.md");
-  if (existsSync5(seatFace)) {
-    const before = readFileSync6(seatFace, "utf8");
-    const after = removeRegion(before, "glossary");
-    if (after !== before) {
-      if (write2) writeFileSync3(seatFace, after);
-      touched.push(relative5(tree, seatFace));
-    }
-  } else {
-    findings.push({ check: "face", grade: "SOFT", file: seatFace, message: "no constructs seat face" });
-  }
-  const conceptFile = ["CONCEPT.md", join9("..", "CONCEPT.md")].map((c) => join9(tree, c)).find(existsSync5) ?? null;
-  const { faces, findings: dfz } = domainFaces(tree, conceptFile);
-  findings.push(...dfz);
-  for (const [file, body3] of faces) {
-    if (!existsSync5(file)) {
-      findings.push({ check: "face", grade: "SOFT", file, message: "no domain face to write into" });
-      continue;
-    }
-    const before = readFileSync6(file, "utf8");
-    const after = replaceRegion(before, "constructs", body3);
-    if (after !== before) {
-      if (write2) writeFileSync3(file, after);
-      touched.push(relative5(tree, file));
-    }
-  }
-  const authored = (() => {
-    try {
-      return JSON.parse(readFileSync6(join9(tree, "..", "sprepo.json"), "utf8")).type === "FOUNDATION";
-    } catch {
-      return false;
-    }
-  })();
-  for (const faceFile of authored ? [] : walkFiles(capabilitiesDir(tree), (p) => basename7(p) === "README.md")) {
-    const { body: body3, findings: mf } = buildMap(faceFile);
-    findings.push(...mf);
-    const before = readFileSync6(faceFile, "utf8");
-    const after = replaceRegion(before, "contents", body3);
-    if (after !== before) {
-      if (write2) writeFileSync3(faceFile, after);
-      touched.push(relative5(tree, faceFile));
-    }
-  }
-  const tags = writeTagLines(tree, write2);
-  findings.push(...tags.findings);
-  console.log(touched.length ? `${write2 ? "wrote" : "would write"} ${touched.length} face${touched.length > 1 ? "s" : ""}:
-  ${touched.join("\n  ")}` : "every face is already current");
-  console.log(tags.touched.length ? `${write2 ? "wrote" : "would write"} ${tags.touched.length} tag line${tags.touched.length > 1 ? "s" : ""}` : "every tag line is already rendered from its block");
-  return findings;
+  return "\u2014";
 }
 function resolveWorkspace() {
   return process.env.SPN_WORKSPACE ?? workspaceRoot3(process.cwd());
@@ -4917,32 +4372,395 @@ function workspaceRoot3(from) {
   }
 }
 
-// packages/plugin-spn-devex/src/scripts/commands/docs/face.ts
-var describe = "write what is generated, between markers \u2014 the domain glossary, the maps, the tag lines";
+// packages/plugin-spn-devex/src/scripts/commands/docs/_pages.ts
+init_docs_tree();
+import { existsSync as existsSync6, mkdirSync as mkdirSync3, readFileSync as readFileSync7, writeFileSync as writeFileSync4 } from "node:fs";
+import { dirname as dirname8, join as join10, relative as relative6 } from "node:path";
+import { fileURLToPath as fileURLToPath2 } from "node:url";
+var PAGE_TEMPLATES = "pages";
+var Refusal = class extends Error {
+};
+function say(notes, workspace) {
+  for (const note of notes)
+    console.log(`${note.grade === "RULE" ? "\u2717" : "!"} ${note.grade.padEnd(4)} ${note.check.padEnd(9)} ${relative6(workspace, note.file)}
+         ${note.message}`);
+  return notes.some((note) => note.grade === "RULE");
+}
+function optionValue(args, option) {
+  const at = args.indexOf(option);
+  return at >= 0 && at + 1 < args.length ? args[at + 1] : null;
+}
+function operands(args, valued) {
+  return args.filter((word, at) => !word.startsWith("--") && !(at > 0 && valued.includes(args[at - 1])));
+}
+function templatesDir(workspace) {
+  return process.env.SPN_TEMPLATES ?? bookTemplatesDir(join10(workspace, "spn-foundation"));
+}
+function pageTemplate(templates, name) {
+  const file = join10(templates, PAGE_TEMPLATES, name);
+  if (!existsSync6(file)) throw new Refusal(`the template ${file} is not there. Set SPN_TEMPLATES to the folder of the book's templates`);
+  const text2 = readFileSync7(file, "utf8");
+  if (!linksSharedStyles(text2)) throw new Refusal(`the template ${file} cannot be used: ${OWN_COPY}`);
+  return text2;
+}
+function newestCut() {
+  const styles = process.env.SPN_STYLES ?? stylesDir(fileURLToPath2(import.meta.url));
+  const version = styles === null ? null : newestVersion(Object.keys(cutVersions(styles)));
+  if (version === null)
+    throw new Refusal(`no version of the shared styles was cut${styles === null ? "" : ` in ${styles}`}, so a page has no version to link (05-artifacts.md, One stylesheet, served in versions)`);
+  return version;
+}
+function escaped(text2) {
+  return text2.replace(/&(?![A-Za-z]+;|#\d+;|#x[0-9A-Fa-f]+;)/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+function attribute2(text2) {
+  return escaped(text2).replace(/"/g, "&quot;");
+}
+function swap(text2, pattern, replacement, part) {
+  if (!pattern.test(text2)) throw new Refusal(`the template has no ${part}, so the page cannot be produced from it`);
+  return text2.replace(pattern, () => replacement);
+}
+var literal = (text2) => text2.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+function withHead(template, head) {
+  const lines = linesFor(head.version, head.script);
+  let page = template.replace(/^\s*<!--(?!\s*spn:doc)[\s\S]*?-->\s*/, "");
+  page = page.replace(/\n*<footer>[\s\S]*?<\/footer>\n*/, "\n\n");
+  page = swap(page, /<title>[\s\S]*?<\/title>/, `<title>${escaped(head.tab)}</title>`, "`<title>`");
+  page = swap(
+    page,
+    /<!--\s*spn:doc[\s\S]*?-->/,
+    `<!-- spn:doc
+${JSON.stringify(head.block)}
+-->
+<!-- ${head.produced} -->`,
+    "`spn:doc` block"
+  );
+  page = swap(
+    page,
+    new RegExp(`<link\\b[^>]*\\bhref="[^"]*${literal(STYLESHEET)}"[^>]*>`),
+    lines.stylesheet,
+    `line that links \`${STYLESHEET}\``
+  );
+  page = swap(
+    page,
+    new RegExp(`<script\\b[^>]*\\bsrc="[^"]*${literal(head.script)}"[^>]*></script>`),
+    lines.script,
+    `line that loads \`${head.script}\``
+  );
+  return page;
+}
+function slotsLeft(shell) {
+  return shell.match(/\{\{[\s\S]*?\}\}/g) ?? [];
+}
+function refuseSlots(shell, template) {
+  const left = slotsLeft(shell);
+  if (left.length) throw new Refusal(`${template} holds ${left.length} slot(s) this command does not fill: ${left.join(" \xB7 ")}`);
+}
+function place(file, page, write2, workspace, command) {
+  const before = existsSync6(file) ? readFileSync7(file, "utf8") : null;
+  const shown = relative6(workspace, file);
+  if (before === page) {
+    console.log(`current  ${shown}`);
+    return [];
+  }
+  if (!write2)
+    return [{ grade: "RULE", check: command, file, message: before === null ? `no page has been produced here yet. Run \`docs ${command}\` without \`--check\`` : `this page is not what \`docs ${command}\` produces now: its source changed, or it was edited by hand` }];
+  mkdirSync3(dirname8(file), { recursive: true });
+  writeFileSync4(file, page);
+  console.log(`${before === null ? "wrote   " : "rewrote "} ${shown}`);
+  return [];
+}
+
+// packages/plugin-spn-devex/src/scripts/commands/docs/index.ts
+var describe = "write the index of a repository's artifacts from the pages on disk";
+var TEMPLATE = "artifact-index-template.html";
+var USAGE = "usage: spn-devex docs index <repository> [--check] [--out <file>]";
+var POCKET_PATH = `${DOCS}/${POCKET.artifacts}`;
+var GROUPS = ["Docs", "Guides", "Reports"];
+var TAB_LIMIT = 8;
+var DATA_BLOCK = /(?:<!--(?:(?!-->)[\s\S])*-->\s*)?<script type="application\/json" id="index-data">([\s\S]*?)<\/script>/;
+var byName = (one, two) => one < two ? -1 : one > two ? 1 : 0;
+var bare = (name) => name.replace(/^\d+-/, "");
+function pagesUnder(folder) {
+  if (!existsSync7(folder)) return [];
+  return readdirSync6(folder).sort(byName).flatMap((name) => {
+    if (name.startsWith(".")) return [];
+    const full = join11(folder, name);
+    if (statSync7(full).isDirectory()) return pagesUnder(full);
+    return name.endsWith(".html") && !name.endsWith(BUNDLED_SUFFIX) ? [full] : [];
+  });
+}
+function factsOf(file) {
+  const text2 = readFileSync8(file, "utf8");
+  let block = {};
+  const found = /<!--\s*spn:doc\s*(\{[\s\S]*?\})\s*-->/.exec(text2);
+  if (found) {
+    try {
+      block = JSON.parse(found[1]);
+    } catch {
+      block = {};
+    }
+  }
+  const stem = basename8(file, ".html");
+  const tab = /<title>([\s\S]*?)<\/title>/.exec(text2)?.[1];
+  const title = typeof block.title === "string" && block.title ? block.title : (tab ? text(tab) : "") || stem;
+  const kind = typeof block.variant === "string" && block.variant ? block.variant : stem.slice(stem.lastIndexOf("-") + 1);
+  return { text: text2, title, kind, source: typeof block.source === "string" ? block.source : null };
+}
+function entriesOf(node) {
+  return [...node.path === void 0 ? [] : [node], ...(node.children ?? []).flatMap(entriesOf)];
+}
+function groupsOf(artifacts) {
+  const docs = dirname9(artifacts);
+  const files = pagesUnder(artifacts).filter((file) => file !== artifactIndex(docs));
+  const facts = new Map(files.map((file) => [file, factsOf(file)]));
+  const notes = [];
+  const pathOf = (file) => slashes(relative7(artifacts, file));
+  const entry = (file) => ({ label: facts.get(file).title, kind: facts.get(file).kind, path: pathOf(file) });
+  const under2 = (folder) => files.filter((file) => file.startsWith(folder + sep5));
+  const direct = (folder) => files.filter((file) => dirname9(file) === folder);
+  const constructsRoot = constructPagesDir(docs);
+  const overviews = under2(overviewsDir(docs));
+  const hub = overviews.find((file) => file === join11(overviewsDir(docs), HUB)) ?? null;
+  const stems = new Map(overviews.filter((file) => file !== hub).map((file) => [file, basename8(file, ".html").replace(/^concept-/, "").replace(/-overview$/, "")]));
+  const words2 = /* @__PURE__ */ new Map();
+  for (const [file, stem] of stems) {
+    const titleWords = facts.get(file).title.split(/\s+/).filter(Boolean);
+    const parts = stem.split("-");
+    if (titleWords.length === parts.length && titleWords.every((word, at) => word.toLowerCase() === parts[at]))
+      parts.forEach((part, at) => words2.set(part, titleWords[at]));
+  }
+  const label = (folder) => {
+    const name = bare(basename8(folder));
+    const spaced = name.replace(/-/g, " ");
+    return words2.get(name) ?? spaced.charAt(0).toUpperCase() + spaced.slice(1).toLowerCase();
+  };
+  const linked = /* @__PURE__ */ new Map();
+  for (const file of overviews) {
+    const reached = [];
+    for (const link of facts.get(file).text.matchAll(/<a\b[^>]*?\bhref="([^"#?]+)/g)) {
+      if (/^[a-z][a-z0-9+.-]*:/.test(link[1])) continue;
+      const target = resolve8(dirname9(file), link[1]);
+      if (target.startsWith(constructsRoot + sep5) && facts.has(target) && !reached.includes(target)) reached.push(target);
+    }
+    linked.set(file, reached);
+  }
+  const areas = [], domains = [];
+  const foldersIn = (folder) => readdirSync6(folder).sort(byName).map((name) => join11(folder, name)).filter((full) => statSync7(full).isDirectory() && under2(full).length > 0);
+  const sortFolders = (folder) => {
+    const inside = foldersIn(folder);
+    if (inside.length) {
+      if (folder !== constructsRoot) areas.push(folder);
+      inside.forEach(sortFolders);
+    } else if (direct(folder).length) domains.push(folder);
+  };
+  if (existsSync7(constructsRoot)) sortFolders(constructsRoot);
+  const keyOf = (folder) => slashes(relative7(constructsRoot, folder)).split("/").filter(Boolean).map(bare).join("-");
+  const home2 = /* @__PURE__ */ new Map();
+  const homeless = [];
+  for (const [file, stem] of stems) {
+    const named = [...areas, ...domains].filter((folder) => {
+      const key = keyOf(folder);
+      return key !== "" && (stem === key || stem.startsWith(`${key}-`));
+    });
+    if (named.length) {
+      home2.set(file, named.reduce((longest, folder) => keyOf(folder).length > keyOf(longest).length ? folder : longest));
+      continue;
+    }
+    const reached = [...new Set(linked.get(file).map((construct) => dirname9(construct)))];
+    if (reached.length === 1) {
+      home2.set(file, reached[0]);
+      continue;
+    }
+    homeless.push(file);
+    notes.push({ grade: "SOFT", check: "index", file, message: `this overview names no folder of the construct pages, and it links constructs of ${reached.length} folders, so it is listed under Docs after the hub and holds nothing` });
+  }
+  const overviewsOf = (folder) => [...stems.keys()].filter((file) => home2.get(file) === folder);
+  const domainNode = (folder) => {
+    const here = overviewsOf(folder);
+    const constructs = direct(folder);
+    const reach2 = new Map(here.map((file) => [file, constructs.filter((construct) => linked.get(file).includes(construct))]));
+    const holds = new Map(here.map((file) => [file, []]));
+    const rest = [];
+    for (const construct of constructs) {
+      const wanted = here.filter((file) => reach2.get(file).includes(construct));
+      if (!wanted.length) {
+        rest.push(construct);
+        if (here.length) notes.push({ grade: "SOFT", check: "index", file: construct, message: "no overview of its domain links this construct, so it comes last in its domain" });
+        continue;
+      }
+      const owner = wanted.reduce((narrowest, file) => {
+        const fewer = reach2.get(file).length - reach2.get(narrowest).length;
+        return fewer < 0 || fewer === 0 && byName(basename8(file), basename8(narrowest)) < 0 ? file : narrowest;
+      });
+      holds.get(owner).push(construct);
+    }
+    if (here.length === 1) {
+      const inside2 = [...holds.get(here[0]), ...rest].map(entry);
+      return {
+        ...entry(here[0]),
+        label: label(folder),
+        title: facts.get(here[0]).title,
+        folded: true,
+        ...inside2.length ? { children: inside2 } : {}
+      };
+    }
+    const place2 = (file) => holds.get(file).length ? constructs.indexOf(holds.get(file)[0]) : constructs.length;
+    const ordered = [...here].sort((one, two) => place2(one) - place2(two) || byName(basename8(one), basename8(two)));
+    const inside = ordered.map((file) => {
+      const held = holds.get(file).map(entry);
+      return { ...entry(file), ...held.length ? { children: held } : {} };
+    });
+    return { label: label(folder), folded: true, children: [...inside, ...rest.map(entry)] };
+  };
+  const folderNode = (folder) => {
+    if (domains.includes(folder)) return domainNode(folder);
+    return { label: label(folder), children: [
+      ...overviewsOf(folder).map(entry),
+      ...direct(folder).map(entry),
+      ...foldersIn(folder).filter((one) => areas.includes(one) || domains.includes(one)).map(folderNode)
+    ] };
+  };
+  const docsGroup = [
+    ...hub ? [entry(hub)] : [],
+    ...homeless.map(entry),
+    ...(existsSync7(constructsRoot) ? foldersIn(constructsRoot) : []).filter((folder) => areas.includes(folder) || domains.includes(folder)).map(folderNode)
+  ];
+  const guides = under2(guidePagesDir(docs));
+  const orderOf = (file) => facts.get(file).source ?? pathOf(file);
+  const guidesGroup = [...guides].sort((one, two) => byName(orderOf(one), orderOf(two))).map(entry);
+  const reports = under2(reportsDir(docs));
+  const reportsGroup = reports.map(entry);
+  const placed = new Set([...docsGroup.flatMap(entriesOf), ...guidesGroup, ...reportsGroup].map((node) => node.path));
+  for (const file of files.filter((one) => !placed.has(pathOf(one)))) {
+    docsGroup.push(entry(file));
+    notes.push({ grade: "SOFT", check: "index", file, message: "the tree has no place for a page that sits here, so it is listed last under Docs, by its own name" });
+  }
+  const every = [docsGroup, guidesGroup, reportsGroup].map((children, at) => ({ label: GROUPS[at], children }));
+  const groups = every.filter((group) => group.children.length > 0);
+  const counted = /* @__PURE__ */ new Map();
+  for (const node of groups.flatMap(entriesOf)) counted.set(node.path, (counted.get(node.path) ?? 0) + 1);
+  const wrong = files.map(pathOf).filter((path) => counted.get(path) !== 1);
+  if (wrong.length || counted.size !== files.length)
+    throw new Refusal(`the tree does not hold every page once: ${wrong.map((path) => `${path} is in it ${counted.get(path) ?? 0} time(s)`).join(", ")}`);
+  return { groups, pages: files, notes };
+}
+function indexPage(template, tree, where) {
+  const shell = withHead(template, {
+    tab: `${where.location} Artifacts`,
+    block: {
+      id: `${basename8(where.repository)}-artifacts-index`,
+      variant: "index",
+      title: "Artifacts",
+      summary: `Every page of this repository's ${POCKET_PATH}, in one tree, opened in tabs.`
+    },
+    produced: "Produced by `docs index` from the pages on disk. Never edit this page: produce it again.",
+    version: newestCut(),
+    script: INDEX_SCRIPT
+  });
+  const data = DATA_BLOCK.exec(shell);
+  if (!data) throw new Refusal("the template has no block of data with the id `index-data`, so the page cannot be produced from it");
+  let around = `${shell.slice(0, data.index)}\0${shell.slice(data.index + data[0].length)}`;
+  around = swap(around, /\{\{WORKSPACE\}\}/, escaped(where.organisation), "slot `{{WORKSPACE}}`");
+  around = swap(around, /\{\{REPOSITORY\}\}/, escaped(where.location), "slot `{{REPOSITORY}}`");
+  around = swap(around, /\{\{THE ADDRESS OF THE HUB[^}]*\}\}/, attribute2(where.hub), "slot for the address of the hub");
+  refuseSlots(around, TEMPLATE);
+  const written = JSON.stringify(tree, null, 1).replace(/</g, "\\u003c");
+  return around.replace("\0", () => `<!-- THE TREE, written by \`docs index\` from the pages on disk. Nobody types it. A folder has \`label\` and
+     \`children\`. A page has \`label\`, \`kind\` and \`path\`. A node marked \`folded\` starts closed. -->
+<script type="application/json" id="index-data">
+${written}
+</script>`);
+}
+function compare(indexFile, artifacts, pages) {
+  const rule = (file, message) => ({ grade: "RULE", check: "index", file, message });
+  if (!existsSync7(indexFile))
+    return [rule(indexFile, `there is no index here, so none of the ${pages.length} page(s) under ${POCKET_PATH} has an entry. Run \`docs index\` without \`--check\``)];
+  const data = DATA_BLOCK.exec(readFileSync8(indexFile, "utf8"));
+  let tree = null;
+  if (data) {
+    try {
+      tree = JSON.parse(data[1]);
+    } catch {
+      tree = null;
+    }
+  }
+  if (!tree || !Array.isArray(tree.groups))
+    return [rule(indexFile, "this index holds no tree: it has no block of data with the id `index-data` that can be read")];
+  const base = typeof tree.base === "string" ? tree.base : "";
+  const counted = /* @__PURE__ */ new Map();
+  const notes = [];
+  for (const node of tree.groups.flatMap(entriesOf)) {
+    const file = resolve8(dirname9(indexFile), (node.beside ? "" : base) + node.path);
+    counted.set(file, (counted.get(file) ?? 0) + 1);
+    if (!pages.includes(file) && counted.get(file) === 1)
+      notes.push(rule(indexFile, `the entry \`${node.label}\` has no page: ${slashes(relative7(artifacts, file))} is not there`));
+  }
+  for (const file of pages) {
+    const times = counted.get(file) ?? 0;
+    if (times === 0) notes.push(rule(file, `the tree of ${ARTIFACT_INDEX} lacks this page`));
+    if (times > 1) notes.push(rule(file, `the tree of ${ARTIFACT_INDEX} holds this page ${times} times`));
+  }
+  return notes;
+}
 function body2(args, workspace) {
-  const named = args.find((r) => !r.startsWith("--"));
-  if (named === void 0) {
-    console.error("usage: spn-devex docs face <docs-tree> [--check]");
+  const [given, ...more] = operands(args, ["--out"]);
+  if (given === void 0 || more.length) {
+    console.error(USAGE);
     return 2;
   }
-  const tree = resolve8(named);
-  const f = face(tree, !args.includes("--check"));
-  for (const x of f) console.log(`${x.grade === "RULE" ? "\u2717" : "!"} ${x.grade.padEnd(4)} ${x.check.padEnd(9)} ${relative6(workspace, x.file)}
-         ${x.message}`);
-  return f.some((x) => x.grade === "RULE") ? 1 : 0;
+  const repository = resolve8(given);
+  const docs = docsOf(repository);
+  const artifacts = artifactsDir(docs);
+  const check2 = args.includes("--check");
+  try {
+    if (!existsSync7(artifacts) || !statSync7(artifacts).isDirectory())
+      throw new Refusal(`${repository} has no ${POCKET_PATH}, so there is nothing to list`);
+    const { groups, pages, notes } = groupsOf(artifacts);
+    const out = resolve8(optionValue(args, "--out") ?? artifactIndex(docs));
+    const base = dirname9(out) === artifacts ? "" : `${slashes(relative7(dirname9(out), artifacts))}/`;
+    const named = locationOf(docs, workspace);
+    const first = groups.flatMap(entriesOf)[0]?.path ?? "";
+    const produce = () => indexPage(pageTemplate(templatesDir(workspace), TEMPLATE), { base, tabs: TAB_LIMIT, groups }, {
+      organisation: process.env.SPN_ORG ?? "SaaS Plane",
+      location: process.env.SPN_LOCATION ?? (named === "\u2014" ? basename8(repository) : named),
+      repository,
+      hub: base + first
+    });
+    if (check2) {
+      const found = compare(out, artifacts, pages);
+      if (!found.length) {
+        let current = true;
+        try {
+          current = readFileSync8(out, "utf8") === produce();
+        } catch {
+          current = true;
+        }
+        if (!current) found.push({ grade: "SOFT", check: "index", file: out, message: "the tree holds every page once, but this page is not what `docs index` writes now: a name or a place changed" });
+        else console.log(`current  ${relative7(workspace, out)}`);
+      }
+      return say([...found, ...notes], workspace) ? 1 : 0;
+    }
+    return say([...place(out, produce(), true, workspace, "index"), ...notes], workspace) ? 1 : 0;
+  } catch (refused) {
+    if (!(refused instanceof Refusal)) throw refused;
+    console.error(`\u2717 ${refused.message}`);
+    return 1;
+  }
 }
 function run2(args) {
   const workspace = resolveWorkspace();
   const startedAt = performance.now();
   begin(commandFacts("spn-devex", args), workspace);
   const code = body2(args, workspace);
-  record({ group: "docs", action: "face", args: argsText(args) }, performance.now() - startedAt, code);
+  record({ group: "docs", action: "index", args: argsText(args) }, performance.now() - startedAt, code);
   end(code);
   return code;
 }
-if (process.argv[1] && basename8(process.argv[1]) === "face.ts")
-  process.exit(run2(process.argv.slice(2)));
+if (process.argv[1] && new URL(import.meta.url).pathname === process.argv[1]) process.exit(run2(process.argv.slice(2)));
 export {
   describe,
+  entriesOf,
+  groupsOf,
   run2 as run
 };

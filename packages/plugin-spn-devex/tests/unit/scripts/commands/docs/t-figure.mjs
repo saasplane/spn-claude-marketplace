@@ -10,6 +10,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
+import { OWN_COPY, linesFor } from "../../../../../../plugin-support-lib/src/lib/page-styles.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
 const BASE = mkdtempSync(join(tmpdir(), "t-docs-figure-"));
@@ -29,27 +30,58 @@ function one(label, ok) {
 
 console.log("\n=== `figure`'s args[0] picks the geometry half or falls through to the render half");
 
+// A page in the shared form: the line that links the shared stylesheet, then the page's content.
+const LINK = linesFor("1.0.0").stylesheet;
+const shared = (content) => `${LINK}\n<div class="sds-page">\n${content}\n</div>\n`;
+// A drawing whose connector ends in empty space, written with whichever class names are given.
+const drawing = (svg, box, connector) =>
+  `<figure><svg class="${svg}" viewBox="0 0 400 200"><rect class="${box}" x="40" y="60" width="100" height="60" rx="3"/>` +
+  `<path class="${connector}" d="M240 30 H185"/></svg></figure>`;
+/** One folder under the scratch base, holding one page. */
+function pageIn(name, text) {
+  const dir = join(BASE, name);
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, "a.html"), text);
+  return dir;
+}
+
 // `check` reads a page's own geometry — no browser involved, so this is the same on every machine.
 {
-  const page = `<h1>p</h1>\n<figure><svg viewBox="0 0 100 60"><rect x="10" y="10" width="40" height="20"/></svg></figure>\n`;
-  const dir = join(BASE, "check");
-  mkdirSync(dir, { recursive: true });
-  writeFileSync(join(dir, "a.html"), page);
-  const { out, code } = run(["check", dir]);
+  const { out, code } = run(["check", pageIn("check", shared(`<h1>p</h1>\n<figure><svg class="sds-drawing" viewBox="0 0 100 60"><rect class="sds-box" x="10" y="10" width="40" height="20"/></svg></figure>`))]);
   one("`figure check` runs the geometry check, not the render — it reports pages, not a render's PNG line",
     out.includes("clean — 1 page") && !out.includes("->"));
   one("and it exits clean", code === 0);
 }
+{
+  // VERIFY THE VERIFIER: the same faulty drawing, on a page in the shared form, is reported.
+  const { out, code } = run(["check", pageIn("check-bad", shared(drawing("sds-drawing", "sds-box", "sds-connector")))]);
+  one("known-bad: a connector that ends in empty space, on a page that links the shared stylesheet, is refused",
+    out.includes("RULE figure") && out.includes("empty space") && code === 1);
+}
+{
+  // A PAGE THAT LINKS NO SHARED STYLESHEET HOLDS ITS OWN COPY, with the class names that copy used.
+  // The check names the page once and reads no drawing of it, so the faulty drawing draws no finding.
+  const own = `<style>.dg .c{stroke:blue}</style>\n<div class="page">\n${drawing("dg", "box", "c")}\n</div>\n`;
+  const { out, code } = run(["check", pageIn("check-own", own)]);
+  one("[MKT.SCRIPTS.108] `figure check` names a page that holds its own copy once, SOFT, with the text every command uses",
+    (out.match(/! SOFT styles/g) ?? []).length === 1 && out.includes(OWN_COPY));
+  one("[MKT.SCRIPTS.108] and reads no drawing of it: no figure finding, and the exit is clean",
+    !out.includes("✗ RULE") && !out.includes("empty space") && code === 0);
+  one("[MKT.SCRIPTS.108] the summary counts it apart from a refusal", out.includes("0 RULE, 1 SOFT, over 1 page"));
+}
 
 // `colour` is the geometry check's other half — also no browser.
 {
-  const dir = join(BASE, "colour");
-  mkdirSync(dir, { recursive: true });
-  writeFileSync(join(dir, "a.html"), `<pre data-lang="ts">const a = 1;</pre>\n`);
-  const { out, code } = run(["colour", dir]);
-  one("`figure colour` runs the colour audit, not the render",
-    out.includes("every coloured block matches its own text") || out.includes("block") && out.includes("off"));
-  one("and it exits with the audit's own code, not a usage error", code === 0 || code === 1);
+  const coloured = `<pre data-lang="ts"><span class="sds-tk-k">const</span> a = <span class="sds-tk-n">1</span>;</pre>`;
+  const { out, code } = run(["colour", pageIn("colour", shared(coloured))]);
+  one("`figure colour` runs the colour audit, not the render: a block coloured with the shared names matches its own text",
+    out.includes("every coloured block matches its own text") && code === 0);
+  const bad = run(["colour", pageIn("colour-bad", shared(coloured.replace("sds-tk-n", "sds-tk-k")))]);
+  one("known-bad: a block whose colouring is not what its text gives is refused",
+    bad.out.includes("1 block off") && bad.code === 1);
+  const own = run(["colour", pageIn("colour-own", `<style>.tk-k{color:red}</style>\n<pre data-lang="ts"><span class="tk-k">const</span> a = 1;</pre>\n`)]);
+  one("[MKT.SCRIPTS.108] `figure colour` names a page that holds its own copy once, and reads no block of it",
+    (own.out.match(/! SOFT styles/g) ?? []).length === 1 && own.out.includes(OWN_COPY) && !own.out.includes("RULE") && own.code === 0);
 }
 
 // Anything else in `args[0]` is a file to render, never a geometry subcommand. The browser is

@@ -10,6 +10,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
 import { ARTIFACT, POCKET, SEAT, WORKSTREAMS, bookTemplatesDir } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { INDEX_SCRIPT, OWN_COPY, linesFor } from "../../../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { ENUM_HEAD, checkCodeFigures, checkTreeFigures } from "../../../../../src/scripts/commands/docs/_lib.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
@@ -32,6 +33,8 @@ function repo(files, { type = "APPS" } = {}) {
 }
 
 const block = (o) => `<!-- spn:doc\n${JSON.stringify(o, null, 2)}\n-->\n`;
+/** The two lines a page in the shared form carries: the stylesheet's, and the script's. */
+const LINES = linesFor("1.0.0");
 
 /** A seat file, written the way an author writes one: block, title, tag line, prose. */
 const doc = (o, body = "Some prose.\n", tag = null) =>
@@ -197,7 +200,7 @@ console.log("\n=== an overview's source headings are read at any depth, not just
 const overview = (sections) =>
   `<meta charset="utf-8">\n<title>T</title>\n` +
   block({ id: "o", variant: "overview", parentId: "concept", title: "T",
-          lenses: ["ARCHITECT"], summary: "s." }) +
+          lenses: ["ARCHITECT"], summary: "s." }) + `${LINES.stylesheet}\n` +
   sections.map((h) => `<h2>${h}</h2>\n<p>x</p>`).join("\n");
 
 const CONCEPT_TREE = "# c\n\n## SaaS Plane — Foundation\n\nstage.\n\n### DevEx\n\nhow it runs.\n\n### Docs\n\nhow it is written.\n\n## Adoption\n\nlast.\n";
@@ -488,7 +491,7 @@ console.log("\n=== the gap scan measures and never fixes");
     const ws = repo({
       [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/x-approach.html`]:
         doc({ id: "x", variant: "approach", title: "X", lenses: ["ARCHITECT"], status: "PLANNING" },
-            "<p>an argument</p>\n"),
+            `${LINES.stylesheet}\n<p>an argument</p>\n`),
     });
     const got = run(ws, ["audit", `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/x-approach.html`]);
     one("an approach page in a repository's docs is refused", got, has("belongs to the workstream"));
@@ -498,7 +501,7 @@ console.log("\n=== the gap scan measures and never fixes");
     const ws = repo({
       [`.spndevex/${WORKSTREAMS}/open/001-a/a-approach.html`]:
         doc({ id: "a", variant: "approach", title: "A", lenses: ["ARCHITECT"], status: "PLANNING" },
-            "<p>an argument</p>\n"),
+            `${LINES.stylesheet}\n<p>an argument</p>\n`),
     });
     const got = run(ws, ["audit", `.spndevex/${WORKSTREAMS}/open/001-a/a-approach.html`]);
     one("the same page in a workstream is not", got, (g) => !/belongs to the workstream/.test(g));
@@ -751,7 +754,7 @@ console.log("\n=== a domain overview borrows from its DOMAIN, not from the conce
     [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-core-overview.html`]:
       `<meta charset="utf-8">\n<title>Core</title>\n` +
       block({ id: "o", variant: "overview", parentId: "concept", title: "Core", lenses: ["ARCHITECT"], summary: "s." }) +
-      sections.map((h) => `<h2>${h}</h2>\n<p>x</p>`).join("\n"),
+      `${LINES.stylesheet}\n` + sections.map((h) => `<h2>${h}</h2>\n<p>x</p>`).join("\n"),
   });
   const audit = (secs) => run(repo(tree(secs)), ["audit", `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-core-overview.html`]);
 
@@ -780,7 +783,7 @@ console.log("\n=== an HTML page links the HTML page, never the markdown seat (Q2
   const page = (href) =>
     `<meta charset="utf-8">\n<title>T</title>\n` +
     block({ id: "o", variant: "overview", parentId: "concept", title: "T", lenses: ["ARCHITECT"], summary: "s." }) +
-    `<h2>Overview</h2>\n<p>See <a href="${href}">it</a>.</p>\n<h2>Glossary</h2>\n<p>x</p>\n<h2>Where to go next</h2>\n<p>x</p>`;
+    `${LINES.stylesheet}\n<h2>Overview</h2>\n<p>See <a href="${href}">it</a>.</p>\n<h2>Glossary</h2>\n<p>x</p>\n<h2>Where to go next</h2>\n<p>x</p>`;
   const mk = (href) => repo({
     "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
     [`docs/${SEAT.constructs}/01-core/thing.md`]: "# Thing\n",
@@ -879,71 +882,125 @@ console.log("\n=== a generated column is read against its own heading (N37 step 
     lacks("column"));
 }
 
-console.log("\n=== an authored page defines no selector its declared template does not (N25 step 6)");
+console.log("\n=== a page's furniture is the shared files': a version that exists, and a style of its own is the page's to add");
 {
-  // THE REAL TEMPLATES, copied untouched. A fixture stylesheet would prove the reader agrees with
-  // the fixture; the figure this check exists to produce is measured against these files.
-  const templates = bookTemplatesDir(resolve(PLUGIN, "..", "..", "..", "spn-foundation"));
-  process.env.SPN_TEMPLATES = templates;
-  const overview = readFileSync(resolve(templates, "pages", "overview-template.html"), "utf8");
-  const hub = readFileSync(resolve(templates, "pages", "hub-template.html"), "utf8");
-  const invent = (page, css) => page.replace("</style>", `${css}\n</style>`);
-  const ws = repo({
-    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-core-overview.html`]: overview,
-    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-bad-overview.html`]: invent(overview, "  .invented-hero > .lede{margin:0}"),
-    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-media-overview.html`]:
-      invent(overview, "  @media (max-width:40rem){ .only-narrow, .tile{padding:0} }\n  @keyframes spin{from{opacity:0}to{opacity:1}}"),
-    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-overview.html`]: hub,
-    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-glyph-overview.html`]: invent(overview, "  .tile .glyph{float:right}"),
-    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-late-overview.html`]: overview + "\n<style>\n  .late-block{color:red}\n</style>\n",
-  });
-  const got = (p) => run(ws, ["audit", `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/${p}`]);
+  const at = `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-core-overview.html`;
+  const o = { id: "o", variant: "overview", parentId: "concept", title: "Core", lenses: ["ARCHITECT"], summary: "s." };
+  // AN OVERVIEW THAT AUDITS CLEAN, so each case below differs from it in one thing and a finding is
+  // that thing's alone.
+  const content = (type = "Overview") =>
+    `<nav class="sds-rail" id="rail"></nav>\n<header class="sds-masthead">\n` +
+    `<div class="sds-eyebrow"><span class="sds-line1">SaaS Plane | t | Core</span>` +
+    `<span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">${type}</span><span class="sds-separator">|</span>` +
+    `<span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Architect</span></span></span></div>\n` +
+    `<h1>Know where you are.</h1>\n<p class="sds-standfirst">This page covers the core.</p>\n</header>\n` +
+    ["Overview", "Glossary", "Where to go next"].map((name, at) =>
+      `<section id="s${at}"><div class="sds-section-head"><h2>${name}</h2></div>\n<p>x</p></section>\n`).join("");
+  const head = `<meta charset="utf-8">\n<title>Core</title>\n` + block(o);
+  const shared = ({ link = LINES.stylesheet, own = "", type } = {}) => `${head}${link}\n${own}${content(type)}${LINES.script}\n`;
+  // THE SAME PAGE WITH ITS OWN COPY OF THE STYLES: a style block in place of the link, a script with
+  // code in place of the script's line, and each class by the name that copy used.
+  const withOwnNames = (html) => html.replaceAll("sds-section-head", "sec-head").replaceAll("sds-label", "lbl")
+    .replaceAll("sds-separator", "sep").replaceAll("sds-", "");
+  const ownCopy = (type) => `${head}<style>.badge{color:red} .invented-hero > .lede{margin:0}</style>\n` +
+    `${withOwnNames(content(type))}<script>/* a rail builder of this page's own */</script>\n`;
+  const audit = (text, files = {}) => run(repo({ "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n", [at]: text, ...files }), ["audit", at]);
 
-  one("an untouched copy of the overview template is not reported", got("concept-core-overview.html"), lacks("SOFT selector"));
-  one("an untouched copy of the hub template is not reported", got("concept-overview.html"), lacks("SOFT selector"));
-  one("a page with an invented selector is reported, SOFT, naming it",
-    got("concept-bad-overview.html"), (g) => g.includes("SOFT selector") && g.includes("`.invented-hero>.lede`"));
-  // The copied template carries its placeholders, so other checks refuse it; the claim here is only
-  // that THIS check reports rather than refuses.
-  one("and it never refuses", got("concept-bad-overview.html"), (g) => g.includes("! SOFT selector") && !g.includes("RULE selector"));
-  one("a selector inside @media is read; one the template declares there is not reported",
-    got("concept-media-overview.html"), (g) => g.includes("defines 1 selector(s)") && g.includes("`.only-narrow`"));
-  one("a keyframe step is not a selector", got("concept-media-overview.html"), lacks("`from`"));
-  one("the hub's template blesses `.tile .glyph`, a domain overview's does not",
-    got("concept-glyph-overview.html"), has("`overview-template.html` does not — `.tile .glyph`"));
-  one("every style block is read, not only the first", got("concept-late-overview.html"), has("`.late-block`"));
-  one("the same page gives the same finding twice", got("concept-bad-overview.html"), (g) => g === got("concept-bad-overview.html"));
+  one("a page that links a version that exists is clean", audit(shared()), has("clean — 1 page"));
+  one("[MKT.SCRIPTS.109] a page that links the shared stylesheet and adds a style of its own draws no finding",
+    audit(shared({ own: "<style>.invented-hero > .lede{margin:0}</style>\n" })), has("clean — 1 page"));
+  one("[MKT.SCRIPTS.109] and a `<script type=\"application/json\">` draws none either",
+    audit(shared({ own: '<script type="application/json">{"rows":[]}</script>\n' })), has("clean — 1 page"));
+  one("a page that links a folder beside it names no version, and draws no finding",
+    audit(shared({ link: '<link rel="stylesheet" href="../assets/sds-docs.css">' }),
+      { [`docs/${POCKET.artifacts}/assets/sds-docs.css`]: "/* the stylesheet, beside the page */\n" }),
+    has("clean — 1 page"));
+
+  const absent = audit(shared({ link: linesFor("9.9.9").stylesheet }));
+  one("known-bad: a page that links version 9.9.9, which nobody cut, is refused", absent,
+    (g) => g.includes("✗ RULE furniture") && g.includes("links version `9.9.9`") && g.includes("1 finding — 1 RULE, 0 SOFT"));
+  one("and the finding names the versions that exist", absent, has("The versions that exist: `1.0.0`"));
+  one("known-bad: a script's line that names a version nobody cut is refused too, though the stylesheet's line is right",
+    audit(shared().replace(LINES.script, linesFor("9.9.9").script)),
+    (g) => g.includes("✗ RULE furniture") && g.includes("links version `9.9.9`"));
+  // `SPN_STYLES` names another folder of versions, and the audit reads the versions that folder lists.
+  const elsewhere = mkdtempSync(join(BASE, "styles-"));
+  writeFileSync(join(elsewhere, "versions.json"), JSON.stringify({ "9.9.9": {} }));
+  process.env.SPN_STYLES = elsewhere;
+  one("a version is judged against the folder `SPN_STYLES` names", audit(shared({ link: linesFor("9.9.9").stylesheet })),
+    (g) => !g.includes("links version `9.9.9`") && g.includes("links version `1.0.0`") && g.includes("The versions that exist: `9.9.9`"));
+  delete process.env.SPN_STYLES;
+
+  const named = audit(ownCopy());
+  one("[MKT.SCRIPTS.108] a page that holds its own copy is named once, SOFT, with the text every command uses",
+    named, (g) => (g.match(/! SOFT styles/g) ?? []).length === 1 && g.includes(OWN_COPY));
+  one("[MKT.SCRIPTS.108] and that is its one finding: nothing about its style block, its script or its class names",
+    named, has("1 finding — 0 RULE, 1 SOFT, over 1 page"));
+  // VERIFY THE VERIFIER: a wrong Type chip is found by its class. On a page in the shared form it is
+  // refused, so the header check does read; on a page with its own copy no class is read at all.
+  one("known-bad: a wrong Type chip on a page in the shared form is refused, so the header is read by its classes",
+    audit(shared({ type: "Construct" })), has("Type reads `Construct`; the block's variant is `overview`"));
+  one("[MKT.SCRIPTS.108] the same wrong chip on a page that holds its own copy is not read: the one SOFT line, and no other",
+    audit(ownCopy("Construct")), (g) => g.includes("1 finding — 0 RULE, 1 SOFT, over 1 page") && !g.includes("Type reads"));
+}
+{
+  // A PRODUCED PAGE, AND THE SAME PAGE WITH ITS OWN COPY. `docs page` writes the construct page in the
+  // shared form; the audit compares it with what the seat produces. A page that holds its own copy
+  // is not compared: it is named once, and `docs page` is what moves it.
+  const templates = bookTemplatesDir(resolve(PLUGIN, "..", "..", "..", "spn-foundation"));
+  const seat = `docs/${SEAT.constructs}/01-core/x.md`;
+  const at = `docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/x-construct.html`;
+  const root = repo({ "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n", [seat]: construct(SECTIONS),
+    // The way back of a produced page is the constructs seat's face, so the face is there to be linked.
+    [`docs/${SEAT.constructs}/README.md`]: doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }) });
+  process.env.SPN_TEMPLATES = templates;
+  run(root, ["page", seat]);
+  const produced = readAt(root, at);
+  const audit = (text) => { writeFileSync(join(root, at), text); return run(root, ["audit", at]); };
+
+  one("a page `docs page` produced links the shared stylesheet, and the audit finds it clean", audit(produced),
+    (g) => produced.includes(LINES.stylesheet) && g.includes("clean — 1 page"));
+  one("known-bad: the same page edited by hand is not what the seat produces",
+    audit(produced.replace("<h2>Model</h2>", "<h2>Model</h2>\n<p>typed into the page</p>")), has("✗ RULE produced"));
+  const own = produced.replace(LINES.stylesheet, "<style>.badge{color:red}</style>")
+    .replace(LINES.script, "<script>/* a rail builder of this page's own */</script>")
+    .replaceAll("sds-section-head", "sec-head").replaceAll("sds-label", "lbl").replaceAll("sds-separator", "sep").replaceAll("sds-", "");
+  const named = audit(own);
+  one("[MKT.SCRIPTS.108] a produced page that holds its own copy draws the one SOFT line, and no `produced` finding",
+    named, (g) => g.includes("! SOFT styles") && g.includes(OWN_COPY) && !g.includes("produced") && g.includes("1 finding — 0 RULE, 1 SOFT, over 1 page"));
+  one("[MKT.SCRIPTS.108] the audit writes nothing into it", readAt(root, at), own);
   delete process.env.SPN_TEMPLATES;
-  one("with no template to read, nothing is reported rather than everything",
-    got("concept-bad-overview.html"), lacks("SOFT selector"));
+}
+{
+  // A CLOSED WORKSTREAM'S PAGE STAYS AS IT IS RENDERED, so its styles are never checked. The same
+  // page under `open/` is named.
+  const argument = doc({ id: "a", variant: "approach", title: "A", lenses: ["ARCHITECT"], status: "PLANNING" },
+    "<style>.card{color:red}</style>\n<p>an argument</p>\n");
+  const under = (state) => {
+    const path = `.spndevex/${WORKSTREAMS}/${state}/001-a/a-approach.html`;
+    return run(repo({ [path]: argument }), ["audit", path]);
+  };
+  one("[MKT.SCRIPTS.108] a page of an open workstream that holds its own copy is named", under("open"), has("! SOFT styles"));
+  one("a page under a workstream's `closed/` folder is not", under("closed"), lacks("styles"));
 }
 
 console.log("\n=== a report is a snapshot: no status, and its header says Generated and Commit (RD.DEVEX.WORKSPACE.192)");
 {
-  // THE REAL TEMPLATE'S SCRIPTS, because the furniture check compares a report with its own
-  // template, and a fixture script would prove only that the check agrees with the fixture.
-  const templates = bookTemplatesDir(resolve(PLUGIN, "..", "..", "..", "spn-foundation"));
-  const reportTemplate = readFileSync(resolve(templates, "pages", "report-template.html"), "utf8");
-  const constructTemplate = readFileSync(resolve(templates, "pages", "construct-template.html"), "utf8");
-  const scriptsOf = (t) => (t.match(/<script\b[^>]*>[\s\S]*?<\/script>/g) ?? []).join("\n");
   const at = `docs/${POCKET.artifacts}/${ARTIFACT.reports}/coverage-report.html`;
   const good = { id: "t-coverage-report", variant: "report", reportType: "COVERAGE", title: "Coverage report",
     lenses: ["QA"], generatedAt: "2026-09-30T12:57+05:30", summary: "What was counted.", keywords: ["report"] };
-  const line2 = (datetime, cls = "local") =>
-    `<span class="line"><span class="lbl">Generated:</span> <span class="badge when"><time class="${cls}" datetime="${datetime}">${datetime}</time></span>` +
-    `<span class="sep">|</span><span class="lbl">Commit:</span> <span class="badge when">e549cfaa</span></span>`;
-  const page = (o, { second = line2(o.generatedAt), chip = "", scripts = scriptsOf(reportTemplate) } = {}) =>
-    block(o) + `<nav class="rail" id="rail"></nav>\n<header class="masthead">\n` +
-    `<div class="eyebrow"><span class="line1">SaaS Plane | t | ${o.title}</span>` +
-    `<span class="line"><span class="lbl">Type:</span> <span class="badge type">Report</span><span class="sep">|</span>` +
-    `<span class="lbl">For:</span> <span class="audience"><span class="badge lens">Quality engineer</span></span>${chip}</span>${second}</div>\n` +
-    `<h1>${o.title}</h1>\n<p class="subtitle">How much of this repository is written, built and proved?</p>\n` +
-    `<p class="standfirst">What was counted.</p>\n</header>\n${scripts}\n`;
-  const audit = (text) => {
-    process.env.SPN_TEMPLATES = templates;
-    try { return run(repo({ "CONCEPT.md": "# c\n", [at]: text }), ["audit", at]); }
-    finally { delete process.env.SPN_TEMPLATES; }
-  };
+  const line2 = (datetime, cls = "sds-local") =>
+    `<span class="sds-line"><span class="sds-label">Generated:</span> <span class="sds-badge sds-when"><time class="${cls}" datetime="${datetime}">${datetime}</time></span>` +
+    `<span class="sds-separator">|</span><span class="sds-label">Commit:</span> <span class="sds-badge sds-when">e549cfaa</span></span>`;
+  // A report in the shared form: the two lines that load the shared files, and the shared names.
+  const page = (o, { second = line2(o.generatedAt), chip = "" } = {}) =>
+    block(o) + `${LINES.stylesheet}\n<nav class="sds-rail" id="rail"></nav>\n<header class="sds-masthead">\n` +
+    `<div class="sds-eyebrow"><span class="sds-line1">SaaS Plane | t | ${o.title}</span>` +
+    `<span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Report</span><span class="sds-separator">|</span>` +
+    `<span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Quality engineer</span></span>${chip}</span>${second}</div>\n` +
+    `<h1>${o.title}</h1>\n<p class="sds-subtitle">How much of this repository is written, built and proved?</p>\n` +
+    `<p class="sds-standfirst">What was counted.</p>\n</header>\n${LINES.script}\n`;
+  const audit = (text) => run(repo({ "CONCEPT.md": "# c\n", [at]: text }), ["audit", at]);
   const mine = /a report carries|a report shows|Generated|no Commit|only a `tests` report|`measuredAt` is|furniture/;
 
   const clean = audit(page(good));
@@ -952,7 +1009,7 @@ console.log("\n=== a report is a snapshot: no status, and its header says Genera
   one("a report block carrying `status` is refused",
     audit(page({ ...good, status: "IMPLEMENTING" })), has("a report carries no `status`"));
   one("a report header showing a status chip is refused",
-    audit(page(good, { chip: `<span class="lbl">Status:</span> <span class="badge status implementing">&#x1F6A7; IMPLEMENTING</span>` })),
+    audit(page(good, { chip: `<span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-implementing">&#x1F6A7; IMPLEMENTING</span>` })),
     has("a report shows no status chip"));
   one("a report with no `generatedAt` is refused",
     audit(page((({ generatedAt, ...rest }) => rest)(good), { second: line2("2026-09-30T12:57+05:30") })), has("a report carries `generatedAt`"));
@@ -961,11 +1018,11 @@ console.log("\n=== a report is a snapshot: no status, and its header says Genera
   one("a header moment that is not the block's is refused",
     audit(page(good, { second: line2("2026-09-29T09:00+05:30") })), has("Generated reads `2026-09-29T09:00+05:30`"));
   one("a Generated `<time>` the script cannot find is refused",
-    audit(page(good, { second: line2(good.generatedAt, "stamp") })), has("carries `class=\"local\"`"));
+    audit(page(good, { second: line2(good.generatedAt, "stamp") })), has("carries `class=\"sds-local\"`"));
   one("a header with no Generated line is refused",
     audit(page(good, { second: "" })), has("no Generated line"));
   one("a header with no Commit is refused",
-    audit(page(good, { second: line2(good.generatedAt).replace(/<span class="sep">\|<\/span><span class="lbl">Commit:[\s\S]*?e549cfaa<\/span>/, "") })),
+    audit(page(good, { second: line2(good.generatedAt).replace(/<span class="sds-separator">\|<\/span><span class="sds-label">Commit:[\s\S]*?e549cfaa<\/span>/, "") })),
     has("no Commit"));
   one("`measuredAt` on a coverage report is refused",
     audit(page({ ...good, measuredAt: "2026-09-30T12:44+05:30" })), has("only a `tests` report carries `measuredAt`"));
@@ -975,39 +1032,37 @@ console.log("\n=== a report is a snapshot: no status, and its header says Genera
     audit(page({ ...good, reportType: "TESTS" })), lacks("measuredAt"));
   one("[MKT.SCRIPTS.82] known-bad: `measuredAt` written as `null` is refused, and the finding says to leave the key out",
     audit(page({ ...good, reportType: "TESTS", measuredAt: null })), has("leave the key out"));
-  one("a report carrying only the construct template's scripts is off its own template",
-    audit(page(good, { scripts: scriptsOf(constructTemplate) })), has("this page's scripts are not the template's"));
 }
 
 // ---------------------------------------------------------------- the masthead's three levels
 
-console.log("\n=== the masthead: h1, an optional p.subtitle, one p.standfirst, and nothing after it (RD.DEVEX.WORKSPACE.187)");
+console.log("\n=== the masthead: h1, an optional p.sds-subtitle, one p.sds-standfirst, and nothing after it (RD.DEVEX.WORKSPACE.187)");
 {
   const page = (inner, file = "concept-core-overview.html") => repo({
     "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
     [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/${file}`]:
       `<meta charset="utf-8">\n<title>Core</title>\n` +
       block({ id: "o", variant: "overview", parentId: "concept", title: "Core", lenses: ["ARCHITECT"], summary: "s." }) +
-      `<header class="masthead">\n<!-- a comment <p>is not a paragraph</p> -->\n${inner}\n</header>\n<h2>Overview</h2>\n<p>x</p>`,
+      `${LINES.stylesheet}\n<header class="sds-masthead">\n<!-- a comment <p>is not a paragraph</p> -->\n${inner}\n</header>\n<h2>Overview</h2>\n<p>x</p>`,
   });
   const audit = (inner, file) => run(page(inner, file), ["audit", `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/${file ?? "concept-core-overview.html"}`]);
-  const GOOD = `<h1>Know where you are.</h1>\n<p class="subtitle">The core is the part every other part reads.</p>\n<p class="standfirst">This page covers the core. Read it first.</p>`;
+  const GOOD = `<h1>Know where you are.</h1>\n<p class="sds-subtitle">The core is the part every other part reads.</p>\n<p class="sds-standfirst">This page covers the core. Read it first.</p>`;
 
   one("h1, one Subtitle and one Description draw no masthead finding", audit(GOOD), lacks("masthead"));
-  one("a Subtitle is optional", audit(GOOD.replace(/<p class="subtitle">.*<\/p>\n/, "")), lacks("masthead"));
+  one("a Subtitle is optional", audit(GOOD.replace(/<p class="sds-subtitle">.*<\/p>\n/, "")), lacks("masthead"));
   one("a second paragraph after the Description is SOFT until every tree is retrofitted (N116 row 9)",
     audit(GOOD + "\n<p>A second paragraph.</p>"), (g) => g.includes("! SOFT masthead") && g.includes("paragraph past the Subtitle"));
   one("a second standfirst is a second paragraph, whatever its class says",
-    audit(GOOD + `\n<p class="standfirst">Another Description.</p>`), has("carries 1 paragraph past the Subtitle"));
+    audit(GOOD + `\n<p class="sds-standfirst">Another Description.</p>`), has("carries 1 paragraph past the Subtitle"));
   one("a tagline beside the Subtitle is a second paragraph too",
-    audit(GOOD.replace("<p class=\"subtitle\">", "<p class=\"tagline\">A tagline.</p>\n<p class=\"subtitle\">")), (g) => g.includes("! SOFT masthead") && g.includes("paragraph past the Subtitle"));
+    audit(GOOD.replace("<p class=\"sds-subtitle\">", "<p class=\"tagline\">A tagline.</p>\n<p class=\"sds-subtitle\">")), (g) => g.includes("! SOFT masthead") && g.includes("paragraph past the Subtitle"));
   one("a Subtitle of two sentences is SOFT",
     audit(GOOD.replace("reads.</p>", "reads. It is small.</p>")), has("! SOFT masthead"));
   one("and names the count", audit(GOOD.replace("reads.</p>", "reads. It is small.</p>")), has("runs to 2 sentences"));
   one("a header with no Description is SOFT",
-    audit(GOOD.replace(/\n<p class="standfirst">.*<\/p>/, "")), has("has no Description"));
+    audit(GOOD.replace(/\n<p class="sds-standfirst">.*<\/p>/, "")), has("has no Description"));
   one("a Subtitle below the Description is out of place",
-    audit(`<h1>Know where you are.</h1>\n<p class="standfirst">This page covers the core.</p>\n<p class="subtitle">The core is the part every other part reads.</p>`),
+    audit(`<h1>Know where you are.</h1>\n<p class="sds-standfirst">This page covers the core.</p>\n<p class="sds-subtitle">The core is the part every other part reads.</p>`),
     has("the Subtitle is out of place"));
   // The foundation hub's pair is read from RD.DEVEX.WORKSPACE.143 in the register beside the page;
   // a register without that row (every other repository) leaves the hub's lines to the author.
@@ -1023,7 +1078,7 @@ console.log("\n=== the masthead: h1, an optional p.subtitle, one p.standfirst, a
     [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-overview.html`]:
       `<meta charset="utf-8">\n<title>Concept</title>\n` +
       block({ id: "o", variant: "overview", parentId: "concept", title: "Concept", lenses: ["ARCHITECT"], summary: "s." }) +
-      `<header class="masthead">\n<h1>${h1}</h1>\n<p class="subtitle">${sub}</p>\n<p class="standfirst">This page is the start.</p>\n</header>\n<h2>Overview</h2>\n<p>x</p>`,
+      `${LINES.stylesheet}\n<header class="sds-masthead">\n<h1>${h1}</h1>\n<p class="sds-subtitle">${sub}</p>\n<p class="sds-standfirst">This page is the start.</p>\n</header>\n<h2>Overview</h2>\n<p>x</p>`,
   }, { type: "FOUNDATION" });
   const audit = (...a) => run(hub(...a), ["audit", `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-overview.html`]);
   one("the hub's pair, word for word from the register's row, is silent",
@@ -1037,35 +1092,116 @@ console.log("\n=== the masthead: h1, an optional p.subtitle, one p.standfirst, a
     audit("x", "y", "| RD.DEVEX.WORKSPACE.143 | a | no pair here | b | c |\n"), has("could not be read from the row"));
 }
 
+// ---------------------------------------------------------------- the two produced kinds of page
+
+console.log("\n=== a guide page and the index of artifacts are pages the audit knows (RD.DEVEX.WORKSPACE.218, .219)");
+{
+  // EACH FIXTURE HAS THE SHAPE THE COMMAND WRITES. `docs guide` and `docs index` were run from source
+  // on a real repository, and the two pages below keep what those pages hold: the block's keys, the
+  // header of a guide with no Status chip, and an index with no header, a block of data and its own script.
+  const guideAt = `docs/${POCKET.artifacts}/${ARTIFACT.guides}/getting-started-guide.html`;
+  const indexAt = `docs/${POCKET.artifacts}/index.html`;
+  const guideBlock = { id: "t-guide-getting-started", variant: "guide", title: "Getting Started", lenses: ["SERVER_DEV", "WEB_DEV"],
+    summary: "Clone to running.", keywords: ["getting started"], source: `docs/${SEAT.guides}/01-getting-started.md` };
+  const guide = (o = guideBlock, { chip = "" } = {}) =>
+    `<meta charset="utf-8">\n<title>${o.title}</title>\n<!-- spn:doc\n${JSON.stringify(o)}\n-->\n` +
+    `<!-- Produced by \`docs guide\` from ${o.source}. Never edit this page: change the guide, and produce the page again. -->\n` +
+    `${LINES.stylesheet}\n<div class="sds-page sds-guide">\n\n<nav class="sds-rail" id="rail">\n` +
+    `  <a class="sds-home" href="../index.html" target="_top">&larr; the index</a>\n  <div class="sds-rail-title">${o.title}</div>\n</nav>\n<div class="sds-wrap">\n\n` +
+    `<header class="sds-masthead">\n  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; t &nbsp;|&nbsp; ${o.title}</span>` +
+    `<span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Guide</span><span class="sds-separator">|</span>` +
+    `<span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Backend developer</span><span class="sds-badge sds-lens">Web developer</span></span>${chip}</span></div>\n` +
+    `  <h1>${o.title}</h1>\n  <p class="sds-standfirst">Clone to running.</p>\n</header>\n\n` +
+    `<section id="s0">\n  <div class="sds-section-head"><h2>Overview</h2></div>\n  <p>x</p>\n</section>\n\n</div>\n</div>\n\n${LINES.script}\n`;
+  const indexBlock = { id: "t-artifacts-index", variant: "index", title: "Artifacts",
+    summary: "Every page of this repository's docs/artifacts, in one tree, opened in tabs." };
+  const tree = { base: "", tabs: 8, groups: [{ label: "Guides", children: [{ label: "Getting Started", kind: "guide", path: `${ARTIFACT.guides}/getting-started-guide.html` }] }] };
+  const index = (o = indexBlock, script = linesFor("1.0.0", INDEX_SCRIPT).script) =>
+    `<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>t Artifacts</title>\n<!-- spn:doc\n${JSON.stringify(o)}\n-->\n` +
+    `<!-- Produced by \`docs index\` from the pages on disk. Never edit this page: produce it again. -->\n` +
+    `${LINES.stylesheet}\n<div class="sds-index" id="index">\n  <aside class="sds-index-side" id="index-side">\n` +
+    `    <nav class="sds-tree" id="index-tree" aria-label="Pages"></nav>\n` +
+    `    <noscript><p class="sds-index-note">This index needs its script to list the pages. Start at <a href="${ARTIFACT.guides}/getting-started-guide.html">the guide</a>.</p></noscript>\n  </aside>\n` +
+    `  <main class="sds-index-main">\n    <div class="sds-tabs" id="index-tabs" role="tablist"></div>\n    <div class="sds-panes" id="index-panes"></div>\n  </main>\n</div>\n\n` +
+    `<script type="application/json" id="index-data">\n${JSON.stringify(tree, null, 1)}\n</script>\n${script}\n`;
+  const pocket = (files = {}) => repo({ "CONCEPT.md": "# c\n", [guideAt]: guide(), [indexAt]: index(), ...files });
+  const audit = (files, target = `docs/${POCKET.artifacts}`) => run(pocket(files), ["audit", target]);
+
+  // (a) the two kinds are variants
+  one("a guide page and the index, as the two commands write them, audit clean", audit({}), has("clean — 2 pages"));
+  const unknown = audit({ [guideAt]: guide({ ...guideBlock, variant: "walkthrough" }) }, guideAt);
+  one("known-bad: a variant nobody declared is still refused, and the set it names holds `guide` and `index`",
+    unknown, (g) => g.includes("`variant` `walkthrough` is not one of") && g.includes("preview · guide · index"));
+
+  // (b) neither carries a status
+  one("a guide page with no `status` in its block draws no status finding", audit({}, guideAt),
+    (g) => g.includes("clean — 1 page") && !g.includes("status"));
+  one("known-bad: the same block declared a `construct` is asked for its status, so the kind is what lifts it",
+    audit({ [guideAt]: guide({ ...guideBlock, variant: "construct", dependsOn: [] }) }, guideAt), has("`status` must be PLANNING · IMPLEMENTING · DONE"));
+  one("known-bad: a Status chip in a guide's header is refused, because the block declares no status",
+    audit({ [guideAt]: guide(guideBlock, { chip: `<span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-done">DONE</span></span>` }) }, guideAt),
+    has("a status chip is here and the block declares no status"));
+
+  // (c) the index has no lenses, no header and no masthead, and it loads its own script
+  const alone = audit({}, indexAt);
+  one("the index is asked for no `lenses`, no header and no masthead, and its block of data and its own script draw no finding",
+    alone, has("clean — 1 page"));
+  const asOverview = `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-core-overview.html`;
+  one("known-bad: the same page declared an `overview` is asked for its lenses and its header, so the kind is what lifts them",
+    audit({ [asOverview]: index({ ...indexBlock, variant: "overview" }) }, asOverview),
+    (g) => g.includes("`lenses` is missing or empty") && g.includes("no `<header>`"));
+  one("known-bad: an index whose own script names a version nobody cut is refused, so its script's line is still read",
+    audit({ [indexAt]: index(indexBlock, linesFor("9.9.9", INDEX_SCRIPT).script) }, indexAt),
+    (g) => g.includes("✗ RULE furniture") && g.includes("links version `9.9.9`"));
+
+  // (d) the index sits directly in the pocket, and `guides/` is a folder of it
+  one("`guides/` is a folder of the pocket, and `index.html` sits directly in it: neither draws a pocket finding",
+    audit({}), (g) => !g.includes("the pocket holds") && !g.includes("directly in the pocket"));
+  const stray = `docs/${POCKET.artifacts}/stray-guide.html`;
+  one("known-bad: another page directly in the pocket is refused, and the finding names the folders",
+    audit({ [stray]: guide() }, stray), (g) => g.includes("`index.html` is the one page that sits directly in the pocket") && g.includes("`guides/`"));
+  const elsewhere = `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/index.html`;
+  one("known-bad: an index in a folder of the pocket is refused, because a repository has one and it sits in the pocket itself",
+    audit({ [elsewhere]: index() }, elsewhere), has("a repository has one index, and it is `docs/artifacts/index.html`"));
+  one("the pocket's face sits directly in the pocket too, and is not refused",
+    audit({ [`docs/${POCKET.artifacts}/README.md`]: doc({ id: "p", title: "Artifacts", lenses: ["ARCHITECT"], status: "DONE" }, "x\n", "`For: Architect` · `Status: ✅ DONE`") },
+      `docs/${POCKET.artifacts}/README.md`), lacks("directly in the pocket"));
+
+  // (e) a bundled copy is not a page of the tree
+  const bundled = { [`docs/${POCKET.artifacts}/index.bundled.html`]: "<style>.sds-index{display:grid}</style>\n<h1>no block: refused if it were read</h1>\n" };
+  one("a `*.bundled.html` copy beside the index is not read: the pocket still counts two pages, and is clean",
+    audit(bundled), has("clean — 2 pages"));
+  one("and named alone it is said to be no page, never refused",
+    audit(bundled, `docs/${POCKET.artifacts}/index.bundled.html`),
+    (g) => g.includes("a sample, a template and a bundled copy are not audited as pages") && !g.includes("RULE"));
+  one("known-bad: the same file under a page's name is read, and refused for having no block",
+    audit({ [`docs/${POCKET.artifacts}/${ARTIFACT.guides}/copy-guide.html`]: Object.values(bundled)[0] }, `docs/${POCKET.artifacts}/${ARTIFACT.guides}/copy-guide.html`),
+    has("✗ RULE block"));
+}
+
 // ---------------------------------------------------------------- a preview page
 
-console.log("\n=== a preview page: variant `preview`, its own title, a Status chip, and the preview template's furniture");
+console.log("\n=== a preview page: variant `preview`, its own title, a Status chip, and the shared furniture");
 {
-  // THE REAL TEMPLATE'S STYLES AND SCRIPTS, so a clean case is clean against what the book ships.
+  // THE BOOK'S OWN TEMPLATE GIVES THE TWO LINES, so a clean case links what the book links.
   const templates = bookTemplatesDir(resolve(PLUGIN, "..", "..", "..", "spn-foundation"));
   const previewTemplate = readFileSync(resolve(templates, "workstream", "approach-preview-template.html"), "utf8");
-  const reportTemplate = readFileSync(resolve(templates, "pages", "report-template.html"), "utf8");
-  const stylesOf = (t) => (t.match(/<style\b[^>]*>[\s\S]*?<\/style>/g) ?? []).join("\n");
-  const scriptsOf = (t) => (t.match(/<script\b[^>]*>[\s\S]*?<\/script>/g) ?? []).join("\n");
+  const linkLine = previewTemplate.match(/<link\b[^>]*sds-docs\.css"[^>]*>/)[0];
+  const scriptLine = previewTemplate.match(/<script\b[^>]*sds-docs\.js"[^>]*><\/script>/)[0];
   const notes = `.spndevex/${WORKSTREAMS}/open/001-a/notes/N001`;
   const at = `${notes}/previews/layout-preview.html`;
   const good = { id: "ws-001-a-layout", variant: "preview", title: "Layout", lenses: ["ARCHITECT"], status: "PLANNING",
     summary: "This page shows the layout.", keywords: ["preview"] };
-  const state = (word) => `<span class="st"><span class="lbl">Status:</span> <span class="badge status ${word.toLowerCase()}">${word}</span></span>`;
-  const page = (o, { chip = state("PROPOSED"), named = o.title, heading = o.title, styles = stylesOf(previewTemplate),
-                     scripts = scriptsOf(previewTemplate) } = {}) =>
-    block(o) + `${styles}\n<nav class="rail" id="rail"></nav>\n<header class="masthead">\n` +
-    `<div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Workstream 001 &nbsp;|&nbsp; ${named}</span>` +
-    `<span class="line"><span class="lbl">Type:</span> <span class="badge type">Preview</span><span class="sep">|</span>` +
-    `<span class="lbl">Arc:</span> <span class="badge">N001</span><span class="sep">|</span>` +
-    `<span class="lbl">Shown:</span> <span class="badge">2026-10-01</span>${chip}</span></div>\n` +
-    `<h1>${heading}</h1>\n<p class="subtitle">Decides how the page is laid out.</p>\n` +
-    `<p class="standfirst">This page shows the layout.</p>\n</header>\n${scripts}\n`;
-  const audit = (files, target = at, from = templates) => {
-    process.env.SPN_TEMPLATES = from;
-    try { return run(repo(files), ["audit", target]); }
-    finally { delete process.env.SPN_TEMPLATES; }
-  };
+  const state = (word) => `<span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-${word.toLowerCase()}">${word}</span></span>`;
+  const page = (o, { chip = state("PROPOSED"), named = o.title, heading = o.title, own = "" } = {}) =>
+    block(o) + `${linkLine}\n${own}<nav class="sds-rail" id="rail"></nav>\n<header class="sds-masthead">\n` +
+    `<div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Workstream 001 &nbsp;|&nbsp; ${named}</span>` +
+    `<span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span><span class="sds-separator">|</span>` +
+    `<span class="sds-label">Arc:</span> <span class="sds-badge">N001</span><span class="sds-separator">|</span>` +
+    `<span class="sds-label">Shown:</span> <span class="sds-badge">2026-10-01</span>${chip}</span></div>\n` +
+    `<h1>${heading}</h1>\n<p class="sds-subtitle">Decides how the page is laid out.</p>\n` +
+    `<p class="sds-standfirst">This page shows the layout.</p>\n</header>\n${scriptLine}\n`;
+  const audit = (files, target = at) => run(repo(files), ["audit", target]);
 
   one("a preview written from the template is clean, with no For chips and a block status the chip does not repeat",
     audit({ [at]: page(good) }), has("clean — 1 page"));
@@ -1073,10 +1209,10 @@ console.log("\n=== a preview page: variant `preview`, its own title, a Status ch
     audit({ [at]: page(good, { chip: state("DECIDED") }) }), has("clean — 1 page"));
   for (const word of ["UNDER REVIEW", "APPROVED", "SUPERSEDED"])
     one(`known-bad: a Status chip reading ${word} is refused, because a preview is PROPOSED or DECIDED`,
-      audit({ [at]: page(good, { chip: `<span class="st"><span class="lbl">Status:</span> <span class="badge status proposed">${word}</span></span>` }) }),
+      audit({ [at]: page(good, { chip: `<span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-proposed">${word}</span></span>` }) }),
       has(`the Status chip reads \`${word}\`; a preview shows PROPOSED · DECIDED`));
   one("known-bad: a Status chip carrying a page's status word is refused",
-    audit({ [at]: page(good, { chip: `<span class="st"><span class="lbl">Status:</span> <span class="badge status proposed">&#x1F52E; PLANNING</span></span>` }) }),
+    audit({ [at]: page(good, { chip: `<span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-proposed">&#x1F52E; PLANNING</span></span>` }) }),
     has("the Status chip reads"));
   one("known-bad: a preview with no Status chip is refused",
     audit({ [at]: page(good, { chip: "" }) }), has("no Status chip — a preview shows PROPOSED · DECIDED"));
@@ -1084,11 +1220,8 @@ console.log("\n=== a preview page: variant `preview`, its own title, a Status ch
     audit({ [at]: page(good, { named: "001 - A" }) }), has("the header title `001 - A` is not the block's `Layout`"));
   one("known-bad: an `<h1>` that is not the preview's title is refused",
     audit({ [at]: page(good, { heading: "001 - A" }) }), has("the `<h1>` `001 - A` is not the block's `Layout`"));
-  one("known-bad: scripts that are not the preview template's are refused",
-    audit({ [at]: page(good, { scripts: scriptsOf(reportTemplate) }) }), has("this page's scripts are not the template's"));
-  one("known-bad: a selector the preview template does not declare is named against that template",
-    audit({ [at]: page(good, { styles: stylesOf(previewTemplate) + "\n<style>.mine{color:red}</style>" }) }),
-    has("`approach-preview-template.html` does not — `.mine`"));
+  one("[MKT.SCRIPTS.109] a preview that adds a style of its own, after the stylesheet's line, is clean",
+    audit({ [at]: page(good, { own: "<style>.mine{color:var(--sds-ink)}</style>\n" }) }), has("clean — 1 page"));
 
   // THE NAME AND THE VARIANT AGREE: a file ending `-preview.html` declares `preview`, and only such a file does.
   one("known-bad: a file ending -preview.html that declares another variant is reported",
@@ -1097,31 +1230,17 @@ console.log("\n=== a preview page: variant `preview`, its own title, a Status ch
     audit({ [`${notes}/previews/layout-page.html`]: page(good) }, `${notes}/previews/layout-page.html`),
     has("the file name does not end `-preview.html`"));
 
-  // WHICH TEMPLATE THE FURNITURE IS READ FROM, proven with a templates folder whose three templates
-  // each carry a script of their own, because the book's three carry the same scripts today.
-  const own = mkdtempSync(join(BASE, "templates-"));
-  const script = (name) => `<script>/* ${name} */</script>`;
-  mkdirSync(join(own, "pages"), { recursive: true });
-  mkdirSync(join(own, "workstream"), { recursive: true });
-  writeFileSync(join(own, "pages", "construct-template.html"), script("construct"));
-  writeFileSync(join(own, "workstream", "approach-template.html"), script("approach"));
-  writeFileSync(join(own, "workstream", "approach-preview-template.html"), script("preview"));
-  one("a preview carrying the preview template's scripts draws no furniture finding",
-    audit({ [at]: page(good, { scripts: script("preview") }) }, at, own), lacks("furniture"));
-  one("known-bad: a preview carrying the construct template's scripts is off its own template",
-    audit({ [at]: page(good, { scripts: script("construct") }) }, at, own), has("this page's scripts are not the template's"));
-
   // A SAMPLE AND A TEMPLATE ARE NOT PAGES. The same broken file is refused under `previews/` and
   // left alone under `samples/`.
-  const broken = "<h1>No block, no header</h1>\n";
+  const broken = `${LINES.stylesheet}\n<h1>No block, no header</h1>\n`;
   one("known-bad: a file with no block under previews/ is refused",
     audit({ [`${notes}/previews/broken-preview.html`]: broken }, `${notes}/previews/broken-preview.html`), has("RULE"));
   one("the same file under samples/ is not audited as a page",
     audit({ [`${notes}/samples/broken-preview.html`]: broken }, `${notes}/samples/broken-preview.html`),
-    (got) => has("a sample and a template are not audited as pages")(got) && lacks("RULE")(got));
+    (got) => has("a sample, a template and a bundled copy are not audited as pages")(got) && lacks("RULE")(got));
   one("a template file is not audited as a page, wherever it sits",
     audit({ [`${notes}/previews/approach-preview-template.html`]: previewTemplate }, `${notes}/previews/approach-preview-template.html`),
-    (got) => has("a sample and a template are not audited as pages")(got) && lacks("RULE")(got));
+    (got) => has("a sample, a template and a bundled copy are not audited as pages")(got) && lacks("RULE")(got));
   one("a notes folder is audited for its previews alone — the sample and the template beside it are not counted",
     audit({ [at]: page(good), [`${notes}/samples/broken-preview.html`]: broken, [`${notes}/samples/close-message.md`]: "Closing.\n",
             [`${notes}/samples/approach-preview-template.html`]: previewTemplate }, notes),
