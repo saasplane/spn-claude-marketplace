@@ -1,0 +1,135 @@
+<meta charset="utf-8">
+<title>Install the Plugins — And Prove They Loaded</title>
+<!-- spn:doc
+{"id":"spn-claude-marketplace-install-the-plugins","variant":"guide","title":"Install the Plugins — And Prove They Loaded","lenses":["SERVER_DEV","WEB_DEV","ARCHITECT","INFRA"],"summary":"Putting the plugin set into a workspace from a directory or from git, the refresh that actually replaces the installed bytes, and the checks that tell you which version a session is really running.","keywords":["install","plugins","marketplace","agent-sync","scope","cache","refresh","verify"],"source":"docs/05-guides/01-install-the-plugins.md"}
+-->
+<!-- Produced by `docs guide` from docs/05-guides/01-install-the-plugins.md. Never edit this page: change the guide, and produce the page again. -->
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.0.0/sds-docs.css">
+<div class="sds-page sds-guide">
+
+<nav class="sds-rail" id="rail">
+  <a class="sds-home" href="../index.html" target="_top">&larr; the index</a>
+  <div class="sds-rail-title">Install the Plugins — And Prove They Loaded</div>
+</nav>
+<div class="sds-wrap">
+
+<header class="sds-masthead">
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Install the Plugins — And Prove They Loaded</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Guide</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Backend developer</span><span class="sds-badge sds-lens">Web developer</span><span class="sds-badge sds-lens">Architect</span><span class="sds-badge sds-lens">DevOps / SRE</span></span></span></div>
+  <h1>Install the Plugins — And Prove They Loaded</h1>
+  <p class="sds-standfirst">Putting the plugin set into a workspace from a directory or from git, the refresh that actually replaces the installed bytes, and the checks that tell you which version a session is really running.</p>
+</header>
+
+<section id="s0">
+  <div class="sds-section-head"><h2>Overview</h2></div>
+  <p>By the end of this you have the plugins your repository declares, installed, current with their source, and proven. The proving is the part worth your attention. <strong>A session that carries no plugin looks exactly like a session that carries all of them</strong> — no error, no warning, nothing. So the last section here is not a formality.</p>
+  <p>Everything below is a terminal command. Run the <code>claude plugin</code> ones <strong>from the workspace root</strong>, because the install is recorded against the directory you ran it in.</p>
+</section>
+
+<section id="s1">
+  <div class="sds-section-head"><h2>Steps</h2></div>
+  <div class="sds-step">
+    <h3 id="know-which-source-you-are-installing-from">know which source you are installing from</h3>
+    <p>A marketplace is either a folder on your machine or a repository you fetch, and which one you have decides almost everything that follows.</p>
+    <div class="sds-scroll"><table>
+      <thead><tr><th>Source</th><th>You are a</th><th>What installs</th></tr></thead>
+      <tbody>
+        <tr><td>a <strong>directory</strong> on this machine</td><td>builder</td><td>the checkout beside its siblings — your own edits</td></tr>
+        <tr><td>a <strong>git repository</strong></td><td>partner</td><td>the published marketplace, fetched over the network</td></tr>
+      </tbody>
+    </table></div>
+    <p>Read it rather than assuming it:</p>
+    <pre data-lang="bash">spnutils workspace status</pre>
+    <p>The first line names the source. A builder's workspace prints <code>directory:</code> and a path; a partner's prints a repository. The same line reports the permission floor beside it.</p>
+    <p>You can ask the <code>claude</code> CLI the same question, and it answers from its own register:</p>
+    <pre data-lang="bash">claude plugin marketplace list</pre>
+  </div>
+  <div class="sds-step">
+    <h3 id="register-the-marketplace-once">register the marketplace, once</h3>
+    <p>A marketplace is registered before any plugin in it can be installed. <strong><code>spnutils workspace init</code> does this for you</strong> as part of minting a workspace, writing the entry into the workspace's <code>.claude/settings.local.json</code>. That is the path to prefer, because it also writes the permission tiers and the plugin union in the same pass.</p>
+    <p>Registering by hand is the same act, one level lower:</p>
+    <pre data-lang="bash"># from a directory on this machine
+claude plugin marketplace add /opt/work/saasplane/code/spn-claude-marketplace
+
+# or from the published repository
+claude plugin marketplace add &lt;org&gt;/spn-claude-marketplace</pre>
+    <p><code>--scope</code> takes <code>user</code>, <code>project</code> or <code>local</code>, and defaults to <code>user</code>. A workspace that is one of several on your machine wants <code>project</code>, so the registration travels with the folder rather than with your account.</p>
+    <p>Before you register a directory you are authoring, you can check that its manifest is well formed:</p>
+    <pre data-lang="bash">claude plugin validate /opt/work/saasplane/code/spn-claude-marketplace</pre>
+  </div>
+  <div class="sds-step">
+    <h3 id="install-what-the-repository-declares">install what the repository declares</h3>
+    <p><strong>Prefer the CLI command.</strong> It reads <code>sprepo.json</code>, derives which plugins that repository loads, installs them, writes the managed instruction block and the generated rules, and reinstalls any plugin that has drifted from its source:</p>
+    <pre data-lang="bash">spnutils repo agent-sync          # this repository
+spnutils workspace agent-sync     # every member of the workspace, in one call</pre>
+    <p>A repository already installed and matching its source costs one comparison and no install, so running it again is cheap and safe.</p>
+    <h4>Doing it by hand</h4>
+    <p>Where you want the underlying act — a hook edit you want live in the next window, say — it is an uninstall followed by an install, per plugin:</p>
+    <pre data-lang="bash">claude plugin uninstall spn-devex@saasplane --scope project
+claude plugin install   spn-devex@saasplane --scope project</pre>
+    <p><strong>Sequentially, never in parallel.</strong> The plugins share one installed-plugins register and one settings file, and concurrent installs race over both.</p>
+  </div>
+</section>
+
+<section id="s2">
+  <div class="sds-section-head"><h2>The traps</h2></div>
+  <p>Every one of these has cost somebody a day, so they are worth reading before you need them.</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>The trap</th><th>What actually happens</th><th>What you do</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Declaring is not loading</strong></td><td><code>enabledPlugins</code> in <code>.claude/settings.json</code> names what a repository wants. Nothing reads that name and fetches it. Until an install runs, the repository's sessions carry no plugin at all</td><td>run the install; a settings file alone never loads anything</td></tr>
+      <tr><td><strong>Cached is not loaded</strong></td><td>the cache holds every version ever installed, keyed by version, and most of those directories are live for nobody. A directory being present proves nothing</td><td>read the live path from the CLI, never from the cache listing</td></tr>
+      <tr><td><strong>Installed is not enabled</strong></td><td>a plugin can sit installed in the cache and be switched off. <code>claude plugin list</code> prints a status per entry, and <code>claude plugin enable</code> and <code>disable</code> move it</td><td>check the status line, not the presence of the folder</td></tr>
+      <tr><td><strong><code>claude plugin update</code> cannot refresh</strong></td><td>it is version-gated. At the same version it reports that you are already on the latest and copies nothing. An in-place edit to a directory-source plugin moves no bytes</td><td>uninstall, then install, at the same version</td></tr>
+      <tr><td><strong>The scope defaults to <code>user</code></strong></td><td>an uninstall without <code>--scope project</code> reports success against a scope holding nothing, and the project install it was meant to clear is still there</td><td>pass <code>--scope project</code> to the uninstall as well as the install</td></tr>
+      <tr><td><strong>The cache path carries a version</strong></td><td>the installed path ends in the version, and an uninstalled version can survive beside the live one carrying an orphan marker</td><td>never type a cache path with a version in it; ask the CLI which directory is live</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>One edit is live without any of this.</strong> A change to a <strong>hook script</strong> is read on its next run. A skill, an agent brief, a reference file or a change to <code>hooks.json</code> waits for an install and a fresh window — so batch those edits and install once, rather than installing after each one.</p>
+</section>
+
+<section id="s3">
+  <div class="sds-section-head"><h2>Steps</h2></div>
+  <div class="sds-step">
+    <h3 id="prove-it-loaded">prove it loaded</h3>
+    <p>The checks below run in increasing strength — what is declared, what is installed, and whether the installed copy is current.</p>
+    <p><strong>What is installed for this directory, at which version, enabled or not:</strong></p>
+    <pre data-lang="bash">claude plugin list</pre>
+    <p>For a precise answer, take the JSON and filter it by the directory you care about — the human listing shows every project on the machine at once:</p>
+    <pre data-lang="bash">claude plugin list --json | node -e \
+  'let s="";process.stdin.on("data",d=&gt;s+=d).on("end",()=&gt;{
+     for (const p of JSON.parse(s)) if (p.projectPath === process.argv[1])
+       console.log(p.id, p.version, p.enabled ? "enabled" : "disabled", p.installPath);
+   })' /opt/work/saasplane/code/spn-claude-marketplace</pre>
+    <p>For this repository that prints one line, because it declares <code>GENERAL</code> and loads the core plugin alone:</p>
+    <pre>spn-devex@saasplane 0.7.3 enabled /Users/…/.claude/plugins/cache/saasplane/spn-devex/0.7.3</pre>
+    <p><strong>What that installed copy actually contains</strong> — the inventory a session will read, and what it costs in context:</p>
+    <pre data-lang="bash">claude plugin details spn-devex@saasplane</pre>
+    <p><strong>Whether the installed copy matches its source.</strong> This is the check that catches the failure nothing else reports. Ask the CLI for the live directory, then compare it against the checkout — so no version is ever typed:</p>
+    <pre data-lang="bash">REPO=/opt/work/saasplane/code/spn-claude-marketplace
+LIVE=$(claude plugin list --json | node -e \
+  'let s="";process.stdin.on("data",d=&gt;s+=d).on("end",()=&gt;{
+     for (const p of JSON.parse(s))
+       if (p.projectPath === process.argv[1] &amp;&amp; p.id === process.argv[2]) console.log(p.installPath);
+   })' "$REPO" spn-devex@saasplane)
+
+diff -rq "$LIVE/" "$REPO/packages/plugin-spn-devex/" | grep -v "__pycache__\|\.DS_Store\|\.in_use"</pre>
+    <p>Silence means the installed bytes are the bytes you are reading. Any output means the session is running something older than your working tree, and <code>spnutils repo agent-sync</code> is what reconciles it.</p>
+    <p><code>__pycache__</code>, <code>.DS_Store</code>, <code>.git</code> and <code>.in_use</code> are excluded because each exists in one copy for a reason of its own. <code>.in_use</code> is the awkward one: the CLI writes it into the installed copy, so a comparison that reads it reports drift on every single run.</p>
+  </div>
+  <div class="sds-step">
+    <h3 id="take-a-fresh-window">take a fresh window</h3>
+    <p>The order is load-bearing, and reversing it costs you a second reload:</p>
+    <ol>
+      <li>every edit you intend to make;</li>
+      <li>the install, once;</li>
+      <li><code>spnutils repo agent-sync</code> or <code>spnutils workspace agent-sync</code>, which re-mint the generated rules, the managed instruction block and the permission tiers;</li>
+      <li>one fresh window.</li>
+    </ol>
+    <p>All three of the things step 3 writes are read when a session starts. A window opened before it loads the previous generation, and a half-reloaded session is one where you cannot tell which surface answered you.</p>
+  </div>
+</section>
+
+</div>
+</div>
+
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.0.0/sds-docs.js"></script>

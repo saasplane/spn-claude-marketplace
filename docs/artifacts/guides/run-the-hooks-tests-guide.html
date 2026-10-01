@@ -1,0 +1,96 @@
+<meta charset="utf-8">
+<title>Run the Suites — And Read What They Wrote Down</title>
+<!-- spn:doc
+{"id":"spn-claude-marketplace-run-the-hooks-tests","variant":"guide","title":"Run the Suites — And Read What They Wrote Down","lenses":["QA","SERVER_DEV","ARCHITECT"],"summary":"Running the plugins' own suites over the source, reading a result honestly rather than by its exit code, and the behaviour cells a run is allowed to write.","keywords":["tests","suites","runner","behaviour rows","register","tier","status","hooks"],"source":"docs/05-guides/02-run-the-hooks-tests.md"}
+-->
+<!-- Produced by `docs guide` from docs/05-guides/02-run-the-hooks-tests.md. Never edit this page: change the guide, and produce the page again. -->
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.0.0/sds-docs.css">
+<div class="sds-page sds-guide">
+
+<nav class="sds-rail" id="rail">
+  <a class="sds-home" href="../index.html" target="_top">&larr; the index</a>
+  <div class="sds-rail-title">Run the Suites — And Read What They Wrote Down</div>
+</nav>
+<div class="sds-wrap">
+
+<header class="sds-masthead">
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Run the Suites — And Read What They Wrote Down</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Guide</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Quality engineer</span><span class="sds-badge sds-lens">Backend developer</span><span class="sds-badge sds-lens">Architect</span></span></span></div>
+  <h1>Run the Suites — And Read What They Wrote Down</h1>
+  <p class="sds-standfirst">Running the plugins' own suites over the source, reading a result honestly rather than by its exit code, and the behaviour cells a run is allowed to write.</p>
+</header>
+
+<section id="s0">
+  <div class="sds-section-head"><h2>Overview</h2></div>
+  <p>Run these after any change to a hook, a check or a tool here. They exercise the source in your working tree rather than the installed copy, so you get an answer before you install anything.</p>
+  <p>They also do a second job that no other repository's suites do. <strong>This repository declares <code>GENERAL</code>, so <code>spnutils</code> serves it with its document commands alone and has no test runner for it.</strong> There is no other program that could write this repository's behaviour rows, so these suites are that program too.</p>
+</section>
+
+<section id="s1">
+  <div class="sds-section-head"><h2>Run the whole set</h2></div>
+  <pre data-lang="bash">cd /opt/work/saasplane/code/spn-claude-marketplace
+node packages/plugin-spn-devex/tests/run.mjs full-1001</pre>
+  <p><code>full-1001</code> is the run's name, and you choose it. It names the file the run writes, so pick one per sitting and reuse it for everything you run in that sitting. <code>node scripts/test-all.mjs full-1001</code> runs every package's suites and hands each runner the same name.</p>
+  <p>Every file named <code>t-*.mjs</code> under <code>packages/plugin-spn-devex/tests/unit/</code> is a suite, found by walking the folder rather than read from a list, and they run in path order. A suite sits at the path of the source file it proves, so the test for <code>src/scripts/checks/doc-check.ts</code> is <code>tests/unit/scripts/checks/t-doc-check.mjs</code>. The output is one line per suite and a tally:</p>
+  <pre>  ok    unit/scripts/checks/t-doc-check.mjs all 24 passed
+  ok    unit/scripts/t-seats.mjs all 123 passed
+  ok    unit/scripts/tools/t-docs.mjs all 157 passed
+
+  20 suite(s) · 758 case(s) · all passing
+  61 case(s) carry a behaviour id -&gt; tests/.output/unit/runs/full-1001.json</pre>
+  <p>A suite that exits non-zero, or whose last line does not count its passes, is printed as <code>FAIL</code>, with its own last line and its exit code beside it. The tally then names how many suites are failing rather than how many cases passed.</p>
+</section>
+
+<section id="s2">
+  <div class="sds-section-head"><h2>Run one suite</h2></div>
+  <p>A suite is an ordinary program, so you run it directly while you iterate on the check it covers:</p>
+  <pre data-lang="bash">node packages/plugin-spn-devex/tests/unit/scripts/checks/t-doc-check.mjs</pre>
+  <p>On its own it prints every case — <code>PASS</code> or <code>FAIL</code>, then the title — under the heading of the behaviour being exercised. That is the level to work at while a check is moving, because the aggregate view drops everything but the last line.</p>
+</section>
+
+<section id="s3">
+  <div class="sds-section-head"><h2>Read the result honestly</h2></div>
+  <p><strong>Read what a run says rather than its exit code.</strong> The exit code is one bit, and these suites are built to tell you more than one bit.</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>What you see</th><th>What it actually means</th></tr></thead>
+    <tbody>
+      <tr><td><code>all passing</code> in the tally</td><td>every suite exited clean and its last line counted its passes</td></tr>
+      <tr><td>a <code>FAIL</code> line</td><td>that suite exited non-zero or its last line counted nothing — a crash reports as <code>CRASHED</code></td></tr>
+      <tr><td><code>N case(s) carry a behaviour id</code></td><td>how many assertions spoke for a register row; the rest spoke only for themselves</td></tr>
+      <tr><td><code>py [not installed]</code> inside a case</td><td>the Python arm is gone, so only the TypeScript check ran</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>The runner discards each suite's error stream on purpose.</strong> Some suites exercise the hook that writes warnings there, and inheriting that stream would print a fixture's findings into the summary as though they were this run's. Where you want a suite's error output, run that suite on its own.</p>
+  <p><strong>These suites are a builder's gate.</strong> Several cases name real files in the surrounding workspace, because what they prove is that a check agrees with the corpus, and a corpus cannot be invented. Somebody holding the plugin without the workspace runs <code>partner-shape.ts</code> instead, which needs nothing but the plugin itself.</p>
+</section>
+
+<section id="s4">
+  <div class="sds-section-head"><h2>What a run writes down</h2></div>
+  <p>A named run writes <code>tests/.output/unit/runs/&lt;run&gt;.json</code> at the repository root, whether or not anything carried an id. It is the same file every stack's runner writes: the run's name, the tier, the instant and one result per id. An empty result set is itself a fact about the run, and an absent file would read as a run that never happened. A run that reuses a name replaces that one file and no other, and the tier keeps its 20 newest. Run the suites with no name and they still run, but nothing is written, because the row writer is always told which run to read.</p>
+  <p>A case speaks for a behaviour row when its <strong>title carries the row's id in brackets</strong> — <code>[MKT.DOCS.01]</code>, for instance. The runner reads the id out of the title, and the case becomes a result under that id. A title with no id proves nothing to the register and is counted only in the tally, which is correct: a register row is a promise somebody made, not every assertion anybody wrote.</p>
+  <div class="sds-step">
+    <h3 id="writing-the-rows">Writing the rows</h3>
+    <p>Add the flag and the run also writes what it found into the behaviour rows:</p>
+    <pre data-lang="bash">node packages/plugin-spn-devex/tests/run.mjs full-1001 --write-status</pre>
+    <p><strong>It writes the <code>Status</code> cell and the <code>Updated at</code> cell, and nothing else.</strong> <code>Updated at</code> reads the run's time and its name, such as <code>2026-10-01T09:12:44Z · full-1001</code>, so a row names the run that proved it. Every other cell in a row — who the actor is, what they do, what they see, the type, the tier — is a decision a person made, and a run has no opinion about any of it.</p>
+    <p>The limits below keep that writer honest, and each one exists to stop a run saying more than it knows:</p>
+    <ul>
+      <li><strong>A run speaks only for the tiers it ran.</strong> These suites exercise one unit against a fixture, with no service and no browser, so they declare <code>UNIT</code> and leave every row of another tier exactly as it was. A partial run that reset the register would make the status swing on each run.</li>
+      <li><strong>A row is green only when every case carrying its id is green.</strong> One red among several is a red row.</li>
+      <li><strong>A row whose tier the run covered, and whose case the run never reached, becomes <code>PENDING</code>.</strong> That is the honest answer and the one a reader needs — a row that used to pass and is no longer proven says so.</li>
+      <li><strong><code>MANUAL</code> is never written over.</strong> A behaviour a person checks by hand has no case and no run.</li>
+    </ul>
+    <p>A row still reading <code>PLANNED</code> is left alone. It has never been proven, so a run that did not reach it changes nothing.</p>
+  </div>
+  <div class="sds-step">
+    <h3 id="where-the-rows-stand-today">Where the rows stand today</h3>
+    <p>A case whose title carries an id, such as <code>[MKT.SCRIPTS.48]</code>, speaks for its row. A row no case names reads <code>PLANNED</code> in <a href="../../03-behaviors/README.md"><code>03-behaviors/</code></a>, which is true: it is declared rather than proven, until a case title carries its id.</p>
+    <p>You can ask the writer what it would do without letting it write, by naming the run to it directly:</p>
+    <pre data-lang="bash">node packages/plugin-spn-devex/src/scripts/cli.ts behaviours stamp full-1001 . --reach repository</pre>
+    <p>It prints one line per row it would change, then a tally. With no <code>--write</code> it changes nothing.</p>
+  </div>
+</section>
+
+</div>
+</div>
+
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.0.0/sds-docs.js"></script>
