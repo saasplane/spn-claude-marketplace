@@ -38,11 +38,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "7511d25c"
+      "seen": "456ac9a4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "2879f9d1"
+      "seen": "a6187bd5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -66,7 +66,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "9d8e7322"
+      "seen": "b806f3a9"
     }
   ]
 }
@@ -577,6 +577,14 @@ a whole file, or what a command prints.
 | they say neither, and it must be opened in a browser to be judged, or it is longer than one screen | write it, and link it from the approach page |
 | they approve a preview that was shown in chat | save it as a file and link it |
 | nobody asked, and no rule owes a preview | write nothing |
+
+**A preview outside any workstream uses the same template — MUST** (`RD.DEVEX.WORKSPACE.209`). When
+the developer asks for something no workstream owns and it must be shown as a page, copy
+`approach-preview-template.html`, name the page `<subject>-preview.html`, and write it into the
+session's scratch folder. Leave out the link back to an approach page and the arc field. Hand it over
+as its full path. Publish it only when the developer asks, and then give them the link. When a
+workstream opens for the work, move the page into its first arc's `previews/` folder and list it there.
+A sample the page shows in a frame is a file beside it: publish or move it with the page.
 
 **A preview costs nothing to throw away.** Code written first makes the decision feel already taken,
 and it turns a question into a fait accompli.
