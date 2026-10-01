@@ -1,199 +1,33 @@
-<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The masthead, and the opening · § The suffix names the kind · § The approach document — a workstream's, never a repository's · § One stylesheet, shipped with the template · § The page itself — its outline, its rail, its width and its furniture
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The masthead, and the opening · § The suffix names the kind · § The approach document — a workstream's, never a repository's · § One stylesheet, served in versions · § The page itself — its outline, its rail, its width and its furniture
      and docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc carries its specification, or names the note that holds it
-     This file holds the structure and styling of a preview page and states no rule: the rail, the masthead, the
-     Overview as plain paragraphs, one section with its subsections, the slots an author fills, and the stylesheet.
-     The stylesheet, the rail and the heading script are the approach template's, copied and not adapted. A section
+     This file holds the structure of a preview page and states no rule: the rail, the masthead, the
+     Overview as plain paragraphs, one section with its subsections, the slots an author fills, and the two lines that load the shared stylesheet and script. A section
      and a subsection are repeated as often as the preview needs, and a subsection keeps only the block that fits. -->
 <meta charset="utf-8">
 <title>Approach Preview Template</title>
 <!-- spn:doc
 {"id": "ws-{{NNN}}-{{slug}}-{{preview-slug}}", "variant": "preview", "title": "{{THE PREVIEW NAME}}", "lenses": ["{{LENS}}"], "status": "PLANNING", "summary": "{{The Description's first sentence, word for word.}}", "keywords": ["{{…}}"]}
 -->
-<style>
-  :root {
-    --paper:#edf0f3; --card:#f7f9fb; --ink:#141920; --slate:#48525f; --faint:#7c8794;
-    --rule:#d2d9e0; --accent:#2f4e7a; --accent-soft:#e0e8f4;
-    --gap:#8f5714; --gap-soft:#f7ecda; --ok:#2a6459; --ok-soft:#dcece8;
-    --ui:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
-    --xs:0.76rem; --sm:0.85rem; --md:0.97rem; --lg:1.32rem; --xl:1.62rem; --xxl:2.5rem;
-    --tk-k:#6d3a9c; --tk-s:#2a6459; --tk-c:#7c8794; --tk-t:#2f4e7a; --tk-n:#8f5714; --tk-add:#2a6459; --tk-del:#a63d3d;
-  }
-  @media (prefers-color-scheme:dark){
-    :root:not([data-theme="light"]){ --paper:#0f1318; --card:#171d24; --ink:#e3e8ee; --slate:#a3adb9; --faint:#6f7986;
-      --rule:#242d37; --accent:#86a9da; --accent-soft:#18232f;
-      --gap:#d59d4f; --gap-soft:#2a2113; --ok:#5db3a4; --ok-soft:#14251f; --tk-k:#c9a3ee; --tk-s:#7fc9b6; --tk-c:#6f7986; --tk-t:#86a9da; --tk-n:#d59d4f; --tk-add:#5db3a4; --tk-del:#e08a8a; }
-  }
-  :root[data-theme="dark"]{ --paper:#0f1318; --card:#171d24; --ink:#e3e8ee; --slate:#a3adb9; --faint:#6f7986;
-    --rule:#242d37; --accent:#86a9da; --accent-soft:#18232f;
-    --gap:#d59d4f; --gap-soft:#2a2113; --ok:#5db3a4; --ok-soft:#14251f; --tk-k:#c9a3ee; --tk-s:#7fc9b6; --tk-c:#6f7986; --tk-t:#86a9da; --tk-n:#d59d4f; --tk-add:#5db3a4; --tk-del:#e08a8a; }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--ui);font-size:1rem;line-height:1.6;-webkit-font-smoothing:antialiased}
-  p{margin:0 0 1rem;max-width:58rem}
-  code,.m{font-family:var(--mono);font-size:0.87em}
-  strong{font-weight:600}
-  em{font-style:italic;color:var(--slate)}
-  a{color:var(--accent)}
-  .page{display:grid;grid-template-columns:13rem minmax(0,1fr);gap:3rem;max-width:min(98vw,80rem);margin:0 auto;padding:3rem 8px 6rem;align-items:start}
-  .rail{position:sticky;top:2.5rem;font-family:var(--ui);font-size:var(--xs)}
-  .rail .home{border-left:none;padding-left:0;margin-bottom:.9rem;color:var(--accent);font-weight:650;display:block}
-  .rail .rail-title{letter-spacing:.15em;text-transform:uppercase;color:var(--faint);margin-bottom:.85rem;font-size:.7rem}
-  .rail a{display:flex;gap:.55rem;text-decoration:none;color:var(--slate);padding:.28rem 0 .28rem .6rem;border-left:2px solid var(--rule);line-height:1.4}
-  .rail a .n{display:none}
-  .rail a.sub{padding-left:1.6rem;font-size:.72rem;color:var(--faint)}
-  .rail a:hover{color:var(--ink)}
-  .rail a.on{color:var(--accent);border-left-color:var(--accent);font-weight:650}
-  .rail .count{margin-left:auto;font-family:var(--mono);font-size:.68rem;background:var(--gap-soft);color:var(--gap);border-radius:2px;padding:0 .3rem}
-  .wrap{display:flex;flex-direction:column;gap:3.25rem;min-width:0}
-  .masthead{display:flex;flex-direction:column;gap:1.1rem}
-  .eyebrow{display:flex;flex-direction:column;gap:.5rem;font-family:var(--ui);font-size:var(--xs);color:var(--faint)}
-  .eyebrow .line{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem .6rem;line-height:1.7}
-  .eyebrow .sep{color:var(--rule);font-weight:300}
-  .eyebrow .line1{letter-spacing:.15em;text-transform:uppercase;font-weight:650;color:var(--faint);line-height:1.7}
-  .eyebrow .lbl{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
-  .eyebrow .st{margin-left:auto;display:inline-flex;align-items:center;gap:.4rem}
-  .eyebrow .audience{display:inline-flex;flex-wrap:wrap;align-items:center;gap:.45rem}
-  .badge{display:inline-flex;align-items:center;gap:.35rem;padding:.1rem .6rem;border-radius:999px;border:1px solid var(--rule);background:var(--card);font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--slate);line-height:1.7;white-space:nowrap}
-  .badge.type{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);font-weight:650}
-  .badge.lens{font-family:var(--ui);font-size:.74rem;letter-spacing:0;text-transform:none}
-  .badge.status{font-weight:700}
-  .badge.status.planning{border-color:var(--gap);color:var(--gap);background:var(--gap-soft)}
-  .badge.status.implementing{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
-  .badge.status.done{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
-  .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(18rem,1fr));gap:.8rem;margin:1.6rem 0}
-  .tile{display:flex;flex-direction:column;border:1px solid var(--rule);background:var(--card);border-radius:3px;padding:.85rem 1rem;min-width:0}
-  .tile h4{margin:0 0 .35rem;font-size:var(--md)}
-  .tile h4 a{color:var(--ink);text-decoration:none}
-  .tile h4 a:hover{color:var(--accent)}
-  .tile p{font-size:var(--sm);color:var(--slate);margin:0 0 .6rem;max-width:none;flex:1}
-  .tile .more{font-size:var(--sm);font-weight:600;text-decoration:none;align-self:flex-start}
-  p > .more{font-weight:600;text-decoration:none}
-  h1{font-family:var(--ui);font-size:var(--xxl);font-weight:700;letter-spacing:-.02em;line-height:1.15;text-wrap:balance;margin:0}
-  .subtitle{font-size:var(--lg);line-height:1.5;color:var(--slate);max-width:46rem;margin:0}
-  .standfirst{font-size:1rem;line-height:1.6;color:var(--ink);max-width:58rem}
-  .sec-head{display:grid;grid-template-columns:1fr;align-items:baseline;gap:.5rem;border-top:2px solid var(--ink);padding-top:.7rem;margin-bottom:1.1rem}
-  .sec-head .num{font-family:var(--mono);font-size:var(--sm);font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
-  h2{font-family:var(--ui);font-size:var(--xl);font-weight:700;letter-spacing:-.01em;text-wrap:balance;margin:0}
-  h3{font-family:var(--ui);font-size:var(--lg);font-weight:600;letter-spacing:-.008em;margin:2rem 0 .6rem}
-  h4{font-family:var(--ui);font-size:var(--md);margin:0 0 .5rem;color:var(--ink)}
-  .scroll{overflow-x:auto;border:1px solid var(--rule);border-radius:3px;background:var(--card);margin:1.6rem 0}
-  table{border-collapse:collapse;width:100%;font-family:var(--ui);font-size:var(--sm);min-width:34rem}
-  .scroll table{table-layout:auto}
-  th{text-align:left;font-family:var(--mono);font-size:var(--xs);letter-spacing:.07em;text-transform:uppercase;color:var(--faint);font-weight:650;padding:.6rem .8rem;border-bottom:1px solid var(--rule)}
-  td{padding:.6rem .8rem;border-bottom:1px solid var(--rule);vertical-align:top;color:var(--slate)}
-  td strong{color:var(--ink)}
-  tr:last-child td{border-bottom:none}
-  .num-cell{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
-  .yes{color:var(--ok);font-weight:650}
-  .no{color:var(--gap);font-weight:650}
-  .s{font-family:var(--mono);font-size:var(--xs);color:var(--faint)}
-  pre{background:var(--card);border:1px solid var(--rule);border-radius:3px;padding:.9rem 1.1rem;margin:1.6rem 0;overflow-x:auto;font-family:var(--mono);font-size:var(--sm);line-height:1.55;color:var(--slate);max-width:100%}
-  pre code{font-size:inherit}
-  pre .tk-k{color:var(--tk-k);font-weight:600} pre .tk-s{color:var(--tk-s)} pre .tk-c{color:var(--tk-c);font-style:italic} pre .tk-t{color:var(--tk-t)} pre .tk-n{color:var(--tk-n)} pre .tk-add{color:var(--tk-add)} pre .tk-del{color:var(--tk-del)} pre .tk-cmd{color:var(--tk-t);font-weight:600}
-  /* A figure */
 
-  figure{margin:2.4rem 0;padding:0;border:0;background:none}
-  figure svg{display:block;width:auto;max-width:100%;height:auto;margin-inline:auto}
-  figcaption{font-family:var(--ui);font-size:var(--xs);color:var(--faint);margin-top:.5rem;max-width:none}
-  .dg .box{fill:var(--card);stroke:var(--rule);stroke-width:1.5}
-  .dg .box.off{fill:none;stroke:var(--rule);stroke-width:1.5;stroke-dasharray:5 4}
-  .dg .box.warn{fill:var(--gap-soft);stroke:var(--gap);stroke-width:1.5}
-  .dg .box.em{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}
-  .dg .t{font-family:var(--ui);font-size:13px;font-weight:650;fill:var(--ink)}
-  .dg .l{font-family:var(--ui);font-size:12px;fill:var(--ink)}
-  .dg .s{font-family:var(--mono);font-size:11px;fill:var(--slate)}
-  .dg .n{font-family:var(--ui);font-size:11px;fill:var(--faint)}
-  /* Arrowheads take the line's colour */
-  .dg{color:var(--accent)}
-  .dg .c{stroke:var(--accent);stroke-width:1.6;fill:none}
-  .pull{border-left:2px solid var(--accent);background:var(--accent-soft);padding:1rem 1.2rem;margin:1.6rem 0;border-radius:0 3px 3px 0}
-  .pull .label{display:block;font-family:var(--ui);font-size:var(--xs);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.3rem}
-  .pull p{margin:0;max-width:none}
-  .open{background:var(--card);border:1px solid var(--rule);border-left:2px solid var(--gap);border-radius:0 3px 3px 0;padding:1.1rem 1.25rem;margin-bottom:.9rem}
-  /* .card, the green-edged card */
-  .card{background:var(--card);border:1px solid var(--rule);border-left:2px solid var(--ok);border-radius:0 3px 3px 0;padding:1.1rem 1.25rem;margin-bottom:.9rem}
-  .card h4{font-size:var(--md)}
-  .card .k{font-family:var(--mono);font-size:var(--xs);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);display:block;margin:.6rem 0 .2rem}
-  .card p{font-size:var(--sm);color:var(--slate);margin:0 0 .4rem;max-width:none}
-  .card .rec{margin-top:.75rem;padding-top:.65rem;border-top:1px dashed var(--rule);font-size:var(--sm);color:var(--ink)}
-  .card .rec b{color:var(--ok)}
-  .card .scroll{margin:.4rem 0}
-  .open h4{font-size:var(--md)}
-  .open .k{font-family:var(--mono);font-size:var(--xs);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);display:block;margin:.6rem 0 .2rem}
-  .open p{font-size:var(--sm);color:var(--slate);margin:0 0 .4rem;max-width:none}
-  .open .rec{margin-top:.75rem;padding-top:.65rem;border-top:1px dashed var(--rule);font-size:var(--sm);color:var(--ink)}
-  .open .rec b{color:var(--ok)}
-  .open .scroll{margin:.4rem 0}
-  pre.pv{font-family:var(--mono);font-size:var(--xs);background:var(--card);border:1px solid var(--rule);border-radius:3px;padding:.7rem .9rem;margin:1rem 0;overflow-x:auto;line-height:1.5}
-  footer{border-top:1px solid var(--rule);padding-top:1.3rem;font-family:var(--ui);font-size:var(--xs);color:var(--faint)}
-  @media (max-width:60rem){
-    .page{grid-template-columns:minmax(0,1fr);gap:1.5rem;padding-top:2rem}
-    .rail{position:static;border:1px solid var(--rule);border-radius:3px;background:var(--card);padding:.9rem 1rem}
-    .rail a{border-left:none;padding-left:0}
-    .rail a.on{border-left:none}
-  }
 
-  /* The rail: two levels */
-  .rail a:not(.sub):not(.home){font-size:.88rem;font-weight:400;color:var(--ink);letter-spacing:-.005em}
-  .rail a.sub{font-size:.78rem;font-weight:400;color:var(--slate)}
-  .rail .rail-title{color:var(--slate)}
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.0.0/sds-docs.css">
+<div class="sds-page">
 
-  /* The rail: one left edge */
-  .rail a:not(.home), .rail a.sub{padding-left:.6rem}
-
-  /* The rail: marks level with the label */
-  .rail a{align-items:center}
-  .rail .count{align-self:center}
-
-  /* The rail: the current entry */
-  .rail a.on:not(.sub):not(.home){font-weight:650;color:var(--accent);box-shadow:inset 1.5px 0 0 var(--accent)}
-  .rail a.on.sub{color:var(--accent);box-shadow:inset 1.5px 0 0 var(--accent)}
-  .rail a:not(.sub):not(.home):hover{color:var(--accent)}
-  .rail a.sub:hover{color:var(--ink)}
-
-  /* The rail: the fold chevron */
-  .rail a .caret{margin-left:auto;flex:none;width:1.35rem;height:1.35rem;display:grid;place-items:center;
-    color:var(--faint);border-radius:3px;transform:none}
-  .rail a .caret::before{content:"";width:.32rem;height:.32rem;border-right:1.5px solid currentColor;
-    border-bottom:1.5px solid currentColor;transform:translateX(-.1rem) rotate(-45deg);transition:transform .15s ease}
-  .rail a.group-open .caret{transform:none}
-  .rail a.group-open .caret::before{transform:translateY(-.1rem) rotate(45deg)}
-  .rail a .caret:hover{background:var(--accent-soft);color:var(--accent)}
-  @media (prefers-reduced-motion:reduce){.rail a .caret::before{transition:none}}
-</style>
-<style>
-/* Heading anchor links */
-a.anchor{display:inline-block;margin-left:.6em;font-family:var(--mono);font-size:.55em;font-weight:400;line-height:1;color:var(--slate,#6b7280);text-decoration:none;opacity:.35;transition:opacity .15s;vertical-align:middle;position:relative;top:-.1em}
-.sec-head:hover a.anchor,h3[id]:hover a.anchor,a.anchor:hover,a.anchor:focus,a.anchor.copied{opacity:1}
-a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7d4a);margin-left:.3em}
-</style>
-<style>
-  /* The status of a preview: the arc's own words */
-  .badge.status.proposed{border-color:var(--gap);color:var(--gap);background:var(--gap-soft)}
-  .badge.status.decided{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
-  /* A whole page shown inside the preview */
-  .frame{border:1px solid var(--rule);border-radius:3px;background:var(--card);margin:1.6rem 0;overflow:hidden}
-  .frame iframe{display:block;width:100%;height:46rem;border:0;background:#fff}
-  .frame .cap{font-family:var(--mono);font-size:var(--xs);color:var(--faint);padding:.45rem .8rem;border-bottom:1px solid var(--rule)}
-</style>
-
-<div class="page">
-
-<nav class="rail" id="rail">
-  <a class="home" href="../../../approach.html#{{the id of the subsection or card this preview serves}}">&larr; {{NNN}} - {{TITLE}}</a>
-  <div class="rail-title">{{THE PREVIEW NAME}}</div>
+<nav class="sds-rail" id="rail">
+  <a class="sds-home" href="../../../approach.html#{{the id of the subsection or card this preview serves}}">&larr; {{NNN}} - {{TITLE}}</a>
+  <div class="sds-rail-title">{{THE PREVIEW NAME}}</div>
 </nav>
-<div class="wrap">
+<div class="sds-wrap">
 
-<header class="masthead">
-  <div class="eyebrow"><span class="line1">{{WORKSPACE}} &nbsp;|&nbsp; Workstream {{NNN}} &nbsp;|&nbsp; {{THE PREVIEW NAME}}</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Preview</span><span class="sep">|</span><span class="lbl">Arc:</span> <span class="badge">N{{nnn}}</span><span class="sep">|</span><span class="lbl">Shown:</span> <span class="badge">{{date}}</span><span class="st"><span class="lbl">Status:</span> <span class="badge status proposed">{{PROPOSED &middot; DECIDED}}</span></span></span></div>
+<header class="sds-masthead">
+  <div class="sds-eyebrow"><span class="sds-line1">{{WORKSPACE}} &nbsp;|&nbsp; Workstream {{NNN}} &nbsp;|&nbsp; {{THE PREVIEW NAME}}</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Preview</span><span class="sds-separator">|</span><span class="sds-label">Arc:</span> <span class="sds-badge">N{{nnn}}</span><span class="sds-separator">|</span><span class="sds-label">Shown:</span> <span class="sds-badge">{{date}}</span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-proposed">{{PROPOSED &middot; DECIDED}}</span></span></span></div>
   <h1>{{THE PREVIEW NAME}}</h1>
-  <p class="subtitle">{{THE SUBTITLE: what you are asked to decide from this page, one plain sentence.}}</p>
-  <p class="standfirst">{{THE DESCRIPTION, one paragraph: what this page shows, why you would look at it, and how the page runs.}}</p>
+  <p class="sds-subtitle">{{THE SUBTITLE: what you are asked to decide from this page, one plain sentence.}}</p>
+  <p class="sds-standfirst">{{THE DESCRIPTION, one paragraph: what this page shows, why you would look at it, and how the page runs.}}</p>
 </header>
 
 <section id="s1" data-block="reasons">
-  <div class="sec-head"><h2>Overview</h2></div>
+  <div class="sds-section-head"><h2>Overview</h2></div>
   <p>{{What this preview shows, and which part of the approach page it serves.}}</p>
   <p>{{What to look at first, and what you are asked to decide.}}</p>
   <p>{{What in this preview is not final, and what will differ in the built thing.}}</p>
@@ -202,19 +36,19 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
 </section>
 
 <section id="s2" data-block="sequence">
-  <div class="sec-head"><h2>{{A section: one part of what is previewed}}</h2></div>
+  <div class="sds-section-head"><h2>{{A section: one part of what is previewed}}</h2></div>
   <p>{{The section&rsquo;s own overview, in one or two sentences. Then its subsections, each with the block that fits.}}</p>
 
   <h3 id="s2a">{{A subsection shown as a diagram}}</h3>
   <p>{{What the diagram shows.}}</p>
   <figure>
-  <svg class="dg" viewBox="18 18 1016 84" width="1016" height="84" role="img" aria-label="{{What the diagram shows, in words.}}">
+  <svg class="sds-drawing" viewBox="18 18 1016 84" width="1016" height="84" role="img" aria-label="{{What the diagram shows, in words.}}">
     <defs><marker id="ar-pv" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="box em" x="20" y="20" width="300" height="80" rx="3"/><text class="t" x="36" y="48">{{Part}}</text><text class="s" x="36" y="70">{{what it does}}</text>
-    <path class="c" d="M320 60 H376" marker-end="url(#ar-pv)"/>
-    <rect class="box" x="376" y="20" width="300" height="80" rx="3"/><text class="t" x="392" y="48">{{Part}}</text><text class="s" x="392" y="70">{{what it does}}</text>
-    <path class="c" d="M676 60 H732" marker-end="url(#ar-pv)"/>
-    <rect class="box" x="732" y="20" width="300" height="80" rx="3"/><text class="t" x="748" y="48">{{Part}}</text><text class="s" x="748" y="70">{{what it does}}</text>
+    <rect class="sds-box sds-tone-blue" x="20" y="20" width="300" height="80" rx="3"/><text class="sds-title" x="36" y="48">{{Part}}</text><text class="sds-code" x="36" y="70">{{what it does}}</text>
+    <path class="sds-connector" d="M320 60 H376" marker-end="url(#ar-pv)"/>
+    <rect class="sds-box" x="376" y="20" width="300" height="80" rx="3"/><text class="sds-title" x="392" y="48">{{Part}}</text><text class="sds-code" x="392" y="70">{{what it does}}</text>
+    <path class="sds-connector" d="M676 60 H732" marker-end="url(#ar-pv)"/>
+    <rect class="sds-box" x="732" y="20" width="300" height="80" rx="3"/><text class="sds-title" x="748" y="48">{{Part}}</text><text class="sds-code" x="748" y="70">{{what it does}}</text>
   </svg>
   <figcaption>{{What to notice.}}</figcaption>
   </figure>
@@ -226,16 +60,16 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
 
   <h3 id="s2c">{{A subsection shown as code changes}}</h3>
   <p><code>{{path of the file that changes}}</code></p>
-  <pre data-lang="diff"><span class="tk-del">- what the file says today</span>
-<span class="tk-add">+ what it will say</span></pre>
+  <pre data-lang="diff"><span class="sds-tk-del">- what the file says today</span>
+<span class="sds-tk-add">+ what it will say</span></pre>
 </section>
 
 <section id="s3" data-block="comparison">
-  <div class="sec-head"><h2>{{Another section}}</h2></div>
+  <div class="sds-section-head"><h2>{{Another section}}</h2></div>
   <p>{{The section&rsquo;s own overview.}}</p>
 
   <h3 id="s3a">{{A subsection shown as a table}}</h3>
-  <div class="scroll"><table>
+  <div class="sds-scroll"><table>
     <thead><tr><th>{{Thing}}</th><th>{{Today}}</th><th>{{Proposed}}</th></tr></thead>
     <tbody>
       <tr><td><strong>{{&hellip;}}</strong></td><td>{{&hellip;}}</td><td>{{&hellip;}}</td></tr>
@@ -244,8 +78,8 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
 
   <h3 id="s3b">{{A subsection that shows a real sample}}</h3>
   <p>{{What the sample is: a template, a report, a page. It is a real file in its own format, kept in the samples folder, and this page only shows it.}}</p>
-  <div class="frame">
-    <div class="cap">{{samples/the-sample-file.html}}</div>
+  <div class="sds-frame">
+    <div class="sds-caption">{{samples/the-sample-file.html}}</div>
     <iframe src="../samples/{{the-sample-file.html}}" title="{{what the sample is}}"></iframe>
   </div>
 </section>
@@ -257,158 +91,4 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
   The approach preview template &middot; copy it and fill the slots &middot; a preview page is named <code>&lt;subject&gt;-preview.html</code>, sits in <code>notes/N&lt;nnn&gt;/previews/</code>, and the approach page links it &middot; a real sample sits in <code>notes/N&lt;nnn&gt;/samples/</code> under its own name &middot; every block and figure is shown once in <code>blocks-template.html</code>
 </footer>
 
-<script>
-(function(){
-  var rail=document.getElementById('rail');if(!rail)return;
-  var secs=Array.prototype.slice.call(document.querySelectorAll('section[id]'));
-  var links=[];
-  secs.forEach(function(s){
-    var num=s.querySelector('.sec-head .num'),h2=s.querySelector('h2');if(!h2)return;
-    var a=document.createElement('a');a.href='#'+s.id;
-    var n=document.createElement('span');n.className='n';n.textContent=num?num.textContent:'';
-    var t=document.createElement('span');t.textContent=h2.textContent.split(' — ')[0];
-    a.appendChild(n);a.appendChild(t);
-    if(s.id==='s4'){var c=s.querySelectorAll('.open').length;if(c){var b=document.createElement('span');b.className='count';b.textContent=c;a.appendChild(b);}}
-    rail.appendChild(a);links.push({el:a,sec:s});
-    Array.prototype.forEach.call(s.querySelectorAll('h3[id]'),function(h){
-      var sa=document.createElement('a');sa.href='#'+h.id;sa.className='sub';sa.textContent=h.textContent;rail.appendChild(sa);
-    });
-  });
-  function mark(){var y=window.scrollY+120,cur=links[0];links.forEach(function(l){if(l.sec.offsetTop<=y)cur=l;});links.forEach(function(l){l.el.classList.toggle('on',l===cur);});}
-  window.addEventListener('scroll',mark,{passive:true});mark();
-})();
-</script>
-
-<style>
-  .rail .sub-group{display:block}
-  .rail.js .sub-group{display:none}
-  .rail.js .sub-group.shown{display:block}
-  .rail a .caret:hover{background:var(--accent-soft);color:var(--accent)}
-  .rail a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-</style>
-<style>
-  /* A quote */
-  blockquote{margin:1.6rem 0;padding:.2rem 0 .2rem 1.1rem;border-left:2px solid var(--rule);color:var(--slate)}
-  blockquote p{margin:0;max-width:none}
-  .tile .s{margin-top:.45rem}
-  /* PROSE, the markdown panel */
-  .prose{border:1px solid var(--rule);background:var(--card);color:var(--slate);border-radius:3px;
-    padding:1.1rem 1.3rem;margin:1.6rem 0}
-  .prose > :first-child{margin-top:0}
-  .prose > :last-child{margin-bottom:0}
-  .prose p,.prose li{max-width:none}
-  .prose strong,.prose h4{color:var(--ink)}
-  .prose code{color:var(--ink)}
-  .prose blockquote{border-left-color:var(--accent);margin:1rem 0}
-  /* NEXT */
-  .nextnav{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.7rem;margin:1.6rem 0}
-  .nextnav-card{display:flex;flex-direction:column;gap:.15rem;border:1px solid var(--rule);background:var(--card);
-    border-radius:3px;padding:.65rem .85rem;text-decoration:none;min-width:0}
-  .nextnav-card:hover{border-color:var(--accent)}
-  .nextnav-card .dir{font-family:var(--mono);font-size:var(--xs);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
-  .nextnav-card .ttl{font-size:var(--sm);font-weight:600;color:var(--ink)}
-  .nextnav-card:hover .ttl{color:var(--accent)}
-  .nextnav-card.next{text-align:right}
-</style>
-
-<script>
-(function(){
-  var rail = document.getElementById('rail-list') || document.getElementById('rail');
-  if (!rail || rail.querySelector('.sub-group')) return;
-  var styled = document.getElementById('rail') || rail;
-
-  /* The caret and the group are one state with two faces. Writing both here is what stops the
-     caret claiming a section is open while its subsections are hidden. */
-  function setOpen(anchor, group, open){
-    group.classList.toggle('shown', open);
-    anchor.classList.toggle('group-open', open);
-    anchor.setAttribute('aria-expanded', open ? 'true' : 'false');
-  }
-
-  /* Regroup whatever the page's own builder produced: a section anchor, then the `sub` anchors
-     that follow it, moved into one collapsing group. */
-  var entries = [], current = null;
-  Array.prototype.slice.call(rail.children).forEach(function(node){
-    if (node.tagName !== 'A' || node.classList.contains('home')) return;
-    if (node.classList.contains('sub')) {
-      if (!current) return;
-      if (!current.group) {
-        current.group = document.createElement('div');
-        current.group.className = 'sub-group';
-        rail.insertBefore(current.group, node);
-      }
-      current.group.appendChild(node);
-      return;
-    }
-    current = { anchor: node, group: null };
-    entries.push(current);
-  });
-
-  entries.forEach(function(entry){
-    if (!entry.group) return;                     // a section with no second level never folds
-    var anchor = entry.anchor, group = entry.group;
-    anchor.classList.add('has-subs');
-    var caret = document.createElement('span');
-    caret.className = 'caret';
-    caret.setAttribute('role', 'button');
-    caret.setAttribute('tabindex', '-1');
-    caret.setAttribute('aria-label', 'Show sections under ' + anchor.textContent.trim());
-    anchor.appendChild(caret);
-    /* The caret toggles without leaving the page; the label still navigates. Hit-testing the
-       element beats measuring offsetX, which broke the moment the caret moved to the right. */
-    anchor.addEventListener('click', function(event){
-      if (event.target !== caret) return;
-      event.preventDefault();
-      /* `pinned` means a reader decided, so the scroll must stop overriding them. */
-      anchor.dataset.pinned = '1';
-      setOpen(anchor, group, !group.classList.contains('shown'));
-    });
-    setOpen(anchor, group, false);
-  });
-
-  /* THE RAIL FOLLOWS THE SCROLL. The page's own builder already marks the current entry with
-     `on`, so this watches that mark rather than measuring offsets a second time — two answers to
-     where the reader is would disagree the first time either changed. */
-  function follow(){
-    entries.forEach(function(entry){
-      if (!entry.group || entry.anchor.dataset.pinned === '1') return;
-      var here = entry.anchor.classList.contains('on') || !!entry.group.querySelector('a.on');
-      setOpen(entry.anchor, entry.group, here);
-    });
-  }
-  new MutationObserver(follow).observe(rail, {subtree: true, attributes: true,
-                                              attributeFilter: ['class']});
-  /* Last, because everything above degrades to the full index when no script runs. */
-  styled.classList.add('js');
-  follow();
-})();
-</script>
-<script>
-/* Every section (h2 inside .sec-head) and every subsection (h3 with an id) gets an anchor link.
-   Clicking it moves the address to that heading and copies the full link, so a subsection can be shared. */
-(function(){
-  function pageBase(){
-    var ref=document.referrer||'';
-    if(window.top!==window&&ref.indexOf('/artifact/')>-1)return ref.split('#')[0];
-    return location.href.split('#')[0];
-  }
-  function attach(h,id){
-    if(!id||h.querySelector('a.anchor'))return;
-    var a=document.createElement('a');a.className='anchor';a.href='#'+id;a.textContent='#';a.title='Copy link to this heading';a.setAttribute('aria-label','Copy link to '+h.textContent.trim());
-    a.addEventListener('click',function(ev){
-      var url=pageBase()+'#'+id;
-      try{history.replaceState(null,'',location.pathname+location.search+'#'+id);}catch(e){}
-      var done=function(){a.classList.add('copied');setTimeout(function(){a.classList.remove('copied');},1400);};
-      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(done,done);}else{done();}
-      var target=document.getElementById(id);if(target){ev.preventDefault();target.scrollIntoView({block:'start'});}
-    });
-    h.appendChild(a);
-  }
-  Array.prototype.forEach.call(document.querySelectorAll('section[id]'),function(s){
-    var h2=s.querySelector('.sec-head h2');if(!h2)return;
-    if(!h2.id)h2.id=s.id+'-title';
-    attach(h2,s.id);
-  });
-  Array.prototype.forEach.call(document.querySelectorAll('h3[id]'),function(h){attach(h,h.id);});
-})();
-</script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.0.0/sds-docs.js"></script>

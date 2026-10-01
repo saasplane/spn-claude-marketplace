@@ -1,0 +1,130 @@
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The index of artifacts — one page that opens every other · § One stylesheet, served in versions
+     This file holds the structure of the index of a repository's artifacts and states no rule: the side with
+     its tree, the tabs, the block of data that holds the tree, and the lines that load the shared stylesheet
+     and the index's script. `docs index` writes the tree from the pages on disk. The sections above state
+     every rule. -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Artifact Index Template</title>
+<!-- spn:doc
+{"id": "{{slug}}", "variant": "index", "title": "{{NAME}}", "summary": "{{What this page lists, in one sentence.}}"}
+-->
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.0.0/sds-docs.css">
+<div class="sds-index" id="index">
+  <aside class="sds-index-side" id="index-side">
+    <div class="sds-index-head">
+      <div class="sds-index-where">{{WORKSPACE}} &nbsp;|&nbsp; {{REPOSITORY}}</div>
+      <button type="button" class="sds-index-toggle" id="index-toggle" aria-expanded="true" aria-controls="index-tree" aria-label="Show or hide the tree of pages" title="Hide the tree"><svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x="2" y="3" width="12" height="10" rx="1.5"/><path d="M6.5 3v10"/></svg></button>
+    </div>
+    <nav class="sds-tree" id="index-tree" aria-label="Pages"></nav>
+    <noscript><p class="sds-index-note">This index needs its script to list the pages. Start at <a href="{{THE ADDRESS OF THE HUB: base, then the path of the hub}}">the hub</a>.</p></noscript>
+  </aside>
+  <main class="sds-index-main">
+    <div class="sds-tabs" id="index-tabs" role="tablist" aria-label="Open pages"></div>
+    <div class="sds-panes" id="index-panes"></div>
+  </main>
+</div>
+
+<!-- THE TREE. THE BUILD WRITES THIS BLOCK FROM THE PAGES ON DISK. NOBODY TYPES IT. The short tree below shows
+     its shape and no more. A folder has `label` and `children`. A page has `label`, `kind` and `path`, and
+     it is listed by its own name. `kind` is kept for a reader of the data, and the tree does not show it.
+     THE GROUPS are Docs, Guides and Reports, in that order. The build leaves out a group that holds nothing,
+     so a real page shows Guides or Reports only when the repository has one. All three are kept here, so
+     the shape is shown. A group may also carry a `note`, which is one line shown under its pages.
+     AN AREA is a folder. Where a repository has no areas, its domains sit under Docs.
+     A DOMAIN WITH ONE OVERVIEW is the link to that overview. Its `label` is the domain's name, and its
+     `title` is the overview's own, which names its tab. Its `children` are the constructs of the domain.
+     A DOMAIN WITH MORE THAN ONE OVERVIEW is a folder. Each overview is an entry under it, by its own name,
+     and its `children` are the constructs it links, which the build reads from the page.
+     A construct that no overview of its domain links comes last in its domain.
+     The build marks each domain `folded`, so it starts closed. No domain is marked here, so the whole short
+     tree is seen.
+     `base` is the one slot here that a person fills: it is the one place the path to the pages is kept. The
+     real index sits at docs/artifacts/index.html, and there `base` is empty. An entry whose address still
+     holds a slot opens a tab that says the page is a slot, and nothing is loaded. -->
+<script type="application/json" id="index-data">
+{
+ "base": "{{BASE: the path from this page to the pages, ending in a slash. It is empty when this page sits in docs/artifacts.}}",
+ "tabs": 8,
+ "groups": [
+  {
+   "label": "Docs",
+   "children": [
+    {
+     "label": "{{HUB: its title}}",
+     "kind": "overview",
+     "path": "{{PATH: from base to the page. The hub sits in overviews/.}}"
+    },
+    {
+     "label": "{{AREA}}",
+     "children": [
+      {
+       "label": "{{DOMAIN: it has one overview, so it opens that overview}}",
+       "title": "{{OVERVIEW: its title}}",
+       "kind": "overview",
+       "path": "{{PATH: from base to the page. An overview sits in overviews/.}}",
+       "children": [
+        {
+         "label": "{{CONSTRUCT: its title}}",
+         "kind": "construct",
+         "path": "{{PATH: from base to the page. A construct sits in constructs/, in the folder of its domain.}}"
+        }
+       ]
+      },
+      {
+       "label": "{{DOMAIN: it has more than one overview, so it is a folder}}",
+       "children": [
+        {
+         "label": "{{OVERVIEW: its title}}",
+         "kind": "overview",
+         "path": "{{PATH: from base to the page. An overview sits in overviews/.}}",
+         "children": [
+          {
+           "label": "{{CONSTRUCT: its title}}",
+           "kind": "construct",
+           "path": "{{PATH: from base to the page. A construct sits in constructs/, in the folder of its domain.}}"
+          }
+         ]
+        },
+        {
+         "label": "{{OVERVIEW: its title}}",
+         "kind": "overview",
+         "path": "{{PATH: from base to the page. An overview sits in overviews/.}}",
+         "children": [
+          {
+           "label": "{{CONSTRUCT: its title}}",
+           "kind": "construct",
+           "path": "{{PATH: from base to the page. A construct sits in constructs/, in the folder of its domain.}}"
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "label": "Guides",
+   "children": [
+    {
+     "label": "{{GUIDE: its title}}",
+     "kind": "guide",
+     "path": "{{PATH: from base to the page.}}"
+    }
+   ]
+  },
+  {
+   "label": "Reports",
+   "children": [
+    {
+     "label": "{{REPORT: its title}}",
+     "kind": "report",
+     "path": "{{PATH: from base to the page. A report sits in reports/.}}"
+    }
+   ]
+  }
+ ]
+}
+</script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.0.0/sds-index.js"></script>

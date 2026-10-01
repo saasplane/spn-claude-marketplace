@@ -1,362 +1,58 @@
 <!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § Reports and templates · § The header and the five sections · § Findings in a report · § Records in a report · § Recommendations in a report · § Who decides · § How a report looks, and where it goes · § The words a report uses · § The coverage report — written, built and proved, and the four report types after it
-     and docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The masthead, and the opening · § The suffix names the kind · § The header — two lines, six fields, produced from the block · § The blocks — what a page reaches for instead of prose · § The figures — what sits inside a block, and the closed set of them · § One stylesheet, shipped with the template · § The page itself — its outline, its rail, its width and its furniture
+     and docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The masthead, and the opening · § The suffix names the kind · § The header — two lines, six fields, produced from the block · § The blocks — what a page reaches for instead of prose · § The figures — what sits inside a block, and the closed set of them · § One stylesheet, served in versions · § The page itself — its outline, its rail, its width and its furniture
      and docs/02-constructs/01-devex/04-workspace/05-report.md (The Report: what a report is)
      and docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md § Metadata
      and docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md § The readability bar
-     This file holds the structure and styling of a report, one shell for all five report types, and states no
-     rule: the five sections in order with their ids, the slots an author fills, and the stylesheet and scripts.
+     This file holds the structure of a report, one shell for all five report types, and states no
+     rule: the five sections in order with their ids, the slots an author fills, and the two lines that load the shared stylesheet and script.
      The sections above state every rule for writing a report, and what each report type fills in. -->
 <meta charset="utf-8">
 <title>Report Template</title>
 <!-- spn:doc
 {"id": "{{repo}}-{{type}}-report", "variant": "report", "repository": "{{repo}}", "reportType": "{{AUDIT|CODE|DOCS|TESTS|COVERAGE}}", "title": "{{REPORT TYPE, in plain words}}", "lenses": ["{{LENS}}"], "generatedAt": "{{YYYY-MM-DDTHH:MM±HH:MM, the moment this page was written}}", "measuredAt": "{{TESTS only, the newest run read — delete the key on every other report type}}", "summary": "{{The Description's first sentence, word for word.}}", "keywords": ["report", "{{type}}"]}
 -->
-<style>
-  :root {
-    --paper:#edf0f3; --card:#f7f9fb; --ink:#141920; --slate:#48525f; --faint:#7c8794;
-    --rule:#d2d9e0; --accent:#2f4e7a; --accent-soft:#e0e8f4;
-    --gap:#8f5714; --gap-soft:#f7ecda; --ok:#2a6459; --ok-soft:#dcece8; --fail:#a63d3d; --fail-soft:#f6e1e1;
-    --ui:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
-    --xs:0.76rem; --sm:0.85rem; --md:0.97rem; --lg:1.32rem; --xl:1.62rem; --xxl:2.5rem;
-    --tk-k:#6d3a9c; --tk-s:#2a6459; --tk-c:#7c8794; --tk-t:#2f4e7a; --tk-n:#8f5714; --tk-add:#2a6459; --tk-del:#a63d3d;
-  }
-  @media (prefers-color-scheme:dark){
-    :root:not([data-theme="light"]){ --paper:#0f1318; --card:#171d24; --ink:#e3e8ee; --slate:#a3adb9; --faint:#6f7986;
-      --rule:#242d37; --accent:#86a9da; --accent-soft:#18232f;
-      --gap:#d59d4f; --gap-soft:#2a2113; --ok:#5db3a4; --ok-soft:#14251f; --fail:#e08a8a; --fail-soft:#2b1818; --tk-k:#c9a3ee; --tk-s:#7fc9b6; --tk-c:#6f7986; --tk-t:#86a9da; --tk-n:#d59d4f; --tk-add:#5db3a4; --tk-del:#e08a8a; }
-  }
-  :root[data-theme="dark"]{ --paper:#0f1318; --card:#171d24; --ink:#e3e8ee; --slate:#a3adb9; --faint:#6f7986;
-    --rule:#242d37; --accent:#86a9da; --accent-soft:#18232f;
-    --gap:#d59d4f; --gap-soft:#2a2113; --ok:#5db3a4; --ok-soft:#14251f; --fail:#e08a8a; --fail-soft:#2b1818; --tk-k:#c9a3ee; --tk-s:#7fc9b6; --tk-c:#6f7986; --tk-t:#86a9da; --tk-n:#d59d4f; --tk-add:#5db3a4; --tk-del:#e08a8a; }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--ui);font-size:1rem;line-height:1.6;-webkit-font-smoothing:antialiased}
-  p{margin:0 0 1rem;max-width:58rem}
-  code,.m{font-family:var(--mono);font-size:0.87em}
-  strong{font-weight:600}
-  em{font-style:italic;color:var(--slate)}
-  a{color:var(--accent)}
-  .page{display:grid;grid-template-columns:13rem minmax(0,1fr);gap:3rem;max-width:min(98vw,80rem);margin:0 auto;padding:3rem 8px 6rem;align-items:start}
-  .rail{position:sticky;top:2.5rem;font-family:var(--ui);font-size:var(--xs)}
-  .rail .home{border-left:none;padding-left:0;margin-bottom:.9rem;color:var(--accent);font-weight:650;display:block}
-  .rail .rail-title{letter-spacing:.15em;text-transform:uppercase;color:var(--faint);margin-bottom:.85rem;font-size:.7rem;font-weight:700}
-  .rail a{display:flex;gap:.55rem;text-decoration:none;color:var(--slate);padding:.28rem 0 .28rem .6rem;border-left:2px solid var(--rule);line-height:1.4}
-  .rail a .n{display:none}
-  .rail a.sub{padding-left:1.6rem;font-size:.72rem;color:var(--faint)}
-  .rail a:hover{color:var(--ink)}
-  .rail a.on{color:var(--accent);border-left-color:var(--accent);font-weight:650}
-  .rail .count{margin-left:auto;font-family:var(--mono);font-size:.68rem;background:var(--gap-soft);color:var(--gap);border-radius:2px;padding:0 .3rem}
-  .wrap{display:flex;flex-direction:column;gap:3.25rem;min-width:0}
-  .masthead{display:flex;flex-direction:column;gap:1.1rem}
-  .eyebrow{display:flex;flex-direction:column;gap:.5rem;font-family:var(--ui);font-size:var(--xs);color:var(--faint)}
-  .eyebrow .line{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem .6rem;line-height:1.7}
-  .eyebrow .sep{color:var(--rule);font-weight:300}
-  .eyebrow .line1{letter-spacing:.15em;text-transform:uppercase;font-weight:650;color:var(--faint);line-height:1.7}
-  .eyebrow .lbl{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
-  .eyebrow .audience{display:inline-flex;flex-wrap:wrap;align-items:center;gap:.45rem}
-  .badge{display:inline-flex;align-items:center;gap:.35rem;padding:.1rem .6rem;border-radius:999px;border:1px solid var(--rule);background:var(--card);font-family:var(--mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--slate);line-height:1.7;white-space:nowrap}
-  .badge.type{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);font-weight:650}
-  .badge.lens{font-family:var(--ui);font-size:.74rem;letter-spacing:0;text-transform:none}
-  .badge.when{text-transform:none;letter-spacing:0}
-  .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(18rem,1fr));gap:.8rem;margin:1.6rem 0}
-  .tile{display:flex;flex-direction:column;border:1px solid var(--rule);background:var(--card);border-radius:3px;padding:.85rem 1rem;min-width:0}
-  .tile h4{margin:0 0 .35rem;font-size:var(--md)}
-  .tile h4 a{color:var(--ink);text-decoration:none}
-  .tile h4 a:hover{color:var(--accent)}
-  .tile p{font-size:var(--sm);color:var(--slate);margin:0 0 .6rem;max-width:none;flex:1}
-  .tile .more{font-size:var(--sm);font-weight:600;text-decoration:none;align-self:flex-start}
-  /* The Summary's tiles */
-  .sides{display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:.8rem;margin:1.2rem 0}
-  .side{border:1px solid var(--rule);background:var(--card);border-radius:3px;padding:.9rem 1rem;display:flex;flex-direction:column;gap:.35rem}
-  .side .lbl{font-family:var(--mono);font-size:var(--xs);letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
-  .side .big{font-family:var(--ui);font-size:1.8rem;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink);line-height:1.1}
-  .side .big .tot{font-weight:400;color:var(--slate)}
-  .side .of{font-size:var(--sm);color:var(--slate)}
-  .side .side-num{display:flex;align-items:baseline;justify-content:space-between;gap:.5rem}
-  .side .pct{font-family:var(--mono);font-size:var(--sm);font-weight:650;color:var(--slate);font-variant-numeric:tabular-nums}
-  .method > :not(summary){margin:0 1rem 1rem}
-  .method > .scroll{margin-top:.2rem}
-  .bar{height:.5rem;border-radius:999px;background:var(--rule);overflow:hidden}
-  .bar i{display:block;height:100%;background:var(--accent)}
-  p > .more{font-weight:600;text-decoration:none}
-  h1{font-family:var(--ui);font-size:var(--xxl);font-weight:700;letter-spacing:-.02em;line-height:1.15;text-wrap:balance;margin:0}
-  .subtitle{font-size:var(--lg);line-height:1.5;color:var(--slate);max-width:46rem;margin:0}
-  .standfirst{font-size:1rem;line-height:1.6;color:var(--ink);max-width:58rem}
-  .sec-head{display:grid;grid-template-columns:1fr;align-items:baseline;gap:.5rem;border-top:2px solid var(--ink);padding-top:.7rem;margin-bottom:1.1rem}
-  .sec-head .num{font-family:var(--mono);font-size:var(--sm);font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
-  h2{font-family:var(--ui);font-size:var(--xl);font-weight:700;letter-spacing:-.01em;text-wrap:balance;margin:0}
-  h3{font-family:var(--ui);font-size:var(--lg);font-weight:600;letter-spacing:-.008em;margin:2rem 0 .6rem}
-  h4{font-family:var(--ui);font-size:var(--md);margin:0 0 .5rem;color:var(--ink)}
-  .scroll{overflow-x:auto;border:1px solid var(--rule);border-radius:3px;background:var(--card);margin:1.6rem 0}
-  table{border-collapse:collapse;width:100%;font-family:var(--ui);font-size:var(--sm);min-width:34rem}
-  td .sub{display:block;margin-top:.4rem;font-size:var(--xs);color:var(--slate)}
-  td .sub b{font-weight:650;color:var(--ink)}
-  td .sl{display:block;margin-top:.3rem;font-family:var(--mono);font-size:var(--xs);font-weight:400;color:var(--faint)}
-  table.grid{table-layout:fixed;min-width:52rem}
-  table.grid th.num-cell,table.grid td.num-cell{padding-left:.5rem;padding-right:.6rem}
-  table.grid th{white-space:nowrap}
-  table.grid td{overflow-wrap:anywhere}
-  .scroll table{table-layout:auto}
-  th{text-align:left;font-family:var(--mono);font-size:var(--xs);letter-spacing:.07em;text-transform:uppercase;color:var(--faint);font-weight:650;padding:.6rem .8rem;border-bottom:1px solid var(--rule)}
-  td{padding:.6rem .8rem;border-bottom:1px solid var(--rule);vertical-align:top;color:var(--slate)}
-  td strong{color:var(--ink)}
-  tr:last-child td{border-bottom:none}
-  .num-cell{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
-  .yes{color:var(--ok);font-weight:650}
-  .no{color:var(--gap);font-weight:650}
-  .s{font-family:var(--mono);font-size:var(--xs);color:var(--faint)}
-  pre{background:var(--card);border:1px solid var(--rule);border-radius:3px;padding:.9rem 1.1rem;margin:1.6rem 0;overflow-x:auto;font-family:var(--mono);font-size:var(--sm);line-height:1.55;color:var(--slate);max-width:100%}
-  pre code{font-size:inherit}
-  pre .tk-k{color:var(--tk-k);font-weight:600} pre .tk-s{color:var(--tk-s)} pre .tk-c{color:var(--tk-c);font-style:italic} pre .tk-t{color:var(--tk-t)} pre .tk-n{color:var(--tk-n)} pre .tk-add{color:var(--tk-add)} pre .tk-del{color:var(--tk-del)} pre .tk-cmd{color:var(--tk-t);font-weight:600}
-  /* A figure */
 
-  figure{margin:2.4rem 0;padding:0;border:0;background:none}
-  figure svg{display:block;width:auto;max-width:100%;height:auto;margin-inline:auto}
-  figcaption{font-family:var(--ui);font-size:var(--xs);color:var(--faint);margin-top:.5rem;max-width:none}
-  .dg .box{fill:var(--card);stroke:var(--rule);stroke-width:1.5}
-  .dg .box.off{fill:none;stroke:var(--rule);stroke-width:1.5;stroke-dasharray:5 4}
-  .dg .box.warn{fill:var(--gap-soft);stroke:var(--gap);stroke-width:1.5}
-  .dg .box.em{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}
-  .dg .t{font-family:var(--ui);font-size:13px;font-weight:650;fill:var(--ink)}
-  .dg .l{font-family:var(--ui);font-size:12px;fill:var(--ink)}
-  .dg .s{font-family:var(--mono);font-size:11px;fill:var(--slate)}
-  .dg .n{font-family:var(--ui);font-size:11px;fill:var(--faint)}
-  /* Arrowheads take the line's colour */
-  .dg{color:var(--accent)}
-  .dg .c{stroke:var(--accent);stroke-width:1.6;fill:none}
-  .pull{border-left:2px solid var(--accent);background:var(--accent-soft);padding:1rem 1.2rem;margin:1.6rem 0;border-radius:0 3px 3px 0}
-  .pull .label{display:block;font-family:var(--ui);font-size:var(--xs);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.3rem}
-  .pull p{margin:0;max-width:none}
-  .open{background:var(--card);border:1px solid var(--rule);border-left:2px solid var(--gap);border-radius:0 3px 3px 0;padding:1.1rem 1.25rem;margin-bottom:.9rem}
-  .open h4{font-size:var(--md)}
-  .open .k{font-family:var(--mono);font-size:var(--xs);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);display:block;margin:.6rem 0 .2rem}
-  .open p{font-size:var(--sm);color:var(--slate);margin:0 0 .4rem;max-width:none}
-  .open .rec{margin-top:.75rem;padding-top:.65rem;border-top:1px dashed var(--rule);font-size:var(--sm);color:var(--ink)}
-  .open .rec b{color:var(--ok)}
-  .open .scroll{margin:.4rem 0}
-  pre.pv{font-family:var(--mono);font-size:var(--xs);background:var(--card);border:1px solid var(--rule);border-radius:3px;padding:.7rem .9rem;margin:1rem 0;overflow-x:auto;line-height:1.5}
-  footer{border-top:1px solid var(--rule);padding-top:1.3rem;font-family:var(--ui);font-size:var(--xs);color:var(--faint)}
-  @media (max-width:60rem){
-    .page{grid-template-columns:minmax(0,1fr);gap:1.5rem;padding-top:2rem}
-    .rail{position:static;border:1px solid var(--rule);border-radius:3px;background:var(--card);padding:.9rem 1rem}
-    .rail a{border-left:none;padding-left:0}
-    .rail a.on{border-left:none}
-  }
 
-  /* The rail: two levels */
-  .rail a:not(.sub):not(.home){font-size:.88rem;font-weight:400;color:var(--ink);letter-spacing:-.005em}
-  .rail a.sub{font-size:.78rem;font-weight:400;color:var(--slate)}
-  .rail .rail-title{color:var(--slate)}
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.0.0/sds-docs.css">
+<div class="sds-page">
 
-  /* The rail: one left edge */
-  .rail a:not(.home), .rail a.sub{padding-left:.6rem}
-
-  /* The rail: marks level with the label */
-  .rail a{align-items:center}
-  .rail .count{align-self:center}
-
-  /* The rail: the current entry */
-  .rail a.on:not(.sub):not(.home){font-weight:650;color:var(--accent);box-shadow:inset 1.5px 0 0 var(--accent)}
-  .rail a.on.sub{color:var(--accent);box-shadow:inset 1.5px 0 0 var(--accent)}
-  .rail a:not(.sub):not(.home):hover{color:var(--accent)}
-  .rail a.sub:hover{color:var(--ink)}
-
-  /* The rail: the fold chevron */
-  .rail a .caret{margin-left:auto;flex:none;width:1.35rem;height:1.35rem;display:grid;place-items:center;
-    color:var(--faint);border-radius:3px;transform:none}
-  .rail a .caret::before{content:"";width:.32rem;height:.32rem;border-right:1.5px solid currentColor;
-    border-bottom:1.5px solid currentColor;transform:translateX(-.1rem) rotate(-45deg);transition:transform .15s ease}
-  .rail a.group-open .caret{transform:none}
-  .rail a.group-open .caret::before{transform:translateY(-.1rem) rotate(45deg)}
-  .rail a .caret:hover{background:var(--accent-soft);color:var(--accent)}
-  @media (prefers-reduced-motion:reduce){.rail a .caret::before{transition:none}}
-</style>
-<style>
-/* Heading anchor links */
-a.anchor{display:inline-block;margin-left:.6em;font-family:var(--mono);font-size:.55em;font-weight:400;line-height:1;color:var(--slate,#6b7280);text-decoration:none;opacity:.35;transition:opacity .15s;vertical-align:middle;position:relative;top:-.1em}
-.sec-head:hover a.anchor,h3[id]:hover a.anchor,a.anchor:hover,a.anchor:focus,a.anchor.copied{opacity:1}
-a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7d4a);margin-left:.3em}
-</style>
-<style>
-  /* The report's own parts */
-
-  /* The verdict */
-  .verdict{font-size:var(--lg);line-height:1.45;color:var(--ink);font-weight:500;max-width:52rem;margin:0 0 1rem}
-  .terms{font-size:var(--sm);color:var(--slate)}
-
-  /* A tile's bar colours */
-  .bar i.ok{background:var(--ok)}
-  .bar i.gap{background:var(--gap)}
-  .bar i.fail{background:var(--fail)}
-
-  /* The breakdown bar */
-  .breakdown{margin:1.4rem 0 1.2rem}
-  .bd-title{font-family:var(--mono);font-size:var(--xs);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:0 0 .45rem}
-  .bd-bar{display:flex;gap:2px;height:1.15rem;border-radius:4px;overflow:hidden;background:var(--paper)}
-  .bd-seg{flex:0 1 0;min-width:.45rem;height:100%}
-  .bd-legend{display:flex;flex-wrap:wrap;gap:.35rem 1.3rem;list-style:none;margin:.65rem 0 0;padding:0;font-size:var(--sm);color:var(--slate)}
-  .bd-legend li{display:inline-flex;align-items:center;gap:.45rem}
-  .bd-legend b{color:var(--ink);font-variant-numeric:tabular-nums}
-  .bd-key{display:inline-block;width:.85rem;height:.85rem;border-radius:2px;flex:none}
-  .st-ok{background:var(--ok)}
-  .st-fail{background:var(--fail)}
-  .st-warn{background:repeating-linear-gradient(45deg,var(--gap) 0 3px,var(--gap-soft) 3px 5px)}
-  .st-none{background:repeating-linear-gradient(135deg,var(--faint) 0 2px,var(--card) 2px 5px);box-shadow:inset 0 0 0 1px var(--faint)}
-  .st-base{background:var(--accent)}
-
-  /* Top gaps */
-  .top-gaps{margin:.4rem 0 0;padding-left:2.2rem;max-width:58rem}
-  .top-gaps li{margin:0 0 .35rem;padding-left:.2rem}
-  .top-gaps li::marker{font-family:var(--mono);font-weight:700;color:var(--gap)}
-
-  /* Measured: the scope list */
-  .scope{list-style:none;margin:0 0 1rem;padding:0;max-width:58rem}
-  .scope li{padding:.3rem 0;border-bottom:1px dashed var(--rule)}
-  .scope li:last-child{border-bottom:none}
-  .scope .k{display:inline-block;min-width:8.5rem;font-family:var(--mono);font-size:var(--xs);letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
-
-  /* Findings: gap, failure and total cells */
-  td.gap{background:var(--gap-soft);color:var(--gap);font-weight:650}
-  td.fail{background:var(--fail-soft);color:var(--fail);font-weight:650}
-  td.done{color:var(--ok);font-weight:650}
-  tr.total td{border-top:2px solid var(--ink);color:var(--ink);font-weight:650}
-  tr.total td.gap,tr.total td.fail{border-top-color:var(--ink)}
-  .units{font-size:var(--sm);color:var(--slate)}
-
-  /* Records */
-  .rec-group{border:1px solid var(--rule);border-radius:3px;background:var(--card);margin:.6rem 0}
-  .rec-group > summary{cursor:pointer;list-style:none;display:flex;flex-wrap:wrap;align-items:center;gap:.35rem .7rem;padding:.7rem 1rem;font-size:var(--sm);color:var(--ink)}
-  .rec-group > summary::-webkit-details-marker{display:none}
-  .rec-group > summary::before{content:"";width:.4rem;height:.4rem;border-right:1.5px solid var(--faint);border-bottom:1.5px solid var(--faint);transform:rotate(-45deg);transition:transform .15s ease;flex:none}
-  .rec-group[open] > summary::before{transform:rotate(45deg)}
-  .rec-group > summary:hover .rec-name{color:var(--accent)}
-  .rec-group > summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-  .rec-name{font-weight:600;min-width:0;overflow-wrap:anywhere}
-  .rec-count{font-family:var(--mono);font-size:var(--xs);background:var(--gap-soft);color:var(--gap);border-radius:2px;padding:.05rem .4rem;font-weight:650;white-space:nowrap}
-  .rec-worst{font-family:var(--mono);font-size:var(--xs);letter-spacing:.06em;text-transform:uppercase;color:var(--slate)}
-  /* A group's decider mix, and a second level of groups */
-  .rec-mix{font-size:var(--xs);color:var(--slate)}
-  .rec-subs{border-top:1px solid var(--rule);padding:.15rem 0 .45rem}
-  .rec-subs > .rec-group{margin:.45rem .75rem}
-  /* The severity dot */
-  .sev{display:inline-block;width:.62rem;height:.62rem;border-radius:50%;flex:none;background:none;box-shadow:inset 0 0 0 1.5px var(--faint)}
-  .sev.fail{background:var(--fail);box-shadow:none}
-  .sev.gap{background:var(--gap);box-shadow:none}
-  .records{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
-  .record{display:grid;grid-template-columns:.62rem minmax(0,1fr);column-gap:.8rem;padding:.65rem 1rem;border-bottom:1px solid var(--rule)}
-  .record:last-child{border-bottom:none}
-  .record > .sev{grid-row:1 / span 3;margin-top:.3rem}
-  .record .loc{grid-column:2;font-family:var(--mono);font-size:var(--xs);color:var(--ink);overflow-wrap:anywhere;word-break:break-word}
-  .record .loc code{font-size:inherit}
-  .record .what{grid-column:2;margin:.2rem 0 0;font-size:var(--sm);color:var(--ink);max-width:58rem;overflow-wrap:anywhere}
-  .record .meta{grid-column:2;margin:.15rem 0 0;font-size:var(--xs);color:var(--slate);overflow-wrap:anywhere}
-  .record .meta code{font-size:inherit}
-  @media (prefers-reduced-motion:reduce){.rec-group > summary::before{transition:none}}
-
-  /* A record's id and its decider */
-  .rec-id{font-family:var(--mono);font-size:var(--xs);color:var(--slate);margin-right:.55rem;white-space:nowrap}
-  .record .by{grid-column:2;margin:.2rem 0 0;font-size:var(--xs);color:var(--slate);overflow-wrap:anywhere}
-  .decider{display:inline-block;font-family:var(--mono);font-size:var(--xs);letter-spacing:.03em;line-height:1.5;border-radius:2px;padding:0 .4rem;border:1px solid var(--rule);color:var(--slate);background:var(--card);white-space:nowrap}
-  .decider.flag{border-color:var(--gap);color:var(--gap)}
-  .decider.dev{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);font-weight:650}
-
-  /* Recommendations */
-  .rec-because{font-size:var(--sm);color:var(--slate)}
-  .open .opts{margin:.2rem 0 .4rem;padding-left:1.2rem;font-size:var(--sm);color:var(--slate)}
-  .open .opts li{margin:0 0 .2rem}
-
-  /* Apps with module rows */
-  tr.proj td{color:var(--ink)}
-  tr.proj td:first-child{font-weight:650}
-  tr.mod td:first-child{padding-left:2.2rem}
-
-  /* A state matrix */
-  td.st{text-align:center;font-family:var(--mono);font-size:var(--xs);font-weight:650;white-space:nowrap}
-  td.st.pass{color:var(--ok);background:var(--ok-soft)}
-  td.st.warn{color:var(--gap);background:var(--gap-soft)}
-  td.st.fail{color:var(--fail);background:var(--fail-soft)}
-  td.st.none{color:var(--faint);font-weight:400}
-  td.st .s{display:block;font-weight:400;white-space:normal}
-
-  /* Long paths wrap */
-  p code,li code{overflow-wrap:anywhere}
-  footer{max-width:min(98vw,80rem);margin:0 auto;padding:1.3rem 16px 3rem}
-
-  /* Phone width */
-  @media (max-width:40rem){
-    .page{padding:1.25rem 16px 4rem;max-width:100%}
-    h1{font-size:1.9rem}
-    .subtitle,.verdict{font-size:1.1rem}
-    .sides{grid-template-columns:repeat(auto-fit,minmax(min(100%,9.5rem),1fr))}
-    .side .big{font-size:1.5rem}
-    .scope .k{display:block;min-width:0}
-    .rec-group > summary,.record{padding-left:.75rem;padding-right:.75rem}
-  }
-
-  /* Print */
-  @media print{
-    :root:root:root{--paper:#fff; --card:#fff; --ink:#141920; --slate:#48525f; --faint:#7c8794;
-      --rule:#d2d9e0; --accent:#2f4e7a; --accent-soft:#e0e8f4;
-      --gap:#8f5714; --gap-soft:#f7ecda; --ok:#2a6459; --ok-soft:#dcece8; --fail:#a63d3d; --fail-soft:#f6e1e1}
-    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-    body{background:#fff;font-size:10.5pt}
-    .rail,a.anchor{display:none !important}
-    .page{display:block;max-width:none;padding:0;margin:0}
-    .wrap{display:block}
-    .wrap > section{break-before:page;margin:0}
-    .wrap > section:first-of-type{break-before:auto;margin-top:1.6rem}
-    .scroll{overflow:visible;border-color:var(--rule)}
-    table{min-width:0}
-    tr,.side,.breakdown,.top-gaps li{break-inside:avoid}
-    h2,h3{break-after:avoid}
-    .rec-group{background:none}
-    .rec-group > summary::before{display:none}
-    .rec-group::details-content{content-visibility:visible;display:block}
-    .record{break-inside:avoid}
-    .open{break-inside:avoid}
-    footer{padding:1rem 0 0}
-  }
-</style>
-
-<div class="page">
-
-<nav class="rail" id="rail">
-  <a class="home" href="../README.md">&larr; Artifacts</a>
-  <div class="rail-title">{{PAGE NAME &mdash; the block's title, the third segment of the header line}}</div>
+<nav class="sds-rail" id="rail">
+  <a class="sds-home" href="../README.md">&larr; Artifacts</a>
+  <div class="sds-rail-title">{{PAGE NAME &mdash; the block's title, the third segment of the header line}}</div>
 </nav>
-<div class="wrap">
+<div class="sds-wrap">
 
-<header class="masthead">
-  <div class="eyebrow"><span class="line1">{{WORKSPACE}} &nbsp;|&nbsp; {{REPOSITORY}} &nbsp;|&nbsp; {{REPORT TYPE, in plain words}}</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Report</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">{{ROLE}}</span></span></span><span class="line"><span class="lbl">Repo:</span> <span class="badge when">{{repo}}</span><span class="sep">|</span><span class="lbl">Commit:</span> <span class="badge when">{{short sha}}</span><span class="sep">|</span><span class="lbl">Generated:</span> <span class="badge when"><time class="local" datetime="{{YYYY-MM-DDTHH:MM±HH:MM}}">{{YYYY-MM-DDTHH:MM±HH:MM}}</time></span></span></div>
+<header class="sds-masthead">
+  <div class="sds-eyebrow"><span class="sds-line1">{{WORKSPACE}} &nbsp;|&nbsp; {{REPOSITORY}} &nbsp;|&nbsp; {{REPORT TYPE, in plain words}}</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Report</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">{{ROLE}}</span></span></span><span class="sds-line"><span class="sds-label">Repo:</span> <span class="sds-badge sds-when">{{repo}}</span><span class="sds-separator">|</span><span class="sds-label">Commit:</span> <span class="sds-badge sds-when">{{short sha}}</span><span class="sds-separator">|</span><span class="sds-label">Generated:</span> <span class="sds-badge sds-when"><time class="sds-local" datetime="{{YYYY-MM-DDTHH:MM±HH:MM}}">{{YYYY-MM-DDTHH:MM±HH:MM}}</time></span></span></div>
   <h1>{{REPORT TYPE, in plain words}}</h1>
-  <p class="subtitle">{{THE SUBTITLE: the report type's approved question, with the repository's folder name}}</p>
-  <p class="standfirst">{{THE DESCRIPTION, one paragraph: what was counted, in everyday words and with no number; then when you would read it.}}</p>
+  <p class="sds-subtitle">{{THE SUBTITLE: the report type's approved question, with the repository's folder name}}</p>
+  <p class="sds-standfirst">{{THE DESCRIPTION, one paragraph: what was counted, in everyday words and with no number; then when you would read it.}}</p>
 </header>
 
 <section id="s0" data-block="reasons">
-  <div class="sec-head"><h2>Summary</h2></div>
-  <p class="verdict">{{THE VERDICT: one sentence answering the Subtitle, with the headline number and its unit, and how many records need your decision.}}</p>
-  <p class="terms">{{The words the tiles use, each explained, and one real member quoted from what you measured.}}</p>
-  <div class="sides">
-    <div class="side"><span class="lbl">{{Side}}</span><div class="side-num"><span class="big">{{n}}<span class="tot"> / {{N}}</span></span><span class="pct">{{share, whole}}%</span></div><div class="bar"><i style="width:{{share}}%"></i></div></div>
-    <div class="side"><span class="lbl">{{Side}}</span><div class="side-num"><span class="big">{{n}}<span class="tot"> / {{N}}</span></span><span class="pct">{{share, whole}}%</span></div><div class="bar"><i class="ok" style="width:100%"></i></div></div>
-    <div class="side"><span class="lbl">{{Gap}}</span><div class="side-num"><span class="big">{{n}}<span class="tot"> / {{N}}</span></span><span class="pct">{{share, whole}}%</span></div><div class="bar"><i class="gap" style="width:{{share}}%"></i></div></div>
+  <div class="sds-section-head"><h2>Summary</h2></div>
+  <p class="sds-verdict">{{THE VERDICT: one sentence answering the Subtitle, with the headline number and its unit, and how many records need your decision.}}</p>
+  <p class="sds-terms">{{The words the tiles use, each explained, and one real member quoted from what you measured.}}</p>
+  <div class="sds-sides">
+    <div class="sds-side"><span class="sds-label">{{Side}}</span><div class="sds-side-numbers"><span class="sds-big">{{n}}<span class="sds-total"> / {{N}}</span></span><span class="sds-percent">{{share, whole}}%</span></div><div class="sds-bar"><i style="width:{{share}}%"></i></div></div>
+    <div class="sds-side"><span class="sds-label">{{Side}}</span><div class="sds-side-numbers"><span class="sds-big">{{n}}<span class="sds-total"> / {{N}}</span></span><span class="sds-percent">{{share, whole}}%</span></div><div class="sds-bar"><i class="sds-success" style="width:100%"></i></div></div>
+    <div class="sds-side"><span class="sds-label">{{Gap}}</span><div class="sds-side-numbers"><span class="sds-big">{{n}}<span class="sds-total"> / {{N}}</span></span><span class="sds-percent">{{share, whole}}%</span></div><div class="sds-bar"><i class="sds-warning" style="width:{{share}}%"></i></div></div>
   </div>
-  <div class="breakdown">
-    <p class="bd-title">{{What the bar splits, and its unit: "The 32 checks, by result"}}</p>
-    <div class="bd-bar" role="img" aria-label="{{every state and its count, in words}}">
-      <span class="bd-seg st-ok" style="flex-grow:{{n}}" title="{{State}}: {{n}} {{units}}"></span>
-      <span class="bd-seg st-warn" style="flex-grow:{{n}}" title="{{State}}: {{n}} {{units}}"></span>
-      <span class="bd-seg st-fail" style="flex-grow:{{n}}" title="{{State}}: {{n}} {{units}}"></span>
+  <div class="sds-breakdown">
+    <p class="sds-breakdown-title">{{What the bar splits, and its unit: "The 32 checks, by result"}}</p>
+    <div class="sds-breakdown-bar" role="img" aria-label="{{every state and its count, in words}}">
+      <span class="sds-breakdown-segment sds-result-success" style="flex-grow:{{n}}" title="{{State}}: {{n}} {{units}}"></span>
+      <span class="sds-breakdown-segment sds-result-warning" style="flex-grow:{{n}}" title="{{State}}: {{n}} {{units}}"></span>
+      <span class="sds-breakdown-segment sds-result-error" style="flex-grow:{{n}}" title="{{State}}: {{n}} {{units}}"></span>
     </div>
-    <ul class="bd-legend">
-      <li><i class="bd-key st-ok"></i>{{PASS}} <b>{{n}}</b></li>
-      <li><i class="bd-key st-warn"></i>{{WARN}} <b>{{n}}</b></li>
-      <li><i class="bd-key st-fail"></i>{{FAIL}} <b>{{n}}</b></li>
+    <ul class="sds-breakdown-legend">
+      <li><i class="sds-breakdown-key sds-result-success"></i>{{PASS}} <b>{{n}}</b></li>
+      <li><i class="sds-breakdown-key sds-result-warning"></i>{{WARN}} <b>{{n}}</b></li>
+      <li><i class="sds-breakdown-key sds-result-error"></i>{{FAIL}} <b>{{n}}</b></li>
     </ul>
   </div>
   <h3 id="top-gaps">Top gaps</h3>
-  <ol class="top-gaps">
+  <ol class="sds-top-gaps">
     <li>{{The largest gap: its count, its unit, where it sits.}}</li>
     <li>{{The second.}}</li>
     <li>{{The third.}}</li>
@@ -364,52 +60,52 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
 </section>
 
 <section id="s1" data-block="must">
-  <div class="sec-head"><h2>Findings</h2></div>
+  <div class="sds-section-head"><h2>Findings</h2></div>
   <p>{{At most one plain sentence: the question this section answers. Never the order of the tables: the rail shows it.}}</p>
   <h3 id="{{axis-id}}">{{By axis}}</h3>
-  <div class="scroll"><table class="grid" style="min-width:34rem"><colgroup><col><col style="width:5.5rem"><col style="width:5.5rem"><col style="width:5.5rem"><col style="width:5.5rem"></colgroup>
-    <thead><tr><th>{{Axis}}</th><th class="num-cell">Checks</th><th class="num-cell">PASS</th><th class="num-cell">WARN</th><th class="num-cell">FAIL</th></tr></thead>
+  <div class="sds-scroll"><table class="sds-grid" style="min-width:34rem"><colgroup><col><col style="width:5.5rem"><col style="width:5.5rem"><col style="width:5.5rem"><col style="width:5.5rem"></colgroup>
+    <thead><tr><th>{{Axis}}</th><th class="sds-number-cell">Checks</th><th class="sds-number-cell">PASS</th><th class="sds-number-cell">WARN</th><th class="sds-number-cell">FAIL</th></tr></thead>
     <tbody>
-      <tr><td><strong>{{worst item}}</strong></td><td class="num-cell">{{n}}</td><td class="num-cell">{{n}}</td><td class="num-cell gap">{{n}}</td><td class="num-cell fail">{{n}}</td></tr>
-      <tr><td><strong>{{next item}}</strong></td><td class="num-cell">{{n}}</td><td class="num-cell done">{{n}}</td><td class="num-cell">0</td><td class="num-cell">0</td></tr>
-      <tr class="total"><td>Total</td><td class="num-cell">{{n}}</td><td class="num-cell">{{n}}</td><td class="num-cell gap">{{n}}</td><td class="num-cell fail">{{n}}</td></tr>
+      <tr><td><strong>{{worst item}}</strong></td><td class="sds-number-cell">{{n}}</td><td class="sds-number-cell">{{n}}</td><td class="sds-number-cell sds-warning">{{n}}</td><td class="sds-number-cell sds-error">{{n}}</td></tr>
+      <tr><td><strong>{{next item}}</strong></td><td class="sds-number-cell">{{n}}</td><td class="sds-number-cell sds-success">{{n}}</td><td class="sds-number-cell">0</td><td class="sds-number-cell">0</td></tr>
+      <tr class="sds-total"><td>Total</td><td class="sds-number-cell">{{n}}</td><td class="sds-number-cell">{{n}}</td><td class="sds-number-cell sds-warning">{{n}}</td><td class="sds-number-cell sds-error">{{n}}</td></tr>
     </tbody>
   </table></div>
-  <p class="units">{{One sentence naming each column's unit.}}</p>
+  <p class="sds-units">{{One sentence naming each column's unit.}}</p>
   <h3 id="repo">Repository</h3>
   <p>{{The Repository table: one row per domain in the docs tree&rsquo;s order, the whole-repository row, then the total; Name, then the spine&rsquo;s counts, with no Project type column.}}</p>
   <h3 id="apps">Apps</h3>
-  <div class="scroll"><table class="grid" style="min-width:34rem"><colgroup><col><col style="width:5.5rem"><col style="width:5.5rem"><col style="width:5.5rem"><col style="width:5.5rem"></colgroup>
-    <thead><tr><th>Name</th><th class="num-cell">Checks</th><th class="num-cell">PASS</th><th class="num-cell">WARN</th><th class="num-cell">FAIL</th></tr></thead>
+  <div class="sds-scroll"><table class="sds-grid" style="min-width:34rem"><colgroup><col><col style="width:5.5rem"><col style="width:5.5rem"><col style="width:5.5rem"><col style="width:5.5rem"></colgroup>
+    <thead><tr><th>Name</th><th class="sds-number-cell">Checks</th><th class="sds-number-cell">PASS</th><th class="sds-number-cell">WARN</th><th class="sds-number-cell">FAIL</th></tr></thead>
     <tbody>
-      <tr><td><strong>{{app}}</strong><span class="sl">{{PROJECT TYPE}}</span></td><td class="num-cell">{{n}}</td><td class="num-cell">{{n}}</td><td class="num-cell gap">{{n}}</td><td class="num-cell">0</td></tr>
-      <tr class="mod"><td><strong>{{module}}</strong><span class="sl">{{PROJECT TYPE}}</span></td><td class="num-cell">{{n}}</td><td class="num-cell">{{n}}</td><td class="num-cell gap">{{n}}</td><td class="num-cell">0</td></tr>
+      <tr><td><strong>{{app}}</strong><span class="sds-sub-line">{{PROJECT TYPE}}</span></td><td class="sds-number-cell">{{n}}</td><td class="sds-number-cell">{{n}}</td><td class="sds-number-cell sds-warning">{{n}}</td><td class="sds-number-cell">0</td></tr>
+      <tr class="sds-module"><td><strong>{{module}}</strong><span class="sds-sub-line">{{PROJECT TYPE}}</span></td><td class="sds-number-cell">{{n}}</td><td class="sds-number-cell">{{n}}</td><td class="sds-number-cell sds-warning">{{n}}</td><td class="sds-number-cell">0</td></tr>
     </tbody>
     <tbody>
-      <tr class="total"><td>{{All n apps}}</td><td class="num-cell">{{n}}</td><td class="num-cell">{{n}}</td><td class="num-cell gap">{{n}}</td><td class="num-cell">0</td></tr>
+      <tr class="sds-total"><td>{{All n apps}}</td><td class="sds-number-cell">{{n}}</td><td class="sds-number-cell">{{n}}</td><td class="sds-number-cell sds-warning">{{n}}</td><td class="sds-number-cell">0</td></tr>
     </tbody>
   </table></div>
   <h3 id="packages">Packages</h3>
   <p>{{The Packages table, one level, with the same columns.}}</p>
-  <p class="units">{{The units, then the totals rule: each table totals its own level, and what spans several owners is counted in each owner and once at the repository level.}}</p>
+  <p class="sds-units">{{The units, then the totals rule: each table totals its own level, and what spans several owners is counted in each owner and once at the repository level.}}</p>
 </section>
 
 <section id="s2" data-block="must">
-  <div class="sec-head"><h2>Records</h2></div>
+  <div class="sds-section-head"><h2>Records</h2></div>
   <p>{{One sentence: what each record is, and which finding it sits behind.}}</p>
-  <details class="rec-group">
-    <summary><span class="sev fail" role="img" title="{{worst state}}" aria-label="{{worst state}}"></span><span class="rec-name">{{the cause, in the Findings&rsquo; own words}}</span><span class="rec-count">{{n}} {{units}}</span><span class="rec-worst">{{worst state}}</span><span class="rec-mix">{{Agent n &middot; Developer n}}</span></summary>
-    <ul class="records">
-      <li class="record" data-id="{{KIND.GROUP.001}}" data-rule="{{rule}}" data-severity="{{FAIL}}" data-decider="{{agent}}" data-location="{{file:line}}"><span class="sev fail" role="img" title="{{state}}" aria-label="{{state}}"></span><div class="loc"><span class="rec-id">{{KIND.GROUP.001}}</span>{{file:line, page:line, row id, or check name and file}}</div><div class="what">{{One plain sentence: what was found.}}</div><div class="meta">{{the report type&rsquo;s pair}}</div><div class="by">Decided by <span class="decider">Agent</span> because {{the rule that lets the agent act}}</div></li>
+  <details class="sds-record-group">
+    <summary><span class="sds-severity sds-error" role="img" title="{{worst state}}" aria-label="{{worst state}}"></span><span class="sds-record-name">{{the cause, in the Findings&rsquo; own words}}</span><span class="sds-record-count">{{n}} {{units}}</span><span class="sds-record-worst">{{worst state}}</span><span class="sds-record-mix">{{Agent n &middot; Developer n}}</span></summary>
+    <ul class="sds-records">
+      <li class="sds-record" data-id="{{KIND.GROUP.001}}" data-rule="{{rule}}" data-severity="{{FAIL}}" data-decider="{{agent}}" data-location="{{file:line}}"><span class="sds-severity sds-error" role="img" title="{{state}}" aria-label="{{state}}"></span><div class="sds-location"><span class="sds-record-id">{{KIND.GROUP.001}}</span>{{file:line, page:line, row id, or check name and file}}</div><div class="sds-what">{{One plain sentence: what was found.}}</div><div class="sds-meta">{{the report type&rsquo;s pair}}</div><div class="sds-by">Decided by <span class="sds-decider">Agent</span> because {{the rule that lets the agent act}}</div></li>
     </ul>
   </details>
-  <details class="rec-group">
-    <summary><span class="sev gap" role="img" title="{{worst state}}" aria-label="{{worst state}}"></span><span class="rec-name">{{the next cause, with more than about 20 items}}</span><span class="rec-count">{{n}} {{units}}</span><span class="rec-worst">{{worst state}}</span><span class="rec-mix">{{Agent n &middot; Developer n}}</span></summary>
-    <div class="rec-subs">
-    <details class="rec-group">
-      <summary><span class="sev gap" role="img" title="{{worst state}}" aria-label="{{worst state}}"></span><span class="rec-name">{{where it happens}}</span><span class="rec-count">{{n}} {{units}}</span><span class="rec-worst">{{worst state}}</span><span class="rec-mix">{{Developer n}}</span></summary>
-    <ul class="records">
-      <li class="record" data-id="{{KIND.GROUP.001}}" data-rule="{{rule}}" data-severity="{{WARN}}" data-decider="{{developer}}" data-location="{{file:line}}"><span class="sev gap" role="img" title="{{state}}" aria-label="{{state}}"></span><div class="loc"><span class="rec-id">{{KIND.GROUP.001}}</span>{{&hellip;}}</div><div class="what">{{&hellip;}}</div><div class="meta">{{&hellip;}}</div><div class="by">Decided by <span class="decider dev">Developer</span> because {{why it needs the developer}}</div></li>
+  <details class="sds-record-group">
+    <summary><span class="sds-severity sds-warning" role="img" title="{{worst state}}" aria-label="{{worst state}}"></span><span class="sds-record-name">{{the next cause, with more than about 20 items}}</span><span class="sds-record-count">{{n}} {{units}}</span><span class="sds-record-worst">{{worst state}}</span><span class="sds-record-mix">{{Agent n &middot; Developer n}}</span></summary>
+    <div class="sds-record-subs">
+    <details class="sds-record-group">
+      <summary><span class="sds-severity sds-warning" role="img" title="{{worst state}}" aria-label="{{worst state}}"></span><span class="sds-record-name">{{where it happens}}</span><span class="sds-record-count">{{n}} {{units}}</span><span class="sds-record-worst">{{worst state}}</span><span class="sds-record-mix">{{Developer n}}</span></summary>
+    <ul class="sds-records">
+      <li class="sds-record" data-id="{{KIND.GROUP.001}}" data-rule="{{rule}}" data-severity="{{WARN}}" data-decider="{{developer}}" data-location="{{file:line}}"><span class="sds-severity sds-warning" role="img" title="{{state}}" aria-label="{{state}}"></span><div class="sds-location"><span class="sds-record-id">{{KIND.GROUP.001}}</span>{{&hellip;}}</div><div class="sds-what">{{&hellip;}}</div><div class="sds-meta">{{&hellip;}}</div><div class="sds-by">Decided by <span class="sds-decider sds-developer">Developer</span> because {{why it needs the developer}}</div></li>
     </ul>
     </details>
     </div>
@@ -417,15 +113,15 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
 </section>
 
 <section id="s3" data-block="reasons">
-  <div class="sec-head"><h2>Measured</h2></div>
+  <div class="sds-section-head"><h2>Measured</h2></div>
   <h3 id="scope">Scope</h3>
   <p>{{One sentence: what was read, and which trees or packages; the run-time window where it differs from Generated. The header already carries the repository, the commit and the Generated time, so Scope never repeats them.}}</p>
   <h3 id="measure-again">Measure again</h3>
   <pre><code>{{the one or two commands to rerun}}</code></pre>
   <p>{{The digest to compare, or why there is none.}}</p>
-  <details class="rec-group method">
-    <summary><span class="rec-name">How each number was produced ({{n}} steps)</span></summary>
-    <div class="scroll"><table class="grid"><colgroup><col style="width:30%"><col style="width:22%"><col style="width:28%"><col style="width:20%"></colgroup>
+  <details class="sds-record-group sds-method">
+    <summary><span class="sds-record-name">How each number was produced ({{n}} steps)</span></summary>
+    <div class="sds-scroll"><table class="sds-grid"><colgroup><col style="width:30%"><col style="width:22%"><col style="width:28%"><col style="width:20%"></colgroup>
       <thead><tr><th>Step</th><th>Read from</th><th>Command</th><th>Result</th></tr></thead>
       <tbody>
         <tr><td>{{1. what this step did}}</td><td><code>{{path}}</code></td><td><code>{{command}}</code></td><td>{{number and unit}}</td></tr>
@@ -440,30 +136,30 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
 </section>
 
 <section id="s4" data-block="next">
-  <div class="sec-head"><h2>Recommendations</h2></div>
+  <div class="sds-section-head"><h2>Recommendations</h2></div>
   <p>{{One sentence: this report changes nothing, and how to check the result after a change.}}</p>
   <h3 id="agent">The agent closes these</h3>
-  <div class="scroll"><table class="grid"><colgroup><col style="width:6%"><col style="width:46%"><col style="width:24%"><col style="width:24%"></colgroup>
+  <div class="sds-scroll"><table class="sds-grid"><colgroup><col style="width:6%"><col style="width:46%"><col style="width:24%"><col style="width:24%"></colgroup>
     <thead><tr><th>#</th><th>Recommendation</th><th>Closes</th><th>Done when</th></tr></thead>
     <tbody>
-      <tr><td class="num-cell">1</td><td><strong>{{Verb first.}}</strong> {{What to change, and the command or file.}}<span class="sub"><b>Why:</b> {{the rule that allows it}}</span></td><td>{{the gap, how much, the unit; the record ids}}<span class="sub"><b>Owner:</b> {{role, package or path}}</span></td><td>{{a condition a person can check}}</td></tr>
+      <tr><td class="sds-number-cell">1</td><td><strong>{{Verb first.}}</strong> {{What to change, and the command or file.}}<span class="sds-sub"><b>Why:</b> {{the rule that allows it}}</span></td><td>{{the gap, how much, the unit; the record ids}}<span class="sds-sub"><b>Owner:</b> {{role, package or path}}</span></td><td>{{a condition a person can check}}</td></tr>
     </tbody>
   </table></div>
   <h3 id="agent-flagged">The agent closes these and flags them</h3>
-  <div class="scroll"><table class="grid"><colgroup><col style="width:6%"><col style="width:46%"><col style="width:24%"><col style="width:24%"></colgroup>
+  <div class="sds-scroll"><table class="sds-grid"><colgroup><col style="width:6%"><col style="width:46%"><col style="width:24%"><col style="width:24%"></colgroup>
     <thead><tr><th>#</th><th>Recommendation</th><th>Closes</th><th>Done when</th></tr></thead>
     <tbody>
-      <tr><td class="num-cell">1</td><td><strong>{{Verb first.}}</strong> {{What to change.}}<span class="sub"><b>Why:</b> {{why the developer should see it}}</span></td><td>{{&hellip;}}<span class="sub"><b>Owner:</b> {{&hellip;}}</span></td><td>{{&hellip;}}</td></tr>
+      <tr><td class="sds-number-cell">1</td><td><strong>{{Verb first.}}</strong> {{What to change.}}<span class="sds-sub"><b>Why:</b> {{why the developer should see it}}</span></td><td>{{&hellip;}}<span class="sds-sub"><b>Owner:</b> {{&hellip;}}</span></td><td>{{&hellip;}}</td></tr>
     </tbody>
   </table></div>
   <h3 id="needs-you">Needs you: {{n}} records, in {{d}} decisions</h3>
-  <div class="open">
+  <div class="sds-open">
     <h4>{{The decision, as a question}}</h4>
-    <span class="k">What</span><p>{{what is found, with its count and the record ids}}</p>
-    <span class="k">Why it needs you</span><p><span class="decider dev">Developer</span> {{because: the book does not decide it, a consumer breaks, or it is a release}}</p>
-    <span class="k">Options</span>
-    <ol class="opts"><li>{{Option A, and what it costs}}</li><li>{{Option B, and what it costs}}</li></ol>
-    <p class="rec"><b>The agent would take</b> {{the option, and why}}</p>
+    <span class="sds-key">What</span><p>{{what is found, with its count and the record ids}}</p>
+    <span class="sds-key">Why it needs you</span><p><span class="sds-decider sds-developer">Developer</span> {{because: the book does not decide it, a consumer breaks, or it is a release}}</p>
+    <span class="sds-key">Options</span>
+    <ol class="sds-options"><li>{{Option A, and what it costs}}</li><li>{{Option B, and what it costs}}</li></ol>
+    <p class="sds-recommended"><b>The agent would take</b> {{the option, and why}}</p>
   </div>
 </section>
 
@@ -474,173 +170,4 @@ a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7
   A template &middot; copy it and fill the slots &middot; the rules for this page are in <code>05-artifacts.md</code> &middot; every block and figure is shown once in <code>blocks-template.html</code>
 </footer>
 
-<script>
-(function(){
-  var rail=document.getElementById('rail');if(!rail)return;
-  var secs=Array.prototype.slice.call(document.querySelectorAll('section[id]'));
-  var links=[];
-  secs.forEach(function(s){
-    var num=s.querySelector('.sec-head .num'),h2=s.querySelector('h2');if(!h2)return;
-    var a=document.createElement('a');a.href='#'+s.id;
-    var n=document.createElement('span');n.className='n';n.textContent=num?num.textContent:'';
-    var t=document.createElement('span');t.textContent=h2.textContent.split(' — ')[0];
-    a.appendChild(n);a.appendChild(t);
-    if(s.id==='s4'){var c=s.querySelectorAll('.open').length;if(c){var b=document.createElement('span');b.className='count';b.textContent=c;a.appendChild(b);}}
-    rail.appendChild(a);links.push({el:a,sec:s});
-    Array.prototype.forEach.call(s.querySelectorAll('h3[id]'),function(h){
-      var sa=document.createElement('a');sa.href='#'+h.id;sa.className='sub';sa.textContent=h.textContent;rail.appendChild(sa);
-    });
-  });
-  function mark(){var y=window.scrollY+120,cur=links[0];links.forEach(function(l){if(l.sec.offsetTop<=y)cur=l;});links.forEach(function(l){l.el.classList.toggle('on',l===cur);});}
-  window.addEventListener('scroll',mark,{passive:true});mark();
-})();
-</script>
-
-<style>
-  .rail .sub-group{display:block}
-  .rail.js .sub-group{display:none}
-  .rail.js .sub-group.shown{display:block}
-  .rail a .caret:hover{background:var(--accent-soft);color:var(--accent)}
-  .rail a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-</style>
-<style>
-  /* A quote */
-  blockquote{margin:1.6rem 0;padding:.2rem 0 .2rem 1.1rem;border-left:2px solid var(--rule);color:var(--slate)}
-  blockquote p{margin:0;max-width:none}
-  .tile .s{margin-top:.45rem}
-  /* PROSE, the markdown panel */
-  .prose{border:1px solid var(--rule);background:var(--card);color:var(--slate);border-radius:3px;
-    padding:1.1rem 1.3rem;margin:1.6rem 0}
-  .prose > :first-child{margin-top:0}
-  .prose > :last-child{margin-bottom:0}
-  .prose p,.prose li{max-width:none}
-  .prose strong,.prose h4{color:var(--ink)}
-  .prose code{color:var(--ink)}
-  .prose blockquote{border-left-color:var(--accent);margin:1rem 0}
-  /* NEXT */
-  .nextnav{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:.7rem;margin:1.6rem 0}
-  .nextnav-card{display:flex;flex-direction:column;gap:.15rem;border:1px solid var(--rule);background:var(--card);
-    border-radius:3px;padding:.65rem .85rem;text-decoration:none;min-width:0}
-  .nextnav-card:hover{border-color:var(--accent)}
-  .nextnav-card .dir{font-family:var(--mono);font-size:var(--xs);letter-spacing:.06em;text-transform:uppercase;color:var(--faint)}
-  .nextnav-card .ttl{font-size:var(--sm);font-weight:600;color:var(--ink)}
-  .nextnav-card:hover .ttl{color:var(--accent)}
-  .nextnav-card.next{text-align:right}
-</style>
-
-<script>
-(function(){
-  var rail = document.getElementById('rail-list') || document.getElementById('rail');
-  if (!rail || rail.querySelector('.sub-group')) return;
-  var styled = document.getElementById('rail') || rail;
-
-  /* The caret and the group are one state with two faces. Writing both here is what stops the
-     caret claiming a section is open while its subsections are hidden. */
-  function setOpen(anchor, group, open){
-    group.classList.toggle('shown', open);
-    anchor.classList.toggle('group-open', open);
-    anchor.setAttribute('aria-expanded', open ? 'true' : 'false');
-  }
-
-  /* Regroup whatever the page's own builder produced: a section anchor, then the `sub` anchors
-     that follow it, moved into one collapsing group. */
-  var entries = [], current = null;
-  Array.prototype.slice.call(rail.children).forEach(function(node){
-    if (node.tagName !== 'A' || node.classList.contains('home')) return;
-    if (node.classList.contains('sub')) {
-      if (!current) return;
-      if (!current.group) {
-        current.group = document.createElement('div');
-        current.group.className = 'sub-group';
-        rail.insertBefore(current.group, node);
-      }
-      current.group.appendChild(node);
-      return;
-    }
-    current = { anchor: node, group: null };
-    entries.push(current);
-  });
-
-  entries.forEach(function(entry){
-    if (!entry.group) return;                     // a section with no second level never folds
-    var anchor = entry.anchor, group = entry.group;
-    anchor.classList.add('has-subs');
-    var caret = document.createElement('span');
-    caret.className = 'caret';
-    caret.setAttribute('role', 'button');
-    caret.setAttribute('tabindex', '-1');
-    caret.setAttribute('aria-label', 'Show sections under ' + anchor.textContent.trim());
-    anchor.appendChild(caret);
-    /* The caret toggles without leaving the page; the label still navigates. Hit-testing the
-       element beats measuring offsetX, which broke the moment the caret moved to the right. */
-    anchor.addEventListener('click', function(event){
-      if (event.target !== caret) return;
-      event.preventDefault();
-      /* `pinned` means a reader decided, so the scroll must stop overriding them. */
-      anchor.dataset.pinned = '1';
-      setOpen(anchor, group, !group.classList.contains('shown'));
-    });
-    setOpen(anchor, group, false);
-  });
-
-  /* THE RAIL FOLLOWS THE SCROLL. The page's own builder already marks the current entry with
-     `on`, so this watches that mark rather than measuring offsets a second time — two answers to
-     where the reader is would disagree the first time either changed. */
-  function follow(){
-    entries.forEach(function(entry){
-      if (!entry.group || entry.anchor.dataset.pinned === '1') return;
-      var here = entry.anchor.classList.contains('on') || !!entry.group.querySelector('a.on');
-      setOpen(entry.anchor, entry.group, here);
-    });
-  }
-  new MutationObserver(follow).observe(rail, {subtree: true, attributes: true,
-                                              attributeFilter: ['class']});
-  /* Last, because everything above degrades to the full index when no script runs. */
-  styled.classList.add('js');
-  follow();
-})();
-</script>
-<script>
-/* Every section (h2 inside .sec-head) and every subsection (h3 with an id) gets an anchor link.
-   Clicking it moves the address to that heading and copies the full link, so a subsection can be shared. */
-(function(){
-  function pageBase(){
-    var ref=document.referrer||'';
-    if(window.top!==window&&ref.indexOf('/artifact/')>-1)return ref.split('#')[0];
-    return location.href.split('#')[0];
-  }
-  function attach(h,id){
-    if(!id||h.querySelector('a.anchor'))return;
-    var a=document.createElement('a');a.className='anchor';a.href='#'+id;a.textContent='#';a.title='Copy link to this heading';a.setAttribute('aria-label','Copy link to '+h.textContent.trim());
-    a.addEventListener('click',function(ev){
-      var url=pageBase()+'#'+id;
-      try{history.replaceState(null,'',location.pathname+location.search+'#'+id);}catch(e){}
-      var done=function(){a.classList.add('copied');setTimeout(function(){a.classList.remove('copied');},1400);};
-      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(done,done);}else{done();}
-      var target=document.getElementById(id);if(target){ev.preventDefault();target.scrollIntoView({block:'start'});}
-    });
-    h.appendChild(a);
-  }
-  Array.prototype.forEach.call(document.querySelectorAll('section[id]'),function(s){
-    var h2=s.querySelector('.sec-head h2');if(!h2)return;
-    if(!h2.id)h2.id=s.id+'-title';
-    attach(h2,s.id);
-  });
-  Array.prototype.forEach.call(document.querySelectorAll('h3[id]'),function(h){attach(h,h.id);});
-})();
-</script>
-<script>
-/* Generated: shows in the reader's own time zone and format. The page keeps the moment with its offset in the
-   `datetime` attribute; this renders it with the reader's locale and zone, and keeps the stored value as the
-   tooltip. Where no script runs, or the value cannot be read, the stored value stays as written. */
-(function(){
-  Array.prototype.forEach.call(document.querySelectorAll('time.local[datetime]'),function(t){
-    var stored=t.getAttribute('datetime'),at=new Date(stored);
-    if(isNaN(at.getTime()))return;
-    try{
-      t.textContent=new Intl.DateTimeFormat(undefined,{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',timeZoneName:'short'}).format(at);
-      t.title=stored;
-    }catch(e){}
-  });
-})();
-</script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.0.0/sds-docs.js"></script>
