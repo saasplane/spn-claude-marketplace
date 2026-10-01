@@ -66,7 +66,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "f79c0389"
+      "seen": "039495cc"
     }
   ]
 }
@@ -723,11 +723,13 @@ grew, owes the page its `Why`, its `What` and its `How`, and a Subtitle and a De
 cover what the page plans. A `What` or `How` subsection that has a preview ends in a *Read the
 preview →* line.
 
-**The page links one version of the shared stylesheet and script, and holds no styles of its own —
-MUST** (`RD.DEVEX.WORKSPACE.214`). An approach page and a preview keep the two lines their template
+**The page links one version of the shared stylesheet and script as its base, and holds no copy of
+them — MUST** (`RD.DEVEX.WORKSPACE.214`). An approach page and a preview keep the two lines their template
 has. One links `sds-docs.css` by the version's address, and the other loads `sds-docs.js` from the
-same version. You add no `<style>` block and no inline script. A page that holds a copy of its styles
-keeps the faults of the day it was written, and a shared file is fixed once for every page.
+same version. A page that holds a copy of its styles keeps the faults of the day it was written, and
+a shared file is fixed once for every page. Use the shared classes first. Where the page has a case
+they do not cover, add one `<style>` block of its own after the stylesheet's line; a class it defines
+itself takes no `sds-` prefix.
 
 **Every class on the page opens with `sds-`** (`RD.DEVEX.WORKSPACE.216`). An open card is a
 `div.sds-open` wrapping an `h4` whose `id` is `q<n>`, and its parts are `sds-key` and

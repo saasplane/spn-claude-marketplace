@@ -100,7 +100,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.106 | Editor | read a guide as a page of steps | `docs guide <guide.md>` writes the guide's page from its markdown: its stages, and steps that number themselves | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.107 | Editor | be told when a guide is not written as steps | `docs guide` names the guide in which it finds no step, exits 1 and writes no page | NEGATIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.108 | Editor | have every command read a page in either form while the pages move | `docs cycles`, `docs page`, `docs audit` and `report refresh` read a page that links the shared stylesheet and one that carries its own, and write in the page's form | POSITIVE | UNIT | PLANNED | — |
-| MKT.SCRIPTS.109 | Editor | be told when a page that links the shared stylesheet still carries styles of its own | `docs audit` reports a `<style>` block or an inline script in that page | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.109 | Editor | add a style of its own to a page for a case the shared stylesheet does not cover | `docs audit` and the checks accept a `<style>` block in a page that links the shared stylesheet, and no command reads a class the page defines itself | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

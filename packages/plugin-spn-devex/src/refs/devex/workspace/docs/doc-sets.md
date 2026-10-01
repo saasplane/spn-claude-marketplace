@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "f79c0389"
+      "seen": "039495cc"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -609,8 +609,8 @@ the rail, which is why a template ships every section and subsection with one. *
 
 ### Every page links one shared stylesheet, in one version
 
-**Every page links one shared stylesheet and one shared script, and holds no styles of its own —
-MUST** (decision RD.DEVEX.WORKSPACE.214). The stylesheet is `sds-docs.css`, and the script is
+**Every page links one shared stylesheet and one shared script as its base, and holds no copy of
+them — MUST** (decision RD.DEVEX.WORKSPACE.214). The stylesheet is `sds-docs.css`, and the script is
 `sds-docs.js`. Between them they carry the colours in both themes, the outline rail, the fold, the
 badges and the link on each heading. A page that holds a copy of its styles keeps the faults of the
 day it was written. With one shared file, a fault is fixed once, for every page that links the file.
@@ -624,8 +624,10 @@ script's line sits at its end.
 <script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.0.0/sds-docs.js"></script>
 ```
 
-- **It holds no `<style>` block and no inline script.** `docs audit` refuses a page that holds either,
-  and the check on a page refuses a link to a version that nobody cut.
+- **A page may add a style of its own, for a case the shared stylesheet does not cover.** The shared
+  classes come first. The page's own `<style>` block sits after the stylesheet's line, and a class it
+  defines itself takes no `sds-` prefix. What several pages need goes into `sds-docs` in a later
+  version. The check on a page refuses a link to a version that nobody cut.
 - **A version is a folder that never changes.** `docs sds cut <version>` writes it, and it refuses a
   version that exists. A change to the styles is a new version, and
   `docs sds repoint <version> <folder>` moves every page under a folder to it.
