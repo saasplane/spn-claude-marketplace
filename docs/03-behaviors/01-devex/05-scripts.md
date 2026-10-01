@@ -99,7 +99,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.105 | Editor | be shown where the index and the pages on disk disagree | `docs index --check` lists each page the tree lacks and each entry that has no page, and writes nothing | NEGATIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.106 | Editor | read a guide as a page of steps | `docs guide <guide.md>` writes the guide's page from its markdown: its stages, and steps that number themselves | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.107 | Editor | be told when a guide is not written as steps | `docs guide` names the guide in which it finds no step, exits 1 and writes no page | NEGATIVE | UNIT | PLANNED | — |
-| MKT.SCRIPTS.108 | Editor | have every command read a page in either form while the pages move | `docs cycles`, `docs page`, `docs audit` and `report refresh` read a page that links the shared stylesheet and one that carries its own, and write in the page's form | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.108 | Editor | be told plainly when a page still holds its own copy of the styles | Each command that reads a page names that page once, as a SOFT finding, says how to move it, and reads no class of it | NEGATIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.109 | Editor | add a style of its own to a page for a case the shared stylesheet does not cover | `docs audit` and the checks accept a `<style>` block in a page that links the shared stylesheet, and no command reads a class the page defines itself | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids

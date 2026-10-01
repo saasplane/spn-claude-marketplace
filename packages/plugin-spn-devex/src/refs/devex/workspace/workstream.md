@@ -735,7 +735,7 @@ itself takes no `sds-` prefix.
 `div.sds-open` wrapping an `h4` whose `id` is `q<n>`, and its parts are `sds-key` and
 `sds-recommended`. A decided card is a `div.sds-card`. The Subtitle is `p.sds-subtitle`, and the
 Description is `p.sds-standfirst`. A page that has not moved to the shared stylesheet still holds the
-earlier names, with no prefix, and the checks read both forms until every page has moved.
+earlier names, with no prefix. The checks read the shared names only, so such a page is moved first.
 
 **You commit the workstream's folder, by path, and you never push it — MUST**
 (`RD.DEVEX.WORKSPACE.213`). The commit goes into the git repository that holds `.spndevex`. Commit the

@@ -106,7 +106,8 @@ find an open card by this shape and by nothing else. So a card written in anothe
 look as if it has no questions.
 
 **A page that has not moved to the shared stylesheet still holds the earlier names**, `div.open` and
-`div.card`, with no prefix. The checks read both forms until every page has moved.
+`div.card`, with no prefix. The checks read the shared names only, so move the page before you add a
+card to it: a check names a page that links no shared stylesheet, and says how to move it.
 
 **Options are a table.** Lettered, one row each, the trade-off in its own column. Prose
 alternatives cannot be scanned and cannot be answered by reference — and in markdown the
