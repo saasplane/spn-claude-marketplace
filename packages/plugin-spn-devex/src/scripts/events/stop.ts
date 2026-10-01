@@ -15,7 +15,9 @@
 //   notes      an answer logged in an arc lands in that arc's notes (spec, plan, previews, samples) the same turn
 //   carried    a proposed arc never carries a review point to a later step of itself
 //   hold       an arc whose status reads HELD must name a card that exists and is unanswered
-//   handover   a reply that says a new window is needed carries the nine labelled lines
+//   handover   a reply that says a new window is needed carries the nine labelled lines, in one column
+//   page-stale an arc this session wrote left its workstream's page behind the arcs
+//   arc-landed an arc this session wrote reached LANDED with a row nobody accounted for
 //   welcome    a session's first turn opens with the welcome, word for word: the heading and its four lines
 //   corpus     the docs trees still answer the questions only a whole-corpus read can ask
 //
@@ -41,8 +43,10 @@ import { closeSync, openSync, readFileSync, readSync, readdirSync, rmSync, statS
 import { basename, dirname, join } from "node:path";
 import { createHash } from "node:crypto";
 import { checkCorpus } from "../checks/corpus.ts";
-import { STEP_ID, answeredNumbers, cardsOf, heldOn, isInProgress, markedAgo, openWorkstreams, stateOf, stepsOf,
-         workstreamPlan } from "../checks/split-plan.ts";
+import { STEP_ID, accounted, answeredNumbers, arcName, arcRowsOf, cardsOf, carryFault, heldOn, isInProgress, markedAgo,
+         miscountLines, openWorkstreams, reportLines, stateOf, stepsOf, tickLands, workstreamPlan } from "../checks/split-plan.ts";
+import { cyclesRule, exemptWorkstream, headerRule, openHeadingRule } from "../checks/doc-check.ts";
+import { cyclesTableAt } from "../commands/docs/cycles.ts";
 import { TERMINAL } from "../checks/arc-status.ts";
 import { workspaceRoot } from "../lib/payload.ts";
 import { DEVEX, isApproachPage, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
@@ -77,6 +81,24 @@ export function handoverLines(body: string): Map<string, string> {
     if (m) { last = m[1]; out.set(last, m[2].trim()); continue; }
     if (last !== null && /^\s+\S/.test(line)) out.set(last, `${out.get(last)} ${line.trim()}`);
     else last = null;
+  }
+  return out;
+}
+
+// The column every value starts in, counted from 0: the longest label, `do not touch:`, and one space.
+const HANDOVER_COLUMN = Math.max(...HANDOVER_LABELS.map((label) => label.length)) + 2;
+
+/**
+ * The column each label's value starts in, counted from 0, in the block's order. A line that starts
+ * with whitespace continues the value above it and is not read as a label. A label with no value has
+ * no column.
+ */
+export function handoverColumns(body: string): Map<string, number> {
+  const out = new Map<string, number>();
+  for (const line of body.split("\n")) {
+    const m = line.match(HANDOVER_LABEL_LINE);
+    if (!m || !m[2].trim()) continue;
+    out.set(m[1], line.length - m[2].trimStart().length);
   }
   return out;
 }
@@ -151,12 +173,16 @@ export function quotesTemplate(fence: Fence): boolean {
 // So a word counts only where a marker is WRITTEN — as a cell's whole content, or at its start so a
 // date or a commit may follow — and a glyph counts anywhere in the row, which is where the corpus
 // puts it (`| 4 | ✅ **done 2026-09-23** — …`).
-const DONE_GLYPHS = ["✅", "↷", "⊘"];
+//
+// THE TICK IS READ AS THE CLOSE GATE READS IT. A tick lands a row only where a date or a landed word
+// follows it, so `✅ the arc is written` is not a done-mark here either. `tickLands` is the one test
+// both readers use.
+const DONE_GLYPHS = ["↷", "⊘"];
 const DONE_WORDS = ["landed", "carried", "deferred"];
 
 /** Whether a step row carries a done-mark, as opposed to merely naming one. */
 function isDone(cells: string[]): boolean {
-  if (cells.some((c) => DONE_GLYPHS.some((g) => c.includes(g)))) return true;
+  if (cells.some((c) => tickLands(c) || DONE_GLYPHS.some((g) => c.includes(g)))) return true;
   return cells.some((c) => {
     const bare = c.replace(/[*_`~]/g, "").trim().toLowerCase();
     return DONE_WORDS.some((w) => bare === w || bare.startsWith(`${w} `));
@@ -266,11 +292,45 @@ function heldCard(step: { state: string | null }): string | null {
   return step.state === null ? null : heldOn(step.state);
 }
 
-/** The rows whose State cell reads `in progress <time>`, each with how old its mark is. */
-export function inProgressSteps(arc: string, now = Date.now()): string[] {
+/**
+ * The rows whose State cell reads `in progress <time>`, each with how old its mark is. A row whose
+ * order is out with an agent is left out: the agent is on it, and its report is what ends the wait.
+ *
+ * @param out  the rows of this arc whose order is out; read from the arc's orders folder when not given
+ */
+export function inProgressSteps(arc: string, now = Date.now(), out: Set<string> = ordersOut(arc)): string[] {
   return (stepsOf(read(arc)) ?? [])
     .filter((step) => step.state !== null && isInProgress(step.state))
+    .filter((step) => !out.has(step.id.toLowerCase()))
     .map((step) => `step ${step.id} — ${step.what.slice(0, 70)} (${markedAgo(step.state ?? "", now)})`);
+}
+
+const REPORT_SUFFIX = "-report.md";
+// The row an order is for, as its first heading names it: `# Order 04a — N006 row 4: …`.
+const ORDER_ROW = /\brow\s+(\d+[a-z]?(?:\.\d+[a-z]?)*)\b/i;
+
+/**
+ * The rows of an arc whose order is out, by step id. An order is out where a file under the arc's
+ * `notes/N<nnn>/orders/` is for that row and no report sits beside it: `03-reports.md` with no
+ * `03-reports-report.md`. The row is the one the order's first heading names (`row 3`). Where the
+ * heading names none, it is the number that opens the file name, so `04a-…` and `04b-…` are both for
+ * row 4. A row with several orders is out until every report is back.
+ */
+export function ordersOut(arc: string): Set<string> {
+  const out = new Set<string>();
+  const id = basename(arc).match(/^(N\d+[a-z]?)(?:[-.]|$)/i)?.[1];
+  if (!id) return out;
+  const folder = join(dirname(dirname(arc)), "notes", id, "orders");
+  let names: string[];
+  try { names = readdirSync(folder).filter((name) => name.endsWith(".md")); } catch { return out; }
+  for (const name of names) {
+    if (name.endsWith(REPORT_SUFFIX)) continue;
+    if (names.includes(`${name.slice(0, -".md".length)}${REPORT_SUFFIX}`)) continue;
+    const heading = read(join(folder, name)).split("\n").find((line) => /^#\s/.test(line)) ?? "";
+    const named = ORDER_ROW.exec(heading)?.[1] ?? /^(\d+)/.exec(name)?.[1].replace(/^0+(?=\d)/, "");
+    if (named) out.add(named.toLowerCase());
+  }
+  return out;
 }
 
 /**
@@ -843,6 +903,11 @@ export function checkHandover(reply: string, root: string, mine: Set<string> | n
   const missing = HANDOVER_LABELS.filter((label) => !lines.has(label));
   if (missing.length)
     return [{ check: "handover", message: `the handover block is missing ${missing.map((label) => `\`${label}:\``).join(" · ")}. Each label opens its own line, lowercase, in this order: ${labels}. The next window starts from that block and has nothing else.` }];
+  // THE LABELS FORM ONE COLUMN, so a missing line is visible and the next window can scan the block.
+  // Every label is present here, so only where each value starts is left to read.
+  const ragged = [...handoverColumns(block.body)].filter(([, column]) => column !== HANDOVER_COLUMN);
+  if (ragged.length)
+    return [{ check: "handover", message: `the handover block's values do not start in one column — ${ragged.map(([label, column]) => `\`${label}:\` starts its value in column ${column}`).join(" · ")}. Each value starts in column ${HANDOVER_COLUMN}, counted from 0, which is the column \`do not touch:\` sets with one space after it. Pad each shorter label with spaces, and indent a wrapped line to the same column.` }];
   const next = lines.get("continue") ?? "";
   if (!WORKSTREAM_NAME.test(next) || !ARC_NAME.test(next))
     return [{ check: "handover", message: `the handover block's \`continue:\` line names no ${WORKSTREAM_NAME.test(next) ? "arc (\`N<n>\`)" : "workstream (\`NNN-subject\`)"}. The next window finds everything else from those two.` }];
@@ -1194,6 +1259,72 @@ export function checkArcToPage(root: string, mine: Set<string> | null = null): W
   return out;
 }
 
+// ---------------------------------------------------------------------------- the page and the arcs
+
+/**
+ * A page left stale by an arc this session wrote (RD.DEVEX.WORKSPACE.204). The parts of a page that
+ * the arcs decide are the Cycles table, the header's status and the heading of `Open`. The write-time
+ * check sees them only when the whole page is written, so an arc that moves leaves the page behind
+ * and this is where it is said. A page with no Cycles table is left alone, because the command named
+ * here has nothing to write on it.
+ *
+ * @param touched  the arcs this session's own tool calls wrote since its last Stop; `null` where that
+ *                 is not known, and then nothing is compared
+ */
+export function checkPageCurrent(touched: Set<string> | null): Warning[] {
+  if (!touched || !touched.size) return [];
+  const behind: Array<{ workstream: string; parts: string[] }> = [];
+  for (const folder of [...new Set([...touched].map((arc) => dirname(dirname(arc))))].sort()) {
+    const parts = new Set<string>();
+    for (const page of pagesOf(folder)) {
+      const text = read(page);
+      if (exemptWorkstream(page) || !cyclesTableAt(text)) continue;
+      if (cyclesRule(page, text).length) parts.add("the Cycles table");
+      if (headerRule(page, text).length) parts.add("the header's status");
+      if (openHeadingRule(page, text).length) parts.add("the heading of `Open`");
+    }
+    if (parts.size) behind.push({ workstream: basename(folder), parts: [...parts] });
+  }
+  if (!behind.length) return [];
+  return [{ check: "page-stale", message:
+    `An arc you wrote this turn left its page behind — ` +
+    behind.map((one) => `\`${one.workstream}\`: ${one.parts.join(", ")}`).join(" · ") +
+    `. The parts of a page that the arcs decide are produced, never typed (RD.DEVEX.WORKSPACE.204). Run ` +
+    behind.map((one) => `\`spn-devex docs cycles ${one.workstream} --write\``).join(" and ") +
+    `, which writes the header's status, the Cycles table and the heading of \`Open\` from the arcs. The rest ` +
+    `of the page is yours to bring current in the same turn (05-artifacts.md § How ends in Cycles).` }];
+}
+
+/**
+ * The close gate's report for an arc that reached `LANDED` this turn. The close refuses a row nobody
+ * decided, and it says so only when every arc of the workstream is read at once. The turn an arc
+ * lands is when its rows are easiest to account for, so its rows are read here as the gate reads them.
+ *
+ * @param before   each arc's mark at this session's last Stop, which holds the status it read then
+ * @param touched  the arcs this session wrote since that Stop; `null` reads nothing
+ */
+export function checkArcLanded(root: string, before: Record<string, ArcMark> | undefined, touched: Set<string> | null): Warning[] {
+  if (!before || !touched) return [];
+  const reports: string[] = [];
+  for (const arc of [...touched].sort()) {
+    const was = before[arc];
+    if (!was || was.status === "LANDED" || statusOf(arc) !== "LANDED") continue;
+    const text = read(arc);
+    const rows = arcRowsOf(text, arcName(arc));
+    const miscounted = miscountLines(arcName(arc), text);
+    const owed = rows.some((row) => !accounted(row) || (stateOf(row) === "carried" && carryFault(root, row) !== null));
+    if (!owed && !miscounted.length) continue;
+    reports.push([...reportLines(root, basename(arc), rows), ...miscounted].join("\n"));
+  }
+  if (!reports.length) return [];
+  return [{ check: "arc-landed", message:
+    `An arc reached \`LANDED\` this turn with a row nobody accounted for. The close gate's report for it:\n${reports.join("\n")}\n` +
+    `Give each row one of three states now, while the arc is in front of you: \`✅ landed\` with its date and ` +
+    `commit, \`↷ carried\` with the workstream that takes it on, or \`⊘ deferred\` with the event that brings ` +
+    `it back. A tick with no date and no landed word reads as pending ` +
+    `(02-workstream/01-workstream.md § A step row says where, at what altitude, and how).` }];
+}
+
 // ---------------------------------------------------------------------------- welcome
 
 /** Markdown emphasis off and white space folded, so a line compares as the words a reader sees. */
@@ -1302,11 +1433,19 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   // No baseline means this Stop ends the session's first turn: the one the welcome belongs to.
   const firstTurn = !baseline && event.transcript_path && !event.agent_id ? firstTurnText(event.transcript_path) : "";
   const waiting = span({ group: "stop", action: "cards" }, () => cardsWaiting(root, mine));
+  // THE ARCS THIS TURN WROTE, IN THIS SESSION'S OWN WORKSTREAMS. A write is matched to an arc by its
+  // file name as well as its path, and two workstreams may each hold an arc of one name. The two
+  // checks that read a page and an arc's rows from these arcs read only the session's own workstreams.
+  const wrote = touched && mine
+    ? new Set([...touched].filter((arc) => mine.has(basename(dirname(dirname(arc))))))
+    : touched;
   const found = [
     ...span({ group: "stop", action: "reply-shape" }, () => checkReplyShape(reply, waiting,
       baseline?.cards ? waiting.filter((card) => !baseline.cards!.includes(card)) : [])),
     ...span({ group: "stop", action: "notes" }, () => checkNotesLanded(root, baseline?.arcs, touched)),
     ...span({ group: "stop", action: "arc-to-page" }, () => checkArcToPage(root, mine)),
+    ...span({ group: "stop", action: "page-stale" }, () => checkPageCurrent(wrote)),
+    ...span({ group: "stop", action: "arc-landed" }, () => checkArcLanded(root, baseline?.arcs, wrote)),
     ...span({ group: "stop", action: "runnable" }, () => checkRunnable(root, baseline?.at ?? 0, baseline?.steps ?? {}, touched)),
     ...span({ group: "stop", action: "hold" }, () => checkHold(root, mine)),
     ...span({ group: "stop", action: "handover" }, () => checkHandover(reply, root, mine)),

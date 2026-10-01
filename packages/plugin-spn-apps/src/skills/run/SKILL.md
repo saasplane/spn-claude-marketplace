@@ -144,11 +144,13 @@ specified path does not exist`, which reads as a broken command rather than a mi
 
 Every run is named by its caller, and leaves `tests/.output/<tier>/runs/<run>.json` behind — or `<run>.<phase>.json` for a journey phase — with every behaviour id its case titles carried, and what the runner actually did with each. **`spnutils` writes the run file and never a row** (`RD.DEVEX.UTILS.071`). Writing it into the registers is the **spn-devex** plugin's row writer, `spn-devex behaviours stamp <run> <repo>` in that plugin (cross-plugin pointer; it ships alongside this plugin), run the way its `test` skill runs it: first without `--write` to see what it would change, then with it. It reads only the run you name, and writes `Updated at` as `<time> · <run>`. The same plugin's `spn-devex behaviours check` then refuses a `SUCCESS` row the run it cites contradicts.
 
-The join is this plugin's, because where a case lives is the stack's:
+The join reads the rows and the case titles together:
 
 ```bash
-node "${CLAUDE_PLUGIN_ROOT}"/scripts/checks/behaviour-join.ts .      # a SUCCESS row no case cites, a case citing no row
+spn-devex behaviours coverage <repo> --json > /tmp/coverage.json   # a case that cites an id no row declares, an id cited only at another level
 ```
+
+Write `--json` to a file and read the file.
 
 **Code coverage is read, never enforced** (`RD.SUPPORT.APPS.133`). A run that collects coverage prints its summary after the tests — lines, statements, functions and branches — and the test tool writes `coverage-summary.json` beside its report. Report those numbers as they are. No configuration carries a threshold, and nothing fails a run on a percentage. The one rule about coverage you check is that every exclude says why:
 

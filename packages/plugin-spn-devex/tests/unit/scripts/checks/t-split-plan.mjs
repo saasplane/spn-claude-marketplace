@@ -609,5 +609,106 @@ console.log("\n=== split-plan — reading an arc's step table");
   check("a page table with Repo and State is not read as a split plan", splitPlan.rowsOf(pageTable, false).length === 0);
 }
 
+console.log("\n=== split-plan — a row is split as the two other readers split it, and its cells are counted");
+{
+  const check = (name, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${name}${ok || !detail ? "" : `\n        ${detail}`}`); };
+  const HEAD = "# N9 — x\n\nStatus: **RUNNING**\n\n## Steps\n\n| # | Repo | Altitude | What | Mechanism | Acceptance | State |\n| --- | --- | --- | --- | --- | --- | --- |\n";
+  // An Acceptance cell that holds a pipe written with a backslash, inside a code span.
+  const ESCAPED = HEAD + "| 1 | spn-x | CODE | the check | by hand | `grep -c \"a\\|b\" file` → 0 | ✅ landed 2026-10-01 — `abc1234` |\n";
+  const escaped = splitPlan.arcRowsOf(ESCAPED, "N9");
+  check("[MKT.HOOKS.38] a cell holding an escaped pipe is read as one cell, so the State cell is the row's own",
+    escaped.length === 1 && splitPlan.stateOf(escaped[0]) === "landed", JSON.stringify(escaped));
+  check("[MKT.HOOKS.38] and stepsOf reads the same State cell", splitPlan.stepsOf(ESCAPED)?.[0].state.startsWith("✅ landed") === true);
+  check("[MKT.HOOKS.38] a row holding an escaped pipe has the header's cell count", splitPlan.miscountedSteps(ESCAPED).length === 0,
+    JSON.stringify(splitPlan.miscountedSteps(ESCAPED)));
+
+  // KNOWN-BAD: a doubled pipe before State, 8 cells under a 7-cell header.
+  const DOUBLED = HEAD + "| 1 | spn-x | CODE | the good row | by hand | green | ✅ landed 2026-10-01 — `abc1234` |\n" +
+    "| 2 | spn-x | CODE | the bad row | by hand | green || ✅ landed 2026-10-01 — `abc1234` |\n";
+  const miscounted = splitPlan.miscountedSteps(DOUBLED);
+  check("[MKT.HOOKS.38] known-bad: a row with a doubled pipe is named with its count and the header's",
+    miscounted.length === 1 && miscounted[0].id === "2" && miscounted[0].cells === 8 && miscounted[0].header === 7, JSON.stringify(miscounted));
+  check("[MKT.HOOKS.38] an arc with no Steps section has no row to count", splitPlan.miscountedSteps("# N1\n\n## Log\n").length === 0);
+
+  // THE REPORT RUN BY HAND prints the same row, and the rows that never say what became of them.
+  const root = workspace("n006-sp-report", {
+    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N9-x.md`]: DOUBLED + "| 3 | spn-x | CODE | the vague row | by hand | green | ✅ the arc is written |\n",
+    "probe-repo/README.md": "# probe-repo\n",
+  });
+  let out = "";
+  try { out = execFileSync("node", [`${HOOKS}/src/scripts/checks/split-plan.ts`, root], { encoding: "utf8", cwd: root }); } catch (e) { out = String(e.stdout ?? ""); }
+  check("[MKT.HOOKS.38] the report run by hand prints the miscounted row", /cell count\s+N9 step 2 — 8 cells under a 7-cell header/.test(out), out);
+  check("[MKT.HOOKS.36] and lists a row that reads pending", /pending\s+spn-x — N9 step 3 — the vague row/.test(out), out);
+  check("[MKT.HOOKS.36] under the tally the Stop hook reads", /001-a-subject: 3 rows · landed 1 · .*pending 1 · undecided 1/.test(out), out);
+
+  const rows = splitPlan.arcRowsOf(DOUBLED, "N9");
+  const lines = splitPlan.reportLines(root, "N9-x.md", rows);
+  check("[MKT.HOOKS.36] the tally is a function that returns lines: the count first, then each row nobody accounted for",
+    lines.length === 2 && lines[0].startsWith("N9-x.md: 2 rows · landed 1") && /undecided\s+spn-x — N9 step 2 — the bad row/.test(lines[1]), JSON.stringify(lines));
+  check("[MKT.HOOKS.36] an arc with every row accounted for is one line, the tally",
+    splitPlan.reportLines(root, "N9-x.md", splitPlan.arcRowsOf(ESCAPED, "N9")).length === 1);
+}
+
+console.log("\n=== split-plan — a tick with no date and no landed word reads as pending");
+{
+  const row = (state) => ({ label: "x", scope: "spn-foundation", state });
+  for (const [what, state, expected] of [
+    ["known-bad: `✅ the arc is written` reads pending", "✅ the arc is written", "pending"],
+    ["known-bad: a tick before a commit alone reads pending", "✅ `abc1234`", "pending"],
+    ["`✅ 2026-09-07` still reads landed", "✅ 2026-09-07", "landed"],
+    ["`✅ landed 2026-10-01 — <commit>` still reads landed", "✅ landed 2026-10-01 — `abc1234`", "landed"],
+    ["`✅ **done 2026-09-23**` still reads landed", "✅ **done 2026-09-23**", "landed"],
+    ["`✅ shipped` still reads landed", "✅ shipped", "landed"],
+    ["the word with no tick still reads landed", "LANDED — `def5678`", "landed"],
+    ["a tick alone is still a row nobody decided", "✅", "empty"],
+    ["a tick before `carried` reads carried, as the word says", "✅ carried → 002-a-successor", "carried"],
+  ]) {
+    n += 1;
+    const got = splitPlan.stateOf(row(state));
+    const ok = got === expected;
+    if (!ok) failed += 1;
+    console.log(`  ${ok ? "PASS" : "FAIL"}  [MKT.HOOKS.39] ${what}${ok ? "" : ` — got ${got}`}`);
+  }
+  for (const [what, cell, expected] of [
+    ["a tick followed by a date lands", "✅ 2026-09-07", true],
+    ["a tick followed by a landed word in bold lands", "✅ **done 2026-09-23** — the proof", true],
+    ["a tick followed by other words does not", "✅ the arc is written", false],
+    ["a cell with no tick does not", "landed 2026-09-27", false],
+  ]) {
+    n += 1;
+    const ok = splitPlan.tickLands(cell) === expected;
+    if (!ok) failed += 1;
+    console.log(`  ${ok ? "PASS" : "FAIL"}  [MKT.HOOKS.39] ${what}`);
+  }
+}
+
+console.log("\n=== split-plan — a carry with its date before the arrow still names its successor");
+{
+  // KNOWN-BAD: `↷ carried 2026-10-01 → N006 row 1` read as naming no successor, and printed DEAD CARRY.
+  carry("[MKT.SCRIPTS.05] a dated carry to an arc of this workstream is sequencing", "↷ carried 2026-10-01 → N006 row 1", "own-arc");
+  carry("[MKT.SCRIPTS.05] a dated carry to another workstream is a handover", "↷ carried 2026-10-01 → 003-cloud-day-0", "workstream");
+  carry("[MKT.SCRIPTS.05] a dated carry written with `to` reads the same", "↷ carried 2026-10-01 to 003-cloud-day-0", "workstream");
+  carry("[MKT.SCRIPTS.05] a date and nothing after it still names no successor", "↷ carried 2026-10-01", "unnamed");
+  n += 1;
+  const named = splitPlan.carryTarget(carried("↷ carried 2026-10-01 → N006 row 1")).name;
+  if (named !== "N006") failed += 1;
+  console.log(`  ${named === "N006" ? "PASS" : "FAIL"}  [MKT.SCRIPTS.05] and the arc it names is read, not the date\n        got ${named}`);
+  fault("[MKT.SCRIPTS.05] a dated carry to a backlog workstream passes", "↷ carried 2026-10-01 → 003-cloud-day-0", false);
+  fault("[MKT.SCRIPTS.05] a dated carry to an arc of this workstream is not a dead carry", "↷ carried 2026-10-01 → N006 row 1", false);
+  fault("[MKT.SCRIPTS.05] a dated carry to a closed workstream is still refused", "↷ carried 2026-10-01 → 010 Phase 3", true);
+}
+
+console.log("\n=== split-plan — the header's status field, and the cards of a page's Open");
+{
+  const check = (name, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${name}${ok || !detail ? "" : `\n        ${detail}`}`); };
+  const labelled = `<div class="eyebrow"><span>SaaS Plane | Workstream | 020</span><span class="st"><span class="lbl">Status:</span> <span class="badge status implementing">&#x1F6A7; IMPLEMENTING</span></span></div>`;
+  check("the status field is what follows the label", splitPlan.mastheadStatus(labelled) === "🚧 IMPLEMENTING", splitPlan.mastheadStatus(labelled));
+  check("a header that labels no status has no field", splitPlan.mastheadStatus(`<div class="eyebrow">Workstream 001 &middot; closed</div>`) === null);
+  check("a page with no header has none", splitPlan.mastheadStatus("<h1>x</h1>") === null);
+  const cards = splitPlan.cardsIn(page({ cards: card(3, "&mdash;") + card(4, "A, 2026-09-19") }));
+  check("the cards of Open are read from a page's text, each with whether it carries its decision",
+    cards.map((one) => `${one.number}:${one.decided}`).join(",") === "Q3:false,Q4:true", JSON.stringify(cards));
+}
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

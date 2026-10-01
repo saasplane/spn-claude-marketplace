@@ -33,16 +33,14 @@ one("an assertion spanning lines, reported on one", {
   expect: "note", says: "says why it might have failed",
 });
 
-// F15 — THE TRAILING COMMA READS AS A SECOND ARGUMENT. `expect(\n  x,\n)` counts two arguments and
-// goes quiet, so a multi-line assertion written the idiomatic way escapes the check entirely. Both
-// implementations do it, and the port keeps the behaviour rather than changing a rule: across both
-// stack repos it hides NOTHING — 1,185 assertions walked, 0 relying on a trailing comma. Recorded,
-// with its measurement, as a decision for the close sweep rather than a change made in a port.
+// A TRAILING COMMA IS NOT A MESSAGE. `expect(\n  x,\n)` is the way a formatter writes an assertion
+// over several lines, and the comma after its only argument carries nothing. The assertion gets the
+// note a bare assertion gets.
 const TRAILING = "await expect(\n  page.getByRole('list'),\n).toHaveCount(1);";
-one("F15 — a trailing comma reads as a message, in both", {
+one("[MKT.PROVIDERS.32] an assertion over several lines with a trailing comma and no message", {
   script: "assertion-message", root: tree({ [J]: file(TRAILING) }),
   input: { file_path: J, content: file(TRAILING) },
-  expect: "",
+  expect: "note", says: "says why it might have failed",
 });
 
 one("an Edit that introduces a bare assertion", {
@@ -93,6 +91,12 @@ const COMMENTED = "// never write expect(editors).toHaveCount(1) with no message
 one("a bare assertion quoted in a comment", {
   script: "assertion-message", root: tree({ [J]: file(COMMENTED) }),
   input: { file_path: J, content: file(COMMENTED) }, expect: "",
+});
+
+const TRAILING_AFTER_MESSAGE = "await expect(\n  page.getByRole('list'),\n  'the list did not render',\n).toHaveCount(1);";
+one("[MKT.PROVIDERS.32] a message followed by a trailing comma is still a message", {
+  script: "assertion-message", root: tree({ [J]: file(TRAILING_AFTER_MESSAGE) }),
+  input: { file_path: J, content: file(TRAILING_AFTER_MESSAGE) }, expect: "",
 });
 
 const COMMA_IN_STRING = "await expect(page.getByText('one, two, three'), 'the list did not render').toHaveCount(1);";

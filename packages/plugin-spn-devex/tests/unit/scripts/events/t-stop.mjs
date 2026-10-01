@@ -8,7 +8,7 @@ import { PLUGIN } from "../../../helpers/harness.mjs";
 import { execFileSync } from "node:child_process";
 import { workspace } from "../../../helpers/fixture.mjs";
 
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve, join } from "node:path";
 import { WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
@@ -1179,6 +1179,247 @@ console.log("\n=== stop — a check speaks once in a turn, and only about this s
     ["known-bad: the next session as the one that starts", "The next window starts at step 5.", true],
     ["known-bad: a direction to paste the block elsewhere", "Paste this block into a fresh window to continue.", true],
   ]) check(`${what} reads as ${expected ? "passing work on" : "not a pass-on"}`, passingOn(reply) === expected);
+}
+
+console.log("\n=== handover — the labels are read as one column, the one `do not touch:` sets");
+{
+  const { checkHandover, handoverColumns } = await import("../../../../src/scripts/events/stop.ts");
+  const ROOT = workspace("n006-stop-handover-column");
+  const check = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${detail}`}`); };
+  const LABELS = ["continue", "model", "read first", "pins", "state", "live now", "done when", "do not touch", "open"];
+  const block = (lines) => "I am handing this over.\n\n```text\n" + lines.join("\n") + "\n```\n";
+  const value = (at) => `value ${at} 020-agent-workstream-improvements N006`;
+  const aligned = LABELS.map((label, at) => `${`${label}:`.padEnd(14)}${value(at)}`);
+
+  // KNOWN-BAD: nine label lines, every label present, whose values start in different columns.
+  const ragged = checkHandover(block(LABELS.map((label, at) => `${label}:${at % 2 ? " " : "      "}${value(at)}`)), ROOT);
+  check("[MKT.HOOKS.37] known-bad: values that start in different columns get one [handover] warning",
+    ragged.length === 1 && ragged[0].check === "handover", JSON.stringify(ragged));
+  check("[MKT.HOOKS.37] and the warning names the column that `do not touch:` sets",
+    /column 14/.test(ragged[0]?.message ?? "") && /`do not touch:`/.test(ragged[0]?.message ?? ""), ragged[0]?.message);
+  const oneOff = checkHandover(block(aligned.map((line) => line.startsWith("model:") ? `model: ${value(1)}` : line)), ROOT);
+  check("[MKT.HOOKS.37] known-bad: one value out of the column is named by its label",
+    oneOff.length === 1 && /`model:`/.test(oneOff[0].message) && !/`pins:`/.test(oneOff[0].message), JSON.stringify(oneOff));
+
+  // UNTOUCHED: the template's layout, its values filled in, a wrapped value indented to the column.
+  check("[MKT.HOOKS.37] every value in the column passes", checkHandover(block(aligned), ROOT).length === 0, JSON.stringify(checkHandover(block(aligned), ROOT)));
+  const wrapped = aligned.flatMap((line) => line.startsWith("pins:") ? [line, `${" ".repeat(14)}re-run the plan's stale check first`] : [line]);
+  check("[MKT.HOOKS.37] a wrapped value indented to that column passes", checkHandover(block(wrapped), ROOT).length === 0);
+  check("[MKT.HOOKS.37] a continuation line is not read as a label, whatever it starts with",
+    checkHandover(block(aligned.flatMap((line) => line.startsWith("state:") ? [line, `${" ".repeat(14)}open: this is the value going on`] : [line])), ROOT).length === 0);
+  check("the column each label's value starts in is read from the block",
+    JSON.stringify([...handoverColumns(["continue:     a", "model: b", "              c"].join("\n"))]) === JSON.stringify([["continue", 14], ["model", 7]]));
+}
+
+console.log("\n=== runnable — a tick with no date and no landed word is not a done-mark");
+{
+  const { unfinishedSteps } = await import("../../../../src/scripts/events/stop.ts");
+  const check = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${detail}`}`); };
+  const arcWith = (name, rows) => {
+    const root = workspace(name, {
+      [`.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html`]: page({ names: ["N5-a-subject.md"] }),
+      [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N5-a-subject.md`]: rows,
+    });
+    return join(root, `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N5-a-subject.md`);
+  };
+  const HEAD = "# N5 — a subject\n\nStatus: **RUNNING — 2026-10-01.**\n\n## Steps\n\n| # | Repo | Altitude | What | Mechanism | Acceptance | State |\n| --- | --- | --- | --- | --- | --- | --- |\n";
+  const steps = unfinishedSteps(arcWith("n006-stop-tick", HEAD +
+    "| 1 | spn-x | DOCS | the vague row | by hand | green | ✅ the arc is written |\n" +
+    "| 2 | spn-x | DOCS | the dated row | by hand | green | ✅ 2026-09-07 |\n" +
+    "| 3 | spn-x | DOCS | the landed row | by hand | green | ✅ landed 2026-10-01 — `abc1234` |\n" +
+    "| 4 | spn-x | DOCS | the done row | by hand | green | ✅ **done 2026-09-23** |\n" +
+    "| 5 | spn-x | DOCS | the carried row | by hand | green | ↷ carried → 021-next |\n"));
+  check("[MKT.HOOKS.39] known-bad: `✅ the arc is written` is an unfinished step at the end of a turn",
+    steps?.length === 1 && steps[0] === "step 1 — the vague row", JSON.stringify(steps));
+  check("[MKT.HOOKS.39] a tick with a date, a tick with a landed word and a carry are each still done",
+    !(steps ?? []).some((step) => /step [2345]\b/.test(step)), JSON.stringify(steps));
+  // An older table has no State column, so every cell is read, and the tick is read the same way.
+  const older = unfinishedSteps(arcWith("n006-stop-tick-older",
+    "# N5 — a subject\n\nStatus: **RUNNING**\n\n## Steps\n\n| # | What | Where | How you would know |\n| --- | --- | --- | --- |\n" +
+    "| 1 | a thing | here | ✅ landed |\n| 2 | another thing | here | ✅ it looks right |\n| 3 | a third | ✅ **done 2026-09-23** — proven | there |\n"));
+  check("[MKT.HOOKS.39] in a table with no State column the tick is read the same way",
+    older?.length === 1 && older[0].startsWith("step 2 —"), JSON.stringify(older));
+}
+
+console.log("\n=== runnable — a row in progress whose order is out with an agent is not reported (MKT.HOOKS.30)");
+{
+  const { checkRunnable, ordersOut } = await import("../../../../src/scripts/events/stop.ts");
+  const check = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${detail}`}`); };
+  const WS = `.spndevex/${WORKSTREAMS}/open/001-a-subject`;
+  const MARKED = `# N3 — a subject\n\nStatus: **RUNNING — 2026-09-29.**\n\n## Steps\n\n` +
+    `| # | Repo | Altitude | What | Mechanism | Acceptance | State |\n| --- | --- | --- | --- | --- | --- | --- |\n` +
+    `| 1 | spn-foundation | DOCS | the chapter | by hand | audit | LANDED — \`abc1234\` |\n` +
+    `| 2 | spn-support-ts | CODE | the split check | agents (order 02) | its suite | in progress 2026-09-29 14:32 +05:30 — with a background agent |\n\n## Log\n\n- **2026-09-29 — go.**\n`;
+  const build = (name, orders) => {
+    const root = workspace(name, {
+      [`${WS}/a-subject-approach.html`]: page({ cards: "", names: ["N3-a-subject.md"] }),
+      [`${WS}/arcs/N3-a-subject.md`]: MARKED,
+      ...Object.fromEntries(Object.entries(orders).map(([file, text]) => [`${WS}/notes/N3/orders/${file}`, text])),
+    });
+    const arc = join(root, WS, "arcs", "N3-a-subject.md");
+    return { arc, found: checkRunnable(root, Date.now() - 60_000, { [arc]: "a-different-hash" }, new Set([arc])) };
+  };
+  const ORDER = "# Order 02 — N3 row 2: the split check\n\nBuild the check.\n";
+
+  const out = build("n006-stop-order-out", { "02-the-split-check.md": ORDER });
+  check("[MKT.HOOKS.30] an order file for the row with no report beside it is an order that is out", [...ordersOut(out.arc)].join(",") === "2", [...ordersOut(out.arc)].join(","));
+  check("[MKT.HOOKS.30] the row in progress is not reported while its order is out", out.found.length === 0, JSON.stringify(out.found));
+
+  // KNOWN-BAD, each way round: the report is back, the order is for another row, and there is no order at all.
+  const back = build("n006-stop-order-back", { "02-the-split-check.md": ORDER, "02-the-split-check-report.md": "# Order 02 — report\n\nDone.\n" });
+  check("[MKT.HOOKS.30] known-bad: once the report is beside the order, the row is named with its age again",
+    back.found.length === 1 && /marked in progress/.test(back.found[0].message) && /step 2/.test(back.found[0].message), JSON.stringify(back.found));
+  const other = build("n006-stop-order-other", { "05-the-release.md": "# Order 05 — N3 row 5: the release\n" });
+  check("[MKT.HOOKS.30] known-bad: an order that is out for another row does not quiet this one", other.found.length === 1, JSON.stringify(other.found));
+  const none = build("n006-stop-order-none", {});
+  check("[MKT.HOOKS.30] known-bad: with no order file the row is named, as before", none.found.length === 1 && [...ordersOut(none.arc)].length === 0);
+  check("[MKT.HOOKS.30] and it is still never called runnable",
+    [back, other, none].every((one) => one.found.every((warning) => !/stopped with runnable work/.test(warning.message))));
+
+  // Where the order's heading names no row, the number that opens its file name is the row.
+  const numbered = build("n006-stop-order-numbered", { "02a-the-split-check.md": "# The split check, first half\n" });
+  check("[MKT.HOOKS.30] an order whose heading names no row is read by the number that opens its file name",
+    [...ordersOut(numbered.arc)].join(",") === "2" && numbered.found.length === 0, JSON.stringify(numbered.found));
+  // Two orders for one row: the row is out until both reports are back.
+  const split = build("n006-stop-order-split", { "02a-first.md": "# Order 02a — N3 row 2: first\n", "02a-first-report.md": "# report\n",
+    "02b-second.md": "# Order 02b — N3 row 2: second\n" });
+  check("[MKT.HOOKS.30] a row with two orders stays out until both reports are back", split.found.length === 0, JSON.stringify(split.found));
+}
+
+console.log("\n=== stop — a page left stale by an arc this session wrote, and an arc that lands with a row undecided");
+{
+  const { cyclesOf, tableOf, producedPage } = await import("../../../../src/scripts/commands/docs/cycles.ts");
+  const HOOK = `${HOOKS}/src/scripts/events/stop.ts`;
+  const check = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${detail.slice(0, 600)}`}`); };
+  const A = `.spndevex/${WORKSTREAMS}/open/001-a-subject`, B = `.spndevex/${WORKSTREAMS}/open/002-b-subject`;
+  const arcText = (status, state = "") => `# N1 — the chapter\n\nStatus: **${status} — 2026-10-01.** The chapter says where the model sits.\n\n## Steps\n\n` +
+    `| # | Repo | Altitude | What | Mechanism | Acceptance | State |\n| --- | --- | --- | --- | --- | --- | --- |\n` +
+    `| 1 | spn-foundation | DOCS | the chapter | by hand | audit | ✅ landed 2026-10-01 — \`abc1234\` |\n` +
+    `| 2 | spn-support-ts | CODE | the check | by hand | its suite | ${state} |\n\n## Log\n\n- **2026-10-01 — go.**\n`;
+  // A page in the approach template's shape: a labelled status, How ending in Cycles, and Open.
+  const pageFor = (folder, status, glyph) => `<!doctype html>
+<div class="eyebrow"><span class="line1">Workstream</span><span class="st"><span class="lbl">Status:</span> <span class="badge status ${status.toLowerCase()}">${glyph} ${status}</span></span></div>
+<section id="s3"><div class="sec-head"><h2>How &mdash; the order</h2></div>
+  <h3 id="h9">Cycles &mdash; the arcs, in the order they run</h3>
+${tableOf(cyclesOf(folder))}
+</section>
+<section id="s4"><div class="sec-head"><h2>Open &mdash; no card is open</h2></div>
+</section>
+`;
+  /** A workspace whose page is current for an arc at `status`, and a transcript that has only read the arc. */
+  const build = (name, status = "DECIDED", state = "") => {
+    const root = workspace(name, { [`${A}/arcs/N1-the-chapter.md`]: arcText(status, state) });
+    const current = status === "DECIDED" || status === "PROPOSED" ? ["PLANNING", "&#x1F52E;"] : ["IMPLEMENTING", "&#x1F6A7;"];
+    writeFileSync(join(root, A, "approach.html"), pageFor(join(root, A), ...current));
+    const transcript = join(root, "transcript.jsonl");
+    writeFileSync(transcript, toolCalls([{ name: "Read", input: { file_path: join(root, A, "arcs", "N1-the-chapter.md") } }]));
+    return { root, transcript, arc: join(root, A, "arcs", "N1-the-chapter.md"), page: join(root, A, "approach.html") };
+  };
+  const toolCalls = (calls) => calls.map((call) => JSON.stringify({ type: "assistant", message: { role: "assistant",
+    content: [{ type: "tool_use", id: "t", name: call.name, input: call.input }] } })).join("\n") + "\n";
+  const stop = (built, session) => run("node", [HOOK], { cwd: built.root, last_assistant_message: "done", session_id: session, transcript_path: built.transcript }, built.root);
+  /** The arc moves to `status`, and the session's own Edit is what moved it, where `mine` says so. */
+  const move = (built, status, state, mine = true) => {
+    writeFileSync(built.arc, arcText(status, state));
+    writeFileSync(built.transcript, readFileSync(built.transcript, "utf8") + toolCalls([mine
+      ? { name: "Edit", input: { file_path: built.arc, old_string: "DECIDED", new_string: status } }
+      : { name: "Read", input: { file_path: built.arc } }]));
+  };
+  const count = (text, piece) => text.split(piece).length - 1;
+
+  // KNOWN-BAD: the page is current, the arc then moves from DECIDED to RUNNING, and this session wrote it.
+  {
+    const built = build("n006-stop-page-stale");
+    const first = stop(built, "d-stale");
+    move(built, "RUNNING", "");
+    const out = stop(built, "d-stale");
+    check("the first Stop, which takes the baseline, says nothing about the page", !/\[page-stale\]/.test(first), first);
+    check("[MKT.HOOKS.35] known-bad: an arc this session moved leaves the page stale, and one warning says so", count(out, "[page-stale]") === 1, out);
+    check("[MKT.HOOKS.35] the warning names the workstream and the command that writes the page",
+      out.includes("`spn-devex docs cycles 001-a-subject --write`"), out);
+  }
+  // UNTOUCHED: the same arc moved by another window, which this session's transcript only read.
+  {
+    const built = build("n006-stop-page-other-writer");
+    stop(built, "d-reader");
+    move(built, "RUNNING", "", false);
+    check("[MKT.HOOKS.35] a turn that wrote no arc gets no warning", !/\[page-stale\]/.test(stop(built, "d-reader")));
+  }
+  // UNTOUCHED: the session moved the arc and produced the page again in the same turn.
+  {
+    const built = build("n006-stop-page-produced");
+    stop(built, "d-produced");
+    move(built, "RUNNING", "");
+    writeFileSync(built.page, producedPage(join(built.root, A), readFileSync(built.page, "utf8")).text);
+    check("[MKT.HOOKS.35] a page produced again in the same turn gets no warning", !/\[page-stale\]/.test(stop(built, "d-produced")));
+  }
+  // UNTOUCHED: a first Stop has no baseline, so nothing says which arcs this turn wrote.
+  {
+    const built = build("n006-stop-page-first");
+    move(built, "RUNNING", "");
+    check("[MKT.HOOKS.35] a first Stop with no baseline compares nothing", !/\[page-stale\]/.test(stop(built, "d-first")));
+  }
+  // UNTOUCHED: another session's workstream, whose page is stale, while this session wrote its own arc.
+  {
+    const built = build("n006-stop-page-other-workstream");
+    const other = join(built.root, B);
+    mkdirSync(join(other, "arcs"), { recursive: true });
+    writeFileSync(join(other, "arcs", "N1-the-chapter.md"), arcText("DECIDED"));
+    writeFileSync(join(other, "approach.html"), pageFor(other, "PLANNING", "&#x1F52E;"));
+    stop(built, "d-other");
+    writeFileSync(join(other, "arcs", "N1-the-chapter.md"), arcText("RUNNING"));       // another window's work
+    writeFileSync(built.transcript, readFileSync(built.transcript, "utf8") +
+      toolCalls([{ name: "Edit", input: { file_path: built.arc, old_string: "go.", new_string: "go, and on." } }]));
+    const out = stop(built, "d-other");
+    check("[MKT.HOOKS.35] a workstream another session wrote is not this session's to hear about", !/\[page-stale\]/.test(out), out);
+  }
+  // UNTOUCHED: a page in the older shape has no Cycles table, so the command has nothing to write.
+  {
+    const built = build("n006-stop-page-older-shape");
+    writeFileSync(built.page, page({ names: ["N1-the-chapter.md"] }));
+    stop(built, "d-older");
+    move(built, "RUNNING", "");
+    check("[MKT.HOOKS.35] a page with no Cycles table is not told to run the command", !/\[page-stale\]/.test(stop(built, "d-older")));
+  }
+
+  // THE CLOSE GATE'S REPORT, WHEN AN ARC LANDS. KNOWN-BAD: the arc moves to LANDED with a row nobody decided.
+  {
+    const built = build("n006-stop-landed-undecided", "RUNNING", "");
+    stop(built, "h-undecided");
+    move(built, "LANDED", "");
+    const out = stop(built, "h-undecided");
+    check("[MKT.HOOKS.36] known-bad: an arc that lands with a row undecided gets one warning", count(out, "[arc-landed]") === 1, out);
+    check("[MKT.HOOKS.36] the warning lists that row, under the close gate's tally",
+      /undecided\s+spn-support-ts — N1 step 2 — the check/.test(out) && /2 rows · landed 1/.test(out), out);
+  }
+  {
+    const built = build("n006-stop-landed-pending", "RUNNING", "");
+    stop(built, "h-pending");
+    move(built, "LANDED", "✅ the arc is written");
+    const out = stop(built, "h-pending");
+    check("[MKT.HOOKS.36] known-bad: a row that reads pending is listed too", /pending\s+spn-support-ts — N1 step 2 — the check/.test(out), out);
+  }
+  // UNTOUCHED: the arc lands with every row landed, carried or deferred.
+  {
+    const built = build("n006-stop-landed-whole", "RUNNING", "");
+    stop(built, "h-whole");
+    move(built, "LANDED", "⊘ deferred until a partner asks");
+    check("[MKT.HOOKS.36] an arc that lands with every row accounted for gets none", !/\[arc-landed\]/.test(stop(built, "h-whole")));
+  }
+  // UNTOUCHED: the arc already read LANDED at the last Stop, and this turn only wrote it again.
+  {
+    const built = build("n006-stop-landed-already", "LANDED", "");
+    stop(built, "h-already");
+    move(built, "LANDED", "");
+    check("[MKT.HOOKS.36] an arc that already read LANDED at the last Stop is not read again", !/\[arc-landed\]/.test(stop(built, "h-already")));
+  }
+  // UNTOUCHED: another window landed the arc, and this session only read it.
+  {
+    const built = build("n006-stop-landed-other-writer", "RUNNING", "");
+    stop(built, "h-reader");
+    move(built, "LANDED", "", false);
+    check("[MKT.HOOKS.36] an arc another window landed is not this session's to hear about", !/\[arc-landed\]/.test(stop(built, "h-reader")));
+  }
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

@@ -397,6 +397,20 @@ console.log("=== coverage measure — the answer as a whole");
 }
 
 {
+  // An id declared by two rows: the second row sits under another construct.
+  const once = { ...APPS, ...node("packages/store", "MODULE_SERVER"), ...code("packages/store/src/app/services/StoreService.ts"),
+    ...construct("01-store", ["COR.STORE.01", "SUCCESS"]), ...chapter("store", "01-store", "src/app/services/StoreService.ts") };
+  const twice = json(repo({ ...once, ...construct("02-shelf", ["COR.STORE.01", "PLANNED"], ["COR.SHELF.01", "PLANNED"]) }));
+  const named = twice.findings.filter((one) => one.message.includes("COR.STORE.01 is declared by 2 rows"));
+  ok("[MKT.SCRIPTS.84] known-bad: an id that two rows declare is listed with each file that declares it",
+    named.length === 1 && named[0].message.includes(`docs/${SEAT.behaviors}/01-core/01-store.md:3`)
+      && named[0].message.includes(`docs/${SEAT.behaviors}/01-core/02-shelf.md:3`), JSON.stringify(twice.findings));
+  ok("[MKT.SCRIPTS.84] and the plain reading prints it", measure(repo({ ...once, ...construct("02-shelf", ["COR.STORE.01", "PLANNED"]) })).includes("is declared by 2 rows"));
+  ok("[MKT.SCRIPTS.84] a repository whose ids are each declared once lists none",
+    !json(repo(once)).findings.some((one) => one.message.includes("is declared by")), JSON.stringify(json(repo(once)).findings));
+}
+
+{
   const root = repo({ "sprepo.json": '{"type":"FOUNDATION","config":{"mtype":"FOUNDATION"}}' });
   const result = json(root);
   ok("a foundation repository is answered with an absence, not with zeros", result.absence !== null && result.repositoryLevel === null, JSON.stringify(result));

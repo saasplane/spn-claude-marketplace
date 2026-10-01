@@ -7,27 +7,31 @@
 // A row names the arc and links its file, says what the arc does and where it stands, and lists the
 // previews and samples the arc's own `## Previews` table carries.
 //
-//   spn-devex docs cycles <workstream> [--json]
+//   spn-devex docs cycles <workstream> [--json | --write]
 //
 // <workstream> is the workstream's folder, its approach page, its number (`016`) or its folder name
 // (`016-provider-secret-storage`), looked up in `.spndevex/workstreams/{open,backlog,closed}/`.
 //
-// It writes no file: the agent pastes the rows, and `doc-check` compares the page with `cyclesOf` (N116, D2).
+// With no option it writes no file. With `--write` it writes the parts of the page that the arcs
+// decide (RD.DEVEX.WORKSPACE.204): the header's status, the Cycles table and the heading of `Open`.
+// `doc-check` compares a page with the same reading, through `tableDifferences` and `headerStatusRule`.
 
-import { basename, dirname, join, posix, resolve } from "node:path";
-import { STATUSES } from "../../checks/arc-status.ts";
-import { isDir, isFile, listdir, read, workspaceRoot } from "../../lib/payload.ts";
+import { writeFileSync } from "node:fs";
+import { basename, dirname, join, posix, relative, resolve } from "node:path";
+import { STATUSES, TERMINAL, pastDecided } from "../../checks/arc-status.ts";
+import { cardsIn, mastheadStatus } from "../../checks/split-plan.ts";
+import { isDir, isFile, listdir, read, unescape, workspaceRoot } from "../../lib/payload.ts";
 import { ARCS, WORKSTREAM_STATES, isApproachPage, workstreamsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { argsText, begin, commandFacts, end, record } from "../../../../../plugin-support-lib/src/lib/timing.ts";
 
-export const describe = "print a workstream's Cycles table from its arcs — one row per arc, with its file, its status and its previews";
+export const describe = "print a workstream's Cycles table from its arcs — one row per arc, with its file, its status and its previews; --write puts the parts the arcs decide into the page";
 
 /** One row of an arc's `## Previews` table: a preview page or a sample, and where its review stands. */
 export type Preview = {
   name: string;            // the file's name
   href: string | null;     // its path from the workstream folder; null where the row links nothing
   kind: string;            // `preview` or `sample`, as the row states it
-  state: string;           // `under review`, `approved`, `superseded` — the State cell before any date
+  state: string;           // `proposed` or `decided`, the arc's own words — the State cell before any date
 };
 
 /** One row of Cycles, and the file it was read from. */
@@ -114,6 +118,18 @@ export function previewsOf(text: string): Preview[] {
     const state = (dated ? stated.slice(0, dated.index) : stated).replace(/[\s—–·,:;(-]+$/, "");
     return { name, href, kind: plain(cells[kindAt] ?? ""), state };
   });
+}
+
+/**
+ * The File cell an unlinked Previews row should carry: the file's name as a link written from the
+ * arc file, which sits in `arcs/`. A name that already holds a path is linked at that path, and a
+ * bare name under the arc's own `previews/` folder.
+ */
+export function previewLinkForm(file: string, name: string): string {
+  const target = name.includes("/")
+    ? `../${name.replace(/^(?:\.{1,2}\/)+/, "")}`
+    : `../notes/${arcId(file) ?? "N<nnn>"}/previews/${name}`;
+  return `[\`${posix.basename(name)}\`](${target})`;
 }
 
 /** The first sentence of a text. */
@@ -248,6 +264,226 @@ export function tableOf(cycles: Cycle[]): string {
   ].join("\n");
 }
 
+// ---------------------------------------------------------------------------- the page against the arcs
+
+/** A cell or heading as a person reads it: tags gone, entities resolved, spaces collapsed. */
+const flat = (html: string): string => unescape(html.replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
+
+/** Every link in a cell, in order: where it points and the text it shows. */
+function anchorsOf(html: string): Array<{ href: string; text: string }> {
+  return [...html.matchAll(/<a\b[^>]*\bhref="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi)]
+    .map((found) => ({ href: unescape(found[1]), text: flat(found[2]) }));
+}
+
+/** A cell with its links taken out, as a person reads the rest. */
+const withoutAnchors = (html: string): string => flat(html.replace(/<a\b[\s\S]*?<\/a>/gi, " "));
+
+/** The key one Cycles row and one arc share: the arc number, or the name where there is none. */
+function cycleKey(label: string): string {
+  const id = /\bN\d+[a-z]?\b/i.exec(label);
+  if (id) return id[0].charAt(0).toUpperCase() + id[0].slice(1);
+  return label.toLowerCase().replace(/^arc\s*[—–:-]\s*/, "").replace(/\s+/g, " ").trim();
+}
+
+/** The header cells of a table, as a page writes them: lower case, joined by a middle dot. */
+export function tableColumns(table: string): string {
+  return [...table.matchAll(/<th\b[^>]*>([\s\S]*?)<\/th>/gi)].map((found) => flat(found[1]).toLowerCase()).join(" · ");
+}
+
+/** The rows of a page's Cycles table, each under the key of the arc it names, in the page's order. */
+function tableRows(table: string): Map<string, string[]> {
+  const rows = [...(table.match(/<tr\b[^>]*>[\s\S]*?<\/tr>/gi) ?? [])]
+    .map((row) => [...row.matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/gi)].map((found) => found[1]))
+    .filter((cells) => cells.length >= 3);
+  return new Map(rows.map((cells) => [cycleKey(withoutAnchors(cells[0])), cells]));
+}
+
+/** The arcs of a workstream, each under the key a Cycles row names it by. */
+function arcsByKey(cycles: Cycle[]): Map<string, Cycle> {
+  return new Map(cycles.map((cycle) => [cycle.id ?? cycleKey(cycle.name), cycle]));
+}
+
+/**
+ * What a page's Cycles table says that its arcs do not: the arcs with no row, the rows naming no arc,
+ * and one line for each row that differs from its arc. Rows are matched by arc and never by position,
+ * so a page may list the arcs in the order a person chooses. With `withPreviews` false only the rows
+ * and their statuses are compared, which is what a closed workstream's three-column table is held to.
+ */
+export function tableDifferences(table: string, cycles: Cycle[], withPreviews = true): { missing: string[]; unknown: string[]; stale: string[] } {
+  const onPage = tableRows(table);
+  const inArcs = arcsByKey(cycles);
+  const stale: string[] = [];
+  for (const [key, cells] of onPage) {
+    const cycle = inArcs.get(key);
+    if (!cycle) continue;
+    const status = flat(cells[2]);
+    if (cycle.status && statusWord(status) !== cycle.status)
+      stale.push(`${key} reads ${statusWord(status) ?? `"${status}"`} and the arc reads ${cycle.status}`);
+    if (!withPreviews) continue;
+    if (withoutAnchors(cells[0]) !== arcLabel(cycle).replace(/\s+/g, " ").trim())
+      stale.push(`${key} is named "${withoutAnchors(cells[0])}" and the arc is "${arcLabel(cycle)}"`);
+    const href = arcHref(cycle);
+    if (!anchorsOf(cells[0]).some((anchor) => anchor.href === href && anchor.text === href))
+      stale.push(`${key} does not link its arc file as ${href}`);
+    if (flat(cells[1]) !== cycle.does.replace(/\s+/g, " ").trim())
+      stale.push(`${key}'s What it does is not the arc's own line`);
+    const previews = previewsCell(cycle);
+    const linked = (html: string) => anchorsOf(html).map((anchor) => anchor.href).join(" ");
+    if (flat(cells[3] ?? "") !== flat(previews) || linked(cells[3] ?? "") !== linked(previews))
+      stale.push(`${key}'s Previews cell is not what the arc's Previews table lists`);
+  }
+  return {
+    missing: [...inArcs.keys()].filter((key) => !onPage.has(key)),
+    unknown: [...onPage.keys()].filter((key) => !inArcs.has(key)),
+    stale,
+  };
+}
+
+/**
+ * Where a page's Cycles table sits: the first table after the last `h3` named Cycles inside How,
+ * which is where `cyclesRule` reads it. Null where How has no such `h3`, or no table follows it.
+ */
+export function cyclesTableAt(text: string): { from: number; to: number } | null {
+  const how = /<h2\b[^>]*>\s*(?:<[^>]+>\s*)*How\b[\s\S]*?<\/h2>/i.exec(text);
+  if (!how) return null;
+  const bodyAt = how.index + how[0].length;
+  const next = text.slice(bodyAt).search(/<h2\b/i);
+  const body = next < 0 ? text.slice(bodyAt) : text.slice(bodyAt, bodyAt + next);
+  const named = [...body.matchAll(/<h3\b[^>]*>([\s\S]*?)<\/h3>/gi)].filter((found) => /^Cycles\b/i.test(flat(found[1]))).at(-1);
+  if (!named) return null;
+  const table = /<table\b[\s\S]*?<\/table>/i.exec(body.slice(named.index!));
+  if (!table) return null;
+  const from = bodyAt + named.index! + table.index;
+  return { from, to: from + table[0].length };
+}
+
+// The three words a workstream page's header shows, each with the class and the glyph the approach
+// template writes its badge with (`templates/workstream/approach-template.html`).
+export const HEADER_STATUSES = {
+  PLANNING: { badge: "planning", glyph: "&#x1F52E;" },
+  IMPLEMENTING: { badge: "implementing", glyph: "&#x1F6A7;" },
+  DONE: { badge: "done", glyph: "&#x2705;" },
+} as const;
+export type HeaderStatus = keyof typeof HEADER_STATUSES;
+const HEADER_WORDS = Object.keys(HEADER_STATUSES) as HeaderStatus[];
+
+/** Whether a workstream folder sits in `closed/`. */
+const isClosed = (folder: string): boolean => basename(dirname(resolve(folder))) === "closed";
+
+/** The word a page's header shows in its labelled status field, or null where it shows none of the three. */
+export function headerStatusOf(text: string): HeaderStatus | null {
+  const field = mastheadStatus(text)?.toUpperCase();
+  if (!field) return null;
+  return HEADER_WORDS.find((word) => new RegExp(`\\b${word}\\b`).test(field)) ?? null;
+}
+
+/**
+ * The word the arcs give a workstream page's header (05-artifacts.md § How ends in Cycles):
+ * `PLANNING` while no arc is past `DECIDED`, `IMPLEMENTING` once one is, and `DONE` for a
+ * workstream in `closed/`.
+ */
+export function headerStatusFor(folder: string, cycles: Cycle[] = cyclesOf(folder)): HeaderStatus {
+  if (isClosed(folder)) return "DONE";
+  return cycles.some((cycle) => pastDecided(cycle.status)) ? "IMPLEMENTING" : "PLANNING";
+}
+
+/**
+ * The header's status where it disagrees with the arcs: the word the page shows and the word the
+ * arcs give. Null where they agree, and where the header labels none of the three words. A page in
+ * `open/` may read `DONE` once every arc carries a terminal status, because the close gate asks for
+ * that stamp before the folder moves.
+ */
+export function headerStatusRule(folder: string, text: string, cycles: Cycle[] = cyclesOf(folder)): { shows: HeaderStatus; gives: HeaderStatus } | null {
+  const shows = headerStatusOf(text);
+  if (shows === null) return null;
+  const gives = headerStatusFor(folder, cycles);
+  if (shows === gives) return null;
+  if (shows === "DONE" && cycles.length > 0 && cycles.every((cycle) => cycle.status !== null && TERMINAL.has(cycle.status))) return null;
+  return { shows, gives };
+}
+
+/** Where the heading of `Open` sits in a page: the inside of the first `h2` whose text starts with Open. */
+function openHeadingAt(text: string): { from: number; to: number } | null {
+  for (const found of text.matchAll(/(<h2\b[^>]*>)([\s\S]*?)<\/h2>/gi)) {
+    if (!/^Open\b/.test(flat(found[2]))) continue;
+    const from = found.index! + found[1].length;
+    return { from, to: from + found[2].length };
+  }
+  return null;
+}
+
+/** The heading of `Open` as the page writes it, read as a person reads it, or null where it has none. */
+export function openHeadingOf(text: string): string | null {
+  const at = openHeadingAt(text);
+  return at ? flat(text.slice(at.from, at.to)) : null;
+}
+
+/**
+ * The heading the page's own cards give `Open`: `Open — Q<n> · Q<n>`, each open card by its number,
+ * or `Open — no card is open`. A card that carries its decision is not open.
+ */
+export function openHeadingFor(text: string): string {
+  const open = [...new Set(cardsIn(text).filter((card) => !card.decided).map((card) => card.number))];
+  return `Open — ${open.length ? open.join(" · ") : "no card is open"}`;
+}
+
+/** The parts of a page that the arcs decide, as `--write` names them. */
+export const PRODUCED_PARTS = { status: "the header's status", table: "the Cycles table", open: "the heading of Open" } as const;
+
+/**
+ * A workstream's page as `--write` leaves it: the header's status, the Cycles table and the heading
+ * of `Open`, each replaced once and only where it differs from what the arcs and the cards give.
+ * `wrote` names the parts that changed, and `skipped` says why a part that differs could not be
+ * written. Null where the page holds no Cycles table to write.
+ */
+export function producedPage(folder: string, text: string, cycles: Cycle[] = cyclesOf(folder)): { text: string; wrote: string[]; skipped: string[] } | null {
+  if (!cyclesTableAt(text)) return null;
+  const wrote: string[] = [];
+  const skipped: string[] = [];
+  let out = text;
+  const splice = (at: { from: number; to: number }, replacement: string): void => {
+    out = out.slice(0, at.from) + replacement + out.slice(at.to);
+  };
+
+  const status = headerStatusRule(folder, out, cycles);
+  if (status) {
+    const header = out.indexOf('class="eyebrow"');
+    const badge = /<span\b[^>]*\bclass="badge status\b[^"]*"[^>]*>[\s\S]*?<\/span>/i.exec(out.slice(Math.max(header, 0)));
+    const ends = out.indexOf("</div>", Math.max(header, 0));
+    if (header < 0 || !badge || (ends >= 0 && header + badge.index > ends))
+      skipped.push(`${PRODUCED_PARTS.status} reads ${status.shows} and the arcs give ${status.gives}, and the header holds no status badge to write`);
+    else {
+      const { badge: name, glyph } = HEADER_STATUSES[status.gives];
+      splice({ from: header + badge.index, to: header + badge.index + badge[0].length },
+        `<span class="badge status ${name}">${glyph} ${status.gives}</span>`);
+      wrote.push(PRODUCED_PARTS.status);
+    }
+  }
+
+  const table = cyclesTableAt(out)!;
+  const current = out.slice(table.from, table.to);
+  const differences = tableDifferences(current, cycles);
+  if (tableColumns(current) !== CYCLES_COLUMNS.join(" · ").toLowerCase()
+      || differences.missing.length || differences.unknown.length || differences.stale.length) {
+    // The rows keep the order the page lists them in, which is the order a person chose. An arc the
+    // page does not list yet is added after them, in the order of the arc numbers.
+    const inArcs = arcsByKey(cycles);
+    const listed = [...tableRows(current).keys()].filter((key) => inArcs.has(key));
+    const ordered = [...listed.map((key) => inArcs.get(key)!),
+                     ...[...inArcs].filter(([key]) => !listed.includes(key)).map(([, cycle]) => cycle)];
+    splice(table, tableOf(ordered).replace(/^\s*<div class="scroll">/, "").replace(/<\/div>$/, ""));
+    wrote.push(PRODUCED_PARTS.table);
+  }
+
+  const heading = openHeadingAt(out);
+  const wanted = openHeadingFor(out);
+  if (heading && flat(out.slice(heading.from, heading.to)) !== wanted) {
+    splice(heading, escape(wanted));
+    wrote.push(PRODUCED_PARTS.open);
+  }
+  return { text: out, wrote, skipped };
+}
+
 /**
  * The workstream folder an argument names: a folder, an approach page inside one, or a number or
  * folder name looked up under the workspace's workstreams. Null where none matches.
@@ -265,10 +501,44 @@ export function workstreamFolder(target: string, workspace: string | null): stri
   return null;
 }
 
+/**
+ * `--write`: bring each approach page of the folder current, or the one page the argument names. A
+ * page that is already current is not written, so its bytes and its time stay as they are.
+ */
+function writePages(folder: string, target: string, cycles: Cycle[]): number {
+  const named = resolve(target);
+  const pages = isFile(named) && isApproachPage(named)
+    ? [named]
+    : listdir(folder).filter((entry) => isApproachPage(entry) && isFile(join(folder, entry))).map((entry) => join(folder, entry));
+  if (!pages.length) { console.error(`${basename(folder)} has no approach page to write`); return 1; }
+  if (isClosed(folder)) {
+    console.log(`${basename(folder)} is closed, and its page keeps what it closed with — nothing was written`);
+    return 0;
+  }
+  let code = 0;
+  for (const page of pages) {
+    const shown = relative(dirname(folder), page);
+    const text = read(page);
+    const produced = producedPage(folder, text, cycles);
+    if (!produced) {
+      console.error(`${shown} has no Cycles table to write — How ends in an h3 named Cycles, with a table under it ` +
+        `(05-artifacts.md § How ends in Cycles). Nothing was written.`);
+      code = 1;
+      continue;
+    }
+    for (const reason of produced.skipped) console.error(`! ${shown}: ${reason}`);
+    if (produced.text === text) { console.log(`${shown} is current — nothing was written`); continue; }
+    writeFileSync(page, produced.text, "utf8");
+    console.log(`${shown}: wrote ${produced.wrote.join(", ")}`);
+  }
+  return code;
+}
+
 function body(args: string[], workspace: string | null): number {
   const json = args.includes("--json");
+  const write = args.includes("--write");
   const target = args.find((arg) => !arg.startsWith("--"));
-  if (!target) { console.error("usage: spn-devex docs cycles <workstream> [--json]"); return 2; }
+  if (!target) { console.error("usage: spn-devex docs cycles <workstream> [--json | --write]"); return 2; }
   const folder = workstreamFolder(target, workspace);
   if (!folder) {
     console.error(`no workstream \`${target}\` — name its folder, its approach page, or its number, ` +
@@ -277,7 +547,10 @@ function body(args: string[], workspace: string | null): number {
   }
   const cycles = cyclesOf(folder);
   if (!cycles.length) { console.error(`${basename(folder)} has no arcs — an empty \`arcs/\` has no Cycles yet`); return 1; }
-  if (json) {
+  let code = 0;
+  if (write) {
+    code = writePages(folder, target, cycles);
+  } else if (json) {
     console.log(JSON.stringify(cycles.map((cycle) => ({
       arc: arcLabel(cycle), does: cycle.does, status: statusLabel(cycle), file: basename(cycle.file),
       previews: cycle.previews })), null, 2));
@@ -288,7 +561,12 @@ function body(args: string[], workspace: string | null): number {
   // appears, and the arc is the file to fix.
   for (const cycle of cycles.filter((c) => !c.status))
     console.error(`! ${basename(cycle.file)} states no status the set knows (${STATUSES.join(" · ")})`);
-  return 0;
+  // A Previews row that links nothing shows on the page as plain text, so the arc is the file to fix.
+  for (const cycle of cycles)
+    for (const preview of cycle.previews.filter((one) => !one.href))
+      console.error(`! ${basename(cycle.file)} names the preview \`${preview.name}\` without a link — write its File cell as ` +
+        previewLinkForm(cycle.file, preview.name));
+  return code;
 }
 
 export function run(args: string[]): number {

@@ -548,6 +548,24 @@ console.log("\n=== a package face's Map names chapters, never the realization fi
   one("the surface map is not a chapter", got, lacks("surface-map.md"));
 }
 
+console.log("\n=== `docs face` with no path refuses, with `--check` or without it");
+{
+  // The current folder is never taken as the tree. A stale tag line under it shows whether a run wrote.
+  const stale = doc({ id: "a", title: "A", variant: "capability", lenses: ["ARCHITECT"], status: "PLANNING" }, "Some prose.\n", "`For: Architect` · `Status: ✅ DONE`");
+  const root = repo({ "CONCEPT.md": "# c\n", [`docs/${SEAT.capabilities}/a.md`]: stale });
+  const exitOf = (args) => {
+    try { execFileSync(process.execPath, [TOOL, "docs", ...args], { encoding: "utf8", cwd: root, stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: root } }); return 0; }
+    catch (error) { return error.status; }
+  };
+  one("[MKT.SCRIPTS.87] with no path the command prints its usage line", run(root, ["face"]), has("usage: spn-devex docs face <docs-tree> [--check]"));
+  one("[MKT.SCRIPTS.87] and exits 2", exitOf(["face"]), 2);
+  one("[MKT.SCRIPTS.87] with `--check` and no path it refuses the same way", exitOf(["face", "--check"]), 2);
+  one("[MKT.SCRIPTS.87] and it wrote nothing under the folder it was run from", readAt(root, `docs/${SEAT.capabilities}/a.md`), stale);
+  // KNOWN-BAD, so the refusal is not the reason nothing was written: handed the tree, the same run writes.
+  run(root, ["face", "docs"]);
+  one("[MKT.SCRIPTS.87] handed the docs tree, the command writes the tag line the block declares",
+    readAt(root, `docs/${SEAT.capabilities}/a.md`), has("`Status: 🔮 PLANNING`"));
+}
 
 console.log(failed ? `\n  ${failed} of ${n} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

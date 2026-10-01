@@ -1,12 +1,15 @@
-// `plugin partner` — proves every hook survives a repo carrying only what a partner has. This case
-// is about `pluginRoot`'s own folder resolution, which is the part most likely to silently break: it
-// must find a plugin's `src/<folder>` whether the checkout names the folder by the plugin's bare
-// `name` (a partner's installed cache) or by `plugin-<name>` (this checkout's own `packages/`) — a
-// resolver that tries only one spelling reads every hook in the real sweep as `not found`.
+// `plugin partner` — proves every hook survives a repo carrying only what a partner has. These cases
+// are about where the proof finds a plugin's files, which is the part most likely to silently break.
+// A checkout keeps each plugin under `packages/plugin-<name>/src/`, with its sources beside its
+// bundles. An installed plugin's root holds `dist/`, `scripts/` and `hooks/` and no `src/` folder,
+// and there the proof runs the bundled hooks. A resolver that knows one layout reads every hook of
+// the other as `not found`.
 import { execFileSync } from "node:child_process";
-import { join } from "node:path";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { dirname, join } from "node:path";
 import { PLUGIN } from "../../../../helpers/harness.mjs";
-import { declared, HOOK_SCRIPT } from "../../../../../src/scripts/commands/plugin/partner.ts";
+import { declared, HOOK_SCRIPT, main, pluginHomes } from "../../../../../src/scripts/commands/plugin/partner.ts";
 
 const TOOL = join(PLUGIN, "src", "scripts", "commands", "plugin", "partner.ts");
 let total = 0, failed = 0;
@@ -58,6 +61,72 @@ console.log("\n=== plugin partner — the real sweep, against this checkout");
     code === 0 && out.includes("hook run(s) — every one survives a repo with no foundation"), out.slice(-400));
   ok("and the declared count is now non-zero, printed in the summary",
     code === 0 && !/^0 declared script/m.test(out), out.slice(-400));
+}
+
+console.log("\n=== plugin partner — from an installed plugin, which has no `src/` folder");
+{
+  const BASE = mkdtempSync(join(tmpdir(), "partner-installed-"));
+  const hooksJson = (...scripts) => JSON.stringify({ hooks: { PreToolUse: [{ matcher: "Write", hooks:
+    scripts.map((script) => ({ type: "command", command: `node "\${CLAUDE_PLUGIN_ROOT}"/dist/events/${script}` })) }] } });
+  let made = 0;
+  /** An install cache: `<cache>/saasplane/<plugin>/<version>/…`, from a flat path map. Returns the folder the bundled command runs from. */
+  const cache = (files) => {
+    made += 1;
+    const family = join(BASE, `cache-${made}`, "saasplane");
+    for (const [path, body] of Object.entries(files)) {
+      mkdirSync(dirname(join(family, path)), { recursive: true });
+      writeFileSync(join(family, path), body, "utf8");
+    }
+    const here = join(family, "spn-devex", "9.9.9", "dist", "commands", "plugin");
+    mkdirSync(here, { recursive: true });
+    return here;
+  };
+  /** One run of the proof from `here`, with what it printed. */
+  const proof = (here) => {
+    const lines = [];
+    const realLog = console.log;
+    console.log = (...args) => lines.push(args.join(" "));
+    let code;
+    try { code = main([], here); } finally { console.log = realLog; }
+    return { code, out: lines.join("\n") };
+  };
+  const QUIET = "process.exit(0);\n";
+  const installed = {
+    "spn-devex/9.9.9/hooks/hooks.json": hooksJson("pretooluse.mjs", "stop.mjs"),
+    "spn-devex/9.9.9/dist/events/pretooluse.mjs": QUIET,
+    "spn-devex/9.9.9/dist/events/stop.mjs": QUIET,
+    // The source ships too, and cannot run there: its imports name a folder only the checkout has.
+    "spn-devex/9.9.9/scripts/events/pretooluse.ts": 'import "../../../../plugin-support-lib/src/lib/payload.ts";\n',
+    "spn-apps/9.9.9/hooks/hooks.json": hooksJson("pretooluse.mjs"),
+    "spn-apps/9.9.9/dist/events/pretooluse.mjs": QUIET,
+    // An older version of a sibling plugin, which is never the one read.
+    "spn-apps/9.9.8/hooks/hooks.json": hooksJson("retired.mjs"),
+  };
+  try {
+    const here = cache(installed);
+    const homes = pluginHomes(here);
+    ok("[MKT.SCRIPTS.90] an installed plugin is found by its version folder, each sibling at the same version",
+      homes.map((home) => `${home.name} ${home.root.split("/").slice(-2).join("/")} ${home.installed}`).join(" | ")
+        === "spn-apps spn-apps/9.9.9 true | spn-devex spn-devex/9.9.9 true", JSON.stringify(homes));
+    const clean = proof(here);
+    ok("[MKT.SCRIPTS.90] the proof runs the bundled hooks, and reports that each one survives",
+      clean.code === 0 && clean.out.includes("3 hook run(s) — every one survives a repo with no foundation"), clean.out);
+    ok("[MKT.SCRIPTS.90] every script a hooks.json declares is found in `dist/`",
+      clean.out.includes("3 declared script(s) — every one present") && !clean.out.includes("not found"), clean.out);
+    ok("[MKT.SCRIPTS.90] the shipped source is not run there", !clean.out.includes(".ts"), clean.out);
+
+    const crashing = proof(cache({ ...installed, "spn-devex/9.9.9/dist/events/stop.mjs": 'throw new Error("a hook that needs the book");\n' }));
+    ok("[MKT.SCRIPTS.90] known-bad: a bundled hook that crashes in the fixture fails the proof, by name",
+      crashing.code === 1 && crashing.out.includes("✘ spn-devex dist/events/stop.mjs"), crashing.out);
+    const nothing = proof(join(BASE, "holds", "no", "plugin", "at", "all"));
+    ok("[MKT.SCRIPTS.90] known-bad: a sweep that finds no plugin fails, and never reports that every hook survives",
+      nothing.code === 1 && !nothing.out.includes("every one survives"), nothing.out);
+    const undeclared = proof(cache({ ...installed, "spn-apps/9.9.9/hooks/hooks.json": hooksJson("pretooluse.mjs", "ghost.mjs") }));
+    ok("[MKT.SCRIPTS.90] known-bad: a hook declared with no bundle behind it fails the proof",
+      undeclared.code === 1 && undeclared.out.includes("spn-apps/ghost.mjs — declared, no file"), undeclared.out);
+  } finally {
+    rmSync(BASE, { recursive: true, force: true });
+  }
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — plugin partner` : `\n  all ${total} passed — plugin partner`);

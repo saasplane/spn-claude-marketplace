@@ -18,7 +18,10 @@ export type ToolInput = {
   file_path?: string;
   command?: string;
   content?: string;
+  /** The text an `Edit` replaces, and whether it replaces every occurrence of it. */
+  old_string?: string;
   new_string?: string;
+  replace_all?: boolean;
   path?: string;
   pattern?: string;
   glob?: string;

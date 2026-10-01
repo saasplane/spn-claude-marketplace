@@ -1,11 +1,12 @@
 // `docs cycles` — a workstream's Cycles table, printed from its arcs (05-artifacts.md § `How` ends in
 // Cycles, and the arcs are the state). Each case builds a workstream in a temporary folder, because
 // what the command reads is arcs, and the arcs of a real workstream move every day.
-import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, statSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { arcCell, arcId, arcLabel, cycleOf, cyclesOf, previewsCell, previewsOf, statusLabel, statusWord, tableOf, workstreamFolder }
   from "../../../../../src/scripts/commands/docs/cycles.ts";
+import * as cyclesModule from "../../../../../src/scripts/commands/docs/cycles.ts";
 import { main } from "../../../../../src/scripts/cli.ts";
 import { WORKSTREAMS } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
@@ -48,10 +49,10 @@ put("N1a-a-brief.md", "# Arc 1a — a brief\n\nStatus: **CARRIED → `N98` steps
 put("N3-part.md", "# N3 — part of it\n\nStatus: **PART-LANDED — 2026-09-29.** Half the rows landed.\n");
 // An arc's Previews section: a table of previews and samples, or the one line `None.`.
 const PREVIEWS = "## Previews\n\n| File | Kind | Shows | State |\n| --- | --- | --- | --- |\n" +
-  "| [`layout-preview.html`](../notes/N010/previews/layout-preview.html) | preview | how the page is laid out | under review |\n" +
-  "| [`close_message.md`](../notes/N010/samples/close_message.md) | sample | what the agent says at a close | approved 2026-10-01 |\n" +
-  "| [`first-preview.html`](../notes/N010/previews/first-preview.html) | preview | the first layout | superseded — 2026-09-30, by the second |\n\n" +
-  "## What done means\n\n| File | Kind | State |\n| --- | --- | --- |\n| not-a-preview.md | sample | approved |\n";
+  "| [`layout-preview.html`](../notes/N010/previews/layout-preview.html) | preview | how the page is laid out | proposed |\n" +
+  "| [`close_message.md`](../notes/N010/samples/close_message.md) | sample | what the agent says at a close | decided 2026-10-01 |\n" +
+  "| [`first-preview.html`](../notes/N010/previews/first-preview.html) | preview | the first layout | decided — 2026-09-30, with the second |\n\n" +
+  "## What done means\n\n| File | Kind | State |\n| --- | --- | --- |\n| not-a-preview.md | sample | decided |\n";
 put("arc-legacy.md", "# Arc — a legacy arc with no number\n\nStatus: **OPEN** · Prepared: 2026-08-31\n");
 
 try {
@@ -100,19 +101,19 @@ try {
     ok("the file name keeps every character of the link's target", listed[1].name === "close_message.md", listed[1].name);
     ok("the kind is the row's own", listed.map((preview) => preview.kind).join(",") === "preview,sample,preview");
     ok("the state is the words before any date",
-      listed.map((preview) => preview.state).join(",") === "under review,approved,superseded", listed.map((preview) => preview.state).join(","));
+      listed.map((preview) => preview.state).join(",") === "proposed,decided,decided", listed.map((preview) => preview.state).join(","));
     ok("a section reading None. has no entries", previewsOf("# N2\n\n## Previews\n\nNone.\n\n## Steps\n").length === 0);
-    ok("an arc with no Previews section has no entries", previewsOf("# N2\n\n## Steps\n\n| File | Kind | State |\n| --- | --- | --- |\n| a.md | sample | approved |\n").length === 0);
-    const unlinked = previewsOf("## Previews\n\n| File | Kind | Shows | State |\n| --- | --- | --- | --- |\n| `plan.md` | sample | the plan | under review |\n");
+    ok("an arc with no Previews section has no entries", previewsOf("# N2\n\n## Steps\n\n| File | Kind | State |\n| --- | --- | --- |\n| a.md | sample | decided |\n").length === 0);
+    const unlinked = previewsOf("## Previews\n\n| File | Kind | Shows | State |\n| --- | --- | --- | --- |\n| `plan.md` | sample | the plan | proposed |\n");
     ok("a File cell with no link is named and links nothing", unlinked[0].name === "plan.md" && unlinked[0].href === null, JSON.stringify(unlinked));
 
     const none = cycleOf(join(arcs, "N2-the-check.md"), "# N2 — the check\n\nStatus: **DECIDED**\n\n## Previews\n\nNone.\n");
     ok("the Previews cell of an arc with none is a dash", previewsCell(none) === "&mdash;", previewsCell(none));
     const held = cycleOf(join(arcs, "N010-the-release.md"), `# N010 — the release\n\nStatus: **RUNNING**\n\n${PREVIEWS}`);
     ok("the Previews cell lists each file as a link, its kind and its state, one per line",
-      previewsCell(held) === `<a href="notes/N010/previews/layout-preview.html">layout-preview.html</a> &middot; preview &middot; under review<br>` +
-        `<a href="notes/N010/samples/close_message.md">close_message.md</a> &middot; sample &middot; approved<br>` +
-        `<a href="notes/N010/previews/first-preview.html">first-preview.html</a> &middot; preview &middot; superseded`, previewsCell(held));
+      previewsCell(held) === `<a href="notes/N010/previews/layout-preview.html">layout-preview.html</a> &middot; preview &middot; proposed<br>` +
+        `<a href="notes/N010/samples/close_message.md">close_message.md</a> &middot; sample &middot; decided<br>` +
+        `<a href="notes/N010/previews/first-preview.html">first-preview.html</a> &middot; preview &middot; decided`, previewsCell(held));
     ok("the Arc cell is the label in bold, then the arc's file as a link from the page",
       arcCell(held) === `<strong>N010 &mdash; the release</strong><br><a class="s" href="arcs/N010-the-release.md">arcs/N010-the-release.md</a>`, arcCell(held));
   }
@@ -163,6 +164,167 @@ try {
     mkdirSync(join(empty, "arcs"), { recursive: true });
     const none = await capture(["docs", "cycles", empty]);
     ok("a workstream with no arcs exits 1", none.code === 1 && none.err.includes("has no arcs"), none.err);
+  }
+
+  console.log("\n=== docs cycles — a Previews row that links nothing is printed as a `!` line");
+  {
+    const home = join(TMP, ".spndevex", WORKSTREAMS, "open", "044-unlinked");
+    mkdirSync(join(home, "arcs"), { recursive: true });
+    const head = "# N999 — the layout\n\nStatus: **RUNNING — 2026-10-01.** It lays the page out.\n\n## Previews\n\n| File | Kind | State |\n| --- | --- | --- |\n";
+    // KNOWN-BAD: the File cell names its file in backticks and links nothing.
+    writeFileSync(join(home, "arcs", "N999-the-layout.md"), head + "| `notes/N999/previews/a-preview.html` | preview | proposed 2026-10-01 |\n");
+    const bad = await capture(["docs", "cycles", home]);
+    ok("[MKT.SCRIPTS.80] the unlinked row is named on stderr, with the link form",
+      bad.code === 0 && bad.err.includes("! N999-the-layout.md") && bad.err.includes("[`a-preview.html`](../notes/N999/previews/a-preview.html)"), bad.err);
+    // UNTOUCHED: the same row written as a markdown link.
+    writeFileSync(join(home, "arcs", "N999-the-layout.md"), head + "| [`a-preview.html`](../notes/N999/previews/a-preview.html) | preview | proposed 2026-10-01 |\n");
+    const good = await capture(["docs", "cycles", home]);
+    ok("[MKT.SCRIPTS.80] a row written as a link prints no `!` line", good.code === 0 && good.err === "", good.err);
+    ok("[MKT.SCRIPTS.80] the link form of a bare file name is written from arcs/",
+      cyclesModule.previewLinkForm(join(home, "arcs", "N999-the-layout.md"), "a-preview.html") === "[`a-preview.html`](../notes/N999/previews/a-preview.html)");
+  }
+
+  console.log("\n=== docs cycles — the header's status follows the arcs");
+  {
+    const header = (word, glyph) => `<div class="eyebrow"><span class="line1">Workstream</span><span class="st"><span class="lbl">Status:</span> ` +
+      `<span class="badge status ${word.toLowerCase()}">${glyph} ${word}</span></span></div>`;
+    const arcAt = (status) => ({ id: "N1", name: "x", does: "", status, detail: "", file: "N1-x.md", previews: [] });
+    const open = join(TMP, ".spndevex", WORKSTREAMS, "open", "045-status");
+    const closed = join(TMP, ".spndevex", WORKSTREAMS, "closed", "046-status");
+    ok("the word a header shows is read from its labelled status field",
+      cyclesModule.headerStatusOf(header("IMPLEMENTING", "&#x1F6A7;")) === "IMPLEMENTING" && cyclesModule.headerStatusOf(`<div class="eyebrow">Workstream 001 &middot; running</div>`) === null);
+    for (const [what, statuses, expected] of [
+      ["PLANNING while no arc is past DECIDED", ["PROPOSED", "DECIDED", null], "PLANNING"],
+      ["IMPLEMENTING once an arc runs", ["DECIDED", "RUNNING"], "IMPLEMENTING"],
+      ["IMPLEMENTING once an arc has landed", ["PROPOSED", "LANDED"], "IMPLEMENTING"],
+      ["IMPLEMENTING while an arc is part-landed", ["PART-LANDED"], "IMPLEMENTING"],
+      ["PLANNING for a workstream with no arc yet", [], "PLANNING"],
+    ]) ok(`[MKT.HOOKS.40] the arcs give ${what}`, cyclesModule.headerStatusFor(open, statuses.map(arcAt)) === expected, cyclesModule.headerStatusFor(open, statuses.map(arcAt)));
+    ok("[MKT.HOOKS.40] a closed workstream gives DONE, whatever its arcs read", cyclesModule.headerStatusFor(closed, [arcAt("RUNNING")]) === "DONE");
+
+    const stale = cyclesModule.headerStatusRule(open, header("PLANNING", "&#x1F52E;"), [arcAt("RUNNING")]);
+    ok("[MKT.HOOKS.40] known-bad: PLANNING over a running arc names the word shown and the word the arcs give",
+      stale?.shows === "PLANNING" && stale?.gives === "IMPLEMENTING", JSON.stringify(stale));
+    ok("[MKT.HOOKS.40] IMPLEMENTING over a running arc agrees", cyclesModule.headerStatusRule(open, header("IMPLEMENTING", "&#x1F6A7;"), [arcAt("RUNNING")]) === null);
+    ok("[MKT.HOOKS.40] a closed page reading DONE agrees", cyclesModule.headerStatusRule(closed, header("DONE", "&#x2705;"), [arcAt("LANDED")]) === null);
+    ok("[MKT.HOOKS.40] a header that labels no status is not judged",
+      cyclesModule.headerStatusRule(open, `<div class="eyebrow">Workstream 001 &middot; running</div>`, [arcAt("RUNNING")]) === null);
+    ok("[MKT.HOOKS.40] DONE in open/ agrees once every arc is terminal, which is the stamp the close asks for first",
+      cyclesModule.headerStatusRule(open, header("DONE", "&#x2705;"), [arcAt("LANDED"), arcAt("DROPPED")]) === null);
+    ok("[MKT.HOOKS.40] known-bad: DONE in open/ while an arc still runs",
+      cyclesModule.headerStatusRule(open, header("DONE", "&#x2705;"), [arcAt("LANDED"), arcAt("RUNNING")])?.gives === "IMPLEMENTING");
+  }
+
+  console.log("\n=== docs cycles --write — the parts of a page that the arcs decide");
+  {
+    const { cyclesRule, headerRule, openHeadingRule } = await import("../../../../../src/scripts/checks/doc-check.ts");
+    const count = (text, piece) => text.split(piece).length - 1;
+    const CARD = (number) => `  <div class="open">\n    <h4 id="q${number}">Q${number} &middot; a question</h4>\n    <div class="rec"><b>Recommended: A.</b> <b>Decision:</b> &mdash;</div>\n  </div>`;
+    const PAGE = ({ status = "PLANNING", glyph = "&#x1F52E;", cyclesBody, open = "Open &mdash; no card is open", cards = "" }) => `<!doctype html>
+<header class="masthead">
+  <div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Workstream &nbsp;|&nbsp; 050 - Write</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Approach</span><span class="st"><span class="lbl">Status:</span> <span class="badge status ${status.toLowerCase()}">${glyph} ${status}</span></span></span></div>
+  <h1>A subject</h1>
+</header>
+<section id="s2"><div class="sec-head"><h2>What &mdash; the shape</h2></div>
+  <div class="scroll"><table><thead><tr><th>Part</th><th>Says</th></tr></thead><tbody><tr><td>one</td><td>a table that is not Cycles</td></tr></tbody></table></div>
+</section>
+<section id="s3"><div class="sec-head"><h2>How &mdash; the order</h2></div>
+  <h3 id="h1">spn-foundation &mdash; the chapter</h3>
+  <p>The chapter first.</p>
+${cyclesBody}
+</section>
+<section id="s4"><div class="sec-head"><h2>${open}</h2></div>
+${cards}
+</section>
+<section id="s5"><div class="sec-head"><h2>Deferred &mdash; parked</h2></div></section>
+`;
+    const CYCLES_H3 = `  <h3 id="h9">Cycles &mdash; the arcs, in the order they run</h3>\n`;
+    const OLD_TABLE = `  <div class="scroll"><table><thead><tr><th>Arc</th><th>What it does</th><th>Status</th><th>Previews</th></tr></thead>\n` +
+      `  <tbody><tr><td><strong>N1 &mdash; the chapter</strong><br><a class="s" href="arcs/N1-the-chapter.md">arcs/N1-the-chapter.md</a></td><td>The chapter says where the model sits.</td><td>PROPOSED</td><td>&mdash;</td></tr></tbody></table></div>`;
+    const build = (state, name, page) => {
+      const home = join(TMP, ".spndevex", WORKSTREAMS, state, name);
+      mkdirSync(join(home, "arcs"), { recursive: true });
+      writeFileSync(join(home, "arcs", "N1-the-chapter.md"), "# N1 — the chapter\n\nStatus: **RUNNING — 2026-10-01.** The chapter says where the model sits.\n");
+      writeFileSync(join(home, "arcs", "N2-the-check.md"), "# N2 — the check\n\nStatus: **DECIDED — 2026-10-01.** A check reads the new shape.\n");
+      if (page !== null) writeFileSync(join(home, "approach.html"), page);
+      return home;
+    };
+    const stamp = (file) => { const past = (Date.now() - 3_600_000) / 1000; utimesSync(file, past, past); return statSync(file).mtimeMs; };
+
+    // KNOWN-BAD: an old table, the wrong status and the wrong heading of Open, with one card open.
+    const home = build("open", "050-write", PAGE({ cyclesBody: CYCLES_H3 + OLD_TABLE, cards: CARD(3) }));
+    const page = join(home, "approach.html");
+    const before = readFileSync(page, "utf8");
+    ok("known-bad: the page is stale by all three rules before the command runs",
+      cyclesRule(page, before).length > 0 && headerRule(page, before).length > 0 && openHeadingRule(page, before).length > 0);
+    const wrote = await capture(["docs", "cycles", "050-write", "--write"], { SPN_WORKSPACE: TMP });
+    const after = readFileSync(page, "utf8");
+    ok("[MKT.SCRIPTS.79] --write exits 0 and says which parts it wrote",
+      wrote.code === 0 && /the header's status/.test(wrote.out) && /the Cycles table/.test(wrote.out) && /the heading of Open/.test(wrote.out), `${wrote.code} ${wrote.out} ${wrote.err}`);
+    ok("[MKT.SCRIPTS.79] after it, the Cycles table is the arcs'", cyclesRule(page, after).length === 0, JSON.stringify(cyclesRule(page, after)));
+    ok("[MKT.SCRIPTS.79] the header's status is written with its class, its glyph and its word",
+      after.includes(`<span class="badge status implementing">&#x1F6A7; IMPLEMENTING</span>`) && headerRule(page, after).length === 0);
+    ok("[MKT.SCRIPTS.79] the heading of Open names each open card by its number",
+      after.includes("<h2>Open &mdash; Q3</h2>") && openHeadingRule(page, after).length === 0);
+    ok("[MKT.SCRIPTS.79] one table, one badge and one heading are replaced, each exactly once",
+      count(after, "<table") === count(before, "<table") && count(after, "badge status") === 1 && count(after, "<h2") === count(before, "<h2") &&
+      count(after, "<th>Arc</th>") === 1 && after.includes("a table that is not Cycles") && after.includes("<h2>Deferred &mdash; parked</h2>"));
+    ok("[MKT.SCRIPTS.79] it adds no generated marker to the page", !after.includes("spn:generated"));
+    const writtenAt = stamp(page);
+    const again = await capture(["docs", "cycles", "050-write", "--write"], { SPN_WORKSPACE: TMP });
+    ok("[MKT.SCRIPTS.79] a second --write changes no byte, and the file's time does not move",
+      again.code === 0 && readFileSync(page, "utf8") === after && statSync(page).mtimeMs === writtenAt && /current/.test(again.out), again.out);
+
+    // UNTOUCHED: a page that is already current, with its rows in the order a person chose.
+    const current = after.replace(/(<tbody>\n)(\s*<tr>[^\n]*\n)(\s*<tr>[^\n]*\n)/, "$1$3$2");
+    ok("the fixture really holds the same rows in another order", current !== after && cyclesRule(page, current).length === 0);
+    writeFileSync(page, current);
+    const currentAt = stamp(page);
+    const untouched = await capture(["docs", "cycles", page, "--write"]);
+    ok("[MKT.SCRIPTS.79] a page that is already current is not written",
+      untouched.code === 0 && readFileSync(page, "utf8") === current && statSync(page).mtimeMs === currentAt, untouched.out);
+
+    // With no card open the heading has one form.
+    const quiet = build("open", "051-quiet", PAGE({ status: "IMPLEMENTING", glyph: "&#x1F6A7;", cyclesBody: CYCLES_H3 + OLD_TABLE, open: "Open &mdash; Q9 &middot; Q10" }));
+    await capture(["docs", "cycles", quiet, "--write"]);
+    ok("[MKT.SCRIPTS.79] with no card open the heading reads `Open — no card is open`",
+      readFileSync(join(quiet, "approach.html"), "utf8").includes("<h2>Open &mdash; no card is open</h2>"));
+
+    // The rows keep the order the page lists them in: N2 first here, and its stale status is what is written.
+    const N2_FIRST = OLD_TABLE.replace("<tbody><tr>", `<tbody><tr><td><strong>N2 &mdash; the check</strong><br><a class="s" href="arcs/N2-the-check.md">arcs/N2-the-check.md</a></td>` +
+      `<td>A check reads the new shape.</td><td>PROPOSED</td><td>&mdash;</td></tr>\n  <tr>`);
+    const ordered = build("open", "056-ordered", PAGE({ status: "IMPLEMENTING", glyph: "&#x1F6A7;", cyclesBody: CYCLES_H3 + N2_FIRST }));
+    await capture(["docs", "cycles", ordered, "--write"]);
+    const orderedText = readFileSync(join(ordered, "approach.html"), "utf8");
+    ok("[MKT.SCRIPTS.79] the rows keep the order the page lists them in",
+      cyclesRule(join(ordered, "approach.html"), orderedText).length === 0 && orderedText.indexOf("<strong>N2 &mdash;") < orderedText.indexOf("<strong>N1 &mdash;") &&
+      orderedText.indexOf("<strong>N2 &mdash;") > 0, orderedText.slice(orderedText.indexOf("<tbody>"), orderedText.indexOf("</tbody>")));
+
+    // UNTOUCHED: a page in closed/ keeps the table it closed with.
+    const closed = build("closed", "052-closed", PAGE({ cyclesBody: CYCLES_H3 + OLD_TABLE }));
+    const closedText = readFileSync(join(closed, "approach.html"), "utf8");
+    const closedAt = stamp(join(closed, "approach.html"));
+    const kept = await capture(["docs", "cycles", closed, "--write"]);
+    ok("[MKT.SCRIPTS.79] a page in closed/ is not written",
+      kept.code === 0 && readFileSync(join(closed, "approach.html"), "utf8") === closedText && statSync(join(closed, "approach.html")).mtimeMs === closedAt, `${kept.code} ${kept.out}`);
+
+    // UNTOUCHED: a page with no h3 named Cycles is refused, and nothing is written.
+    const shapeless = build("open", "053-shapeless", PAGE({ cyclesBody: `  <h3 id="h9">What re-aligns</h3>\n` + OLD_TABLE }));
+    const shapelessText = readFileSync(join(shapeless, "approach.html"), "utf8");
+    const refused = await capture(["docs", "cycles", shapeless, "--write"]);
+    ok("[MKT.SCRIPTS.79] a page with no h3 named Cycles exits 1 with a message and no write",
+      refused.code === 1 && /Cycles/.test(refused.err) && readFileSync(join(shapeless, "approach.html"), "utf8") === shapelessText, `${refused.code} ${refused.err}`);
+
+    const pageless = build("open", "054-pageless", null);
+    const noPage = await capture(["docs", "cycles", pageless, "--write"]);
+    ok("[MKT.SCRIPTS.79] a workstream with no page exits 1", noPage.code === 1 && /no approach page/.test(noPage.err), `${noPage.code} ${noPage.err}`);
+
+    // Without the option nothing is written, as before.
+    const printed = build("open", "055-printed", PAGE({ cyclesBody: CYCLES_H3 + OLD_TABLE }));
+    const printedText = readFileSync(join(printed, "approach.html"), "utf8");
+    const plain = await capture(["docs", "cycles", printed]);
+    ok("[MKT.SCRIPTS.79] with no option the command prints the table and writes no file",
+      plain.code === 0 && plain.out.includes("<th>Arc</th>") && readFileSync(join(printed, "approach.html"), "utf8") === printedText);
   }
 } finally {
   rmSync(TMP, { recursive: true, force: true });

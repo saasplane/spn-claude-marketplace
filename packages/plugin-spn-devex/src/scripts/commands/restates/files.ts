@@ -6,14 +6,17 @@
 // reach them.
 //
 //     spn-devex restates files <book>            check: is every copy current?  (exit 1 if not)
-//     spn-devex restates files <book> --write     copy the book's templates over
+//     spn-devex restates files <book> --write     copy the book's templates over, and remove a copy the book no longer holds
+//
+// THE COPY FOLLOWS THE BOOK BOTH WAYS. A template the book deleted is a copy somebody still copies
+// from, so the check reports it as drift and `--write` removes it.
 //
 // THE COPY IS BYTE-IDENTICAL AND THAT IS DELIBERATE. Nothing is stamped INSIDE a template, because
 // these are five file types and a header in each would be four comment syntaxes and four ways to
 // corrupt a file somebody copies verbatim. The stamps live in one `README.md` beside them, which
 // `restates check` already knows how to read.
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, rmSync, statSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 
 import { seenHash, treeHash } from "../../lib/restates.ts";
@@ -26,24 +29,37 @@ const PLUGIN = resolve(HERE, "..", "..", "..");
 // folder, so a drift check reads one directory rather than two — the citation and the thing cited
 // are siblings (RD.DEVEX.AGENT.072).
 const OUT = join(PLUGIN, PLUGIN_TEMPLATES);
-const INDEX = join(OUT, "README.md");
+/** The copy's own index, which the book does not hold. */
+const COPY_INDEX = "README.md";
 /** The book's own generated index, beside the templates it lists. */
 const BOOK_INDEX = "index.md";
 
-/** Every file under the book's templates folder, as `<group>/<name>`. */
-function templatesOf(book: string): string[] {
-  const root = join(book, BOOK_TEMPLATES);
+/** Every file under a folder, as `<group>/<name>`. */
+function filesUnder(root: string): string[] {
   if (!existsSync(root)) return [];
   const out: string[] = [];
   const walk = (dir: string): void => {
     for (const entry of readdirSync(dir).sort()) {
       const full = join(dir, entry);
       if (statSync(full).isDirectory()) walk(full);
-      else out.push(relative(root, full));
+      else out.push(relative(root, full).split("\\").join("/"));
     }
   };
   walk(root);
   return out;
+}
+
+/** Every file under the book's templates folder, as `<group>/<name>`. */
+const templatesOf = (book: string): string[] => filesUnder(join(book, BOOK_TEMPLATES));
+
+/** Removes each folder under `root` that holds nothing, deepest first. `root` itself stays. */
+function removeEmptyFolders(root: string): void {
+  for (const entry of readdirSync(root)) {
+    const full = join(root, entry);
+    if (!statSync(full).isDirectory()) continue;
+    removeEmptyFolders(full);
+    if (readdirSync(full).length === 0) rmSync(full, { recursive: true });
+  }
 }
 
 /** The BOOK's own index of its templates — a file, so an ordinary citation can watch it. */
@@ -128,17 +144,21 @@ function renderIndex(book: string, names: string[]): string {
 
 export const describe = "the `files`-kind restatement — copy the book's templates into this plugin's refs";
 
-export function run(args: string[]): number {
-  const book = args.find((a) => !a.startsWith("--")) ? resolve(args.find((a) => !a.startsWith("--"))!) : "";
-  const write = args.includes("--write");
-
+/**
+ * The export, or its check, over one book and one copy folder.
+ *
+ * `out` is the folder the copies sit in, and `say` receives each line of the report. The command
+ * passes this plugin's own templates folder; a case passes folders of its own.
+ */
+export function exportTemplates(book: string, out: string, write: boolean, say: (line: string) => void = console.log): number {
   if (!book || !existsSync(join(book, BOOK_TEMPLATES))) {
     // A PARTNER RUNS THIS AND NOTHING HAPPENS, which is correct. They hold the plugin and not the
     // book, so there is nothing to export from — the copies they already have are the answer.
-    console.log("no foundation book here — nothing to export, and the shipped copies stand");
+    say("no foundation book here — nothing to export, and the shipped copies stand");
     return 0;
   }
 
+  const index = join(out, COPY_INDEX);
   const names = templatesOf(book).filter((name) => name !== BOOK_INDEX);
   // The book's index is written FIRST, because it is one of the files the copy carries.
   const bookIndex = renderBookIndex(book, names);
@@ -148,7 +168,7 @@ export function run(args: string[]): number {
   const stale: string[] = [];
   for (const name of names) {
     const from = join(book, BOOK_TEMPLATES, name);
-    const to = join(OUT, name);
+    const to = join(out, name);
     const source = readFileSync(from);
     const current = existsSync(to) ? readFileSync(to) : null;
     if (current !== null && current.equals(source)) continue;
@@ -159,26 +179,44 @@ export function run(args: string[]): number {
     }
   }
 
-  const index = renderIndex(book, names);
-  const indexStale = !existsSync(INDEX) || readFileSync(INDEX, "utf8") !== index;
+  // A COPY THE BOOK NO LONGER HOLDS. Every file in the copy folder is the book's, except the copy's
+  // own index, so a file the book does not name is one the book deleted or renamed.
+  const held = new Set(names);
+  const extra = filesUnder(out).filter((name) => name !== COPY_INDEX && !held.has(name));
+  if (write) {
+    for (const name of extra) rmSync(join(out, name), { force: true });
+    if (extra.length > 0) removeEmptyFolders(out);
+  }
+
+  const copyIndex = renderIndex(book, names);
+  const indexStale = !existsSync(index) || readFileSync(index, "utf8") !== copyIndex;
   if (indexStale && write) {
-    mkdirSync(OUT, { recursive: true });
-    writeFileSync(INDEX, index);
+    mkdirSync(out, { recursive: true });
+    writeFileSync(index, copyIndex);
   }
 
   if (write) {
-    console.log(`${names.length} template(s) exported · ${stale.length} rewritten · index ${indexStale ? "rewritten" : "current"}`);
+    say(`${names.length} template(s) exported · ${stale.length} rewritten · ${extra.length} removed · index ${indexStale ? "rewritten" : "current"}`);
     return 0;
   }
 
-  if (!stale.length && !indexStale && !bookIndexStale) {
-    console.log(`${names.length} template(s) · every copy current`);
+  if (!stale.length && !extra.length && !indexStale && !bookIndexStale) {
+    say(`${names.length} template(s) · every copy current`);
     return 0;
   }
-  console.log(`${stale.length} template(s) behind the book${indexStale ? ", and the index too" : ""}:`);
-  for (const name of stale) console.log(`  ${name}`);
-  console.log("  run `templates-export.ts <book> --write`");
+  say(`${stale.length} template(s) behind the book${indexStale ? ", and the index too" : ""}:`);
+  for (const name of stale) say(`  ${name}`);
+  if (extra.length > 0) {
+    say(`${extra.length} cop${extra.length === 1 ? "y" : "ies"} the book no longer holds:`);
+    for (const name of extra) say(`  ${name}`);
+  }
+  say("  run `spn-devex restates files <book> --write`");
   return 1;
+}
+
+export function run(args: string[]): number {
+  const named = args.find((a) => !a.startsWith("--"));
+  return exportTemplates(named === undefined ? "" : resolve(named), OUT, args.includes("--write"));
 }
 
 if (process.argv[1] && new URL(import.meta.url).pathname === process.argv[1])

@@ -10,6 +10,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
 import { ARTIFACT, POCKET, SEAT, WORKSTREAMS, bookTemplatesDir } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { ENUM_HEAD, checkCodeFigures, checkTreeFigures } from "../../../../../src/scripts/commands/docs/_lib.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
 const BASE = mkdtempSync(join(tmpdir(), "t-docs-audit-"));
@@ -667,6 +668,47 @@ console.log("=== a closed value is declared once, and agrees with what realizes 
   }
 
   {
+    // AN ENUM WHOSE COMMENT HOLDS A BRACE IS READ WHOLE. A body that stops at the first brace reads
+    // no such declaration at all, and then nothing is compared.
+    const BRACED = "export enum SPRungType {\n  /** alone, see {@link SPOther} */\n  UNIT = 'UNIT',\n  WIRED = 'WIRED',\n}\n";
+    one("[MKT.SCRIPTS.86] an enum whose comment holds a brace matches as one declaration",
+      [...BRACED.matchAll(ENUM_HEAD)].length, 1);
+    const root = repo({
+      "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
+      "packages/thing-ts/src/rungs.ts": BRACED,
+      [`docs/${SEAT.constructs}/01-core/rungs.md`]: chapter("Rungs", "rungs",
+        "```ts\nexport enum SPRungType {\n  UNIT = 'UNIT',      // alone\n  WIRED = 'WIRED',    // against the real thing\n  BROWSED = 'BROWSED',// in a real browser\n}\n```"),
+    });
+    one("[MKT.SCRIPTS.86] known-bad: the code's enum with a brace in its comment is still compared with the book",
+      run(root, ["audit", `docs/${SEAT.constructs}/01-core/rungs.md`]), has("names BROWSED"));
+  }
+
+  {
+    // A TERM THAT ENDS IN `Type` AND IS NOT AN ENUM. `EntityType` is a row shape, which the source
+    // declares as an interface, so no chapter owes it a list of members.
+    const terms = (title, id, term) =>
+      doc({ id: id, parentId: "concept", title: title, variant: "construct", lenses: ["ARCHITECT"], status: "PLANNING", dependsOn: [] },
+        `## Overview\n\nWhy it exists.\n\n## Terms\n\n| Term | Contract term | What it means |\n| --- | --- | --- |\n| Entity type | \`${term}\` | one kind of record |\n\n## Model\n\nThe model.\n\n## Parts\n\nNo declaration here.\n\n## Boundary\n\nIt stops here.\n`,
+        "`For: Architect` · `Status: 🔮 PLANNING`");
+    const files = (source) => ({
+      "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
+      ...(source === null ? {} : { "packages/thing-ts/src/entity.ts": source }),
+      [`docs/${SEAT.constructs}/01-core/entity.md`]: terms("Entity", "entity", "EntityType"),
+      [`docs/${SEAT.constructs}/01-core/other.md`]: terms("Other", "other", "EntityType"),
+    });
+    const both = [`docs/${SEAT.constructs}/01-core/entity.md`, `docs/${SEAT.constructs}/01-core/other.md`];
+    one("[MKT.SCRIPTS.86] a `…Type` term the source declares as an interface is not reported as an enum with no members",
+      run(repo(files("export interface EntityType extends EntityTypeInfo {\n  id: string;\n}\n")), ["audit", ...both]), lacks("no chapter declares"));
+    one("[MKT.SCRIPTS.86] nor is one the source declares as a type alias",
+      run(repo(files("export type EntityType = { id: string };\n")), ["audit", ...both]), lacks("no chapter declares"));
+    one("[MKT.SCRIPTS.86] known-bad: a `…Type` term the source declares as an enum, and no chapter declares, is still reported",
+      run(repo(files("export enum EntityType {\n  PERSON = 'PERSON',\n}\n")), ["audit", ...both]),
+      has("`EntityType` is named as a contract term and no chapter declares"));
+    one("[MKT.SCRIPTS.86] known-bad: so is one that no source declares at all, because the book may lead the code",
+      run(repo(files(null)), ["audit", ...both]), has("`EntityType` is named as a contract term and no chapter declares"));
+  }
+
+  {
     // One page cannot see the corpus, so it must not accuse another chapter of not existing.
     const root = repo({
       "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
@@ -929,6 +971,10 @@ console.log("\n=== a report is a snapshot: no status, and its header says Genera
     audit(page({ ...good, measuredAt: "2026-09-30T12:44+05:30" })), has("only a `tests` report carries `measuredAt`"));
   one("`measuredAt` on a tests report is its newest run, and passes",
     audit(page({ ...good, reportType: "TESTS", measuredAt: "2026-09-30T12:44+05:30" })), lacks("carries `measuredAt`"));
+  one("[MKT.SCRIPTS.82] a tests report with no stamped run leaves `measuredAt` out, and passes",
+    audit(page({ ...good, reportType: "TESTS" })), lacks("measuredAt"));
+  one("[MKT.SCRIPTS.82] known-bad: `measuredAt` written as `null` is refused, and the finding says to leave the key out",
+    audit(page({ ...good, reportType: "TESTS", measuredAt: null })), has("leave the key out"));
   one("a report carrying only the construct template's scripts is off its own template",
     audit(page(good, { scripts: scriptsOf(constructTemplate) })), has("this page's scripts are not the template's"));
 }
@@ -993,7 +1039,7 @@ console.log("\n=== the masthead: h1, an optional p.subtitle, one p.standfirst, a
 
 // ---------------------------------------------------------------- a preview page
 
-console.log("\n=== a preview page: variant `preview`, its own title, a State chip, and the preview template's furniture");
+console.log("\n=== a preview page: variant `preview`, its own title, a Status chip, and the preview template's furniture");
 {
   // THE REAL TEMPLATE'S STYLES AND SCRIPTS, so a clean case is clean against what the book ships.
   const templates = bookTemplatesDir(resolve(PLUGIN, "..", "..", "..", "spn-foundation"));
@@ -1005,8 +1051,8 @@ console.log("\n=== a preview page: variant `preview`, its own title, a State chi
   const at = `${notes}/previews/layout-preview.html`;
   const good = { id: "ws-001-a-layout", variant: "preview", title: "Layout", lenses: ["ARCHITECT"], status: "PLANNING",
     summary: "This page shows the layout.", keywords: ["preview"] };
-  const state = (word) => `<span class="st"><span class="lbl">State:</span> <span class="badge status review">${word}</span></span>`;
-  const page = (o, { chip = state("UNDER REVIEW"), named = o.title, heading = o.title, styles = stylesOf(previewTemplate),
+  const state = (word) => `<span class="st"><span class="lbl">Status:</span> <span class="badge status ${word.toLowerCase()}">${word}</span></span>`;
+  const page = (o, { chip = state("PROPOSED"), named = o.title, heading = o.title, styles = stylesOf(previewTemplate),
                      scripts = scriptsOf(previewTemplate) } = {}) =>
     block(o) + `${styles}\n<nav class="rail" id="rail"></nav>\n<header class="masthead">\n` +
     `<div class="eyebrow"><span class="line1">SaaS Plane &nbsp;|&nbsp; Workstream 001 &nbsp;|&nbsp; ${named}</span>` +
@@ -1023,13 +1069,17 @@ console.log("\n=== a preview page: variant `preview`, its own title, a State chi
 
   one("a preview written from the template is clean, with no For chips and a block status the chip does not repeat",
     audit({ [at]: page(good) }), has("clean — 1 page"));
-  for (const word of ["APPROVED", "SUPERSEDED"])
-    one(`a State chip reading ${word} is not compared with the block's PLANNING`,
-      audit({ [at]: page(good, { chip: state(word) }) }), has("clean — 1 page"));
-  one("known-bad: a State chip carrying a status word is refused",
-    audit({ [at]: page(good, { chip: state("&#x1F52E; PLANNING") }) }), has("the State chip reads"));
-  one("known-bad: a preview with no State chip is refused",
-    audit({ [at]: page(good, { chip: "" }) }), has("no State chip"));
+  one("a Status chip reading DECIDED is not compared with the block's PLANNING",
+    audit({ [at]: page(good, { chip: state("DECIDED") }) }), has("clean — 1 page"));
+  for (const word of ["UNDER REVIEW", "APPROVED", "SUPERSEDED"])
+    one(`known-bad: a Status chip reading ${word} is refused, because a preview is PROPOSED or DECIDED`,
+      audit({ [at]: page(good, { chip: `<span class="st"><span class="lbl">Status:</span> <span class="badge status proposed">${word}</span></span>` }) }),
+      has(`the Status chip reads \`${word}\`; a preview shows PROPOSED · DECIDED`));
+  one("known-bad: a Status chip carrying a page's status word is refused",
+    audit({ [at]: page(good, { chip: `<span class="st"><span class="lbl">Status:</span> <span class="badge status proposed">&#x1F52E; PLANNING</span></span>` }) }),
+    has("the Status chip reads"));
+  one("known-bad: a preview with no Status chip is refused",
+    audit({ [at]: page(good, { chip: "" }) }), has("no Status chip — a preview shows PROPOSED · DECIDED"));
   one("known-bad: a header line whose third part is not the preview's title is refused",
     audit({ [at]: page(good, { named: "001 - A" }) }), has("the header title `001 - A` is not the block's `Layout`"));
   one("known-bad: an `<h1>` that is not the preview's title is refused",
@@ -1076,6 +1126,60 @@ console.log("\n=== a preview page: variant `preview`, its own title, a State chi
     audit({ [at]: page(good), [`${notes}/samples/broken-preview.html`]: broken, [`${notes}/samples/close-message.md`]: "Closing.\n",
             [`${notes}/samples/approach-preview-template.html`]: previewTemplate }, notes),
     has("clean — 1 page"));
+}
+
+// ---------------------------------------------------------------- the status check, inside the audit
+
+console.log("\n=== the audit runs the status check on each construct it reads, and writes nothing");
+{
+  const seat = `docs/${SEAT.constructs}/01-core/rungs.md`;
+  const rows = (status) => ["# Behaviors — Rungs", "", "| Id | Who | Does | Sees | Type | Tier | Status | Updated at |", "| --- | --- | --- | --- | --- | --- | --- | --- |",
+    `| COR.RUNG.01 | Architect | reads a rung | the rung | POSITIVE | UNIT | ${status} | — |`, ""].join("\n");
+  const construct = (status, glyph) =>
+    doc({ id: "rungs", parentId: "concept", title: "Rungs", variant: "construct", lenses: ["ARCHITECT"], status: status, dependsOn: [] },
+      "## Overview\n\nWhy it exists.\n\n## Terms\n\n| Term | Contract term | What it means |\n| --- | --- | --- |\n| Rung | — | how much is real |\n\n## Model\n\nThe model.\n\n## Parts\n\nThe parts.\n\n## Boundary\n\nIt stops here.\n",
+      `\`For: Architect\` · \`Status: ${glyph} ${status}\``);
+  const tree = (status, glyph, rowStatus) => repo({
+    "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
+    [seat]: construct(status, glyph),
+    [`docs/${SEAT.behaviors}/01-core/rungs.md`]: rows(rowStatus),
+  });
+
+  const behind = tree("PLANNING", "🔮", "SUCCESS");
+  const before = readAt(behind, seat);
+  const got = run(behind, ["audit", seat]);
+  one("[MKT.SCRIPTS.88] known-bad: a status that fell behind its rows is an audit finding",
+    got, (g) => g.includes("RULE status") && g.includes("the block says `PLANNING`") && g.includes("derive `DONE`"));
+  one("[MKT.SCRIPTS.88] and the audit exits non-zero on it, as on any RULE finding", got, has("1 RULE"));
+  one("[MKT.SCRIPTS.88] the audit writes nothing: the seat file's bytes are as they were", readAt(behind, seat) === before, true);
+  one("[MKT.SCRIPTS.88] a status that matches its rows draws no status finding, and no line from the status command",
+    run(tree("DONE", "✅", "SUCCESS"), ["audit", seat]), (g) => !g.includes("status   ") && !/^current /m.test(g) && g.includes("clean — 1 page"));
+}
+
+// ---------------------------------------------------------------- what a figure claims
+
+console.log("\n=== a figure is read for what it claims: a diff is no copy, and a tree's folder is in the paragraph before it");
+{
+  const root = repo({
+    "repo-a/src/cli.ts": "const REAL = \"the line that is in the file\";\n",
+    "repo-a/packages/alpha/x.txt": "x", "repo-a/packages/beta/x.txt": "x",
+    "repo-a/.git/HEAD": "ref: refs/heads/main\n",
+  });
+  const lines = "- const OLD = \"a line that was never in the file at all\";\n+ const NEW = \"a line that is not in the file yet either\";";
+  const figure = (attributes) => `<p>The change to <code>repo-a/src/cli.ts</code></p>\n<pre${attributes}>${lines}</pre>`;
+  const said = (found) => found.map((one) => `${one.check} ${one.message}`).join(" | ");
+  one("[MKT.SCRIPTS.89] a block whose language is `diff` is never compared with the file its caption names",
+    said(checkCodeFigures("p.html", figure(' data-lang="diff"'), root)), "");
+  one("[MKT.SCRIPTS.89] known-bad: the same lines in a plain block are a copied figure that no longer matches",
+    said(checkCodeFigures("p.html", figure(""), root)), has("codefig the figure copied from `repo-a/src/cli.ts` no longer matches"));
+
+  const tree = "<pre>N006/\n├── previews/\n└── orders/</pre>";
+  const earlier = "<p>The code sits in <code>repo-a/packages/</code>.</p>\n<h3>Another subsection</h3>\n<p>Its notes folder looks like this.</p>\n" + tree;
+  one("[MKT.SCRIPTS.93] a folder named in an earlier paragraph is not read as the tree's folder",
+    said(checkTreeFigures("p.html", earlier, root)), "");
+  const direct = "<p>An earlier paragraph.</p>\n<p>The packages sit in <code>repo-a/packages/</code>.</p>\n<pre>packages/\n├── alpha/\n└── ghost/</pre>";
+  one("[MKT.SCRIPTS.93] known-bad: the paragraph directly before a tree names its folder, and a folder that is not there is reported",
+    said(checkTreeFigures("p.html", direct, root)), (g) => g.includes("draws `ghost/`") && g.includes("holds `beta/`"));
 }
 
 console.log(failed ? `\n  ${failed} of ${n} FAILED` : `\n  all ${n} passed`);

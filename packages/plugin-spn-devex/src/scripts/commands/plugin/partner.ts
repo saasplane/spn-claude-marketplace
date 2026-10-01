@@ -14,12 +14,19 @@
 //     spn-devex plugin partner [--keep]     run it; --keep leaves the fixture for inspection
 //
 // Run it after touching any hook, and before any release of the plugins.
+//
+// IT RUNS FROM A CHECKOUT AND FROM AN INSTALLED PLUGIN. A checkout holds each plugin's sources, and
+// the sweep runs them. An installed plugin has no `src/` folder and its shipped sources cannot run
+// there, so the proof runs the bundled hooks and gives the same answer from the install cache.
 
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join, resolve } from "node:path";
 import { isDir, isFile, listdir, read } from "../../lib/payload.ts";
+
+/** One plugin the proof reads: its bare name, the folder that holds its `hooks/`, `scripts/` and `dist/`, and its layout. */
+export type PluginHome = { name: string; root: string; installed: boolean };
 
 const HERE = resolve(import.meta.dirname);
 
@@ -73,31 +80,46 @@ const SCRIPTS: Array<[plugin: string, script: string, args: string[]]> = [
   ["spn-apps", "assertion-message.ts", ["."]],
 ];
 
+/** Version folder names, oldest first, compared part by part as numbers, so `0.10.2` follows `0.9.9`. */
+const byVersion = (left: string, right: string): number => {
+  const parts = (version: string): number[] => version.split(".").map((part) => Number.parseInt(part, 10) || 0);
+  const [one, other] = [parts(left), parts(right)];
+  for (let at = 0; at < Math.max(one.length, other.length); at += 1) {
+    if ((one[at] ?? 0) !== (other[at] ?? 0)) return (one[at] ?? 0) - (other[at] ?? 0);
+  }
+  return 0;
+};
+
 /**
- * Where a plugin's runnable files sit, in either layout this script legitimately runs from, and
- * whichever language the file is in.
+ * Every plugin beside this one, in whichever layout this file runs from.
  *
- * The marketplace repo puts plugins side by side under `packages/`, one folder per plugin, named
- * `plugin-<name>` — a plain name never carries the kind prefix, so both spellings are tried; the
- * installed cache puts a VERSION directory between the plugin and its files, named by the plugin's
- * own `name` field alone. RUNNING FROM THE CACHE IS THE TEST THAT MATTERS MOST, because that is the
- * copy a partner's session actually loads.
+ * `here` is the folder this command's file sits in: `<root>/scripts/commands/plugin` from source,
+ * and `<root>/dist/commands/plugin` bundled. `<root>` is the plugin's own home in both.
+ *
+ * A CHECKOUT names that home `src`, under `packages/plugin-<name>/`. The folder carries the kind
+ * prefix and the plugin's own name never does, so the prefix is removed.
+ *
+ * AN INSTALLED PLUGIN names its home by its version, under `<cache>/<marketplace>/<name>/`. Each
+ * sibling plugin is read at this plugin's own version, because the plugins are released together;
+ * a sibling that has no such version is read at its newest. RUNNING FROM THE CACHE IS THE TEST THAT
+ * MATTERS MOST, because that is the copy a partner's session loads.
  */
-export function pluginRoot(name: string, folder: string): string | null {
-  const family = resolve(HERE, "..", "..", "..", "..", "..");   // holds every plugin folder beside us
-  // A PLUGIN'S CODE SITS UNDER `src/`, and `hooks/` holds only `hooks.json`. Two spellings of the
-  // folder are tried because the checkout names it `plugin-<name>` while a partner's `name` field —
-  // and the installed cache below — never carries that prefix.
-  for (const candidate of [name, `plugin-${name}`]) {
-    const direct = join(family, candidate, "src", folder);
-    if (isDir(direct)) return direct;                 // repo layout
+export function pluginHomes(here: string = HERE): PluginHome[] {
+  const own = resolve(here, "..", "..", "..");
+  const family = resolve(own, "..", "..");
+  const declares = (root: string): boolean => isFile(join(root, "hooks", "hooks.json"));
+  const homes: PluginHome[] = [];
+  for (const folder of isDir(family) ? readdirSync(family).sort() : []) {
+    if (basename(own) === "src") {
+      const root = join(family, folder, "src");
+      if (declares(root)) homes.push({ name: folder.replace(/^plugin-/, ""), root: root, installed: false });
+      continue;
+    }
+    const versions = listdir(join(family, folder)).filter((version) => declares(join(family, folder, version))).sort(byVersion);
+    const version = versions.includes(basename(own)) ? basename(own) : versions[versions.length - 1];
+    if (version !== undefined) homes.push({ name: folder, root: join(family, folder, version), installed: true });
   }
-  const versioned = join(resolve(family, ".."), name);   // cache layout
-  if (isDir(versioned)) {
-    const picks = listdir(versioned).filter((d) => isDir(join(versioned, d, "src", folder))).sort();
-    if (picks.length) return join(versioned, picks[picks.length - 1], "src", folder);
-  }
-  return null;
+  return homes;
 }
 
 /**
@@ -120,12 +142,29 @@ const findIn = (base: string, script: string): string | null => {
 };
 
 /** The file behind a declared script, wherever the plugin keeps it. */
-const scriptPath = (plugin: string, script: string): string | null => {
-  const root = pluginRoot(plugin, ".");
-  return root ? findIn(root, script) : null;
+const scriptPath = (homes: PluginHome[], plugin: string, script: string): string | null => {
+  const home = homes.find((one) => one.name === plugin);
+  return home ? findIn(home.root, script) : null;
 };
 
-const runnerFor = (script: string) => (script.endsWith(".ts") ? process.execPath : "python3");
+const runnerFor = (script: string) => (/\.(ts|mjs)$/.test(script) ? process.execPath : "python3");
+
+/** One run of the sweep: what the report calls it, the file, and its arguments. */
+type HookRun = { label: string; path: string | null; args: string[] };
+
+/**
+ * What the sweep runs. From a checkout it is `SCRIPTS`, each found in its plugin's sources. From an
+ * installed plugin it is every bundled hook each plugin ships, `dist/events/*.mjs`, with no
+ * arguments: the checks and commands of `SCRIPTS` are inside those bundles there.
+ */
+function hookRuns(homes: PluginHome[]): HookRun[] {
+  if (homes.some((home) => !home.installed)) {
+    return SCRIPTS.map(([plugin, script, args]) =>
+      ({ label: `${script} ${args.join(" ")}`.trim(), path: scriptPath(homes, plugin, script), args: args }));
+  }
+  return homes.flatMap((home) => listdir(join(home.root, "dist", "events")).filter((file) => file.endsWith(".mjs")).sort()
+    .map((file) => ({ label: `${home.name} dist/events/${file}`, path: join(home.root, "dist", "events", file), args: [] })));
+}
 
 /**
  * Every script named by a `hooks.json`, as [plugin, script] pairs.
@@ -141,22 +180,14 @@ const runnerFor = (script: string) => (script.endsWith(".ts") ? process.execPath
  */
 export const HOOK_SCRIPT = /\/(?:scripts\/events|dist\/events)\/([A-Za-z0-9_.-]+\.(?:ts|mjs))/g;
 
-export function declared(): Array<[string, string]> {
-  // `family` IS THE FOLDER HOLDING EVERY PLUGIN, BESIDE THIS ONE — `packages/`, the same folder
-  // `pluginRoot` above resolves to. A prior version climbed one `..` short and landed on this
-  // plugin's own folder, so the walk below found no sibling plugin and read as clean having swept
-  // nothing.
-  const family = resolve(HERE, "..", "..", "..", "..", "..");
+export function declared(homes: PluginHome[] = pluginHomes()): Array<[string, string]> {
+  // EVERY PLUGIN BESIDE THIS ONE IS READ, never this plugin alone: a walk that stopped at this
+  // plugin's own folder found no sibling and read as clean having swept nothing. The name is the
+  // plugin's bare one, which `SCRIPTS` above and every report line already say.
   const found = new Set<string>();
-  for (const folder of isDir(family) ? readdirSync(family).sort() : []) {
-    const manifest = join(family, folder, "src", "hooks", "hooks.json");
-    if (!isFile(manifest)) continue;
-    // THE BARE NAME, NEVER THE FOLDER'S OWN — `SCRIPTS` above and every report line already say
-    // `spn-devex`, and a folder is `plugin-spn-devex` only because `02-shape.md` prefixes kind
-    // folders under `packages/`; the plugin's own name never carries that prefix.
-    const plugin = folder.replace(/^plugin-/, "");
-    for (const match of read(manifest).matchAll(HOOK_SCRIPT))
-      found.add(`${plugin} ${match[1]}`);
+  for (const home of homes) {
+    for (const match of read(join(home.root, "hooks", "hooks.json")).matchAll(HOOK_SCRIPT))
+      found.add(`${home.name} ${match[1]}`);
   }
   return [...found].sort().map((entry) => entry.split(" ") as [string, string]);
 }
@@ -174,24 +205,31 @@ function crashed(stderr: string): boolean {
       || /^[A-Za-z]*Error:/m.test(stderr);
 }
 
-export function main(argv: string[]): number {
+export function main(argv: string[], here: string = HERE): number {
   // KEEP THE FIXTURE PATH IN ITS OWN NAME. Reassigning it to each plugin's scripts directory would
   // run inside the plugins rather than the fixture, and the delete below would then remove real
   // scripts.
   const fixture = mkdtempSync(join(tmpdir(), "partner-shape-"));
   for (const [name, text] of Object.entries(FIXTURE)) writeFileSync(join(fixture, name), text, "utf8");
 
+  const homes = pluginHomes(here);
+  const scripts = declared(homes);
   const failed: Array<[string, string]> = [];
-  for (const [plugin, script] of declared()) {
-    if (!scriptPath(plugin, script)) {
+  for (const [plugin, script] of scripts) {
+    if (!scriptPath(homes, plugin, script)) {
       failed.push([`${plugin}/${script}`, "declared by hooks.json and absent from the plugin"]);
       console.log(`  ✘ ${plugin}/${script} — declared, no file`);
     }
   }
 
-  for (const [plugin, script, args] of SCRIPTS) {
-    const path = scriptPath(plugin, script) ?? "";
-    const label = `${script} ${args.join(" ")}`.trim();
+  const runs = hookRuns(homes);
+  // A SWEEP THAT RAN NOTHING PROVES NOTHING. Where no plugin is found beside this file, the proof
+  // fails by name, so an empty sweep is never reported as every hook surviving.
+  if (runs.length === 0) {
+    failed.push(["the sweep", `no hook was found to run from ${here}`]);
+    console.log("  ✘ no hook was found to run");
+  }
+  for (const { label, path, args } of runs) {
     if (!path || !isFile(path)) {
       failed.push([label, "not found"]);
       console.log(`  ✘ ${label}`);
@@ -202,7 +240,7 @@ export function main(argv: string[]): number {
     // harness nobody runs.
     let stderr = "";
     try {
-      execFileSync(runnerFor(script), [path, ...args],
+      execFileSync(runnerFor(path), [path, ...args],
         { cwd: fixture, stdio: ["ignore", "pipe", "pipe"], encoding: "utf8" });
     } catch (error) {
       stderr = String((error as { stderr?: string }).stderr ?? "");
@@ -225,8 +263,8 @@ export function main(argv: string[]): number {
     console.log("  and every script a hooks.json declares ships beside it.");
     return failed.length;
   }
-  console.log(`\n${SCRIPTS.length} hook run(s) — every one survives a repo with no foundation.`);
-  console.log(`${declared().length} declared script(s) — every one present.`);
+  console.log(`\n${runs.length} hook run(s) — every one survives a repo with no foundation.`);
+  console.log(`${scripts.length} declared script(s) — every one present.`);
   return 0;
 }
 

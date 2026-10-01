@@ -10,8 +10,8 @@ import { PLUGIN } from "../../../helpers/harness.mjs";
 import { execFileSync } from "node:child_process";
 import { workspace } from "../../../helpers/fixture.mjs";
 
-import { existsSync } from "node:fs";
-import { resolve } from "node:path";
+import { existsSync, readFileSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 const HOOKS = PLUGIN;
@@ -177,6 +177,56 @@ one("a loose file moved into closed/ is not a scope finishing",
   build("cl-file", [["a", "spn-foundation", "&#x2705; landed"]]),
   `mv notes.md .spndevex/${WORKSTREAMS}/closed/`,
   "silent");
+
+// WHAT THE HOOK AFTER A CALL COST. The entry runs on `PostToolUse` and on `PostToolUseFailure`, and
+// each run writes its whole-run line, `events` › `closed`, while recording is on. The suite runs with
+// `SPN_TELEMETRY=off`, so these cases take that variable out for the hook they spawn.
+{
+  const recording = () => { const copy = { ...process.env }; delete copy.SPN_TELEMETRY; return copy; };
+  const hook = (payload, env) => {
+    try { return execFileSync("node", [`${HOOKS}/src/scripts/events/closed.ts`], { input: JSON.stringify(payload), encoding: "utf8", cwd: payload.cwd, env, stdio: ["pipe", "pipe", "pipe"] }).trim(); }
+    catch (e) { return `ERROR ${String(e.stderr ?? e.message).slice(0, 200)}`; }
+  };
+  const linesOf = (root) => {
+    const log = join(root, ".spndevex", ".debug", "telemetry", "hooks.jsonl");
+    return existsSync(log) ? readFileSync(log, "utf8").trim().split("\n").filter(Boolean).map((line) => JSON.parse(line)) : [];
+  };
+  const wholeRuns = (root) => linesOf(root).filter((line) => line.group === "events" && line.action === "closed").map((line) => line.event);
+  const same = (label, got, expected) => {
+    n += 1;
+    const ok = JSON.stringify(got) === JSON.stringify(expected);
+    if (!ok) failed += 1;
+    console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok ? "" : `\n        got ${JSON.stringify(got)}\n        expected ${JSON.stringify(expected)}`}`);
+  };
+  const files = {
+    ".spndevex/.debug/telemetry.on": "on\n",
+    [`.spndevex/${WORKSTREAMS}/closed/001-a-subject/a-subject-approach.html`]: page([["a", "spn-foundation", "&#x2705; landed"]]),
+  };
+  const move = `mv .spndevex/${WORKSTREAMS}/open/001-a-subject .spndevex/${WORKSTREAMS}/closed/`;
+  const call = (root, event, command) => ({ session_id: "sess-closed", tool_name: "Bash", tool_use_id: "toolu_closed", cwd: root,
+    hook_event_name: event, tool_input: { command }, ...(event === "PostToolUseFailure" ? { error: "Exit code 128" } : { tool_response: {} }) });
+
+  // KNOWN-BAD — a failed call ran the hook and left no line saying what the hook cost.
+  const failedRoot = workspace("n006-cl-failed", files);
+  const said = hook(call(failedRoot, "PostToolUseFailure", move), recording());
+  same("[MKT.HOOKS.42] a failed call writes its `events › closed` line under PostToolUseFailure", wholeRuns(failedRoot), ["PostToolUseFailure"]);
+  same("[MKT.HOOKS.42] the line is a hook's: a time, and no exit code",
+    linesOf(failedRoot).map((line) => [line.script, line.tool, typeof line.ms, line.exit]), [["spn-devex", "Bash", "number", null]]);
+  same("a move that failed closed nothing, so nothing is said", said, "");
+
+  // UNTOUCHED — a call that worked writes the lines it always wrote, and recording off writes none.
+  const workedRoot = workspace("n006-cl-worked", files);
+  const cheer = messageOf(hook(call(workedRoot, "PostToolUse", move), recording()));
+  same("a call that worked still writes its check's line and its whole-run line, under PostToolUse",
+    linesOf(workedRoot).map((line) => `${line.event} ${line.group} › ${line.action}`), ["PostToolUse closed › closed", "PostToolUse events › closed"]);
+  same("and the close is still cheered", /1 row landed/.test(cheer), true);
+  const offRoot = workspace("n006-cl-off", { [`.spndevex/${WORKSTREAMS}/closed/001-a-subject/a-subject-approach.html`]: files[`.spndevex/${WORKSTREAMS}/closed/001-a-subject/a-subject-approach.html`] });
+  hook(call(offRoot, "PostToolUseFailure", move), recording());
+  same("with recording off, a failed call writes no line", linesOf(offRoot), []);
+  const silencedRoot = workspace("n006-cl-silenced", files);
+  hook(call(silencedRoot, "PostToolUseFailure", move), { ...process.env, SPN_TELEMETRY: "off" });
+  same("and none under SPN_TELEMETRY=off, as the suites run", linesOf(silencedRoot), []);
+}
 
 console.log(failed ? `  ${failed} FAILED` : `  all ${n} passed`);
 process.exit(failed ? 1 : 0);

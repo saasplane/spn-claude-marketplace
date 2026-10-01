@@ -42,6 +42,15 @@ import { arcPathPattern } from "../../../../plugin-support-lib/src/lib/docs-tree
 export const STATUSES = ["PROPOSED", "DECIDED", "RUNNING", "HELD", "PART-LANDED", "LANDED", "CARRIED", "DROPPED"] as const;
 export const TERMINAL = new Set(["LANDED", "CARRIED", "DROPPED"]);
 
+/**
+ * Whether a status is past `DECIDED` in the order of the set. A workstream's page reads `PLANNING`
+ * while none of its arcs is, and `IMPLEMENTING` once one is. A word outside the set is past nothing.
+ */
+export function pastDecided(status: string | null): boolean {
+  const order = STATUSES as readonly string[];
+  return status !== null && order.indexOf(status) > order.indexOf("DECIDED");
+}
+
 // Both spellings are read, because the corpus has both and a reader that knows one is the fault this
 // check exists downstream of. `RD.DEVEX.WORKSPACE.058` names `Status: **WORD` as the one to WRITE.
 const STATUS_LINE = /^\*{0,2}Status:?\*{0,2}\s*\*{0,2}\s*([A-Z][A-Z-]*)/m;

@@ -44,7 +44,8 @@ import { basename, dirname, join, resolve, relative, sep } from "node:path";
 import { emit, readPayload, runAlone, unescape, type Payload, type Verdict } from "../lib/payload.ts";
 import { APPROACH_SUFFIX, ARTIFACT, PLUGIN_TEMPLATES, POCKET, decisionsRegister, inArtifacts, isApproachPage, isArcFile,
          isRegister as inRegisters, workstreamDirOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { CYCLES_COLUMNS, arcHref, arcLabel, cyclesOf, previewsCell, statusWord } from "../commands/docs/cycles.ts";
+import { CYCLES_COLUMNS, cyclesOf, headerStatusRule, openHeadingFor, openHeadingOf, previewLinkForm, previewsOf, tableColumns,
+         tableDifferences } from "../commands/docs/cycles.ts";
 
 export type Finding = [severity: string, message: string];
 
@@ -249,7 +250,7 @@ export function workstreamOf(path: string): { folder: string; name: string } | n
 }
 
 /** Whether the approach-page and arc-row rules skip this path because its workstream is 008. */
-function exemptWorkstream(path: string): boolean {
+export function exemptWorkstream(path: string): boolean {
   return EXEMPT_WORKSTREAM.test(workstreamOf(path)?.name ?? "");
 }
 
@@ -269,28 +270,12 @@ function section(text: string, name: string): string | null {
 /** A cell or heading as a person reads it — tags gone, entities resolved, whitespace collapsed. */
 const flat = (html: string): string => unescape(html.replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
 
-/** The key one Cycles row and one arc share: the arc number, or the name where there is none. */
-function cycleKey(label: string): string {
-  const id = /\bN\d+[a-z]?\b/i.exec(label);
-  if (id) return id[0].charAt(0).toUpperCase() + id[0].slice(1);
-  return label.toLowerCase().replace(/^arc\s*[—–:-]\s*/, "").replace(/\s+/g, " ").trim();
-}
-
 const listed = (keys: string[]) => keys.slice(0, 6).join(", ") + (keys.length > 6 ? ` and ${keys.length - 6} more` : "");
 
 // The header of the Cycles table, as a page writes it, and the same header with no Previews column,
 // which a closed workstream keeps.
 const CYCLES_HEADER = CYCLES_COLUMNS.join(" · ");
 const CYCLES_HEADER_NO_PREVIEWS = CYCLES_COLUMNS.slice(0, 3).join(" · ");
-
-/** Every link in a cell, in order: where it points and the text it shows. */
-function anchorsOf(html: string): Array<{ href: string; text: string }> {
-  return [...html.matchAll(/<a\b[^>]*\bhref="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi)]
-    .map((found) => ({ href: unescape(found[1]), text: flat(found[2]) }));
-}
-
-/** A cell with its links taken out, as a person reads the rest. */
-const withoutAnchors = (html: string): string => flat(html.replace(/<a\b[\s\S]*?<\/a>/gi, " "));
 
 /** Whether a path sits in a closed workstream, whose page keeps the table it closed with. */
 function inClosedWorkstream(path: string): boolean {
@@ -304,8 +289,8 @@ function inClosedWorkstream(path: string): boolean {
  * table has one row per arc in `arcs/`, in the order a person chooses, and each row is the arc's own:
  * its name, the link to its file, its line, its status, and the previews and samples its `## Previews`
  * table lists. `spn-devex docs cycles` prints the rows; this compares the page against the same
- * reading. A page in a closed workstream may carry the table with no Previews column, and then only
- * its rows and their statuses are compared.
+ * reading, which is `tableDifferences` in that command's file. A page in a closed workstream may
+ * carry the table with no Previews column, and then only its rows and their statuses are compared.
  */
 export function cyclesRule(path: string, text: string): Finding[] {
   const body = section(text, "How");
@@ -321,8 +306,7 @@ export function cyclesRule(path: string, text: string): Finding[] {
       "subsection (05-artifacts.md § How ends in Cycles)"]];
 
   const table = /<table\b[\s\S]*?<\/table>/i.exec(body.slice(named.index!))?.[0];
-  const header = table ? [...table.matchAll(/<th\b[^>]*>([\s\S]*?)<\/th>/gi)].map((m) => flat(m[1]).toLowerCase()) : [];
-  const columns = header.join(" · ");
+  const columns = table ? tableColumns(table) : "";
   const withPreviews = columns === CYCLES_HEADER.toLowerCase();
   if (!withPreviews && columns !== CYCLES_HEADER_NO_PREVIEWS.toLowerCase())
     return [[CYCLES, `Cycles carries no table with ${CYCLES_HEADER} — one row per arc, from ` +
@@ -335,48 +319,55 @@ export function cyclesRule(path: string, text: string): Finding[] {
       "its arc file and lists that arc's previews and samples (05-artifacts.md § How ends in Cycles) · " +
       "run `spn-devex docs cycles <workstream>` and replace the table with the one it prints"]];
 
-  const arcs = cyclesOf(home.folder);
-  const rows = [...(table!.match(/<tr\b[^>]*>[\s\S]*?<\/tr>/gi) ?? [])]
-    .map((row) => [...row.matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/gi)].map((m) => m[1]))
-    .filter((cells) => cells.length >= 3);
-  const onPage = new Map(rows.map((cells) => [cycleKey(withoutAnchors(cells[0])), cells]));
-  const inArcs = new Map(arcs.map((arc) => [arc.id ?? cycleKey(arc.name), arc]));
-
+  // Rows are matched by arc, never by position: the page lists arcs in the order they run.
+  const { missing, unknown, stale } = tableDifferences(table!, cyclesOf(home.folder), withPreviews);
   const out: Finding[] = [];
-  const missing = [...inArcs.keys()].filter((key) => !onPage.has(key));
   if (missing.length)
     out.push([CYCLES, `Cycles has no row for ${listed(missing)} — every arc in arcs/ is one row ` +
       `(05-artifacts.md § How ends in Cycles) · ${fix}`]);
-  const unknown = [...onPage.keys()].filter((key) => !inArcs.has(key));
   if (unknown.length)
     out.push([CYCLES, `Cycles lists ${listed(unknown)}, and arcs/ holds no such arc — the table is read ` +
       `from the arcs, never typed (05-artifacts.md § How ends in Cycles) · ${fix}`]);
-
-  // Rows are matched by arc, never by position: the page lists arcs in the order they run.
-  const stale: string[] = [];
-  for (const [key, cells] of onPage) {
-    const arc = inArcs.get(key);
-    if (!arc) continue;
-    const status = flat(cells[2]);
-    if (arc.status && statusWord(status) !== arc.status)
-      stale.push(`${key} reads ${statusWord(status) ?? `"${status}"`} and the arc reads ${arc.status}`);
-    if (!withPreviews) continue;
-    if (withoutAnchors(cells[0]) !== arcLabel(arc).replace(/\s+/g, " ").trim())
-      stale.push(`${key} is named "${withoutAnchors(cells[0])}" and the arc is "${arcLabel(arc)}"`);
-    const href = arcHref(arc);
-    if (!anchorsOf(cells[0]).some((anchor) => anchor.href === href && anchor.text === href))
-      stale.push(`${key} does not link its arc file as ${href}`);
-    if (flat(cells[1]) !== arc.does.replace(/\s+/g, " ").trim())
-      stale.push(`${key}'s What it does is not the arc's own line`);
-    const previews = previewsCell(arc);
-    const linked = (html: string) => anchorsOf(html).map((anchor) => anchor.href).join(" ");
-    if (flat(cells[3] ?? "") !== flat(previews) || linked(cells[3] ?? "") !== linked(previews))
-      stale.push(`${key}'s Previews cell is not what the arc's Previews table lists`);
-  }
   if (stale.length)
     out.push([CYCLES, `Cycles disagrees with the arcs: ${listed(stale)} — the arcs are the state ` +
       `(05-artifacts.md § How ends in Cycles) · ${fix}`]);
   return out;
+}
+
+// The command that writes the parts of a page the arcs decide (RD.DEVEX.WORKSPACE.204).
+const WRITES_THE_PAGE = "`spn-devex docs cycles <workstream> --write` writes it from the arcs";
+
+/**
+ * 05-artifacts.md § How ends in Cycles: on a workstream's page the header's status follows the arcs.
+ * It reads `PLANNING` while no arc is past `DECIDED`, `IMPLEMENTING` once an arc runs or has
+ * landed, and `DONE` when the workstream closes. The rule itself is `headerStatusRule`, beside the
+ * command that writes the status; this states the finding. A header that labels none of the three
+ * words is not judged.
+ */
+export function headerRule(path: string, text: string): Finding[] {
+  const home = workstreamOf(path);
+  if (!home) return [];
+  const found = headerStatusRule(home.folder, text);
+  if (!found) return [];
+  if (inClosedWorkstream(path))
+    return [[CYCLES, `the header's status reads ${found.shows}, and a closed workstream reads ${found.gives} ` +
+      "(05-artifacts.md § How ends in Cycles) · stamp the header's status badge, which a closed page keeps by hand"]];
+  return [[CYCLES, `the header's status reads ${found.shows} and the arcs give ${found.gives} — the header's status ` +
+    `follows the arcs (05-artifacts.md § How ends in Cycles; RD.DEVEX.WORKSPACE.204) · ${WRITES_THE_PAGE}`]];
+}
+
+/**
+ * 05-artifacts.md § How ends in Cycles: the heading of `Open` names the cards that are open, each by
+ * its number, and with no card open it reads `Open — no card is open`. A page with no `Open` heading
+ * and a page in a closed workstream are not judged.
+ */
+export function openHeadingRule(path: string, text: string): Finding[] {
+  if (!workstreamOf(path) || inClosedWorkstream(path)) return [];
+  const shows = openHeadingOf(text);
+  const gives = openHeadingFor(text);
+  if (shows === null || shows === gives) return [];
+  return [[CYCLES, `the heading of Open reads "${shows}" and the page's cards give "${gives}" ` +
+    `(05-artifacts.md § How ends in Cycles; RD.DEVEX.WORKSPACE.204) · ${WRITES_THE_PAGE}`]];
 }
 
 /** The chrome an approach page owes its reader, and the one part nothing checked. */
@@ -591,7 +582,9 @@ function exemptArc(path: string): boolean {
  * row carries a Repo and an Altitude, and the rows run in chain order by repository, then by
  * altitude. The chain between two stack repositories is judgement, so this reads what a script can:
  * the foundation first, each repository's rows together, and DOCS · CODE · GENERATED · RELEASE ·
- * PROOF inside each. A `—` row changes no repository and takes no place in the chain.
+ * PROOF inside each. A `—` row changes no repository and takes no place in the chain. A row whose
+ * cell count differs from its header's is named with both counts, and is read for nothing else,
+ * because its cells no longer sit under their own headings.
  */
 export function arcSteps(path: string, text: string): Finding[] {
   if (exemptArc(path)) return [];
@@ -608,11 +601,16 @@ export function arcSteps(path: string, text: string): Finding[] {
   const clean = (cell: string | undefined) => (cell ?? "").replace(/[*`]/g, "").trim();
   const bare: string[] = [];
   const disorder: string[] = [];
+  const miscounted: string[] = [];
   const seen = new Set<string>();
   let repo: string | null = null;
   let lastAltitude = -1;
   for (const cells of table.slice(1)) {
     const label = clean(cells[0]) || "?";
+    if (cells.length !== table[0].length) {
+      miscounted.push(`row ${label} has ${cells.length} cells under a ${table[0].length}-cell header`);
+      continue;
+    }
     const rowRepo = clean(cells[repoAt]);
     const altitude = ALTITUDES.indexOf(clean(cells[altitudeAt]).toUpperCase());
     if (!rowRepo || altitude < 0) { bare.push(label); continue; }
@@ -630,12 +628,30 @@ export function arcSteps(path: string, text: string): Finding[] {
     lastAltitude = Math.max(lastAltitude, altitude);
   }
   const out: Finding[] = [];
+  if (miscounted.length)
+    out.push([ARC_ROWS, `${listed(miscounted)} — a row with a wrong cell count is read one cell to the left, so its ` +
+      "State is not the cell you wrote. Write a pipe inside a cell with a backslash before it (`\\|`), and give " +
+      `the row one cell for each heading ${where}`]);
   if (bare.length)
     out.push([ARC_ROWS, `row(s) ${listed(bare)} carry no Repo, or no Altitude from ${ALTITUDES.join(" · ")} ${where}`]);
   if (disorder.length)
     out.push([ARC_ROWS, `rows out of chain order: ${listed(disorder)} — rows run by repository, the ` +
       `foundation first, then DOCS · CODE · GENERATED · RELEASE · PROOF inside each ${where}`]);
   return out;
+}
+
+/**
+ * 05-artifacts.md § How ends in Cycles: the page links each preview and each sample of an arc, read
+ * from the arc's `## Previews` table. A row whose File cell holds no link shows on the page as plain
+ * text, so it is named here with the link form. A section that reads `None.`, an arc with no
+ * Previews section, and an arc of workstream 008 are left alone.
+ */
+export function arcPreviews(path: string, text: string): Finding[] {
+  if (exemptArc(path)) return [];
+  return previewsOf(text).filter((preview) => !preview.href).map((preview): Finding =>
+    [ARC_ROWS, `Previews row \`${preview.name}\` names its file without a link — write the File cell as ` +
+      `${previewLinkForm(path, preview.name)}, a link written from \`arcs/\`, so the page can link the file ` +
+      "(05-artifacts.md § How ends in Cycles)"]);
 }
 
 /** An overview borrows its outline and carries no argument organs (05-artifacts). */
@@ -1124,8 +1140,8 @@ export function kindOf(path: string): string {
  * five prose sentences.
  */
 export function check(path: string, text: string, fragment = false): Finding[] {
-  // An arc is state, not corpus: only its step rows are read, and only whole.
-  if (isArc(path)) return fragment ? [] : arcSteps(path, text);
+  // An arc is state, not corpus: only its step rows and its Previews rows are read, and only whole.
+  if (isArc(path)) return fragment ? [] : [...arcSteps(path, text), ...arcPreviews(path, text)];
   const isHtml = path.endsWith(".html");
   const isApproach = isApproachPage(path);
   const isOverview = path.endsWith("-overview.html");
@@ -1145,7 +1161,7 @@ export function check(path: string, text: string, fragment = false): Finding[] {
     if (!fragment) {
       const exempt = exemptWorkstream(path);
       out.push(...approachShape(text, exempt));
-      if (!exempt) out.push(...cyclesRule(path, text));
+      if (!exempt) out.push(...cyclesRule(path, text), ...headerRule(path, text));
       out.push(...pageFurniture(text));
     }
     out.push(...openCards(text));
@@ -1306,14 +1322,13 @@ export function checkDoc(payload: Payload): Verdict {
   if (path && isArc(path)) {
     // An Edit carries only its replacement, and a step table is judged whole. So the edit is applied
     // to the file on disk, which is the text the arc will hold once the write lands.
-    const edit = supplied as typeof supplied & { old_string?: string; replace_all?: boolean };
-    let text = edit.content;
-    if (text === undefined && edit.new_string !== undefined && edit.old_string) {
+    let text = supplied.content;
+    if (text === undefined && supplied.new_string !== undefined && supplied.old_string) {
       const current = read(path);
-      if (!current.includes(edit.old_string)) return null;
-      text = edit.replace_all
-        ? current.split(edit.old_string).join(edit.new_string)
-        : current.replace(edit.old_string, () => edit.new_string!);
+      if (!current.includes(supplied.old_string)) return null;
+      text = supplied.replace_all
+        ? current.split(supplied.old_string).join(supplied.new_string)
+        : current.replace(supplied.old_string, () => supplied.new_string!);
     }
     if (!text) return null;
     found = check(path, text);

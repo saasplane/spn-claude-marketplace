@@ -7,6 +7,12 @@
 // log back, one row per `script` › `group` › `subgroup` › `action`: runs, total, median, p95, slowest,
 // and failures (a non-zero `exit`; a hook check's null exit is never one).
 //
+// A BASH CALL IS ONE LINE, so a total by program holds each call's time once. The line is filed under
+// the first program the filter matched, and its `programs` key says how many programs the call ran.
+// A row counts its calls that ran more than one (`compound`), because their whole time sits in that
+// row, and the reading says so under the table. A line with no `programs` key is read as it was
+// written: a hook check's line, and a command line from before the key existed.
+//
 //     spn-devex plugin timings [--json] [root]
 //
 // With no root, the workspace holding `.spndevex` is found by walking up from the current directory,
@@ -20,7 +26,7 @@ import { workspaceRoot } from "../../../../../plugin-support-lib/src/lib/timing.
 
 type Span = {
   script: string; group: string | null; subgroup: string | null; action: string | null;
-  ms: number; exit: number | null; at: string;
+  ms: number; exit: number | null; at: string; programs: number | null;
 };
 
 const text = (value: unknown) => (typeof value === "string" && value ? value : null);
@@ -36,7 +42,8 @@ function readLog(root: string): Span[] {
       const parsed = JSON.parse(line) as Record<string, unknown>;
       if (typeof parsed.script === "string" && typeof parsed.ms === "number")
         out.push({ script: parsed.script, group: text(parsed.group), subgroup: text(parsed.subgroup), action: text(parsed.action),
-                   ms: parsed.ms, exit: typeof parsed.exit === "number" ? parsed.exit : null, at: String(parsed.at ?? "") });
+                   ms: parsed.ms, exit: typeof parsed.exit === "number" ? parsed.exit : null, at: String(parsed.at ?? ""),
+                   programs: typeof parsed.programs === "number" ? parsed.programs : null });
     } catch { /* a torn last line from a truncated write is skipped, not a crash */ }
   }
   return out;
@@ -52,7 +59,10 @@ function median(sorted: number[]): number {
 
 export type Row = {
   script: string; group: string | null; subgroup: string | null; action: string | null;
-  runs: number; totalMs: number; medianMs: number; p95Ms: number; slowestMs: number; failures: number; lastAt: string;
+  runs: number; totalMs: number; medianMs: number; p95Ms: number; slowestMs: number; failures: number;
+  /** How many of the row's runs are Bash calls that ran more than one program. Their whole time is in this row. */
+  compound: number;
+  lastAt: string;
 };
 
 /**
@@ -76,6 +86,7 @@ export function summarize(spans: Array<Partial<Span> & { script: string; ms: num
       script, group: levelOne, subgroup: levelTwo, action, runs: group.length,
       totalMs: round(ms.reduce((sum, one) => sum + one, 0)), medianMs: round(median(ms)), p95Ms: p95, slowestMs: ms[ms.length - 1],
       failures: group.filter((s) => typeof s.exit === "number" && s.exit !== 0).length,
+      compound: group.filter((s) => typeof s.programs === "number" && s.programs > 1).length,
       lastAt: group.map((s) => String(s.at ?? "")).sort().at(-1) ?? "",
     });
   }
@@ -113,6 +124,10 @@ export function run(args: string[]): number {
     console.log(`  ${name}`.padEnd(44) + String(row.runs).padStart(6) + shown(row.totalMs).padStart(10) + shown(row.medianMs).padStart(10) +
       shown(row.p95Ms).padStart(10) + shown(row.slowestMs).padStart(10) + String(row.failures).padStart(10));
   }
+  const compound = rows.reduce((sum, row) => sum + row.compound, 0);
+  if (compound)
+    console.log(`\n${compound} Bash call(s) ran more than one program. Each is one line, filed under the first program ` +
+      `the filter matched, with the whole call's time.`);
   return 0;
 }
 

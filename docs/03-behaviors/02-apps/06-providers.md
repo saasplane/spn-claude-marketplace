@@ -33,6 +33,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.PROVIDERS.18 | Quality engineer | be warned rather than refused where the model behind a rule is still open | The coverage findings warn, and the file marks what to replace when the model lands | POSITIVE | UNIT | PLANNED | — |
 | MKT.PROVIDERS.19 | Backend developer | find the one home of a rule that is written in two places | The header names the command-line tool's own file, and the instruction to change it there first | POSITIVE | UNIT | PLANNED | — |
 | MKT.PROVIDERS.31 | Backend developer | be refused an exclude that gives no reason | The check denies a new `coveragePathIgnorePatterns` or `coverage.exclude` entry with no comment beside it | NEGATIVE | UNIT | PLANNED | — |
+| MKT.PROVIDERS.32 | Web developer | be warned of a journey assertion written over several lines with a trailing comma and no message | The trailing comma is not counted as a message, so the assertion gets the note a bare assertion gets | NEGATIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

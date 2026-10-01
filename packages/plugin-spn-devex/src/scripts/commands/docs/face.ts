@@ -13,7 +13,11 @@ import { face, resolveWorkspace } from "./_lib.ts";
 export const describe = "write what is generated, between markers — the domain glossary, the maps, the tag lines";
 
 function body(args: string[], workspace: string): number {
-  const tree = resolve(args.find((r) => !r.startsWith("--")) ?? ".");
+  // THE TREE IS NAMED, NEVER ASSUMED. This command writes unless `--check` is given, and the current
+  // folder taken as the tree would walk every repository of a workspace, a workstream's notes too.
+  const named = args.find((r) => !r.startsWith("--"));
+  if (named === undefined) { console.error("usage: spn-devex docs face <docs-tree> [--check]"); return 2; }
+  const tree = resolve(named);
   const f = face(tree, !args.includes("--check"));
   for (const x of f) console.log(`${x.grade === "RULE" ? "✗" : "!"} ${x.grade.padEnd(4)} ${x.check.padEnd(9)} ${relative(workspace, x.file)}\n         ${x.message}`);
   return f.some((x) => x.grade === "RULE") ? 1 : 0;

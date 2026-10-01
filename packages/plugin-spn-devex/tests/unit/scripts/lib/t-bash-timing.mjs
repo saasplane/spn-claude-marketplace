@@ -3,7 +3,7 @@
 //
 // Driven through the real entries: `events/pretooluse.ts` writes `telemetry/pending/<id>.json` for a
 // matched command while recording is on, and `events/closed.ts` — registered for `PostToolUse` and
-// `PostToolUseFailure` on Bash — reads it, writes one line per program, and removes it. Every case
+// `PostToolUseFailure` on Bash — reads it, writes one line for the call, and removes it. Every case
 // points a temporary workspace (with `.spndevex/.debug/telemetry.on`) at the recorder.
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, utimesSync, writeFileSync } from "node:fs";
@@ -14,6 +14,8 @@ import { workspace } from "../../../helpers/fixture.mjs";
 const EVENTS = resolve(PLUGIN, "src", "scripts", "events");
 const KEYS = ["script", "group", "subgroup", "action", "args", "event", "tool", "ms", "exit", "at",
   "repo", "pid", "session", "agent", "workstream", "arc", "order"];
+// A Bash command's line carries one more key, after the seventeen every line carries.
+const COMMAND_KEYS = [...KEYS, "programs"];
 
 let total = 0, failed = 0;
 const same = (label, got, expected) => {
@@ -53,7 +55,8 @@ console.log("=== a matched command, paired before and after");
   const lines = commands(root);
   same("PostToolUse writes one line", lines.length, 1);
   const line = lines[0] ?? {};
-  same("with every key, in the book's order", Object.keys(line), KEYS);
+  same("with every key, in the book's order, and `programs` after them", Object.keys(line), COMMAND_KEYS);
+  same("[MKT.HOOKS.41] a call that ran one program reads programs 1", line.programs, 1);
   same("script, levels and args read from the command",
     [line.script, line.group, line.subgroup, line.action, line.args], ["spnutils", "infra", "platform", "up", "dmo --apply"]);
   same("the agent ran it, through Bash, and it worked", [line.event, line.tool, line.exit], ["command", "Bash", 0]);
@@ -62,6 +65,9 @@ console.log("=== a matched command, paired before and after");
   same("repo is the member the call ran in, and the session is the hook's", [line.repo, line.session], ["spn-infra-ts", "sess-2p"]);
   same("the start file is removed", existsSync(join(pendingOf(root), "toolu_pair.json")), false);
   same("every hook line carries at ending in Z too", logOf(root).every((one) => /Z$/.test(one.at)), true);
+  const checks = logOf(root).filter((one) => one.event !== "command");
+  same("a hook check's line keeps the seventeen keys, and no `programs`",
+    checks.length > 0 && checks.every((one) => JSON.stringify(Object.keys(one)) === JSON.stringify(KEYS)), true);
 }
 
 console.log("\n=== a failed call, read from PostToolUseFailure");
@@ -77,6 +83,27 @@ console.log("\n=== a failed call, read from PostToolUseFailure");
   hook("pretooluse", { ...other, hook_event_name: "PreToolUse" });
   hook("closed", { ...other, hook_event_name: "PostToolUseFailure", error: "interrupted" });
   same("a failure with no code reads 1", commands(root).at(-1)?.exit, 1);
+  same("[MKT.HOOKS.42] each failed call's `events › closed` line sits beside its command line",
+    logOf(root).filter((one) => one.event === "PostToolUseFailure").map((one) => `${one.group} › ${one.action}`),
+    ["events › closed", "events › closed"]);
+}
+
+console.log("\n=== a failed call made by a child agent");
+{
+  const root = workspace("n006-agent-fail", ON);
+  const before = call(root, "toolu_agent_fail", "git rev-parse --verify no-such-ref", { payload: { agent_id: "agent-child-1" } });
+  hook("pretooluse", { ...before, hook_event_name: "PreToolUse" });
+  same("the start file is written for the agent's call", existsSync(join(pendingOf(root), "toolu_agent_fail.json")), true);
+  hook("closed", { ...before, hook_event_name: "PostToolUseFailure", error: "Exit code 128\nfatal: Needed a single revision" });
+  const line = commands(root).at(-1) ?? {};
+  same("[MKT.HOOKS.44] the agent's failed call writes its line, with the exit code and the agent",
+    [line.script, line.action, line.exit, line.agent], ["git", "rev-parse", 128, "agent-child-1"]);
+  same("[MKT.HOOKS.44] and its start file is removed", existsSync(join(pendingOf(root), "toolu_agent_fail.json")), false);
+  const main = call(root, "toolu_main_fail", "git rev-parse --verify no-such-ref");
+  hook("pretooluse", { ...main, hook_event_name: "PreToolUse" });
+  hook("closed", { ...main, hook_event_name: "PostToolUseFailure", error: "Exit code 128" });
+  same("the main window's failed call is closed the same way, with no agent",
+    [commands(root).at(-1)?.exit, commands(root).at(-1)?.agent, readdirSync(pendingOf(root))], [128, null, []]);
 }
 
 console.log("\n=== what writes nothing");
@@ -114,17 +141,30 @@ console.log("\n=== a secret, a background call, a compound command, and the prun
   hook("pretooluse", { ...compound, hook_event_name: "PreToolUse" });
   hook("closed", { ...compound, hook_event_name: "PostToolUse", tool_response: {} });
   const written = commands(root).slice(before);
-  same("a compound command writes one line per match", written.map((one) => `${one.script} ${one.action}`),
-    ["git add", "git commit", "spnutils check"]);
-  same("each with the whole call's ms", new Set(written.map((one) => one.ms)).size, 1);
+  same("[MKT.HOOKS.41] a call that ran three programs writes one line, named for the first the filter matches",
+    written.map((one) => `${one.script} ${one.action} ${one.args}`), ["git add x"]);
+  same("[MKT.HOOKS.41] and `programs` holds how many it ran", written.map((one) => one.programs), [3]);
+  same("so the call's time is summed once", written.reduce((sum, one) => sum + one.ms, 0), written[0]?.ms);
+  const mixed = call(root, "toolu_mixed", "ls -la && spnutils apps check x; git status");
+  hook("pretooluse", { ...mixed, hook_event_name: "PreToolUse" });
+  hook("closed", { ...mixed, hook_event_name: "PostToolUse", tool_response: {} });
+  same("a program the filter does not name is neither the line's name nor counted",
+    commands(root).slice(before + 1).map((one) => [one.script, one.action, one.programs]), [["spnutils", "check", 2]]);
 
+  // A refused call leaves its start file behind: the hook wrote it, and no hook runs after a refusal.
   mkdirSync(pendingOf(root), { recursive: true });
-  const stale = join(pendingOf(root), "toolu_stale.json");
-  writeFileSync(stale, "{}");
-  const twoDaysAgo = (Date.now() - 2 * 24 * 3600 * 1000) / 1000;
-  utimesSync(stale, twoDaysAgo, twoDaysAgo);
+  const minutesAgo = (minutes) => (Date.now() - minutes * 60 * 1000) / 1000;
+  const refused = join(pendingOf(root), "toolu_refused.json");
+  writeFileSync(refused, JSON.stringify({ at: Date.now() - 11 * 60 * 1000, background: false, found: [] }));
+  utimesSync(refused, minutesAgo(11), minutesAgo(11));
+  const running = join(pendingOf(root), "toolu_running.json");
+  writeFileSync(running, JSON.stringify({ at: Date.now() - 9 * 60 * 1000, background: false, found: [] }));
+  utimesSync(running, minutesAgo(9), minutesAgo(9));
   hook("pretooluse", { ...call(root, "toolu_fresh", "git status"), hook_event_name: "PreToolUse" });
-  same("a start file older than a day is removed when one is written", readdirSync(pendingOf(root)).sort(), ["toolu_fresh.json"]);
+  same("[MKT.HOOKS.43] a start file older than 600,000 ms is removed when the next one is written",
+    existsSync(refused), false);
+  same("[MKT.HOOKS.43] and one younger than that is left, because its call may still be running",
+    readdirSync(pendingOf(root)).sort(), ["toolu_fresh.json", "toolu_running.json"]);
 }
 
 console.log("\n=== the workspace filter file");

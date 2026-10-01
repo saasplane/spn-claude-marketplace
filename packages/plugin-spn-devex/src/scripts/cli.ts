@@ -122,8 +122,25 @@ export async function main(argv: string[]): Promise<number> {
   return mod.run(rest);
 }
 
+/**
+ * Resolves once everything already written to a stream has left the process. A pipe is written in
+ * the background, so `process.exit` called straight after a large `console.log` ends the process
+ * with part of the output still queued, and the reader receives the first 65,536 bytes only.
+ */
+const written = (stream: NodeJS.WriteStream): Promise<void> =>
+  new Promise((resolve) => {
+    if (stream.destroyed || stream.writableEnded) { resolve(); return; }
+    stream.write("", () => resolve());
+  });
+
 // MATCHES THE BUNDLED NAME TOO. `cli.ts` runs from source under that name; built, it runs as
 // `dist/cli.mjs` — the same file by a different extension, and a guard tied to one literal name
 // never fires for the other.
-if (process.argv[1] && ["cli.ts", "cli.mjs"].includes(basename(process.argv[1])))
-  process.exit(await main(process.argv.slice(2)));
+//
+// THE ENTRY ENDS ONLY AFTER ITS OUTPUT IS WRITTEN, so `--json` sent through a pipe arrives whole.
+// The exit stays explicit, because a command that leaves a handle open must still end.
+if (process.argv[1] && ["cli.ts", "cli.mjs"].includes(basename(process.argv[1]))) {
+  const code = await main(process.argv.slice(2));
+  await Promise.all([written(process.stdout), written(process.stderr)]);
+  process.exit(code);
+}

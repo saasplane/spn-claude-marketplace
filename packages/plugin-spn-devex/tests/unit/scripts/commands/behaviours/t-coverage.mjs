@@ -138,6 +138,74 @@ console.log("=== behaviour-coverage — tier by tier, from the stamped rows");
   ok("a Tier no vocabulary declares is a named finding", result.findings.some((one) => one.message.includes('Tier "UNITT"')), JSON.stringify(result.findings));
 }
 
+console.log("\n=== behaviour-coverage — what the test source says: an unknown id, another level, an id used twice");
+
+{
+  // A package proven by `.spec.mjs` cases carries its unit level.
+  const root = repo({ ...APPS, ...node("packages/tooling", "SUPPORT_UNIVERSAL"), ...node("packages/bare", "SUPPORT_UNIVERSAL"),
+    "packages/tooling/tests/unit/runner.spec.mjs": "test('[IAM.LOGIN.01] it runs', () => {});\n",
+    "packages/bare/tests/unit/notes.mjs": "// a helper, and no case\n",
+    ...register(["IAM.LOGIN.01", "UNIT", "PLANNED"]) });
+  const unit = json(root).tiers.find((tier) => tier.tier === "UNIT");
+  ok("[MKT.SCRIPTS.85] a node whose unit cases are `.spec.mjs` files is not listed with no case",
+    !unit?.noCase.includes("packages/tooling"), JSON.stringify(unit?.noCase));
+  ok("[MKT.SCRIPTS.85] known-bad: a `.mjs` file that is not a case file does not count as one",
+    unit?.noCase.includes("packages/bare"), JSON.stringify(unit?.noCase));
+}
+
+{
+  const root = repo({ ...APPS, ...node("packages/iam", "MODULE_SERVER"), ...node("apps/web", "APP_WEB"), ...node("packages/toolchain", "TOOLCHAIN"),
+    "packages/iam/tests/unit/login.spec.ts": [
+      "describe('sign-in', () => {",
+      "  it('[IAM.LOGIN.01] accepts a password', () => {});",
+      "  it('[IAM.LOGIN.09] cites a row nobody wrote', () => {});",
+      "  it('[IAM.LOGIN.02] proves a journey row from a unit case', () => {});",
+      "  it('[IAM.LOGIN.03] is one of two cases for this row', () => {});",
+      "  it.skip('[IAM.LOGIN.08] a skipped case proves nothing', () => {});",
+      "});", ""].join("\n"),
+    "apps/web/tests/journeys/login.spec.ts": "test('[IAM.LOGIN.03] signs in through the screen', async () => {});\n",
+    "packages/toolchain/tests/unit/titles.spec.ts": "it('[ZZ.SAMPLE.01] a sample title the runner reads', () => {});\n",
+    ...register(["IAM.LOGIN.01", "UNIT", "PLANNED"], ["IAM.LOGIN.02", "JOURNEY", "PLANNED"], ["IAM.LOGIN.03", "JOURNEY", "PLANNED"]) });
+  const result = json(root);
+  const ofType = (ftype) => result.findings.filter((one) => one.ftype === ftype);
+  const unknown = ofType("CASE_UNKNOWN_ID");
+  ok("[MKT.SCRIPTS.83] known-bad: a case that names an id no row declares is a finding, named by its file",
+    unknown.length === 1 && unknown[0].message.includes("IAM.LOGIN.09") && unknown[0].project === "packages/iam/tests/unit/login.spec.ts",
+    JSON.stringify(unknown));
+  const level = ofType("CASE_OTHER_LEVEL");
+  ok("[MKT.SCRIPTS.83] known-bad: a row whose cases all sit at another level is a finding that names both levels",
+    level.length === 1 && level[0].message.includes("IAM.LOGIN.02 is a JOURNEY row") && level[0].message.includes("(UNIT)"), JSON.stringify(level));
+  ok("[MKT.SCRIPTS.83] a row cited at its own level is no finding, with a second case at another level or without one",
+    !result.findings.some((one) => /IAM\.LOGIN\.0[13]\b/.test(one.message)), JSON.stringify(result.findings));
+  ok("[MKT.SCRIPTS.83] a skipped case and a TOOLCHAIN node's sample titles are not read",
+    !result.findings.some((one) => /IAM\.LOGIN\.08|ZZ\.SAMPLE\.01/.test(one.message)), JSON.stringify(result.findings));
+  let code = 0;
+  try { measure(root); } catch (error) { code = error.status ?? 1; }
+  ok("[MKT.SCRIPTS.83] the findings are a report: the command still exits 0", code === 0, `exit ${code}`);
+  ok("[MKT.SCRIPTS.83] and the printed reading lists them", /CASE_UNKNOWN_ID[^\n]*IAM\.LOGIN\.09/.test(measure(root)), measure(root));
+}
+
+{
+  const twice = {
+    ...register(["IAM.LOGIN.01", "UNIT", "SUCCESS", "2026-09-28T02:00:00Z · full-1"], ["IAM.LOGIN.02", "UNIT", "PLANNED"]),
+    [`docs/${SEAT.behaviors}/org.md`]: [
+      "| Id | Who | Does | Sees | Type | Tier | Status | Updated at |",
+      "| --- | --- | --- | --- | --- | --- | --- | --- |",
+      "| IAM.LOGIN.01 | a person | joins an organization | the organization | POSITIVE | UNIT | PLANNED | — |",
+      ""].join("\n"),
+  };
+  const result = json(repo({ ...APPS, ...node("packages/iam", "MODULE_SERVER"), ...twice }));
+  const duplicate = result.findings.filter((one) => one.ftype === "DUPLICATE_ID");
+  ok("[MKT.SCRIPTS.84] known-bad: an id that two rows declare is a finding that names each file and line",
+    duplicate.length === 1 && duplicate[0].message.includes(`docs/${SEAT.behaviors}/iam.md:3`) && duplicate[0].message.includes(`docs/${SEAT.behaviors}/org.md:3`),
+    JSON.stringify(duplicate));
+  ok("[MKT.SCRIPTS.84] the id is still counted once, from its first row", result.rows.filter((row) => row.id === "IAM.LOGIN.01").length === 1
+    && result.rows.find((row) => row.id === "IAM.LOGIN.01")?.status === "SUCCESS", JSON.stringify(result.rows.map((row) => row.id)));
+  const clean = json(repo({ ...APPS, ...node("packages/iam", "MODULE_SERVER"), ...register(["IAM.LOGIN.01", "UNIT", "PLANNED"], ["IAM.LOGIN.02", "UNIT", "PLANNED"]) }));
+  ok("[MKT.SCRIPTS.84] a register whose ids are each declared once draws no such finding",
+    !clean.findings.some((one) => one.ftype === "DUPLICATE_ID"), JSON.stringify(clean.findings));
+}
+
 console.log("\n=== behaviour-coverage — the domains, with Built in behaviours (N122 5.3d)");
 
 /** Rows `[id, tier, status]` in one behaviours file, at a path under the seat. */

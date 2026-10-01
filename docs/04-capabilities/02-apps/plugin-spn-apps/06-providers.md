@@ -86,7 +86,7 @@ One folder sits under `packages/plugin-spn-apps/src/providers/`, named for the s
 
 **Why** — *a pattern loose enough to match inside a longer string is a check that cannot fail*. One matched a redirect address sitting inside a provider's own consent URL, so a browser journey agreed it was home while the screen was still the vendor's.
 **What** — a host assertion compares a parsed host for equality, or anchors its pattern, and fires only where the literal looks like a host and the statement is about navigation.
-**How** — the same reasoning shapes the assertion-message rule, which asks a journey case what an absence would mean. `packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/host-assertion.ts`.
+**How** — the same reasoning shapes the assertion-message rule, which asks a journey case what an absence would mean. A journey assertion written over several lines with a trailing comma is not counted as carrying a message. `packages/plugin-spn-apps/src/providers/ts/scripts/checks/_tests/host-assertion.ts`.
 
 ## Between modules
 

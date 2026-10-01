@@ -3,6 +3,7 @@
 // discovery itself (a file named `_lib.ts` is never dispatched, an unknown group or action refuses
 // with the list) rather than any one command's own behaviour, which belongs to that command's test.
 import { PLUGIN } from "../../helpers/harness.mjs";
+import { spawnSync } from "node:child_process";
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -37,6 +38,8 @@ console.log("=== cli — real groups and actions this plugin ships");
   ok("a group's actions are its files, not a hand-kept list", docsActions.includes("audit") && docsActions.includes("coherence"));
   ok("`docs cycles` is an action because its file exists", docsActions.includes("cycles"), docsActions.join(","));
   ok("a file starting with `_` is a shared helper, never an action", !docsActions.includes("_lib"), docsActions.join(","));
+  ok("[MKT.SCRIPTS.81] `report refresh` is an action because its file exists",
+    gs.includes("report") && actionsOf("report").includes("refresh"), `${gs.join(",")} · ${actionsOf("report").join(",")}`);
 }
 
 console.log("\n=== cli — help lists every action as data");
@@ -75,6 +78,32 @@ console.log("\n=== cli — dispatches to a real command and hands back its exit 
     // A markdown file with no `spn:doc` block is a RULE finding, so this proves the args reached
     // the real `audit` command and its own exit-code convention (findings → non-zero) held.
     ok("`docs audit` runs for real and returns its own exit code", code === 1, `code ${code}`);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+}
+
+console.log("\n=== cli — `--json` through a pipe arrives whole");
+{
+  // KNOWN-BAD: a pipe holds 65,536 bytes, and an entry that exits straight after it prints leaves
+  // the rest unwritten. The fixture's measurement is several times that size.
+  const root = mkdtempSync(join(tmpdir(), "cli-pipe-"));
+  try {
+    const rows = Array.from({ length: 900 }, (_, at) =>
+      `| IAM.LOGIN.${String(at + 1).padStart(2, "0")} | a person | signs in, case ${at + 1} | the screen after the sign-in | POSITIVE | UNIT | PLANNED | — |`);
+    mkdirSync(join(root, "docs", "03-behaviors"), { recursive: true });
+    writeFileSync(join(root, "sprepo.json"), '{"type":"APPS","config":{"mtype":"APPS","stack":"TS"}}', "utf8");
+    writeFileSync(join(root, "docs", "03-behaviors", "iam.md"),
+      ["| Id | Who | Does | Sees | Type | Tier | Status | Updated at |", "| --- | --- | --- | --- | --- | --- | --- | --- |", ...rows, ""].join("\n"), "utf8");
+    const entry = join(PLUGIN, "src", "scripts", "cli.ts");
+    const piped = spawnSync(process.execPath, [entry, "behaviours", "coverage", root, "--json"],
+      { encoding: "utf8", maxBuffer: 64 * 1024 * 1024, env: { ...process.env, SPN_TELEMETRY: "off" } });
+    let parsed = null;
+    try { parsed = JSON.parse(piped.stdout); } catch { parsed = null; }
+    ok("[MKT.SCRIPTS.95] the fixture's output is larger than a pipe holds", piped.stdout.length > 65536, `${piped.stdout.length} bytes`);
+    ok("[MKT.SCRIPTS.95] every byte arrives, so the output parses", parsed !== null && parsed.rows.length === 900,
+      `${piped.stdout.length} bytes · parsed ${parsed === null ? "no" : parsed.rows.length}`);
+    ok("[MKT.SCRIPTS.95] and the entry still hands back the command's exit code", piped.status === 0, `status ${piped.status}`);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

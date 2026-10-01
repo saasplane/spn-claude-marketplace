@@ -9,13 +9,17 @@
 // RD.DEVEX.WORKSPACE.149). Every tier the repository owes appears, and the same tree measures to the
 // same bytes — the instant is the newest `Updated at` it read, in the local zone with its offset, and
 // the digest hashes the measurement alone.
+//
+// It also reads each case title from the test source, and lists three things as findings: a case
+// that names an id no row declares, an id whose cases all sit at another level than its row's `Tier`,
+// and an id that more than one row declares. A finding never changes the exit code, which is 0.
 
 import { createHash } from "node:crypto";
 import { withOffset } from "../../lib/clock.ts";
 import { readdirSync, statSync } from "node:fs";
 import { basename, join, relative, resolve } from "node:path";
 import { DOCS, reportsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
-import { declaredRows } from "../../../../../plugin-support-lib/src/lib/register.ts";
+import { declaredIds, declaredRows, idsIn } from "../../../../../plugin-support-lib/src/lib/register.ts";
 import { owedBy, TIERS } from "../../../../../plugin-support-lib/src/lib/kinds.ts";
 import { cited, read } from "../../../../../plugin-support-lib/src/lib/runs.ts";
 import { constructKeyOf, domainName, domainOf, domainsOf, readChapters } from "../coverage/_join.ts";
@@ -28,8 +32,8 @@ type Finding = { project: string; kind: null; severity: string; ftype: string; m
 /** Where the tests report lands in a repository's pocket, named by its kind (RD.DEVEX.WORKSPACE.149). */
 export const TESTS_REPORT = join(reportsDir(DOCS), "tests-report.html");
 
-const finding = (file: string, message: string): Finding =>
-  ({ project: file, kind: null, severity: "WARN", ftype: "BEHAVIOUR_ROW", message: message });
+const finding = (file: string, message: string, ftype = "BEHAVIOUR_ROW"): Finding =>
+  ({ project: file, kind: null, severity: "WARN", ftype: ftype, message: message });
 
 const digestOf = (value: unknown): string =>
   `sha256:${createHash("sha256").update(JSON.stringify(value)).digest("hex").slice(0, 16)}`;
@@ -98,7 +102,7 @@ export function foundationAbsence(root: string): Record<string, unknown> | null 
  * suite sits in `contract/`, and an `APP_SERVER`'s `integration/` cases are integration cases.
  */
 const CASE_FOLDERS: Record<string, ReadonlyArray<{ folder: string; match: RegExp }>> = {
-  UNIT: [{ folder: "unit", match: /\.(spec|test)\.tsx?$/ }],
+  UNIT: [{ folder: "unit", match: /\.(spec|test)\.(tsx?|mjs)$/ }],
   COMPONENT: [{ folder: "component", match: /\.ct\.spec\.tsx?$/ }],
   INTEGRATION: [{ folder: "integration", match: /\.int\.(spec|test)\.tsx?$/ }],
   CONTRACT: [{ folder: "contract", match: /\.contract\.spec\.tsx?$/ }],
@@ -130,6 +134,49 @@ export function carriesCase(node: string, tier: string): boolean {
 }
 
 /**
+ * A `describe`, `it` or `test` call's title. A `.skip` or `.todo` call proves nothing, so it is not
+ * read. The same pattern is in `spn-apps`, `providers/ts/scripts/lib/cases.ts`: a plugin imports
+ * nothing from another plugin, so the two are kept alike by hand.
+ */
+const TITLE_CALL = /\b(?:describe|it|test)(?:\.(?!skip|todo)\w+)?\s*\(\s*(['"`])([\s\S]*?)\1/g;
+
+/** One behaviour id a case title cites, with the file the case sits in and the level of its folder. */
+export type CitingCase = { id: string; title: string; file: string; tier: string };
+
+/**
+ * Every id a case title cites, read from the test source under each node's `tests/` folder. The
+ * level of a case is the folder it sits in, as `CASE_FOLDERS` names them.
+ *
+ * A module that an application owns keeps its cases in the application's tree, so only the
+ * application is walked. A `TOOLCHAIN` node is not read: its cases prove the runner itself, and
+ * their sample titles carry ids that no row is meant to declare.
+ */
+export function citingCases(root: string, nodes: string[]): CitingCase[] {
+  const cases: CitingCase[] = [];
+  for (const node of nodes) {
+    if (carrierOf(node).scope !== "" || kindOf(node) === "TOOLCHAIN") continue;
+    for (const [tier, surfaces] of Object.entries(CASE_FOLDERS)) {
+      for (const surface of surfaces) {
+        const folder = join(node, "tests", surface.folder);
+        let entries: Array<{ name: string; parentPath: string; isFile(): boolean }>;
+        try { entries = readdirSync(folder, { recursive: true, withFileTypes: true }); } catch { continue; }
+        const files = entries.filter((entry) => entry.isFile() && surface.match.test(entry.name))
+          .map((entry) => join(entry.parentPath, entry.name)).sort();
+        for (const file of files) {
+          const source = read(file);
+          if (source === null) continue;
+          const shown = relative(root, file).split("\\").join("/");
+          for (const call of source.matchAll(TITLE_CALL)) {
+            for (const id of idsIn(call[2])) cases.push({ id: id, title: call[2], file: shown, tier: tier });
+          }
+        }
+      }
+    }
+  }
+  return cases;
+}
+
+/**
  * The row statuses a Repository row counts, each always present so a zero reads as counted. A `MANUAL`
  * row counts in none of the numbers (05-artifacts.md § The tests report): a person proves it by the
  * repository's browser guide, so it is listed as `manual` beside the counts, and the four sum to Written.
@@ -147,7 +194,7 @@ const manualOf = (group: Array<{ id: string; file: string; status: string | null
 export function measure(root: string): Record<string, unknown> {
   const nodes = nodesOf(root);
   const nameOf = (node: string): string => relative(root, node).split("\\").join("/") || ".";
-  const { rows: declared } = declaredRows(root);
+  const { rows: declared, repeated } = declaredRows(root);
   const findings: Finding[] = [];
   const owedByNode = new Map(nodes.map((node) => [nameOf(node), owedBy(kindOf(node))]));
 
@@ -181,6 +228,37 @@ export function measure(root: string): Record<string, unknown> {
         `${row.id} carries ${misspelt.join(" and ")}, which no closed vocabulary declares, so it is listed without ` +
         `a verdict — correct the spelling and a run can speak for it.`));
     }
+  }
+
+  // An id that more than one row declares. `rows` keeps the first row, and both are named here.
+  for (const one of repeated) {
+    findings.push(finding(one.rows[0].file,
+      `${one.id} is declared by ${one.rows.length} rows — ${one.rows.map((row) => `${row.file}:${row.line}`).join(" · ")}. ` +
+      `The first is the row that is counted. An id names one promise, so give the other row an id of its own.`,
+      "DUPLICATE_ID"));
+  }
+
+  // What the test source says, read from the case titles and never from a run file.
+  const known = declaredIds(root);
+  const tierOfId = new Map(rows.filter((row) => row.tier !== null).map((row) => [row.id, row.tier as string]));
+  const casesById = new Map<string, CitingCase[]>();
+  for (const one of citingCases(root, nodes)) casesById.set(one.id, [...(casesById.get(one.id) ?? []), one]);
+  for (const [id, cases] of [...casesById.entries()].sort(([left], [right]) => left.localeCompare(right))) {
+    if (!known.has(id)) {
+      for (const file of [...new Set(cases.map((one) => one.file))]) {
+        findings.push(finding(file,
+          `a case title cites ${id}, which no behaviour row declares. A case names the row it proves: declare the row, ` +
+          `or correct the id in the title.`, "CASE_UNKNOWN_ID"));
+      }
+      continue;
+    }
+    const owed = tierOfId.get(id);
+    if (owed === undefined || cases.some((one) => one.tier === owed)) continue;
+    const found = [...new Set(cases.map((one) => one.tier))].sort().join(" · ");
+    findings.push(finding(cases[0].file,
+      `${id} is a ${owed} row, and every case that cites it sits at another level (${found}): ` +
+      `${[...new Set(cases.map((one) => one.file))].join(" · ")}. A run counts for a row only at the row's own Tier, ` +
+      `so write the case at ${owed}, or correct the row's Tier.`, "CASE_OTHER_LEVEL"));
   }
 
   // Built is the coverage report's own: a behaviour whose design topic is built, read from the same
@@ -292,4 +370,6 @@ export function run(args: string[]): number {
   return 0;
 }
 
-if (process.argv[1] && new URL(import.meta.url).pathname === process.argv[1]) process.exit(run(process.argv.slice(2)));
+// The exit code is set and the process is left to end by itself, so `--json` sent through a pipe is
+// written whole before the process ends.
+if (process.argv[1] && new URL(import.meta.url).pathname === process.argv[1]) process.exitCode = run(process.argv.slice(2));

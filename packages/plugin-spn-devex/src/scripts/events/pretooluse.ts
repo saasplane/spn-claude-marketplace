@@ -27,6 +27,7 @@
 // A check now RETURNS a `Verdict`. There is no round trip for a verdict to be lost in.
 
 import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { emit, readPayload, type Payload, type Verdict } from "../lib/payload.ts";
 import { checkEnvSeat } from "../checks/env-seat.ts";
 import { checkDoc, bashWrites } from "../checks/doc-check.ts";
@@ -37,6 +38,7 @@ import { checkArcStatus, applies as arcStatusApplies } from "../checks/arc-statu
 import { applies as commentsApply, checkComments } from "../checks/comment-check.ts";
 import { applies as mirrorApplies, checkMirror } from "../checks/mirror.ts";
 import { PUBLISHER, checkPublish } from "../checks/publish.ts";
+import { applies as testRunApplies, checkTestRun } from "../checks/test-run.ts";
 import { begin, end, span, tagsOf, type SpanName } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { startCommand } from "../lib/bash-timing.ts";
 
@@ -59,6 +61,11 @@ const PROSE_SUFFIXES = [".md", ".html"];
 // saves is the check's own work, which is the same saving by a shorter route.
 const CHECKS: Check[] = [
   { name: { group: "env-seat", action: "env-seat" }, run: checkEnvSeat, needs: ["command", "file_path"], applies: () => true },
+  // A refusal, so it runs before the checks that only advise. Its fast path is one pattern over the
+  // path or the command, so a call that names no `src` and no `tests` pays that and stops. A call
+  // that names one lists the start files, a folder that is absent or empty unless a timed command runs.
+  { name: { group: "test-run", action: "test-run" }, run: checkTestRun, needs: ["command", "file_path"],
+    applies: (path, command) => testRunApplies(path, command) },
   { name: { group: "doc-check", action: "doc-check" }, run: checkDoc, needs: ["command", "file_path"],
     applies: (path, command) => PROSE_SUFFIXES.some((s) => path.endsWith(s) || command.includes(s)) },
   // Its workspace sweep is the point: an answered card must be caught on ANY write. What it cannot
@@ -119,6 +126,63 @@ export function generatedRefusal(path: string): string | null {
   return null;
 }
 
+// The two lines that open and close the block `spnutils` writes. Their source is `MANAGED_BLOCK` in
+// `spn-support-ts`, `apps/utility-ts/src/app/support/workspace/managed-keys.ts`. A plugin imports
+// nothing from `spnutils`, so a change there is made here too.
+const AGENT_BLOCK_BEGIN = "<!-- spnutils:agent:begin -->";
+const AGENT_BLOCK_END = "<!-- spnutils:agent:end -->";
+
+/**
+ * Where the block `spnutils` writes sits in a text, from the start of its begin marker to the end of
+ * its end marker, or null where the text holds none. A marker counts only as a whole line, so a file
+ * that quotes one inside a line holds no block.
+ */
+function agentBlock(text: string): { from: number; to: number } | null {
+  let offset = 0;
+  let from = -1;
+  for (const line of text.split("\n")) {
+    const whole = line.replace(/\s+$/, "");
+    if (from < 0 && whole === AGENT_BLOCK_BEGIN) from = offset;
+    else if (from >= 0 && whole === AGENT_BLOCK_END) return { from, to: offset + line.length };
+    offset += line.length + 1;
+  }
+  return null;
+}
+
+/**
+ * Why this `Edit` or `Write` may not be made, or null. The text between the `spnutils:agent` markers
+ * is written by a command, so a hand edit there is lost at the next sync. An `Edit` is refused where
+ * the text it replaces reaches into the block, and a `Write` where it leaves the block different
+ * from the one on disk. A Bash command is not judged: the command that writes the block is one.
+ */
+export function agentBlockRefusal(payload: Payload): string | null {
+  const supplied = payload.tool_input ?? {};
+  if (!supplied.file_path || (supplied.content === undefined && !supplied.old_string)) return null;
+  const path = resolve(payload.cwd ?? process.cwd(), supplied.file_path);
+  let current: string;
+  try { current = readFileSync(path, "utf8"); } catch { return null; }   // a file not on disk holds no block
+  const block = agentBlock(current);
+  if (!block) return null;
+
+  let touched = false;
+  if (supplied.content !== undefined) {
+    const written = agentBlock(supplied.content);
+    touched = !written || supplied.content.slice(written.from, written.to) !== current.slice(block.from, block.to);
+  } else {
+    const replaced = supplied.old_string!;
+    for (let at = current.indexOf(replaced); at >= 0 && !touched; at = current.indexOf(replaced, at + 1)) {
+      touched = at < block.to && at + replaced.length > block.from;
+      if (!supplied.replace_all) break;
+    }
+  }
+  if (!touched) return null;
+  return `Denied: ${path} holds a block that \`spnutils\` writes, between \`${AGENT_BLOCK_BEGIN}\` and ` +
+    `\`${AGENT_BLOCK_END}\`, and this ${supplied.content !== undefined ? "write" : "edit"} changes it. A hand ` +
+    `edit there is lost at the next sync. Run \`spnutils workspace agent-sync\` for the workspace's files, or ` +
+    `\`spnutils repo agent-sync\` for a repository's, and change what the block is written from. The text ` +
+    `below the end marker is yours to edit.`;
+}
+
 /**
  * Every path this tool call would write — the `file_path` form, and the shell write routes.
  *
@@ -147,6 +211,11 @@ export function dispatch(payload: Payload): Verdict {
     const reason = generatedRefusal(path);
     if (reason) return { deny: reason };
   }
+  // The block `spnutils` writes is refused beside it: the same kind of text, inside a file that also
+  // holds a person's own.
+  let blocked: string | null = null;
+  try { blocked = agentBlockRefusal(payload); } catch { blocked = null; }
+  if (blocked) return { deny: blocked };
 
   const path = supplied.file_path ?? "";
   const command = supplied.command ?? "";

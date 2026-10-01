@@ -427,7 +427,7 @@ try {
 
   one("a Previews cell listing a file the arc does not",
     write(page, CLEAN.replace("<td>DECIDED</td><td>&mdash;</td>",
-      `<td>DECIDED</td><td><a href="notes/N2/previews/layout-preview.html">layout-preview.html</a> &middot; preview &middot; under review</td>`)),
+      `<td>DECIDED</td><td><a href="notes/N2/previews/layout-preview.html">layout-preview.html</a> &middot; preview &middot; proposed</td>`)),
     "reports", "N2's Previews cell is not what the arc's Previews table lists");
 
   // THE TABLE WITH NO PREVIEWS COLUMN, in each of the three states. A workstream being worked or
@@ -452,11 +452,11 @@ try {
   mkdirSync(join(previewed, ARCS), { recursive: true });
   writeFileSync(join(previewed, ARCS, "N001-the-chapter.md"), arcFile("N001", "the chapter", "RUNNING").replace("## Steps",
     "## Previews\n\n| File | Kind | Shows | State |\n| --- | --- | --- | --- |\n" +
-    "| [`layout-preview.html`](../notes/N001/previews/layout-preview.html) | preview | how the page is laid out | under review |\n" +
-    "| [`close-message.md`](../notes/N001/samples/close-message.md) | sample | what the agent says at a close | approved 2026-10-01 |\n\n## Steps"));
+    "| [`layout-preview.html`](../notes/N001/previews/layout-preview.html) | preview | how the page is laid out | proposed |\n" +
+    "| [`close-message.md`](../notes/N001/samples/close-message.md) | sample | what the agent says at a close | decided 2026-10-01 |\n\n## Steps"));
   writeFileSync(join(previewed, ARCS, "N002-the-check.md"), arcFile("N002", "the check", "DECIDED").replace("## Steps", "## Previews\n\nNone.\n\n## Steps"));
-  const PREVIEWS_CELL = `<a href="notes/N001/previews/layout-preview.html">layout-preview.html</a> &middot; preview &middot; under review<br>` +
-    `<a href="notes/N001/samples/close-message.md">close-message.md</a> &middot; sample &middot; approved`;
+  const PREVIEWS_CELL = `<a href="notes/N001/previews/layout-preview.html">layout-preview.html</a> &middot; preview &middot; proposed<br>` +
+    `<a href="notes/N001/samples/close-message.md">close-message.md</a> &middot; sample &middot; decided`;
   const PREVIEWED = CLEAN.replace(/N1-the-chapter/g, "N001-the-chapter").replace(/N2-the-check/g, "N002-the-check")
     .replace("N1 &mdash;", "N001 &mdash;").replace("N2 &mdash;", "N002 &mdash;")
     .replace("<td>RUNNING</td><td>&mdash;</td>", `<td>RUNNING</td><td>${PREVIEWS_CELL}</td>`);
@@ -467,7 +467,7 @@ try {
     write(previewedPage, PREVIEWED.replace(PREVIEWS_CELL, "&mdash;")),
     "reports", "N001's Previews cell is not what the arc's Previews table lists");
   one("a Previews cell whose state is not the arc's",
-    write(previewedPage, PREVIEWED.replace("preview &middot; under review", "preview &middot; approved")),
+    write(previewedPage, PREVIEWED.replace("preview &middot; proposed", "preview &middot; decided")),
     "reports", "N001's Previews cell is not what the arc's Previews table lists");
   one("a Previews cell whose link is written from arcs/ rather than from the page",
     write(previewedPage, PREVIEWED.replace(`href="notes/N001/previews/`, `href="../notes/N001/previews/`)),
@@ -529,6 +529,99 @@ try {
     "reports", "returns to spn-foundation");
   one("an Edit that keeps the order", { tool_name: "Edit", tool_input: { file_path: onDisk,
     old_string: "| 4 | — | PROOF |", new_string: "| 4 | — | PROOF | " } }, "silent");
+
+  console.log("\n=== doc-check — a step row's cell count, read when the arc is written");
+
+  // KNOWN-BAD: a doubled pipe before State, so the row has 8 cells under a 7-cell header.
+  one("[MKT.HOOKS.38] a step row with a doubled pipe is named with its count and the header's",
+    write(join(arcs, "N10-doubled.md"), arcFile("N10", "doubled", "DECIDED",
+      "| 1 | spn-support-ts | DOCS | a | by hand | b | |\n| 2 | spn-support-ts | CODE | a | by hand | b || ✅ landed 2026-10-01 |\n")),
+    "reports", "row 2 has 8 cells under a 7-cell header");
+  one("[MKT.HOOKS.38] a step row that is short of its header is named too",
+    write(join(arcs, "N11-short.md"), arcFile("N11", "short", "DECIDED", "| 1 | spn-support-ts | DOCS | a | by hand | b |\n")),
+    "reports", "row 1 has 6 cells under a 7-cell header");
+  // UNTOUCHED: an Acceptance cell that holds a pipe written with a backslash, inside a code span.
+  one("[MKT.HOOKS.38] a cell holding an escaped pipe is read as one cell",
+    write(join(arcs, "N12-escaped.md"), arcFile("N12", "escaped", "DECIDED",
+      "| 1 | spn-support-ts | DOCS | a | by hand | `grep -c \"a\\|b\" file` → 0 | ✅ landed 2026-10-01 |\n")),
+    "silent");
+  const countedOnDisk = join(arcs, "N13-counted.md");
+  writeFileSync(countedOnDisk, arcFile("N13", "counted", "DECIDED", ordered));
+  one("[MKT.HOOKS.38] an Edit that adds a pipe to a row is judged on the arc it leaves",
+    { tool_name: "Edit", tool_input: { file_path: countedOnDisk, old_string: "| 3 | spn-support-ts | CODE | a |", new_string: "| 3 | spn-support-ts | CODE | a | or b |" } },
+    "reports", "row 3 has 8 cells under a 7-cell header");
+  one("[MKT.HOOKS.38] an older 008 arc with a miscounted row is exempt by name",
+    write(join(exempt, ARCS, "N51-older.md"), arcFile("N51", "older", "LANDED", "| 1 | spn-support-ts | DOCS | a | by hand | b || ✅ |\n")),
+    "silent");
+
+  console.log("\n=== doc-check — a row of an arc's Previews table names its file as a link");
+
+  const previewsArc = (id, section) => arcFile(id, "previewed", "DECIDED", "| 1 | spn-support-ts | DOCS | a | by hand | b | |\n")
+    .replace("## Steps", `${section}\n\n## Steps`);
+  const PREVIEWS_HEAD = "## Previews\n\n| File | Kind | Shows | State |\n| --- | --- | --- | --- |\n";
+  // KNOWN-BAD: the File cell names its file in backticks and links nothing.
+  one("[MKT.SCRIPTS.80] a Previews row whose File cell is not a link is named",
+    write(join(arcs, "N999-unlinked.md"), previewsArc("N999", PREVIEWS_HEAD + "| `notes/N999/previews/a-preview.html` | preview | the layout | proposed |")),
+    "reports", "Previews row `notes/N999/previews/a-preview.html` names its file without a link");
+  one("[MKT.SCRIPTS.80] and the note shows the link form",
+    write(join(arcs, "N999-unlinked.md"), previewsArc("N999", PREVIEWS_HEAD + "| `a-preview.html` | preview | the layout | proposed |")),
+    "reports", "[`a-preview.html`](../notes/N999/previews/a-preview.html)");
+  // UNTOUCHED.
+  one("[MKT.SCRIPTS.80] a row written as a markdown link is left alone",
+    write(join(arcs, "N999-linked.md"), previewsArc("N999", PREVIEWS_HEAD + "| [`a-preview.html`](../notes/N999/previews/a-preview.html) | preview | the layout | decided 2026-10-01 |")),
+    "silent");
+  one("[MKT.SCRIPTS.80] a section that reads None. is left alone",
+    write(join(arcs, "N999-none.md"), previewsArc("N999", "## Previews\n\nNone.")), "silent");
+  one("[MKT.SCRIPTS.80] an 008 arc is exempt by name",
+    write(join(exempt, ARCS, "N52-older.md"), previewsArc("N52", PREVIEWS_HEAD + "| `a-preview.html` | preview | the layout | proposed |")),
+    "silent");
+
+  console.log("\n=== doc-check — the header's status against the arcs, when the whole page is written");
+
+  // The header line as the approach template writes it: the status in its own labelled badge.
+  const withStatus = (text, word, glyph = "&#x1F52E;") => text.replace(/<div class="eyebrow">[^\n]*<\/div>/,
+    `<div class="eyebrow"><span class="line1">Who this is for &middot; the developer</span><span class="st"><span class="lbl">Status:</span> ` +
+    `<span class="badge status ${word.toLowerCase()}">${glyph} ${word}</span></span></div>`);
+  // A workstream of its own, holding N1 at RUNNING and N2 at DECIDED, so the arcs give IMPLEMENTING.
+  const statusPage = join(stream(TMP, "050-status"), "approach.html");
+  one("[MKT.HOOKS.40] known-bad: a page reading PLANNING while an arc runs — both words are named",
+    write(statusPage, withStatus(CLEAN, "PLANNING")), "reports", "the header's status reads PLANNING and the arcs give IMPLEMENTING");
+  one("[MKT.HOOKS.40] and the finding names the command that writes it",
+    write(statusPage, withStatus(CLEAN, "PLANNING")), "reports", "spn-devex docs cycles <workstream> --write");
+  one("[MKT.HOOKS.40] a page reading IMPLEMENTING while an arc runs is left alone",
+    write(statusPage, withStatus(CLEAN, "IMPLEMENTING", "&#x1F6A7;")), "silent");
+  one("[MKT.HOOKS.40] a page whose header labels no status is left alone", write(statusPage, CLEAN), "silent");
+
+  // A workstream whose arcs are all at PROPOSED or DECIDED: the arcs give PLANNING.
+  const planning = join(workstreamsDir(TMP, "open"), "048-planning");
+  mkdirSync(join(planning, ARCS), { recursive: true });
+  writeFileSync(join(planning, ARCS, "N1-the-chapter.md"), arcFile("N1", "the chapter", "PROPOSED"));
+  writeFileSync(join(planning, ARCS, "N2-the-check.md"), arcFile("N2", "the check", "DECIDED"));
+  const PLANNED = CLEAN.replace("<td>RUNNING</td>", "<td>PROPOSED</td>");
+  one("[MKT.HOOKS.40] a page reading PLANNING while no arc is past DECIDED is left alone",
+    write(join(planning, "approach.html"), withStatus(PLANNED, "PLANNING")), "silent");
+  one("[MKT.HOOKS.40] known-bad: a page reading IMPLEMENTING while no arc is past DECIDED",
+    write(join(planning, "approach.html"), withStatus(PLANNED, "IMPLEMENTING", "&#x1F6A7;")),
+    "reports", "the header's status reads IMPLEMENTING and the arcs give PLANNING");
+
+  one("[MKT.HOOKS.40] a page in closed/ that reads DONE is left alone",
+    write(closedPage, withStatus(CLEAN, "DONE", "&#x2705;")), "silent");
+  one("[MKT.HOOKS.40] known-bad: a page in closed/ that still reads IMPLEMENTING",
+    write(closedPage, withStatus(CLEAN, "IMPLEMENTING", "&#x1F6A7;")), "reports", "a closed workstream reads DONE");
+  one("[MKT.HOOKS.40] workstream 008's page is exempt by name",
+    write(join(exempt, "plain-probe-approach.html"), withStatus(CLEAN, "PLANNING").replace(HOW_TAIL, "")), "silent");
+
+  // THE STAMP BEFORE THE MOVE. The close gate asks for a page that says it is finished before the
+  // folder moves, so a page in `open/` may read DONE once every arc carries a terminal status.
+  const landing = join(workstreamsDir(TMP, "open"), "049-landing");
+  mkdirSync(join(landing, ARCS), { recursive: true });
+  writeFileSync(join(landing, ARCS, "N1-the-chapter.md"), arcFile("N1", "the chapter", "LANDED"));
+  writeFileSync(join(landing, ARCS, "N2-the-check.md"), arcFile("N2", "the check", "DROPPED"));
+  const LANDED_PAGE = CLEAN.replace("<td>RUNNING</td>", "<td>LANDED</td>").replace("<td>DECIDED</td>", "<td>DROPPED</td>");
+  one("[MKT.HOOKS.40] a page in open/ stamped DONE once every arc is terminal is left alone",
+    write(join(landing, "approach.html"), withStatus(LANDED_PAGE, "DONE", "&#x2705;")), "silent");
+  one("[MKT.HOOKS.40] known-bad: a page in open/ stamped DONE while an arc still runs",
+    write(statusPage, withStatus(CLEAN, "DONE", "&#x2705;")), "reports", "the header's status reads DONE and the arcs give IMPLEMENTING");
 
   // THE SWEEP READS ARCS TOO, and counts each one it scanned — a bad path reads `0 scanned`.
   n += 1;

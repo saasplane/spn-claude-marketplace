@@ -53,8 +53,8 @@ export const VARIANTS = ["approach", "overview", "construct", "behaviors", "capa
                   "face", "data_model", "surface_map", "route_map", "register", "preview"] as const;
 export type Variant = (typeof VARIANTS)[number];
 
-/** The states a preview's State chip shows, as the preview template writes them. */
-export const PREVIEW_STATES = ["UNDER REVIEW", "APPROVED", "SUPERSEDED"];
+/** The words a preview's Status chip shows, as the preview template writes them: the arc's own two. */
+export const PREVIEW_STATES = ["PROPOSED", "DECIDED"];
 
 /** The lens register, as the document chapter's table renders each value for a reader. */
 export const LENS_LABEL: Record<string, string> = {
@@ -271,7 +271,8 @@ export function checkBlock(file: string, src: string, block: any, err: string | 
 
   // A REPORT CARRIES NO STATUS AND SAYS WHEN IT WAS GENERATED (02-document.md § Metadata,
   // RD.DEVEX.WORKSPACE.192). `generatedAt` is what lets the next report supersede this one. Only a
-  // tests report adds `measuredAt`, because only its runs can be older than the page.
+  // tests report adds `measuredAt`, because only its runs can be older than the page. Where no row
+  // cites a run there is no such moment, so the block leaves the key out; `null` is refused.
   if (variant === "report") {
     if ("status" in block)
       add("RULE", "a report carries no `status` — it is a snapshot, and its Summary says what was found (RD.DEVEX.WORKSPACE.192)");
@@ -280,6 +281,8 @@ export function checkBlock(file: string, src: string, block: any, err: string | 
     if ("measuredAt" in block) {
       if (block.reportType !== "TESTS")
         add("RULE", "only a `tests` report carries `measuredAt` — every other report is generated in the moment it measures, and `generatedAt` says when");
+      else if (block.measuredAt === null)
+        add("RULE", "`measuredAt` is written only where a run is stamped — where no row cites a run, leave the key out of the block and say in Measured that no run is stamped");
       else if (!isMoment(block.measuredAt))
         add("RULE", "`measuredAt` is the newest run the tests report read, as a date and a time with its offset — `2026-09-30T12:44+05:30`");
     }
@@ -681,12 +684,12 @@ export function checkHeader(file: string, src: string, block: any): Finding[] {
     if (!/>\s*Commit:\s*</.test(shown))
       add("RULE", "no Commit — a report names the commit it read, beside Generated");
   } else if (block.variant === "preview") {
-    // A PREVIEW'S CHIP IS THE STATE OF ITS REVIEW, never the block's `status`. The block's word says
-    // how far the workstream's page has come; the chip says whether the developer has judged this
-    // preview, so the two are not compared.
-    if (!statusChip) add("RULE", `no State chip — a preview shows ${PREVIEW_STATES.join(" · ")}`);
+    // A PREVIEW'S CHIP SAYS WHETHER THE DEVELOPER HAS ANSWERED IT, never the block's `status`. The
+    // block's word says how far the workstream's page has come; the chip reads `PROPOSED` until the
+    // developer answers and `DECIDED` after, so the two are not compared.
+    if (!statusChip) add("RULE", `no Status chip — a preview shows ${PREVIEW_STATES.join(" · ")}`);
     else if (!PREVIEW_STATES.includes(text(statusChip[1])))
-      add("RULE", `the State chip reads \`${text(statusChip[1])}\`; a preview shows ${PREVIEW_STATES.join(" · ")}`);
+      add("RULE", `the Status chip reads \`${text(statusChip[1])}\`; a preview shows ${PREVIEW_STATES.join(" · ")}`);
   } else if (!carriesStatus(file, block)) {
     if (statusChip && (block.variant === "overview" || !("status" in block)))
       add("RULE", block.variant === "overview" ? "an overview shows no status chip"
@@ -1051,7 +1054,10 @@ export function checkTreeFigures(file: string, src: string, root: string): Findi
   // including the fixture written to prove it. A real caption names the kind first and the folder
   // last (*the skeleton a `SUPPORT_UNIVERSAL` starts from, in `…/support-universal/`*), so reading
   // the first code span reads the kind and gives up. Taking the last one is what a reader does.
-  for (const m of src.matchAll(/<p>([\s\S]*?)<\/p>\s*<pre[^>]*>([\s\S]*?)<\/pre>/g)) {
+  //
+  // ONLY THE PARAGRAPH DIRECTLY BEFORE THE TREE IS READ. The caption cannot hold another `<p>`, so a
+  // folder named in an earlier paragraph, or in an earlier section, is never taken as this tree's.
+  for (const m of src.matchAll(/<p>((?:(?!<p[\s>])[\s\S])*?)<\/p>\s*<pre[^>]*>([\s\S]*?)<\/pre>/g)) {
     const [, caption, body] = m;
     const codes = [...caption.matchAll(/<code>([^<]+)<\/code>/g)].map((c) => c[1]);
     // A CITATION NAMES A FOLDER THAT EXISTS, and it reaches it one of two ways.
@@ -1115,8 +1121,11 @@ export function checkTreeFigures(file: string, src: string, root: string): Findi
 export function checkCodeFigures(file: string, src: string, root: string): Finding[] {
   const f: Finding[] = [];
   // A pathed CODE figure names the file above it. The audit reads that file and compares.
-  for (const m of src.matchAll(/<p>[^<]*<code>([^<]*?\.(?:ts|tsx|json|sql|md|py|sh|yml|yaml))<\/code>[^<]*<\/p>\s*<pre[^>]*>([\s\S]*?)<\/pre>/g)) {
-    const [, path, body] = m;
+  for (const m of src.matchAll(/<p>[^<]*<code>([^<]*?\.(?:ts|tsx|json|sql|md|py|sh|yml|yaml))<\/code>[^<]*<\/p>\s*<pre([^>]*)>([\s\S]*?)<\/pre>/g)) {
+    const [, path, attributes, body] = m;
+    // A DIFF SHOWS A CHANGE, so it never matches the file its caption names. A page writes one as
+    // `<pre data-lang="diff">`, and such a block is not a figure copied from a file.
+    if (/\bdata-lang="diff"/.test(attributes)) continue;
     // A PATHED FIGURE NAMES A PATH. A bare file name is a TERM — the book's whole job is to
     // describe `spkind.json`, and refusing the chapter for not containing one gets it exactly
     // backwards: a standard names the file a stack has, and has none of them itself. The rule's
@@ -1552,11 +1561,12 @@ export function checkDepends(files: string[], blocks: Map<string, any>): Finding
 export type Declaration = { name: string; members: string[]; file: string };
 
 export const ENUM_BLOCK = /```ts\n([\s\S]*?)```/g;
-// AN ENUM BODY HOLDS NO BRACE, so the body is read as "everything that is not one". Closing at the
-// first line-start `}` instead looked right and was not: a one-line `export enum X { A = 'A' }` has
-// no such brace, so the match ran on into the NEXT enum and reported the neighbour's members as
-// this one's. That produced a confident, precise, wrong finding about a chapter that was correct.
-export const ENUM_HEAD = /export enum ([A-Za-z][A-Za-z0-9_]*)\s*\{([^{}]*)\}/g;
+/**
+ * An enum's name and its body. The body holds no brace of its own, so it ends at its first `}` and a
+ * one-line enum never runs on into the enum after it. A comment inside it may hold a balanced pair,
+ * as `{@link Other}` does, and the body reads through such a pair.
+ */
+export const ENUM_HEAD = /export enum ([A-Za-z][A-Za-z0-9_]*)\s*\{((?:[^{}]|\{[^{}]*\})*)\}/g;
 // A member on its own line, or several on one line in a compact declaration.
 export const ENUM_MEMBER = /(?:^|[{,]|\n)\s*([A-Z][A-Z0-9_]*)\s*=/g;
 
@@ -1572,15 +1582,26 @@ export function declarationsIn(file: string, src: string): Declaration[] {
   return found;
 }
 
+/** A name ending in `Type` that source declares as an interface, a type alias or a class. */
+export const SHAPE_HEAD = /export (?:interface|type|(?:abstract )?class) ([A-Z][A-Za-z0-9_]*Type)\b/g;
+
+/** What the workspace's source declares: each enum with its members, and each `…Type` name that is a shape. */
+export type SourceDeclarations = { enums: Map<string, { file: string; members: string[] }>; shapes: Set<string> };
+
 /**
- * Every closed value the workspace's source declares, indexed by name.
+ * Every closed value the workspace's source declares, indexed by name, and every name ending in
+ * `Type` that the source declares as something other than an enum.
  *
  * Built once per run rather than per page. Only `src/` is read: a build output and a dependency
  * hold copies, and a copy disagreeing with its source is a finding about the build rather than
  * about the book.
+ *
+ * A SHAPE IS NOT A CLOSED VALUE. `EntityType` is a row an interface describes, so no chapter owes
+ * it a list of members. A name the source declares both ways is an enum, and stays out of `shapes`.
  */
-export function realizationIndex(workspace: string): Map<string, { file: string; members: string[] }> {
+export function sourceDeclarations(workspace: string): SourceDeclarations {
   const index = new Map<string, { file: string; members: string[] }>();
+  const shaped = new Set<string>();
   const walk = (dir: string, depth: number): void => {
     if (depth > 8) return;
     let entries;
@@ -1593,6 +1614,7 @@ export function realizationIndex(workspace: string): Map<string, { file: string;
       } else if (entry.name.endsWith(".ts") && !entry.name.endsWith(".d.ts")) {
         let body;
         try { body = readFileSync(full, "utf8"); } catch { continue; }
+        if (body.includes("Type")) for (const shape of body.matchAll(SHAPE_HEAD)) shaped.add(shape[1]);
         if (!body.includes("export enum ")) continue;
         for (const decl of body.matchAll(ENUM_HEAD)) {
           const members = [...decl[2].matchAll(ENUM_MEMBER)].map((m) => m[1]);
@@ -1624,7 +1646,12 @@ export function realizationIndex(workspace: string): Map<string, { file: string;
     if (!repo.isDirectory() || repo.name[0] === ".") continue;
     nodesOf(join(workspace, repo.name));
   }
-  return index;
+  return { enums: index, shapes: new Set([...shaped].filter((name) => !index.has(name))) };
+}
+
+/** Every closed value the workspace's source declares, indexed by name. */
+export function realizationIndex(workspace: string): Map<string, { file: string; members: string[] }> {
+  return sourceDeclarations(workspace).enums;
 }
 
 /** Each declaration in this chapter, read against the code that realizes it. */
@@ -1669,7 +1696,14 @@ export function checkVocabulary(
 // exists as `SPDocPassType` is, and the contract had deleted it the day before.
 export const TERMS_CONTRACT = /^\|[^|]*\|\s*`([A-Z][A-Za-z0-9_]*Type)(?:\.[A-Z][A-Za-z0-9_]*)?`\s*\|/gm;
 
-export function checkVocabularyCoverage(files: string[], sources: Map<string, string>): Finding[] {
+/**
+ * The coverage check over a corpus. `shapes` holds the names ending in `Type` that the source
+ * declares as an interface, a type alias or a class: such a term is no closed value, so it is not
+ * reported. A term the source declares nowhere is still reported, because the book may lead the code.
+ */
+export function checkVocabularyCoverage(
+  files: string[], sources: Map<string, string>, shapes: ReadonlySet<string> = new Set<string>()
+): Finding[] {
   const f: Finding[] = [];
   const declaredIn = new Map<string, string[]>();
   for (const file of files) {
@@ -1690,7 +1724,7 @@ export function checkVocabularyCoverage(files: string[], sources: Map<string, st
     }
   }
   for (const [name, file] of named) {
-    if (declaredIn.has(name)) continue;
+    if (declaredIn.has(name) || shapes.has(name)) continue;
     f.push({ check: "vocabulary", grade: "SOFT", file,
       message: `\`${name}\` is named as a contract term and no chapter declares its members — a reader cannot write the value from the book` });
   }
@@ -2363,8 +2397,11 @@ export function behavioursFor(seat: string): string | null {
  * computed — from the block and from the tag line, the two places it renders.
  *
  * It writes the seat file only. The page follows from `docs.ts page`, so there is one writer per file.
+ *
+ * `say` receives each line the status command prints about a seat. `docs audit` calls this with the
+ * write turned off and passes a `say` that prints nothing, so only the findings reach its output.
  */
-export function statusFor(seat: string, workspace: string, write: boolean): Finding[] {
+export function statusFor(seat: string, workspace: string, write: boolean, say: (line: string) => void = console.log): Finding[] {
   const findings: Finding[] = [];
   const src = readFileSync(seat, "utf8");
   const { block, error } = readBlock(src);
@@ -2380,10 +2417,10 @@ export function statusFor(seat: string, workspace: string, write: boolean): Find
     const leading = new RegExp(`,\\s*${pair}`);
     const out = (leading.test(src) ? src.replace(leading, "") : src.replace(new RegExp(`${pair}\\s*,\\s*`), ""))
       .replace(/(`For:[^`\n]*`)[ \t]*·[ \t]*`Status:[^`\n]*`/u, "$1");
-    if (out === src) { console.log(`current  ${shown} — a FOUNDATION construct states a standard and carries no status`); return findings; }
+    if (out === src) { say(`current  ${shown} — a FOUNDATION construct states a standard and carries no status`); return findings; }
     // SOFT while the book's constructs still carry the word. The sweep runs this command in write
     // mode over the tree; until it does, the finding says what is owed rather than refusing 51 pages.
-    if (write) { writeFileSync(seat, out); console.log(`wrote    ${shown} — status removed; a FOUNDATION construct's rows are \`PROMISE\``); }
+    if (write) { writeFileSync(seat, out); say(`wrote    ${shown} — status removed; a FOUNDATION construct's rows are \`PROMISE\``); }
     else findings.push({ check: "status", grade: "SOFT", file: seat,
       message: "a construct in a FOUNDATION repository carries no `status` — its behaviour rows are `PROMISE` and a promise has no proof state" });
     return findings;
@@ -2395,8 +2432,8 @@ export function statusFor(seat: string, workspace: string, write: boolean): Find
     // rolls up to PLANNING. No file means the derivation has no input at all, so it claims nothing
     // and names what is missing — silently stamping PLANNING would read as a measurement.
     findings.push({ check: "status", grade: "SOFT", file: seat,
-      message: "no behaviours file at this construct's own path, so nothing rolls up — \`${SEAT.behaviors}/\` mirrors \`${SEAT.constructs}/\` file for file, and `docs parity` reports the pair" });
-    console.log(`unread   ${shown} — no behaviours file at the mirrored path`);
+      message: `no behaviours file at this construct's own path, so nothing rolls up — \`${SEAT.behaviors}/\` mirrors \`${SEAT.constructs}/\` file for file, and \`docs parity\` reports the pair` });
+    say(`unread   ${shown} — no behaviours file at the mirrored path`);
     return findings;
   }
 
@@ -2414,8 +2451,8 @@ export function statusFor(seat: string, workspace: string, write: boolean): Find
                       `$1${glyph[derived]}$3${derived}$5`);
   }
   const from = relative(workspace, behaviours);
-  if (out === src) { console.log(`current  ${shown} — ${derived} from ${rows.length} row(s) in ${from}`); return findings; }
-  if (write) { writeFileSync(seat, out); console.log(`wrote    ${shown} — ${block.status} → ${derived}, from ${rows.length} row(s) in ${from}`); }
+  if (out === src) { say(`current  ${shown} — ${derived} from ${rows.length} row(s) in ${from}`); return findings; }
+  if (write) { writeFileSync(seat, out); say(`wrote    ${shown} — ${block.status} → ${derived}, from ${rows.length} row(s) in ${from}`); }
   else findings.push({ check: "status", grade: "RULE", file: seat, message: `the block says \`${block.status}\` and the ${rows.length} behaviour row(s) in \`${from}\` derive \`${derived}\`` });
   return findings;
 }
@@ -2762,10 +2799,10 @@ export function duplicateIds(repo: string): Finding[] {
  * id, a folder name to a package name, a persona to a persona.
  *
  * **Three are here and one is not.** Id coverage — every behaviour id cited by a case, and every
- * cited id declared as a row — is already built, in both directions, in the CLI's own
- * `behaviours-join.ts` under `RD.SUPPORT.APPS.084`, and `spnutils apps validate repo` reports it. Building a
- * second one here would be the divergence that file's own header describes: two implementations of
- * one idea, disagreeing about the same estate.
+ * cited id declared as a row — is the behaviours join's, under `RD.SUPPORT.APPS.084`. It is built in
+ * `spn-apps`, in `scripts/checks/behaviour-join.ts`, and `spn-devex behaviours coverage` lists a case
+ * that cites an id no row declares. Building one more here would be two implementations of one
+ * idea, disagreeing about the same estate.
  *
  * **A check that cannot run says so.** An absent scan and an absent finding must never share a
  * verdict, so a seat with no ids and a seat with no `personas.md` are each reported by name with the
@@ -3264,7 +3301,7 @@ export function audit(paths: string[], workspace: string): Finding[] {
   const sources = new Map<string, string>();
   // Read once for the whole run. Per page this would walk every repository's source once per
   // chapter, and the corpus is 339 of them.
-  const realized = realizationIndex(workspace);
+  const { enums: realized, shapes } = sourceDeclarations(workspace);
   const templates = process.env.SPN_TEMPLATES
     ?? bookTemplatesDir(join(workspace, "spn-foundation"));
   for (const p of paths) {
@@ -3294,9 +3331,15 @@ export function audit(paths: string[], workspace: string): Finding[] {
     findings.push(...checkOverviewSource(p, src, block, workspace));
     findings.push(...checkProduced(p, src, block, workspace, templates));
     findings.push(...checkVocabulary(p, src, realized));
+    // THE STATUS CHECK, WITH ITS WRITE TURNED OFF. A construct whose status differs from what its
+    // behaviour rows derive is an audit finding, and the seat file is left as it is. Only that
+    // refusal is taken: a construct with no behaviours file is the parity check's to report, and a
+    // FOUNDATION construct that still carries the word is the status command's own.
+    if (block.variant === "construct" && p.endsWith(".md"))
+      findings.push(...statusFor(p, workspace, false, () => {}).filter((found) => found.grade === "RULE"));
   }
   findings.push(...checkDepends(paths, blocks));
-  findings.push(...checkVocabularyCoverage(paths, sources));
+  findings.push(...checkVocabularyCoverage(paths, sources, shapes));
   return findings;
 }
 

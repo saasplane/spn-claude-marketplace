@@ -24,7 +24,8 @@
 //                      `◐ stopped`, a row still `in progress <time>` and a row `⏸ held on Q<n>` refuse.
 //                      There is no override, and none is needed — recording the deferral is the way through.
 //
-//   sweep :  node split-plan.ts [path …]     (every open workstream's rows)
+//   sweep :  node split-plan.ts [path …]     (every open workstream's rows: the tally, then each row
+//                                             nobody accounted for and each row with a wrong cell count)
 //
 // PORTED FROM `hooks/scripts/split-plan.py`, AND THE PORT IS ALSO THE FIX. The hook audit measured it
 // at 77.7% of every millisecond a hook has ever cost — 79.2 s across 7,895 fires — and 76.0 s of that
@@ -45,7 +46,11 @@ import { APPROACH_SUFFIX, ARCS, DEVEX, SESSIONS, WORKSTREAM_STATES, WORKSTREAMS,
 // The state a row reaches. `landed` is the only one that satisfies the documents pass; all three
 // named states satisfy the close. A mark nobody wrote is what the close refuses.
 const UNDECIDED = new Set(["", "-", "--", "?", "⬜", "☐", "[ ]", "tbd", "todo", "open", "unknown"]);
-const LANDED = ["landed", "✅", "done", "shipped"];
+// A ROW LANDS BY ITS WORD, OR BY A TICK AND A DATE. A tick followed by anything else names no date
+// and no commit a reader can check, so a cell such as `✅ the arc is written` reads as `pending`.
+const LANDED = ["landed", "done", "shipped"];
+const TICK = "✅";
+const DATED = /^\d{4}-\d{2}-\d{2}\b/;
 const ACCOUNTED = ["landed", "carried", "deferred"];
 // `stopped` is the row somebody began and then put down — a question arrived, a plugin needed a
 // reload, the window ran out. It is NOT accounted for: half an edit sits in the tree, and the one
@@ -138,7 +143,8 @@ function* mdTables(text: string): Generator<string[][]> {
       if (table.length) { yield table; table = []; header = null; }
       continue;
     }
-    const cells = stripped.replace(/^\|/, "").replace(/\|$/, "").split("|").map((c) => c.trim());
+    // A pipe written with a backslash stays inside its cell, as `doc-check` and `docs cycles` read it.
+    const cells = stripped.replace(/^\|/, "").replace(/\|$/, "").split(/(?<!\\)\|/).map((c) => c.trim());
     if (/^:?-{3,}/.test(cells[0]) && header) { table = [header]; header = null; continue; }
     if (table.length) table.push(cells); else header = cells;
   }
@@ -227,6 +233,22 @@ export function stepsOf(text: string): Step[] | null {
       out.push({ id, what: cells[whatAt] ?? "", state: stateAt >= 0 ? cells[stateAt] ?? "" : null, cells });
     }
   }
+  return out;
+}
+
+/**
+ * The step rows of an arc whose cell count differs from their header's, each with both counts. Such
+ * a row is read one cell to the left or skipped, so its State is not the cell a person wrote.
+ */
+export function miscountedSteps(text: string): Array<{ id: string; cells: number; header: number }> {
+  const section = stepsSection(text);
+  if (section === null) return [];
+  const out: Array<{ id: string; cells: number; header: number }> = [];
+  for (const table of mdTables(section))
+    for (const cells of table.slice(1)) {
+      const id = stepId(cells[0] ?? "");
+      if (STEP_ID.test(id) && cells.length !== table[0].length) out.push({ id, cells: cells.length, header: table[0].length });
+    }
   return out;
 }
 
@@ -319,9 +341,10 @@ export function stateOf(row: Row): string {
   const raw = row.state.trim().toLowerCase();
   const state = raw.replace(LEAD, "");
   if (UNDECIDED.has(raw) || !state) return "empty";
-  // `✅` IS ITSELF A LANDED MARK, so the raw cell is read before the glyph is stripped. Stripping
-  // first turned every `✅ 2026-09-07` into `2026-09-07` and lost eleven landings.
-  if (startsWithAny(raw, LANDED) || startsWithAny(state, LANDED)) return "landed";
+  if (startsWithAny(state, LANDED)) return "landed";
+  // `✅ 2026-09-07` IS A LANDING: the tick and its date. The tick sits in what `LEAD` strips, so it
+  // is looked for there, and a date with no tick before it stays an ordinary word.
+  if (raw.slice(0, raw.length - state.length).includes(TICK) && DATED.test(state)) return "landed";
   if (state.startsWith("carried")) return "carried";
   if (state.startsWith("deferred")) return "deferred";
   // Read before `pending`, and by the glyph as well as the word, so a stop carrying a date rather
@@ -356,7 +379,8 @@ const SUCCESSOR = /\b(\d{3})(?:-[a-z0-9-]+)?\b/;
 
 /** What a carried cell points at, read from the text after the word `carried`. */
 export function carryTarget(row: Row): { kind: "own-arc" | "workstream" | "unnamed"; name: string } {
-  const after = row.state.replace(LEAD, "").replace(/^carried\s*(?:→|->|to)?\s*/i, "").trim();
+  // A carry may write its date before the arrow, as in `↷ carried 2026-10-01 → N006 row 1`.
+  const after = row.state.replace(LEAD, "").replace(/^carried\s*(?:\d{4}-\d{2}-\d{2}\s*)?(?:→|->|to\b)?\s*/i, "").trim();
   if (!after) return { kind: "unnamed", name: "" };
   // THE OWN-ARC TEST RUNS FIRST. `carried → arcs/N15-what-the-final-shape-left-owed.md step 8` holds
   // digits that `SUCCESSOR` would read as a workstream number if it were asked first.
@@ -454,6 +478,17 @@ export function sequencingResolved(root: string, subject: string, row: Row): boo
   const target = carryTarget(row);
   if (target.kind !== "own-arc") return true;
   return arcStatus(root, subject, target.name) === "LANDED";
+}
+
+/**
+ * Whether the tick in a cell lands its row: a date or a landed word follows it, emphasis marks aside.
+ * The Stop hook reads a row with no State column by this, so both readers take one tick the same way.
+ */
+export function tickLands(cell: string): boolean {
+  const at = cell.indexOf(TICK);
+  if (at < 0) return false;
+  const after = cell.slice(at + TICK.length).toLowerCase().replace(LEAD, "");
+  return DATED.test(after) || startsWithAny(after, LANDED);
 }
 
 /**
@@ -743,7 +778,12 @@ function carriesDecision(card: string): boolean {
 
 /** Each card in a page's `Open` section, with whether the card itself carries its decision. */
 export function cardsOf(page: string): Array<{ number: string; decided: boolean }> {
-  const section = OPEN_SECTION.exec(read(page));
+  return cardsIn(read(page));
+}
+
+/** The same reading over a page's text, for a caller that holds the text and not the file. */
+export function cardsIn(text: string): Array<{ number: string; decided: boolean }> {
+  const section = OPEN_SECTION.exec(text);
   if (!section) return [];
   const html = section[0];
   const out: Array<{ number: string; decided: boolean }> = [];
@@ -956,13 +996,22 @@ const CLOSED_WORDS = ["closed", "landed", "complete", "completed", "done", "auth
 // WORDS, NOT SUBSTRINGS. `incomplete` contains `complete` and `unfinished business` is not a close.
 const FINISHED = new RegExp(`(?:^|[^a-z])(?:${CLOSED_WORDS.join("|")})(?:[^a-z]|$)`, "i");
 
+/**
+ * The status field of a page's header, as a person reads it: what follows the `Status:` label. Null
+ * where the page has no header line, or the line labels no status.
+ */
+export function mastheadStatus(text: string): string | null {
+  const found = EYEBROW.exec(text);
+  if (found === null) return null;
+  return STATUS_FIELD.exec(flat(found[1]))?.[1].trim() ?? null;
+}
+
 /** Whether the page's own masthead says the work is finished. */
 function saysItIsClosed(page: string): boolean {
-  const found = EYEBROW.exec(read(page));
+  const text = read(page);
+  const found = EYEBROW.exec(text);
   if (found === null) return true;                  // no masthead to read is not a finding
-  const line = flat(found[1]);
-  const labelled = STATUS_FIELD.exec(line);
-  return FINISHED.test(labelled ? labelled[1] : line);
+  return FINISHED.test(mastheadStatus(text) ?? flat(found[1]));
 }
 
 export function gateClose(payload: Payload): Verdict {
@@ -1206,43 +1255,69 @@ export function gateClose(payload: Payload): Verdict {
 
 // ---------------------------------------------------------------------------- the sweep
 
+// What the report calls each state a row can be left in without being accounted for.
+const UNACCOUNTED: Array<[state: string, word: string]> = [
+  ["empty", "undecided"], ["pending", "pending"], ["stopped", "stopped"], ["in-progress", "in progress"], [HELD_STATE, "held"],
+];
+
+/**
+ * The close gate's report over one set of rows, as lines: the tally first, then each row nobody
+ * accounted for, each row that waits on an arc of its own workstream, and each carry that cannot
+ * land. `label` names what the rows belong to, a workstream or one arc, and `suffix` ends the tally
+ * line. The report run by hand prints these lines, and the Stop hook reads them for an arc that lands.
+ */
+export function reportLines(root: string, label: string, rows: Row[], suffix = ""): string[] {
+  // SEQUENCING IS COUNTED APART FROM HANDOVER. A row pointing at a later arc of this same workstream
+  // is not carried; it resolves through that arc, and counting it as accounted for is how `pending 0`
+  // stood over ten rows of undone work.
+  const tally: Record<string, number> = { landed: 0, carried: 0, sequencing: 0, deferred: 0, stopped: 0, "in-progress": 0, [HELD_STATE]: 0, pending: 0, empty: 0 };
+  for (const row of rows) {
+    const state = stateOf(row);
+    if (state === "carried" && carryTarget(row).kind === "own-arc") tally.sequencing += 1;
+    else tally[state] += 1;
+  }
+  const out = [
+    `${label}: ${rows.length} rows · landed ${tally.landed} · carried ${tally.carried} · ` +
+    `sequencing ${tally.sequencing} · deferred ${tally.deferred} · stopped ${tally.stopped} · ` +
+    `in progress ${tally["in-progress"]} · held ${tally[HELD_STATE]} · ` +
+    `pending ${tally.pending} · undecided ${tally.empty}${suffix}`,
+  ];
+  for (const [state, word] of UNACCOUNTED)
+    for (const row of rows)
+      if (stateOf(row) === state) out.push(`    ${word}  ${row.scope} — ${row.label.slice(0, 70)}`);
+  // NAMED, NOT JUST COUNTED. `sequencing 10` above a page reading `pending 0` is still a number
+  // somebody has to go and resolve by hand, and the arcs it waits on are what they need.
+  for (const row of rows.filter((one) => stateOf(one) === "carried" && carryTarget(one).kind === "own-arc"))
+    out.push(`    sequencing  ${row.scope} — waits on ${carryTarget(row).name}`);
+  for (const row of rows.filter((one) => stateOf(one) === "carried")) {
+    const fault = carryFault(root, row);
+    if (fault) out.push(`    DEAD CARRY  ${row.scope} — ${fault}`);
+  }
+  return out;
+}
+
+/** One line for each step row of an arc whose cell count differs from its header's. */
+export function miscountLines(arc: string, text: string): string[] {
+  return miscountedSteps(text).map((row) =>
+    `    cell count  ${arc} step ${row.id} — ${row.cells} cells under a ${row.header}-cell header`);
+}
+
 function sweep(roots: string[]): number {
   for (const start of roots) {
     const root = workspaceRoot(start) ?? resolve(start);
     const streams = openWorkstreams(root);
     console.log(`${root}   ${streams.size} open`);
     for (const [subject, pages] of [...streams].sort((a, b) => a[0].localeCompare(b[0]))) {
-      const rows = workstreamPlan(subjectFolders(root, subject, null), pages);
+      const folders = subjectFolders(root, subject, null);
+      const rows = workstreamPlan(folders, pages);
       if (!rows.length) {
         console.log(`  ${subject}: no arc carries a step table with Repo and State — no split plan yet`);
         continue;
       }
-      // SEQUENCING IS COUNTED APART FROM HANDOVER. A row pointing at a later arc of this same
-      // workstream is not carried; it resolves through that arc, and counting it as accounted for is
-      // how `pending 0` stood over ten rows of undone work.
-      const tally: Record<string, number> = { landed: 0, carried: 0, sequencing: 0, deferred: 0, stopped: 0, "in-progress": 0, [HELD_STATE]: 0, pending: 0, empty: 0 };
-      for (const row of rows) {
-        const state = stateOf(row);
-        // A carried row pointing inside this workstream is sequencing, and it is reported as its own
-        // number. The sweep is where a reader takes the count from, so this is where it has to be true.
-        if (state === "carried" && carryTarget(row).kind === "own-arc") tally.sequencing += 1;
-        else tally[state] += 1;
-      }
-      console.log(
-        `  ${subject}: ${rows.length} rows · landed ${tally.landed} · carried ${tally.carried} · ` +
-        `sequencing ${tally.sequencing} · deferred ${tally.deferred} · stopped ${tally.stopped} · ` +
-        `in progress ${tally["in-progress"]} · held ${tally[HELD_STATE]} · ` +
-        `pending ${tally.pending} · undecided ${tally.empty} · ${pages.length} page(s)`);
-      for (const row of rows)
-        if (stateOf(row) === "empty") console.log(`      undecided  ${row.scope} — ${row.label.slice(0, 70)}`);
-      // NAMED, NOT JUST COUNTED. `sequencing 10` above a page reading `pending 0` is still a number
-      // somebody has to go and resolve by hand, and the arcs it waits on are what they need.
-      const waiting = rows.filter((row) => stateOf(row) === "carried" && carryTarget(row).kind === "own-arc");
-      for (const row of waiting)
-        console.log(`      sequencing  ${row.scope} — waits on ${carryTarget(row).name}`);
-      const broken = rows.filter((row) => stateOf(row) === "carried").map((row) => [row, carryFault(root, row)] as const).filter(([, f]) => f);
-      for (const [row, fault] of broken)
-        console.log(`      DEAD CARRY  ${row.scope} — ${fault}`);
+      const lines = reportLines(root, subject, rows, ` · ${pages.length} page(s)`);
+      for (const folder of folders)
+        for (const file of arcFiles(folder)) lines.push(...miscountLines(arcName(file), read(file)));
+      for (const line of lines) console.log(`  ${line}`);
     }
   }
   return 0;

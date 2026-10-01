@@ -3,12 +3,18 @@
 //
 // - `startCommand`, from `PreToolUse`: while recording is on, the command is read (`command-reader.ts`)
 //   and, only where a program the filter names is in it, `telemetry/pending/<tool_use_id>.json` is
-//   written with the start time and the reading. Writing one removes any older than a day, which a
-//   crashed or refused call left behind. An unmatched call pays for the reading and nothing more.
+//   written with the start time and the reading. An unmatched call pays for the reading and nothing
+//   more.
 // - `finishCommand`, from `PostToolUse` or `PostToolUseFailure`: the start file is read and removed,
-//   and one line per program is written with the whole call's `ms` and its `exit`. A failure with no
-//   code reads 1; a background call (`run_in_background`) returns before its command ends, so its
-//   line is written with `exit` null.
+//   and one line is written for the call with its `ms` and its `exit`. The line names the first
+//   program the filter matched, and `programs` holds how many the call ran, so a total by program
+//   holds a call's time once. A failure with no code reads 1; a background call (`run_in_background`)
+//   returns before its command ends, so its line is written with `exit` null.
+//
+// A START FILE NO HOOK CLOSES. A call refused after `PreToolUse` wrote its start file never runs, so
+// no hook comes after it; a crashed call leaves one the same way, and so does a failed call in a
+// window that loaded its hooks before `PostToolUseFailure` was registered. Writing a start file
+// removes every one older than `STALE_MS`, so no reader takes it for a running command.
 
 import { mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -17,9 +23,11 @@ import { loadPrograms, readCommand, type Reading } from "./command-reader.ts";
 import { workspaceRoot, type Payload } from "./payload.ts";
 
 const PENDING = "pending";
-const DAY_MS = 24 * 3600 * 1000;
+/** The longest a foreground Bash call runs: the harness's largest timeout. A start file older than this has no call behind it. */
+export const STALE_MS = 600_000;
 
-type Started = { at: number; background: boolean; found: Reading[] };
+/** The start file: when the call began, whether it runs in the background, and every program the filter matched in it. */
+export type Started = { at: number; background: boolean; found: Reading[] };
 
 /** The call id as a file name, or null where there is none to pair on. */
 function fileOf(payload: Payload): string | null {
@@ -30,7 +38,7 @@ function fileOf(payload: Payload): string | null {
 function prune(dir: string): void {
   const now = Date.now();
   for (const name of readdirSync(dir)) {
-    try { if (now - statSync(join(dir, name)).mtimeMs > DAY_MS) rmSync(join(dir, name), { force: true }); }
+    try { if (now - statSync(join(dir, name)).mtimeMs > STALE_MS) rmSync(join(dir, name), { force: true }); }
     catch { /* another hook removed it first */ }
   }
 }
@@ -74,7 +82,7 @@ export function exitOf(payload: Payload, failed: boolean): number {
   return failed ? 1 : 0;
 }
 
-/** `PostToolUse` or `PostToolUseFailure` on Bash: write the lines and remove the start file. Never throws. */
+/** `PostToolUse` or `PostToolUseFailure` on Bash: write the call's line and remove the start file. Never throws. */
 export function finishCommand(payload: Payload, failed: boolean): void {
   try {
     if (payload.tool_name !== "Bash") return;
@@ -90,11 +98,12 @@ export function finishCommand(payload: Payload, failed: boolean): void {
     const ms = Math.max(0, Math.round(Date.now() - started.at));
     const background = started.background || payload.tool_input?.run_in_background === true;
     const exit = background && !failed ? null : exitOf(payload, failed);
-    const entries: Entry[] = started.found.map((one) => ({
-      script: one.script, group: one.group, subgroup: one.subgroup, action: one.action, args: one.args,
-      repo: one.repo, ms, exit,
-    }));
+    const first = started.found[0];
+    const entry: Entry = {
+      script: first.script, group: first.group, subgroup: first.subgroup, action: first.action, args: first.args,
+      repo: first.repo, ms, exit, programs: started.found.length,
+    };
     write(root, { script: "spn-devex", event: "command", tool: "Bash", session: payload.session_id ?? null, ...tagsOf(payload) },
-          entries);
+          [entry]);
   } catch { /* a tool never fails because timing failed */ }
 }

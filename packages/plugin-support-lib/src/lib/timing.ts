@@ -12,7 +12,8 @@
 // `args` (what was typed after the action, a secret-looking option's value written `***`; null for a
 // hook check), `event`, `tool`, `ms`, `exit` (null for a hook check), `at` (UTC, ending in `Z`),
 // `repo` (the member repository the call ran in; null at the workspace root), `pid`, and the work
-// tags `session`, `agent`, `workstream`, `arc`, `order`.
+// tags `session`, `agent`, `workstream`, `arc`, `order`. A Bash command's line carries one more key
+// after those, `programs`: how many programs the filter names the call ran. No other line carries it.
 //
 // NAMES ARE STRUCTURED AT THE CALL SITE, never parsed from a string. A check file with sub-checks is
 // `{ group: <file>, action: <sub-check> }` (`split-plan` › `close`); a check file with one check names
@@ -40,15 +41,18 @@ const CARRIED = "tags.json";
 const KEEP_MS = 14 * 24 * 3600 * 1000;
 const MAX_BYTES = 4 * 1024 * 1024;
 
-/** Every key a line carries, in the order it is written. */
+/** Every key each line carries, in the order it is written. A Bash command's line adds `programs` after them. */
 export const LINE_KEYS = ["script", "group", "subgroup", "action", "args", "event", "tool", "ms", "exit", "at",
   "repo", "pid", "session", "agent", "workstream", "arc", "order"] as const;
 
 /** What ran, in up to three levels. `args` is what was typed after the action, or null. */
 export type SpanName = { group?: string | null; subgroup?: string | null; action: string | null; args?: string | null };
 
-/** One measured thing, before the facts every line of a run shares are added. */
-export type Entry = SpanName & { ms: number; exit?: number | null; script?: string; repo?: string | null };
+/**
+ * One measured thing, before the facts every line of a run shares are added. `programs` is set for a
+ * Bash command alone, and only an entry that sets it writes the key.
+ */
+export type Entry = SpanName & { ms: number; exit?: number | null; script?: string; repo?: string | null; programs?: number };
 
 /**
  * What every line of one run shares. `script` is the plugin; `cwd` is where the call ran, read for
@@ -282,6 +286,7 @@ export function write(root: string | null, facts: Facts, entries: Entry[], cwd?:
       repo: entry.repo !== undefined ? entry.repo : repo, pid: process.pid,
       session: facts.session ?? null, agent: facts.agent ?? null,
       workstream: work.workstream, arc: work.arc, order: work.order,
+      ...(entry.programs !== undefined ? { programs: entry.programs } : {}),
     }));
     appendFileSync(log, lines.join("\n") + "\n");
   } catch { /* a tool never fails because timing failed */ }
@@ -323,12 +328,14 @@ export function record(name: SpanName, ms: number, exit: number | null = null): 
 
 /**
  * Write what was measured, and the whole run as one more line, if and only if the switch is present.
- * `exit` is the whole run's exit code for a command; a hook run leaves it null.
+ * `exit` is the whole run's exit code for a command; a hook run leaves it null. A run that timed no
+ * check writes nothing, unless `always` asks for its whole-run line: the hook after a failed call
+ * runs no check, and its cost is still read from that line.
  */
-export function end(exit: number | null = null): void {
+export function end(exit: number | null = null, always = false): void {
   try {
     const facts = state.facts;
-    if (!facts || !state.root || !state.spans.length) return;
+    if (!facts || !state.root || (!state.spans.length && !always)) return;
     // The whole process, Node start to here. Startup, TypeScript loading and the imports are most of
     // a hook's cost, and no span inside a check can see them.
     const whole: Entry = { ...(facts.process ?? { group: "events", action: null }), ms: round(performance.now()), exit };

@@ -92,7 +92,7 @@ Repo: <folder name> | Commit: <short hash> | Generated: <time>
 - **Description**: one paragraph saying what was counted, **with no number**, and when you would read it.
 - **Generated** is `generatedAt`, a date and a time with its offset (`2026-09-30T12:57+05:30`), in a `<time class="local" datetime="…">` element whose text is the same value; the template's script shows it in the reader's own time zone.
 - **No status, and no comparison with an earlier report — MUST** (decision `RD.DEVEX.WORKSPACE.192`). A report is a snapshot, and Generated says when its numbers were true. `docs audit` refuses a report that carries a status.
-- **The metadata block** carries `id`, `variant` (`report`), `reportType`, `title`, `repository`, `generatedAt`, `summary` and `keywords`. A `tests` report also carries `measuredAt`, the newest `Updated at` among the rows it read, stated in Measured and never in the header.
+- **The metadata block** carries `id`, `variant` (`report`), `reportType`, `title`, `repository`, `generatedAt`, `summary` and `keywords`. A `tests` report also carries `measuredAt`, the newest `Updated at` among the rows it read, stated in Measured and never in the header. Where no row cites a run, the block leaves `measuredAt` out and Measured says that no run is stamped; `docs audit` refuses the key written as `null`.
 
 **Each report type has one approved Subtitle**, copied word for word with `{repo}` replaced by the repository's folder name:
 
@@ -190,7 +190,7 @@ Every record and every recommendation says who decides it, by one rule:
 | --- | --- | --- | --- |
 | Coverage | a Where row for a built seat; a path that resolves to nothing | retiering or rewriting a row no case can prove | removing a construct; changing what a row promises |
 | Tests | writing a missing case; fixing a flaky wait | retiering a row | a product gap, such as a screen that does not exist |
-| Audit | a self-dependency; a missing `envs/` | removing a duplicate `project.json` | the release model; plugin version policy |
+| Audit | a self-dependency, which is no finding where the package's own source imports the package by its name; a missing `envs/` | removing a duplicate `project.json` | the release model; plugin version policy |
 | Code | history comments; unawaited promises; label-key case | naming inside one package | renaming a published export; a rule the book has not settled |
 | Docs | restamping a status the rows deny; writing a glossary term as code | adding a persona the rows name | a new persona; a contradiction in the book |
 
@@ -238,7 +238,7 @@ Developers and leaders who have not learned the book's words read a report, so i
 
 | Part | What you write |
 | --- | --- |
-| **Measure** | `spn-devex behaviours coverage <repo> --json`, its `digest`, and `measuredAt` — the newest `Updated at` among the rows it read, which can be older than the page |
+| **Measure** | `spn-devex behaviours coverage <repo> --json`, its `digest`, and `measuredAt` — the newest `Updated at` among the rows it read, which can be older than the page. Where the command returns `measuredAt` as `null`, no row cites a run: leave the key out of the block and say so in Measured |
 | **Tiles** | **SUCCESS · FAILED · PENDING · PLANNED**, each x / y of all written behaviours, with a one-line key under the breakdown bar: SUCCESS, the run the behaviour cites, at its own test level, passed; FAILED; PENDING, the test exists and was skipped or has not run; PLANNED, no test names it |
 | **Breakdown bar** | behaviours: SUCCESS · FAILED · PENDING · PLANNED |
 | **Findings** | **By tier**: Tier · Runs · Written · Built · SUCCESS · FAILED · PENDING · PLANNED, from the command's `tiers` · **Repository** by domain → **Apps** → **Packages**: Name · Written · Built · SUCCESS · FAILED · PENDING · PLANNED |
@@ -282,7 +282,7 @@ Developers and leaders who have not learned the book's words read a report, so i
 | **Findings** | **Standard by docs folder**: Docs folder · Pages · PASS · WARN · FAIL · **Status by docs folder**: Docs folder · Pages · DONE · IMPLEMENTING · PLANNING · No status — both in the docs tree's order (`01-purpose` → `02-constructs` → `03-behaviors` → `04-capabilities` → `05-guides` → `registers` → `artifacts` → `README.md`), not worst first · **Rules**: Rule · State · Pages. **No Repository, Apps or Packages tables** |
 | **Records** | level 1 the rule, FAIL rules first; level 2 the docs folder. An item is `page:line` and the finding |
 
-**A construct page counts at the status its behaviours work out to, and every other page at the status it states**; a report states none. A construct page stating another status than its behaviours work out to is the FAIL finding *status contradicts rows*.
+**A construct page counts at the status its behaviours work out to, and every other page at the status it states**; a report states none. A construct page stating another status than its behaviours work out to is the FAIL finding *status contradicts rows*. `docs audit` runs the same status check on each construct page it reads and writes nothing, so count that finding once.
 
 ## How it looks
 
@@ -304,6 +304,16 @@ Developers and leaders who have not learned the book's words read a report, so i
 5. **Set Decided by on every record**, by § Who decides, and write the Needs you cards.
 6. **Check the page**: `spn-devex docs audit <the page>` reads clean, and every number on it traces to a Method row.
 7. **Hand it over as the full path.** Say the verdict in one line. Then open an arc for the records you may close, and raise the Needs you cards as `Q<n>` cards on its page. Publish nothing unless the developer asks.
+
+## Bring the numbers of an existing page current
+
+**`spn-devex report refresh <page>` measures a `coverage` or a `tests` report again and writes the numbers into the page.** Run it when a run has stamped rows, or a fix has landed, since the page was written.
+
+- **What it writes**: the tiles, the breakdown bar and its legend, the count cells of the Findings tables, the digest, and `generatedAt`. On a `tests` report it also writes `measuredAt`, and leaves the key out where no run is stamped.
+- **What it leaves to you**: every sentence. Read the verdict, the terms line, Top gaps, Records and Recommendations against the new numbers, and set Commit in the header to the commit you measured.
+- **It prints each row it could not place**, on a line that starts with `!`: a project or a domain the page has no row for, with its counts, and a row on the page that the measurement does not return. Write or remove those rows yourself, from the counts the line gives.
+- **A page whose digest already matches is left as it is.**
+- **An `audit`, `code` or `docs` report is refused by name.** Each is measured by several commands and a reading, so write it again by the steps above.
 
 ## What this skill never does
 

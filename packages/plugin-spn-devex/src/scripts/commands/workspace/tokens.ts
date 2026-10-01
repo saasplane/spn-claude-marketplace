@@ -3,7 +3,7 @@
 // The register row and the chapter are the source of truth. A rule change is edited there first,
 // then here, in the same change.
 //
-// What a workstream's work cost in tokens, per workstream, arc and order.
+// What a workstream's work cost in tokens and in the model's own time, per workstream, arc and order.
 //
 //     spn-devex workspace tokens [<workstream>] [--json] [--root <workspace>] [--projects <folder>]
 //
@@ -27,6 +27,14 @@
 // A SESSION WITH NO TAGGED LINE IS "untagged", never guessed. A transcript whose session has no
 // telemetry line at all is outside the log's window (the log restarts past its size cap, and it
 // records only while the switch is on), so it is counted, not read.
+//
+// THE MODEL'S OWN TIME IS READ FROM THE TRANSCRIPT. Every `user` and `assistant` line carries
+// `timestamp` in UTC to the millisecond, and no other line is read for time. The time before a line
+// is counted by what the line is: before a reply it is the model's, before a tool result it is a
+// tool's, and before a prompt it is time spent waiting for the developer. So the three add up to the
+// span of one transcript, first stamped line to last. Each stretch takes its tag the way a reply
+// does. An agent's transcript runs while its window waits on the tool that launched it, so an agent's
+// time is also inside its window's tool time, and the three do not add up across transcripts.
 
 import { closeSync, existsSync, openSync, readSync, readdirSync, statSync } from "node:fs";
 import { homedir } from "node:os";
@@ -35,16 +43,20 @@ import { basename, dirname, join, resolve } from "node:path";
 type Tag = { workstream: string | null; arc: string | null; order: string | null };
 type TelemetryLine = Tag & { session: string; agent: string | null; at: number };
 type Usage = { input: number; cacheWrite: number; cacheRead: number; output: number };
+/** Time by who spent it: the model replying, a tool running, the developer not yet prompting. */
+type Time = { modelMs: number; toolMs: number; waitingMs: number };
 type Reply = Usage & { session: string; agent: string | null; at: number };
-export type Row = Tag & Usage & { replies: number };
+/** The time before one transcript line, which ends at `at` and is of the kind the line makes it. */
+type Stretch = { session: string; agent: string | null; at: number; kind: keyof Time; ms: number };
+export type Row = Tag & Usage & Time & { replies: number };
 export type Report = {
   root: string; projects: string; filter: string | null;
   sessions: number; noTranscript: number; transcripts: number; replies: number; repeatedLines: number;
   outsideWindow: number;
-  rows: Row[]; untagged: Usage & { replies: number; sessions: number }; total: Usage & { replies: number };
+  rows: Row[]; untagged: Usage & Time & { replies: number; sessions: number }; total: Usage & Time & { replies: number };
 };
 
-const ZERO = (): Usage => ({ input: 0, cacheWrite: 0, cacheRead: 0, output: 0 });
+const ZERO = (): Usage & Time => ({ input: 0, cacheWrite: 0, cacheRead: 0, output: 0, modelMs: 0, toolMs: 0, waitingMs: 0 });
 
 function workspaceRoot(start: string): string | null {
   try {
@@ -122,21 +134,38 @@ function transcriptsOf(projects: string, session: string): string[] {
   return out;
 }
 
+/** What the time before a transcript line was spent on: the line is a reply, a tool result, or a prompt. */
+function kindOf(entry: Record<string, any>): keyof Time {
+  if (entry.type === "assistant") return "modelMs";
+  const content = entry.message?.content;
+  return Array.isArray(content) && content.some((part) => part?.type === "tool_result") ? "toolMs" : "waitingMs";
+}
+
 /**
  * Every assistant reply in the given transcripts, keyed by `message.id` so a reply written over
- * several lines is counted once. Returns the replies and how many repeated lines were set aside.
+ * several lines is counted once, and the stretch of time before each stamped `user` and `assistant`
+ * line. Returns the replies, how many repeated lines were set aside, and the stretches.
  */
-export function readReplies(files: string[]): { replies: Map<string, Reply>; repeatedLines: number } {
+export function readReplies(files: string[]): { replies: Map<string, Reply>; repeatedLines: number; stretches: Stretch[] } {
   const replies = new Map<string, Reply>();
+  const stretches: Stretch[] = [];
   let repeatedLines = 0;
   for (const file of files) {
     const fromName = basename(file).match(/^agent-([A-Za-z0-9]+)\.jsonl$/)?.[1] ?? null;
     const under = file.indexOf("/subagents/");
     const sessionFromPath = under >= 0 ? basename(file.slice(0, under)) : basename(file, ".jsonl");
+    const stamped: Array<Omit<Stretch, "ms">> = [];
     forEachLine(file, (line) => {
-      if (!line.includes('"assistant"') || !line.includes('"usage"')) return;
+      if (!line.includes('"assistant"') && !line.includes('"user"')) return;
       let parsed: Record<string, any>;
       try { parsed = JSON.parse(line); } catch { return; }
+      if (parsed.type !== "assistant" && parsed.type !== "user") return;
+      const session = typeof parsed.sessionId === "string" ? parsed.sessionId : sessionFromPath;
+      const agent = typeof parsed.agentId === "string" && parsed.agentId ? parsed.agentId : fromName;
+      const stamp = Date.parse(String(parsed.timestamp ?? ""));
+      // A window's own file is one timeline: an agent's line written into it belongs to the agent's.
+      if (!Number.isNaN(stamp) && (under >= 0 || parsed.isSidechain !== true))
+        stamped.push({ session, agent, at: stamp, kind: kindOf(parsed) });
       if (parsed.type !== "assistant") return;
       const message = parsed.message ?? {};
       const id = typeof message.id === "string" ? message.id : null;
@@ -144,9 +173,8 @@ export function readReplies(files: string[]): { replies: Map<string, Reply>; rep
       if (!id || !usage) return;
       const count = (value: unknown) => (typeof value === "number" && Number.isFinite(value) ? value : 0);
       const reply: Reply = {
-        session: typeof parsed.sessionId === "string" ? parsed.sessionId : sessionFromPath,
-        agent: typeof parsed.agentId === "string" && parsed.agentId ? parsed.agentId : fromName,
-        at: Date.parse(String(parsed.timestamp ?? "")) || 0,
+        session, agent,
+        at: stamp || 0,
         input: count(usage.input_tokens), cacheWrite: count(usage.cache_creation_input_tokens),
         cacheRead: count(usage.cache_read_input_tokens), output: count(usage.output_tokens),
       };
@@ -158,8 +186,11 @@ export function readReplies(files: string[]): { replies: Map<string, Reply>; rep
       seen.cacheRead = Math.max(seen.cacheRead, reply.cacheRead);
       seen.output = Math.max(seen.output, reply.output);
     });
+    stamped.sort((earlier, later) => earlier.at - later.at);
+    for (let index = 1; index < stamped.length; index += 1)
+      stretches.push({ ...stamped[index], ms: stamped[index].at - stamped[index - 1].at });
   }
-  return { replies, repeatedLines };
+  return { replies, repeatedLines, stretches };
 }
 
 /** Whether a tag's workstream is the one asked for: `008` and `008-plain-language` both name it. */
@@ -197,7 +228,7 @@ export function report(root: string, projects: string, filter: string | null): R
   // A session the log names whose transcript is not in this project folder: a window rooted in a
   // member repository writes to that repository's folder, and a test writes none.
   const noTranscript = found.filter((one) => one.length === 0).length;
-  const { replies, repeatedLines } = readReplies(files);
+  const { replies, repeatedLines, stretches } = readReplies(files);
 
   const lanes = new Map<string, TelemetryLine[]>();
   for (const line of telemetry.filter(tagged)) {
@@ -213,6 +244,12 @@ export function report(root: string, projects: string, filter: string | null): R
     into.input += reply.input; into.cacheWrite += reply.cacheWrite;
     into.cacheRead += reply.cacheRead; into.output += reply.output; into.replies += 1;
   };
+  const rowOf = (tag: Tag): Row => {
+    const key = JSON.stringify([tag.workstream, tag.arc, tag.order]);
+    const row = rows.get(key) ?? { workstream: tag.workstream, arc: tag.arc, order: tag.order, ...ZERO(), replies: 0 };
+    rows.set(key, row);
+    return row;
+  };
   const untaggedSeen = new Set<string>();
   for (const reply of replies.values()) {
     const tag = tagFor(reply, lanes.get(keyOf(reply.session, reply.agent)) ?? []);
@@ -225,12 +262,17 @@ export function report(root: string, projects: string, filter: string | null): R
     if (!matchesWorkstream(tag.workstream, filter)) continue;
     add(total, reply);
     // A reply is counted once, at its most specific level; the printed tree sums upward.
-    const key = JSON.stringify([tag.workstream, tag.arc, tag.order]);
-    const row = rows.get(key) ?? { workstream: tag.workstream, arc: tag.arc, order: tag.order, ...ZERO(), replies: 0 };
-    add(row, reply);
-    rows.set(key, row);
+    add(rowOf(tag), reply);
   }
   untagged.sessions = untaggedSeen.size;
+  // A stretch of time is joined as a reply is: by its session and agent, to the tagged line that follows it.
+  for (const stretch of stretches) {
+    const tag = tagFor(stretch, lanes.get(keyOf(stretch.session, stretch.agent)) ?? []);
+    if (!tag) { untagged[stretch.kind] += stretch.ms; total[stretch.kind] += stretch.ms; continue; }
+    if (!matchesWorkstream(tag.workstream, filter)) continue;
+    total[stretch.kind] += stretch.ms;
+    rowOf(tag)[stretch.kind] += stretch.ms;
+  }
 
   let outsideWindow = 0;
   try {
@@ -247,9 +289,10 @@ export function report(root: string, projects: string, filter: string | null): R
 }
 
 const n = (value: number) => value.toLocaleString("en-US");
-const cells = (usage: Usage & { replies: number }) =>
+const minutes = (ms: number) => `${(ms / 60000).toFixed(1)} min`;
+const cells = (usage: Usage & Time & { replies: number }) =>
   n(usage.replies).padStart(8) + n(usage.input).padStart(13) + n(usage.cacheWrite).padStart(15) +
-  n(usage.cacheRead).padStart(17) + n(usage.output).padStart(13);
+  n(usage.cacheRead).padStart(17) + n(usage.output).padStart(13) + minutes(usage.modelMs).padStart(14);
 
 /** The tree a reader reads: each workstream, its arcs under it, each arc's orders under that. */
 function print(result: Report): void {
@@ -259,10 +302,11 @@ function print(result: Report): void {
     `(${n(result.repeatedLines)} repeated lines not counted again)`);
   console.log(`telemetry ${join(result.root, ".spndevex", ".debug", "telemetry", "hooks.jsonl")} · transcripts ${result.projects}\n`);
   console.log("Work".padEnd(48) + "Replies".padStart(8) + "Input".padStart(13) + "Cache write".padStart(15) +
-    "Cache read".padStart(17) + "Output".padStart(13));
+    "Cache read".padStart(17) + "Output".padStart(13) + "Model time".padStart(14));
   const sum = (rows: Row[]) => rows.reduce((acc, row) => {
     acc.input += row.input; acc.cacheWrite += row.cacheWrite; acc.cacheRead += row.cacheRead;
-    acc.output += row.output; acc.replies += row.replies; return acc;
+    acc.output += row.output; acc.replies += row.replies;
+    acc.modelMs += row.modelMs; acc.toolMs += row.toolMs; acc.waitingMs += row.waitingMs; return acc;
   }, { ...ZERO(), replies: 0 });
   const label = (text: string, indent: number) => (" ".repeat(indent) + text).slice(0, 47).padEnd(48);
   const workstreams = [...new Set(result.rows.map((row) => row.workstream))];
@@ -282,12 +326,14 @@ function print(result: Report): void {
   }
   console.log(label(`untagged (${result.untagged.sessions} session(s))`, 0) + cells(result.untagged));
   console.log(label("total", 0) + cells(result.total));
+  console.log(`\ntime · the model ${minutes(result.total.modelMs)} · the tools ${minutes(result.total.toolMs)} · ` +
+    `waiting on a prompt ${minutes(result.total.waitingMs)} — an agent's time is also inside its window's tool time`);
   if (result.outsideWindow)
     console.log(`\n${result.outsideWindow} transcript(s) in the project folder have no telemetry line at all — ` +
       `outside the log's window, so not read.`);
 }
 
-export const describe = "tokens per workstream, arc and order, joining hook telemetry to the transcripts by session";
+export const describe = "tokens and the model's own time per workstream, arc and order, joining hook telemetry to the transcripts by session";
 
 export function run(args: string[]): number {
   const json = args.includes("--json");

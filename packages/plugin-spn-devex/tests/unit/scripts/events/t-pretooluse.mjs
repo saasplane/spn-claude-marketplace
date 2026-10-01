@@ -155,6 +155,80 @@ one("generated build output is refused too",
     "silent", { parity: false, why: "the Python dispatcher never carried this check" });
 }
 
+console.log("\n=== pretooluse — a source edit waits while a test run for that repository is going");
+{
+  // The start file `lib/bash-timing.ts` writes before a timed command, written here by path: the
+  // suites run with recording off, and the guard reads the folder whether recording is on or not.
+  const root = workspace("dispatch-test-run", {
+    [join(DEVEX_WORKSTREAMS, "open", "001-a-subject", ARCS, "N1-x.md")]: "# N1 — x\n\nStatus: **RUNNING.**\n\n## Log\n\n- **2026-09-29 — go.**\n",
+    "spn-x/apps/api/src/a.ts": "export const x = 1;\n",
+    "spn-x/docs/a.md": "# A\n",
+  });
+  const pending = join(root, ".spndevex", ".debug", "telemetry", "pending");
+  mkdirSync(pending, { recursive: true });
+  writeFileSync(join(pending, "toolu_run.json"), JSON.stringify({ at: Date.now() - 90_000, background: false,
+    found: [{ script: "spnutils", group: "apps", subgroup: null, action: "test", args: "contract r1 api", repo: "spn-x" }] }));
+  one("[MKT.HOOKS.31] the test-run refusal survives the chain, naming the run",
+    { tool_name: "Edit", cwd: root, tool_input: { file_path: join(root, "spn-x/apps/api/src/a.ts"), old_string: "1", new_string: "2" } },
+    "deny", { says: "spnutils apps test contract r1 api", cwd: root, parity: false, why: "a new guard" });
+  one("[MKT.HOOKS.32] a write outside src and tests passes the same chain",
+    { tool_name: "Write", cwd: root, tool_input: { file_path: join(root, "spn-x/notes.txt"), content: "x" } },
+    "silent", { cwd: root, parity: false, why: "a new guard" });
+}
+
+console.log("\n=== pretooluse — a block `spnutils` writes is never edited by hand");
+{
+  // The two marker lines, as `managed-keys.ts` in `spn-support-ts` states them. Each is built here from
+  // its parts, so this file holds no line that is a marker.
+  const BEGIN = `<!-- spnutils:agent:${"begin"} -->`, END = `<!-- spnutils:agent:${"end"} -->`;
+  const BLOCK = [BEGIN, "# CLAUDE.md — probe-repo", "The plugins carry every rule.", "@docs/README.md", END].join("\n");
+  const OWN = "\n## Notes of my own\n\nA line a person wrote.\n";
+  const managed = join(PROBE_REPO, "CLAUDE.md");
+  mkdirSync(PROBE_REPO, { recursive: true });
+  writeFileSync(managed, BLOCK + "\n" + OWN);
+  const waived = { parity: false, why: "a new guard" };
+
+  one("[MKT.HOOKS.33] an Edit whose old_string sits between the markers is refused, naming both commands",
+    { tool_name: "Edit", tool_input: { file_path: managed, old_string: "The plugins carry every rule.", new_string: "The plugins carry most rules." } },
+    "deny", { says: "spnutils workspace agent-sync", ...waived });
+  one("[MKT.HOOKS.33] and the refusal names the repository's command too",
+    { tool_name: "Edit", tool_input: { file_path: managed, old_string: "@docs/README.md", new_string: "@docs/OTHER.md" } },
+    "deny", { says: "spnutils repo agent-sync", ...waived });
+  one("[MKT.HOOKS.33] an Edit that takes out a marker line is refused",
+    { tool_name: "Edit", tool_input: { file_path: managed, old_string: `${END}\n`, new_string: "" } },
+    "deny", { says: "agent-sync", ...waived });
+  one("[MKT.HOOKS.33] an Edit that starts below the block and reaches into it is refused",
+    { tool_name: "Edit", tool_input: { file_path: managed, old_string: `@docs/README.md\n${END}\n\n## Notes of my own`, new_string: "## Notes" } },
+    "deny", { says: "agent-sync", ...waived });
+  one("[MKT.HOOKS.33] a Write whose text between the markers differs from the file on disk is refused",
+    { tool_name: "Write", tool_input: { file_path: managed, content: BLOCK.replace("every rule", "no rule") + "\n" + OWN } },
+    "deny", { says: "agent-sync", ...waived });
+  one("[MKT.HOOKS.33] a Write that drops the block is refused",
+    { tool_name: "Write", tool_input: { file_path: managed, content: OWN } },
+    "deny", { says: "agent-sync", ...waived });
+
+  one("[MKT.HOOKS.34] an Edit below the end marker passes",
+    { tool_name: "Edit", tool_input: { file_path: managed, old_string: "A line a person wrote.", new_string: "A line a person changed." } },
+    "silent", waived);
+  one("[MKT.HOOKS.34] a Write that keeps the block's bytes passes",
+    { tool_name: "Write", tool_input: { file_path: managed, content: BLOCK + "\n\n## Other notes\n\nAnother line.\n" } },
+    "silent", waived);
+  const plain = join(PROBE_REPO, "NOTES.txt");
+  writeFileSync(plain, "one\ntwo\nthree\n");
+  one("[MKT.HOOKS.34] an Edit of a file with no marker passes",
+    { tool_name: "Edit", tool_input: { file_path: plain, old_string: "two", new_string: "2" } }, "silent", waived);
+  // A file that names the markers inside a line, as source code and a plan do, holds no block.
+  const quoting = join(PROBE_REPO, "markers.txt");
+  writeFileSync(quoting, `const begin = '${BEGIN}';\nconst between = 1;\nconst end = '${END}';\n`);
+  one("[MKT.HOOKS.34] a file that only quotes a marker inside a line holds no block",
+    { tool_name: "Edit", tool_input: { file_path: quoting, old_string: "const between = 1;", new_string: "const between = 2;" } },
+    "silent", waived);
+  one("[MKT.HOOKS.34] a Write of a file that is not on disk yet passes",
+    { tool_name: "Write", tool_input: { file_path: join(PROBE_REPO, "fresh.txt"), content: BLOCK } }, "silent", waived);
+  one("[MKT.HOOKS.34] a Bash call that runs the command which writes the block is not judged",
+    { tool_name: "Bash", tool_input: { command: "spnutils workspace agent-sync" } }, "silent", waived);
+}
+
 // UNTOUCHED — the ordinary calls that must stay silent and cheap.
 one("an ordinary Bash call", { tool_name: "Bash", tool_input: { command: "git status --short" } }, "silent");
 one("reading a source file", { tool_name: "Read", tool_input: { file_path: `${WORKSPACE}/CLAUDE.md` } }, "silent");

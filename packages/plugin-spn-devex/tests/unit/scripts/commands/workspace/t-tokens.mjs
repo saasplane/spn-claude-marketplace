@@ -111,6 +111,62 @@ console.log("\n=== workspace tokens — which tagged line a reply takes");
     projectFolder("/opt/work/saasplane/code", "/h/.claude") === "/h/.claude/projects/-opt-work-saasplane-code");
 }
 
+console.log("\n=== workspace tokens — the model's own time, apart from the tools' and the waiting");
+{
+  // One window: a prompt, a reply that asks for a tool, the tool's result, a reply on two lines, a
+  // second prompt ten minutes later, and a last reply. Its agent runs while the window waits on it.
+  const stamped = (type, timestamp, content, extra = {}) => JSON.stringify({ type, sessionId: "s-time", timestamp, ...extra,
+    message: { role: type, content, ...(extra.id ? { id: extra.id, usage: { input_tokens: 1, cache_creation_input_tokens: 0, cache_read_input_tokens: 0, output_tokens: 1 } } : {}) } });
+  const toolResult = [{ type: "tool_result", tool_use_id: "toolu_1", content: "ok" }];
+  const timeRoot = workspace("n006-tokens-time", {
+    ".spndevex/.debug/telemetry/hooks.jsonl": [
+      line("s-time", "2026-10-01T10:13:35", N116),
+      line("s-time", "2026-10-01T10:02:00", M7, "agent9"),
+    ].join("\n") + "\n",
+    "projects/s-time.jsonl": [
+      stamped("user", "2026-10-01T10:00:00.000Z", "go"),
+      stamped("assistant", "2026-10-01T10:01:00.000Z", [{ type: "tool_use", id: "toolu_1" }], { id: "t1" }),
+      // Not a reply, a tool result or a prompt, so it is not read for time: the tool's 30 s stay whole.
+      JSON.stringify({ type: "system", sessionId: "s-time", timestamp: "2026-10-01T10:01:10.000Z", subtype: "hook" }),
+      stamped("user", "2026-10-01T10:01:30.000Z", toolResult),
+      stamped("assistant", "2026-10-01T10:02:20.000Z", [{ type: "text", text: "a" }], { id: "t2" }),
+      stamped("assistant", "2026-10-01T10:02:30.000Z", [{ type: "text", text: "b" }], { id: "t2" }),
+      stamped("user", "2026-10-01T10:12:30.000Z", "and then"),
+      stamped("assistant", "2026-10-01T10:13:30.000Z", [{ type: "text", text: "c" }], { id: "t3" }),
+      // A line with no timestamp is not read for time either.
+      JSON.stringify({ type: "user", sessionId: "s-time", message: { role: "user", content: "unstamped" } }),
+    ].join("\n") + "\n",
+    "projects/s-time/subagents/agent-agent9.jsonl": [
+      stamped("user", "2026-10-01T10:01:01.000Z", "your order", { agentId: "agent9", isSidechain: true }),
+      stamped("assistant", "2026-10-01T10:01:21.000Z", [{ type: "text", text: "done" }], { agentId: "agent9", isSidechain: true, id: "t4" }),
+    ].join("\n") + "\n",
+  });
+  const timed = report(timeRoot, join(timeRoot, "projects"), null);
+  const row = (tag) => timed.rows.find((one) => one.workstream === tag.workstream && one.arc === tag.arc && one.order === tag.order);
+  const windowRow = row(N116), agentRow = row(M7);
+  ok("[MKT.SCRIPTS.96] the time before each reply line is the model's own", windowRow?.modelMs === 60000 + 50000 + 10000 + 60000, JSON.stringify(windowRow));
+  ok("[MKT.SCRIPTS.96] the time before a tool result is a tool's, and no other line splits it", windowRow?.toolMs === 30000, JSON.stringify(windowRow));
+  ok("[MKT.SCRIPTS.96] the time before a prompt is spent waiting for the developer", windowRow?.waitingMs === 600000, JSON.stringify(windowRow));
+  ok("[MKT.SCRIPTS.96] the three add up to the window's span", windowRow && windowRow.modelMs + windowRow.toolMs + windowRow.waitingMs
+    === Date.parse("2026-10-01T10:13:30.000Z") - Date.parse("2026-10-01T10:00:00.000Z"), JSON.stringify(windowRow));
+  ok("an agent's time goes to the order its own calls touched", agentRow?.modelMs === 20000 && agentRow?.toolMs === 0 && agentRow?.waitingMs === 0,
+    JSON.stringify(agentRow));
+  ok("the total holds each kind of time once", timed.total.modelMs === 200000 && timed.total.toolMs === 30000 && timed.total.waitingMs === 600000,
+    JSON.stringify(timed.total));
+  ok("the tokens beside the time are still counted once", timed.total.replies === 4 && windowRow?.replies === 3, JSON.stringify(timed.total));
+
+  const text = execFileSync("node", [CLI, "workspace", "tokens", "--root", timeRoot, "--projects", join(timeRoot, "projects")], { encoding: "utf8" });
+  ok("[MKT.SCRIPTS.96] the report prints the model's time beside the tokens", /Model time/.test(text) && /\n    \(no order\) .* 3\.0 min\n/.test(text), text);
+  ok("[MKT.SCRIPTS.96] and the tools' time and the waiting apart from it",
+    /the model 3\.3 min · the tools 0\.5 min · waiting on a prompt 10\.0 min/.test(text), text);
+
+  // UNTOUCHED — a transcript whose lines carry no time reads as no time, and its tokens are as before.
+  const all = report(root, projects, null);
+  const bare = all.rows.find((one) => one.workstream === OTHER.workstream);
+  ok("a session with one stamped line has no time before it", bare?.modelMs === 0 && bare?.toolMs === 0 && bare?.waitingMs === 0, JSON.stringify(bare));
+  ok("an untagged session's time is counted as untagged, never assigned", all.untagged.modelMs === 0 && all.untagged.replies === 2, JSON.stringify(all.untagged));
+}
+
 console.log("\n=== workspace tokens — the command");
 {
   const text = execFileSync("node", [CLI, "workspace", "tokens", "--root", root, "--projects", projects], { encoding: "utf8" });

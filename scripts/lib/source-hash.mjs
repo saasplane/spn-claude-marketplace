@@ -47,7 +47,15 @@ function walkFiles(dir) {
 // match is on the fixed tail every such import shares, never on a fixed prefix).
 const SUPPORT_LIB_IMPORT = /plugin-support-lib\/src\/lib\/([A-Za-z0-9_-]+\.ts)/g;
 
-/** The `plugin-support-lib/src/lib/*.ts` files a plugin's own source actually imports — named by scanning import specifiers, never the whole shared folder, so a helper another plugin uses alone cannot mark this one stale. */
+// A shared file's import of its sibling: `./<name>.ts`, as `timing.ts` imports `./docs-tree.ts`.
+const SIBLING_IMPORT = /\b(?:from|import)\s*\(?\s*["']\.\/([A-Za-z0-9_-]+\.ts)["']/g;
+
+/**
+ * The `plugin-support-lib/src/lib/*.ts` files a plugin's bundle holds: each file its own source
+ * imports, and each file those import in turn inside the shared folder. They are named by scanning
+ * import specifiers, never by listing the whole shared folder, so a helper another plugin uses alone
+ * cannot mark this one stale.
+ */
 function importedSupportLibFiles(scriptsFiles, supportLibDir) {
   const names = new Set();
   for (const file of scriptsFiles) {
@@ -56,12 +64,23 @@ function importedSupportLibFiles(scriptsFiles, supportLibDir) {
     try { text = readFileSync(file, "utf8"); } catch { continue; }
     for (const match of text.matchAll(SUPPORT_LIB_IMPORT)) names.add(match[1]);
   }
+  // Each shared file is read once, so two that import each other end the walk.
+  const pending = [...names];
+  while (pending.length > 0) {
+    let text;
+    try { text = readFileSync(join(supportLibDir, pending.pop()), "utf8"); } catch { continue; }
+    for (const match of text.matchAll(SIBLING_IMPORT)) {
+      if (names.has(match[1])) continue;
+      names.add(match[1]);
+      pending.push(match[1]);
+    }
+  }
   return [...names].sort().map((name) => join(supportLibDir, name));
 }
 
 /**
  * One plugin's source hash: every file under its own `src/scripts/`, plus the
- * `plugin-support-lib/src/lib/*.ts` files that source actually imports.
+ * `plugin-support-lib/src/lib/*.ts` files that source imports, and the shared files those import.
  *
  * @param pluginDir     a plugin's package folder, e.g. `packages/plugin-spn-devex`
  * @param supportLibDir `packages/plugin-support-lib`

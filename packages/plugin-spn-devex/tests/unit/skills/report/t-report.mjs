@@ -60,5 +60,16 @@ for (const [type, patterns] of Object.entries(TYPES)) {
   patterns.forEach((pattern, i) => check(`5.1: ${type.toLowerCase()} — ${pattern.source.replace(/\\/g, "").slice(0, 60)}`, pattern.test(text)));
 }
 
+console.log("\n=== what the commands changed, stated where the agent reads it");
+check("[MKT.SCRIPTS.82] a tests report with no stamped run leaves `measuredAt` out, in the block's line and in the Measure row",
+  /Where no row cites a run, the block leaves `measuredAt` out/.test(SKILL) && /leave the key out of the block and say so in Measured/.test(section("Tests — ")));
+check("[MKT.SCRIPTS.81] the skill names the refresh command, what it writes and what it leaves to the agent",
+  /`spn-devex report refresh <page>` measures a `coverage` or a `tests` report again/.test(SKILL) && /\*\*What it leaves to you\*\*: every sentence/.test(SKILL)
+    && /An `audit`, `code` or `docs` report is refused by name/.test(SKILL));
+check("item 22: a self-dependency is no finding where the package's own source imports the package by its name",
+  /\| Audit \| a self-dependency, which is no finding where the package's own source imports the package by its name;/.test(SKILL));
+check("[MKT.SCRIPTS.88] the docs report counts a status that contradicts its rows once, because the audit runs the status check",
+  /`docs audit` runs the same status check on each construct page it reads and writes nothing/.test(section("Docs — ")));
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED — report skill` : `\n  all ${total} passed — report skill`);
 process.exit(failed ? 1 : 0);

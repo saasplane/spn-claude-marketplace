@@ -23,7 +23,7 @@ import { read } from "../../../../../plugin-support-lib/src/lib/runs.ts";
 import { measure as measureTests, nodesOf, TESTS_REPORT } from "../behaviours/coverage.ts";
 import {
   NEVER_READ, builtAmong, constructKeyOf, domainName, domainOf, domainOfKey, domainsOf, entriesOf, isDir, kindOf,
-  readChapters, whereRoot, whyNotBuilt, type Seat, type StatedNotBuilt,
+  readChapters, whereRoot, whyNotBuilt, type Chapter, type Seat, type StatedNotBuilt,
 } from "./_join.ts";
 
 /** Where the coverage report lands in a repository's pocket, named by its kind (RD.DEVEX.WORKSPACE.149). */
@@ -115,6 +115,46 @@ type Level = {
 type Rows = { written: { rows: number }; built: { rows: number }; proved: { rows: number }; notBuilt: { rows: number }; notProved: { rows: number };
               manual: Array<{ id: string; file: string }> };
 
+/** What one package or app owns: its chapters that name a construct, those constructs, and the ones among them that are built. */
+export function ownedBy(node: string, chapters: Chapter[]): { constructChapters: Chapter[]; owned: string[]; built: string[] } {
+  const constructChapters = chapters.filter((chapter) => chapter.node === node && chapter.construct !== null);
+  const owned = [...new Set(constructChapters.map((chapter) => chapter.construct!))].sort();
+  return { constructChapters, owned, built: builtAmong(constructChapters, owned) };
+}
+
+/** The projects a repository's reports count: each folder under `apps/` and `packages/` that declares a kind. */
+const levelsOf = (root: string): string[] =>
+  nodesOf(root).filter((node) => /^(apps|packages)\/[^/]+$/.test(slashes(relative(root, node))));
+
+/**
+ * The behaviour rows each package and app counts, and the ones among them under a built construct.
+ *
+ * A project counts the rows of the constructs it has a capability chapter for, which is the join the
+ * coverage report's Apps and Packages tables use. The tests report's tables count the same rows by
+ * status, so both read this one join. `rows` is the tests measurement's rows; a `MANUAL` row counts
+ * in none of the numbers and is left out.
+ */
+export function levelRows<Row extends { file: string; status: string | null }>(
+  root: string, rows: Row[],
+): Array<{ name: string; path: string; rows: Row[]; built: Row[] }> {
+  const rowsOf = new Map<string, Row[]>();
+  for (const row of rows) {
+    const key = constructKeyOf(row.file);
+    if (key !== null && row.status !== "MANUAL") rowsOf.set(key, [...(rowsOf.get(key) ?? []), row]);
+  }
+  const keys = new Set(rows.map((row) => constructKeyOf(row.file)).filter((key): key is string => key !== null));
+  const levels = levelsOf(root);
+  const { chapters } = readChapters(root, keys, levels);
+  return levels.map((node) => {
+    const { owned, built } = ownedBy(node, chapters);
+    return {
+      name: basename(node), path: slashes(relative(root, node)),
+      rows: owned.flatMap((construct) => rowsOf.get(construct) ?? []),
+      built: built.flatMap((construct) => rowsOf.get(construct) ?? []),
+    };
+  });
+}
+
 /** A repository whose type is FOUNDATION: its rows are promises, so there is nothing built or proved to count. */
 export function foundationAbsence(root: string): Record<string, unknown> | null {
   const text = read(join(root, "sprepo.json"));
@@ -136,7 +176,10 @@ export function measure(root: string): Record<string, unknown> {
   const nameOf = (node: string): string => slashes(relative(root, node)) || ".";
 
   // Proved: the rows the stamp wrote SUCCESS, read as the tests report reads them; no run file is opened.
-  const tests = measureTests(root) as { rows: Array<{ id: string; file: string; status: string | null }>; digest: string; measuredAt: string | null };
+  const tests = measureTests(root) as {
+    rows: Array<{ id: string; file: string; status: string | null }>; digest: string; measuredAt: string | null;
+    findings: Array<{ project: string; ftype: string; message: string }>;
+  };
   const isProved = (row: { status: string | null }): boolean => row.status === "SUCCESS";
 
   // A MANUAL row counts in none of the numbers (05-artifacts.md § The coverage report): a person proves
@@ -156,16 +199,20 @@ export function measure(root: string): Record<string, unknown> {
   }
 
   // The levels: each project under `apps/` and `packages/` that declares a kind.
-  const levels = nodesOf(root).filter((node) => /^(apps|packages)\/[^/]+$/.test(nameOf(node)));
-  const { constructs, chapters, seatsByNode, stated, declaresNothing, findings, built: repoBuilt } =
+  const levels = levelsOf(root);
+  const { constructs, chapters, seatsByNode, stated, declaresNothing, findings: chapterFindings, built: repoBuilt } =
     readChapters(root, new Set([...rowsOf.keys(), ...manualRowsOf.keys()]), levels);
+  // An id that more than one row declares is counted once, from its first row, so the tests
+  // measurement's finding is listed here too, with each file that declares the id.
+  const findings = [
+    ...chapterFindings,
+    ...tests.findings.filter((one) => one.ftype === "DUPLICATE_ID").map((one) => ({ file: one.project, message: one.message })),
+  ];
 
   const levelOf = (node: string): Level => {
     const kind = kindOf(node);
     const own = chapters.filter((chapter) => chapter.node === node);
-    const constructChapters = own.filter((chapter) => chapter.construct !== null);
-    const owned = [...new Set(constructChapters.map((chapter) => chapter.construct!))].sort();
-    const built = builtAmong(constructChapters, owned);
+    const { constructChapters, owned, built } = ownedBy(node, chapters);
     const rows = owned.flatMap((construct) => rowsOf.get(construct) ?? []);
     const builtRows = built.flatMap((construct) => rowsOf.get(construct) ?? []);
     const testsHere = readTests(node);
@@ -305,4 +352,6 @@ export function run(args: string[]): number {
   return 0;
 }
 
-if (process.argv[1] && new URL(import.meta.url).pathname === process.argv[1]) process.exit(run(process.argv.slice(2)));
+// The exit code is set and the process is left to end by itself, so `--json` sent through a pipe is
+// written whole before the process ends.
+if (process.argv[1] && new URL(import.meta.url).pathname === process.argv[1]) process.exitCode = run(process.argv.slice(2));

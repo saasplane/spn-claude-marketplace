@@ -63,5 +63,17 @@ console.log("\n=== the reader itself");
   console.log(`  ${ok ? "PASS" : "FAIL"}  a hyphen is part of the word, so PART-LANDED is not PART`);
 }
 
+console.log("\n=== which statuses are past DECIDED, in the order of the set");
+{
+  const { pastDecided } = await import("../../../../src/scripts/checks/arc-status.ts");
+  for (const [word, expected] of [["PROPOSED", false], ["DECIDED", false], ["RUNNING", true], ["HELD", true],
+    ["PART-LANDED", true], ["LANDED", true], ["CARRIED", true], ["DROPPED", true], ["OPEN", false], [null, false]]) {
+    n += 1;
+    const ok = pastDecided(word) === expected;
+    if (!ok) failed += 1;
+    console.log(`  ${ok ? "PASS" : "FAIL"}  [MKT.HOOKS.40] ${word ?? "an arc with no status"} is ${expected ? "" : "not "}past DECIDED`);
+  }
+}
+
 console.log(failed ? `  ${failed} FAILED` : `  all ${n} passed`);
 process.exit(failed ? 1 : 0);
