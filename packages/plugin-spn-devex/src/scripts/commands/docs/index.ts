@@ -1,0 +1,344 @@
+#!/usr/bin/env node
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The index of artifacts — one page that opens every other
+// The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
+//
+// Write the index of a repository's artifacts from the pages on disk. With `--check` nothing is
+// written: the tree of the index that is there is compared with the pages.
+//
+//   spn-devex docs index <repository> [--check] [--out <file>]
+
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { basename, dirname, join, relative, resolve, sep } from "node:path";
+import { argsText, begin, commandFacts, end, record } from "../../../../../plugin-support-lib/src/lib/timing.ts";
+import { ARTIFACT_INDEX, DOCS, HUB, POCKET, artifactIndex, artifactsDir, constructPagesDir, docsOf, guidePagesDir,
+  overviewsDir, reportsDir, slashes } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { BUNDLED_SUFFIX, INDEX_SCRIPT } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
+import { locationOf, resolveWorkspace, text as plainText } from "./_lib.ts";
+import { Refusal, attribute, escaped, newestCut, operands, optionValue,
+  pageTemplate, place, refuseSlots, say, swap, templatesDir, withHead, type Note } from "./_pages.ts";
+
+export const describe = "write the index of a repository's artifacts from the pages on disk";
+
+const TEMPLATE = "artifact-index-template.html";
+const USAGE = "usage: spn-devex docs index <repository> [--check] [--out <file>]";
+/** The artifacts pocket, as a message names it. */
+const POCKET_PATH = `${DOCS}/${POCKET.artifacts}`;
+/** The three groups of the tree, in their order. */
+const GROUPS = ["Docs", "Guides", "Reports"] as const;
+/** How many tabs the index keeps open. One more page takes the tab that was opened longest ago. */
+const TAB_LIMIT = 8;
+/** The block of data that holds the tree, with the comment above it. */
+const DATA_BLOCK = /(?:<!--(?:(?!-->)[\s\S])*-->\s*)?<script type="application\/json" id="index-data">([\s\S]*?)<\/script>/;
+
+/**
+ * One node of the tree, in the shape `sds-index.js` reads. A node with a `path` is a page. A node with
+ * `children` and no `path` is a folder. An overview that holds constructs has both.
+ */
+export type TreeNode = {
+  label: string; kind?: string; path?: string; title?: string; folded?: boolean; children?: TreeNode[];
+  note?: string; beside?: boolean;
+};
+/** The data of an index: the path to the pages, the limit of tabs, and the groups. */
+export type Tree = { base: string; tabs: number; groups: TreeNode[] };
+
+/** What the index reads of one page: its text, its name, its kind, and the guide it was produced from. */
+type PageFacts = { text: string; title: string; kind: string; source: string | null };
+
+const byName = (one: string, two: string): number => (one < two ? -1 : one > two ? 1 : 0);
+/** A folder's or a file's name without the number that orders it: `02-agent` is `agent`. */
+const bare = (name: string): string => name.replace(/^\d+-/, "");
+
+/** Every page under a folder, in the order of its path. A bundled copy and a hidden folder are skipped. */
+function pagesUnder(folder: string): string[] {
+  if (!existsSync(folder)) return [];
+  return readdirSync(folder).sort(byName).flatMap((name) => {
+    if (name.startsWith(".")) return [];
+    const full = join(folder, name);
+    if (statSync(full).isDirectory()) return pagesUnder(full);
+    return name.endsWith(".html") && !name.endsWith(BUNDLED_SUFFIX) ? [full] : [];
+  });
+}
+
+/** A page's name is the `title` of its block, and its `<title>` where it has no block. */
+function factsOf(file: string): PageFacts {
+  const text = readFileSync(file, "utf8");
+  let block: Record<string, unknown> = {};
+  const found = /<!--\s*spn:doc\s*(\{[\s\S]*?\})\s*-->/.exec(text);
+  if (found) { try { block = JSON.parse(found[1]) as Record<string, unknown>; } catch { block = {}; } }
+  const stem = basename(file, ".html");
+  const tab = /<title>([\s\S]*?)<\/title>/.exec(text)?.[1];
+  const title = typeof block.title === "string" && block.title ? block.title : (tab ? plainText(tab) : "") || stem;
+  const kind = typeof block.variant === "string" && block.variant ? block.variant : stem.slice(stem.lastIndexOf("-") + 1);
+  return { text, title, kind, source: typeof block.source === "string" ? block.source : null };
+}
+
+/** Every page under a node of the tree, the node itself too when it is a page. */
+export function entriesOf(node: TreeNode): TreeNode[] {
+  return [...(node.path === undefined ? [] : [node]), ...(node.children ?? []).flatMap(entriesOf)];
+}
+
+/**
+ * The groups of the tree, from the pages under one artifacts pocket, and what is worth saying about
+ * them. Every page is placed once.
+ */
+export function groupsOf(artifacts: string): { groups: TreeNode[]; pages: string[]; notes: Note[] } {
+  const docs = dirname(artifacts);
+  const files = pagesUnder(artifacts).filter((file) => file !== artifactIndex(docs));
+  const facts = new Map(files.map((file): [string, PageFacts] => [file, factsOf(file)]));
+  const notes: Note[] = [];
+  const pathOf = (file: string): string => slashes(relative(artifacts, file));
+  const entry = (file: string): TreeNode => ({ label: facts.get(file)!.title, kind: facts.get(file)!.kind, path: pathOf(file) });
+  const under = (folder: string): string[] => files.filter((file) => file.startsWith(folder + sep));
+  const direct = (folder: string): string[] => files.filter((file) => dirname(file) === folder);
+
+  const constructsRoot = constructPagesDir(docs);
+  const overviews = under(overviewsDir(docs));
+  const hub = overviews.find((file) => file === join(overviewsDir(docs), HUB)) ?? null;
+  // The part of an overview's file name that names its place: `concept-devex-agent-overview` is `devex-agent`.
+  const stems = new Map(overviews.filter((file) => file !== hub)
+    .map((file): [string, string] => [file, basename(file, ".html").replace(/^concept-/, "").replace(/-overview$/, "")]));
+
+  // A FOLDER'S LABEL is the word an overview's title gives that part of its file name: `devex` is DevEx.
+  const words = new Map<string, string>();
+  for (const [file, stem] of stems) {
+    const titleWords = facts.get(file)!.title.split(/\s+/).filter(Boolean);
+    const parts = stem.split("-");
+    if (titleWords.length === parts.length && titleWords.every((word, at) => word.toLowerCase() === parts[at]))
+      parts.forEach((part, at) => words.set(part, titleWords[at]));
+  }
+  const label = (folder: string): string => {
+    const name = bare(basename(folder));
+    const spaced = name.replace(/-/g, " ");
+    return words.get(name) ?? spaced.charAt(0).toUpperCase() + spaced.slice(1).toLowerCase();
+  };
+
+  // WHICH CONSTRUCTS AN OVERVIEW LINKS is read from the overview's own page: every link of it that
+  // points at a construct page that is there.
+  const linked = new Map<string, string[]>();
+  for (const file of overviews) {
+    const reached: string[] = [];
+    for (const link of facts.get(file)!.text.matchAll(/<a\b[^>]*?\bhref="([^"#?]+)/g)) {
+      if (/^[a-z][a-z0-9+.-]*:/.test(link[1])) continue;
+      const target = resolve(dirname(file), link[1]);
+      if (target.startsWith(constructsRoot + sep) && facts.has(target) && !reached.includes(target)) reached.push(target);
+    }
+    linked.set(file, reached);
+  }
+
+  // THE FOLDERS UNDER THE CONSTRUCT PAGES. A folder that holds folders is an area. A folder that holds
+  // pages and no folder is a domain. A folder with no page under it is not in the tree.
+  const areas: string[] = [], domains: string[] = [];
+  const foldersIn = (folder: string): string[] => readdirSync(folder).sort(byName).map((name) => join(folder, name))
+    .filter((full) => statSync(full).isDirectory() && under(full).length > 0);
+  const sortFolders = (folder: string): void => {
+    const inside = foldersIn(folder);
+    if (inside.length) {
+      if (folder !== constructsRoot) areas.push(folder);
+      inside.forEach(sortFolders);
+    } else if (direct(folder).length) domains.push(folder);
+  };
+  if (existsSync(constructsRoot)) sortFolders(constructsRoot);
+  /** A folder as an overview's file name writes it: `01-devex/02-agent` is `devex-agent`. */
+  const keyOf = (folder: string): string =>
+    slashes(relative(constructsRoot, folder)).split("/").filter(Boolean).map(bare).join("-");
+
+  // THE HOME OF AN OVERVIEW is the folder its file name names, the longest such name first. Failing
+  // that, it is the one folder that holds every construct it links, and otherwise it has no home.
+  const home = new Map<string, string>();
+  const homeless: string[] = [];
+  for (const [file, stem] of stems) {
+    const named = [...areas, ...domains].filter((folder) => {
+      const key = keyOf(folder);
+      return key !== "" && (stem === key || stem.startsWith(`${key}-`));
+    });
+    if (named.length) {
+      home.set(file, named.reduce((longest, folder) => (keyOf(folder).length > keyOf(longest).length ? folder : longest)));
+      continue;
+    }
+    const reached = [...new Set(linked.get(file)!.map((construct) => dirname(construct)))];
+    if (reached.length === 1) { home.set(file, reached[0]); continue; }
+    homeless.push(file);
+    notes.push({ grade: "SOFT", check: "index", file, message:
+      `this overview names no folder of the construct pages, and it links constructs of ${reached.length} folders, so it is listed under Docs after the hub and holds nothing` });
+  }
+  const overviewsOf = (folder: string): string[] => [...stems.keys()].filter((file) => home.get(file) === folder);
+
+  /**
+   * One domain, which starts folded. With one overview it is the link to that overview, with its
+   * constructs under it. With more it is a folder, and each overview holds the constructs it links.
+   */
+  const domainNode = (folder: string): TreeNode => {
+    const here = overviewsOf(folder);
+    const constructs = direct(folder);
+    const reach = new Map(here.map((file): [string, string[]] => [file, constructs.filter((construct) => linked.get(file)!.includes(construct))]));
+    const holds = new Map(here.map((file): [string, string[]] => [file, []]));
+    const rest: string[] = [];
+    for (const construct of constructs) {
+      const wanted = here.filter((file) => reach.get(file)!.includes(construct));
+      if (!wanted.length) {
+        rest.push(construct);
+        if (here.length) notes.push({ grade: "SOFT", check: "index", file: construct, message:
+          "no overview of its domain links this construct, so it comes last in its domain" });
+        continue;
+      }
+      // Where two overviews of one domain link it, it sits under the one that links fewer constructs.
+      const owner = wanted.reduce((narrowest, file) => {
+        const fewer = reach.get(file)!.length - reach.get(narrowest)!.length;
+        return fewer < 0 || (fewer === 0 && byName(basename(file), basename(narrowest)) < 0) ? file : narrowest;
+      });
+      holds.get(owner)!.push(construct);
+    }
+    if (here.length === 1) {
+      const inside = [...holds.get(here[0])!, ...rest].map(entry);
+      return { ...entry(here[0]), label: label(folder), title: facts.get(here[0])!.title, folded: true,
+        ...(inside.length ? { children: inside } : {}) };
+    }
+    // Overviews of one domain stand in the order of the first construct each holds.
+    const place = (file: string): number => (holds.get(file)!.length ? constructs.indexOf(holds.get(file)![0]) : constructs.length);
+    const ordered = [...here].sort((one, two) => place(one) - place(two) || byName(basename(one), basename(two)));
+    const inside = ordered.map((file): TreeNode => {
+      const held = holds.get(file)!.map(entry);
+      return { ...entry(file), ...(held.length ? { children: held } : {}) };
+    });
+    return { label: label(folder), folded: true, children: [...inside, ...rest.map(entry)] };
+  };
+  /** An area is a folder of the tree: its own overviews, its own pages, then the folders in it. */
+  const folderNode = (folder: string): TreeNode => {
+    if (domains.includes(folder)) return domainNode(folder);
+    return { label: label(folder), children: [...overviewsOf(folder).map(entry), ...direct(folder).map(entry),
+      ...foldersIn(folder).filter((one) => areas.includes(one) || domains.includes(one)).map(folderNode)] };
+  };
+
+  // DOCS: the hub by its own name, then an overview with no home, then the folders in their order.
+  const docsGroup: TreeNode[] = [...(hub ? [entry(hub)] : []), ...homeless.map(entry),
+    ...(existsSync(constructsRoot) ? foldersIn(constructsRoot) : [])
+      .filter((folder) => areas.includes(folder) || domains.includes(folder)).map(folderNode)];
+  // GUIDES stand in the order of the guides they were produced from, and REPORTS in the order of their paths.
+  const guides = under(guidePagesDir(docs));
+  const orderOf = (file: string): string => facts.get(file)!.source ?? pathOf(file);
+  const guidesGroup = [...guides].sort((one, two) => byName(orderOf(one), orderOf(two))).map(entry);
+  const reports = under(reportsDir(docs));
+  const reportsGroup = reports.map(entry);
+
+  // EVERY PAGE ON DISK IS IN THE TREE ONCE. A page in a place the tree has no rule for comes last under Docs.
+  const placed = new Set([...docsGroup.flatMap(entriesOf), ...guidesGroup, ...reportsGroup].map((node) => node.path));
+  for (const file of files.filter((one) => !placed.has(pathOf(one)))) {
+    docsGroup.push(entry(file));
+    notes.push({ grade: "SOFT", check: "index", file, message:
+      "the tree has no place for a page that sits here, so it is listed last under Docs, by its own name" });
+  }
+  const every = [docsGroup, guidesGroup, reportsGroup].map((children, at): TreeNode => ({ label: GROUPS[at], children }));
+  const groups = every.filter((group) => group.children!.length > 0);
+  const counted = new Map<string, number>();
+  for (const node of groups.flatMap(entriesOf)) counted.set(node.path!, (counted.get(node.path!) ?? 0) + 1);
+  const wrong = files.map(pathOf).filter((path) => counted.get(path) !== 1);
+  if (wrong.length || counted.size !== files.length)
+    throw new Refusal(`the tree does not hold every page once: ${wrong.map((path) => `${path} is in it ${counted.get(path) ?? 0} time(s)`).join(", ")}`);
+  return { groups, pages: files, notes };
+}
+
+/** The index page: the template's shell, with its head and its slots filled and its tree written. */
+function indexPage(template: string, tree: Tree, where: { organisation: string; location: string; repository: string; hub: string }): string {
+  const shell = withHead(template, {
+    tab: `${where.location} Artifacts`,
+    block: { id: `${basename(where.repository)}-artifacts-index`, variant: "index", title: "Artifacts",
+      summary: `Every page of this repository's ${POCKET_PATH}, in one tree, opened in tabs.` },
+    produced: "Produced by `docs index` from the pages on disk. Never edit this page: produce it again.",
+    version: newestCut(), script: INDEX_SCRIPT,
+  });
+  const data = DATA_BLOCK.exec(shell);
+  if (!data) throw new Refusal("the template has no block of data with the id `index-data`, so the page cannot be produced from it");
+  let around = `${shell.slice(0, data.index)}\u0000${shell.slice(data.index + data[0].length)}`;
+  around = swap(around, /\{\{WORKSPACE\}\}/, escaped(where.organisation), "slot `{{WORKSPACE}}`");
+  around = swap(around, /\{\{REPOSITORY\}\}/, escaped(where.location), "slot `{{REPOSITORY}}`");
+  around = swap(around, /\{\{THE ADDRESS OF THE HUB[^}]*\}\}/, attribute(where.hub), "slot for the address of the hub");
+  refuseSlots(around, TEMPLATE);
+  // The data sits in a script element, so a `<` in it is written as its escape and can never close the element.
+  const written = JSON.stringify(tree, null, 1).replace(/</g, "\\u003c");
+  return around.replace("\u0000", () =>
+    "<!-- THE TREE, written by `docs index` from the pages on disk. Nobody types it. A folder has `label` and\n" +
+    "     `children`. A page has `label`, `kind` and `path`. A node marked `folded` starts closed. -->\n" +
+    `<script type="application/json" id="index-data">\n${written}\n</script>`);
+}
+
+/** Where the tree of the index that is there and the pages on disk disagree. Nothing is written. */
+function compare(indexFile: string, artifacts: string, pages: string[]): Note[] {
+  const rule = (file: string, message: string): Note => ({ grade: "RULE", check: "index", file, message });
+  if (!existsSync(indexFile))
+    return [rule(indexFile, `there is no index here, so none of the ${pages.length} page(s) under ${POCKET_PATH} has an entry. Run \`docs index\` without \`--check\``)];
+  const data = DATA_BLOCK.exec(readFileSync(indexFile, "utf8"));
+  let tree: Tree | null = null;
+  if (data) { try { tree = JSON.parse(data[1]) as Tree; } catch { tree = null; } }
+  if (!tree || !Array.isArray(tree.groups))
+    return [rule(indexFile, "this index holds no tree: it has no block of data with the id `index-data` that can be read")];
+  const base = typeof tree.base === "string" ? tree.base : "";
+  const counted = new Map<string, number>();
+  const notes: Note[] = [];
+  for (const node of tree.groups.flatMap(entriesOf)) {
+    const file = resolve(dirname(indexFile), (node.beside ? "" : base) + node.path);
+    counted.set(file, (counted.get(file) ?? 0) + 1);
+    if (!pages.includes(file) && counted.get(file) === 1)
+      notes.push(rule(indexFile, `the entry \`${node.label}\` has no page: ${slashes(relative(artifacts, file))} is not there`));
+  }
+  for (const file of pages) {
+    const times = counted.get(file) ?? 0;
+    if (times === 0) notes.push(rule(file, `the tree of ${ARTIFACT_INDEX} lacks this page`));
+    if (times > 1) notes.push(rule(file, `the tree of ${ARTIFACT_INDEX} holds this page ${times} times`));
+  }
+  return notes;
+}
+
+function body(args: string[], workspace: string): number {
+  const [given, ...more] = operands(args, ["--out"]);
+  if (given === undefined || more.length) { console.error(USAGE); return 2; }
+  const repository = resolve(given);
+  const docs = docsOf(repository);
+  const artifacts = artifactsDir(docs);
+  const check = args.includes("--check");
+  try {
+    if (!existsSync(artifacts) || !statSync(artifacts).isDirectory())
+      throw new Refusal(`${repository} has no ${POCKET_PATH}, so there is nothing to list`);
+    const { groups, pages, notes } = groupsOf(artifacts);
+    const out = resolve(optionValue(args, "--out") ?? artifactIndex(docs));
+    // The path to the pages is kept once, as `base`. It is empty where the index sits in the pocket itself.
+    const base = dirname(out) === artifacts ? "" : `${slashes(relative(dirname(out), artifacts))}/`;
+    const named = locationOf(docs, workspace);
+    // The hub is the first page of the tree. Where a repository has no hub, the first page stands for it.
+    const first = groups.flatMap(entriesOf)[0]?.path ?? "";
+    const produce = (): string => indexPage(pageTemplate(templatesDir(workspace), TEMPLATE), { base, tabs: TAB_LIMIT, groups }, {
+      organisation: process.env.SPN_ORG ?? "SaaS Plane",
+      location: process.env.SPN_LOCATION ?? (named === "—" ? basename(repository) : named),
+      repository,
+      hub: base + first,
+    });
+    if (check) {
+      const found = compare(out, artifacts, pages);
+      if (!found.length) {
+        let current = true;
+        try { current = readFileSync(out, "utf8") === produce(); } catch { current = true; }
+        if (!current) found.push({ grade: "SOFT", check: "index", file: out, message:
+          "the tree holds every page once, but this page is not what `docs index` writes now: a name or a place changed" });
+        else console.log(`current  ${relative(workspace, out)}`);
+      }
+      return say([...found, ...notes], workspace) ? 1 : 0;
+    }
+    return say([...place(out, produce(), true, workspace, "index"), ...notes], workspace) ? 1 : 0;
+  } catch (refused) {
+    if (!(refused instanceof Refusal)) throw refused;
+    console.error(`✗ ${refused.message}`);
+    return 1;
+  }
+}
+
+/** Run `docs index` with its own arguments, and give back the exit code. */
+export function run(args: string[]): number {
+  const workspace = resolveWorkspace();
+  const startedAt = performance.now();
+  begin(commandFacts("spn-devex", args), workspace);
+  const code = body(args, workspace);
+  record({ group: "docs", action: "index", args: argsText(args) }, performance.now() - startedAt, code);
+  end(code);
+  return code;
+}
+
+if (process.argv[1] && new URL(import.meta.url).pathname === process.argv[1]) process.exit(run(process.argv.slice(2)));
