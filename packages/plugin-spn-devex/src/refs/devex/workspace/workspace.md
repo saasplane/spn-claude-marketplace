@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "d1e5a22d"
+      "seen": "7511d25c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
@@ -205,11 +205,12 @@ The workspace folder carries two dot-homes: `.claude/` (settings — the marketp
       {NNN}-{subject}/                    prepared, blocked, or not picked up yet
     open/
       {NNN}-{subject}/                    being worked now
-        {subject}-approach.html           yours: the argument, iterated while you read it
-        arcs/                             the agent's: one file per arc, its rows and its state
-        notes/N<nn>/                      one arc's work order
+        approach.html                     yours: the argument, iterated while you read it
+        arcs/                             the agent's: one file per arc, N<nnn>-<subject>.md, its rows and its state
+        notes/N<nnn>/                     one arc's work order
           plan.md                         facts pinned to commits, anchors, commands, traps
-          samples/                        the previews the developer approved
+          previews/                       the pages that explain a change, under review or approved
+          samples/                        real files of the kind the work produces, each in its own format
           scripts/                        what a mechanical row runs
           orders/                         one brief per delegated execution, and its report
     closed/
@@ -416,7 +417,7 @@ Plan one change across repos as an **arc**: ordered rows, one per step, each car
 | --- | --- |
 | **shallow** — mechanical once decided | inline, in the workspace window, under the target's law |
 | **deep** — needs the repo's full context | **delegate** to a child session rooted in the target repo, the step file as its brief; fold the result back. The developer keeps one window |
-| **absent** — the repo is not in this workspace | the step itself is the deliverable: an order in the arc's `notes/N<nn>/orders/`, handed to whoever holds that repo |
+| **absent** — the repo is not in this workspace | the step itself is the deliverable: an order in the arc's `notes/N<nnn>/orders/`, handed to whoever holds that repo |
 
 **The return path is unchanged.** Where work in any repo uncovers something contradicting the foundation, that comes home as a decision-register row. A convention corrected quietly in a sibling is a fork nobody declared.
 

@@ -9,12 +9,12 @@
      about 100 characters wraps, and each continuation line is indented to the value column. No blank lines inside.
      The window that picks this up compares its own model and effort with `model:` before it acts, so name an exact model and an effort. -->
 ```text
-continue:     workstream `{{NNN-subject}}`, arc `N{{n}}`, row {{k}}, in a `{{repository}}` window
+continue:     workstream `{{NNN-subject}}`, arc `N{{nnn}}`, row {{k}}, in a `{{repository}}` window
               — or, after a plugin reload — open workstream `{{next NNN-subject}}`;
-              `{{NNN-subject}}` N{{n}} waits on it
+              `{{NNN-subject}}` N{{nnn}} waits on it
 model:        {{an exact model, such as Opus 5.5}}, effort {{low · medium · high · xhigh · max}}
-read first:   `{{absolute path}}/arcs/N{{n}}-….md` (fields, and row {{k}}),
-              `{{absolute path}}/notes/N{{n}}/plan.md` (§ Traps, § Commands, row {{k}}), then
+read first:   `{{absolute path}}/arcs/N{{nnn}}-<subject>.md` (fields, and row {{k}}),
+              `{{absolute path}}/notes/N{{nnn}}/plan.md` (§ Traps, § Commands, row {{k}}), then
               `{{the order or seat file being changed}}`
 pins:         {{repo}} {{short sha}} · {{repo}} {{short sha}} · {{package}} {{version}} released;
               re-run the plan's stale check first — `git -C {{repo}} log {{sha}}..HEAD -- {{paths}}`

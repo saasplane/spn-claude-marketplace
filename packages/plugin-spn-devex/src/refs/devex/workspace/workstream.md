@@ -9,7 +9,7 @@
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/01-agent.md",
       "section": "Every moment gets a plain, warm line",
-      "seen": "a58c68ff"
+      "seen": "da42ac58"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/01-agent.md",
@@ -38,11 +38,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "d1e5a22d"
+      "seen": "7511d25c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "3f4afcf1"
+      "seen": "2879f9d1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -52,7 +52,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An order is one delegated execution, and every order follows the same rules",
-      "seen": "bfbbd059"
+      "seen": "1dac3af9"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -66,7 +66,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "26a726d6"
+      "seen": "9d8e7322"
     }
   ]
 }
@@ -294,10 +294,11 @@ What those constructs make possible later goes in one line, *later, not now*, an
 construct or into an option. The developer widens it when they want to. A construct that is right can
 carry features later, and features built on a wrong one have to be undone with it.
 
-**Opinion or question — MUST** (`RD.DEVEX.WORKSPACE.195`). While no arc row owns the subject, ask the
-developer for an opinion: `O<n>`, in chat only, numbered per window, never written to a file, and no
-hook reads it. Each opinion carries the question, lettered options and the one you lean to, with why.
-Once the answer settles the shape, write the arc row, and anything still open becomes the page's next
+**Suggestion or question — MUST** (`RD.DEVEX.WORKSPACE.199`). While no arc row owns the subject, put
+a suggestion to the developer: `S<n>`, in chat only, numbered per window, never written to a file, and
+no hook reads it. A suggestion is a whole card, as a question is: what, why, lettered options and the
+one you recommend. When one reply holds both, put the questions and the suggestions in two sections,
+each with its own cards. Once the answer settles the shape, write the arc row, and anything still open becomes the page's next
 `Q<n>` card, on the page, which the hooks check ([a number is a promise](#ideating-is-free-executing-is-not-a-number-is-a-promise)).
 
 **A question reaches the developer for one of three reasons, and for no other — MUST.**
@@ -328,9 +329,9 @@ this way:
 **An answer lands in the arc's notes in the same turn — MUST.** An answer to a card, or any point the
 developer makes in review, lands in three places before the turn ends: the card, answered and
 folded; the arc, as a log line and a change to every row it affects; and the arc's notes — its spec,
-its plan, and any sample they name. An answer logged while the spec stays as it was leaves the next
+its plan, and any preview or sample they name. An answer logged while the spec stays as it was leaves the next
 reader planning from the old spec, with nothing on disk to say it moved. The Stop hook checks it:
-a turn that logs an answer for an arc whose `notes/N<nn>/` holds a spec, plan or samples, when none
+a turn that logs an answer for an arc whose `notes/N<nnn>/` holds a spec, a plan, previews or samples, when none
 of them changed, is refused with the file named.
 
 **An answered card folds into the section that then states it, and leaves no revision marker.** Its
@@ -420,11 +421,12 @@ or two plain lines, and none of them is a system report.
 | Moment | What you say |
 | --- | --- |
 | a session starts | the welcome, then the status line |
-| you ask their opinion | what you need from them, and why |
+| you put a suggestion to them | what you need from them, and why, as a whole card |
 | you answer their question | the answer first, in their words, then the next step you could take |
 | you decide something the rules settle | the decision and its reason, in one line |
 | you put a card to them | the choice, its recommendation, and what waits on it meanwhile — in full once, at the top of that reply, and in one line while it stays open; the page keeps the same card |
 | you hand them a page | the full path to the file, to open in a browser; you publish nothing unless they ask |
+| you ask to close a workstream | a few warm paragraphs first, with no table: that the work is finished, what was delivered, what was learned, and thanks. Then the question |
 | a session ends | what landed, what is next, and thanks, with no handover unless they ask for one |
 
 A reply written as a list of tool output has stopped talking to the developer, and a reader who
@@ -450,7 +452,7 @@ document, so one workstream holds a driver change, an estate change and a plugin
 
 **So a step acting on a set carries the members, never the count.** *Sixteen questions*, *twenty-eight moves*, *nine rules* — a step that names the number and not the things has left the specification somewhere you cannot reach, and a conversation is not a place. **The failure looks exactly like success**: the arc reads complete, every step has a sentence, and you invent a different sixteen.
 
-**Where the set is too large for the step, it goes to `notes/N<nn>/<subject>.<ext>`, in that arc's own folder, and the step names that path.** `notes/` is the workstream's **working papers**, not its scratch — the line between the two is that a step names a working paper by path, and nothing names scratch.
+**Where the set is too large for the step, it goes to `notes/N<nnn>/<subject>.<ext>`, in that arc's own folder, and the step names that path.** `notes/` is the workstream's **working papers**, not its scratch — the line between the two is that a step names a working paper by path, and nothing names scratch.
 
 **Three rules follow.**
 
@@ -492,7 +494,7 @@ the card is answered, the answer is recorded, the mark goes, and the row runs ag
 
 **The rules an agent follows while it carries out an order are stated once, here — MUST**
 (`RD.DEVEX.WORKSPACE.186`). An order's *Read first* line cites this section. The arc's
-`notes/N<nn>/orders/00-facts.md` holds only what belongs to that arc: which checkouts the agents
+`notes/N<nnn>/orders/00-facts.md` holds only what belongs to that arc: which checkouts the agents
 share, which nodes are shared, and which gates an agent may run and what they printed at the pin.
 
 **An agent edits only the files its order names.** Another agent owns every other file. When a
@@ -525,6 +527,14 @@ as printed. It gives each gate as the command, its exit code, its counts and whe
 off. It ends with the register text owed, what was found but not changed (each with its file), and
 what needs the developer.
 
+**An order states its loop, and the loop is fixed — MUST** (`RD.DEVEX.WORKSPACE.207`). Documents come
+first, then source, then the changed cases run alone until they pass, then the whole level once, then
+the stamp. A case written to fail first is one narrow run on the unchanged code, never a whole level.
+No source or test file changes while a test run for that repository is in flight.
+
+**An agent launches no child agent — MUST.** A child can go on writing after its parent has reported,
+so the coordinator reads a tree that is still moving. Every order says so under *Never*.
+
 ## Ideating is free. Executing is not. A number is a promise.
 
 **The section above says what an arc must carry. This says when it has to exist** — because both failures that produced these rules happened with the first standard fully in view.
@@ -533,7 +543,7 @@ what needs the developer.
 
 **From the first edit, a step must already exist.** Any edit. **Size does not excuse it and neither does approval** — a yes in conversation authorises the change, never the record. The disguise is the one-word fix the developer has already agreed to: it does not feel like a change, and it leaves the identical hole. A session later the file differs from `HEAD` and nothing says why.
 
-**Writing `Q<n>` asserts the card is already on the approach page.** The number is a claim about the record, so do not spend one before the arc exists. Where the shape is still moving, **ask in prose** — an opinion, `O<n>`, in chat, which is free ([opinion or question](#a-card-is-only-for-what-the-rules-leave-open)) — or ask the developer to open the arc.
+**Writing `Q<n>` asserts the card is already on the approach page.** The number is a claim about the record, so do not spend one before the arc exists. Where the shape is still moving, **ask in chat** — a suggestion, `S<n>`, which is free ([suggestion or question](#a-card-is-only-for-what-the-rules-leave-open)) — or ask the developer to open the arc.
 
 **That escape is what makes the rule followable.** Mid-ideation you often cannot write the arc, because the subject has not settled. Stop numbering until it has. Never keep numbering and reconcile the page afterwards: a page reconciled later records the destination and throws away every turn that reached it.
 
@@ -543,8 +553,30 @@ what needs the developer.
 | --- | --- |
 | **preview** | build only enough to show the thing — real output, a sample entry, a before and after. Say plainly that nothing is committed to |
 | **confirm** | the choices in a table, each with a recommendation. They decide from the thing rather than from a description |
-| **record** | the row in the arc that owns it, and the approved preview saved in the arc's own `notes/` folder |
+| **record** | the row in the arc that owns it, and the approved preview saved in the arc's own `notes/N<nnn>/previews/` folder, listed in the arc's `## Previews` table and linked from the approach page |
 | **code** | only now, and against the row |
+
+**A preview explains a change, and a sample is the thing itself — MUST** (`RD.DEVEX.WORKSPACE.200`).
+A preview written as a page is copied from `approach-preview-template.html`, named
+`<subject>-preview.html`, and lives in `notes/N<nnn>/previews/`. A sample is a real file of the kind
+the work produces — a template, a report, a document. It keeps its own format and its own name, lives
+in `notes/N<nnn>/samples/`, and is never written in the preview layout. Make a sample only when the
+work produces such a file. Each one is *under review*, *approved* or *superseded*; list it in the arc's
+`## Previews` table with its kind and its state, and link it from the approach page. Writing the first
+one opens the arc as `PROPOSED`.
+
+**You pick the form of a preview, and the developer's word overrides it — MUST**
+(`RD.DEVEX.WORKSPACE.201`). The book lists no fixed kinds: show lines that change, a layout, a diagram,
+a whole file, or what a command prints.
+
+| The situation | You |
+| --- | --- |
+| they say *show it here* | show it in chat. A page is shown as the parts that change, with the path of the file |
+| they say *make a page* or *make a file* | write it, and link it from the approach page |
+| they say neither, and it is text that fits one screen | show it in chat |
+| they say neither, and it must be opened in a browser to be judged, or it is longer than one screen | write it, and link it from the approach page |
+| they approve a preview that was shown in chat | save it as a file and link it |
+| nobody asked, and no rule owes a preview | write nothing |
 
 **A preview costs nothing to throw away.** Code written first makes the decision feel already taken,
 and it turns a question into a fait accompli.
@@ -617,16 +649,45 @@ it as one rather than moving on to whatever did work.
 the repository already uses. Before writing a title, use the words the thing it describes uses. A new
 coinage is a second name for a concept that had one, and every reader now has to learn both.
 
+## The approach page stays current, and part of it is produced
+
+**A workstream's page is named `approach.html`** (`RD.DEVEX.WORKSPACE.204`). The folder carries the
+number and the subject, so the file name repeats neither. A workstream that closed under the name
+`<subject>-approach.html` keeps it.
+
+**The parts of the page that the arcs decide are produced, never typed — MUST.** They are the header's
+status, the Cycles table with its previews, and the heading of `Open`. Run
+`spn-devex docs cycles --write <workstream folder>` after any change to an arc's status, its first
+line or its `## Previews` table. The header's status reads `PLANNING` while no arc is past `DECIDED`,
+`IMPLEMENTING` once an arc runs or has landed, and `DONE` when the workstream closes.
+
+**The rest of the page is yours to bring current in the same turn — MUST.** A new arc, or a scope that
+grew, owes the page its `Why`, its `What` and its `How`, and a Subtitle and a Description that still
+cover what the page plans. A `What` or `How` subsection that has a preview ends in a *Read the
+preview →* line.
+
+**An arc's file is named `N<nnn>-<subject>.md`** (`RD.DEVEX.WORKSPACE.203`): a three-digit number and
+a subject of two to four words, such as `N002-bound-handoff.md`. The heading inside keeps the full
+phrase that names the cycle. One number names one file, and every note of the arc sits inside
+`notes/N<nnn>/`.
+
+**A close is a milestone, and you say so before you ask — MUST** (`RD.DEVEX.WORKSPACE.206`). Write a
+few short paragraphs and no table: that the work is finished, what was delivered in terms of what the
+developer can now do, what was learned, and thanks for what they decided along the way. Measure every
+number from the arcs and the close report. Separate the paragraphs with a `&nbsp;` line, as the welcome
+does, and never put them in a quote block. Then ask. Before the folder moves, the page gets its closed
+masthead and a closing block with what was delivered and learned.
+
 ## Nothing is published unless the developer asks
 
 **You publish no page unless the developer asks for it — MUST** (`RD.DEVEX.WORKSPACE.117`). That
-holds for an approach page, a sample the developer is reviewing, and a report. A page stays where it
+holds for an approach page, a preview or a sample the developer is reviewing, and a report. A page stays where it
 was written, and you hand it over as the **full path** to the file, which the developer opens in a
 browser.
 
 | The page is | It lives in | Handed over as |
 | --- | --- | --- |
-| an approach page, or a sample under review | the workstream's folder under `.spndevex/workstreams/`, in no repository | its full path |
+| an approach page, or a preview or a sample under review | the workstream's folder under `.spndevex/workstreams/`, in no repository | its full path |
 | a report, or any other page in a repository | the repository's pocket, committed | its full path |
 
 **Publishing is the developer's call, because a published copy is one more thing somebody has to

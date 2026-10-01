@@ -38,7 +38,7 @@ description: The contract-first build loop - the order work is done in, what eac
 4. **Implementation** — the service behind the contract, plus its storage access. Policy, authorization, and transactional integrity live at this boundary and nowhere else.
 5. **Entry** — the transport adapter. Parse input into the command, invoke the service, render the state.
 6. **Tests** — at the tier that proves the behavior, never the tier that is easiest to write.
-7. **Run** — the checks and the suites run against the part's acceptance, and a fresh regeneration finds no diff. A finding goes back to the step that owns it.
+7. **Run** — the changed cases run alone until they pass, and then the whole level runs once, against the part's acceptance (`RD.DEVEX.WORKSPACE.207`). A fresh regeneration finds no diff. A finding goes back to the step that owns it. A case written to fail first is one narrow run on the unchanged code, never a whole level, and no source or test file changes while a test run for that repository is in flight.
 
 Steps 2–4 are ordered by dependency and cannot be reordered: the validators derive from the states, and the service is written against the interface the contract declares. **A part runs all its documents, then all its source, then all its tests, then the run — never one function at a time.** Going function by function leaves you, at every moment, with code nobody has described and tests for half a shape.
 

@@ -1,12 +1,13 @@
-<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The four page kinds · § The masthead, and the opening · § The shape of a section, on every page kind · § How a page hands a reader on · § The templates — the pages, and the two seat files behind them · § The header — two lines, six fields, produced from the block · § The blocks — what a page reaches for instead of prose · § The figures — what sits inside a block, and the closed set of them · § The overview set is fixed, and a name says its source · § The level rule — an overview covers one level · § What an overview and a hub hold, section by section · § One stylesheet, shipped with the template · § The overview is the hub, and the constructs are its spokes · § The page itself — its outline, its rail, its width and its furniture
-     and docs/04-capabilities/01-devex/04-workspace/04-docs/01-corpus.md § The readability bar
-     This file holds the structure and styling of a repository's hub and states no rule: the sections in order
-     with their ids, the slots an author fills, and the stylesheet. The sections above state every rule for
-     writing the page. -->
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The masthead, and the opening · § The suffix names the kind · § The approach document — a workstream's, never a repository's · § One stylesheet, shipped with the template · § The page itself — its outline, its rail, its width and its furniture
+     and docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc carries its specification, or names the note that holds it
+     This file holds the structure and styling of a preview page and states no rule: the rail, the masthead, the
+     Overview as plain paragraphs, one section with its subsections, the slots an author fills, and the stylesheet.
+     The stylesheet, the rail and the heading script are the approach template's, copied and not adapted. A section
+     and a subsection are repeated as often as the preview needs, and a subsection keeps only the block that fits. -->
 <meta charset="utf-8">
-<title>Hub Template</title>
+<title>Approach Preview Template</title>
 <!-- spn:doc
-{"id": "concept-overview", "variant": "overview", "title": "Concept", "lenses": ["{{LENS}}"], "summary": "{{The Description's first sentence, word for word.}}"}
+{"id": "ws-{{NNN}}-{{slug}}-{{preview-slug}}", "variant": "preview", "title": "{{THE PREVIEW NAME}}", "lenses": ["{{LENS}}"], "status": "PLANNING", "summary": "{{The Description's first sentence, word for word.}}", "keywords": ["{{…}}"]}
 -->
 <style>
   :root {
@@ -36,7 +37,7 @@
   .page{display:grid;grid-template-columns:13rem minmax(0,1fr);gap:3rem;max-width:min(98vw,80rem);margin:0 auto;padding:3rem 8px 6rem;align-items:start}
   .rail{position:sticky;top:2.5rem;font-family:var(--ui);font-size:var(--xs)}
   .rail .home{border-left:none;padding-left:0;margin-bottom:.9rem;color:var(--accent);font-weight:650;display:block}
-  .rail .rail-title{letter-spacing:.15em;text-transform:uppercase;color:var(--faint);margin-bottom:.85rem;font-size:.7rem;font-weight:700}
+  .rail .rail-title{letter-spacing:.15em;text-transform:uppercase;color:var(--faint);margin-bottom:.85rem;font-size:.7rem}
   .rail a{display:flex;gap:.55rem;text-decoration:none;color:var(--slate);padding:.28rem 0 .28rem .6rem;border-left:2px solid var(--rule);line-height:1.4}
   .rail a .n{display:none}
   .rail a.sub{padding-left:1.6rem;font-size:.72rem;color:var(--faint)}
@@ -67,7 +68,6 @@
   .tile p{font-size:var(--sm);color:var(--slate);margin:0 0 .6rem;max-width:none;flex:1}
   .tile .more{font-size:var(--sm);font-weight:600;text-decoration:none;align-self:flex-start}
   p > .more{font-weight:600;text-decoration:none}
-  .tile .glyph{float:right;font-size:.8rem;margin-left:.4rem}
   h1{font-family:var(--ui);font-size:var(--xxl);font-weight:700;letter-spacing:-.02em;line-height:1.15;text-wrap:balance;margin:0}
   .subtitle{font-size:var(--lg);line-height:1.5;color:var(--slate);max-width:46rem;margin:0}
   .standfirst{font-size:1rem;line-height:1.6;color:var(--ink);max-width:58rem}
@@ -110,6 +110,14 @@
   .pull .label{display:block;font-family:var(--ui);font-size:var(--xs);letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.3rem}
   .pull p{margin:0;max-width:none}
   .open{background:var(--card);border:1px solid var(--rule);border-left:2px solid var(--gap);border-radius:0 3px 3px 0;padding:1.1rem 1.25rem;margin-bottom:.9rem}
+  /* .card, the green-edged card */
+  .card{background:var(--card);border:1px solid var(--rule);border-left:2px solid var(--ok);border-radius:0 3px 3px 0;padding:1.1rem 1.25rem;margin-bottom:.9rem}
+  .card h4{font-size:var(--md)}
+  .card .k{font-family:var(--mono);font-size:var(--xs);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);display:block;margin:.6rem 0 .2rem}
+  .card p{font-size:var(--sm);color:var(--slate);margin:0 0 .4rem;max-width:none}
+  .card .rec{margin-top:.75rem;padding-top:.65rem;border-top:1px dashed var(--rule);font-size:var(--sm);color:var(--ink)}
+  .card .rec b{color:var(--ok)}
+  .card .scroll{margin:.4rem 0}
   .open h4{font-size:var(--md)}
   .open .k{font-family:var(--mono);font-size:var(--xs);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);display:block;margin:.6rem 0 .2rem}
   .open p{font-size:var(--sm);color:var(--slate);margin:0 0 .4rem;max-width:none}
@@ -159,88 +167,93 @@ a.anchor{display:inline-block;margin-left:.6em;font-family:var(--mono);font-size
 .sec-head:hover a.anchor,h3[id]:hover a.anchor,a.anchor:hover,a.anchor:focus,a.anchor.copied{opacity:1}
 a.anchor.copied::after{content:" link copied";font-size:.9em;color:var(--ok,#0a7d4a);margin-left:.3em}
 </style>
+<style>
+  /* The state of a preview */
+  .badge.status.review{border-color:var(--gap);color:var(--gap);background:var(--gap-soft)}
+  .badge.status.approved{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
+  .badge.status.superseded{border-color:var(--rule);color:var(--faint);background:var(--card)}
+  /* A whole page shown inside the preview */
+  .frame{border:1px solid var(--rule);border-radius:3px;background:var(--card);margin:1.6rem 0;overflow:hidden}
+  .frame iframe{display:block;width:100%;height:46rem;border:0;background:#fff}
+  .frame .cap{font-family:var(--mono);font-size:var(--xs);color:var(--faint);padding:.45rem .8rem;border-bottom:1px solid var(--rule)}
+</style>
 
 <div class="page">
 
 <nav class="rail" id="rail">
-  <a class="home" href="../../../../README.md">&larr; .spndevex</a>
-  <div class="rail-title">{{REPOSITORY NAME: Foundation &mdash; the second segment of the header line; the hub is the one page whose rail names its repository}}</div>
+  <a class="home" href="../../../approach.html#{{the id of the subsection or card this preview serves}}">&larr; {{NNN}} - {{TITLE}}</a>
+  <div class="rail-title">{{THE PREVIEW NAME}}</div>
 </nav>
 <div class="wrap">
 
 <header class="masthead">
-  <div class="eyebrow"><span class="line1">{{WORKSPACE}} &nbsp;|&nbsp; {{REPOSITORY}} &nbsp;|&nbsp; Concept</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Overview</span><span class="sep">|</span><span class="lbl">For:</span> <span class="audience"><span class="badge lens">{{ROLE}}</span><span class="badge lens">{{ROLE}}</span></span></span></div>
-  <h1>{{THE TITLE: the benefit line, the reader's gain, as a short sentence a reader would say.}}</h1>
-  <p class="subtitle">{{THE SUBTITLE: the what line, one plain sentence saying what the thing is.}}</p>
-  <p class="standfirst">{{THE DESCRIPTION, one paragraph: what the plane is, in everyday words; why you would read this page first; then at most two short sentences on how the page is laid out.}}</p>
+  <div class="eyebrow"><span class="line1">{{WORKSPACE}} &nbsp;|&nbsp; Workstream {{NNN}} &nbsp;|&nbsp; {{THE PREVIEW NAME}}</span><span class="line"><span class="lbl">Type:</span> <span class="badge type">Preview</span><span class="sep">|</span><span class="lbl">Arc:</span> <span class="badge">N{{nnn}}</span><span class="sep">|</span><span class="lbl">Shown:</span> <span class="badge">{{date}}</span><span class="st"><span class="lbl">State:</span> <span class="badge status review">{{UNDER REVIEW &middot; APPROVED &middot; SUPERSEDED}}</span></span></span></div>
+  <h1>{{THE PREVIEW NAME}}</h1>
+  <p class="subtitle">{{THE SUBTITLE: what you are asked to decide from this page, one plain sentence.}}</p>
+  <p class="standfirst">{{THE DESCRIPTION, one paragraph: what this page shows, why you would look at it, and how the page runs.}}</p>
 </header>
 
-<section id="s0" data-block="reasons">
+<section id="s1" data-block="reasons">
   <div class="sec-head"><h2>Overview</h2></div>
-  <p>{{What the Subtitle promises, and how to read the page. Then one h3 per promise.}}</p>
-  <h3 id="o1">{{Promise}}</h3>
-  <p>{{The problem, the mechanism, what you can check.}}</p>
-  <p><a class="more" href="#">Read {{the domain, by the name its heading carries}} &rarr;</a></p>
+  <p>{{What this preview shows, and which part of the approach page it serves.}}</p>
+  <p>{{What to look at first, and what you are asked to decide.}}</p>
+  <p>{{What in this preview is not final, and what will differ in the built thing.}}</p>
 </section>
 
-<section id="s1" data-block="sequence">
-  <div class="sec-head"><h2>{{A narrative section of the concept}} &mdash; {{plain words}}</h2></div>
-  <p>{{The section at reading depth, with its figure; one h3 per step or part. Repeat for each narrative section the concept has — the mental model, what makes a platform scalable, the stage chain.}}</p>
+<section id="s2" data-block="sequence">
+  <div class="sec-head"><h2>{{A section: one part of what is previewed}}</h2></div>
+  <p>{{The section&rsquo;s own overview, in one or two sentences. Then its subsections, each with the block that fits.}}</p>
+
+  <h3 id="s2a">{{A subsection shown as a diagram}}</h3>
+  <p>{{What the diagram shows.}}</p>
   <figure>
-  <svg class="dg" viewBox="0 0 1100 120" width="1100" height="120" role="img" aria-label="{{Three steps in order, left to right.}}">
-    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
-    <rect class="box em" x="20" y="20" width="300" height="80" rx="3"/><text class="t" x="36" y="48">{{Step}}</text><text class="s" x="36" y="70">{{what it settles}}</text><text class="n" x="36" y="90">{{where it lives}}</text>
-    <path class="c" d="M320 60 H376" marker-end="url(#ar)"/>
-    <rect class="box" x="376" y="20" width="300" height="80" rx="3"/><text class="t" x="392" y="48">{{Step}}</text><text class="s" x="392" y="70">{{what it settles}}</text>
-    <path class="c" d="M676 60 H732" marker-end="url(#ar)"/>
-    <rect class="box" x="732" y="20" width="300" height="80" rx="3"/><text class="t" x="748" y="48">{{Step}}</text><text class="s" x="748" y="70">{{what it settles}}</text>
+  <svg class="dg" viewBox="18 18 1016 84" width="1016" height="84" role="img" aria-label="{{What the diagram shows, in words.}}">
+    <defs><marker id="ar-pv" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="box em" x="20" y="20" width="300" height="80" rx="3"/><text class="t" x="36" y="48">{{Part}}</text><text class="s" x="36" y="70">{{what it does}}</text>
+    <path class="c" d="M320 60 H376" marker-end="url(#ar-pv)"/>
+    <rect class="box" x="376" y="20" width="300" height="80" rx="3"/><text class="t" x="392" y="48">{{Part}}</text><text class="s" x="392" y="70">{{what it does}}</text>
+    <path class="c" d="M676 60 H732" marker-end="url(#ar-pv)"/>
+    <rect class="box" x="732" y="20" width="300" height="80" rx="3"/><text class="t" x="748" y="48">{{Part}}</text><text class="s" x="748" y="70">{{what it does}}</text>
   </svg>
   <figcaption>{{What to notice.}}</figcaption>
   </figure>
-  <h3 id="n1">{{Step or part}}</h3>
-  <p>{{What it is, why it is separate.}}</p>
-  <p class="s">{{what delivers it today, where nothing is linked}}</p>
+
+  <h3 id="s2b">{{A subsection shown as a folder tree}}</h3>
+  <pre data-lang="text">{{folder/
+&#x251C;&#x2500;&#x2500; what is added      +
+&#x2514;&#x2500;&#x2500; what is removed    &minus;}}</pre>
+
+  <h3 id="s2c">{{A subsection shown as code changes}}</h3>
+  <p><code>{{path of the file that changes}}</code></p>
+  <pre data-lang="diff"><span class="tk-del">- what the file says today</span>
+<span class="tk-add">+ what it will say</span></pre>
 </section>
 
-<section id="s4" data-block="map">
-  <div class="sec-head"><h2>{{Area}} &mdash; {{what it is for, in plain words}}</h2></div>
-  <p>{{One section per area. What the area is, why it divides as it does, who reads it — explained before any tile. A figure where seeing is faster.}}</p>
-  <h3 id="a1">{{Sub-area}} &mdash; {{what it is, in plain words}}</h3>
-  <p>{{What the sub-area is, explained once, here and nowhere else in the section.}}</p>
-  <p><strong>How to read it.</strong> {{For a first-time reader: the one thing to know or unlearn; when to read it; what you can decide after it.}}</p>
-  <p><a class="more" href="#">Read {{the sub-area, by the name its heading carries}} &rarr;</a></p>
-  <h3 id="a2">{{Sub-area with several reading paths}} &mdash; {{what it is}}</h3>
-  <p>{{What it is, once. Then how to read it, naming each path and when you read it. Then one tile per path, because a heading can link only one page.}}</p>
-  <div class="tiles">
-    <div class="tile"><h4><a href="#">{{Reading path}}</a></h4><p>{{what the path covers, in one line}}</p><a class="more" href="#">Read more &rarr;</a></div>
-    <div class="tile"><h4><a href="#">{{Reading path}}</a></h4><p>{{&hellip;}}</p><a class="more" href="#">Read more &rarr;</a></div>
-  </div>
-</section>
+<section id="s3" data-block="comparison">
+  <div class="sec-head"><h2>{{Another section}}</h2></div>
+  <p>{{The section&rsquo;s own overview.}}</p>
 
-<section id="s8" data-block="glossary">
-  <div class="sec-head"><h2>Glossary</h2></div>
-  <p>{{The words this page gives a meaning to — the repository's own, written by hand.}}</p>
+  <h3 id="s3a">{{A subsection shown as a table}}</h3>
   <div class="scroll"><table>
-    <thead><tr><th>Term</th><th>What it means</th></tr></thead>
-    <tbody><tr><td>{{Estate}}</td><td>{{&hellip;}}</td></tr></tbody>
+    <thead><tr><th>{{Thing}}</th><th>{{Today}}</th><th>{{Proposed}}</th></tr></thead>
+    <tbody>
+      <tr><td><strong>{{&hellip;}}</strong></td><td>{{&hellip;}}</td><td>{{&hellip;}}</td></tr>
+    </tbody>
   </table></div>
-</section>
 
-<section id="s9" data-block="next">
-  <div class="sec-head"><h2>Where to go next</h2></div>
-  <ul>
-    <li>New here &rarr; <a href="#">{{the day-zero walk}}</a></li>
-    <li>Building {{a service, a web app, an estate}} &rarr; <a href="#">{{the path}}</a></li>
-    <li>Reading one construct &rarr; <a href="#">{{the constructs face}}</a></li>
-    <li>What governs this book &rarr; <a href="#">{{the registers}}</a></li>
-  </ul>
+  <h3 id="s3b">{{A subsection that shows a real sample}}</h3>
+  <p>{{What the sample is: a template, a report, a page. It is a real file in its own format, kept in the samples folder, and this page only shows it.}}</p>
+  <div class="frame">
+    <div class="cap">{{samples/the-sample-file.html}}</div>
+    <iframe src="../samples/{{the-sample-file.html}}" title="{{what the sample is}}"></iframe>
+  </div>
 </section>
 
 </div>
 </div>
 
 <footer>
-  A template &middot; copy it and fill the slots &middot; the rules for this page are in <code>05-artifacts.md</code> &middot; every block and figure is shown once in <code>blocks-template.html</code>
+  The approach preview template &middot; copy it and fill the slots &middot; a preview page is named <code>&lt;subject&gt;-preview.html</code>, sits in <code>notes/N&lt;nnn&gt;/previews/</code>, and the approach page links it &middot; a real sample sits in <code>notes/N&lt;nnn&gt;/samples/</code> under its own name &middot; every block and figure is shown once in <code>blocks-template.html</code>
 </footer>
 
 <script>

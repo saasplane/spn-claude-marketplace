@@ -9,7 +9,7 @@
 | | |
 | --- | --- |
 | **Repo** | `{{repo}}` · **Depth:** {{child here · own window}} · **Run from:** `{{absolute path}}` |
-| **Workstream** | `{{NNN-subject}}` · **Arc:** `{{absolute path to arcs/N<n>-….md}}`, rows {{k}} |
+| **Workstream** | `{{NNN-subject}}` · **Arc:** `{{absolute path to arcs/N<nnn>-<subject>.md}}`, rows {{k}} |
 | **Pinned** | `{{repo}}` @ `{{sha}}` — stale if `git -C {{repo}} log {{sha}}..HEAD -- <path>` lists a file you touch |
 | **Model** | {{Opus 5 · Sonnet 5}} |
 | **Read first** | `spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md` § An order is one delegated execution, and every order follows the same rules · `{{absolute path}}/orders/00-facts.md` (this arc's checkout, shared nodes, the gates you may run) · `{{absolute path}}/plan.md` § Traps, § Commands, § Rows {{k}} · the arc's Log |
@@ -28,6 +28,12 @@
 
 Every other file belongs to another agent. If you must touch one, stop and say so in your report.
 
+## Loop
+
+Documents first, then source, then the changed cases run alone until they pass, then the whole level once, then the
+stamp. A case written to fail first is one narrow run on the unchanged code. No source or test file changes while a
+test run for this repository is in flight.
+
 ## Steps
 
 1. {{the step, exact enough to do without asking}}
@@ -40,6 +46,8 @@ Every other file belongs to another agent. If you must touch one, stop and say s
 | known bad | {{the new case run against the unchanged code}} | — | {{red, and the line it prints}} | — |
 
 ## Never
+
+Launch no child agent: do every step yourself.
 
 {{What this order must not do beyond the rules: files it leaves alone, cycles it does not pay.}}
 

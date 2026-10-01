@@ -4,16 +4,16 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The masthead, and the opening",
-      "seen": "4fe3fa2f"
+      "seen": "08c0d45d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "section": "The blocks \u2014 what a page reaches for instead of prose",
+      "section": "The blocks — what a page reaches for instead of prose",
       "seen": "0dd7f138"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "section": "The figures \u2014 what sits inside a block, and the closed set of them",
+      "section": "The figures — what sits inside a block, and the closed set of them",
       "seen": "8a447dae"
     }
   ]

@@ -12,12 +12,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The masthead, and the opening",
-      "seen": "4fe3fa2f"
+      "seen": "08c0d45d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "Reports and templates",
-      "seen": "c8455efd"
+      "seen": "d942c681"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -27,7 +27,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "Nothing is published unless the developer asks",
-      "seen": "a11ce7e5"
+      "seen": "9381571f"
     }
   ]
 }
@@ -148,6 +148,8 @@ Every section fits about one screen, and Records is folded so it never swamps th
 - **An item** (`<li class="record">`) is a state dot, the location in code type, one plain sentence, and a small second line. The dot is filled in the failure colour for the worst state, filled in the gap colour for the middle one, and an empty ring for the least, so its shape carries the grade as well as its colour; the grade is also its accessible name.
 - **Every item has a stable id** `<KIND>.<GROUP>.<nnn>` (`CODE.HIST.047`), a **Decided by** value with its reason, and the data attributes `data-id`, `data-rule`, `data-severity`, `data-decider` (`agent`, `agent-flagged` or `developer`) and `data-location`, so you can read the list back without parsing sentences.
 - **Every group prints open.**
+- **One item per file inside a group** (`RD.DEVEX.WORKSPACE.208`). Where one cause occurs many times in one file, the item names the file once, with the count and the first line it occurs on. Never one item per occurrence.
+- **One list.** The page and the data file it is built from flag the same records.
 
 ### Measured — shows three things and folds one
 

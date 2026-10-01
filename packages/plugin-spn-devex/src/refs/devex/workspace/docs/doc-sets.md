@@ -3,16 +3,16 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/README.md",
-      "seen": "1a816b2e"
+      "seen": "074a12a7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "26a726d6"
+      "seen": "9d8e7322"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The masthead, and the opening",
-      "seen": "4fe3fa2f"
+      "seen": "08c0d45d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -29,7 +29,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md",
-      "seen": "1090478c"
+      "seen": "b700130e"
     },
     {
       "path": "spn-foundation/CONCEPT.md",
@@ -383,6 +383,7 @@ a reader meets first.
 | **construct** | the construct's name | its one-line promise | what it is · why read this page · how the page runs |
 | **report** | its name, such as *Coverage report* | the question it answers, naming the repository by its folder name | what was counted, with no number · when to read it |
 | **approach** | the page's name | the decision it plans | what changes · why read it · how the page runs |
+| **preview** | the preview's name | what you are asked to decide from the page | what the page shows · why look at it · how the page runs |
 
 **Every level is plain language — MUST** (decisions RD.DEVEX.WORKSPACE.182 and
 RD.DEVEX.WORKSPACE.187). A reader lands on the page without knowing yet whether it is the one they
@@ -404,10 +405,12 @@ Description carries no number**: the count moves to `Summary` and to the `summar
 RD.DEVEX.WORKSPACE.143's, word for word.** No other page copies that pair's style, and the
 Description under it still says in everyday words what SaaS Plane is.
 
-**Show a new Title or Subtitle to the developer before you write it.** Both speak for the product,
-so they are the developer's call. Draft the line, show it, and write it only after a yes. A Subtitle
-that exists today moves into place only if it already passes the plain rule; otherwise draft it
-again.
+**Write the Title and the Subtitle of every page kind yourself, and keep them current as the page
+grows — MUST** (`RD.DEVEX.WORKSPACE.205`). Read the kind's row, hold your draft against the approved
+example and the poor ones for that kind, run the check below, and name the change to the developer in
+one line. Do not ask them to approve one. A Subtitle that exists today moves into place only if it
+already passes the plain rule; otherwise write it again. A preview page's Title is the preview's name,
+and its Subtitle says what the developer is asked to decide from the page.
 
 **An approach page's masthead carries no project shorthand either** — an arc number, a question
 number or a release name, such as *N116* or *R2*, that the same sentence does not explain. The
@@ -463,7 +466,8 @@ kind: a good example beside a poor one shows the difference faster than the rule
 4. No level carries a number. A report's counts are in its Summary, and the workstream number that
    opens an approach's `h1` is not part of its Title.
 5. The Subtitle is one plain sentence. On a report it is a question that names the repository by its
-   folder name, on an approach it names the decision the page plans, and on the foundation's hub it
+   folder name, on an approach it names the decision the page plans, on a preview it names what you
+   are asked to decide, and on the foundation's hub it
    is `RD.DEVEX.WORKSPACE.143`'s, word for word.
 6. Read the three levels aloud once, and rewrite any sentence you stumble on.
 
@@ -475,14 +479,14 @@ Every page somebody writes by hand is copied from a template, and the templates 
 | --- | --- | --- |
 | `templates/pages/` | `hub-template.html` · `overview-template.html` · `construct-template.html` · `report-template.html` · `blocks-template.html` | the page kinds a repository has — hub, overview, construct — and the report; the blocks template shows every block and figure kind rendered |
 | `templates/seat-files/` | `construct-seat-template.md` · `schema-template.sql` | what an author writes *inside* a seat: the markdown a construct page is produced from, and the authoritative data model |
-| `templates/workstream/` | `approach-template.html` · `arc-template.md` · `order-template.md` · `handover-template.md` | the workstream's own files. **The approach document is here because an argument is a workstream's**, never a repository's |
+| `templates/workstream/` | `approach-template.html` · `approach-preview-template.html` · `arc-template.md` · `order-template.md` · `handover-template.md` | the workstream's own files. **The approach document is here because an argument is a workstream's**, never a repository's |
 | `templates/agent/` | `skill-template.md` · `agent-template.md` · `lens-template.md` · `ref-template.md` · `hook-template.py` | the agent's own files — hand-written too, and a kind with no template gets written from the last one its author happened to see |
 
 **The plugin and the CLI carry different sets, because they answer different moments.** `pages/` and `seat-files/` ship in both, since the agent copies one to write a page and `repo create` emits a started hub page. `workstream/` and `agent/` ship in the plugin alone: the CLI creates a workstream folder with `mkdir` and owes no shape, and it never writes a skill. The copies are stamped with the book's hash and exported on release, so a release whose copies disagree with the source fails rather than publishing drift.
 
 **A scaffold beats a template, a template beats a document, and a document beats a conversation.** Where the CLI creates a file, that scaffold *is* the template and none is kept in the book — a seat face, a behaviour file, a capability chapter and the glossary are all made that way.
 
-**Five page templates, and the seat files behind them**: `hub-template.html` for the one hub a repository has, `overview-template.html` for one reading path or the hub of a repository other than the foundation, `construct-template.html` for a produced construct page (`docs page` copies its stylesheet and scripts into every page it produces), `approach-template.html` for a workstream's argument, and `report-template.html` for a report — one shell for all five report types. `construct-seat-template.md` is the seat file an author actually writes, and `capability-template.md` one capability chapter. `blocks-template.html` is copied into nothing: it shows every block and every figure kind rendered, and you consult it beside a page template.
+**The page templates, and the seat files behind them**: `hub-template.html` for the one hub a repository has, `overview-template.html` for one reading path or the hub of a repository other than the foundation, `construct-template.html` for a produced construct page (`docs page` copies its stylesheet and scripts into every page it produces), `approach-template.html` for a workstream's argument, `approach-preview-template.html` for a preview page in a workstream, and `report-template.html` for a report — one shell for all five report types. `construct-seat-template.md` is the seat file an author actually writes, and `capability-template.md` one capability chapter. `blocks-template.html` is copied into nothing: it shows every block and every figure kind rendered, and you consult it beside a page template.
 
 **The rules every page kind shares are stated once, in the chapter, and no template repeats them**: headings carry no count and are never links, numbers are for file names, the book's own words are translated, and a card is a title, a description and a *Read more*. **The book's own words are translated on every page a newcomer reads**: say *the agent's viewpoint*, and note once that the book calls it a lens. A word a first-time reader cannot guess is explained where it first appears, or replaced by the plain word. A count is never an explanation: *the eight phases* tells a newcomer nothing, so say what the phases are. A door is a *Read …* line under the text, naming what it opens in the words the heading already carries — *Read Agent →*.
 
@@ -494,7 +498,7 @@ Every page somebody writes by hand is copied from a template, and the templates 
 | **Approach** — an argument | on demand, when a design is argued | none is a defect. **Ahead** leads the code as a concept does, **level** means it landed, **behind** is a correct record of then |
 | **Overview** — a face | **maintained.** A workstream changing the model owes it | it **tracks its seat**. Drift from `CONCEPT.md` is a defect, and `coherence.py` reads it |
 
-**A suggestion is recorded before it is executed — MUST.** The developer instructs and corrects while the work runs, and each one is written down before it is acted on. An instruction becomes a step row in the arc that owns it. A correction becomes a log line and a rewrite of the row it corrects. A question nobody can answer alone becomes an `Open` card, argued in the page rather than in chat. A session's context ends with the session, so anything held only there is work nobody can pick up.
+**An instruction is recorded before it is executed — MUST.** The developer instructs and corrects while the work runs, and each one is written down before it is acted on. An instruction becomes a step row in the arc that owns it. A correction becomes a log line and a rewrite of the row it corrects. A question nobody can answer alone becomes an `Open` card, argued in the page rather than in chat. A session's context ends with the session, so anything held only there is work nobody can pick up.
 
 **A row's State cell says what it reached while the work runs**, so the developer can see what they asked for that has not happened yet:
 

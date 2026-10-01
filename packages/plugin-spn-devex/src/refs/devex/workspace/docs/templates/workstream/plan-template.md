@@ -4,9 +4,9 @@
      restate-drift.ts reports this copy when its source moves. -->
 <!-- A PLAN IS WRITTEN JUST BEFORE ITS ARC RUNS (row 0), BY READING WHAT EXISTS FIRST. It holds no question: a
      question is a card on the approach page. It holds no status: the arc's rows do. -->
-# N{{n}} — plan (the work order)
+# N{{nnn}} — plan (the work order)
 
-Written {{date}}, just before N{{n}} runs. **Each fact is pinned to the commit and tree it was read at.** A fact is
+Written {{date}}, just before N{{nnn}} runs. **Each fact is pinned to the commit and tree it was read at.** A fact is
 stale when `git -C <repo> log <sha>..HEAD -- <path>` lists its file, or `git -C <repo> status --short -- <path>` is
 not empty (another session's uncommitted work); then re-read that file. Re-run this check before each wave.
 
@@ -41,7 +41,7 @@ not empty (another session's uncommitted work); then re-read that file. Re-run t
 
 <!-- The sets, moves and worked example the rows act on. A set is named by its members, never a count; a move is a
      table whose targets are unique; a step producing many files carries one worked example. Too large for here →
-     `notes/N<n>/<subject>.<ext>`, named by path in the row. -->
+     `notes/N<nnn>/<subject>.<ext>`, named by path in the row. -->
 
 ## Traps — read before any row
 

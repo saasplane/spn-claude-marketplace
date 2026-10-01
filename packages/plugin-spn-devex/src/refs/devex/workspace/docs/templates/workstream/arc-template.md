@@ -1,12 +1,13 @@
-<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The arc · § A step row says where, at what altitude, and how · § A step names every surface the change reaches, and how you would know · § A suggestion is recorded before it is executed · § A prompt while an arc runs · § An arc's status says which of eight states it is in
+<!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § The arc · § A step row says where, at what altitude, and how · § A step names every surface the change reaches, and how you would know · § An instruction is recorded before it is executed · § A prompt while an arc runs · § An arc's status says which of eight states it is in
      This file carries rules it does not own. The chapter above is the source of truth.
      A rule change is edited there first, then here, in the same change. Never add a rule here.
      restate-drift.ts reports this copy when its source moves. -->
 <!-- AN ARC IS THE INDEX AND THE STATE; ITS PLAN IS THE WORK ORDER. What each row changes, exactly, lives in
-     `notes/N<n>/plan.md`, pinned to commits. An arc is a plan, never an argument: no card lives here. A question
+     `notes/N<nnn>/plan.md`, pinned to commits. An arc is a plan, never an argument: no card lives here. A question
      is a card on the approach page's Open; HELD names that card; a scope change is logged as a dated line.
-     Name the arc for the cycle it pays, never for its subject. -->
-# N{{n}} — {{the cycle it pays, named: "R: the support release that carries X"}}
+     The heading names the arc for the cycle it pays. The file is named `N<nnn>-<subject>.md`: a three-digit number
+     and a subject of two to four words. -->
+# N{{nnn}} — {{the cycle it pays, named: "R: the support release that carries X"}}
 
 Status: **{{PROPOSED · DECIDED · RUNNING · HELD — waits on Q<n> · PART-LANDED · LANDED · CARRIED — to <where> · DROPPED — <why>}} — {{date}}.** {{One sentence: what this arc changes, and why it is one arc.}}
 
@@ -21,8 +22,17 @@ Status: **{{PROPOSED · DECIDED · RUNNING · HELD — waits on Q<n> · PART-LAN
 | **Design gate** | {{the cards that must be answered first: Q<n>}}, or passed |
 | **Green baseline** | {{the whole-repository gate}} at `{{sha}}`, {{date}}: {{its result line}} |
 | **Model** | Coordinator: {{Opus 5}}. Each order's model is in the plan's Orders table. |
-| **Page** | `{{subject}}-approach.html`: this arc's Cycles row, and the cards it owns ({{Q<n>}}) |
-| **Work order** | `notes/N{{n}}/plan.md` (pinned facts, commands, rows, orders) · `samples/` (approved previews) · `scripts/` · `orders/` (one brief and its report per agent) |
+| **Page** | `approach.html`: this arc's Cycles row, and the cards it owns ({{Q<n>}}) |
+| **Work order** | `notes/N{{nnn}}/plan.md` (pinned facts, commands, rows, orders) · `previews/` (the pages that explain a change) · `samples/` (real files of the kind the work produces) · `scripts/` · `orders/` (one brief and its report per agent) |
+
+## Previews
+
+<!-- One row per preview and per sample of this arc. Kind is `preview` or `sample`. State is `under review`,
+     `approved <date>` or `superseded by <file>`. With none, the table is replaced by the one word `None.` -->
+
+| File | Kind | Shows | State |
+| --- | --- | --- | --- |
+| [`{{subject}}-preview.html`](../notes/N{{nnn}}/previews/{{subject}}-preview.html) | preview | {{what it shows, in one line}} | under review |
 
 ## What done means
 
@@ -42,7 +52,7 @@ Status: **{{PROPOSED · DECIDED · RUNNING · HELD — waits on Q<n> · PART-LAN
 
 | # | Repo | Altitude | What | Mechanism | Acceptance | State |
 | --- | --- | --- | --- | --- | --- | --- |
-| 0 | — | DOCS | write `notes/N{{n}}/plan.md`: pins, what exists today, commands with their before, rows, orders | agents (order 00) | every plan row has Files, Fails before and Proof; every Commands row has its Before | |
+| 0 | — | DOCS | write `notes/N{{nnn}}/plan.md`: pins, what exists today, commands with their before, rows, orders | agents (order 00) | every plan row has Files, Fails before and Proof; every Commands row has its Before | |
 | 1 | {{repo}} | DOCS | plan § 1 | by hand | `{{Commands row}}` → {{before}} → {{after}} | |
 | 2 | {{repo}} | CODE | plan § 2 | agents (order 02) | `{{Commands row}}` → {{before}} → {{after}} | |
 | {{n}} | — | PROOF | re-run every gate above in one pass, cache off, after the last write; and the consumer install | command | each Commands row → its after, in one run | |
@@ -56,6 +66,6 @@ this arc's Cycles row reads LANDED. The landing is committed. The arcs are the s
 ## Log
 
 <!-- An answer or a review point lands in the same turn in the card, in this log and every row it changes, and in
-     notes/N<n>/ (the spec, the plan, and any sample they name). Name the note files it changed. A decision the book,
+     notes/N<nnn>/ (the spec, the plan, and any preview or sample they name). Name the note files it changed. A decision the book,
      the plugin references or the lenses settle is logged here with its reason, and never raised as a card. -->
 - **{{date}} — {{what was decided or corrected, by whom, and why; the notes it changed}}.**

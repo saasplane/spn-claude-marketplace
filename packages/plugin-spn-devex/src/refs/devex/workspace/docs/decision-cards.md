@@ -4,12 +4,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The approach document — a workstream's, never a repository's",
-      "seen": "2626a831"
+      "seen": "d9be2a17"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A card is only for what the rules leave open",
-      "seen": "e72db838"
+      "seen": "46840166"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -67,9 +67,11 @@ already answers costs the developer's attention for nothing.
 change, propose the constructs the ask needs and their patterns, correct on their own, and stop there.
 What they make possible later is one line, *later, not now*, never a construct or an option of its own.
 
-**Opinion or question — MUST** (`RD.DEVEX.WORKSPACE.195`). While no arc row owns the subject, ask for an
-opinion, `O<n>`: in chat only, numbered per window, never written to a file, and read by no hook, with
-the question, lettered options and the one you lean to. Once the answer settles the shape, the arc row
+**Suggestion or question — MUST** (`RD.DEVEX.WORKSPACE.199`). While no arc row owns the subject, put a
+suggestion, `S<n>`: in chat only, numbered per window, never written to a file, and read by no hook. A
+suggestion is a whole card, with the same parts as the card below: what, why, a lettered options table
+and the one you recommend. When one reply holds both, the questions and the suggestions sit in two
+sections, each with its own cards. Once the answer settles the shape, the arc row
 is written, and anything still open becomes the page's next `Q<n>` card, in the shape below.
 
 **A question reaches the developer for one of three reasons, and for no other:**
@@ -84,7 +86,7 @@ is written, and anything still open becomes the page's next `Q<n>` card, in the 
 
 | Part | What it carries |
 | --- | --- |
-| **Number + summary** | Numbered **`Q<n>`**, and the numbering is **stable across the whole exchange** — Q3 is Q3 in the question, the discussion, the answer and the page that later states it. One prefix, because a corpus that has used `O1`, `D1`, bare `1` and a trailing `card D58` costs the reader a guess before they can reply. An `O<n>` opinion asked in chat before an arc row exists is not a card and never reaches a page. The summary names the **choice**, not the topic |
+| **Number + summary** | Numbered **`Q<n>`**, and the numbering is **stable across the whole exchange** — Q3 is Q3 in the question, the discussion, the answer and the page that later states it. One prefix, because a corpus that has used `O1`, `D1`, bare `1` and a trailing `card D58` costs the reader a guess before they can reply. An `S<n>` suggestion put in chat before an arc row exists has a card's parts, is not a page card, and never reaches a page. The summary names the **choice**, not the topic |
 | **What** | The change concretely — the file, the rule, the before → after, in names and counts, not adjectives. It starts from what exists, with the file and the line |
 | **Why** | Which of the three reasons makes the choice the developer's, and what it costs to leave as is: the failure it causes. Never *"for consistency"* |
 | **Options** | A **table**: lettered, trade-off in its own column. *"Leave it"* is a real option wherever viable, with its cost stated |
