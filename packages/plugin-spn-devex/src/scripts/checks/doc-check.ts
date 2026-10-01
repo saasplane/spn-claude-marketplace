@@ -10,7 +10,7 @@
 //
 // EVERY CLASS READ HERE IS A NAME OF THE SHARED STYLESHEET. A page that links no shared stylesheet
 // holds its own copy of the styles: its prose and its path are read, its markup is not, and it draws
-// one SOFT finding that says how to move it.
+// one RULE finding that says how to move it.
 //
 // Calibrated to the rule, never to the corpus (RD.DEVEX.WORKSPACE.106: the check reads the row's numbers, never
 // the corpus's own average). Over prose only — records are exempt, headings and derived chrome are
@@ -1209,7 +1209,7 @@ function holdsOwnCopy(path: string, text: string, fragment: boolean): boolean {
  * the whole-document shape checks do not, and the prose measure runs only once the fragment carries
  * five prose sentences.
  *
- * A page that holds its own copy of the styles is named once, as a SOFT finding with `OWN_COPY`. Its
+ * A page that holds its own copy of the styles is named once, as a RULE finding with `OWN_COPY`. Its
  * path and its prose are still read, and its markup is not. Such a page under a workstream's
  * `closed/` folder is not read at all, and neither is a page's bundled copy.
  */
@@ -1223,7 +1223,7 @@ export function check(path: string, text: string, fragment = false): Finding[] {
     if (inClosedWorkstream(path)) return [];
     const ownProse = proseOf(text, true);
     const ownSentences = sentences(ownProse);
-    const found: Finding[] = [...structural(path), ["SOFT", OWN_COPY]];
+    const found: Finding[] = [...structural(path), ["RULE", OWN_COPY]];
     if (!fragment || ownSentences.length >= 5) found.push(...voice(ownProse, ownSentences, kindOf(path), isOperative(path)));
     return found;
   }

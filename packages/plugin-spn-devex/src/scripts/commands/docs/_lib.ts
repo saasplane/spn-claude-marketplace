@@ -873,12 +873,12 @@ const SERVED_VERSION = new RegExp(
  * no finding, because a page may add a style for a case the shared classes do not cover. A
  * `<script type="application/json">` draws none either, because data is not furniture.
  *
- * A PAGE THAT LINKS NO SHARED STYLESHEET IS NAMED ONCE, SOFT, with the text every command uses for
- * it. Nothing else is said about its styles, its class names or how it is produced.
+ * A PAGE THAT LINKS NO SHARED STYLESHEET IS NAMED ONCE, AS A RULE, with the text every command uses
+ * for it. Nothing else is said about its styles, its class names or how it is produced.
  */
 export function checkFurniture(file: string, src: string): Finding[] {
   if (!file.endsWith(".html") || inClosedWorkstream(file)) return [];
-  if (!linksSharedStyles(src)) return [{ check: "styles", grade: "SOFT", file, message: OWN_COPY }];
+  if (!linksSharedStyles(src)) return [{ check: "styles", grade: "RULE", file, message: OWN_COPY }];
   const named = [...new Set([...src.matchAll(SERVED_VERSION)].map((found) => found[1]))];
   const styles = stylesFolder();
   if (!named.length || styles === null) return [];
@@ -2182,7 +2182,7 @@ export function face(tree: string, write: boolean): Finding[] {
       const ownCopy = holdsOwnCopy(overview, ovBefore);
       const ovAfter = ownCopy ? ovBefore : placeGlossary(ovBefore, html);
       if (ownCopy)
-        findings.push({ check: "styles", grade: "SOFT", file: overview, message: OWN_COPY });
+        findings.push({ check: "styles", grade: "RULE", file: overview, message: OWN_COPY });
       else if (ovAfter === null)
         findings.push({ check: "face", grade: "SOFT", file: overview, message: "this domain's overview has no `Glossary` section with a table in it, so the domain's glossary has nowhere to land" });
       else if (ovAfter !== ovBefore) { if (write) writeFileSync(overview, ovAfter); touched.push(relative(tree, overview)); }
@@ -2559,7 +2559,7 @@ export function pageFor(seat: string, workspace: string, templates: string, writ
     // THE PAGE ON DISK LINKS NO SHARED STYLESHEET, so it is named once, the way every command names
     // such a page, and its markup is not compared. Running this command without `--check` is what
     // moves it: the page is produced again, with the two lines that load the shared files.
-    findings.push({ check: "styles", grade: "SOFT", file: out, message: OWN_COPY });
+    findings.push({ check: "styles", grade: "RULE", file: out, message: OWN_COPY });
   } else {
     findings.push({ check: "page", grade: "RULE", file: out,
       message: before ? "this page is not what `docs.ts page` produces from its seat file — it was edited by hand, or the seat file moved on" : "no page has been produced from this seat file yet" });

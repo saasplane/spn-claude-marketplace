@@ -1004,7 +1004,7 @@ export function gateDocumentsFirst(payload: Payload): Verdict {
     const unmoved = [...openWorkstreams(root)].sort((a, b) => a[0].localeCompare(b[0]))
       .filter(([name]) => subject.includes(name))
       .flatMap(([, pages]) => ownCopyLines(root, pages.filter((page) => resolve(page) !== written)));
-    if (unmoved.length) return { note: `[SOFT] ${unmoved.join("\n[SOFT] ")}\n${OWN_COPY_UNREAD}` };
+    if (unmoved.length) return { note: `[RULE] ${unmoved.join("\n[RULE] ")}\n${OWN_COPY_UNREAD}` };
   }
   return null;
 }
@@ -1081,7 +1081,7 @@ export function gateClose(payload: Payload): Verdict {
 
   // The pages this close did not read the header of, because each holds its own copy of the styles.
   const unmoved: string[] = [];
-  const unmovedNote = (): string => `[SOFT] ${unmoved.join("\n[SOFT] ")}\n${OWN_COPY_UNREAD}`;
+  const unmovedNote = (): string => `[RULE] ${unmoved.join("\n[RULE] ")}\n${OWN_COPY_UNREAD}`;
   for (const [source, destination] of candidates) {
     const root = workspaceRoot(destination) ?? workspaceRoot(cwd);
     if (!root) continue;

@@ -61,7 +61,7 @@
 ### A page links a version that was cut
 
 **Why** — *a stored page links one version by its address* (RD.DEVEX.WORKSPACE.214), and a page that links a version nobody cut shows no styling at all.
-**What** — a write of a page that links the shared stylesheet is refused where its version is not in `versions.json`, and the message names the version and the versions that exist. A page that links no shared stylesheet gets one SOFT line, and no finding about a card or a status, because no class of it is read.
+**What** — a write of a page that links the shared stylesheet is refused where its version is not in `versions.json`, and the message names the version and the versions that exist. A page that links no shared stylesheet gets one RULE line, and no finding about a card or a status, because no class of it is read.
 **How** — the check reads `versions.json` in the plugin's `styles/` folder, which sits beside `dist/` in an installed plugin. `packages/plugin-spn-devex/src/scripts/checks/doc-check.ts`.
 
 ### The first refusal is the answer; advice adds up

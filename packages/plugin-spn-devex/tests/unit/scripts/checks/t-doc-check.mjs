@@ -650,7 +650,7 @@ try {
 
   console.log("\n=== doc-check — a page that holds its own copy of the styles");
 
-  const { check, uncutVersions } = await import("../../../../src/scripts/checks/doc-check.ts");
+  const { check, checkDoc, uncutVersions } = await import("../../../../src/scripts/checks/doc-check.ts");
   const tell = (label, ok, detail = "") => {
     n += 1;
     if (!ok) failed += 1;
@@ -666,9 +666,12 @@ try {
   const ownPage = join(ownHome, "approach.html");
   const found = check(ownPage, OWN);
   tell("the fixture links no shared stylesheet and holds no shared name", !OWN.includes("sds-") && OWN.includes("<style>"));
-  tell("[MKT.SCRIPTS.108] a page with its own copy draws one SOFT finding, which says how to move it",
-    found.length === 1 && found[0][0] === "SOFT" && found[0][1] === OWN_COPY, JSON.stringify(found));
-  one("[MKT.SCRIPTS.108] and the hook says that one line when the page is written", write(ownPage, OWN), "reports", `[SOFT] ${OWN_COPY}`);
+  tell("[MKT.SCRIPTS.108] a page with its own copy draws one RULE finding, which says how to move it",
+    found.length === 1 && found[0][0] === "RULE" && found[0][1] === OWN_COPY, JSON.stringify(found));
+  one("[MKT.SCRIPTS.108] and the hook says that one line when the page is written", write(ownPage, OWN), "reports", `[RULE] ${OWN_COPY}`);
+  const reported = checkDoc(write(ownPage, OWN));
+  tell("[MKT.SCRIPTS.108] the hook reports it as it reports any RULE: a note, and the write is not refused",
+    typeof reported?.note === "string" && reported.note.includes(`[RULE] ${OWN_COPY}`) && reported.deny === undefined, JSON.stringify(reported));
   const stale = check(ownPage, OWN.replace("<td>RUNNING</td>", "<td>PROPOSED</td>").replace(/<p class="standfirst">[^\n]*\n/, ""));
   tell("[MKT.SCRIPTS.108] no markup of it is read: a stale table, a missing opening and a card with no options draw nothing",
     stale.length === 1 && stale[0][1] === OWN_COPY, JSON.stringify(stale));
@@ -684,7 +687,7 @@ try {
   writeFileSync(ownPage, OWN);
   one("[MKT.SCRIPTS.108] an Edit of a page that holds its own copy on disk draws the one line",
     { tool_name: "Edit", tool_input: { file_path: ownPage, old_string: "<h1>A subject</h1>", new_string: "<h1>Another subject</h1>" } },
-    "reports", `[SOFT] ${OWN_COPY}`);
+    "reports", `[RULE] ${OWN_COPY}`);
   const sharedOnDisk = join(stream(TMP, "062-shared"), "approach.html");
   writeFileSync(sharedOnDisk, CLEAN);
   one("[MKT.SCRIPTS.108] untouched: the same Edit of a page in the shared form is silent",

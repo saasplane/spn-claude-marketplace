@@ -20,8 +20,19 @@ import { basename, dirname, extname, join, relative, resolve } from "node:path";
 import { checkFigures, colour, stripSpans } from "../../lib/figures.ts";
 import { draw } from "../../lib/draw.ts";
 import { argsText, begin, commandFacts, end, record } from "../../../../../plugin-support-lib/src/lib/timing.ts";
+import { DEVEX_WORKSTREAMS, DOCS, hasSegment, slashes } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, cutVersions, linesFor, newestVersion } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { holdsOwnCopy, inClosedWorkstream, resolveWorkspace, stylesFolder, walkFiles } from "./_lib.ts";
+
+/**
+ * Whether an html file is a page of ours: it carries an `spn:doc` block, or it sits in a docs tree or in a
+ * workstream's folder. A test report or an application's own `index.html` is neither, so a walk of a whole
+ * repository reads past it and names nothing.
+ */
+function isPageOfOurs(file: string, src: string): boolean {
+  const path = slashes(file);
+  return /<!--\s*spn:doc\b/.test(src) || hasSegment(path, DOCS) || path.includes(`/${DEVEX_WORKSTREAMS}/`);
+}
 
 export const describe = "figure check|colour: a spec's own geometry against the page · figure <path…>: what a browser paints";
 
@@ -55,10 +66,10 @@ function geometryCli(sub: string, args: string[], workspace: string): number {
     for (const f of files) {
       const src = readFileSync(f, "utf8");
       // A DRAWING IS READ BY THE SHARED STYLESHEET'S CLASS NAMES. A page that links no shared
-      // stylesheet holds other names, so it is named once and its drawings are not read. A page of
-      // a closed workstream is not named either.
+      // stylesheet holds other names, so it is named once, as a RULE, and its drawings are not read.
+      // A page of a closed workstream is not named either.
       if (holdsOwnCopy(f, src)) {
-        if (!inClosedWorkstream(f)) { soft += 1; console.log(`! SOFT styles    ${relative(workspace, f)}\n         ${OWN_COPY}`); }
+        if (isPageOfOurs(f, src) && !inClosedWorkstream(f)) { total += 1; console.log(`✗ RULE styles    ${relative(workspace, f)}\n         ${OWN_COPY}`); }
         continue;
       }
       // A SPEC THAT DRAWS NOTHING IS INVISIBLE TO THE REST OF THIS CHECK, which judges the SVGs a
@@ -110,12 +121,13 @@ function geometryCli(sub: string, args: string[], workspace: string): number {
   if (sub === "colour") {
     // The audit's half: a coloured block must strip back to what the author wrote.
     let bad = 0;
+    let unread = 0;
     for (const f of files) {
       const src = readFileSync(f, "utf8");
       // The colouring is spans that carry the shared stylesheet's class names, so a page that links
-      // no shared stylesheet is named once and its blocks are not read.
+      // no shared stylesheet is named once, as a RULE, and its blocks are not read.
       if (holdsOwnCopy(f, src)) {
-        if (!inClosedWorkstream(f)) console.log(`! SOFT styles    ${relative(workspace, f)}\n         ${OWN_COPY}`);
+        if (isPageOfOurs(f, src) && !inClosedWorkstream(f)) { unread += 1; console.log(`✗ RULE styles    ${relative(workspace, f)}\n         ${OWN_COPY}`); }
         continue;
       }
       for (const m of src.matchAll(/<pre data-lang="([a-z]+)">([\s\S]*?)<\/pre>/g)) {
@@ -123,8 +135,13 @@ function geometryCli(sub: string, args: string[], workspace: string): number {
         if (round !== m[2]) { bad++; console.log(`✗ RULE figure    ${relative(workspace, f)}\n         a \`${m[1]}\` block's colouring is not what \`figures colour\` produces from its own text`); }
       }
     }
-    console.log(bad ? `\n${bad} block${bad > 1 ? "s" : ""} off` : "every coloured block matches its own text");
-    return bad ? 1 : 0;
+    // A page that was not read is counted apart from a block that is off, and either one is a RULE.
+    const summary = [
+      ...(bad ? [`${bad} block${bad > 1 ? "s" : ""} off`] : []),
+      ...(unread ? [`${unread} page${unread > 1 ? "s" : ""} not read`] : []),
+    ];
+    console.log(summary.length ? `\n${summary.join(" · ")}` : "every coloured block matches its own text");
+    return bad || unread ? 1 : 0;
   }
 
   console.error("usage: spn-devex docs figure check|colour <path…>");

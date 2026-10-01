@@ -748,8 +748,8 @@ console.log("\n=== split-plan — a page that holds its own copy of the styles")
   const unmoved = build("sp-own-copy", { form: ownPage, cards: ownCard(88, "&mdash;") + ownCard(89, "&mdash;") });
   const payload = { tool_name: "Write", cwd: unmoved, tool_input: { file_path: ARC, content: "x" } };
   const [gave, said] = ts("documents-first", payload, unmoved);
-  check("[MKT.SCRIPTS.108] the gate names a page with its own copy once, as a SOFT line with what to do",
-    gave === "note" && said.split(OWN_COPY).length - 1 === 1 && said.startsWith(`[SOFT] \`.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html\``), said);
+  check("[MKT.SCRIPTS.108] the gate names a page with its own copy once, as a RULE line with what to do, and lets the call through",
+    gave === "note" && said.split(OWN_COPY).length - 1 === 1 && said.startsWith(`[RULE] \`.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html\``), said);
   check("[MKT.SCRIPTS.108] and reads no class of it: no card is reported as out of shape",
     !said.includes("open-card shape") && !said.includes("div."), said);
   const lines = splitPlan.ownCopyLines(unmoved, [join(unmoved, `.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html`)]);
@@ -775,8 +775,9 @@ console.log("\n=== split-plan — a page that holds its own copy of the styles")
   // The close gate does not read the header of such a page, so `running` in it refuses nothing.
   const closing = build("sp-own-copy-close", { form: ownPage, eyebrow: "Status: &#x1F6A7; IMPLEMENTING" });
   const [closed, closeSaid] = ts("close", { tool_name: "Bash", cwd: closing, tool_input: CLOSE }, closing);
-  check("[MKT.SCRIPTS.108] the close gate reads no header of such a page, and names the page once",
-    closed === "note" && closeSaid.split(OWN_COPY).length - 1 === 1 && !closeSaid.includes("does not say it is closed"), `${closed} · ${closeSaid}`);
+  check("[MKT.SCRIPTS.108] the close gate reads no header of such a page, and names the page once, as a RULE line that refuses nothing",
+    closed === "note" && closeSaid.split(OWN_COPY).length - 1 === 1 && closeSaid.includes(`[RULE] \`.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html\``)
+      && !closeSaid.includes("[SOFT]") && !closeSaid.includes("does not say it is closed"), `${closed} · ${closeSaid}`);
   one("[MKT.SCRIPTS.108] untouched: the same header on a page in the shared form still refuses the close", "close",
     build("sp-shared-running", { eyebrow: "Status: &#x1F6A7; IMPLEMENTING" }), CLOSE, "deny", { says: "does not say it is closed" });
 

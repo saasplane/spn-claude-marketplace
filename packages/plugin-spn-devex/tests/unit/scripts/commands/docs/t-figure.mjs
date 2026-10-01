@@ -61,13 +61,17 @@ function pageIn(name, text) {
 {
   // A PAGE THAT LINKS NO SHARED STYLESHEET HOLDS ITS OWN COPY, with the class names that copy used.
   // The check names the page once and reads no drawing of it, so the faulty drawing draws no finding.
-  const own = `<style>.dg .c{stroke:blue}</style>\n<div class="page">\n${drawing("dg", "box", "c")}\n</div>\n`;
+  const own = `<!-- spn:doc\n{"id": "probe", "variant": "overview", "title": "Probe"}\n-->\n<style>.dg .c{stroke:blue}</style>\n<div class="page">\n${drawing("dg", "box", "c")}\n</div>\n`;
   const { out, code } = run(["check", pageIn("check-own", own)]);
-  one("[MKT.SCRIPTS.108] `figure check` names a page that holds its own copy once, SOFT, with the text every command uses",
-    (out.match(/! SOFT styles/g) ?? []).length === 1 && out.includes(OWN_COPY));
-  one("[MKT.SCRIPTS.108] and reads no drawing of it: no figure finding, and the exit is clean",
-    !out.includes("✗ RULE") && !out.includes("empty space") && code === 0);
-  one("[MKT.SCRIPTS.108] the summary counts it apart from a refusal", out.includes("0 RULE, 1 SOFT, over 1 page"));
+  one("[MKT.SCRIPTS.108] `figure check` names a page that holds its own copy once, as a RULE, with the text every command uses",
+    (out.match(/✗ RULE styles/g) ?? []).length === 1 && out.includes(OWN_COPY) && !out.includes("SOFT styles"));
+  one("[MKT.SCRIPTS.108] and reads no drawing of it: no figure finding, and the exit is 1 for the page alone",
+    !out.includes("RULE figure") && !out.includes("empty space") && code === 1);
+  one("[MKT.SCRIPTS.108] the summary counts it as a RULE", out.includes("1 figure finding — 1 RULE, 0 SOFT, over 1 page"));
+  // AN HTML FILE THAT IS NO PAGE OF OURS, such as a test report, has no `spn:doc` block and sits in no docs tree.
+  const report = run(["check", pageIn("check-report", `<style>.x{color:red}</style>\n<div id="root"></div>\n`)]);
+  one("[MKT.SCRIPTS.108] an html file that is no page of ours is read past: it is not named, and the exit is 0",
+    !report.out.includes("RULE styles") && report.code === 0);
 }
 
 // `colour` is the geometry check's other half — also no browser.
@@ -79,9 +83,10 @@ function pageIn(name, text) {
   const bad = run(["colour", pageIn("colour-bad", shared(coloured.replace("sds-tk-n", "sds-tk-k")))]);
   one("known-bad: a block whose colouring is not what its text gives is refused",
     bad.out.includes("1 block off") && bad.code === 1);
-  const own = run(["colour", pageIn("colour-own", `<style>.tk-k{color:red}</style>\n<pre data-lang="ts"><span class="tk-k">const</span> a = 1;</pre>\n`)]);
-  one("[MKT.SCRIPTS.108] `figure colour` names a page that holds its own copy once, and reads no block of it",
-    (own.out.match(/! SOFT styles/g) ?? []).length === 1 && own.out.includes(OWN_COPY) && !own.out.includes("RULE") && own.code === 0);
+  const own = run(["colour", pageIn("colour-own", `<!-- spn:doc\n{"id": "probe", "variant": "overview", "title": "Probe"}\n-->\n<style>.tk-k{color:red}</style>\n<pre data-lang="ts"><span class="tk-k">const</span> a = 1;</pre>\n`)]);
+  one("[MKT.SCRIPTS.108] `figure colour` names a page that holds its own copy once, as a RULE, and reads no block of it",
+    (own.out.match(/✗ RULE styles/g) ?? []).length === 1 && own.out.includes(OWN_COPY) && !own.out.includes("RULE figure") && !/blocks? off/.test(own.out));
+  one("[MKT.SCRIPTS.108] and it exits 1, and the summary says the page was not read", own.out.includes("1 page not read") && own.code === 1);
 }
 
 // Anything else in `args[0]` is a file to render, never a geometry subcommand. The browser is

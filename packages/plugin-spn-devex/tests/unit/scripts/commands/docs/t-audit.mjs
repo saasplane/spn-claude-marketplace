@@ -932,16 +932,24 @@ console.log("\n=== a page's furniture is the shared files': a version that exist
   delete process.env.SPN_STYLES;
 
   const named = audit(ownCopy());
-  one("[MKT.SCRIPTS.108] a page that holds its own copy is named once, SOFT, with the text every command uses",
-    named, (g) => (g.match(/! SOFT styles/g) ?? []).length === 1 && g.includes(OWN_COPY));
+  one("[MKT.SCRIPTS.108] a page that holds its own copy is named once, as a RULE, with the text every command uses",
+    named, (g) => (g.match(/✗ RULE styles/g) ?? []).length === 1 && g.includes(OWN_COPY) && !g.includes("SOFT styles"));
   one("[MKT.SCRIPTS.108] and that is its one finding: nothing about its style block, its script or its class names",
-    named, has("1 finding — 0 RULE, 1 SOFT, over 1 page"));
+    named, has("1 finding — 1 RULE, 0 SOFT, over 1 page"));
+  // The exit code is a RULE's: 1 for the page with its own copy, and 0 for the same page in the shared form.
+  const exitOf = (text) => {
+    const root = repo({ "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n", [at]: text });
+    try { execFileSync(process.execPath, [TOOL, "docs", "audit", at], { encoding: "utf8", cwd: root, stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: root } }); return 0; }
+    catch (error) { return error.status; }
+  };
+  one("[MKT.SCRIPTS.108] `docs audit` exits 1 on a page that holds its own copy", exitOf(ownCopy()), 1);
+  one("untouched: and exits 0 on the same page in the shared form", exitOf(shared()), 0);
   // VERIFY THE VERIFIER: a wrong Type chip is found by its class. On a page in the shared form it is
   // refused, so the header check does read; on a page with its own copy no class is read at all.
   one("known-bad: a wrong Type chip on a page in the shared form is refused, so the header is read by its classes",
     audit(shared({ type: "Construct" })), has("Type reads `Construct`; the block's variant is `overview`"));
-  one("[MKT.SCRIPTS.108] the same wrong chip on a page that holds its own copy is not read: the one SOFT line, and no other",
-    audit(ownCopy("Construct")), (g) => g.includes("1 finding — 0 RULE, 1 SOFT, over 1 page") && !g.includes("Type reads"));
+  one("[MKT.SCRIPTS.108] the same wrong chip on a page that holds its own copy is not read: the one RULE line, and no other",
+    audit(ownCopy("Construct")), (g) => g.includes("✗ RULE styles") && g.includes("1 finding — 1 RULE, 0 SOFT, over 1 page") && !g.includes("Type reads"));
 }
 {
   // A PRODUCED PAGE, AND THE SAME PAGE WITH ITS OWN COPY. `docs page` writes the construct page in the
@@ -966,8 +974,8 @@ console.log("\n=== a page's furniture is the shared files': a version that exist
     .replace(LINES.script, "<script>/* a rail builder of this page's own */</script>")
     .replaceAll("sds-section-head", "sec-head").replaceAll("sds-label", "lbl").replaceAll("sds-separator", "sep").replaceAll("sds-", "");
   const named = audit(own);
-  one("[MKT.SCRIPTS.108] a produced page that holds its own copy draws the one SOFT line, and no `produced` finding",
-    named, (g) => g.includes("! SOFT styles") && g.includes(OWN_COPY) && !g.includes("produced") && g.includes("1 finding — 0 RULE, 1 SOFT, over 1 page"));
+  one("[MKT.SCRIPTS.108] a produced page that holds its own copy draws the one RULE line, and no `produced` finding",
+    named, (g) => g.includes("✗ RULE styles") && g.includes(OWN_COPY) && !g.includes("produced") && g.includes("1 finding — 1 RULE, 0 SOFT, over 1 page"));
   one("[MKT.SCRIPTS.108] the audit writes nothing into it", readAt(root, at), own);
   delete process.env.SPN_TEMPLATES;
 }
@@ -980,8 +988,8 @@ console.log("\n=== a page's furniture is the shared files': a version that exist
     const path = `.spndevex/${WORKSTREAMS}/${state}/001-a/a-approach.html`;
     return run(repo({ [path]: argument }), ["audit", path]);
   };
-  one("[MKT.SCRIPTS.108] a page of an open workstream that holds its own copy is named", under("open"), has("! SOFT styles"));
-  one("a page under a workstream's `closed/` folder is not", under("closed"), lacks("styles"));
+  one("[MKT.SCRIPTS.108] a page of an open workstream that holds its own copy is named, as a RULE", under("open"), has("✗ RULE styles"));
+  one("[MKT.SCRIPTS.108] a page under a workstream's `closed/` folder is not: it draws no `styles` finding", under("closed"), lacks("styles"));
 }
 
 console.log("\n=== a report is a snapshot: no status, and its header says Generated and Commit (RD.DEVEX.WORKSPACE.192)");

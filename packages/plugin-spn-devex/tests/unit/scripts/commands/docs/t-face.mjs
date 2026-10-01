@@ -530,8 +530,14 @@ console.log("\n=== the domain's glossary lands on its overview too, in HTML (Q22
   const own = ov(table("scroll"), { own: true });
   const ownRoot = repo(tree(own));
   const said = run(ownRoot, ["face", "docs"]);
-  one("[MKT.SCRIPTS.108] `docs face` names an overview that holds its own copy once, SOFT, with the text every command uses",
-    said, (g) => (g.match(/! SOFT styles/g) ?? []).length === 1 && g.includes(OWN_COPY));
+  one("[MKT.SCRIPTS.108] `docs face` names an overview that holds its own copy once, as a RULE, with the text every command uses",
+    said, (g) => (g.match(/✗ RULE styles/g) ?? []).length === 1 && g.includes(OWN_COPY) && !g.includes("SOFT styles"));
+  const exitOf = (workspace) => {
+    try { execFileSync(process.execPath, [TOOL, "docs", "face", "docs"], { encoding: "utf8", cwd: workspace, stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: workspace } }); return 0; }
+    catch (error) { return error.status; }
+  };
+  one("[MKT.SCRIPTS.108] and `docs face` exits 1 on it, as on any RULE", exitOf(ownRoot), 1);
+  one("untouched: `docs face` exits 0 on the same tree with the overview in the shared form", exitOf(root), 0);
   one("[MKT.SCRIPTS.108] and writes nothing into it",
     readAt(ownRoot, `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-core-overview.html`), own);
   one("[MKT.SCRIPTS.108] the markdown face beside it still gains its glossary, because a face is no page",

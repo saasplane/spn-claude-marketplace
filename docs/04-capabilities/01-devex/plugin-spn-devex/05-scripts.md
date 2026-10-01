@@ -239,8 +239,8 @@ Everything this plugin can execute sits under `packages/plugin-spn-devex/src/scr
 ### Every script knows one set of class names
 
 **Why** — *every class of the shared stylesheet opens with `sds-`* (RD.DEVEX.WORKSPACE.216), and a page finds its styles by those names alone. A script that knew a second set of names would keep the earlier ones alive.
-**What** — each command and check that reads a page reads the shared stylesheet's class names, and writes no other. A page that links no shared stylesheet holds its own copy of the styles: it is named once, as SOFT, and no class of it is read. A command that writes into a page refuses such a page. A page may add one style block of its own, and no script reads a class the page defines itself.
-**How** — each asks `linksSharedStyles` before it reads a class. `docs audit` holds a page to a version that `versions.json` lists, and knows the variants `guide` and `index`. `packages/plugin-support-lib/src/lib/page-styles.ts`, proven in `packages/plugin-support-lib/tests/unit/lib/t-page-styles.mjs` and in `t-audit.mjs`.
+**What** — each command and check that reads a page reads the shared stylesheet's class names, and writes no other. A page that links no shared stylesheet holds its own copy of the styles: it is named once, as a RULE, and no class of it is read. A page under a workstream's `closed/` folder is never named. A command that writes into a page refuses such a page. A page may add one style block of its own, and no script reads a class the page defines itself.
+**How** — each asks `linksSharedStyles` before it reads a class. `docs audit`, `docs page --check`, `docs face` and `docs figure` exit 1 on such a page. `doc-check`, the two gates and the check at the end of a turn say one `[RULE]` line and refuse nothing. `docs audit` holds a page to a version that `versions.json` lists, and knows the variants `guide` and `index`. `packages/plugin-support-lib/src/lib/page-styles.ts`, proven in `packages/plugin-support-lib/tests/unit/lib/t-page-styles.mjs` and in `t-audit.mjs`.
 
 ## Between modules
 

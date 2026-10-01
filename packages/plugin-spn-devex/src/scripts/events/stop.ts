@@ -1330,7 +1330,7 @@ export function checkOwnCopy(root: string, mine: Set<string> | null = null, told
   const fresh = ownCopyPages(root, mine).filter((line) => !told.includes(line));
   if (!fresh.length) return [];
   return [{ check: "own-copy", message:
-    `[SOFT] ${fresh.join("\n[SOFT] ")}\n` +
+    `[RULE] ${fresh.join("\n[RULE] ")}\n` +
     `Until such a page links \`sds-docs.css\`, its cards are read by their \`id\`, and the shape of a card, ` +
     `the header's status and the parts that \`docs cycles --write\` writes are not checked. Each page is ` +
     `named once in a session.` }];

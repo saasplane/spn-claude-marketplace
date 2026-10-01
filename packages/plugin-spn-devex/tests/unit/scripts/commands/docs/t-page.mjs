@@ -133,17 +133,23 @@ const lacks = (s) => (got) => !String(got).includes(s);
     const ownCopy = '<meta charset="utf-8">\n<style>.badge{color:red}</style>\n<div class="page"><span class="badge">x</span></div>\n';
     writeFileSync(join(ws, pagePath), ownCopy);
     const named = run(ws, ["page", seatPath, "--check"]);
-    one("[MKT.SCRIPTS.108] `docs page --check` names a page that holds its own copy once, SOFT, with the text every command uses",
-        named, (g) => (g.match(/! SOFT styles/g) ?? []).length === 1 && g.includes(OWN_COPY));
-    one("[MKT.SCRIPTS.108] and it says nothing else about that page: no refusal, and no `edited by hand`",
-        named, (g) => !g.includes("RULE") && !g.includes("edited by hand"));
+    one("[MKT.SCRIPTS.108] `docs page --check` names a page that holds its own copy once, as a RULE, with the text every command uses",
+        named, (g) => (g.match(/✗ RULE styles/g) ?? []).length === 1 && g.includes(OWN_COPY) && !g.includes("SOFT styles"));
+    one("[MKT.SCRIPTS.108] and it says nothing else about that page: no `page` finding, and no `edited by hand`",
+        named, (g) => !g.includes("RULE page") && !g.includes("edited by hand"));
+    const exitOfCheck = () => {
+      try { execFileSync(process.execPath, [TOOL, "docs", "page", seatPath, "--check"], { encoding: "utf8", cwd: ws, stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: ws } }); return 0; }
+      catch (error) { return error.status; }
+    };
+    one("[MKT.SCRIPTS.108] and `--check` exits 1 on it, as on any RULE", exitOfCheck(), 1);
     one("[MKT.SCRIPTS.108] `--check` writes nothing into it", readAt(ws, pagePath), ownCopy);
     run(ws, ["page", seatPath]);
     one("[MKT.SCRIPTS.108] `docs page` moves it: the page produced again links the shared stylesheet",
         readAt(ws, pagePath), (g) => g === page && linksSharedStyles(g));
+    one("untouched: `--check` exits 0 on the page in the shared form", exitOfCheck(), 0);
     writeFileSync(join(ws, pagePath), page.replace("<h1>", "<h1>Edited "));
     one("known-bad: a page in the shared form that was edited by hand is still refused by `--check`",
-        run(ws, ["page", seatPath, "--check"]), (g) => g.includes("RULE page") && g.includes("edited by hand") && !g.includes("SOFT styles"));
+        run(ws, ["page", seatPath, "--check"]), (g) => g.includes("RULE page") && g.includes("edited by hand") && !g.includes("RULE styles"));
     run(ws, ["page", seatPath]);
 
     // THE TEMPLATE'S FOOTER IS A NOTE TO ITS AUTHOR, never furniture. Copied into every produced

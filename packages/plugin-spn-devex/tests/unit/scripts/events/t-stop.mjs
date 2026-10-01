@@ -1452,8 +1452,8 @@ ${tableOf(cyclesOf(folder))}
     check("a session that wrote nothing to the workstream is told nothing about its page", !/\[own-copy\]/.test(first), first);
     move(built, "RUNNING", HALF);
     const out = stop(built, "o-own");
-    check("[MKT.SCRIPTS.108] the Stop hook names a page with its own copy once, as a SOFT line with what to do",
-      count(out, "[own-copy]") === 1 && count(out, OWN_COPY) === 1 && out.includes(`[SOFT] \`${A}/approach.html\`: ${OWN_COPY}`), out);
+    check("[MKT.SCRIPTS.108] the Stop hook names a page with its own copy once, as a RULE line with what to do",
+      count(out, "[own-copy]") === 1 && count(out, OWN_COPY) === 1 && out.includes(`[RULE] \`${A}/approach.html\`: ${OWN_COPY}`), out);
     check("[MKT.SCRIPTS.108] it reads no class of the page: it does not say that Open carries no card", !/\[stopped-no-card\]/.test(out) && !/\[cards-in-arcs\]/.test(out), out);
     check("[MKT.SCRIPTS.108] and it does not name the command that refuses such a page", !/\[page-stale\]/.test(out), out);
     check("[MKT.SCRIPTS.108] the card of such a page is still read by its id, so the reply is still asked to open with Needs you",
