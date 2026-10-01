@@ -10,13 +10,16 @@
 # from the same commit as the plugin a partner installs. A version's folder never changes once it is
 # cut, so a run publishes the same bytes for every version that already exists and adds the new one.
 #
+# `feat/setup` IS SERVED TOO, until `develop` holds this folder. The `github-pages` environment decides
+# which branch may deploy, so a branch named here deploys only where that environment allows it.
+#
 # IT BUILDS NOTHING. `public/` is committed as it is served: `spn-devex docs sds cut <version>` writes a
 # version's folder, and this workflow uploads the folder.
 name: pages
 
 on:
   push:
-    branches: [develop]
+    branches: [develop, feat/setup]
     paths:
       - "public/**"
       - ".github/workflows/pages.yml"
