@@ -66,6 +66,9 @@ function isRepoWrite(root: string, path: string): boolean {
   return head !== "" && head !== "." && head !== DEVEX && head !== ".claude";
 }
 
+// The tools whose `file_path` names a file they change.
+const FILE_WRITERS = new Set(["Edit", "Write", "MultiEdit", "NotebookEdit"]);
+
 /** One warning per session, remembered where the workspace keeps its own machinery's state. */
 function alreadyWarned(root: string, session: string | undefined): boolean {
   if (!session) return false;
@@ -83,6 +86,8 @@ export function checkConfirmed(payload: Payload): Verdict {
   try {
     const written = payload.tool_input?.file_path;
     if (!written) return null;
+    // A `Read` carries a `file_path` too, and reading a repository is not writing to it.
+    if (payload.tool_name && !FILE_WRITERS.has(payload.tool_name)) return null;
     const cwd = payload.cwd ?? process.cwd();
     const root = workspaceRoot(cwd);
     if (!root) return null;

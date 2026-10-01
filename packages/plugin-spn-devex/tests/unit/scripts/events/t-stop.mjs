@@ -1062,5 +1062,89 @@ console.log("\n=== welcome — the hook reads the first turn from the transcript
     { session: "f1-bad", extra: { transcript_path: bad }, parity: false, why: "a new check" });
 }
 
+console.log("\n=== stop — a check speaks once in a turn, and only about this session's work (RD.DEVEX.WORKSPACE.198)");
+{
+  const { passingOn, workstreamsOf } = await import("../../../../src/scripts/events/stop.ts");
+  const HOOK = `${HOOKS}/src/scripts/events/stop.ts`;
+  const A = `.spndevex/${WORKSTREAMS}/open/001-a-subject`, B = `.spndevex/${WORKSTREAMS}/open/002-b-subject`;
+  // Two open workstreams. A is whole. B has an arc its page does not name, and an open card.
+  const two = (name) => workspace(name, {
+    [`${A}/approach.html`]: page({ names: ["N1-a-subject.md"] }),
+    [`${A}/arcs/N1-a-subject.md`]: ARC(),
+    [`${B}/approach.html`]: page({ names: [], cards: CARD }),
+    [`${B}/arcs/N1-b-subject.md`]: ARC(),
+  });
+  // A transcript is the only record of who wrote a file: one tool call naming a path under a workstream.
+  const transcript = (root, name, path) => {
+    const file = join(root, name);
+    writeFileSync(file, JSON.stringify({ type: "assistant", message: { content: [
+      { type: "tool_use", name: "Write", input: { file_path: join(root, path), content: "x" } }] } }) + "\n");
+    return file;
+  };
+  const check = (label, ok) => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}`); };
+
+  // The session wrote to A only, so B's unnamed arc and B's open card are another session's.
+  {
+    const root = two("s198-scope-a");
+    const out = run("node", [HOOK], { cwd: root, session_id: "wrote-a", last_assistant_message: "done",
+      transcript_path: transcript(root, "a.jsonl", `${A}/approach.html`) }, root);
+    check("a session that wrote to one workstream is not held for another's unnamed arc", !/unnamed-arc/.test(out));
+    check("and is not asked for another workstream's open card", !/needs-you/.test(out));
+  }
+  // KNOWN-BAD: the session that wrote to B hears about B.
+  {
+    const root = two("s198-scope-b");
+    const out = run("node", [HOOK], { cwd: root, session_id: "wrote-b", last_assistant_message: "done",
+      transcript_path: transcript(root, "b.jsonl", `${B}/arcs/N1-b-subject.md`) }, root);
+    check("known-bad: the session that wrote to that workstream is told about its arc", /unnamed-arc/.test(out));
+    check("known-bad: and is asked for its open card", /needs-you/.test(out));
+  }
+  // UNTOUCHED: with no transcript the writer is unknown, and every open workstream is read, as before.
+  {
+    const root = two("s198-scope-unknown");
+    const out = run("node", [HOOK], { cwd: root, session_id: "unknown", last_assistant_message: "done" }, root);
+    check("with no transcript, every open workstream is still read", /unnamed-arc/.test(out));
+  }
+  // A workstream stays the session's own across turns, though the later turn wrote nothing there.
+  {
+    const root = two("s198-scope-kept");
+    const path = transcript(root, "kept.jsonl", `${B}/arcs/N1-b-subject.md`);
+    run("node", [HOOK], { cwd: root, session_id: "kept", last_assistant_message: "done", transcript_path: path }, root);
+    const later = run("node", [HOOK], { cwd: root, session_id: "kept", last_assistant_message: "done", transcript_path: path }, root);
+    check("a workstream the session wrote to in an earlier turn is still its own", /unnamed-arc/.test(later));
+  }
+  check("workstreamsOf names the folders a transcript wrote to", (() => {
+    const root = two("s198-of");
+    const got = workstreamsOf(transcript(root, "of.jsonl", `${A}/approach.html`), 0, [], [join(root, A), join(root, B)]);
+    return got !== null && got.has("001-a-subject") && !got.has("002-b-subject");
+  })());
+  check("workstreamsOf is unknown, not empty, where there is no transcript", workstreamsOf(undefined, 0, [], []) === null);
+
+  // ONCE IN A TURN. The reply after a finding is its answer, whichever check spoke.
+  {
+    const root = two("s198-once");
+    const hook = (payload) => run("node", [HOOK], { cwd: root, session_id: "once", last_assistant_message: "done", ...payload }, root);
+    const first = /unnamed-arc/.test(hook({}));
+    const second = /unnamed-arc/.test(hook({ stop_hook_active: true }));
+    const third = /unnamed-arc/.test(hook({ stop_hook_active: true }));
+    const nextTurn = /unnamed-arc/.test(hook({}));
+    check("the first reply is told about the unnamed arc", first);
+    check("the reply that answers it is not judged by the same check again", !second);
+    check("nor is a third reply in the same turn", !third);
+    check("known-bad: a later turn is judged afresh", nextTurn);
+  }
+
+  // A HANDOVER IS A DIRECTION, NEVER A MENTION. Each of the first four was read as passing work on.
+  for (const [what, reply, expected] of [
+    ["another session as the subject of a past event", "Another window closed workstream 008 at 14:14.", false],
+    ["a session counted as a cost, after one comma", "It costs one extra plugin release and reinstall, and a new window in each session.", false],
+    ["another session described", "One fact matters for 019: another window was planning it at 14:38.", false],
+    ["a session the developer starts", "N004 runs after the plugin release, in a window you start.", false],
+    ["known-bad: a direction is still a direction", "Pick this up in a new window.", true],
+    ["known-bad: the next session as the one that starts", "The next window starts at step 5.", true],
+    ["known-bad: a direction to paste the block elsewhere", "Paste this block into a fresh window to continue.", true],
+  ]) check(`${what} reads as ${expected ? "passing work on" : "not a pass-on"}`, passingOn(reply) === expected);
+}
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

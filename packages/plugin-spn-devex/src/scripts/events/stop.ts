@@ -19,6 +19,12 @@
 //   welcome    a session's first turn opens with the welcome, word for word: the heading and its four lines
 //   corpus     the docs trees still answer the questions only a whole-corpus read can ask
 //
+// A CHECK SPEAKS ONCE IN A TURN, AND ONLY ABOUT THIS SESSION'S OWN WORK (RD.DEVEX.WORKSPACE.198). The
+// reply that follows a finding is the answer to it, so a check that spoke at this session's last Stop
+// is not run against that answer. The checks that read a page, its arcs and its cards read the
+// workstreams this session has written to (RD.DEVEX.WORKSPACE.197); a workstream another session is
+// still writing is unfinished, and that session hears about it.
+//
 // `corpus` is the newest and the odd one out: every other check here reads what the TURN wrote, and
 // that one reads the workspace. It is here because nothing else ran it — `N38` found that every
 // corpus tool in this plugin was hand-run, so a defect was only ever found by somebody looking for
@@ -313,7 +319,7 @@ export function stepHash(text: string): string {
  * repository, so `git show HEAD:./arc.md` fails there for every arc.
  */
 export type Baseline = { at: number; steps: Record<string, string>; transcriptAt?: number; fired?: string[];
-                         cards?: string[]; arcs?: Record<string, ArcMark> };
+                         cards?: string[]; arcs?: Record<string, ArcMark>; workstreams?: string[] };
 
 /**
  * What one arc looked like at a Stop, for the `notes` and `carried` checks: a short hash of each of
@@ -365,6 +371,21 @@ const SHELL_WRITES = /(?:>|\btee\b|\bsed\s+-i|\bperl\s+-[a-z]*i|\bpython3?\b|\bn
  * moved it, and several windows write the same workstream at once.
  */
 export function arcsTouched(transcript: string, from: number, arcs: string[]): { touched: Set<string>; size: number } | null {
+  const writes = writesOf(transcript, from);
+  if (!writes) return null;
+  const touched = new Set(arcs.filter((arc) => writes.written.some((input) => input.includes(arc) || input.includes(basename(arc)))));
+  return { touched, size: writes.size };
+}
+
+// A dispatched agent writes on this session's behalf, and its brief names where.
+const DISPATCHERS = new Set(["Agent", "Task"]);
+
+/**
+ * The input of every tool call in a transcript, from byte `from`, that can change a file: a file
+ * writer, a shell command that writes, and a brief given to a dispatched agent. `null` where the
+ * transcript cannot be read.
+ */
+export function writesOf(transcript: string, from: number): { written: string[]; size: number } | null {
   let text = "";
   let size = 0;
   try {
@@ -385,12 +406,34 @@ export function arcsTouched(transcript: string, from: number, arcs: string[]): {
     for (const item of content as Array<{ type?: string; name?: string; input?: unknown }>) {
       if (item?.type !== "tool_use" || !item.name) continue;
       const input = JSON.stringify(item.input ?? {});
-      if (FILE_WRITERS.has(item.name)) written.push(input);
+      if (FILE_WRITERS.has(item.name) || DISPATCHERS.has(item.name)) written.push(input);
       else if (item.name === "Bash" && SHELL_WRITES.test(input)) written.push(input);
     }
   }
-  const touched = new Set(arcs.filter((arc) => written.some((input) => input.includes(arc) || input.includes(basename(arc)))));
-  return { touched, size };
+  return { written, size };
+}
+
+/**
+ * The open workstreams a session has written to, by folder name: the ones its last Stop already
+ * knew, and the ones its tool calls have named since. `null` where the transcript cannot be read,
+ * and the caller then reads every open workstream, as it did before a session's writes were known.
+ *
+ * A WORKSTREAM A SESSION OPENS WHILE IDEATING IS ITS OWN FROM THE FIRST WRITE. Creating the folder is
+ * a write that names it, so the session that shaped the idea is the one asked about its cards.
+ */
+export function workstreamsOf(transcript: string | undefined, from: number, known: string[] = [],
+  folders: string[] = []): Set<string> | null {
+  if (!transcript) return null;
+  const writes = writesOf(transcript, from);
+  if (!writes) return null;
+  const names = folders.map((folder) => basename(folder));
+  const now = names.filter((name) => writes.written.some((input) => input.includes(name)));
+  return new Set([...known, ...now].filter((name) => names.includes(name)));
+}
+
+/** The folders a check reads: every open workstream, or only the session's own where those are known. */
+function scoped(folders: string[], mine: Set<string> | null): string[] {
+  return mine ? folders.filter((folder) => mine.has(basename(folder))) : folders;
 }
 
 // ---------------------------------------------------------------------------- notes and carried
@@ -576,9 +619,9 @@ export function checkRunnable(root: string, since = 0, stepsAt: Record<string, s
   return out;
 }
 
-export function checkHold(root: string): Warning[] {
+export function checkHold(root: string, mine: Set<string> | null = null): Warning[] {
   const out: Warning[] = [];
-  for (const ws of openWorkstreamFolders(root)) {
+  for (const ws of scoped(openWorkstreamFolders(root), mine)) {
     const cards = new Set(pagesOf(ws).flatMap(openCards));
     for (const arc of arcsOf(ws)) {
       if (statusOf(arc) !== "HELD") continue;
@@ -618,7 +661,16 @@ export function checkHold(root: string): Warning[] {
  *
  * So a future or conditional mention is not a pass-on. A direction is.
  */
-const SESSION = /\b(?:new|fresh|another|next)\s+(?:window|session)\b|\bhand(?:ing)?\s+(?:this |it )?over\b/gi;
+// A DIRECTION NAMES WHAT TO DO WITH THE SESSION; A MENTION ONLY NAMES ONE (RD.DEVEX.WORKSPACE.198).
+// The pattern was the noun phrase alone, so "another window closed the workstream" and "a release and
+// a new window in each session" read as passing work on. On 2026-10-01 that fired on status replies
+// in three sessions. A pass-on now needs the verb that sends the work there, or the next session as
+// the one that starts, or the plain words for handing over. A handover block with no such sentence is
+// the shape a stop for a question owes, and it is not read as passing work on.
+const SESSION = new RegExp(
+  String.raw`\b(?:open|start|launch|use|continue|resume|carry on|paste|pick (?:this|it|that|the work) up)\b[^.?!\n]{0,24}?\b(?:new|fresh|another|next)\s+(?:window|session)\b` +
+  String.raw`|\bthe\s+next\s+(?:window|session)\s+(?:starts|begins|continues|resumes|picks)\b` +
+  String.raw`|\bhand(?:ing)?\s+(?:this |it )?over\b`, "gi");
 const NOT_YET = /\b(?:will|would|'ll|once|after|before|until|when|going to|about to|then|may|might|could|if)\b[^.?!]{0,80}$/i;
 // AND IT CAN FOLLOW, which the first cut missed. "a fresh window WOULD load the installed copy" is a
 // description of a consequence, and every conditional word in it sits after the phrase rather than
@@ -702,9 +754,9 @@ export function carriesCard(reply: string): boolean {
  * question a handover has to answer, and it subtracts what an arc records as settled — a card the
  * page still shows but an arc has answered is not work anybody is waiting on.
  */
-function cardsWaiting(root: string): string[] {
+function cardsWaiting(root: string, mine: Set<string> | null = null): string[] {
   const out: string[] = [];
-  for (const [, pages] of argued(root)) {
+  for (const [, pages] of argued(root, mine)) {
     const folder = dirname(pages[0]);
     const answered = answeredNumbers(folder);
     for (const page of pages)
@@ -714,7 +766,7 @@ function cardsWaiting(root: string): string[] {
   return [...new Set(out)].sort();
 }
 
-export function checkHandover(reply: string, root: string): Warning[] {
+export function checkHandover(reply: string, root: string, mine: Set<string> | null = null): Warning[] {
   if (!passingOn(reply)) return [];
   // A REPLY PUTTING THE OPEN CARD IN FULL IS THE ANSWER THIS CHECK ASKS FOR. It fired twice in a row
   // on replies that handed nothing over and carried `Q329` whole, demanding the card they carried.
@@ -735,7 +787,7 @@ export function checkHandover(reply: string, root: string): Warning[] {
   //
   // This fires BEFORE the wiring check because it is the cheaper truth: there is no point telling
   // somebody their install is stale if the work itself is not ready to pass on.
-  const waiting = cardsWaiting(root);
+  const waiting = cardsWaiting(root, mine);
   if (waiting.length) {
     return [{ check: "handover", message:
       `This reply passes work on while ${waiting.length === 1 ? "a card is" : `${waiting.length} cards are`} ` +
@@ -815,8 +867,9 @@ function hasOpenCard(text: string): boolean {
 }
 
 /** The open workstreams that have a page, as subject → its pages. */
-function argued(root: string): Array<[string, string[]]> {
+function argued(root: string, mine: Set<string> | null = null): Array<[string, string[]]> {
   return [...openWorkstreams(root)].filter(([, pages]) => pages.length)
+    .filter(([, pages]) => !mine || mine.has(basename(dirname(pages[0]))))
     .sort((a, b) => a[0].localeCompare(b[0]));
 }
 
@@ -831,9 +884,9 @@ function argued(root: string): Array<[string, string[]]> {
  * arc under a heading. A citation is explicit, greppable, and useful to a reader who wants the
  * argument behind a plan.
  */
-export function unnamedArcs(root: string): Array<[string, string, string]> {
+export function unnamedArcs(root: string, mine: Set<string> | null = null): Array<[string, string, string]> {
   const out: Array<[string, string, string]> = [];
-  for (const [subject, pages] of argued(root)) {
+  for (const [subject, pages] of argued(root, mine)) {
     const pageText = pages.map(read).join(" ");
     for (const arc of arcsOf(dirname(pages[0]))) {
       const name = basename(arc);
@@ -851,11 +904,11 @@ export function unnamedArcs(root: string): Array<[string, string, string]> {
  * because there is no page to read — was the one shape it never reported. `008-plain-language` sat in
  * exactly that state while the check ran green beside it.
  */
-export function pagelessWorkstreams(root: string): string[] {
+export function pagelessWorkstreams(root: string, mine: Set<string> | null = null): string[] {
   const out: string[] = [];
   for (const [subject, pages] of [...openWorkstreams(root)].sort((a, b) => a[0].localeCompare(b[0]))) {
     if (pages.length) continue;
-    for (const folder of openWorkstreamFolders(root))
+    for (const folder of scoped(openWorkstreamFolders(root), mine))
       if (basename(folder) === subject && arcsOf(folder).length) { out.push(subject); break; }
   }
   return out;
@@ -868,9 +921,9 @@ export function pagelessWorkstreams(root: string): string[] {
  * a reader could still find it. Here the split plan knows a row waits on somebody and the one section
  * they read says nothing does, so the question is written nowhere at all.
  */
-export function stopsWithEmptyOpen(root: string): Array<[string, string]> {
+export function stopsWithEmptyOpen(root: string, mine: Set<string> | null = null): Array<[string, string]> {
   const out: Array<[string, string]> = [];
-  for (const [subject, pages] of argued(root)) {
+  for (const [subject, pages] of argued(root, mine)) {
     const text = pages.map(read).join(" ");
     const waiting = workstreamPlan([dirname(pages[0])], pages).filter((row) => stateOf(row) === "stopped");
     if (waiting.length && !hasOpenCard(text)) out.push([subject, waiting[0].label]);
@@ -892,9 +945,9 @@ export function stopsWithEmptyOpen(root: string): Array<[string, string]> {
  * its *Settled already* table, which is the arrangement the convention asks for. The question is
  * whether the PAGE names the number at all, not whether it still has a card open.
  */
-export function cardsInArcs(root: string): Array<[string, string, string]> {
+export function cardsInArcs(root: string, mine: Set<string> | null = null): Array<[string, string, string]> {
   const out: Array<[string, string, string]> = [];
-  for (const [subject, pages] of argued(root)) {
+  for (const [subject, pages] of argued(root, mine)) {
     const pageText = pages.map(read).join(" ");
     if (hasOpenCard(pageText)) continue;
     for (const arc of arcsOf(dirname(pages[0]))) {
@@ -1093,16 +1146,16 @@ export function checkReplyShape(reply: string, open: string[] = [], raised: stri
 }
 
 /** The four arc-to-page checks, as warnings. */
-export function checkArcToPage(root: string): Warning[] {
+export function checkArcToPage(root: string, mine: Set<string> | null = null): Warning[] {
   const out: Warning[] = [];
-  const pageless = pagelessWorkstreams(root);
+  const pageless = pagelessWorkstreams(root, mine);
   if (pageless.length)
     out.push({ check: "pageless", message:
       `An open workstream with arcs and no page — ${pageless.join(" · ")}. The arc is the plan and ` +
       `the page is what anybody reads, so a workstream with no page is work nobody can pick up. ` +
       `Give it an approach page in the fixed shape (05-artifacts.md, The approach document).` });
 
-  const inArcs = cardsInArcs(root);
+  const inArcs = cardsInArcs(root, mine);
   if (inArcs.length)
     out.push({ check: "cards-in-arcs", message:
       `A card written into an arc while the page shows none — ` +
@@ -1110,7 +1163,7 @@ export function checkArcToPage(root: string): Warning[] {
       `. An arc plans work and never holds a question. Move it to the page's \`Open\` as a \`Q<n>\` ` +
       `card, in the card pattern (refs/devex/workspace/docs/decision-cards.md).` });
 
-  const stopped = stopsWithEmptyOpen(root);
+  const stopped = stopsWithEmptyOpen(root, mine);
   if (stopped.length)
     out.push({ check: "stopped-no-card", message:
       `A row waiting on the developer while \`Open\` carries no card — ` +
@@ -1119,7 +1172,7 @@ export function checkArcToPage(root: string): Warning[] {
       `says nothing is one nobody can answer. Write it as a \`Q<n>\` card in the page's \`Open\` ` +
       `(refs/devex/workspace/docs/decision-cards.md).` });
 
-  const missing = unnamedArcs(root);
+  const missing = unnamedArcs(root, mine);
   if (missing.length)
     out.push({ check: "unnamed-arc", message:
       `An arc the page does not name — ` +
@@ -1226,29 +1279,38 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
       try { transcriptAt = statSync(event.transcript_path).size; } catch { transcriptAt = undefined; }
     }
   }
-  const repeated = event.stop_hook_active === true && (baseline?.fired ?? []).includes("handover");
+  // THE WORKSTREAMS THIS SESSION HAS WRITTEN TO. The page, arc and card checks read these and no
+  // others, so a session is never held for a workstream another session is still writing. Where no
+  // transcript can be read the answer is unknown, and every open workstream is read.
+  const mine = workstreamsOf(event.transcript_path, baseline?.transcriptAt ?? 0, baseline?.workstreams ?? [],
+                             openWorkstreamFolders(root));
+  // A CHECK THAT SPOKE AT THIS SESSION'S LAST STOP HAS HAD ITS ANSWER. `stop_hook_active` says this
+  // turn continues because a Stop hook spoke, so the reply is the answer to what it said. Judging it
+  // with the same check again is the loop that held sessions until the harness ended the turn.
+  const spoken = new Set(event.stop_hook_active === true ? baseline?.fired ?? [] : []);
   // No baseline means this Stop ends the session's first turn: the one the welcome belongs to.
   const firstTurn = !baseline && event.transcript_path && !event.agent_id ? firstTurnText(event.transcript_path) : "";
-  const waiting = span({ group: "stop", action: "cards" }, () => cardsWaiting(root));
-  const warnings = [
+  const waiting = span({ group: "stop", action: "cards" }, () => cardsWaiting(root, mine));
+  const found = [
     ...span({ group: "stop", action: "reply-shape" }, () => checkReplyShape(reply, waiting,
       baseline?.cards ? waiting.filter((card) => !baseline.cards!.includes(card)) : [])),
     ...span({ group: "stop", action: "notes" }, () => checkNotesLanded(root, baseline?.arcs, touched)),
-    ...span({ group: "stop", action: "arc-to-page" }, () => checkArcToPage(root)),
+    ...span({ group: "stop", action: "arc-to-page" }, () => checkArcToPage(root, mine)),
     ...span({ group: "stop", action: "runnable" }, () => checkRunnable(root, baseline?.at ?? 0, baseline?.steps ?? {}, touched)),
-    ...span({ group: "stop", action: "hold" }, () => checkHold(root)),
-    // A REPLY ANSWERING THE LAST FINDING IS NOT JUDGED BY THE SAME CHECK AGAIN. `stop_hook_active`
-    // says this turn continues because a Stop hook spoke; where the handover check was what spoke,
-    // the reply is its answer, and demanding the block a second time is the loop the developer met.
-    ...span({ group: "stop", action: "handover" }, () => repeated ? [] : checkHandover(reply, root)),
+    ...span({ group: "stop", action: "hold" }, () => checkHold(root, mine)),
+    ...span({ group: "stop", action: "handover" }, () => checkHandover(reply, root, mine)),
     ...span({ group: "stop", action: "welcome" }, () => checkWelcome(firstTurn)),
     ...span({ group: "stop", action: "corpus" }, () => checkCorpus(root)),
   ];
+  const warnings = found.filter((warning) => !spoken.has(warning.check));
   end();
-  // AFTER the checks, never before: they compare against this and would compare against now.
+  // AFTER the checks, never before: they compare against this and would compare against now. `fired`
+  // keeps what spoke earlier in this turn beside what spoke now, so a third reply is not judged by
+  // the first reply's check either.
   writeBaseline(root, session, { at: Date.now(), steps: currentSteps(root), transcriptAt,
-                                 fired: warnings.map((warning) => warning.check), cards: waiting,
-                                 arcs: arcMarks(root) });
+                                 fired: [...new Set([...spoken, ...warnings.map((warning) => warning.check)])],
+                                 cards: waiting, arcs: arcMarks(root),
+                                 workstreams: mine ? [...mine] : baseline?.workstreams });
   if (warnings.length) {
     console.error(warnings.map((w) => `[${w.check}] ${w.message}`).join("\n\n"));
     process.exit(2);   // a Stop hook's non-zero is how the message reaches the turn

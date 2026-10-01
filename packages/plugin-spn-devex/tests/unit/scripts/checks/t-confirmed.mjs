@@ -96,6 +96,7 @@ one("a write into a second repository, still no go", { go: false, path: "spn-pla
 one("the same write once an arc logs a go", { go: true, path: "spn-support-ts/src/probe.ts" }, "silent");
 one("writing the plan itself is how a go is earned", { go: false, path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md` }, "silent");
 one("wiring the window is not executing the plan", { go: false, path: ".claude/settings.json" }, "silent");
+one("reading a repository file is not writing to it", { go: false, path: "spn-support-ts/src/existing.ts", tool: "Read" }, "silent");
 one("a Bash call carries no file_path", { go: false, tool: "Bash" }, "silent");
 
 // The no-nag rule needs two writes in ONE workspace and ONE session, so it is run on its own.

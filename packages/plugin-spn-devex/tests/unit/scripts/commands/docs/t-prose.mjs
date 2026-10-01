@@ -150,5 +150,21 @@ one("but 'lifeblood' is still a metaphor",
 one("and 'wedded to' still is",
   only("wed", "The release is wedded to the branch it was cut from, for better or worse.")?.paragraphs === 1);
 
+// A QUOTATION ON AN HTML PAGE IS WRITTEN WITH ENTITIES. The marks were read as text, so a quoted idiom
+// was scored as the page's own words, and an agent reworded a quotation to pass (workstream 008).
+const html = (name, paragraph) => {
+  const dir = join(patterns, name);
+  mkdirSync(join(dir, "docs"), { recursive: true });
+  const file = join(dir, "docs", "page-overview.html");
+  writeFileSync(file, `<meta charset="utf-8"><section id="s1"><p>${paragraph}</p></section>\n`);
+  return candidates(run([file], BASE).out);
+};
+one("an idiom quoted with &ldquo; and &rdquo; is a quotation",
+  html("entity-quote", "The earlier welcome said &ldquo;it works out of the box&rdquo; and that line was removed from every page last week.")?.paragraphs === 0);
+one("the same idiom quoted with numeric entities is a quotation",
+  html("numeric-quote", "The earlier welcome said &#8220;it works out of the box&#8221; and that line was removed from every page last week.")?.paragraphs === 0);
+one("known-bad: the same idiom with no quotation marks is still flagged",
+  html("bare-idiom", "The earlier welcome works out of the box and that line was removed from every page last week.")?.paragraphs === 1);
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

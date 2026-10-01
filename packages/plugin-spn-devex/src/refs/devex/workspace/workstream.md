@@ -34,7 +34,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The reply while work runs shows what needs you, then what moved",
-      "seen": "4f2eb5c6"
+      "seen": "335e7f56"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
@@ -42,7 +42,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "77ed8de9"
+      "seen": "3f4afcf1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -378,6 +378,12 @@ it is one line, for as long as it stays open. A card repeated in full in every r
 progress, just as agent reports in the chat bury a card, and a card shown twice in one reply reads as
 two questions. The full card stays on the approach page, where anybody can read it again.
 
+**Ask only the questions and suggestions of the workstream you are working on — MUST**
+(`RD.DEVEX.WORKSPACE.197`). The cards under **Needs you** are the ones on that workstream's page. A
+card on another workstream's page belongs to the window that works there, so you do not repeat it.
+When you help shape an idea and a new workstream is opened from it, that workstream is yours from then
+on, and you ask its cards here.
+
 **Agent reports, test and check output, and hook replies go to the arc's log, never the chat.** They
 are the record, and the log is where the record lives. In the chat they bury the one thing the
 developer must act on, which is the card.
@@ -389,6 +395,22 @@ it takes to read them, the way they would read a change sent for review.
 **The rest is in the arc files and the approach page**, which already hold the state, so nothing
 else is built to show it: there is no separate status page. § *A prompt while an arc runs* says when
 a question holds the work.
+
+## A check at the end of a turn speaks once, and only about this window's work
+
+**A check that runs when a turn ends speaks once in that turn — MUST** (`RD.DEVEX.WORKSPACE.198`).
+When a check finds something, you reply again, and that reply is your answer to the finding. The same
+check does not judge the answer a second time. Fix what you can fix in that reply. Name once what you
+cannot fix, and leave it: repeating it changes nothing.
+
+**A window is held only for work it did — MUST.** The checks that read a workstream's page, its arcs
+and its cards read the workstreams this window has written to, and no others. A workstream another
+window is still writing is unfinished rather than wrong, and that window hears about it.
+
+**A handover is a reply that sends the work to another session, never a word in a reply.** You owe
+the handover block only when your reply directs somebody there: it says to open or continue in another
+window, or says where the next one starts. A status reply that mentions another window, a release
+order, or what happens later passes no work on, and you write no block for it.
 
 ## Every moment gets a plain, warm line
 

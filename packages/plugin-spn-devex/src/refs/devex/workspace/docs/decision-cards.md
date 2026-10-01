@@ -14,7 +14,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The reply while work runs shows what needs you, then what moved",
-      "seen": "4f2eb5c6"
+      "seen": "335e7f56"
     }
   ]
 }
@@ -147,6 +147,10 @@ never again in the body of the same reply. While it stays open, each later reply
 — its number, its question, and where it is — before the progress. The full card stays on the
 approach page. `refs/devex/workspace/workstream.md` § *The reply while work runs shows what needs you,
 then what moved* holds that shape.
+
+**The cards named there are those of the workstream you are working on — MUST**
+(`RD.DEVEX.WORKSPACE.197`). A card on another workstream's page belongs to the window that works
+there. A workstream you open while you help shape an idea is yours from then on.
 
 **An answer lands in the arc's notes in the same turn — MUST** (`RD.DEVEX.WORKSPACE.193`): in the
 card, answered and folded; in the arc, as a log line and a change to every row it affects; and in the

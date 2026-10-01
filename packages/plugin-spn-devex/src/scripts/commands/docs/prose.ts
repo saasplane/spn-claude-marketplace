@@ -189,10 +189,22 @@ function sectionsOf(raw: string): { heading: string; body: string }[] {
  * The section is carried because `proseOf` blanks headings, so by the time a block is scored there
  * is no way left to tell which section it sat in — and one section's opening form is mandated.
  */
+/**
+ * Quotation marks written as HTML entities, as the characters they stand for.
+ *
+ * A QUOTATION IS MARKED BY ITS QUOTATION MARKS, and a page writes them as `&ldquo;` and `&rdquo;`. The
+ * blocks are read as text, so an entity was never a mark: a quoted idiom on an `.html` page was scored
+ * as the page's own words, and an agent reworded a quotation to pass the check.
+ */
+export function quotationMarks(text: string): string {
+  return text.replace(/&ldquo;|&#8220;|&#x201[cC];/g, "\u201c").replace(/&rdquo;|&#8221;|&#x201[dD];/g, "\u201d")
+    .replace(/&quot;|&#34;/g, '"');
+}
+
 export function paragraphs(raw: string): Block[] {
   const out: Block[] = [];
   for (const { heading, body } of sectionsOf(raw)) {
-    for (const block of proseOf(body, false).split(BLOCK_BREAK)) {
+    for (const block of proseOf(quotationMarks(body), false).split(BLOCK_BREAK)) {
       const sents = sentences(block);
       if (sents.length) out.push([block.split(/\s+/).filter(Boolean).join(" "), sents, heading]);
     }

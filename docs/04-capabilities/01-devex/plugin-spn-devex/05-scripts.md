@@ -15,7 +15,7 @@ Everything this plugin can execute sits under `packages/plugin-spn-devex/src/scr
 | An arc's status word | `packages/plugin-spn-devex/src/scripts/checks/arc-status.ts` | refuses an arc written with a status word nothing can act on |
 | What the code says about itself | `packages/plugin-spn-devex/src/scripts/checks/comment-check.ts` | refuses a history word, a `//` where JSDoc is owed, a comment repeating its line, a guess |
 | The questions a fragment cannot answer | `packages/plugin-spn-devex/src/scripts/checks/corpus.ts` | asks the corpus questions nobody would otherwise ask until they typed a command |
-| Confirmed execution | `packages/plugin-spn-devex/src/scripts/checks/confirmed.ts` | warns on an edit with no recorded go |
+| Confirmed execution | `packages/plugin-spn-devex/src/scripts/checks/confirmed.ts` | warns on an edit with no recorded go, and never on a read |
 | The document bars | `packages/plugin-spn-devex/src/scripts/checks/doc-check.ts` | measures prose against what a script can measure |
 | The machine seat | `packages/plugin-spn-devex/src/scripts/checks/env-seat.ts` | refuses a command that would render `~/.spnenv` |
 | The governing mirror | `packages/plugin-spn-devex/src/scripts/checks/mirror.ts` | names the capability document an edit belongs to |
@@ -143,7 +143,7 @@ Everything this plugin can execute sits under `packages/plugin-spn-devex/src/scr
 
 **Why** — *handing a whole corpus to a rewriting pass is the expensive way to do it*, and most of it needs no change.
 **What** — the prose faults a pattern can recognise are reported with their paragraphs. A compressed claim, a rule with no action, and a merely dull abstraction cannot be told from good prose by a pattern, so they are not guessed at.
-**How** — code, tables, headings and front matter come out before scoring, and a ledger of hashes lets a long sweep resume. `packages/plugin-spn-devex/src/scripts/commands/docs/prose.ts`.
+**How** — code, tables, headings and front matter come out before scoring, and a ledger of hashes lets a long sweep resume. Quotation marks written as HTML entities are read as quotation marks, so a phrase a page quotes is not scored as the page's own. `packages/plugin-spn-devex/src/scripts/commands/docs/prose.ts`.
 
 ### One writer stamps every repository's rows
 
