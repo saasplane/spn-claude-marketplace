@@ -51,6 +51,9 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.HOOKS.42 | Engineering leader | read what the hook after a failed call cost | A failed call writes its `events › closed` line under `PostToolUseFailure`, beside its command line | POSITIVE | UNIT | PLANNED | — |
 | MKT.HOOKS.43 | Engineering leader | have a call that was refused after its start file was written leave no start file behind | A start file older than 600,000 ms is removed when the next one is written, so no reader takes it for a running command | NEGATIVE | UNIT | PLANNED | — |
 | MKT.HOOKS.44 | Engineering leader | have a failed call made by a child agent closed like any other | The call's line carries its exit code and the agent, and its start file is removed | POSITIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.45 | Editor | be refused a page that links a version nobody cut | The write is refused, and the message names the version the page links and the versions that exist | NEGATIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.46 | Editor | be refused a publish of a page that links its styles from outside | The publish is refused, and the message names `docs sds bundle` and the copy to publish instead | NEGATIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.47 | Editor | write the version's address into a page and get no finding for it | The link check allows the address of the shared stylesheet and script, and still reports any other hosted address | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

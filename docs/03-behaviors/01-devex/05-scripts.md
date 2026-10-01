@@ -89,6 +89,18 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.95 | Quality engineer | send a command's `--json` through a pipe and receive all of it | The entry ends only after its output is written, so a pipe receives every byte past 65,536 | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.96 | Engineering leader | read how long the model itself worked, beside the tokens | `workspace tokens` prints the model's time apart from the tools' time and the time spent waiting on a prompt | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.97 | Engineering leader | add up what the Bash commands cost, by program | `plugin timings` reads one line for each call, so a total holds a call's time once, however many programs the call ran | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.98 | Editor | cut a version of the shared page styles | `docs sds cut <version>` copies the three built files into `public/assets/docs/<version>/` and lists the version in `versions.json` | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.99 | Editor | be refused a version that exists | `docs sds cut` names the folder that is already there, exits 1 and writes nothing, so a version never changes once it is cut | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.100 | Editor | move every page of a folder to another version | `docs sds repoint <version> <folder>` rewrites the version in each page's two addresses, and prints how many pages it changed | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.101 | Editor | be refused a move to a version that was never cut | `docs sds repoint` names the version and the versions that exist, exits 1 and changes no page | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.102 | Editor | get a copy of a page that carries its styles inside it | `docs sds bundle <page>` writes `<page>.bundled.html` beside the page, with the styles and scripts of the version the page links | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.103 | Editor | be refused a bundle of a page that links no version | `docs sds bundle` says the page links no shared stylesheet, exits 1 and writes nothing | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.104 | Editor | open a repository's artifacts from one page | `docs index <repository>` writes `docs/artifacts/index.html`: a tree of the pages on disk in the groups Docs, Guides and Reports, with an empty group left out | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.105 | Editor | be shown where the index and the pages on disk disagree | `docs index --check` lists each page the tree lacks and each entry that has no page, and writes nothing | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.106 | Editor | read a guide as a page of steps | `docs guide <guide.md>` writes the guide's page from its markdown: its stages, and steps that number themselves | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.107 | Editor | be told when a guide is not written as steps | `docs guide` names the guide in which it finds no step, exits 1 and writes no page | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.108 | Editor | have every command read a page in either form while the pages move | `docs cycles`, `docs page`, `docs audit` and `report refresh` read a page that links the shared stylesheet and one that carries its own, and write in the page's form | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.109 | Editor | be told when a page that links the shared stylesheet still carries styles of its own | `docs audit` reports a `<style>` block or an inline script in that page | NEGATIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 
