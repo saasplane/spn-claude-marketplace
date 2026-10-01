@@ -22,8 +22,10 @@ The plugins carry the standards in full — they restate the SaaS Plane foundati
 
 ```
 .claude-plugin/marketplace.json   # the one manifest — hand-kept
-package.json                       # the root build: esbuild, dev-only, never installed
+package.json                       # the root build: esbuild and Tailwind, dev-only, never installed
 scripts/build-plugins.mjs          # bundles each plugin's cli.ts and events/*.ts into dist/
+scripts/build-styles.mjs           # builds the shared page stylesheet from its Tailwind source
+public/assets/docs/<version>/      # the page styles as served by GitHub Pages; a version never changes
 packages/plugin-spn-devex/         # source, edited in place
 packages/plugin-spn-apps/
 packages/plugin-spn-infra/

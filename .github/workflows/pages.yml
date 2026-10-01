@@ -1,0 +1,47 @@
+# RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § One stylesheet, served in versions
+# The chapter is the source of truth; a rule change is edited there first, then here.
+#
+# Serves `public/` as this repository's GitHub Pages site, so a page can link one version of the shared
+# stylesheet by its address:
+#
+#     https://saasplane.github.io/spn-claude-marketplace/assets/docs/<version>/sds-docs.css
+#
+# IT RUNS ON A PUSH TO `develop`, the branch a plugin is installed from, so the files a page links come
+# from the same commit as the plugin a partner installs. A version's folder never changes once it is
+# cut, so a run publishes the same bytes for every version that already exists and adds the new one.
+#
+# IT BUILDS NOTHING. `public/` is committed as it is served: `spn-devex docs sds cut <version>` writes a
+# version's folder, and this workflow uploads the folder.
+name: pages
+
+on:
+  push:
+    branches: [develop]
+    paths:
+      - "public/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+      - id: deployment
+        uses: actions/deploy-pages@v4

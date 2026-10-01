@@ -1,0 +1,617 @@
+/* RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § One stylesheet, served in versions
+   The chapter is the source of truth; a rule change is edited there first, then here.
+
+   The Tailwind source of the one stylesheet every page loads. Every class and token of ours opens with
+   `sds-`. Our tokens are Tailwind's theme. Our named classes use Tailwind inside, by `@apply`, where
+   Tailwind has a utility for the declaration.
+
+   This is the file a person or an agent edits. `node scripts/build-styles.mjs` builds `sds-docs.css`
+   beside it, with @tailwindcss/cli 4.3.3, and `spn-devex docs sds cut <version>` serves a build as a
+   version that never changes. */
+@layer theme, components, utilities;
+
+/* TAILWIND. Its theme and its utilities are loaded; its reset is not, because the page's base rules are
+   ours. `theme(inline)` writes each value of Tailwind's own scale into the rule that uses it, so the
+   built file holds no variable of Tailwind's theme beside ours. */
+@import "tailwindcss/theme.css" layer(theme) theme(inline);
+@import "tailwindcss/utilities.css" layer(utilities) source(none);
+
+/* THE UTILITIES A PAGE USES. The build holds a utility only when it is named here or in a page that is
+   scanned. Scanning is off, because a scan of a whole page takes words of its prose for utilities. The
+   list below is every class in the samples' markup that is not ours. */
+@source inline("bg-ok-soft block border border-ok font-ui gap-4 grid m-0 max-w-none mb-1 my-6 px-5 py-4 rounded-sm sm:grid-cols-2 text-ink text-ok text-xs tracking-widest uppercase");
+
+/* OUR TOKENS ARE TAILWIND'S THEME. Tailwind's own colours, type sizes and fonts are cleared, so a utility
+   can name ours and nothing else: `text-ink`, `bg-card`, `border-rule`, `text-sm`, `font-mono`. Each
+   entry points at a token below, so a named class and a utility read one value in both themes. */
+@theme inline {
+  --color-*: initial;
+  --text-*: initial;
+  --font-*: initial;
+  --color-paper: var(--sds-paper);
+  --color-card: var(--sds-card);
+  --color-ink: var(--sds-ink);
+  --color-slate: var(--sds-slate);
+  --color-faint: var(--sds-faint);
+  --color-rule: var(--sds-rule);
+  --color-accent: var(--sds-accent);
+  --color-accent-soft: var(--sds-accent-soft);
+  --color-gap: var(--sds-gap);
+  --color-gap-soft: var(--sds-gap-soft);
+  --color-ok: var(--sds-ok);
+  --color-ok-soft: var(--sds-ok-soft);
+  --color-fail: var(--sds-fail);
+  --color-fail-soft: var(--sds-fail-soft);
+  --color-tk-k: var(--sds-tk-k);
+  --color-tk-s: var(--sds-tk-s);
+  --color-tk-c: var(--sds-tk-c);
+  --color-tk-t: var(--sds-tk-t);
+  --color-tk-n: var(--sds-tk-n);
+  --color-tk-add: var(--sds-tk-add);
+  --color-tk-del: var(--sds-tk-del);
+  --color-violet: var(--sds-violet);
+  --color-violet-soft: var(--sds-violet-soft);
+  --color-cyan: var(--sds-cyan);
+  --color-cyan-soft: var(--sds-cyan-soft);
+  --color-pink: var(--sds-pink);
+  --color-pink-soft: var(--sds-pink-soft);
+  --color-olive: var(--sds-olive);
+  --color-olive-soft: var(--sds-olive-soft);
+  --color-orange: var(--sds-orange);
+  --color-orange-soft: var(--sds-orange-soft);
+  --color-grey: var(--sds-grey);
+  --color-grey-soft: var(--sds-grey-soft);
+  --color-info: var(--sds-info);
+  --color-info-soft: var(--sds-info-soft);
+  --color-success: var(--sds-success);
+  --color-success-soft: var(--sds-success-soft);
+  --color-warning: var(--sds-warning);
+  --color-warning-soft: var(--sds-warning-soft);
+  --color-error: var(--sds-error);
+  --color-error-soft: var(--sds-error-soft);
+  --color-status: var(--sds-status);
+  --color-status-soft: var(--sds-status-soft);
+  --color-tone: var(--sds-tone);
+  --color-tone-soft: var(--sds-tone-soft);
+  --text-xs: var(--sds-xs);
+  --text-sm: var(--sds-sm);
+  --text-md: var(--sds-md);
+  --text-lg: var(--sds-lg);
+  --text-xl: var(--sds-xl);
+  --text-xxl: var(--sds-xxl);
+  --font-ui: var(--sds-ui);
+  --font-mono: var(--sds-mono);
+}
+
+/* THE TOKENS, each with its dark value. A page never writes a colour or a size of its own. */
+/* THE WIDTHS OF A PAGE are four of them: `--sds-page-max` is the cap of a page and of its footer,
+   `--sds-measure` is the longest line of running text, `--sds-rail-width` is the rail beside a page, and
+   `--sds-tree-width` is the tree of the index. No script and no page sets a width.
+   A media query cannot read a token, so the two points where the layout changes stay typed numbers:
+   60rem, where a page and the index turn to one column, and 40rem, where a page takes the whole
+   window. After a change of `--sds-page-max`, look at both. */
+@layer theme {
+  :root{
+    --sds-paper:#edf0f3; --sds-card:#f7f9fb; --sds-ink:#141920; --sds-slate:#48525f; --sds-faint:#7c8794;
+    --sds-rule:#d2d9e0; --sds-accent:#2f4e7a; --sds-accent-soft:#e0e8f4; --sds-gap:#8f5714; --sds-gap-soft:#f7ecda;
+    --sds-ok:#2a6459; --sds-ok-soft:#dcece8; --sds-fail:#a63d3d; --sds-fail-soft:#f6e1e1;
+    --sds-ui:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    --sds-mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace; --sds-xs:0.76rem; --sds-sm:0.85rem;
+    --sds-md:0.97rem; --sds-lg:1.32rem; --sds-xl:1.62rem; --sds-xxl:2.5rem; --sds-tk-k:#6d3a9c; --sds-tk-s:#2a6459;
+    --sds-tk-c:#7c8794; --sds-tk-t:#2f4e7a; --sds-tk-n:#8f5714; --sds-tk-add:#2a6459; --sds-tk-del:#a63d3d;
+    --sds-violet:#6d3a9c; --sds-violet-soft:#ece3f5; --sds-cyan:#1b6a86; --sds-cyan-soft:#dbeef4; --sds-pink:#a0366d;
+    --sds-pink-soft:#f6e0ec; --sds-olive:#5a661c; --sds-olive-soft:#edf0d8; --sds-orange:#a34412;
+    --sds-orange-soft:#fae5d8; --sds-grey:#48525f; --sds-grey-soft:#e6eaee; --sds-info:#2f4e7a;
+    --sds-info-soft:#e0e8f4; --sds-success:#2a6459; --sds-success-soft:#dcece8; --sds-warning:#8f5714;
+    --sds-warning-soft:#f7ecda; --sds-error:#a63d3d; --sds-error-soft:#f6e1e1; --sds-page-max:80rem;
+    --sds-measure:58rem; --sds-rail-width:13rem; --sds-tree-width:21rem;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --sds-paper:#0f1318; --sds-card:#171d24; --sds-ink:#e3e8ee; --sds-slate:#a3adb9; --sds-faint:#6f7986;
+      --sds-rule:#242d37; --sds-accent:#86a9da; --sds-accent-soft:#18232f; --sds-gap:#d59d4f; --sds-gap-soft:#2a2113;
+      --sds-ok:#5db3a4; --sds-ok-soft:#14251f; --sds-fail:#e08a8a; --sds-fail-soft:#2b1818; --sds-tk-k:#c9a3ee;
+      --sds-tk-s:#7fc9b6; --sds-tk-c:#6f7986; --sds-tk-t:#86a9da; --sds-tk-n:#d59d4f; --sds-tk-add:#5db3a4;
+      --sds-tk-del:#e08a8a; --sds-violet:#c9a3ee; --sds-violet-soft:#251a30; --sds-cyan:#6cc3de;
+      --sds-cyan-soft:#12262e; --sds-pink:#e592bd; --sds-pink-soft:#2c1622; --sds-olive:#b9c66a;
+      --sds-olive-soft:#22260f; --sds-orange:#ee9a66; --sds-orange-soft:#2e1b10; --sds-grey:#a3adb9;
+      --sds-grey-soft:#1c232b; --sds-info:#86a9da; --sds-info-soft:#18232f; --sds-success:#5db3a4;
+      --sds-success-soft:#14251f; --sds-warning:#d59d4f; --sds-warning-soft:#2a2113; --sds-error:#e08a8a;
+      --sds-error-soft:#2b1818;
+    }
+  }
+  :root[data-theme="dark"]{
+    --sds-paper:#0f1318; --sds-card:#171d24; --sds-ink:#e3e8ee; --sds-slate:#a3adb9; --sds-faint:#6f7986;
+    --sds-rule:#242d37; --sds-accent:#86a9da; --sds-accent-soft:#18232f; --sds-gap:#d59d4f; --sds-gap-soft:#2a2113;
+    --sds-ok:#5db3a4; --sds-ok-soft:#14251f; --sds-fail:#e08a8a; --sds-fail-soft:#2b1818; --sds-tk-k:#c9a3ee;
+    --sds-tk-s:#7fc9b6; --sds-tk-c:#6f7986; --sds-tk-t:#86a9da; --sds-tk-n:#d59d4f; --sds-tk-add:#5db3a4;
+    --sds-tk-del:#e08a8a; --sds-violet:#c9a3ee; --sds-violet-soft:#251a30; --sds-cyan:#6cc3de;
+    --sds-cyan-soft:#12262e; --sds-pink:#e592bd; --sds-pink-soft:#2c1622; --sds-olive:#b9c66a;
+    --sds-olive-soft:#22260f; --sds-orange:#ee9a66; --sds-orange-soft:#2e1b10; --sds-grey:#a3adb9;
+    --sds-grey-soft:#1c232b; --sds-info:#86a9da; --sds-info-soft:#18232f; --sds-success:#5db3a4;
+    --sds-success-soft:#14251f; --sds-warning:#d59d4f; --sds-warning-soft:#2a2113; --sds-error:#e08a8a;
+    --sds-error-soft:#2b1818;
+  }
+}
+
+/* OUR RULES: the page's base rules and the named classes, in the order the templates wrote them. They sit
+   in one layer, so the cascade between them is the one of today, and a Tailwind utility on the same
+   element comes after and wins. A rule uses `@apply` for each declaration Tailwind has a utility for,
+   and writes the rest as it is, reading the tokens. */
+@layer components {
+  *{@apply box-border}
+  body{@apply m-0 bg-paper text-ink font-ui; font-size:1rem; line-height:1.6; -webkit-font-smoothing:antialiased}
+  p{margin:0 0 1rem; max-width:var(--sds-measure)}
+  code,.sds-mono{@apply font-mono; font-size:0.87em}
+  strong{@apply font-semibold}
+  em{@apply italic text-slate}
+  a{@apply text-accent}
+  .sds-page{@apply grid gap-12; grid-template-columns:var(--sds-rail-width) minmax(0,1fr); max-width:min(98vw,var(--sds-page-max)); margin:0 auto; padding:3rem 8px 6rem; align-items:start}
+  .sds-rail{@apply sticky top-10 font-ui text-xs}
+  .sds-rail .sds-home{@apply pl-0 text-accent block; border-left:none; margin-bottom:.9rem; font-weight:650}
+  .sds-rail .sds-rail-title{@apply uppercase text-faint font-bold; letter-spacing:.15em; margin-bottom:.85rem; font-size:.7rem}
+  .sds-rail a{@apply flex no-underline text-slate; gap:.55rem; padding:.28rem 0 .28rem .6rem; border-left:2px solid var(--sds-rule); line-height:1.4}
+  .sds-rail a .sds-number{@apply hidden}
+  .sds-rail a.sds-sub{@apply text-faint; padding-left:1.6rem; font-size:.72rem}
+  .sds-rail a:hover{@apply text-ink}
+  .sds-rail a.sds-is-current{@apply text-accent border-l-accent; font-weight:650}
+  .sds-rail .sds-count{@apply ml-auto font-mono bg-gap-soft text-gap; font-size:.68rem; border-radius:2px; padding:0 .3rem}
+  .sds-wrap{@apply flex flex-col gap-13 min-w-0}
+  .sds-masthead{@apply flex flex-col; gap:1.1rem}
+  .sds-eyebrow{@apply flex flex-col gap-2 font-ui text-xs text-faint}
+  .sds-eyebrow .sds-line{@apply flex flex-wrap items-center; gap:.4rem .6rem; line-height:1.7}
+  .sds-eyebrow .sds-separator{@apply text-rule font-light}
+  .sds-eyebrow .sds-line1{@apply uppercase text-faint; letter-spacing:.15em; font-weight:650; line-height:1.7}
+  .sds-eyebrow .sds-label{@apply font-mono uppercase text-faint; font-size:.68rem; letter-spacing:.08em}
+  .sds-eyebrow .sds-audience{@apply inline-flex flex-wrap items-center; gap:.45rem}
+  .sds-badge{@apply inline-flex items-center bg-card font-mono uppercase text-slate whitespace-nowrap; gap:.35rem; padding:.1rem .6rem; border-radius:999px; border:1px solid var(--sds-rule); font-size:.7rem; letter-spacing:.06em; line-height:1.7}
+  .sds-badge.sds-type{@apply border-accent text-accent bg-accent-soft; font-weight:650}
+  .sds-badge.sds-lens{@apply font-ui tracking-normal normal-case; font-size:.74rem}
+  .sds-badge.sds-when{@apply normal-case tracking-normal}
+  .sds-tiles{@apply grid; grid-template-columns:repeat(auto-fill,minmax(18rem,1fr)); gap:.8rem; margin:1.6rem 0}
+  .sds-tile{@apply flex flex-col bg-card min-w-0; border:1px solid var(--sds-rule); border-radius:3px; padding:.85rem 1rem}
+  .sds-tile h4{@apply text-md; margin:0 0 .35rem}
+  .sds-tile h4 a{@apply text-ink no-underline}
+  .sds-tile h4 a:hover{@apply text-accent}
+  .sds-tile p{@apply text-sm text-slate max-w-none flex-1; margin:0 0 .6rem}
+  .sds-tile .sds-more{@apply text-sm font-semibold no-underline self-start}
+
+  /* The Summary's tiles */
+  .sds-sides{@apply grid; grid-template-columns:repeat(auto-fit,minmax(14rem,1fr)); gap:.8rem; margin:1.2rem 0}
+  .sds-side{@apply bg-card flex flex-col; border:1px solid var(--sds-rule); border-radius:3px; padding:.9rem 1rem; gap:.35rem}
+  .sds-side .sds-label{@apply font-mono text-xs uppercase text-faint; letter-spacing:.08em}
+  .sds-side .sds-big{@apply font-ui font-bold text-ink; font-size:1.8rem; font-variant-numeric:tabular-nums; line-height:1.1}
+  .sds-side .sds-big .sds-total{@apply font-normal text-slate}
+  .sds-side .sds-of{@apply text-sm text-slate}
+  .sds-side .sds-side-numbers{@apply flex items-baseline justify-between gap-2}
+  .sds-side .sds-percent{@apply font-mono text-sm text-slate; font-weight:650; font-variant-numeric:tabular-nums}
+  .sds-method > :not(summary){margin:0 1rem 1rem}
+  .sds-method > .sds-scroll{margin-top:.2rem}
+  .sds-bar{@apply h-2 bg-rule overflow-hidden; border-radius:999px}
+  .sds-bar i{@apply block h-full bg-accent}
+  p > .sds-more{@apply font-semibold no-underline}
+  h1{@apply font-ui text-xxl font-bold text-balance m-0; letter-spacing:-.02em; line-height:1.15}
+  .sds-subtitle{@apply text-lg leading-normal text-slate m-0; max-width:46rem}
+  .sds-standfirst{@apply text-ink; font-size:1rem; line-height:1.6; max-width:var(--sds-measure)}
+  .sds-section-head{@apply grid items-baseline gap-2; grid-template-columns:1fr; border-top:2px solid var(--sds-ink); padding-top:.7rem; margin-bottom:1.1rem}
+  .sds-section-head .sds-number{@apply font-mono text-sm font-bold text-accent; font-variant-numeric:tabular-nums}
+  h2{@apply font-ui text-xl font-bold text-balance m-0; letter-spacing:-.01em}
+  h3{@apply font-ui text-lg font-semibold; letter-spacing:-.008em; margin:2rem 0 .6rem}
+  h4{@apply font-ui text-md text-ink; margin:0 0 .5rem}
+  .sds-scroll{@apply overflow-x-auto bg-card; border:1px solid var(--sds-rule); border-radius:3px; margin:1.6rem 0}
+  table{@apply border-collapse w-full font-ui text-sm; min-width:34rem}
+  td .sds-sub{@apply block text-xs text-slate; margin-top:.4rem}
+  td .sds-sub b{@apply text-ink; font-weight:650}
+  td .sds-sub-line{@apply block font-mono text-xs font-normal text-faint; margin-top:.3rem}
+  table.sds-grid{@apply table-fixed; min-width:52rem}
+  table.sds-grid th.sds-number-cell,table.sds-grid td.sds-number-cell{@apply pl-2; padding-right:.6rem}
+  table.sds-grid th{@apply whitespace-nowrap}
+  table.sds-grid td{@apply wrap-anywhere}
+  .sds-scroll table{@apply table-auto}
+  th{@apply text-left font-mono text-xs uppercase text-faint; letter-spacing:.07em; font-weight:650; padding:.6rem .8rem; border-bottom:1px solid var(--sds-rule)}
+  td{@apply align-top text-slate; padding:.6rem .8rem; border-bottom:1px solid var(--sds-rule)}
+  td strong{@apply text-ink}
+  tr:last-child td{border-bottom:none}
+  .sds-number-cell{@apply font-mono text-right whitespace-nowrap; font-variant-numeric:tabular-nums}
+  .sds-yes{@apply text-ok; font-weight:650}
+  .sds-no{@apply text-gap; font-weight:650}
+  .sds-small,.sds-code{@apply font-mono text-xs text-faint}
+  pre{@apply bg-card overflow-x-auto font-mono text-sm text-slate max-w-full; border:1px solid var(--sds-rule); border-radius:3px; padding:.9rem 1.1rem; margin:1.6rem 0; line-height:1.55}
+  pre code{font-size:inherit}
+  pre .sds-tk-k{@apply text-tk-k font-semibold}
+  pre .sds-tk-s{@apply text-tk-s}
+  pre .sds-tk-c{@apply text-tk-c italic}
+  pre .sds-tk-t{@apply text-tk-t}
+  pre .sds-tk-n{@apply text-tk-n}
+  pre .sds-tk-add{@apply text-tk-add}
+  pre .sds-tk-del{@apply text-tk-del}
+  pre .sds-tk-cmd{@apply text-tk-t font-semibold}
+
+  /* A figure */
+  figure{@apply p-0; margin:2.4rem 0; border:0; background:none}
+  figure svg{@apply block w-auto max-w-full h-auto mx-auto}
+  figcaption{@apply font-ui text-xs text-faint mt-2 max-w-none}
+  .sds-drawing .sds-box{@apply fill-card stroke-rule; stroke-width:1.5}
+  .sds-drawing .sds-box.sds-absent{@apply fill-none stroke-rule; stroke-width:1.5; stroke-dasharray:5 4}
+  .sds-drawing .sds-title{@apply font-ui fill-ink; font-size:13px; font-weight:650}
+  .sds-drawing .sds-label{@apply font-ui fill-ink; font-size:12px}
+  .sds-drawing .sds-code{@apply font-mono fill-slate; font-size:11px}
+  .sds-drawing .sds-note{@apply font-ui fill-faint; font-size:11px}
+
+  /* Arrowheads take the line's colour */
+  .sds-drawing{@apply text-accent}
+  .sds-drawing .sds-connector{@apply stroke-accent fill-none; stroke-width:1.6}
+  .sds-pull{@apply bg-accent-soft; border-left:2px solid var(--sds-accent); padding:1rem 1.2rem; margin:1.6rem 0; border-radius:0 3px 3px 0}
+  .sds-pull .sds-label{@apply block font-ui text-xs tracking-widest uppercase text-accent; margin-bottom:.3rem}
+  .sds-pull p{@apply m-0 max-w-none}
+  .sds-open{@apply bg-card; border:1px solid var(--sds-rule); border-left:2px solid var(--sds-gap); border-radius:0 3px 3px 0; padding:1.1rem 1.25rem; margin-bottom:.9rem}
+  .sds-open h4{@apply text-md}
+  .sds-open .sds-key{@apply font-mono text-xs uppercase text-faint block; letter-spacing:.08em; margin:.6rem 0 .2rem}
+  .sds-open p{@apply text-sm text-slate max-w-none; margin:0 0 .4rem}
+  .sds-open .sds-recommended{@apply mt-3 text-sm text-ink; padding-top:.65rem; border-top:1px dashed var(--sds-rule)}
+  .sds-open .sds-recommended b{@apply text-ok}
+  .sds-open .sds-scroll{margin:.4rem 0}
+  pre.sds-preview{@apply font-mono text-xs bg-card overflow-x-auto leading-normal; border:1px solid var(--sds-rule); border-radius:3px; padding:.7rem .9rem; margin:1rem 0}
+  footer{@apply font-ui text-xs text-faint; border-top:1px solid var(--sds-rule); padding-top:1.3rem}
+  @media (max-width:60rem){
+    .sds-page{@apply gap-6 pt-8; grid-template-columns:minmax(0,1fr)}
+    .sds-rail{@apply static bg-card; border:1px solid var(--sds-rule); border-radius:3px; padding:.9rem 1rem}
+    .sds-rail a{@apply pl-0; border-left:none}
+    .sds-rail a.sds-is-current{border-left:none}
+  }
+
+  /* The rail: two levels */
+  .sds-rail a:not(.sds-sub):not(.sds-home){@apply font-normal text-ink; font-size:.88rem; letter-spacing:-.005em}
+  .sds-rail a.sds-sub{@apply font-normal text-slate; font-size:.78rem}
+  .sds-rail .sds-rail-title{@apply text-slate}
+
+  /* The rail: one left edge */
+  .sds-rail a:not(.sds-home), .sds-rail a.sds-sub{padding-left:.6rem}
+
+  /* The rail: marks level with the label */
+  .sds-rail a{@apply items-center}
+  .sds-rail .sds-count{@apply self-center}
+
+  /* The rail: the current entry */
+  .sds-rail a.sds-is-current:not(.sds-sub):not(.sds-home){@apply text-accent; font-weight:650; box-shadow:inset 1.5px 0 0 var(--sds-accent)}
+  .sds-rail a.sds-is-current.sds-sub{@apply text-accent; box-shadow:inset 1.5px 0 0 var(--sds-accent)}
+  .sds-rail a:not(.sds-sub):not(.sds-home):hover{@apply text-accent}
+  .sds-rail a.sds-sub:hover{@apply text-ink}
+
+  /* The rail: the fold chevron */
+  .sds-rail a .sds-caret{@apply ml-auto flex-none grid place-items-center text-faint transform-none; width:1.35rem; height:1.35rem; border-radius:3px}
+  .sds-rail a .sds-caret::before{content:""; width:.32rem; height:.32rem; border-right:1.5px solid currentColor; border-bottom:1.5px solid currentColor; transform:translateX(-.1rem) rotate(-45deg); transition:transform .15s ease}
+  .sds-rail a.sds-is-open .sds-caret{@apply transform-none}
+  .sds-rail a.sds-is-open .sds-caret::before{transform:translateY(-.1rem) rotate(45deg)}
+  .sds-rail a .sds-caret:hover{@apply bg-accent-soft text-accent}
+  @media (prefers-reduced-motion:reduce){
+    .sds-rail a .sds-caret::before{transition:none}
+  }
+
+  /* Heading anchor links */
+  a.sds-anchor{@apply inline-block font-mono font-normal leading-none no-underline opacity-35 align-middle relative; margin-left:.6em; font-size:.55em; color:var(--sds-slate,#6b7280); transition:opacity .15s; top:-.1em}
+  .sds-section-head:hover a.sds-anchor,h3[id]:hover a.sds-anchor,a.sds-anchor:hover,a.sds-anchor:focus,a.sds-anchor.sds-is-copied{@apply opacity-100}
+  a.sds-anchor.sds-is-copied::after{content:" link copied"; font-size:.9em; color:var(--sds-ok,#0a7d4a); margin-left:.3em}
+
+  /* The report's own parts */
+
+  /* The verdict */
+  .sds-verdict{@apply text-lg text-ink font-medium; line-height:1.45; max-width:52rem; margin:0 0 1rem}
+  .sds-terms{@apply text-sm text-slate}
+
+  /* A tile's bar colours */
+  .sds-bar i.sds-success{@apply bg-ok}
+  .sds-bar i.sds-warning{@apply bg-gap}
+  .sds-bar i.sds-error{@apply bg-fail}
+
+  /* The breakdown bar */
+  .sds-breakdown{margin:1.4rem 0 1.2rem}
+  .sds-breakdown-title{@apply font-mono text-xs uppercase text-faint; letter-spacing:.08em; margin:0 0 .45rem}
+  .sds-breakdown-bar{@apply flex overflow-hidden bg-paper; gap:2px; height:1.15rem; border-radius:4px}
+  .sds-breakdown-segment{@apply h-full; flex:0 1 0; min-width:.45rem}
+  .sds-breakdown-legend{@apply flex flex-wrap p-0 text-sm text-slate; gap:.35rem 1.3rem; list-style:none; margin:.65rem 0 0}
+  .sds-breakdown-legend li{@apply inline-flex items-center; gap:.45rem}
+  .sds-breakdown-legend b{@apply text-ink; font-variant-numeric:tabular-nums}
+  .sds-breakdown-key{@apply inline-block flex-none; width:.85rem; height:.85rem; border-radius:2px}
+  .sds-result-success{@apply bg-ok}
+  .sds-result-error{@apply bg-fail}
+  .sds-result-warning{background:repeating-linear-gradient(45deg,var(--sds-gap) 0 3px,var(--sds-gap-soft) 3px 5px)}
+  .sds-result-none{background:repeating-linear-gradient(135deg,var(--sds-faint) 0 2px,var(--sds-card) 2px 5px); box-shadow:inset 0 0 0 1px var(--sds-faint)}
+  .sds-result-base{@apply bg-accent}
+
+  /* Top gaps */
+  .sds-top-gaps{margin:.4rem 0 0; padding-left:2.2rem; max-width:var(--sds-measure)}
+  .sds-top-gaps li{margin:0 0 .35rem; padding-left:.2rem}
+  .sds-top-gaps li::marker{@apply font-mono font-bold text-gap}
+
+  /* Measured: the scope list */
+  .sds-scope{@apply p-0; list-style:none; margin:0 0 1rem; max-width:var(--sds-measure)}
+  .sds-scope li{padding:.3rem 0; border-bottom:1px dashed var(--sds-rule)}
+  .sds-scope li:last-child{border-bottom:none}
+  .sds-scope .sds-key{@apply inline-block font-mono text-xs uppercase text-faint; min-width:8.5rem; letter-spacing:.08em}
+
+  /* Findings: gap, failure and total cells */
+  td.sds-warning{@apply bg-gap-soft text-gap; font-weight:650}
+  td.sds-error{@apply bg-fail-soft text-fail; font-weight:650}
+  td.sds-success{@apply text-ok; font-weight:650}
+  tr.sds-total td{@apply text-ink; border-top:2px solid var(--sds-ink); font-weight:650}
+  tr.sds-total td.sds-warning,tr.sds-total td.sds-error{@apply border-t-ink}
+  .sds-units{@apply text-sm text-slate}
+
+  /* Records */
+  .sds-record-group{@apply bg-card; border:1px solid var(--sds-rule); border-radius:3px; margin:.6rem 0}
+  .sds-record-group > summary{@apply cursor-pointer flex flex-wrap items-center text-sm text-ink; list-style:none; gap:.35rem .7rem; padding:.7rem 1rem}
+  .sds-record-group > summary::-webkit-details-marker{@apply hidden}
+  .sds-record-group > summary::before{@apply flex-none; content:""; width:.4rem; height:.4rem; border-right:1.5px solid var(--sds-faint); border-bottom:1.5px solid var(--sds-faint); transform:rotate(-45deg); transition:transform .15s ease}
+  .sds-record-group[open] > summary::before{transform:rotate(45deg)}
+  .sds-record-group > summary:hover .sds-record-name{@apply text-accent}
+  .sds-record-group > summary:focus-visible{@apply outline-offset-2; outline:2px solid var(--sds-accent)}
+  .sds-record-name{@apply font-semibold min-w-0 wrap-anywhere}
+  .sds-record-count{@apply font-mono text-xs bg-gap-soft text-gap whitespace-nowrap; border-radius:2px; padding:.05rem .4rem; font-weight:650}
+  .sds-record-worst{@apply font-mono text-xs uppercase text-slate; letter-spacing:.06em}
+
+  /* A group's decider mix, and a second level of groups */
+  .sds-record-mix{@apply text-xs text-slate}
+  .sds-record-subs{border-top:1px solid var(--sds-rule); padding:.15rem 0 .45rem}
+  .sds-record-subs > .sds-record-group{margin:.45rem .75rem}
+
+  /* The severity dot */
+  .sds-severity{@apply inline-block flex-none; width:.62rem; height:.62rem; border-radius:50%; background:none; box-shadow:inset 0 0 0 1.5px var(--sds-faint)}
+  .sds-severity.sds-error{@apply bg-fail; box-shadow:none}
+  .sds-severity.sds-warning{@apply bg-gap; box-shadow:none}
+  .sds-records{@apply m-0 p-0; list-style:none; border-top:1px solid var(--sds-rule)}
+  .sds-record{@apply grid; grid-template-columns:.62rem minmax(0,1fr); column-gap:.8rem; padding:.65rem 1rem; border-bottom:1px solid var(--sds-rule)}
+  .sds-record:last-child{border-bottom:none}
+  .sds-record > .sds-severity{grid-row:1 / span 3; margin-top:.3rem}
+  .sds-record .sds-location{@apply col-2 font-mono text-xs text-ink wrap-anywhere; word-break:break-word}
+  .sds-record .sds-location code{font-size:inherit}
+  .sds-record .sds-what{@apply col-2 text-sm text-ink wrap-anywhere; margin:.2rem 0 0; max-width:var(--sds-measure)}
+  .sds-record .sds-meta{@apply col-2 text-xs text-slate wrap-anywhere; margin:.15rem 0 0}
+  .sds-record .sds-meta code{font-size:inherit}
+  @media (prefers-reduced-motion:reduce){
+    .sds-record-group > summary::before{transition:none}
+  }
+
+  /* A record's id and its decider */
+  .sds-record-id{@apply font-mono text-xs text-slate whitespace-nowrap; margin-right:.55rem}
+  .sds-record .sds-by{@apply col-2 text-xs text-slate wrap-anywhere; margin:.2rem 0 0}
+  .sds-decider{@apply inline-block font-mono text-xs leading-normal text-slate bg-card whitespace-nowrap; letter-spacing:.03em; border-radius:2px; padding:0 .4rem; border:1px solid var(--sds-rule)}
+  .sds-decider.sds-flag{@apply border-gap text-gap}
+  .sds-decider.sds-developer{@apply border-accent text-accent bg-accent-soft; font-weight:650}
+
+  /* Recommendations */
+  .sds-record-because{@apply text-sm text-slate}
+  .sds-open .sds-options{@apply text-sm text-slate; margin:.2rem 0 .4rem; padding-left:1.2rem}
+  .sds-open .sds-options li{margin:0 0 .2rem}
+
+  /* Apps with module rows */
+  tr.sds-project td{@apply text-ink}
+  tr.sds-project td:first-child{font-weight:650}
+  tr.sds-module td:first-child{padding-left:2.2rem}
+
+  /* A state matrix */
+  td.sds-state{@apply text-center font-mono text-xs whitespace-nowrap; font-weight:650}
+  td.sds-state.sds-success{@apply text-ok bg-ok-soft}
+  td.sds-state.sds-warning{@apply text-gap bg-gap-soft}
+  td.sds-state.sds-error{@apply text-fail bg-fail-soft}
+  td.sds-state.sds-none{@apply text-faint font-normal}
+  td.sds-state .sds-small{@apply block font-normal whitespace-normal}
+
+  /* Long paths wrap */
+  p code,li code{@apply wrap-anywhere}
+  footer{max-width:min(98vw,var(--sds-page-max)); margin:0 auto; padding:1.3rem 16px 3rem}
+
+  /* Phone width */
+  @media (max-width:40rem){
+    .sds-page{@apply max-w-full; padding:1.25rem 16px 4rem}
+    h1{font-size:1.9rem}
+    .sds-subtitle,.sds-verdict{font-size:1.1rem}
+    .sds-sides{grid-template-columns:repeat(auto-fit,minmax(min(100%,9.5rem),1fr))}
+    .sds-side .sds-big{font-size:1.5rem}
+    .sds-scope .sds-key{@apply block min-w-0}
+    .sds-record-group > summary,.sds-record{@apply pl-3 pr-3}
+  }
+
+  /* Print */
+  @media print{
+    :root:root:root{--sds-paper:#fff; --sds-card:#fff; --sds-ink:#141920; --sds-slate:#48525f; --sds-faint:#7c8794; --sds-rule:#d2d9e0; --sds-accent:#2f4e7a; --sds-accent-soft:#e0e8f4; --sds-gap:#8f5714; --sds-gap-soft:#f7ecda; --sds-ok:#2a6459; --sds-ok-soft:#dcece8; --sds-fail:#a63d3d; --sds-fail-soft:#f6e1e1}
+    *{-webkit-print-color-adjust:exact; print-color-adjust:exact}
+    body{background:#fff; font-size:10.5pt}
+    .sds-rail,a.sds-anchor{display:none !important}
+    .sds-page{@apply block max-w-none p-0 m-0}
+    .sds-wrap{@apply block}
+    .sds-wrap > section{@apply break-before-page m-0}
+    .sds-wrap > section:first-of-type{@apply break-before-auto; margin-top:1.6rem}
+    .sds-scroll{@apply overflow-visible border-rule}
+    table{@apply min-w-0}
+    tr,.sds-side,.sds-breakdown,.sds-top-gaps li{@apply break-inside-avoid}
+    h2,h3{@apply break-after-avoid}
+    .sds-record-group{background:none}
+    .sds-record-group > summary::before{@apply hidden}
+    .sds-record-group::details-content{@apply block; content-visibility:visible}
+    .sds-record{@apply break-inside-avoid}
+    .sds-open{@apply break-inside-avoid}
+    footer{padding:1rem 0 0}
+  }
+  .sds-rail .sds-sub-group{@apply block}
+  .sds-rail.sds-has-script .sds-sub-group{@apply hidden}
+  .sds-rail.sds-has-script .sds-sub-group.sds-is-open{@apply block}
+  .sds-rail a .sds-caret:hover{@apply bg-accent-soft text-accent}
+  .sds-rail a:focus-visible{@apply outline-offset-2; outline:2px solid var(--sds-accent)}
+
+  /* A quote */
+  blockquote{@apply text-slate; margin:1.6rem 0; padding:.2rem 0 .2rem 1.1rem; border-left:2px solid var(--sds-rule)}
+  blockquote p{@apply m-0 max-w-none}
+  .sds-tile .sds-small{margin-top:.45rem}
+
+  /* PROSE, the markdown panel */
+  .sds-prose{@apply bg-card text-slate; border:1px solid var(--sds-rule); border-radius:3px; padding:1.1rem 1.3rem; margin:1.6rem 0}
+  .sds-prose > :first-child{@apply mt-0}
+  .sds-prose > :last-child{@apply mb-0}
+  .sds-prose p,.sds-prose li{@apply max-w-none}
+  .sds-prose strong,.sds-prose h4{@apply text-ink}
+  .sds-prose code{@apply text-ink}
+  .sds-prose blockquote{@apply border-l-accent; margin:1rem 0}
+
+  /* NEXT */
+  .sds-nextnav{@apply grid; grid-template-columns:repeat(auto-fit,minmax(16rem,1fr)); gap:.7rem; margin:1.6rem 0}
+  .sds-nextnav-card{@apply flex flex-col bg-card no-underline min-w-0; gap:.15rem; border:1px solid var(--sds-rule); border-radius:3px; padding:.65rem .85rem}
+  .sds-nextnav-card:hover{@apply border-accent}
+  .sds-nextnav-card .sds-direction{@apply font-mono text-xs uppercase text-faint; letter-spacing:.06em}
+  .sds-nextnav-card .sds-title{@apply text-sm font-semibold text-ink}
+  .sds-nextnav-card:hover .sds-title{@apply text-accent}
+  .sds-nextnav-card.sds-next{@apply text-right}
+
+  /* WHAT THE OTHER TEMPLATES AND PAGES ADD. Each rule is kept as its source wrote it. */
+  .sds-eyebrow .sds-state{@apply ml-auto inline-flex items-center; gap:.4rem}
+  .sds-badge.sds-status{@apply font-bold}
+  .sds-badge.sds-status.sds-planning{@apply border-gap text-gap bg-gap-soft}
+  .sds-badge.sds-status.sds-implementing{@apply border-accent text-accent bg-accent-soft}
+  .sds-badge.sds-status.sds-done{@apply border-ok text-ok bg-ok-soft}
+  .sds-tile .sds-glyph{@apply float-right; font-size:.8rem; margin-left:.4rem}
+  .sds-card{@apply bg-card; border:1px solid var(--sds-rule); border-left:2px solid var(--sds-ok); border-radius:0 3px 3px 0; padding:1.1rem 1.25rem; margin-bottom:.9rem}
+  .sds-card h4{@apply text-md}
+  .sds-card .sds-key{@apply font-mono text-xs uppercase text-faint block; letter-spacing:.08em; margin:.6rem 0 .2rem}
+  .sds-card p{@apply text-sm text-slate max-w-none; margin:0 0 .4rem}
+  .sds-card .sds-recommended{@apply mt-3 text-sm text-ink; padding-top:.65rem; border-top:1px dashed var(--sds-rule)}
+  .sds-card .sds-recommended b{@apply text-ok}
+  .sds-card .sds-scroll{margin:.4rem 0}
+  .sds-badge.sds-status.sds-proposed{@apply border-gap text-gap bg-gap-soft}
+  .sds-badge.sds-status.sds-decided{@apply border-ok text-ok bg-ok-soft}
+  .sds-frame{@apply bg-card overflow-hidden; border:1px solid var(--sds-rule); border-radius:3px; margin:1.6rem 0}
+  .sds-frame iframe{@apply block w-full; height:46rem; border:0; background:#fff}
+  .sds-frame .sds-caption{@apply font-mono text-xs text-faint; padding:.45rem .8rem; border-bottom:1px solid var(--sds-rule)}
+
+  /* THE PALETTE. One tone class on a box, a connector, an arrowhead or a badge. A tone is a pair of
+   tokens, the colour and its soft ground, so light and dark both follow and a page never writes a
+   colour of its own. A tone is a plain colour and carries no meaning; a status has classes of its own.
+   The first four tones are tokens the pages had; this file adds the other six. A chart takes its series
+   starting at violet, cyan, pink and olive, so a red line is not read as an error. */
+  .sds-tone-blue{--sds-tone:var(--sds-accent); --sds-tone-soft:var(--sds-accent-soft)}
+  .sds-tone-green{--sds-tone:var(--sds-ok); --sds-tone-soft:var(--sds-ok-soft)}
+  .sds-tone-amber{--sds-tone:var(--sds-gap); --sds-tone-soft:var(--sds-gap-soft)}
+  .sds-tone-red{--sds-tone:var(--sds-fail); --sds-tone-soft:var(--sds-fail-soft)}
+  .sds-tone-violet{--sds-tone:var(--sds-violet); --sds-tone-soft:var(--sds-violet-soft)}
+  .sds-tone-cyan{--sds-tone:var(--sds-cyan); --sds-tone-soft:var(--sds-cyan-soft)}
+  .sds-tone-pink{--sds-tone:var(--sds-pink); --sds-tone-soft:var(--sds-pink-soft)}
+  .sds-tone-olive{--sds-tone:var(--sds-olive); --sds-tone-soft:var(--sds-olive-soft)}
+  .sds-tone-orange{--sds-tone:var(--sds-orange); --sds-tone-soft:var(--sds-orange-soft)}
+  .sds-tone-grey{--sds-tone:var(--sds-grey); --sds-tone-soft:var(--sds-grey-soft)}
+  .sds-drawing .sds-box[class*="sds-tone-"]{@apply fill-tone-soft stroke-tone; stroke-width:1.5}
+  .sds-drawing .sds-connector[class*="sds-tone-"]{@apply stroke-tone}
+  .sds-drawing marker[class*="sds-tone-"]{@apply text-tone}
+  .sds-badge[class*="sds-tone-"]{@apply border-tone text-tone bg-tone-soft}
+
+  /* THE STATUS CLASSES. One status class on a badge or a pull says how a thing stands: info, success,
+   warning or error. Each status has two tokens of its own, the colour and its soft ground, with a dark
+   value. They start at the values of accent, ok, gap and fail. They are tokens of their own, so changing
+   a warning does not change a chart. A status is never a tone of the palette. */
+  .sds-info{--sds-status:var(--sds-info); --sds-status-soft:var(--sds-info-soft)}
+  .sds-success{--sds-status:var(--sds-success); --sds-status-soft:var(--sds-success-soft)}
+  .sds-warning{--sds-status:var(--sds-warning); --sds-status-soft:var(--sds-warning-soft)}
+  .sds-error{--sds-status:var(--sds-error); --sds-status-soft:var(--sds-error-soft)}
+  .sds-badge.sds-info,.sds-badge.sds-success,.sds-badge.sds-warning,.sds-badge.sds-error{@apply border-status text-status bg-status-soft}
+  .sds-pull.sds-info,.sds-pull.sds-success,.sds-pull.sds-warning,.sds-pull.sds-error{@apply border-l-status bg-status-soft}
+  .sds-pull.sds-info .sds-label,.sds-pull.sds-success .sds-label,.sds-pull.sds-warning .sds-label,.sds-pull.sds-error .sds-label{@apply text-status}
+  @media print{
+    :root:root:root{--sds-info:#2f4e7a; --sds-info-soft:#e0e8f4; --sds-success:#2a6459; --sds-success-soft:#dcece8; --sds-warning:#8f5714; --sds-warning-soft:#f7ecda; --sds-error:#a63d3d; --sds-error-soft:#f6e1e1}
+  }
+
+  /* THE GUIDE. A guide is stages, and a stage is steps. A stage is a section that holds steps, with no class
+   of its own. A step is a block in it that numbers itself, so no number is typed, and the count runs on
+   from one stage to the next. A step holds, in this order: why, the command, and what you see. */
+  .sds-guide{counter-reset:step}
+  .sds-step{counter-increment:step; border-top:1px solid var(--sds-rule); padding-top:1.1rem; margin-top:1.6rem}
+  .sds-step:last-of-type{border-bottom:1px solid var(--sds-rule); padding-bottom:1.1rem; margin-bottom:1.6rem}
+  .sds-step > h3{margin:0 0 .6rem}
+  .sds-step > h3::before{@apply inline-block min-w-7 bg-accent-soft text-accent font-mono text-sm font-bold text-center; content:counter(step); margin-right:.65rem; padding:0 .4rem; border:1px solid var(--sds-accent); border-radius:999px; line-height:1.6; vertical-align:.14em}
+  .sds-step > p{margin:0 0 .7rem}
+  .sds-step > pre{margin:.7rem 0}
+  .sds-step-see{border-left:2px solid var(--sds-rule); padding:.1rem 0 .1rem 1rem; margin:.9rem 0 0}
+  .sds-step-see .sds-label{@apply block font-ui text-xs tracking-widest uppercase text-faint; margin-bottom:.2rem}
+  .sds-step-see p{@apply m-0}
+
+  /* THE INDEX of a repository's artifacts: the tree of its pages on the left, and tabs on the right with one
+   page in each. The page fills the window, and each part scrolls by itself. The tree's width is a token. */
+  .sds-index{@apply grid; grid-template-columns:var(--sds-tree-width) minmax(0,1fr); height:100dvh}
+  .sds-index-side{@apply flex flex-col bg-card; gap:.7rem; min-height:0; overflow-y:auto; border-right:1px solid var(--sds-rule); padding:1rem .9rem 2rem}
+  .sds-index-head{@apply flex items-center justify-between; gap:.8rem}
+  .sds-index-where{@apply font-ui uppercase text-faint; font-size:.7rem; font-weight:650; letter-spacing:.15em}
+  .sds-index-note{@apply text-xs text-slate m-0 max-w-none}
+  .sds-index-toggle{@apply flex-none flex items-center p-0 text-slate cursor-pointer; justify-content:center; width:1.7rem; height:1.7rem; border:1px solid var(--sds-rule); border-radius:3px; background:none}
+  .sds-index-toggle:hover{@apply border-accent text-accent bg-accent-soft}
+  .sds-index-main{@apply flex flex-col min-w-0; min-height:0}
+
+  /* The index: a mark that is drawn. It takes the colour of the text around it, so both themes follow. */
+  .sds-index-toggle svg,.sds-tree-new svg{@apply block fill-none; stroke:currentColor; stroke-width:1.4; stroke-linecap:round; stroke-linejoin:round}
+  .sds-index-toggle svg{@apply w-4 h-4}
+  .sds-tree-new svg{width:.85rem; height:.85rem}
+
+  /* The index with its tree folded away: the page has the whole width of the window. The side holds the
+   button alone, and it lies over the left end of the row of tabs, which makes room for it. The script sets
+   the class, and every width is set here. */
+  .sds-index.sds-is-folded{@apply relative; grid-template-columns:minmax(0,1fr)}
+  .sds-index.sds-is-folded .sds-index-side{@apply top-0 overflow-visible; position:absolute; left:0; z-index:1; padding:.42rem .45rem 0; border:0; background:none}
+  .sds-index.sds-is-folded .sds-index-where,.sds-index.sds-is-folded .sds-tree{@apply hidden}
+  .sds-index.sds-is-folded .sds-tabs{padding-left:2.7rem}
+
+  /* The index: the tree. A folder is a details element. The name of a folder and the name of a page that
+   holds pages start at the same place, each after its own fold mark. */
+  .sds-tree{@apply font-ui text-sm}
+  .sds-tree-group > summary{@apply flex items-center cursor-pointer text-ink; gap:.9rem; list-style:none; padding:.3rem .35rem; border-radius:3px; font-weight:650}
+  .sds-tree-group > summary::-webkit-details-marker{@apply hidden}
+  .sds-tree-group > summary::before{@apply flex-none; content:""; width:.36rem; height:.36rem; border-right:1.5px solid var(--sds-faint); border-bottom:1.5px solid var(--sds-faint); transform:rotate(-45deg); transition:transform .15s ease}
+  .sds-tree-group[open] > summary::before{transform:rotate(45deg)}
+  .sds-tree-group > summary:hover{@apply text-accent}
+  .sds-tree-group > summary:focus-visible,.sds-tree-link:focus-visible,.sds-tree-new:focus-visible,.sds-tree-fold:focus-visible,.sds-tab-title:focus-visible,.sds-tab-close:focus-visible,.sds-index-toggle:focus-visible{@apply outline-offset-2; outline:2px solid var(--sds-accent)}
+  .sds-tree-count{@apply ml-auto font-mono font-normal text-faint; font-size:.68rem}
+  .sds-tree-kids{margin:0 0 .25rem .5rem; padding-left:.55rem; border-left:1px solid var(--sds-rule)}
+  .sds-tree-note{@apply text-xs text-slate max-w-none; margin:.2rem 0 .3rem .35rem}
+  .sds-tree-row{@apply flex; align-items:flex-start; gap:.2rem}
+  .sds-tree-link{@apply flex-1 min-w-0 block text-slate no-underline; padding:.26rem .4rem; border-radius:3px; line-height:1.4}
+  .sds-tree-link:hover{@apply text-ink bg-paper}
+  .sds-tree-link.sds-is-current{@apply text-accent bg-accent-soft; font-weight:650}
+
+  /* The index: the mark that opens a page in a new tab. It is a small drawing and not a plus, because in a
+   tree a plus reads as a fold. */
+  .sds-tree-new{@apply flex-none flex items-center p-0 text-slate cursor-pointer; justify-content:center; width:1.45rem; height:1.45rem; margin-top:.12rem; border:1px solid var(--sds-rule); border-radius:3px; background:none}
+  .sds-tree-new:hover{@apply border-accent text-accent bg-accent-soft}
+  .sds-tree-link.sds-is-current + .sds-tree-new{@apply text-accent}
+
+  /* The index: a page that holds pages. Its row opens its page. The mark before the row folds the pages
+   under it, and it is a button of its own, so a click on one never does the work of the other. */
+  .sds-tree-fold{@apply flex-none flex items-center p-0 cursor-pointer; justify-content:center; width:1.05rem; height:1.45rem; margin-top:.12rem; border:0; border-radius:3px; background:none}
+  .sds-tree-fold::before{content:""; width:.36rem; height:.36rem; border-right:1.5px solid var(--sds-faint); border-bottom:1.5px solid var(--sds-faint); transform:rotate(-45deg); transition:transform .15s ease}
+  .sds-tree-fold[aria-expanded="true"]::before{transform:rotate(45deg)}
+  .sds-tree-fold:hover{@apply bg-paper}
+  .sds-tree-fold:hover::before{@apply border-accent}
+
+  /* The index: the tabs. A tab that is not shown keeps its frame, so its page stays loaded. */
+  .sds-tabs{@apply flex gap-1 overflow-x-auto bg-card; align-items:flex-end; padding:.45rem .5rem 0; border-bottom:1px solid var(--sds-rule)}
+  .sds-tab{@apply flex items-center bg-card; flex:0 1 13rem; min-width:6rem; border:1px solid var(--sds-rule); border-bottom:0; border-radius:3px 3px 0 0}
+  .sds-tab.sds-is-current{@apply bg-paper border-accent; box-shadow:inset 0 2px 0 var(--sds-accent)}
+  .sds-tab-title{@apply flex-1 min-w-0 overflow-hidden whitespace-nowrap text-left font-ui text-xs text-slate cursor-pointer; text-overflow:ellipsis; border:0; background:none; padding:.42rem .2rem .42rem .7rem}
+  .sds-tab.sds-is-current .sds-tab-title{@apply text-ink; font-weight:650}
+  .sds-tab-close{@apply flex-none mr-1 text-faint text-md leading-none cursor-pointer; width:1.4rem; height:1.4rem; border:0; border-radius:3px; background:none}
+  .sds-tab-close:hover{@apply bg-accent-soft text-accent}
+  .sds-tab-close[disabled]{visibility:hidden}
+  .sds-panes{@apply flex-1 bg-paper; min-height:0}
+  .sds-pane{@apply block w-full h-full bg-paper; border:0}
+  .sds-pane[hidden]{@apply hidden}
+
+  /* The index: the note of a slot. An entry whose address is still a slot has no page, so its tab shows a note. */
+  .sds-pane-slot{@apply grid p-8; place-content:center; overflow-y:auto}
+  .sds-pane-slot .sds-pull{@apply m-0; max-width:34rem}
+
+  /* The index on a narrow screen: the side sits above the tabs. Folded, it is one line that says where the
+   reader is and holds the button. The script folds the tree at the start, and after a page is chosen. */
+  @media (max-width:60rem){
+    .sds-index,.sds-index.sds-is-folded{grid-template-columns:minmax(0,1fr); grid-template-rows:auto minmax(0,1fr)}
+    .sds-index-side,.sds-index.sds-is-folded .sds-index-side{@apply static bg-card; overflow-y:auto; border-right:0; border-bottom:1px solid var(--sds-rule); padding:.6rem .8rem; max-height:70dvh}
+    .sds-index.sds-is-folded .sds-index-where{@apply block}
+    .sds-index.sds-is-folded .sds-tabs{@apply pl-2}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .sds-tree-group > summary::before,.sds-tree-fold::before{transition:none}
+  }
+}
