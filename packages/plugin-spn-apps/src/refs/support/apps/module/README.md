@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/",
-      "seen": "0bf40864"
+      "seen": "24d4bd12"
     }
   ]
 }
@@ -142,6 +142,30 @@ When you write a service method, compose the same seven steps, in order, each on
 | `utils/` | yes | a pure function exposes no interior — publishing a service would leak how the module works; publishing input-to-output leaks nothing |
 
 An entity's join keys and a pure function's signature are stable by construction; treat everything else in `app/` as not. Reach the rest through the module's contract services — never reach into this layer directly, whichever module you are working from.
+
+### Support — by area, then by kind of file
+
+`app/support/` is the internal toolkit behind the services. Organize it the same way in a module and in an app. Give each subject of the toolkit one **area**: a folder directly under `support/`, named with a full word. Put no file directly in `support/`, so every file has an area that owns it. An area may hold a sub-area, laid out the same way.
+
+| Kind | What it is | Where it sits in its area |
+| --- | --- | --- |
+| **Manager** | a class that runs a lifecycle, such as create, start, stop and sync, or that owns the providers of a seam | the top of the area |
+| **Provider** | a class that implements a seam's interface for one vendor or one stack | the area's `providers/` folder |
+| **Simple class** | a class with one job and no seam: a reader, a store, a checker, a parser | the top of the area |
+| **Util** | a pure function: values in, values out | the area's `utils/` folder, in a file named for its subject |
+| **Types** | the area's interfaces and types, a seam's interface included | the area's one types file |
+| **Constants** | the area's constants | the area's one constants file |
+
+A **seam** is one interface with an implementation behind it for each vendor or stack. A service calls a manager or a util, and only a manager reaches a provider.
+
+- **Write a function that reads a file, runs a command or reads the environment as a method of a class, never as a util.** A util is then safe to call from anywhere, and you test it with plain values.
+- **Export one class from a class file, and nothing else.** A file named for a class promises that class to every file that imports it.
+- **Never name a provider from a service. The manager picks it.** You then add or swap a provider by changing one manager. A class that abstracts a vendor follows the provider seam: one interface, an `mtype`-selected implementation per vendor, configuration as data.
+- **Give every class and every exported type its area as a prefix**: the area, then the subject, then the word for its kind, such as manager, store or reader. A provider ends with its vendor or its stack. A sub-area uses its own name, in the singular, and never the parent's before it. A seam's interface carries the area too, and the seam's subject where an area has more than one seam. An area declares its prefix, and it may be a short code where the area's name is long; the app states each area's prefix once. In a module the module's code is the prefix, and the area follows it only where the module's support holds more than one area.
+- **Build a class as an object.** A manager and a provider hold their own state, and a static method never stands in for a function. A function a class file would export goes to the area's utils where it is pure, and becomes a method where it is not.
+- **Put the tests in the same areas**: one folder for each area, under the area's own name.
+
+How a kind is declared, and what its file is called, belong to the stack. For TypeScript, read `providers/ts/03-structure.md` and `providers/ts/02-naming.md` in this same plugin.
 
 ## How the outside reaches it — entry
 

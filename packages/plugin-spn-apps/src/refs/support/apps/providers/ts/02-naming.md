@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/02-naming.md",
-      "seen": "d33b0502"
+      "seen": "ef2d4538"
     }
   ]
 }
@@ -82,11 +82,31 @@
 | a constructor config | `{Class}Config`, no `I` | `SPHttpClientAxiosConfig` |
 | an input command | `{Action}{Entity}Command` | `CreateUserCommand` |
 
+### Support classes and seams
+
+**A class under `app/support/` tells you which area its file is in.** The kinds of file are `module/README.md` in this plugin; this is how TypeScript names them.
+
+| What is named | Pattern | Example |
+| --- | --- | --- |
+| a support class | the area, then the subject, then the kind | `KindManifestStore`, `IngressCertificateManager` |
+| a provider | the same, ending with its vendor or its stack | `IngressProviderNginx`, `AppsProviderTS` |
+| a seam's interface | `I`, then the area, then `Provider`; the seam's subject follows the area where an area has more than one seam | `IIngressProvider`, `IDeployReleaseStoreProvider` |
+| an exported type | the area, then the subject | `KindProfile`, `TSNodeIdentifier` |
+| an area's prefix | the area's name, or the short code the area declares where its name is long | `TS` for `typescript/`, `LInfra` for `local-infra/` |
+| the prefix of a sub-area | the sub-area's own name, in the singular, never the parent's before it | `resources/` gives `ResourceManager` |
+| a util file | kebab-case, named for its subject, with no prefix | `utils/platform-slot.ts` |
+
+**Name the file of a class exactly after the class**: `ingress/IngressManager.ts`. A util file takes no prefix, because the folder already says the area. `interface.ts` and `constants.ts` take none for the same reason.
+
+**In a module, the module code is the prefix.** The area follows it only where the module's support holds more than one area: `<MOD><Area><Subject><Kind>`.
+
+**Build a class with `new`; a `static` method never stands in for a function.** A function a class file would export goes to the area's `utils/` where it is pure.
+
 **Enums are PascalCase with a `Type` suffix, always.** In `contract/states/` the enum key is `UPPER_SNAKE_CASE` matching its string value, never a PascalCase key. Values are strings, never numeric.
 
 **Functions and methods are camelCase and start with an action verb** — get, set, create, update, delete, validate. A function that computes or derives a value takes the `prepare*` prefix.
 
-**Write helpers under `app/utils/` as exported `const` arrow functions, verb first.** A never-returning throw or assert helper must stay a `function` declaration, because TypeScript applies never-returning narrowing only to declarations.
+**Write helpers under `app/utils/`, or under a support area's `utils/`, as exported `const` arrow functions, verb first.** A never-returning throw or assert helper must stay a `function` declaration, because TypeScript applies never-returning narrowing only to declarations.
 
 ### The privacy markers, and why they are not interchangeable
 
@@ -191,6 +211,9 @@
 | --- | --- | --- |
 | Class | PascalCase | `UserService` |
 | Class interface | `I` + PascalCase | `IUserService` |
+| Support class | area + subject + kind | `KindManifestStore` |
+| Support provider | area + `Provider` + vendor | `IngressProviderNginx` |
+| Seam interface | `I` + area + `Provider` | `IIngressProvider` |
 | Props interface | `I` + component + `Props` | `IDSButtonProps` |
 | Contract entity | PascalCase, no `I` | `User` |
 | State levels | Meta inside Info inside the state, by `extends` | `IdentityMeta` |

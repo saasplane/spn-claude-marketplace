@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/03-structure.md",
-      "seen": "970c27b2"
+      "seen": "d9bb05ab"
     }
   ]
 }
@@ -70,7 +70,14 @@ packages/<name>/
 **What each layer folder may hold is a rule, not a habit.**
 
 - **`app/services/`, `app/repositories/` and `app/entities/` hold classes only** — one class per file, named after the class. A helper one class needs is a private method; a helper several need goes to `app/utils/` or an installed support package.
-- **`app/support/` is the module's internal toolkit and is deliberately looser.** It may mix classes, multi-export util files and type files, and may nest by area. It is the one area organized by feature rather than by role.
+- **`app/support/` is the internal toolkit of a module or an app, organized by area and then by kind of file.** It is the one area of `app/` organized by feature before role. An area is a kebab-case folder named with a full word, and no file sits directly in `support/`. The kinds are `module/README.md` in this plugin; each has a TypeScript form:
+  - **A manager or a simple class** is one class in a file named for it, at the top of its area: `ingress/IngressManager.ts`, `kind/KindManifestStore.ts`. The file exports that class and nothing else.
+  - **A provider** is `providers/<Area>Provider<Vendor>.ts`, and it implements the seam's interface: `ingress/providers/IngressProviderNginx.ts`.
+  - **A util** sits in `utils/<subject>.ts`, a kebab-case module file with several exports: `ingress/utils/registration.ts`. Every function in it is pure. A function that reads a file, runs a command or reads the environment is a method of a class.
+  - **The area's types** sit in its `interface.ts`, and a seam's interface sits there with them.
+  - **The area's constants** sit in its `constants.ts`.
+
+  How each of these is named is `02-naming.md`, under *Support classes and seams*.
 - **`contract/services/` files each export one `I<MOD><Entity>Service` interface** and carry no logic.
 - **`entry/` transports are classes** — controllers, listeners — thin and delegating, never free functions and never where business logic lives.
 
