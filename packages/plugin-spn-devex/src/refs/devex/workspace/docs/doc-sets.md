@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/README.md",
-      "seen": "074a12a7"
+      "seen": "a835892a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -480,7 +480,7 @@ Every page somebody writes by hand is copied from a template, and the templates 
 | `templates/pages/` | `hub-template.html` · `overview-template.html` · `construct-template.html` · `report-template.html` · `blocks-template.html` | the page kinds a repository has — hub, overview, construct — and the report; the blocks template shows every block and figure kind rendered |
 | `templates/seat-files/` | `construct-seat-template.md` · `schema-template.sql` | what an author writes *inside* a seat: the markdown a construct page is produced from, and the authoritative data model |
 | `templates/workstream/` | `approach-template.html` · `approach-preview-template.html` · `arc-template.md` · `order-template.md` · `handover-template.md` | the workstream's own files. **The approach document is here because an argument is a workstream's**, never a repository's |
-| `templates/agent/` | `skill-template.md` · `agent-template.md` · `lens-template.md` · `ref-template.md` · `hook-template.py` | the agent's own files — hand-written too, and a kind with no template gets written from the last one its author happened to see |
+| `templates/agent/` | `skill-template.md` · `agent-template.md` · `lens-template.md` · `ref-template.md` · `hook-template.ts` | the agent's own files — hand-written too, and a kind with no template gets written from the last one its author happened to see |
 
 **The plugin and the CLI carry different sets, because they answer different moments.** `pages/` and `seat-files/` ship in both, since the agent copies one to write a page and `repo create` emits a started hub page. `workstream/` and `agent/` ship in the plugin alone: the CLI creates a workstream folder with `mkdir` and owes no shape, and it never writes a skill. The copies are stamped with the book's hash and exported on release, so a release whose copies disagree with the source fails rather than publishing drift.
 
