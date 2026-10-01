@@ -38,11 +38,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "456ac9a4"
+      "seen": "cb091991"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "a6187bd5"
+      "seen": "c1f3a9d0"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -377,7 +377,7 @@ the previous section's rule.
 **Needs you** at the start of that reply, and never again in the body of the same reply. After that
 it is one line, for as long as it stays open. A card repeated in full in every reply buries the
 progress, just as agent reports in the chat bury a card, and a card shown twice in one reply reads as
-two questions. The full card stays on the approach page, where anybody can read it again.
+a second question. The full card stays on the approach page, where anybody can read it again.
 
 **Ask only the questions and suggestions of the workstream you are working on — MUST**
 (`RD.DEVEX.WORKSPACE.197`). The cards under **Needs you** are the ones on that workstream's page. A
@@ -577,6 +577,22 @@ a whole file, or what a command prints.
 | they say neither, and it must be opened in a browser to be judged, or it is longer than one screen | write it, and link it from the approach page |
 | they approve a preview that was shown in chat | save it as a file and link it |
 | nobody asked, and no rule owes a preview | write nothing |
+
+**A preview holds what the developer judges, and nothing you need — MUST** (`RD.DEVEX.WORKSPACE.210`).
+It is written for the person who says yes or no. Show the proposal in its final form, the few rules it
+rests on, and the choices asked. What you measured, the commit you read, the order of the work and the
+plan stay in the arc.
+
+How much a preview shows follows the decision, and not the work it took to reach it.
+
+| The change | The preview shows |
+| --- | --- |
+| a folder or a set of files is restructured | the final tree, with a comment on each line |
+| a new page, message or report | a sample of it |
+| a rule changes | the sentence before and after |
+
+Before you write a section, ask whether the developer needs it to answer. A section that only shows
+how thorough you were goes into the arc's log.
 
 **A preview outside any workstream uses the same template — MUST** (`RD.DEVEX.WORKSPACE.209`). When
 the developer asks for something no workstream owns and it must be shown as a page, copy

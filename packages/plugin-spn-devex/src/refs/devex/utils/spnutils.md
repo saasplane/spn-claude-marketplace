@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "375d374b"
+      "seen": "44f0c76c"
     }
   ],
   "decisions": [
@@ -201,6 +201,28 @@ one laptop without evicting each other's registration. The exceptions are the ge
 machine-singleton pieces: the trust root and the shared `:443` proxy, each named for the machine and
 never for an organization. Everything under `cache/` may be deleted at any time at the cost of
 recomputing it; nothing else there should be.
+
+**What you have there, by top-level folder.** Read this before you look for any of it in source.
+
+| Path under `~/.spnutils` | Holds |
+| --- | --- |
+| `certs/` | the machine's trust root, and each platform's certificates under `{org}/{spc}/` |
+| `ingress/` | the shared proxy and the machine resolver: compose file, `nginx/conf.d/` with a vhost for each registered app |
+| `platforms/{org}/{spc}/` | the rendered platform stack, its app registry, its routes, its spaces and its modules |
+| `estate/{org}/{spc}/` | resolved state, and the engine's working data for each layer |
+| `registry/` | the machine store: every estate package released with `--local` |
+| `cache/` | copies that can be fetched again, such as the engine's providers |
+| `browser/chrome/` | the automation browser profile: the machine's own, and deliberately not the developer's Chrome |
+
+**The browser profile is yours to drive, and the developer's Chrome never is.** Chrome refuses
+automation on a person's default profile, so `infra organization up` provisions this separate one. It
+holds live credentials for real accounts: never commit it, copy it or print from it.
+
+**Look at a page you built before you hand it over.** Load it from disk in this profile, in light and
+in dark, and read what the browser computed: failed requests, console errors, sideways scroll, and a
+screenshot. Open it with Playwright's `chromium.launchPersistentContext` on `~/.spnutils/browser/chrome`,
+with `channel: 'chrome'` and `headless: true`, from a repository that has `@playwright/test`. Starting
+Chrome by hand with a profile of your own hangs. Open a published page only when the developer asks.
 
 ## What this ref leaves to the book
 
