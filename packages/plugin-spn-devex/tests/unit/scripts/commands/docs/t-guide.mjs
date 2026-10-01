@@ -354,6 +354,20 @@ tool record
   same("[MKT.SCRIPTS.106] step sections: sections that are steps, one after another, are one stage, which the guide did not name",
     headsOf(text), ["Overview", "Before you start", "Steps", "Clean reset", "Steps"]);
   ok("[MKT.SCRIPTS.106] step sections: the run counts each stage and each step", ran.out.includes("3 stage(s) · 4 step(s)"), ran.out);
+  // A guide that numbers its sections, `## 1. …`, says the same thing as one that writes `## Step 1 — …`.
+  const NUMBERED = block({ id: "sample-stand-it-up", title: "Stand It Up", lenses: ["QA"], status: "DONE", summary: "Stand it up." }) + "\n# Stand It Up\n\nYou stand the platform up and check it.\n\n## 1. Stand the platform\n\nThe tests need the platform.\n\n```bash\ntool platform up\n```\n\n" +
+    "## 2. Run the unit tests\n\n```bash\ntool test\n```\n\n## 3. Remove the data\n\n```bash\ntool clean\n```\n\n## 4. Record the run\n\n```bash\ntool record\n```\n";
+  const numbered = repo({ [`${GUIDES}/01-stand-it-up.md`]: NUMBERED });
+  const numberedRun = guide([join(numbered, GUIDES, "01-stand-it-up.md")]);
+  const numberedOut = `${PAGES}/stand-it-up${GUIDE_PAGE_SUFFIX}`;
+  same("[MKT.SCRIPTS.106] step sections: a heading that opens with a number and a dot is a step too, without its typed number",
+    numberedRun.code === 0 && existsSync(join(numbered, numberedOut)) ? stepsOf(read(numbered, numberedOut)) : numberedRun.out,
+    ["Stand the platform", "Run the unit tests", "Remove the data", "Record the run"]);
+  // The same guide with a `###` heading under one numbered section numbers its stages, and that heading is the step.
+  const staged = repo({ [`${GUIDES}/01-stand-it-up.md`]: NUMBERED.replace("The tests need the platform.", "### Start the engine\n\nThe tests need the platform.") });
+  const stagedRun = guide([join(staged, GUIDES, "01-stand-it-up.md")]);
+  same("[MKT.SCRIPTS.106] step sections: where a numbered section holds a `###` heading, the numbered sections are stages and keep their numbers",
+    stagedRun.code === 0 && existsSync(join(staged, numberedOut)) ? stepsOf(read(staged, numberedOut)) : stagedRun.out, ["Start the engine"]);
   same("[MKT.SCRIPTS.106] step sections: a step holds what its section holds, and a heading under it is a part of the step",
     stepAt(text, "stand-the-platform").split("\n"), [
       `  <div class="sds-step">`,

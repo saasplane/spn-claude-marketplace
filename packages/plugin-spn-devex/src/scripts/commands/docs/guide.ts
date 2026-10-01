@@ -232,6 +232,11 @@ const SEEN = /(?:\*\*What you see[:.]?\*\*:?|What you see:)\s*/;
 const TYPED_NUMBER = /^(?:Step\s+)?\d+\s*[.):—–-]\s+/i;
 /** A heading that says it is a step, whatever its level: the word `Step`, a number and a dash. */
 const STEP_NAME = /^Step\s+\d+\s*[—–-]\s+/i;
+/**
+ * A section's name that opens with a number and a dot: `3. Run it`. Where no numbered section of a guide
+ * holds a `###` heading, each numbered section is a step. Where one does, the numbered sections are stages.
+ */
+const NUMBERED_NAME = /^\d+\s*[.)]\s+/;
 /** The name of a stage that the guide did not name: its steps are sections of the guide itself. */
 const UNNAMED_STAGE = "Steps";
 
@@ -324,7 +329,8 @@ function headingStep(name: string, inside: Block[], tally: Tally, link: Link): s
 /**
  * The sections of a guide's page. Where its steps are the rows of a table with a `Step` and a `Runs`
  * column, the sections before that table's section are what must be true first. Otherwise a section
- * is a stage, and a step is a `###` heading under it or a heading that opens with `Step N —`.
+ * is a stage, and a step is a `###` heading under it, a heading that opens with `Step N —`, or a `##` section
+ * that opens with `N.` in a guide whose numbered sections hold no `###` heading.
  */
 function sectionsOf(guide: Guide, link: Link): { sections: string[]; tally: Tally } {
   const tally: Tally = { stages: 0, steps: 0, ids: new Set(), noCommand: [], noResult: [], loose: [] };
@@ -360,8 +366,16 @@ function sectionsOf(guide: Guide, link: Link): { sections: string[]; tally: Tall
     add(UNNAMED_STAGE, gathered);
     gathered = [];
   };
+  // A guide numbers either its stages or its steps. It numbers its steps where no numbered section holds a
+  // `###` heading, because a `###` heading under a section is a step of that section.
+  const numbersItsSteps = !guide.sections.some((section) => NUMBERED_NAME.test(plain(section.title))
+    && section.content.some((one) => one.kind === "heading" && one.level === 3));
   for (const section of guide.sections) {
-    if (STEP_NAME.test(plain(section.title))) { gathered.push(...headingStep(section.title, section.content, tally, link)); continue; }
+    const title = plain(section.title);
+    if (STEP_NAME.test(title) || (numbersItsSteps && NUMBERED_NAME.test(title))) {
+      gathered.push(...headingStep(section.title, section.content, tally, link));
+      continue;
+    }
     closeStage();
     const opens = section.content.flatMap((one, at) =>
       (one.kind === "heading" && (one.level === 3 || STEP_NAME.test(plain(one.text))) ? [at] : []));
@@ -433,7 +447,7 @@ function pageOf(guideFile: string, options: { name: string | null; out: string |
   if (tally.steps === 0)
     return [{ grade: "RULE", check: "guide", file, message:
       "this guide holds no step, so no page is written. A step is a row of a table with a `Step` and a `Runs` column, " +
-      "a `###` heading under a `##` section, or a heading that opens with `Step`, a number and a dash. " +
+      "a `###` heading under a `##` section, a heading that opens with `Step`, a number and a dash, or a `##` section that opens with a number and a dot. " +
       "Bring the guide to the shape of steps first (05-artifacts.md, The guide page)" }];
 
   const named = locationOf(file, workspace);
