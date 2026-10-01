@@ -88,6 +88,10 @@ same("a path outside one names none", tree.workstreamDirOf(SEAT_FILE), null);
 same("an arc file is an .md directly under arcs/",
   [join(WORKSTREAM, tree.ARCS, "N1-probe.md"), join(WORKSTREAM, tree.ARCS, "deep", "N1.md"), join(WORKSTREAM, "notes.md")].map(tree.isArcFile),
   [true, false, false]);
+same("an approach page is a workstream's approach.html, or a page with the approach suffix",
+  [join(WORKSTREAM, tree.APPROACH_PAGE), join(WORKSTREAM, `probe${tree.APPROACH_SUFFIX}`), join(WORKSTREAM, "approach.md"),
+   join(WORKSTREAM, "preapproach.html")].map(tree.isApproachPage),
+  [true, true, false, false]);
 same("the arc pattern reads a command that names one",
   tree.arcPathPattern(false).test(`cat ${join(WORKSTREAM, tree.ARCS, "N1-probe.md")} | head`), true);
 

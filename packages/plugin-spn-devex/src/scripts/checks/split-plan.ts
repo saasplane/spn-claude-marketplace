@@ -39,7 +39,7 @@ import { TERMINAL, statusIn } from "./arc-status.ts";
 import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { emit, isDir, isFile, listdir, read, readPayload, runAlone, unescape, workspaceRoot,
          type Payload, type Verdict } from "../lib/payload.ts";
-import { APPROACH_SUFFIX, ARCS, DEVEX, SESSIONS, WORKSTREAM_STATES, WORKSTREAMS, legacyWorkstreamsDir, workstreamsDir,
+import { APPROACH_SUFFIX, ARCS, DEVEX, SESSIONS, WORKSTREAM_STATES, WORKSTREAMS, isApproachPage, legacyWorkstreamsDir, workstreamsDir,
          type WorkstreamState } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 // The state a row reaches. `landed` is the only one that satisfies the documents pass; all three
@@ -99,7 +99,7 @@ const startsWithAny = (text: string, prefixes: string[]) => prefixes.some((p) =>
 //
 // It is deliberately a superset: `closed` and `arcs` as bare words match a commit message that merely
 // mentions them, and those pay the full sweep. A guard that errs toward running is the right error.
-const TOUCHES_PLAN = /-approach\.html|\.spndevex|\bworkstreams?\b|\bsessions\b|\barcs\b|\bclosed\b/i;
+const TOUCHES_PLAN = /\bapproach\.html|\.spndevex|\bworkstreams?\b|\bsessions\b|\barcs\b|\bclosed\b/i;
 
 /** Everything this call says about where it is pointed — the path form and the shell form. */
 function subjectText(payload: Payload): string {
@@ -481,7 +481,7 @@ function pagesIn(folder: string): string[] {
       let stat;
       try { stat = statSync(full); } catch { continue; }
       if (stat.isDirectory()) { if (!SKIP.has(entry)) walk(full); }
-      else if (entry.endsWith("-approach.html")) out.push(full);
+      else if (isApproachPage(entry)) out.push(full);
     }
   };
   walk(folder);
@@ -982,7 +982,7 @@ export function gateClose(payload: Payload): Verdict {
     // A move is the act the gate is written for. A write straight into `closed/` is the same act by
     // another route — except on the page itself, which must stay editable so a row nobody decided
     // can be decided.
-    if (closing(full) && !full.endsWith("-approach.html")) candidates.push([null, full]);
+    if (closing(full) && !isApproachPage(full)) candidates.push([null, full]);
   }
 
   for (const [source, destination] of candidates) {

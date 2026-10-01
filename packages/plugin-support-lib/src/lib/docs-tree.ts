@@ -209,6 +209,17 @@ export type WorkstreamState = (typeof WORKSTREAM_STATES)[number];
 export const ARCS = "arcs";
 /** What an approach page's file name ends in. It lives in its workstream, never in a docs tree. */
 export const APPROACH_SUFFIX = "-approach.html";
+/** A workstream's own page. The folder carries the number and the subject, so the file name repeats neither. */
+export const APPROACH_PAGE = "approach.html";
+
+/**
+ * Whether a file is an approach page: a workstream's `approach.html`, or a page named
+ * `<subject>-approach.html`, which is the name a closed workstream keeps.
+ */
+export function isApproachPage(path: string): boolean {
+  const name = slashes(path).split("/").pop() ?? "";
+  return name === APPROACH_PAGE || name.endsWith(APPROACH_SUFFIX);
+}
 
 /** The folder holding one state's workstreams, `<root>/.spndevex/workstreams/<state>`. */
 export function workstreamsDir(root: string, state: WorkstreamState): string {

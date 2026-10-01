@@ -42,7 +42,7 @@
 import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { basename, dirname, join, resolve, relative, sep } from "node:path";
 import { emit, readPayload, runAlone, unescape, type Payload, type Verdict } from "../lib/payload.ts";
-import { APPROACH_SUFFIX, ARTIFACT, PLUGIN_TEMPLATES, POCKET, decisionsRegister, inArtifacts, isArcFile,
+import { APPROACH_SUFFIX, ARTIFACT, PLUGIN_TEMPLATES, POCKET, decisionsRegister, inArtifacts, isApproachPage, isArcFile,
          isRegister as inRegisters, workstreamDirOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { cyclesOf, statusWord } from "../commands/docs/cycles.ts";
 
@@ -1048,7 +1048,7 @@ export function watched(path: string): boolean {
   const base = parts[parts.length - 1];
   if (base.endsWith(".md") && p.includes("/.spndevex/")) return false;
   if (base.endsWith(".html"))
-    return base.endsWith("-approach.html") || base.endsWith("-overview.html")
+    return isApproachPage(base) || base.endsWith("-overview.html")
         || inArtifacts(p) || p.includes("/.spndevex/notes/");
   if (base === "README.md" || base === "CONCEPT.md") return true;
   if (!base.endsWith(".md")) return false;
@@ -1081,7 +1081,7 @@ export function check(path: string, text: string, fragment = false): Finding[] {
   // An arc is state, not corpus: only its step rows are read, and only whole.
   if (isArc(path)) return fragment ? [] : arcSteps(path, text);
   const isHtml = path.endsWith(".html");
-  const isApproach = path.endsWith("-approach.html");
+  const isApproach = isApproachPage(path);
   const isOverview = path.endsWith("-overview.html");
   const prose = proseOf(text, isHtml);
   const out: Finding[] = structural(path);

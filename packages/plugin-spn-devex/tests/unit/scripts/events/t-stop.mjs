@@ -146,6 +146,22 @@ one("an open workstream whose only arcs are N-named, and no page",
   workspace("stop-pageless-new", { [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-a-subject.md`]: ARC() }),
   "warns", { says: "An open workstream with arcs and no page", parity: false, why: F11 });
 
+console.log("\n=== stop — a workstream's page is found by the name approach.html");
+
+one("an open workstream whose page is approach.html, naming its arc",
+  workspace("stop-approach-page", {
+    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/approach.html`]: page({ names: ["N1-a-subject.md"] }),
+    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-a-subject.md`]: ARC(),
+  }),
+  "silent", { parity: false, why: "the Python finds a page by its suffix only" });
+
+one("the same page, with an arc it does not name",
+  workspace("stop-approach-page-unnamed", {
+    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/approach.html`]: page({ names: [] }),
+    [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-a-subject.md`]: ARC(),
+  }),
+  "warns", { says: "An arc the page does not name", parity: false, why: "the Python finds a page by its suffix only" });
+
 console.log("\n=== stop — F16: the template's own unanswered card must read as open");
 
 // The card template ships `<b>Decision:</b> &mdash;`. A check that asks only whether the marker is

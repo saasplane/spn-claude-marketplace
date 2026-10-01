@@ -39,7 +39,7 @@ import { STEP_ID, answeredNumbers, cardsOf, heldOn, isInProgress, markedAgo, ope
          workstreamPlan } from "../checks/split-plan.ts";
 import { TERMINAL } from "../checks/arc-status.ts";
 import { workspaceRoot } from "../lib/payload.ts";
-import { DEVEX, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { DEVEX, isApproachPage, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { cacheState, welcome } from "./orientation.ts";
 import { begin, span, end, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
 
@@ -174,7 +174,7 @@ function arcsOf(ws: string): string[] {
 }
 
 function pagesOf(ws: string): string[] {
-  try { return readdirSync(ws).filter((f) => f.endsWith("-approach.html")).map((f) => join(ws, f)); }
+  try { return readdirSync(ws).filter(isApproachPage).map((f) => join(ws, f)); }
   catch { return []; }
 }
 

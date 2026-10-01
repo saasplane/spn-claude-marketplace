@@ -15,7 +15,7 @@
 import { basename, dirname, join, resolve } from "node:path";
 import { STATUSES } from "../../checks/arc-status.ts";
 import { isDir, isFile, listdir, read, workspaceRoot } from "../../lib/payload.ts";
-import { WORKSTREAM_STATES, workstreamsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { WORKSTREAM_STATES, isApproachPage, workstreamsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { argsText, begin, commandFacts, end, record } from "../../../../../plugin-support-lib/src/lib/timing.ts";
 
 export const describe = "print a workstream's Cycles table from its arcs — one row per arc, with its status";
@@ -166,7 +166,7 @@ export function tableOf(cycles: Cycle[]): string {
 export function workstreamFolder(target: string, workspace: string | null): string | null {
   const direct = resolve(target);
   if (isDir(direct)) return direct;
-  if (isFile(direct) && direct.endsWith("-approach.html")) return dirname(direct);
+  if (isFile(direct) && isApproachPage(direct)) return dirname(direct);
   if (!workspace) return null;
   for (const state of WORKSTREAM_STATES) {
     const base = workstreamsDir(workspace, state);

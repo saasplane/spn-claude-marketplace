@@ -92,6 +92,8 @@ try {
     ok("by folder", workstreamFolder(folder, null) === folder);
     ok("by its approach page", (writeFileSync(join(folder, "probe-approach.html"), "<h1>x</h1>"),
       workstreamFolder(join(folder, "probe-approach.html"), null) === folder));
+    ok("by a page named approach.html", (writeFileSync(join(folder, "approach.html"), "<h1>x</h1>"),
+      workstreamFolder(join(folder, "approach.html"), null) === folder));
     ok("by number, in any state", workstreamFolder("042", TMP) === folder);
     ok("by folder name", workstreamFolder("042-probe", TMP) === folder);
     ok("an unknown name finds nothing", workstreamFolder("999", TMP) === null);

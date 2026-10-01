@@ -51,7 +51,7 @@ import { homedir } from "node:os";
 import { basename, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { isDir, isFile, listdir, read, readPayload, runAlone, type Payload } from "../lib/payload.ts";
-import { ARCS, DEVEX, SESSIONS, WORKSTREAM_STATES, legacyWorkstreamsDir, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { ARCS, DEVEX, SESSIONS, WORKSTREAM_STATES, isApproachPage, legacyWorkstreamsDir, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { begin, end, record, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
 
 const MARKETPLACE = "saasplane";
@@ -289,7 +289,7 @@ export function workstreams(root: string): Workstream[] {
           // workstream's own. A recursive `find` therefore linked a retired page belonging to
           // another repo, and the arc count matched a template rather than the arcs.
           page: (() => {
-            const own = listdir(path).filter((f) => f.endsWith("-approach.html")).sort()[0];
+            const own = listdir(path).filter(isApproachPage).sort()[0];
             return own ? join(path, own) : "";
           })(),
           arcs: listdir(join(path, "arcs")).filter((f) => f.endsWith(".md")).length,
