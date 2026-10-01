@@ -42,7 +42,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "66bc4cd2"
+      "seen": "340bd4d5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -52,7 +52,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An order is one delegated execution, and every order follows the same rules",
-      "seen": "1dac3af9"
+      "seen": "fd40ae39"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -66,7 +66,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "b86c3be4"
+      "seen": "e4416974"
     }
   ]
 }
@@ -497,6 +497,22 @@ the card is answered, the answer is recorded, the mark goes, and the row runs ag
 `notes/N<nnn>/orders/00-facts.md` holds only what belongs to that arc: which checkouts the agents
 share, which nodes are shared, and which gates an agent may run and what they printed at the pin.
 
+**Delegate only work longer than about 15 minutes — MUST** (`RD.DEVEX.WORKSPACE.211`). The
+coordinator is the session that writes the orders and reads what comes back. Do shorter work yourself:
+an order carries 10 to 20 minutes of fixed cost before any of the work is done.
+
+**Before the first order that changes code by hand, show one real before-and-after and wait for a
+yes — MUST.** *By hand* means an agent edits each file itself, and no script makes the change. Take
+one real piece of the code the orders will change, and show it as it is now and as it will be, as a
+[preview](#anything-the-developer-has-not-reviewed-preview-confirm-record-then-code). Send the orders
+once the developer has said yes. A change described in words is read differently by each agent, and
+the work is then done twice.
+
+**An order names the few parts to read — MUST.** Write *Read first* as files with a section, a
+function or lines, and name a whole document only where the whole is needed. When you carry out an
+order, read those parts first, and go beyond them only where a step cannot be done without it. Each
+read is a round trip of about 20 seconds.
+
 **An agent edits only the files its order names.** Another agent owns every other file. When a
 change needs a file outside the list, the agent stops and says so in its report, because two agents
 writing one file lose one agent's work without a signal.
@@ -521,16 +537,30 @@ command, and it does not list processes with `pgrep -f` or `ps -f`, since both p
 **A comment states what is true now.** It never says *moved from*, *used to* or *was*. The history
 lives in the arc's Log and in the commit.
 
-**The report is the agent's final message.** It lists every file changed, created or deleted, by
-absolute path, each with one line on what changed. It pastes the `git diff --stat` for those files
-as printed. It gives each gate as the command, its exit code, its counts and whether the cache was
-off. It ends with the register text owed, what was found but not changed (each with its file), and
-what needs the developer.
+**The hand-back is short, and it lists no file — MUST** (`RD.DEVEX.WORKSPACE.211`). An order's
+report is the agent's hand-back to the coordinator: its final message, saved beside the order as
+`<order>-report.md`. The reply is at most 15 lines. The file is at most 40 lines, and may hold the
+same text. It says five things:
+
+- each step, done or not done;
+- each gate as the command, its exit code, its counts and whether the cache was off;
+- what the agent decided that the order did not say;
+- what is left, with the register text owed and anything found and not changed;
+- what needs the developer.
+
+It lists no file and pastes no diff, because the coordinator reads both from git in one command. A
+hand-back is not a report artifact: it has no template, no header and no sections, and no rule of the
+`report` skill applies to it.
 
 **An order states its loop, and the loop is fixed — MUST** (`RD.DEVEX.WORKSPACE.207`). Documents come
 first, then source, then the changed cases run alone until they pass, then the whole level once, then
 the stamp. A case written to fail first is one narrow run on the unchanged code, never a whole level.
 No source or test file changes while a test run for that repository is in flight.
+
+**An order takes no baseline of its own where a run on the same commit exists — MUST.** The arc's
+`00-facts.md` holds what each gate printed at the pin, and the *Before* number comes from there. Where
+no run on that commit exists, run the gate once before you change anything. **Run the gates once, at
+the end of each step.** Inside a step, run only the changed cases.
 
 **An agent launches no child agent — MUST.** A child can go on writing after its parent has reported,
 so the coordinator reads a tree that is still moving. Every order says so under *Never*.
@@ -692,6 +722,13 @@ line or its `## Previews` table. The header's status reads `PLANNING` while no a
 grew, owes the page its `Why`, its `What` and its `How`, and a Subtitle and a Description that still
 cover what the page plans. A `What` or `How` subsection that has a preview ends in a *Read the
 preview →* line.
+
+**You commit the workstream's folder, by path, and you never push it — MUST**
+(`RD.DEVEX.WORKSPACE.213`). The commit goes into the git repository that holds `.spndevex`. Commit the
+folder at three moments: when an arc lands, when a card is answered, and before a script edits the
+approach page. Name the folder in the commit, so it holds that workstream and nothing another window
+has written. A page that is not in git exists in one place, and a script that empties it leaves no
+copy. This is the coordinator's commit: an agent carrying out an order still commits nothing.
 
 **An arc's file is named `N<nnn>-<subject>.md`** (`RD.DEVEX.WORKSPACE.203`): a three-digit number and
 a subject of two to four words, such as `N002-bound-handoff.md`. The heading inside keeps the full

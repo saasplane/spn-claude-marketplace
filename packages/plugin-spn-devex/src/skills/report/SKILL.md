@@ -17,7 +17,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "Reports and templates",
-      "seen": "d942c681"
+      "seen": "dd9b7397"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -43,7 +43,7 @@ description: Write one of the five reports on a repository — coverage (how muc
 
 **A report measures one repository against one question, at one moment** (decision `RD.DEVEX.WORKSPACE.149`). It has two readers. A leader reads it to learn where things stand and presents it for review, so its first screen stands alone. You read it as a work list: you close the gaps a rule lets you close, and you bring the developer only the decisions that need a person.
 
-**A report is written on request and never on initiative.** If nobody asked, do not write one.
+**A report is written on request and never on initiative.** If nobody asked, do not write one and do not refresh one.
 
 **The report fixes nothing.** It says what was found. You then open an arc for the records you may close, marking the flagged ones, and raise a `Q<n>` card for each record only the developer can decide. Running the measurement again is how the next report shows what closed.
 
@@ -307,7 +307,7 @@ Developers and leaders who have not learned the book's words read a report, so i
 
 ## Bring the numbers of an existing page current
 
-**`spn-devex report refresh <page>` measures a `coverage` or a `tests` report again and writes the numbers into the page.** Run it when a run has stamped rows, or a fix has landed, since the page was written.
+**`spn-devex report refresh <page>` measures a `coverage` or a `tests` report again and writes the numbers into the page.** Run it when a developer asks for the report to be brought current (decision `RD.DEVEX.WORKSPACE.212`). A release, a close or a finished run is not a reason to run it. Stamping the rows stays part of every run, whether or not a page exists.
 
 - **What it writes**: the tiles, the breakdown bar and its legend, the count cells of the Findings tables, the digest, and `generatedAt`. On a `tests` report it also writes `measuredAt`, and leaves the key out where no run is stamped.
 - **What it leaves to you**: every sentence. Read the verdict, the terms line, Top gaps, Records and Recommendations against the new numbers, and set Commit in the header to the commit you measured.
