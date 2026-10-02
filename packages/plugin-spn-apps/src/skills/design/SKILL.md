@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/01-common/",
-      "seen": "505a5b27"
+      "seen": "33a62cff"
     }
   ]
 }
@@ -74,7 +74,8 @@ A container is optional. Use one where a part of the page has a header, content 
 
 - **Give one container to each part that reads as one unit.** Parts that should sit apart are separate containers, or cards. A container frames a part of a page. A card, `DSCard`, frames one thing.
 - **Write the parts in one order**: `DSContainer.Header`, then `DSContainer.Content`, then `DSContainer.Footer`. A container holds one or more content parts, and at most one header and one footer.
-- **A content part holds one block that fits its frame, or blocks that sit inset.** A table, a list, a code block, a group of accordions and an empty state fit. Every other block sits inset.
+- **The page decides what fills a part.** Write `flush` on a part whose content reaches the edge of the frame, such as a table. A part without `flush` insets everything it holds.
+- **In a `flush` part, a block that draws a border of its own draws none.** Those blocks are a table, a list, a code block, an accordion and an empty state. Every other block reaches the edge.
 - **Never put a container inside a container.** A card, an accordion or a set of tabs goes inside the content.
 - **Leave the look to the theme.** The look is `frames`, `raised`, `bordered` and `rounded`. Set one on a container only where that container differs from the app.
 - **Write no color, no padding and no margin on a container.** The gap between two blocks comes from the scale.
@@ -111,7 +112,7 @@ The six task states are idle, working, done, failed, empty and denied.
 Take each block from the list its pattern names. Write it by its name in the book, with each prop that differs from its default.
 
 - **`variant`, `color` and `size` each mean one thing on every block.** `variant` is the surface treatment, `color` is the hue and `size` is the density step. Every value comes from the vocabulary of its prop.
-- **Leave `size` unset**, unless one block must differ. A block takes the size of the block above it, and then the app's.
+- **Leave `size` unset**, unless one block must differ. A block takes the size that the container, the widget or the `DSScope` above it passes on, and then the app's.
 - **Write only props the book names.** Hover, focus and pressed are shown states. The platform produces them, and the tree never sets them.
 - **A block drawn from data is a host and its items.** Write the host, and then one item for each entry you want shown.
 - **What a block does stays in words**: where an action leads, and which permission gates it. Write it beside the block.
@@ -126,7 +127,7 @@ Write one tree for each page. It reads from the top level down: the page, the la
 | The page | its route, its purpose in one sentence, and its main action |
 | The layout | `DSLayout`, then its type |
 | A block | its name in the book, then each prop as `name=VALUE` |
-| A part of a block | the name of the part: `DSContainer.Header`, or a named place of the layout |
+| A part of a block | the name of the part: `DSContainer.Header`, or a named place of the layout. A part of a container carries `flush` after its name, where the page writes it |
 | Content | the text a person reads, in quotes |
 | A placement of the page's own | `row`, `column` or `grid`, in lower case. It is no block, and it carries no look |
 | A task | at the right of the block that carries it: the intent, and what the block does |
@@ -145,7 +146,7 @@ page  /orders · purpose: find an order · main action: New order
             │   └── DSButton  variant=SOLID color=PRIMARY "New order"             Move · leads to /orders/new
             ├── DSContainer.Content
             │   └── DSWFilterBar                                                  Find
-            └── DSContainer.Content
+            └── DSContainer.Content  flush
                 └── DSWDataTable                                                  Find · Read
 ```
 

@@ -3,15 +3,15 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/01-common/08-design-library.md",
-      "seen": "28a3b105"
+      "seen": "b56467c9"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/01-common/06-names.md",
-      "seen": "31ba2c07"
+      "seen": "11fd5eab"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/01-common/07-layout-container.md",
-      "seen": "7dcacd8c"
+      "seen": "6d40e010"
     }
   ]
 }
@@ -52,6 +52,7 @@ The design library holds one file for each layer of the design system. A page dr
 | `color` | a variable mode, set on the instance itself |
 | The look of a container or a card | a mode of the theme's collections, for each of `frames`, `raised`, `bordered` and `rounded` |
 | A part of a block, or a named place | the part of the instance that carries that name. The blocks of the tree go inside it |
+| `flush` on a part of a container | the frame setting, a variable mode set on that part |
 | Content | the text of the instance, typed as the tree gives it |
 | `row`, `column` or `grid` | a plain frame with auto layout. Its gap binds a variable of the scale |
 | A block drawn from data | the host instance, with one item instance for each entry |
@@ -64,7 +65,7 @@ The design library holds one file for each layer of the design system. A page dr
 - **Never set a hue on a plain frame.** A mode reaches everything inside the frame it is set on, and no code does that.
 - **Never type a color.** Every color on the page is a variable of Core, and a block already binds it.
 - **Never type a number where the scale holds one.** The gap and the padding of a plain frame each bind a variable.
-- **Never set the frame setting by hand.** A library component sets it on its own content. That is how a table reads that it sits in a frame.
+- **Set the frame setting on a part only where the tree writes `flush` on that part.** It is a variable mode set on the part. That is how a table reads that it fills the part.
 - **Never rename an instance, a property or a value.** The name carries the link between the design and its code.
 
 ## When the library does not hold a block
