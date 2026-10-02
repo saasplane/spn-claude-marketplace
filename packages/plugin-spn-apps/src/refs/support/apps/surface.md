@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/",
-      "seen": "816accc9"
+      "seen": "2b50012a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/08-web.md",
@@ -145,7 +145,7 @@ A container is an optional block. A page uses one when a part of it has a header
 | Content | `DSContainer.Content` | one or more | no prop of its own. Several join in one frame |
 | Footer | `DSContainer.Footer` | none or one | no prop of its own |
 
-The parts sit in one order: the header, then the content, then the footer. The look of a container is four props, and nothing else.
+The parts sit in one order: the header, then the content, then the footer. The header places its first block at the start and its last at the end. The footer starts its blocks at the start edge. The look of a container is four props, and nothing else.
 
 | Prop | Values | What it decides |
 | --- | --- | --- |
