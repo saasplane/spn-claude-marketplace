@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/08-web.md",
-      "seen": "8607f5f6"
+      "seen": "a6f1e5bf"
     }
   ]
 }
@@ -24,7 +24,7 @@
 
 **A hook names its context.** A hook of the design system reads as `useDS` + the context + the value, such as `useDSScopeSize`, `useDSAppAuthz`, `useDSAppTestData` and `useDSOverlayConfirm`. Each context has one hook that returns it whole: `useDSContext`, `useDSAppContext`, `useDSScopeContext` and `useDSOverlayContext`. `useDSScopeIsFramed` returns whether the block sits in a `flush` part, with the block's own `bordered` winning. The Surface ref states the rule.
 
-**`DSScope` sets the size or the frame setting for what it holds.** A page writes `<DSScope size={…}>` around a region. A part of a container with `flush` draws no inset, and it wraps what it holds in `DSScope framed`. A part without `flush` draws its inset when it is in the frame, and it sets no frame setting. Each block that reacts reads `useDSScopeIsFramed(props.bordered)`, and wraps what it holds in `DSScope`, so the setting stops there. A card and each overlay wrap what they hold in `DSScope` with nothing set: the frame setting stops, and the size above passes through. A block that only holds content sets no scope. 🚧 Not yet realized: no release carries `DSScope` or the container.
+**`DSScope` sets the size or the frame setting for what it holds.** A page writes `<DSScope size={…}>` around a region. A part of a container with `flush` draws no inset, and it wraps what it holds in `DSScope framed`. A part without `flush` draws its inset when it is in the frame, and it sets no frame setting. Each block that reacts wraps what it holds in `DSScope framed={false}`, so the setting stops there. A block that takes `bordered` reads `useDSScopeIsFramed(props.bordered)`. A card, and each overlay that holds blocks, wrap what they hold in `DSScope framed={false}`: the frame setting stops, and the size above passes through. An unset `framed` passes the setting on. A block that only holds content sets no scope. 🚧 Not yet realized: no release carries `DSScope` or the container.
 
 **The default size is a field of the theme.** `size` is required on the theme. A component rendered without `size` takes the size of the nearest block above it that sets one, and then the theme's `size`. Resolve it through `useDSScopeSize`, never through a destructure default. 🚧 Not yet realized: the context holds the default size as `defaultComponentSize` today, so read the installed package before you write a theme.
 

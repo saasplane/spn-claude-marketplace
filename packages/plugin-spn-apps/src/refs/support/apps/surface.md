@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-apps/11-surface.md",
-      "seen": "c465fc58"
+      "seen": "1b5060ca"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/",
-      "seen": "e80a3612"
+      "seen": "e2a96be0"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/08-web.md",
@@ -131,7 +131,7 @@ One name is used in the book, in the design library and in every stack. The book
 - Name a prop and its vocabulary with one word: the vocabulary `DS<Component><Word>Type` is taken through the prop `<word>`.
 - Take every value from the vocabulary of its prop, never a free string.
 - Use `bordered` for a border a block draws around itself, and `rounded` for the corners of its frame. Only the container and the card take `raised`.
-- An unset `bordered` reads the frame setting of a `flush` part above it, and only on a block that frames a part of a page. Those blocks are the table, the data table, the list, the code block, the accordions and the empty state. A field, a menubar and an avatar read their own default, because their border is the control's own chrome.
+- An unset `bordered` reads the frame setting of a `flush` part above it, and only on a block that frames a part of a page. Those blocks are the table, the code block, the accordions and the empty state. The data table and the list take no `bordered`: neither draws a border on any page. A field, a menubar and an avatar read their own default, because their border is the control's own chrome.
 - Use `flush` on a part of a container for a part that draws no inset. It is yes or no, and no when it is not set.
 - Mark each property of the design library as a declared prop, a shown state, or a setting taken from the block above. A design read back to code never gains a prop that no platform has.
 - Name a hook of the design system by its context: `useDS`, then the context, then the value. Each context has one hook that returns it whole. The size and the frame setting each have a hook of one value, which takes the block's own prop. The rule binds a hook whose value comes from one context: a hook that reads several, or none, is named for what it does.
@@ -234,7 +234,9 @@ A frame is drawn once on any part of a page. The page follows that rule, and no 
 
 | A block in a `flush` part | What it does |
 | --- | --- |
-| `DSTable` · `DSWDataTable` · `DSList` · `DSCodeBlockView` · `DSAccordion` · `DSAccordionGroup` · `DSEmpty` | it draws no border and no rounding of its own. Its own `bordered` still wins |
+| `DSTable` · `DSCodeBlockView` · `DSAccordion` · `DSAccordionGroup` · `DSEmpty` | it draws no border and no rounding of its own. Its own `bordered` still wins |
+| `DSAccordion` · `DSWDataTable` | it keeps its own text off the edge of the frame. The header row and the panel of an accordion take the side inset of the size step. So do the bars of a data table, and its grid of records. The rows of its table reach the edge |
+| `DSList` · `DSWDataTable` | it draws no border on any page, so it has none to leave out, and it takes no `bordered` |
 | Any other block: an image, a form, a text, a page's own component | nothing. It reaches the edge |
 | A block inside the one that reacted | nothing. The setting stops at the block that used it |
 | A block inside a card, or inside an overlay | nothing. A block that draws a frame of its own starts a new one |
