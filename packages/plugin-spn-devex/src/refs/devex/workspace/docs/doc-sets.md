@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "3e70bd3b"
+      "seen": "bd45fe96"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -553,6 +553,8 @@ The last three are what the close sweep asks of every row, and an empty row, a r
 | **Approach** | the **mechanics** — concepts and boundaries, never an inventory of rules the chapters own | the **reasoning** — options weighed, costs accepted, the preview that made a choice judgeable |
 
 A register row records *what* was decided, never the options that lost or what they would have cost. That is why an approach carries its reasoning in full, and why `Open` cards run deeper than the body around them.
+
+**An approach page is written for the developer who decides** (decision RD.DEVEX.WORKSPACE.225). Your own material stays in the arc and its notes: how you checked a fact, what you first proposed in chat, the names of your scripts and note files, and full lists of files or names. **A fact has one home** (decision RD.DEVEX.WORKSPACE.223): the page states it once, and where a preview holds the detail the page gives two or three sentences and the link. `refs/devex/workspace/workstream.md` § *The approach page stays current* states both rules in full.
 
 **The suffix names the kind, and the set is closed** (decision RD.DEVEX.WORKSPACE.103). It is `-overview.html`, `-construct.html`, `-approach.html`, `-report.html`, `-preview.html` and `-guide.html`, and nothing else. A suffix equals the metadata block's `variant`. The index of artifacts is named `index.html`, with no suffix, and its variant is `index`. The routing test is one question: *were options weighed and one chosen?* Yes → `-approach`. No → `-overview`. A document with no options, no recommendation and no accepted cost is an overview whichever folder holds it.
 

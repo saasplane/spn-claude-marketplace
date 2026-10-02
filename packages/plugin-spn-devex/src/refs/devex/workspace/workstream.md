@@ -38,11 +38,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "d25f8ce2"
+      "seen": "a129d0d0"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "2063b57c"
+      "seen": "2720c9e2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -66,7 +66,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "3e70bd3b"
+      "seen": "bd45fe96"
     }
   ]
 }
@@ -589,7 +589,7 @@ so the coordinator reads a tree that is still moving. Every order says so under 
 | --- | --- |
 | **preview** | build only enough to show the thing — real output, a sample entry, a before and after. Say plainly that nothing is committed to |
 | **confirm** | the choices in a table, each with a recommendation. They decide from the thing rather than from a description |
-| **record** | the row in the arc that owns it, and the approved preview saved in the arc's own `notes/N<nnn>/previews/` folder, listed in the arc's `## Previews` table and linked from the approach page |
+| **record** | the row in the arc that owns it. An approved preview that is a file stays in the arc's own `notes/N<nnn>/previews/` folder, listed in the arc's `## Previews` table and linked from the approach page. One that was shown in chat is written into the arc with the answer, and gets no file |
 | **code** | only now, and against the row |
 
 **A preview explains a change, and a sample is the thing itself — MUST** (`RD.DEVEX.WORKSPACE.200`).
@@ -600,25 +600,48 @@ in `notes/N<nnn>/samples/`, and is never written in the preview layout. Make a s
 work produces such a file. Each one reads `PROPOSED` until the developer answers and `DECIDED` after. Remove one that a later one
 replaces, and say so in the arc's log. List each in the arc's
 `## Previews` table with its kind and its state, and link it from the approach page. Writing the first
-one opens the arc as `PROPOSED`.
+one opens the arc as `PROPOSED`. A preview belongs to its arc: a later arc that needs an earlier arc's
+preview or sample links it, and never copies it, says it again or edits it
+(`RD.DEVEX.WORKSPACE.224`). A copy is a second version, and nothing keeps the two in step.
 
 **You pick the form of a preview, and the developer's word overrides it — MUST**
 (`RD.DEVEX.WORKSPACE.201`). The book lists no fixed kinds: show lines that change, a layout, a diagram,
-a whole file, or what a command prints.
+a whole file, or what a command prints. **A preview becomes a file only in four cases**
+(`RD.DEVEX.WORKSPACE.224`): they ask for one, or one of the three rows below that write it. Text
+that is only long is not one of them.
 
 | The situation | You |
 | --- | --- |
 | they say *show it here* | show it in chat. A page is shown as the parts that change, with the path of the file |
 | they say *make a page* or *make a file* | write it, and link it from the approach page |
-| they say neither, and it is text that fits one screen | show it in chat |
-| they say neither, and it must be opened in a browser to be judged, or it is longer than one screen | write it, and link it from the approach page |
-| they approve a preview that was shown in chat | save it as a file and link it |
+| they say neither, and it must be seen to be judged, such as a drawing, a layout or a rendered page | write it, and link it from the approach page |
+| they say neither, and it is a long list that they answer row by row | write it, and link it from the approach page |
+| they say neither, and the ask is big and is only one subsection of the approach, so its detail does not belong on the page | write it, and link it from the approach page |
+| they say neither, and it is none of those three | show it in chat, or state it on the approach page |
+| they approve a preview that was shown in chat | write it into the arc with their answer, and write no file |
 | nobody asked, and no rule owes a preview | write nothing |
+
+**A fact has one home — MUST** (`RD.DEVEX.WORKSPACE.223`). When a preview holds the detail of a
+change, the approach page gives two or three sentences and the link to go through it. When the page
+holds the detail, a preview links the page and does not say it again. A later preview links an
+earlier one. A parked item is stated only in the page's `Deferred`. Before you write a table, a tree
+or a list, check whether the page or another preview already holds it; if one does, link it. Two
+copies of one fact drift apart, and the developer then reads both to learn which one is current.
+
+**A preview is kept, and one decision gets one preview — MUST** (`RD.DEVEX.WORKSPACE.224`). A
+preview the developer asked for, or one you wrote, stays a file, decided or not. Never fold it fully
+into the page and remove it. As the arcs progress, bring the page's sentences about that preview and
+its link current in the same turn, and do not rewrite the earlier arc's file. Write one preview for
+one decision, and never two that each show the same decision in another form.
+
+**A preview opens with what the developer decides.** Its Overview names the decision first. It does
+not retell how the workstream reached this point, because the approach page holds that.
 
 **A preview holds what the developer judges, and nothing you need — MUST** (`RD.DEVEX.WORKSPACE.210`).
 It is written for the person who says yes or no. Show the proposal in its final form, the few rules it
 rests on, and the choices asked. What you measured, the commit you read, the order of the work and the
-plan stay in the arc.
+plan stay in the arc. The approach page follows the same rule: the section *The approach page stays
+current* below states it.
 
 How much a preview shows follows the decision, and not the work it took to reach it.
 
@@ -727,7 +750,16 @@ line or its `## Previews` table. The header's status reads `PLANNING` while no a
 **The rest of the page is yours to bring current in the same turn — MUST.** A new arc, or a scope that
 grew, owes the page its `Why`, its `What` and its `How`, and a Subtitle and a Description that still
 cover what the page plans. A `What` or `How` subsection that has a preview ends in a *Read the
-preview →* line.
+preview →* line. The subsection says the decision in two or three sentences, and the preview holds
+the detail. The page never states a preview's tables, trees or lists a second time, and one section
+of the page never repeats another (`RD.DEVEX.WORKSPACE.223`).
+
+**The page is written for the developer who decides — MUST** (`RD.DEVEX.WORKSPACE.225`). It holds
+what they need to decide, in plain words: the problem, the decision, the options weighed and what
+each costs. Keep your own material in the arc and its notes: how you checked a fact, what you first
+proposed in chat, the names of your scripts and note files, and full lists of files or names. A
+finding says what was found, and a link to the note serves a reader who wants the evidence. You read
+the arc, so nothing is lost by keeping it there.
 
 **The page links one version of the shared stylesheet and script as its base, and holds no copy of
 them — MUST** (`RD.DEVEX.WORKSPACE.214`). An approach page and a preview keep the two lines their template
