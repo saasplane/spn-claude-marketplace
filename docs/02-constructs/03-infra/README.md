@@ -21,13 +21,13 @@ The estate domain is the smallest of the three domains, and the boundary is what
 
 | Construct | What it is |
 | --- | --- |
-| [Plugin — spn-infra as a Delivery Unit](01-plugin.md) | The folder that carries the estate standard into a session — the manifest that names it, the description that decides whether a session loads it, and the version rule it shares with its two siblings. |
-| [Hooks — One Moment, Every Write](02-hooks.md) | The single wiring entry this plugin declares — the one moment it claims, the two calls it narrows to, the command it names against the plugin root, and why an estate plugin needs no other moment. |
-| [Skills — The Doors an Estate Is Changed Through](03-skills.md) | The skills an estate repository answers to — changing what the estate is, reading a rendering before it is approved, authoring a module end to end, and publishing a package — and the boundary every one of them restates rather than works around. |
-| [Scripts — The Write-Time Gate and What Runs It](04-scripts.md) | The three folders under this plugin's scripts tree — the dispatcher wired to every write, the gate that resolves which subjects judge it, and the rule bodies they run — the narrow set of things they know about, and the direction they fail in when the input cannot be read. |
-| [Refs — The Estate's Vocabulary, Restated as Cards](05-refs.md) | The estate's own words, restated for a reader who may never open the book — which file declares what, which layer owns which act, how a name is composed from coordinates, the laws a declaration must hold to, and what each cloud's vocabulary is. |
-| [Providers — One Folder per Cloud, Scripts Half Only](06-providers.md) | What this plugin puts in the providers construct — a scripts half per cloud and no skills half at all — why the authoring stack decides that, and how a cloud joins by adding a folder nothing has to be told about. |
-| [Tests — The Tier, the Mirror, and a Runner That Walks](07-tests.md) | How this plugin proves its own gate — a tree named by tier and then by what a suite proves, a runner that walks rather than globs, a harness that finds the plugin root instead of counting it, and the absences that say what does not run here. |
+| [Plugin — spn-infra as a Delivery Unit](01-plugin.md) | This plugin carries this repository's estate standard — the rules for the infrastructure a product runs on — into a session that is working on one, in one folder. |
+| [Hooks — One Moment, Every Write](02-hooks.md) | This plugin wires exactly one moment of a session — the point just before a write happens — because every rule it holds is about what a file contains. |
+| [Skills — The Doors Infrastructure Is Changed Through](03-skills.md) | The skills here are how an estate — the infrastructure a product runs on — gets changed: by editing what it declares itself to be, then letting a tool render and apply that declaration. |
+| [Scripts — The Write-Time Gate and What Runs It](04-scripts.md) | Scripts holds the gate that catches what must never appear in an estate declaration — a credential, an identifier a tool should discover for itself, a cloud provider's own string outside the one entry allowed to hold it — before it is written. |
+| [Refs — This Domain's Vocabulary, Restated as Cards](05-refs.md) | Refs is where the estate's own vocabulary — the words for the infrastructure a product runs on — is restated in full, as cards, for a reader who may never open the foundation book. |
+| [Providers — One Folder per Cloud, Scripts Half Only](06-providers.md) | This plugin serves every cloud an estate can run on, and everything that varies between clouds sits in one folder per cloud under Providers. |
+| [Tests — How This Plugin Proves Its Own Gate](07-tests.md) | This plugin proves its own gate — the rules that refuse a file — in a Tests folder arranged so moving a source file moves its test with it. |
 <!-- /spn:generated -->
 
 <!-- spn:generated glossary — do not edit inside these markers; `docs.ts face` writes it -->

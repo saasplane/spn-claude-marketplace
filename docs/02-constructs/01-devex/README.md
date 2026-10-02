@@ -21,14 +21,14 @@ Read the first two before anything else. The plugin is the container, and the ho
 
 | Construct | What it is |
 | --- | --- |
-| [The Plugin — Delivery Unit of the Marketplace](01-plugin.md) | The folder that carries a standard from this repository into a running session — its manifest, its entry in the marketplace list, the installed copy a session actually reads, and the version field that says which bytes those are. |
-| [Hooks — Code the Runtime Calls on Your Behalf](02-hooks.md) | Code a plugin wires to the moments a session offers — the file that declares the wiring, the four moments and the authority each one carries, the payload a hook is handed, the verdict it returns rather than prints, and the exit code that is always zero. |
-| [Refs — A Chapter, Restated and Stamped](06-refs.md) | A markdown restatement of one or more chapters, carrying a hash of the exact text it last read, so a chapter that moves is reported rather than quietly outrun — and the three ways a restatement can fail to be comparable at all. |
-| [Agents — The Personas a Session Convenes, and the Lenses They Are Handed](03-agents.md) | A named persona a session can call mid-turn — the frontmatter that decides when it answers, the authority its own file grants it, the reviewing viewpoint a parameterized brief is handed, and the one condition that viewpoint may block on. |
-| [Skills — A Stage's Steps, Loaded on Match](04-skills.md) | A named unit of work a session can be asked for — a folder, a description matched against the work at hand, the instructions loaded once it matches, and the rule that a skill carries steps and never a rule of its own. |
-| [Scripts — The Code a Plugin Ships, Wired or Reached by Name](05-scripts.md) | The folder a plugin keeps its code in — the check a moment composes, the tool a person reaches by its own path, the shared library both read, and the rule that one question is decided by one file whichever of the two asks it. |
-| [Providers — How a Plugin Is Extended Per Instance](07-providers.md) | How a plugin admits a second stack or a second cloud without a gate being edited — the two halves a provider contributes, the rule that decides whether it contributes a skills half at all, and the line between what a provider states and what it does. |
-| [Tests — The Tier, the Mirror, and a Runner That Walks](08-tests.md) | The folder a plugin proves itself from — the tier that says what kind of proof a suite is, the mirror that says what it is proof of, the runner that finds every suite by walking rather than by a list, and the two tiers deliberately left absent. |
+| [The Plugin — Delivery Unit of the Marketplace](01-plugin.md) | A plugin carries one of this repository's standards into a running session, in one folder: its manifest, its entry in the marketplace list, the installed copy a session actually reads, and the version field that names which bytes those are. |
+| [Hooks — Code the Runtime Calls on Your Behalf](02-hooks.md) | A hook is code a plugin wires to a moment a session offers, so the runtime calls it and the rule is asked again on every single call. |
+| [Refs — A Chapter, Restated and Stamped](06-refs.md) | A ref is a markdown restatement of one or more foundation chapters, carrying a hash of the exact text it last read. |
+| [Agents — The Personas a Session Convenes, and the Viewpoints They Are Handed](03-agents.md) | An agent here is a named persona a session can call in the middle of a turn, for a second, independent read on a change. |
+| [Skills — A Stage's Steps, Loaded on Match](04-skills.md) | A skill is a named unit of work a session can be asked for — a folder holding a description that is matched against the work at hand, and the instructions that load only once that description matches. |
+| [Scripts — The Code a Plugin Ships, Wired or Reached by Name](05-scripts.md) | Scripts is the one folder that holds everything a plugin can execute — the checks a hook composes, the tools a person reaches by typing their path, and the library code both sides read. |
+| [Providers — How a Plugin Is Extended Per Instance](07-providers.md) | A provider is one folder per instance — one stack, or one cloud — holding everything about that instance that varies, inside a plugin that otherwise stays the same for every one of them. |
+| [Tests — How This Plugin Proves Itself](08-tests.md) | Tests is the folder a plugin proves itself from, arranged so a reader can find the suite that covers a script just by following that script's own path. |
 <!-- /spn:generated -->
 
 <!-- spn:generated glossary — do not edit inside these markers; `docs.ts face` writes it -->
@@ -48,6 +48,7 @@ Read the first two before anything else. The plugin is the container, and the ho
 | [a hook](02-hooks.md) | `hooks.json` | a script a plugin wires to a named moment, declared with a matcher, a command and a timeout |
 | [a matcher](02-hooks.md) | `matcher` | the names a moment is narrowed to, so a script runs only for the calls it could have an opinion about |
 | [a moment](02-hooks.md) | `hooks` | a named point in a session the harness stops at and runs whatever a plugin wired there |
+| [a prompt being sent](02-hooks.md) | `UserPromptSubmit` | the moment a prompt is sent, before the model reads it; a hook there may name the session and may not refuse a call |
 | [a turn about to end](02-hooks.md) | `Stop` | the moment before a reply is handed back, when a warning is still useful and a refusal is not |
 | [a verdict](02-hooks.md) | `Verdict` | what a hook decided: `deny` refuses the call, `note` is advice the turn reads, and nothing at all is silence |
 | [the call](02-hooks.md) | `ToolInput` | the fields inside that payload a hook actually reads — a file path, a shell command, the content or replacement text a write carries |

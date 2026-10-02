@@ -1,5 +1,5 @@
 <!-- spn:doc
-{"id": "spn-devex-capabilities", "variant": "capability", "title": "Capabilities — spn-devex", "lenses": ["ARCHITECT", "SERVER_DEV"], "status": "DONE", "summary": "The ten constructs of the core domain, one chapter each: the plugin that delivers them, the hook frame and the four moments it wires, the checks and tools, the page production, and the skills, refs, lenses and agent briefs a session loads.", "keywords": ["spn-devex", "capabilities", "plugin", "hooks", "skills", "refs", "agents"]}
+{"id": "spn-devex-capabilities", "variant": "capability", "title": "Capabilities — spn-devex", "lenses": ["ARCHITECT", "SERVER_DEV"], "status": "DONE", "summary": "The ten constructs of the core domain, one chapter each: the plugin that delivers them, the hook frame and the five moments it wires, the checks and tools, the page production, and the skills, refs, lenses and agent briefs a session loads.", "keywords": ["spn-devex", "capabilities", "plugin", "hooks", "skills", "refs", "agents"]}
 -->
 
 # Capabilities — spn-devex
@@ -12,7 +12,7 @@
 | --- | --- |
 | [01 — Plugin](01-plugin.md) | The manifest, the marketplace row, and the version field that names what is published |
 | [02 — Hook](02-hooks.md) | The wiring, the verdict that is returned rather than printed, and the one process that composes every check |
-| [03 — Loop Events](02-hooks.md) | The four moments: the window opening, a call about to run, a shell command that finished, a turn about to end |
+| [03 — Loop Events](02-hooks.md) | The five moments: the window opening, a prompt being sent, a call about to run, a shell command that finished, a turn about to end |
 | [04 — Checks](05-scripts.md) | Six stack-agnostic checks, each naming the chapter it restates and reading the smallest slice it can |
 | [05 — Tools](05-scripts.md) | Six commands run by name: the corpus audit, coherence, drift, the partner proof, the prose triage, the row writer |
 | [06 — Pages](05-scripts.md) | The renderer, the figure drawer, the figure checker, and the rule that a page is never edited by hand |
@@ -31,7 +31,7 @@ Source folders, one per chapter: `.claude-plugin/plugin.json` for Plugin · `hoo
 | Chapter | Realizes | Carries | Status |
 | --- | --- | --- | --- |
 | [01-plugin.md](01-plugin.md) | `plugin-set` | One manifest, one marketplace row, and the widest of the three folders — with a version field that names what is published rather than what is being worked on. | ✅ |
-| [02-hooks.md](02-hooks.md) | `hook-set` | The four moments this plugin wires and the shared shapes every hook in the workspace is built on: a verdict that is returned rather than printed, one process for the whole call chain, and an exit code that is always zero. | ✅ |
+| [02-hooks.md](02-hooks.md) | `hook-set` | The five moments this plugin wires and the shared shapes every hook in the workspace is built on: a verdict that is returned rather than printed, one process for the whole call chain, and an exit code that is always zero. | ✅ |
 | [03-agents.md](03-agents.md) | `agent-set` | The briefs a session can convene — one fixed engineering persona, one reviewer parameterized by a viewpoint, a rewrite and review pair in which only the rewriter may edit, and the viewpoint files the parameterized one reads by name. | ✅ |
 | [04-skills.md](04-skills.md) | `skill-set` | One folder per stack-agnostic DevEx stage, each holding a single SKILL.md whose description is written to be matched against a turn's work rather than browsed by a person. | ✅ |
 | [05-scripts.md](05-scripts.md) | `checks` | The stack-agnostic checks the dispatcher composes, the tools reached by their own path, and the library both read — including the renderer, the drawer and the figure checker that produce every page in the workspace. | ✅ |

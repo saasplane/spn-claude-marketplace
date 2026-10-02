@@ -42,7 +42,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "340bd4d5"
+      "seen": "e736da66"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -108,6 +108,12 @@ output, and a reader learns to scroll past it, including the day it says somethi
 which workstream is never written to disk, so another window may work the same one. When other
 windows are open, do not pick a workstream for this window: ask the developer which one it should
 manage.
+
+**A session is named for the workstream and the arc it works on** (`RD.DEVEX.WORKSPACE.222`), so the
+developer finds the window in the session list by its work. A hook gives the name from the prompt:
+the folder's name once a prompt names one workstream, such as `020-agent-workstream-improvements`,
+and `020-N011 artifacts-by-domain` where a handover starts the session on an arc. A name the
+developer types is kept until the work changes, and a session keeps the arc it started on.
 
 ## Every prompt is read before anything moves
 

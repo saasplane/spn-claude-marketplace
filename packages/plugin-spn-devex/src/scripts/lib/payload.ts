@@ -43,6 +43,8 @@ export type Payload = {
   error?: string;
   /** The subagent that made the call; absent in the main window. */
   agent_id?: string;
+  /** What the developer typed, on `UserPromptSubmit`. */
+  prompt?: string;
 };
 
 /** What a check decided. `deny` refuses the call; `note` is advice the turn reads. */

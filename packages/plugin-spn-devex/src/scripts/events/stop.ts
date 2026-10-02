@@ -66,9 +66,12 @@ const HANDOVER_LABELS = ["continue", "model", "read first", "pins", "state", "li
   "do not touch", "open"];
 const HANDOVER_LABEL_LINE = new RegExp(`^(${HANDOVER_LABELS.join("|")}):(.*)$`);
 // `continue:` must carry the workstream (`008-plain-language`) and the arc (`N119`), because the next
-// window finds everything else from those two.
-const WORKSTREAM_NAME = /\b\d{3}-[a-z0-9][a-z0-9-]*/;
-const ARC_NAME = /\bN\d+\b/;
+// window finds everything else from those two. `events/prompt.ts` reads the same two patterns to
+// name a session, so a workstream and an arc are spelled one way for both events.
+/** A workstream folder's name, as a text writes it: three digits, a hyphen and the subject. */
+export const WORKSTREAM_NAME = /\b\d{3}-[a-z0-9][a-z0-9-]*/;
+/** An arc's number, as a text writes it: `N` and its digits. */
+export const ARC_NAME = /\bN\d+\b/;
 
 /**
  * The labelled lines of a handover block, each with its value. A line that starts with whitespace

@@ -29,7 +29,7 @@ Each rule carries its own name, so a refusal says which law it read rather than 
 
 ## Follows the pattern
 
-- The four moments and the refuse-or-report line — [Hooks](../../../02-constructs/01-devex/02-hooks.md)
+- The five moments and the refuse-or-report line — [Hooks](../../../02-constructs/01-devex/02-hooks.md)
 - The decision a refusal is printed as, and the always-zero exit — [Hooks in spn-devex](../../01-devex/plugin-spn-devex/02-hooks.md)
 - The three folders a script tree is filed into — [Scripts](../../../02-constructs/01-devex/05-scripts.md)
 - The one-entry, `<group> <action>` shape a plugin's rules are named under — the foundation's `04-plugins/02-shape.md`

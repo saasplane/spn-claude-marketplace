@@ -42,12 +42,12 @@ function inArtifacts(path) {
   return hasSegment(path, POCKET.artifacts);
 }
 function isProducedPage(path) {
-  const inside2 = artifactDocsPathOf(path);
-  return inside2 !== null && inside2.at(-2) === CONSTRUCT_PAGES && slashes(path).endsWith(CONSTRUCT_PAGE_SUFFIX);
+  const inside = artifactDocsPathOf(path);
+  return inside !== null && inside.at(-2) === CONSTRUCT_PAGES && slashes(path).endsWith(CONSTRUCT_PAGE_SUFFIX);
 }
 function isOverview(path) {
-  const inside2 = artifactDocsPathOf(path);
-  return inside2 !== null && !inside2.slice(0, -1).includes(CONSTRUCT_PAGES) && slashes(path).endsWith(OVERVIEW_PAGE_SUFFIX);
+  const inside = artifactDocsPathOf(path);
+  return inside !== null && !inside.slice(0, -1).includes(CONSTRUCT_PAGES) && slashes(path).endsWith(OVERVIEW_PAGE_SUFFIX);
 }
 function pagePlaceOf(path) {
   const norm = slashes(path);
@@ -67,6 +67,9 @@ function pagePlaceOf(path) {
 function isRegister(path) {
   const norm = slashes(path);
   return norm.endsWith(".md") && norm.includes(segment(POCKET.registers)) && !norm.endsWith(`/${FACE}`);
+}
+function bookTemplatesDir(foundation) {
+  return join(foundation, BOOK_TEMPLATES);
 }
 function isApproachPage(path) {
   const name = slashes(path).split("/").pop() ?? "";
@@ -143,26 +146,26 @@ __export(payload_exports, {
   readPayload: () => readPayload,
   runAlone: () => runAlone,
   unescape: () => unescape,
-  workspaceRoot: () => workspaceRoot2
+  workspaceRoot: () => workspaceRoot
 });
-import { readFileSync as readFileSync3, existsSync as existsSync3, readdirSync, statSync as statSync2 } from "node:fs";
-import { basename, dirname as dirname3, join as join4, resolve as resolve2 } from "node:path";
+import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
+import { basename, dirname, join as join2, resolve } from "node:path";
 function unescape(text) {
   return text.replace(/&#x([0-9a-f]+);/gi, (_, code) => String.fromCodePoint(parseInt(code, 16))).replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number(code))).replace(/&([a-z][a-z0-9]*);/gi, (whole, name) => ENTITIES[name.toLowerCase()] ?? whole);
 }
 function read(path) {
   try {
-    return readFileSync3(path, "utf8");
+    return readFileSync(path, "utf8");
   } catch {
     return "";
   }
 }
-function workspaceRoot2(start) {
+function workspaceRoot(start) {
   try {
-    let path = resolve2(start);
+    let path = resolve(start);
     for (; ; ) {
-      if (existsSync3(join4(path, DEVEX)) && statSync2(join4(path, DEVEX)).isDirectory()) return path;
-      const up = dirname3(path);
+      if (existsSync(join2(path, DEVEX)) && statSync(join2(path, DEVEX)).isDirectory()) return path;
+      const up = dirname(path);
       if (up === path) return null;
       path = up;
     }
@@ -179,21 +182,21 @@ function listdir(path) {
 }
 function isDir(path) {
   try {
-    return statSync2(path).isDirectory();
+    return statSync(path).isDirectory();
   } catch {
     return false;
   }
 }
 function isFile(path) {
   try {
-    return statSync2(path).isFile();
+    return statSync(path).isFile();
   } catch {
     return false;
   }
 }
 function readPayload() {
   try {
-    return JSON.parse(readFileSync3(0, "utf8") || "{}");
+    return JSON.parse(readFileSync(0, "utf8") || "{}");
   } catch {
     return {};
   }
@@ -268,49 +271,16 @@ var init_payload = __esm({
   }
 });
 
-// packages/plugin-spn-devex/src/scripts/commands/docs/sds.ts
+// packages/plugin-spn-devex/src/scripts/events/prompt.ts
+init_payload();
 init_docs_tree();
-import { createHash as createHash2 } from "node:crypto";
-import { existsSync as existsSync6, mkdirSync as mkdirSync3, readFileSync as readFileSync7, readdirSync as readdirSync6, statSync as statSync7, writeFileSync as writeFileSync4 } from "node:fs";
-import { basename as basename8, dirname as dirname8, join as join10, resolve as resolve8 } from "node:path";
-import { fileURLToPath as fileURLToPath2 } from "node:url";
-
-// packages/plugin-support-lib/src/lib/page-styles.ts
-import { existsSync, readFileSync } from "node:fs";
-import { dirname, join as join2 } from "node:path";
-var STYLES_ADDRESS = "https://saasplane.github.io/spn-claude-marketplace/assets/docs/";
-var STYLESHEET = "sds-docs.css";
-var PAGE_SCRIPT = "sds-docs.js";
-var INDEX_SCRIPT = "sds-index.js";
-var SERVED_FILES = Object.freeze([STYLESHEET, PAGE_SCRIPT, INDEX_SCRIPT]);
-var BUNDLED_SUFFIX = ".bundled.html";
-var STYLESHEET_LINK = /<link\b[^>]*\bhref="([^"]*)sds-docs\.css"[^>]*>/i;
-var VERSION_FOLDER = /(?:^|\/)(\d+\.\d+\.\d+)\/$/;
-function sharedStyles(html) {
-  const folder = STYLESHEET_LINK.exec(html)?.[1];
-  if (folder === void 0) return null;
-  return { folder, version: VERSION_FOLDER.exec(folder)?.[1] ?? null, served: folder.startsWith(STYLES_ADDRESS) };
-}
-function linksSharedStyles(html) {
-  return sharedStyles(html) !== null;
-}
-var OWN_COPY = "this page links no shared stylesheet: it holds its own copy of the styles, and the class names that copy used. Produce it again with `docs page`, or copy it from its template, so it links `sds-docs.css` (05-artifacts.md, One stylesheet, served in versions)";
-function stylesDir(from) {
-  for (let at = dirname(from), last = ""; at !== last; last = at, at = dirname(at)) {
-    if (existsSync(join2(at, "styles", "versions.json"))) return join2(at, "styles");
-  }
-  return null;
-}
-function cutVersions(styles) {
-  const file = join2(styles, "versions.json");
-  if (!existsSync(file)) return {};
-  return JSON.parse(readFileSync(file, "utf8"));
-}
+import { mkdirSync as mkdirSync4, readFileSync as readFileSync7, readdirSync as readdirSync8, writeFileSync as writeFileSync5 } from "node:fs";
+import { dirname as dirname9, join as join12 } from "node:path";
 
 // packages/plugin-support-lib/src/lib/timing.ts
 init_docs_tree();
-import { appendFileSync, existsSync as existsSync2, mkdirSync, readFileSync as readFileSync2, statSync, writeFileSync } from "node:fs";
-import { dirname as dirname2, isAbsolute, join as join3, relative, resolve, sep as sep2 } from "node:path";
+import { appendFileSync, existsSync as existsSync2, mkdirSync, readFileSync as readFileSync2, statSync as statSync2, writeFileSync } from "node:fs";
+import { dirname as dirname2, isAbsolute, join as join3, relative, resolve as resolve2, sep as sep2 } from "node:path";
 var DEVEX2 = ".spndevex";
 var DEBUG = ".debug";
 var SWITCH = "telemetry.on";
@@ -320,9 +290,9 @@ var CARRIED = "tags.json";
 var KEEP_MS = 14 * 24 * 3600 * 1e3;
 var MAX_BYTES = 4 * 1024 * 1024;
 var state = { root: null, cwd: null, facts: null, spans: [] };
-function workspaceRoot(start) {
+function workspaceRoot2(start) {
   try {
-    let path = resolve(start);
+    let path = resolve2(start);
     for (; ; ) {
       if (existsSync2(join3(path, DEVEX2))) return path;
       const up = dirname2(path);
@@ -345,7 +315,7 @@ function telemetryDir(root) {
 function repoOf(root, dir) {
   try {
     if (!root || !dir) return null;
-    const rel = relative(resolve(root), resolve(dir));
+    const rel = relative(resolve2(root), resolve2(dir));
     if (!rel || rel.startsWith("..") || isAbsolute(rel)) return null;
     const first = rel.split(sep2)[0];
     return first && !first.startsWith(".") ? first : null;
@@ -427,11 +397,11 @@ function commandFacts(script, args) {
     tags = tagsOf({ tool_input: { command: args.join(" ") }, cwd: process.cwd() });
   } catch {
   }
-  let typed2 = null;
+  let typed = null;
   try {
-    typed2 = argsText(process.argv.slice(2));
+    typed = argsText(process.argv.slice(2));
   } catch {
-    typed2 = null;
+    typed = null;
   }
   return {
     script,
@@ -440,7 +410,7 @@ function commandFacts(script, args) {
     session,
     ...tags,
     cwd: process.cwd(),
-    process: { group: "cli", action: "cli", args: typed2 }
+    process: { group: "cli", action: "cli", args: typed }
   };
 }
 function carryTags(dir, facts) {
@@ -484,7 +454,7 @@ function write(root, facts, entries, cwd) {
     mkdirSync(dir, { recursive: true });
     const log = join3(dir, LOG);
     try {
-      if (existsSync2(log) && statSync(log).size > MAX_BYTES) writeFileSync(log, "");
+      if (existsSync2(log) && statSync2(log).size > MAX_BYTES) writeFileSync(log, "");
     } catch {
     }
     let work = { workstream: facts.workstream ?? null, arc: facts.arc ?? null, order: facts.order ?? null };
@@ -520,12 +490,42 @@ function write(root, facts, entries, cwd) {
 }
 function begin(facts, start) {
   try {
-    state.root = workspaceRoot(start ?? process.env.CLAUDE_PROJECT_DIR ?? process.cwd());
+    state.root = workspaceRoot2(start ?? process.env.CLAUDE_PROJECT_DIR ?? process.cwd());
     state.cwd = facts.cwd ?? start ?? process.cwd();
     state.facts = facts;
     state.spans = [];
   } catch {
   }
+}
+function span(name, fn) {
+  const t0 = performance.now();
+  const done = () => {
+    try {
+      state.spans.push({ ...name, ms: round(performance.now() - t0) });
+    } catch {
+    }
+  };
+  let result;
+  try {
+    result = fn();
+  } catch (error) {
+    done();
+    throw error;
+  }
+  if (result && typeof result.then === "function") {
+    return result.then(
+      (value) => {
+        done();
+        return value;
+      },
+      (error) => {
+        done();
+        throw error;
+      }
+    );
+  }
+  done();
+  return result;
 }
 function record(name, ms, exit = null) {
   try {
@@ -544,1227 +544,425 @@ function end(exit = null, always = false) {
   }
 }
 
-// packages/plugin-spn-devex/src/scripts/commands/docs/_lib.ts
-import { readFileSync as readFileSync6, writeFileSync as writeFileSync3, mkdirSync as mkdirSync2, existsSync as existsSync5, readdirSync as readdirSync5, statSync as statSync6 } from "node:fs";
-import { dirname as dirname7, join as join9, resolve as resolve7, basename as basename7, relative as relative5 } from "node:path";
+// packages/plugin-spn-devex/src/scripts/events/stop.ts
+import { closeSync as closeSync2, openSync as openSync2, readFileSync as readFileSync6, readSync, readdirSync as readdirSync7, rmSync, statSync as statSync8, mkdirSync as mkdirSync3, writeFileSync as writeFileSync4 } from "node:fs";
+import { basename as basename8, dirname as dirname8, join as join11 } from "node:path";
+import { createHash as createHash3 } from "node:crypto";
 
-// packages/plugin-spn-devex/src/scripts/lib/draw.ts
-var RESOURCE = {
-  client: { shape: "window" },
-  "way-in": { shape: "chevron" },
-  queue: { shape: "pipe" },
-  store: { shape: "store" },
-  cache: { shape: "store", soft: true },
-  // a cylinder you can afford to lose
-  bucket: { shape: "bucket" },
-  service: { shape: "process" }
-};
-var W_LABEL = 7;
-var W_NOTE = 6.4;
-var W_TITLE = 7.6;
-var PAD_X = 16;
-var GAP_Y = 24;
-var GAP_COL = 56;
-var GAP_LINKED = 56;
-var SIDE_POINTS = 3;
-var GAP_APART = 24;
-var LABEL_H = 12;
-var LABEL_GAP = 8;
-var H_ONE = 44;
-var H_TWO = 64;
-var esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-var spoken = (s) => s.replace(/`([^`]+)`/g, "$1").replace(/\[([^\]]+)\]\([^)]+\)/g, "$1").replace(/\*\*([^*]+)\*\*/g, "$1").replace(/(^|[^*])\*([^*]+)\*(?!\*)/g, "$1$2");
-function fit(body3) {
-  const src = body3.filter((l) => !l.includes("<defs>")).join("\n");
-  let lo = [Infinity, Infinity], hi = [-Infinity, -Infinity];
-  const see = (x, y, pad = 0) => {
-    lo = [Math.min(lo[0], x - pad), Math.min(lo[1], y - pad)];
-    hi = [Math.max(hi[0], x + pad), Math.max(hi[1], y + pad)];
-  };
-  for (const m of src.matchAll(/<rect[^>]*\sx="(-?[\d.]+)" y="(-?[\d.]+)" width="([\d.]+)" height="([\d.]+)"/g)) {
-    const [x, y, w, h] = m.slice(1).map(Number);
-    see(x, y);
-    see(x + w, y + h);
-  }
-  for (const m of src.matchAll(/<circle[^>]*\scx="(-?[\d.]+)" cy="(-?[\d.]+)" r="([\d.]+)"/g)) {
-    const [cx, cy, r] = m.slice(1).map(Number);
-    see(cx, cy, r);
-  }
-  for (const m of src.matchAll(/<ellipse[^>]*\scx="(-?[\d.]+)" cy="(-?[\d.]+)" rx="([\d.]+)" ry="([\d.]+)"/g)) {
-    const [cx, cy, rx, ry] = m.slice(1).map(Number);
-    see(cx - rx, cy - ry);
-    see(cx + rx, cy + ry);
-  }
-  for (const m of src.matchAll(/<text class="([\w-]+)" x="(-?[\d.]+)" y="(-?[\d.]+)">([\s\S]*?)<\/text>/g)) {
-    const cls = m[1], x = Number(m[2]), y = Number(m[3]);
-    const w = m[4].replace(/&[a-z]+;/g, " ").length * (cls === "sds-title" ? W_TITLE : cls === "sds-label" ? W_LABEL : W_NOTE);
-    see(x, y - 13);
-    see(x + w, y + 3);
-  }
-  for (const m of src.matchAll(/<path[^>]*\sd="([^"]+)"/g)) {
-    const conn = m[0].includes('class="sds-connector');
-    let x = 0, y = 0;
-    for (const [, c, u, v] of m[1].matchAll(/([MLHV])\s*(-?[\d.]+)(?:\s+(-?[\d.]+))?/g)) {
-      const a = Number(u);
-      x = c === "V" ? x : a;
-      y = c === "V" ? a : c === "H" ? y : Number(v);
-      see(x, y, conn ? 9 : 2);
-    }
-  }
-  if (!Number.isFinite(lo[0])) return { x0: 0, y0: 0, w: 1100, h: 1 };
-  const x0 = Math.floor(lo[0] - 2), y0 = Math.floor(lo[1] - 2);
-  return { x0, y0, w: Math.ceil(hi[0] + 2) - x0, h: Math.ceil(hi[1] + 2) - y0 };
-}
-function svgOf(body3, label) {
-  const { x0, y0, w, h } = fit(body3);
-  return [
-    // A FIGURE IS NEVER SCALED UP. The page sets `width:100%` so a wide figure shrinks to the column,
-    // and that same rule stretched a NARROW one: a flowchart 586 across was blown up to the column's
-    // 1100, so its text rendered at twice the size of the figure above it and the drawing stood
-    // 1650px tall. The cap is the figure's own width, inline so it beats the stylesheet, and
-    // `width:100%` still shrinks it on a narrow screen (2026-09-22, found on the Sign-in sample).
-    `<svg class="sds-drawing" viewBox="${x0} ${y0} ${w} ${h}" style="max-width:${w}px" role="img" aria-label="${esc(spoken(label))}">`,
-    `  <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>`,
-    ...body3,
-    `</svg>`
-  ].join("\n");
-}
-function vertsOf(d, path) {
-  const out = [];
-  let x = 0, y = 0;
-  for (const [, c, u, v] of d.matchAll(/([MHV])\s*(-?[\d.]+)(?:\s+(-?[\d.]+))?/g)) {
-    const a = Number(u);
-    const nx = c === "V" ? x : a, ny = c === "V" ? a : c === "M" ? Number(v) : y;
-    if (c === "V") out.push({ x, y1: y, y2: ny, path });
-    x = nx;
-    y = ny;
-  }
-  return out;
-}
-function horzOf(d, path) {
-  const out = [];
-  let x = 0, y = 0;
-  for (const [, c, u, v] of d.matchAll(/([MHV])\s*(-?[\d.]+)(?:\s+(-?[\d.]+))?/g)) {
-    const a = Number(u);
-    const nx = c === "V" ? x : a, ny = c === "V" ? a : c === "M" ? Number(v) : y;
-    if (c === "H") out.push({ x: Math.min(x, nx), y, w: Math.abs(nx - x), h: 0, path });
-    x = nx;
-    y = ny;
-  }
-  return out;
-}
-function placeLabels(pending, verticals, margin, width, boxes = []) {
-  const settled = [];
-  const PITCH = LABEL_H + LABEL_GAP;
-  const bands = [0, -PITCH, PITCH, -2 * PITCH, 2 * PITCH, -3 * PITCH, 3 * PITCH];
-  return pending.map((p) => {
-    const blockedAt = (y) => {
-      const top = y - LABEL_H, bottom = y;
-      return [
-        ...verticals.filter((v) => Math.min(v.y1, v.y2) < bottom + LABEL_GAP && Math.max(v.y1, v.y2) > top - LABEL_GAP).map((v) => [v.x - LABEL_GAP, v.x + LABEL_GAP]),
-        ...boxes.filter((b) => b.y < bottom + LABEL_GAP && b.y + b.h > top - LABEL_GAP).map((b) => [b.x - LABEL_GAP, b.x + b.w + LABEL_GAP]),
-        ...settled.filter((q) => Math.abs(q.y - y) < PITCH).map((q) => [q.x - LABEL_GAP, q.x + q.w + LABEL_GAP])
-      ];
-    };
-    let best = null;
-    for (const dy of bands) {
-      const y = p.y + dy;
-      const blocked = blockedAt(y);
-      const free = (x) => x >= margin && x + p.w <= width - margin && !blocked.some(([lo, hi]) => lo < x + p.w && x < hi);
-      if (free(p.x)) {
-        best = { x: p.x, y };
-        break;
-      }
-      const tries = [...blocked.flatMap(([lo, hi]) => [hi, lo - p.w]), margin, width - margin - p.w].filter(free).sort((m, n) => Math.abs(m - p.x) - Math.abs(n - p.x));
-      if (tries.length) {
-        best = { x: tries[0], y };
-        break;
-      }
-    }
-    const at = best ?? { x: p.x, y: p.y };
-    settled.push({ x: at.x, y: at.y, w: p.w });
-    return `  <text class="sds-note" x="${Math.round(at.x)}" y="${Math.round(at.y)}">${esc(p.txt)}</text>`;
-  });
-}
-function sidePoints(start, len, asking) {
-  const at = (f) => Math.round(start + len * f);
-  const halves = [at(0.25), at(0.75)], all = [at(0.25), at(0.5), at(0.75)];
-  const want = Math.min(Math.max(asking, 1), SIDE_POINTS);
-  if (want === 1) return [at(0.5)];
-  if (want === 2) return len / 2 >= GAP_APART ? halves : [at(0.5)];
-  if (len / (SIDE_POINTS + 1) >= GAP_APART) return all;
-  return len / 2 >= GAP_APART ? halves : [at(0.5)];
-}
-var alignedTo = (points, towards) => points.reduce((best, p) => Math.abs(p - towards) < Math.abs(best - towards) ? p : best, points[0]);
-function boxWidth(b) {
-  const label = b.label.length * W_LABEL;
-  const note = (b.note ?? "").length * W_NOTE;
-  return Math.ceil(Math.max(label, note) + PAD_X * 2);
-}
-var boxHeight = (b) => b.note ? H_TWO : H_ONE;
-function boxClass(b) {
-  if (b.em) return "sds-box sds-tone-blue";
-  if (b.warn) return "sds-box sds-tone-amber";
-  if (b.off) return "sds-box sds-absent";
-  return "sds-box";
-}
-function rect(b, x, y, w, h) {
-  const cy = b.note ? y + 26 : y + h / 2 + 4;
-  const out = [
-    `  <rect class="${boxClass(b)}" x="${x}" y="${y}" width="${w}" height="${h}" rx="3"/>`,
-    `  <text class="sds-label" x="${x + PAD_X}" y="${cy}">${esc(b.label)}</text>`
-  ];
-  if (b.note) out.push(`  <text class="sds-note" x="${x + PAD_X}" y="${cy + 19}">${esc(b.note)}</text>`);
-  return out.join("\n");
-}
-function drawEntities(spec) {
-  const findings = [];
-  const boxes = spec.boxes ?? [];
-  const links = spec.links ?? [];
-  if (!boxes.length) return { svg: "", findings: ["a `dg` figure with no boxes"] };
-  const centre = boxes.find((b) => b.em) ?? boxes[0];
-  if (!boxes.some((b) => b.em)) findings.push(`no box is marked \`em\`, so \`${centre.id}\` was taken as the centre`);
-  const targets = links.filter((l) => l.from === centre.id).map((l) => l.to);
-  const sources = links.filter((l) => l.to === centre.id).map((l) => l.from);
-  const byId = new Map(boxes.map((b) => [b.id, b]));
-  for (const l of links) for (const end2 of [l.from, l.to])
-    if (!byId.has(end2)) findings.push(`a link names \`${end2}\`, and no box has that id`);
-  const left = [...new Set(sources)].map((id) => byId.get(id)).filter(Boolean);
-  const right = [...new Set(targets)].map((id) => byId.get(id)).filter(Boolean);
-  const placed = /* @__PURE__ */ new Set([centre.id, ...left.map((b) => b.id), ...right.map((b) => b.id)]);
-  for (const b of boxes) if (!placed.has(b.id)) {
-    right.push(b);
-    findings.push(`\`${b.id}\` is in no link, so it was placed beside the centre`);
-  }
-  const colWidth = (col) => col.length ? Math.max(...col.map(boxWidth)) : 0;
-  const wL = colWidth(left), wC = boxWidth(centre), wR = colWidth(right);
-  const colHeight = (col) => col.reduce((h, b) => h + boxHeight(b) + GAP_Y, -GAP_Y);
-  const hL = colHeight(left), hC = boxHeight(centre), hR = colHeight(right);
-  const margin = 24;
-  const relationText = (l) => l.label ? l.card ? `${l.label}  ${l.card}` : l.label : l.card ?? "";
-  const widestLabel = Math.max(0, ...links.map((l) => relationText(l).length * W_NOTE));
-  const crossings = Math.max(
-    links.filter((l) => l.to === centre.id).length,
-    links.filter((l) => l.from === centre.id).length,
-    1
-  );
-  const gapCol = Math.max(GAP_COL, Math.ceil(widestLabel) + LABEL_GAP * 2 + GAP_APART * (crossings - 1));
-  const height = Math.max(hL, hC, hR) + margin * 2;
-  const width = margin * 2 + wL + wC + wR + gapCol * 2;
-  const xL = margin, xC = margin + wL + gapCol, xR = xC + wC + gapCol;
-  const out = [];
-  const at = /* @__PURE__ */ new Map();
-  const layColumn = (col, x, w, total) => {
-    let y = margin + (height - margin * 2 - total) / 2;
-    for (const b of col) {
-      const h = boxHeight(b);
-      out.push(rect(b, x, y, w, h));
-      at.set(b.id, { x, y, w, h });
-      y += h + GAP_Y;
-    }
-  };
-  layColumn(left, xL, wL, hL);
-  layColumn([centre], xC, wC, hC);
-  layColumn(right, xR, wR, hR);
-  const eVerts = [], ePending = [];
-  const eHorz = [];
-  const leaves = /* @__PURE__ */ new Map(), lands = /* @__PURE__ */ new Map();
-  for (const l of links) {
-    const a = at.get(l.from), b = at.get(l.to);
-    if (!a || !b) continue;
-    const side = a.x < b.x ? "R" : "L";
-    const bump = (m, k) => m.set(k, (m.get(k) ?? 0) + 1);
-    bump(leaves, `${l.from}:${side}`);
-    bump(lands, `${l.to}:${side === "R" ? "L" : "R"}`);
-  }
-  const lane = /* @__PURE__ */ new Map();
-  for (const l of links) {
-    const peers = links.filter((p) => (at.get(p.from)?.x ?? -1) === (at.get(l.from)?.x ?? -2) && (at.get(p.to)?.x ?? -1) === (at.get(l.to)?.x ?? -2));
-    lane.set(l, { i: peers.indexOf(l), n: peers.length });
-  }
-  for (const [pathId, l] of links.entries()) {
-    const a = at.get(l.from), b = at.get(l.to);
-    if (!a || !b) continue;
-    const fromRight = a.x < b.x;
-    const x1 = fromRight ? a.x + a.w : a.x;
-    const x2 = fromRight ? b.x : b.x + b.w;
-    const { i, n } = lane.get(l) ?? { i: 0, n: 1 };
-    const y1 = alignedTo(sidePoints(a.y, a.h, leaves.get(`${l.from}:${fromRight ? "R" : "L"}`) ?? 0), b.y + b.h / 2);
-    const y2 = alignedTo(sidePoints(b.y, b.h, lands.get(`${l.to}:${fromRight ? "L" : "R"}`) ?? 0), y1);
-    const mid = x1 + (x2 - x1) * (i + 1) / (n + 1);
-    const dash = l.dashed ? ' stroke-dasharray="5 4"' : "";
-    const dPath = `M${x1} ${y1} H${mid} V${y2} H${x2}`;
-    out.push(`  <path class="sds-connector" d="${dPath}"${dash} marker-end="url(#ar)"/>`);
-    eVerts.push(...vertsOf(dPath, pathId));
-    eHorz.push(...horzOf(dPath, pathId));
-    if (!l.card)
-      findings.push(`the relation \`${l.from}\` \u2192 \`${l.to}\` carries no cardinality; every relation line in an entity diagram says one or many (\`card\`: "1:N")`);
-    const text = relationText(l);
-    if (text) {
-      const w = text.length * W_NOTE;
-      const lead = Math.min(x1, mid), tail = Math.max(x1, mid);
-      const want = (lead + tail - w) / 2;
-      const lo = Math.min(x1, x2) + LABEL_GAP, hi = Math.max(x1, x2) - LABEL_GAP;
-      const under2 = i % 2 === 1;
-      ePending.push({
-        x: Math.round(Math.min(Math.max(want, lo), Math.max(lo, hi - w))),
-        y: y1 + (under2 ? LABEL_H + LABEL_GAP : -LABEL_GAP),
-        w,
-        txt: text,
-        path: pathId
-      });
-    }
-  }
-  out.push(...placeLabels(ePending, eVerts, margin, width, [...at.values(), ...eHorz]));
-  return { svg: svgOf(out, spec.title ?? spec.caption ?? "entity diagram"), findings };
-}
-function drawChain(spec) {
-  const boxes = spec.boxes ?? [];
-  if (!boxes.length) return { svg: "", findings: ["a `dg` figure with no boxes"] };
-  const margin = 24, gap = 56;
-  const h = Math.max(...boxes.map(boxHeight));
-  const widths = boxes.map(boxWidth);
-  const width = margin * 2 + widths.reduce((a, b) => a + b, 0) + gap * (boxes.length - 1);
-  if (width > 1100) {
-    const links = boxes.slice(0, -1).map((b, i) => ({ from: b.id, to: boxes[i + 1].id }));
-    return drawMap({ ...spec, kind: "map", links });
-  }
-  const height = margin * 2 + h;
-  const out = [];
-  let x = margin;
-  boxes.forEach((b, i) => {
-    out.push(rect(b, x, margin, widths[i], h));
-    if (i < boxes.length - 1) out.push(`  <path class="sds-connector" d="M${x + widths[i]} ${margin + h / 2} H${x + widths[i] + gap}" marker-end="url(#ar)"/>`);
-    x += widths[i] + gap;
-  });
-  return {
-    svg: svgOf(out, spec.title ?? spec.caption ?? "chain"),
-    findings: []
-  };
-}
-var NOTE_CHARS = 34;
-function wrapNote(note) {
-  const words2 = note.split(/\s+/);
-  const lines = [];
-  let cur = "";
-  for (const w of words2) {
-    if (cur && (cur + " " + w).length > NOTE_CHARS) {
-      lines.push(cur);
-      cur = w;
-    } else cur = cur ? cur + " " + w : w;
-  }
-  if (cur) lines.push(cur);
-  return lines;
-}
-var shapeOf = (b) => b.shape ?? "process";
-var SKEW = 16;
-var BARS = 11;
-var CAP = 13;
-var DOT = 17;
-var BAR = 22;
-var POINT = 40;
-var TAPER = 12;
-function centred(cls, txt, cx, y) {
-  const w = txt.length * (cls === "sds-label" ? W_LABEL : W_NOTE);
-  return `  <text class="${cls}" x="${Math.round(cx - w / 2)}" y="${y}">${esc(txt)}</text>`;
-}
-function mapBoxWidth(b) {
-  const lines = b.note ? wrapNote(b.note) : [];
-  const widest = Math.max(b.label.length * W_LABEL, ...lines.map((l) => l.length * W_NOTE));
-  const base = Math.ceil(widest + PAD_X * 2);
-  switch (shapeOf(b)) {
-    // A DIAMOND HOLDS ONLY THE RECTANGLE INSCRIBED IN IT. A rectangle centred in a diamond of width
-    // W and height H fits exactly when `tw/W + th/H <= 1`, so a flat allowance cannot be right at
-    // any size — the wider the text, the more the corners take away. Doubling each side puts both
-    // ratios at one half, which leaves the text's own corners inside the edge with its padding to
-    // spare. Found by the developer on the Sign-in flowchart, where *The organization judges* sat
-    // wider than the diamond at its own height and the note's last line fell outside it entirely
-    // (2026-09-22).
-    case "decision":
-      return base * 2;
-    case "io":
-      return base + SKEW;
-    case "predefined":
-      return base + BARS * 2;
-    case "terminator":
-      return base + 12;
-    case "connector":
-      return DOT * 2;
-    case "chevron":
-      return base + POINT;
-    case "pipe":
-      return base + CAP;
-    case "bucket":
-      return base + TAPER * 2;
-    default:
-      return base;
-  }
-}
-function mapBoxHeight(b) {
-  const lines = b.note ? wrapNote(b.note).length : 0;
-  const base = lines ? 26 + 19 * lines + 12 : H_ONE;
-  switch (shapeOf(b)) {
-    // The other half of the inscribed rule above: doubled, so the text's height uses half the
-    // diamond and its width the other half.
-    case "decision":
-      return base * 2;
-    // The cap sits INSIDE the box's own bounds rather than above them, so the grid's spacing keeps
-    // every neighbour clear of it without the layout knowing a cylinder is there.
-    case "store":
-      return base + CAP;
-    case "terminator":
-      return Math.max(base, 40);
-    case "connector":
-      return DOT * 2;
-    case "window":
-      return base + BAR;
-    default:
-      return base;
-  }
-}
-function mapRect(b, x, y, w, h) {
-  const cls = boxClass(b), cx = x + w / 2, cy = y + h / 2;
-  const body3 = [];
-  let textTop = y + 26, textMid = cy + 4, centre = true;
-  switch (shapeOf(b)) {
-    case "terminator":
-      body3.push(`  <rect class="${cls}" x="${x}" y="${y}" width="${w}" height="${h}" rx="${h / 2}"/>`);
-      break;
-    case "decision":
-      body3.push(`  <path class="${cls}" d="M${cx} ${y} L${x + w} ${cy} L${cx} ${y + h} L${x} ${cy} Z"/>`);
-      textTop = cy - 19 * (b.note ? wrapNote(b.note).length : 0) / 2 + 4;
-      break;
-    case "io":
-      body3.push(`  <path class="${cls}" d="M${x + SKEW} ${y} L${x + w} ${y} L${x + w - SKEW} ${y + h} L${x} ${y + h} Z"/>`);
-      break;
-    case "predefined":
-      body3.push(
-        `  <rect class="${cls}" x="${x}" y="${y}" width="${w}" height="${h}" rx="3"/>`,
-        `  <path class="${cls}" d="M${x + BARS} ${y} V${y + h}"/>`,
-        `  <path class="${cls}" d="M${x + w - BARS} ${y} V${y + h}"/>`
-      );
-      break;
-    case "store":
-      body3.push(
-        `  <rect class="${cls}" x="${x}" y="${y + CAP}" width="${w}" height="${h - CAP}" rx="3"/>`,
-        `  <ellipse class="${cls}" cx="${cx}" cy="${y + CAP}" rx="${w / 2}" ry="${CAP}"/>`
-      );
-      textTop = y + CAP + 26;
-      textMid = y + CAP + (h - CAP) / 2 + 4;
-      break;
-    case "connector":
-      body3.push(`  <circle class="${cls}" cx="${cx}" cy="${cy}" r="${DOT}"/>`);
-      break;
-    case "window":
-      body3.push(
-        `  <rect class="${cls}" x="${x}" y="${y}" width="${w}" height="${h}" rx="3"/>`,
-        `  <path class="sds-connector" data-role="curve" d="M${x} ${y + BAR} H${x + w}"/>`
-      );
-      textTop = y + BAR + 24;
-      textMid = y + BAR + (h - BAR) / 2 + 4;
-      centre = false;
-      break;
-    case "chevron":
-      body3.push(`  <path class="${cls}" d="M${x} ${y} H${x + w - POINT} L${x + w} ${cy} L${x + w - POINT} ${y + h} H${x} Z"/>`);
-      centre = false;
-      break;
-    case "pipe":
-      body3.push(
-        `  <rect class="${cls}" x="${x + CAP}" y="${y}" width="${w - CAP}" height="${h}" rx="3"/>`,
-        `  <ellipse class="${cls}" cx="${x + CAP}" cy="${cy}" rx="${CAP}" ry="${h / 2}"/>`
-      );
-      textTop = y + 26;
-      textMid = cy + 4;
-      centre = false;
-      break;
-    case "bucket":
-      body3.push(`  <path class="${cls}" d="M${x} ${y} L${x + w} ${y} L${x + w - TAPER} ${y + h} L${x + TAPER} ${y + h} Z"/>`);
-      centre = false;
-      break;
-    default:
-      body3.push(`  <rect class="${cls}" x="${x}" y="${y}" width="${w}" height="${h}" rx="3"/>`);
-      centre = false;
-  }
-  if (!b.note) {
-    body3.push(centre ? centred("sds-label", b.label, cx, textMid) : `  <text class="sds-label" x="${x + PAD_X}" y="${textMid}">${esc(b.label)}</text>`);
-    return body3.join("\n");
-  }
-  body3.push(centre ? centred("sds-label", b.label, cx, textTop) : `  <text class="sds-label" x="${x + PAD_X}" y="${textTop}">${esc(b.label)}</text>`);
-  wrapNote(b.note).forEach((line, i) => body3.push(
-    centre ? centred("sds-note", line, cx, textTop + 19 * (i + 1)) : `  <text class="sds-note" x="${x + PAD_X}" y="${textTop + 19 + 19 * i}">${esc(line)}</text>`
-  ));
-  return body3.join("\n");
-}
-function acrossPoints(b, p, side, asking) {
-  const cx = p.x + p.w / 2;
-  switch (shapeOf(b)) {
-    case "decision":
-    case "connector":
-    case "terminator":
-      return [Math.round(cx)];
-    case "io":
-      return [Math.round(cx + (side === "top" ? SKEW / 2 : -SKEW / 2))];
-    default:
-      return sidePoints(p.x, p.w, asking);
-  }
-}
-var edgeY = (b, p, side) => side === "bottom" ? p.y + p.h : shapeOf(b) === "store" ? p.y + CAP : p.y;
-function edgeX(b, p, side) {
-  const cx = p.x + p.w / 2;
-  switch (shapeOf(b)) {
-    case "io":
-      return side === "left" ? p.x + SKEW / 2 : p.x + p.w - SKEW / 2;
-    case "connector":
-      return side === "left" ? cx - DOT : cx + DOT;
-    // A bucket narrows towards its foot, so at its own middle it is half a taper in on both sides.
-    case "bucket":
-      return side === "left" ? p.x + TAPER / 2 : p.x + p.w - TAPER / 2;
-    // A pipe is entered at the tip of its cap, which is where work goes in.
-    case "pipe":
-      return side === "left" ? p.x : p.x + p.w;
-    default:
-      return side === "left" ? p.x : p.x + p.w;
-  }
-}
-var midY = (b, p) => shapeOf(b) === "store" ? p.y + CAP + (p.h - CAP) / 2 : p.y + p.h / 2;
-function drawMap(spec, opts = {}) {
-  const label = opts.downward ? "flowchart" : "map";
-  const findings = [];
-  const all = spec.boxes ?? [];
-  const links = spec.links ?? [];
-  if (!all.length) return { svg: "", findings: ["a `dg` figure with no boxes"] };
-  const byId = new Map(all.map((b) => [b.id, b]));
-  for (const l of links) for (const end2 of [l.from, l.to])
-    if (!byId.has(end2)) findings.push(`a link names \`${end2}\`, and no box has that id`);
-  const kids = /* @__PURE__ */ new Map();
-  const top = [];
-  for (const b of all) {
-    if (b.in === void 0) {
-      top.push(b);
-      continue;
-    }
-    if (!byId.has(b.in)) {
-      findings.push(`\`${b.id}\` is nested in \`${b.in}\`, and no box has that id`);
-      top.push(b);
-      continue;
-    }
-    if (b.in === b.id) {
-      findings.push(`\`${b.id}\` is nested in itself`);
-      top.push(b);
-      continue;
-    }
-    kids.set(b.in, [...kids.get(b.in) ?? [], b]);
-  }
-  if (!top.length) {
-    findings.push("every box is nested, so none could be placed");
-    return { svg: "", findings };
-  }
-  const HEAD = 34, PAD_IN = 16;
-  const outerW = (b) => {
-    const own = mapBoxWidth(b);
-    const inner = (kids.get(b.id) ?? []).map(outerW);
-    return inner.length ? Math.max(own, Math.max(...inner) + PAD_IN * 2) : own;
-  };
-  const outerH = (b) => {
-    const inner = kids.get(b.id) ?? [];
-    if (!inner.length) return mapBoxHeight(b);
-    return HEAD + inner.reduce((h, c) => h + outerH(c) + 10, 0) + PAD_IN - 10 + PAD_IN;
-  };
-  const holder = (id) => {
-    const b = byId.get(id);
-    return b && b.in !== void 0 && byId.has(b.in) ? holder(b.in) : id;
-  };
-  const topIds = top.map((b) => b.id);
-  const depth2 = new Map(topIds.map((id) => [id, 0]));
-  const edges = links.map((l) => [holder(l.from), holder(l.to)]).filter(([f, t]) => f !== t && depth2.has(f) && depth2.has(t));
-  for (let pass = 0; pass < topIds.length + 1; pass++) {
-    let moved = false;
-    for (const [f, t] of edges) {
-      const want = depth2.get(f) + 1;
-      if (want > depth2.get(t)) {
-        depth2.set(t, want);
-        moved = true;
-      }
-    }
-    if (!moved) break;
-    if (pass === topIds.length) {
-      findings.push("the links form a cycle, so the rows could not be decided; a map flows one way");
-      break;
-    }
-  }
-  const CANVAS = 1100, margin = 24, gapX = GAP_LINKED;
-  if (!kids.size) {
-    const inOf = /* @__PURE__ */ new Map(), outOf = /* @__PURE__ */ new Map();
-    for (const [f, t] of edges) {
-      outOf.set(f, (outOf.get(f) ?? 0) + 1);
-      inOf.set(t, (inOf.get(t) ?? 0) + 1);
-    }
-    const heads = topIds.filter((id) => !(inOf.get(id) ?? 0));
-    const simple = topIds.every((id) => (inOf.get(id) ?? 0) <= 1 && (outOf.get(id) ?? 0) <= 1);
-    if (simple && heads.length === 1 && edges.length === topIds.length - 1 && topIds.length > 1) {
-      const next = new Map(edges);
-      const order = [];
-      let cur = heads[0];
-      while (cur && order.length <= topIds.length) {
-        order.push(cur);
-        cur = next.get(cur);
-      }
-      if (order.length === topIds.length) {
-        const boxes = order.map((id) => byId.get(id));
-        const linkOf = (a, b) => links.find((l) => holder(l.from) === a && holder(l.to) === b);
-        const labelW = (i) => (linkOf(order[i], order[i + 1])?.label ?? "").length * W_NOTE;
-        const ws = boxes.map(mapBoxWidth), hs = boxes.map(mapBoxHeight);
-        const gaps = boxes.slice(0, -1).map((_, i) => Math.max(gapX, labelW(i) + 16));
-        const total = ws.reduce((s, w) => s + w, 0) + gaps.reduce((s, g) => s + g, 0);
-        const out2 = [];
-        let width2 = CANVAS, height2 = 0;
-        if (total <= CANVAS - margin * 2 && !opts.downward) {
-          const h = Math.max(...hs);
-          let x = margin + Math.floor((CANVAS - margin * 2 - total) / 2);
-          const y2 = margin;
-          boxes.forEach((b, i) => {
-            const by = y2 + (h - hs[i]) / 2;
-            out2.push(mapRect(b, x, by, ws[i], hs[i]));
-            if (i < boxes.length - 1) {
-              const l = linkOf(order[i], order[i + 1]);
-              const x1 = x + ws[i], x2 = x1 + gaps[i], cy = y2 + h / 2;
-              out2.push(`  <path class="sds-connector" d="M${x1} ${cy} H${x2}"${l?.dashed ? ' stroke-dasharray="5 4"' : ""} marker-end="url(#ar)"/>`);
-              if (l?.label) out2.push(`  <text class="sds-note" x="${Math.round(x1 + (gaps[i] - labelW(i)) / 2)}" y="${cy - 8}">${esc(l.label)}</text>`);
-              x = x2;
-            }
-          });
-          height2 = margin + h + margin;
-        } else {
-          const w = Math.max(...ws);
-          const x = margin + Math.floor((CANVAS - margin * 2 - w) / 2);
-          let y2 = margin;
-          const GAP_V = 40;
-          boxes.forEach((b, i) => {
-            out2.push(mapRect(b, x, y2, w, hs[i]));
-            if (i < boxes.length - 1) {
-              const l = linkOf(order[i], order[i + 1]);
-              const cx = x + w / 2, y1 = y2 + hs[i], y22 = y1 + GAP_V;
-              out2.push(`  <path class="sds-connector" d="M${cx} ${y1} V${y22}"${l?.dashed ? ' stroke-dasharray="5 4"' : ""} marker-end="url(#ar)"/>`);
-              if (l?.label) out2.push(`  <text class="sds-note" x="${cx + 10}" y="${y1 + GAP_V / 2 + 4}">${esc(l.label)}</text>`);
-              y2 = y22;
-            }
-          });
-          height2 = y2 + hs[hs.length - 1] + margin;
-        }
-        return { svg: svgOf(out2, spec.title ?? spec.caption ?? label), findings };
-      }
-    }
-  }
-  const levels = [.../* @__PURE__ */ new Set([...depth2.values()])].sort((a, b) => a - b);
-  const pos = /* @__PURE__ */ new Map();
-  const byLevel = levels.map((lv) => top.filter((b) => depth2.get(b.id) === lv));
-  byLevel.forEach((row) => row.forEach((b, i) => pos.set(b.id, i)));
-  const mean = (ids, fallback) => ids.length ? ids.reduce((s, id) => s + (pos.get(id) ?? 0), 0) / ids.length : fallback;
-  const sweep3 = (down) => {
-    const order = down ? byLevel : [...byLevel].reverse();
-    for (const row of order) {
-      const key = (b) => mean(edges.filter(([f, t]) => (down ? t : f) === b.id).map(([f, t]) => down ? f : t), pos.get(b.id) ?? 0);
-      row.sort((a, b) => key(a) - key(b) || (pos.get(a.id) ?? 0) - (pos.get(b.id) ?? 0));
-      row.forEach((b, i) => pos.set(b.id, i));
-    }
-  };
-  sweep3(true);
-  sweep3(false);
-  sweep3(true);
-  const rows2 = [];
-  for (const lv of levels) {
-    const members = byLevel[levels.indexOf(lv)];
-    let row = [];
-    let used = 0;
-    for (const b of members) {
-      const w = outerW(b);
-      if (row.length && used + gapX + w > CANVAS - margin * 2) {
-        rows2.push(row);
-        row = [];
-        used = 0;
-      }
-      row.push(b);
-      used += (used ? gapX : 0) + w;
-    }
-    if (row.length) rows2.push(row);
-  }
-  const out = [];
-  const at = /* @__PURE__ */ new Map();
-  const place = (b, x, y2, w, h, row) => {
-    const inner = kids.get(b.id) ?? [];
-    at.set(b.id, { x, y: y2, w, h, row });
-    if (!inner.length) {
-      out.push(mapRect(b, x, y2, w, h));
-      return;
-    }
-    out.push(`  <rect class="${boxClass(b)}" x="${x}" y="${y2}" width="${w}" height="${h}" rx="3" fill="none"/>`);
-    out.push(`  <text class="sds-label" x="${x + PAD_IN}" y="${y2 + 22}">${esc(b.label)}</text>`);
-    let cy = y2 + HEAD;
-    for (const c of inner) {
-      const ch = outerH(c);
-      place(c, x + PAD_IN, cy, w - PAD_IN * 2, ch, row);
-      cy += ch + 10;
-    }
-  };
-  const rowOf = /* @__PURE__ */ new Map();
-  rows2.forEach((row, i) => {
-    for (const b of row) rowOf.set(b.id, i);
-  });
-  const rowOfAny = (id) => rowOf.get(holder(id)) ?? -1;
-  const lastInRow = new Set(rows2.map((row) => row[row.length - 1].id));
-  const bySide = (id) => lastInRow.has(holder(id));
-  const exitLane = /* @__PURE__ */ new Map(), entryLane = /* @__PURE__ */ new Map();
-  const lanesIn = rows2.map(() => 0);
-  const takeLane = (gap) => ({ gap, index: lanesIn[gap]++ });
-  const leaveBottom = /* @__PURE__ */ new Map(), enterTop = /* @__PURE__ */ new Map();
-  const leaveTop = /* @__PURE__ */ new Map(), enterBottom = /* @__PURE__ */ new Map();
-  const bump = (m, id) => m.set(id, (m.get(id) ?? 0) + 1);
-  for (const l of links) {
-    const ra = rowOfAny(l.from), rb = rowOfAny(l.to);
-    if (ra < 0 || rb < 0 || ra === rb) continue;
-    if (rb === ra + 1) {
-      const lane = takeLane(ra);
-      exitLane.set(l, lane);
-      entryLane.set(l, lane);
-      bump(leaveBottom, l.from);
-      bump(enterTop, l.to);
-    } else if (rb > ra + 1) {
-      if (!bySide(l.from)) {
-        exitLane.set(l, takeLane(ra));
-        bump(leaveBottom, l.from);
-      }
-      if (!bySide(l.to)) {
-        entryLane.set(l, takeLane(rb - 1));
-        bump(enterTop, l.to);
-      }
-    } else {
-      if (!bySide(l.from)) {
-        exitLane.set(l, takeLane(ra - 1));
-        bump(leaveTop, l.from);
-      }
-      if (!bySide(l.to)) {
-        entryLane.set(l, takeLane(rb));
-        bump(enterBottom, l.to);
-      }
-    }
-  }
-  const LANE_H = LABEL_H + LABEL_GAP * 2, LANE_TOP = LANE_H;
-  const gapAfter = (i) => Math.max(GAP_LINKED, LANE_TOP + LANE_H * lanesIn[i]);
-  const laneY = (gap, lane) => rowBottom[gap] + LANE_TOP + LANE_H * lane;
-  const rowTop = [], rowBottom = [];
-  let y = margin;
-  rows2.forEach((row, i) => {
-    const rh = Math.max(...row.map(outerH));
-    const rw = row.reduce((s, b) => s + outerW(b), 0) + gapX * (row.length - 1);
-    let x = margin + Math.floor((CANVAS - margin * 2 - rw) / 2);
-    rowTop.push(y);
-    rowBottom.push(y + rh);
-    for (const b of row) {
-      const w = outerW(b);
-      place(b, x, y, w, outerH(b), i);
-      x += w + gapX;
-    }
-    y += rh + (i < rows2.length - 1 ? gapAfter(i) : 0);
-  });
-  const rightMost = Math.max(...[...at.values()].map((p2) => p2.x + p2.w));
-  const skippers = links.filter((l) => {
-    const ra = rowOfAny(l.from), rb = rowOfAny(l.to);
-    return ra >= 0 && rb >= 0 && (rb < ra || rb > ra + 1);
-  });
-  const sideLane = (l) => rightMost + GAP_LINKED + Math.max(0, skippers.indexOf(l)) * GAP_Y;
-  const width = Math.max(rightMost, skippers.length ? sideLane(skippers[skippers.length - 1]) : 0) + margin;
-  const height = y + margin;
-  const exitX = (l) => {
-    const a = at.get(l.from), b = at.get(l.to);
-    const up = b.row < a.row;
-    const n = (up ? leaveTop : leaveBottom).get(l.from) ?? 0;
-    const towards = b.row === a.row + 1 ? b.x + b.w / 2 : sideLane(l);
-    return alignedTo(acrossPoints(byId.get(l.from), a, up ? "top" : "bottom", n), towards);
-  };
-  const entryX = (l) => {
-    const a = at.get(l.from), b = at.get(l.to);
-    const up = b.row < a.row;
-    const n = (up ? enterBottom : enterTop).get(l.to) ?? 0;
-    const towards = b.row === a.row + 1 ? a.x + a.w / 2 : sideLane(l);
-    return alignedTo(acrossPoints(byId.get(l.to), b, up ? "bottom" : "top", n), towards);
-  };
-  const drops = [];
-  for (const l of links) {
-    const a = at.get(l.from), b = at.get(l.to);
-    if (!a || !b || a.row === b.row) continue;
-    const down = b.row > a.row;
-    const el = exitLane.get(l), en = entryLane.get(l);
-    const ba = byId.get(l.from), bb = byId.get(l.to);
-    if (el) drops.push({ link: l, lane: el, x: exitX(l), edge: edgeY(ba, a, down ? "bottom" : "top") });
-    if (en) drops.push({ link: l, lane: en, x: entryX(l), edge: edgeY(bb, b, down ? "top" : "bottom") });
-  }
-  const clashes = (ds, yOf) => {
-    const segs = ds.map((d) => {
-      const ly = yOf(d.lane);
-      return { k: d.link, x: d.x, y1: Math.min(d.edge, ly), y2: Math.max(d.edge, ly) };
-    });
-    let n = 0;
-    for (let i = 0; i < segs.length; i++) for (let j = i + 1; j < segs.length; j++) {
-      if (segs[i].k === segs[j].k) continue;
-      const apart = Math.abs(segs[i].x - segs[j].x);
-      if (apart < 0.5 || apart >= GAP_APART) continue;
-      if (Math.min(segs[i].y2, segs[j].y2) - Math.max(segs[i].y1, segs[j].y1) > LABEL_GAP) n += 1;
-    }
-    return n;
-  };
-  const orders = (xs) => xs.length <= 1 ? [xs] : xs.flatMap((x, i) => orders([...xs.slice(0, i), ...xs.slice(i + 1)]).map((r) => [x, ...r]));
-  for (let g = 0; g < rows2.length; g++) {
-    const ds = drops.filter((d) => d.lane.gap === g);
-    const lanes = [...new Set(ds.map((d) => d.lane))];
-    if (lanes.length < 2) continue;
-    const yFor = (order) => {
-      const m = new Map(order.map((ln, i) => [ln, rowBottom[g] + LANE_TOP + LANE_H * i]));
-      return (ln) => m.get(ln);
-    };
-    let best = lanes, score2 = clashes(ds, yFor(lanes));
-    if (score2) {
-      if (lanes.length <= 6) {
-        for (const order of orders(lanes)) {
-          const s2 = clashes(ds, yFor(order));
-          if (s2 < score2) {
-            best = order;
-            score2 = s2;
-            if (!score2) break;
-          }
-        }
-      } else {
-        const rest = [...lanes], picked = [];
-        while (rest.length) {
-          let at2 = 0, low = Infinity;
-          for (let i = 0; i < rest.length; i++) {
-            const trial = [...picked, rest[i]];
-            const s2 = clashes(ds.filter((d) => trial.includes(d.lane)), yFor([...trial, ...rest.filter((r) => r !== rest[i])]));
-            if (s2 < low) {
-              low = s2;
-              at2 = i;
-            }
-          }
-          picked.push(...rest.splice(at2, 1));
-        }
-        if (clashes(ds, yFor(picked)) < score2) best = picked;
-      }
-    }
-    best.forEach((ln, i) => {
-      ln.index = i;
-    });
-  }
-  const taken = [];
-  const labelAt = (gap, cx, w, baseY) => {
-    let x = Math.min(Math.max(cx - w / 2, margin), width - margin - w);
-    let ly = baseY;
-    for (let tries = 0; tries < 4; tries++) {
-      const hit = taken.find((t) => t.gap === gap && Math.abs(t.y - ly) < LABEL_H + LABEL_GAP && t.x1 < x + w && x < t.x2);
-      if (!hit) break;
-      ly += LABEL_H + LABEL_GAP;
-    }
-    taken.push({ gap, x1: x, x2: x + w, y: ly });
-    return { x, y: ly };
-  };
-  const verticals = [];
-  const horizontals = [];
-  const pending = [];
-  for (const [pathId, l] of links.entries()) {
-    const a = at.get(l.from), b = at.get(l.to);
-    if (!a || !b) continue;
-    const dash = l.dashed ? ' stroke-dasharray="5 4"' : "";
-    let d;
-    let label2 = null;
-    const w = (l.label ?? "").length * W_NOTE;
-    if (a.row === b.row) {
-      const rightward = a.x < b.x;
-      const ba = byId.get(l.from), bb = byId.get(l.to);
-      const x1 = edgeX(ba, a, rightward ? "right" : "left"), x2 = edgeX(bb, b, rightward ? "left" : "right");
-      const y1 = midY(ba, a), y2 = midY(bb, b), mid = (x1 + x2) / 2;
-      d = `M${x1} ${y1} H${mid} V${y2} H${x2}`;
-      if (l.label) label2 = labelAt(-1 - a.row, mid, w, Math.min(a.y, b.y) - LABEL_GAP);
-    } else if (b.row === a.row + 1) {
-      const x1 = exitX(l), x2 = entryX(l);
-      const y1 = edgeY(byId.get(l.from), a, "bottom"), y2 = edgeY(byId.get(l.to), b, "top");
-      const lane = exitLane.get(l);
-      const mid = laneY(a.row, lane ? lane.index : 0);
-      const straight = Math.abs(x1 - x2) < 1;
-      d = straight ? `M${x1} ${y1} V${y2}` : `M${x1} ${y1} V${mid} H${x2} V${y2}`;
-      if (l.label) {
-        const lo = Math.min(x1, x2), hi = Math.max(x1, x2);
-        const cx = straight ? x1 + 8 + w / 2 : (lo + hi) / 2;
-        label2 = { x: Math.min(Math.max(cx - w / 2, margin), width - margin - w), y: straight ? mid + LABEL_GAP : mid - LABEL_GAP };
-        if (!straight && w > hi - lo - 8) {
-          label2.x = Math.min(Math.max(hi + 6, margin), width - margin - w);
-          if (label2.x + w > width - margin) label2.x = Math.max(lo - w - 6, margin);
-        }
-      }
-    } else if (b.row > a.row) {
-      const sideX = sideLane(l);
-      const parts = [];
-      let runY, runFrom;
-      const ba = byId.get(l.from), bb = byId.get(l.to);
-      if (bySide(l.from)) {
-        runY = midY(ba, a);
-        runFrom = edgeX(ba, a, "right");
-        parts.push(`M${runFrom} ${runY}`);
-      } else {
-        const el = exitLane.get(l);
-        runY = laneY(el.gap, el.index);
-        runFrom = exitX(l);
-        parts.push(`M${runFrom} ${edgeY(ba, a, "bottom")}`, `V${runY}`);
-      }
-      parts.push(`H${sideX}`);
-      if (bySide(l.to)) parts.push(`V${midY(bb, b)}`, `H${edgeX(bb, b, "right")}`);
-      else {
-        const en = entryLane.get(l);
-        parts.push(`V${laneY(en.gap, en.index)}`, `H${entryX(l)}`, `V${edgeY(bb, b, "top")}`);
-      }
-      d = parts.join(" ");
-      if (l.label) label2 = labelAt(a.row, (runFrom + sideX) / 2, w, runY - LABEL_GAP);
-    } else {
-      findings.push(`the link \`${l.from}\` \u2192 \`${l.to}\` runs upward; a map flows one way, so a link points at a box below its source`);
-      const sideX = sideLane(l);
-      const parts = [];
-      let runY, runFrom;
-      const ba = byId.get(l.from), bb = byId.get(l.to);
-      if (bySide(l.from)) {
-        runY = midY(ba, a);
-        runFrom = edgeX(ba, a, "right");
-        parts.push(`M${runFrom} ${runY}`);
-      } else {
-        const el = exitLane.get(l);
-        runY = laneY(el.gap, el.index);
-        runFrom = exitX(l);
-        parts.push(`M${runFrom} ${edgeY(ba, a, "top")}`, `V${runY}`);
-      }
-      parts.push(`H${sideX}`);
-      if (bySide(l.to)) parts.push(`V${midY(bb, b)}`, `H${edgeX(bb, b, "right")}`);
-      else {
-        const en = entryLane.get(l);
-        parts.push(`V${laneY(en.gap, en.index)}`, `H${entryX(l)}`, `V${edgeY(bb, b, "bottom")}`);
-      }
-      d = parts.join(" ");
-      if (l.label) label2 = labelAt(a.row - 1, (runFrom + sideX) / 2, w, runY - LABEL_GAP);
-    }
-    out.push(`  <path class="sds-connector" d="${d}"${dash} marker-end="url(#ar)"/>`);
-    horizontals.push(...horzOf(d, pathId));
-    if (label2 && l.label) {
-      verticals.push(...vertsOf(d, pathId));
-      pending.push({ ...label2, w, txt: l.label, path: pathId });
-    } else verticals.push(...vertsOf(d, pathId));
-  }
-  out.push(...placeLabels(pending, verticals, margin, width, [...at.values(), ...horizontals]));
-  return { svg: svgOf(out, spec.title ?? spec.caption ?? label), findings };
-}
-function drawSystem(spec) {
-  const findings = [];
-  const layers = spec.layers ?? [];
-  const outside = spec.outside ?? [];
-  const links = spec.links ?? [];
-  if (!layers.length) return { svg: "", findings: ["a `system` figure with no layers; a system is layers inside one boundary"] };
-  const inner = layers.flatMap((l) => l.boxes);
-  const byId = new Map([...inner, ...outside].map((b) => [b.id, b]));
-  const layerOf = /* @__PURE__ */ new Map();
-  layers.forEach((l, i) => l.boxes.forEach((b) => layerOf.set(b.id, i)));
-  const isOut = new Set(outside.map((b) => b.id));
-  for (const l of links) for (const end2 of [l.from, l.to])
-    if (!byId.has(end2)) findings.push(`an edge names \`${end2}\`, and no box has that id`);
-  for (const l of links)
-    if (!l.label && (isOut.has(l.from) || isOut.has(l.to)))
-      findings.push(`the edge \`${l.from}\` \u2192 \`${l.to}\` crosses the boundary with nothing on it; an edge carries what flows`);
-  const reaches = new Set(links.filter((l) => !isOut.has(l.from) && isOut.has(l.to)).map((l) => l.to));
-  const feeds = new Set(links.filter((l) => isOut.has(l.from)).map((l) => l.from));
-  const left = outside.filter((b) => feeds.has(b.id));
-  const right = outside.filter((b) => !feeds.has(b.id) && reaches.has(b.id));
-  for (const b of outside)
-    if (!feeds.has(b.id) && !reaches.has(b.id))
-      findings.push(`\`${b.id}\` sits outside the boundary with no edge to it; anything drawn outside is something the system talks to`);
-  const shaped = (b) => b.shape ? b : { ...b, shape: RESOURCE[b.as ?? "service"].shape, off: b.off ?? RESOURCE[b.as ?? "service"].soft };
-  const margin = 24, HEAD_MOD = 40, HEAD_LAYER = 36, PAD_IN = 16;
-  const innerW = Math.max(200, ...inner.map(mapBoxWidth));
-  const layerW = innerW + PAD_IN * 2, modW = layerW + PAD_IN * 2;
-  const depthOf = new Map(left.map((b) => [b.id, 0]));
-  for (let pass = 0; pass < left.length; pass++)
-    for (const l of links)
-      if (depthOf.has(l.from) && depthOf.has(l.to))
-        depthOf.set(l.to, Math.max(depthOf.get(l.to), depthOf.get(l.from) + 1));
-  const leftCols = [];
-  for (const b of left) (leftCols[depthOf.get(b.id) ?? 0] ??= []).push(b);
-  const leftW = leftCols.map((c) => Math.max(...c.map((b) => mapBoxWidth(shaped(b)))));
-  const leftGap = leftCols.map((col) => {
-    const said = links.filter((l) => col.some((b) => b.id === l.from)).map((l) => (l.label ?? "").length * W_NOTE);
-    return Math.max(GAP_LINKED, Math.ceil(Math.max(0, ...said)) + 32);
-  });
-  const leftSpan = leftW.reduce((t, w, i) => t + w + leftGap[i], 0);
-  const rightW = right.length ? Math.max(...right.map((b) => mapBoxWidth(shaped(b)))) : 0;
-  const modX = margin + leftSpan;
-  const outEdges = links.filter((l) => !isOut.has(l.from) && reaches.has(l.to));
-  const outLabel = Math.max(0, ...outEdges.map((l) => (l.label ?? "").length * W_NOTE));
-  const railW = outEdges.length ? Math.max(GAP_LINKED + GAP_APART * Math.max(0, outEdges.length - 1) + GAP_LINKED, Math.ceil(outLabel) + 32) : GAP_LINKED;
-  const rightX = modX + modW + (right.length ? railW : 0);
-  const at = /* @__PURE__ */ new Map();
-  const body3 = [];
-  const layerAt = [];
-  let y = margin + HEAD_MOD;
-  for (const layer of layers) {
-    const hs = layer.boxes.map(mapBoxHeight);
-    const lh = HEAD_LAYER + hs.reduce((t, h) => t + h, 0) + GAP_Y * (hs.length - 1) + PAD_IN;
-    layerAt.push({ y, h: lh });
-    let by = y + HEAD_LAYER;
-    layer.boxes.forEach((b, i) => {
-      at.set(b.id, { x: modX + PAD_IN * 2, y: by, w: innerW, h: hs[i] });
-      by += hs[i] + GAP_Y;
-    });
-    y += lh + GAP_LINKED;
-  }
-  const modH = y - GAP_LINKED + PAD_IN - margin;
-  body3.push(`  <rect class="sds-box sds-absent" x="${modX}" y="${margin}" width="${modW}" height="${modH}" rx="3" fill="none"/>`);
-  body3.push(`  <text class="sds-title" x="${modX + PAD_IN}" y="${margin + 26}">${esc(spec.title ?? "the system")}</text>`);
-  layers.forEach((layer, i) => {
-    const { y: ly, h: lh } = layerAt[i];
-    body3.push(`  <rect class="sds-box sds-absent" x="${modX + PAD_IN}" y="${ly}" width="${layerW}" height="${lh}" rx="3" fill="none"/>`);
-    body3.push(`  <text class="sds-title" x="${modX + PAD_IN * 2}" y="${ly + 24}">${esc(layer.name)}</text>`);
-    for (const b of layer.boxes) {
-      const p = at.get(b.id);
-      body3.push(mapRect(b, p.x, p.y, p.w, p.h));
-    }
-  });
-  for (let i = 0; i + 1 < layers.length; i++) {
-    const a = layerAt[i], b = layerAt[i + 1];
-    body3.push(`  <path class="sds-connector" d="M${modX + modW / 2} ${a.y + a.h} V${b.y}" marker-end="url(#ar)"/>`);
-  }
-  const settle = (boxes, want, x, w) => {
-    const rows2 = boxes.map((b) => ({ b, h: mapBoxHeight(shaped(b)), y: want(b) })).sort((m, n) => m.y - n.y);
-    let floor = margin;
-    for (const r of rows2) {
-      r.y = Math.max(r.y - r.h / 2, floor);
-      at.set(r.b.id, { x, y: r.y, w, h: r.h });
-      body3.push(mapRect(shaped(r.b), x, r.y, w, r.h));
-      floor = r.y + r.h + GAP_Y;
-    }
-  };
-  const midOf = (id) => {
-    const p = at.get(id);
-    return p ? p.y + p.h / 2 : margin + modH / 2;
-  };
-  let lx = margin;
-  leftCols.forEach((col, i) => {
-    settle(col, (b) => {
-      const onward = links.filter((l) => l.from === b.id).map((l) => l.to);
-      return onward.length ? onward.reduce((t, id) => t + midOf(id), 0) / onward.length : margin + modH / 2;
-    }, lx, leftW[i]);
-    lx += leftW[i] + leftGap[i];
-  });
-  settle(right, (b) => {
-    const back = links.filter((l) => l.to === b.id).map((l) => l.from);
-    return back.length ? back.reduce((t, id) => t + midOf(id), 0) / back.length : margin + modH / 2;
-  }, rightX, rightW);
-  const pending = [], verticals = [];
-  const leaving = /* @__PURE__ */ new Map(), arriving = /* @__PURE__ */ new Map();
-  for (const l of links) {
-    if (!at.has(l.from) || !at.has(l.to)) continue;
-    leaving.set(l.from, (leaving.get(l.from) ?? 0) + 1);
-    arriving.set(l.to, (arriving.get(l.to) ?? 0) + 1);
-  }
-  const span = (b, p) => shapeOf(b) === "store" ? { start: p.y + CAP, len: p.h - CAP } : { start: p.y, len: p.h };
-  const seat = /* @__PURE__ */ new Map();
-  for (const [id, group] of new Map(
-    [...new Set(links.map((l) => l.from))].map((id2) => [id2, links.filter((l) => l.from === id2 && at.has(l.to))])
-  )) {
-    if (!at.has(id)) continue;
-    group.sort((m, n) => at.get(m.to).y - at.get(n.to).y).forEach((l, i) => seat.set(l, i));
-  }
-  const arrive = /* @__PURE__ */ new Map();
-  for (const [id, group] of new Map(
-    [...new Set(links.map((l) => l.to))].map((id2) => [id2, links.filter((l) => l.to === id2 && at.has(l.from))])
-  )) {
-    if (!at.has(id)) continue;
-    group.sort((m, n) => at.get(m.from).y - at.get(n.from).y).forEach((l, i) => arrive.set(l, i));
-  }
-  const sideY = (b, p, n, i) => {
-    const { start, len } = span(b, p);
-    const pts = sidePoints(start, len, n);
-    return pts[Math.min(i, pts.length - 1)];
-  };
-  const outward = links.filter((l) => isOut.has(l.to) && !isOut.has(l.from) && at.has(l.to) && at.has(l.from));
-  const railOf = /* @__PURE__ */ new Map();
-  outward.forEach((l, i) => railOf.set(l, i));
-  if (outward.length > 1) {
-    const runsFor = (order) => {
-      const segs = [];
-      order.forEach((l, i) => {
-        const a = at.get(l.from), b = at.get(l.to);
-        const ba = shaped(byId.get(l.from));
-        const bb = shaped(byId.get(l.to));
-        const y1 = sideY(ba, a, leaving.get(l.from) ?? 1, seat.get(l) ?? 0);
-        const y2 = sideY(bb, b, arriving.get(l.to) ?? 1, arrive.get(l) ?? 0);
-        const via = modX + modW + GAP_LINKED + GAP_APART * i;
-        if (Math.abs(y1 - y2) < 1) segs.push({ k: l, y: y1, x1: edgeX(ba, { ...a, row: 0 }, "right"), x2: b.x });
-        else {
-          segs.push({ k: l, y: y1, x1: edgeX(ba, { ...a, row: 0 }, "right"), x2: via });
-          segs.push({ k: l, y: y2, x1: via, x2: b.x });
-        }
-      });
-      let bad = 0;
-      for (let i = 0; i < segs.length; i++) for (let j = i + 1; j < segs.length; j++) {
-        if (segs[i].k === segs[j].k) continue;
-        const apart = Math.abs(segs[i].y - segs[j].y);
-        if (apart < 0.5 || apart >= GAP_APART) continue;
-        if (Math.min(segs[i].x2, segs[j].x2) - Math.max(segs[i].x1, segs[j].x1) > LABEL_GAP) bad += 1;
-      }
-      return bad;
-    };
-    const permute = (xs) => xs.length <= 1 ? [xs] : xs.flatMap((x, i) => permute([...xs.slice(0, i), ...xs.slice(i + 1)]).map((r) => [x, ...r]));
-    let best = outward, score2 = runsFor(outward);
-    if (score2) {
-      const tries = outward.length <= 6 ? permute(outward) : [
-        [...outward].sort((m, n) => at.get(m.to).y - at.get(n.to).y),
-        [...outward].sort((m, n) => at.get(n.to).y - at.get(m.to).y)
-      ];
-      for (const order of tries) {
-        const s2 = runsFor(order);
-        if (s2 < score2) {
-          best = order;
-          score2 = s2;
-          if (!score2) break;
-        }
-      }
-    }
-    best.forEach((l, i) => railOf.set(l, i));
-  }
-  for (const [pathId, l] of links.entries()) {
-    const a = at.get(l.from), b = at.get(l.to);
-    if (!a || !b) continue;
-    const ba = shaped(byId.get(l.from));
-    const bb = shaped(byId.get(l.to));
-    const dash = l.dashed ? ' stroke-dasharray="5 4"' : "";
-    const w = (l.label ?? "").length * W_NOTE;
-    const x1 = edgeX(ba, { ...a, row: 0 }, "right"), x2 = edgeX(bb, { ...b, row: 0 }, "left");
-    const y1 = sideY(ba, a, leaving.get(l.from) ?? 1, seat.get(l) ?? 0);
-    const y2 = sideY(bb, b, arriving.get(l.to) ?? 1, arrive.get(l) ?? 0);
-    let d, lx2, ly2;
-    if (isOut.has(l.to) && !isOut.has(l.from)) {
-      const via = modX + modW + GAP_LINKED + GAP_APART * (railOf.get(l) ?? 0);
-      d = Math.abs(y1 - y2) < 1 ? `M${x1} ${y1} H${x2}` : `M${x1} ${y1} H${via} V${y2} H${x2}`;
-      const from = Math.abs(y1 - y2) < 1 ? modX + modW : via;
-      lx2 = from + (x2 - from - w) / 2;
-      ly2 = y2 - LABEL_GAP;
-    } else {
-      d = Math.abs(y1 - y2) < 1 ? `M${x1} ${y1} H${x2}` : `M${x1} ${y1} V${y2} H${x2}`;
-      const stop = isOut.has(l.to) ? x2 : modX;
-      lx2 = x1 + (stop - x1 - w) / 2;
-      ly2 = Math.min(y1, y2) - LABEL_GAP;
-    }
-    body3.push(`  <path class="sds-connector" d="${d}"${dash} marker-end="url(#ar)"/>`);
-    verticals.push(...vertsOf(d, pathId));
-    if (l.label) pending.push({ x: Math.round(lx2), y: Math.round(ly2), w, txt: l.label, path: pathId });
-  }
-  body3.push(...placeLabels(pending, verticals, margin, rightX + rightW + margin));
-  return { svg: svgOf(body3, spec.title ?? spec.caption ?? "system diagram"), findings };
-}
-function drawSequence(spec) {
-  const findings = [];
-  const parts = spec.boxes ?? [];
-  const msgs = spec.links ?? [];
-  if (!parts.length) return { svg: "", findings: ["a `dg` figure with no boxes"] };
-  const idx = new Map(parts.map((b, i) => [b.id, i]));
-  for (const m of msgs) for (const end2 of [m.from, m.to])
-    if (!idx.has(end2)) findings.push(`a message names \`${end2}\`, and no participant has that id`);
-  const known = msgs.filter((m) => idx.has(m.from) && idx.has(m.to));
-  for (const m of known) if (!m.label)
-    findings.push(`the message \`${m.from}\` \u2192 \`${m.to}\` carries no label; a sequence shows who says WHAT to whom`);
-  const margin = 24;
-  const HEAD_H = 44, PITCH = LABEL_H + LABEL_GAP * 3, TAIL = 36, SELF_W = 44, SELF_H = 22;
-  const ws = parts.map((b) => Math.max(120, Math.ceil(b.label.length * W_LABEL + PAD_X * 2)));
-  const gaps = parts.slice(0, -1).map((_, i) => {
-    const across = known.filter((m) => {
-      const a = idx.get(m.from), b = idx.get(m.to);
-      return Math.min(a, b) === i && Math.max(a, b) === i + 1;
-    });
-    const widest = Math.max(0, ...across.map((m) => (m.label ?? "").length * W_NOTE));
-    return Math.max(GAP_COL, Math.ceil(widest + 24 - (ws[i] + ws[i + 1]) / 2));
-  });
-  const out = [];
-  const xs = [];
-  let x = margin;
-  parts.forEach((b, i) => {
-    xs.push(x + ws[i] / 2);
-    out.push(`  <rect class="${boxClass(b)}" x="${x}" y="${margin}" width="${ws[i]}" height="${HEAD_H}" rx="3"/>`);
-    out.push(centred("sds-label", b.label, x + ws[i] / 2, margin + HEAD_H / 2 + 4));
-    x += ws[i] + (gaps[i] ?? 0);
-  });
-  let y = margin + HEAD_H + PITCH;
-  for (const m of known) {
-    const a = xs[idx.get(m.from)], b = xs[idx.get(m.to)];
-    const dash = m.dashed ? ' stroke-dasharray="5 4"' : "";
-    if (m.from === m.to) {
-      out.push(`  <path class="sds-connector" d="M${a} ${y} H${a + SELF_W} V${y + SELF_H} H${a}"${dash} marker-end="url(#ar)"/>`);
-      if (m.label) out.push(`  <text class="sds-note" x="${Math.round(a + SELF_W + LABEL_GAP)}" y="${y + SELF_H / 2 + 4}">${esc(m.label)}</text>`);
-      y += SELF_H + PITCH;
-      continue;
-    }
-    out.push(`  <path class="sds-connector" d="M${a} ${y} H${b}"${dash} marker-end="url(#ar)"/>`);
-    if (m.label) out.push(centred("sds-note", m.label, (a + b) / 2, y - LABEL_GAP));
-    y += PITCH;
-  }
-  const foot = y - PITCH + TAIL;
-  parts.forEach((_, i) => out.push(
-    `  <path class="sds-connector sds-lifeline" d="M${xs[i]} ${margin + HEAD_H} V${foot}" stroke-dasharray="3 5"/>`
-  ));
-  return { svg: svgOf(out, spec.title ?? spec.caption ?? "sequence diagram"), findings };
-}
-function drawFlowchart(spec) {
-  const boxes = spec.boxes ?? [];
-  const links = spec.links ?? [];
-  const outs = /* @__PURE__ */ new Map(), ins = /* @__PURE__ */ new Map();
-  for (const l of links) {
-    outs.set(l.from, (outs.get(l.from) ?? 0) + 1);
-    ins.set(l.to, (ins.get(l.to) ?? 0) + 1);
-  }
-  const shaped = boxes.map((b) => {
-    if (b.shape) return b;
-    if (!ins.get(b.id) || !outs.get(b.id)) return { ...b, shape: "terminator" };
-    if ((outs.get(b.id) ?? 0) > 1) return { ...b, shape: "decision" };
-    return b;
-  });
-  const shapeById = new Map(shaped.map((b) => [b.id, shapeOf(b)]));
-  const { svg, findings } = drawMap({ ...spec, boxes: shaped }, { downward: true });
-  for (const l of links)
-    if (shapeById.get(l.from) === "decision" && !l.label)
-      findings.push(`the branch \`${l.from}\` \u2192 \`${l.to}\` leaves a decision with no answer on it; each branch out of a diamond carries its own answer`);
-  return { svg, findings };
-}
-var DRAWERS = {
-  entities: drawEntities,
-  chain: drawChain,
-  flowchart: drawFlowchart,
-  sequence: drawSequence,
-  system: drawSystem,
-  map: drawMap
-};
-var KINDS = Object.keys(DRAWERS);
+// packages/plugin-spn-devex/src/scripts/checks/corpus.ts
+import { createHash as createHash2 } from "node:crypto";
+import { execFileSync } from "node:child_process";
+import { existsSync as existsSync3, readdirSync as readdirSync3, statSync as statSync4 } from "node:fs";
+import { basename as basename2, dirname as dirname3, join as join5, relative as relative2, resolve as resolve3 } from "node:path";
 
-// packages/plugin-spn-devex/src/scripts/lib/figures.ts
-var LANGS = {
-  ts: { keywords: "const let var function return if else for while class interface type enum export import from as await async new extends implements readonly public private void null undefined true false".split(" "), comment: /\/\/[^\n]*|\/\*[\s\S]*?\*\//g, type: /\b[A-Z][A-Za-z0-9_]+\b/g },
-  json: { keywords: ["true", "false", "null"] },
-  yaml: { comment: /#[^\n]*/g },
-  sql: { keywords: "SELECT FROM WHERE INSERT INTO VALUES UPDATE SET DELETE CREATE TABLE INDEX PRIMARY KEY FOREIGN REFERENCES NOT NULL UNIQUE ON DEFAULT ALTER ADD CONSTRAINT AND OR JOIN LEFT INNER GROUP BY ORDER LIMIT".split(" "), comment: /--[^\n]*/g },
-  sh: { comment: /#[^\n]*/g },
-  diff: {},
-  md: {}
-};
+// packages/plugin-spn-devex/src/scripts/lib/corpus-cache.ts
+import { randomBytes } from "node:crypto";
+import {
+  closeSync,
+  mkdirSync as mkdirSync2,
+  openSync,
+  readdirSync as readdirSync2,
+  readFileSync as readFileSync3,
+  renameSync,
+  statSync as statSync3,
+  unlinkSync,
+  writeFileSync as writeFileSync2,
+  writeSync
+} from "node:fs";
+import { homedir } from "node:os";
+import { join as join4 } from "node:path";
+var TEST_STORE_ENV = "SPN_CORPUS_CACHE_FOR_TESTS";
+var SCHEMA = 1;
+var LOCK_STALE_MS = 6e4;
+var POLL_MS = 50;
+var PRUNE_AFTER_MS = 14 * 24 * 60 * 60 * 1e3;
+var TEMP_STALE_MS = 60 * 60 * 1e3;
+function storeDir() {
+  return process.env[TEST_STORE_ENV] || join4(homedir(), ".spnutils", "cache", "corpus");
+}
+var sleepCell = new Int32Array(new SharedArrayBuffer(4));
+function sleep(ms) {
+  Atomics.wait(sleepCell, 0, 0, ms);
+}
+function hashFiles(hash, dir, limit) {
+  const files = [];
+  const walk2 = (at, rel) => {
+    let entries;
+    try {
+      entries = readdirSync2(at);
+    } catch {
+      return true;
+    }
+    for (const entry of entries) {
+      if (entry.startsWith(".") || entry === "node_modules" || entry === "dist") continue;
+      const full = join4(at, entry);
+      let st;
+      try {
+        st = statSync3(full);
+      } catch {
+        continue;
+      }
+      const relPath = rel ? `${rel}/${entry}` : entry;
+      if (st.isDirectory()) {
+        if (!walk2(full, relPath)) return false;
+        continue;
+      }
+      if (!st.isFile()) continue;
+      if (limit.left-- <= 0) return false;
+      files.push(relPath);
+    }
+    return true;
+  };
+  if (!walk2(dir, "")) return false;
+  files.sort();
+  for (const rel of files) {
+    let bytes;
+    try {
+      bytes = readFileSync3(join4(dir, rel));
+    } catch {
+      hash.update(`${rel}\0unreadable\0`);
+      continue;
+    }
+    hash.update(`${rel}\0${bytes.length}\0`);
+    hash.update(bytes);
+  }
+  return true;
+}
+function hashFile(hash, label, path) {
+  try {
+    const bytes = readFileSync3(path);
+    hash.update(`${label}\0${bytes.length}\0`);
+    hash.update(bytes);
+  } catch {
+    hash.update(`${label}\0absent\0`);
+  }
+}
+function verdictPath(key) {
+  return join4(storeDir(), `${key}.json`);
+}
+function lockPath(key) {
+  return join4(storeDir(), `${key}.lock`);
+}
+function readVerdict(key) {
+  try {
+    const saved = JSON.parse(readFileSync3(verdictPath(key), "utf8"));
+    if (saved?.schema !== SCHEMA || saved?.key !== key || !Array.isArray(saved?.findings)) return null;
+    return saved;
+  } catch {
+    return null;
+  }
+}
+function writeVerdict(verdict) {
+  const temp = join4(storeDir(), `.${verdict.key}.${process.pid}.${randomBytes(4).toString("hex")}.tmp`);
+  try {
+    mkdirSync2(storeDir(), { recursive: true });
+    writeFileSync2(temp, `${JSON.stringify(verdict, null, 2)}
+`, "utf8");
+    renameSync(temp, verdictPath(verdict.key));
+    return true;
+  } catch {
+    try {
+      unlinkSync(temp);
+    } catch {
+    }
+    return false;
+  }
+}
+function alive(pid) {
+  if (!Number.isInteger(pid) || pid <= 0) return false;
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (error) {
+    return error?.code === "EPERM";
+  }
+}
+function claim(key) {
+  const path = lockPath(key);
+  try {
+    mkdirSync2(storeDir(), { recursive: true });
+  } catch {
+    return null;
+  }
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const fd = openSync(path, "wx");
+      try {
+        writeSync(fd, String(process.pid));
+      } finally {
+        closeSync(fd);
+      }
+      return () => {
+        try {
+          unlinkSync(path);
+        } catch {
+        }
+      };
+    } catch (error) {
+      if (error?.code !== "EEXIST") return null;
+      let stale = false;
+      try {
+        const st = statSync3(path);
+        const owner = Number(readFileSync3(path, "utf8").trim());
+        stale = Date.now() - st.mtimeMs > LOCK_STALE_MS || owner > 0 && !alive(owner);
+      } catch {
+        continue;
+      }
+      if (!stale) return null;
+      try {
+        unlinkSync(path);
+      } catch {
+      }
+    }
+  }
+  return null;
+}
+function verdictFor(key, subject, compute, waitUntil) {
+  const stored = readVerdict(key);
+  if (stored) return { verdict: stored, source: "replayed" };
+  const make = (c) => ({ schema: SCHEMA, key, subject, at: (/* @__PURE__ */ new Date()).toISOString(), findings: c.findings, ran: c.ran });
+  for (; ; ) {
+    const release = claim(key);
+    if (release) {
+      try {
+        const late = readVerdict(key);
+        if (late) return { verdict: late, source: "waited" };
+        const computed = compute();
+        const verdict = make(computed);
+        return { verdict, source: computed.store && writeVerdict(verdict) ? "ran" : "unshared" };
+      } finally {
+        release();
+      }
+    }
+    const theirs = readVerdict(key);
+    if (theirs) return { verdict: theirs, source: "waited" };
+    if (Date.now() >= waitUntil) return { verdict: make(compute()), source: "unshared" };
+    sleep(POLL_MS);
+  }
+}
+function prune(now = Date.now()) {
+  let entries;
+  try {
+    entries = readdirSync2(storeDir());
+  } catch {
+    return;
+  }
+  for (const entry of entries) {
+    const full = join4(storeDir(), entry);
+    const limit = entry.endsWith(".tmp") ? TEMP_STALE_MS : entry.endsWith(".json") ? PRUNE_AFTER_MS : 0;
+    if (!limit) continue;
+    try {
+      if (now - statSync3(full).mtimeMs > limit) unlinkSync(full);
+    } catch {
+    }
+  }
+}
 
-// packages/plugin-spn-devex/src/scripts/lib/render.ts
+// packages/plugin-spn-devex/src/scripts/checks/corpus.ts
 init_docs_tree();
+var WIRED = [
+  { args: (tree) => ["docs", "audit", tree], label: "audit" },
+  { args: (tree) => ["docs", "face", "--check", dirname3(tree)], label: "face --check" },
+  { args: (tree) => ["docs", "topics", dirname3(tree)], label: "topics" },
+  { args: (tree) => ["docs", "parity", dirname3(tree)], label: "parity" }
+];
+var REPORTED_ELSEWHERE = [
+  { label: "coherence", why: "most of what it reports is a cardinality heuristic that cannot tell a closed set from one that can grow, so it is read rather than gated on" },
+  { label: "restate-drift", why: "a drift is a question \u2014 does this restatement still hold \u2014 and the only answer is reading the diff, which a hook cannot do for you" },
+  { label: "figures check", why: "joins once it has run clean across all seven trees on a day nothing was redrawn" }
+];
+var BUDGET_MS = 1e4;
+var MAX_FILES = 2e4;
+function docsTrees(root) {
+  const out = [];
+  let entries;
+  try {
+    entries = readdirSync3(root);
+  } catch {
+    return out;
+  }
+  for (const entry of entries.sort()) {
+    if (entry.startsWith(".") || entry === "node_modules") continue;
+    const repo = join5(root, entry);
+    try {
+      if (!statSync4(repo).isDirectory()) continue;
+    } catch {
+      continue;
+    }
+    if (!existsSync3(join5(repo, "sprepo.json"))) continue;
+    const tree = join5(repo, "docs");
+    if (existsSync3(tree)) out.push(tree);
+  }
+  return out;
+}
+function runOne(root, cli, args) {
+  if (!existsSync3(cli)) return { rule: [], broke: `no CLI at ${cli}` };
+  try {
+    execFileSync(
+      process.execPath,
+      [cli, ...args],
+      { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], timeout: 2e4, cwd: root, env: { ...process.env, SPN_WORKSPACE: root } }
+    );
+    return { rule: [], broke: null };
+  } catch (error) {
+    const out = String(error?.stdout ?? "");
+    if (error?.status === 1) {
+      const lines = out.split("\n");
+      const rule = [];
+      for (let i = 0; i < lines.length; i++) {
+        if (!lines[i].includes("\u2717")) continue;
+        const why = (lines[i + 1] ?? "").trim();
+        rule.push(`${lines[i].replace(/^✗\s*RULE\s*/, "").trim()}${why ? ` \u2014 ${why}` : ""}`);
+      }
+      return { rule, broke: null };
+    }
+    return { rule: [], broke: `exit ${error?.status ?? "?"} \u2014 ${String(error?.stderr ?? error?.message ?? "").slice(0, 200)}` };
+  }
+}
+function pluginScriptsDir(from) {
+  let dir = from;
+  for (let hop = 0; hop < 8; hop++) {
+    const name = basename2(dir);
+    if (name === "scripts" || name === "dist") return join5(dirname3(dir), "scripts");
+    const up = dirname3(dir);
+    if (up === dir) break;
+    dir = up;
+  }
+  return from;
+}
+var SCRIPTS = pluginScriptsDir(import.meta.dirname);
+function cliPath(scripts) {
+  const bundled = join5(dirname3(scripts), "dist", "cli.mjs");
+  return existsSync3(bundled) ? bundled : join5(scripts, "cli.ts");
+}
+var CLI = cliPath(SCRIPTS);
+var SUPPORT_LIB = resolve3(SCRIPTS, "..", "..", "..", "plugin-support-lib", "src", "lib");
+var shortHash = (hash) => hash.digest("hex").slice(0, 32);
+function checkerHash(scripts = SCRIPTS, supportLib = SUPPORT_LIB) {
+  const hash = createHash2("sha256");
+  hash.update(`node\0${process.version}\0`);
+  const limit = { left: MAX_FILES };
+  hash.update("scripts\0");
+  if (!hashFiles(hash, scripts, limit)) return null;
+  hash.update("support\0");
+  if (!hashFiles(hash, supportLib, limit)) return null;
+  return shortHash(hash);
+}
+function templatesDir(root) {
+  return process.env.SPN_TEMPLATES ?? bookTemplatesDir(join5(root, "spn-foundation"));
+}
+function treeHash(root, tree) {
+  const hash = createHash2("sha256");
+  const limit = { left: MAX_FILES };
+  hash.update(`tree\0${relative2(root, tree)}\0`);
+  if (!hashFiles(hash, tree, limit)) return null;
+  const repo = dirname3(tree);
+  hashFile(hash, "sprepo.json", join5(repo, "sprepo.json"));
+  hashFile(hash, "CONCEPT.md", join5(repo, "CONCEPT.md"));
+  hash.update("templates\0");
+  if (!hashFiles(hash, templatesDir(root), limit)) return null;
+  return shortHash(hash);
+}
+function runCorpus(root) {
+  const trees = docsTrees(root);
+  if (!trees.length) return { warnings: [], runs: [] };
+  const deadline = Date.now() + BUDGET_MS;
+  const checker = checkerHash();
+  const findings = [];
+  const broke = [];
+  const runs = [];
+  const replayed = [];
+  let cutShort = false;
+  const settle = (subject, key, compute) => {
+    if (!key) {
+      const c = compute();
+      runs.push({ subject, source: "unshared" });
+      return c.findings;
+    }
+    const { verdict, source } = verdictFor(key, subject, compute, deadline);
+    runs.push({ subject, source });
+    if ((source === "replayed" || source === "waited") && verdict.findings.length) replayed.push(subject);
+    return verdict.findings;
+  };
+  for (const tree of trees) {
+    const subject = relative2(root, tree);
+    if (Date.now() > deadline) {
+      cutShort = true;
+      runs.push({ subject, source: "not reached" });
+      continue;
+    }
+    const hash = checker ? treeHash(root, tree) : null;
+    const lines = settle(subject, hash && `${hash}.${checker}`, () => {
+      const found = [];
+      const ran = [];
+      let complete = true, failed = false;
+      for (const step of WIRED) {
+        if (Date.now() > deadline) {
+          complete = false;
+          cutShort = true;
+          break;
+        }
+        const { rule, broke: failure } = runOne(root, CLI, step.args(tree));
+        ran.push({ tool: step.label, rule: rule.length });
+        if (failure) {
+          failed = true;
+          broke.push(`\`${step.label}\` could not run over \`${subject}\` \u2014 ${failure}`);
+          continue;
+        }
+        for (const line of rule) found.push(`${basename2(dirname3(tree))} \xB7 ${step.label} \xB7 ${line}`);
+      }
+      return { findings: found, ran, store: complete && !failed };
+    });
+    findings.push(...lines);
+  }
+  if (runs.some((r) => r.source === "ran")) prune();
+  const which = `Ran ${WIRED.map((w) => `\`${w.label}\``).join(" \xB7 ")} over ${trees.length} docs tree(s). NOT run, and each is somebody's owed work rather than a clean result: ` + REPORTED_ELSEWHERE.map((t) => `\`${t.label}\` (${t.why})`).join(" \xB7 ") + ".";
+  const warnings = [];
+  if (cutShort) {
+    const answered = runs.filter((r) => r.source !== "not reached").length;
+    warnings.push({ check: "corpus", message: `The corpus run passed its ${BUDGET_MS / 1e3}s budget and stopped with ${answered} of ${runs.length} subjects answered. **This is not a clean result.** Nothing it did not finish was stored, so the next turn runs that part again. If this keeps happening the corpus has outgrown a per-turn check and \`Q183\` should be re-asked with CI as option C.
+
+${which}` });
+  }
+  if (broke.length)
+    warnings.push({ check: "corpus", message: `A corpus tool failed to run, which is not the same as finding nothing:
+  ${broke.join("\n  ")}
+
+${which}` });
+  if (findings.length)
+    warnings.push({ check: "corpus", message: `${findings.length} RULE finding(s) in the docs trees:
+  ${findings.slice(0, 12).join("\n  ")}` + (findings.length > 12 ? `
+  \u2026 and ${findings.length - 12} more` : "") + // SAYING IT IS A REPLAY IS PART OF BEING HONEST ABOUT IT. A repeated finding that reads as a
+    // fresh run invites somebody to think the check keeps re-finding it, when the truth is simpler
+    // and more useful: nothing has changed since it was found, including the fault.
+    (replayed.length ? `
+
+From ${replayed.map((s) => `\`${s}\``).join(" \xB7 ")}: nothing there and nothing in the checker has changed since these were found, so the tools were not re-run \u2014 this is the stored verdict.` : "") + `
+
+${which}` });
+  return { warnings, runs };
+}
+function checkCorpus(root) {
+  return runCorpus(root).warnings;
+}
+if (process.argv[1] && basename2(process.argv[1]) === "corpus.ts") {
+  const root = process.argv[2] ?? process.cwd();
+  const { warnings, runs } = runCorpus(root);
+  console.log(`subjects: ${runs.map((r) => `${r.subject} ${r.source}`).join(" \xB7 ") || "none"}
+`);
+  for (const w of warnings) console.log(`[${w.check}] ${w.message}
+`);
+  console.log(warnings.length ? `${warnings.length} warning(s)` : "corpus clean");
+  process.exit(warnings.length ? 1 : 0);
+}
 
 // packages/plugin-spn-devex/src/scripts/checks/split-plan.ts
-import { readdirSync as readdirSync2, statSync as statSync3 } from "node:fs";
+import { readdirSync as readdirSync4, statSync as statSync5 } from "node:fs";
 
 // packages/plugin-spn-devex/src/scripts/checks/arc-status.ts
 init_payload();
 init_docs_tree();
-import { basename as basename2 } from "node:path";
+import { basename as basename3 } from "node:path";
 var STATUSES = ["PROPOSED", "DECIDED", "RUNNING", "HELD", "PART-LANDED", "LANDED", "CARRIED", "DROPPED"];
 var TERMINAL = /* @__PURE__ */ new Set(["LANDED", "CARRIED", "DROPPED"]);
 function pastDecided(status) {
@@ -1789,7 +987,7 @@ function checkArcStatus(payload) {
   const declared = statusIn(written);
   if (declared === null) return null;
   if (STATUSES.includes(declared)) return null;
-  const name = basename2(path || "the arc");
+  const name = basename3(path || "the arc");
   return {
     deny: `\`${name}\` declares \`Status: ${declared}\`, which is not one of the eight (RD.DEVEX.WORKSPACE.058): ${STATUSES.join(" \xB7 ")}.
 Every check that reads an arc reads this word, so one outside the set is a state nothing can act on \u2014 \`runnable\` and \`hold\` both skip it in silence rather than reporting it.
@@ -1805,7 +1003,41 @@ if (process.argv[1]?.endsWith("arc-status.ts")) {
 // packages/plugin-spn-devex/src/scripts/checks/split-plan.ts
 init_payload();
 init_docs_tree();
-import { basename as basename3, dirname as dirname4, isAbsolute as isAbsolute2, join as join5, relative as relative2, resolve as resolve3, sep as sep3 } from "node:path";
+import { basename as basename4, dirname as dirname5, isAbsolute as isAbsolute2, join as join7, relative as relative3, resolve as resolve4, sep as sep3 } from "node:path";
+
+// packages/plugin-support-lib/src/lib/page-styles.ts
+import { existsSync as existsSync4, readFileSync as readFileSync4 } from "node:fs";
+import { dirname as dirname4, join as join6 } from "node:path";
+var STYLES_ADDRESS = "https://saasplane.github.io/spn-claude-marketplace/assets/docs/";
+var STYLESHEET = "sds-docs.css";
+var PAGE_SCRIPT = "sds-docs.js";
+var INDEX_SCRIPT = "sds-index.js";
+var SERVED_FILES = Object.freeze([STYLESHEET, PAGE_SCRIPT, INDEX_SCRIPT]);
+var BUNDLED_SUFFIX = ".bundled.html";
+var STYLESHEET_LINK = /<link\b[^>]*\bhref="([^"]*)sds-docs\.css"[^>]*>/i;
+var VERSION_FOLDER = /(?:^|\/)(\d+\.\d+\.\d+)\/$/;
+function sharedStyles(html) {
+  const folder = STYLESHEET_LINK.exec(html)?.[1];
+  if (folder === void 0) return null;
+  return { folder, version: VERSION_FOLDER.exec(folder)?.[1] ?? null, served: folder.startsWith(STYLES_ADDRESS) };
+}
+function linksSharedStyles(html) {
+  return sharedStyles(html) !== null;
+}
+var OWN_COPY = "this page links no shared stylesheet: it holds its own copy of the styles, and the class names that copy used. Produce it again with `docs page`, or copy it from its template, so it links `sds-docs.css` (05-artifacts.md, One stylesheet, served in versions)";
+function stylesDir(from) {
+  for (let at = dirname4(from), last = ""; at !== last; last = at, at = dirname4(at)) {
+    if (existsSync4(join6(at, "styles", "versions.json"))) return join6(at, "styles");
+  }
+  return null;
+}
+function cutVersions(styles) {
+  const file = join6(styles, "versions.json");
+  if (!existsSync4(file)) return {};
+  return JSON.parse(readFileSync4(file, "utf8"));
+}
+
+// packages/plugin-spn-devex/src/scripts/checks/split-plan.ts
 var UNDECIDED = /* @__PURE__ */ new Set(["", "-", "--", "?", "\u2B1C", "\u2610", "[ ]", "tbd", "todo", "open", "unknown"]);
 var LANDED = ["landed", "done", "shipped"];
 var TICK = "\u2705";
@@ -1895,6 +1127,22 @@ function stepsSection(text) {
   const stop = rest.findIndex((line) => /^##\s/.test(line));
   return (stop < 0 ? rest : rest.slice(0, stop)).join("\n");
 }
+function stepsOf(text) {
+  const section2 = stepsSection(text);
+  if (section2 === null) return null;
+  const out = [];
+  for (const table of mdTables(section2)) {
+    const head = table[0].map(headerName);
+    const whatAt = head.indexOf("what") > 0 ? head.indexOf("what") : 1;
+    const stateAt = head.indexOf("state");
+    for (const cells of table.slice(1)) {
+      const id = stepId(cells[0] ?? "");
+      if (!STEP_ID.test(id)) continue;
+      out.push({ id, what: cells[whatAt] ?? "", state: stateAt >= 0 ? cells[stateAt] ?? "" : null, cells });
+    }
+  }
+  return out;
+}
 function miscountedSteps(text) {
   const section2 = stepsSection(text);
   if (section2 === null) return [];
@@ -1907,13 +1155,13 @@ function miscountedSteps(text) {
   return out;
 }
 function arcName(file) {
-  const name = basename3(file).replace(/\.md$/, "");
+  const name = basename4(file).replace(/\.md$/, "");
   return /^N\d+[a-z]?/i.exec(name)?.[0] ?? name;
 }
 function arcFiles(folder) {
-  const dir = join5(folder, "arcs");
+  const dir = join7(folder, "arcs");
   if (!isDir(dir)) return [];
-  return listdir(dir).filter((name) => name.endsWith(".md")).sort().map((name) => join5(dir, name));
+  return listdir(dir).filter((name) => name.endsWith(".md")).sort().map((name) => join7(dir, name));
 }
 function arcRowsOf(text, arc) {
   const section2 = stepsSection(text);
@@ -1922,7 +1170,7 @@ function arcRowsOf(text, arc) {
 }
 function workstreamPlan(folders, pages) {
   const rows2 = pages.flatMap(planOf);
-  for (const folder of [...new Set(folders.map((f) => resolve3(f)))])
+  for (const folder of [...new Set(folders.map((f) => resolve4(f)))])
     for (const file of arcFiles(folder)) rows2.push(...arcRowsOf(read(file), arcName(file)));
   return rows2;
 }
@@ -1934,6 +1182,9 @@ function inProgressSince(cell) {
   const offset = !m[4] || /^z$/i.test(m[4]) ? "Z" : m[4].includes(":") ? m[4] : `${m[4].slice(0, 3)}:${m[4].slice(3)}`;
   const at = /* @__PURE__ */ new Date(`${m[1]}T${m[2]}${m[3] ?? ":00"}${offset}`);
   return Number.isNaN(at.getTime()) ? null : at;
+}
+function isInProgress(cell) {
+  return IN_PROGRESS.test(flat(cell).replace(/[*_`]/g, "").trim().replace(LEAD, ""));
 }
 function heldOn(cell) {
   const m = HELD.exec(flat(cell).replace(/[*_`]/g, "").trim().replace(LEAD, ""));
@@ -1979,7 +1230,7 @@ function carryTarget(row) {
 function workstreamState(root, number) {
   for (const container of CONTAINERS) {
     for (const state2 of STATES) {
-      const dir = join5(root, DEVEX, container, state2);
+      const dir = join7(root, DEVEX, container, state2);
       if (!isDir(dir)) continue;
       for (const entry of listdir(dir)) {
         if (entry === number || entry.startsWith(`${number}-`)) return state2;
@@ -2002,15 +1253,15 @@ var ARC_STATES = /* @__PURE__ */ new Set(["LANDED", "PART-LANDED", "TAKEN", "RUN
 function arcStatus(root, subject, arc) {
   for (const container of CONTAINERS) {
     for (const state2 of STATES) {
-      const dir = join5(root, DEVEX, container, state2);
+      const dir = join7(root, DEVEX, container, state2);
       if (!isDir(dir)) continue;
       for (const entry of listdir(dir)) {
         if (!(entry === subject || entry.startsWith(`${subject.slice(0, 3)}-`))) continue;
-        const arcs = join5(dir, entry, "arcs");
+        const arcs = join7(dir, entry, "arcs");
         if (!isDir(arcs)) continue;
         const file = listdir(arcs).find((f) => f.toLowerCase().startsWith(`${arc.toLowerCase()}-`) || f.toLowerCase().includes(`-${arc.toLowerCase()}-`));
         if (!file) continue;
-        const line = read(join5(arcs, file)).split("\n").find((l) => /^status:/i.test(l.trim()));
+        const line = read(join7(arcs, file)).split("\n").find((l) => /^status:/i.test(l.trim()));
         if (!line) return null;
         const word = line.replace(/^\s*status:\s*/i, "").replace(/[*_`]/g, "").trim().split(/[\s—–]/)[0]?.toUpperCase() ?? "";
         return ARC_STATES.has(word) ? word : null;
@@ -2024,6 +1275,12 @@ function sequencingResolved(root, subject, row) {
   if (target.kind !== "own-arc") return true;
   return arcStatus(root, subject, target.name) === "LANDED";
 }
+function tickLands(cell) {
+  const at = cell.indexOf(TICK);
+  if (at < 0) return false;
+  const after = cell.slice(at + TICK.length).toLowerCase().replace(LEAD, "");
+  return DATED.test(after) || startsWithAny(after, LANDED);
+}
 function accounted(row) {
   return ACCOUNTED.includes(stateOf(row));
 }
@@ -2035,15 +1292,15 @@ function pagesIn(folder) {
   const walk2 = (dir) => {
     let entries;
     try {
-      entries = readdirSync2(dir).sort();
+      entries = readdirSync4(dir).sort();
     } catch {
       return;
     }
     for (const entry of entries) {
-      const full = join5(dir, entry);
+      const full = join7(dir, entry);
       let stat;
       try {
-        stat = statSync3(full);
+        stat = statSync5(full);
       } catch {
         continue;
       }
@@ -2059,64 +1316,64 @@ function stateFolders(root, state2) {
   return [workstreamsDir(root, state2), legacyWorkstreamsDir(root, state2)];
 }
 function openWorkstreams(root) {
-  const devex = join5(root, DEVEX);
+  const devex = join7(root, DEVEX);
   const found = /* @__PURE__ */ new Map();
   for (const openDir of stateFolders(root, "open"))
     for (const subject of listdir(openDir)) {
-      const folder = join5(openDir, subject);
+      const folder = join7(openDir, subject);
       if (isDir(folder) && !found.has(subject)) found.set(subject, pagesIn(folder));
     }
-  for (const name of listdir(join5(devex, "arcs"))) {
+  for (const name of listdir(join7(devex, "arcs"))) {
     if (!name.startsWith("arc-") || !name.endsWith(".md")) continue;
     const subject = name.slice("arc-".length, -".md".length);
     if (!found.has(subject)) found.set(subject, []);
-    const page = join5(devex, "notes", `${subject}-approach.html`);
+    const page = join7(devex, "notes", `${subject}-approach.html`);
     const pages = found.get(subject);
     if (isFile(page) && !pages.includes(page)) pages.push(page);
   }
   return found;
 }
 function subjectPages(root, subject, source) {
-  const devex = join5(root, DEVEX);
+  const devex = join7(root, DEVEX);
   const out = [];
   if (source && isDir(source)) out.push(...pagesIn(source));
   for (const state2 of STATES)
     for (const base of stateFolders(root, state2)) {
-      const candidate = join5(base, subject);
+      const candidate = join7(base, subject);
       if (isDir(candidate)) {
         for (const page of pagesIn(candidate)) if (!out.includes(page)) out.push(page);
       }
     }
-  const legacy = join5(devex, "notes", `${subject}-approach.html`);
+  const legacy = join7(devex, "notes", `${subject}-approach.html`);
   if (isFile(legacy) && !out.includes(legacy)) out.push(legacy);
   return out;
 }
 function subjectFolders(root, subject, source) {
   const out = [];
-  if (source && isDir(source)) out.push(resolve3(source));
+  if (source && isDir(source)) out.push(resolve4(source));
   for (const state2 of STATES)
     for (const base of stateFolders(root, state2)) {
-      const candidate = resolve3(join5(base, subject));
+      const candidate = resolve4(join7(base, subject));
       if (isDir(candidate) && !out.includes(candidate)) out.push(candidate);
     }
   return out;
 }
 function home(root, subject) {
   for (const base of stateFolders(root, "open")) {
-    const folder = relative2(root, join5(base, subject));
-    if (isDir(join5(root, folder))) return `${folder}/`;
+    const folder = relative3(root, join7(base, subject));
+    if (isDir(join7(root, folder))) return `${folder}/`;
   }
-  const legacy = join5(DEVEX, ARCS, `arc-${subject}.md`);
-  if (isFile(join5(root, legacy))) return legacy;
-  return `${relative2(root, join5(workstreamsDir(root, "open"), subject))}/`;
+  const legacy = join7(DEVEX, ARCS, `arc-${subject}.md`);
+  if (isFile(join7(root, legacy))) return legacy;
+  return `${relative3(root, join7(workstreamsDir(root, "open"), subject))}/`;
 }
 function isRepoSeat(path) {
-  const normalized = slashes2(resolve3(path));
+  const normalized = slashes2(resolve4(path));
   if (normalized.includes(`/${DEVEX}/`)) return false;
   return normalized.endsWith(APPROACH_SUFFIX);
 }
 function repoOf2(root, path) {
-  const within = relative2(root, resolve3(path));
+  const within = relative3(root, resolve4(path));
   if (!within || within.startsWith("..") || isAbsolute2(within)) return null;
   return within.split(sep3)[0];
 }
@@ -2177,7 +1434,7 @@ function moves(command) {
     while (tokens.length && (["sudo", "env", "command", "nohup", "time"].includes(tokens[0]) || /^\w+=/.test(tokens[0])))
       tokens = tokens.slice(1);
     if (!tokens.length) continue;
-    const verb = basename3(tokens[0]);
+    const verb = basename4(tokens[0]);
     let args = tokens.slice(1);
     if (verb === "git" && args.length && args[0] === "mv") args = args.slice(1);
     else if (!MOVERS.has(verb)) continue;
@@ -2189,7 +1446,7 @@ function moves(command) {
   return out;
 }
 function closing(destination) {
-  return CLOSED.test(slashes2(resolve3(destination)));
+  return CLOSED.test(slashes2(resolve4(destination)));
 }
 var OPEN_SECTION = /<section id="s4"[\s\S]*?<\/section>/i;
 var CARD_OPEN = /<h4[^>]*\bid="(q\d+)"[^>]*>/gi;
@@ -2199,11 +1456,11 @@ var ANSWERED_RUN = /\bQ(\d+)\s*(?:to|through|–|—|-)\s*Q(\d+)\b[^.\n]{0,60}?\
 var CODE_SPAN = /```[\s\S]*?```|`[^`\n]*`/g;
 function answeredNumbers(folder) {
   const out = /* @__PURE__ */ new Set();
-  const arcs = join5(folder, "arcs");
+  const arcs = join7(folder, "arcs");
   if (!isDir(arcs)) return out;
   for (const name of listdir(arcs)) {
     if (!name.endsWith(".md")) continue;
-    const text = read(join5(arcs, name)).replace(CODE_SPAN, " ");
+    const text = read(join7(arcs, name)).replace(CODE_SPAN, " ");
     for (const match of text.matchAll(ANSWERED)) out.add((match[1] || match[2]).toUpperCase());
     for (const match of text.matchAll(ANSWERED_RUN)) {
       const first = Number(match[1]), last = Number(match[2]);
@@ -2258,7 +1515,7 @@ function holdsOwnCopy(page) {
   return text !== "" && !linksSharedStyles(text);
 }
 function ownCopyLines(root, pages) {
-  return pages.filter((page) => !closing(page) && holdsOwnCopy(page)).map((page) => `\`${slashes2(relative2(root, page))}\`: ${OWN_COPY}.`);
+  return pages.filter((page) => !closing(page) && holdsOwnCopy(page)).map((page) => `\`${slashes2(relative3(root, page))}\`: ${OWN_COPY}.`);
 }
 var OWN_COPY_UNREAD = "Until such a page links `sds-docs.css`, its cards are read by their `id`, and the shape of a card and the header's status are not checked.";
 function misshapenCards(page) {
@@ -2284,8 +1541,8 @@ function staleCards(folder, pages) {
   const out = [];
   for (const page of pages)
     for (const card of cardsOf(page)) {
-      if (card.decided) out.push([basename3(page), card.number, "the card carries its own decision"]);
-      else if (answered.has(card.number)) out.push([basename3(page), card.number, "an arc records it as answered"]);
+      if (card.decided) out.push([basename4(page), card.number, "the card carries its own decision"]);
+      else if (answered.has(card.number)) out.push([basename4(page), card.number, "an arc records it as answered"]);
     }
   return out;
 }
@@ -2298,7 +1555,7 @@ function unfoldedCards(folder, pages) {
     const stillOpen = new Set(cardsOf(page).map((c) => c.number));
     const mentioned = new Set([...text.matchAll(/\bQ\d+\b/g)].map((m) => m[0].toUpperCase()));
     for (const number of [...answered].sort((a, b) => Number(a.slice(1)) - Number(b.slice(1))))
-      if (!stillOpen.has(number) && !mentioned.has(number)) out.push([basename3(page), number]);
+      if (!stillOpen.has(number) && !mentioned.has(number)) out.push([basename4(page), number]);
   }
   return out;
 }
@@ -2306,11 +1563,11 @@ function gateDocumentsFirst(payload) {
   if (!TOUCHES_PLAN.test(subjectText(payload))) return null;
   const supplied = payload.tool_input ?? {};
   const cwd = payload.cwd ?? process.cwd();
-  const root = workspaceRoot2(cwd);
+  const root = workspaceRoot(cwd);
   if (root) {
     for (const [, pages] of [...openWorkstreams(root)].sort((a, b) => a[0].localeCompare(b[0]))) {
       if (!pages.length) continue;
-      const folder = dirname4(pages[0]);
+      const folder = dirname5(pages[0]);
       const gone = unfoldedCards(folder, pages);
       if (gone.length) {
         const named = gone.slice(0, 6).map(([page, number]) => `${number} in ${page}`).join(" \xB7 ");
@@ -2321,7 +1578,7 @@ function gateDocumentsFirst(payload) {
         const named = stale.slice(0, 6).map(([page, number, why]) => `${number} in ${page} (${why})`).join(" \xB7 ");
         return { note: `An answered card is still in \`Open\` \u2014 ${named}. The page still asks a question somebody has already settled. Fold each one into the section that now states it, and take it out of \`Open\`: an answered question is never an entry with the answer written beside it (05-artifacts.md, The approach document).` };
       }
-      const misshapen = pages.flatMap((page) => misshapenCards(page).map((card) => ({ page: basename3(page), ...card })));
+      const misshapen = pages.flatMap((page) => misshapenCards(page).map((card) => ({ page: basename4(page), ...card })));
       if (misshapen.length) {
         const named = misshapen.slice(0, 6).map((card) => `${card.number} in ${card.page} (${card.shape})`).join(" \xB7 ");
         const more = misshapen.length > 6 ? ` and ${misshapen.length - 6} more` : "";
@@ -2331,9 +1588,9 @@ function gateDocumentsFirst(payload) {
   }
   const targets = supplied.file_path ? [supplied.file_path] : moves(supplied.command ?? "").map(([, destination]) => destination);
   for (const raw of targets) {
-    const target = resolve3(cwd, raw);
+    const target = resolve4(cwd, raw);
     if (!isRepoSeat(target)) continue;
-    const seatRoot = workspaceRoot2(target) ?? workspaceRoot2(cwd);
+    const seatRoot = workspaceRoot(target) ?? workspaceRoot(cwd);
     if (!seatRoot) continue;
     const repo = repoOf2(seatRoot, target);
     if (!repo) continue;
@@ -2348,13 +1605,13 @@ function gateDocumentsFirst(payload) {
   \u2026 and ${pending.length - 6} more` : "";
       return { note: `Documents-first \u2014 workstream \`${subject}\` still has rows that have not landed, and its split plan names ${repo}:
 ${listed2}${more}
-  You are writing ${basename3(target)} into that repo. While a subject is open the argument lives in the workstream \u2014 \`${home(seatRoot, subject)}\` \u2014 and lands in a seat once it is settled. Write the documents in scope order, highest scope first: the foundation before the repo, the repo before the seat, all of it before the code. If this page IS the landing, say so and land the row.` };
+  You are writing ${basename4(target)} into that repo. While a subject is open the argument lives in the workstream \u2014 \`${home(seatRoot, subject)}\` \u2014 and lands in a seat once it is settled. Write the documents in scope order, highest scope first: the foundation before the repo, the repo before the seat, all of it before the code. If this page IS the landing, say so and land the row.` };
     }
   }
   if (root) {
     const subject = subjectText(payload);
-    const written = supplied.file_path ? resolve3(cwd, supplied.file_path) : null;
-    const unmoved = [...openWorkstreams(root)].sort((a, b) => a[0].localeCompare(b[0])).filter(([name]) => subject.includes(name)).flatMap(([, pages]) => ownCopyLines(root, pages.filter((page) => resolve3(page) !== written)));
+    const written = supplied.file_path ? resolve4(cwd, supplied.file_path) : null;
+    const unmoved = [...openWorkstreams(root)].sort((a, b) => a[0].localeCompare(b[0])).filter(([name]) => subject.includes(name)).flatMap(([, pages]) => ownCopyLines(root, pages.filter((page) => resolve4(page) !== written)));
     if (unmoved.length) return { note: `[RULE] ${unmoved.join("\n[RULE] ")}
 ${OWN_COPY_UNREAD}` };
   }
@@ -2384,24 +1641,24 @@ function gateClose(payload) {
   const cwd = payload.cwd ?? process.cwd();
   const candidates = [];
   for (const [source, destination] of moves(command)) {
-    const full = resolve3(cwd, destination);
-    if (closing(full)) candidates.push([resolve3(cwd, source), full]);
+    const full = resolve4(cwd, destination);
+    if (closing(full)) candidates.push([resolve4(cwd, source), full]);
   }
   if (written) {
-    const full = resolve3(cwd, written);
+    const full = resolve4(cwd, written);
     if (closing(full) && !isApproachPage(full)) candidates.push([null, full]);
   }
   const unmoved = [];
   const unmovedNote = () => `[RULE] ${unmoved.join("\n[RULE] ")}
 ${OWN_COPY_UNREAD}`;
   for (const [source, destination] of candidates) {
-    const root = workspaceRoot2(destination) ?? workspaceRoot2(cwd);
+    const root = workspaceRoot(destination) ?? workspaceRoot(cwd);
     if (!root) continue;
-    let subject = source ? basename3(source.replace(/\/+$/, "")) : "";
+    let subject = source ? basename4(source.replace(/\/+$/, "")) : "";
     if (subject.startsWith("arc-") && subject.endsWith(".md"))
       subject = subject.slice("arc-".length, -".md".length);
     if (!subject || STRUCTURE.has(subject)) {
-      const after = relative2(join5(root, DEVEX), destination).split(sep3);
+      const after = relative3(join7(root, DEVEX), destination).split(sep3);
       subject = after.find((part) => !STRUCTURE.has(part)) ?? "";
     }
     if (!subject) continue;
@@ -2410,7 +1667,7 @@ ${OWN_COPY_UNREAD}`;
     const unstamped = pages.filter((page) => !saysItIsClosed(page));
     if (unstamped.length)
       return {
-        note: `\`${subject}\` is closing while its page still says it is running. Stamp the masthead first \u2014 ${unstamped.map((p) => basename3(p)).join(" \xB7 ")} \u2014 because a reader opens the page, not the folder, and the folder is the only thing this move changes (05-artifacts.md, The approach document).`,
+        note: `\`${subject}\` is closing while its page still says it is running. Stamp the masthead first \u2014 ${unstamped.map((p) => basename4(p)).join(" \xB7 ")} \u2014 because a reader opens the page, not the folder, and the folder is the only thing this move changes (05-artifacts.md, The approach document).`,
         deny: `Denied: ${subject}'s page does not say it is closed. The masthead is what a reader meets first, and closing must change it as well as the folder.`
       };
     unmoved.push(...ownCopyLines(root, pages).filter((line) => !unmoved.includes(line)));
@@ -2466,10 +1723,10 @@ Repair each on THIS page, never in the workstream named \u2014 a closed scope cl
       };
     }
     const unfinished = [];
-    const arcDirs = [...new Set([...folders, ...pages.map(dirname4)].map((f) => join5(f, "arcs")))];
+    const arcDirs = [...new Set([...folders, ...pages.map(dirname5)].map((f) => join7(f, "arcs")))];
     for (const dir of arcDirs.filter(isDir)) {
       for (const f of listdir(dir).filter((x) => x.endsWith(".md"))) {
-        const st = statusIn(read(join5(dir, f)));
+        const st = statusIn(read(join7(dir, f)));
         if (st && !TERMINAL.has(st)) unfinished.push(`  - ${f.replace(/\.md$/, "")} \u2014 ${st}`);
       }
     }
@@ -2576,7 +1833,7 @@ function miscountLines(arc, text) {
 }
 function sweep(roots) {
   for (const start of roots) {
-    const root = workspaceRoot2(start) ?? resolve3(start);
+    const root = workspaceRoot(start) ?? resolve4(start);
     const streams = openWorkstreams(root);
     console.log(`${root}   ${streams.size} open`);
     for (const [subject, pages] of [...streams].sort((a, b) => a[0].localeCompare(b[0]))) {
@@ -2613,13 +1870,13 @@ if (runAlone("split-plan.ts")) {
 // packages/plugin-spn-devex/src/scripts/checks/doc-check.ts
 init_payload();
 init_docs_tree();
-import { readFileSync as readFileSync4, readdirSync as readdirSync3, statSync as statSync4, existsSync as existsSync4 } from "node:fs";
-import { basename as basename5, dirname as dirname6, join as join7, resolve as resolve5, relative as relative4, sep as sep4 } from "node:path";
+import { readFileSync as readFileSync5, readdirSync as readdirSync5, statSync as statSync6, existsSync as existsSync5 } from "node:fs";
+import { basename as basename6, dirname as dirname7, join as join9, resolve as resolve6, relative as relative5, sep as sep4 } from "node:path";
 import { fileURLToPath } from "node:url";
 
 // packages/plugin-spn-devex/src/scripts/commands/docs/cycles.ts
-import { writeFileSync as writeFileSync2 } from "node:fs";
-import { basename as basename4, dirname as dirname5, join as join6, posix, relative as relative3, resolve as resolve4 } from "node:path";
+import { writeFileSync as writeFileSync3 } from "node:fs";
+import { basename as basename5, dirname as dirname6, join as join8, posix, relative as relative4, resolve as resolve5 } from "node:path";
 init_payload();
 init_docs_tree();
 var CYCLES_COLUMNS = ["Arc", "What it does", "Status", "Previews"];
@@ -2640,7 +1897,7 @@ function statusWord(text) {
   return BY_LENGTH.find((word) => new RegExp(`^${word}(?![A-Z-])`).test(head)) ?? null;
 }
 function arcId(file) {
-  const found = ARC_ID.exec(basename4(file));
+  const found = ARC_ID.exec(basename5(file));
   return found ? found[1].charAt(0).toUpperCase() + found[1].slice(1) : null;
 }
 function previewsOf(text) {
@@ -2681,7 +1938,7 @@ function cycleOf(file, text) {
   const lines = text.split("\n");
   const heading = lines.find((line) => /^#\s/.test(line)) ?? "";
   const id = arcId(file);
-  const name = plain(heading.replace(/^#\s+/, "")).replace(/^(?:Arc\s*)?(?:N?\d+[a-z]?)?\s*[—–:-]\s*/i, "").trim() || basename4(file, ".md");
+  const name = plain(heading.replace(/^#\s+/, "")).replace(/^(?:Arc\s*)?(?:N?\d+[a-z]?)?\s*[—–:-]\s*/i, "").trim() || basename5(file, ".md");
   const at = lines.findIndex((line) => STATUS_LINE2.test(line));
   const paragraph = [];
   for (let i = at; at >= 0 && i < lines.length; i += 1) {
@@ -2712,12 +1969,12 @@ function runOrder(a, b) {
     if (Number(an) !== Number(bn)) return Number(an) - Number(bn);
     if (al !== bl) return al < bl ? -1 : 1;
   }
-  return basename4(a.file) < basename4(b.file) ? -1 : basename4(a.file) > basename4(b.file) ? 1 : 0;
+  return basename5(a.file) < basename5(b.file) ? -1 : basename5(a.file) > basename5(b.file) ? 1 : 0;
 }
 function cyclesOf(folder) {
-  const arcs = join6(folder, "arcs");
+  const arcs = join8(folder, "arcs");
   if (!isDir(arcs)) return [];
-  return listdir(arcs).filter((entry) => entry.endsWith(".md") && isFile(join6(arcs, entry))).map((entry) => cycleOf(join6(arcs, entry), read(join6(arcs, entry)))).sort(runOrder);
+  return listdir(arcs).filter((entry) => entry.endsWith(".md") && isFile(join8(arcs, entry))).map((entry) => cycleOf(join8(arcs, entry), read(join8(arcs, entry)))).sort(runOrder);
 }
 function arcLabel(cycle) {
   return cycle.id ? `${cycle.id} \u2014 ${cycle.name}` : cycle.name;
@@ -2729,7 +1986,7 @@ function statusLabel(cycle) {
 var escape2 = (text) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/—/g, "&mdash;").replace(/·/g, "&middot;");
 var attribute = (text) => escape2(text).replace(/"/g, "&quot;");
 function arcHref(cycle) {
-  return `${ARCS}/${basename4(cycle.file)}`;
+  return `${ARCS}/${basename5(cycle.file)}`;
 }
 function arcCell(cycle) {
   const href = arcHref(cycle);
@@ -2810,10 +2067,10 @@ function cyclesTableAt(text) {
   if (!how) return null;
   const bodyAt = how.index + how[0].length;
   const next = text.slice(bodyAt).search(/<h2\b/i);
-  const body3 = next < 0 ? text.slice(bodyAt) : text.slice(bodyAt, bodyAt + next);
-  const named = [...body3.matchAll(/<h3\b[^>]*>([\s\S]*?)<\/h3>/gi)].filter((found) => /^Cycles\b/i.test(flat2(found[1]))).at(-1);
+  const body2 = next < 0 ? text.slice(bodyAt) : text.slice(bodyAt, bodyAt + next);
+  const named = [...body2.matchAll(/<h3\b[^>]*>([\s\S]*?)<\/h3>/gi)].filter((found) => /^Cycles\b/i.test(flat2(found[1]))).at(-1);
   if (!named) return null;
-  const table = /<table\b[\s\S]*?<\/table>/i.exec(body3.slice(named.index));
+  const table = /<table\b[\s\S]*?<\/table>/i.exec(body2.slice(named.index));
   if (!table) return null;
   const from = bodyAt + named.index + table.index;
   return { from, to: from + table[0].length };
@@ -2824,7 +2081,7 @@ var HEADER_STATUSES = {
   DONE: { badge: "sds-done", glyph: "&#x2705;" }
 };
 var HEADER_WORDS = Object.keys(HEADER_STATUSES);
-var isClosed = (folder) => basename4(dirname5(resolve4(folder))) === "closed";
+var isClosed = (folder) => basename5(dirname6(resolve5(folder))) === "closed";
 function headerStatusOf(text) {
   const field = mastheadStatus(text)?.toUpperCase();
   if (!field) return null;
@@ -2849,6 +2106,10 @@ function openHeadingAt(text) {
     return { from, to: from + found[2].length };
   }
   return null;
+}
+function openHeadingOf(text) {
+  const at = openHeadingAt(text);
+  return at ? flat2(text.slice(at.from, at.to)) : null;
 }
 function openHeadingFor(text) {
   const open = [...new Set(cardsIn(text).filter((card) => !card.decided).map((card) => card.number))];
@@ -2901,31 +2162,31 @@ function producedPage(folder, text, cycles = cyclesOf(folder)) {
   return { text: out, wrote, skipped };
 }
 function workstreamFolder(target, workspace) {
-  const direct = resolve4(target);
+  const direct = resolve5(target);
   if (isDir(direct)) return direct;
-  if (isFile(direct) && isApproachPage(direct)) return dirname5(direct);
+  if (isFile(direct) && isApproachPage(direct)) return dirname6(direct);
   if (!workspace) return null;
   for (const state2 of WORKSTREAM_STATES) {
     const base = workstreamsDir(workspace, state2);
     const found = listdir(base).find((entry) => entry === target || entry.startsWith(`${target}-`));
-    if (found && isDir(join6(base, found))) return join6(base, found);
+    if (found && isDir(join8(base, found))) return join8(base, found);
   }
   return null;
 }
 function writePages(folder, target, cycles) {
-  const named = resolve4(target);
-  const pages = isFile(named) && isApproachPage(named) ? [named] : listdir(folder).filter((entry) => isApproachPage(entry) && isFile(join6(folder, entry))).map((entry) => join6(folder, entry));
+  const named = resolve5(target);
+  const pages = isFile(named) && isApproachPage(named) ? [named] : listdir(folder).filter((entry) => isApproachPage(entry) && isFile(join8(folder, entry))).map((entry) => join8(folder, entry));
   if (!pages.length) {
-    console.error(`${basename4(folder)} has no approach page to write`);
+    console.error(`${basename5(folder)} has no approach page to write`);
     return 1;
   }
   if (isClosed(folder)) {
-    console.log(`${basename4(folder)} is closed, and its page keeps what it closed with \u2014 nothing was written`);
+    console.log(`${basename5(folder)} is closed, and its page keeps what it closed with \u2014 nothing was written`);
     return 0;
   }
   let code = 0;
   for (const page of pages) {
-    const shown = relative3(dirname5(folder), page);
+    const shown = relative4(dirname6(folder), page);
     const text = read(page);
     if (!linksSharedStyles(text)) {
       console.error(`${shown}: ${OWN_COPY}. Nothing was written.`);
@@ -2943,7 +2204,7 @@ function writePages(folder, target, cycles) {
       console.log(`${shown} is current \u2014 nothing was written`);
       continue;
     }
-    writeFileSync2(page, produced.text, "utf8");
+    writeFileSync3(page, produced.text, "utf8");
     console.log(`${shown}: wrote ${produced.wrote.join(", ")}`);
   }
   return code;
@@ -2963,7 +2224,7 @@ function body(args, workspace) {
   }
   const cycles = cyclesOf(folder);
   if (!cycles.length) {
-    console.error(`${basename4(folder)} has no arcs \u2014 an empty \`arcs/\` has no Cycles yet`);
+    console.error(`${basename5(folder)} has no arcs \u2014 an empty \`arcs/\` has no Cycles yet`);
     return 1;
   }
   let code = 0;
@@ -2974,21 +2235,21 @@ function body(args, workspace) {
       arc: arcLabel(cycle),
       does: cycle.does,
       status: statusLabel(cycle),
-      file: basename4(cycle.file),
+      file: basename5(cycle.file),
       previews: cycle.previews
     })), null, 2));
   } else {
     console.log(tableOf(cycles));
   }
   for (const cycle of cycles.filter((c) => !c.status))
-    console.error(`! ${basename4(cycle.file)} states no status the set knows (${STATUSES.join(" \xB7 ")})`);
+    console.error(`! ${basename5(cycle.file)} states no status the set knows (${STATUSES.join(" \xB7 ")})`);
   for (const cycle of cycles)
     for (const preview of cycle.previews.filter((one) => !one.href))
-      console.error(`! ${basename4(cycle.file)} names the preview \`${preview.name}\` without a link \u2014 write its File cell as ` + previewLinkForm(cycle.file, preview.name));
+      console.error(`! ${basename5(cycle.file)} names the preview \`${preview.name}\` without a link \u2014 write its File cell as ` + previewLinkForm(cycle.file, preview.name));
   return code;
 }
 function run(args) {
-  const workspace = process.env.SPN_WORKSPACE ?? workspaceRoot2(process.cwd());
+  const workspace = process.env.SPN_WORKSPACE ?? workspaceRoot(process.cwd());
   const startedAt = performance.now();
   begin(commandFacts("spn-devex", args), workspace ?? void 0);
   const code = body(args, workspace);
@@ -2996,7 +2257,7 @@ function run(args) {
   end(code);
   return code;
 }
-if (process.argv[1] && basename4(process.argv[1]) === "cycles.ts")
+if (process.argv[1] && basename5(process.argv[1]) === "cycles.ts")
   process.exit(run(process.argv.slice(2)));
 
 // packages/plugin-spn-devex/src/scripts/checks/doc-check.ts
@@ -3094,9 +2355,9 @@ var IMPERATIVE = new RegExp(
 var NORMATIVE = /\b(?:MUST NOT|MUST|SHOULD NOT|SHOULD|MAY)\b/;
 var REACH_BAR = { "artifact-html": 15, readme: 25, chapter: 15, concept: 15 };
 function pocketKind(parts) {
-  const inside2 = artifactDocsPathOf(parts.join("/"));
-  if (inside2 !== null)
-    return inside2.slice(0, -1).includes(CONSTRUCT_PAGES) ? { place: `in ${CONSTRUCT_PAGES}/`, suffix: CONSTRUCT_PAGE_SUFFIX } : { place: `under ${POCKET.artifacts}/${ARTIFACT.docs}/, in no ${CONSTRUCT_PAGES}/ folder,`, suffix: OVERVIEW_PAGE_SUFFIX };
+  const inside = artifactDocsPathOf(parts.join("/"));
+  if (inside !== null)
+    return inside.slice(0, -1).includes(CONSTRUCT_PAGES) ? { place: `in ${CONSTRUCT_PAGES}/`, suffix: CONSTRUCT_PAGE_SUFFIX } : { place: `under ${POCKET.artifacts}/${ARTIFACT.docs}/, in no ${CONSTRUCT_PAGES}/ folder,`, suffix: OVERVIEW_PAGE_SUFFIX };
   return parts.includes(POCKET.artifacts) && parts.at(-2) === ARTIFACT.guides ? { place: `in ${ARTIFACT.guides}/`, suffix: GUIDE_PAGE_SUFFIX } : null;
 }
 var NODE_MANIFESTS = ["spkind.json", "spinfrapkg.json"];
@@ -3110,28 +2371,28 @@ var BLOCK_BREAK = /\n\s*\n/;
 var TABLE_SEP = /^\|?\s*:?-{3,}/;
 var read2 = (path) => {
   try {
-    return readFileSync4(path, "utf8");
+    return readFileSync5(path, "utf8");
   } catch {
     return "";
   }
 };
 var exists = (path) => {
   try {
-    return existsSync4(path);
+    return existsSync5(path);
   } catch {
     return false;
   }
 };
 function structural(path) {
   const out = [];
-  const folder = dirname6(resolve5(path));
-  const base = basename5(path);
+  const folder = dirname7(resolve6(path));
+  const base = basename6(path);
   if (base === "CONCEPT.md") {
-    const hasNode = NODE_MANIFESTS.some((m) => exists(join7(folder, m)));
-    if (hasNode && !exists(join7(folder, "sprepo.json")))
+    const hasNode = NODE_MANIFESTS.some((m) => exists(join9(folder, m)));
+    if (hasNode && !exists(join9(folder, "sprepo.json")))
       out.push(["BLOCK", "CONCEPT.md sits beside a node manifest \u2014 RD.DEVEX.WORKSPACE.080: a concept belongs to a repo root. Ideating a node lands as sections of its repo's concept, never as a file at the node"]);
   }
-  const parts = slashes3(resolve5(path)).split("/");
+  const parts = slashes3(resolve6(path)).split("/");
   const kind = base.endsWith(".html") ? pocketKind(parts) : null;
   if (kind !== null && !base.endsWith(kind.suffix)) {
     const belongs = pagePlaceOf(parts.join("/"));
@@ -3143,7 +2404,7 @@ function structural(path) {
 var EXEMPT_WORKSTREAM = /^008-/;
 var EXEMPT_ARCS_THROUGH = 120;
 function workstreamOf(path) {
-  return workstreamDirOf(slashes3(resolve5(path)));
+  return workstreamDirOf(slashes3(resolve6(path)));
 }
 function exemptWorkstream(path) {
   return EXEMPT_WORKSTREAM.test(workstreamOf(path)?.name ?? "");
@@ -3163,19 +2424,19 @@ var CYCLES_HEADER = CYCLES_COLUMNS.join(" \xB7 ");
 var CYCLES_HEADER_NO_PREVIEWS = CYCLES_COLUMNS.slice(0, 3).join(" \xB7 ");
 function inClosedWorkstream(path) {
   const home2 = workstreamOf(path);
-  return home2 !== null && basename5(dirname6(home2.folder)) === "closed";
+  return home2 !== null && basename6(dirname7(home2.folder)) === "closed";
 }
 function cyclesRule(path, text) {
-  const body3 = section(text, "How");
-  if (body3 === null) return [];
+  const body2 = section(text, "How");
+  if (body2 === null) return [];
   const fix = "`spn-devex docs cycles <workstream>` prints the table from the arcs";
-  const subsections = [...body3.matchAll(/<h3\b[^>]*>([\s\S]*?)<\/h3>/gi)];
+  const subsections = [...body2.matchAll(/<h3\b[^>]*>([\s\S]*?)<\/h3>/gi)];
   const named = subsections.filter((m) => /^Cycles\b/i.test(flat3(m[1]))).at(-1);
   if (!named)
     return [[CYCLES, `How does not end in Cycles \u2014 its last subsection is an h3 named Cycles, one row per arc with ${CYCLES_HEADER} (05-artifacts.md \xA7 How ends in Cycles) \xB7 ${fix}`]];
   if (named !== subsections.at(-1))
     return [[CYCLES, `How carries "${flat3(subsections.at(-1)[1])}" after Cycles \u2014 Cycles is How's last subsection (05-artifacts.md \xA7 How ends in Cycles)`]];
-  const table = /<table\b[\s\S]*?<\/table>/i.exec(body3.slice(named.index))?.[0];
+  const table = /<table\b[\s\S]*?<\/table>/i.exec(body2.slice(named.index))?.[0];
   const columns = table ? tableColumns(table) : "";
   const withPreviews = columns === CYCLES_HEADER.toLowerCase();
   if (!withPreviews && columns !== CYCLES_HEADER_NO_PREVIEWS.toLowerCase())
@@ -3203,6 +2464,13 @@ function headerRule(path, text) {
   if (inClosedWorkstream(path))
     return [[CYCLES, `the header's status reads ${found.shows}, and a closed workstream reads ${found.gives} (05-artifacts.md \xA7 How ends in Cycles) \xB7 stamp the header's status badge, which a closed page keeps by hand`]];
   return [[CYCLES, `the header's status reads ${found.shows} and the arcs give ${found.gives} \u2014 the header's status follows the arcs (05-artifacts.md \xA7 How ends in Cycles; RD.DEVEX.WORKSPACE.204) \xB7 ${WRITES_THE_PAGE}`]];
+}
+function openHeadingRule(path, text) {
+  if (!workstreamOf(path) || inClosedWorkstream(path)) return [];
+  const shows = openHeadingOf(text);
+  const gives = openHeadingFor(text);
+  if (shows === null || shows === gives) return [];
+  return [[CYCLES, `the heading of Open reads "${shows}" and the page's cards give "${gives}" (05-artifacts.md \xA7 How ends in Cycles; RD.DEVEX.WORKSPACE.204) \xB7 ${WRITES_THE_PAGE}`]];
 }
 var LOADS_PAGE_SCRIPT = new RegExp(`<script\\b[^>]*\\bsrc="[^"]*${PAGE_SCRIPT.replace(".", "\\.")}"`, "i");
 function pageFurniture(text) {
@@ -3242,14 +2510,14 @@ var SECOND_PARAGRAPH = "SOFT";
 var MASTHEAD = "SOFT";
 var MASTHEAD_WHERE = "(05-artifacts.md \xA7 The masthead, and the opening; RD.DEVEX.WORKSPACE.187)";
 function mastheadKind(path) {
-  const base = basename5(path);
+  const base = basename6(path);
   if (base === HUB) return "hub";
   const suffix = /-(overview|construct|report|approach|preview)\.html$/.exec(base);
   return suffix ? suffix[1] : null;
 }
-var spoken2 = (html) => flat3(html).replace(/[’‘]/g, "'").replace(/[“”]/g, '"');
+var spoken = (html) => flat3(html).replace(/[’‘]/g, "'").replace(/[“”]/g, '"');
 function hubPair(path) {
-  let folder = dirname6(resolve5(path));
+  let folder = dirname7(resolve6(path));
   for (; ; ) {
     const register = decisionsRegister(folder);
     if (exists(register)) {
@@ -3259,9 +2527,9 @@ function hubPair(path) {
       const statement = /\breads\s+\*([^*\n]+)\*/.exec(row[0])?.[1];
       if (!title || !statement) return "unreadable";
       const subtitle = statement.charAt(0).toUpperCase() + statement.slice(1);
-      return { title: spoken2(title), subtitle: spoken2(/[.!?]$/.test(subtitle) ? subtitle : subtitle + ".") };
+      return { title: spoken(title), subtitle: spoken(/[.!?]$/.test(subtitle) ? subtitle : subtitle + ".") };
     }
-    const up = dirname6(folder);
+    const up = dirname7(folder);
     if (up === folder) return null;
     folder = up;
   }
@@ -3270,9 +2538,9 @@ function masthead(path, text, kind = mastheadKind(path)) {
   if (!kind) return [];
   const header = /<header\b[^>]*>([\s\S]*?)<\/header>/i.exec(text.replace(/<!--[\s\S]*?-->/g, " "));
   if (!header) return [];
-  const body3 = header[1];
+  const body2 = header[1];
   const out = [];
-  const parts = [...body3.matchAll(/<h1\b[^>]*>([\s\S]*?)<\/h1>|<p\b([^>]*)>([\s\S]*?)<\/p>/gi)].map((m) => {
+  const parts = [...body2.matchAll(/<h1\b[^>]*>([\s\S]*?)<\/h1>|<p\b([^>]*)>([\s\S]*?)<\/p>/gi)].map((m) => {
     if (m[1] !== void 0) return { role: "h1", html: m[1] };
     const classes = (/\bclass\s*=\s*"([^"]*)"/i.exec(m[2])?.[1] ?? "").split(/\s+/);
     const role = classes.includes("sds-subtitle") ? "subtitle" : classes.includes("sds-standfirst") ? "standfirst" : "p";
@@ -3280,10 +2548,10 @@ function masthead(path, text, kind = mastheadKind(path)) {
   });
   const subtitles = parts.filter((p) => p.role === "subtitle");
   const standfirsts = parts.filter((p) => p.role === "standfirst");
-  const paragraphs2 = parts.filter((p) => p.role !== "h1");
+  const paragraphs = parts.filter((p) => p.role !== "h1");
   const allowed = Math.min(subtitles.length, 1) + Math.min(standfirsts.length, 1);
-  if (paragraphs2.length > allowed) {
-    const extra = paragraphs2.length - allowed;
+  if (paragraphs.length > allowed) {
+    const extra = paragraphs.length - allowed;
     out.push([SECOND_PARAGRAPH, `the header carries ${extra} paragraph${extra > 1 ? "s" : ""} past the Subtitle and the Description \u2014 the Description is one paragraph, and nothing follows it in the header ${MASTHEAD_WHERE} \xB7 fold the rest into the first section`]);
   }
   if (!standfirsts.length && kind !== "approach")
@@ -3293,7 +2561,7 @@ function masthead(path, text, kind = mastheadKind(path)) {
   if (subAt >= 0 && (subAt < h1At || leadAt >= 0 && subAt > leadAt))
     out.push([MASTHEAD, `the Subtitle is out of place \u2014 it sits directly under the \`h1\` and above the Description ${MASTHEAD_WHERE}`]);
   if (subtitles.length) {
-    const count = spoken2(subtitles[0].html).split(/(?<=[.!?])\s+(?=\S)/).filter((s) => words(s).length).length;
+    const count = spoken(subtitles[0].html).split(/(?<=[.!?])\s+(?=\S)/).filter((s) => words(s).length).length;
     if (count > 1)
       out.push([MASTHEAD, `the Subtitle runs to ${count} sentences \u2014 it is one sentence, in plain language ${MASTHEAD_WHERE}`]);
   }
@@ -3303,9 +2571,9 @@ function masthead(path, text, kind = mastheadKind(path)) {
       out.push([MASTHEAD, "RD.DEVEX.WORKSPACE.143 is in the register and its Title or Subtitle could not be read from the row \u2014 the row writes the Title in backticks and the Subtitle in italics after *reads*"]);
     else if (pair) {
       const h1 = parts.find((p) => p.role === "h1");
-      if (!h1 || spoken2(h1.html) !== pair.title)
+      if (!h1 || spoken(h1.html) !== pair.title)
         out.push([MASTHEAD, `the foundation hub's Title is not RD.DEVEX.WORKSPACE.143's, word for word \u2014 "${pair.title}" ${MASTHEAD_WHERE}`]);
-      if (!subtitles.length || spoken2(subtitles[0].html) !== pair.subtitle)
+      if (!subtitles.length || spoken(subtitles[0].html) !== pair.subtitle)
         out.push([MASTHEAD, `the foundation hub's Subtitle is not RD.DEVEX.WORKSPACE.143's, word for word \u2014 "${pair.subtitle}" ${MASTHEAD_WHERE}`]);
     }
   }
@@ -3315,7 +2583,7 @@ var ALTITUDES = ["DOCS", "CODE", "GENERATED", "RELEASE", "PROOF"];
 var ARC_ROWS = "SOFT";
 var NO_REPO = /* @__PURE__ */ new Set(["\u2014", "\u2013", "-", ""]);
 function isArc(path) {
-  return isArcFile(slashes3(resolve5(path)));
+  return isArcFile(slashes3(resolve6(path)));
 }
 function stepTable(text) {
   const tables = [];
@@ -3341,7 +2609,7 @@ function stepTable(text) {
 }
 function exemptArc(path) {
   if (!exemptWorkstream(path)) return false;
-  const number = /^N(\d+)/i.exec(basename5(path));
+  const number = /^N(\d+)/i.exec(basename6(path));
   return !number || Number(number[1]) <= EXEMPT_ARCS_THROUGH;
 }
 function arcSteps(path, text) {
@@ -3405,27 +2673,27 @@ function overviewShape(text) {
     return [["RULE", "overview carries " + organs.join(" + ") + " \u2014 those are an argument's organs. A question found while writing an overview is an approach document waiting to be offered, or a register row"]];
   return [];
 }
-function cardDivs(body3) {
+function cardDivs(body2) {
   const out = [];
-  for (const opening2 of body3.matchAll(/<div\b[^>]*class="(?:[^"]*\s)?sds-open(?:\s[^"]*)?"[^>]*>/gi)) {
+  for (const opening2 of body2.matchAll(/<div\b[^>]*class="(?:[^"]*\s)?sds-open(?:\s[^"]*)?"[^>]*>/gi)) {
     const from = opening2.index + opening2[0].length;
     let depth2 = 1;
     let at = from;
-    for (const tag of body3.slice(from).matchAll(/<div\b[^>]*>|<\/div\s*>/gi)) {
+    for (const tag of body2.slice(from).matchAll(/<div\b[^>]*>|<\/div\s*>/gi)) {
       depth2 += tag[0].startsWith("</") ? -1 : 1;
       if (depth2 === 0) {
         at = from + tag.index;
         break;
       }
     }
-    out.push(body3.slice(from, at));
+    out.push(body2.slice(from, at));
   }
   return out;
 }
-function cards(body3) {
+function cards(body2) {
   const out = [];
-  const divs = cardDivs(body3);
-  const chunks = divs.length ? divs : body3.split(/(?=<h[34]\b)/);
+  const divs = cardDivs(body2);
+  const chunks = divs.length ? divs : body2.split(/(?=<h[34]\b)/);
   for (const chunk of chunks) {
     const title = /<h[34]\b[^>]*>([\s\S]*?)<\/h[34]>/i.exec(chunk);
     if (title)
@@ -3485,9 +2753,9 @@ function words(s) {
   return s.split(/\s+/).filter((t) => t && WORD_CHAR.test(t));
 }
 function sentences(prose) {
-  const plain2 = prose.split(QUOTE_L).join(" ").split(QUOTE_R).join(" ");
+  const plain3 = prose.split(QUOTE_L).join(" ").split(QUOTE_R).join(" ");
   const out = [];
-  for (const block of plain2.split(BLOCK_BREAK))
+  for (const block of plain3.split(BLOCK_BREAK))
     for (const s of block.split(SENT_END)) {
       const n = words(s).length;
       if (n > 3) out.push([s.split(/\s+/).filter(Boolean).join(" "), n]);
@@ -3556,7 +2824,7 @@ function voice(prose, sents, kind = "chapter", operative = false) {
   return out;
 }
 function isRegister2(path) {
-  const p = slashes3(resolve5(path));
+  const p = slashes3(resolve6(path));
   return isRegister(p);
 }
 var REGISTER_ID = "(?:[A-Z]{2,6}\\.[A-Z]{1,8}(?:\\.[A-Z]{1,8})?\\.\\d{1,4})";
@@ -3572,13 +2840,13 @@ var RULED_BY = new RegExp(
 );
 var ANNOTATED = /~~[^~\n]+~~|<del\b/i;
 var SUPERSESSION = "SOFT";
-function supersession(rid, body3, raw) {
+function supersession(rid, body2, raw) {
   const out = [];
-  const over = [...new Set([...body3.matchAll(RULES_OVER)].map((m) => m[1]).filter((id) => id !== rid))].sort();
-  const under2 = [...new Set([...body3.matchAll(RULED_BY)].map((m) => m[1]).filter((id) => id !== rid))].sort();
+  const over = [...new Set([...body2.matchAll(RULES_OVER)].map((m) => m[1]).filter((id) => id !== rid))].sort();
+  const under = [...new Set([...body2.matchAll(RULED_BY)].map((m) => m[1]).filter((id) => id !== rid))].sort();
   for (const [name, how] of [
     ...over.map((n) => [n, "rules over"]),
-    ...under2.map((n) => [n, "is ruled by"])
+    ...under.map((n) => [n, "is ruled by"])
   ])
     out.push([SUPERSESSION, `row ${rid} ${how} ${name} \u2014 a row states present truth and never names what it replaced (06-registers.md \xA7 A row states present truth) \xB7 rewrite the row, and let git keep the old wording`]);
   if (ANNOTATED.test(raw))
@@ -3599,12 +2867,12 @@ function rows(text) {
     if (cells.length && cells[cells.length - 1] === "") cells = cells.slice(0, -1);
     if (cells.length < 2) continue;
     const rid = cells[0].replace(MD_LINK, "$1").replace(/[*`]/g, "").trim() || `line ${i + 1}`;
-    const body3 = cells.slice(1).map((c) => c.replace(MD_LINK, "$1"));
+    const body2 = cells.slice(1).map((c) => c.replace(MD_LINK, "$1"));
     if (IS_REGISTER_ID.test(rid))
-      out.push(...supersession(rid, body3.join(" ").replace(/[*`]/g, " "), cells.slice(1).join(" ")));
-    if (YOU.test(body3.join(" ").replace(YOU_AS_TERM, " ")))
+      out.push(...supersession(rid, body2.join(" ").replace(/[*`]/g, " "), cells.slice(1).join(" ")));
+    if (YOU.test(body2.join(" ").replace(YOU_AS_TERM, " ")))
       out.push(["RULE", `row ${rid} says *you* \u2014 a record is never warmed (RD.DEVEX.WORKSPACE.106 \xA7 Rows; 04-discipline \xA7 Voice discipline)`]);
-    for (const cell of body3)
+    for (const cell of body2)
       for (const [sent, n] of sentences(cell.replace(/[*`]/g, ""))) {
         sents.push([sent, n]);
         if (n > ROW_LONG)
@@ -3619,28 +2887,28 @@ var STACK_TEMPLATES = {
 var GENERIC_TEMPLATE = { suffixes: [".tmpl", ".template", ".j2", ".jinja", ".mustache", ".erb"], dotPrefix: null };
 var stackCache = /* @__PURE__ */ new Map();
 function stackOf(path) {
-  let folder = dirname6(resolve5(path));
+  let folder = dirname7(resolve6(path));
   for (; ; ) {
     if (stackCache.has(folder)) return stackCache.get(folder);
-    const manifest = join7(folder, "sprepo.json");
+    const manifest = join9(folder, "sprepo.json");
     if (exists(manifest)) {
-      let claim = null;
+      let claim3 = null;
       try {
-        claim = (JSON.parse(read2(manifest))?.config ?? {})?.stack ?? null;
+        claim3 = (JSON.parse(read2(manifest))?.config ?? {})?.stack ?? null;
       } catch {
-        claim = null;
+        claim3 = null;
       }
-      stackCache.set(folder, claim);
-      return claim;
+      stackCache.set(folder, claim3);
+      return claim3;
     }
-    const up = dirname6(folder);
+    const up = dirname7(folder);
     if (up === folder) return null;
     folder = up;
   }
 }
 function asWritten(path) {
-  const folder = dirname6(path);
-  let base = basename5(path);
+  const folder = dirname7(path);
+  let base = basename6(path);
   const convention = STACK_TEMPLATES[stackOf(path) ?? ""] ?? GENERIC_TEMPLATE;
   for (const suffix of convention.suffixes)
     if (base.endsWith(suffix)) {
@@ -3649,15 +2917,15 @@ function asWritten(path) {
     }
   const prefix = convention.dotPrefix;
   if (prefix && base.startsWith(prefix)) base = "." + base.slice(prefix.length);
-  return folder === "." && !path.startsWith("./") ? base : join7(folder, base);
+  return folder === "." && !path.startsWith("./") ? base : join9(folder, base);
 }
 function isOperative(path) {
-  const p = slashes3(resolve5(path));
+  const p = slashes3(resolve6(path));
   if (["/providers/apps/", "/providers/infra/"].some((d) => p.includes(d))) return true;
   return p.includes("/plugins/") && ["agents", "skills", "refs", "commands"].some((d) => p.includes(`/${d}/`));
 }
 function watched(path) {
-  const p = slashes3(resolve5(asWritten(path)));
+  const p = slashes3(resolve6(asWritten(path)));
   const parts = p.split("/");
   if (parts.slice(0, -1).some((d) => SKIP2.has(d))) return false;
   const base = parts[parts.length - 1];
@@ -3670,10 +2938,10 @@ function watched(path) {
   if (p.includes("/docs/")) return true;
   return isOperative(p);
 }
-var KINDS2 = ["chapter", "readme", "concept", "artifact-html", "register"];
+var KINDS = ["chapter", "readme", "concept", "artifact-html", "register"];
 function kindOf(path) {
   const written = asWritten(path);
-  const base = basename5(written);
+  const base = basename6(written);
   if (base === "CONCEPT.md") return "concept";
   if (base === "README.md") return "readme";
   if (written.endsWith(".html")) return "artifact-html";
@@ -3695,10 +2963,10 @@ function ownStylesDir() {
 }
 function uncutVersions(text, styles = ownStylesDir()) {
   if (styles === null) return [];
-  const cut2 = Object.keys(cutVersions(styles));
-  if (!cut2.length) return [];
+  const cut = Object.keys(cutVersions(styles));
+  if (!cut.length) return [];
   const linked = [...text.matchAll(SERVED_LINK)].map((found) => VERSION_FOLDER2.exec(found[1])?.[1]).filter((version) => version !== void 0);
-  return [...new Set(linked)].filter((version) => !cut2.includes(version)).map((version) => ["RULE", `the page ${UNCUT}: \`${version}\`. \`versions.json\` holds ${cut2.map((one) => `\`${one}\``).join(" \xB7 ")}. Link a version that exists, or cut this one first with \`spn-devex docs sds cut ${version}\` (05-artifacts.md \xA7 One stylesheet, served in versions)`]);
+  return [...new Set(linked)].filter((version) => !cut.includes(version)).map((version) => ["RULE", `the page ${UNCUT}: \`${version}\`. \`versions.json\` holds ${cut.map((one) => `\`${one}\``).join(" \xB7 ")}. Link a version that exists, or cut this one first with \`spn-devex docs sds cut ${version}\` (05-artifacts.md \xA7 One stylesheet, served in versions)`]);
 }
 function holdsOwnCopy2(path, text, fragment) {
   if (linksSharedStyles(text)) return false;
@@ -3785,7 +3053,7 @@ function argvWrites(head) {
     while (tokens.length && (["sudo", "env", "command", "nohup"].includes(tokens[0]) || /^\w+=/.test(tokens[0])))
       tokens = tokens.slice(1);
     if (!tokens.length) continue;
-    const cmd = basename5(tokens[0]);
+    const cmd = basename6(tokens[0]);
     const args = tokens.slice(1);
     if (cmd === "sed") {
       out.push(...sedFiles(args).map((f) => [f, "inplace"]));
@@ -3858,13 +3126,13 @@ function bashWrites(command) {
     ];
     const bodies = [];
     for (const d of delimiters) {
-      const body3 = [];
+      const body2 = [];
       while (i < lines.length && lines[i].trim() !== d) {
-        body3.push(lines[i]);
+        body2.push(lines[i]);
         i += 1;
       }
       i += 1;
-      bodies.push(body3.join("\n"));
+      bodies.push(body2.join("\n"));
     }
     targets.forEach(([target, append, how], n) => out.push([target, n < bodies.length ? bodies[n] : null, append, how]));
     for (const [target, how] of argvWrites(head)) out.push([bare(target), null, how === "inplace", how]);
@@ -3903,7 +3171,7 @@ function checkDoc(payload) {
     if (!writes.length) return null;
     plural = writes.length > 1;
     for (const [target, text, append, how] of writes) {
-      const tag = basename5(target) + ": ";
+      const tag = basename6(target) + ": ";
       if (text === null) {
         found.push(["SOFT", tag + UNREAD[how] + " \u2014 the gate cannot measure this write. Write the document with Write or Edit, or sweep the file afterwards, and it is checked"]);
         continue;
@@ -3912,12 +3180,12 @@ function checkDoc(payload) {
     }
   }
   if (!found.length) return null;
-  const body3 = found.map(([sev, msg]) => `  - [${sev}] ${msg}`).join("\n");
+  const body2 = found.map(([sev, msg]) => `  - [${sev}] ${msg}`).join("\n");
   const moves2 = found.some(([, m]) => m.includes("RD.DOCS.04") || m.includes("RD.DEVEX.WORKSPACE.096")) ? "\n  The four moves: split it \xB7 say *you* \xB7 define the term \xB7 land it on your reader \u2014 never shorten (`refs/devex/workspace/docs/doc-sets.md` \xA7 One voice; decisions RD.DEVEX.WORKSPACE.106 \xB7 RD.DEVEX.WORKSPACE.107)." : "";
   const subject = plural ? "these files miss" : "this file misses";
   const limits = fragment ? "\n  This run scored the replacement text, not the document \u2014 a table cell reads as prose here, and a paragraph's opening sentence is not a fragment's. Sweep the whole file to reach those: `node doc-check.ts <path>`." : "";
   const note = `Doc standard \u2014 ${subject} bars the book states:
-${body3}${moves2}${limits}
+${body2}${moves2}${limits}
   Load \`refs/devex/workspace/docs/doc-sets.md\` (One voice / Every surface / The artifacts pocket) and, for an approach page, \`${PLUGIN_TEMPLATES}/workstream/approach-template.html\`.`;
   const uncut = found.filter(([, message]) => message.includes(UNCUT));
   if (uncut.length)
@@ -3928,7 +3196,7 @@ function* walk(roots) {
   for (const root of roots) {
     let stat;
     try {
-      stat = statSync4(root);
+      stat = statSync6(root);
     } catch {
       continue;
     }
@@ -3941,15 +3209,15 @@ function* walk(roots) {
       const dir = stack.pop();
       let entries;
       try {
-        entries = readdirSync3(dir).sort();
+        entries = readdirSync5(dir).sort();
       } catch {
         continue;
       }
       for (const entry of entries) {
-        const full = join7(dir, entry);
+        const full = join9(dir, entry);
         let entryStat;
         try {
-          entryStat = statSync4(full);
+          entryStat = statSync6(full);
         } catch {
           continue;
         }
@@ -3984,7 +3252,7 @@ function rates(root, stats) {
   console.log("| kind | files | sentences | words/sentence | % past 25 | past 30 per 100 | *you* per 100 | reach % | reach bar | files with RULE | files with SOFT |");
   console.log("| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |");
   const prose = emptyStats();
-  for (const kind of KINDS2.slice(0, -1)) {
+  for (const kind of KINDS.slice(0, -1)) {
     if (stats[kind].files) console.log(line(kind, stats[kind], `${REACH_BAR[kind]} %`));
     for (const key of Object.keys(prose)) prose[key] += stats[kind][key];
   }
@@ -3996,7 +3264,7 @@ function sweep2(roots, summaryOnly) {
   let files = 0, dirty = 0;
   const perRoot = [];
   for (const root of roots) {
-    const stats = Object.fromEntries(KINDS2.map((k) => [k, emptyStats()]));
+    const stats = Object.fromEntries(KINDS.map((k) => [k, emptyStats()]));
     for (const path of [...walk([root])].sort()) {
       const text = read2(path);
       files += 1;
@@ -4006,7 +3274,7 @@ function sweep2(roots, summaryOnly) {
         dirty += 1;
         for (const [sev] of found) total[sev] += 1;
         if (!summaryOnly) {
-          console.log(relative4(process.cwd(), path));
+          console.log(relative5(process.cwd(), path));
           for (const [sev, msg] of found) console.log(`   [${sev}] ${msg}`);
         }
         continue;
@@ -4023,7 +3291,7 @@ function sweep2(roots, summaryOnly) {
       dirty += 1;
       for (const [sev] of found) total[sev] += 1;
       if (summaryOnly) continue;
-      console.log(relative4(process.cwd(), path));
+      console.log(relative5(process.cwd(), path));
       for (const [sev, msg] of found) console.log(`   [${sev}] ${msg}`);
     }
     perRoot.push([root, stats]);
@@ -4052,13 +3320,26 @@ if (runAlone("doc-check.ts")) {
   process.exit(sweep2(roots.length ? roots : ["."], argv.includes("--summary")));
 }
 
-// packages/plugin-spn-devex/src/scripts/commands/docs/prose.ts
+// packages/plugin-spn-devex/src/scripts/events/stop.ts
 init_payload();
-import { execFileSync } from "node:child_process";
-import { createHash } from "node:crypto";
-import { readdirSync as readdirSync4, readFileSync as readFileSync5, realpathSync, statSync as statSync5, appendFileSync as appendFileSync2 } from "node:fs";
-import { basename as basename6, extname, join as join8, resolve as resolve6 } from "node:path";
-var SKIP_DIR = /* @__PURE__ */ new Set([
+init_docs_tree();
+
+// packages/plugin-spn-devex/src/scripts/events/orientation.ts
+init_payload();
+init_docs_tree();
+import { execFileSync as execFileSync2 } from "node:child_process";
+import { readdirSync as readdirSync6, realpathSync, statSync as statSync7 } from "node:fs";
+import { homedir as homedir2 } from "node:os";
+import { basename as basename7, join as join10, relative as relative6, resolve as resolve7, sep as sep5 } from "node:path";
+import { fileURLToPath as fileURLToPath2 } from "node:url";
+var MARKETPLACE = "saasplane";
+var CORE = "spn-devex";
+var WORLD_PLUGINS = {
+  FOUNDATION: [CORE],
+  INFRA: [CORE, "spn-infra"],
+  APPS: [CORE, "spn-apps"]
+};
+var SKIP3 = /* @__PURE__ */ new Set([
   "node_modules",
   ".git",
   "dist",
@@ -4066,551 +3347,1510 @@ var SKIP_DIR = /* @__PURE__ */ new Set([
   ".nx",
   "coverage",
   ".output",
-  "__pycache__",
-  ".venv",
   "tool-results",
-  ".pnpm-store"
+  "__pycache__",
+  ".venv"
 ]);
-function ignoredFolders(dir) {
-  let top;
+var NODE_MANIFEST = { APPS: "spkind.json", INFRA: "spinfrapkg.json" };
+var STATES2 = WORKSTREAM_STATES;
+var NUMBERED = /^(\d{1,4})-(.+)$/;
+function readJson(path) {
   try {
-    top = execFileSync(
-      "git",
-      ["-C", dir, "rev-parse", "--show-toplevel"],
-      { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }
-    ).trim();
+    return JSON.parse(read(path));
   } catch {
-    return /* @__PURE__ */ new Set();
-  }
-  if (top === "") return /* @__PURE__ */ new Set();
-  const cached = IGNORED.get(top);
-  if (cached) return cached;
-  const found = /* @__PURE__ */ new Set();
-  try {
-    const listed2 = execFileSync(
-      "git",
-      ["-C", top, "ls-files", "--others", "--ignored", "--exclude-standard", "--directory"],
-      { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], maxBuffer: 64 * 1024 * 1024 }
-    );
-    for (const line of listed2.split("\n"))
-      if (line.endsWith("/")) found.add(realOf(join8(top, line.slice(0, -1))));
-  } catch {
-  }
-  IGNORED.set(top, found);
-  return found;
-}
-var IGNORED = /* @__PURE__ */ new Map();
-function realOf(target) {
-  try {
-    return realpathSync(resolve6(target));
-  } catch {
-    return resolve6(target);
+    return null;
   }
 }
-var SKIP_FILE = /^(CHANGELOG|LICENSE|spn-symbols|.*\.generated)\.md$/i;
-var CODE_EXT = { ".ts": "c", ".tsx": "c", ".js": "c", ".jsx": "c", ".py": "py", ".sh": "sh" };
-var DIRECTIVE = /^\s*(?:eslint|prettier|@ts-|ts-|type:|noqa|pylint|pragma|istanbul|biome-ignore|v8 ignore|c8 ignore|TODO\b|FIXME\b|HACK\b|XXX\b|https?:\/\/|#!|-\*-|coding[:=])/i;
-var GENERATED = /(generated|do not edit|auto-?generated)/i;
-function commentBlocks(src, style) {
-  if (GENERATED.test(src.slice(0, 400))) return [];
+var LETTER = /[\p{L}_]/u;
+function hyphenChunks(word) {
   const out = [];
-  let run3 = [];
-  let linePattern;
-  if (style === "c") {
-    for (const found of src.matchAll(/\/\*\*?([\s\S]*?)\*\//g))
-      out.push(found[1].replace(/^\s*\*+/gm, ""));
-    linePattern = /^\s*\/\/+(.*)$/;
-  } else {
-    for (const found of src.matchAll(/"""([\s\S]*?)"""|'''([\s\S]*?)'''/g))
-      out.push(found[1] || found[2] || "");
-    linePattern = /^\s*#+(.*)$/;
-  }
-  for (const line of src.split("\n")) {
-    const found = linePattern.exec(line);
-    if (found) run3.push(found[1]);
-    else if (run3.length) {
-      out.push(run3.join("\n"));
-      run3 = [];
+  let start = 0;
+  for (let i = 0; i < word.length; i += 1) {
+    if (word[i] !== "-") continue;
+    const before = word.slice(0, i);
+    const okBefore = new RegExp(`${LETTER.source}{2}$`, "u").test(before) || new RegExp(`${LETTER.source}-${LETTER.source}$`, "u").test(before);
+    const okAfter = new RegExp(`^${LETTER.source}-?${LETTER.source}`, "u").test(word.slice(i + 1));
+    if (okBefore && okAfter) {
+      out.push(word.slice(start, i + 1));
+      start = i + 1;
     }
   }
-  if (run3.length) out.push(run3.join("\n"));
-  return out;
+  out.push(word.slice(start));
+  return out.filter(Boolean);
 }
-function proseComments(path, style) {
-  const src = read(path);
-  const out = [];
-  for (const body3 of commentBlocks(src, style)) {
-    const text = body3.split(/\s+/).filter(Boolean).join(" ");
-    if (!text || DIRECTIVE.test(text)) continue;
-    const sents = sentences(text);
-    if (text.split(/\s+/).filter(Boolean).length >= 8 && sents.length) out.push([text, sents]);
+function wrap(text, width) {
+  const chunks = [];
+  for (const piece of text.split(/(\s+)/)) {
+    if (!piece) continue;
+    if (/^\s+$/.test(piece)) chunks.push(piece.replace(/\s/g, " "));
+    else chunks.push(...hyphenChunks(piece));
   }
-  return out;
-}
-var OPENERS = {
-  pronoun: /^(?:it|they|this|these|those)\s+(?:is|are|was|were|arrives|carries|holds|has|have|makes|does|comes|goes|means|sits|lives)\b/i,
-  defines: /^\w[\w\s`'-]{0,40}?\s+is\s+(?:what\s+happens|the\s+\w+\s+that\s+\w+s\b)/i
-};
-var ABSTRACT = /\bthe (?:property|thing|point|reason|part) (?:that|which)\b|\bcomes down to\b/gi;
-var METAPHOR = /\b(?:fates?|degrade[sd]? into|centre of gravity|center of gravity|lifeblood|marriage of|wedded to|a home for|breathes?)\b/i;
-var MANDATED_OPENER = /^boundary$/i;
-var FAULTS = ["idiom", "opener", "abstract", "metaphor"];
-function sectionsOf(raw) {
   const out = [];
-  let heading = "";
-  let body3 = [];
-  let fenced = false;
-  for (const line of raw.split("\n")) {
-    if (/^\s*```/.test(line)) fenced = !fenced;
-    const head = fenced ? null : /^##\s+(.+?)\s*$/.exec(line);
-    if (head) {
-      out.push({ heading, body: body3.join("\n") });
-      heading = head[1].replace(/[*`_]/g, "").trim();
-      body3 = [];
+  let line = [];
+  let length = 0;
+  const flush = () => {
+    while (line.length && /^\s+$/.test(line[line.length - 1])) length -= line.pop().length;
+    if (line.length) out.push(line.join(""));
+    line = [];
+    length = 0;
+  };
+  for (const chunk of chunks) {
+    if (!line.length && /^\s+$/.test(chunk)) continue;
+    if (length + chunk.length <= width) {
+      line.push(chunk);
+      length += chunk.length;
       continue;
     }
-    body3.push(line);
+    flush();
+    if (/^\s+$/.test(chunk)) continue;
+    line.push(chunk);
+    length = chunk.length;
   }
-  out.push({ heading, body: body3.join("\n") });
+  flush();
   return out;
 }
-function quotationMarks(text) {
-  return text.replace(/&ldquo;|&#8220;|&#x201[cC];/g, "\u201C").replace(/&rdquo;|&#8221;|&#x201[dD];/g, "\u201D").replace(/&quot;|&#34;/g, '"');
+function hasLaw(path) {
+  return isFile(join10(path, "sprepo.json"));
 }
-function paragraphs(raw) {
+function workspaceRootOf(start) {
+  let path = resolve7(start);
+  const seen = [];
+  for (; ; ) {
+    seen.push(path);
+    if (isDir(join10(path, ".spndevex"))) return path;
+    const up = resolve7(path, "..");
+    if (up === path) break;
+    path = up;
+  }
+  for (const candidate of seen)
+    if (listdir(candidate).some((d) => hasLaw(join10(candidate, d)))) return candidate;
+  return resolve7(start);
+}
+function members(root) {
   const out = [];
-  for (const { heading, body: body3 } of sectionsOf(raw)) {
-    for (const block of proseOf(quotationMarks(body3), false).split(BLOCK_BREAK)) {
-      const sents = sentences(block);
-      if (sents.length) out.push([block.split(/\s+/).filter(Boolean).join(" "), sents, heading]);
-    }
+  for (const name of listdir(root)) {
+    const path = join10(root, name);
+    if (!isDir(path)) continue;
+    if (hasLaw(path) || isDir(join10(path, ".git"))) out.push([name, path]);
   }
   return out;
 }
-function score(block, sents, section2 = "") {
-  const found = {};
-  const clean = block.replace(MARKED, " ");
-  const idioms = [...new Set([...clean.matchAll(IDIOM)].map((m) => m[1].toLowerCase()))].sort();
-  if (idioms.length) found.idiom = idioms.join(" \xB7 ");
-  const first = sents[0][0];
-  const hits = MANDATED_OPENER.test(section2) ? [] : Object.entries(OPENERS).filter(([, pattern]) => pattern.test(first)).map(([name]) => name);
-  if (hits.length) found.opener = `${hits.join(" + ")} \u2014 "${opening(first, 8)}"`;
-  const abstract = [...clean.matchAll(ABSTRACT)].map((m) => m[0].trim().toLowerCase());
-  if (abstract.length) found.abstract = [...new Set(abstract)].sort().join(" \xB7 ");
-  const metaphor = METAPHOR.exec(clean);
-  if (metaphor) found.metaphor = metaphor[0].toLowerCase();
-  return found;
+function lawOf(path) {
+  const manifest = readJson(join10(path, "sprepo.json")) ?? {};
+  const config = manifest.config ?? {};
+  const pins = [];
+  for (const [role, key] of [["org", "organization"], ["plt", "platform"]]) {
+    const entry = (config.infra ?? {})[key] ?? {};
+    if (!entry.package) continue;
+    pins.push(`${role} ${basename7(entry.package)}@${entry.version || "path"}`);
+  }
+  return { world: manifest.type ?? null, stack: config.stack ?? null, pins };
 }
-function under(dir, entry) {
-  return dir.endsWith("/") ? `${dir}${entry}` : `${dir}/${entry}`;
+function expectedPlugins(world) {
+  return WORLD_PLUGINS[world ?? ""] ?? [CORE];
 }
-function* filesUnder(roots, comments = false) {
-  for (const root of roots) {
-    let stat;
+function enabledPlugins(path) {
+  const settings = readJson(join10(path, ".claude", "settings.json")) ?? {};
+  return new Set(Object.entries(settings.enabledPlugins ?? {}).filter(([, on]) => on).map(([key]) => key.split("@")[0]));
+}
+function countNodes(path, world) {
+  const manifest = NODE_MANIFEST[world ?? ""];
+  if (!manifest) return null;
+  const base = resolve7(path);
+  const baseDepth = base.split(sep5).length;
+  let found = 0;
+  const stack = [base];
+  while (stack.length) {
+    const dir = stack.pop();
+    let entries;
     try {
-      stat = statSync5(root);
+      entries = readdirSync6(dir);
     } catch {
       continue;
     }
-    if (stat.isFile()) {
-      yield root;
+    if (dir.split(sep5).length - baseDepth > 3) continue;
+    if (entries.includes(manifest)) found += 1;
+    for (const entry of entries) {
+      if (SKIP3.has(entry) || entry.startsWith(".")) continue;
+      const next = join10(dir, entry);
+      if (isDir(next)) stack.push(next);
+    }
+  }
+  return found;
+}
+function age(seconds) {
+  const days = Math.floor((Date.now() / 1e3 - seconds) / 86400);
+  if (days <= 0) return "touched today";
+  if (days === 1) return "touched yesterday";
+  return `untouched ${days} days`;
+}
+function newest(paths) {
+  const stamps = [];
+  for (const path of paths) {
+    try {
+      stamps.push(statSync7(path).mtimeMs / 1e3);
+    } catch {
       continue;
     }
-    const walk2 = function* (dir) {
-      let entries;
-      try {
-        entries = readdirSync4(dir).sort();
-      } catch {
-        return;
-      }
-      const folders = [];
-      for (const entry of entries) {
-        const full = under(dir, entry);
-        let entryStat;
-        try {
-          entryStat = statSync5(full);
-        } catch {
-          continue;
-        }
-        if (entryStat.isDirectory()) {
-          if (!SKIP_DIR.has(entry) && !entry.startsWith(".") && !ignoredFolders(dir).has(realOf(full)))
-            folders.push(full);
-          continue;
-        }
-        if (entry.endsWith(".md") && !SKIP_FILE.test(entry)) yield full;
-        else if (comments && CODE_EXT[extname(entry)]) yield full;
-      }
-      for (const folder of folders) yield* walk2(folder);
-    };
-    yield* walk2(root);
   }
+  return stamps.length ? Math.max(...stamps) : 0;
+}
+function treeFiles(path) {
+  const out = [];
+  const stack = [path];
+  while (stack.length) {
+    const dir = stack.pop();
+    let entries;
+    try {
+      entries = readdirSync6(dir);
+    } catch {
+      continue;
+    }
+    for (const entry of entries) {
+      const full = join10(dir, entry);
+      if (isDir(full)) {
+        if (!SKIP3.has(entry)) stack.push(full);
+      } else out.push(full);
+    }
+  }
+  return out;
+}
+function numbered(folder) {
+  const match = NUMBERED.exec(folder);
+  return match ? [match[1], match[2]] : ["", folder];
+}
+function workstreams(root) {
+  const devex = join10(root, DEVEX);
+  const found = /* @__PURE__ */ new Map();
+  for (const state2 of STATES2)
+    for (const [base, legacy] of [
+      [workstreamsDir(root, state2), ""],
+      [legacyWorkstreamsDir(root, state2), `${SESSIONS}/`]
+    ])
+      for (const folder of listdir(base)) {
+        const path = join10(base, folder);
+        if (!isDir(path) || found.has(folder)) continue;
+        const files = treeFiles(path);
+        const [number, subject] = numbered(folder);
+        found.set(folder, {
+          folder,
+          number,
+          subject,
+          state: state2,
+          // BOTH OF THESE READ ONE LEVEL, NOT THE TREE. `treeFiles` walks everything under the
+          // folder, and a workstream's `notes/retired/` holds whole pockets that other repositories
+          // gave up — 51 approach pages in one case, every one of them sorting before the
+          // workstream's own. A recursive `find` therefore linked a retired page belonging to
+          // another repo, and the arc count matched a template rather than the arcs.
+          page: (() => {
+            const own = listdir(path).filter(isApproachPage).sort()[0];
+            return own ? join10(path, own) : "";
+          })(),
+          arcs: listdir(join10(path, "arcs")).filter((f) => f.endsWith(".md")).length,
+          when: newest(files) || newest([path]),
+          legacy
+        });
+      }
+  for (const name of listdir(join10(devex, "arcs"))) {
+    if (!name.startsWith("arc-") || !name.endsWith(".md")) continue;
+    const subject = name.slice("arc-".length, -".md".length);
+    if (found.has(subject)) continue;
+    const arc = join10(devex, "arcs", name);
+    const page = join10(devex, "notes", `${subject}-approach.html`);
+    found.set(subject, {
+      folder: subject,
+      number: "",
+      subject,
+      state: "open",
+      page: isFile(page) ? page : "",
+      arcs: 1,
+      when: newest([arc, page]),
+      legacy: "arcs/"
+    });
+  }
+  return [...found.values()].sort((a, b) => {
+    const left = a.number || "zzz", right = b.number || "zzz";
+    if (left !== right) return left < right ? -1 : 1;
+    return a.subject < b.subject ? -1 : a.subject > b.subject ? 1 : 0;
+  });
+}
+function versionKey(name) {
+  return name.split(".").map((part) => /^\d+$/.test(part) ? Number(part) : -1);
+}
+function compareVersions(a, b) {
+  const left = versionKey(a), right = versionKey(b);
+  for (let i = 0; i < Math.max(left.length, right.length); i += 1) {
+    const l = left[i] ?? -Infinity, r = right[i] ?? -Infinity;
+    if (l !== r) return l < r ? -1 : 1;
+  }
+  return 0;
 }
 function digest(path) {
+  const base = resolve7(path);
+  const out = [];
+  const stack = [base];
+  while (stack.length) {
+    const dir = stack.pop();
+    let entries;
+    try {
+      entries = readdirSync6(dir).sort();
+    } catch {
+      continue;
+    }
+    for (const entry of entries) {
+      const full = join10(dir, entry);
+      let stat;
+      try {
+        stat = statSync7(full);
+      } catch {
+        continue;
+      }
+      if (stat.isDirectory()) {
+        if (!SKIP3.has(entry)) stack.push(full);
+      } else out.push(`${relative6(base, full)}\0${stat.size}`);
+    }
+  }
+  return out.sort().join("\n");
+}
+function loadedBehind() {
+  let here;
   try {
-    return createHash("sha256").update(readFileSync5(path)).digest("hex").slice(0, 16);
+    here = fileURLToPath2(import.meta.url).replace(/\\/g, "/");
+  } catch {
+    return null;
+  }
+  const at = /^(.*\/plugins\/cache)\/([^/]+)\/([^/]+)\/([^/]+)\//.exec(here);
+  if (!at) return null;
+  const [, cacheRoot, , plugin, loaded] = at;
+  const cached = join10(cacheRoot, at[2], plugin);
+  const versions = listdir(cached).filter((v) => !isFile(join10(cached, v, ".orphaned_at")));
+  if (!versions.length) return null;
+  const newest2 = versions.reduce((a, b) => compareVersions(a, b) >= 0 ? a : b);
+  if (compareVersions(newest2, loaded) <= 0) return null;
+  return { plugin, loaded, newest: newest2 };
+}
+function cacheState(root, pluginNames) {
+  const sources = {};
+  for (const name of ["settings.json", "settings.local.json"])
+    Object.assign(sources, (readJson(join10(root, ".claude", name)) ?? {}).extraKnownMarketplaces ?? {});
+  let pairs = Object.entries(sources).map(([market, entry]) => [market, ((entry ?? {}).source ?? {}).path ?? null]);
+  if (!pairs.length) {
+    const holds = listdir(root).map((name) => join10(root, name)).filter((path) => pluginNames.every((plugin) => isDir(join10(path, "plugins", plugin))));
+    pairs = holds.length ? [[MARKETPLACE, holds[0]]] : [];
+  }
+  if (!pairs.length) return "cache unknown \u2014 no marketplace source";
+  const stale = [];
+  for (const [market, source] of pairs) {
+    if (!source || !isDir(source)) return "cache unknown";
+    const declared = {};
+    for (const entry of (readJson(join10(source, ".claude-plugin", "marketplace.json")) ?? {}).plugins ?? [])
+      if (entry?.name && typeof entry.source === "string") declared[entry.name] = entry.source;
+    for (const plugin of pluginNames) {
+      const live = join10(source, declared[plugin] ?? join10("plugins", plugin));
+      const cached = join10(homedir2(), ".claude", "plugins", "cache", market, plugin);
+      const versions = listdir(cached).filter((v) => !isFile(join10(cached, v, ".orphaned_at")));
+      if (!isDir(live) || !versions.length) return "cache unknown";
+      const latest = versions.reduce((a, b) => compareVersions(a, b) >= 0 ? a : b);
+      if (digest(join10(cached, latest)) !== digest(live)) stale.push(plugin);
+    }
+  }
+  if (stale.length) return "cache stale \u2014 " + [...new Set(stale)].sort().join(" ");
+  return "cache current";
+}
+function rung(repos) {
+  if (!repos.length) return [0, "empty \u2014 no sprepo.json anywhere"];
+  const apps = repos.filter((r) => r.world === "APPS");
+  if (!apps.length) return [1, "estate only \u2014 no APPS repo yet"];
+  const withoutConcept = apps.filter((r) => !isFile(join10(r.path, "CONCEPT.md")));
+  if (withoutConcept.length)
+    return [2, "an APPS repo carries no CONCEPT.md \u2014 " + withoutConcept.map((r) => r.name).join(" ")];
+  if (apps.every((r) => (r.nodes ?? 0) < 3)) return [3, "concept present, very few nodes below it"];
+  return [4, "building \u2014 apps and packages present"];
+}
+function developerName() {
+  try {
+    const name = String(((readJson(join10(homedir2(), ".claude.json")) ?? {}).oauthAccount ?? {}).displayName ?? "");
+    const first = name.trim().split(/\s+/)[0] ?? "";
+    return first.length > 1 && first.length <= 20 && /^[a-z]+$/i.test(first.replace(/-/g, "")) ? first : null;
+  } catch {
+    return null;
+  }
+}
+var WELCOME_SPACER = "\n&nbsp;\n";
+function welcome(who, firstVisit) {
+  const name = who ? `, ${who}` : "";
+  return [
+    firstVisit ? `# \u{1F44B} Welcome to SaaS Plane${name}. Glad you're here!` : `# \u{1F44B} Good to see you again${name}. Welcome back to SaaS Plane!`,
+    "",
+    "*The AI-native, DevEx-first Foundation for Building and Launching Secure, Scalable, Compliance-ready SaaS Platforms.*",
+    WELCOME_SPACER,
+    "\u{1F916} **I'm your DevEx agent.** Think of me as the engineering teammate who has read every standard in this workspace, so your time can go to the product.",
+    WELCOME_SPACER,
+    "\u{1F9ED} I work with you through the whole software lifecycle: **Start** (Bootstrap a repo, Source Control), **Plan** (Ideate), **Build** (Develop, Test), **Ship** (Provision, Deliver) and **Run** (Operate). Each stage has its own standards and its own proof, and I carry both for you.",
+    WELCOME_SPACER,
+    "\u{1F465} I look at the work through every role on your team: **Leadership** (Engineering Manager, Business Analyst, Product Manager), **Build** (Solution Architect, Backend Engineer, Frontend Engineer), **Quality** (QA Engineer), **Operations** (DevOps, DevSecOps) and **Docs** (Technical Writer). Tell me whose view you need, and I'll bring it."
+  ];
+}
+function statusLine(s) {
+  const plural = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
+  const parts = [plural(s.repos, "repo", "repos")];
+  if (s.open.length)
+    parts.push(`${plural(s.open.length, "workstream")} open (${s.open.map((w) => w.number || w.subject).join(", ")})`);
+  if (s.backlog) parts.push(`${s.backlog} in backlog`);
+  if (s.others) parts.push(`${plural(s.others, "other window", "other windows")} open here`);
+  if (s.unwired) parts.push(`${s.unwired} unwired`);
+  if (s.stale) parts.push(s.stale);
+  if (s.behind) parts.push(s.behind);
+  if (s.rung) parts.push(s.rung);
+  return parts.join(" \xB7 ");
+}
+function ownChain() {
+  const chain = /* @__PURE__ */ new Set();
+  let pid = process.pid;
+  for (let i = 0; i < 12; i += 1) {
+    chain.add(pid);
+    let out;
+    try {
+      out = execFileSync2("ps", ["-o", "ppid=", "-p", String(pid)], { encoding: "utf8", timeout: 2e3 }).trim();
+    } catch {
+      break;
+    }
+    if (!/^\d+$/.test(out) || Number(out) <= 1) break;
+    pid = Number(out);
+  }
+  return chain;
+}
+function sessionsHere(root) {
+  try {
+    const mine = ownChain();
+    const listing = execFileSync2("ps", ["-eo", "pid=,comm="], { encoding: "utf8", timeout: 3e3 });
+    let others = 0;
+    for (const line of listing.split("\n")) {
+      const parts = line.trim().split(/\s+(.+)/);
+      if (parts.length < 2 || !/^\d+$/.test(parts[0])) continue;
+      const pid = Number(parts[0]);
+      if (mine.has(pid) || basename7(parts[1].trim()) !== "claude") continue;
+      let cwd;
+      try {
+        cwd = execFileSync2("lsof", ["-a", "-p", String(pid), "-d", "cwd", "-Fn"], { encoding: "utf8", timeout: 3e3 });
+      } catch {
+        continue;
+      }
+      for (const entry of cwd.split("\n"))
+        if (entry.startsWith("n")) {
+          let real;
+          try {
+            real = realpathSync(entry.slice(1));
+          } catch {
+            real = entry.slice(1);
+          }
+          if (real.startsWith(root)) {
+            others += 1;
+            break;
+          }
+        }
+    }
+    return others;
+  } catch {
+    return 0;
+  }
+}
+function workstreamLines(streams) {
+  if (!streams.length)
+    return [
+      "### Workstreams \u2014 none yet",
+      "",
+      "A subject becomes one by `mkdir` under `backlog/` or `open/` \u2014 then update the agent and reload BEFORE executing it (`cross-repo.md`)."
+    ];
+  const byState = Object.fromEntries(
+    STATES2.map((state2) => [state2, streams.filter((w) => w.state === state2)])
+  );
+  const tally = STATES2.filter((s) => byState[s].length).map((s) => `${byState[s].length} ${s}`).join(" \xB7 ");
+  const out = [
+    `### Workstreams \u2014 ${tally}`,
+    "",
+    "Open one with the agent update and the reload, then execute \u2014 `cross-repo.md`."
+  ];
+  const live = [...byState.open, ...byState.backlog];
+  if (live.length) {
+    out.push("", "| | # | Workstream | Page | Arcs | Touched |", "| --- | --- | --- | --- | --- | --- |");
+    for (const state2 of ["open", "backlog"])
+      for (const w of byState[state2]) {
+        const page = !w.page ? "\u2014" : state2 === "open" ? `[approach page](file://${w.page})` : "approach page";
+        const legacy = w.legacy ? ` \xB7 still in ${w.legacy}` : "";
+        out.push(`| ${state2 === "open" ? "\u{1F7E2} open" : "\u23F8 backlog"} | ${w.number || "\u2014"} | ${w.subject} | ${page} | ${w.arcs} | ${age(w.when)}${legacy} |`);
+      }
+  }
+  if (byState.closed.length) {
+    out.push("", `**${byState.closed.length} closed** \u2014 ` + byState.closed.map((w) => "`" + w.folder + "`").join(" \xB7 "));
+  }
+  return out;
+}
+function closingLines(streams, others) {
+  const ask = "So \u2014 what are we building?";
+  const openNow = streams.filter((w) => w.state === "open");
+  if (openNow.length !== 1) return ["", ask, ""];
+  const only = openNow[0];
+  const name = [only.number, only.subject].filter(Boolean).join(" ");
+  const offer = others ? `${name} is open, but ${others} other session${others > 1 ? "s are" : " is"} open in this workspace. I will not touch it unless you ask me to.` : `Or ask me to continue ${name}, and I will start where we stopped.`;
+  return ["", ask, "", ...wrap(offer, 84), ""];
+}
+function claim2(repo) {
+  if (!repo.world) return "\u2014";
+  return repo.world + (repo.stack ? ` \xB7 ${repo.stack}` : "");
+}
+function orient(root, cwd) {
+  const repos = members(root).map(([name, path]) => {
+    const { world, stack, pins } = lawOf(path);
+    const want = expectedPlugins(world);
+    const have = enabledPlugins(path);
+    return {
+      name,
+      path,
+      world,
+      stack,
+      pins,
+      want,
+      have,
+      wired: want.every((p) => have.has(p)),
+      nodes: countNodes(path, world)
+    };
+  });
+  const who = developerName();
+  const governed = repos.filter((r) => r.world);
+  const streams = workstreams(root);
+  const [level, why] = rung(governed);
+  const greeting = welcome(who, streams.length === 0);
+  const clean = (lines2) => lines2.map((line) => line.replace(/[ \t]+$/, "")).join("\n");
+  if (!governed.length) {
+    const started = streams.find((s) => s.state === "open" && s.subject === "new-platform");
+    const message2 = clean(greeting) + "\n" + WELCOME_SPACER + "\n" + (started ? "You started a platform here and we did not finish. No repository exists yet, and your answers are on disk where you left them \u2014 `" + relative6(root, join10(workstreamsDir(root, "open"), started.folder, ARCS)) + "/`.\n\nI will read what you already answered, tell you where we stopped, and pick up at the next question. Nothing you decided is asked again.\n\nShall we carry on?\n" : "This folder is empty, which is a good place to start. There is nothing to read yet, so nothing here is decided.\n\nSay yes and I mint the workspace, open a workstream to hold your answers, then ask the estate questions one at a time. Your answers name every account, package and prefix that comes after, and each one lands in a file as you give it \u2014 so nothing rests on this window staying open. Say no and nothing is created.\n\nWould you like to start a new platform?\n");
+    const note2 = "\n---\nDay-0 mode: no sprepo.json under " + root + ". You have no code to read, so do not orient \u2014 open your first reply with the welcome above, word for word and whole, whatever the prompt, then load the `bootstrap` skill and walk it. " + (started ? "A day-0 walk is already open here: `" + relative6(root, join10(workstreamsDir(root, "open"), started.folder)) + "/`. Read its arc BEFORE you say anything. Resume at the first coordinate it does not carry an answer for, and never ask again for one it holds.\n" : "Act 0 is the door above: ask, and run nothing until they answer. A no is a real answer and this folder stays empty. On a yes, act 1 mints the workspace and act 2 opens the workstream that holds the answers, before the first question is asked.\n");
+    return [message2, message2 + note2];
+  }
+  const settings = readJson(join10(root, ".claude", "settings.json")) ?? {};
+  const floor = Object.entries(settings.enabledPlugins ?? {}).filter(([, on]) => on).map(([k]) => k);
+  const plugins = [...new Set(floor.map((k) => k.split("@")[0]))].sort();
+  const cache = plugins.length ? cacheState(root, plugins) : null;
+  const behind = loadedBehind();
+  const others = sessionsHere(root);
+  const status = statusLine({
+    repos: repos.length,
+    open: streams.filter((w) => w.state === "open"),
+    backlog: streams.filter((w) => w.state === "backlog").length,
+    others,
+    unwired: repos.filter((r) => !r.wired).length,
+    stale: cache?.startsWith("cache stale") ? cache : null,
+    behind: behind ? `this window runs ${behind.plugin} ${behind.loaded}, ${behind.newest} is installed` : null,
+    // Rung 4 is an ordinary session, and an ordinary session says nothing about its rung.
+    rung: level < 4 ? `rung ${level}: ${why}` : null
+  });
+  const message = clean([...greeting, WELCOME_SPACER, status]);
+  const head = plugins.length ? `floor ${plugins.length} plugins \xB7 ${cache}` : "floor not minted \u2014 no plugins enabled here";
+  const lines = ["## The ground", "", `\`${root}\` \xB7 ${head}`];
+  if (behind)
+    lines.push("", `\u26A0 this window loaded \`${behind.plugin} ${behind.loaded}\` and \`${behind.newest}\` is installed \u2014 it keeps the copy it started with, so take a fresh window before trusting a skill, a brief or a rule file`);
+  if (resolve7(cwd) !== root) lines.push("", `Rooted in \`${relative6(root, resolve7(cwd))}\`.`);
+  lines.push("");
+  lines.push(
+    "### Repositories",
+    "",
+    "| Repo | Law | Plugins | Wiring | Holds |",
+    "| --- | --- | --- | --- | --- |"
+  );
+  for (const r of repos) {
+    const facts = [];
+    if (r.nodes) facts.push(`${r.nodes} node${r.nodes !== 1 ? "s" : ""}`);
+    facts.push(...r.pins);
+    lines.push(`| \`${r.name}\` | ${r.world ? claim2(r) : "_no claim_"} | ${r.want.join(" ") || "\u2014"} | ${r.wired ? "wired" : "**UNWIRED**"} | ${facts.join(" \xB7 ") || "\u2014"} |`);
+  }
+  lines.push("");
+  lines.push(...workstreamLines(streams));
+  lines.push(...closingLines(streams, others));
+  const note = `
+---
+Ground, read at load \u2014 the members, their law, and every workstream in all three states. \`open/\` is available now, \`backlog/\` is parked behind a named blocker, and \`closed/\` is the receipt. The number is an identity, never a priority. Rung ${level}: ${why}. Open your first reply with the welcome above, word for word: the heading, the italic line, and the \u{1F916}, \u{1F9ED} and \u{1F465} lines, each whole, with the \`&nbsp;\` spacer line after the italic line and after each of the three. That holds whatever the prompt, a question and a pasted handover included: the prompt is answered after the welcome, never instead of it, and in some editors this reply is the only place the developer sees it. Then the status line under it. Show the tables only when asked (*where are we?*). The closing question is asked ONLY when the developer's first message does not already say what to do. A handover block, an arc name, or any named next step replaces it \u2014 under the status line, one line: *Picking up N<nn> \u2014 <the arc's title>, at row <n>: <what the row does>.* Then the first thing you will do, never by asking again. A handover block names a \`model:\` with a model and an effort: before any action, compare the model with the one your system prompt names. On a mismatch, one line under the status line names both models and how to switch \u2014 the model picker or the \`/model\` command \u2014 and nothing runs until the developer switches or says to go on. The effort on that line is a note for the developer to set in the picker, and nothing compares it. If that row's State reads \`in progress <time>\`, another window may be on it: leave it, say how old the mark is, and ask before you touch it. Something new in the first prompt gets its goal asked in one or two plain questions, never lettered options and never a \`Q<n>\` card: a card lives on the approach page, which does not exist yet. Publish nothing unless the developer asks (RD.DEVEX.WORKSPACE.117): an approach page, a sample or a report stays where it was written, and you hand it over as the full path to the file, to open in a browser. That holds over a publishing tool's own default to publish without being asked. Never turn the rung into a menu. The standing offer under that question appears only when exactly one workstream is open and no other session is live here \u2014 so where you cannot see one, do not propose resuming anything.
+`;
+  return [message, message + "\n\n" + clean(lines) + note];
+}
+if (runAlone("orientation.ts")) {
+  const stdinMode = process.argv.includes("--stdin");
+  let cwd = process.cwd();
+  let payload = {};
+  if (stdinMode) {
+    payload = readPayload();
+    cwd = payload.cwd || cwd;
+  } else {
+    const args = process.argv.slice(2).filter((a) => !a.startsWith("-"));
+    if (args.length) cwd = args[0];
+  }
+  const started = performance.now();
+  begin({
+    script: "spn-devex",
+    event: "SessionStart",
+    tool: null,
+    session: payload.session_id ?? null,
+    ...tagsOf(payload),
+    process: { group: "events", action: "orientation" }
+  }, cwd);
+  let result = null;
+  try {
+    result = orient(workspaceRootOf(cwd), cwd);
+  } catch (err) {
+    if (!stdinMode) console.error(`orientation unavailable: ${err}`);
+  }
+  record({ group: "orientation", action: "orientation" }, performance.now() - started);
+  end();
+  if (result) {
+    const [message, context] = result;
+    if (stdinMode)
+      console.log(JSON.stringify({
+        systemMessage: message,
+        hookSpecificOutput: { hookEventName: "SessionStart", additionalContext: context }
+      }));
+    else console.log(context);
+  }
+  process.exit(0);
+}
+
+// packages/plugin-spn-devex/src/scripts/events/stop.ts
+var HANDOVER_LABELS = [
+  "continue",
+  "model",
+  "read first",
+  "pins",
+  "state",
+  "live now",
+  "done when",
+  "do not touch",
+  "open"
+];
+var HANDOVER_LABEL_LINE = new RegExp(`^(${HANDOVER_LABELS.join("|")}):(.*)$`);
+var WORKSTREAM_NAME = /\b\d{3}-[a-z0-9][a-z0-9-]*/;
+var ARC_NAME = /\bN\d+\b/;
+function handoverLines(body2) {
+  const out = /* @__PURE__ */ new Map();
+  let last = null;
+  for (const line of body2.split("\n")) {
+    const m = line.match(HANDOVER_LABEL_LINE);
+    if (m) {
+      last = m[1];
+      out.set(last, m[2].trim());
+      continue;
+    }
+    if (last !== null && /^\s+\S/.test(line)) out.set(last, `${out.get(last)} ${line.trim()}`);
+    else last = null;
+  }
+  return out;
+}
+var HANDOVER_COLUMN = Math.max(...HANDOVER_LABELS.map((label) => label.length)) + 2;
+function handoverColumns(body2) {
+  const out = /* @__PURE__ */ new Map();
+  for (const line of body2.split("\n")) {
+    const m = line.match(HANDOVER_LABEL_LINE);
+    if (!m || !m[2].trim()) continue;
+    out.set(m[1], line.length - m[2].trimStart().length);
+  }
+  return out;
+}
+function looksLikeHandover(body2) {
+  return handoverLines(body2).size >= 2 || /workstream/i.test(body2) && /\barc\b/i.test(body2);
+}
+function fencesOf(reply) {
+  const out = [];
+  const lines = reply.split("\n");
+  let offset = 0;
+  let open = null;
+  for (const line of lines) {
+    const next = offset + line.length + 1;
+    if (open === null) {
+      const m = line.match(/^ {0,3}(`{3,}|~{3,})\s*([^`\s]*)/);
+      if (m) open = { mark: m[1], info: m[2].toLowerCase(), start: offset, bodyStart: next };
+    } else {
+      const m = line.match(/^ {0,3}(`{3,}|~{3,})\s*$/);
+      if (m && m[1][0] === open.mark[0] && m[1].length >= open.mark.length) {
+        out.push({ info: open.info, body: reply.slice(open.bodyStart, offset), start: open.start, end: Math.min(next, reply.length) });
+        open = null;
+      }
+    }
+    offset = next;
+  }
+  if (open) out.push({ info: open.info, body: reply.slice(open.bodyStart), start: open.start, end: reply.length });
+  return out;
+}
+function withoutFences(reply) {
+  let out = "", at = 0;
+  for (const fence of fencesOf(reply)) {
+    out += reply.slice(at, fence.start) + " \n";
+    at = fence.end;
+  }
+  return out + reply.slice(at);
+}
+function quotesTemplate(fence) {
+  return fence.info === "diff" || fence.body.includes("{{");
+}
+var DONE_GLYPHS = ["\u21B7", "\u2298"];
+var DONE_WORDS = ["landed", "carried", "deferred"];
+function isDone(cells) {
+  if (cells.some((c) => tickLands(c) || DONE_GLYPHS.some((g) => c.includes(g)))) return true;
+  return cells.some((c) => {
+    const bare = c.replace(/[*_`~]/g, "").trim().toLowerCase();
+    return DONE_WORDS.some((w) => bare === w || bare.startsWith(`${w} `));
+  });
+}
+function read3(p) {
+  try {
+    return readFileSync6(p, "utf8");
   } catch {
     return "";
   }
 }
-function survey(roots, done, comments) {
-  const rows2 = [];
-  let skipped = 0;
-  for (const path of filesUnder(roots, comments)) {
-    const raw = read(path);
-    if (done.has(digest(path))) {
-      skipped += 1;
+function openWorkstreamFolders(root) {
+  const dir = workstreamsDir(root, "open");
+  try {
+    return readdirSync7(dir).map((d) => join11(dir, d)).filter((d) => statSync8(d).isDirectory());
+  } catch {
+    return [];
+  }
+}
+function arcsOf(ws) {
+  const dir = join11(ws, "arcs");
+  try {
+    return readdirSync7(dir).filter((f) => f.endsWith(".md")).map((f) => join11(dir, f));
+  } catch {
+    return [];
+  }
+}
+function pagesOf(ws) {
+  try {
+    return readdirSync7(ws).filter(isApproachPage).map((f) => join11(ws, f));
+  } catch {
+    return [];
+  }
+}
+function statusOf(arc) {
+  const m = read3(arc).match(/^\*{0,2}Status:?\*{0,2}\s*\*{0,2}\s*([A-Z][A-Z-]*)/m);
+  return m ? m[1] : "";
+}
+var NOT_RUNNABLE = /* @__PURE__ */ new Set(["PROPOSED", "DECIDED", "HELD"]);
+var DEBUG2 = ".debug";
+function openCardsOf(arc) {
+  return new Set(pagesOf(dirname8(dirname8(arc))).flatMap(openCards2));
+}
+function pageCardsOf(arc) {
+  return new Set(pagesOf(dirname8(dirname8(arc))).flatMap((page) => cardsOf(page).map((card) => card.number)));
+}
+function unfinishedSteps(arc, open = openCardsOf(arc), onPage = pageCardsOf(arc)) {
+  const steps = stepsOf(read3(arc));
+  if (steps === null) return null;
+  return steps.filter((step) => !isDone(step.state === null ? step.cells : [step.state])).filter((step) => step.state === null || !isInProgress(step.state)).filter((step) => {
+    const card = heldCard(step);
+    return card === null || !open.has(card);
+  }).map((step) => {
+    const card = heldCard(step);
+    if (card === null) return `step ${step.id} \u2014 ${step.what.slice(0, 70)}`;
+    return onPage.has(card) ? `step ${step.id} was held on ${card}, which is answered \u2014 ${step.what.slice(0, 70)}` : `step ${step.id} is held on ${card}, which is not on the approach page \u2014 ${step.what.slice(0, 70)}`;
+  });
+}
+function heldCard(step) {
+  return step.state === null ? null : heldOn(step.state);
+}
+function inProgressSteps(arc, now = Date.now(), out = ordersOut(arc)) {
+  return (stepsOf(read3(arc)) ?? []).filter((step) => step.state !== null && isInProgress(step.state)).filter((step) => !out.has(step.id.toLowerCase())).map((step) => `step ${step.id} \u2014 ${step.what.slice(0, 70)} (${markedAgo(step.state ?? "", now)})`);
+}
+var REPORT_SUFFIX = "-report.md";
+var ORDER_ROWS = /\brows?\s+(\d+[a-z]?(?:\.\d+[a-z]?)*(?:(?:\s*,\s*|\s+and\s+|\s+to\s+)\d+[a-z]?(?:\.\d+[a-z]?)*)*)/i;
+function rowsNamed(heading) {
+  const named = ORDER_ROWS.exec(heading)?.[1];
+  if (!named) return [];
+  const range = /^(\d+)\s+to\s+(\d+)$/i.exec(named.trim());
+  if (range) {
+    const rows2 = [];
+    for (let row = Number(range[1]); row <= Number(range[2]); row += 1) rows2.push(String(row));
+    return rows2;
+  }
+  return named.split(/\s*,\s*|\s+and\s+|\s+to\s+/i).map((row) => row.trim().toLowerCase()).filter(Boolean);
+}
+function ordersOut(arc) {
+  const out = /* @__PURE__ */ new Set();
+  const id = basename8(arc).match(/^(N\d+[a-z]?)(?:[-.]|$)/i)?.[1];
+  if (!id) return out;
+  const folder = join11(dirname8(dirname8(arc)), "notes", id, "orders");
+  let names;
+  try {
+    names = readdirSync7(folder).filter((name) => name.endsWith(".md"));
+  } catch {
+    return out;
+  }
+  for (const name of names) {
+    if (name.endsWith(REPORT_SUFFIX)) continue;
+    if (names.includes(`${name.slice(0, -".md".length)}${REPORT_SUFFIX}`)) continue;
+    const heading = read3(join11(folder, name)).split("\n").find((line) => /^#\s/.test(line)) ?? "";
+    const rows2 = rowsNamed(heading);
+    const numbered2 = /^(\d+)/.exec(name)?.[1].replace(/^0+(?=\d)/, "");
+    for (const row of rows2.length ? rows2 : numbered2 ? [numbered2] : []) out.add(row);
+  }
+  return out;
+}
+function openCards2(page) {
+  return cardsOf(page).filter((card) => !card.decided).map((card) => card.number);
+}
+function stepRows(text) {
+  return text.split("\n").filter((line) => {
+    const first = /^\|\s*([^|]*)\|/.exec(line);
+    return first !== null && STEP_ID.test(first[1].replace(/[*_`]/g, "").trim());
+  }).join("\n");
+}
+function stepHash(text) {
+  return createHash3("sha256").update(stepRows(text)).digest("hex").slice(0, 12);
+}
+var sessionKey = (id) => (id || "").replace(/[^A-Za-z0-9_-]/g, "").slice(0, 80) || "_";
+var sessionsDir = (root) => join11(root, DEVEX, DEBUG2, "stop", "sessions");
+var KEEP_MS2 = 14 * 24 * 3600 * 1e3;
+function readBaseline(root, session) {
+  try {
+    return JSON.parse(readFileSync6(join11(sessionsDir(root), `${sessionKey(session)}.json`), "utf8"));
+  } catch {
+    return null;
+  }
+}
+function currentSteps(root) {
+  const seen = {};
+  for (const ws of openWorkstreamFolders(root))
+    for (const arc of arcsOf(ws)) seen[arc] = stepHash(read3(arc));
+  return seen;
+}
+function writeBaseline(root, session, baseline) {
+  try {
+    const dir = sessionsDir(root);
+    mkdirSync3(dir, { recursive: true });
+    writeFileSync4(join11(dir, `${sessionKey(session)}.json`), JSON.stringify(baseline), "utf8");
+    const cutoff = Date.now() - KEEP_MS2;
+    for (const name of readdirSync7(dir))
+      try {
+        if (statSync8(join11(dir, name)).mtimeMs < cutoff) rmSync(join11(dir, name), { force: true });
+      } catch {
+      }
+  } catch {
+  }
+}
+var FILE_WRITERS = /* @__PURE__ */ new Set(["Edit", "Write", "MultiEdit", "NotebookEdit"]);
+var SHELL_WRITES = /(?:>|\btee\b|\bsed\s+-i|\bperl\s+-[a-z]*i|\bpython3?\b|\bnode\b|\bmv\b|\bcp\b)/;
+function arcsTouched(transcript, from, arcs) {
+  const writes = writesOf(transcript, from);
+  if (!writes) return null;
+  const touched = new Set(arcs.filter((arc) => writes.written.some((input) => input.includes(arc) || input.includes(basename8(arc)))));
+  return { touched, size: writes.size };
+}
+var DISPATCHERS = /* @__PURE__ */ new Set(["Agent", "Task"]);
+function writesOf(transcript, from) {
+  let text = "";
+  let size = 0;
+  try {
+    size = statSync8(transcript).size;
+    const start = from > 0 && from <= size ? from : 0;
+    const buffer = Buffer.alloc(size - start);
+    const fd = openSync2(transcript, "r");
+    try {
+      readSync(fd, buffer, 0, buffer.length, start);
+    } finally {
+      closeSync2(fd);
+    }
+    text = buffer.toString("utf8");
+  } catch {
+    return null;
+  }
+  const written = [];
+  for (const line of text.split("\n")) {
+    if (!line.includes('"tool_use"')) continue;
+    let entry;
+    try {
+      entry = JSON.parse(line);
+    } catch {
       continue;
     }
-    const style = CODE_EXT[extname(path)];
-    const blocks = style ? proseComments(path, style) : paragraphs(raw);
-    const flagged = blocks.map(([b, s, sec]) => [b, s, score(b, s, sec)]).filter(([, , found]) => Object.keys(found).length);
-    if (blocks.length)
-      rows2.push([path, blocks.length, blocks.reduce((sum, [, s]) => sum + s.length, 0), flagged]);
+    const content = entry.message?.content;
+    if (!Array.isArray(content)) continue;
+    for (const item of content) {
+      if (item?.type !== "tool_use" || !item.name) continue;
+      const input = JSON.stringify(item.input ?? {});
+      if (FILE_WRITERS.has(item.name) || DISPATCHERS.has(item.name)) written.push(input);
+      else if (item.name === "Bash" && SHELL_WRITES.test(input)) written.push(input);
+    }
   }
-  return [rows2, skipped];
+  return { written, size };
 }
-function main(argv) {
-  const args = argv.filter((a) => !a.startsWith("--"));
-  const flags = argv.filter((a) => a.startsWith("--"));
-  const opt = {};
-  for (const flag of flags) {
-    const at = flag.indexOf("=");
-    if (at >= 0) opt[flag.slice(0, at)] = flag.slice(at + 1);
-    else opt[flag] = true;
+function workstreamsOf(transcript, from, known = [], folders = []) {
+  if (!transcript) return null;
+  const writes = writesOf(transcript, from);
+  if (!writes) return null;
+  const names = folders.map((folder) => basename8(folder));
+  const now = names.filter((name) => writes.written.some((input) => input.includes(name)));
+  return new Set([...known, ...now].filter((name) => names.includes(name)));
+}
+function scoped(folders, mine) {
+  return mine ? folders.filter((folder) => mine.has(basename8(folder))) : folders;
+}
+function logEntries(text) {
+  const at = text.search(/^##[ \t]+Log\b/m);
+  if (at < 0) return [];
+  const body2 = text.slice(at).split("\n").slice(1);
+  const out = [];
+  for (const line of body2) {
+    if (/^##[ \t]/.test(line)) break;
+    if (/^- /.test(line)) out.push(line.trim());
   }
-  const roots = args.length ? args : ["."];
-  let done = /* @__PURE__ */ new Set();
-  const ledger = opt["--ledger"];
-  if (typeof ledger === "string" && isFile(ledger))
-    done = new Set(read(ledger).split("\n").filter((line) => line.trim()).map((line) => line.split(/\s+/)[0]));
-  const comments = Boolean(opt["--comments"]);
-  if (opt["--paragraphs"]) {
-    for (const path of filesUnder(roots, comments)) {
-      const style = CODE_EXT[extname(path)];
-      const blocks = style ? proseComments(path, style) : paragraphs(read(path));
-      for (const [block, sents, section2] of blocks) {
-        const found = score(block, sents, section2);
-        if (!Object.keys(found).length) continue;
-        console.log(`
---- ${path}  [${Object.entries(found).map(([k, v]) => `${k}: ${v}`).join(" \xB7 ")}]`);
-        console.log(block);
+  return out;
+}
+var entryHash = (line) => createHash3("sha256").update(line).digest("hex").slice(0, 10);
+var REVIEWED_FOLDERS = ["previews", "samples"];
+function notesFiles(arc) {
+  const id = basename8(arc).match(/^(N\d+[a-z]?)(?:[-.]|$)/i)?.[1];
+  if (!id) return [];
+  const folder = join11(dirname8(dirname8(arc)), "notes", id);
+  const out = [];
+  for (const name of ["spec.md", "plan.md"]) {
+    try {
+      if (statSync8(join11(folder, name)).isFile()) out.push(join11(folder, name));
+    } catch {
+    }
+  }
+  const walk2 = (dir) => {
+    let entries;
+    try {
+      entries = readdirSync7(dir).sort();
+    } catch {
+      return;
+    }
+    for (const entry of entries) {
+      const full = join11(dir, entry);
+      try {
+        if (statSync8(full).isDirectory()) walk2(full);
+        else out.push(full);
+      } catch {
       }
     }
-    return 0;
-  }
-  const [rows2, skipped] = survey(roots, done, comments);
-  const ordered = rows2.map((row, index) => ({ row, index })).sort((a, b) => b.row[3].length - a.row[3].length || a.index - b.index).map((r) => r.row);
-  const totalParagraphs = ordered.reduce((sum, r) => sum + r[1], 0);
-  const totalSentences = ordered.reduce((sum, r) => sum + r[2], 0);
-  const flaggedParagraphs = ordered.reduce((sum, r) => sum + r[3].length, 0);
-  const withAny = ordered.filter((r) => r[3].length);
-  const tally = Object.fromEntries(FAULTS.map((f) => [f, 0]));
-  for (const [, , , flagged] of ordered)
-    for (const [, , found] of flagged)
-      for (const key of Object.keys(found)) tally[key] += 1;
-  console.log("file".padEnd(64) + "paras".padStart(7) + "flagged".padStart(9));
-  for (const [path, blocks, , flagged] of withAny.slice(0, 25))
-    console.log(path.slice(-63).padEnd(64) + String(blocks).padStart(7) + String(flagged.length).padStart(9));
-  if (withAny.length > 25) console.log(`... and ${withAny.length - 25} more files with candidates`);
-  console.log();
-  console.log(`  scanned        ${ordered.length} files \xB7 ${totalParagraphs} paragraphs \xB7 ${totalSentences} sentences`);
-  if (skipped) console.log(`  skipped        ${skipped} files already recorded in the ledger`);
-  console.log(`  candidates     ${flaggedParagraphs} paragraphs in ${withAny.length} files \u2014 ${Math.floor(100 * flaggedParagraphs / Math.max(totalParagraphs, 1))} % of paragraphs`);
-  console.log(`  by fault       ` + FAULTS.map((k) => `${k} ${tally[k]}`).join(" \xB7 "));
-  console.log();
-  console.log("  A reader still owns the three faults no pattern can see: a claim compressed past");
-  console.log("  reading, a rule that never says what to do, and an abstraction that is merely dull.");
-  console.log("  So this narrows the reading. It does not replace it.");
-  const record2 = opt["--record"];
-  if (typeof record2 === "string") {
-    for (const [path] of ordered) appendFileSync2(record2, `${digest(path)}  ${path}
-`);
-    console.log(`
-  recorded ${ordered.length} file hashes to ${record2}`);
-  }
-  return 0;
+  };
+  for (const reviewed of REVIEWED_FOLDERS) walk2(join11(folder, reviewed));
+  return out;
 }
-if (process.argv[1] && basename6(process.argv[1]) === "prose.ts")
-  process.exit(main(process.argv.slice(2)));
-
-// packages/plugin-spn-devex/src/scripts/commands/docs/_lib.ts
-init_docs_tree();
-var SERVED_VERSION = new RegExp(
-  `<(?:link|script)\\b[^>]*\\b(?:href|src)="(?:[^"]*/)?(\\d+\\.\\d+\\.\\d+)/(?:${SERVED_FILES.map((served) => served.replace(/\./g, "\\.")).join("|")})"`,
+function notesSignature(files) {
+  return createHash3("sha256").update(files.map((file) => {
+    try {
+      const stat = statSync8(file);
+      return `${file}\0${stat.size}\0${stat.mtimeMs}`;
+    } catch {
+      return file;
+    }
+  }).join("\n")).digest("hex").slice(0, 12);
+}
+function arcMarks(root) {
+  const out = {};
+  for (const arc of openArcs(root)) {
+    const text = read3(arc);
+    out[arc] = { log: logEntries(text).map(entryHash), notes: notesSignature(notesFiles(arc)), status: statusOf(arc) };
+  }
+  return out;
+}
+var RECORDS_AN_ANSWER = /\bQ\d+\s+(?:[A-D]\b|revised\b|answered\b)|\bupdates?\b|\breview points?\b|\(the developer\b/i;
+var CARRIED_FORWARD = /\bcarried\b[^.;]{0,40}\bto\s+(?:step|row)\s+\d/i;
+function checkNotesLanded(root, before, touched = null) {
+  if (!before) return [];
+  const out = [];
+  for (const arc of openArcs(root)) {
+    const was = before[arc];
+    if (!was) continue;
+    if (touched && !touched.has(arc)) continue;
+    const text = read3(arc);
+    const seen = new Set(was.log);
+    const added = logEntries(text).filter((line) => !seen.has(entryHash(line)));
+    if (!added.length) continue;
+    const files = notesFiles(arc);
+    if (files.length && added.some((line) => RECORDS_AN_ANSWER.test(line)) && notesSignature(files) === was.notes) {
+      const fromNotes = (file) => file.slice(file.indexOf("/notes/") + 1);
+      const folderOf = (file) => REVIEWED_FOLDERS.find((reviewed) => file.includes(`/${reviewed}/`));
+      const shown = files.filter((file) => !folderOf(file)).map(fromNotes);
+      for (const reviewed of REVIEWED_FOLDERS) {
+        const inside = files.find((file) => folderOf(file) === reviewed);
+        if (inside) shown.push(fromNotes(inside).slice(0, fromNotes(inside).indexOf(`/${reviewed}/`)) + `/${reviewed}/`);
+      }
+      out.push({ check: "notes", message: `\`${basename8(arc)}\` logged an answer this turn and its notes did not move \u2014 ${shown.join(" \xB7 ")}. An answer, or any review point, lands in the same turn in the card, in the arc (a log line and every row it changes) and in the arc's notes: the spec, the plan and any preview or sample they name \u2014 MUST (RD.DEVEX.WORKSPACE.193). Bring the notes the answer changes up to date now, and name them in the log line.` });
+    }
+    const status = statusOf(arc);
+    if ((was.status === "PROPOSED" || status === "PROPOSED") && added.some((line) => CARRIED_FORWARD.test(line)))
+      out.push({ check: "carried", message: `\`${basename8(arc)}\` is PROPOSED and its log carries a review point to a later step of itself. A proposed arc never does: nothing is built on its spec yet, so the point changes the spec now (RD.DEVEX.WORKSPACE.193). Write it into the spec and the plan this turn.` });
+  }
+  return out;
+}
+function openArcs(root) {
+  return openWorkstreamFolders(root).flatMap(arcsOf);
+}
+function checkRunnable(root, since = 0, stepsAt = {}, touched = null) {
+  const out = [];
+  for (const ws of openWorkstreamFolders(root)) {
+    const cards2 = pagesOf(ws).flatMap(openCards2);
+    for (const arc of arcsOf(ws)) {
+      const status = statusOf(arc);
+      if (TERMINAL.has(status)) continue;
+      if (NOT_RUNNABLE.has(status)) continue;
+      if (!since) continue;
+      let wrote = false;
+      if (touched) wrote = touched.has(arc);
+      else {
+        try {
+          wrote = statSync8(arc).mtimeMs > since;
+        } catch {
+          wrote = false;
+        }
+      }
+      if (!wrote) continue;
+      const now = stepHash(read3(arc));
+      if ((stepsAt[arc] ?? now) === now) continue;
+      const steps = unfinishedSteps(arc, new Set(cards2));
+      const claimed = inProgressSteps(arc);
+      if (claimed.length && !cards2.length)
+        out.push({
+          check: "runnable",
+          message: `\`${basename8(arc)}\` has ${claimed.length === 1 ? "a row" : `${claimed.length} rows`} marked in progress: ${claimed.join(" \xB7 ")}. If this sitting is on it, finish it and mark it landed with its commit, or mark it \`\u25D0 stopped\` with what was done. If another window marked it, leave it and ask the developer, saying how old the mark is (02-workstream/01-workstream.md \xA7 A step row says where, at what altitude, and how).`
+        });
+      if (steps === null) {
+        out.push({ check: "runnable", message: `\`${basename8(arc)}\` reads ${status || "no status"} and has no \`## Steps\` table, so nothing can say whether work is left. Give it the step table the arc template carries.` });
+        continue;
+      }
+      if (!steps.length) continue;
+      if (cards2.length) continue;
+      out.push({
+        check: "runnable",
+        message: `stopped with runnable work \u2014 this session changed the step rows of \`${basename8(arc)}\`, and ${steps.length} step${steps.length > 1 ? "s are" : " is"} not landed, and no card is open. The next one is ${steps[0]}. Reporting is not stopping: a milestone line goes between steps, in the same turn as the next step (02-workstream/01-workstream.md \xA7 Say what you opened, and know when to wait for the answer).`
+      });
+    }
+  }
+  return out;
+}
+function checkHold(root, mine = null) {
+  const out = [];
+  for (const ws of scoped(openWorkstreamFolders(root), mine)) {
+    const cards2 = new Set(pagesOf(ws).flatMap(openCards2));
+    for (const arc of arcsOf(ws)) {
+      if (statusOf(arc) !== "HELD") continue;
+      const named = [...read3(arc).matchAll(/`?(Q\d+)`?/g)].map((m) => m[1].toUpperCase());
+      const live = named.filter((n) => cards2.has(n));
+      if (!live.length)
+        out.push({ check: "hold", message: `\`${arc.split("/").pop()}\` reads HELD and names no card that is open and unanswered. A HELD arc waits on a card; if its cards are answered, re-plan it and lift the hold.` });
+    }
+  }
+  return out;
+}
+var SESSION = new RegExp(
+  String.raw`\b(?:open|start|launch|use|continue|resume|carry on|paste|pick (?:this|it|that|the work) up)\b[^.?!\n]{0,24}?\b(?:new|fresh|another|next)\s+(?:window|session)\b` + String.raw`|\bthe\s+next\s+(?:window|session)\s+(?:starts|begins|continues|resumes|picks)\b` + String.raw`|\bhand(?:ing)?\s+(?:this |it )?over\b`,
   "gi"
 );
-function resolveWorkspace() {
-  return process.env.SPN_WORKSPACE ?? workspaceRoot3(process.cwd());
+var NOT_YET = /\b(?:will|would|'ll|once|after|before|until|when|going to|about to|then|may|might|could|if)\b[^.?!]{0,80}$/i;
+var NOT_YET_AFTER = /^[^.?!]{0,60}\b(?:will|would|'ll|may|might|could|can|cannot|can't|is going to)\b/i;
+var IN_AN_ARC_TITLE = /\bN\d{1,3}\b[^.?!|\n]{0,40}$/;
+var ANY_WINDOW = /\b(?:any|every|each)\s+$/i;
+var A_COST_LIST = /(?:,[^.?!,]{1,60}){2,}(?:,)?\s*(?:and|or)\s+[^.?!,]{0,30}$/i;
+var ABOUT_THE_WORDS = /\b(?:the (?:phrase|phrases|word|words|wording)|mention(?:s|ed|ing)?|fire[sd]? on|matche[sd]|triggered by|the \[?handover\]? check)\b[^.?!]{0,60}$/i;
+var OPENS_A_HANDOVER = /^[ \t]{0,3}(?:#{1,4}[ \t]*|\*\*)handover\b|^[ \t]{0,3}handover[ \t]*(?:[:\u2014\u2013-]|$)/im;
+function unquoted(reply) {
+  return withoutFences(reply).replace(/`[^`\n]*`/g, " ").replace(/^[ \t]{0,3}>.*$/gm, " ").replace(/"[^"\n]*"/g, " ").replace(/\u201c[^\u201d\n]*\u201d/g, " ").replace(/(?<![*\w])\*(?![*\s])[^*\n]+?(?<![*\s])\*(?![*\w])/g, " ");
 }
-function workspaceRoot3(from) {
-  let dir = resolve7(from);
-  for (; ; ) {
-    if (existsSync5(join9(dir, "spn-foundation")) || existsSync5(join9(dir, ".spndevex"))) return dir;
-    const up = dirname7(dir);
-    if (up === dir) return resolve7(from);
-    dir = up;
+function passingOn(reply) {
+  const prose = unquoted(reply);
+  if (OPENS_A_HANDOVER.test(prose)) return true;
+  for (const hit of prose.matchAll(SESSION)) {
+    const at = hit.index ?? 0;
+    const before = prose.slice(Math.max(0, at - 90), at);
+    const after = prose.slice(at + hit[0].length, at + hit[0].length + 70);
+    if (NOT_YET.test(before) || NOT_YET_AFTER.test(after)) continue;
+    if (A_COST_LIST.test(before)) continue;
+    if (ABOUT_THE_WORDS.test(before)) continue;
+    if (IN_AN_ARC_TITLE.test(before)) continue;
+    if (ANY_WINDOW.test(before)) continue;
+    return true;
   }
+  return false;
 }
-
-// packages/plugin-spn-devex/src/scripts/commands/docs/sds.ts
-var describe = "cut a version of the shared page styles, move pages to one, or bundle a page with its styles inside";
-var USAGE = [
-  "usage: spn-devex docs sds cut <version> [--root <folder>]",
-  "       spn-devex docs sds repoint <version> <folder\u2026> [--check] [--root <folder>]",
-  "       spn-devex docs sds bundle <page> [--assets <folder>]"
-].join("\n");
-var VERSION = /^\d+\.\d+\.\d+$/;
-var MARKETPLACE = "spn-claude-marketplace";
-var STYLES_SEAT = join10("packages", "plugin-spn-devex", "src", "styles");
-var SERVED_SEAT = join10("public", "assets", "docs");
-var VERSIONS_FILE = "versions.json";
-var FETCH_LIMIT_MS = 15e3;
-var escaped = (text) => text.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&");
-var SERVED_NAMES = SERVED_FILES.map(escaped).join("|");
-var LOADED_ADDRESS = new RegExp(
-  `(<(?:link|script)\\b[^>]*?\\b(?:href|src)="${escaped(STYLES_ADDRESS)})(\\d+\\.\\d+\\.\\d+)(\\/(?:${SERVED_NAMES})")`,
-  "gi"
-);
-var LOADING_LINE = new RegExp(
-  `<link\\b[^>]*\\bhref="[^"]*${escaped(STYLESHEET)}"[^>]*>|<script\\b[^>]*\\bsrc="(?:[^"]*\\/)?(${escaped(PAGE_SCRIPT)}|${escaped(INDEX_SCRIPT)})"[^>]*>\\s*<\\/script>`,
-  "gi"
-);
-var isAddress = (folder) => /^(?:[a-z][a-z0-9+.-]*:)?\/\//i.test(folder);
-var isDir2 = (path) => {
+function carriesCard(reply) {
+  const prose = withoutFences(reply);
+  return NUMBERED2.test(prose) && TABLE.test(prose) && LETTERED_ROW.test(prose);
+}
+function cardsWaiting(root, mine = null) {
+  const out = [];
+  for (const [, pages] of argued(root, mine)) {
+    const folder = dirname8(pages[0]);
+    const answered = answeredNumbers(folder);
+    for (const page of pages)
+      for (const card of cardsOf(page))
+        if (!card.decided && !answered.has(card.number)) out.push(card.number);
+  }
+  return [...new Set(out)].sort();
+}
+function checkHandover(reply, root, mine = null) {
+  if (!passingOn(reply)) return [];
+  if (carriesCard(reply)) return [];
+  const waiting = cardsWaiting(root, mine);
+  if (waiting.length) {
+    return [{ check: "handover", message: `This reply passes work on while ${waiting.length === 1 ? "a card is" : `${waiting.length} cards are`} open \u2014 ${waiting.join(" \xB7 ")}. **Answer first, then hand over.** A card's answer can change which arc runs next and what the next window reads first, so a handover written over one is a brief that assumed an answer nobody gave. Put the cards to the developer in full, and offer the window once they are settled.` }];
+  }
+  let wiring = "";
   try {
-    return statSync7(path).isDirectory();
+    wiring = cacheState(root, ["spn-devex", "spn-apps", "spn-infra"]);
   } catch {
-    return false;
+    wiring = "";
   }
-};
-var isFile2 = (path) => {
-  try {
-    return statSync7(path).isFile();
-  } catch {
-    return false;
+  if (wiring.startsWith("cache stale")) {
+    return [{ check: "handover", message: `This reply passes work on while the plugin source is ahead of what is installed \u2014 ${wiring}. The session that changed the wiring is the one session that cannot load it, and it is also the only one that knows what changed. So finishing is this sitting's job, not the next reader's: release what changed, bump the plugins, install them, run \`workspace agent-sync\`, and verify every location from \`installed_plugins.json\`. Passing this on first is what turns one sitting into three windows (N39).` }];
   }
-};
-function refuse(action, reason) {
-  console.error(`\u2717 docs sds ${action} \u2014 refused: ${reason}`);
-  return 1;
+  const labels = HANDOVER_LABELS.map((label) => `${label}:`).join(" \xB7 ");
+  const shaped = fencesOf(reply).filter((fence) => fence.info !== "diff" && looksLikeHandover(fence.body));
+  const block = shaped.find((fence) => !quotesTemplate(fence));
+  if (!block && shaped.length)
+    return [{ check: "handover", message: `the handover block still holds \`{{\u2026}}\` placeholders. Fill in every one \u2014 ${labels} \u2014 and write the same block into the arc's log.` }];
+  if (!block)
+    return [{ check: "handover", message: `this reply passes work on to another session and carries no handover block. Fill in the handover template in a fenced block \u2014 ${labels}, one per line, each value starting in the column \`do not touch:\` sets \u2014 with no \`{{\u2026}}\` left, and write the same block into the arc's log.` }];
+  const lines = handoverLines(block.body);
+  const missing = HANDOVER_LABELS.filter((label) => !lines.has(label));
+  if (missing.length)
+    return [{ check: "handover", message: `the handover block is missing ${missing.map((label) => `\`${label}:\``).join(" \xB7 ")}. Each label opens its own line, lowercase, in this order: ${labels}. The next window starts from that block and has nothing else.` }];
+  const ragged = [...handoverColumns(block.body)].filter(([, column]) => column !== HANDOVER_COLUMN);
+  if (ragged.length)
+    return [{ check: "handover", message: `the handover block's values do not start in one column \u2014 ${ragged.map(([label, column]) => `\`${label}:\` starts its value in column ${column}`).join(" \xB7 ")}. Each value starts in column ${HANDOVER_COLUMN}, counted from 0, which is the column \`do not touch:\` sets with one space after it. Pad each shorter label with spaces, and indent a wrapped line to the same column.` }];
+  const next = lines.get("continue") ?? "";
+  if (!WORKSTREAM_NAME.test(next) || !ARC_NAME.test(next))
+    return [{ check: "handover", message: `the handover block's \`continue:\` line names no ${WORKSTREAM_NAME.test(next) ? "arc (`N<n>`)" : "workstream (`NNN-subject`)"}. The next window finds everything else from those two.` }];
+  return [];
 }
-function typed(args) {
-  const read3 = { words: [], root: null, assets: null, check: false };
-  for (let index = 0; index < args.length; index += 1) {
-    const word = args[index];
-    if (word === "--check") {
-      read3.check = true;
+function namesCard(text, card) {
+  return new RegExp(`\\b${card}\\b`, "i").test(text);
+}
+function hasOpenCard(text) {
+  return /<div\b[^>]*class="(?:[^"]*\s)?sds-open(?:\s[^"]*)?"/i.test(text);
+}
+function cardPatternReadable(pages) {
+  return !pages.some(holdsOwnCopy);
+}
+function argued(root, mine = null) {
+  return [...openWorkstreams(root)].filter(([, pages]) => pages.length).filter(([, pages]) => !mine || mine.has(basename8(dirname8(pages[0])))).sort((a, b) => a[0].localeCompare(b[0]));
+}
+function unnamedArcs(root, mine = null) {
+  const out = [];
+  for (const [subject, pages] of argued(root, mine)) {
+    const pageText = pages.map(read3).join(" ");
+    for (const arc of arcsOf(dirname8(pages[0]))) {
+      const name = basename8(arc);
+      if (!pageText.includes(name)) out.push([subject, name, basename8(pages[0])]);
+    }
+  }
+  return out;
+}
+function pagelessWorkstreams(root, mine = null) {
+  const out = [];
+  for (const [subject, pages] of [...openWorkstreams(root)].sort((a, b) => a[0].localeCompare(b[0]))) {
+    if (pages.length) continue;
+    for (const folder of scoped(openWorkstreamFolders(root), mine))
+      if (basename8(folder) === subject && arcsOf(folder).length) {
+        out.push(subject);
+        break;
+      }
+  }
+  return out;
+}
+function stopsWithEmptyOpen(root, mine = null) {
+  const out = [];
+  for (const [subject, pages] of argued(root, mine)) {
+    if (!cardPatternReadable(pages)) continue;
+    const text = pages.map(read3).join(" ");
+    const waiting = workstreamPlan([dirname8(pages[0])], pages).filter((row) => stateOf(row) === "stopped");
+    if (waiting.length && !hasOpenCard(text)) out.push([subject, waiting[0].label]);
+  }
+  return out;
+}
+function cardsInArcs(root, mine = null) {
+  const out = [];
+  for (const [subject, pages] of argued(root, mine)) {
+    if (!cardPatternReadable(pages)) continue;
+    const pageText = pages.map(read3).join(" ");
+    if (hasOpenCard(pageText)) continue;
+    for (const arc of arcsOf(dirname8(pages[0]))) {
+      const unrecorded = [...read3(arc).matchAll(/^#{2,4}\s+`?(Q\d+[A-Z]?)`?\s*[·\u00b7]/gm)].map((found) => found[1]).filter((card) => !namesCard(pageText, card));
+      if (unrecorded.length) {
+        out.push([subject, basename8(arc), unrecorded[0]]);
+        break;
+      }
+    }
+  }
+  return out;
+}
+var ASKS = /\b(?:[Ss]ay|[Aa]nswer|[Rr]eply|[Pp]ick|[Cc]hoose|[Cc]hoosing|[Ss]elect)\s+(?:with\s+)?[`"*]?(?:Q\d+)?[A-D]\b|\b[Rr]ecommendation\s+is\s+[`"*]?[A-D]\b|(?:^|[.:;\u2014]\s+)\**[Oo]ption\s+[`"*]?[A-D]\b|\b[A-D]\s*,\s*[A-D]\s*(?:,\s*[A-D]\s*)?(?:or|\/)\s*[A-D]\b/;
+var REPORTS = /\b(?:answered|decided|chose|chosen|settled|recorded)\b/i;
+var asking = (reply) => ASKS.test(withoutFences(reply).split(/(?<=[.!?\n])\s+/).filter((line) => !REPORTS.test(line)).join(" "));
+var TABLE = /^\|.*\|\s*$\n^\|[\s:-]*\|[\s:|-]*$/m;
+var LETTERED_ROW = /^\|\s*\**\s*[A-D]\s*\**\s*\|/m;
+var NUMBERED2 = /\bQ\d+\b/;
+var WHAT = /(^|\n)\s*(?:#{2,4}\s*|\*\*|<b>)?\s*What\b|\bwhat (?:it |this )?(?:changes|does|is being decided|it would change)\b/i;
+var WHY = /(^|\n)\s*(?:#{2,4}\s*|\*\*|<b>)?\s*Why\b|\bwhat it costs to (?:leave|wait|do nothing)\b|\bwhat it blocks\b/i;
+var RECOMMENDS = /\brecommend(?:ation|ed|s)?\b|\bI would take\b|\bthe one I would pick\b/i;
+function missingParts(reply) {
+  const out = [];
+  if (!NUMBERED2.test(reply)) out.push("**the number** \u2014 a card is `Q<n>`, stable across the whole exchange");
+  if (!(TABLE.test(reply) && LETTERED_ROW.test(reply)))
+    out.push("**the options as a lettered table**, the trade-off in its own column");
+  if (!WHAT.test(reply)) out.push("**What** \u2014 the change concretely: the file, the rule, the before and after");
+  if (!WHY.test(reply)) out.push("**Why** \u2014 what it costs to leave it alone, and what it blocks");
+  if (!RECOMMENDS.test(reply)) out.push("**the recommendation** \u2014 one option, carrying the reason it wins");
+  return out;
+}
+var NEEDS_YOU = /^[ \t]{0,3}(?:#{1,6}[ \t]*)?(?:\*\*|__)?[ \t]*Needs you\b/i;
+var PART_ENDS = /^[ \t]{0,3}(?:(?:#{1,6}[ \t]*|\*\*|__)[ \t]*(?:Progress|What moved)\b|(?:-{3,}|\*{3,}|_{3,})[ \t]*$)/i;
+function opensWithNeedsYou(reply) {
+  const first = reply.split("\n").find((line) => line.trim() !== "") ?? "";
+  return NEEDS_YOU.test(first);
+}
+function needsYouPart(reply) {
+  if (!opensWithNeedsYou(reply)) return "";
+  const lines = withoutFences(reply).split("\n");
+  const start = lines.findIndex((line) => line.trim() !== "");
+  const out = [];
+  for (let at = start; at < lines.length; at += 1) {
+    if (at > start && PART_ENDS.test(lines[at])) break;
+    out.push(lines[at]);
+  }
+  return out.join("\n");
+}
+function putsInFull(text, card) {
+  return namesCard(text, card) && TABLE.test(text) && LETTERED_ROW.test(text);
+}
+function checkReplyShape(reply, open = [], raised = []) {
+  const out = [];
+  const fresh = open.filter((card) => raised.includes(card));
+  const older = open.filter((card) => !raised.includes(card));
+  const oneLine = "each card still open from an earlier reply is one line \u2014 its number, its question, and where it is";
+  if (open.length && !opensWithNeedsYou(reply))
+    out.push({ check: "needs-you", message: `A card is open \u2014 ${open.slice(0, 4).join(" \xB7 ")} \u2014 and the reply does not open with **Needs you**. Every reply while work runs opens with what needs you, then the progress \u2014 MUST (RD.DEVEX.WORKSPACE.189). ` + (fresh.length ? `A card raised in this reply goes there in full once (${fresh.join(" \xB7 ")}); ` : "") + `${oneLine}. Do not repeat a card already put in full.` });
+  else if (open.length) {
+    const part = needsYouPart(reply);
+    const notWhole = fresh.filter((card) => !putsInFull(part, card));
+    if (notWhole.length)
+      out.push({ check: "needs-you", message: `${notWhole.join(" \xB7 ")} ${notWhole.length > 1 ? "were" : "was"} raised in this reply and ${notWhole.length > 1 ? "are" : "is"} not in full under **Needs you** at its top. A card is put in full once, at the top of the reply that raises it, and never again in its body \u2014 MUST (RD.DEVEX.WORKSPACE.189). Do not repeat it now: from your next reply it is one line \u2014 its number, its question, and where it is \u2014 and the full card stays on the approach page.` });
+    const unnamed = older.filter((card) => !namesCard(part, card));
+    if (unnamed.length)
+      out.push({ check: "needs-you", message: `${unnamed.slice(0, 4).join(" \xB7 ")} ${unnamed.length > 1 ? "are" : "is"} still open and the **Needs you** part does not name ${unnamed.length > 1 ? "them" : "it"}. ${oneLine[0].toUpperCase()}${oneLine.slice(1)}, before the progress \u2014 MUST (RD.DEVEX.WORKSPACE.189). Never the full card again: that stays on the approach page.` });
+  }
+  if (!asking(reply)) return out;
+  const missing = missingParts(reply);
+  if (!missing.length) return out;
+  out.push({ check: "reply-shape", message: "Your reply puts a decision and the card is not whole. Missing: " + missing.join(" \xB7 ") + ". A card put to a person in chat follows the same layout a document uses \u2014 MUST \u2014 and it assumes **no memory of this session**, because people decide days later (refs/devex/workspace/docs/decision-cards.md). Write it in full in the reply, with the detail to decide from, and put the same card on the approach page." });
+  return out;
+}
+function checkArcToPage(root, mine = null) {
+  const out = [];
+  const pageless = pagelessWorkstreams(root, mine);
+  if (pageless.length)
+    out.push({ check: "pageless", message: `An open workstream with arcs and no page \u2014 ${pageless.join(" \xB7 ")}. The arc is the plan and the page is what anybody reads, so a workstream with no page is work nobody can pick up. Give it an approach page in the fixed shape (05-artifacts.md, The approach document).` });
+  const inArcs = cardsInArcs(root, mine);
+  if (inArcs.length)
+    out.push({ check: "cards-in-arcs", message: `A card written into an arc while the page shows none \u2014 ` + inArcs.slice(0, 4).map(([subject, arc, card]) => `${card} in ${arc} (${subject})`).join(" \xB7 ") + `. An arc plans work and never holds a question. Move it to the page's \`Open\` as a \`Q<n>\` card, in the card pattern (refs/devex/workspace/docs/decision-cards.md).` });
+  const stopped = stopsWithEmptyOpen(root, mine);
+  if (stopped.length)
+    out.push({ check: "stopped-no-card", message: `A row waiting on the developer while \`Open\` carries no card \u2014 ` + stopped.slice(0, 4).map(([subject, row]) => `row ${row} in ${subject}`).join(" \xB7 ") + `. A stop is an open item like any other, and a question the plan knows about while the page says nothing is one nobody can answer. Write it as a \`Q<n>\` card in the page's \`Open\` (refs/devex/workspace/docs/decision-cards.md).` });
+  const missing = unnamedArcs(root, mine);
+  if (missing.length)
+    out.push({ check: "unnamed-arc", message: `An arc the page does not name \u2014 ` + missing.slice(0, 4).map(([subject, arc]) => `${arc} in ${subject}`).join(" \xB7 ") + `. An arc is the plan and the page is what anybody reads, so an arc nothing names is work that looks finished from the only surface they open. Give it its row in the page's Cycles table, citing the arc file (05-artifacts.md, The approach document).` });
+  return out;
+}
+function checkPageCurrent(touched) {
+  if (!touched || !touched.size) return [];
+  const behind = [];
+  for (const folder of [...new Set([...touched].map((arc) => dirname8(dirname8(arc))))].sort()) {
+    const parts = /* @__PURE__ */ new Set();
+    for (const page of pagesOf(folder)) {
+      const text = read3(page);
+      if (exemptWorkstream(page) || holdsOwnCopy(page) || !cyclesTableAt(text)) continue;
+      if (cyclesRule(page, text).length) parts.add("the Cycles table");
+      if (headerRule(page, text).length) parts.add("the header's status");
+      if (openHeadingRule(page, text).length) parts.add("the heading of `Open`");
+    }
+    if (parts.size) behind.push({ workstream: basename8(folder), parts: [...parts] });
+  }
+  if (!behind.length) return [];
+  return [{ check: "page-stale", message: `An arc you wrote this turn left its page behind \u2014 ` + behind.map((one) => `\`${one.workstream}\`: ${one.parts.join(", ")}`).join(" \xB7 ") + `. The parts of a page that the arcs decide are produced, never typed (RD.DEVEX.WORKSPACE.204). Run ` + behind.map((one) => `\`spn-devex docs cycles ${one.workstream} --write\``).join(" and ") + `, which writes the header's status, the Cycles table and the heading of \`Open\` from the arcs. The rest of the page is yours to bring current in the same turn (05-artifacts.md \xA7 How ends in Cycles).` }];
+}
+function ownCopyPages(root, mine = null) {
+  return argued(root, mine).flatMap(([, pages]) => ownCopyLines(root, pages));
+}
+function checkOwnCopy(root, mine = null, told = []) {
+  const fresh = ownCopyPages(root, mine).filter((line) => !told.includes(line));
+  if (!fresh.length) return [];
+  return [{ check: "own-copy", message: `[RULE] ${fresh.join("\n[RULE] ")}
+Until such a page links \`sds-docs.css\`, its cards are read by their \`id\`, and the shape of a card, the header's status and the parts that \`docs cycles --write\` writes are not checked. Each page is named once in a session.` }];
+}
+function checkArcLanded(root, before, touched) {
+  if (!before || !touched) return [];
+  const reports = [];
+  for (const arc of [...touched].sort()) {
+    const was = before[arc];
+    if (!was || was.status === "LANDED" || statusOf(arc) !== "LANDED") continue;
+    const text = read3(arc);
+    const rows2 = arcRowsOf(text, arcName(arc));
+    const miscounted = miscountLines(arcName(arc), text);
+    const owed = rows2.some((row) => !accounted(row) || stateOf(row) === "carried" && carryFault(root, row) !== null);
+    if (!owed && !miscounted.length) continue;
+    reports.push([...reportLines(root, basename8(arc), rows2), ...miscounted].join("\n"));
+  }
+  if (!reports.length) return [];
+  return [{ check: "arc-landed", message: `An arc reached \`LANDED\` this turn with a row nobody accounted for. The close gate's report for it:
+${reports.join("\n")}
+Give each row one of three states now, while the arc is in front of you: \`\u2705 landed\` with its date and commit, \`\u21B7 carried\` with the workstream that takes it on, or \`\u2298 deferred\` with the event that brings it back. A tick with no date and no landed word reads as pending (02-workstream/01-workstream.md \xA7 A step row says where, at what altitude, and how).` }];
+}
+function plain2(text) {
+  return text.replace(/\*\*|__|(?<![\w*])\*(?!\s)|(?<!\s)\*(?![\w*])/g, "").replace(/^#+\s*/gm, "").replace(/\s+/g, " ").trim();
+}
+function firstTurnText(transcript) {
+  let raw = "";
+  try {
+    raw = readFileSync6(transcript, "utf8");
+  } catch {
+    return "";
+  }
+  const texts = [];
+  for (const line of raw.split("\n")) {
+    if (!line.trim()) continue;
+    let entry;
+    try {
+      entry = JSON.parse(line);
+    } catch {
       continue;
     }
-    if (word === "--root" || word === "--assets") {
-      const value = args[index + 1];
-      if (value === void 0 || value.startsWith("--")) return null;
-      if (word === "--root") read3.root = value;
-      else read3.assets = value;
-      index += 1;
-      continue;
-    }
-    if (word.startsWith("--")) return null;
-    read3.words.push(word);
+    if (entry.type !== "assistant" || !Array.isArray(entry.message?.content)) continue;
+    for (const part of entry.message.content)
+      if (part.type === "text" && part.text) texts.push(part.text);
   }
-  return read3;
+  return texts.join("\n\n");
 }
-function isMarketplace(folder) {
-  return isDir2(join10(folder, "public")) && isDir2(join10(folder, STYLES_SEAT));
+function missingWelcome(text) {
+  const said = plain2(text);
+  const [, , tagline, , agent, , stages, , roles] = welcome(null, false).map(plain2);
+  const missing = [];
+  if (!/Welcome back to SaaS Plane!|Glad you're here!/.test(said)) missing.push("the heading");
+  for (const [name, line] of [["the italic line", tagline], ["the \u{1F916} line", agent], ["the \u{1F9ED} line", stages], ["the \u{1F465} line", roles]])
+    if (!said.includes(line)) missing.push(name);
+  return missing;
 }
-function marketplaceFrom(root) {
-  if (root !== null) return isMarketplace(resolve8(root)) ? resolve8(root) : null;
-  for (let at = resolve8(process.cwd()), last = ""; at !== last; last = at, at = dirname8(at)) {
-    if (isMarketplace(at)) return at;
+function checkWelcome(firstTurn) {
+  if (!firstTurn.trim()) return [];
+  const missing = missingWelcome(firstTurn);
+  if (!missing.length) return [];
+  return [{ check: "welcome", message: `This session's first reply left out ${missing.join(" \xB7 ")} of the welcome. The first reply opens with the welcome word for word, whatever the prompt \u2014 a question and a pasted handover included \u2014 then the status line, then the answer (RD.DEVEX.WORKSPACE.045). In some editors that reply is the only place the developer sees it. Say it in full at the top of your next reply.` }];
+}
+var argv1Base = process.argv[1] ? basename8(process.argv[1]) : "";
+if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
+  let input = "";
+  try {
+    input = readFileSync6(0, "utf8");
+  } catch {
+  }
+  let reply = "";
+  try {
+    reply = JSON.parse(input || "{}")?.last_assistant_message ?? "";
+  } catch {
+    reply = input;
+  }
+  let start = "";
+  try {
+    start = JSON.parse(input || "{}")?.cwd ?? "";
+  } catch {
+    start = "";
+  }
+  const root = workspaceRoot(start || process.env.CLAUDE_PROJECT_DIR || process.cwd()) ?? (start || process.env.CLAUDE_PROJECT_DIR || process.cwd());
+  let event = {};
+  try {
+    event = JSON.parse(input || "{}") ?? {};
+  } catch {
+    event = {};
+  }
+  const session = String(event.session_id ?? "");
+  begin({
+    script: "spn-devex",
+    event: "Stop",
+    tool: null,
+    session: event.session_id ?? null,
+    ...tagsOf(event),
+    process: { group: "events", action: "stop" }
+  }, root);
+  const baseline = readBaseline(root, session);
+  let touched = null;
+  let transcriptAt;
+  if (event.transcript_path) {
+    if (baseline) {
+      const found2 = arcsTouched(event.transcript_path, baseline.transcriptAt ?? 0, openArcs(root));
+      if (found2) {
+        touched = found2.touched;
+        transcriptAt = found2.size;
+      }
+    } else {
+      try {
+        transcriptAt = statSync8(event.transcript_path).size;
+      } catch {
+        transcriptAt = void 0;
+      }
+    }
+  }
+  const mine = workstreamsOf(
+    event.transcript_path,
+    baseline?.transcriptAt ?? 0,
+    baseline?.workstreams ?? [],
+    openWorkstreamFolders(root)
+  );
+  const spoken2 = new Set(event.stop_hook_active === true ? baseline?.fired ?? [] : []);
+  const firstTurn = !baseline && event.transcript_path && !event.agent_id ? firstTurnText(event.transcript_path) : "";
+  const waiting = span({ group: "stop", action: "cards" }, () => cardsWaiting(root, mine));
+  const wrote = touched && mine ? new Set([...touched].filter((arc) => mine.has(basename8(dirname8(dirname8(arc)))))) : touched;
+  const found = [
+    ...span({ group: "stop", action: "reply-shape" }, () => checkReplyShape(
+      reply,
+      waiting,
+      baseline?.cards ? waiting.filter((card) => !baseline.cards.includes(card)) : []
+    )),
+    ...span({ group: "stop", action: "notes" }, () => checkNotesLanded(root, baseline?.arcs, touched)),
+    ...span({ group: "stop", action: "arc-to-page" }, () => checkArcToPage(root, mine)),
+    ...span({ group: "stop", action: "page-stale" }, () => checkPageCurrent(wrote)),
+    ...span({ group: "stop", action: "own-copy" }, () => checkOwnCopy(root, mine, baseline?.ownCopy ?? [])),
+    ...span({ group: "stop", action: "arc-landed" }, () => checkArcLanded(root, baseline?.arcs, wrote)),
+    ...span({ group: "stop", action: "runnable" }, () => checkRunnable(root, baseline?.at ?? 0, baseline?.steps ?? {}, touched)),
+    ...span({ group: "stop", action: "hold" }, () => checkHold(root, mine)),
+    ...span({ group: "stop", action: "handover" }, () => checkHandover(reply, root, mine)),
+    ...span({ group: "stop", action: "welcome" }, () => checkWelcome(firstTurn)),
+    ...span({ group: "stop", action: "corpus" }, () => checkCorpus(root))
+  ];
+  const warnings = found.filter((warning) => !spoken2.has(warning.check));
+  const ownCopyTold = [.../* @__PURE__ */ new Set([
+    ...baseline?.ownCopy ?? [],
+    ...warnings.some((warning) => warning.check === "own-copy") ? ownCopyPages(root, mine) : []
+  ])];
+  end();
+  writeBaseline(root, session, {
+    at: Date.now(),
+    steps: currentSteps(root),
+    transcriptAt,
+    fired: [.../* @__PURE__ */ new Set([...spoken2, ...warnings.map((warning) => warning.check)])],
+    cards: waiting,
+    arcs: arcMarks(root),
+    workstreams: mine ? [...mine] : baseline?.workstreams,
+    ownCopy: ownCopyTold
+  });
+  if (warnings.length) {
+    console.error(warnings.map((w) => `[${w.check}] ${w.message}`).join("\n\n"));
+    process.exit(2);
+  }
+  process.exit(0);
+}
+
+// packages/plugin-spn-devex/src/scripts/events/prompt.ts
+var DEBUG3 = ".debug";
+var NAMES = "names";
+var ARC_FILE_END = ".md";
+var everyWorkstreamName = () => new RegExp(WORKSTREAM_NAME.source, "g");
+function workstreamFolder2(root, name) {
+  for (const state2 of WORKSTREAM_STATES) {
+    const folder = join12(workstreamsDir(root, state2), name);
+    if (isDir(folder)) return folder;
   }
   return null;
 }
-var NOT_MARKETPLACE = (root) => `\`${resolve8(root ?? process.cwd())}\` is not the marketplace's checkout: it holds no \`public/\` beside \`${slashes(STYLES_SEAT)}/\`. Run it there, or name the checkout with \`--root <folder>\``;
-function versionsIn(styles) {
+function workstreamsNamed(text, root) {
+  const named = [];
+  for (const found of text.matchAll(everyWorkstreamName()))
+    if (!named.includes(found[0]) && workstreamFolder2(root, found[0])) named.push(found[0]);
+  return named;
+}
+function arcSubject(folder, arc) {
+  const opening2 = `${arc}-`;
+  let files;
   try {
-    return cutVersions(styles);
-  } catch (error) {
-    return `\`${join10(styles, VERSIONS_FILE)}\` cannot be read: ${error.message}`;
+    files = readdirSync8(join12(folder, ARCS)).sort();
+  } catch {
+    return null;
+  }
+  const file = files.find((name) => name.startsWith(opening2) && name.endsWith(ARC_FILE_END) && name.length > opening2.length + ARC_FILE_END.length);
+  return file ? file.slice(opening2.length, -ARC_FILE_END.length) : null;
+}
+function handoverName(line, root) {
+  const named = [...line.matchAll(everyWorkstreamName())];
+  if (!named.length) return null;
+  const workstream = named[0][0];
+  const folder = workstreamFolder2(root, workstream);
+  if (!folder) return null;
+  const arc = line.slice(0, named.length > 1 ? named[1].index : line.length).match(ARC_NAME)?.[0];
+  const subject = arc ? arcSubject(folder, arc) : null;
+  if (!arc || !subject) return { name: workstream, form: "workstream" };
+  return { name: `${workstream.slice(0, 3)}-${arc} ${subject}`, form: "arc" };
+}
+function sessionName(prompt, root) {
+  const next = handoverLines(prompt).get("continue");
+  const handed = next === void 0 ? null : handoverName(next, root);
+  if (handed) return handed;
+  const named = workstreamsNamed(prompt, root);
+  return named.length === 1 ? { name: named[0], form: "workstream" } : null;
+}
+function nameToGive(worked, recorded) {
+  if (!worked) return null;
+  if (recorded && recorded.name === worked.name) return null;
+  if (recorded && worked.form === "workstream") return null;
+  return worked;
+}
+function recordFile(root, session) {
+  const key = session.replace(/[^A-Za-z0-9_-]/g, "").slice(0, 80);
+  return key ? join12(root, DEVEX, DEBUG3, NAMES, `${key}.json`) : null;
+}
+function readRecord(file) {
+  try {
+    const held = JSON.parse(readFileSync7(file, "utf8"));
+    if (!held || typeof held.name !== "string" || !held.name) return null;
+    return held.form === "workstream" || held.form === "arc" ? { name: held.name, form: held.form } : null;
+  } catch {
+    return null;
   }
 }
-function cut(version, root) {
-  if (!VERSION.test(version)) return refuse("cut", `\`${version}\` is not a version. A version is three numbers, such as \`1.1.0\``);
-  const home2 = marketplaceFrom(root);
-  if (home2 === null) return refuse("cut", NOT_MARKETPLACE(root));
-  const styles = join10(home2, STYLES_SEAT);
-  const folder = join10(home2, SERVED_SEAT, version);
-  const versions = versionsIn(styles);
-  if (typeof versions === "string") return refuse("cut", versions);
-  if (existsSync6(folder)) {
-    return refuse("cut", `version ${version} exists at \`${folder}\`. A version never changes once it is cut, so cut the next one`);
-  }
-  if (version in versions) {
-    return refuse("cut", `\`${join10(styles, VERSIONS_FILE)}\` lists version ${version}, whose folder is \`${folder}\`. A version never changes once it is cut, so cut the next one`);
-  }
-  const missing = SERVED_FILES.filter((name) => !isFile2(join10(styles, name)));
-  if (missing.length) return refuse("cut", `\`${styles}\` holds no ${missing.map((name) => `\`${name}\``).join(", ")}. Build the styles first`);
-  const hashes = {};
-  const built = SERVED_FILES.map((name) => ({ name, bytes: readFileSync7(join10(styles, name)) }));
-  mkdirSync3(folder, { recursive: true });
-  for (const { name, bytes } of built) {
-    writeFileSync4(join10(folder, name), bytes);
-    hashes[name] = createHash2("sha256").update(bytes).digest("hex");
-  }
-  writeFileSync4(join10(styles, VERSIONS_FILE), `${JSON.stringify({ ...versions, [version]: hashes }, null, 2)}
-`, "utf8");
-  console.log(`\u2713 cut version ${version} \u2192 ${folder}`);
-  for (const name of SERVED_FILES) console.log(`    ${name.padEnd(14)} sha256 ${hashes[name]}`);
-  return 0;
+function answerFor(payload, start) {
+  const session = typeof payload.session_id === "string" ? payload.session_id : "";
+  const prompt = typeof payload.prompt === "string" ? payload.prompt : "";
+  if (!session || !prompt) return "";
+  const root = workspaceRoot(start);
+  if (!root) return "";
+  const file = recordFile(root, session);
+  if (!file) return "";
+  const give = nameToGive(sessionName(prompt, root), readRecord(file));
+  if (!give) return "";
+  mkdirSync4(dirname9(file), { recursive: true });
+  writeFileSync5(file, JSON.stringify(give), "utf8");
+  return JSON.stringify({ hookSpecificOutput: { hookEventName: "UserPromptSubmit", sessionTitle: give.name } });
 }
-var CLOSED_WORKSTREAMS = new RegExp(`(?:^|\\/)${escaped(DEVEX_WORKSTREAMS)}\\/closed(?:\\/|$)`);
-function inClosedWorkstream2(path) {
-  return CLOSED_WORKSTREAMS.test(slashes(resolve8(path)));
-}
-function pagesUnder(folder) {
-  if (inClosedWorkstream2(folder)) return [];
-  const pages = [];
-  const entries = readdirSync6(folder, { withFileTypes: true }).sort((one, two) => one.name.localeCompare(two.name));
-  for (const entry of entries) {
-    const path = join10(folder, entry.name);
-    if (entry.isDirectory()) {
-      if (entry.name !== "node_modules" && !entry.name.startsWith(".")) pages.push(...pagesUnder(path));
-    } else if (entry.isFile() && entry.name.endsWith(".html")) {
-      pages.push(path);
-    }
+if (runAlone("prompt.ts")) {
+  let answer = "";
+  try {
+    const payload = readPayload();
+    const start = typeof payload.cwd === "string" && payload.cwd || process.env.CLAUDE_PROJECT_DIR || process.cwd();
+    begin({
+      script: "spn-devex",
+      event: "UserPromptSubmit",
+      tool: null,
+      session: typeof payload.session_id === "string" ? payload.session_id : null,
+      ...tagsOf(payload),
+      process: { group: "events", action: "prompt" }
+    }, start);
+    answer = span({ group: "prompt", action: "name" }, () => answerFor(payload, start));
+  } catch {
+    answer = "";
   }
-  return pages;
+  end();
+  if (answer) console.log(answer);
+  process.exit(0);
 }
-var pagesText = (count) => `${count} page${count === 1 ? "" : "s"}`;
-function repoint(version, folders, check2, root) {
-  const home2 = root === null ? null : marketplaceFrom(root);
-  if (root !== null && home2 === null) return refuse("repoint", NOT_MARKETPLACE(root));
-  const styles = home2 === null ? stylesDir(fileURLToPath2(import.meta.url)) : join10(home2, STYLES_SEAT);
-  if (styles === null) return refuse("repoint", `no \`styles/${VERSIONS_FILE}\` sits above this command, so the list of versions cannot be read`);
-  const versions = versionsIn(styles);
-  if (typeof versions === "string") return refuse("repoint", versions);
-  if (!(version in versions)) {
-    const listed2 = Object.keys(versions);
-    return refuse("repoint", `nobody cut version \`${version}\`. ${listed2.length ? `The versions that exist: ${listed2.join(", ")}` : "No version exists yet"}. Cut it first with \`docs sds cut ${version}\`, or move the pages to a version that exists`);
-  }
-  const unreadable = folders.filter((folder) => !isDir2(folder) && !(isFile2(folder) && folder.endsWith(".html")));
-  if (unreadable.length) {
-    return refuse("repoint", `${unreadable.map((folder) => `\`${folder}\``).join(", ")} is not a folder and not a page`);
-  }
-  const pages = folders.flatMap((folder) => isDir2(folder) ? pagesUnder(folder) : inClosedWorkstream2(folder) ? [] : [folder]);
-  let moved = 0, already = 0, elsewhere = 0;
-  for (const page of pages) {
-    const text = readFileSync7(page, "latin1");
-    if (sharedStyles(text)?.served !== true) {
-      elsewhere += 1;
-      continue;
-    }
-    const repointed = text.replace(LOADED_ADDRESS, (_whole, before, _from, after) => `${before}${version}${after}`);
-    if (repointed === text) {
-      already += 1;
-      continue;
-    }
-    if (!check2) writeFileSync4(page, repointed, "latin1");
-    moved += 1;
-    console.log(`${check2 ? "would move" : "moved"}  ${page}`);
-  }
-  console.log(`${pagesText(moved)} ${check2 ? "would move" : "moved"} to ${version} \xB7 ${already} already there \xB7 ${elsewhere} that link no served address left as they are`);
-  return 0;
-}
-function folderSource(folder) {
-  return {
-    named: `\`${folder}\``,
-    read: async (name) => isFile2(join10(folder, name)) ? readFileSync7(join10(folder, name), "utf8") : null
-  };
-}
-function addressSource(version) {
-  const address = `${STYLES_ADDRESS}${version}/`;
-  return {
-    named: address,
-    read: async (name) => {
-      try {
-        const response = await fetch(`${address}${name}`, { signal: AbortSignal.timeout(FETCH_LIMIT_MS) });
-        return response.ok ? await response.text() : null;
-      } catch {
-        return null;
-      }
-    }
-  };
-}
-function sourceFor(page, html, assets) {
-  const link = sharedStyles(html);
-  if (link === null) return OWN_COPY;
-  if (assets !== null) return folderSource(resolve8(assets));
-  if (!link.served) {
-    if (isAddress(link.folder)) {
-      return `the page links its stylesheet from \`${link.folder}\`, which is not the served address. Name the folder that holds its files with \`--assets <folder>\``;
-    }
-    return folderSource(resolve8(dirname8(page), link.folder));
-  }
-  if (link.version === null) {
-    return `the page links \`${link.folder}\`, which names no version. Name the folder that holds its files with \`--assets <folder>\``;
-  }
-  const checkout = join10(resolveWorkspace(), MARKETPLACE, SERVED_SEAT, link.version);
-  return isDir2(checkout) ? folderSource(checkout) : addressSource(link.version);
-}
-function inside(name, text) {
-  const body3 = text.endsWith("\n") ? text : `${text}
-`;
-  if (name === STYLESHEET) return `<style>
-${body3.replace(/<\/style/gi, "<\\/style")}</style>`;
-  return `<script>
-${body3.replace(/<\/script/gi, "<\\/script")}</script>`;
-}
-async function bundle(page, assets) {
-  if (!isFile2(page)) return refuse("bundle", `\`${page}\` is not a file`);
-  if (page.endsWith(BUNDLED_SUFFIX)) return refuse("bundle", `\`${page}\` is a bundled copy. Bundle the page that links the stylesheet`);
-  if (!page.endsWith(".html")) return refuse("bundle", `\`${page}\` is not an \`.html\` page`);
-  const html = readFileSync7(page, "utf8");
-  const source = sourceFor(page, html, assets);
-  if (typeof source === "string") return refuse("bundle", `\`${page}\`: ${source}`);
-  const needed = /* @__PURE__ */ new Set();
-  for (const line of html.matchAll(LOADING_LINE)) needed.add(line[1] ?? STYLESHEET);
-  const held = /* @__PURE__ */ new Map();
-  for (const name of needed) {
-    const text = await source.read(name);
-    if (text === null) {
-      const version = sharedStyles(html)?.version;
-      return refuse("bundle", `\`${page}\`: ${version ? `version ${version}` : "the version it links"} cannot be read. \`${name}\` is not at ${source.named}. Name a folder that holds it with \`--assets <folder>\``);
-    }
-    held.set(name, text);
-  }
-  const bundled = html.replace(LOADING_LINE, (_line, script) => {
-    const name = script ?? STYLESHEET;
-    return inside(name, held.get(name) ?? "");
-  });
-  const target = `${page.slice(0, -".html".length)}${BUNDLED_SUFFIX}`;
-  writeFileSync4(target, bundled, "utf8");
-  console.log(`\u2713 bundled ${[...needed].join(" \xB7 ")} from ${source.named} \u2192 ${target}`);
-  return 0;
-}
-async function body2(args) {
-  const read3 = typed(args);
-  const [action, ...rest] = read3?.words ?? [];
-  if (read3 === null || action === void 0) {
-    console.error(USAGE);
-    return 2;
-  }
-  if (action === "cut" && rest.length === 1) return cut(rest[0], read3.root);
-  if (action === "repoint" && rest.length >= 2) return repoint(rest[0], rest.slice(1), read3.check, read3.root);
-  if (action === "bundle" && rest.length === 1) return bundle(rest[0], read3.assets);
-  console.error(USAGE);
-  return 2;
-}
-async function run2(args) {
-  const startedAt = performance.now();
-  begin(commandFacts("spn-devex", args), resolveWorkspace());
-  const code = await body2(args);
-  record({ group: "docs", action: "sds", args: argsText(args) }, performance.now() - startedAt, code);
-  end(code);
-  return code;
-}
-if (process.argv[1] && basename8(process.argv[1]) === "sds.ts")
-  process.exit(await run2(process.argv.slice(2)));
 export {
-  describe,
-  run2 as run
+  answerFor,
+  nameToGive,
+  readRecord,
+  recordFile,
+  sessionName
 };

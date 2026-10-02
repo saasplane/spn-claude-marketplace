@@ -54,6 +54,11 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.HOOKS.45 | Editor | be refused a page that links a version nobody cut | The write is refused, and the message names the version the page links and the versions that exist | NEGATIVE | UNIT | PLANNED | — |
 | MKT.HOOKS.46 | Editor | be refused a publish of a page that links its styles from outside | The publish is refused, and the message names `docs sds bundle` and the copy to publish instead | NEGATIVE | UNIT | PLANNED | — |
 | MKT.HOOKS.47 | Editor | write the version's address into a page and get no finding for it | The check accepts a page that links a version which was cut, and says nothing about its address | POSITIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.48 | Engineering leader | find a window in the session list by the workstream it works on | A prompt that names one workstream folder that exists names the session after that folder, such as `020-agent-workstream-improvements` | POSITIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.49 | Engineering leader | find the window a handover started by its arc | A handover whose `continue:` line names a workstream and an arc of it names the session `020-N011 artifacts-by-domain`, and an arc with no file or the reload form gives the folder's name | POSITIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.50 | Engineering leader | keep the name Claude Code gave a session that is bound to no workstream | A prompt that names no workstream folder, or two of them with no handover, gets no answer and no record | NEGATIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.51 | Engineering leader | keep a name typed for a session until the work changes | The script is silent while the name it works out is the one it recorded last, and a later prompt that names another workstream changes nothing | POSITIVE | UNIT | PLANNED | — |
+| MKT.HOOKS.52 | Backend developer | send a prompt even when the naming script cannot read it | A broken payload or a missing session id ends in exit zero with nothing printed, and a prompt holding quotes, newlines and backticks still gets valid JSON | NEGATIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

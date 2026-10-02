@@ -5,7 +5,7 @@
 //
 // {{check-name}} — {{what it decides, in one sentence}}.
 //
-// Event: {{PreToolUse | PostToolUse | SessionStart | Stop}} · Tools: {{Edit, Write, Bash}} · Files: {{the pattern it reads}}
+// Event: {{PreToolUse | PostToolUse | SessionStart | UserPromptSubmit | Stop}} · Tools: {{Edit, Write, Bash}} · Files: {{the pattern it reads}}
 // Grades: BLOCK (refused, no override) · RULE (refused; the message names the rule and the fix) · SOFT (reported, not refused).
 // A BLOCK or a RULE returns `deny`. A SOFT returns `note`. A call the check does not decide returns null.
 //

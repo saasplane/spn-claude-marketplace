@@ -63,7 +63,7 @@ One entry, read from the outside in: a moment, the calls it is narrowed to, and 
 
 ### One moment, because every law here is about text
 
-`spn-devex` wires four moments across seven tools, and it has reason to: it has something to say when a window opens, after a command has run, and before a turn is handed back. This plugin has nothing to say at any of those. **What it knows is what a file may not contain**, and the only moment that knowledge can act on is the one before a file is written.
+`spn-devex` wires five moments across eight tools, and it has reason to: it has something to say when a window opens, when a prompt is sent, after a command has run, and before a turn is handed back. This plugin has nothing to say at any of those. **What it knows is what a file may not contain**, and the only moment that knowledge can act on is the one before a file is written.
 
 ### The matcher narrows before the command runs
 

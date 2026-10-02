@@ -22,7 +22,7 @@ A hook is code a plugin wires to a moment a session offers, so the runtime calls
 
 A rule that lives only in a document is read once, trusted from memory, and then broken by somebody who never opened it. A hook is how this repository avoids that: it is code the runtime itself calls, at a moment it chooses, rather than a document somebody might skip.
 
-One sentence carries the model: **the moment decides the authority**. A call about to run is the only place a call can still be stopped. Every other moment arrives after the thing it might have objected to has already happened, so all it can do is speak.
+One sentence carries the model: **the moment decides the authority**. A call about to run is the only place a call can still be stopped. Every other moment arrives before any call exists, or after the thing it might have objected to has already happened, so all it can do is speak.
 
 Two more promises come from one failure. A verdict was once printed and parsed back, and a refusal that did not parse was dropped in silence — one check fired a hundred and forty-seven times and changed nothing. So a check now **returns** what it decided, and the dispatcher reads the object. And a hook **always exits zero**, because a hook that crashes takes every other gate beside it down with it.
 
@@ -35,6 +35,7 @@ This construct realizes the book's `01-devex/02-agent/04-plugins`.
 | a hook | `hooks.json` | a script a plugin wires to a named moment, declared with a matcher, a command and a timeout |
 | a moment | `hooks` | a named point in a session the harness stops at and runs whatever a plugin wired there |
 | the window opening | `SessionStart` | the moment a session begins, resumes or is cleared; its output is the first screen a developer sees |
+| a prompt being sent | `UserPromptSubmit` | the moment a prompt is sent, before the model reads it; a hook there may name the session and may not refuse a call |
 | a call about to run | `PreToolUse` | the moment before a tool call is performed, and the only moment that may refuse one |
 | a command that finished | `PostToolUse` | the moment after a shell command has run, when its own text and its result can both be read |
 | a turn about to end | `Stop` | the moment before a reply is handed back, when a warning is still useful and a refusal is not |
@@ -50,21 +51,23 @@ The moments run in the order a session meets them. Nothing chains one to the nex
 
 ```dg
 { "kind": "map",
-  "caption": "Only the call moment sits before the act, so every later moment can speak and never refuse.",
+  "caption": "Only the call moment sits before the act, so every other moment can speak and never refuse.",
   "boxes": [
     { "id": "a", "label": "the window opens", "note": "SessionStart — the ground is read and printed" },
+    { "id": "p", "label": "a prompt is sent", "note": "UserPromptSubmit — the session may be named" },
     { "id": "b", "label": "a call is about to run", "note": "PreToolUse — the one moment a call can be refused" },
     { "id": "c", "label": "a command finished", "note": "PostToolUse — the act has already happened" },
     { "id": "d", "label": "the turn is ending", "note": "Stop — warnings only, because the turn is written" }
   ],
   "links": [
-    { "from": "a", "to": "b", "label": "then" },
+    { "from": "a", "to": "p", "label": "then" },
+    { "from": "p", "to": "b", "label": "then" },
     { "from": "b", "to": "c", "label": "then" },
     { "from": "c", "to": "d", "label": "then" }
   ] }
 ```
 
-`spn-devex` is the only plugin here that wires more than one moment. It wires all four, one script each, and none of those scripts is reached any other way. `spn-apps` and `spn-infra` each wire the call moment alone and put their own gates behind it.
+`spn-devex` is the only plugin here that wires more than one moment. It wires all five, one script each, and none of those scripts is reached any other way. At the prompt moment its script names the session for the workstream and the arc the prompt binds, so a developer finds the window in the session list by its work. It says nothing else there, and it is silent while the name it works out is the one it gave last. `spn-apps` and `spn-infra` each wire the call moment alone and put their own gates behind it.
 
 ## Parts
 
