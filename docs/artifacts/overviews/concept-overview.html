@@ -13,24 +13,6 @@
 -->
 
 <link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.0.0/sds-docs.css">
-<style>
-:root[data-theme="light"]{--sds-paper:#edf0f3;--sds-card:#f7f9fb;--sds-ink:#141920;--sds-slate:#48525f;--sds-faint:#7c8794;--sds-rule:#d2d9e0;--sds-accent:#2f4e7a;--sds-accent-soft:#e0e8f4;--sds-gap:#8f5714;--sds-gap-soft:#f7ecda;--sds-ok:#2a6459;--sds-ok-soft:#dcece8}
-.sds-rail .sds-home:hover{text-decoration:underline}
-.hero{display:flex;flex-direction:column;gap:1.2rem;padding-bottom:2.5rem;border-bottom:2px solid var(--sds-ink)}
-.tagline{font-family:var(--sds-ui);font-size:1.06rem;line-height:1.55;color:var(--sds-ink);max-width:38rem;border-left:2px solid var(--sds-accent);padding-left:1rem;margin:0}
-.tagline b{font-weight:650;color:var(--sds-accent)}
-.hero-meta{display:flex;flex-wrap:wrap;gap:.5rem;font-family:var(--sds-mono);font-size:var(--sds-xs)}
-.hero-meta span{border:1px solid var(--sds-rule);border-radius:2px;padding:.2rem .55rem;color:var(--sds-slate);background:var(--sds-card)}
-.lede{font-size:1.06rem;color:var(--sds-slate)}
-.dim{color:var(--sds-faint)}
-.gapc{border:1px solid var(--sds-gap);border-left-width:3px;border-radius:0 3px 3px 0;background:var(--sds-gap-soft);padding:.95rem 1.1rem;margin:1.5rem 0}
-.gapc h4{font-family:var(--sds-ui);font-size:var(--sds-sm);font-weight:650;margin:0;color:var(--sds-gap);display:flex;align-items:baseline;gap:.55rem;flex-wrap:wrap}
-.gapc .chip{font-family:var(--sds-mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--sds-gap);border-radius:2px;padding:0 .35rem;color:var(--sds-gap)}
-.gapc .sds-scroll{margin:.8rem 0 0;background:transparent;border-color:var(--sds-gap)}
-.gapc table{min-width:26rem}
-.gapc th{width:11rem;color:var(--sds-gap);border-bottom-color:var(--sds-gap);opacity:.85}
-.gapc td{border-bottom-color:var(--sds-gap);color:var(--sds-ink);opacity:.9}
-</style>
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -46,22 +28,18 @@
 
 <div class="sds-wrap">
 
-<header class="hero">
-  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Marketplace &nbsp;|&nbsp; Concept</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Overview</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Architect</span><span class="sds-badge sds-lens">Backend developer</span><span class="sds-badge sds-lens">Partner / integrator</span></span></span></div>
+<header class="sds-masthead">
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Marketplace &nbsp;|&nbsp; Concept</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Overview</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Architect</span><span class="sds-badge sds-lens">Backend developer</span><span class="sds-badge sds-lens">Partner / integrator</span></span></span><span class="sds-line"><span class="sds-badge">3 plugins</span><span class="sds-badge">5 instrument kinds</span><span class="sds-badge">declares GENERAL</span><span class="sds-badge">public, while the book is not</span></span></div>
   <h1>Instruments, not rules.</h1>
   <p class="sds-subtitle">The plugins that carry SaaS Plane's rules into a running session, and the machinery that reads them.</p>
   <p class="sds-standfirst">This is the public marketplace that ships the instruments of the SaaS Plane agent — the plugins, and the machinery that reads their rules and runs them while somebody is working. Read this page to see how the pieces fit together before you open any one of them. Each area below links to the page that explains it in full.</p>
-  <div class="hero-meta">
-    <span>3 plugins</span><span>5 instrument kinds</span>
-    <span>declares GENERAL</span><span>public, while the book is not</span>
-  </div>
 </header>
 
 <!-- ─────────────────────────────────────────── 00 -->
 <section id="s0">
   <h2>Overview</h2>
   <p>The foundation book states the rules; this repository delivers them. Every rule here restates a chapter written somewhere else, and a rule invented here is a defect. It ships three plugins carrying five kinds of instrument in all.</p>
-  <p class="lede">A SaaS Plane workspace loads its agent instruments from here. They are
+  <p>A SaaS Plane workspace loads its agent instruments from here. They are
   hooks that fire on an event, tools somebody runs by name, skills that carry a stage's steps,
   refs that restate a chapter of the foundation book, and the agent briefs a session
   convenes.</p>
@@ -85,7 +63,7 @@
 <!-- ─────────────────────────────────────────── 01 -->
 <section id="s1">
   <h2>Boundary</h2>
-  <p class="lede">The instruments themselves, as code and as files a runtime loads — and
+  <p>The instruments themselves, as code and as files a runtime loads — and
   nothing about what those instruments say.</p>
 
   <div class="sds-scroll">
@@ -115,8 +93,8 @@
   <p>The last two rows are one argument, not two facts. Being public is not a convenience
   here — it is the constraint the whole restatement machinery exists to answer.</p>
 
-  <div class="gapc">
-    <h4><span class="chip">gap</span> Boundary — no argument recorded</h4>
+  <div class="sds-pull sds-warning">
+    <h4><span class="sds-badge sds-warning">gap</span> Boundary — no argument recorded</h4>
     <div class="sds-scroll"><table><tbody>
       <tr><th>Owed</th><td>why the drift checker compares a stamped hash rather than resolving
         the chapter at read time, and what is given up by that choice</td></tr>
@@ -135,7 +113,7 @@
 <!-- ─────────────────────────────────────────── 02 -->
 <section id="s2">
   <h2>Who it serves</h2>
-  <p class="lede">Two readers hold different halves of the same chain, and the difference
+  <p>Two readers hold different halves of the same chain, and the difference
   decides how every page here is written.</p>
 
   <div class="sds-scroll">
@@ -160,8 +138,8 @@
   <p>This is why a broken link is a worse defect here than in most repositories. A partner
   cannot follow it to the source, so the restatement has to stand on its own.</p>
 
-  <div class="gapc">
-    <h4><span class="chip">gap</span> Who it serves — no argument recorded</h4>
+  <div class="sds-pull sds-warning">
+    <h4><span class="sds-badge sds-warning">gap</span> Who it serves — no argument recorded</h4>
     <div class="sds-scroll"><table><tbody>
       <tr><th>Owed</th><td>how much of a chapter a ref must carry before a partner can act on
         it without the book, and who decides that a restatement is thin</td></tr>
@@ -180,7 +158,7 @@
 <!-- ─────────────────────────────────────────── 03 -->
 <section id="s3">
   <h2>The domains it holds</h2>
-  <p class="lede">This repository is a monorepo of plugins, so it divides by plugin.</p>
+  <p>This repository is a monorepo of plugins, so it divides by plugin.</p>
 
   <p>A monorepo divides by the thing it holds many of, and what this one holds many of is Claude
   plugins for SaaS Plane. Each is a domain, with a section of its own in the concept and one
@@ -241,7 +219,7 @@
 <!-- ─────────────────────────────────────────── 04 -->
 <section id="s4">
   <h2>The world it declares</h2>
-  <p class="lede">This repository declares <code>GENERAL</code>, which is a world with no stack in it.</p>
+  <p>This repository declares <code>GENERAL</code>, which is a world with no stack in it.</p>
 
   <p>A repository's manifest declares which world it belongs to — <code>FOUNDATION</code>,
   <code>APPS</code>, <code>INFRA</code> or <code>GENERAL</code> — and a public marketplace is the
@@ -270,7 +248,7 @@
 <!-- ─────────────────────────────────────────── 05 -->
 <section id="s5">
   <h2>Glossary</h2>
-  <p class="lede">The words this page leans on. Each is meant in the narrow sense this
+  <p>The words this page leans on. Each is meant in the narrow sense this
   repository gives it, and where the foundation book defines one, the book wins.</p>
 
   <div class="sds-scroll"><table>
@@ -307,7 +285,7 @@
 <!-- ─────────────────────────────────────────── 06 -->
 <section id="s6">
   <h2>Where to go next</h2>
-  <p class="lede">Pick the row that matches what you came for. Each is the shortest path from
+  <p>Pick the row that matches what you came for. Each is the shortest path from
   this page to the thing that states the answer in full.</p>
 
   <div class="sds-scroll"><table>

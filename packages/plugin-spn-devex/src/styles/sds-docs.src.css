@@ -16,10 +16,38 @@
 @import "tailwindcss/theme.css" layer(theme) theme(inline);
 @import "tailwindcss/utilities.css" layer(utilities) source(none);
 
-/* THE UTILITIES A PAGE USES. The build holds a utility only when it is named here or in a page that is
+/* THE UTILITIES A PAGE MAY USE. The build holds a utility only when it is named here or in a page that is
    scanned. Scanning is off, because a scan of a whole page takes words of its prose for utilities. The
-   list below is every class in the samples' markup that is not ours. */
-@source inline("bg-ok-soft block border border-ok font-ui gap-4 grid m-0 max-w-none mb-1 my-6 px-5 py-4 rounded-sm sm:grid-cols-2 text-ink text-ok text-xs tracking-widest uppercase");
+   lines below name the standard set, one family after another, and Tailwind expands the braces. A page
+   uses any utility of the set with no new version of the stylesheet. The built file holds a rule for no
+   other utility. */
+/* layout */
+@source inline("{block,inline-block,inline,flex,inline-flex,grid,hidden,contents}");
+@source inline("{flex-row,flex-col,flex-wrap,flex-nowrap,flex-1,flex-none,grow,shrink-0}");
+@source inline("{items,self}-{start,center,end,baseline,stretch}");
+@source inline("justify-{start,center,end,between,around}");
+@source inline("{gap,gap-x,gap-y}-{0,1,2,3,4,5,6,8,10,12}");
+@source inline("{,sm:}grid-cols-{1,2,3,4,5,6}");
+@source inline("col-span-{1,2,3,4,5,6,full}");
+/* spacing */
+@source inline("{m,mx,my,mt,mr,mb,ml,p,px,py,pt,pr,pb,pl}-{0,1,2,3,4,5,6,8,10,12}");
+@source inline("{m,mx,my,mt,mr,mb,ml}-auto");
+/* size */
+@source inline("{w,h}-{auto,full}");
+@source inline("{min-w-0,max-w-none,max-w-full}");
+/* type */
+@source inline("text-{xs,sm,md,lg,xl,xxl}");
+@source inline("font-{ui,mono,normal,medium,semibold,bold}");
+@source inline("text-{left,center,right}");
+@source inline("leading-{none,tight,snug,normal,relaxed}");
+@source inline("tracking-{tight,normal,wide,wider,widest}");
+@source inline("{italic,not-italic,uppercase,lowercase,capitalize,normal-case,underline,no-underline,truncate,whitespace-nowrap,whitespace-normal,wrap-anywhere}");
+/* the colours of our tokens */
+@source inline("{text,bg,border}-{paper,card,ink,slate,faint,rule,accent,accent-soft,ok,ok-soft,gap,gap-soft,fail,fail-soft,info,info-soft,success,success-soft,warning,warning-soft,error,error-soft,violet,violet-soft,cyan,cyan-soft,pink,pink-soft,olive,olive-soft,orange,orange-soft,grey,grey-soft}");
+/* borders, corners and overflow */
+@source inline("{border,border-0,border-2,border-t,border-r,border-b,border-l,border-dashed}");
+@source inline("rounded-{none,sm,md,full}");
+@source inline("overflow-{auto,hidden,visible,x-auto}");
 
 /* OUR TOKENS ARE TAILWIND'S THEME. Tailwind's own colours, type sizes and fonts are cleared, so a utility
    can name ours and nothing else: `text-ink`, `bg-card`, `border-rule`, `text-sm`, `font-mono`. Each
@@ -501,6 +529,20 @@
   .sds-drawing .sds-connector[class*="sds-tone-"]{@apply stroke-tone}
   .sds-drawing marker[class*="sds-tone-"]{@apply text-tone}
   .sds-badge[class*="sds-tone-"]{@apply border-tone text-tone bg-tone-soft}
+
+  /* A CALLOUT THAT HOLDS A HEADING AND A TABLE. A callout is `sds-pull`, and its colour is `--sds-status`.
+   A callout with no status class takes the accent, set here. A status class on the callout sets its own
+   colour in the rules that follow, so each rule below is written once and holds for a plain callout and for
+   the four statuses. The heading is an `h4`: small, in the callout's colour, with room for a badge beside its
+   words. The table sits on the callout's own ground, with the callout's colour for its borders. A row's `th`
+   names what its `td` says, so it keeps one width down the table. */
+  .sds-pull{--sds-status:var(--sds-accent); --sds-status-soft:var(--sds-accent-soft)}
+  .sds-pull h4{@apply flex flex-wrap items-baseline m-0 text-sm text-status; gap:.55rem; font-weight:650}
+  .sds-pull .sds-scroll{@apply bg-transparent border-status; margin:.8rem 0 0}
+  .sds-pull table{min-width:26rem}
+  .sds-pull th{@apply text-status border-b-status; opacity:.85}
+  .sds-pull tbody th{width:11rem}
+  .sds-pull td{@apply text-ink border-b-status; opacity:.9}
 
   /* THE STATUS CLASSES. One status class on a badge or a pull says how a thing stands: info, success,
    warning or error. Each status has two tokens of its own, the colour and its soft ground, with a dark
