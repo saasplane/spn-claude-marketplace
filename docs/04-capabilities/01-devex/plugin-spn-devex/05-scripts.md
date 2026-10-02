@@ -242,6 +242,12 @@ Everything this plugin can execute sits under `packages/plugin-spn-devex/src/scr
 **What** — each command and check that reads a page reads the shared stylesheet's class names, and writes no other. A page that links no shared stylesheet holds its own copy of the styles: it is named once, as a RULE, and no class of it is read. A page under a workstream's `closed/` folder is never named. A command that writes into a page refuses such a page. A page may add one style block of its own, and no script reads a class the page defines itself.
 **How** — each asks `linksSharedStyles` before it reads a class. `docs audit`, `docs page --check`, `docs face` and `docs figure` exit 1 on such a page. `doc-check`, the two gates and the check at the end of a turn say one `[RULE]` line and refuse nothing. `docs audit` holds a page to a version that `versions.json` lists, and knows the variants `guide` and `index`. `packages/plugin-support-lib/src/lib/page-styles.ts`, proven in `packages/plugin-support-lib/tests/unit/lib/t-page-styles.mjs` and in `t-audit.mjs`.
 
+### A page's place is asked of one module
+
+**Why** — *the folders of the artifacts pocket are the outline the index shows* (RD.DEVEX.WORKSPACE.221). A script that built a page's path by itself would keep a second statement of the layout, and the two would part when the layout changed.
+**What** — the layout module states the pocket by domain. A domain's folder under `docs/artifacts/docs/` is named as its seat folder is, and it holds the domain's overviews and a `constructs/` folder. `docs page` writes a construct page to the path its seat file gives. `docs index` reads the areas and the domains from the folders. `docs audit` and the write check name the place of a page that sits elsewhere, and they refuse a page whose suffix disagrees with its folder. A link in a glossary that `docs face` writes into an overview is expressed from the overview's own folder.
+**How** — each script asks the module for a path or a kind, through `producedPageOf`, `seatOf`, `isProducedPage`, `isOverview` and `pagePlaceOf`, and none joins a folder name itself. A domain's overview is found by its title among every overview under the pocket's `docs/` folder, because a domain may hold two. `packages/plugin-support-lib/src/lib/docs-tree.ts`, proven in `packages/plugin-support-lib/tests/unit/lib/t-docs-tree.mjs`, and in `t-index.mjs`, `t-page.mjs`, `t-audit.mjs` and `t-face.mjs` beside the suites above.
+
 ## Between modules
 
 | Direction | With | What | Why |

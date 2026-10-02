@@ -21,7 +21,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, writeFileSync, mkdtempSync, rmSync, renameSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { tmpdir } from "node:os";
-import { ARTIFACT, POCKET, SEAT } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { ARTIFACT, CONSTRUCT_PAGES, POCKET, SEAT } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 const TOOL = join(PLUGIN, "src", "scripts", "commands", "docs", "coherence.ts");
 const BASE = mkdtempSync(join(tmpdir(), "t-coherence-"));
@@ -274,14 +274,26 @@ one("a repository with no packages/plugin-* folder reports nothing", !run(noShel
 // 21 — an overview is read too, and the markup around a path is not part of it. A `<pre>` block is
 //      a page's fence; an escaped placeholder is still a placeholder.
 const page = shelf("path-page", "# A page\n");
-mk(page, `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-overview.html`,
+mk(page, `docs/${POCKET.artifacts}/${ARTIFACT.docs}/concept-overview.html`,
   "<p>Run <code>packages/plugin-spn-x/src/scripts/checks/real.ts</code> and " +
   "<code>packages/plugin-spn-x/src/scripts/checks/&lt;subject&gt;.ts</code>, never " +
   "<code>packages/plugin-spn-x/hooks/run.mjs</code>.</p>\n<pre>packages/plugin-spn-x/src/example.ts</pre>\n");
 const pageOut = run(page);
 one("a dead path on an overview is reported, without its markup",
-  pageOut.includes(`packages/plugin-spn-x/hooks/run.mjs — named in docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-overview.html:1`));
+  pageOut.includes(`packages/plugin-spn-x/hooks/run.mjs — named in docs/${POCKET.artifacts}/${ARTIFACT.docs}/concept-overview.html:1`));
 one("a real path and an escaped placeholder on an overview are not", /PATH\s+1 plugin path/.test(pageOut));
+
+// 21b — an overview in a domain's folder is read as the hub is. A construct page of that folder is
+//       not: it is produced from its seat file, and the seat file is what is read.
+const domainPage = shelf("path-domain-page", "# A page\n");
+const POCKET_DOCS = `docs/${POCKET.artifacts}/${ARTIFACT.docs}`;
+mk(domainPage, `${POCKET_DOCS}/01-core/core-overview.html`, "<p>Never <code>packages/plugin-spn-x/hooks/gone-one.mjs</code>.</p>\n");
+mk(domainPage, `${POCKET_DOCS}/01-core/${CONSTRUCT_PAGES}/01-thing-construct.html`, "<p>Never <code>packages/plugin-spn-x/hooks/gone-two.mjs</code>.</p>\n");
+const domainOut = run(domainPage);
+one("[MKT.SCRIPTS.110] a dead path on an overview in its domain's folder is reported, and it names the page by its place",
+  domainOut.includes(`packages/plugin-spn-x/hooks/gone-one.mjs — named in ${POCKET_DOCS}/01-core/core-overview.html:1`));
+one("[MKT.SCRIPTS.110] a construct page in the constructs folder beside it is not read as an overview",
+  /PATH\s+1 plugin path/.test(domainOut) && !domainOut.includes("gone-two.mjs"));
 
 // 22 — a placeholder inside a segment keeps the segment whole, so it is asked of the folder above.
 const partSegment = shelf("path-part-segment",

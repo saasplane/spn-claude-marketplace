@@ -1,0 +1,153 @@
+<meta charset="utf-8">
+<title>Refs — The Book, Restated Inside the Plugin</title>
+<!-- spn:doc
+{"id":"stack-refs","variant":"construct","title":"Refs — The Book, Restated Inside the Plugin","subtitle":"The foundation book's rules, carried inside this plugin for a reader with no other copy.","lenses":["SERVER_DEV","ARCHITECT"],"status":"PLANNING","dependsOn":["ref-set"],"summary":"Refs carries, inside this plugin, the foundation-book rules a partner needs but has no checkout to read.","keywords":["ref","restatement","domain","stamp","leaf","generated"]}
+-->
+<!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.css">
+<div class="sds-page">
+
+<nav class="sds-rail" id="rail">
+  <a class="sds-home" href="../apps-overview.html">&larr; spn-apps — The TypeScript Stack Domain</a>
+  <div class="sds-rail-title">Refs — The Book, Restated Inside the Plugin</div>
+</nav>
+<div class="sds-wrap">
+
+<header class="sds-masthead">
+  <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Refs — The Book, Restated Inside the Plugin</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Backend developer</span><span class="sds-badge sds-lens">Architect</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>Refs — The Book, Restated Inside the Plugin</h1>
+  <p class="sds-subtitle">The foundation book's rules, carried inside this plugin for a reader with no other copy.</p>
+  <p class="sds-standfirst">Refs carries, inside this plugin, the foundation-book rules a partner needs but has no checkout to read. Read this page before you write a new ref here, or when you want to know how the folder is arranged. It explains the one folder per book domain, why each leaf stands on its own, and the stamp that shows a copy has fallen behind.</p>
+</header>
+
+<!-- 00 -->
+<section id="s0">
+  <div class="sds-section-head"><h2>Overview</h2></div>
+  <p>Two rules keep the folder honest. <strong>A ref states and never executes</strong> — it says what is true of an apps node, and anything a skill performs lives elsewhere. And <strong>a ref restates and adds nothing</strong> — the book governs, the copy carries, and the copy says which version of the book it was read at, so a copy that has fallen behind can be reported rather than believed.</p>
+  <p>This construct realizes the book's <code>01-devex/02-agent/04-plugins</code>.</p>
+</section>
+
+<!-- 01 -->
+<section id="s1">
+  <div class="sds-section-head"><h2>Terms</h2></div>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <tbody>
+      <tr><td>a ref</td><td><code>refs/</code></td><td>a self-contained markdown leaf restating a chapter of the book, written out rather than linked to</td></tr>
+      <tr><td>a domain folder</td><td>—</td><td>one folder per book domain, and the only kind of folder this tree holds at its top</td></tr>
+      <tr><td>a group</td><td>—</td><td>a folder under a domain; a file under it is named for a construct the book states</td></tr>
+      <tr><td>the face</td><td><code>README.md</code></td><td>a folder's own subject, which is what makes a folder a subject rather than a bucket</td></tr>
+      <tr><td>the stamp</td><td><code>spn:restates</code></td><td>the block at the top naming each chapter this file restates and the hash last read from it</td></tr>
+      <tr><td>drift</td><td>—</td><td>the state where a stamped hash no longer matches the chapter, which is what a run reports</td></tr>
+      <tr><td>a stack entry</td><td><code>providers/&lt;stack&gt;/</code></td><td>what is <strong>true</strong> of one stack — its kinds, naming, generation, tests and conformance</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 02 -->
+<section id="s2">
+  <div class="sds-section-head"><h2>Model</h2></div>
+  <p>The book is the source. A ref is the copy that travels with the plugin, arranged so its shape tells a reader where to look before they have read anything.</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="426 22 248 428" style="max-width:248px" role="img" aria-label="The reader holds the plugin and not the book, so the copy is complete and says which version it copied.">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="sds-box" x="428" y="24" width="244" height="76" rx="3"/>
+    <text class="sds-label" x="444" y="50">the book</text>
+    <text class="sds-note" x="444" y="69">the foundation's own chapters —</text>
+    <text class="sds-note" x="444" y="88">the source that governs</text>
+    <path class="sds-connector" d="M550 100 V140" marker-end="url(#ar)"/>
+    <text class="sds-note" x="560" y="124">restated as</text>
+    <rect class="sds-box" x="428" y="140" width="244" height="76" rx="3"/>
+    <text class="sds-label" x="444" y="166">a ref</text>
+    <text class="sds-note" x="444" y="185">a self-contained leaf, complete</text>
+    <text class="sds-note" x="444" y="204">without the book beside it</text>
+    <path class="sds-connector" d="M550 216 V256" marker-end="url(#ar)"/>
+    <text class="sds-note" x="560" y="240">carries</text>
+    <rect class="sds-box" x="428" y="256" width="244" height="76" rx="3"/>
+    <text class="sds-label" x="444" y="282">the stamp</text>
+    <text class="sds-note" x="444" y="301">each chapter it restates, and the</text>
+    <text class="sds-note" x="444" y="320">hash last read there</text>
+    <path class="sds-connector" d="M550 332 V372" marker-end="url(#ar)"/>
+    <text class="sds-note" x="560" y="356">read by</text>
+    <rect class="sds-box" x="428" y="372" width="244" height="76" rx="3"/>
+    <text class="sds-label" x="444" y="398">a drift run</text>
+    <text class="sds-note" x="444" y="417">compares the hash and reports a</text>
+    <text class="sds-note" x="444" y="436">copy that fell behind</text>
+  </svg>
+    <figcaption>The reader holds the plugin and not the book, so the copy is complete and says which version it copied.</figcaption>
+  </figure>
+  <!-- dg:source
+{ "kind": "map",
+  "caption": "The reader holds the plugin and not the book, so the copy is complete and says which version it copied.",
+  "boxes": [
+    { "id": "a", "label": "the book", "note": "the foundation's own chapters — the source that governs" },
+    { "id": "b", "label": "a ref", "note": "a self-contained leaf, complete without the book beside it" },
+    { "id": "c", "label": "the stamp", "note": "each chapter it restates, and the hash last read there" },
+    { "id": "d", "label": "a drift run", "note": "compares the hash and reports a copy that fell behind" }
+  ],
+  "links": [
+    { "from": "a", "to": "b", "label": "restated as" },
+    { "from": "b", "to": "c", "label": "carries" },
+    { "from": "c", "to": "d", "label": "read by" }
+  ] }
+  -->
+</section>
+
+<!-- 03 -->
+<section id="s3">
+  <div class="sds-section-head"><h2>Parts</h2></div>
+  <h3 id="the-tree-holds-domain-folders-and-nothin">The tree holds domain folders and nothing else</h3>
+  <p>The top of this folder is one folder per book domain. A folder under a domain is a group, a file under a group is named for a construct the book states, and a construct needing more than one file becomes a folder named for it. Nothing else is allowed a place, which is what keeps the arrangement readable without a map.</p>
+  <h3 id="a-folder-s-face-is-that-folder-s-own-sub">A folder's face is that folder's own subject</h3>
+  <p>Every folder carries a face, and the face is about the folder rather than a listing of what is inside it. A folder whose face is an index is a folder nobody can tell the subject of.</p>
+  <h3 id="what-this-plugin-restates-and-in-which-d">What this plugin restates, and in which domains</h3>
+  <p>One domain carries what a node is and everything it is built from — its shape, its packages, its modules, its resources, its apps, its tests, its comments, its agent surface and what it ships. A second carries the platform a partner adopts rather than rebuilds: tenancy, identity, surfaces, data and trust, lifecycle. A third carries one entry per module that ships, so the folder listing is the list.</p>
+  <h3 id="a-stack-sits-inside-the-domain-not-besid">A stack sits inside the domain, not beside it</h3>
+  <p>This plugin is the apps domain, and a stack is a realization of that domain rather than a domain of its own. So the stack entries sit under the domain folder, one folder per stack, and every stack answers the same questions under the same file names — which makes the folder listing the coverage. A stack with no capability for one of those questions writes the file anyway and says what to do instead.</p>
+  <h3 id="a-ref-states-what-is-true-it-never-says-">A ref states what is true; it never says what to do</h3>
+  <p>The stack entries say what a kind is, how a name is formed, what generation produces, which tiers a node owes and what conformance means. The procedure a skill walks in that stack is not here, because a ref restates a construct and a procedure restates none.</p>
+  <h3 id="a-leaf-is-self-contained-because-the-rea">A leaf is self-contained, because the reader has no book</h3>
+  <p>A ref does not link into the foundation and expect a reader to follow it. Everything it restates is written out, under a stamp naming the version it was read at. That is the cost of being installable alone, and it is paid deliberately.</p>
+  <h3 id="one-file-is-written-by-a-command-and-say">One file is written by a command, and says so</h3>
+  <p>The list of published packages a node may depend on moves every release, so a hand-written one is stale the day after it is written and nothing reports it. That file carries a citation naming the command that produced it, and re-running the command is how a reader checks it. There is no construct per package, so nothing in the book lists them and a hand-written list would be wrong at the next release.</p>
+  <h3 id="the-module-list-is-not-generated-because">The module list is not generated, because the folder is the list</h3>
+  <p>One entry per module that ships means the listing already answers <em>which modules are there</em>. A generator over it would produce a second answer able to disagree with the first.</p>
+</section>
+
+<!-- 04 -->
+<section id="s4">
+  <div class="sds-section-head"><h2>Boundary</h2></div>
+  <p>This page answers what this plugin restates and how the folder is arranged. It does not answer how a restatement is stamped, parsed or compared — the block, the hash and the drift comparison are <a href="../../01-devex/constructs/06-refs-construct.html">The Ref</a>. It does not answer what any chapter of the book says, because the book says it.</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <tbody>
+      <tr><td>which domains this plugin carries, and that the top of the tree holds domain folders alone</td><td>the block, the stamp, the hash and the drift comparison</td><td><a href="../../01-devex/constructs/06-refs-construct.html">The Ref</a></td></tr>
+      <tr><td>that a stack entry states what is true of a stack</td><td>the procedure a skill walks in that stack, and the rules a gate runs against it</td><td><a href="./06-providers-construct.html">Providers</a></td></tr>
+      <tr><td>that one file here is written by a command and carries the citation saying so</td><td>what that command reads, and what it leaves out</td><td><a href="./04-scripts-construct.html">Scripts</a></td></tr>
+      <tr><td>that a ref carries the book rather than citing it</td><td>what the book says</td><td>the foundation's own chapters</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 05 -->
+<section id="s5">
+  <div class="sds-section-head"><h2>Binds</h2></div>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <tbody>
+      <tr><td><code>RD.DEVEX.WORKSPACE.118</code></td><td>a file carrying a rule it does not own is a restatement, and says so under the restates command</td><td>MUST</td></tr>
+      <tr><td><code>RD.DEVEX.UTILS.019</code></td><td>the plugins are authored and delivered in one public repository, so the corpus is restatements that add no rule of their own</td><td>MUST</td></tr>
+      <tr><td><code>RD.DEVEX.WORKSPACE.176</code></td><td>a repository answers to the world it declares, which is what makes a stack a claim rather than something detected</td><td>MUST</td></tr>
+      <tr><td>the foundation's <code>02-delivery.md</code> § When an edit becomes behaviour</td><td>a ref is readable only after an install, so an edit here is not live in the open session</td><td>MUST</td></tr>
+    </tbody>
+  </table></div>
+  <p>Try it: <code>node packages/plugin-spn-devex/src/dist/cli.mjs restates check</code> (or <code>spn-devex restates check</code>, once installed)</p>
+</section>
+
+
+
+</div>
+</div>
+
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.js"></script>

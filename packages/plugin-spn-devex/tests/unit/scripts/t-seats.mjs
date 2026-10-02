@@ -8,7 +8,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, readdirSync, rmSyn
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
-import { ARTIFACT, POCKET, SEAT, bookTemplatesDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { ARTIFACT, CONSTRUCT_PAGES, POCKET, SEAT, bookTemplatesDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { linesFor } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
@@ -59,6 +59,8 @@ function run(root, args) {
   } catch (e) { return String(e.stdout ?? "") + String(e.stderr ?? ""); }
 }
 const readAt = (root, p) => readFileSync(join(root, p), "utf8");
+/** Where the construct pages of the domain `01-core` sit: the `constructs` folder of its folder in the pocket. */
+const CORE_PAGES = `docs/${POCKET.artifacts}/${ARTIFACT.docs}/01-core/${CONSTRUCT_PAGES}`;
 
 let n = 0, failed = 0;
 function one(name, got, want) {
@@ -84,7 +86,7 @@ console.log("\n=== the produced page is the seat, and no register row is joined 
   });
   const before = readAt(ws, `docs/${SEAT.constructs}/01-core/01-boot.md`);
   const out = run(ws, ["page", `docs/${SEAT.constructs}/01-core/01-boot.md`]);
-  const page = readAt(ws, `docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/01-boot-construct.html`);
+  const page = readAt(ws, `${CORE_PAGES}/01-boot-construct.html`);
 
   one("no register row reaches the page", page,
       (g) => !g.includes("CORE.BOOT.01") && !g.includes("CORE.BOOT.02"));
@@ -101,7 +103,7 @@ console.log("\n=== the produced page is the seat, and no register row is joined 
   one("and a page that really was hand-edited still is", (() => {
         // The produced page is found rather than named: the renderer decides the file name, and a
         // test that hard-codes it fails for the wrong reason the day that changes.
-        const dir = join(ws, `docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core`);
+        const dir = join(ws, CORE_PAGES);
         const f = join(dir, readdirSync(dir).find((x) => x.endsWith(".html")));
         writeFileSync(f, `${readFileSync(f, "utf8")}\n<p>typed in by hand</p>\n`, "utf8");
         return run(ws, ["audit", "docs"]);
@@ -115,7 +117,7 @@ console.log("\n=== the produced page is the seat, and no register row is joined 
   });
   const out2 = run(ws2, ["page", `docs/${SEAT.constructs}/01-core/01-boot.md`]);
   one("a domain register reaches no page",
-      readAt(ws2, `docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/01-boot-construct.html`), lacks("CORE.BOOT.01"));
+      readAt(ws2, `${CORE_PAGES}/01-boot-construct.html`), lacks("CORE.BOOT.01"));
   one("and no fallback is reported", out2, lacks("because this topic has no file of its own yet"));
 }
 
@@ -140,10 +142,10 @@ console.log("\n=== `figures check` takes a folder, the way `audit` does");
   const page = (svg) => `${linesFor("1.0.0").stylesheet}\n<h1>p</h1>\n<figure><svg class="sds-drawing" viewBox="0 0 100 60">${svg}</svg></figure>\n`;
   const clean = page('<rect class="sds-box" x="10" y="10" width="40" height="20"/>');
   const ws = repo({
-    [`docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/a-construct.html`]: clean,
-    [`docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/b-construct.html`]: clean,
+    [`${CORE_PAGES}/a-construct.html`]: clean,
+    [`${CORE_PAGES}/b-construct.html`]: clean,
   });
-  const out = run(ws, ["figure", "check", `docs/${POCKET.artifacts}/${ARTIFACT.constructs}`]);
+  const out = run(ws, ["figure", "check", `docs/${POCKET.artifacts}/${ARTIFACT.docs}`]);
   one("a folder is every page under it, not a read of the directory", out, lacks("EISDIR"));
   one("and it says how many it judged", out, has("clean — 2 pages"));
   one("a path that is not there is named, not read",
@@ -359,10 +361,10 @@ console.log("\n=== a code figure names a PATH; a bare file name is a term");
     "# C\n\n`For: Architect` · `Status: ✅ DONE`\n\n" + linesFor("1.0.0").stylesheet + "\n" +
     `<p>The manifest <code>${name}</code> declares it:</p>\n<pre>{ "kind": "MODULE_SERVER" }</pre>\n`;
   one("a bare file name is not read as a path to open",
-      run(repo({ [`docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/a-construct.html`]: withFig("spkind.json") }), ["audit", "docs"]),
+      run(repo({ [`${CORE_PAGES}/a-construct.html`]: withFig("spkind.json") }), ["audit", "docs"]),
       lacks("no such file exists"));
   one("a real path that is not there is still a RULE",
-      run(repo({ [`docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/a-construct.html`]: withFig("packages/gone/spkind.json") }), ["audit", "docs"]),
+      run(repo({ [`${CORE_PAGES}/a-construct.html`]: withFig("packages/gone/spkind.json") }), ["audit", "docs"]),
       has("a figure names `packages/gone/spkind.json`, and no such file exists"));
 }
 

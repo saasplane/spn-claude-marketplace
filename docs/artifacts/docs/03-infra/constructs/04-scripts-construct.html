@@ -1,0 +1,159 @@
+<meta charset="utf-8">
+<title>Scripts — The Write-Time Gate and What Runs It</title>
+<!-- spn:doc
+{"id":"estate-guard","variant":"construct","title":"Scripts — The Write-Time Gate and What Runs It","subtitle":"The gate that catches what should never be written into an infrastructure declaration.","lenses":["INFRA","TRUST"],"status":"PLANNING","dependsOn":["checks","estate-hooks"],"summary":"Scripts holds the gate that catches what must never appear in an estate declaration — a credential, an identifier a tool should discover for itself, a cloud provider's own string outside the one entry allowed to hold it — before it is written.","keywords":["scripts","dispatcher","subject","rule","secret","allow"]}
+-->
+<!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.css">
+<div class="sds-page">
+
+<nav class="sds-rail" id="rail">
+  <a class="sds-home" href="../infra-overview.html">&larr; spn-infra — The Estate Domain</a>
+  <div class="sds-rail-title">Scripts — The Write-Time Gate and What Runs It</div>
+</nav>
+<div class="sds-wrap">
+
+<header class="sds-masthead">
+  <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Scripts — The Write-Time Gate and What Runs It</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">DevOps / SRE</span><span class="sds-badge sds-lens">DevSecOps / Security</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>Scripts — The Write-Time Gate and What Runs It</h1>
+  <p class="sds-subtitle">The gate that catches what should never be written into an infrastructure declaration.</p>
+  <p class="sds-standfirst">Scripts holds the gate that catches what must never appear in an estate declaration — a credential, an identifier a tool should discover for itself, a cloud provider's own string outside the one entry allowed to hold it — before it is written. Read this page before you add a new rule here, or when you want to know which file actually runs at write time. It explains the dispatcher the wiring calls, the gate that decides which rules have an opinion about a file, and the named rule bodies that check the text directly.</p>
+</header>
+
+<!-- 00 -->
+<section id="s0">
+  <div class="sds-section-head"><h2>Overview</h2></div>
+  <p>An estate declaration says what infrastructure should exist, and things that must never appear in one are cheap to catch at the moment somebody writes them and expensive to find later.</p>
+  <p>Read the direction it fails in before you read anything else. <strong>When the gate does not understand its input, it allows the call.</strong> A gate refusing whatever it cannot parse would deny far more than the things it actually knows about, and people would route around it, which leaves an estate with no gate at all.</p>
+  <p>This construct realizes the book's <code>01-devex/02-agent/04-plugins</code>.</p>
+</section>
+
+<!-- 01 -->
+<section id="s1">
+  <div class="sds-section-head"><h2>Terms</h2></div>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <tbody>
+      <tr><td>the dispatcher</td><td><code>scripts/events/pretooluse.ts</code></td><td>this plugin's hook entry point: one process, run for every write and every edit</td></tr>
+      <tr><td>the gate</td><td><code>scripts/checks/subjects.ts</code></td><td>what resolves which subjects judge this call, and the one file that knows a provider folder exists</td></tr>
+      <tr><td>a subject</td><td><code>rendering</code> · <code>manifest</code></td><td>one kind of file with one parse — built output, or a declaration somebody edits</td></tr>
+      <tr><td>a rule</td><td><code>scripts/lib/&lt;name&gt;.ts</code></td><td>one thing the gate knows how to recognise, carrying its own name and its own refusal message</td></tr>
+      <tr><td>the new text</td><td><code>content</code> · <code>new_string</code></td><td>what this call would add — a write's content, or an edit's replacement — which is what the rules read</td></tr>
+      <tr><td>the estate manifest</td><td><code>spestate.json</code></td><td>the declaration file where one rule applies and nowhere else</td></tr>
+      <tr><td>a sanctioned home</td><td><code>region</code></td><td>the place a provider's own string is legitimate, which is removed from the text before that rule searches</td></tr>
+      <tr><td>allowing</td><td>—</td><td>the answer to anything the gate cannot read: no decision, and the ordinary permission flow continues</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 02 -->
+<section id="s2">
+  <div class="sds-section-head"><h2>Model</h2></div>
+  <p>Three folders, three jobs, and the order they run in is the order a person meets them. The dispatcher is called; it asks the gate which subjects apply; each subject runs the rule bodies that have an opinion about this path.</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="423 22 254 447" style="max-width:254px" role="img" aria-label="The rule bodies are cloud-free and the parse is not, which is why the two sit in different folders.">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="sds-box" x="425" y="24" width="250" height="95" rx="3"/>
+    <text class="sds-label" x="441" y="50">events/</text>
+    <text class="sds-note" x="441" y="69">the dispatcher the wiring names —</text>
+    <text class="sds-note" x="441" y="88">reads the call, keeps the first</text>
+    <text class="sds-note" x="441" y="107">refusal</text>
+    <path class="sds-connector" d="M550 119 V159" marker-end="url(#ar)"/>
+    <text class="sds-note" x="560" y="143">asks</text>
+    <rect class="sds-box" x="425" y="159" width="250" height="76" rx="3"/>
+    <text class="sds-label" x="441" y="185">checks/</text>
+    <text class="sds-note" x="441" y="204">the gate — resolves which subjects</text>
+    <text class="sds-note" x="441" y="223">judge this write</text>
+    <path class="sds-connector" d="M550 235 V275" marker-end="url(#ar)"/>
+    <text class="sds-note" x="560" y="259">dispatches into</text>
+    <rect class="sds-box" x="425" y="275" width="250" height="76" rx="3"/>
+    <text class="sds-label" x="441" y="301">providers/</text>
+    <text class="sds-note" x="441" y="320">one cloud's parse of a subject,</text>
+    <text class="sds-note" x="441" y="339">outside this folder</text>
+    <path class="sds-connector" d="M550 351 V391" marker-end="url(#ar)"/>
+    <text class="sds-note" x="560" y="375">runs</text>
+    <rect class="sds-box" x="425" y="391" width="250" height="76" rx="3"/>
+    <text class="sds-label" x="441" y="417">lib/</text>
+    <text class="sds-note" x="441" y="436">the rule bodies, each named, each</text>
+    <text class="sds-note" x="441" y="455">with its own refusal</text>
+  </svg>
+    <figcaption>The rule bodies are cloud-free and the parse is not, which is why the two sit in different folders.</figcaption>
+  </figure>
+  <!-- dg:source
+{ "kind": "map",
+  "caption": "The rule bodies are cloud-free and the parse is not, which is why the two sit in different folders.",
+  "boxes": [
+    { "id": "a", "label": "events/", "note": "the dispatcher the wiring names — reads the call, keeps the first refusal" },
+    { "id": "b", "label": "checks/", "note": "the gate — resolves which subjects judge this write" },
+    { "id": "c", "label": "providers/", "note": "one cloud's parse of a subject, outside this folder" },
+    { "id": "d", "label": "lib/", "note": "the rule bodies, each named, each with its own refusal" }
+  ],
+  "links": [
+    { "from": "a", "to": "b", "label": "asks" },
+    { "from": "b", "to": "c", "label": "dispatches into" },
+    { "from": "c", "to": "d", "label": "runs" }
+  ] }
+  -->
+  <p><strong>The path is read before any text</strong>, because one refusal needs nothing else: built output is refused whatever it would contain. Then the text this call would add is taken, and each remaining subject is asked about it in turn, the first denial ending the run.</p>
+  <p>A rule that fails is skipped rather than fatal: a gate that crashes the chain removes every other gate with it, which is worse than any single miss. The helpers the dispatcher reads its event and records its timings through are <strong>this plugin's own copies</strong>. A plugin is installed on its own and a partner may hold one without the others, so a sibling's file cannot be a dependency — reaching for one means resolving it at runtime, and a resolve that misses has to return the pass-through, which is silence wearing the shape of success.</p>
+</section>
+
+<!-- 03 -->
+<section id="s3">
+  <div class="sds-section-head"><h2>Parts</h2></div>
+  <h3 id="three-folders-and-what-decides-which-one">Three folders, and what decides which one a file goes in</h3>
+  <p><code>events/</code> holds what the wiring calls, and there is one such file because there is one wired moment. <code>checks/</code> holds the gate, which knows which subjects exist and how to reach a provider's parse of each. <code>lib/</code> holds everything more than one of them needs: the rule bodies, the event shape, the timing recorder. <strong>The axis is what the file is for, not what it is about</strong>, which is why a rule about secrets and a rule about built output sit side by side.</p>
+  <h3 id="unsure-means-allow-and-every-exit-is-zer">Unsure means allow, and every exit is zero</h3>
+  <p>Unreadable input, or a call naming no file, ends the run in silence with the call allowed. A refusal prints the documented decision and still exits zero, because a hook that fails loudly takes every other gate down with it. The dispatcher returns as soon as it finds no file path, and the whole run is wrapped so nothing reaches the harness as a failure.</p>
+  <h3 id="it-reads-the-text-the-call-would-add-not">It reads the text the call would add, not the file</h3>
+  <p>A refusal must be about what is being written. Judging the file on disk would refuse an edit to a file that already carries the fault and miss the fault arriving now. So a write's content or an edit's replacement is taken, whichever is present, and where there is no new text only the subject that reads the path alone can run.</p>
+  <h3 id="the-gate-discovers-the-clouds-and-delibe">The gate discovers the clouds and deliberately runs every one</h3>
+  <p>The gate names no cloud. It reads which folders the providers tree holds and imports each one's validator for each subject, so a third cloud joins by adding a folder rather than by editing an import list. <strong>And it runs all of them, not the declared one.</strong> A write-time gate cannot read a resolved estate — there may not be one yet — and running only the declared cloud's patterns would let an AWS region into a declaration whose cloud entry says Google, which is the mistake somebody makes while moving an estate between clouds and the moment the gate is most worth having. The cost is a handful of regular expressions against text already in memory.</p>
+  <h3 id="the-rule-bodies-sit-flat-because-every-o">The rule bodies sit flat, because every one of them is cloud-free</h3>
+  <p><em>An account id is never pinned</em> is true on every cloud, and so is <em>no secrets at any path</em>, and so is <em>built output is not source</em>. Those rule bodies name no cloud anywhere in them. The provider-string rule is the exception, and it varies in its <strong>patterns</strong> rather than in its judgement — <em>a provider string lives only inside a cloud entry</em> holds everywhere, while what a region looks like is that cloud's business — so it is written as a factory each cloud feeds its own spellings to. <strong>There is no rules folder</strong>, because the moment one exists, rules drift into it that only one cloud ever needed.</p>
+  <h3 id="an-identifier-is-refused-where-a-key-nam">An identifier is refused where a key names it</h3>
+  <p>A bare run of digits is not evidence of anything, and refusing every one of them would block timestamps, sizes and identifiers with nothing to do with an account. So the rule fires where a key spelled as an account identifier is assigned a value of the right shape, and leaves a loose number alone. The credential rule is shaped the same way: it needs a credential-named key assigned a quoted literal of real length, and ignores a reference to a variable. Both sides of the length boundary are stated as test cases, so nobody re-derives the threshold from a regular expression.</p>
+  <h3 id="one-rule-reads-only-the-estate-manifest">One rule reads only the estate manifest</h3>
+  <p>A provider's own region string is legitimate in a small number of places — the region mapping on a cloud entry, and a profile's capacity keys. Searching for such strings everywhere would refuse documentation and test fixtures. So the rule fires only on a file named as an estate manifest, removes the sanctioned homes from the text first, and searches what is left.</p>
+  <h3 id="every-refusal-names-the-card-that-explai">Every refusal names the card that explains it</h3>
+  <p>A denial and its reasoning are one hop apart: the sentence every refusal carries points at the laws card this plugin ships, so a reader who has just been refused can reach the rule without searching for it. The sentence is written once and quoted by every rule, because copies of a law drift and a person then meets a different account of it depending on which file they happened to touch.</p>
+</section>
+
+<!-- 04 -->
+<section id="s4">
+  <div class="sds-section-head"><h2>Boundary</h2></div>
+  <p>This page answers what the scripts tree holds, what it refuses, what it reads to decide, and what it does when it cannot decide. It does not answer the frame it sits in — the moments, the decision shape and the always-zero exit are <a href="../../01-devex/constructs/02-hooks-construct.html">Hooks</a>, and the entry that wires this dispatcher is <a href="./02-hooks-construct.html">Hooks</a>. It does not answer what one cloud's text looks like, and it does not answer what the estate laws say.</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <tbody>
+      <tr><td>the three folders, the subjects, the rule bodies, and that anything unrecognised is allowed</td><td>the moment this is wired to, the matcher and the timeout</td><td><a href="./02-hooks-construct.html">Hooks</a></td></tr>
+      <tr><td>that the gate names no cloud and discovers them instead</td><td>what one cloud's regions and instance classes actually look like</td><td><a href="./06-providers-construct.html">Providers</a></td></tr>
+      <tr><td>that a refusal names the card carrying its reasoning</td><td>what the estate laws actually say, and which one a rule is catching</td><td><a href="./05-refs-construct.html">Refs</a></td></tr>
+      <tr><td>that an estate leak is caught at write time</td><td>how an estate is changed on purpose, and through which door</td><td><a href="./03-skills-construct.html">Skills</a></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 05 -->
+<section id="s5">
+  <div class="sds-section-head"><h2>Binds</h2></div>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <tbody>
+      <tr><td><code>RD.DEVEX.UTILS.019</code></td><td>the scripts restate the estate laws and add no rule of their own</td><td>MUST</td></tr>
+      <tr><td><code>RD.SUPPORT.INFRA.026</code></td><td>which manifest declares an estate node, and therefore which file the manifest rule applies to</td><td>MUST</td></tr>
+      <tr><td>the foundation's <code>02-delivery.md</code> § When an edit becomes behaviour</td><td>a script is a hook's body, so an edit to it is live on its next run</td><td>MUST</td></tr>
+      <tr><td><code>RD.DEVEX.008</code></td><td>a plugin carries its own libraries and never reaches into a sibling at runtime</td><td>MUST</td></tr>
+      <tr><td>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></td><td>the four kinds of script, one command entry, a shared folder never installed on its own</td><td>MUST</td></tr>
+    </tbody>
+  </table></div>
+  <p>Try it: <code>node packages/plugin-spn-infra/tests/run.mjs</code></p>
+</section>
+
+
+
+</div>
+</div>
+
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.js"></script>

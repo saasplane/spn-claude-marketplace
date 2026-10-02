@@ -32,10 +32,10 @@
 // Exit code is the number of findings.
 
 import { existsSync, readdirSync, statSync } from "node:fs";
-import { basename, join, dirname, resolve } from "node:path";
+import { basename, join, dirname, relative, resolve } from "node:path";
 import { isDir, isFile, read } from "../../lib/payload.ts";
-import { ARTIFACT, DECISIONS, DOCS, POCKET, capabilitiesDir, constructsDir, decisionsRegister, docsOf,
-  hasSegment, hubPage, overviewsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { ARTIFACT, DECISIONS, POCKET, artifactDocsDir, capabilitiesDir, constructsDir, decisionsRegister, docsOf,
+  hasSegment, hubPage, isOverview } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { DECISION_ID_SRC, check as restatesCheck, parse as restatesParse, registerRows, undeclared } from "../../lib/restates.ts";
 
 const DECISION_ID = new RegExp(DECISION_ID_SRC, "g");
@@ -575,16 +575,28 @@ function blanked(text: string, pattern: RegExp): string {
   return text.replace(pattern, (hit) => hit.replace(/[^\n]/g, " "));
 }
 
+/** Every overview under the pocket's `docs` folder, by its path from the root, in the order of that path. */
+function overviewPages(root: string): string[] {
+  const found: string[] = [];
+  const walk = (folder: string): void => {
+    for (const entry of readdirSync(folder)) {
+      const full = join(folder, entry);
+      if (isDir(full)) walk(full);
+      else if (isOverview(full)) found.push(relative(root, full));
+    }
+  };
+  const top = artifactDocsDir(docsOf(root));
+  if (isDir(top)) walk(top);
+  return found.sort();
+}
+
 function pluginPaths(root: string, sources: string[]): string[] {
   const shelf = join(root, "packages");
   const plugins = new Set(isDir(shelf)
     ? readdirSync(shelf).filter((entry) => entry.startsWith("plugin-") && isDir(join(shelf, entry)))
     : []);
   if (!plugins.size) return [];                     // no packages/plugin-* here — not this repo's question
-  const overviews = overviewsDir(docsOf(root));
-  const pages = isDir(overviews)
-    ? readdirSync(overviews).filter((e) => e.endsWith(".html")).sort().map((e) => join(overviewsDir(DOCS), e))
-    : [];
+  const pages = overviewPages(root);
 
   const dead: string[] = [];
   for (const path of [...sources, ...pages]) {

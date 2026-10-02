@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/02-trust.md",
-      "seen": "06fb3092"
+      "seen": "6a7ece62"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/08-agent-surface/README.md",
-      "seen": "f85d34fe"
+      "seen": "5856012d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",

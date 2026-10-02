@@ -1,0 +1,156 @@
+<meta charset="utf-8">
+<title>Providers — Where the Stack Is Allowed to Be Named</title>
+<!-- spn:doc
+{"id":"apps-providers","variant":"construct","title":"Providers — Where the Stack Is Allowed to Be Named","subtitle":"The one folder where a language may be named at all.","lenses":["ARCHITECT","SERVER_DEV"],"status":"PLANNING","dependsOn":["provider-set","stack-skills","stack-checks"],"summary":"Providers is the one folder in this plugin allowed to name a language, holding everything that varies with the language a project is written in, one folder per stack.","keywords":["provider","instance","stack","steps","subject","private"]}
+-->
+<!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.css">
+<div class="sds-page">
+
+<nav class="sds-rail" id="rail">
+  <a class="sds-home" href="../apps-overview.html">&larr; spn-apps — The TypeScript Stack Domain</a>
+  <div class="sds-rail-title">Providers — Where the Stack Is Allowed to Be Named</div>
+</nav>
+<div class="sds-wrap">
+
+<header class="sds-masthead">
+  <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Providers — Where the Stack Is Allowed to Be Named</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Architect</span><span class="sds-badge sds-lens">Backend developer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>Providers — Where the Stack Is Allowed to Be Named</h1>
+  <p class="sds-subtitle">The one folder where a language may be named at all.</p>
+  <p class="sds-standfirst">Providers is the one folder in this plugin allowed to name a language, holding everything that varies with the language a project is written in, one folder per stack. Read this page before you add a second stack, or when you want to know why adding one means adding a folder rather than editing a gate. It explains why this domain's provider always carries both halves, and how a skill and a gate each reach into it.</p>
+</header>
+
+<!-- 00 -->
+<section id="s0">
+  <div class="sds-section-head"><h2>Overview</h2></div>
+  <p><strong>This domain's provider carries both halves, and it always will.</strong> A provider earns a half that a skill loads when the instance changes the language the work is written in — and here the instance <em>is</em> the stack, so writing a contract, a service and an entry is a different procedure in a different language every time. That is a fact about this domain rather than a stage it is passing through.</p>
+  <p>This construct realizes the book's <code>01-devex/02-agent/04-plugins</code>.</p>
+</section>
+
+<!-- 01 -->
+<section id="s1">
+  <div class="sds-section-head"><h2>Terms</h2></div>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <tbody>
+      <tr><td>an instance</td><td><code>providers/&lt;instance&gt;/</code></td><td>one realization this plugin serves, which in this domain is a stack</td></tr>
+      <tr><td>the claim</td><td><code>config.stack</code></td><td>what a repository declares about its own stack, and the only place a gate reads one from</td></tr>
+      <tr><td>the skills half</td><td><code>providers/&lt;stack&gt;/skills/&lt;skill&gt;/</code></td><td>the procedure a skill loads once it has resolved which stack it is standing in</td></tr>
+      <tr><td>the scripts half</td><td><code>providers/&lt;stack&gt;/scripts/checks/</code></td><td>the parse a gate resolves into, and the rules that read what the parse produced</td></tr>
+      <tr><td>a door</td><td><code>src.ts</code> · <code>tests.ts</code></td><td>the file a gate imports for one subject: it parses once, orders the verdicts, and isolates a rule that throws</td></tr>
+      <tr><td>a private rule</td><td><code>_&lt;subject&gt;/</code></td><td>one rule, behind an underscore folder, private to the door standing beside it</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 02 -->
+<section id="s2">
+  <div class="sds-section-head"><h2>Model</h2></div>
+  <p>The gate composes a path from the declaration and imports whatever is there. Nothing about the stack reaches the gate, and nothing about the gate is repeated in the provider.</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="283 22 534 372" style="max-width:534px" role="img" aria-label="The path is composed from the declaration, which is why a second stack costs a folder and no edit.">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="sds-box" x="428" y="24" width="244" height="76" rx="3"/>
+    <text class="sds-label" x="444" y="50">the claim</text>
+    <text class="sds-note" x="444" y="69">the stack the nearest sprepo.json</text>
+    <text class="sds-note" x="444" y="88">declares</text>
+    <rect class="sds-box" x="425" y="156" width="250" height="76" rx="3"/>
+    <text class="sds-label" x="441" y="182">the composed path</text>
+    <text class="sds-note" x="441" y="201">providers/&lt;stack&gt;/ — never written</text>
+    <text class="sds-note" x="441" y="220">out in a gate</text>
+    <rect class="sds-box" x="285" y="316" width="250" height="76" rx="3"/>
+    <text class="sds-label" x="301" y="342">the skills half</text>
+    <text class="sds-note" x="301" y="361">a procedure: what to do, in order,</text>
+    <text class="sds-note" x="301" y="380">in this stack</text>
+    <rect class="sds-box" x="591" y="316" width="224" height="76" rx="3"/>
+    <text class="sds-label" x="607" y="342">the scripts half</text>
+    <text class="sds-note" x="607" y="361">a parse, and the private rules</text>
+    <text class="sds-note" x="607" y="380">that read it</text>
+    <path class="sds-connector" d="M550 100 V156" marker-end="url(#ar)"/>
+    <path class="sds-connector" d="M488 232 V260 H410 V316" marker-end="url(#ar)"/>
+    <path class="sds-connector" d="M613 232 V288 H703 V316" marker-end="url(#ar)"/>
+    <text class="sds-note" x="558" y="136">composes</text>
+    <text class="sds-note" x="496" y="252">a skill loads</text>
+    <text class="sds-note" x="709" y="280">a gate imports</text>
+  </svg>
+    <figcaption>The path is composed from the declaration, which is why a second stack costs a folder and no edit.</figcaption>
+  </figure>
+  <!-- dg:source
+{ "kind": "map",
+  "caption": "The path is composed from the declaration, which is why a second stack costs a folder and no edit.",
+  "boxes": [
+    { "id": "a", "label": "the claim", "note": "the stack the nearest sprepo.json declares" },
+    { "id": "b", "label": "the composed path", "note": "providers/<stack>/ — never written out in a gate" },
+    { "id": "c", "label": "the skills half", "note": "a procedure: what to do, in order, in this stack" },
+    { "id": "d", "label": "the scripts half", "note": "a parse, and the private rules that read it" }
+  ],
+  "links": [
+    { "from": "a", "to": "b", "label": "composes" },
+    { "from": "b", "to": "c", "label": "a skill loads" },
+    { "from": "b", "to": "d", "label": "a gate imports" }
+  ] }
+  -->
+</section>
+
+<!-- 03 -->
+<section id="s3">
+  <div class="sds-section-head"><h2>Parts</h2></div>
+  <h3 id="the-folder-mirrors-the-plugin-s-own-name">The folder mirrors the plugin's own names</h3>
+  <p>A plugin holds <code>skills/</code> and <code>scripts/</code>; a provider contributes under the same two names. A contributor filling one has already read the folders it mirrors, so plugging in a stack needs no explanation. It is also why a provider folder holds markdown and TypeScript side by side while every other folder in a plugin holds one kind: the organizing axis here is <em>what changes</em>, and that is paid deliberately.</p>
+  <h3 id="the-build-steps-are-the-skills-half">The build steps are the skills half</h3>
+  <p>The build skill names the steps and their order and holds none of them. Each step file settles one layer for this stack — the contract and its validators, the service shape, the thin entry, the queue listener and its consumption contract, the front end's plug-in points, how each test tier is run, and where an environment key goes in this stack's own files. A step this stack does not ship is a step this stack does not walk.</p>
+  <h3 id="a-folder-is-named-for-the-skill-not-for-">A folder is named for the skill, not for the plugin that ships it</h3>
+  <p>One folder here serves a skill that lives in the core plugin: the part of deciding what a node is that only a language can answer — how ownership of a capability is read from what the repository actually composes, and where markdown may not go. It sits under the skill's own name, because what a reader needs to know is which skill loads it. This is the material that proves the shape works across plugins at all.</p>
+  <h3 id="the-subjects-are-two-and-they-line-up-wi">The subjects are two, and they line up with the paths the rules watch</h3>
+  <p>A write is asked about its source and about its tests, and nothing else. A third subject for contracts was a grouping that overlapped the first on every contract file: every contract rule watches a path under <code>src/</code>, so a contract file was read and masked twice, at write time, where a person is waiting. Which rules apply is decided by the path and the node's kind, never by a subject's name.</p>
+  <h3 id="a-door-parses-once-orders-the-answers-an">A door parses once, orders the answers, and survives a rule that throws</h3>
+  <p>The file a gate imports is the only file in the subject that reads the source: it builds the resulting text once per write rather than once per rule. It keeps the first refusal, because a person fixes one thing at a time and several refusals for one edit read as a broken gate. It collects every note, because advice is advice and several pieces can be true at once. And it skips a rule that throws rather than losing the whole subject with it.</p>
+  <h3 id="a-rule-is-private-to-the-door-beside-it">A rule is private to the door beside it</h3>
+  <p>A rule is an implementation detail of the check that runs it, not an entry in a shared registry, so it sits behind an underscore folder named for its own subject. A listing of the checks folder therefore shows the doors and nothing else, and what a door runs is read by opening the folder beside it. Nothing outside a private folder imports into it.</p>
+  <h3 id="what-the-source-subject-refuses">What the source subject refuses</h3>
+  <p>Its rules read this stack's own syntax: an enablement code that is not prefixed by the module owning it, a read method returning a list type under a plural name, a chained continuation where the stack's own standard asks for a sequenced wait, and a contract state that would close a dependency cycle. Each names the chapter or the card holding its reasoning rather than restating it, because a check is the part a script can catch and a card is the part a person has to read.</p>
+  <h3 id="one-rule-is-written-twice-on-purpose-and">One rule is written twice on purpose, and says where the other copy is</h3>
+  <p>The cycle rule is also in the command-line tool, and this copy exists because the failure it prevents lands at boot: a loop resolves to nothing at start-up, so the application comes up broken rather than failing to build, and a check that runs at review time runs after the damage. The header names the tool's own file as the single home of the rule, with the instruction that a change is made there first and here second, in the same change.</p>
+  <h3 id="what-the-tests-subject-refuses-and-what-">What the tests subject refuses, and what it only warns about</h3>
+  <p>A journey assertion whose host pattern could match inside a longer address is refused, because a pattern loose enough to match inside a string is a check that cannot fail — one agreed a browser was home while the screen was still a vendor's consent page. An assertion with nothing explaining an absence is refused for the same reason. The coverage findings warn instead, and under-report on purpose, because the model behind them belongs to an open argument and a refusal on an unsettled rule teaches people to work around the gate.</p>
+  <h3 id="adding-a-stack">Adding a stack</h3>
+  <p>Add a folder named for the stack, with a skills half for what a skill loads and a scripts half for what a gate imports, mirroring the folders those gates already have. No gate changes, and a listing of this folder is the coverage.</p>
+</section>
+
+<!-- 04 -->
+<section id="s4">
+  <div class="sds-section-head"><h2>Boundary</h2></div>
+  <p>This page answers what this domain's provider contributes and how it is arranged. It does not answer what a provider is — the two halves, the naming mirror, the rule that a gate never names an instance, and the line between what a provider states and what it does are <a href="../../01-devex/constructs/07-providers-construct.html">The Provider</a>. It does not answer what a step file says either.</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <tbody>
+      <tr><td>both halves for the stacks this domain serves, the subjects, and the private rules behind each door</td><td>the shape itself, the resolution rule, and the <em>only the halves you have</em> rule</td><td><a href="../../01-devex/constructs/07-providers-construct.html">The Provider</a></td></tr>
+      <tr><td>the parse, the verdict order and the isolation of a rule that throws</td><td>the gate that resolves into this folder, and the process it runs in</td><td><a href="./04-scripts-construct.html">Scripts</a> · <a href="./02-hooks-construct.html">Hooks</a></td></tr>
+      <tr><td>the procedure a skill loads in this stack</td><td>which skills exist, what each one is for, and the order they name</td><td><a href="./03-skills-construct.html">Skills</a></td></tr>
+      <tr><td>that a stack entry stating what is <em>true</em> is not a procedure</td><td>those entries, and the domain folder holding them</td><td><a href="./05-refs-construct.html">Refs</a></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 05 -->
+<section id="s5">
+  <div class="sds-section-head"><h2>Binds</h2></div>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <tbody>
+      <tr><td><code>RD.DEVEX.WORKSPACE.176</code></td><td>a repository answers to the world it declares, which is what makes its manifest the one place a stack is read from</td><td>MUST</td></tr>
+      <tr><td><code>RD.DEVEX.AGENT.025</code></td><td>a folder per skill value and a value per folder, so a provider folder carries material and never a skill of its own</td><td>MUST</td></tr>
+      <tr><td><code>RD.DEVEX.FUNCTION.035</code></td><td>a rule reaches a write-time hook only where review would be too late, which is why the cycle rule is here as well as in the command-line tool</td><td>MUST</td></tr>
+      <tr><td><code>RD.PLATFORM.CORE.033</code></td><td>the enablement grammar the source subject's refusals are written against</td><td>MUST</td></tr>
+    </tbody>
+  </table></div>
+  <p>Try it: <code>node packages/plugin-spn-apps/tests/run.mjs</code></p>
+</section>
+
+
+
+</div>
+</div>
+
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.js"></script>

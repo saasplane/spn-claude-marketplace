@@ -11,7 +11,12 @@
 //   <repo>/docs/                                     a repository's docs tree
 //     01-purpose/ … 05-guides/                       the five seats, numbered in reading order
 //     registers/decisions.md                         the pocket holding the repository's own rules
-//     artifacts/{overviews,constructs,reports}/      the pocket holding what a node produced
+//     artifacts/                                     the pocket holding what a node produced
+//       index.html                                   the index of artifacts
+//       docs/concept-overview.html                   the hub, and each overview that belongs to no one domain
+//       docs/<domain>/<name>-overview.html           a domain's overviews, in the folder named as its seat folder
+//       docs/<domain>/constructs/<x>-construct.html  the domain's construct pages
+//       guides/ · reports/                           the guide pages, and the reports somebody asked for
 //   <workspace>/.spndevex/workstreams/<state>/<NNN-subject>/
 //                                                    a workstream, its approach page and its arcs
 //
@@ -43,9 +48,14 @@ export const SEATS: readonly string[] = Object.values(SEAT);
 export const POCKET = { registers: "registers", artifacts: "artifacts" } as const;
 export type Pocket = keyof typeof POCKET;
 
-/** The artifacts pocket's folder set, which is fixed (05-artifacts.md § What the pocket holds). */
-export const ARTIFACT = { overviews: "overviews", constructs: "constructs", guides: "guides", reports: "reports" } as const;
+/**
+ * The artifacts pocket's folder set, which is fixed (05-artifacts.md § What the pocket holds). The
+ * index of artifacts sits beside the three, directly in the pocket.
+ */
+export const ARTIFACT = { docs: "docs", guides: "guides", reports: "reports" } as const;
 export const ARTIFACT_FOLDERS: readonly string[] = Object.values(ARTIFACT);
+/** The folder of a domain that holds its construct pages, beside the domain's overviews. */
+export const CONSTRUCT_PAGES = "constructs";
 
 /** The one folder a seat may hold that is not documents (03-tree.md § A seat may carry `templates/`). */
 export const TEMPLATES = "templates";
@@ -56,11 +66,13 @@ export const FACE = "README.md";
 export const DECISIONS = "decisions.md";
 /** What a construct page's file name ends in, beside the seat file's stem. */
 export const CONSTRUCT_PAGE_SUFFIX = "-construct.html";
+/** What an overview's file name ends in. */
+export const OVERVIEW_PAGE_SUFFIX = "-overview.html";
 /** What a guide page's file name ends in. */
 export const GUIDE_PAGE_SUFFIX = "-guide.html";
 /** The index of artifacts: one per repository, directly in the pocket. */
 export const ARTIFACT_INDEX = "index.html";
-/** The hub: one per repository, the entry point of the overviews. */
+/** The hub: one per repository, the entry point of the overviews, directly in the pocket's `docs` folder. */
 export const HUB = "concept-overview.html";
 
 /** Forward slashes, whatever the platform wrote. */
@@ -81,25 +93,37 @@ export function registersDir(docs: string): string { return pocketDir(docs, "reg
 /** The decision log, `<docs>/registers/decisions.md`. */
 export function decisionsRegister(docs: string): string { return join(registersDir(docs), DECISIONS); }
 export function artifactsDir(docs: string): string { return pocketDir(docs, "artifacts"); }
-export function overviewsDir(docs: string): string { return join(artifactsDir(docs), ARTIFACT.overviews); }
-/** Where construct pages sit: the pocket folder that mirrors the constructs seat folder for folder. */
-export function constructPagesDir(docs: string): string { return join(artifactsDir(docs), ARTIFACT.constructs); }
+/** The pocket's `docs` folder: the hub, and one folder for each domain or subdomain. */
+export function artifactDocsDir(docs: string): string { return join(artifactsDir(docs), ARTIFACT.docs); }
+/** Where a domain's construct pages sit, from the domain's folder in the pocket. */
+export function domainConstructsDir(domainFolder: string): string { return join(domainFolder, CONSTRUCT_PAGES); }
 export function reportsDir(docs: string): string { return join(artifactsDir(docs), ARTIFACT.reports); }
 /** Where guide pages sit: the pocket folder that holds each guide produced as a page. */
 export function guidePagesDir(docs: string): string { return join(artifactsDir(docs), ARTIFACT.guides); }
 /** The index of artifacts of a docs tree. */
 export function artifactIndex(docs: string): string { return join(artifactsDir(docs), ARTIFACT_INDEX); }
 /** The hub page of a docs tree. */
-export function hubPage(docs: string): string { return join(overviewsDir(docs), HUB); }
+export function hubPage(docs: string): string { return join(artifactDocsDir(docs), HUB); }
 /**
- * The folder a file sits in directly under a docs tree's artifacts pocket — `overviews` for
- * `<repo>/docs/artifacts/overviews/01-x/a.html` — or `null` where the file is not inside a folder of
+ * The folder a file sits in directly under a docs tree's artifacts pocket — `reports` for
+ * `<repo>/docs/artifacts/reports/2026/a.html` — or `null` where the file is not inside a folder of
  * that pocket. A check compares it with `ARTIFACT_FOLDERS`, because the pocket's folder set is fixed.
  */
 export function artifactFolderOf(path: string): string | null {
   const parts = slashes(path).split("/");
   for (let at = 0; at + 3 < parts.length; at += 1)
     if (parts[at] === DOCS && parts[at + 1] === POCKET.artifacts) return parts[at + 2] || null;
+  return null;
+}
+
+/**
+ * The path of a file under the pocket's `docs` folder, one part for each folder and the file's name
+ * last — `["01-x", "constructs", "a-construct.html"]` — or `null` where the file is not under it.
+ */
+export function artifactDocsPathOf(path: string): string[] | null {
+  const parts = slashes(path).split("/");
+  for (let at = 0; at + 3 < parts.length; at += 1)
+    if (parts[at] === DOCS && parts[at + 1] === POCKET.artifacts && parts[at + 2] === ARTIFACT.docs) return parts.slice(at + 3);
   return null;
 }
 
@@ -141,30 +165,81 @@ export function isSeatFile(path: string): boolean {
   return inSeat(norm, "constructs") && norm.endsWith(".md") && !norm.endsWith(`/${FACE}`);
 }
 
-/** The construct page a seat file is produced as (05-artifacts.md § What the pocket holds). */
+/**
+ * The folder of a domain in the pocket, from its seat folder: `<docs>/02-constructs/01-x/02-y` gives
+ * `<docs>/artifacts/docs/01-x/02-y`. The constructs seat itself gives the pocket's `docs` folder.
+ * Null where the folder is not in the constructs seat.
+ */
+export function domainDirOf(seatFolder: string): string | null {
+  const split = splitAtSeat(`${slashes(seatFolder).replace(/\/+$/, "")}/`, "constructs");
+  if (!split) return null;
+  return [split.docs, POCKET.artifacts, ARTIFACT.docs, ...split.rel.split("/").filter(Boolean)].join("/");
+}
+
+/**
+ * The construct page a seat file is produced as (05-artifacts.md § What the pocket holds):
+ * `<docs>/02-constructs/01-x/a.md` gives `<docs>/artifacts/docs/01-x/constructs/a-construct.html`.
+ */
 export function producedPageOf(seatFile: string): string {
-  return slashes(seatFile)
-    .replace(segment(SEAT.constructs), segment(`${POCKET.artifacts}/${ARTIFACT.constructs}`))
-    .replace(/\.md$/, CONSTRUCT_PAGE_SUFFIX);
+  const norm = slashes(seatFile);
+  const page = norm.replace(/\.md$/, CONSTRUCT_PAGE_SUFFIX);
+  const domain = domainDirOf(norm.slice(0, norm.lastIndexOf("/")));
+  return domain === null ? page : `${domainConstructsDir(domain)}/${page.slice(page.lastIndexOf("/") + 1)}`;
 }
 
-/** A construct page: an `…-construct.html` in the pocket folder that mirrors the constructs seat. */
+/**
+ * A construct page: an `…-construct.html` in a folder named `constructs`, under the pocket's `docs`
+ * folder.
+ */
 export function isProducedPage(path: string): boolean {
-  const norm = slashes(path);
-  return norm.includes(segment(`${POCKET.artifacts}/${ARTIFACT.constructs}`)) && norm.endsWith(CONSTRUCT_PAGE_SUFFIX);
+  const inside = artifactDocsPathOf(path);
+  return inside !== null && inside.at(-2) === CONSTRUCT_PAGES && slashes(path).endsWith(CONSTRUCT_PAGE_SUFFIX);
 }
 
-/** The seat file a construct page is produced from, found by path alone. */
+/**
+ * The seat file a construct page is produced from, found by path alone. A path that is no construct
+ * page is given back as it is.
+ */
 export function seatOf(producedPage: string): string {
-  return slashes(producedPage)
-    .replace(segment(`${POCKET.artifacts}/${ARTIFACT.constructs}`), segment(SEAT.constructs))
-    .replace(new RegExp(`${CONSTRUCT_PAGE_SUFFIX.replace(/[.]/g, "\\.")}$`), ".md");
+  const norm = slashes(producedPage);
+  const inside = artifactDocsPathOf(norm);
+  if (inside === null || !isProducedPage(norm)) return norm;
+  const docs = norm.slice(0, norm.length - [POCKET.artifacts, ARTIFACT.docs, ...inside].join("/").length - 1);
+  const name = inside.at(-1)!.slice(0, -CONSTRUCT_PAGE_SUFFIX.length);
+  return [docs, SEAT.constructs, ...inside.slice(0, -2), `${name}.md`].join("/");
 }
 
-/** An overview page: an `.html` in the pocket's `overviews/`. */
+/**
+ * An overview page: an `…-overview.html` under the pocket's `docs` folder, in no folder named
+ * `constructs`. The hub is one.
+ */
 export function isOverview(path: string): boolean {
+  const inside = artifactDocsPathOf(path);
+  return inside !== null && !inside.slice(0, -1).includes(CONSTRUCT_PAGES) && slashes(path).endsWith(OVERVIEW_PAGE_SUFFIX);
+}
+
+/**
+ * Where a page belongs when its file name says it is an overview or a construct page and it sits
+ * somewhere else in the artifacts pocket. The answer is the path a message names, from the
+ * repository's root, with `<domain>` standing for a folder the path alone cannot give. Null for a page
+ * that sits in its place, and for a file of any other kind.
+ */
+export function pagePlaceOf(path: string): string | null {
   const norm = slashes(path);
-  return norm.includes(segment(`${POCKET.artifacts}/${ARTIFACT.overviews}`)) && norm.endsWith(".html");
+  const folder = artifactFolderOf(norm);
+  if (folder === null) return null;
+  const pocketDocs = [DOCS, POCKET.artifacts, ARTIFACT.docs].join("/");
+  const name = norm.slice(norm.lastIndexOf("/") + 1);
+  if (name.endsWith(OVERVIEW_PAGE_SUFFIX)) {
+    if (isOverview(norm)) return null;
+    return name === HUB ? `${pocketDocs}/${name}` : `${pocketDocs}/${name} beside the hub, or ${pocketDocs}/<domain>/${name}`;
+  }
+  if (!name.endsWith(CONSTRUCT_PAGE_SUFFIX) || isProducedPage(norm)) return null;
+  // The folders between the pocket's folder and the page name the domain in two places: directly in the
+  // pocket under a folder named `constructs`, and beside a domain's overviews.
+  const below = norm.slice(norm.lastIndexOf(segment(`${POCKET.artifacts}/${folder}`))).split("/").slice(3, -1);
+  const named = below.length > 0 && !below.includes(CONSTRUCT_PAGES) && (folder === CONSTRUCT_PAGES || folder === ARTIFACT.docs);
+  return `${pocketDocs}/${named ? below.join("/") : "<domain>"}/${CONSTRUCT_PAGES}/${name}`;
 }
 
 /** A register: a `.md` in the registers pocket that is not its face. */

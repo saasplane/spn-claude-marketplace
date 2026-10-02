@@ -1,0 +1,157 @@
+<meta charset="utf-8">
+<title>Skills — The Commands an Apps Repository Answers To</title>
+<!-- spn:doc
+{"id":"stack-skills","variant":"construct","title":"Skills — The Commands an Apps Repository Answers To","subtitle":"The commands an apps repository can be asked to run, one folder each.","lenses":["SERVER_DEV","WEB_DEV"],"status":"PLANNING","dependsOn":["skill-set"],"summary":"A skill belongs to this domain when it describes work on a piece of an apps repository — scaffolding a project, building a capability, running the suites, proving a package, or publishing the repository.","keywords":["skill","steps","mode","classification","stage","absence"]}
+-->
+<!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.css">
+<div class="sds-page">
+
+<nav class="sds-rail" id="rail">
+  <a class="sds-home" href="../apps-overview.html">&larr; spn-apps — The TypeScript Stack Domain</a>
+  <div class="sds-rail-title">Skills — The Commands an Apps Repository Answers To</div>
+</nav>
+<div class="sds-wrap">
+
+<header class="sds-masthead">
+  <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Skills — The Commands an Apps Repository Answers To</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Backend developer</span><span class="sds-badge sds-lens">Web developer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>Skills — The Commands an Apps Repository Answers To</h1>
+  <p class="sds-subtitle">The commands an apps repository can be asked to run, one folder each.</p>
+  <p class="sds-standfirst">A skill belongs to this domain when it describes work on a piece of an apps repository — scaffolding a project, building a capability, running the suites, proving a package, or publishing the repository. Read this page before you add a new skill here, or when you want to know why one is missing. It explains why the longest skills read their steps from elsewhere, why a mode is an argument rather than a second folder, and which skill is deliberately absent.</p>
+</header>
+
+<!-- 00 -->
+<section id="s0">
+  <div class="sds-section-head"><h2>Overview</h2></div>
+  <p>Each of those is a different walk, and each lives in one folder under this plugin's <code>skills/</code>.</p>
+  <p>The thing to check first is that <strong>a skill here names no stack</strong>. The steps of a build differ in every language, so the skill states the order and reads the step files from the provider the node's own <code>sprepo.json</code> declares. The second thing is the absence: <strong>planning is not a skill of this domain.</strong> The book's skill set is closed and folded planning into a stack-agnostic skill, so shipping one here would add a value the standard does not have, and two skills would then compete for the same ask.</p>
+  <p>This construct realizes the book's <code>01-devex/02-agent/02-skills</code>.</p>
+</section>
+
+<!-- 01 -->
+<section id="s1">
+  <div class="sds-section-head"><h2>Terms</h2></div>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <tbody>
+      <tr><td>a skill</td><td><code>SKILL.md</code></td><td>one folder under this plugin's <code>skills/</code>, named for a command of the group this domain answers to</td></tr>
+      <tr><td>the value</td><td><code>APPS_{SKILL}</code></td><td>the name the enum carries for that folder, its domain prefix derived from the plugin's own claim</td></tr>
+      <tr><td>the stage</td><td><code>RD.DEVEX.AGENT.017</code></td><td>the one stage a skill serves, which is what makes the applicable standards derivable from the skill that was invoked</td></tr>
+      <tr><td>a mode</td><td>—</td><td>an argument a skill's own description names, so one folder answers several close asks</td></tr>
+      <tr><td>a step</td><td><code>steps/</code></td><td>one file of a longer walk, read only when the skill's own router names it</td></tr>
+      <tr><td>the classification</td><td>—</td><td>the first thing the router does: deciding which layers an ask actually touches</td></tr>
+      <tr><td>the closing gate</td><td>—</td><td>the review a skill hands its own work to, named in its description so the hand-off happens without being asked for</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 02 -->
+<section id="s2">
+  <div class="sds-section-head"><h2>Model</h2></div>
+  <p>The ask is matched to a skill, the skill is narrowed by a mode, and the longest skill sequences steps it reads from the provider for the node's own stack.</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="423 22 254 466" style="max-width:254px" role="img" aria-label="The skill names the step and its order; the provider holds the file, so the walk is concrete without the skill naming a stack.">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="sds-box" x="425" y="24" width="250" height="95" rx="3"/>
+    <text class="sds-label" x="441" y="50">the ask</text>
+    <text class="sds-note" x="441" y="69">build, scaffold, run, prove,</text>
+    <text class="sds-note" x="441" y="88">review, publish — in your own</text>
+    <text class="sds-note" x="441" y="107">words</text>
+    <path class="sds-connector" d="M550 119 V159" marker-end="url(#ar)"/>
+    <text class="sds-note" x="560" y="143">matched to</text>
+    <rect class="sds-box" x="425" y="159" width="250" height="76" rx="3"/>
+    <text class="sds-label" x="441" y="185">the skill</text>
+    <text class="sds-note" x="441" y="204">one folder under skills/, chosen</text>
+    <text class="sds-note" x="441" y="223">by its own description</text>
+    <path class="sds-connector" d="M550 235 V275" marker-end="url(#ar)"/>
+    <text class="sds-note" x="560" y="259">narrowed by</text>
+    <rect class="sds-box" x="425" y="275" width="250" height="76" rx="3"/>
+    <text class="sds-label" x="441" y="301">the mode</text>
+    <text class="sds-note" x="441" y="320">an argument the description names,</text>
+    <text class="sds-note" x="441" y="339">never a second skill</text>
+    <path class="sds-connector" d="M550 351 V391" marker-end="url(#ar)"/>
+    <text class="sds-note" x="560" y="375">sequences</text>
+    <rect class="sds-box" x="425" y="391" width="250" height="95" rx="3"/>
+    <text class="sds-label" x="441" y="417">the steps</text>
+    <text class="sds-note" x="441" y="436">named and ordered here, read from</text>
+    <text class="sds-note" x="441" y="455">the provider for the declared</text>
+    <text class="sds-note" x="441" y="474">stack</text>
+  </svg>
+    <figcaption>The skill names the step and its order; the provider holds the file, so the walk is concrete without the skill naming a stack.</figcaption>
+  </figure>
+  <!-- dg:source
+{ "kind": "map",
+  "caption": "The skill names the step and its order; the provider holds the file, so the walk is concrete without the skill naming a stack.",
+  "boxes": [
+    { "id": "a", "label": "the ask", "note": "build, scaffold, run, prove, review, publish — in your own words" },
+    { "id": "b", "label": "the skill", "note": "one folder under skills/, chosen by its own description" },
+    { "id": "c", "label": "the mode", "note": "an argument the description names, never a second skill" },
+    { "id": "d", "label": "the steps", "note": "named and ordered here, read from the provider for the declared stack" }
+  ],
+  "links": [
+    { "from": "a", "to": "b", "label": "matched to" },
+    { "from": "b", "to": "c", "label": "narrowed by" },
+    { "from": "c", "to": "d", "label": "sequences" }
+  ] }
+  -->
+</section>
+
+<!-- 03 -->
+<section id="s3">
+  <div class="sds-section-head"><h2>Parts</h2></div>
+  <h3 id="one-skill-divides-into-steps-and-the-ord">One skill divides into steps, and the order is the rule</h3>
+  <p>The contract comes first, and everything downstream is generated from it or written against it. A service written before its state is a service that will be rewritten. So the build skill is the only folder here that sequences steps at all, the order is fixed, and each step is read before that layer's code is written rather than after.</p>
+  <h3 id="the-skill-names-the-step-the-provider-ho">The skill names the step; the provider holds it</h3>
+  <p>A step file is written in a language, so it cannot live in a skill that serves every stack this domain may grow. The skill states the step names, their order and what each one settles, and composes the path <code>providers/{stack}/skills/implement/steps/{step}.md</code> from the nearest <code>sprepo.json</code>. A step file the declared stack does not ship is a step that stack does not walk, and nothing here stubs one.</p>
+  <h3 id="the-router-classifies-before-it-sequence">The router classifies before it sequences</h3>
+  <p>The build skill first decides whether the ask touches the back end alone, the front end alone, or both, and that classification decides which steps apply. Sequencing every step for every ask would make the smallest change cost the largest walk.</p>
+  <h3 id="a-mode-is-an-argument-not-a-second-folde">A mode is an argument, not a second folder</h3>
+  <p>Two folders with almost the same description compete for the same match, and the matching gets worse as the pair grows. So a skill answering several close asks takes a mode, names its modes in the sentence a session matches against, and says which neighbouring skill an adjacent ask belongs to instead. A destructive mode says it is destructive in that same sentence rather than in the body it loads afterwards.</p>
+  <h3 id="each-skill-declares-the-one-stage-it-ser">Each skill declares the one stage it serves</h3>
+  <p>A skill and a stage are separate closed sets mapped many to one, and the mapping is what makes <em>which standards apply to this request</em> derivable from the skill that was invoked. Scaffolding answers to the repository stage, proving answers to the test stage, and the build loop's skills answer to the develop stage. Flattening them derives nothing.</p>
+  <h3 id="a-skill-carries-a-stamp-so-a-chapter-it-">A skill carries a stamp, so a chapter it fell behind can say so</h3>
+  <p>A skill is prose the agent loads, and prose drifts from the book silently because nothing compares it. Every skill here opens with a block naming the chapters it restates and the hash last read from each, so a drift run reads a skill exactly as it reads a ref.</p>
+  <h3 id="the-closing-gate-belongs-to-the-skill">The closing gate belongs to the skill</h3>
+  <p>A contract change reviewed at the end of a session is reviewed by the context that wrote it. So the build skill closes with the suites and then hands the change to the review skill in its contract mode, and the hand-off is named in the description, so it happens even when nobody asks for it.</p>
+  <h3 id="the-absent-skill-and-where-its-material-">The absent skill, and where its material lives</h3>
+  <p>Deciding what a node is belongs to a skill that is the same in every world, and it lives once in the core plugin. What this plugin supplies is the part of that walk only a stack can answer, and it sits under the provider for that stack rather than under <code>skills/</code>.</p>
+</section>
+
+<!-- 04 -->
+<section id="s4">
+  <div class="sds-section-head"><h2>Boundary</h2></div>
+  <p>This page answers which skills this domain ships and how they are shaped. It does not answer what a skill is — the frontmatter, the matching against a listing, and the rule that a skill carries steps and never a rule of its own are <a href="../../01-devex/constructs/04-skills-construct.html">The Skill</a>. It does not answer what any step file says either.</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <tbody>
+      <tr><td>the skills this domain answers to, the step order behind the longest of them, and the modes each one takes</td><td>the frontmatter, the listing, the matching and the step mechanism</td><td><a href="../../01-devex/constructs/04-skills-construct.html">The Skill</a></td></tr>
+      <tr><td>that a skill names a step and never a stack</td><td>the step files themselves, and which stack ships which of them</td><td><a href="./06-providers-construct.html">Providers</a></td></tr>
+      <tr><td>that deciding what a node is belongs to a skill this plugin does not ship</td><td>that skill, and the walk it runs</td><td><a href="../../01-devex/constructs/04-skills-construct.html">The Skill</a></td></tr>
+      <tr><td>that a skill hands its own work to a review at its close</td><td>what that review checks, and which viewpoint it convenes</td><td><a href="../../01-devex/constructs/03-agents-construct.html">Agents</a></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 05 -->
+<section id="s5">
+  <div class="sds-section-head"><h2>Binds</h2></div>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <tbody>
+      <tr><td><code>RD.DEVEX.AGENT.025</code></td><td>one folder per skill value and one value per folder, the prefix derived from the shipping plugin's own claim</td><td>MUST</td></tr>
+      <tr><td><code>RD.DEVEX.AGENT.017</code></td><td>each skill declares the one stage it serves, so the standards that apply are derivable from the skill</td><td>MUST</td></tr>
+      <tr><td><code>RD.DEVEX.FUNCTION.062</code></td><td>planning folds into a stack-agnostic skill, which is why this domain ships none</td><td>MUST</td></tr>
+      <tr><td><code>RD.DEVEX.WORKSPACE.118</code></td><td>a skill that carries a rule it does not own is a restatement, and says so under a stamp</td><td>MUST</td></tr>
+      <tr><td>the foundation's <code>02-delivery.md</code> § When an edit becomes behaviour</td><td>a skill edit is loadable only after an install and a fresh window</td><td>MUST</td></tr>
+    </tbody>
+  </table></div>
+  <p>Try it: <code>node packages/plugin-spn-devex/src/dist/cli.mjs restates check</code> (or <code>spn-devex restates check</code>, once installed)</p>
+</section>
+
+
+
+</div>
+</div>
+
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.js"></script>

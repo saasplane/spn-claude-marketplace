@@ -20,9 +20,10 @@ import { masthead, type MastheadKind } from "../../checks/doc-check.ts";
 import { filesUnder as proseFilesUnder, paragraphs as proseParagraphs, score as proseScore } from "./prose.ts";
 
 import { withOffset } from "../../lib/clock.ts";
-import { GUIDE_PAGE_SUFFIX, ARTIFACT_FOLDERS, ARTIFACT_INDEX, DEVEX_WORKSTREAMS, DOCS, FACE, POCKET, SEAT, SEATS, TEMPLATES, artifactFolderOf,
-  behaviorsDir, bookTemplatesDir, capabilitiesDir, constructsDir, docsOf, inSeat, inTemplates, isProducedPage, mirrorPath,
-  overviewsDir, producedPageOf, seatOf, splitAtSeat, workstreamDirOf } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { GUIDE_PAGE_SUFFIX, ARTIFACT_FOLDERS, ARTIFACT_INDEX, DEVEX_WORKSTREAMS, DOCS, FACE, HUB, POCKET, SEAT, SEATS, TEMPLATES,
+  artifactDocsDir, artifactFolderOf, behaviorsDir, bookTemplatesDir, capabilitiesDir, constructsDir, docsOf, inSeat, inTemplates,
+  isOverview, isProducedPage, mirrorPath, pagePlaceOf, producedPageOf, seatOf, splitAtSeat,
+  workstreamDirOf } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, PAGE_SCRIPT, SERVED_FILES, STYLESHEET, cutVersions, linksSharedStyles,
   stylesDir, BUNDLED_SUFFIX } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 export type Grade = "RULE" | "SOFT";
@@ -262,13 +263,18 @@ export function checkBlock(file: string, src: string, block: any, err: string | 
   if (variant === "approach" && /(^|\/)docs\//.test(file.replace(/\\/g, "/")))
     add("RULE", `an approach page belongs to the workstream that argues it, never to a repository's \`docs/\` — move it under \`${DEVEX_WORKSTREAMS}/\``);
 
-  // THE POCKET'S FOLDER SET IS FIXED: OVERVIEWS, CONSTRUCTS, GUIDES, REPORTS AND NOTHING ELSE
-  // (05-artifacts.md § What the pocket holds). A file in any other folder of the pocket is a file
-  // some seat needs, so it is a seat depending on a pocket, which is the one thing the pocket rule
-  // forbids. A fact a seat needs lives in a seat.
+  // THE POCKET'S FOLDER SET IS FIXED: DOCS, GUIDES, REPORTS AND NOTHING ELSE (05-artifacts.md § What
+  // the pocket holds). A file in any other folder of the pocket is a file some seat needs, and a fact
+  // a seat needs lives in a seat. An overview or a construct page out of its place is told its place.
   const pocketFolder = artifactFolderOf(file);
+  const belongs = pagePlaceOf(file);
+  const pocketSet = ARTIFACT_FOLDERS.map((folder) => `\`${folder}/\``).join(", ").replace(/, ([^,]*)$/, " and $1");
   if (pocketFolder !== null && !ARTIFACT_FOLDERS.includes(pocketFolder))
-    add("RULE", `the pocket holds ${ARTIFACT_FOLDERS.map((folder) => `\`${folder}/\``).join(", ").replace(/, ([^,]*)$/, " and $1")} — a fact a seat needs lives in a seat, never in \`${pocketFolder}/\``);
+    add("RULE", belongs === null
+      ? `the pocket holds ${pocketSet} — a fact a seat needs lives in a seat, never in \`${pocketFolder}/\``
+      : `the pocket holds ${pocketSet}, and no \`${pocketFolder}/\` — this page belongs at ${belongs}`);
+  else if (belongs !== null)
+    add("RULE", `this page is out of its place in \`${pocketFolder}/\` — it belongs at ${belongs}`);
 
   // BESIDE ITS FOLDERS THE POCKET HOLDS ITS FACE AND ONE PAGE, THE INDEX. Every other page sits in
   // the folder of its kind, and the index sits nowhere but directly in the pocket.
@@ -737,7 +743,7 @@ export function checkHeader(file: string, src: string, block: any): Finding[] {
   // The masthead's three levels, from the one check the doc-check hook runs too, so the page an
   // author saves and the page `docs audit` reads are judged by the same rule. The kind is the
   // block's variant; a hub is the overview named `concept-overview.html`.
-  const kind: MastheadKind | null = basename(file) === "concept-overview.html" ? "hub"
+  const kind: MastheadKind | null = basename(file) === HUB ? "hub"
     : ["overview", "construct", "report", "approach", "preview"].includes(block.variant) ? block.variant : null;
   for (const [grade, message] of masthead(file, src, kind))
     f.push({ check: "masthead", grade: grade as Grade, file, message });
@@ -1370,7 +1376,7 @@ export function checkProduced(file: string, src: string, block: any, workspace: 
   // A page that links no shared stylesheet is named once, by the furniture check, and `docs page`
   // is what moves it. Comparing it here would say the same thing a second time.
   if (holdsOwnCopy(file, src)) return [];
-  // The pocket mirrors the seat folder for folder, so the pair is found by path alone.
+  // A domain's folder in the pocket is named as its seat folder, so the pair is found by path alone.
   const seat = seatOf(file);
   if (seat === file || !existsSync(seat))
     return [{ check: "produced", grade: "SOFT", file, message: "no seat file sits at the mirrored path, so this page cannot be compared with what it would be produced from" }];
@@ -1799,13 +1805,15 @@ export function overviewForDomain(domainDir: string): string | null {
   if (!existsSync(face)) return null;
   const title = readBlock(readFileSync(face, "utf8")).block?.title;
   if (!title) return null;
-  const overviews = overviewsDir(split.docs);
-  if (!existsSync(overviews)) return null;
-  for (const f of readdirSync(overviews).filter((x) => x.endsWith(".html")).sort()) {
-    const full = join(overviews, f);
-    if (readBlock(readFileSync(full, "utf8")).block?.title === title) return full;
-  }
-  return null;
+  return overviewPages(split.docs).find((page) => readBlock(readFileSync(page, "utf8")).block?.title === title) ?? null;
+}
+
+/**
+ * Every overview of a docs tree, in the order of its path: the hub and each overview beside it, and
+ * the overviews of each domain's folder. A bundled copy ends in another suffix, so it is not one.
+ */
+export function overviewPages(docs: string): string[] {
+  return walkFiles(artifactDocsDir(docs), isOverview).sort();
 }
 
 /** The same glossary, as the domain's overview carries it (Q226 `A`). */
@@ -1813,7 +1821,16 @@ export function buildGlossaryHtml(domainDir: string, overviewFile: string): { bo
   const { rows, findings } = glossaryRows(domainDir);
   const esc = (x: string) => x.replace(/&(?![a-zA-Z#][a-zA-Z0-9]*;)/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   // `\|` is markdown's way to keep a pipe inside a cell; HTML has no such need, so the pipe is bare.
-  const cell = (x: string) => esc(x.replace(/\\\|/g, "|")).replace(/`([^`]*)`/g, "<code>$1</code>");
+  // A LINK IN A TERM'S MEANING IS WRITTEN FOR THE SEAT FILE'S OWN FOLDER. The overview sits elsewhere,
+  // so the link is written as an anchor whose address is expressed again from the overview's folder. A
+  // hosted address and a link inside the page are kept as they are.
+  const linked = (text: string, seat: string): string => text.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_all, label: string, target: string) => {
+    if (/^(?:[a-z][a-z0-9+.-]*:|#|\/)/i.test(target)) return `<a href="${target}">${label}</a>`;
+    const [path, fragment] = target.split("#");
+    const address = relative(dirname(overviewFile), resolve(dirname(seat), path)).replace(/\\/g, "/");
+    return `<a href="${address}${fragment === undefined ? "" : `#${fragment}`}">${label}</a>`;
+  });
+  const cell = (x: string, seat: string) => linked(esc(x.replace(/\\\|/g, "|")).replace(/`([^`]*)`/g, "<code>$1</code>"), seat);
   const out = [
     '  <div class="sds-scroll"><table class="sds-glossary">',
     "    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>",
@@ -1824,7 +1841,7 @@ export function buildGlossaryHtml(domainDir: string, overviewFile: string): { bo
     if (r.group !== group) { out.push(`      <tr class="sds-group"><td colspan="3">${esc(r.group)}</td></tr>`); group = r.group; }
     const href = relative(dirname(overviewFile), pageForSeat(r.file));
     const term = r.term && r.term !== "—" ? `<a href="${href}">${esc(r.term)}</a>` : esc(r.term);
-    out.push(`      <tr><td>${term}</td><td>${cell(r.contract)}</td><td>${cell(r.means)}</td></tr>`);
+    out.push(`      <tr><td>${term}</td><td>${cell(r.contract, r.file)}</td><td>${cell(r.means, r.file)}</td></tr>`);
   }
   if (!rows.length) out.push('      <tr><td>&mdash;</td><td>&mdash;</td><td>no construct in this domain carries a <code>Terms</code> table yet</td></tr>');
   out.push("    </tbody>", "  </table></div>");
@@ -2477,11 +2494,10 @@ export function behaviourRows(file: string): BehaviourRow[] {
 /**
  * The page a construct returns to: its domain's overview (Q238).
  *
- * A DOMAIN AND ITS OVERVIEW SHARE ONE TITLE, AND THAT IS THE ONLY JOIN. The file is
- * `concept-devex-function-overview.html` in one repository and `concept-iam-overview.html` in
- * another — area in the name here, not there — so the path cannot be computed from the seat. Both
- * carry the block title `DevEx Function`, and that is stable because `face` writes the domain's own
- * README from the same concept section the overview borrows.
+ * A DOMAIN AND ITS OVERVIEW SHARE ONE TITLE, AND THAT IS THE ONLY JOIN. A domain's folder may hold
+ * two overviews, and an overview may sit beside the hub, so the path cannot be computed from the
+ * seat. The title is stable because `face` writes the domain's own README from the same concept
+ * section the overview borrows.
  *
  * NULL WHERE THE DOMAIN HAS NO OVERVIEW, which is nine domains today, and the caller then keeps the
  * constructs seat's face. A guess would be worse than the old link: it would name a page that is
@@ -2505,13 +2521,8 @@ export function overviewAbove(seat: string, out: string): { href: string; label:
   const title = block?.title;
   if (!title) return null;
 
-  const overviews = overviewsDir(split.docs);
-  if (!existsSync(overviews)) return null;
-  for (const f of readdirSync(overviews).filter((x) => x.endsWith(".html")).sort()) {
-    const b = readBlock(readFileSync(join(overviews, f), "utf8")).block;
-    if (b?.title === title) return { href: relative(dirname(out), join(overviews, f)), label: title };
-  }
-  return null;
+  const overview = overviewPages(split.docs).find((page) => readBlock(readFileSync(page, "utf8")).block?.title === title);
+  return overview === undefined ? null : { href: relative(dirname(out), overview), label: title };
 }
 
 export function pageFor(seat: string, workspace: string, templates: string, write: boolean): Finding[] {
@@ -2536,7 +2547,7 @@ export function pageFor(seat: string, workspace: string, templates: string, writ
   if (location === "—")
     findings.push({ check: "page", grade: "SOFT", file: seat, message: "no manifest above this file declares a `name`, so the header's location reads `—` (Q79 puts `name` on the manifests)" });
 
-  // The page sits beside its seat file, in the pocket that mirrors the seat folder for folder.
+  // The page sits in the `constructs` folder of its domain's folder in the pocket.
   // It is computed BEFORE rendering because the body's links are re-expressed against it: the seat
   // writes `platform-grants.md` for a sibling, and beside the page that sibling is
   // `platform-grants-construct.html`.

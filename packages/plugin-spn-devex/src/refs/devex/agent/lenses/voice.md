@@ -16,7 +16,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The masthead, and the opening",
-      "seen": "de892b27"
+      "seen": "25162f20"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",

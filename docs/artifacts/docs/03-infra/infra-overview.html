@@ -1,0 +1,181 @@
+<meta charset="utf-8">
+<title>spn-infra — The Estate Domain</title>
+<!-- spn:doc
+{
+  "id": "spn-claude-marketplace-infra-overview",
+  "variant": "overview",
+  "title": "spn-infra — The Estate Domain",
+  "lenses": [
+    "INFRA",
+    "ARCHITECT"
+  ],
+  "summary": "spn-infra is the plugin an estate repository loads, and this page reads it one folder at a time, around the one boundary every folder keeps.",
+  "keywords": [
+    "spn-infra",
+    "overview",
+    "estate",
+    "gate",
+    "cloud",
+    "provider",
+    "skills",
+    "refs"
+  ]
+}
+-->
+
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.css">
+<div class="sds-page">
+<nav class="sds-rail" id="rail">
+  <a class="sds-home" href="../concept-overview.html">&larr; the hub</a>
+  <div class="sds-rail-title">spn-infra — The Estate Domain</div>
+</nav>
+<div class="sds-wrap">
+<header class="sds-masthead">
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Marketplace &nbsp;|&nbsp; spn-infra — The Estate Domain</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Overview</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">DevOps / SRE</span><span class="sds-badge sds-lens">Architect</span></span></span></div>
+  <h1>Nothing in this plugin changes a cloud.</h1>
+  <p class="sds-subtitle">The one boundary every folder in this plugin keeps: nothing here touches a cloud directly.</p>
+  <p class="sds-standfirst">spn-infra is the plugin an estate repository loads, and this page reads it one folder at a time, around the one boundary every folder keeps. Read it before you add a rule about what an estate declaration may contain, or when you want to know what this plugin catches and what it leaves to the tool. It takes each folder in turn and sends you to the page that states it in full.</p>
+</header>
+
+<section id="s0">
+  <div class="sds-section-head"><h2>Overview</h2></div>
+  <p>An estate declaration says what infrastructure should exist, and some things must never appear in one: a credential, an account identifier a tool finds for itself, a cloud's own string outside the entry allowed to hold it. <code>spn-infra</code> catches those at the moment they are written, and explains the estate's words to a reader who may never open the book.</p>
+  <p>This page is for a DevOps engineer or an architect working in an estate repository, and for anyone about to add a rule or a cloud to this plugin. It assumes you know what a plugin is; if you do not, the <a href="../01-devex/devex-overview.html">spn-devex overview</a> comes first. After it you know where each estate rule is enforced, and what this plugin will never do for you.</p>
+  <p><strong>The one thing to unlearn is that an estate plugin operates the estate.</strong> It does not. The gate refuses a bad write, the cards explain the vocabulary, and each skill names the command that does the work through the tool's own doors. A cloud is changed only by that tool, never by this plugin and never by a hand-run apply. This plugin ships no agents, and it has no chapter for them.</p>
+  <p><strong>What you can decide after this page.</strong> Whether a rule you want is about the text of a declaration, and so belongs in the gate; whether it is the same on every cloud or belongs to one; and where its proof goes.</p>
+</section>
+
+<section id="s1">
+  <div class="sds-section-head"><h2>Plugin &mdash; spn-infra as a delivery unit</h2></div>
+  <p><code>spn-infra</code> is the folder that carries the estate standard into a session working on an estate: one manifest, one entry in the marketplace list, and the folders beneath it. Its version belongs to the set and moves with its two siblings whether or not anything here changed. Its description belongs to this plugin alone, and it is what a session matches against when it decides whether to load the plugin at all.</p>
+  <p><em>Decide here:</em> whether the description says enough for a session in an estate repository to load this plugin.</p>
+  <p><a class="sds-more" href="constructs/01-plugin-construct.html">Read Plugin &rarr;</a></p>
+</section>
+
+<section id="s2">
+  <div class="sds-section-head"><h2>Hooks &mdash; one moment, every write</h2></div>
+  <p>Every rule this plugin holds is about what a file contains, so the wiring is as narrow as the rules: the moment before a call writes or edits a file, and nothing else. That is the only moment that can still stop a write. An estate leak is cheap to catch while somebody writes it and expensive to find later, so this plugin claims that moment and no other.</p>
+  <p><em>Decide here:</em> whether a new estate rule can be checked from the text being written.</p>
+  <p><a class="sds-more" href="constructs/02-hooks-construct.html">Read Hooks &rarr;</a></p>
+</section>
+
+<section id="s3">
+  <div class="sds-section-head"><h2>Skills &mdash; the doors an estate is changed through</h2></div>
+  <p>An estate is changed by editing what it declares itself to be, then letting a tool render and apply that declaration. The skills cover that walk: starting a new piece, changing what the estate is, reviewing and running a rendering before anybody approves it, verifying, and releasing a finished piece. They share one boundary, and each one states it: no skill changes a cloud. Each names the command that does.</p>
+  <p><em>Decide here:</em> which request starts which walk, and which command each one hands the work to.</p>
+  <p><a class="sds-more" href="constructs/03-skills-construct.html">Read Skills &rarr;</a></p>
+</section>
+
+<section id="s4">
+  <div class="sds-section-head"><h2>Scripts &mdash; the write-time gate and what runs it</h2></div>
+  <p>The scripts tree is the catch. A dispatcher the wiring starts, a gate that works out which subjects have an opinion about the file, and a set of named rule bodies in <code>lib/</code>, each free of any cloud. Read the direction it fails in first: when the gate does not understand its input, it allows the call. A gate that refused everything it could not parse would deny far more than it knows about, and people would route around it.</p>
+  <p><em>Decide here:</em> whether a new rule is a rule body the gate asks, and whether it holds on every cloud.</p>
+  <p><a class="sds-more" href="constructs/04-scripts-construct.html">Read Scripts &rarr;</a></p>
+</section>
+
+<section id="s5">
+  <div class="sds-section-head"><h2>Refs &mdash; the estate's vocabulary, restated as cards</h2></div>
+  <p>An estate is declared in a small vocabulary where every word is exact: which file marks a node, which layer owns which act, how a resource name is built, what a declaration must never contain. A card restates one of those subjects in full, for a reader who may never open the book. A card is a ref, so it carries a stamp and adds no rule. Every value in it is grammar, never a real one: no organization's environment, region or account appears.</p>
+  <p><em>Decide here:</em> where to read an estate word before writing it, and what a card may never hold.</p>
+  <p><a class="sds-more" href="constructs/05-refs-construct.html">Read Refs &rarr;</a></p>
+</section>
+
+<section id="s6">
+  <div class="sds-section-head"><h2>Providers &mdash; one folder per cloud, scripts half only</h2></div>
+  <p>Everything that differs between clouds sits in <code>providers/</code>, one folder per cloud, so admitting the next cloud is adding a folder. Here each folder holds a scripts half and no skills half. A skills half is earned when the instance changes what an author writes, and a cloud does not: a declaration is provider-neutral, and every rendering is written against OpenTofu whichever cloud it reaches. So the rule is the domain's and the parsing is the provider's.</p>
+  <p><em>Decide here:</em> what a new cloud must bring, and why it brings no skills.</p>
+  <p><a class="sds-more" href="constructs/06-providers-construct.html">Read Providers &rarr;</a></p>
+</section>
+
+<section id="s7">
+  <div class="sds-section-head"><h2>Tests &mdash; the tier, the mirror, and a runner that walks</h2></div>
+  <p>A gate nobody proves is a gate nobody can trust to be narrow. The rules here are patterns over text somebody is about to write, and a pattern one character too wide refuses correct files until somebody turns the whole gate off. So each rule is proven against what it must refuse and against what it must let through. The tier comes first and the mirror second, so moving a source file moves its proof with it.</p>
+  <p><em>Decide here:</em> what a new rule must be proven against, and where that proof goes.</p>
+  <p><a class="sds-more" href="constructs/07-tests-construct.html">Read Tests &rarr;</a></p>
+</section>
+
+<section id="s8" data-block="glossary">
+  <div class="sds-section-head"><h2>Glossary</h2></div>
+  <p>Every term this domain declares, grouped by the construct that declares it.</p>
+  <!-- spn:generated glossary-html — do not edit inside these markers; `docs.ts face` writes it -->
+  <div class="sds-scroll"><table class="sds-glossary">
+    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <tbody>
+      <tr class="sds-group"><td colspan="3">Plugin</td></tr>
+      <tr><td><a href="constructs/01-plugin-construct.html">an INFRA repository</a></td><td><code>sprepo.json</code></td><td>a repository whose declared world is <code>INFRA</code> — the estate repository, and the blueprint repository beside it</td></tr>
+      <tr><td><a href="constructs/01-plugin-construct.html">the description</a></td><td><code>description</code></td><td>the sentence a session matches the work at hand against; it decides whether this plugin is loaded</td></tr>
+      <tr><td><a href="constructs/01-plugin-construct.html">the manifest</a></td><td><code>plugin.json</code></td><td><code>.claude-plugin/plugin.json</code> inside this plugin's own folder, carrying its name, version, description and author</td></tr>
+      <tr><td><a href="constructs/01-plugin-construct.html">the name</a></td><td><code>spn-infra</code></td><td>what the marketplace entry and every install refer to this folder by</td></tr>
+      <tr><td><a href="constructs/01-plugin-construct.html">the plugin root</a></td><td><code>CLAUDE_PLUGIN_ROOT</code></td><td>the installed copy a session reads, and the base every wired command is written against</td></tr>
+      <tr><td><a href="constructs/01-plugin-construct.html">the version</a></td><td><code>version</code></td><td>which published bytes a session is reading, shared with the other two plugins</td></tr>
+      <tr class="sds-group"><td colspan="3">Hooks</td></tr>
+      <tr><td><a href="constructs/02-hooks-construct.html">a call about to run</a></td><td><code>PreToolUse</code></td><td>the moment before a tool call is performed, and the only moment that may refuse one</td></tr>
+      <tr><td><a href="constructs/02-hooks-construct.html">the command</a></td><td><code>command</code></td><td>what the harness runs, written against the plugin root rather than against any checkout</td></tr>
+      <tr><td><a href="constructs/02-hooks-construct.html">the matcher</a></td><td><code>Write|Edit</code></td><td>the calls the moment is narrowed to, so nothing else pays for the hook at all</td></tr>
+      <tr><td><a href="constructs/02-hooks-construct.html">the plugin root</a></td><td><code>CLAUDE_PLUGIN_ROOT</code></td><td>the installed folder a session reads, which is what makes the wired path portable</td></tr>
+      <tr><td><a href="constructs/02-hooks-construct.html">the timeout</a></td><td><code>timeout</code></td><td>the seconds the harness allows the command before it gives up on it</td></tr>
+      <tr><td><a href="constructs/02-hooks-construct.html">the wiring</a></td><td><code>hooks.json</code></td><td>the one file declaring which moments this plugin claims and what it runs at each</td></tr>
+      <tr class="sds-group"><td colspan="3">Skills</td></tr>
+      <tr><td><a href="constructs/03-skills-construct.html">a module</a></td><td><code>spinfrapkg.json</code></td><td>a piece the platform actually runs, attached at a step of the estate's own lifecycle</td></tr>
+      <tr><td><a href="constructs/03-skills-construct.html">a pin flip</a></td><td>—</td><td>pointing a consumer at a published version, which is the last act of authoring a module</td></tr>
+      <tr><td><a href="constructs/03-skills-construct.html">a rendering</a></td><td>—</td><td>what a declaration would produce if applied, read while changing it is still cheap</td></tr>
+      <tr><td><a href="constructs/03-skills-construct.html">an approval</a></td><td>—</td><td>the moment after which the estate has changed and the question becomes a repair</td></tr>
+      <tr><td><a href="constructs/03-skills-construct.html">an estate skill</a></td><td><code>SKILL.md</code></td><td>one folder under this plugin's <code>skills/</code>. **The words are the ones the apps domain reads** — <code>new</code> · <code>implement</code> · <code>review</code> · <code>run</code> · <code>verify</code> · <code>release</code> — so a partner working in both domains learns one set of names</td></tr>
+      <tr><td><a href="constructs/03-skills-construct.html">declaring</a></td><td>—</td><td>changing what the estate says it is, as an edit to a manifest rather than to a rendering</td></tr>
+      <tr class="sds-group"><td colspan="3">Scripts</td></tr>
+      <tr><td><a href="constructs/04-scripts-construct.html">a rule</a></td><td><code>scripts/lib/&lt;name&gt;.ts</code></td><td>one thing the gate knows how to recognise, carrying its own name and its own refusal message</td></tr>
+      <tr><td><a href="constructs/04-scripts-construct.html">a sanctioned home</a></td><td><code>region</code></td><td>the place a provider's own string is legitimate, which is removed from the text before that rule searches</td></tr>
+      <tr><td><a href="constructs/04-scripts-construct.html">a subject</a></td><td><code>rendering</code> · <code>manifest</code></td><td>one kind of file with one parse — built output, or a declaration somebody edits</td></tr>
+      <tr><td><a href="constructs/04-scripts-construct.html">allowing</a></td><td>—</td><td>the answer to anything the gate cannot read: no decision, and the ordinary permission flow continues</td></tr>
+      <tr><td><a href="constructs/04-scripts-construct.html">the dispatcher</a></td><td><code>scripts/events/pretooluse.ts</code></td><td>this plugin's hook entry point: one process, run for every write and every edit</td></tr>
+      <tr><td><a href="constructs/04-scripts-construct.html">the estate manifest</a></td><td><code>spestate.json</code></td><td>the declaration file where one rule applies and nowhere else</td></tr>
+      <tr><td><a href="constructs/04-scripts-construct.html">the gate</a></td><td><code>scripts/checks/subjects.ts</code></td><td>what resolves which subjects judge this call, and the one file that knows a provider folder exists</td></tr>
+      <tr><td><a href="constructs/04-scripts-construct.html">the new text</a></td><td><code>content</code> · <code>new_string</code></td><td>what this call would add — a write's content, or an edit's replacement — which is what the rules read</td></tr>
+      <tr class="sds-group"><td colspan="3">Refs</td></tr>
+      <tr><td><a href="constructs/05-refs-construct.html">a card</a></td><td><code>refs/support/infra/</code></td><td>one markdown file restating one subject of the estate model, in full, under a stamp</td></tr>
+      <tr><td><a href="constructs/05-refs-construct.html">a cloud's vocabulary</a></td><td><code>refs/support/infra/providers/&lt;cloud&gt;/</code></td><td>what that cloud calls the things the model names, restated subject by subject</td></tr>
+      <tr><td><a href="constructs/05-refs-construct.html">a coordinate</a></td><td>—</td><td>one part a resource name is composed from, drawn from a closed vocabulary</td></tr>
+      <tr><td><a href="constructs/05-refs-construct.html">a law</a></td><td>—</td><td>one thing a declaration must never do, written with the checkable defect it names</td></tr>
+      <tr><td><a href="constructs/05-refs-construct.html">a layer</a></td><td>—</td><td>one band of the estate, with the same commands as every other and a fixed place in the order</td></tr>
+      <tr><td><a href="constructs/05-refs-construct.html">the manifests</a></td><td><code>spestate.json</code> · <code>spinfrapkg.json</code></td><td>the files that mark an estate node and name what kind it is</td></tr>
+      <tr><td><a href="constructs/05-refs-construct.html">the path locator</a></td><td>—</td><td>how a node is resolved from wherever you are standing, rather than guessed from a folder name</td></tr>
+      <tr class="sds-group"><td colspan="3">Providers</td></tr>
+      <tr><td><a href="constructs/06-providers-construct.html">a cloud</a></td><td><code>providers/&lt;cloud&gt;/</code></td><td>one realization this plugin serves — the folder is the whole registration</td></tr>
+      <tr><td><a href="constructs/06-providers-construct.html">a skills half</a></td><td><code>providers/&lt;instance&gt;/skills/</code></td><td>what a skill loads when working in this instance — a procedure, which no cloud here has</td></tr>
+      <tr><td><a href="constructs/06-providers-construct.html">a subject</a></td><td><code>manifest</code> · <code>rendering</code></td><td>one kind of file with one parse, named the same way in every cloud's folder</td></tr>
+      <tr><td><a href="constructs/06-providers-construct.html">discovery</a></td><td><code>instances()</code></td><td>the gate reading which folders exist, rather than a list of clouds written anywhere</td></tr>
+      <tr><td><a href="constructs/06-providers-construct.html">the scripts half</a></td><td><code>providers/&lt;cloud&gt;/scripts/checks/</code></td><td>what the gate runs for this cloud: one validator per subject</td></tr>
+      <tr><td><a href="constructs/06-providers-construct.html">the vocabulary</a></td><td><code>refs/support/infra/providers/&lt;cloud&gt;/</code></td><td>what this cloud calls things, restated as a fact rather than run as code</td></tr>
+      <tr class="sds-group"><td colspan="3">Tests</td></tr>
+      <tr><td><a href="constructs/07-tests-construct.html">a suite</a></td><td><code>t-&lt;subject&gt;.mjs</code></td><td>one file of cases, named for what it proves rather than for where it sits</td></tr>
+      <tr><td><a href="constructs/07-tests-construct.html">a tier</a></td><td><code>unit/</code></td><td>what kind of proof a suite is, which is the first thing the path says</td></tr>
+      <tr><td><a href="constructs/07-tests-construct.html">the harness</a></td><td><code>tests/helpers/harness.mjs</code></td><td>what drives a real process per case and reads the verdict back</td></tr>
+      <tr><td><a href="constructs/07-tests-construct.html">the mirror</a></td><td><code>unit/&lt;source path&gt;</code></td><td>the rest of the path, repeating the path of the file being proven</td></tr>
+      <tr><td><a href="constructs/07-tests-construct.html">the plugin root</a></td><td><code>PLUGIN</code></td><td>found once by the harness, so no suite counts folders to reach the code</td></tr>
+      <tr><td><a href="constructs/07-tests-construct.html">the runner</a></td><td><code>tests/run.mjs</code></td><td>one command for every suite; it walks the tree rather than reading a list</td></tr>
+      <tr><td><a href="constructs/07-tests-construct.html">the tree</a></td><td><code>tests/</code></td><td>this plugin's proofs, at the plugin root and never beside the source they prove</td></tr>
+    </tbody>
+  </table></div>
+  <!-- /spn:generated -->
+</section>
+
+<section id="s9" data-block="next">
+  <div class="sds-section-head"><h2>Where to go next</h2></div>
+  <ul>
+    <li>What each instrument is, before this domain adds to it &rarr; <a href="../01-devex/devex-overview.html">spn-devex</a></li>
+    <li>The stack plugin, whose provider carries both halves &rarr; <a href="../02-apps/apps-overview.html">spn-apps</a></li>
+    <li>What each chapter here is held to in this plugin's own source &rarr; <a href="../../../04-capabilities/03-infra/plugin-spn-infra/README.md">capabilities: spn-infra</a></li>
+    <li>What an estate engineer is promised &rarr; <a href="../../../03-behaviors/03-infra/README.md">behaviours: infra</a></li>
+    <li>Every construct of this domain, in reading order &rarr; <a href="../../../02-constructs/03-infra/README.md">constructs: infra</a></li>
+    <li>Back to the whole model &rarr; <a href="../concept-overview.html">the hub</a></li>
+  </ul>
+</section>
+
+</div>
+</div>
+
+<footer>
+  Sources: <a href="../../../../CONCEPT.md">CONCEPT.md</a> &sect; infra; the constructs it links.
+</footer>
+
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.js"></script>

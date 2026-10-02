@@ -1,0 +1,169 @@
+<meta charset="utf-8">
+<title>Scripts — The Code This Plugin Runs</title>
+<!-- spn:doc
+{"id":"stack-checks","variant":"construct","title":"Scripts — The Code This Plugin Runs","subtitle":"Every file this plugin runs, sorted by what calls it and what stack it serves.","lenses":["SERVER_DEV","WEB_DEV"],"status":"PLANNING","dependsOn":["apps-hooks","checks"],"summary":"Scripts holds everything this plugin executes, divided by what calls each file — the wiring, the gate the wiring asks, the tools a person or agent runs by typing their path, and the libraries the others read.","keywords":["gate","subject","dispatcher","register","action","coverage"]}
+-->
+<!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.css">
+<div class="sds-page">
+
+<nav class="sds-rail" id="rail">
+  <a class="sds-home" href="../apps-overview.html">&larr; spn-apps — The TypeScript Stack Domain</a>
+  <div class="sds-rail-title">Scripts — The Code This Plugin Runs</div>
+</nav>
+<div class="sds-wrap">
+
+<header class="sds-masthead">
+  <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Scripts — The Code This Plugin Runs</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Backend developer</span><span class="sds-badge sds-lens">Web developer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>Scripts — The Code This Plugin Runs</h1>
+  <p class="sds-subtitle">Every file this plugin runs, sorted by what calls it and what stack it serves.</p>
+  <p class="sds-standfirst">Scripts holds everything this plugin executes, divided by what calls each file — the wiring, the gate the wiring asks, the tools a person or agent runs by typing their path, and the libraries the others read. Read this page before you add a script here, or when you want to know which file runs a given command. It explains how the gate resolves a write to the declared stack without naming one, and what the commands over this domain's own registers do.</p>
+</header>
+
+<!-- 00 -->
+<section id="s0">
+  <div class="sds-section-head"><h2>Overview</h2></div>
+  <p>Two decisions shape the whole folder. <strong>Nothing here names a stack</strong> — the gate reads the declaration and resolves into a provider, so the code that knows a language sits outside this folder entirely. And <strong>a tool writes only what a run found</strong> — part of a behaviour row is somebody's decision, and a tool writing over that would turn a declaration into a guess.</p>
+  <p>This construct realizes the book's <code>01-devex/02-agent/04-plugins</code>.</p>
+</section>
+
+<!-- 01 -->
+<section id="s1">
+  <div class="sds-section-head"><h2>Terms</h2></div>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <tbody>
+      <tr><td>the gate</td><td><code>subjectsFor</code></td><td>the stack-free half: it reads the node's declaration and hands the write to the provider for it</td></tr>
+      <tr><td>a subject</td><td><code>SUBJECT_NAMES</code></td><td>one grouping of rules a write is asked about, cheapest first</td></tr>
+      <tr><td>the dispatcher</td><td><code>pretooluse.ts</code></td><td>the single process behind the wired entry, which keeps the first refusal and joins the advice</td></tr>
+      <tr><td>the resulting text</td><td><code>resultingText</code></td><td>the source as the pending write would leave it, which is what a rule actually reads</td></tr>
+      <tr><td>masking</td><td><code>mask</code></td><td>blanking comments and string bodies before searching, so a word inside a quote is never read as code</td></tr>
+      <tr><td>a register</td><td><code>HEADINGS</code></td><td>any table carrying the behaviour headings in order, wherever in a repository it sits</td></tr>
+      <tr><td>a row</td><td><code>cellsOf</code></td><td>one behaviour: who does what, what they see, its kind, the tier that proves it, its status and when that was found</td></tr>
+      <tr><td>the tier</td><td><code>tier</code></td><td>the rung a row is proven at; a run matches itself against this and leaves the other rungs alone</td></tr>
+      <tr><td>the results file</td><td>—</td><td>what a test runner wrote about one run, read by behaviour id and by tier</td></tr>
+      <tr><td>an action</td><td><code>@SPAPIRouteCommand</code></td><td>one published thing a caller can perform, found by its declaration rather than by a folder shape</td></tr>
+      <tr><td>a hand-checked row</td><td><code>MANUAL</code></td><td>a row a person proves, which no run ever writes over</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 02 -->
+<section id="s2">
+  <div class="sds-section-head"><h2>Model</h2></div>
+  <p>The folder has two halves that never meet. One is reached by the wiring and answers about a single write. The other is reached by its own path and answers about a whole repository.</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="273 22 554 268" style="max-width:554px" role="img" aria-label="The wired half answers about one write; the commanded half answers about a repository, and neither reads the other.">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="sds-box" x="275" y="24" width="244" height="76" rx="3"/>
+    <text class="sds-label" x="291" y="50">the wired half</text>
+    <text class="sds-note" x="291" y="69">events/ and checks/ — one process</text>
+    <text class="sds-note" x="291" y="88">per write</text>
+    <rect class="sds-box" x="575" y="24" width="250" height="76" rx="3"/>
+    <text class="sds-label" x="591" y="50">the commanded half</text>
+    <text class="sds-note" x="591" y="69">tools/ — run by its own path, over</text>
+    <text class="sds-note" x="591" y="88">one repository</text>
+    <rect class="sds-box" x="288" y="212" width="231" height="76" rx="3"/>
+    <text class="sds-label" x="304" y="238">the gate</text>
+    <text class="sds-note" x="304" y="257">reads the declaration, resolves</text>
+    <text class="sds-note" x="304" y="276">into the provider for it</text>
+    <rect class="sds-box" x="575" y="212" width="237" height="76" rx="3"/>
+    <text class="sds-label" x="591" y="238">the shared half</text>
+    <text class="sds-note" x="591" y="257">lib/ — the payload, the reading,</text>
+    <text class="sds-note" x="591" y="276">the register, the hash</text>
+    <path class="sds-connector" d="M458 100 V128 H404 V212" marker-end="url(#ar)"/>
+    <path class="sds-connector" d="M458 100 V156 H634 V212" marker-end="url(#ar)"/>
+    <path class="sds-connector" d="M700 100 V184 H753 V212" marker-end="url(#ar)"/>
+    <text class="sds-note" x="418" y="120">asks</text>
+    <text class="sds-note" x="530" y="148">reads</text>
+    <text class="sds-note" x="711" y="176">reads</text>
+  </svg>
+    <figcaption>The wired half answers about one write; the commanded half answers about a repository, and neither reads the other.</figcaption>
+  </figure>
+  <!-- dg:source
+{ "kind": "map",
+  "caption": "The wired half answers about one write; the commanded half answers about a repository, and neither reads the other.",
+  "boxes": [
+    { "id": "a", "label": "the wired half", "note": "events/ and checks/ — one process per write" },
+    { "id": "b", "label": "the gate", "note": "reads the declaration, resolves into the provider for it" },
+    { "id": "c", "label": "the commanded half", "note": "tools/ — run by its own path, over one repository" },
+    { "id": "d", "label": "the shared half", "note": "lib/ — the payload, the reading, the register, the hash" }
+  ],
+  "links": [
+    { "from": "a", "to": "b", "label": "asks" },
+    { "from": "a", "to": "d", "label": "reads" },
+    { "from": "c", "to": "d", "label": "reads" }
+  ] }
+  -->
+</section>
+
+<!-- 03 -->
+<section id="s3">
+  <div class="sds-section-head"><h2>Parts</h2></div>
+  <h3 id="the-gate-names-no-stack-and-that-is-what">The gate names no stack, and that is what it is for</h3>
+  <p>The file that names the subjects reads the stack from the nearest <code>sprepo.json</code> and imports the provider's own half by a path composed from that declaration. The import is composed rather than written, because a written one would be this file naming a stack — the one thing it may not do. A second stack joins by adding a folder and nothing here changes.</p>
+  <h3 id="a-repository-the-plugin-has-no-provider-">A repository the plugin has no provider for is left alone</h3>
+  <p>A gate that refused what it cannot classify would refuse far more than it was asked to, and a stub that answered would teach a reader the realization works. So a declaration this plugin ships no folder for resolves to no subject, silently.</p>
+  <h3 id="the-subjects-are-ordered-by-what-they-co">The subjects are ordered by what they cost</h3>
+  <p>A subject that reads one file is asked before a subject that walks a tree, and a refusal above stops the walk below. Which rules apply is decided by the path and the node's kind rather than by the subject's name.</p>
+  <h3 id="one-process-behind-the-entry">One process behind the entry</h3>
+  <p>The wiring declares one entry and this file runs everything behind it, keeping the first refusal and joining the advice. Separate entries are separate interpreter start-ups whatever language the scripts are written in, and on one measured edit the start-ups cost more than ten times the checking itself.</p>
+  <h3 id="the-payload-shape-is-copied-never-import">The payload shape is copied, never imported</h3>
+  <p>A plugin never depends on another plugin's internals. The two install separately and version separately, and a partner may hold one without the other on disk at all, so an import across them would work in this checkout and break in every install. This plugin keeps its own copy, named exactly as the core plugin names the same job, so learning one teaches you both.</p>
+  <h3 id="a-source-file-is-read-with-the-write-alr">A source file is read with the write already applied</h3>
+  <p>Reading what is on disk reports faults somebody else wrote and misses the one arriving now. So comments and string bodies are masked, the caller's pending text is laid over the file, and every rule reads that. The reading is shared rather than private to one rule, and it happens once per write rather than once per rule.</p>
+  <h3 id="the-stamp-is-computed-here-and-must-agre">The stamp is computed here, and must agree with the other copy byte for byte</h3>
+  <p>The hash behind a restatement's <code>seen</code> value is spelled once per plugin, because a plugin is installed alone and cannot read another plugin's files. Two plugins computing it differently would report drift against each other for files that agree, and a finding that is wrong teaches people to stop reading the run. A case in this plugin's own suite hashes a fixture with both copies and fails if they differ.</p>
+  <h3 id="a-register-is-found-by-its-header-never-">A register is found by its header, never by a path</h3>
+  <p>A documents tree that moves must break no tool, and reading the header is the only way to be right in the layout a repository has today and in the one that follows it. So any table whose headings are the behaviour headings is a register. The headings and the row test are one exported pair read by every tool that touches a register, because two tools parsing a table differently means one writes rows the other cannot see.</p>
+  <h3 id="two-cells-are-the-run-s-and-the-rest-are">Two cells are the run's and the rest are a person's</h3>
+  <p>The kind of behaviour and the tier that proves it are decisions somebody made. The status and the moment it was found are what the last run saw. The two were one cell until they disagreed quietly, and a row whose case had stopped running still read as proven. The writer touches those two and copies every other cell through untouched.</p>
+  <h3 id="a-run-speaks-only-for-the-tiers-it-ran">A run speaks only for the tiers it ran</h3>
+  <p>A partial run that reset a whole register would make every status swing on every run, and nobody could read a red as new. So a run updates the rows declaring a tier it covered and leaves the rest exactly as it found them. That is why the tier is a person's cell to declare: it is what a run matches itself against, and a hand-checked row is never written over.</p>
+  <h3 id="it-reads-the-run-s-own-artifact-never-a-">It reads the run's own artifact, never a specification</h3>
+  <p>A status derived from a specification reports a case that exists as a case that ran. Crossing a route with a surface, or scanning a source tree for case titles, cannot see a case that was skipped or filtered out. So the writer reads the file the runner produced, and a row whose case never reached the runner says so.</p>
+  <h3 id="a-row-s-gap-is-closed-by-the-chain-not-b">A row's gap is closed by the chain, not by a tool</h3>
+  <p>A behaviour enters the product through its row: the row is written first, a case cites it, and the run's artifact stamps it. So no tool here compares what a service publishes against the rows. Every stack declares its actions its own way, and a comparison per stack is not worth a permanent check; code written outside the chain is answered in review.</p>
+  <h3 id="a-generator-writes-a-list-nobody-could-k">A generator writes a list nobody could keep by hand</h3>
+  <p>A published set moves every release, so a hand-written list of it is stale the day after it is written and nothing reports that. One tool reads what the support repository publishes and writes the table, under a citation naming the command that produced it — so re-running the command is how a reader checks it. What it leaves out is the point: a package a partner cannot depend on is not something to list.</p>
+</section>
+
+<!-- 04 -->
+<section id="s4">
+  <div class="sds-section-head"><h2>Boundary</h2></div>
+  <p>This page answers what sits in this plugin's scripts folder and what each part may decide. It does not answer the frame a check runs in — the payload, the verdict, the composition and the always-zero exit are <a href="../../01-devex/constructs/02-hooks-construct.html">Hooks</a> and <a href="../../01-devex/constructs/05-scripts-construct.html">The Check</a>, and this plugin follows that shape rather than inventing one. It does not answer any rule about a language, because no such rule lives here.</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <tbody>
+      <tr><td>resolving a write to the declared stack, the subject order, and the single process behind the entry</td><td>the payload, the verdict, the dispatcher's shape, and the exit code</td><td><a href="../../01-devex/constructs/02-hooks-construct.html">Hooks</a></td></tr>
+      <tr><td>finding a register by its header, the cells a run owns, and checking the rows against the cases and the runs</td><td>that a tool is invoked by its own path and grades what it finds</td><td><a href="../../01-devex/constructs/05-scripts-construct.html">The Check</a></td></tr>
+      <tr><td>that nothing here names a stack</td><td>every rule that reads a language's own syntax, and the parse that feeds it</td><td><a href="./06-providers-construct.html">Providers</a></td></tr>
+      <tr><td>that a run speaks only for the tiers it covered</td><td>what a behaviour row must contain, and the grammar of its id</td><td>the foundation's document chapter</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 05 -->
+<section id="s5">
+  <div class="sds-section-head"><h2>Binds</h2></div>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <tbody>
+      <tr><td><code>RD.DEVEX.FUNCTION.008</code></td><td>a behaviour row's shape, its id grammar, and that a test title carries the id</td><td>MUST</td></tr>
+      <tr><td><code>RD.SUPPORT.APPS.035</code></td><td>which rung proves which behaviour, and that status is synced from a run rather than typed</td><td>MUST</td></tr>
+      <tr><td><code>RD.DEVEX.FUNCTION.035</code></td><td>a rule reaches a write-time hook only where review would be too late</td><td>MUST</td></tr>
+      <tr><td><code>RD.DEVEX.WORKSPACE.176</code></td><td>a repository answers to the world it declares, which is what the gate reads the stack from</td><td>MUST</td></tr>
+      <tr><td>the foundation's <code>02-delivery.md</code> § When an edit becomes behaviour</td><td>a script here is live on its next run, so an edit lands without an install</td><td>MUST</td></tr>
+      <tr><td>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></td><td>the four kinds of script, one command entry, a shared folder never installed on its own</td><td>MUST</td></tr>
+    </tbody>
+  </table></div>
+  <p>Try it: <code>node packages/plugin-spn-apps/tests/run.mjs</code></p>
+</section>
+
+
+
+</div>
+</div>
+
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.js"></script>

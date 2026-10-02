@@ -9,7 +9,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, rmSync
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
-import { ARTIFACT, POCKET, SEAT, bookTemplatesDir } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { ARTIFACT, CONSTRUCT_PAGES, POCKET, SEAT, bookTemplatesDir } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, linksSharedStyles, sharedStyles } from "../../../../../../plugin-support-lib/src/lib/page-styles.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
@@ -46,6 +46,10 @@ function run(root, args) {
   } catch (e) { return String(e.stdout ?? "") + String(e.stderr ?? ""); }
 }
 const readAt = (root, p) => readFileSync(join(root, p), "utf8");
+/** The pocket's `docs` folder, which holds the hub and one folder for each domain. */
+const POCKET_DOCS = `docs/${POCKET.artifacts}/${ARTIFACT.docs}`;
+/** Where a construct's page sits: the `constructs` folder of its domain's folder in the pocket. */
+const pageOf = (domain, name) => `${POCKET_DOCS}/${domain}/${CONSTRUCT_PAGES}/${name}-construct.html`;
 const absent = (root, p) => !existsSync(join(root, p));
 
 let n = 0, failed = 0;
@@ -59,7 +63,7 @@ const has = (s) => (got) => String(got).includes(s);
 const lacks = (s) => (got) => !String(got).includes(s);
 
   // A PRODUCED PAGE'S LINKS ARE RE-EXPRESSED FOR THE FOLDER IT LANDS IN. The seat writes
-  // `sibling.md`; beside the page that file is `sibling-construct.html`, and the page sits three
+  // `sibling.md`; beside the page that file is `sibling-construct.html`, and the page sits four
   // levels from the capabilities seat rather than two. Copying the href across verbatim broke a
   // link on 166 of 166 produced pages in the workspace, and nothing saw it: the audit reads
   // structure and never follows a link.
@@ -72,6 +76,7 @@ const lacks = (s) => (got) => !String(got).includes(s);
       [`docs/${SEAT.constructs}/01-core/thing.md`]: seat("thing",
         `## Boundary\n\nSee [Other](other.md) and [the cap](../../${SEAT.capabilities}/x.md).\n`),
       [`docs/${SEAT.constructs}/01-core/other.md`]: seat("other", "## Boundary\n\nx\n"),
+      [`docs/${SEAT.constructs}/README.md`]: "# Constructs\n",
       [`docs/${SEAT.capabilities}/x.md`]: "# X\n",
     });
     // `page` needs the real construct template for its furniture; the throwaway repo has none.
@@ -79,13 +84,18 @@ const lacks = (s) => (got) => !String(got).includes(s);
     process.env.SPN_TEMPLATES = templates;
     run(ws, ["page", `docs/${SEAT.constructs}/01-core/thing.md`]);
     run(ws, ["page", `docs/${SEAT.constructs}/01-core/other.md`]);
-    const page = readAt(ws, `docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/thing-construct.html`);
+    const page = readAt(ws, pageOf("01-core", "thing"));
 
-    one("a sibling seat link becomes the sibling PAGE", page, has('href="./other-construct.html"'));
-    one("a link out of the seat tree is re-based for the page's depth", page,
-        has(`href="../../../${SEAT.capabilities}/x.md"`));
-    one("the rail's home link is re-based too, not shipped as `../README.md`", page,
-        (g) => g.includes(`class="sds-home" href="../../../${SEAT.constructs}/README.md"`));
+    one("[MKT.SCRIPTS.110] `docs page` writes a construct page into the constructs folder of its domain's folder, and nowhere else in the pocket",
+        [existsSync(join(ws, pageOf("01-core", "thing"))), existsSync(join(ws, pageOf("01-core", "other"))),
+         absent(ws, `docs/${POCKET.artifacts}/${CONSTRUCT_PAGES}`)].join(" "), "true true true");
+    one("[MKT.SCRIPTS.110] a sibling seat link becomes the sibling PAGE, in the same constructs folder", page, has('href="./other-construct.html"'));
+    one("[MKT.SCRIPTS.110] a link out of the seat tree is expressed against the page's own folder", page,
+        has(`href="../../../../${SEAT.capabilities}/x.md"`));
+    one("[MKT.SCRIPTS.110] the rail's home link is expressed against it too, not shipped as `../README.md`", page,
+        (g) => g.includes(`class="sds-home" href="../../../../${SEAT.constructs}/README.md"`));
+    one("[MKT.SCRIPTS.110] every relative link of the page names a file that is there",
+        [...page.matchAll(/href="(\.[^"#]*)/g)].map((found) => found[1]).filter((href) => absent(ws, join(dirname(pageOf("01-core", "thing")), href))), (g) => g.length === 0);
     one("and the page it produced is the page the audit expects", run(ws, ["audit", "docs"]),
         (g) => !/produced/.test(g));
     // A PRODUCED PAGE CARRIES THE TEMPLATE'S TWO LINES, AND NOTHING ELSE OF ITS FURNITURE. The line
@@ -94,7 +104,7 @@ const lacks = (s) => (got) => !String(got).includes(s);
     const bookTemplate = readFileSync(resolve(templates, "pages", "construct-template.html"), "utf8");
     const linkLine = bookTemplate.match(/<link\b[^>]*sds-docs\.css"[^>]*>/)[0];
     const scriptLine = bookTemplate.match(/<script\b[^>]*sds-docs\.js"[^>]*><\/script>/)[0];
-    const pagePath = `docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/thing-construct.html`;
+    const pagePath = pageOf("01-core", "thing");
     const seatPath = `docs/${SEAT.constructs}/01-core/thing.md`;
     one("a section head carries no number — a heading is a name", page, (g) => !/class="sds-number"/.test(g));
     one("the template's line names a version at the served address", sharedStyles(linkLine),
@@ -163,7 +173,7 @@ const lacks = (s) => (got) => !String(got).includes(s);
       "\n<footer>AUTHOR-NOTE: copy this template, keep the comments</footer>\n");
     process.env.SPN_TEMPLATES = noted;
     run(ws, ["page", `docs/${SEAT.constructs}/01-core/thing.md`]);
-    const footed = readAt(ws, `docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/thing-construct.html`);
+    const footed = readAt(ws, pageOf("01-core", "thing"));
     process.env.SPN_TEMPLATES = templates;
     rmSync(noted, { recursive: true, force: true });
     one("the template's author note never reaches a produced page", footed, (g) => !/AUTHOR-NOTE/.test(g) && !/<footer>/.test(g));
@@ -178,7 +188,7 @@ const lacks = (s) => (got) => !String(got).includes(s);
       .replace(/"title":/, '"subtitle": "One plain promise, under the title.",\n  "title":');
     writeFileSync(join(ws, `docs/${SEAT.constructs}/01-core/thing-sub.md`), withSub);
     run(ws, ["page", `docs/${SEAT.constructs}/01-core/thing-sub.md`]);
-    const subbed = readAt(ws, `docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/thing-sub-construct.html`);
+    const subbed = readAt(ws, pageOf("01-core", "thing-sub"));
     one("a seat's subtitle is rendered under the title", subbed,
       (g) => /<h1>[^<]*<\/h1>\s*<p class="sds-subtitle">One plain promise, under the title.<\/p>/.test(g));
     one("a seat without one renders no subtitle line", page, (g) => !/<p class="sds-subtitle">/.test(g));
@@ -189,18 +199,18 @@ const lacks = (s) => (got) => !String(got).includes(s);
     writeFileSync(join(ws, `docs/${SEAT.constructs}/01-core/thing.md`), seat("thing",
       "## Boundary\n\n#### A sub-part\n\n| a | b | c |\n| --- | --- | --- |\n| repos | `{org}-public\\|-private` | x |\n"));
     run(ws, ["page", `docs/${SEAT.constructs}/01-core/thing.md`]);
-    const page2 = readAt(ws, `docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/thing-construct.html`);
+    const page2 = readAt(ws, pageOf("01-core", "thing"));
     one("an escaped pipe stays inside its cell", page2, has("<code>{org}-public|-private</code></td><td>x</td>"));
     one("a level-four heading is a heading, not a paragraph of hashes", page2, has('<h4 id="a-sub-part">A sub-part</h4>'));
     writeFileSync(join(ws, `docs/${SEAT.constructs}/01-core/thing.md`), seat("thing",
       "## Boundary\n<!-- RESTATES: a chapter\n     never add a rule here -->\n\nvisible\n<!-- block: REASONS -->\n"));
     run(ws, ["page", `docs/${SEAT.constructs}/01-core/thing.md`]);
-    const page3 = readAt(ws, `docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/thing-construct.html`);
+    const page3 = readAt(ws, pageOf("01-core", "thing"));
     one("an author's HTML comment never reaches the page", page3, (g) => !/RESTATES|block: REASONS/.test(g) && /<p>visible<\/p>/.test(g));
     writeFileSync(join(ws, `docs/${SEAT.constructs}/01-core/thing.md`), seat("thing",
       "The promise, in one line.\n\nThe summary paragraph.\n\n## Boundary\n\nx\n"));
     run(ws, ["page", `docs/${SEAT.constructs}/01-core/thing.md`]);
-    const page4 = readAt(ws, `docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/thing-construct.html`);
+    const page4 = readAt(ws, pageOf("01-core", "thing"));
     one("the first lead paragraph is the standfirst, the rest are the summary", page4, (g) => /<p class="sds-standfirst">The promise, in one line\.<\/p>\s*<p>The summary paragraph\.<\/p>/.test(g));
 
     // A NUMBERED LIST IS A LIST. There was no case for `1.`, so it fell through to the paragraph path
@@ -211,7 +221,7 @@ const lacks = (s) => (got) => !String(got).includes(s);
     writeFileSync(join(ws, `docs/${SEAT.constructs}/01-core/thing.md`), seat("thing",
       "## Boundary\n\n1. **First** the step that comes first.\n2. **Then** the next one.\n3) A closing paren is a list too.\n\n- a bullet after it\n- another\n"));
     run(ws, ["page", `docs/${SEAT.constructs}/01-core/thing.md`]);
-    const page5 = readAt(ws, `docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/thing-construct.html`);
+    const page5 = readAt(ws, pageOf("01-core", "thing"));
     one("a numbered list is an ordered list, not a paragraph of digits", page5,
         (g) => /<ol>[\s\S]*<li><strong>First<\/strong> the step that comes first\.<\/li>[\s\S]*<\/ol>/.test(g));
     one("every item of it is in the list, `)` included", page5,
@@ -230,26 +240,27 @@ console.log("\n=== the rail names the page, and the way back names where it goes
       status: "PLANNING", dependsOn: [] },
     "## Boundary\n\nx\n", "`For: Architect` · `Status: 🔮 PLANNING`");
 
-  // A DOMAIN AND ITS OVERVIEW JOIN ON THEIR TITLE AND NOTHING ELSE. The overview's file name
-  // carries the area in one repository and not in another, so no path can be computed. Here the
-  // face and the overview both say `Core` and the file is named for neither, which is what makes
-  // the join the only thing under test.
+  // A DOMAIN AND ITS OVERVIEW JOIN ON THEIR TITLE AND NOTHING ELSE. A domain's folder may hold two
+  // overviews, so no path can be computed. Here the face and one overview both say `Core`, that file
+  // is named for neither, and a second overview of the folder comes first by its name.
   const ws = repo({
     "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
     [`docs/${SEAT.constructs}/README.md`]: doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
     [`docs/${SEAT.constructs}/01-core/README.md`]: doc({ id: "core", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
     [`docs/${SEAT.constructs}/01-core/thing.md`]: seat("thing", "The Thing Itself"),
-    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-anything-at-all-overview.html`]:
+    [`${POCKET_DOCS}/01-core/anything-at-all-overview.html`]:
       '<!-- spn:doc\n{"id":"ov","variant":"overview","title":"Core","lenses":["ARCHITECT"],"summary":"s"}\n-->\n<h1>x</h1>\n',
+    [`${POCKET_DOCS}/01-core/a-reading-path-overview.html`]:
+      '<!-- spn:doc\n{"id":"path","variant":"overview","title":"A Reading Path","lenses":["ARCHITECT"],"summary":"s"}\n-->\n<h1>x</h1>\n',
   });
   run(ws, ["page", `docs/${SEAT.constructs}/01-core/thing.md`]);
-  const page = readAt(ws, `docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/thing-construct.html`);
+  const page = readAt(ws, pageOf("01-core", "thing"));
 
   one("the rail carries the page's own name, not the word Outline",
     page, has('<div class="sds-rail-title">The Thing Itself</div>'));
   one("and never the word it replaced", page, lacks('<div class="sds-rail-title">Outline</div>'));
-  one("the way back reaches the domain's overview, found by its title alone",
-    page, has(`href="../../${ARTIFACT.overviews}/concept-anything-at-all-overview.html"`));
+  one("[MKT.SCRIPTS.110] the way back reaches the domain's overview, found by its title alone, in the folder above the constructs folder",
+    page, has(`class="sds-home" href="../anything-at-all-overview.html"`));
   one("and it names the domain rather than a category", page, has("&larr; Core"));
   one("so the old category label is gone", page, lacks("&larr; the model"));
 }
@@ -268,7 +279,7 @@ console.log("\n=== the rail names the page, and the way back names where it goes
       "## Boundary\n\nx\n", "`For: Architect` · `Status: 🔮 PLANNING`"),
   });
   run(ws, ["page", `docs/${SEAT.constructs}/01-core/thing.md`]);
-  const page = readAt(ws, `docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/thing-construct.html`);
+  const page = readAt(ws, pageOf("01-core", "thing"));
   one("with no overview above it the constructs face stands, rather than a link to nothing",
     page, has("&larr; the model"));
 }

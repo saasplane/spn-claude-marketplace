@@ -10,8 +10,9 @@
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
 import { argsText, begin, commandFacts, end, record } from "../../../../../plugin-support-lib/src/lib/timing.ts";
-import { ARTIFACT_INDEX, DOCS, HUB, POCKET, artifactIndex, artifactsDir, constructPagesDir, docsOf, guidePagesDir,
-  overviewsDir, reportsDir, slashes } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { ARTIFACT_INDEX, CONSTRUCT_PAGES, DOCS, OVERVIEW_PAGE_SUFFIX, POCKET, artifactDocsDir, artifactIndex, artifactsDir, docsOf,
+  domainConstructsDir, guidePagesDir, hubPage, isOverview, isProducedPage, reportsDir,
+  slashes } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { BUNDLED_SUFFIX, INDEX_SCRIPT } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { locationOf, resolveWorkspace, text as plainText } from "./_lib.ts";
 import { Refusal, attribute, escaped, newestCut, operands, optionValue,
@@ -91,12 +92,16 @@ export function groupsOf(artifacts: string): { groups: TreeNode[]; pages: string
   const under = (folder: string): string[] => files.filter((file) => file.startsWith(folder + sep));
   const direct = (folder: string): string[] => files.filter((file) => dirname(file) === folder);
 
-  const constructsRoot = constructPagesDir(docs);
-  const overviews = under(overviewsDir(docs));
-  const hub = overviews.find((file) => file === join(overviewsDir(docs), HUB)) ?? null;
-  // The part of an overview's file name that names its place: `concept-devex-agent-overview` is `devex-agent`.
-  const stems = new Map(overviews.filter((file) => file !== hub)
-    .map((file): [string, string] => [file, basename(file, ".html").replace(/^concept-/, "").replace(/-overview$/, "")]));
+  const docsRoot = artifactDocsDir(docs);
+  const hub = files.find((file) => file === hubPage(docs)) ?? null;
+  /** The overviews directly in one folder. The hub is not one of them. */
+  const overviewsIn = (folder: string): string[] => direct(folder).filter((file) => file !== hub && isOverview(file));
+  /** The construct pages of one folder: every page directly in its `constructs` folder. */
+  const constructsIn = (folder: string): string[] => direct(domainConstructsDir(folder));
+  const overviews = under(docsRoot).filter((file) => file !== hub && isOverview(file));
+  // The part of an overview's file name that names its place: `devex-agent-overview` is `devex-agent`.
+  const stems = new Map(overviews
+    .map((file): [string, string] => [file, basename(file).slice(0, -OVERVIEW_PAGE_SUFFIX.length)]));
 
   // A FOLDER'S LABEL is the word an overview's title gives that part of its file name: `devex` is DevEx.
   const words = new Map<string, string>();
@@ -120,56 +125,35 @@ export function groupsOf(artifacts: string): { groups: TreeNode[]; pages: string
     for (const link of facts.get(file)!.text.matchAll(/<a\b[^>]*?\bhref="([^"#?]+)/g)) {
       if (/^[a-z][a-z0-9+.-]*:/.test(link[1])) continue;
       const target = resolve(dirname(file), link[1]);
-      if (target.startsWith(constructsRoot + sep) && facts.has(target) && !reached.includes(target)) reached.push(target);
+      if (isProducedPage(target) && facts.has(target) && !reached.includes(target)) reached.push(target);
     }
     linked.set(file, reached);
   }
 
-  // THE FOLDERS UNDER THE CONSTRUCT PAGES. A folder that holds folders is an area. A folder that holds
-  // pages and no folder is a domain. A folder with no page under it is not in the tree.
-  const areas: string[] = [], domains: string[] = [];
-  const foldersIn = (folder: string): string[] => readdirSync(folder).sort(byName).map((name) => join(folder, name))
-    .filter((full) => statSync(full).isDirectory() && under(full).length > 0);
-  const sortFolders = (folder: string): void => {
-    const inside = foldersIn(folder);
-    if (inside.length) {
-      if (folder !== constructsRoot) areas.push(folder);
-      inside.forEach(sortFolders);
-    } else if (direct(folder).length) domains.push(folder);
-  };
-  if (existsSync(constructsRoot)) sortFolders(constructsRoot);
-  /** A folder as an overview's file name writes it: `01-devex/02-agent` is `devex-agent`. */
-  const keyOf = (folder: string): string =>
-    slashes(relative(constructsRoot, folder)).split("/").filter(Boolean).map(bare).join("-");
+  // THE FOLDERS UNDER THE POCKET'S `docs` FOLDER ARE THE OUTLINE. A folder that holds a `constructs`
+  // folder or an overview is a domain, and a folder that holds such folders is an area. A folder that
+  // holds neither is not in the tree.
+  const foldersIn = (folder: string): string[] => readdirSync(folder).sort(byName).filter((name) => name !== CONSTRUCT_PAGES)
+    .map((name) => join(folder, name)).filter((full) => statSync(full).isDirectory() && under(full).length > 0);
+  const holdsPages = (folder: string): boolean => overviewsIn(folder).length + constructsIn(folder).length > 0;
+  const inTree = (folder: string): boolean => holdsPages(folder) || foldersIn(folder).some(inTree);
+  const isArea = (folder: string): boolean => foldersIn(folder).some(inTree);
 
-  // THE HOME OF AN OVERVIEW is the folder its file name names, the longest such name first. Failing
-  // that, it is the one folder that holds every construct it links, and otherwise it has no home.
-  const home = new Map<string, string>();
-  const homeless: string[] = [];
-  for (const [file, stem] of stems) {
-    const named = [...areas, ...domains].filter((folder) => {
-      const key = keyOf(folder);
-      return key !== "" && (stem === key || stem.startsWith(`${key}-`));
-    });
-    if (named.length) {
-      home.set(file, named.reduce((longest, folder) => (keyOf(folder).length > keyOf(longest).length ? folder : longest)));
-      continue;
-    }
-    const reached = [...new Set(linked.get(file)!.map((construct) => dirname(construct)))];
-    if (reached.length === 1) { home.set(file, reached[0]); continue; }
-    homeless.push(file);
+  // AN OVERVIEW BESIDE THE HUB belongs to no one domain, so it holds no construct.
+  const beside = existsSync(docsRoot) ? overviewsIn(docsRoot) : [];
+  for (const file of beside) {
+    const reached = new Set(linked.get(file)!.map((construct) => dirname(construct))).size;
     notes.push({ grade: "SOFT", check: "index", file, message:
-      `this overview names no folder of the construct pages, and it links constructs of ${reached.length} folders, so it is listed under Docs after the hub and holds nothing` });
+      `this overview sits beside the hub, in no domain's folder, and it links constructs of ${reached} folder(s), so it is listed under Docs after the hub and holds nothing` });
   }
-  const overviewsOf = (folder: string): string[] => [...stems.keys()].filter((file) => home.get(file) === folder);
 
   /**
    * One domain, which starts folded. With one overview it is the link to that overview, with its
    * constructs under it. With more it is a folder, and each overview holds the constructs it links.
    */
   const domainNode = (folder: string): TreeNode => {
-    const here = overviewsOf(folder);
-    const constructs = direct(folder);
+    const here = overviewsIn(folder);
+    const constructs = constructsIn(folder);
     const reach = new Map(here.map((file): [string, string[]] => [file, constructs.filter((construct) => linked.get(file)!.includes(construct))]));
     const holds = new Map(here.map((file): [string, string[]] => [file, []]));
     const rest: string[] = [];
@@ -202,17 +186,16 @@ export function groupsOf(artifacts: string): { groups: TreeNode[]; pages: string
     });
     return { label: label(folder), folded: true, children: [...inside, ...rest.map(entry)] };
   };
-  /** An area is a folder of the tree: its own overviews, its own pages, then the folders in it. */
+  /** An area is a folder of the tree: its own overviews, its own constructs, then the folders in it. */
   const folderNode = (folder: string): TreeNode => {
-    if (domains.includes(folder)) return domainNode(folder);
-    return { label: label(folder), children: [...overviewsOf(folder).map(entry), ...direct(folder).map(entry),
-      ...foldersIn(folder).filter((one) => areas.includes(one) || domains.includes(one)).map(folderNode)] };
+    if (!isArea(folder)) return domainNode(folder);
+    return { label: label(folder), children: [...overviewsIn(folder).map(entry), ...constructsIn(folder).map(entry),
+      ...foldersIn(folder).filter(inTree).map(folderNode)] };
   };
 
-  // DOCS: the hub by its own name, then an overview with no home, then the folders in their order.
-  const docsGroup: TreeNode[] = [...(hub ? [entry(hub)] : []), ...homeless.map(entry),
-    ...(existsSync(constructsRoot) ? foldersIn(constructsRoot) : [])
-      .filter((folder) => areas.includes(folder) || domains.includes(folder)).map(folderNode)];
+  // DOCS: the hub by its own name, then each overview beside it, then the folders in their order.
+  const docsGroup: TreeNode[] = [...(hub ? [entry(hub)] : []), ...beside.map(entry),
+    ...(existsSync(docsRoot) ? foldersIn(docsRoot) : []).filter(inTree).map(folderNode)];
   // GUIDES stand in the order of the guides they were produced from, and REPORTS in the order of their paths.
   const guides = under(guidePagesDir(docs));
   const orderOf = (file: string): string => facts.get(file)!.source ?? pathOf(file);

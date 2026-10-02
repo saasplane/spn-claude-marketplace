@@ -1,0 +1,147 @@
+<meta charset="utf-8">
+<title>Skills — The Doors Infrastructure Is Changed Through</title>
+<!-- spn:doc
+{"id":"estate-skills","variant":"construct","title":"Skills — The Doors Infrastructure Is Changed Through","subtitle":"The commands that change what a piece of infrastructure declares itself to be.","lenses":["INFRA","ARCHITECT"],"status":"PLANNING","dependsOn":["skill-set"],"summary":"The skills here are how an estate — the infrastructure a product runs on — gets changed: by editing what it declares itself to be, then letting a tool render and apply that declaration.","keywords":["skill","declare","plan","module","release","door"]}
+-->
+<!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.css">
+<div class="sds-page">
+
+<nav class="sds-rail" id="rail">
+  <a class="sds-home" href="../infra-overview.html">&larr; spn-infra — The Estate Domain</a>
+  <div class="sds-rail-title">Skills — The Doors Infrastructure Is Changed Through</div>
+</nav>
+<div class="sds-wrap">
+
+<header class="sds-masthead">
+  <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Skills — The Doors Infrastructure Is Changed Through</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">DevOps / SRE</span><span class="sds-badge sds-lens">Architect</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>Skills — The Doors Infrastructure Is Changed Through</h1>
+  <p class="sds-subtitle">The commands that change what a piece of infrastructure declares itself to be.</p>
+  <p class="sds-standfirst">The skills here are how an estate — the infrastructure a product runs on — gets changed: by editing what it declares itself to be, then letting a tool render and apply that declaration. Read this page before you make a change, or when you want to know which skill covers which step. It covers saying what the estate is, reading a rendering before anyone approves it, writing a new piece for it to run, and publishing a finished piece.</p>
+</header>
+
+<!-- 00 -->
+<section id="s0">
+  <div class="sds-section-head"><h2>Overview</h2></div>
+  <p>They share one boundary, and each of them restates it. <strong>No skill here changes a cloud.</strong> Each names the tool's command that does, and the caution the workspace states everywhere — a cloud is changed only through the tool's own doors — is repeated rather than worked around.</p>
+  <p>This construct realizes the book's <code>01-devex/02-agent/02-skills</code>.</p>
+</section>
+
+<!-- 01 -->
+<section id="s1">
+  <div class="sds-section-head"><h2>Terms</h2></div>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <tbody>
+      <tr><td>an estate skill</td><td><code>SKILL.md</code></td><td>one folder under this plugin's <code>skills/</code>. <strong>The words are the ones the apps domain reads</strong> — <code>new</code> · <code>implement</code> · <code>review</code> · <code>run</code> · <code>verify</code> · <code>release</code> — so a partner working in both domains learns one set of names</td></tr>
+      <tr><td>declaring</td><td>—</td><td>changing what the estate says it is, as an edit to a manifest rather than to a rendering</td></tr>
+      <tr><td>a rendering</td><td>—</td><td>what a declaration would produce if applied, read while changing it is still cheap</td></tr>
+      <tr><td>an approval</td><td>—</td><td>the moment after which the estate has changed and the question becomes a repair</td></tr>
+      <tr><td>a module</td><td><code>spinfrapkg.json</code></td><td>a piece the platform actually runs, attached at a step of the estate's own lifecycle</td></tr>
+      <tr><td>a pin flip</td><td>—</td><td>pointing a consumer at a published version, which is the last act of authoring a module</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 02 -->
+<section id="s2">
+  <div class="sds-section-head"><h2>Model</h2></div>
+  <p>Each skill is a different point on one walk, and the last box is the same for all of them.</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="423 22 254 428" style="max-width:254px" role="img" aria-label="Every skill ends at the tool's command, because a cloud is changed only through the tool's own doors.">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="sds-box" x="425" y="24" width="250" height="76" rx="3"/>
+    <text class="sds-label" x="441" y="50">the ask</text>
+    <text class="sds-note" x="441" y="69">change what the estate is, or</text>
+    <text class="sds-note" x="441" y="88">publish what it runs</text>
+    <path class="sds-connector" d="M550 100 V140" marker-end="url(#ar)"/>
+    <text class="sds-note" x="560" y="124">matched to</text>
+    <rect class="sds-box" x="425" y="140" width="250" height="76" rx="3"/>
+    <text class="sds-label" x="441" y="166">the skill</text>
+    <text class="sds-note" x="441" y="185">one folder under `skills/`, chosen</text>
+    <text class="sds-note" x="441" y="204">by its own description</text>
+    <path class="sds-connector" d="M550 216 V256" marker-end="url(#ar)"/>
+    <text class="sds-note" x="560" y="240">reviewed as</text>
+    <rect class="sds-box" x="425" y="256" width="250" height="76" rx="3"/>
+    <text class="sds-label" x="441" y="282">the manifest edit</text>
+    <text class="sds-note" x="441" y="301">one line per choice, validated and</text>
+    <text class="sds-note" x="441" y="320">read as a diff</text>
+    <path class="sds-connector" d="M550 332 V372" marker-end="url(#ar)"/>
+    <text class="sds-note" x="560" y="356">handed to</text>
+    <rect class="sds-box" x="425" y="372" width="250" height="76" rx="3"/>
+    <text class="sds-label" x="441" y="398">the tool's command</text>
+    <text class="sds-note" x="441" y="417">the only door a cloud is changed</text>
+    <text class="sds-note" x="441" y="436">through</text>
+  </svg>
+    <figcaption>Every skill ends at the tool's command, because a cloud is changed only through the tool's own doors.</figcaption>
+  </figure>
+  <!-- dg:source
+{ "kind": "map",
+  "caption": "Every skill ends at the tool's command, because a cloud is changed only through the tool's own doors.",
+  "boxes": [
+    { "id": "a", "label": "the ask", "note": "change what the estate is, or publish what it runs" },
+    { "id": "b", "label": "the skill", "note": "one folder under `skills/`, chosen by its own description" },
+    { "id": "c", "label": "the manifest edit", "note": "one line per choice, validated and read as a diff" },
+    { "id": "d", "label": "the tool's command", "note": "the only door a cloud is changed through" }
+  ],
+  "links": [
+    { "from": "a", "to": "b", "label": "matched to" },
+    { "from": "b", "to": "c", "label": "reviewed as" },
+    { "from": "c", "to": "d", "label": "handed to" }
+  ] }
+  -->
+  <p>None of these folders divides into steps: each walk is short enough that one file holds it. <strong>The instance never reaches them either.</strong> The cloud an estate runs on changes what a rendering contains and not what the walk is, so no skill here loads a per-cloud procedure and this plugin ships none.</p>
+</section>
+
+<!-- 03 -->
+<section id="s3">
+  <div class="sds-section-head"><h2>Parts</h2></div>
+  <h3 id="declaring-is-a-manifest-edit-reviewed-li">Declaring is a manifest edit, reviewed line by line</h3>
+  <p>A change to what the estate is should read as one line per choice. A diff mixing rendered output with declared intent hides the decision inside the consequence. So the declaring skill changes the manifest, validates it, and shows the difference in that shape. Authoring a new package and publishing one are explicitly not this skill, and its description names both neighbours so a wrong ask lands in the right folder.</p>
+  <h3 id="a-rendering-is-read-before-anything-is-a">A rendering is read before anything is approved</h3>
+  <p>Approval is the last moment a wrong rendering is cheap. After it, the estate has changed. So one skill states what a rendering must name and what it must never contain, and it also answers the narrower question of whether a declaration change produced exactly what was intended and nothing more. It is convened before any approval, never after.</p>
+  <h3 id="authoring-a-module-names-what-is-not-a-m">Authoring a module names what is not a module</h3>
+  <p>A vendor reached over the network is application configuration behind a seam, and the estate never sees it. Treating one as a module builds infrastructure for something that does not exist. So the authoring skill covers a piece the platform actually runs, and rules the networked case out in the sentence a session matches against. It walks the whole path in one file, from the first scaffold to the pin flip.</p>
+  <h3 id="the-version-is-a-reviewed-edit-and-the-t">The version is a reviewed edit, and the tool's command does the rest</h3>
+  <p>A version typed into a build script is a second place the number lives. The package manifest is the one place. So the publishing skill edits that field as a reviewed change and then runs the release command, which stages and publishes. The same skill covers repointing a bespoke script at the release command, so the second place stops existing.</p>
+  <h3 id="standing-a-node-up-and-running-a-layer-a">Standing a node up and running a layer are doors, not journeys</h3>
+  <p>Two of these folders open a command that already ships and had nothing fronting it. <strong><code>new</code> scaffolds an estate node</strong> — which type, where it goes, what its manifest must carry. <strong><code>run</code> brings a layer up or down and reports what is standing.</strong> Neither carries a walk of its own, because the command is the walk; what the skill adds is knowing which target to name and what the flags mean before you type one.</p>
+  <h3 id="a-skill-names-the-card-and-the-card-hold">A skill names the card, and the card holds the words</h3>
+  <p>None of these files defines the estate's vocabulary. Each names the card that does — which file declares what, which layer owns which act, how a name is composed — so a skill sequences the work and the card holds the words.</p>
+</section>
+
+<!-- 04 -->
+<section id="s4">
+  <div class="sds-section-head"><h2>Boundary</h2></div>
+  <p>This page answers which skills an estate repository answers to and what each one does. It does not answer what a skill is — the frontmatter, the matching and the rule that a skill carries steps and never a rule are <a href="../../01-devex/constructs/04-skills-construct.html">The Skill</a>. It does not answer the vocabulary these skills use either, and it does not answer what happens at write time when an edit would break a law.</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <tbody>
+      <tr><td>the skills an estate answers to, and that none of them changes a cloud itself</td><td>the frontmatter, the listing and the matching every skill shares</td><td><a href="../../01-devex/constructs/04-skills-construct.html">The Skill</a></td></tr>
+      <tr><td>that a declaration change is read as one line per choice, before any approval</td><td>the manifest, layer, naming and law vocabulary each skill uses</td><td><a href="./05-refs-construct.html">Refs</a></td></tr>
+      <tr><td>that publishing is a reviewed version edit followed by the release command</td><td>what is refused at the moment an estate file is written</td><td><a href="./04-scripts-construct.html">Scripts</a></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 05 -->
+<section id="s5">
+  <div class="sds-section-head"><h2>Binds</h2></div>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <tbody>
+      <tr><td>the foundation's DevEx Skills construct</td><td>the skill set is closed, and a skill's value spells the domain of the plugin that ships it</td><td>MUST</td></tr>
+      <tr><td><code>RD.DEVEX.WORKSPACE.020</code></td><td>a cloud is changed only through the tool's own doors, and never by hand</td><td>MUST</td></tr>
+      <tr><td><code>RD.DEVEX.UTILS.019</code></td><td>every skill here restates a chapter and adds no rule of its own</td><td>MUST</td></tr>
+    </tbody>
+  </table></div>
+  <p>Try it: <code>node packages/plugin-spn-devex/src/dist/cli.mjs restates check</code> (or <code>spn-devex restates check</code>, once installed)</p>
+</section>
+
+
+
+</div>
+</div>
+
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.js"></script>

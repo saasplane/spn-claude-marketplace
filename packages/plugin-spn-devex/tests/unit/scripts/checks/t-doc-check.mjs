@@ -6,9 +6,9 @@ import { execFileSync } from "node:child_process";
 
 import { existsSync, mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
-import { ARCS, artifactIndex, capabilitiesDir, constructPagesDir, decisionsRegister, docsOf, guidePagesDir, hubPage, overviewsDir, registersDir,
-  workstreamsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { join, relative, resolve } from "node:path";
+import { ARCS, artifactDocsDir, artifactIndex, capabilitiesDir, decisionsRegister, docsOf, domainConstructsDir, domainDirOf, constructsDir,
+  guidePagesDir, hubPage, registersDir, workstreamsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, STYLES_ADDRESS, linesFor } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 
 const HOOKS = PLUGIN;
@@ -24,6 +24,8 @@ const WORKSPACE = realpathSync(mkdtempSync(join(tmpdir(), "doc-check-probe-")));
 process.on("exit", () => rmSync(WORKSPACE, { recursive: true, force: true }));
 const PROBE_REPO = join(WORKSPACE, "probe-repo");
 const PROBE_DOCS = docsOf(PROBE_REPO);
+// One domain's folder in the pocket, named as its seat folder is. Its overviews sit directly in it.
+const PROBE_DOMAIN = domainDirOf(join(constructsDir(PROBE_DOCS), "01-probe"));
 mkdirSync(join(WORKSPACE, ".spndevex"), { recursive: true });
 
 // THE PARITY ARM IS THE INCUMBENT, AND THE INCUMBENT IS GOING AWAY. Until the plugin reinstall
@@ -164,12 +166,12 @@ one("an approach page with no Why, What or How",
   "reports", "carries no why + what + how");
 
 one("an overview carrying an argument's organs",
-  write(join(overviewsDir(PROBE_DOCS), "probe-overview.html"),
+  write(join(PROBE_DOMAIN, "probe-overview.html"),
     `${STYLES.stylesheet}<div class="sds-eyebrow">Who this is for &middot; a reader</div><section><h2>Open</h2><p>You read it once and you know it.</p></section>`),
   "reports", "overview carries open");
 
-one("an approach page sitting in the overviews pocket",
-  write(join(overviewsDir(PROBE_DOCS), "probe-approach.html"), CLEAN),
+one("an approach page sitting beside a domain's overviews",
+  write(join(PROBE_DOMAIN, "probe-approach.html"), CLEAN),
   "reports", "does not end -overview.html");
 
 one("an Open card carrying no options table",
@@ -277,7 +279,7 @@ one("a rule may quote the mistake it bans",
 console.log("\n=== doc-check — the masthead: h1, an optional p.sds-subtitle, one p.sds-standfirst (RD.DEVEX.WORKSPACE.187)");
 
 // The same function `docs audit` runs, so a page is judged alike when it is saved and when it is audited.
-const CONSTRUCT = join(constructPagesDir(PROBE_DOCS), "probe-construct.html");
+const CONSTRUCT = join(domainConstructsDir(PROBE_DOMAIN), "probe-construct.html");
 const page = (inner) => `<!doctype html>
 ${STYLES.stylesheet}
 <header class="sds-masthead">
@@ -310,6 +312,26 @@ one("a construct header with no Description is SOFT",
 one("a Subtitle under the Description is out of place",
   write(CONSTRUCT, page(`  <h1>Probe</h1>\n  <p class="sds-standfirst">This page covers the probe. Read it before you change it.</p>\n  <p class="sds-subtitle">You keep one place for the model.</p>`)),
   "reports", "[SOFT] the Subtitle is out of place");
+// THE PLACE OF A PAGE UNDER THE POCKET'S `docs` FOLDER NAMES ITS KIND. A page in a `constructs` folder
+// is a construct page, and every other page is an overview: beside the hub, or in a domain's folder.
+{
+  const OVERVIEW = `<!doctype html>\n${STYLES.stylesheet}\n<div class="sds-eyebrow">Who this is for &middot; a reader</div>\n` +
+    `<section><h2>Overview</h2><p>You read it once and you know it.</p></section>`;
+  const strayConstruct = join(PROBE_DOMAIN, "probe-construct.html");
+  one("[MKT.SCRIPTS.110] an overview in its domain's folder is held to its suffix, and draws no finding about its place",
+    write(join(PROBE_DOMAIN, "probe-overview.html"), OVERVIEW), "silent");
+  one("[MKT.SCRIPTS.110] an overview beside the hub draws none either",
+    write(join(artifactDocsDir(PROBE_DOCS), "probe-overview.html"), OVERVIEW), "silent");
+  one("[MKT.SCRIPTS.110] a construct page beside its domain's overviews is refused: outside a constructs folder a page is an overview",
+    write(strayConstruct, page(MAST)), "reports", "in no constructs/ folder, but does not end -overview.html");
+  one("[MKT.SCRIPTS.110] and the finding names the same page's path in its domain's constructs folder",
+    write(strayConstruct, page(MAST)), "reports", `this page belongs at ${relative(PROBE_REPO, CONSTRUCT)}`);
+  one("[MKT.SCRIPTS.110] an overview in a constructs folder is refused: a page there is a construct page",
+    write(join(domainConstructsDir(PROBE_DOMAIN), "probe-overview.html"), OVERVIEW), "reports", "sits in constructs/ but does not end -construct.html");
+  one("[MKT.SCRIPTS.110] a page of another name beside the hub is held to the overview's suffix",
+    write(join(artifactDocsDir(PROBE_DOCS), "probe-notes.html"), OVERVIEW), "reports", "does not end -overview.html");
+}
+
 // THE HUB CASES ARE HERMETIC. The pair is read from the register beside the page, so each case
 // builds its own workspace holding a stub RD.DEVEX.WORKSPACE.143 row, and the suite never depends
 // on what the real foundation's register says today.
@@ -318,7 +340,7 @@ one("a Subtitle under the Description is out of place",
   try {
     const hubIn = (repoName, register) => {
       const docs = docsOf(join(HUB_WS, repoName));
-      mkdirSync(overviewsDir(docs), { recursive: true });
+      mkdirSync(artifactDocsDir(docs), { recursive: true });
       if (register !== null) {
         mkdirSync(registersDir(docs), { recursive: true });
         writeFileSync(decisionsRegister(docs),
@@ -760,10 +782,10 @@ try {
   // page, it holds its own copy, and beside an overview its name does not end `-overview.html`.
   const BUNDLED = `<!doctype html>\n<style>.sds-masthead{margin:0}</style>\n<header class="sds-masthead"><h1>Probe</h1></header>\n<p>You read it with no network.</p>\n`;
   one("a page's bundled copy is not read: it is a copy made to publish",
-    write(join(overviewsDir(PROBE_DOCS), "probe-overview.bundled.html"), BUNDLED), "silent");
+    write(join(PROBE_DOMAIN, "probe-overview.bundled.html"), BUNDLED), "silent");
   tell("known-bad: the same text under a page's own name is read, and is told it holds its own copy",
-    check(join(overviewsDir(PROBE_DOCS), "probe-overview.html"), BUNDLED).some(([, message]) => message === OWN_COPY)
-      && check(join(overviewsDir(PROBE_DOCS), "probe-overview.bundled.html"), BUNDLED).length === 0);
+    check(join(PROBE_DOMAIN, "probe-overview.html"), BUNDLED).some(([, message]) => message === OWN_COPY)
+      && check(join(PROBE_DOMAIN, "probe-overview.bundled.html"), BUNDLED).length === 0);
 
   const RAIL = `<nav class="sds-rail" id="rail"></nav>\n`;
   one("known-bad: a page that carries a rail and loads no shared script is told its outline is not built",

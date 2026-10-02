@@ -9,7 +9,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, rmSync
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
-import { ARTIFACT, POCKET, SEAT, WORKSTREAMS, bookTemplatesDir } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { ARTIFACT, CONSTRUCT_PAGES, POCKET, SEAT, WORKSTREAMS, bookTemplatesDir } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { INDEX_SCRIPT, OWN_COPY, linesFor } from "../../../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { ENUM_HEAD, checkCodeFigures, checkTreeFigures } from "../../../../../src/scripts/commands/docs/_lib.ts";
 
@@ -49,6 +49,8 @@ function run(root, args) {
   } catch (e) { return String(e.stdout ?? "") + String(e.stderr ?? ""); }
 }
 const readAt = (root, p) => readFileSync(join(root, p), "utf8");
+/** The pocket's `docs` folder: the hub, each overview beside it, and one folder for each domain. */
+const POCKET_DOCS = `docs/${POCKET.artifacts}/${ARTIFACT.docs}`;
 const absent = (root, p) => !existsSync(join(root, p));
 
 let n = 0, failed = 0;
@@ -206,29 +208,29 @@ const overview = (sections) =>
 const CONCEPT_TREE = "# c\n\n## SaaS Plane — Foundation\n\nstage.\n\n### DevEx\n\nhow it runs.\n\n### Docs\n\nhow it is written.\n\n## Adoption\n\nlast.\n";
 {
   const root = repo({ "CONCEPT.md": CONCEPT_TREE,
-    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/o.html`]: overview(["Overview", "DevEx", "Docs", "Glossary", "Where to go next"]) });
+    [`${POCKET_DOCS}/o-overview.html`]: overview(["Overview", "DevEx", "Docs", "Glossary", "Where to go next"]) });
   one("a domain heading at `###` is a real heading, and the overview may borrow it",
-    run(root, ["audit", `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/o.html`]), lacks("no counterpart"));
+    run(root, ["audit", `${POCKET_DOCS}/o-overview.html`]), lacks("no counterpart"));
 }
 {
   const root = repo({ "CONCEPT.md": CONCEPT_TREE,
-    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/o.html`]: overview(["Overview", "DevEx", "Invented", "Glossary", "Where to go next"]) });
+    [`${POCKET_DOCS}/o-overview.html`]: overview(["Overview", "DevEx", "Invented", "Glossary", "Where to go next"]) });
   one("a heading the concept does not have anywhere is still a finding",
-    run(root, ["audit", `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/o.html`]), has("Invented — an overview never invents"));
+    run(root, ["audit", `${POCKET_DOCS}/o-overview.html`]), has("Invented — an overview never invents"));
 }
 {
   const root = repo({ "CONCEPT.md": CONCEPT_TREE,
-    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/o.html`]: overview(["Overview", "Docs", "DevEx", "Glossary", "Where to go next"]) });
+    [`${POCKET_DOCS}/o-overview.html`]: overview(["Overview", "Docs", "DevEx", "Glossary", "Where to go next"]) });
   one("and the source's order still binds across depths",
-    run(root, ["audit", `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/o.html`]), has("an overview holds its source's order"));
+    run(root, ["audit", `${POCKET_DOCS}/o-overview.html`]), has("an overview holds its source's order"));
 }
 {
   // A concept that SHOWS an example page in a fenced block is not declaring those headings.
   const root = repo({
     "CONCEPT.md": CONCEPT_TREE + "\n```markdown\n## Fenced Heading\n```\n",
-    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/o.html`]: overview(["Overview", "Fenced Heading", "Glossary", "Where to go next"]) });
+    [`${POCKET_DOCS}/o-overview.html`]: overview(["Overview", "Fenced Heading", "Glossary", "Where to go next"]) });
   one("a heading inside a fence is not a heading the concept has",
-    run(root, ["audit", `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/o.html`]), has("Fenced Heading — an overview never invents"));
+    run(root, ["audit", `${POCKET_DOCS}/o-overview.html`]), has("Fenced Heading — an overview never invents"));
 }
 
 
@@ -489,11 +491,11 @@ console.log("\n=== the gap scan measures and never fixes");
   // the week somebody is busy. The page is refused wherever it sits in `docs/`, a pocket folder too.
   {
     const ws = repo({
-      [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/x-approach.html`]:
+      [`${POCKET_DOCS}/x-approach.html`]:
         doc({ id: "x", variant: "approach", title: "X", lenses: ["ARCHITECT"], status: "PLANNING" },
             `${LINES.stylesheet}\n<p>an argument</p>\n`),
     });
-    const got = run(ws, ["audit", `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/x-approach.html`]);
+    const got = run(ws, ["audit", `${POCKET_DOCS}/x-approach.html`]);
     one("an approach page in a repository's docs is refused", got, has("belongs to the workstream"));
   }
   {
@@ -507,7 +509,7 @@ console.log("\n=== the gap scan measures and never fixes");
     one("the same page in a workstream is not", got, (g) => !/belongs to the workstream/.test(g));
   }
 
-  // The pocket's folder set is overviews, constructs and reports (05-artifacts.md § What the pocket
+  // The pocket's folder set is docs, guides and reports (05-artifacts.md § What the pocket
   // holds). A folder the set does not name held "what a document was written from", and every such
   // file was a seat depending on a pocket — 229 files across five repositories, 187 of them cited by
   // nothing. The check reads the set, so any other name is refused the same way; two are probed.
@@ -519,6 +521,49 @@ console.log("\n=== the gap scan measures and never fixes");
     });
     const got = run(ws, ["audit", `docs/${POCKET.artifacts}/${folder}/packages/x/purpose.md`]);
     one(`a file in a pocket folder outside the set (${folder}/) is refused`, got, has(`never in \`${folder}/\``));
+  }
+
+  // A PAGE OUT OF ITS PLACE IS TOLD ITS PLACE. A repository whose pages sit in one folder of overviews
+  // and one tree of construct pages, directly in the pocket, holds each page in a folder the set does
+  // not name. The finding says where the page belongs, so the move needs no second look at the book.
+  {
+    const overviewPage = `<meta charset="utf-8">\n<title>Core</title>\n` +
+      block({ id: "o", variant: "overview", parentId: "concept", title: "Core", lenses: ["ARCHITECT"], summary: "s." }) + `${LINES.stylesheet}\n<h2>Overview</h2>\n<p>x</p>`;
+    const constructPage = `<meta charset="utf-8">\n<title>Thing</title>\n` +
+      block({ id: "x", variant: "construct", parentId: "core", title: "Thing", lenses: ["ARCHITECT"], status: "DONE", summary: "s.", dependsOn: [] }) + `${LINES.stylesheet}\n<h2>Boundary</h2>\n<p>x</p>`;
+    // A folder named `overviews`, which the pocket's set does not hold, and the pocket's own `constructs`.
+    const LEFT_OVERVIEWS = `docs/${POCKET.artifacts}/overviews`;
+    const LEFT_CONSTRUCTS = `docs/${POCKET.artifacts}/${CONSTRUCT_PAGES}`;
+    const placed = {
+      overview: `${POCKET_DOCS}/01-core/core-overview.html`,
+      beside: `${POCKET_DOCS}/core-overview.html`,
+      construct: `${POCKET_DOCS}/01-core/${CONSTRUCT_PAGES}/01-thing-construct.html`,
+      nested: `${POCKET_DOCS}/01-area/02-core/${CONSTRUCT_PAGES}/01-thing-construct.html`,
+    };
+    const at = (path, text) => run(repo({ "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n", [path]: text }), ["audit", path]);
+
+    const leftOverview = at(`${LEFT_OVERVIEWS}/core-overview.html`, overviewPage);
+    one("[MKT.SCRIPTS.110] an overview left under `overviews/` is a finding of the audit, and it names the folder the pocket does not hold",
+      leftOverview, (g) => g.includes("✗ RULE block") && g.includes("the pocket holds `docs/`, `guides/` and `reports/`, and no `overviews/`"));
+    one("[MKT.SCRIPTS.110] and it names where the overview belongs: beside the hub, or in its domain's folder",
+      leftOverview, has(`this page belongs at ${placed.beside} beside the hub, or ${POCKET_DOCS}/<domain>/core-overview.html`));
+    const leftConstruct = at(`${LEFT_CONSTRUCTS}/01-core/01-thing-construct.html`, constructPage);
+    one("[MKT.SCRIPTS.110] a construct page left under the pocket's own `constructs/` is a finding of the audit",
+      leftConstruct, (g) => g.includes("✗ RULE block") && g.includes(`and no \`${CONSTRUCT_PAGES}/\``));
+    one("[MKT.SCRIPTS.110] and it names the page's path in its domain's constructs folder", leftConstruct, has(`this page belongs at ${placed.construct}`));
+    one("[MKT.SCRIPTS.110] a construct page two folders deep is told both folders, with the constructs folder last",
+      at(`${LEFT_CONSTRUCTS}/01-area/02-core/01-thing-construct.html`, constructPage), has(`this page belongs at ${placed.nested}`));
+    one("[MKT.SCRIPTS.110] a construct page beside its domain's overviews is out of its place too, and is told the constructs folder beside it",
+      at(`${POCKET_DOCS}/01-core/01-thing-construct.html`, constructPage),
+      (g) => g.includes(`out of its place in \`${ARTIFACT.docs}/\``) && g.includes(`it belongs at ${placed.construct}`));
+    one("[MKT.SCRIPTS.110] an overview in a constructs folder is out of its place, and is told the two places an overview sits in",
+      at(`${POCKET_DOCS}/01-core/${CONSTRUCT_PAGES}/core-overview.html`, overviewPage), has(`it belongs at ${placed.beside} beside the hub, or`));
+    for (const [name, path, text] of [["an overview in its domain's folder", placed.overview, overviewPage],
+      ["an overview beside the hub", placed.beside, overviewPage], ["a construct page in its domain's constructs folder", placed.construct, constructPage]])
+      one(`[MKT.SCRIPTS.110] ${name} draws no finding about its place`, at(path, text),
+        (g) => !g.includes("the pocket holds") && !g.includes("belongs at") && !g.includes("out of its place"));
+    one("[MKT.SCRIPTS.110] a construct page with no seat file at the path its own path gives is said to have none",
+      at(placed.construct, constructPage), has("no seat file sits at the mirrored path"));
   }
   {
     // The same file in the seat that owns it is exactly right, and must pass untouched.
@@ -751,12 +796,12 @@ console.log("\n=== a domain overview borrows from its DOMAIN, not from the conce
     [`docs/${SEAT.constructs}/01-core/README.md`]: doc({ id: "core", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
     [`docs/${SEAT.constructs}/01-core/01-beta.md`]: seat("beta", "Beta", ["gamma"]),
     [`docs/${SEAT.constructs}/01-core/02-gamma.md`]: seat("gamma", "Gamma", []),
-    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-core-overview.html`]:
+    [`${POCKET_DOCS}/01-core/core-overview.html`]:
       `<meta charset="utf-8">\n<title>Core</title>\n` +
       block({ id: "o", variant: "overview", parentId: "concept", title: "Core", lenses: ["ARCHITECT"], summary: "s." }) +
       `${LINES.stylesheet}\n` + sections.map((h) => `<h2>${h}</h2>\n<p>x</p>`).join("\n"),
   });
-  const audit = (secs) => run(repo(tree(secs)), ["audit", `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-core-overview.html`]);
+  const audit = (secs) => run(repo(tree(secs)), ["audit", `${POCKET_DOCS}/01-core/core-overview.html`]);
 
   // ASSERT ON THE FINDING UNDER TEST, never on the absence of every finding: this fixture carries
   // no `<header>`, so `checkHeader` fires on it and a bare `lacks("✗")` was failing for a reason
@@ -787,18 +832,18 @@ console.log("\n=== an HTML page links the HTML page, never the markdown seat (Q2
   const mk = (href) => repo({
     "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
     [`docs/${SEAT.constructs}/01-core/thing.md`]: "# Thing\n",
-    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/o.html`]: page(href),
+    [`${POCKET_DOCS}/o-overview.html`]: page(href),
   });
   one("a link to a construct SEAT is refused, and it names the page it should have used",
-    run(mk(`../../${SEAT.constructs}/01-core/thing.md`), ["audit", `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/o.html`]),
+    run(mk(`../../${SEAT.constructs}/01-core/thing.md`), ["audit", `${POCKET_DOCS}/o-overview.html`]),
     has("thing-construct.html"));
   one("a link to the produced page is silent",
-    run(mk(`../${ARTIFACT.constructs}/01-core/thing-construct.html`), ["audit", `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/o.html`]),
+    run(mk(`01-core/${CONSTRUCT_PAGES}/thing-construct.html`), ["audit", `${POCKET_DOCS}/o-overview.html`]),
     lacks("an HTML page links the HTML page"));
   // A SEAT README IS PRODUCED AS NO PAGE AT ALL, so a link to one has nowhere else to go. Refusing
   // it would be a gate demanding a file the generator never writes.
   one("a link to a seat README keeps its .md, because no page exists for it",
-    run(mk(`../../${SEAT.constructs}/README.md`), ["audit", `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/o.html`]),
+    run(mk(`../../${SEAT.constructs}/README.md`), ["audit", `${POCKET_DOCS}/o-overview.html`]),
     lacks("an HTML page links the HTML page"));
 }
 
@@ -884,7 +929,7 @@ console.log("\n=== a generated column is read against its own heading (N37 step 
 
 console.log("\n=== a page's furniture is the shared files': a version that exists, and a style of its own is the page's to add");
 {
-  const at = `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-core-overview.html`;
+  const at = `${POCKET_DOCS}/01-core/core-overview.html`;
   const o = { id: "o", variant: "overview", parentId: "concept", title: "Core", lenses: ["ARCHITECT"], summary: "s." };
   // AN OVERVIEW THAT AUDITS CLEAN, so each case below differs from it in one thing and a finding is
   // that thing's alone.
@@ -913,7 +958,7 @@ console.log("\n=== a page's furniture is the shared files': a version that exist
     audit(shared({ own: '<script type="application/json">{"rows":[]}</script>\n' })), has("clean — 1 page"));
   one("a page that links a folder beside it names no version, and draws no finding",
     audit(shared({ link: '<link rel="stylesheet" href="../assets/sds-docs.css">' }),
-      { [`docs/${POCKET.artifacts}/assets/sds-docs.css`]: "/* the stylesheet, beside the page */\n" }),
+      { [`${POCKET_DOCS}/assets/sds-docs.css`]: "/* the stylesheet, beside the page's folder */\n" }),
     has("clean — 1 page"));
 
   const absent = audit(shared({ link: linesFor("9.9.9").stylesheet }));
@@ -957,7 +1002,7 @@ console.log("\n=== a page's furniture is the shared files': a version that exist
   // is not compared: it is named once, and `docs page` is what moves it.
   const templates = bookTemplatesDir(resolve(PLUGIN, "..", "..", "..", "spn-foundation"));
   const seat = `docs/${SEAT.constructs}/01-core/x.md`;
-  const at = `docs/${POCKET.artifacts}/${ARTIFACT.constructs}/01-core/x-construct.html`;
+  const at = `${POCKET_DOCS}/01-core/${CONSTRUCT_PAGES}/x-construct.html`;
   const root = repo({ "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n", [seat]: construct(SECTIONS),
     // The way back of a produced page is the constructs seat's face, so the face is there to be linked.
     [`docs/${SEAT.constructs}/README.md`]: doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }) });
@@ -1049,14 +1094,14 @@ console.log("\n=== a report is a snapshot: no status, and its header says Genera
 
 console.log("\n=== the masthead: h1, an optional p.sds-subtitle, one p.sds-standfirst, and nothing after it (RD.DEVEX.WORKSPACE.187)");
 {
-  const page = (inner, file = "concept-core-overview.html") => repo({
+  const page = (inner, file = "01-core/core-overview.html") => repo({
     "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
-    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/${file}`]:
+    [`${POCKET_DOCS}/${file}`]:
       `<meta charset="utf-8">\n<title>Core</title>\n` +
       block({ id: "o", variant: "overview", parentId: "concept", title: "Core", lenses: ["ARCHITECT"], summary: "s." }) +
       `${LINES.stylesheet}\n<header class="sds-masthead">\n<!-- a comment <p>is not a paragraph</p> -->\n${inner}\n</header>\n<h2>Overview</h2>\n<p>x</p>`,
   });
-  const audit = (inner, file) => run(page(inner, file), ["audit", `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/${file ?? "concept-core-overview.html"}`]);
+  const audit = (inner, file) => run(page(inner, file), ["audit", `${POCKET_DOCS}/${file ?? "01-core/core-overview.html"}`]);
   const GOOD = `<h1>Know where you are.</h1>\n<p class="sds-subtitle">The core is the part every other part reads.</p>\n<p class="sds-standfirst">This page covers the core. Read it first.</p>`;
 
   one("h1, one Subtitle and one Description draw no masthead finding", audit(GOOD), lacks("masthead"));
@@ -1086,12 +1131,12 @@ console.log("\n=== the masthead: h1, an optional p.sds-subtitle, one p.sds-stand
   const hub = (h1, sub, row = ROW) => repo({
     "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
     [`docs/${POCKET.registers}/decisions.md`]: "# Decisions\n\n| ID | Area | Decision | Why | When |\n| --- | --- | --- | --- | --- |\n" + row,
-    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-overview.html`]:
+    [`${POCKET_DOCS}/concept-overview.html`]:
       `<meta charset="utf-8">\n<title>Concept</title>\n` +
       block({ id: "o", variant: "overview", parentId: "concept", title: "Concept", lenses: ["ARCHITECT"], summary: "s." }) +
       `${LINES.stylesheet}\n<header class="sds-masthead">\n<h1>${h1}</h1>\n<p class="sds-subtitle">${sub}</p>\n<p class="sds-standfirst">This page is the start.</p>\n</header>\n<h2>Overview</h2>\n<p>x</p>`,
   }, { type: "FOUNDATION" });
-  const audit = (...a) => run(hub(...a), ["audit", `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-overview.html`]);
+  const audit = (...a) => run(hub(...a), ["audit", `${POCKET_DOCS}/concept-overview.html`]);
   one("the hub's pair, word for word from the register's row, is silent",
     audit("Only this probe&rsquo;s own title.", "The probe's own subtitle, read from the row."), lacks("RD.DEVEX.WORKSPACE.143"));
   one("a hub Title that is not the row's is SOFT, and quotes the row",
@@ -1157,7 +1202,7 @@ console.log("\n=== a guide page and the index of artifacts are pages the audit k
   const alone = audit({}, indexAt);
   one("the index is asked for no `lenses`, no header and no masthead, and its block of data and its own script draw no finding",
     alone, has("clean — 1 page"));
-  const asOverview = `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-core-overview.html`;
+  const asOverview = `${POCKET_DOCS}/01-core/core-overview.html`;
   one("known-bad: the same page declared an `overview` is asked for its lenses and its header, so the kind is what lifts them",
     audit({ [asOverview]: index({ ...indexBlock, variant: "overview" }) }, asOverview),
     (g) => g.includes("`lenses` is missing or empty") && g.includes("no `<header>`"));
@@ -1171,7 +1216,7 @@ console.log("\n=== a guide page and the index of artifacts are pages the audit k
   const stray = `docs/${POCKET.artifacts}/stray-guide.html`;
   one("known-bad: another page directly in the pocket is refused, and the finding names the folders",
     audit({ [stray]: guide() }, stray), (g) => g.includes("`index.html` is the one page that sits directly in the pocket") && g.includes("`guides/`"));
-  const elsewhere = `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/index.html`;
+  const elsewhere = `${POCKET_DOCS}/index.html`;
   one("known-bad: an index in a folder of the pocket is refused, because a repository has one and it sits in the pocket itself",
     audit({ [elsewhere]: index() }, elsewhere), has("a repository has one index, and it is `docs/artifacts/index.html`"));
   one("the pocket's face sits directly in the pocket too, and is not refused",

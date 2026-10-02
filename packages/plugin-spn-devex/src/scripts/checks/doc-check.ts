@@ -48,8 +48,9 @@ import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { basename, dirname, join, resolve, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { emit, readPayload, runAlone, unescape, type Payload, type Verdict } from "../lib/payload.ts";
-import { GUIDE_PAGE_SUFFIX, APPROACH_SUFFIX, ARTIFACT, PLUGIN_TEMPLATES, POCKET, decisionsRegister, inArtifacts, isApproachPage, isArcFile,
-         isRegister as inRegisters, workstreamDirOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { GUIDE_PAGE_SUFFIX, APPROACH_SUFFIX, ARTIFACT, CONSTRUCT_PAGES, CONSTRUCT_PAGE_SUFFIX, HUB, OVERVIEW_PAGE_SUFFIX, PLUGIN_TEMPLATES, POCKET,
+         artifactDocsPathOf, decisionsRegister, inArtifacts, isApproachPage, isArcFile, isRegister as inRegisters, pagePlaceOf,
+         workstreamDirOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { BUNDLED_SUFFIX, OWN_COPY, PAGE_SCRIPT, SERVED_FILES, cutVersions, linksSharedStyles, stylesDir } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { CYCLES_COLUMNS, cyclesOf, headerStatusRule, openHeadingFor, openHeadingOf, previewLinkForm, previewsOf, tableColumns,
          tableDifferences } from "../commands/docs/cycles.ts";
@@ -190,9 +191,21 @@ const NORMATIVE = /\b(?:MUST NOT|MUST|SHOULD NOT|SHOULD|MAY)\b/;
 const REACH_BAR: Record<string, number> = { "artifact-html": 15, readme: 25, chapter: 15, concept: 15 };
 const REACH_MIN_N = 8;
 
-// RD.DEVEX.WORKSPACE.103 — the suffix names the kind, and the set is closed. An approach page lives
-// in its workstream, never in the pocket, so the one pocket folder with a fixed suffix is overviews.
-const POCKET_KIND: Record<string, string> = { [ARTIFACT.overviews]: "-overview.html", [ARTIFACT.guides]: GUIDE_PAGE_SUFFIX };
+/**
+ * The suffix a page of the pocket is held to by its place, and that place as a message names it. Null
+ * where the place holds a page to no suffix. RD.DEVEX.WORKSPACE.103: the suffix names the kind, and
+ * the set is closed. Under the pocket's `docs` folder a page in a `constructs` folder is a construct
+ * page and every other page is an overview. A page directly in `guides/` is a guide.
+ */
+function pocketKind(parts: string[]): { place: string; suffix: string } | null {
+  const inside = artifactDocsPathOf(parts.join("/"));
+  if (inside !== null)
+    return inside.slice(0, -1).includes(CONSTRUCT_PAGES)
+      ? { place: `in ${CONSTRUCT_PAGES}/`, suffix: CONSTRUCT_PAGE_SUFFIX }
+      : { place: `under ${POCKET.artifacts}/${ARTIFACT.docs}/, in no ${CONSTRUCT_PAGES}/ folder,`, suffix: OVERVIEW_PAGE_SUFFIX };
+  return parts.includes(POCKET.artifacts) && parts.at(-2) === ARTIFACT.guides
+    ? { place: `in ${ARTIFACT.guides}/`, suffix: GUIDE_PAGE_SUFFIX } : null;
+}
 const NODE_MANIFESTS = ["spkind.json", "spinfrapkg.json"];
 const SKIP = new Set(["node_modules", ".git", "dist", "build", "coverage", "tool-results", ".output", ".nx"]);
 
@@ -226,19 +239,17 @@ export function structural(path: string): Finding[] {
         "never as a file at the node"]);
   }
 
-  // RD.DEVEX.WORKSPACE.103 — folder and suffix must agree. A page under `guides/` ends `-guide.html`
+  // RD.DEVEX.WORKSPACE.103 — place and suffix must agree. A page under `guides/` ends `-guide.html`
   // (RD.DEVEX.WORKSPACE.218). The index of artifacts sits directly in the pocket and has no suffix
   // (RD.DEVEX.WORKSPACE.219), so it is held to none.
   const parts = slashes(resolve(path)).split("/");
-  if (parts.includes(POCKET.artifacts) && base.endsWith(".html")) {
-    const pocket = parts[parts.length - 2];
-    const want = POCKET_KIND[pocket];
-    if (want && !base.endsWith(want)) {
-      const hint = base.endsWith(APPROACH_SUFFIX)
-        ? " — an overview explains, an approach argues; the test is whether options were weighed and one chosen"
-        : "";
-      out.push(["BLOCK", `${base} sits in ${pocket}/ but does not end ${want} — RD.DEVEX.WORKSPACE.103: the suffix names the kind${hint}`]);
-    }
+  const kind = base.endsWith(".html") ? pocketKind(parts) : null;
+  if (kind !== null && !base.endsWith(kind.suffix)) {
+    const belongs = pagePlaceOf(parts.join("/"));
+    const hint = base.endsWith(APPROACH_SUFFIX)
+      ? " — an overview explains, an approach argues; the test is whether options were weighed and one chosen"
+      : belongs !== null ? ` — this page belongs at ${belongs}` : "";
+    out.push(["BLOCK", `${base} sits ${kind.place} but does not end ${kind.suffix} — RD.DEVEX.WORKSPACE.103: the suffix names the kind${hint}`]);
   }
   return out;
 }
@@ -419,7 +430,7 @@ export function approachShape(text: string, exempt = false): Finding[] {
   const missing = ["why", "what", "how"].filter((s) => !heads.includes(s));
   if (missing.length)
     return [["RULE", "carries no " + missing.join(" + ") + " — this explains rather than argues, so " +
-      `it is an overview: ${POCKET.artifacts}/${ARTIFACT.overviews}/<name>-overview.html (RD.DEVEX.WORKSPACE.102 / 040). An approach ` +
+      `it is an overview: ${POCKET.artifacts}/${ARTIFACT.docs}/<domain>/<name>${OVERVIEW_PAGE_SUFFIX} (RD.DEVEX.WORKSPACE.102 / 040). An approach ` +
       "is an opening, then Why > What > How > Open > Deferred"]];
   if (exempt) return [];
 
@@ -461,7 +472,7 @@ const MASTHEAD_WHERE = "(05-artifacts.md § The masthead, and the opening; RD.DE
 export type MastheadKind = "hub" | "overview" | "construct" | "report" | "approach" | "preview";
 export function mastheadKind(path: string): MastheadKind | null {
   const base = basename(path);
-  if (base === "concept-overview.html") return "hub";
+  if (base === HUB) return "hub";
   const suffix = /-(overview|construct|report|approach|preview)\.html$/.exec(base);
   return suffix ? suffix[1] as MastheadKind : null;
 }

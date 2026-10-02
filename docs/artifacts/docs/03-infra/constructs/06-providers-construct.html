@@ -1,0 +1,147 @@
+<meta charset="utf-8">
+<title>Providers — One Folder per Cloud, Scripts Half Only</title>
+<!-- spn:doc
+{"id":"estate-providers","variant":"construct","title":"Providers — One Folder per Cloud, Scripts Half Only","subtitle":"One folder per cloud, holding only what changes between them.","lenses":["INFRA","ARCHITECT"],"status":"PLANNING","dependsOn":["provider-set","estate-guard"],"summary":"This plugin serves every cloud an estate can run on, and everything that varies between clouds sits in one folder per cloud under Providers.","keywords":["provider","cloud","aws","gcp","scripts half","discovery"]}
+-->
+<!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.css">
+<div class="sds-page">
+
+<nav class="sds-rail" id="rail">
+  <a class="sds-home" href="../infra-overview.html">&larr; spn-infra — The Estate Domain</a>
+  <div class="sds-rail-title">Providers — One Folder per Cloud, Scripts Half Only</div>
+</nav>
+<div class="sds-wrap">
+
+<header class="sds-masthead">
+  <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Providers — One Folder per Cloud, Scripts Half Only</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">DevOps / SRE</span><span class="sds-badge sds-lens">Architect</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>Providers — One Folder per Cloud, Scripts Half Only</h1>
+  <p class="sds-subtitle">One folder per cloud, holding only what changes between them.</p>
+  <p class="sds-standfirst">This plugin serves every cloud an estate can run on, and everything that varies between clouds sits in one folder per cloud under <code>providers/</code>. Read this page before you add a new cloud, or when you want to know why these folders hold only scripts. It explains why adding a cloud means adding a folder rather than editing a gate, and what decides whether a folder also carries a skills half.</p>
+</header>
+
+<!-- 00 -->
+<section id="s0">
+  <div class="sds-section-head"><h2>Overview</h2></div>
+  <p><strong>A skills half is earned by changing the authoring stack.</strong> In the apps domain the instance <em>is</em> the stack, so a provider there always changes the language the work is written in and always carries a procedure. Here the instance is the cloud, and the cloud does not change what an author writes: an estate declaration is provider-neutral, and every rendering is written against OpenTofu whichever cloud it will reach. So the walk is the same on every cloud, and <strong>this plugin is not expected to grow a skills half</strong>. The asymmetry is a fact about the two domains rather than a gap in one of them.</p>
+  <p>This construct realizes the book's <code>01-devex/02-agent/04-plugins</code>.</p>
+</section>
+
+<!-- 01 -->
+<section id="s1">
+  <div class="sds-section-head"><h2>Terms</h2></div>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <tbody>
+      <tr><td>a cloud</td><td><code>providers/&lt;cloud&gt;/</code></td><td>one realization this plugin serves — the folder is the whole registration</td></tr>
+      <tr><td>the scripts half</td><td><code>providers/&lt;cloud&gt;/scripts/checks/</code></td><td>what the gate runs for this cloud: one validator per subject</td></tr>
+      <tr><td>a subject</td><td><code>manifest</code> · <code>rendering</code></td><td>one kind of file with one parse, named the same way in every cloud's folder</td></tr>
+      <tr><td>a skills half</td><td><code>providers/&lt;instance&gt;/skills/</code></td><td>what a skill loads when working in this instance — a procedure, which no cloud here has</td></tr>
+      <tr><td>the vocabulary</td><td><code>refs/support/infra/providers/&lt;cloud&gt;/</code></td><td>what this cloud calls things, restated as a fact rather than run as code</td></tr>
+      <tr><td>discovery</td><td><code>instances()</code></td><td>the gate reading which folders exist, rather than a list of clouds written anywhere</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 02 -->
+<section id="s2">
+  <div class="sds-section-head"><h2>Model</h2></div>
+  <p>The folder is the registration. Nothing names a cloud: the gate reads which folders the providers tree holds, and for each subject it imports that cloud's validator if the cloud ships one.</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="22 22 1055 80" style="max-width:1055px" role="img" aria-label="Nothing between the gate and a cloud's parse is a list somebody has to keep current.">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="sds-box" x="24" y="24" width="237" height="76" rx="3"/>
+    <text class="sds-label" x="40" y="50">the gate</text>
+    <text class="sds-note" x="40" y="69">names no cloud; reads the folder</text>
+    <text class="sds-note" x="40" y="88">instead</text>
+    <path class="sds-connector" d="M261 62 H334.6" marker-end="url(#ar)"/>
+    <text class="sds-note" x="269" y="54">discovers</text>
+    <rect class="sds-box" x="334.6" y="24" width="180" height="76" rx="3"/>
+    <text class="sds-label" x="350.6" y="50">providers/&lt;cloud&gt;/</text>
+    <text class="sds-note" x="350.6" y="69">the folder is the whole</text>
+    <text class="sds-note" x="350.6" y="88">registration</text>
+    <path class="sds-connector" d="M514.6 62 H570.6" marker-end="url(#ar)"/>
+    <text class="sds-note" x="527" y="54">holds</text>
+    <rect class="sds-box" x="570.6" y="24" width="224" height="76" rx="3"/>
+    <text class="sds-label" x="586.6" y="50">scripts/checks/&lt;subject&gt;.ts</text>
+    <text class="sds-note" x="586.6" y="69">this cloud's parse and its own</text>
+    <text class="sds-note" x="586.6" y="88">spellings</text>
+    <path class="sds-connector" d="M794.6 62 H850.6" marker-end="url(#ar)"/>
+    <text class="sds-note" x="810" y="54">runs</text>
+    <rect class="sds-box" x="850.6" y="24" width="224" height="76" rx="3"/>
+    <text class="sds-label" x="866.6" y="50">the rule bodies</text>
+    <text class="sds-note" x="866.6" y="69">shared, cloud-free, and handed</text>
+    <text class="sds-note" x="866.6" y="88">this cloud's patterns</text>
+  </svg>
+    <figcaption>Nothing between the gate and a cloud's parse is a list somebody has to keep current.</figcaption>
+  </figure>
+  <!-- dg:source
+{ "kind": "map",
+  "caption": "Nothing between the gate and a cloud's parse is a list somebody has to keep current.",
+  "boxes": [
+    { "id": "a", "label": "the gate", "note": "names no cloud; reads the folder instead" },
+    { "id": "b", "label": "providers/<cloud>/", "note": "the folder is the whole registration" },
+    { "id": "c", "label": "scripts/checks/<subject>.ts", "note": "this cloud's parse and its own spellings" },
+    { "id": "d", "label": "the rule bodies", "note": "shared, cloud-free, and handed this cloud's patterns" }
+  ],
+  "links": [
+    { "from": "a", "to": "b", "label": "discovers" },
+    { "from": "b", "to": "c", "label": "holds" },
+    { "from": "c", "to": "d", "label": "runs" }
+  ] }
+  -->
+  <p><strong>A provider mirrors the plugin's own folder names</strong>, so a contributor filling one is filling folders they have already read. <strong>And it contributes only the halves it has something to put in</strong>: a folder standing empty to look complete teaches a reader that the realization works, while one that is missing says what is true.</p>
+</section>
+
+<!-- 03 -->
+<section id="s3">
+  <div class="sds-section-head"><h2>Parts</h2></div>
+  <h3 id="the-clouds-this-plugin-ships-a-parse-for">The clouds this plugin ships a parse for</h3>
+  <p><code>providers/aws/</code> and <code>providers/gcp/</code> each hold <code>scripts/checks/manifest.ts</code> and <code>scripts/checks/rendering.ts</code>. <strong>The rule is the domain's and the parse is the provider's</strong>: a rule says <em>an account id is never pinned</em>, which holds on every cloud, while what a region or an instance class looks like belongs to the cloud and to nothing else. Each validator reads the text once and hands it to every rule that applies, so four rules are not four passes over the same text.</p>
+  <h3 id="a-cloud-with-no-folder-is-a-cloud-with-n">A cloud with no folder is a cloud with no parse, and it says so</h3>
+  <p><code>local</code> has no folder here. Its vocabulary is restated in the refs tree like every other cloud's, because those words are true whether or not code reads them — but no validator ships for it, and the absence is the statement rather than an oversight. A stub folder answering with silence would teach a reader that the write-time check works there.</p>
+  <h3 id="the-vocabulary-is-a-fact-so-it-lives-in-">The vocabulary is a fact, so it lives in refs rather than here</h3>
+  <p>What differs between clouds is what they call things, and a name is a fact. Each cloud's words are restated subject by subject under the refs tree, where a reader looking something up and a skill citing it both find them in one place. <strong><code>providers/</code> executes and <code>refs/</code> states</strong>, and that line is what keeps a cloud's spellings out of a folder a gate dispatches into.</p>
+  <h3 id="the-gate-discovers-the-clouds-and-runs-e">The gate discovers the clouds and runs every one of them</h3>
+  <p>The gate lists no cloud. It reads the folders the providers tree holds, sorted so the order is stable, and imports each one's validator per subject; a cloud shipping nothing for a subject simply contributes nothing there. <strong>And it runs every cloud's validators rather than the declared one.</strong> Running only the declared cloud's patterns would let an AWS region into a declaration whose cloud entry says Google — the mistake somebody makes while moving an estate between clouds, and the moment the gate is most worth having. A write-time gate cannot read a resolved estate anyway, because there may not be one yet.</p>
+  <h3 id="a-shared-rule-body-is-a-factory-not-a-ru">A shared rule body is a factory, not a rule</h3>
+  <p>Where every cloud needs one rule, what they share is the judgement and what differs is the pattern. The provider-string rule is written as a function each cloud's validator feeds its own spellings to, and it lives with the plugin's other shared code rather than inside any cloud's folder. Inlining it would put one copy of the same rule in each cloud, which is the duplication the factory exists to prevent.</p>
+  <h3 id="adding-a-cloud">Adding a cloud</h3>
+  <p>Add <code>providers/&lt;cloud&gt;/scripts/checks/</code>, with a validator per subject it has an opinion about, and restate that cloud's vocabulary in the refs tree. No gate changes, no import list changes, and a listing of the folder is the coverage.</p>
+</section>
+
+<!-- 04 -->
+<section id="s4">
+  <div class="sds-section-head"><h2>Boundary</h2></div>
+  <p>This page answers what this plugin puts in a provider folder and why the halves are what they are. It does not answer what a provider is — the two halves, the rule that a gate never names an instance, and the test a skills half has to pass are <a href="../../01-devex/constructs/07-providers-construct.html">Providers</a>. It does not answer what the shared rule bodies say, and it does not answer what each cloud's words mean.</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <tbody>
+      <tr><td>that a cloud carries a scripts half alone, and why the authoring stack decides it</td><td>the two halves, the dispatch rule, and what a provider may never hold</td><td><a href="../../01-devex/constructs/07-providers-construct.html">Providers</a></td></tr>
+      <tr><td>that a cloud's parse and its own spellings sit in its own folder</td><td>the gate that discovers the folders, and the shared rule bodies it runs</td><td><a href="./04-scripts-construct.html">Scripts</a></td></tr>
+      <tr><td>that a cloud with no validator says so by having no folder</td><td>that cloud's vocabulary, which is restated whether or not code reads it</td><td><a href="./05-refs-construct.html">Refs</a></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 05 -->
+<section id="s5">
+  <div class="sds-section-head"><h2>Binds</h2></div>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <tbody>
+      <tr><td><code>RD.DEVEX.WORKSPACE.176</code></td><td>a repository answers to the world it declares, which is what makes <code>sprepo.json</code> the one place an instance is read from</td><td>MUST</td></tr>
+      <tr><td><code>RD.DEVEX.UTILS.019</code></td><td>a provider folder restates nothing and states no rule the domain owns</td><td>MUST</td></tr>
+      <tr><td>the apps plugin's subject registry</td><td><em>until a parser exists there is no folder for it</em> — a realization that is absent says so, and a stub that answers teaches you it works</td><td>MUST</td></tr>
+    </tbody>
+  </table></div>
+  <p>Try it: <code>node packages/plugin-spn-infra/tests/run.mjs</code></p>
+</section>
+
+
+
+</div>
+</div>
+
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.js"></script>

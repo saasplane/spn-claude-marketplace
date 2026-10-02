@@ -13,7 +13,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, readFileSync, existsSync, rmSync
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
-import { ARTIFACT, POCKET, SEAT, TEMPLATES } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { ARTIFACT, CONSTRUCT_PAGES, POCKET, SEAT, TEMPLATES } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, linesFor } from "../../../../../../plugin-support-lib/src/lib/page-styles.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
@@ -472,7 +472,7 @@ console.log("\n=== a seat face lists the mirrors beside it, never the chapters t
 console.log("\n=== the domain's glossary lands on its overview too, in HTML (Q226 A, Q231, Q234)");
 {
   const terms = "## Terms\n\n| Term | Contract term | What it means |\n| --- | --- | --- |\n" +
-    "| sign-in | `SPSession` | one person's live access |\n\n" +
+    "| sign-in | `SPSession` | one person's live access, as [the rule](../../registers/decisions.md#r1) and [the standard](https://example.com/s) say |\n\n" +
     "## Model\n\nx\n\n## Parts\n\nx\n\n## Boundary\n\nx\n\n" +
     "## Binds\n\n| where it lives today | |\n| --- | --- |\n| a | b |\n\n## Proof\n\nx\n";
   // An overview in the shared form by default: the line that links the shared stylesheet, and the
@@ -495,18 +495,25 @@ console.log("\n=== the domain's glossary lands on its overview too, in HTML (Q22
     [`docs/${SEAT.constructs}/01-core/session.md`]:
       doc({ id: "session", variant: "construct", parentId: "c", dependsOn: [], title: "Session", lenses: ["ARCHITECT"], status: "PLANNING" },
           terms, "`For: Architect` · `Status: 🔮 PLANNING`"),
-    [`docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-core-overview.html`]: overview,
+    [`docs/${POCKET.artifacts}/${ARTIFACT.docs}/01-core/core-overview.html`]: overview,
   });
   const root = repo(tree(ov(curated)));
   run(root, ["face", "docs"]);
-  const page = readAt(root, `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-core-overview.html`);
+  const page = readAt(root, `docs/${POCKET.artifacts}/${ARTIFACT.docs}/01-core/core-overview.html`);
 
   one("the overview gains a generated region, the first in any HTML page",
     page, has("spn:generated glossary"));
   one("and it carries the three columns the markdown face carries",
     page, has("<th>Term</th><th>Contract term</th><th>What it means</th>"));
   one("the term links to the construct PAGE, never the markdown seat (Q234)",
-    page, has(`href="../${ARTIFACT.constructs}/01-core/session-construct.html"`));
+    page, has(`href="${CONSTRUCT_PAGES}/session-construct.html"`));
+  // A term's meaning may hold a link, written for the seat file's folder. The overview sits in another
+  // folder, so the link is an anchor whose address is expressed from the overview's own folder.
+  one("a link in a term's meaning is an anchor, expressed from the overview's folder, with its fragment kept",
+    page, has('<a href="../../../registers/decisions.md#r1">the rule</a>'));
+  one("a hosted address in a term's meaning is kept as it is",
+    page, has('<a href="https://example.com/s">the standard</a>'));
+  one("and no markdown link is left as text in the page", page, lacks("](../../registers/"));
   one("the hand-typed row is gone, because the region replaced the table",
     page, lacks("typed by hand"));
   one("the authored line above the table survives (Q231)",
@@ -516,7 +523,7 @@ console.log("\n=== the domain's glossary lands on its overview too, in HTML (Q22
 
   // A REGION IS ONLY TRUSTWORTHY IF A SECOND RUN WRITES THE SAME BYTES. The first run replaces a
   // curated table; the second has to find its own markers and land on the same page exactly.
-  const again = (() => { run(root, ["face", "docs"]); return readAt(root, `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-core-overview.html`); })();
+  const again = (() => { run(root, ["face", "docs"]); return readAt(root, `docs/${POCKET.artifacts}/${ARTIFACT.docs}/01-core/core-overview.html`); })();
   one("and a second run writes the same bytes", again === page ? "same" : "DIFFERENT", has("same"));
   one("the glossary is written with the shared stylesheet's names", page,
     (g) => g.includes('<div class="sds-scroll"><table class="sds-glossary">') && g.includes('<tr class="sds-group">'));
@@ -539,7 +546,7 @@ console.log("\n=== the domain's glossary lands on its overview too, in HTML (Q22
   one("[MKT.SCRIPTS.108] and `docs face` exits 1 on it, as on any RULE", exitOf(ownRoot), 1);
   one("untouched: `docs face` exits 0 on the same tree with the overview in the shared form", exitOf(root), 0);
   one("[MKT.SCRIPTS.108] and writes nothing into it",
-    readAt(ownRoot, `docs/${POCKET.artifacts}/${ARTIFACT.overviews}/concept-core-overview.html`), own);
+    readAt(ownRoot, `docs/${POCKET.artifacts}/${ARTIFACT.docs}/01-core/core-overview.html`), own);
   one("[MKT.SCRIPTS.108] the markdown face beside it still gains its glossary, because a face is no page",
     readAt(ownRoot, `docs/${SEAT.constructs}/01-core/README.md`), has("spn:generated glossary"));
 }

@@ -3,16 +3,16 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/README.md",
-      "seen": "a835892a"
+      "seen": "030ba321"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "d2c13e7c"
+      "seen": "c56841da"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The masthead, and the opening",
-      "seen": "de892b27"
+      "seen": "25162f20"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -21,7 +21,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
-      "seen": "e85593fb"
+      "seen": "543a5e88"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
@@ -29,11 +29,11 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/04-docs.md",
-      "seen": "b700130e"
+      "seen": "204e7d21"
     },
     {
       "path": "spn-foundation/CONCEPT.md",
-      "seen": "b91357a5"
+      "seen": "a2d3ec08"
     }
   ],
   "decisions": [
@@ -278,7 +278,7 @@ named a table in none of 252 rows measured; deleting it repaired the defect that
 the files could. Storage is read in the data model itself, which is grouped by table and says which
 constraint matters and why each index exists.
 
-**A domain's overview is its face in HTML**: it links into `artifacts/constructs/<domain>/` and
+**A domain's overview is its face in HTML**: it sits in `artifacts/docs/<domain>/`, links into the `constructs/` folder beside it, and
 carries the same glossary. Extra reading paths beneath it carry none.
 
 **The invariants between the seats hold this shape up, and the folders are only where they land.** A
@@ -318,12 +318,12 @@ The pocket holds what the node **authors** rather than derives, and its three au
 | Kind | Path | Holds | Earned when |
 | --- | --- | --- | --- |
 | **Concept** | `CONCEPT.md`, the repository root | the whole model, once — shape, never depth | the repo exists |
-| **Overview** | `artifacts/overviews/<source>-overview.html` | one source expanded to reading depth, one level down | the fixed set below names it |
-| **Construct page** | `artifacts/constructs/<domain>/<slug>-construct.html` | one construct at reading depth, produced from its seat file | a construct exists |
+| **Overview** | `artifacts/docs/<folder>/<name>-overview.html`; the hub is `artifacts/docs/concept-overview.html` | one source expanded to reading depth, one level down | the fixed set below names it |
+| **Construct page** | `artifacts/docs/<folder>/constructs/<slug>-construct.html` | one construct at reading depth, produced from its seat file | a construct exists |
 
 **A concept is not an artifact.** It sits at the repository root beside `README.md`, a scaffold marker written before `docs/` exists and read by somebody who may never open the tree. It is listed here because it is the first altitude of the progression, not because the pocket holds it.
 
-**`constructs/` mirrors the constructs seat folder for folder**, with `<slug>-construct.html` beside each `<slug>.md` and **no `README.md` anywhere inside it**. That is what lets the audit pair a page with its seat file by path alone, rather than by an index somebody maintains.
+**`artifacts/docs/` mirrors the constructs seat folder for folder.** `<folder>` is the seat's folder path under `02-constructs/`, so the seat `02-constructs/<folder>/<slug>.md` gives the page `artifacts/docs/<folder>/constructs/<slug>-construct.html`, and **no folder inside the pocket holds a `README.md`**. An overview is named `<name>-overview.html`, with no `concept-` before the name, because its folder says which domain it belongs to. An overview that no single folder owns sits beside the hub. That is what lets the audit pair a page with its seat file by path alone, rather than by an index somebody maintains.
 
 **Four page kinds cover everything somebody writes by hand**, and each answers one reader: an **approach** for the person deciding, a **hub** for the person arriving, an **overview** for the person taking one reading path, and a **construct** for the person building against the model. Only the approach carries cards, and only the approach lives outside the pocket.
 
@@ -340,7 +340,7 @@ The pocket holds what the node **authors** rather than derives, and its three au
 
 **The index opens every page of a repository from one place.** A tree of the pages sits on the left, in the groups Docs, Guides and Reports, and a group that holds nothing is left out. The pages open in tabs on the right. The index has no masthead and no header line, because it is a frame around other pages. `docs index` refuses a repository that has no `docs/artifacts`. The hub stays the page you read first: it explains the model, and the index is where you look for one file among all of them.
 
-**The folder set is fixed, and adding one is a decision**: `overviews/`, `constructs/`, `guides/`, `reports/` and nothing else, beside the one `index.html`. A `resources/` folder for *what a document was written from* is refused by name: every such file is a file some seat needs, and **nothing in a pocket may be depended on** (decision RD.DEVEX.WORKSPACE.138).
+**The folder set is fixed, and adding one is a decision**: `docs/`, `guides/`, `reports/` and nothing else, beside the one `index.html` (decision RD.DEVEX.WORKSPACE.221). `docs/` holds the hub, the overviews and the construct pages, and the index reads its groups and its domains from these folders. A `resources/` folder for *what a document was written from* is refused by name: every such file is a file some seat needs, and **nothing in a pocket may be depended on** (decision RD.DEVEX.WORKSPACE.138).
 
 ### A construct page has six sections, in one order
 
@@ -390,7 +390,7 @@ a reader meets first.
 | --- | --- | --- | --- |
 | **hub** (`concept-overview.html`) | the benefit line | the what line | what the plane is · why read this page first · how it is laid out |
 | **repository overview** | the repository's benefit line | the repository's what line | what this repository holds · why read on · how it is laid out |
-| **concept overview** (`concept-*-overview.html`) | the area's benefit line | the area's what line | what this area covers · why read on · what the pages below cover |
+| **concept overview** (one reading path, `<name>-overview.html`) | the area's benefit line | the area's what line | what this area covers · why read on · what the pages below cover |
 | **construct** | the construct's name | its one-line promise | what it is · why read this page · how the page runs |
 | **report** | its name, such as *Coverage report* | the question it answers, naming the repository by its folder name | what was counted, with no number · when to read it |
 | **approach** | the page's name | the decision it plans | what changes · why read it · how the page runs |

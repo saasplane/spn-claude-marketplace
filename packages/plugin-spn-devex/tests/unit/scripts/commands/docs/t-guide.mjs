@@ -6,7 +6,7 @@ import { existsSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, 
 import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve } from "node:path";
 import { PLUGIN, WORKSPACE } from "../../../../helpers/harness.mjs";
-import { ARTIFACT, DOCS, GUIDE_PAGE_SUFFIX, POCKET, SEAT, bookTemplatesDir } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { ARTIFACT, CONSTRUCT_PAGES, DOCS, GUIDE_PAGE_SUFFIX, POCKET, SEAT, bookTemplatesDir } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, linesFor } from "../../../../../../plugin-support-lib/src/lib/page-styles.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
@@ -151,7 +151,7 @@ After the last step the service is down again.
     text.split("\n").filter((line) => /<t[dh]>(?:#|\d+)<\/t[dh]>/.test(line)).join("\n"));
 
   ok("a link to a construct's seat file points at that construct's page, from the page's own place",
-    text.includes(`<a href="../${ARTIFACT.constructs}/01-core/thing-construct.html">the model</a>`), each(text, /(<a [^>]*>)/g).join(" "));
+    text.includes(`<a href="../${ARTIFACT.docs}/01-core/${CONSTRUCT_PAGES}/thing-construct.html">the model</a>`), each(text, /(<a [^>]*>)/g).join(" "));
   ok("a link to another file is written again against the page's own place, and keeps its anchor",
     text.includes('<a href="../../README.md#the-map">the face</a>') && text.includes(`<a href="../../${SEAT.guides}/02-build.md">Build</a>`));
   ok("the link home is `../index.html`", text.includes('<a class="sds-home" href="../index.html" target="_top">'));

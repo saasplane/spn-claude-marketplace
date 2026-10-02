@@ -1,0 +1,145 @@
+<meta charset="utf-8">
+<title>The Plugin — What spn-apps Is, and When a Session Loads It</title>
+<!-- spn:doc
+{"id":"apps-plugin","variant":"construct","title":"The Plugin — What spn-apps Is, and When a Session Loads It","subtitle":"The one folder that makes spn-apps its own plugin, separate from every other.","lenses":["ARCHITECT","LEAD"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"This plugin is the one folder everything in the apps domain ships from, and the folder an install copies whole.","keywords":["plugin","manifest","identity","description","version","lockstep"]}
+-->
+<!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.css">
+<div class="sds-page">
+
+<nav class="sds-rail" id="rail">
+  <a class="sds-home" href="../apps-overview.html">&larr; spn-apps — The TypeScript Stack Domain</a>
+  <div class="sds-rail-title">The Plugin — What spn-apps Is, and When a Session Loads It</div>
+</nav>
+<div class="sds-wrap">
+
+<header class="sds-masthead">
+  <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; The Plugin — What spn-apps Is, and When a Session Loads It</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Architect</span><span class="sds-badge sds-lens">Engineering leader</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>The Plugin — What spn-apps Is, and When a Session Loads It</h1>
+  <p class="sds-subtitle">The one folder that makes spn-apps its own plugin, separate from every other.</p>
+  <p class="sds-standfirst">This plugin is the one folder everything in the apps domain ships from, and the folder an install copies whole. Read this page to see what it claims about itself, who is entitled to load it, and what its version number means. It covers the manifest, the world that earns it, and the version rule it shares with the marketplace's other two plugins.</p>
+</header>
+
+<!-- 00 -->
+<section id="s0">
+  <div class="sds-section-head"><h2>Overview</h2></div>
+  <p>Two things about a plugin are worth separating before anything else. <strong>Its identity is its own</strong> — the name and the description, which say what this plugin carries and therefore whether the work at hand has anything to do with it. <strong>Its version is not its own</strong> — every plugin in this marketplace carries the same number, and a release moves all of them together.</p>
+  <p>This construct realizes the book's <code>01-devex/02-agent/04-plugins</code>.</p>
+</section>
+
+<!-- 01 -->
+<section id="s1">
+  <div class="sds-section-head"><h2>Terms</h2></div>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <tbody>
+      <tr><td>the manifest</td><td><code>plugin.json</code></td><td>the file at <code>.claude-plugin/plugin.json</code> claiming a name, a version, a description and an author</td></tr>
+      <tr><td>the name</td><td><code>name</code></td><td>what an install, a marketplace entry and a session all address this folder by</td></tr>
+      <tr><td>the description</td><td><code>description</code></td><td>the sentences matched against the work at hand, which is how this plugin's material is reached at all</td></tr>
+      <tr><td>the world</td><td><code>sprepo.json</code></td><td>what a repository declares about itself, from which its plugin set is derived</td></tr>
+      <tr><td>the version</td><td><code>version</code></td><td>the number saying which bytes are published, shared with the other plugins and moved after a release</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 02 -->
+<section id="s2">
+  <div class="sds-section-head"><h2>Model</h2></div>
+  <p>A repository declares a world; the set of plugins it gets is derived from that declaration; an install copies each one; and a session reads the installed copy rather than this checkout.</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="423 22 254 428" style="max-width:254px" role="img" aria-label="Nobody types a plugin name into a workspace: the declaration is read and the set follows from it.">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="sds-box" x="425" y="24" width="250" height="76" rx="3"/>
+    <text class="sds-label" x="441" y="50">a repository's claim</text>
+    <text class="sds-note" x="441" y="69">sprepo.json — the world it answers</text>
+    <text class="sds-note" x="441" y="88">to</text>
+    <path class="sds-connector" d="M550 100 V140" marker-end="url(#ar)"/>
+    <text class="sds-note" x="560" y="124">derives</text>
+    <rect class="sds-box" x="425" y="140" width="250" height="76" rx="3"/>
+    <text class="sds-label" x="441" y="166">the derived set</text>
+    <text class="sds-note" x="441" y="185">which plugins this repository is</text>
+    <text class="sds-note" x="441" y="204">entitled to load</text>
+    <path class="sds-connector" d="M550 216 V256" marker-end="url(#ar)"/>
+    <text class="sds-note" x="560" y="240">installed as</text>
+    <rect class="sds-box" x="425" y="256" width="250" height="76" rx="3"/>
+    <text class="sds-label" x="441" y="282">the installed copy</text>
+    <text class="sds-note" x="441" y="301">found by name and by the version</text>
+    <text class="sds-note" x="441" y="320">the manifest carries</text>
+    <path class="sds-connector" d="M550 332 V372" marker-end="url(#ar)"/>
+    <text class="sds-note" x="560" y="356">read by</text>
+    <rect class="sds-box" x="425" y="372" width="250" height="76" rx="3"/>
+    <text class="sds-label" x="441" y="398">a session</text>
+    <text class="sds-note" x="441" y="417">matches the description against</text>
+    <text class="sds-note" x="441" y="436">the work at hand</text>
+  </svg>
+    <figcaption>Nobody types a plugin name into a workspace: the declaration is read and the set follows from it.</figcaption>
+  </figure>
+  <!-- dg:source
+{ "kind": "map",
+  "caption": "Nobody types a plugin name into a workspace: the declaration is read and the set follows from it.",
+  "boxes": [
+    { "id": "a", "label": "a repository's claim", "note": "sprepo.json — the world it answers to" },
+    { "id": "b", "label": "the derived set", "note": "which plugins this repository is entitled to load" },
+    { "id": "c", "label": "the installed copy", "note": "found by name and by the version the manifest carries" },
+    { "id": "d", "label": "a session", "note": "matches the description against the work at hand" }
+  ],
+  "links": [
+    { "from": "a", "to": "b", "label": "derives" },
+    { "from": "b", "to": "c", "label": "installed as" },
+    { "from": "c", "to": "d", "label": "read by" }
+  ] }
+  -->
+</section>
+
+<!-- 03 -->
+<section id="s3">
+  <div class="sds-section-head"><h2>Parts</h2></div>
+  <h3 id="the-identity-is-this-plugin-s-own">The identity is this plugin's own</h3>
+  <p>The manifest names this folder <code>spn-apps</code> and describes the apps domain before any language is chosen: the contract model a module publishes, the rules a contract state follows, and the worksheet a partner fills in to decide which shipped modules they adopt. The description is long deliberately, because it is matched against the work at hand rather than browsed by a person, and material nothing matches is material nothing reaches.</p>
+  <h3 id="the-world-decides-who-gets-it">The world decides who gets it</h3>
+  <p>A workspace never types a plugin name. Each repository declares its world in its own manifest, and the set of plugins it is entitled to load is derived from that declaration — which is why this plugin arrives in a repository that answers to the apps world and nowhere else. The derivation is the foundation's, and this page only says which side of it this plugin sits on.</p>
+  <h3 id="the-version-is-shared-and-it-is-not-a-cl">The version is shared, and it is not a claim about this folder</h3>
+  <p>Every plugin in this marketplace carries the same number, and a release moves all of them — a plugin with no change in it is released anyway, at the new number. The reason is that a reader cannot tell three numbers apart: the plugins are installed as one set by one command, so differing numbers cannot be told from one release that half-landed. One number answers <em>are you current?</em> and several only raise the question.</p>
+  <h3 id="the-count-moves-after-a-release-never-be">The count moves after a release, never before</h3>
+  <p>The release happens at the number a manifest already carries, and the first edit after it moves the number. So the field names <strong>what is published</strong> rather than what somebody is working on. That is also what makes a stale cache findable: a cache directory is keyed by version, so a plugin edited without an increment installs over its own published bytes and nothing tells a reader which of the two is running.</p>
+  <h3 id="what-this-plugin-holds-and-what-it-does-">What this plugin holds, and what it does not</h3>
+  <p>This folder ships wiring, skills, scripts, refs, providers and tests. It ships no agents, because a persona and a reviewing viewpoint answer to no stack and live once in the core plugin — and the absence is a statement rather than a gap. Each folder it does ship has its own page, and none of them is described here.</p>
+</section>
+
+<!-- 04 -->
+<section id="s4">
+  <div class="sds-section-head"><h2>Boundary</h2></div>
+  <p>This page answers what this plugin claims about itself and what its version means. It does not answer what a plugin is in general — the manifest's shape, the marketplace entry, the installed copy and the plugin root are <a href="../../01-devex/constructs/01-plugin-construct.html">The Plugin</a>. It does not answer what sits inside any of the folders it ships.</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <tbody>
+      <tr><td>this plugin's name, its description, and which world earns it</td><td>the shape of a manifest, the marketplace list, and what an installed copy is</td><td><a href="../../01-devex/constructs/01-plugin-construct.html">The Plugin</a></td></tr>
+      <tr><td>that the version is shared across the marketplace and moves after a release</td><td>how a release is cut, and what is granted rather than published</td><td>the foundation's Agent Plugins construct</td></tr>
+      <tr><td>that this plugin ships no agents</td><td>what an agent brief is, and which plugin ships one</td><td><a href="../../01-devex/constructs/03-agents-construct.html">Agents</a></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 05 -->
+<section id="s5">
+  <div class="sds-section-head"><h2>Binds</h2></div>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <tbody>
+      <tr><td><code>RD.DEVEX.UTILS.019</code></td><td>the plugins are authored and delivered in one public repository, and publishing is pushing it</td><td>MUST</td></tr>
+      <tr><td><code>RD.DEVEX.WORKSPACE.176</code></td><td>a repository answers to the world it declares, which is what the plugin set is derived from</td><td>MUST</td></tr>
+      <tr><td>the marketplace's <code>CLAUDE.md</code> § Versioning</td><td>the plugins move together, at one number, stamped in each manifest because that is what a marketplace reads</td><td>MUST</td></tr>
+      <tr><td>the foundation's <code>02-delivery.md</code> § The set a repo gets is derived from its own claim</td><td>a workspace never types a plugin name</td><td>MUST</td></tr>
+      <tr><td>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></td><td>source beside a committed build, one command entry, a shared folder never installed on its own</td><td>MUST</td></tr>
+    </tbody>
+  </table></div>
+  <p>Try it: <code>node packages/plugin-spn-devex/src/dist/cli.mjs plugin partner</code> (or <code>spn-devex plugin partner</code>, once installed)</p>
+</section>
+
+
+
+</div>
+</div>
+
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.js"></script>

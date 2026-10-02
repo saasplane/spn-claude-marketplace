@@ -66,7 +66,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "d2c13e7c"
+      "seen": "c56841da"
     }
   ]
 }

@@ -1,0 +1,145 @@
+<meta charset="utf-8">
+<title>Plugin — spn-infra as a Delivery Unit</title>
+<!-- spn:doc
+{"id":"estate-plugin","variant":"construct","title":"Plugin — spn-infra as a Delivery Unit","subtitle":"The one folder that carries this repository's infrastructure rules into a working session.","lenses":["INFRA","ARCHITECT"],"status":"PLANNING","dependsOn":["plugin-set"],"summary":"This plugin carries this repository's estate standard — the rules for the infrastructure a product runs on — into a session that is working on one, in one folder.","keywords":["plugin","manifest","version","lockstep","description","INFRA"]}
+-->
+<!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.css">
+<div class="sds-page">
+
+<nav class="sds-rail" id="rail">
+  <a class="sds-home" href="../infra-overview.html">&larr; spn-infra — The Estate Domain</a>
+  <div class="sds-rail-title">Plugin — spn-infra as a Delivery Unit</div>
+</nav>
+<div class="sds-wrap">
+
+<header class="sds-masthead">
+  <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Plugin — spn-infra as a Delivery Unit</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">DevOps / SRE</span><span class="sds-badge sds-lens">Architect</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>Plugin — spn-infra as a Delivery Unit</h1>
+  <p class="sds-subtitle">The one folder that carries this repository's infrastructure rules into a working session.</p>
+  <p class="sds-standfirst">This plugin carries this repository's estate standard — the rules for the infrastructure a product runs on — into a session that is working on one, in one folder. Read this page to see what this plugin claims about itself and when a session loads it. It explains the manifest, the marketplace entry, and the version rule it shares with its two sibling plugins.</p>
+</header>
+
+<!-- 00 -->
+<section id="s0">
+  <div class="sds-section-head"><h2>Overview</h2></div>
+  <p>A rule an agent never loads is a rule nobody follows. <code>spn-infra</code> carries one manifest, one entry in the marketplace list, and a set of construct folders beneath it, and every other page of this domain names something inside that container.</p>
+  <p>Two things about the manifest pull in opposite directions, and both are deliberate. <strong>The version is the set's and the identity is this plugin's own.</strong> The number moves with its two siblings whether or not anything here changed, so a reader comparing three numbers never has to wonder whether a release half-landed. The description belongs to <code>spn-infra</code> alone, and it is what a session matches against when it decides whether to load the plugin at all.</p>
+  <p>This construct realizes the book's <code>01-devex/02-agent/04-plugins</code>.</p>
+</section>
+
+<!-- 01 -->
+<section id="s1">
+  <div class="sds-section-head"><h2>Terms</h2></div>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <tbody>
+      <tr><td>the manifest</td><td><code>plugin.json</code></td><td><code>.claude-plugin/plugin.json</code> inside this plugin's own folder, carrying its name, version, description and author</td></tr>
+      <tr><td>the name</td><td><code>spn-infra</code></td><td>what the marketplace entry and every install refer to this folder by</td></tr>
+      <tr><td>the description</td><td><code>description</code></td><td>the sentence a session matches the work at hand against; it decides whether this plugin is loaded</td></tr>
+      <tr><td>the version</td><td><code>version</code></td><td>which published bytes a session is reading, shared with the other two plugins</td></tr>
+      <tr><td>an INFRA repository</td><td><code>sprepo.json</code></td><td>a repository whose declared world is <code>INFRA</code> — the estate repository, and the blueprint repository beside it</td></tr>
+      <tr><td>the plugin root</td><td><code>CLAUDE_PLUGIN_ROOT</code></td><td>the installed copy a session reads, and the base every wired command is written against</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 02 -->
+<section id="s2">
+  <div class="sds-section-head"><h2>Model</h2></div>
+  <p>A session never reads this checkout. It reads an installed copy, found by the plugin's name together with the version its manifest carries, and it loads that copy only where the repository it is standing in declares the world this plugin serves.</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="423 22 267 409" style="max-width:267px" role="img" aria-label="The declared world decides the load; the version decides which bytes are loaded.">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="sds-box" x="425" y="24" width="250" height="76" rx="3"/>
+    <text class="sds-label" x="441" y="50">the marketplace entry</text>
+    <text class="sds-note" x="441" y="69">names this plugin and the folder</text>
+    <text class="sds-note" x="441" y="88">holding it</text>
+    <path class="sds-connector" d="M550 100 V140" marker-end="url(#ar)"/>
+    <text class="sds-note" x="560" y="124">points at</text>
+    <rect class="sds-box" x="425" y="140" width="250" height="76" rx="3"/>
+    <text class="sds-label" x="441" y="166">plugin.json</text>
+    <text class="sds-note" x="441" y="185">name, version, description — the</text>
+    <text class="sds-note" x="441" y="204">plugin's own claim</text>
+    <path class="sds-connector" d="M550 216 V256" marker-end="url(#ar)"/>
+    <text class="sds-note" x="560" y="240">an install copies it</text>
+    <rect class="sds-box" x="425" y="256" width="250" height="57" rx="3"/>
+    <text class="sds-label" x="441" y="282">the installed copy</text>
+    <text class="sds-note" x="441" y="301">found by name and version together</text>
+    <path class="sds-connector" d="M550 313 V353" marker-end="url(#ar)"/>
+    <text class="sds-note" x="560" y="337">loaded into</text>
+    <rect class="sds-box" x="425" y="353" width="250" height="76" rx="3"/>
+    <text class="sds-label" x="441" y="379">an INFRA repository</text>
+    <text class="sds-note" x="441" y="398">its own sprepo.json decides this</text>
+    <text class="sds-note" x="441" y="417">plugin is loaded</text>
+  </svg>
+    <figcaption>The declared world decides the load; the version decides which bytes are loaded.</figcaption>
+  </figure>
+  <!-- dg:source
+{ "kind": "map",
+  "caption": "The declared world decides the load; the version decides which bytes are loaded.",
+  "boxes": [
+    { "id": "a", "label": "the marketplace entry", "note": "names this plugin and the folder holding it" },
+    { "id": "b", "label": "plugin.json", "note": "name, version, description — the plugin's own claim" },
+    { "id": "c", "label": "the installed copy", "note": "found by name and version together" },
+    { "id": "d", "label": "an INFRA repository", "note": "its own sprepo.json decides this plugin is loaded" }
+  ],
+  "links": [
+    { "from": "a", "to": "b", "label": "points at" },
+    { "from": "b", "to": "c", "label": "an install copies it" },
+    { "from": "c", "to": "d", "label": "loaded into" }
+  ] }
+  -->
+</section>
+
+<!-- 03 -->
+<section id="s3">
+  <div class="sds-section-head"><h2>Parts</h2></div>
+  <h3 id="the-three-plugins-carry-one-number-and-e">The three plugins carry one number, and every release moves all three</h3>
+  <p><strong>A reader cannot tell three version numbers apart.</strong> The plugins install as one set, by one command, and a session loads whichever of them its repository declares. Faced with three different numbers there is no way to tell from the outside whether that is three deliberate versions or one release that half-landed. So the three move together, and a plugin with nothing changed in it is released anyway at the new number. The cost is releasing an unchanged plugin, which costs nothing.</p>
+  <h3 id="the-number-names-what-is-published-not-w">The number names what is published, not what somebody is working on</h3>
+  <p><strong>The release happens at the version the plugins already carry, and the count moves afterwards.</strong> A published version ships, and the first edit after it increments the patch — for all three, not for the one that was touched. That is what makes a stale cache findable: a cache directory is keyed by version, so a plugin edited without an increment installs over its own published bytes and nothing tells a reader which of the two is running.</p>
+  <h3 id="the-description-is-this-plugin-s-own-and">The description is this plugin's own, and it decides the load</h3>
+  <p><strong>A description is matched, not browsed.</strong> It states in full what the plugin carries — the estate skills, the cards that hold the estate's vocabulary, the per-cloud material, and the refusal a write meets — because a session compares it against the work at hand rather than reading it for pleasure. The marketplace entry carries a second description for a listing to show, and the manifest is the current one wherever the two disagree.</p>
+  <h3 id="it-loads-where-a-repository-declares-inf">It loads where a repository declares INFRA</h3>
+  <p><strong>The world is read from the repository, never typed by a workspace.</strong> A repository declaring <code>INFRA</code> gets this plugin, and that covers both the estate repository and the blueprint repository beside it, because both are edited under the estate's laws. A repository declaring another world never loads it, which is why the guard can be narrow: it only ever meets files that belong to an estate.</p>
+  <h3 id="what-this-plugin-holds-and-what-it-leave">What this plugin holds, and what it leaves out</h3>
+  <p><code>spn-infra</code> ships <code>hooks/</code>, <code>skills/</code>, <code>scripts/</code>, <code>refs/</code>, <code>providers/</code> and <code>tests/</code>. <strong>It ships no <code>agents/</code> folder, and the absence is the statement</strong>: an agent brief convenes a reviewer over a change, and the estate's own review happens against a rendering through the tool's doors rather than against a diff. Each of the folders it does ship is named by its own page here.</p>
+</section>
+
+<!-- 04 -->
+<section id="s4">
+  <div class="sds-section-head"><h2>Boundary</h2></div>
+  <p>This page answers what carries the estate standard into a session and which bytes a session reads. It does not answer what a plugin is in general — the manifest shape, the marketplace file and the installed copy are <a href="../../01-devex/constructs/01-plugin-construct.html">The Plugin</a>. It does not answer what any construct inside this folder holds.</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <tbody>
+      <tr><td>this plugin's identity, its description, and that it loads where a repository declares <code>INFRA</code></td><td>the shape of a manifest, a marketplace entry, and what an installed copy is</td><td><a href="../../01-devex/constructs/01-plugin-construct.html">The Plugin</a></td></tr>
+      <tr><td>that the version is the set's and moves after a release</td><td>which moments this plugin wires, and what the wiring declares</td><td><a href="./02-hooks-construct.html">Hooks</a></td></tr>
+      <tr><td>that no <code>agents/</code> folder is shipped</td><td>what the folders it does ship hold</td><td><a href="./03-skills-construct.html">Skills</a> · <a href="./04-scripts-construct.html">Scripts</a> · <a href="./05-refs-construct.html">Refs</a> · <a href="./06-providers-construct.html">Providers</a> · <a href="./07-tests-construct.html">Tests</a></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 05 -->
+<section id="s5">
+  <div class="sds-section-head"><h2>Binds</h2></div>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <tbody>
+      <tr><td><a href="../../../../registers/decisions.md">RD.DEVEX.006</a></td><td>the manifest is the current description, and a marketplace entry disagreeing with it is the stale side</td><td>MUST</td></tr>
+      <tr><td><code>RD.DEVEX.WORKSPACE.176</code></td><td>a repository answers to the world it declares, which is what decides this plugin is loaded at all</td><td>MUST</td></tr>
+      <tr><td>the foundation's <code>02-delivery.md</code> § The set a repo gets is derived from its own claim</td><td>a workspace never types a plugin name; the set comes from the consuming repository's own manifest</td><td>MUST</td></tr>
+      <tr><td>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></td><td>source beside a committed build, one command entry, a shared folder never installed on its own</td><td>MUST</td></tr>
+    </tbody>
+  </table></div>
+  <p>Try it: <code>node packages/plugin-spn-devex/src/dist/cli.mjs plugin partner</code> (or <code>spn-devex plugin partner</code>, once installed)</p>
+</section>
+
+
+
+</div>
+</div>
+
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.js"></script>

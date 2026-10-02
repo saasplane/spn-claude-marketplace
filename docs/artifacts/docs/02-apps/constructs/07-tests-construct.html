@@ -1,0 +1,155 @@
+<meta charset="utf-8">
+<title>Tests — The Stack's Own Folders, Without the Stack's Framework</title>
+<!-- spn:doc
+{"id":"apps-tests","variant":"construct","title":"Tests — The Stack's Own Folders, Without the Stack's Framework","subtitle":"How this plugin proves the rules it holds every other repository to.","lenses":["QA","SERVER_DEV"],"status":"PLANNING","dependsOn":["stack-checks","apps-providers"],"summary":"This plugin ships rules that other repositories are held to, so it owes proof of its own, carried in a Tests folder built the same way this domain asks every project it governs to build one.","keywords":["tests","tier","mirror","runner","harness","discovery"]}
+-->
+<!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.css">
+<div class="sds-page">
+
+<nav class="sds-rail" id="rail">
+  <a class="sds-home" href="../apps-overview.html">&larr; spn-apps — The TypeScript Stack Domain</a>
+  <div class="sds-rail-title">Tests — The Stack's Own Folders, Without the Stack's Framework</div>
+</nav>
+<div class="sds-wrap">
+
+<header class="sds-masthead">
+  <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Tests — The Stack's Own Folders, Without the Stack's Framework</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Quality engineer</span><span class="sds-badge sds-lens">Backend developer</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>Tests — The Stack's Own Folders, Without the Stack's Framework</h1>
+  <p class="sds-subtitle">How this plugin proves the rules it holds every other repository to.</p>
+  <p class="sds-standfirst">This plugin ships rules that other repositories are held to, so it owes proof of its own, carried in a Tests folder built the same way this domain asks every project it governs to build one. Read this page before you add a new suite, or when you want to know why one level of proof is missing on purpose. It explains the one deliberate exception to that convention, and the rule that nothing here may count its own depth.</p>
+</header>
+
+<!-- 00 -->
+<section id="s0">
+  <div class="sds-section-head"><h2>Overview</h2></div>
+  <p><strong>The folders are the convention and the framework is not.</strong> The stack's own test step puts a project's suites at its root, divided by tier, never beside the source — and that is followed here exactly. What is not followed is the choice of runner. These suites drive real hook processes through standard input and read what those processes write back, so a framework would wrap a subprocess harness inside another harness and buy nothing.</p>
+  <p>This construct realizes the book's <code>01-devex/02-agent/04-plugins</code>.</p>
+</section>
+
+<!-- 01 -->
+<section id="s1">
+  <div class="sds-section-head"><h2>Terms</h2></div>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <tbody>
+      <tr><td>the tier</td><td><code>unit/</code></td><td>what kind of proof this is, which is the first thing a folder name answers</td></tr>
+      <tr><td>the mirror</td><td>—</td><td>the path under a tier, which is the source file's own path inside the plugin</td></tr>
+      <tr><td>a suite</td><td><code>t-&lt;name&gt;.mjs</code></td><td>one file proving one thing, named for what it proves rather than for where it sits</td></tr>
+      <tr><td>the runner</td><td><code>run.mjs</code></td><td>the one command that finds every suite and reports the verdict of each</td></tr>
+      <tr><td>the harness</td><td><code>harness.mjs</code></td><td>what a suite is written against: a throwaway tree, one case, and the plugin root found once</td></tr>
+      <tr><td>discovery</td><td><code>checkPath</code></td><td>finding the file a case names by searching the provider folders, rather than typing its path</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 02 -->
+<section id="s2">
+  <div class="sds-section-head"><h2>Model</h2></div>
+  <p>The tier comes first and the mirror second, because the tier answers <em>what kind of proof is this</em> and the mirror answers <em>of what</em>.</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="429 22 241 428" style="max-width:241px" role="img" aria-label="Tier before mirror: a second kind of proof for the same file lands beside the first without colliding with it.">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="sds-box" x="431" y="24" width="237" height="76" rx="3"/>
+    <text class="sds-label" x="447" y="50">the runner</text>
+    <text class="sds-note" x="447" y="69">walks the folder and finds every</text>
+    <text class="sds-note" x="447" y="88">suite under it</text>
+    <path class="sds-connector" d="M549.5 100 V140" marker-end="url(#ar)"/>
+    <text class="sds-note" x="559.5" y="124">walks into</text>
+    <rect class="sds-box" x="431" y="140" width="237" height="76" rx="3"/>
+    <text class="sds-label" x="447" y="166">the tier</text>
+    <text class="sds-note" x="447" y="185">the first folder — what kind of</text>
+    <text class="sds-note" x="447" y="204">proof this is</text>
+    <path class="sds-connector" d="M549.5 216 V256" marker-end="url(#ar)"/>
+    <text class="sds-note" x="559.5" y="240">holds</text>
+    <rect class="sds-box" x="431" y="256" width="237" height="76" rx="3"/>
+    <text class="sds-label" x="447" y="282">the mirror</text>
+    <text class="sds-note" x="447" y="301">under it, the source file's own</text>
+    <text class="sds-note" x="447" y="320">path inside the plugin</text>
+    <path class="sds-connector" d="M549.5 332 V372" marker-end="url(#ar)"/>
+    <text class="sds-note" x="559.5" y="356">holds</text>
+    <rect class="sds-box" x="431" y="372" width="237" height="76" rx="3"/>
+    <text class="sds-label" x="447" y="398">a suite</text>
+    <text class="sds-note" x="447" y="417">written against the harness,</text>
+    <text class="sds-note" x="447" y="436">naming what it proves</text>
+  </svg>
+    <figcaption>Tier before mirror: a second kind of proof for the same file lands beside the first without colliding with it.</figcaption>
+  </figure>
+  <!-- dg:source
+{ "kind": "map",
+  "caption": "Tier before mirror: a second kind of proof for the same file lands beside the first without colliding with it.",
+  "boxes": [
+    { "id": "a", "label": "the runner", "note": "walks the folder and finds every suite under it" },
+    { "id": "b", "label": "the tier", "note": "the first folder — what kind of proof this is" },
+    { "id": "c", "label": "the mirror", "note": "under it, the source file's own path inside the plugin" },
+    { "id": "d", "label": "a suite", "note": "written against the harness, naming what it proves" }
+  ],
+  "links": [
+    { "from": "a", "to": "b", "label": "walks into" },
+    { "from": "b", "to": "c", "label": "holds" },
+    { "from": "c", "to": "d", "label": "holds" }
+  ] }
+  -->
+</section>
+
+<!-- 03 -->
+<section id="s3">
+  <div class="sds-section-head"><h2>Parts</h2></div>
+  <h3 id="the-tier-is-the-first-folder-and-the-mir">The tier is the first folder, and the mirror sits under it</h3>
+  <p>Putting the mirror first would leave nowhere to file a second kind of proof for the same file. With the tier first, a wired proof of something a unit suite already covers lands under its own tier at the same path, and neither collides with the other.</p>
+  <h3 id="a-tier-with-nothing-in-it-has-no-folder">A tier with nothing in it has no folder</h3>
+  <p>There is no folder for a tier this plugin proves nothing at, and none for a setup the runner does not need. This is the same rule the gate already states about a realization that is absent: an empty folder teaches a reader that the thing works, where a missing one says what is true.</p>
+  <h3 id="the-mirror-is-exact-so-a-rule-and-its-pr">The mirror is exact, so a rule and its proof move together</h3>
+  <p>A suite sits at the path its subject sits at inside the plugin. A rule under a provider's private folder has its suite under the same provider's private folder, and a script under the shared folder has its suite under the shared folder. A runner that globbed one flat folder made a rule's proof, a structural proof and a tool's proof indistinguishable, and it is why moving a rule used to move its proof nowhere.</p>
+  <h3 id="the-runner-walks-and-judges-on-the-exit-">The runner walks, and judges on the exit code</h3>
+  <p>The suites are found by walking rather than by a list, so a new one is picked up by existing. The verdict is each suite's exit code, and the summary line only says how many cases there were: judging on the printed text alone read a suite that fails while printing a cheerful summary as green, and a suite that passes in different words as red. A runner that can disagree with its own suites proves nothing.</p>
+  <h3 id="a-suite-s-own-error-output-is-discarded">A suite's own error output is discarded</h3>
+  <p>A suite exercising a gate prints that gate's findings, and inheriting them would put a fixture's warnings into this run's summary as though they were real. So the runner captures what a suite decided and drops what it wrote to the error stream.</p>
+  <h3 id="nothing-counts-its-own-depth">Nothing counts its own depth</h3>
+  <p>The suites sit at many depths because the mirror puts them there, so a relative hop from a suite to the plugin root would be a constant every move has to update — the defect the mirror exists to remove rather than introduce. The plugin root is found once and exported, the runner walks, and the search for a rule walks whatever folders a provider ships. Moving the suites once already broke all of them at the same moment, each having computed its own depth.</p>
+  <h3 id="a-case-names-the-rule-never-its-folder">A case names the rule, never its folder</h3>
+  <p>The harness searches every provider folder for the file a case names, rather than looking in a folder it was told about. A harness that knew which stack to look in would be the one place in this plugin naming an instance. So a rule that moves between subjects or between providers breaks no suite, and a case stays about the rule.</p>
+  <h3 id="a-case-runs-the-real-process-against-a-t">A case runs the real process against a throwaway tree</h3>
+  <p>The harness writes a temporary tree, sends a real payload to the real script on standard input, and reads what came back — so what is proven is what a session would actually get, rather than what a function returns when called directly. The trees are removed when the run ends.</p>
+  <h3 id="the-payload-a-case-replays-sits-beside-t">The payload a case replays sits beside the suites, once per event</h3>
+  <p><code>tests/fixtures/payloads/pretooluse/</code> holds one recorded call for the one event this plugin wires, and a suite reads it rather than constructing its own. A payload is an input, never a generated answer, so a stale one is a fixture problem and never a passing case that stopped proving anything.</p>
+  <h3 id="two-more-cases-prove-the-bundle-not-one-">Two more cases prove the bundle, not one file</h3>
+  <p><code>unit/t-dist-current.mjs</code> and <code>unit/t-bundle-parity.mjs</code> sit at the tree's root rather than under any one mirror, because each proves a property of the whole plugin: the first recomputes a bundle's declared sources against the banner esbuild wrote into it, and the second runs a recorded payload through the source and through the committed bundle and asserts the two agree. Both call the one shared harness the foundation's plugins realization states, <code>packages/plugin-support-lib/tests/helpers/</code>, so the build and the check can never quietly disagree.</p>
+</section>
+
+<!-- 04 -->
+<section id="s4">
+  <div class="sds-section-head"><h2>Boundary</h2></div>
+  <p>This page answers how this plugin proves itself and how the folder is arranged. It does not answer which tier proves which behaviour in a repository this plugin governs — the ladder and the derivation are the foundation's, and this domain's test step restates them. It does not answer what any rule decides either.</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <tbody>
+      <tr><td>the tier-before-mirror order, the exact mirror, and the rule that nothing counts its own depth</td><td>which tier proves which behaviour in a governed repository</td><td>the foundation's test standard, restated in <a href="./06-providers-construct.html">Providers</a></td></tr>
+      <tr><td>that the runner walks and judges on an exit code</td><td>what each suite asserts, and the rule it is about</td><td><a href="./06-providers-construct.html">Providers</a> · <a href="./04-scripts-construct.html">Scripts</a></td></tr>
+      <tr><td>that the folders follow the stack's convention while the runner does not</td><td>the stack's own test framework, and when a governed node must use it</td><td><a href="./05-refs-construct.html">Refs</a></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 05 -->
+<section id="s5">
+  <div class="sds-section-head"><h2>Binds</h2></div>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <tbody>
+      <tr><td><code>RD.SUPPORT.APPS.035</code></td><td>the tier ladder, and that a test title carries the behaviour id it proves</td><td>MUST</td></tr>
+      <tr><td><code>RD.DEVEX.FUNCTION.008</code></td><td>a behaviour row's shape and its id grammar, which is what a suite's title joins to</td><td>MUST</td></tr>
+      <tr><td>the foundation's <code>02-delivery.md</code> § When an edit becomes behaviour</td><td>a suite is run from this checkout, so it proves the source rather than an installed copy</td><td>MUST</td></tr>
+      <tr><td>the foundation's test construct § The test tree, and its <code>04-plugins/02-shape.md</code></td><td>the staleness case, the parity case, the payload fixture, and the shared harness every plugin's tests owe once it builds</td><td>MUST</td></tr>
+    </tbody>
+  </table></div>
+  <p>Try it: <code>node packages/plugin-spn-apps/tests/run.mjs</code></p>
+</section>
+
+
+
+</div>
+</div>
+
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.js"></script>

@@ -1,0 +1,178 @@
+<meta charset="utf-8">
+<title>Scripts — The Code a Plugin Ships, Wired or Reached by Name</title>
+<!-- spn:doc
+{"id":"checks","variant":"construct","title":"Scripts — The Code a Plugin Ships, Wired or Reached by Name","subtitle":"Every file a plugin can run lives in one folder, sorted by what calls it.","lenses":["SERVER_DEV","ARCHITECT"],"status":"PLANNING","dependsOn":["hook-set"],"summary":"Scripts is the one folder that holds everything a plugin can execute — the checks a hook composes, the tools a person reaches by typing their path, and the library code both sides read.","keywords":["script","check","tool","applies","finding","grade"]}
+-->
+<!-- Produced by `docs.ts page` from the seat file. Never edit this page: edit the seat file and produce it again. -->
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.css">
+<div class="sds-page">
+
+<nav class="sds-rail" id="rail">
+  <a class="sds-home" href="../devex-overview.html">&larr; spn-devex — The Stack-Agnostic Domain</a>
+  <div class="sds-rail-title">Scripts — The Code a Plugin Ships, Wired or Reached by Name</div>
+</nav>
+<div class="sds-wrap">
+
+<header class="sds-masthead">
+  <!-- Rendered from the spn:doc block by `docs.ts page`. Never typed: a header that disagreed with its block is what this removes. -->
+  <div class="sds-eyebrow"><span class="sds-line1">SaaS Plane &nbsp;|&nbsp; Claude Marketplace &nbsp;|&nbsp; Scripts — The Code a Plugin Ships, Wired or Reached by Name</span><span class="sds-line"><span class="sds-label">Type:</span> <span class="sds-badge sds-type">Construct</span><span class="sds-separator">|</span><span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Backend developer</span><span class="sds-badge sds-lens">Architect</span></span><span class="sds-state"><span class="sds-label">Status:</span> <span class="sds-badge sds-status sds-planning">&#x1F52E; PLANNING</span></span></span></div>
+  <h1>Scripts — The Code a Plugin Ships, Wired or Reached by Name</h1>
+  <p class="sds-subtitle">Every file a plugin can run lives in one folder, sorted by what calls it.</p>
+  <p class="sds-standfirst">Scripts is the one folder that holds everything a plugin can execute — the checks a hook composes, the tools a person reaches by typing their path, and the library code both sides read. Read this page before you add a new script, or when you are not sure whether a rule belongs in a hook or in a tool. It explains how each kind is reached and the two habits every file in the folder keeps.</p>
+</header>
+
+<!-- 00 -->
+<section id="s0">
+  <div class="sds-section-head"><h2>Overview</h2></div>
+  <p>Two habits run through the whole folder. The first is that <strong>a script names the chapter it restates</strong> in its own header, so the rule has exactly one home and a change is made there first. The second is that <strong>a script reads the smallest slice its question needs</strong>. Reading everything on every call once cost three quarters of every millisecond the hooks had spent, and a gate that makes a session slow is a gate somebody eventually removes.</p>
+  <p>Sharing one decision between a write-time check and a sweep is the habit that decides the folder's shape. <strong>A rule answered one way while a file is written and another way in a sweep is two rules</strong>, so the code that decides lives once and both callers import it.</p>
+  <p>This construct realizes the book's <code>01-devex/02-agent/01-agent</code>.</p>
+</section>
+
+<!-- 01 -->
+<section id="s1">
+  <div class="sds-section-head"><h2>Terms</h2></div>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Term</th><th>Contract term</th><th>What it means</th></tr></thead>
+    <tbody>
+      <tr><td>a script</td><td><code>scripts/</code></td><td>one file a plugin ships under <code>checks/</code>, <code>events/</code>, <code>tools/</code> or <code>lib/</code>, named for what it decides or measures</td></tr>
+      <tr><td>a check</td><td><code>Check</code></td><td>a file a moment's dispatcher composes: it reads one call and returns a verdict</td></tr>
+      <tr><td>the fast path</td><td><code>applies</code></td><td>a test on the path or the shell command alone, deciding whether this check could have an opinion at all</td></tr>
+      <tr><td>what it reads</td><td><code>needs</code></td><td>which fields of a call a check requires; a call carrying none of them never reaches it</td></tr>
+      <tr><td>a refusal</td><td><code>deny</code></td><td>the call is stopped, with the reason a reader is given</td></tr>
+      <tr><td>advice</td><td><code>note</code></td><td>the call goes through and the turn is told something; advice from several checks is joined</td></tr>
+      <tr><td>a tool</td><td>—</td><td>a file under <code>tools/</code> that nothing wires, reached by naming its own path</td></tr>
+      <tr><td>a finding</td><td><code>Finding</code></td><td>one thing a run found: which question raised it, its grade, the file, and what a reader should do</td></tr>
+      <tr><td>the grade</td><td><code>Grade</code></td><td>how a finding is weighted — <code>RULE</code> refuses and <code>SOFT</code> reports</td></tr>
+      <tr><td>the exit code</td><td>—</td><td>the count of refusals; a report alone leaves a run green</td></tr>
+      <tr><td>a job</td><td>—</td><td>one named unit of work inside a tool, such as <code>audit</code>, <code>page</code>, <code>topics</code> or <code>parity</code></td></tr>
+      <tr><td>silence</td><td>—</td><td>the answer where the input a question needs is absent, which is a fact about the repository rather than a finding about it</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 02 -->
+<section id="s2">
+  <div class="sds-section-head"><h2>Model</h2></div>
+  <p>There are two ways into this folder and one body of code behind them. A moment reaches a check; a person or a skill reaches a tool. What either one asks is decided in the same place.</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="423 22 254 428" style="max-width:254px" role="img" aria-label="One rule, two callers, so a write-time answer and a sweep answer cannot disagree.">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>
+    <rect class="sds-box" x="425" y="24" width="250" height="76" rx="3"/>
+    <text class="sds-label" x="441" y="50">a call or a command</text>
+    <text class="sds-note" x="441" y="69">a moment's dispatch, or a path</text>
+    <text class="sds-note" x="441" y="88">somebody typed</text>
+    <path class="sds-connector" d="M550 100 V140" marker-end="url(#ar)"/>
+    <text class="sds-note" x="560" y="124">reaches</text>
+    <rect class="sds-box" x="425" y="140" width="250" height="76" rx="3"/>
+    <text class="sds-label" x="441" y="166">the script</text>
+    <text class="sds-note" x="441" y="185">one file under checks, events,</text>
+    <text class="sds-note" x="441" y="204">tools or lib</text>
+    <path class="sds-connector" d="M550 216 V256" marker-end="url(#ar)"/>
+    <text class="sds-note" x="560" y="240">asks</text>
+    <rect class="sds-box" x="425" y="256" width="250" height="76" rx="3"/>
+    <text class="sds-label" x="441" y="282">the rule</text>
+    <text class="sds-note" x="441" y="301">decided once; both callers import</text>
+    <text class="sds-note" x="441" y="320">the same code</text>
+    <path class="sds-connector" d="M550 332 V372" marker-end="url(#ar)"/>
+    <text class="sds-note" x="560" y="356">returns</text>
+    <rect class="sds-box" x="425" y="372" width="250" height="76" rx="3"/>
+    <text class="sds-label" x="441" y="398">the answer</text>
+    <text class="sds-note" x="441" y="417">a verdict on a call; graded</text>
+    <text class="sds-note" x="441" y="436">findings and an exit code on a run</text>
+  </svg>
+    <figcaption>One rule, two callers, so a write-time answer and a sweep answer cannot disagree.</figcaption>
+  </figure>
+  <!-- dg:source
+{ "kind": "map",
+  "caption": "One rule, two callers, so a write-time answer and a sweep answer cannot disagree.",
+  "boxes": [
+    { "id": "a", "label": "a call or a command", "note": "a moment's dispatch, or a path somebody typed" },
+    { "id": "b", "label": "the script", "note": "one file under checks, events, tools or lib" },
+    { "id": "c", "label": "the rule", "note": "decided once; both callers import the same code" },
+    { "id": "d", "label": "the answer", "note": "a verdict on a call; graded findings and an exit code on a run" }
+  ],
+  "links": [
+    { "from": "a", "to": "b", "label": "reaches" },
+    { "from": "b", "to": "c", "label": "asks" },
+    { "from": "c", "to": "d", "label": "returns" }
+  ] }
+  -->
+  <p>A refusal ends a chain, because anything said after an answer is noise. Advice does not end it, because two useful things are worth more than one.</p>
+</section>
+
+<!-- 03 -->
+<section id="s3">
+  <div class="sds-section-head"><h2>Parts</h2></div>
+  <h3 id="the-four-folders-and-what-reaches-each">The four folders, and what reaches each</h3>
+  <p><code>checks/</code> holds the files a moment's dispatcher composes. <code>events/</code> holds one file per moment, which is the only code the wiring names. <code>tools/</code> holds the files nothing wires, reached by typing a path. <code>lib/</code> holds what more than one of the others reads and what none of them owns. The whole tree sits under <code>scripts/</code>, and the plugin's <code>hooks/</code> folder holds the wiring file alone.</p>
+  <h3 id="a-check-is-a-file-and-its-header-names-i">A check is a file, and its header names its source</h3>
+  <p>Each check sits in its own file under <code>scripts/checks/</code> and opens with a line naming the chapter or register row of the foundation book it restates. That line carries no hash and nothing compares it, and that is deliberate: it tells a reader where the rule lives, and the rule is that a change is made in the chapter first and here second, in the same change.</p>
+  <h3 id="refusing-a-whole-route-beats-listing-the">Refusing a whole route beats listing the safe ones</h3>
+  <p>Where a value must never be rendered, every route that would render it is refused rather than the safe routes listed. One pipeline prints key names and the next prints every value, and telling those apart inside a shell string is guesswork. The whole command is read, so even a quoted path inside a here-document is caught, and the message names the door to use instead.</p>
+  <h3 id="some-checks-speak-and-never-refuse">Some checks speak and never refuse</h3>
+  <p>Where deciding needs a reading rather than a match, a gate would be guessing. The check that names which document governs the folder you are editing does that and nothing else, and where no row governs a folder it stays silent — that gap belongs to a sweep over the whole tree rather than to one write. And a warning that repeats is a warning nobody reads: one turn writes many files, often into one folder, so a speaking check remembers what it already said and says it once, keeping that memory in the workspace's own folder for what its machinery says about itself.</p>
+  <h3 id="a-fragment-cannot-answer-a-question-abou">A fragment cannot answer a question about a tree</h3>
+  <p>Every check under <code>checks/</code> reads the fragment being written, and a fragment cannot show that a page names a folder deleted last week or that a produced page stopped matching its seat. Those are corpus questions, and one check exists to ask a few of them without waiting for somebody to type a command.</p>
+  <h3 id="the-workspace-gates-ask-for-accounting-n">The workspace gates ask for accounting, not completion</h3>
+  <p>Closing a scope with work still pending is good housekeeping. What must not happen is a row nobody decided. So the close gate passes landed, carried and deferred alike, and refuses only the undecided row, and there is no override because recording the deferral is the way through. Two of the workspace gates read the same table for different reasons, so they live in one file and the dispatcher registers each separately. Naming them apart matters: one sweeps the workspace and the other reads a single path, and anybody measuring the cost needs to know which.</p>
+  <h3 id="the-bars-a-check-measures-come-from-a-ru">The bars a check measures come from a rule, never from the corpus</h3>
+  <p>A bar set from what the corpus already averages moves every time the corpus does, so a sweep would approve whatever is already there. The document check takes its numbers from the register row that states them, and takes headings, tables, code and metadata out of the text before measuring what is left.</p>
+  <h3 id="a-tool-is-reached-by-name-and-grades-wha">A tool is reached by name, and grades what it finds</h3>
+  <p>Nothing matches a tool against the work you are doing, so you reach one by naming its path. It reads the repository it was pointed at and answers with both a list and a number: findings a person reads, each carrying its grade, and an exit code a pipeline reads that counts only the refusals. That is why the grade is part of a finding rather than a judgement made at the end.</p>
+  <h3 id="one-file-serves-the-write-time-check-and">One file serves the write-time check and the sweep</h3>
+  <p>A rule answered one way while a file is written and another way in a sweep is two rules. The practical consequence is that the same file must read a document in both of its spellings — the markdown an author writes and the HTML a page is produced as — because reading only one of them once reported every hand-written page as missing every section it carried.</p>
+  <h3 id="a-job-not-a-flag">A job, not a flag</h3>
+  <p>A tool with more than one job gives each job a name and a path argument, and a path is a file or a folder in every one of them. Given a folder, a job means every document under it, which is what anybody typing one meant.</p>
+  <h3 id="two-questions-that-look-alike-and-are-no">Two questions that look alike and are not</h3>
+  <p>Comparing documents inside one repository and comparing a restatement against a book in another repository are different questions with different inputs, and no repository holds both trees. So they are two tools, and both read one parser, because writing the parser twice would be the defect the instrument exists to catch.</p>
+  <h3 id="silence-where-the-input-is-absent">Silence where the input is absent</h3>
+  <p>A partner holds the plugins and neither the book nor its registers. A question whose input is missing answers with one line and a clean exit, because a crash on a repository the tool was not written for shows a partner a broken agent rather than a missing file.</p>
+  <h3 id="a-tool-that-proves-the-other-scripts">A tool that proves the other scripts</h3>
+  <p>One tool builds a repository carrying only what a partner has, runs every wired script and every other tool against it, and reports. A crash is a failure there; a finding is not, because findings are that repository's own business. It picks an interpreter from each script's own extension, so a ported script is exercised the same way its predecessor was.</p>
+  <h3 id="a-tool-that-reports-candidates-rather-th">A tool that reports candidates rather than verdicts</h3>
+  <p>Handing a whole corpus to a rewriting pass is the expensive way to improve it, and most of the corpus needs no change. So the prose triage reports the paragraphs a pattern can recognise, with a ledger of what it has already scored so a long sweep can resume, and it leaves the faults no pattern can tell from good prose to a reader.</p>
+  <h3 id="a-tool-that-writes-rather-than-reports">A tool that writes rather than reports</h3>
+  <p>One tool here writes. It reads the files of the one run it is told to read and puts what the run found into the cells a run owns, leaving every other cell exactly as it was. It exists because this repository declares no stack, so no stack runner writes its rows, and only the plugins' own suites know.</p>
+  <h3 id="a-tool-produces-the-pages-and-the-page-s">A tool produces the pages, and the page's own shape belongs to the book</h3>
+  <p>An author writes markdown and a reader opens HTML, and the whole of what sits between the two is a job of the documents tool: <code>page</code> produces, <code>face</code> writes the generated regions of a face, <code>figures</code> measures every drawing, and <code>audit</code> produces a page again and compares it byte for byte, so a hand edit is found rather than inherited. What the tool must not decide is what a page is made of. <strong>The block vocabulary, the figure grammar and the furniture a page carries are the foundation's</strong>, stated in <code>spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md</code> with the templates beside it, and this folder only realizes them. Where the two disagree, the chapter wins.</p>
+</section>
+
+<!-- 04 -->
+<section id="s4">
+  <div class="sds-section-head"><h2>Boundary</h2></div>
+  <p>This page answers what a script is, how each kind is reached, and what it answers with. It does not answer how checks are composed, what the payload is, or why the exit code is always zero — that is <a href="./02-hooks-construct.html">Hooks</a>. It does not answer what the rules themselves say either: each file's header names the chapter that states its rule, and that chapter is where a change is made.</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Owns</th><th>Refuses</th><th>Who owns that instead</th></tr></thead>
+    <tbody>
+      <tr><td>the four folders, the shape of one check, the shape of one tool, and the grade a finding carries</td><td>the composition, the payload, the dispatcher's own guard, and the exit code a moment's script ends on</td><td><a href="./02-hooks-construct.html">Hooks</a></td></tr>
+      <tr><td>the line between refusing a call and only speaking about it</td><td>which rule a given script enforces, and what that rule says</td><td>the foundation chapter each header names</td></tr>
+      <tr><td>that a page is produced from its seat file and compared against it</td><td>what a page is made of — the blocks, the figure grammar and the furniture</td><td>the foundation's <code>05-artifacts.md</code></td></tr>
+      <tr><td>that a stack-agnostic question belongs here</td><td>a question true only of one stack, or only of an estate</td><td>the scripts chapter of <a href="../../../../02-constructs/02-apps/README.md">the apps domain</a> or <a href="../../../../02-constructs/03-infra/README.md">the infra domain</a></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- 05 -->
+<section id="s5">
+  <div class="sds-section-head"><h2>Binds</h2></div>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>Rule</th><th>What it decides</th><th>Weight</th></tr></thead>
+    <tbody>
+      <tr><td><code>RD.DEVEX.UTILS.019</code></td><td>a script restates a chapter and adds no rule of its own</td><td>MUST</td></tr>
+      <tr><td><code>RD.DEVEX.WORKSPACE.118</code></td><td>a file carrying a rule it does not own is a restatement, and it names its source</td><td>MUST</td></tr>
+      <tr><td><code>RD.DEVEX.WORKSPACE.176</code></td><td>this repository is served with docs commands alone, which is why its own rows are written by a tool the plugins ship</td><td>MUST</td></tr>
+      <tr><td>the foundation's <code>02-delivery.md</code> § What it makes checkable</td><td>which standards are expected to be answered by a script rather than by a reader</td><td>MUST</td></tr>
+      <tr><td>the foundation's <code>05-artifacts.md</code> § The blocks · § The figures</td><td>what a produced page is made of, which this folder renders and never decides</td><td>MUST</td></tr>
+      <tr><td>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></td><td>the four kinds of script, the <code>&lt;group&gt; &lt;action&gt;</code> shape <code>commands/</code> dispatches by, one command entry</td><td>MUST</td></tr>
+    </tbody>
+  </table></div>
+  <p>Try it: <code>node packages/plugin-spn-devex/src/dist/cli.mjs plugin partner</code> (or <code>spn-devex plugin partner</code>, once installed)</p>
+</section>
+
+
+
+</div>
+</div>
+
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.js"></script>
