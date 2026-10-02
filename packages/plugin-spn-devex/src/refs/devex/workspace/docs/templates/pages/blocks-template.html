@@ -5,7 +5,7 @@
 
 
 
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.0.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.css">
 <div class="sds-page">
 <nav class="sds-rail" id="rail">
   <a class="sds-home" href="../../../../README.md">&larr; .spndevex</a>
@@ -565,15 +565,25 @@ spnutils repo agent-sync</pre>
   <div class="sds-pull sds-success"><span class="sds-label">Success</span><p>A pull that carries <code>sds-success</code>: the step ran, and the check passed.</p></div>
   <div class="sds-pull sds-warning"><span class="sds-label">Warning</span><p>A pull that carries <code>sds-warning</code>: this works, and one part of it is still done by hand.</p></div>
   <div class="sds-pull sds-error"><span class="sds-label">Error</span><p>A pull that carries <code>sds-error</code>: the command stopped, and nothing was written.</p></div>
+  <p>A pull may hold a heading and a table in place of a label and a paragraph. The heading is an <code>h4</code>, and a badge may sit beside its words. A row's <code>th</code> names what its <code>td</code> says. The pull below carries <code>sds-warning</code>, and a hub writes a declared gap in this form.</p>
+  <div class="sds-pull sds-warning">
+    <h4><span class="sds-badge sds-warning">{{gap}}</span> {{The section}} &mdash; {{what stands open, in a few words}}</h4>
+    <div class="sds-scroll"><table><tbody>
+      <tr><th>{{Owed}}</th><td>{{what nobody has stated yet}}</td></tr>
+      <tr><th>{{Stated today}}</th><td>{{where the claim is written today, with a link}}</td></tr>
+    </tbody></table></div>
+  </div>
   <h3 id="b-utilities">UTILITIES &mdash; a layout that no block covers</h3>
   <p>Use a named class first. Use a Tailwind utility only for a layout that no block covers. A utility reads the same tokens as a named class, so both themes follow. Below, utilities put two boxes in one row. The first box is the named class <code>sds-pull</code>. The second box has no class of ours, and every part of its look is a utility.</p>
   <div class="grid gap-4 my-6 sm:grid-cols-2">
     <div class="sds-pull m-0"><span class="sds-label">A named class</span><p><code>sds-pull m-0</code> &mdash; the block, and one utility that takes away its margin inside the row.</p></div>
     <div class="border border-ok bg-ok-soft rounded-sm px-5 py-4"><span class="block font-ui text-xs uppercase tracking-widest text-ok mb-1">Utilities alone</span><p class="m-0 max-w-none text-ink"><code>border border-ok bg-ok-soft rounded-sm px-5 py-4</code> &mdash; the same tokens, read through Tailwind.</p></div>
   </div>
+  <p>The built stylesheet holds one standard set of utilities, and no other utility has a rule in it. The chapter lists the set by family. The row below uses three of them: <code>flex</code> and <code>justify-between</code> put its two ends apart, and <code>text-faint</code> writes the second end in faint text.</p>
+  <div class="flex justify-between gap-4"><span>{{A name}}</span><span class="text-faint">{{a note beside it, in faint text}}</span></div>
 </section>
 
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.0.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.js"></script>

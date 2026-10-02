@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "039495cc"
+      "seen": "d2c13e7c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -620,14 +620,21 @@ repository or in a workstream's folder. The stylesheet's line sits at the top of
 script's line sits at its end.
 
 ```html
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.0.0/sds-docs.css">
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.0.0/sds-docs.js"></script>
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.css">
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.js"></script>
 ```
 
 - **A page may add a style of its own, for a case the shared stylesheet does not cover.** The shared
   classes come first. The page's own `<style>` block sits after the stylesheet's line, and a class it
-  defines itself takes no `sds-` prefix. What several pages need goes into `sds-docs` in a later
-  version. The check on a page refuses a link to a version that nobody cut.
+  defines itself takes no `sds-` prefix, and never a utility's name. What several pages need goes
+  into `sds-docs` in a later version. The check on a page refuses a link to a version that nobody cut.
+- **A callout takes a status class, and it may hold a heading and a table.** The callout is
+  `sds-pull`, and the heading and the table take its status's colour. A declared gap in a hub is such
+  a callout, with `sds-warning`.
+- **The built file holds one standard set of utilities, and no other.** The set covers layout,
+  spacing, size, type, borders, corners and overflow, and the colours of our tokens, such as `flex`,
+  `gap-4`, `mt-2`, `text-sm`, `text-faint` and `bg-accent-soft`. Use a named class first, and a
+  utility only where no class fits. A utility outside the set has no effect on a page.
 - **A version is a folder that never changes.** `docs sds cut <version>` writes it, and it refuses a
   version that exists. A change to the styles is a new version, and
   `docs sds repoint <version> <folder>` moves every page under a folder to it.

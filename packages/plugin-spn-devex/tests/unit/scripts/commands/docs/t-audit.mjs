@@ -967,7 +967,10 @@ console.log("\n=== a page's furniture is the shared files': a version that exist
   const audit = (text) => { writeFileSync(join(root, at), text); return run(root, ["audit", at]); };
 
   one("a page `docs page` produced links the shared stylesheet, and the audit finds it clean", audit(produced),
-    (g) => produced.includes(LINES.stylesheet) && g.includes("clean — 1 page"));
+    // The page takes its two lines from the template, so it links the version the template links.
+    (g) => /<link rel="stylesheet" href="[^"]*\/assets\/docs\/\d+\.\d+\.\d+\/sds-docs\.css">/.test(produced)
+      && produced.includes(/<link rel="stylesheet"[^>]*>/.exec(readFileSync(resolve(templates, "pages", "construct-template.html"), "utf8"))[0])
+      && g.includes("clean — 1 page"));
   one("known-bad: the same page edited by hand is not what the seat produces",
     audit(produced.replace("<h2>Model</h2>", "<h2>Model</h2>\n<p>typed into the page</p>")), has("✗ RULE produced"));
   const own = produced.replace(LINES.stylesheet, "<style>.badge{color:red}</style>")

@@ -66,7 +66,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "039495cc"
+      "seen": "d2c13e7c"
     }
   ]
 }
@@ -728,8 +728,9 @@ them — MUST** (`RD.DEVEX.WORKSPACE.214`). An approach page and a preview keep 
 has. One links `sds-docs.css` by the version's address, and the other loads `sds-docs.js` from the
 same version. A page that holds a copy of its styles keeps the faults of the day it was written, and
 a shared file is fixed once for every page. Use the shared classes first. Where the page has a case
-they do not cover, add one `<style>` block of its own after the stylesheet's line; a class it defines
-itself takes no `sds-` prefix.
+they do not cover, reach for a utility of the standard set, such as `flex` or `text-faint`. Where no
+utility fits either, add one `<style>` block of its own after the stylesheet's line; a class it
+defines itself takes no `sds-` prefix, and never a utility's name.
 
 **Every class on the page opens with `sds-`** (`RD.DEVEX.WORKSPACE.216`). An open card is a
 `div.sds-open` wrapping an `h4` whose `id` is `q<n>`, and its parts are `sds-key` and
