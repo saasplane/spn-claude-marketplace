@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/01-common/",
-      "seen": "64d76890"
+      "seen": "505a5b27"
     }
   ],
   "decisions": [
@@ -47,7 +47,7 @@
 
 **Judged against, beside the book:** Nielsen's ten usability heuristics, as the Nielsen Norman Group states them, and the domain's usual workflow. A page option is weighed against the heuristic it keeps or breaks, named.
 
-**Worn** while designing a page. **Convened** over a page before it lands: a design in Figma, a preview or a built screen. **Advises — never blocks.**
+**Worn** while designing a page, and beside `WEB_DEV` while writing a screen. **Convened** over a page before it lands: a design in Figma, a preview or a built screen. **Advises — never blocks.**
 
 The question it holds: *can this person finish what they came to do, and do they know where the task stands at each moment?*
 

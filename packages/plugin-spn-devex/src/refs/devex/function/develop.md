@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/04-develop.md",
-      "seen": "ffcff6e1"
+      "seen": "cb138973"
     }
   ]
 }

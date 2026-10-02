@@ -15,15 +15,15 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/01-common/05-design-system.md",
-      "seen": "ecb219e6"
+      "seen": "b3a79e29"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/01-common/03-interaction.md",
-      "seen": "0e5e0d3d"
+      "seen": "37647d71"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/01-common/02-accessibility.md",
-      "seen": "ecfa4be2"
+      "seen": "e45989a5"
     }
   ]
 }

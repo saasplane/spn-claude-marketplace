@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/08-web.md",
-      "seen": "97a3219a"
+      "seen": "17b11d24"
     }
   ]
 }
@@ -22,7 +22,9 @@
 
 **A name is the book's, and TypeScript adds only its form.** The Surface construct states the name of a component, of a prop and of a closed value. This stack adds the form and nothing else: `DS` + PascalCase for a component, `I` + that name + `Props` for its props, a `Type` suffix for an enum, and `DS_` + UPPER_SNAKE for a constant map. A prop the book renames takes the book's name.
 
-**The default size is a field of the theme.** `size` is required on the theme. A component rendered without `size` takes the size of the nearest block above it that sets one, and then the theme's `size`. Resolve it through `useDSDefaultSize`, never through a destructure default. 🚧 Not yet realized: the context holds the default size as `defaultComponentSize` today, so read the installed package before you write a theme.
+**A hook names its context.** A hook of the design system reads as `useDS` + the context + the value, such as `useDSScopeSize`, `useDSAppAuthz`, `useDSAppTestData` and `useDSOverlayConfirm`. Each context has one hook that returns it whole: `useDSContext`, `useDSAppContext`, `useDSScopeContext` and `useDSOverlayContext`. `useDSScopeIsFramed` returns whether a frame is drawn here, with the block's own `bordered` winning. The Surface ref states the rule.
+
+**The default size is a field of the theme.** `size` is required on the theme. A component rendered without `size` takes the size of the nearest block above it that sets one, and then the theme's `size`. Resolve it through `useDSScopeSize`, never through a destructure default. 🚧 Not yet realized: the context holds the default size as `defaultComponentSize` today, so read the installed package before you write a theme.
 
 **A component reads the roles and the scale, and nothing below them.** It never reads a ramp, the seed or a number of its own. The scale holds the height, the padding, the gap, the radius and the icon size of each size step, and a component reads it through the size maps. 🚧 The scale is not yet realized as tokens: the numbers sit in the class maps today.
 

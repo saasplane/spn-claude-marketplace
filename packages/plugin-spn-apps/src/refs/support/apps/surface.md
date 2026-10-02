@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-apps/11-surface.md",
-      "seen": "26518b92"
+      "seen": "4c325e29"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/",
-      "seen": "2b50012a"
+      "seen": "4fade0c4"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/08-web.md",
@@ -132,6 +132,7 @@ One name is used in the book, in the design library and in every stack. The book
 - Use `bordered` for a border a block draws around itself, and `rounded` for the corners of its frame. Only the container and the card take `raised`.
 - An unset `bordered` reads the frame above only on a block that frames a part of a page: the table, the code block, the accordions and the empty state. A field, a menubar and an avatar read their own default, because their border is the control's own chrome.
 - Mark each property of the design library as a declared prop, a shown state, or a setting taken from the block above. A design read back to code never gains a prop that no platform has.
+- Name a hook of the design system by its context: `useDS`, then the context, then the value. Each context has one hook that returns it whole. The size and the frame setting each have a hook of one value, which takes the block's own prop. The rule binds a hook whose value comes from one context: a hook that reads several, or none, is named for what it does.
 
 The names chapter of the book lists each prop that takes another name, with its values. The web design system uses `variant` for several vocabularies today.
 
