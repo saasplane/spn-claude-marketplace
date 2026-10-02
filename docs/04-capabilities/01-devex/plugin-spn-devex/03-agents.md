@@ -16,7 +16,7 @@ Four markdown files sit under `packages/plugin-spn-devex/src/agents/`, each a pe
 | The review panel | `packages/plugin-spn-devex/src/agents/spn-panel.md` | one viewpoint over one change, at a gate a skill names |
 | The prose rewriter | `packages/plugin-spn-devex/src/agents/spn-prose-rewriter.md` | rewrites flagged paragraphs, never a whole file |
 | The prose reviewer | `packages/plugin-spn-devex/src/agents/spn-prose-reviewer.md` | judges whether a rewrite kept every claim it had to keep |
-| The viewpoint files | `packages/plugin-spn-devex/src/refs/devex/agent/lenses/` | one file per reviewing function: `lead` · `business` · `product` · `architect` · `server-dev` · `web-dev` · `qa` · `infra` · `trust` · `partner` · `voice` |
+| The viewpoint files | `packages/plugin-spn-devex/src/refs/devex/agent/lenses/` | one file per reviewing function: `lead` · `business` · `product` · `architect` · `server-dev` · `web-dev` · `qa` · `infra` · `trust` · `partner` · `voice` · `ux` |
 | What the set of viewpoints is | `packages/plugin-spn-devex/src/refs/devex/agent/lenses.md` | the restatement that states the set itself, and what each function is for |
 | The lens register | `packages/plugin-spn-devex/src/scripts/lib/render.ts` | the same values a document's `lenses` field may carry, and the label each renders as |
 | Where a viewpoint is convened | `packages/plugin-spn-devex/src/skills/ideate/SKILL.md` · `packages/plugin-spn-devex/src/skills/develop/SKILL.md` | the skills that say which gate convenes which viewpoint |

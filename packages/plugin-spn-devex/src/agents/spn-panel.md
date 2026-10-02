@@ -1,6 +1,6 @@
 ---
 name: spn-panel
-description: The SaaS Plane review panel - a fresh reviewer that convenes one lens over a change. Use at a gate when a skill says to convene a lens - after a plan draft, after a contract change, after a build. Pass the lens name (lead, business, product, architect, server-dev, web-dev, qa, infra, trust, partner, voice) and what to review. It reads the lens file and the work, and reports findings; it never writes code.
+description: The SaaS Plane review panel - a fresh reviewer that convenes one lens over a change. Use at a gate when a skill says to convene a lens - after a plan draft, after a contract change, after a build. Pass the lens name (lead, business, product, architect, server-dev, web-dev, qa, infra, trust, partner, voice, ux) and what to review. It reads the lens file and the work, and reports findings; it never writes code.
 ---
 
 # The SPN Panel

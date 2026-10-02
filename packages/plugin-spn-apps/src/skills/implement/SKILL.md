@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "efbbe76f"
+      "seen": "6f182673"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
@@ -83,7 +83,7 @@ Order never changes; skip only what the classification skips. **Documents lead c
 
 ## Lenses
 
-The step files are the `server-dev` and `web-dev` lenses worn — they carry the same rules. Additionally wear the spn-devex plugin's `refs/devex/agent/lenses/trust.md` on any mutation and `refs/devex/agent/lenses/partner.md` on contract states. The close's review gates are the panel convened: `partner` when the published surface changed, `trust` when authorization, audit, or secrets moved, `qa` always.
+The step files are the `server-dev` and `web-dev` lenses worn — they carry the same rules. Additionally wear the spn-devex plugin's `refs/devex/agent/lenses/trust.md` on any mutation and `refs/devex/agent/lenses/partner.md` on contract states. The close's review gates are the panel convened: `partner` when the published surface changed, `trust` when authorization, audit, or secrets moved, `ux` when a page changed, `qa` always.
 
 ## Write code the capability generator can read
 

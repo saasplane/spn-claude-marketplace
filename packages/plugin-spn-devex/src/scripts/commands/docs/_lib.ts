@@ -75,7 +75,7 @@ export const LENS_LABEL: Record<string, string> = {
   LEAD: "Engineering leader", BUSINESS: "Business manager", PRODUCT: "Product manager",
   ARCHITECT: "Architect", SERVER_DEV: "Backend developer", WEB_DEV: "Web developer",
   QA: "Quality engineer", INFRA: "DevOps / SRE", TRUST: "DevSecOps / Security",
-  PARTNER: "Partner / integrator", VOICE: "Editor",
+  PARTNER: "Partner / integrator", VOICE: "Editor", UX: "UX designer",
 };
 
 export const STATUS_WORD: Record<string, string> = { PLANNING: "PLANNING", IMPLEMENTING: "IMPLEMENTING", DONE: "DONE" };

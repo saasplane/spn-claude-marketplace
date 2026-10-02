@@ -116,6 +116,18 @@ console.log("\n=== a markdown seat file is checked as a seat file, not as a page
   one("a title inside a fence is not a second title",
     run(root, ["audit", "check", "docs/a.md"]), has("clean — 1 page"));
 }
+{
+  // `UX` is the UX designer's lens (RD.DEVEX.AGENT.079). A page may declare it, and its tag line
+  // reads the label the register gives the value.
+  const root = repo({
+    "CONCEPT.md": "# c\n",
+    "docs/a.md": doc({ id: "a", title: "A Title", lenses: ["UX"], status: "DONE" },
+                     "Lead.\n", "`For: UX designer` · `Status: ✅ DONE`"),
+  });
+  one("a page that declares `UX` is clean: the value is a lens, and its tag line reads `For: UX designer`",
+    run(root, ["audit", "check", "docs/a.md"]),
+    (got) => got.includes("clean — 1 page") && !got.includes("is not a lens"));
+}
 
 
 // ------------------------------------------- the outline check reads the format it is given

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "efbbe76f"
+      "seen": "6f182673"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/04-develop.md",
@@ -77,7 +77,7 @@ Edit the generator or its source when a generated file needs to be different. An
 
 ## Lenses
 
-Wear per layer: `refs/devex/agent/lenses/server-dev.md` on contract, service, and entry; `refs/devex/agent/lenses/web-dev.md` on ui; `refs/devex/agent/lenses/trust.md` on any mutation; `refs/devex/agent/lenses/partner.md` while writing contract states. At the close, convene the `spn-panel` subagent with `partner` if the published surface changed, and with `trust` if authorization, audit, or secrets moved.
+Wear per layer: `refs/devex/agent/lenses/server-dev.md` on contract, service, and entry; `refs/devex/agent/lenses/web-dev.md` on ui; `refs/devex/agent/lenses/trust.md` on any mutation; `refs/devex/agent/lenses/partner.md` while writing contract states. At the close, convene the `spn-panel` subagent with `partner` if the published surface changed, and with `trust` if authorization, audit, or secrets moved. Convene it with `ux` over a page before the page lands.
 
 ## Finish
 

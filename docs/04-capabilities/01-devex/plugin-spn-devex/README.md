@@ -18,7 +18,7 @@
 | [06 — Pages](05-scripts.md) | The renderer, the figure drawer, the figure checker, and the rule that a page is never edited by hand |
 | [07 — Skill](04-skills.md) | Eleven stage skills, one folder each, whose descriptions are written to be matched |
 | [08 — Ref](06-refs.md) | Eleven restatements, each stamped with the hash of what it last saw |
-| [09 — Lenses](03-agents.md) | Eleven reviewing viewpoints, each naming the one thing it may block |
+| [09 — Lenses](03-agents.md) | One reviewing viewpoint for each engineering function, each naming what it may block |
 | [10 — Agent](03-agents.md) | Four briefs a session convenes, of which one may write |
 
 ## The rest of the domain

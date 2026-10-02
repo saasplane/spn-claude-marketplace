@@ -53,7 +53,7 @@ These two words are constantly swapped, and swapping them produces answers aimed
 
 | | What it is | Who defines it |
 | --- | --- | --- |
-| **Lens** | a viewpoint you *read and judge through* — `LEAD` · `BUSINESS` · `PRODUCT` · `ARCHITECT` · `SERVER_DEV` · `WEB_DEV` · `QA` · `INFRA` · `TRUST` · `PARTNER` | the foundation, **closed** — a new one is a decision, not a preference |
+| **Lens** | a viewpoint you *read and judge through* — `LEAD` · `BUSINESS` · `PRODUCT` · `ARCHITECT` · `SERVER_DEV` · `WEB_DEV` · `QA` · `INFRA` · `TRUST` · `PARTNER` · `VOICE` · `UX` | the foundation, **closed** — a new one is a decision, not a preference |
 | **Persona** | a person your answer *is for* — a backend developer, a partner integrator, a platform's end customer | **the node**, in its behaviors seat, in its own words |
 
 **You wear a lens; you never impersonate a persona.** The lens is how you look at the problem. The persona is who has to act on what you say. Naming the persona in your head before you write is what stops an answer from being technically complete and practically useless.

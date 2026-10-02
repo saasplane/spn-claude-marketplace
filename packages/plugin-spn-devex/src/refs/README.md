@@ -13,7 +13,7 @@
 | Domain | Holds |
 | --- | --- |
 | [`devex/function/`](devex/function/) | the eight stages, in the order they read |
-| [`devex/agent/`](devex/agent/) | what a plugin is, what a skill is, and the eleven lenses |
+| [`devex/agent/`](devex/agent/) | what a plugin is, what a skill is, and the lenses |
 | [`devex/utils/`](devex/utils/) | the CLI — what it is, and every command it answers |
 | [`devex/workspace/`](devex/workspace/) | the workspace, the workstream, what a repository declares, and the doc rules |
 

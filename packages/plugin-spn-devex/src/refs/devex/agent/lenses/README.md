@@ -1,6 +1,6 @@
 # The lenses — worn while writing, convened at review
 
-**Eleven files sit beside this one, one per engineering function.** Each is a reviewer's whole brief: what that function checks, and what it never does.
+**One file for each engineering function sits beside this one.** Each is a reviewer's whole brief: what that function checks, and what it never does.
 
 **This folder is the `03-lenses` construct**, restated. The construct says what a lens *is*; the files say what each one *checks*.
 

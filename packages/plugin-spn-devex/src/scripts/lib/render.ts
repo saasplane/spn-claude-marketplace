@@ -24,7 +24,7 @@ const LENS_LABEL: Record<string, string> = {
   LEAD: "Engineering leader", BUSINESS: "Business manager", PRODUCT: "Product manager",
   ARCHITECT: "Architect", SERVER_DEV: "Backend developer", WEB_DEV: "Web developer",
   QA: "Quality engineer", INFRA: "DevOps / SRE", TRUST: "DevSecOps / Security",
-  PARTNER: "Partner / integrator", VOICE: "Editor",
+  PARTNER: "Partner / integrator", VOICE: "Editor", UX: "UX designer",
 };
 const STATUS_GLYPH: Record<string, string> = { DONE: "&#x2705;", IMPLEMENTING: "&#x1F6A7;", PLANNING: "&#x1F52E;" };
 

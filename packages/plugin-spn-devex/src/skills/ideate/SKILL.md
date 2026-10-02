@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/02-skills.md",
-      "seen": "efbbe76f"
+      "seen": "6f182673"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/03-ideate.md",
@@ -67,6 +67,8 @@ Name the register it belongs in: the workspace's own `docs/registers/decisions.m
 ### Hand off by naming the next skill
 
 `shape` and `design` → `new` where scaffolding is needed, otherwise `implement`. `decision` → done, or `review` where the ruling needs a second reading.
+
+A page that the requirement holds → the `design` skill of the apps plugin, before `implement`. It designs the page as a tree of named blocks.
 
 ## Two directions, and the source decides which
 

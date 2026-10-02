@@ -5,7 +5,7 @@
   "title": "Behaviors — Skills",
   "lenses": ["SERVER_DEV", "WEB_DEV"],
   "status": "PLANNING",
-  "summary": "What this domain's skills promise: the contract written before anything generated from it, only the steps an ask touches, a destructive mode announced before it is loaded, a step reached without a stack being typed, and a review the build hands its own work to.",
+  "summary": "What this domain's skills promise: the contract written before anything generated from it, only the steps an ask touches, a destructive mode announced before it is loaded, a step reached without a stack being typed, a review the build hands its own work to, and a page designed before its code is written.",
   "keywords": ["skill", "steps", "classification", "mode", "stage", "rows"]
 }
 -->
@@ -29,6 +29,8 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SKILLS.14 | Editor | be told when a skill has fallen behind the chapters it restates | Every skill carries a stamp, so a drift run reads a skill exactly as it reads a ref | NEGATIVE | UNIT | PLANNED | — |
 | MKT.SKILLS.15 | Engineering leader | have a contract change reviewed by something that did not write it | The build skill closes with the suites and hands the change to the review skill | POSITIVE | UNIT | PLANNED | — |
 | MKT.SKILLS.16 | Architect | decide what a node is without a second skill competing for the ask | That skill lives once in the core plugin, and this plugin supplies only the material it loads | NEGATIVE | UNIT | PLANNED | — |
+| MKT.SKILLS.25 | Web developer | design a page before its code is written | The design skill serves the ideate stage, and states the page as a tree of named blocks with their props | POSITIVE | UNIT | PLANNED | — |
+| MKT.SKILLS.26 | Web developer | get the design of a page in a window that holds no Figma connector | The skill reads its one step, `draw`, only where the window holds the connector and a drawing is asked for | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

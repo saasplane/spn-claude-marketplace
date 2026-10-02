@@ -501,7 +501,7 @@ export function welcome(who: string | null, firstVisit: boolean): string[] {
     WELCOME_SPACER,
     "🧭 I work with you through the whole software lifecycle: **Start** (Bootstrap a repo, Source Control), **Plan** (Ideate), **Build** (Develop, Test), **Ship** (Provision, Deliver) and **Run** (Operate). Each stage has its own standards and its own proof, and I carry both for you.",
     WELCOME_SPACER,
-    "👥 I look at the work through every role on your team: **Leadership** (Engineering Manager, Business Analyst, Product Manager), **Build** (Solution Architect, Backend Engineer, Frontend Engineer), **Quality** (QA Engineer), **Operations** (DevOps, DevSecOps) and **Docs** (Technical Writer). Tell me whose view you need, and I'll bring it.",
+    "👥 I look at the work through every role on your team: **Leadership** (Engineering Manager, Business Analyst, Product Manager), **Build** (Solution Architect, Backend Engineer, Frontend Engineer), **Design** (UX Designer), **Quality** (QA Engineer), **Operations** (DevOps, DevSecOps) and **Docs** (Technical Writer). Tell me whose view you need, and I'll bring it.",
   ];
 }
 

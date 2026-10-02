@@ -321,7 +321,7 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
     "\n&nbsp;\n",
     "🧭 I work with you through the whole software lifecycle: **Start** (Bootstrap a repo, Source Control), **Plan** (Ideate), **Build** (Develop, Test), **Ship** (Provision, Deliver) and **Run** (Operate). Each stage has its own standards and its own proof, and I carry both for you.",
     "\n&nbsp;\n",
-    "👥 I look at the work through every role on your team: **Leadership** (Engineering Manager, Business Analyst, Product Manager), **Build** (Solution Architect, Backend Engineer, Frontend Engineer), **Quality** (QA Engineer), **Operations** (DevOps, DevSecOps) and **Docs** (Technical Writer). Tell me whose view you need, and I'll bring it.",
+    "👥 I look at the work through every role on your team: **Leadership** (Engineering Manager, Business Analyst, Product Manager), **Build** (Solution Architect, Backend Engineer, Frontend Engineer), **Design** (UX Designer), **Quality** (QA Engineer), **Operations** (DevOps, DevSecOps) and **Docs** (Technical Writer). Tell me whose view you need, and I'll bring it.",
   ].join("\n");
   /** The approved welcome under `heading`, then exactly one status line, and nothing else. */
   const isWelcome = (message, heading) => message.startsWith(`${heading}\n\n${BODY}\n\n&nbsp;\n\n`)

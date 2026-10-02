@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/03-ideate.md",
-      "seen": "f2906727"
+      "seen": "7855b6aa"
     }
   ]
 }
@@ -160,6 +160,8 @@ An argument closes by being consumed: the half that outlives it is a register ro
 **Wearing a lens while drafting is not reviewing through it.** The context that drafted a design contains every justification for it, so it agrees with itself — the architect's lens is convened over the draft as well as worn while writing it, because the reviewer who can still block is the one who did not write the thing.
 
 **The architect's lens blocks on a new mechanism reachable from more than one module**, and the block clears when a register row names what that mechanism was weighed against. Below that threshold the lens advises, and advice declined is dropped.
+
+**The `UX` lens is worn where a page is designed.**
 
 ## What this phase hands on, and what it never does
 

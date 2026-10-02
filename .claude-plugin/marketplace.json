@@ -8,7 +8,7 @@
     {
       "name": "spn-devex",
       "source": "./packages/plugin-spn-devex/src",
-      "description": "SaaS Plane devex \u2014 installed in every repository, stack-agnostic. Ten skills: the eight stages in order (bootstrap, scm, ideate, develop, test, provision, deliver, operate) plus check and report, which serve any stage. The SPN engineer persona, the spn-panel reviewer and the eleven lens files it convenes. The refs a partner needs without the book: what a plugin is, what a skill is, the workspace and the workstream loop, what a repository declares, the doc-set grammar, block and figure spelling, decision cards, and the templates every page is copied from, each linking one shared stylesheet. Hooks that deny hand-edits to generated files, check every document against the bars the book states mechanically, print the window's orientation at session start, and read a workstream's split plan before a seat write or a close.",
+      "description": "SaaS Plane devex \u2014 installed in every repository, stack-agnostic. Ten skills: the eight stages in order (bootstrap, scm, ideate, develop, test, provision, deliver, operate) plus check and report, which serve any stage. The SPN engineer persona, the spn-panel reviewer and the lens files it convenes, one for each engineering function. The refs a partner needs without the book: what a plugin is, what a skill is, the workspace and the workstream loop, what a repository declares, the doc-set grammar, block and figure spelling, decision cards, and the templates every page is copied from, each linking one shared stylesheet. Hooks that deny hand-edits to generated files, check every document against the bars the book states mechanically, print the window's orientation at session start, and read a workstream's split plan before a seat write or a close.",
       "author": {
         "name": "SaaS Plane"
       }
@@ -16,7 +16,7 @@
     {
       "name": "spn-apps",
       "source": "./packages/plugin-spn-apps/src",
-      "description": "SaaS Plane apps domain \u2014 one plugin for every APPS repository, stack-agnostic with its stacks inside it. Six skills: new, implement, review, run, verify, release. The apps model a node is built from, the platform model a partner adopts rather than rebuilds \u2014 tenancy, identity, surfaces, data and trust, lifecycle, and the seven modules that ship \u2014 and the rules a change must obey, with each stack's parser kept apart from the rule it serves.",
+      "description": "SaaS Plane apps domain \u2014 one plugin for every APPS repository, stack-agnostic with its stacks inside it. Seven skills: new, implement, review, run, verify, release, design. The apps model a node is built from, the platform model a partner adopts rather than rebuilds \u2014 tenancy, identity, surfaces, data and trust, lifecycle, and the seven modules that ship \u2014 and the rules a change must obey, with each stack's parser kept apart from the rule it serves.",
       "author": {
         "name": "SaaS Plane"
       }
