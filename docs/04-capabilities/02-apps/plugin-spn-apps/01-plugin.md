@@ -36,7 +36,7 @@
 ### A committed build sits beneath the source, reached through one command entry
 
 **Why** — the foundation's `04-plugins/02-shape.md` states the target every plugin here realizes.
-**What** — `src/scripts/` carries one entry, `cli.ts`, dispatching `<group> <action>` to `commands/<group>/<action>.ts` files — `coverage` and `library` are this plugin's two groups — and `hooks.json` runs a committed `dist/` instead of the `.ts` sources, with a test that refuses a bundle older than what it was built from.
+**What** — `src/scripts/` carries one entry, `cli.ts`, dispatching `<group> [<subject>] <action>` to the files under `commands/<group>/` — `coverage` and `library` are this plugin's two groups — and `hooks.json` runs a committed `dist/` instead of the `.ts` sources, with a test that refuses a bundle older than what it was built from.
 **How** — read the standard chapter before reading anything built against it here.
 
 ### The description is long deliberately, because it is matched rather than read

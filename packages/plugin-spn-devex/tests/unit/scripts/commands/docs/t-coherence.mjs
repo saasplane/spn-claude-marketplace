@@ -18,12 +18,13 @@ import { PLUGIN } from "../../../../helpers/harness.mjs";
 // The fixture is written rather than copied from the corpus on purpose. A test whose input is the
 // live book passes for whatever reason the book happens to be in today.
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, writeFileSync, mkdtempSync, rmSync, renameSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync, mkdtempSync, rmSync, renameSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { ARTIFACT, CONSTRUCT_PAGES, POCKET, SEAT } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { FINDINGS } from "../../../../../src/scripts/commands/docs/coherence.ts";
 
-const TOOL = join(PLUGIN, "src", "scripts", "commands", "docs", "coherence.ts");
+const TOOL = join(PLUGIN, "src", "scripts", "cli.ts");
 const BASE = mkdtempSync(join(tmpdir(), "t-coherence-"));
 process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
 
@@ -34,9 +35,10 @@ function one(label, ok) {
   if (!ok) { failed += 1; console.log(`  FAIL  ${label}`); }
 }
 
-function run(root) {
-  try { return execFileSync("node", [TOOL, root], { encoding: "utf8" }); }
-  catch (e) { return String(e.stdout ?? ""); }
+/** One `docs coherence check` of a path through the entry, with what follows the path. A refusal's text is handed back with the rest. */
+function run(root, ...more) {
+  try { return execFileSync(process.execPath, [TOOL, "docs", "coherence", "check", root, ...more], { encoding: "utf8", stdio: "pipe" }); }
+  catch (e) { return String(e.stdout ?? "") + String(e.stderr ?? ""); }
 }
 
 function tree(name, pageBody, withRegister = true) {
@@ -299,6 +301,87 @@ one("[MKT.SCRIPTS.110] a construct page in the constructs folder beside it is no
 const partSegment = shelf("path-part-segment",
   "# A page\n\nA rule's suite sits at `packages/plugin-spn-x/src/scripts/checks/_<subject>/`.\n");
 one("a placeholder inside a segment is not read as a truncated name", !run(partSegment).includes("PATH "));
+
+// ── the grammar: an action, one path inside a repository, and a filter ─────────────────────────
+//
+// A repository this time, because a run with no path takes the repository the caller is in. Two
+// files cite an id no row carries, and two write a count into a set that can grow, in three folders.
+
+{
+/** What one run through the entry printed, and its exit code, from the folder given. */
+function typed(cwd, ...words) {
+  try { return { code: 0, out: execFileSync(process.execPath, [TOOL, "docs", "coherence", ...words], { encoding: "utf8", stdio: "pipe", cwd }) }; }
+  catch (e) { return { code: e.status, out: String(e.stdout ?? "") + String(e.stderr ?? "") }; }
+}
+const USAGE = "usage: spn-devex docs coherence check [<path>] [--finding <name>]\n";
+const repository = tree("repository",
+  "# A page\n\nThis cites RD.GOV.999, which no row carries. It names the three kinds of page.\n");
+mk(repository, "sprepo.json", '{"type":"APPS","name":"t","config":null}');
+mk(repository, `docs/${SEAT.constructs}/01-core/b.md`,
+  "# B\n\nThis cites RD.DEVEX.WORKSPACE.155, which the register carries, and RD.GOV.998, which it does not.\n");
+mk(repository, `docs/${SEAT.behaviors}/c.md`, "# C\n\nIt lists the four skills of the plugin.\n");
+const CORE = `docs/${SEAT.constructs}/01-core`;
+
+const bare = typed(repository);
+one("[MKT.SCRIPTS.111] with no action the entry prints the usage line, says an action is owed and exits 2",
+  bare.code === 2 && bare.out === `${USAGE}\`docs coherence\` needs an action.\n`);
+one("[MKT.SCRIPTS.111] a path where the action belongs is refused with exit 2", typed(repository, ".").code === 2);
+const option = typed(repository, "check", ".", "--json");
+one("an option the command does not take is refused by its name, with exit 2",
+  option.code === 2 && option.out === `${USAGE}\`docs coherence check\` does not take \`--json\`.\n`);
+one("a second path is refused with exit 2", typed(repository, "check", ".", "docs").code === 2);
+
+const whole = typed(repository, "check", ".");
+one("known-bad: the repository, checked, reports both ids and both counts",
+  /CITATION\s+2 decision id\(s\)/.test(whole.out) && whole.out.includes("RD.GOV.999") && whole.out.includes("RD.GOV.998")
+    && whole.out.includes("the three kinds") && whole.out.includes("the four skills"));
+one("and its exit code is the number of findings it reports: one citation finding and two counts", whole.code === 3);
+one("the closing line of a whole run names no path", /documents compared against each other — 2 cardinality · 1 citation\n$/.test(whole.out));
+
+const narrow = typed(repository, "check", CORE);
+one("[MKT.SCRIPTS.135] a run narrowed to one folder reports the id cited under it, and no finding from a file beside it",
+  /CITATION\s+1 decision id\(s\)/.test(narrow.out) && narrow.out.includes("RD.GOV.998") && !narrow.out.includes("RD.GOV.999")
+    && !narrow.out.includes("the three kinds") && !narrow.out.includes("the four skills"));
+// THE REGISTER SITS OUTSIDE THE PATH. A run that read only its path would find no register, so it
+// would report no citation at all, and a run that found one would report the id the register carries.
+one("[MKT.SCRIPTS.135] the narrow run still reads the register outside its path: the id the register carries is not reported",
+  narrow.out.includes("CITATION") && !narrow.out.includes("RD.DEVEX.WORKSPACE.155 —"));
+one("[MKT.SCRIPTS.135] its exit code is the number of findings under the path", narrow.code === 1);
+one("[MKT.SCRIPTS.135] and its closing line counts every document read, and names the path", narrow.out.endsWith(`1 citation under ${CORE}\n`)
+  && narrow.out.match(/^(\d+) documents compared/m)?.[1] === whole.out.match(/^(\d+) documents compared/m)?.[1]);
+const oneFile = typed(repository, "check", `docs/${SEAT.behaviors}/c.md`);
+one("[MKT.SCRIPTS.135] a run narrowed to one file reports that file's finding alone",
+  oneFile.code === 1 && oneFile.out.includes("the four skills") && !oneFile.out.includes("CITATION") && !oneFile.out.includes("the three kinds"));
+const cleanFolder = typed(repository, "check", `docs/${POCKET.registers}`);
+one("[MKT.SCRIPTS.135] a run narrowed to a folder with no finding reports nothing and exits 0",
+  cleanFolder.code === 0 && cleanFolder.out.includes("— nothing under"));
+
+const inside = typed(join(repository, CORE), "check");
+one("[MKT.SCRIPTS.113] with no path the run takes the repository the caller is in, from a folder inside it too",
+  typed(repository, "check").out === whole.out && inside.out === whole.out && inside.code === 3);
+const outside = typed(BASE, "check");
+one("[MKT.SCRIPTS.113] where the caller is in no repository, `check` with no path says to name one, and exits 2",
+  outside.code === 2 && outside.out === `${USAGE}\`docs coherence check\` needs a path here, because the folder it is run from is in no repository. Name a repository.\n`);
+
+const citationOnly = typed(repository, "check", ".", "--finding", "citation");
+one("[MKT.SCRIPTS.136] `--finding citation` reports the findings of that name alone",
+  citationOnly.code === 1 && citationOnly.out.includes("CITATION") && !citationOnly.out.includes("CARDINALITY"));
+const both = typed(repository, "check", ".", "--finding", "citation", "--finding=cardinality");
+one("[MKT.SCRIPTS.136] `--finding` typed twice reports both names", both.code === 3 && both.out.includes("CITATION") && both.out.includes("CARDINALITY"));
+const filteredNarrow = typed(repository, "check", CORE, "--finding", "cardinality");
+one("[MKT.SCRIPTS.136] a name that nothing under the path earns reports nothing and exits 0", filteredNarrow.code === 0 && !filteredNarrow.out.includes("CITATION"));
+const outsideSet = typed(repository, "check", ".", "--finding", "block");
+one("[MKT.SCRIPTS.115] a finding name outside the set is refused with the set, and exit 2",
+  outsideSet.code === 2 && outsideSet.out.includes("takes `--finding` from vocabulary · ruling · ownership · cardinality · hub · restates · citation · chapter · contract · path, and `block` is none of them."));
+
+// The set `--finding` takes is the first word of each finding the command's own source writes.
+{
+  const source = readFileSync(join(PLUGIN, "src", "scripts", "commands", "docs", "coherence.ts"), "utf8");
+  const written = [...new Set([...source.matchAll(/`([A-Z]{3,}) +["$]/g)].map((found) => found[1].toLowerCase()))].sort();
+  one("the declared set and the first words of the findings in the source are the same",
+    written.length > 5 && written.join(" ") === [...FINDINGS].sort().join(" "));
+}
+}
 
 console.log(failed ? `${failed} of ${n} failed` : `all ${n} passed — coherence`);
 process.exit(failed ? 1 : 0);

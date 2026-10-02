@@ -1,4 +1,4 @@
-// `restates docs --write <ref>` — restamps one ref's `docs` citations after the developer has
+// `restates docs write <ref>` — restamps one ref's `docs` citations after the developer has
 // re-read each source and fixed any disagreement in the ref's own prose. It never touches the
 // prose itself, and it never touches a file other than the one named on the command line.
 import { execFileSync } from "node:child_process";
@@ -19,10 +19,10 @@ const one = (label, got, want) => {
 const BASE = mkdtempSync(join(tmpdir(), "t-restates-docs-write-"));
 process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
 
-const TOOL = join(import.meta.dirname, "..", "..", "..", "..", "..", "src", "scripts", "commands", "restates", "docs.ts");
+const TOOL = join(import.meta.dirname, "..", "..", "..", "..", "..", "src", "scripts", "cli.ts");
 const write = (refPath) => {
-  try { return { out: execFileSync("node", [TOOL, "--write", refPath], { encoding: "utf8" }), code: 0 }; }
-  catch (e) { return { out: String(e.stdout ?? ""), code: e.status ?? 1 }; }
+  try { return { out: execFileSync("node", [TOOL, "restates", "docs", "write", refPath], { encoding: "utf8", stdio: "pipe", env: { ...process.env, SPN_TELEMETRY: "off" } }), code: 0 }; }
+  catch (e) { return { out: String(e.stdout ?? "") + String(e.stderr ?? ""), code: e.status ?? 1 }; }
 };
 
 const workspace = join(BASE, "ws");
@@ -134,5 +134,15 @@ console.log("\n=== a folder citation restamps by its tree hash, exactly as `chec
     check(refPath, workspace, block, ["docs"]).length, 0);
 }
 
-console.log(failed ? `\n  ${failed} of ${n} FAILED — restates docs --write` : `\n  all ${n} passed — restates docs --write`);
+console.log("\n=== a ref outside every workspace is refused with exit 1, and its bytes stay");
+{
+  const refPath = join(BASE, "outside.md");
+  const body = '<!-- spn:restates\n{\n  "docs": [\n    { "path": "spn-foundation/docs/ghost.md", "seen": "deadbeef" }\n  ]\n}\n-->\n\n# a ref\n';
+  writeFileSync(refPath, body);
+  const result = write(refPath);
+  one("a ref with no `.spndevex` above it is refused by name, with exit 1 and never 2", [result.code, result.out.includes("no workspace found")], (g) => g.join() === "1,true");
+  one("and it is left byte-identical", readFileSync(refPath, "utf8"), body);
+}
+
+console.log(failed ? `\n  ${failed} of ${n} FAILED — restates docs write` : `\n  all ${n} passed — restates docs write`);
 process.exit(failed ? 1 : 0);

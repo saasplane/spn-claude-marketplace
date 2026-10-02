@@ -42,11 +42,11 @@ const doc = (o, body = "Some prose.\n", tag = null) =>
   block({ summary: `What ${o.title} is.`, ...o }) +
   `\n# ${o.title}\n\n` + (tag === null ? "" : tag + "\n\n") + body;
 
-/** `args` is the action's own argv — `["face", "docs"]` — run through `cli.ts docs <args>`. */
+/** `args` is what follows the group — `["face", "write", "docs"]` — run through `cli.ts docs <args>`. A refusal's text is handed back with the rest. */
 function run(root, args) {
   try {
     return execFileSync(process.execPath, [TOOL, "docs", ...args],
-      { encoding: "utf8", cwd: root, env: { ...process.env, SPN_WORKSPACE: root } });
+      { encoding: "utf8", cwd: root, stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: root } });
   } catch (e) { return String(e.stdout ?? "") + String(e.stderr ?? ""); }
 }
 const readAt = (root, p) => readFileSync(join(root, p), "utf8");
@@ -75,7 +75,7 @@ console.log("=== the tag line is rendered from the block, never typed");
       doc({ id: "b", title: "Behaviors", lenses: ["SERVER_DEV", "QA"], status: "DONE" },
           "Prose under it.\n", "`Lenses: DevOps · everyone` · `Status: ✅ Implemented`"),
   });
-  run(root, ["face", "docs"]);
+  run(root, ["face", "write", "docs"]);
   const got = readAt(root, `docs/${SEAT.behaviors}/README.md`);
   one("the label becomes For: and the actors come from the block",
     got, has("`For: Backend developer · Quality engineer`"));
@@ -84,7 +84,7 @@ console.log("=== the tag line is rendered from the block, never typed");
     got, has("`Status: ✅ DONE`\n\nProse under it."));
 
   const before = readAt(root, `docs/${SEAT.behaviors}/README.md`);
-  run(root, ["face", "docs"]);
+  run(root, ["face", "write", "docs"]);
   one("running it twice writes the same bytes", readAt(root, `docs/${SEAT.behaviors}/README.md`), before);
 }
 
@@ -94,7 +94,7 @@ console.log("=== the tag line is rendered from the block, never typed");
     [`docs/${SEAT.behaviors}/README.md`]:
       doc({ id: "b", title: "Behaviors", lenses: ["QA"], status: "DONE" }, "Lead.\n"),
   });
-  run(root, ["face", "docs"]);
+  run(root, ["face", "write", "docs"]);
   one("a document with no tag line gets one under its title",
     readAt(root, `docs/${SEAT.behaviors}/README.md`),
     has(`# Behaviors\n\n\`For: Quality engineer\` · \`Status: ✅ DONE\`\n\nLead.`));
@@ -109,7 +109,7 @@ console.log("=== the tag line is rendered from the block, never typed");
           "Lead.\n\n```text\n# An Example\n\n`For: Architect` · `Status: 🔮 PLANNING`\n```\n",
           "`For: Quality engineer` · `Status: ✅ DONE`"),
   });
-  run(root, ["face", "docs"]);
+  run(root, ["face", "write", "docs"]);
   const got = readAt(root, `docs/${SEAT.behaviors}/README.md`);
   one("a tag line inside a fence is content and is left alone", got, has("`For: Architect` · `Status: 🔮 PLANNING`"));
   one("the real tag line is still the block's", got, has("`For: Quality engineer` · `Status: ✅ DONE`"));
@@ -133,7 +133,7 @@ console.log("\n=== a domain face maps a construct nested under a level, not just
     [`docs/${SEAT.constructs}/01-core/01-level/nested.md`]:
       doc({ id: "nested", variant: "construct", parentId: "c", dependsOn: [], title: "Nested", lenses: ["ARCHITECT"], status: "PLANNING" }),
   });
-  run(root, ["face", "docs"]);
+  run(root, ["face", "write", "docs"]);
   one("the DOMAIN's face maps everything below it, nested included",
     readAt(root, `docs/${SEAT.constructs}/01-core/README.md`), has("[Nested]"));
 }
@@ -154,7 +154,7 @@ console.log("\n=== face writes no tag line for a chapter that only TEACHES the m
     "\n# Human Title\n```\n";
   const root = repo({ "CONCEPT.md": "# c\n", "docs/teaches.md": teaches });
   const before = readAt(root, "docs/teaches.md");
-  run(root, ["face", "docs"]);
+  run(root, ["face", "write", "docs"]);
   one("and `face` writes no tag line into it — the file is untouched",
     readAt(root, "docs/teaches.md"), before);
 }
@@ -174,7 +174,7 @@ const GROUPED = {
 };
 {
   const root = repo(GROUPED);
-  const out = run(root, ["face", "docs"]);
+  const out = run(root, ["face", "write", "docs"]);
   one("a group two levels up still gets a face", out, has(`${SEAT.constructs}/01-foundation/README.md`));
   one("and so does each domain under it", out, has(`${SEAT.constructs}/01-foundation/01-devex/README.md`));
   one("the group's face maps its domains, read from the concept's own sections",
@@ -197,7 +197,7 @@ const GROUPED = {
       "### Docs\n\nHow the corpus is written.\n\n#### Node Vocabulary\n\n" +
       "| Type | Purpose |\n| --- | --- |\n| `NODE` | anything that owns a doc set |\n\n" +
       "A second paragraph the face must not carry.\n") });
-  run(root, ["face", "docs"]);
+  run(root, ["face", "write", "docs"]);
   const face = readAt(root, `docs/${SEAT.constructs}/01-foundation/02-docs/README.md`);
   one("a domain written as prose and tables still carries its opening paragraph",
     face, has("How the corpus is written."));
@@ -212,7 +212,7 @@ const GROUPED = {
     "CONCEPT.md": GROUPED["CONCEPT.md"].replace("How the function operates.",
       `How the function operates, argued in [the page](docs/${POCKET.artifacts}/${ARTIFACT.reports}/a.html).`),
     [`docs/${POCKET.artifacts}/${ARTIFACT.reports}/a.html`]: "<p>x</p>\n" });
-  run(root, ["face", "docs"]);
+  run(root, ["face", "write", "docs"]);
   one("a link inside a copied bridge is re-based onto the face that now carries it",
     readAt(root, `docs/${SEAT.constructs}/01-foundation/01-devex/README.md`),
     has(`](../../../${POCKET.artifacts}/${ARTIFACT.reports}/a.html)`));
@@ -222,7 +222,7 @@ const GROUPED = {
     [`docs/${SEAT.constructs}/01-foundation/03-nobody-declared/README.md`]:
       doc({ id: "x", title: "Nobody", lenses: ["ARCHITECT"], status: "PLANNING" }) });
   one("a domain folder the concept does not name is invariant 1's finding",
-    run(root, ["face", "docs", "--check"]), has("invariant 1"));
+    run(root, ["face", "check", "docs"]), has("invariant 1"));
 }
 
 
@@ -237,9 +237,9 @@ console.log("\n=== a concept may name its domains in a table");
     [`docs/${SEAT.constructs}/01-contract/README.md`]: doc({ id: "c1", title: "Contract", lenses: ["ARCHITECT"], status: "PLANNING" }),
     [`docs/${SEAT.constructs}/06-design-system/README.md`]: doc({ id: "c2", title: "DS", lenses: ["WEB_DEV"], status: "PLANNING" }),
   });
-  const out = run(root, ["face", "docs", "--check"]);
+  const out = run(root, ["face", "check", "docs"]);
   one("a domain named only by a table row satisfies invariant 1", out, lacks("invariant 1"));
-  run(root, ["face", "docs"]);
+  run(root, ["face", "write", "docs"]);
   one("and the row's remaining cells become the face's bridge",
     readAt(root, `docs/${SEAT.constructs}/01-contract/README.md`), has("@x/contract"));
   one("a multi-word domain matches its folder — `Design system` is `06-design-system`",
@@ -252,7 +252,7 @@ console.log("\n=== a concept may name its domains in a table");
     [`docs/${SEAT.constructs}/07-nobody-declared/README.md`]: doc({ id: "n", title: "N", lenses: ["ARCHITECT"], status: "PLANNING" }),
   });
   one("a domain no row and no heading names is still invariant 1's finding",
-    run(root, ["face", "docs", "--check"]), has("invariant 1"));
+    run(root, ["face", "check", "docs"]), has("invariant 1"));
 }
 
 
@@ -271,7 +271,7 @@ console.log(`\n=== a seat's \`${TEMPLATES}/\` is excluded by the folder, never p
     // A template's block carries placeholders and it is a mirror of nothing.
     [`docs/${SEAT.capabilities}/01-x/01-server/${TEMPLATES}/a-template.md`]: "# {{NAME}}\n\nno block here.\n",
   });
-  const out = run(root, ["face", "docs"]);
+  const out = run(root, ["face", "write", "docs"]);
   one("a template is never taken for a mirror", out, lacks("a-template.md"));
   one("the real mirror still reaches the Map",
     readAt(root, `docs/${SEAT.capabilities}/01-x/01-server/README.md`), has("| [app.md](app.md) |"));
@@ -305,7 +305,7 @@ console.log("\n=== the dictionary is generated from the constructs, never typed 
           "| `sp_session` | `SPSession` | one row per live access |\n",
           "`For: Backend developer` · `Status: ✅ DONE`"),
   });
-  run(root, ["face", "docs"]);
+  run(root, ["face", "write", "docs"]);
   const domain = readAt(root, `docs/${SEAT.constructs}/01-core/README.md`);
   one("a Terms row becomes a dictionary row on its own domain's face",
     domain, has("| [sign-in](session.md) | `SPSession` | one person's live access to one app site |"));
@@ -336,7 +336,7 @@ console.log("\n=== the dictionary is generated from the constructs, never typed 
       doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }, "Some prose.\n\n" + stale),
     [`docs/${SEAT.constructs}/01-core/README.md`]: doc({ id: "c", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
   });
-  const out = run(root, ["face", "docs"]);
+  const out = run(root, ["face", "write", "docs"]);
   const seat = readAt(root, `docs/${SEAT.constructs}/README.md`);
   one("a dictionary left on a seat face by the old shape is removed", seat, lacks("Where it is stored"));
   one("and the markers go with it, so nothing invites an edit inside a region nobody writes",
@@ -366,7 +366,7 @@ console.log("\n=== the glossary is ordered the way a reader meets the words, not
       doc({ id: "zebra", variant: "construct", parentId: "c", dependsOn: [], title: "Zebra", lenses: ["ARCHITECT"], status: "PLANNING" },
           terms("banana"), "`For: Architect` · `Status: 🔮 PLANNING`"),
   });
-  run(root, ["face", "docs"]);
+  run(root, ["face", "write", "docs"]);
   const domain = readAt(root, `docs/${SEAT.constructs}/01-core/README.md`);
   const at = (needle) => domain.indexOf(needle);
   one("a construct contributes a heading row, so the grouping is visible rather than implied",
@@ -387,7 +387,7 @@ console.log("\n=== the glossary is ordered the way a reader meets the words, not
           "`For: Architect` · `Status: 🔮 PLANNING`"),
   });
   one("a two-column Terms table cannot be generated from, and says so",
-    run(root, ["face", "docs", "--check"]), has("two columns"));
+    run(root, ["face", "check", "docs"]), has("two columns"));
 }
 
 
@@ -403,12 +403,12 @@ console.log("\n=== a Map is a list of mirrors, so an authored seat has none");
           "`For: Architect` · `Status: ✅ DONE`"),
   };
   const derived = repo(files);
-  run(derived, ["face", "docs"]);
+  run(derived, ["face", "write", "docs"]);
   one("where the seat is derived from source, the face carries a Contents table",
     readAt(derived, `docs/${SEAT.capabilities}/README.md`), has("spn:generated contents"));
 
   const authored = repo(files, { type: "FOUNDATION" });
-  run(authored, ["face", "docs"]);
+  run(authored, ["face", "write", "docs"]);
   one("where the seat is AUTHORED, no Contents table is invented — there is no src/ for a row to name",
     readAt(authored, `docs/${SEAT.capabilities}/README.md`), lacks("spn:generated contents"));
 }
@@ -437,7 +437,7 @@ console.log("\n=== a seat face lists the mirrors beside it, never the chapters t
       doc({ id: "ch", title: "App", lenses: ["SERVER_DEV"], status: "DONE" }, "Lead.\n",
           "`For: Backend developer` · `Status: ✅ DONE`"),
   });
-  run(root, ["face", "docs"]);
+  run(root, ["face", "write", "docs"]);
   const seat = readAt(root, `docs/${SEAT.capabilities}/README.md`);
   one("a chapter three levels down never reaches the seat's Map",
     seat, lacks("01-core/01-server/01-app"));
@@ -449,7 +449,7 @@ console.log("\n=== a seat face lists the mirrors beside it, never the chapters t
     readAt(root, `docs/${SEAT.capabilities}/01-core/01-server/README.md`), has("| [01-app.md](01-app.md) |"));
 
   const before = seat;
-  run(root, ["face", "docs"]);
+  run(root, ["face", "write", "docs"]);
   one("running it twice writes the same bytes", readAt(root, `docs/${SEAT.capabilities}/README.md`), before);
 }
 {
@@ -463,7 +463,7 @@ console.log("\n=== a seat face lists the mirrors beside it, never the chapters t
       doc({ id: "m", title: "App", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
           "`For: Architect` · `Status: ✅ DONE`"),
   });
-  run(root, ["face", "docs"]);
+  run(root, ["face", "write", "docs"]);
   one("a direct `.md` child is a mirror and names the folder it governs",
     readAt(root, `docs/${SEAT.capabilities}/README.md`), has("| [app.md](app.md) | `src/app/` |"));
 }
@@ -498,7 +498,7 @@ console.log("\n=== the domain's glossary lands on its overview too, in HTML (Q22
     [`docs/${POCKET.artifacts}/${ARTIFACT.docs}/01-core/core-overview.html`]: overview,
   });
   const root = repo(tree(ov(curated)));
-  run(root, ["face", "docs"]);
+  run(root, ["face", "write", "docs"]);
   const page = readAt(root, `docs/${POCKET.artifacts}/${ARTIFACT.docs}/01-core/core-overview.html`);
 
   one("the overview gains a generated region, the first in any HTML page",
@@ -523,7 +523,7 @@ console.log("\n=== the domain's glossary lands on its overview too, in HTML (Q22
 
   // A REGION IS ONLY TRUSTWORTHY IF A SECOND RUN WRITES THE SAME BYTES. The first run replaces a
   // curated table; the second has to find its own markers and land on the same page exactly.
-  const again = (() => { run(root, ["face", "docs"]); return readAt(root, `docs/${POCKET.artifacts}/${ARTIFACT.docs}/01-core/core-overview.html`); })();
+  const again = (() => { run(root, ["face", "write", "docs"]); return readAt(root, `docs/${POCKET.artifacts}/${ARTIFACT.docs}/01-core/core-overview.html`); })();
   one("and a second run writes the same bytes", again === page ? "same" : "DIFFERENT", has("same"));
   one("the glossary is written with the shared stylesheet's names", page,
     (g) => g.includes('<div class="sds-scroll"><table class="sds-glossary">') && g.includes('<tr class="sds-group">'));
@@ -536,11 +536,11 @@ console.log("\n=== the domain's glossary lands on its overview too, in HTML (Q22
   // is named once, and its bytes stay as they are.
   const own = ov(table("scroll"), { own: true });
   const ownRoot = repo(tree(own));
-  const said = run(ownRoot, ["face", "docs"]);
+  const said = run(ownRoot, ["face", "write", "docs"]);
   one("[MKT.SCRIPTS.108] `docs face` names an overview that holds its own copy once, as a RULE, with the text every command uses",
     said, (g) => (g.match(/✗ RULE styles/g) ?? []).length === 1 && g.includes(OWN_COPY) && !g.includes("SOFT styles"));
   const exitOf = (workspace) => {
-    try { execFileSync(process.execPath, [TOOL, "docs", "face", "docs"], { encoding: "utf8", cwd: workspace, stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: workspace } }); return 0; }
+    try { execFileSync(process.execPath, [TOOL, "docs", "face", "write", "docs"], { encoding: "utf8", cwd: workspace, stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: workspace } }); return 0; }
     catch (error) { return error.status; }
   };
   one("[MKT.SCRIPTS.108] and `docs face` exits 1 on it, as on any RULE", exitOf(ownRoot), 1);
@@ -562,7 +562,7 @@ console.log("\n=== an escaped pipe inside a Terms cell stays one cell (found by 
           "## Terms\n\n| Term | Contract term | What it means |\n| --- | --- | --- |\n" +
           "| the matcher | `Write\\|Edit` | the tool names an entry narrows to |\n"),
   });
-  run(root, ["face", "docs"]);
+  run(root, ["face", "write", "docs"]);
   const got = readAt(root, `docs/${SEAT.constructs}/01-core/README.md`);
   one("the contract term keeps its pipe and the meaning keeps its column",
     got, has("| [the matcher](hooks.md) | `Write\\|Edit` | the tool names an entry narrows to |"));
@@ -579,29 +579,169 @@ console.log("\n=== a package face's Map names chapters, never the realization fi
     [`docs/${SEAT.capabilities}/01-core/module-web-core-ts/surface-map.md`]:
       doc({ id: "sm", variant: "surface_map", title: "Surface Map", lenses: ["WEB_DEV"], status: "DONE" }, "x\n", "`For: Web developer` · `Status: ✅ DONE`"),
   });
-  run(root, ["face", "docs"]);
+  run(root, ["face", "write", "docs"]);
   const got = readAt(root, `docs/${SEAT.capabilities}/01-core/module-web-core-ts/README.md`);
   one("the chapter is in the Map", got, has("| [01-app.md](01-app.md) |"));
   one("the surface map is not a chapter", got, lacks("surface-map.md"));
 }
 
-console.log("\n=== `docs face` with no path refuses, with `--check` or without it");
+// ---------------------------------------------------------------- the grammar: an action, a path, a block
+
+/** The exit code of one run, typed after the group, from the folder given. */
+const exitIn = (cwd, args) => {
+  try { execFileSync(process.execPath, [TOOL, "docs", ...args], { encoding: "utf8", cwd, stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: cwd } }); return 0; }
+  catch (error) { return error.status; }
+};
+const USAGE = "usage: spn-devex docs face check [<path>] [--block glossary|constructs|contents|tags]\n" +
+              "       spn-devex docs face write <path> [--block glossary|constructs|contents|tags]\n";
+
+console.log("\n=== `docs face` needs its action as a word, and a `write` needs a path");
 {
-  // The current folder is never taken as the tree. A stale tag line under it shows whether a run wrote.
+  // A stale tag line under the tree shows whether a run wrote.
   const stale = doc({ id: "a", title: "A", variant: "capability", lenses: ["ARCHITECT"], status: "PLANNING" }, "Some prose.\n", "`For: Architect` · `Status: ✅ DONE`");
   const root = repo({ "CONCEPT.md": "# c\n", [`docs/${SEAT.capabilities}/a.md`]: stale });
-  const exitOf = (args) => {
-    try { execFileSync(process.execPath, [TOOL, "docs", ...args], { encoding: "utf8", cwd: root, stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: root } }); return 0; }
-    catch (error) { return error.status; }
+  const at = `docs/${SEAT.capabilities}/a.md`;
+
+  one("[MKT.SCRIPTS.111] with no action the entry prints each usage line and says an action is owed",
+    run(root, ["face"]), USAGE + "`docs face` needs an action.\n");
+  one("[MKT.SCRIPTS.111] and exits 2", exitIn(root, ["face"]), 2);
+  one("[MKT.SCRIPTS.111] a path where the action belongs is refused the same way, and `--check` is named as the action `check`",
+    run(root, ["face", "docs", "--check"]), USAGE + "`docs face` needs an action. `--check` is the action `check`.\n");
+  one("[MKT.SCRIPTS.111] with exit 2", exitIn(root, ["face", "docs", "--check"]), 2);
+  one("[MKT.SCRIPTS.111] and a path alone, with no action before it, is refused with exit 2", exitIn(root, ["face", "docs"]), 2);
+  one("[MKT.SCRIPTS.111] none of the refused runs wrote", readAt(root, at), stale);
+
+  one("[MKT.SCRIPTS.87] [MKT.SCRIPTS.112] `write` with no path prints its usage line and says a path is owed",
+    run(root, ["face", "write"]),
+    "usage: spn-devex docs face write <path> [--block glossary|constructs|contents|tags]\n`docs face write` needs a path.\n");
+  one("[MKT.SCRIPTS.87] [MKT.SCRIPTS.112] and exits 2", exitIn(root, ["face", "write"]), 2);
+  one("[MKT.SCRIPTS.87] [MKT.SCRIPTS.112] and it wrote nothing under the folder it was run from", readAt(root, at), stale);
+
+  one("[MKT.SCRIPTS.113] `check` with no path takes the repository the caller is in, from a folder inside it too",
+    [run(root, ["face", "check"]), run(join(root, "docs", SEAT.capabilities), ["face", "check"])].map((said) => said.includes("would write 1 tag line")), (got) => got.every(Boolean));
+  one("[MKT.SCRIPTS.113] and exits 0, because a stale region is reported and is no RULE finding", exitIn(root, ["face", "check"]), 0);
+  one("[MKT.SCRIPTS.113] `check` writes nothing", readAt(root, at), stale);
+  one("[MKT.SCRIPTS.113] where the caller is in no repository, `check` with no path says to name one",
+    run(BASE, ["face", "check"]),
+    "usage: spn-devex docs face check [<path>] [--block glossary|constructs|contents|tags]\n" +
+    "`docs face check` needs a path here, because the folder it is run from is in no repository. Name a repository.\n");
+  one("[MKT.SCRIPTS.113] with exit 2", exitIn(BASE, ["face", "check"]), 2);
+
+  one("[MKT.SCRIPTS.115] a block outside the set is refused with the set",
+    run(root, ["face", "write", "docs", "--block", "maps"]), has("takes `--block` from glossary · constructs · contents · tags, and `maps` is none of them."));
+  one("[MKT.SCRIPTS.115] with exit 2", exitIn(root, ["face", "write", "docs", "--block", "maps"]), 2);
+  one("an option the command does not take is refused with exit 2", exitIn(root, ["face", "check", "docs", "--json"]), 2);
+  one("a second path is refused with exit 2", exitIn(root, ["face", "write", "docs", "docs"]), 2);
+  one("and no refused run wrote", readAt(root, at), stale);
+
+  // KNOWN-BAD, so the refusals are not the reason nothing was written: handed the tree, the same run writes.
+  run(root, ["face", "write", "docs"]);
+  one("[MKT.SCRIPTS.87] handed the docs tree, `write` writes the tag line the block declares",
+    readAt(root, at), has("`Status: 🔮 PLANNING`"));
+  one("and after the write a `check` finds every region current",
+    run(root, ["face", "check", "docs"]), (got) => got.includes("every face is already current") && got.includes("every tag line is already rendered from its block"));
+}
+
+/** Two domains, each with a construct that declares a term, a capabilities face with a mirror, and every tag line stale. */
+const twoDomains = () => {
+  const terms = (term) => "## Terms\n\n| Term | Contract term | What it means |\n| --- | --- | --- |\n" + `| ${term} | \`SP${term}\` | the ${term} |\n`;
+  const tag = "`For: Architect` · `Status: ✅ DONE`";
+  return repo({
+    "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n\n## Edge\n\nThe edge.\n",
+    [`docs/${SEAT.constructs}/README.md`]: doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }, "Some prose.\n", tag),
+    [`docs/${SEAT.constructs}/01-core/README.md`]: doc({ id: "c", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }, "Some prose.\n", tag),
+    [`docs/${SEAT.constructs}/01-core/session.md`]:
+      doc({ id: "session", variant: "construct", parentId: "c", dependsOn: [], title: "Session", lenses: ["ARCHITECT"], status: "PLANNING" }, terms("apple"), tag),
+    [`docs/${SEAT.constructs}/02-edge/README.md`]: doc({ id: "e", title: "Edge", lenses: ["ARCHITECT"], status: "PLANNING" }, "Some prose.\n", tag),
+    [`docs/${SEAT.constructs}/02-edge/gate.md`]:
+      doc({ id: "gate", variant: "construct", parentId: "e", dependsOn: [], title: "Gate", lenses: ["ARCHITECT"], status: "PLANNING" }, terms("banana"), tag),
+    [`docs/${SEAT.capabilities}/README.md`]: doc({ id: "f", title: "Capabilities", lenses: ["ARCHITECT"], status: "PLANNING" }, "Lead.\n", tag),
+    [`docs/${SEAT.capabilities}/app.md`]: doc({ id: "m", title: "App", lenses: ["ARCHITECT"], status: "PLANNING" }, "Lead.\n", tag),
+  });
+};
+const CORE = `docs/${SEAT.constructs}/01-core`, EDGE = `docs/${SEAT.constructs}/02-edge`, MIRRORS = `docs/${SEAT.capabilities}`;
+const EVERY = [`docs/${SEAT.constructs}/README.md`, `${CORE}/README.md`, `${CORE}/session.md`, `${EDGE}/README.md`, `${EDGE}/gate.md`,
+  `${MIRRORS}/README.md`, `${MIRRORS}/app.md`];
+/** The bytes of every file of the fixture, by its path. */
+const bytesOf = (root) => Object.fromEntries(EVERY.map((file) => [file, readAt(root, file)]));
+/** The files whose bytes differ between two readings. */
+const changed = (before, after) => EVERY.filter((file) => before[file] !== after[file]);
+
+console.log("\n=== a narrow path reads and writes only the regions it feeds");
+{
+  const root = twoDomains();
+  const before = bytesOf(root);
+  const said = run(root, ["face", "write", `${CORE}/session.md`]);
+  const after = bytesOf(root);
+  one("a seat file feeds its domain's face and its own tag line, and no other file changes",
+    changed(before, after), (got) => JSON.stringify(got) === JSON.stringify([`${CORE}/README.md`, `${CORE}/session.md`]));
+  one("the domain's face gains its glossary and its map", after[`${CORE}/README.md`],
+    (got) => got.includes("| [apple](session.md) |") && got.includes("spn:generated constructs") && got.includes("[Session](session.md)"));
+  one("the domain's face keeps its stale tag line, because the path is the seat file and a tag line is fed by its own file",
+    after[`${CORE}/README.md`], has("`Status: ✅ DONE`"));
+  one("the seat file's own tag line is rendered", after[`${CORE}/session.md`], has("`Status: 🔮 PLANNING`"));
+  one("the other domain's face is the same bytes", after[`${EDGE}/README.md`], before[`${EDGE}/README.md`]);
+  one("and so is the capabilities face", after[`${MIRRORS}/README.md`], before[`${MIRRORS}/README.md`]);
+  one("the run names the one face it wrote", said, (got) => got.includes("wrote 2 faces") && !got.includes("02-edge") && got.includes("wrote 1 tag line"));
+
+  // KNOWN-BAD, so the narrow run is the reason the others stayed: the whole tree, written, changes them.
+  run(root, ["face", "write", "docs"]);
+  one("known-bad: a write of the whole tree changes the other domain's face and the capabilities face",
+    changed(after, bytesOf(root)), (got) => got.includes(`${EDGE}/README.md`) && got.includes(`${MIRRORS}/README.md`) && got.includes(`${EDGE}/gate.md`));
+}
+{
+  const root = twoDomains();
+  const before = bytesOf(root);
+  run(root, ["face", "write", EDGE]);
+  one("a folder inside the tree feeds the faces and the tag lines under it, and no file outside it changes",
+    changed(before, bytesOf(root)), (got) => JSON.stringify(got) === JSON.stringify([`${EDGE}/README.md`, `${EDGE}/gate.md`]));
+}
+{
+  const root = twoDomains();
+  const before = bytesOf(root);
+  run(root, ["face", "write", `${MIRRORS}/app.md`]);
+  one("a mirror feeds the Map of the face beside it, and its own tag line",
+    changed(before, bytesOf(root)), (got) => JSON.stringify(got) === JSON.stringify([`${MIRRORS}/README.md`, `${MIRRORS}/app.md`]));
+  one("the Map names the mirror", readAt(root, `${MIRRORS}/README.md`), has("| [app.md](app.md) |"));
+}
+{
+  const root = twoDomains();
+  const whole = run(root, ["face", "check", "."]);
+  const narrow = run(root, ["face", "check", CORE]);
+  one("`check` narrowed to a folder reports the faces under it and none beside it",
+    narrow, (got) => got.includes("01-core/README.md") && !got.includes("02-edge") && !got.includes(`${SEAT.capabilities}/README.md`));
+  one("known-bad: the same `check` of the repository reports the other domain too", whole, has("02-edge/README.md"));
+  one("and neither `check` wrote a byte", changed(bytesOf(twoDomains()), bytesOf(root)), (got) => got.length === 0);
+}
+
+console.log("\n=== `--block` reads and writes one generated block");
+{
+  const core = `${CORE}/README.md`, mirrors = `${MIRRORS}/README.md`;
+  const after = (...blocks) => {
+    const root = twoDomains();
+    const said = run(root, ["face", "write", "docs", ...blocks.flatMap((block) => ["--block", block])]);
+    return { said, files: bytesOf(root) };
   };
-  one("[MKT.SCRIPTS.87] with no path the command prints its usage line", run(root, ["face"]), has("usage: spn-devex docs face <docs-tree> [--check]"));
-  one("[MKT.SCRIPTS.87] and exits 2", exitOf(["face"]), 2);
-  one("[MKT.SCRIPTS.87] with `--check` and no path it refuses the same way", exitOf(["face", "--check"]), 2);
-  one("[MKT.SCRIPTS.87] and it wrote nothing under the folder it was run from", readAt(root, `docs/${SEAT.capabilities}/a.md`), stale);
-  // KNOWN-BAD, so the refusal is not the reason nothing was written: handed the tree, the same run writes.
-  run(root, ["face", "docs"]);
-  one("[MKT.SCRIPTS.87] handed the docs tree, the command writes the tag line the block declares",
-    readAt(root, `docs/${SEAT.capabilities}/a.md`), has("`Status: 🔮 PLANNING`"));
+  const stale = bytesOf(twoDomains());
+  const carries = (files) => ({
+    glossary: files[core].includes("spn:generated glossary"),
+    constructs: files[core].includes("spn:generated constructs"),
+    contents: files[mirrors].includes("spn:generated contents"),
+    tags: files[core].includes("`Status: 🔮 PLANNING`"),
+  });
+  const only = (block) => ({ glossary: false, constructs: false, contents: false, tags: false, [block]: true });
+  one("untouched: the fixture carries none of the four before a write", JSON.stringify(carries(stale)),
+    JSON.stringify({ glossary: false, constructs: false, contents: false, tags: false }));
+  for (const block of ["glossary", "constructs", "contents", "tags"]) {
+    const { said, files } = after(block);
+    one(`\`--block ${block}\` writes that block and no other`, JSON.stringify(carries(files)), JSON.stringify(only(block)));
+    one(`and \`--block ${block}\` speaks for its own block alone`, said,
+      (got) => (block === "tags") === got.includes("tag line") && (block !== "tags") === got.includes("face"));
+  }
+  one("`--block` typed twice writes both blocks",
+    JSON.stringify(carries(after("glossary", "tags").files)), JSON.stringify({ glossary: true, constructs: false, contents: false, tags: true }));
+  one("and with no `--block` every block is written",
+    JSON.stringify(carries(after().files)), JSON.stringify({ glossary: true, constructs: true, contents: true, tags: true }));
 }
 
 console.log(failed ? `\n  ${failed} of ${n} FAILED` : `\n  all ${n} passed`);

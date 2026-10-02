@@ -1,26 +1,29 @@
-#!/usr/bin/env node
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The guide page — stages, and steps that number themselves
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
-// Produce a guide's page from its markdown: the command reads the guide and places what it finds.
-// With `--check` nothing is written.
+// A guide's page, produced from its markdown: the command reads the guide and places what it finds.
 //
-//   spn-devex docs guide <guide.md…> [--check] [--name <name>] [--out <file>]
+//   spn-devex docs guide check <guide.md…> [--name <name>] [--out <file>]   report each page that differs
+//   spn-devex docs guide write <guide.md…> [--name <name>] [--out <file>]   write each page
+//
+// A SUBJECT WITH TWO ACTIONS, AND A `file` PATH. Each path names one guide, and both actions need
+// one. `--name` and `--out` say where one page sits, so `check` takes them too and looks there.
 
 import { existsSync, readFileSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
-import { argsText, begin, commandFacts, end, record } from "../../../../../plugin-support-lib/src/lib/timing.ts";
+import { type Action, REQUIRED, UsageFault, VALUE, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { GUIDE_PAGE_SUFFIX, docsRootOf, guidePagesDir, slashes } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { PAGE_SCRIPT } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { hrefForPage } from "../../lib/render.ts";
 import { LENS_LABEL, locationOf, resolveWorkspace } from "./_lib.ts";
-import { Refusal, attribute, escaped, newestCut, operands, optionValue, pageTemplate,
+import { Refusal, attribute, escaped, newestCut, pageTemplate,
   place, refuseSlots, say, swap, templatesDir, withHead, type Note } from "./_pages.ts";
 
-export const describe = "produce a guide's page of stages and steps from its markdown";
+export const describe = "a guide's page of stages and steps, produced from its markdown";
 
 const TEMPLATE = "guide-template.html";
-const USAGE = "usage: spn-devex docs guide <guide.md…> [--check] [--name <name>] [--out <file>]";
+const OPTIONS = { name: VALUE, out: VALUE };
+const USAGE = "<guide.md…> [--name <name>] [--out <file>]";
 
 // ---------------------------------------------------------------------------- the markdown reader
 
@@ -465,17 +468,18 @@ function pageOf(guideFile: string, options: { name: string | null; out: string |
   return notes;
 }
 
-function body(args: string[], workspace: string): number {
-  const guides = operands(args, ["--name", "--out"]);
-  const name = optionValue(args, "--name"), out = optionValue(args, "--out");
-  if (!guides.length || ((name !== null || out !== null) && guides.length > 1)) {
-    console.error(guides.length ? `\`--name\` and \`--out\` name one page, so they take one guide\n${USAGE}` : USAGE);
-    return 2;
-  }
+/** Both actions are one production of each page; `write` is the one that puts it on disk. */
+function run(args: string[], write: boolean): number {
+  const words = readWords(args, OPTIONS);
+  const guides = scopeOf(words.paths, REQUIRED);
+  const name = words.value("name"), out = words.value("out");
+  if ((name !== null || out !== null) && guides.length > 1)
+    throw new UsageFault("takes one guide with `--name` or `--out`, because each of them names one page.");
+  const workspace = resolveWorkspace();
   let failed = false;
   for (const guide of guides) {
     try {
-      if (say(pageOf(guide, { name, out, write: !args.includes("--check") }, workspace), workspace)) failed = true;
+      if (say(pageOf(guide, { name, out, write }, workspace), workspace)) failed = true;
     } catch (refused) {
       if (!(refused instanceof Refusal)) throw refused;
       console.error(`✗ ${refused.message}`);
@@ -485,15 +489,15 @@ function body(args: string[], workspace: string): number {
   return failed ? 1 : 0;
 }
 
-/** Run `docs guide` with its own arguments, and give back the exit code. */
-export function run(args: string[]): number {
-  const workspace = resolveWorkspace();
-  const startedAt = performance.now();
-  begin(commandFacts("spn-devex", args), workspace);
-  const code = body(args, workspace);
-  record({ group: "docs", action: "guide", args: argsText(args) }, performance.now() - startedAt, code);
-  end(code);
-  return code;
-}
-
-if (process.argv[1] && new URL(import.meta.url).pathname === process.argv[1]) process.exit(run(process.argv.slice(2)));
+export const actions: Record<string, Action> = {
+  check: {
+    describe: "report each guide page that differs from what its guide gives, and write nothing",
+    usage: USAGE,
+    run: (args) => run(args, false),
+  },
+  write: {
+    describe: "write each guide's page from its markdown",
+    usage: USAGE,
+    run: (args) => run(args, true),
+  },
+};

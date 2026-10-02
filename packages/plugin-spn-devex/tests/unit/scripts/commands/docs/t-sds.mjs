@@ -114,15 +114,35 @@ for (const [name, body] of Object.entries(BUILT)) put(join(SCRATCH, "assets", na
 
 // ---------------------------------------------------------------------------- cut
 
-console.log("=== docs sds — the usage");
+const USAGE = "usage: spn-devex docs sds cut <version> [--root <folder>]\n" +
+              "       spn-devex docs sds check <version> <folder…> [--root <folder>]\n" +
+              "       spn-devex docs sds repoint <version> <folder…> [--root <folder>]\n" +
+              "       spn-devex docs sds bundle <page> [--assets <folder>]\n";
+
+console.log("=== docs sds — the action is a word, and each action refuses what it does not take");
 {
   const bare = sds();
-  ok("no action prints the usage line and exits 2", bare.code === 2 && bare.out.includes("usage: spn-devex docs sds cut <version>"), bare.out);
+  ok("[MKT.SCRIPTS.111] no action prints each usage line, says an action is owed and exits 2",
+    bare.code === 2 && bare.out === `${USAGE}\`docs sds\` needs an action.\n`, bare.out);
   const unknown = sds("publish", "1.0.0");
-  ok("an action that does not exist prints the usage line and exits 2", unknown.code === 2 && unknown.out.includes("usage:"), unknown.out);
+  ok("[MKT.SCRIPTS.111] an action that does not exist is refused the same way", unknown.code === 2 && unknown.out === `${USAGE}\`docs sds\` needs an action.\n`, unknown.out);
+  const asOption = sds("--check", "1.1.0", SITE);
+  ok("[MKT.SCRIPTS.111] `--check` where the action belongs is named as the action `check`",
+    asOption.code === 2 && asOption.out === `${USAGE}\`docs sds\` needs an action. \`--check\` is the action \`check\`.\n`, asOption.out);
   const option = sds("cut", "1.0.0", "--force", "--root", MARKET);
-  ok("an option that does not exist prints the usage line, exits 2 and cuts nothing",
-    option.code === 2 && option.out.includes("usage:") && !existsSync(SERVED), option.out);
+  ok("an option that does not exist is refused by its name, with exit 2, and cuts nothing",
+    option.code === 2 && option.out === "usage: spn-devex docs sds cut <version> [--root <folder>]\n`docs sds cut` does not take `--force`.\n" && !existsSync(SERVED), option.out);
+  const noVersion = sds("cut", "--root", MARKET);
+  ok("`cut` with no version says a version is owed, exits 2 and cuts nothing",
+    noVersion.code === 2 && noVersion.out === "usage: spn-devex docs sds cut <version> [--root <folder>]\n`docs sds cut` needs a version.\n" && !existsSync(SERVED), noVersion.out);
+  const twoVersions = sds("cut", "1.0.0", "1.1.0", "--root", MARKET);
+  ok("`cut` with two versions is refused with exit 2, and cuts nothing", twoVersions.code === 2 && twoVersions.out.includes("`docs sds cut` takes one version.") && !existsSync(SERVED), twoVersions.out);
+  const noRoot = sds("cut", "1.0.0", "--root");
+  ok("`--root` with no value after it is refused with exit 2", noRoot.code === 2 && noRoot.out.includes("needs a value after `--root`."), noRoot.out);
+  const noPage = sds("bundle");
+  ok("`bundle` with no page says a path is owed, and exits 2",
+    noPage.code === 2 && noPage.out === "usage: spn-devex docs sds bundle <page> [--assets <folder>]\n`docs sds bundle` needs a path.\n", noPage.out);
+  ok("`bundle` with two pages is refused with exit 2", sds("bundle", LEDGER, INDEX).code === 2);
 }
 
 console.log("=== docs sds cut — a version is a folder and an entry");
@@ -217,14 +237,24 @@ console.log("=== docs sds repoint — what it refuses");
   ok("a folder that is not there is refused before any page is changed",
     noFolder.code === 1 && noFolder.out.includes("no-such-folder") && `${tree(SITE)}\n${tree(WORKSTREAMS)}` === before, noFolder.out);
   const noPages = sds("repoint", "1.1.0", "--root", MARKET);
-  ok("a move that names no folder prints the usage line and exits 2", noPages.code === 2 && noPages.out.includes("usage:"), noPages.out);
+  ok("[MKT.SCRIPTS.112] a move that names no folder prints its usage line, says a path is owed and exits 2",
+    noPages.code === 2 && noPages.out === "usage: spn-devex docs sds repoint <version> <folder…> [--root <folder>]\n`docs sds repoint` needs a path.\n", noPages.out);
+  const noLook = sds("check", "1.1.0", "--root", MARKET);
+  ok("[MKT.SCRIPTS.134] `check` that names no folder is refused the same way, because a look is of the folders it is given",
+    noLook.code === 2 && noLook.out === "usage: spn-devex docs sds check <version> <folder…> [--root <folder>]\n`docs sds check` needs a path.\n", noLook.out);
+  const withOption = sds("repoint", "1.1.0", SITE, "--check", "--root", MARKET);
+  ok("`repoint` does not take `--check`: the look is the action `check`, and the refused run changes no page",
+    withOption.code === 2 && withOption.out.includes("`docs sds repoint` does not take `--check`.") && `${tree(SITE)}\n${tree(WORKSTREAMS)}` === before, withOption.out);
+  const neverLook = sds("check", "9.9.9", SITE, "--root", MARKET);
+  ok("[MKT.SCRIPTS.134] `check` refuses a version nobody cut as `repoint` does, with exit 1",
+    neverLook.code === 1 && neverLook.out.includes("docs sds check — refused") && neverLook.out.includes("9.9.9"), neverLook.out);
 }
 
 console.log("=== docs sds repoint — the version changes, and no other byte");
 {
   const before = tree(SITE);
-  const dry = sds("repoint", "1.1.0", SITE, "--check", "--root", MARKET);
-  ok("[MKT.SCRIPTS.100] --check prints each page it would change and the count, and writes nothing",
+  const dry = sds("check", "1.1.0", SITE, "--root", MARKET);
+  ok("[MKT.SCRIPTS.134] `check` prints each page a move would change and the count, exits 0 and writes nothing",
     dry.code === 0 && dry.out.includes(`would move  ${LEDGER}`) && dry.out.includes("3 pages would move to 1.1.0") && tree(SITE) === before, dry.out);
 
   const moved = sds("repoint", "1.1.0", SITE, "--root", MARKET);

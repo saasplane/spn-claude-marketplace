@@ -1,5 +1,5 @@
-// `docs index` writes the index of a repository's artifacts from the pages on disk, and `--check`
-// compares the tree of the index that is there with those pages. Every case builds a small
+// `docs index write` writes the index of a repository's artifacts from the pages on disk, and `docs
+// index check` compares the tree of the index that is there with those pages. Every case builds a small
 // repository in a temporary folder, runs the real command through `cli.ts`, and reads the page back.
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
@@ -32,7 +32,7 @@ const environment = { ...process.env, SPN_TELEMETRY: "off", SPN_WORKSPACE: BASE,
   SPN_TEMPLATES: bookTemplatesDir(resolve(WORKSPACE, "spn-foundation")) };
 delete environment.SPN_ORG;
 delete environment.SPN_LOCATION;
-/** One run of `docs index` through the entry, with its exit code and what it printed. */
+/** One run of `docs index` through the entry, typed after the subject, with its exit code and what it printed. */
 const index = (args, extra = {}) => {
   try { return { code: 0, out: execFileSync(process.execPath, [TOOL, "docs", "index", ...args], { encoding: "utf8", env: { ...environment, ...extra }, stdio: "pipe" }) }; }
   catch (error) { return { code: error.status ?? 1, out: String(error.stdout ?? "") + String(error.stderr ?? "") }; }
@@ -111,7 +111,7 @@ const withAreas = () => repo({
 {
   const root = withAreas();
   const before = filesUnder(root);
-  const ran = index([root]);
+  const ran = index(["write", root]);
   ok("[MKT.SCRIPTS.104] the index is written, and the run exits 0", ran.code === 0 && existsSync(join(root, INDEX)), ran.out);
   same("[MKT.SCRIPTS.104] the run writes the index and no other file", filesUnder(root), [...before, INDEX].sort());
   const text = read(root, INDEX);
@@ -161,36 +161,36 @@ const withAreas = () => repo({
   ok("the page's own block says it is the index, and a line says the page is produced",
     text.includes('"variant":"index"') && text.includes("<!-- Produced by `docs index`"));
 
-  const again = index([root]);
+  const again = index(["write", root]);
   ok("a second run writes the same bytes", again.code === 0 && read(root, INDEX) === text && again.out.includes("current"), again.out);
   ok("the index itself is not a page of the tree on the second run", !treeOf(read(root, INDEX)).groups.flatMap(entries).some((node) => node.path === ARTIFACT_INDEX));
 
-  // ------------------------------------------------------------------------ --check
-  const checked = index([root, "--check"]);
-  ok("[MKT.SCRIPTS.105] `--check` on an index that holds every page exits 0", checked.code === 0 && checked.out.includes("current"), checked.out);
+  // ------------------------------------------------------------------------ check
+  const checked = index(["check", root]);
+  ok("[MKT.SCRIPTS.105] `check` on an index that holds every page exits 0", checked.code === 0 && checked.out.includes("current"), checked.out);
 
   writeFileSync(join(root, POCKET_DOCS, constructOf(AGENT, "04-new")), construct("new", "New"));
   rmSync(join(root, POCKET_DOCS, constructOf(APPS, "02-manifest")));
-  const stale = index([root, "--check"]);
-  ok("[MKT.SCRIPTS.105] `--check` exits 1 where the tree and the pages disagree", stale.code === 1, stale.out);
-  ok("[MKT.SCRIPTS.105] `--check` lists a page the tree lacks",
+  const stale = index(["check", root]);
+  ok("[MKT.SCRIPTS.105] `check` exits 1 where the tree and the pages disagree", stale.code === 1, stale.out);
+  ok("[MKT.SCRIPTS.105] `check` lists a page the tree lacks",
     /RULE[^\n]*04-new-construct\.html\n[^\n]*lacks this page/.test(stale.out), stale.out);
-  ok("[MKT.SCRIPTS.105] `--check` lists an entry that has no page",
+  ok("[MKT.SCRIPTS.105] `check` lists an entry that has no page",
     /the entry `Manifest` has no page: [^\n]*02-manifest-construct\.html is not there/.test(stale.out), stale.out);
-  ok("[MKT.SCRIPTS.105] `--check` names no page that the tree and the disk agree on", !/01-lens-construct|03-release-construct/.test(stale.out), stale.out);
-  ok("[MKT.SCRIPTS.105] `--check` writes nothing", read(root, INDEX) === text);
+  ok("[MKT.SCRIPTS.105] `check` names no page that the tree and the disk agree on", !/01-lens-construct|03-release-construct/.test(stale.out), stale.out);
+  ok("[MKT.SCRIPTS.105] `check` writes nothing", read(root, INDEX) === text);
 
-  const mended = index([root]);
+  const mended = index(["write", root]);
   const after = treeOf(read(root, INDEX)).groups.flatMap(entries).map((node) => node.path);
-  ok("the next run without `--check` brings the index to the pages on disk",
+  ok("the next `write` brings the index to the pages on disk",
     mended.code === 0 && mended.out.includes("rewrote") && after.some((path) => path.endsWith("04-new-construct.html")) && !after.some((path) => path.endsWith("02-manifest-construct.html")), mended.out);
 
   // A page's name changed, and no page came or went: the entries agree, so the exit code stays 0.
   const written = read(root, INDEX);
   writeFileSync(join(root, POCKET_DOCS, constructOf(AGENT, "01-lens")), construct("lens", "Lens, Named Again"));
-  const renamed = index([root, "--check"]);
-  ok("`--check` says, without failing, that a name changed since the index was written",
-    renamed.code === 0 && /SOFT[^\n]*index\.html\n[^\n]*not what `docs index` writes now/.test(renamed.out) && read(root, INDEX) === written, renamed.out);
+  const renamed = index(["check", root]);
+  ok("`check` says, without failing, that a name changed since the index was written",
+    renamed.code === 0 && /SOFT[^\n]*index\.html\n[^\n]*not what `docs index write` writes now/.test(renamed.out) && read(root, INDEX) === written, renamed.out);
 }
 
 // ---------------------------------------------------------------------------- no index yet, and no pocket
@@ -198,13 +198,13 @@ const withAreas = () => repo({
 {
   const root = withAreas();
   const before = filesUnder(root);
-  const none = index([root, "--check"]);
-  ok("[MKT.SCRIPTS.105] `--check` with no index says so, exits 1 and writes none",
+  const none = index(["check", root]);
+  ok("[MKT.SCRIPTS.105] `check` with no index says so, exits 1 and writes none",
     none.code === 1 && none.out.includes("there is no index here") && JSON.stringify(filesUnder(root)) === JSON.stringify(before), none.out);
 
   const out = join(BASE, "elsewhere", ARTIFACT_INDEX);
   mkdirSync(dirname(out));
-  const away = index([root, "--out", out]);
+  const away = index(["write", root, "--out", out]);
   const tree = existsSync(out) ? treeOf(readFileSync(out, "utf8")) : { base: null };
   ok("`--out` writes the page elsewhere, keeps the path to the pages in `base`, and writes nothing into the repository",
     away.code === 0 && tree.base === `../spn-sample-${made}/${ARTIFACTS}/` && JSON.stringify(filesUnder(root)) === JSON.stringify(before), `${away.out}\n${tree.base}`);
@@ -212,11 +212,84 @@ const withAreas = () => repo({
 
 {
   const root = repo({ [`${DOCS}/README.md`]: "# Docs\n" });
-  const refused = index([root]);
+  const refused = index(["write", root]);
   ok("a repository with no artifacts pocket is refused, and nothing is written",
     refused.code === 1 && refused.out.includes(`has no ${ARTIFACTS}`) && !existsSync(join(root, ARTIFACTS)), refused.out);
-  const usage = index([]);
-  ok("with no repository the command prints its usage and exits 2", usage.code === 2 && usage.out.includes("usage: spn-devex docs index"), usage.out);
+}
+
+// ---------------------------------------------------------------------------- the grammar: an action, and a path inside a repository
+
+{
+  const CHECK_USAGE = "usage: spn-devex docs index check [<path>] [--out <file>]";
+  const WRITE_USAGE = "usage: spn-devex docs index write <path> [--out <file>]";
+  const USAGE = `${CHECK_USAGE}\n${WRITE_USAGE.replace("usage: ", "       ")}`;
+  /** The same run, from a folder: `check` with no path reads the folder it is run from. */
+  const indexIn = (cwd, args) => {
+    try { return { code: 0, out: execFileSync(process.execPath, [TOOL, "docs", "index", ...args], { encoding: "utf8", cwd, env: environment, stdio: "pipe" }) }; }
+    catch (error) { return { code: error.status ?? 1, out: String(error.stdout ?? "") + String(error.stderr ?? "") }; }
+  };
+  const root = withAreas();
+  const before = filesUnder(root);
+  const unchanged = () => JSON.stringify(filesUnder(root)) === JSON.stringify(before);
+
+  const none = index([]);
+  ok("[MKT.SCRIPTS.111] with no action the entry prints each usage line, says an action is owed and exits 2",
+    none.code === 2 && none.out === `${USAGE}\n\`docs index\` needs an action.\n`, none.out);
+  const option = index([root, "--check"]);
+  ok("[MKT.SCRIPTS.111] a repository where the action belongs is refused the same way, and `--check` is named as the action `check`",
+    option.code === 2 && option.out === `${USAGE}\n\`docs index\` needs an action. \`--check\` is the action \`check\`.\n`, option.out);
+  const alone = index([root]);
+  ok("[MKT.SCRIPTS.111] a repository alone, and a word that is no action, are refused with exit 2", alone.code === 2 && index(["produce", root]).code === 2, alone.out);
+  const noPath = indexIn(root, ["write"]);
+  ok("[MKT.SCRIPTS.112] `write` with no path prints its usage line, says a path is owed and exits 2, from inside a repository too",
+    noPath.code === 2 && noPath.out === `${WRITE_USAGE}\n\`docs index write\` needs a path.\n`, noPath.out);
+  const noOption = index(["write", root, "--json"]);
+  ok("an option the command does not take is refused by its name, with exit 2",
+    noOption.code === 2 && noOption.out === `${WRITE_USAGE}\n\`docs index write\` does not take \`--json\`.\n`, noOption.out);
+  ok("a second path is refused with exit 2", index(["write", root, root]).code === 2);
+  ok("no refused run wrote a file", unchanged());
+  const outside = indexIn(BASE, ["check"]);
+  ok("[MKT.SCRIPTS.113] where the caller is in no repository, `check` with no path says to name one, and exits 2",
+    outside.code === 2 && outside.out === `${CHECK_USAGE}\n\`docs index check\` needs a path here, because the folder it is run from is in no repository. Name a repository.\n`, outside.out);
+
+  // A PATH INSIDE THE REPOSITORY FINDS THE REPOSITORY. One page of the pocket, handed to `write`, writes the one index.
+  const fromPage = index(["write", join(root, GUIDES, "getting-started-guide.html")]);
+  ok("[MKT.SCRIPTS.133] `write` handed one page of the pocket finds the repository and writes its one index",
+    fromPage.code === 0 && fromPage.out.includes("wrote") && existsSync(join(root, INDEX))
+      && treeOf(read(root, INDEX)).groups.flatMap(entries).some((node) => node.path.endsWith("01-lens-construct.html")), fromPage.out);
+  const text = read(root, INDEX);
+  const here = indexIn(root, ["check"]), inside = indexIn(join(root, GUIDES), ["check"]);
+  ok("[MKT.SCRIPTS.113] `check` with no path takes the repository the caller is in, from a folder inside it too",
+    here.code === 0 && here.out.includes("current") && inside.code === 0 && inside.out.includes("current"), here.out + inside.out);
+
+  // TWO FAULTS, IN TWO FOLDERS: a construct page the tree lacks, and a guide whose page is gone.
+  writeFileSync(join(root, POCKET_DOCS, constructOf(AGENT, "04-new")), construct("new", "New"));
+  rmSync(join(root, GUIDES, "a-later-guide.html"));
+  const whole = index(["check", root]);
+  ok("known-bad: `check` of the repository reports both faults and exits 1",
+    whole.code === 1 && whole.out.includes("04-new-construct.html") && whole.out.includes("the entry `A Later Guide` has no page"), whole.out);
+  const guides = index(["check", join(root, GUIDES)]);
+  ok("[MKT.SCRIPTS.133] `check` narrowed to the guides folder reports the entry whose page is gone from it, and nothing from the folder beside it",
+    guides.code === 1 && guides.out.includes("the entry `A Later Guide` has no page") && !guides.out.includes("04-new-construct.html"), guides.out);
+  const constructs = index(["check", join(root, POCKET_DOCS, AGENT)]);
+  ok("[MKT.SCRIPTS.133] and narrowed to one domain's folder it reports the page the tree lacks, and not the guide",
+    constructs.code === 1 && constructs.out.includes("04-new-construct.html") && !constructs.out.includes("A Later Guide"), constructs.out);
+  const clean = index(["check", join(root, POCKET_DOCS, APPS)]);
+  ok("[MKT.SCRIPTS.133] narrowed to a folder with no fault it reports neither fault, and exits 0",
+    clean.code === 0 && !clean.out.includes("RULE") && !clean.out.includes("04-new-construct.html") && !clean.out.includes("A Later Guide"), clean.out);
+  const onePage = index(["check", join(root, POCKET_DOCS, HUB)]);
+  ok("[MKT.SCRIPTS.133] narrowed to one page that has its entry it says the tree and the page agree, and exits 0",
+    onePage.code === 0 && onePage.out.includes("agree") && !onePage.out.includes("RULE"), onePage.out);
+  ok("no `check` wrote a byte", read(root, INDEX) === text);
+
+  const beside = index(["write", join(root, ARTIFACTS, "README.md")]);
+  ok("a file of the pocket that is no page still names the pocket, so `write` writes the index", beside.code === 0 && beside.out.includes("rewrote"), beside.out);
+  mkdirSync(join(root, DOCS, "05-guides"));
+  const written = read(root, INDEX);
+  writeFileSync(join(root, POCKET_DOCS, constructOf(AGENT, "05-newer")), construct("newer", "Newer"));
+  const away = index(["write", join(root, DOCS, "05-guides")]);
+  ok("a path of the repository that holds no page of the pocket and no index feeds nothing, so `write` says so and writes nothing",
+    away.code === 0 && away.out.includes("nothing to write") && read(root, INDEX) === written, away.out);
 }
 
 // ---------------------------------------------------------------------------- no areas, and reports
@@ -241,7 +314,7 @@ const withAreas = () => repo({
     [`${REPORTS}/audit-report.html`]: report("Audit report"),
     [`${ARTIFACTS}/loose/odd-page.html`]: bare("Odd"),
   });
-  const ran = index([root]);
+  const ran = index(["write", root]);
   const tree = ran.code === 0 ? treeOf(read(root, INDEX)) : { groups: [] };
   same("[MKT.SCRIPTS.104] a repository with reports and no guide page has the groups Docs and Reports",
     tree.groups.map((group) => group.label), ["Docs", "Reports"]);
@@ -291,7 +364,7 @@ const withAreas = () => repo({
     [`${ARTIFACTS}/probe-overviews/left-overview.html`]: overview("left", "Left Overview"),
     [`${ARTIFACTS}/${CONSTRUCT_PAGES}/01-one/02-left-construct.html`]: construct("left", "Left Construct"),
   });
-  const ran = index([root]);
+  const ran = index(["write", root]);
   const tree = ran.code === 0 ? treeOf(read(root, INDEX)) : { groups: [] };
   const shape = (node) => (node.children ? { [node.label + (node.path ? " →" : "")]: node.children.map(shape) } : node.label);
   same("[MKT.SCRIPTS.110] the outline is read from the folders: an overview belongs to the domain whose folder holds it, whatever it links",
@@ -317,13 +390,13 @@ const withAreas = () => repo({
   const templates = join(BASE, "templates-before");
   mkdirSync(join(templates, "pages"), { recursive: true });
   writeFileSync(join(templates, "pages", "artifact-index-template.html"), "<title>Index</title>\n<style>.tree{}</style>\n<div class=\"index\"></div>\n");
-  const refused = index([root], { SPN_TEMPLATES: templates });
+  const refused = index(["write", root], { SPN_TEMPLATES: templates });
   ok("a template that links no shared stylesheet is refused in the one wording, and no index is written",
     refused.code === 1 && refused.out.includes(OWN_COPY) && !existsSync(join(root, INDEX)), refused.out);
 
   const none = join(BASE, "styles-none");
   mkdirSync(none);
-  const uncut = index([root], { SPN_STYLES: none });
+  const uncut = index(["write", root], { SPN_STYLES: none });
   ok("with no version cut the command stops and writes no index",
     uncut.code === 1 && uncut.out.includes("no version of the shared styles was cut") && !existsSync(join(root, INDEX)), uncut.out);
 }

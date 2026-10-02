@@ -142,12 +142,12 @@ specified path does not exist`, which reads as a broken command rather than a mi
 
 ## After a run: the rows say what it found
 
-Every run is named by its caller, and leaves `tests/.output/<tier>/runs/<run>.json` behind — or `<run>.<phase>.json` for a journey phase — with every behaviour id its case titles carried, and what the runner actually did with each. **`spnutils` writes the run file and never a row** (`RD.DEVEX.UTILS.071`). Writing it into the registers is the **spn-devex** plugin's row writer, `spn-devex behaviours stamp <run> <repo>` in that plugin (cross-plugin pointer; it ships alongside this plugin), run the way its `test` skill runs it: first without `--write` to see what it would change, then with it. It reads only the run you name, and writes `Updated at` as `<time> · <run>`. The same plugin's `spn-devex behaviours check` then refuses a `SUCCESS` row the run it cites contradicts.
+Every run is named by its caller, and leaves `tests/.output/<tier>/runs/<run>.json` behind — or `<run>.<phase>.json` for a journey phase — with every behaviour id its case titles carried, and what the runner actually did with each. **`spnutils` writes the run file and never a row** (`RD.DEVEX.UTILS.071`). Writing it into the registers is the **spn-devex** plugin's row writer, `spn-devex behaviours stamp` in that plugin (cross-plugin pointer; it ships alongside this plugin), run the way its `test` skill runs it: first `spn-devex behaviours stamp check <run> <repo>` to see what it would change, then `spn-devex behaviours stamp write <run> <repo>`. It reads only the run you name, and writes `Updated at` as `<time> · <run>`. The same plugin's `spn-devex behaviours check` then refuses a `SUCCESS` row the run it cites contradicts.
 
 The join reads the rows and the case titles together:
 
 ```bash
-spn-devex behaviours coverage <repo> --json > /tmp/coverage.json   # a case that cites an id no row declares, an id cited only at another level
+spn-devex behaviours coverage show <repo> --json > /tmp/coverage.json   # a case that cites an id no row declares, an id cited only at another level
 ```
 
 Write `--json` to a file and read the file.

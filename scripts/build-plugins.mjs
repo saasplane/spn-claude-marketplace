@@ -27,8 +27,8 @@
 // hash and nothing else — so two builds of the same sources are byte-identical, which is the gate
 // this arc names: `node scripts/build-plugins.mjs` run twice must not move a single byte.
 //
-// EVERY COMMAND SHIPS BUNDLED, ONE FILE PER COMMAND. `commands/<group>/<action>.ts` →
-// `dist/commands/<group>/<action>.mjs`, and the bundled `cli.mjs` dispatches there. A command file
+// EVERY COMMAND SHIPS BUNDLED, ONE FILE PER COMMAND. `commands/<group>/<file>.ts` →
+// `dist/commands/<group>/<file>.mjs`, and the bundled `cli.mjs` dispatches there. A command file
 // imports `plugin-support-lib` by a path that exists only in this repository — five folders up — so
 // the unbundled source reached the installed plugin with its imports pointing outside it, and every
 // command failed with ERR_MODULE_NOT_FOUND in a fresh window (008 N119). One bundle per command
@@ -58,7 +58,7 @@ const PLUGINS = named.length > 0 ? named : ALL_PLUGINS;
 function isFile(path) { try { return statSync(path).isFile(); } catch { return false; } }
 function isDir(path) { try { return statSync(path).isDirectory(); } catch { return false; } }
 
-/** `{ outName: absoluteSourcePath }` — `cli` (if the plugin ships one), every `commands/<group>/<action>`, and every `events/<name>`. */
+/** `{ outName: absoluteSourcePath }` — `cli` (if the plugin ships one), every `commands/<group>/<file>`, and every `events/<name>`. */
 function entriesOf(pluginDir) {
   const scripts = join(pluginDir, "src", "scripts");
   const entries = {};

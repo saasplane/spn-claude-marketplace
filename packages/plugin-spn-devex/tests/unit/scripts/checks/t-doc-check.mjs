@@ -464,7 +464,7 @@ try {
   // THE TABLE WITH NO PREVIEWS COLUMN, in each of the three states. A workstream being worked or
   // parked is told to print the table again; a closed one stays as it was written.
   one("three columns in an open workstream — told to run the command",
-    write(page, NO_PREVIEWS), "reports", "run `spn-devex docs cycles <workstream>`");
+    write(page, NO_PREVIEWS), "reports", "run `spn-devex docs cycles show <workstream>`");
   one("three columns in a backlog workstream — told to run the command",
     write(join(stream(TMP, "045-parked", "backlog"), "approach.html"), NO_PREVIEWS),
     "reports", "no Previews column");
@@ -618,7 +618,7 @@ try {
   one("[MKT.HOOKS.40] known-bad: a page reading PLANNING while an arc runs — both words are named",
     write(statusPage, withStatus(CLEAN, "PLANNING")), "reports", "the header's status reads PLANNING and the arcs give IMPLEMENTING");
   one("[MKT.HOOKS.40] and the finding names the command that writes it",
-    write(statusPage, withStatus(CLEAN, "PLANNING")), "reports", "spn-devex docs cycles <workstream> --write");
+    write(statusPage, withStatus(CLEAN, "PLANNING")), "reports", "spn-devex docs cycles write <workstream>");
   one("[MKT.HOOKS.40] a page reading IMPLEMENTING while an arc runs is left alone",
     write(statusPage, withStatus(CLEAN, "IMPLEMENTING", "&#x1F6A7;")), "silent");
   one("[MKT.HOOKS.40] a page whose header labels no status is left alone", write(statusPage, CLEAN), "silent");

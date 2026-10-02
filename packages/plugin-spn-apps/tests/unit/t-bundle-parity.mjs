@@ -40,8 +40,8 @@ console.log("\n=== bundle parity — the CLI against a temp project, no side eff
 {
   const root = mkdtempSync(join(tmpdir(), "apps-parity-catalogue-"));
   try {
-    const { source, bundle, parity } = compareRun(CLI_SOURCE, CLI_BUNDLE, { argv: ["library", "catalogue", root] });
-    ok("cli.mjs agrees with cli.ts on `library catalogue` against an empty project", parity,
+    const { source, bundle, parity } = compareRun(CLI_SOURCE, CLI_BUNDLE, { argv: ["library", "catalogue", "check", root] });
+    ok("cli.mjs agrees with cli.ts on `library catalogue check` against an empty project", parity,
        `source: ${JSON.stringify(source)}\n        bundle: ${JSON.stringify(bundle)}`);
   } finally {
     rmSync(root, { recursive: true, force: true });

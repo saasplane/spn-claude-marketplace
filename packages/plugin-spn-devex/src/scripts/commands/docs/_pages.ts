@@ -27,17 +27,6 @@ export function say(notes: Note[], workspace: string): boolean {
   return notes.some((note) => note.grade === "RULE");
 }
 
-/** The value typed after an option, or null where the option is not there. */
-export function optionValue(args: string[], option: string): string | null {
-  const at = args.indexOf(option);
-  return at >= 0 && at + 1 < args.length ? args[at + 1] : null;
-}
-
-/** The words of a command that are no option, and no value of an option in `valued`. */
-export function operands(args: string[], valued: string[]): string[] {
-  return args.filter((word, at) => !word.startsWith("--") && !(at > 0 && valued.includes(args[at - 1])));
-}
-
 /** The templates: `SPN_TEMPLATES`, else the book's templates beside the workspace. */
 export function templatesDir(workspace: string): string {
   return process.env.SPN_TEMPLATES ?? bookTemplatesDir(join(workspace, "spn-foundation"));
@@ -142,8 +131,8 @@ export function place(file: string, page: string, write: boolean, workspace: str
   if (before === page) { console.log(`current  ${shown}`); return []; }
   if (!write)
     return [{ grade: "RULE", check: command, file, message: before === null
-      ? `no page has been produced here yet. Run \`docs ${command}\` without \`--check\``
-      : `this page is not what \`docs ${command}\` produces now: its source changed, or it was edited by hand` }];
+      ? `no page has been produced here yet. Run \`docs ${command} write\``
+      : `this page is not what \`docs ${command} write\` produces now: its source changed, or it was edited by hand` }];
   mkdirSync(dirname(file), { recursive: true });
   writeFileSync(file, page);
   console.log(`${before === null ? "wrote   " : "rewrote "} ${shown}`);

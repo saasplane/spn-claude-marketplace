@@ -32,7 +32,7 @@ A node's behaviour rows open `PLANNED`. Proving one is not a separate errand fro
 1. **Write the row before the case.** A case with no row to cite proves nothing a reader can act on.
 2. **One case line, or one `tofu test` run, per row — in the tier folder that owns it.** The folder says the tier; the file's kind says the engine. A `*.sh` case prints `ok <TIER> <ID> <title>` through `helpers/case.sh`; a `*.tftest.hcl` run is named for its id (`PLT_ZONE_01_<title>` proves `PLT.ZONE.01`).
 3. **`spnutils infra test <run>`** runs the node's build, then its cases, then its `*.tftest.hcl` files under `tofu test`, and writes `tests/.output/<tier>/runs/<run>.json` per tier — one file per run under the name you give, never a document a person edits by hand. The name is required; a reused name replaces that one file, and each tier keeps its 20 newest.
-4. **The agent stamps the rows the run proved**, with the same writer and the same rules as an application's: `spn-devex behaviours stamp <run> . --write` reads only that run, writes `Updated at` as `<time> · <run>`, speaks only for the tiers it ran, and never overwrites a row marked `MANUAL`.
+4. **The agent stamps the rows the run proved**, with the same writer and the same rules as an application's: `spn-devex behaviours stamp write <run> .` reads only that run, writes `Updated at` as `<time> · <run>`, speaks only for the tiers it ran, and never overwrites a row marked `MANUAL`.
 5. **`spnutils infra release`** runs its tests as a run named `release-<version>`, such as `release-0.4.1`, and refuses a node whose kind owes a tier with no case, or any case that fails. There is no flag that skips the harness.
 
 ## validate — the build, before any tier

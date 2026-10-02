@@ -53,7 +53,7 @@ export function linksSharedStyles(html: string): boolean {
 
 /** What a command says about a page that links no shared stylesheet, so every command says it in one way. */
 export const OWN_COPY = "this page links no shared stylesheet: it holds its own copy of the styles, and the " +
-  "class names that copy used. Produce it again with `docs page`, or copy it from its template, so it links " +
+  "class names that copy used. Produce it again with `docs page write`, or copy it from its template, so it links " +
   "`sds-docs.css` (05-artifacts.md, One stylesheet, served in versions)";
 
 /** The two lines a page of one version carries: the stylesheet's, and the script's. */

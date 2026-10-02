@@ -6,7 +6,7 @@ import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
 const HERE = resolve(import.meta.dirname, "..", "..", "..");
-const { STYLES_ADDRESS, SERVED_FILES, sharedStyles, linksSharedStyles, linesFor, stylesDir, cutVersions, newestVersion } =
+const { OWN_COPY, STYLES_ADDRESS, SERVED_FILES, sharedStyles, linksSharedStyles, linesFor, stylesDir, cutVersions, newestVersion } =
   await import(pathToFileURL(resolve(HERE, "src", "lib", "page-styles.ts")).href);
 
 let total = 0, failed = 0;
@@ -49,6 +49,10 @@ try {
 } finally {
   rmSync(scratch, { recursive: true, force: true });
 }
+// The sentence every command says about a page that holds its own copy tells the reader what to run.
+// The command that produces a page is `docs page write`; the subject alone is refused by the entry.
+ok("the sentence about a page that holds its own copy names the action that produces a page, `docs page write`",
+  OWN_COPY.includes("Produce it again with `docs page write`, or copy it from its template"), OWN_COPY);
 ok("a version serves the stylesheet and the two scripts", JSON.stringify(SERVED_FILES) === JSON.stringify(["sds-docs.css", "sds-docs.js", "sds-index.js"]));
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — page-styles` : `\n  all ${total} passed — page-styles`);

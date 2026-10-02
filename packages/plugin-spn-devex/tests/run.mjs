@@ -106,7 +106,7 @@ if (writeStatus) {
   // This run is the whole of its tier here, so a row no case named any more goes back to PLANNED.
   const cli = resolve(HERE, "..", "src", "scripts", "cli.ts");
   try {
-    console.log(execFileSync(process.execPath, [cli, "behaviours", "stamp", runName, REPO, "--write", "--reach", "repository"], { encoding: "utf8" }));
+    console.log(execFileSync(process.execPath, [cli, "behaviours", "stamp", "write", runName, REPO, "--reach", "repository"], { encoding: "utf8" }));
   } catch (error) { console.log(String(error.stdout ?? "")); }
 }
 

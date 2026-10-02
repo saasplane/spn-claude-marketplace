@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // RESTATES: nothing. This tool carries no rule of its own — it reads what the support repository
 // publishes and writes it down.
 //
@@ -14,17 +13,21 @@
 // something a partner can depend on, so listing it would answer a question about the repository
 // rather than about what is available. The count in the table is the count a partner can install.
 //
-//     spn-apps library catalogue <workspace>            write the TS provider's 14-libraries.md
-//     spn-apps library catalogue <workspace> --check    report what would change, write nothing
+//     spn-apps library catalogue check <workspace>    report what a write would change, write nothing
+//     spn-apps library catalogue write <workspace>    write the TS provider's 14-libraries.md
+//
+// A SUBJECT WITH TWO ACTIONS, EACH TAKING THE WORKSPACE. The workspace is the folder the sibling
+// checkouts sit in, and it is always named, because the table is written into the marketplace
+// checkout from what the support checkout publishes.
 //
 // **THE SUPPORT REPOSITORY IS FOUND, NEVER ASSUMED** — the same stance `restate-drift.ts` takes.
 // Run from a partner's checkout it says so and exits clean; an empty table would read as *there
 // are no libraries*, which is a different claim from *this checkout cannot see them*.
 //
-// **ONE IMPLEMENTATION ONLY.** The old `scripts/tools/library-catalogue.ts` forwarder is gone
-// (`N101` step 1b's path sweep); `spn-apps library catalogue` is the one door.
+// **ONE IMPLEMENTATION ONLY.** `spn-apps library catalogue` is the one door to this table.
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { type Action, REQUIRED, onePath, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { seenHash } from "../../lib/stamp.ts";
 import { capabilitiesDir, docsOf, slashes } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
@@ -84,12 +87,12 @@ function libraries(workspace: string): Library[] {
 }
 
 function render(found: Library[], bookSeen: string): string {
-  // A RESTATEMENT CITES ANOTHER REPOSITORY, NEVER ITS OWN (`RD.DEVEX.AGENT.073`). This file used to stamp
-  // `library-catalogue.ts` beside the book rule — a ref in the marketplace citing a script in the
-  // marketplace, which has no distance to measure because both move in the same commit. The
-  // generator's freshness is the generator's problem, and the paragraph below names the command.
+  // A RESTATEMENT CITES ANOTHER REPOSITORY, NEVER ITS OWN (`RD.DEVEX.AGENT.073`). The block stamps
+  // the book's rule alone, and never this script: a ref in the marketplace citing a script in the
+  // marketplace has no distance to measure, because both move in the same commit. The marker under
+  // the block names the command that writes the table.
   let out = `<!-- spn:restates\n{\n  "docs": [\n    { "path": "${BOOK_RULE}", "seen": "${bookSeen}" }\n  ]\n}\n-->\n`;
-  out += `<!-- spn:generated libraries — do not edit inside these markers; \`spn-apps library catalogue\` writes it -->\n`;
+  out += `<!-- spn:generated libraries — do not edit inside these markers; \`spn-apps library catalogue write\` writes it -->\n`;
   out += `# Libraries — the published packages a node may depend on\n\n`;
   out += `**Source of truth:** the foundation's \`10-providers/ts/14-libraries.md\`. **That chapter states the rule and this ref carries the list**, which is the one entry where the book and this folder answer the same question differently. How a package travels in this stack — the scopes, the registry each one publishes to, and why a consumer pins an exact version rather than a range — is the book's. Which packages exist is nobody's to write by hand, because the set moves at every release.\n\n`;
   out += `**This table is generated from the support repository's own manifests**, and it moves every release. **${found.length} package(s) are published.**\n\n`;
@@ -118,7 +121,7 @@ export function main(workspace: string, check = false): number {
   if (check) { console.log(`would write  ${OUT} — ${found.length} package(s)`); return 1; }
   writeFileSync(at, body);
   console.log(`wrote    ${OUT} — ${found.length} package(s)`);
-  // WRITING IS SUCCESS. The exit code says whether the run FAILED, and only --check reports
+  // WRITING IS SUCCESS. The exit code says whether the run FAILED, and only `check` reports
   // staleness through it — a generator that exits non-zero after writing correctly fails every
   // build that regenerates as a step.
   return 0;
@@ -126,10 +129,18 @@ export function main(workspace: string, check = false): number {
 
 export const describe = "Regenerate the TS provider's published-library table from the support repository";
 
-export function run(args: string[]): number {
-  return main(args.find((a) => !a.startsWith("-")) ?? process.cwd(), args.includes("--check"));
-}
+/** Both actions read the same manifests and render the same table; `write` is the one that saves it. */
+const run = (args: string[], check: boolean): number => main(onePath(scopeOf(readWords(args).paths, REQUIRED)), check);
 
-if (process.argv[1] && process.argv[1].endsWith("catalogue.ts")) {
-  process.exit(run(process.argv.slice(2)));
-}
+export const actions: Record<string, Action> = {
+  check: {
+    describe: "report whether the published-library table is behind the support repository, and write nothing",
+    usage: "<workspace>",
+    run: (args) => run(args, true),
+  },
+  write: {
+    describe: "write the TS provider's published-library table from the support repository",
+    usage: "<workspace>",
+    run: (args) => run(args, false),
+  },
+};

@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The coverage report — written, built and proved
 //           docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md § What a Where row declares
 //           docs/04-capabilities/02-support/01-apps/10-providers/ts/03-structure.md § What a Where Row May Name
@@ -8,7 +7,11 @@
 // The coverage report's measurement: how much of a repository is written, built and proved, and
 // the gaps between the three, per package, per app and for the repository.
 //
-//     spn-devex coverage measure <repo> [--json]
+//     spn-devex coverage measure [<path>] [--json]
+//
+// AN ACTION OF ITS GROUP, AND A `tree` PATH. The command finds the repository from the path and
+// measures all of it, because a package's numbers are joined from the documents of the whole tree.
+// Handed a folder inside the repository, it prints the packages, apps and domains under that folder.
 //
 // It never writes the page (RD.DEVEX.WORKSPACE.149); the units, the gaps and what a Where row
 // declares are in the capability chapter "Scripts in spn-devex", § The coverage measurement reads
@@ -18,7 +21,8 @@
 import { createHash } from "node:crypto";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { withOffset } from "../../lib/clock.ts";
-import { DOCS, reportsDir, slashes } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
+import { FLAG, OPTIONAL, onePath, readWords, repositoryOf, scopeOf, under } from "../../../../../plugin-support-lib/src/lib/command.ts";
+import { DOCS, behaviorsDir, reportsDir, slashes } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { read } from "../../../../../plugin-support-lib/src/lib/runs.ts";
 import { measure as measureTests, nodesOf, TESTS_REPORT } from "../behaviours/coverage.ts";
 import {
@@ -309,6 +313,30 @@ export function measure(root: string): Record<string, unknown> {
   };
 }
 
+/**
+ * A measurement narrowed to what sits under a path: each package and app whose folder sits under the
+ * path or holds it, each domain whose behaviours do, and the findings of the files under it. The
+ * repository's totals, the digest and the page speak for the whole repository, so a narrowed
+ * measurement carries none of them.
+ */
+export function narrowed(result: Record<string, any>, root: string, path: string): Record<string, any> {
+  const touches = (place: string): boolean => under(place, [path]) || under(path, [place]);
+  const levels = (all: Array<{ path: string }>) => all.filter((level) => touches(join(root, level.path)));
+  const behaviours = behaviorsDir(join(root, DOCS));
+  const about = result.wholeRepository as { files: string[] } | null;
+  return {
+    ...result,
+    repositoryLevel: null,
+    packages: levels(result.packages),
+    apps: levels(result.apps),
+    domains: result.domains.filter((domain: { domain: string }) => touches(join(behaviours, domain.domain))),
+    wholeRepository: about !== null && about.files.some((file) => under(join(root, file), [path])) ? about : null,
+    findings: result.findings.filter((one: { file: string }) => under(join(root, one.file), [path])),
+    digest: null,
+    report: null,
+  };
+}
+
 // ---------------------------------------------------------------------------- the reading
 
 /** The measurement as a person reads it in a terminal: the per-level table, the domains and the totals. */
@@ -319,8 +347,9 @@ export function describeResult(result: Record<string, any>): string[] {
     name, kind, String(level.written.rows), String(level.written.constructs), String(level.built.rows), String(level.built.constructs), String(level.proved.rows),
     String(level.statedNotBuilt.count), String(level.builtNotStated.count), String(level.builtNotStated.proved), String(level.builtNotProved.count),
   ];
+  const total = result.repositoryLevel;
   const table = [head, ...[...result.packages, ...result.apps].map((level: any) => rowOf(level.path, level.kind ?? "—", level)),
-    rowOf(result.repository, "repository", result.repositoryLevel)];
+    ...(total === null ? [] : [rowOf(result.repository, "repository", total)])];
   const widths = head.map((_, column) => Math.max(...table.map((row) => row[column].length)));
   const lines = [
     `${result.repository} — written, built and proved, measured ${result.measuredAt}`,
@@ -331,27 +360,26 @@ export function describeResult(result: Record<string, any>): string[] {
   const rowsLine = (label: string, one: any): string =>
     `  ${label}: ${one.written.rows} written · ${one.built.rows} built · ${one.proved.rows} proved · ${one.notBuilt.rows} not built · ${one.notProved.rows} not proved`;
   for (const domain of result.domains) lines.push(rowsLine(`domain ${domain.domain} (${domain.name})`, domain));
-  lines.push(rowsLine("the whole repository", result.wholeRepository));
-  const total = result.repositoryLevel;
-  lines.push(`  totals: ${total.written.rows} rows in ${total.written.constructs} constructs written · ${total.built.rows} rows built, ` +
+  if (result.wholeRepository !== null) lines.push(rowsLine("the whole repository", result.wholeRepository));
+  if (total !== null) lines.push(`  totals: ${total.written.rows} rows in ${total.written.constructs} constructs written · ${total.built.rows} rows built, ` +
     `in ${total.built.constructs} constructs · ${total.proved.rows} rows proved · ${total.builtNotStated.count} not written (${total.builtNotStated.proved} of them proved) · ` +
     `${total.statedNotBuilt.count} not built · ${total.builtNotProved.count} not proved`);
   for (const one of result.findings) lines.push(`  ${one.file}: ${one.message}`);
-  lines.push(`  ${result.report.path} — ${!result.report.exists ? "not written yet" : result.report.current ? "current, nothing to write" : "stale"} · ${result.digest}`);
+  if (result.report !== null) lines.push(`  ${result.report.path} — ${!result.report.exists ? "not written yet" : result.report.current ? "current, nothing to write" : "stale"} · ${result.digest}`);
   return lines;
 }
 
 export const describe = "the coverage report's measurement — written, built and proved, and the gaps, per package, app, domain and repository";
 
-/** `spn-devex coverage measure <repo> [--json]`. */
+export const usage = "[<path>] [--json]";
+
 export function run(args: string[]): number {
-  const root = resolve(args.find((arg) => !arg.startsWith("--")) ?? ".");
-  const result = foundationAbsence(root) ?? measure(root);
-  if (args.includes("--json")) console.log(JSON.stringify(result, null, 2));
+  const words = readWords(args, { json: FLAG });
+  const path = onePath(scopeOf(words.paths, OPTIONAL));
+  const root = repositoryOf(path) ?? path;
+  const whole = foundationAbsence(root) ?? measure(root);
+  const result = path === root || whole.absence !== null ? whole : narrowed(whole, root, path);
+  if (words.given("json")) console.log(JSON.stringify(result, null, 2));
   else for (const line of describeResult(result)) console.log(line);
   return 0;
 }
-
-// The exit code is set and the process is left to end by itself, so `--json` sent through a pipe is
-// written whole before the process ends.
-if (process.argv[1] && new URL(import.meta.url).pathname === process.argv[1]) process.exitCode = run(process.argv.slice(2));

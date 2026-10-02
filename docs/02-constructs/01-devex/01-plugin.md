@@ -99,4 +99,4 @@ This page answers what a plugin is made of, how it is listed, and what an instal
 | [RD.DEVEX.006](../../registers/decisions.md) | the manifest is the current description, and a marketplace entry that disagrees with it is the stale side | MUST |
 | the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | the Node realization of this construct's own shape — source beside a committed build, and a shared folder never installed on its own | MUST |
 
-Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs plugin partner` (or `spn-devex plugin partner`, once installed)
+Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs plugin partner check` (or `spn-devex plugin partner check`, once installed)

@@ -1,28 +1,29 @@
-#!/usr/bin/env node
 // RESTATES: `docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md` § The figures, and
 // `docs/05-guides/README.md` § Before step 1 — your machine, which names the browser this needs.
 // The chapters are the source of truth; a rule change is edited there first, then here.
 //
-// Two halves under one action: the geometry check reads a spec and the SVG it draws to; the browser
-// render answers what a real layout paints. `check`/`colour` in `args[0]` pick the first; any other
-// `args[0]` is a path, and the whole list renders.
+// Two halves under one subject: the geometry check reads a spec and the SVG it draws to; the browser
+// render answers what a real layout paints.
 //
-//   spn-devex docs figure check <path…>    labels fit and connectors join · a block's colouring matches its text
-//   spn-devex docs figure colour <path…>   the audit's half: a coloured block strips back to what the author wrote
-//   spn-devex docs figure <svg-or-html…>   render each in a headless browser and report what it painted
+//   spn-devex docs figure check <path…> [--variant <name>]    labels fit and connectors join · a block's colouring matches its text
+//   spn-devex docs figure colour <path…> [--variant <name>]   the audit's half: a coloured block strips back to what the author wrote
+//   spn-devex docs figure render <svg-or-html…>               render each in a headless browser and report what it painted
+//
+// A SUBJECT WITH THREE ACTIONS, AND A `file` PATH. A path names one file, or a folder of them, and
+// each action needs one. `--variant` reads only the documents whose block declares that variant.
 //
 // THE BROWSER IS OPTIONAL AND THIS SAYS SO RATHER THAN FAILING, on a machine carrying no global
 // `playwright` install (the guides seat carries the line to add one).
 
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, statSync } from "node:fs";
-import { basename, dirname, extname, join, relative, resolve } from "node:path";
+import { basename, dirname, extname, join, relative } from "node:path";
 import { checkFigures, colour, stripSpans } from "../../lib/figures.ts";
 import { draw } from "../../lib/draw.ts";
-import { argsText, begin, commandFacts, end, record } from "../../../../../plugin-support-lib/src/lib/timing.ts";
+import { type Action, REQUIRED, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { DEVEX_WORKSTREAMS, DOCS, hasSegment, slashes } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, cutVersions, linesFor, newestVersion } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
-import { holdsOwnCopy, inClosedWorkstream, resolveWorkspace, stylesFolder, walkFiles } from "./_lib.ts";
+import { VARIANTS, holdsOwnCopy, inClosedWorkstream, readBlock, resolveWorkspace, stylesFolder, walkFiles } from "./_lib.ts";
 
 /**
  * Whether an html file is a page of ours: it carries an `spn:doc` block, or it sits in a docs tree or in a
@@ -34,27 +35,39 @@ function isPageOfOurs(file: string, src: string): boolean {
   return /<!--\s*spn:doc\b/.test(src) || hasSegment(path, DOCS) || path.includes(`/${DEVEX_WORKSTREAMS}/`);
 }
 
-export const describe = "figure check|colour: a spec's own geometry against the page · figure <path…>: what a browser paints";
+export const describe = "a figure's own geometry against the page, and what a browser paints of it";
 
 // ---------------------------------------------------------------------------- check | colour
 
-function geometryCli(sub: string, args: string[], workspace: string): number {
+/** The two actions that read a page's own text: `check` judges its drawings, and `colour` its coloured blocks. */
+function geometry(sub: "check" | "colour", args: string[]): number {
+  const words = readWords(args, { variant: VARIANTS });
+  const paths = scopeOf(words.paths, REQUIRED);
+  const variants = words.values("variant");
+  const workspace = resolveWorkspace();
   // A PATH IS A FILE OR A FOLDER, exactly as it is for `audit`. Given a folder this reads the
   // directory itself rather than dying on EISDIR with a raw stack trace — `figure check
   // <repo>/docs/artifacts` is the only way a whole corpus gets judged in one call. The same walk
   // `audit` uses, so `templates/` is skipped by the rule that already exists.
   const missing: string[] = [];
-  const files = args.filter((a) => !a.startsWith("--")).flatMap((p) => {
-    const full = resolve(p);
+  const named = paths.flatMap((full) => {
     let st;
     // A PATH THAT IS NOT THERE IS NAMED, never read. Falling through to `readFileSync` turned a typo
     // into a raw ENOENT stack trace, which is the same fault as the folder one wearing a different
     // error code: the tool reporting itself as broken when the argument was.
     try { st = statSync(full); } catch { missing.push(full); return []; }
-    return st.isDirectory() ? walkFiles(full, (f) => f.endsWith(".html") || f.endsWith(".md")) : [full];
+    return st.isDirectory() ? walkFiles(full, (file) => file.endsWith(".html") || file.endsWith(".md")) : [full];
   });
-  for (const m of missing) console.log(`✗ RULE figure    ${relative(workspace, m)}\n         no such file or folder`);
-  if (!files.length && !missing.length) { console.log("no page under that path"); return 0; }
+  // `--variant` narrows the run to the documents whose block declares one of the variants it names.
+  const declares = (file: string): boolean => {
+    try { return variants.includes(readBlock(readFileSync(file, "utf8")).block?.variant ?? ""); } catch { return false; }
+  };
+  const files = variants.length ? named.filter(declares) : named;
+  for (const gone of missing) console.log(`✗ RULE figure    ${relative(workspace, gone)}\n         no such file or folder`);
+  if (!files.length && !missing.length) {
+    console.log(variants.length && named.length ? `no page under that path declares the variant ${variants.join(" · ")}` : "no page under that path");
+    return 0;
+  }
   if (!files.length) return 1;
 
   if (sub === "check") {
@@ -118,34 +131,29 @@ function geometryCli(sub: string, args: string[], workspace: string): number {
     return total ? 1 : 0;
   }
 
-  if (sub === "colour") {
-    // The audit's half: a coloured block must strip back to what the author wrote.
-    let bad = 0;
-    let unread = 0;
-    for (const f of files) {
-      const src = readFileSync(f, "utf8");
-      // The colouring is spans that carry the shared stylesheet's class names, so a page that links
-      // no shared stylesheet is named once, as a RULE, and its blocks are not read.
-      if (holdsOwnCopy(f, src)) {
-        if (isPageOfOurs(f, src) && !inClosedWorkstream(f)) { unread += 1; console.log(`✗ RULE styles    ${relative(workspace, f)}\n         ${OWN_COPY}`); }
-        continue;
-      }
-      for (const m of src.matchAll(/<pre data-lang="([a-z]+)">([\s\S]*?)<\/pre>/g)) {
-        const round = colour(stripSpans(m[2]), m[1]);
-        if (round !== m[2]) { bad++; console.log(`✗ RULE figure    ${relative(workspace, f)}\n         a \`${m[1]}\` block's colouring is not what \`figures colour\` produces from its own text`); }
-      }
+  // The audit's half: a coloured block must strip back to what the author wrote.
+  let bad = 0;
+  let unread = 0;
+  for (const f of files) {
+    const src = readFileSync(f, "utf8");
+    // The colouring is spans that carry the shared stylesheet's class names, so a page that links
+    // no shared stylesheet is named once, as a RULE, and its blocks are not read.
+    if (holdsOwnCopy(f, src)) {
+      if (isPageOfOurs(f, src) && !inClosedWorkstream(f)) { unread += 1; console.log(`✗ RULE styles    ${relative(workspace, f)}\n         ${OWN_COPY}`); }
+      continue;
     }
-    // A page that was not read is counted apart from a block that is off, and either one is a RULE.
-    const summary = [
-      ...(bad ? [`${bad} block${bad > 1 ? "s" : ""} off`] : []),
-      ...(unread ? [`${unread} page${unread > 1 ? "s" : ""} not read`] : []),
-    ];
-    console.log(summary.length ? `\n${summary.join(" · ")}` : "every coloured block matches its own text");
-    return bad || unread ? 1 : 0;
+    for (const m of src.matchAll(/<pre data-lang="([a-z]+)">([\s\S]*?)<\/pre>/g)) {
+      const round = colour(stripSpans(m[2]), m[1]);
+      if (round !== m[2]) { bad++; console.log(`✗ RULE figure    ${relative(workspace, f)}\n         a \`${m[1]}\` block's colouring is not what \`docs figure colour\` produces from its own text`); }
+    }
   }
-
-  console.error("usage: spn-devex docs figure check|colour <path…>");
-  return 2;
+  // A page that was not read is counted apart from a block that is off, and either one is a RULE.
+  const summary = [
+    ...(bad ? [`${bad} block${bad > 1 ? "s" : ""} off`] : []),
+    ...(unread ? [`${unread} page${unread > 1 ? "s" : ""} not read`] : []),
+  ];
+  console.log(summary.length ? `\n${summary.join(" · ")}` : "every coloured block matches its own text");
+  return bad || unread ? 1 : 0;
 }
 
 // ---------------------------------------------------------------------------- browser render
@@ -216,11 +224,8 @@ const PROBE = `(() => {
   return out;
 })()`;
 
-async function renderCli(files: string[]): Promise<number> {
-  if (!files.length) {
-    console.log("usage: spn-devex docs figure <svg-or-html> [...]");
-    return 2;
-  }
+async function render(args: string[]): Promise<number> {
+  const files = scopeOf(readWords(args).paths, REQUIRED);
   const entry = playwrightPath();
   if (!entry) {
     console.log("No browser on this machine, so nothing was rendered — this is not a failure.");
@@ -257,20 +262,22 @@ async function renderCli(files: string[]): Promise<number> {
   return 0;
 }
 
-// ---------------------------------------------------------------------------- dispatch
+// ---------------------------------------------------------------------------- the actions
 
-export async function run(args: string[]): Promise<number> {
-  const workspace = resolveWorkspace();
-  const startedAt = performance.now();
-  begin(commandFacts("spn-devex", args), workspace);
-  const [sub, ...rest] = args;
-  const code = sub === "check" || sub === "colour"
-    ? geometryCli(sub, rest, workspace)
-    : await renderCli(args.filter((a) => !a.startsWith("-")));
-  record({ group: "docs", action: "figure", args: argsText(args) }, performance.now() - startedAt, code);
-  end(code);
-  return code;
-}
-
-if (process.argv[1] && basename(process.argv[1]) === "figure.ts")
-  process.exit(await run(process.argv.slice(2)));
+export const actions: Record<string, Action> = {
+  check: {
+    describe: "labels fit and connectors join, and every spec draws: the findings of each page's own drawings",
+    usage: "<path…> [--variant <name>]",
+    run: (args) => geometry("check", args),
+  },
+  colour: {
+    describe: "a coloured block strips back to the text its author wrote",
+    usage: "<path…> [--variant <name>]",
+    run: (args) => geometry("colour", args),
+  },
+  render: {
+    describe: "render each figure in a headless browser, and report what it painted",
+    usage: "<svg-or-html…>",
+    run: render,
+  },
+};

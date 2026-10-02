@@ -38,11 +38,11 @@ const doc = (o, body = "Some prose.\n", tag = null) =>
   block({ summary: `What ${o.title} is.`, ...o }) +
   `\n# ${o.title}\n\n` + (tag === null ? "" : tag + "\n\n") + body;
 
-/** `args` is the action's own argv — `["page", "docs/…"]` — run through `cli.ts docs <args>`. */
+/** `args` is what follows the group — `["page", "write", "docs/…"]` — run through `cli.ts docs <args>`. A refusal's text is handed back with the rest. */
 function run(root, args) {
   try {
     return execFileSync(process.execPath, [TOOL, "docs", ...args],
-      { encoding: "utf8", cwd: root, env: { ...process.env, SPN_WORKSPACE: root } });
+      { encoding: "utf8", cwd: root, stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: root } });
   } catch (e) { return String(e.stdout ?? "") + String(e.stderr ?? ""); }
 }
 const readAt = (root, p) => readFileSync(join(root, p), "utf8");
@@ -82,8 +82,8 @@ const lacks = (s) => (got) => !String(got).includes(s);
     // `page` needs the real construct template for its furniture; the throwaway repo has none.
     const templates = bookTemplatesDir(resolve(PLUGIN, "..", "..", "..", "spn-foundation"));
     process.env.SPN_TEMPLATES = templates;
-    run(ws, ["page", `docs/${SEAT.constructs}/01-core/thing.md`]);
-    run(ws, ["page", `docs/${SEAT.constructs}/01-core/other.md`]);
+    run(ws, ["page", "write", `docs/${SEAT.constructs}/01-core/thing.md`]);
+    run(ws, ["page", "write", `docs/${SEAT.constructs}/01-core/other.md`]);
     const page = readAt(ws, pageOf("01-core", "thing"));
 
     one("[MKT.SCRIPTS.110] `docs page` writes a construct page into the constructs folder of its domain's folder, and nowhere else in the pocket",
@@ -96,8 +96,10 @@ const lacks = (s) => (got) => !String(got).includes(s);
         (g) => g.includes(`class="sds-home" href="../../../../${SEAT.constructs}/README.md"`));
     one("[MKT.SCRIPTS.110] every relative link of the page names a file that is there",
         [...page.matchAll(/href="(\.[^"#]*)/g)].map((found) => found[1]).filter((href) => absent(ws, join(dirname(pageOf("01-core", "thing")), href))), (g) => g.length === 0);
-    one("and the page it produced is the page the audit expects", run(ws, ["audit", "docs"]),
-        (g) => !/produced/.test(g));
+    // THE AUDIT HAS TO HAVE READ THE PAGES for its silence about them to mean anything, so the case
+    // asserts the count of pages it read as well as the finding it does not report.
+    one("and the page it produced is the page the audit expects: the audit reads both pages and reports no `produced` finding",
+        run(ws, ["audit", "check", POCKET_DOCS]), (g) => /over 2 pages|clean — 2 pages/.test(g) && !/produced/.test(g));
     // A PRODUCED PAGE CARRIES THE TEMPLATE'S TWO LINES, AND NOTHING ELSE OF ITS FURNITURE. The line
     // that links the shared stylesheet sits above the page, and the line that loads the shared
     // script closes it. Both are read from the book's own template, so the version is the book's.
@@ -125,42 +127,42 @@ const lacks = (s) => (got) => !String(got).includes(s);
     writeFileSync(join(more, "pages", "construct-template.html"),
                   bookTemplate + "\n<style>.mine{color:red}</style>\n<script>/* a script with code */</script>\n");
     process.env.SPN_TEMPLATES = more;
-    run(ws, ["page", seatPath]);
+    run(ws, ["page", "write", seatPath]);
     one("a style block and a script with code in the template never reach a produced page", readAt(ws, pagePath), page);
 
     // KNOWN-BAD: a template with no line that loads the shared stylesheet. A page produced from it
     // would link no shared file, so the command refuses and the page on disk stays as it is.
     writeFileSync(join(more, "pages", "construct-template.html"), bookTemplate.replace(linkLine, ""));
-    const refused = run(ws, ["page", seatPath]);
+    const refused = run(ws, ["page", "write", seatPath]);
     one("known-bad: a template with no line that loads the shared stylesheet is refused, and the finding names the file",
         refused, (g) => g.includes("RULE page") && g.includes("holds no line that loads `sds-docs.css`"));
     one("and nothing is written: the page on disk is the page it was", readAt(ws, pagePath), page);
     process.env.SPN_TEMPLATES = templates;
     rmSync(more, { recursive: true, force: true });
 
-    // A PAGE ON DISK THAT LINKS NO SHARED STYLESHEET HOLDS ITS OWN COPY OF THE STYLES. `--check` names
-    // it once and compares none of its markup; the command without `--check` is what moves it.
+    // A PAGE ON DISK THAT LINKS NO SHARED STYLESHEET HOLDS ITS OWN COPY OF THE STYLES. `check` names
+    // it once and compares none of its markup; `write` is what moves it.
     const ownCopy = '<meta charset="utf-8">\n<style>.badge{color:red}</style>\n<div class="page"><span class="badge">x</span></div>\n';
     writeFileSync(join(ws, pagePath), ownCopy);
-    const named = run(ws, ["page", seatPath, "--check"]);
-    one("[MKT.SCRIPTS.108] `docs page --check` names a page that holds its own copy once, as a RULE, with the text every command uses",
+    const named = run(ws, ["page", "check", seatPath]);
+    one("[MKT.SCRIPTS.108] `docs page check` names a page that holds its own copy once, as a RULE, with the text every command uses",
         named, (g) => (g.match(/✗ RULE styles/g) ?? []).length === 1 && g.includes(OWN_COPY) && !g.includes("SOFT styles"));
     one("[MKT.SCRIPTS.108] and it says nothing else about that page: no `page` finding, and no `edited by hand`",
         named, (g) => !g.includes("RULE page") && !g.includes("edited by hand"));
     const exitOfCheck = () => {
-      try { execFileSync(process.execPath, [TOOL, "docs", "page", seatPath, "--check"], { encoding: "utf8", cwd: ws, stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: ws } }); return 0; }
+      try { execFileSync(process.execPath, [TOOL, "docs", "page", "check", seatPath], { encoding: "utf8", cwd: ws, stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: ws } }); return 0; }
       catch (error) { return error.status; }
     };
-    one("[MKT.SCRIPTS.108] and `--check` exits 1 on it, as on any RULE", exitOfCheck(), 1);
-    one("[MKT.SCRIPTS.108] `--check` writes nothing into it", readAt(ws, pagePath), ownCopy);
-    run(ws, ["page", seatPath]);
-    one("[MKT.SCRIPTS.108] `docs page` moves it: the page produced again links the shared stylesheet",
+    one("[MKT.SCRIPTS.108] and `check` exits 1 on it, as on any RULE", exitOfCheck(), 1);
+    one("[MKT.SCRIPTS.108] `check` writes nothing into it", readAt(ws, pagePath), ownCopy);
+    run(ws, ["page", "write", seatPath]);
+    one("[MKT.SCRIPTS.108] `docs page write` moves it: the page produced again links the shared stylesheet",
         readAt(ws, pagePath), (g) => g === page && linksSharedStyles(g));
-    one("untouched: `--check` exits 0 on the page in the shared form", exitOfCheck(), 0);
+    one("untouched: `check` exits 0 on the page in the shared form", exitOfCheck(), 0);
     writeFileSync(join(ws, pagePath), page.replace("<h1>", "<h1>Edited "));
-    one("known-bad: a page in the shared form that was edited by hand is still refused by `--check`",
-        run(ws, ["page", seatPath, "--check"]), (g) => g.includes("RULE page") && g.includes("edited by hand") && !g.includes("RULE styles"));
-    run(ws, ["page", seatPath]);
+    one("known-bad: a page in the shared form that was edited by hand is still refused by `check`",
+        run(ws, ["page", "check", seatPath]), (g) => g.includes("RULE page") && g.includes("edited by hand") && !g.includes("RULE styles"));
+    run(ws, ["page", "write", seatPath]);
 
     // THE TEMPLATE'S FOOTER IS A NOTE TO ITS AUTHOR, never furniture. Copied into every produced
     // page, readers of 122 construct pages met "A template from workstream 008 · copy it …", and an
@@ -172,7 +174,7 @@ const lacks = (s) => (got) => !String(got).includes(s);
       bookTemplate.replace(/<footer>[\s\S]*?<\/footer>/, "") +
       "\n<footer>AUTHOR-NOTE: copy this template, keep the comments</footer>\n");
     process.env.SPN_TEMPLATES = noted;
-    run(ws, ["page", `docs/${SEAT.constructs}/01-core/thing.md`]);
+    run(ws, ["page", "write", `docs/${SEAT.constructs}/01-core/thing.md`]);
     const footed = readAt(ws, pageOf("01-core", "thing"));
     process.env.SPN_TEMPLATES = templates;
     rmSync(noted, { recursive: true, force: true });
@@ -187,7 +189,7 @@ const lacks = (s) => (got) => !String(got).includes(s);
       .replace(/"id":\s*"([^"]+)"/, '"id": "$1-sub"')
       .replace(/"title":/, '"subtitle": "One plain promise, under the title.",\n  "title":');
     writeFileSync(join(ws, `docs/${SEAT.constructs}/01-core/thing-sub.md`), withSub);
-    run(ws, ["page", `docs/${SEAT.constructs}/01-core/thing-sub.md`]);
+    run(ws, ["page", "write", `docs/${SEAT.constructs}/01-core/thing-sub.md`]);
     const subbed = readAt(ws, pageOf("01-core", "thing-sub"));
     one("a seat's subtitle is rendered under the title", subbed,
       (g) => /<h1>[^<]*<\/h1>\s*<p class="sds-subtitle">One plain promise, under the title.<\/p>/.test(g));
@@ -198,18 +200,18 @@ const lacks = (s) => (got) => !String(got).includes(s);
     // used to fall through to the paragraph path, hashes and all.
     writeFileSync(join(ws, `docs/${SEAT.constructs}/01-core/thing.md`), seat("thing",
       "## Boundary\n\n#### A sub-part\n\n| a | b | c |\n| --- | --- | --- |\n| repos | `{org}-public\\|-private` | x |\n"));
-    run(ws, ["page", `docs/${SEAT.constructs}/01-core/thing.md`]);
+    run(ws, ["page", "write", `docs/${SEAT.constructs}/01-core/thing.md`]);
     const page2 = readAt(ws, pageOf("01-core", "thing"));
     one("an escaped pipe stays inside its cell", page2, has("<code>{org}-public|-private</code></td><td>x</td>"));
     one("a level-four heading is a heading, not a paragraph of hashes", page2, has('<h4 id="a-sub-part">A sub-part</h4>'));
     writeFileSync(join(ws, `docs/${SEAT.constructs}/01-core/thing.md`), seat("thing",
       "## Boundary\n<!-- RESTATES: a chapter\n     never add a rule here -->\n\nvisible\n<!-- block: REASONS -->\n"));
-    run(ws, ["page", `docs/${SEAT.constructs}/01-core/thing.md`]);
+    run(ws, ["page", "write", `docs/${SEAT.constructs}/01-core/thing.md`]);
     const page3 = readAt(ws, pageOf("01-core", "thing"));
     one("an author's HTML comment never reaches the page", page3, (g) => !/RESTATES|block: REASONS/.test(g) && /<p>visible<\/p>/.test(g));
     writeFileSync(join(ws, `docs/${SEAT.constructs}/01-core/thing.md`), seat("thing",
       "The promise, in one line.\n\nThe summary paragraph.\n\n## Boundary\n\nx\n"));
-    run(ws, ["page", `docs/${SEAT.constructs}/01-core/thing.md`]);
+    run(ws, ["page", "write", `docs/${SEAT.constructs}/01-core/thing.md`]);
     const page4 = readAt(ws, pageOf("01-core", "thing"));
     one("the first lead paragraph is the standfirst, the rest are the summary", page4, (g) => /<p class="sds-standfirst">The promise, in one line\.<\/p>\s*<p>The summary paragraph\.<\/p>/.test(g));
 
@@ -220,7 +222,7 @@ const lacks = (s) => (got) => !String(got).includes(s);
     // it because the two patterns sit next to each other and must not eat one another.
     writeFileSync(join(ws, `docs/${SEAT.constructs}/01-core/thing.md`), seat("thing",
       "## Boundary\n\n1. **First** the step that comes first.\n2. **Then** the next one.\n3) A closing paren is a list too.\n\n- a bullet after it\n- another\n"));
-    run(ws, ["page", `docs/${SEAT.constructs}/01-core/thing.md`]);
+    run(ws, ["page", "write", `docs/${SEAT.constructs}/01-core/thing.md`]);
     const page5 = readAt(ws, pageOf("01-core", "thing"));
     one("a numbered list is an ordered list, not a paragraph of digits", page5,
         (g) => /<ol>[\s\S]*<li><strong>First<\/strong> the step that comes first\.<\/li>[\s\S]*<\/ol>/.test(g));
@@ -253,7 +255,7 @@ console.log("\n=== the rail names the page, and the way back names where it goes
     [`${POCKET_DOCS}/01-core/a-reading-path-overview.html`]:
       '<!-- spn:doc\n{"id":"path","variant":"overview","title":"A Reading Path","lenses":["ARCHITECT"],"summary":"s"}\n-->\n<h1>x</h1>\n',
   });
-  run(ws, ["page", `docs/${SEAT.constructs}/01-core/thing.md`]);
+  run(ws, ["page", "write", `docs/${SEAT.constructs}/01-core/thing.md`]);
   const page = readAt(ws, pageOf("01-core", "thing"));
 
   one("the rail carries the page's own name, not the word Outline",
@@ -278,12 +280,76 @@ console.log("\n=== the rail names the page, and the way back names where it goes
         status: "PLANNING", dependsOn: [] },
       "## Boundary\n\nx\n", "`For: Architect` · `Status: 🔮 PLANNING`"),
   });
-  run(ws, ["page", `docs/${SEAT.constructs}/01-core/thing.md`]);
+  run(ws, ["page", "write", `docs/${SEAT.constructs}/01-core/thing.md`]);
   const page = readAt(ws, pageOf("01-core", "thing"));
   one("with no overview above it the constructs face stands, rather than a link to nothing",
     page, has("&larr; the model"));
 }
 
+// ---------------------------------------------------------------- the grammar: an action, and the seat files it names
+
+/** The exit code of one run, typed after the group, from the folder given. */
+const exitIn = (cwd, args) => {
+  try { execFileSync(process.execPath, [TOOL, "docs", ...args], { encoding: "utf8", cwd, stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: cwd } }); return 0; }
+  catch (error) { return error.status; }
+};
+const USAGE = "usage: spn-devex docs page check <seat…>\n" +
+              "       spn-devex docs page write <seat…>\n";
+
+console.log("\n=== `docs page` needs its action as a word, and both actions need a seat file");
+{
+  process.env.SPN_TEMPLATES = bookTemplatesDir(resolve(PLUGIN, "..", "..", "..", "spn-foundation"));
+  const seat = (id) => doc(
+    { id, variant: "construct", parentId: "concept", title: id, lenses: ["ARCHITECT"], status: "PLANNING", dependsOn: [] },
+    "## Boundary\n\nx\n", "`For: Architect` · `Status: 🔮 PLANNING`");
+  const CORE = `docs/${SEAT.constructs}/01-core`, EDGE = `docs/${SEAT.constructs}/02-edge`;
+  const ws = repo({
+    [`${CORE}/thing.md`]: seat("thing"),
+    [`${CORE}/other.md`]: seat("other"),
+    [`${EDGE}/gate.md`]: seat("gate"),
+  });
+  const THING = `${CORE}/thing.md`;
+  const pages = () => ["thing", "other"].map((name) => existsSync(join(ws, pageOf("01-core", name))))
+    .concat(existsSync(join(ws, pageOf("02-edge", "gate")))).join(" ");
+
+  one("[MKT.SCRIPTS.111] with no action the entry prints each usage line and says an action is owed",
+    run(ws, ["page"]), USAGE + "`docs page` needs an action.\n");
+  one("[MKT.SCRIPTS.111] and exits 2", exitIn(ws, ["page"]), 2);
+  one("[MKT.SCRIPTS.111] a seat file where the action belongs is refused the same way, and `--check` is named as the action `check`",
+    run(ws, ["page", THING, "--check"]), USAGE + "`docs page` needs an action. `--check` is the action `check`.\n");
+  one("[MKT.SCRIPTS.111] with exit 2, and a seat file alone is refused with exit 2 too",
+    [exitIn(ws, ["page", THING, "--check"]), exitIn(ws, ["page", THING])].join(), "2,2");
+  one("[MKT.SCRIPTS.111] a word that is no action of the subject is refused the same way",
+    run(ws, ["page", "produce", THING]), USAGE + "`docs page` needs an action.\n");
+  one("[MKT.SCRIPTS.112] `write` with no path prints its usage line and says a path is owed",
+    run(ws, ["page", "write"]), "usage: spn-devex docs page write <seat…>\n`docs page write` needs a path.\n");
+  one("[MKT.SCRIPTS.112] and exits 2", exitIn(ws, ["page", "write"]), 2);
+  one("[MKT.SCRIPTS.130] `check` with no path is refused too, because a page is produced from the seat file that is named",
+    run(ws, ["page", "check"]), "usage: spn-devex docs page check <seat…>\n`docs page check` needs a path.\n");
+  one("[MKT.SCRIPTS.130] with exit 2", exitIn(ws, ["page", "check"]), 2);
+  one("an option the command does not take is refused by its name",
+    run(ws, ["page", "write", THING, "--json"]), "usage: spn-devex docs page write <seat…>\n`docs page write` does not take `--json`.\n");
+  one("with exit 2", exitIn(ws, ["page", "write", THING, "--json"]), 2);
+  one("no refused run wrote a page", pages(), "false false false");
+
+  const said = run(ws, ["page", "check", THING]);
+  one("[MKT.SCRIPTS.130] `check` says that no page has been produced from the seat file yet, as a RULE",
+    said, (got) => got.includes("✗ RULE page") && got.includes("no page has been produced from this seat file yet"));
+  one("[MKT.SCRIPTS.130] and exits 1", exitIn(ws, ["page", "check", THING]), 1);
+  one("[MKT.SCRIPTS.130] `check` writes nothing", pages(), "false false false");
+
+  // KNOWN-BAD, so `check` and the refusals are not the reason no page was written: the same seat, written.
+  one("[MKT.SCRIPTS.130] known-bad: `write` of the same seat file puts its page on disk, and no other page",
+    [run(ws, ["page", "write", THING]).includes("wrote"), pages()].join(" "), "true true false false");
+  one("[MKT.SCRIPTS.130] and after the write a `check` reads the page as current and exits 0",
+    [run(ws, ["page", "check", THING]).includes("current"), exitIn(ws, ["page", "check", THING])].join(), "true,0");
+
+  run(ws, ["page", "write", CORE]);
+  one("a folder names every seat file under it, and no seat file beside it", pages(), "true true false");
+  run(ws, ["page", "write", THING, `${EDGE}/gate.md`]);
+  one("several paths are one run", pages(), "true true true");
+  delete process.env.SPN_TEMPLATES;
+}
 
 console.log(failed ? `\n  ${failed} of ${n} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

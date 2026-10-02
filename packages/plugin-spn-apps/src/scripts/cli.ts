@@ -1,100 +1,153 @@
 #!/usr/bin/env node
-// RESTATES: spn-foundation docs/02-constructs/01-devex/02-agent/04-plugins.md § The shape of a
-// plugin, and its Node realization docs/04-capabilities/01-devex/02-agent/04-plugins/02-shape.md
-// § One entry, dispatching by group and action. Those chapters are the source of truth.
+// RESTATES: spn-foundation docs/04-capabilities/01-devex/02-agent/04-plugins/02-shape.md § One entry,
+// dispatching by group and action. The chapter is the source of truth; a rule change is edited there
+// first, then here, in the same change.
 //
-// `spn-apps <group> <action> [args] [--json]` — the one entry every `spn-apps` tool is reached
-// through, printed with the plugin named so two plugins may share a group's name without ambiguity.
+// The one entry a plugin ships. Every command is typed in one grammar:
 //
-// A command lives at `commands/<group>/<action>.ts` and exports `{ describe, run }`. This file
-// discovers the set by walking that folder rather than listing it by hand, so a command that exists
-// is reachable and nothing here can drift from what `commands/` actually holds.
-import { readdirSync } from "node:fs";
+//     spn-apps <group> <subject> <action> [<path>…] [options]    an action of a subject
+//     spn-apps <group> <action> [<path>…] [options]              an action that has no subject
+//     spn-apps help [--json]                                      every action, as a reading or as data
+//
+// A GROUP IS A FOLDER, AND A FILE IN IT SAYS WHAT IT IS BY WHAT IT EXPORTS. A file that exports
+// `actions` is a subject, and the third word typed is its action. A file that exports `run` is an
+// action of its group. `help` and the dispatch read the same `commands/` tree, so a file added there
+// is reachable as soon as it exists. A file whose name starts with `_` is a helper that commands
+// import, and it is never dispatched.
+//
+// THE ENTRY READS THE WORDS BEFORE THE PATH, AND THE COMMAND READS THE REST. What follows the action
+// is handed to the action's `run`, which reads it with `plugin-support-lib/src/lib/command.ts`. That
+// file also prints a usage fault and writes the run's telemetry line, so every command refuses in the
+// same words and is recorded once.
+//
+// Each plugin that ships commands ships this file as the same text, apart from the plugin's name.
+
+import { readdirSync, statSync } from "node:fs";
 import { basename, join } from "node:path";
 import { pathToFileURL } from "node:url";
+import { type CommandFile, actionOwed, commandWords, isSubject, runCommand, usageOf } from "../../../plugin-support-lib/src/lib/command.ts";
 
-const NAME = "spn-apps";
-// FROM SOURCE, `commands/<group>/<action>.ts` beside this file; BUNDLED, `dist/commands/<group>/<action>.mjs`
+const PLUGIN_NAME = "spn-apps";
+// FROM SOURCE, `commands/<group>/<file>.ts` beside this file; BUNDLED, `dist/commands/<group>/<file>.mjs`
 // beside `dist/cli.mjs`. A command's source imports `plugin-support-lib` by a path that exists only in
 // the marketplace repository, so an installed plugin can run a command only from its bundle.
-const BUNDLED = basename(import.meta.dirname) === "dist";
-const COMMANDS_DIR = join(import.meta.dirname, "commands");
+const HERE = import.meta.dirname;
+const BUNDLED = basename(HERE) === "dist";
+const COMMANDS = join(HERE, "commands");
 const EXTENSION = BUNDLED ? ".mjs" : ".ts";
 
-type Command = { describe: string; run: (args: string[]) => number | Promise<number> };
-type Entry = { group: string; action: string; describe: string };
+/** One action as `help` lists it. `subject` is null for a command of two words. */
+export type Listed = { group: string; subject: string | null; action: string; command: string; describe: string };
 
-/** Every `<group> <action>` this plugin ships, group then action, both sorted. */
-function discover(): { group: string; action: string }[] {
-  const found: { group: string; action: string }[] = [];
-  let groups: string[] = [];
-  try {
-    groups = readdirSync(COMMANDS_DIR, { withFileTypes: true })
-      .filter((entry) => entry.isDirectory()).map((entry) => entry.name).sort();
-  } catch { groups = []; }
-  for (const group of groups) {
-    let actions: string[] = [];
-    try {
-      actions = readdirSync(join(COMMANDS_DIR, group))
-        .filter((file) => file.endsWith(EXTENSION) && !file.startsWith("_")).map((file) => file.slice(0, -EXTENSION.length)).sort();
-    } catch { actions = []; }
-    for (const action of actions) found.push({ group, action });
-  }
-  return found;
+function isFolder(path: string): boolean {
+  try { return statSync(path).isDirectory(); } catch { return false; }
 }
 
-async function load(group: string, action: string): Promise<Command | null> {
-  try {
-    // `pathToFileURL(COMMANDS_DIR)`, NEVER A BARE RELATIVE SPECIFIER. A relative `./commands/…`
-    // resolves against this module's own URL, which a bundler may rewrite; the absolute folder is
-    // the one each mode actually ships.
-    const module = await import(pathToFileURL(join(COMMANDS_DIR, group, `${action}${EXTENSION}`)).href);
-    if (typeof module.run !== "function") return null;
-    return { describe: typeof module.describe === "string" ? module.describe : "", run: module.run };
-  } catch {
-    return null;
-  }
+/** Every group: a folder under `commands/` whose name does not start with `_`. */
+export function groups(): string[] {
+  if (!isFolder(COMMANDS)) return [];
+  return readdirSync(COMMANDS).filter((entry) => !entry.startsWith("_") && isFolder(join(COMMANDS, entry))).sort();
 }
 
-/** Every command, with its `describe`, for `help` and for an unknown-command listing. */
-async function catalogue(): Promise<Entry[]> {
-  const entries: Entry[] = [];
-  for (const { group, action } of discover()) {
-    const command = await load(group, action);
-    entries.push({ group, action, describe: command?.describe ?? "" });
-  }
-  return entries;
+/** Every command file of one group, by its name without the extension. A name that starts with `_` is a helper. */
+export function filesOf(group: string): string[] {
+  const folder = join(COMMANDS, group);
+  if (!isFolder(folder)) return [];
+  return readdirSync(folder)
+    .filter((entry) => entry.endsWith(EXTENSION) && !entry.startsWith("_"))
+    .map((entry) => entry.slice(0, -EXTENSION.length))
+    .sort();
 }
 
-function printList(entries: Entry[], json: boolean): void {
-  if (json) { console.log(JSON.stringify(entries, null, 2)); return; }
-  console.log(`${NAME} <group> <action> [args] [--json]\n`);
-  for (const entry of entries) {
-    console.log(`  ${NAME} ${entry.group} ${entry.action}`.padEnd(32) + `  ${entry.describe}`);
-  }
+/** What one command file exports, or null where the group holds no such file. */
+async function load(group: string, file: string): Promise<CommandFile | null> {
+  if (!filesOf(group).includes(file)) return null;
+  // The absolute folder, never a relative specifier: a bundler may rewrite this module's own address.
+  return (await import(pathToFileURL(join(COMMANDS, group, `${file}${EXTENSION}`)).href)) as CommandFile;
 }
 
-async function main(): Promise<number> {
-  const argv = process.argv.slice(2);
-  // --json IS THIS FILE'S OWN FLAG, never a command's. Stripping it here is what keeps a forwarded
-  // command's argv identical to what a person would pass the tool it forwards to directly.
-  const json = argv.includes("--json");
-  const [group, action, ...rest] = argv.filter((one) => one !== "--json");
-
-  if (!group || group === "help") {
-    printList(await catalogue(), json);
-    return group === "help" ? 0 : 1;
+/** Every action this plugin ships: each action of each subject, and each action that has no subject. */
+export async function surface(): Promise<Listed[]> {
+  const listed: Listed[] = [];
+  for (const group of groups()) {
+    for (const file of filesOf(group)) {
+      const exported = await load(group, file);
+      if (!exported) continue;
+      if (!isSubject(exported)) {
+        listed.push({ group, subject: null, action: file, command: commandWords(group, null, file), describe: exported.describe ?? "" });
+        continue;
+      }
+      for (const [action, { describe }] of Object.entries(exported.actions))
+        listed.push({ group, subject: file, action, command: commandWords(group, file, action), describe: describe ?? "" });
+    }
   }
+  return listed;
+}
 
-  const command = action ? await load(group, action) : null;
-  if (!command) {
-    process.stderr.write(action
-      ? `${NAME}: no command "${group} ${action}"\n\n`
-      : `${NAME}: "${group}" needs an action\n\n`);
-    printList(await catalogue(), json);
+async function printHelp(json: boolean): Promise<number> {
+  const commands = await surface();
+  if (json) {
+    console.log(JSON.stringify({ plugin: PLUGIN_NAME, commands }, null, 2));
+    return 0;
+  }
+  console.log(`${PLUGIN_NAME} — typed as \`${PLUGIN_NAME} <group> [<subject>] <action> [<path>…] [options]\`:\n`);
+  const width = Math.max(0, ...commands.map((listed) => listed.command.length));
+  for (const listed of commands) console.log(`  ${listed.command.padEnd(width)}  ${listed.describe}`);
+  return 0;
+}
+
+/** The whole run: read the words before the path, find the command, and hand back its exit code. */
+export async function main(argv: string[]): Promise<number> {
+  const [group, second, ...rest] = argv;
+
+  if (group === undefined || group === "help") return printHelp(argv.includes("--json"));
+
+  const known = groups();
+  if (!known.includes(group)) {
+    console.error(`unknown group \`${group}\` — groups: ${known.length ? known.join(" · ") : "(none shipped)"}`);
     return 2;
   }
-  return command.run(rest);
+
+  const files = filesOf(group);
+  const exported = second === undefined ? null : await load(group, second);
+  if (second === undefined || !exported) {
+    console.error(second === undefined
+      ? `usage: ${PLUGIN_NAME} ${group} [<subject>] <action> […] — \`${group}\` holds: ${files.join(" · ")}`
+      : `unknown command \`${group} ${second}\` — \`${group}\` holds: ${files.join(" · ")}`);
+    return 2;
+  }
+
+  if (!isSubject(exported))
+    return runCommand({ plugin: PLUGIN_NAME, group, subject: null, action: second, usage: exported.usage ?? "", run: exported.run }, rest);
+
+  const [third, ...words] = rest;
+  const action = third !== undefined && Object.hasOwn(exported.actions, third) ? exported.actions[third] : null;
+  if (third === undefined || !action) {
+    console.error(`${usageOf(PLUGIN_NAME, group, second, exported.actions)}\n${actionOwed(group, second, exported.actions, rest)}`);
+    return 2;
+  }
+  return runCommand({ plugin: PLUGIN_NAME, group, subject: second, action: third, usage: action.usage, run: action.run }, words);
 }
 
-process.exit(await main());
+/**
+ * Resolves once everything already written to a stream has left the process. A pipe is written in
+ * the background, so `process.exit` called straight after a large `console.log` ends the process
+ * with part of the output still queued, and the reader receives the first 65,536 bytes only.
+ */
+const written = (stream: NodeJS.WriteStream): Promise<void> =>
+  new Promise((resolve) => {
+    if (stream.destroyed || stream.writableEnded) { resolve(); return; }
+    stream.write("", () => resolve());
+  });
+
+// MATCHES THE BUNDLED NAME TOO. `cli.ts` runs from source under that name; built, it runs as
+// `dist/cli.mjs` — the same file by a different extension, and a guard tied to one literal name
+// never fires for the other.
+//
+// THE ENTRY ENDS ONLY AFTER ITS OUTPUT IS WRITTEN, so `--json` sent through a pipe arrives whole.
+// The exit stays explicit, because a command that leaves a handle open must still end.
+if (process.argv[1] && ["cli.ts", "cli.mjs"].includes(basename(process.argv[1]))) {
+  const code = await main(process.argv.slice(2));
+  await Promise.all([written(process.stdout), written(process.stderr)]);
+  process.exit(code);
+}

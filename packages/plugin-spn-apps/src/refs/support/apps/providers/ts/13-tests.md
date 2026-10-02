@@ -36,4 +36,4 @@
 
 **Run the tier that owns the rule you changed.** A change to a refusal needs the integration tier; unit passes straight over it.
 
-**Every run is named, and leaves a file of that name.** `spnutils apps test <tier> <run> <package>` (or `pnpm test <tier> <run>` inside the node) writes `tests/.output/<tier>/runs/<run>.json`; a journey phase writes `<run>.<phase>.json`. A reused name replaces that one file, and each tier keeps its 20 newest. The runner's raw report is deleted once it is folded in. Give every tier of one sitting the same name, then stamp with `spn-devex behaviours stamp <run> <repo> --write`.
+**Every run is named, and leaves a file of that name.** `spnutils apps test <tier> <run> <package>` (or `pnpm test <tier> <run>` inside the node) writes `tests/.output/<tier>/runs/<run>.json`; a journey phase writes `<run>.<phase>.json`. A reused name replaces that one file, and each tier keeps its 20 newest. The runner's raw report is deleted once it is folded in. Give every tier of one sitting the same name, then stamp with `spn-devex behaviours stamp write <run> <repo>`.

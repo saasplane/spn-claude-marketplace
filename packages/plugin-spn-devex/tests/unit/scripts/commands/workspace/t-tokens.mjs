@@ -1,4 +1,4 @@
-// `workspace tokens` — hook telemetry joined to the transcripts by session (RD.DEVEX.WORKSPACE.185).
+// `workspace tokens show` — hook telemetry joined to the transcripts by session (RD.DEVEX.WORKSPACE.185).
 //
 // THE KNOWN BAD IS A REPLY WRITTEN ON THREE LINES. A transcript writes one line per content block of
 // a reply and repeats its `usage` on each, so a reader summing lines counts that reply three times.
@@ -155,7 +155,8 @@ console.log("\n=== workspace tokens — the model's own time, apart from the too
     JSON.stringify(timed.total));
   ok("the tokens beside the time are still counted once", timed.total.replies === 4 && windowRow?.replies === 3, JSON.stringify(timed.total));
 
-  const text = execFileSync("node", [CLI, "workspace", "tokens", "--root", timeRoot, "--projects", join(timeRoot, "projects")], { encoding: "utf8" });
+  const text = execFileSync("node", [CLI, "workspace", "tokens", "show", "--root", timeRoot, "--projects", join(timeRoot, "projects")],
+    { encoding: "utf8", stdio: "pipe", env: { ...process.env, SPN_TELEMETRY: "off" } });
   ok("[MKT.SCRIPTS.96] the report prints the model's time beside the tokens", /Model time/.test(text) && /\n    \(no order\) .* 3\.0 min\n/.test(text), text);
   ok("[MKT.SCRIPTS.96] and the tools' time and the waiting apart from it",
     /the model 3\.3 min · the tools 0\.5 min · waiting on a prompt 10\.0 min/.test(text), text);
@@ -169,15 +170,30 @@ console.log("\n=== workspace tokens — the model's own time, apart from the too
 
 console.log("\n=== workspace tokens — the command");
 {
-  const text = execFileSync("node", [CLI, "workspace", "tokens", "--root", root, "--projects", projects], { encoding: "utf8" });
+  const ENV = { ...process.env, SPN_TELEMETRY: "off" };
+  /** `workspace tokens` through the entry, with the words typed after it: what it printed, and its exit code. */
+  const typed = (...words) => {
+    try { return { out: execFileSync("node", [CLI, "workspace", "tokens", ...words], { encoding: "utf8", stdio: "pipe", env: ENV }), code: 0 }; }
+    catch (error) { return { out: `${error.stdout ?? ""}${error.stderr ?? ""}`, code: error.status ?? -1 }; }
+  };
+  const text = typed("show", "--root", root, "--projects", projects).out;
   ok("prints the tree with the totals", /008-plain-language/.test(text) && /\n  N116/.test(text) && /M7-order-rules-telemetry-subtitle/.test(text) && /\ntotal/.test(text), text);
   ok("says untagged rather than guessing", /untagged \(2 session\(s\)\)/.test(text), text);
-  const json = JSON.parse(execFileSync("node", [CLI, "workspace", "tokens", "008", "--json", "--root", root, "--projects", projects], { encoding: "utf8" }));
+  const json = JSON.parse(typed("show", "008", "--json", "--root", root, "--projects", projects).out);
   ok("--json carries the filter and the rows", json.filter === "008" && json.rows.length === 2, JSON.stringify(json).slice(0, 200));
-  let refused = false;
-  try { execFileSync("node", [CLI, "workspace", "tokens", "--root", projects], { encoding: "utf8", stdio: "pipe" }); }
-  catch (error) { refused = error.status === 2; }
-  ok("a folder that is not a workspace exits 2", refused);
+  const USAGE = "usage: spn-devex workspace tokens show [<workstream>] [--json] [--root <workspace>] [--projects <folder>]\n";
+  const lost = typed("show", "--root", projects);
+  ok("a folder that is not a workspace is refused with the usage line, and exits 2",
+    lost.code === 2 && lost.out.startsWith(USAGE + "`workspace tokens show` needs a workspace, and ") && lost.out.includes("pass `--root <workspace>`"), lost.out);
+  const none = typed("--root", root);
+  ok("[MKT.SCRIPTS.111] with no action the entry prints the usage line and says an action is owed",
+    none.code === 2 && none.out === USAGE + "`workspace tokens` needs an action.\n", none.out);
+  const option = typed("show", "--root", root, "--write");
+  ok("[MKT.SCRIPTS.174] an option the command does not take is refused with exit 2", option.code === 2 && option.out === USAGE + "`workspace tokens show` does not take `--write`.\n", option.out);
+  const valueless = typed("show", "--root");
+  ok("an option that takes a value is refused without one, with exit 2", valueless.code === 2 && valueless.out.includes("needs a value after `--root`."), valueless.out);
+  const two = typed("show", "008", "015", "--root", root, "--projects", projects);
+  ok("a second workstream is refused with exit 2", two.code === 2 && two.out.includes("takes one workstream."), two.out);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED — workspace tokens` : `\n  all ${total} passed — workspace tokens`);

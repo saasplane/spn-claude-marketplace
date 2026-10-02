@@ -1,4 +1,4 @@
-// behaviours ids — the soft id check reads contract, component and journey cases from the test source.
+// `behaviours ids check` — the id check reads contract, component and journey cases from the test source.
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -55,12 +55,33 @@ ok("journey: the root's cases are read, node_modules is not", found.get("JOURNEY
 ok("a data-built title whose table is imported carries its id through data", found.get("JOURNEY").filter((c) => c.throughData).map((c) => c.file), ["tests/journeys/built.spec.ts"]);
 
 console.log("\n=== the command — strict: exit 1 while any case has no id");
-let out = "", code = 0;
-try { out = execFileSync("node", [new URL("../../../../../src/scripts/commands/behaviours/ids.ts", import.meta.url).pathname, root], { encoding: "utf8" }); }
-catch (e) { out = String(e.stdout ?? ""); code = e.status ?? 1; }
+const CLI = new URL("../../../../../src/scripts/cli.ts", import.meta.url).pathname;
+/** `behaviours ids` through the entry, with the words typed after it: what it printed, and its exit code. */
+const typed = (...words) => {
+  try { return { out: execFileSync("node", [CLI, "behaviours", "ids", ...words], { encoding: "utf8", stdio: "pipe", env: { ...process.env, SPN_TELEMETRY: "off" } }), code: 0 }; }
+  catch (e) { return { out: String(e.stdout ?? "") + String(e.stderr ?? ""), code: e.status ?? 1 }; }
+};
+const { out, code } = typed("check", root);
 ok("known-bad: a repository with cases missing their id exits 1", code, 1);
 ok("it names each file with a missing id", out.includes("✗ component  apps/web/tests/component/Card.ct.spec.tsx  1 case(s) with no id"), true);
 ok("and totals by tier", out.includes("2 case(s) with no id — contract 1 of 2 · component 1 of 1 · journey 0 of 2; 1 through data"), true);
+
+console.log("\n=== the command — the action is a word, and a narrow path reads the cases under it");
+const USAGE = "usage: spn-devex behaviours ids check [<path>]\n";
+ok("[MKT.SCRIPTS.111] with no action the entry prints the usage line and says an action is owed",
+  typed(), { out: USAGE + "`behaviours ids` needs an action.\n", code: 2 });
+ok("[MKT.SCRIPTS.111] a path where the action belongs is refused the same way", typed(root), { out: USAGE + "`behaviours ids` needs an action.\n", code: 2 });
+ok("[MKT.SCRIPTS.174] an option the command does not take is refused with exit 2",
+  typed("check", root, "--json"), { out: USAGE + "`behaviours ids check` does not take `--json`.\n", code: 2 });
+// The folder becomes a repository, so a path inside it is narrowed and never read as a tree of its own.
+put("sprepo.json", JSON.stringify({ type: "APPS", config: { mtype: "APPS", stack: "TS" } }));
+const narrow = typed("check", join(root, "apps", "web"));
+ok("[MKT.SCRIPTS.164] a run narrowed to one project names the case files under it, and counts no case beside it",
+  [narrow.code, narrow.out.includes("✗ component  apps/web/tests/component/Card.ct.spec.tsx  1 case(s) with no id"), narrow.out.includes("contract 0 of 0 · component 1 of 1 · journey 0 of 0")],
+  [1, true, true]);
+const clean = typed("check", join(root, "tests", "journeys"));
+ok("[MKT.SCRIPTS.164] and a run narrowed to a folder whose cases all carry an id exits 0",
+  [clean.code, clean.out.includes("0 case(s) with no id — contract 0 of 0 · component 0 of 0 · journey 0 of 2; 1 through data")], [0, true]);
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

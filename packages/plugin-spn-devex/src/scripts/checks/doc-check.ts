@@ -308,14 +308,14 @@ function inClosedWorkstream(path: string): boolean {
  * `h3` named Cycles, whose table has Arc · What it does · Status · Previews. Inside a workstream the
  * table has one row per arc in `arcs/`, in the order a person chooses, and each row is the arc's own:
  * its name, the link to its file, its line, its status, and the previews and samples its `## Previews`
- * table lists. `spn-devex docs cycles` prints the rows; this compares the page against the same
+ * table lists. `spn-devex docs cycles show` prints the rows; this compares the page against the same
  * reading, which is `tableDifferences` in that command's file. A page in a closed workstream may
  * carry the table with no Previews column, and then only its rows and their statuses are compared.
  */
 export function cyclesRule(path: string, text: string): Finding[] {
   const body = section(text, "How");
   if (body === null) return [];                                   // approachShape reports a missing How
-  const fix = "`spn-devex docs cycles <workstream>` prints the table from the arcs";
+  const fix = "`spn-devex docs cycles show <workstream>` prints the table from the arcs";
   const subsections = [...body.matchAll(/<h3\b[^>]*>([\s\S]*?)<\/h3>/gi)];
   const named = subsections.filter((m) => /^Cycles\b/i.test(flat(m[1]))).at(-1);
   if (!named)
@@ -337,7 +337,7 @@ export function cyclesRule(path: string, text: string): Finding[] {
   if (!withPreviews && !inClosedWorkstream(path))
     return [[CYCLES, `Cycles carries ${CYCLES_HEADER_NO_PREVIEWS} and no Previews column — each row links ` +
       "its arc file and lists that arc's previews and samples (05-artifacts.md § How ends in Cycles) · " +
-      "run `spn-devex docs cycles <workstream>` and replace the table with the one it prints"]];
+      "run `spn-devex docs cycles show <workstream>` and replace the table with the one it prints"]];
 
   // Rows are matched by arc, never by position: the page lists arcs in the order they run.
   const { missing, unknown, stale } = tableDifferences(table!, cyclesOf(home.folder), withPreviews);
@@ -355,7 +355,7 @@ export function cyclesRule(path: string, text: string): Finding[] {
 }
 
 // The command that writes the parts of a page the arcs decide (RD.DEVEX.WORKSPACE.204).
-const WRITES_THE_PAGE = "`spn-devex docs cycles <workstream> --write` writes it from the arcs";
+const WRITES_THE_PAGE = "`spn-devex docs cycles write <workstream>` writes it from the arcs";
 
 /**
  * 05-artifacts.md § How ends in Cycles: on a workstream's page the header's status follows the arcs.

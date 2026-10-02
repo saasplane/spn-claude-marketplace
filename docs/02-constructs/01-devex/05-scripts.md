@@ -151,6 +151,6 @@ This page answers what a script is, how each kind is reached, and what it answer
 | `RD.DEVEX.WORKSPACE.176` | this repository is served with docs commands alone, which is why its own rows are written by a tool the plugins ship | MUST |
 | the foundation's `02-delivery.md` § What it makes checkable | which standards are expected to be answered by a script rather than by a reader | MUST |
 | the foundation's `05-artifacts.md` § The blocks · § The figures | what a produced page is made of, which this folder renders and never decides | MUST |
-| the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | the four kinds of script, the `<group> <action>` shape `commands/` dispatches by, one command entry | MUST |
+| the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | the four kinds of script, the `<group> [<subject>] <action>` shape `commands/` dispatches by, one command entry | MUST |
 
-Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs plugin partner` (or `spn-devex plugin partner`, once installed)
+Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs plugin partner check` (or `spn-devex plugin partner check`, once installed)

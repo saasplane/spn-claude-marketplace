@@ -1,5 +1,5 @@
 import { PLUGIN } from "../../../../helpers/harness.mjs";
-// `behaviour-coverage` — the tests report's measurement. It writes nothing, so every case asserts
+// `behaviours coverage show` — the tests report's measurement. It writes nothing, so every case asserts
 // what it measured, and the one byte-level promise: an unchanged tree measures to the same bytes.
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
@@ -7,7 +7,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { POCKET, SEAT } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
-const TOOL = resolve(PLUGIN, "src", "scripts", "commands", "behaviours", "coverage.ts");
+const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
 const kept = [];
 process.on("exit", () => { for (const d of kept) rmSync(d, { recursive: true, force: true }); });
 
@@ -52,8 +52,13 @@ const runFile = (dir, tier, name, results, ranAt = "2026-09-28T02:00:00Z") => ({
 
 // Pinned so the measured instant reads the same on any machine this suite runs on — the tool reports
 // the newest Updated at in the LOCAL zone with its offset, and the local zone is otherwise whatever the host is.
-const measure = (root, ...args) => execFileSync("node", [TOOL, ...args, root],
-  { encoding: "utf8", env: { ...process.env, TZ: "Asia/Kolkata" } });
+const ENV = { ...process.env, TZ: "Asia/Kolkata", SPN_TELEMETRY: "off" };
+const measure = (root, ...args) => execFileSync("node", [TOOL, "behaviours", "coverage", "show", ...args, root], { encoding: "utf8", stdio: "pipe", env: ENV });
+/** `behaviours coverage` through the entry, with the words typed after it: what it printed, and its exit code. */
+const typed = (...words) => {
+  try { return { out: execFileSync("node", [TOOL, "behaviours", "coverage", ...words], { encoding: "utf8", stdio: "pipe", env: ENV }), code: 0 }; }
+  catch (error) { return { out: `${error.stdout ?? ""}${error.stderr ?? ""}`, code: error.status ?? -1 }; }
+};
 const json = (root) => JSON.parse(measure(root, "--json"));
 
 console.log("=== behaviour-coverage — tier by tier, from the stamped rows");
@@ -301,5 +306,38 @@ console.log("\n=== behaviour-coverage — an absence, and the same bytes twice")
   ok("without --json it prints the tiers for a person", text.includes("UNIT") && text.includes("no run cited") && text.includes("rows 1"), text);
 }
 
-console.log(failed ? `\n  ${failed} of ${total} FAILED — behaviour-coverage` : `\n  all ${total} passed — behaviour-coverage`);
+console.log("\n=== behaviours coverage — the action is a word, and a narrow path counts the rows under it");
+
+{
+  const rowsAt = (path, ...rows) => ({ [`docs/${SEAT.behaviors}/${path}`]: Object.values(register(...rows))[0] });
+  const root = repo({ ...APPS, ...node("packages/iam", "MODULE_SERVER"),
+    ...rowsAt("01-iam/login.md", ["IAM.LOGIN.01", "UNIT", "SUCCESS", "2026-09-28T02:00:00Z · full-1"], ["IAM.LOGIN.02", "UNIT", "PLANNED"]),
+    ...rowsAt("02-pay/card.md", ["PAY.CARD.01", "UNIT", "FAILED", "2026-09-28T02:00:00Z · full-1"]) });
+  const USAGE = "usage: spn-devex behaviours coverage show [<path>] [--json]\n";
+  const none = typed();
+  ok("[MKT.SCRIPTS.111] with no action the entry prints the usage line and says an action is owed",
+    none.code === 2 && none.out === USAGE + "`behaviours coverage` needs an action.\n", none.out);
+  const flag = typed("--json", root);
+  ok("[MKT.SCRIPTS.111] an option where the action belongs is refused with exit 2", flag.code === 2 && flag.out.startsWith(USAGE), flag.out);
+  const option = typed("show", root, "--write");
+  ok("[MKT.SCRIPTS.174] an option the command does not take is refused with exit 2",
+    option.code === 2 && option.out === USAGE + "`behaviours coverage show` does not take `--write`.\n", option.out);
+
+  const whole = json(root);
+  ok("untouched: the repository, measured, counts the rows of both registers and names the report page",
+    whole.rows.length === 3 && whole.report?.exists === false, JSON.stringify([whole.rows.length, whole.report]));
+  const narrow = JSON.parse(typed("show", join(root, "docs", SEAT.behaviors, "02-pay"), "--json").out);
+  ok("[MKT.SCRIPTS.163] a run narrowed to a folder counts the rows of the registers under it, and none beside it",
+    narrow.rows.length === 1 && narrow.rows[0].id === "PAY.CARD.01" && narrow.tiers.find((tier) => tier.tier === "UNIT")?.status.FAILED === 1
+      && narrow.tiers.find((tier) => tier.tier === "UNIT")?.status.SUCCESS === 0, JSON.stringify(narrow.rows));
+  ok("[MKT.SCRIPTS.163] a narrowed measurement says nothing about the report page, whose digest is the whole repository's",
+    narrow.report === null && narrow.digest !== whole.digest && narrow.repository === whole.repository, JSON.stringify([narrow.report, narrow.digest]));
+  const text = typed("show", join(root, "docs", SEAT.behaviors, "02-pay", "card.md")).out;
+  ok("[MKT.SCRIPTS.163] the printed reading of one register counts its row alone, and names no page", text.includes("rows 1 — FAILED 1") && !text.includes("tests-report.html"), text);
+  let inside;
+  try { inside = JSON.parse(execFileSync("node", [TOOL, "behaviours", "coverage", "show", "--json"], { cwd: join(root, "packages", "iam"), encoding: "utf8", stdio: "pipe", env: ENV })); } catch { inside = null; }
+  ok("[MKT.SCRIPTS.113] with no path the run takes the repository the caller is in, from a folder inside it", inside?.rows.length === 3 && inside.digest === whole.digest, JSON.stringify(inside?.rows?.length));
+}
+
+console.log(failed ? `\n  ${failed} of ${total} FAILED — behaviours coverage` : `\n  all ${total} passed — behaviours coverage`);
 process.exit(failed ? 1 : 0);

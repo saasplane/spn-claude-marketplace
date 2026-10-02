@@ -60,7 +60,7 @@ node packages/plugin-spn-devex/tests/run.mjs full-1001</pre>
     </tbody>
   </table></div>
   <p><strong>The runner discards each suite's error stream on purpose.</strong> Some suites exercise the hook that writes warnings there, and inheriting that stream would print a fixture's findings into the summary as though they were this run's. Where you want a suite's error output, run that suite on its own.</p>
-  <p><strong>These suites are a builder's gate.</strong> Several cases name real files in the surrounding workspace, because what they prove is that a check agrees with the corpus, and a corpus cannot be invented. Somebody holding the plugin without the workspace runs <code>partner-shape.ts</code> instead, which needs nothing but the plugin itself.</p>
+  <p><strong>These suites are a builder's gate.</strong> Several cases name real files in the surrounding workspace, because what they prove is that a check agrees with the corpus, and a corpus cannot be invented. Somebody holding the plugin without the workspace runs <code>spn-devex plugin partner check</code> instead, which needs nothing but the plugin itself.</p>
 </section>
 
 <section id="s4">
@@ -85,8 +85,8 @@ node packages/plugin-spn-devex/tests/run.mjs full-1001</pre>
     <h3 id="where-the-rows-stand-today">Where the rows stand today</h3>
     <p>A case whose title carries an id, such as <code>[MKT.SCRIPTS.48]</code>, speaks for its row. A row no case names reads <code>PLANNED</code> in <a href="../../03-behaviors/README.md"><code>03-behaviors/</code></a>, which is true: it is declared rather than proven, until a case title carries its id.</p>
     <p>You can ask the writer what it would do without letting it write, by naming the run to it directly:</p>
-    <pre data-lang="bash">node packages/plugin-spn-devex/src/scripts/cli.ts behaviours stamp full-1001 . --reach repository</pre>
-    <p>It prints one line per row it would change, then a tally. With no <code>--write</code> it changes nothing.</p>
+    <pre data-lang="bash">node packages/plugin-spn-devex/src/scripts/cli.ts behaviours stamp check full-1001 . --reach repository</pre>
+    <p>It prints one line per row it would change, then a tally. The action <code>check</code> changes nothing; only <code>write</code> puts <code>Status</code> and <code>Updated at</code> into the rows.</p>
   </div>
 </section>
 

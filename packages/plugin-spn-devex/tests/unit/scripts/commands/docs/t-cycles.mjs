@@ -145,25 +145,46 @@ try {
 
   console.log("\n=== docs cycles — through the CLI");
   {
-    const printed = await capture(["docs", "cycles", "042"], { SPN_WORKSPACE: TMP });
+    const printed = await capture(["docs", "cycles", "show", "042"], { SPN_WORKSPACE: TMP });
     ok("prints the table and exits 0", printed.code === 0 && printed.out.includes("<th>Arc</th>"), `code ${printed.code}`);
     ok("names the arc whose status the set does not know, on stderr", printed.err.includes("arc-legacy.md"), printed.err);
 
-    const json = await capture(["docs", "cycles", folder, "--json"]);
+    const json = await capture(["docs", "cycles", "show", folder, "--json"]);
     let rows = [];
     try { rows = JSON.parse(json.out); } catch { /* reported below */ }
     ok("--json prints one object per arc", json.code === 0 && rows.length === 6 && rows[0].arc === "N1 — the chapter", json.out.slice(0, 200));
     ok("--json names each arc's file and lists its previews", rows[0]?.file === "N1-the-chapter.md" && Array.isArray(rows[0]?.previews), json.out.slice(0, 200));
 
-    const missing = await capture(["docs", "cycles", "999"], { SPN_WORKSPACE: TMP });
-    ok("an unknown workstream exits 2 and says how to name one", missing.code === 2 && missing.err.includes("no workstream"), missing.err);
+    const SHOW_USAGE = "usage: spn-devex docs cycles show <workstream> [--json]";
+    const WRITE_USAGE = "usage: spn-devex docs cycles write <workstream>";
+    const USAGE = `${SHOW_USAGE}\n${WRITE_USAGE.replace("usage: ", "       ")}`;
+    const missing = await capture(["docs", "cycles", "show", "999"], { SPN_WORKSPACE: TMP });
+    ok("an unknown workstream exits 2 and says how to name one",
+      missing.code === 2 && missing.err === `${SHOW_USAGE}\n\`docs cycles show\` finds no workstream \`999\`. Name its folder, its approach page, or its number, as \`spnutils workspace status\` lists it.`, missing.err);
 
-    const usage = await capture(["docs", "cycles"]);
-    ok("no workstream named is a usage error", usage.code === 2 && usage.err.includes("usage"), usage.err);
+    const bare = await capture(["docs", "cycles"]);
+    ok("[MKT.SCRIPTS.111] with no action the entry prints each usage line, says an action is owed and exits 2",
+      bare.code === 2 && bare.err === `${USAGE}\n\`docs cycles\` needs an action.`, bare.err);
+    const asOption = await capture(["docs", "cycles", "042", "--write"], { SPN_WORKSPACE: TMP });
+    ok("[MKT.SCRIPTS.111] a workstream where the action belongs is refused the same way, and `--write` is named as the action `write`",
+      asOption.code === 2 && asOption.err === `${USAGE}\n\`docs cycles\` needs an action. \`--write\` is the action \`write\`.`, asOption.err);
+    const alone = await capture(["docs", "cycles", "042"], { SPN_WORKSPACE: TMP });
+    ok("[MKT.SCRIPTS.111] a workstream alone, with no action before it, is refused with exit 2 and prints no table", alone.code === 2 && alone.out === "", alone.out);
+    const noShow = await capture(["docs", "cycles", "show"], { SPN_WORKSPACE: TMP });
+    ok("`show` with no workstream says one is owed, and exits 2", noShow.code === 2 && noShow.err === `${SHOW_USAGE}\n\`docs cycles show\` needs a workstream.`, noShow.err);
+    const noWrite = await capture(["docs", "cycles", "write"], { SPN_WORKSPACE: TMP });
+    ok("[MKT.SCRIPTS.112] `write` with no workstream prints its usage line, says one is owed and exits 2",
+      noWrite.code === 2 && noWrite.err === `${WRITE_USAGE}\n\`docs cycles write\` needs a workstream.`, noWrite.err);
+    const two = await capture(["docs", "cycles", "show", "042", "043"], { SPN_WORKSPACE: TMP });
+    ok("a second workstream is refused with exit 2", two.code === 2 && two.err.includes("`docs cycles show` takes one workstream."), two.err);
+    const jsonOnWrite = await capture(["docs", "cycles", "write", "042", "--json"], { SPN_WORKSPACE: TMP });
+    ok("`write` does not take `--json`, and an option neither action takes is refused the same way",
+      jsonOnWrite.code === 2 && jsonOnWrite.err === `${WRITE_USAGE}\n\`docs cycles write\` does not take \`--json\`.`
+        && (await capture(["docs", "cycles", "show", "042", "--write"], { SPN_WORKSPACE: TMP })).code === 2, jsonOnWrite.err);
 
     const empty = join(TMP, ".spndevex", WORKSTREAMS, "open", "043-empty");
     mkdirSync(join(empty, "arcs"), { recursive: true });
-    const none = await capture(["docs", "cycles", empty]);
+    const none = await capture(["docs", "cycles", "show", empty]);
     ok("a workstream with no arcs exits 1", none.code === 1 && none.err.includes("has no arcs"), none.err);
   }
 
@@ -174,12 +195,12 @@ try {
     const head = "# N999 — the layout\n\nStatus: **RUNNING — 2026-10-01.** It lays the page out.\n\n## Previews\n\n| File | Kind | State |\n| --- | --- | --- |\n";
     // KNOWN-BAD: the File cell names its file in backticks and links nothing.
     writeFileSync(join(home, "arcs", "N999-the-layout.md"), head + "| `notes/N999/previews/a-preview.html` | preview | proposed 2026-10-01 |\n");
-    const bad = await capture(["docs", "cycles", home]);
+    const bad = await capture(["docs", "cycles", "show", home]);
     ok("[MKT.SCRIPTS.80] the unlinked row is named on stderr, with the link form",
       bad.code === 0 && bad.err.includes("! N999-the-layout.md") && bad.err.includes("[`a-preview.html`](../notes/N999/previews/a-preview.html)"), bad.err);
     // UNTOUCHED: the same row written as a markdown link.
     writeFileSync(join(home, "arcs", "N999-the-layout.md"), head + "| [`a-preview.html`](../notes/N999/previews/a-preview.html) | preview | proposed 2026-10-01 |\n");
-    const good = await capture(["docs", "cycles", home]);
+    const good = await capture(["docs", "cycles", "show", home]);
     ok("[MKT.SCRIPTS.80] a row written as a link prints no `!` line", good.code === 0 && good.err === "", good.err);
     ok("[MKT.SCRIPTS.80] the link form of a bare file name is written from arcs/",
       cyclesModule.previewLinkForm(join(home, "arcs", "N999-the-layout.md"), "a-preview.html") === "[`a-preview.html`](../notes/N999/previews/a-preview.html)");
@@ -216,7 +237,7 @@ try {
       cyclesModule.headerStatusRule(open, header("DONE", "&#x2705;"), [arcAt("LANDED"), arcAt("RUNNING")])?.gives === "IMPLEMENTING");
   }
 
-  console.log("\n=== docs cycles --write — the parts of a page that the arcs decide");
+  console.log("\n=== docs cycles write — the parts of a page that the arcs decide");
   {
     const { cyclesRule, headerRule, openHeadingRule } = await import("../../../../../src/scripts/checks/doc-check.ts");
     const count = (text, piece) => text.split(piece).length - 1;
@@ -261,9 +282,9 @@ ${linesFor("1.0.0").script}
     const before = readFileSync(page, "utf8");
     ok("known-bad: the page is stale by all three rules before the command runs",
       cyclesRule(page, before).length > 0 && headerRule(page, before).length > 0 && openHeadingRule(page, before).length > 0);
-    const wrote = await capture(["docs", "cycles", "050-write", "--write"], { SPN_WORKSPACE: TMP });
+    const wrote = await capture(["docs", "cycles", "write", "050-write"], { SPN_WORKSPACE: TMP });
     const after = readFileSync(page, "utf8");
-    ok("[MKT.SCRIPTS.79] --write exits 0 and says which parts it wrote",
+    ok("[MKT.SCRIPTS.79] `write` exits 0 and says which parts it wrote",
       wrote.code === 0 && /the header's status/.test(wrote.out) && /the Cycles table/.test(wrote.out) && /the heading of Open/.test(wrote.out), `${wrote.code} ${wrote.out} ${wrote.err}`);
     ok("[MKT.SCRIPTS.79] after it, the Cycles table is the arcs'", cyclesRule(page, after).length === 0, JSON.stringify(cyclesRule(page, after)));
     ok("[MKT.SCRIPTS.79] the header's status is written with its class, its glyph and its word",
@@ -275,8 +296,8 @@ ${linesFor("1.0.0").script}
       count(after, "<th>Arc</th>") === 1 && after.includes("a table that is not Cycles") && after.includes("<h2>Deferred &mdash; parked</h2>"));
     ok("[MKT.SCRIPTS.79] it adds no generated marker to the page", !after.includes("spn:generated"));
     const writtenAt = stamp(page);
-    const again = await capture(["docs", "cycles", "050-write", "--write"], { SPN_WORKSPACE: TMP });
-    ok("[MKT.SCRIPTS.79] a second --write changes no byte, and the file's time does not move",
+    const again = await capture(["docs", "cycles", "write", "050-write"], { SPN_WORKSPACE: TMP });
+    ok("[MKT.SCRIPTS.79] a second `write` changes no byte, and the file's time does not move",
       again.code === 0 && readFileSync(page, "utf8") === after && statSync(page).mtimeMs === writtenAt && /current/.test(again.out), again.out);
 
     // UNTOUCHED: a page that is already current, with its rows in the order a person chose.
@@ -284,13 +305,13 @@ ${linesFor("1.0.0").script}
     ok("the fixture really holds the same rows in another order", current !== after && cyclesRule(page, current).length === 0);
     writeFileSync(page, current);
     const currentAt = stamp(page);
-    const untouched = await capture(["docs", "cycles", page, "--write"]);
+    const untouched = await capture(["docs", "cycles", "write", page]);
     ok("[MKT.SCRIPTS.79] a page that is already current is not written",
       untouched.code === 0 && readFileSync(page, "utf8") === current && statSync(page).mtimeMs === currentAt, untouched.out);
 
     // With no card open the heading has one form.
     const quiet = build("open", "051-quiet", PAGE({ status: "IMPLEMENTING", glyph: "&#x1F6A7;", cyclesBody: CYCLES_H3 + OLD_TABLE, open: "Open &mdash; Q9 &middot; Q10" }));
-    await capture(["docs", "cycles", quiet, "--write"]);
+    await capture(["docs", "cycles", "write", quiet]);
     ok("[MKT.SCRIPTS.79] with no card open the heading reads `Open — no card is open`",
       readFileSync(join(quiet, "approach.html"), "utf8").includes("<h2>Open &mdash; no card is open</h2>"));
 
@@ -298,7 +319,7 @@ ${linesFor("1.0.0").script}
     const N2_FIRST = OLD_TABLE.replace("<tbody><tr>", `<tbody><tr><td><strong>N2 &mdash; the check</strong><br><a class="sds-small" href="arcs/N2-the-check.md">arcs/N2-the-check.md</a></td>` +
       `<td>A check reads the new shape.</td><td>PROPOSED</td><td>&mdash;</td></tr>\n  <tr>`);
     const ordered = build("open", "056-ordered", PAGE({ status: "IMPLEMENTING", glyph: "&#x1F6A7;", cyclesBody: CYCLES_H3 + N2_FIRST }));
-    await capture(["docs", "cycles", ordered, "--write"]);
+    await capture(["docs", "cycles", "write", ordered]);
     const orderedText = readFileSync(join(ordered, "approach.html"), "utf8");
     ok("[MKT.SCRIPTS.79] the rows keep the order the page lists them in",
       cyclesRule(join(ordered, "approach.html"), orderedText).length === 0 && orderedText.indexOf("<strong>N2 &mdash;") < orderedText.indexOf("<strong>N1 &mdash;") &&
@@ -308,30 +329,30 @@ ${linesFor("1.0.0").script}
     const closed = build("closed", "052-closed", PAGE({ cyclesBody: CYCLES_H3 + OLD_TABLE }));
     const closedText = readFileSync(join(closed, "approach.html"), "utf8");
     const closedAt = stamp(join(closed, "approach.html"));
-    const kept = await capture(["docs", "cycles", closed, "--write"]);
+    const kept = await capture(["docs", "cycles", "write", closed]);
     ok("[MKT.SCRIPTS.79] a page in closed/ is not written",
       kept.code === 0 && readFileSync(join(closed, "approach.html"), "utf8") === closedText && statSync(join(closed, "approach.html")).mtimeMs === closedAt, `${kept.code} ${kept.out}`);
 
     // UNTOUCHED: a page with no h3 named Cycles is refused, and nothing is written.
     const shapeless = build("open", "053-shapeless", PAGE({ cyclesBody: `  <h3 id="h9">What re-aligns</h3>\n` + OLD_TABLE }));
     const shapelessText = readFileSync(join(shapeless, "approach.html"), "utf8");
-    const refused = await capture(["docs", "cycles", shapeless, "--write"]);
+    const refused = await capture(["docs", "cycles", "write", shapeless]);
     ok("[MKT.SCRIPTS.79] a page with no h3 named Cycles exits 1 with a message and no write",
       refused.code === 1 && /Cycles/.test(refused.err) && readFileSync(join(shapeless, "approach.html"), "utf8") === shapelessText, `${refused.code} ${refused.err}`);
 
     const pageless = build("open", "054-pageless", null);
-    const noPage = await capture(["docs", "cycles", pageless, "--write"]);
+    const noPage = await capture(["docs", "cycles", "write", pageless]);
     ok("[MKT.SCRIPTS.79] a workstream with no page exits 1", noPage.code === 1 && /no approach page/.test(noPage.err), `${noPage.code} ${noPage.err}`);
 
     // Without the option nothing is written, as before.
     const printed = build("open", "055-printed", PAGE({ cyclesBody: CYCLES_H3 + OLD_TABLE }));
     const printedText = readFileSync(join(printed, "approach.html"), "utf8");
-    const plain = await capture(["docs", "cycles", printed]);
+    const plain = await capture(["docs", "cycles", "show", printed]);
     ok("[MKT.SCRIPTS.79] with no option the command prints the table and writes no file",
       plain.code === 0 && plain.out.includes("<th>Arc</th>") && readFileSync(join(printed, "approach.html"), "utf8") === printedText);
   }
 
-  console.log("\n=== docs cycles --write — a page that holds its own copy of the styles is refused");
+  console.log("\n=== docs cycles write — a page that holds its own copy of the styles is refused");
   {
     // KNOWN-BAD: the page links no shared stylesheet. Its header, its table and its card use the class
     // names of its own copy, and all three parts are stale against the arcs.
@@ -358,18 +379,18 @@ ${linesFor("1.0.0").script}
       return home;
     };
     const own = place("open", "057-own-copy");
-    const refused = await capture(["docs", "cycles", own, "--write"]);
-    ok("[MKT.SCRIPTS.108] --write refuses a page that holds its own copy: exit 1, and the message says how to move it",
+    const refused = await capture(["docs", "cycles", "write", own]);
+    ok("[MKT.SCRIPTS.108] `write` refuses a page that holds its own copy: exit 1, and the message says how to move it",
       refused.code === 1 && refused.err.includes(`approach.html: ${OWN_COPY}`) && refused.err.split(OWN_COPY).length - 1 === 1, `${refused.code} ${refused.err}`);
     ok("[MKT.SCRIPTS.108] and it writes nothing: the page keeps every byte", readFileSync(join(own, "approach.html"), "utf8") === OWN_PAGE);
     ok("[MKT.SCRIPTS.108] it names no part of the page, because it read no class of it",
       !/status badge|Cycles table to write|wrote/.test(refused.err + refused.out), refused.err + refused.out);
-    const printed = await capture(["docs", "cycles", own]);
+    const printed = await capture(["docs", "cycles", "show", own]);
     ok("[MKT.SCRIPTS.108] with no option the table is still printed from the arcs, in the shared names",
       printed.code === 0 && printed.out.includes(`<div class="sds-scroll"><table>`) && printed.out.includes(`<a class="sds-small" href="arcs/N1-the-chapter.md">`), printed.out);
     // A page under `closed/` is never read, so it is neither refused nor written.
     const shut = place("closed", "058-own-copy-closed");
-    const kept = await capture(["docs", "cycles", shut, "--write"]);
+    const kept = await capture(["docs", "cycles", "write", shut]);
     ok("[MKT.SCRIPTS.108] a page under closed/ is not read: exit 0, no word about its styles, and no write",
       kept.code === 0 && !kept.err.includes(OWN_COPY) && readFileSync(join(shut, "approach.html"), "utf8") === OWN_PAGE, `${kept.code} ${kept.out} ${kept.err}`);
   }

@@ -23,7 +23,7 @@
 
 **Source of truth:** the foundation's `04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md` — *The masthead, and the opening*, *The blocks* and *The figures*. This file restates them for an agent that ships without the book beside it; where the two disagree, the book wins.
 
-**You write markdown.** `docs.ts page` produces the HTML, and the shared stylesheet that every page
+**You write markdown.** `docs page write` produces the HTML, and the shared stylesheet that every page
 links supplies every border, background and colour. That gives a block the same form on every page
 and in both themes, so you never add styling to a page. So this file is the whole vocabulary you
 need: what a block is *typed as* in a seat file. The HTML blocks template is the **rendered**
@@ -83,7 +83,7 @@ decoration.
 ## What has no markdown spelling yet
 
 `CATALOG` · `CARDS` · `NEXT` · the `PROSE` panel are named in the chapter and **the renderer produces
-none of them** — there is no markdown that asks for one, and `docs.ts page` adds no navigation. They
+none of them** — there is no markdown that asks for one, and `docs page write` adds no navigation. They
 exist today only as hand-written HTML in the templates. Until that changes, write a table for a
 `CATALOG` and ordinary paragraphs where you wanted a `PROSE` panel, and do not hand-write HTML to
 fake either.

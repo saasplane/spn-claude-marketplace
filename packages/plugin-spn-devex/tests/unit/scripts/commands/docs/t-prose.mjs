@@ -19,15 +19,21 @@ import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 
 const HOOKS = PLUGIN;
-const TOOL = join(HOOKS, "src", "scripts", "commands", "docs", "prose.ts");
+const TOOL = join(HOOKS, "src", "scripts", "cli.ts");
 const BASE = mkdtempSync(join(tmpdir(), "t-prose-triage-"));
 process.on("exit", () => rmSync(BASE, { recursive: true, force: true }));
 
 let n = 0, failed = 0;
 
+/** One `docs prose list` through the entry, with what was typed after the action. */
 function run(args, cwd) {
-  try { return { out: execFileSync("node", [TOOL, ...args], { encoding: "utf8", cwd }), code: 0 }; }
-  catch (e) { return { out: String(e.stdout ?? ""), code: e.status ?? 1 }; }
+  return typed(["list", ...args], cwd);
+}
+
+/** One run of `docs prose` through the entry, typed after the subject. A refusal's text is handed back with the rest. */
+function typed(args, cwd) {
+  try { return { out: execFileSync(process.execPath, [TOOL, "docs", "prose", ...args], { encoding: "utf8", cwd, stdio: "pipe" }), code: 0 }; }
+  catch (e) { return { out: String(e.stdout ?? "") + String(e.stderr ?? ""), code: e.status ?? 1 }; }
 }
 
 function one(label, ok) {
@@ -165,6 +171,71 @@ one("the same idiom quoted with numeric entities is a quotation",
   html("numeric-quote", "The earlier welcome said &#8220;it works out of the box&#8221; and that line was removed from every page last week.")?.paragraphs === 0);
 one("known-bad: the same idiom with no quotation marks is still flagged",
   html("bare-idiom", "The earlier welcome works out of the box and that line was removed from every page last week.")?.paragraphs === 1);
+
+// ── the grammar: an action as a word, the files it names, and a filter ──
+
+{
+  const LIST_USAGE = "usage: spn-devex docs prose list [<path>…] [--comments] [--ledger=<file>] [--record=<file>] [--variant <name>]";
+  const PARAGRAPHS_USAGE = "usage: spn-devex docs prose paragraphs <file>";
+  const USAGE = `${LIST_USAGE}\n${PARAGRAPHS_USAGE.replace("usage: ", "       ")}\n`;
+  const blockOf = (variant) => `<!-- spn:doc\n${JSON.stringify({ id: variant, variant, title: "A page", lenses: ["QA"], summary: "s" })}\n-->\n\n`;
+  // A repository, so a run with no path has one to take: two flagged documents of two variants, and one with no block.
+  const home = join(BASE, "home");
+  mkdirSync(join(home, "docs", "sub"), { recursive: true });
+  writeFileSync(join(home, "sprepo.json"), '{"type":"APPS","name":"t","config":null}');
+  writeFileSync(join(home, "docs", "01-construct.md"), blockOf("construct") + FLAGGED);
+  writeFileSync(join(home, "docs", "02-report.md"), blockOf("report") + FLAGGED);
+  writeFileSync(join(home, "docs", "sub", "03-plain.md"), FLAGGED);
+
+  const bare = typed([], home);
+  one("[MKT.SCRIPTS.111] with no action the entry prints each usage line, says an action is owed and exits 2",
+    bare.code === 2 && bare.out === `${USAGE}\`docs prose\` needs an action.\n`);
+  const asOption = typed(["--paragraphs", join(home, "docs", "01-construct.md")], home);
+  one("[MKT.SCRIPTS.111] `--paragraphs` where the action belongs is named as the action `paragraphs`",
+    asOption.code === 2 && asOption.out === `${USAGE}\`docs prose\` needs an action. \`--paragraphs\` is the action \`paragraphs\`.\n`);
+  one("[MKT.SCRIPTS.111] a path where the action belongs is refused with exit 2", typed([home], BASE).code === 2);
+  const option = typed(["list", home, "--json"], BASE);
+  one("an option the command does not take is refused by its name, with exit 2",
+    option.code === 2 && option.out === `${LIST_USAGE}\n\`docs prose list\` does not take \`--json\`.\n`);
+  one("`paragraphs` takes no option of `list`", typed(["paragraphs", join(home, "docs", "01-construct.md"), "--comments"], BASE).code === 2);
+
+  const whole = typed(["list", home], BASE);
+  one("known-bad: the repository, listed, reports all three documents", candidates(whole.out)?.paragraphs === 3 && candidates(whole.out)?.files === 3);
+  const oneFolder = typed(["list", join(home, "docs", "sub")], BASE);
+  one("a folder names the documents under it, and no document beside it",
+    candidates(oneFolder.out)?.files === 1 && oneFolder.out.includes("03-plain.md") && !oneFolder.out.includes("01-construct.md"));
+  const twoPaths = typed(["list", join(home, "docs", "sub"), join(home, "docs", "02-report.md")], BASE);
+  one("several paths are one run", candidates(twoPaths.out)?.files === 2 && !twoPaths.out.includes("01-construct.md"));
+  const inside = typed(["list"], join(home, "docs"));
+  one("[MKT.SCRIPTS.113] with no path `list` takes the repository the caller is in, from a folder inside it too",
+    candidates(typed(["list"], home).out)?.files === 3 && candidates(inside.out)?.files === 3);
+  const outside = typed(["list"], BASE);
+  one("[MKT.SCRIPTS.113] where the caller is in no repository, `list` with no path says to name one, and exits 2",
+    outside.code === 2 && outside.out === `${LIST_USAGE}\n\`docs prose list\` needs a path here, because the folder it is run from is in no repository. Name a repository.\n`);
+
+  const constructs = typed(["list", home, "--variant", "construct"], BASE);
+  one("[MKT.SCRIPTS.139] `--variant construct` reads the documents whose block declares that variant, and no other",
+    candidates(constructs.out)?.files === 1 && constructs.out.includes("01-construct.md") && !constructs.out.includes("02-report.md") && !constructs.out.includes("03-plain.md")
+      && /scanned\s+1 files/.test(constructs.out));
+  const twoVariants = typed(["list", home, "--variant", "construct", "--variant=report"], BASE);
+  one("[MKT.SCRIPTS.139] `--variant` typed twice reads both kinds, and never a document with no block",
+    candidates(twoVariants.out)?.files === 2 && !twoVariants.out.includes("03-plain.md"));
+  const noSuch = typed(["list", home, "--variant", "guide"], BASE);
+  one("[MKT.SCRIPTS.139] a variant no document declares reads nothing, and exits 0", noSuch.code === 0 && /scanned\s+0 files/.test(noSuch.out));
+  const outsideSet = typed(["list", home, "--variant", "chapter"], BASE);
+  one("[MKT.SCRIPTS.115] a variant outside the set is refused with the set, and exit 2",
+    outsideSet.code === 2 && outsideSet.out.includes("takes `--variant` from approach · overview · construct") && outsideSet.out.includes("and `chapter` is none of them."));
+
+  const printed = typed(["paragraphs", join(home, "docs", "01-construct.md")], BASE);
+  one("[MKT.SCRIPTS.140] `paragraphs` prints each flagged paragraph of the one file, under a line that names the file and the fault",
+    printed.code === 0 && /--- \S*01-construct\.md  \[opener: /.test(printed.out) && printed.out.includes("This is the part that costs people time")
+      && !printed.out.includes("02-report.md"));
+  const noFile = typed(["paragraphs"], home);
+  one("[MKT.SCRIPTS.140] `paragraphs` with no file says a path is owed and exits 2, from inside a repository too",
+    noFile.code === 2 && noFile.out === `${PARAGRAPHS_USAGE}\n\`docs prose paragraphs\` needs a path.\n`);
+  one("[MKT.SCRIPTS.140] and a second file is refused with exit 2",
+    typed(["paragraphs", join(home, "docs", "01-construct.md"), join(home, "docs", "02-report.md")], BASE).code === 2);
+}
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);

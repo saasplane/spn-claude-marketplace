@@ -1,11 +1,13 @@
-#!/usr/bin/env node
 // RESTATES: RD.DEVEX.WORKSPACE.185, and `docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md`.
 // The register row and the chapter are the source of truth. A rule change is edited there first,
 // then here, in the same change.
 //
 // What a workstream's work cost in tokens and in the model's own time, per workstream, arc and order.
 //
-//     spn-devex workspace tokens [<workstream>] [--json] [--root <workspace>] [--projects <folder>]
+//     spn-devex workspace tokens show [<workstream>] [--json] [--root <workspace>] [--projects <folder>]
+//
+// A SUBJECT WITH ONE ACTION. Its one word after the action is a workstream's number or name, which
+// narrows the reading to that workstream. The workspace is `--root`, or the one the caller is in.
 //
 // THE JOIN IS BY SESSION, NEVER BY GUESSING. Each hook telemetry line in
 // `.spndevex/.debug/telemetry/hooks.jsonl` carries `session`, and `workstream`, `arc`, `order` and
@@ -39,6 +41,7 @@
 import { closeSync, existsSync, openSync, readSync, readdirSync, statSync } from "node:fs";
 import { homedir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
+import { type Action, FLAG, UsageFault, VALUE, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 
 type Tag = { workstream: string | null; arc: string | null; order: string | null };
 type TelemetryLine = Tag & { session: string; agent: string | null; at: number };
@@ -335,22 +338,24 @@ function print(result: Report): void {
 
 export const describe = "tokens and the model's own time per workstream, arc and order, joining hook telemetry to the transcripts by session";
 
-export function run(args: string[]): number {
-  const json = args.includes("--json");
-  const valueOf = (flag: string) => { const at = args.indexOf(flag); return at >= 0 ? args[at + 1] : undefined; };
-  const rootArg = valueOf("--root"), projectsArg = valueOf("--projects");
-  const skip = new Set([rootArg, projectsArg].filter(Boolean));
-  const filter = args.find((arg) => !arg.startsWith("--") && !skip.has(arg)) ?? null;
-  const root = resolve(rootArg ?? workspaceRoot(process.cwd()) ?? process.cwd());
-  if (!existsSync(join(root, ".spndevex"))) {
-    console.error(`no workspace at ${root} — run this inside one, or pass --root <workspace>`);
-    return 2;
-  }
-  const projects = resolve(projectsArg ?? projectFolder(root));
+function show(args: string[]): number {
+  const words = readWords(args, { json: FLAG, root: VALUE, projects: VALUE });
+  if (words.paths.length > 1) throw new UsageFault("takes one workstream.");
+  const filter = words.paths[0] ?? null;
+  const root = resolve(words.value("root") ?? workspaceRoot(process.cwd()) ?? process.cwd());
+  if (!existsSync(join(root, ".spndevex")))
+    throw new UsageFault(`needs a workspace, and ${root} is none. Run it inside one, or pass \`--root <workspace>\`.`);
+  const projects = resolve(words.value("projects") ?? projectFolder(root));
   const result = report(root, projects, filter);
-  if (json) console.log(JSON.stringify(result, null, 2));
+  if (words.given("json")) console.log(JSON.stringify(result, null, 2));
   else print(result);
   return 0;
 }
 
-if (process.argv[1] && new URL(import.meta.url).pathname === process.argv[1]) process.exit(run(process.argv.slice(2)));
+export const actions: Record<string, Action> = {
+  show: {
+    describe: "print tokens and the model's own time per workstream, arc and order; with --json, as data",
+    usage: "[<workstream>] [--json] [--root <workspace>] [--projects <folder>]",
+    run: show,
+  },
+};

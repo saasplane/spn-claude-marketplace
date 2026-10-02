@@ -1,7 +1,7 @@
-// `report refresh` — measures a `coverage` or a `tests` report again and writes the numbers into its
-// page. Every case builds a repository and a page in a temporary folder, runs the real command
-// through `cli.ts`, and reads the page back from disk: the numbers it must write, the sentences it
-// must leave, and the pages it must refuse.
+// `report refresh` — measures a `coverage` or a `tests` report again. `write` puts the numbers into
+// its page, and `check` prints them beside the ones the page holds. Every case builds a repository
+// and a page in a temporary folder, runs the real command through `cli.ts`, and reads the page back
+// from disk: the numbers it must write, the sentences it must leave, and the pages it must refuse.
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -39,7 +39,8 @@ const command = (...args) => {
   try { return { code: 0, out: execFileSync(process.execPath, [TOOL, ...args], { encoding: "utf8", env: ENV, stdio: "pipe" }) }; }
   catch (error) { return { code: error.status ?? 1, out: String(error.stdout ?? "") + String(error.stderr ?? "") }; }
 };
-const refresh = (page) => command("report", "refresh", page);
+const refresh = (page) => command("report", "refresh", "write", page);
+const checked = (page) => command("report", "refresh", "check", page);
 
 // ---------------------------------------------------------------------------- the repository
 
@@ -166,7 +167,19 @@ console.log("=== report refresh — a tests report");
 {
   const root = repo(sample());
   const path = placed(root, "tests-report.html", testsPage());
-  const measured = JSON.parse(command("behaviours", "coverage", root, "--json").out);
+  const measured = JSON.parse(command("behaviours", "coverage", "show", root, "--json").out);
+
+  // `check` first, on the stale page: it prints what a write would put there, and leaves every byte.
+  const stale = readFileSync(path, "utf8");
+  const looked = checked(path);
+  ok("[MKT.SCRIPTS.169] `check` exits 0 and says the page would be written, not that it was", looked.code === 0 && /^would write /.test(looked.out) && !/^wrote /m.test(looked.out), looked.out);
+  ok("[MKT.SCRIPTS.169] `check` prints each number it would write, with the number the page holds",
+    looked.out.includes("  tile SUCCESS: 1 / 4 — the page holds 9 / 9\n") && looked.out.includes("  breakdown FAILED: 1 — the page holds 9\n")
+      && looked.out.includes("  By tier · Unit · Written: 3 — the page holds 9\n") && looked.out.includes("  Repository · spn-sample-ts · PLANNED: 1 — the page holds 9\n"), looked.out);
+  ok("[MKT.SCRIPTS.169] and the digest and the measured moment it would write, each beside the page's own",
+    looked.out.includes(`  digest: ${measured.digest} — the page holds ${OLD_DIGEST}\n`) && looked.out.includes("  measuredAt: 2026-09-28T07:30+05:30 — the page holds 2026-08-31T08:00+05:30\n"), looked.out);
+  ok("[MKT.SCRIPTS.169] `check` writes nothing: the page keeps every byte", readFileSync(path, "utf8") === stale);
+
   const ran = refresh(path);
   const text = readFileSync(path, "utf8");
   ok("[MKT.SCRIPTS.81] the command exits 0 and says what it wrote", ran.code === 0 && /wrote/.test(ran.out) && ran.out.includes(measured.digest), ran.out);
@@ -205,6 +218,8 @@ console.log("=== report refresh — a tests report");
   const again = refresh(path);
   ok("[MKT.SCRIPTS.81] a page whose digest already matches is left as it is, and the command says so",
     again.code === 0 && /current/.test(again.out) && readFileSync(path, "utf8") === text && statSync(path).mtimeMs === before, again.out);
+  const settled = checked(path);
+  ok("[MKT.SCRIPTS.169] after the write a `check` reads the page as current, and prints no number", settled.code === 0 && /^current /.test(settled.out) && !settled.out.includes("the page holds"), settled.out);
 }
 
 console.log("\n=== report refresh — a tests report where no run is stamped");
@@ -216,8 +231,12 @@ console.log("\n=== report refresh — a tests report where no run is stamped");
   ok("[MKT.SCRIPTS.82] where no row cites a run the block leaves `measuredAt` out, and never writes `null`",
     ran.code === 0 && !("measuredAt" in block) && block.generatedAt !== "2026-09-01T09:00+05:30", JSON.stringify(block));
   ok("[MKT.SCRIPTS.82] and the command says that Measured still names a moment no run stamped", /no run is stamped/.test(ran.out), ran.out);
-  const audit = command("docs", "audit", path).out;
-  ok("[MKT.SCRIPTS.82] `docs audit` draws no `measuredAt` finding on that page", !/measuredAt/.test(audit), audit);
+  const audit = command("docs", "audit", "check", path).out;
+  ok("[MKT.SCRIPTS.82] `docs audit check` reads that page, and draws no `measuredAt` finding on it", /over 1 page|clean — 1 page/.test(audit) && !/measuredAt/.test(audit), audit);
+  // KNOWN-BAD, so the audit is the reason no finding is drawn: the same page with the key written as `null` draws one.
+  const nulled = placed(root, "tests-report-null.html", readFileSync(path, "utf8").replace(/("generatedAt":"[^"]*")/, '$1,"measuredAt":null'));
+  const refusedKey = command("docs", "audit", "check", nulled).out;
+  ok("[MKT.SCRIPTS.82] known-bad: the same page with `measuredAt` written as `null` draws the finding", /measuredAt/.test(refusedKey), refusedKey);
 }
 
 // ---------------------------------------------------------------------------- a coverage report
@@ -227,6 +246,10 @@ console.log("\n=== report refresh — a coverage report");
   const root = repo(sample());
   const path = placed(root, "coverage-report.html", coveragePage());
   const measured = JSON.parse(command("coverage", "measure", root, "--json").out);
+  const looked = checked(path);
+  ok("[MKT.SCRIPTS.169] `check` of a coverage report prints its numbers and no `measuredAt`, which that report does not carry",
+    looked.code === 0 && looked.out.includes("  tile Written: 4 — the page holds 9\n") && looked.out.includes("  Packages · store · Not proved: 2 — the page holds 9\n")
+      && !looked.out.includes("measuredAt") && readFileSync(path, "utf8").includes(OLD_DIGEST), looked.out);
   const ran = refresh(path);
   const text = readFileSync(path, "utf8");
   ok("[MKT.SCRIPTS.81] a coverage report is refreshed from `coverage measure`", ran.code === 0 && text.includes(measured.digest) && !text.includes(OLD_DIGEST), ran.out);
@@ -296,8 +319,25 @@ console.log("\n=== report refresh — refused by name, and nothing written");
     undated.code === 1 && /digest/.test(undated.out) && readFileSync(noDigest, "utf8").includes("no digest here"), undated.out);
   const plain = placed(root, "notes.html", "<h1>No block</h1>\n");
   ok("[MKT.SCRIPTS.81] known-bad: a file that is not a report page is refused", refresh(plain).code === 1, refresh(plain).out);
-  ok("[MKT.SCRIPTS.81] with no page the command prints its usage line and exits 2",
-    command("report", "refresh").code === 2 && command("report", "refresh").out.includes("usage: spn-devex report refresh <page>"), command("report", "refresh").out);
+  const USAGE = "usage: spn-devex report refresh check <page>\n       spn-devex report refresh write <page>\n";
+  ok("[MKT.SCRIPTS.111] with no action the entry prints each usage line, says an action is owed, and exits 2",
+    command("report", "refresh").code === 2 && command("report", "refresh").out === USAGE + "`report refresh` needs an action.\n", command("report", "refresh").out);
+  const stalePath = placed(root, "tests-report.html", testsPage());
+  const before = readFileSync(stalePath, "utf8");
+  const bare = command("report", "refresh", stalePath);
+  ok("[MKT.SCRIPTS.111] a page where the action belongs is refused with exit 2, and the page keeps every byte",
+    bare.code === 2 && bare.out === USAGE + "`report refresh` needs an action.\n" && readFileSync(stalePath, "utf8") === before, bare.out);
+  for (const action of ["check", "write"]) {
+    const none = command("report", "refresh", action);
+    ok(`[MKT.SCRIPTS.112] \`${action}\` with no page prints its usage line and says a path is owed, with exit 2`,
+      none.code === 2 && none.out === `usage: spn-devex report refresh ${action} <page>\n\`report refresh ${action}\` needs a path.\n`, none.out);
+    const option = command("report", "refresh", action, stalePath, "--json");
+    ok(`[MKT.SCRIPTS.174] \`${action}\` refuses an option it does not take, with exit 2`, option.code === 2 && option.out.includes("does not take `--json`."), option.out);
+    ok(`\`${action}\` refuses a second page with exit 2`, command("report", "refresh", action, stalePath, stalePath).code === 2);
+  }
+  ok("and no refused run wrote", readFileSync(stalePath, "utf8") === before);
+  const refusedCheck = checked(plain);
+  ok("[MKT.SCRIPTS.169] known-bad: `check` refuses a file that is not a report page the way `write` does, with exit 1", refusedCheck.code === 1 && /not a report page/.test(refusedCheck.out), refusedCheck.out);
   // KNOWN-BAD: a report page that links no shared stylesheet. Its tiles, its bar and its cells use the
   // class names of its own copy, and the digest it names is stale, so a refresh would have work to do.
   const ownCopy = testsPage().split(STYLES.stylesheet).join("<style>.side{border:1px solid} .num-cell{text-align:right}</style>")

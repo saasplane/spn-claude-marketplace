@@ -57,7 +57,7 @@ const register = (id, rows) => doc(
 function run(root, args) {
   try {
     return execFileSync(process.execPath, [TOOL, "docs", ...args],
-      { encoding: "utf8", cwd: root, env: { ...process.env, SPN_WORKSPACE: root } });
+      { encoding: "utf8", cwd: root, stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: root } });
   } catch (e) { return String(e.stdout ?? "") + String(e.stderr ?? ""); }
 }
 
@@ -80,22 +80,22 @@ console.log("=== a topic the constructs seat does not name is refused in the oth
     [`docs/${SEAT.capabilities}/01-core/pkg-ts/01-boot.md`]: "# Boot\n\nWhere it lives.\n",
   };
   one("a tree where all three seats name the same topic is clean",
-      run(repo(good), ["topics", "."]), has("clean — 1 repository"));
+      run(repo(good), ["topics", "check", "."]), has("clean — 1 repository"));
 
   one("a numbered behaviours file naming no construct is a RULE",
-      run(repo({ ...good, [`docs/${SEAT.behaviors}/01-core/02-ghost.md`]: register("g", [["CORE.GHOST.01", "x", "UNIT", "PLANNED"]]) }), ["topics", "."]),
+      run(repo({ ...good, [`docs/${SEAT.behaviors}/01-core/02-ghost.md`]: register("g", [["CORE.GHOST.01", "x", "UNIT", "PLANNED"]]) }), ["topics", "check", "."]),
       has("`ghost` is a numbered topic of the behaviours seat"));
 
   one("the same topic under a different domain is a RULE, not a pass",
-      run(repo({ ...good, [`docs/${SEAT.behaviors}/02-other/01-boot.md`]: register("b2", [["CORE.BOOT.02", "x", "UNIT", "PLANNED"]]) }), ["topics", "."]),
+      run(repo({ ...good, [`docs/${SEAT.behaviors}/02-other/01-boot.md`]: register("b2", [["CORE.BOOT.02", "x", "UNIT", "PLANNED"]]) }), ["topics", "check", "."]),
       has("sits under `02-other` here and under `01-core` in the constructs seat"));
 
   one("a capability chapter naming no construct is a RULE",
-      run(repo({ ...good, [`docs/${SEAT.capabilities}/01-core/pkg-ts/02-ghost.md`]: "# Ghost\n" }), ["topics", "."]),
+      run(repo({ ...good, [`docs/${SEAT.capabilities}/01-core/pkg-ts/02-ghost.md`]: "# Ghost\n" }), ["topics", "check", "."]),
       has("`ghost` is a numbered chapter of the capabilities seat"));
 
   one("an unnumbered file in either seat is not a topic and is not judged",
-      run(repo({ ...good, [`docs/${SEAT.behaviors}/01-core/personas.md`]: doc({ id: "p", title: "Personas", lenses: ["QA"], status: "PLANNING" }) }), ["topics", "."]),
+      run(repo({ ...good, [`docs/${SEAT.behaviors}/01-core/personas.md`]: doc({ id: "p", title: "Personas", lenses: ["QA"], status: "PLANNING" }) }), ["topics", "check", "."]),
       has("clean — 1 repository"));
 
   // THE REGRESSION. Unnumbered constructs and numbered behaviours is the corpus mid-move, and the
@@ -104,11 +104,11 @@ console.log("=== a topic the constructs seat does not name is refused in the oth
       run(repo({
         [`docs/${SEAT.constructs}/01-core/boot.md`]: seat("boot"),
         [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: register("b", [["CORE.BOOT.01", "can boot", "UNIT", "PLANNED"]]),
-      }), ["topics", "."]),
+      }), ["topics", "check", "."]),
       (g) => /RULE/.test(g) && !/clean/.test(g));
 
   one("a repository with no constructs seat at all is silent, not noisy",
-      run(repo({ [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: register("b", [["CORE.BOOT.01", "x", "UNIT", "PLANNED"]]) }), ["topics", "."]),
+      run(repo({ [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: register("b", [["CORE.BOOT.01", "x", "UNIT", "PLANNED"]]) }), ["topics", "check", "."]),
       has("clean — 1 repository"));
 }
 
@@ -128,10 +128,10 @@ console.log("\n=== a topic name repeats across domains, and that is not drift");
     [`docs/${SEAT.behaviors}/02-infra/01-shape.md`]: register("b2", [["INFRA.SHAPE.01", "y", "UNIT", "PLANNED"]]),
   };
   one("one name in two domains, with a rows file under each, is clean",
-      run(repo(two), ["topics", "."]), has("clean — 1 repository"));
+      run(repo(two), ["topics", "check", "."]), has("clean — 1 repository"));
 
   one("and a third domain nothing names is still a RULE",
-      run(repo({ ...two, [`docs/${SEAT.behaviors}/03-other/01-shape.md`]: register("b3", [["OTHER.SHAPE.01", "z", "UNIT", "PLANNED"]]) }), ["topics", "."]),
+      run(repo({ ...two, [`docs/${SEAT.behaviors}/03-other/01-shape.md`]: register("b3", [["OTHER.SHAPE.01", "z", "UNIT", "PLANNED"]]) }), ["topics", "check", "."]),
       (g) => /`shape` sits under `03-other` here and under/.test(g) && /`01-apps`/.test(g) && /`02-infra`/.test(g));
 }
 
@@ -142,14 +142,14 @@ console.log("\n=== one id names one document");
       run(repo({
         [`docs/${SEAT.capabilities}/01-core/pkg-ts/README.md`]: doc2("pkg-caps", "Capabilities — pkg-ts"),
         [`docs/${SEAT.capabilities}/01-core/pkg-ts/01-boot.md`]: doc2("pkg-caps", "boot in pkg-ts"),
-      }), ["topics", "."]),
+      }), ["topics", "check", "."]),
       (g) => /`pkg-caps` is the id of 2 documents/.test(g) && (g.match(/RULE ids/g) ?? []).length === 2);
 
   one("a tree where every id is its own is clean",
       run(repo({
         [`docs/${SEAT.capabilities}/01-core/pkg-ts/README.md`]: doc2("pkg-caps", "Capabilities — pkg-ts"),
         [`docs/${SEAT.capabilities}/01-core/pkg-ts/01-boot.md`]: doc2("pkg-boot", "boot in pkg-ts"),
-      }), ["topics", "."]),
+      }), ["topics", "check", "."]),
       has("clean — 1 repository"));
 
   one("three documents under one id say three, not two",
@@ -157,7 +157,7 @@ console.log("\n=== one id names one document");
         [`docs/${SEAT.capabilities}/01-core/a/README.md`]: doc2("same", "A"),
         [`docs/${SEAT.capabilities}/01-core/b/README.md`]: doc2("same", "B"),
         [`docs/${SEAT.capabilities}/01-core/c/README.md`]: doc2("same", "C"),
-      }), ["topics", "."]),
+      }), ["topics", "check", "."]),
       has("`same` is the id of 3 documents"));
 
   // A template carries a placeholder id and is excluded from every walk by folder, not per file.
@@ -165,8 +165,65 @@ console.log("\n=== one id names one document");
       run(repo({
         [`docs/${SEAT.capabilities}/01-core/pkg-ts/README.md`]: doc2("pkg-caps", "Capabilities — pkg-ts"),
         [`docs/${SEAT.capabilities}/${TEMPLATES}/capability-template.md`]: doc2("pkg-caps", "A template"),
-      }), ["topics", "."]),
+      }), ["topics", "check", "."]),
       has("clean — 1 repository"));
+}
+
+// ---------------------------------------------------------------- the grammar: an action, and paths inside a repository
+
+/** What one run printed and its exit code, typed after the group, from the folder given. */
+const typed = (cwd, args) => {
+  try { return { code: 0, out: execFileSync(process.execPath, [TOOL, "docs", ...args], { encoding: "utf8", cwd, stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: cwd } }) }; }
+  catch (error) { return { code: error.status, out: String(error.stdout ?? "") + String(error.stderr ?? "") }; }
+};
+const USAGE = "usage: spn-devex docs topics check [<path>…]\n";
+
+console.log("\n=== `docs topics` needs its action as a word, and a narrow path reports what sits under it");
+{
+  const doc2 = (id, title) => doc({ id, title, lenses: ["ARCHITECT"], status: "PLANNING" });
+  // Two faults in two seats: a behaviours topic no construct names, and one id on two capability faces.
+  const root = repo({
+    [`docs/${SEAT.constructs}/01-core/01-boot.md`]: seat("c-boot"),
+    [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: register("b-boot", [["CORE.BOOT.01", "x", "UNIT", "PLANNED"]]),
+    [`docs/${SEAT.behaviors}/01-core/02-ghost.md`]: register("b-ghost", [["CORE.GHOST.01", "x", "UNIT", "PLANNED"]]),
+    [`docs/${SEAT.capabilities}/01-core/a/README.md`]: doc2("same", "A"),
+    [`docs/${SEAT.capabilities}/01-core/b/README.md`]: doc2("same", "B"),
+  });
+  const GHOST = `docs/${SEAT.behaviors}/01-core/02-ghost.md`;
+
+  const bare = typed(root, ["topics"]);
+  one("[MKT.SCRIPTS.111] with no action the entry prints the usage line, says an action is owed and exits 2",
+    [bare.code, bare.out].join(), `2,${USAGE}\`docs topics\` needs an action.\n`);
+  one("[MKT.SCRIPTS.111] a path where the action belongs is refused with exit 2", typed(root, ["topics", "."]).code, 2);
+  const option = typed(root, ["topics", "check", ".", "--json"]);
+  one("an option the command does not take is refused by its name, with exit 2",
+    [option.code, option.out].join(), `2,${USAGE}\`docs topics check\` does not take \`--json\`.\n`);
+
+  const whole = typed(root, ["topics", "check", "."]);
+  one("known-bad: the repository, checked, reports the topic no construct names and the id of two documents, and exits 1",
+    whole, (got) => got.code === 1 && got.out.includes("`ghost` is a numbered topic") && got.out.includes("`same` is the id of 2 documents") && got.out.includes("3 finding(s) — 3 RULE"));
+  const behaviours = typed(root, ["topics", "check", `docs/${SEAT.behaviors}`]);
+  one("[MKT.SCRIPTS.138] a run narrowed to one seat reports the finding under it, and none from the seat beside it",
+    behaviours, (got) => got.code === 1 && got.out.includes("`ghost` is a numbered topic") && !got.out.includes("`same`") && got.out.includes("1 finding(s) — 1 RULE"));
+  // THE CONSTRUCTS SEAT SITS OUTSIDE THE PATH. A run that read only the one file would have no seat
+  // to compare it with, and would report nothing.
+  const oneFile = typed(root, ["topics", "check", GHOST]);
+  one("[MKT.SCRIPTS.138] a run narrowed to one file still compares it with the constructs seat outside its path",
+    oneFile, (got) => got.code === 1 && got.out.includes("`ghost` is a numbered topic") && got.out.includes("1 finding(s) — 1 RULE"));
+  const oneFace = typed(root, ["topics", "check", `docs/${SEAT.capabilities}/01-core/a`]);
+  one("[MKT.SCRIPTS.138] a run narrowed to one of two documents under one id reports that document, and names the other in its message",
+    oneFace, (got) => got.code === 1 && got.out.includes("1 finding(s) — 1 RULE") && got.out.includes("01-core/b/README.md"));
+  const clean = typed(root, ["topics", "check", `docs/${SEAT.constructs}`]);
+  one("[MKT.SCRIPTS.138] a run narrowed to a folder with no finding is clean and exits 0", clean, (got) => got.code === 0 && got.out.includes("clean — 1 repository"));
+  const several = typed(root, ["topics", "check", GHOST, `docs/${SEAT.capabilities}`]);
+  one("several paths of one repository are one run, and the repository is read once", several, (got) => got.code === 1 && got.out.includes("3 finding(s) — 3 RULE"));
+
+  const inside = typed(join(root, "docs", SEAT.constructs), ["topics", "check"]);
+  one("[MKT.SCRIPTS.113] with no path the run takes the repository the caller is in, from a folder inside it too",
+    [typed(root, ["topics", "check"]).out.includes("3 finding(s)"), inside.out.includes("3 finding(s)"), inside.code].join(), "true,true,1");
+  const outside = typed(BASE, ["topics", "check"]);
+  one("[MKT.SCRIPTS.113] where the caller is in no repository, `check` with no path says to name one, and exits 2",
+    [outside.code, outside.out].join(), `2,${USAGE}\`docs topics check\` needs a path here, because the folder it is run from is in no repository. Name a repository.\n`);
 }
 
 console.log(failed ? `\n  ${failed} of ${n} FAILED — docs topics` : `\n  all ${n} passed — docs topics`);

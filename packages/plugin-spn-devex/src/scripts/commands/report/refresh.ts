@@ -1,18 +1,22 @@
-#!/usr/bin/env node
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § Reports and templates
 //           docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md § Metadata
 // The chapters are the source of truth; a rule change is edited there first, then here, in the same change.
 //
 // Measure a report again and write its numbers into its page.
 //
-//     spn-devex report refresh <page>
+//     spn-devex report refresh check <page>     print each number a write would put on the page, beside the one the page holds
+//     spn-devex report refresh write <page>     write them
+//
+// A SUBJECT WITH TWO ACTIONS, EACH TAKING ONE PAGE. Both measure the repository the page sits in and
+// work out the same page; `write` is the one that saves it.
 //
 // It writes numbers and never a sentence, and it names each row it could not place; the capability
 // chapter "Scripts in spn-devex", § A report's numbers are measured again by a command, says what it
 // refreshes and what it refuses.
 
-import { readFileSync, statSync, writeFileSync } from "node:fs";
-import { basename, dirname, join, relative, resolve } from "node:path";
+import { readFileSync, writeFileSync } from "node:fs";
+import { basename, relative } from "node:path";
+import { type Action, REQUIRED, onePath, readWords, repositoryOf, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { withOffset } from "../../lib/clock.ts";
 import { OWN_COPY, linksSharedStyles } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { foundationAbsence as testsAbsence, measure as measureTests } from "../behaviours/coverage.ts";
@@ -59,17 +63,6 @@ const escaped = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, "\
 /** A count as a report writes it: `1,084`. */
 const written = (count: number): string => count.toLocaleString("en-US");
 
-/** The nearest folder at or above a file that declares itself a repository. */
-function repositoryOf(file: string): string | null {
-  let dir = dirname(resolve(file));
-  for (;;) {
-    try { if (statSync(join(dir, "sprepo.json")).isFile()) return dir; } catch { /* not this folder */ }
-    const up = dirname(dir);
-    if (up === dir) return null;
-    dir = up;
-  }
-}
-
 /** The page's `spn:doc` block: its text as written, where it sits, and its parsed value. */
 function blockOf(page: string): { at: number; text: string; value: Record<string, unknown> } | null {
   const found = /<!--\s*spn:doc\s*([\s\S]*?)-->/.exec(page);
@@ -94,7 +87,7 @@ function sectionOf(page: string, heading: string): { from: number; to: number } 
 
 const sum = (values: number[]): number => values.reduce((all, one) => all + one, 0);
 
-/** A tests report's numbers, from `behaviours coverage` and the join the coverage report counts projects by. */
+/** A tests report's numbers, from `behaviours coverage show` and the join the coverage report counts projects by. */
 function testsNumbers(root: string): Numbers {
   const result = measureTests(root) as Record<string, any>;
   type Tally = { written: number; built: number; status: Record<string, number> };
@@ -217,8 +210,11 @@ function totalOf(rows: MeasuredRow[]): Counts {
 
 // ---------------------------------------------------------------------------- writing the page
 
-/** What one pass over the page wrote, and what it could not place. */
-type Written = { page: string; placed: number; unplaced: string[] };
+/** One number a pass puts on the page: where it sits, what the page holds there, and what the measurement gives. */
+type Change = { where: string; holds: string; writes: string };
+
+/** What one pass over the page wrote, each number it placed, and what it could not place. */
+type Written = { page: string; placed: number; unplaced: string[]; changes: Change[] };
 
 /** A share as a tile writes it: whole, never `100%` short of the whole and never `0%` above nothing. */
 const shareOf = (count: number, of: number): string => {
@@ -235,6 +231,7 @@ const widthOf = (count: number, of: number): string =>
 /** The tiles: each `div.sds-side`, found by its label, from its opening to the next tile or the end of the row of tiles. */
 function writeTiles(page: string, tiles: Numbers["tiles"]): Written {
   const unplaced: string[] = [];
+  const changes: Change[] = [];
   const seen = new Set<string>();
   let placed = 0;
   const out = page.replace(/<div class="sds-side"><span class="sds-label">([^<]*)<\/span>[\s\S]*?(?=\s*<div class="sds-side">|\s*<\/div>\s*<div class="sds-breakdown">|\s*<\/div>\s*<h3|\s*<\/div>\s*<\/section>)/g, (tile, label: string) => {
@@ -243,6 +240,11 @@ function writeTiles(page: string, tiles: Numbers["tiles"]): Written {
     seen.add(measured.label);
     placed += 1;
     const { count, of } = measured;
+    changes.push({
+      where: `tile ${measured.label}`,
+      holds: shown(/<span class="sds-big">([\s\S]*?<\/span>)/.exec(tile)?.[1] ?? ""),
+      writes: of === null ? written(count) : `${written(count)} / ${written(of)}`,
+    });
     let next = tile.replace(/(<span class="sds-big">)[^<]*(<span class="sds-total">)[^<]*(<\/span>)/, (_all, open: string, total: string, close: string) =>
       `${open}${written(count)}${total} / ${of === null ? "" : written(of)}${close}`);
     if (next === tile) next = tile.replace(/(<span class="sds-big">)[^<]*(<\/span>)/, `$1${written(count)}$2`);
@@ -256,25 +258,27 @@ function writeTiles(page: string, tiles: Numbers["tiles"]): Written {
     });
   });
   for (const tile of tiles) if (!seen.has(tile.label)) unplaced.push(`the page has no tile \`${tile.label}\` — ${written(tile.count)}${tile.of === null ? "" : ` of ${written(tile.of)}`}`);
-  return { page: out, placed: placed, unplaced: unplaced };
+  return { page: out, placed: placed, unplaced: unplaced, changes: changes };
 }
 
 /** The breakdown: each legend entry's count, then the bar rebuilt from the legend, one segment for each state above 0. */
 function writeBreakdown(page: string, states: Numbers["states"]): Written {
   const unplaced: string[] = [];
+  const changes: Change[] = [];
   const from = page.indexOf('<div class="sds-breakdown">');
-  if (from < 0) return { page: page, placed: 0, unplaced: ["the page has no breakdown bar"] };
+  if (from < 0) return { page: page, placed: 0, unplaced: ["the page has no breakdown bar"], changes: changes };
   const end = page.indexOf("</ul>", from);
-  if (end < 0) return { page: page, placed: 0, unplaced: ["the breakdown has no legend, so its bar cannot be rebuilt"] };
+  if (end < 0) return { page: page, placed: 0, unplaced: ["the breakdown has no legend, so its bar cannot be rebuilt"], changes: changes };
   let region = page.slice(from, end);
 
   const keys = new Map<string, string>();
   const seen = new Set<string>();
-  region = region.replace(/(<li><i class="sds-breakdown-key ([^"]*)"><\/i>)([^<]*?)(\s*<b>)[^<]*(<\/b>)/g, (entry, open: string, key: string, label: string, bold: string, close: string) => {
+  region = region.replace(/(<li><i class="sds-breakdown-key ([^"]*)"><\/i>)([^<]*?)(\s*<b>)([^<]*)(<\/b>)/g, (entry, open: string, key: string, label: string, bold: string, held: string, close: string) => {
     const measured = states.find((one) => one.label === shown(label));
     if (measured === undefined) { unplaced.push(`the legend entry \`${shown(label)}\` is on the page, and the measurement returns no such state`); return entry; }
     seen.add(measured.label);
     keys.set(measured.label, key);
+    changes.push({ where: `breakdown ${measured.label}`, holds: shown(held), writes: written(measured.count) });
     return `${open}${label}${bold}${written(measured.count)}${close}`;
   });
   for (const state of states) if (!seen.has(state.label)) unplaced.push(`the legend has no entry \`${state.label}\` — ${written(state.count)}`);
@@ -287,7 +291,7 @@ function writeBreakdown(page: string, states: Numbers["states"]): Written {
     const label = states.map((state) => `${state.label} ${written(state.count)}`).join(", ");
     return `${open.replace(/aria-label="[^"]*"/, `aria-label="${label}"`)}${segments.join("")}${close.startsWith("\n") ? close : `\n${close}`}`;
   });
-  return { page: page.slice(0, from) + region + page.slice(end), placed: seen.size, unplaced: unplaced };
+  return { page: page.slice(0, from) + region + page.slice(end), placed: seen.size, unplaced: unplaced, changes: changes };
 }
 
 /**
@@ -303,26 +307,28 @@ function cellClass(column: string, count: number, whole: number | null | undefin
 }
 
 /** One row with its count cells rewritten. A cell that holds a dash, and a column the counts do not name, stay as they are. */
-function writeRow(row: string, columns: string[], counts: Counts): { row: string; cells: number } {
+function writeRow(row: string, columns: string[], counts: Counts, where: string): { row: string; cells: number; changes: Change[] } {
   let at = 0;
   let cells = 0;
+  const changes: Change[] = [];
   const next = row.replace(/<td\b([^>]*)>([\s\S]*?)<\/td>/g, (cell, attributes: string, inner: string) => {
     const column = columns[at];
     at += 1;
     const count = column === undefined ? undefined : counts[column];
     if (at === 1 || count === undefined || count === null || /^(?:—|–|-|&mdash;)$/.test(inner.trim())) return cell;
     cells += 1;
+    changes.push({ where: `${where} · ${column}`, holds: shown(inner), writes: written(count) });
     const marks = /\bclass="([^"]*)"/.exec(attributes)?.[1] ?? "sds-number-cell";
     return `<td class="${cellClass(column, count, counts.Written, marks)}">${written(count)}</td>`;
   });
-  return { row: next, cells: cells };
+  return { row: next, cells: cells, changes: changes };
 }
 
 /** One Findings table, found by its heading: each row the measurement returns is written, and each row on one side alone is named. */
 function writeTable(page: string, table: Numbers["tables"][number]): Written {
   // A table the page leaves out is missing only where the measurement has a row for it: a
   // repository with no package carries a sentence under Packages, and no table.
-  const absent: Written = { page: page, placed: 0, unplaced: table.rows.length === 0 ? [] : [`the page has no \`${table.heading}\` table`] };
+  const absent: Written = { page: page, placed: 0, unplaced: table.rows.length === 0 ? [] : [`the page has no \`${table.heading}\` table`], changes: [] };
   const heading = new RegExp(`<h3\\b[^>]*>\\s*${escaped(table.heading)}\\s*</h3>`).exec(page);
   if (heading === null) return absent;
   const after = heading.index + heading[0].length;
@@ -334,17 +340,19 @@ function writeTable(page: string, table: Numbers["tables"][number]): Written {
 
   const columns = [...found[0].matchAll(/<th\b[^>]*>([\s\S]*?)<\/th>/g)].map((cell) => shown(cell[1]));
   const unplaced: string[] = [];
+  const changes: Change[] = [];
   const seen = new Set<MeasuredRow>();
   let placed = 0;
   const next = found[0].replace(/<tr\b([^>]*)>([\s\S]*?)<\/tr>/g, (row, attributes: string, inner: string) => {
     if (/<th\b/.test(inner)) return row;
-    if (/\bclass="(?:[^"]*\s)?sds-total(?:\s[^"]*)?"/.test(attributes)) {
-      const total = writeRow(row, columns, table.total);
-      placed += total.cells;
-      return total.row;
-    }
     const first = /<td\b[^>]*>([\s\S]*?)<\/td>/.exec(inner)?.[1] ?? "";
     const name = shown(/<strong>([\s\S]*?)<\/strong>/.exec(first)?.[1] ?? first.replace(/<span class="sds-sub-line">[\s\S]*?<\/span>/, ""));
+    if (/\bclass="(?:[^"]*\s)?sds-total(?:\s[^"]*)?"/.test(attributes)) {
+      const total = writeRow(row, columns, table.total, `${table.heading} · ${name}`);
+      placed += total.cells;
+      changes.push(...total.changes);
+      return total.row;
+    }
     const second = shown(/<span class="sds-sub-line">([\s\S]*?)<\/span>/.exec(first)?.[1] ?? "");
     const measured = table.rows.find((one) => !seen.has(one) && one.matches(name, second));
     if (measured === undefined) {
@@ -352,8 +360,9 @@ function writeTable(page: string, table: Numbers["tables"][number]): Written {
       return row;
     }
     seen.add(measured);
-    const wrote = writeRow(row, columns, measured.counts);
+    const wrote = writeRow(row, columns, measured.counts, `${table.heading} · ${name}`);
     placed += wrote.cells;
+    changes.push(...wrote.changes);
     return wrote.row;
   });
   for (const row of table.rows) {
@@ -362,7 +371,7 @@ function writeTable(page: string, table: Numbers["tables"][number]): Written {
     unplaced.push(`${table.heading}: the page has no row for ${/\s/.test(row.label) ? row.label : `\`${row.label}\``} — ${counts}`);
   }
   const start = after + (found.index ?? 0);
-  return { page: page.slice(0, start) + next + page.slice(start + found[0].length), placed: placed, unplaced: unplaced };
+  return { page: page.slice(0, start) + next + page.slice(start + found[0].length), placed: placed, unplaced: unplaced, changes: changes };
 }
 
 /** The block's two moments, written into the block's own text so its layout stays as the author wrote it. */
@@ -393,11 +402,11 @@ function writeBlock(page: string, block: { at: number; text: string }, generated
 /** Prints why a page is not refreshed, and answers the exit code for a refusal. */
 const refused = (reason: string): number => { console.error(reason); return 1; };
 
-/** `spn-devex report refresh <page>`. */
-export function run(args: string[]): number {
-  const named = args.find((arg) => !arg.startsWith("--"));
-  if (named === undefined) { console.error("usage: spn-devex report refresh <page>"); return 2; }
-  const path = resolve(named);
+/** Both actions measure again and work out the page a write would save; `write` is the one that saves it. */
+function run(args: string[], write: boolean): number {
+  const words = readWords(args);
+  const path = onePath(scopeOf(words.paths, REQUIRED));
+  const named = words.paths[0];
   let page: string;
   try { page = readFileSync(path, "utf8"); } catch { return refused(`${named}: no such page`); }
 
@@ -431,7 +440,7 @@ export function run(args: string[]): number {
   const numbers = type === "TESTS" ? testsNumbers(root) : coverageNumbers(root);
   const where = relative(process.cwd(), path) || named;
   if (old === numbers.digest) {
-    console.log(`current  ${where} — its digest ${numbers.digest} is the measurement's, so nothing is written`);
+    console.log(`current  ${where} — its digest ${numbers.digest} is the measurement's, so ${write ? "nothing is written" : "a write would change nothing"}`);
     return 0;
   }
 
@@ -440,6 +449,7 @@ export function run(args: string[]): number {
   const tiles = writeTiles(page, numbers.tiles);
   const breakdown = writeBreakdown(tiles.page, numbers.states);
   unplaced.push(...tiles.unplaced, ...breakdown.unplaced);
+  const changes: Change[] = [...tiles.changes, ...breakdown.changes];
   let next = breakdown.page;
   let cells = 0;
   let tables = 0;
@@ -449,6 +459,7 @@ export function run(args: string[]): number {
     cells += wrote.placed;
     if (wrote.placed > 0) tables += 1;
     unplaced.push(...wrote.unplaced);
+    changes.push(...wrote.changes);
   }
 
   // The digest, wherever the page names the one it was written at.
@@ -480,6 +491,18 @@ export function run(args: string[]): number {
     unplaced.push("no run is stamped, so the block carries no `measuredAt` — Measured says so in its Scope sentence");
   }
 
+  if (!write) {
+    // Each number a write would put on the page, beside the number the page holds there.
+    const differ = changes.filter((one) => one.holds !== one.writes).length;
+    console.log(`would write  ${where} — the ${type.toLowerCase()} report of ${basename(root)}, measured again and not written`);
+    for (const one of changes) console.log(`  ${one.where}: ${one.writes}${one.holds === one.writes ? ", as the page holds" : ` — the page holds ${one.holds}`}`);
+    console.log(`  digest: ${numbers.digest} — the page holds ${old}`);
+    if (numbers.measuredAt !== undefined) console.log(`  measuredAt: ${numbers.measuredAt ?? "left out, because no run is stamped"} — the page holds ${oldMeasuredAt ?? "none"}`);
+    console.log(`  ${changes.length} number(s), and ${differ} of them differ from the page`);
+    for (const line of unplaced) console.log(`  ! ${line}`);
+    return 0;
+  }
+
   writeFileSync(path, next, "utf8");
   console.log(`wrote    ${where} — the ${type.toLowerCase()} report of ${basename(root)}, measured again`);
   console.log(`  ${tiles.placed} tile(s) · ${breakdown.placed} state(s) in the breakdown · ${cells} cell(s) in ${tables} table(s) · digest ${numbers.digest}`);
@@ -490,5 +513,15 @@ export function run(args: string[]): number {
   return 0;
 }
 
-// The exit code is set and the process is left to end by itself, so everything printed is written first.
-if (process.argv[1] && new URL(import.meta.url).pathname === process.argv[1]) process.exitCode = run(process.argv.slice(2));
+export const actions: Record<string, Action> = {
+  check: {
+    describe: "measure a coverage or a tests report again and print each number a write would put on its page, beside the one the page holds",
+    usage: "<page>",
+    run: (args) => run(args, false),
+  },
+  write: {
+    describe: "measure a coverage or a tests report again and write the numbers into its page",
+    usage: "<page>",
+    run: (args) => run(args, true),
+  },
+};

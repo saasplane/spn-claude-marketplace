@@ -3,7 +3,7 @@
   "files": [
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/templates",
-      "seen": "85e71b37"
+      "seen": "09e4d3c8"
     }
   ]
 }
@@ -12,7 +12,7 @@
 
 **The book owns every file here and this folder is a copy.** They are byte-identical to
 `spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/templates/`, and when the two
-disagree the book wins. `restates files --write` writes them and `restates check` reports a copy
+disagree the book wins. `restates files write` writes them and `restates check` reports a copy
 that has fallen behind, so a builder's edit reaches every partner with the next plugin release
 rather than being discovered by somebody's first session going wrong.
 

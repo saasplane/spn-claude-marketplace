@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // What the agent's machinery and its commands cost, read back from the telemetry log.
 //
 // `workspace timings --on` arms the recorder (a switch file under `.spndevex/.debug/`); every hook
@@ -13,8 +12,9 @@
 // row, and the reading says so under the table. A line with no `programs` key is read as it was
 // written: a hook check's line, and a command line from before the key existed.
 //
-//     spn-devex plugin timings [--json] [root]
+//     spn-devex plugin timings show [--json] [<root>]
 //
+// A SUBJECT WITH ONE ACTION. Its one path is a workspace, because the log sits under one.
 // With no root, the workspace holding `.spndevex` is found by walking up from the current directory,
 // the same walk every hook does. Quiet and exit 0 where the log does not exist — a switch left off is
 // a fact about this session, not a finding. A line written before the levels existed reads under its
@@ -22,6 +22,7 @@
 
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { type Action, FLAG, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { workspaceRoot } from "../../../../../plugin-support-lib/src/lib/timing.ts";
 
 type Span = {
@@ -103,9 +104,11 @@ function shown(ms: number): string {
 
 export const describe = "what each script › group › subgroup › action cost — runs, total, median, p95, slowest, failures — read from the telemetry log";
 
-export function run(args: string[]): number {
-  const json = args.includes("--json");
-  const root = resolve(args.find((a) => !a.startsWith("--")) ?? workspaceRoot(process.cwd()) ?? process.cwd());
+function show(args: string[]): number {
+  const words = readWords(args, { json: FLAG });
+  if (words.paths.length > 1) throw new UsageFault("takes one workspace root.");
+  const json = words.given("json");
+  const root = resolve(words.paths[0] ?? workspaceRoot(process.cwd()) ?? process.cwd());
   const spans = readLog(root);
   if (spans.length === 0) {
     if (json) console.log(JSON.stringify({ root, spans: 0, rows: [] }, null, 2));
@@ -131,4 +134,10 @@ export function run(args: string[]): number {
   return 0;
 }
 
-if (process.argv[1] && new URL(import.meta.url).pathname === process.argv[1]) process.exit(run(process.argv.slice(2)));
+export const actions: Record<string, Action> = {
+  show: {
+    describe: "print one row for each script › group › subgroup › action the log holds; with --json, as data",
+    usage: "[--json] [<root>]",
+    run: show,
+  },
+};

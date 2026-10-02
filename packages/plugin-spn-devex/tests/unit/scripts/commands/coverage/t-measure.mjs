@@ -8,7 +8,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { SEAT } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
-const TOOL = resolve(PLUGIN, "src", "scripts", "commands", "coverage", "measure.ts");
+const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
 const kept = [];
 process.on("exit", () => { for (const dir of kept) rmSync(dir, { recursive: true, force: true }); });
 
@@ -57,7 +57,13 @@ const chapter = (pkg, name, ...paths) => ({
 });
 const code = (path) => ({ [path]: "export const value = 1;\n" });
 
-const measure = (root, ...args) => execFileSync("node", [TOOL, ...args, root], { encoding: "utf8" });
+const ENV = { ...process.env, SPN_TELEMETRY: "off" };
+const measure = (root, ...args) => execFileSync("node", [TOOL, "coverage", "measure", ...args, root], { encoding: "utf8", stdio: "pipe", env: ENV });
+/** `coverage measure` through the entry, from the folder given, with the words typed after it: what it printed, and its exit code. */
+const typed = (cwd, ...words) => {
+  try { return { out: execFileSync("node", [TOOL, "coverage", "measure", ...words], { cwd, encoding: "utf8", stdio: "pipe", env: ENV }), code: 0 }; }
+  catch (error) { return { out: `${error.stdout ?? ""}${error.stderr ?? ""}`, code: error.status ?? -1 }; }
+};
 const json = (root) => JSON.parse(measure(root, "--json"));
 const levelOf = (result, path) => [...result.packages, ...result.apps].find((level) => level.path === path);
 
@@ -414,6 +420,51 @@ console.log("=== coverage measure — the answer as a whole");
   const root = repo({ "sprepo.json": '{"type":"FOUNDATION","config":{"mtype":"FOUNDATION"}}' });
   const result = json(root);
   ok("a foundation repository is answered with an absence, not with zeros", result.absence !== null && result.repositoryLevel === null, JSON.stringify(result));
+}
+
+console.log("=== coverage measure — the path, and what the command refuses");
+{
+  const root = repo({
+    ...APPS, ...node("packages/store", "MODULE_SERVER"), ...node("apps/web", "APP_WEB"),
+    ...construct("01-store", ["COR.STORE.01", "SUCCESS"], ["COR.STORE.02", "PLANNED"]),
+    ...chapter("store", "01-store", "src/app/services/StoreService.ts"), ...code("packages/store/src/app/services/StoreService.ts"),
+    [`docs/${SEAT.behaviors}/02-web/README.md`]: "# Behaviors — Web\n",
+  });
+  const whole = json(root);
+  ok("untouched: the repository, measured, carries its totals, its digest, a package, an app and two domains",
+    whole.repositoryLevel !== null && /^sha256:/.test(whole.digest) && whole.packages.length === 1 && whole.apps.length === 1 && whole.domains.length === 2,
+    JSON.stringify([whole.packages.length, whole.apps.length, whole.domains.map((one) => one.domain)]));
+
+  const pkg = JSON.parse(typed(root, "packages/store", "--json").out);
+  ok("[MKT.SCRIPTS.166] a run narrowed to one package prints that package, and no app and no domain beside it",
+    pkg.packages.length === 1 && pkg.packages[0].path === "packages/store" && pkg.apps.length === 0 && pkg.domains.length === 0,
+    JSON.stringify([pkg.packages, pkg.apps, pkg.domains]));
+  ok("[MKT.SCRIPTS.166] the package's numbers are the ones the whole repository measures for it",
+    JSON.stringify(pkg.packages[0]) === JSON.stringify(whole.packages[0]), JSON.stringify(pkg.packages[0]));
+  ok("[MKT.SCRIPTS.166] a narrowed measurement carries no totals, no digest and no page, because each speaks for the whole repository",
+    pkg.repositoryLevel === null && pkg.digest === null && pkg.report === null, JSON.stringify([pkg.repositoryLevel, pkg.digest, pkg.report]));
+  const deep = JSON.parse(typed(root, "packages/store/src/app", "--json").out);
+  ok("[MKT.SCRIPTS.166] a folder inside a package brings the package that holds it", deep.packages.length === 1 && deep.apps.length === 0, JSON.stringify(deep.packages));
+  const domain = JSON.parse(typed(root, `docs/${SEAT.behaviors}/01-core`, "--json").out);
+  ok("[MKT.SCRIPTS.166] a run narrowed to one domain's behaviours prints that domain, and no package",
+    JSON.stringify(domain.domains.map((one) => one.domain)) === '["01-core"]' && domain.packages.length === 0 && domain.wholeRepository === null,
+    JSON.stringify([domain.domains, domain.packages]));
+  const text = typed(root, "packages/store").out;
+  ok("[MKT.SCRIPTS.166] the printed reading of a narrowed run names the package, and prints no totals and no page",
+    /\n\s+packages\/store\s+MODULE_SERVER/.test(text) && !text.includes("totals:") && !text.includes("coverage-report.html") && !text.includes("apps/web"), text);
+
+  const inside = typed(join(root, "apps", "web"), "--json");
+  ok("[MKT.SCRIPTS.113] with no path the run takes the repository the caller is in, from a folder inside it",
+    inside.code === 0 && JSON.parse(inside.out).digest === whole.digest, inside.out.slice(0, 200));
+  const nowhere = mkdtempSync(join(tmpdir(), "coverage-nowhere-"));
+  kept.push(nowhere);
+  const lost = typed(nowhere);
+  ok("[MKT.SCRIPTS.113] where the caller is in no repository, the run with no path says to name one, with exit 2",
+    lost.code === 2 && lost.out === "usage: spn-devex coverage measure [<path>] [--json]\n`coverage measure` needs a path here, because the folder it is run from is in no repository. Name a repository.\n", lost.out);
+  const option = typed(root, ".", "--write");
+  ok("[MKT.SCRIPTS.174] an option the command does not take is refused with exit 2", option.code === 2 && option.out.includes("`coverage measure` does not take `--write`."), option.out);
+  const two = typed(root, ".", "docs");
+  ok("a second path is refused with exit 2", two.code === 2 && two.out.includes("takes one path."), two.out);
 }
 
 console.log(`\n${total - failed} of ${total} passed`);

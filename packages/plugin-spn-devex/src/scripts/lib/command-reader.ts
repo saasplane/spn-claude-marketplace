@@ -8,6 +8,12 @@
 // A program is read by its rule: how many words make its levels, which first words take one more,
 // and which options take a value (so `git -C <dir> status` reads `status`).
 //
+// A PLUGIN COMMAND IS READ BY ITS GRAMMAR: `<group> [<subject>] <action>`. A subject is a command
+// file that names its actions, so `docs face check docs/` reads group `docs`, subgroup `face`,
+// action `check`, and `restates check <book>` reads group `restates`, action `check`. Those are the
+// levels the command's own telemetry line carries. `PLUGIN_SUBJECTS` names each subject, and a case
+// in the suite compares it with the command files.
+//
 // THE FILTER. `DEFAULT_PROGRAMS` names `spnutils`, the three plugin CLIs, `nx`, `git` and `docker`.
 // A workspace may add or remove programs in `.spndevex/.debug/telemetry/filter.json`:
 //
@@ -52,15 +58,33 @@ const pluginCli = (plugin: string) => {
 const DOCKER_GROUPS = ["builder", "buildx", "compose", "config", "container", "context", "image", "manifest", "network",
   "node", "plugin", "secret", "service", "stack", "swarm", "system", "trust", "volume"];
 
+/**
+ * The subjects of each plugin, by group: each command file that names its actions, so its command
+ * is typed as three words. A group's other files are actions of the group, typed as two.
+ */
+export const PLUGIN_SUBJECTS: Record<string, Record<string, string[]>> = {
+  "spn-devex": {
+    behaviours: ["coverage", "ids", "stamp"],
+    docs: ["audit", "coherence", "cycles", "face", "figure", "guide", "index", "page", "parity", "prose", "sds", "status", "topics"],
+    plugin: ["partner", "paths", "timings"],
+    report: ["refresh"],
+    restates: ["decisions", "docs", "files"],
+    workspace: ["tokens"],
+  },
+  "spn-apps": { library: ["catalogue"] },
+  "spn-infra": {},
+};
+
 export const DEFAULT_PROGRAMS: Program[] = [
   { script: "spnutils", matches: named("spnutils"), levels: 2,
     // The groups whose second word has subcommands of its own, read from `spnutils help --json`.
     deeper: { apps: ["migrate"], infra: ["app", "config", "domain", "environment", "organization", "platform", "scaffold", "web"] },
     valued: ["mode", "phase", "usecase", "u", "code", "c", "scope", "s", "support-version", "name", "stack", "organization",
              "platform", "env", "e", "app", "a", "port", "p", "deployment", "unit", "ports", "dist", "from", "timeout"] },
-  { script: "spn-devex", matches: pluginCli("spn-devex"), levels: 2, valued: ["reach", "results"] },
-  { script: "spn-apps", matches: pluginCli("spn-apps"), levels: 2 },
-  { script: "spn-infra", matches: pluginCli("spn-infra"), levels: 2 },
+  { script: "spn-devex", matches: pluginCli("spn-devex"), levels: 2, deeper: PLUGIN_SUBJECTS["spn-devex"],
+    valued: ["block", "finding", "name", "out", "projects", "reach", "root", "variant"] },
+  { script: "spn-apps", matches: pluginCli("spn-apps"), levels: 2, deeper: PLUGIN_SUBJECTS["spn-apps"] },
+  { script: "spn-infra", matches: pluginCli("spn-infra"), levels: 2, deeper: PLUGIN_SUBJECTS["spn-infra"] },
   { script: "nx", matches: named("nx"), levels: 1 },
   { script: "git", matches: named("git"), levels: 1, valued: ["C", "c", "git-dir", "work-tree", "namespace"] },
   { script: "docker", matches: named("docker"), levels: 1,
@@ -235,8 +259,11 @@ function readSegment(words: string[], programs: Program[]): Omit<Reading, "repo"
   }
   // Options before the first level are not the action's args; a run with no level keeps them all.
   const after = levels.length ? rest.slice(last + 1) : rest;
+  // Two words read where three were owed are a group and its subgroup, typed with no action after them.
   const [group, subgroup, action] =
-    levels.length === 3 ? levels : levels.length === 2 ? [levels[0], null, levels[1]] : [null, null, levels[0] ?? null];
+    levels.length === 3 ? levels
+    : levels.length === 2 ? (want === 3 ? [levels[0], levels[1], null] : [levels[0], null, levels[1]])
+    : [null, null, levels[0] ?? null];
   return { script: program.script, group, subgroup, action, args: argsText(after) };
 }
 

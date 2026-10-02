@@ -186,10 +186,10 @@ A **double** stands in for a collaborator and belongs to the unit tier only; a *
 **Every run is named, and `spnutils` runs a tier and writes that run's file, never a row** (`RD.DEVEX.UTILS.071`). Choose one name for the sitting, such as `full-1001`, and give it to every test command: `spnutils apps test <tier> <run> <package>`, `spnutils infra test <run> [package]`. The run writes `tests/.output/<tier>/runs/<run>.json`, and a journey phase writes `<run>.<phase>.json`, so one run name never overwrites itself across phases. A reused name replaces that one file and no other, and each tier keeps its 20 newest. What the run means for the documents is yours, through this plugin's scripts:
 
 ```bash
-node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs behaviours stamp <run> .              # what it would change
-node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs behaviours stamp <run> . --write      # Status and Updated at, from that run
+node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs behaviours stamp check <run> .        # what it would change
+node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs behaviours stamp write <run> .        # Status and Updated at, from that run
 node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs behaviours check .                    # a SUCCESS row the run it cites contradicts
-node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs behaviours coverage --json .          # the tests report's measurement
+node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs behaviours coverage show . --json     # the tests report's measurement
 ```
 
 The writer reads only the run you name, `<run>.json` and every `<run>.<phase>.json` in every node, and refuses a stamp that names none, listing the newest runs it found. It writes `Updated at` as `<time> · <run>`, so a row names the run that proved it. It stamps a row only from a result at the row's own `Tier`, never writes over `MANUAL`, and leaves a row the run did not mention alone unless `--reach repository` says the run is the whole of its tiers. It reads a register by its headings, so an eight-, nine- or ten-cell row is stamped alike. A repository's one root journey run is read wherever it wrote its file, so the rows of every web application it drove are stamped from it (`RD.SUPPORT.APPS.135`). The proof check reads each `SUCCESS` row against the run its `Updated at` cites; a row citing a run whose file is not on disk is counted, never judged. The coverage measurement and the reports read the stamped rows only, and open no run file. A stack's plugin adds what knows the stack — where a case lives, for the join.

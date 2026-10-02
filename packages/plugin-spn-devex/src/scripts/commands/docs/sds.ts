@@ -1,32 +1,30 @@
-#!/usr/bin/env node
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § One stylesheet, served in versions
 // The chapter is the source of truth; a rule change is edited there first, then here.
 //
-// Cut a version of the shared page styles, move the pages of a folder to one, or write a copy of a
-// page that carries its version's styles inside it. Every refusal exits 1 and writes nothing.
+// The shared page styles, served in versions: cut a version, move the pages of a folder to one, or
+// write a copy of a page that carries its version's styles inside it. Every refusal exits 1 and
+// writes nothing.
 //
-//   spn-devex docs sds cut <version> [--root <folder>]
-//   spn-devex docs sds repoint <version> <folder…> [--check] [--root <folder>]
-//   spn-devex docs sds bundle <page> [--assets <folder>]
+//   spn-devex docs sds cut <version> [--root <folder>]                  cut a version
+//   spn-devex docs sds check <version> <folder…> [--root <folder>]      list the pages a move would change
+//   spn-devex docs sds repoint <version> <folder…> [--root <folder>]    move the pages
+//   spn-devex docs sds bundle <page> [--assets <folder>]                write the bundled copy
+//
+// A SUBJECT WITH FOUR ACTIONS, AND A `file` PATH. `check` is the look before `repoint` and writes
+// nothing. The version is a word of its own before the paths, so it is never read as a path.
 
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
-import { basename, dirname, join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { DEVEX_WORKSTREAMS, slashes } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import {
   BUNDLED_SUFFIX, INDEX_SCRIPT, OWN_COPY, PAGE_SCRIPT, SERVED_FILES, STYLESHEET, STYLES_ADDRESS, cutVersions, sharedStyles, stylesDir,
 } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
-import { argsText, begin, commandFacts, end, record } from "../../../../../plugin-support-lib/src/lib/timing.ts";
+import { type Action, REQUIRED, UsageFault, VALUE, onePath, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { resolveWorkspace } from "./_lib.ts";
 
-export const describe = "cut a version of the shared page styles, move pages to one, or bundle a page with its styles inside";
-
-const USAGE = [
-  "usage: spn-devex docs sds cut <version> [--root <folder>]",
-  "       spn-devex docs sds repoint <version> <folder…> [--check] [--root <folder>]",
-  "       spn-devex docs sds bundle <page> [--assets <folder>]",
-].join("\n");
+export const describe = "the shared page styles, served in versions: cut one, move pages to one, or bundle a page with its styles inside";
 
 /** A version as it is typed: three numbers. */
 const VERSION = /^\d+\.\d+\.\d+$/;
@@ -75,28 +73,6 @@ const isFile = (path: string): boolean => {
 function refuse(action: string, reason: string): number {
   console.error(`✗ docs sds ${action} — refused: ${reason}`);
   return 1;
-}
-
-/** What follows `docs sds` on the command line: the plain words in order, and each option. */
-type Typed = { words: string[]; root: string | null; assets: string | null; check: boolean };
-
-/** Read the words and the options, or null where an option is unknown or has no value. */
-function typed(args: string[]): Typed | null {
-  const read: Typed = { words: [], root: null, assets: null, check: false };
-  for (let index = 0; index < args.length; index += 1) {
-    const word = args[index];
-    if (word === "--check") { read.check = true; continue; }
-    if (word === "--root" || word === "--assets") {
-      const value = args[index + 1];
-      if (value === undefined || value.startsWith("--")) return null;
-      if (word === "--root") read.root = value; else read.assets = value;
-      index += 1;
-      continue;
-    }
-    if (word.startsWith("--")) return null;
-    read.words.push(word);
-  }
-  return read;
 }
 
 // ---------------------------------------------------------------------------- the marketplace
@@ -203,21 +179,22 @@ const pagesText = (count: number): string => `${count} page${count === 1 ? "" : 
  * not name reaches the disk unchanged, whatever encoding the page is in.
  */
 function repoint(version: string, folders: string[], check: boolean, root: string | null): number {
+  const action = check ? "check" : "repoint";
   const home = root === null ? null : marketplaceFrom(root);
-  if (root !== null && home === null) return refuse("repoint", NOT_MARKETPLACE(root));
+  if (root !== null && home === null) return refuse(action, NOT_MARKETPLACE(root));
   const styles = home === null ? stylesDir(fileURLToPath(import.meta.url)) : join(home, STYLES_SEAT);
-  if (styles === null) return refuse("repoint", `no \`styles/${VERSIONS_FILE}\` sits above this command, so the list of versions cannot be read`);
+  if (styles === null) return refuse(action, `no \`styles/${VERSIONS_FILE}\` sits above this command, so the list of versions cannot be read`);
   const versions = versionsIn(styles);
-  if (typeof versions === "string") return refuse("repoint", versions);
+  if (typeof versions === "string") return refuse(action, versions);
   if (!(version in versions)) {
     const listed = Object.keys(versions);
-    return refuse("repoint", `nobody cut version \`${version}\`. `
+    return refuse(action, `nobody cut version \`${version}\`. `
       + `${listed.length ? `The versions that exist: ${listed.join(", ")}` : "No version exists yet"}. `
       + `Cut it first with \`docs sds cut ${version}\`, or move the pages to a version that exists`);
   }
   const unreadable = folders.filter((folder) => !isDir(folder) && !(isFile(folder) && folder.endsWith(".html")));
   if (unreadable.length) {
-    return refuse("repoint", `${unreadable.map((folder) => `\`${folder}\``).join(", ")} is not a folder and not a page`);
+    return refuse(action, `${unreadable.map((folder) => `\`${folder}\``).join(", ")} is not a folder and not a page`);
   }
 
   const pages = folders.flatMap((folder) => (isDir(folder) ? pagesUnder(folder) : inClosedWorkstream(folder) ? [] : [folder]));
@@ -329,28 +306,54 @@ async function bundle(page: string, assets: string | null): Promise<number> {
   return 0;
 }
 
-// ---------------------------------------------------------------------------- the command
 
-async function body(args: string[]): Promise<number> {
-  const read = typed(args);
-  const [action, ...rest] = read?.words ?? [];
-  if (read === null || action === undefined) { console.error(USAGE); return 2; }
-  if (action === "cut" && rest.length === 1) return cut(rest[0], read.root);
-  if (action === "repoint" && rest.length >= 2) return repoint(rest[0], rest.slice(1), read.check, read.root);
-  if (action === "bundle" && rest.length === 1) return bundle(rest[0], read.assets);
-  console.error(USAGE);
-  return 2;
+// ---------------------------------------------------------------------------- the actions
+
+/** The version typed before the paths, and the words after it. Throws where no version was typed. */
+function versionFirst(words: string[]): { version: string; rest: string[] } {
+  const [version, ...rest] = words;
+  if (version === undefined) throw new UsageFault("needs a version.");
+  return { version, rest };
 }
 
-/** Run `docs sds` with the words that follow it, and resolve to its exit code. */
-export async function run(args: string[]): Promise<number> {
-  const startedAt = performance.now();
-  begin(commandFacts("spn-devex", args), resolveWorkspace());
-  const code = await body(args);
-  record({ group: "docs", action: "sds", args: argsText(args) }, performance.now() - startedAt, code);
-  end(code);
-  return code;
+function cutAction(args: string[]): number {
+  const words = readWords(args, { root: VALUE });
+  const { version, rest } = versionFirst(words.paths);
+  if (rest.length) throw new UsageFault("takes one version.");
+  return cut(version, words.value("root"));
 }
 
-if (process.argv[1] && basename(process.argv[1]) === "sds.ts")
-  process.exit(await run(process.argv.slice(2)));
+/** `check` and `repoint` are one reading of the pages; `repoint` is the one that writes them. */
+function move(args: string[], check: boolean): number {
+  const words = readWords(args, { root: VALUE });
+  const { version, rest } = versionFirst(words.paths);
+  return repoint(version, scopeOf(rest, REQUIRED), check, words.value("root"));
+}
+
+function bundleAction(args: string[]): Promise<number> {
+  const words = readWords(args, { assets: VALUE });
+  return bundle(onePath(scopeOf(words.paths, REQUIRED)), words.value("assets"));
+}
+
+export const actions: Record<string, Action> = {
+  cut: {
+    describe: "copy the built styles into a version's folder, and list the version",
+    usage: "<version> [--root <folder>]",
+    run: cutAction,
+  },
+  check: {
+    describe: "list the pages a move to the version would change, and write nothing",
+    usage: "<version> <folder…> [--root <folder>]",
+    run: (args) => move(args, true),
+  },
+  repoint: {
+    describe: "move every page under the folders to the version",
+    usage: "<version> <folder…> [--root <folder>]",
+    run: (args) => move(args, false),
+  },
+  bundle: {
+    describe: "write a copy of a page that carries its version's styles inside it",
+    usage: "<page> [--assets <folder>]",
+    run: bundleAction,
+  },
+};

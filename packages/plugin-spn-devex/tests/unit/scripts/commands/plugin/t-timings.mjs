@@ -1,4 +1,4 @@
-// `plugin timings` — the telemetry log read back, grouped by `script` › `group` › `subgroup` ›
+// `plugin timings show` — the telemetry log read back, grouped by `script` › `group` › `subgroup` ›
 // `action`: runs, total, median, p95, slowest and failures per row (RD.DEVEX.WORKSPACE.185, N8 row 2p).
 // A Bash call is one line with a `programs` count, so a total by program holds its time once.
 import { execFileSync } from "node:child_process";
@@ -8,7 +8,15 @@ import { join } from "node:path";
 import { PLUGIN } from "../../../../helpers/harness.mjs";
 import { summarize } from "../../../../../src/scripts/commands/plugin/timings.ts";
 
-const TOOL = join(PLUGIN, "src", "scripts", "commands", "plugin", "timings.ts");
+const TOOL = join(PLUGIN, "src", "scripts", "cli.ts");
+const ENV = { ...process.env, SPN_TELEMETRY: "off" };
+/** `plugin timings show` through the entry, with the words typed after it. */
+const show = (...words) => execFileSync("node", [TOOL, "plugin", "timings", "show", ...words], { encoding: "utf8", stdio: "pipe", env: ENV });
+/** `plugin timings` typed with exactly these words: what it printed, and its exit code. */
+const typed = (...words) => {
+  try { return { out: execFileSync("node", [TOOL, "plugin", "timings", ...words], { encoding: "utf8", stdio: "pipe", env: ENV }), code: 0 }; }
+  catch (error) { return { out: `${error.stdout ?? ""}${error.stderr ?? ""}`, code: error.status ?? -1 }; }
+};
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
   total += 1;
@@ -73,7 +81,7 @@ console.log("\n=== plugin timings — reads a real log on disk, and is quiet wit
 {
   const root = mkdtempSync(join(tmpdir(), "timings-"));
   try {
-    const quiet = execFileSync("node", [TOOL, root], { encoding: "utf8" });
+    const quiet = show(root);
     ok("no log at all exits clean and says so", quiet.includes("no telemetry"), quiet);
 
     const dir = join(root, ".spndevex", ".debug", "telemetry");
@@ -86,12 +94,12 @@ console.log("\n=== plugin timings — reads a real log on disk, and is quiet wit
       "{ not json — a torn line from a truncated write",
     ].join("\n");
     writeFileSync(join(dir, "hooks.jsonl"), lines + "\n", "utf8");
-    const out = execFileSync("node", [TOOL, "--json", root], { encoding: "utf8" });
+    const out = show("--json", root);
     const parsed = JSON.parse(out);
     ok("the torn line is skipped, not a crash, and the three good ones are read", parsed.spans === 3, out);
     const events = parsed.rows.find((r) => r.group === "events");
     ok("the JSON form carries the same median", events?.medianMs === 52.5, out);
-    const text = execFileSync("node", [TOOL, root], { encoding: "utf8" });
+    const text = show(root);
     ok("the reading names each level and each column", /spn-devex/.test(text) && /events pretooluse/.test(text)
       && /Runs/.test(text) && /Total/.test(text) && /p95/.test(text) && /Slowest/.test(text) && /Failures/.test(text), text);
     ok("a log with no call that ran several programs says nothing about them", !/more than one program/.test(text), text);
@@ -99,13 +107,22 @@ console.log("\n=== plugin timings — reads a real log on disk, and is quiet wit
     const command = { script: "git", group: null, subgroup: null, action: "add", args: "x", event: "command", tool: "Bash", ms: 900, exit: 1,
       at: "2026-10-01T00:00:00Z", repo: "spn-x", pid: 1, session: "s", agent: null, workstream: null, arc: null, order: null, programs: 3 };
     writeFileSync(join(dir, "hooks.jsonl"), lines + "\n" + JSON.stringify(command) + "\n", "utf8");
-    const withCall = JSON.parse(execFileSync("node", [TOOL, "--json", root], { encoding: "utf8" }));
+    const withCall = JSON.parse(show("--json", root));
     const git = withCall.rows.find((r) => r.script === "git");
     ok("[MKT.SCRIPTS.97] the log's one line for a failed call of three programs reads as one run, one failure",
       git?.runs === 1 && git?.totalMs === 900 && git?.failures === 1 && git?.compound === 1, JSON.stringify(git));
-    const printed = execFileSync("node", [TOOL, root], { encoding: "utf8" });
+    const printed = show(root);
     ok("[MKT.SCRIPTS.97] and the reading says the call's whole time is under its first program",
       /1 Bash call\(s\) ran more than one program/.test(printed), printed);
+
+    const USAGE = "usage: spn-devex plugin timings show [--json] [<root>]\n";
+    const none = typed(root);
+    ok("[MKT.SCRIPTS.111] with no action the entry prints the usage line and says an action is owed",
+      none.code === 2 && none.out === USAGE + "`plugin timings` needs an action.\n", none.out);
+    const option = typed("show", root, "--on");
+    ok("[MKT.SCRIPTS.174] an option the command does not take is refused with exit 2", option.code === 2 && option.out === USAGE + "`plugin timings show` does not take `--on`.\n", option.out);
+    const two = typed("show", root, root);
+    ok("a second root is refused with exit 2", two.code === 2 && two.out.includes("takes one workspace root."), two.out);
   } finally {
     rmSync(root, { recursive: true, force: true });
   }

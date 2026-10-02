@@ -1,4 +1,4 @@
-// `plugin partner` — proves every hook survives a repo carrying only what a partner has. These cases
+// `plugin partner check` — proves every hook survives a repo carrying only what a partner has. These cases
 // are about where the proof finds a plugin's files, which is the part most likely to silently break.
 // A checkout keeps each plugin under `packages/plugin-<name>/src/`, with its sources beside its
 // bundles. An installed plugin's root holds `dist/`, `scripts/` and `hooks/` and no `src/` folder,
@@ -11,7 +11,8 @@ import { dirname, join } from "node:path";
 import { PLUGIN } from "../../../../helpers/harness.mjs";
 import { declared, HOOK_SCRIPT, main, pluginHomes } from "../../../../../src/scripts/commands/plugin/partner.ts";
 
-const TOOL = join(PLUGIN, "src", "scripts", "commands", "plugin", "partner.ts");
+const TOOL = join(PLUGIN, "src", "scripts", "cli.ts");
+const ENV = { ...process.env, SPN_TELEMETRY: "off" };
 let total = 0, failed = 0;
 const ok = (label, condition, detail = "") => {
   total += 1;
@@ -55,12 +56,27 @@ console.log("\n=== plugin partner — the real sweep, against this checkout");
   // what a partner has. Run from the real checkout, because a fixture cannot fabricate the plugin
   // tree this check exists to sweep.
   let out = "", code = 0;
-  try { out = execFileSync("node", [TOOL], { encoding: "utf8", cwd: PLUGIN }); }
+  try { out = execFileSync("node", [TOOL, "plugin", "partner", "check"], { encoding: "utf8", cwd: PLUGIN, stdio: "pipe", env: ENV }); }
   catch (e) { out = String(e.stdout ?? ""); code = e.status ?? 1; }
   ok("every declared hook is found and none crashes in the fixture",
     code === 0 && out.includes("hook run(s) — every one survives a repo with no foundation"), out.slice(-400));
   ok("and the declared count is now non-zero, printed in the summary",
     code === 0 && !/^0 declared script/m.test(out), out.slice(-400));
+  ok("[MKT.SCRIPTS.172] a command is swept through the entry, by its words, and each one is found",
+    out.includes("✔ scripts/cli.ts restates check") && out.includes("✔ scripts/cli.ts docs prose list ."), out.slice(0, 600));
+
+  const typed = (...words) => {
+    try { return { out: execFileSync("node", [TOOL, "plugin", "partner", ...words], { encoding: "utf8", cwd: PLUGIN, stdio: "pipe", env: ENV }), code: 0 }; }
+    catch (e) { return { out: String(e.stdout ?? "") + String(e.stderr ?? ""), code: e.status ?? 1 }; }
+  };
+  const USAGE = "usage: spn-devex plugin partner check [--keep]\n";
+  ok("[MKT.SCRIPTS.111] with no action the entry prints the usage line and says an action is owed",
+    typed().code === 2 && typed().out === USAGE + "`plugin partner` needs an action.\n", typed().out);
+  ok("[MKT.SCRIPTS.111] `--keep` alone is no action, and is refused with exit 2", typed("--keep").code === 2 && typed("--keep").out.startsWith(USAGE));
+  ok("[MKT.SCRIPTS.174] an option the command does not take is refused with exit 2",
+    typed("check", "--json").code === 2 && typed("check", "--json").out === USAGE + "`plugin partner check` does not take `--json`.\n", typed("check", "--json").out);
+  ok("a path is refused with exit 2, because the proof builds its own fixture",
+    typed("check", ".").code === 2 && typed("check", ".").out.includes("takes no path"), typed("check", ".").out);
 }
 
 console.log("\n=== plugin partner — from an installed plugin, which has no `src/` folder");
@@ -87,7 +103,7 @@ console.log("\n=== plugin partner — from an installed plugin, which has no `sr
     const realLog = console.log;
     console.log = (...args) => lines.push(args.join(" "));
     let code;
-    try { code = main([], here); } finally { console.log = realLog; }
+    try { code = main(false, here); } finally { console.log = realLog; }
     return { code, out: lines.join("\n") };
   };
   const QUIET = "process.exit(0);\n";

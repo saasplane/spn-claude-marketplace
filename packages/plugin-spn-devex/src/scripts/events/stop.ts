@@ -1323,7 +1323,7 @@ export function checkPageCurrent(touched: Set<string> | null): Warning[] {
     `An arc you wrote this turn left its page behind — ` +
     behind.map((one) => `\`${one.workstream}\`: ${one.parts.join(", ")}`).join(" · ") +
     `. The parts of a page that the arcs decide are produced, never typed (RD.DEVEX.WORKSPACE.204). Run ` +
-    behind.map((one) => `\`spn-devex docs cycles ${one.workstream} --write\``).join(" and ") +
+    behind.map((one) => `\`spn-devex docs cycles write ${one.workstream}\``).join(" and ") +
     `, which writes the header's status, the Cycles table and the heading of \`Open\` from the arcs. The rest ` +
     `of the page is yours to bring current in the same turn (05-artifacts.md § How ends in Cycles).` }];
 }
@@ -1351,7 +1351,7 @@ export function checkOwnCopy(root: string, mine: Set<string> | null = null, told
   return [{ check: "own-copy", message:
     `[RULE] ${fresh.join("\n[RULE] ")}\n` +
     `Until such a page links \`sds-docs.css\`, its cards are read by their \`id\`, and the shape of a card, ` +
-    `the header's status and the parts that \`docs cycles --write\` writes are not checked. Each page is ` +
+    `the header's status and the parts that \`docs cycles write\` writes are not checked. Each page is ` +
     `named once in a session.` }];
 }
 

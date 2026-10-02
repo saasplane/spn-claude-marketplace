@@ -48,11 +48,11 @@ console.log("\n=== 5.1 — each report type: its command, its tables and its rec
 const TYPES = {
   "Coverage": [/spn-devex coverage measure <repo> --json/, /Name · Written · Built · Proved · Not written · Not built · Not proved/, /level 1 the gap/,
     /A `MANUAL` row counts in none of the numbers — MUST[\s\S]*Proved by hand/],
-  "Tests": [/spn-devex behaviours coverage <repo> --json/, /Tier · Runs · Written · Built · SUCCESS · FAILED · PENDING · PLANNED/, /The tests report reads the stamped rows only/, /level 1 the status/,
+  "Tests": [/spn-devex behaviours coverage show <repo> --json/, /Tier · Runs · Written · Built · SUCCESS · FAILED · PENDING · PLANNED/, /The tests report reads the stamped rows only/, /level 1 the status/,
     /A `MANUAL` row counts in none of the numbers — MUST[\s\S]*Proved by hand/],
   "Audit": [/spnutils apps validate repo/, /Plugin · Declared · Installed · Source · State/, /setup only — MUST/, /level 1 the area/],
   "Code": [/spnutils apps check <package>/, /Group · Checks · PASS · WARN · FAIL/, /Lint is one check per package/, /level 1 the rule group/],
-  "Docs": [/docs status <repo>\/docs\/02-constructs --check/, /Docs folder · Pages · DONE · IMPLEMENTING · PLANNING · No status/, /Rule · State · Pages/, /level 1 the rule/],
+  "Docs": [/spn-devex docs status check <repo>\/docs\/02-constructs/, /the action is `check`, never `write`/, /Docs folder · Pages · DONE · IMPLEMENTING · PLANNING · No status/, /Rule · State · Pages/, /level 1 the rule/],
 };
 for (const [type, patterns] of Object.entries(TYPES)) {
   const text = section(`${type} — `);
@@ -64,7 +64,7 @@ console.log("\n=== what the commands changed, stated where the agent reads it");
 check("[MKT.SCRIPTS.82] a tests report with no stamped run leaves `measuredAt` out, in the block's line and in the Measure row",
   /Where no row cites a run, the block leaves `measuredAt` out/.test(SKILL) && /leave the key out of the block and say so in Measured/.test(section("Tests — ")));
 check("[MKT.SCRIPTS.81] the skill names the refresh command, what it writes and what it leaves to the agent",
-  /`spn-devex report refresh <page>` measures a `coverage` or a `tests` report again/.test(SKILL) && /\*\*What it leaves to you\*\*: every sentence/.test(SKILL)
+  /`spn-devex report refresh write <page>` measures a `coverage` or a `tests` report again/.test(SKILL) && /\*\*What it leaves to you\*\*: every sentence/.test(SKILL)
     && /An `audit`, `code` or `docs` report is refused by name/.test(SKILL));
 check("item 22: a self-dependency is no finding where the package's own source imports the package by its name",
   /\| Audit \| a self-dependency, which is no finding where the package's own source imports the package by its name;/.test(SKILL));

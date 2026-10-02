@@ -1,7 +1,11 @@
-#!/usr/bin/env node
 // The tests report's measurement — every behaviour row, read as the stamp wrote it.
 //
-//     spn-devex behaviours coverage [--json] [root]
+//     spn-devex behaviours coverage show [<path>] [--json]
+//
+// A SUBJECT WITH ONE ACTION, AND A `tree` PATH. The command finds the repository from the path. Handed
+// the repository, it measures every row. Handed a folder or a register inside it, it counts only the
+// rows whose register sits under the path, and it says nothing about the report page, because the
+// page's digest is the whole repository's.
 //
 // It reads the stamped rows only: each row's `Status`, and the run its `Updated at` cites. It opens
 // no run file, so what it counts is what the stamp wrote (the book's RD.DEVEX.UTILS.071). It measures
@@ -18,6 +22,7 @@ import { createHash } from "node:crypto";
 import { withOffset } from "../../lib/clock.ts";
 import { readdirSync, statSync } from "node:fs";
 import { basename, join, relative, resolve } from "node:path";
+import { type Action, FLAG, OPTIONAL, onePath, readWords, repositoryOf, scopeOf, under } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { DOCS, reportsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { declaredIds, declaredRows, idsIn } from "../../../../../plugin-support-lib/src/lib/register.ts";
 import { owedBy, TIERS } from "../../../../../plugin-support-lib/src/lib/kinds.ts";
@@ -190,11 +195,18 @@ const isManual = (row: { status: string | null }): boolean => row.status === "MA
 const manualOf = (group: Array<{ id: string; file: string; status: string | null }>) =>
   group.filter(isManual).map((row) => ({ id: row.id, file: row.file }));
 
-/** The measurement for one repository. */
-export function measure(root: string): Record<string, unknown> {
+/**
+ * The measurement for one repository. `scope` narrows it to the rows whose register sits under one
+ * of those paths; a narrowed measurement carries no `report`, because the page's digest is the whole
+ * repository's.
+ */
+export function measure(root: string, scope: string[] | null = null): Record<string, unknown> {
   const nodes = nodesOf(root);
   const nameOf = (node: string): string => relative(root, node).split("\\").join("/") || ".";
-  const { rows: declared, repeated } = declaredRows(root);
+  const inScope = (file: string): boolean => scope === null || under(join(root, file), scope);
+  const everyRow = declaredRows(root);
+  const declared = everyRow.rows.filter((row) => inScope(row.file));
+  const repeated = everyRow.repeated.filter((one) => one.rows.some((row) => inScope(row.file)));
   const findings: Finding[] = [];
   const owedByNode = new Map(nodes.map((node) => [nameOf(node), owedBy(kindOf(node))]));
 
@@ -319,9 +331,10 @@ export function measure(root: string): Record<string, unknown> {
     domains: domains,
     wholeRepository: wholeRepository,
     manual: [...domains.flatMap((domain) => domain.manual), ...wholeRepository.manual],
-    findings: findings,
+    findings: findings.filter((one) => inScope(one.project)),
   };
   const digest = digestOf(measured);
+  if (scope !== null) return { ...measured, digest: digest, report: null };
   const page = read(join(root, TESTS_REPORT));
   return { ...measured, digest: digest, report: { path: TESTS_REPORT, exists: page !== null, current: page !== null && page.includes(digest) } };
 }
@@ -362,14 +375,20 @@ export function describeResult(result: Record<string, any>): string[] {
 
 export const describe = "the tests report's measurement — every behaviour row, read as the stamp wrote it";
 
-export function run(args: string[]): number {
-  const root = resolve(args.find((a) => !a.startsWith("--")) ?? ".");
-  const result = foundationAbsence(root) ?? measure(root);
-  if (args.includes("--json")) console.log(JSON.stringify(result, null, 2));
+function show(args: string[]): number {
+  const words = readWords(args, { json: FLAG });
+  const path = onePath(scopeOf(words.paths, OPTIONAL));
+  const root = repositoryOf(path) ?? path;
+  const result = foundationAbsence(root) ?? measure(root, resolve(path) === root ? null : [path]);
+  if (words.given("json")) console.log(JSON.stringify(result, null, 2));
   else for (const line of describeResult(result)) console.log(line);
   return 0;
 }
 
-// The exit code is set and the process is left to end by itself, so `--json` sent through a pipe is
-// written whole before the process ends.
-if (process.argv[1] && new URL(import.meta.url).pathname === process.argv[1]) process.exitCode = run(process.argv.slice(2));
+export const actions: Record<string, Action> = {
+  show: {
+    describe: "print the measurement of the rows under the path; with --json, as data",
+    usage: "[<path>] [--json]",
+    run: show,
+  },
+};

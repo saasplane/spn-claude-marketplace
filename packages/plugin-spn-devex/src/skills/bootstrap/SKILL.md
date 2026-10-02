@@ -95,7 +95,7 @@ An approach page argues. The routing test in `refs/devex/workspace/docs/doc-sets
 
 Two further reasons hold in a partner's folder, where this walk almost always runs:
 
-- **An approach page is hand-written HTML with a fixed shape** — a masthead naming its audience, a folding outline, and a `How` section carrying both its halves. The shape lives in a template inside `spn-foundation`, which a partner never checks out, and `docs.ts page` produces construct pages only. There is nothing for a partner to copy.
+- **An approach page is hand-written HTML with a fixed shape** — a masthead naming its audience, a folding outline, and a `How` section carrying both its halves. The shape lives in a template inside `spn-foundation`, which a partner never checks out, and `docs page write` produces construct pages only. There is nothing for a partner to copy.
 - **A `.md` file under `.spndevex/` is state rather than corpus**, so `doc-check` leaves it alone. Nothing stands between the sentence the developer just said and the file it lands in.
 
 `refs/devex/workspace/workspace.md` already blesses this shape: a subject with an arc and no approach page is valid, not a gap. **Where the developer asks for the argument written up, that is an ordinary page in an ordinary sitting** — offer it after act 4, and never let the walk wait on it.

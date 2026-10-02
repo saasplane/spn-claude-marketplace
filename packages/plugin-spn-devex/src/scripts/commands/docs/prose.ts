@@ -1,18 +1,21 @@
-#!/usr/bin/env node
 // RESTATES: RD.DEVEX.WORKSPACE.096 rule 7 and RD.DEVEX.WORKSPACE.115. The chapters are the source of truth.
 //
-// Find the paragraphs worth rewriting, so a prose pass reads candidates rather than a corpus.
+// The paragraphs worth rewriting, so a prose pass reads candidates rather than a corpus.
 //
 // Workstream 008 covers every prose sentence in the workspace — 33,166 of them at the time this was
 // written. Handing that to agents whole is the expensive way to do it, and most of it needs no
 // change. Six of the nine faults that workstream names are detectable by pattern, so this reports
 // where they are and a rewriting pass reads only those paragraphs and their headings.
 //
-//   spn-devex docs prose [path ...]            report per file, most candidates first
-//   spn-devex docs prose --comments            include prose in code comments, not markdown alone
-//   spn-devex docs prose --paragraphs <path>   print the flagged paragraphs of one file
-//   spn-devex docs prose --ledger=<file>       skip files whose content hash is already recorded
-//   spn-devex docs prose --record=<file>       append the hashes of every file reported
+//   spn-devex docs prose list [<path>…]     report per file, most candidates first
+//       --comments                           include prose in code comments, not markdown alone
+//       --ledger=<file>                      skip files whose content hash is already recorded
+//       --record=<file>                      append the hashes of every file reported
+//       --variant <name>                     read only the documents whose block declares that variant
+//   spn-devex docs prose paragraphs <file>  print the flagged paragraphs of one file
+//
+// A SUBJECT WITH TWO ACTIONS, AND A `file` PATH. A path names one file, or a folder of them, and the
+// command reads exactly those. With no path, `list` reads the repository the caller is in.
 //
 // What it never reads is what must never change: a code block, a table row, a heading, front matter
 // and the reading strip are all removed before anything is scored, because `proseOf` removes them. A
@@ -25,8 +28,10 @@
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readdirSync, readFileSync, realpathSync, statSync, appendFileSync } from "node:fs";
-import { basename, extname, join, resolve } from "node:path";
+import { extname, join, resolve } from "node:path";
 import { isFile, read } from "../../lib/payload.ts";
+import { type Action, FLAG, OPTIONAL, REQUIRED, VALUE, onePath, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
+import { VARIANTS, readBlock } from "./_lib.ts";
 import { BLOCK_BREAK, IDIOM, MARKED, opening, proseOf, sentences, type Sentence } from "../../checks/doc-check.ts";
 
 const SKIP_DIR = new Set(["node_modules", ".git", "dist", "build", ".nx", "coverage", ".output",
@@ -281,11 +286,16 @@ function digest(path: string): string {
 
 type Row = [path: string, blocks: number, sentences: number, flagged: Array<[string, Sentence[], Record<string, string>]>];
 
-function survey(roots: string[], done: Set<string>, comments: boolean): [Row[], number] {
+/**
+ * `variants` narrows the survey to the documents whose block declares one of them. A file with no
+ * block, such as a source file read for its comments, declares none and is left out of such a run.
+ */
+function survey(roots: string[], done: Set<string>, comments: boolean, variants: string[] = []): [Row[], number] {
   const rows: Row[] = [];
   let skipped = 0;
   for (const path of filesUnder(roots, comments)) {
     const raw = read(path);
+    if (variants.length && !variants.includes(readBlock(raw).block?.variant ?? "")) continue;
     if (done.has(digest(path))) { skipped += 1; continue; }
     const style = CODE_EXT[extname(path)];
     const blocks = style ? proseComments(path, style) : paragraphs(raw);
@@ -297,45 +307,23 @@ function survey(roots: string[], done: Set<string>, comments: boolean): [Row[], 
   return [rows, skipped];
 }
 
-export function main(argv: string[]): number {
-  const args = argv.filter((a) => !a.startsWith("--"));
-  const flags = argv.filter((a) => a.startsWith("--"));
-  const opt: Record<string, string | true> = {};
-  for (const flag of flags) {
-    const at = flag.indexOf("=");
-    if (at >= 0) opt[flag.slice(0, at)] = flag.slice(at + 1);
-    else opt[flag] = true;
-  }
-  const roots = args.length ? args : ["."];
+function list(args: string[]): number {
+  const words = readWords(args, { comments: FLAG, ledger: VALUE, record: VALUE, variant: VARIANTS });
+  const roots = scopeOf(words.paths, OPTIONAL);
   let done = new Set<string>();
-  const ledger = opt["--ledger"];
-  if (typeof ledger === "string" && isFile(ledger))
+  const ledger = words.value("ledger");
+  if (ledger !== null && isFile(ledger))
     done = new Set(read(ledger).split("\n").filter((line) => line.trim()).map((line) => line.split(/\s+/)[0]));
 
-  const comments = Boolean(opt["--comments"]);
-  if (opt["--paragraphs"]) {
-    for (const path of filesUnder(roots, comments)) {
-      const style = CODE_EXT[extname(path)];
-      const blocks = style ? proseComments(path, style) : paragraphs(read(path));
-      for (const [block, sents, section] of blocks) {
-        const found = score(block, sents, section);
-        if (!Object.keys(found).length) continue;
-        console.log(`\n--- ${path}  [${Object.entries(found).map(([k, v]) => `${k}: ${v}`).join(" · ")}]`);
-        console.log(block);
-      }
-    }
-    return 0;
-  }
-
-  const [rows, skipped] = survey(roots, done, comments);
+  const [rows, skipped] = survey(roots, done, words.given("comments"), words.values("variant"));
   // Stable, so files with equal counts keep the order they were walked in.
   const ordered = rows.map((row, index) => ({ row, index }))
-    .sort((a, b) => (b.row[3].length - a.row[3].length) || (a.index - b.index)).map((r) => r.row);
-  const totalParagraphs = ordered.reduce((sum, r) => sum + r[1], 0);
-  const totalSentences = ordered.reduce((sum, r) => sum + r[2], 0);
-  const flaggedParagraphs = ordered.reduce((sum, r) => sum + r[3].length, 0);
-  const withAny = ordered.filter((r) => r[3].length);
-  const tally: Record<string, number> = Object.fromEntries(FAULTS.map((f) => [f, 0]));
+    .sort((one, two) => (two.row[3].length - one.row[3].length) || (one.index - two.index)).map((placed) => placed.row);
+  const totalParagraphs = ordered.reduce((sum, row) => sum + row[1], 0);
+  const totalSentences = ordered.reduce((sum, row) => sum + row[2], 0);
+  const flaggedParagraphs = ordered.reduce((sum, row) => sum + row[3].length, 0);
+  const withAny = ordered.filter((row) => row[3].length);
+  const tally: Record<string, number> = Object.fromEntries(FAULTS.map((fault) => [fault, 0]));
   for (const [, , , flagged] of ordered)
     for (const [, , found] of flagged)
       for (const key of Object.keys(found)) tally[key] += 1;
@@ -349,22 +337,47 @@ export function main(argv: string[]): number {
   if (skipped) console.log(`  skipped        ${skipped} files already recorded in the ledger`);
   console.log(`  candidates     ${flaggedParagraphs} paragraphs in ${withAny.length} files ` +
     `— ${Math.floor((100 * flaggedParagraphs) / Math.max(totalParagraphs, 1))} % of paragraphs`);
-  console.log(`  by fault       ` + FAULTS.map((k) => `${k} ${tally[k]}`).join(" · "));
+  console.log(`  by fault       ` + FAULTS.map((fault) => `${fault} ${tally[fault]}`).join(" · "));
   console.log();
   console.log("  A reader still owns the three faults no pattern can see: a claim compressed past");
   console.log("  reading, a rule that never says what to do, and an abstraction that is merely dull.");
   console.log("  So this narrows the reading. It does not replace it.");
 
-  const record = opt["--record"];
-  if (typeof record === "string") {
+  const record = words.value("record");
+  if (record !== null) {
     for (const [path] of ordered) appendFileSync(record, `${digest(path)}  ${path}\n`);
     console.log(`\n  recorded ${ordered.length} file hashes to ${record}`);
   }
   return 0;
 }
 
-export const describe = "the paragraphs worth rewriting — idiom, opener, abstraction and metaphor faults a pattern can see";
-export const run = main;
+function printParagraphs(args: string[]): number {
+  const words = readWords(args);
+  const file = onePath(scopeOf(words.paths, REQUIRED));
+  for (const path of filesUnder([file])) {
+    const style = CODE_EXT[extname(path)];
+    const blocks = style ? proseComments(path, style) : paragraphs(read(path));
+    for (const [block, sents, section] of blocks) {
+      const found = score(block, sents, section);
+      if (!Object.keys(found).length) continue;
+      console.log(`\n--- ${path}  [${Object.entries(found).map(([fault, what]) => `${fault}: ${what}`).join(" · ")}]`);
+      console.log(block);
+    }
+  }
+  return 0;
+}
 
-if (process.argv[1] && basename(process.argv[1]) === "prose.ts")
-  process.exit(main(process.argv.slice(2)));
+export const describe = "the paragraphs worth rewriting — idiom, opener, abstraction and metaphor faults a pattern can see";
+
+export const actions: Record<string, Action> = {
+  list: {
+    describe: "report the files that hold paragraphs worth rewriting, most candidates first",
+    usage: "[<path>…] [--comments] [--ledger=<file>] [--record=<file>] [--variant <name>]",
+    run: list,
+  },
+  paragraphs: {
+    describe: "print the flagged paragraphs of one file",
+    usage: "<file>",
+    run: printParagraphs,
+  },
+};

@@ -1,14 +1,20 @@
-#!/usr/bin/env node
 // RESTATES: RD.DEVEX.WORKSPACE.162, RD.DEVEX.WORKSPACE.080, RD.DEVEX.WORKSPACE.088, RD.DEVEX.WORKSPACE.118, `04-discipline.md` and
 // `06-registers.md`. The chapters are the source of truth; a rule change is edited there first.
 //
-// Check the corpus against itself, rather than against its own form.
+// The corpus checked against itself, rather than against its own form.
+//
+//   spn-devex docs coherence check [<path>] [--finding <name>]   the findings under the path
+//
+// A SUBJECT WITH ONE ACTION, AND A `corpus` PATH. `check` reads every document of the repository the
+// path sits in, because each question compares one document with another, and it reports the
+// findings whose file sits under the path. A path in no repository is read as it is. `--finding`
+// narrows what is reported to the questions it names.
 //
 // Every other validator here asks whether a document is well-formed: links resolve, metadata parses,
 // statuses are legal. All of them pass while two documents state opposite rules, because nothing
 // compares one rule to another.
 //
-// This asks six questions that only have answers across documents:
+// This asks questions that only have answers across documents:
 //
 //   VOCABULARY   does every closed vocabulary say the same thing everywhere it appears
 //   RULING       does each row carry exactly one ruling, and nothing but ruling
@@ -24,16 +30,17 @@
 // requires and no row yet carries. Until a row carries that list, the comparison is an inference
 // problem rather than a check, and an inference that guesses wrong is worse than silence.
 //
-// Run from the repo root, in ANY repo. EVERY QUESTION DEGRADES TO SILENCE WHERE ITS INPUT IS ABSENT
+// It runs in ANY repo. EVERY QUESTION DEGRADES TO SILENCE WHERE ITS INPUT IS ABSENT
 // — a partner holds the plugins and neither the foundation book nor its registers, so a missing
 // register, concept or overview is a fact about that repo rather than a finding about it. A check
 // that crashes on a repo it was not written for takes the whole hook down with it.
 //
-// Exit code is the number of findings.
+// Exit code is the number of findings it reports.
 
 import { existsSync, readdirSync, statSync } from "node:fs";
 import { basename, join, dirname, relative, resolve } from "node:path";
 import { isDir, isFile, read } from "../../lib/payload.ts";
+import { type Action, OPTIONAL, onePath, readWords, repositoryOf, scopeOf, under } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { ARTIFACT, DECISIONS, POCKET, artifactDocsDir, capabilitiesDir, constructsDir, decisionsRegister, docsOf,
   hasSegment, hubPage, isOverview } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { DECISION_ID_SRC, check as restatesCheck, parse as restatesParse, registerRows, undeclared } from "../../lib/restates.ts";
@@ -112,10 +119,16 @@ function body(root: string, path: string): string {
     .replace(HISTORICAL, "");
 }
 
-// ---------------------------------------------------------------------------- the six questions
+// ---------------------------------------------------------------------------- the questions
+
+/**
+ * Whether a finding is reported: it is, where one of the files it is about sits under the path of the
+ * run. Each file is named by its path from the root. A run on the whole repository reports every one.
+ */
+type Reported = (...files: string[]) => boolean;
 
 /** A closed vocabulary must read identically everywhere it is written. */
-function vocabulary(root: string, sources: string[]): string[] {
+function vocabulary(root: string, sources: string[], reported: Reported): string[] {
   const seen = new Map<string, Map<string, string[]>>();
   for (const path of sources)
     for (const found of read(join(root, path))
@@ -136,6 +149,7 @@ function vocabulary(root: string, sources: string[]): string[] {
     const widest = variants[0][1];
     for (const [source, values] of variants.slice(1)) {
       if (values.join("\u0000") === widest.join("\u0000")) continue;
+      if (!reported(source, variants[0][0])) continue;
       const missing = widest.filter((v) => !values.includes(v));
       const extra = values.filter((v) => !widest.includes(v));
       // Printed as Python prints a list — no space inside the brackets. The two runs are compared
@@ -199,9 +213,10 @@ function registerTableRows(text: string): Array<Map<string, string>> {
  * checked is a bolded complete SENTENCE after the opening one, which is what a buried ruling looks
  * like every time it has appeared.
  */
-function rulings(root: string): string[] {
+function rulings(root: string, reported: Reported): string[] {
   const register = decisionsRegister(docsOf(root));
   if (!isFile(register)) return [];                // a repo earns a register; absence is not drift
+  if (!reported(relative(root, register))) return [];
   const split: Array<[number, string, string]> = [];
   const long: Array<[number, string]> = [];
   for (const row of registerTableRows(read(register))) {
@@ -230,7 +245,7 @@ function rulings(root: string): string[] {
 }
 
 /** Two documents ruling on one subject, neither citing the other. */
-function ownership(root: string, sources: string[]): string[] {
+function ownership(root: string, sources: string[], reported: Reported): string[] {
   const out: string[] = [];
   const owners = new Map<string, string[]>();
   for (const path of sources) {
@@ -249,7 +264,7 @@ function ownership(root: string, sources: string[]): string[] {
   }
   for (const [key, all] of owners) {
     const where = [...new Set(all)].sort();
-    if (where.length < 2) continue;
+    if (where.length < 2 || !reported(...where)) continue;
     // A link is not a licence to restate. 04-discipline allows repetition only as a DECLARED mirror,
     // so a citation downgrades the finding — it never clears it.
     let cites = false, mirror = false;
@@ -276,7 +291,7 @@ const LOAD_BEARING = new Set(["seats", "passes", "layers", "entries", "principal
   "stages", "runtimes", "directions", "disciplines", "families"]);
 
 /** A count written into prose for a set that is free to grow (RD.DEVEX.WORKSPACE.162). */
-function cardinality(root: string, sources: string[]): string[] {
+function cardinality(root: string, sources: string[], reported: Reported): string[] {
   const WORDS = "(?:two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)";
   const GROWABLE = "(?:kinds?|constructs?|skills?|lenses|domains?|tiers?|artifacts?|" +
     "chapters?|templates?|resources?|groups?|personas?|verbs?|invariants?|providers?|surfaces?)";
@@ -284,6 +299,7 @@ function cardinality(root: string, sources: string[]): string[] {
   const out: string[] = [];
   for (const path of sources) {
     if (hasSegment(path, ARTIFACT.reports)) continue;  // point-in-time (RD.DEVEX.WORKSPACE.088)
+    if (!reported(path)) continue;
     const text = body(root, path);
     for (const found of text.matchAll(pattern)) {
       const noun = found[1].toLowerCase().replace(/s+$/, "") + "s";
@@ -307,10 +323,11 @@ function cardinality(root: string, sources: string[]): string[] {
  * Only the concept's own `##` and `###` headings are compared. A face carries fewer words per
  * section by design — what it may not carry is fewer sections.
  */
-function hub(root: string): string[] {
+function hub(root: string, reported: Reported): string[] {
   const concept = join(root, "CONCEPT.md");
   const face = hubPage(docsOf(root));
   if (!isFile(concept) || !isFile(face)) return [];   // a repo earns a face; absence is not drift
+  if (!reported(relative(root, concept), relative(root, face))) return [];
   const rendered = read(face).replace(/<[^>]+>/g, " ").toLowerCase();
   const missing: string[] = [];
   for (const found of read(concept).matchAll(/^#{2,3} +(.+?)\s*$/gm)) {
@@ -336,8 +353,8 @@ function hub(root: string): string[] {
  * belongs to the stamping pass, and a finding on every unstamped file would be the whole tree on the
  * first run.
  */
-function restatementDrift(root: string): string[] {
-  const providers = markdownUnder(root, "providers").sort(byPathParts);
+function restatementDrift(root: string, reported: Reported): string[] {
+  const providers = markdownUnder(root, "providers").sort(byPathParts).filter((path) => reported(path));
   if (!providers.length) return [];                 // no provider tree here; that is not drift
   const known = registerRows(decisionsRegister(docsOf(root)));
   const findings: string[] = [];
@@ -379,7 +396,7 @@ function restatementDrift(root: string): string[] {
  * an act when the act happened, and a row removed later does not make that log wrong — it makes it
  * history. Rewriting it would state something that never happened.
  */
-function citations(root: string): string[] {
+function citations(root: string, reported: Reported): string[] {
   const register = decisionsRegister(docsOf(root));
   const registerText = read(register);
   if (!registerText) return [];                    // no register here — not this repo's question
@@ -392,6 +409,7 @@ function citations(root: string): string[] {
 
   const dangling = new Map<string, string[]>();
   for (const path of sourcesOf(root)) {
+    if (!reported(path)) continue;
     const text = read(join(root, path));
     for (const hit of text.matchAll(DECISION_ID)) {
       const id = hit[0];
@@ -432,7 +450,7 @@ function citations(root: string): string[] {
  * authoring it, so the question is the foundation's alone — run elsewhere it finds no constructs
  * tree and says nothing.
  */
-function capabilityChapters(root: string): string[] {
+function capabilityChapters(root: string, reported: Reported): string[] {
   const constructs = constructsDir(docsOf(root));
   const capabilities = capabilitiesDir(docsOf(root));
   if (!isDir(constructs) || !isDir(capabilities)) return [];
@@ -450,15 +468,19 @@ function capabilityChapters(root: string): string[] {
 
   const held = (where: string, stem: string): boolean =>
     isFile(join(capabilities, where, `${stem}.md`)) || anyChapter(join(capabilities, where, stem));
+  /** A construct with no chapter is about its own file, and about the place its chapter would sit. */
+  const owes = (where: string, chapter: string): boolean =>
+    !held(where, chapter.replace(/\.md$/, ""))
+    && reported(relative(root, join(constructs, where, chapter)), relative(root, join(capabilities, where, chapter.replace(/\.md$/, ""))));
 
   for (const area of folders(constructs).sort()) {
     for (const group of folders(join(constructs, area)).sort())
       for (const chapter of chapters(join(constructs, area, group)).sort())
-        if (!held(`${area}/${group}`, chapter.replace(/\.md$/, "")))
+        if (owes(`${area}/${group}`, chapter))
           owed.push(`${area}/${group}/${chapter}`);
     // An area whose constructs sit directly under it, with no group level.
     for (const chapter of chapters(join(constructs, area)).sort())
-      if (!held(area, chapter.replace(/\.md$/, "")))
+      if (owes(area, chapter))
         owed.push(`${area}/${chapter}`);
   }
   if (!owed.length) return [];
@@ -485,7 +507,7 @@ function capabilityChapters(root: string): string[] {
  * asked has either found a question the contract is missing, or has written somewhere nobody will
  * look — and both are worth knowing.
  */
-function providerContracts(root: string): string[] {
+function providerContracts(root: string, reported: Reported): string[] {
   const findings: string[] = [];
   const dirs = (at: string): string[] =>
     isDir(at) ? readdirSync(at).filter((e) => isDir(join(at, e))) : [];
@@ -502,6 +524,8 @@ function providerContracts(root: string): string[] {
         const want = new Set([...contract.matchAll(/^\|\s*`([0-9A-Za-z.-]+\.md)`\s*\|/gm)].map((m) => m[1]));
         if (!want.size) continue;
         for (const instance of dirs(at).sort()) {
+          // An instance is compared with the contract beside it, so the finding is about both.
+          if (!reported(relative(root, join(at, instance)), relative(root, join(at, "02-contract.md")))) continue;
           const have = new Set(readdirSync(join(at, instance)).filter((e) => e.endsWith(".md")));
           const missing = [...want].filter((f) => !have.has(f)).sort();
           const extra = [...have].filter((f) => !want.has(f)).sort();
@@ -590,7 +614,7 @@ function overviewPages(root: string): string[] {
   return found.sort();
 }
 
-function pluginPaths(root: string, sources: string[]): string[] {
+function pluginPaths(root: string, sources: string[], reported: Reported): string[] {
   const shelf = join(root, "packages");
   const plugins = new Set(isDir(shelf)
     ? readdirSync(shelf).filter((entry) => entry.startsWith("plugin-") && isDir(join(shelf, entry)))
@@ -600,6 +624,7 @@ function pluginPaths(root: string, sources: string[]): string[] {
 
   const dead: string[] = [];
   for (const path of [...sources, ...pages]) {
+    if (!reported(path)) continue;
     let text = read(join(root, path));
     for (const pattern of [/```[\s\S]*?```/g, /<pre[\s\S]*?<\/pre>/g, /<!--[\s\S]*?-->/g, HISTORICAL])
       text = blanked(text, pattern);
@@ -625,30 +650,67 @@ function pluginPaths(root: string, sources: string[]): string[] {
   return [out];
 }
 
-export function main(root: string): number {
+// ---------------------------------------------------------------------------- the command
+
+/** Each question by the name its findings carry. A finding's first word is that name in capitals. */
+const QUESTIONS: Record<string, (root: string, sources: string[], reported: Reported) => string[]> = {
+  vocabulary,
+  ruling: (root, _sources, reported) => rulings(root, reported),
+  ownership,
+  cardinality,
+  hub: (root, _sources, reported) => hub(root, reported),
+  restates: (root, _sources, reported) => restatementDrift(root, reported),
+  citation: (root, _sources, reported) => citations(root, reported),
+  chapter: (root, _sources, reported) => capabilityChapters(root, reported),
+  contract: (root, _sources, reported) => providerContracts(root, reported),
+  path: pluginPaths,
+};
+
+/** The name of each kind of finding `check` can report: the set `--finding` takes its value from. */
+export const FINDINGS = Object.keys(QUESTIONS);
+
+/**
+ * The root a run reads: the repository the path sits in. A path in no repository is read as it is,
+ * so a folder is its own root and a file's root is the folder it sits in.
+ */
+function rootOf(path: string): string {
+  return repositoryOf(path) ?? (isDir(path) ? path : dirname(path));
+}
+
+function check(args: string[]): number {
+  const words = readWords(args, { finding: FINDINGS });
+  const path = onePath(scopeOf(words.paths, OPTIONAL));
+  const names = words.values("finding");
+  const root = rootOf(path);
+  const whole = resolve(path) === resolve(root);
+
+  // WHAT IS READ IS THE WHOLE ROOT, AND WHAT IS REPORTED SITS UNDER THE PATH. A finding about a
+  // folder is reported where the folder is under the path, and where the path is inside the folder.
+  const reported: Reported = (...files) => whole || files.some((file) =>
+    under(join(root, file), [path]) || under(path, [join(root, file)]));
   const sources = sourcesOf(root);
-  const findings = [
-    ...vocabulary(root, sources), ...rulings(root), ...ownership(root, sources),
-    ...cardinality(root, sources), ...hub(root), ...restatementDrift(root),
-    ...citations(root), ...capabilityChapters(root), ...providerContracts(root),
-    ...pluginPaths(root, sources),
-  ];
+  const findings = Object.entries(QUESTIONS)
+    .filter(([name]) => !names.length || names.includes(name))
+    .flatMap(([, ask]) => ask(root, sources, reported));
   for (const finding of findings) { console.log(finding); console.log(); }
   const kinds = new Map<string, number>();
   for (const finding of findings) {
     const kind = finding.split(/\s+/)[0];
     kinds.set(kind, (kinds.get(kind) ?? 0) + 1);
   }
-  const summary = [...kinds.entries()].sort((a, b) => (a[0] < b[0] ? -1 : 1))
+  const summary = [...kinds.entries()].sort((one, two) => (one[0] < two[0] ? -1 : 1))
     .map(([kind, count]) => `${count} ${kind.toLowerCase()}`).join(" · ") || "nothing";
-  console.log(`${sources.length} documents compared against each other — ${summary}`);
-  return findings.length;
+  console.log(`${sources.length} documents compared against each other — ${summary}${whole ? "" : ` under ${relative(root, path)}`}`);
+  return Math.min(findings.length, 250);
 }
 
-export const describe = "the corpus against itself — vocabulary, ruling, ownership, cardinality, hub, restates, citation, chapter and path";
-export function run(args: string[]): number {
-  return Math.min(main(args[0] ?? process.cwd()), 250);
-}
+export const describe = "the corpus against itself — vocabulary, ruling, ownership, cardinality, hub, restates, citation, chapter, contract and path";
 
-if (process.argv[1] && basename(process.argv[1]) === "coherence.ts")
-  process.exit(run(process.argv.slice(2)));
+export const actions: Record<string, Action> = {
+  check: {
+    describe: "the findings under the path, from every document of its repository compared with the others",
+    usage: "[<path>] [--finding <name>]",
+    run: check,
+  },
+};
+

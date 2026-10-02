@@ -26,8 +26,13 @@ import { GUIDE_PAGE_SUFFIX, ARTIFACT_FOLDERS, ARTIFACT_INDEX, DEVEX_WORKSTREAMS,
   workstreamDirOf } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, PAGE_SCRIPT, SERVED_FILES, STYLESHEET, cutVersions, linksSharedStyles,
   stylesDir, BUNDLED_SUFFIX } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
+import { under } from "../../../../../plugin-support-lib/src/lib/command.ts";
 export type Grade = "RULE" | "SOFT";
-export type Finding = { check: string; grade: Grade; file: string; message: string };
+/**
+ * One finding. `file` is the file it is printed against. `about` is set where the finding compares
+ * several files, and holds each of them, so a run narrowed to any one of them still reports it.
+ */
+export type Finding = { check: string; grade: Grade; file: string; message: string; about?: string[] };
 
 // THE SET IS OWNED BY `SPDocVariantType` in the CLI's contract, and this is a copy of it. Nothing
 // links the two, so a value added there and not here is silently refused, and one added here and
@@ -561,10 +566,12 @@ export function tagLine(file: string, block: any): string {
  * that lives in every document rather than between markers in a few, which is why it carries no
  * markers: the whole line is the generated region.
  */
-export function writeTagLines(tree: string, write: boolean): { touched: string[]; findings: Finding[] } {
+export function writeTagLines(tree: string, write: boolean, paths: readonly string[] = [tree]): { touched: string[]; findings: Finding[] } {
   const findings: Finding[] = [];
   const touched: string[] = [];
   for (const file of walkFiles(tree, (p) => p.endsWith(".md"))) {
+    // A tag line is rendered from its own file's block, so a run narrowed to a path reads the files under it alone.
+    if (!under(file, paths)) continue;
     const before = readFileSync(file, "utf8");
     const { block } = readBlock(before);
     if (!block || !block.lenses?.length) continue;
@@ -1613,18 +1620,20 @@ export function checkVocabularyCoverage(
   // Only where a corpus was given. One page on its own cannot say whether another declares a value.
   if (files.length < 2) return f;
   for (const [name, where] of declaredIn) {
-    if (where.length > 1) f.push({ check: "vocabulary", grade: "SOFT", file: where[0],
+    if (where.length > 1) f.push({ check: "vocabulary", grade: "SOFT", file: where[0], about: where,
       message: `\`${name}\` is declared in ${where.length} chapters — ${where.join(" · ")}; a closed vocabulary is written in one place and cited everywhere else` });
   }
-  const named = new Map<string, string>();
+  // Each term with every file that names it. The finding is printed against the first of them.
+  const named = new Map<string, string[]>();
   for (const file of files) {
     for (const row of (sources.get(file) ?? "").matchAll(TERMS_CONTRACT)) {
-      if (!named.has(row[1])) named.set(row[1], file);
+      const naming = named.get(row[1]) ?? [];
+      if (!naming.includes(file)) named.set(row[1], [...naming, file]);
     }
   }
-  for (const [name, file] of named) {
+  for (const [name, naming] of named) {
     if (declaredIn.has(name) || shapes.has(name)) continue;
-    f.push({ check: "vocabulary", grade: "SOFT", file,
+    f.push({ check: "vocabulary", grade: "SOFT", file: naming[0], about: naming,
       message: `\`${name}\` is named as a contract term and no chapter declares its members — a reader cannot write the value from the book` });
   }
   return f;
@@ -2167,16 +2176,51 @@ export function placeGlossary(src: string, body: string): string | null {
   return src.replace(sec, next);
 }
 
-export function face(tree: string, write: boolean): Finding[] {
+/**
+ * The generated blocks `face` writes, by the name a run selects one with. `glossary` is a domain's
+ * glossary, on the domain's face and on its overview. `constructs` is the map on a face of the
+ * constructs seat, and `contents` the map on a face of the capabilities seat. `tags` is the tag line
+ * of each document.
+ */
+export const FACE_BLOCKS = ["glossary", "constructs", "contents", "tags"] as const;
+
+/** What one run of `face` is narrowed to: the paths it was handed, and the blocks it was asked for. */
+export type FaceScope = { paths: readonly string[]; blocks: readonly string[] };
+
+/**
+ * Whether a package face lists chapters, which it reads at every depth below it. Every other face
+ * of the capabilities seat lists the mirrors that sit directly beside it.
+ */
+function isPackageFace(faceFile: string): boolean {
+  return (splitAtSeat(faceFile, "capabilities")?.rel ?? "").split("/").length >= 3;
+}
+
+/**
+ * The generated regions of a docs tree, compared with what they are generated from, and written
+ * where `write` is set.
+ *
+ * A RUN IS NARROWED BY ITS SCOPE. A region is read only where the scope's paths feed it: the file
+ * that carries the region sits under a path, or a path sits in the folder the region is generated
+ * from. So a seat file feeds its domain's glossary, the map of each face above it, and its own tag
+ * line, and the faces of every other domain are neither read nor written. With no scope the whole
+ * tree is read.
+ */
+export function face(tree: string, write: boolean, scope: FaceScope = { paths: [tree], blocks: FACE_BLOCKS }): Finding[] {
   const findings: Finding[] = [];
   const touched: string[] = [];
+  const asked = (block: (typeof FACE_BLOCKS)[number]): boolean => scope.blocks.includes(block);
+  /** `carrier` holds the region; `source` is the folder the region is generated from. */
+  const fed = (carrier: string, source: string): boolean =>
+    under(carrier, scope.paths) || scope.paths.some((path) => under(path, [source]));
 
   // ONE DICTIONARY PER DOMAIN, AND NONE ON THE SEAT. The seat face keeps the domain table it already
   // carries, and a reader who wants the words goes to the domain that decides their meaning
   // (`refs/doc-sets.md`, *It sits on the domain, not on the seat face*).
   const constructsSeat = constructsDir(tree);
-  for (const dir of constructFolders(constructsSeat).filter((d) => isDomainFolder(constructsSeat, d))) {
+  for (const dir of asked("glossary") ? constructFolders(constructsSeat).filter((d) => isDomainFolder(constructsSeat, d)) : []) {
     const domainFace = join(dir, "README.md");
+    const overviewOfDomain = overviewForDomain(dir);
+    if (!fed(domainFace, dir) && !(overviewOfDomain && under(overviewOfDomain, scope.paths))) continue;
     if (!existsSync(domainFace)) {
       findings.push({ check: "face", grade: "SOFT", file: domainFace, message: "no domain face to write the glossary into" });
       continue;
@@ -2192,7 +2236,7 @@ export function face(tree: string, write: boolean): Finding[] {
     // the contract term a column there. The rows are gathered once for both, so the two cannot
     // drift; the findings are taken from the markdown build alone, or every two-column `Terms`
     // table would be reported twice.
-    const overview = overviewForDomain(dir);
+    const overview = overviewOfDomain;
     if (overview) {
       const { body: html } = buildGlossaryHtml(dir, overview);
       const ovBefore = readFileSync(overview, "utf8");
@@ -2209,12 +2253,14 @@ export function face(tree: string, write: boolean): Finding[] {
     }
   }
 
+  // The seat face carries no glossary, so nothing feeds it: it is read where it sits under a path.
   const seatFace = join(constructsSeat, "README.md");
-  if (existsSync(seatFace)) {
+  const seatFaceInRun = asked("glossary") && under(seatFace, scope.paths);
+  if (seatFaceInRun && existsSync(seatFace)) {
     const before = readFileSync(seatFace, "utf8");
     const after = removeRegion(before, "glossary");
     if (after !== before) { if (write) writeFileSync(seatFace, after); touched.push(relative(tree, seatFace)); }
-  } else {
+  } else if (seatFaceInRun) {
     findings.push({ check: "face", grade: "SOFT", file: seatFace, message: "no constructs seat face" });
   }
 
@@ -2224,9 +2270,11 @@ export function face(tree: string, write: boolean): Finding[] {
   // that list. A concept states the model at SHAPE depth — which domains exist and why the
   // repository divides that way — and a construct's summary is depth (MD10).
   const conceptFile = ["CONCEPT.md", join("..", "CONCEPT.md")].map((c) => join(tree, c)).find(existsSync) ?? null;
-  const { faces, findings: dfz } = domainFaces(tree, conceptFile);
-  findings.push(...dfz);
+  const { faces, findings: dfz } = asked("constructs") ? domainFaces(tree, conceptFile) : { faces: new Map<string, string>(), findings: [] };
+  // A finding of this step names the folder whose face it is about.
+  findings.push(...dfz.filter((found) => fed(join(found.file, "README.md"), found.file)));
   for (const [file, body] of faces) {
+    if (!fed(file, dirname(file))) continue;
     if (!existsSync(file)) { findings.push({ check: "face", grade: "SOFT", file, message: "no domain face to write into" }); continue; }
     const before = readFileSync(file, "utf8");
     const after = replaceRegion(before, "constructs", body);
@@ -2241,7 +2289,13 @@ export function face(tree: string, write: boolean): Finding[] {
     catch { return false; }
   })();
 
-  for (const faceFile of authored ? [] : walkFiles(capabilitiesDir(tree), (p) => basename(p) === "README.md")) {
+  for (const faceFile of authored || !asked("contents") ? [] : walkFiles(capabilitiesDir(tree), (p) => basename(p) === "README.md")) {
+    // A package face is fed by every chapter below it; any other face by the mirrors directly beside it.
+    const beside = dirname(faceFile);
+    const feeds = isPackageFace(faceFile)
+      ? fed(faceFile, beside)
+      : under(faceFile, scope.paths) || scope.paths.some((path) => path === beside || dirname(path) === beside);
+    if (!feeds) continue;
     const { body, findings: mf } = buildMap(faceFile);
     findings.push(...mf);
     const before = readFileSync(faceFile, "utf8");
@@ -2249,15 +2303,18 @@ export function face(tree: string, write: boolean): Finding[] {
     if (after !== before) { if (write) writeFileSync(faceFile, after); touched.push(relative(tree, faceFile)); }
   }
 
-  const tags = writeTagLines(tree, write);
+  const tags = asked("tags") ? writeTagLines(tree, write, scope.paths) : { touched: [], findings: [] };
   findings.push(...tags.findings);
 
-  console.log(touched.length
-    ? `${write ? "wrote" : "would write"} ${touched.length} face${touched.length > 1 ? "s" : ""}:\n  ${touched.join("\n  ")}`
-    : "every face is already current");
-  console.log(tags.touched.length
-    ? `${write ? "wrote" : "would write"} ${tags.touched.length} tag line${tags.touched.length > 1 ? "s" : ""}`
-    : "every tag line is already rendered from its block");
+  // Each line speaks for the blocks the run asked for, and for those alone.
+  if (asked("glossary") || asked("constructs") || asked("contents"))
+    console.log(touched.length
+      ? `${write ? "wrote" : "would write"} ${touched.length} face${touched.length > 1 ? "s" : ""}:\n  ${touched.join("\n  ")}`
+      : "every face is already current");
+  if (asked("tags"))
+    console.log(tags.touched.length
+      ? `${write ? "wrote" : "would write"} ${tags.touched.length} tag line${tags.touched.length > 1 ? "s" : ""}`
+      : "every tag line is already rendered from its block");
   return findings;
 }
 
@@ -2571,12 +2628,12 @@ export function pageFor(seat: string, workspace: string, templates: string, writ
     console.log(`${before ? "rewrote " : "wrote   "} ${relative(workspace, out)}`);
   } else if (before && holdsOwnCopy(out, before)) {
     // THE PAGE ON DISK LINKS NO SHARED STYLESHEET, so it is named once, the way every command names
-    // such a page, and its markup is not compared. Running this command without `--check` is what
-    // moves it: the page is produced again, with the two lines that load the shared files.
+    // such a page, and its markup is not compared. `docs page write` is what moves it: the page is
+    // produced again, with the two lines that load the shared files.
     findings.push({ check: "styles", grade: "RULE", file: out, message: OWN_COPY });
   } else {
     findings.push({ check: "page", grade: "RULE", file: out,
-      message: before ? "this page is not what `docs.ts page` produces from its seat file — it was edited by hand, or the seat file moved on" : "no page has been produced from this seat file yet" });
+      message: before ? "this page is not what `docs page write` produces from its seat file — it was edited by hand, or the seat file moved on" : "no page has been produced from this seat file yet" });
   }
   return findings;
 }
@@ -3296,9 +3353,10 @@ export function workspaceRoot(from: string): string {
  * means every seat file under it — markdown only, because these two act on the file an author writes
  * rather than on the page produced from it. Shared by `page.ts` and `status.ts`.
  */
-export const seatPaths = (args: string[]): string[] =>
-  args.filter((r) => !r.startsWith("--")).flatMap((p) => {
-    const full = resolve(p);
-    let st; try { st = statSync(full); } catch { return [full]; }
-    return st.isDirectory() ? walkFiles(full, (f) => f.endsWith(".md") && basename(f) !== "README.md") : [full];
+export const seatPaths = (paths: string[]): string[] =>
+  paths.flatMap((path) => {
+    const full = resolve(path);
+    let folder = false;
+    try { folder = statSync(full).isDirectory(); } catch { return [full]; }
+    return folder ? walkFiles(full, (file) => file.endsWith(".md") && basename(file) !== "README.md") : [full];
   });

@@ -32,11 +32,11 @@
 //      none today. The reason a tool is outside has to be the SHAPE of what it reports, because
 //      that is the part that stays true until somebody changes the tool.
 //
-// AND THE SCOPE IS THE DOCS TREE, NEVER THE REPOSITORY ROOT. `audit` given a folder means *every
-// document under it*, so a root pulls in every package `README.md` and `CLAUDE.md` — none of which
+// AND THE PATH IS THE DOCS TREE, NEVER THE REPOSITORY ROOT. `audit check` reports every finding
+// under its path, so a root reports every package `README.md` and `CLAUDE.md` — none of which
 // carries an `spn:doc` block, all of which are RULE. Measured over the seven: 954 findings at the
 // root against 25 at the docs trees, and the tool reports both in the same voice. A wrong argument
-// that looks like a corpus collapse is the defect this whole arc is about, so the scope is computed
+// that looks like a corpus collapse is the defect this whole arc is about, so the path is computed
 // here and never taken from a caller.
 
 import { createHash } from "node:crypto";
@@ -48,12 +48,17 @@ import { bookTemplatesDir } from "../../../../plugin-support-lib/src/lib/docs-tr
 
 export type Warning = { check: string; message: string };
 
-/** The docs commands that are silent on a clean corpus today, so a finding from one means something. */
+/**
+ * The docs commands that are silent on a clean corpus today, so a finding from one means something.
+ * `audit check` and `face check` are handed the docs tree: each finds the repository from it, and
+ * reports only what sits under it. `topics check` and `parity check` are handed the repository:
+ * each compares the seats of its docs tree, and reports every finding in the repository.
+ */
 const WIRED = [
-  { args: (tree: string) => ["docs", "audit", tree], label: "audit" },
-  { args: (tree: string) => ["docs", "face", "--check", dirname(tree)], label: "face --check" },
-  { args: (tree: string) => ["docs", "topics", dirname(tree)], label: "topics" },
-  { args: (tree: string) => ["docs", "parity", dirname(tree)], label: "parity" },
+  { args: (tree: string) => ["docs", "audit", "check", tree], label: "audit check" },
+  { args: (tree: string) => ["docs", "face", "check", tree], label: "face check" },
+  { args: (tree: string) => ["docs", "topics", "check", dirname(tree)], label: "topics check" },
+  { args: (tree: string) => ["docs", "parity", "check", dirname(tree)], label: "parity check" },
 ];
 
 /**
@@ -64,9 +69,9 @@ const WIRED = [
  * nobody earned. A silent corpus check that quietly covers four of six tools would be exactly that.
  */
 const REPORTED_ELSEWHERE = [
-  { label: "coherence", why: "most of what it reports is a cardinality heuristic that cannot tell a closed set from one that can grow, so it is read rather than gated on" },
-  { label: "restate-drift", why: "a drift is a question — does this restatement still hold — and the only answer is reading the diff, which a hook cannot do for you" },
-  { label: "figures check", why: "joins once it has run clean across all seven trees on a day nothing was redrawn" },
+  { label: "coherence check", why: "most of what it reports is a cardinality heuristic that cannot tell a closed set from one that can grow, so it is read rather than gated on" },
+  { label: "restates check", why: "a drift is a question — does this restatement still hold — and the only answer is reading the diff, which a hook cannot do for you" },
+  { label: "figure check", why: "joins once it has run clean across all seven trees on a day nothing was redrawn" },
 ];
 
 // THE RUN'S OWN BUDGET, BECAUSE THE HOOK'S TIMEOUT IS NOT A SAFE ONE TO RELY ON. A `Stop` hook that

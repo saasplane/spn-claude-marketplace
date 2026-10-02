@@ -151,4 +151,4 @@ This page answers which moments exist, how a script claims one, what it is hande
 | [RD.DEVEX.002](../../registers/decisions.md) | the dispatcher does refuse on its own account, through the generated-file guard it runs before the list | MUST |
 | the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | a hook is the Event kind of script, run from a committed bundle a staleness test keeps current | MUST |
 
-Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs plugin partner` (or `spn-devex plugin partner`, once installed)
+Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs plugin partner check` (or `spn-devex plugin partner check`, once installed)

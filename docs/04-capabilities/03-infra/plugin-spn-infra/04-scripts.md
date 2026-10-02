@@ -32,15 +32,15 @@ Each rule carries its own name, so a refusal says which law it read rather than 
 - The five moments and the refuse-or-report line — [Hooks](../../../02-constructs/01-devex/02-hooks.md)
 - The decision a refusal is printed as, and the always-zero exit — [Hooks in spn-devex](../../01-devex/plugin-spn-devex/02-hooks.md)
 - The three folders a script tree is filed into — [Scripts](../../../02-constructs/01-devex/05-scripts.md)
-- The one-entry, `<group> <action>` shape a plugin's rules are named under — the foundation's `04-plugins/02-shape.md`
+- The one-entry, `<group> [<subject>] <action>` shape a plugin's rules are named under — the foundation's `04-plugins/02-shape.md`
 
 ## Special handling
 
 ### This plugin has no commands, and the absence is not a gap
 
-**Why** — *a `<group> <action>` entry replaces a flat `tools/` folder*, and this plugin never had one: everything it ships is the write-time gate — `events/`, `checks/`, `lib/` — with nothing reached by a person or an agent typing a path.
+**Why** — *a `<group> [<subject>] <action>` entry replaces a flat `tools/` folder*, and this plugin never had one: everything it ships is the write-time gate — `events/`, `checks/`, `lib/` — with nothing reached by a person or an agent typing a path.
 **What** — this plugin carries no `cli.ts` and no `commands/` folder. It carries what its two siblings carry: a committed `dist/` that `hooks.json` runs instead of `src/scripts/events/pretooluse.ts`.
-**How** — a command surface is added to this plugin the day it ships something meant to be reached by name rather than by a moment; until then, `spn-devex`'s `plugin` group is where a cross-plugin question about this one is answered — `spn-devex plugin paths`, for instance, checks a path this plugin's own skills and refs name.
+**How** — a command surface is added to this plugin the day it ships something meant to be reached by name rather than by a moment; until then, `spn-devex`'s `plugin` group is where a cross-plugin question about this one is answered — `spn-devex plugin paths check`, for instance, checks a path this plugin's own skills and refs name.
 
 ### Unsure means allow, and every exit is zero
 

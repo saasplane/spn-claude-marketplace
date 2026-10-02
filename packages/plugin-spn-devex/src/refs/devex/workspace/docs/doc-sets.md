@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/README.md",
-      "seen": "030ba321"
+      "seen": "8c5ef818"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "c56841da"
+      "seen": "3e70bd3b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -21,7 +21,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md",
-      "seen": "543a5e88"
+      "seen": "cef5546e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/02-document.md",
@@ -333,8 +333,8 @@ The pocket holds what the node **authors** rather than derives, and its three au
 
 | Kind | Path | Produced by | Produced from |
 | --- | --- | --- | --- |
-| **Guide page** | `artifacts/guides/<name>-guide.html` | `docs guide <guide.md>` | the guide's markdown in `05-guides/`, and `guide-template.html` |
-| **The index of artifacts** | `artifacts/index.html` | `docs index <repository>` | the pages on disk, and `artifact-index-template.html` |
+| **Guide page** | `artifacts/guides/<name>-guide.html` | `docs guide write <guide.md>` | the guide's markdown in `05-guides/`, and `guide-template.html` |
+| **The index of artifacts** | `artifacts/index.html` | `docs index write <repository>` | the pages on disk, and `artifact-index-template.html` |
 
 **Every repository has its getting-started guide and its test-and-verify guide as a page.** A newcomer needs these before any other guide: the first says how to start, and the second says how to check that a change works. Every other guide stays markdown, unless a developer asks for it as a page. A guide page is stages, and a stage is steps. A step holds why, the command and what you see, in that order. The stylesheet numbers the steps, so nobody types a number. A guide page has no status. Where `docs guide` finds no step in a guide, it reports the guide and writes nothing.
 
@@ -485,7 +485,7 @@ kind: a good example beside a poor one shows the difference faster than the rule
 
 ### The templates sit beside the chapters, in `templates/`
 
-Every page somebody writes by hand is copied from a template, and the templates live in the docs domain's own `templates/` folder — beside the chapters that state their rules. **A template holds a page's shape — its sections, its slots and the two lines that load the shared stylesheet and script — and no rule**, so a rule is stated in one place only. **A seat may hold that one folder that is not documents.** It is unnumbered, because you consult a template rather than reading the set in order, and it is excluded from the document checks **by the folder rather than per file**: a per-file exemption is a hole, and a named folder is a rule. **Each template names the chapter sections that govern it**, at the top of the file; a change to a template's shape is edited in the template, and `restates files` reports a plugin copy that has fallen behind it.
+Every page somebody writes by hand is copied from a template, and the templates live in the docs domain's own `templates/` folder — beside the chapters that state their rules. **A template holds a page's shape — its sections, its slots and the two lines that load the shared stylesheet and script — and no rule**, so a rule is stated in one place only. **A seat may hold that one folder that is not documents.** It is unnumbered, because you consult a template rather than reading the set in order, and it is excluded from the document checks **by the folder rather than per file**: a per-file exemption is a hole, and a named folder is a rule. **Each template names the chapter sections that govern it**, at the top of the file; a change to a template's shape is edited in the template, and `restates files check` reports a plugin copy that has fallen behind it.
 
 | Folder | Holds | Shapes |
 | --- | --- | --- |
@@ -682,7 +682,7 @@ version of the stylesheet that has them.
 
 ## Blocks and figures — what a page is made of
 
-**A page is produced, never authored.** You write a **seat file in markdown** and `docs.ts page` renders it. You never name a block, never write a class, and never paste HTML into a seat file. The renderer reads ordinary markdown components and gives each one its form: a table becomes a card, a fenced block with a language becomes a coloured code block, a blockquote becomes the `MUST` callout, a numbered list becomes an ordered list, a ```` ```dg ```` fence becomes a drawn figure.
+**A page is produced, never authored.** You write a **seat file in markdown** and `docs page write` renders it. You never name a block, never write a class, and never paste HTML into a seat file. The renderer reads ordinary markdown components and gives each one its form: a table becomes a card, a fenced block with a language becomes a coloured code block, a blockquote becomes the `MUST` callout, a numbered list becomes an ordered list, a ```` ```dg ```` fence becomes a drawn figure.
 
 **Markdown keeps its own grammar and HTML keeps the blocks.** A capability chapter stays markdown and is never produced as a page, so none of this reaches it. The split is stated in the book: `02-document.md` governs markdown, `05-artifacts.md` governs the page.
 

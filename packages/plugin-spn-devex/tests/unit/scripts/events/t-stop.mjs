@@ -1349,7 +1349,7 @@ ${tableOf(cyclesOf(folder))}
     check("the first Stop, which takes the baseline, says nothing about the page", !/\[page-stale\]/.test(first), first);
     check("[MKT.HOOKS.35] known-bad: an arc this session moved leaves the page stale, and one warning says so", count(out, "[page-stale]") === 1, out);
     check("[MKT.HOOKS.35] the warning names the workstream and the command that writes the page",
-      out.includes("`spn-devex docs cycles 001-a-subject --write`"), out);
+      out.includes("`spn-devex docs cycles write 001-a-subject`"), out);
   }
   // UNTOUCHED: the same arc moved by another window, which this session's transcript only read.
   {

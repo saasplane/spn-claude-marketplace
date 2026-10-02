@@ -1,36 +1,39 @@
-#!/usr/bin/env node
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md · 05-artifacts.md · 02-document.md
 // The chapters are the source of truth; a rule change is edited there first, then here.
 //
-// Refuse a numbered topic the constructs seat does not name, and two documents under one id.
+// A numbered topic the constructs seat does not name, and two documents under one id.
 //
-//   spn-devex docs topics <repo…>
+//   spn-devex docs topics check [<path>…]   the findings under the paths
+//
+// A SUBJECT WITH ONE ACTION, AND A `tree` PATH. A path may be a repository, or a folder or a file
+// inside one. The command finds the repository from the path and compares its three seats, and it
+// reports the findings whose file sits under the path.
 
-import { basename, relative, resolve } from "node:path";
-import { argsText, begin, commandFacts, end, record } from "../../../../../plugin-support-lib/src/lib/timing.ts";
+import { relative, resolve } from "node:path";
+import { type Action, OPTIONAL, readWords, repositoryOf, scopeOf, under } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { duplicateIds, resolveWorkspace, topicsCheck } from "./_lib.ts";
 
-export const describe = "refuse a numbered topic the constructs seat does not name, and two documents under one id";
+export const describe = "a numbered topic the constructs seat does not name, and two documents under one id";
 
-function body(args: string[], workspace: string): number {
-  const targets = args.filter((r) => !r.startsWith("--")).map((r) => resolve(r));
-  if (!targets.length) { console.error("usage: spn-devex docs topics <repo…>"); return 2; }
-  const f = targets.flatMap((t) => [...topicsCheck(t), ...duplicateIds(t)]);
-  for (const x of f) console.log(`${x.grade === "RULE" ? "✗" : "!"} ${x.grade.padEnd(4)} ${x.check.padEnd(9)} ${relative(workspace, x.file)}\n         ${x.message}`);
-  const rule = f.filter((x) => x.grade === "RULE").length;
-  console.log(f.length ? `\n${f.length} finding(s) — ${rule} RULE, ${f.length - rule} SOFT` : `\nclean — ${targets.length} repository(ies)`);
+function check(args: string[]): number {
+  const words = readWords(args);
+  const paths = scopeOf(words.paths, OPTIONAL);
+  const workspace = resolveWorkspace();
+  // Each path brings its repository once. A path in no repository is read as it is.
+  const repositories = [...new Set(paths.map((path) => repositoryOf(path) ?? resolve(path)))];
+  const found = repositories.flatMap((repository) => [...topicsCheck(repository), ...duplicateIds(repository)])
+    .filter((finding) => under(finding.file, paths));
+  for (const finding of found)
+    console.log(`${finding.grade === "RULE" ? "✗" : "!"} ${finding.grade.padEnd(4)} ${finding.check.padEnd(9)} ${relative(workspace, finding.file)}\n         ${finding.message}`);
+  const rule = found.filter((finding) => finding.grade === "RULE").length;
+  console.log(found.length ? `\n${found.length} finding(s) — ${rule} RULE, ${found.length - rule} SOFT` : `\nclean — ${repositories.length} repository(ies)`);
   return rule ? 1 : 0;
 }
 
-export function run(args: string[]): number {
-  const workspace = resolveWorkspace();
-  const startedAt = performance.now();
-  begin(commandFacts("spn-devex", args), workspace);
-  const code = body(args, workspace);
-  record({ group: "docs", action: "topics", args: argsText(args) }, performance.now() - startedAt, code);
-  end(code);
-  return code;
-}
-
-if (process.argv[1] && basename(process.argv[1]) === "topics.ts")
-  process.exit(run(process.argv.slice(2)));
+export const actions: Record<string, Action> = {
+  check: {
+    describe: "the topic and id findings under the paths, from the three seats of each path's repository",
+    usage: "[<path>…]",
+    run: check,
+  },
+};

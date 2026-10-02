@@ -42,7 +42,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "e736da66"
+      "seen": "2063b57c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -52,7 +52,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "An order is one delegated execution, and every order follows the same rules",
-      "seen": "fd40ae39"
+      "seen": "f7da8474"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -66,7 +66,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "c56841da"
+      "seen": "3e70bd3b"
     }
   ]
 }
@@ -529,7 +529,7 @@ release, or run `apps format`, which rewrites whole nodes. The coordinator commi
 path, once it has read the report.
 
 **An agent runs only the gates its order names, and never a writer.** A gate that rewrites
-generated files, such as `restates … --write`, a plugin build or a register edit, changes files
+generated files, such as `restates … write`, a plugin build or a register edit, changes files
 that other agents are reading. Register row text goes into the report, and the coordinator writes
 every row.
 
@@ -718,7 +718,7 @@ number and the subject, so the file name repeats neither. A workstream that clos
 
 **The parts of the page that the arcs decide are produced, never typed — MUST.** They are the header's
 status, the Cycles table with its previews, and the heading of `Open`. Run
-`spn-devex docs cycles --write <workstream folder>` after any change to an arc's status, its first
+`spn-devex docs cycles write <workstream folder>` after any change to an arc's status, its first
 line or its `## Previews` table. The header's status reads `PLANNING` while no arc is past `DECIDED`,
 `IMPLEMENTING` once an arc runs or has landed, and `DONE` when the workstream closes. The heading of
 `Open` reads `Open — Q<n> · Q<n>`, each open card by its number. With no card open it reads

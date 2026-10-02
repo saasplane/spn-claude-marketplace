@@ -30,7 +30,9 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SCRIPTS.28 | Quality engineer | move a documents tree and have every tool still find the registers | A register is recognised by its own headings, wherever in the repository it sits | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.35 | Partner / integrator | read which published packages a node may depend on without a checkout | A command writes the table, under a citation naming the command that produced it | POSITIVE | UNIT | PLANNED | — |
 | MKT.SCRIPTS.52 | Quality engineer | find a `SUCCESS` row no case cites, and a case citing an id no row declares | The join check reads every register and every case title, and names each finding in both directions | NEGATIVE | UNIT | PLANNED | — |
-| MKT.SCRIPTS.60 | Backend developer | discover every command this plugin offers without reading source | `cli.ts help --json` lists `coverage check` · `library catalogue`, and an unknown group or action is refused by name — proven in `tests/unit/scripts/t-cli.mjs` | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.60 | Backend developer | discover every command this plugin offers without reading source | `cli.ts help --json` lists `coverage check` · `library catalogue check` · `library catalogue write`, and an unknown group or action is refused by name — proven in `tests/unit/scripts/t-cli.mjs` | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.180 | Partner / integrator | see whether the library table is behind before it is written | `library catalogue check <workspace>` says what a write would change, writes nothing and exits 1 where the table is behind. `library catalogue write <workspace>` writes it, under a marker that names that command | POSITIVE | UNIT | PLANNED | — |
+| MKT.SCRIPTS.181 | Backend developer | scan chosen folders for a coverage exclude that gives no reason | `coverage check [<path>…]` scans each path it is given, takes the repository the caller is in where it is given none, and refuses an option with exit 2 | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 

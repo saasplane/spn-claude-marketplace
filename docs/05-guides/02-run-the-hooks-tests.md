@@ -62,7 +62,7 @@ On its own it prints every case — `PASS` or `FAIL`, then the title — under t
 
 **The runner discards each suite's error stream on purpose.** Some suites exercise the hook that writes warnings there, and inheriting that stream would print a fixture's findings into the summary as though they were this run's. Where you want a suite's error output, run that suite on its own.
 
-**These suites are a builder's gate.** Several cases name real files in the surrounding workspace, because what they prove is that a check agrees with the corpus, and a corpus cannot be invented. Somebody holding the plugin without the workspace runs `partner-shape.ts` instead, which needs nothing but the plugin itself.
+**These suites are a builder's gate.** Several cases name real files in the surrounding workspace, because what they prove is that a check agrees with the corpus, and a corpus cannot be invented. Somebody holding the plugin without the workspace runs `spn-devex plugin partner check` instead, which needs nothing but the plugin itself.
 
 ## What a run writes down
 
@@ -96,10 +96,10 @@ A case whose title carries an id, such as `[MKT.SCRIPTS.48]`, speaks for its row
 You can ask the writer what it would do without letting it write, by naming the run to it directly:
 
 ```bash
-node packages/plugin-spn-devex/src/scripts/cli.ts behaviours stamp full-1001 . --reach repository
+node packages/plugin-spn-devex/src/scripts/cli.ts behaviours stamp check full-1001 . --reach repository
 ```
 
-It prints one line per row it would change, then a tally. With no `--write` it changes nothing.
+It prints one line per row it would change, then a tally. The action `check` changes nothing; only `write` puts `Status` and `Updated at` into the rows.
 
 ---
 

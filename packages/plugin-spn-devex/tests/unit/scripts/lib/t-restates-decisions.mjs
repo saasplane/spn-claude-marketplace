@@ -118,7 +118,7 @@ console.log("\n=== undeclared() — a row named in prose the block's object cita
     missing.includes("RD.SUPPORT.APPS.087"), true);
 }
 
-console.log("\n=== restates decisions --write — restamps after the developer's rewrite, never the prose");
+console.log("\n=== restates decisions write — restamps after the developer's rewrite, never the prose");
 {
   const devexRoot = join(BASE, "devex-ws");
   mkdirSync(join(devexRoot, ".spndevex"), { recursive: true });
@@ -128,8 +128,8 @@ console.log("\n=== restates decisions --write — restamps after the developer's
   const refPath2 = join(devexRoot, "ref.md");
   const staleBody = '<!-- spn:restates\n{\n  "decisions": [\n    {\n      "repo": "spn-foundation",\n      "row": "RD.SUPPORT.APPS.086",\n      "seen": "deadbeef"\n    }\n  ]\n}\n-->\n\n# a ref\n\nProse untouched by the writer.\n';
   writeFileSync(refPath2, staleBody);
-  const TOOL = join(import.meta.dirname, "..", "..", "..", "..", "src", "scripts", "commands", "restates", "decisions.ts");
-  const out = execFileSync("node", [TOOL, "--write", refPath2], { encoding: "utf8" });
+  const TOOL = join(import.meta.dirname, "..", "..", "..", "..", "src", "scripts", "cli.ts");
+  const out = execFileSync("node", [TOOL, "restates", "decisions", "write", refPath2], { encoding: "utf8", stdio: "pipe", env: { ...process.env, SPN_TELEMETRY: "off" } });
   const after = readFileSync(refPath2, "utf8");
   one("the writer reports one row restamped", out, (g) => /1 row\(s\) restamped/.test(g));
   one("the seen hash now matches the row's real text", after, (g) => g.includes(`"seen": "${rowHash(reg, "RD.SUPPORT.APPS.086")}"`));

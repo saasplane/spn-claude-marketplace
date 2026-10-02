@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "af67eaa5"
+      "seen": "81e9fabe"
     }
   ],
   "decisions": [
@@ -134,10 +134,10 @@ routed by each package's own scope.
 else; `infra test <run> [package]` does the same for the estate. **The caller names every run, and the
 name is required**: build one while you work, such as `full-1001`, and give every tier of one sitting
 the same name. A reused name replaces that one file, and each tier keeps its 20 newest. What that run
-means for the documents is the agent's own work, through plugin scripts: `spn-devex behaviours stamp
-<run> <repo>` reads only that run's files and writes `Status` and `Updated at` as `<time> · <run>`,
-the proof check reads each row against the run it cites, and coverage and the reports read the stamped
-rows only.
+means for the documents is the agent's own work, through plugin scripts:
+`spn-devex behaviours stamp write <run> <repo>` reads only that run's files and writes `Status` and
+`Updated at` as `<time> · <run>`, the proof check reads each row against the run it cites, and
+coverage and the reports read the stamped rows only.
 
 ## `infra` — the estate
 

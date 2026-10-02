@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // RESTATES: CONCEPT.md § DevEx Delivery — a partner receives the public marketplace and neither the
 // foundation book nor its registers.
 //
@@ -11,7 +10,9 @@
 // `CONCEPT.md`, `README.md` — and runs every hook against it. A crash is a failure; a finding is not.
 // Findings are that repo's business. SILENCE ON A MISSING INPUT IS THE CONTRACT.
 //
-//     spn-devex plugin partner [--keep]     run it; --keep leaves the fixture for inspection
+//     spn-devex plugin partner check [--keep]     run it; --keep leaves the fixture for inspection
+//
+// A SUBJECT WITH ONE ACTION, AND NO PATH: the fixture is built in a temporary folder of its own.
 //
 // Run it after touching any hook, and before any release of the plugins.
 //
@@ -23,6 +24,7 @@ import { execFileSync } from "node:child_process";
 import { mkdtempSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join, resolve } from "node:path";
+import { type Action, FLAG, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { isDir, isFile, listdir, read } from "../../lib/payload.ts";
 
 /** One plugin the proof reads: its bare name, the folder that holds its `hooks/`, `scripts/` and `dist/`, and its layout. */
@@ -39,20 +41,20 @@ const FIXTURE: Record<string, string> = {
   "README.md": "# Partner Platform\n\nYou run this locally with `pnpm dev`.\n",
 };
 
+/** The entry of the core plugin: a command is run through it, by its words, because the entry is a command's one way in. */
+const ENTRY = "scripts/cli.ts";
+
 // Every hook, with the arguments it takes when swept over a tree.
 const SCRIPTS: Array<[plugin: string, script: string, args: string[]]> = [
   ["spn-devex", "coherence.ts", ["."]],
   ["spn-devex", "doc-check.ts", ["."]],
-  ["spn-devex", "docs/prose.ts", ["."]],
+  ["spn-devex", ENTRY, ["docs", "prose", "list", "."]],
   ["spn-devex", "split-plan.ts", ["."]],
   ["spn-apps", "contract-cycle.ts", ["."]],
   ["spn-devex", "orientation.ts", []],
   // Runs in the fixture, which holds plugins and NO book. That is a partner's shape exactly, and the
-  // check must print one line and exit clean rather than report every file as drifted. Named
-  // `restates/check.ts` — there are two files named bare `check.ts` in this plugin
-  // (`commands/behaviours/check.ts` is the other), so the parent folder disambiguates which one
-  // `findIn` below walks to.
-  ["spn-devex", "restates/check.ts", []],
+  // check must print one line and exit clean rather than report every file as drifted.
+  ["spn-devex", ENTRY, ["restates", "check"]],
   // Reads its event from stdin and gets none here. It must exit clean rather than block or crash: it
   // guards a file the loop legitimately uses, and a guard that takes the chain down is worse than the
   // exposure it was written for.
@@ -205,7 +207,8 @@ function crashed(stderr: string): boolean {
       || /^[A-Za-z]*Error:/m.test(stderr);
 }
 
-export function main(argv: string[], here: string = HERE): number {
+/** The proof, run from `here`. `keep` leaves the fixture on disk and prints where it is. */
+export function main(keep: boolean, here: string = HERE): number {
   // KEEP THE FIXTURE PATH IN ITS OWN NAME. Reassigning it to each plugin's scripts directory would
   // run inside the plugins rather than the fixture, and the delete below would then remove real
   // scripts.
@@ -253,7 +256,7 @@ export function main(argv: string[], here: string = HERE): number {
     }
   }
 
-  if (argv.includes("--keep")) console.log(`\nfixture kept at ${fixture}`);
+  if (keep) console.log(`\nfixture kept at ${fixture}`);
   else rmSync(fixture, { recursive: true, force: true });
 
   if (failed.length) {
@@ -261,7 +264,7 @@ export function main(argv: string[], here: string = HERE): number {
     for (const [label, why] of failed) console.log(`    ${label}\n      ${why}`);
     console.log("\n  A hook reads the book where it exists and never requires it,");
     console.log("  and every script a hooks.json declares ships beside it.");
-    return failed.length;
+    return 1;
   }
   console.log(`\n${runs.length} hook run(s) — every one survives a repo with no foundation.`);
   console.log(`${scripts.length} declared script(s) — every one present.`);
@@ -269,6 +272,17 @@ export function main(argv: string[], here: string = HERE): number {
 }
 
 export const describe = "run every hook in a fixture holding only what a partner has, never the book";
-export function run(args: string[]): number { return Math.min(main(args), 250); }
 
-if (process.argv[1] && basename(process.argv[1]) === "partner.ts") process.exit(run(process.argv.slice(2)));
+function check(args: string[]): number {
+  const words = readWords(args, { keep: FLAG });
+  if (words.paths.length) throw new UsageFault("takes no path: it builds its own fixture.");
+  return main(words.given("keep"));
+}
+
+export const actions: Record<string, Action> = {
+  check: {
+    describe: "run every hook in a fixture that holds no book, and name each one that crashes or is not shipped",
+    usage: "[--keep]",
+    run: check,
+  },
+};

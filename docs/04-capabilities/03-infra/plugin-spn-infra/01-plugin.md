@@ -38,7 +38,7 @@
 ### A committed build, further off than its two siblings: no commands yet
 
 **Why** — the foundation's `04-plugins/02-shape.md` states the target every plugin here realizes.
-**What** — this plugin carries a committed `dist/` that `hooks.json` runs instead of `src/scripts/events/pretooluse.ts`, with a test that refuses a bundle older than what it was built from — the same as its two siblings. **What it does not gain is a `cli.ts` or a `commands/` folder**: this plugin ships no `tools/` folder, only the write-time gate, so there is no flat list of tools for a `<group> <action>` entry to replace.
+**What** — this plugin carries a committed `dist/` that `hooks.json` runs instead of `src/scripts/events/pretooluse.ts`, with a test that refuses a bundle older than what it was built from — the same as its two siblings. **What it does not gain is a `cli.ts` or a `commands/` folder**: this plugin ships no `tools/` folder, only the write-time gate, so there is no flat list of tools for a `<group> [<subject>] <action>` entry to replace.
 **How** — read the standard chapter before reading anything built against it here.
 
 ### The three plugins carry one number

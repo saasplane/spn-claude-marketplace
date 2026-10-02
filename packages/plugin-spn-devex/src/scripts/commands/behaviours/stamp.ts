@@ -1,11 +1,16 @@
-#!/usr/bin/env node
 // Write what one named run found into the behaviour rows, and nothing else — the one writer of
 // `Status` and `Updated at` in every repository (the book's RD.DEVEX.UTILS.071: the CLI writes the
 // run's file and never a row). It reads the registers under `docs/`, and only the files of the run
 // it is told to read: `<run>.json` and every `<run>.<phase>.json` under each node's
 // `tests/.output/<tier>/runs/`.
 //
-//     spn-devex behaviours stamp <run> <repo> [--write] [--reach repository]
+//     spn-devex behaviours stamp check <run> <path> [--reach repository]   report the rows a write would change
+//     spn-devex behaviours stamp write <run> <path> [--reach repository]   write them
+//
+// A SUBJECT WITH TWO ACTIONS, AND A `tree` PATH. The path may be the repository, a folder inside it
+// or one register. The command finds the repository from the path, reads the run's files from the
+// whole repository, and stamps only the registers that sit under the path. A path in no repository
+// is read as it is: the folder itself holds the run's files and the `docs/` tree.
 //
 // **What a row is for.** `Type` and `Tier` are decisions somebody makes, so a person writes them.
 // `Status` and `Updated at` are what a run FOUND, so the agent writes them, `Updated at` as
@@ -26,12 +31,13 @@
 // **Columns are found by heading**, so an eight-, nine- or ten-cell register is stamped alike and
 // keeps its width. A file is rewritten only where a row of it changed.
 //
-// Exit code: 2 when no run is named, 1 when the named run left no file; otherwise, without
-// `--write`, the rows that would change plus the malformed files, so a pipeline can gate on drift;
-// with it, the malformed files alone.
+// Exit code: 1 where the named run left no file. Otherwise `check` exits 1 where a row would change
+// or a file of the run is malformed, so a pipeline can gate on drift, and `write` exits 1 where a
+// file of the run is malformed. A run or a path left out is a usage fault.
 
 import { statSync, writeFileSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
+import { type Action, REQUIRED, UsageFault, readWords, repositoryOf, scopeOf, under } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { cellValue, registerRows, statusOf } from "../../../../../plugin-support-lib/src/lib/register.ts";
 import { namedRun, newest, read, RUN_NAME, runNames, stampOf, walk, worst } from "../../../../../plugin-support-lib/src/lib/runs.ts";
 import type { Run } from "../../../../../plugin-support-lib/src/lib/runs.ts";
@@ -95,32 +101,38 @@ function newestRuns(root: string): string {
     : `The newest runs here: ${found.map((one) => `${one.run} (${one.ranAt})`).join(" · ")}.`;
 }
 
-/** The options this command takes. Any other is refused, so a stray value is never read as the repository. */
-const OPTIONS = new Set(["--write", "--reach"]);
-
 export const describe = "the one writer of Status and Updated at — stamp behaviour rows from one named run";
 
-export function run(argv: string[]): number {
-  const write = argv.includes("--write");
-  const reachIsRepository = argv.includes("--reach") && argv[argv.indexOf("--reach") + 1] === "repository";
-  const unknown = argv.filter((arg) => arg.startsWith("--") && !OPTIONS.has(arg));
-  const words = argv.filter((arg, at) => !arg.startsWith("--") && argv[at - 1] !== "--reach");
-  const root = resolve(words[1] ?? ".");
-  const usage = "spn-devex behaviours stamp <run> <repo> [--write] [--reach repository]";
-  if (unknown.length > 0) {
-    console.error(`✗ ${unknown.join(" ")}: not an option of this command. Usage: ${usage}`);
-    return 2;
-  }
-  const name = words[0];
-  if (name === undefined) {
-    console.error(`✗ Name the run to stamp from. Usage: ${usage}\n  ${newestRuns(root)}`);
-    return 2;
-  }
+/** `--reach` takes one value: the run was the whole of its tiers, across the repository. */
+const OPTIONS = { reach: ["repository"] };
+const USAGE = "<run> <path> [--reach repository]";
+
+/** The repository a typed path sits in, or the path itself where it sits in none. */
+const rootOf = (path: string): string => repositoryOf(path) ?? path;
+
+/**
+ * The run and the path, read from the words typed after the action. A word that is no run name is
+ * taken for a path typed with no run before it, and the fault names the newest runs under it.
+ */
+function runAndPath(typed: string[]): { name: string; path: string } {
+  if (typed.length === 0) throw new UsageFault("needs a run and a path.");
+  if (typed.length > 2) throw new UsageFault("takes one run and one path.");
+  const [name, path] = typed;
   if (!RUN_NAME.test(name)) {
-    console.error(`✗ '${name}' is not a run name: a letter or digit first, then letters, digits, dots, dashes and underscores. ` +
-      `Usage: ${usage}\n  ${newestRuns(root)}`);
-    return 2;
+    const root = rootOf(resolve(path ?? name));
+    throw new UsageFault(typed.length === 1
+      ? `needs the run to stamp from, before the path. ${newestRuns(root)}`
+      : `takes a run name first, and '${name}' is none: a letter or digit first, then letters, digits, dots, dashes and underscores. ${newestRuns(root)}`);
   }
+  return { name, path: scopeOf(path === undefined ? [] : [path], REQUIRED)[0] };
+}
+
+/** Both actions are one reading of the run and the registers; `write` is the one that changes files. */
+function run(args: string[], write: boolean): number {
+  const words = readWords(args, OPTIONS);
+  const reachIsRepository = words.given("reach");
+  const { name, path } = runAndPath(words.paths);
+  const root = rootOf(path);
 
   const { runs, findings } = namedRun(root, name);
   for (const finding of findings) console.error(`✗ ${finding}`);
@@ -128,13 +140,13 @@ export function run(argv: string[]): number {
     console.error(findings.length > 0
       ? `✗ Run ${name} left no file that can be read, so nothing was stamped.`
       : `✗ No run named ${name} left a file under ${root}\n  ${newestRuns(root)}`);
-    return Math.max(findings.length, 1);
+    return 1;
   }
 
   const tiers = [...new Set(runs.map((one) => one.tier))].sort();
   const changes: Change[] = [];
   for (const file of walk(join(root, "docs"))) {
-    if (!file.endsWith(".md")) continue;
+    if (!file.endsWith(".md") || !under(file, [path])) continue;
     const body = read(file);
     if (body === null || !body.includes("|")) continue;
     const outcome = apply(body, name, runs, reachIsRepository, relative(root, file));
@@ -154,7 +166,18 @@ export function run(argv: string[]): number {
       "the whole of these tiers, and a row nothing cites goes back to PLANNED."
     );
   }
-  return Math.min(findings.length + (write ? 0 : changes.length), 250);
+  return findings.length > 0 || (!write && changes.length > 0) ? 1 : 0;
 }
 
-if (process.argv[1] && new URL(import.meta.url).pathname === process.argv[1]) process.exit(run(process.argv.slice(2)));
+export const actions: Record<string, Action> = {
+  check: {
+    describe: "report the rows one named run would change, and write nothing",
+    usage: USAGE,
+    run: (args) => run(args, false),
+  },
+  write: {
+    describe: "write what one named run found into the Status and Updated at of the rows under the path",
+    usage: USAGE,
+    run: (args) => run(args, true),
+  },
+};

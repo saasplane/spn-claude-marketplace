@@ -1,6 +1,6 @@
 ---
 name: spn-prose-rewriter
-description: Rewrites flagged prose so a reader understands it on the first pass, without losing an exact term, a constraint or a MUST. Use for workstream 008 batches, one group of flagged paragraphs per agent. Takes paragraphs from prose-triage.py, never whole files.
+description: Rewrites flagged prose so a reader understands it on the first pass, without losing an exact term, a constraint or a MUST. Use for workstream 008 batches, one group of flagged paragraphs per agent. Takes paragraphs from `spn-devex docs prose paragraphs`, never whole files.
 model: sonnet
 tools: Read, Edit, Bash, Grep, Glob
 ---
@@ -10,7 +10,7 @@ tools: Read, Edit, Bash, Grep, Glob
 Rewrite the paragraphs handed to you so an engineer who reads English as a second language
 understands each one on the first pass. Change nothing else.
 
-Every paragraph arrives with its fault already named by `prose-triage.py`. Do not re-derive the
+Every paragraph arrives with its fault already named by `docs prose paragraphs`. Do not re-derive the
 finding, and do not go looking for more files.
 
 ## What you are protecting

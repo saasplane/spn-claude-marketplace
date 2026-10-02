@@ -12,6 +12,7 @@ import { execFileSync } from "node:child_process";
 import { ARTIFACT, CONSTRUCT_PAGES, POCKET, SEAT, WORKSTREAMS, bookTemplatesDir } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { INDEX_SCRIPT, OWN_COPY, linesFor } from "../../../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { ENUM_HEAD, checkCodeFigures, checkTreeFigures } from "../../../../../src/scripts/commands/docs/_lib.ts";
+import { FINDINGS } from "../../../../../src/scripts/commands/docs/audit.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
 const BASE = mkdtempSync(join(tmpdir(), "t-docs-audit-"));
@@ -32,6 +33,18 @@ function repo(files, { type = "APPS" } = {}) {
   return root;
 }
 
+/** A folder in no repository: the files of a flat path map, and no `sprepo.json` at or above it. */
+function loose(files) {
+  made += 1;
+  const root = join(BASE, `loose${made}`);
+  for (const [path, text] of Object.entries(files)) {
+    const full = join(root, path);
+    mkdirSync(dirname(full), { recursive: true });
+    writeFileSync(full, text, "utf8");
+  }
+  return root;
+}
+
 const block = (o) => `<!-- spn:doc\n${JSON.stringify(o, null, 2)}\n-->\n`;
 /** The two lines a page in the shared form carries: the stylesheet's, and the script's. */
 const LINES = linesFor("1.0.0");
@@ -41,11 +54,11 @@ const doc = (o, body = "Some prose.\n", tag = null) =>
   block({ summary: `What ${o.title} is.`, ...o }) +
   `\n# ${o.title}\n\n` + (tag === null ? "" : tag + "\n\n") + body;
 
-/** `args` is the action's own argv — `["audit", "docs/a.md"]` — run through `cli.ts docs <args>`. */
+/** `args` is what follows the group — `["audit", "check", "docs/a.md"]` — run through `cli.ts docs <args>`. */
 function run(root, args) {
   try {
     return execFileSync(process.execPath, [TOOL, "docs", ...args],
-      { encoding: "utf8", cwd: root, env: { ...process.env, SPN_WORKSPACE: root } });
+      { encoding: "utf8", cwd: root, stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: root } });
   } catch (e) { return String(e.stdout ?? "") + String(e.stderr ?? ""); }
 }
 const readAt = (root, p) => readFileSync(join(root, p), "utf8");
@@ -73,7 +86,7 @@ console.log("\n=== a markdown seat file is checked as a seat file, not as a page
                      "Lead.\n", "`For: Quality engineer` · `Status: ✅ DONE`"),
   });
   one("a well-formed seat file is clean — it is never asked for an HTML <header>",
-    run(root, ["audit", "docs/a.md"]), has("clean — 1 page"));
+    run(root, ["audit", "check", "docs/a.md"]), has("clean — 1 page"));
 }
 {
   const root = repo({
@@ -82,7 +95,7 @@ console.log("\n=== a markdown seat file is checked as a seat file, not as a page
                      "Lead.\n", "`For: Architect` · `Status: ✅ DONE`"),
   });
   one("a lens line that disagrees with the block is a finding",
-    run(root, ["audit", "docs/a.md"]), has("which the block does not declare"));
+    run(root, ["audit", "check", "docs/a.md"]), has("which the block does not declare"));
 }
 {
   const root = repo({
@@ -91,7 +104,7 @@ console.log("\n=== a markdown seat file is checked as a seat file, not as a page
                      "Lead.\n", "`For: Quality engineer` · `Status: 🔮 PLANNING`"),
   });
   one("a status chip that disagrees with the block is a finding",
-    run(root, ["audit", "docs/a.md"]), has("the block says `DONE`"));
+    run(root, ["audit", "check", "docs/a.md"]), has("the block says `DONE`"));
 }
 {
   const root = repo({
@@ -101,7 +114,7 @@ console.log("\n=== a markdown seat file is checked as a seat file, not as a page
                      "`For: Quality engineer` · `Status: ✅ DONE`"),
   });
   one("a title inside a fence is not a second title",
-    run(root, ["audit", "docs/a.md"]), has("clean — 1 page"));
+    run(root, ["audit", "check", "docs/a.md"]), has("clean — 1 page"));
 }
 
 
@@ -128,12 +141,12 @@ const construct = (sections) =>
 {
   const root = repo({ "CONCEPT.md": "# c\n", [`docs/${SEAT.constructs}/x.md`]: construct(SECTIONS) });
   one("a construct with every section, written as `##`, is clean",
-    run(root, ["audit", `docs/${SEAT.constructs}/x.md`]), has("clean — 1 page"));
+    run(root, ["audit", "check", `docs/${SEAT.constructs}/x.md`]), has("clean — 1 page"));
 }
 {
   const root = repo({ "CONCEPT.md": "# c\n",
     [`docs/${SEAT.constructs}/x.md`]: construct(SECTIONS.filter((h) => h !== "Boundary")) });
-  const out = run(root, ["audit", `docs/${SEAT.constructs}/x.md`]);
+  const out = run(root, ["audit", "check", `docs/${SEAT.constructs}/x.md`]);
   one("a construct genuinely missing a section is still a finding", out, has("missing section: Boundary"));
   one("and it names only the one that is missing", out, lacks("missing section: Terms"));
 }
@@ -144,12 +157,12 @@ const construct = (sections) =>
   const root = repo({ "CONCEPT.md": "# c\n",
     [`docs/${SEAT.constructs}/x.md`]: construct(["Overview", "Terms", "Model", "Parts", "Boundary"]) });
   one("a construct carrying neither Binds nor Proof is clean, which is the shape `E` leaves",
-    run(root, ["audit", `docs/${SEAT.constructs}/x.md`]), has("clean — 1 page"));
+    run(root, ["audit", "check", `docs/${SEAT.constructs}/x.md`]), has("clean — 1 page"));
 
   const swapped = repo({ "CONCEPT.md": "# c\n",
     [`docs/${SEAT.constructs}/x.md`]: construct(["Overview", "Terms", "Model", "Parts", "Proof", "Boundary"]) });
   one("an optional section out of place is still out of place",
-    run(swapped, ["audit", `docs/${SEAT.constructs}/x.md`]), has("`Proof` comes before `Boundary`"));
+    run(swapped, ["audit", "check", `docs/${SEAT.constructs}/x.md`]), has("`Proof` comes before `Boundary`"));
 }
 {
   // OVERVIEW IS REQUIRED, AND IT WAS OPTIONAL FOR ONE SITTING (N67). Adding a required section to
@@ -160,20 +173,20 @@ const construct = (sections) =>
   const root = repo({ "CONCEPT.md": "# c\n",
     [`docs/${SEAT.constructs}/x.md`]: construct(SECTIONS.filter((h) => h !== "Overview")) });
   one("a construct with no Overview is refused, and named",
-    run(root, ["audit", `docs/${SEAT.constructs}/x.md`]), has("missing section: Overview"));
+    run(root, ["audit", "check", `docs/${SEAT.constructs}/x.md`]), has("missing section: Overview"));
 
   // Order matters as much as presence: Overview argues WHY and Terms defines the words the Model
   // uses, so a page that defines before it argues is a finding rather than a preference.
   const swapped = repo({ "CONCEPT.md": "# c\n",
     [`docs/${SEAT.constructs}/x.md`]: construct(["Terms", "Overview", "Model", "Parts", "Boundary", "Binds", "Proof"]) });
   one("a construct that puts Terms before Overview is refused",
-    run(swapped, ["audit", `docs/${SEAT.constructs}/x.md`]), has("`Terms` comes before `Overview`"));
+    run(swapped, ["audit", "check", `docs/${SEAT.constructs}/x.md`]), has("`Terms` comes before `Overview`"));
 }
 {
   const v1 = doc({ id: "x", variant: "construct", parentId: "concept", dependsOn: [], title: "X", lenses: ["ARCHITECT"], status: "PLANNING" },
       "Lead.\n\n## Boundary\n\nb\n\n## Model\n\nm\n\n## Parts\n\np\n\n## Relations\n\nr\n\n" + SECTION_BODY.Binds + "\n## Proof\n\n" + SECTION_BODY.Proof,
       "`For: Architect` · `Status: 🔮 PLANNING`");
-  const out = run(repo({ "CONCEPT.md": "# c\n", [`docs/${SEAT.constructs}/x.md`]: v1 }), ["audit", `docs/${SEAT.constructs}/x.md`]);
+  const out = run(repo({ "CONCEPT.md": "# c\n", [`docs/${SEAT.constructs}/x.md`]: v1 }), ["audit", "check", `docs/${SEAT.constructs}/x.md`]);
   one("a v1-shaped construct is reported softly until N13 re-shapes it, never refused", out, (g) => /carries the v1 outline/.test(g) && !/missing section/.test(g));
 }
 {
@@ -182,13 +195,13 @@ const construct = (sections) =>
     [`docs/${SEAT.constructs}/x.md`]: construct(SECTIONS.filter((h) => h !== "Boundary"))
       .replace("## Binds", "```text\n## Boundary\n```\n\n## Binds") });
   one("a heading inside a fence does not satisfy the outline",
-    run(root, ["audit", `docs/${SEAT.constructs}/x.md`]), has("missing section: Boundary"));
+    run(root, ["audit", "check", `docs/${SEAT.constructs}/x.md`]), has("missing section: Boundary"));
 }
 {
   // `produced` compares a PAGE with the seat it would be produced from. A seat file is not a page.
   const root = repo({ "CONCEPT.md": "# c\n", [`docs/${SEAT.constructs}/x.md`]: construct(SECTIONS) });
   one("the produced check stays silent on a seat file, which has no page yet",
-    run(root, ["audit", `docs/${SEAT.constructs}/x.md`]), lacks("no seat file sits at the mirrored path"));
+    run(root, ["audit", "check", `docs/${SEAT.constructs}/x.md`]), lacks("no seat file sits at the mirrored path"));
 }
 
 
@@ -210,19 +223,19 @@ const CONCEPT_TREE = "# c\n\n## SaaS Plane — Foundation\n\nstage.\n\n### DevEx
   const root = repo({ "CONCEPT.md": CONCEPT_TREE,
     [`${POCKET_DOCS}/o-overview.html`]: overview(["Overview", "DevEx", "Docs", "Glossary", "Where to go next"]) });
   one("a domain heading at `###` is a real heading, and the overview may borrow it",
-    run(root, ["audit", `${POCKET_DOCS}/o-overview.html`]), lacks("no counterpart"));
+    run(root, ["audit", "check", `${POCKET_DOCS}/o-overview.html`]), lacks("no counterpart"));
 }
 {
   const root = repo({ "CONCEPT.md": CONCEPT_TREE,
     [`${POCKET_DOCS}/o-overview.html`]: overview(["Overview", "DevEx", "Invented", "Glossary", "Where to go next"]) });
   one("a heading the concept does not have anywhere is still a finding",
-    run(root, ["audit", `${POCKET_DOCS}/o-overview.html`]), has("Invented — an overview never invents"));
+    run(root, ["audit", "check", `${POCKET_DOCS}/o-overview.html`]), has("Invented — an overview never invents"));
 }
 {
   const root = repo({ "CONCEPT.md": CONCEPT_TREE,
     [`${POCKET_DOCS}/o-overview.html`]: overview(["Overview", "Docs", "DevEx", "Glossary", "Where to go next"]) });
   one("and the source's order still binds across depths",
-    run(root, ["audit", `${POCKET_DOCS}/o-overview.html`]), has("an overview holds its source's order"));
+    run(root, ["audit", "check", `${POCKET_DOCS}/o-overview.html`]), has("an overview holds its source's order"));
 }
 {
   // A concept that SHOWS an example page in a fenced block is not declaring those headings.
@@ -230,7 +243,7 @@ const CONCEPT_TREE = "# c\n\n## SaaS Plane — Foundation\n\nstage.\n\n### DevEx
     "CONCEPT.md": CONCEPT_TREE + "\n```markdown\n## Fenced Heading\n```\n",
     [`${POCKET_DOCS}/o-overview.html`]: overview(["Overview", "Fenced Heading", "Glossary", "Where to go next"]) });
   one("a heading inside a fence is not a heading the concept has",
-    run(root, ["audit", `${POCKET_DOCS}/o-overview.html`]), has("Fenced Heading — an overview never invents"));
+    run(root, ["audit", "check", `${POCKET_DOCS}/o-overview.html`]), has("Fenced Heading — an overview never invents"));
 }
 
 
@@ -250,7 +263,7 @@ const PROOF_OK = "## Proof\n\n| Check | Kind | What a green run shows |\n| --- |
 {
   const root = repo({ "CONCEPT.md": "# c\n", [`docs/${SEAT.constructs}/x.md`]: withSections(BINDS_OK, PROOF_OK) });
   one("a construct with both tables and a real command is clean",
-    run(root, ["audit", `docs/${SEAT.constructs}/x.md`]), has("clean"));
+    run(root, ["audit", "check", `docs/${SEAT.constructs}/x.md`]), has("clean"));
 }
 {
   // ONE TABLE IS THE SHAPE `E` LEAVES BEHIND — the rules that hold the construct, and nothing about
@@ -258,20 +271,20 @@ const PROOF_OK = "## Proof\n\n| Check | Kind | What a green run shows |\n| --- |
   const one_table = "## Binds\n\n| Rule | What it decides | Weight |\n| --- | --- | --- |\n| `a.md` | x | MUST |\n";
   const root = repo({ "CONCEPT.md": "# c\n", [`docs/${SEAT.constructs}/x.md`]: withSections(one_table, PROOF_OK) });
   one("Binds carrying the rules table alone is clean",
-    run(root, ["audit", `docs/${SEAT.constructs}/x.md`]), has("clean"));
+    run(root, ["audit", "check", `docs/${SEAT.constructs}/x.md`]), has("clean"));
 }
 {
   const no_table = "## Binds\n\nThe rules are written down somewhere else.\n";
   const root = repo({ "CONCEPT.md": "# c\n", [`docs/${SEAT.constructs}/x.md`]: withSections(no_table, PROOF_OK) });
   one("Binds carrying no table at all is still a finding",
-    run(root, ["audit", `docs/${SEAT.constructs}/x.md`]), has("Binds carries no table"));
+    run(root, ["audit", "check", `docs/${SEAT.constructs}/x.md`]), has("Binds carries no table"));
 }
 {
   // A realization table with no row was invariant 6's RULE, and `E` removes the table it read.
   const no_row = "## Binds\n\n| Rule | What it decides | Weight |\n| --- | --- | --- |\n| `a.md` | x | MUST |\n\n| Repo | Node | What it realizes | State |\n| --- | --- | --- | --- |\n";
   const root = repo({ "CONCEPT.md": "# c\n", [`docs/${SEAT.constructs}/x.md`]: withSections(no_row, PROOF_OK) });
   one("an empty realization table is no longer a finding — `E` retires the row it demanded",
-    run(root, ["audit", `docs/${SEAT.constructs}/x.md`]), has("clean"));
+    run(root, ["audit", "check", `docs/${SEAT.constructs}/x.md`]), has("clean"));
 }
 {
   // THE `NODE` CELL IS NOT RESOLVED ANY MORE, and the case names the exact substring match that went:
@@ -280,23 +293,23 @@ const PROOF_OK = "## Proof\n\n| Check | Kind | What a green run shows |\n| --- |
   const loose = BINDS_OK.replace("| R | n | x | planned |", "| R | the estate declaration | x | done |");
   const root = repo({ "CONCEPT.md": "# c\n", [`docs/${SEAT.constructs}/x.md`]: withSections(loose, PROOF_OK) });
   one("a `Node` cell is no longer resolved, loosely or at all",
-    run(root, ["audit", `docs/${SEAT.constructs}/x.md`]), lacks("resolves to no node"));
+    run(root, ["audit", "check", `docs/${SEAT.constructs}/x.md`]), lacks("resolves to no node"));
 }
 {
   const odd = BINDS_OK.replace("| R | n | x | planned |", "| R | n | x | nearly |");
   const root = repo({ "CONCEPT.md": "# c\n", [`docs/${SEAT.constructs}/x.md`]: withSections(odd, PROOF_OK) });
   one("a realization state outside planned · partial · done is reported",
-    run(root, ["audit", `docs/${SEAT.constructs}/x.md`]), has("planned · partial · done"));
+    run(root, ["audit", "check", `docs/${SEAT.constructs}/x.md`]), has("planned · partial · done"));
 }
 {
   // A COMMAND IS WRITTEN AS CODE, and markdown's backticks are not part of the command.
   const spec = PROOF_OK.replace("`spnutils apps test`", "`some-thing.spec.ts`");
   const root = repo({ "CONCEPT.md": "# c\n", [`docs/${SEAT.constructs}/x.md`]: withSections(BINDS_OK, spec) });
   one("a Proof row naming a spec file rather than a command is reported",
-    run(root, ["audit", `docs/${SEAT.constructs}/x.md`]), has("may not name a command"));
+    run(root, ["audit", "check", `docs/${SEAT.constructs}/x.md`]), has("may not name a command"));
   const root2 = repo({ "CONCEPT.md": "# c\n", [`docs/${SEAT.constructs}/x.md`]: withSections(BINDS_OK, PROOF_OK) });
   one("and a real command in backticks is NOT — the markers are stripped first",
-    run(root2, ["audit", `docs/${SEAT.constructs}/x.md`]), lacks("may not name a command"));
+    run(root2, ["audit", "check", `docs/${SEAT.constructs}/x.md`]), lacks("may not name a command"));
 }
 
 
@@ -314,7 +327,7 @@ console.log("\n=== a chapter that TEACHES the metadata block does not thereby de
     "\n# Human Title\n```\n";
   const root = repo({ "CONCEPT.md": "# c\n", "docs/teaches.md": teaches });
   one("the example's block is not read as the document's own",
-    run(root, ["audit", "docs/teaches.md"]), has("no spn:doc block"));
+    run(root, ["audit", "check", "docs/teaches.md"]), has("no spn:doc block"));
 }
 {
   // The ordinary case must still work: a real block, and an example further down.
@@ -323,7 +336,7 @@ console.log("\n=== a chapter that TEACHES the metadata block does not thereby de
     "`For: Quality engineer` · `Status: ✅ DONE`");
   const root = repo({ "CONCEPT.md": "# c\n", "docs/real.md": both });
   one("a real block above a fenced example is still read, and it is the real one",
-    run(root, ["audit", "docs/real.md"]), has("clean"));
+    run(root, ["audit", "check", "docs/real.md"]), has("clean"));
 }
 // ---------------------------------------------------------------- the Map cell resolves on disk
 
@@ -345,7 +358,7 @@ console.log("\n=== a link is opened, rather than merely written");
       doc({ id: "l-there", title: "There", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
           "`For: Architect` · `Status: ✅ DONE`"),
   });
-  const out = run(root, ["audit", "docs"]);
+  const out = run(root, ["audit", "check", "docs"]);
   one("a link naming nothing is reported", out, has("names `03-gone.md`, and nothing is there"));
   one("a link that resolves is not", out, lacks("names `02-there.md`"));
   one("an anchor on a page that exists is the page, and the page is there",
@@ -367,7 +380,7 @@ console.log("\n=== a link is opened, rather than merely written");
       "\nA link is written like this:\n\n```md\nSee [the other page](99-nowhere.md).\n```\n" +
       "\nAnd in a page, like this:\n\n<pre>&lt;a href=\"98-nowhere.md\"&gt;the other page&lt;/a&gt;</pre>\n",
   });
-  const out = run(root, ["audit", "docs"]);
+  const out = run(root, ["audit", "check", "docs"]);
   one("a link inside a fenced sample is a sample", out, lacks("99-nowhere.md"));
   one("a link inside a pre block is a sample too", out, lacks("98-nowhere.md"));
 }
@@ -397,7 +410,7 @@ console.log("\n=== a Governs cell names a folder that exists, and the audit says
       doc({ id: "g-ghost", title: "Ghost", lenses: ["ARCHITECT"], status: "DONE" }, "Lead.\n",
           "`For: Architect` · `Status: ✅ DONE`"),
   });
-  const out = run(root, ["audit", "docs"]);
+  const out = run(root, ["audit", "check", "docs"]);
   one("the cell that resolves to nothing is reported", out, has("`src/01-core/01-server/ghost/`, and no such folder exists"));
   one("and the row it sits on is named by its text, not its link syntax",
     out, (g) => g.includes("the Contents table says `ghost.md` governs") && !g.includes("[ghost.md](ghost.md)"));
@@ -417,7 +430,7 @@ console.log("\n=== a Governs cell names a folder that exists, and the audit says
       "<!-- /spn:generated -->\n",
     "src/app/index.ts": "export const a = 1;\n",
   });
-  one("a Map whose every cell resolves reports nothing", run(root, ["audit", "docs"]), lacks("SOFT map"));
+  one("a Map whose every cell resolves reports nothing", run(root, ["audit", "check", "docs"]), lacks("SOFT map"));
 }
 {
   // The empty Map the generator writes where a level has no mirror is not a dead cell.
@@ -432,7 +445,7 @@ console.log("\n=== a Governs cell names a folder that exists, and the audit says
       "<!-- /spn:generated -->\n",
   });
   one("`this layer carries no mirror yet` is the right answer, not a finding",
-    run(root, ["audit", "docs"]), lacks("SOFT map"));
+    run(root, ["audit", "check", "docs"]), lacks("SOFT map"));
 }
 {
   // `Governs` IS ALSO A COLUMN HEADING IN AUTHORED TABLES, where the cell is a sentence. The
@@ -447,7 +460,7 @@ console.log("\n=== a Governs cell names a folder that exists, and the audit says
           "`For: Architect` · `Status: ✅ DONE`"),
   });
   one("an authored `Governs` column of prose is not read as a path",
-    run(root, ["audit", "docs"]), lacks("SOFT map"));
+    run(root, ["audit", "check", "docs"]), lacks("SOFT map"));
 }
 
 console.log("\n=== the gap scan measures and never fixes");
@@ -464,7 +477,7 @@ console.log("\n=== the gap scan measures and never fixes");
     "pkg/docs/README.md": "# stray\n",
   });
   const before = readAt(root, `docs/${SEAT.behaviors}/README.md`);
-  const rep = run(root, ["audit", "--report", "."]);
+  const rep = run(root, ["audit", "report", "."]);
 
   // THE MEASUREMENT IS A RETURN VALUE, NEVER A FILE (RD.DEVEX.WORKSPACE.149). A report is written by the agent
   // from what it read; a tool hands over what it measured and writes nothing into a pocket. Before
@@ -480,7 +493,7 @@ console.log("\n=== the gap scan measures and never fixes");
   one("the report counts no arguments in the pocket", rep, lacks("arguments still in the pocket"));
   one("a page with no block is counted", rep, has("block (RULE)"));
   one("--json hands the agent the same measurement as data",
-    run(root, ["audit", "--report", ".", "--json"]), (g) => {
+    run(root, ["audit", "report", ".", "--json"]), (g) => {
       try { const d = JSON.parse(g); return d.repo !== undefined && Array.isArray(d.seats) && d.measuredAt !== undefined; }
       catch { return false; }
     });
@@ -495,7 +508,7 @@ console.log("\n=== the gap scan measures and never fixes");
         doc({ id: "x", variant: "approach", title: "X", lenses: ["ARCHITECT"], status: "PLANNING" },
             `${LINES.stylesheet}\n<p>an argument</p>\n`),
     });
-    const got = run(ws, ["audit", `${POCKET_DOCS}/x-approach.html`]);
+    const got = run(ws, ["audit", "check", `${POCKET_DOCS}/x-approach.html`]);
     one("an approach page in a repository's docs is refused", got, has("belongs to the workstream"));
   }
   {
@@ -505,7 +518,7 @@ console.log("\n=== the gap scan measures and never fixes");
         doc({ id: "a", variant: "approach", title: "A", lenses: ["ARCHITECT"], status: "PLANNING" },
             `${LINES.stylesheet}\n<p>an argument</p>\n`),
     });
-    const got = run(ws, ["audit", `.spndevex/${WORKSTREAMS}/open/001-a/a-approach.html`]);
+    const got = run(ws, ["audit", "check", `.spndevex/${WORKSTREAMS}/open/001-a/a-approach.html`]);
     one("the same page in a workstream is not", got, (g) => !/belongs to the workstream/.test(g));
   }
 
@@ -519,7 +532,7 @@ console.log("\n=== the gap scan measures and never fixes");
         doc({ id: "xp", title: "Purpose — x", lenses: ["ARCHITECT"], status: "DONE" },
             "why x exists\n", "`For: Architect` · `Status: ✅ DONE`"),
     });
-    const got = run(ws, ["audit", `docs/${POCKET.artifacts}/${folder}/packages/x/purpose.md`]);
+    const got = run(ws, ["audit", "check", `docs/${POCKET.artifacts}/${folder}/packages/x/purpose.md`]);
     one(`a file in a pocket folder outside the set (${folder}/) is refused`, got, has(`never in \`${folder}/\``));
   }
 
@@ -540,7 +553,7 @@ console.log("\n=== the gap scan measures and never fixes");
       construct: `${POCKET_DOCS}/01-core/${CONSTRUCT_PAGES}/01-thing-construct.html`,
       nested: `${POCKET_DOCS}/01-area/02-core/${CONSTRUCT_PAGES}/01-thing-construct.html`,
     };
-    const at = (path, text) => run(repo({ "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n", [path]: text }), ["audit", path]);
+    const at = (path, text) => run(repo({ "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n", [path]: text }), ["audit", "check", path]);
 
     const leftOverview = at(`${LEFT_OVERVIEWS}/core-overview.html`, overviewPage);
     one("[MKT.SCRIPTS.110] an overview left under `overviews/` is a finding of the audit, and it names the folder the pocket does not hold",
@@ -572,7 +585,7 @@ console.log("\n=== the gap scan measures and never fixes");
         doc({ id: "xp", title: "Purpose — x", lenses: ["ARCHITECT"], status: "DONE" },
             "why x exists\n", "`For: Architect` · `Status: ✅ DONE`"),
     });
-    const got = run(ws, ["audit", `docs/${SEAT.purpose}/x.md`]);
+    const got = run(ws, ["audit", "check", `docs/${SEAT.purpose}/x.md`]);
     one(`the same file in ${SEAT.purpose} is not`, got, (g) => !/lives in a seat/.test(g));
   }
   {
@@ -582,7 +595,7 @@ console.log("\n=== the gap scan measures and never fixes");
         doc({ id: "xr", title: "Report — x", lenses: ["ARCHITECT"], status: "DONE" },
             "what x measured\n", "`For: Architect` · `Status: ✅ DONE`"),
     });
-    const got = run(ws, ["audit", `docs/${POCKET.artifacts}/${ARTIFACT.reports}/x.md`]);
+    const got = run(ws, ["audit", "check", `docs/${POCKET.artifacts}/${ARTIFACT.reports}/x.md`]);
     one(`a file in ${ARTIFACT.reports}/, a folder the set names, is not`, got, (g) => !/lives in a seat/.test(g));
   }
 
@@ -615,7 +628,7 @@ console.log("=== a closed value is declared once, and agrees with what realizes 
       [`docs/${SEAT.constructs}/01-core/rungs.md`]: chapter("Rungs", "rungs", AGREES),
     });
     one("a declaration that matches the code it realizes is reported nowhere",
-      run(root, ["audit", `docs/${SEAT.constructs}/01-core/rungs.md`]), lacks("vocabulary"));
+      run(root, ["audit", "check", `docs/${SEAT.constructs}/01-core/rungs.md`]), lacks("vocabulary"));
   }
 
   {
@@ -627,7 +640,7 @@ console.log("=== a closed value is declared once, and agrees with what realizes 
       [`docs/${SEAT.constructs}/01-core/rungs.md`]: chapter("Rungs", "rungs",
         "```ts\nexport enum SPRungType {\n  UNIT = 'UNIT',      // alone\n  WIRED = 'WIRED',    // against the real thing\n  BROWSED = 'BROWSED',// in a real browser\n}\n```"),
     });
-    const got = run(root, ["audit", `docs/${SEAT.constructs}/01-core/rungs.md`]);
+    const got = run(root, ["audit", "check", `docs/${SEAT.constructs}/01-core/rungs.md`]);
     one("a member the book names and the code lacks is reported", got, has("names BROWSED"));
     one("and the finding names the file that would have to change", got, has("src/rungs.ts"));
     one("neither side is called the wrong one", got, has("one of the two is wrong"));
@@ -642,7 +655,7 @@ console.log("=== a closed value is declared once, and agrees with what realizes 
       [`docs/${SEAT.constructs}/01-core/rungs.md`]: chapter("Rungs", "rungs", AGREES),
     });
     one("a member the code carries and the book omits is reported",
-      run(root, ["audit", `docs/${SEAT.constructs}/01-core/rungs.md`]), has("does not name BROWSED"));
+      run(root, ["audit", "check", `docs/${SEAT.constructs}/01-core/rungs.md`]), has("does not name BROWSED"));
   }
 
   {
@@ -656,7 +669,7 @@ console.log("=== a closed value is declared once, and agrees with what realizes 
       [`docs/${SEAT.constructs}/01-core/rungs.md`]: chapter("Rungs", "rungs",
         "```ts\nexport enum SPRungType { UNIT = 'UNIT' }  // alone\n\nexport enum SPOther {\n  ADM = 'ADM',  // administer\n  MIG = 'MIG',  // migrate\n}\n```"),
     });
-    const got = run(root, ["audit", `docs/${SEAT.constructs}/01-core/rungs.md`]);
+    const got = run(root, ["audit", "check", `docs/${SEAT.constructs}/01-core/rungs.md`]);
     one("a one-line enum does not swallow the enum after it", got, lacks("vocabulary"));
     one("and neither is accused of carrying the other's members", got, lacks("ADM"));
   }
@@ -669,7 +682,7 @@ console.log("=== a closed value is declared once, and agrees with what realizes 
       [`docs/${SEAT.constructs}/01-core/rungs.md`]: chapter("Rungs", "rungs", AGREES),
     });
     one("a value no source realizes yet is reported nowhere",
-      run(root, ["audit", `docs/${SEAT.constructs}/01-core/rungs.md`]), lacks("vocabulary"));
+      run(root, ["audit", "check", `docs/${SEAT.constructs}/01-core/rungs.md`]), lacks("vocabulary"));
   }
 
   {
@@ -681,7 +694,7 @@ console.log("=== a closed value is declared once, and agrees with what realizes 
       [`docs/${SEAT.constructs}/01-core/again.md`]: chapter("Again", "again", AGREES),
     });
     one("one value declared in two chapters is reported",
-      run(root, ["audit", `docs/${SEAT.constructs}/01-core/rungs.md`, `docs/${SEAT.constructs}/01-core/again.md`]),
+      run(root, ["audit", "check", `docs/${SEAT.constructs}/01-core/rungs.md`, `docs/${SEAT.constructs}/01-core/again.md`]),
       has("is declared in 2 chapters"));
   }
 
@@ -693,7 +706,7 @@ console.log("=== a closed value is declared once, and agrees with what realizes 
       [`docs/${SEAT.constructs}/01-core/other.md`]: chapter("Other", "other", "Nor here.\n"),
     });
     one("a contract term no chapter declares is reported",
-      run(root, ["audit", `docs/${SEAT.constructs}/01-core/rungs.md`, `docs/${SEAT.constructs}/01-core/other.md`]),
+      run(root, ["audit", "check", `docs/${SEAT.constructs}/01-core/rungs.md`, `docs/${SEAT.constructs}/01-core/other.md`]),
       has("`SPRungType` is named as a contract term and no chapter declares"));
   }
 
@@ -711,7 +724,7 @@ console.log("=== a closed value is declared once, and agrees with what realizes 
       [`docs/${SEAT.constructs}/01-core/other.md`]: chapter("Other", "other", "Nor here.\n"),
     });
     one("a member reference names its type, and an undeclared one is reported",
-      run(root, ["audit", `docs/${SEAT.constructs}/01-core/rungs.md`, `docs/${SEAT.constructs}/01-core/other.md`]),
+      run(root, ["audit", "check", `docs/${SEAT.constructs}/01-core/rungs.md`, `docs/${SEAT.constructs}/01-core/other.md`]),
       has("`SPRungType` is named as a contract term"));
   }
 
@@ -728,7 +741,7 @@ console.log("=== a closed value is declared once, and agrees with what realizes 
         "```ts\nexport enum SPRungType {\n  UNIT = 'UNIT',      // alone\n  WIRED = 'WIRED',    // against the real thing\n  BROWSED = 'BROWSED',// in a real browser\n}\n```"),
     });
     one("[MKT.SCRIPTS.86] known-bad: the code's enum with a brace in its comment is still compared with the book",
-      run(root, ["audit", `docs/${SEAT.constructs}/01-core/rungs.md`]), has("names BROWSED"));
+      run(root, ["audit", "check", `docs/${SEAT.constructs}/01-core/rungs.md`]), has("names BROWSED"));
   }
 
   {
@@ -746,24 +759,50 @@ console.log("=== a closed value is declared once, and agrees with what realizes 
     });
     const both = [`docs/${SEAT.constructs}/01-core/entity.md`, `docs/${SEAT.constructs}/01-core/other.md`];
     one("[MKT.SCRIPTS.86] a `…Type` term the source declares as an interface is not reported as an enum with no members",
-      run(repo(files("export interface EntityType extends EntityTypeInfo {\n  id: string;\n}\n")), ["audit", ...both]), lacks("no chapter declares"));
+      run(repo(files("export interface EntityType extends EntityTypeInfo {\n  id: string;\n}\n")), ["audit", "check", ...both]), lacks("no chapter declares"));
     one("[MKT.SCRIPTS.86] nor is one the source declares as a type alias",
-      run(repo(files("export type EntityType = { id: string };\n")), ["audit", ...both]), lacks("no chapter declares"));
+      run(repo(files("export type EntityType = { id: string };\n")), ["audit", "check", ...both]), lacks("no chapter declares"));
     one("[MKT.SCRIPTS.86] known-bad: a `…Type` term the source declares as an enum, and no chapter declares, is still reported",
-      run(repo(files("export enum EntityType {\n  PERSON = 'PERSON',\n}\n")), ["audit", ...both]),
+      run(repo(files("export enum EntityType {\n  PERSON = 'PERSON',\n}\n")), ["audit", "check", ...both]),
       has("`EntityType` is named as a contract term and no chapter declares"));
     one("[MKT.SCRIPTS.86] known-bad: so is one that no source declares at all, because the book may lead the code",
-      run(repo(files(null)), ["audit", ...both]), has("`EntityType` is named as a contract term and no chapter declares"));
+      run(repo(files(null)), ["audit", "check", ...both]), has("`EntityType` is named as a contract term and no chapter declares"));
   }
 
   {
-    // One page cannot see the corpus, so it must not accuse another chapter of not existing.
+    // A PATH IN NO REPOSITORY IS READ AS IT IS. One page read alone cannot see a corpus, so it must
+    // not accuse another chapter of not existing.
+    const root = loose({
+      [`docs/${SEAT.constructs}/01-core/rungs.md`]: chapter("Rungs", "rungs", "No declaration here.\n"),
+      [`docs/${SEAT.constructs}/01-core/other.md`]: chapter("Other", "other", "Nor here.\n"),
+    });
+    one("a page in no repository, audited alone, never claims a value is undeclared",
+      run(root, ["audit", "check", `docs/${SEAT.constructs}/01-core/rungs.md`]), (got) => got.includes("clean — 1 page") && !got.includes("no chapter declares"));
+    one("known-bad: the folder that holds both pages, audited, does claim it",
+      run(root, ["audit", "check", "docs"]), has("no chapter declares"));
+  }
+
+  {
+    // INSIDE A REPOSITORY A NARROW RUN STILL READS THE CORPUS. A value declared in two chapters is a
+    // finding no single page can show, and it is reported whichever of the two the run is narrowed to.
+    const rungs = `docs/${SEAT.constructs}/01-core/rungs.md`, again = `docs/${SEAT.constructs}/01-core/again.md`;
     const root = repo({
       "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
-      [`docs/${SEAT.constructs}/01-core/rungs.md`]: chapter("Rungs", "rungs", "No declaration here.\n"),
+      [rungs]: chapter("Rungs", "rungs", AGREES),
+      [again]: chapter("Again", "again", AGREES),
     });
-    one("one page audited alone never claims a value is undeclared",
-      run(root, ["audit", `docs/${SEAT.constructs}/01-core/rungs.md`]), lacks("no chapter declares"));
+    const times = (got) => got.split("is declared in 2 chapters").length - 1;
+    one("[MKT.SCRIPTS.114] a value declared in two chapters is reported on a run narrowed to one of them",
+      run(root, ["audit", "check", rungs]), (got) => times(got) === 1 && got.includes("over 1 page"));
+    one("[MKT.SCRIPTS.114] and on a run narrowed to the other", run(root, ["audit", "check", again]), (got) => times(got) === 1 && got.includes("over 1 page"));
+    one("[MKT.SCRIPTS.114] a run on the whole repository reports it once", times(run(root, ["audit", "check"])), 1);
+
+    const lone = repo({
+      "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
+      [rungs]: chapter("Rungs", "rungs", "No declaration here.\n"),
+    });
+    one("[MKT.SCRIPTS.114] a term no chapter of the repository declares is reported on a run narrowed to the page that names it",
+      run(lone, ["audit", "check", rungs]), has("`SPRungType` is named as a contract term and no chapter declares"));
   }
 
   {
@@ -775,7 +814,7 @@ console.log("=== a closed value is declared once, and agrees with what realizes 
       [`docs/${SEAT.constructs}/01-core/rungs.md`]: chapter("Rungs", "rungs",
         "```ts\nexport enum SPRungType {\n  UNIT = 'UNIT',  // alone\n}\n```"),
     });
-    const got = run(root, ["audit", `docs/${SEAT.constructs}/01-core/rungs.md`]);
+    const got = run(root, ["audit", "check", `docs/${SEAT.constructs}/01-core/rungs.md`]);
     one("a disagreement reports rather than refuses", got, has("SOFT vocabulary"));
     one("and it is counted among the soft findings", got, has("0 RULE, 1 SOFT"));
   }
@@ -801,7 +840,7 @@ console.log("\n=== a domain overview borrows from its DOMAIN, not from the conce
       block({ id: "o", variant: "overview", parentId: "concept", title: "Core", lenses: ["ARCHITECT"], summary: "s." }) +
       `${LINES.stylesheet}\n` + sections.map((h) => `<h2>${h}</h2>\n<p>x</p>`).join("\n"),
   });
-  const audit = (secs) => run(repo(tree(secs)), ["audit", `${POCKET_DOCS}/01-core/core-overview.html`]);
+  const audit = (secs) => run(repo(tree(secs)), ["audit", "check", `${POCKET_DOCS}/01-core/core-overview.html`]);
 
   // ASSERT ON THE FINDING UNDER TEST, never on the absence of every finding: this fixture carries
   // no `<header>`, so `checkHeader` fires on it and a bare `lacks("✗")` was failing for a reason
@@ -835,15 +874,15 @@ console.log("\n=== an HTML page links the HTML page, never the markdown seat (Q2
     [`${POCKET_DOCS}/o-overview.html`]: page(href),
   });
   one("a link to a construct SEAT is refused, and it names the page it should have used",
-    run(mk(`../../${SEAT.constructs}/01-core/thing.md`), ["audit", `${POCKET_DOCS}/o-overview.html`]),
+    run(mk(`../../${SEAT.constructs}/01-core/thing.md`), ["audit", "check", `${POCKET_DOCS}/o-overview.html`]),
     has("thing-construct.html"));
   one("a link to the produced page is silent",
-    run(mk(`01-core/${CONSTRUCT_PAGES}/thing-construct.html`), ["audit", `${POCKET_DOCS}/o-overview.html`]),
+    run(mk(`01-core/${CONSTRUCT_PAGES}/thing-construct.html`), ["audit", "check", `${POCKET_DOCS}/o-overview.html`]),
     lacks("an HTML page links the HTML page"));
   // A SEAT README IS PRODUCED AS NO PAGE AT ALL, so a link to one has nowhere else to go. Refusing
   // it would be a gate demanding a file the generator never writes.
   one("a link to a seat README keeps its .md, because no page exists for it",
-    run(mk(`../../${SEAT.constructs}/README.md`), ["audit", `${POCKET_DOCS}/o-overview.html`]),
+    run(mk(`../../${SEAT.constructs}/README.md`), ["audit", "check", `${POCKET_DOCS}/o-overview.html`]),
     lacks("an HTML page links the HTML page"));
 }
 
@@ -860,26 +899,26 @@ console.log("\n=== a data model is read against its fixed outline, and reports s
   const mk = (path, text) => repo({ "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n", [path]: text });
 
   one("a data model in the shape, beside its package, is clean",
-    run(mk(at, dm(good)), ["audit", at]), has("clean — 1 page"));
+    run(mk(at, dm(good)), ["audit", "check", at]), has("clean — 1 page"));
   // THE KNOWN-BAD INPUT IS THE CORPUS'S OWN FIRST ROW: 19 of 25 files opened with this dictionary heading.
   const dictionary = good.replace("| Table | Stores | The rule it keeps |", "| Consumer | Capability | Description |");
-  const out = run(mk(at, dm(dictionary)), ["audit", at]);
+  const out = run(mk(at, dm(dictionary)), ["audit", "check", at]);
   one("a dictionary's first row under Tables is an outline finding", out,
     has("`Tables`'s first row is `Consumer · Capability · Description`; the data_model heading is `Table · Stores · The rule it keeps`"));
   one("and it is SOFT, because the check is new", out, has("SOFT outline"));
   one("and nothing about it refuses", out, has("0 RULE"));
   one("a data model with no Indexes section is missing one",
-    run(mk(at, dm(good.replace(/## Indexes[\s\S]*$/, ""))), ["audit", at]), has("missing section: Indexes"));
+    run(mk(at, dm(good.replace(/## Indexes[\s\S]*$/, ""))), ["audit", "check", at]), has("missing section: Indexes"));
   one("Seeds and order is optional, and in its place it is silent",
-    run(mk(at, dm(good + "\n## Seeds and order\n\nThe roles migration runs first.\n")), ["audit", at]), has("clean — 1 page"));
+    run(mk(at, dm(good + "\n## Seeds and order\n\nThe roles migration runs first.\n")), ["audit", "check", at]), has("clean — 1 page"));
   one("a section the outline does not have is named",
-    run(mk(at, dm(good + "\n## Environment Variables\n\nNone.\n")), ["audit", at]), has("the data_model outline does not have: Environment Variables"));
+    run(mk(at, dm(good + "\n## Environment Variables\n\nNone.\n")), ["audit", "check", at]), has("the data_model outline does not have: Environment Variables"));
   const root = `docs/${SEAT.capabilities}/01-core/data-model.md`;
   one("a data model at a domain's root sits above the half that owns the storage",
-    run(mk(root, dm(good)), ["audit", root]), has("at a domain's root it sits above the half that owns the storage"));
+    run(mk(root, dm(good)), ["audit", "check", root]), has("at a domain's root it sits above the half that owns the storage"));
   const bare = doc({ id: "dm", title: "Contract Terms", lenses: ["SERVER_DEV"], status: "DONE" }, good, "`For: Backend developer` · `Status: ✅ DONE`");
   one("a data-model.md that declares no kind is itself a finding — nothing else would read its outline",
-    run(mk(at, bare), ["audit", at]), has("declares `variant` `—`; the file kind is `data_model`"));
+    run(mk(at, bare), ["audit", "check", at]), has("declares `variant` `—`; the file kind is `data_model`"));
 }
 
 console.log("\n=== a surface map carries one table per ui/ folder, and a surface is one of four kinds (N37 step 3)");
@@ -893,11 +932,11 @@ console.log("\n=== a surface map carries one table per ui/ folder, and a surface
     "| `DSButton` | component | — | a button |\n";
   const at = `docs/${SEAT.capabilities}/01-core/module-web-core-ts/surface-map.md`;
   const mk = (text) => repo({ "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n", [at]: text });
-  one("a surface map in the shape is clean", run(mk(sm(good)), ["audit", at]), has("clean — 1 page"));
+  one("a surface map in the shape is clean", run(mk(sm(good)), ["audit", "check", at]), has("clean — 1 page"));
   one("a kind outside the four is named",
-    run(mk(sm(good.replace("| hook |", "| util |"))), ["audit", at]), has("`useIdentityFactors` is of kind `util`; a surface is one of page · component · widget · hook"));
+    run(mk(sm(good.replace("| hook |", "| util |"))), ["audit", "check", at]), has("`useIdentityFactors` is of kind `util`; a surface is one of page · component · widget · hook"));
   one("a screen-keyed first row is refused softly — routes are the application's",
-    run(mk(sm(good.replace("| Surface | Kind | Contract term | What it is for |", "| Screen | Route | Contract term | Surfaces |"))), ["audit", at]),
+    run(mk(sm(good.replace("| Surface | Kind | Contract term | What it is for |", "| Screen | Route | Contract term | Surfaces |"))), ["audit", "check", at]),
     has("`security`'s first row is `Screen · Route · Contract term · Surfaces`"));
 }
 
@@ -910,20 +949,20 @@ console.log("\n=== a generated column is read against its own heading (N37 step 
   const mk = (region) => repo({ "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n", [at]: face(region) });
   const good = "| Term | Contract term | What it means |\n| --- | --- | --- |\n| **Session** | | |\n" +
     "| [sign-in](session.md) | `SPSession` | one person's live access |\n| [device](session.md) | — | the client a session opened from |\n";
-  one("a glossary whose cells answer their headings is silent", run(mk(good), ["audit", at]), lacks("column"));
+  one("a glossary whose cells answer their headings is silent", run(mk(good), ["audit", "check", at]), lacks("column"));
   // THE DEFECT THAT OPENED THE ARC, REPRODUCED: the column no reading was ever written for.
   const stored = "| Term | Contract term | Where it is stored |\n| --- | --- | --- |\n" +
     "| [scheduler](job.md) | `JobScheduler` | `${APP}_JOB_SCHEDULER_PROVIDER` |\n| [queue](job.md) | `JobQueue` | ✅ written |\n";
-  const out = run(mk(stored), ["audit", at]);
+  const out = run(mk(stored), ["audit", "check", at]);
   one("a generated column no reading exists for is reported by a run", out,
     has("the generated glossary column `Where it is stored` has no reading of its values"));
   one("a status marker under Contract term is not a spelling",
-    run(mk(good.replace("`SPSession`", "✅ written")), ["audit", at]), has("under the generated glossary column `Contract term` is not the term as the system spells it"));
+    run(mk(good.replace("`SPSession`", "✅ written")), ["audit", "check", at]), has("under the generated glossary column `Contract term` is not the term as the system spells it"));
   one("a description standing where a spelling belongs is named",
-    run(mk(good.replace("`SPSession`", "the estate's app row")), ["audit", at]), has("`the estate's app row`"));
-  one("a group divider row is not data", run(mk(good), ["audit", at]), lacks("`Session`"));
+    run(mk(good.replace("`SPSession`", "the estate's app row")), ["audit", "check", at]), has("`the estate's app row`"));
+  one("a group divider row is not data", run(mk(good), ["audit", "check", at]), lacks("`Session`"));
   one("a table written by hand, outside the markers, is the author's and is not read",
-    run(repo({ "CONCEPT.md": "# c\n", [at]: doc({ id: "c", title: "Core", lenses: ["ARCHITECT"] }, "| Term | Anything |\n| --- | --- |\n| a | ✅ |\n", "`For: Architect`") }), ["audit", at]),
+    run(repo({ "CONCEPT.md": "# c\n", [at]: doc({ id: "c", title: "Core", lenses: ["ARCHITECT"] }, "| Term | Anything |\n| --- | --- |\n| a | ✅ |\n", "`For: Architect`") }), ["audit", "check", at]),
     lacks("column"));
 }
 
@@ -949,7 +988,7 @@ console.log("\n=== a page's furniture is the shared files': a version that exist
     .replaceAll("sds-separator", "sep").replaceAll("sds-", "");
   const ownCopy = (type) => `${head}<style>.badge{color:red} .invented-hero > .lede{margin:0}</style>\n` +
     `${withOwnNames(content(type))}<script>/* a rail builder of this page's own */</script>\n`;
-  const audit = (text, files = {}) => run(repo({ "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n", [at]: text, ...files }), ["audit", at]);
+  const audit = (text, files = {}) => run(repo({ "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n", [at]: text, ...files }), ["audit", "check", at]);
 
   one("a page that links a version that exists is clean", audit(shared()), has("clean — 1 page"));
   one("[MKT.SCRIPTS.109] a page that links the shared stylesheet and adds a style of its own draws no finding",
@@ -984,7 +1023,7 @@ console.log("\n=== a page's furniture is the shared files': a version that exist
   // The exit code is a RULE's: 1 for the page with its own copy, and 0 for the same page in the shared form.
   const exitOf = (text) => {
     const root = repo({ "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n", [at]: text });
-    try { execFileSync(process.execPath, [TOOL, "docs", "audit", at], { encoding: "utf8", cwd: root, stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: root } }); return 0; }
+    try { execFileSync(process.execPath, [TOOL, "docs", "audit", "check", at], { encoding: "utf8", cwd: root, stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: root } }); return 0; }
     catch (error) { return error.status; }
   };
   one("[MKT.SCRIPTS.108] `docs audit` exits 1 on a page that holds its own copy", exitOf(ownCopy()), 1);
@@ -1007,9 +1046,9 @@ console.log("\n=== a page's furniture is the shared files': a version that exist
     // The way back of a produced page is the constructs seat's face, so the face is there to be linked.
     [`docs/${SEAT.constructs}/README.md`]: doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }) });
   process.env.SPN_TEMPLATES = templates;
-  run(root, ["page", seat]);
+  run(root, ["page", "write", seat]);
   const produced = readAt(root, at);
-  const audit = (text) => { writeFileSync(join(root, at), text); return run(root, ["audit", at]); };
+  const audit = (text) => { writeFileSync(join(root, at), text); return run(root, ["audit", "check", at]); };
 
   one("a page `docs page` produced links the shared stylesheet, and the audit finds it clean", audit(produced),
     // The page takes its two lines from the template, so it links the version the template links.
@@ -1034,7 +1073,7 @@ console.log("\n=== a page's furniture is the shared files': a version that exist
     "<style>.card{color:red}</style>\n<p>an argument</p>\n");
   const under = (state) => {
     const path = `.spndevex/${WORKSTREAMS}/${state}/001-a/a-approach.html`;
-    return run(repo({ [path]: argument }), ["audit", path]);
+    return run(repo({ [path]: argument }), ["audit", "check", path]);
   };
   one("[MKT.SCRIPTS.108] a page of an open workstream that holds its own copy is named, as a RULE", under("open"), has("✗ RULE styles"));
   one("[MKT.SCRIPTS.108] a page under a workstream's `closed/` folder is not: it draws no `styles` finding", under("closed"), lacks("styles"));
@@ -1056,7 +1095,7 @@ console.log("\n=== a report is a snapshot: no status, and its header says Genera
     `<span class="sds-label">For:</span> <span class="sds-audience"><span class="sds-badge sds-lens">Quality engineer</span></span>${chip}</span>${second}</div>\n` +
     `<h1>${o.title}</h1>\n<p class="sds-subtitle">How much of this repository is written, built and proved?</p>\n` +
     `<p class="sds-standfirst">What was counted.</p>\n</header>\n${LINES.script}\n`;
-  const audit = (text) => run(repo({ "CONCEPT.md": "# c\n", [at]: text }), ["audit", at]);
+  const audit = (text) => run(repo({ "CONCEPT.md": "# c\n", [at]: text }), ["audit", "check", at]);
   const mine = /a report carries|a report shows|Generated|no Commit|only a `tests` report|`measuredAt` is|furniture/;
 
   const clean = audit(page(good));
@@ -1101,7 +1140,7 @@ console.log("\n=== the masthead: h1, an optional p.sds-subtitle, one p.sds-stand
       block({ id: "o", variant: "overview", parentId: "concept", title: "Core", lenses: ["ARCHITECT"], summary: "s." }) +
       `${LINES.stylesheet}\n<header class="sds-masthead">\n<!-- a comment <p>is not a paragraph</p> -->\n${inner}\n</header>\n<h2>Overview</h2>\n<p>x</p>`,
   });
-  const audit = (inner, file) => run(page(inner, file), ["audit", `${POCKET_DOCS}/${file ?? "01-core/core-overview.html"}`]);
+  const audit = (inner, file) => run(page(inner, file), ["audit", "check", `${POCKET_DOCS}/${file ?? "01-core/core-overview.html"}`]);
   const GOOD = `<h1>Know where you are.</h1>\n<p class="sds-subtitle">The core is the part every other part reads.</p>\n<p class="sds-standfirst">This page covers the core. Read it first.</p>`;
 
   one("h1, one Subtitle and one Description draw no masthead finding", audit(GOOD), lacks("masthead"));
@@ -1136,7 +1175,7 @@ console.log("\n=== the masthead: h1, an optional p.sds-subtitle, one p.sds-stand
       block({ id: "o", variant: "overview", parentId: "concept", title: "Concept", lenses: ["ARCHITECT"], summary: "s." }) +
       `${LINES.stylesheet}\n<header class="sds-masthead">\n<h1>${h1}</h1>\n<p class="sds-subtitle">${sub}</p>\n<p class="sds-standfirst">This page is the start.</p>\n</header>\n<h2>Overview</h2>\n<p>x</p>`,
   }, { type: "FOUNDATION" });
-  const audit = (...a) => run(hub(...a), ["audit", `${POCKET_DOCS}/concept-overview.html`]);
+  const audit = (...a) => run(hub(...a), ["audit", "check", `${POCKET_DOCS}/concept-overview.html`]);
   one("the hub's pair, word for word from the register's row, is silent",
     audit("Only this probe&rsquo;s own title.", "The probe's own subtitle, read from the row."), lacks("RD.DEVEX.WORKSPACE.143"));
   one("a hub Title that is not the row's is SOFT, and quotes the row",
@@ -1181,7 +1220,7 @@ console.log("\n=== a guide page and the index of artifacts are pages the audit k
     `  <main class="sds-index-main">\n    <div class="sds-tabs" id="index-tabs" role="tablist"></div>\n    <div class="sds-panes" id="index-panes"></div>\n  </main>\n</div>\n\n` +
     `<script type="application/json" id="index-data">\n${JSON.stringify(tree, null, 1)}\n</script>\n${script}\n`;
   const pocket = (files = {}) => repo({ "CONCEPT.md": "# c\n", [guideAt]: guide(), [indexAt]: index(), ...files });
-  const audit = (files, target = `docs/${POCKET.artifacts}`) => run(pocket(files), ["audit", target]);
+  const audit = (files, target = `docs/${POCKET.artifacts}`) => run(pocket(files), ["audit", "check", target]);
 
   // (a) the two kinds are variants
   one("a guide page and the index, as the two commands write them, audit clean", audit({}), has("clean — 2 pages"));
@@ -1257,7 +1296,7 @@ console.log("\n=== a preview page: variant `preview`, its own title, a Status ch
     `<span class="sds-label">Shown:</span> <span class="sds-badge">2026-10-01</span>${chip}</span></div>\n` +
     `<h1>${heading}</h1>\n<p class="sds-subtitle">Decides how the page is laid out.</p>\n` +
     `<p class="sds-standfirst">This page shows the layout.</p>\n</header>\n${scriptLine}\n`;
-  const audit = (files, target = at) => run(repo(files), ["audit", target]);
+  const audit = (files, target = at) => run(repo(files), ["audit", "check", target]);
 
   one("a preview written from the template is clean, with no For chips and a block status the chip does not repeat",
     audit({ [at]: page(good) }), has("clean — 1 page"));
@@ -1322,13 +1361,13 @@ console.log("\n=== the audit runs the status check on each construct it reads, a
 
   const behind = tree("PLANNING", "🔮", "SUCCESS");
   const before = readAt(behind, seat);
-  const got = run(behind, ["audit", seat]);
+  const got = run(behind, ["audit", "check", seat]);
   one("[MKT.SCRIPTS.88] known-bad: a status that fell behind its rows is an audit finding",
     got, (g) => g.includes("RULE status") && g.includes("the block says `PLANNING`") && g.includes("derive `DONE`"));
   one("[MKT.SCRIPTS.88] and the audit exits non-zero on it, as on any RULE finding", got, has("1 RULE"));
   one("[MKT.SCRIPTS.88] the audit writes nothing: the seat file's bytes are as they were", readAt(behind, seat) === before, true);
   one("[MKT.SCRIPTS.88] a status that matches its rows draws no status finding, and no line from the status command",
-    run(tree("DONE", "✅", "SUCCESS"), ["audit", seat]), (g) => !g.includes("status   ") && !/^current /m.test(g) && g.includes("clean — 1 page"));
+    run(tree("DONE", "✅", "SUCCESS"), ["audit", "check", seat]), (g) => !g.includes("status   ") && !/^current /m.test(g) && g.includes("clean — 1 page"));
 }
 
 // ---------------------------------------------------------------- what a figure claims
@@ -1361,6 +1400,105 @@ console.log("\n=== a figure is read for what it claims: a diff is no copy, and a
   const direct = "<p>An earlier paragraph.</p>\n<p>The packages sit in <code>repo-a/packages/</code>.</p>\n<pre>packages/\n├── alpha/\n└── ghost/</pre>";
   one("[MKT.SCRIPTS.93] known-bad: the paragraph directly before a tree names its folder, and a folder that is not there is reported",
     said(checkTreeFigures("p.html", direct, root)), (g) => g.includes("draws `ghost/`") && g.includes("holds `beta/`"));
+}
+
+// ---------------------------------------------------------------- the grammar: an action, paths, two filters
+
+/** The exit code of one run, typed after the group, from the folder given. */
+const exitIn = (cwd, args) => {
+  try { execFileSync(process.execPath, [TOOL, "docs", ...args], { encoding: "utf8", cwd, stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: cwd } }); return 0; }
+  catch (error) { return error.status; }
+};
+const AUDIT_USAGE = "usage: spn-devex docs audit check [<path>…] [--variant <name>] [--finding <name>]\n" +
+                    "       spn-devex docs audit report <repo> [--json]\n";
+/** A repository with one clean page, one clean construct, and one page with no block, each in its own folder. */
+const mixed = () => repo({
+  "docs/good/a.md": doc({ id: "a", title: "A Title", lenses: ["QA"], status: "DONE" }, "Lead.\n", "`For: Quality engineer` · `Status: ✅ DONE`"),
+  [`docs/${SEAT.constructs}/x.md`]: construct(SECTIONS),
+  "docs/bad/b.md": "# No Block Here\n\nProse.\n",
+  "docs/bad/c.md": doc({ id: "c", title: "C Title", lenses: ["QA"], status: "DONE" }, "Lead.\n", "`For: Architect` · `Status: ✅ DONE`"),
+});
+
+console.log("\n=== `docs audit` needs its action as a word");
+{
+  const root = mixed();
+  one("[MKT.SCRIPTS.111] with no action the entry prints each usage line and says an action is owed",
+    run(root, ["audit"]), AUDIT_USAGE + "`docs audit` needs an action.\n");
+  one("[MKT.SCRIPTS.111] a path where the action belongs is refused with exit 2", exitIn(root, ["audit", "docs"]), 2);
+  one("[MKT.SCRIPTS.111] `--report` is named as the action `report`",
+    run(root, ["audit", "--report", "."]), AUDIT_USAGE + "`docs audit` needs an action. `--report` is the action `report`.\n");
+  one("[MKT.SCRIPTS.111] with exit 2", exitIn(root, ["audit", "--report", "."]), 2);
+  one("`report` with no repository prints its usage line and says a path is owed",
+    run(root, ["audit", "report"]), "usage: spn-devex docs audit report <repo> [--json]\n`docs audit report` needs a path.\n");
+  one("with exit 2, and a second path is refused the same way", [exitIn(root, ["audit", "report"]), exitIn(root, ["audit", "report", ".", "docs"])],
+    (got) => got.join() === "2,2");
+  one("an option `check` does not take is refused with exit 2", exitIn(root, ["audit", "check", "docs", "--json"]), 2);
+}
+
+console.log("\n=== a narrow run reports what sits under its path, and nothing beside it");
+{
+  const root = mixed();
+  one("known-bad: the docs tree, audited, reports the page with no block and exits 1",
+    [run(root, ["audit", "check", "docs"]).includes("bad/b.md"), exitIn(root, ["audit", "check", "docs"])], (got) => got.join() === "true,1");
+  one("[MKT.SCRIPTS.114] a run narrowed to the clean folder reports nothing from the folder beside it",
+    run(root, ["audit", "check", "docs/good"]), (got) => got.includes("clean — 1 page") && !got.includes("bad/"));
+  one("[MKT.SCRIPTS.114] and exits 0, because no finding it reports is a RULE", exitIn(root, ["audit", "check", "docs/good"]), 0);
+  one("several paths are one run: each page under any of them is counted",
+    run(root, ["audit", "check", "docs/good", `docs/${SEAT.constructs}`]), has("clean — 2 pages"));
+  one("[MKT.SCRIPTS.113] with no path the run takes the repository the caller is in, from a folder inside it too",
+    [run(root, ["audit", "check"]), run(join(root, "docs", "good"), ["audit", "check"])].map((got) => got.includes("bad/b.md") && got.includes("over 4 pages")),
+    (got) => got.join() === "true,true");
+  one("[MKT.SCRIPTS.113] where the caller is in no repository, `check` with no path says to name one",
+    run(BASE, ["audit", "check"]),
+    "usage: spn-devex docs audit check [<path>…] [--variant <name>] [--finding <name>]\n" +
+    "`docs audit check` needs a path here, because the folder it is run from is in no repository. Name a repository.\n");
+  one("[MKT.SCRIPTS.113] with exit 2", exitIn(BASE, ["audit", "check"]), 2);
+}
+
+console.log("\n=== `--variant` and `--finding` narrow what is reported");
+{
+  const root = mixed();
+  const whole = run(root, ["audit", "check", "docs"]);
+  one("untouched: with no filter the run reports the missing block and the wrong tag line, over every page",
+    whole, (got) => got.includes("RULE block") && got.includes("header") && got.includes("over 4 pages"));
+  one("`--variant construct` counts and reports the constructs alone",
+    run(root, ["audit", "check", "docs", "--variant", "construct"]), (got) => got.includes("clean — 1 page") && !got.includes("bad/"));
+  one("`--variant` typed twice selects both kinds", run(root, ["audit", "check", "docs", "--variant", "construct", "--variant=overview"]), has("clean — 1 page"));
+  one("a variant no page under the path declares is said, and the run exits 0",
+    [run(root, ["audit", "check", "docs", "--variant", "guide"]), exitIn(root, ["audit", "check", "docs", "--variant", "guide"])],
+    (got) => got[0].includes("no page under that path declares the variant guide") && got[1] === 0);
+  one("[MKT.SCRIPTS.115] a variant outside the set is refused with the set",
+    run(root, ["audit", "check", "docs", "--variant", "chapter"]), (got) => got.includes("takes `--variant` from approach · overview · construct") && got.includes("and `chapter` is none of them."));
+  one("[MKT.SCRIPTS.115] with exit 2", exitIn(root, ["audit", "check", "docs", "--variant", "chapter"]), 2);
+
+  const blockOnly = run(root, ["audit", "check", "docs", "--finding", "block"]);
+  one("`--finding block` reports the findings of that name alone", blockOnly,
+    (got) => got.includes("RULE block") && !got.includes("header") && got.includes("1 finding — 1 RULE, 0 SOFT, over 4 pages"));
+  one("`--finding` typed twice reports both names", run(root, ["audit", "check", "docs", "--finding", "block", "--finding", "header"]),
+    (got) => got.includes("RULE block") && got.includes("header"));
+  one("a finding name that nothing under the path earns reads clean", run(root, ["audit", "check", "docs", "--finding", "treefig"]), has("clean — 4 pages"));
+  one("[MKT.SCRIPTS.115] a finding name outside the set is refused with the set",
+    run(root, ["audit", "check", "docs", "--finding", "page"]), (got) => got.includes("takes `--finding` from binds · block · cards") && got.includes("and `page` is none of them."));
+  one("[MKT.SCRIPTS.115] with exit 2", exitIn(root, ["audit", "check", "docs", "--finding", "page"]), 2);
+}
+
+console.log("\n=== the set `--finding` takes is the names the audit's own findings carry");
+{
+  // Every function the audit reaches is read from the source, with the name each of its findings carries.
+  const source = readFileSync(resolve(PLUGIN, "src", "scripts", "commands", "docs", "_lib.ts"), "utf8");
+  const heads = [...source.matchAll(/^(?:export )?function ([A-Za-z0-9_]+)\(/gm)];
+  const bodies = new Map(heads.map((head, at) => [head[1], source.slice(head.index, heads[at + 1]?.index ?? source.length)]));
+  const reached = new Set(), carried = new Set();
+  const walk = (name) => {
+    if (reached.has(name) || !bodies.has(name)) return;
+    reached.add(name);
+    for (const found of bodies.get(name).matchAll(/check: "([a-z-]+)"/g)) carried.add(found[1]);
+    for (const call of bodies.get(name).matchAll(/\b([A-Za-z0-9_]+)\(/g)) walk(call[1]);
+  };
+  walk("audit");
+  one("the declared set and the names in the source are the same", [...FINDINGS].sort().join(" "), [...carried].sort().join(" "));
+  one("untouched: the walk reads the audit's own checks, so the comparison is of something", reached.has("checkBlock") && carried.has("block") && carried.size > 10, true);
+  one("and a name of another command, such as `page` or `face`, is not in the set", FINDINGS.includes("page") || FINDINGS.includes("face"), false);
 }
 
 console.log(failed ? `\n  ${failed} of ${n} FAILED` : `\n  all ${n} passed`);

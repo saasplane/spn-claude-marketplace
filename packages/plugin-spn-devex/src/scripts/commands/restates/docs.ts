@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // RESTATES: RD.DEVEX.WORKSPACE.118, and `docs/04-capabilities/01-devex/04-workspace/04-docs/04-discipline.md` §
 // Restatement discipline.
 //
@@ -7,13 +6,16 @@
 // kinds together; this narrows to one, so a drift names its owed act — a `docs` drift is rewritten,
 // never copied or re-run (RD.DEVEX.AGENT.072).
 //
-//     spn-devex restates docs [path/to/spn-foundation]      check: is every citation current?
-//     spn-devex restates docs --write <ref>                  restamp one ref's docs citations
+//     spn-devex restates docs check [<book>]      is every citation current?
+//     spn-devex restates docs write <ref>         restamp one ref's docs citations
 //
-// Exit code is the number of findings.
+// A SUBJECT WITH TWO ACTIONS. `check` takes the book's folder, and finds a sibling checkout where it
+// is given none. `write` takes one ref and restamps that file alone. `check` exits 1 where it
+// reports a finding, and `write` exits 1 where the ref cannot be read.
 
 import { readFileSync, writeFileSync } from "node:fs";
-import { dirname, join, relative, resolve } from "node:path";
+import { dirname, join, relative } from "node:path";
+import { type Action, REQUIRED, UsageFault, onePath, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { isFile, read, workspaceRoot } from "../../lib/payload.ts";
 import {
   BLOCK_COMMENT, DECISION_ID_SRC, type Citation, check as checkKind, isDir, parse,
@@ -33,7 +35,7 @@ function writeOne(refPath: string): number {
   const workspace = workspaceRoot(dirname(refPath));
   if (!workspace) {
     console.error(`${refPath}: no workspace found walking up from this file (no .spndevex)`);
-    return 2;
+    return 1;
   }
   const [block, broken] = parse(refPath);
   if (broken) { console.error(`${refPath}: ${broken}`); return 1; }
@@ -81,7 +83,7 @@ export function main(argv: string[], root: string): number {
   const book = findBook(argv.find((a) => !a.startsWith("-")), root);
   if (book === null) {
     console.log(`${documents.length} plugin document(s) · no foundation book to compare against — quiet`);
-    console.log("  Pass the book's path to run it: restates docs path/to/spn-foundation");
+    console.log("  Pass the book's path to run it: restates docs check path/to/spn-foundation");
     return 0;
   }
   const findings: string[] = [];
@@ -110,13 +112,22 @@ export function main(argv: string[], root: string): number {
 }
 
 export const describe = "the `docs`-kind restatement alone — a drift here owes a rewrite";
-export function run(args: string[]): number {
-  if (args.includes("--write")) {
-    const ref = args.find((a) => !a.startsWith("-"));
-    if (!ref) { console.error("usage: restates docs --write <ref>"); return 2; }
-    return writeOne(resolve(ref));
-  }
-  return Math.min(main(args, process.cwd()), 250);
+
+function check(args: string[]): number {
+  const { paths } = readWords(args);
+  if (paths.length > 1) throw new UsageFault("takes one book.");
+  return main(paths, process.cwd()) > 0 ? 1 : 0;
 }
 
-if (process.argv[1] && new URL(import.meta.url).pathname === process.argv[1]) process.exit(run(process.argv.slice(2)));
+export const actions: Record<string, Action> = {
+  check: {
+    describe: "report each `docs` citation that is behind the book, and each source a block leaves out",
+    usage: "[<book>]",
+    run: check,
+  },
+  write: {
+    describe: "restamp one ref's `docs` citations, after its prose was read against each source",
+    usage: "<ref>",
+    run: (args) => writeOne(onePath(scopeOf(readWords(args).paths, REQUIRED))),
+  },
+};

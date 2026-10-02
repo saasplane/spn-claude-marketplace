@@ -1,27 +1,30 @@
-#!/usr/bin/env node
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The index of artifacts — one page that opens every other
 // The chapter is the source of truth; a rule change is edited there first, then here, in the same change.
 //
-// Write the index of a repository's artifacts from the pages on disk. With `--check` nothing is
-// written: the tree of the index that is there is compared with the pages.
+// The index of a repository's artifacts, produced from the pages on disk.
 //
-//   spn-devex docs index <repository> [--check] [--out <file>]
+//   spn-devex docs index check [<path>] [--out <file>]   compare the tree of the index with the pages
+//   spn-devex docs index write <path> [--out <file>]     write the index
+//
+// A SUBJECT WITH TWO ACTIONS, AND A `tree` PATH. The path may be a repository, or any folder or file
+// inside one, and the command finds the repository from it. A repository has one index, so `write`
+// writes that one page, and `check` reports what it finds under the path.
 
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { basename, dirname, join, relative, resolve, sep } from "node:path";
-import { argsText, begin, commandFacts, end, record } from "../../../../../plugin-support-lib/src/lib/timing.ts";
+import { type Action, OPTIONAL, REQUIRED, VALUE, docsTreeOf, onePath, readWords, repositoryOf, scopeOf, under } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { ARTIFACT_INDEX, CONSTRUCT_PAGES, DOCS, OVERVIEW_PAGE_SUFFIX, POCKET, artifactDocsDir, artifactIndex, artifactsDir, docsOf,
   domainConstructsDir, guidePagesDir, hubPage, isOverview, isProducedPage, reportsDir,
   slashes } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { BUNDLED_SUFFIX, INDEX_SCRIPT } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { locationOf, resolveWorkspace, text as plainText } from "./_lib.ts";
-import { Refusal, attribute, escaped, newestCut, operands, optionValue,
+import { Refusal, attribute, escaped, newestCut,
   pageTemplate, place, refuseSlots, say, swap, templatesDir, withHead, type Note } from "./_pages.ts";
 
-export const describe = "write the index of a repository's artifacts from the pages on disk";
+export const describe = "the index of a repository's artifacts, produced from the pages on disk";
 
 const TEMPLATE = "artifact-index-template.html";
-const USAGE = "usage: spn-devex docs index <repository> [--check] [--out <file>]";
+const OPTIONS = { out: VALUE };
 /** The artifacts pocket, as a message names it. */
 const POCKET_PATH = `${DOCS}/${POCKET.artifacts}`;
 /** The three groups of the tree, in their order. */
@@ -244,11 +247,14 @@ function indexPage(template: string, tree: Tree, where: { organisation: string; 
     `<script type="application/json" id="index-data">\n${written}\n</script>`);
 }
 
+/** A note of `check`, with the page it is about where that is another file than the one it is printed against. */
+type Compared = Note & { about?: string };
+
 /** Where the tree of the index that is there and the pages on disk disagree. Nothing is written. */
-function compare(indexFile: string, artifacts: string, pages: string[]): Note[] {
-  const rule = (file: string, message: string): Note => ({ grade: "RULE", check: "index", file, message });
+function compare(indexFile: string, artifacts: string, pages: string[]): Compared[] {
+  const rule = (file: string, message: string, about?: string): Compared => ({ grade: "RULE", check: "index", file, message, about });
   if (!existsSync(indexFile))
-    return [rule(indexFile, `there is no index here, so none of the ${pages.length} page(s) under ${POCKET_PATH} has an entry. Run \`docs index\` without \`--check\``)];
+    return [rule(indexFile, `there is no index here, so none of the ${pages.length} page(s) under ${POCKET_PATH} has an entry. Run \`docs index write\``)];
   const data = DATA_BLOCK.exec(readFileSync(indexFile, "utf8"));
   let tree: Tree | null = null;
   if (data) { try { tree = JSON.parse(data[1]) as Tree; } catch { tree = null; } }
@@ -256,12 +262,12 @@ function compare(indexFile: string, artifacts: string, pages: string[]): Note[] 
     return [rule(indexFile, "this index holds no tree: it has no block of data with the id `index-data` that can be read")];
   const base = typeof tree.base === "string" ? tree.base : "";
   const counted = new Map<string, number>();
-  const notes: Note[] = [];
+  const notes: Compared[] = [];
   for (const node of tree.groups.flatMap(entriesOf)) {
     const file = resolve(dirname(indexFile), (node.beside ? "" : base) + node.path);
     counted.set(file, (counted.get(file) ?? 0) + 1);
     if (!pages.includes(file) && counted.get(file) === 1)
-      notes.push(rule(indexFile, `the entry \`${node.label}\` has no page: ${slashes(relative(artifacts, file))} is not there`));
+      notes.push(rule(indexFile, `the entry \`${node.label}\` has no page: ${slashes(relative(artifacts, file))} is not there`, file));
   }
   for (const file of pages) {
     const times = counted.get(file) ?? 0;
@@ -271,18 +277,35 @@ function compare(indexFile: string, artifacts: string, pages: string[]): Note[] 
   return notes;
 }
 
-function body(args: string[], workspace: string): number {
-  const [given, ...more] = operands(args, ["--out"]);
-  if (given === undefined || more.length) { console.error(USAGE); return 2; }
-  const repository = resolve(given);
-  const docs = docsOf(repository);
+/**
+ * The docs tree a path belongs to. A folder in no repository that holds a `docs/` folder is read as a
+ * repository would be, so a tree with no manifest above it still has an index.
+ */
+function treeOf(path: string): string {
+  if (repositoryOf(path) === null && existsSync(join(path, DOCS))) return docsOf(path);
+  return docsTreeOf(path);
+}
+
+/** Both actions are one reading of the pages on disk; `write` is the one that puts the index there. */
+function run(args: string[], write: boolean): number {
+  const words = readWords(args, OPTIONS);
+  const path = onePath(scopeOf(words.paths, write ? REQUIRED : OPTIONAL));
+  const workspace = resolveWorkspace();
+  const docs = treeOf(path);
+  const repository = dirname(docs);
   const artifacts = artifactsDir(docs);
-  const check = args.includes("--check");
   try {
     if (!existsSync(artifacts) || !statSync(artifacts).isDirectory())
       throw new Refusal(`${repository} has no ${POCKET_PATH}, so there is nothing to list`);
+    const typedOut = words.value("out");
+    const out = resolve(typedOut ?? artifactIndex(docs));
+    // THE PATH FEEDS THE INDEX where the index sits under it, or where it sits in the pocket the index
+    // is produced from. A path beside both names no page of the index, so the run has nothing to do.
+    if (typedOut === null && !under(out, [path]) && !under(path, [artifacts])) {
+      console.log(`nothing to ${write ? "write" : "check"} — ${relative(workspace, path)} holds no page of ${POCKET_PATH} and no index`);
+      return 0;
+    }
     const { groups, pages, notes } = groupsOf(artifacts);
-    const out = resolve(optionValue(args, "--out") ?? artifactIndex(docs));
     // The path to the pages is kept once, as `base`. It is empty where the index sits in the pocket itself.
     const base = dirname(out) === artifacts ? "" : `${slashes(relative(dirname(out), artifacts))}/`;
     const named = locationOf(docs, workspace);
@@ -294,18 +317,22 @@ function body(args: string[], workspace: string): number {
       repository,
       hub: base + first,
     });
-    if (check) {
-      const found = compare(out, artifacts, pages);
-      if (!found.length) {
-        let current = true;
-        try { current = readFileSync(out, "utf8") === produce(); } catch { current = true; }
-        if (!current) found.push({ grade: "SOFT", check: "index", file: out, message:
-          "the tree holds every page once, but this page is not what `docs index` writes now: a name or a place changed" });
-        else console.log(`current  ${relative(workspace, out)}`);
-      }
-      return say([...found, ...notes], workspace) ? 1 : 0;
+    if (write) return say([...place(out, produce(), true, workspace, "index"), ...notes], workspace) ? 1 : 0;
+
+    // WHAT IS READ IS THE WHOLE POCKET, AND WHAT IS REPORTED SITS UNDER THE PATH. A note is reported
+    // where its file, or the page it is about, is under the path, and the index itself where it is.
+    const found = compare(out, artifacts, pages);
+    const whole = under(out, [path]);
+    if (!found.length && whole) {
+      let current = true;
+      try { current = readFileSync(out, "utf8") === produce(); } catch { current = true; }
+      if (!current) found.push({ grade: "SOFT", check: "index", file: out, message:
+        "the tree holds every page once, but this page is not what `docs index write` writes now: a name or a place changed" });
+      else console.log(`current  ${relative(workspace, out)}`);
     }
-    return say([...place(out, produce(), true, workspace, "index"), ...notes], workspace) ? 1 : 0;
+    const reported = [...found, ...notes].filter((note: Compared) => under(note.file, [path]) || (note.about !== undefined && under(note.about, [path])));
+    if (!reported.length && !whole) console.log(`current  ${relative(workspace, path)} — the tree of ${ARTIFACT_INDEX} and the pages under this path agree`);
+    return say(reported, workspace) ? 1 : 0;
   } catch (refused) {
     if (!(refused instanceof Refusal)) throw refused;
     console.error(`✗ ${refused.message}`);
@@ -313,15 +340,15 @@ function body(args: string[], workspace: string): number {
   }
 }
 
-/** Run `docs index` with its own arguments, and give back the exit code. */
-export function run(args: string[]): number {
-  const workspace = resolveWorkspace();
-  const startedAt = performance.now();
-  begin(commandFacts("spn-devex", args), workspace);
-  const code = body(args, workspace);
-  record({ group: "docs", action: "index", args: argsText(args) }, performance.now() - startedAt, code);
-  end(code);
-  return code;
-}
-
-if (process.argv[1] && new URL(import.meta.url).pathname === process.argv[1]) process.exit(run(process.argv.slice(2)));
+export const actions: Record<string, Action> = {
+  check: {
+    describe: "compare the tree of the index with the pages on disk, and write nothing",
+    usage: "[<path>] [--out <file>]",
+    run: (args) => run(args, false),
+  },
+  write: {
+    describe: "write the index of the repository the path sits in",
+    usage: "<path> [--out <file>]",
+    run: (args) => run(args, true),
+  },
+};

@@ -1,11 +1,13 @@
-#!/usr/bin/env node
 // RESTATES: spn-foundation docs/04-capabilities/02-support/01-apps/06-tests/README.md § A case title carries the id and the sentence
 // The chapter is the source of truth. A rule change is edited there first, then here, in the same change.
 //
 // The id check: contract, component and journey cases with no behaviour id in their title or an
 // enclosing `describe`, read from the test source.
 //
-//     spn-devex behaviours ids [root]
+//     spn-devex behaviours ids check [<path>]
+//
+// A SUBJECT WITH ONE ACTION, AND A `tree` PATH. The command finds the repository from the path, and
+// reads the case files that sit under the path.
 //
 // Source, not run artifacts: an artifact lists only the cases that name an id. A title built from a
 // template literal in a file that writes an id literally, or imports the table that does, carries its
@@ -14,6 +16,7 @@
 
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, join, relative, resolve, sep } from "node:path";
+import { type Action, OPTIONAL, onePath, readWords, repositoryOf, scopeOf, under } from "../../../../../plugin-support-lib/src/lib/command.ts";
 
 export const describe = "contract, component and journey cases with no behaviour id — read from the test source";
 
@@ -96,20 +99,21 @@ function importsAnId(file: string): boolean {
   return false;
 }
 
-/** Every bound case in the repository, by tier. */
-export function boundCases(root: string): Map<BoundTier, Case[]> {
+/** Every bound case in the repository, by tier. `scope` keeps the case files that sit under one of those paths. */
+export function boundCases(root: string, scope: string[] | null = null): Map<BoundTier, Case[]> {
   const found = new Map<BoundTier, Case[]>([["CONTRACT", []], ["COMPONENT", []], ["JOURNEY", []]]);
   for (const file of specFiles(root)) {
     const tier = boundTier(root, file);
-    if (tier === null) continue;
+    if (tier === null || (scope !== null && !under(file, scope))) continue;
     for (const one of casesIn(readFileSync(file, "utf8"), importsAnId(file))) found.get(tier)?.push({ file: relative(root, file), ...one });
   }
   return found;
 }
 
-export function run(args: string[]): number {
-  const root = resolve(args.find((a) => !a.startsWith("--")) ?? ".");
-  const found = boundCases(root);
+function check(args: string[]): number {
+  const path = onePath(scopeOf(readWords(args).paths, OPTIONAL));
+  const root = repositoryOf(path) ?? path;
+  const found = boundCases(root, resolve(path) === root ? null : [path]);
   let missing = 0;
   let viaData = 0;
   for (const [tier, cases] of found) {
@@ -128,4 +132,10 @@ export function run(args: string[]): number {
   return missing ? 1 : 0;
 }
 
-if (process.argv[1] && new URL(import.meta.url).pathname === process.argv[1]) process.exit(run(process.argv.slice(2)));
+export const actions: Record<string, Action> = {
+  check: {
+    describe: "name each case file under the path whose cases carry no behaviour id",
+    usage: "[<path>]",
+    run: check,
+  },
+};

@@ -1,27 +1,28 @@
-#!/usr/bin/env node
 // RESTATES: nothing. This command names no rule of its own — it finds a project's stack and hands
-// the argv straight to that stack's own coverage-excludes check, unchanged.
+// its paths to that stack's own coverage-excludes check.
 //
 // `spn-apps coverage check` — scan for a coverage exclude that carries no reason.
 //
-//     spn-apps coverage check [path] …
+//     spn-apps coverage check [<path>…]
+//
+// AN ACTION OF ITS GROUP, AND A `file` PATH. Each path names a file or a folder to scan. Given none,
+// the command scans the repository the caller is in.
 //
 // **STACK-GENERIC, NEVER STACK-SPECIFIC.** The scan logic stays under
 // `providers/<stack>/scripts/checks/_tests/coverage-excludes.ts`; nothing here repeats it. This file
-// reads the target's own `sprepo.json` for its stack, then calls that stack's exported `scan(argv)`.
+// reads the first path's own `sprepo.json` for its stack, then calls that stack's exported `scan(paths)`.
 // `--stdin` (the PreToolUse hook mode) stays the hook's own door, through `events/pretooluse.ts`.
-import { join, resolve } from "node:path";
+import { join } from "node:path";
+import { OPTIONAL, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { stackOf } from "../../lib/stack.ts";
 
 export const describe = "Scan for a coverage exclude with no comment giving its reason";
-
-/** The first path argv names, or the working directory — what the target's stack is read from. */
-function targetOf(args: string[]): string {
-  return args.find((a) => !a.startsWith("--")) ?? process.cwd();
-}
+export const usage = "[<path>…]";
 
 export async function run(args: string[]): Promise<number> {
-  const target = resolve(targetOf(args));
+  const paths = scopeOf(readWords(args).paths, OPTIONAL);
+  // The stack is read from the first path: one run scans one repository's files.
+  const target = paths[0];
   const stack = stackOf(join(target, "sprepo.json"));
   if (!stack) {
     process.stderr.write(`coverage check: no stack declared at or above ${target} — nothing to scan\n`);
@@ -38,5 +39,5 @@ export async function run(args: string[]): Promise<number> {
     process.stderr.write(`coverage check: the ${stack} provider's coverage-excludes check exports no scan()\n`);
     return 1;
   }
-  return provider.scan(args);
+  return provider.scan(paths);
 }

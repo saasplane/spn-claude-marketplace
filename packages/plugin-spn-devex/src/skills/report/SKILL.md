@@ -17,7 +17,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "Reports and templates",
-      "seen": "b67b1441"
+      "seen": "5f842b5a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -244,7 +244,7 @@ Developers and leaders who have not learned the book's words read a report, so i
 
 | Part | What you write |
 | --- | --- |
-| **Measure** | `spn-devex behaviours coverage <repo> --json`, its `digest`, and `measuredAt` — the newest `Updated at` among the rows it read, which can be older than the page. Where the command returns `measuredAt` as `null`, no row cites a run: leave the key out of the block and say so in Measured |
+| **Measure** | `spn-devex behaviours coverage show <repo> --json`, its `digest`, and `measuredAt` — the newest `Updated at` among the rows it read, which can be older than the page. Where the command returns `measuredAt` as `null`, no row cites a run: leave the key out of the block and say so in Measured |
 | **Tiles** | **SUCCESS · FAILED · PENDING · PLANNED**, each x / y of all written behaviours, with a one-line key under the breakdown bar: SUCCESS, the run the behaviour cites, at its own test level, passed; FAILED; PENDING, the test exists and was skipped or has not run; PLANNED, no test names it |
 | **Breakdown bar** | behaviours: SUCCESS · FAILED · PENDING · PLANNED |
 | **Findings** | **By tier**: Tier · Runs · Written · Built · SUCCESS · FAILED · PENDING · PLANNED, from the command's `tiers` · **Repository** by domain → **Apps** → **Packages**: Name · Written · Built · SUCCESS · FAILED · PENDING · PLANNED |
@@ -281,7 +281,7 @@ Developers and leaders who have not learned the book's words read a report, so i
 
 | Part | What you write |
 | --- | --- |
-| **Measure** | `spn-devex docs audit <repo>/docs`, `spn-devex docs parity <repo>`, `spn-devex docs topics <repo>`, and `spn-devex docs status <repo>/docs/02-constructs --check` — **never without `--check`**, which would rewrite the pages. No digest |
+| **Measure** | `spn-devex docs audit check <repo>/docs`, `spn-devex docs parity check <repo>`, `spn-devex docs topics check <repo>`, and `spn-devex docs status check <repo>/docs/02-constructs` — **the action is `check`, never `write`**, which would rewrite the pages. No digest |
 | **Unit and states** | one check is one page. FAIL is a page with a RULE finding, WARN a page with SOFT findings only; the page says so once, because RULE and SOFT are the command's own words |
 | **Tiles** | Pages passed · Docs folders complete · Design topics done |
 | **Breakdown bar** | pages: PASS · WARN · FAIL |
@@ -308,12 +308,12 @@ Developers and leaders who have not learned the book's words read a report, so i
 3. **Read the sources, not summaries of them.** The point of a report is the difference between what the tree contains and what the docs claim.
 4. **Copy the template** to `docs/artifacts/reports/<type>-report.html` and fill the header, then the five sections in order, from what you measured.
 5. **Set Decided by on every record**, by § Who decides, and write the Needs you cards.
-6. **Check the page**: `spn-devex docs audit <the page>` reads clean, and every number on it traces to a Method row.
+6. **Check the page**: `spn-devex docs audit check <the page>` reads clean, and every number on it traces to a Method row.
 7. **Hand it over as the full path.** Say the verdict in one line. Then open an arc for the records you may close, and raise the Needs you cards as `Q<n>` cards on its page. Publish nothing unless the developer asks.
 
 ## Bring the numbers of an existing page current
 
-**`spn-devex report refresh <page>` measures a `coverage` or a `tests` report again and writes the numbers into the page.** Run it when a developer asks for the report to be brought current (decision `RD.DEVEX.WORKSPACE.212`). A release, a close or a finished run is not a reason to run it. Stamping the rows stays part of every run, whether or not a page exists.
+**`spn-devex report refresh write <page>` measures a `coverage` or a `tests` report again and writes the numbers into the page.** Run it when a developer asks for the report to be brought current (decision `RD.DEVEX.WORKSPACE.212`). A release, a close or a finished run is not a reason to run it. Stamping the rows stays part of every run, whether or not a page exists.
 
 - **What it writes**: the tiles, the breakdown bar and its legend, the count cells of the Findings tables, the digest, and `generatedAt`. On a `tests` report it also writes `measuredAt`, and leaves the key out where no run is stamped.
 - **What it leaves to you**: every sentence. Read the verdict, the terms line, Top gaps, Records and Recommendations against the new numbers, and set Commit in the header to the commit you measured.

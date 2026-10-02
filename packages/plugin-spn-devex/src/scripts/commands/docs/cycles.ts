@@ -1,23 +1,24 @@
-#!/usr/bin/env node
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § `How` ends in Cycles, and the arcs are the state
 //           docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc's status says which of eight states it is in
 // The chapters are the source of truth; a rule change is edited there first, then here.
 //
-// Print a workstream's Cycles table, read from its arcs: one row per arc, in the order the arcs run.
-// A row names the arc and links its file, says what the arc does and where it stands, and lists the
+// A workstream's Cycles table, read from its arcs: one row per arc, in the order the arcs run. A row
+// names the arc and links its file, says what the arc does and where it stands, and lists the
 // previews and samples the arc's own `## Previews` table carries.
 //
-//   spn-devex docs cycles <workstream> [--json | --write]
+//   spn-devex docs cycles show <workstream> [--json]   print the table, or the rows as data
+//   spn-devex docs cycles write <workstream>           write the parts of the page the arcs decide
 //
 // <workstream> is the workstream's folder, its approach page, its number (`016`) or its folder name
 // (`016-provider-secret-storage`), looked up in `.spndevex/workstreams/{open,backlog,closed}/`.
 //
-// With no option it writes no file. With `--write` it writes the parts of the page that the arcs
-// decide (RD.DEVEX.WORKSPACE.204): the header's status, the Cycles table and the heading of `Open`.
-// `doc-check` compares a page with the same reading, through `tableDifferences` and `headerStatusRule`.
+// A SUBJECT WITH TWO ACTIONS. `show` writes no file. `write` writes the parts of the page that the
+// arcs decide (RD.DEVEX.WORKSPACE.204): the header's status, the Cycles table and the heading of
+// `Open`. `doc-check` compares a page with the same reading, through `tableDifferences` and
+// `headerStatusRule`.
 //
 // Every class it reads and writes is a name of the shared stylesheet (05-artifacts.md § One stylesheet,
-// served in versions). A page that links no shared stylesheet is refused by `--write`, and not written.
+// served in versions). A page that links no shared stylesheet is refused by `write`, and not written.
 
 import { writeFileSync } from "node:fs";
 import { basename, dirname, join, posix, relative, resolve } from "node:path";
@@ -26,9 +27,9 @@ import { cardsIn, mastheadStatus } from "../../checks/split-plan.ts";
 import { isDir, isFile, listdir, read, unescape, workspaceRoot } from "../../lib/payload.ts";
 import { ARCS, WORKSTREAM_STATES, isApproachPage, workstreamsDir } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, linksSharedStyles } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
-import { argsText, begin, commandFacts, end, record } from "../../../../../plugin-support-lib/src/lib/timing.ts";
+import { type Action, FLAG, UsageFault, readWords } from "../../../../../plugin-support-lib/src/lib/command.ts";
 
-export const describe = "print a workstream's Cycles table from its arcs — one row per arc, with its file, its status and its previews; --write puts the parts the arcs decide into the page";
+export const describe = "a workstream's Cycles table, read from its arcs: one row per arc, with its file, its status and its previews";
 
 /** One row of an arc's `## Previews` table: a preview page or a sample, and where its review stands. */
 export type Preview = {
@@ -431,11 +432,11 @@ export function openHeadingFor(text: string): string {
   return `Open — ${open.length ? open.join(" · ") : "no card is open"}`;
 }
 
-/** The parts of a page that the arcs decide, as `--write` names them. */
+/** The parts of a page that the arcs decide, as `write` names them. */
 export const PRODUCED_PARTS = { status: "the header's status", table: "the Cycles table", open: "the heading of Open" } as const;
 
 /**
- * A workstream's page as `--write` leaves it: the header's status, the Cycles table and the heading
+ * A workstream's page as `write` leaves it: the header's status, the Cycles table and the heading
  * of `Open`, each replaced once and only where it differs from what the arcs and the cards give.
  * `wrote` names the parts that changed, and `skipped` says why a part that differs could not be
  * written. Null where the page holds no Cycles table to write.
@@ -506,7 +507,7 @@ export function workstreamFolder(target: string, workspace: string | null): stri
 }
 
 /**
- * `--write`: bring each approach page of the folder current, or the one page the argument names. A
+ * The action `write`: bring each approach page of the folder current, or the one page the argument names. A
  * page that is already current is not written, so its bytes and its time stay as they are. A page
  * that links no shared stylesheet is refused with `OWN_COPY`, and no class of it is read.
  */
@@ -544,23 +545,29 @@ function writePages(folder: string, target: string, cycles: Cycle[]): number {
   return code;
 }
 
-function body(args: string[], workspace: string | null): number {
-  const json = args.includes("--json");
-  const write = args.includes("--write");
-  const target = args.find((arg) => !arg.startsWith("--"));
-  if (!target) { console.error("usage: spn-devex docs cycles <workstream> [--json | --write]"); return 2; }
+/** What `show` prints: the table as the page carries it, or each row as data. */
+type Form = "table" | "json";
+
+/**
+ * Both actions are one reading of the arcs. `show` prints it, and `write` puts it into the page. The
+ * workstream is one word, and it is read as typed: a number or a folder name is no path.
+ */
+function run(args: string[], write: boolean): number {
+  const words = readWords(args, write ? {} : { json: FLAG });
+  const [target, ...more] = words.paths;
+  if (target === undefined) throw new UsageFault("needs a workstream.");
+  if (more.length) throw new UsageFault("takes one workstream.");
+  const form: Form = words.given("json") ? "json" : "table";
+  const workspace = process.env.SPN_WORKSPACE ?? workspaceRoot(process.cwd());
   const folder = workstreamFolder(target, workspace);
-  if (!folder) {
-    console.error(`no workstream \`${target}\` — name its folder, its approach page, or its number, ` +
-      `as \`spnutils workspace status\` lists it`);
-    return 2;
-  }
+  if (!folder)
+    throw new UsageFault(`finds no workstream \`${target}\`. Name its folder, its approach page, or its number, as \`spnutils workspace status\` lists it.`);
   const cycles = cyclesOf(folder);
   if (!cycles.length) { console.error(`${basename(folder)} has no arcs — an empty \`arcs/\` has no Cycles yet`); return 1; }
   let code = 0;
   if (write) {
     code = writePages(folder, target, cycles);
-  } else if (json) {
+  } else if (form === "json") {
     console.log(JSON.stringify(cycles.map((cycle) => ({
       arc: arcLabel(cycle), does: cycle.does, status: statusLabel(cycle), file: basename(cycle.file),
       previews: cycle.previews })), null, 2));
@@ -569,7 +576,7 @@ function body(args: string[], workspace: string | null): number {
   }
   // An arc whose status the set does not know is printed and named, never guessed at: the row still
   // appears, and the arc is the file to fix.
-  for (const cycle of cycles.filter((c) => !c.status))
+  for (const cycle of cycles.filter((one) => !one.status))
     console.error(`! ${basename(cycle.file)} states no status the set knows (${STATUSES.join(" · ")})`);
   // A Previews row that links nothing shows on the page as plain text, so the arc is the file to fix.
   for (const cycle of cycles)
@@ -579,15 +586,15 @@ function body(args: string[], workspace: string | null): number {
   return code;
 }
 
-export function run(args: string[]): number {
-  const workspace = process.env.SPN_WORKSPACE ?? workspaceRoot(process.cwd());
-  const startedAt = performance.now();
-  begin(commandFacts("spn-devex", args), workspace ?? undefined);
-  const code = body(args, workspace);
-  record({ group: "docs", action: "cycles", args: argsText(args) }, performance.now() - startedAt, code);
-  end(code);
-  return code;
-}
-
-if (process.argv[1] && basename(process.argv[1]) === "cycles.ts")
-  process.exit(run(process.argv.slice(2)));
+export const actions: Record<string, Action> = {
+  show: {
+    describe: "print the Cycles table of a workstream from its arcs; with --json, each row as data",
+    usage: "<workstream> [--json]",
+    run: (args) => run(args, false),
+  },
+  write: {
+    describe: "write the parts of a workstream's page that its arcs decide",
+    usage: "<workstream>",
+    run: (args) => run(args, true),
+  },
+};

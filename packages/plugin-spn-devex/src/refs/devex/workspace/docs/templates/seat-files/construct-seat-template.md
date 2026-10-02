@@ -14,11 +14,11 @@
      This file carries rules it does not own. The chapter above is the source of truth.
      A rule change is edited there first, then here, in the same change. Never add a rule here.
      restate-drift.ts reports this copy when its source moves. -->
-<!-- THE ONLY FILE AN AGENT AUTHORS for a construct. `docs.ts page` produces the HTML page from it — one block per
+<!-- THE ONLY FILE AN AGENT AUTHORS for a construct. `docs page write` produces the HTML page from it — one block per
      `##`, no block is forced and none is numbered. The block keeps eight keys: `id`, `variant`, `title`, `lenses`,
      `status`, `dependsOn`, `subtitle`, `summary`. `subtitle` is the page's Subtitle, the construct's one-line promise; `docs page`
      renders it under the h1, and it is plain language, like the Description. `dependsOn` is the reading order and the only record of what this construct
-     needs; the domain face renders it. `status` is rolled up by `docs.ts status` from the behaviour rows at this
+     needs; the domain face renders it. `status` is rolled up by `docs status write` from the behaviour rows at this
      construct's own path — `03-behaviors/<same relative path>` — and is never typed. IN A `FOUNDATION` REPOSITORY THERE
      IS NO `status` KEY AND NO `Status:` CHIP: those rows are promises, and a promise has no proof state. -->
 # {{NAME — the subject in full, so the title stands alone: Estate Shape, not Shape; Kind Manifest, not Manifest.}}

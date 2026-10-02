@@ -50,7 +50,7 @@ const register = (id, rows) => doc(
 function run(root, args) {
   try {
     return execFileSync(process.execPath, [TOOL, "docs", ...args],
-      { encoding: "utf8", cwd: root, env: { ...process.env, SPN_WORKSPACE: root } });
+      { encoding: "utf8", cwd: root, stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: root } });
   } catch (e) { return String(e.stdout ?? "") + String(e.stderr ?? ""); }
 }
 const readAt = (root, p) => readFileSync(join(root, p), "utf8");
@@ -74,7 +74,7 @@ console.log("=== a construct's status rolls up the behaviour rows at its own pat
       seat("c-boot").replace('"status": "PLANNING"', `"status": "${status}"`),
     [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: register("b-boot", rows),
   });
-  const derived = (root) => run(root, ["status", "--check", `docs/${SEAT.constructs}/01-core/01-boot.md`]);
+  const derived = (root) => run(root, ["status", "check", `docs/${SEAT.constructs}/01-core/01-boot.md`]);
 
   one("every row PLANNED derives PLANNING",
     derived(repo(tree([["CORE.BOOT.01", "x", "UNIT", "PLANNED"]]))), has("current") );
@@ -152,15 +152,15 @@ console.log("\n=== a FOUNDATION construct derives no status at all");
 
   const root = book();
   one("the check names the word the page carries and nothing derives",
-    run(root, ["status", "--check", `docs/${SEAT.constructs}/01-core/01-boot.md`]),
+    run(root, ["status", "check", `docs/${SEAT.constructs}/01-core/01-boot.md`]),
     has("carries no `status`"));
 
-  run(root, ["status", `docs/${SEAT.constructs}/01-core/01-boot.md`]);
+  run(root, ["status", "write", `docs/${SEAT.constructs}/01-core/01-boot.md`]);
   const after = readAt(root, `docs/${SEAT.constructs}/01-core/01-boot.md`);
   one("a write strips the field from the block", after, lacks('"status"'));
   one("and strips the chip from the tag line", after, lacks("Status:"));
   one("and leaves the For line standing", after, has("`For: Architect`"));
-  one("running it again is quiet", run(root, ["status", "--check", `docs/${SEAT.constructs}/01-core/01-boot.md`]),
+  one("running it again is quiet", run(root, ["status", "check", `docs/${SEAT.constructs}/01-core/01-boot.md`]),
     lacks("carries no `status`"));
 
   // `status` AS THE FIRST KEY IS THE EDGE THE COMMA RULE EXISTS FOR. Taking the leading comma
@@ -173,29 +173,94 @@ console.log("\n=== a FOUNDATION construct derives no status at all");
       "## Overview\n\nwhy\n\n## Terms\n\nt\n\n## Model\n\nm\n\n## Parts\n\np\n\n## Boundary\n\nb\n",
     [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: register("b", []),
   }, { type: "FOUNDATION" });
-  run(first, ["status", `docs/${SEAT.constructs}/01-core/01-boot.md`]);
+  run(first, ["status", "write", `docs/${SEAT.constructs}/01-core/01-boot.md`]);
   one("stripping a leading `status` leaves a block that still parses",
-    run(first, ["audit", `docs/${SEAT.constructs}/01-core/01-boot.md`]), lacks("spn:doc"));
+    run(first, ["audit", "check", `docs/${SEAT.constructs}/01-core/01-boot.md`]), lacks("spn:doc"));
   one("and the field is gone", readAt(first, `docs/${SEAT.constructs}/01-core/01-boot.md`), lacks('"status"'));
 
   // THE AUDIT DOES NOT SAY IT TOO. `status` owns the fault and fixes it; reporting it from the block
   // check and from the header it renders put 204 findings on the book where there had been one.
   one("the audit stays out of it — one fault, one command",
-    run(book(), ["audit", `docs/${SEAT.constructs}/01-core/01-boot.md`]), lacks("carries no `status`"));
+    run(book(), ["audit", "check", `docs/${SEAT.constructs}/01-core/01-boot.md`]), lacks("carries no `status`"));
 
   // A CHIP THE BLOCK DOES NOT DECLARE IS A PAGE NOBODY RE-RENDERED, and that is the audit's fault.
   const stale = repo({ [`docs/${SEAT.constructs}/01-core/01-boot.md`]:
     seat("c-boot").replace(/,?\s*"status": "PLANNING"/, "") }, { type: "FOUNDATION" });
   one("a chip left standing over a block with no status is refused",
-    run(stale, ["audit", `docs/${SEAT.constructs}/01-core/01-boot.md`]),
+    run(stale, ["audit", "check", `docs/${SEAT.constructs}/01-core/01-boot.md`]),
     has("the block declares no status"));
 
   // The same page in an APPS repository still derives a word — the world is what decides.
   one("the rule is the repository's world, not the file's shape",
     run(repo({ [`docs/${SEAT.constructs}/01-core/01-boot.md`]: seat("c-boot"),
                [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: register("b", [["CORE.BOOT.01", "x", "UNIT", "SUCCESS"]]) }),
-        ["status", "--check", `docs/${SEAT.constructs}/01-core/01-boot.md`]),
+        ["status", "check", `docs/${SEAT.constructs}/01-core/01-boot.md`]),
     has("derive `DONE`"));
+}
+
+// ---------------------------------------------------------------- the grammar: an action, and the seat files it names
+
+/** The exit code of one run, typed after the group, from the folder given. */
+const exitIn = (cwd, args) => {
+  try { execFileSync(process.execPath, [TOOL, "docs", ...args], { encoding: "utf8", cwd, stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: cwd } }); return 0; }
+  catch (error) { return error.status; }
+};
+const USAGE = "usage: spn-devex docs status check <seat…>\n" +
+              "       spn-devex docs status write <seat…>\n";
+
+console.log("\n=== `docs status` needs its action as a word, and both actions need a seat file");
+{
+  // Each construct says PLANNING over one proven row, so each derives DONE and a write changes it.
+  const CORE = `docs/${SEAT.constructs}/01-core`, EDGE = `docs/${SEAT.constructs}/02-edge`;
+  const proven = (id) => register(id, [[`CORE.${id.toUpperCase()}.01`, "x", "UNIT", "SUCCESS"]]);
+  const root = repo({
+    [`${CORE}/01-boot.md`]: seat("c-boot"),
+    [`${CORE}/02-halt.md`]: seat("c-halt"),
+    [`${EDGE}/01-gate.md`]: seat("c-gate"),
+    [`docs/${SEAT.behaviors}/01-core/01-boot.md`]: proven("boot"),
+    [`docs/${SEAT.behaviors}/01-core/02-halt.md`]: proven("halt"),
+    [`docs/${SEAT.behaviors}/02-edge/01-gate.md`]: proven("gate"),
+  });
+  const BOOT = `${CORE}/01-boot.md`;
+  const SEATS = [BOOT, `${CORE}/02-halt.md`, `${EDGE}/01-gate.md`];
+  /** For each seat file, whether its block says DONE. */
+  const done = () => SEATS.map((file) => readAt(root, file).includes('"status": "DONE"')).join(" ");
+
+  one("[MKT.SCRIPTS.111] with no action the entry prints each usage line and says an action is owed",
+    run(root, ["status"]), USAGE + "`docs status` needs an action.\n");
+  one("[MKT.SCRIPTS.111] and exits 2", exitIn(root, ["status"]), 2);
+  one("[MKT.SCRIPTS.111] a seat file where the action belongs is refused the same way, and `--check` is named as the action `check`",
+    run(root, ["status", "--check", BOOT]), USAGE + "`docs status` needs an action. `--check` is the action `check`.\n");
+  one("[MKT.SCRIPTS.111] with exit 2, and a seat file alone is refused with exit 2 too",
+    [exitIn(root, ["status", "--check", BOOT]), exitIn(root, ["status", BOOT])].join(), "2,2");
+  one("[MKT.SCRIPTS.111] a word that is no action of the subject is refused the same way",
+    run(root, ["status", "derive", BOOT]), USAGE + "`docs status` needs an action.\n");
+  one("[MKT.SCRIPTS.112] `write` with no path prints its usage line and says a path is owed",
+    run(root, ["status", "write"]), "usage: spn-devex docs status write <seat…>\n`docs status write` needs a path.\n");
+  one("[MKT.SCRIPTS.112] and exits 2", exitIn(root, ["status", "write"]), 2);
+  one("[MKT.SCRIPTS.131] `check` with no path is refused too, because a status is derived for the seat file that is named",
+    run(root, ["status", "check"]), "usage: spn-devex docs status check <seat…>\n`docs status check` needs a path.\n");
+  one("[MKT.SCRIPTS.131] with exit 2", exitIn(root, ["status", "check"]), 2);
+  one("an option the command does not take is refused by its name",
+    run(root, ["status", "write", BOOT, "--json"]), "usage: spn-devex docs status write <seat…>\n`docs status write` does not take `--json`.\n");
+  one("with exit 2", exitIn(root, ["status", "write", BOOT, "--json"]), 2);
+  one("no refused run changed a seat file", done(), "false false false");
+
+  one("[MKT.SCRIPTS.131] `check` names the status the rows derive, as a RULE",
+    run(root, ["status", "check", BOOT]), (got) => got.includes("✗ RULE status") && got.includes("derive `DONE`"));
+  one("[MKT.SCRIPTS.131] and exits 1", exitIn(root, ["status", "check", BOOT]), 1);
+  one("[MKT.SCRIPTS.131] `check` writes nothing", done(), "false false false");
+
+  // KNOWN-BAD, so `check` and the refusals are not the reason no seat file changed: the same seat, written.
+  one("[MKT.SCRIPTS.131] known-bad: `write` of the same seat file writes the derived status into it, and into no other",
+    [run(root, ["status", "write", BOOT]).includes("PLANNING → DONE"), done()].join(" "), "true true false false");
+  one("[MKT.SCRIPTS.131] and after the write a `check` reads the status as current and exits 0",
+    [run(root, ["status", "check", BOOT]).includes("current"), exitIn(root, ["status", "check", BOOT])].join(), "true,0");
+
+  run(root, ["status", "write", CORE]);
+  one("a folder names every seat file under it, and no seat file beside it", done(), "true true false");
+  run(root, ["status", "write", BOOT, `${EDGE}/01-gate.md`]);
+  one("several paths are one run", done(), "true true true");
 }
 
 console.log(failed ? `\n  ${failed} of ${n} FAILED — docs status` : `\n  all ${n} passed — docs status`);

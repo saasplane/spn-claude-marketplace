@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/02-modules/03-notifications.md",
-      "seen": "d682d8be"
+      "seen": "b560f903"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/02-modules/03-notifications/",

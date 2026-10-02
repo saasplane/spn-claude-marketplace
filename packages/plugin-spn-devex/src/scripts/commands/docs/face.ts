@@ -1,37 +1,45 @@
-#!/usr/bin/env node
 // RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/03-tree.md · 05-artifacts.md · 02-document.md
 // The chapters are the source of truth; a rule change is edited there first, then here.
 //
-// What is generated, between markers — written unless `--check` asks only for a report.
+// What is generated, between markers: a domain's glossary, the maps, and the tag lines.
 //
-//   spn-devex docs face <docs-tree> [--check]
+//   spn-devex docs face check [<path>] [--block <name>]   report what a write would change
+//   spn-devex docs face write <path> [--block <name>]     write it
+//
+// A SUBJECT WITH TWO ACTIONS, AND A `tree` PATH. The path may be a docs tree, a folder inside one, or
+// one seat file. The command finds the docs tree from the path, and reads only the generated regions
+// that the path feeds. `--block` narrows the run to the blocks it names.
 
-import { basename, relative, resolve } from "node:path";
-import { argsText, begin, commandFacts, end, record } from "../../../../../plugin-support-lib/src/lib/timing.ts";
-import { face, resolveWorkspace } from "./_lib.ts";
+import { relative } from "node:path";
+import { type Action, OPTIONAL, REQUIRED, docsTreeOf, onePath, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
+import { FACE_BLOCKS, face, resolveWorkspace } from "./_lib.ts";
 
-export const describe = "write what is generated, between markers — the domain glossary, the maps, the tag lines";
+export const describe = "what is generated, between markers: a domain's glossary, the maps, the tag lines";
 
-function body(args: string[], workspace: string): number {
-  // THE TREE IS NAMED, NEVER ASSUMED. This command writes unless `--check` is given, and the current
-  // folder taken as the tree would walk every repository of a workspace, a workstream's notes too.
-  const named = args.find((r) => !r.startsWith("--"));
-  if (named === undefined) { console.error("usage: spn-devex docs face <docs-tree> [--check]"); return 2; }
-  const tree = resolve(named);
-  const f = face(tree, !args.includes("--check"));
-  for (const x of f) console.log(`${x.grade === "RULE" ? "✗" : "!"} ${x.grade.padEnd(4)} ${x.check.padEnd(9)} ${relative(workspace, x.file)}\n         ${x.message}`);
-  return f.some((x) => x.grade === "RULE") ? 1 : 0;
-}
+const OPTIONS = { block: FACE_BLOCKS };
+const BLOCK_USAGE = `[--block ${FACE_BLOCKS.join("|")}]`;
 
-export function run(args: string[]): number {
+/** Both actions are one reading of the tree; `write` is the one that changes files. */
+function run(args: string[], write: boolean): number {
+  const words = readWords(args, OPTIONS);
+  const path = onePath(scopeOf(words.paths, write ? REQUIRED : OPTIONAL));
+  const blocks = words.values("block");
   const workspace = resolveWorkspace();
-  const startedAt = performance.now();
-  begin(commandFacts("spn-devex", args), workspace);
-  const code = body(args, workspace);
-  record({ group: "docs", action: "face", args: argsText(args) }, performance.now() - startedAt, code);
-  end(code);
-  return code;
+  const found = face(docsTreeOf(path), write, { paths: [path], blocks: blocks.length ? blocks : FACE_BLOCKS });
+  for (const finding of found)
+    console.log(`${finding.grade === "RULE" ? "✗" : "!"} ${finding.grade.padEnd(4)} ${finding.check.padEnd(9)} ${relative(workspace, finding.file)}\n         ${finding.message}`);
+  return found.some((finding) => finding.grade === "RULE") ? 1 : 0;
 }
 
-if (process.argv[1] && basename(process.argv[1]) === "face.ts")
-  process.exit(run(process.argv.slice(2)));
+export const actions: Record<string, Action> = {
+  check: {
+    describe: "report the generated regions a write would change, and write nothing",
+    usage: `[<path>] ${BLOCK_USAGE}`,
+    run: (args) => run(args, false),
+  },
+  write: {
+    describe: "write the generated regions the path feeds",
+    usage: `<path> ${BLOCK_USAGE}`,
+    run: (args) => run(args, true),
+  },
+};

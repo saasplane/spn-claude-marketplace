@@ -1,6 +1,6 @@
 {
   "name": "spn-apps",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "description": "SaaS Plane apps domain, stack-agnostic \u2014 what an application is made of before any language is chosen: the contract model a module publishes, the rules a contract state follows, and the platform worksheet a partner fills in to decide which of the shipped modules they adopt. One door skill opens it, because a ref reaches a session only when something names it.",
   "author": {
     "name": "SaaS Plane"

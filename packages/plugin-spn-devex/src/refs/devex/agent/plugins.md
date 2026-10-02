@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/04-plugins.md",
-      "seen": "730ad38b"
+      "seen": "e0ea181a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
@@ -54,6 +54,20 @@ An edit to the folder changes nothing about the cache until an install copies on
 
 **A ref is the only layer a consumer actually has.** The book is not loaded in a session, and a partner holds no checkout of it. So a ref carries the actionable substance itself and cites its chapter **by name**, never by a path that resolves only for somebody holding both trees.
 
+## How a plugin's command is typed
+
+**Every command reads the same way** (`RD.DEVEX.AGENT.078`): `spn-<plugin> <group> [<subject>] <action> [<path>…] [options]`. The last word before the path is a verb, and you always type it.
+
+| Part | The rule | Example |
+| --- | --- | --- |
+| **Action** | `check` reads and reports. `write` changes files. `show` prints. A subject may have a verb of its own, such as `measure` or `report`. A command with more than one action has no default. | `spn-devex docs face check` |
+| **Path** | It says what the action acts on, and it may be a folder inside a repository or one file. A check of the whole corpus still reads everything and reports only the findings under the path. | `spn-devex docs audit check docs/artifacts` |
+| **Filter** | An option named for what it selects: `--variant` for documents, `--block` for a generated block, `--finding` for a kind of finding. | `--finding link` |
+
+**Name the smallest path the work needs, and run `check` before `write`.** A `write` with no path refuses, so a write never reaches a file nobody named. With no path, `check` and `show` take the repository you are in, and they refuse at a workspace root, where several repositories sit side by side.
+
+**Read the exit.** For `check` and `write`, exit 1 means a rule finding. Exit 2 means the command was typed wrongly, and the refusal prints the usage to type. `spn-<plugin> help` lists every command with its actions.
+
 ## The `spn:restates` stamp
 
 **A stamp lives here and nowhere else, and it cites another repository — never this one** (`RD.DEVEX.AGENT.073`). Both halves follow from what a restatement is for: it exists because a rule lives in the book and is repeated here, where the book cannot be read, and the `seen` hash is what makes that gap reportable. **A file citing its own repository has no gap to report** — both halves move in the same commit — so the stamp has no work to do and the hash stops matching the file with nobody to notice. Do not stamp a generated ref against the generator that writes it: say which command produces the file, in prose, and let a reader re-run it.
@@ -102,7 +116,7 @@ A moved `docs` entry means somebody rewrites a paragraph. A moved `files` entry 
 
 **`section` is optional, and it decides what the hash covers.** Name one and the stamp covers that heading's own text; leave it out and it covers the whole file. A citation is exactly as precise as the sentence it replaces, so a long chapter does not re-stamp every ref that cites one paragraph of it. **Each citation carries its own `seen`, not one stamp per block** — a block citing an eight-thousand-line concept and a hundred-line section would otherwise re-stamp the second every time the first moved, which is usually a wrong finding and teaches you to stop reading the run.
 
-**Compute every `seen` yourself; never invent one.** A wrong hash reports agreement that was never checked. A file's hash, a folder's hash and a decision row's hash come from different functions — `seenHash` for a file, `treeHash` for a folder, `rowHash` for one row's own line in a register — all in the marketplace's own `restates.ts` library. `restates decisions --write <ref>` computes and writes a `decisions` citation's `seen` for you, once you have re-read the row and corrected any disagreement in the ref's own text.
+**Compute every `seen` yourself; never invent one.** A wrong hash reports agreement that was never checked. A file's hash, a folder's hash and a decision row's hash come from different functions — `seenHash` for a file, `treeHash` for a folder, `rowHash` for one row's own line in a register — all in the marketplace's own `restates.ts` library. `restates decisions write <ref>` computes and writes a `decisions` citation's `seen` for you, once you have re-read the row and corrected any disagreement in the ref's own text.
 
 ## The three plugins, and how they divide
 

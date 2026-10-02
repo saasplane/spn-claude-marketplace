@@ -32,11 +32,15 @@ const environment = { ...process.env, SPN_TELEMETRY: "off", SPN_WORKSPACE: BASE,
   SPN_TEMPLATES: bookTemplatesDir(resolve(WORKSPACE, "spn-foundation")) };
 delete environment.SPN_ORG;
 delete environment.SPN_LOCATION;
-/** One run of `docs guide` through the entry, with its exit code and what it printed. */
+/** One run of `docs guide` through the entry, typed after the subject, with its exit code and what it printed. */
 const guide = (args, extra = {}) => {
   try { return { code: 0, out: execFileSync(process.execPath, [TOOL, "docs", "guide", ...args], { encoding: "utf8", env: { ...environment, ...extra }, stdio: "pipe" }) }; }
   catch (error) { return { code: error.status ?? 1, out: String(error.stdout ?? "") + String(error.stderr ?? "") }; }
 };
+
+const CHECK_USAGE = "usage: spn-devex docs guide check <guide.md…> [--name <name>] [--out <file>]";
+const WRITE_USAGE = "usage: spn-devex docs guide write <guide.md…> [--name <name>] [--out <file>]";
+const USAGE = `${CHECK_USAGE}\n${WRITE_USAGE.replace("usage: ", "       ")}`;
 
 const GUIDES = `${DOCS}/${SEAT.guides}`;
 const PAGES = `${DOCS}/${POCKET.artifacts}/${ARTIFACT.guides}`;
@@ -112,7 +116,7 @@ After the last step the service is down again.
   const root = repo({ [`${GUIDES}/01-getting-started.md`]: TABLE_GUIDE, [`${GUIDES}/02-build.md`]: "# Build\n",
     [`${DOCS}/README.md`]: "# Docs\n", [`${DOCS}/${SEAT.constructs}/01-core/thing.md`]: "# Thing\n" });
   const before = filesUnder(root);
-  const ran = guide([join(root, GUIDES, "01-getting-started.md")]);
+  const ran = guide(["write", join(root, GUIDES, "01-getting-started.md")]);
   const out = `${PAGES}/getting-started-guide.html`;
   ok("[MKT.SCRIPTS.106] a guide written as a table gives its page, named for the file without its number, and exits 0",
     ran.code === 0 && existsSync(join(root, out)), ran.out);
@@ -175,15 +179,15 @@ After the last step the service is down again.
   ok("the run says how many stages and steps it placed, and which steps lack what you see",
     ran.out.includes("1 stage(s) · 3 step(s)") && /SOFT[^\n]*01-getting-started\.md\n[^\n]*step 3: no text is marked as what you see/.test(ran.out), ran.out);
 
-  const again = guide([join(root, GUIDES, "01-getting-started.md")]);
+  const again = guide(["write", join(root, GUIDES, "01-getting-started.md")]);
   ok("a second run writes the same bytes", again.code === 0 && read(root, out) === text && again.out.includes("current"), again.out);
-  const checked = guide([join(root, GUIDES, "01-getting-started.md"), "--check"]);
-  ok("`--check` on a page that is current exits 0", checked.code === 0 && checked.out.includes("current"), checked.out);
+  const checked = guide(["check", join(root, GUIDES, "01-getting-started.md")]);
+  ok("[MKT.SCRIPTS.132] `check` on a page that is current exits 0", checked.code === 0 && checked.out.includes("current"), checked.out);
 
   writeFileSync(join(root, GUIDES, "01-getting-started.md"), TABLE_GUIDE.replace("**Stop it** when you are done", "**Stop it.** It frees the port."));
-  const stale = guide([join(root, GUIDES, "01-getting-started.md"), "--check"]);
-  ok("`--check` after the guide changed exits 1, names the page and writes nothing",
-    stale.code === 1 && /RULE[^\n]*getting-started-guide\.html\n[^\n]*not what `docs guide` produces now/.test(stale.out) && read(root, out) === text, stale.out);
+  const stale = guide(["check", join(root, GUIDES, "01-getting-started.md")]);
+  ok("[MKT.SCRIPTS.132] `check` after the guide changed exits 1, names the page and writes nothing",
+    stale.code === 1 && /RULE[^\n]*getting-started-guide\.html\n[^\n]*not what `docs guide write` produces now/.test(stale.out) && read(root, out) === text, stale.out);
 }
 
 // ---------------------------------------------------------------------------- a guide written under headings
@@ -245,7 +249,7 @@ Read the first failure only.
 
 {
   const root = repo({ [`${GUIDES}/07-test-and-verify.md`]: HEADINGS_GUIDE });
-  const ran = guide([join(root, GUIDES, "07-test-and-verify.md")]);
+  const ran = guide(["write", join(root, GUIDES, "07-test-and-verify.md")]);
   const out = `${PAGES}/test-and-verify-guide.html`;
   ok("[MKT.SCRIPTS.106] a guide written under headings gives its page, and exits 0", ran.code === 0 && existsSync(join(root, out)), ran.out);
   const text = existsSync(join(root, out)) ? read(root, out) : "";
@@ -276,17 +280,24 @@ Read the first failure only.
     text.includes('<h1>Test and Verify</h1>\n  <p class="sds-subtitle">Prove a change at every tier.</p>\n  <p class="sds-standfirst">A full run of every tier.</p>'));
   ok("the run names the step that lacks what you see", /step 2: no text is marked as what you see/.test(ran.out), ran.out);
 
-  const named = guide([join(root, GUIDES, "07-test-and-verify.md"), "--name", "verify"]);
+  const named = guide(["write", join(root, GUIDES, "07-test-and-verify.md"), "--name", "verify"]);
   ok("`--name` names the page", named.code === 0 && existsSync(join(root, PAGES, "verify-guide.html"))
     && read(root, `${PAGES}/verify-guide.html`) === text, named.out);
 
   const elsewhere = join(BASE, "elsewhere", "page.html");
   mkdirSync(dirname(elsewhere));
   const before = filesUnder(root);
-  const away = guide([join(root, GUIDES, "07-test-and-verify.md"), "--out", elsewhere]);
+  const away = guide(["write", join(root, GUIDES, "07-test-and-verify.md"), "--out", elsewhere]);
   ok("`--out` writes the page elsewhere, with its links written for that place, and writes nothing into the repository",
     away.code === 0 && readFileSync(elsewhere, "utf8").includes(`<a href="../spn-sample-${made}/${GUIDES}/06-release.md">Release</a>`)
       && JSON.stringify(filesUnder(root)) === JSON.stringify(before), away.out);
+  const checkedNamed = guide(["check", join(root, GUIDES, "07-test-and-verify.md"), "--name", "verify"]);
+  const checkedAway = guide(["check", join(root, GUIDES, "07-test-and-verify.md"), "--out", elsewhere]);
+  ok("[MKT.SCRIPTS.132] `check` takes `--name` and `--out` too, and looks at the page each of them names",
+    checkedNamed.code === 0 && checkedNamed.out.includes("verify-guide.html") && checkedAway.code === 0 && checkedAway.out.includes("current"),
+    checkedNamed.out + checkedAway.out);
+  const checkedOther = guide(["check", join(root, GUIDES, "07-test-and-verify.md"), "--name", "never-written"]);
+  ok("known-bad: `check` of a name no page was written under exits 1", checkedOther.code === 1 && checkedOther.out.includes("no page has been produced here yet"), checkedOther.out);
 }
 
 // ---------------------------------------------------------------------------- a guide whose sections are its steps
@@ -345,7 +356,7 @@ tool record
 
 {
   const root = repo({ [`${GUIDES}/07-verify.md`]: STEP_SECTIONS });
-  const ran = guide([join(root, GUIDES, "07-verify.md")]);
+  const ran = guide(["write", join(root, GUIDES, "07-verify.md")]);
   const out = `${PAGES}/verify${GUIDE_PAGE_SUFFIX}`;
   ok("[MKT.SCRIPTS.106] a guide whose sections open with `Step N —` gives its page, and exits 0", ran.code === 0 && existsSync(join(root, out)), ran.out);
   const text = existsSync(join(root, out)) ? read(root, out) : "";
@@ -358,14 +369,14 @@ tool record
   const NUMBERED = block({ id: "sample-stand-it-up", title: "Stand It Up", lenses: ["QA"], status: "DONE", summary: "Stand it up." }) + "\n# Stand It Up\n\nYou stand the platform up and check it.\n\n## 1. Stand the platform\n\nThe tests need the platform.\n\n```bash\ntool platform up\n```\n\n" +
     "## 2. Run the unit tests\n\n```bash\ntool test\n```\n\n## 3. Remove the data\n\n```bash\ntool clean\n```\n\n## 4. Record the run\n\n```bash\ntool record\n```\n";
   const numbered = repo({ [`${GUIDES}/01-stand-it-up.md`]: NUMBERED });
-  const numberedRun = guide([join(numbered, GUIDES, "01-stand-it-up.md")]);
+  const numberedRun = guide(["write", join(numbered, GUIDES, "01-stand-it-up.md")]);
   const numberedOut = `${PAGES}/stand-it-up${GUIDE_PAGE_SUFFIX}`;
   same("[MKT.SCRIPTS.106] step sections: a heading that opens with a number and a dot is a step too, without its typed number",
     numberedRun.code === 0 && existsSync(join(numbered, numberedOut)) ? stepsOf(read(numbered, numberedOut)) : numberedRun.out,
     ["Stand the platform", "Run the unit tests", "Remove the data", "Record the run"]);
   // The same guide with a `###` heading under one numbered section numbers its stages, and that heading is the step.
   const staged = repo({ [`${GUIDES}/01-stand-it-up.md`]: NUMBERED.replace("The tests need the platform.", "### Start the engine\n\nThe tests need the platform.") });
-  const stagedRun = guide([join(staged, GUIDES, "01-stand-it-up.md")]);
+  const stagedRun = guide(["write", join(staged, GUIDES, "01-stand-it-up.md")]);
   same("[MKT.SCRIPTS.106] step sections: where a numbered section holds a `###` heading, the numbered sections are stages and keep their numbers",
     stagedRun.code === 0 && existsSync(join(staged, numberedOut)) ? stepsOf(read(staged, numberedOut)) : stagedRun.out, ["Start the engine"]);
   same("[MKT.SCRIPTS.106] step sections: a step holds what its section holds, and a heading under it is a part of the step",
@@ -405,13 +416,13 @@ tool run
 {
   const root = repo({ [`${GUIDES}/03-notes.md`]: NO_STEP, [`${GUIDES}/01-getting-started.md`]: TABLE_GUIDE });
   const before = filesUnder(root);
-  const ran = guide([join(root, GUIDES, "03-notes.md")]);
+  const ran = guide(["write", join(root, GUIDES, "03-notes.md")]);
   ok("[MKT.SCRIPTS.107] a guide with no step is named, and the run exits 1",
     ran.code === 1 && /RULE[^\n]*03-notes\.md\n[^\n]*this guide holds no step, so no page is written/.test(ran.out), ran.out);
   ok("[MKT.SCRIPTS.107] no page is written for a guide with no step, and no folder is made for one",
     JSON.stringify(filesUnder(root)) === JSON.stringify(before) && !existsSync(join(root, PAGES)), filesUnder(root).join(" "));
 
-  const both = guide([join(root, GUIDES, "03-notes.md"), join(root, GUIDES, "01-getting-started.md")]);
+  const both = guide(["write", join(root, GUIDES, "03-notes.md"), join(root, GUIDES, "01-getting-started.md")]);
   ok("[MKT.SCRIPTS.107] beside a guide with steps, the guide with none is still named, the other page is written, and the run exits 1",
     both.code === 1 && both.out.includes("holds no step") && existsSync(join(root, PAGES, "getting-started-guide.html"))
       && !existsSync(join(root, PAGES, "notes-guide.html")), both.out);
@@ -424,19 +435,45 @@ tool run
   const before = filesUnder(root);
   const unchanged = () => JSON.stringify(filesUnder(root)) === JSON.stringify(before);
 
-  const noBlock = guide([join(root, GUIDES, "04-no-block.md")]);
+  const noBlock = guide(["write", join(root, GUIDES, "04-no-block.md")]);
   ok("a guide with no block is refused, and nothing is written", noBlock.code === 1 && noBlock.out.includes("has no `spn:doc` block") && unchanged(), noBlock.out);
-  const missing = guide([join(root, GUIDES, "09-not-there.md")]);
+  const missing = guide(["write", join(root, GUIDES, "09-not-there.md")]);
   ok("a guide that is not there is refused", missing.code === 1 && missing.out.includes("is not there") && unchanged(), missing.out);
-  const usage = guide([]);
-  ok("with no guide the command prints its usage and exits 2", usage.code === 2 && usage.out.includes("usage: spn-devex docs guide"), usage.out);
-  const two = guide([join(root, GUIDES, "01-getting-started.md"), join(root, GUIDES, "04-no-block.md"), "--name", "one"]);
-  ok("`--name` with two guides is refused, and nothing is written", two.code === 2 && two.out.includes("take one guide") && unchanged(), two.out);
+  const two = guide(["write", join(root, GUIDES, "01-getting-started.md"), join(root, GUIDES, "04-no-block.md"), "--name", "one"]);
+  ok("`--name` with two guides is refused with exit 2, and nothing is written",
+    two.code === 2 && two.out === `${WRITE_USAGE}\n\`docs guide write\` takes one guide with \`--name\` or \`--out\`, because each of them names one page.\n` && unchanged(), two.out);
+
+  // THE GRAMMAR: an action as a word, and a guide for each action.
+  const GUIDE = join(root, GUIDES, "01-getting-started.md");
+  const none = guide([]);
+  ok("[MKT.SCRIPTS.111] with no action the entry prints each usage line, says an action is owed and exits 2",
+    none.code === 2 && none.out === `${USAGE}\n\`docs guide\` needs an action.\n`, none.out);
+  const option = guide([GUIDE, "--check"]);
+  ok("[MKT.SCRIPTS.111] a guide where the action belongs is refused the same way, and `--check` is named as the action `check`",
+    option.code === 2 && option.out === `${USAGE}\n\`docs guide\` needs an action. \`--check\` is the action \`check\`.\n`, option.out);
+  const unknown = guide(["produce", GUIDE]);
+  ok("[MKT.SCRIPTS.111] a word that is no action of the subject is refused the same way",
+    unknown.code === 2 && unknown.out === `${USAGE}\n\`docs guide\` needs an action.\n`, unknown.out);
+  const noPath = guide(["write"]);
+  ok("[MKT.SCRIPTS.112] `write` with no guide prints its usage line, says a path is owed and exits 2",
+    noPath.code === 2 && noPath.out === `${WRITE_USAGE}\n\`docs guide write\` needs a path.\n`, noPath.out);
+  const noCheckPath = guide(["check"]);
+  ok("[MKT.SCRIPTS.132] `check` with no guide is refused too, because a page is produced from the guide that is named",
+    noCheckPath.code === 2 && noCheckPath.out === `${CHECK_USAGE}\n\`docs guide check\` needs a path.\n`, noCheckPath.out);
+  const noOption = guide(["write", GUIDE, "--json"]);
+  ok("an option the command does not take is refused by its name, with exit 2",
+    noOption.code === 2 && noOption.out === `${WRITE_USAGE}\n\`docs guide write\` does not take \`--json\`.\n`, noOption.out);
+  const noValue = guide(["write", GUIDE, "--name"]);
+  ok("`--name` with no value after it is refused with exit 2", noValue.code === 2 && noValue.out.includes("needs a value after `--name`."), noValue.out);
+  ok("no refused run wrote a file", unchanged());
+  const first = guide(["check", GUIDE]);
+  ok("[MKT.SCRIPTS.132] `check` before any page is written says to run `docs guide write`, exits 1 and writes nothing",
+    first.code === 1 && first.out.includes("no page has been produced here yet. Run `docs guide write`") && unchanged(), first.out);
 
   const templates = join(BASE, "templates-before");
   mkdirSync(join(templates, "pages"), { recursive: true });
   writeFileSync(join(templates, "pages", "guide-template.html"), "<title>Guide</title>\n<style>.step{}</style>\n<div class=\"page guide\"></div>\n");
-  const refused = guide([join(root, GUIDES, "01-getting-started.md")], { SPN_TEMPLATES: templates });
+  const refused = guide(["write", join(root, GUIDES, "01-getting-started.md")], { SPN_TEMPLATES: templates });
   ok("a template that links no shared stylesheet is refused in the one wording, and no page is written",
     refused.code === 1 && refused.out.includes(OWN_COPY) && unchanged(), refused.out);
 
@@ -445,7 +482,7 @@ tool run
   const changed = join(BASE, "templates-changed");
   mkdirSync(join(changed, "pages"), { recursive: true });
   writeFileSync(join(changed, "pages", "guide-template.html"), real.replace("<h1>{{NAME}}</h1>", "<h1>{{NAME}}</h1>\n  <p>{{A NEW SLOT}}</p>"));
-  const slot = guide([join(root, GUIDES, "01-getting-started.md")], { SPN_TEMPLATES: changed });
+  const slot = guide(["write", join(root, GUIDES, "01-getting-started.md")], { SPN_TEMPLATES: changed });
   ok("a template with a slot the command does not fill is refused, and the slot is named",
     slot.code === 1 && slot.out.includes("{{A NEW SLOT}}") && unchanged(), slot.out);
 }
