@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/",
-      "seen": "1b249c49"
+      "seen": "816accc9"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/08-web.md",
@@ -131,7 +131,7 @@ One name is used in the book, in the design library and in every stack. The book
 - Take every value from the vocabulary of its prop, never a free string.
 - Use `bordered` for a border a block draws around itself, and `rounded` for the corners of its frame. Only the container and the card take `raised`.
 - An unset `bordered` reads the frame above only on a block that frames a part of a page: the table, the code block, the accordions and the empty state. A field, a menubar and an avatar read their own default, because their border is the control's own chrome.
-- Mark each property of the design library as a declared prop or a shown state. A design read back to code never gains a prop that no platform has.
+- Mark each property of the design library as a declared prop, a shown state, or a setting taken from the block above. A design read back to code never gains a prop that no platform has.
 
 The names chapter of the book lists each prop that takes another name, with its values. The web design system uses `variant` for several vocabularies today.
 
@@ -197,7 +197,7 @@ A frame is drawn once on any part of a page. The first block inside a framed con
 
 ### The design library — 🔮
 
-The design library follows the book, and it declares no name. It holds one Figma file for each layer and one for drafts. `color` is a variable mode there, and it stays a prop on every stack. Behavior stays in words, in the book. No file of the library is published yet.
+The design library follows the book, and it declares no name. It holds one Figma file for each layer and one for drafts. `color` is a variable mode there, and it stays a prop on every stack. The look of a container and of a card is a mode of the theme's collections there, and it stays props on every stack. Behavior stays in words, in the book. No file of the library is published yet.
 
 ### What only a browser needs — ✅
 
