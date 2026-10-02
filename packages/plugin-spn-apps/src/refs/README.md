@@ -10,7 +10,7 @@
 
 | Domain | Holds |
 | --- | --- |
-| [`support/apps/`](support/apps/) | what a node is, and everything it is built from — shape, packages, modules, resources, apps, tests, comments, the agent surface, what it ships, and the stacks that realize it |
+| [`support/apps/`](support/apps/) | what a node is, and everything it is built from — shape, packages, modules, resources, apps, tests, comments, the agent surface, what it ships, the stacks that realize it, and the surface a person sees and touches |
 | [`platform/core/`](platform/core/) | the platform a partner adopts rather than rebuilds — tenancy, identity, surfaces, data and trust, lifecycle |
 | [`platform/modules/`](platform/modules/) | one ref per module that ships, and the face says what a module is |
 

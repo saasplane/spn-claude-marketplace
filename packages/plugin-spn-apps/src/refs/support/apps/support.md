@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/02-support/",
-      "seen": "a8008829"
+      "seen": "ef7faef6"
     }
   ]
 }
@@ -115,19 +115,11 @@ Let exactly two contexts cross the boundary, one direction each — never let an
 
 If you find a design system reaching into application state — a store, a router instance, a domain service — treat it as having stopped being portable. If you find an application reaching around the context to style a component, treat it as having stopped inheriting the system.
 
-## What a support package may offer, briefly
+## Where the design system and accessibility are stated
 
-Expect a web support package's published capability set to look like this, at the altitude this standard fixes:
+The web family states its two groups, the `ui/` taxonomy, the web app framework, and one standard that belongs to neither group alone. That standard is client-side authorization: treat permission-gated rendering as presentation only. Hiding a control is courtesy, and the refusal is always the server's. The framework supplies the session seam that rule depends on, so a module never reads or stores a credential itself.
 
-- **Theming**: derive the brand from a single seed; treat light/dark as a mode flip on the token role layer; read roles from a component, never a raw value; let the design-system root own theme state, with the setter reachable from any depth.
-- **Formatting**: ship one formatting capability per preference vocabulary (date, time, number, currency, address); never format by hand in a component or module; resolve an absent optional preference to the vocabulary's declared default, never the browser's locale.
-- **Translation**: pass every user-facing string through the design system's translate capability (key, source message, variables); let the application supply the implementation.
-- **Navigation**: declare a `navigate` seam and anchor data in the design system; never import a router, read a route, or touch history from inside it; bind the application's router to the seam once.
-- **Media**: resolve variant, size, and density into an address; require a placeholder and an error image rather than treating them as optional; never assemble a URL by hand in a screen.
-- **Overlays**: request dialogs, confirmations, and sheets through one imperative seam, never mount them from the component that needs them.
-- **Gated rendering**: treat permission-gated rendering as presentation only — hiding a control is courtesy, and the refusal is always the server's.
-
-Read the full capability groups a conforming design system answers — actions, data entry, data display, navigation, layout, overlays, feedback, media/typography, widgets — as the stack's own component inventory. What you must hold fixed is that a product module composes them rather than restyling copies, and that a missing control gets proposed to the system rather than hand-rolled.
+**The depth of the design-system group is not in the web family.** What a person sees and touches is one standard for every kind of surface, and the Surface topic states it. That topic holds the design system and the accessibility baseline, with what only a browser needs beside them. Read the `surface.md` ref in this plugin for theming, formatting, translation, navigation, media, overlays, the capability set, the names of the blocks, and the accessibility rules.
 
 ## The `ui/` taxonomy every web consumer inherits
 
@@ -140,6 +132,10 @@ Apply this same taxonomy whether you are filing a support package's own tree or 
 | `hooks/` | reusable stateful logic and service invocation, named `use` + what it does | every unit that has any |
 | `utils/` | pure helper functions only | every unit that has any |
 | `widgets/` | embeddable composite units, self-contained enough to mount anywhere their props allow | units shipping embeddable composites |
+| `containers/` | blocks that frame a part of a page as a header, content and a footer | units that ship containers (the design system) |
+| `layouts/` | blocks that frame a page, with its navigation and its main area | units that ship layouts (the design system) |
+
+A layout frames a page, and a container frames a part of one. Give a container its look from the theme and from its own props, never from a style the caller writes, and never put a container inside a container. Let a layout own the navigation and the main area of a page, and nothing inside that area. Never import a router into a layout: it moves between pages through the navigation seam. This taxonomy says where the two live. The `surface.md` ref states the blocks themselves.
 
 Export through exactly one barrel at a package's root; never give a subfolder its own barrel index. If a util in one of these folders turns out domain-free and broadly useful, promote it to core utilities rather than copying it between units.
 
@@ -154,7 +150,7 @@ Export through exactly one barrel at a package's root; never give a subfolder it
 
 ## Boundary
 
-Use this ref for what makes a package support, what it may depend on, and what it must never reach for. Reach for the shape ref (`shape.md` in this plugin) first when the question is where a file goes — it owns what folders a support package's `src/` interior takes, and what the privacy marker does inside them. Reach for the application lifecycle standard when the question is how a selection value is named, where it is read, and what boot does with it. Reach for the backing-resources standard when the question is what a resource costs once it holds state a mistake can lose.
+Use this ref for what makes a package support, what it may depend on, and what it must never reach for. Reach for the shape ref (`shape.md` in this plugin) first when the question is where a file goes — it owns what folders a support package's `src/` interior takes, and what the privacy marker does inside them. Reach for the `surface.md` ref when the question is what a page is built from, what a block is named, or how the design system gives an app its look. Reach for the application lifecycle standard when the question is how a selection value is named, where it is read, and what boot does with it. Reach for the backing-resources standard when the question is what a resource costs once it holds state a mistake can lose.
 
 ## Proof
 

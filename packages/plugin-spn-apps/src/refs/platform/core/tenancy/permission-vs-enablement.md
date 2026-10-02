@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/01-tenancy/03-people-access.md",
-      "seen": "1fa27d47"
+      "seen": "4d4c404e"
     }
   ],
   "decisions": [

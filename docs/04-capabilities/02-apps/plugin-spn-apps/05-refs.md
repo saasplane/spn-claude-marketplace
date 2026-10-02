@@ -13,7 +13,7 @@ A partner holding this plugin has no checkout of the foundation book beside it, 
 | Part of the construct | Lives in | What it is |
 | --- | --- | --- |
 | How the folder is arranged | `packages/plugin-spn-apps/src/refs/README.md` | one folder per book domain, and what a group and a file under it mean |
-| What a node is | `packages/plugin-spn-apps/src/refs/support/apps/` | shape, packages, modules, resources, apps, tests, comments, the agent surface, what it ships |
+| What a node is | `packages/plugin-spn-apps/src/refs/support/apps/` | shape, packages, modules, resources, apps, tests, comments, the agent surface, what it ships, and the surface a person sees |
 | The platform a partner adopts | `packages/plugin-spn-apps/src/refs/platform/core/` | tenancy, identity, surfaces, data and trust, lifecycle |
 | The modules that ship | `packages/plugin-spn-apps/src/refs/platform/modules/` | one entry per module, so the folder listing is the list |
 | What a stack is allowed to be | `packages/plugin-spn-apps/src/refs/support/apps/providers/README.md` | read before adding a second stack, and before assuming a tool can work out which one it is in |
