@@ -307,13 +307,28 @@ export function inProgressSteps(arc: string, now = Date.now(), out: Set<string> 
 }
 
 const REPORT_SUFFIX = "-report.md";
-// The row an order is for, as its first heading names it: `# Order 04a — N006 row 4: …`.
-const ORDER_ROW = /\brow\s+(\d+[a-z]?(?:\.\d+[a-z]?)*)\b/i;
+// The rows an order is for, as its first heading names them: `# Order 04a — N006 row 4: …`, or for an
+// order that carries several, `rows 0, 1 and 2` or `rows 0 to 2`.
+const ORDER_ROWS = /\brows?\s+(\d+[a-z]?(?:\.\d+[a-z]?)*(?:(?:\s*,\s*|\s+and\s+|\s+to\s+)\d+[a-z]?(?:\.\d+[a-z]?)*)*)/i;
+
+/** The rows a heading names. `0 to 2` is each whole number from the first to the last. */
+function rowsNamed(heading: string): string[] {
+  const named = ORDER_ROWS.exec(heading)?.[1];
+  if (!named) return [];
+  const range = /^(\d+)\s+to\s+(\d+)$/i.exec(named.trim());
+  if (range) {
+    const rows: string[] = [];
+    for (let row = Number(range[1]); row <= Number(range[2]); row += 1) rows.push(String(row));
+    return rows;
+  }
+  return named.split(/\s*,\s*|\s+and\s+|\s+to\s+/i).map((row) => row.trim().toLowerCase()).filter(Boolean);
+}
 
 /**
  * The rows of an arc whose order is out, by step id. An order is out where a file under the arc's
  * `notes/N<nnn>/orders/` is for that row and no report sits beside it: `03-reports.md` with no
- * `03-reports-report.md`. The row is the one the order's first heading names (`row 3`). Where the
+ * `03-reports-report.md`. The rows are the ones the order's first heading names (`row 3`, or
+ * `rows 0, 1 and 2`, or `rows 0 to 2` for an order that carries several). Where the
  * heading names none, it is the number that opens the file name, so `04a-…` and `04b-…` are both for
  * row 4. A row with several orders is out until every report is back.
  */
@@ -328,8 +343,9 @@ export function ordersOut(arc: string): Set<string> {
     if (name.endsWith(REPORT_SUFFIX)) continue;
     if (names.includes(`${name.slice(0, -".md".length)}${REPORT_SUFFIX}`)) continue;
     const heading = read(join(folder, name)).split("\n").find((line) => /^#\s/.test(line)) ?? "";
-    const named = ORDER_ROW.exec(heading)?.[1] ?? /^(\d+)/.exec(name)?.[1].replace(/^0+(?=\d)/, "");
-    if (named) out.add(named.toLowerCase());
+    const rows = rowsNamed(heading);
+    const numbered = /^(\d+)/.exec(name)?.[1].replace(/^0+(?=\d)/, "");
+    for (const row of rows.length ? rows : numbered ? [numbered] : []) out.add(row);
   }
   return out;
 }

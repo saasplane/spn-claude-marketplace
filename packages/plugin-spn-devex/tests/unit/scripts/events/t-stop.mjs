@@ -1285,6 +1285,13 @@ console.log("\n=== runnable — a row in progress whose order is out with an age
   const numbered = build("n006-stop-order-numbered", { "02a-the-split-check.md": "# The split check, first half\n" });
   check("[MKT.HOOKS.30] an order whose heading names no row is read by the number that opens its file name",
     [...ordersOut(numbered.arc)].join(",") === "2" && numbered.found.length === 0, JSON.stringify(numbered.found));
+  // One order that carries several rows names them all, as a list or as a range.
+  const several = build("n010-stop-order-several", { "15-three-rows.md": "# Order 15 — N3 rows 1, 2 and 4: three rows\n" });
+  check("[MKT.HOOKS.30] an order whose heading names several rows is out for each of them",
+    [...ordersOut(several.arc)].sort().join(",") === "1,2,4" && several.found.length === 0, [...ordersOut(several.arc)].join(","));
+  const ranged = build("n010-stop-order-ranged", { "15-a-range.md": "# Order 15 — N3 rows 0 to 2: a range\n" });
+  check("[MKT.HOOKS.30] `rows 0 to 2` is rows 0, 1 and 2", [...ordersOut(ranged.arc)].sort().join(",") === "0,1,2" && ranged.found.length === 0,
+    [...ordersOut(ranged.arc)].join(","));
   // Two orders for one row: the row is out until both reports are back.
   const split = build("n006-stop-order-split", { "02a-first.md": "# Order 02a — N3 row 2: first\n", "02a-first-report.md": "# report\n",
     "02b-second.md": "# Order 02b — N3 row 2: second\n" });
