@@ -9,6 +9,9 @@
 // A connector is a claim that two things touch, which is what makes a figure checkable rather than a
 // matter of taste. Ported from this workstream's `notes/figcheck.py`, the reference that passes on all
 // seven pages — and checked against it rather than trusted.
+//
+// A SKELETON NEEDS NO RULE OF ITS OWN HERE: it draws no connector, so every rule above reads it as
+// an ordinary set of boxes and labels, and the look it must never borrow is the drawer's promise.
 
 /** The measure, at the drawn scale: pixels per character, by text class. */
 const PX: Record<string, number> = { "sds-title": 7.6, "sds-label": 7.0, "sds-code": 6.6, "sds-note": 6.4 };

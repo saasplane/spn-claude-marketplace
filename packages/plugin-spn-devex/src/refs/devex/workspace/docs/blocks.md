@@ -14,7 +14,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The figures — what sits inside a block, and the closed set of them",
-      "seen": "6bfb2106"
+      "seen": "578f3224"
     }
   ]
 }
@@ -125,6 +125,7 @@ and can be read.
 | `sequence` | a process has more than one participant and **who speaks to whom** is the point | `boxes` are participants, `links` are messages in order; `dashed` is a reply |
 | `entities` | the construct is **data** and what relates to what is the point | `card` on every link. The subject is `em`; direction decides the column |
 | `chain` | a straight run of steps, left to right | nothing. No `links` needed |
+| `skeleton` | the content is **where the parts of a screen or a block sit** — a mock of a layout | `frame` instead of `boxes` and `links`. No connectors: position is the whole claim |
 
 `flow` is **retired**. It aliased `map` before `flowchart` existed; asking for one is refused.
 
@@ -209,3 +210,31 @@ reader with the one question they opened it to answer.
 
 `from` and `to` naming the same participant draws a loop off its own lifeline. Every message needs a
 label: a sequence shows who says **what** to whom.
+
+### `skeleton` — a mock of a layout, and nothing about how it looks
+
+One outer `frame`: a box with an optional `label` (its title) and `note`, holding `rows` top to
+bottom. A row holds `items` left to right; `label` names the row in a column every row of the frame
+shares, and `framed` puts its items inside one box, as an example sits in its frame. An item is
+`text` (a box as wide as its word, or the rest of the row with `fill`), a `note` (muted text, no
+box), or a `frame` of its own — a region, such as a navigation beside a main area, taking a `width`
+of `1/4` · `1/3` · `1/2` · `2/3` · `3/4` of the row, or what is left.
+
+```dg
+{ "kind": "skeleton",
+  "caption": "Inline: a narrow frame for a small block; the variants as a row of choices.",
+  "frame": { "label": "DSButton — Inline", "note": "the main way to ask for an action",
+    "rows": [
+      { "label": "Example", "framed": true,
+        "items": [{ "text": "Save", "em": true }, { "text": "Cancel" },
+                  { "note": "narrow frame: the block at its own size" }] },
+      { "items": [{ "text": "▸ show code", "fill": true, "off": true }] },
+      { "label": "Variants", "items": [{ "text": "SOLID" }, { "text": "SOFT" }, { "text": "OUTLINE" }] },
+      { "items": [
+        { "frame": { "label": "navigation", "width": "1/4", "rows": [{ "items": [{ "text": "Home", "fill": true }] }] } },
+        { "frame": { "label": "main", "rows": [{ "items": [{ "note": "the page" }] }] } }] }] } }
+```
+
+**No connector, ever.** Where a part sits is the whole claim, so a skeleton never draws an arrow.
+**And no colour that means something in the product.** `em` takes the blue tone and `off` the grey
+one — the words a `map` box already uses — and nothing here stands in for the library's own look.

@@ -3,14 +3,15 @@
 // The chapters are the source of truth; a rule change is edited there first, then here.
 //
 // Two halves under one subject: the geometry check reads a spec and the SVG it draws to; the browser
-// render answers what a real layout paints.
+// render answers what a real layout paints; `draw` is the same drawer, offered to a hand-written page.
 //
 //   spn-devex docs figure check <path…> [--variant <name>]    labels fit and connectors join · a block's colouring matches its text
 //   spn-devex docs figure colour <path…> [--variant <name>]   the audit's half: a coloured block strips back to what the author wrote
 //   spn-devex docs figure render <svg-or-html…>               render each in a headless browser and report what it painted
+//   spn-devex docs figure draw <spec.json…>                   print the drawing of each spec — a `.json` file, or a `.md` page's own ```dg``` blocks
 //
-// A SUBJECT WITH THREE ACTIONS, AND A `file` PATH. A path names one file, or a folder of them, and
-// each action needs one. `--variant` reads only the documents whose block declares that variant.
+// A SUBJECT WITH FOUR ACTIONS. `check`, `colour` and `render` take a `file` path, one or a folder of
+// them, and `--variant` narrows the first two; `draw` takes one or more spec files directly.
 //
 // THE BROWSER IS OPTIONAL AND THIS SAYS SO RATHER THAN FAILING, on a machine carrying no global
 // `playwright` install (the guides seat carries the line to add one).
@@ -262,6 +263,32 @@ async function render(args: string[]): Promise<number> {
   return 0;
 }
 
+// ---------------------------------------------------------------------------- draw
+
+/**
+ * A HAND-WRITTEN PAGE ASKS THE SAME HELPER a seat file's build step calls on its own: no author
+ * places a coordinate either way. A `.json` file is one spec; a `.md` file's own ```` ```dg ```` blocks
+ * are drawn in the order they appear, as the page itself would hold them.
+ */
+function drawSpecs(args: string[]): number {
+  const files = scopeOf(readWords(args).paths, REQUIRED);
+  const workspace = resolveWorkspace();
+  let total = 0;
+  for (const file of files) {
+    const src = readFileSync(file, "utf8");
+    const texts = file.endsWith(".md") ? [...src.matchAll(/```dg\n([\s\S]*?)```/g)].map((m) => m[1]) : [src];
+    texts.forEach((text, i) => {
+      let spec: { caption?: string; [k: string]: unknown };
+      try { spec = JSON.parse(text); }
+      catch (e) { total += 1; console.log(`✗ RULE figure    ${relative(workspace, file)}\n         spec${i + 1}: not valid JSON — ${(e as Error).message}`); return; }
+      const { svg, findings } = draw(spec as Parameters<typeof draw>[0]);
+      for (const f of findings) { total += 1; console.log(`✗ RULE figure    ${relative(workspace, file)}\n         spec${i + 1}: ${f}`); }
+      if (svg) console.log(`<figure>\n${svg}${spec.caption ? `\n<figcaption>${spec.caption}</figcaption>` : ""}\n</figure>`);
+    });
+  }
+  return total ? 1 : 0;
+}
+
 // ---------------------------------------------------------------------------- the actions
 
 export const actions: Record<string, Action> = {
@@ -279,5 +306,10 @@ export const actions: Record<string, Action> = {
     describe: "render each figure in a headless browser, and report what it painted",
     usage: "<svg-or-html…>",
     run: render,
+  },
+  draw: {
+    describe: "print the drawing of each spec — a `.json` file, or a `.md` page's own ```dg``` blocks",
+    usage: "<spec.json…>",
+    run: drawSpecs,
   },
 };

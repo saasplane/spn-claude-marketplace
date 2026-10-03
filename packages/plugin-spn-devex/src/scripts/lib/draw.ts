@@ -39,8 +39,24 @@ export type Link = { from: string; to: string; label?: string; dashed?: boolean;
 export type Layer = { name: string; boxes: Box[] };
 export type Spec = {
   kind: string; boxes?: Box[]; links?: Link[]; caption?: string; title?: string;
-  layers?: Layer[]; outside?: (Box & { as?: Resource })[];
+  layers?: Layer[]; outside?: (Box & { as?: Resource })[]; frame?: SkeletonFrame;
 };
+
+/**
+ * SKELETON — where the parts of a screen or a block sit, and nothing about how they look
+ * (05-artifacts.md § `SKELETON`). An item is a box with the word a person sees, a note in muted
+ * text, or a frame of its own: a region, such as a navigation beside a main area.
+ */
+export type SkeletonItem = {
+  text?: string; note?: string; fill?: boolean; em?: boolean; off?: boolean; warn?: boolean;
+  frame?: SkeletonFrame;
+};
+/** A row runs left to right. `label` names the place, in a column every row of the frame shares;
+ *  `framed` puts the row's items inside one box, as an example sits in its frame. */
+export type SkeletonRow = { label?: string; framed?: boolean; items: SkeletonItem[] };
+/** A frame is a box, with an optional title (`label`) and `note`, holding rows top to bottom. A
+ *  frame nested in a row may carry `width` — a fraction of the row, or absent for what is left. */
+export type SkeletonFrame = { label?: string; note?: string; width?: string; rows: SkeletonRow[] };
 
 /** The measure the figure check uses, at the drawn scale. */
 const W_LABEL = 7, W_NOTE = 6.4, W_TITLE = 7.6;
@@ -1495,6 +1511,159 @@ function drawFlowchart(spec: Spec): { svg: string; findings: string[] } {
   return { svg, findings };
 }
 
+/**
+ * SKELETON — a mock of a layout, drawn under the rule that holds for every other kind: nothing by
+ * eye, every box measured from its own text. No connectors: position is the whole claim, so this
+ * drawer emits none and the figure check's connector rules pass it by construction.
+ *
+ * Two numbers, both taken from the grid rather than invented: a plain item's box is the clear air a
+ * label already owes on both sides (`LABEL_H + LABEL_GAP * 2`), and a framed row's item is one more
+ * `LABEL_GAP` taller — room enough to read as the heavier, "this is the example" box.
+ */
+const SKEL_ROW_H = LABEL_H + LABEL_GAP * 2, SKEL_ITEM_H = SKEL_ROW_H + LABEL_GAP;
+const WIDTH_FRACTIONS: Record<string, number> = { "1/4": 1 / 4, "1/3": 1 / 3, "1/2": 1 / 2, "2/3": 2 / 3, "3/4": 3 / 4 };
+
+/** The words a MAP box already uses, with the skeleton's own tone for an absent place. */
+function skelClass(it: SkeletonItem): string {
+  if (it.em) return "sds-box sds-tone-blue";
+  if (it.warn) return "sds-box sds-tone-amber";
+  if (it.off) return "sds-box sds-tone-grey";
+  return "sds-box";
+}
+/** A box as wide as its text, by the measure a leaf uses, with the leaf's own padding. */
+const skelTextW = (s: string) => Math.ceil(s.length * W_LABEL + PAD_X * 2);
+/** A note carries no box, so no padding — only the run its words need. */
+const skelNoteW = (s: string) => Math.ceil(s.length * W_LABEL);
+/** Which of the three shapes an item is; `null` is the fourth thing the spec refuses. */
+const skelKind = (it: SkeletonItem): "text" | "note" | "frame" | null =>
+  it.frame ? "frame" : it.text !== undefined ? "text" : it.note !== undefined ? "note" : null;
+
+/** An item's own width where it has one; a `fill` text or a frame takes what the row has left. */
+function skelFixedWidth(it: SkeletonItem): number {
+  const kind = skelKind(it);
+  if (kind === "text") return it.fill ? 0 : skelTextW(it.text!);
+  if (kind === "note") return skelNoteW(it.note!);
+  return 0; // a frame never sets the row's shared width — it takes a fraction of it, or what is left
+}
+
+/** A row's height, independent of width: the tallest item it holds, or that plus the framed pad. */
+function skelRowHeight(row: SkeletonRow): number {
+  const items = row.items.length ? row.items : [{}];
+  const hs = items.map((it) => (skelKind(it) === "frame" ? skelFrameHeight(it.frame!) : row.framed ? SKEL_ITEM_H : SKEL_ROW_H));
+  const h = Math.max(...hs);
+  return row.framed ? h + GAP_Y * 2 : h;
+}
+/** A frame's height, independent of width: its header, its rows stacked with the grid's own gap, its own pad. */
+function skelFrameHeight(frame: SkeletonFrame): number {
+  const rows = frame.rows ?? [];
+  const body = rows.reduce((t, r) => t + skelRowHeight(r), 0) + GAP_Y * Math.max(0, rows.length - 1);
+  return (frame.note ? H_TWO : H_ONE) + body + PAD_X;
+}
+/** The left column every row of a frame shares, sized to the widest row label — or none at all. */
+function skelLabelCol(frame: SkeletonFrame): number {
+  const labels = (frame.rows ?? []).map((r) => r.label).filter((l): l is string => !!l);
+  return labels.length ? Math.ceil(Math.max(...labels.map((l) => l.length * W_LABEL))) : 0;
+}
+/** A row's own minimum width: its fixed items, the gaps between them, and a framed row's own pad. */
+function skelRowMinWidth(row: SkeletonRow): number {
+  const fixed = row.items.reduce((t, it) => t + skelFixedWidth(it), 0);
+  const gaps = GAP_Y * Math.max(0, row.items.length - 1);
+  return fixed + gaps + (row.framed ? GAP_Y * 2 : 0);
+}
+// A FLOOR RATHER THAN A ZERO, for the degenerate case every row's width is left to a `fill` or a
+// fraction: nothing would set the frame's own width, and 0 is not a figure.
+const SKEL_MIN_W = 200;
+
+/**
+ * Each item's width within a row of `available` pixels. A text's own width, a note's own width,
+ * and a frame's fraction of `available` are fixed; a `fill` text or a frame named with no fraction
+ * takes an equal share of what the fixed items and the row's own gaps leave over. An item that is
+ * none of `text`, `note` or `frame`, and a `width` naming no fraction the spec has, are findings —
+ * the drawer still places something, rather than leaving a gap nobody can explain.
+ */
+function skelRowWidths(row: SkeletonRow, available: number, findings: string[]): number[] {
+  const n = row.items.length;
+  const widths: number[] = new Array(n).fill(0);
+  const flex: number[] = [];
+  let fixed = 0;
+  row.items.forEach((it, i) => {
+    const kind = skelKind(it);
+    if (kind === null) { findings.push("an item that is none of `text`, `note` or `frame`"); return; }
+    if (kind === "text" && it.fill) { flex.push(i); return; }
+    if (kind === "text") { widths[i] = skelTextW(it.text!); fixed += widths[i]; return; }
+    if (kind === "note") { widths[i] = skelNoteW(it.note!); fixed += widths[i]; return; }
+    const w = it.frame!.width;
+    if (w === undefined) { flex.push(i); return; }
+    const frac = WIDTH_FRACTIONS[w];
+    if (frac === undefined) {
+      findings.push(`a frame's \`width\` is \`${w}\`, and a skeleton takes one of ${Object.keys(WIDTH_FRACTIONS).join(" · ")}, or none for what is left`);
+      flex.push(i); return;
+    }
+    widths[i] = Math.round(available * frac); fixed += widths[i];
+  });
+  const gaps = GAP_Y * Math.max(0, n - 1);
+  const left = Math.max(0, available - fixed - gaps);
+  const share = flex.length ? Math.round(left / flex.length) : 0;
+  for (const i of flex) widths[i] = share;
+  return widths;
+}
+
+/** One frame, drawn at `(x, y)`. `forcedW` is given for a frame nested in a row; the outer frame
+ *  sizes itself from its own rows instead. */
+function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: number | undefined, findings: string[], out: string[]): void {
+  const labelCol = skelLabelCol(frame);
+  const rowContentW = forcedW !== undefined
+    ? Math.max(0, forcedW - PAD_X * 2 - (labelCol ? labelCol + GAP_Y : 0))
+    : Math.max(SKEL_MIN_W, ...(frame.rows ?? []).map(skelRowMinWidth));
+  const w = forcedW !== undefined ? forcedW : PAD_X * 2 + (labelCol ? labelCol + GAP_Y : 0) + rowContentW;
+  const h = skelFrameHeight(frame);
+
+  out.push(`  <rect class="sds-box" x="${x}" y="${y}" width="${w}" height="${h}" rx="3"/>`);
+  if (frame.label) out.push(`  <text class="sds-title" x="${x + PAD_X}" y="${y + 26}">${esc(frame.label)}</text>`);
+  if (frame.note) out.push(`  <text class="sds-code" x="${x + PAD_X}" y="${y + 45}">${esc(frame.note)}</text>`);
+
+  const itemsX = x + PAD_X + (labelCol ? labelCol + GAP_Y : 0);
+  let rowY = y + (frame.note ? H_TWO : H_ONE);
+  for (const row of frame.rows ?? []) {
+    const rh = skelRowHeight(row);
+    if (row.label) out.push(`  <text class="sds-label" x="${x + PAD_X}" y="${Math.round(rowY + rh / 2 + 4)}">${esc(row.label)}</text>`);
+
+    let innerX = itemsX, innerY = rowY, innerW = rowContentW;
+    if (row.framed) {
+      out.push(`  <rect class="sds-box" x="${itemsX}" y="${rowY}" width="${rowContentW}" height="${rh}" rx="3"/>`);
+      innerX = itemsX + GAP_Y; innerY = rowY + GAP_Y; innerW = rowContentW - GAP_Y * 2;
+    }
+
+    const widths = skelRowWidths(row, innerW, findings);
+    const slotH = row.framed ? SKEL_ITEM_H : SKEL_ROW_H;
+    let ix = innerX;
+    row.items.forEach((it, i) => {
+      const iw = widths[i];
+      const kind = skelKind(it);
+      if (kind === "text") {
+        out.push(`  <rect class="${skelClass(it)}" x="${ix}" y="${innerY}" width="${iw}" height="${slotH}" rx="3"/>`);
+        out.push(`  <text class="sds-code" x="${ix + PAD_X}" y="${Math.round(innerY + slotH / 2 + 4)}">${esc(it.text!)}</text>`);
+      } else if (kind === "note") {
+        out.push(`  <text class="sds-code" x="${ix}" y="${Math.round(innerY + slotH / 2 + 4)}">${esc(it.note!)}</text>`);
+      } else if (kind === "frame") {
+        skelDrawFrame(it.frame!, ix, innerY, iw, findings, out);
+      }
+      ix += iw + GAP_Y;
+    });
+    rowY += rh + GAP_Y;
+  }
+}
+
+/** A `skeleton` with no `frame` draws nothing — it is one outer frame, and there is no other claim
+ *  this kind can make. */
+function drawSkeleton(spec: Spec): { svg: string; findings: string[] } {
+  if (!spec.frame) return { svg: "", findings: ["a `skeleton` figure with no `frame`; a skeleton is one outer frame"] };
+  const findings: string[] = [];
+  const out: string[] = [];
+  skelDrawFrame(spec.frame, 24, 24, undefined, findings, out);
+  return { svg: svgOf(out, spec.title ?? spec.caption ?? "skeleton"), findings };
+}
+
 const DRAWERS: Record<string, (s: Spec) => { svg: string; findings: string[] }> = {
   entities: drawEntities,
   chain: drawChain,
@@ -1502,6 +1671,7 @@ const DRAWERS: Record<string, (s: Spec) => { svg: string; findings: string[] }> 
   sequence: drawSequence,
   system: drawSystem,
   map: drawMap,
+  skeleton: drawSkeleton,
 };
 
 /**

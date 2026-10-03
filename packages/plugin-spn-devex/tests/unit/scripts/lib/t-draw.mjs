@@ -552,5 +552,68 @@ console.log("\n=== a drawing carries the shared stylesheet's class names, and no
   one("a path with any other class is not read as a connector", checkFigures(wrap("mine")), none);
 }
 
+console.log("\n=== SKELETON — a mock of a layout, and nothing about how it looks");
+{
+  // The plan's own example (notes/N012/plan.md § The skeleton): one outer frame, a framed row with
+  // a marked item and a note, an unframed fill row, a plain row, and a row of two nested regions —
+  // one holding a fraction of the row, one holding what is left.
+  const PLAN_SPEC = { kind: "skeleton",
+    title: "The section of DSButton, in the Inline layout",
+    caption: "Inline: a narrow frame for a small block; the variants as a row of choices.",
+    frame: { label: "DSButton — Inline", note: "the main way to ask for an action",
+      rows: [
+        { label: "Example", framed: true,
+          items: [{ text: "Save", em: true }, { text: "Cancel" }, { note: "narrow frame: the block at its own size" }] },
+        { items: [{ text: "▸ show code", fill: true, off: true }] },
+        { label: "Variants", items: [{ text: "SOLID" }, { text: "SOFT" }, { text: "OUTLINE" }] },
+        { items: [
+          { frame: { label: "navigation", width: "1/4", rows: [{ items: [{ text: "Home", fill: true }] }] } },
+          { frame: { label: "main", rows: [{ items: [{ note: "the page" }] }] } }] }] } };
+  const plan = judge(PLAN_SPEC);
+  one("the plan's own spec draws with no finding", plan.findings, none);
+  one("and the figure check passes it", plan.figure, none);
+  one("a skeleton draws no connector: position is the whole claim", plan.svg, (g) => !g.includes("sds-connector"));
+  one("`skeleton` is a kind the book names, and a helper draws it", KINDS, (k) => k.includes("skeleton"));
+
+  one("a spec with no `frame` is a finding, not an empty canvas",
+    draw({ kind: "skeleton" }).findings, says("no `frame`"));
+  one("an unknown `width` on a nested frame is a finding",
+    draw({ kind: "skeleton", frame: { rows: [{ items: [
+      { frame: { width: "2/5", rows: [{ items: [{ text: "x" }] }] } },
+      { text: "y", fill: true },
+    ] }] } }).findings, says("`2/5`"));
+  one("an item that is none of `text`, `note` or `frame` is a finding",
+    draw({ kind: "skeleton", frame: { rows: [{ items: [{ warn: true }] }] } }).findings,
+    says("none of `text`, `note` or `frame`"));
+
+  // A box marked `em` or `off` carries the skeleton's own tones — `off` reads as muted grey here,
+  // never the `sds-absent` a MAP box uses for a resource that is not there.
+  const tones = draw({ kind: "skeleton", frame: { rows: [{ items: [
+    { text: "Save", em: true }, { text: "Cancel" }, { text: "Disabled", off: true } ] }] } }).svg;
+  one("`em` takes the blue tone", tones, (g) => g.includes('<rect class="sds-box sds-tone-blue"'));
+  one("`off` takes the grey tone, not `sds-absent`", tones, (g) => g.includes('<rect class="sds-box sds-tone-grey"') && !g.includes("sds-absent"));
+
+  // A row's label sits in one column every row of the frame shares, and a row with no label still
+  // lines its items up under the ones that have one.
+  const cols = draw({ kind: "skeleton", frame: { rows: [
+    { label: "Variants", items: [{ text: "A" }] },
+    { items: [{ text: "B" }] },
+  ] } }).svg;
+  const xOfCode = (g) => [...g.matchAll(/<text class="sds-code" x="([\d.]+)"/g)].map((m) => Number(m[1]));
+  one("a labelled row and an unlabelled one line their items up on the same column",
+    cols, (g) => new Set(xOfCode(g)).size === 1);
+
+  // A nested frame given no `width` takes what the row has left, after the one given a fraction.
+  const split = judge({ kind: "skeleton", frame: { rows: [{ items: [
+    { frame: { label: "nav", width: "1/4", rows: [{ items: [{ text: "x" }] }] } },
+    { frame: { label: "main", rows: [{ items: [{ text: "y" }] }] } },
+  ] }] } });
+  one("the two regions pass the figure check at their own widths", split.figure, none);
+  const frameWidths = [...split.svg.matchAll(/<rect class="sds-box" x="[\d.]+" y="[\d.]+" width="([\d.]+)" height="[\d.]+" rx="3"\/>\n  <text class="sds-title"/g)]
+    .map((m) => Number(m[1]));
+  one("the fractioned region (nav) is narrower than the one taking what is left (main)",
+    frameWidths, ([nav, main]) => nav < main);
+}
+
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
 process.exit(failed ? 1 : 0);
