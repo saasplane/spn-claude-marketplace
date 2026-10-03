@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/01-common/",
-      "seen": "3b60bab4"
+      "seen": "3b49a0ab"
     }
   ],
   "decisions": [
@@ -36,6 +36,26 @@
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.151",
       "seen": "4fb48b4e"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.SUPPORT.APPS.158",
+      "seen": "2e9c0cdd"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.SUPPORT.APPS.160",
+      "seen": "c689b04f"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.SUPPORT.APPS.161",
+      "seen": "af73eec0"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.SUPPORT.APPS.163",
+      "seen": "ab56efe9"
     }
   ]
 }
@@ -43,7 +63,7 @@
 
 # Lens — `UX` (UX designer)
 
-**Source of truth:** the foundation book's Surface topic (`02-support/01-apps/11-surface/01-common`): its standards, accessibility, interaction, patterns, design system, names, layout and container, and design library chapters. It also restates decisions `RD.SUPPORT.APPS.142`, `RD.SUPPORT.APPS.146`, `RD.SUPPORT.APPS.147`, `RD.SUPPORT.APPS.149`, `RD.SUPPORT.APPS.150` and `RD.SUPPORT.APPS.151`. This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
+**Source of truth:** the foundation book's Surface topic (`02-support/01-apps/11-surface/01-common`): its standards, accessibility, interaction, patterns, design system, names, layout and container, and design library chapters. It also restates decisions `RD.SUPPORT.APPS.142`, `RD.SUPPORT.APPS.146`, `RD.SUPPORT.APPS.147`, `RD.SUPPORT.APPS.149`, `RD.SUPPORT.APPS.150`, `RD.SUPPORT.APPS.151`, `RD.SUPPORT.APPS.158`, `RD.SUPPORT.APPS.160`, `RD.SUPPORT.APPS.161` and `RD.SUPPORT.APPS.163`. This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
 
 **Judged against, beside the book:** Nielsen's ten usability heuristics, as the Nielsen Norman Group states them, and the domain's usual workflow. A page option is weighed against the heuristic it keeps or breaks, named.
 
@@ -63,6 +83,8 @@ The question it holds: *can this person finish what they came to do, and do they
 
 - **The page has one purpose and one main action.** Ask what the person came here to do. An answer that needs *and* is two pages. Several actions of equal weight leave the person to work out what the page is for (standards § A page has one purpose).
 - **Each level owns its own thing.** The layout draws the navigation and hands the page the main area. A page that draws its own navigation has taken the layout's job. A layout that arranges the page's blocks has taken the page's (standards § The levels · `RD.SUPPORT.APPS.146`).
+- **The page's fill and the main area's inset are the layout's, never the page's.** The page's fill is `page/fill`, set by the theme — no page or story sets a fill of its own. The layout gives the main area one inset, `layout/main-inset`, in every layout type, and a page whose content runs edge to edge writes `flush` on the main area instead (layout and container § The layout · `RD.SUPPORT.APPS.160`, `RD.SUPPORT.APPS.161`).
+- **The navigation behaves the same in every layout type.** An item's actions are reachable without hover, wherever the item is drawn as a row. A closed group that holds the current page shows the selected mark. A shut group's flyout opens on a press, and hover shows only its name. The narrow dock keeps its back link (layout and container § How the navigation behaves · `RD.SUPPORT.APPS.163`).
 - **A framed part reads header, content, footer, in that order.** The title and the actions of a part then sit in the same place on every page. A container inside a container is a finding (layout and container § The container · `RD.SUPPORT.APPS.147`).
 - **A frame is drawn once.** Two borders around one table are the finding. A `bordered` block in a `flush` part is a finding, because the page asked for both lines. A table, a list, a code block, an accordion or an empty state in a `flush` part draws no border of its own (layout and container § A frame is drawn once · `RD.SUPPORT.APPS.149`).
 - **Each task runs by the pattern of its intent, from the blocks that pattern names.** The intents are Move, Find, Read, Enter, Choose, Act, Interrupt, Disclose, Hear back and Be refused. A second way to run a known task is a finding. So is a control the page built for itself (patterns § The patterns, by intent · design system § The capability set).
@@ -71,10 +93,11 @@ The question it holds: *can this person finish what they came to do, and do they
 - **A failure says what went wrong, and gives the way back.** A failed send keeps what the person entered. A failed action leaves every record as it was. An empty result keeps its filters shown (interaction § Feedback, recovery and interruption · patterns § Find, § Enter, § Act).
 - **A refusal leaves the person somewhere to go.** A refused block is hidden or disabled. A refused page says that the person has no permission. The navigation stays usable in both cases (patterns § Be refused).
 - **An interruption says why, answers, and returns the person.** An action that destroys something asks first, in `DSAlertDialog`. Leaving an interruption returns the person and the focus to the place they left (interaction § Feedback, recovery and interruption · patterns § Interrupt, § Act).
+- **Every overlay that covers a page dims it with one scrim, `scrim/overlay`.** A dialog, an alert dialog, a drawer and a sheet dim the page the same way, and `DSBackdrop` draws that scrim (patterns § Interrupt · `RD.SUPPORT.APPS.158`).
 - **The surface answers with the design system's own blocks.** A loading picture or a failure picture that the page drew itself is a finding. So is anything a person needs that only hover reaches (interaction § Feedback, recovery and interruption, § Input, by kind of surface).
 - **The look comes from the theme, and never from the page.** A color, a padding, a margin, a radius or a gap set by hand is the finding (layout and container § What a container refuses · `RD.SUPPORT.APPS.150`). In a design, it is a color that binds no variable, or a copy of a block that is no longer an instance (design system § The capability set).
 - **A hue, a surface treatment and a word each mean one thing on every page.** `variant` is the surface treatment, `color` is the hue and `size` is the density step. A hue that means success on one page and decoration on the next is a finding (standards § What a surface is judged by · names § The three shared names).
-- **Each shared state has one picture.** Error, focus, disabled and selected look the same on every block of the page (design library § Each shared state has one picture · `RD.SUPPORT.APPS.142`).
+- **Each shared state has one picture.** Error, focus, disabled and selected look the same on every block of the page. Every block that takes the key draws the focus picture, including a tab, an entry of a menubar or a breadcrumb, and the header of an accordion or a collapsible — no block takes the key and shows nothing (design library § Each shared state has one picture · `RD.SUPPORT.APPS.142`).
 - **The page works by keyboard, shows its focus and keeps its contrast**, in light and in dark. A page built from the design system's blocks inherits all of it. A control the page built owes all of it on its own (accessibility § The baseline).
 - **One page holds at each density, theme, device type, language and direction.** A second version of the page for any of them is a finding. So is a block restyled for dark (standards § What a surface adapts to).
 

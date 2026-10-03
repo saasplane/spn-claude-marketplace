@@ -3,15 +3,15 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/01-common/08-design-library.md",
-      "seen": "b56467c9"
+      "seen": "6e5cf2a5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/01-common/06-names.md",
-      "seen": "11fd5eab"
+      "seen": "feabdd12"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/01-common/07-layout-container.md",
-      "seen": "b96409a0"
+      "seen": "60bafcef"
     }
   ]
 }
@@ -67,6 +67,12 @@ The design library holds one file for each layer of the design system. A page dr
 - **Never type a number where the scale holds one.** The gap and the padding of a plain frame each bind a variable.
 - **Set the frame setting on a part only where the tree writes `flush` on that part.** It is a variable mode set on the part. That is how a table reads that it fills the part.
 - **Never rename an instance, a property or a value.** The name carries the link between the design and its code.
+
+## How a block is drawn
+
+- **An overlay is drawn as its surface alone, placed over a `DSBackdrop`, and its extent is the size of the instance.** It draws no width of its own; the instance placed on the canvas decides it.
+- **A popup or an overlay that a block opens is a private part of that block, shown by the switch `open`.** It is never a block a designer places on a page of its own.
+- **A value that only changes which published block sits in a slot is no variant.** The slot already makes that choice, so a variant for it would repeat the choice and need a new version for each block that may sit there.
 
 ## When the library does not hold a block
 

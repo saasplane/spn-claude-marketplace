@@ -15,7 +15,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/01-common/05-design-system.md",
-      "seen": "ec22c281"
+      "seen": "6efa662d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/01-common/03-interaction.md",

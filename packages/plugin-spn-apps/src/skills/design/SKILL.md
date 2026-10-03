@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/01-common/",
-      "seen": "3b60bab4"
+      "seen": "3b49a0ab"
     }
   ]
 }
@@ -104,6 +104,7 @@ The six task states are idle, working, done, failed, empty and denied.
 - **Decide what the person sees in each task state**, for every task. A block drawn from data shows all six, each with a picture of its own. An action shows working, and then done or failed.
 - **Decide the way back from each failure.** A failed state says what went wrong. A failed send keeps what the person entered. An empty result keeps its filters shown.
 - **An action that destroys something asks first**, in `DSAlertDialog`.
+- **A toast and an alert take their icon from their hue, and the two draw one picture.** The toast is an alert that appears for a while and leaves, so no caller passes its icon.
 - **Put nothing a person needs behind hover alone.** `DSTooltip` and `DSHoverCard` hold an addition, and never the one way to a thing.
 - **Never invent a pattern for an intent the table holds.** A task that fits no intent is named in the result, and the page waits. A new intent joins the patterns chapter of the book first.
 
@@ -114,7 +115,7 @@ Take each block from the list its pattern names. Write it by its name in the boo
 - **`variant`, `color` and `size` each mean one thing on every block.** `variant` is the surface treatment, `color` is the hue and `size` is the density step. Every value comes from the vocabulary of its prop.
 - **Leave `size` unset**, unless one block must differ. A block takes the size that the container, the widget or the `DSScope` above it passes on, and then the app's.
 - **Write only props the book names.** Hover, focus and pressed are shown states. The platform produces them, and the tree never sets them.
-- **A block drawn from data is a host and its items.** Write the host, and then one item for each entry you want shown.
+- **A block drawn from data is a host and its items.** Write the host, and then one item for each entry you want shown. One item serves every host that takes one data shape — the three menus take one shape and share `DSMenuNode`. A host whose data differs declares its own item.
 - **What a block does stays in words**: where an action leads, and which permission gates it. Write it beside the block.
 - **A block the design system lacks is never built inside the page.** Name it under *Missing*, with the task that needs it. It is proposed to the design system.
 

@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-apps/11-surface.md",
-      "seen": "1b5060ca"
+      "seen": "76b805fd"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/",
-      "seen": "e2a96be0"
+      "seen": "f54f5063"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/08-web.md",
@@ -30,10 +30,10 @@ Each section below carries the status of its book chapter. The marks tell a rule
 
 | Mark | Means | Sections that carry it |
 | --- | --- | --- |
-| ✅ | implemented: the book states it as done | accessibility · the contexts and the seams · what only a browser needs |
-| 🔮 | planned: the book states the standard, and it is not a record of what runs today | the levels · interaction · the names · the container · the layout · the theme · the order of a setting · the design library |
+| ✅ | implemented: the book states it as done | accessibility · the contexts and the seams · the names · what only a browser needs |
+| 🔮 | planned: the book states the standard, and it is not a record of what runs today | the levels · interaction · the container · the layout · the theme · the order of a setting · the design library |
 
-Read a 🔮 section as design. No check reads a page against the levels or the interaction rules yet. No stack builds the container yet, or the context that carries a frame. A theme holds the brand color and light or dark today.
+Read a 🔮 section as design. No check reads a page against the levels or the interaction rules yet. `@saasplane/support-web-ds-ts` 2.0.0 builds the container, the context that carries a frame (`DSScope`), and the theme's six choices. It does not yet build the inset of the main area, the page's fill, the layout's own measures, or how the navigation behaves.
 
 ## Terms
 
@@ -116,7 +116,7 @@ A conforming design system answers a fixed set of groups: actions, data entry, d
 
 The set sits in five layers, on every stack: core, components, widgets, containers and layouts. A layer uses only the layers named before it. How far a stack has built the scale is the stack's to say. For TypeScript, read `providers/ts/08-web.md` in this same plugin.
 
-### A name is the contract — 🔮
+### A name is the contract — ✅
 
 One name is used in the book, in the design library and in every stack. The book names every block, prop, closed value and token. The design library draws each one under that name, and a stack builds it under that name. No file maps a design name to a code name. A stack may add the form its language asks for, and never a second name.
 
@@ -136,7 +136,7 @@ One name is used in the book, in the design library and in every stack. The book
 - Mark each property of the design library as a declared prop, a shown state, or a setting taken from the block above. A design read back to code never gains a prop that no platform has.
 - Name a hook of the design system by its context: `useDS`, then the context, then the value. Each context has one hook that returns it whole. The size and the frame setting each have a hook of one value, which takes the block's own prop. The rule binds a hook whose value comes from one context: a hook that reads several, or none, is named for what it does.
 
-The names chapter of the book lists each prop that takes another name, with its values. The web design system uses `variant` for several vocabularies today.
+The names chapter of the book lists each prop that takes another name, with its values.
 
 ### The container — 🔮
 
@@ -184,7 +184,20 @@ A container takes no background color, no padding value, no margin, no container
 
 ### The layout — 🔮
 
-A layout owns the navigation and the main area of a page, and nothing inside that area. A page chooses its layout, and no rule restricts where the page places a block in the main area. The gap between two blocks comes from the scale. The layout types are `RAIL`, `DOCK` and `TOPNAV`, and every type places the same named places. A layout names no routing library.
+A layout owns the navigation and the main area of a page, and nothing inside that area. A page chooses its layout, and no rule restricts where the page places a block in the main area. The gap between two blocks comes from the scale — between two blocks, and between the parts of one control. The layout types are `RAIL`, `DOCK` and `TOPNAV`, and every type places the same named places. A layout names no routing library.
+
+- **The page's fill is `page/fill`, and the theme sets it.** A theme whose containers are raised draws the page on the sunken surface, so a raised frame shows. Any other theme draws the page on the plain surface. No page and no story sets a fill of its own.
+- **The layout gives the main area one inset, `layout/main-inset`, in every layout type.** A page whose content runs from edge to edge writes `flush` on the main area, the same word a part of a container takes. The page writes no inset of its own.
+- **The layout's measures are named in the scale**: the width of the rail open and shut, the height of a bar, the width of the dock's column, the width of the shell and the inset of the main area. No layout holds one as a number.
+
+#### How the navigation behaves
+
+Each layout type draws its navigation the same way, whatever the type.
+
+- **An item's actions are reachable without hover**, in room of their own in the row, wherever the item is drawn as a row: the open rail, the dock, the flyout of the shut rail, the panel of the top bar, and the menus of a narrow screen.
+- **A closed group that holds the current page shows the selected mark, in every layout type.** The top bar marks the selected row of its panel.
+- **The flyout of a shut group opens on a press, and hover shows the group's name, as a tooltip.** Hover opens nothing.
+- **The narrow dock keeps its back link.** An item does the same thing on every screen.
 
 ### The theme — 🔮
 
@@ -230,6 +243,8 @@ Size flows down from whoever composes a region. Only the blocks of this table pa
 
 No other block passes its size on. A card, a dialog, a drawer, a sheet and an alert do not. Tabs, a tooltip, a menu, a popover and a collapsible do not either. The size above still reaches the blocks inside such a block.
 
+A popover draws its own surface: the fill, the edge, the radius and the shadow. A block that opens a popover draws no surface of its own around it.
+
 A frame is drawn once on any part of a page. The page follows that rule, and no code enforces it. A block never changes because of where it sits. It reacts to one thing only: sitting in a `flush` part.
 
 | A block in a `flush` part | What it does |
@@ -247,7 +262,18 @@ A frame is drawn once on any part of a page. The page follows that rule, and no 
 
 ### The design library — 🔮
 
-The design library follows the book, and it declares no name. It holds one Figma file for each layer and one for drafts. `color` is a variable mode there, and it stays a prop on every stack. The look of a container and of a card is a mode of the theme's collections there, and it stays props on every stack. Behavior stays in words, in the book. No file of the library is published yet.
+The design library follows the book, and it declares no name. It holds one Figma file for each layer and one for drafts. `color` is a variable mode there, and it stays a prop on every stack. The look of a container and of a card is a mode of the theme's collections there, and it stays props on every stack. Behavior stays in words, in the book. The five files of the library — Core, Components, Widgets, Containers and Layouts — are published.
+
+- **A block drawn from data is a host and an item. One item serves every host that takes one data shape.** The three menus take one shape, so they draw one item, `DSMenuNode`. A host whose data differs declares its own item.
+- **Each shared state has one picture, on every block and on every kind of surface.** The picture is chosen on the first component that has the state.
+- **Selected has one picture for each kind of entry.** A row of a list or a menu draws a check at its end. An entry that is no row — a bar entry, the current page of a pager or a breadcrumb, a tab, a day of a calendar, an item of the layout's navigation — has no room for a check, and draws a fill of the primary role with its label in that role. Each block draws the picture of its kind.
+- **Every block that takes the key draws the focus picture**, including a tab, an entry of a menubar or a breadcrumb, and the header of an accordion or a collapsible. No block takes the key and shows nothing.
+
+#### How a block is drawn
+
+- **An overlay is drawn as its surface alone, placed over a `DSBackdrop`, and its extent is the size of the instance.** It draws no width of its own.
+- **A popup or an overlay that a block opens is a private part of that block, shown by the switch `open`.** It is never a block a designer places on a page of its own.
+- **A value that only changes which published block sits in a slot is no variant.** The slot holds the block.
 
 ### What only a browser needs — ✅
 
