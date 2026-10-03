@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/01-common/08-design-library.md",
-      "seen": "6e5cf2a5"
+      "seen": "63618de1"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/01-common/06-names.md",
@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/01-common/07-layout-container.md",
-      "seen": "60bafcef"
+      "seen": "93aed038"
     }
   ]
 }
@@ -32,13 +32,13 @@ Its provenance is the foundation book's design library, names, and layout and co
 
 The design library holds one file for each layer of the design system. A page draws from what those files have published, and from nothing else.
 
-| Layer | The file holds | SaaS Plane names its file |
-| --- | --- | --- |
-| Core | the variables, the text styles, the scale and the icons | `DS 1-core` |
-| Components | one page for each group of components | `DS 2-Components` |
-| Widgets | one page for each widget | `DS 3-Widgets` |
-| Containers | the container, with its parts and its look | `DS 4-Containers` |
-| Layouts | the layout, in each of its types | `DS 5-Layouts` |
+| Layer | The file holds | SaaS Plane names its file | Its file key |
+| --- | --- | --- | --- |
+| Core | the variables, the text styles, the scale and the icons | `DS 1-core` | `3RZVOKGItY4Kos2ZVfmI3V` |
+| Components | one page for each group of components | `DS 2-Components` | `saEPRBFUOa7QEj84NpCJkr` |
+| Widgets | one page for each widget | `DS 3-Widgets` | `QfApgt8QTngjhGe0Hqf3Xq` |
+| Containers | the container, with its parts and its look | `DS 4-Containers` | `XQPPdU83nFQjT5LQ3JmHgg` |
+| Layouts | the layout, in each of its types | `DS 5-Layouts` | `ENmqF4WjVnecAVnpuy0nHF` |
 
 **Never draw from Lab.** It holds drafts, and it is never published.
 

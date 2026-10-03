@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-apps/11-surface.md",
-      "seen": "76b805fd"
+      "seen": "11eaa279"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/",
-      "seen": "f54f5063"
+      "seen": "4fbbf064"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/08-web.md",
@@ -154,7 +154,7 @@ The parts sit in one order: the header, then the content, then the footer. The h
 | --- | --- | --- |
 | `frames` | a list: any of `HEADER`, `CONTENT`, `FOOTER` | which parts the frame holds. A part that is not listed sits flat on the page |
 | `raised` | yes or no | whether the frame is filled with the raised surface and lifted |
-| `bordered` | yes or no | whether the frame has a border. Inside a bordered frame, a line divides the parts |
+| `bordered` | yes or no | whether the frame has a border. Inside a bordered frame, a line divides each two parts the frame holds. Blocks that need no line between them sit in one content part |
 | `rounded` | yes or no | whether the corners of the frame are rounded |
 
 A container also takes `size`, which sets the density of every block inside it.
@@ -188,7 +188,7 @@ A layout owns the navigation and the main area of a page, and nothing inside tha
 
 - **The page's fill is `page/fill`, and the theme sets it.** A theme whose containers are raised draws the page on the sunken surface, so a raised frame shows. Any other theme draws the page on the plain surface. No page and no story sets a fill of its own.
 - **The layout gives the main area one inset, `layout/main-inset`, in every layout type.** A page whose content runs from edge to edge writes `flush` on the main area, the same word a part of a container takes. The page writes no inset of its own.
-- **The layout's measures are named in the scale**: the width of the rail open and shut, the height of a bar, the width of the dock's column, the width of the shell and the inset of the main area. No layout holds one as a number.
+- **The layout's measures are named in the scale**: the width of the rail open, shut and on a narrow screen, the height of a bar, the width of the dock's column, the width of the shell and the inset of the main area. No layout holds one as a number.
 
 #### How the navigation behaves
 
@@ -263,6 +263,19 @@ A frame is drawn once on any part of a page. The page follows that rule, and no 
 ### The design library — 🔮
 
 The design library follows the book, and it declares no name. It holds one Figma file for each layer and one for drafts. `color` is a variable mode there, and it stays a prop on every stack. The look of a container and of a card is a mode of the theme's collections there, and it stays props on every stack. Behavior stays in words, in the book. The five files of the library — Core, Components, Widgets, Containers and Layouts — are published.
+
+SaaS Plane's own files sit in the **Design System** folder of the SaaS Plane team in Figma, and a link opens only for a person with a seat on that team:
+
+| File | Link | Its pages |
+| --- | --- | --- |
+| **DS 1-core** | https://www.figma.com/design/3RZVOKGItY4Kos2ZVfmI3V/DS-1-Core | Colour · Type · Scale · Icons |
+| **DS 2-Components** | https://www.figma.com/design/saEPRBFUOa7QEj84NpCJkr/DS-2-Components | one page for each group, then Choices |
+| **DS 3-Widgets** | https://www.figma.com/design/QfApgt8QTngjhGe0Hqf3Xq/DS-3-Widgets | Filter bar · Data table |
+| **DS 4-Containers** | https://www.figma.com/design/XQPPdU83nFQjT5LQ3JmHgg/DS-4-Containers | Container |
+| **DS 5-Layouts** | https://www.figma.com/design/ENmqF4WjVnecAVnpuy0nHF/DS-5-Layouts | Layout |
+| **DS 9-Lab** | https://www.figma.com/design/wa0knrmgfiLnYfjAgdJMlz/DS-9-Lab | drafts, never published |
+
+Core holds the variables in collections, and each is one setting of the book: `Roles` (Light, Dark), `Hue` (the values of `color`), `Scale`, `Theme-Font`, `Theme-Radius`, the four `Theme-*` collections of the container look (`Theme-Raised` also holds `page/fill`), and `Frame` (the frame setting of `flush`). A private part's name starts with a dot; a description is one line and a link; a file that changes is published by a person.
 
 - **A block drawn from data is a host and an item. One item serves every host that takes one data shape.** The three menus take one shape, so they draw one item, `DSMenuNode`. A host whose data differs declares its own item.
 - **Each shared state has one picture, on every block and on every kind of surface.** The picture is chosen on the first component that has the state.
