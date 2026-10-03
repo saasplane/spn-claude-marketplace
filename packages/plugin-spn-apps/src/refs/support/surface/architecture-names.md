@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/04-architecture-names.md",
-      "seen": "34be9882"
+      "seen": "f6ee80af"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "1f7b95d1"
+      "seen": "40f13a5f"
     }
   ]
 }
@@ -41,7 +41,9 @@ One name is used in the book, in the design library and in every stack. The book
 | --- | --- | --- | --- |
 | `variant` | the surface treatment | `SOLID` · `SOFT` · `OUTLINE` · `GHOST` · `LINK` | `DSVariantType` |
 | `color` | the hue | `DEFAULT` · `PRIMARY` · `INFO` · `SUCCESS` · `WARNING` · `ERROR` | `DSColorType` |
-| `size` | the density step | `XS` · `SM` · `MD` · `LG` · `XL` | `DSSizeType` |
+| `size` | the density step, read smallest to largest | `XS` · `SM` · `MD` · `LG` · `XL` | `DSSizeType` |
+
+**The five values of `size` are read smallest to largest, `XS` to `XL`, wherever they are listed** — in the book, in the design library and in every stack — **and `SM` is the default size a theme sets**; a block told no size takes it. Neither rule holds for `variant` or `color`, because neither of those is a scale.
 
 Keep each of the three names for its one meaning, on every block — a block takes `variant` and `color` independently. A prop that means something else takes another name: a shape, a type step or a kind of alert is not a surface treatment. Name a prop and its vocabulary with one word: the vocabulary `DS<Component><Word>Type` is taken through the prop `<word>`. Take every value from the vocabulary of its prop, never a free string.
 
@@ -77,6 +79,7 @@ This ref states which three props mean one thing everywhere, what kind every oth
 | --- | --- |
 | `RD.SUPPORT.APPS.140` | the book names every block, prop and token of the design system, and every stack uses that name |
 | `RD.SUPPORT.APPS.143` | `variant` names the surface treatment, `color` the hue and `size` the density step, on every block and every kind of surface |
+| `RD.SUPPORT.SURFACE.007` | the five values of `size` are read smallest to largest, `XS` to `XL`, wherever they are listed, and `SM` is the default size a theme sets |
 | `RD.SUPPORT.APPS.145` | the design system has the layers core, components, widgets, containers and layouts, on every stack, and a layer uses only the layers named before it |
 | `RD.SUPPORT.APPS.154` | a hook of the design system names the context its value comes from |
 | `RD.SUPPORT.APPS.142` | each shared state of a control has one picture, chosen in the design library on the first component that has it |

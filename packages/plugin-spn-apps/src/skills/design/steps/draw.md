@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "1f7b95d1"
+      "seen": "40f13a5f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
@@ -70,6 +70,7 @@ The design library holds one file for each layer of the design system. A page dr
 - **Never type a color.** Every color on the page is a variable of Core, and a block already binds it.
 - **Never type a number where the scale holds one.** The gap and the padding of a plain frame each bind a variable.
 - **Set the frame setting on a part only where the tree writes `flush` on that part.** It is a variable mode set on the part. That is how a table reads that it fills the part.
+- **Draw sizes smallest to largest.** A set shows its `SM` version at the top left, as the default a theme sets, and its layers run `XS` to `XL`. An icon beside a text takes the icon size of that text's size step and shares its centre line: an `XS` icon beside `XS` text.
 - **Never rename an instance, a property or a value.** The name carries the link between the design and its code.
 
 ## How a block is drawn

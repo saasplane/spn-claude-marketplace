@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/05-architecture-core.md",
-      "seen": "c8211598"
+      "seen": "00b58afb"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/05-architecture-core/",
-      "seen": "69c2b90b"
+      "seen": "119dae5c"
     }
   ]
 }
@@ -48,7 +48,7 @@ Every role is named for its job, never for a color: **Surface** is the fill a bl
 
 ## The scale — ✅
 
-The scale has five steps, `XS` to `XL`. Each step carries six measures: height, padding (the inset of a card or a part of a container), the gap between blocks, the gap between the parts of a control, radius, and icon size. The layout's own measures are named in the scale too — the width of the rail open, shut and on a narrow screen, the height of a bar, the width of the dock's column, the width of the shell and the inset of the main area — and no layout holds one as a number.
+The scale has five steps, `XS` to `XL`. Each step carries six measures: height, padding (the inset of a card or a part of a container), the gap between blocks, the gap between the parts of a control, radius, and icon size. **An icon placed beside a text takes the icon size of that text's own size step, and the two sit on one centre line** (`RD.SUPPORT.SURFACE.008`): at `XS`·`SM`·`MD`·`LG`·`XL` the text reads 12·13·14·16·18px and its icon 12·14·16·18·20px. The layout's own measures are named in the scale too — the width of the rail open, shut and on a narrow screen, the height of a bar, the width of the dock's column, the width of the shell and the inset of the main area — and no layout holds one as a number.
 
 ## The type steps and icons — ✅
 
@@ -62,6 +62,7 @@ This ref names every role, every step of the scale, and the family of every type
 
 | Rule | What it decides |
 | --- | --- |
+| `RD.SUPPORT.SURFACE.008` | an icon placed beside a text takes the icon size of that text's own size step, and the two sit on one centre line |
 | `RD.SUPPORT.APPS.152` | the spacing and size scale is a token group beside the roles, and a block reads a role token and the scale, never a ramp step or a number of its own |
 
 ## Proof

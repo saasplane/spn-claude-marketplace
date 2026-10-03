@@ -14,7 +14,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The figures — what sits inside a block, and the closed set of them",
-      "seen": "2224935a"
+      "seen": "4afebe89"
     }
   ]
 }
@@ -125,7 +125,7 @@ and can be read.
 | `sequence` | a process has more than one participant and **who speaks to whom** is the point | `boxes` are participants, `links` are messages in order; `dashed` is a reply |
 | `entities` | the construct is **data** and what relates to what is the point | `card` on every link. The subject is `em`; direction decides the column |
 | `chain` | a straight run of steps, left to right | nothing. No `links` needed |
-| `skeleton` | the content is **where the parts of a screen or a block sit** — a mock of a layout, a preview | `frame` instead of `boxes` and `links`; named places tinted and tagged. No connectors: position is the whole claim |
+| `skeleton` | the content is **where the parts of one layer sit** — a mock of a layout, a preview | `frame` instead of `boxes` and `links`; dotted boundaries with a name for components, parts and slots. No connectors: position is the whole claim |
 
 `flow` is **retired**. It aliased `map` before `flowchart` existed; asking for one is refused.
 
@@ -213,40 +213,57 @@ label: a sequence shows who says **what** to whom.
 
 ### `skeleton` — a mock of a layout, and nothing about how it looks
 
-A skeleton is a **visual preview of how the inner blocks are placed**, so a developer gets the idea before reading a prop. It draws a surface's views only, never a system, a flow or a data shape (`system`, `flowchart` and `entities` draw those). It may show an arrangement no block has yet, so a tag names a place in
+A skeleton is drawn for **one layer: the app, a layout, a container, a widget or a component**. It shows where that layer's primary sub-components are placed, each with its own component's name, and sample values fill the rest. It draws a surface's views only, never a system, a flow or a data shape (`system`, `flowchart` and `entities` draw those). It may show an arrangement no block has yet, so a tag names a place in
 plain words, or by a block's prop where the block exists. Draw one wherever a reader must picture an
-arrangement, in a construct page or an overview: a page, a layout's named places, a container's parts,
-a widget, a showcase section, a component that frames others. A hand-written page (an approach page, a
+arrangement, in a construct page or an overview: a layout's types and named places, a container's parts, each widget, a showcase section, and the few components that frame others: the table, the form, the dialog. Never one for every component. A hand-written page (an approach page, a
 preview) takes the same drawing from `docs figure draw <spec.json>`.
 
-One outer `frame`: a box with an optional `label` (its title), `note` and `tag`, holding `rows` top to
-bottom. A row holds `items` left to right; `label` names the row in a column every row of the frame
-shares, and `framed` puts its items inside one box, as an example sits in its frame.
+Each sub-component stands where it stands on the screen: the start or the end of its row, the top or the foot of its column; a part that takes the room left takes it in the drawing too.
 
-| Item | Draws |
+**A place is one of three things, and each reads by its own mark, never by a tint.**
+
+| A place is | Marked | Holds |
+| --- | --- | --- |
+| a component, a part or a slot | a dotted boundary, with its name | a part draws what it holds; a slot that accepts any node draws nothing inside it, only its name |
+| a frame's own look | a background for `raised`, a solid line for `bordered`, neither for `flat` | the parts of one frame, together. Never a colour that stands for one place against another |
+| a control, a title or a stand-in | nothing of its own | see below |
+
+A **control** carries no tag and takes its own size: the height its real component has at the size step drawn, never stretched to its row and never shrunk to a label's line. A **title** is plain text, never a tagged box and never `em`. **Sample values fill the rest**: a title, a button, a field or a record carries a value a real screen could show, and where the content is many of one thing a stand-in shows the kind with no name. An **icon** is a small square holding one of a small set of plain line shapes the drawer draws itself, with one default where none fits; a skeleton shows no icon of the library.
+
+One outer `frame`: a box with an optional `label` (its title), `look`, `note` and `tag`, holding `rows` top to
+bottom. A row holds `items` left to right; `label` names the row in a column every row of the frame
+shares.
+
+| Field | Draws |
 | --- | --- |
-| `text` | a box as wide as its word, or the rest of the row with `fill`; a control keeps its own height |
+| `frame` | a region, such as a navigation beside a main area: `look` `raised` · `bordered` · `flat`; `width` `1/4` · `1/3` · `1/2` · `2/3` · `3/4` of the row, or what is left with `fill`; regions in one row end on one line |
+| `text` | a box as wide as its word, or the rest of the row with `fill` |
 | `note` | muted text, no box |
-| `frame` | a region, such as a navigation beside a main area: `width` `1/4` · `1/3` · `1/2` · `2/3` · `3/4` of the row, or what is left; regions in one row end on one line |
-| `tone` · `tag` | a named place: tinted in a palette tone, with a small tag at its corner (`brand`, `nav`, `children`). It stretches to its row. The tone tells places apart and means nothing more |
-| `lines` · `headings` | that many placeholder bars, in the place's tone; a heading bar is shorter and taller |
+| `slot` | one block whose text is its own name, with nothing drawn inside it |
+| `tag` | the name on a component, a part or a slot's dotted boundary |
+| `control` | `button` · `field` · `select` · `checkbox` · `pager`, each at its own component's height, with a sample value; a `pager` is one packed group |
+| `standin` | `rows` · `cards` · `field` · `list`: placeholder bars at the skeleton's own rhythm, for the many of one thing |
+| `icon` | a small square holding the name of one plain shape the drawer draws itself, or its default |
 | `spacer` | free room: the items after it sit at the end of the row |
 | `height` | a region standing taller than what it holds, in rows |
-| `em` · `off` · `warn` | the words a `map` box uses: the one thing to notice, something muted, something wrong |
+
+A skeleton takes neither `tone` nor `em`; a `map` takes both.
+
+**A skeleton takes its own guidelines, apart from the grid every other figure shares.** Padding inside a boundary is 16px, and the gap between parts, in a row or down a frame, is 24px. A control's height follows its own component's size step: 28 · 32 · 36 · 40 · 44px for `XS` · `SM` · `MD` · `LG` · `XL`. A name sits on a 20px line, at its boundary's own corner, and an icon beside a word sits on that same centre line. A stand-in's rhythm is a 6px bar and an 8px heading bar, stepping 14px to the next. Inside the outer frame a named boundary nests no deeper than two; a third level is drawn as its own skeleton. The check asks three things of a skeleton alone: a component, a part or a slot boundary carries a name; a control carries no tag; and a named boundary nests no deeper than two.
 
 ```dg
 { "kind": "skeleton",
-  "caption": "RAIL: each named place tinted and tagged; the navigation's items as bars.",
+  "caption": "RAIL: each named place carries its prop's name; a place that takes any node is a slot; the navigation's entries are a list stand-in.",
   "frame": { "label": "DSLayout — RAIL", "rows": [{ "items": [
     { "frame": { "width": "1/4", "rows": [
-      { "items": [{ "tag": "brand", "tone": "amber", "fill": true }] },
-      { "items": [{ "tag": "nav", "tone": "cyan", "lines": 5, "headings": [0, 3], "fill": true }] },
-      { "items": [{ "tag": "account", "tone": "pink", "fill": true }] }] } },
+      { "items": [{ "slot": "brand", "fill": true }] },
+      { "items": [{ "frame": { "tag": "nav", "fill": true, "rows": [
+        { "items": [{ "standin": "list", "lines": 5, "headings": [0], "fill": true }] }] } }] },
+      { "items": [{ "slot": "account", "fill": true }] }] } },
     { "frame": { "rows": [
-      { "items": [{ "text": "≡" }, { "spacer": true }, { "tag": "utilityActions", "tone": "violet" }] },
-      { "items": [{ "tag": "children", "tone": "green", "fill": true, "height": 4 }] }] } }] }] } }
+      { "items": [{ "icon": "menu" }, { "spacer": true }, { "slot": "utilityActions" }] },
+      { "items": [{ "frame": { "tag": "children", "fill": true, "rows": [] } }] }] } }] }] } }
 ```
 
 **No connector, ever.** Where a part sits is the whole claim, so a skeleton never draws an arrow.
-**And never the library's look**: no colour that means something in the product, no size in pixels, no
-real icon. Where the look matters, the section links the drawing in the library.
+**And never the library's look**: no colour that means something in the product, no size in pixels. Where the look matters, the section links the drawing in the library.

@@ -1,8 +1,13 @@
 <!-- RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § The masthead, and the opening · § The suffix names the kind · § The approach document — a workstream's, never a repository's · § One stylesheet, served in versions · § The page itself — its outline, its rail, its width and its furniture
      and docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md § An arc carries its specification, or names the note that holds it
      This file holds the structure of a preview page and states no rule: the rail, the masthead, the
-     Overview as plain paragraphs, one section with its subsections, the slots an author fills, and the two lines that load the shared stylesheet and script. A section
-     and a subsection are repeated as often as the preview needs, and a subsection keeps only the block that fits. -->
+     Overview as plain paragraphs, then Today, Proposed and Where it lands, each with its subsections, the slots
+     an author fills, and the two lines that load the shared stylesheet and script. A preview shows and holds no
+     card: a question is asked on the approach page, in Open, and the card there links the preview that shows its
+     options. A section and a subsection are repeated as often as the preview needs, and a subsection keeps only
+     the block that fits: the subsections below are a choice of blocks, and an author deletes those the
+     preview does not need. A preview never frames a sample file: it shows a thing with these blocks, and
+     links a real file in the samples folder. -->
 <meta charset="utf-8">
 <title>Approach Preview Template</title>
 <!-- spn:doc
@@ -38,7 +43,7 @@
 </section>
 
 <section id="s2" data-block="sequence">
-  <div class="sds-section-head"><h2>Why &mdash; {{the problem in one line}}</h2></div>
+  <div class="sds-section-head"><h2>Today &mdash; {{the thing as it is, in one line}}</h2></div>
   <p>{{The section&rsquo;s own overview, in one or two sentences. Then its subsections, each with the block that fits.}}</p>
 
   <h3 id="s2a">{{A subsection shown as a diagram}}</h3>
@@ -67,8 +72,8 @@
 </section>
 
 <section id="s3" data-block="comparison">
-  <div class="sds-section-head"><h2>What &mdash; {{the decision in one line}}</h2></div>
-  <p>{{The section&rsquo;s own overview.}}</p>
+  <div class="sds-section-head"><h2>Proposed &mdash; {{the thing as it will be, in one line}}</h2></div>
+  <p>{{The section&rsquo;s own overview. Where a decision is still open, its options sit side by side.}}</p>
 
   <h3 id="s3a">{{A subsection shown as a table}}</h3>
   <div class="sds-scroll"><table>
@@ -78,21 +83,39 @@
     </tbody>
   </table></div>
 
-  <h3 id="s3b">{{A subsection that shows a real sample}}</h3>
-  <p>{{What the sample is: a template, a report, a page. It is a real file in its own format, kept in the samples folder, and this page only shows it.}}</p>
-  <div class="sds-frame">
-    <div class="sds-caption">{{samples/the-sample-file.html}}</div>
-    <iframe src="../samples/{{the-sample-file.html}}" title="{{what the sample is}}"></iframe>
-  </div>
+  <h3 id="s3b">{{A subsection shown as options, side by side}}</h3>
+  <p>{{Used where a decision is still open. One column for each option, and one row for each thing a reader compares. The question itself is asked on the approach page.}}</p>
+  <div class="sds-scroll"><table>
+    <thead><tr><th>{{What is compared}}</th><th>{{Option A}}</th><th>{{Option B}}</th></tr></thead>
+    <tbody>
+      <tr><td><strong>{{&hellip;}}</strong></td><td>{{&hellip;}}</td><td>{{&hellip;}}</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3 id="s3c">{{A subsection shown as a drawing}}</h3>
+  <p>{{What the drawing shows. A figure is drawn by <code>docs figure draw</code> from its specification, and pasted here whole.}}</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="18 18 660 84" width="660" height="84" role="img" aria-label="{{What the drawing shows, in words.}}">
+    <rect class="sds-box" x="20" y="20" width="300" height="80" rx="3"/><text class="sds-title" x="36" y="48">{{Part}}</text><text class="sds-code" x="36" y="70">{{what it becomes}}</text>
+    <rect class="sds-box sds-tone-blue" x="376" y="20" width="300" height="80" rx="3"/><text class="sds-title" x="392" y="48">{{Part}}</text><text class="sds-code" x="392" y="70">{{what it becomes}}</text>
+  </svg>
+  <figcaption>{{What to notice.}}</figcaption>
+  </figure>
+
+  <h3 id="s3d">{{A subsection that shows a sample of the real thing}}</h3>
+  <p>{{What the sample is: a row, a file&rsquo;s first lines, a command&rsquo;s output, with real values. The page shows it with its own blocks and never in a frame.}}</p>
+  <pre data-lang="text">{{the sample, as the real thing prints it}}</pre>
+  <p>{{Where the thing is a whole file: }}<a href="../samples/{{the-sample-file}}">{{open the sample &rarr;}}</a></p>
 </section>
 
 <section id="s4" data-block="sequence">
-  <div class="sds-section-head"><h2>How &mdash; {{what changes in each repository, in one line}}</h2></div>
-  <p>{{Which repositories change, in the order the work runs.}}</p>
+  <div class="sds-section-head"><h2>Where it lands &mdash; {{what changes in each repository, in one line}}</h2></div>
+  <p>{{Which repositories change, in a few lines each, in the order the work runs. The approach page&rsquo;s own How holds the full detail.}}</p>
   <h3 id="s4a">{{repository}} &mdash; {{the kind of change}}</h3>
   <p><code>{{path of the file that changes}}</code></p>
   <pre data-lang="diff"><span class="sds-tk-del">- what the file says today</span>
 <span class="sds-tk-add">+ what it will say</span></pre>
+  <p>{{Read the full change in the approach page&rsquo;s How &rarr;}}</p>
 </section>
 
 </div>

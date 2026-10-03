@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "46d40bd8"
+      "seen": "09a8b9ac"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -602,6 +602,23 @@ section per area, then Glossary, then Where to go next.
 - **A hub's Glossary is written by hand, with two columns: *Term* and *What it means*.** The term
   links to the page that defines it. There is no *Contract term* column; the generated three-column
   glossary belongs to each domain (decision RD.DEVEX.WORKSPACE.150).
+
+**Every page walks up one step, by the back link at the top of its rail — MUST** (decision RD.DEVEX.WORKSPACE.232).
+The top of a chain has none. A construct page goes back to its overview: where a domain has more than one
+overview, the one that links forward to it, and where it has one, that one. An overview, a guide, a report
+and an index go back to the hub. A preview goes back to its approach page, at the subsection it serves. The
+hub is the top of a repository's chain and an approach page is the top of a workstream's, so neither carries
+a back link. The back link, and every link of the rail and of *Where to go next*, opens a page; a link inside
+the content may open a markdown file, such as a sample or a chapter.
+
+**A preview shows, and an approach page argues — MUST** (decision RD.DEVEX.WORKSPACE.233). A preview's
+sections are *Overview*, *Today*, *Proposed* and *Where it lands*, and it holds no card. *Overview* says what
+the reader is asked to decide, what to look at first and what is not final. *Today* shows the thing as it is.
+*Proposed* shows it as it will be, with its options side by side where a decision is still open. *Where it
+lands* names the files that change, by repository, with a link to the approach page's own `How`. The
+reasoning stays on the approach page, so a preview carries no `Why`, `What` or `How`. A preview never frames a
+sample file: it shows a thing with the page's own blocks, and links a real file in the arc's `samples/`
+folder.
 
 **The rail is built from the markup.** Every `<section id>` becomes an entry, named from its `h2` up
 to the em dash, and every `<h3 id>` inside it an entry under it, named the same way: *SEQUENCE — steps in

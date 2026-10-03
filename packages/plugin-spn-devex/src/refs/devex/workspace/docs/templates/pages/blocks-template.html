@@ -506,205 +506,316 @@ spnutils repo agent-sync</pre>
   <figcaption>{{What to notice: nothing reaches the data subnet from outside, and every account is the same shape at a different size.}}</figcaption>
   </figure>
   <h3 id="b-skeleton">SKELETON &mdash; a mock of a layout</h3>
-  <p>{{What you are looking at: the thing&rsquo;s outer frame, and where each of its places sits.}} A skeleton is a preview: each place is tinted and tagged, in plain words or by a block&rsquo;s prop where one exists, and nothing shows the library&rsquo;s look. A construct page or an overview asks for one in a <code>dg</code> block of kind <code>skeleton</code>; a hand-written page takes the drawing from <code>docs figure draw &lt;spec&gt;</code>. One sample at each level:</p>
+  <p>{{What you are looking at: the thing&rsquo;s outer frame, and where each of its places sits.}} A skeleton is a preview: each place reads by its own mark, never by a tint — a dotted boundary with a name for a component, a part or a slot; a background for raised, a solid line for bordered, neither for flat — in plain words or by a block&rsquo;s prop where one exists, and nothing shows the library&rsquo;s look. A construct page or an overview asks for one in a <code>dg</code> block of kind <code>skeleton</code>; a hand-written page takes the drawing from <code>docs figure draw &lt;spec&gt;</code>. One sample at each level:</p>
   <p><strong>A page</strong> &mdash; a listing page: the layout&rsquo;s places around a container whose content is the data table.</p>
   <figure>
-  <svg class="sds-drawing" viewBox="22 22 1150 400" style="max-width:1150px" role="img" aria-label="A listing page: the layout, a container and the data table">
-    <rect class="sds-box" x="24" y="24" width="1146" height="396" rx="3"/>
-    <text class="sds-title" x="40" y="50">Members — a listing page</text>
-    <text class="sds-code" x="40" y="69">DSLayout RAIL · DSContainer · DSWDataTable</text>
-    <rect class="sds-box" x="40" y="88" width="279" height="316" rx="3"/>
-    <rect class="sds-box sds-tone-amber" x="56" y="104" width="247" height="28" rx="3"/>
-    <text class="sds-note" x="64" y="120">brand</text>
-    <rect class="sds-box sds-tone-cyan" x="56" y="156" width="247" height="106" rx="3"/>
-    <text class="sds-note" x="64" y="172">nav</text>
-    <rect class="sds-box sds-tone-cyan" x="72" y="184" width="90" height="8" rx="3"/>
-    <rect class="sds-box sds-tone-cyan" x="72" y="198" width="215" height="6" rx="3"/>
-    <rect class="sds-box sds-tone-cyan" x="72" y="212" width="215" height="6" rx="3"/>
-    <rect class="sds-box sds-tone-cyan" x="72" y="226" width="215" height="6" rx="3"/>
-    <rect class="sds-box sds-tone-cyan" x="72" y="240" width="215" height="6" rx="3"/>
-    <rect class="sds-box sds-tone-pink" x="56" y="286" width="247" height="28" rx="3"/>
-    <text class="sds-note" x="64" y="302">account</text>
-    <rect class="sds-box sds-tone-green" x="343" y="88" width="811" height="316" rx="3"/>
-    <text class="sds-note" x="351" y="104">children</text>
-    <rect class="sds-box sds-tone-blue" x="359" y="116" width="148" height="48" rx="3"/>
-    <text class="sds-note" x="367" y="132">DSContainer.Header</text>
-    <text class="sds-code" x="375" y="154">Members</text>
-    <rect class="sds-box sds-tone-blue" x="1064" y="116" width="74" height="28" rx="3"/>
-    <text class="sds-code" x="1080" y="134">Invite</text>
-    <rect class="sds-box sds-tone-olive" x="359" y="188" width="779" height="200" rx="3"/>
-    <text class="sds-note" x="367" y="204">DSContainer.Content flush</text>
-    <rect class="sds-box" x="375" y="216" width="74" height="28" rx="3"/>
-    <text class="sds-code" x="391" y="234">Search</text>
-    <rect class="sds-box" x="473" y="216" width="649" height="38" rx="3"/>
-    <rect class="sds-box sds-tone-grey" x="489" y="232" width="617" height="6" rx="3"/>
-    <rect class="sds-box" x="375" y="278" width="747" height="94" rx="3"/>
-    <rect class="sds-box sds-tone-grey" x="391" y="294" width="300" height="8" rx="3"/>
-    <rect class="sds-box sds-tone-grey" x="391" y="308" width="715" height="6" rx="3"/>
-    <rect class="sds-box sds-tone-grey" x="391" y="322" width="715" height="6" rx="3"/>
-    <rect class="sds-box sds-tone-grey" x="391" y="336" width="715" height="6" rx="3"/>
-    <rect class="sds-box sds-tone-grey" x="391" y="350" width="715" height="6" rx="3"/>
-  </svg>
-  <figcaption>A page composes blocks and never restyles one: the layout's places around a container whose content is the data table.</figcaption>
+  <svg class="sds-drawing" viewBox="22 22 1056 429" style="max-width:1056px" role="img" aria-label="A listing page: the layout, a container and the data table">
+  <rect class="sds-box" x="24" y="24" width="1052" height="424.0008" rx="3"/>
+  <text class="sds-title" x="40" y="50">Members — a listing page</text>
+  <text class="sds-code" x="40" y="69">DSLayout RAIL · DSContainer · DSWDataTable</text>
+  <rect x="40" y="88" width="255" height="344.0008" rx="3" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <rect x="56" y="104" width="223" height="28" rx="3" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-note" x="64" y="120">brand</text>
+  <rect x="56" y="156" width="223" height="208.0008" rx="3" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-note" x="64" y="172">nav</text>
+  <rect x="56" y="388.0008" width="223" height="28" rx="3" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-note" x="64" y="404.0008">account</text>
+  <rect x="319" y="88" width="741" height="344.0008" rx="3" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-note" x="327" y="104">children</text>
+  <rect x="335" y="116" width="709" height="72" rx="3" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-note" x="343" y="132">DSContainer.Header</text>
+  <text class="sds-code" x="351" y="162">Members</text>
+  <rect x="954" y="144" width="74" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".9" stroke-width="1.5"/>
+  <text class="sds-code" x="970" y="162">Invite</text>
+  <rect x="335" y="212" width="709" height="204" rx="3" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-note" x="343" y="228">DSContainer.Content</text>
+  <rect x="351" y="240" width="53" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="367" y="258">☐ ▾</text>
+  <rect x="428" y="240" width="313" height="28" rx="3" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-note" x="436" y="256">headerNode</text>
+  <rect x="765" y="240" width="74" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="781" y="258">Sort ▾</text>
+  <rect x="863" y="240" width="39" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="879" y="258">▦</text>
+  <rect x="926" y="240" width="39" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="942" y="258">≡</text>
+  <rect x="989" y="240" width="39" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="1005" y="258">⊞</text>
+  <rect x="367" y="308" width="271" height="8" rx="3" fill="currentColor" fill-opacity=".25"/>
+  <rect x="367" y="322" width="645" height="6" rx="3" fill="currentColor" fill-opacity=".25"/>
+  <rect x="367" y="336" width="645" height="6" rx="3" fill="currentColor" fill-opacity=".25"/>
+  <rect x="367" y="350" width="645" height="6" rx="3" fill="currentColor" fill-opacity=".25"/>
+  <rect x="367" y="364" width="645" height="6" rx="3" fill="currentColor" fill-opacity=".25"/>
+  <rect x="367" y="378" width="645" height="6" rx="3" fill="currentColor" fill-opacity=".25"/>
+</svg>
+  <figcaption>A page composes blocks and never restyles one: the layout's places around a container whose content is the data table. The content part is set flush, so the table reaches its edges. The table's headerNode takes any node the page gives it, so it is one block with its name.</figcaption>
   </figure>
-  <p><strong>A layout</strong> &mdash; the RAIL layout: its five named places, each tinted and tagged.</p>
+  <p><strong>A layout</strong> &mdash; the RAIL layout: its five named places, each one block with its name.</p>
   <figure>
-  <svg class="sds-drawing" viewBox="22 22 1069 326" style="max-width:1069px" role="img" aria-label="DSLayout of type RAIL: its five named places">
-    <rect class="sds-box" x="24" y="24" width="1065" height="322" rx="3"/>
-    <text class="sds-title" x="40" y="50">DSLayout — RAIL</text>
-    <text class="sds-code" x="40" y="69">brand · nav · utilityActions · account · children</text>
-    <rect class="sds-box" x="40" y="88" width="258" height="242" rx="3"/>
-    <rect class="sds-box sds-tone-amber" x="56" y="104" width="226" height="28" rx="3"/>
-    <text class="sds-note" x="64" y="120">brand</text>
-    <rect class="sds-box sds-tone-cyan" x="56" y="156" width="226" height="106" rx="3"/>
-    <text class="sds-note" x="64" y="172">nav</text>
-    <rect class="sds-box sds-tone-cyan" x="72" y="184" width="81" height="8" rx="3"/>
-    <rect class="sds-box sds-tone-cyan" x="72" y="198" width="194" height="6" rx="3"/>
-    <rect class="sds-box sds-tone-cyan" x="72" y="212" width="194" height="6" rx="3"/>
-    <rect class="sds-box sds-tone-cyan" x="72" y="226" width="81" height="8" rx="3"/>
-    <rect class="sds-box sds-tone-cyan" x="72" y="240" width="194" height="6" rx="3"/>
-    <rect class="sds-box sds-tone-pink" x="56" y="286" width="226" height="28" rx="3"/>
-    <text class="sds-note" x="64" y="302">account</text>
-    <rect class="sds-box" x="322" y="88" width="751" height="242" rx="3"/>
-    <rect class="sds-box" x="338" y="104" width="39" height="28" rx="3"/>
-    <text class="sds-code" x="354" y="122">≡</text>
-    <rect class="sds-box sds-tone-violet" x="935" y="104" width="122" height="28" rx="3"/>
-    <text class="sds-note" x="943" y="120">utilityActions</text>
-    <rect class="sds-box sds-tone-green" x="338" y="156" width="719" height="112" rx="3"/>
-    <text class="sds-note" x="346" y="172">children</text>
-  </svg>
-  <figcaption>Each named place is tinted and tagged with its prop, so the picture reads against the props by name.</figcaption>
+  <svg class="sds-drawing" viewBox="22 22 1056 337" style="max-width:1056px" role="img" aria-label="DSLayout of type RAIL: its five named places">
+  <rect class="sds-box" x="24" y="24" width="1052" height="332.0012" rx="3"/>
+  <text class="sds-title" x="40" y="50">DSLayout — RAIL</text>
+  <text class="sds-code" x="40" y="69">brand · nav · utilityActions · account · children</text>
+  <rect x="40" y="88" width="255" height="252.00119999999998" rx="3" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <rect x="56" y="104" width="223" height="28" rx="3" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-note" x="64" y="120">brand</text>
+  <rect x="56" y="156" width="223" height="116.0012" rx="3" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-note" x="64" y="172">nav</text>
+  <rect x="56" y="296.0012" width="223" height="28" rx="3" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-note" x="64" y="312.0012">account</text>
+  <rect x="319" y="88" width="741" height="252.00119999999998" rx="3" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <rect x="335" y="104" width="39" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="351" y="122">≡</text>
+  <rect x="922" y="104" width="122" height="28" rx="3" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-note" x="930" y="120">utilityActions</text>
+  <rect x="335" y="156" width="709" height="168" rx="3" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-note" x="343" y="172">children</text>
+</svg>
+  <figcaption>Each named place carries the name of its prop, so the picture reads against the props by name. A place takes any node, so it is one block with its name and nothing inside. The toggle is the layout's own control.</figcaption>
   </figure>
   <p><strong>A container</strong> &mdash; a container&rsquo;s parts in their one order, with a <code>flush</code> part.</p>
   <figure>
-  <svg class="sds-drawing" viewBox="22 22 1056 394" style="max-width:1056px" role="img" aria-label="DSContainer: its parts, in one order">
-    <rect class="sds-box" x="24" y="24" width="1052" height="390" rx="3"/>
-    <text class="sds-title" x="40" y="50">DSContainer</text>
-    <text class="sds-code" x="40" y="69">frames · raised · bordered · rounded, and size</text>
-    <rect class="sds-box sds-tone-blue" x="40" y="88" width="915" height="48" rx="3"/>
-    <text class="sds-note" x="48" y="104">DSContainer.Header</text>
-    <text class="sds-code" x="56" y="126">the page title</text>
-    <rect class="sds-box sds-tone-blue" x="979" y="88" width="81" height="28" rx="3"/>
-    <text class="sds-code" x="995" y="106">actions</text>
-    <rect class="sds-box sds-tone-green" x="40" y="160" width="1020" height="78" rx="3"/>
-    <text class="sds-note" x="48" y="176">DSContainer.Content</text>
-    <rect class="sds-box sds-tone-green" x="56" y="188" width="988" height="6" rx="3"/>
-    <rect class="sds-box sds-tone-green" x="56" y="202" width="988" height="6" rx="3"/>
-    <rect class="sds-box sds-tone-green" x="56" y="216" width="988" height="6" rx="3"/>
-    <rect class="sds-box sds-tone-olive" x="40" y="262" width="1020" height="64" rx="3"/>
-    <text class="sds-note" x="48" y="278">DSContainer.Content flush</text>
-    <rect class="sds-box sds-tone-olive" x="56" y="290" width="988" height="6" rx="3"/>
-    <rect class="sds-box sds-tone-olive" x="56" y="304" width="988" height="6" rx="3"/>
-    <rect class="sds-box sds-tone-violet" x="40" y="350" width="148" height="48" rx="3"/>
-    <text class="sds-note" x="48" y="366">DSContainer.Footer</text>
-    <text class="sds-code" x="56" y="388">actions</text>
-  </svg>
-  <figcaption>A header, one or more content parts joined in one frame, and a footer; a part takes only flush.</figcaption>
+  <svg class="sds-drawing" viewBox="22 22 1056 386" style="max-width:1056px" role="img" aria-label="DSContainer: a header, content and a footer">
+  <rect class="sds-box" x="24" y="24" width="1052" height="382" rx="3"/>
+  <text class="sds-title" x="40" y="50">DSContainer</text>
+  <text class="sds-code" x="40" y="69">frames · raised · bordered · rounded, and size</text>
+  <rect x="40" y="88" width="1020" height="72" rx="3" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-note" x="48" y="104">DSContainer.Header</text>
+  <text class="sds-code" x="56" y="134">Members</text>
+  <rect x="872" y="116" width="74" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="888" y="134">Export</text>
+  <rect x="970" y="116" width="74" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".9" stroke-width="1.5"/>
+  <text class="sds-code" x="986" y="134">Invite</text>
+  <rect x="40" y="184" width="1020" height="110" rx="3" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-note" x="48" y="200">DSContainer.Content</text>
+  <rect x="72" y="228" width="956" height="6" rx="3" fill="currentColor" fill-opacity=".25"/>
+  <rect x="72" y="242" width="956" height="6" rx="3" fill="currentColor" fill-opacity=".25"/>
+  <rect x="72" y="256" width="956" height="6" rx="3" fill="currentColor" fill-opacity=".25"/>
+  <rect x="40" y="318" width="1020" height="72" rx="3" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-note" x="48" y="334">DSContainer.Footer</text>
+  <rect x="830" y="346" width="74" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="846" y="364">Cancel</text>
+  <rect x="928" y="346" width="116" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".9" stroke-width="1.5"/>
+  <text class="sds-code" x="944" y="364">Save changes</text>
+</svg>
+  <figcaption>Three parts in one order. Each part holds anything, and each takes flush.</figcaption>
+  </figure>
+  <p><strong>The looks of a container</strong> &mdash; the same three parts, eight ways: which parts share a frame, and whether that frame is raised, bordered and rounded.</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="22 22 1056 508" style="max-width:1056px" role="img" aria-label="The looks of a container: the same three parts, eight ways">
+  <text class="sds-code" x="24" y="36">1 · all raised</text>
+  <rect x="24" y="48" width="236" height="208" rx="8" fill="currentColor" fill-opacity=".08" stroke="none"/>
+  <path d="M24 48 h236 v56 h-236 z" fill="none" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-code" x="40" y="81">Header</text>
+  <rect x="172" y="64" width="72" height="24" rx="4" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <path d="M24 104 h236 v104 h-236 z" fill="none" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-code" x="40" y="132">Content</text>
+  <rect x="40" y="148" width="150" height="5" rx="2" fill="currentColor" fill-opacity=".25"/>
+  <rect x="40" y="162" width="115" height="5" rx="2" fill="currentColor" fill-opacity=".25"/>
+  <rect x="40" y="176" width="135" height="5" rx="2" fill="currentColor" fill-opacity=".25"/>
+  <path d="M24 208 h236 v48 h-236 z" fill="none" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-code" x="40" y="237">Footer</text>
+  <text class="sds-code" x="296" y="36">2 · all flat</text>
+  <path d="M296 48 h236 v56 h-236 z" fill="none" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-code" x="312" y="81">Header</text>
+  <rect x="444" y="64" width="72" height="24" rx="4" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <path d="M296 104 h236 v104 h-236 z" fill="none" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-code" x="312" y="132">Content</text>
+  <rect x="312" y="148" width="150" height="5" rx="2" fill="currentColor" fill-opacity=".25"/>
+  <rect x="312" y="162" width="115" height="5" rx="2" fill="currentColor" fill-opacity=".25"/>
+  <rect x="312" y="176" width="135" height="5" rx="2" fill="currentColor" fill-opacity=".25"/>
+  <path d="M296 208 h236 v48 h-236 z" fill="none" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-code" x="312" y="237">Footer</text>
+  <text class="sds-code" x="568" y="36">3 · header flat, the rest raised</text>
+  <rect x="568" y="104" width="236" height="152" rx="8" fill="currentColor" fill-opacity=".08" stroke="none"/>
+  <path d="M568 48 h236 v56 h-236 z" fill="none" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-code" x="584" y="81">Header</text>
+  <rect x="716" y="64" width="72" height="24" rx="4" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <path d="M568 104 h236 v104 h-236 z" fill="none" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-code" x="584" y="132">Content</text>
+  <rect x="584" y="148" width="150" height="5" rx="2" fill="currentColor" fill-opacity=".25"/>
+  <rect x="584" y="162" width="115" height="5" rx="2" fill="currentColor" fill-opacity=".25"/>
+  <rect x="584" y="176" width="135" height="5" rx="2" fill="currentColor" fill-opacity=".25"/>
+  <path d="M568 208 h236 v48 h-236 z" fill="none" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-code" x="584" y="237">Footer</text>
+  <text class="sds-code" x="840" y="36">4 · content raised alone</text>
+  <rect x="840" y="104" width="236" height="104" rx="8" fill="currentColor" fill-opacity=".08" stroke="none"/>
+  <path d="M840 48 h236 v56 h-236 z" fill="none" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-code" x="856" y="81">Header</text>
+  <rect x="988" y="64" width="72" height="24" rx="4" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <path d="M840 104 h236 v104 h-236 z" fill="none" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-code" x="856" y="132">Content</text>
+  <rect x="856" y="148" width="150" height="5" rx="2" fill="currentColor" fill-opacity=".25"/>
+  <rect x="856" y="162" width="115" height="5" rx="2" fill="currentColor" fill-opacity=".25"/>
+  <rect x="856" y="176" width="135" height="5" rx="2" fill="currentColor" fill-opacity=".25"/>
+  <path d="M840 208 h236 v48 h-236 z" fill="none" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-code" x="856" y="237">Footer</text>
+  <text class="sds-code" x="24" y="308">5 · full border, connected</text>
+  <rect x="24" y="320" width="236" height="208" rx="8" fill="none" stroke="currentColor" stroke-opacity=".6" stroke-width="1.5"/>
+  <path d="M24 376 h236" fill="none" stroke="currentColor" stroke-opacity=".6" stroke-width="1.5"/>
+  <path d="M24 480 h236" fill="none" stroke="currentColor" stroke-opacity=".6" stroke-width="1.5"/>
+  <text class="sds-code" x="40" y="353">Header</text>
+  <rect x="172" y="336" width="72" height="24" rx="4" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="40" y="404">Content</text>
+  <rect x="40" y="420" width="150" height="5" rx="2" fill="currentColor" fill-opacity=".25"/>
+  <rect x="40" y="434" width="115" height="5" rx="2" fill="currentColor" fill-opacity=".25"/>
+  <rect x="40" y="448" width="135" height="5" rx="2" fill="currentColor" fill-opacity=".25"/>
+  <text class="sds-code" x="40" y="509">Footer</text>
+  <text class="sds-code" x="296" y="308">6 · the rest bordered, raised</text>
+  <rect x="296" y="376" width="236" height="152" rx="8" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-opacity=".6" stroke-width="1.5"/>
+  <path d="M296 480 h236" fill="none" stroke="currentColor" stroke-opacity=".6" stroke-width="1.5"/>
+  <path d="M296 320 h236 v56 h-236 z" fill="none" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-code" x="312" y="353">Header</text>
+  <rect x="444" y="336" width="72" height="24" rx="4" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="312" y="404">Content</text>
+  <rect x="312" y="420" width="150" height="5" rx="2" fill="currentColor" fill-opacity=".25"/>
+  <rect x="312" y="434" width="115" height="5" rx="2" fill="currentColor" fill-opacity=".25"/>
+  <rect x="312" y="448" width="135" height="5" rx="2" fill="currentColor" fill-opacity=".25"/>
+  <text class="sds-code" x="312" y="509">Footer</text>
+  <text class="sds-code" x="568" y="308">7 · content bordered, raised</text>
+  <rect x="568" y="376" width="236" height="104" rx="8" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-opacity=".6" stroke-width="1.5"/>
+  <path d="M568 320 h236 v56 h-236 z" fill="none" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-code" x="584" y="353">Header</text>
+  <rect x="716" y="336" width="72" height="24" rx="4" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="584" y="404">Content</text>
+  <rect x="584" y="420" width="150" height="5" rx="2" fill="currentColor" fill-opacity=".25"/>
+  <rect x="584" y="434" width="115" height="5" rx="2" fill="currentColor" fill-opacity=".25"/>
+  <rect x="584" y="448" width="135" height="5" rx="2" fill="currentColor" fill-opacity=".25"/>
+  <path d="M568 480 h236 v48 h-236 z" fill="none" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-code" x="584" y="509">Footer</text>
+  <text class="sds-code" x="840" y="308">8 · the same border, square</text>
+  <rect x="840" y="320" width="236" height="208" rx="0" fill="none" stroke="currentColor" stroke-opacity=".6" stroke-width="1.5"/>
+  <path d="M840 376 h236" fill="none" stroke="currentColor" stroke-opacity=".6" stroke-width="1.5"/>
+  <path d="M840 480 h236" fill="none" stroke="currentColor" stroke-opacity=".6" stroke-width="1.5"/>
+  <text class="sds-code" x="856" y="353">Header</text>
+  <rect x="988" y="336" width="72" height="24" rx="4" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="856" y="404">Content</text>
+  <rect x="856" y="420" width="150" height="5" rx="2" fill="currentColor" fill-opacity=".25"/>
+  <rect x="856" y="434" width="115" height="5" rx="2" fill="currentColor" fill-opacity=".25"/>
+  <rect x="856" y="448" width="135" height="5" rx="2" fill="currentColor" fill-opacity=".25"/>
+  <text class="sds-code" x="856" y="509">Footer</text>
+</svg>
+  <figcaption>A background is a raised surface, a solid line is a border the container has, and a part with neither is flat. The dotted line around a part only marks where it ends, and says nothing about its look.</figcaption>
   </figure>
   <p><strong>A widget</strong> &mdash; the data table: its bar, its records as bars, and its pagination.</p>
   <figure>
-  <svg class="sds-drawing" viewBox="22 22 1056 350" style="max-width:1056px" role="img" aria-label="DSWDataTable: its bar, its records and its pagination">
-    <rect class="sds-box" x="24" y="24" width="1052" height="346" rx="3"/>
-    <text class="sds-title" x="40" y="50">DSWDataTable</text>
-    <text class="sds-code" x="40" y="69">layouts TABLE · LIST · GRID</text>
-    <rect class="sds-box sds-tone-blue" x="40" y="88" width="74" height="50" rx="3"/>
-    <text class="sds-note" x="48" y="104">search</text>
-    <text class="sds-code" x="56" y="127">Search</text>
-    <rect class="sds-box sds-tone-cyan" x="138" y="88" width="821" height="50" rx="3"/>
-    <text class="sds-note" x="146" y="104">DSWFilterBar</text>
-    <rect class="sds-box sds-tone-cyan" x="154" y="116" width="789" height="6" rx="3"/>
-    <rect class="sds-box sds-tone-violet" x="983" y="88" width="77" height="50" rx="3"/>
-    <text class="sds-note" x="991" y="104">actions</text>
-    <text class="sds-code" x="999" y="127">New</text>
-    <rect class="sds-box sds-tone-green" x="40" y="162" width="1020" height="120" rx="3"/>
-    <text class="sds-note" x="48" y="178">records</text>
-    <rect class="sds-box sds-tone-green" x="56" y="190" width="415" height="8" rx="3"/>
-    <rect class="sds-box sds-tone-green" x="56" y="204" width="988" height="6" rx="3"/>
-    <rect class="sds-box sds-tone-green" x="56" y="218" width="988" height="6" rx="3"/>
-    <rect class="sds-box sds-tone-green" x="56" y="232" width="988" height="6" rx="3"/>
-    <rect class="sds-box sds-tone-green" x="56" y="246" width="988" height="6" rx="3"/>
-    <rect class="sds-box sds-tone-green" x="56" y="260" width="988" height="6" rx="3"/>
-    <text class="sds-code" x="40" y="324">1–20 of 240</text>
-    <rect class="sds-box sds-tone-amber" x="964" y="306" width="96" height="48" rx="3"/>
-    <text class="sds-note" x="972" y="322">pagination</text>
-    <text class="sds-code" x="980" y="344">‹ 1 2 3 ›</text>
-  </svg>
-  <figcaption>One widget placed whole: it passes its size to its parts, and shows every task state where the records go.</figcaption>
+  <svg class="sds-drawing" viewBox="22 22 1056 326" style="max-width:1056px" role="img" aria-label="DSWDataTable: its bar, its records and its pagination">
+  <rect class="sds-box" x="24" y="24" width="1052" height="322" rx="3"/>
+  <text class="sds-title" x="40" y="50">DSWDataTable</text>
+  <text class="sds-code" x="40" y="69">layouts TABLE · LIST · GRID</text>
+  <rect x="40" y="88" width="53" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="56" y="106">☐ ▾</text>
+  <rect x="117" y="88" width="656" height="28" rx="3" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-note" x="125" y="104">headerNode</text>
+  <rect x="797" y="88" width="74" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="813" y="106">Sort ▾</text>
+  <rect x="895" y="88" width="39" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="911" y="106">▦</text>
+  <rect x="958" y="88" width="39" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="974" y="106">≡</text>
+  <rect x="1021" y="88" width="39" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="1037" y="106">⊞</text>
+  <rect x="40" y="140" width="1020" height="138" rx="3" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-note" x="48" y="156">records</text>
+  <rect x="72" y="184" width="402" height="8" rx="3" fill="currentColor" fill-opacity=".25"/>
+  <rect x="72" y="198" width="956" height="6" rx="3" fill="currentColor" fill-opacity=".25"/>
+  <rect x="72" y="212" width="956" height="6" rx="3" fill="currentColor" fill-opacity=".25"/>
+  <rect x="72" y="226" width="956" height="6" rx="3" fill="currentColor" fill-opacity=".25"/>
+  <rect x="72" y="240" width="956" height="6" rx="3" fill="currentColor" fill-opacity=".25"/>
+  <text class="sds-code" x="40" y="320">1–20 of 240</text>
+  <rect x="769" y="302" width="39" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="785" y="320">‹</text>
+  <rect x="832" y="302" width="39" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="848" y="320">1</text>
+  <rect x="895" y="302" width="39" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="911" y="320">2</text>
+  <rect x="958" y="302" width="39" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="974" y="320">3</text>
+  <rect x="1021" y="302" width="39" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="1037" y="320">›</text>
+</svg>
+  <figcaption>One widget placed whole: it passes its size to its parts, and shows every task state where the records go. The picture shows the TABLE layout. The bar starts with the bulk select, which is there only when the table has bulk actions. headerNode takes any component a page gives it, such as a search or a filter bar; those are the page's and never parts of the table.</figcaption>
   </figure>
   <p><strong>A component</strong> &mdash; a dialog, one of the few components that frame others, over its scrim.</p>
   <figure>
-  <svg class="sds-drawing" viewBox="22 22 1056 292" style="max-width:1056px" role="img" aria-label="DSDialog: a component that frames others">
-    <rect class="sds-box" x="24" y="24" width="1052" height="288" rx="3"/>
-    <text class="sds-title" x="40" y="50">DSDialog</text>
-    <text class="sds-code" x="40" y="69">opened by a button; one scrim under every interruption</text>
-    <rect class="sds-box sds-tone-grey" x="40" y="88" width="1020" height="208" rx="3"/>
-    <text class="sds-note" x="48" y="104">scrim</text>
-    <rect class="sds-box" x="56" y="116" width="988" height="164" rx="3"/>
-    <text class="sds-title" x="72" y="142">Remove member?</text>
-    <rect class="sds-box" x="72" y="160" width="956" height="52" rx="3"/>
-    <rect class="sds-box sds-tone-grey" x="88" y="176" width="924" height="6" rx="3"/>
-    <rect class="sds-box sds-tone-grey" x="88" y="190" width="924" height="6" rx="3"/>
-    <rect class="sds-box" x="856" y="236" width="74" height="28" rx="3"/>
-    <text class="sds-code" x="872" y="254">Cancel</text>
-    <rect class="sds-box sds-tone-amber" x="954" y="236" width="74" height="28" rx="3"/>
-    <text class="sds-code" x="970" y="254">Remove</text>
-  </svg>
+  <svg class="sds-drawing" viewBox="22 22 1056 448" style="max-width:1056px" role="img" aria-label="DSDialog: a component that frames others">
+  <rect class="sds-box" x="24" y="24" width="1052" height="444" rx="3"/>
+  <text class="sds-title" x="40" y="50">DSDialog</text>
+  <text class="sds-code" x="40" y="69">opened by a button; one scrim under every interruption</text>
+  <rect x="40" y="88" width="1020" height="364" rx="3" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-note" x="48" y="104">scrim</text>
+  <rect x="56" y="116" width="988" height="320" rx="3" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <rect x="72" y="132" width="956" height="72" rx="3" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-note" x="80" y="148">title</text>
+  <text class="sds-code" x="88" y="178">Remove Priya Shah?</text>
+  <rect x="973" y="160" width="39" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="989" y="178">✕</text>
+  <rect x="72" y="228" width="956" height="96" rx="3" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-note" x="80" y="244">content</text>
+  <rect x="104" y="272" width="892" height="6" rx="3" fill="currentColor" fill-opacity=".25"/>
+  <rect x="104" y="286" width="892" height="6" rx="3" fill="currentColor" fill-opacity=".25"/>
+  <rect x="72" y="348" width="956" height="72" rx="3" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <text class="sds-note" x="80" y="364">actions</text>
+  <rect x="840" y="376" width="74" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="856" y="394">Cancel</text>
+  <rect x="938" y="376" width="74" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".9" stroke-width="1.5"/>
+  <text class="sds-code" x="954" y="394">Remove</text>
+</svg>
   <figcaption>A dialog frames its own parts: a title, its body, and its actions at the end, over a scrim.</figcaption>
   </figure>
   <p><strong>A showcase section</strong> &mdash; one block&rsquo;s section: its example, its code open with Copy, its variants, states, props and links.</p>
   <figure>
   <svg class="sds-drawing" viewBox="22 22 1056 514" style="max-width:1056px" role="img" aria-label="The section of DSButton, in the Inline layout">
-    <rect class="sds-box" x="24" y="24" width="1052" height="510" rx="3"/>
-    <text class="sds-title" x="40" y="50">DSButton — Inline</text>
-    <text class="sds-code" x="40" y="69">the main way to ask for an action</text>
-    <text class="sds-label" x="40" y="134">Example</text>
-    <rect class="sds-box" x="120" y="88" width="940" height="84" rx="3"/>
-    <rect class="sds-box sds-tone-blue" x="144" y="112" width="60" height="36" rx="3"/>
-    <text class="sds-code" x="160" y="134">Save</text>
-    <rect class="sds-box" x="228" y="112" width="74" height="36" rx="3"/>
-    <text class="sds-code" x="244" y="134">Cancel</text>
-    <text class="sds-code" x="326" y="134">narrow frame: the block at its own size</text>
-    <text class="sds-label" x="40" y="257">Code</text>
-    <rect class="sds-box" x="120" y="196" width="940" height="114" rx="3"/>
-    <rect class="sds-box sds-tone-grey" x="144" y="220" width="808" height="66" rx="3"/>
-    <rect class="sds-box sds-tone-grey" x="160" y="236" width="776" height="6" rx="3"/>
-    <rect class="sds-box sds-tone-grey" x="160" y="250" width="776" height="6" rx="3"/>
-    <rect class="sds-box sds-tone-grey" x="160" y="264" width="776" height="6" rx="3"/>
-    <rect class="sds-box sds-tone-blue" x="976" y="220" width="60" height="36" rx="3"/>
-    <text class="sds-code" x="992" y="242">Copy</text>
-    <text class="sds-label" x="40" y="352">Variants</text>
-    <rect class="sds-box" x="120" y="334" width="67" height="28" rx="3"/>
-    <text class="sds-code" x="136" y="352">SOLID</text>
-    <rect class="sds-box" x="211" y="334" width="60" height="28" rx="3"/>
-    <text class="sds-code" x="227" y="352">SOFT</text>
-    <rect class="sds-box" x="295" y="334" width="81" height="28" rx="3"/>
-    <text class="sds-code" x="311" y="352">OUTLINE</text>
-    <rect class="sds-box" x="400" y="334" width="67" height="28" rx="3"/>
-    <text class="sds-code" x="416" y="352">GHOST</text>
-    <rect class="sds-box" x="491" y="334" width="60" height="28" rx="3"/>
-    <text class="sds-code" x="507" y="352">LINK</text>
-    <rect class="sds-box" x="575" y="334" width="130" height="28" rx="3"/>
-    <text class="sds-code" x="591" y="352">sizes XS to XL</text>
-    <text class="sds-label" x="40" y="404">States</text>
-    <rect class="sds-box" x="120" y="386" width="60" height="28" rx="3"/>
-    <text class="sds-code" x="136" y="404">rest</text>
-    <rect class="sds-box" x="204" y="386" width="67" height="28" rx="3"/>
-    <text class="sds-code" x="220" y="404">hover</text>
-    <rect class="sds-box" x="295" y="386" width="67" height="28" rx="3"/>
-    <text class="sds-code" x="311" y="404">focus</text>
-    <rect class="sds-box" x="386" y="386" width="88" height="28" rx="3"/>
-    <text class="sds-code" x="402" y="404">disabled</text>
-    <text class="sds-label" x="40" y="456">Props</text>
-    <rect class="sds-box" x="120" y="438" width="109" height="28" rx="3"/>
-    <text class="sds-code" x="136" y="456">props table</text>
-    <rect class="sds-box sds-tone-blue" x="253" y="438" width="137" height="28" rx="3"/>
-    <text class="sds-code" x="269" y="456">Open playground</text>
-    <text class="sds-label" x="40" y="508">Links</text>
-    <rect class="sds-box" x="120" y="490" width="214" height="28" rx="3"/>
-    <text class="sds-code" x="136" y="508">drawing in DS 2-Components</text>
-    <rect class="sds-box" x="358" y="490" width="165" height="28" rx="3"/>
-    <text class="sds-code" x="374" y="508">chapter in the book</text>
-  </svg>
+  <rect class="sds-box" x="24" y="24" width="1052" height="510" rx="3"/>
+  <text class="sds-title" x="40" y="50">DSButton — Inline</text>
+  <text class="sds-code" x="40" y="69">the main way to ask for an action</text>
+  <text class="sds-label" x="40" y="134">Example</text>
+  <rect x="120" y="88" width="940" height="84" rx="3" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <rect x="144" y="112" width="60" height="36" rx="3" fill="none" stroke="currentColor" stroke-opacity=".9" stroke-width="1.5"/>
+  <text class="sds-code" x="160" y="134">Save</text>
+  <rect x="228" y="112" width="74" height="36" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="244" y="134">Cancel</text>
+  <text class="sds-code" x="326" y="134">narrow frame: the block at its own size</text>
+  <text class="sds-label" x="40" y="257">Code</text>
+  <rect x="120" y="196" width="940" height="114" rx="3" fill="currentColor" fill-opacity=".08" stroke="currentColor" stroke-opacity=".4" stroke-width="1" stroke-dasharray="2 4"/>
+  <rect x="160" y="236" width="776" height="6" rx="3" fill="currentColor" fill-opacity=".25"/>
+  <rect x="160" y="250" width="776" height="6" rx="3" fill="currentColor" fill-opacity=".25"/>
+  <rect x="160" y="264" width="776" height="6" rx="3" fill="currentColor" fill-opacity=".25"/>
+  <rect x="976" y="220" width="60" height="36" rx="3" fill="none" stroke="currentColor" stroke-opacity=".9" stroke-width="1.5"/>
+  <text class="sds-code" x="992" y="242">Copy</text>
+  <text class="sds-label" x="40" y="352">Variants</text>
+  <rect x="120" y="334" width="67" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="136" y="352">SOLID</text>
+  <rect x="211" y="334" width="60" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="227" y="352">SOFT</text>
+  <rect x="295" y="334" width="81" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="311" y="352">OUTLINE</text>
+  <rect x="400" y="334" width="67" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="416" y="352">GHOST</text>
+  <rect x="491" y="334" width="60" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="507" y="352">LINK</text>
+  <rect x="575" y="334" width="130" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="591" y="352">sizes XS to XL</text>
+  <text class="sds-label" x="40" y="404">States</text>
+  <rect x="120" y="386" width="60" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="136" y="404">rest</text>
+  <rect x="204" y="386" width="67" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="220" y="404">hover</text>
+  <rect x="295" y="386" width="67" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="311" y="404">focus</text>
+  <rect x="386" y="386" width="88" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="402" y="404">disabled</text>
+  <text class="sds-label" x="40" y="456">Props</text>
+  <rect x="120" y="438" width="109" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="136" y="456">props table</text>
+  <rect x="253" y="438" width="137" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".9" stroke-width="1.5"/>
+  <text class="sds-code" x="269" y="456">Open playground</text>
+  <text class="sds-label" x="40" y="508">Links</text>
+  <rect x="120" y="490" width="214" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="136" y="508">drawing in DS 2-Components</text>
+  <rect x="358" y="490" width="165" height="28" rx="3" fill="none" stroke="currentColor" stroke-opacity=".5"/>
+  <text class="sds-code" x="374" y="508">chapter in the book</text>
+</svg>
   <figcaption>Inline: a narrow frame for a small block; its code open under it, ready to copy.</figcaption>
   </figure>
 </section>

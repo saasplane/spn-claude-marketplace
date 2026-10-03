@@ -46,7 +46,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "46d40bd8"
+      "seen": "09a8b9ac"
     }
   ]
 }
@@ -505,8 +505,16 @@ into the page and remove it. As the arcs progress, bring the page's sentences ab
 its link current in the same turn, and do not rewrite the earlier arc's file. Write one preview for
 one decision, and never two that each show the same decision in another form.
 
-**A preview opens with what the developer decides.** Its Overview names the decision first. It does
-not retell how the workstream reached this point, because the approach page holds that.
+**A preview shows, and an approach page argues — MUST** (`RD.DEVEX.WORKSPACE.233`). A preview's sections
+are *Overview*, *Today*, *Proposed* and *Where it lands*, and it holds no card. *Overview* names the
+decision first, what to look at first and what is not final. *Today* shows the thing as it is, and
+*Proposed* shows it as it will be, with its options side by side where a decision is still open. *Where
+it lands* names the files that change, by repository, in a few lines, with a link to the approach page's
+own `How`. A preview carries no `Why`, `What` or `How` and does not retell how the workstream reached
+this point, because the approach page holds that. A question is asked on the approach page, in `Open`,
+and its card links the preview that shows the options. **A preview never frames a sample file**: it shows
+a thing with the page's own blocks, such as a table, a tree, a figure or a code block, and where the
+thing is a real file it links that file in the arc's `samples/` folder.
 
 **A preview holds what the developer judges, and nothing you need — MUST** (`RD.DEVEX.WORKSPACE.210`).
 It is written for the person who says yes or no. Show the proposal in its final form, the few rules it
@@ -531,7 +539,7 @@ the developer asks for something no workstream owns and it must be shown as a pa
 session's scratch folder. Leave out the link back to an approach page and the arc field. Hand it over
 as its full path. Publish it only when the developer asks, and then give them the link. When a
 workstream opens for the work, move the page into its first arc's `previews/` folder and list it there.
-A sample the page shows in a frame is a file beside it: publish or move it with the page.
+A sample the page links is a file beside it: publish or move it with the page.
 
 **The plan is begun at design time, pinned to the commit and the paths each fact was read at, and
 kept lean — MUST** (`RD.DEVEX.WORKSPACE.227`). Designing a preview already does most of the reading
@@ -638,6 +646,11 @@ each costs. Keep your own material in the arc and its notes: how you checked a f
 proposed in chat, the names of your scripts and note files, and full lists of files or names. A
 finding says what was found, and a link to the note serves a reader who wants the evidence. You read
 the arc, so nothing is lost by keeping it there.
+
+**Every page walks up one step, by the back link at the top of its rail — MUST** (`RD.DEVEX.WORKSPACE.232`).
+A preview goes back to its approach page, at the subsection it serves. An approach page is the top of its
+workstream's chain, so it has no back link. The back link, and every link of the rail and of *Where to go
+next*, opens a page, never a markdown file.
 
 **The page links one version of the shared stylesheet and script as its base, and holds no copy of
 them — MUST** (`RD.DEVEX.WORKSPACE.214`). An approach page and a preview keep the two lines their template

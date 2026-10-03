@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/",
-      "seen": "a1356186"
+      "seen": "3cabf088"
     }
   ],
   "decisions": [
@@ -73,7 +73,7 @@ The question it holds: *can this person finish what they came to do, and do they
 
 ## First, read the page as a person meets it
 
-- **Read the page itself, never a description of it.** That is the frame in Figma, the preview, the running screen, or the tree the `design` skill wrote.
+- **Read the page itself, never a description of it.** That is the frame in Figma, the preview, the running screen, or the tree the `design` skill wrote. A built page is looked at through one action of the plugin, `spn-devex docs look <page>`, with the global Playwright and the profile `spnutils` provides, and never through a script inside a repository.
 - **Read from the top level down**: the page, the layout, each container, then each widget or component. A fault high in the chain shows again in every level below it (standards § The levels).
 - **Name each task in one verb.** Then hold it against the pattern of that intent, part by part: blocks, task states, feedback, recovery and input (interaction § The six parts of a pattern).
 - **Read a planned chapter as the standard a page is held to.** Most Surface chapters are marked planned. They are not a record of what every page does today.
@@ -96,8 +96,9 @@ The question it holds: *can this person finish what they came to do, and do they
 - **Every overlay that covers a page dims it with one scrim, `scrim/overlay`.** A dialog, an alert dialog, a drawer and a sheet dim the page the same way, and `DSBackdrop` draws that scrim (patterns § Interrupt · `RD.SUPPORT.APPS.158`).
 - **The surface answers with the design system's own blocks.** A loading picture or a failure picture that the page drew itself is a finding. So is anything a person needs that only hover reaches (interaction § Feedback, recovery and interruption, § Input, by kind of surface).
 - **The look comes from the theme, and never from the page.** A color, a padding, a margin, a radius or a gap set by hand is the finding (layout and container § What a container refuses · `RD.SUPPORT.APPS.150`). In a design, it is a color that binds no variable, or a copy of a block that is no longer an instance (design system § The capability set).
-- **A hue, a surface treatment and a word each mean one thing on every page.** `variant` is the surface treatment, `color` is the hue and `size` is the density step. A hue that means success on one page and decoration on the next is a finding (standards § What a surface is judged by · names § The three shared names).
+- **A hue, a surface treatment and a word each mean one thing on every page.** `variant` is the surface treatment, `color` is the hue and `size` is the density step, read smallest to largest, `XS` to `XL`, with `SM` the default a theme sets. A hue that means success on one page and decoration on the next is a finding (standards § What a surface is judged by · names § The three shared names).
 - **Each shared state has one picture.** Error, focus, disabled and selected look the same on every block of the page. Every block that takes the key draws the focus picture, including a tab, an entry of a menubar or a breadcrumb, and the header of an accordion or a collapsible — no block takes the key and shows nothing (design library § Each shared state has one picture · `RD.SUPPORT.APPS.142`).
+- **An icon beside a text takes the icon size of that text's own size step, and the two sit on one centre line.** An `XS` text takes the `XS` icon; an icon one step off, or sitting above or below the line of its text, is a finding (names and core § The scale · `RD.SUPPORT.SURFACE.008`).
 - **The page works by keyboard, shows its focus and keeps its contrast**, in light and in dark. A page built from the design system's blocks inherits all of it. A control the page built owes all of it on its own (accessibility § The baseline).
 - **One page holds at each density, theme, device type, language and direction.** A second version of the page for any of them is a finding. So is a block restyled for dark (standards § What a surface adapts to).
 

@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "81e9fabe"
+      "seen": "c22707ac"
     }
   ],
   "decisions": [
@@ -105,8 +105,10 @@ option's value written as `***`), `event`, `tool`, `ms`, `exit`, `at` in UTC end
 `agent` when the hook's input carries one. A Bash call that ran more than one program writes one line,
 named for the first program the filter picks, with `programs`, the count it ran. **The tags carry forward**: per session and agent, the last tagged call's tags are kept
 beside the log, a call that touches no workstream path inherits them, and a call that names other work
-replaces them. A report in the plugin, not in `spnutils`, joins those lines to the Claude Code
-transcripts by `session` and prints the tokens spent per workstream, arc and order.
+replaces them. A `Stop` event carries the turn's own token usage beside its `ms`: read fresh, read from
+cache, written to cache, and output. **A window's cost is read from this telemetry by a command of the
+plugin (`spn-devex plugin cost show`), which sums the usage per session, for the main window and for each
+child, and never from a transcript — MUST** (`RD.DEVEX.AGENT.082`).
 
 **There is no command for opening a scope of work.** A workstream is a folder in one of three
 states; you make the folder, `status` lists what is open, and a write-time check holds the close
@@ -219,11 +221,13 @@ recomputing it; nothing else there should be.
 automation on a person's default profile, so `infra organization up` provisions this separate one. It
 holds live credentials for real accounts: never commit it, copy it or print from it.
 
-**Look at a page you built before you hand it over.** Load it from disk in this profile, in light and
-in dark, and read what the browser computed: failed requests, console errors, sideways scroll, and a
-screenshot. Open it with Playwright's `chromium.launchPersistentContext` on `~/.spnutils/browser/chrome`,
-with `channel: 'chrome'` and `headless: true`, from a repository that has `@playwright/test`. Starting
-Chrome by hand with a profile of your own hangs. Open a published page only when the developer asks.
+**Look at a page you built before you hand it over, through one action of the plugin, and never through
+a repository — MUST** (`RD.DEVEX.UTILS.074`). The action is `spn-devex docs look <page>`. It loads the page
+from disk in this profile, in light and in dark, with the global Playwright, and reports what the browser
+computed: failed requests, console errors, sideways scroll, and a screenshot. It reports *not checked*
+where no browser is installed. A partner holds the plugin and `spnutils`, and no application repository
+does, so never write a script inside the repository you stand in to do it. Starting Chrome by hand with
+a profile of your own hangs. Open a published page only when the developer asks.
 
 ## What this ref leaves to the book
 

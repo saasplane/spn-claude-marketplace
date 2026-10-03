@@ -4,7 +4,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The approach document — a workstream's, never a repository's",
-      "seen": "f82fc1f7"
+      "seen": "c09e8f6c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -91,7 +91,7 @@ is written, and anything still open becomes the page's next `Q<n>` card, in the 
 | **Why** | Which of the three reasons makes the choice the developer's, and what it costs to leave as is: the failure it causes. Never *"for consistency"* |
 | **Options** | A **table**: lettered, trade-off in its own column. *"Leave it"* is a real option wherever viable, with its cost stated |
 | **→ Recommendation** | One option, carrying the reason it wins, and citing what decides it |
-| **Preview** | Where the decision is a shape — an outline, a tree, a sample row, a code fragment — inline. A reader who must ask *"show me"* was handed an undecidable card |
+| **Preview** | Where the decision is a shape — an outline, a tree, a sample row, a code fragment — inline. A reader who must ask *"show me"* was handed an undecidable card. Where a page shows the options, the card links that preview page; the question is asked in the card on the approach page and never in the preview, which holds no card |
 
 **A card on the page is an open card, so it carries a recommendation and no `Decision` field.** A
 field saying the card is open says nothing, and a field left empty is a blank somebody feels they
