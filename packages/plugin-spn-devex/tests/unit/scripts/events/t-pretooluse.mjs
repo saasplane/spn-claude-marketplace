@@ -177,6 +177,14 @@ console.log("\n=== pretooluse — a source edit waits while a test run for that 
     "silent", { cwd: root, parity: false, why: "a new guard" });
 }
 
+console.log("\n=== pretooluse — a long foreground command is met with a note to run it in the background");
+one("[MKT.HOOKS.53] `pnpm test` in the foreground gets a note through the chain",
+  { tool_name: "Bash", tool_input: { command: "pnpm test" } }, "note",
+  { says: "background shell", parity: false, why: "a new guard" });
+one("[MKT.HOOKS.54] the same command with run_in_background:true passes the chain silently",
+  { tool_name: "Bash", tool_input: { command: "pnpm test", run_in_background: true } }, "silent",
+  { parity: false, why: "a new guard" });
+
 console.log("\n=== pretooluse — a block `spnutils` writes is never edited by hand");
 {
   // The two marker lines, as `managed-keys.ts` in `spn-support-ts` states them. Each is built here from
@@ -226,8 +234,9 @@ console.log("\n=== pretooluse — a block `spnutils` writes is never edited by h
     "silent", waived);
   one("[MKT.HOOKS.34] a Write of a file that is not on disk yet passes",
     { tool_name: "Write", tool_input: { file_path: join(PROBE_REPO, "fresh.txt"), content: BLOCK } }, "silent", waived);
-  one("[MKT.HOOKS.34] a Bash call that runs the command which writes the block is not judged",
-    { tool_name: "Bash", tool_input: { command: "spnutils workspace agent-sync" } }, "silent", waived);
+  one("[MKT.HOOKS.34] a Bash call that runs the command which writes the block is not judged by the agent-block guard",
+    { tool_name: "Bash", tool_input: { command: "spnutils workspace agent-sync" } }, "note",
+    { ...waived, says: "background shell" });
 }
 
 // UNTOUCHED — the ordinary calls that must stay silent and cheap.

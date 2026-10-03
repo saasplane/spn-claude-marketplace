@@ -39,6 +39,7 @@ import { applies as commentsApply, checkComments } from "../checks/comment-check
 import { applies as mirrorApplies, checkMirror } from "../checks/mirror.ts";
 import { PUBLISHER, checkPublish } from "../checks/publish.ts";
 import { applies as testRunApplies, checkTestRun } from "../checks/test-run.ts";
+import { applies as longRunApplies, checkLongRun } from "../checks/long-run.ts";
 import { begin, end, span, tagsOf, type SpanName } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { startCommand } from "../lib/bash-timing.ts";
 
@@ -66,6 +67,10 @@ const CHECKS: Check[] = [
   // that names one lists the start files, a folder that is absent or empty unless a timed command runs.
   { name: { group: "test-run", action: "test-run" }, run: checkTestRun, needs: ["command", "file_path"],
     applies: (path, command) => testRunApplies(path, command) },
+  // A `note`, never a `deny`, so its cost is one regular expression over the command — cheaper than
+  // any refusal above it, and it still runs this early because a Bash call pays no other check here.
+  { name: { group: "long-run", action: "long-run" }, run: checkLongRun, needs: ["command"],
+    applies: (path, command) => longRunApplies(path, command) },
   { name: { group: "doc-check", action: "doc-check" }, run: checkDoc, needs: ["command", "file_path"],
     applies: (path, command) => PROSE_SUFFIXES.some((s) => path.endsWith(s) || command.includes(s)) },
   // Its workspace sweep is the point: an answered card must be caught on ANY write. What it cannot
