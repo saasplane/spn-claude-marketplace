@@ -261,6 +261,18 @@
   figcaption{@apply font-ui text-xs text-faint mt-2 max-w-none}
   .sds-drawing .sds-box{@apply fill-card stroke-rule; stroke-width:1.5}
   .sds-drawing .sds-box.sds-absent{@apply fill-none stroke-rule; stroke-width:1.5; stroke-dasharray:5 4}
+  /* THE MARKS OF A SKELETON. A surface is a background, a border is a solid line the block has, a guide is a
+   dotted line that marks a component, a part or a slot, a control is a thin plain line, a bar stands in for
+   content, and a glyph is a plain line shape. A mark is a class and carries no colour of its own; a skeleton
+   is never told apart by a tone. */
+  .sds-drawing .sds-skel-surface{@apply fill-ink stroke-none; fill-opacity:.06}
+  .sds-drawing .sds-skel-border{@apply fill-none stroke-ink; stroke-opacity:.6; stroke-width:1.5}
+  .sds-drawing .sds-skel-guide{@apply fill-none stroke-ink; stroke-opacity:.4; stroke-width:1; stroke-dasharray:2 4}
+  .sds-drawing .sds-skel-control{@apply fill-none stroke-ink; stroke-opacity:.5; stroke-width:1}
+  .sds-drawing .sds-skel-control.sds-skel-main{stroke-opacity:.9; stroke-width:1.5}
+  .sds-drawing .sds-skel-bar{@apply fill-ink stroke-none; fill-opacity:.25}
+  .sds-drawing .sds-skel-glyph{@apply fill-none stroke-ink; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round}
+  .sds-drawing .sds-skel-glyph.sds-skel-glyph-solid{@apply fill-ink}
   .sds-drawing .sds-title{@apply font-ui fill-ink; font-size:13px; font-weight:650}
   .sds-drawing .sds-label{@apply font-ui fill-ink; font-size:12px}
   .sds-drawing .sds-code{@apply font-mono fill-slate; font-size:11px}

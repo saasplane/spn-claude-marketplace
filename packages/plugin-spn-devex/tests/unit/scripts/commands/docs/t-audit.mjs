@@ -898,6 +898,33 @@ console.log("\n=== an HTML page links the HTML page, never the markdown seat (Q2
     lacks("an HTML page links the HTML page"));
 }
 
+console.log("\n=== the back link, the rail and Where to go next open a page; the content may open a markdown file");
+{
+  const page = ({ home, next, inside }) =>
+    `<meta charset="utf-8">\n<title>T</title>\n` +
+    block({ id: "o", variant: "overview", parentId: "concept", title: "T", lenses: ["ARCHITECT"], summary: "s." }) +
+    `${LINES.stylesheet}\n<nav class="sds-rail" id="rail">\n  <a class="sds-home" href="${home}">&larr; Home</a>\n</nav>\n` +
+    `<section id="s1">\n  <div class="sds-section-head"><h2>Overview</h2></div>\n<p>See <a href="${inside}">a sample</a>.</p>\n</section>\n` +
+    `<section id="s2">\n  <div class="sds-section-head"><h2>Glossary</h2></div>\n<p>x</p>\n</section>\n` +
+    `<section id="s3">\n  <div class="sds-section-head"><h2>Where to go next</h2></div>\n<ul><li><a href="${next}">next</a></li></ul>\n</section>`;
+  const FILE = `${POCKET_DOCS}/o-overview.html`;
+  const mk = (parts) => repo({ "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n", [FILE]: page(parts) });
+  const good = { home: "concept-overview.html", next: "p-overview.html#x", inside: "../../notes/sample.md" };
+  const check = (root) => run(root, ["audit", "check", FILE, "--finding", "rail"]);
+  const exitOf = (root) => { try { execFileSync(process.execPath, [TOOL, "docs", "audit", "check", FILE, "--finding", "rail"], { cwd: root, stdio: "pipe", env: { ...process.env, SPN_WORKSPACE: root } }); return 0; } catch (error) { return error.status; } };
+  one("a back link to a page, a Where to go next link to a page with an anchor, and a markdown link in the content are clean",
+    check(mk(good)), has("clean"));
+  const bad = mk({ ...good, home: `../../../${SEAT.constructs}/02-support/README.md` });
+  one("a back link that opens a markdown file is a RULE, and it says the rail",
+    check(bad), (g) => g.includes("✗ RULE rail") && g.includes("the rail opens") && g.includes("README.md"));
+  one("and the audit exits 1 on it", exitOf(bad), 1);
+  one("a Where to go next link that opens a markdown file is a RULE too",
+    check(mk({ ...good, next: "../x/thing.md#s1" })), (g) => g.includes("✗ RULE rail") && g.includes("Where to go next opens"));
+  one("a markdown link inside the content is never refused",
+    check(mk({ ...good, inside: "sample.md" })), lacks("RULE rail"));
+  one("the finding name `rail` is one the command takes", FINDINGS.includes("rail"), true);
+}
+
 // ---------------------------------------------------------------- N37: the realization files
 
 console.log("\n=== a data model is read against its fixed outline, and reports softly while it is new (N37 step 3)");
@@ -1055,7 +1082,8 @@ console.log("\n=== a page's furniture is the shared files': a version that exist
   const seat = `docs/${SEAT.constructs}/01-core/x.md`;
   const at = `${POCKET_DOCS}/01-core/${CONSTRUCT_PAGES}/x-construct.html`;
   const root = repo({ "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n", [seat]: construct(SECTIONS),
-    // The way back of a produced page is the constructs seat's face, so the face is there to be linked.
+    // The domain has no overview, so the way back of a produced page is the hub, a page.
+    [`${POCKET_DOCS}/concept-overview.html`]: block({ id: "hub", variant: "overview", title: "Hub", lenses: ["ARCHITECT"], summary: "s." }) + "<h1>x</h1>\n",
     [`docs/${SEAT.constructs}/README.md`]: doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }) });
   process.env.SPN_TEMPLATES = templates;
   run(root, ["page", "write", seat]);

@@ -22,7 +22,7 @@ export const describe = "the invariants a page must hold";
 
 /** The name of each kind of finding `check` can report: the word printed after the grade on a finding's line. */
 export const FINDINGS = ["binds", "block", "cards", "codefig", "column", "contents", "depends", "furniture", "header", "link",
-  "masthead", "outline", "overview", "produced", "proof", "status", "style", "styles", "treefig", "vocabulary"] as const;
+  "masthead", "outline", "overview", "produced", "proof", "rail", "status", "style", "styles", "treefig", "vocabulary"] as const;
 
 const isDocument = (file: string): boolean => file.endsWith(".md") || file.endsWith(".html");
 

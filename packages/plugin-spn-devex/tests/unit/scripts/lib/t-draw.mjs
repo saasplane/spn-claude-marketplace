@@ -351,7 +351,9 @@ console.log("\n=== every example in the blocks reference actually draws");
     one(`example ${i + 1} is strict JSON`, spec, (g) => g !== null);
     if (!spec) continue;
     const r = judge(spec);
-    one(`example ${i + 1} (${spec.kind}) draws without a finding`, r.findings, none);
+    // THE REFERENCE FOLLOWS THE BOOK IN A LATER ROW. Its skeleton example still names `tone`, which a skeleton no
+    // longer reads, so the finding that names the new field is the one finding this case waits on.
+    one(`example ${i + 1} (${spec.kind}) draws without a finding`, r.findings.filter((f) => !f.includes("a skeleton no longer reads")), none);
     one(`example ${i + 1} (${spec.kind}) passes the figure check`, r.figure, none);
   }
   // And every kind the reference names in its table is a kind the drawer has.
@@ -552,95 +554,127 @@ console.log("\n=== a drawing carries the shared stylesheet's class names, and no
   one("a path with any other class is not read as a connector", checkFigures(wrap("mine")), none);
 }
 
-console.log("\n=== SKELETON — a mock of a layout, and nothing about how it looks");
+console.log("\n=== SKELETON — the marks, the controls and the check of a layer's own blocks");
 {
-  // The plan's own example (notes/N012/plan.md § The skeleton): one outer frame, a framed row with
-  // a marked item and a note, an unframed fill row, a plain row, and a row of two nested regions —
-  // one holding a fraction of the row, one holding what is left.
+  const rect = (g, cls) => [...g.matchAll(new RegExp(`<rect class="${cls}" x="([\\d.]+)" y="([\\d.]+)" width="([\\d.]+)" height="([\\d.]+)"`, "g"))].map((m) => m.slice(1).map(Number));
   const PLAN_SPEC = { kind: "skeleton",
     title: "The section of DSButton, in the Inline layout",
     caption: "Inline: a narrow frame for a small block; the variants as a row of choices.",
     frame: { label: "DSButton — Inline", note: "the main way to ask for an action",
       rows: [
         { label: "Example", framed: true,
-          items: [{ text: "Save", em: true }, { text: "Cancel" }, { note: "narrow frame: the block at its own size" }] },
-        { items: [{ text: "▸ show code", fill: true, off: true }] },
-        { label: "Variants", items: [{ text: "SOLID" }, { text: "SOFT" }, { text: "OUTLINE" }] },
+          items: [{ control: "button", text: "Save", main: true }, { control: "button", text: "Cancel" }, { note: "narrow frame: the block at its own size" }] },
+        { label: "Variants", items: [{ control: "button", text: "SOLID" }, { control: "button", text: "SOFT" }] },
         { items: [
-          { frame: { label: "navigation", width: "1/4", rows: [{ items: [{ text: "Home", fill: true }] }] } },
-          { frame: { label: "main", rows: [{ items: [{ note: "the page" }] }] } }] }] } };
+          { frame: { tag: "navigation", width: "1/4", rows: [{ items: [{ text: "Home", fill: true }] }] } },
+          { frame: { tag: "main", rows: [{ items: [{ note: "the page" }] }] } }] }] } };
   const plan = judge(PLAN_SPEC);
-  one("the plan's own spec draws with no finding", plan.findings, none);
-  one("and the figure check passes it", plan.figure, none);
+  one("a spec in the new fields draws with no finding", plan.findings, none);
   one("a skeleton draws no connector: position is the whole claim", plan.svg, (g) => !g.includes("sds-connector"));
   one("`skeleton` is a kind the book names, and a helper draws it", KINDS, (k) => k.includes("skeleton"));
-
-  one("a spec with no `frame` is a finding, not an empty canvas",
-    draw({ kind: "skeleton" }).findings, says("no `frame`"));
+  one("a skeleton's drawing is marked, so the figure check reads it by the skeleton's own rules",
+    plan.svg, (g) => g.startsWith('<svg class="sds-drawing sds-skeleton"') && checkFigures(g).length === 0);
+  one("a spec with no `frame` is a finding, not an empty canvas", draw({ kind: "skeleton" }).findings, says("no `frame`"));
   one("an unknown `width` on a nested frame is a finding",
     draw({ kind: "skeleton", frame: { rows: [{ items: [
-      { frame: { width: "2/5", rows: [{ items: [{ text: "x" }] }] } },
-      { text: "y", fill: true },
-    ] }] } }).findings, says("`2/5`"));
+      { frame: { tag: "a", width: "2/5", rows: [{ items: [{ text: "x" }] }] } }, { control: "button", text: "y", fill: true }] }] } }).findings, says("`2/5`"));
   one("an item that is none of the shapes a skeleton has is a finding",
-    draw({ kind: "skeleton", frame: { rows: [{ items: [{ warn: true }] }] } }).findings,
-    says("none of `text`, `tag`, `note`, `lines`, `spacer` or `frame`"));
+    draw({ kind: "skeleton", frame: { rows: [{ items: [{}] }] } }).findings, says("none of `text`, `note`, `slot`, `icon`, `control`, `standin`, `spacer` or `frame`"));
 
-  // A box marked `em` or `off` carries the skeleton's own tones — `off` reads as muted grey here,
-  // never the `sds-absent` a MAP box uses for a resource that is not there.
-  const tones = draw({ kind: "skeleton", frame: { rows: [{ items: [
-    { text: "Save", em: true }, { text: "Cancel" }, { text: "Disabled", off: true } ] }] } }).svg;
-  one("`em` takes the blue tone", tones, (g) => g.includes('<rect class="sds-box sds-tone-blue"'));
-  one("`off` takes the grey tone, not `sds-absent`", tones, (g) => g.includes('<rect class="sds-box sds-tone-grey"') && !g.includes("sds-absent"));
+  // 1 · the marks: classes of the stylesheet, and no colour in the drawing
+  const marks = judge({ kind: "skeleton", frame: { rows: [{ items: [
+    { frame: { tag: "A", rows: [{ items: [{ text: "a" }] }] } },
+    { frame: { tag: "B", look: "bordered", rows: [{ items: [{ text: "b" }] }] } },
+    { frame: { tag: "C", look: "flat", rows: [{ items: [{ text: "c" }] }] } }] }] } }).svg;
+  one("a drawing carries no inline colour and no tone", marks, (g) => !/ (fill|stroke|style)=|sds-tone-/.test(g.replace(/style="max-width:\d+px"/, "")));
+  one("a part with no look is a surface with the dotted boundary", marks, (g) => rect(g, "sds-skel-surface").length === 1 && rect(g, "sds-skel-guide").length === 2);
+  one("a bordered part is one solid border and no dotted boundary", marks, (g) => rect(g, "sds-skel-border").length === 1);
+  one("the outer frame is the drawing's own edge, not a mark", marks, (g) => rect(g, "sds-box").length === 1);
 
-  // A row's label sits in one column every row of the frame shares, and a row with no label still
-  // lines its items up under the ones that have one.
-  const cols = draw({ kind: "skeleton", frame: { rows: [
-    { label: "Variants", items: [{ text: "A" }] },
-    { items: [{ text: "B" }] },
-  ] } }).svg;
-  const xOfCode = (g) => [...g.matchAll(/<text class="sds-code" x="([\d.]+)"/g)].map((m) => Number(m[1]));
-  one("a labelled row and an unlabelled one line their items up on the same column",
-    cols, (g) => new Set(xOfCode(g)).size === 1);
+  // 2 · a frame's look
+  const look = (value) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ frame: { tag: "P", look: value, rows: [] } }] }] } });
+  one("`raised` draws a surface under the boundary", look("raised").svg, (g) => g.includes("sds-skel-surface") && g.includes("sds-skel-guide"));
+  one("`flat` draws the boundary and no surface", look("flat").svg, (g) => !g.includes("sds-skel-surface") && g.includes("sds-skel-guide"));
+  one("`bordered` draws a border and no boundary", look("bordered").svg, (g) => g.includes("sds-skel-border") && !g.includes("sds-skel-guide"));
+  one("a look the skeleton lacks is refused by name", look("glass").findings, says("`glass`"));
+  one("a part with a look and no name is a finding",
+    draw({ kind: "skeleton", frame: { rows: [{ items: [{ frame: { look: "flat", rows: [] } }] }] } }).findings, says("carries no name"));
 
-  // A nested frame given no `width` takes what the row has left, after the one given a fraction.
-  const split = judge({ kind: "skeleton", frame: { rows: [{ items: [
-    { frame: { label: "nav", width: "1/4", rows: [{ items: [{ text: "x" }] }] } },
-    { frame: { label: "main", rows: [{ items: [{ text: "y" }] }] } },
-  ] }] } });
-  one("the two regions pass the figure check at their own widths", split.figure, none);
-  const frameWidths = [...split.svg.matchAll(/<rect class="sds-box" x="[\d.]+" y="[\d.]+" width="([\d.]+)" height="[\d.]+" rx="3"\/>\n  <text class="sds-title"/g)]
-    .map((m) => Number(m[1]));
-  one("the fractioned region (nav) is narrower than the one taking what is left (main)",
-    frameWidths, ([nav, main]) => nav < main);
+  // 3 · a slot
+  const slot = draw({ kind: "skeleton", frame: { rows: [{ items: [{ slot: "headerNode", fill: true }] }] } });
+  one("a slot is one block whose only content is its name", slot.svg, (g) => (g.match(/<text/g) ?? []).length === 1 && g.includes(">headerNode<") && none(slot.findings));
+  one("a slot that holds anything is a finding", draw({ kind: "skeleton", frame: { rows: [{ items: [{ slot: "x", text: "y" }] }] } }).findings, says("a slot holds nothing"));
 
-  // A NAMED PLACE IS TINTED AND TAGGED: the look of the Storybook wireframes the developer chose
-  // (05-artifacts.md § SKELETON; `spn-support-ts` `3d7e6c80^`, DSLayoutReport). A tag names the place,
-  // bars stand in for items, a spacer pushes what follows to the end, and a region may stand taller.
-  const RAIL = { kind: "skeleton", frame: { label: "RAIL", rows: [{ items: [
-    { frame: { width: "1/4", rows: [
-      { items: [{ tag: "brand", tone: "amber", fill: true }] },
-      { items: [{ tag: "nav", tone: "cyan", lines: 5, headings: [0, 3], fill: true }] },
-      { items: [{ tag: "account", tone: "pink", fill: true }] }] } },
-    { frame: { rows: [
-      { items: [{ text: "≡" }, { spacer: true }, { tag: "utilityActions", tone: "violet" }] },
-      { items: [{ tag: "children", tone: "green", fill: true, height: 4 }] }] } },
-  ] }] } };
-  const rail = judge(RAIL);
-  one("a layout of tagged places draws with no finding", rail.findings, none);
-  one("…and passes the figure check: every tag fits its place, every bar keeps its inset", rail.figure, none);
-  one("a place takes its tone's class", rail.svg, (g) => g.includes("sds-box sds-tone-cyan") && g.includes("sds-box sds-tone-pink"));
-  one("a tag is written in the note measure", rail.svg, (g) => /<text class="sds-note"[^>]*>utilityActions</.test(g));
-  const bars = (g) => [...g.matchAll(/<rect class="sds-box sds-tone-cyan" x="[\d.]+" y="[\d.]+" width="([\d.]+)" height="([\d.]+)"/g)].map((m) => [Number(m[1]), Number(m[2])]);
-  one("five bars in the nav, and its two headings shorter and taller than the rest",
-    bars(rail.svg).slice(1), (b) => b.length === 5 && b[0][0] < b[1][0] && b[0][1] > b[1][1] && b[3][0] < b[4][0]);
-  const xOf = (g, word) => Number((g.match(new RegExp(`<text class="sds-note" x="([\\d.]+)" y="[\\d.]+">${word}<`)) ?? [])[1]);
-  one("a spacer pushes the place after it to the end of the row", rail.svg, (g) => xOf(g, "utilityActions") > 900);
-  const heights = (g) => [...g.matchAll(/<rect class="sds-box" x="[\d.]+" y="([\d.]+)" width="[\d.]+" height="([\d.]+)"/g)].map((m) => Number(m[1]) + Number(m[2]));
-  one("two regions side by side end on one line", rail.svg, (g) => { const ends = heights(g).slice(1, 3); return ends.length === 2 && ends[0] === ends[1]; });
-  one("the outer frame takes at least the grid's content width", rail.svg, (g) => Number((g.match(/<rect class="sds-box" x="24" y="24" width="(\d+)"/) ?? [])[1]) >= 1052);
-  one("a tone the palette lacks is refused by name",
-    draw({ kind: "skeleton", frame: { rows: [{ items: [{ tag: "x", tone: "teal" }] }] } }).findings, says("`teal`"));
+  // 4 · controls
+  const controls = draw({ kind: "skeleton", frame: { rows: [{ items: [
+    { control: "button", text: "Cancel" }, { control: "button", text: "Save", main: true },
+    { control: "field", text: "name@example.com" }, { control: "select", text: "Sort" }, { control: "checkbox" },
+    { control: "pager", text: "‹ 1 2 ›" }] }] } });
+  one("every control draws with no finding", controls.findings, none);
+  one("a control is a thin outline of the component's height, 28 in a plain row", controls.svg, (g) => rect(g, "sds-skel-control").every((r) => r[3] === 28));
+  one("the main action is told apart by weight, with the same class and no colour", controls.svg, (g) => g.includes("sds-skel-control sds-skel-main") && rect(g, "sds-skel-control sds-skel-main").length === 1);
+  one("a pager is one packed group: its parts sit 4px apart", controls.svg, (g) => {
+    const boxes = rect(g, "sds-skel-control").slice(-4); return boxes.slice(1).every((b, i) => b[0] - (boxes[i][0] + boxes[i][2]) === 4); });
+  one("a framed row takes the larger control height", draw({ kind: "skeleton", frame: { rows: [{ framed: true, items: [{ control: "button", text: "Save" }] }] } }).svg,
+    (g) => rect(g, "sds-skel-control")[0][3] === 36);
+  one("a control with a tag is a finding", draw({ kind: "skeleton", frame: { rows: [{ items: [{ control: "button", text: "x", tag: "name" }] }] } }).findings, says("a control carries no tag"));
+  one("a control that runs over one line is a finding", draw({ kind: "skeleton", frame: { rows: [{ items: [{ control: "button", text: "a\nb" }] }] } }).findings, says("one line"));
+  one("a control the skeleton lacks is refused by name", draw({ kind: "skeleton", frame: { rows: [{ items: [{ control: "slider", text: "x" }] }] } }).findings, says("`slider`"));
+
+  // 5 · icons
+  const icons = draw({ kind: "skeleton", frame: { rows: [{ items: ["close", "add", "menu", "search", "more", "previous", "next", "select", "checkbox", "bell", "person", "default"].map((icon) => ({ icon })) }] } });
+  one("each of the twelve icons draws with no finding", icons.findings, none);
+  one("an icon sits in a square whose side is the control's height", icons.svg, (g) => rect(g, "sds-skel-control").length === 12 && rect(g, "sds-skel-control").every((r) => r[2] === 28 && r[3] === 28));
+  one("icons are line shapes of the stylesheet, with no transform", icons.svg, (g) => g.includes("sds-skel-glyph") && !g.includes("transform"));
+  one("an icon the set lacks is a finding that names the default", draw({ kind: "skeleton", frame: { rows: [{ items: [{ icon: "rocket" }] }] } }).findings, says("`default`"));
+  const word = draw({ kind: "skeleton", frame: { rows: [{ items: [{ icon: "add", text: "New" }, { control: "button", text: "Go" }] }] } }).svg;
+  const wordY = Number((word.match(/<text class="sds-code" x="[\d.]+" y="([\d.]+)">New/) ?? [])[1]);
+  one("a word beside an icon is centred on the icon's own line", word, () => wordY === rect(word, "sds-skel-control")[0][1] + 14 + 4);
+
+  // 6 · a title is plain text
+  const title = draw({ kind: "skeleton", frame: { rows: [{ items: [{ text: "Members" }] }] } }).svg;
+  one("a title is plain text with no box", title, (g) => g.includes(">Members<") && rect(g, "sds-skel-control").length === 0 && rect(g, "sds-skel-guide").length === 0);
+
+  // 7 · stand-ins
+  const standin = (kind, extra = {}) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ standin: kind, lines: 3, fill: true, ...extra }] }] } });
+  one("rows are bars, and a heading bar is shorter and taller", standin("rows", { headings: [0] }).svg,
+    (g) => { const b = rect(g, "sds-skel-bar"); return b.length === 3 && b[0][2] < b[1][2] && b[0][3] > b[1][3]; });
+  one("a card grid is cards, each with bars", standin("cards").svg, (g) => rect(g, "sds-skel-control").length === 3 && rect(g, "sds-skel-bar").length === 9);
+  one("a form field is its label above its field", standin("field").svg, (g) => rect(g, "sds-skel-bar").length === 1 && rect(g, "sds-skel-control").length === 1);
+  one("list entries are a mark and a bar each", standin("list").svg, (g) => rect(g, "sds-skel-bar").length === 6);
+  one("a stand-in the skeleton lacks is refused by name", standin("tree").findings, says("`tree`"));
+
+  // 8 · a part that takes the height left
+  const rail = draw({ kind: "skeleton", frame: { rows: [{ items: [
+    { frame: { width: "1/4", rows: [{ items: [{ slot: "brand", fill: true }] }, { items: [{ frame: { tag: "nav", fill: true, rows: [] } }] }, { items: [{ slot: "account", fill: true }] }] } },
+    { frame: { tag: "children", rows: [{ items: [{ standin: "rows", lines: 14, fill: true }] }] } }] }] } }).svg;
+  const ys = (g, cls) => rect(g, cls).map((r) => r[1] + r[3]);
+  one("`nav` reaches down and `account` stands at the foot of the column", rail, (g) => {
+    const guides = rect(g, "sds-skel-guide"); const column = guides[0], account = guides[3];
+    return Math.abs((account[1] + account[3]) - (column[1] + column[3] - 16)) < 1; });
+  one("the two columns end on one line", rail, (g) => { const [column, , , , children] = rect(g, "sds-skel-guide"); return column[1] + column[3] === children[1] + children[3]; });
+
+  // 9 · measures of its own
+  one("the other kinds' constants are untouched by the skeleton: a MAP draws as before", draw({ kind: "map", boxes: [{ id: "a", label: "A" }] }).svg,
+    (g) => g.includes('class="sds-box"') && !g.includes("sds-skel"));
+
+  // 10 · the check
+  const centre = draw({ kind: "skeleton", frame: { rows: [{ items: [{ text: "Members" }, { icon: "close" }, { control: "button", text: "Go" }, { slot: "s" }] }] } });
+  one("the items of one row share one centre line", centre.svg, () => {
+    const g = centre.svg; const c = rect(g, "sds-skel-control").map((r) => r[1] + r[3] / 2);
+    const label = Number((g.match(/<text class="sds-label" x="[\d.]+" y="([\d.]+)"/) ?? [])[1]) - 4;
+    return new Set([...c, label]).size === 1 && none(centre.findings); });
+  const deep = { kind: "skeleton", frame: { rows: [{ items: [{ frame: { tag: "a", rows: [{ items: [{ frame: { tag: "b", rows: [{ items: [{ frame: { tag: "c", rows: [] } }] }] } }] }] } }] }] } };
+  one("a third named boundary is a finding that names it", draw(deep).findings, says("draw `c` as a skeleton of its own"));
+  one("two named boundaries are allowed", draw({ ...deep, frame: { rows: [{ items: [{ frame: { tag: "a", rows: [{ items: [{ frame: { tag: "b", rows: [] } }] }] } }] }] } }).findings, none);
+
+  // 11 · the old fields
+  const oldFields = draw({ kind: "skeleton", frame: { tone: "blue", rows: [{ items: [{ text: "Save", em: true }, { note: "n", off: true }] }] } });
+  one("`tone` is not read, and the finding names `look`", oldFields.findings, says("no longer reads `tone`"));
+  one("`em` is not read, and the finding names `control` and `main`", oldFields.findings, says("`control` with `main: true`"));
+  one("`off` is not read, and the finding names `note`", oldFields.findings, says("no longer reads `off`"));
+  one("nothing is drawn by guessing: no tone class reaches the drawing", oldFields.svg, (g) => !g.includes("sds-tone-"));
+  one("an old `warn` is a finding that names the new field", draw({ kind: "skeleton", frame: { rows: [{ items: [{ text: "x", warn: true }] }] } }).findings, says("no longer reads `warn`"));
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

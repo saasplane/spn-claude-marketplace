@@ -1871,6 +1871,49 @@
     stroke-width: 1.5;
     stroke-dasharray: 5 4;
   }
+  .sds-drawing .sds-skel-surface {
+    fill: var(--sds-ink);
+    stroke: none;
+    fill-opacity: .06;
+  }
+  .sds-drawing .sds-skel-border {
+    fill: none;
+    stroke: var(--sds-ink);
+    stroke-opacity: .6;
+    stroke-width: 1.5;
+  }
+  .sds-drawing .sds-skel-guide {
+    fill: none;
+    stroke: var(--sds-ink);
+    stroke-opacity: .4;
+    stroke-width: 1;
+    stroke-dasharray: 2 4;
+  }
+  .sds-drawing .sds-skel-control {
+    fill: none;
+    stroke: var(--sds-ink);
+    stroke-opacity: .5;
+    stroke-width: 1;
+  }
+  .sds-drawing .sds-skel-control.sds-skel-main {
+    stroke-opacity: .9;
+    stroke-width: 1.5;
+  }
+  .sds-drawing .sds-skel-bar {
+    fill: var(--sds-ink);
+    stroke: none;
+    fill-opacity: .25;
+  }
+  .sds-drawing .sds-skel-glyph {
+    fill: none;
+    stroke: var(--sds-ink);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .sds-drawing .sds-skel-glyph.sds-skel-glyph-solid {
+    fill: var(--sds-ink);
+  }
   .sds-drawing .sds-title {
     fill: var(--sds-ink);
     font-family: var(--sds-ui);

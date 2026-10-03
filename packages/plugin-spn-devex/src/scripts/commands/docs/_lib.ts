@@ -21,7 +21,7 @@ import { filesUnder as proseFilesUnder, paragraphs as proseParagraphs, score as 
 
 import { withOffset } from "../../lib/clock.ts";
 import { GUIDE_PAGE_SUFFIX, ARTIFACT_FOLDERS, ARTIFACT_INDEX, DEVEX_WORKSTREAMS, DOCS, FACE, HUB, POCKET, SEAT, SEATS, TEMPLATES,
-  artifactDocsDir, artifactFolderOf, behaviorsDir, bookTemplatesDir, capabilitiesDir, constructsDir, docsOf, inSeat, inTemplates,
+  artifactDocsDir, artifactFolderOf, behaviorsDir, bookTemplatesDir, capabilitiesDir, constructsDir, docsOf, domainDirOf, hubPage, inSeat, inTemplates,
   isOverview, isProducedPage, mirrorPath, pagePlaceOf, producedPageOf, seatOf, splitAtSeat,
   workstreamDirOf } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, PAGE_SCRIPT, SERVED_FILES, STYLESHEET, cutVersions, linksSharedStyles,
@@ -2549,37 +2549,43 @@ export function behaviourRows(file: string): BehaviourRow[] {
 }
 
 /**
- * The page a construct returns to: its domain's overview (Q238).
+ * The page a construct returns to: the overview of its group, always a page (Q238).
  *
- * A DOMAIN AND ITS OVERVIEW SHARE ONE TITLE, AND THAT IS THE ONLY JOIN. A domain's folder may hold
- * two overviews, and an overview may sit beside the hub, so the path cannot be computed from the
- * seat. The title is stable because `face` writes the domain's own README from the same concept
- * section the overview borrows.
+ * THE OVERVIEWS NAME THEIR OWN CONSTRUCTS, SO THE WAY BACK IS THAT LINK READ IN REVERSE. Every
+ * overview links forward to the construct pages it owns (`Read … →`), and a domain may hold several
+ * overviews, so no title and no file name can say which one owns a construct. The overview of the
+ * domain whose own links reach this construct's page is the answer. Nothing is listed in code: each
+ * overview of each domain of each repository is read as it stands.
  *
- * NULL WHERE THE DOMAIN HAS NO OVERVIEW, which is nine domains today, and the caller then keeps the
- * constructs seat's face. A guess would be worse than the old link: it would name a page that is
- * not there, and a link is a promise a reader can follow it.
+ * WHERE NO OVERVIEW NAMES THE CONSTRUCT, the domain's first overview, in the order of its path.
+ * WHERE THE DOMAIN HAS NONE, the repository's hub. NULL ONLY WHERE THERE IS NO HUB EITHER, and the
+ * caller then keeps the constructs seat's face: a guess would name a page that is not there, and a
+ * link is a promise a reader can follow.
  */
 export function overviewAbove(seat: string, out: string): { href: string; label: string } | null {
   const seatPath = resolve(seat).replace(/\\/g, "/");
   const split = splitAtSeat(seatPath, "constructs", "last");
   if (!split) return null;
   const seatDir = constructsDir(split.docs);
+  const target = (page: string) => ({
+    href: relative(dirname(out), page),
+    label: String(readBlock(readFileSync(page, "utf8")).block?.title ?? basename(page)),
+  });
 
   // The domain is the folder invariant 1 already tests for: depth 1 under the seat, or depth 2
   // where its parent is a group. Walk up from the seat until one of those is true.
   let dir = dirname(seatPath);
   while (dir.startsWith(seatDir) && dir !== seatDir && !isDomainFolder(seatDir, dir)) dir = dirname(dir);
-  if (dir === seatDir || !dir.startsWith(seatDir)) return null;
+  const domainPocket = dir !== seatDir && dir.startsWith(seatDir) ? domainDirOf(dir) : null;
+  const overviews = domainPocket === null ? [] : overviewPages(split.docs).filter((page) => dirname(page).replace(/\\/g, "/") === domainPocket);
 
-  const face = join(dir, "README.md");
-  if (!existsSync(face)) return null;
-  const { block } = readBlock(readFileSync(face, "utf8"));
-  const title = block?.title;
-  if (!title) return null;
-
-  const overview = overviewPages(split.docs).find((page) => readBlock(readFileSync(page, "utf8")).block?.title === title);
-  return overview === undefined ? null : { href: relative(dirname(out), overview), label: title };
+  const page = resolve(out);
+  const naming = overviews.find((overview) =>
+    [...readFileSync(overview, "utf8").matchAll(/href="([^"#]+)/g)].some((link) => resolve(dirname(overview), link[1]) === page));
+  const chosen = naming ?? overviews[0];
+  if (chosen) return target(chosen);
+  const hub = hubPage(split.docs);
+  return existsSync(hub) ? target(hub) : null;
 }
 
 export function pageFor(seat: string, workspace: string, templates: string, write: boolean): Finding[] {
@@ -3231,6 +3237,29 @@ export function checkConstructLink(file: string, src: string): Finding[] {
   return f;
 }
 
+/**
+ * A page's back link, every link of its rail and every link of its Where to go next open a page.
+ *
+ * A link inside the content may open a markdown file, a sample or a chapter; the navigation that
+ * stands outside the content may not, because a reader following it would leave the rendering. An
+ * anchor after the path is fine, and a link to another site or a bare `#fragment` is not a file.
+ */
+export function checkRailLinks(file: string, src: string): Finding[] {
+  if (!file.endsWith(".html") || inTemplates(file)) return [];
+  const f: Finding[] = [];
+  const refuse = (where: string, href: string) => {
+    const path = href.split("#")[0].trim();
+    if (!path || /^[a-z][a-z0-9+.-]*:/i.test(path) || path.includes("{{") || path.endsWith(".html")) return;
+    f.push({ check: "rail", grade: "RULE", file, message:
+      `${where} opens \`${href}\` — the way back, the rail and Where to go next open a page that ends in \`.html\`; only a link inside the content may open a markdown file` });
+  };
+  const rail = src.match(/<nav class="sds-rail"[^>]*>([\s\S]*?)<\/nav>/);
+  if (rail) for (const m of rail[1].matchAll(/href="([^"]*)"/g)) refuse("the rail", m[1]);
+  for (const next of src.matchAll(/<h2>Where to go next<\/h2><\/div>([\s\S]*?)<\/section>/g))
+    for (const m of next[1].matchAll(/href="([^"]*)"/g)) refuse("Where to go next", m[1]);
+  return f;
+}
+
 export function checkLinks(file: string, src: string): Finding[] {
   if (inTemplates(file)) return [];
   const f: Finding[] = [];
@@ -3302,6 +3331,7 @@ export function audit(paths: string[], workspace: string): Finding[] {
     findings.push(...checkStyleBalance(p, src));
     findings.push(...checkLinks(p, src));
     findings.push(...checkConstructLink(p, src));
+    findings.push(...checkRailLinks(p, src));
     findings.push(...checkFurniture(p, src));
     findings.push(...checkGovernsMap(p, src));
     findings.push(...checkProof(p, src));

@@ -44,29 +44,35 @@ export type Spec = {
 
 /**
  * SKELETON — where the parts of a screen or a block sit, and nothing about how they look
- * (05-artifacts.md § `SKELETON`). An item is a box with the word a person sees, a note in muted
- * text, or a frame of its own: a region, such as a navigation beside a main area.
+ * (05-artifacts.md § `SKELETON`). An item is plain words, a control, an icon, a slot, a stand-in, a
+ * note in muted text, or a frame of its own: a region, such as a navigation beside a main area.
  */
 export type SkeletonItem = {
-  text?: string; note?: string; fill?: boolean; em?: boolean; off?: boolean; warn?: boolean;
+  /** Plain words — a title. With `control` it is the control's sample value; with `icon`, the word beside it. */
+  text?: string; note?: string; fill?: boolean;
   frame?: SkeletonFrame;
-  /** A named place: its region tinted in a palette tone, and a small tag naming the prop it is. */
-  tone?: SkeletonTone; tag?: string;
-  /** Placeholder bars in place of words; the indexes in `headings` are shorter, taller heading bars. */
-  lines?: number; headings?: number[];
+  /** A named place that holds content: a dotted boundary and its name. */
+  tag?: string;
+  /** A slot that accepts any node: one block whose only content is its name. */
+  slot?: string;
+  /** A control at the size of its component, on one line. `main` tells the main action by weight, never by colour. */
+  control?: "button" | "field" | "select" | "checkbox" | "pager"; main?: boolean;
+  /** One of the small set of plain line shapes the drawer draws, centred in a square the height of a control. */
+  icon?: "close" | "add" | "menu" | "search" | "more" | "previous" | "next" | "select" | "checkbox" | "bell" | "person" | "default";
+  /** What bars stand in for; `lines` counts them, and the indexes in `headings` are shorter, taller heading bars. */
+  standin?: "rows" | "cards" | "field" | "list"; lines?: number; headings?: number[];
   /** Free room that pushes the items after it to the end of the row. */
   spacer?: boolean;
   /** A region standing taller than what it holds, in rows. */
   height?: number;
 };
-/** The palette's ten tones (05-artifacts.md § The palette). A tone tells one place from the next and means nothing more. */
-export type SkeletonTone = "blue" | "green" | "amber" | "red" | "violet" | "cyan" | "pink" | "olive" | "orange" | "grey";
 /** A row runs left to right. `label` names the place, in a column every row of the frame shares;
  *  `framed` puts the row's items inside one box, as an example sits in its frame. */
 export type SkeletonRow = { label?: string; framed?: boolean; items: SkeletonItem[] };
 /** A frame is a box, with an optional title (`label`) and `note`, holding rows top to bottom. A
- *  frame nested in a row may carry `width` — a fraction of the row, or absent for what is left. */
-export type SkeletonFrame = { label?: string; note?: string; width?: string; rows: SkeletonRow[]; tone?: SkeletonTone; tag?: string; height?: number };
+ *  frame nested in a row may carry `width` — a fraction of the row, or absent for what is left. Its `look` is
+ *  `raised` (a surface), `bordered` (a solid line) or `flat` (neither), and `fill` takes the height left in its column. */
+export type SkeletonFrame = { label?: string; note?: string; width?: string; rows: SkeletonRow[]; look?: "raised" | "bordered" | "flat"; tag?: string; height?: number; fill?: boolean };
 
 /** The measure the figure check uses, at the drawn scale. */
 const W_LABEL = 7, W_NOTE = 6.4, W_TITLE = 7.6;
@@ -143,7 +149,7 @@ function fit(body: string[]): { x0: number; y0: number; w: number; h: number } {
 }
 
 /** One masthead for every drawer: the marker it needs, and a viewBox that hugs what was drawn. */
-function svgOf(body: string[], label: string): string {
+function svgOf(body: string[], label: string, extraClass = ""): string {
   const { x0, y0, w, h } = fit(body);
   return [
     // A FIGURE IS NEVER SCALED UP. The page sets `width:100%` so a wide figure shrinks to the column,
@@ -151,7 +157,7 @@ function svgOf(body: string[], label: string): string {
     // 1100, so its text rendered at twice the size of the figure above it and the drawing stood
     // 1650px tall. The cap is the figure's own width, inline so it beats the stylesheet, and
     // `width:100%` still shrinks it on a narrow screen (2026-09-22, found on the Sign-in sample).
-    `<svg class="sds-drawing" viewBox="${x0} ${y0} ${w} ${h}" style="max-width:${w}px" role="img" aria-label="${esc(spoken(label))}">`,
+    `<svg class="sds-drawing${extraClass ? " " + extraClass : ""}" viewBox="${x0} ${y0} ${w} ${h}" style="max-width:${w}px" role="img" aria-label="${esc(spoken(label))}">`,
     // THE ARROWHEAD ONLY WHERE AN ARROW USES IT. A figure with no connector — every skeleton — carried
     // a marker it never drew, and six of them on one page repeated the id `ar` six times.
     ...(body.some((l) => l.includes("marker-end")) ? [`  <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs>`] : []),
@@ -1526,102 +1532,145 @@ function drawFlowchart(spec: Spec): { svg: string; findings: string[] } {
 /**
  * SKELETON — a mock of a layout, drawn under the rule that holds for every other kind: nothing by
  * eye, every box measured from its own text. No connectors: position is the whole claim, so this
- * drawer emits none and the figure check's connector rules pass it by construction.
+ * drawer emits none.
  *
- * Two numbers, both taken from the grid rather than invented: a plain item's box is the clear air a
- * label already owes on both sides (`LABEL_H + LABEL_GAP * 2`), and a framed row's item is one more
- * `LABEL_GAP` taller — room enough to read as the heavier, "this is the example" box.
+ * A SKELETON READS ITS OWN MEASURES (05-artifacts.md § `SKELETON`, § The skeleton's own guidelines).
+ * Every number below is a copy of a grid number or a number of its own; none is shared with another
+ * kind, so a change here never moves a MAP, a FLOWCHART, a SYSTEM or an ENTITIES figure.
+ *
+ * Marks, never tints: a background is a surface (`sds-skel-surface`), a solid line is a border the block
+ * has (`sds-skel-border`), a dotted line marks a component, a part or a slot (`sds-skel-guide`), a thin
+ * line is a control (`sds-skel-control`), and a soft bar stands in for content (`sds-skel-bar`). A drawing
+ * carries no colour of its own: every mark is a class of the shared stylesheet.
  */
-const SKEL_ROW_H = LABEL_H + LABEL_GAP * 2, SKEL_ITEM_H = SKEL_ROW_H + LABEL_GAP;
-const WIDTH_FRACTIONS: Record<string, number> = { "1/4": 1 / 4, "1/3": 1 / 3, "1/2": 1 / 2, "2/3": 2 / 3, "3/4": 3 / 4 };
-
-const SKEL_TONES = new Set(["blue", "green", "amber", "red", "violet", "cyan", "pink", "olive", "orange", "grey"]);
+const SKEL_PAD = 16, SKEL_GAP = 24, SKEL_LABEL_H = 12, SKEL_LABEL_GAP = 8;
+const SKEL_W_LABEL = 7, SKEL_W_NOTE = 6.4, SKEL_W_TITLE = 7.6;
+const SKEL_H_ONE = 44, SKEL_H_TWO = 64;
+/** A control's height at each size step, from the library's own scale. An unframed row draws `XS`, and a framed row `MD`. */
+const SKEL_CONTROL_H = { XS: 28, SM: 32, MD: 36, LG: 40, XL: 44 };
+const SKEL_ROW_H = SKEL_CONTROL_H.XS, SKEL_ITEM_H = SKEL_CONTROL_H.MD;
 /** A tag's line: the note measure, its own clear air below it before the words or bars it heads. */
-const SKEL_TAG_H = LABEL_H + LABEL_GAP;
+const SKEL_TAG_H = SKEL_LABEL_H + SKEL_LABEL_GAP;
 /** One placeholder bar and the gap under it; a heading bar is a little taller. */
-const SKEL_BAR = 6, SKEL_HEAD_BAR = 8, SKEL_BAR_STEP = SKEL_BAR + LABEL_GAP;
-/** A tone the palette does not have is a finding, and the box is drawn plain rather than guessed at. */
-function skelTone(tone: string | undefined, findings: string[]): string {
-  if (tone === undefined) return "";
-  if (SKEL_TONES.has(tone)) return ` sds-tone-${tone}`;
-  findings.push(`a skeleton's \`tone\` is \`${tone}\`, and the palette has ${[...SKEL_TONES].join(" · ")}`);
-  return "";
+const SKEL_BAR = 6, SKEL_HEAD_BAR = 8, SKEL_BAR_STEP = SKEL_BAR + SKEL_LABEL_GAP;
+/** Controls of one packed group (a pager, a layout switch) sit this far apart. */
+const SKEL_PACK_GAP = 4;
+/** How many named boundaries may sit inside one another before the drawing is split. */
+const SKEL_NEST_MAX = 2;
+const SKEL_LINES_W = 160, SKEL_FIELD_W = 160, SKEL_CARD_H = 64;
+const WIDTH_FRACTIONS: Record<string, number> = { "1/4": 1 / 4, "1/3": 1 / 3, "1/2": 1 / 2, "2/3": 2 / 3, "3/4": 3 / 4 };
+// THE OUTER FRAME TAKES THE GRID'S CONTENT WIDTH (05-artifacts.md § The grid), as the hand-drawn
+// skeletons did: a layout is a screen, and a screen drawn 300 wide reads as a widget.
+const SKEL_CANVAS = 1052;
+// A FLOOR RATHER THAN A ZERO, for the degenerate case every row's width is left to a `fill` or a
+// fraction: nothing would set the frame's own width, and 0 is not a figure.
+const SKEL_MIN_W = 200;
+
+const SKEL_LOOKS = ["raised", "bordered", "flat"];
+const SKEL_CONTROLS = ["button", "field", "select", "checkbox", "pager"];
+const SKEL_STANDINS = ["rows", "cards", "field", "list"];
+const SKEL_ICONS = ["close", "add", "menu", "search", "more", "previous", "next", "select", "checkbox", "bell", "person", "default"];
+
+type SkelKind = "frame" | "spacer" | "slot" | "standin" | "control" | "icon" | "place" | "plain" | "note";
+/** Which shape an item is; `null` is the thing the spec refuses. A tag with no other claim is a named place. */
+const skelKind = (it: SkeletonItem): SkelKind | null =>
+  it.frame ? "frame" : it.spacer ? "spacer" : it.slot !== undefined ? "slot"
+    : it.standin !== undefined || it.lines !== undefined ? "standin"
+    : it.control !== undefined ? "control" : it.icon !== undefined ? "icon"
+    : it.tag !== undefined ? "place" : it.text !== undefined ? "plain" : it.note !== undefined ? "note" : null;
+
+/** `tone` as a colour and `em` on a word are not read: the finding names the field that replaces each. */
+function skelOldFields(holder: SkeletonItem | SkeletonFrame, findings: string[]): void {
+  const said = (message: string) => { if (!findings.includes(message)) findings.push(message); };
+  const old = holder as { tone?: string; em?: boolean; off?: boolean; warn?: boolean };
+  if (old.tone !== undefined) said("a skeleton no longer reads `tone`; a place is told apart by its mark, so give a frame a `look` of `raised`, `bordered` or `flat`");
+  if (old.em !== undefined) said("a skeleton no longer reads `em`; a title is plain `text`, and the main action is a `control` with `main: true`");
+  if (old.off !== undefined) said("a skeleton no longer reads `off`; muted words are a `note`");
+  if (old.warn !== undefined) said("a skeleton no longer reads `warn`; a skeleton shows an arrangement, so say it in a `note`");
 }
 
-/** The words a MAP box already uses; a named place's own tone wins over them. */
-function skelClass(it: SkeletonItem, findings: string[] = []): string {
-  if (it.tone !== undefined) return "sds-box" + skelTone(it.tone, findings);
-  if (it.em) return "sds-box sds-tone-blue";
-  if (it.warn) return "sds-box sds-tone-amber";
-  if (it.off) return "sds-box sds-tone-grey";
-  return "sds-box";
-}
-/** A box as wide as its text, by the measure a leaf uses, with the leaf's own padding. */
-const skelTextW = (s: string) => Math.ceil(s.length * W_LABEL + PAD_X * 2);
-/** A note carries no box, so no padding — only the run its words need. */
-const skelNoteW = (s: string) => Math.ceil(s.length * W_LABEL);
-/** A tag is set in the note measure, with a leaf's padding either side. */
-const skelTagW = (s: string) => Math.ceil(s.length * W_NOTE + PAD_X * 2);
-/** Which shape an item is; `null` is the thing the spec refuses. A tag alone is a box: a named place
- *  with nothing in it yet. */
-const skelKind = (it: SkeletonItem): "text" | "note" | "frame" | "lines" | "spacer" | null =>
-  it.frame ? "frame" : it.spacer ? "spacer" : it.lines !== undefined ? "lines"
-    : it.text !== undefined || it.tag !== undefined ? "text" : it.note !== undefined ? "note" : null;
-/** The width bars take when nothing asks them to fill: room for a short run of words. */
-const SKEL_LINES_W = 160;
+const skelWordW = (s: string) => Math.ceil(s.length * SKEL_W_LABEL);
+const skelTextW = (s: string) => Math.ceil(s.length * SKEL_W_LABEL + SKEL_PAD * 2);
+const skelTagW = (s: string) => Math.ceil(s.length * SKEL_W_NOTE + SKEL_PAD * 2);
+const skelControlH = (framed: boolean) => (framed ? SKEL_ITEM_H : SKEL_ROW_H);
+const skelPagerParts = (it: SkeletonItem) => (it.text ?? "‹ 1 2 3 ›").split(/\s+/).filter(Boolean);
+const skelPartW = (part: string, h: number) => Math.max(h, Math.ceil(part.length * SKEL_W_LABEL + SKEL_PAD));
+const skelIconOnly = (it: SkeletonItem) => skelKind(it) === "icon" && it.text === undefined;
+const r2 = (n: number) => Math.round(n * 100) / 100;
 
-/** An item's own width where it has one; a `fill` text or a frame takes what the row has left. */
-function skelFixedWidth(it: SkeletonItem): number {
-  const kind = skelKind(it);
-  if (kind === "text") return it.fill ? 0 : skelBoxW(it);
-  if (kind === "lines") return it.fill ? 0 : Math.max(SKEL_LINES_W, it.tag ? skelTagW(it.tag) : 0);
-  if (kind === "note") return skelNoteW(it.note!);
-  return 0; // a frame never sets the row's shared width — it takes a fraction of it, or what is left
+/** An item's own width where it has one; a `fill` item or a frame takes what the row has left. */
+function skelFixedWidth(it: SkeletonItem, framed: boolean): number {
+  const h = skelControlH(framed);
+  switch (skelKind(it)) {
+    case "plain": return skelWordW(it.text!);
+    case "note": return skelWordW(it.note!);
+    case "place": return it.fill ? 0 : Math.max(it.text !== undefined ? skelTextW(it.text) : 0, skelTagW(it.tag!), SKEL_PAD * 2);
+    case "slot": return it.fill ? 0 : Math.max(skelTagW(it.slot!), SKEL_PAD * 2);
+    case "standin": return it.fill ? 0 : SKEL_LINES_W;
+    case "icon": return h + (it.text !== undefined ? SKEL_LABEL_GAP + skelWordW(it.text) : 0);
+    case "control": {
+      const text = it.text ?? "";
+      if (it.control === "pager") {
+        const parts = skelPagerParts(it);
+        return parts.reduce((t, p) => t + skelPartW(p, h), 0) + SKEL_PACK_GAP * (parts.length - 1);
+      }
+      if (it.control === "checkbox") return h + (text ? SKEL_LABEL_GAP + skelWordW(text) : 0);
+      if (it.fill) return 0;
+      if (it.control === "field") return Math.max(skelTextW(text), SKEL_FIELD_W);
+      if (it.control === "select") return skelTextW(text) + SKEL_PAD + 8;
+      return Math.max(skelTextW(text), SKEL_PAD * 2);
+    }
+    default: return 0; // a frame never sets the row's shared width — it takes a fraction of it, or what is left
+  }
 }
 
-/** A box as wide as the wider of its words and its tag. */
-function skelBoxW(it: SkeletonItem): number {
-  return Math.max(it.text !== undefined ? skelTextW(it.text) : 0, it.tag ? skelTagW(it.tag) : 0, PAD_X * 2);
-}
 /** An item's own height: its slot, its tag's line above its words, its bars, or the rows it asks for. */
 function skelItemHeight(it: SkeletonItem, framed: boolean): number {
   const kind = skelKind(it);
   if (kind === "frame") return skelFrameHeight(it.frame!);
-  const slot = framed ? SKEL_ITEM_H : SKEL_ROW_H;
+  const slot = skelControlH(framed);
   let h = slot;
-  if (kind === "text" && it.tag && it.text !== undefined) h = slot + SKEL_TAG_H;
-  if (kind === "lines") h = (it.tag ? SKEL_TAG_H + LABEL_GAP : PAD_X) + Math.max(1, it.lines!) * SKEL_BAR_STEP - LABEL_GAP + PAD_X;
+  if (kind === "place" && it.text !== undefined) h = slot + SKEL_TAG_H;
+  if (kind === "standin") {
+    const count = Math.max(1, it.lines ?? 3);
+    if (it.standin === "cards") h = SKEL_CARD_H;
+    else if (it.standin === "field") h = SKEL_HEAD_BAR + SKEL_LABEL_GAP + slot;
+    else h = SKEL_PAD + count * SKEL_BAR_STEP - SKEL_LABEL_GAP + SKEL_PAD;
+  }
   return Math.max(h, (it.height ?? 0) * SKEL_ROW_H);
 }
 /** A row's height, independent of width: the tallest item it holds, or that plus the framed pad. */
 function skelRowHeight(row: SkeletonRow): number {
   const items = row.items.length ? row.items : [{}];
-  const hs = items.map((it) => skelItemHeight(it, !!row.framed));
-  const h = Math.max(...hs);
-  return row.framed ? h + GAP_Y * 2 : h;
+  const h = Math.max(...items.map((it) => skelItemHeight(it, !!row.framed)));
+  return row.framed ? h + SKEL_GAP * 2 : h;
 }
-/** A frame's height, independent of width: its header, its rows stacked with the grid's own gap, its own pad. */
+/** A frame's height, independent of width: its header, its rows stacked with the gap, its own pad. */
 function skelFrameHeight(frame: SkeletonFrame): number {
   const rows = frame.rows ?? [];
-  const body = rows.reduce((t, r) => t + skelRowHeight(r), 0) + GAP_Y * Math.max(0, rows.length - 1);
-  return Math.max(skelHead(frame) + body + PAD_X, (frame.height ?? 0) * SKEL_ROW_H);
+  const body = rows.reduce((t, r) => t + skelRowHeight(r), 0) + SKEL_GAP * Math.max(0, rows.length - 1);
+  return Math.max(skelHead(frame) + body + SKEL_PAD, (frame.height ?? 0) * SKEL_ROW_H);
 }
 /** A frame's header: its tag's line, then its title and note. A frame with neither title nor tag
  *  starts its rows at its own padding. */
 function skelHead(frame: SkeletonFrame): number {
-  const tag = frame.tag ? SKEL_TAG_H + LABEL_GAP : 0;
-  if (!frame.label) return Math.max(tag, PAD_X);
-  return tag + (frame.note ? H_TWO : H_ONE);
+  const tag = frame.tag ? SKEL_TAG_H + SKEL_LABEL_GAP : 0;
+  if (!frame.label) return Math.max(tag, SKEL_PAD);
+  return tag + (frame.note ? SKEL_H_TWO : SKEL_H_ONE);
 }
 /** The left column every row of a frame shares, sized to the widest row label — or none at all. */
 function skelLabelCol(frame: SkeletonFrame): number {
   const labels = (frame.rows ?? []).map((r) => r.label).filter((l): l is string => !!l);
-  return labels.length ? Math.ceil(Math.max(...labels.map((l) => l.length * W_LABEL))) : 0;
+  return labels.length ? Math.ceil(Math.max(...labels.map((l) => l.length * SKEL_W_LABEL))) : 0;
 }
+/** The gap after item `i` of a row: a packed group (icon after icon, pager part after part) sits close. */
+const skelGapAfter = (row: SkeletonRow, i: number) =>
+  skelIconOnly(row.items[i]) && row.items[i + 1] && skelIconOnly(row.items[i + 1]) ? SKEL_PACK_GAP : SKEL_GAP;
+const skelRowGaps = (row: SkeletonRow) =>
+  row.items.slice(0, -1).reduce((t, _, i) => t + skelGapAfter(row, i), 0);
 /** A row's own minimum width: its fixed items, the gaps between them, and a framed row's own pad. */
 function skelRowMinWidth(row: SkeletonRow): number {
-  // A FILL OR A FRAME STILL NEEDS ROOM FOR WHAT IT HOLDS. Counting only the fixed items let a row of
-  // tagged places shrink the whole figure to its floor, and every tag overran its box.
+  // A FILL OR A FRAME STILL NEEDS ROOM FOR WHAT IT HOLDS.
   const need = (it: SkeletonItem): number => {
     const kind = skelKind(it);
     if (kind === "spacer") return 0;
@@ -1630,36 +1679,37 @@ function skelRowMinWidth(row: SkeletonRow): number {
       const frac = it.frame!.width ? WIDTH_FRACTIONS[it.frame!.width] : undefined;
       return frac ? Math.ceil(own / frac) : own;
     }
-    if (kind === "text") return skelBoxW(it);
-    if (kind === "lines") return Math.max(SKEL_LINES_W, it.tag ? skelTagW(it.tag) : 0);
-    return skelFixedWidth(it);
-  // (a note is its own width)
+    if (kind === "standin" || kind === "slot") return Math.max(kind === "slot" ? skelTagW(it.slot!) : SKEL_LINES_W, SKEL_PAD * 2);
+    if (kind === "place") return Math.max(skelTagW(it.tag!), it.text !== undefined ? skelTextW(it.text) : 0, SKEL_PAD * 2);
+    if (kind === "control" && it.fill) return it.control === "field" ? SKEL_FIELD_W : skelTextW(it.text ?? "");
+    return skelFixedWidth(it, !!row.framed);
   };
   const fixed = row.items.reduce((t, it) => t + need(it), 0);
-  const gaps = GAP_Y * Math.max(0, row.items.length - 1);
-  return fixed + gaps + (row.framed ? GAP_Y * 2 : 0);
+  return fixed + skelRowGaps(row) + (row.framed ? SKEL_GAP * 2 : 0);
 }
 /** A frame's own minimum width: its padding, its label column, and its widest row's need. */
 function skelFrameMinWidth(frame: SkeletonFrame): number {
   const labelCol = skelLabelCol(frame);
-  const head = Math.max(frame.label ? Math.ceil(frame.label.length * W_TITLE) : 0, frame.tag ? skelTagW(frame.tag) - PAD_X : 0,
-    frame.label && frame.note ? Math.ceil(frame.note.length * W_NOTE) : 0);
+  const head = Math.max(frame.label ? Math.ceil(frame.label.length * SKEL_W_TITLE) : 0, frame.tag ? skelTagW(frame.tag) - SKEL_PAD : 0,
+    frame.label && frame.note ? Math.ceil(frame.note.length * SKEL_W_NOTE) : 0);
   const rows = Math.max(0, ...(frame.rows ?? []).map(skelRowMinWidth));
-  return PAD_X * 2 + Math.max(head, (labelCol ? labelCol + GAP_Y : 0) + rows);
+  return SKEL_PAD * 2 + Math.max(head, (labelCol ? labelCol + SKEL_GAP : 0) + rows);
 }
-// THE OUTER FRAME TAKES THE GRID'S CONTENT WIDTH (05-artifacts.md § The grid), as the hand-drawn
-// skeletons did: a layout is a screen, and a screen drawn 300 wide reads as a widget.
-const SKEL_CANVAS = 1052;
-// A FLOOR RATHER THAN A ZERO, for the degenerate case every row's width is left to a `fill` or a
-// fraction: nothing would set the frame's own width, and 0 is not a figure.
-const SKEL_MIN_W = 200;
+
+/** Whether an item takes the rest of its row's width. */
+const skelFlexes = (it: SkeletonItem): boolean => {
+  const kind = skelKind(it);
+  if (kind === "spacer") return true;
+  if (kind === "frame") return it.frame!.width === undefined || WIDTH_FRACTIONS[it.frame!.width] === undefined;
+  return !!it.fill && kind !== "plain" && kind !== "note" && kind !== "icon";
+};
 
 /**
- * Each item's width within a row of `available` pixels. A text's own width, a note's own width,
- * and a frame's fraction of `available` are fixed; a `fill` text or a frame named with no fraction
- * takes an equal share of what the fixed items and the row's own gaps leave over. An item that is
- * none of `text`, `note` or `frame`, and a `width` naming no fraction the spec has, are findings —
- * the drawer still places something, rather than leaving a gap nobody can explain.
+ * Each item's width within a row of `available` pixels. An item's own width and a frame's fraction of
+ * `available` are fixed; a `fill` item, a spacer or a frame named with no fraction takes an equal share of
+ * what the fixed items and the row's own gaps leave over. An item with no shape a skeleton has, and a
+ * `width` naming no fraction the spec has, are findings — the drawer still places something, rather than
+ * leaving a gap nobody can explain.
  */
 function skelRowWidths(row: SkeletonRow, available: number, findings: string[]): number[] {
   const n = row.items.length;
@@ -1668,95 +1718,225 @@ function skelRowWidths(row: SkeletonRow, available: number, findings: string[]):
   let fixed = 0;
   row.items.forEach((it, i) => {
     const kind = skelKind(it);
-    if (kind === null) { findings.push("an item that is none of `text`, `tag`, `note`, `lines`, `spacer` or `frame`"); return; }
-    if (kind === "spacer") { flex.push(i); return; }
-    if ((kind === "text" || kind === "lines") && it.fill) { flex.push(i); return; }
-    if (kind === "text") { widths[i] = skelBoxW(it); fixed += widths[i]; return; }
-    if (kind === "lines") { widths[i] = skelFixedWidth(it); fixed += widths[i]; return; }
-    if (kind === "note") { widths[i] = skelNoteW(it.note!); fixed += widths[i]; return; }
-    const w = it.frame!.width;
-    if (w === undefined) { flex.push(i); return; }
-    const frac = WIDTH_FRACTIONS[w];
-    if (frac === undefined) {
-      findings.push(`a frame's \`width\` is \`${w}\`, and a skeleton takes one of ${Object.keys(WIDTH_FRACTIONS).join(" · ")}, or none for what is left`);
+    if (kind === null) { findings.push("an item that is none of `text`, `note`, `slot`, `icon`, `control`, `standin`, `spacer` or `frame`"); return; }
+    if (kind === "frame") {
+      const w = it.frame!.width;
+      if (w !== undefined && WIDTH_FRACTIONS[w] === undefined)
+        findings.push(`a frame's \`width\` is \`${w}\`, and a skeleton takes one of ${Object.keys(WIDTH_FRACTIONS).join(" · ")}, or none for what is left`);
+      if (w !== undefined && WIDTH_FRACTIONS[w] !== undefined) { widths[i] = Math.round(available * WIDTH_FRACTIONS[w]); fixed += widths[i]; return; }
       flex.push(i); return;
     }
-    widths[i] = Math.round(available * frac); fixed += widths[i];
+    if (skelFlexes(it)) { flex.push(i); return; }
+    widths[i] = skelFixedWidth(it, !!row.framed); fixed += widths[i];
   });
-  const gaps = GAP_Y * Math.max(0, n - 1);
-  const left = Math.max(0, available - fixed - gaps);
+  const left = Math.max(0, available - fixed - skelRowGaps(row));
   const share = flex.length ? Math.round(left / flex.length) : 0;
   for (const i of flex) widths[i] = share;
   return widths;
 }
 
+const skelRect = (cls: string, x: number, y: number, w: number, h: number) =>
+  `  <rect class="${cls}" x="${r2(x)}" y="${r2(y)}" width="${r2(w)}" height="${r2(h)}" rx="3"/>`;
+const skelPath = (cls: string, points: [number, number][][]) =>
+  `  <path class="${cls}" d="${points.map((line) => line.map(([px, py], i) => `${i ? "L" : "M"}${r2(px)} ${r2(py)}`).join(" ")).join(" ")}"/>`;
+
+/** A frame's marks. The outer frame is the drawing's own edge; a part is a surface, a border or neither, and a part with no border of its own shows the dotted boundary. */
+function skelMarks(look: string | undefined, x: number, y: number, w: number, h: number): string[] {
+  if (look === "bordered") return [skelRect("sds-skel-border", x, y, w, h)];
+  if (look === "flat") return [skelRect("sds-skel-guide", x, y, w, h)];
+  return [skelRect("sds-skel-surface", x, y, w, h), skelRect("sds-skel-guide", x, y, w, h)];
+}
+
+/**
+ * An icon is a few plain line shapes, drawn about the centre `(cx, cy)` in a box of `g` pixels. Every
+ * point is written out in absolute numbers, so no transform hides a shape from the drawing's own fit.
+ */
+function skelGlyph(name: string, cx: number, cy: number, g: number): string[] {
+  const u = g / 24, X = (v: number) => cx - g / 2 + v * u, Y = (v: number) => cy - g / 2 + v * u;
+  const line = (...pts: number[][]): [number, number][] => pts.map(([a, b]) => [X(a), Y(b)]);
+  const stroke = (...lines: [number, number][][]) => skelPath("sds-skel-glyph", lines);
+  const solid = (...lines: [number, number][][]) => skelPath("sds-skel-glyph sds-skel-glyph-solid", lines);
+  const dot = (a: number, b: number, rad: number) => `  <circle class="sds-skel-glyph sds-skel-glyph-solid" cx="${r2(X(a))}" cy="${r2(Y(b))}" r="${r2(rad * u)}"/>`;
+  switch (name) {
+    case "close": return [stroke(line([6, 6], [18, 18]), line([18, 6], [6, 18]))];
+    case "add": return [stroke(line([12, 5], [12, 19]), line([5, 12], [19, 12]))];
+    case "menu": return [stroke(line([5, 7], [19, 7]), line([5, 12], [19, 12]), line([5, 17], [19, 17]))];
+    case "search": return [`  <circle class="sds-skel-glyph" cx="${r2(X(10))}" cy="${r2(Y(10))}" r="${r2(6 * u)}"/>`, stroke(line([15, 15], [20, 20]))];
+    case "more": return [dot(5, 12, 1.6), dot(12, 12, 1.6), dot(19, 12, 1.6)];
+    case "previous": return [stroke(line([14, 5], [7, 12], [14, 19]))];
+    case "next": return [stroke(line([10, 5], [17, 12], [10, 19]))];
+    case "select": return [stroke(line([6, 9], [12, 15], [18, 9]))];
+    case "checkbox": return [stroke(line([8, 12], [11, 15], [16, 8]))];
+    case "bell": return [solid(line([12, 4], [16, 7], [17, 12], [19.5, 16], [4.5, 16], [7, 12], [8, 7], [12, 4])), dot(12, 19, 1.6)];
+    case "person": return [dot(12, 8, 4), solid(line([4, 20], [6, 15], [12, 13], [18, 15], [20, 20], [4, 20]))];
+    default: return [dot(12, 12, 2)];
+  }
+}
+
+/** One item that is a leaf (a control, an icon, a slot, plain words, a stand-in), drawn at `(ix, iy)`, `iw` wide and `ih` tall. */
+function skelDrawLeaf(it: SkeletonItem, kind: SkelKind, ix: number, iy: number, iw: number, ih: number, boxH: number, framed: boolean, findings: string[], out: string[]): void {
+  const mid = iy + ih / 2;
+  const baseline = Math.round(mid + 4);
+  const h = skelControlH(framed);
+  if (kind === "plain") { out.push(`  <text class="sds-label" x="${ix}" y="${baseline}">${esc(it.text!)}</text>`); return; }
+  if (kind === "note") { out.push(`  <text class="sds-code" x="${ix}" y="${baseline}">${esc(it.note!)}</text>`); return; }
+  if (kind === "slot") {
+    out.push(...skelMarks(undefined, ix, iy, iw, ih));
+    out.push(`  <text class="sds-note" x="${ix + SKEL_LABEL_GAP}" y="${iy + SKEL_LABEL_H + 4}">${esc(it.slot!)}</text>`);
+    return;
+  }
+  if (kind === "place") {
+    out.push(...skelMarks(undefined, ix, iy, iw, ih));
+    out.push(`  <text class="sds-note" x="${ix + SKEL_LABEL_GAP}" y="${iy + SKEL_LABEL_H + 4}">${esc(it.tag!)}</text>`);
+    if (it.text !== undefined) out.push(`  <text class="sds-code" x="${ix + SKEL_PAD}" y="${Math.round(iy + SKEL_TAG_H + (ih - SKEL_TAG_H) / 2 + 4)}">${esc(it.text)}</text>`);
+    return;
+  }
+  if (kind === "icon") {
+    if (!SKEL_ICONS.includes(it.icon!)) findings.push(`an icon is \`${it.icon}\`, and a skeleton draws ${SKEL_ICONS.join(" · ")}; \`default\` is drawn where none fits`);
+    out.push(skelRect("sds-skel-control", ix, iy, h, h));
+    out.push(...skelGlyph(it.icon!, ix + h / 2, mid, Math.round(h / 2)));
+    if (it.text !== undefined) out.push(`  <text class="sds-code" x="${ix + h + SKEL_LABEL_GAP}" y="${baseline}">${esc(it.text)}</text>`);
+    return;
+  }
+  if (kind === "control") {
+    const text = it.text ?? "";
+    if (!SKEL_CONTROLS.includes(it.control!)) findings.push(`a control is \`${it.control}\`, and a skeleton draws ${SKEL_CONTROLS.join(" · ")}`);
+    if (it.tag !== undefined) findings.push(`a control carries no tag: \`${it.tag}\` names a component, a part or a slot, and a control is told by its sample value`);
+    if (text.includes("\n")) findings.push("a control stands on one line, and its sample value runs over more");
+    const cls = "sds-skel-control" + (it.main ? " sds-skel-main" : "");
+    if (it.control === "pager") {
+      let px = ix;
+      for (const part of skelPagerParts(it)) {
+        const pw = skelPartW(part, h);
+        out.push(skelRect(cls, px, iy, pw, h));
+        if (part === "‹" || part === "›") out.push(...skelGlyph(part === "‹" ? "previous" : "next", px + pw / 2, mid, Math.round(h / 2)));
+        else out.push(`  <text class="sds-code" x="${r2(px + (pw - part.length * SKEL_W_LABEL) / 2)}" y="${baseline}">${esc(part)}</text>`);
+        px += pw + SKEL_PACK_GAP;
+      }
+      return;
+    }
+    if (it.control === "checkbox") {
+      out.push(skelRect(cls, ix, iy, h, h));
+      out.push(...skelGlyph("checkbox", ix + h / 2, mid, Math.round(h / 2)));
+      if (text) out.push(`  <text class="sds-code" x="${ix + h + SKEL_LABEL_GAP}" y="${baseline}">${esc(text)}</text>`);
+      return;
+    }
+    out.push(skelRect(cls, ix, iy, iw, h));
+    if (text) out.push(`  <text class="sds-code" x="${ix + SKEL_PAD}" y="${baseline}">${esc(text)}</text>`);
+    if (it.control === "select") out.push(...skelGlyph("select", ix + iw - SKEL_PAD - 4, mid, Math.round(h / 2)));
+    return;
+  }
+  // a stand-in: bars with no box around them
+  const count = Math.max(1, it.lines ?? 3);
+  const kindOf = it.standin ?? "rows";
+  if (!SKEL_STANDINS.includes(kindOf)) findings.push(`a stand-in is \`${kindOf}\`, and a skeleton draws ${SKEL_STANDINS.join(" · ")}`);
+  const bar = (x: number, y: number, w: number, hh: number) => skelRect("sds-skel-bar", x, y, w, hh);
+  if (kindOf === "cards") {
+    const cardW = (iw - SKEL_GAP * (count - 1)) / count;
+    for (let c = 0; c < count; c++) {
+      const cx = ix + c * (cardW + SKEL_GAP);
+      out.push(skelRect("sds-skel-control", cx, iy, cardW, SKEL_CARD_H));
+      out.push(bar(cx + SKEL_PAD, iy + SKEL_PAD, (cardW - SKEL_PAD * 2) * 0.5, SKEL_HEAD_BAR));
+      out.push(bar(cx + SKEL_PAD, iy + SKEL_PAD + SKEL_BAR_STEP + 4, cardW - SKEL_PAD * 2, SKEL_BAR));
+      out.push(bar(cx + SKEL_PAD, iy + SKEL_PAD + SKEL_BAR_STEP * 2 + 4, (cardW - SKEL_PAD * 2) * 0.7, SKEL_BAR));
+    }
+    return;
+  }
+  if (kindOf === "field") {
+    out.push(bar(ix, iy, Math.min(iw, SKEL_FIELD_W) * 0.4, SKEL_HEAD_BAR));
+    out.push(skelRect("sds-skel-control", ix, iy + SKEL_HEAD_BAR + SKEL_LABEL_GAP, iw, h));
+    return;
+  }
+  const heads = new Set(it.headings ?? []);
+  let by = iy + SKEL_PAD;
+  for (let b = 0; b < count; b++) {
+    const head = heads.has(b);
+    if (kindOf === "list") {
+      out.push(bar(ix + SKEL_PAD, by, SKEL_BAR, SKEL_BAR));
+      out.push(bar(ix + SKEL_PAD + SKEL_BAR + SKEL_LABEL_GAP, by, (iw - SKEL_PAD * 2 - SKEL_BAR - SKEL_LABEL_GAP) * (head ? 0.42 : 0.7), head ? SKEL_HEAD_BAR : SKEL_BAR));
+    } else out.push(bar(ix + SKEL_PAD, by, (iw - SKEL_PAD * 2) * (head ? 0.42 : 1), head ? SKEL_HEAD_BAR : SKEL_BAR));
+    by += SKEL_BAR_STEP;
+  }
+}
+
 /** One frame, drawn at `(x, y)`. `forcedW` is given for a frame nested in a row; the outer frame
- *  sizes itself from its own rows instead. */
-function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: number | undefined, findings: string[], out: string[], forcedH?: number): void {
+ *  sizes itself from its own rows instead. `named` counts the named boundaries that hold this one. */
+function skelDrawFrame(frame: SkeletonFrame, x: number, y: number, forcedW: number | undefined, findings: string[], out: string[], forcedH?: number, named = 0): void {
+  const root = forcedW === undefined;
+  skelOldFields(frame, findings);
+  const rows = frame.rows ?? [];
   const labelCol = skelLabelCol(frame);
   const rowContentW = forcedW !== undefined
-    ? Math.max(0, forcedW - PAD_X * 2 - (labelCol ? labelCol + GAP_Y : 0))
-    : Math.max(SKEL_MIN_W, SKEL_CANVAS - PAD_X * 2 - (labelCol ? labelCol + GAP_Y : 0), ...(frame.rows ?? []).map(skelRowMinWidth));
-  const w = forcedW !== undefined ? forcedW : PAD_X * 2 + (labelCol ? labelCol + GAP_Y : 0) + rowContentW;
+    ? Math.max(0, forcedW - SKEL_PAD * 2 - (labelCol ? labelCol + SKEL_GAP : 0))
+    : Math.max(SKEL_MIN_W, SKEL_CANVAS - SKEL_PAD * 2 - (labelCol ? labelCol + SKEL_GAP : 0), ...rows.map(skelRowMinWidth));
+  const w = forcedW !== undefined ? forcedW : SKEL_PAD * 2 + (labelCol ? labelCol + SKEL_GAP : 0) + rowContentW;
   // A FRAME IN A ROW STANDS AS TALL AS THE ROW, so a rail and the main area beside it end on one line.
-  const h = Math.max(skelFrameHeight(frame), forcedH ?? 0);
+  const natural = skelFrameHeight(frame);
+  const h = Math.max(natural, forcedH ?? 0);
 
-  out.push(`  <rect class="sds-box${skelTone(frame.tone, findings)}" x="${x}" y="${y}" width="${w}" height="${h}" rx="3"/>`);
-  const tagH = frame.tag ? SKEL_TAG_H + LABEL_GAP : 0;
-  if (frame.tag) out.push(`  <text class="sds-note" x="${x + LABEL_GAP}" y="${y + LABEL_H + 4}">${esc(frame.tag)}</text>`);
-  if (frame.label) out.push(`  <text class="sds-title" x="${x + PAD_X}" y="${y + tagH + 26}">${esc(frame.label)}</text>`);
-  if (frame.label && frame.note) out.push(`  <text class="sds-code" x="${x + PAD_X}" y="${y + tagH + 45}">${esc(frame.note)}</text>`);
+  if (frame.look !== undefined && !SKEL_LOOKS.includes(frame.look))
+    findings.push(`a frame's \`look\` is \`${frame.look}\`, and a frame takes ${SKEL_LOOKS.join(" · ")}`);
+  if (frame.look !== undefined && !frame.tag && !frame.label && !root)
+    findings.push(`a boundary with a \`look\` of \`${frame.look}\` carries no name; give the part its \`tag\``);
+  if (frame.tag && named >= SKEL_NEST_MAX)
+    findings.push(`the boundary \`${frame.tag}\` sits inside ${named} named boundaries, and a skeleton nests ${SKEL_NEST_MAX} at most; draw \`${frame.tag}\` as a skeleton of its own`);
+  if (root) out.push(skelRect("sds-box", x, y, w, h));
+  else out.push(...skelMarks(frame.look, x, y, w, h));
+  const tagH = frame.tag ? SKEL_TAG_H + SKEL_LABEL_GAP : 0;
+  if (frame.tag) out.push(`  <text class="sds-note" x="${x + SKEL_LABEL_GAP}" y="${y + SKEL_LABEL_H + 4}">${esc(frame.tag)}</text>`);
+  if (frame.label) out.push(`  <text class="sds-title" x="${x + SKEL_PAD}" y="${y + tagH + 26}">${esc(frame.label)}</text>`);
+  if (frame.label && frame.note) out.push(`  <text class="sds-code" x="${x + SKEL_PAD}" y="${y + tagH + 45}">${esc(frame.note)}</text>`);
 
-  const itemsX = x + PAD_X + (labelCol ? labelCol + GAP_Y : 0);
+  // A PART THAT TAKES THE HEIGHT LEFT: where the frame stands taller than its rows need, the rows whose
+  // one item is a `fill` frame share what is over.
+  const heights = rows.map(skelRowHeight);
+  const growers = rows.map((row, i) => (row.items.length === 1 && row.items[0].frame?.fill ? i : -1)).filter((i) => i >= 0);
+  const slack = Math.max(0, h - natural);
+  if (growers.length && slack > 0) for (const i of growers) heights[i] += slack / growers.length;
+
+  const itemsX = x + SKEL_PAD + (labelCol ? labelCol + SKEL_GAP : 0);
   let rowY = y + skelHead(frame);
-  for (const row of frame.rows ?? []) {
-    const rh = skelRowHeight(row);
-    if (row.label) out.push(`  <text class="sds-label" x="${x + PAD_X}" y="${Math.round(rowY + rh / 2 + 4)}">${esc(row.label)}</text>`);
+  rows.forEach((row, rowIndex) => {
+    const rh = heights[rowIndex];
+    if (row.label) out.push(`  <text class="sds-label" x="${x + SKEL_PAD}" y="${Math.round(rowY + rh / 2 + 4)}">${esc(row.label)}</text>`);
 
     let innerX = itemsX, innerY = rowY, innerW = rowContentW;
     if (row.framed) {
-      out.push(`  <rect class="sds-box" x="${itemsX}" y="${rowY}" width="${rowContentW}" height="${rh}" rx="3"/>`);
-      innerX = itemsX + GAP_Y; innerY = rowY + GAP_Y; innerW = rowContentW - GAP_Y * 2;
+      out.push(...skelMarks(undefined, itemsX, rowY, rowContentW, rh));
+      innerX = itemsX + SKEL_GAP; innerY = rowY + SKEL_GAP; innerW = rowContentW - SKEL_GAP * 2;
     }
 
     const widths = skelRowWidths(row, innerW, findings);
-    const slotH = row.framed ? SKEL_ITEM_H : SKEL_ROW_H;
-    // EVERY BOX IN A ROW STANDS AS TALL AS THE ROW, so a tagged place beside a plain one lines up at
+    // EVERY BOX IN A ROW STANDS AS TALL AS THE ROW, so a named place beside a plain one lines up at
     // both edges, as the regions of a layout do.
-    const boxH = row.framed ? rh - GAP_Y * 2 : rh;
+    const boxH = row.framed ? rh - SKEL_GAP * 2 : rh;
+    const centres: number[] = [];
     let ix = innerX;
     row.items.forEach((it, i) => {
       const iw = widths[i];
       const kind = skelKind(it);
-      if (kind === "text" || kind === "lines") {
-        // A PLACE STRETCHES, A CONTROL DOES NOT: a tagged or bar-holding region fills the row, and a plain
-        // box (a button, a chip) keeps its own slot, as it would on the screen.
-        const place = !!it.tag || kind === "lines" || it.height !== undefined;
-        const ih = place ? boxH : skelItemHeight(it, !!row.framed);
-        out.push(`  <rect class="${skelClass(it, findings)}" x="${ix}" y="${innerY}" width="${iw}" height="${ih}" rx="3"/>`);
-        const tagH = it.tag ? SKEL_TAG_H : 0;
-        if (it.tag) out.push(`  <text class="sds-note" x="${ix + LABEL_GAP}" y="${innerY + LABEL_H + 4}">${esc(it.tag)}</text>`);
-        if (kind === "text" && it.text !== undefined)
-          out.push(`  <text class="sds-code" x="${ix + PAD_X}" y="${Math.round(innerY + tagH + (ih - tagH) / 2 + 4)}">${esc(it.text)}</text>`);
-        if (kind === "lines") {
-          const heads = new Set(it.headings ?? []);
-          let by = innerY + (it.tag ? SKEL_TAG_H + LABEL_GAP : PAD_X);
-          for (let b = 0; b < Math.max(1, it.lines!); b++) {
-            const bh = heads.has(b) ? SKEL_HEAD_BAR : SKEL_BAR;
-            const bw = Math.round((iw - PAD_X * 2) * (heads.has(b) ? 0.42 : 1));
-            out.push(`  <rect class="sds-box${it.tone ? skelTone(it.tone, []) : " sds-tone-grey"}" x="${ix + PAD_X}" y="${by}" width="${bw}" height="${bh}" rx="3"/>`);
-            by += SKEL_BAR_STEP;
-          }
-        }
-      } else if (kind === "note") {
-        out.push(`  <text class="sds-code" x="${ix}" y="${Math.round(innerY + slotH / 2 + 4)}">${esc(it.note!)}</text>`);
-      } else if (kind === "frame") {
-        skelDrawFrame(it.frame!, ix, innerY, iw, findings, out, boxH);
+      skelOldFields(it, findings);
+      if (kind === "slot") {
+        const stray = ["text", "note", "lines", "standin", "control", "icon", "frame"].filter((k) => (it as Record<string, unknown>)[k] !== undefined);
+        if (stray.length) findings.push(`a slot holds nothing: \`${it.slot}\` carries ${stray.map((k) => `\`${k}\``).join(", ")}, and a slot is one block whose only content is its name`);
       }
-      ix += iw + GAP_Y;
+      if (kind === "frame") skelDrawFrame(it.frame!, ix, innerY, iw, findings, out, boxH, named + (frame.tag ? 1 : 0));
+      else if (kind !== null && kind !== "spacer") {
+        // A PLACE AND A STAND-IN STRETCH, A CONTROL DOES NOT: a named region fills its row, and a
+        // control keeps the height of its component, centred on the row's one centre line.
+        const stretches = kind === "slot" || kind === "place" || (it.height !== undefined && kind === "standin");
+        const own = stretches ? boxH : skelItemHeight(it, !!row.framed);
+        const top = kind === "standin" || stretches ? innerY : innerY + (boxH - Math.min(own, boxH)) / 2;
+        const drawnH = kind === "standin" ? Math.min(own, boxH) : own;
+        if (kind !== "standin") centres.push(top + (kind === "control" || kind === "icon" ? skelControlH(!!row.framed) : own) / 2);
+        skelDrawLeaf(it, kind, ix, top, iw, kind === "control" || kind === "icon" ? skelControlH(!!row.framed) : drawnH, boxH, !!row.framed, findings, out);
+      }
+      ix += iw + skelGapAfter(row, i);
     });
-    rowY += rh + GAP_Y;
-  }
+    if (centres.length > 1 && Math.max(...centres) - Math.min(...centres) > 0.5)
+      findings.push("the items of one row do not share one centre line");
+    rowY += rh + SKEL_GAP;
+  });
 }
 
 /** A `skeleton` with no `frame` draws nothing — it is one outer frame, and there is no other claim
@@ -1766,7 +1946,7 @@ function drawSkeleton(spec: Spec): { svg: string; findings: string[] } {
   const findings: string[] = [];
   const out: string[] = [];
   skelDrawFrame(spec.frame, 24, 24, undefined, findings, out);
-  return { svg: svgOf(out, spec.title ?? spec.caption ?? "skeleton"), findings };
+  return { svg: svgOf(out, spec.title ?? spec.caption ?? "skeleton", "sds-skeleton"), findings };
 }
 
 const DRAWERS: Record<string, (s: Spec) => { svg: string; findings: string[] }> = {

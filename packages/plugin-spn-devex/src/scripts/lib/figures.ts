@@ -10,8 +10,9 @@
 // matter of taste. Ported from this workstream's `notes/figcheck.py`, the reference that passes on all
 // seven pages — and checked against it rather than trusted.
 //
-// A SKELETON NEEDS NO RULE OF ITS OWN HERE: it draws no connector, so every rule above reads it as
-// an ordinary set of boxes and labels, and the look it must never borrow is the drawer's promise.
+// A SKELETON IS NOT READ HERE. Its check is the skeleton's own, made while it is drawn (`draw.ts`): the
+// centre of each item of a row, a control on one line, a slot that holds nothing, and how deep names nest.
+// The rules for boxes, labels and arrows are not applied to it, and no other kind changes.
 
 /** The measure, at the drawn scale: pixels per character, by text class. */
 const PX: Record<string, number> = { "sds-title": 7.6, "sds-label": 7.0, "sds-code": 6.6, "sds-note": 6.4 };
@@ -166,6 +167,7 @@ export function checkFigures(src: string): FigureFinding[] {
   const svgs = [...src.matchAll(/<svg[\s\S]*?<\/svg>/g)].map((m) => m[0]);
 
   svgs.forEach((svg, n) => {
+    if (/class="sds-drawing[^"]*\bsds-skeleton\b/.test(svg)) return;
     // A viewBox may carry an origin, so a figure can hug its own content and render edge to edge
     // rather than paying an inner margin the section already provides (05-artifacts.md § A figure runs
     // edge to edge). The edge test measures against the box's real bounds, not against 0,0.

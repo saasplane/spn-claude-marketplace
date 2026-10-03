@@ -138,12 +138,12 @@ console.log("\n=== `draw` prints the drawing of a spec a hand-written page holds
   one("a `.md` file's own ```dg``` blocks are drawn in order, one `<figure>` each",
     (md.out.match(/<figure>/g) ?? []).length === 2 && md.code === 0);
 
-  const badSpec = { kind: "skeleton", frame: { rows: [{ items: [{ warn: true }] }] } };
+  const badSpec = { kind: "skeleton", frame: { rows: [{ items: [{}] }] } };
   const badFile = join(BASE, "skel-bad.json");
   writeFileSync(badFile, JSON.stringify(badSpec));
   const bad = run(["draw", badFile]);
   one("known-bad: an item that is none of the shapes a skeleton has is a finding",
-    bad.out.includes("none of `text`, `tag`, `note`, `lines`, `spacer` or `frame`") && bad.code === 1);
+    bad.out.includes("none of `text`, `note`, `slot`, `icon`, `control`, `standin`, `spacer` or `frame`") && bad.code === 1);
 
   const noPath2 = run(["draw"]);
   one("`draw` with no path says a path is owed, and exits 2",

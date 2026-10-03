@@ -233,7 +233,7 @@ const lacks = (s) => (got) => !String(got).includes(s);
         (g) => /<ul>\s*<li>a bullet after it<\/li>/.test(g));
     delete process.env.SPN_TEMPLATES;
   }
-console.log("\n=== the rail names the page, and the way back names where it goes (Q238, Q239)");
+console.log("\n=== the rail names the page, and the way back opens the overview that names the construct (Q238, Q239)");
 {
   const templates = bookTemplatesDir(resolve(PLUGIN, "..", "..", "..", "spn-foundation"));
   process.env.SPN_TEMPLATES = templates;
@@ -241,49 +241,64 @@ console.log("\n=== the rail names the page, and the way back names where it goes
     { id, variant: "construct", parentId: "core", title, lenses: ["ARCHITECT"],
       status: "PLANNING", dependsOn: [] },
     "## Boundary\n\nx\n", "`For: Architect` · `Status: 🔮 PLANNING`");
+  const overview = (id, title, body) =>
+    `<!-- spn:doc\n{"id":"${id}","variant":"overview","title":"${title}","lenses":["ARCHITECT"],"summary":"s"}\n-->\n${body}\n`;
+  const read = (name) => `<p><a class="sds-more" href="constructs/${name}-construct.html">Read ${name} &rarr;</a></p>`;
 
-  // A DOMAIN AND ITS OVERVIEW JOIN ON THEIR TITLE AND NOTHING ELSE. A domain's folder may hold two
-  // overviews, so no path can be computed. Here the face and one overview both say `Core`, that file
-  // is named for neither, and a second overview of the folder comes first by its name.
+  // A DOMAIN MAY HOLD SEVERAL OVERVIEWS, and the one whose own links name the construct is its way
+  // back. Three overviews sit in one domain, the first by path names nothing, and each construct goes
+  // to the one that links forward to it. The README title joins none of them.
   const ws = repo({
     "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n",
     [`docs/${SEAT.constructs}/README.md`]: doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
     [`docs/${SEAT.constructs}/01-core/README.md`]: doc({ id: "core", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
     [`docs/${SEAT.constructs}/01-core/thing.md`]: seat("thing", "The Thing Itself"),
-    [`${POCKET_DOCS}/01-core/anything-at-all-overview.html`]:
-      '<!-- spn:doc\n{"id":"ov","variant":"overview","title":"Core","lenses":["ARCHITECT"],"summary":"s"}\n-->\n<h1>x</h1>\n',
-    [`${POCKET_DOCS}/01-core/a-reading-path-overview.html`]:
-      '<!-- spn:doc\n{"id":"path","variant":"overview","title":"A Reading Path","lenses":["ARCHITECT"],"summary":"s"}\n-->\n<h1>x</h1>\n',
+    [`docs/${SEAT.constructs}/01-core/other.md`]: seat("other", "The Other"),
+    [`docs/${SEAT.constructs}/01-core/stray.md`]: seat("stray", "The Stray"),
+    [`${POCKET_DOCS}/concept-overview.html`]: overview("hub", "Hub", "<h1>x</h1>"),
+    [`${POCKET_DOCS}/01-core/a-first-overview.html`]: overview("first", "First Overview", read("other")),
+    [`${POCKET_DOCS}/01-core/b-second-overview.html`]: overview("second", "Second Overview", read("thing")),
+    [`${POCKET_DOCS}/01-core/c-third-overview.html`]: overview("third", "Third Overview", "<h1>x</h1>"),
   });
-  run(ws, ["page", "write", `docs/${SEAT.constructs}/01-core/thing.md`]);
+  for (const name of ["thing", "other", "stray"]) run(ws, ["page", "write", `docs/${SEAT.constructs}/01-core/${name}.md`]);
   const page = readAt(ws, pageOf("01-core", "thing"));
 
   one("the rail carries the page's own name, not the word Outline",
     page, has('<div class="sds-rail-title">The Thing Itself</div>'));
   one("and never the word it replaced", page, lacks('<div class="sds-rail-title">Outline</div>'));
-  one("[MKT.SCRIPTS.110] the way back reaches the domain's overview, found by its title alone, in the folder above the constructs folder",
-    page, has(`class="sds-home" href="../anything-at-all-overview.html"`));
-  one("and it names the domain rather than a category", page, has("&larr; Core"));
+  one("[MKT.SCRIPTS.110] the way back opens the overview whose own links name the construct, a page and never a markdown file",
+    page, has(`class="sds-home" href="../b-second-overview.html">&larr; Second Overview`));
+  one("[MKT.SCRIPTS.110] another construct of the domain goes to the overview that names it, not to the first",
+    readAt(ws, pageOf("01-core", "other")), has(`class="sds-home" href="../a-first-overview.html">&larr; First Overview`));
+  one("[MKT.SCRIPTS.110] a construct no overview names goes to the domain's first overview",
+    readAt(ws, pageOf("01-core", "stray")), has(`class="sds-home" href="../a-first-overview.html"`));
   one("so the old category label is gone", page, lacks("&larr; the model"));
+  one("and the audit finds no rail finding on any of the three",
+    run(ws, ["audit", "check", POCKET_DOCS, "--finding", "rail"]), (g) => /clean/.test(g));
 }
 
 {
-  // NO OVERVIEW, NO GUESS. Nine domains have no overview today, and a link that names a page which
-  // is not there is worse than the category label it replaced.
+  // NO OVERVIEW IN THE DOMAIN: the repository's hub. With no hub either, no guess is written.
   const templates = bookTemplatesDir(resolve(PLUGIN, "..", "..", "..", "spn-foundation"));
   process.env.SPN_TEMPLATES = templates;
-  const ws = repo({
+  const files = {
     [`docs/${SEAT.constructs}/README.md`]: doc({ id: "d", title: "Constructs", lenses: ["ARCHITECT"], status: "PLANNING" }),
     [`docs/${SEAT.constructs}/01-core/README.md`]: doc({ id: "core", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
     [`docs/${SEAT.constructs}/01-core/thing.md`]: doc(
       { id: "thing", variant: "construct", parentId: "core", title: "Thing", lenses: ["ARCHITECT"],
         status: "PLANNING", dependsOn: [] },
       "## Boundary\n\nx\n", "`For: Architect` · `Status: 🔮 PLANNING`"),
-  });
-  run(ws, ["page", "write", `docs/${SEAT.constructs}/01-core/thing.md`]);
-  const page = readAt(ws, pageOf("01-core", "thing"));
-  one("with no overview above it the constructs face stands, rather than a link to nothing",
-    page, has("&larr; the model"));
+  };
+  const withHub = repo({ ...files,
+    [`${POCKET_DOCS}/concept-overview.html`]:
+      '<!-- spn:doc\n{"id":"hub","variant":"overview","title":"The Hub","lenses":["ARCHITECT"],"summary":"s"}\n-->\n<h1>x</h1>\n' });
+  run(withHub, ["page", "write", `docs/${SEAT.constructs}/01-core/thing.md`]);
+  one("[MKT.SCRIPTS.110] a domain with no overview goes back to the hub page",
+    readAt(withHub, pageOf("01-core", "thing")), has(`class="sds-home" href="../../concept-overview.html">&larr; The Hub`));
+  const bare = repo(files);
+  run(bare, ["page", "write", `docs/${SEAT.constructs}/01-core/thing.md`]);
+  one("with no overview and no hub the constructs face stands, rather than a link to nothing",
+    readAt(bare, pageOf("01-core", "thing")), has("&larr; the model"));
 }
 
 // ---------------------------------------------------------------- the grammar: an action, and the seat files it names

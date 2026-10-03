@@ -53,6 +53,7 @@ import { workspaceRoot } from "../lib/payload.ts";
 import { DEVEX, isApproachPage, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { cacheState, welcome } from "./orientation.ts";
 import { begin, span, end, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
+import { recordUsage } from "../lib/usage.ts";
 
 type Warning = { check: string; message: string };
 
@@ -1465,8 +1466,11 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   let event: { session_id?: string; transcript_path?: string; stop_hook_active?: boolean; agent_id?: string; cwd?: string } = {};
   try { event = JSON.parse(input || "{}") ?? {}; } catch { event = {}; }
   const session = String(event.session_id ?? "");
-  begin({ script: "spn-devex", event: "Stop", tool: null, session: event.session_id ?? null, ...tagsOf(event),
-          process: { group: "events", action: "stop" } }, root);
+  const facts = { script: "spn-devex", event: "Stop", tool: null, session: event.session_id ?? null, ...tagsOf(event),
+                  process: { group: "events", action: "stop" } };
+  begin(facts, root);
+  // WHAT THE TURNS COST, written beside the timing log while recording is on, for `plugin cost show`.
+  recordUsage(root, facts, event.transcript_path);
   // THIS SESSION'S OWN BASELINE, and what its own tool calls wrote since it. The transcript is read
   // from where the last Stop left off, so a long session pays for its newest turn and not its whole
   // history. A first Stop reads nothing: there is no baseline to judge the writes against.

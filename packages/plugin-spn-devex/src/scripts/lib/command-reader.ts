@@ -66,7 +66,7 @@ export const PLUGIN_SUBJECTS: Record<string, Record<string, string[]>> = {
   "spn-devex": {
     behaviours: ["coverage", "ids", "stamp"],
     docs: ["audit", "coherence", "cycles", "face", "figure", "guide", "index", "page", "parity", "prose", "sds", "status", "topics"],
-    plugin: ["partner", "paths", "timings"],
+    plugin: ["cost", "partner", "paths", "timings"],
     report: ["refresh"],
     restates: ["decisions", "docs", "files"],
     workspace: ["tokens"],
