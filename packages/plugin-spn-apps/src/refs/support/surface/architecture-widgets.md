@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/07-architecture-widgets.md",
-      "seen": "0c79dc53"
+      "seen": "620a6471"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/07-architecture-widgets/",
-      "seen": "337021c8"
+      "seen": "0abb52c7"
     }
   ]
 }
@@ -33,7 +33,7 @@ A widget is built for one purpose. It is not a set of components a page composes
 
 ## DSWDataTable — 🔮
 
-Shows many records as one block: a bar (search, an arbitrary node such as a `DSWFilterBar`, and the widget's own actions, in that order), its records (one shape for the whole widget: table, list or grid of cards), and a footer (the count of what is shown, and the pagination).
+Shows many records as one block: a bar (the bulk select and the bulk actions, present only when the table has bulk actions; then `headerNode`, a place that takes any node the page gives it, such as a search or a filter bar; then the sort; then the layout switch), its records (one shape for the whole widget: table, list or grid of cards), and a footer (the count of what is shown, and the pagination).
 
 | Task state | What it shows |
 | --- | --- |
@@ -45,6 +45,7 @@ Shows many records as one block: a bar (search, an arbitrary node such as a `DSW
 | Failed | the read failed; it says so, and offers a retry |
 | Denied | a record, column or action the person may not see or use is left out: hidden or disabled, never drawn and then blocked |
 
+- The bar holds no search and no filter bar of its own. A search or a filter bar is the page's, and goes into `headerNode`.
 - A read that fails **MUST** offer a retry.
 - The two empty messages **MUST** differ.
 - `DSWDataTable` **MUST** take one size, from its own prop or the block above it, and **MUST** pass it to its bar, its records and its pager.

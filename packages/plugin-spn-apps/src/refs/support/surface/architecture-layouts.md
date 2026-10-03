@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/09-architecture-layouts.md",
-      "seen": "79033c10"
+      "seen": "ad6bec59"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",

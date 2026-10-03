@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/",
-      "seen": "3cabf088"
+      "seen": "477256d8"
     }
   ]
 }
@@ -112,7 +112,7 @@ The six task states are idle, working, done, failed, empty and denied.
 
 Take each block from the list its pattern names. Write it by its name in the book, with each prop that differs from its default.
 
-- **`variant`, `color` and `size` each mean one thing on every block.** `variant` is the surface treatment, `color` is the hue and `size` is the density step, read smallest to largest, `XS` to `XL`, with `SM` the default a theme sets. Every value comes from the vocabulary of its prop.
+- **`variant`, `color` and `size` each mean one thing on every block.** `variant` is the surface treatment, `color` is the hue and `size` is the density step, read smallest to largest, `XS` to `XL`, with `SM` the default a theme sets. Every value comes from the vocabulary of its prop. `CUSTOM` is a value of `color` that means the caller owns the colour: a page sets a colour outside the theme only through it, as `customColor` on a block that takes it.
 - **Leave `size` unset**, unless one block must differ. A block takes the size that the container, the widget or the `DSScope` above it passes on, and then the app's.
 - **Write only props the book names.** Hover, focus and pressed are shown states. The platform produces them, and the tree never sets them.
 - **A block drawn from data is a host and its items.** Write the host, and then one item for each entry you want shown. One item serves every host that takes one data shape — the three menus take one shape and share `DSMenuNode`. A host whose data differs declares its own item.
