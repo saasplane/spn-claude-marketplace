@@ -15,6 +15,8 @@
 | **Model** | {{Opus 5 · Sonnet 5}} |
 | **Read first** | Only these parts: `spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md` § An order is one delegated execution, and every order follows the same rules · `{{absolute path}}/orders/00-facts.md` § {{the checkout and the gates this order uses}} · `{{absolute path}}/plan.md` § Traps, § Commands, § Rows {{k}} · the arc's Log, {{the entries this order needs, by date}} |
 
+**Launch no agent.** **Read only:** the parts named in *Read first*, above, and the file you change. **Hand back** at most 15 lines; write the rest to `{{nn}}-{{subject}}-report.md` beside this order.
+
 ## What already exists
 
 {{The mechanism this order changes or sits beside, and its twin elsewhere. Name the part of each file to read: its

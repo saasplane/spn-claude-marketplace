@@ -38,7 +38,7 @@
 </section>
 
 <section id="s2" data-block="sequence">
-  <div class="sds-section-head"><h2>{{A section: one part of what is previewed}}</h2></div>
+  <div class="sds-section-head"><h2>Why &mdash; {{the problem in one line}}</h2></div>
   <p>{{The section&rsquo;s own overview, in one or two sentences. Then its subsections, each with the block that fits.}}</p>
 
   <h3 id="s2a">{{A subsection shown as a diagram}}</h3>
@@ -67,7 +67,7 @@
 </section>
 
 <section id="s3" data-block="comparison">
-  <div class="sds-section-head"><h2>{{Another section}}</h2></div>
+  <div class="sds-section-head"><h2>What &mdash; {{the decision in one line}}</h2></div>
   <p>{{The section&rsquo;s own overview.}}</p>
 
   <h3 id="s3a">{{A subsection shown as a table}}</h3>
@@ -84,6 +84,15 @@
     <div class="sds-caption">{{samples/the-sample-file.html}}</div>
     <iframe src="../samples/{{the-sample-file.html}}" title="{{what the sample is}}"></iframe>
   </div>
+</section>
+
+<section id="s4" data-block="sequence">
+  <div class="sds-section-head"><h2>How &mdash; {{what changes in each repository, in one line}}</h2></div>
+  <p>{{Which repositories change, in the order the work runs.}}</p>
+  <h3 id="s4a">{{repository}} &mdash; {{the kind of change}}</h3>
+  <p><code>{{path of the file that changes}}</code></p>
+  <pre data-lang="diff"><span class="sds-tk-del">- what the file says today</span>
+<span class="sds-tk-add">+ what it will say</span></pre>
 </section>
 
 </div>
