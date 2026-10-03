@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/02-support/",
-      "seen": "ef7faef6"
+      "seen": "ba0b3f44"
     }
   ]
 }
@@ -119,7 +119,7 @@ If you find a design system reaching into application state — a store, a route
 
 The web family states its two groups, the `ui/` taxonomy, the web app framework, and one standard that belongs to neither group alone. That standard is client-side authorization: treat permission-gated rendering as presentation only. Hiding a control is courtesy, and the refusal is always the server's. The framework supplies the session seam that rule depends on, so a module never reads or stores a credential itself.
 
-**The depth of the design-system group is not in the web family.** What a person sees and touches is one standard for every kind of surface, and the Surface topic states it. That topic holds the design system and the accessibility baseline, with what only a browser needs beside them. Read the `surface.md` ref in this plugin for theming, formatting, translation, navigation, media, overlays, the capability set, the names of the blocks, and the accessibility rules.
+**The depth of the design-system group is not in the web family.** What a person sees and touches is one standard for every kind of surface, and the Surface domain states it. That domain holds the design system and the accessibility baseline, with what only a browser needs beside them. Read `refs/support/surface/architecture-app.md` in this plugin for theming, formatting, translation, navigation, media and overlays; `architecture-components.md` for the capability set and the names of the blocks; and `standards-core.md` for the accessibility rules.
 
 ## The `ui/` taxonomy every web consumer inherits
 
@@ -135,7 +135,7 @@ Apply this same taxonomy whether you are filing a support package's own tree or 
 | `containers/` | blocks that frame a part of a page as a header, content and a footer | units that ship containers (the design system) |
 | `layouts/` | blocks that frame a page, with its navigation and its main area | units that ship layouts (the design system) |
 
-A layout frames a page, and a container frames a part of one. Give a container its look from the theme and from its own props, never from a style the caller writes, and never put a container inside a container. Let a layout own the navigation and the main area of a page, and nothing inside that area. Never import a router into a layout: it moves between pages through the navigation seam. This taxonomy says where the two live. The `surface.md` ref states the blocks themselves.
+A layout frames a page, and a container frames a part of one. Give a container its look from the theme and from its own props, never from a style the caller writes, and never put a container inside a container. Let a layout own the navigation and the main area of a page, and nothing inside that area. Never import a router into a layout: it moves between pages through the navigation seam. This taxonomy says where the two live. The `refs/support/surface/architecture-containers.md` and `architecture-layouts.md` refs state the blocks themselves.
 
 Export through exactly one barrel at a package's root; never give a subfolder its own barrel index. If a util in one of these folders turns out domain-free and broadly useful, promote it to core utilities rather than copying it between units.
 
@@ -150,7 +150,7 @@ Export through exactly one barrel at a package's root; never give a subfolder it
 
 ## Boundary
 
-Use this ref for what makes a package support, what it may depend on, and what it must never reach for. Reach for the shape ref (`shape.md` in this plugin) first when the question is where a file goes — it owns what folders a support package's `src/` interior takes, and what the privacy marker does inside them. Reach for the `surface.md` ref when the question is what a page is built from, what a block is named, or how the design system gives an app its look. Reach for the application lifecycle standard when the question is how a selection value is named, where it is read, and what boot does with it. Reach for the backing-resources standard when the question is what a resource costs once it holds state a mistake can lose.
+Use this ref for what makes a package support, what it may depend on, and what it must never reach for. Reach for the shape ref (`shape.md` in this plugin) first when the question is where a file goes — it owns what folders a support package's `src/` interior takes, and what the privacy marker does inside them. Reach for the `refs/support/surface/` refs (`standards-core.md` through `providers.md`) when the question is what a page is built from, what a block is named, or how the design system gives an app its look. Reach for the application lifecycle standard when the question is how a selection value is named, where it is read, and what boot does with it. Reach for the backing-resources standard when the question is what a resource costs once it holds state a mistake can lose.
 
 ## Proof
 

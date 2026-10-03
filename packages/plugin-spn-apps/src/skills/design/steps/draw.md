@@ -2,16 +2,20 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/01-common/08-design-library.md",
-      "seen": "63618de1"
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
+      "seen": "4bfad2f8"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/01-common/06-names.md",
-      "seen": "feabdd12"
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
+      "seen": "1f7b95d1"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/01-common/07-layout-container.md",
-      "seen": "93aed038"
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
+      "seen": "c816ab8f"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
+      "seen": "7d4d7421"
     }
   ]
 }

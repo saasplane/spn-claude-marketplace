@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/README.md",
-      "seen": "dc840286"
+      "seen": "8691e676"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/02-scm.md",
@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/01-function/07-deliver.md",
-      "seen": "d39a86c8"
+      "seen": "27ca0b30"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/02-delivery.md",

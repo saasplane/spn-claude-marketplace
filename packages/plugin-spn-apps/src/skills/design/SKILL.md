@@ -10,8 +10,8 @@
       "seen": "9bcedab1"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/01-common/",
-      "seen": "cbfe3b56"
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/",
+      "seen": "a1356186"
     }
   ]
 }
@@ -25,7 +25,7 @@ description: Design a page of a SaaS Plane app from the blocks of the design sys
 
 **Read `refs/devex/workspace/workstream.md` (spn-devex) before acting.** It holds the loop this skill runs inside: how a prompt is read, where a new ask goes, what a prompt does to a running arc, and how a reply closes.
 
-**Then read `refs/support/apps/surface.md`, in this plugin.** It holds the levels of a page, the names, the container, the layout and the theme. This skill holds the order of the decisions, the patterns, and the form of the result.
+**Then read `refs/support/surface/standards-core.md`, `architecture-names.md`, `architecture-containers.md`, `architecture-layouts.md` and `architecture-app.md`, in this plugin.** They hold the levels of a page, the names, the container, the layout and the theme. This skill holds the order of the decisions, the patterns, and the form of the result.
 
 Take the scope from the argument: one page, or a flow of pages. A flow is several pages, and each page gets a tree of its own.
 

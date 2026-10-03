@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/08-web.md",
-      "seen": "06459d96"
+      "seen": "14890d49"
     }
   ]
 }
@@ -18,19 +18,11 @@
 
 **No file under `_shadcn/` is edited by hand.** The shadcn CLI emits or copies every file there: the primitives, and the hooks and helpers beside them. The rule covers the whole folder. Make the change a component needs in its `DS*` wrapper. Run the CLI again to refresh a file. Re-point the tokens to change a look, because an edited primitive loses the edit at the next regeneration.
 
-**Three prop names are shared, and each one means one thing.** `variant` is the surface treatment, `color` is the hue, and `size` is the density step. A component takes `variant` and `color` independently, and never folds the two into one prop. The Surface ref, [`../../surface.md`](../../surface.md), states the three names with their values.
+**Three prop names are shared, and each one means one thing.** `variant` is the surface treatment, `color` is the hue, and `size` is the density step. A component takes `variant` and `color` independently, and never folds the two into one prop. The Surface ref, [`../../../surface/architecture-names.md`](../../../surface/architecture-names.md), states the three names with their values.
 
 **A name is the book's, and TypeScript adds only its form.** The Surface construct states the name of a component, of a prop and of a closed value. This stack adds the form and nothing else: `DS` + PascalCase for a component, `I` + that name + `Props` for its props, a `Type` suffix for an enum, and `DS_` + UPPER_SNAKE for a constant map. A prop the book renames takes the book's name.
 
-**A hook names its context.** A hook of the design system reads as `useDS` + the context + the value, such as `useDSScopeSize`, `useDSAppAuthz`, `useDSAppTestData` and `useDSOverlayConfirm`. Each context has one hook that returns it whole: `useDSContext`, `useDSAppContext`, `useDSScopeContext` and `useDSOverlayContext`. `useDSScopeIsFramed` returns whether the block sits in a `flush` part, with the block's own `bordered` winning. The Surface ref states the rule.
-
-**`DSScope` sets the size or the frame setting for what it holds.** A page writes `<DSScope size={…}>` around a region. A part of a container with `flush` draws no inset, and it wraps what it holds in `DSScope framed`. A part without `flush` draws its inset when it is in the frame, and it sets no frame setting. Each block that reacts wraps what it holds in `DSScope framed={false}`, so the setting stops there. A block that takes `bordered` reads `useDSScopeIsFramed(props.bordered)`. A card, and each overlay that holds blocks, wrap what they hold in `DSScope framed={false}`: the frame setting stops, and the size above passes through. An unset `framed` passes the setting on. A block that only holds content sets no scope. `DSScope` and `DSContainer` ship in `support-web-ds-ts` 2.0.0.
-
-**The default size is a field of the theme.** `size` is required on the theme. A component rendered without `size` takes the size of the nearest block above it that sets one, and then the theme's `size`. Resolve it through `useDSScopeSize`, never through a destructure default. Realized in `support-web-ds-ts` 2.0.0.
-
-**A component reads the roles and the scale, and nothing below them.** It never reads a ramp, the seed or a number of its own. The scale holds the height, the padding, the gap between blocks, the gap between the parts of a control, the radius and the icon size of each size step, and a component reads it through the size maps. The scale ships as tokens in `support-web-ds-ts` 2.0.0.
-
-**The design system's own boot is not the application's boot.** They are two different acts, and confusing them puts application state inside a library.
+**A hook names its context.** A hook of the design system reads as `useDS` + the context + the value, such as `useDSScopeSize` and `useDSOverlayConfirm`. [`../../../surface/architecture-names.md`](../../../surface/architecture-names.md) states the rule. The two contexts realized — the app context, the design-system context, `DSScope`, the default size and the tokens a component may consume — are [`../../../surface/providers.md`](../../../surface/providers.md)'s, which this package's own interior realizes.
 
 **Every web app declares the same scripts, and a separate preview script is not among them** — it was the start script under another name and is retired. **The test bundle is a flavour of the build, never a second script.**
 

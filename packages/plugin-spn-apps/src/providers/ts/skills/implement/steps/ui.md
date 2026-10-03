@@ -26,7 +26,7 @@ App-local modules (a feature owned by one app) live under `apps/<app>/src/module
 
 ## The two contexts — read them, never re-derive them
 
-The surface has exactly two contexts and they point opposite ways (foundation book, `docs/04-capabilities/02-support/01-apps/11-surface/01-common/05-design-system.md`). The restatement is `refs/support/apps/surface.md`, in this plugin. Read it for the levels of a page, the names, the container and the theme.
+The surface has exactly two contexts and they point opposite ways (foundation book, `docs/04-capabilities/02-support/03-surface/10-architecture-app/01-common/01-contexts.md`). The restatement is `refs/support/surface/architecture-app.md`, in this plugin; read `standards-core.md` for the levels of a page, `architecture-names.md` for the names, and `architecture-containers.md` for the container.
 
 - **App context** — session, permission codes, the reader's locale facts (language, country, timezone, currency, date/number/time formats), the `translate` implementation, and the unauthenticated policy. Read it with the DS app-context hook; the app supplies it.
 - **DS context** — live theme and its setter, device, `navigate`, and image transformation with placeholder/error. Read it with the DS context hook; `DSApp` supplies it.

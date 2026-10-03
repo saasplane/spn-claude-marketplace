@@ -2,60 +2,60 @@
 {
   "docs": [
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/01-common/",
-      "seen": "cbfe3b56"
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/",
+      "seen": "a1356186"
     }
   ],
   "decisions": [
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.142",
-      "seen": "f4bb678e"
+      "seen": "5b93ce37"
     },
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.146",
-      "seen": "4eaaf6bc"
+      "seen": "efe578e5"
     },
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.147",
-      "seen": "4acc6739"
+      "seen": "212f80d7"
     },
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.149",
-      "seen": "9c8bd21b"
+      "seen": "74b31faa"
     },
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.150",
-      "seen": "661b9748"
+      "seen": "07930387"
     },
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.151",
-      "seen": "4fb48b4e"
+      "seen": "9bd75a71"
     },
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.158",
-      "seen": "2e9c0cdd"
+      "seen": "149cf477"
     },
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.160",
-      "seen": "c689b04f"
+      "seen": "a09dba38"
     },
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.161",
-      "seen": "af73eec0"
+      "seen": "2d53664f"
     },
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.163",
-      "seen": "ab56efe9"
+      "seen": "5a5d9267"
     }
   ]
 }
@@ -63,7 +63,7 @@
 
 # Lens — `UX` (UX designer)
 
-**Source of truth:** the foundation book's Surface topic (`02-support/01-apps/11-surface/01-common`): its standards, accessibility, interaction, patterns, design system, names, layout and container, and design library chapters. It also restates decisions `RD.SUPPORT.APPS.142`, `RD.SUPPORT.APPS.146`, `RD.SUPPORT.APPS.147`, `RD.SUPPORT.APPS.149`, `RD.SUPPORT.APPS.150`, `RD.SUPPORT.APPS.151`, `RD.SUPPORT.APPS.158`, `RD.SUPPORT.APPS.160`, `RD.SUPPORT.APPS.161` and `RD.SUPPORT.APPS.163`. This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
+**Source of truth:** the foundation book's Surface domain (`02-support/03-surface`): its standards, accessibility, interaction, patterns, design system, names, layout and container, and design library constructs. It also restates decisions `RD.SUPPORT.APPS.142`, `RD.SUPPORT.APPS.146`, `RD.SUPPORT.APPS.147`, `RD.SUPPORT.APPS.149`, `RD.SUPPORT.APPS.150`, `RD.SUPPORT.APPS.151`, `RD.SUPPORT.APPS.158`, `RD.SUPPORT.APPS.160`, `RD.SUPPORT.APPS.161` and `RD.SUPPORT.APPS.163`. This file restates those rules and adds none of its own; where they disagree, the book wins and this file is regenerated.
 
 **Judged against, beside the book:** Nielsen's ten usability heuristics, as the Nielsen Norman Group states them, and the domain's usual workflow. A page option is weighed against the heuristic it keeps or breaks, named.
 

@@ -3,27 +3,27 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/02-web/README.md",
-      "seen": "44687e9f"
+      "seen": "c5ecdceb"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/02-support/02-web/README.md",
-      "seen": "da39a390"
+      "seen": "e19969bd"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/07-comments/README.md",
       "seen": "f997e7cb"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/01-common/05-design-system.md",
-      "seen": "6efa662d"
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/10-architecture-app/01-common/01-contexts.md",
+      "seen": "c22d6453"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/01-common/03-interaction.md",
-      "seen": "37647d71"
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/02-standards-interaction/01-common/01-interaction.md",
+      "seen": "cd2ce41a"
     },
     {
-      "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/11-surface/01-common/02-accessibility.md",
-      "seen": "e45989a5"
+      "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/01-standards-core/01-common/02-accessibility.md",
+      "seen": "f21ecccc"
     }
   ]
 }
@@ -31,7 +31,9 @@
 
 # Lens — `WEB_DEV` (Web developer)
 
-**Source of truth:** the foundation book's module web seats (`02-support/01-apps/03-module/02-web` — the `ui/` taxonomy), the web support family (`02-support/01-apps/02-support/02-web` — the two groups · core web · client-side authorization), the Surface topic (`02-support/01-apps/11-surface` — the design system · interaction · accessibility), the comments group (`02-support/01-apps/07-comments`), and the web test tiers. Read this file as a restatement of those rules, adding none of its own; where they disagree, the book wins and this file is regenerated. Look to the stack's ui step file for the stack-concrete detail.
+**Source of truth:** the foundation book's module web seats (`02-support/01-apps/03-module/02-web` — the `ui/` taxonomy), the web support family (`02-support/01-apps/02-support/02-web` — the two groups · core web · client-side authorization), the Surface domain (`02-support/03-surface` — the app's contexts · interaction · accessibility), the comments group (`02-support/01-apps/07-comments`), and the web test tiers. Read this file as a restatement of those rules, adding none of its own; where they disagree, the book wins and this file is regenerated. Look to the stack's ui step file for the stack-concrete detail.
+
+The Surface restatement, in the apps plugin, sits as `refs/support/surface/architecture-app.md`, `standards-interaction.md` and `standards-core.md`.
 
 **Judged against, beside the book:** WCAG 2.2 for accessibility, and Core Web Vitals for what a user feels of performance. A screen option is weighed against the success criterion or the measure it moves.
 
