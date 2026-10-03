@@ -4,7 +4,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, relative, resolve } from "node:path";
+import { basename, dirname, join, relative, resolve } from "node:path";
 import { PLUGIN, WORKSPACE } from "../../../../helpers/harness.mjs";
 import { ARTIFACT, ARTIFACT_INDEX, CONSTRUCT_PAGES, DOCS, HUB, POCKET, bookTemplatesDir } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { INDEX_SCRIPT, OWN_COPY, linesFor } from "../../../../../../plugin-support-lib/src/lib/page-styles.ts";
@@ -406,8 +406,8 @@ console.log("\n=== the index goes back to the hub, one step up the chain");
   const root = withAreas();
   index(["write", root]);
   const text = read(root, INDEX);
-  ok("the way back sits at the top of the side and opens the hub, named by the hub's own title",
-    text.includes(`<aside class="sds-index-side" id="index-side">\n    <a class="sds-home" href="${ARTIFACT.docs}/${HUB}">&larr; Concept</a>\n    <div class="sds-index-head">`));
+  ok("the way back sits at the top of the side and opens the hub, named by the repository",
+    text.includes(`<aside class="sds-index-side" id="index-side">\n    <a class="sds-home" href="${ARTIFACT.docs}/${HUB}">&larr; ${basename(root)}</a>\n    <div class="sds-index-head">`));
   const away = join(BASE, "elsewhere-back", ARTIFACT_INDEX);
   mkdirSync(dirname(away));
   index(["write", root, "--out", away]);

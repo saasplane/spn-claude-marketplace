@@ -4,7 +4,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, relative, resolve } from "node:path";
+import { basename, dirname, join, relative, resolve } from "node:path";
 import { PLUGIN, WORKSPACE } from "../../../../helpers/harness.mjs";
 import { ARTIFACT, CONSTRUCT_PAGES, DOCS, GUIDE_PAGE_SUFFIX, POCKET, SEAT, bookTemplatesDir } from "../../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, linesFor } from "../../../../../../plugin-support-lib/src/lib/page-styles.ts";
@@ -495,8 +495,8 @@ console.log("\n=== a guide goes back to the hub of its repository, one step up t
     [`${DOCS}/README.md`]: "# Docs\n", [`${DOCS}/${POCKET.artifacts}/${ARTIFACT.docs}/concept-overview.html`]: hub });
   const ran = guide(["write", join(root, GUIDES, "01-getting-started.md")]);
   const text = read(root, `${PAGES}/getting-started-guide.html`);
-  ok("the way back opens the hub, a page, named by the hub's own title", ran.code === 0
-    && text.includes('<a class="sds-home" href="../docs/concept-overview.html">&larr; The Hub &amp; More</a>'), ran.out + each(text, /(<a [^>]*sds-home[^>]*>)/g).join(" "));
+  ok("the way back opens the hub, a page, named by the repository", ran.code === 0
+    && text.includes(`<a class="sds-home" href="../docs/concept-overview.html">&larr; ${basename(root)}</a>`), ran.out + each(text, /(<a [^>]*sds-home[^>]*>)/g).join(" "));
   ok("and it is not the index, and it keeps the page inside its own tab", !text.includes("../index.html") && !text.includes('target="_top"'));
   ok("the page is current against what the command writes now", guide(["check", join(root, GUIDES, "01-getting-started.md")]).code === 0);
 }

@@ -3275,7 +3275,9 @@ export function checkRailLinks(file: string, src: string): Finding[] {
 export function hubAbove(docs: string, out: string): { href: string; label: string } | null {
   const hub = hubPage(docs);
   if (!existsSync(hub)) return null;
-  return { href: relative(dirname(out), hub), label: String(readBlock(readFileSync(hub, "utf8")).block?.title ?? basename(hub)) };
+  // THE BACK LINK NAMES THE REPOSITORY, as the book's templates do: `← spn-foundation`. The hub's own
+  // title is the same word in every repository, so it would tell a reader nothing about where they land.
+  return { href: relative(dirname(out), hub), label: basename(repoOf(hub) ?? dirname(resolve(docs))) };
 }
 
 /** The pages that walk up one step, by kind. The hub and an approach page are the tops of a chain. */
