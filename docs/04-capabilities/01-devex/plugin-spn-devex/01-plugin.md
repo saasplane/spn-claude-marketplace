@@ -14,7 +14,7 @@
 | --- | --- | --- |
 | The manifest | `packages/plugin-spn-devex/src/.claude-plugin/plugin.json` | `name`, `version`, `description`, `author` |
 | The marketplace entry | `.claude-plugin/marketplace.json` | the repository's own list; the `spn-devex` row names `./packages/plugin-spn-devex` |
-| What the folder delivers | `packages/plugin-spn-devex/src/` | `hooks/` · `agents/` · `skills/` · `scripts/` · `refs/`, with `tests/` beside them at the plugin's root |
+| What the folder delivers | `packages/plugin-spn-devex/src/` | `bin/spn-devex` · `tiers.json` · `hooks/` · `agents/` · `skills/` · `scripts/` · `refs/`, with `tests/` beside them at the plugin's root |
 | What a wired path names | `packages/plugin-spn-devex/src/hooks/hooks.json` | a command written against `CLAUDE_PLUGIN_ROOT`, so it resolves inside the installed copy rather than in this checkout |
 
 ## Follows the pattern
@@ -34,7 +34,7 @@
 ### A committed build sits beneath the source, reached through one command entry
 
 **Why** — *a hook that pays for type-stripping on every call is a hook somebody eventually stops trusting to be fast*, and a plugin offering sixteen tools by sixteen separate paths is a vocabulary that grows by one every time somebody adds a tool. The foundation's `04-plugins/02-shape.md` states the target every plugin here realizes.
-**What** — `src/scripts/` carries one entry, `cli.ts`, dispatching `<group> [<subject>] <action>` to the files under `commands/<group>/`, and `hooks.json` runs a committed `dist/cli.mjs` and `dist/events/*.mjs` instead of the `.ts` sources. `tests/unit/t-dist-current.mjs` refuses a bundle older than what it was built from, calling the shared harness in `plugin-support-lib`. A hook script stays live on its next run either way; a bundle changes what that means without changing the rule.
+**What** — `src/scripts/` carries one entry, `cli.ts`, dispatching `<group> [<subject>] <action>` to the files under `commands/<group>/`, and `hooks.json` runs a committed `dist/cli.mjs` and `dist/events/*.mjs` instead of the `.ts` sources. A command is typed by the plugin's own name, `spn-devex`, because `bin/spn-devex` is a launcher on the path of the Bash tool while the plugin is enabled, and `tiers.json` declares the tier of each command group. `tests/unit/t-dist-current.mjs` refuses a bundle older than what it was built from, calling the shared harness in `plugin-support-lib`. A hook script stays live on its next run either way; a bundle changes what that means without changing the rule.
 **How** — read the standard chapter before reading anything built against it here; a rule this plugin states and the chapter does not is a defect rather than something this plugin does differently.
 
 ### The version is moved after the release, never before

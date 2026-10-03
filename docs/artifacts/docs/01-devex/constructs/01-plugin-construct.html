@@ -104,7 +104,7 @@
   <h3 id="the-marketplace-entry">The marketplace entry</h3>
   <p>One file at the repository root, <code>.claude-plugin/marketplace.json</code>, carries a <code>plugins</code> array. Each entry names the plugin, the relative <code>source</code> folder holding it, and a description a listing can show without opening the folder. Nothing generates the file: a generator would need a source, and that source would be a second list able to disagree with this one. The price of writing it by hand is that the two descriptions can drift, and one pair has.</p>
   <h3 id="the-installed-copy-and-what-a-wired-path">The installed copy, and what a wired path names</h3>
-  <p>Installing reads an entry, copies that plugin's folder, and stores it where a session can read it. Everything a plugin wires names that folder through <code>CLAUDE_PLUGIN_ROOT</code> rather than through a path in this checkout, so a plugin works wherever it was installed.</p>
+  <p>Installing reads an entry, copies that plugin's folder, and stores it where a session can read it. Everything a plugin wires names that folder through <code>CLAUDE_PLUGIN_ROOT</code> rather than through a path in this checkout, so a plugin works wherever it was installed. A command of the plugin is typed by the plugin's own name, because the plugin ships a launcher under that name in <code>bin/</code>, and no one types a path to the entry file. A plugin with a command line declares the tier of each command group in <code>tiers.json</code>.</p>
   <h3 id="what-a-plugin-may-hold-and-what-it-owes">What a plugin may hold, and what it owes</h3>
   <p>A plugin folder holds any mix of the constructs this domain names, and owes none of them. <code>spn-devex</code> carries every one except <code>providers/</code>, which is why it is the folder to open to see what a full plugin looks like. <code>spn-apps</code> and <code>spn-infra</code> each carry a <code>providers/</code> folder and no <code>agents/</code>. Each construct is named by its own page, and none of them is described here.</p>
 </section>
@@ -135,7 +135,7 @@
       <tr><td>the foundation's plugins construct § The shape of a plugin, and its <code>04-plugins/02-shape.md</code></td><td>the Node realization of this construct's own shape — source beside a committed build, and a shared folder never installed on its own</td><td>MUST</td></tr>
     </tbody>
   </table></div>
-  <p>Try it: <code>node packages/plugin-spn-devex/src/dist/cli.mjs plugin partner check</code> (or <code>spn-devex plugin partner check</code>, once installed)</p>
+  <p>Try it: <code>spn-devex plugin partner check</code></p>
 </section>
 
 

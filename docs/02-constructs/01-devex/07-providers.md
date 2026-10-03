@@ -105,4 +105,4 @@ Add `providers/<instance>/`, with a `skills/` half for what a skill loads and a 
 | `RD.DEVEX.WORKSPACE.176` | a repository answers to the world it declares, which is what makes `sprepo.json` the one place an instance is read from | MUST |
 | the apps plugin's subject registry | *until a parser exists there is no folder for it* — a realization that is absent says so, and a stub that answers teaches you it works | MUST |
 
-Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs docs coherence check` (or `spn-devex docs coherence check`, once installed)
+Try it: `spn-devex docs coherence check`

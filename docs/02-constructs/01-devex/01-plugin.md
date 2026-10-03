@@ -74,7 +74,7 @@ One file at the repository root, `.claude-plugin/marketplace.json`, carries a `p
 
 ### The installed copy, and what a wired path names
 
-Installing reads an entry, copies that plugin's folder, and stores it where a session can read it. Everything a plugin wires names that folder through `CLAUDE_PLUGIN_ROOT` rather than through a path in this checkout, so a plugin works wherever it was installed.
+Installing reads an entry, copies that plugin's folder, and stores it where a session can read it. Everything a plugin wires names that folder through `CLAUDE_PLUGIN_ROOT` rather than through a path in this checkout, so a plugin works wherever it was installed. A command of the plugin is typed by the plugin's own name, because the plugin ships a launcher under that name in `bin/`, and no one types a path to the entry file. A plugin with a command line declares the tier of each command group in `tiers.json`.
 
 ### What a plugin may hold, and what it owes
 
@@ -99,4 +99,4 @@ This page answers what a plugin is made of, how it is listed, and what an instal
 | [RD.DEVEX.006](../../registers/decisions.md) | the manifest is the current description, and a marketplace entry that disagrees with it is the stale side | MUST |
 | the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | the Node realization of this construct's own shape — source beside a committed build, and a shared folder never installed on its own | MUST |
 
-Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs plugin partner check` (or `spn-devex plugin partner check`, once installed)
+Try it: `spn-devex plugin partner check`

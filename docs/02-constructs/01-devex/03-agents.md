@@ -127,4 +127,4 @@ This page answers what a brief is, how a persona is convened, what a viewpoint f
 | `RD.DEVEX.WORKSPACE.118` | a lens is a restatement, and the book wins wherever the two disagree | MUST |
 | [RD.DEVEX.004](../../registers/decisions.md) | a read-only promise is bound only where the brief declares `tools`; elsewhere it is prose | MUST |
 
-Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs restates check` (or `spn-devex restates check`, once installed)
+Try it: `spn-devex restates check`

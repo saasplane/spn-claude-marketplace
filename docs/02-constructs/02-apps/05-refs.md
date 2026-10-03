@@ -110,4 +110,4 @@ This page answers what this plugin restates and how the folder is arranged. It d
 | `RD.DEVEX.WORKSPACE.176` | a repository answers to the world it declares, which is what makes a stack a claim rather than something detected | MUST |
 | the foundation's `02-delivery.md` § When an edit becomes behaviour | a ref is readable only after an install, so an edit here is not live in the open session | MUST |
 
-Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs restates check` (or `spn-devex restates check`, once installed)
+Try it: `spn-devex restates check`

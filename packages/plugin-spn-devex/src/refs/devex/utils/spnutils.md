@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/03-utils/01-spnutils.md",
-      "seen": "26753702"
+      "seen": "8eed94cd"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
@@ -109,6 +109,9 @@ replaces them. A `Stop` event carries the turn's own token usage beside its `ms`
 cache, written to cache, and output. **A window's cost is read from this telemetry by a command of the
 plugin (`spn-devex plugin cost show`), which sums the usage per session, for the main window and for each
 child, and never from a transcript — MUST** (`RD.DEVEX.AGENT.082`).
+
+**The permission tiers the floor writes follow a rule of the delivery chapter.** A tier is declared on a
+command or on a group of commands, and a plugin declares the tiers of its own command groups.
 
 **There is no command for opening a scope of work.** A workstream is a folder in one of three
 states; you make the folder, `status` lists what is open, and a write-time check holds the close

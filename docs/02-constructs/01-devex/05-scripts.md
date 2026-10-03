@@ -153,4 +153,4 @@ This page answers what a script is, how each kind is reached, and what it answer
 | the foundation's `05-artifacts.md` § The blocks · § The figures | what a produced page is made of, which this folder renders and never decides | MUST |
 | the foundation's plugins construct § The shape of a plugin, and its `04-plugins/02-shape.md` | the four kinds of script, the `<group> [<subject>] <action>` shape `commands/` dispatches by, one command entry | MUST |
 
-Try it: `node packages/plugin-spn-devex/src/dist/cli.mjs plugin partner check` (or `spn-devex plugin partner check`, once installed)
+Try it: `spn-devex plugin partner check`

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/02-agent/04-plugins.md",
-      "seen": "e0ea181a"
+      "seen": "0f97511c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/04-plugins/01-plugins.md",
@@ -57,6 +57,8 @@ An edit to the folder changes nothing about the cache until an install copies on
 ## How a plugin's command is typed
 
 **Every command reads the same way** (`RD.DEVEX.AGENT.078`): `spn-<plugin> <group> [<subject>] <action> [<path>…] [options]`. The last word before the path is a verb, and you always type it.
+
+**A command is typed by the plugin's own name**, because the plugin ships a launcher under that name in `bin/`, and no one types a path to the entry file. A plugin with a command line declares the tier of each command group in `tiers.json`, and the delivery chapter states how `spnutils` turns that into rules.
 
 | Part | The rule | Example |
 | --- | --- | --- |

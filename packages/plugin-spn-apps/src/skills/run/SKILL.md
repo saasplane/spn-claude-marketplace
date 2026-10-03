@@ -155,7 +155,7 @@ Write `--json` to a file and read the file.
 **Code coverage is read, never enforced** (`RD.SUPPORT.APPS.133`). A run that collects coverage prints its summary after the tests — lines, statements, functions and branches — and the test tool writes `coverage-summary.json` beside its report. Report those numbers as they are. No configuration carries a threshold, and nothing fails a run on a percentage. The one rule about coverage you check is that every exclude says why:
 
 ```bash
-node "${CLAUDE_PLUGIN_ROOT}"/dist/cli.mjs coverage check <project>   # an exclude with no comment giving its reason
+spn-apps coverage check <project>   # an exclude with no comment giving its reason
 ```
 
 **Pass `--reach repository` only when the run you name IS the whole of the tiers it names** — a full run of every node that owes them, under one name. Without it, a row the run did not mention is left exactly as it was. With it, such a row goes back to `PLANNED`, which is right after a complete run and wrong after a single node's: runs are per node and a register is per repository, so one node's journey run would otherwise reset another's rows.
