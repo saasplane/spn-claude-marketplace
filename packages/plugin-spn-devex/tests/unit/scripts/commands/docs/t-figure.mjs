@@ -142,8 +142,8 @@ console.log("\n=== `draw` prints the drawing of a spec a hand-written page holds
   const badFile = join(BASE, "skel-bad.json");
   writeFileSync(badFile, JSON.stringify(badSpec));
   const bad = run(["draw", badFile]);
-  one("known-bad: an item that is none of `text`, `note` or `frame` is a finding",
-    bad.out.includes("none of `text`, `note` or `frame`") && bad.code === 1);
+  one("known-bad: an item that is none of the shapes a skeleton has is a finding",
+    bad.out.includes("none of `text`, `tag`, `note`, `lines`, `spacer` or `frame`") && bad.code === 1);
 
   const noPath2 = run(["draw"]);
   one("`draw` with no path says a path is owed, and exits 2",

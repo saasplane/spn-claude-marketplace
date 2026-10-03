@@ -5,7 +5,7 @@
 
 
 
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.2.0/sds-docs.css">
 <div class="sds-page">
 <nav class="sds-rail" id="rail">
   <a class="sds-home" href="../../../../README.md">&larr; .spndevex</a>
@@ -38,7 +38,7 @@
 </section>
 
 <section id="blocks" data-block="example">
-  <div class="sds-section-head"><h2>Every block, once &mdash; what each one looks like</h2></div>
+  <div class="sds-section-head"><h2>Words &mdash; blocks that set writing apart</h2></div>
   <p>Each one below is a <strong>block</strong>: it carries a border, a background or a form of its own, so a reader sees it is not the surrounding prose before reading a word of it. Use one when the content is a rule, a set, a comparison, a literal, a shape, or a passage that belongs in its own panel.</p>
   <h3 id="b-prose">PROSE &mdash; the markdown block</h3>
   <p>{{A passage that explains. Use it wherever the content is plain writing and no other block fits: <strong>REASONS</strong> is for prose that makes a claim and gives grounds, and this is for prose that simply teaches. It carries its own border, background and text colour, so it reads as a block the page chose rather than as the page's own voice continuing. Everything markdown gives you renders inside it.}}</p>
@@ -54,6 +54,88 @@
   </ol>
   <blockquote><p>{{A sentence worth setting apart &mdash; a rule stated in full, or a line quoted from the source the page is about.}}</p></blockquote>
   </div>
+  <h3 id="b-must">MUST &mdash; a rule</h3>
+  <div class="sds-pull">
+    <span class="sds-label">Must</span>
+    <p><strong>{{The rule, in one sentence.}}</strong> {{Who it binds, what it binds them to, and what happens when it is broken.}}</p>
+    <p class="sds-small">Check it with <code>{{command}}</code>.</p>
+  </div>
+  <h3 id="b-catalog">CATALOG &mdash; a fixed list, one line each</h3>
+  <p>{{What the set is, and the rule that decides what is in it.}}</p>
+  <div class="sds-tiles">
+    <div class="sds-tile"><h4>{{Thing}}</h4><p>{{one line: what it is for}}</p><p class="sds-small"><code>{{its literal}}</code></p></div>
+    <div class="sds-tile"><h4>{{Thing}}</h4><p>{{&hellip;}}</p><p class="sds-small"><code>{{its literal}}</code></p></div>
+    <div class="sds-tile"><h4>{{Thing}}</h4><p>{{&hellip;}}</p><p class="sds-small"><code>{{its literal}}</code></p></div>
+  </div>
+  <h3 id="b-comparison">COMPARISON &mdash; things side by side</h3>
+  <div class="sds-scroll"><table>
+    <thead><tr><th></th><th>{{A reader's question}}</th><th>{{A reader's question}}</th></tr></thead>
+    <tbody><tr><td><strong>{{Thing}}</strong></td><td>{{&hellip;}}</td><td>{{&hellip;}}</td></tr><tr><td><strong>{{Thing}}</strong></td><td>{{&hellip;}}</td><td>{{&hellip;}}</td></tr></tbody>
+  </table></div>
+</section>
+
+<section id="literals" data-block="example">
+  <div class="sds-section-head"><h2>Literals &mdash; code, trees and changes, read character by character</h2></div>
+  <p>{{A literal is read character by character, so it sits in a block of its own and is coloured when the page is produced.}}</p>
+  <h3 id="b-example">EXAMPLE &mdash; faster to see, with a CODE figure</h3>
+  <p>{{One sentence saying what you are looking at.}}</p>
+  <pre data-lang="ts"><span class="sds-tk-k">export</span> <span class="sds-tk-k">enum</span> <span class="sds-tk-t">{{SPContractType}}</span> {
+  {{MEMBER}} = <span class="sds-tk-s">'{{member}}'</span>,   <span class="sds-tk-c">// what this member means</span>
+}</pre>
+  <p>{{One sentence saying what to notice.}}</p>
+  <h3 id="b-code">CODE &mdash; one block per language the renderer colours</h3>
+  <p>{{Tag every block with its language. An untagged block is never coloured, and the colouring is added when the page is produced &mdash; these samples are the real output, not hand-written spans.}}</p>
+  <p class="sds-small">ts &mdash; a contract as it is declared, a comment per member</p>
+  <pre data-lang="ts"><span class="sds-tk-k">export</span> <span class="sds-tk-k">interface</span> <span class="sds-tk-t">SPRepo</span> {
+  <span class="sds-tk-k">type</span>: <span class="sds-tk-t">SPRepoType</span>;   <span class="sds-tk-c">// the world, and the whole of what a tool dispatches on</span>
+  name: <span class="sds-tk-t">CDTString</span>;          <span class="sds-tk-c">// what a person calls this repository</span>
+  config: <span class="sds-tk-t">SPRepoConfig</span> | <span class="sds-tk-k">null</span>;
+}</pre>
+  <p class="sds-small">json &mdash; a manifest, with real values</p>
+  <pre data-lang="json">{
+  <span class="sds-tk-s">"type"</span>: <span class="sds-tk-s">"APPS"</span>,
+  <span class="sds-tk-s">"name"</span>: <span class="sds-tk-s">"Platform"</span>,
+  <span class="sds-tk-s">"config"</span>: { <span class="sds-tk-s">"stack"</span>: <span class="sds-tk-s">"TS"</span>, <span class="sds-tk-s">"deploys"</span>: <span class="sds-tk-k">true</span>, <span class="sds-tk-s">"platform"</span>: <span class="sds-tk-k">null</span> }
+}</pre>
+  <p class="sds-small">yaml &mdash; a declaration a person edits</p>
+  <pre data-lang="yaml"><span class="sds-tk-c"># one environment row, as the estate declares it</span>
+setup: dev
+region: in
+deploy:
+  mtype: BRANCH
+  branch: develop</pre>
+  <p class="sds-small">sql &mdash; the authoritative shape of a table</p>
+  <pre data-lang="sql"><span class="sds-tk-k">CREATE</span> <span class="sds-tk-k">TABLE</span> iam_identity (
+  id CHAR(<span class="sds-tk-n">26</span>) <span class="sds-tk-k">PRIMARY</span> <span class="sds-tk-k">KEY</span>,
+  handle VARCHAR(<span class="sds-tk-n">180</span>) <span class="sds-tk-k">NOT</span> <span class="sds-tk-k">NULL</span> <span class="sds-tk-k">UNIQUE</span>,
+  created_at TIMESTAMPTZ <span class="sds-tk-k">DEFAULT</span> now()
+);</pre>
+  <p class="sds-small">sh &mdash; a command somebody else can run</p>
+  <pre data-lang="sh"><span class="sds-tk-c"># bring a repository to the standard, then wire its agent</span>
+spnutils repo create platform
+spnutils repo agent-sync</pre>
+  <p class="sds-small">md &mdash; markdown shown as source, when the page is about the markup</p>
+  <pre data-lang="md">## Terms
+
+| Term | Contract term | What it means |
+| --- | --- | --- |
+| Estate | <span class="sds-tk-s">`SPEstate`</span> | everything one company&#x27;s work runs on |</pre>
+  <p class="sds-small">no language &mdash; output, a path, a name pattern: nothing to colour</p>
+  <pre>{{org}}-{{spc}}-{{env}}-{{region}}
+&rarr; spn-dmo-live-in</pre>
+  <h3 id="b-tree">TREE &mdash; a hierarchy, as a text block</h3>
+  <pre>{{root}}/
+├── {{child}}/        {{what it holds}}
+│   └── {{leaf}}      {{what it is}}
+└── {{child}}         {{what it is}}</pre>
+  <h3 id="b-diff">DIFF &mdash; what a file says today and what it will say (approach pages only)</h3>
+  <pre data-lang="diff"><span class="sds-tk-del">- what the file says today</span>
+<span class="sds-tk-add">+ what it will say</span></pre>
+</section>
+
+<section id="figures" data-block="example">
+  <div class="sds-section-head"><h2>Figures &mdash; a shape the reader must see</h2></div>
+  <p>{{Every figure has a sentence before it saying what you are looking at, and a caption after it saying what to notice. Choose the kind by what the reader has to see.}}</p>
   <h3 id="b-sequence">SEQUENCE &mdash; steps in order</h3>
   <p>{{What you are looking at.}}</p>
   <figure>
@@ -423,78 +505,213 @@
   </svg>
   <figcaption>{{What to notice: nothing reaches the data subnet from outside, and every account is the same shape at a different size.}}</figcaption>
   </figure>
-  <h3 id="b-catalog">CATALOG &mdash; a fixed list, one line each</h3>
-  <p>{{What the set is, and the rule that decides what is in it.}}</p>
-  <div class="sds-tiles">
-    <div class="sds-tile"><h4>{{Thing}}</h4><p>{{one line: what it is for}}</p><p class="sds-small"><code>{{its literal}}</code></p></div>
-    <div class="sds-tile"><h4>{{Thing}}</h4><p>{{&hellip;}}</p><p class="sds-small"><code>{{its literal}}</code></p></div>
-    <div class="sds-tile"><h4>{{Thing}}</h4><p>{{&hellip;}}</p><p class="sds-small"><code>{{its literal}}</code></p></div>
-  </div>
-  <h3 id="b-comparison">COMPARISON &mdash; things side by side</h3>
-  <div class="sds-scroll"><table>
-    <thead><tr><th></th><th>{{A reader's question}}</th><th>{{A reader's question}}</th></tr></thead>
-    <tbody><tr><td><strong>{{Thing}}</strong></td><td>{{&hellip;}}</td><td>{{&hellip;}}</td></tr><tr><td><strong>{{Thing}}</strong></td><td>{{&hellip;}}</td><td>{{&hellip;}}</td></tr></tbody>
-  </table></div>
-  <h3 id="b-must">MUST &mdash; a rule</h3>
-  <div class="sds-pull">
-    <span class="sds-label">Must</span>
-    <p><strong>{{The rule, in one sentence.}}</strong> {{Who it binds, what it binds them to, and what happens when it is broken.}}</p>
-    <p class="sds-small">Check it with <code>{{command}}</code>.</p>
-  </div>
-  <h3 id="b-example">EXAMPLE &mdash; faster to see, with a CODE figure</h3>
-  <p>{{One sentence saying what you are looking at.}}</p>
-  <pre data-lang="ts"><span class="sds-tk-k">export</span> <span class="sds-tk-k">enum</span> <span class="sds-tk-t">{{SPContractType}}</span> {
-  {{MEMBER}} = <span class="sds-tk-s">'{{member}}'</span>,   <span class="sds-tk-c">// what this member means</span>
-}</pre>
-  <p>{{One sentence saying what to notice.}}</p>
-  <h3 id="b-code">CODE &mdash; one block per language the renderer colours</h3>
-  <p>{{Tag every block with its language. An untagged block is never coloured, and the colouring is added when the page is produced &mdash; these samples are the real output, not hand-written spans.}}</p>
-  <p class="sds-small">ts &mdash; a contract as it is declared, a comment per member</p>
-  <pre data-lang="ts"><span class="sds-tk-k">export</span> <span class="sds-tk-k">interface</span> <span class="sds-tk-t">SPRepo</span> {
-  <span class="sds-tk-k">type</span>: <span class="sds-tk-t">SPRepoType</span>;   <span class="sds-tk-c">// the world, and the whole of what a tool dispatches on</span>
-  name: <span class="sds-tk-t">CDTString</span>;          <span class="sds-tk-c">// what a person calls this repository</span>
-  config: <span class="sds-tk-t">SPRepoConfig</span> | <span class="sds-tk-k">null</span>;
-}</pre>
-  <p class="sds-small">json &mdash; a manifest, with real values</p>
-  <pre data-lang="json">{
-  <span class="sds-tk-s">"type"</span>: <span class="sds-tk-s">"APPS"</span>,
-  <span class="sds-tk-s">"name"</span>: <span class="sds-tk-s">"Platform"</span>,
-  <span class="sds-tk-s">"config"</span>: { <span class="sds-tk-s">"stack"</span>: <span class="sds-tk-s">"TS"</span>, <span class="sds-tk-s">"deploys"</span>: <span class="sds-tk-k">true</span>, <span class="sds-tk-s">"platform"</span>: <span class="sds-tk-k">null</span> }
-}</pre>
-  <p class="sds-small">yaml &mdash; a declaration a person edits</p>
-  <pre data-lang="yaml"><span class="sds-tk-c"># one environment row, as the estate declares it</span>
-setup: dev
-region: in
-deploy:
-  mtype: BRANCH
-  branch: develop</pre>
-  <p class="sds-small">sql &mdash; the authoritative shape of a table</p>
-  <pre data-lang="sql"><span class="sds-tk-k">CREATE</span> <span class="sds-tk-k">TABLE</span> iam_identity (
-  id CHAR(<span class="sds-tk-n">26</span>) <span class="sds-tk-k">PRIMARY</span> <span class="sds-tk-k">KEY</span>,
-  handle VARCHAR(<span class="sds-tk-n">180</span>) <span class="sds-tk-k">NOT</span> <span class="sds-tk-k">NULL</span> <span class="sds-tk-k">UNIQUE</span>,
-  created_at TIMESTAMPTZ <span class="sds-tk-k">DEFAULT</span> now()
-);</pre>
-  <p class="sds-small">sh &mdash; a command somebody else can run</p>
-  <pre data-lang="sh"><span class="sds-tk-c"># bring a repository to the standard, then wire its agent</span>
-spnutils repo create platform
-spnutils repo agent-sync</pre>
-  <p class="sds-small">md &mdash; markdown shown as source, when the page is about the markup</p>
-  <pre data-lang="md">## Terms
+  <h3 id="b-skeleton">SKELETON &mdash; a mock of a layout</h3>
+  <p>{{What you are looking at: the thing&rsquo;s outer frame, and where each of its places sits.}} A skeleton is a preview: each place is tinted and tagged, in plain words or by a block&rsquo;s prop where one exists, and nothing shows the library&rsquo;s look. A construct page or an overview asks for one in a <code>dg</code> block of kind <code>skeleton</code>; a hand-written page takes the drawing from <code>docs figure draw &lt;spec&gt;</code>. One sample at each level:</p>
+  <p><strong>A page</strong> &mdash; a listing page: the layout&rsquo;s places around a container whose content is the data table.</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="22 22 1150 400" style="max-width:1150px" role="img" aria-label="A listing page: the layout, a container and the data table">
+    <rect class="sds-box" x="24" y="24" width="1146" height="396" rx="3"/>
+    <text class="sds-title" x="40" y="50">Members — a listing page</text>
+    <text class="sds-code" x="40" y="69">DSLayout RAIL · DSContainer · DSWDataTable</text>
+    <rect class="sds-box" x="40" y="88" width="279" height="316" rx="3"/>
+    <rect class="sds-box sds-tone-amber" x="56" y="104" width="247" height="28" rx="3"/>
+    <text class="sds-note" x="64" y="120">brand</text>
+    <rect class="sds-box sds-tone-cyan" x="56" y="156" width="247" height="106" rx="3"/>
+    <text class="sds-note" x="64" y="172">nav</text>
+    <rect class="sds-box sds-tone-cyan" x="72" y="184" width="90" height="8" rx="3"/>
+    <rect class="sds-box sds-tone-cyan" x="72" y="198" width="215" height="6" rx="3"/>
+    <rect class="sds-box sds-tone-cyan" x="72" y="212" width="215" height="6" rx="3"/>
+    <rect class="sds-box sds-tone-cyan" x="72" y="226" width="215" height="6" rx="3"/>
+    <rect class="sds-box sds-tone-cyan" x="72" y="240" width="215" height="6" rx="3"/>
+    <rect class="sds-box sds-tone-pink" x="56" y="286" width="247" height="28" rx="3"/>
+    <text class="sds-note" x="64" y="302">account</text>
+    <rect class="sds-box sds-tone-green" x="343" y="88" width="811" height="316" rx="3"/>
+    <text class="sds-note" x="351" y="104">children</text>
+    <rect class="sds-box sds-tone-blue" x="359" y="116" width="148" height="48" rx="3"/>
+    <text class="sds-note" x="367" y="132">DSContainer.Header</text>
+    <text class="sds-code" x="375" y="154">Members</text>
+    <rect class="sds-box sds-tone-blue" x="1064" y="116" width="74" height="28" rx="3"/>
+    <text class="sds-code" x="1080" y="134">Invite</text>
+    <rect class="sds-box sds-tone-olive" x="359" y="188" width="779" height="200" rx="3"/>
+    <text class="sds-note" x="367" y="204">DSContainer.Content flush</text>
+    <rect class="sds-box" x="375" y="216" width="74" height="28" rx="3"/>
+    <text class="sds-code" x="391" y="234">Search</text>
+    <rect class="sds-box" x="473" y="216" width="649" height="38" rx="3"/>
+    <rect class="sds-box sds-tone-grey" x="489" y="232" width="617" height="6" rx="3"/>
+    <rect class="sds-box" x="375" y="278" width="747" height="94" rx="3"/>
+    <rect class="sds-box sds-tone-grey" x="391" y="294" width="300" height="8" rx="3"/>
+    <rect class="sds-box sds-tone-grey" x="391" y="308" width="715" height="6" rx="3"/>
+    <rect class="sds-box sds-tone-grey" x="391" y="322" width="715" height="6" rx="3"/>
+    <rect class="sds-box sds-tone-grey" x="391" y="336" width="715" height="6" rx="3"/>
+    <rect class="sds-box sds-tone-grey" x="391" y="350" width="715" height="6" rx="3"/>
+  </svg>
+  <figcaption>A page composes blocks and never restyles one: the layout's places around a container whose content is the data table.</figcaption>
+  </figure>
+  <p><strong>A layout</strong> &mdash; the RAIL layout: its five named places, each tinted and tagged.</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="22 22 1069 326" style="max-width:1069px" role="img" aria-label="DSLayout of type RAIL: its five named places">
+    <rect class="sds-box" x="24" y="24" width="1065" height="322" rx="3"/>
+    <text class="sds-title" x="40" y="50">DSLayout — RAIL</text>
+    <text class="sds-code" x="40" y="69">brand · nav · utilityActions · account · children</text>
+    <rect class="sds-box" x="40" y="88" width="258" height="242" rx="3"/>
+    <rect class="sds-box sds-tone-amber" x="56" y="104" width="226" height="28" rx="3"/>
+    <text class="sds-note" x="64" y="120">brand</text>
+    <rect class="sds-box sds-tone-cyan" x="56" y="156" width="226" height="106" rx="3"/>
+    <text class="sds-note" x="64" y="172">nav</text>
+    <rect class="sds-box sds-tone-cyan" x="72" y="184" width="81" height="8" rx="3"/>
+    <rect class="sds-box sds-tone-cyan" x="72" y="198" width="194" height="6" rx="3"/>
+    <rect class="sds-box sds-tone-cyan" x="72" y="212" width="194" height="6" rx="3"/>
+    <rect class="sds-box sds-tone-cyan" x="72" y="226" width="81" height="8" rx="3"/>
+    <rect class="sds-box sds-tone-cyan" x="72" y="240" width="194" height="6" rx="3"/>
+    <rect class="sds-box sds-tone-pink" x="56" y="286" width="226" height="28" rx="3"/>
+    <text class="sds-note" x="64" y="302">account</text>
+    <rect class="sds-box" x="322" y="88" width="751" height="242" rx="3"/>
+    <rect class="sds-box" x="338" y="104" width="39" height="28" rx="3"/>
+    <text class="sds-code" x="354" y="122">≡</text>
+    <rect class="sds-box sds-tone-violet" x="935" y="104" width="122" height="28" rx="3"/>
+    <text class="sds-note" x="943" y="120">utilityActions</text>
+    <rect class="sds-box sds-tone-green" x="338" y="156" width="719" height="112" rx="3"/>
+    <text class="sds-note" x="346" y="172">children</text>
+  </svg>
+  <figcaption>Each named place is tinted and tagged with its prop, so the picture reads against the props by name.</figcaption>
+  </figure>
+  <p><strong>A container</strong> &mdash; a container&rsquo;s parts in their one order, with a <code>flush</code> part.</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="22 22 1056 394" style="max-width:1056px" role="img" aria-label="DSContainer: its parts, in one order">
+    <rect class="sds-box" x="24" y="24" width="1052" height="390" rx="3"/>
+    <text class="sds-title" x="40" y="50">DSContainer</text>
+    <text class="sds-code" x="40" y="69">frames · raised · bordered · rounded, and size</text>
+    <rect class="sds-box sds-tone-blue" x="40" y="88" width="915" height="48" rx="3"/>
+    <text class="sds-note" x="48" y="104">DSContainer.Header</text>
+    <text class="sds-code" x="56" y="126">the page title</text>
+    <rect class="sds-box sds-tone-blue" x="979" y="88" width="81" height="28" rx="3"/>
+    <text class="sds-code" x="995" y="106">actions</text>
+    <rect class="sds-box sds-tone-green" x="40" y="160" width="1020" height="78" rx="3"/>
+    <text class="sds-note" x="48" y="176">DSContainer.Content</text>
+    <rect class="sds-box sds-tone-green" x="56" y="188" width="988" height="6" rx="3"/>
+    <rect class="sds-box sds-tone-green" x="56" y="202" width="988" height="6" rx="3"/>
+    <rect class="sds-box sds-tone-green" x="56" y="216" width="988" height="6" rx="3"/>
+    <rect class="sds-box sds-tone-olive" x="40" y="262" width="1020" height="64" rx="3"/>
+    <text class="sds-note" x="48" y="278">DSContainer.Content flush</text>
+    <rect class="sds-box sds-tone-olive" x="56" y="290" width="988" height="6" rx="3"/>
+    <rect class="sds-box sds-tone-olive" x="56" y="304" width="988" height="6" rx="3"/>
+    <rect class="sds-box sds-tone-violet" x="40" y="350" width="148" height="48" rx="3"/>
+    <text class="sds-note" x="48" y="366">DSContainer.Footer</text>
+    <text class="sds-code" x="56" y="388">actions</text>
+  </svg>
+  <figcaption>A header, one or more content parts joined in one frame, and a footer; a part takes only flush.</figcaption>
+  </figure>
+  <p><strong>A widget</strong> &mdash; the data table: its bar, its records as bars, and its pagination.</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="22 22 1056 350" style="max-width:1056px" role="img" aria-label="DSWDataTable: its bar, its records and its pagination">
+    <rect class="sds-box" x="24" y="24" width="1052" height="346" rx="3"/>
+    <text class="sds-title" x="40" y="50">DSWDataTable</text>
+    <text class="sds-code" x="40" y="69">layouts TABLE · LIST · GRID</text>
+    <rect class="sds-box sds-tone-blue" x="40" y="88" width="74" height="50" rx="3"/>
+    <text class="sds-note" x="48" y="104">search</text>
+    <text class="sds-code" x="56" y="127">Search</text>
+    <rect class="sds-box sds-tone-cyan" x="138" y="88" width="821" height="50" rx="3"/>
+    <text class="sds-note" x="146" y="104">DSWFilterBar</text>
+    <rect class="sds-box sds-tone-cyan" x="154" y="116" width="789" height="6" rx="3"/>
+    <rect class="sds-box sds-tone-violet" x="983" y="88" width="77" height="50" rx="3"/>
+    <text class="sds-note" x="991" y="104">actions</text>
+    <text class="sds-code" x="999" y="127">New</text>
+    <rect class="sds-box sds-tone-green" x="40" y="162" width="1020" height="120" rx="3"/>
+    <text class="sds-note" x="48" y="178">records</text>
+    <rect class="sds-box sds-tone-green" x="56" y="190" width="415" height="8" rx="3"/>
+    <rect class="sds-box sds-tone-green" x="56" y="204" width="988" height="6" rx="3"/>
+    <rect class="sds-box sds-tone-green" x="56" y="218" width="988" height="6" rx="3"/>
+    <rect class="sds-box sds-tone-green" x="56" y="232" width="988" height="6" rx="3"/>
+    <rect class="sds-box sds-tone-green" x="56" y="246" width="988" height="6" rx="3"/>
+    <rect class="sds-box sds-tone-green" x="56" y="260" width="988" height="6" rx="3"/>
+    <text class="sds-code" x="40" y="324">1–20 of 240</text>
+    <rect class="sds-box sds-tone-amber" x="964" y="306" width="96" height="48" rx="3"/>
+    <text class="sds-note" x="972" y="322">pagination</text>
+    <text class="sds-code" x="980" y="344">‹ 1 2 3 ›</text>
+  </svg>
+  <figcaption>One widget placed whole: it passes its size to its parts, and shows every task state where the records go.</figcaption>
+  </figure>
+  <p><strong>A component</strong> &mdash; a dialog, one of the few components that frame others, over its scrim.</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="22 22 1056 292" style="max-width:1056px" role="img" aria-label="DSDialog: a component that frames others">
+    <rect class="sds-box" x="24" y="24" width="1052" height="288" rx="3"/>
+    <text class="sds-title" x="40" y="50">DSDialog</text>
+    <text class="sds-code" x="40" y="69">opened by a button; one scrim under every interruption</text>
+    <rect class="sds-box sds-tone-grey" x="40" y="88" width="1020" height="208" rx="3"/>
+    <text class="sds-note" x="48" y="104">scrim</text>
+    <rect class="sds-box" x="56" y="116" width="988" height="164" rx="3"/>
+    <text class="sds-title" x="72" y="142">Remove member?</text>
+    <rect class="sds-box" x="72" y="160" width="956" height="52" rx="3"/>
+    <rect class="sds-box sds-tone-grey" x="88" y="176" width="924" height="6" rx="3"/>
+    <rect class="sds-box sds-tone-grey" x="88" y="190" width="924" height="6" rx="3"/>
+    <rect class="sds-box" x="856" y="236" width="74" height="28" rx="3"/>
+    <text class="sds-code" x="872" y="254">Cancel</text>
+    <rect class="sds-box sds-tone-amber" x="954" y="236" width="74" height="28" rx="3"/>
+    <text class="sds-code" x="970" y="254">Remove</text>
+  </svg>
+  <figcaption>A dialog frames its own parts: a title, its body, and its actions at the end, over a scrim.</figcaption>
+  </figure>
+  <p><strong>A showcase section</strong> &mdash; one block&rsquo;s section: its example, its code open with Copy, its variants, states, props and links.</p>
+  <figure>
+  <svg class="sds-drawing" viewBox="22 22 1056 514" style="max-width:1056px" role="img" aria-label="The section of DSButton, in the Inline layout">
+    <rect class="sds-box" x="24" y="24" width="1052" height="510" rx="3"/>
+    <text class="sds-title" x="40" y="50">DSButton — Inline</text>
+    <text class="sds-code" x="40" y="69">the main way to ask for an action</text>
+    <text class="sds-label" x="40" y="134">Example</text>
+    <rect class="sds-box" x="120" y="88" width="940" height="84" rx="3"/>
+    <rect class="sds-box sds-tone-blue" x="144" y="112" width="60" height="36" rx="3"/>
+    <text class="sds-code" x="160" y="134">Save</text>
+    <rect class="sds-box" x="228" y="112" width="74" height="36" rx="3"/>
+    <text class="sds-code" x="244" y="134">Cancel</text>
+    <text class="sds-code" x="326" y="134">narrow frame: the block at its own size</text>
+    <text class="sds-label" x="40" y="257">Code</text>
+    <rect class="sds-box" x="120" y="196" width="940" height="114" rx="3"/>
+    <rect class="sds-box sds-tone-grey" x="144" y="220" width="808" height="66" rx="3"/>
+    <rect class="sds-box sds-tone-grey" x="160" y="236" width="776" height="6" rx="3"/>
+    <rect class="sds-box sds-tone-grey" x="160" y="250" width="776" height="6" rx="3"/>
+    <rect class="sds-box sds-tone-grey" x="160" y="264" width="776" height="6" rx="3"/>
+    <rect class="sds-box sds-tone-blue" x="976" y="220" width="60" height="36" rx="3"/>
+    <text class="sds-code" x="992" y="242">Copy</text>
+    <text class="sds-label" x="40" y="352">Variants</text>
+    <rect class="sds-box" x="120" y="334" width="67" height="28" rx="3"/>
+    <text class="sds-code" x="136" y="352">SOLID</text>
+    <rect class="sds-box" x="211" y="334" width="60" height="28" rx="3"/>
+    <text class="sds-code" x="227" y="352">SOFT</text>
+    <rect class="sds-box" x="295" y="334" width="81" height="28" rx="3"/>
+    <text class="sds-code" x="311" y="352">OUTLINE</text>
+    <rect class="sds-box" x="400" y="334" width="67" height="28" rx="3"/>
+    <text class="sds-code" x="416" y="352">GHOST</text>
+    <rect class="sds-box" x="491" y="334" width="60" height="28" rx="3"/>
+    <text class="sds-code" x="507" y="352">LINK</text>
+    <rect class="sds-box" x="575" y="334" width="130" height="28" rx="3"/>
+    <text class="sds-code" x="591" y="352">sizes XS to XL</text>
+    <text class="sds-label" x="40" y="404">States</text>
+    <rect class="sds-box" x="120" y="386" width="60" height="28" rx="3"/>
+    <text class="sds-code" x="136" y="404">rest</text>
+    <rect class="sds-box" x="204" y="386" width="67" height="28" rx="3"/>
+    <text class="sds-code" x="220" y="404">hover</text>
+    <rect class="sds-box" x="295" y="386" width="67" height="28" rx="3"/>
+    <text class="sds-code" x="311" y="404">focus</text>
+    <rect class="sds-box" x="386" y="386" width="88" height="28" rx="3"/>
+    <text class="sds-code" x="402" y="404">disabled</text>
+    <text class="sds-label" x="40" y="456">Props</text>
+    <rect class="sds-box" x="120" y="438" width="109" height="28" rx="3"/>
+    <text class="sds-code" x="136" y="456">props table</text>
+    <rect class="sds-box sds-tone-blue" x="253" y="438" width="137" height="28" rx="3"/>
+    <text class="sds-code" x="269" y="456">Open playground</text>
+    <text class="sds-label" x="40" y="508">Links</text>
+    <rect class="sds-box" x="120" y="490" width="214" height="28" rx="3"/>
+    <text class="sds-code" x="136" y="508">drawing in DS 2-Components</text>
+    <rect class="sds-box" x="358" y="490" width="165" height="28" rx="3"/>
+    <text class="sds-code" x="374" y="508">chapter in the book</text>
+  </svg>
+  <figcaption>Inline: a narrow frame for a small block; its code open under it, ready to copy.</figcaption>
+  </figure>
+</section>
 
-| Term | Contract term | What it means |
-| --- | --- | --- |
-| Estate | <span class="sds-tk-s">`SPEstate`</span> | everything one company&#x27;s work runs on |</pre>
-  <p class="sds-small">no language &mdash; output, a path, a name pattern: nothing to colour</p>
-  <pre>{{org}}-{{spc}}-{{env}}-{{region}}
-&rarr; spn-dmo-live-in</pre>
-  <h3 id="b-tree">TREE &mdash; a hierarchy, as a text block</h3>
-  <pre>{{root}}/
-├── {{child}}/        {{what it holds}}
-│   └── {{leaf}}      {{what it is}}
-└── {{child}}         {{what it is}}</pre>
-  <h3 id="b-diff">DIFF &mdash; what a file says today and what it will say (approach pages only)</h3>
-  <pre data-lang="diff"><span class="sds-tk-del">- what the file says today</span>
-<span class="sds-tk-add">+ what it will say</span></pre>
+<section id="navigation" data-block="example">
+  <div class="sds-section-head"><h2>Navigation &mdash; the words and the ways out of a page</h2></div>
+  <p>{{What a reader uses to find a word, or to leave for the next page.}}</p>
   <h3 id="b-glossary">GLOSSARY &mdash; the words, in the order a reader meets them</h3>
   <p class="sds-small">On a <strong>domain overview</strong> this region is generated by <code>docs face</code> from the constructs' <code>Terms</code> tables, grouped by construct in the domain's reading order. On a <strong>hub</strong> it is written by hand and carries <strong>two</strong> columns: a hub names the book's own structural words, and 9 of the foundation hub's 11 have no contract term at all.</p>
   <div class="sds-scroll"><table>
@@ -513,6 +730,11 @@ spnutils repo agent-sync</pre>
     <a class="sds-nextnav-card" href="#"><span class="sds-direction">&larr; Previous</span><span class="sds-title">{{The page before this one}}</span></a>
     <a class="sds-nextnav-card sds-next" href="#"><span class="sds-direction">Next &rarr;</span><span class="sds-title">{{The page after this one}}</span></a>
   </div>
+</section>
+
+<section id="style" data-block="example">
+  <div class="sds-section-head"><h2>Colour and layout &mdash; tones, statuses and utilities</h2></div>
+  <p>{{The classes a block or a drawing takes for its colour, and the utilities for a layout no block covers.}}</p>
   <h3 id="b-palette">PALETTE &mdash; the tones a drawing, a chart or a badge may take</h3>
   <p>Put one tone class on a box, a connector, an arrowhead or a badge. A tone is a plain colour for a drawing or a chart, and it carries no meaning. A tone is a pair of tokens, so both themes follow, and a page never writes a colour of its own. A chart takes its series starting at violet, cyan, pink and olive, so a red line is not read as an error. To say how a thing stands, use a status class, shown in the next block.</p>
   <figure>
@@ -586,4 +808,4 @@ spnutils repo agent-sync</pre>
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.1.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.2.0/sds-docs.js"></script>

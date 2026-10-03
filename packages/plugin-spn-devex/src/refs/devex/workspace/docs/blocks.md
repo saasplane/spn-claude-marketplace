@@ -14,7 +14,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The figures — what sits inside a block, and the closed set of them",
-      "seen": "578f3224"
+      "seen": "2224935a"
     }
   ]
 }
@@ -125,7 +125,7 @@ and can be read.
 | `sequence` | a process has more than one participant and **who speaks to whom** is the point | `boxes` are participants, `links` are messages in order; `dashed` is a reply |
 | `entities` | the construct is **data** and what relates to what is the point | `card` on every link. The subject is `em`; direction decides the column |
 | `chain` | a straight run of steps, left to right | nothing. No `links` needed |
-| `skeleton` | the content is **where the parts of a screen or a block sit** — a mock of a layout | `frame` instead of `boxes` and `links`. No connectors: position is the whole claim |
+| `skeleton` | the content is **where the parts of a screen or a block sit** — a mock of a layout, a preview | `frame` instead of `boxes` and `links`; named places tinted and tagged. No connectors: position is the whole claim |
 
 `flow` is **retired**. It aliased `map` before `flowchart` existed; asking for one is refused.
 
@@ -213,28 +213,40 @@ label: a sequence shows who says **what** to whom.
 
 ### `skeleton` — a mock of a layout, and nothing about how it looks
 
-One outer `frame`: a box with an optional `label` (its title) and `note`, holding `rows` top to
+A skeleton is a **visual preview of how the inner blocks are placed**, so a developer gets the idea before reading a prop. It draws a surface's views only, never a system, a flow or a data shape (`system`, `flowchart` and `entities` draw those). It may show an arrangement no block has yet, so a tag names a place in
+plain words, or by a block's prop where the block exists. Draw one wherever a reader must picture an
+arrangement, in a construct page or an overview: a page, a layout's named places, a container's parts,
+a widget, a showcase section, a component that frames others. A hand-written page (an approach page, a
+preview) takes the same drawing from `docs figure draw <spec.json>`.
+
+One outer `frame`: a box with an optional `label` (its title), `note` and `tag`, holding `rows` top to
 bottom. A row holds `items` left to right; `label` names the row in a column every row of the frame
-shares, and `framed` puts its items inside one box, as an example sits in its frame. An item is
-`text` (a box as wide as its word, or the rest of the row with `fill`), a `note` (muted text, no
-box), or a `frame` of its own — a region, such as a navigation beside a main area, taking a `width`
-of `1/4` · `1/3` · `1/2` · `2/3` · `3/4` of the row, or what is left.
+shares, and `framed` puts its items inside one box, as an example sits in its frame.
+
+| Item | Draws |
+| --- | --- |
+| `text` | a box as wide as its word, or the rest of the row with `fill`; a control keeps its own height |
+| `note` | muted text, no box |
+| `frame` | a region, such as a navigation beside a main area: `width` `1/4` · `1/3` · `1/2` · `2/3` · `3/4` of the row, or what is left; regions in one row end on one line |
+| `tone` · `tag` | a named place: tinted in a palette tone, with a small tag at its corner (`brand`, `nav`, `children`). It stretches to its row. The tone tells places apart and means nothing more |
+| `lines` · `headings` | that many placeholder bars, in the place's tone; a heading bar is shorter and taller |
+| `spacer` | free room: the items after it sit at the end of the row |
+| `height` | a region standing taller than what it holds, in rows |
+| `em` · `off` · `warn` | the words a `map` box uses: the one thing to notice, something muted, something wrong |
 
 ```dg
 { "kind": "skeleton",
-  "caption": "Inline: a narrow frame for a small block; the variants as a row of choices.",
-  "frame": { "label": "DSButton — Inline", "note": "the main way to ask for an action",
-    "rows": [
-      { "label": "Example", "framed": true,
-        "items": [{ "text": "Save", "em": true }, { "text": "Cancel" },
-                  { "note": "narrow frame: the block at its own size" }] },
-      { "items": [{ "text": "▸ show code", "fill": true, "off": true }] },
-      { "label": "Variants", "items": [{ "text": "SOLID" }, { "text": "SOFT" }, { "text": "OUTLINE" }] },
-      { "items": [
-        { "frame": { "label": "navigation", "width": "1/4", "rows": [{ "items": [{ "text": "Home", "fill": true }] }] } },
-        { "frame": { "label": "main", "rows": [{ "items": [{ "note": "the page" }] }] } }] }] } }
+  "caption": "RAIL: each named place tinted and tagged; the navigation's items as bars.",
+  "frame": { "label": "DSLayout — RAIL", "rows": [{ "items": [
+    { "frame": { "width": "1/4", "rows": [
+      { "items": [{ "tag": "brand", "tone": "amber", "fill": true }] },
+      { "items": [{ "tag": "nav", "tone": "cyan", "lines": 5, "headings": [0, 3], "fill": true }] },
+      { "items": [{ "tag": "account", "tone": "pink", "fill": true }] }] } },
+    { "frame": { "rows": [
+      { "items": [{ "text": "≡" }, { "spacer": true }, { "tag": "utilityActions", "tone": "violet" }] },
+      { "items": [{ "tag": "children", "tone": "green", "fill": true, "height": 4 }] }] } }] }] } }
 ```
 
 **No connector, ever.** Where a part sits is the whole claim, so a skeleton never draws an arrow.
-**And no colour that means something in the product.** `em` takes the blue tone and `off` the grey
-one — the words a `map` box already uses — and nothing here stands in for the library's own look.
+**And never the library's look**: no colour that means something in the product, no size in pixels, no
+real icon. Where the look matters, the section links the drawing in the library.

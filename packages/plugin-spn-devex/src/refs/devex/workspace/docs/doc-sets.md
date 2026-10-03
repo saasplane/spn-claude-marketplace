@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "19cc9652"
+      "seen": "46d40bd8"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -604,7 +604,9 @@ section per area, then Glossary, then Where to go next.
   glossary belongs to each domain (decision RD.DEVEX.WORKSPACE.150).
 
 **The rail is built from the markup.** Every `<section id>` becomes an entry, named from its `h2` up
-to the em dash, and every `<h3 id>` inside it an entry under it. A heading with no `id` never reaches
+to the em dash, and every `<h3 id>` inside it an entry under it, named the same way: *SEQUENCE — steps in
+order* is *SEQUENCE* in the rail, and the heading on the page keeps the rest (decision RD.DEVEX.WORKSPACE.231,
+styles `1.2.0`). A heading with no `id` never reaches
 the rail, which is why a template ships every section and subsection with one. **The side gutter is
 `8px` on every page, at every width, except a report at phone width (`40rem` and below), which takes
 `16px`.**

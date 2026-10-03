@@ -582,9 +582,9 @@ console.log("\n=== SKELETON — a mock of a layout, and nothing about how it loo
       { frame: { width: "2/5", rows: [{ items: [{ text: "x" }] }] } },
       { text: "y", fill: true },
     ] }] } }).findings, says("`2/5`"));
-  one("an item that is none of `text`, `note` or `frame` is a finding",
+  one("an item that is none of the shapes a skeleton has is a finding",
     draw({ kind: "skeleton", frame: { rows: [{ items: [{ warn: true }] }] } }).findings,
-    says("none of `text`, `note` or `frame`"));
+    says("none of `text`, `tag`, `note`, `lines`, `spacer` or `frame`"));
 
   // A box marked `em` or `off` carries the skeleton's own tones — `off` reads as muted grey here,
   // never the `sds-absent` a MAP box uses for a resource that is not there.
@@ -613,6 +613,34 @@ console.log("\n=== SKELETON — a mock of a layout, and nothing about how it loo
     .map((m) => Number(m[1]));
   one("the fractioned region (nav) is narrower than the one taking what is left (main)",
     frameWidths, ([nav, main]) => nav < main);
+
+  // A NAMED PLACE IS TINTED AND TAGGED: the look of the Storybook wireframes the developer chose
+  // (05-artifacts.md § SKELETON; `spn-support-ts` `3d7e6c80^`, DSLayoutReport). A tag names the place,
+  // bars stand in for items, a spacer pushes what follows to the end, and a region may stand taller.
+  const RAIL = { kind: "skeleton", frame: { label: "RAIL", rows: [{ items: [
+    { frame: { width: "1/4", rows: [
+      { items: [{ tag: "brand", tone: "amber", fill: true }] },
+      { items: [{ tag: "nav", tone: "cyan", lines: 5, headings: [0, 3], fill: true }] },
+      { items: [{ tag: "account", tone: "pink", fill: true }] }] } },
+    { frame: { rows: [
+      { items: [{ text: "≡" }, { spacer: true }, { tag: "utilityActions", tone: "violet" }] },
+      { items: [{ tag: "children", tone: "green", fill: true, height: 4 }] }] } },
+  ] }] } };
+  const rail = judge(RAIL);
+  one("a layout of tagged places draws with no finding", rail.findings, none);
+  one("…and passes the figure check: every tag fits its place, every bar keeps its inset", rail.figure, none);
+  one("a place takes its tone's class", rail.svg, (g) => g.includes("sds-box sds-tone-cyan") && g.includes("sds-box sds-tone-pink"));
+  one("a tag is written in the note measure", rail.svg, (g) => /<text class="sds-note"[^>]*>utilityActions</.test(g));
+  const bars = (g) => [...g.matchAll(/<rect class="sds-box sds-tone-cyan" x="[\d.]+" y="[\d.]+" width="([\d.]+)" height="([\d.]+)"/g)].map((m) => [Number(m[1]), Number(m[2])]);
+  one("five bars in the nav, and its two headings shorter and taller than the rest",
+    bars(rail.svg).slice(1), (b) => b.length === 5 && b[0][0] < b[1][0] && b[0][1] > b[1][1] && b[3][0] < b[4][0]);
+  const xOf = (g, word) => Number((g.match(new RegExp(`<text class="sds-note" x="([\\d.]+)" y="[\\d.]+">${word}<`)) ?? [])[1]);
+  one("a spacer pushes the place after it to the end of the row", rail.svg, (g) => xOf(g, "utilityActions") > 900);
+  const heights = (g) => [...g.matchAll(/<rect class="sds-box" x="[\d.]+" y="([\d.]+)" width="[\d.]+" height="([\d.]+)"/g)].map((m) => Number(m[1]) + Number(m[2]));
+  one("two regions side by side end on one line", rail.svg, (g) => { const ends = heights(g).slice(1, 3); return ends.length === 2 && ends[0] === ends[1]; });
+  one("the outer frame takes at least the grid's content width", rail.svg, (g) => Number((g.match(/<rect class="sds-box" x="24" y="24" width="(\d+)"/) ?? [])[1]) >= 1052);
+  one("a tone the palette lacks is refused by name",
+    draw({ kind: "skeleton", frame: { rows: [{ items: [{ tag: "x", tone: "teal" }] }] } }).findings, says("`teal`"));
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);
