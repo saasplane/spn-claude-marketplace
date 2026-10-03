@@ -46,7 +46,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "09a8b9ac"
+      "seen": "024d673f"
     }
   ]
 }
@@ -649,8 +649,8 @@ the arc, so nothing is lost by keeping it there.
 
 **Every page walks up one step, by the back link at the top of its rail — MUST** (`RD.DEVEX.WORKSPACE.232`).
 A preview goes back to its approach page, at the subsection it serves. An approach page is the top of its
-workstream's chain, so it has no back link. The back link, and every link of the rail and of *Where to go
-next*, opens a page, never a markdown file.
+workstream's chain, so it has no back link. In its back link and its previous and next doors, a page opens a
+page; a link inside the content, *Where to go next* included, may open a markdown file, a sample or a preview.
 
 **The page links one version of the shared stylesheet and script as its base, and holds no copy of
 them — MUST** (`RD.DEVEX.WORKSPACE.214`). An approach page and a preview keep the two lines their template

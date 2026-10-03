@@ -3238,11 +3238,13 @@ export function checkConstructLink(file: string, src: string): Finding[] {
 }
 
 /**
- * A page's back link, every link of its rail and every link of its Where to go next open a page.
+ * In its back link and its previous and next doors, a page opens a page.
  *
- * A link inside the content may open a markdown file, a sample or a chapter; the navigation that
- * stands outside the content may not, because a reader following it would leave the rendering. An
- * anchor after the path is fine, and a link to another site or a bare `#fragment` is not a file.
+ * The back link at the top of the rail (`a.sds-home`) and the two doors of the `NEXT` block
+ * (`a.sds-nextnav-card` inside `div.sds-nextnav`) open a page that ends in `.html`; a markdown file
+ * walks a markdown file by its own footer. A link inside the content, Where to go next included, may
+ * open anything a reader needs for reference. An anchor after the path is fine, and a link to another
+ * site or a bare `#fragment` is not a file.
  */
 export function checkRailLinks(file: string, src: string): Finding[] {
   if (!file.endsWith(".html") || inTemplates(file)) return [];
@@ -3251,12 +3253,17 @@ export function checkRailLinks(file: string, src: string): Finding[] {
     const path = href.split("#")[0].trim();
     if (!path || /^[a-z][a-z0-9+.-]*:/i.test(path) || path.includes("{{") || path.endsWith(".html")) return;
     f.push({ check: "rail", grade: "RULE", file, message:
-      `${where} opens \`${href}\` — the way back, the rail and Where to go next open a page that ends in \`.html\`; only a link inside the content may open a markdown file` });
+      `${where} opens \`${href}\` — the back link and the previous and next doors open a page that ends in \`.html\`; only a link inside the content may open a markdown file` });
   };
-  const rail = src.match(/<nav class="sds-rail"[^>]*>([\s\S]*?)<\/nav>/);
-  if (rail) for (const m of rail[1].matchAll(/href="([^"]*)"/g)) refuse("the rail", m[1]);
-  for (const next of src.matchAll(/<h2>Where to go next<\/h2><\/div>([\s\S]*?)<\/section>/g))
-    for (const m of next[1].matchAll(/href="([^"]*)"/g)) refuse("Where to go next", m[1]);
+  const back = src.match(/<a class="sds-home"[^>]*?href="([^"]*)"/);
+  if (back) refuse("the back link", back[1]);
+  for (const nav of src.matchAll(/<div class="sds-nextnav"[^>]*>([\s\S]*?)<\/div>/g))
+    for (const door of nav[1].matchAll(/<a\b([^>]*)>/g)) {
+      const attributes = door[1];
+      if (!/class="[^"]*\bsds-nextnav-card\b/.test(attributes)) continue;
+      const href = attributes.match(/href="([^"]*)"/);
+      if (href) refuse(/class="[^"]*\bsds-next\b/.test(attributes) ? "the next door" : "the previous door", href[1]);
+    }
   return f;
 }
 

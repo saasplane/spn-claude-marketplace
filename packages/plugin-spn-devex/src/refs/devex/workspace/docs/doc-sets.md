@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "09a8b9ac"
+      "seen": "024d673f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -608,8 +608,8 @@ The top of a chain has none. A construct page goes back to its overview: where a
 overview, the one that links forward to it, and where it has one, that one. An overview, a guide, a report
 and an index go back to the hub. A preview goes back to its approach page, at the subsection it serves. The
 hub is the top of a repository's chain and an approach page is the top of a workstream's, so neither carries
-a back link. The back link, and every link of the rail and of *Where to go next*, opens a page; a link inside
-the content may open a markdown file, such as a sample or a chapter.
+a back link. In its back link and its previous and next doors, a markdown file opens a markdown file and a page opens a
+page; a link inside the content, *Where to go next* included, may open a markdown file, a sample or a preview.
 
 **A preview shows, and an approach page argues — MUST** (decision RD.DEVEX.WORKSPACE.233). A preview's
 sections are *Overview*, *Today*, *Proposed* and *Where it lands*, and it holds no card. *Overview* says what
