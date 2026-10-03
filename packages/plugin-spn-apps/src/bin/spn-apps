@@ -1,0 +1,7 @@
+#!/bin/sh
+# spn-apps — the plugin's command line, typed by its bare name. Claude Code puts a plugin's `bin/` on
+# the Bash tool's path while the plugin is enabled, and `CLAUDE_PLUGIN_ROOT` is not set in a Bash tool
+# call, so this finds the plugin from its own location and reads no variable. Every argument goes to
+# the entry as given, and the entry's exit code is this command's.
+here=$(cd "$(dirname "$0")" && pwd)
+exec node "$here/../dist/cli.mjs" "$@"

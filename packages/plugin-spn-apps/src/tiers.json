@@ -1,0 +1,7 @@
+{
+  "groups": {
+    "coverage": "allow",
+    "library": "allow"
+  },
+  "commands": {}
+}

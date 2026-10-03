@@ -15,7 +15,7 @@ const ok = (label, condition, detail = "") => {
 };
 
 /** A path a description names: one of the plugin's own folders, then a path beneath it. */
-const NAMED_PATH = /(?:refs|skills|scripts|agents|hooks)\/[A-Za-z0-9_.\/-]+/g;
+const NAMED_PATH = /(?:refs|skills|scripts|agents|hooks|bin)\/[A-Za-z0-9_.\/-]+/g;
 
 /** Every plugin path a description names, with the punctuation that ends its sentence removed. */
 const pathsNamed = (description) =>

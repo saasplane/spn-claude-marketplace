@@ -1,0 +1,13 @@
+{
+  "groups": {
+    "behaviours": "allow",
+    "coverage": "allow",
+    "docs": "allow",
+    "plan": "allow",
+    "plugin": "allow",
+    "report": "allow",
+    "restates": "allow",
+    "workspace": "allow"
+  },
+  "commands": {}
+}
