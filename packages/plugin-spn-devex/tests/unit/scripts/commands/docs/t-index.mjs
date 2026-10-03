@@ -401,5 +401,22 @@ const withAreas = () => repo({
     uncut.code === 1 && uncut.out.includes("no version of the shared styles was cut") && !existsSync(join(root, INDEX)), uncut.out);
 }
 
+console.log("\n=== the index goes back to the hub, one step up the chain");
+{
+  const root = withAreas();
+  index(["write", root]);
+  const text = read(root, INDEX);
+  ok("the way back sits at the top of the side and opens the hub, named by the hub's own title",
+    text.includes(`<aside class="sds-index-side" id="index-side">\n    <a class="sds-home" href="${ARTIFACT.docs}/${HUB}">&larr; Concept</a>\n    <div class="sds-index-head">`));
+  const away = join(BASE, "elsewhere-back", ARTIFACT_INDEX);
+  mkdirSync(dirname(away));
+  index(["write", root, "--out", away]);
+  ok("written elsewhere, the link is the hub's path from where the page sits",
+    readFileSync(away, "utf8").includes(`class="sds-home" href="${relative(dirname(away), join(root, POCKET_DOCS, HUB))}"`));
+  const bare = repo({ [`${POCKET_DOCS}/${AGENT}/devex-agent-overview.html`]: overview("agent", "DevEx Agent"), [`${ARTIFACTS}/README.md`]: "# Artifacts\n" });
+  index(["write", bare]);
+  ok("a repository with no hub gives the index no way back", !read(bare, INDEX).includes("sds-home"));
+}
+
 console.log(failed ? `\n  ${failed} of ${total} FAILED` : `\n  all ${total} passed`);
 process.exit(failed ? 1 : 0);

@@ -22,7 +22,7 @@ import { filesUnder as proseFilesUnder, paragraphs as proseParagraphs, score as 
 import { withOffset } from "../../lib/clock.ts";
 import { GUIDE_PAGE_SUFFIX, ARTIFACT_FOLDERS, ARTIFACT_INDEX, DEVEX_WORKSTREAMS, DOCS, FACE, HUB, POCKET, SEAT, SEATS, TEMPLATES,
   artifactDocsDir, artifactFolderOf, behaviorsDir, bookTemplatesDir, capabilitiesDir, constructsDir, docsOf, domainDirOf, hubPage, inSeat, inTemplates,
-  isOverview, isProducedPage, mirrorPath, pagePlaceOf, producedPageOf, seatOf, splitAtSeat,
+  docsRootOf, isApproachPage, isOverview, isProducedPage, mirrorPath, pagePlaceOf, producedPageOf, seatOf, slashes, splitAtSeat,
   workstreamDirOf } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, PAGE_SCRIPT, SERVED_FILES, STYLESHEET, cutVersions, linksSharedStyles,
   stylesDir, BUNDLED_SUFFIX } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
@@ -3260,6 +3260,88 @@ export function checkRailLinks(file: string, src: string): Finding[] {
   return f;
 }
 
+/**
+ * The hub of a repository as the page at `out` links it: the way back of an overview, a guide, a
+ * report and an index. Null where the repository has no hub, because a link is a promise a reader can
+ * follow and a hub that is not there cannot be followed to.
+ */
+export function hubAbove(docs: string, out: string): { href: string; label: string } | null {
+  const hub = hubPage(docs);
+  if (!existsSync(hub)) return null;
+  return { href: relative(dirname(out), hub), label: String(readBlock(readFileSync(hub, "utf8")).block?.title ?? basename(hub)) };
+}
+
+/** The pages that walk up one step, by kind. The hub and an approach page are the tops of a chain. */
+export type WalkKind = "hub" | "approach" | "preview" | "construct" | "overview" | "guide" | "index" | "report";
+
+/**
+ * A page's kind for the walk up, read as the rest of the audit reads it: the suffix of its file name
+ * and the variant of its metadata block, and never the folder it sits in.
+ */
+export function walkKindOf(file: string, block: any): WalkKind | null {
+  const name = basename(file);
+  const variant = block?.variant;
+  if (name === HUB) return "hub";
+  if (isApproachPage(file) || variant === "approach") return "approach";
+  if (name.endsWith("-preview.html") || variant === "preview") return "preview";
+  if (name.endsWith("-construct.html") || variant === "construct") return "construct";
+  if (name.endsWith("-overview.html") || variant === "overview") return "overview";
+  if (name.endsWith("-guide.html") || variant === "guide") return "guide";
+  if (name === ARTIFACT_INDEX && variant === "index") return "index";
+  if (variant === "report") return "report";
+  return null;
+}
+
+/**
+ * Every page walks up one step, by the back link at the top of its rail; the top of a chain has none.
+ *
+ * A construct page goes back to the overview that links forward to it, an overview, a guide, a report
+ * and an index to the hub, a preview to the approach page of its workstream. The hub and an approach
+ * page carry none. Where the page a link should open is not there (a repository with no hub, a preview
+ * outside a workstream), the page owes no link: a link is a promise a reader can follow. A back link
+ * that opens a markdown file is the rail check's to refuse, so it is not said twice.
+ */
+export function checkWayBack(file: string, src: string, block: any): Finding[] {
+  if (!file.endsWith(".html") || inTemplates(file) || holdsOwnCopy(file, src)) return [];
+  const kind = walkKindOf(file, block);
+  if (!kind) return [];
+  const back = src.match(/<a class="sds-home" href="([^"]*)"/);
+  const rule = (message: string): Finding[] => [{ check: "rail", grade: "RULE", file, message }];
+  if (kind === "hub" || kind === "approach")
+    return back ? rule(`the way back opens \`${back[1]}\` — ${kind === "hub" ? "the hub is the top of a repository's chain" : "an approach page is the top of a workstream's chain"}, so it carries no way back`) : [];
+
+  const norm = slashes(resolve(file));
+  let want: string | null = null;
+  let wantName = "";
+  if (kind === "construct") {
+    const seat = seatOf(norm);
+    const above = seat === norm ? null : overviewAbove(seat, norm);
+    want = above ? resolve(dirname(norm), above.href) : null;
+    wantName = "the overview that links forward to it";
+  } else if (kind === "preview") {
+    const workstream = workstreamDirOf(norm);
+    const approach = workstream && readdirSync(workstream.folder).find((name) => isApproachPage(name));
+    want = workstream && approach ? join(workstream.folder, approach) : null;
+    wantName = "the approach page of its workstream";
+  } else {
+    const docs = docsRootOf(norm);
+    want = docs && existsSync(hubPage(docs)) ? hubPage(docs) : null;
+    wantName = "the hub of its repository";
+  }
+  if (!want) {
+    // No page to open. A preview must still open an approach page, wherever it sits.
+    if (kind === "preview" && back && !isApproachPage(back[1].split("#")[0]))
+      return rule(`the way back opens \`${back[1]}\`, which is not an approach page — a preview goes back to its approach page`);
+    return [];
+  }
+  const should = slashes(relative(dirname(norm), want));
+  if (!back) return rule(`this ${kind} has no way back at the top of its rail — it should open ${wantName}, \`${should}\``);
+  const path = back[1].split("#")[0].trim();
+  if (!path || path.endsWith(".md") || /^[a-z][a-z0-9+.-]*:/i.test(path) || path.includes("{{")) return [];
+  if (resolve(dirname(norm), path) === want) return [];
+  return rule(`the way back opens \`${back[1]}\` — ${/^[aeiou]/.test(kind) ? "an" : "a"} ${kind} goes back to ${wantName}, \`${should}\``);
+}
+
 export function checkLinks(file: string, src: string): Finding[] {
   if (inTemplates(file)) return [];
   const f: Finding[] = [];
@@ -3332,6 +3414,7 @@ export function audit(paths: string[], workspace: string): Finding[] {
     findings.push(...checkLinks(p, src));
     findings.push(...checkConstructLink(p, src));
     findings.push(...checkRailLinks(p, src));
+    findings.push(...checkWayBack(p, src, block));
     findings.push(...checkFurniture(p, src));
     findings.push(...checkGovernsMap(p, src));
     findings.push(...checkProof(p, src));

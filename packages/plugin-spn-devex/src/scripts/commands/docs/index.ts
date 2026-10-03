@@ -17,7 +17,7 @@ import { ARTIFACT_INDEX, CONSTRUCT_PAGES, DOCS, OVERVIEW_PAGE_SUFFIX, POCKET, ar
   domainConstructsDir, guidePagesDir, hubPage, isOverview, isProducedPage, reportsDir,
   slashes } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { BUNDLED_SUFFIX, INDEX_SCRIPT } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
-import { locationOf, resolveWorkspace, text as plainText } from "./_lib.ts";
+import { hubAbove, locationOf, resolveWorkspace, text as plainText } from "./_lib.ts";
 import { Refusal, attribute, escaped, newestCut,
   pageTemplate, place, refuseSlots, say, swap, templatesDir, withHead, type Note } from "./_pages.ts";
 
@@ -224,7 +224,7 @@ export function groupsOf(artifacts: string): { groups: TreeNode[]; pages: string
 }
 
 /** The index page: the template's shell, with its head and its slots filled and its tree written. */
-function indexPage(template: string, tree: Tree, where: { organisation: string; location: string; repository: string; hub: string }): string {
+function indexPage(template: string, tree: Tree, where: { organisation: string; location: string; repository: string; hub: string; back: { href: string; label: string } | null }): string {
   const shell = withHead(template, {
     tab: `${where.location} Artifacts`,
     block: { id: `${basename(where.repository)}-artifacts-index`, variant: "index", title: "Artifacts",
@@ -238,6 +238,10 @@ function indexPage(template: string, tree: Tree, where: { organisation: string; 
   around = swap(around, /\{\{WORKSPACE\}\}/, escaped(where.organisation), "slot `{{WORKSPACE}}`");
   around = swap(around, /\{\{REPOSITORY\}\}/, escaped(where.location), "slot `{{REPOSITORY}}`");
   around = swap(around, /\{\{THE ADDRESS OF THE HUB[^}]*\}\}/, attribute(where.hub), "slot for the address of the hub");
+  // THE WAY BACK IS THE HUB, at the top of the side. The template has none, and the one page that has no hub to go back to is a repository without one.
+  if (where.back)
+    around = swap(around, /<aside class="sds-index-side" id="index-side">\n/,
+      `<aside class="sds-index-side" id="index-side">\n    <a class="sds-home" href="${attribute(where.back.href)}">&larr; ${escaped(where.back.label)}</a>\n`, "side of the index");
   refuseSlots(around, TEMPLATE);
   // The data sits in a script element, so a `<` in it is written as its escape and can never close the element.
   const written = JSON.stringify(tree, null, 1).replace(/</g, "\\u003c");
@@ -316,6 +320,7 @@ function run(args: string[], write: boolean): number {
       location: process.env.SPN_LOCATION ?? (named === "—" ? basename(repository) : named),
       repository,
       hub: base + first,
+      back: hubAbove(docs, out),
     });
     if (write) return say([...place(out, produce(), true, workspace, "index"), ...notes], workspace) ? 1 : 0;
 

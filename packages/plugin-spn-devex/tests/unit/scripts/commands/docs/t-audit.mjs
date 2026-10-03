@@ -925,6 +925,84 @@ console.log("\n=== the back link, the rail and Where to go next open a page; the
   one("the finding name `rail` is one the command takes", FINDINGS.includes("rail"), true);
 }
 
+console.log("\n=== every page walks up one step: the back link by kind of page, and the top of a chain has none");
+{
+  // A page of any kind, with `home` as the link at the top of its rail, or none where `home` is null.
+  const page = (variant, title, home, extra = "") =>
+    `<meta charset="utf-8">\n<title>${title}</title>\n` +
+    block({ id: `${variant}-x`, variant, title, lenses: ["ARCHITECT"], summary: "s." }) +
+    `${LINES.stylesheet}\n<nav class="sds-rail" id="rail">\n${home === null ? "" : `  <a class="sds-home" href="${home}">&larr; Up</a>\n`}</nav>\n` +
+    `<section id="s1">\n<p>x</p>${extra}\n</section>\n`;
+  const HUB_AT = `${POCKET_DOCS}/concept-overview.html`;
+  const hubFile = page("overview", "The Hub", null);
+  const rail = (root, file) => run(root, ["audit", "check", file, "--finding", "rail"]);
+  const refused = (root, file, ...words) => one(`${file.split("/").pop()}: a RULE that says ${words[0]}`, rail(root, file),
+    (g) => g.includes("✗ RULE rail") && words.every((word) => g.includes(word)));
+  const clean = (name, root, file) => one(name, rail(root, file), has("clean"));
+  const base = { "CONCEPT.md": "# c\n\n## Core\n\nThe core.\n", [HUB_AT]: hubFile };
+
+  // THE TOPS OF A CHAIN: the hub and an approach page carry none.
+  clean("a hub with no back link is clean", repo(base), HUB_AT);
+  refused(repo({ ...base, [HUB_AT]: page("overview", "The Hub", "../../README.md") }), HUB_AT, "the top of a repository's chain");
+  const approachAt = ".spndevex/workstreams/open/001-x/approach.html";
+  clean("an approach page with no back link is clean", repo({ ...base, [approachAt]: page("approach", "X", null) }), approachAt);
+  refused(repo({ ...base, [approachAt]: page("approach", "X", "../../../README.md") }), approachAt, "the top of a workstream's chain");
+  const closedAt = ".spndevex/workstreams/closed/002-y/y-approach.html";
+  refused(repo({ ...base, [closedAt]: page("approach", "Y", "../../../README.md") }), closedAt, "the top of a workstream's chain");
+
+  // AN OVERVIEW, A GUIDE, A REPORT AND AN INDEX GO BACK TO THE HUB.
+  const kinds = {
+    overview: [`${POCKET_DOCS}/01-core/core-overview.html`, "../concept-overview.html"],
+    guide: [`docs/${POCKET.artifacts}/${ARTIFACT.guides}/start-guide.html`, "../docs/concept-overview.html"],
+    report: [`docs/${POCKET.artifacts}/${ARTIFACT.reports}/2026/audit-report.html`, "../../docs/concept-overview.html"],
+  };
+  for (const [variant, [file, up]] of Object.entries(kinds)) {
+    clean(`a ${variant} that goes back to the hub is clean`, repo({ ...base, [file]: page(variant, "T", up) }), file);
+    const none = repo({ ...base, [file]: page(variant, "T", null) });
+    refused(none, file, `no way back`, "the hub of its repository", "concept-overview.html");
+    const wrong = repo({ ...base, [file]: page(variant, "T", "../other-overview.html"), [`${POCKET_DOCS}/other-overview.html`]: page("overview", "O", "concept-overview.html") });
+    refused(wrong, file, `${variant === "overview" ? "an" : "a"} ${variant} goes back to the hub of its repository`, "concept-overview.html");
+  }
+  const indexAt = `docs/${POCKET.artifacts}/index.html`;
+  const indexPage = (home) => `<meta charset="utf-8">\n<title>I</title>\n` +
+    block({ id: "i", variant: "index", title: "Artifacts", summary: "s." }) +
+    `${LINES.stylesheet}\n<div class="sds-index"><aside class="sds-index-side">\n${home === null ? "" : `<a class="sds-home" href="${home}">&larr; The Hub</a>\n`}</aside></div>\n`;
+  clean("an index that goes back to the hub is clean", repo({ ...base, [indexAt]: indexPage("artifacts/docs/concept-overview.html".replace("artifacts/", "")) }), indexAt);
+  refused(repo({ ...base, [indexAt]: indexPage(null) }), indexAt, "no way back", "docs/concept-overview.html");
+  refused(repo({ ...base, [indexAt]: indexPage("docs/01-core/core-overview.html"), [`${POCKET_DOCS}/01-core/core-overview.html`]: page("overview", "C", "../concept-overview.html") }),
+    indexAt, "an index goes back to the hub");
+  clean("a repository with no hub owes its overview no way back, because there is nothing to open",
+    repo({ "CONCEPT.md": base["CONCEPT.md"], [kinds.overview[0]]: page("overview", "T", null) }), kinds.overview[0]);
+
+  // A CONSTRUCT PAGE GOES BACK TO THE OVERVIEW THAT LINKS FORWARD TO IT, never to the hub while one does.
+  const seats = {
+    [`docs/${SEAT.constructs}/01-core/README.md`]: doc({ id: "core", title: "Core", lenses: ["ARCHITECT"], status: "PLANNING" }),
+    [`docs/${SEAT.constructs}/01-core/thing.md`]: doc({ id: "thing", variant: "construct", parentId: "core", title: "Thing", lenses: ["ARCHITECT"], status: "PLANNING", dependsOn: [] }, "x\n"),
+  };
+  const constructAt = `${POCKET_DOCS}/01-core/constructs/thing-construct.html`;
+  const naming = page("overview", "Core Overview", "../concept-overview.html", '<a href="constructs/thing-construct.html">Read thing</a>');
+  const withOverview = (home) => repo({ ...base, ...seats, [`${POCKET_DOCS}/01-core/core-overview.html`]: naming,
+    [constructAt]: page("construct", "Thing", home) });
+  clean("a construct page that goes back to the overview naming it is clean", withOverview("../core-overview.html"), constructAt);
+  refused(withOverview("../../concept-overview.html"), constructAt, "a construct goes back to the overview that links forward to it", "../core-overview.html");
+  refused(withOverview(null), constructAt, "no way back", "the overview that links forward to it", "../core-overview.html");
+
+  // A PREVIEW GOES BACK TO ITS APPROACH PAGE, AT THE SUBSECTION IT SERVES.
+  const previewAt = ".spndevex/workstreams/open/001-x/notes/N001/previews/shape-preview.html";
+  const withApproach = (home) => repo({ ...base, [approachAt]: page("approach", "X", null), [previewAt]: page("preview", "Shape", home) });
+  clean("a preview that goes back to its approach page, at a subsection, is clean", withApproach("../../../approach.html#c12"), previewAt);
+  refused(withApproach("../../../../../../../docs/artifacts/docs/concept-overview.html"), previewAt, "a preview goes back to the approach page of its workstream", "approach.html");
+  refused(withApproach(null), previewAt, "no way back", "the approach page of its workstream");
+  refused(repo({ ...base, [previewAt]: page("preview", "Shape", "../../../README.md") }), previewAt, "not an approach page");
+
+  // THE KIND IS READ FROM THE FILE NAME AND THE BLOCK, NEVER FROM THE FOLDER: a page in a folder that
+  // looks like a guide's, but whose name and block say overview, is judged as an overview, and a page
+  // of a kind with no rule is left alone.
+  const odd = `docs/${POCKET.artifacts}/${ARTIFACT.guides}/odd-overview.html`;
+  refused(repo({ ...base, [odd]: page("overview", "Odd", null) }), odd, "this overview");
+  clean("a page of a kind with no rule is left alone", repo({ ...base, [`${POCKET_DOCS}/x.html`]: page("capability", "C", null) }), `${POCKET_DOCS}/x.html`);
+}
+
 // ---------------------------------------------------------------- N37: the realization files
 
 console.log("\n=== a data model is read against its fixed outline, and reports softly while it is new (N37 step 3)");

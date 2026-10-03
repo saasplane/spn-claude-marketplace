@@ -611,12 +611,12 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
     { control: "field", text: "name@example.com" }, { control: "select", text: "Sort" }, { control: "checkbox" },
     { control: "pager", text: "‹ 1 2 ›" }] }] } });
   one("every control draws with no finding", controls.findings, none);
-  one("a control is a thin outline of the component's height, 28 in a plain row", controls.svg, (g) => rect(g, "sds-skel-control").every((r) => r[3] === 28));
+  one("a control is a thin outline of the component's height, 32 by default", controls.svg, (g) => rect(g, "sds-skel-control").every((r) => r[3] === 32));
   one("the main action is told apart by weight, with the same class and no colour", controls.svg, (g) => g.includes("sds-skel-control sds-skel-main") && rect(g, "sds-skel-control sds-skel-main").length === 1);
   one("a pager is one packed group: its parts sit 4px apart", controls.svg, (g) => {
     const boxes = rect(g, "sds-skel-control").slice(-4); return boxes.slice(1).every((b, i) => b[0] - (boxes[i][0] + boxes[i][2]) === 4); });
-  one("a framed row takes the larger control height", draw({ kind: "skeleton", frame: { rows: [{ framed: true, items: [{ control: "button", text: "Save" }] }] } }).svg,
-    (g) => rect(g, "sds-skel-control")[0][3] === 36);
+  one("a framed row no longer decides a control's height", draw({ kind: "skeleton", frame: { rows: [{ framed: true, items: [{ control: "button", text: "Save" }] }] } }).svg,
+    (g) => rect(g, "sds-skel-control")[0][3] === 32);
   one("a control with a tag is a finding", draw({ kind: "skeleton", frame: { rows: [{ items: [{ control: "button", text: "x", tag: "name" }] }] } }).findings, says("a control carries no tag"));
   one("a control that runs over one line is a finding", draw({ kind: "skeleton", frame: { rows: [{ items: [{ control: "button", text: "a\nb" }] }] } }).findings, says("one line"));
   one("a control the skeleton lacks is refused by name", draw({ kind: "skeleton", frame: { rows: [{ items: [{ control: "slider", text: "x" }] }] } }).findings, says("`slider`"));
@@ -624,12 +624,12 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   // 5 · icons
   const icons = draw({ kind: "skeleton", frame: { rows: [{ items: ["close", "add", "menu", "search", "more", "previous", "next", "select", "checkbox", "bell", "person", "default"].map((icon) => ({ icon })) }] } });
   one("each of the twelve icons draws with no finding", icons.findings, none);
-  one("an icon sits in a square whose side is the control's height", icons.svg, (g) => rect(g, "sds-skel-control").length === 12 && rect(g, "sds-skel-control").every((r) => r[2] === 28 && r[3] === 28));
+  one("an icon sits in a square whose side is the control's height", icons.svg, (g) => rect(g, "sds-skel-control").length === 12 && rect(g, "sds-skel-control").every((r) => r[2] === 32 && r[3] === 32));
   one("icons are line shapes of the stylesheet, with no transform", icons.svg, (g) => g.includes("sds-skel-glyph") && !g.includes("transform"));
   one("an icon the set lacks is a finding that names the default", draw({ kind: "skeleton", frame: { rows: [{ items: [{ icon: "rocket" }] }] } }).findings, says("`default`"));
   const word = draw({ kind: "skeleton", frame: { rows: [{ items: [{ icon: "add", text: "New" }, { control: "button", text: "Go" }] }] } }).svg;
   const wordY = Number((word.match(/<text class="sds-code" x="[\d.]+" y="([\d.]+)">New/) ?? [])[1]);
-  one("a word beside an icon is centred on the icon's own line", word, () => wordY === rect(word, "sds-skel-control")[0][1] + 14 + 4);
+  one("a word beside an icon is centred on the icon's own line", word, () => wordY === rect(word, "sds-skel-control")[0][1] + 16 + 4);
 
   // 6 · a title is plain text
   const title = draw({ kind: "skeleton", frame: { rows: [{ items: [{ text: "Members" }] }] } }).svg;
@@ -667,6 +667,54 @@ console.log("\n=== SKELETON — the marks, the controls and the check of a layer
   const deep = { kind: "skeleton", frame: { rows: [{ items: [{ frame: { tag: "a", rows: [{ items: [{ frame: { tag: "b", rows: [{ items: [{ frame: { tag: "c", rows: [] } }] }] } }] }] } }] }] } };
   one("a third named boundary is a finding that names it", draw(deep).findings, says("draw `c` as a skeleton of its own"));
   one("two named boundaries are allowed", draw({ ...deep, frame: { rows: [{ items: [{ frame: { tag: "a", rows: [{ items: [{ frame: { tag: "b", rows: [] } }] }] } }] }] } }).findings, none);
+
+
+  // 12 · parts that share one frame (a container's `frames`, `raised`, `bordered`, `rounded`)
+  const part = (tag, rows = [{ items: [{ text: tag }] }]) => ({ items: [{ frame: { tag, rows } }] });
+  const box = (props) => draw({ kind: "skeleton", frame: { rows: [{ items: [{ frame: { tag: "C", ...props, rows: [part("Header"), part("Content"), part("Footer")] } }] }] } });
+  const all = box({ frames: ["Header", "Content", "Footer"], raised: true, rounded: true });
+  one("a container with `frames` draws with no finding", all.findings, none);
+  one("parts of a container stand with no gap between them", all.svg, (g) => { const r = rect(g, "sds-skel-guide"); return r.length === 3 && r[1][1] === r[0][1] + r[0][3] && r[2][1] === r[1][1] + r[1][3]; });
+  one("a raised frame is one surface behind its parts, rounded", all.svg, (g) => rect(g, "sds-skel-surface").length === 1 && g.includes('class="sds-skel-surface"') && /sds-skel-surface"[^>]*rx="8"/.test(g));
+  one("a raised frame leaves each part its dotted boundary", all.svg, (g) => rect(g, "sds-skel-guide").length === 3 && rect(g, "sds-skel-border").length === 0);
+  const bordered = box({ frames: ["Header", "Content", "Footer"], bordered: true });
+  one("a bordered frame is one outline, square when not `rounded`", bordered.svg, (g) => rect(g, "sds-skel-border").length === 1 && /sds-skel-border"[^>]*rx="0"/.test(g));
+  one("a bordered frame has one solid line between each two parts", bordered.svg, (g) => (g.match(/<path class="sds-skel-border"/g) ?? []).length === 2);
+  one("a part inside a bordered frame shows no dotted boundary", bordered.svg, (g) => rect(g, "sds-skel-guide").length === 0);
+  const both = box({ frames: ["Content", "Footer"], raised: true, bordered: true, rounded: true });
+  one("a frame may be both raised and bordered", both.svg, (g) => rect(g, "sds-skel-surface").length === 1 && rect(g, "sds-skel-border").length === 1);
+  one("a part in no frame is flat: its dotted boundary and no surface", both.svg, (g) => rect(g, "sds-skel-guide").length === 1);
+  one("a frame holds only the parts named, next to each other", both.svg, (g) => { const s = rect(g, "sds-skel-surface")[0], b = rect(g, "sds-skel-guide")[0]; return s[1] === b[1] + b[3]; });
+  one("an empty `frames` is all flat: three dotted boundaries and no frame", box({ frames: [] }).svg, (g) => rect(g, "sds-skel-guide").length === 3 && !g.includes("sds-skel-surface") && rect(g, "sds-skel-border").length === 0);
+  one("`frames` naming a part that is not there is a finding", box({ frames: ["Nope"], raised: true }).findings, says("no part of this container has that `tag`"));
+  one("`frames` with neither `raised` nor `bordered` is a finding", box({ frames: ["Header"] }).findings, says("neither `raised` nor `bordered`"));
+  one("`raised` with no `frames` is a finding", box({ raised: true }).findings, says("belong to a frame with `frames`"));
+  one("a part with its own `look` inside a container is a finding", draw({ kind: "skeleton", frame: { rows: [{ items: [{ frame: { tag: "C", frames: [], rows: [{ items: [{ frame: { tag: "P", look: "raised", rows: [] } }] }] } }] }] } }).findings, says("leave `look` off a part"));
+  one("a frame standing alone keeps its `look`", look("raised").findings, none);
+
+  // 13 · a slot or a part takes the height left in its column
+  const column = (item) => draw({ kind: "skeleton", frame: { rows: [{ items: [
+    { frame: { tag: "rail", rows: [{ items: [{ slot: "top" }] }, { items: [item] }, { items: [{ slot: "foot" }] }] } },
+    { frame: { tag: "main", rows: [{ items: [{ standin: "rows", lines: 24 }] }] } }] }] } });
+  const grown = column({ slot: "nav", fill: true });
+  const guides = (g) => rect(g, "sds-skel-guide");
+  one("a slot with `fill` and nothing inside it draws with no finding", grown.findings, none);
+  one("a slot with `fill` reaches down, and the slot after it stands at the foot", grown.svg, (g) => { const r = guides(g); const rail = r[0], nav = r[2], foot = r[3]; return nav[3] > 100 && foot[1] + foot[3] + 16 === rail[1] + rail[3]; });
+  one("a slot with no `fill` keeps the height of a control", column({ slot: "nav" }).svg, (g) => guides(g)[2][3] === 32);
+  one("a tagged part with `fill` takes the height left too", column({ tag: "nav", fill: true }).svg, (g) => guides(g)[2][3] > 100);
+  one("a slot alone in its row takes the row's width", grown.svg, (g) => { const r = guides(g); return r[1][2] === r[0][2] - 32; });
+
+  // 14 · a control's size step
+  const sized = (size, inner) => draw({ kind: "skeleton", frame: { size, rows: [{ items: [{ control: "button", text: "Go" }, { icon: "add" }, { control: "field", text: "x" }] }, ...(inner ?? [])] } });
+  for (const [step, height] of [["XS", 28], ["SM", 32], ["MD", 36], ["LG", 40], ["XL", 44]])
+    one(`size ${step} draws every control ${height} high`, sized(step).svg, (g) => rect(g, "sds-skel-control").length === 3 && rect(g, "sds-skel-control").every((r) => r[3] === height));
+  one("no size is `SM`, 32", sized(undefined).svg, (g) => rect(g, "sds-skel-control").every((r) => r[3] === 32));
+  one("a frame inside the outer one takes its own size, and a control reads the nearest", draw({ kind: "skeleton", frame: { size: "XL", rows: [{ items: [
+    { frame: { tag: "small", size: "XS", rows: [{ items: [{ control: "button", text: "a" }] }] } }, { frame: { tag: "inherits", rows: [{ items: [{ control: "button", text: "b" }] }] } }] }] } }).svg,
+    (g) => rect(g, "sds-skel-control").map((r) => r[3]).join() === "28,44");
+  one("a size the step lacks is a finding that names it", sized("HUGE").findings, says("`HUGE`"));
+  one("a row's height follows the size step", sized("XL").svg, (g) => rect(g, "sds-box")[0][3] - rect(sized("XS").svg, "sds-box")[0][3] === 16);
+
 
   // 11 · the old fields
   const oldFields = draw({ kind: "skeleton", frame: { tone: "blue", rows: [{ items: [{ text: "Save", em: true }, { note: "n", off: true }] }] } });

@@ -15,7 +15,7 @@ import { type Action, REQUIRED, UsageFault, VALUE, readWords, scopeOf } from "..
 import { GUIDE_PAGE_SUFFIX, docsRootOf, guidePagesDir, slashes } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { PAGE_SCRIPT } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
 import { hrefForPage } from "../../lib/render.ts";
-import { LENS_LABEL, locationOf, resolveWorkspace } from "./_lib.ts";
+import { LENS_LABEL, hubAbove, locationOf, resolveWorkspace } from "./_lib.ts";
 import { Refusal, attribute, escaped, newestCut, pageTemplate,
   place, refuseSlots, say, swap, templatesDir, withHead, type Note } from "./_pages.ts";
 
@@ -398,7 +398,7 @@ function sectionsOf(guide: Guide, link: Link): { sections: string[]; tally: Tall
 // ---------------------------------------------------------------------------- the page
 
 /** The guide's page: the template's shell, with its head and its masthead filled, and the guide's sections. */
-function guidePage(template: string, guide: Guide, sections: string[], where: { organisation: string; location: string; source: string }): string {
+function guidePage(template: string, guide: Guide, sections: string[], where: { organisation: string; location: string; source: string; hub: { href: string; label: string } | null }): string {
   const { block } = guide;
   const title = String(block.title);
   const lenses = Array.isArray(block.lenses) ? block.lenses.map(String) : [];
@@ -414,6 +414,10 @@ function guidePage(template: string, guide: Guide, sections: string[], where: { 
   const to = page.lastIndexOf(closing);
   if (from < 0 || to < from) throw new Refusal("the template has no section, so the page cannot be produced from it");
   let shell = `${page.slice(0, from)}${HELD}${page.slice(to + closing.length)}`;
+  // THE WAY BACK IS THE HUB, one step up the chain, and the template's `the index` is replaced. A
+  // repository with no hub gives the page no way back, because a link must open a page that is there.
+  shell = swap(shell, /[ \t]*<a class="sds-home"[^>]*>[^<]*<\/a>\n/,
+    where.hub ? `  <a class="sds-home" href="${attribute(where.hub.href)}">&larr; ${escaped(where.hub.label)}</a>\n` : "", "way back in its rail");
   shell = swap(shell, /\{\{PAGE NAME[^}]*\}\}/, escaped(title), "slot for the name in the rail");
   shell = swap(shell, /\{\{WORKSPACE\}\}/, escaped(where.organisation), "slot `{{WORKSPACE}}`");
   shell = swap(shell, /\{\{LOCATION\}\}/, escaped(where.location), "slot `{{LOCATION}}`");
@@ -458,6 +462,7 @@ function pageOf(guideFile: string, options: { name: string | null; out: string |
     organisation: process.env.SPN_ORG ?? "SaaS Plane",
     location: process.env.SPN_LOCATION ?? (named === "—" ? basename(repository) : named),
     source: slashes(relative(repository, file)),
+    hub: hubAbove(docs, out),
   });
   const notes = place(out, page, options.write, workspace, "guide");
   if (!notes.length) console.log(`         ${tally.stages} stage(s) · ${tally.steps} step(s)`);

@@ -158,7 +158,8 @@ After the last step the service is down again.
     text.includes(`<a href="../${ARTIFACT.docs}/01-core/${CONSTRUCT_PAGES}/thing-construct.html">the model</a>`), each(text, /(<a [^>]*>)/g).join(" "));
   ok("a link to another file is written again against the page's own place, and keeps its anchor",
     text.includes('<a href="../../README.md#the-map">the face</a>') && text.includes(`<a href="../../${SEAT.guides}/02-build.md">Build</a>`));
-  ok("the link home is `../index.html`", text.includes('<a class="sds-home" href="../index.html" target="_top">'));
+  ok("a repository with no hub gives the page no way back, and not a link to the index",
+    !text.includes("sds-home") && !text.includes("../index.html"), each(text, /(<a [^>]*sds-home[^>]*>)/g).join(" "));
   const lines = linesFor(NEWEST);
   ok("the page links the newest version that was cut, and loads the page script from it",
     text.includes(lines.stylesheet) && text.includes(lines.script) && !text.includes("/1.0.0/") && !text.includes("/1.2.0/"));
@@ -485,6 +486,19 @@ tool run
   const slot = guide(["write", join(root, GUIDES, "01-getting-started.md")], { SPN_TEMPLATES: changed });
   ok("a template with a slot the command does not fill is refused, and the slot is named",
     slot.code === 1 && slot.out.includes("{{A NEW SLOT}}") && unchanged(), slot.out);
+}
+
+console.log("\n=== a guide goes back to the hub of its repository, one step up the chain");
+{
+  const hub = `<!-- spn:doc\n{"id":"hub","variant":"overview","title":"The Hub &amp; More","lenses":["LEAD"],"summary":"s"}\n-->\n<h1>x</h1>\n`;
+  const root = repo({ [`${GUIDES}/01-getting-started.md`]: TABLE_GUIDE, [`${GUIDES}/02-build.md`]: "# Build\n",
+    [`${DOCS}/README.md`]: "# Docs\n", [`${DOCS}/${POCKET.artifacts}/${ARTIFACT.docs}/concept-overview.html`]: hub });
+  const ran = guide(["write", join(root, GUIDES, "01-getting-started.md")]);
+  const text = read(root, `${PAGES}/getting-started-guide.html`);
+  ok("the way back opens the hub, a page, named by the hub's own title", ran.code === 0
+    && text.includes('<a class="sds-home" href="../docs/concept-overview.html">&larr; The Hub &amp; More</a>'), ran.out + each(text, /(<a [^>]*sds-home[^>]*>)/g).join(" "));
+  ok("and it is not the index, and it keeps the page inside its own tab", !text.includes("../index.html") && !text.includes('target="_top"'));
+  ok("the page is current against what the command writes now", guide(["check", join(root, GUIDES, "01-getting-started.md")]).code === 0);
 }
 
 console.log(failed ? `\n  ${failed} of ${total} FAILED` : `\n  all ${total} passed`);
