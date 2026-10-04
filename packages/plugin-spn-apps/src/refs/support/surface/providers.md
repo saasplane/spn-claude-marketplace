@@ -7,11 +7,11 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/13-providers/",
-      "seen": "4f60439f"
+      "seen": "54b71953"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/13-providers/ts/01-design-system.md",
-      "seen": "aca88129"
+      "seen": "94d901fc"
     }
   ]
 }
@@ -52,11 +52,11 @@ A provider holds one design-system package and one showcase, `ts` today and `nat
 | Overlays | `DSOverlayContext.showComponent` plus `useDSOverlayConfirm` — no screen mounts a dialog into the tree |
 | Access to it all | one hook per context, returning it whole: `useDSContext` · `useDSAppContext` · `useDSScopeContext` · `useDSOverlayContext`. `useDSAppAuthz` checks a permission; `useDSAppTestData` builds the test attributes; `useDSScopeIsFramed` returns whether the block sits in a `flush` part, with the block's own `bordered` winning. `useServiceExecutor` resolves to what the call returns, or to nothing on failure |
 
-The package has an interior the UI taxonomy deliberately does not reach — the taxonomy binds what a package *exposes*; this is what the system is *made of*: `ui/boot/` (the system's own composition — `DSApp`, the contexts, the roots it mounts); `ui/core/` (the vocabularies every component reads); `ui/components/<group>/` (one folder per capability group); `ui/widgets/` (assembled surfaces mounted whole); `ui/hooks/` · `ui/utils/` (context accessors and density resolution, pure helpers); `ui/managers/` (cross-cutting runtime helpers); `assets/` (fonts, images, token stylesheets); `_shadcn/` (vendored primitives, never exported, never hand-edited). **`ui/boot/` is the design system booting itself, not the application's boot** — two different acts, one word apart.
+The package has an interior the UI taxonomy deliberately does not reach — the taxonomy binds what a package *exposes*; this is what the system is *made of*: `ui/boot/` (the system's own composition — `DSApp`, the contexts, the roots it mounts); `ui/core/` (the vocabularies every component reads); `ui/components/<group>/` (one folder per capability group); `ui/widgets/` (assembled surfaces mounted whole: the data table and the filter bar); `ui/layouts/` (the app layout); `ui/hooks/` · `ui/utils/` (context accessors and density resolution, pure helpers); `ui/managers/` (cross-cutting runtime helpers); `assets/` (fonts, images, token stylesheets); `_shadcn/` (vendored primitives, never exported, never hand-edited). **`ui/boot/` is the design system booting itself, not the application's boot** — two different acts, one word apart.
 
 The tokens sit in tiers, and a component sees only the roles and the scale: Tier 0 the seed (one brand value); Tier 1 the ramps (generated from the seed; neutral and status ramps fixed); Tier 2 the roles (mode-adaptive surface / foreground / accent tokens) and the scale (fixed by the design system); Tier 3 components (`variant` × `color` → role classes). A component consumes role tokens, never ramps and never the seed — reaching past the role layer is what makes dark mode a second component tree instead of a mode flip. Light and dark are one re-pointing of the role layer, not a parallel stylesheet. A component reads the scale through the size maps, never a number of its own.
 
-`@saasplane/support-web-ds-ts` 2.0.0 builds the container, the context that carries a frame (`DSScope`), and the theme's six choices. It does not yet build the inset of the main area, the page's fill, the layout's own measures, or how the navigation behaves — read those sections as design until a check reads a page against them.
+`@saasplane/support-web-ds-ts` 2.1.0 builds the container, the context that carries a frame (`DSScope`), the theme's six choices, the inset of the main area, the page's fill, the layout's own measures, and how the navigation behaves.
 
 ## No file under `_shadcn/` is edited by hand
 

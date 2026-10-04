@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/09-architecture-layouts.md",
-      "seen": "ad6bec59"
+      "seen": "52af90e7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/09-architecture-layouts/",
-      "seen": "7d4d7421"
+      "seen": "3f3eab29"
     }
   ]
 }
@@ -39,7 +39,7 @@ Every layout type places the same named places. A layout names no routing librar
 ## The main area — 🔮
 
 - **The page's fill is `page/fill`, and the theme sets it.** A theme whose containers are raised draws the page on the sunken surface, so a raised frame shows. Any other theme draws the page on the plain surface. No page and no story sets a fill of its own.
-- **The layout gives the main area one inset, `layout/main-inset`, in every layout type.** A page whose content runs from edge to edge writes `flush` on the main area, the same word a part of a container takes. The page writes no inset of its own.
+- **The layout gives the main area one inset, `layout/main-inset`, in every layout type.** A page whose content runs from edge to edge gives `flush` on the layout, the same word a part of a container takes. The page writes no inset of its own.
 - **The layout's measures are named in the scale**: the width of the rail open, shut and on a narrow screen, the height of a bar, the width of the dock's column, the width of the shell and the inset of the main area. No layout holds one as a number.
 
 ## How the navigation behaves — 🔮

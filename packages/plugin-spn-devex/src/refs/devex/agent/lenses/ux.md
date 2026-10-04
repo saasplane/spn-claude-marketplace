@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/",
-      "seen": "477256d8"
+      "seen": "1cbd0489"
     }
   ],
   "decisions": [
@@ -50,7 +50,7 @@
     {
       "repo": "spn-foundation",
       "row": "RD.SUPPORT.APPS.161",
-      "seen": "2d53664f"
+      "seen": "d5ec6640"
     },
     {
       "repo": "spn-foundation",
@@ -83,7 +83,7 @@ The question it holds: *can this person finish what they came to do, and do they
 
 - **The page has one purpose and one main action.** Ask what the person came here to do. An answer that needs *and* is two pages. Several actions of equal weight leave the person to work out what the page is for (standards § A page has one purpose).
 - **Each level owns its own thing.** The layout draws the navigation and hands the page the main area. A page that draws its own navigation has taken the layout's job. A layout that arranges the page's blocks has taken the page's (standards § The levels · `RD.SUPPORT.APPS.146`).
-- **The page's fill and the main area's inset are the layout's, never the page's.** The page's fill is `page/fill`, set by the theme — no page or story sets a fill of its own. The layout gives the main area one inset, `layout/main-inset`, in every layout type, and a page whose content runs edge to edge writes `flush` on the main area instead (layout and container § The layout · `RD.SUPPORT.APPS.160`, `RD.SUPPORT.APPS.161`).
+- **The page's fill and the main area's inset are the layout's, never the page's.** The page's fill is `page/fill`, set by the theme — no page or story sets a fill of its own. The layout gives the main area one inset, `layout/main-inset`, in every layout type, and a page whose content runs edge to edge gives `flush` on the layout instead (layout and container § The layout · `RD.SUPPORT.APPS.160`, `RD.SUPPORT.APPS.161`).
 - **The navigation behaves the same in every layout type.** An item's actions are reachable without hover, wherever the item is drawn as a row. A closed group that holds the current page shows the selected mark. A shut group's flyout opens on a press, and hover shows only its name. The narrow dock keeps its back link (layout and container § How the navigation behaves · `RD.SUPPORT.APPS.163`).
 - **A framed part reads header, content, footer, in that order.** The title and the actions of a part then sit in the same place on every page. A container inside a container is a finding (layout and container § The container · `RD.SUPPORT.APPS.147`).
 - **A frame is drawn once.** Two borders around one table are the finding. A `bordered` block in a `flush` part is a finding, because the page asked for both lines. A table, a list, a code block, an accordion or an empty state in a `flush` part draws no border of its own (layout and container § A frame is drawn once · `RD.SUPPORT.APPS.149`).
