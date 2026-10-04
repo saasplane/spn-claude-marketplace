@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/05-architecture-core.md",
-      "seen": "b29cce34"
+      "seen": "3e9ecc17"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/05-architecture-core/",
-      "seen": "119dae5c"
+      "seen": "72c8da20"
     }
   ]
 }
@@ -44,7 +44,7 @@ A block reads a role token and the scale, never a ramp step, and never holds a n
 
 ## The roles, by job — ✅
 
-Every role is named for its job, never for a color: **Surface** is the fill a block or a part of the page sits on, at rest, raised, sunken, inset or hovered. **Foreground** is the text and the icon drawn on a surface, from body down to a muted or inverse tone — text on a filled surface reads the inverse foreground role, light in both modes. **Border** is the line a bordered block or a divided list draws. **Accent** is the hue of a block's `color`, with its own hover, its own fill on a solid block and its own tint on a soft one. Every overlay that covers a page dims it with one scrim role, and `DSBackdrop` draws that scrim.
+Every role is named for its job, never for a color: **Surface** is the fill a block or a part of the page sits on, at rest, raised, sunken, inset or hovered. **Foreground** is the text and the icon drawn on a surface, from body down to a muted or inverse tone — text on a filled surface reads the inverse foreground role, light in both modes. **Border** is the line a bordered block or a divided list draws. **Accent** is the hue of a block's `color`, with its own hover, its own fill on a solid block and its own tint on a soft one. Every overlay that covers a page dims it with one scrim role, and `DSBackdrop` draws that scrim. A block reads these roles and types no value of its own: `field/fill` is the fill of a field at rest, and `control/thumb` is the thumb of a switch, which reads `surface` in light and `fg` in dark. Focus has one width, `focus/primitive/width`, 3 px, with a border and a soft ring, `focus/primitive/border` and `focus/primitive/ring`, and an error border and ring, `focus/primitive/border-error` and `focus/primitive/ring-error`. `popup/ring` is the fine ring around a popup, and `opacity/disabled`, 50%, is the strength of a disabled block.
 
 ## The scale — ✅
 

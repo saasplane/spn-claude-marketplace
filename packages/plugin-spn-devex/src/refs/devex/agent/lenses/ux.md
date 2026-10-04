@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/",
-      "seen": "1cbd0489"
+      "seen": "7e2591db"
     }
   ],
   "decisions": [

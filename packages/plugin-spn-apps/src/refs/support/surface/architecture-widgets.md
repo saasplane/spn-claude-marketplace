@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/07-architecture-widgets/",
-      "seen": "b418895c"
+      "seen": "629e9367"
     }
   ]
 }
@@ -47,6 +47,7 @@ Shows many records as one block: a bar (the bulk select and the bulk actions, pr
 
 - The bar holds no search and no filter bar of its own. A search or a filter bar is the page's, and goes into `headerNode`.
 - A read that fails **MUST** offer a retry.
+- A read refused because the person is no longer signed in belongs to the app, which sends the person to sign in. The table shows its refused state for a read the person may not make.
 - The two empty messages **MUST** differ.
 - `DSWDataTable` **MUST** take one size, from its own prop or the block above it, and **MUST** pass it to its bar, its records and its pager.
 
