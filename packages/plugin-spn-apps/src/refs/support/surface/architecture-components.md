@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/06-architecture-components.md",
-      "seen": "05f09632"
+      "seen": "53462f33"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/06-architecture-components/",
@@ -33,7 +33,7 @@ A **block** is any unit a surface is built from — a layout, a container, a wid
 
 ## The groups — 🔮
 
-Eleven groups, each answering one need of a surface. The library draws one page per group, each provider keeps one folder per group and one showcase page per group, and a new component joins this list before it is drawn or built anywhere.
+Eleven groups, each answering one need of a surface. The library draws one page per group, each provider keeps one folder per group, the showcase opens each group of units with an Overview page, and a new component joins this list before it is drawn or built anywhere.
 
 | Group | Answers | Blocks |
 | --- | --- | --- |
