@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/12-delivery-showcase.md",
-      "seen": "3999edd2"
+      "seen": "0d2e4fc0"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/12-delivery-showcase/",
@@ -76,7 +76,7 @@ Each unit below is listed with its category, its showcase layout and what it has
 | Component - Feedback | Display · Content: `DSAlert` sizes, colours · `DSProgress` sizes, colours, states · `DSSkeleton` content · `DSEmpty` sizes, content. `DSSpinner` Display · Inline · sizes, colours, content. `DSToast` Overlay · Content · colours |
 | Component - Structure | Utility · Content: `DSCollapsible` sizes, states, content · `DSHScroll` content · `DSScrollArea` content · `DSSeparator` colours, content |
 | Component - Media | `DSAspectRatio` Display · Content · none. Display · Inline: `DSIcon` sizes, colours, states, content · `DSImage` sizes, states, content |
-| Component - Navigation | Control · Content: `DSBreadcrumb` data · `DSMenubar` sizes, data · `DSNavigationMenu` sizes, data · `DSPagination` sizes, value · `DSTabs` sizes, content, data · `DSAnchor` states, content. `DSLink` Control · Inline · sizes, colours, states, content |
+| Component - Navigation | Control · Content: `DSBreadcrumb` data · `DSMenubar` sizes, data · `DSNavigationMenu` sizes, data · `DSPagination` sizes, states, value · `DSTabs` sizes, states, content, data · `DSAnchor` states, content. `DSLink` Control · Inline · sizes, colours, states, content |
 | Component - Overlays | Overlay · Content: `DSDialog` sizes · `DSAlertDialog` colours, states, content · `DSDrawer` sizes, content · `DSSheet` sizes, content · `DSBackdrop` none |
 | Component - Popovers | Overlay · Content: `DSContextMenu` sizes, states, content, opener, data · `DSDropdownMenu` sizes, states, content, opener, data · `DSHoverCard` states, content, opener · `DSPopover` states, content, opener · `DSTooltip` sizes, states, content, opener |
 | Component - Typography | Display · Inline: `DSText` colours, content · `DSKbd` sizes, data |
