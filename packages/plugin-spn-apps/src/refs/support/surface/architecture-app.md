@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/10-architecture-app.md",
-      "seen": "83ee44e1"
+      "seen": "a2c13042"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/10-architecture-app/",
@@ -43,7 +43,9 @@ Exactly two contexts cross between an app and its design system, one direction e
 - **Overlays**: request dialogs, confirmations and sheets through one imperative seam. Never mount them from the component that needs them.
 - **Gated rendering**: treat it as presentation only. Hiding a control is courtesy, and the refusal is the server's.
 
-A conforming design system answers a fixed set of groups (`architecture-components.md`). The set sits in five layers, on every stack (`architecture-names.md`): core, components, widgets, containers and layouts. A layer uses only the layers named before it.
+A conforming design system answers a fixed set of groups (`architecture-components.md`). The set sits in six layers, on every stack (`architecture-names.md`): core, components, widgets, containers, layouts and app. A layer uses only the layers named before it.
+
+**App is the sixth and last layer.** It holds the root block `DSApp`, the app's contract and the theme. It may use every layer before it, and no block of another layer uses the root block: a block only reads what the root block hands down.
 
 ## The theme — 🔮
 

@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/13-providers/",
-      "seen": "e119d14b"
+      "seen": "1225e9bb"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/13-providers/ts/01-design-system.md",
@@ -57,6 +57,8 @@ The package has an interior the UI taxonomy deliberately does not reach — the 
 The tokens sit in tiers, and a component sees only the roles and the scale: Tier 0 the seed (one brand value); Tier 1 the ramps (generated from the seed; neutral and status ramps fixed); Tier 2 the roles (mode-adaptive surface / foreground / accent tokens) and the scale (fixed by the design system); Tier 3 components (`variant` × `color` → role classes). A component consumes role tokens, never ramps and never the seed — reaching past the role layer is what makes dark mode a second component tree instead of a mode flip. Light and dark are one re-pointing of the role layer, not a parallel stylesheet. A component reads the scale through the size maps, never a number of its own.
 
 `@saasplane/support-web-ds-ts` 2.1.0 builds the container, the context that carries a frame (`DSScope`), the theme's six choices, the inset of the main area, the page's fill, the layout's own measures, and how the navigation behaves.
+
+`web-ds-storybook-ts` is the `ts` provider's showcase, built with Storybook. The outline in `delivery-showcase.md` leaves one measure to the stack, the width under which a page is narrow: in this showcase a page is narrow below 768 px.
 
 ## No file under `_shadcn/` is edited by hand
 

@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/11-delivery-library.md",
-      "seen": "ca6786e4"
+      "seen": "6800197a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "4bfad2f8"
+      "seen": "3cc9bc9f"
     }
   ]
 }
@@ -27,7 +27,7 @@ Read this before you add a token or a block to the library, or before you ask wh
 
 ## The files, by layer — 🔮
 
-The design library holds one file for each layer of the design system, and one for drafts.
+The design library holds one file for each layer of the design system that is drawn, and one for drafts. Five of the six layers are drawn: Core, Components, Widgets, Containers and Layouts. The sixth layer, App, has no file of its own: the choices of the theme are variables, so Core holds them, and the rest of the app's contract stays in words.
 
 | File | Holds | May use |
 | --- | --- | --- |

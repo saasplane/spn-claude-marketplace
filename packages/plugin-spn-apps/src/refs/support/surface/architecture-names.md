@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/04-architecture-names.md",
-      "seen": "aacabe6e"
+      "seen": "c0fa0995"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "f9368815"
+      "seen": "f4a1e707"
     }
   ]
 }
@@ -26,7 +26,7 @@ Read this before you name a new block, a new prop or a new layer of the design s
 | Name | the one word the book gives a block, a prop or a value. The design library and every stack build under that word |
 | Shared name | one of the three prop names (`variant` · `color` · `size`) that mean one thing on every block and every kind of surface |
 | Vocabulary | a closed set of values a prop may take |
-| Layer | one of the five steps the design system is built in: core, components, widgets, containers, layouts. A layer uses only the layers named before it |
+| Layer | one of the six steps the design system is built in: core, components, widgets, containers, layouts, app. A layer uses only the layers named before it |
 | Declared prop | a property the caller sets, under the same name on every stack |
 | Shown state | a state the platform produces itself, such as hover or focus. It has a picture and no prop |
 | Shared state | `REST` · `HOVER` · `FOCUS` · `PRESSED` · `DISABLED` · `ERROR` · `SELECTED` — a state most blocks share, with one picture on every block and every kind of surface |
@@ -51,7 +51,7 @@ Keep each of the three names for its one meaning, on every block — a block tak
 
 A few names carry their own rule rather than the shared three: use `bordered` for a border a block draws around itself, and `rounded` for the corners of its frame. Only the container and the card take `raised`. An unset `bordered` reads the frame setting of a `flush` part above it, and only on a block that frames a part of a page — the table, the code block, the accordions and the empty state. The data table and the list take no `bordered`, because neither draws a border on any page. A field, a menubar and an avatar read their own default, because their border is the control's own chrome. Use `flush` on a part of a container for a part that draws no inset — it is yes or no, and no when it is not set.
 
-## The five layers — ✅
+## The six layers — ✅
 
 | Design-system layer | Holds | May use |
 | --- | --- | --- |
@@ -60,8 +60,11 @@ A few names carry their own rule rather than the shared three: use `bordered` fo
 | Widgets | blocks built for one purpose | components and core |
 | Containers | the container | components and core |
 | Layouts | the layout | every layer before it |
+| App | the root block `DSApp`, the app's contract and the theme | every layer before it |
 
-A layer uses only the layers named before it, so the direction between two blocks is never an argument: the block in the later layer is the one that depends.
+A layer uses only the layers named before it, so the direction between two blocks is never an argument: the block in the later layer is the one that depends. The vocabulary is `CORE` · `COMPONENTS` · `WIDGETS` · `CONTAINERS` · `LAYOUTS` · `APP`.
+
+**App is the last layer, so no block of another layer uses the root block.** A block reads what the root block hands down from where it sits (`architecture-app.md`). Reading a setting that was handed down is not using the block that handed it. In a web package, each layer from components to layouts is one folder of the `ui` taxonomy, and the root block stands beside those folders.
 
 ## Marking each property — ✅
 
@@ -73,7 +76,7 @@ A block drawn from data is a host and an item: one item serves every host that t
 
 ## Boundary
 
-This ref states which three props mean one thing everywhere, what kind every other prop is, which five layers a block is built from, and which seven states share one picture. It stops at giving any of them a value — that is `architecture-core.md`. It does not say which blocks exist — that is `architecture-components.md`.
+This ref states which three props mean one thing everywhere, what kind every other prop is, which six layers a block is built from, and which seven states share one picture. It stops at giving any of them a value — that is `architecture-core.md`. It does not say which blocks exist — that is `architecture-components.md`.
 
 ## Binds
 
@@ -83,7 +86,7 @@ This ref states which three props mean one thing everywhere, what kind every oth
 | `RD.SUPPORT.APPS.143` | `variant` names the surface treatment, `color` the hue and `size` the density step, on every block and every kind of surface |
 | `RD.SUPPORT.SURFACE.007` | the five values of `size` are read smallest to largest, `XS` to `XL`, wherever they are listed, and `SM` is the default size a theme sets |
 | `RD.SUPPORT.SURFACE.009` | `CUSTOM` is a value of `color` on every stack, and the one named way a page sets a colour outside the theme |
-| `RD.SUPPORT.APPS.145` | the design system has the layers core, components, widgets, containers and layouts, on every stack, and a layer uses only the layers named before it |
+| `RD.SUPPORT.APPS.145` | the design system has the layers core, components, widgets, containers, layouts and app, on every stack, and a layer uses only the layers named before it |
 | `RD.SUPPORT.APPS.154` | a hook of the design system names the context its value comes from |
 | `RD.SUPPORT.APPS.142` | each shared state of a control has one picture, chosen in the design library on the first component that has it |
 | `RD.SUPPORT.APPS.157` | selected has one picture for each kind of entry |

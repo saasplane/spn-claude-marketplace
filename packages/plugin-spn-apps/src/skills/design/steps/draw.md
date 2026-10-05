@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "4bfad2f8"
+      "seen": "3cc9bc9f"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "f9368815"
+      "seen": "f4a1e707"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
@@ -34,7 +34,7 @@ Its provenance is the foundation book's design library, names, and layout and co
 
 ## What the page is drawn from
 
-The design library holds one file for each layer of the design system. A page draws from what those files have published, and from nothing else.
+The design library holds one file for each layer of the design system that is drawn. The sixth layer, App, has no file of its own, and Core holds the choices of the theme. A page draws from what those files have published, and from nothing else.
 
 | Layer | The file holds | SaaS Plane names its file | Its file key |
 | --- | --- | --- | --- |
