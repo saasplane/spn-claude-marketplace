@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/12-delivery-showcase.md",
-      "seen": "0d2e4fc0"
+      "seen": "39bd5040"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/12-delivery-showcase/",
-      "seen": "ce4da84a"
+      "seen": "b92cbb64"
     }
   ]
 }
@@ -17,7 +17,7 @@
 
 Source of truth: the foundation's Delivery Showcase construct (`docs/02-constructs/02-support/03-surface/12-delivery-showcase.md`) and its capability chapters (`docs/04-capabilities/02-support/03-surface/12-delivery-showcase/`). Delivery Showcase is the twelfth of thirteen Surface constructs.
 
-Read this before you add a unit to a showcase, or before you judge whether one is complete. A stack that realizes Surface proves it with a showcase: a running catalogue that shows how every unit is used, like the web's Storybook. Every stack follows the same outline with its own tool — Storybook on the web, a showcase app on native. A showcase is for a developer who is about to use a unit. It shows how a unit is used, and it is not a test of the system. **The thing to unlearn: nobody lays out a page of a showcase.** A unit declares a few facts about itself, and its page is derived from them. A stack builds the frame that derives the pages, never an outline of its own.
+Read this before you add a unit to a showcase, or before you judge whether one is complete. A stack that realizes Surface proves it with a showcase: a running catalogue that shows how every unit is used, like the web's Storybook. Every stack follows the same outline with its own tool — Storybook on the web, a showcase app on native. A showcase is for a developer or a partner who is about to use a unit. A partner is an organization that builds its own SaaS platform on SaaS Plane. It shows how a unit is used, and it is not a test of the system. **The thing to unlearn: nobody lays out a page of a showcase.** A unit declares a few facts about itself, and its page is derived from them. A stack builds the frame that derives the pages, never an outline of its own.
 
 ## The rule — 🔮
 
@@ -30,12 +30,14 @@ Read this before you add a unit to a showcase, or before you judge whether one i
 7. A unit that writes a value shows the live value beside it in every example.
 8. A size is a tab of the page or the section that shows the unit, and never a page of its own.
 9. A showcase is built from the units of the design system it proves, and from nothing else.
+10. A showcase is a showcase of the Surface and of the design system. It names no chapter of the book and no file of a repository's documents, and its links to the design library stay.
 
 ## Terms
 
 | Term | What it means |
 | --- | --- |
 | Showcase | a running catalogue that shows how every unit is used |
+| Partner | an organization that builds its own SaaS platform on SaaS Plane. It reads the showcase and opens the design library, and it does not hold the book |
 | Layer | the layer of the design system that a group belongs to: Core, Components, Widgets, Containers, Layouts or App |
 | Group | one part of the showcase's navigation, such as Core or Component - Actions |
 | Unit | one component, widget, container or layout of the library |
@@ -132,7 +134,7 @@ FIGMA  {link}  {last sync}  |  SHOWCASE  {layer}  {group}  {category}  {showcase
 
 - The two groups stand side by side, from the start of the row, with a bar between them. Figma is first and Showcase is second, and the bar is the same one that stands between the parts of the first line. On a narrow page the row wraps by group: a group moves to the next line as a whole, and no value is cut.
 - **A group has one label, and a pill holds a value only.** The labels are *Figma* and *Showcase*. No pill carries a label of its own: the label of its group and its place in the group say what a pill means. Under *Figma*, the first pill is the link and the second is the last sync. Under *Showcase*, the pills are the layer, the group, the category and the showcase layout, in that order. The order is the same on every main page.
-- The pill of the link opens the unit's drawing in the library, and reads the unit's name.
+- The pill of the link opens the unit's drawing in the library, and reads the unit's name. A developer and a partner can both open it, because a partner is given the public library.
 - The date and time of the sync are written for a person, in the reader's own zone: the date in words, a twelve-hour time with AM or PM, and the zone by its name, as in *4 Oct 2026, 9:40 PM IST*.
 - **A missing value is a pill that holds a dash.** The pill keeps its place, so the order of the values still says what each pill means. The page invents no link and no date.
 - No badge stands beside a title. No import line follows the opening.
@@ -268,6 +270,9 @@ Theme is a page of App, of its own kind. It has three parts, in this order.
 
 ## The rules of every page — 🔮
 
+- A showcase is read by a developer or a partner, and both are about to use a unit.
+- A showcase names no chapter of the book, no file or folder of a repository's documents, and no row of a register. A partner holds the published design library and the showcase, and does not hold the book, so a page says in its own words what a reader needs to know.
+- A link to the design library stays: the first page of a showcase links to it, and so does the opening of a unit's main page. A partner is given the public library, so a developer and a partner can both open every such link.
 - The words inside a previewed unit are what an app shows a person, such as *Save changes* or *Add member*, and never the name of a size or of a variant.
 - A size named in words is written out: X Small, Small, Medium, Large, X Large. A tab keeps the short name, `XS` to `XL`.
 - The showcase opens at the default size the apps use, `SM`. An example gives a size only where size is what it shows.
