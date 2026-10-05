@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/12-delivery-showcase.md",
-      "seen": "d74b8fd4"
+      "seen": "3999edd2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/12-delivery-showcase/",
-      "seen": "18aa1b44"
+      "seen": "ce4da84a"
     }
   ]
 }
@@ -72,18 +72,18 @@ Each unit below is listed with its category, its showcase layout and what it has
 | Group | Its units |
 | --- | --- |
 | Component - Actions | `DSButton` Control · Inline · sizes, colours, variants, states, content, opener. `DSButtonGroup` Control · Content · sizes |
-| Component - Data Display | Display · Content: `DSAccordion` sizes, content · `DSAccordionGroup` sizes, content, data · `DSAddressView` sizes, data · `DSCard` sizes, opener · `DSCarousel` none · `DSCodeBlockView` sizes · `DSDataFieldView` sizes, data · `DSDataUnit` sizes, content · `DSItem` sizes, content, opener · `DSJSONView` data · `DSList` sizes · `DSTable` sizes. Display · Inline: `DSAvatar` sizes, content · `DSAvatarGroup` sizes · `DSBadge` sizes, colours, variants, states, content, opener |
-| Component - Feedback | Display · Content: `DSAlert` sizes, colours · `DSProgress` sizes, colours · `DSSkeleton` none · `DSEmpty` sizes, content. `DSSpinner` Display · Inline · sizes, colours, content. `DSToast` Overlay · Content · colours |
-| Component - Structure | Utility · Content: `DSCollapsible` sizes, content · `DSHScroll` none · `DSScrollArea` none · `DSSeparator` colours |
-| Component - Media | `DSAspectRatio` Display · Content · none. Display · Inline: `DSIcon` colours, states, content · `DSImage` content |
-| Component - Navigation | Control · Content: `DSBreadcrumb` data · `DSMenubar` sizes, data · `DSNavigationMenu` sizes, data · `DSPagination` sizes, value · `DSTabs` sizes, content, data · `DSAnchor` states, opener. `DSLink` Control · Inline · sizes, colours, states, content, opener |
-| Component - Overlays | Overlay · Content: `DSDialog` sizes · `DSAlertDialog` colours, content · `DSDrawer` sizes · `DSSheet` sizes · `DSBackdrop` none |
-| Component - Popovers | Overlay · Content: `DSContextMenu` sizes, states, opener, data · `DSDropdownMenu` sizes, states, opener, data · `DSHoverCard` states, content, opener · `DSPopover` states, content, opener · `DSTooltip` sizes, states, opener |
-| Component - Typography | Display · Inline: `DSText` colours · `DSKbd` sizes, data |
+| Component - Data Display | Display · Content: `DSAccordion` sizes, content · `DSAccordionGroup` sizes, content, data · `DSAddressView` sizes, states, content, data · `DSCard` sizes, content, opener · `DSCarousel` none · `DSCodeBlockView` sizes, content · `DSDataFieldView` sizes, states, data · `DSDataUnit` sizes, states, content · `DSItem` sizes, content, opener · `DSJSONView` data · `DSList` sizes, states, content, opener · `DSTable` sizes, content. Display · Inline: `DSAvatar` sizes, content · `DSAvatarGroup` sizes · `DSBadge` sizes, colours, variants, states, content, opener |
+| Component - Feedback | Display · Content: `DSAlert` sizes, colours · `DSProgress` sizes, colours, states · `DSSkeleton` content · `DSEmpty` sizes, content. `DSSpinner` Display · Inline · sizes, colours, content. `DSToast` Overlay · Content · colours |
+| Component - Structure | Utility · Content: `DSCollapsible` sizes, states, content · `DSHScroll` content · `DSScrollArea` content · `DSSeparator` colours, content |
+| Component - Media | `DSAspectRatio` Display · Content · none. Display · Inline: `DSIcon` sizes, colours, states, content · `DSImage` sizes, states, content |
+| Component - Navigation | Control · Content: `DSBreadcrumb` data · `DSMenubar` sizes, data · `DSNavigationMenu` sizes, data · `DSPagination` sizes, value · `DSTabs` sizes, content, data · `DSAnchor` states, content. `DSLink` Control · Inline · sizes, colours, states, content |
+| Component - Overlays | Overlay · Content: `DSDialog` sizes · `DSAlertDialog` colours, states, content · `DSDrawer` sizes, content · `DSSheet` sizes, content · `DSBackdrop` none |
+| Component - Popovers | Overlay · Content: `DSContextMenu` sizes, states, content, opener, data · `DSDropdownMenu` sizes, states, content, opener, data · `DSHoverCard` states, content, opener · `DSPopover` states, content, opener · `DSTooltip` sizes, states, content, opener |
+| Component - Typography | Display · Inline: `DSText` colours, content · `DSKbd` sizes, data |
 | Component - Utility | Display · Inline · none: `DSFormatCurrency` · `DSFormatDate` · `DSFormatDateTime` · `DSFormatNumber` · `DSFormatTime`. Utility · Content: `DSAuthz` content · `DSAnchorContainer` states, opener · `DSElementObserver` none · `DSPortal` none · `DSSticky` states |
-| Data Entry - Fields | Control · Content: `DSInput` sizes, states, content, value · `DSInputNumber` sizes, states, content, value · `DSInputOTP` · `DSInputPhone` · `DSTextarea` · `DSCheckbox` · `DSRadio` · `DSSwitch` · `DSSlider` · `DSSliderRange` sizes, states, value each · `DSCheckboxGroup` · `DSRadioGroup` sizes, states, value, data each · `DSToggle` sizes, colours, states, content, value · `DSToggleGroup` · `DSToggleGroupMulti` sizes, colours, states, value, data each. `DSLabel` Control · Inline · sizes, states |
+| Data Entry - Fields | Control · Content: `DSInput` sizes, states, content, value · `DSInputNumber` sizes, states, content, value · `DSInputOTP` sizes, states, content, value · `DSInputPhone` · `DSTextarea` · `DSCheckbox` · `DSSwitch` · `DSSlider` · `DSSliderRange` sizes, states, value each · `DSCheckboxGroup` sizes, states, value, data · `DSRadio` sizes, states, content, value · `DSRadioGroup` sizes, states, content, value, data · `DSToggle` sizes, colours, states, content, value · `DSToggleGroup` · `DSToggleGroupMulti` sizes, colours, states, content, value, data each. `DSLabel` Control · Inline · sizes, states |
 | Data Entry - Pickers | Control · Content: `DSSelect` · `DSSelectMulti` · `DSAutocomplete` · `DSAutocompleteMulti` sizes, states, content, value, data each · `DSDatePicker` · `DSTimePicker` · `DSDateTimePicker` sizes, states, value each · `DSDateRangePicker` sizes, states, value, data. `DSCommand` Composite · Content · sizes, data. `DSCommandPalette` Overlay · Content · sizes, opener, data |
-| Data Entry - Composites | `DSForm` Composite · Full width · sizes · a form; scenario pages All controls and Field behavior. Composite · Content: `DSAddressForm` sizes, states, value · `DSAttachment` · `DSAttachmentMulti` · `DSDataFieldForm` sizes, states, value, data each · `DSJSONControl` sizes, states, value · `DSDataFieldBuilder` states, value, data. `DSImagePicker` Composite · Inline · none |
+| Data Entry - Composites | `DSForm` Composite · Full width · sizes · a form; scenario pages All controls and Field behavior. Composite · Content: `DSAddressForm` sizes, states, value · `DSAttachment` · `DSAttachmentMulti` · `DSDataFieldForm` sizes, states, value, data each · `DSJSONControl` sizes, states, value · `DSDataFieldBuilder` states, value, data. `DSImagePicker` Composite · Inline · states, content, opener |
 | Widgets | `DSWDataTable` Composite · Full width · data; scenario pages Table, List, Grid, Record actions, Sticky columns. `DSWFilterBar` Composite · Full width · sizes, content, data; scenario page With overflow |
 | Containers | `DSContainer` Composite · Full width · sizes; scenario pages Listing, Form, Dashboard |
 | Layouts | `DSLayout` Screen · Full screen · content, data · no Playground; one page for each layout type: Rail, Dock, Top nav |
@@ -117,7 +117,7 @@ Every main page opens the same way. The opening is styled as a page of the book 
 
 ```text
 SAAS PLANE  |  DESIGN SYSTEM  |  {LAYER}
-FIGMA  {link}  {last sync}          SHOWCASE  {layer}  {group}  {category}  {showcase layout}
+FIGMA  {link}  {last sync}  |  SHOWCASE  {layer}  {group}  {category}  {showcase layout}
 {Unit name}
 {short summary}
 ```
@@ -130,7 +130,7 @@ FIGMA  {link}  {last sync}          SHOWCASE  {layer}  {group}  {category}  {sho
 | The name | the unit's name | as the title of the page |
 | The summary | one short sentence that says what the unit is for | as plain text under the name |
 
-- The two groups stand in one row, Figma at its start and Showcase at its end. On a narrow page the row wraps, and no value is cut.
+- The two groups stand side by side, from the start of the row, with a bar between them. Figma is first and Showcase is second, and the bar is the same one that stands between the parts of the first line. On a narrow page the row wraps by group: a group moves to the next line as a whole, and no value is cut.
 - **A group has one label, and a pill holds a value only.** The labels are *Figma* and *Showcase*. No pill carries a label of its own: the label of its group and its place in the group say what a pill means. Under *Figma*, the first pill is the link and the second is the last sync. Under *Showcase*, the pills are the layer, the group, the category and the showcase layout, in that order. The order is the same on every main page.
 - The pill of the link opens the unit's drawing in the library, and reads the unit's name.
 - The date and time of the sync are written for a person, in the reader's own zone: the date in words, a twelve-hour time with AM or PM, and the zone by its name, as in *4 Oct 2026, 9:40 PM IST*.
@@ -173,7 +173,7 @@ What a unit has is read from its own props.
 | colours | it takes `color` | the section Colors |
 | variants | it takes `variant` | no section: every tab of Sizes and of Colors shows each variant |
 | states | the caller sets a state on it, such as disabled or working | the section States |
-| content | it holds an icon, or a place that takes any block | the section Content |
+| content | it holds an icon, or a place that takes any block, or it has a choice under another prop's name | the section Content |
 | value | it writes a value | no section: every card shows the live value beside the unit |
 | opener | something opens it, or it opens something | no section: the Usage example holds the thing that opens it |
 | data | it is drawn from a list, a record or a config | no section: the Usage example holds real records |
@@ -182,7 +182,7 @@ A unit sits in one category, placed by what a developer mostly does with it. The
 
 ## Sections, and the card of a section — 🔮
 
-A main page holds its sections in one order. Usage is first and Props is last. A section appears only when the unit has something for it.
+A main page holds its sections in one order. Usage is first and Props is last. A section appears only when the unit has something for it. A unit's own sections, where it has any, stand between States and Props.
 
 | Section | Appears when the unit has | What it holds |
 | --- | --- | --- |
@@ -192,6 +192,10 @@ A main page holds its sections in one order. Usage is first and Props is last. A
 | Content | content | one tab for each icon or place the unit holds |
 | States | states | each state the caller sets: in one row, with the name of each state under it, when the showcase layout is Inline; otherwise one tab for each state. A unit that is loading shows the state *Working* |
 | Props | always | the props table and the unit's config objects. Its footer holds the link to the Playground |
+
+**A choice that a unit has under another prop's name is a tab of Content.** Such a choice is not a size, a colour or a state. It is a kind of what the unit shows or holds, or a place where it stands: the type of a row of tabs, the shape of a skeleton, the placement of a drawer, or the number of digits of a code field. A unit with such a choice has content, and each value of the choice is one tab of the section Content. The choice never gets a section of its own under the name of its prop, and never a page.
+
+**A unit may add a section of its own after the sections its tags give.** A unit does so when it has a whole set of choices that none of the six sections names. Examples are the looks and the pinned parts of a table, the display of a code view, and the type of an address form. A section of its own is built as every other section is: a container with a title, one line, and one card of tabs. It stands after the sections that the tags give, which end with States, and before Props. A unit with several of them lists them in the order it wants them read.
 
 A section opens on the tab its unit names. Where the unit names none, Sizes opens at `SM`, Colors at the primary colour, and any other section at its first tab. A section with one example has no row of tabs, unless that example carries a name of its own.
 
@@ -207,6 +211,7 @@ A section opens on the tab its unit names. Where the unit names none, Sizes open
 - A header's actions stand at its end, and a footer's actions stand at its start. An action of the header acts on what the section shows now. An action of the footer leads on from the section, to another page or to another part of the same page.
 - Every section has a header. A section with no action that follows from it has no footer.
 - The look of the frame comes from the theme, as an app's does. The showcase sets no border, no fill and no corners of its own on a section, so a change of the container's look in the theme shows on every section.
+- No container stands inside another container. The containers construct refuses a container inside a container, and a section is a container. So an example that is a container, or a whole page of an app, is shown as an embedded screen in the content of its section. The screen is a page of its own, loaded in the section's content, and the frame of the section is the one frame that the reader sees.
 - The opening of a page is the page's own header, and not the header of a container.
 
 The content of a section's container is one card. The card holds the tabs, the preview and the code as one object. The container's frame is the card's border and its corners, so a section has one border and not two.
@@ -232,7 +237,7 @@ A unit whose props take objects explains each object under its props table, in a
 
 ## The container's pages, and the page Theme — 🔮
 
-The pages of `DSContainer` show every variant that `architecture-containers.md` states, each as a real page of an app inside the container, never as an empty box. Its main page says what a container is for under the opening. It then shows the parts, the parts a frame holds, each look that `raised`, `bordered` and `rounded` make, and a part with its inset and with `flush`, as tabs of sections of the container's own. Those sections stand after Usage and before Props. A listing, a form and a dashboard are one scenario page each.
+The pages of `DSContainer` show every variant that `architecture-containers.md` states, each as a real page of an app, as an embedded screen in the content of a section, never as an empty box. No container stands inside another container. Its main page says what a container is for under the opening. It then shows the parts, the parts a frame holds, each look that `raised`, `bordered` and `rounded` make, and a part with its inset and with `flush`, as tabs of sections of the container's own. Those sections stand after the sections that its tags give and before Props. A listing, a form and a dashboard are one scenario page each.
 
 Theme is a page of App, of its own kind. It has three parts, in this order.
 
@@ -275,7 +280,7 @@ Theme is a page of App, of its own kind. It has three parts, in this order.
 
 ## What a stack chooses — 🔮
 
-The construct fixes the layers, the groups and their order; the pages of a unit; the opening and what each part of it holds; the tags and that a page is derived from them; the sections, their order and when each appears; and the card of a section with where the code sits. It also fixes that a section is one container, that a size is a tab, that an embedded screen fills the content of its section, and that every part of a page is a unit of the design system. Every rule of the construct is the construct's, and a stack changes none of them. A stack chooses the tool that draws the showcase, how a page is stored, how a pill, a tab and a control are drawn, how a unit writes its declaration, the width under which a page is narrow, the number of pages, how a running screen is embedded, the navigation and the bar its tool draws around a page, and which units it builds yet. On the web a unit is one set of stories with its declaration and its examples, and *Show code* is a control of the Storybook's toolbar. A native showcase follows the same outline.
+The construct fixes the layers, the groups and their order; the pages of a unit; the opening and what each part of it holds; the tags and that a page is derived from them; the sections, their order and when each appears; and the card of a section with where the code sits. It also fixes that a section is one container, that a size is a tab, that an embedded screen fills the content of its section, that an example that is a container or a whole page of an app is an embedded screen so that no container stands inside another, and that every part of a page is a unit of the design system. Every rule of the construct is the construct's, and a stack changes none of them. A stack chooses the tool that draws the showcase, how a page is stored, how a pill, a tab and a control are drawn, how a unit writes its declaration, the width under which a page is narrow, the number of pages, how a running screen is embedded, the navigation and the bar its tool draws around a page, and which units it builds yet. On the web a unit is one set of stories with its declaration and its examples, and *Show code* is a control of the Storybook's toolbar. A native showcase follows the same outline.
 
 ## What the showcase proves — 🔮
 
