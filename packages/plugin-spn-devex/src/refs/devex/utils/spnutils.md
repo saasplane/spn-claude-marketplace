@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/03-utils/01-spnutils.md",
-      "seen": "8eed94cd"
+      "seen": "ef7057a5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "c22707ac"
+      "seen": "f9962ede"
     }
   ],
   "decisions": [
@@ -133,6 +133,12 @@ is broken rather than fussy.
 The `gen-*` chain is never hand-edited: validators are what the API enforces, symbols and labels are
 what the agents read. `apps release` publishes every releasable project at one version, lockstep,
 routed by each package's own scope.
+
+`apps surface <operation> [package]` finds where a design library and a stack's design system differ,
+with no model reading either one. It is one command with an operation, as `migrate` is, so the tool
+keeps four groups. The operations are `plugin`, `library`, `snapshot`, `gaps` and `status`, and the
+options are `--level`, `--unit` and `--raw`. Every file is under `~/.spnutils/surface/`, and none
+enters a repository.
 
 **`spnutils` never reads or writes a document — MUST** (`RD.DEVEX.UTILS.071`). `apps test <tier> <run>
 <package>` runs a tier and writes that run's file, `tests/.output/<tier>/runs/<run>.json`, and nothing

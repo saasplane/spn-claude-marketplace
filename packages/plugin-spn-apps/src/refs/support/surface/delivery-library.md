@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/11-delivery-library.md",
-      "seen": "bccf43e8"
+      "seen": "a05c2e8a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "55d97ee7"
+      "seen": "c31d3ab0"
     }
   ]
 }
@@ -67,7 +67,7 @@ The primary ramp comes from one seed by a formula, and the radius of each size s
 
 ## The snapshot
 
-A person who wants to know where the library and a stack differ should not have to read either one in full. A snapshot is one file that states a design system in the Surface domain's own words. It is written from the library, and the same file is written from each stack's code, so the two are compared key by key. It holds no word of a design tool and no word of a stack, so the web and a native stack write exactly the same file. A command of the stack's tool writes each snapshot, with no model. A snapshot is the machine's own state and it never enters a repository.
+A person who wants to know where the library and a stack differ should not have to read either one in full. A snapshot is one file that states a design system in the Surface domain's own words. It is written from the library, and the same file is written from each stack's code, so the two are compared key by key. It holds no word of a design tool and no word of a stack, so the web and a native stack write exactly the same file. The command `spnutils apps surface library` writes the library's snapshot and `spnutils apps surface snapshot <package>` writes a stack's, with no model. A file holds a time in UTC, and a command prints it in local time with its offset. A snapshot is the machine's own state and it never enters a repository.
 
 A snapshot has four parts and three levels:
 
@@ -93,7 +93,7 @@ A gap is one difference between the library's snapshot and a stack's. Its kind i
 | `TOKEN_ABSENT` | a token that one side holds and the other does not |
 | `NAME_UNMAPPED` | a name the naming map does not know, so no comparison was possible |
 
-One gap is a record with the keys `kind`, `level`, `path`, `lacks`, `library` and `stack`. `lacks` is `LIBRARY` or `STACK`, and it is empty for `VALUE_DIFFERS` and `NAME_UNMAPPED`. The record is JSON, named by its package, and it also holds what the gaps were compared from and a count of what could not be compared. A view of one line for each gap is written from the record and is never edited.
+One gap is a record with the keys `kind`, `level`, `path`, `lacks`, `library` and `stack`. `lacks` is `LIBRARY` or `STACK`, and it is null for `VALUE_DIFFERS` and `NAME_UNMAPPED`, the two kinds that lack nothing on one side. The view prints a dash for it. The record is JSON, named by its package, and it also holds what the gaps were compared from and a count of what could not be compared. A view of one line for each gap is written from the record and is never edited.
 
 The view stays short by five rules. A `UNIT_ABSENT` line replaces every line under that unit. Many `VALUE_ABSENT` gaps on one prop become one line with a list. What could not be compared is a count in the footer and never a line. Level 3 is written only for the units that levels 1 and 2 flagged. **A person and a model read the gaps, and never the library.**
 
