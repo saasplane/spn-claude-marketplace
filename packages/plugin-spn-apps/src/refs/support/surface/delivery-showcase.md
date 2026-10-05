@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/12-delivery-showcase.md",
-      "seen": "853c94fe"
+      "seen": "e55ca86d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/12-delivery-showcase/",
-      "seen": "ea9a59a2"
+      "seen": "afbf352d"
     }
   ]
 }
@@ -189,10 +189,10 @@ A main page holds its sections in one order. Usage is first and Props is last. A
 | Section | Appears when the unit has | What it holds |
 | --- | --- | --- |
 | Usage | always | one example: the richest real use of the unit, one that an app would really have |
-| Sizes | sizes | one tab for each size, `XS` to `XL`. Each tab shows every variant, as the cells of one grid |
-| Colors | colours | one tab for each colour. Each tab shows every variant, as the cells of one grid |
+| Sizes | sizes | one tab for each size, `XS` to `XL`. Each tab shows every variant together, and not as a grid |
+| Colors | colours | one tab for each colour. Each tab shows every variant together, laid out as the tab of Sizes is |
 | Content | content | one tab for each icon or place the unit holds, and one tab for each choice of the unit that has no section of its own |
-| States | states | each state the caller sets: as the cells of one grid, with the name of each state at the top of its cell, when the showcase layout is Inline; otherwise one tab for each state. A unit that is loading shows the state *Working* |
+| States | states | each state the caller sets: as the cells of one grid, with the name of each state at the top of its cell, when the showcase layout is Inline; otherwise one tab for each state, and a tab that holds several states shows them as the cells of one grid too. The grid is the rule of this section alone. A unit that is loading shows the state *Working* |
 | Props | always | the props table and the unit's config objects. Its footer holds the link to the Playground |
 
 **A choice that a unit has under another prop's name is a tab of Content.** Such a choice is not a size, a colour or a state. It is a kind of what the unit shows or holds, or a place where it stands: the type of a row of tabs, the shape of a skeleton, the placement of a drawer, or the number of digits of a code field. A unit with such a choice has content, and each value of the choice is one tab of the section Content. The choice never gets a section of its own under the name of its prop, and never a page.
@@ -231,7 +231,7 @@ The content of a section's container is one card. The card holds the tabs, the p
 - **The code is shown whole, and is never cut.** The copy control copies all of it.
 - Where the showcase layout is Full width or Full screen, the code stands under the preview, inside the same card.
 
-**A unit stands in its preview by its showcase layout, and an example sets nothing by hand.** The card reads the layout from the unit's declaration, in a preview of one case and inside each cell of a grid.
+**A unit stands in its preview by its showcase layout, and an example sets nothing by hand.** The card reads the layout from the unit's declaration, in a preview of one case, in a preview of several cases, and inside each cell of the grid of States.
 
 | Showcase layout | Where the unit stands | How wide it is |
 | --- | --- | --- |
@@ -242,7 +242,7 @@ The content of a section's container is one card. The card holds the tabs, the p
 
 An example sets no alignment and no width to place its unit. A unit that stands in the wrong place has a wrong showcase layout in its declaration, and the declaration is corrected.
 
-**Several cases in one preview stand in one grid of cells of equal width.** Each cell holds the title of its case at the top, at the start of the cell, and under the title the unit, placed by the table above. The space between cells is a token of the core.
+**Several cases in one preview stand in one grid of cells of equal width in the States section, and in no other section.** The States section may show its cases in a tab or with no tabs, and the rule is the same. In every other section (Usage, Sizes, Colors, Content, and a section of the unit's own) there is no grid: the cases of an Inline unit stand in one row that wraps, each as wide as its own content, with the name of the case under it, and the cases of a Content unit stand one under the other, at the start, each with its name above it. Each cell holds the title of its case at the top, at the start of the cell, and under the title the unit, placed by the table above. The space between cells is a token of the core.
 
 | How many cells stand in a row | A preview of an Inline unit | A preview of a Content unit |
 | --- | --- | --- |
@@ -254,7 +254,7 @@ An example sets no alignment and no width to place its unit. A unit that stands 
 - The width of the preview decides the columns, and the width of the page does not. A preview that stands beside the code is half as wide as the card, so its grid folds earlier.
 - A grid never makes a page scroll sideways. A unit that is wider than its cell scrolls inside the cell.
 - A preview of one case draws no grid and no title. The comment line of the code already names the case.
-- A case that shows its unit at full width takes the whole width. A case does so when its code gives the unit's `fullWidth`, or when its tab is named *Full width*. In a grid such a case takes a whole row. A unit is never drawn shrunk to its content, in the centre, where a case says it fills the width.
+- A case that shows its unit at full width takes the whole width. A case does so when its code gives the unit's `fullWidth`, or when its tab is named *Full width*. In the grid of States such a case takes a whole row. In any other preview it is as wide as the preview. A unit is never drawn shrunk to its content, in the centre, where a case says it fills the width.
 - Three kinds of case keep the form they have, and are not cells: the cases of a unit whose showcase layout is Full width, the cases of a unit that writes a value, and a case that is an embedded screen. Each stands at the whole width of its preview, one under the other.
 
 **A unit that writes a value, and a form.** In every example of such a unit, the live value stands beside the unit, and the code goes under both. The live unit takes about three fifths of the row. Beside it stands a dark panel titled *State*, with a copy control at the end of its title bar, a rule under the title, and under it the value the unit writes, live. The code stands under both, at the card's full width. On a narrow page the panel stands under the unit, and the code behind the bar with *Show code*. The main page has no section for the value. A form takes the same card.
