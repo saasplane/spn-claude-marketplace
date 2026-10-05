@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/12-delivery-showcase.md",
-      "seen": "9d186a04"
+      "seen": "853c94fe"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/12-delivery-showcase/",
-      "seen": "b92cbb64"
+      "seen": "ea9a59a2"
     }
   ]
 }
@@ -78,7 +78,7 @@ Each unit below is listed with its category, its showcase layout and what it has
 | Component - Feedback | Display · Content: `DSAlert` sizes, colours · `DSProgress` sizes, colours, states · `DSSkeleton` content · `DSEmpty` sizes, content. `DSSpinner` Display · Inline · sizes, colours, content. `DSToast` Overlay · Content · colours |
 | Component - Structure | Utility · Content: `DSCollapsible` sizes, states, content · `DSHScroll` content · `DSScrollArea` content · `DSSeparator` colours, content |
 | Component - Media | `DSAspectRatio` Display · Content · none. Display · Inline: `DSIcon` sizes, colours, states, content · `DSImage` sizes, states, content |
-| Component - Navigation | Control · Content: `DSBreadcrumb` data · `DSMenubar` sizes, data · `DSNavigationMenu` sizes, data · `DSPagination` sizes, states, content, value · `DSTabs` sizes, states, content, data · `DSAnchor` states, content. `DSLink` Control · Inline · sizes, colours, states, content |
+| Component - Navigation | Control · Content: `DSBreadcrumb` content, data · `DSMenubar` sizes, data · `DSNavigationMenu` sizes, data · `DSPagination` sizes, states, content, value · `DSTabs` sizes, states, content, data · `DSAnchor` states, content. `DSLink` Control · Inline · sizes, colours, states, content |
 | Component - Overlays | Overlay · Content: `DSDialog` sizes · `DSAlertDialog` colours, states, content · `DSDrawer` sizes, content · `DSSheet` sizes, content · `DSBackdrop` none |
 | Component - Popovers | Overlay · Content: `DSContextMenu` sizes, states, content, opener, data · `DSDropdownMenu` sizes, states, content, opener, data · `DSHoverCard` states, content, opener · `DSPopover` states, content, opener · `DSTooltip` sizes, states, content, opener |
 | Component - Typography | Display · Inline: `DSText` colours, content · `DSKbd` sizes, data |
@@ -103,7 +103,7 @@ Each unit below is listed with its category, its showcase layout and what it has
 
 | Showcase layout | Its pages | A scenario is | Where the code sits | How States are shown |
 | --- | --- | --- | --- | --- |
-| Inline | a main page and a Playground | a section or a tab | in the card, beside the preview | in one row, with the name of each state under it |
+| Inline | a main page and a Playground | a section or a tab | in the card, beside the preview | as the cells of one grid, with the name of each state at the top of its cell |
 | Content | a main page and a Playground | a section or a tab | in the card, beside the preview; under the unit and its State panel where the unit writes a value | as tabs, one state in each |
 | Full width | a short main page of Usage and Props, a Playground, and one page for each scenario | a page | in the card, under the preview | on the scenario pages |
 | Full screen | a short main page of Usage and Props, and one page for each type of the screen; no Playground | a page | in the card, under the embedded screen | on the page of each type |
@@ -146,7 +146,7 @@ FIGMA  {link}  {last sync}  |  SHOWCASE  {layer}  {group}  {category}  {showcase
 | layer | Core, Components, Widgets, Containers, Layouts, App | the first line and the Showcase group of the opening. The layer follows from the group |
 | group | the groups above | where the unit sits in the navigation |
 | category | Control, Display, Overlay, Composite, Utility, Screen | the Showcase group of the opening, and the unit's card on its group's Overview |
-| showcase layout | Inline, Content, Full width, Full screen | how a preview is laid out, whether States stand in one row or in tabs, where the code sits, and whether a scenario is a section or a page |
+| showcase layout | Inline, Content, Full width, Full screen | where the unit stands in a preview, whether States stand in one grid or in tabs, where the code sits, and whether a scenario is a section or a page |
 | has | sizes, colours, variants, states, content, value, opener, data | which sections the main page holds, and which card a section takes |
 
 A unit also declares its name, its short summary, and its link to the library with the instant of the last sync. A form declares that it is a form.
@@ -189,15 +189,17 @@ A main page holds its sections in one order. Usage is first and Props is last. A
 | Section | Appears when the unit has | What it holds |
 | --- | --- | --- |
 | Usage | always | one example: the richest real use of the unit, one that an app would really have |
-| Sizes | sizes | one tab for each size, `XS` to `XL`. Each tab shows every variant, in a row that flows to the next line |
-| Colors | colours | one tab for each colour. Each tab shows every variant, in a row that flows to the next line |
-| Content | content | one tab for each icon or place the unit holds |
-| States | states | each state the caller sets: in one row, with the name of each state under it, when the showcase layout is Inline; otherwise one tab for each state. A unit that is loading shows the state *Working* |
+| Sizes | sizes | one tab for each size, `XS` to `XL`. Each tab shows every variant, as the cells of one grid |
+| Colors | colours | one tab for each colour. Each tab shows every variant, as the cells of one grid |
+| Content | content | one tab for each icon or place the unit holds, and one tab for each choice of the unit that has no section of its own |
+| States | states | each state the caller sets: as the cells of one grid, with the name of each state at the top of its cell, when the showcase layout is Inline; otherwise one tab for each state. A unit that is loading shows the state *Working* |
 | Props | always | the props table and the unit's config objects. Its footer holds the link to the Playground |
 
 **A choice that a unit has under another prop's name is a tab of Content.** Such a choice is not a size, a colour or a state. It is a kind of what the unit shows or holds, or a place where it stands: the type of a row of tabs, the shape of a skeleton, the placement of a drawer, or the number of digits of a code field. A unit with such a choice has content, and each value of the choice is one tab of the section Content. The choice never gets a section of its own under the name of its prop, and never a page.
 
 **A unit may add a section of its own after the sections its tags give.** A unit does so when it has a whole set of choices that none of the six sections names. Examples are the looks and the pinned parts of a table, the display of a code view, and the type of an address form. A section of its own is built as every other section is: a container with a title, one line, and one card of tabs. It stands after the sections that the tags give, which end with States, and before Props. A unit with several of them lists them in the order it wants them read.
+
+**Usage is one example, and it keeps one case where it shows one use.** Several cases stand in Usage only when they are one use told in parts. A case that shows a choice of the unit is a tab under its own name, in Content or in States. The folded trail of a breadcrumb is a choice of the unit, so it is a tab of Content.
 
 A section opens on the tab its unit names. Where the unit names none, Sizes opens at `SM`, Colors at the primary colour, and any other section at its first tab. A section with one example has no row of tabs, unless that example carries a name of its own.
 
@@ -205,14 +207,14 @@ A section opens on the tab its unit names. Where the unit names none, Sizes open
 
 | Part of the container | What it holds in a section | In the frame |
 | --- | --- | --- |
-| Header | at its start, the section's title, and under it one muted line that says what the section shows. At its end, level with the title, the section's actions, such as *Open full screen* over an embedded screen | no. It sits flat on the page |
-| Content | the card: the tabs, the preview and the code as one object. The part is `flush`, because what it holds reaches the edge of the frame | yes. It is the one part the frame holds |
-| Footer | at its start, the actions that follow from the section, such as *Open the Playground* under Props | no. It sits flat on the page |
+| Header | at its start, the section's title, and under it one muted line that says what the section shows. At its end, level with the title, the section's actions, such as *Open full screen* over an embedded screen | only where the theme names it. Under the showcase's default theme it sits flat on the page |
+| Content | the card: the tabs, the preview and the code as one object. The part is `flush`, because what it holds reaches the edge of the frame | yes, under every theme. The showcase's default theme names it |
+| Footer | at its start, the actions that follow from the section, such as *Open the Playground* under Props | only where the theme names it. Under the showcase's default theme it sits flat on the page |
 
-- The frame is the section's one border. What stands in the content draws no border and no corners of its own.
+- The frame is the section's one border. It holds the parts that the showcase's theme names, and the content by default. A section writes no frame parts of its own. Under the default theme the frame holds the content only. Under a theme that names the header, the content and the footer, the title, the line, the actions and the footer are inside the frame with the card. What stands in the content draws no border and no corners of its own.
 - A header's actions stand at its end, and a footer's actions stand at its start. An action of the header acts on what the section shows now. An action of the footer leads on from the section, to another page or to another part of the same page.
 - Every section has a header. A section with no action that follows from it has no footer.
-- The look of the frame comes from the theme, as an app's does. The showcase sets no border, no fill and no corners of its own on a section, so a change of the container's look in the theme shows on every section.
+- The look of the frame comes from the theme, as an app's does. The showcase sets no frame part, no border, no fill and no corners of its own on a section, so a change of the container's look in the theme shows on every section. Its default theme names the content as the one framed part.
 - No container stands inside another container. The containers construct refuses a container inside a container, and a section is a container. So an example that is a container, or a whole page of an app, is shown as an embedded screen in the content of its section. The screen is a page of its own, loaded in the section's content, and the frame of the section is the one frame that the reader sees.
 - The opening of a page is the page's own header, and not the header of a container.
 
@@ -221,13 +223,39 @@ The content of a section's container is one card. The card holds the tabs, the p
 | Part of the card | On a wide page | On a narrow page |
 | --- | --- | --- |
 | Tabs | a row at the card's top, from its start. The open tab has a line under it in the primary colour, and a rule runs across the card under the row | the same row. When the tabs do not fit, the row scrolls sideways inside the card and never wraps |
-| Preview | at the start of the card, on the card's own surface, with its content centred | under the tabs, at the card's full width |
+| Preview | at the start of the card, on the card's own surface, with its unit placed by the unit's showcase layout | under the tabs, at the card's full width |
 | Code | beside the preview, on a dark surface that reaches the card's end and bottom edge, with no gap and no frame of its own; open at first | under one bar across the card, which holds *Show code* at its start and the copy control at its end; closed at first. When open, the same dark block, as wide as the card, closing the card's bottom edge |
 | Inside the code | each case begins with a comment line that names it, then the usage. An empty line separates two cases. A copy control stands at the top of the code, at its end | the same. A long line scrolls sideways inside the block, and the page never scrolls sideways |
 
 - **The code is the usage only**: the lines a developer writes at the point of use. It holds no import, no wrapping function and no whole file.
 - **The code is shown whole, and is never cut.** The copy control copies all of it.
 - Where the showcase layout is Full width or Full screen, the code stands under the preview, inside the same card.
+
+**A unit stands in its preview by its showcase layout, and an example sets nothing by hand.** The card reads the layout from the unit's declaration, in a preview of one case and inside each cell of a grid.
+
+| Showcase layout | Where the unit stands | How wide it is |
+| --- | --- | --- |
+| Inline | in the centre of the preview | as wide as its own content |
+| Content | at the start of the preview | as wide as the preview. A field, which is a unit that writes a value, is held to 28 rem, the width the design system gives its large overlay |
+| Full width | at the start of the preview | the whole width of the preview |
+| Full screen | the embedded screen fills the preview | the whole width, from edge to edge |
+
+An example sets no alignment and no width to place its unit. A unit that stands in the wrong place has a wrong showcase layout in its declaration, and the declaration is corrected.
+
+**Several cases in one preview stand in one grid of cells of equal width.** Each cell holds the title of its case at the top, at the start of the cell, and under the title the unit, placed by the table above. The space between cells is a token of the core.
+
+| How many cells stand in a row | A preview of an Inline unit | A preview of a Content unit |
+| --- | --- | --- |
+| Desktop: a preview 32 rem wide or wider | up to four | up to two |
+| Tablet: a preview from 24 rem to under 32 rem | up to two | one |
+| Phone: a preview narrower than 24 rem | one | one |
+
+- A grid has no more columns than it has cases. Three cases of an Inline unit stand in three columns where there is room for four, and two cases of a Content unit stand in two. More cases than columns wrap to a next row of the same columns, so every cell has the same width.
+- The width of the preview decides the columns, and the width of the page does not. A preview that stands beside the code is half as wide as the card, so its grid folds earlier.
+- A grid never makes a page scroll sideways. A unit that is wider than its cell scrolls inside the cell.
+- A preview of one case draws no grid and no title. The comment line of the code already names the case.
+- A case that shows its unit at full width takes the whole width. A case does so when its code gives the unit's `fullWidth`, or when its tab is named *Full width*. In a grid such a case takes a whole row. A unit is never drawn shrunk to its content, in the centre, where a case says it fills the width.
+- Three kinds of case keep the form they have, and are not cells: the cases of a unit whose showcase layout is Full width, the cases of a unit that writes a value, and a case that is an embedded screen. Each stands at the whole width of its preview, one under the other.
 
 **A unit that writes a value, and a form.** In every example of such a unit, the live value stands beside the unit, and the code goes under both. The live unit takes about three fifths of the row. Beside it stands a dark panel titled *State*, with a copy control at the end of its title bar, a rule under the title, and under it the value the unit writes, live. The code stands under both, at the card's full width. On a narrow page the panel stands under the unit, and the code behind the bar with *Show code*. The main page has no section for the value. A form takes the same card.
 
@@ -279,7 +307,7 @@ Theme is a page of App, of its own kind. It has three parts, in this order.
 - An action's example shows the primary colour.
 - A thing inline with text takes the text's size step. Core holds the page *Inline alignment*: every control at each size on one centre line, and a line of text with an icon, a badge, a link and a button on the text's baseline.
 - One control, *Show code*, on the showcase's own bar, sets the code of every card. It is on at first on a wide page and off at first on a narrow one. On a narrow page each card also has its own control, which wins for its card. On a wide page a card has no control of its own.
-- Every page reads well on a phone, a tablet and a desktop. On a narrow page a split stacks, nothing has a fixed width, a wide table scrolls inside its own box, and a row of variants flows to the next line. The page never scrolls sideways.
+- Every page reads well on a phone, a tablet and a desktop. On a narrow page a split stacks, nothing has a fixed width, a wide table scrolls inside its own box, and a grid of variants folds to fewer columns. The page never scrolls sideways.
 - A documentation page, which is a page written in prose such as a page of Core, has no outline panel. Its content is as wide as the width of the shell, a measure of the layout, and on a narrower window it fits the window.
 - A unit inside a documentation page keeps its own sizes. The styling a tool gives its documentation never reaches a unit.
 
