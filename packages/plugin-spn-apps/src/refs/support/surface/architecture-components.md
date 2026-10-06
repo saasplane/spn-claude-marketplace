@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/06-architecture-components/",
-      "seen": "fd06a72f"
+      "seen": "01e6dc09"
     }
   ]
 }
