@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "024d673f"
+      "seen": "6d8c6552"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -619,6 +619,13 @@ lands* names the files that change, by repository, with a link to the approach p
 reasoning stays on the approach page, so a preview carries no `Why`, `What` or `How`. A preview never frames a
 sample file: it shows a thing with the page's own blocks, and links a real file in the arc's `samples/`
 folder.
+
+**Code shown on a page follows its stack's own standards — MUST** (decision RD.DEVEX.WORKSPACE.235). A code
+block in a preview or on an approach page is read as code and copied as code, so it follows the naming and
+code chapters of the stack it belongs to. Before you write one, load that stack's naming and code references:
+for TypeScript, `refs/support/apps/providers/ts/02-naming.md` and `05-code.md` in the `spn-apps` plugin. A
+page in a workstream belongs to no stack, so nothing else loads them. A support interface in a sample names
+no platform word.
 
 **The rail is built from the markup.** Every `<section id>` becomes an entry, named from its `h2` up
 to the em dash, and every `<h3 id>` inside it an entry under it, named the same way: *SEQUENCE — steps in

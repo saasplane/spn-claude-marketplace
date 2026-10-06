@@ -46,7 +46,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "024d673f"
+      "seen": "6d8c6552"
     }
   ]
 }
@@ -515,6 +515,15 @@ this point, because the approach page holds that. A question is asked on the app
 and its card links the preview that shows the options. **A preview never frames a sample file**: it shows
 a thing with the page's own blocks, such as a table, a tree, a figure or a code block, and where the
 thing is a real file it links that file in the arc's `samples/` folder.
+
+**Code shown on a page follows its stack's own standards — MUST** (`RD.DEVEX.WORKSPACE.235`). A code
+block in a preview or on an approach page is read as code and copied as code. So it follows the naming
+and code chapters of the stack it belongs to, exactly as a file in that stack's repository does. Before
+you write such a block, load that stack's naming and code references and write the block to them: for
+TypeScript, `refs/support/apps/providers/ts/02-naming.md` and `05-code.md` in the `spn-apps` plugin. A
+page in a workstream belongs to no stack, so nothing else brings those references into your session.
+Each stage keeps its own words in a sample too: a support interface names no platform word, such as an
+organization.
 
 **A preview holds what the developer judges, and nothing you need — MUST** (`RD.DEVEX.WORKSPACE.210`).
 It is written for the person who says yes or no. Show the proposal in its final form, the few rules it
