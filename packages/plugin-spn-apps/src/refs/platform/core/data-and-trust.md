@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/01-core/04-data-and-trust.md",
-      "seen": "91b1d6fb"
+      "seen": "ca0e88c3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/",
-      "seen": "d57a0ac1"
+      "seen": "323135a1"
     }
   ]
 }
@@ -97,6 +97,19 @@ Retention and privacy are not platform-wide constants — they are one organizat
 Read the **effective policy** — the section-by-section merge of the two layers — never the seeded defaults directly; that is what lets a platform default evolve without drifting away from what every organization actually reads.
 
 **Unlike an auth policy, a data policy resolves whole: the nearest layer holding one wins entirely, and it does not merge attribute by attribute.** Retention has no agreed direction — longer is stricter for an audit obligation, shorter for a privacy one — so merging two organizations' answers would produce a promise neither of them made. If you are writing a purge job or a data-subject flow, consult the effective policy every time rather than a constant you hard-coded once; the policy store and merge are implemented, but enforcement is a per-module responsibility, so until your module consults it, the policy is advisory for the data your module owns.
+
+## A secret you must read back is stored sealed
+
+Most secrets are never read back — a password is checked against a one-way hash, so nothing recoverable is stored. Some must be used later: the key an organization brings for its own email vendor, the client secret of its sign-in provider, a person's authenticator seed. Carry such a secret in the configuration's **`internal` block**, the write-only half of the shape: a caller may write it, and every read model masks it. Give a configuration that holds no supplied secret no block at all, because an empty block claims a protection with no subject (`RD.PLATFORM.CORE.029`).
+
+The mask guards the reply. It does not guard the row, so a copy of the database, a backup, or a query by a read-only role would hold the secret as it was typed. **So a secret that must be read back is stored sealed — MUST** (`RD.PLATFORM.CORE.041`): the service encrypts the value before it saves the row.
+
+- Encrypt the whole `internal` block, under a **data key** made for that value alone.
+- A key service holds the **master key** that protects every data key. It is kept apart from the key that encrypts the data, and only the running service may use it.
+- The row holds one sealed value. A read opens it for the one path that uses the secret, and the read model still masks it.
+- A sealed value is bound to what it belongs to — the organization, the table and the row; a person's own secret is bound to the identity in the organization's place. A sealed value copied into another row does not open there.
+
+A value that does not open gives the caller nothing, and nothing falls back to a value stored in plain. The rule covers every table that keeps an `internal` block, and each one added later. The capability that seals and opens is **the seal**, a backing-resource family of the Support stage; how a value is sealed, who holds the key and what a caller owes the seal are that family's to state. **It is designed and not built yet** — today the `internal` block is masked on every read and stored as it was written.
 
 ## Disclosure
 

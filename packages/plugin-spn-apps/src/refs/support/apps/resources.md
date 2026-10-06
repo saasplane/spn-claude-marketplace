@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-apps/04-resources.md",
-      "seen": "27fea46a"
+      "seen": "a37be94a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/04-resources/",
-      "seen": "f5e3a1bd"
+      "seen": "7667ae8c"
     }
   ]
 }
@@ -40,12 +40,13 @@ export interface ISPResourceProvider {
 - Put a timeout on that call when you implement one, so a wedged resource fails the probe instead of hanging it.
 - Make `close()` safe to call more than once.
 - **You do not reach secrets through this interface.** A secret is a value a deployment is handed, read once at boot from the estate's configuration store — there is nothing to keep open and nothing to release. It sits inside the same discipline (a mistake with it is a loss) without being a resource provider.
+- **The seal is not that secret, and the two are easy to confuse.** A secret is a value your service is handed at start. The seal is a capability your service calls while it runs, to encrypt a secret a customer gave the product before a store receives it. The seal is a resource provider, and it answers this lifecycle like database, cache, queue and storage.
 
 ## The families
 
-### Security — the access discipline the other four assume
+### Security — the access discipline the other families assume
 
-Read this family first: it is the discipline database, cache, queue and storage all build on, not itself a resource you reach through `ISPResourceProvider`.
+Read this family first: it is the discipline database, cache, queue, storage and the seal all build on, not itself a resource you reach through `ISPResourceProvider`.
 
 A server process boots with **two mandatory database connections**, and you refuse to start without both:
 
@@ -67,11 +68,13 @@ Behind the connections sits one **role quartet** per scope:
 
 Hold secrets at rest to the same zero-tolerance rule everywhere: persist a credential secret (password, delivered one-time code, recovery code, refresh token, device trust) only as a one-way hash — never encrypted, never reversible. Treat a secret that must be stored to be used (an authenticator seed, a bring-your-own provider key) as write-only from the contract's perspective — mask it on every read, and reach it only through a named internal server-side path.
 
+**Store a secret that must be read back sealed — MUST** (`RD.SUPPORT.APPS.166`). Encryption of the disk protects a stolen disk; it does not protect a dump, a replica, or a query by the read-only role, because the database decrypts for each of them. So the service encrypts the whole `internal` sub-object itself, before it saves the row, through the seal family below. No database role can open a sealed value, so `app_ro` reads a sealed string and you can grant it for investigation without granting the secrets. **The seal is designed and not built yet** — today the `internal` sub-object is stored as written.
+
 ### Database — the record of truth
 
 The rule that matters most: **one schema per service; reach your own tables and join another's only on a declared key.**
 
-Hold entity shape fixed across every table you write: a sortable, service-assigned 26-character `id` you assign yourself, never database-generated; audit stamps `created_at`/`updated_at`/`created_by`/`updated_by`; lifecycle as an `active` boolean — **never add a soft-delete column**, and reserve hard delete for junction and owned-child rows; put semi-structured data in `{purpose}_json` columns with `camelCase` keys; denormalize a polymorphic document's discriminator to an indexable `{noun}_type` column alongside it; store a value that must never be read back under an `internal` sub-object or in a column with no read mapping.
+Hold entity shape fixed across every table you write: a sortable, service-assigned 26-character `id` you assign yourself, never database-generated; audit stamps `created_at`/`updated_at`/`created_by`/`updated_by`; lifecycle as an `active` boolean — **never add a soft-delete column**, and reserve hard delete for junction and owned-child rows; put semi-structured data in `{purpose}_json` columns with `camelCase` keys; denormalize a polymorphic document's discriminator to an indexable `{noun}_type` column alongside it; store a value that must never be read back under an `internal` sub-object or in a column with no read mapping. Once the seal is built, a value the service itself must read back is stored sealed, so the column holds one sealed string and never the value.
 
 | Object | Grammar | Sample |
 | --- | --- | --- |
@@ -110,6 +113,22 @@ Expect buckets to be provisioned; never create one at runtime. Put the **access 
 **Derive a key; never author one.** What you hold as a caller is a logical folder path — bounded, POSIX-style segments with no way to spell `.`, `..` or a separator — and let the store compose the physical key from validated segments, the file's own id, and a lossy key-safe rendering of the display name. **Put metadata in the database and content in storage** — own every stored object with a database record carrying identity, scope, classification and lifecycle, and treat the storage key as an attribute of that record, never a public fact.
 
 **Treat public as a prefix, not a permission.** Issue private access short-lived and signed, from a service, after its authorization gate; follow the same discipline in reverse for upload. A private object reachable by a stable URL is a defect you should fix. Put content the product must serve without a session under the store's `PUBLIC` prefix, fronted by the platform documents host — the edge caches that prefix, it does not decide access, so a request that goes around it meets the store's own prefix policy.
+
+### Seal — it stores nothing, and it opens a value only where it belongs
+
+The rule that matters most: **a value opens only under the context it was sealed with, and a value that does not open answers nothing.**
+
+**The family is designed and not built yet** (`RD.SUPPORT.APPS.166`). What follows is the design of record; today a secret that must be read back is stored as it was written.
+
+The seal has one interface with two operations. `seal` takes a value and a context and returns one sealed string; the value is the whole `internal` sub-object of a stored document, never one field of it. `open` takes a sealed string and a context and returns the value. Each `seal` uses a **data key** made for that value alone, under a **master key** that never leaves its holder, and the sealed string keeps the encrypted value and the wrapped data key together.
+
+- **Name a context on every call** — the facts that say what the value belongs to: the organization, the table and the row, or the identity in the organization's place for a person's own secret. Which facts make a context is your module's decision; the support stage treats them as opaque names and values. The sealed string records its context, and an `open` under another context does not open it.
+- **Treat an `open` that answers nothing as an absent secret.** A changed string, another context, an unknown form, or a refused key all answer nothing — no value and no error. Never fall back to a value stored in plain. `open` throws only when the key holder cannot be reached, because a retry may succeed.
+- **Readiness is reachability of the key holder.** A wrong setting — an unknown provider, a missing key id, a key the service's role may not use — fails boot by name, never through readiness.
+- **Only a service that lists the family opens it.** Boot builds the provider for a service that names the seal among its families, and the estate grants the key to those services' roles alone.
+- **The cloud and the local implementation write the same stored form.** In the cloud the cloud's key service holds the master key, apart from the key that encrypts the database. On a machine the key is a fixed constant in the implementation; it is not a secret, and it protects test data only.
+
+**What the family refuses:** it stores nothing and has no read by name, so it is no vault; it is not the configuration store that hands a deployment its own secrets; it does not replace a hash for a secret that is never read back; and it does not replace the mask — every contract read still masks a sealed value. If you need a secret back from an API, the seal does not give it to you.
 
 ## The provider seam — how one is selected
 

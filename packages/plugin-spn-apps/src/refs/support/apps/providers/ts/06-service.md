@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/06-service.md",
-      "seen": "10177279"
+      "seen": "801f6113"
     }
   ]
 }
@@ -111,6 +111,8 @@
 | Reachable from a controller | yes | no — server-side callers only |
 
 **The masking is in the read path, not the caller**, so a new controller or a forgotten select cannot leak it. **The unmasked read has a different name**, so the audit question becomes who calls the `*Internal` method, which you can grep for.
+
+**An integration's constructor config holds credentials in plain, for use, and stays flat.** Today the service reads them from the stored entity's `internal` as they were written. Once the seal is built, the stored `internal` is one sealed string, and the service opens it before it builds that config.
 
 ## Search
 

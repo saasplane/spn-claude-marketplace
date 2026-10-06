@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/06-service.md",
-      "seen": "10177279"
+      "seen": "801f6113"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/07-data.md",
@@ -64,7 +64,7 @@ Repo returns `{ total, entityIds }` (mode-split TOTAL/RECORDS/BOTH, ids-only sel
 
 - Business invariants are named `_assert*` helpers that **throw** (never return booleans); `throw<MOD>Error(code, message, data?)` from the module error registry (category decided once per code); shared helpers (`throwErrorEntityNotFound`, `throwErrorBadInput({ field })`, …) otherwise. Prefer throwing to logging; logging is not handling — re-throw. Never `Promise<void>` returns — return `SPResultBoolean`.
 - **Anti-enumeration 404**: cross-tenant/cross-owner probes get EntityNotFound, never Forbidden; 403 only for known-entity permission failures.
-- **Secret masking is a mapper responsibility** (no ORM column hiding): secrets live under `internal` in polymorphic configs, nulled by `_mask*` before any read model leaves. That holds in every mapper path including Details. Reveal-once secrets return exactly once at creation in a dedicated state. Never read a secret off a read model — read the stored entity's `internal`.
+- **Secret masking is a mapper responsibility** (no ORM column hiding): secrets live under `internal` in polymorphic configs, nulled by `_mask*` before any read model leaves. That holds in every mapper path including Details. Reveal-once secrets return exactly once at creation in a dedicated state. Never read a secret off a read model — read the stored entity's `internal`. Today that block is stored as it was written; once the seal is built it is one sealed string, and the service opens it before it builds an integration's config.
 
 ## Entities
 

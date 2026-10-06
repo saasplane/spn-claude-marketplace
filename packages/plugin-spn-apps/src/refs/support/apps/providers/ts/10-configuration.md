@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/10-configuration.md",
-      "seen": "a68f7619"
+      "seen": "30194e02"
     }
   ]
 }
@@ -75,6 +75,7 @@ APP_ENV / APP_MODE / NODE_ENV                 ← bootstrap, unprefixed
 | database | `POSTGRESQL` | no — the migration connection requires one |
 | cache | `REDIS` | yes |
 | queue | `KAFKA` | yes |
+| seal (designed, not built yet) | `AWS_KMS` · `LOCAL` | no — a service that seals nothing leaves the family out of its declaration |
 | API | `FASTIFY` | yes |
 | CLI | `COMMANDER` | yes |
 
@@ -102,6 +103,20 @@ APP_ENV / APP_MODE / NODE_ENV                 ← bootstrap, unprefixed
 - **The application cache block also backs the lock provider.**
 - **The queue's client id derives from the declared code, and the topic list comes from the application's own declaration** — neither is an environment variable. Each declared topic gets a paired error topic built at boot.
 - **No bucket fact publishes for storage.** The bucket is the world's derived store name, and a key never names one.
+
+**The seal block is a selector and, in the cloud, one key id** (`RD.SUPPORT.APPS.166`). The seal is the family that encrypts a stored secret before the row is saved. **It is designed and not built yet.**
+
+```
+{CODE}_RESOURCE_SEAL_APP_PROVIDER=AWS_KMS
+{CODE}_RESOURCE_SEAL_APP_AWS_KMS_KEY_ID      # the id of the environment's key for stored secrets — plain, not a secret
+
+{CODE}_RESOURCE_SEAL_APP_PROVIDER=LOCAL      # a machine: the selector is the whole block
+```
+
+- **The key id is published, never typed.** The environment apply reads it from the cloud and publishes it (`RD.SUPPORT.INFRA.109`). On a machine the block is one line in the service's own `envs/local.env`.
+- **No credential pair and no endpoints key publish.** In the cloud the service calls the key service as its own workload role; `LOCAL` uses a fixed constant inside the local provider.
+- **The block is opened only for a service that lists `SEAL` in its `connections`.** A service that lists it and has no block fails boot by the missing key's name.
+- **A wrong setting stops boot** — a selector outside the accepted set, a missing `KEY_ID` under `AWS_KMS`, or a key the service's role may not use. Boot checks that the service can use its key before the service takes traffic.
 
 ## Module namespaces
 

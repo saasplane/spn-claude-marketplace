@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/aws/08-environment.md",
-      "seen": "bfe91e3d"
+      "seen": "4883171e"
     }
   ]
 }
@@ -31,6 +31,14 @@
 **Act 1 computes and does not ask.** If a step here is waiting for somebody to supply a CIDR, the addressing rule has been broken upstream — see [`04-addressing.md`](04-addressing.md).
 
 **A role per schema, not a role per service.** The grant follows the data rather than the caller, so a second service reading the same schema needs no new role and a service reading two schemas holds two.
+
+**Act 4 also creates the key for stored secrets** (`RD.SUPPORT.INFRA.109`). It is a second KMS key in the environment, beside the data key and apart from it, with yearly rotation on. Nothing in `spestate.json` asks for it: every environment has one. **Give it a key policy of its own**, because the provisioning role holds every action in the account and an IAM grant alone would let that role use the key. The policy admits the workload roles of the apps that list the seal, and refuses the provisioning role.
+
+- **Publish the seal block for each app that lists the seal**: `{CODE}_RESOURCE_SEAL_APP_PROVIDER=AWS_KMS` and `{CODE}_RESOURCE_SEAL_APP_AWS_KMS_KEY_ID`, the id read from the key and written in the plain half. Publish no credential for KMS: the workload role answers.
+- **Grant that app's workload role two actions on the key, and no others**: making a data key, and unwrapping one. An app that does not list the seal receives no grant.
+- **A CloudTrail trail records every call that makes or unwraps a data key**, with the organization and the row the service named, into the log archive the estate already has.
+
+Verify it: the environment holds two keys and the data services use the data key only; the workload role of an app that lists the seal makes and unwraps a data key, while the provisioning role and an app that does not list the seal are refused; and the trail shows those calls. The key, its block and its trail are designed and not stood yet.
 
 ## What an environment may reach
 

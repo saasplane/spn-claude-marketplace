@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-infra/07-trust.md",
-      "seen": "12989541"
+      "seen": "0f33c40a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/07-trust/",
@@ -120,6 +120,8 @@ Scanners are stood up by the platform layer, into whichever cloud the organizati
 ## Evidence is a by-product
 
 Findings, audit trails and configuration history flow into the observing accounts continuously, so compliance is a query rather than a project. The accounts that receive them can deploy nothing, which is what makes the record worth trusting.
+
+**The audit trail is declared, and it records each use of the key for stored secrets** (`RD.SUPPORT.INFRA.109`). An environment holds one key that protects the secrets a product must read back. A running service asks the key service for a data key when it stores such a secret, and asks it to unwrap one when it uses the secret; each call names the organization and the row the secret belongs to. The trail records every such call with those names, into the log archive the estate already has — append-only, and no operator may delete from it. So *when was this organization's secret opened* is a query over that archive, and the service that opened the secret cannot edit the answer. The trail is designed and not declared yet.
 
 **What is unproven MUST say so.** A claim with no evidence behind it is reported as unproven rather than quietly left out, because a report that hides its gaps is worse than no report — it gets believed. When you cannot establish a fact about what is running, state that you could not establish it. Never fill the gap with an inference and present it as a finding.
 

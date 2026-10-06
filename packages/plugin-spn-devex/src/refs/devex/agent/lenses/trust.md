@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/02-trust.md",
-      "seen": "6a7ece62"
+      "seen": "0c89e163"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/08-agent-surface/README.md",
@@ -15,7 +15,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/01-server/01-contract/01-states.md",
-      "seen": "b62bee18"
+      "seen": "c748334e"
     }
   ]
 }
@@ -35,6 +35,7 @@
 - **Every mutation lands in the audit trail**, attributed to a principal, in an organization context. The attribution test must answer: which principal, which action, which organization, under which policy — for people, the system, and agents alike.
 - **Context comes from the auth context, never the command body.** Take the caller's organization and identity from what the runtime authenticated; a request cannot assert its own scope.
 - **Secrets are structural**: no raw secret at rest, stored secrets write-only from the contract's perspective, never returnable by any API. Treat a design that needs to read a secret back as a wrong design, not a missing feature.
+- **A secret that must be read back is stored sealed** (`RD.PLATFORM.CORE.041`): the service encrypts it before it saves the row, under a key kept apart from the key that encrypts the data, and only the running service may use that key. The seal is designed and not built yet, so today such a secret is masked on every read and stored as written.
 - **No signing secret has a default.** A service started without one refuses to boot rather than signing with a value somebody could guess (`RD.SUPPORT.INFRA.095`). A signing secret rotates behind a fallback that only VERIFIES, so a rotation signs nobody out.
 - **A stored token rotates; an unstored one is short-lived and names its use.** A refresh token the server keeps rotates on every use, and presenting an already-rotated one revokes the session. A renewal token the server does not keep is signed, short-lived, and says what it is for — every check refuses a token whose use does not match (`RD.SUPPORT.APPS.090` · `RD.SUPPORT.APPS.095`). Nothing revokes an unstored token, so ending the session is what ends it.
 - **Failures never disclose existence** — an id outside the caller's scope resolves to `NOT_FOUND`, a failed login is one generic answer, no internals leak outward.

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-infra/04-resources.md",
-      "seen": "2d564375"
+      "seen": "d6a509be"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/04-resources/",
@@ -31,6 +31,8 @@ A resource is a backing service that holds state: a database, a cache, a queue, 
 | `STORAGE` | one store for the environment, private with no exception | access through the one document system, never a key prefix |
 
 **The secret store is on no row, because nobody declares it — every environment has one, so asking for it would be asking for something already there.** The set of four is closed and total: a fifth engine is a contract change, exactly the ceremony a baseline set should demand.
+
+**An environment also stands a key for stored secrets, and nobody declares that either** (`RD.SUPPORT.INFRA.109`). A product stores some secrets it must read back, such as a provider key an organization brings, and its service encrypts each one before it saves the row. That needs a master key held where the data is not, so the environment's blueprint creates one in each environment, at apply. **It is a key of its own** — not the key that encrypts the engines' data, so reading the data and opening a stored secret are two separate rights. **It carries a policy of its own**: only the role of a service that lists the seal may use it; the role that provisions the account may not, and no database role can. **The declaration gains nothing for it** — no row to write and no engine family to name. The key is designed and not stood yet.
 
 **An application selects no engine and names no share — MUST NOT.** Every scheduled deployment receives a derived share scoped to its own coordinates: its role set from the factory, topics named for their owner, storage reached through the one document system, its own configuration prefix. Nothing nameable crosses the seam in either direction, in either direction — that is what keeps the estate from ever reading a code repository. A new application is one reviewed row; a new version is no estate change at all.
 
