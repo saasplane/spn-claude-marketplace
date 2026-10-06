@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-apps/05-app.md",
-      "seen": "e9fc788e"
+      "seen": "1db56de9"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/05-app/",
@@ -233,6 +233,8 @@ internal dep   workspace:*           →   2.4.0
 ```
 
 The tag is the only record of the version, so releasing edits no file and a long-lived branch never conflicts over a number nobody typed. A release **MUST** run from a clean tree at the commit it tags; a source manifest still holding a real version stops the run before anything is built.
+
+**A release can be made at any time.** The registry is asked one thing: is the version the release plans free for every package? A free version is released whole. A version a halted release used for some packages is spent, carries no tag, and is named in one sentence and left behind by the next release. What the registry holds as newest never decides whether a release passes, and a scaffolded application is proven against this repository's own packages as built in the same run. A publish the network drops is tried again, three tries in all, and a version the registry already holds for that package is not an error on the retry.
 
 ## The web application
 
