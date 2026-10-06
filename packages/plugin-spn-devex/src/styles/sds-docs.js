@@ -1,6 +1,7 @@
 /* RESTATES: spn-foundation docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md § One stylesheet, served in versions
    The one script every page loads: the rail, the fold under each section, the link beside each
-   heading, and the reader's own time on a report. Every class it sets or reads opens with sds-. */
+   heading, the reader's own time on a report, and the colour of a code block. Every class it sets or
+   reads opens with sds-. */
 (function(){
   var rail=document.getElementById('rail');if(!rail)return;
   var secs=Array.prototype.slice.call(document.querySelectorAll('section[id]'));
@@ -128,5 +129,64 @@
       t.textContent=new Intl.DateTimeFormat(undefined,{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',timeZoneName:'short'}).format(at);
       t.title=stored;
     }catch(e){}
+  });
+})();
+/* A code block is coloured here, when the page opens. The page's file holds plain code in a `pre` tagged with
+   its language, and this reads the tag. A block that already holds an element is left as it is, so a page whose
+   colour was written into its file shows the same as before. A block with no language, or with one this does not
+   know, is never coloured. A token the rules do not know stays plain, and is never coloured wrongly. Where no
+   script runs, the block shows as plain code. */
+(function(){
+  var LANGS={
+    ts:{keywords:'const let var function return if else for while class interface type enum export import from as await async new extends implements readonly public private void null undefined true false'.split(' '),comment:/\/\/[^\n]*|\/\*[\s\S]*?\*\//g,type:/\b[A-Z][A-Za-z0-9_]+\b/g},
+    json:{keywords:['true','false','null']},
+    yaml:{comment:/#[^\n]*/g},
+    sql:{keywords:'SELECT FROM WHERE INSERT INTO VALUES UPDATE SET DELETE CREATE TABLE INDEX PRIMARY KEY FOREIGN REFERENCES NOT NULL UNIQUE ON DEFAULT ALTER ADD CONSTRAINT AND OR JOIN LEFT INNER GROUP BY ORDER LIMIT'.split(' '),comment:/--[^\n]*/g},
+    sh:{comment:/#[^\n]*/g},
+    diff:{},
+    md:{}
+  };
+  function esc(text){return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function colour(code,lang){
+    var spec=LANGS[lang];
+    if(lang==='diff'){
+      return code.split('\n').map(function(line){
+        if(line.charAt(0)==='+')return '<span class="sds-tk-add">'+esc(line)+'</span>';
+        if(line.charAt(0)==='-')return '<span class="sds-tk-del">'+esc(line)+'</span>';
+        return esc(line);
+      }).join('\n');
+    }
+    /* Every span is held aside behind a marker and put back at the end. A pass that ran over markup it had
+       just written would colour its own output: `class` is a TypeScript keyword, and it is also in every span.
+       The marker is the SUB character around letters, never digits, because the number rule would match a digit. */
+    var SEP=String.fromCharCode(26),held=[];
+    function marker(index){
+      var letters='',n=index+1;
+      while(n>0){letters=String.fromCharCode(97+((n-1)%26))+letters;n=Math.floor((n-1)/26);}
+      return SEP+letters+SEP;
+    }
+    function hold(cls,text){held.push('<span class="'+cls+'">'+esc(text)+'</span>');return marker(held.length-1);}
+    function keep(cls,escaped){held.push('<span class="'+cls+'">'+escaped+'</span>');return marker(held.length-1);}
+    var out=code;
+    /* Comments and strings come out first, so a keyword inside one is never coloured as code. */
+    if(spec.comment)out=out.replace(spec.comment,function(match){return hold('sds-tk-c',match);});
+    out=out.replace(/'[^'\n]*'|"[^"\n]*"|`[^`\n]*`/g,function(match){return hold('sds-tk-s',match);});
+    out=esc(out);
+    out=out.replace(/\b\d+(?:\.\d+)?\b/g,function(match){return keep('sds-tk-n',match);});
+    if(spec.keywords&&spec.keywords.length){
+      var words=new RegExp('\\b('+spec.keywords.join('|')+')\\b','g');
+      out=out.replace(words,function(match){return keep('sds-tk-k',match);});
+    }
+    if(spec.type)out=out.replace(spec.type,function(match){return keep('sds-tk-t',match);});
+    return out.replace(new RegExp(SEP+'([a-z]+)'+SEP,'g'),function(whole,letters){
+      var index=0;
+      for(var i=0;i<letters.length;i++)index=index*26+(letters.charCodeAt(i)-96);
+      return held[index-1];
+    });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('pre[data-lang]'),function(pre){
+    var lang=pre.getAttribute('data-lang');
+    if(!LANGS[lang]||pre.children.length)return;
+    pre.innerHTML=colour(pre.textContent,lang);
   });
 })();
