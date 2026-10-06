@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "df99332a"
+      "seen": "a1625c6b"
     }
   ]
 }
@@ -120,6 +120,7 @@ A plugin of SaaS Plane's own, run by hand in the Figma desktop app, works on the
 A change of the surface is stated in the construct first, drawn in the library second and built in the web or a native stack third. An improvement is taken in the same order. A person settles what a gap cannot give once, in the decisions file. The command `spnutils apps surface library-plan <package>` reads the gaps, the two snapshots, the raw files and the decisions file, and writes one plan for each library file into `plugin-input/<package>/`, with `counts` last, and a view of the plans by library file, `compare/<package>/library-plan.md`, for a person to review. The library is the side that changes, and a plan shows what would change there before anything is applied.
 
 - **A plan holds operations of eighteen kinds, one entry each, and the plugin completes every one.** A person draws, rebinds, removes and confirms nothing in Figma: a person chooses a plan, reads the dry run and presses apply, and sends a picture to the agent when something looks wrong. Five kinds make a place (`VARIANT_PROPERTY_ADD`, `VARIANT_VALUE_ADD`, `SET_CREATE_EMPTY`, `SHEET_PLACE` and `CASES_DRAW`), and each carries `changes`, a list of exact changes from a closed set of eight kinds: `SET`, `BIND`, `ADD`, `COPY`, `REMOVE`, `BASE`, `SWAP` and `DRAWING`. A decision that draws and gives none is refused by name. Its keys are `planVersion` (`2`), `file`, `madeAgainst`, `decidedIn`, `pluginVersionNeeded`, `operations` and `counts` (`operations`, `doneByPlugin`, `expectedSkips`).
+- **A unit that is one component becomes a set when it gains its first property.** The component and its copies are combined as variants into a set with the unit's name, in the component's place; the component keeps its key and a later run finds the unit by it.
 - **The tool's folder, `~/.spnutils/surface/`, is ordered around the plugin, and the tool writes only under `plugin/`, `plugin-input/` and `compare/`.** The plugin saves into `plugin-output/raw/` and `plugin-output/results/<package>/`, a person writes `decisions/<package>.decisions.json`, and the tool never writes in those two. `spnutils apps surface plugin` makes the whole tree, and run again it leaves every other folder and file as it was.
 - **A removal of a variable or a style is written by its usage in the raw file.** Bound by no layer: the plugin alone removes it. Bound by layers: a `LAYERS_REBIND` entry comes first, which the plugin does by binding those layers to the variable the decision names or by letting them go, naming each page and path up to 20 and the whole count, and the removal follows. With no such decision the variable is refused by name. Usage not known, from a raw file of version 1 or 2: the removal is written as checked when applied, and the view says so.
 - **A decision matches a gap exactly.** A gap's key is its path, and for `VALUE_ABSENT` the path, `=` and the value. A decision's subject is one key or a list of keys, each compared as written and never as a prefix. The command refuses, by name, a decision that changes the library and matches no gap, and a gap that two decisions match.
