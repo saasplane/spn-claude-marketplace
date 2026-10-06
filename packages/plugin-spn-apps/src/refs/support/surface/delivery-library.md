@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/11-delivery-library.md",
-      "seen": "5877f9c7"
+      "seen": "6bcf581e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "a1625c6b"
+      "seen": "9f054559"
     }
   ]
 }
@@ -128,6 +128,19 @@ A change of the surface is stated in the construct first, drawn in the library s
 - **The result file says one outcome for each entry:** `DONE`, `SKIPPED`, `REFUSED` or `FAILED` (an entry that was undone), with `run.leftRefused` and `counts` last. The command `status` reads the result files.
 - **A rule of the comparison removes a gap only when a named fact proves it, and `rulesApplied` MUST count it.** The comparison leaves out what is not a unit, and it reads the props the stack declares. A second reader of the web's snapshot reads from the running showcase the values that only a browser works out.
 
+## The two ways to change the library
+
+- **A developer's hands in the design library are two things: publishing a file, and using the plugin** (import it, choose a plan, apply, save a result, read a file). Nothing else is asked of a developer. Never ask a developer to draw, rebind, remove or confirm anything in Figma. When something looks wrong the developer sends a picture, and you correct the plan or the tool and show the result again.
+- **You change the library in one of two ways: a plan that the plugin executes whole, or the Figma connector.** Pick the way from the nature of the work, say which way and why, name the developer's next step, and show the result.
+
+| The work has | The way |
+| --- | --- |
+| many changes that are alike, exact values, a token or many versions touched, or a change that must be seen before it happens or run again | a plan |
+| few items made once, items composed from units or drawn freely (an icon, a sheet of cases, a page), or work where looking at the result matters more than running it again | the connector |
+
+- **Three kinds of work.** A unit that changes (a prop, a value, a look) is a plan. A case the showcase shows is a unit with prop values set: place it as instances, and never draw it as a new look. A use case, a page or a pattern built from units is not synchronised with a stack: compose it from the published library on request, in a file that is not a library file.
+- **Before the connector writes, say what you are about to change**, stay inside the file and the items you named, and show the result. The connector never publishes a library.
+
 ## Drawing a block
 
 - A block drawn from data is a host and an item. One item serves every host that takes one data shape (`architecture-components.md`).
@@ -148,6 +161,7 @@ This ref states what the library draws, how its files are layered, and what stay
 | `RD.SUPPORT.SURFACE.025` | a change of the surface is stated in the construct first, drawn in the library second and built in the web or a native stack third |
 | `RD.SUPPORT.SURFACE.026` | the library draws every case the showcase shows, and states a block with a behaviour and little or no look by its behaviour and its feedback |
 | `RD.SUPPORT.SURFACE.027` | the plugin has a read mode and an update mode, and the update mode writes only what a plan names, only in the open file, only after a dry run and an apply, and never publishes |
+| `RD.SUPPORT.SURFACE.028` | a developer's hands in the library are publishing a file and using the plugin, the agent changes the library by a plan or by the connector picked by the nature of the work, and says what it will change before a connector write |
 
 ## Proof
 

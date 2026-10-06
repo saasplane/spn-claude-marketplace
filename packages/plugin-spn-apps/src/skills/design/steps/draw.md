@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "a1625c6b"
+      "seen": "9f054559"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
@@ -25,6 +25,12 @@
 Read this step when the tree of the page is written and the window holds the Figma connector. **The tree is the source, and the drawing follows it.** A change of mind goes into the tree first, and then into the drawing.
 
 Its provenance is the foundation book's design library, names, and layout and container chapters. Apply this restatement. The chapters are provenance, and not files to open.
+
+## Before you write in Figma
+
+- **Say what you are about to change**: the file, and the items. Stay inside them, and show the result when you have written.
+- **A page is composed from the published library, in a file that is not a library file.** Never write a page into a library file. A case the showcase shows is placed as instances of its unit and never drawn as a new look.
+- **Never ask the developer to draw, rebind, remove or confirm anything in Figma.** A developer publishes a file and uses the plugin, and that is all. When the library lacks something, the change of the library is a plan the plugin executes or a connector write, picked by the nature of the work, as `refs/support/surface/delivery-library.md` states. Say which way and why, and name the developer's next step.
 
 ## Before you draw
 
