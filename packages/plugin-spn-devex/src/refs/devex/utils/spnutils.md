@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/03-utils/01-spnutils.md",
-      "seen": "590fed6a"
+      "seen": "84b9a74d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "6c63ca8b"
+      "seen": "42c37488"
     }
   ],
   "decisions": [
@@ -136,14 +136,16 @@ routed by each package's own scope.
 
 `apps surface <operation> [package]` finds where a design library and a stack's design system differ,
 with no model reading either one. It is one command with an operation, as `migrate` is, so the tool
-keeps four groups. The operations are `plugin`, `library`, `snapshot`, `gaps`, `changes` and `status`,
-and the options are `--level`, `--unit`, `--raw`, `--file` and `--decisions`. `changes <package>` reads
-the gaps, the two snapshots, the raw files and the decisions file, and writes one change file for each
-library file under `~/.spnutils/surface/changes/`, each with `counts` last, and a view of them by
-library file for a person to review. It writes nothing else, and it never touches a repository or
-Figma. `status` also reads the result files that the plugin's update mode saved in
-`~/.spnutils/surface/results/`. Every file is under `~/.spnutils/surface/`, and none enters a
-repository.
+keeps four groups. The operations are `plugin`, `library`, `snapshot`, `gaps`, `library-plan` and
+`status`, and the options are `--level`, `--unit`, `--raw`, `--file` and `--decisions`. `plugin` also
+makes the folders a person saves into and picks from, and `library` reads the raw files in
+`plugin-output/raw/`. `library-plan <package>` reads the gaps, the two snapshots, the raw files and
+the decisions file, and writes one plan for each library file into `plugin-input/<package>/`, each with
+`counts` last, and a view of the plans by library file in `compare/<package>/library-plan.md` for a
+person to review. The tool writes only under `plugin/`, `plugin-input/` and `compare/`, and never
+touches a repository or Figma. `status` also reads the result files that the plugin's update mode
+saved in `plugin-output/results/<package>/`. Every file is under `~/.spnutils/surface/`, and none
+enters a repository.
 
 **`spnutils` never reads or writes a document — MUST** (`RD.DEVEX.UTILS.071`). `apps test <tier> <run>
 <package>` runs a tier and writes that run's file, `tests/.output/<tier>/runs/<run>.json`, and nothing

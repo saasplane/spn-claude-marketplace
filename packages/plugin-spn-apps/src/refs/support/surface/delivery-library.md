@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/11-delivery-library.md",
-      "seen": "81ec37a9"
+      "seen": "980b843d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "6a799846"
+      "seen": "867349a5"
     }
   ]
 }
@@ -26,9 +26,9 @@ Read this before you add a token or a block to the library, or before you ask wh
 | Design library | the Figma files that draw each named block and token |
 | Snapshot | one file that states a design system in the Surface domain's own words, written from the library and from each stack |
 | Gap | one difference between the library's snapshot and a stack's snapshot, of one closed kind |
-| Change file | one file for one library file, that lists what the plugin's update mode does there, one operation an entry |
+| Plan | one file for one library file, that lists what the plugin's update mode does there, one operation an entry |
 | Result file | the file the update mode saves after an apply, that says what happened to each entry |
-| Decisions file | the short file of what a person settled once, from which the change files are written |
+| Decisions file | the short file of what a person settled once, from which the plans are written |
 
 ## The files, by layer — 🔮
 
@@ -105,7 +105,7 @@ The view stays short by five rules. A `UNIT_ABSENT` line replaces every line und
 A plugin of SaaS Plane's own, run by hand in the Figma desktop app, works on the library file that is open. It has two modes, Read and Update. There is one run, and one file saved, for each of the five library files. Lab is never read.
 
 - **The read mode MUST only read.** It creates, sets, moves and deletes nothing, and it saves what it read as one raw file. The plugin asks for no network in either mode.
-- **The update mode MUST act on the open file alone, and MUST apply only what a change file names, only after the person has seen the dry run and pressed apply.** It MUST save a named version before its first operation, and it MUST NEVER publish.
+- **The update mode MUST act on the open file alone, and MUST apply only what a plan names, only after the person has seen the dry run and pressed apply.** It MUST save a named version before its first operation, and it MUST NEVER publish.
 - **A run MUST ask for one save.** A cancelled save leaves the window open with a button that saves the same result and makes no new read.
 - **A change MUST be published before it is read.** A raw file holds what its file held when it was read.
 - **The raw file holds the facts as Figma names them**, with no rule of ours applied. Its keys are `rawVersion`, `file`, `collections`, `styles`, `pages` and `counts`. `rawVersion` is `2`: a version holds its own frame, a layer holds its sizing, and a text layer holds its case and its decoration, and a file of version 1 is still read and lacks those three facts. **`counts` MUST be written last**: eight numbers that prove the file whole. The command that writes the library's snapshot refuses a file with no `counts`, with counts that differ from what it holds, or of an unknown `rawVersion`, and names the file.
@@ -115,10 +115,11 @@ A plugin of SaaS Plane's own, run by hand in the Figma desktop app, works on the
 
 ## Bringing the library to a stack
 
-A change of the surface is stated in the construct first, drawn in the library second and built in the web or a native stack third. An improvement is taken in the same order. A person settles what a gap cannot give once, in the decisions file. The command `spnutils apps surface changes <package>` reads the gaps, the two snapshots, the raw files and the decisions file, and writes one change file for each library file, with `counts` last, and a view of them by library file for a person to review.
+A change of the surface is stated in the construct first, drawn in the library second and built in the web or a native stack third. An improvement is taken in the same order. A person settles what a gap cannot give once, in the decisions file. The command `spnutils apps surface library-plan <package>` reads the gaps, the two snapshots, the raw files and the decisions file, and writes one plan for each library file into `plugin-input/<package>/`, with `counts` last, and a view of the plans by library file, `compare/<package>/library-plan.md`, for a person to review. The library is the side that changes, and a plan shows what would change there before anything is applied.
 
-- **A change file holds operations of fourteen kinds, one entry each.** Each kind is done by the plugin alone, or prepared by the plugin and drawn by a person. Its keys are `changesVersion`, `file`, `madeAgainst`, `decidedIn`, `pluginVersionNeeded`, `operations` and `counts`.
-- **The dry run changes nothing, and apply MUST be available only when no operation is refused.** The plugin refuses a change file made for another library file or against an older state of the library, and an entry whose expected value is not what the file holds.
+- **A plan holds operations of fourteen kinds, one entry each.** Each kind is done by the plugin alone, or prepared by the plugin and drawn by a person. Its keys are `planVersion`, `file`, `madeAgainst`, `decidedIn`, `pluginVersionNeeded`, `operations` and `counts`.
+- **The tool's folder, `~/.spnutils/surface/`, is ordered around the plugin, and the tool writes only under `plugin/`, `plugin-input/` and `compare/`.** The plugin saves into `plugin-output/raw/` and `plugin-output/results/<package>/`, a person writes `decisions/<package>.decisions.json`, and the tool never writes in those two. `spnutils apps surface plugin` makes the whole tree, and run again it leaves every other folder and file as it was.
+- **The dry run changes nothing, and apply MUST be available only when no operation is refused.** The plugin refuses a plan made for another library file or against an older state of the library, and an entry whose expected value is not what the file holds.
 - **The result file says one outcome for each entry:** `DONE`, `PREPARED`, `SKIPPED` or `REFUSED`, with `counts` last. The command `status` reads the result files.
 - **A rule of the comparison removes a gap only when a named fact proves it, and `rulesApplied` MUST count it.** The comparison leaves out what is not a unit, and it reads the props the stack declares. A second reader of the web's snapshot reads from the running showcase the values that only a browser works out.
 
@@ -141,7 +142,7 @@ This ref states what the library draws, how its files are layered, and what stay
 | `RD.SUPPORT.APPS.141` | the design library draws the look of each named block, and behavior stays in words |
 | `RD.SUPPORT.SURFACE.025` | a change of the surface is stated in the construct first, drawn in the library second and built in the web or a native stack third |
 | `RD.SUPPORT.SURFACE.026` | the library draws every case the showcase shows, and states a block with a behaviour and little or no look by its behaviour and its feedback |
-| `RD.SUPPORT.SURFACE.027` | the plugin has a read mode and an update mode, and the update mode writes only what a change file names, only in the open file, only after a dry run and an apply, and never publishes |
+| `RD.SUPPORT.SURFACE.027` | the plugin has a read mode and an update mode, and the update mode writes only what a plan names, only in the open file, only after a dry run and an apply, and never publishes |
 
 ## Proof
 
