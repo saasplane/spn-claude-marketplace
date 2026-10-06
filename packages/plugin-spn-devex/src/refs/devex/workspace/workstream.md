@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "363cc220"
+      "seen": "b6a9ba62"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -284,20 +284,24 @@ and its cards read the workstreams bound to this window, and no others. A workst
 is still writing is unfinished rather than wrong, and that window hears about it. A window that works
 on no workstream is held for none.
 
-**A window's workstreams are bound by the path it wrote, never by what it wrote — MUST**
+**A window's workstreams are bound by where it wrote and by what the developer named, never by what it wrote — MUST**
 (`RD.DEVEX.WORKSPACE.236`). The plugin keeps a note of its own for each session in
 `.spndevex/.debug/windows/`, named by Claude Code's session id and removed after fourteen days. It
 lists the workstream folders the window has worked on, the time it last wrote each arc, and the last
 finding of each note it was told. No person reads it, and it never says which state a workstream is
 in: the folder tree says that.
 
-| What the window did | Binds? |
+| What the window did | Tie |
 | --- | --- |
-| Wrote, edited or moved a file whose path is inside `.spndevex/workstreams/{open,backlog,closed}/{NNN}-{subject}/`, in its own turn or in a child's call | **yes**, that workstream |
-| Sent a first prompt that names exactly one workstream folder, or a handover whose `continue:` line names one | **yes**, even before it writes |
-| Read a file in a workstream, or ran a command that only reads | no |
-| Wrote text that names another workstream's folder or page, in a log line, a card or a brief | no: only the path of a write counts |
-| Sent a prompt that names two workstream folders and holds no handover | neither |
+| Sent a first prompt that names exactly one workstream folder, or a handover whose `continue:` line names workstreams | **owns** each one named; a handover that names two gives two |
+| Wrote a file inside a workstream folder, in its own turn or in a child's call, owning none yet and nothing having named one | **owns** it: the first one it writes inside |
+| Wrote a file inside a workstream folder when it already owns another | **visits** it; a visit never becomes ownership by itself |
+| Read a file, wrote text that only names another workstream, or sent a prompt naming two workstreams with no handover | nothing |
+
+For a workstream the window owns, the hooks apply everything. For one it only visits, they apply the
+standard for the one file written and the notes rule for an arc the window itself changed there, and
+never that workstream's cards, **Needs you**, the handover check, or rows the window did not change.
+Every message names the workstream and says whether the window owns it or visits it.
 
 A workstream that leaves `open/` drops out of the window's set. Two windows on one workstream each
 hear it, and two windows on two workstreams each hear only their own. A call a child makes counts
