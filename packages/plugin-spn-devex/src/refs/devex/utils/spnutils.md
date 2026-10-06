@@ -142,7 +142,10 @@ makes the folders a person saves into and picks from, and `library` reads the ra
 `plugin-output/raw/`. `library-plan <package>` reads the gaps, the two snapshots, the raw files and
 the decisions file, and writes one plan for each library file into `plugin-input/<package>/`, each with
 `counts` last, and a view of the plans by library file in `compare/<package>/library-plan.md` for a
-person to review. The tool writes only under `plugin/`, `plugin-input/` and `compare/`, and never
+person to review. A plan writes the removal of a variable or a style by its usage in the raw file, and
+holds the work a person does as entries, so the view shows the layers a person must rebind. A
+decision of the decisions file matches a gap exactly, and the command refuses by name a decision that
+matches no gap. The tool writes only under `plugin/`, `plugin-input/` and `compare/`, and never
 touches a repository or Figma. `status` also reads the result files that the plugin's update mode
 saved in `plugin-output/results/<package>/`. Every file is under `~/.spnutils/surface/`, and none
 enters a repository.

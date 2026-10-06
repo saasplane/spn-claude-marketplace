@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/11-delivery-library.md",
-      "seen": "980b843d"
+      "seen": "3f27eb93"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "df9aa540"
+      "seen": "9794f5e8"
     }
   ]
 }
@@ -108,7 +108,7 @@ A plugin of SaaS Plane's own, run by hand in the Figma desktop app, works on the
 - **The update mode MUST act on the open file alone, and MUST apply only what a plan names, only after the person has seen the dry run and pressed apply.** It MUST save a named version before its first operation, and it MUST NEVER publish.
 - **A run MUST ask for one save.** A cancelled save leaves the window open with a button that saves the same result and makes no new read.
 - **A change MUST be published before it is read.** A raw file holds what its file held when it was read.
-- **The raw file holds the facts as Figma names them**, with no rule of ours applied. Its keys are `rawVersion`, `file`, `collections`, `styles`, `pages` and `counts`. `rawVersion` is `2`: a version holds its own frame, a layer holds its sizing, and a text layer holds its case and its decoration, and a file of version 1 is still read and lacks those three facts. **`counts` MUST be written last**: eight numbers that prove the file whole. The command that writes the library's snapshot refuses a file with no `counts`, with counts that differ from what it holds, or of an unknown `rawVersion`, and names the file.
+- **The raw file holds the facts as Figma names them**, with no rule of ours applied. Its keys are `rawVersion`, `file`, `collections`, `styles`, `pages`, `usage` and `counts`. `rawVersion` is `3`: a version holds its own frame, a layer holds its sizing, a text layer holds its case and its decoration, and `usage` holds, for every variable and style bound by at least one layer of the whole file, the whole count of layers and the first 20 paths with the field bound. A file of version 1 or 2 is still read. Version 1 lacks the frame, the sizing and the text facts, and versions 1 and 2 lack `usage`, so the command that reads the raw files says in one line for each such file that usage outside components is not known. Layers of other library files that bind a variable of this file are not read. **`counts` MUST be written last**: eight numbers that prove the file whole. The command that writes the library's snapshot refuses a file with no `counts`, with counts that differ from what it holds, or of an unknown `rawVersion`, and names the file.
 - **Every library file MUST have a raw file before the library's snapshot is written.** A unit in one file is bound to a variable of another, so no file can be read alone.
 - **The naming map is the one place a design tool's name appears.** It is one file kept inside the stack's tool. It maps by rule first and by exception second, and a name it does not know is a `NAME_UNMAPPED` gap, never a guess. It holds, for example, a boolean drawn as a variant with two values (a flag prop), a `BOOLEAN` switch that shows a part (the presence of a content prop), a `state` variant (a shown state, never a prop), a page name (a group name, with the layer from the file) and a one-value token such as `radius/base` (`theme.radius`).
 - **A model MUST NOT read the library, a raw file or a snapshot to find a gap.** It reads the gaps.
@@ -117,10 +117,12 @@ A plugin of SaaS Plane's own, run by hand in the Figma desktop app, works on the
 
 A change of the surface is stated in the construct first, drawn in the library second and built in the web or a native stack third. An improvement is taken in the same order. A person settles what a gap cannot give once, in the decisions file. The command `spnutils apps surface library-plan <package>` reads the gaps, the two snapshots, the raw files and the decisions file, and writes one plan for each library file into `plugin-input/<package>/`, with `counts` last, and a view of the plans by library file, `compare/<package>/library-plan.md`, for a person to review. The library is the side that changes, and a plan shows what would change there before anything is applied.
 
-- **A plan holds operations of fourteen kinds, one entry each.** Each kind is done by the plugin alone, or prepared by the plugin and drawn by a person. Its keys are `planVersion`, `file`, `madeAgainst`, `decidedIn`, `pluginVersionNeeded`, `operations` and `counts`.
+- **A plan holds operations of eighteen kinds, one entry each.** Each kind is done by the plugin alone, or prepared by the plugin and drawn by a person, or is the work of a person from the start: `LAYERS_REBIND`, `LAYER_REMOVE`, `DRAWING_REPLACE` and `CASES_DRAW`. The plugin checks these four where it can, and a person confirms a drawing. Its keys are `planVersion`, `file`, `madeAgainst`, `decidedIn`, `pluginVersionNeeded`, `operations` and `counts`.
 - **The tool's folder, `~/.spnutils/surface/`, is ordered around the plugin, and the tool writes only under `plugin/`, `plugin-input/` and `compare/`.** The plugin saves into `plugin-output/raw/` and `plugin-output/results/<package>/`, a person writes `decisions/<package>.decisions.json`, and the tool never writes in those two. `spnutils apps surface plugin` makes the whole tree, and run again it leaves every other folder and file as it was.
-- **The dry run changes nothing, and apply MUST be available only when no operation is refused.** The plugin refuses a plan made for another library file or against an older state of the library, and an entry whose expected value is not what the file holds.
-- **The result file says one outcome for each entry:** `DONE`, `PREPARED`, `SKIPPED` or `REFUSED`, with `counts` last. The command `status` reads the result files.
+- **A removal of a variable or a style is written by its usage in the raw file.** Bound by no layer: the plugin alone removes it. Bound by layers: a `LAYERS_REBIND` entry for a person comes first, naming each page and path up to 20 and the whole count, and the removal follows. Usage not known, from a raw file of version 1 or 2: the removal is written as checked when applied, and the view says so.
+- **A decision matches a gap exactly.** A gap's key is its path, and for `VALUE_ABSENT` the path, `=` and the value. A decision's subject is one key or a list of keys, each compared as written and never as a prefix. The command refuses, by name, a decision that changes the library and matches no gap, and a gap that two decisions match.
+- **The dry run changes nothing, and apply is available only when no operation is refused, unless the person ticks the box that applies the ready entries and leaves the refused ones.** The plugin refuses a plan made for another library file or against an older state of the library, an entry whose expected value is not what the file holds, and the removal of a variable or a style that layers bind, naming up to 20 of those layers by page and path. An entry that a person completes never holds apply back.
+- **The result file says one outcome for each entry:** `DONE`, `PREPARED`, `SKIPPED`, `REFUSED`, `CHECKED`, `OPEN` or `CONFIRMED`, with `run.leftRefused` and `counts` last. The command `status` reads the result files.
 - **A rule of the comparison removes a gap only when a named fact proves it, and `rulesApplied` MUST count it.** The comparison leaves out what is not a unit, and it reads the props the stack declares. A second reader of the web's snapshot reads from the running showcase the values that only a browser works out.
 
 ## Drawing a block
