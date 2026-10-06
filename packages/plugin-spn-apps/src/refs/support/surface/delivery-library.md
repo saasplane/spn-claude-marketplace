@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/11-delivery-library.md",
-      "seen": "3f27eb93"
+      "seen": "38fc95b3"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "9794f5e8"
+      "seen": "144553cd"
     }
   ]
 }
@@ -106,6 +106,8 @@ A plugin of SaaS Plane's own, run by hand in the Figma desktop app, works on the
 
 - **The read mode MUST only read.** It creates, sets, moves and deletes nothing, and it saves what it read as one raw file. The plugin asks for no network in either mode.
 - **The update mode MUST act on the open file alone, and MUST apply only what a plan names, only after the person has seen the dry run and pressed apply.** It MUST save a named version before its first operation, and it MUST NEVER publish.
+- **An operation that fails MUST leave the file as it found it.** The plugin gives back each name it changed, removes each copy, frame, page and set it made, and binds again what it rebound, and the result file says that the operation was undone or names what it could not undo. A property is added to a set as a whole: every version is named first and the set is read once afterwards, because Figma refuses to describe a set whose versions differ.
+- **A variable of another library file is found by name among the library variables the open file can use.** The manifest asks for the `teamlibrary` permission, the plugin imports the variable only when an entry binds a layer to it and only on apply, and when it cannot find the variable it refuses the entry and says that the other file's library must be published and enabled in this file.
 - **A run MUST ask for one save.** A cancelled save leaves the window open with a button that saves the same result and makes no new read.
 - **A change MUST be published before it is read.** A raw file holds what its file held when it was read.
 - **The raw file holds the facts as Figma names them**, with no rule of ours applied. Its keys are `rawVersion`, `file`, `collections`, `styles`, `pages`, `usage` and `counts`. `rawVersion` is `3`: a version holds its own frame, a layer holds its sizing, a text layer holds its case and its decoration, and `usage` holds, for every variable and style bound by at least one layer of the whole file, the whole count of layers and the first 20 paths with the field bound. A file of version 1 or 2 is still read. Version 1 lacks the frame, the sizing and the text facts, and versions 1 and 2 lack `usage`, so the command that reads the raw files says in one line for each such file that usage outside components is not known. Layers of other library files that bind a variable of this file are not read. **`counts` MUST be written last**: eight numbers that prove the file whole. The command that writes the library's snapshot refuses a file with no `counts`, with counts that differ from what it holds, or of an unknown `rawVersion`, and names the file.
