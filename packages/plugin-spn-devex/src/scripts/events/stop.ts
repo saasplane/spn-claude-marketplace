@@ -16,8 +16,8 @@
 //   carried    a proposed arc never carries a review point to a later step of itself
 //   hold       an arc whose status reads HELD must name a card that exists and is unanswered
 //   handover   a reply that says a new window is needed carries the nine labelled lines, in one column
-//   page-stale an arc this session wrote left its workstream's page behind the arcs
-//   own-copy   a page of this session's workstreams links no shared stylesheet; said once in a session
+//   page-stale an arc this window wrote left its workstream's page behind the arcs
+//   own-copy   a page of this window's workstreams links no shared stylesheet; said once in a session
 //   arc-landed an arc this session wrote reached LANDED with a row nobody accounted for
 //   welcome    a session's first turn opens with the welcome, word for word: the heading and its four lines
 //   corpus     the docs trees still answer the questions only a whole-corpus read can ask
@@ -25,8 +25,9 @@
 // A CHECK SPEAKS ONCE IN A TURN, AND ONLY ABOUT THIS SESSION'S OWN WORK (RD.DEVEX.WORKSPACE.198). The
 // reply that follows a finding is the answer to it, so a check that spoke at this session's last Stop
 // is not run against that answer. The checks that read a page, its arcs and its cards read the
-// workstreams this session has written to (RD.DEVEX.WORKSPACE.197); a workstream another session is
-// still writing is unfinished, and that session hears about it.
+// workstreams bound to this window by the path of its writes, its first prompt or a handover
+// (RD.DEVEX.WORKSPACE.197 and .236, `lib/window.ts`); a workstream another window is still writing is
+// unfinished, and that window hears about it. A window bound to none hears nothing about them.
 //
 // `corpus` is the newest and the odd one out: every other check here reads what the TURN wrote, and
 // that one reads the workspace. It is here because nothing else ran it — `N38` found that every
@@ -40,7 +41,7 @@
 // you should continue when there is no blocker.* Reporting is not stopping. A milestone line belongs
 // between steps, in the same turn as the next step.
 
-import { closeSync, openSync, readFileSync, readSync, readdirSync, rmSync, statSync, mkdirSync, writeFileSync } from "node:fs";
+import { readFileSync, readdirSync, rmSync, statSync, mkdirSync, writeFileSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
 import { createHash } from "node:crypto";
 import { checkCorpus } from "../checks/corpus.ts";
@@ -54,6 +55,7 @@ import { DEVEX, isApproachPage, workstreamsDir } from "../../../../plugin-suppor
 import { cacheState, welcome } from "./orientation.ts";
 import { begin, span, end, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { recordUsage } from "../lib/usage.ts";
+import { arcsWrittenSince, fromWorkspace, named, reposWritten, visitedWorkstreams, windowSet } from "../lib/window.ts";
 
 type Warning = { check: string; message: string };
 
@@ -399,8 +401,8 @@ export function stepHash(text: string): string {
  * **IT CANNOT USE `git`.** The workstream folder lives at the workspace root, which is not a
  * repository, so `git show HEAD:./arc.md` fails there for every arc.
  */
-export type Baseline = { at: number; steps: Record<string, string>; transcriptAt?: number; fired?: string[];
-                         cards?: string[]; arcs?: Record<string, ArcMark>; workstreams?: string[];
+export type Baseline = { at: number; steps: Record<string, string>; fired?: string[];
+                         cards?: string[]; arcs?: Record<string, ArcMark>;
                          /** The pages this session was already told hold their own copy of the styles. */
                          ownCopy?: string[] };
 
@@ -440,83 +442,9 @@ export function writeBaseline(root: string, session: string, baseline: Baseline)
   } catch { /* the check must never fail because it could not write its own note */ }
 }
 
-// The tools whose input can change a file. `Bash` counts only where its command writes, so a
-// session that merely READ an arc while another window changed it is not taken for the writer.
-const FILE_WRITERS = new Set(["Edit", "Write", "MultiEdit", "NotebookEdit"]);
-const SHELL_WRITES = /(?:>|\btee\b|\bsed\s+-i|\bperl\s+-[a-z]*i|\bpython3?\b|\bnode\b|\bmv\b|\bcp\b)/;
-
-/**
- * The arcs this session's own tool calls wrote since `from` (a byte offset into its transcript), and
- * the transcript's size now. `null` where the transcript cannot be read, so the caller falls back to
- * the file times.
- *
- * THE TRANSCRIPT IS THE ONLY RECORD OF WHO WROTE A FILE. A file's time says it moved and never who
- * moved it, and several windows write the same workstream at once.
- */
-export function arcsTouched(transcript: string, from: number, arcs: string[]): { touched: Set<string>; size: number } | null {
-  const writes = writesOf(transcript, from);
-  if (!writes) return null;
-  const touched = new Set(arcs.filter((arc) => writes.written.some((input) => input.includes(arc) || input.includes(basename(arc)))));
-  return { touched, size: writes.size };
-}
-
-// A dispatched agent writes on this session's behalf, and its brief names where.
-const DISPATCHERS = new Set(["Agent", "Task"]);
-
-/**
- * The input of every tool call in a transcript, from byte `from`, that can change a file: a file
- * writer, a shell command that writes, and a brief given to a dispatched agent. `null` where the
- * transcript cannot be read.
- */
-export function writesOf(transcript: string, from: number): { written: string[]; size: number } | null {
-  let text = "";
-  let size = 0;
-  try {
-    size = statSync(transcript).size;
-    const start = from > 0 && from <= size ? from : 0;
-    const buffer = Buffer.alloc(size - start);
-    const fd = openSync(transcript, "r");
-    try { readSync(fd, buffer, 0, buffer.length, start); } finally { closeSync(fd); }
-    text = buffer.toString("utf8");
-  } catch { return null; }
-  const written: string[] = [];
-  for (const line of text.split("\n")) {
-    if (!line.includes('"tool_use"')) continue;
-    let entry: { message?: { content?: unknown } };
-    try { entry = JSON.parse(line); } catch { continue; }
-    const content = entry.message?.content;
-    if (!Array.isArray(content)) continue;
-    for (const item of content as Array<{ type?: string; name?: string; input?: unknown }>) {
-      if (item?.type !== "tool_use" || !item.name) continue;
-      const input = JSON.stringify(item.input ?? {});
-      if (FILE_WRITERS.has(item.name) || DISPATCHERS.has(item.name)) written.push(input);
-      else if (item.name === "Bash" && SHELL_WRITES.test(input)) written.push(input);
-    }
-  }
-  return { written, size };
-}
-
-/**
- * The open workstreams a session has written to, by folder name: the ones its last Stop already
- * knew, and the ones its tool calls have named since. `null` where the transcript cannot be read,
- * and the caller then reads every open workstream, as it did before a session's writes were known.
- *
- * A WORKSTREAM A SESSION OPENS WHILE IDEATING IS ITS OWN FROM THE FIRST WRITE. Creating the folder is
- * a write that names it, so the session that shaped the idea is the one asked about its cards.
- */
-export function workstreamsOf(transcript: string | undefined, from: number, known: string[] = [],
-  folders: string[] = []): Set<string> | null {
-  if (!transcript) return null;
-  const writes = writesOf(transcript, from);
-  if (!writes) return null;
-  const names = folders.map((folder) => basename(folder));
-  const now = names.filter((name) => writes.written.some((input) => input.includes(name)));
-  return new Set([...known, ...now].filter((name) => names.includes(name)));
-}
-
-/** The folders a check reads: every open workstream, or only the session's own where those are known. */
-function scoped(folders: string[], mine: Set<string> | null): string[] {
-  return mine ? folders.filter((folder) => mine.has(basename(folder))) : folders;
+/** The folders a check reads: the ones this window works on, and no others (RD.DEVEX.WORKSPACE.236). */
+function scoped(folders: string[], mine: Set<string>): string[] {
+  return folders.filter((folder) => mine.has(basename(folder)));
 }
 
 // ---------------------------------------------------------------------------- notes and carried
@@ -575,7 +503,7 @@ function notesSignature(files: string[]): string {
 /** Every open arc's mark at this Stop. */
 export function arcMarks(root: string): Record<string, ArcMark> {
   const out: Record<string, ArcMark> = {};
-  for (const arc of openArcs(root)) {
+  for (const arc of snapshotArcs(root)) {
     const text = read(arc);
     out[arc] = { log: logEntries(text).map(entryHash), notes: notesSignature(notesFiles(arc)), status: statusOf(arc) };
   }
@@ -599,16 +527,20 @@ const CARRIED_FORWARD = /\bcarried\b[^.;]{0,40}\bto\s+(?:step|row)\s+\d/i;
  * is built on its spec yet, so the point changes the spec now.
  *
  * @param before   each arc's mark at this session's last Stop; nothing is judged without one
- * @param touched  the arcs this session wrote, from its transcript; `null` reads every arc
+ * @param touched  the arcs this window wrote since then, from the window's note (`lib/window.ts`)
+ * @param mine     the workstreams this window owns; an arc of any other is nobody's business here
+ * @param visits   the workstreams it only visits: the notes rule still holds for an arc the window itself
+ *                 changed there (`touched`), and nothing else about them is read
  */
 export function checkNotesLanded(root: string, before: Record<string, ArcMark> | undefined,
-                                 touched: Set<string> | null = null): Warning[] {
+                                 touched: Set<string>, mine: Set<string>, visits: Set<string> = new Set()): Warning[] {
   if (!before) return [];
   const out: Warning[] = [];
-  for (const arc of openArcs(root)) {
+  const tie = (arc: string) => (mine.has(workstreamOf(arc)) ? "owns" : "visits") as "owns" | "visits";
+  for (const arc of openArcs(root, new Set([...mine, ...visits]))) {
     const was = before[arc];
     if (!was) continue;
-    if (touched && !touched.has(arc)) continue;
+    if (!touched.has(arc)) continue;
     const text = read(arc);
     const seen = new Set(was.log);
     const added = logEntries(text).filter((line) => !seen.has(entryHash(line)));
@@ -623,42 +555,54 @@ export function checkNotesLanded(root: string, before: Record<string, ArcMark> |
         const inside = files.find((file) => folderOf(file) === reviewed);
         if (inside) shown.push(fromNotes(inside).slice(0, fromNotes(inside).indexOf(`/${reviewed}/`)) + `/${reviewed}/`);
       }
-      out.push({ check: "notes", message:
-        `\`${basename(arc)}\` logged an answer this turn and its notes did not move — ${shown.join(" · ")}. ` +
+      out.push({ check: "notes", message: named(workstreamOf(arc),
+        `\`${fromWorkspace(root, arc)}\` logged an answer this turn and its notes did not move — ${shown.join(" · ")}. ` +
         `An answer, or any review point, lands in the same turn in the card, in the arc (a log line and every ` +
         `row it changes) and in the arc's notes: the spec, the plan and any preview or sample they name — MUST ` +
         `(RD.DEVEX.WORKSPACE.193). Bring the notes the answer changes up to date now, and name them in the ` +
-        `log line.` });
+        `log line.`, tie(arc)) });
     }
     const status = statusOf(arc);
     if ((was.status === "PROPOSED" || status === "PROPOSED") && added.some((line) => CARRIED_FORWARD.test(line)))
-      out.push({ check: "carried", message:
-        `\`${basename(arc)}\` is PROPOSED and its log carries a review point to a later step of itself. A proposed ` +
+      out.push({ check: "carried", message: named(workstreamOf(arc),
+        `\`${fromWorkspace(root, arc)}\` is PROPOSED and its log carries a review point to a later step of itself. A proposed ` +
         `arc never does: nothing is built on its spec yet, so the point changes the spec now (RD.DEVEX.WORKSPACE.193). ` +
-        `Write it into the spec and the plan this turn.` });
+        `Write it into the spec and the plan this turn.`, tie(arc)) });
   }
   return out;
 }
 
-/** Every arc file of every open workstream. */
-function openArcs(root: string): string[] {
+/** Every arc file of the open workstreams this window works on. */
+function openArcs(root: string, mine: Set<string>): string[] {
+  return scoped(openWorkstreamFolders(root), mine).flatMap(arcsOf);
+}
+
+/**
+ * Every arc of every open workstream, for the baseline a Stop writes. A snapshot is state and never
+ * speech: it is read only for the arcs of this window's workstreams, so a workstream the window binds
+ * later already has its marks. It is the one read of every open arc in this file.
+ */
+function snapshotArcs(root: string): string[] {
   return openWorkstreamFolders(root).flatMap(arcsOf);
 }
+
+/** The workstream an arc file sits in, by its folder name. */
+const workstreamOf = (arc: string): string => basename(dirname(dirname(arc)));
 
 /**
  * Arcs this session worked on that still have runnable steps, with no card open to block them.
  *
  * @param since    when THIS SESSION last stopped; 0 is its first Stop, and the check stays quiet
  * @param stepsAt  each arc's step-row hash at that Stop
- * @param touched  the arcs this session's own tool calls wrote since then, read from its transcript;
- *                 `null` where no transcript could be read, and then a file time newer than `since`
- *                 stands in for it
+ * @param touched  the arcs this window's own tool calls wrote since then, from the window's note;
+ *                 `null` where that is not known, and then a file time newer than `since` stands in
+ * @param mine     the workstreams this window works on; the others are read by nobody here
  */
-export function checkRunnable(root: string, since = 0, stepsAt: Record<string, string> = {},
-                              touched: Set<string> | null = null): Warning[] {
+export function checkRunnable(root: string, since: number, stepsAt: Record<string, string>,
+                              touched: Set<string> | null, mine: Set<string>): Warning[] {
   const out: Warning[] = [];
 
-  for (const ws of openWorkstreamFolders(root)) {
+  for (const ws of scoped(openWorkstreamFolders(root), mine)) {
     const cards = pagesOf(ws).flatMap(openCards);
     for (const arc of arcsOf(ws)) {
       // WHICH ARC IS BEING EXECUTED IS A FACT, NOT A CLAIM, AND IT IS THIS SESSION'S FACT. A status
@@ -690,39 +634,39 @@ export function checkRunnable(root: string, since = 0, stepsAt: Record<string, s
       if (claimed.length && !cards.length)
         out.push({
           check: "runnable",
-          message: `\`${basename(arc)}\` has ${claimed.length === 1 ? "a row" : `${claimed.length} rows`} marked in progress: ` +
+          message: named(basename(ws), `\`${fromWorkspace(root, arc)}\` has ${claimed.length === 1 ? "a row" : `${claimed.length} rows`} marked in progress: ` +
             `${claimed.join(" · ")}. If this sitting is on it, finish it and mark it landed with its commit, or mark ` +
             `it \`◐ stopped\` with what was done. If another window marked it, leave it and ask the developer, ` +
-            `saying how old the mark is (02-workstream/01-workstream.md § A step row says where, at what altitude, and how).`,
+            `saying how old the mark is (02-workstream/01-workstream.md § A step row says where, at what altitude, and how).`),
         });
       if (steps === null) {
-        out.push({ check: "runnable", message: `\`${basename(arc)}\` reads ${status || "no status"} and has no \`## Steps\` table, so nothing can say whether work is left. Give it the step table the arc template carries.` });
+        out.push({ check: "runnable", message: named(basename(ws), `\`${fromWorkspace(root, arc)}\` reads ${status || "no status"} and has no \`## Steps\` table, so nothing can say whether work is left. Give it the step table the arc template carries.`) });
         continue;
       }
       if (!steps.length) continue;
       if (cards.length) continue;   // a card blocks: the hold reply covers that case
       out.push({
         check: "runnable",
-        message: `stopped with runnable work — this session changed the step rows of \`${basename(arc)}\`, and ${steps.length} step` +
+        message: named(basename(ws), `stopped with runnable work — this session changed the step rows of \`${fromWorkspace(root, arc)}\`, and ${steps.length} step` +
           `${steps.length > 1 ? "s are" : " is"} not landed, and no card is open. The next one is ${steps[0]}. ` +
           `Reporting is not stopping: a milestone line goes between steps, in the same turn as the next step ` +
-          `(02-workstream/01-workstream.md § Say what you opened, and know when to wait for the answer).`,
+          `(02-workstream/01-workstream.md § Say what you opened, and know when to wait for the answer).`),
       });
     }
   }
   return out;
 }
 
-export function checkHold(root: string, mine: Set<string> | null = null): Warning[] {
+export function checkHold(root: string, mine: Set<string>): Warning[] {
   const out: Warning[] = [];
   for (const ws of scoped(openWorkstreamFolders(root), mine)) {
     const cards = new Set(pagesOf(ws).flatMap(openCards));
     for (const arc of arcsOf(ws)) {
       if (statusOf(arc) !== "HELD") continue;
-      const named = [...read(arc).matchAll(/`?(Q\d+)`?/g)].map((m) => m[1].toUpperCase());
-      const live = named.filter((n) => cards.has(n));
+      const asked = [...read(arc).matchAll(/`?(Q\d+)`?/g)].map((m) => m[1].toUpperCase());
+      const live = asked.filter((n) => cards.has(n));
       if (!live.length)
-        out.push({ check: "hold", message: `\`${arc.split("/").pop()}\` reads HELD and names no card that is open and unanswered. A HELD arc waits on a card; if its cards are answered, re-plan it and lift the hold.` });
+        out.push({ check: "hold", message: named(basename(ws), `\`${fromWorkspace(root, arc)}\` reads HELD and names no card that is open and unanswered. A HELD arc waits on a card; if its cards are answered, re-plan it and lift the hold.`) });
     }
   }
   return out;
@@ -848,19 +792,42 @@ export function carriesCard(reply: string): boolean {
  * question a handover has to answer, and it subtracts what an arc records as settled — a card the
  * page still shows but an arc has answered is not work anybody is waiting on.
  */
-function cardsWaiting(root: string, mine: Set<string> | null = null): string[] {
-  const out: string[] = [];
-  for (const [, pages] of argued(root, mine)) {
-    const folder = dirname(pages[0]);
-    const answered = answeredNumbers(folder);
-    for (const page of pages)
-      for (const card of cardsOf(page))
-        if (!card.decided && !answered.has(card.number)) out.push(card.number);
-  }
-  return [...new Set(out)].sort();
+function cardsWaiting(root: string, mine: Set<string>): string[] {
+  return [...new Set([...cardsByWorkstream(root, mine).values()].flat())].sort();
 }
 
-export function checkHandover(reply: string, root: string, mine: Set<string> | null = null): Warning[] {
+/** The open cards of each workstream this window works on, by the workstream's folder name. */
+export function cardsByWorkstream(root: string, mine: Set<string>): Map<string, string[]> {
+  const out = new Map<string, string[]>();
+  for (const [subject, pages] of argued(root, mine)) {
+    const folder = dirname(pages[0]);
+    const answered = answeredNumbers(folder);
+    const cards: string[] = [];
+    for (const page of pages)
+      for (const card of cardsOf(page))
+        if (!card.decided && !answered.has(card.number)) cards.push(card.number);
+    if (cards.length) out.set(subject, [...new Set(cards)].sort());
+  }
+  return out;
+}
+
+/**
+ * Cards as a line that says which workstream each belongs to: `021-figma-design-standard: Q10 · Q8`.
+ * A card the map does not place is listed bare, so a caller with no map still gets its numbers.
+ */
+export function cardList(cards: string[], where: Map<string, string[]> = new Map()): string {
+  const placed = new Set<string>();
+  const parts: string[] = [];
+  for (const [subject, held] of where) {
+    const here = held.filter((card) => cards.includes(card));
+    here.forEach((card) => placed.add(card));
+    if (here.length) parts.push(`\`${subject}\`: ${here.join(" · ")}`);
+  }
+  const bare = cards.filter((card) => !placed.has(card));
+  return [...parts, ...(bare.length ? [bare.join(" · ")] : [])].join("; ");
+}
+
+export function checkHandover(reply: string, root: string, mine: Set<string>): Warning[] {
   if (!passingOn(reply)) return [];
   // A REPLY PUTTING THE OPEN CARD IN FULL IS THE ANSWER THIS CHECK ASKS FOR. It fired twice in a row
   // on replies that handed nothing over and carried `Q329` whole, demanding the card they carried.
@@ -885,7 +852,7 @@ export function checkHandover(reply: string, root: string, mine: Set<string> | n
   if (waiting.length) {
     return [{ check: "handover", message:
       `This reply passes work on while ${waiting.length === 1 ? "a card is" : `${waiting.length} cards are`} ` +
-      `open — ${waiting.join(" \u00b7 ")}. **Answer first, then hand over.** A card's answer can change which ` +
+      `open — ${cardList(waiting, cardsByWorkstream(root, mine))}. **Answer first, then hand over.** A card's answer can change which ` +
       `arc runs next and what the next window reads first, so a handover written over one is a brief that ` +
       `assumed an answer nobody gave. Put the cards to the developer in full, and offer the window once they ` +
       `are settled.` }];
@@ -974,9 +941,9 @@ function cardPatternReadable(pages: string[]): boolean {
 }
 
 /** The open workstreams that have a page, as subject → its pages. */
-function argued(root: string, mine: Set<string> | null = null): Array<[string, string[]]> {
+function argued(root: string, mine: Set<string>): Array<[string, string[]]> {
   return [...openWorkstreams(root)].filter(([, pages]) => pages.length)
-    .filter(([, pages]) => !mine || mine.has(basename(dirname(pages[0]))))
+    .filter(([, pages]) => mine.has(basename(dirname(pages[0]))))
     .sort((a, b) => a[0].localeCompare(b[0]));
 }
 
@@ -991,7 +958,7 @@ function argued(root: string, mine: Set<string> | null = null): Array<[string, s
  * arc under a heading. A citation is explicit, greppable, and useful to a reader who wants the
  * argument behind a plan.
  */
-export function unnamedArcs(root: string, mine: Set<string> | null = null): Array<[string, string, string]> {
+export function unnamedArcs(root: string, mine: Set<string>): Array<[string, string, string]> {
   const out: Array<[string, string, string]> = [];
   for (const [subject, pages] of argued(root, mine)) {
     const pageText = pages.map(read).join(" ");
@@ -1011,10 +978,10 @@ export function unnamedArcs(root: string, mine: Set<string> | null = null): Arra
  * because there is no page to read — was the one shape it never reported. `008-plain-language` sat in
  * exactly that state while the check ran green beside it.
  */
-export function pagelessWorkstreams(root: string, mine: Set<string> | null = null): string[] {
+export function pagelessWorkstreams(root: string, mine: Set<string>): string[] {
   const out: string[] = [];
   for (const [subject, pages] of [...openWorkstreams(root)].sort((a, b) => a[0].localeCompare(b[0]))) {
-    if (pages.length) continue;
+    if (pages.length || !mine.has(subject)) continue;
     for (const folder of scoped(openWorkstreamFolders(root), mine))
       if (basename(folder) === subject && arcsOf(folder).length) { out.push(subject); break; }
   }
@@ -1028,7 +995,7 @@ export function pagelessWorkstreams(root: string, mine: Set<string> | null = nul
  * a reader could still find it. Here the split plan knows a row waits on somebody and the one section
  * they read says nothing does, so the question is written nowhere at all.
  */
-export function stopsWithEmptyOpen(root: string, mine: Set<string> | null = null): Array<[string, string]> {
+export function stopsWithEmptyOpen(root: string, mine: Set<string>): Array<[string, string]> {
   const out: Array<[string, string]> = [];
   for (const [subject, pages] of argued(root, mine)) {
     if (!cardPatternReadable(pages)) continue;
@@ -1053,7 +1020,7 @@ export function stopsWithEmptyOpen(root: string, mine: Set<string> | null = null
  * its *Settled already* table, which is the arrangement the convention asks for. The question is
  * whether the PAGE names the number at all, not whether it still has a card open.
  */
-export function cardsInArcs(root: string, mine: Set<string> | null = null): Array<[string, string, string]> {
+export function cardsInArcs(root: string, mine: Set<string>): Array<[string, string, string]> {
   const out: Array<[string, string, string]> = [];
   for (const [subject, pages] of argued(root, mine)) {
     if (!cardPatternReadable(pages)) continue;
@@ -1215,14 +1182,15 @@ function putsInFull(text: string, card: string): boolean {
  * @param raised  the open cards this turn raised — open now and not open at the session's last Stop;
  *                empty when there is no last Stop to compare with, and then every card is an older one
  */
-export function checkReplyShape(reply: string, open: string[] = [], raised: string[] = []): Warning[] {
+export function checkReplyShape(reply: string, open: string[] = [], raised: string[] = [],
+                                where: Map<string, string[]> = new Map()): Warning[] {
   const out: Warning[] = [];
   const fresh = open.filter((card) => raised.includes(card));
   const older = open.filter((card) => !raised.includes(card));
   const oneLine = "each card still open from an earlier reply is one line — its number, its question, and where it is";
   if (open.length && !opensWithNeedsYou(reply))
     out.push({ check: "needs-you", message:
-      `A card is open — ${open.slice(0, 4).join(" · ")} — and the reply does not open with **Needs you**. ` +
+      `A card is open — ${cardList(open.slice(0, 4), where)} — and the reply does not open with **Needs you**. ` +
       `Every reply while work runs opens with what needs you, then the progress — MUST (RD.DEVEX.WORKSPACE.189). ` +
       (fresh.length ? `A card raised in this reply goes there in full once (${fresh.join(" · ")}); ` : "") +
       `${oneLine}. Do not repeat a card already put in full.` });
@@ -1231,14 +1199,14 @@ export function checkReplyShape(reply: string, open: string[] = [], raised: stri
     const notWhole = fresh.filter((card) => !putsInFull(part, card));
     if (notWhole.length)
       out.push({ check: "needs-you", message:
-        `${notWhole.join(" · ")} ${notWhole.length > 1 ? "were" : "was"} raised in this reply and ${notWhole.length > 1 ? "are" : "is"} not ` +
+        `${cardList(notWhole, where)} ${notWhole.length > 1 ? "were" : "was"} raised in this reply and ${notWhole.length > 1 ? "are" : "is"} not ` +
         `in full under **Needs you** at its top. A card is put in full once, at the top of the reply that raises it, and ` +
         `never again in its body — MUST (RD.DEVEX.WORKSPACE.189). Do not repeat it now: from your next reply it is ` +
         `one line — its number, its question, and where it is — and the full card stays on the approach page.` });
     const unnamed = older.filter((card) => !namesCard(part, card));
     if (unnamed.length)
       out.push({ check: "needs-you", message:
-        `${unnamed.slice(0, 4).join(" · ")} ${unnamed.length > 1 ? "are" : "is"} still open and the **Needs you** part does not ` +
+        `${cardList(unnamed.slice(0, 4), where)} ${unnamed.length > 1 ? "are" : "is"} still open and the **Needs you** part does not ` +
         `name ${unnamed.length > 1 ? "them" : "it"}. ${oneLine[0].toUpperCase()}${oneLine.slice(1)}, before the progress — ` +
         `MUST (RD.DEVEX.WORKSPACE.189). Never the full card again: that stays on the approach page.` });
   }
@@ -1255,7 +1223,7 @@ export function checkReplyShape(reply: string, open: string[] = [], raised: stri
 }
 
 /** The four arc-to-page checks, as warnings. */
-export function checkArcToPage(root: string, mine: Set<string> | null = null): Warning[] {
+export function checkArcToPage(root: string, mine: Set<string>): Warning[] {
   const out: Warning[] = [];
   const pageless = pagelessWorkstreams(root, mine);
   if (pageless.length)
@@ -1335,7 +1303,7 @@ export function checkPageCurrent(touched: Set<string> | null): Warning[] {
  * The pages of the open workstreams this session reads that hold their own copy of the styles, each
  * as the line that names it: its path from the workspace, then `OWN_COPY`.
  */
-export function ownCopyPages(root: string, mine: Set<string> | null = null): string[] {
+export function ownCopyPages(root: string, mine: Set<string>): string[] {
   return argued(root, mine).flatMap(([, pages]) => ownCopyLines(root, pages));
 }
 
@@ -1346,7 +1314,7 @@ export function ownCopyPages(root: string, mine: Set<string> | null = null): str
  *
  * @param told  the lines this session was given at an earlier Stop; a page is named once in a session
  */
-export function checkOwnCopy(root: string, mine: Set<string> | null = null, told: string[] = []): Warning[] {
+export function checkOwnCopy(root: string, mine: Set<string>, told: string[] = []): Warning[] {
   const fresh = ownCopyPages(root, mine).filter((line) => !told.includes(line));
   if (!fresh.length) return [];
   return [{ check: "own-copy", message:
@@ -1375,7 +1343,8 @@ export function checkArcLanded(root: string, before: Record<string, ArcMark> | u
     const miscounted = miscountLines(arcName(arc), text);
     const owed = rows.some((row) => !accounted(row) || (stateOf(row) === "carried" && carryFault(root, row) !== null));
     if (!owed && !miscounted.length) continue;
-    reports.push([...reportLines(root, basename(arc), rows), ...miscounted].join("\n"));
+    reports.push(`\`${workstreamOf(arc)}\` · \`${fromWorkspace(root, arc)}\`:\n` +
+      [...reportLines(root, basename(arc), rows), ...miscounted].join("\n"));
   }
   if (!reports.length) return [];
   return [{ check: "arc-landed", message:
@@ -1471,51 +1440,41 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   begin(facts, root);
   // WHAT THE TURNS COST, written beside the timing log while recording is on, for `plugin cost show`.
   recordUsage(root, facts, event.transcript_path);
-  // THIS SESSION'S OWN BASELINE, and what its own tool calls wrote since it. The transcript is read
-  // from where the last Stop left off, so a long session pays for its newest turn and not its whole
-  // history. A first Stop reads nothing: there is no baseline to judge the writes against.
+  // THIS SESSION'S OWN BASELINE, and the workstreams and arcs its own writes bound it to. Both come from
+  // the window's note (`lib/window.ts`), which PreToolUse and the prompt hook write from the PATH of a
+  // write, a prompt or a handover and never from text. The baseline's own old `workstreams` list is not
+  // read: it was bound by names found anywhere in a write, and a log line mentioning another workstream
+  // bound it for ever. A window with no binding gets the empty set and hears nothing about a card, a page,
+  // an arc or a row (RD.DEVEX.WORKSPACE.236).
   const baseline = readBaseline(root, session);
-  let touched: Set<string> | null = null;
-  let transcriptAt: number | undefined;
-  if (event.transcript_path) {
-    if (baseline) {
-      const found = arcsTouched(event.transcript_path, baseline.transcriptAt ?? 0, openArcs(root));
-      if (found) { touched = found.touched; transcriptAt = found.size; }
-    } else {
-      try { transcriptAt = statSync(event.transcript_path).size; } catch { transcriptAt = undefined; }
-    }
-  }
-  // THE WORKSTREAMS THIS SESSION HAS WRITTEN TO. The page, arc and card checks read these and no
-  // others, so a session is never held for a workstream another session is still writing. Where no
-  // transcript can be read the answer is unknown, and every open workstream is read.
-  const mine = workstreamsOf(event.transcript_path, baseline?.transcriptAt ?? 0, baseline?.workstreams ?? [],
-                             openWorkstreamFolders(root));
+  const mine = windowSet(root, session);
+  const touched = baseline ? arcsWrittenSince(root, session, baseline.at) : new Set<string>();
   // A CHECK THAT SPOKE AT THIS SESSION'S LAST STOP HAS HAD ITS ANSWER. `stop_hook_active` says this
   // turn continues because a Stop hook spoke, so the reply is the answer to what it said. Judging it
   // with the same check again is the loop that held sessions until the harness ended the turn.
   const spoken = new Set(event.stop_hook_active === true ? baseline?.fired ?? [] : []);
   // No baseline means this Stop ends the session's first turn: the one the welcome belongs to.
   const firstTurn = !baseline && event.transcript_path && !event.agent_id ? firstTurnText(event.transcript_path) : "";
+  const where = cardsByWorkstream(root, mine);
   const waiting = span({ group: "stop", action: "cards" }, () => cardsWaiting(root, mine));
-  // THE ARCS THIS TURN WROTE, IN THIS SESSION'S OWN WORKSTREAMS. A write is matched to an arc by its
-  // file name as well as its path, and two workstreams may each hold an arc of one name. The two
-  // checks that read a page and an arc's rows from these arcs read only the session's own workstreams.
-  const wrote = touched && mine
-    ? new Set([...touched].filter((arc) => mine.has(basename(dirname(dirname(arc))))))
-    : touched;
+  // THE ARCS THIS WINDOW WROTE THIS TURN, IN ITS OWN WORKSTREAMS.
+  const wrote = new Set([...touched].filter((arc) => mine.has(workstreamOf(arc))));
+  // A VISITED WORKSTREAM IS READ FOR ONE THING: the notes rule on an arc this window itself changed there.
+  const visits = visitedWorkstreams(root, session);
+  const wroteAnywhere = new Set([...touched].filter((arc) => mine.has(workstreamOf(arc)) || visits.has(workstreamOf(arc))));
   const found = [
     ...span({ group: "stop", action: "reply-shape" }, () => checkReplyShape(reply, waiting,
-      baseline?.cards ? waiting.filter((card) => !baseline.cards!.includes(card)) : [])),
-    ...span({ group: "stop", action: "notes" }, () => checkNotesLanded(root, baseline?.arcs, touched)),
+      baseline?.cards ? waiting.filter((card) => !baseline.cards!.includes(card)) : [], where)),
+    ...span({ group: "stop", action: "notes" }, () => checkNotesLanded(root, baseline?.arcs, wroteAnywhere, mine, visits)),
     ...span({ group: "stop", action: "arc-to-page" }, () => checkArcToPage(root, mine)),
     ...span({ group: "stop", action: "page-stale" }, () => checkPageCurrent(wrote)),
     ...span({ group: "stop", action: "own-copy" }, () => checkOwnCopy(root, mine, baseline?.ownCopy ?? [])),
     ...span({ group: "stop", action: "arc-landed" }, () => checkArcLanded(root, baseline?.arcs, wrote)),
-    ...span({ group: "stop", action: "runnable" }, () => checkRunnable(root, baseline?.at ?? 0, baseline?.steps ?? {}, touched)),
+    ...span({ group: "stop", action: "runnable" }, () => checkRunnable(root, baseline?.at ?? 0, baseline?.steps ?? {}, wrote, mine)),
     ...span({ group: "stop", action: "hold" }, () => checkHold(root, mine)),
     ...span({ group: "stop", action: "handover" }, () => checkHandover(reply, root, mine)),
     ...span({ group: "stop", action: "welcome" }, () => checkWelcome(firstTurn)),
-    ...span({ group: "stop", action: "corpus" }, () => checkCorpus(root)),
+    ...span({ group: "stop", action: "corpus" }, () => checkCorpus(root, reposWritten(root, session))),
   ];
   const warnings = found.filter((warning) => !spoken.has(warning.check));
   // A page is named once in a session, so the pages named now join the ones named before.
@@ -1525,10 +1484,9 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   // AFTER the checks, never before: they compare against this and would compare against now. `fired`
   // keeps what spoke earlier in this turn beside what spoke now, so a third reply is not judged by
   // the first reply's check either.
-  writeBaseline(root, session, { at: Date.now(), steps: currentSteps(root), transcriptAt,
+  writeBaseline(root, session, { at: Date.now(), steps: currentSteps(root),
                                  fired: [...new Set([...spoken, ...warnings.map((warning) => warning.check)])],
-                                 cards: waiting, arcs: arcMarks(root),
-                                 workstreams: mine ? [...mine] : baseline?.workstreams, ownCopy: ownCopyTold });
+                                 cards: waiting, arcs: arcMarks(root), ownCopy: ownCopyTold });
   if (warnings.length) {
     console.error(warnings.map((w) => `[${w.check}] ${w.message}`).join("\n\n"));
     process.exit(2);   // a Stop hook's non-zero is how the message reaches the turn

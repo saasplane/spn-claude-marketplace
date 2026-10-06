@@ -29,6 +29,7 @@
 
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { basename, isAbsolute, join, relative, resolve } from "node:path";
+import { windowWorkstreams } from "../lib/window.ts";
 import { DEVEX, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { emit, isDir, listdir, read, readPayload, runAlone, workspaceRoot,
          type Payload, type Verdict } from "../lib/payload.ts";
@@ -92,16 +93,19 @@ export function checkConfirmed(payload: Payload): Verdict {
     const root = workspaceRoot(cwd);
     if (!root) return null;
     if (!isRepoWrite(root, resolve(cwd, written))) return null;
-    const workstreams = openWorkstreams(root);
+    // THE GO MUST BE IN A WORKSTREAM THIS WINDOW WORKS ON (RD.DEVEX.WORKSPACE.236). A go in another
+    // window's workstream licenses nothing here. A window that works on none has no workstream to
+    // name, so it is asked about the workspace as a whole and the note names no workstream.
+    const own = new Set(windowWorkstreams(root, payload.session_id));
+    const open = openWorkstreams(root);
+    const workstreams = own.size ? open.filter((folder) => own.has(basename(folder))) : open;
     if (!workstreams.length) return null;
-    // One go covers the window. A developer running two scopes said go to one of them, and warning
-    // about the other would be noise on work they are watching.
     if (workstreams.some(hasGo)) return null;
     if (alreadyWarned(root, payload.session_id)) return null;
-    const names = workstreams.map((w) => basename(w)).join(" · ");
+    const names = own.size ? workstreams.map((w) => basename(w)).join(" · ") : "";
     return {
       note:
-        `This is a repository write and no open workstream records a go — ${names}. ` +
+        `This is a repository write and ${own.size ? "no workstream of this window records a go — " + names : "no open workstream records a go"}. ` +
         `Execution is confirmed rather than assumed: show the plan, ask, and write the ` +
         `answer down as a log line in the arc, opening \`- **<date> — go.**\`. A go held only ` +
         `in the conversation ends with the window, and the next session cannot tell a plan ` +

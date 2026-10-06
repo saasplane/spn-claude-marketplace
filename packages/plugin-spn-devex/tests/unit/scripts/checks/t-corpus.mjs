@@ -77,9 +77,9 @@ function subjects(out) {
 }
 
 /** Run the check as the hook runs it. Exit 1 means warnings; 0 means silence. */
-function run(root) {
+function run(root, ...extra) {
   try {
-    const out = execFileSync(process.execPath, [CHECK, root], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], env: ENV });
+    const out = execFileSync(process.execPath, [CHECK, root, ...extra], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], env: ENV });
     return { warned: false, out, subjects: subjects(out) };
   } catch (error) {
     const out = String(error.stdout ?? "");
@@ -292,6 +292,35 @@ console.log("\n=== corpus — the trigger, against a known-bad corpus");
   mkdirSync(join(root, ".spndevex"), { recursive: true });
   const { warned, out } = run(root);
   check("a workspace carrying no docs tree is silent and does not crash", !warned, out.slice(0, 300));
+}
+
+// ---- A WINDOW IS TOLD OF A REPOSITORY'S DOCS ONLY WHERE IT WROTE UNDER IT (RD.DEVEX.WORKSPACE.236)
+{
+  emptyStore();
+  const root = fixture("window-repos", { "repo-a/docs/bad.md": BAD, "repo-b/docs/bad.md": BAD }, ["repo-a", "repo-b"]);
+  const none = run(root, "--repos=");
+  check("a window that wrote under no repository hears none of its findings", !none.warned && !none.out.includes("bad.md"), none.out.slice(0, 300));
+  const own = run(root, "--repos=repo-a");
+  check("a window hears the findings of the repository it wrote under", own.warned && own.out.includes("repo-a/docs/bad.md"), own.out.slice(0, 300));
+  check("and none of another repository's, which it did not write under", !own.out.includes("repo-b/docs/bad.md"), own.out.slice(0, 300));
+  check("a finding names its repository, and so does the message", own.out.includes("repo-a · audit check") && own.out.includes("`repo-a`"), own.out.slice(0, 300));
+  const again = run(root, "--repos=repo-a");
+  check("the replay's sentence says what was compared, and what was not",
+    again.out.includes("stored verdict") && again.out.includes("sprepo.json") && again.out.includes("sibling repository"), again.out.slice(0, 600));
+}
+
+// ---- A FINDING IN A FILE THAT IS CHANGED AND NOT COMMITTED IS SAID TO BE WORK IN PROGRESS
+{
+  emptyStore();
+  const root = fixture("window-wip", { "repo-a/docs/bad.md": BAD });
+  const git = (...args) => execFileSync("git", ["-C", join(root, "repo-a"), "-c", "user.email=t@t", "-c", "user.name=t", ...args], { stdio: "ignore" });
+  git("init", "-q"); git("add", "-A"); git("commit", "-q", "-m", "x");
+  const committed = run(root, "--repos=repo-a");
+  check("a finding in a committed file is not marked", committed.warned && !committed.out.includes("[uncommitted]"), committed.out.slice(0, 400));
+  appendFileSync(join(root, "repo-a", "docs", "bad.md"), "\nmore\n");
+  const wip = run(root, "--repos=repo-a");
+  check("a finding in a file that is changed and not committed says so",
+    wip.out.includes("bad.md") && wip.out.includes("[uncommitted]") && wip.out.includes("work in progress"), wip.out.slice(0, 500));
 }
 
 rmSync(BASE, { recursive: true, force: true });

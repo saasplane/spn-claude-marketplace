@@ -26,12 +26,13 @@
 //
 // A check now RETURNS a `Verdict`. There is no round trip for a verdict to be lost in.
 
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
-import { emit, readPayload, type Payload, type Verdict } from "../lib/payload.ts";
+import { readFileSync, statSync } from "node:fs";
+import { basename, resolve } from "node:path";
+import { emit, readPayload, workspaceRoot, type Payload, type Verdict } from "../lib/payload.ts";
+import { recordWrites } from "../lib/window.ts";
 import { checkEnvSeat } from "../checks/env-seat.ts";
 import { checkDoc, bashWrites } from "../checks/doc-check.ts";
-import { gateDocumentsFirst, gateClose } from "../checks/split-plan.ts";
+import { gateDocumentsFirst, gateClose, moves } from "../checks/split-plan.ts";
 import { checkConfirmed } from "../checks/confirmed.ts";
 import { checkReleaseGo, applies as releaseApplies } from "../checks/release-go.ts";
 import { checkArcStatus, applies as arcStatusApplies } from "../checks/arc-status.ts";
@@ -201,6 +202,49 @@ function writtenPaths(payload: Payload): string[] {
   try { return bashWrites(supplied.command).map(([path]) => path); } catch { return []; }
 }
 
+// A folder made, or a folder moved into a state, is a write that opens a workstream, but `bashWrites`
+// reads redirects, `tee`, `sed -i` and copies, and a `mkdir` is none of them.
+// The tools whose `file_path` names a file they change.
+const FILE_WRITERS = new Set(["Edit", "Write", "MultiEdit", "NotebookEdit"]);
+
+const MKDIR = /(?:^|[;&|\n])\s*mkdir\s+((?:-\S+\s+)*)([^;&|\n]+)/g;
+
+/** The folders a command makes. */
+function madeFolders(command: string): string[] {
+  const out: string[] = [];
+  for (const found of command.matchAll(MKDIR))
+    for (const word of found[2].trim().split(/\s+/)) if (!word.startsWith("-")) out.push(word.replace(/^['"]|['"]$/g, ""));
+  return out;
+}
+
+/** Where a move lands: the destination, or the destination holding the source's name where it is a folder. */
+function landings(command: string, cwd: string): string[] {
+  const out: string[] = [];
+  for (const [source, destination] of moves(command)) {
+    out.push(destination);
+    try { if (statSync(resolve(cwd, destination)).isDirectory()) out.push(`${destination.replace(/\/+$/, "")}/${basename(source)}`); } catch { /* not there yet */ }
+  }
+  return out;
+}
+
+/**
+ * EVERY PATH A CALL PUTS A WRITE INSIDE, for the one question of which workstream a window works on:
+ * the paths a call writes, the folders it makes and the places a move lands. Never text inside a write.
+ */
+export function bindingPaths(payload: Payload): string[] {
+  const supplied = payload.tool_input ?? {};
+  const cwd = payload.cwd ?? process.cwd();
+  // A `Read` carries a `file_path` too, and reading a file binds nothing.
+  const writes = !payload.tool_name || FILE_WRITERS.has(payload.tool_name) || payload.tool_name === "Bash";
+  const paths = writes ? writtenPaths(payload) : [];
+  if (writes && supplied.command) {
+    try { paths.push(...madeFolders(supplied.command), ...landings(supplied.command, cwd)); } catch { /* the binding is best effort */ }
+  }
+  const notebook = (supplied as { notebook_path?: string }).notebook_path;
+  if (notebook && writes) paths.push(notebook);
+  return paths;
+}
+
 export function dispatch(payload: Payload): Verdict {
   const supplied = payload.tool_input ?? {};
 
@@ -222,6 +266,15 @@ export function dispatch(payload: Payload): Verdict {
   let blocked: string | null = null;
   try { blocked = agentBlockRefusal(payload); } catch { blocked = null; }
   if (blocked) return { deny: blocked };
+
+  // THE WINDOW'S BINDING IS WRITTEN HERE, from the paths this call writes (RD.DEVEX.WORKSPACE.236), and
+  // before the checks read it: the first write into a workstream makes it this window's. A child's call
+  // carries its window's session id, so its writes bind the window that dispatched it.
+  try {
+    const cwd = payload.cwd ?? process.cwd();
+    const root = workspaceRoot(cwd);
+    if (root && payload.session_id) recordWrites(root, payload.session_id, cwd, bindingPaths(payload));
+  } catch { /* a binding that cannot be written is a window that hears less */ }
 
   const path = supplied.file_path ?? "";
   const command = supplied.command ?? "";

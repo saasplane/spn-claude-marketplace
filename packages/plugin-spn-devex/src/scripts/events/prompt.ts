@@ -21,6 +21,7 @@ import { isDir, readPayload, runAlone, workspaceRoot, type Payload } from "../li
 import { ARCS, DEVEX, WORKSTREAM_STATES, workstreamsDir } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { begin, end, span, tagsOf } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { ARC_NAME, WORKSTREAM_NAME, handoverLines } from "./stop.ts";
+import { bindNamed, readWindow } from "../lib/window.ts";
 
 /** What a session is called, and which of the two forms the name has. */
 export type SessionName = { name: string; form: "workstream" | "arc" };
@@ -100,6 +101,26 @@ export function sessionName(prompt: string, root: string): SessionName | null {
 }
 
 /**
+ * The workstreams a prompt makes this window OWN (RD.DEVEX.WORKSPACE.236), and how.
+ *
+ * A handover owns every workstream its `continue:` line names that exists: the reload form names two,
+ * and a window that continues one while the other waits on it owns both. A prompt with no handover owns
+ * a workstream only where it names exactly one workstream folder that exists, and only while the window
+ * owns none yet: a later prompt often names a second workstream to compare it or cite it.
+ */
+export function bindingsOf(prompt: string, root: string, session: string): Array<{ name: string; by: "prompt" | "handover" }> {
+  const next = handoverLines(prompt).get("continue");
+  if (next !== undefined) {
+    const owned = [...new Set([...next.matchAll(everyWorkstreamName())].map((found) => found[0]))]
+      .filter((name) => workstreamFolder(root, name));
+    if (owned.length) return owned.map((name) => ({ name, by: "handover" as const }));
+  }
+  if (Object.values(readWindow(root, session).workstreams).some((one) => one.tie === "owns")) return [];
+  const named = workstreamsNamed(prompt, root);
+  return named.length === 1 ? [{ name: named[0], by: "prompt" }] : [];
+}
+
+/**
  * The name to give the session, or null where the script stays silent.
  *
  * @param worked    the name the prompt gives, from `sessionName`
@@ -141,6 +162,10 @@ export function answerFor(payload: Payload, start: string): string {
   if (!session || !prompt) return "";
   const root = workspaceRoot(start);
   if (!root) return "";
+  // THE WINDOW'S BINDING, before the name: a window that asks before it writes is asked its cards.
+  try {
+    for (const bound of bindingsOf(prompt, root, session)) bindNamed(root, session, bound.name, bound.by);
+  } catch { /* a binding that cannot be written is a window that hears less */ }
   const file = recordFile(root, session);
   if (!file) return "";
   const give = nameToGive(sessionName(prompt, root), readRecord(file));

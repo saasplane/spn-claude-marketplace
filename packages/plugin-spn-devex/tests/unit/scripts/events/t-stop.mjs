@@ -6,12 +6,17 @@ import { PLUGIN } from "../../../helpers/harness.mjs";
 // The first pair proves parity. The second is finding F11 — the Python goes silent and the port does
 // not, which is the whole reason the filter had to go.
 import { execFileSync } from "node:child_process";
-import { workspace } from "../../../helpers/fixture.mjs";
+import { bindOpen, wroteArcs, workspace } from "../../../helpers/fixture.mjs";
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, writeFileSync } from "node:fs";
+import { bindNamed, recordWrites } from "../../../../src/scripts/lib/window.ts";
 import { resolve, join } from "node:path";
 import { WORKSTREAMS } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, linesFor } from "../../../../../plugin-support-lib/src/lib/page-styles.ts";
+
+// Every workstream open in a fixture, as the set of a window that works on all of them. The checks take
+// the workstreams their window works on and read no others (RD.DEVEX.WORKSPACE.236).
+const everyone = (root) => { try { return new Set(readdirSync(join(root, ".spndevex", "workstreams", "open"))); } catch { return new Set(); } };
 
 const HOOKS = PLUGIN;
 const SCRIPTS = resolve(HOOKS, "scripts");
@@ -98,10 +103,15 @@ const said = (out) => {
 let n = 0, failed = 0;
 function one(label, root, expect, { says, reply = "done", parity = true, why = "", session, edit, extra = {} } = {}) {
   n += 1;
-  const payload = { cwd: root, last_assistant_message: reply, ...(session ? { session_id: session } : {}), ...extra };
+  // EVERY CASE IS A WINDOW THAT WORKS ON THE FIXTURE'S OPEN WORKSTREAMS (RD.DEVEX.WORKSPACE.236): a hook
+  // speaks only of the workstreams its window is bound to, so the case says whose window it is.
+  const sid = session ?? `t-stop-${n}`;
+  bindOpen(root, sid);
+  const payload = { cwd: root, last_assistant_message: reply, session_id: sid, ...extra };
   // A SESSION'S FIRST STOP IS ITS BASELINE. Where a case is about work this session did, the hook
-  // runs once to take that baseline, the edit is made, and the case is the second Stop.
-  if (edit) { run("node", [`${HOOKS}/src/scripts/events/stop.ts`], payload, root); edit(root); }
+  // runs once to take that baseline, the edit is made, and the case is the second Stop. The edit is
+  // this window's own write, so the window's note records it as PreToolUse would.
+  if (edit) { run("node", [`${HOOKS}/src/scripts/events/stop.ts`], payload, root); edit(root); wroteArcs(root, sid); }
   const ts = said(run("node", [`${HOOKS}/src/scripts/events/stop.ts`], payload, root));
   const py = hasPython("stop.py") ? said(run("python3", [`${SCRIPTS}/stop.py`], payload, root)) : null;
   const saysOk = !says || ts.includes(says);
@@ -260,7 +270,7 @@ console.log("\n=== runnable — N39 step 8: which arc is being executed is a fac
     ["no baseline of this session's own — its first Stop stays quiet", 0, 0, WORK_MOVED],
   ]) {
     n += 1;
-    const got = checkRunnable(root, since, baseline).length;
+    const got = checkRunnable(root, since, baseline, null, everyone(root)).length;
     const ok = got === expected;
     if (!ok) failed += 1;
     console.log(`  ${ok ? "PASS" : "FAIL"}  ${what} -> ${got} warning(s)`);
@@ -271,7 +281,7 @@ console.log("\n=== runnable — N39 step 8: which arc is being executed is a fac
   {
     const { stepHash } = await import("../../../../src/scripts/events/stop.ts");
     const same = { [arcPath]: stepHash(readFileSync(arcPath, "utf8")) };
-    const quiet = checkRunnable(root, past, same).length === 0;
+    const quiet = checkRunnable(root, past, same, null, everyone(root)).length === 0;
     if (!quiet) failed += 1;
     console.log(`  ${quiet ? "PASS" : "FAIL"}  an arc whose RECORD moved but whose step rows did not is silent`);
   }
@@ -280,19 +290,21 @@ console.log("\n=== runnable — N39 step 8: which arc is being executed is a fac
   // window that had never opened it, after every reply, and forced eight "Blocked" turns. With no
   // baseline of this session's own, the word alone decides nothing.
   n += 1;
-  const claimed = checkRunnable(workspace("stop-runnable-claimed", {
+  const claimedRoot = workspace("stop-runnable-claimed", {
     [`.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html`]: page({ cards: "", names: ["N1-a-subject.md"] }),
     [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-a-subject.md`]: RUNNING,
-  }), 0).length === 0;
+  });
+  const claimed = checkRunnable(claimedRoot, 0, {}, null, everyone(claimedRoot)).length === 0;
   if (!claimed) failed += 1;
   console.log(`  ${claimed ? "PASS" : "FAIL"}  an arc that SAYS RUNNING no longer fires on the word alone`);
 
   // A LANDED ARC'S UNFINISHED ROWS ARE HISTORY. Editing one to add a log line must not report it.
   n += 1;
-  const landed = checkRunnable(workspace("stop-runnable-landed", {
+  const landedRoot = workspace("stop-runnable-landed", {
     [`.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html`]: page({ cards: "", names: ["N1-a-subject.md"] }),
     [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-a-subject.md`]: RUNNING.replace("Status: **RUNNING**", "**Status: LANDED 2026-09-23**"),
-  }), past, WORK_MOVED).length === 0;
+  });
+  const landed = checkRunnable(landedRoot, past, WORK_MOVED, null, everyone(landedRoot)).length === 0;
   if (!landed) failed += 1;
   console.log(`  ${landed ? "PASS" : "FAIL"}  a LANDED arc written this sitting is history, not work`);
 
@@ -304,7 +316,7 @@ console.log("\n=== runnable — N39 step 8: which arc is being executed is a fac
     ["the same arc when this session's own tool call wrote it", new Set([arcPath]), 1],
   ]) {
     n += 1;
-    const got = checkRunnable(root, past, WORK_MOVED, touched).length;
+    const got = checkRunnable(root, past, WORK_MOVED, touched, everyone(root)).length;
     const ok = got === expected;
     if (!ok) failed += 1;
     console.log(`  ${ok ? "PASS" : "FAIL"}  ${what} -> ${got} warning(s)`);
@@ -340,8 +352,10 @@ console.log("\n=== runnable — scoped to the session, the step row read by head
   {
     const root = shaped("m1-stop-cites");
     const payload = { cwd: root, last_assistant_message: "done", session_id: "m1-cites" };
+    bindOpen(root, "m1-cites");
     run("node", [`${HOOKS}/src/scripts/events/stop.ts`], payload, root);
     touchStep(root);
+    wroteArcs(root, "m1-cites");
     const out = run("node", [`${HOOKS}/src/scripts/events/stop.ts`], payload, root);
     n += 1;
     const ok = /01-workstream\.md § Say what you opened/.test(out) && !/11-workspace/.test(out) && !/next one is step 3e\.1 — spn-/.test(out);
@@ -363,56 +377,24 @@ console.log("\n=== runnable — scoped to the session, the step row read by head
   }
 
   // A SECOND TURN IN A WINDOW THAT NEVER WROTE THE ARC. This window has a baseline, another window
-  // moves the arc's steps, and this window's transcript shows no write to it: not its work.
+  // moves the arc's steps, and this window's note records no write to it: not its work.
   {
     const root = shaped("m1-stop-other-writer");
-    const transcript = join(root, "transcript.jsonl");
-    const lines = (inputs) => inputs.map((input) => JSON.stringify({ type: "assistant", message: { role: "assistant",
-      content: [{ type: "tool_use", id: "t", name: input.name, input: input.input }] } })).join("\n") + "\n";
-    writeFileSync(transcript, lines([{ name: "Read", input: { file_path: join(root, SHAPED_AT) } }]), "utf8");
-    const payload = { cwd: root, last_assistant_message: "done", session_id: "m1-reader", transcript_path: transcript };
+    bindOpen(root, "m1-reader");
+    const payload = { cwd: root, last_assistant_message: "done", session_id: "m1-reader" };
     run("node", [`${HOOKS}/src/scripts/events/stop.ts`], payload, root);
     touchStep(root);                                   // another window works on the arc
-    writeFileSync(transcript, readFileSync(transcript, "utf8") +
-      lines([{ name: "Bash", input: { command: `cat ${SHAPED_AT}` } }]), "utf8");
     const quiet = !/\[runnable\]/.test(run("node", [`${HOOKS}/src/scripts/events/stop.ts`], payload, root));
     n += 1; if (!quiet) failed += 1;
     console.log(`  ${quiet ? "PASS" : "FAIL"}  an arc this session only read, while another window changed it, is not its work`);
 
-    // And the same session, once its own Edit writes the step rows.
-    touchStep(root);
+    // And the same session, once its own Edit writes the step rows (PreToolUse records the write).
     const file = join(root, SHAPED_AT);
     writeFileSync(file, readFileSync(file, "utf8").replace("| the split check |", "| the split check, reworded |"), "utf8");
-    writeFileSync(transcript, readFileSync(transcript, "utf8") +
-      lines([{ name: "Edit", input: { file_path: file, old_string: "| the split check |", new_string: "| the split check, reworded |" } }]), "utf8");
+    wroteArcs(root, "m1-reader");
     const warns = /\[runnable\]/.test(run("node", [`${HOOKS}/src/scripts/events/stop.ts`], payload, root));
     n += 1; if (!warns) failed += 1;
     console.log(`  ${warns ? "PASS" : "FAIL"}  the same arc once this session's own Edit changed its step rows`);
-  }
-
-  // THE TRANSCRIPT READER ON ITS OWN: writers count, a read does not, and a Bash command counts only
-  // where it writes.
-  {
-    const root = workspace("m1-stop-transcript", {});
-    const arc = join(root, "arcs", "N9-x.md");
-    const transcript = join(root, "t.jsonl");
-    const entry = (name, input) => JSON.stringify({ type: "assistant", message: { content: [{ type: "tool_use", name, input }] } });
-    for (const [what, line, expected] of [
-      ["an Edit on the arc", entry("Edit", { file_path: arc }), true],
-      ["a Write on the arc", entry("Write", { file_path: arc, content: "x" }), true],
-      ["a Read of the arc", entry("Read", { file_path: arc }), false],
-      ["a Bash command that only prints it", entry("Bash", { command: "cat arcs/N9-x.md" }), false],
-      ["a Bash command that rewrites it", entry("Bash", { command: "sed -i '' 's/a/b/' arcs/N9-x.md" }), true],
-    ]) {
-      writeFileSync(transcript, `${line}\n`, "utf8");
-      const got = arcsTouched(transcript, 0, [arc])?.touched.has(arc) ?? null;
-      n += 1; const ok = got === expected; if (!ok) failed += 1;
-      console.log(`  ${ok ? "PASS" : "FAIL"}  ${what} ${expected ? "counts" : "does not count"} as a write`);
-    }
-    n += 1;
-    const missing = arcsTouched(join(root, "absent.jsonl"), 0, [arc]) === null;
-    if (!missing) failed += 1;
-    console.log(`  ${missing ? "PASS" : "FAIL"}  an unreadable transcript is null, so the caller falls back to file times`);
   }
 }
 
@@ -538,7 +520,7 @@ console.log("\n=== the handover check — what counts as saying a window is need
   // throws, and the whole install precondition is skipped in silence — a suite that would pass
   // whether or not the half exists. The fixture root has no plugin cache, so the wiring reads
   // unknown and these cases test the block rules alone, which is what they are for.
-  const says = (reply) => checkHandover(reply, ROOT).length > 0;
+  const says = (reply) => checkHandover(reply, ROOT, everyone(ROOT)).length > 0;
 
   for (const [what, reply] of [
     ["a passing mention of the noun", "The handover marks it as not mine to decide."],
@@ -591,7 +573,7 @@ console.log("\n=== the handover check — what counts as saying a window is need
   // became three. The fixture cannot install a plugin, so the STATE is faked at the only seam that
   // matters — the reply is a real direction, and a stale wiring string must beat the block rules.
   {
-    const stale = checkHandover("Open a new window and paste this.", ROOT);
+    const stale = checkHandover("Open a new window and paste this.", ROOT, everyone(ROOT));
     // With no cache under the fixture the wiring reads unknown, so this asserts the ORDER instead:
     // a direction with no block is still caught, which is the pre-existing rule surviving the change.
     n += 1;
@@ -652,16 +634,16 @@ console.log("\n=== the handover check — what counts as saying a window is need
     const reply = "Q329 · which way\n\n**What** — the gate.\n\n**Why** — what it costs to leave it.\n\n" +
       "| | Option | What it costs |\n| --- | --- | --- |\n| **A** | now | a cycle |\n| **B** | wait | a window |\n\n" +
       "Recommended: A. Once it is answered, the next window starts at step 2.\n\nOpen a new window after you answer.";
-    const quiet = checkHandover(reply, CARDED).length === 0;
+    const quiet = checkHandover(reply, CARDED, everyone(CARDED)).length === 0;
     n += 1; if (!quiet) failed += 1;
     console.log(`  ${quiet ? "PASS" : "FAIL"}  a reply putting the open card in full is not refused for a handover`);
-    const bare = checkHandover("Open a new window after you answer.", CARDED);
+    const bare = checkHandover("Open a new window after you answer.", CARDED, everyone(CARDED));
     const still = bare.length === 1 && /Answer first/.test(bare[0].message);
     n += 1; if (!still) failed += 1;
     console.log(`  ${still ? "PASS" : "FAIL"}  the same direction without the card is still told to answer first`);
   }
 
-  const short = checkHandover("Pick this up in a new window.\n```\ncontinue: workstream 008-plain-language, arc N13\n```", ROOT);
+  const short = checkHandover("Pick this up in a new window.\n```\ncontinue: workstream 008-plain-language, arc N13\n```", ROOT, everyone(ROOT));
   const named = short.length === 1 && /`model:`/.test(short[0].message) && /`open:`/.test(short[0].message)
     && !/missing[^.]*`continue:`/.test(short[0].message);
   if (!named) failed += 1;
@@ -740,9 +722,9 @@ console.log("\n=== handover — the template's fields, and a fence that quotes t
     ["a fence holding {{ quotes a template", quotesTemplate(fencesOf(CARD_FENCE)[0]), true],
     ["a filled-in block does not", quotesTemplate(fencesOf(FILLED)[0]), false],
     ["a diff of the template is not a pass-on", passingOn(DIFF), false],
-    ["no [handover] finding on the diff preview", checkHandover(DIFF, ROOT).length, 0],
-    ["no [handover] finding on a card fence holding {{", checkHandover(CARD_FENCE, ROOT).length, 0],
-    ["the filled-in template, in the aligned layout with wrapped values, is a whole handover", checkHandover(`Pick this up in a new window.\n\n${FILLED}`, ROOT).length, 0],
+    ["no [handover] finding on the diff preview", checkHandover(DIFF, ROOT, everyone(ROOT)).length, 0],
+    ["no [handover] finding on a card fence holding {{", checkHandover(CARD_FENCE, ROOT, everyone(ROOT)).length, 0],
+    ["the filled-in template, in the aligned layout with wrapped values, is a whole handover", checkHandover(`Pick this up in a new window.\n\n${FILLED}`, ROOT, everyone(ROOT)).length, 0],
   ]) {
     n += 1;
     const ok = got === expected;
@@ -761,7 +743,7 @@ console.log("\n=== handover — the template's fields, and a fence that quotes t
   // EACH LABEL IS OWED. A block missing one is refused, and the refusal names the label it lacks.
   for (const label of ["continue", "pins", "live now", "open"]) {
     n += 1;
-    const got = checkHandover(`Pick this up in a new window.\n\n${withoutLabel(label)}`, ROOT);
+    const got = checkHandover(`Pick this up in a new window.\n\n${withoutLabel(label)}`, ROOT, everyone(ROOT));
     const ok = got.length === 1 && new RegExp(`missing \`${label}:\``).test(got[0].message);
     if (!ok) failed += 1;
     console.log(`  ${ok ? "PASS" : "FAIL"}  a block missing \`${label}:\` is refused, naming it${ok ? "" : ` — got ${JSON.stringify(got)}`}`);
@@ -769,14 +751,14 @@ console.log("\n=== handover — the template's fields, and a fence that quotes t
 
   // NO LEGACY: the sentence form is refused as a block missing every label.
   n += 1;
-  const sentence = checkHandover(`Pick this up in a new window.\n\n${SENTENCE}`, ROOT);
+  const sentence = checkHandover(`Pick this up in a new window.\n\n${SENTENCE}`, ROOT, everyone(ROOT));
   const refused = sentence.length === 1 && /missing `continue:` · `model:`/.test(sentence[0].message) && /`open:`/.test(sentence[0].message);
   if (!refused) failed += 1;
   console.log(`  ${refused ? "PASS" : "FAIL"}  the old sentence form is refused, naming the labels it lacks${refused ? "" : ` — got ${JSON.stringify(sentence)}`}`);
 
   // A LABEL IN CAPITALS IS NOT THE LABEL. The chapter fixes them lowercase.
   n += 1;
-  const upper = checkHandover(`Pick this up in a new window.\n\n${FILLED.replace("\nmodel:", "\nModel:")}`, ROOT);
+  const upper = checkHandover(`Pick this up in a new window.\n\n${FILLED.replace("\nmodel:", "\nModel:")}`, ROOT, everyone(ROOT));
   const caseKept = upper.length === 1 && /missing `model:`/.test(upper[0].message);
   if (!caseKept) failed += 1;
   console.log(`  ${caseKept ? "PASS" : "FAIL"}  \`Model:\` in capitals does not count as \`model:\``);
@@ -787,7 +769,7 @@ console.log("\n=== handover — the template's fields, and a fence that quotes t
     ["no workstream", "workstream `008-plain-language`, ", "", /names no workstream/],
   ]) {
     n += 1;
-    const got = checkHandover(`Pick this up in a new window.\n\n${FILLED.replace(from, to)}`, ROOT);
+    const got = checkHandover(`Pick this up in a new window.\n\n${FILLED.replace(from, to)}`, ROOT, everyone(ROOT));
     const ok = got.length === 1 && says.test(got[0].message);
     if (!ok) failed += 1;
     console.log(`  ${ok ? "PASS" : "FAIL"}  a \`continue:\` line with ${what} is refused${ok ? "" : ` — got ${JSON.stringify(got)}`}`);
@@ -795,7 +777,7 @@ console.log("\n=== handover — the template's fields, and a fence that quotes t
   // THE ARC IS NAMED WITH THE DIGITS ITS FILE WRITES: three, two or one.
   for (const arc of ["N001", "N15", "N1"]) {
     n += 1;
-    const got = checkHandover(`Pick this up in a new window.\n\n${FILLED.replace("`N116`", `\`${arc}\``)}`, ROOT);
+    const got = checkHandover(`Pick this up in a new window.\n\n${FILLED.replace("`N116`", `\`${arc}\``)}`, ROOT, everyone(ROOT));
     const ok = got.length === 0;
     if (!ok) failed += 1;
     console.log(`  ${ok ? "PASS" : "FAIL"}  a \`continue:\` line naming arc ${arc} is a whole handover${ok ? "" : ` — got ${JSON.stringify(got)}`}`);
@@ -814,7 +796,7 @@ console.log("\n=== runnable — a row in progress is named with its age, never c
     [`.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N3-a-subject.md`]: MARKED,
   });
   const arcPath = join(root, `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N3-a-subject.md`);
-  const found = checkRunnable(root, Date.now() - 60_000, { [arcPath]: "a-different-hash" }, new Set([arcPath]));
+  const found = checkRunnable(root, Date.now() - 60_000, { [arcPath]: "a-different-hash" }, new Set([arcPath]), everyone(root));
   const now = Date.parse("2026-09-29T12:00:00Z");
   for (const [what, ok] of [
     ["the row in progress is not an unfinished runnable step", unfinishedSteps(arcPath).length === 0],
@@ -1104,7 +1086,7 @@ console.log("\n=== welcome — the hook reads the first turn from the transcript
 
 console.log("\n=== stop — a check speaks once in a turn, and only about this session's work (RD.DEVEX.WORKSPACE.198)");
 {
-  const { passingOn, workstreamsOf } = await import("../../../../src/scripts/events/stop.ts");
+  const { passingOn } = await import("../../../../src/scripts/events/stop.ts");
   const HOOK = `${HOOKS}/src/scripts/events/stop.ts`;
   const A = `.spndevex/${WORKSTREAMS}/open/001-a-subject`, B = `.spndevex/${WORKSTREAMS}/open/002-b-subject`;
   // Two open workstreams. A is whole. B has an arc its page does not name, and an open card.
@@ -1114,55 +1096,78 @@ console.log("\n=== stop — a check speaks once in a turn, and only about this s
     [`${B}/approach.html`]: page({ names: [], cards: CARD }),
     [`${B}/arcs/N1-b-subject.md`]: ARC(),
   });
-  // A transcript is the only record of who wrote a file: one tool call naming a path under a workstream.
-  const transcript = (root, name, path) => {
-    const file = join(root, name);
-    writeFileSync(file, JSON.stringify({ type: "assistant", message: { content: [
-      { type: "tool_use", name: "Write", input: { file_path: join(root, path), content: "x" } }] } }) + "\n");
-    return file;
-  };
+  // THE WINDOW'S NOTE IS THE ONLY RECORD OF WHICH WORKSTREAMS IT WORKS ON (RD.DEVEX.WORKSPACE.236): a write
+  // whose path is inside the folder binds it, as PreToolUse records it.
+  const wroteTo = (root, session, path) => recordWrites(root, session, root, [join(root, path)]);
   const check = (label, ok) => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}`); };
 
-  // The session wrote to A only, so B's unnamed arc and B's open card are another session's.
+  // The window wrote to A only, so B's unnamed arc and B's open card are another window's.
   {
     const root = two("s198-scope-a");
-    const out = run("node", [HOOK], { cwd: root, session_id: "wrote-a", last_assistant_message: "done",
-      transcript_path: transcript(root, "a.jsonl", `${A}/approach.html`) }, root);
-    check("a session that wrote to one workstream is not held for another's unnamed arc", !/unnamed-arc/.test(out));
+    wroteTo(root, "wrote-a", `${A}/approach.html`);
+    const out = run("node", [HOOK], { cwd: root, session_id: "wrote-a", last_assistant_message: "done" }, root);
+    check("a window that wrote to one workstream is not held for another's unnamed arc", !/unnamed-arc/.test(out));
     check("and is not asked for another workstream's open card", !/needs-you/.test(out));
   }
-  // KNOWN-BAD: the session that wrote to B hears about B.
+  // KNOWN-BAD: the window that wrote to B hears about B, and the message names B.
   {
     const root = two("s198-scope-b");
-    const out = run("node", [HOOK], { cwd: root, session_id: "wrote-b", last_assistant_message: "done",
-      transcript_path: transcript(root, "b.jsonl", `${B}/arcs/N1-b-subject.md`) }, root);
-    check("known-bad: the session that wrote to that workstream is told about its arc", /unnamed-arc/.test(out));
+    wroteTo(root, "wrote-b", `${B}/arcs/N1-b-subject.md`);
+    const out = run("node", [HOOK], { cwd: root, session_id: "wrote-b", last_assistant_message: "done" }, root);
+    check("known-bad: the window that wrote to that workstream is told about its arc", /unnamed-arc/.test(out));
     check("known-bad: and is asked for its open card", /needs-you/.test(out));
+    check("and each message names the workstream by its folder", /002-b-subject/.test(out.split("[needs-you]")[1] ?? ""));
   }
-  // UNTOUCHED: with no transcript the writer is unknown, and every open workstream is read, as before.
+  // A WINDOW WITH NO WORKSTREAM HEARS NOTHING, however many are open.
   {
-    const root = two("s198-scope-unknown");
-    const out = run("node", [HOOK], { cwd: root, session_id: "unknown", last_assistant_message: "done" }, root);
-    check("with no transcript, every open workstream is still read", /unnamed-arc/.test(out));
+    const root = two("s198-scope-none");
+    const out = run("node", [HOOK], { cwd: root, session_id: "bound-to-none", last_assistant_message: "done" }, root);
+    check("a window with no workstream is told nothing about a card, an arc or a page", out === "", out.slice(0, 200));
   }
-  // A workstream stays the session's own across turns, though the later turn wrote nothing there.
+  // A workstream stays the window's own across turns, though the later turn wrote nothing there.
   {
     const root = two("s198-scope-kept");
-    const path = transcript(root, "kept.jsonl", `${B}/arcs/N1-b-subject.md`);
-    run("node", [HOOK], { cwd: root, session_id: "kept", last_assistant_message: "done", transcript_path: path }, root);
-    const later = run("node", [HOOK], { cwd: root, session_id: "kept", last_assistant_message: "done", transcript_path: path }, root);
-    check("a workstream the session wrote to in an earlier turn is still its own", /unnamed-arc/.test(later));
+    wroteTo(root, "kept", `${B}/arcs/N1-b-subject.md`);
+    run("node", [HOOK], { cwd: root, session_id: "kept", last_assistant_message: "done" }, root);
+    const later = run("node", [HOOK], { cwd: root, session_id: "kept", last_assistant_message: "done" }, root);
+    check("a workstream the window wrote to in an earlier turn is still its own", /unnamed-arc/.test(later));
   }
-  check("workstreamsOf names the folders a transcript wrote to", (() => {
-    const root = two("s198-of");
-    const got = workstreamsOf(transcript(root, "of.jsonl", `${A}/approach.html`), 0, [], [join(root, A), join(root, B)]);
-    return got !== null && got.has("001-a-subject") && !got.has("002-b-subject");
-  })());
-  check("workstreamsOf is unknown, not empty, where there is no transcript", workstreamsOf(undefined, 0, [], []) === null);
+  // AN OLD BASELINE THAT BOUND A WINDOW BY A NAME FOUND IN TEXT IS HARMLESS: its list is never read.
+  {
+    const root = two("s198-old-baseline");
+    wroteTo(root, "old", `${A}/approach.html`);
+    const dir = join(root, ".spndevex", ".debug", "stop", "sessions");
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, "old.json"), JSON.stringify({ at: 1, steps: {}, workstreams: ["001-a-subject", "002-b-subject"], cards: [] }));
+    const out = run("node", [HOOK], { cwd: root, session_id: "old", last_assistant_message: "done" }, root);
+    check("an old baseline listing another workstream does not make the window answer for it", !/unnamed-arc/.test(out) && !/needs-you/.test(out), out.slice(0, 200));
+  }
+  // TWO WINDOWS, TWO WORKSTREAMS: each hears only its own. TWO WINDOWS, ONE WORKSTREAM: both hear it.
+  {
+    const root = two("s198-two-windows");
+    wroteTo(root, "win-a", `${A}/approach.html`);
+    wroteTo(root, "win-b", `${B}/approach.html`);
+    wroteTo(root, "win-b2", `${B}/arcs/N1-b-subject.md`);
+    const said = (session) => run("node", [HOOK], { cwd: root, session_id: session, last_assistant_message: "done" }, root);
+    const outA = said("win-a"), outB = said("win-b"), outB2 = said("win-b2");
+    check("two windows on two workstreams: the first hears nothing of the second's", !/002-b-subject|unnamed-arc|needs-you/.test(outA), outA.slice(0, 200));
+    check("and the second hears its own arc and card", /unnamed-arc/.test(outB) && /needs-you/.test(outB));
+    check("two windows on one workstream both hear it", /unnamed-arc/.test(outB2) && /needs-you/.test(outB2));
+  }
+  // A WORKSTREAM THAT LEAVES open/ DROPS OUT of the window's answer.
+  {
+    const root = two("s198-leaves-open");
+    wroteTo(root, "leaver", `${B}/approach.html`);
+    mkdirSync(join(root, ".spndevex", WORKSTREAMS, "closed"), { recursive: true });
+    renameSync(join(root, B), join(root, ".spndevex", WORKSTREAMS, "closed", "002-b-subject"));
+    const out = run("node", [HOOK], { cwd: root, session_id: "leaver", last_assistant_message: "done" }, root);
+    check("a workstream that moved to closed/ is no longer heard", out === "", out.slice(0, 200));
+  }
 
   // ONCE IN A TURN. The reply after a finding is its answer, whichever check spoke.
   {
     const root = two("s198-once");
+    wroteTo(root, "once", `${B}/approach.html`);
     const hook = (payload) => run("node", [HOOK], { cwd: root, session_id: "once", last_assistant_message: "done", ...payload }, root);
     const first = /unnamed-arc/.test(hook({}));
     const second = /unnamed-arc/.test(hook({ stop_hook_active: true }));
@@ -1197,21 +1202,21 @@ console.log("\n=== handover — the labels are read as one column, the one `do n
   const aligned = LABELS.map((label, at) => `${`${label}:`.padEnd(14)}${value(at)}`);
 
   // KNOWN-BAD: nine label lines, every label present, whose values start in different columns.
-  const ragged = checkHandover(block(LABELS.map((label, at) => `${label}:${at % 2 ? " " : "      "}${value(at)}`)), ROOT);
+  const ragged = checkHandover(block(LABELS.map((label, at) => `${label}:${at % 2 ? " " : "      "}${value(at)}`)), ROOT, everyone(ROOT));
   check("[MKT.HOOKS.37] known-bad: values that start in different columns get one [handover] warning",
     ragged.length === 1 && ragged[0].check === "handover", JSON.stringify(ragged));
   check("[MKT.HOOKS.37] and the warning names the column that `do not touch:` sets",
     /column 14/.test(ragged[0]?.message ?? "") && /`do not touch:`/.test(ragged[0]?.message ?? ""), ragged[0]?.message);
-  const oneOff = checkHandover(block(aligned.map((line) => line.startsWith("model:") ? `model: ${value(1)}` : line)), ROOT);
+  const oneOff = checkHandover(block(aligned.map((line) => line.startsWith("model:") ? `model: ${value(1)}` : line)), ROOT, everyone(ROOT));
   check("[MKT.HOOKS.37] known-bad: one value out of the column is named by its label",
     oneOff.length === 1 && /`model:`/.test(oneOff[0].message) && !/`pins:`/.test(oneOff[0].message), JSON.stringify(oneOff));
 
   // UNTOUCHED: the template's layout, its values filled in, a wrapped value indented to the column.
-  check("[MKT.HOOKS.37] every value in the column passes", checkHandover(block(aligned), ROOT).length === 0, JSON.stringify(checkHandover(block(aligned), ROOT)));
+  check("[MKT.HOOKS.37] every value in the column passes", checkHandover(block(aligned), ROOT, everyone(ROOT)).length === 0, JSON.stringify(checkHandover(block(aligned), ROOT, everyone(ROOT))));
   const wrapped = aligned.flatMap((line) => line.startsWith("pins:") ? [line, `${" ".repeat(14)}re-run the plan's stale check first`] : [line]);
-  check("[MKT.HOOKS.37] a wrapped value indented to that column passes", checkHandover(block(wrapped), ROOT).length === 0);
+  check("[MKT.HOOKS.37] a wrapped value indented to that column passes", checkHandover(block(wrapped), ROOT, everyone(ROOT)).length === 0);
   check("[MKT.HOOKS.37] a continuation line is not read as a label, whatever it starts with",
-    checkHandover(block(aligned.flatMap((line) => line.startsWith("state:") ? [line, `${" ".repeat(14)}open: this is the value going on`] : [line])), ROOT).length === 0);
+    checkHandover(block(aligned.flatMap((line) => line.startsWith("state:") ? [line, `${" ".repeat(14)}open: this is the value going on`] : [line])), ROOT, everyone(ROOT)).length === 0);
   check("the column each label's value starts in is read from the block",
     JSON.stringify([...handoverColumns(["continue:     a", "model: b", "              c"].join("\n"))]) === JSON.stringify([["continue", 14], ["model", 7]]));
 }
@@ -1262,7 +1267,7 @@ console.log("\n=== runnable — a row in progress whose order is out with an age
       ...Object.fromEntries(Object.entries(orders).map(([file, text]) => [`${WS}/notes/N3/orders/${file}`, text])),
     });
     const arc = join(root, WS, "arcs", "N3-a-subject.md");
-    return { arc, found: checkRunnable(root, Date.now() - 60_000, { [arc]: "a-different-hash" }, new Set([arc])) };
+    return { arc, found: checkRunnable(root, Date.now() - 60_000, { [arc]: "a-different-hash" }, new Set([arc]), everyone(root)) };
   };
   const ORDER = "# Order 02 — N3 row 2: the split check\n\nBuild the check.\n";
 
@@ -1330,13 +1335,17 @@ ${tableOf(cyclesOf(folder))}
   };
   const toolCalls = (calls) => calls.map((call) => JSON.stringify({ type: "assistant", message: { role: "assistant",
     content: [{ type: "tool_use", id: "t", name: call.name, input: call.input }] } })).join("\n") + "\n";
-  const stop = (built, session) => run("node", [HOOK], { cwd: built.root, last_assistant_message: "done", session_id: session, transcript_path: built.transcript }, built.root);
+  // THE WINDOW OWNS WORKSTREAM A (RD.DEVEX.WORKSPACE.236): its prompt named it, and the case then says what it wrote.
+  const stop = (built, session) => {
+    bindNamed(built.root, session, "001-a-subject", "prompt");
+    built.session = session;
+    return run("node", [HOOK], { cwd: built.root, last_assistant_message: "done", session_id: session, transcript_path: built.transcript }, built.root);
+  };
   /** The arc moves to `status`, and the session's own Edit is what moved it, where `mine` says so. */
   const move = (built, status, state, mine = true) => {
     writeFileSync(built.arc, arcText(status, state));
-    writeFileSync(built.transcript, readFileSync(built.transcript, "utf8") + toolCalls([mine
-      ? { name: "Edit", input: { file_path: built.arc, old_string: "DECIDED", new_string: status } }
-      : { name: "Read", input: { file_path: built.arc } }]));
+    // The window's own Edit is recorded by PreToolUse as a write of the arc; another window's is not.
+    if (mine) recordWrites(built.root, built.session, built.root, [built.arc]);
   };
   const count = (text, piece) => text.split(piece).length - 1;
 
@@ -1381,8 +1390,7 @@ ${tableOf(cyclesOf(folder))}
     writeFileSync(join(other, "approach.html"), pageFor(other, "PLANNING", "&#x1F52E;"));
     stop(built, "d-other");
     writeFileSync(join(other, "arcs", "N1-the-chapter.md"), arcText("RUNNING"));       // another window's work
-    writeFileSync(built.transcript, readFileSync(built.transcript, "utf8") +
-      toolCalls([{ name: "Edit", input: { file_path: built.arc, old_string: "go.", new_string: "go, and on." } }]));
+    recordWrites(built.root, "d-other", built.root, [built.arc]);
     const out = stop(built, "d-other");
     check("[MKT.HOOKS.35] a workstream another session wrote is not this session's to hear about", !/\[page-stale\]/.test(out), out);
   }
@@ -1455,7 +1463,7 @@ ${tableOf(cyclesOf(folder))}
     const built = buildOwn("n008-stop-own-copy");
     const text = readFileSync(built.page, "utf8");
     check("the fixture links no shared stylesheet and holds no shared name", !text.includes("sds-") && text.includes("<style>") && text.includes(`<div class="open">`));
-    const first = stop(built, "o-own");
+    const first = run("node", [HOOK], { cwd: built.root, last_assistant_message: "done", session_id: "o-own", transcript_path: built.transcript }, built.root);
     check("a session that wrote nothing to the workstream is told nothing about its page", !/\[own-copy\]/.test(first), first);
     move(built, "RUNNING", HALF);
     const out = stop(built, "o-own");
@@ -1464,11 +1472,12 @@ ${tableOf(cyclesOf(folder))}
     check("[MKT.SCRIPTS.108] it reads no class of the page: it does not say that Open carries no card", !/\[stopped-no-card\]/.test(out) && !/\[cards-in-arcs\]/.test(out), out);
     check("[MKT.SCRIPTS.108] and it does not name the command that refuses such a page", !/\[page-stale\]/.test(out), out);
     check("[MKT.SCRIPTS.108] the card of such a page is still read by its id, so the reply is still asked to open with Needs you",
-      /\[needs-you\] A card is open — Q1/.test(out), out);
+      /\[needs-you\] A card is open — `001-a-subject`: Q1/.test(out), out);
     const again = stop(built, "o-own");
     check("[MKT.SCRIPTS.108] the page is named once in a session: the next Stop does not name it again", !/\[own-copy\]/.test(again), again);
     check("[MKT.SCRIPTS.108] another session that writes to the workstream is told once too",
-      count(run("node", [HOOK], { cwd: built.root, last_assistant_message: "done", session_id: "o-other" }, built.root), "[own-copy]") === 1);
+      (recordWrites(built.root, "o-other", built.root, [built.arc]),
+        count(run("node", [HOOK], { cwd: built.root, last_assistant_message: "done", session_id: "o-other" }, built.root), "[own-copy]")) === 1);
   }
   // UNTOUCHED: the same workstream with its page in the shared form, and the same card as a `div.sds-open`.
   {
@@ -1484,10 +1493,10 @@ ${tableOf(cyclesOf(folder))}
   // The same reading, asked of the function: the lines it names, and the ones a session was told before.
   {
     const built = buildOwn("n008-stop-own-copy-lines");
-    const lines = ownCopyPages(built.root);
+    const lines = ownCopyPages(built.root, everyone(built.root));
     check("[MKT.SCRIPTS.108] the line is the page's path from the workspace, then OWN_COPY", lines.length === 1 && lines[0] === `\`${A}/approach.html\`: ${OWN_COPY}.`, JSON.stringify(lines));
     check("[MKT.SCRIPTS.108] a workstream that is not this session's is not read", ownCopyPages(built.root, new Set(["002-b-subject"])).length === 0);
-    check("[MKT.SCRIPTS.108] a page the session was told about before draws no warning", checkOwnCopy(built.root, null, lines).length === 0 && checkOwnCopy(built.root, null, []).length === 1);
+    check("[MKT.SCRIPTS.108] a page the session was told about before draws no warning", checkOwnCopy(built.root, everyone(built.root), lines).length === 0 && checkOwnCopy(built.root, everyone(built.root), []).length === 1);
   }
 }
 

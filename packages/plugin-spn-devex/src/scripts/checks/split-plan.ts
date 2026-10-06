@@ -47,6 +47,7 @@ import { emit, isDir, isFile, listdir, read, readPayload, runAlone, unescape, wo
 import { APPROACH_SUFFIX, ARCS, DEVEX, SESSIONS, WORKSTREAM_STATES, WORKSTREAMS, isApproachPage, legacyWorkstreamsDir, workstreamsDir,
          type WorkstreamState } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 import { OWN_COPY, linksSharedStyles } from "../../../../plugin-support-lib/src/lib/page-styles.ts";
+import { alreadyTold, fromWorkspace, named, windowSet } from "../lib/window.ts";
 
 // The state a row reaches. `landed` is the only one that satisfies the documents pass; all three
 // named states satisfy the close. A mark nobody wrote is what the close refuses.
@@ -916,6 +917,26 @@ export function unfoldedCards(folder: string, pages: string[]): Array<[string, s
 
 // ---------------------------------------------------------------------------- gate: documents-first
 
+/**
+ * The open workstreams THIS WINDOW works on, and the pages that argue each (RD.DEVEX.WORKSPACE.236).
+ * The empty map for a window with no binding: a gate reading this says nothing about a card, a page or
+ * a row. It is the one way a hook reads a workstream's pages, so none reads every open one.
+ */
+export function ownWorkstreams(root: string, session: string | undefined): Map<string, string[]> {
+  const mine = windowSet(root, session);
+  return new Map([...openWorkstreams(root)].filter(([subject]) => mine.has(subject)));
+}
+
+/**
+ * Whether a PreToolUse note was already said to this window, and so stays silent. A note speaks once for
+ * one finding and again only when the finding changes (RD.DEVEX.WORKSPACE.198). A call a child makes
+ * is told no card or page note at all, because a child cannot fold a card or answer one.
+ */
+function silent(payload: Payload, root: string, slot: string, finding: string, forChild = false): boolean {
+  if (forChild && payload.agent_id) return true;
+  return alreadyTold(root, payload.session_id, slot, finding);
+}
+
 export function gateDocumentsFirst(payload: Payload): Verdict {
   if (!TOUCHES_PLAN.test(subjectText(payload))) return null;      // the fast path
 
@@ -925,39 +946,42 @@ export function gateDocumentsFirst(payload: Payload): Verdict {
   if (root) {
     // THE ANSWERED CARD. It is the rule most often broken by the agent that just obeyed it: the
     // answer lands, the work moves on, and the page keeps asking. Checked here rather than at close
-    // because by then it has misled every reader.
-    for (const [, pages] of [...openWorkstreams(root)].sort((a, b) => a[0].localeCompare(b[0]))) {
+    // because by then it has misled every reader. Only the workstreams this window works on are read,
+    // each note names its workstream and the page's path from the workspace, and a finding is said once.
+    for (const [subject, pages] of [...ownWorkstreams(root, payload.session_id)].sort((a, b) => a[0].localeCompare(b[0]))) {
       if (!pages.length) continue;
+      if (payload.agent_id) break;                  // a child hears no card or page note
       const folder = dirname(pages[0]);             // the arcs sit beside the page
+      const where = (page: string): string => fromWorkspace(root, join(folder, page));
       const gone = unfoldedCards(folder, pages);
-      if (gone.length) {
-        const named = gone.slice(0, 6).map(([page, number]) => `${number} in ${page}`).join(" · ");
-        return { note:
-          `An answered card left \`Open\` and took its answer with it — ${named}. ` +
+      const goneLine = gone.slice(0, 6).map(([page, number]) => `${number} in ${where(page)}`).join(" · ");
+      if (gone.length && !silent(payload, root, `unfolded|${subject}`, goneLine)) {
+        return { note: named(subject,
+          `An answered card left \`Open\` and took its answer with it — ${goneLine}. ` +
           `The arc records it as answered, and the page now says nothing about it at all. A fold ` +
           `moves the card into the section that states what it settled; what replaces it is what ` +
           `execution reads, because the window holding the answer is gone ` +
-          `(05-artifacts.md, The approach document).` };
+          `(05-artifacts.md, The approach document).`) };
       }
       const stale = staleCards(folder, pages);
-      if (stale.length) {
-        const named = stale.slice(0, 6).map(([page, number, why]) => `${number} in ${page} (${why})`).join(" · ");
-        return { note:
-          `An answered card is still in \`Open\` — ${named}. The page still asks a question ` +
+      const staleLine = stale.slice(0, 6).map(([page, number, why]) => `${number} in ${where(page)} (${why})`).join(" · ");
+      if (stale.length && !silent(payload, root, `stale|${subject}`, staleLine)) {
+        return { note: named(subject,
+          `An answered card is still in \`Open\` — ${staleLine}. The page still asks a question ` +
           `somebody has already settled. Fold each one into the section that now states it, and ` +
           `take it out of \`Open\`: an answered question is never an entry with the answer ` +
-          `written beside it (05-artifacts.md, The approach document).` };
+          `written beside it (05-artifacts.md, The approach document).`) };
       }
-      const misshapen = pages.flatMap((page) => misshapenCards(page).map((card) => ({ page: basename(page), ...card })));
-      if (misshapen.length) {
-        const named = misshapen.slice(0, 6).map((card) => `${card.number} in ${card.page} (${card.shape})`).join(" · ");
+      const misshapen = pages.flatMap((page) => misshapenCards(page).map((card) => ({ page: fromWorkspace(root, page), ...card })));
+      const shapeLine = misshapen.slice(0, 6).map((card) => `${card.number} in ${card.page} (${card.shape})`).join(" · ");
+      if (misshapen.length && !silent(payload, root, `misshapen|${subject}`, shapeLine)) {
         const more = misshapen.length > 6 ? ` and ${misshapen.length - 6} more` : "";
-        return { note:
-          `A card in \`Open\` is not in the open-card shape — ${named}${more}. An open card is a ` +
+        return { note: named(subject,
+          `A card in \`Open\` is not in the open-card shape — ${shapeLine}${more}. An open card is a ` +
           `\`<div class="sds-open">\` wrapping \`<h4 id="q<n>">\` (RD.DEVEX.WORKSPACE.147); \`div.sds-card\` is ` +
           `the decided shape, so the page shows the question as settled and the rail does not count ` +
           `it. Fold an answered card into the section that states its decision, and rewrite a ` +
-          `question still open in the open shape (05-artifacts.md, A card).` };
+          `question still open in the open shape (05-artifacts.md, A card).`) };
       }
     }
   }
@@ -972,7 +996,7 @@ export function gateDocumentsFirst(payload: Payload): Verdict {
     if (!seatRoot) continue;
     const repo = repoOf(seatRoot, target);
     if (!repo) continue;
-    for (const [subject, pages] of [...openWorkstreams(seatRoot)].sort((a, b) => a[0].localeCompare(b[0]))) {
+    for (const [subject, pages] of [...ownWorkstreams(seatRoot, payload.session_id)].sort((a, b) => a[0].localeCompare(b[0]))) {
       const rows = workstreamPlan(subjectFolders(seatRoot, subject, null), pages);
       if (!rows.some((row) => namesRepo(row.scope, repo))) continue;
       const pending = rows.filter((row) => stateOf(row) !== "landed");
@@ -983,6 +1007,8 @@ export function gateDocumentsFirst(payload: Payload): Verdict {
       const listed = pending.slice(0, 6)
         .map((r) => `  - [${stateOf(r).toUpperCase().padEnd(7)}] ${r.scope} — ${r.label.slice(0, 90)}`).join("\n");
       const more = pending.length > 6 ? `\n  … and ${pending.length - 6} more` : "";
+      // SAID ONCE FOR ONE FINDING: the repository and the rows it names, until a row lands.
+      if (silent(payload, seatRoot, `rows|${subject}|${repo}`, pending.map((r) => `${r.label}:${stateOf(r)}`).join("|"))) continue;
       return { note:
         `Documents-first — workstream \`${subject}\` still has rows that have not landed, and ` +
         `its split plan names ${repo}:\n${listed}${more}\n` +
@@ -994,17 +1020,15 @@ export function gateDocumentsFirst(payload: Payload): Verdict {
     }
   }
 
-  // A PAGE THAT HOLDS ITS OWN COPY OF THE STYLES IS NAMED, where this call names its workstream. The
-  // gate reads every open workstream on every call, so a page of a workstream the call does not name
-  // is left unsaid, and no class of it is read either way. The page the call itself writes is
-  // `doc-check`'s to name, so one call never says it twice.
-  if (root) {
-    const subject = subjectText(payload);
+  // A PAGE THAT HOLDS ITS OWN COPY OF THE STYLES IS NAMED to the window that works on its workstream,
+  // once for one page, and never to a child. The page the call itself writes is `doc-check`'s to name,
+  // so one call never says it twice.
+  if (root && !payload.agent_id) {
     const written = supplied.file_path ? resolve(cwd, supplied.file_path) : null;
-    const unmoved = [...openWorkstreams(root)].sort((a, b) => a[0].localeCompare(b[0]))
-      .filter(([name]) => subject.includes(name))
+    const unmoved = [...ownWorkstreams(root, payload.session_id)].sort((a, b) => a[0].localeCompare(b[0]))
       .flatMap(([, pages]) => ownCopyLines(root, pages.filter((page) => resolve(page) !== written)));
-    if (unmoved.length) return { note: `[RULE] ${unmoved.join("\n[RULE] ")}\n${OWN_COPY_UNREAD}` };
+    if (unmoved.length && !silent(payload, root, "own-copy", unmoved.join("|")))
+      return { note: `[RULE] ${unmoved.join("\n[RULE] ")}\n${OWN_COPY_UNREAD}` };
   }
   return null;
 }

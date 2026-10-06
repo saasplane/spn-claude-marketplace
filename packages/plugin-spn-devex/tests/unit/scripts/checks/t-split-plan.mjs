@@ -5,7 +5,7 @@ import { PLUGIN } from "../../../helpers/harness.mjs";
 // `parity: false` on purpose: the Python cannot see a card answered on the page, which is the defect
 // the port fixes, so agreeing with it there would mean the fix did not land.
 import { execFileSync } from "node:child_process";
-import { workspace } from "../../../helpers/fixture.mjs";
+import { bindOpen, workspace } from "../../../helpers/fixture.mjs";
 
 import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -180,7 +180,8 @@ function py(gate, payload, cwd) {
 let n = 0, failed = 0;
 function one(label, gate, root, toolInput, expect, { says, parity = true, why = "" } = {}) {
   n += 1;
-  const payload = { tool_name: toolInput.command ? "Bash" : "Write", cwd: root, tool_input: toolInput };
+  const payload = { tool_name: toolInput.command ? "Bash" : "Write", cwd: root, tool_input: toolInput, session_id: "t-split-plan" };
+  bindOpen(root, "t-split-plan");
   const [tsV, tsWhy] = ts(gate, payload, root);
   const [pyV] = py(gate, payload, root) ?? [null];
   const saysOk = !says || tsWhy.includes(says);
@@ -354,12 +355,12 @@ const decidedShape = (n) => `  <div class="sds-card" id="q${n}">
 one("2k: a div.sds-card with an h3 in Open is refused, naming the card and the book's shape", "documents-first",
   build("sp-2k-card", { cards: decidedShape(88) }),
   { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md`, content: "x" },
-  "note", { says: "not in the open-card shape — Q88 in a-subject-approach.html (a `div.sds-card`", parity: false, why: "the Python never read the wrapper" });
+  "note", { says: "not in the open-card shape — Q88 in .spndevex/workstreams/open/001-a-subject/a-subject-approach.html (a `div.sds-card`", parity: false, why: "the Python never read the wrapper" });
 
 one("2k: an h4 card wrapped in a div.sds-card is refused too", "documents-first",
   build("sp-2k-h4-card", { cards: card(88, "&mdash;").replace('<div class="sds-open">', '<div class="sds-card">') }),
   { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md`, content: "x" },
-  "note", { says: "Q88 in a-subject-approach.html (an `h4` inside a `div.sds-card`", parity: false, why: "the Python never read the wrapper" });
+  "note", { says: "Q88 in .spndevex/workstreams/open/001-a-subject/a-subject-approach.html (an `h4` inside a `div.sds-card`", parity: false, why: "the Python never read the wrapper" });
 
 one("2k: the refusal states the book's shape and cites RD.DEVEX.WORKSPACE.147", "documents-first",
   build("sp-2k-rule", { cards: decidedShape(88) }),
@@ -374,7 +375,7 @@ one("2k: a div.sds-open + h4 open card passes", "documents-first",
 one("2k: an answered h4 card is still refused as today", "documents-first",
   build("sp-2k-answered", { cards: card(88, "<strong>B.</strong> The other way.") }),
   { file_path: `.spndevex/${WORKSTREAMS}/open/001-a-subject/arcs/N1-something.md`, content: "x" },
-  "note", { says: "Q88 in a-subject-approach.html (the card carries its own decision)", parity: false, why: "this is the defect F5 names — the Python reads only the arcs" });
+  "note", { says: "Q88 in .spndevex/workstreams/open/001-a-subject/a-subject-approach.html (the card carries its own decision)", parity: false, why: "this is the defect F5 names — the Python reads only the arcs" });
 
 one("writing a seat page while the workstream's rows still pend", "documents-first",
   build("sp-seat", { rows: [["the chapter", "spn-foundation", "&#x2705; landed"], ["the check", "probe-repo", ""]] }),
@@ -746,7 +747,8 @@ console.log("\n=== split-plan — a page that holds its own copy of the styles")
   // KNOWN-BAD FOR A READER OF THE SHARED NAMES: every card of this page is a `div.open`, which is the
   // name its own copy of the styles uses. Read by the shared names it would be `not in the open-card shape`.
   const unmoved = build("sp-own-copy", { form: ownPage, cards: ownCard(88, "&mdash;") + ownCard(89, "&mdash;") });
-  const payload = { tool_name: "Write", cwd: unmoved, tool_input: { file_path: ARC, content: "x" } };
+  const payload = { tool_name: "Write", cwd: unmoved, tool_input: { file_path: ARC, content: "x" }, session_id: "t-own-copy" };
+  bindOpen(unmoved, "t-own-copy");
   const [gave, said] = ts("documents-first", payload, unmoved);
   check("[MKT.SCRIPTS.108] the gate names a page with its own copy once, as a RULE line with what to do, and lets the call through",
     gave === "note" && said.split(OWN_COPY).length - 1 === 1 && said.startsWith(`[RULE] \`.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html\``), said);
@@ -757,8 +759,10 @@ console.log("\n=== split-plan — a page that holds its own copy of the styles")
   check("[MKT.SCRIPTS.108] the shape of a card on such a page is not judged",
     splitPlan.misshapenCards(join(unmoved, `.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html`)).length === 0);
 
-  one("[MKT.SCRIPTS.108] a call that names the plan and not that workstream is not told about its page", "documents-first",
-    unmoved, { command: `ls .spndevex/${WORKSTREAMS}/open` }, "silent", { parity: false, why: "the Python knows no shared stylesheet" });
+  // THE WINDOW DECIDES WHO IS TOLD, never the call's text (RD.DEVEX.WORKSPACE.236): a window that works on
+  // no workstream is told nothing about this page, whatever the call names.
+  check("[MKT.SCRIPTS.108] a window that works on no workstream is not told about the page",
+    ts("documents-first", { tool_name: "Bash", cwd: unmoved, tool_input: { command: `ls .spndevex/${WORKSTREAMS}/open/001-a-subject` }, session_id: "t-no-workstream" }, unmoved)[0] !== "note");
 
   one("[MKT.SCRIPTS.108] a write of the page itself is left to doc-check, so one call does not name the page twice", "documents-first",
     unmoved, { file_path: join(unmoved, `.spndevex/${WORKSTREAMS}/open/001-a-subject/a-subject-approach.html`), content: "<h1>x</h1>" },
@@ -766,7 +770,7 @@ console.log("\n=== split-plan — a page that holds its own copy of the styles")
 
   one("[MKT.SCRIPTS.108] a card answered on such a page is still found, because a card is read by its id", "documents-first",
     build("sp-own-copy-answered", { form: ownPage, cards: ownCard(88, "<strong>B.</strong> The other way.") }),
-    { file_path: ARC, content: "x" }, "note", { says: "Q88 in a-subject-approach.html (the card carries its own decision)", parity: false, why: "the Python knows no shared stylesheet" });
+    { file_path: ARC, content: "x" }, "note", { says: "Q88 in .spndevex/workstreams/open/001-a-subject/a-subject-approach.html (the card carries its own decision)", parity: false, why: "the Python knows no shared stylesheet" });
 
   // UNTOUCHED: the same cards on a page in the shared form draw no line at all.
   one("[MKT.SCRIPTS.108] untouched: a page in the shared form is not named", "documents-first",
