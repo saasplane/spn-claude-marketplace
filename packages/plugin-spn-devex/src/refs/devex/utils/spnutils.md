@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/03-utils/01-spnutils.md",
-      "seen": "ef7057a5"
+      "seen": "590fed6a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "f9962ede"
+      "seen": "6c63ca8b"
     }
   ],
   "decisions": [
@@ -136,9 +136,14 @@ routed by each package's own scope.
 
 `apps surface <operation> [package]` finds where a design library and a stack's design system differ,
 with no model reading either one. It is one command with an operation, as `migrate` is, so the tool
-keeps four groups. The operations are `plugin`, `library`, `snapshot`, `gaps` and `status`, and the
-options are `--level`, `--unit` and `--raw`. Every file is under `~/.spnutils/surface/`, and none
-enters a repository.
+keeps four groups. The operations are `plugin`, `library`, `snapshot`, `gaps`, `changes` and `status`,
+and the options are `--level`, `--unit`, `--raw`, `--file` and `--decisions`. `changes <package>` reads
+the gaps, the two snapshots, the raw files and the decisions file, and writes one change file for each
+library file under `~/.spnutils/surface/changes/`, each with `counts` last, and a view of them by
+library file for a person to review. It writes nothing else, and it never touches a repository or
+Figma. `status` also reads the result files that the plugin's update mode saved in
+`~/.spnutils/surface/results/`. Every file is under `~/.spnutils/surface/`, and none enters a
+repository.
 
 **`spnutils` never reads or writes a document — MUST** (`RD.DEVEX.UTILS.071`). `apps test <tier> <run>
 <package>` runs a tier and writes that run's file, `tests/.output/<tier>/runs/<run>.json`, and nothing

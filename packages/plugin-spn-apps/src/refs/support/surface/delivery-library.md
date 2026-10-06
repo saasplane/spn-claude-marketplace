@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/11-delivery-library.md",
-      "seen": "a05c2e8a"
+      "seen": "618c315a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "c31d3ab0"
+      "seen": "8abaff4a"
     }
   ]
 }
@@ -26,6 +26,9 @@ Read this before you add a token or a block to the library, or before you ask wh
 | Design library | the Figma files that draw each named block and token |
 | Snapshot | one file that states a design system in the Surface domain's own words, written from the library and from each stack |
 | Gap | one difference between the library's snapshot and a stack's snapshot, of one closed kind |
+| Change file | one file for one library file, that lists what the plugin's update mode does there, one operation an entry |
+| Result file | the file the update mode saves after an apply, that says what happened to each entry |
+| Decisions file | the short file of what a person settled once, from which the change files are written |
 
 ## The files, by layer — 🔮
 
@@ -59,7 +62,7 @@ In the design library, `color` is a variable mode. `variant`, `size` and the sta
 
 ## What stays in words — 🔮
 
-The library holds the pictures, the properties and the variables. The book states what has no picture: keyboard use and where focus goes; the overlay seam, and translation; a data shape as a whole; the permission gate. A description in the library carries one line and a link to the chapter that states the behavior.
+The library holds the pictures, the properties and the variables. It draws every case a person can see in the showcase, and a line in a description never stands in for a drawing. The book states what no person sees: keyboard use and where focus goes; the overlay seam, and translation; a data shape as a whole; the rule that decides a refusal by the permission gate, whose denied state is drawn. A block with a behaviour and little or no look is stated by its behaviour and its feedback: `DSAuthz`, `DSSticky`, `DSAnchor` and `DSAnchorContainer` have a small sheet of states each, the five formatters share one sheet of formats, `DSAspectRatio` has one sheet of ratios, `DSElementObserver` has an entry with its description and no states, and `DSPortal`, a block of the web alone, has no entry. A description in the library carries one line and a link to the chapter that states the behavior.
 
 ## A value held worked out — 🔮
 
@@ -93,39 +96,52 @@ A gap is one difference between the library's snapshot and a stack's. Its kind i
 | `TOKEN_ABSENT` | a token that one side holds and the other does not |
 | `NAME_UNMAPPED` | a name the naming map does not know, so no comparison was possible |
 
-One gap is a record with the keys `kind`, `level`, `path`, `lacks`, `library` and `stack`. `lacks` is `LIBRARY` or `STACK`, and it is null for `VALUE_DIFFERS` and `NAME_UNMAPPED`, the two kinds that lack nothing on one side. The view prints a dash for it. The record is JSON, named by its package, and it also holds what the gaps were compared from and a count of what could not be compared. A view of one line for each gap is written from the record and is never edited.
+One gap is a record with the keys `kind`, `level`, `path`, `lacks`, `library` and `stack`. `lacks` is `LIBRARY` or `STACK`, and it is null for `VALUE_DIFFERS` and `NAME_UNMAPPED`, the two kinds that lack nothing on one side. The view prints a dash for it. The record is JSON, named by its package, and it also holds what the gaps were compared from and a count of what could not be compared. It holds `rulesApplied` too, the count of gaps each rule of the comparison left out. A view of one line for each gap is written from the record and is never edited.
 
 The view stays short by five rules. A `UNIT_ABSENT` line replaces every line under that unit. Many `VALUE_ABSENT` gaps on one prop become one line with a list. What could not be compared is a count in the footer and never a line. Level 3 is written only for the units that levels 1 and 2 flagged. **A person and a model read the gaps, and never the library.**
 
 ## Reading the library
 
-A plugin of SaaS Plane's own, run by hand in the Figma desktop app, reads the library file that is open and saves it as one raw file. There is one run, and one raw file, for each of the five library files. Lab is never read.
+A plugin of SaaS Plane's own, run by hand in the Figma desktop app, works on the library file that is open. It has two modes, Read and Update. There is one run, and one file saved, for each of the five library files. Lab is never read.
 
-- **The plugin MUST only read.** It creates, sets, moves and deletes nothing, and it asks for no network.
+- **The read mode MUST only read.** It creates, sets, moves and deletes nothing, and it saves what it read as one raw file. The plugin asks for no network in either mode.
+- **The update mode MUST act on the open file alone, and MUST apply only what a change file names, only after the person has seen the dry run and pressed apply.** It MUST save a named version before its first operation, and it MUST NEVER publish.
 - **A run MUST ask for one save.** A cancelled save leaves the window open with a button that saves the same result and makes no new read.
 - **A change MUST be published before it is read.** A raw file holds what its file held when it was read.
-- **The raw file holds the facts as Figma names them**, with no rule of ours applied. Its keys are `rawVersion`, `file`, `collections`, `styles`, `pages` and `counts`. **`counts` MUST be written last**: eight numbers that prove the file whole. The command that writes the library's snapshot refuses a file with no `counts`, with counts that differ from what it holds, or of an unknown `rawVersion`, and names the file.
+- **The raw file holds the facts as Figma names them**, with no rule of ours applied. Its keys are `rawVersion`, `file`, `collections`, `styles`, `pages` and `counts`. `rawVersion` is `2`: a version holds its own frame, a layer holds its sizing, and a text layer holds its case and its decoration, and a file of version 1 is still read and lacks those three facts. **`counts` MUST be written last**: eight numbers that prove the file whole. The command that writes the library's snapshot refuses a file with no `counts`, with counts that differ from what it holds, or of an unknown `rawVersion`, and names the file.
 - **Every library file MUST have a raw file before the library's snapshot is written.** A unit in one file is bound to a variable of another, so no file can be read alone.
 - **The naming map is the one place a design tool's name appears.** It is one file kept inside the stack's tool. It maps by rule first and by exception second, and a name it does not know is a `NAME_UNMAPPED` gap, never a guess. It holds, for example, a boolean drawn as a variant with two values (a flag prop), a `BOOLEAN` switch that shows a part (the presence of a content prop), a `state` variant (a shown state, never a prop), a page name (a group name, with the layer from the file) and a one-value token such as `radius/base` (`theme.radius`).
 - **A model MUST NOT read the library, a raw file or a snapshot to find a gap.** It reads the gaps.
+
+## Bringing the library to a stack
+
+For the pass of workstream 021, arc N020, the web's design system is the baseline, and the library and the book are brought to it. After it, a change is stated in the book first, drawn in the library second and built in a stack third. A person settles what a gap cannot give once, in the decisions file. The command `spnutils apps surface changes <package>` reads the gaps, the two snapshots, the raw files and the decisions file, and writes one change file for each library file, with `counts` last, and a view of them by library file for a person to review.
+
+- **A change file holds operations of fourteen kinds, one entry each.** Each kind is done by the plugin alone, or prepared by the plugin and drawn by a person. Its keys are `changesVersion`, `file`, `madeAgainst`, `decidedIn`, `pluginVersionNeeded`, `operations` and `counts`.
+- **The dry run changes nothing, and apply MUST be available only when no operation is refused.** The plugin refuses a change file made for another library file or against an older state of the library, and an entry whose expected value is not what the file holds.
+- **The result file says one outcome for each entry:** `DONE`, `PREPARED`, `SKIPPED` or `REFUSED`, with `counts` last. The command `status` reads the result files.
+- **A rule of the comparison removes a gap only when a named fact proves it, and `rulesApplied` MUST count it.** The comparison leaves out what is not a unit, and it reads the props the stack declares. A second reader of the web's snapshot reads from the running showcase the values that only a browser works out.
 
 ## Drawing a block
 
 - A block drawn from data is a host and an item. One item serves every host that takes one data shape (`architecture-components.md`).
 - Each shared state has one picture, on every block and on every kind of surface (`architecture-names.md`).
-- An overlay is drawn as its surface alone, placed over a `DSBackdrop`, and its extent is the size of the instance. It draws no width of its own.
+- An overlay is drawn as its surface alone, placed over a `DSBackdrop`, and its extent is the size of the instance. It draws no width of its own, and the library draws no `extent` variant.
 - A popup or an overlay that a block opens is a private part of that block, shown by the switch `open`. It is never a block a designer places on a page of its own.
 - A value that only changes which published block sits in a slot is no variant. The slot holds the block.
 
 ## Boundary
 
-This ref states what the library draws, how its files are layered, and what stays in words because no picture can hold it. It does not state which blocks or tokens exist — that is `architecture-components.md` and `architecture-core.md`. It does not state how a stack builds what the library draws, or what proves it did — that is `providers.md` and `delivery-showcase.md`.
+This ref states what the library draws, how its files are layered, and what stays in words because no person sees it. It does not state which blocks or tokens exist — that is `architecture-components.md` and `architecture-core.md`. It does not state how a stack builds what the library draws, or what proves it did — that is `providers.md` and `delivery-showcase.md`.
 
 ## Binds
 
 | Rule | What it decides |
 | --- | --- |
 | `RD.SUPPORT.APPS.141` | the design library draws the look of each named block, and behavior stays in words |
+| `RD.SUPPORT.SURFACE.025` | for this pass the web's design system is the baseline the library and the book are brought to, and a change after it is stated in the book first, drawn in the library second and built in a stack third |
+| `RD.SUPPORT.SURFACE.026` | the library draws every case the showcase shows, and states a block with a behaviour and little or no look by its behaviour and its feedback |
+| `RD.SUPPORT.SURFACE.027` | the plugin has a read mode and an update mode, and the update mode writes only what a change file names, only in the open file, only after a dry run and an apply, and never publishes |
 
 ## Proof
 

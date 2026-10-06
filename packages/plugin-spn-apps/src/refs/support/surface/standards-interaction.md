@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/02-standards-interaction.md",
-      "seen": "8573358f"
+      "seen": "8896986b"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/02-standards-interaction/",
@@ -57,7 +57,7 @@ A block drawn from data, such as a table or a list, shows every one of the six. 
 
 Every action answers the person: working, and then done or failed. Silence is never an answer. So an action shows that it is working as soon as it starts, then that it is done or that it failed. Feedback is drawn by blocks of the design system, never by a page's own picture — working, done and failed look the same on every page of every app.
 
-A failed state says what went wrong, and gives the way back to where the person was. An interruption follows the same rule: it says why it interrupts, it answers, and it returns the person and their focus to the place they left, raised through one seam so every interruption inherits one behavior for focus, for leaving and for stacking. A denied state is presentation only — it tells the person they are refused, and protects nothing; the refusal itself is the server's.
+A failed state says what went wrong, and gives the way back to where the person was. An interruption follows the same rule: it says why it interrupts, it answers, and it returns the person and their focus to the place they left, raised through one seam so every interruption inherits one behavior for focus, for leaving and for stacking. A denied state is presentation only — it tells the person they are refused, and protects nothing; the refusal itself is the server's. The design library draws the denied state of a block that can refuse a person, and the rule that decides it stays in words.
 
 ## Input, by kind of surface — 🔮
 

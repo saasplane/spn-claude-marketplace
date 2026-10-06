@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "c31d3ab0"
+      "seen": "8abaff4a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "2b7a6384"
+      "seen": "493812c5"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/08-architecture-containers/",
@@ -75,7 +75,7 @@ The design library holds one file for each layer of the design system that is dr
 
 ## How a block is drawn
 
-- **An overlay is drawn as its surface alone, placed over a `DSBackdrop`, and its extent is the size of the instance.** It draws no width of its own; the instance placed on the canvas decides it.
+- **An overlay is drawn as its surface alone, placed over a `DSBackdrop`, and its extent is the size of the instance.** It draws no width of its own, and the library draws no `extent` variant; the instance placed on the canvas decides it.
 - **A popup or an overlay that a block opens is a private part of that block, shown by the switch `open`.** It is never a block a designer places on a page of its own.
 - **A value that only changes which published block sits in a slot is no variant.** The slot already makes that choice, so a variant for it would repeat the choice and need a new version for each block that may sit there.
 
