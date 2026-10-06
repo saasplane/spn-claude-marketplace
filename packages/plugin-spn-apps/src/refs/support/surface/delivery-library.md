@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/11-delivery-library.md",
-      "seen": "618c315a"
+      "seen": "81ec37a9"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "8abaff4a"
+      "seen": "6a799846"
     }
   ]
 }
@@ -115,7 +115,7 @@ A plugin of SaaS Plane's own, run by hand in the Figma desktop app, works on the
 
 ## Bringing the library to a stack
 
-For the pass of workstream 021, arc N020, the web's design system is the baseline, and the library and the book are brought to it. After it, a change is stated in the book first, drawn in the library second and built in a stack third. A person settles what a gap cannot give once, in the decisions file. The command `spnutils apps surface changes <package>` reads the gaps, the two snapshots, the raw files and the decisions file, and writes one change file for each library file, with `counts` last, and a view of them by library file for a person to review.
+A change of the surface is stated in the construct first, drawn in the library second and built in the web or a native stack third. An improvement is taken in the same order. A person settles what a gap cannot give once, in the decisions file. The command `spnutils apps surface changes <package>` reads the gaps, the two snapshots, the raw files and the decisions file, and writes one change file for each library file, with `counts` last, and a view of them by library file for a person to review.
 
 - **A change file holds operations of fourteen kinds, one entry each.** Each kind is done by the plugin alone, or prepared by the plugin and drawn by a person. Its keys are `changesVersion`, `file`, `madeAgainst`, `decidedIn`, `pluginVersionNeeded`, `operations` and `counts`.
 - **The dry run changes nothing, and apply MUST be available only when no operation is refused.** The plugin refuses a change file made for another library file or against an older state of the library, and an entry whose expected value is not what the file holds.
@@ -139,7 +139,7 @@ This ref states what the library draws, how its files are layered, and what stay
 | Rule | What it decides |
 | --- | --- |
 | `RD.SUPPORT.APPS.141` | the design library draws the look of each named block, and behavior stays in words |
-| `RD.SUPPORT.SURFACE.025` | for this pass the web's design system is the baseline the library and the book are brought to, and a change after it is stated in the book first, drawn in the library second and built in a stack third |
+| `RD.SUPPORT.SURFACE.025` | a change of the surface is stated in the construct first, drawn in the library second and built in the web or a native stack third |
 | `RD.SUPPORT.SURFACE.026` | the library draws every case the showcase shows, and states a block with a behaviour and little or no look by its behaviour and its feedback |
 | `RD.SUPPORT.SURFACE.027` | the plugin has a read mode and an update mode, and the update mode writes only what a change file names, only in the open file, only after a dry run and an apply, and never publishes |
 
