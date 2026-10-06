@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/11-delivery-library.md",
-      "seen": "38fc95b3"
+      "seen": "5877f9c7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "144553cd"
+      "seen": "df99332a"
     }
   ]
 }
@@ -119,12 +119,12 @@ A plugin of SaaS Plane's own, run by hand in the Figma desktop app, works on the
 
 A change of the surface is stated in the construct first, drawn in the library second and built in the web or a native stack third. An improvement is taken in the same order. A person settles what a gap cannot give once, in the decisions file. The command `spnutils apps surface library-plan <package>` reads the gaps, the two snapshots, the raw files and the decisions file, and writes one plan for each library file into `plugin-input/<package>/`, with `counts` last, and a view of the plans by library file, `compare/<package>/library-plan.md`, for a person to review. The library is the side that changes, and a plan shows what would change there before anything is applied.
 
-- **A plan holds operations of eighteen kinds, one entry each.** Each kind is done by the plugin alone, or prepared by the plugin and drawn by a person, or is the work of a person from the start: `LAYERS_REBIND`, `LAYER_REMOVE`, `DRAWING_REPLACE` and `CASES_DRAW`. The plugin checks these four where it can, and a person confirms a drawing. Its keys are `planVersion`, `file`, `madeAgainst`, `decidedIn`, `pluginVersionNeeded`, `operations` and `counts`.
+- **A plan holds operations of eighteen kinds, one entry each, and the plugin completes every one.** A person draws, rebinds, removes and confirms nothing in Figma: a person chooses a plan, reads the dry run and presses apply, and sends a picture to the agent when something looks wrong. Five kinds make a place (`VARIANT_PROPERTY_ADD`, `VARIANT_VALUE_ADD`, `SET_CREATE_EMPTY`, `SHEET_PLACE` and `CASES_DRAW`), and each carries `changes`, a list of exact changes from a closed set of eight kinds: `SET`, `BIND`, `ADD`, `COPY`, `REMOVE`, `BASE`, `SWAP` and `DRAWING`. A decision that draws and gives none is refused by name. Its keys are `planVersion` (`2`), `file`, `madeAgainst`, `decidedIn`, `pluginVersionNeeded`, `operations` and `counts` (`operations`, `doneByPlugin`, `expectedSkips`).
 - **The tool's folder, `~/.spnutils/surface/`, is ordered around the plugin, and the tool writes only under `plugin/`, `plugin-input/` and `compare/`.** The plugin saves into `plugin-output/raw/` and `plugin-output/results/<package>/`, a person writes `decisions/<package>.decisions.json`, and the tool never writes in those two. `spnutils apps surface plugin` makes the whole tree, and run again it leaves every other folder and file as it was.
-- **A removal of a variable or a style is written by its usage in the raw file.** Bound by no layer: the plugin alone removes it. Bound by layers: a `LAYERS_REBIND` entry for a person comes first, naming each page and path up to 20 and the whole count, and the removal follows. Usage not known, from a raw file of version 1 or 2: the removal is written as checked when applied, and the view says so.
+- **A removal of a variable or a style is written by its usage in the raw file.** Bound by no layer: the plugin alone removes it. Bound by layers: a `LAYERS_REBIND` entry comes first, which the plugin does by binding those layers to the variable the decision names or by letting them go, naming each page and path up to 20 and the whole count, and the removal follows. With no such decision the variable is refused by name. Usage not known, from a raw file of version 1 or 2: the removal is written as checked when applied, and the view says so.
 - **A decision matches a gap exactly.** A gap's key is its path, and for `VALUE_ABSENT` the path, `=` and the value. A decision's subject is one key or a list of keys, each compared as written and never as a prefix. The command refuses, by name, a decision that changes the library and matches no gap, and a gap that two decisions match.
-- **The dry run changes nothing, and apply is available only when no operation is refused, unless the person ticks the box that applies the ready entries and leaves the refused ones.** The plugin refuses a plan made for another library file or against an older state of the library, an entry whose expected value is not what the file holds, and the removal of a variable or a style that layers bind, naming up to 20 of those layers by page and path. An entry that a person completes never holds apply back.
-- **The result file says one outcome for each entry:** `DONE`, `PREPARED`, `SKIPPED`, `REFUSED`, `CHECKED`, `OPEN` or `CONFIRMED`, with `run.leftRefused` and `counts` last. The command `status` reads the result files.
+- **The dry run changes nothing, and apply is available only when no operation is refused, unless the person ticks the box that applies the ready entries and leaves the refused ones.** The plugin refuses a plan made for another library file or against an older state of the library, an entry whose expected value is not what the file holds, and the removal of a variable or a style that layers bind, naming up to 20 of those layers by page and path, and a change that names a layer, a field, a value or a variable that does not fit. For an entry that makes versions it shows the count of versions made and each change as layer, field, before and after.
+- **The result file says one outcome for each entry:** `DONE`, `SKIPPED`, `REFUSED` or `FAILED` (an entry that was undone), with `run.leftRefused` and `counts` last. The command `status` reads the result files.
 - **A rule of the comparison removes a gap only when a named fact proves it, and `rulesApplied` MUST count it.** The comparison leaves out what is not a unit, and it reads the props the stack declares. A second reader of the web's snapshot reads from the running showcase the values that only a browser works out.
 
 ## Drawing a block
