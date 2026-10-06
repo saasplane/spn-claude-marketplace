@@ -9,15 +9,15 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The reply while work runs shows what needs you, then what moved",
-      "seen": "335e7f56"
+      "seen": "10f96eb0"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
-      "seen": "a129d0d0"
+      "seen": "b4becba7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "5a719241"
+      "seen": "363cc220"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -255,7 +255,10 @@ a second question. The full card stays on the approach page, where anybody can r
 (`RD.DEVEX.WORKSPACE.197`). The cards under **Needs you** are the ones on that workstream's page. A
 card on another workstream's page belongs to the window that works there, so you do not repeat it.
 When you help shape an idea and a new workstream is opened from it, that workstream is yours from then
-on, and you ask its cards here.
+on, and you ask its cards here. A workstream is yours when a write of this window put its path inside
+the folder, or when your first prompt or a handover named it; a log line that only mentions another
+workstream makes it nobody's but the window that works there (`RD.DEVEX.WORKSPACE.236`). A window that
+works on no workstream asks no card.
 
 **Agent reports, test and check output, and hook replies go to the arc's log, never the chat.** They
 are the record, and the log is where the record lives. In the chat they bury the one thing the
@@ -277,8 +280,42 @@ check does not judge the answer a second time. Fix what you can fix in that repl
 cannot fix, and leave it: repeating it changes nothing.
 
 **A window is held only for work it did — MUST.** The checks that read a workstream's page, its arcs
-and its cards read the workstreams this window has written to, and no others. A workstream another
-window is still writing is unfinished rather than wrong, and that window hears about it.
+and its cards read the workstreams bound to this window, and no others. A workstream another window
+is still writing is unfinished rather than wrong, and that window hears about it. A window that works
+on no workstream is held for none.
+
+**A window's workstreams are bound by the path it wrote, never by what it wrote — MUST**
+(`RD.DEVEX.WORKSPACE.236`). The plugin keeps a note of its own for each session in
+`.spndevex/.debug/windows/`, named by Claude Code's session id and removed after fourteen days. It
+lists the workstream folders the window has worked on, the time it last wrote each arc, and the last
+finding of each note it was told. No person reads it, and it never says which state a workstream is
+in: the folder tree says that.
+
+| What the window did | Binds? |
+| --- | --- |
+| Wrote, edited or moved a file whose path is inside `.spndevex/workstreams/{open,backlog,closed}/{NNN}-{subject}/`, in its own turn or in a child's call | **yes**, that workstream |
+| Sent a first prompt that names exactly one workstream folder, or a handover whose `continue:` line names one | **yes**, even before it writes |
+| Read a file in a workstream, or ran a command that only reads | no |
+| Wrote text that names another workstream's folder or page, in a log line, a card or a brief | no: only the path of a write counts |
+| Sent a prompt that names two workstream folders and holds no handover | neither |
+
+A workstream that leaves `open/` drops out of the window's set. Two windows on one workstream each
+hear it, and two windows on two workstreams each hear only their own. A call a child makes counts
+for the window that dispatched it, and the child hears no note about cards or pages.
+
+**A hook speaks only of this window's workstreams, before a tool runs as well as at the end of a
+turn — MUST** (`RD.DEVEX.WORKSPACE.236`). Some checks stay across the workspace on purpose, because
+they are not about a window: the listing at the start of a session, a major release's go (it names a
+version), the close of a workstream (it names the folder the command moves), and the checks of one
+written file (they name the file).
+
+**A message about a workstream names it — MUST.** It gives the workstream's folder name, such as
+`021-figma-design-standard`, and gives a page or an arc by its path from the workspace, never by its
+base name alone.
+
+**A note before a tool runs speaks once for one finding — MUST.** The same finding, with the same
+cards or rows, is not said again until it changes. The end-of-turn card list of
+`RD.DEVEX.WORKSPACE.189` is never hidden by it.
 
 **A handover is a reply that sends the work to another session, never a word in a reply.** You owe
 the handover block only when your reply directs somebody there: it says to open or continue in another

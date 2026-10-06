@@ -14,7 +14,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The reply while work runs shows what needs you, then what moved",
-      "seen": "335e7f56"
+      "seen": "10f96eb0"
     }
   ]
 }
@@ -164,7 +164,9 @@ then what moved* holds that shape.
 
 **The cards named there are those of the workstream you are working on — MUST**
 (`RD.DEVEX.WORKSPACE.197`). A card on another workstream's page belongs to the window that works
-there. A workstream you open while you help shape an idea is yours from then on.
+there. A workstream you open while you help shape an idea is yours from then on. A workstream is
+yours when this window wrote a file inside its folder, or its first prompt or a handover named it
+(`RD.DEVEX.WORKSPACE.236`); a window that works on none asks no card.
 
 **An answer lands in the arc's notes in the same turn — MUST** (`RD.DEVEX.WORKSPACE.193`): in the
 card, answered and folded; in the arc, as a log line and a change to every row it affects; and in the
