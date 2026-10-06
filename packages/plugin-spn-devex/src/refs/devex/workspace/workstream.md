@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "b6a9ba62"
+      "seen": "3481fa00"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -311,7 +311,10 @@ for the window that dispatched it, and the child hears no note about cards or pa
 turn — MUST** (`RD.DEVEX.WORKSPACE.236`). Some checks stay across the workspace on purpose, because
 they are not about a window: the listing at the start of a session, a major release's go (it names a
 version), the close of a workstream (it names the folder the command moves), and the checks of one
-written file (they name the file).
+written file (they name the file). The check of the docs trees is not among them: a window is told of a
+docs finding only for a repository it has itself written under, by path. A finding in a file that is
+changed and not committed is work in progress, and the message says the file is uncommitted. A stored
+verdict's message says only what was compared. Every finding names its repository.
 
 **A message about a workstream names it — MUST.** It gives the workstream's folder name, such as
 `021-figma-design-standard`, and gives a page or an arc by its path from the workspace, never by its
