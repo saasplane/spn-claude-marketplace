@@ -3,13 +3,17 @@
 // Passed to the Figma connector's `use_figma` as it is. A plain script with top-level `await` and
 // `return`, no wrapper. Fill INPUTS, change nothing else.
 //
-// It changes only the set, its versions, and the top-level nodes named in `mayMove`. DRY IS THE
+// It changes only the set, its versions, and the nodes named in `mayMove` that share the set's parent. DRY IS THE
 // DEFAULT: with `dryRun: true` it changes nothing and returns what would move. Set `dryRun: false`
 // only after a dry run came back with `mode: "dry"` and a plan the developer's order allows.
 //
-// The label. The set's header label is the top-level text whose text begins with the set's name and ` — `
-// (its layer is named `label · ` and the text, but a header whose layer lacks the prefix is still the header).
-// After that, clauses are separated by ` · `, in the book's form:
+// The home. A set stands in a section, or on the page itself in the old form. Its home is that section or that
+// page: the header and the labels are found among the home's own children, and the set is checked against the
+// other children of the home, in the home's coordinates, which are the set's own.
+//
+// The label. The set's header label is the text in the home whose text begins with the set's name and ` — `
+// (its layer is named `header · ` and the unit's name, or `label · ` and the text in the old form; a header
+// whose layer name is neither is still the header). After that, clauses are separated by ` · `, in the book's form:
 //
 //   rows: variant=SOLID, OUTLINE x size=MD, XS, SM       the first factor runs slowest; ` x ` joins factors
 //   columns: case=text, block, new tab, disabled         a bare value takes the property before it
@@ -21,7 +25,7 @@
 // reason. This script lays out an axis only when every cell of one factor names one property.
 //
 // Before anything moves it checks the plan: no version outside the set, no two versions meeting,
-// no two top-level nodes meeting, and the version at the top left carrying `defaults` (every
+// no two nodes of the home meeting, and the version at the top left carrying `defaults` (every
 // property of the set, as the stack gives them). A failed check moves nothing. The answer holds the
 // default version before and after, the set's box before and after, and the counts.
 //
@@ -41,6 +45,7 @@ const INPUTS = {
 
 // ---- the book's label form: begin (this block is the same in page.js and layout.js)
 const LABEL_PREFIX = "label · ";
+const HEADER_PREFIX = "header · ";
 const SAMPLE_PREFIX = "sample · ";
 const UNIT_SEPARATOR = " — ";
 const CLAUSE_SEPARATOR = " · ";
@@ -192,16 +197,17 @@ await figma.setCurrentPageAsync(page);
 const setBoxBefore = boxOf(set);
 const defaultBefore = defaultVersionName(set);
 const versions = set.children.filter((child) => child.type === "COMPONENT");
-const identity = { set: { id: set.id, name: set.name }, page: { id: page.id, name: page.name }, defaultBefore, setBoxBefore };
+const home = set.parent.type === "SECTION" ? set.parent : page;
+const identity = { set: { id: set.id, name: set.name }, page: { id: page.id, name: page.name }, home: { id: home.id, name: home.name, type: home.type }, defaultBefore, setBoxBefore };
 
 if (versions.length === 0) return refusal([`the set ${set.id} holds no version`], identity);
 
 // 1. The label, and what it says.
-const labels = page.children.filter((node) =>
+const labels = home.children.filter((node) =>
   node.type === "TEXT" && !node.name.startsWith(SAMPLE_PREFIX) && node.characters.startsWith(set.name + UNIT_SEPARATOR));
 if (labels.length !== 1) {
   return refusal([labels.length === 0
-    ? `no label on this page names ${set.name}: a set whose label states no layout is reported, not laid out`
+    ? `no label in ${home.type === "PAGE" ? "this page" : `the section ${home.name}`} names ${set.name}: a set whose label states no layout is reported, not laid out`
     : `${labels.length} labels name ${set.name}`], identity);
 }
 const label = labels[0];
@@ -275,8 +281,8 @@ for (const [cell, version] of cells) {
   placements.push({ version, box: [columnX.get(column), rowY.get(row), version.width, version.height] });
 }
 
-// A top-level node that may move, and that would meet the planned set, goes to its right.
-const topLevel = page.children.filter((node) => node.id !== set.id)
+// A node of the home that may move, and that would meet the planned set, goes to its right.
+const topLevel = home.children.filter((node) => node.id !== set.id)
   .map((node) => ({ node, id: node.id, box: boxOf(node) }));
 const nodeMoves = [];
 for (const entry of topLevel) {
@@ -307,7 +313,7 @@ const checks = {
 const failed = [];
 if (outside.length > 0) failed.push(`${outside.length} version(s) would be outside the set: ${outside.slice(0, 5).join(", ")}`);
 if (versionPairs.length > 0) failed.push(`${versionPairs.length} pair(s) of versions would meet: ${JSON.stringify(versionPairs.slice(0, 5))}`);
-if (topLevelPairs.length > 0) failed.push(`${topLevelPairs.length} pair(s) of top-level nodes would meet: ${JSON.stringify(topLevelPairs.slice(0, 5))}`);
+if (topLevelPairs.length > 0) failed.push(`${topLevelPairs.length} pair(s) of nodes in ${home.type === "PAGE" ? "the page" : "the section"} would meet: ${JSON.stringify(topLevelPairs.slice(0, 5))}`);
 if (wrongDefaults.length > 0) failed.push(`the top-left version ${plannedTopLeft.name} does not carry the given defaults: ${JSON.stringify(wrongDefaults)}`);
 
 const moves = placements.filter((placement) => placement.version.x !== placement.box[0] || placement.version.y !== placement.box[1]);
@@ -339,7 +345,7 @@ const after = set.children.filter((child) => child.type === "COMPONENT");
 const outsideAfter = after.filter((version) =>
   version.x < 0 || version.y < 0 || version.x + version.width > set.width || version.y + version.height > set.height).length;
 const versionPairsAfter = pairsThatMeet(after.map((version) => ({ id: version.id, box: boxOf(version) }))).length;
-const topLevelPairsAfter = pairsThatMeet(page.children.map((node) => ({ id: node.id, box: boxOf(node) }))).length;
+const topLevelPairsAfter = pairsThatMeet(home.children.map((node) => ({ id: node.id, box: boxOf(node) }))).length;
 return {
   ...summary,
   mode: "applied",

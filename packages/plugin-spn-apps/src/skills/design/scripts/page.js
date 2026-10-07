@@ -7,21 +7,30 @@
 //   pageId null      lists the file's pages (id, name) and stops. No page switch.
 //   report inventory what the book's inventory holds for the agent's own work: the page, each set and
 //                    lone component, each sheet of cases, each label with its layer name, full text and
-//                    the unit it names, each sample, each reference frame and every other top-level node.
-//                    Every node carries `index`, its place in the page's order, and `name`, its layer name.
-//                    `from` and `to` take a range of top-level nodes by `index`, and the answer stops by
-//                    itself before `maxBytes`, returning `next` to continue from.
+//                    the unit it names, each sample, each section, each reference frame and every other node.
+//                    Every node carries `index`, its place in the page's order (the walk down through the
+//                    sections), `name`, its layer name, and, inside a section, `parent`, that section's id.
+//                    `from` and `to` take a range of nodes by `index`, and the answer stops by itself before
+//                    `maxBytes`, returning `next` to continue from.
 //   report scan      the last scan before a publish. It always reads the whole page, because a pair that
 //                    meets or a label whose unit is elsewhere needs every node. Its answer is counts and
-//                    the first items of each finding.
+//                    the first items of each finding, the page's `form` and what it `read`. A scan that found
+//                    no unit is not clean: `emptyReading` says so.
 //   report both      the two together, for a small page. The whole answer stays under `maxBytes`: the scan
 //                    gives up items first, then the inventory stops early, and `cut` says what was left out.
 //
-// Boxes are [x, y, width, height]. A set's versions carry their own box inside the set.
+// The form of a page is `sections` when its top level holds a section, `flat` when it holds nodes and no
+// section (the old form), `empty` when it holds nothing. A page is read in either form: the walk goes through
+// sections, and sections inside sections for parts, and stops at every other node.
 //
-// A top-level node is one of: a set, a component, a sheet (a frame named `<unit> cases`), a label (a text
-// that is a header, a row label or a column label), a sample (`sample · ...`), a reference frame (a frame on
-// a page that holds no set and no component), or other. Only `other` is a stray.
+// Boxes are [x, y, width, height], in the page's coordinates (a node's own x and y plus the origins of the
+// sections above it), so that a label and a row, or two nodes, are always compared in one frame of reference.
+// A set's versions carry their own box inside the set.
+//
+// A node is one of: a section, a set, a component, a sheet (a frame named `<unit> cases`), a label (a text
+// that is a header, a row label, a column label or a band's label), a sample (`sample · ...`), a reference
+// frame (a frame on a page that holds no set and no component), or other. Only `other` is a stray. A header's
+// layer is `header · <Unit>`; every other label's is `label · <text>`.
 //
 // A row label belongs to the row it sits by and a column label to the column it sits by: the label's centre
 // must lie inside the span of one row (or column) of a set's versions, with the label beside the set (left
@@ -40,6 +49,7 @@ const INPUTS = {
 
 // ---- the book's label form: begin (this block is the same in page.js and layout.js)
 const LABEL_PREFIX = "label · ";
+const HEADER_PREFIX = "header · ";
 const SAMPLE_PREFIX = "sample · ";
 const UNIT_SEPARATOR = " — ";
 const CLAUSE_SEPARATOR = " · ";
@@ -191,6 +201,11 @@ function isSheet(node) {
   return (node.type === "FRAME" || node.type === "SECTION") && node.name.endsWith(SHEET_SUFFIX);
 }
 
+// A section that is no sheet holds a unit, or a unit's parts, or the shared parts.
+function isSection(node) {
+  return node.type === "SECTION" && !isSheet(node);
+}
+
 // One set, read once. The definitions come from the set, inside a try, because they throw from a
 // version. The default version is the one Figma reports; the top left is the one found by position.
 function readSet(set) {
@@ -217,10 +232,26 @@ function readSet(set) {
   return { set, versions, definitions, readError, props, defaultVersion, topLeftVersion: topLeft?.name ?? null };
 }
 
-// ---- the page's top-level nodes, sorted into their kinds
-const pageHoldsUnits = page.children.some((node) => node.type === "COMPONENT_SET" || node.type === "COMPONENT");
+// ---- the page's nodes, sorted into their kinds
+// The walk goes down through sections (and sections inside sections, for parts) and no further. A node's box
+// is in page coordinates, found by adding the origins of the sections above it, so every comparison is made in
+// one frame of reference.
+const placed = [];
+function collect(parent, depth) {
+  for (const node of parent.children) {
+    placed.push({ node, depth, parentId: depth === 0 ? null : parent.id });
+    if (isSection(node)) collect(node, depth + 1);
+  }
+}
+function absoluteBox(node) {
+  let [x, y] = [node.x, node.y];
+  for (let up = node.parent; up && up.type !== "PAGE"; up = up.parent) { x += up.x; y += up.y; }
+  return [x, y, node.width, node.height];
+}
+collect(page, 0);
+const pageHoldsUnits = placed.some(({ node }) => node.type === "COMPONENT_SET" || node.type === "COMPONENT");
 const unitNames = new Set();
-for (const node of page.children) {
+for (const { node } of placed) {
   if (node.type === "COMPONENT_SET" || node.type === "COMPONENT") unitNames.add(node.name);
   if (isSheet(node)) { unitNames.add(node.name); unitNames.add(node.name.slice(0, -SHEET_SUFFIX.length)); }
 }
@@ -244,14 +275,27 @@ function kindOf(node) {
   if (node.type === "COMPONENT") return "component";
   if (isSheet(node)) return "sheet";
   if (isSample(node)) return "sample";
-  if (node.type === "TEXT" && (node.name.startsWith(LABEL_PREFIX) || isHeaderText(textOf(node) ?? ""))) return "label";
+  if (isSection(node)) return "section";
+  if (node.type === "TEXT" && (node.name.startsWith(LABEL_PREFIX) || node.name.startsWith(HEADER_PREFIX) || isHeaderText(textOf(node) ?? ""))) return "label";
   if ((node.type === "FRAME" || node.type === "SECTION") && !pageHoldsUnits) return "reference";
   return "other";
 }
 
-const topLevel = page.children.map((node, index) => ({ node, index, kind: kindOf(node), box: boxOf(node) }));
-const unitNodes = topLevel.filter((entry) => ["set", "component", "sheet"].includes(entry.kind));
-const sets = topLevel.filter((entry) => entry.kind === "set");
+const entries = placed.map((item, index) => ({ ...item, index, kind: kindOf(item.node), box: absoluteBox(item.node) }));
+const topLevel = entries.filter((entry) => entry.depth === 0);
+const sets = entries.filter((entry) => entry.kind === "set");
+const form = topLevel.length === 0 ? "empty" : topLevel.some((entry) => entry.kind === "section") ? "sections" : "flat";
+const BAND_LABELS = ["Cases", "Samples", "Parts"];
+// The unit a set, a lone component or a sheet stands for: a case component is no unit of its own.
+const unitEntryByName = new Map();
+for (const entry of entries) {
+  const isUnit = entry.kind === "set" || (entry.kind === "component" && !CASE_NAME.test(entry.node.name));
+  if (isUnit) unitEntryByName.set(entry.node.name, entry);
+}
+for (const entry of entries) {
+  const unit = entry.node.name.slice(0, -SHEET_SUFFIX.length);
+  if (entry.kind === "sheet" && !unitEntryByName.has(unit)) unitEntryByName.set(unit, entry);
+}
 
 // The rows and columns of a set, as the spans its versions fill on the page: [start, end] along y and x.
 const spanCache = new Map();
@@ -291,19 +335,24 @@ function tieOfValueLabel(entry) {
 
 function readLabel(entry) {
   const text = textOf(entry.node) ?? "";
-  if (isHeaderText(text)) {
+  const named = entry.node.name.startsWith(HEADER_PREFIX);
+  if (named || isHeaderText(text)) {
     const parsed = parseHeader(text);
-    const head = text.slice(0, text.indexOf(UNIT_SEPARATOR));
+    const cut = text.indexOf(UNIT_SEPARATOR);
+    const head = cut > 0 ? text.slice(0, cut) : entry.node.name.slice(HEADER_PREFIX.length);
     const forSheet = head.endsWith(SHEET_SUFFIX);
     const unit = forSheet ? head.slice(0, -SHEET_SUFFIX.length) : head;
     const form = forSheet ? "sheet" : parsed.error ? "cannot say" : parsed.layout.oneComponent ? "one component" : "grid";
     return { text, part: "header", unit, via: "text", onPage: unitNames.has(head) || unitNames.has(unit), setId: null, form, reason: forSheet ? null : parsed.error };
   }
+  if (entry.node.name.startsWith(LABEL_PREFIX) && BAND_LABELS.includes(text)) {
+    return { text, part: "band", unit: null, via: null, onPage: true, setId: null, form: null, reason: null };
+  }
   const tie = tieOfValueLabel(entry);
   return { text, part: tie ? tie.axis : "untied", unit: tie ? tie.name : null, via: tie ? tie.axis : null, onPage: tie !== null, setId: tie ? tie.setId : null, form: null, reason: null };
 }
 
-const labelEntries = topLevel.filter((entry) => entry.kind === "label").map((entry) => ({ entry, ...readLabel(entry) }));
+const labelEntries = entries.filter((entry) => entry.kind === "label").map((entry) => ({ entry, ...readLabel(entry) }));
 const labelOf = new Map(labelEntries.map((label) => [label.entry, label]));
 
 // A sample belongs to the unit whose name its caption begins with, where one does.
@@ -316,7 +365,7 @@ function unitOfSample(node) {
 
 function inventoryEntry(entry) {
   const { node, kind, box, index } = entry;
-  const base = { kind, id: node.id, index, name: node.name, box };
+  const base = { kind, id: node.id, index, name: node.name, box, ...(entry.parentId ? { parent: entry.parentId } : {}) };
   if (kind === "set") {
     const read = readSet(node);
     return {
@@ -338,28 +387,29 @@ function inventoryEntry(entry) {
     };
   }
   if (kind === "sample") return { ...base, nodeType: node.type, unit: unitOfSample(node) };
+  if (kind === "section") return { ...base, nodeType: node.type, children: node.children.length };
   return { ...base, nodeType: node.type };
 }
 
-const GROUP_OF = { set: "sets", component: "components", sheet: "sheets", label: "labels", sample: "samples", reference: "references", other: "others" };
+const GROUP_OF = { set: "sets", component: "components", sheet: "sheets", label: "labels", sample: "samples", section: "sections", reference: "references", other: "others" };
 
-// The inventory of a range of top-level nodes. It stops before `budget` bytes and says where to go on. With
+// The inventory of a range of the page's nodes, in the order of the walk down through the sections. It stops before `budget` bytes and says where to go on. With
 // `allowFirst` false, not even the first node is taken when it does not fit.
 function inventory(budget, allowFirst) {
   const from = INPUTS.from ?? 0;
-  const to = Math.min(INPUTS.to ?? topLevel.length, topLevel.length);
+  const to = Math.min(INPUTS.to ?? entries.length, entries.length);
   const groups = Object.fromEntries(Object.values(GROUP_OF).map((group) => [group, []]));
   let used = 0;
   let next = null;
   for (let index = from; index < to; index += 1) {
-    const item = inventoryEntry(topLevel[index]);
+    const item = inventoryEntry(entries[index]);
     const size = JSON.stringify(item).length + 1;
     const fits = used + size <= budget;
     if (!fits && (used > 0 || !allowFirst)) { next = index; break; }
     used += size;
-    groups[GROUP_OF[topLevel[index].kind]].push(item);
+    groups[GROUP_OF[entries[index].kind]].push(item);
   }
-  return { range: [from, next ?? to], topLevelCount: topLevel.length, next, ...groups };
+  return { range: [from, next ?? to], topLevelCount: topLevel.length, nodeCount: entries.length, next, ...groups };
 }
 
 function finding(items, limit) {
@@ -378,7 +428,7 @@ function scanFindings() {
   for (const entry of sets) {
     const read = readSet(entry.node);
     const set = entry.node;
-    const placed = read.versions.map((version) => ({ id: version.id, box: boxOf(version) }));
+    const positions = read.versions.map((version) => ({ id: version.id, box: boxOf(version) }));
     for (const version of read.versions) {
       const box = boxOf(version);
       if (box[0] < 0 || box[1] < 0 || box[0] + box[2] > set.width || box[1] + box[3] > set.height) {
@@ -390,7 +440,7 @@ function scanFindings() {
         emptyVersions.push({ set: set.id, version: version.id, why: hasNoLayer && hasNoSize ? "no layer and no size" : hasNoLayer ? "no layer" : "no size" });
       }
     }
-    for (const pair of pairsThatMeet(placed)) versionPairs.push({ set: set.id, pair });
+    for (const pair of pairsThatMeet(positions)) versionPairs.push({ set: set.id, pair });
     if (read.readError !== null) unreadableSets.push({ set: set.id, error: read.readError });
     if (read.versions.length > INPUTS.maxVersions) setsOverLimit.push({ set: set.id, name: set.name, versions: read.versions.length });
     for (const name of Object.keys(read.props)) {
@@ -401,7 +451,8 @@ function scanFindings() {
     for (const label of labelEntries) {
       const belongs = (label.part === "header" && label.unit === set.name) || label.setId === set.id;
       if (!belongs) continue;
-      const body = label.part === "header" ? label.text.slice(label.text.indexOf(UNIT_SEPARATOR) + UNIT_SEPARATOR.length) : label.text;
+      const cut = label.text.indexOf(UNIT_SEPARATOR);
+      const body = label.part !== "header" ? label.text : cut > 0 ? label.text.slice(cut + UNIT_SEPARATOR.length) : "";
       named.push(...defaultMarksOf(body));
     }
     if (named.length > 0 && read.defaultVersion !== null) {
@@ -414,7 +465,7 @@ function scanFindings() {
   const emptyCases = [];
   const badCaseNames = [];
   const duplicateCaseNames = [];
-  for (const entry of topLevel.filter((candidate) => candidate.kind === "sheet")) {
+  for (const entry of entries.filter((candidate) => candidate.kind === "sheet")) {
     const seen = new Set();
     for (const child of entry.node.children) {
       if (isSheetLabel(child)) continue;
@@ -435,6 +486,10 @@ function scanFindings() {
     .map((label) => ({ label: label.entry.node.id, unit: label.unit, text: label.text.slice(0, 80) }));
   const labelLayerNames = labelEntries.flatMap((label) => {
     const name = label.entry.node.name;
+    if (label.part === "header" && name.startsWith(HEADER_PREFIX)) {
+      return name === HEADER_PREFIX + label.unit ? [] : [{ label: label.entry.node.id, name: name.slice(0, 80), text: label.text.slice(0, 80), why: "the layer name is not `header · ` and the unit's name" }];
+    }
+    if (label.part === "header" && form === "sections") return [{ label: label.entry.node.id, name: name.slice(0, 80), text: label.text.slice(0, 80), why: "the layer name of a header is `header · ` and the unit's name" }];
     if (!name.startsWith(LABEL_PREFIX)) return [{ label: label.entry.node.id, name: name.slice(0, 80), text: label.text.slice(0, 80), why: "the layer name has no `label · ` prefix" }];
     if (name !== LABEL_PREFIX + label.text) return [{ label: label.entry.node.id, name: name.slice(0, 80), text: label.text.slice(0, 80), why: "the layer name is not `label · ` and the text" }];
     return [];
@@ -442,10 +497,61 @@ function scanFindings() {
   const labelsFormCannotSay = labelEntries.filter((label) => label.part === "header" && label.form === "cannot say" && sets.some((set) => set.node.name === label.unit))
     .map((label) => ({ label: label.entry.node.id, unit: label.unit, reason: label.reason }));
 
+  // The unit that a thing names must stand in the same section as the thing: a header, a row or column label,
+  // a sheet of cases and a sample are the unit's own.
+  const outsideUnitSection = [];
+  for (const entry of entries.filter((candidate) => ["sheet", "sample", "label"].includes(candidate.kind))) {
+    const name = entry.kind === "sheet" ? entry.node.name.slice(0, -SHEET_SUFFIX.length)
+      : entry.kind === "sample" ? unitOfSample(entry.node) : labelOf.get(entry).unit;
+    const owner = unitEntryByName.get(name);
+    if (owner && owner !== entry && owner.parentId !== entry.parentId) {
+      outsideUnitSection.push({ id: entry.node.id, kind: entry.kind, unit: name, in: entry.parentId, unitIn: owner.parentId });
+    }
+  }
+  const topLevelNotSection = form === "sections"
+    ? topLevel.filter((entry) => entry.kind !== "section").map((entry) => ({ id: entry.node.id, nodeType: entry.node.type, name: entry.node.name }))
+    : [];
+  const sectionIds = [...new Set(entries.map((entry) => entry.parentId).filter((id) => id !== null))];
+  const meetingInSection = sectionIds.flatMap((sectionId) => pairsThatMeet(
+    entries.filter((entry) => entry.parentId === sectionId).map((entry) => ({ id: entry.node.id, box: entry.box })))
+    .map((pair) => ({ section: sectionId, pair })));
+  // A section's pieces, from the top: header, the set with its labels, cases, samples, parts. Read by the top of each.
+  const BANDS = ["header", "set", "cases", "samples", "parts"];
+  const bandOf = (entry) => {
+    if (entry.kind === "set" || entry.kind === "component") return CASE_NAME.test(entry.node.name) ? 2 : 1;
+    if (entry.kind === "sheet") return 2;
+    if (entry.kind === "sample") return 3;
+    if (entry.kind === "section") return 4;
+    const label = labelOf.get(entry);
+    if (!label) return null;
+    if (label.part === "header") return 0;
+    if (label.part === "row" || label.part === "column") return 1;
+    return label.part === "band" ? 2 + BAND_LABELS.indexOf(label.text) : null;
+  };
+  const sectionOutOfOrder = [];
+  for (const sectionId of sectionIds) {
+    const pieces = entries.filter((entry) => entry.parentId === sectionId && bandOf(entry) !== null)
+      .sort((first, second) => first.box[1] - second.box[1] || bandOf(first) - bandOf(second));
+    let deepest = 0;
+    for (const piece of pieces) {
+      if (bandOf(piece) < deepest) sectionOutOfOrder.push({ section: sectionId, id: piece.node.id, name: piece.node.name.slice(0, 80), band: BANDS[bandOf(piece)], standsBelow: BANDS[deepest] });
+      deepest = Math.max(deepest, bandOf(piece));
+    }
+  }
+  // A set or a lone component is a unit, and a unit has a header. A case component is no unit.
+  const headed = new Set(labelEntries.filter((label) => label.part === "header").map((label) => label.unit));
+  const unitsWithoutHeader = [...unitEntryByName].filter(([name]) => !headed.has(name))
+    .map(([name, entry]) => ({ unit: name, id: entry.node.id, in: entry.parentId }));
+  const kinds = (kind) => entries.filter((entry) => entry.kind === kind).length;
+  const emptyReading = kinds("set") + kinds("component") + kinds("sheet") === 0
+    ? [{ page: page.id, nodes: entries.length, why: "the scan found no set, no lone component and no sheet of cases, so it checked no unit" }]
+    : [];
+
   return {
-    versionsOutside, versionPairsMeeting: versionPairs, topLevelPairsMeeting: topLevelPairs.map((pair) => ({ pair })),
+    emptyReading, versionsOutside, versionPairsMeeting: versionPairs, topLevelPairsMeeting: topLevelPairs.map((pair) => ({ pair })),
     strays, defaultNamedProperties, unreadableSets, setsOverLimit, emptyVersions, emptyCases,
     badCaseNames, duplicateCaseNames, labelsUnitElsewhere, labelLayerNames, labelsFormCannotSay, defaultNotLabels,
+    topLevelNotSection, meetingInSection, sectionOutOfOrder, unitsWithoutHeader, outsideUnitSection,
   };
 }
 
@@ -454,11 +560,13 @@ const scanShown = (limit) => {
   const findings = {};
   for (const [name, items] of Object.entries(allFindings)) findings[name] = finding(items, limit);
   const blocking = Object.entries(allFindings).filter(([name]) => !NOT_BLOCKING.includes(name));
-  return { clean: blocking.every(([, items]) => items.length === 0), notBlocking: NOT_BLOCKING, findings };
+  const read = Object.fromEntries(Object.keys(GROUP_OF).map((kind) => [GROUP_OF[kind], entries.filter((entry) => entry.kind === kind).length]));
+  return { clean: blocking.every(([, items]) => items.length === 0), notBlocking: NOT_BLOCKING, form, read: { topLevel: topLevel.length, ...read }, findings };
 };
 
 const result = {
   page: { id: page.id, name: page.name, background: backgroundOf(page) },
+  form,
   readAt: new Date().toISOString(),
 };
 const bytesOf = (value) => JSON.stringify(value).length;

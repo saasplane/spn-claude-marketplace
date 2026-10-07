@@ -523,6 +523,179 @@ await guard(async () => {
   same("a set of 1,000 is not", fine.setsOverLimit.count, 0);
 });
 
+// ---- a page whose units sit inside sections ------------------------------------------------------
+//
+// A unit is one section: from the top its header (layer `header · <Unit>`), its set with the row and column
+// labels, its cases, its samples and its parts, a part being a section inside its owner's. A page holds sections
+// and nothing else at its top level. The coordinates below are those of the section a node stands in.
+
+console.log("\n=== a page of sections: the same scripts read it");
+const section = (id, name, box, children) => ({ id, name, type: "SECTION", x: box[0], y: box[1], width: box[2], height: box[3], children });
+const headerText = (id, unit, characters, box) => text(id, `header · ${unit}`, characters, box);
+const sample = (id, name, box) => ({ id, name, type: "INSTANCE", x: box[0], y: box[1], width: box[2], height: box[3], children: [{ id: `${id}:0`, type: "TEXT" }] });
+const iconPart = (id, box = [80, 860, 400, 220]) => section(`${id}:sec`, ".DSIcon", box, [
+  headerText(`${id}:head`, ".DSIcon", ".DSIcon — one component", [80, 80, 300, 20]),
+  version(`${id}:icon`, ".DSIcon", 80, 128, 48, 48),
+]);
+// One unit's section: header, set with its labels, cases, samples, and the parts it is given.
+function unitSection(sid, name, origin, { header = true, parts = [], sampleAbove = false } = {}) {
+  const set = componentSet(`${sid}:set`, name, [200, 148, 300, 200], grid(sid, tidy));
+  const cases = sheet(`${sid}:sheet`, `${name} cases`, [80, sampleAbove ? 668 : 444, 300, 100], [sheetCase(`${sid}:c1`, "case=text")]);
+  const shown = sample(`${sid}:smp`, "sample · open", [80, sampleAbove ? 444 : 668, 200, 60]);
+  return section(`${sid}:sec`, name, [origin[0], origin[1], 800, 1300], [
+    ...(header ? [headerText(`${sid}:head`, name, `${name} — rows: size=SM, MD · columns: state=rest, hover`, [80, 80, 600, 20])] : []),
+    set,
+    labelText(`${sid}:row`, "SM (default)", [116, 168, 60, 20]),
+    labelText(`${sid}:col`, "rest", [220, 112, 60, 20]),
+    labelText(`${sid}:lc`, "Cases", [80, sampleAbove ? 624 : 400, 100, 20]),
+    cases,
+    labelText(`${sid}:ls`, "Samples", [80, sampleAbove ? 400 : 624, 100, 20]),
+    shown,
+    ...(parts.length > 0 ? [labelText(`${sid}:lp`, "Parts", [80, 820, 100, 20]), ...parts] : []),
+  ]);
+}
+const sectioned = (nodes) => file([page("2:1", "Actions", nodes)]);
+const scanSections = async (nodes, inputs = {}) => (await run("page.js", { pageId: "2:1", report: "scan", findingItems: 25, ...inputs }, sectioned(nodes))).scan;
+const inventorySections = async (nodes) => (await run("page.js", { pageId: "2:1", report: "inventory", maxBytes: 16000 }, sectioned(nodes))).inventory;
+const counts = (scan) => Object.fromEntries(Object.entries(scan.findings).filter(([, one]) => one.count > 0).map(([name, one]) => [name, one.count]));
+
+await guard(async () => {
+  const old = await scanOf([buttonSet(tidy), buttonHeader()]);
+  same("the old form: things at the page's top level are read, and the scan says the page is flat", [old.clean, old.form, old.read.sets, old.read.labels], [true, "flat", 1, 1]);
+  const scan = await scanSections([unitSection("B", "DSButton", [100, 100], { parts: [iconPart("P")] })]);
+  same("the same unit in a section, a part's section inside it: clean, and the page is said to be in sections",
+    [scan.clean, scan.form, counts(scan)], [true, "sections", {}]);
+  same("the scan says what it read: one unit, its sheet, its sample, its labels and its two sections",
+    [scan.read.sets, scan.read.components, scan.read.sheets, scan.read.samples, scan.read.labels, scan.read.sections, scan.read.topLevel], [1, 1, 1, 1, 7, 2, 1]);
+});
+await guard(async () => {
+  const inventory = await inventorySections([unitSection("B", "DSButton", [100, 100], { parts: [iconPart("P")] })]);
+  same("a set in a section holds its box in page coordinates and the section it stands in", [inventory.sets[0].box, inventory.sets[0].parent], [[300, 248, 300, 200], "B:sec"]);
+  same("a header is read from its layer `header · ` and tied to its unit, in the part's section too",
+    inventory.labels.filter((label) => label.part === "header").map((label) => [label.unit, label.parent, label.name]),
+    [["DSButton", "B:sec", "header · DSButton"], [".DSIcon", "P:sec", "header · .DSIcon"]]);
+  same("a row label and a column label are tied to the set by its rows' and columns' spans, in one frame of reference",
+    inventory.labels.filter((label) => ["row", "column"].includes(label.part)).map((label) => [label.part, label.unit]), [["row", "DSButton"], ["column", "DSButton"]]);
+  same("a band's label is no value label and is tied to no unit", inventory.labels.filter((label) => label.part === "band").map((label) => label.text), ["Cases", "Samples", "Parts"]);
+  same("the sections are listed, the part's inside its owner's", inventory.sections.map((one) => [one.id, one.parent ?? null]), [["B:sec", null], ["P:sec", "B:sec"]]);
+  same("a lone component of a part is found inside its section", [inventory.components[0].id, inventory.components[0].box, inventory.components[0].parent], ["P:icon", [260, 1088, 48, 48], "P:sec"]);
+  const range = await run("page.js", { pageId: "2:1", report: "inventory", from: 1, to: 2, maxBytes: 16000 }, sectioned([unitSection("B", "DSButton", [100, 100], { parts: [iconPart("P")] })]));
+  same("a range reads the nodes in the order of the walk, the sections' children after their section", [range.inventory.range, Object.values(range.inventory).flat().filter((item) => item?.index !== undefined).map((item) => item.id)], [[1, 2], ["B:head"]]);
+});
+await guard(async () => {
+  const shared = section("SP:sec", "Shared parts", [100, 1640, 800, 400], [headerText("SP:head", ".DSIcon", ".DSIcon — one component", [80, 80, 300, 20]), version("SP:icon", ".DSIcon", 80, 128, 48, 48)]);
+  const scan = await scanSections([unitSection("B", "DSButton", [100, 100]), shared]);
+  same("a `Shared parts` section at the end of the page is clean, and its unit has its header", [scan.clean, scan.read.sections, scan.findings.unitsWithoutHeader.count], [true, 2, 0]);
+});
+await guard(async () => {
+  const away = unitSection("B", "DSButton", [100, 100]);
+  away.children.find((child) => child.id === "B:row").y = 1000;
+  const inventory = await inventorySections([away]);
+  same("a row label away from its row is tied to no set", inventory.labels.filter((label) => label.id === "B:row").map((label) => [label.part, label.unit]), [["untied", null]]);
+  const tied = await inventorySections([unitSection("B", "DSButton", [100, 100])]);
+  same("the same label at its row's height is tied: a section's offset does not break the tie", tied.labels.filter((label) => label.id === "B:row").map((label) => [label.part, label.unit]), [["row", "DSButton"]]);
+});
+await guard(async () => {
+  const strayRect = loose("X:1", "Rectangle 1", [2000, 100, 10, 10]);
+  const strayLabel = labelText("X:2", "DSButton — one row", [2000, 300, 100, 20]);
+  const scan = await scanSections([unitSection("B", "DSButton", [100, 100]), strayRect, strayLabel]);
+  same("a node at the top level of a sectioned page that is no section is named, a label too", [scan.clean, scan.findings.topLevelNotSection.items.map((item) => item.id)], [false, ["X:1", "X:2"]]);
+});
+await guard(async () => {
+  const crowded = unitSection("B", "DSButton", [100, 100]);
+  crowded.children.find((child) => child.id === "B:sheet").y = 300;
+  const scan = await scanSections([crowded]);
+  same("two things that meet inside a section are named, with the section", scan.findings.meetingInSection.items, [{ section: "B:sec", pair: ["B:sheet", "B:set"] }]);
+  const second = unitSection("C", "DSInput", [100, 1000]);
+  const meeting = await scanSections([unitSection("B", "DSButton", [100, 100]), second]);
+  same("two sections that meet are named at the page's top level", meeting.findings.topLevelPairsMeeting.items.map((item) => item.pair), [["B:sec", "C:sec"]]);
+  same("two sections that meet also fail the scan", meeting.clean, false);
+});
+await guard(async () => {
+  const swappedBands = await scanSections([unitSection("B", "DSButton", [100, 100], { sampleAbove: true })]);
+  same("a section whose samples stand above its cases is named, with the band it stands below",
+    swappedBands.findings.sectionOutOfOrder.items.map((item) => [item.band, item.standsBelow]), [["cases", "samples"], ["cases", "samples"]]);
+  const headerLow = unitSection("B", "DSButton", [100, 100]);
+  headerLow.children.find((child) => child.id === "B:head").y = 380;
+  same("a header below the set is named", (await scanSections([headerLow])).findings.sectionOutOfOrder.items.map((item) => [item.id, item.band]), [["B:head", "header"]]);
+});
+await guard(async () => {
+  const scan = await scanSections([unitSection("B", "DSButton", [100, 100], { header: false })]);
+  same("a unit with no header is named, in its section", [scan.clean, scan.findings.unitsWithoutHeader.items], [false, [{ unit: "DSButton", id: "B:set", in: "B:sec" }]]);
+  const withHeaders = await scanSections([unitSection("B", "DSButton", [100, 100], { parts: [iconPart("P")] })]);
+  const noPartHeader = unitSection("B", "DSButton", [100, 100], { parts: [iconPart("P")] });
+  noPartHeader.children.find((child) => child.id === "P:sec").children.splice(0, 1);
+  same("a part with no header is named too", [withHeaders.findings.unitsWithoutHeader.count, (await scanSections([noPartHeader])).findings.unitsWithoutHeader.items.map((item) => item.unit)], [0, [".DSIcon"]]);
+});
+await guard(async () => {
+  const misplaced = unitSection("B", "DSButton", [100, 100]);
+  misplaced.children.push(headerText("B:other", "DSInput", "DSInput — one row", [500, 80, 100, 20]), sample("B:alien", "sample · DSInput open", [500, 668, 100, 60]));
+  const scan = await scanSections([misplaced, unitSection("C", "DSInput", [100, 1640])]);
+  same("a header and a sample of another unit, standing in this unit's section, are named",
+    scan.findings.outsideUnitSection.items.map((item) => [item.id, item.kind, item.unit, item.in, item.unitIn]), [["B:other", "label", "DSInput", "B:sec", "C:sec"], ["B:alien", "sample", "DSInput", "B:sec", "C:sec"]]);
+});
+await guard(async () => {
+  const names = async (name) => {
+    const unit = unitSection("B", "DSButton", [100, 100]);
+    unit.children.find((child) => child.id === "B:head").name = name;
+    return (await scanSections([unit])).findings.labelLayerNames.items.map((item) => item.why);
+  };
+  same("`header · ` and the unit's name is the header's layer name", await names("header · DSButton"), []);
+  same("in a page of sections a header named as a label is named", await names("label · DSButton — rows: size=SM, MD · columns: state=rest, hover"), ["the layer name of a header is `header · ` and the unit's name"]);
+  same("a header named for another unit is named", await names("header · DSInput"), ["the layer name is not `header · ` and the unit's name"]);
+});
+await guard(async () => {
+  const empty = await run("page.js", { pageId: "2:1", report: "scan" }, sectioned([]));
+  same("an empty page is never clean: the empty reading is its own finding", [empty.scan.clean, empty.scan.form, empty.scan.findings.emptyReading.count], [false, "empty", 1]);
+  const hollow = await scanSections([section("H:sec", "DSButton", [0, 0, 400, 400], [])]);
+  same("a section with no unit in it is an empty reading, not a clean page", [hollow.clean, hollow.findings.emptyReading.count, hollow.form], [false, 1, "sections"]);
+  const reference = await run("page.js", { pageId: "2:1", report: "scan" }, file([page("2:1", "Choices", [{ id: "6:1", name: "§ 6.1", type: "FRAME", x: 0, y: 0, width: 100, height: 100, children: [{ id: "6:1:0", type: "TEXT" }] }])]));
+  same("a page that holds no unit is not clean either", [reference.scan.clean, reference.scan.findings.emptyReading.count], [false, 1]);
+  const both = await run("page.js", { pageId: "2:1", report: "both", maxBytes: 16000 }, sectioned([]));
+  same("the answer says the form at its top, whichever report is asked", [both.form, both.scan.form], ["empty", "empty"]);
+});
+
+console.log("\n=== layout.js — a set in a section");
+const layoutIn = (nodes, inputs = {}) => run("layout.js", layoutInputs({ setId: "B:set", ...inputs }), sectioned(nodes));
+const unitWith = (order) => {
+  const unit = unitSection("B", "DSButton", [100, 100]);
+  const set = componentSet("B:set", "DSButton", [200, 148, 300, 200], grid("B", order));
+  unit.children.splice(unit.children.findIndex((child) => child.id === "B:set"), 1, set);
+  return unit;
+};
+await guard(async () => {
+  const unit = unitWith(swapped);
+  const result = await layoutIn([unit]);
+  same("the header is found in the set's own section, and the home is that section", [result.mode, result.label.id, result.home], ["dry", "B:head", { id: "B:sec", name: "DSButton", type: "SECTION" }]);
+  same("its box is in the section's coordinates, and nothing of the section's other pieces is said to meet it", [result.setBoxBefore, result.checks.topLevelPairsMeeting], [[200, 148, 300, 200], 0]);
+  const applied = await layoutIn([unitWith(swapped)], { dryRun: false });
+  same("applied in a section: every version is placed and the verified counts are zero", [applied.mode, applied.verified], ["applied", { versionsOutside: 0, versionPairsMeeting: 0, topLevelPairsMeeting: 0 }]);
+});
+await guard(async () => {
+  const unit = unitWith(swapped);
+  unit.children = unit.children.filter((child) => child.id !== "B:head");
+  const strayHeader = labelText("X:1", "DSButton — rows: size=SM, MD · columns: state=rest, hover", [3000, 0, 300, 20]);
+  const refused = await layoutIn([unit, strayHeader]);
+  same("a header at the page's top level is not the set's: with none in its section it refuses", [refused.mode, refused.refused[0].startsWith("no label in the section DSButton")], ["refused", true]);
+});
+await guard(async () => {
+  const unit = unitWith(swapped);
+  unit.children.push(componentSet("B:near", "DSNear", [300, 148, 100, 100], [version("B:near:a", "size=SM", 10, 10)]));
+  const set = unit.children.find((child) => child.id === "B:set");
+  set.resize(100, 100);
+  const refused = await layoutIn([unit], { resize: true });
+  same("a neighbour in the same section that the planned set would meet refuses, and moves nothing",
+    [refused.mode, refused.checks.topLevelPairsMeeting > 0, refused.refused.some((reason) => reason.includes("in the section"))], ["refused", true, true]);
+  const moved = await layoutIn([unit], { dryRun: false, mayMove: ["B:near"] });
+  same("a neighbour it may move is moved clear in the section's own coordinates", [moved.mode, moved.nodeMoves.map((move) => move[0]), moved.nodeMoves[0][1] >= 200 + 260 + 100, moved.verified.topLevelPairsMeeting], ["applied", ["B:near"], true, 0]);
+});
+await guard(async () => {
+  const unit = unitWith(swapped);
+  const elsewhere = section("E:sec", "DSOther", [100, 1640, 800, 400], [loose("E:1", "Rectangle", [200, 148, 300, 200])]);
+  const result = await layoutIn([unit, elsewhere]);
+  same("a node of another section at the same relative place is no neighbour: nothing meets", [result.mode, result.checks.topLevelPairsMeeting], ["dry", 0]);
+});
+
 // ---- the texts ----------------------------------------------------------------------------------
 
 console.log("\n=== the texts the agent passes on");
