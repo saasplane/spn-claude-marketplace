@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/11-delivery-library.md",
-      "seen": "1007f3ea"
+      "seen": "6168459d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "61a0ef82"
+      "seen": "48168461"
     }
   ]
 }
@@ -134,9 +134,9 @@ A change of the surface is stated in the construct first, drawn in the library s
 - **The result file says one outcome for each entry:** `DONE`, `SKIPPED`, `REFUSED` or `FAILED` (an entry that was undone), with `run.leftRefused` and `counts` last. The command `status` reads the result files.
 - **A rule of the comparison removes a gap only when a named fact proves it, and `rulesApplied` MUST count it.** The comparison leaves out what is not a unit, and it reads the props the stack declares. A second reader of the web's snapshot reads from the running showcase the values that only a browser works out.
 
-## The two ways to change the library
+## A developer's hands are three, and you change the library in one of two ways
 
-- **A developer's hands in the design library are two things: publishing a file, and using the plugin** (import it, choose a plan, apply, save a result, read a file). Nothing else is asked of a developer. Never ask a developer to draw, rebind, remove or confirm anything in Figma. When something looks wrong the developer sends a picture, and you correct the plan or the tool and show the result again.
+- **A developer's hands in the design library are three things: publishing a file, using the plugin, and saving a named version of a file before the connector's first change in it.** Using the plugin means to import it, choose a plan, apply, save a result and read a file. The plugin saves its own named version before it applies a plan, so the third is asked only when the connector is to work, because the connector cannot save one. Nothing else is asked of a developer. Never ask a developer to draw, rebind, remove or confirm anything in Figma. When something looks wrong the developer sends a picture, and you correct the plan or the tool and show the result again.
 - **You change the library in one of two ways: a plan that the plugin executes whole, or the Figma connector.** Pick the way from the nature of the work, say which way and why, name the developer's next step, and show the result.
 
 | The work has | The way |
@@ -145,7 +145,30 @@ A change of the surface is stated in the construct first, drawn in the library s
 | few items made once, items composed from units or drawn freely (an icon, a sheet of cases, a page), or work where looking at the result matters more than running it again | the connector |
 
 - **Three kinds of work.** A unit that changes (a prop, a value, a look) is a plan. A case the showcase shows is a unit with prop values set: place it as instances, and never draw it as a new look. A use case, a page or a pattern built from units is not synchronised with a stack: compose it from the published library on request, in a file that is not a library file.
-- **Before the connector writes, say what you are about to change**, stay inside the file and the items you named, and show the result. The connector never publishes a library.
+- **Before the connector writes, say what you are about to change**, stay inside the file and the items you named, and show the result. A write outside the named file or items is a defect. The connector never publishes a library.
+- **Before the connector's first change in a library file, a person MUST have saved a named version of that file.** The connector cannot save one, so ask the developer for it and wait. Without it, a change that goes wrong leaves no point to go back to, and you could not give one.
+
+## How the connector's work is carried out
+
+The connector works one call at a time, and each call costs time and tokens. Six agents worked in one library file by the connector, and each used between 57 and 131 tool calls. The cost came from finding the file again, from a read, a change and a proof as three calls for one item, from probing how the file behaves, and from a picture for nearly every step. These rules take that cost away without making a change less safe.
+
+- **An inventory of a library file MUST be read once and handed on.** Before the first change in a library file, one reading writes an inventory of it: its pages with their ids; its sets and lone components with their ids, pages, properties and counts of versions; the form its sheets of cases take; and the ids of the variables and styles the work will bind. Every agent that then works in that file is given the inventory and does not read those facts again. The inventory names the time it was read. A change to the file updates the inventory's lines for what it changed. Without one, each agent reads the same facts again, and each reading is paid for in full.
+- **A script MUST cover a page and return its own proof.** The changes one page needs go in as few calls as stay safe to run again, and the same call returns what proves it: the ids changed or made, the counts, the names and the boxes. A separate reading call is made only where that proof is missing. A change followed by a reading call for each item is the same work paid for twice.
+- **Calls that change a file MUST run one at a time.** Two agents never change one library file at once. Reading calls may run together. Two changes to one file at once can each be made against a state the other has already changed.
+- **One picture MUST be taken for each set or sheet.** It is taken once after the set or the sheet is made or changed, and once more only after a repair of what the picture showed. A picture for each step costs more than the proof the step already returned.
+- **What a probe learned MUST be written once, where the next agent reads it before working, and it is not tried again.** A fact about how Figma or the connector behaves, which an agent had to try out, is written down: how a slot of an instance is filled, how a version is copied, what the connector cannot do. A fact tried twice is paid for twice, and a probe in a real file can change the file.
+
+### The connector's facts
+
+Read this list before you work in a library file by the connector. **The agent that learns a new fact adds it to this list**, in the book first, and then here.
+
+| Fact | What it means for the work |
+| --- | --- |
+| The connector cannot save a named version | a person saves it before the connector's first change in a file |
+| A call starts on the file's first page | a script switches page once, and does not assume the page it worked on before |
+| A comma inside a version's value splits its name | a value never holds a comma, or the set breaks |
+| Versions copied into a set sit on one another | they are laid out before the set is read or shown |
+| The footer slot of a nested popup takes an instance | the instance is put in through the slot |
 
 ## Drawing a block
 
@@ -167,7 +190,8 @@ This ref states what the library draws, how its files are layered, and what stay
 | `RD.SUPPORT.SURFACE.025` | a change of the surface is stated in the construct first, drawn in the library second and built in the web or a native stack third |
 | `RD.SUPPORT.SURFACE.026` | the library draws every case the showcase shows, and states a block with a behaviour and little or no look by its behaviour and its feedback |
 | `RD.SUPPORT.SURFACE.027` | the plugin has a read mode and an update mode, and the update mode writes only what a plan names, only in the open file, only after a dry run and an apply, and never publishes |
-| `RD.SUPPORT.SURFACE.028` | a developer's hands in the library are publishing a file and using the plugin, the agent changes the library by a plan or by the connector picked by the nature of the work, and says what it will change before a connector write |
+| `RD.SUPPORT.SURFACE.028` | the agent changes the library by a plan or by the connector picked by the nature of the work, and says what it will change before a connector write |
+| `RD.SUPPORT.SURFACE.029` | a developer's hands in the library are three (publishing a file, using the plugin, saving a named version before the connector's first change), and the connector's work is carried out by an inventory read once, a script for each page, one picture for each set, a probe written once and a named version saved first |
 
 ## Proof
 
