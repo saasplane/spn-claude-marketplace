@@ -59,7 +59,7 @@ const CLAUSE_SEPARATOR = " · ";
 const FACTOR_SEPARATOR = " x ";
 const DEFAULT_MARK = /\s+\(default\)$/;
 const MARK_TEXT = /^(.*?)\s*\(default(?: at the top)?\)$/;
-const MARK_SPLIT = /, | · | x |=|: |each with /;
+const MARK_SPLIT = /, | · | x |=|each with /;
 const UNIT_LIKE = /^\.?[A-Z][A-Za-z0-9.]*[a-z][A-Za-z0-9.]*( cases)?$/;
 
 // An axis is factors joined by ` x `; a factor is cells joined by `, `; a cell is `property=value` or only
@@ -121,7 +121,8 @@ function parseHeader(text) {
 // piece and its last word (an older label wrote `size SM (default)`). Never the word before the value.
 function defaultMarksOf(text) {
   const marks = [];
-  for (const piece of text.split(MARK_SPLIT)) {
+  // A clause word (`rows: `, `columns: `) is no part of a value, and a `: ` after a cell's `=` is inside its value.
+  for (const piece of text.replace(/(^|· )(rows|columns): /g, "$1").split(MARK_SPLIT)) {
     const found = MARK_TEXT.exec(piece.trim());
     if (!found || found[1].trim().length === 0) continue;
     const value = found[1].trim();
@@ -459,7 +460,8 @@ function scanFindings() {
       named.push(...defaultMarksOf(body));
     }
     if (named.length > 0 && read.defaultVersion !== null) {
-      const carried = Object.values(parseVersionName(read.defaultVersion));
+      // A long value may be named by its words before its first `: `, so the default carries both.
+      const carried = Object.values(parseVersionName(read.defaultVersion)).flatMap((value) => [value, value.split(": ")[0]]);
       const wrong = named.filter((mark) => !mark.candidates.some((candidate) => carried.includes(candidate)));
       if (wrong.length > 0) defaultNotLabels.push({ set: set.id, labelNames: wrong.map((mark) => mark.value), defaultVersion: read.defaultVersion });
     }

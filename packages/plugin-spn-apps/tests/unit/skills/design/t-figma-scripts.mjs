@@ -681,6 +681,19 @@ await guard(async () => {
     [found.clean, found.findings.samplesNamingNoUnit.items], [false, [{ id: "B:smp", name: "sample · nothing set", in: "B:sec" }]]);
 });
 
+// A value that itself holds `: ` (real: DSAnchor on Navigation, DSAnchorContainer 422:128706 on Utility). The header
+// names the value by its words before the first `: `, or writes it whole; either marks the version that carries it.
+await guard(async () => {
+  const anchor = setNamed("1:set", "DSAnchor", [0, 0, 600, 100], ["case=text: a word or two as a link", "case=block: a card as a link"]);
+  const marked = async (header, set = anchor) => (await scanOf([set, labelText("1:label", header, [0, -30, 300, 20])])).findings.defaultNotLabels;
+  same("DSAnchor: `case=text (default)` is true of `case=text: a word or two as a link`", (await marked("DSAnchor — one row · columns: case=text (default), block")).count, 0);
+  const container = setNamed("2:set", "DSAnchorContainer", [0, 0, 600, 100], ["case=address: the row goes to an address", "case=handler: a handler runs"]);
+  const containerMarked = async (header) => (await scanOf([container, labelText("2:label", header, [0, -30, 300, 20])])).findings.defaultNotLabels;
+  same("DSAnchorContainer: `case=address (default)` is true of `case=address: the row goes to an address`", (await containerMarked("DSAnchorContainer — one row · columns: case=address (default), handler")).count, 0);
+  same("the whole value written in the header is true too", (await containerMarked("DSAnchorContainer — one row · columns: case=address: the row goes to an address (default), handler")).count, 0);
+  same("a mark on the other value is still named", (await marked("DSAnchor — one row · columns: case=block (default), text")).items.map((item) => item.labelNames), [["block"]]);
+});
+
 console.log("\n=== layout.js — a set in a section");
 const layoutIn = (nodes, inputs = {}) => run("layout.js", layoutInputs({ setId: "B:set", ...inputs }), sectioned(nodes));
 const unitWith = (order) => {

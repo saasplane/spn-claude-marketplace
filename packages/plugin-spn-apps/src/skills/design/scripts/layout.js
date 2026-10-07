@@ -52,7 +52,7 @@ const CLAUSE_SEPARATOR = " · ";
 const FACTOR_SEPARATOR = " x ";
 const DEFAULT_MARK = /\s+\(default\)$/;
 const MARK_TEXT = /^(.*?)\s*\(default(?: at the top)?\)$/;
-const MARK_SPLIT = /, | · | x |=|: |each with /;
+const MARK_SPLIT = /, | · | x |=|each with /;
 const UNIT_LIKE = /^\.?[A-Z][A-Za-z0-9.]*[a-z][A-Za-z0-9.]*( cases)?$/;
 
 // An axis is factors joined by ` x `; a factor is cells joined by `, `; a cell is `property=value` or only
@@ -114,7 +114,8 @@ function parseHeader(text) {
 // piece and its last word (an older label wrote `size SM (default)`). Never the word before the value.
 function defaultMarksOf(text) {
   const marks = [];
-  for (const piece of text.split(MARK_SPLIT)) {
+  // A clause word (`rows: `, `columns: `) is no part of a value, and a `: ` after a cell's `=` is inside its value.
+  for (const piece of text.replace(/(^|· )(rows|columns): /g, "$1").split(MARK_SPLIT)) {
     const found = MARK_TEXT.exec(piece.trim());
     if (!found || found[1].trim().length === 0) continue;
     const value = found[1].trim();
