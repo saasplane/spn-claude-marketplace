@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "85f8fd0b"
+      "seen": "28f8ea3d"
     }
   ]
 }
@@ -24,9 +24,10 @@ Its provenance is the foundation book's design library chapter. Apply this resta
 6. **Before you add a property or a value to a set, work out the versions the set will hold, never pass 1,000, and draw a look the stack shows as one case as a case on the unit's sheet.** Heading: "Versions that are added are laid out".
 7. **Where a call moves versions, lay out one set by passing `skills/design/scripts/layout.js` to the connector as it is, dry first, and read the default version of each set before and after, check it against the stack's default at the top left, and correct a label that disagrees, never follow it.** Headings: "The default version is the stack's default, and the label tells the truth about it", and "How the connector's work is carried out".
 8. **Give a new set, sheet or page the form of its neighbours, place a case as instances of the unit, and say on the sheet's label what a unit cannot hold, and list it.** Headings: "A new set, sheet or page takes the form of its neighbours", "A sheet of cases, and a case", "A unit that cannot hold the web's case", and "A unit with no look of its own".
-9. **Take one picture for each set or sheet, and look at it.** Headings: "How the connector's work is carried out", and "What the agent reads and keeps".
-10. **Scan the whole file last, with `skills/design/scripts/page.js` set to report the scan.** Heading: "Before a publish".
-11. **Tell the developer what changed, what still differs from the web and was left, and that the publish is theirs.** Heading: "Before a publish".
+9. **Put every thing a unit owns inside the unit's section, in the book's order: the header, the set with its row and column labels, the cases, the samples and the parts, with a page's top level holding sections only.** Make a new unit in a section of its own at the end of its group's page, put a label or a sample in its unit's section, a part in the section of the unit that owns it or in Shared parts, and read a set's key, its versions' keys, its name, its size, its default and its properties before a move into a section and after it. Heading: "A file's pages are the showcase's groups, and a unit is one section".
+10. **Take one picture for each set or sheet, and look at it.** Headings: "How the connector's work is carried out", and "What the agent reads and keeps".
+11. **Scan the whole file last, with `skills/design/scripts/page.js` set to report the scan.** Heading: "Before a publish".
+12. **Tell the developer what changed, what still differs from the web and was left, and that the publish is theirs.** Heading: "Before a publish".
 
 Never edit the body of either script: fill its inputs and pass the rest as it is.
 

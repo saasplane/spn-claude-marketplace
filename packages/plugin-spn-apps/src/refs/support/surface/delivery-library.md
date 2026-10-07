@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/11-delivery-library.md",
-      "seen": "bfa74c1a"
+      "seen": "2b0a7720"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "85f8fd0b"
+      "seen": "28f8ea3d"
     }
   ]
 }
@@ -28,6 +28,8 @@ Read this before you add a token or a block to the library, or before you ask wh
 | Gap | one difference between the library's snapshot and a stack's snapshot, of one closed kind |
 | Inventory | one file for one library file, that holds what the agent read of it through the connector, to the depth the comparison needs, and that the tool takes in |
 | Accepted difference | a gap that has been looked at and accepted, recorded with its reason and taken in by the tool, so that the list of gaps leaves it out and counts it |
+| A unit's section | the Figma section that holds one unit and everything the unit owns, named as the unit. It is a different thing from a block of the design system, which a unit's set draws |
+| Shared parts | the last section of a page, which holds a part that two or more units on the page use |
 
 ## The files, by layer — 🔮
 
@@ -47,13 +49,13 @@ A file can use only what another file has published. SaaS Plane's own library is
 | File | Its pages |
 | --- | --- |
 | DS 1-core | Colour · Type · Scale · Icons |
-| DS 2-Components | one page for each group, then Choices |
+| DS 2-Components | one page for each group of the showcase, in its order: Actions · Data display · Feedback · Structure · Media · Navigation · Overlays · Popovers · Typography · Utility, then the three pages of Data entry: Fields, Pickers and Composites. Each set sits in its unit's section on its group's page |
 | DS 3-Widgets | Filter bar · Data table |
 | DS 4-Containers | Container |
 | DS 5-Layouts | Layout |
 | DS 9-Lab | drafts, never published |
 
-Core holds the variables in collections, and each is one setting of the book: `Ramps` (the ramps, which no block reads), `Roles` (Light, Dark), `Hue` (the values of `color`), `Scale`, `Theme-Font`, `Theme-Radius`, the four `Theme-*` collections of the container look (`Theme-Raised` also holds `page/fill`), and `Frame` (the frame setting of `flush`). A private part's name starts with a dot; a description is one line and a link; a file that changes is published by a person.
+Core holds the variables in collections, and each is one setting of the book: `Ramps` (the ramps, which no block reads), `Roles` (Light, Dark), `Hue` (the values of `color`), `Scale`, `Theme-Font`, `Theme-Radius`, the four `Theme-*` collections of the container look (`Theme-Raised` also holds `page/fill`), and `Frame` (the frame setting of `flush`). A private part's name starts with a dot, and it is drawn inside the section of the unit that owns it, or in the section named Shared parts when several units use it; a description is one line and a link; a file that changes is published by a person.
 
 ## Color is a mode, and the rest are properties — 🔮
 
@@ -352,6 +354,46 @@ Read this list before you work in a library file by the connector. Each is a fac
 
 A library file is read by people and by scripts. A person reads the grid of a set to see every case at once. A script reads the label of a set to learn how the grid is laid out, and reads the top left of a set to learn its default. So each rule below keeps one thing true that a script or a person relies on.
 
+### A file's pages are the showcase's groups, and a unit is one section
+
+A person who opens a page reads it as a tree: the page, then one section for each unit, then what the unit holds. A page of a file that holds units is one group of the showcase, so a person who knows the showcase finds the same groups in the file, in the same order.
+
+- **A page's name MUST be its group's name in the showcase, without the `Component - ` that starts the name of a group of components, and the pages MUST stand in the showcase's order.** The group `Component - Actions` is the page Actions. The group `Data Entry - Fields` is the page Data entry · Fields, and its two sisters are Data entry · Pickers and Data entry · Composites. A file does not order its pages by its own rule.
+- **A page that is no group of the showcase MUST NOT be kept.** What it holds goes to the page of the unit it serves, and what serves no unit is removed.
+- **A page MUST hold one section for each unit of its group, named exactly as the unit, such as `DSInput`, and nothing else at its top level.** No level stands between a page and its units. A label or a sample that stood loose on the page would be parted from its unit the next time the unit moves, so every thing a unit owns sits inside the unit's section.
+- **The sections MUST stand in the showcase's order of the group's units, in one column down the page.** A person who knows the showcase then finds a unit where the showcase lists it. A unit that the showcase lists and the page has no node for gets no section, and the agent reports it.
+- **A unit's section MUST hold these, from the top down, in this order: the header, the set with its row and column labels, the cases, the samples and the parts.** A band the unit has nothing for is left out with its label.
+
+| Piece | What it is |
+| --- | --- |
+| The header | one text, named `header · ` and the unit's name. It reads the unit's name, ` — `, what the unit is in one line, then the layout, with its rows and its columns |
+| The set | the unit's set, unchanged, with its column labels above it and its row labels in one column on its left |
+| The cases | a text `label · Cases`, and under it the unit's sheets of cases and its loose case components |
+| The samples | a text `label · Samples`, and under it each sample with the label that names it |
+| The parts | a text `label · Parts`, and under it one section for each part, named as the part and built the same way |
+
+- **The header's one line MUST come from the set's own description, its first sentence, and its rows and columns from the set's own grid.** A header written from memory would be a second statement of what the set already says. The header is the unit's one header label: it carries the layout in the form that "The form of a label" states, and a unit has no second header text beside it. A header label that was drawn before, with the unit's name and a layout, is replaced by the header, and the layer name and the one line are the header's only additions.
+- **A part is a set or a lone component that serves another unit and that the showcase does not list on its own, and it MUST sit in the section of the unit that owns it.** The owner is the unit whose source uses the part, read from the stack and never guessed from the name. A name that starts with a dot is always a part. A part that two or more units on the page use sits in a last section of the page, named `Shared parts`, built the same way.
+- **A label or a sample of a unit MUST sit in that unit's section, even when it was drawn on another page.** One that is found on the page of another unit moves to its unit's page and into its section. A thing whose unit is not in the file, or that serves no unit, is removed, and the agent reports each one it removes with what it was.
+
+The distances are fixed, so that every section reads the same. They are in pixels, in the section's own coordinates.
+
+| What | Distance |
+| --- | --- |
+| Padding between the section's edge and its content | 80 on every side, the header at the top left |
+| From the header to the top of the column labels | 48 |
+| From the bottom of a column label to the top of the set | 16, the label's left edge at its column's left |
+| From the row labels' right edge to the set | 24, the column as wide as its widest label, each label centred on its row |
+| Between two bands | 80 |
+| From a band's label to its content | 24 |
+| Between things in one band | 48, standing left to right and wrapping under after 4,000 wide |
+| Between two sections of a page | 240, the first at the top left of the page |
+
+The section is as large as its content and its padding, and it holds each of them: a section neither clips nor resizes what is in it by itself.
+
+- **Moving a set into a section, or to another page, MUST change nothing of the unit.** Its key, its versions' keys, its name, its size, its default and its properties stay as they were, and an instance keeps its main component. An agent reads them before the move and after it, and reports both, as it does for a default.
+- **Size stays a property of a unit, and a set keeps a version for each value of the web.** A value that is only a colour, a corner, a height, a padding or a text size is carried by a variable and never by a version.
+
 ### A set and its layout
 
 - **A set's versions MUST sit in a grid inside the set. No version sits outside the set's box, and no two versions meet.** A version outside its set belongs to no set when a person looks, and two versions that meet hide each other.
@@ -382,16 +424,16 @@ These three rules and the layout rules above do not conflict, because they cover
 
 A set, a lone component and a sheet each have a header label. A row of a set may have a row label.
 
-- **A label MUST name its unit in a form a script can read: its layer is named `label · ` followed by its text, and the text takes one of the three forms stated below.** The unit's name is the name the book gives it. A script then finds the unit that a label belongs to by reading the label, and not by guessing from where it sits. A row label and a column label name the values their row or column holds, and a script finds the unit by the row or column the label sits beside.
-- **A label MUST sit by its unit, on the unit's own page, and move when the unit moves.** A label left behind when its set moves names nothing near it. A label on a page other than its unit's is a defect, and an agent that finds one reports it.
+- **A label MUST name its unit in a form a script can read: its layer is named `label · ` followed by its text, or `header · ` followed by the unit's name for a header, and the text takes one of the three forms stated below.** The unit's name is the name the book gives it. A script then finds the unit that a label belongs to by reading the label, and not by guessing from where it sits. A row label and a column label name the values their row or column holds, and a script finds the unit by the row or column the label sits beside.
+- **A label MUST sit inside its unit's section, on the unit's own page, and move when the unit moves.** A label left behind when its set moves names nothing near it. A label outside its unit's section, or on a page other than its unit's, is a defect, and an agent that finds one reports it. "A file's pages are the showcase's groups, and a unit is one section" states where in the section each label stands.
 
 ### The form of a label
 
-The layer of every label is named `label · ` followed by the label's text, so the name and the text say the same thing. A label has one of three forms.
+The layer of a row label and of a column label is named `label · ` followed by the label's text, and the layer of a header is named `header · ` followed by the unit's name, so the name and the text say the same thing about the unit. A label has one of three forms.
 
 | Label | Its text |
 | --- | --- |
-| Header | the unit's name, then ` — `, then the layout, with notes if there are any |
+| Header | the unit's name, then ` — `, then what the unit is in one line, then ` · `, then the layout, with notes if there are any |
 | Row | the values of the row, in the order of the axes, joined by ` · ` |
 | Column | the values of the column, in the order of the axes, joined by ` · ` |
 
@@ -400,16 +442,16 @@ The layer of every label is named `label · ` followed by the label's text, so t
 - **The default is marked ` (default)`, written once after the one value of each property that the stack's default version carries.** That value comes first in its list, because the version at the top left carries the default.
 - **A row label and a column label name values and no property.** The header names the property, and the label is read against it. `SOLID (default) · SM (default)` is the row of the default variant at the default size.
 
-Two real labels follow. The first is the text of the label of `DSList`. The second is the label of `DSProgress` written in this form.
+Two headers follow, written in this form: the one for `DSList` and the one for `DSProgress`.
 
 ```text
-label · DSList — rows: bulleted=false (default), bulleted=true · columns: flush=false (default), flush=true · its slot holds three DSList.Item at MD, with divided off
-label · DSProgress — rows: size=SM (default), XS, MD, LG, XL · columns: showValue=false (default), true, indeterminate=true · withLabel is off
+header · DSList — the list of items · rows: bulleted=false (default), bulleted=true · columns: flush=false (default), flush=true · its slot holds three DSList.Item at MD, with divided off
+header · DSProgress — the progress bar · rows: size=SM (default), XS, MD, LG, XL · columns: showValue=false (default), true, indeterminate=true · withLabel is off
 ```
 
 ### A sheet of cases, and a case
 
-- **A sheet of cases MUST sit on its unit's page, beside the unit's set, and its name MUST be the unit's name followed by `cases`, such as `DSInput cases`.** The page then shows the unit and its cases in one place, and a script finds the sheet from the unit's name.
+- **A sheet of cases MUST sit in its unit's section, in the band of cases under the unit's set, and its name MUST be the unit's name followed by `cases`, such as `DSInput cases`.** The section then shows the unit and its cases in one place, and a script finds the sheet from the unit's name.
 - **A case MUST be the unit with its prop values set, placed as instances of the unit, and never drawn as a new look.** A case drawn as a new look would be a second look for the same unit. A case is named for what it shows, under one property named `case`, because Figma names the property `Property 1` when the components it combines are not named `property=value`. A case's name holds no comma, and the connector's facts state why.
 - **A case is not a unit and is never published as one.** It MUST NOT take, in the file, a form that publishes it as a component of the library. A published case would appear among the units a stack imports, so a stack would be offered units the book never named, one for each case of each sheet.
 
@@ -417,8 +459,8 @@ How the library keeps to the last rule is stated as far as the book can state it
 
 ### A sample
 
-- **A sample is a node on the page of the unit it shows, at the top level of the page, and its name is `sample · ` followed by what it shows.** It is an instance, a frame of instances, or the text that captions one. It shows a unit in a use that the grid of its set cannot hold, such as a select open, a pair of arrows both on, or a dialog over its backdrop.
-- **A sample is not a unit and is not a stray.** It is no component, holds no version and is never published. It belongs to the unit it shows, so the scan before a publish does not list it as a stray. Like every other top-level node it sits clear of the nodes beside it.
+- **A sample is a node in the section of the unit it shows, in the band of samples, and its name is `sample · ` followed by what it shows.** It is an instance, a frame of instances, or the text that captions one. It shows a unit in a use that the grid of its set cannot hold, such as a select open, a pair of arrows both on, or a dialog over its backdrop.
+- **A sample is not a unit and is not a stray.** It is no component, holds no version and is never published. It belongs to the unit it shows, so the scan before a publish does not list it as a stray. Like every other thing in a section it sits clear of the things beside it, at the distance the section states.
 
 ### A unit with no look of its own
 
@@ -430,7 +472,7 @@ How the library keeps to the last rule is stated as far as the book can state it
 
 ### A new set, sheet or page takes the form of its neighbours
 
-- **A new set, sheet or page MUST take the form of its neighbours: the ground of a set, a label, a place clear of every other node, and the background of its page.** The ground of a set is its fill and its stroke, bound to the same variables the neighbouring sets bind. A new node is made at the corner of its page, where it meets what is there, and a new page has the editor's own background and not the library's. A new set with no ground shows dark text on a dark page, and a page with another background makes the same unit look different from its neighbours.
+- **A new set, sheet or page MUST take the form of its neighbours: the ground of a set, a label, a place clear of every other node, and the background of its page.** The ground of a set is its fill and its stroke, bound to the same variables the neighbouring sets bind. A new unit is made in a section of its own, named as the unit, and the section stands at the end of its group's page, 240 below the last section, in the place the showcase's order gives it. A new page has the editor's own background and not the library's. A new set with no ground shows dark text on a dark page, and a page with another background makes the same unit look different from its neighbours.
 
 ## How an agent changes a library file through the connector
 
@@ -452,7 +494,7 @@ The rules under "Before a connector writes" and "How the connector's work is car
 
 ### Before a publish
 
-- **Before the agent says that a file may be published, it MUST scan the whole file and report each of these:** versions outside a set; pairs of versions that meet; top-level nodes that meet; strays, which are nodes that belong to no unit, no sheet and no sample; a property left with the editor's default name; a set whose properties cannot be read; labels on a page other than their unit's; and each set whose default version is not the one its label names. A person publishes after the agent's word, and a file that is published with one of these shows it to every stack that reads the library.
+- **Before the agent says that a file may be published, it MUST scan the whole file and report each of these:** versions outside a set; pairs of versions that meet; top-level nodes that meet; a top-level node that is no unit's section; things inside a section that meet; strays, which are nodes that belong to no unit, no sheet and no sample; a property left with the editor's default name; a set whose properties cannot be read; labels outside their unit's section or on a page other than their unit's; and each set whose default version is not the one its label names. A person publishes after the agent's word, and a file that is published with one of these shows it to every stack that reads the library.
 
 ## Drawing a block
 
@@ -478,6 +520,7 @@ This ref states what the library draws, how its files are layered, and what stay
 | `RD.SUPPORT.SURFACE.029` | the connector's work in a library file is carried out by an inventory read once, a script for each page, one picture for each set and a probe written once, and a person saves a named version before the connector's first change |
 | `RD.SUPPORT.SURFACE.030` | a library file holds a set in a grid its label states, the stack's default at the top left with the label corrected to it, a label a script can read, and a case that is never published as a unit |
 | `RD.SUPPORT.SURFACE.031` | an agent checks an order against the live file and the web, changes only the nodes it names, and scans the whole file before it says a publish may go |
+| `RD.SUPPORT.SURFACE.032` | a library file has a page for each group of the showcase, in its order, and each unit is one section that holds everything the unit owns, with the header, set, cases, samples and parts in a fixed order and at fixed distances |
 
 ## Proof
 
