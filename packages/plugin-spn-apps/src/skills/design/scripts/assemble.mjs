@@ -3,7 +3,10 @@
 // takes in (`spnutils apps surface library --file`). Plain Node: it reads files and writes one file, and it
 // never runs `spnutils` and never reaches the network. The agent has no judgement in it.
 //
-//   node assemble.mjs --answers <folder> --out <file> [--layer <LAYER>] [--slug <slug>]
+//   node assemble.mjs --answers <folder> --out <file> [--name <file name>] [--layer <LAYER>] [--slug <slug>]
+//
+// Through the connector `figma.root.name` is `Document`, so pass the library file's name with `--name`,
+// such as `DS 4-Containers`; without it the name the answers hold is used.
 //
 // The folder holds one JSON file for each answer, saved exactly as the connector returned it:
 //   - the answer of `inventory.js` with `pageId: null` (the list of the file's pages), once,
@@ -35,7 +38,7 @@ function option(name) {
 
 const folder = option("answers");
 const out = option("out");
-if (folder === null || out === null) refuse("usage: node assemble.mjs --answers <folder> --out <file> [--layer <LAYER>] [--slug <slug>]");
+if (folder === null || out === null) refuse("usage: node assemble.mjs --answers <folder> --out <file> [--name <file name>] [--layer <LAYER>] [--slug <slug>]");
 
 // ---- read the answers
 const answers = readdirSync(folder).filter((name) => name.endsWith(".json")).sort().map((name) => {
@@ -49,7 +52,8 @@ if (answers.length === 0) refuse(`${folder} holds no answer`);
 
 const fileNames = [...new Set(answers.map((answer) => answer.file))];
 if (fileNames.length !== 1 || typeof fileNames[0] !== "string") refuse(`the answers are for ${fileNames.length} files (${fileNames.join(", ")}), and must be for one`);
-const fileName = fileNames[0];
+// The connector names the document `Document`, so the library file's own name is an input (`--name`).
+const fileName = option("name") ?? fileNames[0];
 
 const pageLists = answers.filter((answer) => answer.script === "inventory" && Array.isArray(answer.pages));
 const unitAnswers = answers.filter((answer) => answer.script === "inventory" && Array.isArray(answer.units));

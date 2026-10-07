@@ -278,6 +278,8 @@ await guard(async () => {
   same("a unit holds no `index` and the counts are what the file holds", [Object.keys(inventory.pages[0].units[0]).includes("index"), inventory.counts], [false, { pages: 2, units: 2, variables: 1, textStyles: 1, effectStyles: 0 }]);
   ok("readAt is the earliest time any answer was read", inventory.file.readAt === answersList.map((answer) => answer.readAt).sort()[0]);
   same("--layer and --slug are taken as given", [assemble(answersList, ["--layer", "WIDGETS", "--slug", "ds-3-widgets"]).inventory.file.layer, assemble(answersList, ["--layer", "WIDGETS", "--slug", "ds-3-widgets"]).inventory.file.slug], ["WIDGETS", "ds-3-widgets"]);
+  const renamed = assemble(answersList.map((answer) => ({ ...answer, file: "Document" })), ["--name", "DS 3-Widgets"]).inventory;
+  same("the connector names a document `Document`, so --name gives the file's name, and the slug and layer follow", [renamed.file.name, renamed.file.slug, renamed.file.layer], ["DS 3-Widgets", "ds-3-widgets", "WIDGETS"]);
   const withMeasures = assemble(await readAll(twoPages(), ["DSBox"]));
   same("a unit read with its versions makes the depth 3, and the other units hold none", [withMeasures.inventory.file.depth, withMeasures.inventory.pages[0].units[0].versions.length, withMeasures.inventory.pages[1].units[0].versions], [3, 2, null]);
 });
