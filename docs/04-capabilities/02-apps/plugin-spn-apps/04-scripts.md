@@ -22,6 +22,7 @@ The folder divides by what calls each file. `events/` holds the one process the 
 | What a register is | `packages/plugin-support-lib/src/lib/register.ts` | the headings a register carries, each column found by its heading, one copy in the shared support folder that every plugin reading a register imports |
 | The tiers each kind owes | `packages/plugin-support-lib/src/lib/kinds.ts` | the book's table of kind and owed tier; a contract case is told from an integration one by its folder, `tests/contract/`, and by an `APP_SERVER`'s `tests/integration/` reporting under the tier its kind owes |
 | What a run left behind | `packages/plugin-support-lib/src/lib/runs.ts` | the walk the case reader uses, one copy in the shared support folder |
+| The connector check | `packages/plugin-spn-apps/src/scripts/checks/figma-connector.ts` | a `use_figma` script read before the call: the unsupported APIs, a page assignment, a notice and a close are refused, and the rest is noted |
 | The join check | `packages/plugin-spn-apps/src/scripts/checks/behaviour-join.ts` | every row against every case title, in both directions |
 | The package table | `packages/plugin-spn-apps/src/scripts/commands/library/catalogue.ts` | writes the list of published packages a node may depend on |
 

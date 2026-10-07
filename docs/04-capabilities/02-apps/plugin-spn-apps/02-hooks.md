@@ -6,7 +6,7 @@
 
 `For: Architect · Backend developer` · `Status: ✅ DONE` · `Realizes: Hooks`
 
-The wiring of this plugin is one file declaring one entry. It claims the moment a call is about to run, narrowed to the two tools that change a file, and names one command. **Every rule this plugin holds is about what a file contains**, so there is no other moment worth claiming: reading a file, running a command or ending a turn cannot introduce a pattern in a contract, a service or a test.
+The wiring of this plugin is one file declaring one entry. It claims the moment a call is about to run, narrowed to the two tools that change a file and the Figma connector's script runner, and names one command. **Every rule this plugin holds is about what a file contains, or what a connector script says**, so there is no other moment worth claiming: reading a file, running a command or ending a turn cannot introduce a pattern in a contract, a service or a test.
 
 ## Where
 
@@ -14,10 +14,11 @@ The wiring of this plugin is one file declaring one entry. It claims the moment 
 | --- | --- | --- |
 | The wiring | `packages/plugin-spn-apps/src/hooks/hooks.json` | one `PreToolUse` entry, its matcher, its command and its time budget |
 | The moment | the `PreToolUse` key of that file | the only moment that may refuse a call, and the only one this plugin claims |
-| The matcher | the `matcher` field of that entry | the two tool names that change a file, and nothing else |
+| The matcher | the `matcher` field of that entry | the two tool names that change a file, and the Figma connector's script runner, `mcp__figma__use_figma`, and nothing else |
 | The command | the `command` field of that entry | the one process, addressed through the plugin root rather than through this checkout |
 | The dispatcher | `packages/plugin-spn-apps/src/scripts/events/pretooluse.ts` | runs everything behind the entry, keeps the first refusal, joins the advice |
 | What it resolves | `packages/plugin-spn-apps/src/scripts/checks/subjects.ts` | the subjects for the stack the nearest manifest declares |
+| The connector check | `packages/plugin-spn-apps/src/scripts/checks/figma-connector.ts` | refuses a `use_figma` script that calls an API the connector does not support or one that throws there, and notes a second page switch and a missing `skillNames` |
 
 ## Follows the pattern
 
@@ -41,7 +42,7 @@ The wiring of this plugin is one file declaring one entry. It claims the moment 
 ### The narrowest wiring this plugin could have
 
 **Why** — *a moment claimed for symmetry is a start-up paid on every call in a session*, for an answer nobody asked for.
-**What** — one moment, narrowed to `Write` and `Edit`. Everything else a session does never reaches this plugin at all.
+**What** — one moment, narrowed to `Write`, `Edit` and the Figma connector's `use_figma`. Everything else a session does never reaches this plugin at all.
 **How** — the harness applies the matcher before any process of this plugin's starts, so the filter is free. `packages/plugin-spn-apps/src/hooks/hooks.json`.
 
 ### The budget is declared in the wiring, not trusted to the scripts

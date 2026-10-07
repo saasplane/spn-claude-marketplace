@@ -34,13 +34,18 @@ import type { Payload, Verdict } from "../../../../plugin-support-lib/src/lib/pa
 import { begin, span, end as endTiming, tagsOf, type SpanName } from "../../../../plugin-support-lib/src/lib/timing.ts";
 import { emit, payload } from "../../../../plugin-support-lib/src/lib/payload.ts";
 import { subjectsFor } from "../checks/subjects.ts";
+import { FIGMA_TOOL, run as runFigmaConnector } from "../checks/figma-connector.ts";
 
 // THE SUBJECTS ARE RESOLVED PER WRITE, not held in a module-level list, because which provider
 // answers is a fact about the file being written rather than about this plugin. A workspace holding
 // two stacks gets each one's rules on its own files, from one installed plugin.
 export async function dispatch(event: Payload, span: <T>(name: SpanName, fn: () => T) => T): Promise<Verdict> {
+  // THE CONNECTOR'S SCRIPT RUNNER IS READ BY ITS OWN CHECK, not through a subject: its call has no
+  // file path and the check knows no stack.
+  if (event.tool_name === FIGMA_TOOL)
+    return span({ group: "figma", action: "connector" }, () => runFigmaConnector(event));
   const supplied = event.tool_input ?? {};
-  if (!supplied.file_path) return null;            // every rule here reads a path
+  if (!supplied.file_path) return null;            // every other rule here reads a path
   const notes: string[] = [];
   for (const subject of await subjectsFor(supplied.file_path)) {
     let verdict: Verdict = null;
