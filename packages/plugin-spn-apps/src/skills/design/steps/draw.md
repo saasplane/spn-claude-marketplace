@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "48168461"
+      "seen": "20d3cb33"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
@@ -30,7 +30,7 @@ Its provenance is the foundation book's design library, names, and layout and co
 
 - **Say what you are about to change**: the file, and the items. Stay inside them, and show the result when you have written.
 - **A page is composed from the published library, in a file that is not a library file.** Never write a page into a library file. A case the showcase shows is placed as instances of its unit and never drawn as a new look.
-- **Never ask the developer to draw, rebind, remove or confirm anything in Figma.** A developer's hands are three: publishing a file, using the plugin, and saving a named version before the connector's first change in a library file. Nothing else is asked. When the library lacks something, the change of the library is a plan the plugin executes or a connector write, picked by the nature of the work, as `refs/support/surface/delivery-library.md` states. Say which way and why, and name the developer's next step.
+- **Never ask the developer to draw, rebind, remove or confirm anything in Figma.** A developer's hands are three: publishing a file, using the plugin, and saving a named version before the connector's first change in a library file. Nothing else is asked. When the library lacks something, the change of the library is a plan the plugin executes or a connector write, picked by the nature of the work, as `refs/support/surface/delivery-library.md` states. Before a connector write, read its heading "The connector's facts". Say which way and why, and name the developer's next step.
 
 ## Before you draw
 

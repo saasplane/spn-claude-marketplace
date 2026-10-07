@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "48168461"
+      "seen": "20d3cb33"
     }
   ]
 }
@@ -160,15 +160,45 @@ The connector works one call at a time, and each call costs time and tokens. Six
 
 ### The connector's facts
 
-Read this list before you work in a library file by the connector. **The agent that learns a new fact adds it to this list**, in the book first, and then here.
+Read this list before you work in a library file by the connector. Each is a fact about how Figma or the connector behaves, written once so that no agent tries it again. **The agent that learns a new fact adds it to this list**, in the book first, and then here.
 
-| Fact | What it means for the work |
-| --- | --- |
-| The connector cannot save a named version | a person saves it before the connector's first change in a file |
-| A call starts on the file's first page | a script switches page once, and does not assume the page it worked on before |
-| A comma inside a version's value splits its name | a value never holds a comma, or the set breaks |
-| Versions copied into a set sit on one another | they are laid out before the set is read or shown |
-| The footer slot of a nested popup takes an instance | the instance is put in through the slot |
+| Group | Fact | What the agent does |
+| --- | --- | --- |
+| Every call | A script is plain JavaScript | it uses top-level `await` and `return`, with no wrapper and no call to close the plugin |
+| Every call | Only the `return` value comes back | it returns what it needs to see, because a log line is not returned and a notice throws |
+| Every call | Every promise must be awaited | it awaits each one, or the call ends before the work does |
+| Every call | No state lives between calls | it passes the ids of an earlier call as text in the script |
+| Every call | A call names the skills it follows | it passes the skill names on every call, and the skill for changing a library on a call that changes a set, a version, a variable or a style |
+| Every call | An error says whether the call may run again | it reads that answer, runs the call again if it is safe, and reads the file first if it is not |
+| Pages | A call starts on the file's first page, every time | a script does not assume the page it worked on before |
+| Pages | Moving to a page is an async call, and a switch loads the file again | a script switches page once and never inside a loop over pages |
+| Pages | Work on several pages is several calls | it sends one call for each page, and calls that only read may be sent together |
+| Reading | A search by type uses an index and is far faster than a search with a test | it searches by type first |
+| Reading | A node's subtree is searched by a selector | it uses the node's query, such as a name, a type or a child of a type, and not a loop |
+| Reading | A set holds its property definitions and a version does not | it never reads the definitions from a version, and optional chaining does not make that safe |
+| Reading | Only some kinds of node have some properties | it checks the node's kind before it reads such a property |
+| Reading | A picture of a node comes back in the answer | it asks the node for it, and sets the scale when the default size is too small |
+| Writing | A call that changes the file must say what it changed | it returns every id made or changed |
+| Writing | A colour runs from 0 to 1, and its opacity sits on the paint | it writes the three channels with no alpha, and sets the opacity on the paint |
+| Writing | Fills and strokes are read-only lists | it copies the list, changes the copy and assigns it back |
+| Writing | A paint bound to a variable is a new paint | it assigns the new paint back |
+| Writing | A text cannot change before its fonts are loaded | it loads the text's own fonts first, then changes it |
+| Writing | A new node lands at the corner of its page | it places the node clear of what the page holds |
+| Writing | A child must be in its parent before it is set to hug or fill | it appends the child first, and sets the size before the sizing modes |
+| Writing | A variable or a style that fits is better than a plain value | it binds fills, strokes, padding, radius and gap to a variable where one fits, and uses a plain value only where the work names one |
+| Writing | Versions combined into a set sit on one another | it lays them out in a grid and resizes the set before the set is read or shown |
+| Writing | A comma inside a version's value splits its name | a value never holds a comma, or the set breaks |
+| Writing | An id cannot be guessed | it reads an id from an earlier answer and never makes one up |
+| Writing | A name's beginning can match more than one node | it cleans up only by exact id |
+| Composing a sheet | A part moved across calls can fail with no error and leave a node with no parent | it makes the wrapper frame first, builds each part inside it, and fetches the wrapper by id at the start of each script |
+| Composing a sheet | A child cannot be appended to an instance | it fills a slot through the slot, and the footer slot of a nested popup takes an instance put in through it |
+| Composing a sheet | An instance holds its text in a text property | it sets the text through that property, reading the exact key from the instance, and sets the text of a layer only where no property holds it |
+| Composing a sheet | A variable or a style of another library file is not in the local lists | it finds one through a layer of this file that uses it, or imports it by key |
+| Composing a sheet | A picture of a whole case cannot be edited | it never places one as a fill or a layer, and builds the case from layers |
+| What the connector cannot do | It cannot save a named version | a person saves it before the connector's first change in a file |
+| What the connector cannot do | It cannot load all pages at once | it works on one page at a time |
+| What the connector cannot do | It cannot set plugin data | it keeps its notes outside the file |
+| What the connector cannot do | It cannot create an image from bytes | it builds the drawing from layers, and an icon is an instance of the icon unit |
 
 ## Drawing a block
 
