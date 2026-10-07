@@ -15,7 +15,6 @@ import { dirname, relative, resolve } from "node:path";
 import { existsSync } from "node:fs";
 
 import { draw, type Spec } from "./draw.ts";
-import { colour } from "./figures.ts";
 import { isSeatFile, producedPageOf } from "../../../../plugin-support-lib/src/lib/docs-tree.ts";
 
 export type Finding = { message: string; line?: number };
@@ -30,6 +29,8 @@ const STATUS_GLYPH: Record<string, string> = { DONE: "&#x2705;", IMPLEMENTING: "
 
 /** The block a section declares, chosen the way the chapter's own order chooses it. */
 const esc = (s: string) => s.replace(/&(?![a-zA-Z#][a-zA-Z0-9]*;)/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+/** Code is a literal, so every `&` is written as an entity: a block tagged with a language shows each character its author typed. */
+const escapedCode = (code: string) => code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 /**
  * Inline markdown, in the order that stops one form eating another. Inline code is held behind a
@@ -161,9 +162,9 @@ function renderBody(lines: string[], findings: Finding[]): string {
       } else if (lang === "html") {
         out.push(body.join("\n"));
       } else {
-        // Colour is added when the page is produced, as spans the stylesheet colours in both
-        // themes. No highlighter runs in the reader's browser.
-        out.push(`  <pre${lang ? ` data-lang="${lang}"` : ""}>${lang ? colour(body.join("\n"), lang) : esc(body.join("\n"))}</pre>`);
+        // The page holds plain code, tagged with its language. The shared script colours the block
+        // when the page opens, so no colour is written here.
+        out.push(`  <pre${lang ? ` data-lang="${lang}"` : ""}>${lang ? escapedCode(body.join("\n")) : esc(body.join("\n"))}</pre>`);
       }
       continue;
     }

@@ -46,7 +46,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "6d8c6552"
+      "seen": "34a63ae2"
     }
   ]
 }
@@ -568,6 +568,16 @@ TypeScript, `refs/support/apps/providers/ts/02-naming.md` and `05-code.md` in th
 page in a workstream belongs to no stack, so nothing else brings those references into your session.
 Each stage keeps its own words in a sample too: a support interface names no platform word, such as an
 organization.
+
+**Write a code block plain, and tag it with its language — MUST** (`RD.DEVEX.WORKSPACE.237`). On a
+page you write by hand, a code block is `<pre data-lang="ts">` with the code inside it and nothing else:
+no `<span>`, and no colour class. Write `&lt;` for `<` and `&amp;` for `&`, as in any HTML text. The
+shared script that every page loads colours the block when the page opens, so you run no step to colour
+it. The script knows `ts`, `json`, `yaml`, `sql`, `sh`, `diff` and `md`. A block with no language, such
+as a tree or a command's output, is `<pre>` with no tag, and it is never coloured.
+`spn-devex docs figure colour <page…>` names a block whose file still carries colour spans. The
+script colours code from version `1.4.0` of the shared files, so a page that links an earlier version
+shows its code plain.
 
 **A preview holds what the developer judges, and nothing you need — MUST** (`RD.DEVEX.WORKSPACE.210`).
 It is written for the person who says yes or no. Show the proposal in its final form, the few rules it

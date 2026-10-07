@@ -76,42 +76,42 @@
 
 <section id="literals" data-block="example">
   <div class="sds-section-head"><h2>Literals &mdash; code, trees and changes, read character by character</h2></div>
-  <p>{{A literal is read character by character, so it sits in a block of its own and is coloured when the page is produced.}}</p>
+  <p>{{A literal is read character by character, so it sits in a block of its own. The page's file holds the code plain, and the shared script colours it when the page opens.}}</p>
   <h3 id="b-example">EXAMPLE &mdash; faster to see, with a CODE figure</h3>
   <p>{{One sentence saying what you are looking at.}}</p>
-  <pre data-lang="ts"><span class="sds-tk-k">export</span> <span class="sds-tk-k">enum</span> <span class="sds-tk-t">{{SPContractType}}</span> {
-  {{MEMBER}} = <span class="sds-tk-s">'{{member}}'</span>,   <span class="sds-tk-c">// what this member means</span>
+  <pre data-lang="ts">export enum {{SPContractType}} {
+  {{MEMBER}} = '{{member}}',   // what this member means
 }</pre>
   <p>{{One sentence saying what to notice.}}</p>
-  <h3 id="b-code">CODE &mdash; one block per language the renderer colours</h3>
-  <p>{{Tag every block with its language. An untagged block is never coloured, and the colouring is added when the page is produced &mdash; these samples are the real output, not hand-written spans.}}</p>
+  <h3 id="b-code">CODE &mdash; one block per language the shared script colours</h3>
+  <p>{{Tag every block with its language, as <code>data-lang</code> on the <code>pre</code>. The file holds plain code. The shared script, <code>sds-docs.js</code>, reads the tag when the page opens and colours the block, so nobody writes a colour into a page. A block with no tag is never coloured.}}</p>
   <p class="sds-small">ts &mdash; a contract as it is declared, a comment per member</p>
-  <pre data-lang="ts"><span class="sds-tk-k">export</span> <span class="sds-tk-k">interface</span> <span class="sds-tk-t">SPRepo</span> {
-  <span class="sds-tk-k">type</span>: <span class="sds-tk-t">SPRepoType</span>;   <span class="sds-tk-c">// the world, and the whole of what a tool dispatches on</span>
-  name: <span class="sds-tk-t">CDTString</span>;          <span class="sds-tk-c">// what a person calls this repository</span>
-  config: <span class="sds-tk-t">SPRepoConfig</span> | <span class="sds-tk-k">null</span>;
+  <pre data-lang="ts">export interface SPRepo {
+  type: SPRepoType;   // the world, and the whole of what a tool dispatches on
+  name: CDTString;          // what a person calls this repository
+  config: SPRepoConfig | null;
 }</pre>
   <p class="sds-small">json &mdash; a manifest, with real values</p>
   <pre data-lang="json">{
-  <span class="sds-tk-s">"type"</span>: <span class="sds-tk-s">"APPS"</span>,
-  <span class="sds-tk-s">"name"</span>: <span class="sds-tk-s">"Platform"</span>,
-  <span class="sds-tk-s">"config"</span>: { <span class="sds-tk-s">"stack"</span>: <span class="sds-tk-s">"TS"</span>, <span class="sds-tk-s">"deploys"</span>: <span class="sds-tk-k">true</span>, <span class="sds-tk-s">"platform"</span>: <span class="sds-tk-k">null</span> }
+  "type": "APPS",
+  "name": "Platform",
+  "config": { "stack": "TS", "deploys": true, "platform": null }
 }</pre>
   <p class="sds-small">yaml &mdash; a declaration a person edits</p>
-  <pre data-lang="yaml"><span class="sds-tk-c"># one environment row, as the estate declares it</span>
+  <pre data-lang="yaml"># one environment row, as the estate declares it
 setup: dev
 region: in
 deploy:
   mtype: BRANCH
   branch: develop</pre>
   <p class="sds-small">sql &mdash; the authoritative shape of a table</p>
-  <pre data-lang="sql"><span class="sds-tk-k">CREATE</span> <span class="sds-tk-k">TABLE</span> iam_identity (
-  id CHAR(<span class="sds-tk-n">26</span>) <span class="sds-tk-k">PRIMARY</span> <span class="sds-tk-k">KEY</span>,
-  handle VARCHAR(<span class="sds-tk-n">180</span>) <span class="sds-tk-k">NOT</span> <span class="sds-tk-k">NULL</span> <span class="sds-tk-k">UNIQUE</span>,
-  created_at TIMESTAMPTZ <span class="sds-tk-k">DEFAULT</span> now()
+  <pre data-lang="sql">CREATE TABLE iam_identity (
+  id CHAR(26) PRIMARY KEY,
+  handle VARCHAR(180) NOT NULL UNIQUE,
+  created_at TIMESTAMPTZ DEFAULT now()
 );</pre>
   <p class="sds-small">sh &mdash; a command somebody else can run</p>
-  <pre data-lang="sh"><span class="sds-tk-c"># bring a repository to the standard, then wire its agent</span>
+  <pre data-lang="sh"># bring a repository to the standard, then wire its agent
 spnutils repo create platform
 spnutils repo agent-sync</pre>
   <p class="sds-small">md &mdash; markdown shown as source, when the page is about the markup</p>
@@ -119,7 +119,7 @@ spnutils repo agent-sync</pre>
 
 | Term | Contract term | What it means |
 | --- | --- | --- |
-| Estate | <span class="sds-tk-s">`SPEstate`</span> | everything one company&#x27;s work runs on |</pre>
+| Estate | `SPEstate` | everything one company&#x27;s work runs on |</pre>
   <p class="sds-small">no language &mdash; output, a path, a name pattern: nothing to colour</p>
   <pre>{{org}}-{{spc}}-{{env}}-{{region}}
 &rarr; spn-dmo-live-in</pre>
@@ -129,8 +129,8 @@ spnutils repo agent-sync</pre>
 │   └── {{leaf}}      {{what it is}}
 └── {{child}}         {{what it is}}</pre>
   <h3 id="b-diff">DIFF &mdash; what a file says today and what it will say (approach pages only)</h3>
-  <pre data-lang="diff"><span class="sds-tk-del">- what the file says today</span>
-<span class="sds-tk-add">+ what it will say</span></pre>
+  <pre data-lang="diff">- what the file says today
++ what it will say</pre>
 </section>
 
 <section id="figures" data-block="example">

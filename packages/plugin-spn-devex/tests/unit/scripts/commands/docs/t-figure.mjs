@@ -7,6 +7,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
+import { colouredBlocks } from "../../../../../src/scripts/lib/figures.ts";
 import { OWN_COPY, linesFor } from "../../../../../../plugin-support-lib/src/lib/page-styles.ts";
 
 const TOOL = resolve(PLUGIN, "src", "scripts", "cli.ts");
@@ -71,18 +72,28 @@ function pageIn(name, text) {
     !report.out.includes("RULE styles") && report.code === 0);
 }
 
-// `colour` is the geometry check's other half — also no browser.
+// `colour` reads a page's code blocks — also no browser. A page's file holds plain code, and the shared
+// script colours it when the page opens, so a block that carries colour spans in the file is named.
 {
   const coloured = `<pre data-lang="ts"><span class="sds-tk-k">const</span> a = <span class="sds-tk-n">1</span>;</pre>`;
-  const { out, code } = run(["colour", pageIn("colour", shared(coloured))]);
-  one("`figure colour` runs the colour audit, not the render: a block coloured with the shared names matches its own text",
-    out.includes("every coloured block matches its own text") && code === 0);
-  const bad = run(["colour", pageIn("colour-bad", shared(coloured.replace("sds-tk-n", "sds-tk-k")))]);
-  one("known-bad: a block whose colouring is not what its text gives is refused",
-    bad.out.includes("1 block off") && bad.code === 1);
+  const plain = `<pre data-lang="ts">const a = 1; // a &lt;tag&gt;</pre>\n<pre data-lang="diff">- today\n+ after</pre>\n<pre>folder/\n  file</pre>`;
+  const { out, code } = run(["colour", pageIn("colour", shared(plain))]);
+  one("`figure colour` runs the colour check, not the render: a plain block tagged with its language passes, and so does a block with no language",
+    out.includes("every code block is plain in its file") && code === 0);
+  const bad = run(["colour", pageIn("colour-bad", shared(coloured))]);
+  one("known-bad: a block whose file still carries colour spans is refused, and the finding names its language",
+    bad.out.includes("1 block carries colour in the file") && bad.out.includes("a `ts` block carries colour spans in the file") && bad.code === 1);
+  one("the finding says who colours a block, and what to do", bad.out.includes("the shared script colours it when the page opens: remove the spans"));
+  const untagged = run(["colour", pageIn("colour-untagged", shared(`<pre><span class="sds-tk-del">- today</span></pre>`))]);
+  one("known-bad: a block with no language that carries colour spans is refused too",
+    untagged.out.includes("a block with no language carries colour spans in the file") && untagged.code === 1);
+  one("each of the seven classes the shared script writes is found, in a block of any language",
+    ["k", "t", "s", "c", "n", "add", "del"].every((name) => colouredBlocks(`<pre data-lang="sql"><span class="sds-tk-${name}">x</span></pre>`).length === 1));
+  one("a span written as text, and a span outside a block, are not colour in a block",
+    colouredBlocks(`<p><span class="sds-tk-k">const</span></p>\n<pre data-lang="md">&lt;span class="sds-tk-k"&gt;const&lt;/span&gt;</pre>`).length === 0);
   const own = run(["colour", pageIn("colour-own", `<!-- spn:doc\n{"id": "probe", "variant": "overview", "title": "Probe"}\n-->\n<style>.tk-k{color:red}</style>\n<pre data-lang="ts"><span class="tk-k">const</span> a = 1;</pre>\n`)]);
   one("[MKT.SCRIPTS.108] `figure colour` names a page that holds its own copy once, as a RULE, and reads no block of it",
-    (own.out.match(/✗ RULE styles/g) ?? []).length === 1 && own.out.includes(OWN_COPY) && !own.out.includes("RULE figure") && !/blocks? off/.test(own.out));
+    (own.out.match(/✗ RULE styles/g) ?? []).length === 1 && own.out.includes(OWN_COPY) && !own.out.includes("RULE figure") && !/blocks? carr/.test(own.out));
   one("[MKT.SCRIPTS.108] and it exits 1, and the summary says the page was not read", own.out.includes("1 page not read") && own.code === 1);
 }
 
@@ -180,11 +191,11 @@ console.log("\n=== `--variant` narrows the pages `check` and `colour` read");
     outside.code === 2 && outside.out.includes("takes `--variant` from approach · overview · construct") && outside.out.includes("and `chapter` is none of them."));
 
   const allBlocks = run(["colour", dir]);
-  one("known-bad: with no filter `colour` reports the block on all three pages", allBlocks.code === 1 && allBlocks.out.includes("3 blocks off"));
+  one("known-bad: with no filter `colour` reports the block on all three pages", allBlocks.code === 1 && allBlocks.out.includes("3 blocks carry colour in the file"));
   const reports = run(["colour", dir, "--variant", "report"]);
   one("[MKT.SCRIPTS.141] `colour --variant report` reads the one page of that variant",
-    reports.code === 1 && reports.out.includes("1 block off") && reports.out.includes("report.html") && !reports.out.includes("overview.html"));
-  one("[MKT.SCRIPTS.141] the message names the action that produces the colouring", reports.out.includes("is not what `docs figure colour` produces from its own text"));
+    reports.code === 1 && reports.out.includes("1 block carries colour in the file") && reports.out.includes("report.html") && !reports.out.includes("overview.html"));
+  one("[MKT.SCRIPTS.141] the message names the block by its language", reports.out.includes("a `ts` block carries colour spans in the file"));
   const oneFile = run(["check", join(dir, "plain.html")]);
   one("a path that names one file reads that file alone", oneFile.code === 1 && oneFile.out.includes("over 1 page") && !oneFile.out.includes("overview.html"));
 }

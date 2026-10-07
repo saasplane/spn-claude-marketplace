@@ -5,8 +5,8 @@
 // Two halves under one subject: the geometry check reads a spec and the SVG it draws to; the browser
 // render answers what a real layout paints; `draw` is the same drawer, offered to a hand-written page.
 //
-//   spn-devex docs figure check <path…> [--variant <name>]    labels fit and connectors join · a block's colouring matches its text
-//   spn-devex docs figure colour <path…> [--variant <name>]   the audit's half: a coloured block strips back to what the author wrote
+//   spn-devex docs figure check <path…> [--variant <name>]    labels fit and connectors join, and every spec draws
+//   spn-devex docs figure colour <path…> [--variant <name>]   a code block's file holds plain code, and carries no colour span
 //   spn-devex docs figure render <svg-or-html…>               render each in a headless browser and report what it painted
 //   spn-devex docs figure draw <spec.json…>                   print the drawing of each spec — a `.json` file, or a `.md` page's own ```dg``` blocks
 //
@@ -19,7 +19,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { basename, dirname, extname, join, relative } from "node:path";
-import { checkFigures, colour, stripSpans } from "../../lib/figures.ts";
+import { checkFigures, colouredBlocks } from "../../lib/figures.ts";
 import { draw } from "../../lib/draw.ts";
 import { type Action, REQUIRED, readWords, scopeOf } from "../../../../../plugin-support-lib/src/lib/command.ts";
 import { DEVEX_WORKSTREAMS, DOCS, hasSegment, slashes } from "../../../../../plugin-support-lib/src/lib/docs-tree.ts";
@@ -40,7 +40,7 @@ export const describe = "a figure's own geometry against the page, and what a br
 
 // ---------------------------------------------------------------------------- check | colour
 
-/** The two actions that read a page's own text: `check` judges its drawings, and `colour` its coloured blocks. */
+/** The two actions that read a page's own text: `check` judges its drawings, and `colour` its code blocks. */
 function geometry(sub: "check" | "colour", args: string[]): number {
   const words = readWords(args, { variant: VARIANTS });
   const paths = scopeOf(words.paths, REQUIRED);
@@ -132,28 +132,30 @@ function geometry(sub: "check" | "colour", args: string[]): number {
     return total ? 1 : 0;
   }
 
-  // The audit's half: a coloured block must strip back to what the author wrote.
+  // A page's file holds plain code: the shared script colours a block when the page opens, so a block
+  // whose file carries colour spans holds a second copy of the colouring, and it is named.
   let bad = 0;
   let unread = 0;
   for (const f of files) {
     const src = readFileSync(f, "utf8");
-    // The colouring is spans that carry the shared stylesheet's class names, so a page that links
-    // no shared stylesheet is named once, as a RULE, and its blocks are not read.
+    // The shared script colours a block, so a page that links no shared stylesheet and script is
+    // named once, as a RULE, and its blocks are not read.
     if (holdsOwnCopy(f, src)) {
       if (isPageOfOurs(f, src) && !inClosedWorkstream(f)) { unread += 1; console.log(`✗ RULE styles    ${relative(workspace, f)}\n         ${OWN_COPY}`); }
       continue;
     }
-    for (const m of src.matchAll(/<pre data-lang="([a-z]+)">([\s\S]*?)<\/pre>/g)) {
-      const round = colour(stripSpans(m[2]), m[1]);
-      if (round !== m[2]) { bad++; console.log(`✗ RULE figure    ${relative(workspace, f)}\n         a \`${m[1]}\` block's colouring is not what \`docs figure colour\` produces from its own text`); }
+    for (const block of colouredBlocks(src)) {
+      bad += 1;
+      console.log(`✗ RULE figure    ${relative(workspace, f)}\n         ${block.language ? `a \`${block.language}\` block` : "a block with no language"} carries colour spans in the file. `
+        + "A page's file holds plain code, and the shared script colours it when the page opens: remove the spans");
     }
   }
   // A page that was not read is counted apart from a block that is off, and either one is a RULE.
   const summary = [
-    ...(bad ? [`${bad} block${bad > 1 ? "s" : ""} off`] : []),
+    ...(bad ? [`${bad} block${bad > 1 ? "s carry" : " carries"} colour in the file`] : []),
     ...(unread ? [`${unread} page${unread > 1 ? "s" : ""} not read`] : []),
   ];
-  console.log(summary.length ? `\n${summary.join(" · ")}` : "every coloured block matches its own text");
+  console.log(summary.length ? `\n${summary.join(" · ")}` : "every code block is plain in its file");
   return bad || unread ? 1 : 0;
 }
 
@@ -298,7 +300,7 @@ export const actions: Record<string, Action> = {
     run: (args) => geometry("check", args),
   },
   colour: {
-    describe: "a coloured block strips back to the text its author wrote",
+    describe: "a code block's file holds plain code, and carries no colour span",
     usage: "<path…> [--variant <name>]",
     run: (args) => geometry("colour", args),
   },

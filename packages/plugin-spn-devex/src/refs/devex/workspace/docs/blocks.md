@@ -9,7 +9,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "The blocks — what a page reaches for instead of prose",
-      "seen": "95e1ebbb"
+      "seen": "ecd6d365"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -73,7 +73,8 @@ declares *the* block of a section.
 | a shape (a figure) | a fenced block tagged `dg`, holding strict JSON |
 | a note to yourself, never rendered | `<!-- … -->`, on one line or many |
 
-**A fenced block with no language is never coloured**, so tag it. The colourer knows seven:
+**A fenced block with no language is never coloured**, so tag it. The page holds the code plain, and
+the shared script colours a tagged block when the page opens. The script knows seven languages:
 `ts` · `json` · `yaml` · `sql` · `sh` · `diff` · `md`.
 
 **One rule for figures, and it is not optional**: every figure has a **sentence before it** saying

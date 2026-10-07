@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "6d8c6552"
+      "seen": "34a63ae2"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -627,6 +627,10 @@ for TypeScript, `refs/support/apps/providers/ts/02-naming.md` and `05-code.md` i
 page in a workstream belongs to no stack, so nothing else loads them. A support interface in a sample names
 no platform word.
 
+**A code block is written plain, and tagged with its language — MUST** (decision RD.DEVEX.WORKSPACE.237). A
+page's file holds `<pre data-lang="ts">` with the code inside it, and no `<span>` or colour class. The shared
+script colours the block when the page opens, from that tag. A block with no language is `<pre>` with no tag.
+
 **The rail is built from the markup.** Every `<section id>` becomes an entry, named from its `h2` up
 to the em dash, and every `<h3 id>` inside it an entry under it, named the same way: *SEQUENCE — steps in
 order* is *SEQUENCE* in the rail, and the heading on the page keeps the rest (decision RD.DEVEX.WORKSPACE.231,
@@ -710,7 +714,7 @@ version of the stylesheet that has them.
 
 ## Blocks and figures — what a page is made of
 
-**A page is produced, never authored.** You write a **seat file in markdown** and `docs page write` renders it. You never name a block, never write a class, and never paste HTML into a seat file. The renderer reads ordinary markdown components and gives each one its form: a table becomes a card, a fenced block with a language becomes a coloured code block, a blockquote becomes the `MUST` callout, a numbered list becomes an ordered list, a ```` ```dg ```` fence becomes a drawn figure.
+**A page is produced, never authored.** You write a **seat file in markdown** and `docs page write` renders it. You never name a block, never write a class, and never paste HTML into a seat file. The renderer reads ordinary markdown components and gives each one its form: a table becomes a card, a fenced block with a language becomes a code block tagged with that language, which the shared script colours when the page opens, a blockquote becomes the `MUST` callout, a numbered list becomes an ordered list, a ```` ```dg ```` fence becomes a drawn figure.
 
 **Markdown keeps its own grammar and HTML keeps the blocks.** A capability chapter stays markdown and is never produced as a page, so none of this reaches it. The split is stated in the book: `02-document.md` governs markdown, `05-artifacts.md` governs the page.
 

@@ -4,7 +4,7 @@
 //
 //   check    labels fit their boxes; every connector starts and ends on a box edge or on another
 //            connector; nothing hugs the viewBox edge; no connector crosses a label
-//   colour   the tokens of a `data-lang` block, wrapped in spans the stylesheet colours in both themes
+//   colour   the code blocks of a page whose file carries colour spans; the shared script colours a block when the page opens
 //
 // A connector is a claim that two things touch, which is what makes a figure checkable rather than a
 // matter of taste. Ported from this workstream's `notes/figcheck.py`, the reference that passes on all
@@ -477,81 +477,19 @@ export function checkFigures(src: string): FigureFinding[] {
 // ---------------------------------------------------------------------------- colour
 
 /**
- * Token colouring, added when the page is produced. A token the rules do not know stays plain —
- * never wrong — and the audit compares the raw text rather than the spans, so stripping every span
- * must give back exactly what the author wrote.
+ * A code block is coloured when the page opens, by the shared script (`styles/sds-docs.js`), which holds
+ * the language rules and is their one place. A page's file holds plain code, so the command side keeps
+ * no rule of its own: it only finds a block whose file carries the spans the script writes.
  */
-const LANGS: Record<string, { keywords?: string[]; comment?: RegExp; type?: RegExp }> = {
-  ts: { keywords: "const let var function return if else for while class interface type enum export import from as await async new extends implements readonly public private void null undefined true false".split(" "), comment: /\/\/[^\n]*|\/\*[\s\S]*?\*\//g, type: /\b[A-Z][A-Za-z0-9_]+\b/g },
-  json: { keywords: ["true", "false", "null"] },
-  yaml: { comment: /#[^\n]*/g },
-  sql: { keywords: "SELECT FROM WHERE INSERT INTO VALUES UPDATE SET DELETE CREATE TABLE INDEX PRIMARY KEY FOREIGN REFERENCES NOT NULL UNIQUE ON DEFAULT ALTER ADD CONSTRAINT AND OR JOIN LEFT INNER GROUP BY ORDER LIMIT".split(" "), comment: /--[^\n]*/g },
-  sh: { comment: /#[^\n]*/g },
-  diff: {},
-  md: {},
-};
+const CODE_BLOCK = /<pre\b([^>]*)>([\s\S]*?)<\/pre>/g;
+const COLOUR_SPAN = /<span class="sds-tk-(?:k|t|s|c|n|add|del)">/;
+const LANGUAGE_TAG = /\bdata-lang="([^"]*)"/;
 
-const HTML_ESC = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
-export function colour(code: string, lang: string): string {
-  const spec = LANGS[lang];
-  if (!spec) return HTML_ESC(code);
-
-  if (lang === "diff")
-    return code.split("\n").map((l) =>
-      l.startsWith("+") ? `<span class="sds-tk-add">${HTML_ESC(l)}</span>`
-      : l.startsWith("-") ? `<span class="sds-tk-del">${HTML_ESC(l)}</span>`
-      : HTML_ESC(l)).join("\n");
-
-  // Comments and strings are taken out first, so a keyword inside one is never coloured as code.
-  //
-  // The placeholder is built at runtime from SUB (0x1A) and carries its index in LETTERS. Two faults
-  // the round-trip test found: a digit in the marker was matched by the number rule below, which
-  // wrapped it in a span and left the marker unrestorable; and writing the control character into
-  // this file as a literal put raw NUL bytes in the source.
-  const SEP = String.fromCharCode(26);
-  const held: string[] = [];
-  const mark = (i: number) => {
-    let s = "", n = i + 1;
-    while (n > 0) { s = String.fromCharCode(97 + ((n - 1) % 26)) + s; n = Math.floor((n - 1) / 26); }
-    return SEP + s + SEP;
-  };
-  const hold = (cls: string, text: string) => {
-    held.push(`<span class="${cls}">${HTML_ESC(text)}</span>`);
-    return mark(held.length - 1);
-  };
-
-  // EVERY span becomes a placeholder, not just the comments and strings. Inserting markup and then
-  // running another pass over it is how a highlighter colours its own output: the TypeScript keyword
-  // list carries `class`, so the keyword pass wrapped the `class` inside a `<span class="sds-tk-n">` it
-  // had just written. The round-trip test is what caught it.
-  const keep = (cls: string, escaped: string) => {
-    held.push(`<span class="${cls}">${escaped}</span>`);
-    return mark(held.length - 1);
-  };
-
-  let out = code;
-  if (spec.comment) out = out.replace(spec.comment, (m) => hold("sds-tk-c", m));
-  out = out.replace(/'[^'\n]*'|"[^"\n]*"|`[^`\n]*`/g, (m) => hold("sds-tk-s", m));
-
-  out = HTML_ESC(out);
-  out = out.replace(/\b\d+(?:\.\d+)?\b/g, (m) => keep("sds-tk-n", m));
-  if (spec.keywords?.length) {
-    const kw = new RegExp(`\\b(${spec.keywords.map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})\\b`, "g");
-    out = out.replace(kw, (m) => keep("sds-tk-k", m));
+/** Each code block of a page whose file carries colour spans, by its language tag; null where it has none. */
+export function colouredBlocks(html: string): { language: string | null }[] {
+  const found: { language: string | null }[] = [];
+  for (const [, attributes, body] of html.matchAll(CODE_BLOCK)) {
+    if (COLOUR_SPAN.test(body)) found.push({ language: LANGUAGE_TAG.exec(attributes)?.[1] ?? null });
   }
-  if (spec.type) out = out.replace(spec.type, (m) => keep("sds-tk-t", m));
-
-  return out.replace(new RegExp(`${SEP}([a-z]+)${SEP}`, "g"), (_, k: string) => {
-    let i = 0;
-    for (const ch of k) i = i * 26 + (ch.charCodeAt(0) - 96);
-    return held[i - 1];
-  });
-}
-
-/** The audit's half: the raw text of a coloured block must equal what the author wrote. */
-export function stripSpans(html: string): string {
-  // `&amp;` is unescaped LAST. Doing it first turns an author's literal `&lt;` into `<`.
-  return html.replace(/<span class="sds-tk-[a-z]+">/g, "").replace(/<\/span>/g, "")
-    .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+  return found;
 }
