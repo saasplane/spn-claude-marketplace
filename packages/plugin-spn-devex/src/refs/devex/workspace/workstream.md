@@ -46,7 +46,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "34a63ae2"
+      "seen": "4c0f7596"
     }
   ]
 }
@@ -553,12 +553,31 @@ one decision, and never two that each show the same decision in another form.
 are *Overview*, *Today*, *Proposed* and *Where it lands*, and it holds no card. *Overview* names the
 decision first, what to look at first and what is not final. *Today* shows the thing as it is, and
 *Proposed* shows it as it will be, with its options side by side where a decision is still open. *Where
-it lands* names the files that change, by repository, in a few lines, with a link to the approach page's
-own `How`. A preview carries no `Why`, `What` or `How` and does not retell how the workstream reached
+it lands* shows the files that change as one folder tree for each repository, with a link to the approach
+page's own `How`. A preview carries no `Why`, `What` or `How` and does not retell how the workstream reached
 this point, because the approach page holds that. A question is asked on the approach page, in `Open`,
 and its card links the preview that shows the options. **A preview never frames a sample file**: it shows
 a thing with the page's own blocks, such as a table, a tree, a figure or a code block, and where the
 thing is a real file it links that file in the arc's `samples/` folder.
+
+**Draw *Where it lands* as one folder tree for each repository — MUST** (`RD.DEVEX.WORKSPACE.238`). A
+reviewer understands a change by browsing folders, and a path in a table cell has to be put together in
+the head. So never write the section as a table of file paths. Group it by repository, in the order the
+work runs. For each repository write one line that names it and says what happens there, and then one
+`TREE` block:
+
+- one folder or file on each line, and never two columns of entries
+- a note in one column on the right: `new` or `changed`, then what the change is
+- a folder with no note only holds what is under it
+- a deep path drawn as folders on their own lines, so the note column stays near the names
+- in a preview that is still proposed, the folders and the files that are certain, with a sentence that
+  says which ones are not known yet
+
+The section is a mix of blocks whose first job is to show the changes. Always draw the tree. After a
+repository's tree, add the blocks that show its changes: a diff of one file, code, JSON or a figure. A
+table never lists the changes. You decide which changes need a block. Add a block only where the note
+beside the entry is not enough to judge the change. Code in such a block is plain with its language tag
+and follows its stack's references, as the next two rules say.
 
 **Code shown on a page follows its stack's own standards — MUST** (`RD.DEVEX.WORKSPACE.235`). A code
 block in a preview or on an approach page is read as code and copied as code. So it follows the naming

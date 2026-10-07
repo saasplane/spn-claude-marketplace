@@ -15,7 +15,7 @@
 -->
 
 
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.3.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.css">
 <div class="sds-page">
 
 <nav class="sds-rail" id="rail">
@@ -110,11 +110,32 @@
 
 <section id="s4" data-block="sequence">
   <div class="sds-section-head"><h2>Where it lands &mdash; {{what changes in each repository, in one line}}</h2></div>
-  <p>{{Which repositories change, in a few lines each, in the order the work runs. The approach page&rsquo;s own How holds the full detail.}}</p>
-  <h3 id="s4a">{{repository}} &mdash; {{the kind of change}}</h3>
-  <p><code>{{path of the file that changes}}</code></p>
+  <p>{{Which repositories change, in the order the work runs. The approach page&rsquo;s own How holds the full detail.}}</p>
+
+  <h3 id="s4a">{{Every change, by repository, in the order the work runs}}</h3>
+  <p>{{Each repository is drawn as its own folder tree. The note on the right says whether the entry is new or changed, and what the change is. A folder with no note only holds the entries under it. Where the preview is still proposed, say here which folders and files are not known yet.}}</p>
+  <!-- One repository is one line, its tree, and then the blocks that explain its changes. Repeat the three for each
+       repository, in the order the work runs. The tree is always drawn: one folder or file on each line, a deep path
+       as folders on their own lines, and the notes in one column (RD.DEVEX.WORKSPACE.238). -->
+  <p><strong>1 &middot; {{repository}}</strong> &mdash; {{what happens there}}</p>
+  <pre>{{repository}}/
+├── {{folder}}/
+│   ├── {{folder}}/
+│   │   ├── {{file}}   new      {{what the file is}}
+│   │   └── {{file}}   changed  {{what the change is}}
+│   └── {{file}}       changed  {{what the change is}}
+└── {{folder}}/        new      {{what the folder holds}}</pre>
+  <!-- A block that explains one change follows the tree it belongs to: a diff of one file, code, JSON, a table or a
+       figure. Add one only where the note beside the entry is not enough to judge the change, and delete this one
+       where every note is enough. -->
+  <p><code>{{path of the file whose change needs more than its note}}</code></p>
   <pre data-lang="diff">- what the file says today
 + what it will say</pre>
+  <p><strong>2 &middot; {{repository}}</strong> &mdash; {{what happens there}}</p>
+  <pre>{{repository}}/
+└── {{folder}}/
+    ├── {{file}}   new      {{what the file is}}
+    └── {{file}}   changed  {{what the change is}}</pre>
   <p>{{Read the full change in the approach page&rsquo;s How &rarr;}}</p>
 </section>
 
@@ -125,4 +146,4 @@
   The approach preview template &middot; copy it and fill the slots &middot; a preview page is named <code>&lt;subject&gt;-preview.html</code>, sits in <code>notes/N&lt;nnn&gt;/previews/</code>, and the approach page links it &middot; a real sample sits in <code>notes/N&lt;nnn&gt;/samples/</code> under its own name &middot; every block and figure is shown once in <code>blocks-template.html</code>
 </footer>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.3.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.js"></script>

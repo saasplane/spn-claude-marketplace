@@ -5,7 +5,7 @@
 
 
 
-<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.3.0/sds-docs.css">
+<link rel="stylesheet" href="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.css">
 <div class="sds-page">
 <nav class="sds-rail" id="rail">
   <a class="sds-home" href="{{THE ADDRESS OF THE HUB: base, then the path of the hub, ending in .html}}">&larr; {{THE HUB&rsquo;S REPOSITORY NAME}}</a>
@@ -128,6 +128,12 @@ spnutils repo agent-sync</pre>
 ├── {{child}}/        {{what it holds}}
 │   └── {{leaf}}      {{what it is}}
 └── {{child}}         {{what it is}}</pre>
+  <p class="sds-small">where a change lands &mdash; one folder or file on each line, and a note in one column: new or changed, then what the change is</p>
+  <pre>{{repository}}/
+├── {{folder}}/
+│   ├── {{file}}      new      {{what the file is}}
+│   └── {{file}}      changed  {{what the change is}}
+└── {{folder}}/       changed  {{what changes in the files under it}}</pre>
   <h3 id="b-diff">DIFF &mdash; what a file says today and what it will say (approach pages only)</h3>
   <pre data-lang="diff">- what the file says today
 + what it will say</pre>
@@ -968,4 +974,4 @@ spnutils repo agent-sync</pre>
 </div>
 </div>
 
-<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.3.0/sds-docs.js"></script>
+<script src="https://saasplane.github.io/spn-claude-marketplace/assets/docs/1.4.0/sds-docs.js"></script>

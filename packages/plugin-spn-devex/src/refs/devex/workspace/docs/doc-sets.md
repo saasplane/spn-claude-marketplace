@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "34a63ae2"
+      "seen": "4c0f7596"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -615,10 +615,22 @@ page; a link inside the content, *Where to go next* included, may open a markdow
 sections are *Overview*, *Today*, *Proposed* and *Where it lands*, and it holds no card. *Overview* says what
 the reader is asked to decide, what to look at first and what is not final. *Today* shows the thing as it is.
 *Proposed* shows it as it will be, with its options side by side where a decision is still open. *Where it
-lands* names the files that change, by repository, with a link to the approach page's own `How`. The
+lands* shows the files that change as one folder tree for each repository, with a link to the approach page's
+own `How`. The
 reasoning stays on the approach page, so a preview carries no `Why`, `What` or `How`. A preview never frames a
 sample file: it shows a thing with the page's own blocks, and links a real file in the arc's `samples/`
 folder.
+
+**`Where it lands` is one folder tree for each repository — MUST** (decision RD.DEVEX.WORKSPACE.238). The
+section is grouped by repository, in the order the work runs, and it is never a table of file paths. One line
+names the repository and says what happens there. Then the repository is one `TREE` block: one folder or file
+on each line, never two columns of entries, and a note in one column on the right that reads `new` or
+`changed` and then says what the change is. A folder with no note only holds what is under it. A deep path is
+drawn as folders on their own lines, so the note column stays near the names. A preview that is still proposed
+draws the folders and the files that are certain, and says which are not known yet. The tree is always drawn.
+The section is a mix of blocks whose first job is to show the changes. After a repository's tree come the
+blocks that show its changes, such as a diff of one file, code, JSON or a figure. You add one only where the
+note beside the entry is not enough to judge the change. A table never lists the changes.
 
 **Code shown on a page follows its stack's own standards — MUST** (decision RD.DEVEX.WORKSPACE.235). A code
 block in a preview or on an approach page is read as code and copied as code, so it follows the naming and
