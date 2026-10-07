@@ -1,0 +1,489 @@
+{
+  "inventoryVersion": 1,
+  "file": {
+    "name": "DS 4-Containers",
+    "slug": "ds-4-containers",
+    "layer": "CONTAINERS",
+    "readAt": "2026-10-06T11:40:47.017Z",
+    "depth": 2
+  },
+  "collections": [
+    {
+      "name": "Ramps",
+      "defaultMode": "Default seed",
+      "modes": [
+        "Default seed"
+      ],
+      "variables": [
+        {
+          "name": "seed/primary",
+          "type": "COLOR",
+          "values": {
+            "Default seed": "#1a365dff"
+          }
+        },
+        {
+          "name": "seed/primary-hover",
+          "type": "COLOR",
+          "values": {
+            "Default seed": "#0d294fff"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Roles",
+      "defaultMode": "Light",
+      "modes": [
+        "Light",
+        "Dark"
+      ],
+      "variables": [
+        {
+          "name": "surface/sunken",
+          "type": "COLOR",
+          "values": {
+            "Light": {
+              "alias": "color/neutral/50"
+            },
+            "Dark": {
+              "alias": "color/neutral/950"
+            }
+          }
+        },
+        {
+          "name": "surface/inset",
+          "type": "COLOR",
+          "values": {
+            "Light": {
+              "alias": "color/neutral/100"
+            },
+            "Dark": {
+              "alias": "color/neutral/800"
+            }
+          }
+        },
+        {
+          "name": "surface",
+          "type": "COLOR",
+          "values": {
+            "Light": {
+              "alias": "color/neutral/0"
+            },
+            "Dark": {
+              "alias": "color/neutral/950"
+            }
+          }
+        },
+        {
+          "name": "surface/raised",
+          "type": "COLOR",
+          "values": {
+            "Light": {
+              "alias": "color/neutral/0"
+            },
+            "Dark": {
+              "alias": "color/neutral/900"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Scale",
+      "defaultMode": "Web",
+      "modes": [
+        "Web"
+      ],
+      "variables": [
+        {
+          "name": "icon-size/xxs",
+          "type": "FLOAT",
+          "values": {
+            "Web": 10
+          }
+        },
+        {
+          "name": "icon-size/xs",
+          "type": "FLOAT",
+          "values": {
+            "Web": 12
+          }
+        }
+      ]
+    },
+    {
+      "name": "Empty collection",
+      "defaultMode": "Default",
+      "modes": [
+        "Default"
+      ],
+      "variables": []
+    }
+  ],
+  "styles": {
+    "text": [
+      {
+        "name": "heading/xl",
+        "fontSize": 40,
+        "lineHeight": {
+          "unit": "PERCENT",
+          "value": 120.00000476837158
+        }
+      },
+      {
+        "name": "heading/lg",
+        "fontSize": 34,
+        "lineHeight": {
+          "unit": "PERCENT",
+          "value": 120.00000476837158
+        }
+      }
+    ],
+    "effect": [
+      {
+        "name": "shadow/md"
+      }
+    ]
+  },
+  "pages": [
+    {
+      "id": "page-0",
+      "name": "Container",
+      "units": [
+        {
+          "id": "f43d8c45215791c042d9b969a3d8c4fdddbbef92",
+          "name": "DSContainer.Content",
+          "kind": "SET",
+          "props": {
+            "children#5:10": {
+              "type": "SLOT",
+              "values": null
+            },
+            "size": {
+              "type": "VARIANT",
+              "default": "SM",
+              "values": [
+                "XS",
+                "SM",
+                "MD",
+                "LG",
+                "XL"
+              ]
+            },
+            "flush": {
+              "type": "VARIANT",
+              "default": "false",
+              "values": [
+                "false",
+                "true"
+              ]
+            }
+          },
+          "versionCount": 4,
+          "defaultVersion": "size=SM, flush=false",
+          "drawn": {
+            "boundVariables": [
+              "fg"
+            ],
+            "frameVariables": [
+              "frame/content/divider",
+              "frame/content/padding/sm",
+              "frame/content/padding/xs",
+              "surface/border"
+            ],
+            "sizing": {
+              "horizontal": [
+                "FILL"
+              ],
+              "vertical": [
+                "HUG"
+              ]
+            },
+            "frame": {
+              "stroke": [
+                false
+              ],
+              "effect": [
+                false
+              ],
+              "radius": [
+                false
+              ]
+            },
+            "text": {
+              "case": [
+                "ORIGINAL"
+              ],
+              "decoration": [
+                "NONE"
+              ]
+            }
+          },
+          "versions": null
+        },
+        {
+          "id": "bfbdff446b049e7b2af58beb012cbe13a569b604",
+          "name": "DSContainer",
+          "kind": "SET",
+          "props": {
+            "size": {
+              "type": "VARIANT",
+              "default": "SM",
+              "values": [
+                "XS",
+                "SM",
+                "MD",
+                "LG",
+                "XL"
+              ]
+            }
+          },
+          "versionCount": 2,
+          "defaultVersion": "size=SM",
+          "drawn": {
+            "boundVariables": [
+              "fg",
+              "frame/content/divider",
+              "frame/content/padding/sm",
+              "frame/content/padding/xs",
+              "size/sm/gap",
+              "size/xs/gap",
+              "surface/border"
+            ],
+            "frameVariables": [],
+            "sizing": {
+              "horizontal": [
+                "FILL"
+              ],
+              "vertical": [
+                "HUG"
+              ]
+            },
+            "frame": {
+              "stroke": [
+                false
+              ],
+              "effect": [
+                false
+              ],
+              "radius": [
+                false
+              ]
+            },
+            "text": {
+              "case": [
+                "ORIGINAL"
+              ],
+              "decoration": [
+                "NONE"
+              ]
+            }
+          },
+          "versions": null
+        }
+      ]
+    },
+    {
+      "id": "page-1",
+      "name": "Overlays",
+      "units": [
+        {
+          "id": "018a1c499c5055da32f6d0722190799590d4e77c",
+          "name": "DSPopover",
+          "kind": "SET",
+          "props": {
+            "content#81:0": {
+              "type": "SLOT",
+              "values": null
+            }
+          },
+          "versionCount": 1,
+          "defaultVersion": "DSPopover",
+          "drawn": {
+            "boundVariables": [
+              "fg"
+            ],
+            "frameVariables": [
+              "popup/ring",
+              "radius/base",
+              "shadow/color",
+              "surface/raised"
+            ],
+            "sizing": {
+              "horizontal": [
+                "HUG"
+              ],
+              "vertical": [
+                "HUG"
+              ]
+            },
+            "frame": {
+              "stroke": [
+                true
+              ],
+              "effect": [
+                true
+              ],
+              "radius": [
+                true
+              ]
+            },
+            "text": {
+              "case": [
+                "ORIGINAL"
+              ],
+              "decoration": [
+                "NONE"
+              ]
+            }
+          },
+          "versions": null
+        },
+        {
+          "id": "b4831ca21691f96dfdf32f78017e4dbba5f3dfe3",
+          "name": "DSKbdKey",
+          "kind": "SET",
+          "props": {
+            "label#76:0": {
+              "type": "TEXT",
+              "default": "K",
+              "values": null
+            },
+            "size": {
+              "type": "VARIANT",
+              "default": "SM",
+              "values": [
+                "XS",
+                "SM",
+                "MD",
+                "LG",
+                "XL"
+              ]
+            }
+          },
+          "versionCount": 3,
+          "defaultVersion": "size=SM",
+          "drawn": {
+            "boundVariables": [
+              "fg/muted"
+            ],
+            "frameVariables": [
+              "size/xs/radius",
+              "surface/border",
+              "surface/inset"
+            ],
+            "sizing": {
+              "horizontal": [
+                "HUG"
+              ],
+              "vertical": [
+                "HUG"
+              ]
+            },
+            "frame": {
+              "stroke": [
+                true
+              ],
+              "effect": [
+                false
+              ],
+              "radius": [
+                true
+              ]
+            },
+            "text": {
+              "case": [
+                "ORIGINAL"
+              ],
+              "decoration": [
+                "NONE"
+              ]
+            }
+          },
+          "versions": null
+        },
+        {
+          "id": "2e187ef5b3c2a70cb141bb88d43fea817c96bed6",
+          "name": "DSTable.HCell",
+          "kind": "SET",
+          "props": {
+            "label#47:0": {
+              "type": "TEXT",
+              "default": "Header",
+              "values": null
+            },
+            "withSort#176:0": {
+              "type": "BOOLEAN",
+              "default": false,
+              "values": null
+            },
+            "size": {
+              "type": "VARIANT",
+              "default": "SM",
+              "values": [
+                "XS",
+                "SM",
+                "MD",
+                "LG",
+                "XL"
+              ]
+            }
+          },
+          "versionCount": 3,
+          "defaultVersion": "size=SM",
+          "drawn": {
+            "boundVariables": [
+              "fg/muted",
+              "size/md/icon",
+              "size/sm/icon",
+              "size/xs/icon"
+            ],
+            "frameVariables": [
+              "size/md/padding",
+              "size/sm/padding",
+              "size/xs/padding",
+              "surface/sunken"
+            ],
+            "sizing": {
+              "horizontal": [
+                "FILL",
+                "HUG"
+              ],
+              "vertical": [
+                "HUG"
+              ]
+            },
+            "frame": {
+              "stroke": [
+                false
+              ],
+              "effect": [
+                false
+              ],
+              "radius": [
+                false
+              ]
+            },
+            "text": {
+              "case": [
+                "UPPER"
+              ],
+              "decoration": [
+                "NONE"
+              ]
+            }
+          },
+          "versions": null
+        }
+      ]
+    }
+  ],
+  "counts": {
+    "pages": 2,
+    "units": 5,
+    "variables": 8,
+    "textStyles": 2,
+    "effectStyles": 1
+  }
+}

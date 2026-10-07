@@ -16,7 +16,7 @@ Its provenance is the foundation book's design library chapter. Apply this resta
 
 ## The walk, in order
 
-1. **Read the file once, by passing `skills/design/scripts/page.js` to the connector as it is with its inputs filled, or take the inventory you were handed, and write the time of the reading on it.** Headings: "The inventory", "How the connector's work is carried out", and "What the agent reads and keeps".
+1. **Read the file once, by passing `skills/design/scripts/page.js` to the connector as it is with its inputs filled, or take the inventory you were handed, and write the time of the reading on it; where the inventory is for the tool, read the file with `skills/design/scripts/inventory.js` (the list of pages first, then one call for each page) and `skills/design/scripts/tokens.js`, save each answer as a file in one folder, put them together with `node skills/design/scripts/assemble.mjs --answers <folder> --out <inventory>`, and take that in with `spnutils apps surface library --file <inventory>`.** Headings: "The inventory", "How the connector's work is carried out", and "What the agent reads and keeps".
 2. **Ask the developer for a named version before the first change in the file, and wait.** Heading: "Before a connector writes".
 3. **Check the order against the live file, and against the web's file and line, and say what you corrected.** Heading: "Before the change".
 4. **Tell the developer what is about to change, item by item.** Heading: "Before a connector writes".

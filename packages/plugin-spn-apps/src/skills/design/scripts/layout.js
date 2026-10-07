@@ -7,16 +7,18 @@
 // DEFAULT: with `dryRun: true` it changes nothing and returns what would move. Set `dryRun: false`
 // only after a dry run came back with `mode: "dry"` and a plan the developer's order allows.
 //
-// The label. The set's header label is the top-level text layer named `label · ...` whose text
-// begins with the set's name and ` — `. After that, clauses are separated by ` · `:
+// The label. The set's header label is the top-level text whose text begins with the set's name and ` — `
+// (its layer is named `label · ` and the text, but a header whose layer lacks the prefix is still the header).
+// After that, clauses are separated by ` · `, in the book's form:
 //
-//   rows: variant=SOLID, OUTLINE x size=MD, XS, SM       the first factor runs slowest
-//   columns: case=text, block, new tab, disabled
-//   one row   |   one column                             a single line on that side
+//   rows: variant=SOLID, OUTLINE x size=MD, XS, SM       the first factor runs slowest; ` x ` joins factors
+//   columns: case=text, block, new tab, disabled         a bare value takes the property before it
+//   one row   |   one column                             a single line on that side (an axis left out is one too)
+//   one component                                        a unit with no grid: a set is refused
 //
-// Each factor is `property=value, value, ...` (or `property (value, value)`), joined by ` x `. Every
-// property of the set must be named once, and every version must hold a stated value. A label this
-// does not understand lays out nothing: it returns `mode: "refused"` with the reason.
+// A cell is `property=value`, and ` (default)` after a value marks the default. A note may stand before or
+// after the layout. A label the form cannot say lays out nothing: it returns `mode: "refused"` with the
+// reason. This script lays out an axis only when every cell of one factor names one property.
 //
 // Before anything moves it checks the plan: no version outside the set, no two versions meeting,
 // no two top-level nodes meeting, and the version at the top left carrying `defaults` (every
@@ -37,10 +39,85 @@ const INPUTS = {
   listMoves: 50,
 };
 
+// ---- the book's label form: begin (this block is the same in page.js and layout.js)
 const LABEL_PREFIX = "label · ";
+const SAMPLE_PREFIX = "sample · ";
 const UNIT_SEPARATOR = " — ";
 const CLAUSE_SEPARATOR = " · ";
 const FACTOR_SEPARATOR = " x ";
+const DEFAULT_MARK = /\s+\(default\)$/;
+const MARK_TEXT = /^(.*?)\s*\(default(?: at the top)?\)$/;
+const MARK_SPLIT = /, | · | x |=|: |each with /;
+const UNIT_LIKE = /^\.?[A-Z][A-Za-z0-9.]*[a-z][A-Za-z0-9.]*( cases)?$/;
+
+// An axis is factors joined by ` x `; a factor is cells joined by `, `; a cell is `property=value` or only
+// `value`, taking the property of the cell before it; ` (default)` after a value marks the default.
+function parseAxis(text) {
+  const factors = [];
+  for (const piece of text.split(FACTOR_SEPARATOR)) {
+    const cells = [];
+    let property = null;
+    for (const raw of piece.split(", ")) {
+      const cut = raw.indexOf("=");
+      if (cut > 0) property = raw.slice(0, cut).trim();
+      const marked = DEFAULT_MARK.test(cut > 0 ? raw.slice(cut + 1) : raw);
+      const value = (cut > 0 ? raw.slice(cut + 1) : raw).replace(DEFAULT_MARK, "").trim();
+      if (property === null) return { error: `the cell "${raw.trim()}" names no property, and no cell stands before it` };
+      if (value.length === 0) return { error: `the cell "${raw.trim()}" holds no value` };
+      cells.push({ property, value, isDefault: marked });
+    }
+    factors.push({ cells });
+  }
+  return { factors };
+}
+
+// A header: the unit, ` — `, then clauses joined by ` · `. A clause is `rows: <axis>`, `columns: <axis>`,
+// `one row`, `one column`, `one component` (a comma may follow it), or a note. Returns { unit, layout, error }
+// where layout is { rows, columns, oneComponent } (an axis left out is [], one line) or null.
+function parseHeader(text) {
+  const cut = text.indexOf(UNIT_SEPARATOR);
+  if (cut <= 0) return { unit: null, layout: null, error: "the text holds no unit before ' — '" };
+  const unit = text.slice(0, cut);
+  let rows = null;
+  let columns = null;
+  let oneComponent = false;
+  let stated = 0;
+  for (const clause of text.slice(cut + UNIT_SEPARATOR.length).split(CLAUSE_SEPARATOR).map((part) => part.trim())) {
+    if (clause === "one row" || clause === "one column") {
+      const side = clause === "one row" ? "rows" : "columns";
+      if ((side === "rows" ? rows : columns) !== null) return { unit, layout: null, error: `the label states the ${side} twice` };
+      if (side === "rows") rows = []; else columns = [];
+    } else if (clause === "one component" || clause.startsWith("one component,")) {
+      oneComponent = true;
+    } else if (clause.startsWith("rows: ") || clause.startsWith("columns: ")) {
+      const side = clause.startsWith("rows: ") ? "rows" : "columns";
+      if ((side === "rows" ? rows : columns) !== null) return { unit, layout: null, error: `the label states the ${side} twice` };
+      const axis = parseAxis(clause.slice(side.length + 2));
+      if (axis.error) return { unit, layout: null, error: `the ${side} clause: ${axis.error}` };
+      if (side === "rows") rows = axis.factors; else columns = axis.factors;
+    } else {
+      continue;
+    }
+    stated += 1;
+  }
+  if (stated === 0) return { unit, layout: null, error: "the label states no layout (rows, columns, one row, one column or one component)" };
+  if (oneComponent && (rows !== null || columns !== null)) return { unit, layout: null, error: "the label says one component and also states rows or columns" };
+  return { unit, layout: { rows: rows ?? [], columns: columns ?? [], oneComponent }, error: null };
+}
+
+// The values a text marks as the default: each is the candidates for the value before the mark, the whole
+// piece and its last word (an older label wrote `size SM (default)`). Never the word before the value.
+function defaultMarksOf(text) {
+  const marks = [];
+  for (const piece of text.split(MARK_SPLIT)) {
+    const found = MARK_TEXT.exec(piece.trim());
+    if (!found || found[1].trim().length === 0) continue;
+    const value = found[1].trim();
+    marks.push({ value, candidates: [value, value.split(" ").pop()] });
+  }
+  return marks;
+}
+// ---- the book's label form: end
 
 const boxOf = (node) => [node.x, node.y, node.width, node.height];
 const meets = (first, second) =>
@@ -80,41 +157,25 @@ function defaultVersionName(set) {
   try { return set.defaultVariant?.name ?? null; } catch { return null; }
 }
 
-function stripMark(value) {
-  return value.replace(/ \(default\)$/, "").trim();
-}
-
-// One factor: `property=a, b, c` or `property (a, b, c)`. Returns null where it is neither.
-function parseFactor(text) {
-  const equals = /^([^=(,]+)=(.+)$/.exec(text);
-  const parens = /^([^=(,]+?)\s*\((.+)\)$/.exec(text);
-  const found = equals ?? parens;
-  if (!found) return null;
-  const values = found[2].split(",").map(stripMark).filter((value) => value.length > 0);
-  return values.length > 0 ? { property: found[1].trim(), values } : null;
-}
-
-// Returns { rows, columns } as lists of factors, or { error }.
-function parseLabel(text, setName) {
-  const body = text.slice(setName.length + UNIT_SEPARATOR.length);
-  const clauses = body.split(CLAUSE_SEPARATOR).map((clause) => clause.trim());
-  let rows = null;
-  let columns = null;
-  for (const clause of clauses) {
-    const side = clause.startsWith("rows:") ? "rows" : clause.startsWith("columns:") ? "columns" : null;
-    if (clause === "one row") { rows = []; continue; }
-    if (clause === "one column") { columns = []; continue; }
-    if (side === null) continue;
-    const factors = [];
-    for (const piece of clause.slice(side.length + 1).split(FACTOR_SEPARATOR)) {
-      const factor = parseFactor(piece.trim());
-      if (!factor) return { error: `the ${side} clause has a factor this script cannot read: "${piece.trim()}"` };
-      factors.push(factor);
+// The label's layout as lists of factors, each { property, values }, or { error }.
+function parseLabel(text) {
+  const parsed = parseHeader(text);
+  if (parsed.error) return { error: parsed.error };
+  if (parsed.layout.oneComponent) return { error: "the label says one component, and a set is not one component" };
+  const factorsOf = (side, factors) => {
+    const lists = [];
+    for (const factor of factors) {
+      const properties = [...new Set(factor.cells.map((cell) => cell.property))];
+      if (properties.length !== 1) return { error: `the ${side} clause has cells of ${properties.join(" and ")} in one run, which this script does not lay out` };
+      lists.push({ property: properties[0], values: factor.cells.map((cell) => cell.value) });
     }
-    if (side === "rows") rows = factors; else columns = factors;
-  }
-  if (rows === null && columns === null) return { error: "the label states neither rows nor columns" };
-  return { rows: rows ?? [], columns: columns ?? [] };
+    return { lists };
+  };
+  const rows = factorsOf("rows", parsed.layout.rows);
+  if (rows.error) return rows;
+  const columns = factorsOf("columns", parsed.layout.columns);
+  if (columns.error) return columns;
+  return { rows: rows.lists, columns: columns.lists };
 }
 
 function refusal(reasons, extra = {}) {
@@ -137,15 +198,15 @@ if (versions.length === 0) return refusal([`the set ${set.id} holds no version`]
 
 // 1. The label, and what it says.
 const labels = page.children.filter((node) =>
-  node.type === "TEXT" && node.name.startsWith(LABEL_PREFIX) && node.characters.startsWith(set.name + UNIT_SEPARATOR));
+  node.type === "TEXT" && !node.name.startsWith(SAMPLE_PREFIX) && node.characters.startsWith(set.name + UNIT_SEPARATOR));
 if (labels.length !== 1) {
   return refusal([labels.length === 0
     ? `no label on this page names ${set.name}: a set whose label states no layout is reported, not laid out`
     : `${labels.length} labels name ${set.name}`], identity);
 }
 const label = labels[0];
-const parsed = parseLabel(label.characters, set.name);
-if (parsed.error) return refusal([parsed.error], { ...identity, label: { id: label.id, text: label.characters } });
+const parsed = parseLabel(label.characters);
+if (parsed.error) return refusal([`the label cannot be laid out: ${parsed.error}`], { ...identity, label: { id: label.id, text: label.characters } });
 
 // 2. Every version into its cell.
 const understood = { rows: parsed.rows, columns: parsed.columns };
