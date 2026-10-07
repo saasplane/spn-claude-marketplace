@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/",
-      "seen": "46d24558"
+      "seen": "bdbc2ec5"
     }
   ]
 }
@@ -190,7 +190,7 @@ Treat `migrations/` as the module's only schema-change path — never run DDL by
 
 ## Config is one namespace the module carries with it
 
-A module's configuration is one namespace, declared by the module and populated once at boot from the environment. Read it thereafter through the module reference, never by reading the environment directly — a variable you read anywhere but boot is an undeclared dependency, invisible to validation and impossible to supply in a test that stands the module up with no environment at all. Stay inside your own `{CODE}_{MODULE}_*` prefix; never read outside it.
+A module's configuration is one namespace, declared by the module and populated once at boot from the environment. Read it thereafter through the module reference, never by reading the environment directly — a variable you read anywhere but boot is an undeclared dependency, invisible to validation and impossible to supply in a test that stands the module up with no environment at all. Stay inside your own `{CODE}_{MODULE}_*` prefix; never read outside it. When your setting is a fact the estate publishes, the estate's key carries no module's name, and the application's own settings write your key as a `${…}` reference to it (`RD.SUPPORT.INFRA.111`).
 
 ## How one module reaches another
 

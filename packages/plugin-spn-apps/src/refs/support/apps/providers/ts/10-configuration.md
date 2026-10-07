@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/10-configuration.md",
-      "seen": "30194e02"
+      "seen": "7a437091"
     }
   ]
 }
@@ -75,7 +75,7 @@ APP_ENV / APP_MODE / NODE_ENV                 ← bootstrap, unprefixed
 | database | `POSTGRESQL` | no — the migration connection requires one |
 | cache | `REDIS` | yes |
 | queue | `KAFKA` | yes |
-| seal (designed, not built yet) | `AWS_KMS` · `LOCAL` | no — a service that seals nothing leaves the family out of its declaration |
+| seal | `AWS_KMS` · `LOCAL` | no — a service that seals nothing leaves the family out of its declaration |
 | API | `FASTIFY` | yes |
 | CLI | `COMMANDER` | yes |
 
@@ -104,7 +104,7 @@ APP_ENV / APP_MODE / NODE_ENV                 ← bootstrap, unprefixed
 - **The queue's client id derives from the declared code, and the topic list comes from the application's own declaration** — neither is an environment variable. Each declared topic gets a paired error topic built at boot.
 - **No bucket fact publishes for storage.** The bucket is the world's derived store name, and a key never names one.
 
-**The seal block is a selector and, in the cloud, one key id** (`RD.SUPPORT.APPS.166`). The seal is the family that encrypts a stored secret before the row is saved. **It is designed and not built yet.**
+**The seal block is a selector and, in the cloud, one key id** (`RD.SUPPORT.APPS.166`). The seal is the family that encrypts a stored secret before the row is saved.
 
 ```
 {CODE}_RESOURCE_SEAL_APP_PROVIDER=AWS_KMS
@@ -123,6 +123,20 @@ APP_ENV / APP_MODE / NODE_ENV                 ← bootstrap, unprefixed
 **A module reads its own variables under the application code followed by the module code**, both normalized the same way. That is what lets the same module class run under any application code.
 
 **Module configuration is contributed at boot by the module itself.** The shell never enumerates module variables, and which variables a module reads is that module's own documentation.
+
+**A module's key whose value the estate publishes is written as a reference in `envs/cloud.env`** (`RD.SUPPORT.INFRA.111`). The estate's key carries no module's name, the module reads its own key, and the app's cloud settings join the two. One comment above the block says who publishes the facts:
+
+```
+# The estate publishes the six facts of the tenant edge. The identity module reads its own keys.
+DMO_IAM_EDGE_TYPE=${DMO_PLATFORM_INTEGRATION_EDGE_TYPE}
+DMO_IAM_EDGE_ROUTE_STORE_ARN=${DMO_PLATFORM_INTEGRATION_EDGE_ROUTE_STORE_ARN}
+DMO_IAM_EDGE_TARGET=${DMO_PLATFORM_INTEGRATION_EDGE_TARGET}
+DMO_IAM_EDGE_DISTRIBUTION_ID=${DMO_PLATFORM_INTEGRATION_EDGE_DISTRIBUTION_ID}
+DMO_IAM_EDGE_CERTIFICATE_REGION=${DMO_PLATFORM_INTEGRATION_EDGE_CERTIFICATE_REGION}
+DMO_IAM_EDGE_CUSTOM_DOMAINS=${DMO_PLATFORM_INTEGRATION_EDGE_CUSTOM_DOMAINS}
+```
+
+`envs/local.env` carries the module's own keys as literals, because no estate publishes an edge on a machine. The module's code reads `{CODE}_IAM_EDGE_*` in both files and never the published key.
 
 ## The platform namespace
 

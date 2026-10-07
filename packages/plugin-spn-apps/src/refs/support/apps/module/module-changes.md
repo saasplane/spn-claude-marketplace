@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/01-server/01-contract/01-states.md",
-      "seen": "c748334e"
+      "seen": "652259d2"
     }
   ]
 }
@@ -56,7 +56,7 @@ A contract is a chain of six constructs: **Contract** → **Services** → **Met
 - Passkeys: only verified public material persists — never the raw attestation.
 - Session tokens, and the two are not one rule. A refresh token the server **stores** rotates, with hashed storage — every refresh burns the old one, so a leaked token dies on next use. A renewal token the server does **not** store is short-lived, signed, and **names its use**; every check refuses a token whose use does not match (`RD.SUPPORT.APPS.090` · `RD.SUPPORT.APPS.095`). Nothing revokes an unstored token, so ending the session is what ends it. Follow the same hash-only rule for device-trust secrets.
 - **Storage ≠ retrievability — write-only internals.** Some secrets must be stored to be used (authenticator seeds, raw delivery targets, BYOK provider keys). For these, every contract read returns a **masked** state. Unmasked access exists only as an internal server-side capability — never registered as a route — consumed solely by the delivery or verification path. **A secret that must be stored MUST NOT be returnable by any API.** A design that requires reading a secret back out is a wrong design.
-- **A secret that must be read back MUST be stored sealed** (`RD.PLATFORM.CORE.041` · `RD.SUPPORT.APPS.166`). A mask protects what leaves through the API. It does not protect the row, so a copy of the database would hold the secret as it was typed. Sealed means the service encrypts the whole `internal` sub-object before it saves the row, under a data key made for that value alone; a key service holds the master key, apart from the key that encrypts the database, and only the running service may use it. A server-side read opens the value for use, and the read model still masks it. The seal is designed and not built yet: today the `internal` sub-object is stored as it was written.
+- **A secret that must be read back MUST be stored sealed** (`RD.PLATFORM.CORE.041` · `RD.SUPPORT.APPS.166`). A mask protects what leaves through the API. It does not protect the row, so a copy of the database would hold the secret as it was typed. Sealed means the service encrypts the whole `internal` sub-object before it saves the row, under a data key made for that value alone; a key service holds the master key, apart from the key that encrypts the database, and only the running service may use it. A server-side read opens the value for use, and the read model still masks it. The seal is built: the repository seals the `internal` sub-object before the row is saved, and opens it on every read.
 
 ## Evolution and versioning
 

@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/01-apps/04-resources.md",
-      "seen": "a37be94a"
+      "seen": "1c4ce232"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/04-resources/",
-      "seen": "7667ae8c"
+      "seen": "a3046685"
     }
   ]
 }
@@ -68,7 +68,7 @@ Behind the connections sits one **role quartet** per scope:
 
 Hold secrets at rest to the same zero-tolerance rule everywhere: persist a credential secret (password, delivered one-time code, recovery code, refresh token, device trust) only as a one-way hash — never encrypted, never reversible. Treat a secret that must be stored to be used (an authenticator seed, a bring-your-own provider key) as write-only from the contract's perspective — mask it on every read, and reach it only through a named internal server-side path.
 
-**Store a secret that must be read back sealed — MUST** (`RD.SUPPORT.APPS.166`). Encryption of the disk protects a stolen disk; it does not protect a dump, a replica, or a query by the read-only role, because the database decrypts for each of them. So the service encrypts the whole `internal` sub-object itself, before it saves the row, through the seal family below. No database role can open a sealed value, so `app_ro` reads a sealed string and you can grant it for investigation without granting the secrets. **The seal is designed and not built yet** — today the `internal` sub-object is stored as written.
+**Store a secret that must be read back sealed — MUST** (`RD.SUPPORT.APPS.166`). Encryption of the disk protects a stolen disk; it does not protect a dump, a replica, or a query by the read-only role, because the database decrypts for each of them. So the service encrypts the whole `internal` sub-object itself, before it saves the row, through the seal family below. No database role can open a sealed value, so `app_ro` reads a sealed string and you can grant it for investigation without granting the secrets. **The seal is built**: the repository seals the `internal` sub-object before the row is saved.
 
 ### Database — the record of truth
 
@@ -118,7 +118,7 @@ Expect buckets to be provisioned; never create one at runtime. Put the **access 
 
 The rule that matters most: **a value opens only under the context it was sealed with, and a value that does not open answers nothing.**
 
-**The family is designed and not built yet** (`RD.SUPPORT.APPS.166`). What follows is the design of record; today a secret that must be read back is stored as it was written.
+**The family is built** (`RD.SUPPORT.APPS.166`). A secret that must be read back is sealed before its row is saved, and what follows is what the code does.
 
 The seal has one interface with two operations. `seal` takes a value and a context and returns one sealed string; the value is the whole `internal` sub-object of a stored document, never one field of it. `open` takes a sealed string and a context and returns the value. Each `seal` uses a **data key** made for that value alone, under a **master key** that never leaves its holder, and the sealed string keeps the encrypted value and the wrapped data key together.
 

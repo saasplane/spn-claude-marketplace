@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-infra/06-modules.md",
-      "seen": "7d9ced2c"
+      "seen": "7291b2a6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/06-modules/",
-      "seen": "4b676b4d"
+      "seen": "ae697077"
     }
   ]
 }
@@ -175,13 +175,22 @@ Every resource key follows one shape, and the middle token names the **connectio
 
 **An installed module's purpose code joins the family set** for the facts its own apply publishes. **Module facts keep a three-way placement**: plain boundary facts (`{SPC}_{MODULE}_{FACT}`) sit on the plain half; per-consumer minted pairs (`{SPC}_{MODULE}_{APP}_{FACT}`) sit on the secret half, composed only into their consumer's environment; the module's own interior sits in its own seat and is never published. A published key never spells the product a module renders, and never spells an application's token either.
 
+**A published key carries no module of the code that reads it — MUST** (`RD.SUPPORT.INFRA.111`). The estate publishes a fact under a name for the thing the fact is about. A module reads a setting under its own prefix, `{SPC}_{MODULE}_*`, and nothing outside it. The service's own settings join the two: the module's key is written as a `${…}` reference to the published key. The tenant edge is the example, and the job scheduler has the same shape:
+
+| | The estate publishes | The module reads | The service's own settings write |
+| --- | --- | --- | --- |
+| the edge | `{SPC}_PLATFORM_INTEGRATION_EDGE_TYPE` | the identity module: `{SPC}_IAM_EDGE_TYPE` | `DMO_IAM_EDGE_TYPE=${DMO_PLATFORM_INTEGRATION_EDGE_TYPE}` |
+| the job scheduler | `{SPC}_RESOURCE_DB_JOBPGBOSS_POSTGRESQL_HOST` | the job module: `{SPC}_JOB_SCHEDULER_PGBOSS_HOST` | `DMO_JOB_SCHEDULER_PGBOSS_HOST=${DMO_RESOURCE_DB_JOBPGBOSS_POSTGRESQL_HOST}` |
+
+A setting the estate does not publish stays the module's own and is written as a literal. An installed module of the estate is not a module of the code: its boundary facts keep `{SPC}_{MODULE}_{FACT}`, because that module is what the fact is about.
+
 ## The app plane is authored
 
 **`/environments/{env}/apps/{app}/vars` is dev-authored, and nothing lands there by machine**, with one composed exception. What belongs there is what only a team knows:
 
 - **The CORS origin regex is an authored key, never a derived formula** — no formula from the platform domain can say which origins an API admits.
 - **Identity facts (`{SPC}_ORG_*`, `{SPC}_PLATFORM_*`) are SaaS-construct facts** — an independent application adopting no SaaS construct composes an environment without them, and that absence is blessed, not a gap.
-- **The routing facts publish into every environment's store**, so a loading application reads what the blueprint generated: `{SPC}_PLATFORM_DOMAIN` (the one key for the platform domain), `{SPC}_PLATFORM_ENV` (the host prefix — never blank in the cloud, blank locally), `{SPC}_PLATFORM_APPS_{APP}_SUBDOMAIN` (the bare label), and the identity module's `{SPC}_IAM_EDGE_TYPE` · `_ROUTE_STORE_ARN` · `_TARGET` · `_DISTRIBUTION_ID` · `_CUSTOM_DOMAINS`. `infra config render {spc} {env} {app}` produces the same block locally, plus two keys the cloud never publishes because no cloud edge stands on a machine: `_IAM_EDGE_DEBUG` (selects the local edge provider — a deployment cannot ask for it by type, only by this flag) and `_IAM_EDGE_ROUTE_DIR` (the machine path the local edge provider reads and writes its routes under).
+- **The routing facts publish into every environment's store**, so a loading application reads what the blueprint generated: `{SPC}_PLATFORM_DOMAIN` (the one key for the platform domain), `{SPC}_PLATFORM_ENV` (the host prefix — never blank in the cloud, blank locally), `{SPC}_PLATFORM_APPS_{APP}_SUBDOMAIN` (the bare label), and the tenant edge's six facts, `{SPC}_PLATFORM_INTEGRATION_EDGE_TYPE` · `_ROUTE_STORE_ARN` · `_TARGET` · `_DISTRIBUTION_ID` · `_CERTIFICATE_REGION` · `_CUSTOM_DOMAINS`. `infra config render {spc} {env} {app}` produces the routing block locally, with the same spellings. No cloud edge stands on a machine and nothing publishes one there, so the local rendering writes the edge block as the identity module's own keys, `{SPC}_IAM_EDGE_*`, as literals. Two of them are settings the cloud never publishes: `{SPC}_IAM_EDGE_DEBUG` (selects the local edge provider — a deployment cannot ask for it by type, only by this flag) and `{SPC}_IAM_EDGE_ROUTE_DIR` (the machine path the local edge provider reads and writes its routes under).
 - **The health port is `{CODE}_HEALTH_PORT`** — unset or empty means no health server, and local runs opt in. A deployed environment receives a **published default of `8010`, supplied by the deploy render** — a published default, never a code default, so the composed environment states everything true of the running application.
 
 **A dev-authored value may cite a fact; a fact is always a literal.** `${…}` references resolve one pass against the *composed* rungs, so a reference sees exactly what the application would see. An unknown reference refuses by name at the comparison and at the render, never expanding quietly to nothing. An expansion pulling in a credential materializes on the secret path. That is what makes a published endpoint written once: an engine swap flips a record, and every value referencing it follows at the next render.
@@ -194,6 +203,7 @@ Every resource key follows one shape, and the middle token names the **connectio
 | a build instruction inside a local rendering | a laptop asked to build what the cloud pulls |
 | a mount resolving outside the package | a plug-in reaching state it does not own |
 | a product name in a module code, a folder, or a published key | the indirection the purpose code exists for, bypassed |
+| a published key that spells a module of the code that reads it | the estate named a consumer, and the fact changes when that module is renamed or replaced |
 | a credential in a manifest or an environment file | the plane was bypassed, and the value now lives wherever that file went |
 | a machine writing outside the environment rung | the split between writers broke, and a team's value can be replaced by an apply |
 | an application granted read access to the ledger | the boundary that lets the ledger hold credentials is gone |

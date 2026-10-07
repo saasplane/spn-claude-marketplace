@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/03-platform/01-core/04-data-and-trust.md",
-      "seen": "ca0e88c3"
+      "seen": "ed9ac113"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/04-data-and-trust/",
@@ -109,7 +109,7 @@ The mask guards the reply. It does not guard the row, so a copy of the database,
 - The row holds one sealed value. A read opens it for the one path that uses the secret, and the read model still masks it.
 - A sealed value is bound to what it belongs to — the organization, the table and the row; a person's own secret is bound to the identity in the organization's place. A sealed value copied into another row does not open there.
 
-A value that does not open gives the caller nothing, and nothing falls back to a value stored in plain. The rule covers every table that keeps an `internal` block, and each one added later. The capability that seals and opens is **the seal**, a backing-resource family of the Support stage; how a value is sealed, who holds the key and what a caller owes the seal are that family's to state. **It is designed and not built yet** — today the `internal` block is masked on every read and stored as it was written.
+A value that does not open gives the caller nothing, and nothing falls back to a value stored in plain. The rule covers every table that keeps an `internal` block, and each one added later. The capability that seals and opens is **the seal**, a backing-resource family of the Support stage; how a value is sealed, who holds the key and what a caller owes the seal are that family's to state. **It is built**: the Support stage ships it, and the platform seals every table that keeps an `internal` block. What is proven only on a real cloud account, and has not been run there yet, is the key's own behaviour: that its policy cannot be changed after it is created, and that each use of it reaches the audit trail.
 
 ## Disclosure
 
