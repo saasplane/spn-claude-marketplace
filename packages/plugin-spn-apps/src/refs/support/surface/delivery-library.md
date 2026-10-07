@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/11-delivery-library.md",
-      "seen": "6168459d"
+      "seen": "850362c7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "20d3cb33"
+      "seen": "9e182f2c"
     }
   ]
 }
@@ -200,6 +200,82 @@ Read this list before you work in a library file by the connector. Each is a fac
 | What the connector cannot do | It cannot set plugin data | it keeps its notes outside the file |
 | What the connector cannot do | It cannot create an image from bytes | it builds the drawing from layers, and an icon is an instance of the icon unit |
 
+## What a library file holds
+
+A library file is read by people and by scripts. A person reads the grid of a set to see every case at once. A script reads the label of a set to learn how the grid is laid out, and reads the top left of a set to learn its default. So each rule below keeps one thing true that a script or a person relies on.
+
+### A set and its layout
+
+- **A set's versions MUST sit in a grid inside the set. No version sits outside the set's box, and no two versions meet.** A version outside its set belongs to no set when a person looks, and two versions that meet hide each other.
+- **A set's header label MUST state which property runs on the rows, which runs on the columns, and in which order the values of each run, and the set MUST be laid out as its label says.** The label is the one place a layout is written, so a script and a person read the same layout. The one thing a label does not decide is the default version, which the next heading decides, and that rule always wins over a label.
+- **A layout MUST be changed by changing the label and the set together.** A set laid out in a new way under an old label, or a label rewritten over an old layout, leaves the two saying different things.
+- **A set whose label states no layout MUST NOT be laid out again by an agent.** An agent that chose a layout for it would be choosing for the designer, and the choice could not be checked against anything. The agent reports the set, so that a label can be written.
+
+### The default version is the stack's default, and the label tells the truth about it
+
+In Figma, the default version of a set is the version at its top left. So the layout of a set decides its default, and moving versions can change the default without anyone seeing it. The default of a unit is what a stack gives it when no prop is passed. A stack states it, the library follows it, and the library does not state a second default of its own.
+
+- **The version at the top left of a set MUST carry the stack's default value of every property.** Then the row and the column that hold the default come first.
+- **The header label of the set MUST name that default.**
+- **Where a label and the stack differ on the default, the stack decides, and the label is corrected first. A label is never followed to a different default.** A default the library holds under a label's word would become the default of every instance placed from it, and no stack builds it. A label states a default as a claim, and a claim is checked against the stack, never the other way.
+
+These three rules and the layout rules above do not conflict, because they cover two different questions. A set follows its label for which property runs on the rows and which on the columns, and in which order. It does not follow a label for which version comes first: the row and the column that hold the default come first whatever an old label says, and the label is corrected to say so. A set whose label states no layout is not moved, and if its default version is not the stack's, the agent reports it and does not move it.
+
+- **Anything that moves versions MUST read the default version of each set it touches before it moves them and after, and report both.** A default that changed is then seen on the day it changes, and not found later in a file that others have built on. The evidence is a layout done from labels that still named a default the stack did not give: seventeen sets were laid out as their labels said, and each one's default moved from the stack's default to another size.
+
+### Versions that are added are laid out
+
+- **Whatever adds versions to a set, a plan or the connector, MUST place them in the grid as the label's order gives, and MUST prove that no version is outside the set and no two versions meet.** A copy of a version lands on top of the one it was made from, and a set with stacked or outside versions reads as one case. The plan's kinds that make a place carry the same, and the connector's facts state that combined versions sit on one another.
+
+### A label
+
+A set, a lone component and a sheet each have a header label. A row of a set may have a row label.
+
+- **A label MUST name its unit in a form a script can read: its layer is named `label · ` followed by its text, and its text begins with the unit's name and then ` — `.** For example, `label · DSAnchor — one row · columns: case=text, block, new tab, disabled`. The unit's name is the name the book gives it. A script then finds the unit that a label belongs to by reading the label, and not by guessing from where it sits. The row label of a set names the value its row holds, such as `label · XS`, and a script finds its unit by the row it sits beside.
+- **A label MUST sit by its unit, on the unit's own page, and move when the unit moves.** A label left behind when its set moves names nothing near it. A label on a page other than its unit's is a defect, and an agent that finds one reports it.
+
+### A sheet of cases, and a case
+
+- **A sheet of cases MUST sit on its unit's page, beside the unit's set, and its name MUST be the unit's name followed by `cases`, such as `DSInput cases`.** The page then shows the unit and its cases in one place, and a script finds the sheet from the unit's name.
+- **A case MUST be the unit with its prop values set, placed as instances of the unit, and never drawn as a new look.** A case drawn as a new look would be a second look for the same unit. A case is named for what it shows, under one property named `case`, and a case's name holds no comma, as the connector's facts and the plan's kinds state.
+- **A case is not a unit and is never published as one.** It MUST NOT take, in the file, a form that publishes it as a component of the library. A published case would appear among the units a stack imports, so a stack would be offered units the book never named, one for each case of each sheet.
+
+How the library keeps to the last rule is stated as far as the book can state it today. The form a case takes in the file must not publish it as a component of the library. The tool that draws cases and the files that hold them are brought to this by their own change, and until that change lands a case that is still a component is a recorded difference from this rule, never a form to copy.
+
+### A unit with no look of its own
+
+- **A unit with no look of its own MUST be shown on a sheet that is composed from library units, and the sheet's label MUST say that the unit is not drawn.** A unit that places or watches another unit draws nothing, so a drawing of it would be a look the web does not have. The sheet shows what a person sees when the unit is used, and the label says what the unit is.
+
+### A unit that cannot hold the web's case
+
+- **When a unit cannot hold a case of the web, the case MUST show what the unit can hold, the sheet's label MUST say what is cut, and the cut MUST be recorded as a difference between the unit and the web, to be closed in the unit.** A sheet that shows less than the web without saying so reads as the whole case. The difference is closed by changing the unit, so that the sheet can later show the whole case. It is never closed by redrawing the case.
+
+### A new set, sheet or page takes the form of its neighbours
+
+- **A new set, sheet or page MUST take the form of its neighbours: the ground of a set, a label, a place clear of every other node, and the background of its page.** The ground of a set is its fill and its stroke, bound to the same variables the neighbouring sets bind. A new node is made at the corner of its page, where it meets what is there, and a new page has the editor's own background and not the library's. A new set with no ground shows dark text on a dark page, and a page with another background makes the same unit look different from its neighbours.
+
+## How an agent changes a library file through the connector
+
+The rules under "A developer's hands are three" and "How the connector's work is carried out" state what the agent says before it writes, the named version a person saves first, and how the connector's work is carried out. The rules below add to them and repeat none of them.
+
+### Before the change
+
+- **An order MUST be checked against the live file before it runs.** A plan or an order that was written from a reading MUST name the time of that reading. Before a change, the agent reads the live file for what the order assumes: that each unit exists, that it is a set or a lone component, and what its properties are. It corrects the order and says what it corrected. A file changes between a reading and a change, and an order written from the older reading names counts that are wrong and units that are not there.
+- **An order MUST name the web's file and line for each thing it makes, and where the order and the web differ, the agent takes the web and says so in its report.** The library follows the web, and an order written from memory can name a trigger or a count the web does not have.
+
+### During the change
+
+- **A script that changes a file MUST change only the nodes it names.** It is given the nodes it may touch. Before it moves anything it checks that the change leaves no version outside its set, no two versions meeting and no two top-level nodes meeting, and if the change would, it moves nothing. A change outside the named nodes is a defect and is reported, never kept quiet, because a node moved outside the order is a change nobody approved and nobody will look for.
+
+### What the agent reads and keeps
+
+- **An inventory MUST hold, for each page: its id, name and background.** For each set and each lone component it holds the id, the box, the properties with their values, the count of versions, the default version and the ground. For each sheet it holds the id, the box and the cases. For each label it holds the id, the full text, the box and the unit it names. It holds every other top-level node too, and the time it was read. A label's text is in it because without the text the next agent reads the file again to learn what a label says, and the inventory is read once to avoid that. The rule that an inventory is read once and handed on is stated above; this rule states what it holds.
+- **A picture that is taken MUST be looked at, and the report MUST say which pictures were looked at and what each one showed.** A picture that nobody looked at proves nothing, and the cost of taking it is paid for nothing.
+
+### Before a publish
+
+- **Before the agent says that a file may be published, it MUST scan the whole file and report each of these:** versions outside a set; pairs of versions that meet; top-level nodes that meet; strays, which are nodes that belong to no unit and no sheet; a property left with the editor's default name; a set whose properties cannot be read; labels on a page other than their unit's; and each set whose default version is not the one its label names. A person publishes after the agent's word, and a file that is published with one of these shows it to every stack that reads the library.
+
 ## Drawing a block
 
 - A block drawn from data is a host and an item. One item serves every host that takes one data shape (`architecture-components.md`).
@@ -222,6 +298,8 @@ This ref states what the library draws, how its files are layered, and what stay
 | `RD.SUPPORT.SURFACE.027` | the plugin has a read mode and an update mode, and the update mode writes only what a plan names, only in the open file, only after a dry run and an apply, and never publishes |
 | `RD.SUPPORT.SURFACE.028` | the agent changes the library by a plan or by the connector picked by the nature of the work, and says what it will change before a connector write |
 | `RD.SUPPORT.SURFACE.029` | a developer's hands in the library are three (publishing a file, using the plugin, saving a named version before the connector's first change), and the connector's work is carried out by an inventory read once, a script for each page, one picture for each set, a probe written once and a named version saved first |
+| `RD.SUPPORT.SURFACE.030` | a library file holds a set in a grid its label states, the stack's default at the top left with the label corrected to it, a label a script can read, and a case that is never published as a unit |
+| `RD.SUPPORT.SURFACE.031` | an agent checks an order against the live file and the web, changes only the nodes it names, and scans the whole file before it says a publish may go |
 
 ## Proof
 
