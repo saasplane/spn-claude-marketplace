@@ -5,6 +5,8 @@
 // inventory the tool takes in: `inventory.js` and `tokens.js` give that one.
 //
 //   pageId null      lists the file's pages (id, name) and stops. No page switch.
+//   (The connector refuses a returned value over 20,480 bytes: keep `maxBytes` at 16000 or under. An inventory
+//   of a page of about 100 nodes takes three ranges, each continued from `next`.)
 //   report inventory what the book's inventory holds for the agent's own work: the page, each set and
 //                    lone component, each sheet of cases, each label with its layer name, full text and
 //                    the unit it names, each sample, each section, each reference frame and every other node.
@@ -30,7 +32,8 @@
 // A node is one of: a section, a set, a component, a sheet (a frame named `<unit> cases`), a label (a text
 // that is a header, a row label, a column label or a band's label), a sample (`sample · ...`), a reference
 // frame (a frame on a page that holds no set and no component), or other. Only `other` is a stray. A header's
-// layer is `header · <Unit>`; every other label's is `label · <text>`.
+// layer is `header · <Unit>`; every other label's is `label · <text>`, a sheet's label (`<unit> cases — ...`,
+// part `sheet`) included, and it stands in the Cases band. A sample's name begins with its unit's name.
 //
 // A row label belongs to the row it sits by and a column label to the column it sits by: the label's centre
 // must lie inside the span of one row (or column) of a set's versions, with the label beside the set (left
@@ -343,7 +346,7 @@ function readLabel(entry) {
     const forSheet = head.endsWith(SHEET_SUFFIX);
     const unit = forSheet ? head.slice(0, -SHEET_SUFFIX.length) : head;
     const form = forSheet ? "sheet" : parsed.error ? "cannot say" : parsed.layout.oneComponent ? "one component" : "grid";
-    return { text, part: "header", unit, via: "text", onPage: unitNames.has(head) || unitNames.has(unit), setId: null, form, reason: forSheet ? null : parsed.error };
+    return { text, part: forSheet ? "sheet" : "header", unit, via: "text", onPage: unitNames.has(head) || unitNames.has(unit), setId: null, form, reason: forSheet ? null : parsed.error };
   }
   if (entry.node.name.startsWith(LABEL_PREFIX) && BAND_LABELS.includes(text)) {
     return { text, part: "band", unit: null, via: null, onPage: true, setId: null, form: null, reason: null };
@@ -482,7 +485,7 @@ function scanFindings() {
   const strays = topLevel.filter((entry) => entry.kind === "other")
     .map((entry) => ({ id: entry.node.id, nodeType: entry.node.type, name: entry.node.name }));
   // Only a header names a unit. A row label and a column label name values, so they are never "elsewhere".
-  const labelsUnitElsewhere = labelEntries.filter((label) => label.part === "header" && !label.onPage)
+  const labelsUnitElsewhere = labelEntries.filter((label) => (label.part === "header" || label.part === "sheet") && !label.onPage)
     .map((label) => ({ label: label.entry.node.id, unit: label.unit, text: label.text.slice(0, 80) }));
   const labelLayerNames = labelEntries.flatMap((label) => {
     const name = label.entry.node.name;
@@ -525,6 +528,7 @@ function scanFindings() {
     const label = labelOf.get(entry);
     if (!label) return null;
     if (label.part === "header") return 0;
+    if (label.part === "sheet") return 2;
     if (label.part === "row" || label.part === "column") return 1;
     return label.part === "band" ? 2 + BAND_LABELS.indexOf(label.text) : null;
   };
@@ -542,13 +546,15 @@ function scanFindings() {
   const headed = new Set(labelEntries.filter((label) => label.part === "header").map((label) => label.unit));
   const unitsWithoutHeader = [...unitEntryByName].filter(([name]) => !headed.has(name))
     .map(([name, entry]) => ({ unit: name, id: entry.node.id, in: entry.parentId }));
+  const samplesNamingNoUnit = entries.filter((entry) => entry.kind === "sample" && unitOfSample(entry.node) === null)
+    .map((entry) => ({ id: entry.node.id, name: entry.node.name.slice(0, 80), in: entry.parentId }));
   const kinds = (kind) => entries.filter((entry) => entry.kind === kind).length;
   const emptyReading = kinds("set") + kinds("component") + kinds("sheet") === 0
     ? [{ page: page.id, nodes: entries.length, why: "the scan found no set, no lone component and no sheet of cases, so it checked no unit" }]
     : [];
 
   return {
-    emptyReading, versionsOutside, versionPairsMeeting: versionPairs, topLevelPairsMeeting: topLevelPairs.map((pair) => ({ pair })),
+    emptyReading, samplesNamingNoUnit, versionsOutside, versionPairsMeeting: versionPairs, topLevelPairsMeeting: topLevelPairs.map((pair) => ({ pair })),
     strays, defaultNamedProperties, unreadableSets, setsOverLimit, emptyVersions, emptyCases,
     badCaseNames, duplicateCaseNames, labelsUnitElsewhere, labelLayerNames, labelsFormCannotSay, defaultNotLabels,
     topLevelNotSection, meetingInSection, sectionOutOfOrder, unitsWithoutHeader, outsideUnitSection,
@@ -561,7 +567,9 @@ const scanShown = (limit) => {
   for (const [name, items] of Object.entries(allFindings)) findings[name] = finding(items, limit);
   const blocking = Object.entries(allFindings).filter(([name]) => !NOT_BLOCKING.includes(name));
   const read = Object.fromEntries(Object.keys(GROUP_OF).map((kind) => [GROUP_OF[kind], entries.filter((entry) => entry.kind === kind).length]));
-  return { clean: blocking.every(([, items]) => items.length === 0), notBlocking: NOT_BLOCKING, form, read: { topLevel: topLevel.length, ...read }, findings };
+  const captions = entries.filter((entry) => entry.kind === "sample" && entry.node.type === "TEXT").length;
+  read.samples -= captions;
+  return { clean: blocking.every(([, items]) => items.length === 0), notBlocking: NOT_BLOCKING, form, read: { topLevel: topLevel.length, ...read, sampleLabels: captions }, findings };
 };
 
 const result = {

@@ -538,19 +538,21 @@ const iconPart = (id, box = [80, 860, 400, 220]) => section(`${id}:sec`, ".DSIco
   version(`${id}:icon`, ".DSIcon", 80, 128, 48, 48),
 ]);
 // One unit's section: header, set with its labels, cases, samples, and the parts it is given.
-function unitSection(sid, name, origin, { header = true, parts = [], sampleAbove = false } = {}) {
+function unitSection(sid, name, origin, { header = true, parts = [], sampleAbove = false, sheetLabel = false, caption = false } = {}) {
   const set = componentSet(`${sid}:set`, name, [200, 148, 300, 200], grid(sid, tidy));
   const cases = sheet(`${sid}:sheet`, `${name} cases`, [80, sampleAbove ? 668 : 444, 300, 100], [sheetCase(`${sid}:c1`, "case=text")]);
-  const shown = sample(`${sid}:smp`, "sample · open", [80, sampleAbove ? 444 : 668, 200, 60]);
+  const shown = sample(`${sid}:smp`, `sample · ${name} open`, [80, sampleAbove ? 444 : 668, 200, 60]);
   return section(`${sid}:sec`, name, [origin[0], origin[1], 800, 1300], [
     ...(header ? [headerText(`${sid}:head`, name, `${name} — rows: size=SM, MD · columns: state=rest, hover`, [80, 80, 600, 20])] : []),
     set,
     labelText(`${sid}:row`, "SM (default)", [116, 168, 60, 20]),
     labelText(`${sid}:col`, "rest", [220, 112, 60, 20]),
     labelText(`${sid}:lc`, "Cases", [80, sampleAbove ? 624 : 400, 100, 20]),
+    ...(sheetLabel ? [text(`${sid}:sl`, `label · ${name} cases — horizontalScroll=true · wrap=true, wrap=false`, `${name} cases — horizontalScroll=true · wrap=true, wrap=false`, [80, 420, 300, 20])] : []),
     cases,
     labelText(`${sid}:ls`, "Samples", [80, sampleAbove ? 400 : 624, 100, 20]),
     shown,
+    ...(caption ? [text(`${sid}:cap`, `sample · ${name} open`, `sample · ${name} open`, [300, 668, 200, 20])] : []),
     ...(parts.length > 0 ? [labelText(`${sid}:lp`, "Parts", [80, 820, 100, 20]), ...parts] : []),
   ]);
 }
@@ -653,6 +655,30 @@ await guard(async () => {
   same("a page that holds no unit is not clean either", [reference.scan.clean, reference.scan.findings.emptyReading.count], [false, 1]);
   const both = await run("page.js", { pageId: "2:1", report: "both", maxBytes: 16000 }, sectioned([]));
   same("the answer says the form at its top, whichever report is asked", [both.form, both.scan.form], ["empty", "empty"]);
+});
+
+await guard(async () => {
+  // The three real sheet labels of Data display (453:2926, 458:3831, 459:3869): layer `label · <Unit> cases — ...`.
+  for (const name of ["DSTable", "DSCodeBlockView", "DSJSONView"]) {
+    const scan = await scanSections([unitSection("B", name, [100, 100], { sheetLabel: true })]);
+    same(`${name}'s sheet label, in the Cases band above its sheet, is no header: clean, no layer name and no order finding`, [scan.clean, counts(scan)], [true, {}]);
+    const inventory = await inventorySections([unitSection("B", name, [100, 100], { sheetLabel: true })]);
+    same(`${name}'s sheet label has a part of its own, and is read as a sheet's`, inventory.labels.filter((label) => label.id === "B:sl").map((label) => [label.part, label.form, label.unit]), [["sheet", "sheet", name]]);
+  }
+  const missing = unitSection("B", "DSTable", [100, 100], { header: false, sheetLabel: true });
+  same("a sheet's label never hides a unit with no header", (await scanSections([missing])).findings.unitsWithoutHeader.items.map((item) => item.unit), ["DSTable"]);
+  const low = unitSection("B", "DSTable", [100, 100], { sheetLabel: true });
+  low.children.find((child) => child.id === "B:sl").y = 640;
+  same("a sheet's label below the samples' label is out of the cases band", (await scanSections([low])).findings.sectionOutOfOrder.items.map((item) => item.id), ["B:sl"]);
+});
+await guard(async () => {
+  const scan = await scanSections([unitSection("B", "DSButton", [100, 100], { caption: true })]);
+  same("a sample's caption is counted apart: one sample and one sample label", [scan.read.samples, scan.read.sampleLabels, scan.clean], [1, 1, true]);
+  const unnamed = unitSection("B", "DSButton", [100, 100]);
+  unnamed.children.find((child) => child.id === "B:smp").name = "sample · nothing set";
+  const found = await scanSections([unnamed]);
+  same("a sample that names no unit is a finding of its own, with its id, name and section; the scan is not clean",
+    [found.clean, found.findings.samplesNamingNoUnit.items], [false, [{ id: "B:smp", name: "sample · nothing set", in: "B:sec" }]]);
 });
 
 console.log("\n=== layout.js — a set in a section");
