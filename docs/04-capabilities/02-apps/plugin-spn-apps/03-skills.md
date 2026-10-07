@@ -20,7 +20,7 @@ Each folder under this plugin's `skills/` is named for a command of the `apps` g
 | Publishing | `packages/plugin-spn-apps/src/skills/release/SKILL.md` | the repository's releasable projects, in lockstep, scoped to the repository and never one package |
 | Designing a page | `packages/plugin-spn-apps/src/skills/design/SKILL.md` | the layout, the containers, the pattern of each task and the blocks, stated as a tree of named blocks |
 | The steps the build loop names | `packages/plugin-spn-apps/src/providers/ts/skills/implement/steps/` | one file per layer, held by the provider for the declared stack |
-| The step the design skill names | `packages/plugin-spn-apps/src/skills/design/steps/draw.md` | draws the tree in Figma from the published libraries, held by the skill because it names no stack |
+| The steps the design skill names | `packages/plugin-spn-apps/src/skills/design/steps/draw.md` and `change-library.md` | draw the tree in Figma from the published libraries, and change a library file through the connector, held by the skill because they name no stack |
 | What each one restates | the `spn:restates` block at the top of each `SKILL.md` | the skills chapter, and the chapter of the one stage that skill serves |
 | The absent planning skill's material | `packages/plugin-spn-apps/src/providers/ts/skills/ideate/plan.md` | the part of the core `ideate` walk only this stack can answer, held by the provider rather than under `skills/` |
 
@@ -43,11 +43,11 @@ Each folder under this plugin's `skills/` is named for a command of the `apps` g
 **What** — the skill states the step names, their order and what each settles, and composes the path `providers/{stack}/skills/implement/steps/{step}.md` from the nearest manifest.
 **How** — the steps are a table rather than a list of links, and a step the declared stack does not ship is a step that stack does not walk. `packages/plugin-spn-apps/src/skills/implement/SKILL.md`.
 
-### One skill holds its own step, because the step names no stack
+### One skill holds its own steps, because the steps name no stack
 
-**Why** — *a step is read when the work reaches it*. A window with no Figma connector never reaches the drawing, so it never loads that file.
-**What** — `design` serves the ideate stage. You ask it to design, lay out or draw a page, and it states the page as a tree of named blocks. Its one step, `draw`, draws that tree in Figma.
-**How** — the step is written in no language, so it sits in the skill's own folder and no provider holds it. `packages/plugin-spn-apps/src/skills/design/steps/draw.md`.
+**Why** — *a step is read when the work reaches it*. A window with no Figma connector never reaches the drawing or the change of a library file, so it never loads those files.
+**What** — `design` serves the ideate stage. You ask it to design, lay out or draw a page, and it states the page as a tree of named blocks. Its steps are `draw`, which draws that tree in Figma, and `change-library`, which changes a library file through the connector.
+**How** — the steps are written in no language, so they sit in the skill's own folder and no provider holds them. `packages/plugin-spn-apps/src/skills/design/steps/draw.md`.
 
 ### A mode is an argument, not a second skill
 

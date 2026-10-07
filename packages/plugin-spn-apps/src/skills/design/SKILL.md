@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/",
-      "seen": "859b272d"
+      "seen": "e8c040cb"
     }
   ]
 }
@@ -170,7 +170,7 @@ Missing       none
 
 A tree is complete with no drawing. Draw it where the window holds the Figma connector and the developer asks for the drawing. Read `skills/design/steps/draw.md` then, and follow it. It draws the tree from the published libraries, by instances, with the look as theme modes. It then reads the page back by name. Where the window holds no connector, say so, and hand over the tree.
 
-The page is a use case, composed from the published library in a file that is not a library file. It is never put into a library file, and it is not changed by a plan. Where the drawing needs a block or a value the library lacks, that is a change of the library, and it is done in one of two ways: a plan the plugin executes, or the connector, picked by the nature of the work (`refs/support/surface/delivery-library.md`; before a connector write, read its heading "The connector's facts"). Say which way and why, name the developer's next step, and show the result. Where the way is the connector, read `skills/design/steps/change-library.md` and follow its walk. Never ask a developer to draw, rebind or confirm anything in Figma: a developer's hands are three: publishing a file, using the plugin, and saving a named version before the connector's first change in a library file, which the connector cannot save. Nothing else is asked.
+The page is a use case, composed from the published library in a file that is not a library file. It is never put into a library file. Where the drawing needs a block or a value the library lacks, that is a change of the library, and the connector makes it (`refs/support/surface/delivery-library.md`, under "A developer's hands are two, and you change the library through the connector"; before a connector write, read its heading "The connector's facts"). Read `skills/design/steps/change-library.md` and follow its walk, name the developer's next step, and show the result. Never ask a developer to draw, rebind or confirm anything in Figma: a developer's hands are two, saving a named version before the connector's first change in a library file, which the connector cannot save, and publishing a file. Nothing else is asked.
 
 ## Close
 

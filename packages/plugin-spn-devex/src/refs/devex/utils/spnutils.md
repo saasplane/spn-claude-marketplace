@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/03-utils/01-spnutils.md",
-      "seen": "84b9a74d"
+      "seen": "e2890d5c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "42c37488"
+      "seen": "21d55d9a"
     }
   ],
   "decisions": [
@@ -20,6 +20,11 @@
       "repo": "spn-foundation",
       "row": "RD.DEVEX.UTILS.072",
       "seen": "eb25b0de"
+    },
+    {
+      "repo": "spn-foundation",
+      "row": "RD.DEVEX.UTILS.075",
+      "seen": "e94a2e3b"
     }
   ]
 }
@@ -136,19 +141,17 @@ routed by each package's own scope.
 
 `apps surface <operation> [package]` finds where a design library and a stack's design system differ,
 with no model reading either one. It is one command with an operation, as `migrate` is, so the tool
-keeps four groups. The operations are `plugin`, `library`, `snapshot`, `gaps`, `library-plan` and
-`status`, and the options are `--level`, `--unit`, `--raw`, `--file` and `--decisions`. `plugin` also
-makes the folders a person saves into and picks from, and `library` reads the raw files in
-`plugin-output/raw/`. `library-plan <package>` reads the gaps, the two snapshots, the raw files and
-the decisions file, and writes one plan for each library file into `plugin-input/<package>/`, each with
-`counts` last, and a view of the plans by library file in `compare/<package>/library-plan.md` for a
-person to review. A plan writes the removal of a variable or a style by its usage in the raw file, and
-holds the work a person does as entries, so the view shows the layers a person must rebind. A
-decision of the decisions file matches a gap exactly, and the command refuses by name a decision that
-matches no gap. The tool writes only under `plugin/`, `plugin-input/` and `compare/`, and never
-touches a repository or Figma. `status` also reads the result files that the plugin's update mode
-saved in `plugin-output/results/<package>/`. Every file is under `~/.spnutils/surface/`, and none
-enters a repository.
+keeps four groups. The operations are `snapshot`, `library`, `gaps`, `accepted` and `status`, and the
+options are `--level`, `--unit` and `--file`. `snapshot <package>` writes a stack's snapshot from its
+code. `library` takes in the inventory of one library file that the agent prepared elsewhere, and writes
+the library's snapshot when the inventories of all five are held. `gaps <package>` compares the two
+snapshots and writes the gaps, with `rulesApplied` and `accepted`, and a view of one line for each gap.
+`accepted <package>` takes in the differences that have been looked at and accepted, and the next `gaps`
+leaves them out and counts them. `status` says what is on the machine and what is missing, and writes
+nothing. `library` and `accepted` check the file they take in and copy it into place, and refuse by name
+a file that fails the check, writing nothing. Four of the five operations read and write the machine's
+folder alone and need no stack. The tool never touches a repository or Figma. Every file is under
+`~/.spnutils/surface/`, in folders that say who writes there, and none enters a repository.
 
 **`spnutils` never reads or writes a document — MUST** (`RD.DEVEX.UTILS.071`). `apps test <tier> <run>
 <package>` runs a tier and writes that run's file, `tests/.output/<tier>/runs/<run>.json`, and nothing
@@ -235,6 +238,12 @@ recomputing it; nothing else there should be.
 | `registry/` | the machine store: every estate package released with `--local` |
 | `cache/` | copies that can be fetched again, such as the engine's providers |
 | `browser/chrome/` | the automation browser profile: the machine's own, and deliberately not the developer's Chrome |
+| `surface/` | the design comparison: the library's inventories and snapshot, and for each package its snapshot, its gaps and its accepted differences, as the delivery library states |
+
+**The tool's home folder is the tool's own — MUST** (`RD.DEVEX.UTILS.075`). A developer and an agent are
+never asked to add or change a file in `~/.spnutils`. What the tool needs from outside is taken in by a
+command, which checks the file and copies it into place, so a file is prepared elsewhere and never left
+in the folder by hand.
 
 **The browser profile is yours to drive, and the developer's Chrome never is.** Chrome refuses
 automation on a person's default profile, so `infra organization up` provisions this separate one. It

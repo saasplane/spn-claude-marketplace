@@ -70,7 +70,7 @@ A step file is written in a language, so it cannot live in a skill that serves e
 
 ### A step that names no stack stays in the skill's own folder
 
-The design skill has one step, `draw`. It draws the page in Figma from the published libraries, so it is written in no language and no provider holds it. The step sits in `skills/design/steps/`. The skill reads it only where the window holds the Figma connector and you ask for a drawing. A window with no connector never loads it, and the design is complete without it.
+The design skill has two steps, `draw` and `change-library`. `draw` draws the page in Figma from the published libraries, and `change-library` walks a change of a library file through the connector, with the two scripts the skill ships to read a page and to lay out a set. Neither names a language, so no provider holds them. The steps sit in `skills/design/steps/`. The skill reads them only where the window holds the Figma connector and the work reaches them. A window with no connector never loads them, and the design is complete without them.
 
 ### The design skill states a page before its code is written
 

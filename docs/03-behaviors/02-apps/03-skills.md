@@ -30,7 +30,7 @@ Every row below is declared and none is claimed: a run writes the last two cells
 | MKT.SKILLS.15 | Engineering leader | have a contract change reviewed by something that did not write it | The build skill closes with the suites and hands the change to the review skill | POSITIVE | UNIT | PLANNED | — |
 | MKT.SKILLS.16 | Architect | decide what a node is without a second skill competing for the ask | That skill lives once in the core plugin, and this plugin supplies only the material it loads | NEGATIVE | UNIT | PLANNED | — |
 | MKT.SKILLS.25 | Web developer | design a page before its code is written | The design skill serves the ideate stage, and states the page as a tree of named blocks with their props | POSITIVE | UNIT | PLANNED | — |
-| MKT.SKILLS.26 | Web developer | get the design of a page in a window that holds no Figma connector | The skill reads its one step, `draw`, only where the window holds the connector and a drawing is asked for | POSITIVE | UNIT | PLANNED | — |
+| MKT.SKILLS.26 | Web developer | get the design of a page in a window that holds no Figma connector | The skill reads its steps, `draw` and `change-library`, only where the window holds the connector and the work reaches them | POSITIVE | UNIT | PLANNED | — |
 
 ## Retired ids
 
