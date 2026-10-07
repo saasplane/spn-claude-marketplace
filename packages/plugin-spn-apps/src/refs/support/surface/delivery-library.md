@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/11-delivery-library.md",
-      "seen": "2b0a7720"
+      "seen": "00714c2d"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "28f8ea3d"
+      "seen": "6f2d553b"
     }
   ]
 }
@@ -48,11 +48,11 @@ A file can use only what another file has published. SaaS Plane's own library is
 
 | File | Its pages |
 | --- | --- |
-| DS 1-core | Colour · Type · Scale · Icons |
+| DS 1-core | Colour · Type · Scale · Icons · States, the pages of the showcase's Core entries that show tokens |
 | DS 2-Components | one page for each group of the showcase, in its order: Actions · Data display · Feedback · Structure · Media · Navigation · Overlays · Popovers · Typography · Utility, then the three pages of Data entry: Fields, Pickers and Composites. Each set sits in its unit's section on its group's page |
-| DS 3-Widgets | Filter bar · Data table |
-| DS 4-Containers | Container |
-| DS 5-Layouts | Layout |
+| DS 3-Widgets | Widgets: `DSWDataTable`, then `DSWFilterBar` with its item `DSWFilterField` |
+| DS 4-Containers | Containers |
+| DS 5-Layouts | Layouts |
 | DS 9-Lab | drafts, never published |
 
 Core holds the variables in collections, and each is one setting of the book: `Ramps` (the ramps, which no block reads), `Roles` (Light, Dark), `Hue` (the values of `color`), `Scale`, `Theme-Font`, `Theme-Radius`, the four `Theme-*` collections of the container look (`Theme-Raised` also holds `page/fill`), and `Frame` (the frame setting of `flush`). A private part's name starts with a dot, and it is drawn inside the section of the unit that owns it, or in the section named Shared parts when several units use it; a description is one line and a link; a file that changes is published by a person.
@@ -359,6 +359,7 @@ A library file is read by people and by scripts. A person reads the grid of a se
 A person who opens a page reads it as a tree: the page, then one section for each unit, then what the unit holds. A page of a file that holds units is one group of the showcase, so a person who knows the showcase finds the same groups in the file, in the same order.
 
 - **A page's name MUST be its group's name in the showcase, without the `Component - ` that starts the name of a group of components, and the pages MUST stand in the showcase's order.** The group `Component - Actions` is the page Actions. The group `Data Entry - Fields` is the page Data entry · Fields, and its two sisters are Data entry · Pickers and Data entry · Composites. A file does not order its pages by its own rule.
+- **The Core file's pages MUST be the showcase's Core entries that show tokens: Colour, Type, Scale, Icons and States.** The file holds no component, so its section holds a group of tokens with its specimens and not a unit. The showcase's Core entries Primitives, Patterns and Inline alignment show components, so they have no page in this file and stay in the showcase. "A section of the Core file" states what such a section holds. The Scale page holds Control sizes and The layout's measures as the showcase does, and States is drawn from tokens only, one row for each state. The pages of the Widgets, Containers and Layouts files are Widgets, Containers and Layouts.
 - **A page that is no group of the showcase MUST NOT be kept.** What it holds goes to the page of the unit it serves, and what serves no unit is removed.
 - **A page MUST hold one section for each unit of its group, named exactly as the unit, such as `DSInput`, and nothing else at its top level.** No level stands between a page and its units. A label or a sample that stood loose on the page would be parted from its unit the next time the unit moves, so every thing a unit owns sits inside the unit's section.
 - **The sections MUST stand in the showcase's order of the group's units, in one column down the page.** A person who knows the showcase then finds a unit where the showcase lists it. A unit that the showcase lists and the page has no node for gets no section, and the agent reports it.
@@ -393,6 +394,20 @@ The section is as large as its content and its padding, and it holds each of the
 
 - **Moving a set into a section, or to another page, MUST change nothing of the unit.** Its key, its versions' keys, its name, its size, its default and its properties stay as they were, and an instance keeps its main component. An agent reads them before the move and after it, and reports both, as it does for a default.
 - **Size stays a property of a unit, and a set keeps a version for each value of the web.** A value that is only a colour, a corner, a height, a padding or a text size is carried by a variable and never by a version.
+- **A unit that the showcase lists and that is drawn only as a sheet of cases MUST have a section with its header and its sheet.** It has no set of versions. Its header's layout clause reads `no set of versions, shown as cases`. The sheet's label stands above the sheet in the band of cases, its layer named `label · ` and its text, and it is never the unit's header.
+- **A thing MUST be given room for what it draws, and "nothing meets" and "inside its section" MUST be judged by what a thing draws as well as by its box.** An open sample draws a popup outside its box, and a shadow reaches past its box. Each of them stays clear of its neighbours and inside its section.
+- **The layers panel MUST read from the top in the page's order, and inside a section in the order of its pieces.** A person who reads the panel reads the page.
+- **A section MUST take the fill that its page's content stood on.** The unit then reads on the ground it was drawn on.
+- **A sample's layer and its caption MUST begin `sample · ` and the unit's name, with no comma straight after the unit.** The unit's name is then read the same way in every sample.
+- **A row label MUST be centred on its row's band.**
+
+### A section of the Core file
+
+The Core file holds no component set, so a section there holds a group of tokens and not a unit. It is named as the group, such as `Control sizes`, and holds these, from the top: the header, an optional label with the rest of the description, and one frame of specimens.
+
+- **The header is named `header · ` and the group's name, and it reads the group's name, ` — `, and one line.** The label that follows holds what the line cannot.
+- **The frame of specimens MUST draw each specimen from the file's variables and text styles, with no value typed in.** A specimen then changes when a variable changes.
+- **A frame of specimens that sets a variable mode MUST be moved whole, and a specimen MUST NOT be taken out of the frame that gives it its mode.** A specimen outside its frame reads in the wrong mode.
 
 ### A set and its layout
 
@@ -437,8 +452,10 @@ The layer of a row label and of a column label is named `label · ` followed by 
 | Row | the values of the row, in the order of the axes, joined by ` · ` |
 | Column | the values of the column, in the order of the axes, joined by ` · ` |
 
-- **The layout of a header is `rows: <axis>` and `columns: <axis>`, in either order, joined by ` · `.** An axis that is left out is one row or one column, and `one row` and `one column` say it in words. Where the unit is one component with no grid it reads `one component`. A note may stand before or after the layout, each after ` · `, and after `one component` it may follow a comma. A script finds the layout by its words and reads no note.
+- **The layout of a header is `rows: <axis>` and `columns: <axis>`, in either order, joined by ` · `.** An axis that is left out is one row or one column, and `one row` and `one column` say it in words. Where the unit is one component with no grid it reads `one component`. Where the unit has no set of versions and is shown only as a sheet of cases, it reads `no set of versions, shown as cases`. A note may stand before or after the layout, each after ` · `, and after `one component` it may follow a comma. A script finds the layout by its words and reads no note.
 - **An axis is a list of cells in the order they run from the top left, joined by `, `.** A cell is `<property>=<value>`, or only `<value>` when its property is the property of the cell before it. Two properties that multiply, the outer one first, are joined by ` x `, so `variant=SOLID (default), SOFT x size=SM (default), XS` gives every size under each variant.
+- **A cell names a value in whole, or by the part of it before its first `: `.** For the value `address: the row goes to an address` the cell is `case=address (default)`. A value that is long, or that holds `: `, is then written short, and a script reads both forms.
+- **A grid whose rows hold different cases is written with one cell for each row, and its columns read `the other cases of that kind`.** `DSFormats` stands for five formatters, one in each row, and a row's cells are that formatter's own cases, so no one property runs across the columns. Its rows axis names what each row holds, such as `case=currency USD (default), date US_STANDARD`, and a note after the layout may say what the set stands for.
 - **The default is marked ` (default)`, written once after the one value of each property that the stack's default version carries.** That value comes first in its list, because the version at the top left carries the default.
 - **A row label and a column label name values and no property.** The header names the property, and the label is read against it. `SOLID (default) · SM (default)` is the row of the default variant at the default size.
 
@@ -521,6 +538,7 @@ This ref states what the library draws, how its files are layered, and what stay
 | `RD.SUPPORT.SURFACE.030` | a library file holds a set in a grid its label states, the stack's default at the top left with the label corrected to it, a label a script can read, and a case that is never published as a unit |
 | `RD.SUPPORT.SURFACE.031` | an agent checks an order against the live file and the web, changes only the nodes it names, and scans the whole file before it says a publish may go |
 | `RD.SUPPORT.SURFACE.032` | a library file has a page for each group of the showcase, in its order, and each unit is one section that holds everything the unit owns, with the header, set, cases, samples and parts in a fixed order and at fixed distances |
+| `RD.SUPPORT.SURFACE.033` | the Core file's pages and its sections of tokens, a unit drawn only as cases, the forms a header meets in practice, the pages of the Widgets, Containers and Layouts files, and the six sentences that complete `.032`: room for what a thing draws, the layers panel in the page's order, a section's fill, a sample's name, and a row label centred on its band |
 
 ## Proof
 
