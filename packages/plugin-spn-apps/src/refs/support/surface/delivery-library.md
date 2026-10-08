@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/11-delivery-library.md",
-      "seen": "00714c2d"
+      "seen": "c906fb06"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "63615af9"
+      "seen": "3e679ebf"
     }
   ]
 }
@@ -361,21 +361,21 @@ A person who opens a page reads it as a tree: the page, then one section for eac
 - **A page's name MUST be its group's name in the showcase, without the `Component - ` that starts the name of a group of components, and the pages MUST stand in the showcase's order.** The group `Component - Actions` is the page Actions. The group `Data Entry - Fields` is the page Data entry · Fields, and its two sisters are Data entry · Pickers and Data entry · Composites. A file does not order its pages by its own rule.
 - **The Core file's pages MUST be the showcase's Core entries that show tokens: Colour, Type, Scale, Icons and States.** The file holds no component, so its section holds a group of tokens with its specimens and not a unit. The showcase's Core entries Primitives, Patterns and Inline alignment show components, so they have no page in this file and stay in the showcase. "A section of the Core file" states what such a section holds. The Scale page holds Control sizes and The layout's measures as the showcase does, and States is drawn from tokens only, one row for each state. The pages of the Widgets, Containers and Layouts files are Widgets, Containers and Layouts.
 - **A page that is no group of the showcase MUST NOT be kept.** What it holds goes to the page of the unit it serves, and what serves no unit is removed.
-- **A page MUST hold one section for each unit of its group, named exactly as the unit, such as `DSInput`, and nothing else at its top level.** No level stands between a page and its units. A label or a sample that stood loose on the page would be parted from its unit the next time the unit moves, so every thing a unit owns sits inside the unit's section.
+- **A page MUST hold one section for each unit of its group, named exactly as the unit, such as `DSInput`, and nothing else at its top level.** No level stands between a page and its units. A label or a usage that stood loose on the page would be parted from its unit the next time the unit moves, so every thing a unit owns sits inside the unit's section.
 - **The sections MUST stand in the showcase's order of the group's units, in one column down the page.** A person who knows the showcase then finds a unit where the showcase lists it. A unit that the showcase lists and the page has no node for gets no section, and the agent reports it.
-- **A unit's section MUST hold these, from the top down, in this order: the header, the set with its row and column labels, the cases, the samples and the parts.** A band the unit has nothing for is left out with its label, and a top-level unit always has its samples. A unit whose versions draw everything it can show owes no sheet of cases. A top-level unit owes a sample of its primary use whatever else it draws, as "What a library file owes of a unit" states.
+- **A unit's section MUST hold these, from the top down, in this order: the header, the set with its row and column labels, the usage, the cases and the parts.** A person sees what a unit is for before every switch on it, as the page of the unit in the showcase opens with its Usage. A band the unit has nothing for is left out with its label, and a top-level unit always has its Usage. A unit whose versions draw everything it can show owes no sheet of cases. A top-level unit owes a usage of its primary use whatever else it draws, as "What a library file owes of a unit" states.
 
 | Piece | What it is |
 | --- | --- |
 | The header | one text, named `header · ` and the unit's name. It reads the unit's name, ` — `, what the unit is in one line, then the layout, with its rows and its columns |
 | The set | the unit's set, unchanged, with its column labels above it and its row labels in one column on its left |
+| The usage | a text `label · Usage`, and under it each usage of the unit with the caption that names it |
 | The cases | a text `label · Cases`, and under it the unit's sheets of cases and its loose case components |
-| The samples | a text `label · Samples`, and under it each sample with the label that names it |
 | The parts | a text `label · Parts`, and under it one section for each part, named as the part and built the same way |
 
 - **The header's one line MUST come from the set's own description, its first sentence, and its rows and columns from the set's own grid.** A header written from memory would be a second statement of what the set already says. The header is the unit's one header label: it carries the layout in the form that "The form of a label" states, and a unit has no second header text beside it. A header label that was drawn before, with the unit's name and a layout, is replaced by the header, and the layer name and the one line are the header's only additions.
 - **A part is a set or a lone component that serves another unit and that the showcase does not list on its own, and it MUST sit in the section of the unit that owns it.** The owner is the unit whose source uses the part, read from the stack and never guessed from the name. A name that starts with a dot is always a part. A part that two or more units on the page use sits in a last section of the page, named `Shared parts`, built the same way.
-- **A label or a sample of a unit MUST sit in that unit's section, even when it was drawn on another page.** One that is found on the page of another unit moves to its unit's page and into its section. A thing whose unit is not in the file, or that serves no unit, is removed, and the agent reports each one it removes with what it was.
+- **A label or a usage of a unit MUST sit in that unit's section, even when it was drawn on another page.** One that is found on the page of another unit moves to its unit's page and into its section. A thing whose unit is not in the file, or that serves no unit, is removed, and the agent reports each one it removes with what it was.
 
 The distances are fixed, so that every section reads the same. They are in pixels, in the section's own coordinates.
 
@@ -395,10 +395,10 @@ The section is as large as its content and its padding, and it holds each of the
 - **Moving a set into a section, or to another page, MUST change nothing of the unit.** Its key, its versions' keys, its name, its size, its default and its properties stay as they were, and an instance keeps its main component. An agent reads them before the move and after it, and reports both, as it does for a default.
 - **Size stays a property of a unit, and a set keeps a version for each value of the web.** A value that is only a colour, a corner, a height, a padding or a text size is carried by a variable and never by a version.
 - **A unit that the showcase lists and that is drawn only as a sheet of cases MUST have a section with its header and its sheet.** It has no set of versions. Its header's layout clause reads `no set of versions, shown as cases`. The sheet's label stands above the sheet in the band of cases, its layer named `label · ` and its text, and it is never the unit's header.
-- **A thing MUST be given room for what it draws, and "nothing meets" and "inside its section" MUST be judged by what a thing draws as well as by its box.** An open sample draws a popup outside its box, and a shadow reaches past its box. Each of them stays clear of its neighbours and inside its section.
+- **A thing MUST be given room for what it draws, and "nothing meets" and "inside its section" MUST be judged by what a thing draws as well as by its box.** An open select in a usage draws a popup outside its box, and a shadow reaches past its box. Each of them stays clear of its neighbours and inside its section.
 - **The layers panel MUST read from the top in the page's order, and inside a section in the order of its pieces.** A person who reads the panel reads the page.
 - **A section MUST take the fill that its page's content stood on.** The unit then reads on the ground it was drawn on.
-- **A sample's layer and its caption MUST begin `sample · ` and the unit's name, with no comma straight after the unit.** The unit's name is then read the same way in every sample.
+- **A usage's layer and its caption MUST begin `usage · ` and the unit's name, with no comma straight after the unit.** The unit's name is then read the same way in every usage.
 - **A row label MUST be centred on its row's band.**
 
 ### A section of the Core file
@@ -468,22 +468,22 @@ header · DSProgress — the progress bar · rows: size=SM (default), XS, MD, LG
 
 ### A sheet of cases, and a case
 
-- **A sheet of cases MUST sit in its unit's section, in the band of cases under the unit's set, and its name MUST be the unit's name followed by `cases`, such as `DSInput cases`.** The section then shows the unit and its cases in one place, and a script finds the sheet from the unit's name.
+- **A sheet of cases MUST sit in its unit's section, in the band of cases under the unit's usage, and its name MUST be the unit's name followed by `cases`, such as `DSInput cases`.** The section then shows the unit and its cases in one place, and a script finds the sheet from the unit's name.
 - **A case MUST be the unit with its prop values set, placed as instances of the unit, and never drawn as a new look.** A case drawn as a new look would be a second look for the same unit. A case is named for what it shows, under one property named `case`, because Figma names the property `Property 1` when the components it combines are not named `property=value`. A case's name holds no comma, and the connector's facts state why.
 - **A case is not a unit and is never published as one.** It MUST NOT take, in the file, a form that publishes it as a component of the library. A published case would appear among the units a stack imports, so a stack would be offered units the book never named, one for each case of each sheet.
 
 How the library keeps to the last rule is stated as far as the book can state it today. The form a case takes in the file must not publish it as a component of the library. The files that hold cases are brought to this by their own change, and until that change lands a case that is still a component is a recorded difference from this rule, never a form to copy.
 
-### A sample
+### A usage
 
-- **A sample is a node in the section of the unit it shows, in the band of samples, and its name is `sample · ` followed by what it shows.** It is an instance, a frame of instances, or the text that captions one. It shows a unit in a use that the grid of its set cannot hold, such as a select open, a pair of arrows both on, or a dialog over its backdrop.
-- **A sample is not a unit and is not a stray.** It is no component, holds no version and is never published. It belongs to the unit it shows, so the scan before a publish does not list it as a stray. Like every other thing in a section it sits clear of the things beside it, at the distance the section states.
+- **A usage is a node in the section of the unit it shows, in the band of Usage, and its name is `usage · ` followed by what it shows.** It is an instance, a frame of instances, or the text that captions one. It shows a unit in a use that the grid of its set cannot hold, such as a select open, a pair of arrows both on, or a dialog over its backdrop.
+- **A usage is not a unit and is not a stray.** It is no component, holds no version and is never published. It belongs to the unit it shows, so the scan before a publish does not list it as a stray. Like every other thing in a section it sits clear of the things beside it, at the distance the section states.
 
 ### What a library file owes of a unit
 
-A showcase is the running catalogue that a stack proves its realization with, and a showcase is proven against the library. A property that a unit has, and that nothing on its page draws, leaves nothing to prove the showcase against. A person who opens the file cannot see what the web supports, and a stack cannot show that it built it. So the page draws what a person sees of each unit.
+A showcase is the running catalogue that a stack proves its realization with, and a showcase is proven against the library. The Usage band is the part of the library that the showcase's own Usage is proven against: both draw the one use of the unit that an app would really have. A property that a unit has, and that nothing on its page draws, leaves nothing to prove the showcase against. A person who opens the file cannot see what the web supports, and a stack cannot show that it built it. So the page draws what a person sees of each unit.
 
-- **A top-level unit MUST have a sample of its primary use.** A top-level unit is a unit the showcase lists on its own. A part owes no sample, because it serves another unit and the sample of that unit shows it. The sample stands in the band of samples and takes the name that "A sample" states.
+- **A top-level unit MUST have a usage of its primary use.** A top-level unit is a unit the showcase lists on its own. A part owes no usage, because it serves another unit and the usage of that unit shows it. The usage stands in the band of Usage and takes the name that "A usage" states.
 - **A property that changes what is visibly there MUST be drawn.** An icon, a heading, a footer, a clear button and an open menu are such properties. Each is drawn by a version of the set, or by a case named `<property>=<value>` on the version where the property draws. A property whose default is on is drawn by its off case. A property that draws only on one version is drawn by a case on that version, and not by a case on the default.
 - **The test is what a person can see, at rest or in any state the unit can be in, and a state a unit can be in MUST be drawn.** A state is a visible change: open (a select's popup, a menu, a dialog), hover, focus, pressed, selected, checked, filled, invalid with its message, disabled, loading and empty. The library chapter already requires a drawing for every state that changes what a person sees, and makes the state a property of the set, `state=…`, with a shown state drawn as a picture and no prop. This rule includes both and restates neither.
 - **A property of behaviour changes nothing a person can see in any state, so it has nothing to draw, and the unit's header MUST name it.** It decides when or how something happens, and not what is there. A late-loading image (`lazy`), a callback, the delay before a tooltip shows, whether a menu closes when an item is chosen, the step of a number, the limit on a value and the `name` of a field are such properties. The header names each one in the clause `behaviour: ` that "The form of a label" states, so a script tells a property of behaviour from a property that nothing draws.
@@ -525,7 +525,7 @@ The rules under "Before a connector writes" and "How the connector's work is car
 
 ### Before a publish
 
-- **Before the agent says that a file may be published, it MUST scan the whole file and report each of these:** versions outside a set; pairs of versions that meet; top-level nodes that meet; a top-level node that is no unit's section; things inside a section that meet; strays, which are nodes that belong to no unit, no sheet and no sample; a property left with the editor's default name; a set whose properties cannot be read; labels outside their unit's section or on a page other than their unit's; a direct child of a section that lies outside its section; a top-level unit with no sample; a property that nothing draws and that the header does not name as behaviour; and each set whose default version is not the one its label names. A person publishes after the agent's word, and a file that is published with one of these shows it to every stack that reads the library.
+- **Before the agent says that a file may be published, it MUST scan the whole file and report each of these:** versions outside a set; pairs of versions that meet; top-level nodes that meet; a top-level node that is no unit's section; things inside a section that meet; strays, which are nodes that belong to no unit, no sheet and no usage; a property left with the editor's default name; a set whose properties cannot be read; labels outside their unit's section or on a page other than their unit's; a direct child of a section that lies outside its section; a top-level unit with no usage; a property that nothing draws and that the header does not name as behaviour; and each set whose default version is not the one its label names. A person publishes after the agent's word, and a file that is published with one of these shows it to every stack that reads the library.
 
 ## Drawing a block
 
@@ -551,9 +551,9 @@ This ref states what the library draws, how its files are layered, and what stay
 | `RD.SUPPORT.SURFACE.029` | the connector's work in a library file is carried out by an inventory read once, a script for each page, one picture for each set and a probe written once, and a person saves a named version before the connector's first change |
 | `RD.SUPPORT.SURFACE.030` | a library file holds a set in a grid its label states, the stack's default at the top left with the label corrected to it, a label a script can read, and a case that is never published as a unit |
 | `RD.SUPPORT.SURFACE.031` | an agent checks an order against the live file and the web, changes only the nodes it names, and scans the whole file before it says a publish may go |
-| `RD.SUPPORT.SURFACE.032` | a library file has a page for each group of the showcase, in its order, and each unit is one section that holds everything the unit owns, with the header, set, cases, samples and parts in a fixed order and at fixed distances |
-| `RD.SUPPORT.SURFACE.033` | the Core file's pages and its sections of tokens, a unit drawn only as cases, the forms a header meets in practice, the pages of the Widgets, Containers and Layouts files, and the six sentences that complete `.032`: room for what a thing draws, the layers panel in the page's order, a section's fill, a sample's name, and a row label centred on its band |
-| `RD.SUPPORT.SURFACE.036` | a library file draws what the showcase is proven against: a sample of its primary use for every top-level unit, a drawing of every property that changes what is visibly there, a header note for a property of behaviour, a mode with one case for a property whose value is a token, and a scan that reports a property nothing draws |
+| `RD.SUPPORT.SURFACE.032` | a library file has a page for each group of the showcase, in its order, and each unit is one section that holds everything the unit owns, with the header, set, usage, cases and parts in a fixed order and at fixed distances |
+| `RD.SUPPORT.SURFACE.033` | the Core file's pages and its sections of tokens, a unit drawn only as cases, the forms a header meets in practice, the pages of the Widgets, Containers and Layouts files, and the six sentences that complete `.032`: room for what a thing draws, the layers panel in the page's order, a section's fill, a usage's name, and a row label centred on its band |
+| `RD.SUPPORT.SURFACE.036` | a library file draws what the showcase is proven against: a usage of its primary use for every top-level unit, a drawing of every property that changes what is visibly there, a header note for a property of behaviour, a mode with one case for a property whose value is a token, and a scan that reports a property nothing draws |
 
 ## Proof
 

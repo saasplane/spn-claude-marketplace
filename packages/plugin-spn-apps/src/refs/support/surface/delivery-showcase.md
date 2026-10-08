@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/12-delivery-showcase.md",
-      "seen": "9cca892e"
+      "seen": "07fcbd78"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/12-delivery-showcase/",
-      "seen": "0832a471"
+      "seen": "4c42fba5"
     }
   ]
 }
@@ -66,6 +66,8 @@ The groups stand in the order of their layers. Welcome stands before them and be
 | App | App |
 
 Welcome, Core and App hold pages, and every other group holds units. Core holds Colour, Type, Scale, Icons, States, Primitives, Patterns and Inline alignment. App holds Theme and Contract. A group of units opens with its Overview, also when it has one unit, and no group nests inside another. Core, Components, Widgets, Containers and Layouts each match a library file, DS 1-core to DS 5-Layouts; App matches none. A showcase shows no unit that the constructs do not name.
+
+The Core pages Colour, Type, Scale, Icons and States each cover every section that the library's Core page of the same name has. A section is covered when it has a home on that page under the same name, shows the same tokens with the same values, and has the one line that the library's header has. The showcase may cover a section by a section of the page, a tab or another page of the story, keeps its live components, its code and its teaching sections, and may hold more than the library does. The library's file lists the sections, in "A section of the Core file". Primitives, Patterns and Inline alignment stay in the showcase alone, since they show components and the Core file holds none.
 
 A group's Overview names the group, says in one sentence what its units are for, and holds one card for each unit: its name, its category, one sentence, a small live example with real words, and the pages the unit has.
 
@@ -188,7 +190,7 @@ A main page holds its sections in one order. Usage is first and Props is last. A
 
 | Section | Appears when the unit has | What it holds |
 | --- | --- | --- |
-| Usage | always | one example: the richest real use of the unit, one that an app would really have |
+| Usage | always | one example: the richest real use of the unit, one that an app would really have. The library draws the same use in the Usage band of the unit's section, and that band is what this Usage is proven against |
 | Sizes | sizes | one tab for each size, `XS` to `XL`. Each tab shows every variant together, and not as a grid |
 | Colors | colours | one tab for each colour. Each tab shows every variant together, laid out as the tab of Sizes is |
 | Content | content | one tab for each icon or place the unit holds, and one tab for each choice of the unit that has no section of its own, such as a full width button |
