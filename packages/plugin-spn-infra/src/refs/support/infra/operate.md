@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/08-operate/",
-      "seen": "cecb1c0d"
+      "seen": "2d21f122"
     }
   ]
 }
@@ -60,13 +60,16 @@ Every field a deployment needs already lives somewhere a person reviewed. If you
 - **The two gateways are kept apart**, so a wrong route cannot make a private surface answer on the internet.
 - **HTTPS ends at the load balancer**, with the zone's wildcard certificate, which covers the internal hosts too.
 - **One cluster serves one environment**, with namespaces `prd`, `plt` and `vnd`.
-- **Hosting does not change the pair.** Under `CLUSTER` the storage engine's own address is one more route. The book names no gateway product; which one the blueprint installs is open.
+- **Hosting does not change the pair.** Under `CLUSTER` the storage engine's own address is one more route.
+- **Each gateway has a host of its own**, `{env}-gateway.{spd}` and `{env}-gateway.internal.{spd}`. A route's host is given a record that points at it, so no route names a load balancer, and the label `gateway` is never a deployment's (`RD.SUPPORT.INFRA.119`).
+- **The estate publishes how many proxies stand in front of each listener.** `{SPC}_API_TRUSTED_PROXIES` is `2` for a deployment that has a route and `0` for an `INTERNAL` one. `{SPC}_API_REMOTE_TRUSTED_PROXIES` is `3` for every remote port: the calling service, the internal load balancer and the private gateway.
+- **The book names no gateway product where it states the rule.** The provider's chapter says what is installed (`providers/aws/08-environment.md`).
 
-**A remote port is always `PRIVATE` — MUST** (`RD.SUPPORT.INFRA.114`). `expose` describes the main port only; the remote port's reach is a rule and not a field. A calling pod reaches it by the same private HTTPS host an operator's machine uses, which is why the internal load balancer admits the cluster's nodes.
+**A remote port is always `PRIVATE` — MUST** (`RD.SUPPORT.INFRA.114`). `expose` describes the main port only; the remote port's reach is a rule and not a field. Its address is `https://{env}-{app}-remote.internal.{spd}`, where `{app}` is the application's `kindCode`, so no deployment's label may end `-remote`. A calling pod reaches it by the same private HTTPS host an operator's machine uses, which is why the internal load balancer admits the cluster's nodes.
 
-**A deployment may ask three things of its route** (`RD.SUPPORT.INFRA.116`): a rate limit, a timeout and a largest body, in a `gateway` block on its row. The manifest names the need, never the gateway's own field. The gateway's limit counts calls to the whole deployment from one address; a route's own limit is declared in code and counts calls to one route from one caller.
+**A deployment may ask three things of its route** (`RD.SUPPORT.INFRA.116`): a rate limit, a timeout and a largest body, in a `gateway` block on its row. The manifest names the need, never the gateway's own field. The gateway's limit counts calls to the whole deployment from one address. Its window is `1`, `60`, `3600` or `86400` seconds, and it is one count across every proxy pod, kept in the environment's own cache (`RD.SUPPORT.INFRA.118` · `RD.SUPPORT.INFRA.120`). A route's own limit is declared in code and counts calls to one route from one caller.
 
-**The public load balancer carries one web firewall** (`RD.SUPPORT.INFRA.117`), declared on the environment, covering every public deployment behind it. It starts with three rule groups, each counting only. Nothing is attached to the internal load balancer, and a public web application is not covered.
+**The public load balancer carries one web firewall** (`RD.SUPPORT.INFRA.117`), declared on the environment in the key `firewall`, covering every public deployment behind it. The key holds `NONE` or `COUNT`; every environment writes it and it has no default. `COUNT` stands the firewall with three rule groups, each counting only. `NONE` stands none, and no value makes one refuse a request. Nothing is attached to the internal load balancer, and a public web application is not covered.
 
 ## Namespace is a blast radius; exposure is declared with the namespace as its ceiling
 

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/01-shape/02-coordinates.md",
-      "seen": "394445c7"
+      "seen": "bce4b3f6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/06-modules/02-config.md",
@@ -46,6 +46,8 @@ Worked examples: network `spn-dmo-in-dev` · NP cluster `spn-dmo-np-in` · bucke
 internal service   {env}-{ns}-{app}-{stype}.internal.{domain}
 engine records     {env}-{world}-{engine}.internal.{spd}   database · cache · queue — low TTL
 consumer app       {env}-{app}.{domain}         every environment — PROD included
+remote port        {env}-{app}-remote.internal.{spd}   {app} = the application's kindCode — the platform's private zone, always
+gateway            {env}-gateway.{spd} · {env}-gateway.internal.{spd}   each gateway's own host; a route's host points at it
 module services    {env}-{module}-{service}.{spd}   the estate owns the namespace; the module names its services
 platform documents {env}-{world}-docs.{spd}
 storage API        {env}-{world}-storage.{spd}  CLUSTER only — the engine's S3 API via the ingress, TLS from the zone wildcard
@@ -58,6 +60,7 @@ custom domain      customer-owned               outside the zone, its own certif
 - **One world-marking rule covers every service hostname class** (RD.SUPPORT.INFRA.052): the world token is the platform's `{spc}`, a space's code, or a module's code — **no unmarked default world exists**. A space that stands its own engine gets its own records (`in-dev-sas-database…`), which is why unmarked records would be ambiguous, not merely inconsistent. The world token always matches the key prefix of the facts carrying the hostname.
 - **Locally** (RD.SUPPORT.INFRA.079): `{world}-{service}.{lc-domain}` for every service, engines included — `dmo-docs` · `dmo-sas-docs` · `idp-auth` · `dmo-database.lc-spndemo.app:9000` · `dmo-sas-cache.lc-spndemo.app:9011`. The machine's resolver answers the host with `127.0.0.1`, so nothing is proxied and no engine protocol is intercepted. The port stays the transport distinguisher, and the hostname carries the world; each port comes from the five hundred the platform declares (RD.SUPPORT.INFRA.062, see `../providers/local/04-addressing.md`). Server certificates are minted per `{world}-{family}`, so an engine presents a certificate for the name you dial.
 - **Module namespaces are validated** (RD.SUPPORT.INFRA.056): no kindCode may equal a declared module code or begin with one plus a hyphen.
+- **Two labels belong to the grammar and never to a deployment** (RD.SUPPORT.INFRA.119): `gateway`, which is each gateway's own host, and any label that ends `-remote`, which is an application's remote port. `spnutils infra validate` refuses a deployment whose `subdomains` hold either, and names the row.
 - **Engine records**: the environment apply writes them into the private zone, pointing at whatever the hosting rendered. Use these names in published endpoint facts, **never provider hostnames** — an engine swap flips a record, and every consumer follows.
 - **PROD keeps `{env}` like every environment.** A bare name never exists as grammar, so published facts, config documents and minted URLs are env-pinned always.
 - One single-level wildcard per zone covers every present and future name — adding an environment, app, space, or module service never issues a certificate. Adding a service domain issues exactly that domain's own pair.

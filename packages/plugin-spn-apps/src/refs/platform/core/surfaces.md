@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/03-platform/01-core/03-surfaces/",
-      "seen": "ec5f25c9"
+      "seen": "40409fd3"
     }
   ]
 }
@@ -73,6 +73,8 @@ An organization can bind its own domain to a site instead of using the platform'
 **Two environments are structurally identical and differ only in the coordinates they declare.** Any two environments hold the same components; a difference that cannot be expressed as workload, size or hosting is a design fault, not a case for a special environment. **Nothing crosses** — data, credentials and identity never span two environments.
 
 A **workload** is neither geography nor purpose. Availability, backup retention and deletion protection all read from it, never from the setup label — a mistake in a non-production environment cannot reach a production one by construction. A customer-dedicated installation is an ordinary setup row with its own label and a `PROD` workload, provisioned by the same machinery as everything else — dedicated is a row, never a special architecture.
+
+An environment's row also writes `firewall`, the web firewall on its public load balancer: `COUNT` stands one that records each match and lets the request through, and `NONE` stands none. Every row writes it.
 
 These four coordinates are estate declarations, read from the platform's own manifest, not platform contract terms — do not branch a module on one directly.
 

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-infra/05-apps.md",
-      "seen": "691c35bd"
+      "seen": "c9a10952"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/05-apps/",
@@ -183,6 +183,8 @@ A service that serves its modules' contracts to the other services of its platfo
 | `{SPC}_REMOTE_SERVICE_{NAME}_ENDPOINTS` | the environment's path | the remote address of the application whose `kindCode` is `{NAME}` |
 | `{SPC}_REMOTE_CREDENTIAL_*` | the environment's path | how a calling service proves itself: the provider's kind, and for the cluster's token its file, what it must be for, this platform's namespaces and the cluster's issuer |
 
+**In a cloud a remote port is reached at `https://{env}-{app}-remote.internal.{spd}`**, where `{app}` is the application's `kindCode`. The host sits in the platform domain's internal zone, whatever service domain the application's own hosts answer on. That address, with its scheme, is the published value, and a pod and an operator's machine use the same one.
+
 The cluster gives every application an identity and writes a token marked for remote calls into each pod; the receiving service checks it first. On a machine each service listens on one more local port, nothing is added to the local ingress, and the local address is plain HTTP on the service's own host and remote port.
 
 ### Two load balancers and two gateways
@@ -202,7 +204,19 @@ An environment has one pair for each reach, however many services it holds (`RD.
 - **One cluster serves one environment**, with three namespaces named for what they hold: `prd`, `plt` and `vnd`.
 - **`MANAGED` and `CLUSTER` say who runs a data engine** and do not change this.
 
-The book says "a gateway" and names no product; which one the blueprint installs is open.
+**The estate tells each listener how many proxies stand in front of it**, because a service finds the caller's address by counting back from the right of the forwarded-address header (`RD.SUPPORT.APPS.176`):
+
+| Setting | Value | The proxies it counts |
+| --- | --- | --- |
+| `{SPC}_API_TRUSTED_PROXIES` | `2` for a deployment that has a route | the load balancer, then the gateway |
+| `{SPC}_API_TRUSTED_PROXIES` | `0` for an `INTERNAL` deployment | none |
+| `{SPC}_API_REMOTE_TRUSTED_PROXIES` | `3` for every deployment that declares a remote port | the calling service, the internal load balancer, then the private gateway |
+
+A value a team writes for either key wins over the published one.
+
+**A deployment's label is never `gateway`, and never ends `-remote` — MUST** (`RD.SUPPORT.INFRA.119`). The estate's rules refuse each and name the row. Each gateway has a host of its own, `{env}-gateway.{spd}` and `{env}-gateway.internal.{spd}`, which every route's host points at. `{env}-{app}-remote` is the host of an application's remote port.
+
+The book says "a gateway" and names no product where it states the rule; the provider's chapter says what is installed (`providers/aws/08-environment.md`).
 
 ### What a deployment asks of its route
 
@@ -225,12 +239,19 @@ export interface SPEstateAppDeploymentGatewayRateLimit {
 - **Each member left out takes the gateway's default.**
 - **The block sits on a deployment that has a route:** an API, or a web deployment that declares a port. It is refused on a web deployment with no port and on one whose `expose` is `INTERNAL`.
 - **It applies to the main route.** A remote route takes the gateway's defaults.
+- **The rate limit's window is one second, one minute, one hour or one day — MUST** (`RD.SUPPORT.INFRA.118`). `windowSeconds` is `1`, `60`, `3600` or `86400`, because a gateway counts in those four units and no other. The estate's rules refuse any other number and name the row.
+- **The count is one count, however many proxy pods a gateway runs.** The gateway keeps it in the environment's own cache (`RD.SUPPORT.INFRA.120`).
 
 The gateway's limit counts calls to the whole deployment from one address and stops a flood before it reaches a pod. A route's own limit is declared in code, counts calls to one route from one caller, and gives a fair share of one costly thing.
 
 ### A web firewall on the public load balancer
 
-An environment's internet-facing load balancer is given one web firewall, declared on the environment, covering every public deployment behind it (`RD.SUPPORT.INFRA.117`). It starts with three of the cloud's rule groups (common rules, known bad inputs, address reputation) and starts by counting only. Nothing is attached to the internal load balancer, and a public web application is not covered, because it is a bundle served from the edge.
+An environment's internet-facing load balancer is given one web firewall, declared on the environment in the key `firewall`, covering every public deployment behind it (`RD.SUPPORT.INFRA.117`).
+
+- **The key holds `NONE` or `COUNT`, and every environment writes it — MUST.** `COUNT` stands the firewall and `NONE` stands none. The key has no default, so an environment that leaves it out is refused and never stands an unguarded load balancer in silence.
+- **It holds three of the cloud's rule groups** (common rules, known bad inputs, address reputation), **and it counts only.** Each match is recorded with the rule's name and the request is let through. No value of the key makes the firewall refuse.
+- **One deployment is treated differently by a rule limited to its host**, inside the one firewall.
+- **Nothing is attached to the internal load balancer**, and a public web application is not covered, because it is a bundle served from the edge.
 
 ## Locally, only the ports are read
 
@@ -244,6 +265,9 @@ An environment's internet-facing load balancer is given one web firewall, declar
 | a grant read as a binding | a missing dependency reads as a typo |
 | a binding read as a grant | the plan created a second copy of something the estate already had |
 | two deployments of one application declaring a remote port | the application's code has no single remote address to name |
+| a deployment labelled `gateway`, or with a label ending `-remote` | it takes a gateway's own record, or answers on another application's private address |
+| a gateway rate limit with a window that is not 1, 60, 3600 or 86400 seconds | the manifest declares a limit the gateway cannot count |
+| an environment with no `firewall` key | a public load balancer could stand with no firewall and nothing would say so |
 | a shape omitting a fact every deployment declares | a new shape arrived carrying an exemption, and reviews stopped reading the same way |
 | exposure inferred rather than declared | something is reachable from somewhere nobody chose |
 | exposure exceeding its namespace | an application granted itself reach the level above never allowed |

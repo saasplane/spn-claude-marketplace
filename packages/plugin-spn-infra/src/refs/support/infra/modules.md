@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/06-modules/",
-      "seen": "13987e5d"
+      "seen": "88a9dab4"
     }
   ]
 }
@@ -195,9 +195,13 @@ Every resource key follows one shape, and the middle token names the **connectio
 | `{SPC}_REMOTE_CREDENTIAL_KUBERNETES_TOKEN_PATH` · `_AUDIENCE` · `_NAMESPACES` · `_ISSUER` | `/environments/{env}/vars` | the token's file in the pod, what a token must be for, this platform's namespaces, and the cluster's issuer |
 
 - **`{NAME}` is the application's `kindCode`.** An application has at most one deployment that declares a remote port, so the name is one address.
+- **In a cloud the address is `https://{env}-{app}-remote.internal.{spd}`**, with its scheme. `{app}` is the same `kindCode`, and the host is a route on the private gateway. A pod and an operator's machine read the same value.
+- **The estate publishes two proxy counts beside a deployment's ports.** `{SPC}_API_TRUSTED_PROXIES` is `2` for a deployment that has a route (the load balancer, then the gateway) and `0` for an `INTERNAL` one. `{SPC}_API_REMOTE_TRUSTED_PROXIES` is `3`: the calling service, the internal load balancer, then the private gateway. A value a team authors for either key wins.
 - **A module held remotely reads the address under its own prefix**, `{SPC}_{MODULE}_REMOTE_ENDPOINTS`, and the service's own settings write that key as a reference: `DMO_IAM_REMOTE_ENDPOINTS=${DMO_REMOTE_SERVICE_API_ENDPOINTS}`. So moving a module to another service is a change of one settings line.
 - **The namespaces are `prd,plt,vnd`**, and the token's audience is `spn-remote`, so a token issued for anything else is refused.
 - **Locally the provider is `LOCAL`**, written in the service's own environment file with `{SPC}_REMOTE_CREDENTIAL_LOCAL_SERVICE`, the application's `kindCode`. `infra config render` writes each remote address as plain HTTP on the service's local host and remote port: `http://api.lc-spndemo.app:9200`.
+
+**The gateway's rate limit store is published beside them** (`RD.SUPPORT.INFRA.120`). A gateway counts a deployment's rate limit once across all its proxy pods, in the environment's own cache. The platform's world publishes three keys in the secret half of `/environments/{env}/vars`: `{SPC}_GATEWAY_RATE_LIMIT_STORE_URL` (the cache's address), `{SPC}_GATEWAY_RATE_LIMIT_STORE_AUTH` (the cache user the gateway counts as, with its password) and `{SPC}_GATEWAY_RATE_LIMIT_STORE_TLS` (whether the connection is encrypted). The gateway reads them and no service does. A deployment given the environment's settings receives them with the rest.
 
 **An installed module's purpose code joins the family set** for the facts its own apply publishes. **Module facts keep a three-way placement**: plain boundary facts (`{SPC}_{MODULE}_{FACT}`) sit on the plain half; per-consumer minted pairs (`{SPC}_{MODULE}_{APP}_{FACT}`) sit on the secret half, composed only into their consumer's environment; the module's own interior sits in its own seat and is never published. A published key never spells the product a module renders, and never spells an application's token either.
 
