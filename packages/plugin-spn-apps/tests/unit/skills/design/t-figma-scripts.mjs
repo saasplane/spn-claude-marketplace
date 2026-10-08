@@ -476,7 +476,7 @@ await guard(async () => {
   const empty = componentSet("1:set", "DSImage", [0, 0, 300, 200], [version("1:a", "state=loading", 20, 20, 100, 40, { empty: true }), version("1:b", "state=rest", 140, 20, 0, 40)]);
   const scan = (await scanOf([empty, labelText("1:label", "DSImage — one row · columns: state=loading, rest", [0, -30, 300, 20])]));
   same("an empty version says why it is empty", scan.findings.emptyVersions.items.map((item) => [item.version, item.why]), [["1:a", "no layer"], ["1:b", "no size"]]);
-  same("empty versions do not make the page unclean, and the answer says which findings do not block", [scan.clean, scan.notBlocking], [true, ["emptyVersions", "emptyCases"]]);
+  same("empty versions do not make the page unclean, and the answer says which findings do not block", [scan.clean, scan.notBlocking], [true, ["emptyVersions", "emptyCases", "unitsWithoutCases", "unitsWithoutSample"]]);
 });
 // 9. the scan names a set whose default version is not the one its label names (DSBadge), and gives no false hit
 await guard(async () => {
@@ -692,6 +692,109 @@ await guard(async () => {
   same("DSAnchorContainer: `case=address (default)` is true of `case=address: the row goes to an address`", (await containerMarked("DSAnchorContainer — one row · columns: case=address (default), handler")).count, 0);
   same("the whole value written in the header is true too", (await containerMarked("DSAnchorContainer — one row · columns: case=address: the row goes to an address (default), handler")).count, 0);
   same("a mark on the other value is still named", (await marked("DSAnchor — one row · columns: case=block (default), text")).items.map((item) => item.labelNames), [["block"]]);
+});
+
+// A section does not clip: a child can lie outside the section's box and still be its child. The unit's section
+// below is at (100, 100) and 800 x 1300, so it spans x 100 to 900 and y 100 to 1400 on the page.
+console.log("\n=== page.js — a child outside its section's box");
+const outsideOf = async (nodes) => (await scanSections(nodes)).findings.childOutsideSection;
+const withChild = (child, parts = []) => { const unit = unitSection("B", "DSButton", [100, 100], { parts }); unit.children.push(child); return unit; };
+await guard(async () => {
+  const clean = await outsideOf([unitSection("B", "DSButton", [100, 100], { parts: [iconPart("P")] })]);
+  same("a unit whose pieces all lie inside its section and its part's section names nothing", clean.count, 0);
+  const sides = [
+    ["left", loose("X:l", "Rectangle left", [-50, 500, 100, 20]), 50],
+    ["top", loose("X:t", "Rectangle top", [500, -40, 100, 20]), 40],
+    ["right", loose("X:r", "Rectangle right", [750, 500, 100, 20]), 50],
+    ["bottom", loose("X:b", "Rectangle bottom", [500, 1280, 100, 60]), 40],
+  ];
+  for (const [side, child, px] of sides) {
+    const found = await outsideOf([withChild(child)]);
+    same(`a child outside on the ${side} is named with its section, the side and the px, and the scan is not clean`,
+      [found.items.map((item) => [item.child, item.section, item.side, item.px, item.bounds]), (await scanSections([withChild(child)])).clean],
+      [[[child.id, "B:sec", side, px, "box"]], false]);
+  }
+  same("a child inside the section is not named", (await outsideOf([withChild(loose("X:i", "Rectangle inside", [500, 1000, 100, 20]))])).count, 0);
+});
+await guard(async () => {
+  const at = async (x) => (await outsideOf([withChild(loose("X:e", "Rectangle edge", [x, 500, 100, 20]))])).items.map((item) => [item.side, item.px]);
+  same("a child 1 px beyond the box is within the tolerance and is not named", await at(-1), []);
+  same("a child 2 px beyond the box is named", await at(-2), [["left", 2]]);
+  same("a child touching the edge is not named", await at(0), []);
+});
+await guard(async () => {
+  const wide = sample("X:w", "sample · DSButton open", [500, 1000, 100, 20]);
+  wide.absoluteRenderBounds = { x: 600, y: 1100, width: 100, height: 320 };
+  const found = await outsideOf([withChild(wide)]);
+  same("a child whose box is inside but whose render bounds reach past the section is named, by the render bounds",
+    found.items.map((item) => [item.child, item.side, item.px, item.bounds]), [["X:w", "bottom", 20, "render"]]);
+  const inside = sample("X:n", "sample · DSButton open", [500, 1000, 100, 20]);
+  inside.absoluteRenderBounds = { x: 590, y: 1090, width: 140, height: 60 };
+  same("render bounds wider than the box but inside the section name nothing", (await outsideOf([withChild(inside)])).count, 0);
+  const own = loose("X:o", "Rectangle own", [500, 1000, 100, 20]);
+  own.absoluteBoundingBox = { x: 880, y: 1100, width: 100, height: 20 };
+  same("an absoluteBoundingBox, where the node has one, is the box that is read", (await outsideOf([withChild(own)])).items.map((item) => [item.side, item.px]), [["right", 80]]);
+});
+await guard(async () => {
+  const insidePart = iconPart("P");
+  insidePart.children.push(loose("P:x", "Rectangle in part", [350, 100, 100, 20]));
+  const found = await outsideOf([unitSection("B", "DSButton", [100, 100], { parts: [insidePart] })]);
+  same("a child of a part's section is judged against the part's own box, not its owner's", found.items.map((item) => [item.child, item.section, item.side, item.px]), [["P:x", "P:sec", "right", 50]]);
+  const far = iconPart("Q", [600, 860, 400, 220]);
+  const part = await outsideOf([unitSection("B", "DSButton", [100, 100], { parts: [far] })]);
+  same("a part's section that lies outside its owner's box is named as the owner's child", part.items.map((item) => [item.child, item.section, item.side, item.px]), [["Q:sec", "B:sec", "right", 200]]);
+});
+await guard(async () => {
+  const flat = await scanOf([buttonSet(tidy), buttonHeader(), loose("X:f", "Rectangle", [5000, 5000, 10, 10])]);
+  same("a flat page has no section to lie outside of", flat.findings.childOutsideSection.count, 0);
+});
+await guard(async () => {
+  const names = (found) => found.items.map((item) => item.child);
+  const many = unitSection("B", "DSButton", [100, 100]);
+  for (let at = 0; at < 40; at += 1) many.children.push(loose(`M:${at}`, `Rectangle ${at}`, [-100, 20 * at, 10, 10]));
+  const shown = (await scanSections([many])).findings.childOutsideSection;
+  same("a long finding is counted whole and cut to the findingItems", [shown.count, names(shown).length], [40, 25]);
+});
+
+// The sibling check that was there already, `meetingInSection`, compares every direct child of a section with the
+// others, whatever its kind, by their boxes. A nested part's section against a sheet and a sample against a sheet
+// are two of those pairs; nothing was added for them.
+console.log("\n=== page.js — siblings that meet inside a section");
+await guard(async () => {
+  const part = iconPart("P", [80, 460, 400, 220]);
+  const found = (await scanSections([unitSection("B", "DSButton", [100, 100], { parts: [part] })])).findings.meetingInSection.items;
+  same("a part's section that meets the sheet of cases is named with the section",
+    found.filter((item) => item.pair.includes("B:sheet")).map((item) => [item.section, [...item.pair].sort()]), [["B:sec", ["B:sheet", "P:sec"]]]);
+  const crowded = unitSection("B", "DSButton", [100, 100]);
+  crowded.children.find((child) => child.id === "B:smp").y = 480;
+  same("a sample that meets the sheet of cases is named with the section",
+    (await scanSections([crowded])).findings.meetingInSection.items.map((item) => [item.section, [...item.pair].sort()]), [["B:sec", ["B:sheet", "B:smp"]]]);
+});
+
+console.log("\n=== page.js — units with no cases and units with no sample");
+await guard(async () => {
+  const bare = unitSection("B", "DSButton", [100, 100], { parts: [iconPart("P")] });
+  bare.children = bare.children.filter((child) => child.id !== "B:sheet" && child.id !== "B:smp");
+  const scan = await scanSections([bare]);
+  same("a top-level unit with no sheet and no sample is named in each, and a part owes neither",
+    [scan.findings.unitsWithoutCases.items, scan.findings.unitsWithoutSample.items],
+    [[{ unit: "DSButton", id: "B:set", in: "B:sec" }], [{ unit: "DSButton", id: "B:set", in: "B:sec" }]]);
+  same("neither makes the scan unclean, and the answer says they do not block", [scan.clean, scan.notBlocking.includes("unitsWithoutCases"), scan.notBlocking.includes("unitsWithoutSample")], [true, true, true]);
+  const full = await scanSections([unitSection("B", "DSButton", [100, 100], { parts: [iconPart("P")] })]);
+  same("a unit with a sheet and a sample is named in neither", [full.findings.unitsWithoutCases.count, full.findings.unitsWithoutSample.count], [0, 0]);
+});
+await guard(async () => {
+  const lone = unitSection("B", "DSButton", [100, 100]);
+  lone.children = lone.children.filter((child) => child.id !== "B:sheet");
+  lone.children.push(version("B:case", "case=text", 80, 444, 50, 20));
+  const scan = await scanSections([lone]);
+  same("a loose case component counts as the unit's cases", scan.findings.unitsWithoutCases.count, 0);
+  const shared = section("SP:sec", "Shared parts", [100, 1640, 800, 400], [headerText("SP:head", "DSBase", "DSBase — one component", [80, 80, 300, 20]), version("SP:base", "DSBase", 80, 128, 48, 48)]);
+  const withShared = await scanSections([unitSection("B", "DSButton", [100, 100]), shared]);
+  same("a unit in `Shared parts` is a part and owes neither", [withShared.findings.unitsWithoutCases.count, withShared.findings.unitsWithoutSample.count], [0, 0]);
+  const other = unitSection("B", "DSButton", [100, 100]);
+  other.children.find((child) => child.id === "B:smp").name = "sample · DSInput open";
+  same("a sample that names another unit is no sample of this one", (await scanSections([other])).findings.unitsWithoutSample.items.map((item) => item.unit), ["DSButton"]);
 });
 
 console.log("\n=== layout.js — a set in a section");

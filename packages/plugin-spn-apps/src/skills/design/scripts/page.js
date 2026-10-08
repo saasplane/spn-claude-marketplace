@@ -17,7 +17,10 @@
 //   report scan      the last scan before a publish. It always reads the whole page, because a pair that
 //                    meets or a label whose unit is elsewhere needs every node. Its answer is counts and
 //                    the first items of each finding, the page's `form` and what it `read`. A scan that found
-//                    no unit is not clean: `emptyReading` says so.
+//                    no unit is not clean: `emptyReading` says so. `childOutsideSection` names each child that
+//                    lies beyond its section's box (by its box or by what it draws) by more than 1 px, with the
+//                    side and the px. `unitsWithoutCases` and `unitsWithoutSample` name the top-level units that
+//                    have no sheet of cases or no sample; they do not block, since a unit with nothing to show owes none.
 //   report both      the two together, for a small page. The whole answer stays under `maxBytes`: the scan
 //                    gives up items first, then the inventory stops early, and `cut` says what was left out.
 //
@@ -135,7 +138,9 @@ function defaultMarksOf(text) {
 const SHEET_SUFFIX = " cases";
 const EDITOR_DEFAULT_PROPERTY = /^Property \d+$/;
 const CASE_NAME = /^[^=,]+=[^=,]+(, [^=,]+=[^=,]+)*$/;
-const NOT_BLOCKING = ["emptyVersions", "emptyCases"];
+const NOT_BLOCKING = ["emptyVersions", "emptyCases", "unitsWithoutCases", "unitsWithoutSample"];
+// A child may lie this far (px) beyond its section's box before it is named: the sums of fractional origins.
+const OUTSIDE_TOLERANCE = 1;
 
 if (INPUTS.pageId === null) {
   return { pages: figma.root.children.map((page) => ({ id: page.id, name: page.name })) };
@@ -251,6 +256,19 @@ function absoluteBox(node) {
   let [x, y] = [node.x, node.y];
   for (let up = node.parent; up && up.type !== "PAGE"; up = up.parent) { x += up.x; y += up.y; }
   return [x, y, node.width, node.height];
+}
+const rectOfBox = (box) => ({ x: box[0], y: box[1], width: box[2], height: box[3] });
+// How far `drawn` reaches beyond `room` (both { x, y, width, height } in page coordinates): the side that reaches
+// furthest and by how many px, or null when no side reaches past the tolerance.
+function overshoot(room, drawn) {
+  const by = {
+    left: room.x - drawn.x,
+    top: room.y - drawn.y,
+    right: drawn.x + drawn.width - (room.x + room.width),
+    bottom: drawn.y + drawn.height - (room.y + room.height),
+  };
+  const [side, px] = Object.entries(by).sort((first, second) => second[1] - first[1])[0];
+  return px > OUTSIDE_TOLERANCE ? { side, px: Math.round(px * 100) / 100 } : null;
 }
 collect(page, 0);
 const pageHoldsUnits = placed.some(({ node }) => node.type === "COMPONENT_SET" || node.type === "COMPONENT");
@@ -513,6 +531,38 @@ function scanFindings() {
       outsideUnitSection.push({ id: entry.node.id, kind: entry.kind, unit: name, in: entry.parentId, unitIn: owner.parentId });
     }
   }
+  // A section does not clip, so a child can lie outside the white box and still be its child. Each direct child of
+  // each section, at any depth, must lie wholly inside the section's box, by its box and by what it draws.
+  const childOutsideSection = [];
+  if (form === "sections") {
+    for (const owner of entries.filter((candidate) => candidate.kind === "section")) {
+      const room = owner.node.absoluteBoundingBox ?? rectOfBox(owner.box);
+      for (const child of entries.filter((candidate) => candidate.parentId === owner.node.id)) {
+        const drawn = [
+          ["box", child.node.absoluteBoundingBox ?? rectOfBox(child.box)],
+          ["render", child.node.absoluteRenderBounds ?? null],
+        ];
+        let worst = null;
+        for (const [bounds, rect] of drawn) {
+          const found = rect === null ? null : overshoot(room, rect);
+          if (found !== null && (worst === null || found.px > worst.px)) worst = { ...found, bounds };
+        }
+        if (worst !== null) childOutsideSection.push({ child: child.node.id, name: child.node.name.slice(0, 80), section: owner.node.id, side: worst.side, px: worst.px, bounds: worst.bounds });
+      }
+    }
+  }
+  // A unit with nothing to show owes no sheet and no sample (the book leaves out a band the unit has nothing for),
+  // so these two are counts that do not block. A part (a unit in a section inside a section, a name that starts with
+  // a dot, or a unit in `Shared parts`) owes neither.
+  const sectionNameOf = (id) => entries.find((candidate) => candidate.node.id === id)?.node.name ?? null;
+  const topUnits = form !== "sections" ? [] : [...unitEntryByName].filter(([name, entry]) =>
+    entry.parentId !== null && entry.depth < 2 && !name.startsWith(".") && sectionNameOf(entry.parentId) !== "Shared parts");
+  const unitsWithoutCases = topUnits.filter(([name, entry]) => !entries.some((candidate) => candidate.parentId === entry.parentId &&
+    ((candidate.kind === "sheet" && candidate.node.name === name + SHEET_SUFFIX) || (candidate.kind === "component" && CASE_NAME.test(candidate.node.name)))))
+    .map(([name, entry]) => ({ unit: name, id: entry.node.id, in: entry.parentId }));
+  const unitsWithoutSample = topUnits.filter(([name, entry]) => !entries.some((candidate) => candidate.kind === "sample" &&
+    candidate.parentId === entry.parentId && unitOfSample(candidate.node) === name))
+    .map(([name, entry]) => ({ unit: name, id: entry.node.id, in: entry.parentId }));
   const topLevelNotSection = form === "sections"
     ? topLevel.filter((entry) => entry.kind !== "section").map((entry) => ({ id: entry.node.id, nodeType: entry.node.type, name: entry.node.name }))
     : [];
@@ -560,6 +610,7 @@ function scanFindings() {
     strays, defaultNamedProperties, unreadableSets, setsOverLimit, emptyVersions, emptyCases,
     badCaseNames, duplicateCaseNames, labelsUnitElsewhere, labelLayerNames, labelsFormCannotSay, defaultNotLabels,
     topLevelNotSection, meetingInSection, sectionOutOfOrder, unitsWithoutHeader, outsideUnitSection,
+    childOutsideSection, unitsWithoutCases, unitsWithoutSample,
   };
 }
 
