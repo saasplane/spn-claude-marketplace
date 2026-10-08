@@ -35,10 +35,26 @@ function version(id, name, x, y, width = 100, height = 40, extra = {}) {
     fills: solid(null), strokes: [],
   };
   Object.defineProperty(node, "componentPropertyDefinitions", {
+    configurable: true,
     get() { throw new Error("can only get component property definitions of a component set or non-variant component"); },
   });
+  for (const child of node.children) Object.defineProperty(child, "componentPropertyReferences", { get() { return {}; } });
   return node;
 }
+
+// A layer inside a component, as the API answers on 4,226 real versions: `componentPropertyReferences` is an object of the
+// properties the layer is tied to (keys `characters`, `visible`, `mainComponent`, and `slotContentId` on a SLOT, which may
+// also hold `visible`), and `{}` when it is tied to none; never null or undefined. A node outside a component holds null.
+const layer = (id, name, type, references = null, children = undefined) => {
+  const node = { id, name, type, x: 0, y: 0, width: 10, height: 10, ...(children ? { children } : {}) };
+  Object.defineProperty(node, "componentPropertyReferences", { configurable: true, get() { return references ?? {}; } });
+  return node;
+};
+const outsideLayer = (id, name, type) => {
+  const node = { id, name, type, x: 0, y: 0, width: 10, height: 10 };
+  Object.defineProperty(node, "componentPropertyReferences", { get() { return null; } });
+  return node;
+};
 
 function componentSet(id, name, box, versions, { definitions = {}, unreadable = false, fill = "VariableID:fill", stroke = "VariableID:stroke" } = {}) {
   const set = {
@@ -903,7 +919,10 @@ await guard(async () => {
   const wrong = await scanSections([unitSection("B", "DSButton", [100, 100], { definitions: iconDefinitions, note: " · behaviour: label, lazy" })]);
   same("a name in the clause that is no property of the unit is its own finding, and does not block",
     [wrong.findings.behaviourNamesNoProperty.items.map((item) => [item.unit, item.name]), wrong.notBlocking.includes("behaviourNamesNoProperty")], [[["DSButton", "lazy"]], true]);
-  const sound = await scanSections([drawing(unitSection("B", "DSButton", [100, 100], { definitions: iconDefinitions, note: " · behaviour: label" }), everyDrawn)]);
+  const soundUnit = drawing(unitSection("B", "DSButton", [100, 100], { definitions: iconDefinitions, note: " · behaviour: label" }), everyDrawn);
+  // every property is tied to a layer of the first version, so that propertyTiedToNothing has nothing to name
+  soundUnit.children.find((child) => child.type === "COMPONENT_SET").children[0].children = Object.keys(iconDefinitions).filter((key) => iconDefinitions[key].type !== "VARIANT").map((key, at) => layer(`B:t${at}`, `layer ${at}`, "TEXT", { characters: key }));
+  const sound = await scanSections([soundUnit]);
   same("a unit whose every property is drawn or named is clean", [sound.clean, counts(sound)], [true, {}]);
 });
 await guard(async () => {
@@ -1017,13 +1036,6 @@ await guard(async () => {
 });
 
 console.log("\n=== page.js — a version whose layers carry no reference its twin holds");
-// A layer inside a component, as Figma gives it: `componentPropertyReferences` is an object of the properties the layer is
-// tied to (keys `characters`, `visible`, `mainComponent`, and `slotContentId` on a SLOT) or null. A SLOT carries `slotContentId`.
-const layer = (id, name, type, references = null, children = undefined) => {
-  const node = { id, name, type, x: 0, y: 0, width: 10, height: 10, ...(children ? { children } : {}) };
-  Object.defineProperty(node, "componentPropertyReferences", { get() { return references; } });
-  return node;
-};
 const wiredVersion = (id, name, y, layers) => {
   const node = version(id, name, 20, y);
   node.children = layers;
@@ -1085,7 +1097,8 @@ await guard(async () => {
   const found = await wiredScan([wiredVersion("W:1", "size=SM", 0, bodyOf("W:1", false)), wiredVersion("W:2", "size=MD", 60, bodyOf("W:2", false))]);
   same("a set where no version holds any reference has nothing to compare", [found.versionNotWired.count, found.versionSlotIsFrame.count], [0, 0]);
   const apart = await wiredScan([wiredVersion("W:1", "size=SM, tone=A", 0, bodyOf("W:1", true)), wiredVersion("W:2", "size=MD, tone=B", 60, bodyOf("W:2", false))]);
-  same("a version that differs from the wired one in two values has no twin there and is not named", apart.versionNotWired.count, 0);
+  same("a version that differs from the wired one in two values is named all the same: the twin no longer decides, and it has no nearest wired version",
+    apart.versionNotWired.items.map((item) => [item.version, item.missing, item.nearest]), [["W:2", 3, null]]);
   const lone = await wiredScan([wiredVersion("W:1", "size=SM", 0, bodyOf("W:1", true))]);
   same("a set of one version has no twin", lone.versionNotWired.count, 0);
   const twice = await wiredScan([
@@ -1093,6 +1106,93 @@ await guard(async () => {
     wiredVersion("W:2", "size=MD", 60, [layer("W:2:a", "row", "FRAME", { visible: "p#1:1" }), layer("W:2:b", "row", "FRAME", null)]),
   ]);
   same("two sibling layers of one name are two paths: the unwired second one is not mistaken for the wired first", twice.versionNotWired.count, 0);
+});
+
+console.log("\n=== page.js — a path wired in any version, a tie that moves, a tie to another property, a property tied to nothing");
+const definedScan = async (versions, definitions, extra = []) => (await scanOf([componentSet("W:set", "DSInput", [0, 0, 300, 400], versions, { definitions }), buttonHeader(), ...extra])).findings;
+await guard(async () => {
+  // DSInput-like: only kind=TEXT, size=SM holds the references; the others have a twin that holds none, or none at all.
+  const grid = [["TEXT", "SM"], ["TEXT", "MD"], ["NUMBER", "SM"], ["NUMBER", "MD"], ["EMAIL", "SM"], ["EMAIL", "MD"]];
+  const found = await wiredScan(grid.map(([kind, size], at) => wiredVersion(`W:${at}`, `kind=${kind}, size=${size}`, at * 60, bodyOf(`W:${at}`, at === 0))));
+  same("every version that lacks what any version holds is named, also one whose one-value twins are all unwired too; the nearest wired version is given, or null",
+    found.versionNotWired.items.map((item) => [item.version, item.missing, item.nearest]),
+    [["W:1", 3, "W:0"], ["W:2", 3, "W:0"], ["W:3", 3, null], ["W:4", 3, "W:0"], ["W:5", 3, null]]);
+});
+await guard(async () => {
+  // DSLayoutNavNode-like: a SLOT in one version only; the FRAMEs have only FRAME twins, or none a value apart.
+  const slotted = (id, type) => [layer(`${id}:b`, "nodes wrap", "FRAME", null, [layer(`${id}:s`, "nodes", type, type === "SLOT" ? { slotContentId: "nodes#1:5" } : null)])];
+  const found = await wiredScan([
+    wiredVersion("W:0", "kind=A, size=SM", 0, slotted("W:0", "SLOT")),
+    wiredVersion("W:1", "kind=B, size=MD", 60, slotted("W:1", "FRAME")),
+    wiredVersion("W:2", "kind=C, size=MD", 120, slotted("W:2", "FRAME")),
+  ]);
+  same("a FRAME at a path where any version holds a SLOT is named in versionSlotIsFrame, though no twin of it is a SLOT",
+    [found.versionSlotIsFrame.items.map((item) => item.version), found.versionNotWired.count], [["W:1", "W:2"], 0]);
+});
+await guard(async () => {
+  // DSProgress-like: with showValue=false the visibility is tied on header, with showValue=true on header > label.
+  const progress = (id, shown, extra = {}) => [layer(`${id}:h`, "header", "FRAME", shown ? null : { visible: "showValue#1:1" }, [
+    layer(`${id}:l`, "label", "TEXT", { characters: "text#1:2", ...(shown ? { visible: "showValue#1:1" } : {}), ...extra }),
+  ])];
+  const found = await wiredScan([
+    wiredVersion("W:1", "percent=40, showValue=false", 0, progress("W:1", false)),
+    wiredVersion("W:2", "percent=40, showValue=true", 60, progress("W:2", true)),
+  ]);
+  same("a version that ties the same property on another layer is not named for lacking it here: the tie moves between layers by design", found.versionNotWired.count, 0);
+  const cleared = wiredVersion("W:3", "percent=0, showValue=true", 120, [layer("W:3:h", "header", "FRAME", null, [layer("W:3:l", "label", "TEXT", null)])]);
+  const named = await wiredScan([
+    wiredVersion("W:1", "percent=40, showValue=false", 0, progress("W:1", false)),
+    wiredVersion("W:2", "percent=40, showValue=true", 60, progress("W:2", true)),
+    cleared,
+  ]);
+  same("a version that ties the property nowhere (left untied on purpose) is still named", named.versionNotWired.items.map((item) => [item.version, item.missing]), [["W:3", 3]]);
+});
+await guard(async () => {
+  // DSLayout-like: rail > nav is a SLOT tied to nav#5:21 in the versions, and to nav#168:0 in one.
+  const rail = (id, key) => [layer(`${id}:r`, "rail", "FRAME", null, [layer(`${id}:n`, "nav", "SLOT", { slotContentId: key })])];
+  const found = await wiredScan([
+    wiredVersion("W:1", "side=LEFT", 0, rail("W:1", "nav#5:21")),
+    wiredVersion("W:2", "side=RIGHT", 60, rail("W:2", "nav#5:21")),
+    wiredVersion("W:3", "side=TOP", 120, rail("W:3", "nav#168:0")),
+  ]);
+  same("a version tied at a path to another property than the others is named, with the path and both keys, and blocks",
+    [found.versionTiedToAnotherProperty.items.map((item) => [item.version, item.path, item.holds, item.others]), found.versionNotWired.count],
+    [[["W:3", "rail > nav (slotContentId)", "nav#168:0", "nav#5:21"]], 0]);
+  const scan = await scanOf([componentSet("W:set", "DSInput", [0, 0, 300, 400], [wiredVersion("W:1", "side=LEFT", 0, rail("W:1", "a#1:1")), wiredVersion("W:2", "side=RIGHT", 60, rail("W:2", "a#1:1")), wiredVersion("W:3", "side=TOP", 120, rail("W:3", "b#1:2"))]), buttonHeader()]);
+  same("versionTiedToAnotherProperty blocks", [scan.notBlocking.includes("versionTiedToAnotherProperty"), scan.clean], [false, false]);
+  const split = await wiredScan([wiredVersion("W:1", "side=LEFT", 0, rail("W:1", "nav#5:21")), wiredVersion("W:2", "side=RIGHT", 60, rail("W:2", "nav#168:0"))]);
+  same("two versions tied to two properties have no minority: none is named", split.versionTiedToAnotherProperty.count, 0);
+  const same3 = await wiredScan([wiredVersion("W:1", "side=LEFT", 0, rail("W:1", "nav#5:21")), wiredVersion("W:2", "side=RIGHT", 60, rail("W:2", "nav#5:21"))]);
+  same("versions tied to the same property are not named", same3.versionTiedToAnotherProperty.count, 0);
+});
+await guard(async () => {
+  const body = (id, keys) => [layer(`${id}:b`, "body", "FRAME", null, keys.map((key, at) => layer(`${id}:${at}`, `part ${at}`, "TEXT", { characters: key })))];
+  const definitions = {
+    "size#1:0": { type: "VARIANT", defaultValue: "SM", variantOptions: ["SM", "MD"] },
+    "label#1:1": { type: "TEXT", defaultValue: "Name" },
+    "withIcon#1:2": { type: "BOOLEAN", defaultValue: false },
+    "startNode#9:9": { type: "SLOT", defaultValue: "" },
+  };
+  const found = await definedScan([wiredVersion("W:1", "size=SM", 0, body("W:1", ["label#1:1"])), wiredVersion("W:2", "size=MD", 60, body("W:2", []))], definitions);
+  same("a definition that no layer of any version is tied to is named with its unit, name, key and type; one tied in a single version only, and a VARIANT, are not",
+    found.propertyTiedToNothing.items.map((item) => [item.set, item.setName, item.property, item.key, item.type]),
+    [["W:set", "DSInput", "withIcon", "withIcon#1:2", "BOOLEAN"], ["W:set", "DSInput", "startNode", "startNode#9:9", "SLOT"]]);
+  const scan = await scanOf([componentSet("W:set", "DSInput", [0, 0, 300, 400], [wiredVersion("W:1", "size=SM", 0, body("W:1", []))], { definitions }), buttonHeader()]);
+  same("propertyTiedToNothing blocks, and its count is whole", [scan.notBlocking.includes("propertyTiedToNothing"), scan.findings.propertyTiedToNothing.count, scan.clean], [false, 3, false]);
+  const nested = [layer("W:1:b", "body", "FRAME", null, [layer("W:1:i", "inner", "INSTANCE", null, [layer("W:1:t", "text", "TEXT", { characters: "withIcon#1:2" })])])];
+  const entered = await definedScan([wiredVersion("W:1", "size=SM", 0, nested)], { "withIcon#1:2": { type: "BOOLEAN", defaultValue: false } });
+  same("a layer inside an instance is not entered: its reference is the nested component's, so the property is still tied to nothing", entered.propertyTiedToNothing.count, 1);
+  const throwing = layer("W:1:x", "body", "TEXT");
+  Object.defineProperty(throwing, "componentPropertyReferences", { get() { throw new Error("cannot read"); } });
+  const unread = await definedScan([wiredVersion("W:1", "size=SM", 0, [throwing])], { "withIcon#1:2": { type: "BOOLEAN", defaultValue: false } });
+  same("a set with a layer whose references cannot be read is not judged: an unread tie is not a missing tie", unread.propertyTiedToNothing.count, 0);
+  const nodeOutside = await definedScan([wiredVersion("W:1", "size=SM", 0, [outsideLayer("W:1:o", "body", "TEXT")])], { "withIcon#1:2": { type: "BOOLEAN", defaultValue: false } });
+  same("a layer that answers null (outside a component) holds no tie and does not throw", nodeOutside.propertyTiedToNothing.count, 1);
+  const lone = version("L:1", "DSChip", 0, 0);
+  lone.children = [layer("L:1:t", "label", "TEXT", { characters: "label#1:1" })];
+  Object.defineProperty(lone, "componentPropertyDefinitions", { get() { return definitions; } });
+  const loneFound = (await scanOf([lone])).findings.propertyTiedToNothing;
+  same("a lone component with definitions is read the same way", loneFound.items.map((item) => [item.setName, item.property]), [["DSChip", "withIcon"], ["DSChip", "startNode"]]);
 });
 
 console.log("\n=== page.js — the four weaknesses of the property check");

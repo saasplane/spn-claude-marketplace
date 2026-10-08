@@ -33,12 +33,17 @@
 //                    credited to the unit it belongs to (the unit of an instance in it, a unit named by a layer in it, else the
 //                    one unit of its section). The answer's `propertyChecks` says `run`, or `skipped: ...` on a page that is not
 //                    in sections. `versionNotWired` blocks: in a set of more than one version, a layer path that holds a
-//                    `componentPropertyReferences` entry (`characters`, `visible`, `mainComponent`, `slotContentId`) in some
-//                    version is wired; a version is named, with the count of missing references and its first paths, when its
-//                    node at a wired path, of the same type as the twin's, lacks the reference of that kind that its twin (the
-//                    version differing from it in exactly one variant value) holds there. A version with no node at the path, a
-//                    set with no reference at all, and a node of another type than the twin's are not named by it; that last is
-//                    `versionSlotIsFrame`, which does not block (a FRAME where the twin has a SLOT). These do not
+//                    `componentPropertyReferences` entry (`characters`, `visible`, `mainComponent`, `slotContentId`) in any
+//                    version, on a node of one type, is wired for that kind; a version is named, with the count of missing
+//                    references, its first paths and `nearest` (a version one variant value apart that holds the reference, or
+//                    null; its absence excuses nothing), when its node at that path, of that type, lacks the kind. A version that
+//                    ties the same property on another layer (the tie moved by design), a version with no node at the path and a
+//                    set with no reference at all are not named. `versionTiedToAnotherProperty` blocks: where a path is tied in
+//                    several versions to different properties, a version off the most common one is named with the path, the
+//                    key it holds and the key the others hold. `propertyTiedToNothing` blocks: a set's or lone component's
+//                    definition, not a VARIANT, that no layer of any version references (an instance's layers are not entered),
+//                    with the unit, the property's name and key and its type. A node of another type than the wired ones is
+//                    `versionSlotIsFrame`, which does not block (a FRAME where another version has a SLOT). These do not
 //                    block: `unitsWithoutCases` (a unit whose versions draw everything owes no sheet), `usagesWithoutCaption`
 //                    (a usage with no caption directly above it), `partSectionTooWide` (a part's section with more than the
 //                    padding empty at its right), `propertyClearedByNameAlone` (a property cleared only by the name of a case that
@@ -557,10 +562,11 @@ function layersOf(version) {
       times.set(child.name, nth);
       const here = (path === "" ? "" : path + PATH_JOIN) + (nth > 1 ? `${child.name} [${nth}]` : child.name);
       let tied = null;
-      try { tied = child.componentPropertyReferences ?? null; } catch { tied = null; }
+      let unread = false;
+      try { tied = child.componentPropertyReferences ?? null; } catch { unread = true; }
       const references = {};
       for (const [kind, property] of Object.entries(tied ?? {})) if (property) references[kind] = property;
-      found.set(here, { type: child.type, references });
+      found.set(here, { type: child.type, references, unread });
       walk(child, here);
     }
   };
@@ -568,23 +574,48 @@ function layersOf(version) {
   return found;
 }
 
-// For one set: the versions that lack a reference their twin holds at the same layer path, and those whose layer there is
-// of another type than the twin's. A twin is a version that differs in exactly one variant value.
-function unwiredIn(read) {
-  const none = { lacking: [], reshaped: [] };
+// For one set or lone component: what its layers' references say. A path is wired for a kind when any version holds that
+// kind there on a node of the same type. Named: a version whose node there, of that type, lacks it (`lacking`; not when the
+// version ties the same property on another layer, since a tie may move between layers by design); a version whose layer
+// is of another type where no version of its type holds the kind (`reshaped`, a FRAME where another version has a SLOT);
+// a version tied there to another property than the most (`tiedElsewhere`); a definition, not a VARIANT, that no layer of
+// any version references (`unreferenced`). The nearest wired version, a twin (one variant value apart) that holds the
+// reference, is given to help a writer; its absence excuses nothing.
+function wiringOf(read) {
+  const out = { lacking: [], reshaped: [], tiedElsewhere: [], unreferenced: [] };
   const versions = read.versions;
-  if (versions.length < 2 || versions.length > INPUTS.maxVersions) return none;
+  if (versions.length === 0 || versions.length > INPUTS.maxVersions) return out;
   const layers = versions.map(layersOf);
   const wired = new Map();
-  for (const one of layers) {
+  const held = layers.map(() => new Set());
+  let unread = false;
+  layers.forEach((one, index) => {
     for (const [path, node] of one) {
-      for (const kind of Object.keys(node.references)) {
-        if (!wired.has(path)) wired.set(path, new Set());
-        wired.get(path).add(kind);
+      if (node.unread) unread = true;
+      for (const [kind, property] of Object.entries(node.references)) {
+        held[index].add(property);
+        if (!wired.has(path)) wired.set(path, new Map());
+        const group = wired.get(path);
+        const id = node.type + "\u0000" + kind;
+        if (!group.has(id)) group.set(id, new Map());
+        const keys = group.get(id);
+        keys.set(property, (keys.get(property) ?? 0) + 1);
+      }
+    }
+  });
+  const label = { set: read.set.id, setName: read.set.name.slice(0, 80) };
+  if (!unread) {
+    for (const [key, definition] of Object.entries(read.definitions ?? {})) {
+      if (definition.type !== "VARIANT" && !held.some((one) => one.has(key))) {
+        out.unreferenced.push({ ...label, property: propertyName(key).slice(0, 80), key: key.slice(0, 80), type: definition.type });
       }
     }
   }
-  if (wired.size === 0) return none;
+  if (versions.length < 2 || wired.size === 0) return out;
+  const leaderOf = (keys) => {
+    const ranked = [...keys].sort((first, second) => second[1] - first[1]);
+    return ranked[0][1] > ranked[1][1] ? ranked[0][0] : null;
+  };
   const values = versions.map((version) => parseVersionName(version.name));
   const signature = (index, skipped) => skipped + "\u0000" + JSON.stringify(Object.keys(values[index]).filter((key) => key !== skipped).sort().map((key) => [key, values[index][key]]));
   const buckets = new Map();
@@ -596,28 +627,35 @@ function unwiredIn(read) {
     }
   });
   const twinsOf = (index) => Object.keys(values[index]).flatMap((key) => (buckets.get(signature(index, key)) ?? []).filter((other) => other !== index && values[other][key] !== values[index][key]));
-  const lacking = [];
-  const reshaped = [];
   versions.forEach((version, index) => {
-    const twins = twinsOf(index);
     const missing = [];
     const changed = [];
-    for (const [path, kinds] of wired) {
+    let first = null;
+    for (const [path, group] of wired) {
       const node = layers[index].get(path);
       if (node === undefined) continue;
-      for (const kind of kinds) {
-        if (node.references[kind]) continue;
-        const twin = twins.map((other) => layers[other].get(path)).find((one) => one !== undefined && one.references[kind]);
-        if (twin === undefined) continue;
-        if (twin.type === node.type) missing.push(`${path} (${kind})`);
-        else changed.push(`${path} (${kind}; twin ${twin.type}, here ${node.type})`);
+      for (const [id, keys] of group) {
+        const [type, kind] = id.split("\u0000");
+        const own = node.references[kind];
+        if (type !== node.type) {
+          if (!own && !group.has(node.type + "\u0000" + kind)) changed.push(`${path} (${kind}; twin ${type}, here ${node.type})`);
+        } else if (!own) {
+          if ([...keys.keys()].some((property) => held[index].has(property))) continue;
+          first ??= { path, kind };
+          missing.push(`${path} (${kind})`);
+        } else if (keys.size > 1 && leaderOf(keys) !== null && leaderOf(keys) !== own) {
+          out.tiedElsewhere.push({ ...label, version: version.id, name: version.name.slice(0, 80), path: `${path} (${kind})`.slice(0, 120), holds: own.slice(0, 80), others: leaderOf(keys).slice(0, 80) });
+        }
       }
     }
-    const item = (paths) => ({ set: read.set.id, setName: read.set.name.slice(0, 80), version: version.id, name: version.name.slice(0, 80), missing: paths.length, paths: paths.slice(0, PATHS_NAMED).map((path) => path.slice(0, 120)) });
-    if (missing.length > 0) lacking.push(item(missing));
-    if (changed.length > 0) reshaped.push(item(changed));
+    const item = (paths) => ({ ...label, version: version.id, name: version.name.slice(0, 80), missing: paths.length, paths: paths.slice(0, PATHS_NAMED).map((path) => path.slice(0, 120)) });
+    if (missing.length > 0) {
+      const nearest = twinsOf(index).find((other) => layers[other].get(first.path)?.references[first.kind]);
+      out.lacking.push({ ...item(missing), nearest: nearest === undefined ? null : versions[nearest].id });
+    }
+    if (changed.length > 0) out.reshaped.push(item(changed));
   });
-  return { lacking, reshaped };
+  return out;
 }
 
 // Every finding, whole. `scanShown` cuts each to its first `limit` items.
@@ -669,10 +707,15 @@ function scanFindings() {
 
   const versionNotWired = [];
   const versionSlotIsFrame = [];
-  for (const entry of sets) {
-    const { lacking, reshaped } = unwiredIn(readSet(entry.node));
-    versionNotWired.push(...lacking);
-    versionSlotIsFrame.push(...reshaped);
+  const versionTiedToAnotherProperty = [];
+  const propertyTiedToNothing = [];
+  for (const entry of unitEntries) {
+    const lone = entry.kind === "component";
+    const wiring = wiringOf(lone ? { set: entry.node, versions: [entry.node], definitions: definitionsOf(entry.node) } : readSet(entry.node));
+    versionNotWired.push(...wiring.lacking);
+    versionSlotIsFrame.push(...wiring.reshaped);
+    versionTiedToAnotherProperty.push(...wiring.tiedElsewhere);
+    propertyTiedToNothing.push(...wiring.unreferenced);
   }
 
   const emptyCases = [];
@@ -856,7 +899,7 @@ function scanFindings() {
     strays, defaultNamedProperties, unreadableSets, setsOverLimit, emptyVersions, emptyCases,
     badCaseNames, duplicateCaseNames, labelsUnitElsewhere, labelLayerNames, labelsFormCannotSay, defaultNotLabels,
     topLevelNotSection, meetingInSection, sectionOutOfOrder, unitsWithoutHeader, outsideUnitSection,
-    childOutsideSection, unitsWithoutCases, unitsWithoutUsage, propertyNotDrawn, propertyClearedByNameAlone, behaviourNamesNoProperty, versionNotWired, versionSlotIsFrame, usagesWithoutCaption, partSectionTooWide,
+    childOutsideSection, unitsWithoutCases, unitsWithoutUsage, propertyNotDrawn, propertyClearedByNameAlone, behaviourNamesNoProperty, versionNotWired, versionSlotIsFrame, versionTiedToAnotherProperty, propertyTiedToNothing, usagesWithoutCaption, partSectionTooWide,
   };
 }
 
