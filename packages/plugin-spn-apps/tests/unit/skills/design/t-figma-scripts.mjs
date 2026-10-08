@@ -31,7 +31,7 @@ const solid = (variableId) => [{ type: "SOLID", boundVariables: variableId ? { c
 
 function version(id, name, x, y, width = 100, height = 40, extra = {}) {
   const node = {
-    id, name, type: "COMPONENT", x, y, width, height, children: extra.empty ? [] : [{ id: `${id}:0`, type: "RECTANGLE" }],
+    id, name, type: "COMPONENT", x, y, width, height, children: extra.empty ? [] : [{ id: `${id}:0`, name: "shape", type: "RECTANGLE" }],
     fills: solid(null), strokes: [],
   };
   Object.defineProperty(node, "componentPropertyDefinitions", {
@@ -62,7 +62,7 @@ const text = (id, name, characters, box) => ({ id, name, type: "TEXT", character
 const sheet = (id, name, box, cases) => ({ id, name, type: "FRAME", x: box[0], y: box[1], width: box[2], height: box[3], children: cases });
 // An instance, as Figma gives it: its main component is read asynchronously (the sync read throws on a page that
 // loads on demand), and its property values are in `componentProperties`, each as { type, value }.
-const instanceNode = (id, name, box, { main = null, properties = {}, children = [{ id: `${id}:0`, type: "TEXT" }] } = {}) => {
+const instanceNode = (id, name, box, { main = null, properties = {}, children = [{ id: `${id}:0`, name: "text", type: "TEXT" }] } = {}) => {
   const node = { id, name, type: "INSTANCE", x: box[0], y: box[1], width: box[2], height: box[3], children, componentProperties: properties, async getMainComponentAsync() { return main; } };
   Object.defineProperty(node, "mainComponent", { get() { throw new Error("Cannot call with documentAccess: dynamic-page. Use getMainComponentAsync instead."); } });
   return node;
@@ -497,7 +497,7 @@ await guard(async () => {
   const empty = componentSet("1:set", "DSImage", [0, 0, 300, 200], [version("1:a", "state=loading", 20, 20, 100, 40, { empty: true }), version("1:b", "state=rest", 140, 20, 0, 40)]);
   const scan = (await scanOf([empty, labelText("1:label", "DSImage — one row · columns: state=loading, rest", [0, -30, 300, 20])]));
   same("an empty version says why it is empty", scan.findings.emptyVersions.items.map((item) => [item.version, item.why]), [["1:a", "no layer"], ["1:b", "no size"]]);
-  same("empty versions do not make the page unclean, and the answer says which findings do not block", [scan.clean, scan.notBlocking], [true, ["emptyVersions", "emptyCases", "unitsWithoutCases", "behaviourNamesNoProperty", "usagesWithoutCaption", "partSectionTooWide"]]);
+  same("empty versions do not make the page unclean, and the answer says which findings do not block", [scan.clean, scan.notBlocking], [true, ["emptyVersions", "emptyCases", "unitsWithoutCases", "behaviourNamesNoProperty", "usagesWithoutCaption", "partSectionTooWide", "propertyClearedByNameAlone", "versionSlotIsFrame"]]);
 });
 // 9. the scan names a set whose default version is not the one its label names (DSBadge), and gives no false hit
 await guard(async () => {
@@ -1014,6 +1014,156 @@ await guard(async () => {
   const elsewhere = section("E:sec", "DSOther", [100, 1640, 800, 400], [loose("E:1", "Rectangle", [200, 148, 300, 200])]);
   const result = await layoutIn([unit, elsewhere]);
   same("a node of another section at the same relative place is no neighbour: nothing meets", [result.mode, result.checks.topLevelPairsMeeting], ["dry", 0]);
+});
+
+console.log("\n=== page.js — a version whose layers carry no reference its twin holds");
+// A layer inside a component, as Figma gives it: `componentPropertyReferences` is an object of the properties the layer is
+// tied to (keys `characters`, `visible`, `mainComponent`, and `slotContentId` on a SLOT) or null. A SLOT carries `slotContentId`.
+const layer = (id, name, type, references = null, children = undefined) => {
+  const node = { id, name, type, x: 0, y: 0, width: 10, height: 10, ...(children ? { children } : {}) };
+  Object.defineProperty(node, "componentPropertyReferences", { get() { return references; } });
+  return node;
+};
+const wiredVersion = (id, name, y, layers) => {
+  const node = version(id, name, 20, y);
+  node.children = layers;
+  return node;
+};
+const bodyOf = (id, wired, extra = []) => [layer(`${id}:b`, "body", "FRAME", null, [
+  layer(`${id}:t`, "label", "TEXT", wired ? { characters: "label#1:1" } : null),
+  layer(`${id}:i`, "icon", "INSTANCE", wired ? { visible: "withIcon#1:2", mainComponent: "icon#1:3" } : null),
+  ...extra,
+])];
+const wiredScan = async (versions) => (await scanOf([componentSet("W:set", "DSInput", [0, 0, 300, 400], versions), buttonHeader()])).findings;
+await guard(async () => {
+  const found = await wiredScan([
+    wiredVersion("W:1", "readOnly=false, type=TEXT", 0, bodyOf("W:1", true)),
+    wiredVersion("W:2", "readOnly=true, type=TEXT", 60, bodyOf("W:2", false)),
+    wiredVersion("W:3", "readOnly=false, type=EMAIL", 120, bodyOf("W:3", true)),
+    wiredVersion("W:4", "readOnly=true, type=EMAIL", 180, bodyOf("W:4", false)),
+  ]);
+  same("a version whose layers carry no reference its twin holds is named, with its set, the missing count and its paths",
+    found.versionNotWired.items.map((item) => [item.set, item.setName, item.version, item.name, item.missing, item.paths]),
+    [["W:set", "DSInput", "W:2", "readOnly=true, type=TEXT", 3, ["body > label (characters)", "body > icon (visible)", "body > icon (mainComponent)"]],
+      ["W:set", "DSInput", "W:4", "readOnly=true, type=EMAIL", 3, ["body > label (characters)", "body > icon (visible)", "body > icon (mainComponent)"]]]);
+  const scan = await scanOf([componentSet("W:set", "DSInput", [0, 0, 300, 400], [wiredVersion("W:1", "readOnly=false", 0, bodyOf("W:1", true)), wiredVersion("W:2", "readOnly=true", 60, bodyOf("W:2", false))]), buttonHeader()]);
+  same("versionNotWired blocks", [scan.clean, scan.notBlocking.includes("versionNotWired"), scan.findings.versionNotWired.count], [false, false, 1]);
+});
+await guard(async () => {
+  const more = [layer("W:2:x1", "a", "TEXT"), layer("W:2:x2", "b", "TEXT"), layer("W:2:x3", "c", "TEXT")];
+  const wired = (id) => bodyOf(id, true, ["a", "b", "c"].map((name, at) => layer(`${id}:x${at}`, name, "TEXT", { characters: `${name}#1:9` })));
+  const found = await wiredScan([wiredVersion("W:1", "state=rest", 0, wired("W:1")), wiredVersion("W:2", "state=hover", 60, bodyOf("W:2", false, more))]);
+  same("the count of missing references is whole and the paths are cut to the first three", [found.versionNotWired.items[0].missing, found.versionNotWired.items[0].paths.length], [6, 3]);
+});
+await guard(async () => {
+  const bare = [layer("W:2:b", "body", "FRAME", null, [layer("W:2:t", "label", "TEXT", null)])];
+  const found = await wiredScan([wiredVersion("W:1", "ellipsis=false", 0, bodyOf("W:1", true)), wiredVersion("W:2", "ellipsis=true", 60, bare)]);
+  same("a version with no node at a wired path (an ellipsis version with no icon layer) is named only for the layers it has", found.versionNotWired.items.map((item) => [item.version, item.missing, item.paths]), [["W:2", 1, ["body > label (characters)"]]]);
+  const noLayer = [layer("W:2:s", "separator", "RECTANGLE", null)];
+  const none = await wiredScan([wiredVersion("W:1", "kind=item", 0, bodyOf("W:1", true)), wiredVersion("W:2", "kind=separator", 60, noLayer)]);
+  same("a version with none of the wired paths (a separator) is not named", [none.versionNotWired.count, none.versionSlotIsFrame.count], [0, 0]);
+});
+await guard(async () => {
+  const slotted = (id, slot) => [layer(`${id}:b`, "body", "FRAME", null, [slot])];
+  const found = await wiredScan([
+    wiredVersion("W:1", "type=TEXT", 0, slotted("W:1", layer("W:1:s", "startNode", "SLOT", { slotContentId: "startNode#1:5", visible: "withStart#1:6" }))),
+    wiredVersion("W:2", "type=NUMBER", 60, slotted("W:2", layer("W:2:s", "startNode", "FRAME"))),
+  ]);
+  same("a FRAME where the twin has a SLOT is named apart, in versionSlotIsFrame, and not in versionNotWired",
+    [found.versionNotWired.count, found.versionSlotIsFrame.items.map((item) => [item.version, item.missing, item.paths])],
+    [0, [["W:2", 2, ["body > startNode (slotContentId; twin SLOT, here FRAME)", "body > startNode (visible; twin SLOT, here FRAME)"]]]]);
+  const scan = await scanOf([componentSet("W:set", "DSInput", [0, 0, 300, 400], [wiredVersion("W:1", "type=TEXT", 0, slotted("W:1", layer("W:1:s", "startNode", "SLOT", { slotContentId: "startNode#1:5" }))), wiredVersion("W:2", "type=NUMBER", 60, slotted("W:2", layer("W:2:s", "startNode", "FRAME")))]), buttonHeader()]);
+  const sound = await scanOf([componentSet("W:set", "DSInput", [0, 0, 300, 400], [wiredVersion("W:1", "type=TEXT", 0, slotted("W:1", layer("W:1:s", "startNode", "SLOT", { slotContentId: "startNode#1:5" }))), wiredVersion("W:2", "type=NUMBER", 60, slotted("W:2", layer("W:2:s", "startNode", "SLOT", { slotContentId: "startNode#1:5" })))]), buttonHeader()]);
+  same("versionSlotIsFrame does not block: the scan is as clean with the FRAME as with the SLOT", [scan.findings.versionSlotIsFrame.count, sound.findings.versionSlotIsFrame.count, scan.clean === sound.clean, scan.notBlocking.includes("versionSlotIsFrame")], [1, 0, true, true]);
+  const slotLacking = await wiredScan([
+    wiredVersion("W:1", "type=TEXT", 0, slotted("W:1", layer("W:1:s", "startNode", "SLOT", { slotContentId: "startNode#1:5" }))),
+    wiredVersion("W:2", "type=EMAIL", 60, slotted("W:2", layer("W:2:s", "startNode", "SLOT"))),
+  ]);
+  same("a SLOT that lacks the slot reference its twin SLOT holds is a version not wired", slotLacking.versionNotWired.items.map((item) => [item.version, item.paths]), [["W:2", ["body > startNode (slotContentId)"]]]);
+});
+await guard(async () => {
+  const found = await wiredScan([wiredVersion("W:1", "size=SM", 0, bodyOf("W:1", false)), wiredVersion("W:2", "size=MD", 60, bodyOf("W:2", false))]);
+  same("a set where no version holds any reference has nothing to compare", [found.versionNotWired.count, found.versionSlotIsFrame.count], [0, 0]);
+  const apart = await wiredScan([wiredVersion("W:1", "size=SM, tone=A", 0, bodyOf("W:1", true)), wiredVersion("W:2", "size=MD, tone=B", 60, bodyOf("W:2", false))]);
+  same("a version that differs from the wired one in two values has no twin there and is not named", apart.versionNotWired.count, 0);
+  const lone = await wiredScan([wiredVersion("W:1", "size=SM", 0, bodyOf("W:1", true))]);
+  same("a set of one version has no twin", lone.versionNotWired.count, 0);
+  const twice = await wiredScan([
+    wiredVersion("W:1", "size=SM", 0, [layer("W:1:a", "row", "FRAME", { visible: "p#1:1" }), layer("W:1:b", "row", "FRAME", null)]),
+    wiredVersion("W:2", "size=MD", 60, [layer("W:2:a", "row", "FRAME", { visible: "p#1:1" }), layer("W:2:b", "row", "FRAME", null)]),
+  ]);
+  same("two sibling layers of one name are two paths: the unwired second one is not mistaken for the wired first", twice.versionNotWired.count, 0);
+});
+
+console.log("\n=== page.js — the four weaknesses of the property check");
+const linkDefinitions = { "label#2:1": { type: "TEXT", defaultValue: "Link" }, "withIcon#2:2": { type: "BOOLEAN", defaultValue: false } };
+const twoUnits = (caseNames = []) => {
+  const unit = unitSection("B", "DSButton", [100, 100], { definitions: iconDefinitions, caseNames });
+  const other = componentSet("B:set2", "DSLink", [520, 148, 200, 100], [version("B:set2:1", "tone=A", 0, 0), version("B:set2:2", "tone=B", 100, 0)], { definitions: linkDefinitions });
+  unit.children.push(other);
+  unit.children.push(headerText("B:head2", "DSLink", "DSLink — rows: tone=A, B", [520, 80, 300, 20]));
+  return { unit, button: unit.children.find((child) => child.id === "B:set"), link: other };
+};
+const looseCase = (id, name, children) => { const node = version(id, name, 80, 668, 50, 20); node.children = children; return node; };
+const propertiesOf = (unitName, values) => Object.fromEntries(Object.entries(values).map(([key, value]) => [key, { type: (unitName === "DSLink" ? linkDefinitions : iconDefinitions)[key].type, value }]));
+const propertyScan = async (unit) => (await scanSections([unit])).findings;
+const unitsNamed = (found) => found.items.map((item) => `${item.unit}.${item.property}`);
+const withoutSheet = (unit) => { unit.children = unit.children.filter((child) => child.id !== "B:sheet"); return unit; };
+await guard(async () => {
+  const { unit, link } = twoUnits();
+  withoutSheet(unit).children.push(looseCase("B:lc", "label=Save", [layer("B:lc:n", "DSLink label", "TEXT")]));
+  const found = await propertyScan(unit);
+  same("a loose case component is credited to the unit its layer names, not to every unit of its section",
+    [unitsNamed(found.propertyClearedByNameAlone), unitsNamed(found.propertyNotDrawn).filter((name) => name.endsWith(".label"))], [["DSLink.label"], ["DSButton.label"]]);
+  const held = twoUnits();
+  withoutSheet(held.unit).children.push(looseCase("B:lc", "label=Save", [instanceNode("B:lc:i", "a button", [0, 0, 10, 10], { main: held.button.children[0], properties: propertiesOf("DSButton", { "label#1:3": "Save" }) })]));
+  const heldFound = await propertyScan(held.unit);
+  same("a loose case component holding an instance of one unit belongs to that unit: the other unit's property is not cleared",
+    [unitsNamed(heldFound.propertyNotDrawn).filter((name) => name.endsWith(".label")), unitsNamed(heldFound.propertyClearedByNameAlone)], [["DSLink.label"], []]);
+  const alone = unitSection("B", "DSButton", [100, 100], { definitions: iconDefinitions });
+  withoutSheet(alone).children.push(looseCase("B:lc", "label=Save", []));
+  same("a loose case component with no instance and no unit named, in a section of one unit, is that unit's", unitsNamed((await propertyScan(alone)).propertyClearedByNameAlone), ["DSButton.label"]);
+  const nobody = twoUnits();
+  withoutSheet(nobody.unit).children.push(looseCase("B:lc", "label=Save", []));
+  same("a loose case component that belongs to no unit of a section of two clears none", unitsNamed((await propertyScan(nobody.unit)).propertyClearedByNameAlone), []);
+  void link;
+});
+await guard(async () => {
+  const opened = unitSection("B", "DSButton", [100, 100], { definitions: iconDefinitions, caseNames: ["label=Save"] });
+  const set = opened.children.find((child) => child.type === "COMPONENT_SET");
+  const sheetOf = opened.children.find((child) => child.id === "B:sheet");
+  sheetOf.children = [instanceNode("B:c1", "label=Save", [0, 0, 50, 20], { main: set.children[0], properties: propertiesOf("DSButton", { "label#1:3": "Button" }) })];
+  const unopened = await propertyScan(opened);
+  same("a case named `label=Save` that holds an instance of the unit with the label at its default does not clear it", [unitsNamed(unopened.propertyNotDrawn).includes("DSButton.label"), unopened.propertyClearedByNameAlone.count], [true, 0]);
+  sheetOf.children = [instanceNode("B:c1", "label=Save", [0, 0, 50, 20], { main: set.children[0], properties: propertiesOf("DSButton", { "label#1:3": "Save" }) })];
+  same("the same case with the label changed clears it by the instance, and not by name", [unitsNamed((await propertyScan(opened)).propertyNotDrawn).includes("DSButton.label"), (await propertyScan(opened)).propertyClearedByNameAlone.count], [false, 0]);
+  sheetOf.children = [instanceNode("B:c1", "withStartIcon=true, startIcon=HOME", [0, 0, 50, 20], { main: set.children[0], properties: propertiesOf("DSButton", { "withStartIcon#1:1": true }) })];
+  const swapped = await propertyScan(opened);
+  same("a case naming a swap clears it where the instance holds its `with` flag on", [unitsNamed(swapped.propertyNotDrawn).includes("DSButton.startIcon"), unitsNamed(swapped.propertyNotDrawn).includes("DSButton.withStartIcon")], [false, false]);
+  sheetOf.children = [instanceNode("B:c1", "withStartIcon=true, startIcon=HOME", [0, 0, 50, 20], { main: set.children[0], properties: propertiesOf("DSButton", {}) })];
+  const flagOff = await propertyScan(opened);
+  same("a case naming a swap and its flag, whose instance holds both at their defaults, clears neither", [unitsNamed(flagOff.propertyNotDrawn).includes("DSButton.startIcon"), unitsNamed(flagOff.propertyNotDrawn).includes("DSButton.withStartIcon")], [true, true]);
+  const byName = unitSection("B", "DSButton", [100, 100], { definitions: iconDefinitions, caseNames: ["label=Save", "withHeading=false"] });
+  const named = await scanSections([byName]);
+  same("a case drawn with no instance of the unit clears by its name, and the answer counts and names those properties without blocking",
+    [unitsNamed(named.findings.propertyClearedByNameAlone), named.findings.propertyClearedByNameAlone.count, named.notBlocking.includes("propertyClearedByNameAlone"), named.findings.propertyNotDrawn.count],
+    [["DSButton.label", "DSButton.withHeading"], 2, true, 2]);
+});
+await guard(async () => {
+  const flat = await scanOf([componentSet("F:set", "DSButton", [0, 0, 300, 200], grid("F", tidy), { definitions: iconDefinitions }), buttonHeader()]);
+  const sections = await scanSections([unitSection("B", "DSButton", [100, 100])]);
+  same("a flat page's answer says the property checks were skipped, and a page in sections says they ran",
+    [flat.propertyChecks.startsWith("skipped"), flat.propertyChecks.includes("flat"), sections.propertyChecks], [true, true, "run"]);
+});
+await guard(async () => {
+  const { unit, button, link } = twoUnits();
+  link.children[0].children = [instanceNode("B:in", "button in a link", [0, 0, 10, 10], { main: button.children[0], properties: propertiesOf("DSButton", { "withStartIcon#1:1": true }) })];
+  link.children[0].children[0].parent = link.children[0];
+  const found = await propertyScan(unit);
+  same("an instance that stands inside another unit's set does not count as drawing", unitsNamed(found.propertyNotDrawn).includes("DSButton.withStartIcon"), true);
+  const outside = twoUnits();
+  outside.unit.children.push(instanceNode("B:out", "usage · DSButton elsewhere", [500, 1000, 100, 20], { main: outside.button.children[0], properties: propertiesOf("DSButton", { "withStartIcon#1:1": true }) }));
+  same("the same instance standing outside every unit's set does", unitsNamed((await propertyScan(outside.unit)).propertyNotDrawn).includes("DSButton.withStartIcon"), false);
 });
 
 // ---- the texts ----------------------------------------------------------------------------------

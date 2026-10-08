@@ -27,10 +27,22 @@
 //                    property, type and default. A property is drawn when an instance of the unit outside its set holds it
 //                    off its default, or when a case of the unit's sheet (or a loose case component in its section) is named
 //                    for it, `<property>=`. A swap named `startIcon` is judged with the boolean `withStartIcon` of the unit.
-//                    `behaviourNamesNoProperty` names a property the clause gives that the unit does not have. These do not
+//                    `behaviourNamesNoProperty` names a property the clause gives that the unit does not have. An instance that
+//                    stands inside a set or lone component of any unit draws nothing. A case's name counts for a property only
+//                    where the case holds no instance of the unit (an instance speaks for itself); a loose case component is
+//                    credited to the unit it belongs to (the unit of an instance in it, a unit named by a layer in it, else the
+//                    one unit of its section). The answer's `propertyChecks` says `run`, or `skipped: ...` on a page that is not
+//                    in sections. `versionNotWired` blocks: in a set of more than one version, a layer path that holds a
+//                    `componentPropertyReferences` entry (`characters`, `visible`, `mainComponent`, `slotContentId`) in some
+//                    version is wired; a version is named, with the count of missing references and its first paths, when its
+//                    node at a wired path, of the same type as the twin's, lacks the reference of that kind that its twin (the
+//                    version differing from it in exactly one variant value) holds there. A version with no node at the path, a
+//                    set with no reference at all, and a node of another type than the twin's are not named by it; that last is
+//                    `versionSlotIsFrame`, which does not block (a FRAME where the twin has a SLOT). These do not
 //                    block: `unitsWithoutCases` (a unit whose versions draw everything owes no sheet), `usagesWithoutCaption`
-//                    (a usage with no caption directly above it) and `partSectionTooWide` (a part's section with more than the
-//                    padding empty at its right).
+//                    (a usage with no caption directly above it), `partSectionTooWide` (a part's section with more than the
+//                    padding empty at its right), `propertyClearedByNameAlone` (a property cleared only by the name of a case that
+//                    holds no instance of the unit: a person opens it) and `versionSlotIsFrame`.
 //   report both      the two together, for a small page. The whole answer stays under `maxBytes`: the scan
 //                    gives up items first, then the inventory stops early, and `cut` says what was left out.
 //
@@ -148,9 +160,11 @@ function defaultMarksOf(text) {
 const SHEET_SUFFIX = " cases";
 const EDITOR_DEFAULT_PROPERTY = /^Property \d+$/;
 const CASE_NAME = /^[^=,]+=[^=,]+(, [^=,]+=[^=,]+)*$/;
-const NOT_BLOCKING = ["emptyVersions", "emptyCases", "unitsWithoutCases", "behaviourNamesNoProperty", "usagesWithoutCaption", "partSectionTooWide"];
+const NOT_BLOCKING = ["emptyVersions", "emptyCases", "unitsWithoutCases", "behaviourNamesNoProperty", "usagesWithoutCaption", "partSectionTooWide", "propertyClearedByNameAlone", "versionSlotIsFrame"];
 const DRAWABLE_TYPES = ["BOOLEAN", "INSTANCE_SWAP", "TEXT"];
 const BEHAVIOUR_CLAUSE = "behaviour: ";
+const PATH_JOIN = " > ";
+const PATHS_NAMED = 3;
 // The distances of a section (the book's table): the padding, the gap a caption may stand above its usage, the edge a caption may be off.
 const SECTION_PADDING = 80;
 const CAPTION_REACH = 48;
@@ -412,21 +426,27 @@ function isInside(node, ancestor) {
 }
 // A unit is a set, or a lone component that is no case.
 const unitEntries = entries.filter((entry) => entry.kind === "set" || (entry.kind === "component" && !CASE_NAME.test(entry.node.name)));
-// For each unit, the names of its boolean, swap and text properties that an instance on the page, outside the unit's own
-// set, holds at a value other than the default. The main component is read the way a page that loads on demand allows.
+const unitOfComponent = new Map();
+for (const { node } of unitEntries) for (const component of node.type === "COMPONENT_SET" ? node.children : [node]) unitOfComponent.set(component.id, node);
+const unitNodeIds = new Set(unitEntries.map((entry) => entry.node.id));
+function isInsideAUnit(node) {
+  for (let up = node.parent; up; up = up.parent) if (unitNodeIds.has(up.id)) return true;
+  return false;
+}
+// For each unit, the names of its boolean, swap and text properties that an instance on the page holds at a value other
+// than the default. An instance that stands inside any unit's set or lone component draws nothing: it is a part of that
+// unit's own drawing. The main component is read the way a page that loads on demand allows.
 async function drawnByInstances() {
-  const unitOfComponent = new Map();
   const definitionsOfUnit = new Map();
   const drawn = new Map();
   for (const { node } of unitEntries) {
     drawn.set(node.id, new Set());
     definitionsOfUnit.set(node.id, definitionsOf(node));
-    for (const component of node.type === "COMPONENT_SET" ? node.children : [node]) unitOfComponent.set(component.id, node);
   }
   for (const instance of page.findAllWithCriteria({ types: ["INSTANCE"] })) {
     const main = await instance.getMainComponentAsync();
     const unit = main ? unitOfComponent.get(main.id) : undefined;
-    if (unit === undefined || isInside(instance, unit)) continue;
+    if (unit === undefined || isInsideAUnit(instance)) continue;
     const definitions = definitionsOfUnit.get(unit.id);
     for (const [key, held] of Object.entries(instance.componentProperties ?? {})) {
       const definition = definitions[key];
@@ -435,7 +455,39 @@ async function drawnByInstances() {
   }
   return drawn;
 }
+// What each case holds: the units of the instances in it (the case itself or a layer of it; an instance is not entered), and
+// the unit a layer of it is named for. A case is a child of a sheet, or a loose case component.
+async function readCase(root, sectionUnits) {
+  const holds = new Set();
+  const named = [];
+  const walk = async (node, isRoot) => {
+    if (!isRoot) {
+      for (const unit of sectionUnits) if (node.name === unit.node.name || node.name.startsWith(unit.node.name + " ")) named.push(unit);
+    }
+    if (node.type === "INSTANCE") {
+      const main = await node.getMainComponentAsync();
+      const unit = main ? unitOfComponent.get(main.id) : undefined;
+      if (unit !== undefined) holds.add(unit.id);
+      return;
+    }
+    for (const child of node.children ?? []) await walk(child, false);
+  };
+  await walk(root, true);
+  named.sort((first, second) => second.node.name.length - first.node.name.length);
+  return { holds, named: named[0] ?? null };
+}
+async function readCases() {
+  const readings = new Map();
+  for (const entry of entries) {
+    const isLoose = entry.kind === "component" && CASE_NAME.test(entry.node.name);
+    if (entry.kind !== "sheet" && !isLoose) continue;
+    const sectionUnits = unitEntries.filter((unit) => unit.parentId === entry.parentId);
+    for (const node of isLoose ? [entry.node] : entry.node.children.filter((child) => !isSheetLabel(child))) readings.set(node, await readCase(node, sectionUnits));
+  }
+  return readings;
+}
 const drawnOffDefault = form === "sections" ? await drawnByInstances() : new Map();
+const caseReadings = form === "sections" ? await readCases() : new Map();
 
 function inventoryEntry(entry) {
   const { node, kind, box, index } = entry;
@@ -490,6 +542,84 @@ function finding(items, limit) {
   return { count: items.length, items: items.slice(0, limit) };
 }
 
+// ---- the references of a set's versions
+// The layers of a version by path (the layer names from the version down, joined; a second sibling of one name takes
+// ` [2]`, and so on). A node inside an instance is not entered. A node outside a component, or one that throws on the
+// read, holds no reference; a reference is a key of `componentPropertyReferences` (`characters`, `visible`,
+// `mainComponent`, and a SLOT's `slotContentId`) with the property it is tied to.
+function layersOf(version) {
+  const found = new Map();
+  const walk = (node, path) => {
+    if (node.type === "INSTANCE" || !node.children) return;
+    const times = new Map();
+    for (const child of node.children) {
+      const nth = (times.get(child.name) ?? 0) + 1;
+      times.set(child.name, nth);
+      const here = (path === "" ? "" : path + PATH_JOIN) + (nth > 1 ? `${child.name} [${nth}]` : child.name);
+      let tied = null;
+      try { tied = child.componentPropertyReferences ?? null; } catch { tied = null; }
+      const references = {};
+      for (const [kind, property] of Object.entries(tied ?? {})) if (property) references[kind] = property;
+      found.set(here, { type: child.type, references });
+      walk(child, here);
+    }
+  };
+  walk(version, "");
+  return found;
+}
+
+// For one set: the versions that lack a reference their twin holds at the same layer path, and those whose layer there is
+// of another type than the twin's. A twin is a version that differs in exactly one variant value.
+function unwiredIn(read) {
+  const none = { lacking: [], reshaped: [] };
+  const versions = read.versions;
+  if (versions.length < 2 || versions.length > INPUTS.maxVersions) return none;
+  const layers = versions.map(layersOf);
+  const wired = new Map();
+  for (const one of layers) {
+    for (const [path, node] of one) {
+      for (const kind of Object.keys(node.references)) {
+        if (!wired.has(path)) wired.set(path, new Set());
+        wired.get(path).add(kind);
+      }
+    }
+  }
+  if (wired.size === 0) return none;
+  const values = versions.map((version) => parseVersionName(version.name));
+  const signature = (index, skipped) => skipped + "\u0000" + JSON.stringify(Object.keys(values[index]).filter((key) => key !== skipped).sort().map((key) => [key, values[index][key]]));
+  const buckets = new Map();
+  values.forEach((one, index) => {
+    for (const key of Object.keys(one)) {
+      const at = signature(index, key);
+      if (!buckets.has(at)) buckets.set(at, []);
+      buckets.get(at).push(index);
+    }
+  });
+  const twinsOf = (index) => Object.keys(values[index]).flatMap((key) => (buckets.get(signature(index, key)) ?? []).filter((other) => other !== index && values[other][key] !== values[index][key]));
+  const lacking = [];
+  const reshaped = [];
+  versions.forEach((version, index) => {
+    const twins = twinsOf(index);
+    const missing = [];
+    const changed = [];
+    for (const [path, kinds] of wired) {
+      const node = layers[index].get(path);
+      if (node === undefined) continue;
+      for (const kind of kinds) {
+        if (node.references[kind]) continue;
+        const twin = twins.map((other) => layers[other].get(path)).find((one) => one !== undefined && one.references[kind]);
+        if (twin === undefined) continue;
+        if (twin.type === node.type) missing.push(`${path} (${kind})`);
+        else changed.push(`${path} (${kind}; twin ${twin.type}, here ${node.type})`);
+      }
+    }
+    const item = (paths) => ({ set: read.set.id, setName: read.set.name.slice(0, 80), version: version.id, name: version.name.slice(0, 80), missing: paths.length, paths: paths.slice(0, PATHS_NAMED).map((path) => path.slice(0, 120)) });
+    if (missing.length > 0) lacking.push(item(missing));
+    if (changed.length > 0) reshaped.push(item(changed));
+  });
+  return { lacking, reshaped };
+}
+
 // Every finding, whole. `scanShown` cuts each to its first `limit` items.
 function scanFindings() {
   const versionsOutside = [];
@@ -535,6 +665,14 @@ function scanFindings() {
       const wrong = named.filter((mark) => !mark.candidates.some((candidate) => carried.includes(candidate)));
       if (wrong.length > 0) defaultNotLabels.push({ set: set.id, labelNames: wrong.map((mark) => mark.value), defaultVersion: read.defaultVersion });
     }
+  }
+
+  const versionNotWired = [];
+  const versionSlotIsFrame = [];
+  for (const entry of sets) {
+    const { lacking, reshaped } = unwiredIn(readSet(entry.node));
+    versionNotWired.push(...lacking);
+    versionSlotIsFrame.push(...reshaped);
   }
 
   const emptyCases = [];
@@ -620,26 +758,39 @@ function scanFindings() {
     candidate.parentId === entry.parentId && unitOfUsage(candidate.node) === name))
     .map(([name, entry]) => ({ unit: name, id: entry.node.id, in: entry.parentId }));
   const propertyNotDrawn = [];
+  const propertyClearedByNameAlone = [];
   const behaviourNamesNoProperty = [];
   for (const unit of form === "sections" ? unitEntries : []) {
     const definitions = Object.entries(definitionsOf(unit.node)).map(([key, definition]) => ({ name: propertyName(key), definition }));
     const header = labelEntries.find((label) => label.part === "header" && label.unit === unit.node.name && label.entry.parentId === unit.parentId);
     const clause = (header?.text ?? "").split(CLAUSE_SEPARATOR).find((note) => note.trim().startsWith(BEHAVIOUR_CLAUSE));
     const behaviour = clause === undefined ? [] : clause.trim().slice(BEHAVIOUR_CLAUSE.length).split(", ").map((name) => name.trim()).filter((name) => name.length > 0);
-    const casedNames = new Set();
+    // A case's name credits a property only where the case holds no instance of the unit: an instance speaks for itself,
+    // and the page's instances are read above. A loose case component belongs to one unit, not to every unit of its section.
+    const sectionUnits = unitEntries.filter((one) => one.parentId === unit.parentId);
+    const namedByCases = new Set();
     for (const candidate of entries.filter((one) => one.parentId === unit.parentId)) {
       const isOwnSheet = candidate.kind === "sheet" && candidate.node.name === unit.node.name + SHEET_SUFFIX;
       const isLooseCase = candidate.kind === "component" && CASE_NAME.test(candidate.node.name);
-      const caseNames = isOwnSheet ? candidate.node.children.filter((child) => !isSheetLabel(child)).map((child) => child.name) : isLooseCase ? [candidate.node.name] : [];
-      for (const caseName of caseNames) for (const cell of caseName.split(", ")) if (cell.includes("=")) casedNames.add(cell.slice(0, cell.indexOf("=")).trim());
+      if (!isOwnSheet && !isLooseCase) continue;
+      for (const caseNode of isOwnSheet ? candidate.node.children.filter((child) => !isSheetLabel(child)) : [candidate.node]) {
+        const reading = caseReadings.get(caseNode);
+        if (reading === undefined || reading.holds.has(unit.node.id)) continue;
+        const belongs = !isLooseCase || (reading.holds.size > 0 ? false : reading.named !== null ? reading.named === unit : sectionUnits.length === 1);
+        if (!belongs) continue;
+        for (const cell of caseNode.name.split(", ")) if (cell.includes("=")) namedByCases.add(cell.slice(0, cell.indexOf("=")).trim());
+      }
     }
-    const covered = (name) => (drawnOffDefault.get(unit.node.id)?.has(name) ?? false) || casedNames.has(name) || behaviour.includes(name);
+    const drawn = (name) => (drawnOffDefault.get(unit.node.id)?.has(name) ?? false) || behaviour.includes(name);
     const booleans = definitions.filter((one) => one.definition.type === "BOOLEAN").map((one) => one.name);
     for (const { name, definition } of definitions.filter((one) => DRAWABLE_TYPES.includes(one.definition.type))) {
       // a swap is judged with the boolean that turns it on: `startIcon` with `withStartIcon`
       const partner = `with${name.charAt(0).toUpperCase()}${name.slice(1)}`;
-      if (covered(name) || (definition.type === "INSTANCE_SWAP" && booleans.includes(partner) && covered(partner))) continue;
-      propertyNotDrawn.push({ unit: unit.node.name.slice(0, 80), id: unit.node.id, property: name.slice(0, 80), type: definition.type, default: String(definition.defaultValue).slice(0, 40), in: unit.parentId });
+      const names = definition.type === "INSTANCE_SWAP" && booleans.includes(partner) ? [name, partner] : [name];
+      if (names.some(drawn)) continue;
+      const item = { unit: unit.node.name.slice(0, 80), id: unit.node.id, property: name.slice(0, 80), type: definition.type, default: String(definition.defaultValue).slice(0, 40), in: unit.parentId };
+      if (names.some((one) => namedByCases.has(one))) propertyClearedByNameAlone.push(item);
+      else propertyNotDrawn.push(item);
     }
     for (const name of behaviour.filter((one) => !definitions.some((known) => known.name === one))) {
       behaviourNamesNoProperty.push({ unit: unit.node.name.slice(0, 80), id: unit.node.id, name: name.slice(0, 80), in: unit.parentId });
@@ -705,7 +856,7 @@ function scanFindings() {
     strays, defaultNamedProperties, unreadableSets, setsOverLimit, emptyVersions, emptyCases,
     badCaseNames, duplicateCaseNames, labelsUnitElsewhere, labelLayerNames, labelsFormCannotSay, defaultNotLabels,
     topLevelNotSection, meetingInSection, sectionOutOfOrder, unitsWithoutHeader, outsideUnitSection,
-    childOutsideSection, unitsWithoutCases, unitsWithoutUsage, propertyNotDrawn, behaviourNamesNoProperty, usagesWithoutCaption, partSectionTooWide,
+    childOutsideSection, unitsWithoutCases, unitsWithoutUsage, propertyNotDrawn, propertyClearedByNameAlone, behaviourNamesNoProperty, versionNotWired, versionSlotIsFrame, usagesWithoutCaption, partSectionTooWide,
   };
 }
 
@@ -717,7 +868,7 @@ const scanShown = (limit) => {
   const read = Object.fromEntries(Object.keys(GROUP_OF).map((kind) => [GROUP_OF[kind], entries.filter((entry) => entry.kind === kind).length]));
   const captions = entries.filter((entry) => entry.kind === "usage" && entry.node.type === "TEXT").length;
   read.usages -= captions;
-  return { clean: blocking.every(([, items]) => items.length === 0), notBlocking: NOT_BLOCKING, form, read: { topLevel: topLevel.length, ...read, usageLabels: captions }, findings };
+  return { clean: blocking.every(([, items]) => items.length === 0), notBlocking: NOT_BLOCKING, form, propertyChecks: form === "sections" ? "run" : `skipped: the page is ${form}, and the property checks read only a page in sections`, read: { topLevel: topLevel.length, ...read, usageLabels: captions }, findings };
 };
 
 const result = {
