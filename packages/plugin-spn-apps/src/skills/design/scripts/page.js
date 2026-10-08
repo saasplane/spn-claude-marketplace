@@ -16,7 +16,11 @@
 //                    `maxBytes`, returning `next` to continue from.
 //   report scan      the last scan before a publish. It always reads the whole page, because a pair that
 //                    meets or a label whose unit is elsewhere needs every node. Its answer is counts and
-//                    the first items of each finding, the page's `form` and what it `read`. A scan that found
+//                    the first items of each finding, the page's `form` and what it `read`. The answer is measured
+//                    in UTF-8 bytes and kept under `answerBytes` (18000; the connector refuses 20,480): the longest
+//                    lists give up items, down to 3 and then to counts alone, the counts always whole, and `shortened`
+//                    says what was left out. `only: "<finding>"` returns that finding's whole list instead, from `from`,
+//                    at most `count` items and as many as fit `answerBytes`; `next` continues. A scan that found
 //                    no unit is not clean: `emptyReading` says so. `childOutsideSection` names each child that
 //                    lies beyond its section's box (by its box or by what it draws) by more than 1 px, with the
 //                    side and the px. `unitsWithoutUsage` blocks: it names each top-level unit with no usage (a part owes none; a
@@ -47,7 +51,9 @@
 //                    version to repair by hand. `versionTiedToAnotherProperty` blocks: where a path is tied in several
 //                    versions to different properties, a version off the most common one is named with the path, the key it
 //                    holds and the key the others hold, unless one variant of the set explains the split (every version with
-//                    one of its values holds one key there); otherwise `nearestVariant` is the variant with the fewest values
+//                    one of its values holds one key there, and each value that holds a key is held by at least two
+//                    versions, since a lone version cannot establish a pattern: a legitimate value with a single
+//                    version in a small set is named, and its `nearestVariant` lets a person judge); otherwise `nearestVariant` is the variant with the fewest values
 //                    that hold both keys (`valuesHoldingBoth`), for a person to judge; two variants that explain it only
 //                    together do not excuse it. `propertyTiedToNothing` blocks: a set's or lone component's
 //                    definition, not a VARIANT, that no layer of any version references (an instance's layers are not entered),
@@ -85,6 +91,9 @@ const INPUTS = {
   to: null,
   maxBytes: 16000,
   findingItems: 25,
+  answerBytes: 18000,
+  only: null,
+  count: null,
   labelReach: 400,
   maxVersions: 1000,
   pathsNamed: 3,
@@ -606,7 +615,7 @@ async function drawsDefault(node, kind, definition) {
 // missing ties would change it is `differs`, a thing for a person to judge); a version whose layer is of another type where
 // no version of its type holds the kind (`reshaped`, a FRAME where another version has a SLOT); a version tied there to
 // another property than the most (`tiedElsewhere`; not when one variant of the set explains the split, every version of one
-// of its values holding one key; else the variant nearest to explaining it is given); a definition, not a VARIANT, that no
+// of its values holding one key and each held by two versions at least; else the variant nearest to explaining it is given); a definition, not a VARIANT, that no
 // layer of any version references (`unreferenced`). The nearest wired version, one that holds every missing reference and
 // differs in the fewest variant values, is given to help a writer; its absence excuses nothing.
 async function wiringOf(read) {
@@ -664,13 +673,21 @@ async function wiringOf(read) {
     const holders = layers.flatMap((one, other) => (one.get(path)?.type === type && one.get(path).references[kind] ? [[other, one.get(path).references[kind]]] : []));
     let nearestVariant = null;
     let fewest = Infinity;
+    let rank = Infinity;
     for (const variant of new Set(values.flatMap(Object.keys))) {
       const byValue = new Map();
-      for (const [other, key] of holders) byValue.set(values[other][variant], (byValue.get(values[other][variant]) ?? new Set()).add(key));
-      const mixed = [...byValue.values()].filter((group) => group.size > 1).length;
-      if (mixed < fewest) { fewest = mixed; nearestVariant = variant; }
+      for (const [other, key] of holders) {
+        const group = byValue.get(values[other][variant]) ?? { keys: new Set(), count: 0 };
+        group.keys.add(key);
+        group.count += 1;
+        byValue.set(values[other][variant], group);
+      }
+      const mixed = [...byValue.values()].filter((group) => group.keys.size > 1).length;
+      const lone = [...byValue.values()].some((group) => group.count < 2);
+      if (mixed === 0 && !lone) { splits.set(at, null); return null; }
+      if (mixed * 2 + (lone ? 1 : 0) < rank) { rank = mixed * 2 + (lone ? 1 : 0); fewest = mixed; nearestVariant = variant; }
     }
-    const found = fewest === 0 ? null : { variant: nearestVariant, values: fewest === Infinity ? 0 : fewest };
+    const found = { variant: nearestVariant, values: fewest === Infinity ? 0 : fewest };
     splits.set(at, found);
     return found;
   };
@@ -961,9 +978,9 @@ async function scanFindings() {
 }
 
 const allFindings = await scanFindings();
-const scanShown = (limit) => {
+const scanShown = (limit, limits = {}) => {
   const findings = {};
-  for (const [name, items] of Object.entries(allFindings)) findings[name] = finding(items, limit);
+  for (const [name, items] of Object.entries(allFindings)) findings[name] = finding(items, limits[name] ?? limit);
   const blocking = Object.entries(allFindings).filter(([name]) => !NOT_BLOCKING.includes(name));
   const read = Object.fromEntries(Object.keys(GROUP_OF).map((kind) => [GROUP_OF[kind], entries.filter((entry) => entry.kind === kind).length]));
   const captions = entries.filter((entry) => entry.kind === "usage" && entry.node.type === "TEXT").length;
@@ -977,9 +994,61 @@ const result = {
   readAt: new Date().toISOString(),
 };
 const bytesOf = (value) => JSON.stringify(value).length;
+// UTF-8 bytes of the JSON, which is what the connector measures.
+const utf8Of = (value) => {
+  let bytes = 0;
+  for (const char of JSON.stringify(value)) { const code = char.codePointAt(0); bytes += code < 0x80 ? 1 : code < 0x800 ? 2 : code < 0x10000 ? 3 : 4; }
+  return bytes;
+};
+
+// The default scan answer, under `answerBytes`: the longest lists (by their items' bytes) give up an item at a time down
+// to 3, then every list goes to its count alone. The counts stay whole; `shortened` says what was left out and how to ask.
+function scanBounded() {
+  const limits = {};
+  const build = () => {
+    const scan = scanShown(INPUTS.findingItems, limits);
+    const left = {};
+    for (const [name, one] of Object.entries(scan.findings)) if (one.count > one.items.length) left[name] = one.count - one.items.length;
+    if (Object.keys(left).length > 0) scan.shortened = { itemsLeftOut: left, askForOneWhole: 'run again with only: "<finding>" (and from, count to page it)' };
+    return scan;
+  };
+  let scan = build();
+  while (utf8Of(scan) > INPUTS.answerBytes) {
+    let worst = null;
+    let heaviest = 0;
+    for (const [name, one] of Object.entries(scan.findings)) {
+      const weight = one.items.length > 3 ? utf8Of(one.items) : 0;
+      if (weight > heaviest) { heaviest = weight; worst = name; }
+    }
+    if (worst !== null) limits[worst] = scan.findings[worst].items.length - 1;
+    else for (const name of Object.keys(allFindings)) limits[name] = 0;
+    const next = build();
+    if (worst === null && utf8Of(next) === utf8Of(scan)) break;
+    scan = next;
+  }
+  return scan;
+}
+
+// One finding's whole list, from `from`, `count` items at most (and as many as fit `answerBytes`); `next` continues.
+function onlyFinding(name) {
+  const items = allFindings[name];
+  if (items === undefined) return { error: `only names no finding: ${name}`, findings: Object.keys(allFindings) };
+  const first = Math.min(INPUTS.from, items.length);
+  const shown = [];
+  let used = 0;
+  let next = null;
+  for (let index = first; index < items.length; index += 1) {
+    const size = utf8Of(items[index]) + 1;
+    if (shown.length >= (INPUTS.count ?? Infinity) || (shown.length > 0 && used + size > INPUTS.answerBytes)) { next = index; break; }
+    used += size;
+    shown.push(items[index]);
+  }
+  return { finding: name, count: items.length, from: first, next, items: shown };
+}
 
 if (INPUTS.report === "inventory") result.inventory = inventory(INPUTS.maxBytes, true);
-if (INPUTS.report === "scan") result.scan = scanShown(INPUTS.findingItems);
+if (INPUTS.report === "scan" && INPUTS.only !== null) result.only = onlyFinding(INPUTS.only);
+else if (INPUTS.report === "scan") result.scan = scanBounded();
 if (INPUTS.report === "both") {
   // The whole answer stays under maxBytes. The scan is cut first, to the fewest items that fit half of it;
   // the inventory takes what is left and stops early. `cut` says what was left out.

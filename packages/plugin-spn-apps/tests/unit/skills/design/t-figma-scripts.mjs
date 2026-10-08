@@ -1210,8 +1210,16 @@ await guard(async () => {
     wiredVersion("W:2", "expanded=true, state=hover", 60, indicator("W:2", "expandedIcon#1:1")),
     wiredVersion("W:3", "expanded=true, state=focus", 120, indicator("W:3", "expandedIcon#1:1")),
     wiredVersion("W:4", "expanded=false, state=rest", 180, indicator("W:4", "collapsedIcon#1:2")),
+    wiredVersion("W:5", "expanded=false, state=hover", 240, indicator("W:5", "collapsedIcon#1:2")),
   ]);
-  same("a swap that follows a variant (every expanded version one key, every collapsed one the other) is not named, though the collapsed one is the minority", found.versionTiedToAnotherProperty.count, 0);
+  same("a swap that follows a variant (every expanded version one key, every collapsed one the other, each value held by two versions at least) is not named, though the collapsed ones are the minority", found.versionTiedToAnotherProperty.count, 0);
+  const lone = await wiredScan([
+    wiredVersion("W:1", "expanded=true, state=rest", 0, indicator("W:1", "expandedIcon#1:1")),
+    wiredVersion("W:2", "expanded=true, state=hover", 60, indicator("W:2", "expandedIcon#1:1")),
+    wiredVersion("W:3", "expanded=true, state=focus", 120, indicator("W:3", "expandedIcon#1:1")),
+    wiredVersion("W:4", "expanded=false, state=rest", 180, indicator("W:4", "collapsedIcon#1:2")),
+  ]);
+  same("a value held by one version only cannot explain a split: that version is named, for a person to judge by its nearestVariant", lone.versionTiedToAnotherProperty.items.map((item) => [item.version, item.nearestVariant]), [["W:4", "expanded"]]);
   // .DSContainerFrames-like: the layer `frame` is the footer in frames=FOOTER and the header in the others.
   const frame = (id, key) => [layer(`${id}:f`, "frame", "FRAME", { visible: key })];
   const frames = await wiredScan([
@@ -1220,6 +1228,7 @@ await guard(async () => {
     wiredVersion("W:3", "frames=HEADER+FOOTER, size=SM", 120, frame("W:3", "withHeader#1:1")),
     wiredVersion("W:4", "frames=HEADER+FOOTER, size=MD", 180, frame("W:4", "withHeader#1:1")),
     wiredVersion("W:5", "frames=FOOTER, size=SM", 240, frame("W:5", "withFooter#1:2")),
+    wiredVersion("W:6", "frames=FOOTER, size=MD", 300, frame("W:6", "withFooter#1:2")),
   ]);
   same("a layer that is the footer in one value of a variant and the header in the others is not named: `frames` explains the split", frames.versionTiedToAnotherProperty.count, 0);
   // two variants together: the key is y for (B, M) and (C, S) only; neither layout nor size explains it alone.
@@ -1227,6 +1236,46 @@ await guard(async () => {
   const together = await wiredScan(both.map(([layout, size, key], at) => wiredVersion(`W:${at}`, `layout=${layout}, size=${size}`, at * 60, frame(`W:${at}`, `${key}#1:1`))));
   same("a key that depends on two variants together, which no single variant explains, is named, and the item says which variant comes nearest",
     together.versionTiedToAnotherProperty.items.map((item) => [item.version, item.nearestVariant, item.valuesHoldingBoth]), [["W:3", "layout", 2], ["W:4", "layout", 2]]);
+});
+await guard(async () => {
+  // DSLayout-like, as read: rail > nav is nav#5:21 in four versions, all flush=false, and nav#168:0 in the one flush=true.
+  // `flush` holds one key under each of its values, but flush=true is held by one version: it explains nothing.
+  const rail = (id, key) => [layer(`${id}:r`, "rail", "FRAME", null, [layer(`${id}:n`, "nav", "SLOT", { slotContentId: key })])];
+  const layout = await wiredScan([
+    wiredVersion("W:1", "side=LEFT, size=SM, flush=false", 0, rail("W:1", "nav#5:21")),
+    wiredVersion("W:2", "side=LEFT, size=MD, flush=false", 60, rail("W:2", "nav#5:21")),
+    wiredVersion("W:3", "side=RIGHT, size=SM, flush=false", 120, rail("W:3", "nav#5:21")),
+    wiredVersion("W:4", "side=RIGHT, size=MD, flush=false", 180, rail("W:4", "nav#5:21")),
+    wiredVersion("W:5", "side=LEFT, size=MD, flush=true", 240, rail("W:5", "nav#168:0")),
+  ]);
+  same("the DSLayout shape: one version on another key, the only holder with flush=true, is named though flush seems to explain it",
+    layout.versionTiedToAnotherProperty.items.map((item) => [item.version, item.path, item.holds, item.others]), [["W:5", "rail > nav (slotContentId)", "nav#168:0", "nav#5:21"]]);
+  const pair = await wiredScan([wiredVersion("W:1", "flush=false", 0, rail("W:1", "nav#5:21")), wiredVersion("W:2", "flush=true", 60, rail("W:2", "nav#168:0"))]);
+  same("a path tied in two versions, each to another key, has no minority: nothing is named", pair.versionTiedToAnotherProperty.count, 0);
+});
+await guard(async () => {
+  // the answer's cap by bytes
+  const many = unitSection("B", "DSButton", [100, 100]);
+  for (let at = 0; at < 40; at += 1) many.children.push(loose(`M:${at}`, `Rectangle ${at} ${"long ".repeat(15)}`, [-100, 20 * at, 10, 10]));
+  const asked = async (inputs) => (await run("page.js", { pageId: "2:1", report: "scan", findingItems: 25, ...inputs }, sectioned([many])));
+  const utf8 = (value) => Buffer.byteLength(JSON.stringify(value), "utf8");
+  const fewer = unitSection("B", "DSButton", [100, 100]);
+  for (let at = 0; at < 5; at += 1) fewer.children.push(loose(`F:${at}`, `Rectangle ${at}`, [-100, 20 * at, 10, 10]));
+  const whole = (await run("page.js", { pageId: "2:1", report: "scan" }, sectioned([fewer]))).scan;
+  same("a page of few findings is not shortened", [whole.shortened, whole.findings.childOutsideSection.items.length], [undefined, 5]);
+  const small = (await asked({ answerBytes: 4000 })).scan;
+  same("an answer over the limit is cut to under it, its counts whole, and says it was shortened",
+    [utf8(small) <= 4000, small.findings.childOutsideSection.count, small.findings.childOutsideSection.items.length < 25, small.findings.childOutsideSection.items.length >= 3, small.shortened.itemsLeftOut.childOutsideSection > 0, small.shortened.askForOneWhole.includes("only")],
+    [true, 40, true, true, true, true]);
+  const counts = (await asked({ answerBytes: 1 })).scan;
+  same("under a limit nothing fits, the lists go to counts alone, still whole", [counts.findings.childOutsideSection.count, counts.findings.childOutsideSection.items.length, counts.shortened.itemsLeftOut.childOutsideSection], [40, 0, 40]);
+  const one = (await asked({ only: "childOutsideSection", answerBytes: 100000 })).only;
+  same("`only` returns the finding's items past the default cap", [one.count, one.items.length, one.next], [40, 40, null]);
+  const paged = (await asked({ only: "childOutsideSection", from: 5, count: 10 })).only;
+  same("`only` pages by from and count", [paged.items.length, paged.from, paged.next, paged.items[0].child], [10, 5, 15, "M:5"]);
+  const bytePaged = (await asked({ only: "childOutsideSection", answerBytes: 1000 })).only;
+  same("`only` stops before answerBytes and gives next", [bytePaged.items.length < 40, bytePaged.next === bytePaged.items.length], [true, true]);
+  same("`only` with an unknown finding says so", (await asked({ only: "nothing" })).only.error.includes("nothing"), true);
 });
 await guard(async () => {
   // DSProgress / DSNavigationMenuItem / DSInput-like: the layer is untied on purpose and shows other than the property's default.
