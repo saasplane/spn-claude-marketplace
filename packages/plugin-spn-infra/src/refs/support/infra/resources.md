@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-infra/04-resources.md",
-      "seen": "9fe57c80"
+      "seen": "9ca2e43a"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/04-resources/",
-      "seen": "c6ea40fa"
+      "seen": "a9da1d57"
     }
   ]
 }
@@ -32,7 +32,7 @@ A resource is a backing service that holds state: a database, a cache, a queue, 
 
 **The secret store is on no row, because nobody declares it — every environment has one, so asking for it would be asking for something already there.** The set of four is closed and total: a fifth engine is a contract change, exactly the ceremony a baseline set should demand.
 
-**An environment also stands a key for stored secrets, and nobody declares that either** (`RD.SUPPORT.INFRA.109`). A product stores some secrets it must read back, such as a provider key an organization brings, and its service encrypts each one before it saves the row. That needs a master key held where the data is not, so the environment's blueprint creates one in each environment, at apply. **It is a key of its own** — not the key that encrypts the engines' data, so reading the data and opening a stored secret are two separate rights. **It carries a policy of its own**: only the role of a service that lists the seal may use it; the role that provisions the account may not, and no database role can. **The declaration gains nothing for it** — no row to write and no engine family to name. The key is built and released in the blueprints. It has not been stood on a real cloud account yet.
+**An environment also stands a key for stored secrets, and nobody declares that either** (`RD.SUPPORT.INFRA.109`). A product stores some secrets it must read back, such as a provider key an organization brings, and its service encrypts each one before it saves the row. That needs a master key held where the data is not, so the environment's blueprint creates one in each environment, at apply. **It is a key of its own** — not the key that encrypts the engines' data, so reading the data and opening a stored secret are two separate rights. **It carries a policy of its own**: only the role of an application whose row lists the `SEAL` grant may use it; the role that provisions the account may not, and no database role can. **It is one for each environment** — the platform and its spaces share it, so an application in a space that lists the grant seals with the same key. **The declaration gains nothing for it** — no row to write and no engine family to name. The key is built and released in the blueprints. It has not been stood on a real cloud account yet.
 
 **An application selects no engine and names no share — MUST NOT.** Every scheduled deployment receives a derived share scoped to its own coordinates: its role set from the factory, topics named for their owner, storage reached through the one document system, its own configuration prefix. Nothing nameable crosses the seam in either direction, in either direction — that is what keeps the estate from ever reading a code repository. A new application is one reviewed row; a new version is no estate change at all.
 
@@ -68,7 +68,7 @@ Beside the platform resources, a platform may declare named per-need data worlds
 
 ```ts
 export interface SPEstateSpace {
-  code: CDTString;                                 // its published prefix, and its hostname world token
+  code: CDTString;                                 // names the space; the platform's code goes in front of it in every published name
   database: SPEstateSpaceResourceDatabase | null;   // a family left out is simply not stood
   cache: SPEstateResourceCache | null;
   queue: SPEstateResourceQueue | null;
@@ -76,9 +76,20 @@ export interface SPEstateSpace {
 }
 ```
 
-**A space is per-need where the platform resources are total.** A family absent from a space is not stood at all. Its database family speaks the baseline's own grammar — the same `schemas` rows, the same `users` grant rows. A space owns no applications, no accounts, no domains; an application binds to one by the `space` key on its registration row, and an absent key means the platform resources answer. An application still declares no demand — selecting a space is passing a code.
+**A space is per-need where the platform resources are total.** A family absent from a space is not stood at all. Its database family speaks the baseline's own grammar — the same `schemas` rows, the same `users` grant rows. A space owns no applications, no accounts, no domains; an application binds to one by the `space` key on its registration row, and an absent key means the platform resources answer. A row that names a space may also keep the platform, and its deployment is then given both sets of settings. An application still declares no demand — selecting a space is passing a code.
 
-**On a machine, a space's engines take their ports from the hundred the platform declares, and nobody writes them** (`RD.SUPPORT.INFRA.062`). Space *i*, counting from zero in declaration order, takes the ten ports from `+70 + 10 × i`, with each family at the same offset it has in the platform's own engines. So a platform stands at most three spaces locally.
+**A space carries its platform's code** (`RD.SUPPORT.INFRA.112`). Every name the estate publishes for a space starts with the platform's code and then the space's code.
+
+| What | The platform's own | A space's |
+| --- | --- | --- |
+| The prefix of its published keys | `{SPC}_` | `{SPC}_{SPACE}_` |
+| The world token in its host names | `{spc}` | `{spc}-{space}` |
+| An example key | `DMO_RESOURCE_DB_APP_ENDPOINTS` | `DMO_SAS_RESOURCE_DB_APP_ENDPOINTS` |
+| An example local host | `dmo-database.lc-spndemo.app` | `dmo-sas-database.lc-spndemo.app` |
+
+A prefix is one word for a platform and two words for a space. A space's code must differ from the other spaces' codes of its platform; two platforms may use the same space code. The world token in a host name always matches the key prefix that carries it.
+
+**On a machine, a space's engines take their ports from the five hundred the platform declares, and nobody writes them** (`RD.SUPPORT.INFRA.062`). The first hundred of the range holds the engines, ten ports for each world: the platform's own take the first ten, and space *i*, counting from one in declaration order, takes the ten ports from `+10 × i`, with each family at the same offset it has in the platform's own engines. So a platform stands at most nine spaces locally. A space has engines and nothing else; an application that belongs to a space takes a service's port or a web application's port like any other.
 
 **A space is one of two independent extension axes, and they never couple** (`RD.SUPPORT.INFRA.085`). A space extends by **data**; a service domain (bound by `serviceDomain`) extends by **face**. An application takes either, both or neither.
 
@@ -86,7 +97,7 @@ export interface SPEstateSpace {
 
 ## A module owns its own world
 
-A module's resources are its own engine instances, in its own world, under the module's own purpose code — **never databases or schemas inside the platform's engines** (`RD.SUPPORT.INFRA.053`). A module that migrates itself is structurally the administrator of *something*, so it owns the whole world its administrator role reaches. **The estate standardizes the boundary — the world code, its host labels, the local ports it derives inside the platform's declared hundred, its placement, a private configuration seat, a ledger seat, and the standing guardrails — and never the interior.** Which resources a module stands, and how its blueprint stands them, is the module's own business. How a module reaches applications through the configuration plane is a separate topic, restated in the modules card.
+A module's resources are its own engine instances, in its own world, under the module's own purpose code — **never databases or schemas inside the platform's engines** (`RD.SUPPORT.INFRA.053`). A module that migrates itself is structurally the administrator of *something*, so it owns the whole world its administrator role reaches. **The estate standardizes the boundary — the world code, its host labels, the local ports it derives inside the platform's declared range, its placement, a private configuration seat, a ledger seat, and the standing guardrails — and never the interior.** Which resources a module stands, and how its blueprint stands them, is the module's own business. How a module reaches applications through the configuration plane is a separate topic, restated in the modules card.
 
 ## Hosting and size are independent axes
 

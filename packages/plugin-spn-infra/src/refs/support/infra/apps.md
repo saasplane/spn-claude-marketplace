@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/02-infra/05-apps.md",
-      "seen": "70f98148"
+      "seen": "691c35bd"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/05-apps/",
@@ -31,28 +31,60 @@ Two independent statements have to agree before anything runs, made in two diffe
 export interface SPEstateApp {
   kindCode: CDTString;                     // the token the code node declares for itself
   repo: CDTString;                         // one of the repositories the platform declared
-  space: CDTString | null;                 // a binding: which data world; absent is the platform's
+  space: CDTString | null;                 // a binding: which space holds its data; absent is the platform's resources
+  platform: CDTBoolean | null;             // a binding: the platform's settings beside its space's; absent is false
   serviceDomain: CDTString | null;         // a binding: which face; absent is the platform domain
-  resources: SPEstateAppResources | null;  // a claim: absent is the baseline, nothing claimed
+  grants: SPEstateAppGrantType[] | null;   // the cloud services its runtime may call as itself; absent is none
   deployments: SPEstateAppDeployment[];    // the scheduled units this application runs
 }
 ```
 
 **Names derive, engines are declared once elsewhere, and everything else is refused by shape.** No hostname, no schema, no topic, no prefix and no secret name ever appears in a row — the name grammar owns the hostnames, the migrations own the schemas and topics, the coordinates own the prefixes.
 
-## A binding names something; a claim asks for something — MUST tell them apart
+## A row reads in two parts: bindings and grants — MUST tell them apart
 
-The two kinds of key on a row look alike and behave differently, and telling them apart is what keeps a review honest.
+The optional keys on a row are of two kinds, and telling them apart is what keeps a review honest.
 
-| | A binding (`space`, `serviceDomain`) | A claim (`resources`) |
+| | A binding (`space`, `platform`, `serviceDomain`) | A grant (`grants`) |
 | --- | --- | --- |
-| Says | *use the row the platform already declared* | *I would like this capability* |
-| The estate may | nothing to decline — the row exists or the binding is refused | decide whether to stand it |
-| Absent means | the platform's own world, or the platform domain | the baseline, nothing claimed |
+| Says | which settings the deployment is given, and which face it answers on | which cloud services the runtime may call as itself |
+| Names | a row the platform already declared | a value from a closed list in the contract |
+| Absent means | the platform's resources, and the platform domain | no grant |
 
-A code the platform never declared is refused when the declaration is checked. A face bound on a row that registers no host is refused as one nothing would read. **Reading a claim as a binding makes a missing dependency look like a typo; reading a binding as a claim makes a plan quietly create a second copy of something the estate already had.**
+A code the platform never declared is refused when the declaration is checked. A face bound on a row that registers no host is refused as one nothing would read. **Reading a grant as a binding makes a missing dependency look like a typo; reading a binding as a grant makes a plan quietly create a second copy of something the estate already had.**
 
-**The claim vocabulary today holds one capability: `hostname`** — whether an application manages tenant custom domains. Claiming it buys a scoped identity that may request certificates and edit the environment's web delivery, the one integration whose credential never exists as a value because the workload acts as itself. It is true for the application that owns identity and for no other. **A workload that did not claim a capability holds no grant for it**, so a permission problem surfaces because a declaration was missing rather than because a role was guessed too narrow.
+### What an application's row says about its settings
+
+A space and an application are two separate rows. The space owns no application. An application says on its own row what it needs, in three choices (`RD.SUPPORT.INFRA.113`):
+
+| The application needs | Its row | What its deployment is given |
+| --- | --- | --- |
+| the platform | no `space` key | the platform's settings, `{SPC}_…` |
+| a space only | `"space": "sas"` | the space's settings, `{SPC}_{SPACE}_…` |
+| the platform and a space | `"space": "sas"` and `"platform": true` | both sets, each under its own prefix |
+
+- **Nothing is merged and nothing is given a second name.** The deployment loads the settings of both layers as they are; the application opens the connections it wants from each.
+- **`platform` is written only as `true`, and only on a row that names a space.** The rules refuse it on a row with no `space`, on a web application, and as `"platform": false` — an application that does not want the platform leaves the key out.
+- **The key is not a grant.** It says which settings the deployment is given. A grant says what the runtime may call as itself.
+- **An application that keeps the platform also holds the settings of the platform's database.** A module's data is still reached through that module's contract; the rule holds it, because the settings no longer do.
+
+These are the last three of the four shapes a platform is built in on the server (`../../apps/shape.md`).
+
+### What the runtime may call as itself — `grants`
+
+A database, a cache and a queue are reached with a user and a password, which arrive as settings. Two cloud services are reached another way: the runtime calls them as itself, with no credential, because the blueprint grants its role the right. A row lists them in `grants` (`RD.SUPPORT.INFRA.110`).
+
+| Grant | What the runtime may do |
+| --- | --- |
+| `SEAL` | use the environment's key for stored secrets, so the application seals secrets of its own in its own rows |
+| `EDGE` | bind a tenant's own domain: request its certificate and write its route |
+
+- **Each value comes from a closed list in the contract** (`SPEstateAppGrantType`). A manifest that names anything else is refused; a further cloud service is one more value.
+- **A grant is not restricted by `space`.** An application that lists one is granted it, on the platform or in a space.
+- **A workload that lists no grant holds none**, so a permission problem surfaces because a declaration was missing rather than because a role was guessed too narrow. `EDGE` is true for the application that owns identity and for no other.
+- **A service lists `SEAL` only when a module it mounts stores secrets.** A service that holds that module remotely receives the opened value from it and never touches the seal.
+
+On a machine the seal is a fixed key in the settings and nothing is granted.
 
 ## Every deployment declares the same four facts
 
@@ -78,8 +110,8 @@ Which edge a deployment answers on, which zone it sits in, and whether it stands
 | Value (`SPEstateExposeType`) | The deployment | Reached by |
 | --- | --- | --- |
 | `PUBLIC` | answers on the internet | anybody |
-| `PRIVATE` | answers on the internal zone | an operator arriving through the platform's own ranges |
-| `INTERNAL` | answers inside the cluster only, and stands no ingress | another workload in the cluster |
+| `PRIVATE` | answers on the internal zone | a workload in the cluster, and an operator arriving through the platform's own ranges |
+| `INTERNAL` | answers inside the cluster only, and has no route | another workload in the cluster |
 
 **The namespace is the ceiling, not the source — a deployment cannot declare more exposure than the namespace it sits in allows.** A platform or vendor-namespace service claiming `PUBLIC` is refused by name when the declaration is resolved, before any plan runs — widening the attack surface is a change somebody makes deliberately at the level that owns it, never an application granting itself reach because it asked. A background worker declares its exposure too, and anything but `INTERNAL` is refused: having no inbound surface is a fact about a background worker, not a choice it gets to make.
 
@@ -97,6 +129,8 @@ export interface SPEstateAppDeploymentApi extends SPEstateAppDeployment {
   websocket: CDTBoolean;
   size: SPEstateSizeType | null;   // null takes the environment's own capacity profile
   subdomains: CDTString[];         // every label it answers on, first is primary
+  remotePort: CDTInt | null;       // the remote listener's port; null serves no contract to other services
+  gateway: SPEstateAppDeploymentGateway | null;  // what it asks of its route; null takes the gateway's defaults
 }
 ```
 
@@ -116,19 +150,100 @@ export interface SPEstateAppDeploymentWeb extends SPEstateAppDeployment {
 
 A background worker (`SPEstateAppDeploymentProcessor`) declares its capacity and nothing else — **the absence of a subdomain is the statement**: it has no inbound surface to name, and resolve refuses anything but `INTERNAL` exposure on it.
 
-**Every port a deployment declares sits inside the hundred local ports its platform declares — MUST** (`RD.SUPPORT.INFRA.062`). An API's `port` sits at `+30`–`39` from the range's first port, in app-row order, and its `healthPort` is that port plus ten, at `+40`–`49`. A web deployment's `port` sits at `+50`–`69`, in app-row order. `spnutils infra validate` refuses a port outside the range, and a port in the wrong part of it. The same number is the port the deployment listens on in the cloud, so it is chosen once.
+**Every port a deployment declares sits inside the five hundred local ports its platform declares — MUST** (`RD.SUPPORT.INFRA.062`). The offsets count from the range's first port.
 
-## Locally, only the port is read
+| The port | Its part of the range | Rule |
+| --- | --- | --- |
+| an API's `port` | `+100`–`149` | in app-row order from `+100` |
+| its `healthPort` | `+150`–`199` | the service's port plus 50 |
+| its `remotePort` | `+200`–`249` | the service's port plus 100 |
+| a web deployment's `port` | `+300`–`399` | in app-row order from `+300` |
 
-**An application on a developer's machine is its own tree, and the estate is not consulted about that — MUST.** Its folder and its kind manifest say it exists; the row governs only what **deploys**. The one fact a machine reads from a row is a deployment's declared port, so the local ingress sends the app's host to the port the app listens on. That separates the two lifecycles twice over: a new environment never needs a code release, and a new commit never touches the estate. Requiring a grant to run locally would put the estate between a developer and their own machine, protecting nothing — there is no shared surface to protect and no cost to bound.
+`spnutils infra validate` refuses a port outside the range, and a port in the wrong part of it. The same number is the port the deployment listens on in the cloud, so it is chosen once.
+
+### A remote port is always private
+
+A service that serves its modules' contracts to the other services of its platform declares a **remote port** on its API deployment (`RD.SUPPORT.INFRA.114`).
+
+- **A remote port is always `PRIVATE` — MUST.** `expose` describes the main port; the remote listener's reach is a rule and not a field a row can choose, so a wrong value can never put it on the internet.
+- **An application has at most one deployment that declares a remote port — MUST**, so its code names one remote address.
+- **A deployment with no remote port serves no contract to others.** A monolith declares none.
+
+| Exposure | Answers on | From the cluster | From a machine over the VPN | From the internet |
+| --- | --- | --- | --- | --- |
+| `PUBLIC` | the internet | yes | yes | yes |
+| `PRIVATE`, and every remote port | the internal zone | yes | yes | no |
+| `INTERNAL` | the cluster only, no route | yes | no | no |
+
+**The estate publishes each remote address to the services that call it**, naming a service by its application's `kindCode`, because two applications may each have a deployment called `api`.
+
+| Setting | Published at | What it is |
+| --- | --- | --- |
+| `{SPC}_API_REMOTE_PORT` | the deployment's own path | the remote listener's port, from `remotePort` |
+| `{SPC}_REMOTE_SERVICE_{NAME}_ENDPOINTS` | the environment's path | the remote address of the application whose `kindCode` is `{NAME}` |
+| `{SPC}_REMOTE_CREDENTIAL_*` | the environment's path | how a calling service proves itself: the provider's kind, and for the cluster's token its file, what it must be for, this platform's namespaces and the cluster's issuer |
+
+The cluster gives every application an identity and writes a token marked for remote calls into each pod; the receiving service checks it first. On a machine each service listens on one more local port, nothing is added to the local ingress, and the local address is plain HTTP on the service's own host and remote port.
+
+### Two load balancers and two gateways
+
+An environment has one pair for each reach, however many services it holds (`RD.SUPPORT.INFRA.115`). A deployment is a route on a gateway and has no load balancer of its own.
+
+| Exposure | Load balancer | Gateway, inside the cluster | Registered as |
+| --- | --- | --- | --- |
+| `PUBLIC` | one, facing the internet | the public gateway | a route for its host |
+| `PRIVATE` | one, internal, admitting the operator ranges and the cluster's own nodes | the private gateway | a route for its internal host |
+| a remote port | the internal one | the private gateway | a route, always, whatever `expose` is |
+| `INTERNAL` | none | none | no route; other workloads use its service address |
+
+- **The two gateways are kept apart**, so a wrong route cannot make a private surface answer on the internet.
+- **HTTPS ends at the load balancer**, with the zone's certificate, for both reaches.
+- **A service in the cluster reaches a remote port by the same private HTTPS host an operator's machine uses.**
+- **One cluster serves one environment**, with three namespaces named for what they hold: `prd`, `plt` and `vnd`.
+- **`MANAGED` and `CLUSTER` say who runs a data engine** and do not change this.
+
+The book says "a gateway" and names no product; which one the blueprint installs is open.
+
+### What a deployment asks of its route
+
+A deployment that has a route may state limits for it on its own row; the blueprint turns them into the gateway's settings (`RD.SUPPORT.INFRA.116`).
+
+```ts
+export interface SPEstateAppDeploymentGateway {
+  rateLimit: SPEstateAppDeploymentGatewayRateLimit | null;  // a ceiling on requests from one address, counted in front of every pod
+  timeoutSeconds: CDTInt | null;                            // how long one request may take
+  maxBodyMegabytes: CDTInt | null;                          // the largest request body accepted
+}
+
+export interface SPEstateAppDeploymentGatewayRateLimit {
+  max: CDTInt;
+  windowSeconds: CDTInt;
+}
+```
+
+- **The manifest names the need and never the gateway's own field**, so the gateway can be replaced without touching a manifest.
+- **Each member left out takes the gateway's default.**
+- **The block sits on a deployment that has a route:** an API, or a web deployment that declares a port. It is refused on a web deployment with no port and on one whose `expose` is `INTERNAL`.
+- **It applies to the main route.** A remote route takes the gateway's defaults.
+
+The gateway's limit counts calls to the whole deployment from one address and stops a flood before it reaches a pod. A route's own limit is declared in code, counts calls to one route from one caller, and gives a fair share of one costly thing.
+
+### A web firewall on the public load balancer
+
+An environment's internet-facing load balancer is given one web firewall, declared on the environment, covering every public deployment behind it (`RD.SUPPORT.INFRA.117`). It starts with three of the cloud's rule groups (common rules, known bad inputs, address reputation) and starts by counting only. Nothing is attached to the internal load balancer, and a public web application is not covered, because it is a bundle served from the edge.
+
+## Locally, only the ports are read
+
+**An application on a developer's machine is its own tree, and the estate is not consulted about that — MUST.** Its folder and its kind manifest say it exists; the row governs only what **deploys**. A machine reads two facts from a row: a deployment's declared port, so the local ingress sends the app's host to the port the app listens on, and a declared remote port, so the tool can write that service's remote address into the settings of the services that call it. That separates the two lifecycles twice over: a new environment never needs a code release, and a new commit never touches the estate. Requiring a grant to run locally would put the estate between a developer and their own machine, protecting nothing — there is no shared surface to protect and no cost to bound.
 
 ## What it makes checkable
 
 | Defect | What it means |
 | --- | --- |
 | something deployed with no row | it is running by accident rather than by grant, and the declaration is documentation |
-| a claim read as a binding | a missing dependency reads as a typo |
-| a binding read as a claim | the plan created a second copy of something the estate already had |
+| a grant read as a binding | a missing dependency reads as a typo |
+| a binding read as a grant | the plan created a second copy of something the estate already had |
+| two deployments of one application declaring a remote port | the application's code has no single remote address to name |
 | a shape omitting a fact every deployment declares | a new shape arrived carrying an exemption, and reviews stopped reading the same way |
 | exposure inferred rather than declared | something is reachable from somewhere nobody chose |
 | exposure exceeding its namespace | an application granted itself reach the level above never allowed |

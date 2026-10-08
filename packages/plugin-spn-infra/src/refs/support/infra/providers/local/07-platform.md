@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/local/07-platform.md",
-      "seen": "defc3331"
+      "seen": "c09bf933"
     }
   ]
 }
@@ -16,7 +16,7 @@
 
 ## What it stands
 
-**The engines of every resource world, at the same versions the cloud runs.** A world stands its own instance, so a platform and a space bound beside it hold separate engines rather than sharing one ([resources](../../resources.md)). Each family takes a world-marked hostname and a port from the hundred the platform declares, which [`04-addressing.md`](04-addressing.md) states.
+**The engines of every resource world, at the same versions the cloud runs.** A world stands its own instance, so a platform and a space bound beside it hold separate engines rather than sharing one ([resources](../../resources.md)). Each family takes a world-marked hostname and a port from the five hundred the platform declares, which [`04-addressing.md`](04-addressing.md) states.
 
 **Each installed module's local rendering.** A module package carries its own renderings and the tooling carries none: `src/local/` holds one `docker-compose.yml` and what it mounts, applied by `docker compose` with a `.env` the tooling writes (`RD.SUPPORT.INFRA.078`). The tooling parses neither rendering and names no product on either side.
 
