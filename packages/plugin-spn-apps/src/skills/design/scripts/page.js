@@ -540,7 +540,8 @@ function scanFindings() {
       for (const child of entries.filter((candidate) => candidate.parentId === owner.node.id)) {
         const drawn = [
           ["box", child.node.absoluteBoundingBox ?? rectOfBox(child.box)],
-          ["render", child.node.absoluteRenderBounds ?? null],
+          // a SECTION has no render bounds and Figma throws on the read, so a section is judged by its box alone
+          ["render", child.node.type === "SECTION" ? null : child.node.absoluteRenderBounds ?? null],
         ];
         let worst = null;
         for (const [bounds, rect] of drawn) {

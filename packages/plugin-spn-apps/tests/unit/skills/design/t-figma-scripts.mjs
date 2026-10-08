@@ -65,7 +65,12 @@ const loose = (id, name, box) => ({ id, name, type: "RECTANGLE", x: box[0], y: b
 
 function file(pages) {
   const everything = new Map();
-  const walk = (node) => { everything.set(node.id, node); for (const child of node.children ?? []) { child.parent ??= node; walk(child); } };
+  // real Figma has no render bounds on a SECTION and throws on the read, so the stand-in does too
+  const walk = (node) => {
+    if (node.type === "SECTION") {
+      Object.defineProperty(node, "absoluteRenderBounds", { get() { throw new Error("no such property 'absoluteRenderBounds' on SECTION node"); }, configurable: true });
+    }
+    everything.set(node.id, node); for (const child of node.children ?? []) { child.parent ??= node; walk(child); } };
   const root = { id: "0:0", type: "DOCUMENT", children: pages };
   for (const pageNode of pages) { pageNode.type = "PAGE"; pageNode.parent = root; walk(pageNode); }
   const figma = {
@@ -743,6 +748,14 @@ await guard(async () => {
   const far = iconPart("Q", [600, 860, 400, 220]);
   const part = await outsideOf([unitSection("B", "DSButton", [100, 100], { parts: [far] })]);
   same("a part's section that lies outside its owner's box is named as the owner's child", part.items.map((item) => [item.child, item.section, item.side, item.px]), [["Q:sec", "B:sec", "right", 200]]);
+});
+await guard(async () => {
+  // real Figma throws on absoluteRenderBounds of a SECTION; the stand-in does too, so the scan must not read it
+  const owner = unitSection("B", "DSButton", [100, 100], { parts: [iconPart("P"), iconPart("Q", [600, 860, 400, 220])] });
+  let found = null;
+  try { found = await outsideOf([owner]); } catch (error) { found = { thrown: error.message }; }
+  same("a sectioned page with a part section inside its owner and one outside answers, names the outside one by box, and does not throw",
+    found.items?.map((item) => [item.child, item.section, item.side, item.px, item.bounds]) ?? found, [["Q:sec", "B:sec", "right", 200, "box"]]);
 });
 await guard(async () => {
   const flat = await scanOf([buttonSet(tidy), buttonHeader(), loose("X:f", "Rectangle", [5000, 5000, 10, 10])]);
