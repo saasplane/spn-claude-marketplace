@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/03-utils/01-spnutils.md",
-      "seen": "6ee555a6"
+      "seen": "e2890d5c"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/03-utils/01-spnutils/01-utils.md",
-      "seen": "1aad73e4"
+      "seen": "b7a74c9b"
     }
   ],
   "decisions": [
@@ -117,12 +117,6 @@ child, and never from a transcript — MUST** (`RD.DEVEX.AGENT.082`).
 
 **The permission tiers the floor writes follow a rule of the delivery chapter.** A tier is declared on a
 command or on a group of commands, and a plugin declares the tiers of its own command groups.
-
-**`workspace env rename <from> <to>` renames one key of the seat file, `~/.spnenv`, and follows it in
-every `${reference}`.** The value stays as typed and is never printed; the answer holds names and
-counts. It refuses when the file assigns no `<from>` and when it assigns both names, and it reports
-nothing to rename (exit 0) when only `<to>` is assigned. It is in the `ask` tier, and it refuses a
-line inside a region the tool writes whole (`producer`, `managed`).
 
 **There is no command for opening a scope of work.** A workstream is a folder in one of three
 states; you make the folder, `status` lists what is open, and a write-time check holds the close
