@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/02-infra/10-providers/aws/08-environment.md",
-      "seen": "f883af65"
+      "seen": "46ae43a1"
     }
   ]
 }
@@ -43,7 +43,8 @@
 | Carries | each `PUBLIC` deployment's main route | each `PRIVATE` deployment's main route, and every remote port's route |
 
 - **The gateway is Envoy Gateway**, installed from its chart at a stated version. A route is the standard Gateway API kind, so a route names no product.
-- **Each gateway has its own proxies and its own `Service`**, and the two share nothing, so a route on the private gateway has no path from the internet.
+- **Each gateway has a namespace of its own, `gateway-public` and `gateway-private`, with its own proxies and its own `Service`**, and the two share nothing, so a route on the private gateway has no path from the internet. The gateway's controller runs in `kube-system`, and no proxy runs there.
+- **A network rule names one caller for each port.** The public gateway's proxies reach the main port of a `PUBLIC` deployment and nothing else. The private gateway's proxies reach the main port of a `PRIVATE` deployment, and every remote port. The cluster's network add-on is told to enforce the rules.
 - **Each load balancer is one ingress of class `alb`** that names its gateway's `Service`. HTTPS ends there, on 443 alone, with the workload's wildcard certificates, and plain HTTP goes on to the proxies.
 - **A route's host is given a record that points at its gateway's host**, so no route names a load balancer.
 - **A deployment's rate limit is one count across a gateway's proxy pods**, kept in the environment's own cache (`RD.SUPPORT.INFRA.120`).
@@ -56,7 +57,7 @@
 
 **The environment publishes what a call between services needs** (`RD.SUPPORT.INFRA.114`). The platform's world writes the credential block once: `{SPC}_REMOTE_CREDENTIAL_PROVIDER=KUBERNETES`, the cluster's issuer, the namespaces `plt,prd,vnd`, the audience `spn-remote` and the token's path. Each deployment that declares a remote port publishes `{SPC}_REMOTE_SERVICE_{NAME}_ENDPOINTS` as `https://{env}-{app}-remote.internal.{spd}`. The world also publishes the gateway's rate limit store in the secret half: `{SPC}_GATEWAY_RATE_LIMIT_STORE_URL`, `_AUTH` and `_TLS`.
 
-**A deployment is placed by its `ns`, its code and its `expose`.** `PUBLIC` is a route on the public gateway, `PRIVATE` a route on the private one, and `INTERNAL` has no route; `NONE` is refused by name. A `gateway` block becomes the route's policy. A remote port gets a second route on the private gateway, whatever `expose` says, a network rule that admits this environment's namespaces alone, and every pod that is not a web deployment is given a token marked `spn-remote`. Each deployment is rendered `{PREFIX}_API_TRUSTED_PROXIES` (`2` behind a route, `0` for `INTERNAL`) and `{PREFIX}_API_REMOTE_TRUSTED_PROXIES` (`3`).
+**A deployment is placed by its `ns`, its code and its `expose`.** `PUBLIC` is a route on the public gateway, `PRIVATE` a route on the private one, and `INTERNAL` has no route; `NONE` is refused by name. A `gateway` block becomes the route's policy. A remote port gets a second route on the private gateway, whatever `expose` says, a network rule that admits this environment's namespaces and the private gateway's proxies alone, and every pod that is not a web deployment is given a token marked `spn-remote`. Each deployment is rendered `{PREFIX}_API_TRUSTED_PROXIES` (`2` behind a route, `0` for `INTERNAL`) and `{PREFIX}_API_REMOTE_TRUSTED_PROXIES` (`3`).
 
 **Act 4 also creates the key for stored secrets** (`RD.SUPPORT.INFRA.109`). It is a second KMS key in the environment, beside the data key and apart from it, with yearly rotation on. Nothing in `spestate.json` asks for it: every environment has one. **Give it a key policy of its own**, because the provisioning role holds every action in the account and an IAM grant alone would let that role use the key. The policy admits the workload roles of the apps that list the seal, and refuses the provisioning role.
 
