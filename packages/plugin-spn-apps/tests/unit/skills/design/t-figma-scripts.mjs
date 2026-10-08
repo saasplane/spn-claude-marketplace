@@ -45,8 +45,12 @@ function version(id, name, x, y, width = 100, height = 40, extra = {}) {
 // A layer inside a component, as the API answers on 4,226 real versions: `componentPropertyReferences` is an object of the
 // properties the layer is tied to (keys `characters`, `visible`, `mainComponent`, and `slotContentId` on a SLOT, which may
 // also hold `visible`), and `{}` when it is tied to none; never null or undefined. A node outside a component holds null.
-const layer = (id, name, type, references = null, children = undefined) => {
+// `values` is what the layer draws: `visible`, `characters`, and `main` (the component an instance is of, read asynchronously).
+const layer = (id, name, type, references = null, children = undefined, values = null) => {
   const node = { id, name, type, x: 0, y: 0, width: 10, height: 10, ...(children ? { children } : {}) };
+  if (values && "visible" in values) node.visible = values.visible;
+  if (values && "characters" in values) node.characters = values.characters;
+  if (values && "main" in values) node.getMainComponentAsync = async () => values.main;
   Object.defineProperty(node, "componentPropertyReferences", { configurable: true, get() { return references ?? {}; } });
   return node;
 };
@@ -513,7 +517,7 @@ await guard(async () => {
   const empty = componentSet("1:set", "DSImage", [0, 0, 300, 200], [version("1:a", "state=loading", 20, 20, 100, 40, { empty: true }), version("1:b", "state=rest", 140, 20, 0, 40)]);
   const scan = (await scanOf([empty, labelText("1:label", "DSImage — one row · columns: state=loading, rest", [0, -30, 300, 20])]));
   same("an empty version says why it is empty", scan.findings.emptyVersions.items.map((item) => [item.version, item.why]), [["1:a", "no layer"], ["1:b", "no size"]]);
-  same("empty versions do not make the page unclean, and the answer says which findings do not block", [scan.clean, scan.notBlocking], [true, ["emptyVersions", "emptyCases", "unitsWithoutCases", "behaviourNamesNoProperty", "usagesWithoutCaption", "partSectionTooWide", "propertyClearedByNameAlone", "versionSlotIsFrame"]]);
+  same("empty versions do not make the page unclean, and the answer says which findings do not block", [scan.clean, scan.notBlocking], [true, ["emptyVersions", "emptyCases", "unitsWithoutCases", "behaviourNamesNoProperty", "usagesWithoutCaption", "partSectionTooWide", "propertyClearedByNameAlone", "versionSlotIsFrame", "versionDiffersFromDefault"]]);
 });
 // 9. the scan names a set whose default version is not the one its label names (DSBadge), and gives no false hit
 await guard(async () => {
@@ -1097,8 +1101,8 @@ await guard(async () => {
   const found = await wiredScan([wiredVersion("W:1", "size=SM", 0, bodyOf("W:1", false)), wiredVersion("W:2", "size=MD", 60, bodyOf("W:2", false))]);
   same("a set where no version holds any reference has nothing to compare", [found.versionNotWired.count, found.versionSlotIsFrame.count], [0, 0]);
   const apart = await wiredScan([wiredVersion("W:1", "size=SM, tone=A", 0, bodyOf("W:1", true)), wiredVersion("W:2", "size=MD, tone=B", 60, bodyOf("W:2", false))]);
-  same("a version that differs from the wired one in two values is named all the same: the twin no longer decides, and it has no nearest wired version",
-    apart.versionNotWired.items.map((item) => [item.version, item.missing, item.nearest]), [["W:2", 3, null]]);
+  same("a version that differs from the wired one in two values is named all the same: the twin no longer decides, and its nearest is the wired version that holds every missing tie with the fewest values apart",
+    apart.versionNotWired.items.map((item) => [item.version, item.missing, item.nearest]), [["W:2", 3, "W:1"]]);
   const lone = await wiredScan([wiredVersion("W:1", "size=SM", 0, bodyOf("W:1", true))]);
   same("a set of one version has no twin", lone.versionNotWired.count, 0);
   const twice = await wiredScan([
@@ -1114,9 +1118,9 @@ await guard(async () => {
   // DSInput-like: only kind=TEXT, size=SM holds the references; the others have a twin that holds none, or none at all.
   const grid = [["TEXT", "SM"], ["TEXT", "MD"], ["NUMBER", "SM"], ["NUMBER", "MD"], ["EMAIL", "SM"], ["EMAIL", "MD"]];
   const found = await wiredScan(grid.map(([kind, size], at) => wiredVersion(`W:${at}`, `kind=${kind}, size=${size}`, at * 60, bodyOf(`W:${at}`, at === 0))));
-  same("every version that lacks what any version holds is named, also one whose one-value twins are all unwired too; the nearest wired version is given, or null",
+  same("every version that lacks what any version holds is named, also one whose one-value twins are all unwired too; the nearest wired version is given: a twin one value apart, else the one that holds every missing tie",
     found.versionNotWired.items.map((item) => [item.version, item.missing, item.nearest]),
-    [["W:1", 3, "W:0"], ["W:2", 3, "W:0"], ["W:3", 3, null], ["W:4", 3, "W:0"], ["W:5", 3, null]]);
+    [["W:1", 3, "W:0"], ["W:2", 3, "W:0"], ["W:3", 3, "W:0"], ["W:4", 3, "W:0"], ["W:5", 3, "W:0"]]);
 });
 await guard(async () => {
   // DSLayoutNavNode-like: a SLOT in one version only; the FRAMEs have only FRAME twins, or none a value apart.
@@ -1151,14 +1155,15 @@ await guard(async () => {
   // DSLayout-like: rail > nav is a SLOT tied to nav#5:21 in the versions, and to nav#168:0 in one.
   const rail = (id, key) => [layer(`${id}:r`, "rail", "FRAME", null, [layer(`${id}:n`, "nav", "SLOT", { slotContentId: key })])];
   const found = await wiredScan([
-    wiredVersion("W:1", "side=LEFT", 0, rail("W:1", "nav#5:21")),
-    wiredVersion("W:2", "side=RIGHT", 60, rail("W:2", "nav#5:21")),
-    wiredVersion("W:3", "side=TOP", 120, rail("W:3", "nav#168:0")),
+    wiredVersion("W:1", "side=LEFT, size=SM", 0, rail("W:1", "nav#5:21")),
+    wiredVersion("W:2", "side=LEFT, size=MD", 60, rail("W:2", "nav#5:21")),
+    wiredVersion("W:3", "side=RIGHT, size=SM", 120, rail("W:3", "nav#5:21")),
+    wiredVersion("W:4", "side=RIGHT, size=MD", 180, rail("W:4", "nav#168:0")),
   ]);
-  same("a version tied at a path to another property than the others is named, with the path and both keys, and blocks",
-    [found.versionTiedToAnotherProperty.items.map((item) => [item.version, item.path, item.holds, item.others]), found.versionNotWired.count],
-    [[["W:3", "rail > nav (slotContentId)", "nav#168:0", "nav#5:21"]], 0]);
-  const scan = await scanOf([componentSet("W:set", "DSInput", [0, 0, 300, 400], [wiredVersion("W:1", "side=LEFT", 0, rail("W:1", "a#1:1")), wiredVersion("W:2", "side=RIGHT", 60, rail("W:2", "a#1:1")), wiredVersion("W:3", "side=TOP", 120, rail("W:3", "b#1:2"))]), buttonHeader()]);
+  same("a lone version tied to another property that no single variant explains is named, with the path, both keys and the variant nearest to explaining it, and blocks",
+    [found.versionTiedToAnotherProperty.items.map((item) => [item.version, item.path, item.holds, item.others, item.nearestVariant, item.valuesHoldingBoth]), found.versionNotWired.count],
+    [[["W:4", "rail > nav (slotContentId)", "nav#168:0", "nav#5:21", "side", 1]], 0]);
+  const scan = await scanOf([componentSet("W:set", "DSInput", [0, 0, 300, 400], [wiredVersion("W:1", "side=LEFT, size=SM", 0, rail("W:1", "a#1:1")), wiredVersion("W:2", "side=LEFT, size=MD", 60, rail("W:2", "a#1:1")), wiredVersion("W:3", "side=RIGHT, size=SM", 120, rail("W:3", "a#1:1")), wiredVersion("W:4", "side=RIGHT, size=MD", 180, rail("W:4", "b#1:2"))]), buttonHeader()]);
   same("versionTiedToAnotherProperty blocks", [scan.notBlocking.includes("versionTiedToAnotherProperty"), scan.clean], [false, false]);
   const split = await wiredScan([wiredVersion("W:1", "side=LEFT", 0, rail("W:1", "nav#5:21")), wiredVersion("W:2", "side=RIGHT", 60, rail("W:2", "nav#168:0"))]);
   same("two versions tied to two properties have no minority: none is named", split.versionTiedToAnotherProperty.count, 0);
@@ -1193,6 +1198,84 @@ await guard(async () => {
   Object.defineProperty(lone, "componentPropertyDefinitions", { get() { return definitions; } });
   const loneFound = (await scanOf([lone])).findings.propertyTiedToNothing;
   same("a lone component with definitions is read the same way", loneFound.items.map((item) => [item.setName, item.property]), [["DSChip", "withIcon"], ["DSChip", "startNode"]]);
+});
+
+console.log("\n=== page.js — a split explained by a variant, a layer meant to differ, the nearest version, the caps");
+const wiredScanWith = async (inputs, versions) => (await run("page.js", { pageId: "2:1", report: "scan", findingItems: 25, ...inputs }, file([page("2:1", "Actions", [componentSet("W:set", "DSInput", [0, 0, 300, 400], versions), buttonHeader()])]))).scan.findings;
+await guard(async () => {
+  // DSAccordion-like: the swap on `header row > indicator` follows `expanded`: every expanded version holds one key, every collapsed one the other.
+  const indicator = (id, key) => [layer(`${id}:r`, "header row", "FRAME", null, [layer(`${id}:i`, "indicator", "INSTANCE", { mainComponent: key })])];
+  const found = await wiredScan([
+    wiredVersion("W:1", "expanded=true, state=rest", 0, indicator("W:1", "expandedIcon#1:1")),
+    wiredVersion("W:2", "expanded=true, state=hover", 60, indicator("W:2", "expandedIcon#1:1")),
+    wiredVersion("W:3", "expanded=true, state=focus", 120, indicator("W:3", "expandedIcon#1:1")),
+    wiredVersion("W:4", "expanded=false, state=rest", 180, indicator("W:4", "collapsedIcon#1:2")),
+  ]);
+  same("a swap that follows a variant (every expanded version one key, every collapsed one the other) is not named, though the collapsed one is the minority", found.versionTiedToAnotherProperty.count, 0);
+  // .DSContainerFrames-like: the layer `frame` is the footer in frames=FOOTER and the header in the others.
+  const frame = (id, key) => [layer(`${id}:f`, "frame", "FRAME", { visible: key })];
+  const frames = await wiredScan([
+    wiredVersion("W:1", "frames=HEADER, size=SM", 0, frame("W:1", "withHeader#1:1")),
+    wiredVersion("W:2", "frames=HEADER, size=MD", 60, frame("W:2", "withHeader#1:1")),
+    wiredVersion("W:3", "frames=HEADER+FOOTER, size=SM", 120, frame("W:3", "withHeader#1:1")),
+    wiredVersion("W:4", "frames=HEADER+FOOTER, size=MD", 180, frame("W:4", "withHeader#1:1")),
+    wiredVersion("W:5", "frames=FOOTER, size=SM", 240, frame("W:5", "withFooter#1:2")),
+  ]);
+  same("a layer that is the footer in one value of a variant and the header in the others is not named: `frames` explains the split", frames.versionTiedToAnotherProperty.count, 0);
+  // two variants together: the key is y for (B, M) and (C, S) only; neither layout nor size explains it alone.
+  const both = [["A", "S", "x"], ["A", "M", "x"], ["B", "S", "x"], ["B", "M", "y"], ["C", "S", "y"], ["C", "M", "x"], ["D", "S", "x"], ["D", "M", "x"]];
+  const together = await wiredScan(both.map(([layout, size, key], at) => wiredVersion(`W:${at}`, `layout=${layout}, size=${size}`, at * 60, frame(`W:${at}`, `${key}#1:1`))));
+  same("a key that depends on two variants together, which no single variant explains, is named, and the item says which variant comes nearest",
+    together.versionTiedToAnotherProperty.items.map((item) => [item.version, item.nearestVariant, item.valuesHoldingBoth]), [["W:3", "layout", 2], ["W:4", "layout", 2]]);
+});
+await guard(async () => {
+  // DSProgress / DSNavigationMenuItem / DSInput-like: the layer is untied on purpose and shows other than the property's default.
+  const definitions = {
+    "value#1:2": { type: "TEXT", defaultValue: "40%" },
+    "withPanel#1:3": { type: "BOOLEAN", defaultValue: false },
+    "icon#1:4": { type: "INSTANCE_SWAP", defaultValue: "9:9" },
+  };
+  const parts = (id, wired, shown) => [layer(`${id}:b`, "body", "FRAME", null, [
+    layer(`${id}:v`, "value", "TEXT", wired ? { characters: "value#1:2" } : null, undefined, { characters: shown.text }),
+    layer(`${id}:c`, "chevron", "FRAME", wired ? { visible: "withPanel#1:3" } : null, undefined, { visible: shown.visible }),
+    layer(`${id}:i`, "icon", "INSTANCE", wired ? { mainComponent: "icon#1:4" } : null, undefined, { main: shown.main }),
+  ])];
+  const rest = { text: "40%", visible: false, main: { id: "9:9", key: "k9" } };
+  const scan = async (others) => (await scanOf([componentSet("W:set", "DSInput", [0, 0, 300, 400], [wiredVersion("W:1", "percent=40", 0, parts("W:1", true, rest)), ...others.map((one, at) => wiredVersion(`W:${at + 2}`, one[0], 60 * (at + 1), parts(`W:${at + 2}`, false, one[1])))], { definitions }), buttonHeader()]));
+  const meant = await scan([["percent=0", { ...rest, text: "0%", visible: true, main: { id: "8:8", key: "k8" } }]]);
+  same("a version all of whose missing ties would change what is drawn (the text, the visibility, the swap off their defaults) is a version that differs from its default, not a version not wired",
+    [meant.findings.versionNotWired.count, meant.findings.versionDiffersFromDefault.items.map((item) => [item.version, item.missing, item.plain, item.changesDrawing, item.changing])],
+    [0, [["W:2", 3, 0, 3, ["body > value (characters)", "body > chevron (visible)", "body > icon (mainComponent)"]]]]);
+  same("versionDiffersFromDefault does not block", [meant.notBlocking.includes("versionDiffersFromDefault"), meant.findings.versionDiffersFromDefault.count], [true, 1]);
+  const plain = await scan([["percent=60", rest], ["percent=61", { ...rest, main: { id: "x", key: "9:9" } }]]);
+  same("a version whose layers already show the defaults (the swap by the component's id or its key) is a version not wired, with every tie plain",
+    [plain.findings.versionDiffersFromDefault.count, plain.findings.versionNotWired.items.map((item) => [item.version, item.plain, item.changesDrawing, item.changing])], [0, [["W:2", 3, 0, []], ["W:3", 3, 0, []]]]);
+  const mixed = await scan([["percent=0", { ...rest, visible: true }]]);
+  same("a version with one missing tie that would change what is drawn and two plain ones stays a version not wired, giving the counts of each",
+    [mixed.findings.versionDiffersFromDefault.count, mixed.findings.versionNotWired.items.map((item) => [item.version, item.missing, item.plain, item.changesDrawing, item.changing])],
+    [0, [["W:2", 3, 2, 1, ["body > chevron (visible)"]]]]);
+  const unknown = await wiredScan([wiredVersion("W:1", "percent=40", 0, bodyOf("W:1", true)), wiredVersion("W:2", "percent=0", 60, bodyOf("W:2", false))]);
+  same("a tie whose property default is not known counts as plain: the version stays not wired", [unknown.versionDiffersFromDefault.count, unknown.versionNotWired.items.map((item) => [item.plain, item.changesDrawing])], [0, [[3, 0]]]);
+});
+await guard(async () => {
+  const one = (id, wired, extra = []) => [layer(`${id}:a`, "a", "TEXT", wired.includes("a") ? { characters: "a#1:1" } : null), layer(`${id}:b`, "b", "TEXT", wired.includes("b") ? { characters: "b#1:2" } : null), ...extra];
+  const none = await wiredScan([wiredVersion("W:1", "p=1, q=1", 0, one("W:1", ["a"])), wiredVersion("W:2", "p=2, q=2", 60, one("W:2", ["b"])), wiredVersion("W:3", "p=3, q=3", 120, one("W:3", []))]);
+  same("the nearest is null only when no version holds every missing tie (W:3 misses both, and none holds both)", none.versionNotWired.items.map((item) => [item.version, item.nearest]), [["W:1", "W:2"], ["W:2", "W:1"], ["W:3", null]]);
+  const far = await wiredScan([
+    wiredVersion("W:1", "p=1, q=1, r=1", 0, one("W:1", [])),
+    wiredVersion("W:2", "p=2, q=2, r=2", 60, one("W:2", ["a", "b"])),
+    wiredVersion("W:3", "p=2, q=2, r=1", 120, one("W:3", ["a", "b"])),
+  ]);
+  same("where no twin one value apart holds the ties, the nearest is the wired version that holds all of them and differs in the fewest values", far.versionNotWired.items.map((item) => [item.version, item.nearest]), [["W:1", "W:3"]]);
+});
+await guard(async () => {
+  const long = "state=" + "x".repeat(100) + ", filled=" + "y".repeat(40);
+  const many = (id, wired) => [layer(`${id}:b`, "body", "FRAME", null, ["a", "b", "c", "d", "e"].map((name) => layer(`${id}:${name}`, name, "TEXT", wired ? { characters: `${name}#1:1` } : null)))];
+  const versions = () => [wiredVersion("W:1", "state=rest", 0, many("W:1", true)), wiredVersion("W:2", long, 60, many("W:2", false))];
+  const found = await wiredScanWith({}, versions());
+  same("a version name is kept to 160 characters, and the paths to the first three by default", [found.versionNotWired.items[0].name.length, found.versionNotWired.items[0].paths.length, found.versionNotWired.items[0].missing], [long.length, 3, 5]);
+  const whole = await wiredScanWith({ pathsNamed: 100 }, versions());
+  same("`pathsNamed` asks for every path", [whole.versionNotWired.items[0].paths.length, whole.versionNotWired.items[0].paths[4]], [5, "body > e (characters)"]);
 });
 
 console.log("\n=== page.js — the four weaknesses of the property check");
