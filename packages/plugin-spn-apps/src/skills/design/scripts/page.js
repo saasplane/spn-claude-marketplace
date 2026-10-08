@@ -9,7 +9,7 @@
 //   of a page of about 100 nodes takes three ranges, each continued from `next`.)
 //   report inventory what the book's inventory holds for the agent's own work: the page, each set and
 //                    lone component, each sheet of cases, each label with its layer name, full text and
-//                    the unit it names, each sample, each section, each reference frame and every other node.
+//                    the unit it names, each usage, each section, each reference frame and every other node.
 //                    Every node carries `index`, its place in the page's order (the walk down through the
 //                    sections), `name`, its layer name, and, inside a section, `parent`, that section's id.
 //                    `from` and `to` take a range of nodes by `index`, and the answer stops by itself before
@@ -19,8 +19,8 @@
 //                    the first items of each finding, the page's `form` and what it `read`. A scan that found
 //                    no unit is not clean: `emptyReading` says so. `childOutsideSection` names each child that
 //                    lies beyond its section's box (by its box or by what it draws) by more than 1 px, with the
-//                    side and the px. `unitsWithoutSample` blocks: it names each top-level unit with no sample (a part owes none; a
-//                    unit drawn as cases alone, with no component in its section, takes its first case for its sample).
+//                    side and the px. `unitsWithoutUsage` blocks: it names each top-level unit with no usage (a part owes none; a
+//                    unit drawn as cases alone, with no component in its section, takes its first case for its usage).
 //                    `propertyNotDrawn` blocks: it names each BOOLEAN, INSTANCE_SWAP and TEXT property of a unit (a part too)
 //                    that nothing on the page draws off its default and that the unit's header does not name after
 //                    `behaviour: ` (a note of the header, such as ` · behaviour: collapsible, sticky`), with the unit,
@@ -28,8 +28,8 @@
 //                    off its default, or when a case of the unit's sheet (or a loose case component in its section) is named
 //                    for it, `<property>=`. A swap named `startIcon` is judged with the boolean `withStartIcon` of the unit.
 //                    `behaviourNamesNoProperty` names a property the clause gives that the unit does not have. These do not
-//                    block: `unitsWithoutCases` (a unit whose versions draw everything owes no sheet), `samplesWithoutCaption`
-//                    (a sample with no caption directly above it) and `partSectionTooWide` (a part's section with more than the
+//                    block: `unitsWithoutCases` (a unit whose versions draw everything owes no sheet), `usagesWithoutCaption`
+//                    (a usage with no caption directly above it) and `partSectionTooWide` (a part's section with more than the
 //                    padding empty at its right).
 //   report both      the two together, for a small page. The whole answer stays under `maxBytes`: the scan
 //                    gives up items first, then the inventory stops early, and `cut` says what was left out.
@@ -43,10 +43,10 @@
 // A set's versions carry their own box inside the set.
 //
 // A node is one of: a section, a set, a component, a sheet (a frame named `<unit> cases`), a label (a text
-// that is a header, a row label, a column label or a band's label), a sample (`sample · ...`), a reference
+// that is a header, a row label, a column label or a band's label), a usage (`usage · ...`), a reference
 // frame (a frame on a page that holds no set and no component), or other. Only `other` is a stray. A header's
 // layer is `header · <Unit>`; every other label's is `label · <text>`, a sheet's label (`<unit> cases — ...`,
-// part `sheet`) included, and it stands in the Cases band. A sample's name begins with its unit's name.
+// part `sheet`) included, and it stands in the Cases band. A usage's name begins with its unit's name.
 //
 // A row label belongs to the row it sits by and a column label to the column it sits by: the label's centre
 // must lie inside the span of one row (or column) of a set's versions, with the label beside the set (left
@@ -66,7 +66,7 @@ const INPUTS = {
 // ---- the book's label form: begin (this block is the same in page.js and layout.js)
 const LABEL_PREFIX = "label · ";
 const HEADER_PREFIX = "header · ";
-const SAMPLE_PREFIX = "sample · ";
+const USAGE_PREFIX = "usage · ";
 const UNIT_SEPARATOR = " — ";
 const CLAUSE_SEPARATOR = " · ";
 const FACTOR_SEPARATOR = " x ";
@@ -148,10 +148,10 @@ function defaultMarksOf(text) {
 const SHEET_SUFFIX = " cases";
 const EDITOR_DEFAULT_PROPERTY = /^Property \d+$/;
 const CASE_NAME = /^[^=,]+=[^=,]+(, [^=,]+=[^=,]+)*$/;
-const NOT_BLOCKING = ["emptyVersions", "emptyCases", "unitsWithoutCases", "behaviourNamesNoProperty", "samplesWithoutCaption", "partSectionTooWide"];
+const NOT_BLOCKING = ["emptyVersions", "emptyCases", "unitsWithoutCases", "behaviourNamesNoProperty", "usagesWithoutCaption", "partSectionTooWide"];
 const DRAWABLE_TYPES = ["BOOLEAN", "INSTANCE_SWAP", "TEXT"];
 const BEHAVIOUR_CLAUSE = "behaviour: ";
-// The distances of a section (the book's table): the padding, the gap a caption may stand above its sample, the edge a caption may be off.
+// The distances of a section (the book's table): the padding, the gap a caption may stand above its usage, the edge a caption may be off.
 const SECTION_PADDING = 80;
 const CAPTION_REACH = 48;
 const CAPTION_EDGE = 2;
@@ -295,24 +295,24 @@ for (const { node } of placed) {
 }
 
 // A text is a header when it names a unit before ` — ` and says a layout or names a unit by its shape. A
-// caption such as `sample · DSImagePicker open — more` and a value such as `none — follows the hue` is not.
+// caption such as `usage · DSImagePicker open — more` and a value such as `none — follows the hue` is not.
 function isHeaderText(text) {
-  if (text.startsWith(SAMPLE_PREFIX)) return false;
+  if (text.startsWith(USAGE_PREFIX)) return false;
   const cut = text.indexOf(UNIT_SEPARATOR);
   if (cut <= 0) return false;
   const head = text.slice(0, cut);
   return UNIT_LIKE.test(head) || unitNames.has(head) || parseHeader(text).layout !== null;
 }
 
-function isSample(node) {
-  return node.name.startsWith(SAMPLE_PREFIX) || (node.type === "TEXT" && (textOf(node) ?? "").startsWith(SAMPLE_PREFIX));
+function isUsage(node) {
+  return node.name.startsWith(USAGE_PREFIX) || (node.type === "TEXT" && (textOf(node) ?? "").startsWith(USAGE_PREFIX));
 }
 
 function kindOf(node) {
   if (node.type === "COMPONENT_SET") return "set";
   if (node.type === "COMPONENT") return "component";
   if (isSheet(node)) return "sheet";
-  if (isSample(node)) return "sample";
+  if (isUsage(node)) return "usage";
   if (isSection(node)) return "section";
   if (node.type === "TEXT" && (node.name.startsWith(LABEL_PREFIX) || node.name.startsWith(HEADER_PREFIX) || isHeaderText(textOf(node) ?? ""))) return "label";
   if ((node.type === "FRAME" || node.type === "SECTION") && !pageHoldsUnits) return "reference";
@@ -323,7 +323,7 @@ const entries = placed.map((item, index) => ({ ...item, index, kind: kindOf(item
 const topLevel = entries.filter((entry) => entry.depth === 0);
 const sets = entries.filter((entry) => entry.kind === "set");
 const form = topLevel.length === 0 ? "empty" : topLevel.some((entry) => entry.kind === "section") ? "sections" : "flat";
-const BAND_LABELS = ["Cases", "Samples", "Parts"];
+const BAND_LABELS = ["Usage", "Cases", "Parts"];
 // The unit a set, a lone component or a sheet stands for: a case component is no unit of its own.
 const unitEntryByName = new Map();
 for (const entry of entries) {
@@ -393,10 +393,10 @@ function readLabel(entry) {
 const labelEntries = entries.filter((entry) => entry.kind === "label").map((entry) => ({ entry, ...readLabel(entry) }));
 const labelOf = new Map(labelEntries.map((label) => [label.entry, label]));
 
-// A sample belongs to the unit whose name its caption begins with, where one does.
-function unitOfSample(node) {
+// A usage belongs to the unit whose name its caption begins with, where one does.
+function unitOfUsage(node) {
   const shown = node.type === "TEXT" ? (textOf(node) ?? "") : node.name;
-  const after = shown.slice(SAMPLE_PREFIX.length);
+  const after = shown.slice(USAGE_PREFIX.length);
   const names = [...unitNames].filter((name) => after === name || after.startsWith(name + " ")).sort((first, second) => second.length - first.length);
   return names[0] ?? null;
 }
@@ -460,12 +460,12 @@ function inventoryEntry(entry) {
       ...(found.form ? { form: found.form } : {}), ...(found.reason ? { reason: found.reason } : {}),
     };
   }
-  if (kind === "sample") return { ...base, nodeType: node.type, unit: unitOfSample(node) };
+  if (kind === "usage") return { ...base, nodeType: node.type, unit: unitOfUsage(node) };
   if (kind === "section") return { ...base, nodeType: node.type, children: node.children.length };
   return { ...base, nodeType: node.type };
 }
 
-const GROUP_OF = { set: "sets", component: "components", sheet: "sheets", label: "labels", sample: "samples", section: "sections", reference: "references", other: "others" };
+const GROUP_OF = { set: "sets", component: "components", sheet: "sheets", label: "labels", usage: "usages", section: "sections", reference: "references", other: "others" };
 
 // The inventory of a range of the page's nodes, in the order of the walk down through the sections. It stops before `budget` bytes and says where to go on. With
 // `allowFirst` false, not even the first node is taken when it does not fit.
@@ -573,11 +573,11 @@ function scanFindings() {
     .map((label) => ({ label: label.entry.node.id, unit: label.unit, reason: label.reason }));
 
   // The unit that a thing names must stand in the same section as the thing: a header, a row or column label,
-  // a sheet of cases and a sample are the unit's own.
+  // a sheet of cases and a usage are the unit's own.
   const outsideUnitSection = [];
-  for (const entry of entries.filter((candidate) => ["sheet", "sample", "label"].includes(candidate.kind))) {
+  for (const entry of entries.filter((candidate) => ["sheet", "usage", "label"].includes(candidate.kind))) {
     const name = entry.kind === "sheet" ? entry.node.name.slice(0, -SHEET_SUFFIX.length)
-      : entry.kind === "sample" ? unitOfSample(entry.node) : labelOf.get(entry).unit;
+      : entry.kind === "usage" ? unitOfUsage(entry.node) : labelOf.get(entry).unit;
     const owner = unitEntryByName.get(name);
     if (owner && owner !== entry && owner.parentId !== entry.parentId) {
       outsideUnitSection.push({ id: entry.node.id, kind: entry.kind, unit: name, in: entry.parentId, unitIn: owner.parentId });
@@ -605,7 +605,7 @@ function scanFindings() {
     }
   }
   // A unit whose versions draw everything it can show owes no sheet, so `unitsWithoutCases` is a count that does not
-  // block. A top-level unit owes a sample of its primary use, so `unitsWithoutSample` blocks. A part (a unit in a
+  // block. A top-level unit owes a usage, which shows its primary use, so `unitsWithoutUsage` blocks. A part (a unit in a
   // section inside a section, a name that starts with a dot, or a unit in `Shared parts`) owes neither.
   const sectionNameOf = (id) => entries.find((candidate) => candidate.node.id === id)?.node.name ?? null;
   const topUnits = form !== "sections" ? [] : [...unitEntryByName].filter(([name, entry]) =>
@@ -613,11 +613,11 @@ function scanFindings() {
   const unitsWithoutCases = topUnits.filter(([name, entry]) => !entries.some((candidate) => candidate.parentId === entry.parentId &&
     ((candidate.kind === "sheet" && candidate.node.name === name + SHEET_SUFFIX) || (candidate.kind === "component" && CASE_NAME.test(candidate.node.name)))))
     .map(([name, entry]) => ({ unit: name, id: entry.node.id, in: entry.parentId }));
-  // A unit drawn as cases alone (a sheet, and no component in its section) takes its first case for its sample.
+  // A unit drawn as cases alone (a sheet, and no component in its section) takes its first case for its usage.
   const drawnAsCasesAlone = (entry) => entry.kind === "sheet" && entry.node.children.some((child) => !isSheetLabel(child)) &&
     !unitEntries.some((candidate) => candidate.parentId === entry.parentId);
-  const unitsWithoutSample = topUnits.filter(([name, entry]) => !drawnAsCasesAlone(entry) && !entries.some((candidate) => candidate.kind === "sample" &&
-    candidate.parentId === entry.parentId && unitOfSample(candidate.node) === name))
+  const unitsWithoutUsage = topUnits.filter(([name, entry]) => !drawnAsCasesAlone(entry) && !entries.some((candidate) => candidate.kind === "usage" &&
+    candidate.parentId === entry.parentId && unitOfUsage(candidate.node) === name))
     .map(([name, entry]) => ({ unit: name, id: entry.node.id, in: entry.parentId }));
   const propertyNotDrawn = [];
   const behaviourNamesNoProperty = [];
@@ -645,9 +645,9 @@ function scanFindings() {
       behaviourNamesNoProperty.push({ unit: unit.node.name.slice(0, 80), id: unit.node.id, name: name.slice(0, 80), in: unit.parentId });
     }
   }
-  // A sample's caption stands directly above it, level at the left edge, within the reach of the section's distances.
-  const samplesWithoutCaption = entries.filter((entry) => entry.kind === "sample" && entry.node.type !== "TEXT" && entry.parentId !== null &&
-    !entries.some((caption) => caption.kind === "sample" && caption.node.type === "TEXT" && caption.parentId === entry.parentId &&
+  // A usage's caption stands directly above it, level at the left edge, within the reach of the section's distances.
+  const usagesWithoutCaption = entries.filter((entry) => entry.kind === "usage" && entry.node.type !== "TEXT" && entry.parentId !== null &&
+    !entries.some((caption) => caption.kind === "usage" && caption.node.type === "TEXT" && caption.parentId === entry.parentId &&
       Math.abs(caption.box[0] - entry.box[0]) <= CAPTION_EDGE && caption.box[1] + caption.box[3] <= entry.box[1] + CAPTION_EDGE &&
       entry.box[1] - (caption.box[1] + caption.box[3]) <= CAPTION_REACH))
     .map((entry) => ({ id: entry.node.id, name: entry.node.name.slice(0, 80), in: entry.parentId }));
@@ -665,17 +665,17 @@ function scanFindings() {
   const meetingInSection = sectionIds.flatMap((sectionId) => pairsThatMeet(
     entries.filter((entry) => entry.parentId === sectionId).map((entry) => ({ id: entry.node.id, box: entry.box })))
     .map((pair) => ({ section: sectionId, pair })));
-  // A section's pieces, from the top: header, the set with its labels, cases, samples, parts. Read by the top of each.
-  const BANDS = ["header", "set", "cases", "samples", "parts"];
+  // A section's pieces, from the top: header, the set with its labels, usage, cases, parts. Read by the top of each.
+  const BANDS = ["header", "set", "usage", "cases", "parts"];
   const bandOf = (entry) => {
-    if (entry.kind === "set" || entry.kind === "component") return CASE_NAME.test(entry.node.name) ? 2 : 1;
-    if (entry.kind === "sheet") return 2;
-    if (entry.kind === "sample") return 3;
+    if (entry.kind === "set" || entry.kind === "component") return CASE_NAME.test(entry.node.name) ? 3 : 1;
+    if (entry.kind === "sheet") return 3;
+    if (entry.kind === "usage") return 2;
     if (entry.kind === "section") return 4;
     const label = labelOf.get(entry);
     if (!label) return null;
     if (label.part === "header") return 0;
-    if (label.part === "sheet") return 2;
+    if (label.part === "sheet") return 3;
     if (label.part === "row" || label.part === "column") return 1;
     return label.part === "band" ? 2 + BAND_LABELS.indexOf(label.text) : null;
   };
@@ -693,7 +693,7 @@ function scanFindings() {
   const headed = new Set(labelEntries.filter((label) => label.part === "header").map((label) => label.unit));
   const unitsWithoutHeader = [...unitEntryByName].filter(([name]) => !headed.has(name))
     .map(([name, entry]) => ({ unit: name, id: entry.node.id, in: entry.parentId }));
-  const samplesNamingNoUnit = entries.filter((entry) => entry.kind === "sample" && unitOfSample(entry.node) === null)
+  const usagesNamingNoUnit = entries.filter((entry) => entry.kind === "usage" && unitOfUsage(entry.node) === null)
     .map((entry) => ({ id: entry.node.id, name: entry.node.name.slice(0, 80), in: entry.parentId }));
   const kinds = (kind) => entries.filter((entry) => entry.kind === kind).length;
   const emptyReading = kinds("set") + kinds("component") + kinds("sheet") === 0
@@ -701,11 +701,11 @@ function scanFindings() {
     : [];
 
   return {
-    emptyReading, samplesNamingNoUnit, versionsOutside, versionPairsMeeting: versionPairs, topLevelPairsMeeting: topLevelPairs.map((pair) => ({ pair })),
+    emptyReading, usagesNamingNoUnit, versionsOutside, versionPairsMeeting: versionPairs, topLevelPairsMeeting: topLevelPairs.map((pair) => ({ pair })),
     strays, defaultNamedProperties, unreadableSets, setsOverLimit, emptyVersions, emptyCases,
     badCaseNames, duplicateCaseNames, labelsUnitElsewhere, labelLayerNames, labelsFormCannotSay, defaultNotLabels,
     topLevelNotSection, meetingInSection, sectionOutOfOrder, unitsWithoutHeader, outsideUnitSection,
-    childOutsideSection, unitsWithoutCases, unitsWithoutSample, propertyNotDrawn, behaviourNamesNoProperty, samplesWithoutCaption, partSectionTooWide,
+    childOutsideSection, unitsWithoutCases, unitsWithoutUsage, propertyNotDrawn, behaviourNamesNoProperty, usagesWithoutCaption, partSectionTooWide,
   };
 }
 
@@ -715,9 +715,9 @@ const scanShown = (limit) => {
   for (const [name, items] of Object.entries(allFindings)) findings[name] = finding(items, limit);
   const blocking = Object.entries(allFindings).filter(([name]) => !NOT_BLOCKING.includes(name));
   const read = Object.fromEntries(Object.keys(GROUP_OF).map((kind) => [GROUP_OF[kind], entries.filter((entry) => entry.kind === kind).length]));
-  const captions = entries.filter((entry) => entry.kind === "sample" && entry.node.type === "TEXT").length;
-  read.samples -= captions;
-  return { clean: blocking.every(([, items]) => items.length === 0), notBlocking: NOT_BLOCKING, form, read: { topLevel: topLevel.length, ...read, sampleLabels: captions }, findings };
+  const captions = entries.filter((entry) => entry.kind === "usage" && entry.node.type === "TEXT").length;
+  read.usages -= captions;
+  return { clean: blocking.every(([, items]) => items.length === 0), notBlocking: NOT_BLOCKING, form, read: { topLevel: topLevel.length, ...read, usageLabels: captions }, findings };
 };
 
 const result = {

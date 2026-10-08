@@ -4,7 +4,7 @@
 // wrapper. Fill INPUTS, change nothing else. It reads a page whose top level holds only sections (a section for each
 // unit, a unit's parts as sections inside it) and changes only the position and size of the sections and of the
 // pieces directly inside them, and the fill of a section. It never changes a set, a version, a property or a layer
-// inside a set, a sheet or a sample, and never the order of the layers. One changing call at a time.
+// inside a set, a sheet or a usage, and never the order of the layers. One changing call at a time.
 //
 //   mode "plan"     dry run: the plan, nothing changed. Returns the page's content line `contentLine`, the one width
 //                   `width` of every top-level section, each section's box before and after, `problems` (two things
@@ -33,12 +33,15 @@
 // A section's pieces are found by name and by role. The header is the text named `header · `. The set is a component
 // set, or a component whose name has no `=` (a lone unit), the topmost one. A row label is a text that ends left of the
 // set within 80 px and level with its rows; a column label is a text that ends 32 px or less above the set and starts
-// over it; both keep their offset from the set. `label · Cases`, `label · Samples` and `label · Parts` are the bands'
-// labels. A thing (a sheet, a sample, a loose case, a part's section) belongs to the last band label above it. A text
+// over it; both keep their offset from the set. `label · Usage`, `label · Cases` and `label · Parts` are the bands'
+// labels. A thing (a sheet, a usage, a loose case, a part's section) belongs to the last band label above it. A text
 // above a thing, the nearest, is its caption: it stands 16 above the thing, their left edges level. The things of a
 // band stand in rows, their tops level, 48 apart, wrapping after `wrapAt`. A thing that draws outside its box
 // (render bounds beyond its bounding box) is given room for what it draws. The page's content line is the padding and
 // the widest column of row labels; every set stands on it.
+//
+// The order of a section, from the top: the header, the set with its labels, Usage, Cases, Parts. `apply` places the
+// bands in that order whatever order they stand in, and the proof fails a section whose bands do not.
 
 const INPUTS = {
   mode: "plan",
@@ -54,9 +57,11 @@ const INPUTS = {
   allowAnomalies: false,
 };
 
-const BAND_LABEL = /^label · (Cases|Samples|Parts)$/;
+const BAND_LABEL = /^label · (Usage|Cases|Parts)$/;
 const HEADER_PREFIX = "header · ";
 const BAND_PREFIX_LENGTH = "label · ".length;
+const BAND_ORDER = ["Usage", "Cases", "Parts"];
+const bandRank = (band) => BAND_ORDER.indexOf(band.name);
 const ROW_LABEL_REACH = 80;
 const COLUMN_LABEL_REACH = 32;
 const distances = INPUTS.distances;
@@ -213,7 +218,7 @@ function planSection(section) {
     }
     bottom = groupBottom;
   }
-  for (const band of reading.bands) {
+  for (const band of [...reading.bands].sort((first, second) => bandRank(first) - bandRank(second))) {
     const labelTop = bottom === null ? distances.padding : bottom + distances.band;
     let rowTop = labelTop;
     if (band.label) {
@@ -480,6 +485,9 @@ function proveRun() {
       for (const label of reading.rowLabels) previousBottom = Math.max(previousBottom, label.y + label.height);
     } else if (reading.header) {
       previousBottom = reading.header.y + reading.header.height;
+    }
+    for (let at = 1; at < reading.bands.length; at += 1) {
+      if (bandRank(reading.bands[at]) < bandRank(reading.bands[at - 1])) fails.push(`${reading.bands[at].name} stands below ${reading.bands[at - 1].name} in ${section.name}`);
     }
     for (const band of reading.bands) {
       if (band.label) {

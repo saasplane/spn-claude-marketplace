@@ -46,7 +46,7 @@ const INPUTS = {
 // ---- the book's label form: begin (this block is the same in page.js and layout.js)
 const LABEL_PREFIX = "label · ";
 const HEADER_PREFIX = "header · ";
-const SAMPLE_PREFIX = "sample · ";
+const USAGE_PREFIX = "usage · ";
 const UNIT_SEPARATOR = " — ";
 const CLAUSE_SEPARATOR = " · ";
 const FACTOR_SEPARATOR = " x ";
@@ -205,7 +205,7 @@ if (versions.length === 0) return refusal([`the set ${set.id} holds no version`]
 
 // 1. The label, and what it says.
 const labels = home.children.filter((node) =>
-  node.type === "TEXT" && !node.name.startsWith(SAMPLE_PREFIX) && node.characters.startsWith(set.name + UNIT_SEPARATOR));
+  node.type === "TEXT" && !node.name.startsWith(USAGE_PREFIX) && node.characters.startsWith(set.name + UNIT_SEPARATOR));
 if (labels.length !== 1) {
   return refusal([labels.length === 0
     ? `no label in ${home.type === "PAGE" ? "this page" : `the section ${home.name}`} names ${set.name}: a set whose label states no layout is reported, not laid out`

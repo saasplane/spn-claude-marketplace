@@ -101,11 +101,24 @@ function unitSection({ stray = false } = {}) {
     set,
     text("S:row", "label · SM (default)", "SM (default)", [100, 160, 40, 20]),
     text("S:col", "label · rest", "rest", [160, 120, 40, 20]),
-    text("S:bs", "label · Samples", "Samples", [50, 300, 100, 20]),
-    text("S:cap", "label · sample · DSButton open", "sample · DSButton open", [53, 330, 150, 20]),
-    node("S:smp", "sample · DSButton open", "INSTANCE", [50, 360, 120, 40]),
+    text("S:bs", "label · Usage", "Usage", [50, 300, 100, 20]),
+    text("S:cap", "label · usage · DSButton open", "usage · DSButton open", [53, 330, 150, 20]),
+    node("S:smp", "usage · DSButton open", "INSTANCE", [50, 360, 120, 40]),
     ...(stray ? [node("S:stray", "Rectangle", "RECTANGLE", [60, 60, 10, 10])] : []),
   ]);
+}
+// The same unit with both bands, Cases standing above Usage: the order the book does not give.
+function casesAboveUsage() {
+  const unit = unitSection();
+  unit.children = unit.children.filter((child) => !["S:bs", "S:cap", "S:smp"].includes(child.id));
+  unit.children.push(
+    text("S:bc", "label · Cases", "Cases", [50, 300, 100, 20]),
+    node("S:sheet", "DSButton cases", "FRAME", [50, 330, 200, 60]),
+    text("S:bs", "label · Usage", "Usage", [50, 450, 100, 20]),
+    text("S:cap", "label · usage · DSButton open", "usage · DSButton open", [53, 480, 150, 20]),
+    node("S:smp", "usage · DSButton open", "INSTANCE", [50, 510, 120, 40]),
+  );
+  return unit;
 }
 const pageOf = (...sections) => file(sections);
 const at = (figma, id) => figma.everything.get(id);
@@ -122,13 +135,22 @@ await guard(async () => {
   same("the header stands at the padding", boxOf(at(figma, "S:head")).slice(0, 2), [80, 80]);
   same("the set stands on the content line, below the header and its column labels", boxOf(at(figma, "S:set")).slice(0, 2), [130, 168]);
   same("a row label and a column label keep their offset from the set", [at(figma, "S:row").x - at(figma, "S:set").x, at(figma, "S:row").y - at(figma, "S:set").y, at(figma, "S:col").x - at(figma, "S:set").x, at(figma, "S:col").y - at(figma, "S:set").y], [-50, 20, 10, -20]);
-  same("the band's label stands 80 below the set, and the caption 24 below the label, 16 above its sample, level with it at the left",
+  same("the band's label stands 80 below the set, and the caption 24 below the label, 16 above its usage, level with it at the left",
     [at(figma, "S:bs").y, at(figma, "S:cap").y, at(figma, "S:smp").y, at(figma, "S:cap").x === at(figma, "S:smp").x], [348, 392, 428, true]);
   same("the section is at the page's top left, as wide as the widest and as high as its content and its padding", boxOf(at(figma, "S:sec")), [0, 0, 460, 548]);
   same("the section takes the top fill", at(figma, "S:sec").fills, [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }]);
   same("no version of the set moved", at(figma, "S:set").children.map(boxOf), [[0, 0, 100, 40], [0, 50, 100, 40]]);
   const again = await run({ mode: "apply" }, figma);
   same("a second apply moves and resizes nothing", [again.nodesMoved, again.nodesResized, again.filled], [0, 0, 0]);
+});
+await guard(async () => {
+  const figma = pageOf(casesAboveUsage());
+  const before = await run({ mode: "prove" }, figma);
+  same("a section with Cases above Usage fails the proof, naming the band", before.fails.includes("Usage stands below Cases in DSButton"), true);
+  const applied = await run({ mode: "apply" }, figma);
+  same("apply places the bands in the book's order: Usage 80 below the set, Cases 80 below the usage",
+    [applied.applied, at(figma, "S:bs").y, at(figma, "S:smp").y, at(figma, "S:bc").y, at(figma, "S:sheet").y], [true, 348, 428, 548, 592]);
+  same("the section is then as high as its content and its padding, and the proof passes", [boxOf(at(figma, "S:sec")), (await run({ mode: "prove" }, figma)).fails], [[0, 0, 460, 732], []]);
 });
 await guard(async () => {
   const figma = pageOf(unitSection({ stray: true }));

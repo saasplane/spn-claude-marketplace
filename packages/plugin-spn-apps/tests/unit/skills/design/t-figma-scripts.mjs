@@ -357,7 +357,7 @@ const REAL = {
   badgeNow: "DSBadge — rows: SOLID, SOFT, OUTLINE, GHOST, LINK, each with SM (default at the top), XS, MD, LG, XL · columns: rest, hover, disabled · every switch is off",
   tone: "none — follows the hue",
   inverse: "INVERSE — white",
-  sampleDialog: "sample · DSDialog over DSBackdrop. It is no component",
+  usageDialog: "usage · DSDialog over DSBackdrop. It is no component",
 };
 // A set of two or four versions named by `names`, laid out one under another, the first at the top left.
 const setNamed = (id, name, box, names) => componentSet(id, name, box, names.map((versionName, at) => version(`${id}:${at}`, versionName, 20, 20 + at * 60)));
@@ -420,14 +420,14 @@ await guard(async () => {
 });
 
 console.log("\n=== the nine faults of the first real reading");
-// 1. a header with no prefix, a sample and a page's own reference frame are not strays
+// 1. a header with no prefix, a usage and a page's own reference frame are not strays
 await guard(async () => {
   const badge = setNamed("1:set", "DSBadge", [200, 8032, 409, 400], ["variant=SOLID, size=SM, disabled=false, state=rest", "variant=SOLID, size=XS, disabled=false, state=rest"]);
   const header = text("1:head", REAL.badgeNow, REAL.badgeNow, [200, 8000, 971, 20]);
-  const sample = { id: "1:smp", name: "sample · nothing set", type: "INSTANCE", x: 680, y: 188, width: 320, height: 53, children: [{ id: "1:smp:0", type: "TEXT" }] };
-  const caption = text("1:cap", "sample · DSDialog over DSBackdrop. It is no component", "sample · DSDialog over DSBackdrop. It is no component", [680, 160, 200, 20]);
-  const found = (await scanOf([badge, header, sample, caption])).findings;
-  same("a header with no prefix, a sample instance and a sample caption are no stray", found.strays.items, []);
+  const usageInstance = { id: "1:smp", name: "usage · nothing set", type: "INSTANCE", x: 680, y: 188, width: 320, height: 53, children: [{ id: "1:smp:0", type: "TEXT" }] };
+  const caption = text("1:cap", "usage · DSDialog over DSBackdrop. It is no component", "usage · DSDialog over DSBackdrop. It is no component", [680, 160, 200, 20]);
+  const found = (await scanOf([badge, header, usageInstance, caption])).findings;
+  same("a header with no prefix, a usage instance and a usage caption are no stray", found.strays.items, []);
   same("the header with no prefix is named as a label with a wrong layer name", found.labelLayerNames.items.map((item) => [item.label, item.why]), [["1:head", "the layer name has no `label · ` prefix"]]);
   const reference = (id, name) => ({ id, name, type: "FRAME", x: 0, y: id === "6:1" ? 0 : 800, width: 1334, height: 699, children: [{ id: `${id}:0`, type: "TEXT" }] });
   const choices = (await run("page.js", { pageId: "2:1", report: "scan" }, file([page("2:1", "Choices", [reference("6:1", "§ 6.1 A hue as text"), reference("6:2", "C1 Selected, on an entry that is no row of a list")])]))).scan.findings;
@@ -460,11 +460,11 @@ await guard(async () => {
   const inventory = await inventoryOf([
     setNamed("1:set", "DSText", [300, 160, 600, 200], ["tone=DEFAULT"]),
     labelText("L:1", REAL.tone, [292, 128, 100, 20]), labelText("L:2", REAL.inverse, [892, 128, 100, 20]),
-    text("S:1", "sample · DSImagePicker open — the picker, open (a caption made up for this case)", "sample · DSImagePicker open — the picker, open (a caption made up for this case)", [900, 900, 100, 20]),
+    text("S:1", "usage · DSImagePicker open — the picker, open (a caption made up for this case)", "usage · DSImagePicker open — the picker, open (a caption made up for this case)", [900, 900, 100, 20]),
   ]);
   same("`none — follows the hue` and `INVERSE — white` are value labels, tied by their column or to none, and never to the unit `none` or `INVERSE`",
     inventory.labels.map((label) => [label.part, label.unit]), [["column", "DSText"], ["untied", null]]);
-  same("a sample's caption with a dash is a sample and names no unit", inventory.samples.map((sample) => [sample.kind, sample.unit]), [["sample", null]]);
+  same("a usage's caption with a dash is a usage and names no unit", inventory.usages.map((usage) => [usage.kind, usage.unit]), [["usage", null]]);
 });
 // 5. a case named with two properties is right
 await guard(async () => {
@@ -497,7 +497,7 @@ await guard(async () => {
   const empty = componentSet("1:set", "DSImage", [0, 0, 300, 200], [version("1:a", "state=loading", 20, 20, 100, 40, { empty: true }), version("1:b", "state=rest", 140, 20, 0, 40)]);
   const scan = (await scanOf([empty, labelText("1:label", "DSImage — one row · columns: state=loading, rest", [0, -30, 300, 20])]));
   same("an empty version says why it is empty", scan.findings.emptyVersions.items.map((item) => [item.version, item.why]), [["1:a", "no layer"], ["1:b", "no size"]]);
-  same("empty versions do not make the page unclean, and the answer says which findings do not block", [scan.clean, scan.notBlocking], [true, ["emptyVersions", "emptyCases", "unitsWithoutCases", "behaviourNamesNoProperty", "samplesWithoutCaption", "partSectionTooWide"]]);
+  same("empty versions do not make the page unclean, and the answer says which findings do not block", [scan.clean, scan.notBlocking], [true, ["emptyVersions", "emptyCases", "unitsWithoutCases", "behaviourNamesNoProperty", "usagesWithoutCaption", "partSectionTooWide"]]);
 });
 // 9. the scan names a set whose default version is not the one its label names (DSBadge), and gives no false hit
 await guard(async () => {
@@ -547,33 +547,33 @@ await guard(async () => {
 // ---- a page whose units sit inside sections ------------------------------------------------------
 //
 // A unit is one section: from the top its header (layer `header · <Unit>`), its set with the row and column
-// labels, its cases, its samples and its parts, a part being a section inside its owner's. A page holds sections
+// labels, its usage, its cases and its parts, a part being a section inside its owner's. A page holds sections
 // and nothing else at its top level. The coordinates below are those of the section a node stands in.
 
 console.log("\n=== a page of sections: the same scripts read it");
 const section = (id, name, box, children) => ({ id, name, type: "SECTION", x: box[0], y: box[1], width: box[2], height: box[3], children });
 const headerText = (id, unit, characters, box) => text(id, `header · ${unit}`, characters, box);
-const sample = (id, name, box, options) => instanceNode(id, name, box, options);
+const usageNode = (id, name, box, options) => instanceNode(id, name, box, options);
 const iconPart = (id, box = [80, 860, 400, 220]) => section(`${id}:sec`, ".DSIcon", box, [
   headerText(`${id}:head`, ".DSIcon", ".DSIcon — one component", [80, 80, 300, 20]),
   version(`${id}:icon`, ".DSIcon", 80, 128, 48, 48),
 ]);
-// One unit's section: header, set with its labels, cases, samples, and the parts it is given.
-function unitSection(sid, name, origin, { header = true, parts = [], sampleAbove = false, sheetLabel = false, caption = true, definitions = {}, note = "", caseNames = ["case=text"] } = {}) {
+// One unit's section: header, set with its labels, usage, cases, and the parts it is given.
+function unitSection(sid, name, origin, { header = true, parts = [], casesAbove = false, sheetLabel = false, caption = true, definitions = {}, note = "", caseNames = ["case=text"] } = {}) {
   const set = componentSet(`${sid}:set`, name, [200, 148, 300, 200], grid(sid, tidy), { definitions });
-  const cases = sheet(`${sid}:sheet`, `${name} cases`, [80, sampleAbove ? 668 : 444, 300, 100], caseNames.map((caseName, at) => sheetCase(`${sid}:c${at + 1}`, caseName)));
-  const shown = sample(`${sid}:smp`, `sample · ${name} open`, [80, sampleAbove ? 444 : 668, 200, 60]);
+  const cases = sheet(`${sid}:sheet`, `${name} cases`, [80, casesAbove ? 444 : 668, 300, 100], caseNames.map((caseName, at) => sheetCase(`${sid}:c${at + 1}`, caseName)));
+  const shown = usageNode(`${sid}:smp`, `usage · ${name} open`, [80, casesAbove ? 668 : 444, 200, 60]);
   return section(`${sid}:sec`, name, [origin[0], origin[1], 800, 1300], [
     ...(header ? [headerText(`${sid}:head`, name, `${name} — rows: size=SM, MD · columns: state=rest, hover${note}`, [80, 80, 600, 20])] : []),
     set,
     labelText(`${sid}:row`, "SM (default)", [116, 168, 60, 20]),
     labelText(`${sid}:col`, "rest", [220, 112, 60, 20]),
-    labelText(`${sid}:lc`, "Cases", [80, sampleAbove ? 624 : 400, 100, 20]),
-    ...(sheetLabel ? [text(`${sid}:sl`, `label · ${name} cases — horizontalScroll=true · wrap=true, wrap=false`, `${name} cases — horizontalScroll=true · wrap=true, wrap=false`, [80, 420, 300, 20])] : []),
-    cases,
-    labelText(`${sid}:ls`, "Samples", [80, sampleAbove ? 400 : 624, 100, 20]),
+    labelText(`${sid}:lu`, "Usage", [80, casesAbove ? 624 : 400, 100, 20]),
     shown,
-    ...(caption ? [text(`${sid}:cap`, `sample · ${name} open`, `sample · ${name} open`, [80, sampleAbove ? 422 : 646, 200, 20])] : []),
+    ...(caption ? [text(`${sid}:cap`, `usage · ${name} open`, `usage · ${name} open`, [80, casesAbove ? 646 : 422, 200, 20])] : []),
+    labelText(`${sid}:lc`, "Cases", [80, casesAbove ? 400 : 624, 100, 20]),
+    ...(sheetLabel ? [text(`${sid}:sl`, `label · ${name} cases — horizontalScroll=true · wrap=true, wrap=false`, `${name} cases — horizontalScroll=true · wrap=true, wrap=false`, [80, casesAbove ? 420 : 644, 300, 20])] : []),
+    cases,
     ...(parts.length > 0 ? [labelText(`${sid}:lp`, "Parts", [80, 820, 100, 20]), ...parts] : []),
   ]);
 }
@@ -588,8 +588,8 @@ await guard(async () => {
   const scan = await scanSections([unitSection("B", "DSButton", [100, 100], { parts: [iconPart("P")] })]);
   same("the same unit in a section, a part's section inside it: clean, and the page is said to be in sections",
     [scan.clean, scan.form, counts(scan)], [true, "sections", {}]);
-  same("the scan says what it read: one unit, its sheet, its sample, its labels and its two sections",
-    [scan.read.sets, scan.read.components, scan.read.sheets, scan.read.samples, scan.read.labels, scan.read.sections, scan.read.topLevel], [1, 1, 1, 1, 7, 2, 1]);
+  same("the scan says what it read: one unit, its sheet, its usage, its labels and its two sections",
+    [scan.read.sets, scan.read.components, scan.read.sheets, scan.read.usages, scan.read.labels, scan.read.sections, scan.read.topLevel], [1, 1, 1, 1, 7, 2, 1]);
 });
 await guard(async () => {
   const inventory = await inventorySections([unitSection("B", "DSButton", [100, 100], { parts: [iconPart("P")] })]);
@@ -599,7 +599,7 @@ await guard(async () => {
     [["DSButton", "B:sec", "header · DSButton"], [".DSIcon", "P:sec", "header · .DSIcon"]]);
   same("a row label and a column label are tied to the set by its rows' and columns' spans, in one frame of reference",
     inventory.labels.filter((label) => ["row", "column"].includes(label.part)).map((label) => [label.part, label.unit]), [["row", "DSButton"], ["column", "DSButton"]]);
-  same("a band's label is no value label and is tied to no unit", inventory.labels.filter((label) => label.part === "band").map((label) => label.text), ["Cases", "Samples", "Parts"]);
+  same("a band's label is no value label and is tied to no unit", inventory.labels.filter((label) => label.part === "band").map((label) => label.text), ["Usage", "Cases", "Parts"]);
   same("the sections are listed, the part's inside its owner's", inventory.sections.map((one) => [one.id, one.parent ?? null]), [["B:sec", null], ["P:sec", "B:sec"]]);
   same("a lone component of a part is found inside its section", [inventory.components[0].id, inventory.components[0].box, inventory.components[0].parent], ["P:icon", [260, 1088, 48, 48], "P:sec"]);
   const range = await run("page.js", { pageId: "2:1", report: "inventory", from: 1, to: 2, maxBytes: 16000 }, sectioned([unitSection("B", "DSButton", [100, 100], { parts: [iconPart("P")] })]));
@@ -635,9 +635,9 @@ await guard(async () => {
   same("two sections that meet also fail the scan", meeting.clean, false);
 });
 await guard(async () => {
-  const swappedBands = await scanSections([unitSection("B", "DSButton", [100, 100], { sampleAbove: true })]);
-  same("a section whose samples stand above its cases is named, with the band it stands below",
-    swappedBands.findings.sectionOutOfOrder.items.map((item) => [item.band, item.standsBelow]), [["cases", "samples"], ["cases", "samples"]]);
+  const swappedBands = await scanSections([unitSection("B", "DSButton", [100, 100], { casesAbove: true })]);
+  same("a section whose cases stand above its usage is named, with the band each piece of the usage stands below",
+    swappedBands.findings.sectionOutOfOrder.items.map((item) => [item.band, item.standsBelow]), [["usage", "cases"], ["usage", "cases"], ["usage", "cases"]]);
   const headerLow = unitSection("B", "DSButton", [100, 100]);
   headerLow.children.find((child) => child.id === "B:head").y = 380;
   same("a header below the set is named", (await scanSections([headerLow])).findings.sectionOutOfOrder.items.map((item) => [item.id, item.band]), [["B:head", "header"]]);
@@ -652,10 +652,10 @@ await guard(async () => {
 });
 await guard(async () => {
   const misplaced = unitSection("B", "DSButton", [100, 100]);
-  misplaced.children.push(headerText("B:other", "DSInput", "DSInput — one row", [500, 80, 100, 20]), sample("B:alien", "sample · DSInput open", [500, 668, 100, 60]));
+  misplaced.children.push(headerText("B:other", "DSInput", "DSInput — one row", [500, 80, 100, 20]), usageNode("B:alien", "usage · DSInput open", [500, 668, 100, 60]));
   const scan = await scanSections([misplaced, unitSection("C", "DSInput", [100, 1640])]);
-  same("a header and a sample of another unit, standing in this unit's section, are named",
-    scan.findings.outsideUnitSection.items.map((item) => [item.id, item.kind, item.unit, item.in, item.unitIn]), [["B:other", "label", "DSInput", "B:sec", "C:sec"], ["B:alien", "sample", "DSInput", "B:sec", "C:sec"]]);
+  same("a header and a usage of another unit, standing in this unit's section, are named",
+    scan.findings.outsideUnitSection.items.map((item) => [item.id, item.kind, item.unit, item.in, item.unitIn]), [["B:other", "label", "DSInput", "B:sec", "C:sec"], ["B:alien", "usage", "DSInput", "B:sec", "C:sec"]]);
 });
 await guard(async () => {
   const names = async (name) => {
@@ -688,18 +688,18 @@ await guard(async () => {
   }
   const missing = unitSection("B", "DSTable", [100, 100], { header: false, sheetLabel: true });
   same("a sheet's label never hides a unit with no header", (await scanSections([missing])).findings.unitsWithoutHeader.items.map((item) => item.unit), ["DSTable"]);
-  const low = unitSection("B", "DSTable", [100, 100], { sheetLabel: true });
-  low.children.find((child) => child.id === "B:sl").y = 640;
-  same("a sheet's label below the samples' label is out of the cases band", (await scanSections([low])).findings.sectionOutOfOrder.items.map((item) => item.id), ["B:sl"]);
+  const low = unitSection("B", "DSTable", [100, 100], { sheetLabel: true, parts: [iconPart("P")] });
+  low.children.find((child) => child.id === "B:sl").y = 840;
+  same("a sheet's label below the parts' label is out of the cases band", (await scanSections([low])).findings.sectionOutOfOrder.items.map((item) => item.id), ["B:sl"]);
 });
 await guard(async () => {
   const scan = await scanSections([unitSection("B", "DSButton", [100, 100], { caption: true })]);
-  same("a sample's caption is counted apart: one sample and one sample label", [scan.read.samples, scan.read.sampleLabels, scan.clean], [1, 1, true]);
+  same("a usage's caption is counted apart: one usage and one usage label", [scan.read.usages, scan.read.usageLabels, scan.clean], [1, 1, true]);
   const unnamed = unitSection("B", "DSButton", [100, 100]);
-  unnamed.children.find((child) => child.id === "B:smp").name = "sample · nothing set";
+  unnamed.children.find((child) => child.id === "B:smp").name = "usage · nothing set";
   const found = await scanSections([unnamed]);
-  same("a sample that names no unit is a finding of its own, with its id, name and section; the scan is not clean",
-    [found.clean, found.findings.samplesNamingNoUnit.items], [false, [{ id: "B:smp", name: "sample · nothing set", in: "B:sec" }]]);
+  same("a usage that names no unit is a finding of its own, with its id, name and section; the scan is not clean",
+    [found.clean, found.findings.usagesNamingNoUnit.items], [false, [{ id: "B:smp", name: "usage · nothing set", in: "B:sec" }]]);
 });
 
 // A value that itself holds `: ` (real: DSAnchor on Navigation, DSAnchorContainer 422:128706 on Utility). The header
@@ -744,12 +744,12 @@ await guard(async () => {
   same("a child touching the edge is not named", await at(0), []);
 });
 await guard(async () => {
-  const wide = sample("X:w", "sample · DSButton open", [500, 1000, 100, 20]);
+  const wide = usageNode("X:w", "usage · DSButton open", [500, 1000, 100, 20]);
   wide.absoluteRenderBounds = { x: 600, y: 1100, width: 100, height: 320 };
   const found = await outsideOf([withChild(wide)]);
   same("a child whose box is inside but whose render bounds reach past the section is named, by the render bounds",
     found.items.map((item) => [item.child, item.side, item.px, item.bounds]), [["X:w", "bottom", 20, "render"]]);
-  const inside = sample("X:n", "sample · DSButton open", [500, 1000, 100, 20]);
+  const inside = usageNode("X:n", "usage · DSButton open", [500, 1000, 100, 20]);
   inside.absoluteRenderBounds = { x: 590, y: 1090, width: 140, height: 60 };
   same("render bounds wider than the box but inside the section name nothing", (await outsideOf([withChild(inside)])).count, 0);
   const own = loose("X:o", "Rectangle own", [500, 1000, 100, 20]);
@@ -786,45 +786,52 @@ await guard(async () => {
 });
 
 // The sibling check that was there already, `meetingInSection`, compares every direct child of a section with the
-// others, whatever its kind, by their boxes. A nested part's section against a sheet and a sample against a sheet
+// others, whatever its kind, by their boxes. A nested part's section against a sheet and a usage against a sheet
 // are two of those pairs; nothing was added for them.
 console.log("\n=== page.js — siblings that meet inside a section");
 await guard(async () => {
-  const part = iconPart("P", [80, 460, 400, 220]);
+  const part = iconPart("P", [80, 700, 400, 220]);
   const found = (await scanSections([unitSection("B", "DSButton", [100, 100], { parts: [part] })])).findings.meetingInSection.items;
   same("a part's section that meets the sheet of cases is named with the section",
     found.filter((item) => item.pair.includes("B:sheet")).map((item) => [item.section, [...item.pair].sort()]), [["B:sec", ["B:sheet", "P:sec"]]]);
   const crowded = unitSection("B", "DSButton", [100, 100]);
-  crowded.children.find((child) => child.id === "B:smp").y = 480;
-  same("a sample that meets the sheet of cases is named with the section",
+  crowded.children.find((child) => child.id === "B:smp").y = 700;
+  same("a usage that meets the sheet of cases is named with the section",
     (await scanSections([crowded])).findings.meetingInSection.items.map((item) => [item.section, [...item.pair].sort()]), [["B:sec", ["B:sheet", "B:smp"]]]);
 });
 
-console.log("\n=== page.js — units with no cases and units with no sample");
+console.log("\n=== page.js — units with no cases and units with no usage");
 await guard(async () => {
   const bare = unitSection("B", "DSButton", [100, 100], { parts: [iconPart("P")] });
   bare.children = bare.children.filter((child) => child.id !== "B:sheet" && child.id !== "B:smp" && child.id !== "B:cap");
   const scan = await scanSections([bare]);
-  same("a top-level unit with no sheet and no sample is named in each, and a part owes neither",
-    [scan.findings.unitsWithoutCases.items, scan.findings.unitsWithoutSample.items],
+  same("a top-level unit with no sheet and no usage is named in each, and a part owes neither",
+    [scan.findings.unitsWithoutCases.items, scan.findings.unitsWithoutUsage.items],
     [[{ unit: "DSButton", id: "B:set", in: "B:sec" }], [{ unit: "DSButton", id: "B:set", in: "B:sec" }]]);
-  same("no sample makes the scan unclean and no sheet does not, and the answer says which does not block", [scan.clean, scan.notBlocking.includes("unitsWithoutCases"), scan.notBlocking.includes("unitsWithoutSample")], [false, true, false]);
+  same("no usage makes the scan unclean and no sheet does not, and the answer says which does not block", [scan.clean, scan.notBlocking.includes("unitsWithoutCases"), scan.notBlocking.includes("unitsWithoutUsage")], [false, true, false]);
   const full = await scanSections([unitSection("B", "DSButton", [100, 100], { parts: [iconPart("P")] })]);
-  same("a unit with a sheet and a sample is named in neither", [full.findings.unitsWithoutCases.count, full.findings.unitsWithoutSample.count], [0, 0]);
+  same("a unit with a sheet and a usage is named in neither", [full.findings.unitsWithoutCases.count, full.findings.unitsWithoutUsage.count], [0, 0]);
 });
 await guard(async () => {
   const lone = unitSection("B", "DSButton", [100, 100]);
   lone.children = lone.children.filter((child) => child.id !== "B:sheet");
-  lone.children.push(version("B:case", "case=text", 80, 444, 50, 20));
+  lone.children.push(version("B:case", "case=text", 80, 668, 50, 20));
   const scan = await scanSections([lone]);
   same("a loose case component counts as the unit's cases", scan.findings.unitsWithoutCases.count, 0);
   const shared = section("SP:sec", "Shared parts", [100, 1640, 800, 400], [headerText("SP:head", "DSBase", "DSBase — one component", [80, 80, 300, 20]), version("SP:base", "DSBase", 80, 128, 48, 48)]);
   const withShared = await scanSections([unitSection("B", "DSButton", [100, 100]), shared]);
-  same("a unit in `Shared parts` is a part and owes neither", [withShared.findings.unitsWithoutCases.count, withShared.findings.unitsWithoutSample.count], [0, 0]);
+  same("a unit in `Shared parts` is a part and owes neither", [withShared.findings.unitsWithoutCases.count, withShared.findings.unitsWithoutUsage.count], [0, 0]);
   const other = unitSection("B", "DSButton", [100, 100]);
-  other.children.find((child) => child.id === "B:smp").name = "sample · DSInput open";
-  other.children.find((child) => child.id === "B:cap").characters = "sample · DSInput open";
-  same("a sample that names another unit is no sample of this one", (await scanSections([other])).findings.unitsWithoutSample.items.map((item) => item.unit), ["DSButton"]);
+  other.children.find((child) => child.id === "B:smp").name = "usage · DSInput open";
+  other.children.find((child) => child.id === "B:cap").characters = "usage · DSInput open";
+  same("a usage that names another unit is no usage of this one", (await scanSections([other])).findings.unitsWithoutUsage.items.map((item) => item.unit), ["DSButton"]);
+  const oldName = unitSection("B", "DSButton", [100, 100]);
+  oldName.children.find((child) => child.id === "B:smp").name = "sample · DSButton open";
+  oldName.children.find((child) => child.id === "B:cap").name = "sample · DSButton open";
+  oldName.children.find((child) => child.id === "B:cap").characters = "sample · DSButton open";
+  const oldScan = await scanSections([oldName]);
+  same("a layer named `sample · ` is no usage: the unit owes one, and nothing is read as a usage",
+    [oldScan.findings.unitsWithoutUsage.items.map((item) => item.unit), oldScan.read.usages, oldScan.read.usageLabels], [["DSButton"], 0, 0]);
 });
 
 // What a library file owes of a unit: a property that nothing draws is named, unless a header names it as behaviour.
@@ -836,7 +843,7 @@ const iconDefinitions = {
   "label#1:3": { type: "TEXT", defaultValue: "Button" },
   "withHeading#1:4": { type: "BOOLEAN", defaultValue: true },
 };
-// The unit's sample is an instance of the unit's first version, holding the given values of the unit's properties.
+// The unit's usage is an instance of the unit's first version, holding the given values of the unit's properties.
 const drawing = (unit, properties) => {
   const set = unit.children.find((child) => child.type === "COMPONENT_SET");
   const shown = unit.children.find((child) => child.id.endsWith(":smp"));
@@ -869,11 +876,11 @@ await guard(async () => {
     namesOf(await undrawn(unit)), []);
   const loneCase = unitSection("B", "DSButton", [100, 100], { definitions: iconDefinitions });
   loneCase.children = loneCase.children.filter((child) => child.id !== "B:sheet");
-  for (const [at, caseName] of ["withStartIcon=true", "label=Save", "withHeading=false"].entries()) loneCase.children.push(version(`B:lc${at}`, caseName, 80, 444 + at * 10, 50, 20));
+  for (const [at, caseName] of ["withStartIcon=true", "label=Save", "withHeading=false"].entries()) loneCase.children.push(version(`B:lc${at}`, caseName, 80, 668 + at * 10, 50, 20));
   same("a loose case component in the unit's section draws it the same way, and its boolean draws the swap", namesOf(await undrawn(loneCase)), []);
   const loneWithPair = unitSection("B", "DSButton", [100, 100], { definitions: iconDefinitions });
   loneWithPair.children = loneWithPair.children.filter((child) => child.id !== "B:sheet");
-  for (const [at, caseName] of ["withStartIcon=true, startIcon=HOME", "label=Save", "withHeading=false"].entries()) loneWithPair.children.push(version(`B:lc${at}`, caseName, 80, 444 + at * 10, 50, 20));
+  for (const [at, caseName] of ["withStartIcon=true, startIcon=HOME", "label=Save", "withHeading=false"].entries()) loneWithPair.children.push(version(`B:lc${at}`, caseName, 80, 668 + at * 10, 50, 20));
   same("a case that names a pair draws both", namesOf(await undrawn(loneWithPair)), []);
   const partly = unitSection("B", "DSButton", [100, 100], { definitions: iconDefinitions, caseNames: ["label=Save"] });
   same("a case that names one property draws only that one", namesOf(await undrawn(partly)), ["withStartIcon", "startIcon", "withHeading"]);
@@ -904,7 +911,7 @@ await guard(async () => {
   const part = section("P:sec", ".DSIcon", [80, 860, 400, 220], [headerText("P:head", ".DSIcon", ".DSIcon — rows: size=SM", [80, 80, 300, 20]), set]);
   const found = await undrawn(unitSection("B", "DSButton", [100, 100], { parts: [part] }));
   same("a part's property that nothing draws is named, with the part's section", found.items.map((item) => [item.unit, item.property, item.in]), [[".DSIcon", "withBadge", "P:sec"]]);
-  same("a part owes no sample, so it is named in no sample finding", (await scanSections([unitSection("B", "DSButton", [100, 100], { parts: [part] })])).findings.unitsWithoutSample.count, 0);
+  same("a part owes no usage, so it is named in no usage finding", (await scanSections([unitSection("B", "DSButton", [100, 100], { parts: [part] })])).findings.unitsWithoutUsage.count, 0);
 });
 await guard(async () => {
   const lone = { id: "L:unit", name: "DSLink", type: "COMPONENT", x: 200, y: 148, width: 100, height: 40, children: [{ id: "L:unit:0", type: "RECTANGLE" }], fills: solid(null), strokes: [], componentPropertyDefinitions: { "withIcon#3:1": { type: "BOOLEAN", defaultValue: false } } };
@@ -923,7 +930,7 @@ await guard(async () => {
   set.children[0].children[0].parent = set.children[0];
   same("an instance inside the unit's own set draws nothing", (await undrawn(unit)).count, 4);
   const other = unitSection("B", "DSButton", [100, 100], { definitions: iconDefinitions });
-  const nested = sample("B:nest", "sample · DSButton nested", [500, 1000, 100, 20], { main: other.children.find((child) => child.type === "COMPONENT_SET").children[1], properties: { "withStartIcon#1:1": { type: "BOOLEAN", value: true } } });
+  const nested = usageNode("B:nest", "usage · DSButton nested", [500, 1000, 100, 20], { main: other.children.find((child) => child.type === "COMPONENT_SET").children[1], properties: { "withStartIcon#1:1": { type: "BOOLEAN", value: true } } });
   other.children.push(nested);
   same("an instance of any version of the unit draws it, wherever it stands on the page", namesOf(await undrawn(other)), ["label", "withHeading"]);
 });
@@ -932,7 +939,7 @@ await guard(async () => {
   same("a page in the old flat form is not judged for drawn properties", flat.findings.propertyNotDrawn.count, 0);
 });
 
-console.log("\n=== page.js — a unit with no sample, and a unit drawn as cases alone");
+console.log("\n=== page.js — a unit with no usage, and a unit drawn as cases alone");
 const casesAlone = (caseNames) => section("A:sec", "DSAspectRatio", [100, 100, 800, 600], [
   headerText("A:head", "DSAspectRatio", "DSAspectRatio — no set of versions, shown as cases", [80, 80, 600, 20]),
   labelText("A:lc", "Cases", [80, 144, 100, 20]),
@@ -940,28 +947,28 @@ const casesAlone = (caseNames) => section("A:sec", "DSAspectRatio", [100, 100, 8
 ]);
 await guard(async () => {
   const scan = await scanSections([casesAlone(["ratio=16:9"])]);
-  same("a unit drawn as cases alone, with no component in its section, takes its first case for its sample", [scan.findings.unitsWithoutSample.count, scan.clean], [0, true]);
-  same("a unit drawn as cases alone with an empty sheet has no first case: it owes its sample", (await scanSections([casesAlone([])])).findings.unitsWithoutSample.items.map((item) => item.unit), ["DSAspectRatio"]);
+  same("a unit drawn as cases alone, with no component in its section, takes its first case for its usage", [scan.findings.unitsWithoutUsage.count, scan.clean], [0, true]);
+  same("a unit drawn as cases alone with an empty sheet has no first case: it owes its usage", (await scanSections([casesAlone([])])).findings.unitsWithoutUsage.items.map((item) => item.unit), ["DSAspectRatio"]);
   const withComponent = casesAlone(["ratio=16:9"]);
   withComponent.children.push(version("A:lone", "DSAspectRatio", 80, 300, 40, 40));
-  same("a sheet beside a component of its section is not a unit of cases alone: with no sample it is named", (await scanSections([withComponent])).findings.unitsWithoutSample.count, 1);
+  same("a sheet beside a component of its section is not a unit of cases alone: with no usage it is named", (await scanSections([withComponent])).findings.unitsWithoutUsage.count, 1);
 });
 await guard(async () => {
   const bare = unitSection("B", "DSButton", [100, 100]);
   bare.children = bare.children.filter((child) => child.id !== "B:smp" && child.id !== "B:cap");
   const scan = await scanSections([bare]);
-  same("a top-level unit with no sample is named and the scan is not clean", [scan.findings.unitsWithoutSample.items.map((item) => item.unit), scan.clean], [["DSButton"], false]);
+  same("a top-level unit with no usage is named and the scan is not clean", [scan.findings.unitsWithoutUsage.items.map((item) => item.unit), scan.clean], [["DSButton"], false]);
 });
 
-console.log("\n=== page.js — a sample's caption, and a part's section as wide as its content");
+console.log("\n=== page.js — a usage's caption, and a part's section as wide as its content");
 await guard(async () => {
   const uncaptioned = unitSection("B", "DSButton", [100, 100], { caption: false });
   const scan = await scanSections([uncaptioned]);
-  same("a sample with no caption directly above it is counted and does not block", [scan.findings.samplesWithoutCaption.items.map((item) => item.id), scan.clean], [["B:smp"], true]);
+  same("a usage with no caption directly above it is counted and does not block", [scan.findings.usagesWithoutCaption.items.map((item) => item.id), scan.clean], [["B:smp"], true]);
   const moved = unitSection("B", "DSButton", [100, 100]);
   moved.children.find((child) => child.id === "B:cap").x = 300;
-  same("a caption off the sample's left edge is no caption of it", (await scanSections([moved])).findings.samplesWithoutCaption.count, 1);
-  same("a caption above its sample at its left edge is found", (await scanSections([unitSection("B", "DSButton", [100, 100])])).findings.samplesWithoutCaption.count, 0);
+  same("a caption off the usage's left edge is no caption of it", (await scanSections([moved])).findings.usagesWithoutCaption.count, 1);
+  same("a caption above its usage at its left edge is found", (await scanSections([unitSection("B", "DSButton", [100, 100])])).findings.usagesWithoutCaption.count, 0);
   const wide = iconPart("P", [80, 860, 600, 220]);
   const tooWide = await scanSections([unitSection("B", "DSButton", [100, 100], { parts: [wide] })]);
   same("a part's section with more than the padding empty at its right is counted and does not block", [tooWide.findings.partSectionTooWide.items.map((item) => [item.id, item.emptyAtRight]), tooWide.clean], [[["P:sec", 220]], true]);
