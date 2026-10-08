@@ -19,8 +19,18 @@
 //                    the first items of each finding, the page's `form` and what it `read`. A scan that found
 //                    no unit is not clean: `emptyReading` says so. `childOutsideSection` names each child that
 //                    lies beyond its section's box (by its box or by what it draws) by more than 1 px, with the
-//                    side and the px. `unitsWithoutCases` and `unitsWithoutSample` name the top-level units that
-//                    have no sheet of cases or no sample; they do not block, since a unit with nothing to show owes none.
+//                    side and the px. `unitsWithoutSample` blocks: it names each top-level unit with no sample (a part owes none; a
+//                    unit drawn as cases alone, with no component in its section, takes its first case for its sample).
+//                    `propertyNotDrawn` blocks: it names each BOOLEAN, INSTANCE_SWAP and TEXT property of a unit (a part too)
+//                    that nothing on the page draws off its default and that the unit's header does not name after
+//                    `behaviour: ` (a note of the header, such as ` · behaviour: collapsible, sticky`), with the unit,
+//                    property, type and default. A property is drawn when an instance of the unit outside its set holds it
+//                    off its default, or when a case of the unit's sheet (or a loose case component in its section) is named
+//                    for it, `<property>=`. A swap named `startIcon` is judged with the boolean `withStartIcon` of the unit.
+//                    `behaviourNamesNoProperty` names a property the clause gives that the unit does not have. These do not
+//                    block: `unitsWithoutCases` (a unit whose versions draw everything owes no sheet), `samplesWithoutCaption`
+//                    (a sample with no caption directly above it) and `partSectionTooWide` (a part's section with more than the
+//                    padding empty at its right).
 //   report both      the two together, for a small page. The whole answer stays under `maxBytes`: the scan
 //                    gives up items first, then the inventory stops early, and `cut` says what was left out.
 //
@@ -138,7 +148,13 @@ function defaultMarksOf(text) {
 const SHEET_SUFFIX = " cases";
 const EDITOR_DEFAULT_PROPERTY = /^Property \d+$/;
 const CASE_NAME = /^[^=,]+=[^=,]+(, [^=,]+=[^=,]+)*$/;
-const NOT_BLOCKING = ["emptyVersions", "emptyCases", "unitsWithoutCases", "unitsWithoutSample"];
+const NOT_BLOCKING = ["emptyVersions", "emptyCases", "unitsWithoutCases", "behaviourNamesNoProperty", "samplesWithoutCaption", "partSectionTooWide"];
+const DRAWABLE_TYPES = ["BOOLEAN", "INSTANCE_SWAP", "TEXT"];
+const BEHAVIOUR_CLAUSE = "behaviour: ";
+// The distances of a section (the book's table): the padding, the gap a caption may stand above its sample, the edge a caption may be off.
+const SECTION_PADDING = 80;
+const CAPTION_REACH = 48;
+const CAPTION_EDGE = 2;
 // A child may lie this far (px) beyond its section's box before it is named: the sums of fractional origins.
 const OUTSIDE_TOLERANCE = 1;
 
@@ -385,6 +401,42 @@ function unitOfSample(node) {
   return names[0] ?? null;
 }
 
+// ---- what the page's instances draw of each unit
+const propertyName = (key) => key.replace(/#.*$/, "");
+function definitionsOf(node) {
+  try { return node.componentPropertyDefinitions ?? {}; } catch { return {}; }
+}
+function isInside(node, ancestor) {
+  for (let up = node.parent; up; up = up.parent) if (up === ancestor) return true;
+  return false;
+}
+// A unit is a set, or a lone component that is no case.
+const unitEntries = entries.filter((entry) => entry.kind === "set" || (entry.kind === "component" && !CASE_NAME.test(entry.node.name)));
+// For each unit, the names of its boolean, swap and text properties that an instance on the page, outside the unit's own
+// set, holds at a value other than the default. The main component is read the way a page that loads on demand allows.
+async function drawnByInstances() {
+  const unitOfComponent = new Map();
+  const definitionsOfUnit = new Map();
+  const drawn = new Map();
+  for (const { node } of unitEntries) {
+    drawn.set(node.id, new Set());
+    definitionsOfUnit.set(node.id, definitionsOf(node));
+    for (const component of node.type === "COMPONENT_SET" ? node.children : [node]) unitOfComponent.set(component.id, node);
+  }
+  for (const instance of page.findAllWithCriteria({ types: ["INSTANCE"] })) {
+    const main = await instance.getMainComponentAsync();
+    const unit = main ? unitOfComponent.get(main.id) : undefined;
+    if (unit === undefined || isInside(instance, unit)) continue;
+    const definitions = definitionsOfUnit.get(unit.id);
+    for (const [key, held] of Object.entries(instance.componentProperties ?? {})) {
+      const definition = definitions[key];
+      if (definition && DRAWABLE_TYPES.includes(definition.type) && held.value !== definition.defaultValue) drawn.get(unit.id).add(propertyName(key));
+    }
+  }
+  return drawn;
+}
+const drawnOffDefault = form === "sections" ? await drawnByInstances() : new Map();
+
 function inventoryEntry(entry) {
   const { node, kind, box, index } = entry;
   const base = { kind, id: node.id, index, name: node.name, box, ...(entry.parentId ? { parent: entry.parentId } : {}) };
@@ -552,18 +604,60 @@ function scanFindings() {
       }
     }
   }
-  // A unit with nothing to show owes no sheet and no sample (the book leaves out a band the unit has nothing for),
-  // so these two are counts that do not block. A part (a unit in a section inside a section, a name that starts with
-  // a dot, or a unit in `Shared parts`) owes neither.
+  // A unit whose versions draw everything it can show owes no sheet, so `unitsWithoutCases` is a count that does not
+  // block. A top-level unit owes a sample of its primary use, so `unitsWithoutSample` blocks. A part (a unit in a
+  // section inside a section, a name that starts with a dot, or a unit in `Shared parts`) owes neither.
   const sectionNameOf = (id) => entries.find((candidate) => candidate.node.id === id)?.node.name ?? null;
   const topUnits = form !== "sections" ? [] : [...unitEntryByName].filter(([name, entry]) =>
     entry.parentId !== null && entry.depth < 2 && !name.startsWith(".") && sectionNameOf(entry.parentId) !== "Shared parts");
   const unitsWithoutCases = topUnits.filter(([name, entry]) => !entries.some((candidate) => candidate.parentId === entry.parentId &&
     ((candidate.kind === "sheet" && candidate.node.name === name + SHEET_SUFFIX) || (candidate.kind === "component" && CASE_NAME.test(candidate.node.name)))))
     .map(([name, entry]) => ({ unit: name, id: entry.node.id, in: entry.parentId }));
-  const unitsWithoutSample = topUnits.filter(([name, entry]) => !entries.some((candidate) => candidate.kind === "sample" &&
+  // A unit drawn as cases alone (a sheet, and no component in its section) takes its first case for its sample.
+  const drawnAsCasesAlone = (entry) => entry.kind === "sheet" && entry.node.children.some((child) => !isSheetLabel(child)) &&
+    !unitEntries.some((candidate) => candidate.parentId === entry.parentId);
+  const unitsWithoutSample = topUnits.filter(([name, entry]) => !drawnAsCasesAlone(entry) && !entries.some((candidate) => candidate.kind === "sample" &&
     candidate.parentId === entry.parentId && unitOfSample(candidate.node) === name))
     .map(([name, entry]) => ({ unit: name, id: entry.node.id, in: entry.parentId }));
+  const propertyNotDrawn = [];
+  const behaviourNamesNoProperty = [];
+  for (const unit of form === "sections" ? unitEntries : []) {
+    const definitions = Object.entries(definitionsOf(unit.node)).map(([key, definition]) => ({ name: propertyName(key), definition }));
+    const header = labelEntries.find((label) => label.part === "header" && label.unit === unit.node.name && label.entry.parentId === unit.parentId);
+    const clause = (header?.text ?? "").split(CLAUSE_SEPARATOR).find((note) => note.trim().startsWith(BEHAVIOUR_CLAUSE));
+    const behaviour = clause === undefined ? [] : clause.trim().slice(BEHAVIOUR_CLAUSE.length).split(", ").map((name) => name.trim()).filter((name) => name.length > 0);
+    const casedNames = new Set();
+    for (const candidate of entries.filter((one) => one.parentId === unit.parentId)) {
+      const isOwnSheet = candidate.kind === "sheet" && candidate.node.name === unit.node.name + SHEET_SUFFIX;
+      const isLooseCase = candidate.kind === "component" && CASE_NAME.test(candidate.node.name);
+      const caseNames = isOwnSheet ? candidate.node.children.filter((child) => !isSheetLabel(child)).map((child) => child.name) : isLooseCase ? [candidate.node.name] : [];
+      for (const caseName of caseNames) for (const cell of caseName.split(", ")) if (cell.includes("=")) casedNames.add(cell.slice(0, cell.indexOf("=")).trim());
+    }
+    const covered = (name) => (drawnOffDefault.get(unit.node.id)?.has(name) ?? false) || casedNames.has(name) || behaviour.includes(name);
+    const booleans = definitions.filter((one) => one.definition.type === "BOOLEAN").map((one) => one.name);
+    for (const { name, definition } of definitions.filter((one) => DRAWABLE_TYPES.includes(one.definition.type))) {
+      // a swap is judged with the boolean that turns it on: `startIcon` with `withStartIcon`
+      const partner = `with${name.charAt(0).toUpperCase()}${name.slice(1)}`;
+      if (covered(name) || (definition.type === "INSTANCE_SWAP" && booleans.includes(partner) && covered(partner))) continue;
+      propertyNotDrawn.push({ unit: unit.node.name.slice(0, 80), id: unit.node.id, property: name.slice(0, 80), type: definition.type, default: String(definition.defaultValue).slice(0, 40), in: unit.parentId });
+    }
+    for (const name of behaviour.filter((one) => !definitions.some((known) => known.name === one))) {
+      behaviourNamesNoProperty.push({ unit: unit.node.name.slice(0, 80), id: unit.node.id, name: name.slice(0, 80), in: unit.parentId });
+    }
+  }
+  // A sample's caption stands directly above it, level at the left edge, within the reach of the section's distances.
+  const samplesWithoutCaption = entries.filter((entry) => entry.kind === "sample" && entry.node.type !== "TEXT" && entry.parentId !== null &&
+    !entries.some((caption) => caption.kind === "sample" && caption.node.type === "TEXT" && caption.parentId === entry.parentId &&
+      Math.abs(caption.box[0] - entry.box[0]) <= CAPTION_EDGE && caption.box[1] + caption.box[3] <= entry.box[1] + CAPTION_EDGE &&
+      entry.box[1] - (caption.box[1] + caption.box[3]) <= CAPTION_REACH))
+    .map((entry) => ({ id: entry.node.id, name: entry.node.name.slice(0, 80), in: entry.parentId }));
+  // A part's section is as wide as its content and its padding; a top-level section is as wide as the widest of the page.
+  const partSectionTooWide = entries.filter((entry) => entry.kind === "section" && entry.depth > 0).map((entry) => {
+    const children = entries.filter((child) => child.parentId === entry.node.id);
+    const right = Math.max(0, ...children.map((child) => child.node.x + child.node.width));
+    return { id: entry.node.id, name: entry.node.name.slice(0, 80), emptyAtRight: Math.round((entry.node.width - right) * 100) / 100, children: children.length };
+  }).filter((one) => one.children > 0 && one.emptyAtRight > SECTION_PADDING + OUTSIDE_TOLERANCE)
+    .map(({ id, name, emptyAtRight }) => ({ id, name, emptyAtRight }));
   const topLevelNotSection = form === "sections"
     ? topLevel.filter((entry) => entry.kind !== "section").map((entry) => ({ id: entry.node.id, nodeType: entry.node.type, name: entry.node.name }))
     : [];
@@ -611,7 +705,7 @@ function scanFindings() {
     strays, defaultNamedProperties, unreadableSets, setsOverLimit, emptyVersions, emptyCases,
     badCaseNames, duplicateCaseNames, labelsUnitElsewhere, labelLayerNames, labelsFormCannotSay, defaultNotLabels,
     topLevelNotSection, meetingInSection, sectionOutOfOrder, unitsWithoutHeader, outsideUnitSection,
-    childOutsideSection, unitsWithoutCases, unitsWithoutSample,
+    childOutsideSection, unitsWithoutCases, unitsWithoutSample, propertyNotDrawn, behaviourNamesNoProperty, samplesWithoutCaption, partSectionTooWide,
   };
 }
 
