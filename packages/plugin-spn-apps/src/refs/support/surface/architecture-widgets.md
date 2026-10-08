@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/07-architecture-widgets.md",
-      "seen": "620a6471"
+      "seen": "ff98e0cc"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/07-architecture-widgets/",
-      "seen": "629e9367"
+      "seen": "01fd5ad1"
     }
   ]
 }
@@ -50,6 +50,7 @@ Shows many records as one block: a bar (the bulk select and the bulk actions, pr
 - A read refused because the person is no longer signed in belongs to the app, which sends the person to sign in. The table shows its refused state for a read the person may not make.
 - The two empty messages **MUST** differ.
 - `DSWDataTable` **MUST** take one size, from its own prop or the block above it, and **MUST** pass it to its bar, its records and its pager.
+- When its records are shown as a table, `DSWDataTable` **MUST** turn the table's `hoverable` prop on. A person acts on a record of this widget, so a row under the pointer says that it answers. A plain `DSTable` leaves it off, because a row that does nothing when it is pressed should not react.
 
 ## DSWFilterBar — 🔮
 
