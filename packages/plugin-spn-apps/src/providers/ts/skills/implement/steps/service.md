@@ -11,7 +11,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/06-service.md",
-      "seen": "801f6113"
+      "seen": "5f0d171e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/07-data.md",
@@ -19,7 +19,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/03-structure.md",
-      "seen": "683253b2"
+      "seen": "d5565b9c"
     }
   ]
 }
@@ -58,7 +58,9 @@ Repo returns `{ total, entityIds }` (mode-split TOTAL/RECORDS/BOTH, ids-only sel
 - **Cache**: key grammar `namespace:prefix:params[:suffix]` (suffixes: MT/IF/DT/AL/BE); tenant-scoped keys lead with `[null,'authUser.orgId']`; cache the prepared read model, never the entity; TTL one module constant (60s tenant data, 3600s master data). A purge must reproduce the build key exactly.
 - **Queues**: cross-module writes ride the three request queues (notification / audit / job) via the `request*` helpers. **Publish on commit** (`_publishOnCommit`), never inside the transaction window, and never construct the event base by hand. **RequestKey idempotency**: consumer short-circuits on `getByRequestKey`; semantic keys for once-per-fact sends, `ulid()` when each attempt is its own fact. Queue re-entry is a deliberately **ungated** public `handle*Event` (documented as queue-only, no route). Listeners rehydrate the originating actor from the event's auth passport. `subscriberId` is part of the consumption contract — renaming it replays the backlog.
 - **Audit**: every authenticated mutation calls `recordAuditLog` **after** the fresh read (WHAT/RESULT/TARGET only; WHO/WHERE derive from context; `requestKey: ulid()`); no-session paths use the explicit-actor `requestAuditLog` — never fake a context. Full-State read models expose `createdBy`/`updatedBy` as resolved Metas, batched and deduped via the terminal (non-recursing) resolvers.
-- **System actors**: gated work with no session runs under `runAsOrgSystem(orgId, fn)` / `runAsPlatformSystem(fn)` — batch sub-writes inside one callback.
+- **System actors**: gated work with no session runs under `runAsOrgSystem(orgId, fn)` / `runAsPlatformSystem(fn)` — batch sub-writes inside one callback. A function cannot cross between services, so in a service that holds the identity module remotely ask for the caller with `iamModule.services.contract.principalService.getSystemAuthUser(command)` and run under it locally.
+- **Mounted or remote**: `services.impl` exists only where the module is mounted; a service that holds a module remotely has `services.contract` alone, so a module's inner services are reachable in the same process only. A module has a runtime manager `<MOD>RuntimeModuleManager` (nine methods, `getAPIRemoteServices` lists each contract service as `{ name, methods, impl }`) and a remote manager `<MOD>RemoteModuleManager` in `remote/`, importing from `@saasplane/module-server-<code>-ts/remote`; the methods data under `contract/methods/` is produced by `spnutils apps gen-validators`, never by hand.
+- **Authentication and captcha**: a service builds `SPAuthProviderIAMIssuer` where it mounts the identity module or signs people in, `SPAuthProviderIAMVerifier` where it holds it remotely, and `SPAuthProviderDefault` otherwise. A queue listener rehydrates the caller from the signed passport through `prepareAuthUser`. A captcha-declaring route obliges the handler's `getCaptchaConfig`; the method that receives the command checks the solution with `iamModule.services.contract.sessionService.verifyCaptchaInput`.
 
 ## Guards, errors, masking
 

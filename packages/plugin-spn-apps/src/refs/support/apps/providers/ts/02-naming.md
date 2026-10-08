@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/02-naming.md",
-      "seen": "4bfe7cb9"
+      "seen": "7fdc830d"
     }
   ]
 }
@@ -129,7 +129,21 @@
 
 **Treat a trailing acronym as a word: `Id` and `Ids`, never `ID` or `IDs`.**
 
-**A module code stays fully uppercase** in class names, type names, init functions and file names — `MDMModuleManager`, `initJOBModule`. The lowercase singleton instance is the only exception.
+**A module code stays fully uppercase** in class names, type names, init functions and file names — `MDMRuntimeModuleManager`, `initJOBModule`. The lowercase singleton instance is the only exception.
+
+**A server module's wiring names** carry its code and kind. At the package root: `interface.ts` holds `SPModule<CODE>` (extends `SPServiceAppRuntimeModule`) and `SPModule<CODE>Config` (extends `SPServiceAppRuntimeModuleConfig`); `<CODE>RuntimeModuleManager.ts` holds class `<CODE>RuntimeModuleManager` (extends `SPServiceAppRuntimeModuleManager`); `index.ts` is the main door and re-exports only. The `remote/` folder is the second door, written by hand: `remote/interface.ts` holds `SPModule<CODE>Remote` (extends `SPServiceAppRemoteModule`), one member under `services.contract` for each contract interface, importing nothing from the module's own `interface.ts`; `remote/<CODE>RemoteModuleManager.ts` holds class `<CODE>RemoteModuleManager` (extends `SPServiceAppRemoteModuleManager`); `remote/<code>Module.ts` holds `<code>Module`, typed `SPModule<CODE>Remote`; `remote/index.ts` exports `contract/` and those three files.
+
+**A module's two managers are named as a pair — MUST.** `<CODE>RuntimeModuleManager` mounts the module and `<CODE>RemoteModuleManager` holds it by its contract; no other manager name exists for a module. The whole family, one base and its two kinds on each row:
+
+| | Base | Mounted | Remote |
+| --- | --- | --- | --- |
+| the manager | `SPServiceAppModuleManager` | `SPServiceAppRuntimeModuleManager` | `SPServiceAppRemoteModuleManager` |
+| the module | `SPAppModule` | `SPAppModuleRuntime`, `SPServiceAppRuntimeModule` | `SPAppModuleRemote`, `SPServiceAppRemoteModule` |
+| the config | `SPAppModuleConfig` | `SPServiceAppRuntimeModuleConfig` | `SPServiceAppRemoteModuleConfig` |
+| a line of the module list | `SPServiceAppBootModule` | `SPServiceAppRuntimeBootModule` | `SPServiceAppRemoteBootModule` |
+| one module's own | | `IAMRuntimeModuleManager`, `SPModuleIAM` | `IAMRemoteModuleManager`, `SPModuleIAMRemote` |
+
+The field that tells the two kinds apart is `moduleType`, of `SPAppModuleType` (`RUNTIME` · `REMOTE`); a module's type is not a contract state, so the field takes the plain name and not `mtype`. The generated `contract/methods/I<MOD><Entity>Service.ts` holds const `I<MOD><Entity>ServiceMethods`, typed `SPServiceMethods<I<MOD><Entity>Service>`, written by `spnutils apps gen-validators` and never hand-edited; the folder follows `services/` file for file. A second service imports `@saasplane/module-server-iam-ts/remote` for a module held remotely.
 
 **Two spellings of one acronym make a symbol unsearchable.** That is the reason behind all of the above.
 

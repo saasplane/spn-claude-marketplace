@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/01-shape/",
-      "seen": "2fd1e985"
+      "seen": "626daf11"
     }
   ]
 }
@@ -29,7 +29,7 @@ Before you touch a node's folders, find its kind. A node declares one fact about
 | Kind manifest | `SPKind` | the file `spkind.json` at a node's root, the only file the kind system reads |
 | Kind config | `SPKindConfig` | the per-kind extra the manifest carries — `null` where a kind needs none |
 | Mnemonic | `code` | the 2–4 letter word a module declares, inherited by every class, permission and configuration key it owns |
-| App code | `code` | the word an application declares, naming the claim the estate's own rows grant it |
+| App code | `code` | the word an application declares, naming the code the estate's own rows grant a place to run |
 | Layer | — | one of `contract`, `app`, `entry` — the three standard folders a contract-publishing node is built from |
 | Util | — | a function that takes input and gives output, needing only its input and the app's global object in order to run |
 | App-owned module | — | a module living inside an application's own folder instead of as its own project, carrying the same kind, layers and documents as the packaged form |
@@ -152,6 +152,20 @@ Where the rule is instead **one folder per group** (`TOOLCHAIN`, `SUPPORT_*`), t
 ### Modules that live inside an application
 
 You may find a module living inside an application's folder instead of shipping as its own project — that is a packaging decision, never a different kind of thing. It still declares the same `MODULE_SERVER` or `MODULE_WEB` kind, carries the same three layers, and owns the same documents as the packaged form. Expect three consequences: its identity is its folder, named for its mnemonic, because a name pattern belongs to a published project and this one publishes nothing; it emits no index of its own surface, because nothing installs it; its proof rides the application's own tests, because a test tree belongs to a project and this is not one. It may depend on packages, and nothing may depend on it. The day a second application wants it, package it: give it a name, its own tests, and a build of its own, while its identifiers and documents travel unchanged.
+
+## The four shapes a platform is built in on the server
+
+A platform's server code takes one of four shapes, and a module is written the same way in all four. The choice is two questions: how many services run, and whose resources each one stands on.
+
+| | Monolith | Microservices, shared platform | Own space, talking with the platform | Independent, space only |
+| --- | --- | --- | --- | --- |
+| Services | one | several | several | several |
+| In the platform's manifest | nothing more | an application row | a row that names a space and keeps the platform | a row that names a space |
+| Its own data lives in | the platform's resources | the platform's resources | the space | the space |
+| Keys it is given | `{SPC}_…` | `{SPC}_…` | `{SPC}_…` and `{SPC}_{SPACE}_…` | `{SPC}_{SPACE}_…` |
+| Reaches a SaaS Plane module by | a direct call in the process | a remote call, or its queue | a remote call, or its queue | it does not |
+
+**A module's data is reached through that module's contract — MUST**, even where a service is given the platform's database settings. A partner's service builds on the SaaS Plane modules and does not repeat them: it asks the identity module whose token this is, calls a module's contract held remotely for an answer now, and publishes to a module's request topic on the platform's queue for work later.
 
 ## Boundary
 

@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/05-app/",
-      "seen": "a713e0bc"
+      "seen": "26a272d7"
     }
   ]
 }
@@ -33,7 +33,7 @@ interface App {
 
 **Providers are infrastructure; modules are domain.** When you place a capability, follow one rule: app-wide goes in `providers`, domain-specific goes in the owning module. Never put a service, a client or a repository at the app root — if you find one there, beside the process entry, the app manager, the app reference and the interface, it is a module you have not given a folder yet.
 
-A module mirrors the shape one level down: `config` plus `services`, split into `contract` (the public interface) and `impl` (the concrete implementation). A server module adds `clients` (external SDKs that domain alone uses) and `repositories` (its own data access). **A module owns a capability and no seam of its own.** It ships no shell: its services need an application's configuration, resources and entries before they can run, and its components need an application's providers, session and routing. Neither can be stood up alone — which is exactly what an application is for.
+A module mirrors the shape one level down: its `config`, its kind, and `services.contract` (the public interface). A module is one of two kinds in an app. A **mounted** module runs in this app, so it also holds `services.impl` (the concrete implementation), and on a server it adds `repositories` (its own data access). A **remote** module lives in another service, so only its contract is here. A member a module needs of its own, such as a client for an external SDK that domain alone uses, is declared on its own type. **A module owns a capability and no seam of its own.** It ships no shell: its services need an application's configuration, resources and entries before they can run, and its components need an application's providers, session and routing. Neither can be stood up alone — which is exactly what an application is for.
 
 Providers vary by runtime, because a browser provisions no infrastructure at all:
 
@@ -110,22 +110,48 @@ Everything composed into the build is present after the module phase. What diffe
 
 ### The module manager contract
 
-Plug a module into the application through one manager class. Register it as exactly one entry in the app's module list, and stop there — nothing else at the app root may know the module exists:
+Plug a module into the application through a manager class. **A module offers two managers from one base — MUST**: a runtime manager for the service that mounts it, and a remote manager for a service that calls it in another service. Boot starts and stops both the same way, and asks the runtime questions only of a runtime manager, so a remote manager is never asked for tables or routes it does not have. Register the module as exactly one entry in the app's module list, and stop there — nothing else at the app root may know the module exists. The entry pairs a config with a manager: a mounted module's config says where its routes are served, and a remote module's config is its code alone.
+
+```ts
+{ config: { code: 'USER',  entry: { api: { basePath: '/iam' } } }, moduleManager: new UserRuntimeModuleManager() },  // mounted here
+{ config: { code: 'STOCK' }, moduleManager: new StockRemoteModuleManager() },                                      // lives in another service
+```
+
+- **The pairing is typed — MUST.** A remote manager given a base path, or a runtime manager given no entry, does not build.
+- **The line names no service.** A remote module reads its address under its own prefix, and the service's settings write that key as a reference to the address the estate publishes, so moving a module to another service is a change of one settings line and no code.
+- **A service that has more than one address for a remote module refuses to boot**, and names the key.
+
+What every manager answers:
 
 | Method | Returns | When it runs |
 | --- | --- | --- |
-| `initModule` | the module — config, services, clients, repositories | boot phase 2 |
+| `initModule` | the module | boot phase 2 |
+| `shutdownModule` | teardown | shutdown, reverse order |
+
+What a runtime manager also answers:
+
+| Method | Returns | When it runs |
+| --- | --- | --- |
 | `getEntities` | ORM entities the module owns | database init (phase 1) |
 | `getMigrations` | schema migrations the module owns | the `MIGRATE` run mode |
 | `getAPIControllers` | HTTP controllers, mounted under the module's API base path | HTTP entry start |
+| `getAPIRemoteServices` | the module's contract services: each one's name, its methods as data, and what implements it | HTTP entry start, for the remote route |
 | `getCLIControllers` | command surfaces the module contributes | CLI entry start |
 | `getQueueListeners` | queue consumers | queue entry start |
 | `getContractSchemas` | validator namespaces published as named OpenAPI schemas | before HTTP entry start |
-| `shutdownModule` | teardown | shutdown, reverse order |
+
+What a remote manager also answers:
+
+| Method | Returns | When it runs |
+| --- | --- | --- |
+| `getModuleCode` | the module's code, as its runtime manager is mounted under | boot phase 2 |
+| `getRemoteServices` | each contract service of the module, with its methods as data | boot phase 2, to build one proxy for each |
+
+A remote manager is written by hand and is small, because its base does the work: it names every contract service the module has, no fewer and no more, and the base reads where the module lives from the module's own settings and builds the proxies.
 
 The split of ignorance is the point: the boot manager never knows business domains, only the providers it built; the app manager never knows modules, only app-wide concerns; a module manager never knows other modules, only its own slice. Adding a domain costs one folder plus one line; deleting it is the reverse.
 
-**Entries MUST mount only after every module has initialized.** An entry executes contract services, and nothing it invokes may still be assembling. Before the HTTP entry starts, boot collects every module's contract schemas and publishes each Command and State as a named OpenAPI component — the source the generated API clients read.
+**Entries MUST mount only after every module has initialized.** The HTTP entry mounts each mounted module's controllers, and registers its contract services to serve other services on the remote route, on a listener of its own; a remote module contributes no entry. An entry executes contract services, and nothing it invokes may still be assembling. Before the HTTP entry starts, boot collects every module's contract schemas and publishes each Command and State as a named OpenAPI component — the source the generated API clients read.
 
 **Migrations never run beside serving traffic.** They execute in a run mode of their own: boot phases 1 and 2 run identically, no entry starts, the runner merges every module's declared migrations, runs the pending ones over the migration connection — the only DDL-capable credential the application ever holds — then the process exits.
 
@@ -137,7 +163,7 @@ app.modules.order.services.impl.orderService      // never — private implement
 app.modules.order.repositories.order              // never — another domain's data access
 ```
 
-The `contract` slot is deliberately narrower than `impl`, so one module structurally cannot reach another's internals. Every collaboration crosses that seam, so swapping the implementation behind it changes nothing for callers — which is what keeps *where a module runs* a deployment decision rather than a rewrite.
+The `contract` slot is deliberately narrower than `impl`, so one module structurally cannot reach another's internals. Where module A is remote, the other two lines do not exist at all: a remote module has no `impl` and no repositories, so a module's inner services are reachable in the same process only. Every collaboration crosses that seam, so swapping the implementation behind it changes nothing for callers — which is what keeps *where a module runs* a deployment decision rather than a rewrite.
 
 ### Schema ownership is part of what an app decides
 

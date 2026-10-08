@@ -30,7 +30,7 @@ Present a manifest change as **one line per choice** — what was chosen, at whi
 ```text
 + environment in-stg (region in, NP, size XS, CLUSTER, deploys from branch develop)
     → derives network spn-dmo-in-stg, namespaces in-stg-*, records in-stg-*.internal.spndemo.app
-+ app grant splt: API (PRD, 9132) + PROCESSOR (PRD)
++ app grant splt: API (PRD, 9101) + PROCESSOR (PRD)
 ```
 
 Never present a raw JSON dump as the review, and never bury a choice inside a reformat. Check each line against the typed/never-typed split in the `implement` skill — a derived name, a discovered identifier, a secret, an ARN, an account id or a provider string outside a cloud entry is a finding, not a detail. The declaration change rides a pull request (`refs/support/infra/laws.md`, plan-is-the-review).

@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/10-configuration.md",
-      "seen": "7a437091"
+      "seen": "91b4811b"
     }
   ]
 }
@@ -19,6 +19,7 @@ APP_ENV / APP_MODE / NODE_ENV                 ← bootstrap, unprefixed
 {CODE}_LOG_*                                  ← app shell: logging
 {CODE}_API_*                                  ← app shell: the API entry
 {CODE}_AUTH_*                                 ← app shell: auth defaults
+{CODE}_REMOTE_*                               ← app shell: remote calls — the credential, the timeout, where each service is
 {CODE}_RESOURCE_{FAM}_{WORLD}_*               ← estate-published connection blocks
 {CODE}_ORG_* · {CODE}_PLATFORM_*              ← estate-published identity, read at the point of use
 {CODE}_{MODULE}_*                             ← module namespaces
@@ -26,7 +27,9 @@ APP_ENV / APP_MODE / NODE_ENV                 ← bootstrap, unprefixed
 
 **Derive the prefix from the application's declared code**, uppercased with hyphens replaced by underscores. Apply the same normalization to every segment built from a name. **Never hardcode a prefix that could be derived.** The code also namespaces runtime resources, so two applications sharing one cache never collide.
 
-**A service application of a platform passes the platform code**, because that is the shared world the estate publishes into and what platform-wide session sharing requires. A standalone application passes its own.
+**A service application of a platform passes the platform code**, because that is the shared world the estate publishes into and what platform-wide session sharing requires. **A service in a space passes the platform's code and then the space's code**, joined by an underscore: the sample service, in the space `sas` of `dmo`, passes `'DMO_SAS'` (`RD.SUPPORT.INFRA.112`), so its own keys and the keys the estate publishes for its space start the same way. A prefix is one word for a service on the platform and two words for a service in a space. A standalone application passes its own.
+
+**A service in a space whose row keeps the platform is given both layers.** It reads its own settings under `{SPC}_{SPACE}_`, and its settings file names a platform key by reference, as for a second queue connection that points at the platform's queue: `DMO_SAS_RESOURCE_QUEUE_CONNECTIONS=APP,PLATFORM` and `DMO_SAS_RESOURCE_QUEUE_PLATFORM_ENDPOINTS=${DMO_RESOURCE_QUEUE_APP_ENDPOINTS}`.
 
 ## The bootstrap variables
 
@@ -44,7 +47,7 @@ APP_ENV / APP_MODE / NODE_ENV                 ← bootstrap, unprefixed
 
 **An application carries an `envs/` folder with one file per `APP_ENV` value**, loaded if it exists. The entry reads `APP_ENV` through `getEnvGeneric`, like every bootstrap variable, and never through `process.env` (`RD.SUPPORT.APPS.136`). The file is optional by design, because a cloud deployment reads real environment variables from the parameter store.
 
-- **The local file is generated against the application's local infrastructure registration**, and its ports come from the hundred local ports the platform declares (`RD.SUPPORT.INFRA.062`): the service's own port at `+30`–`39` from the range's first port, and its health port ten above it.
+- **The local file is generated against the application's local infrastructure registration**, and its ports come from the five hundred local ports the platform declares (`RD.SUPPORT.INFRA.062`): the service's own port at `+100`–`149` from the range's first port, its health port at that port plus 50 (`+150`–`199`), its remote port at that port plus 100 (`+200`–`249`), and the engines of its world in that world's ten of the first hundred — the platform's at `+000`–`009`, a space's at `+010`–`099`.
 - **The cloud file is the reference**: the same variable set with cloud-shaped values, documenting what a deployment must provide. It may declare reserved slots the loader does not read yet — treat those as names, not live configuration.
 - **A comment carries the rationale for every non-obvious value.**
 
@@ -88,9 +91,11 @@ APP_ENV / APP_MODE / NODE_ENV                 ← bootstrap, unprefixed
 - **Logging** takes a provider, and an unset provider fails boot naming the key.
 - **The API entry** carries the provider alone; the listener, CORS, rate-limit and cookie fields live on the provider-specific variant, because a base naming one implementation's needs makes `NONE` unrepresentable. The API reads its token from the authorization header alone, and every cookie a handler writes is host-only and unsigned.
 - **The health listener binds its own port**, read once before any entry starts, and never as routes on the serving port. Unset means no health server, and a deployment receives the published default from the deploy render rather than a code default.
-- **Auth** carries the signing secret and its rotation fallback, the auth cache prefix and lifetime, and the sudo-mode freshness windows.
+- **The API entry's remote and proxy settings:** `{CODE}_API_REMOTE_PORT` is the remote listener, which serves the mounted modules' contract services to the platform's other services (unset: no remote listener opens, and the service serves no contract to others); `{CODE}_API_TRUSTED_PROXIES` and `{CODE}_API_REMOTE_TRUSTED_PROXIES` say how many proxies stand in front of each listener, so the person's address is the entry that many places from the right of the forwarded-address header (default `0`).
+- **Auth is in two parts.** Every service reads the first: the auth cache and the sudo-mode freshness windows. Only a service that signs people in sets the issuer's part, read into `config.auth.issuer`: the signing secret (`{CODE}_AUTH_JWT_SECRET`, which signs tokens and every passport's proof), its rotation fallback, the cache prefix and the lifetime. **The four are set together or not at all.** A service that sets none has `config.auth.issuer` as `null`: it signs no token and holds no secret. A service that builds `SPAuthProviderIAMIssuer` refuses to start by the key's name when it is `null`; one that builds the Verifier or the default provider sets none of them.
+- **`{CODE}_REMOTE_*` is remote calls**, the service's own block under no entry, so a service whose `{CODE}_API_PROVIDER` is `NONE` reads it too: `_CREDENTIAL_PROVIDER` (`KUBERNETES` · `LOCAL`; unset means the service makes no remote call and serves none, and there is no `NONE`), `_CREDENTIAL_KUBERNETES_TOKEN_PATH` · `_AUDIENCE` (`spn-remote`) · `_NAMESPACES` (`prd,plt,vnd`) · `_ISSUER` (all required under `KUBERNETES`), `_CREDENTIAL_LOCAL_SERVICE` (the application's `kindCode`, required under `LOCAL`), `_TIMEOUT_MS` (default `10000`), `_REMOTE_SERVICE_{NAME}_ENDPOINTS` (published by the estate) and `{CODE}_{MODULE}_REMOTE_ENDPOINTS` (where a module held remotely lives; required for each, and refused when it lists more than one address). A missing fact is refused at boot by the key's name. A service that publishes its modules' contracts sets the remote port; one that consumes another's sets one `_REMOTE_ENDPOINTS` line for each module it holds remotely, written as a reference to what the estate publishes (`DMO_IAM_REMOTE_ENDPOINTS=${DMO_REMOTE_SERVICE_API_ENDPOINTS}`), so moving a module to another service is a change of one settings line and no code (`RD.SUPPORT.INFRA.111`). A worker that only reads the queue sets `{CODE}_API_PROVIDER=NONE` and no remote port. On a machine the provider is `LOCAL` and the address is plain HTTP on the service's local host and remote port.
 
-**A signing secret rotates without signing anybody out.** A rotation is two deployments: first set the fallback to the old secret and the secret to a new one, then empty the fallback once every token the old secret signed has expired.
+**A signing secret rotates without signing anybody out.** A rotation is two deployments: first set the fallback to the old secret and the secret to a new one, then empty the fallback once every token the old secret signed has expired. A passport's proof is signed with the same secret and work can wait in a queue longer than a token lives, so keep the fallback for as long as work can wait there.
 
 ## Resource blocks
 
@@ -150,5 +155,5 @@ DMO_IAM_EDGE_CUSTOM_DOMAINS=${DMO_PLATFORM_INTEGRATION_EDGE_CUSTOM_DOMAINS}
 
 - **A committed file carries no secret value.** Give a secret variable an empty value and a comment saying it is required in the shell profile locally, and injected from the secret store in the cloud.
 - **The secret variables in the standard namespaces** are the signing secret, its rotation fallback, and every user and password pair in a resource block.
-- **No secret has a default.** An empty signing secret fails boot by name, because a default would be a secret everyone who reads the source holds.
+- **No secret has a default.** An empty signing secret fails boot by name in a service that sets any of the issuer's four keys (a service that signs nobody in sets none and holds no secret), because a default would be a secret everyone who reads the source holds.
 - **Non-secret configuration and secrets follow the same path scheme in the cloud**, and only the backing store differs.

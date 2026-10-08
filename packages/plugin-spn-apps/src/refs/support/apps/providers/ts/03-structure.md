@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/03-structure.md",
-      "seen": "683253b2"
+      "seen": "d5565b9c"
     }
   ]
 }
@@ -61,11 +61,37 @@ packages/<name>/
 
 | Layer | Holds | Visible to |
 | --- | --- | --- |
-| `contract/` | states, service interfaces, validators, constants — contract types only, no logic | everyone |
+| `contract/` | states, service interfaces, validators, methods, constants — contract types only, no logic | everyone |
 | `app/` | services, repositories, entities, support classes, utils | this module, except `entities/` and `utils/` |
 | `entry/` | transport adapters that a host mounts — `api`, `queue`, `cli` on the server, `ui` on the web | nothing; it is mounted, not consumed |
 
-**Leave a layer a node does not need absent, never empty.** A module wiring file set sits at the package root, beside a `migrations/` folder where the module owns storage.
+**Leave a layer a node does not need absent, never empty.** A module wiring file set sits at the package root (`interface.ts`, `<code>Module.ts`, `<CODE>RuntimeModuleManager.ts`), beside a `remote/` folder and a `migrations/` folder where the module owns storage.
+
+### One server module, one package, two doors
+
+A server module is one folder, one kind and one published package, and the package has two doors; a service chooses a door by what it imports. The main door, `import { IAMRuntimeModuleManager } from '@saasplane/module-server-iam-ts'`, reaches the whole of `src/` and is used by the service that mounts the module. The `/remote` door, `import { IAMRemoteModuleManager } from '@saasplane/module-server-iam-ts/remote'`, reaches `src/contract/` and `src/remote/` and nothing else, and gives the contract, the remote manager and `<code>Module` typed with the contract only; a service that calls the module in another service uses it.
+
+```
+packages/module-server-iam-ts/
+├── package.json
+├── rollup.config.js                    one line that asks the toolchain for the build
+├── remote/package.json                 three lines: its entry is ../src/remote/index.ts
+└── src/
+    ├── contract/                       data only: constants.ts, states/ and services/ by hand, validators/ and methods/ produced
+    ├── remote/                         by hand: index.ts, interface.ts, IAMRemoteModuleManager.ts, iamModule.ts
+    ├── app/  entry/  migrations/
+    ├── interface.ts  iamModule.ts
+    ├── IAMRuntimeModuleManager.ts      extends the runtime manager; lists its contract services
+    └── index.ts                        the main door
+```
+
+- **The command produces validators and methods inside `src/contract/`, and nothing outside it — MUST.** Everything else, the `remote/` folder too, is written by hand.
+- **`src/contract/` and `src/remote/` MUST NOT import from the rest of the module**, so the second door loads no implementation. The toolchain's check refuses such an import, as it refuses logic in `src/contract/`.
+- **`remote/interface.ts` MUST NOT import the module's own `src/interface.ts`**, which names the inner services and repositories. A mounted module has to fit the contract type where the framework hands it out, so the two cannot drift apart unseen.
+- **A contract that uses another module's types imports them from that module's remote door**, never the main door.
+- **A module that may run in a service where another module is remote imports that module's `<code>Module` from its remote door.** There `services.impl` does not exist, so the compiler holds the rule that a module's inner services are reachable in the same process only.
+- **The scaffold gives a new server module its `remote/` folder and its door.**
+- **The door is a folder** because a module's manifest carries no entry-point map and server code resolves a package by path: inside the repository it points at the source, in the published package at the built files. A package's dependencies belong to the package and not to a door, so a module's manifest lists the libraries the module imports and no others.
 
 **What each layer folder may hold is a rule, not a habit.**
 
@@ -101,7 +127,7 @@ apps/<app>-ts/src/
 └── modules/             → one folder per domain; everything else lives here
 ```
 
-**Bootstrap files sit at the top of `src/`, and everything else is a module.** A service app's modules mirror the package triad. A web app's shell is `modules/boot/`, holding the router, the app root, session and auth hooks, client construction and the shell's own screens — never at the source root.
+**Bootstrap files sit at the top of `src/`, and everything else is a module.** A service app's modules mirror the package triad, as `src/modules/<module>/{interface.ts, <module>Module.ts, <Module>RuntimeModuleManager.ts, app/, contract/, entry/, migrations/}`. An app-local module is mounted in its own app and published by no package, so it has no second door. A web app's shell is `modules/boot/`, holding the router, the app root, session and auth hooks, client construction and the shell's own screens — never at the source root.
 
 **Every application declares its own `interface.ts`**, and the app-structure names follow the app-code grammar: `<CODE>App`, `<CODE>AppConfig`, `<CODE>AppManager`, and the typed singleton `<code>App`. Codes are unique, so these names never collide the way descriptive ones do. Consuming a shared type directly in the entry point leaves the app with no extension point.
 

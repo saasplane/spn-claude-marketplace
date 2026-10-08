@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/11-generation.md",
-      "seen": "6bd83a48"
+      "seen": "c4c09ba2"
     }
   ]
 }
@@ -19,11 +19,14 @@
 | Generator | Re-run it when | It writes |
 | --- | --- | --- |
 | `spnutils apps gen-validators <package>` | anything under `contract/states/` changed | the matching schemas under `contract/validators/` |
+| `spnutils apps gen-validators <package>` | anything under `contract/services/` changed | each contract interface's methods as data under `contract/methods/` |
 | `spnutils apps gen-barrel <package>` | the package's public surface changed | the barrel — what the package exports |
 | `spnutils apps gen-labels <package>` | a `translate()` call site was added or moved | the label manifest |
 | `spnutils apps gen-symbols <package>` | the public surface changed | the symbol index |
 | `spnutils apps codegen <target> <package>` | a service's published API changed | the typed client for it |
 | `spnutils repo agent-sync` | the repository's own manifests changed | the agent wiring |
+
+**`contract/methods/` follows `contract/services/` file for file**, as `validators/` follows `states/`. Each file holds one object, typed `SPServiceMethods<I<MOD><Entity>Service>`, that lists the methods of one contract interface and the two validators of each: what goes in and what comes out. The command reads each method's signature and names the validators `validators/` exports for it; a method that is not one command in and one state out is refused, naming the method. It writes inside `src/contract/` and nowhere else — **MUST**; the `remote/` folder and the managers are written by hand. The object is what both ends of a call between services read: the runtime manager hands it to the API entry, the remote manager hands it to the proxy, and the type refuses an object that misses a method or names one the interface does not have. Never hand-edit `contract/methods/**`; edit `contract/services/**` and re-run `gen-validators`.
 
 **Run `gen-validators` and `gen-barrel` before you commit**, not at the end of the day. A stale validator does not fail quietly — it takes the service down at boot, and the failure names a schema rather than the edit that caused it.
 

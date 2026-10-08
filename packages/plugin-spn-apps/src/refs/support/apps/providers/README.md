@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/",
-      "seen": "f1bffbd4"
+      "seen": "f62848f7"
     }
   ]
 }
@@ -40,6 +40,8 @@
 ## What a stack may never do
 
 **No stack invents, renames or re-scopes a kind, a symbol role, or any other closed value.** The closed vocabularies are the platform's, and a stack that extends one has forked the model while appearing to join it.
+
+**Every stack carries the seven rules of a call between services.** A server module has two faces, its contract and its implementation; the contract face loads without the implementation; a module offers a runtime manager and a remote manager from one base; a module's inner services are reachable in the same process only; each contract interface has its methods as data, produced and never written; one service calls another's contract through the API entry's remote route, with the caller's signed passport and the calling service's own credential; and only the identity module says whose token it is. Whether a stack publishes the contract face as a second door of one package or as a package of its own is that stack's choice.
 
 **A stack declares which runtimes it realizes**, and answers *out of coverage* for a kind it does not have — rather than quietly skipping it. **No stack may answer *what kinds exist* differently from any other.**
 

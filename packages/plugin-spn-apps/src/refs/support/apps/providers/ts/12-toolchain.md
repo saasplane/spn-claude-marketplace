@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/12-toolchain.md",
-      "seen": "7dde59ca"
+      "seen": "b4f62945"
     }
   ]
 }
@@ -19,6 +19,8 @@
 **The test overlay is chosen by runner, not by kind.** Two packages of different kinds running the same runner share an overlay; one package running two runners has two.
 
 **The per-tier targets are inferred, never declared** — a package gains a tier by having that tier's folder, not by writing a target for it.
+
+**A `MODULE_SERVER` package has a second door, and the toolchain builds and publishes it with no setting in the package.** The rollup factory returns a second configuration when `src/remote/index.ts` exists, writing `dist/remote/index.esm.js`, `dist/remote/index.cjs` and `dist/remote/index.d.ts` beside the main output; the package's `rollup.config.js` stays one line. `spn-postbuild` writes `exports['./remote']` beside `exports['.']`, with `types` first, and refuses a manifest that names a file the build did not make. The check holds that `src/contract/` and `src/remote/` import nothing from the rest of the module. The source manifest carries no `exports` map, so inside the repository the door is a small folder, `remote/package.json`, whose entry is `../src/remote/index.ts`, and `@saasplane/module-server-iam-ts/remote` resolves there in development and through the `exports` map once published.
 
 **A package declares one script per command it answers, and nothing else.** An identical script list in every package was the older rule and it is replaced: a script for a tier the package does not have is a command that can only fail.
 

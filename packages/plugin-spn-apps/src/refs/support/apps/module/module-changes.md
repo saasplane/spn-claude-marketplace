@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/01-shape/03-architecture.md",
-      "seen": "f84e0106"
+      "seen": "8bce1417"
     },
     {
       "path": "spn-foundation/docs/registers/conformance.md",
@@ -66,11 +66,11 @@ A contract is a chain of six constructs: **Contract** → **Services** → **Met
 
 ## The generation chain
 
-The hand-written contract states are the **only** hand-written artifact of the API surface. Validators, the published API spec, the API client, and agent tool schemas are all generated — and generated files are never edited; regeneration is the only edit path. There is no second hand-written client.
+The hand-written contract states are the **only** hand-written artifact of the API surface. Validators, the contract's methods as data (one entry for each method of each service interface, naming the validators of what goes in and what comes out), the published API spec, the API client, and agent tool schemas are all generated — and generated files are never edited; regeneration is the only edit path. There is no second hand-written client.
 
 ## Boundary rule
 
-**Pass cross-module calls through contracts, never internals.** This is what makes the monolith/microservice choice reversible: callers depend on the contract, not the deployment.
+**Pass cross-module calls through contracts, never internals.** This is what makes the monolith/microservice choice reversible: callers depend on the contract, not the deployment. A module is either mounted in a service or held remotely, where only its contract is present and the call crosses to the service that mounts it, by the API entry's remote route, by module, service, method and command. A service that holds a module remotely **MUST NOT** be able to name its inner services. A person's public token stops at the first service; from there the caller travels as the passport the identity module signed, with the calling service's own credential on every call. What a call may do is decided by the method's own check and nothing at the route.
 
 ## The review card
 
