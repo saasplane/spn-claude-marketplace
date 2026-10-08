@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "830ad6e7"
+      "seen": "63615af9"
     }
   ]
 }
@@ -485,7 +485,10 @@ A showcase is the running catalogue that a stack proves its realization with, an
 
 - **A top-level unit MUST have a sample of its primary use.** A top-level unit is a unit the showcase lists on its own. A part owes no sample, because it serves another unit and the sample of that unit shows it. The sample stands in the band of samples and takes the name that "A sample" states.
 - **A property that changes what is visibly there MUST be drawn.** An icon, a heading, a footer, a clear button and an open menu are such properties. Each is drawn by a version of the set, or by a case named `<property>=<value>` on the version where the property draws. A property whose default is on is drawn by its off case. A property that draws only on one version is drawn by a case on that version, and not by a case on the default.
-- **A property that changes only how a unit behaves MUST NOT be drawn, and the unit's header MUST name it.** A unit that collapses, that sticks, that loads late or that calls back has nothing more to show for it. The header names it in the clause `behaviour: ` that "The form of a label" states, so a script tells a property of behaviour from a property that nothing draws.
+- **The test is what a person can see, at rest or in any state the unit can be in, and a state a unit can be in MUST be drawn.** A state is a visible change: open (a select's popup, a menu, a dialog), hover, focus, pressed, selected, checked, filled, invalid with its message, disabled, loading and empty. The library chapter already requires a drawing for every state that changes what a person sees, and makes the state a property of the set, `state=…`, with a shown state drawn as a picture and no prop. This rule includes both and restates neither.
+- **A property of behaviour changes nothing a person can see in any state, so it has nothing to draw, and the unit's header MUST name it.** It decides when or how something happens, and not what is there. A late-loading image (`lazy`), a callback, the delay before a tooltip shows, whether a menu closes when an item is chosen, the step of a number, the limit on a value and the `name` of a field are such properties. The header names each one in the clause `behaviour: ` that "The form of a label" states, so a script tells a property of behaviour from a property that nothing draws.
+- **A property that lets a unit reach a state is drawn by that state.** `collapsible` lets a panel be shut, and the shut panel is a state, so it is drawn. `sticky` holds a header in place while a page scrolls, and a case draws one scroll place, as "A unit with no look of its own" states for a still picture of behaviour. A property is named in the `behaviour:` clause only when no state it leads to looks different.
+- **Example, `DSSelect`.** `open` is drawn, because the popup is there to see. `disabled` is drawn, and so is a start icon. Whether the popup closes when a choice is made is behaviour, and the header names it.
 - **A property whose value is a token MUST be shown as a mode, by one case with the mode set on the instance.** A hue and a density are such properties. A variable carries each of their values, as the rule on size states, so a version for each value would draw the same unit again and again.
 - **A unit that the library draws as cases alone, having no look of its own, MUST say why in the label of its sheet.** A person who reads the sheet then learns that the unit has no set because the unit has no look, and not because a set is missing.
 - **The duty MUST run one way: a showcase may show more than the library, and a library MUST NOT lack a primary case.** A library that lacks a primary case of a unit is at fault, and the showcase is not.
