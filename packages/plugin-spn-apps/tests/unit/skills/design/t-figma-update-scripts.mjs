@@ -488,8 +488,14 @@ await guard(async () => {
   same("a header that names no layout leaves no label to write", [none.rows, none.columns], [[], []]);
   const lost = labelsPage();
   lost.home.children = lost.home.children.filter((child) => !child.name.startsWith("label · size"));
-  const styleless = await run("labels.js", { setId: "9:1", dryRun: false }, figmaFile([lost.page]));
-  ok("a side with no label to take the style from is told, and nothing is changed", styleless.problems.some((text) => /no row label stood/.test(text)), JSON.stringify(styleless.problems));
+  const borrowed = await run("labels.js", { setId: "9:1", dryRun: false }, figmaFile([lost.page]));
+  const rowLabels = lost.home.children.filter((child) => child.type === "TEXT" && child.characters.startsWith("size="));
+  same("a side that had no label takes the style of the other side's and names its property (seen on DSAnchorContainer, whose one property moved from the rows to the columns)",
+    [borrowed.problems, borrowed.rows, rowLabels.map((label) => [label.characters, label.x, label.y])], [[], ["size=SM (default)", "size=MD"], [["size=SM (default)", 96, 130], ["size=MD", 96, 210]]]);
+  const bareSides = labelsPage();
+  bareSides.home.children = bareSides.home.children.filter((child) => !child.name.startsWith("label · s"));
+  const styleless = await run("labels.js", { setId: "9:1", dryRun: false }, figmaFile([bareSides.page]));
+  ok("with no label on either side to take the style from it is told, and nothing is changed", styleless.problems.some((text) => /no label stood on either side/.test(text)) && bareSides.home.children.length === 2, JSON.stringify(styleless.problems));
   // the set was laid out again and is now shorter than the rows its old labels stood beside
   const shrunk = labelsPage();
   shrunk.home.children.find((child) => child.id === "9:1").height = 60;

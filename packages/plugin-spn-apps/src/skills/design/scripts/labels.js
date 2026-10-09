@@ -16,8 +16,9 @@
 // The book's distances: a row label ends 24 left of the set, centred on its row; a column label stands 16
 // above the set, its left edge at its column's left.
 //
-// It refuses, and changes nothing, when the header names no layout, when a side had no label to take the
-// style from, or when the versions of a row or a column do not share one value for a named property.
+// A side that had no label takes the style of the other side's and names its property. It refuses, and changes
+// nothing, when the header names no layout, when no label stood on either side to take the style from, or
+// when the versions of a row or a column do not share one value for a named property.
 
 //
 //   oldSetBox  the set's box [x, y, width, height] before `layout.js` laid it out (its answer's
@@ -73,10 +74,14 @@ const bands = (axis, size) => {
   return found;
 };
 const problems = [];
-const textsOf = (side, found, properties, old) => {
+// A side that had no label takes the style of the other side's and names its property (`property=value`):
+// a set whose header moved its one property from the rows to the columns has only row labels standing.
+const templateOf = (old, other) => old[0] ?? other[0] ?? null;
+const textsOf = (side, found, properties, old, other) => {
   if (properties.length === 0) return [];
-  if (old.length === 0) { problems.push(`no ${side} label stood to take the style from`); return []; }
-  const named = old[0].characters.includes("=");
+  const template = templateOf(old, other);
+  if (!template) { problems.push(`no label stood on either side to take the style of a ${side} label from`); return []; }
+  const named = old.length > 0 ? old[0].characters.includes("=") : true;
   return found.map((band) => {
     const parts = properties.map((property) => {
       const values = new Set(band.versions.map((version) => cellsOf(version.name)[property]));
@@ -87,8 +92,8 @@ const textsOf = (side, found, properties, old) => {
     return { band, text: parts.join(named ? ", " : " · ") };
   });
 };
-const rows = textsOf("row", bands("y", "height"), rowProperties, oldRows);
-const columns = textsOf("column", bands("x", "width"), columnProperties, oldColumns);
+const rows = textsOf("row", bands("y", "height"), rowProperties, oldRows, oldColumns);
+const columns = textsOf("column", bands("x", "width"), columnProperties, oldColumns, oldRows);
 
 const plan = { set: set.name, dryRun: INPUTS.dryRun, removed: [...oldRows, ...oldColumns].map((text) => text.characters), rows: rows.map((one) => one.text), columns: columns.map((one) => one.text), problems };
 if (problems.length > 0 || INPUTS.dryRun) return plan;
@@ -105,13 +110,13 @@ const write = async (template, text) => {
 };
 const made = [];
 for (const one of rows) {
-  const label = await write(oldRows[0], one.text);
+  const label = await write(templateOf(oldRows, oldColumns), one.text);
   label.x = set.x - 24 - label.width;
   label.y = set.y + one.band.at + one.band.size / 2 - label.height / 2;
   made.push(label.id);
 }
 for (const one of columns) {
-  const label = await write(oldColumns[0], one.text);
+  const label = await write(templateOf(oldColumns, oldRows), one.text);
   label.x = set.x + one.band.at;
   label.y = set.y - 16 - label.height;
   made.push(label.id);
