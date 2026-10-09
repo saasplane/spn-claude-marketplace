@@ -763,8 +763,8 @@ export function openCards(text: string): Finding[] {
       else if (!/recommend|(?:→|&rarr;|&#8594;)\s*(?:<[^>]+>)*\s*\**[A-D]\b/i.test(rest))
         out.push(["RULE", `Open card "${name}" carries no recommendation — the reader does the analysis twice (refs/decision-cards.md)`]);
       if (!VIEWS_PART.test(rest))
-        out.push(["RULE", `Open card "${name}" carries no Views part. Add \`<span class="sds-key">Views</span>\` and a paragraph after the ` +
-          `options: who spoke, why those views, and what each objected to (RD.DEVEX.WORKSPACE.242)`]);
+        out.push(["RULE", `Open card "${name}" carries no Views part. Add \`<span class="sds-key">Views</span>\` after What and before the ` +
+          `options: one line on who spoke and why those views, then each view's reason in one or two plain sentences (RD.DEVEX.WORKSPACE.242)`]);
     }
   const deferred = section(text, "Deferred");
   if (deferred !== null)

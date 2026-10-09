@@ -193,6 +193,10 @@ ${views}
   for (const [what, got, expected] of [
     ["a card without the part draws one RULE finding", openCards(openCard("")).filter(([severity, message]) => severity === "RULE" && message.includes("Views")).length, 1],
     ["and nothing else, so the page's other parts are not reported beside it", openCards(openCard("")).length, 1],
+    ["the finding says where the part goes: after What and before the options",
+      openCards(openCard("")).filter(([, message]) => message.includes("after What and before the options")).length, 1],
+    ["known-bad: the finding no longer sends the part after the options",
+      openCards(openCard("")).filter(([, message]) => message.includes("a paragraph after the options")).length, 0],
     ["a card with the part draws none", openCards(openCard(VIEWS)).length, 0],
     ["known-bad: the word in the card's title or its prose is not the part",
       openCards(openCard("<p>The views differ on this one.</p>", "Q1 &middot; whose Views count")).length, 1],

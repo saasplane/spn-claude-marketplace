@@ -17,7 +17,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
       "section": "Reports and templates",
-      "seen": "5f842b5a"
+      "seen": "a3bd8060"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -178,7 +178,7 @@ The first two groups are a table of **# · Recommendation · Closes · Done when
 
 **No Decided by column and no Effort column**: the group heading says who decides, and Closes says what an action is worth.
 
-**Needs you is short cards**, headed with its count (*Needs you: 4 records, in 4 decisions*). Each card has a heading naming the decision as a question, then *What*, *Why it needs you* and the *Options*, and a closing line with the option you would take. **You copy each card unchanged to a `Q<n>` card on the arc's page**, so write it as a card from the start (`refs/devex/workspace/docs/decision-cards.md`). A card on the page also carries a *Views* part, which is added when the card is copied. It sits after the card's Why and What and before its options: one line on who spoke and why, then each view's reason in one or two plain sentences, as a colleague would say it out loud, such as *"**Product:** A person never sees the request key, so a version kept there tells them nothing."*
+**Needs you is short cards**, headed with its count (*Needs you: 4 records, in 4 decisions*). Each card has a heading naming the decision as a question, then *Why it needs you*, *What* and the *Options*, in that order, and a closing line with the option you would take. A report's card reads Why first, as a card on the page does, because a card has one order. **You copy each card unchanged to a `Q<n>` card on the arc's page**, so write it as a card from the start (`refs/devex/workspace/docs/decision-cards.md`). A card on the page also carries a *Views* part, which is added when the card is copied. It sits after the card's Why and What and before its options: one line on who spoke and why, then each view's reason in one or two plain sentences, as a colleague would say it out loud, such as *"**Product:** A person never sees the request key, so a version kept there tells them nothing."*
 
 ## Who decides — MUST
 
