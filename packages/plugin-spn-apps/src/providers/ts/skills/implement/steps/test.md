@@ -101,6 +101,8 @@ Never leave mutated: the platform org and its policies, org-TYPE/GLOBAL auth/dat
 | unit, in a node project · integration · contract | Jest | `-- <path or pattern>` | `-- -t "<id>"` |
 | unit, in a web project | Vitest | `-- <path or pattern>` | `-- -t "<id>"` |
 | component | Playwright CT | `-- <path or pattern>` | `-- -g "<id>"` |
+| unit, in `toolchain-ts` | `node --test` | none: it is handed the whole folder | none |
+| journey | Playwright | none: the tier names its own folder, so a path adds to it | not part of the selective loop |
 
 ```bash
 spnutils apps test contract <working> <client> -- tests/contract/<mod>    # while coding: one module's contract cases, the working name reused
@@ -108,6 +110,7 @@ spnutils apps test contract <fresh> <client> -- tests/contract/<mod>      # once
 spn-devex behaviours stamp write <fresh> <repo>                           # never with --reach repository
 ```
 
+- **Through `spnutils`, a selection needs a tool newer than `5.1.0`.** Up to `5.1.0` the command loses the `--` on its way to the runner: a path is refused as a second run name, and a flag is dropped, so the whole tier runs. On `5.1.0`, write the same selection from inside the node: `npx spn-test <tier> <run> -- <selection>`.
 - **A selection that matches no file exits clean.** Every runner is given `--passWithNoTests`, so a mistyped path passes. Read each named id as `SUCCESS` from `tests/.output/<tier>/runs/<run>.json`, and report an id the file does not name as *nothing proves this*.
 - **A contract or integration selection still pays the tier's global setup.** Only the cases are fewer.
 - **A changed contract state or a regenerated client touches every caller's cases**, so its selection names each caller's folder, not only the module that changed.

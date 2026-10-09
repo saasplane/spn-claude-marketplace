@@ -620,7 +620,9 @@ whole run can meet it. Report a selection that matched no case in these words: *
 **A whole tier runs before a release, or in one of five named cases — MUST**
 (`RD.DEVEX.WORKSPACE.245`). Before a release, the full pass is a named step: run the owed tiers of
 the nodes the release publishes, whole and once, with the services up, and ask for the release go only
-after it. The release command is unchanged. Outside a release, run a whole tier only when one of
+after it. The release command runs every tier it can run by itself and releases every library, a
+generated client among them; it does not run a client's contract tier, which calls a running
+service, and it names that tier as not run. Outside a release, run a whole tier only when one of
 these holds:
 
 - the changed package is imported by nodes outside the order;

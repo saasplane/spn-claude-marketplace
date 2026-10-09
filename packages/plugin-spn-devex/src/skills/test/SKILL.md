@@ -32,7 +32,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/README.md",
       "section": "The selective loop — what runs while work is under way",
-      "seen": "0a400292"
+      "seen": "34ef49ae"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/13-tests.md",
@@ -232,7 +232,7 @@ Everything after `--` reaches the runner unchanged, so the words are the runner'
 
 **A whole tier runs before a release, or in one of five named cases — MUST** (`RD.DEVEX.WORKSPACE.245`).
 
-**Before a release, the full pass is a named step.** Run the owed tiers of the nodes the release publishes, whole and once, with the services up. Ask for the release go only after that pass. The release command and its own gates stay as they are.
+**Before a release, the full pass is a named step.** Run the owed tiers of the nodes the release publishes, whole and once, with the services up. Ask for the release go only after that pass. The release command runs every tier it can run by itself and releases every library, a generated client among them. It does not run a client's contract tier, which calls a running service, and it names that tier as not run. So that tier is run here, in the full pass.
 
 **Outside a release, run a whole tier only in these five cases:**
 

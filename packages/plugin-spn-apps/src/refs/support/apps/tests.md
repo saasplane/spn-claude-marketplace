@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/",
-      "seen": "8cfeea47"
+      "seen": "d9d32f00"
     }
   ]
 }
@@ -140,7 +140,7 @@ A behaviour row and a case are joined by the row's id, and the join is mechanica
 
 **State acceptance as named behaviour ids, read as `SUCCESS` from the run file — MUST.** It is never an exit code, because the runner exits clean when a selection matches no case. It is never a count of a whole tier, because only a whole run can meet one. Report a selection that matched no case as *nothing proves this*.
 
-**A whole tier runs before a release, or in one of five named cases — MUST** (`RD.DEVEX.WORKSPACE.245`). The full pass is a named step before a release: the owed tiers of the nodes the release publishes, whole and once, with the services up, and the release go is asked after it. The release command is unchanged. Outside a release, a whole tier runs when:
+**A whole tier runs before a release, or in one of five named cases — MUST** (`RD.DEVEX.WORKSPACE.245`). The full pass is a named step before a release: the owed tiers of the nodes the release publishes, whole and once, with the services up, and the release go is asked after it. The release command runs every tier it can run by itself and releases every library, a generated client among them, at the one version; a client's contract tier calls a running service, so the command does not run it and names it as not run. Outside a release, a whole tier runs when:
 
 - the changed package is imported by nodes outside the order;
 - a test configuration, a global setup or a runner file changed;
