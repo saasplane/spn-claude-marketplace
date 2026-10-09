@@ -9,12 +9,12 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
       "section": "A card is only for what the rules leave open",
-      "seen": "ec26f9c6"
+      "seen": "813fc6a9"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The reply while work runs shows what needs you, then what moved",
-      "seen": "8775a2cf"
+      "seen": "873b5641"
     }
   ]
 }
@@ -95,7 +95,7 @@ is written, and anything still open becomes the page's next `Q<n>` card, in the 
 | **What** | The change concretely — the file, the rule, the before → after, in names and counts, not adjectives. It starts from what exists, with the file and the line |
 | **Why** | Which of the three reasons makes the choice the developer's, and what it costs to leave as is: the failure it causes. Never *"for consistency"* |
 | **Options** | A **table**: lettered, trade-off in its own column. *"Leave it"* is a real option wherever viable, with its cost stated |
-| **Views** | One line on who spoke and why those views. Then each view in its own voice: its name in bold, and one or two plain sentences of what it said, as a person at the table would say it. A view with no objection says so in its own line. Never a summary of what "the views" thought (`RD.DEVEX.AGENT.090`). The agent picks the views from what is being decided and their number from the signs of complexity (`refs/devex/agent/lenses.md`). On the page the part is required: the check that runs when the page is written reports a card in `Open` without it. A card or a suggestion in chat carries it too, and no check reads it there |
+| **Views** | One line on who spoke and why those views. Then each view in its own voice: its name in bold, and what it said, as a colleague would say it out loud, in short full sentences and everyday words, never a slogan. Such as: **Architect:** If we hold a finding back, we have to show it later. Let's show it in full the next time the agent stops and waits. If we don't, it gets lost. **Lead:** This is the same problem as Needs you. Let's fix both in this arc. We don't need a new one. A view with no objection says so in its own line. Never a summary of what "the views" thought (`RD.DEVEX.AGENT.090`). The agent picks the views from what is being decided and their number from the signs of complexity (`refs/devex/agent/lenses.md`). On the page the part is required: the check that runs when the page is written reports a card in `Open` without it. A card or a suggestion in chat carries it too, and no check reads it there |
 | **→ Recommendation** | One option, carrying the reason it wins, and citing what decides it |
 | **Preview** | Where the decision is a shape — an outline, a tree, a sample row, a code fragment — inline. A reader who must ask *"show me"* was handed an undecidable card. Where a page shows the options, the card links that preview page; the question is asked in the card on the approach page and never in the preview, which holds no card. A code fragment is written to its stack's own naming and code standards (decision RD.DEVEX.WORKSPACE.235) |
 

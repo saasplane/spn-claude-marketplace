@@ -554,8 +554,10 @@ console.log("\n=== orientation — the short rules are in the agent's context, e
   says("the agent's context holds the short rules, after the ground and its note",
     at > ordinary.context.indexOf("Ground, read at load") && ordinary.context.indexOf("Ground, read at load") > 0);
   says("the developer's pane does not show them", !ordinary.message.includes(HEADING) && !ordinary.message.includes("in its own voice"));
-  says("they are about ten lines: the heading and no more than nine rules",
-    lines.length >= 7 && lines.length <= 9, `got ${lines.length} rule lines`);
+  says("they are about ten lines: the heading and no more than ten rules",
+    lines.length >= 7 && lines.length <= 10, `got ${lines.length} rule lines`);
+  says("known-bad: no line asks for a person at the table, the wording the developer's correction replaced",
+    block.length > 0 && !block.includes("person at the table") && !block.includes("one or two plain sentences"));
 
   for (const [what, words] of [
     ["views take part in a discussion about a shape, at any moment of a workstream",
@@ -564,7 +566,11 @@ console.log("\n=== orientation — the short rules are in the agent's context, e
     ["what each number of signs brings",
       ["No sign: the one view that owns the question, in one sentence", "One sign: the architect's view and the owning view",
        "Two signs or more: the starting group with product and partner", "a fresh agent"]],
-    ["a view is shown in its own voice", ["in its own voice", "its name, then one or two plain sentences", "Never sum up what \"the views\" thought"]],
+    ["a view is shown in its own voice, as a colleague would say it, never a slogan",
+      ["in its own voice", "as a colleague would say them out loud, in short full sentences and everyday words, never a slogan",
+       "Never sum up what \"the views\" thought"]],
+    ["a reply reads as one person talking to another",
+      ["Write every reply as one person talking to another", "full sentences", "no clipped one-line verdicts", "Use a table only for facts that are a table"]],
     ["a shape-setting decision is put to the developer before it is built",
       ["sets a shape, a name, a member, a check or the direction of a dependency is put to the developer before it is built"]],
     ["structure before content", ["Structure comes before content"]],

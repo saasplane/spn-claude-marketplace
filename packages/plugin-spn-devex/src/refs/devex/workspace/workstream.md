@@ -9,7 +9,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The reply while work runs shows what needs you, then what moved",
-      "seen": "8775a2cf"
+      "seen": "873b5641"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "6cef90ed"
+      "seen": "e5235be7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -46,7 +46,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "d17fac5c"
+      "seen": "4f361906"
     }
   ]
 }
@@ -216,7 +216,7 @@ them this way:
   the domain's usual workflow. Each lens names the references it judges against
   ([`refs/devex/agent/lenses/`](../agent/lenses/README.md)).
 - **Views** says who spoke and why those, and then each view says what it objected to, in its own
-  voice: its name, and one or two plain sentences (`refs/devex/agent/lenses.md` § *A view is shown in
+  voice: its name, and what it said in short full sentences (`refs/devex/agent/lenses.md` § *A view is shown in
   its own voice*).
 - **The Recommendation** cites what decides it.
 
@@ -291,6 +291,14 @@ works on no workstream asks no card.
 **Agent reports, test and check output, and hook replies go to the arc's log, never the chat.** They
 are the record, and the log is where the record lives. In the chat they bury the one thing the
 developer must act on, which is the card.
+
+**A reply reads as one person talking to another — MUST** (`RD.DEVEX.AGENT.091`). Write it in full
+sentences, in everyday words, in the order you would say them out loud. Never write a row of clipped
+one-line verdicts, and never a slogan or a maxim. A table is for facts that are a table: several
+things compared on the same points. *We* and *let's* are fine. This holds for every reply, and for
+each view's own lines inside one (`refs/devex/agent/lenses.md` § *A view is shown in its own voice*).
+A line such as *a check nobody runs is not a check* sounds finished and tells the developer nothing
+they can act on.
 
 **The diff is how the developer follows the work.** A line that says *row 3 landed* asks them to
 trust it. The few lines that changed, with a sentence on what they do, let them check it in the time
