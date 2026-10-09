@@ -9,7 +9,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "The reply while work runs shows what needs you, then what moved",
-      "seen": "46931c8e"
+      "seen": "8775a2cf"
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/04-workspace/02-workstream.md",
@@ -17,7 +17,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
-      "seen": "c0ab61a6"
+      "seen": "6cef90ed"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/02-workstream/01-workstream.md",
@@ -46,7 +46,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
-      "seen": "6991071c"
+      "seen": "d17fac5c"
     }
   ]
 }
@@ -215,7 +215,9 @@ them this way:
   source — OWASP ASVS, NIST 800-63, the twelve-factor app, a pattern's own literature — and against
   the domain's usual workflow. Each lens names the references it judges against
   ([`refs/devex/agent/lenses/`](../agent/lenses/README.md)).
-- **Views** says who spoke, why those, and what each objected to.
+- **Views** says who spoke and why those, and then each view says what it objected to, in its own
+  voice: its name, and one or two plain sentences (`refs/devex/agent/lenses.md` § *A view is shown in
+  its own voice*).
 - **The Recommendation** cites what decides it.
 
 **An answer lands in the arc's notes in the same turn — MUST.** An answer to a card, or any point the
@@ -312,6 +314,22 @@ that was open before this turn. With no row in progress, a reply that names no o
 back, and the message of the check says which rows it read. A reply that raises a card shows it in
 full at its top in both cases (`RD.DEVEX.WORKSPACE.189`).
 
+**While work runs, a finding sends you back only when it is about the reply itself — MUST**
+(`RD.DEVEX.WORKSPACE.244`). Work runs while a row of this window's arcs is marked in progress. Every
+other finding is held until the first turn end where no row is in progress, which is where you wait.
+
+| The finding is about | While a row is in progress |
+| --- | --- |
+| the reply itself: a card it raised that is not in full at its top, a decision it put with no whole card, a handover block that is missing or not whole, a first reply without the welcome | you reply again, as at any turn end |
+| anything else: the docs trees, an answer whose notes did not move, a page behind its arcs, an arc the page does not name, a row that can run, an arc that landed with a row undecided | held. No reply is sent for it |
+
+**Nothing held is lost or shortened, and nothing held is stored as text.** A turn end that holds a
+finding leaves its marks where they were: the time, the step rows, the logs and the notes it compares
+against. So the next turn end finds the same thing again, and the first turn end where you wait says
+each finding whole. Fix what you already know is owed while the work runs: a finding you fixed in
+between is not found again. **So clear the mark when a row lands, stops or is held**, because a row
+left in progress also holds every finding back.
+
 **A window is held only for work it did — MUST.** The checks that read a workstream's page, its arcs
 and its cards read the workstreams bound to this window, and no others. A workstream another window
 is still writing is unfinished rather than wrong, and that window hears about it. A window that works
@@ -362,6 +380,13 @@ the handover block only when your reply directs somebody there: it says to open 
 window, or says where the next one starts. A status reply that mentions another window, a release
 order, or what happens later passes no work on, and you write no block for it. The block is written
 once, in the reply that passes the work on, and a later reply in the same window names it in one line.
+
+**A finding on a handover reply is answered without the block.** Fix what the finding names and point
+at the block above it. The check keeps the step rows it read when a whole block was written, and
+while those rows have not moved it asks for no second block. A new block is owed only when the work
+has moved since. **A card that is open at a handover is one line, never the card in full**: name it
+on the block's `open:` line with its number and its question. The full card is on the approach page,
+and the next window reads it there.
 
 ## Every moment gets a plain, warm line
 
@@ -946,7 +971,9 @@ Nothing above is enforced by good intentions. Every transition that can be check
 | an answer logged for an arc lands in that arc's notes in the same turn, and a proposed arc carries no review point to a later step of itself | `stop.ts`, when a turn ends |
 | a page published without being asked is met by a reminder, never a refusal | `pretooluse.ts`, on a publish |
 | a page that links its stylesheet from outside is refused on a publish, and the refusal names `docs sds bundle` | `pretooluse.ts`, on a publish |
-| a reply that passes work on carries a handover block with all nine labels and no `{{…}}` left | `stop.ts`, when a turn ends |
+| a reply that passes work on carries a handover block with all nine labels and no `{{…}}` left, once while the step rows have not moved, and names each open card | `stop.ts`, when a turn ends |
+| while a row is in progress, only a finding about the reply sends the agent back, and the rest is found again when it waits | `stop.ts`, when a turn ends |
+| the short rules are in the agent's context from the first turn | `orientation.ts`, at session start |
 | what landed, said out loud | `closed.ts`, after the folder moves |
 | what the agent's own machinery costs | `timing.ts`, on every hook run |
 | a repository write with no go on record | `confirmed.ts`, on the first such write in a window |

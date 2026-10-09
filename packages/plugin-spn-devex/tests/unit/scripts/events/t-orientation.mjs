@@ -3,7 +3,7 @@
 // this workspace is not in and would otherwise never be exercised: day zero, a workspace with no
 // workstreams, one with exactly one open (the standing offer), and the legacy shapes.
 import { execFileSync } from "node:child_process";
-import { mkdirSync, writeFileSync, rmSync, cpSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync, rmSync, cpSync } from "node:fs";
 import { join } from "node:path";
 
 import { existsSync } from "node:fs";
@@ -517,6 +517,93 @@ console.log("\n=== orientation — the welcome word for word, and one status lin
   says("day zero opens on the first-visit welcome, then the door, and no status line",
     zero.message.startsWith(`# 👋 Welcome to SaaS Plane, Dhruv. Glad you're here!\n\n${BODY}\n\n&nbsp;\n\nThis folder is empty`)
     && zero.context.includes("open your first reply with the welcome above, word for word and whole, whatever the prompt"));
+}
+
+// ── the short rules (RD.DEVEX.AGENT.089, Q55 B) ──
+//
+// A REFERENCE IS READ WHEN A SKILL NAMES IT, and a reply in the middle of an arc calls no skill. So the
+// rules a reply must follow are printed once, here, in short form, and each line names the reference
+// that holds the rule whole. The cases read the hook's own output, and they open every file a line
+// names: a line that points at a file or a section that is not there is a rule nobody can read.
+console.log("\n=== orientation — the short rules are in the agent's context, each naming its reference");
+{
+  const says = (label, ok, detail = "") => {
+    n += 1;
+    if (!ok) failed += 1;
+    console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${detail}`}`);
+  };
+  const hook = (root) => {
+    try {
+      const out = execFileSync("node", [`${HOOKS}/src/scripts/events/orientation.ts`, "--stdin"], {
+        input: JSON.stringify({ cwd: root, session_id: "t-orientation-rules" }), encoding: "utf8", cwd: root,
+        env: { ...process.env, SPN_TELEMETRY: "off" }, maxBuffer: 16 * 1024 * 1024 });
+      const parsed = JSON.parse(out);
+      return { message: parsed.systemMessage, context: parsed.hookSpecificOutput.additionalContext };
+    } catch (e) { return { message: `ERROR ${e.stderr ?? e.message}`, context: "" }; }
+  };
+  const ordinary = hook(fixture("short-rules", {
+    "spn-app-ts/sprepo.json": repo("APPS", { stack: "TS" }),
+    "spn-app-ts/CONCEPT.md": "# concept\n",
+    [`.spndevex/${WORKSTREAMS}/open/042-widget-pricing/arcs/N1-a.md`]: "# arc\n",
+  }));
+  const HEADING = "## The short rules";
+  const at = ordinary.context.indexOf(HEADING);
+  const block = at < 0 ? "" : ordinary.context.slice(at);
+  const lines = block.split("\n").filter((line) => line.startsWith("- "));
+
+  says("the agent's context holds the short rules, after the ground and its note",
+    at > ordinary.context.indexOf("Ground, read at load") && ordinary.context.indexOf("Ground, read at load") > 0);
+  says("the developer's pane does not show them", !ordinary.message.includes(HEADING) && !ordinary.message.includes("in its own voice"));
+  says("they are about ten lines: the heading and no more than nine rules",
+    lines.length >= 7 && lines.length <= 9, `got ${lines.length} rule lines`);
+
+  for (const [what, words] of [
+    ["views take part in a discussion about a shape, at any moment of a workstream",
+      ["take part in a discussion about a shape", "at any moment of a workstream", "in the middle of a run"]],
+    ["the three signs", ["crosses a repository", "changes what a partner builds on", "sets a pattern others will follow"]],
+    ["what each number of signs brings",
+      ["No sign: the one view that owns the question, in one sentence", "One sign: the architect's view and the owning view",
+       "Two signs or more: the starting group with product and partner", "a fresh agent"]],
+    ["a view is shown in its own voice", ["in its own voice", "its name, then one or two plain sentences", "Never sum up what \"the views\" thought"]],
+    ["a shape-setting decision is put to the developer before it is built",
+      ["sets a shape, a name, a member, a check or the direction of a dependency is put to the developer before it is built"]],
+    ["structure before content", ["Structure comes before content"]],
+    ["Needs you opens a reply in two cases only",
+      ["**Needs you** opens a reply in two cases only", "in full, once", "each open card in one line", "A progress reply has no such part"]],
+    ["arcs are the agent's to manage, and a workstream is the developer's decision",
+      ["The arcs of a workstream are yours to manage", "A new workstream is always the developer's decision"]],
+    ["no script judges whether a prompt is such a discussion", ["No script tells you that a prompt opens a discussion about a shape"]],
+  ]) {
+    const missing = words.filter((word) => !block.includes(word));
+    says(`a line states: ${what}`, missing.length === 0, `missing: ${missing.join(" | ")}`);
+  }
+
+  // EACH LINE POINTS AT A REFERENCE THAT EXISTS, AND AT A SECTION THAT FILE REALLY HAS.
+  const pointer = /→ `(refs\/[^`]+\.md)` § (.+)$/;
+  const unpointed = lines.filter((line) => !pointer.test(line));
+  says("every line ends with the path of its reference and the section that holds the rule",
+    lines.length > 0 && unpointed.length === 0, `no pointer: ${unpointed.map((line) => line.slice(0, 60)).join(" | ")}`);
+  const broken = [];
+  for (const line of lines) {
+    const found = pointer.exec(line);
+    if (!found) continue;
+    const file = resolve(HOOKS, "src", found[1]);
+    let text = "";
+    try { text = readFileSync(file, "utf8"); } catch { broken.push(`${found[1]} is not a file`); continue; }
+    if (!text.split("\n").some((heading) => /^#{2,4} /.test(heading) && heading.replace(/^#+ /, "").trim() === found[2].trim()))
+      broken.push(`${found[1]} has no section "${found[2]}"`);
+  }
+  says("every reference named is a file of the plugin, and every section named is a heading in it",
+    lines.length > 0 && broken.length === 0, broken.join(" | "));
+
+  // KNOWN-BAD: the same reader must reject a line that points nowhere.
+  says("known-bad: a line with no reference fails the pointer test", !pointer.test("- Show each view in its own voice."));
+
+  const zero = hook(fixture("short-rules-day-zero", { ".spndevex/README.md": "state\n" }));
+  says("day zero carries the same rules, after its note",
+    zero.context.includes(HEADING) && zero.context.indexOf(HEADING) > zero.context.indexOf("Day-0 mode") && !zero.message.includes(HEADING));
+  says("the by-hand form prints them too, since it prints what the agent reads",
+    run("node", [`${HOOKS}/src/scripts/events/orientation.ts`, WORKSPACE], WORKSPACE).includes(HEADING) || !IN_WORKSPACE);
 }
 
 console.log(failed ? `\n  ${failed} FAILED` : `\n  all ${n} passed`);

@@ -154,8 +154,8 @@ Every unanswered question is a card with **real options and a recommendation**. 
 
 - **More views, or more passes, need the developer's word.** The limit keeps a small choice from costing a wait and a long reply.
 - **A view whose word is to count as a review that can block a gate is a fresh `spn-panel`, at any number of signs.** You wrote the proposal, so a lens file you read yourself gives advice and blocks nothing.
-- **Name each point by its view**, such as *Architect:* or *Partner:*, and say where two views disagree instead of blending them. The developer can then answer one view.
-- **Say in one line which views you brought, why those, and which way each was made.** Without it the developer cannot tell an independent objection from your own. On a card that line is its *Views* part.
+- **Show each view in its own voice** (`RD.DEVEX.AGENT.090`): its name in bold, such as **Architect:** or **Partner:**, then one or two plain sentences of what it said, as a person at the table would say it. A view with no objection says so in its own line. Never sum up what "the views" thought, and where two views disagree, leave them as two lines. The developer can then answer one view. The form is in [`refs/devex/agent/lenses.md`](../../refs/devex/agent/lenses.md) § *A view is shown in its own voice*.
+- **Say in one line which views you brought, why those, and which way each was made.** Without it the developer cannot tell an independent objection from your own. On a card that line, and each view's own line under it, are its *Views* part.
 - **A view does not replace the review.** Once a draft exists, the convened lens still reads it.
 
 ## Structure first, and what other platforms do

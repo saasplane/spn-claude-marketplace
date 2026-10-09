@@ -4,7 +4,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "One agent, one lens per engineering function",
-      "seen": "ac2c5d74"
+      "seen": "709102e6"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -15,6 +15,11 @@
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
       "section": "Every prompt is read before anything moves",
       "seen": "3295ff99"
+    },
+    {
+      "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
+      "section": "The rules of a reply reach the agent at session start, in short form",
+      "seen": "5bb6e9c0"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/01-agent/01-agent.md",
@@ -47,7 +52,7 @@ discussion: the same lens file that is worn while writing and convened at review
 | Part | What the agent does |
 | --- | --- |
 | **Who speaks** | what the developer just said, and what the workstream is about, decide which views speak |
-| **You can see it** | each point is named by the view that makes it, such as *Architect:* or *Partner:* |
+| **You can see it** | each view is shown as a speaker: its name, such as *Architect:* or *Partner:*, then one or two plain sentences of what it said (`refs/devex/agent/lenses.md` § *A view is shown in its own voice*) |
 | **Disagreement** | where two views disagree, the reply says so and never blends them into one answer |
 | **The stance** | a view questions the ask and adds to it. It starts from what the thing is for and who owns it, and asks *what would you object to here?* as well as *does this work?* |
 
@@ -89,6 +94,31 @@ developer finds the window in the session list by its work. A hook gives the nam
 the folder's name once a prompt names one workstream, such as `020-agent-workstream-improvements`,
 and `020-N011 artifacts-by-domain` where a handover starts the session on an arc. A name the
 developer types is kept until the work changes, and a session keeps the arc it started on.
+
+## The rules of a reply reach you at session start, in short form
+
+**The rules a reply must follow are put in front of you once, at session start, in short form, and
+each line points at the reference that holds the rule whole — MUST** (`RD.DEVEX.AGENT.089`). The
+session-start hook prints them into your context, after the ground, under the heading *The short
+rules*. They are about ten plain lines, and the developer's pane does not show them.
+
+| The short form states | The reference that holds it whole |
+| --- | --- |
+| your lenses take part in a discussion about a shape as views, at any moment of a workstream | this file, § *One agent, and the lenses take part as views* |
+| the three signs of complexity, and what each number of signs brings | `refs/devex/agent/lenses.md` § *Which views speak, and how many* |
+| a view is shown in its own voice | `refs/devex/agent/lenses.md` § *A view is shown in its own voice* |
+| a decision that sets a shape, a name, a member, a check or the direction of a dependency is put to the developer before it is built | this file, § *Every prompt is read before anything moves* |
+| structure comes before content | `refs/devex/function/ideate.md` |
+| **Needs you** opens a reply in two cases only | `refs/devex/workspace/workstream.md` § *The reply while work runs shows what needs you, then what moved* |
+| managing the arcs is yours, and a new workstream is always the developer's decision | `refs/devex/workspace/workstream.md` § *A new subject: another arc, or a workstream of its own* |
+
+**A line is a pointer, never a second copy of the rule.** When a line applies to the reply you are
+about to write, open the reference it names and follow the rule there. A rule changes in the book
+first, then in its reference, then in its line.
+
+**No script judges whether a prompt opens a discussion about a shape.** You read the prompt and
+decide, as you do for every prompt. A reference is read when a skill names it, and a reply in the
+middle of an arc calls no skill, so these lines are what carries the rules into that reply.
 
 ## Every prompt is read before anything moves
 

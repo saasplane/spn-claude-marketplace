@@ -495,12 +495,12 @@ one("a reply that asks nothing is still silent, whatever parts it lacks",
   "silent", { reply: NEEDS + "Landed and committed. Nothing else is open." });
 
 // F20 — A HANDOVER OVER AN OPEN CARD. The developer caught this twice in one session: the agent
-// offered a new window with two cards standing. A card's answer can change which arc runs next and
-// what the next window reads first, so a handover written over one is a brief that assumed an
-// answer nobody gave.
-one("a handover offered while a card is open is refused, and the card is named",
+// offered a new window with two cards open and neither one named. The next window must know the
+// question is there. CHANGED ON PURPOSE (RD.DEVEX.WORKSPACE.189): the card is named in one line on the
+// block's `open:` line, and the check no longer asks for it in full before any handover.
+one("a handover whose block says `open: none` while a card is open is told to name the card in one line",
   build("stop-handover-open-card", { arcNames: ["arc-a-subject.md"], pageOpts: { cards: CARD, names: ["arc-a-subject.md"] } }),
-  "warns", { says: "Answer first, then hand over",
+  "warns", { says: "Name each open card in one line on the block's `open:` line",
              reply: "Pick this up in a new window.\n```\ncontinue: workstream 001-a-subject, arc N1, step 1\nmodel: Opus 5.5\nread first: the page\npins: spn-foundation abc1234\nstate: clean\nlive now: no reload\ndone when: it lands\ndo not touch: closed\nopen: none\n```" });
 
 console.log("\n=== the handover check — what counts as saying a window is needed");
@@ -637,10 +637,13 @@ console.log("\n=== the handover check — what counts as saying a window is need
     const quiet = checkHandover(reply, CARDED, everyone(CARDED)).length === 0;
     n += 1; if (!quiet) failed += 1;
     console.log(`  ${quiet ? "PASS" : "FAIL"}  a reply putting the open card in full is not refused for a handover`);
+    // CHANGED ON PURPOSE (RD.DEVEX.WORKSPACE.189). This asked for the open card in full before any
+    // handover. A card open at a handover is one line now, so the direction is told to name the card.
     const bare = checkHandover("Open a new window after you answer.", CARDED, everyone(CARDED));
-    const still = bare.length === 1 && /Answer first/.test(bare[0].message);
+    const still = bare.length === 1 && bare[0].message.includes("Q329") && /in one line/.test(bare[0].message)
+      && !/Answer first/.test(bare[0].message);
     n += 1; if (!still) failed += 1;
-    console.log(`  ${still ? "PASS" : "FAIL"}  the same direction without the card is still told to answer first`);
+    console.log(`  ${still ? "PASS" : "FAIL"}  the same direction without the card is told to name the open card in one line`);
   }
 
   const short = checkHandover("Pick this up in a new window.\n```\ncontinue: workstream 008-plain-language, arc N13\n```", ROOT, everyone(ROOT));
@@ -1571,6 +1574,182 @@ ${tableOf(cyclesOf(folder))}
     check("[MKT.SCRIPTS.108] the line is the page's path from the workspace, then OWN_COPY", lines.length === 1 && lines[0] === `\`${A}/approach.html\`: ${OWN_COPY}.`, JSON.stringify(lines));
     check("[MKT.SCRIPTS.108] a workstream that is not this session's is not read", ownCopyPages(built.root, new Set(["002-b-subject"])).length === 0);
     check("[MKT.SCRIPTS.108] a page the session was told about before draws no warning", checkOwnCopy(built.root, everyone(built.root), lines).length === 0 && checkOwnCopy(built.root, everyone(built.root), []).length === 1);
+  }
+}
+
+// ── while work runs, only a finding about the reply sends the agent back (RD.DEVEX.WORKSPACE.244) ──
+//
+// EVERY FINDING MADE THE AGENT REPLY AGAIN, and the developer saw that reply. While a row is in
+// progress, a finding about a page, the notes or a docs tree is held: the hook exits 0. It is not kept
+// as text. The baseline's marks stay where they were, so the checks find it again at the first turn end
+// where no row is in progress. The cases below run the hook over several turn ends of one session.
+{
+  const { splitFindings, checkHandover, givesHandover } = await import("../../../../src/scripts/events/stop.ts");
+  const HOOK = `${HOOKS}/src/scripts/events/stop.ts`;
+  const W = `.spndevex/${WORKSTREAMS}/open/001-a-subject`;
+  const MARK = "in progress 2026-10-09 14:32 +05:30";
+  const LANDED = "LANDED — `def5678`";
+  const steps = (state) => `# N3 — a subject\n\nStatus: **RUNNING**\n\n## Steps\n\n` +
+    `| # | Repo | Altitude | What | Mechanism | Acceptance | State |\n| --- | --- | --- | --- | --- | --- | --- |\n` +
+    `| 1 | spn-foundation | DOCS | the chapter | by hand | audit | LANDED — \`abc1234\` |\n` +
+    `| 2 | spn-support-ts | CODE | the split check | by hand | its suite | ${state} |\n\n## Log\n\n- **2026-10-09 — go.**\n`;
+  const built = (name, { named = true, state = MARK } = {}) => workspace(name, {
+    [`${W}/approach.html`]: page({ names: named ? ["N3-a-subject.md"] : [] }),
+    [`${W}/arcs/N3-a-subject.md`]: steps(state),
+    [`${W}/notes/N3/spec.md`]: "# N3 — the specification\n\nThe check reads wiring.\n",
+  });
+  const stop = (root, session, reply = "Row 1 landed.", extra = {}) => {
+    bindOpen(root, session);
+    return run("node", [HOOK], { cwd: root, session_id: session, last_assistant_message: reply, ...extra }, root);
+  };
+  const arcOf = (root) => join(root, W, "arcs", "N3-a-subject.md");
+  const rewrite = (root, session, change) => { writeFileSync(arcOf(root), change(readFileSync(arcOf(root), "utf8")), "utf8"); wroteArcs(root, session); };
+  const ANSWER = "- **2026-10-09 — Q7 B** (the developer: *\"the second reading\"*). The check reads setup only.\n";
+  const logAnswer = (root, session) => rewrite(root, session, (text) => text + ANSWER);
+  const land = (root, session) => rewrite(root, session, (text) => text.replace(MARK, LANDED));
+  const moveSpec = (root) => writeFileSync(join(root, W, "notes", "N3", "spec.md"), "# N3 — the specification\n\nThe check reads setup only, as the developer chose.\n", "utf8");
+  const check = (label, ok, detail = "") => { n += 1; if (!ok) failed += 1; console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}${ok || !detail ? "" : `\n        ${String(detail).slice(0, 300)}`}`); };
+
+  console.log("\n=== stop — while a row is in progress, a finding that is not about the reply is held (RD.DEVEX.WORKSPACE.244)");
+  {
+    const root = built("n009-held-page", { named: false });
+    const running = stop(root, "held-page");
+    check("a finding about the page, while a row is in progress, sends no reply: the hook is silent", running === "", running);
+    land(root, "held-page");
+    const waiting = stop(root, "held-page");
+    check("known-bad: the same finding is said at the first turn end where no row is in progress",
+      /\[unnamed-arc\]/.test(waiting) && waiting.includes("N3-a-subject.md"), waiting);
+  }
+  {
+    const root = built("n009-held-notes");
+    stop(root, "held-notes");                       // the session's first turn end: its baseline
+    logAnswer(root, "held-notes");
+    const second = stop(root, "held-notes");
+    check("an answer whose notes did not move is held while a row is in progress", !/\[notes\]/.test(second) && second === "", second);
+    const third = stop(root, "held-notes");
+    check("and it is still held at the next turn end of the same run", third === "", third);
+    land(root, "held-notes");
+    const waiting = stop(root, "held-notes");
+    check("nothing held is lost: the notes finding is found again, whole, when the agent waits",
+      /\[notes\]/.test(waiting) && waiting.includes("notes/N3/spec.md") && waiting.includes("RD.DEVEX.WORKSPACE.193"), waiting);
+    const after = stop(root, "held-notes", "Done.", { stop_hook_active: true });
+    check("and once said, the marks move on: the reply that answers it is not told again", !/\[notes\]/.test(after), after);
+    const later = stop(root, "held-notes");
+    check("nor is a later turn that changed nothing", !/\[notes\]/.test(later), later);
+  }
+  {
+    const root = built("n009-held-fixed");
+    stop(root, "held-fixed");
+    logAnswer(root, "held-fixed");
+    const held = stop(root, "held-fixed");
+    moveSpec(root);
+    land(root, "held-fixed");
+    const waiting = stop(root, "held-fixed");
+    check("a held finding that the agent fixed before it waits is not found again, so it is not said",
+      held === "" && !/\[notes\]/.test(waiting), `${held} // ${waiting}`);
+  }
+  {
+    const root = built("n009-held-reply", { named: false });
+    const out = stop(root, "held-reply", "Row 1 landed.\n\nPick B and we move on.");
+    check("known-bad: a decision put with no card still sends the agent back while a row is in progress", /\[reply-shape\]/.test(out), out);
+    check("and the finding about the page is held in that same turn", !/\[unnamed-arc\]/.test(out), out);
+    land(root, "held-reply");
+    const waiting = stop(root, "held-reply");
+    check("the held finding is said when the agent waits, though another check spoke in between", /\[unnamed-arc\]/.test(waiting), waiting);
+  }
+  {
+    const root = built("n009-held-handover", { named: false });
+    const out = stop(root, "held-handover", "Pick this up in a new window.");
+    check("known-bad: a pass-on with no block still sends the agent back while a row is in progress",
+      /\[handover\]/.test(out) && !/\[unnamed-arc\]/.test(out), out);
+  }
+  {
+    const ABOUT_THE_REPLY = ["needs-you", "reply-shape", "handover", "welcome"];
+    const THE_REST = ["notes", "carried", "pageless", "cards-in-arcs", "stopped-no-card", "unnamed-arc", "page-stale", "own-copy",
+      "arc-landed", "runnable", "hold", "corpus"];
+    const all = [...ABOUT_THE_REPLY, ...THE_REST].map((name) => ({ check: name, message: `the ${name} finding, whole` }));
+    const names = (list) => list.map((warning) => warning.check).join(" ");
+    const split = typeof splitFindings === "function" ? splitFindings : () => ({ said: [], held: [] });
+    const running = split(all, true), waiting = split(all, false);
+    check("while a row is in progress, the four findings about the reply are said", names(running.said) === ABOUT_THE_REPLY.join(" "), names(running.said));
+    check("and every other finding is held, with its message as it was", names(running.held) === THE_REST.join(" ")
+      && running.held.every((warning) => warning.message === `the ${warning.check} finding, whole`), names(running.held));
+    check("with no row in progress, every finding is said and none is held", names(waiting.said) === names(all) && waiting.held.length === 0, names(waiting.held));
+  }
+
+  // ── a handover block is owed once, and an open card in a handover is one line (RD.DEVEX.WORKSPACE.189, .198) ──
+  console.log("\n=== handover — the block is owed once, and a card that is open is named in one line, never asked for in full");
+  const WHOLE = ["```text",
+    "continue:     workstream `001-a-subject`, arc `N3`, row 2, in a `spn-support-ts` window",
+    "model:        Opus 5.5, effort high",
+    "read first:   the arc `N3-a-subject.md`, rows 1 and 2",
+    "pins:         spn-support-ts abc1234",
+    "state:        row 1 landed; row 2 not started",
+    "live now:     no reload",
+    "done when:    the suite passes",
+    "do not touch: the templates folder",
+    "open:         none",
+    "```"].join("\n");
+  const PASS_ON = "Pick this up in a new window.";
+  const gives = typeof givesHandover === "function" ? givesHandover : () => null;
+  for (const [what, got, expected] of [
+    ["a reply with the whole block gives a handover", gives(`${PASS_ON}\n\n${WHOLE}`), true],
+    ["a block with a label missing does not", gives(`${PASS_ON}\n\n${WHOLE.replace(/\npins:[^\n]*/, "")}`), false],
+    ["a block with a {{…}} left does not", gives(`${PASS_ON}\n\n${WHOLE.replace("`N3`", "`N{{n}}`")}`), false],
+    ["a reply with no block does not", gives(PASS_ON), false],
+  ]) check(what, got === expected, `got ${got}`);
+  {
+    const root = built("n009-handover-fn", { state: LANDED });
+    const mine = everyone(root);
+    check("a pass-on with no block, after a whole block was given, owes no second block",
+      checkHandover(PASS_ON, root, mine, true).length === 0, JSON.stringify(checkHandover(PASS_ON, root, mine, true)));
+    check("known-bad: the same pass-on, with no block given before, is told to write one",
+      checkHandover(PASS_ON, root, mine, false).length === 1 && /carries no handover block/.test(checkHandover(PASS_ON, root, mine, false)[0].message));
+    check("known-bad: a block printed again is still read, so one with a label missing is told so",
+      checkHandover(`${PASS_ON}\n\n${WHOLE.replace(/\npins:[^\n]*/, "")}`, root, mine, true).length === 1);
+  }
+  {
+    const carded = workspace("n009-handover-card", {
+      [`${W}/approach.html`]: page({ cards: CARD, names: ["N3-a-subject.md"] }),
+      [`${W}/arcs/N3-a-subject.md`]: steps(LANDED),
+    });
+    const mine = everyone(carded);
+    const named = checkHandover(`${PASS_ON}\n\n${WHOLE.replace("open:         none", "open:         Q1 · a real question, on the approach page")}`, carded, mine);
+    check("a handover that names the open card in one line on its `open:` line is whole", named.length === 0, JSON.stringify(named));
+    const unnamed = checkHandover(`${PASS_ON}\n\n${WHOLE}`, carded, mine);
+    check("a handover that leaves an open card out is told to name it in one line",
+      unnamed.length === 1 && unnamed[0].message.includes("Q1") && /in one line/.test(unnamed[0].message) && /`open:`/.test(unnamed[0].message),
+      JSON.stringify(unnamed));
+    check("and the message never asks for the card in full, and never says to answer first",
+      unnamed.length === 1 && !/Put the cards to the developer in full/.test(unnamed[0].message) && !/Answer first/.test(unnamed[0].message),
+      JSON.stringify(unnamed));
+    const later = checkHandover("The handover is in my last reply. Open a new window from it when you are ready.", carded, mine, true);
+    check("a later reply that names the handover in one line owes no block and no card", later.length === 0, JSON.stringify(later));
+  }
+  {
+    // THE HOOK REMEMBERS THE BLOCK. Turn 1 gives it; turn 2 directs the work on again with no block.
+    const root = built("n009-handover-once", { state: LANDED });
+    const first = stop(root, "ho-once", `${PASS_ON}\n\n${WHOLE}`);
+    const second = stop(root, "ho-once", PASS_ON);
+    check("the hook: the reply that gives the whole block is silent", first === "", first);
+    check("the hook: a later reply in the same window that passes the work on again is not asked for a second block", !/\[handover\]/.test(second), second);
+    rewrite(root, "ho-once", (text) => text.replace("the split check", "the split check, and its cases"));
+    const moved = stop(root, "ho-once", PASS_ON);
+    check("known-bad: once the step rows have moved, the old block no longer says where to start, and a block is owed", /\[handover\]/.test(moved), moved);
+  }
+  {
+    // A FINDING ON A HANDOVER REPLY IS ANSWERED WITHOUT THE BLOCK. The page does not name the arc, so
+    // the handover reply draws `unnamed-arc`. The answer mentions the new window and prints no block.
+    const root = built("n009-handover-answer", { named: false, state: LANDED });
+    const first = stop(root, "ho-answer", `${PASS_ON}\n\n${WHOLE}`);
+    check("the hook: a handover reply with a whole block is told only about the page", /\[unnamed-arc\]/.test(first) && !/\[handover\]/.test(first), first);
+    const answer = stop(root, "ho-answer", "The page now names the arc. The handover block above still holds: open a new window from it.",
+      { stop_hook_active: true });
+    check("the hook: the reply that answers that finding is not asked for the block again", !/\[handover\]/.test(answer), answer);
+    const never = built("n009-handover-never", { state: LANDED });
+    stop(never, "ho-never", "Row 2 landed.");
+    const asked = stop(never, "ho-never", PASS_ON);
+    check("known-bad: a window that never gave a block is told to write one", /\[handover\]/.test(asked), asked);
   }
 }
 

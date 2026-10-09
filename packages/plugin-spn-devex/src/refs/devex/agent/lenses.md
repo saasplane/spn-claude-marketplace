@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/02-agent/03-lenses/01-lenses.md",
-      "seen": "8f3232dc"
+      "seen": "de285b3f"
     }
   ]
 }
@@ -38,7 +38,7 @@
 
 ## A view in a discussion about a shape
 
-**A lens also takes part in a discussion about a shape, as a view — MUST** (`RD.DEVEX.AGENT.084`). The agent stays one agent. `refs/devex/agent/agent.md` says what a view is. This section says how a view differs from a worn lens and a convened one, which views speak, how many, and how each one is made.
+**A lens also takes part in a discussion about a shape, as a view — MUST** (`RD.DEVEX.AGENT.084`). The agent stays one agent. `refs/devex/agent/agent.md` says what a view is. This section says how a view differs from a worn lens and a convened one, which views speak, how many, how each one is made, and how each one is shown.
 
 | | Worn | A view | Convened |
 | --- | --- | --- | --- |
@@ -68,7 +68,7 @@ A sign of complexity is one of these, each read from the change itself: the choi
 | one sign | the architect's view and the owning view | one |
 | two signs or more | the starting group for what is being decided, with product and partner among them | one, and a second after the developer's answer |
 
-**More views, or more passes, need the developer's word.** A choice inside one place that brings every view costs the developer a wait and a long reply for a decision one sentence settles. **The agent says which views it brought, and why those.** One line is enough. On a card, that line is the card's *Views* part.
+**More views, or more passes, need the developer's word.** A choice inside one place that brings every view costs the developer a wait and a long reply for a decision one sentence settles. **The agent says which views it brought, and why those.** One line is enough, and each view then speaks in its own voice (§ *A view is shown in its own voice*). On a card, that line and the views under it are the card's *Views* part.
 
 ### How a view is made
 
@@ -82,6 +82,24 @@ A sign of complexity is one of these, each read from the change itself: the choi
 | May it block | no. It is a worn lens | yes, where its lens file says so |
 
 **A view that the one agent makes is advice, whatever lens it reads.** The context that wrote a proposal cannot block it, and it cannot pass it either.
+
+### A view is shown in its own voice
+
+**Show a view as a speaker: its name, then one or two plain sentences of what it said, as a person at the table would say it — MUST** (`RD.DEVEX.AGENT.090`). Never give a summary of what "the views" thought. This is the form, in a reply and on a card:
+
+> **Architect:** A rule that sits in a file the agent may never open is not a rule. Put it where every session sees it.
+>
+> **Lead:** Do not build a check yet. Run the replay and see whether this is enough.
+
+| Part | The rule |
+| --- | --- |
+| **The name** | the role's plain name in bold, with a colon: *Architect*, *Lead*, *Partner*, *Product* |
+| **The words** | one or two short sentences in simple language. The view says what it objects to or what it would add, and why, in the first person where that reads naturally |
+| **No objection** | a view with none says so in its own line, such as *I have no objection* |
+| **How it was made** | say it in brackets when that matters: *(spoken by the one agent)* or *(a fresh agent)* |
+| **Disagreement** | two views that disagree stand as two lines, one under the other. Do not blend them |
+
+**One line before the views says which ones you brought, and why those.** The views follow it, one line each. A sentence such as *the views agreed that the name is fine* says nothing the developer can answer: it has no owner and no words of its own.
 
 ### The architect's view answers for the structure of the system, and of the work on it
 

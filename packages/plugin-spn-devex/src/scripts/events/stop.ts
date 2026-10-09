@@ -15,7 +15,8 @@
 //   notes      an answer logged in an arc lands in that arc's notes (spec, plan, previews, samples) the same turn
 //   carried    a proposed arc never carries a review point to a later step of itself
 //   hold       an arc whose status reads HELD must name a card that exists and is unanswered
-//   handover   a reply that says a new window is needed carries the nine labelled lines, in one column
+//   handover   a reply that says a new window is needed carries the nine labelled lines, in one column,
+//              once while the step rows stand, and names each open card in one line
 //   page-stale an arc this window wrote left its workstream's page behind the arcs
 //   own-copy   a page of this window's workstreams links no shared stylesheet; said once in a session
 //   arc-landed an arc this session wrote reached LANDED with a row nobody accounted for
@@ -28,6 +29,10 @@
 // workstreams bound to this window by the path of its writes, its first prompt or a handover
 // (RD.DEVEX.WORKSPACE.197 and .236, `lib/window.ts`); a workstream another window is still writing is
 // unfinished, and that window hears about it. A window bound to none hears nothing about them.
+//
+// WHILE A ROW IS IN PROGRESS, ONLY A FINDING ABOUT THE REPLY SENDS THE AGENT BACK (RD.DEVEX.WORKSPACE.244):
+// `needs-you`, `reply-shape`, `handover` and `welcome`. Every other finding is held, and the checks find
+// it again at the first turn end where no row is in progress (`splitFindings`).
 //
 // `corpus` is the newest and the odd one out: every other check here reads what the TURN wrote, and
 // that one reads the workspace. It is here because nothing else ran it — `N38` found that every
@@ -421,7 +426,9 @@ export function stepHash(text: string): string {
 export type Baseline = { at: number; steps: Record<string, string>; fired?: string[];
                          cards?: string[]; arcs?: Record<string, ArcMark>;
                          /** The pages this session was already told hold their own copy of the styles. */
-                         ownCopy?: string[] };
+                         ownCopy?: string[];
+                         /** `stepsMark` as it read when this session wrote a whole handover block. */
+                         handover?: string };
 
 /**
  * What one arc looked like at a Stop, for the `notes` and `carried` checks: a short hash of each of
@@ -844,35 +851,63 @@ export function cardList(cards: string[], where: Map<string, string[]> = new Map
   return [...parts, ...(bare.length ? [bare.join(" · ")] : [])].join("; ");
 }
 
-export function checkHandover(reply: string, root: string, mine: Set<string>): Warning[] {
+/** The fenced blocks of a reply that are shaped as a handover; a `diff` block never is. */
+function handoverFences(reply: string): Fence[] {
+  return fencesOf(reply).filter((fence) => fence.info !== "diff" && looksLikeHandover(fence.body));
+}
+
+/**
+ * Whether the reply holds a handover block that is filled in and carries all nine labels. The hook
+ * keeps this, so the block is asked for once (RD.DEVEX.WORKSPACE.189).
+ */
+export function givesHandover(reply: string): boolean {
+  const block = handoverFences(reply).find((fence) => !quotesTemplate(fence));
+  if (!block) return false;
+  const lines = handoverLines(block.body);
+  return HANDOVER_LABELS.every((label) => lines.has(label));
+}
+
+/**
+ * One hash of the step rows of every arc in this window's workstreams. The hook keeps it when a whole
+ * handover block is written. While it has not moved, the work stands where the block says, and no
+ * second block is owed. Only this window's arcs are read, so another window's work never brings the
+ * question back.
+ */
+export function stepsMark(root: string, mine: Set<string>): string {
+  const rows = openArcs(root, mine).sort().map((arc) => `${arc}\n${stepHash(read(arc))}`);
+  return createHash("sha256").update(rows.join("\n")).digest("hex").slice(0, 12);
+}
+
+/**
+ * The handover check: a reply that passes work on carries the block, names each open card, and is
+ * not sent while the installed plugins are behind their source.
+ *
+ * @param given  whether this window already wrote a whole block and the step rows of its arcs have
+ *               not moved since (`stepsMark`); a pass-on with no block then owes nothing
+ */
+export function checkHandover(reply: string, root: string, mine: Set<string>, given = false): Warning[] {
   if (!passingOn(reply)) return [];
-  // A REPLY PUTTING THE OPEN CARD IN FULL IS THE ANSWER THIS CHECK ASKS FOR. It fired twice in a row
-  // on replies that handed nothing over and carried `Q329` whole, demanding the card they carried.
+  // A REPLY THAT PUTS A WHOLE CARD ASKS A QUESTION, AND HANDS NOTHING OVER, also when it offers the
+  // next window for after the answer.
   if (carriesCard(reply)) return [];
 
-  // AN OPEN CARD BEATS A HANDOVER, AND IT COMES FIRST — finding F20, caught by the developer twice
-  // in one session after the agent offered a new window with two cards standing.
-  //
-  // **A card open is work nobody can plan around.** Its answer may change which arc runs next, what
-  // the next window reads first, and whether the step named in the block is still the right step —
-  // so a handover written over an open card is a plan built on an unknown. The next window inherits
-  // the question AND a brief that assumed an answer to it.
-  //
-  // The rule the book already states is *you stop only when something needs deciding*, and a card is
-  // exactly that. What it never said is the converse: **while something needs deciding, you do not
-  // hand the work to somebody else** — you ask, and the answer either changes the plan or it does
-  // not. Asking costs a turn; a handover built on a guess costs a window.
-  //
-  // This fires BEFORE the wiring check because it is the cheaper truth: there is no point telling
-  // somebody their install is stale if the work itself is not ready to pass on.
-  const waiting = cardsWaiting(root, mine);
-  if (waiting.length) {
+  // THE BLOCK IS OWED ONCE (RD.DEVEX.WORKSPACE.189). A later reply names the handover in one line, and
+  // so does the reply that answers a finding on the handover reply. A block printed again is still read.
+  const shaped = handoverFences(reply);
+  if (given && !shaped.length) return [];
+
+  // AN OPEN CARD IS NAMED IN ONE LINE, NEVER PUT IN FULL (RD.DEVEX.WORKSPACE.189). The next window must
+  // know the question is there, and the block's `open:` line is where it looks. This comes before the
+  // wiring check because it is the cheaper truth.
+  const where = cardsByWorkstream(root, mine);
+  const unnamed = cardsWaiting(root, mine).filter((card) => !namesCard(reply, card));
+  if (unnamed.length) {
+    const many = unnamed.length > 1;
     return [{ check: "handover", message:
-      `This reply passes work on while ${waiting.length === 1 ? "a card is" : `${waiting.length} cards are`} ` +
-      `open — ${cardList(waiting, cardsByWorkstream(root, mine))}. **Answer first, then hand over.** A card's answer can change which ` +
-      `arc runs next and what the next window reads first, so a handover written over one is a brief that ` +
-      `assumed an answer nobody gave. Put the cards to the developer in full, and offer the window once they ` +
-      `are settled.` }];
+      `This reply passes work on while ${cardList(unnamed, where)} ${many ? "are" : "is"} open, and it does not name ` +
+      `${many ? "them" : "it"}. Name each open card in one line on the block's \`open:\` line: its number and its question. ` +
+      `Do not put the whole card in the reply: it is on the approach page, and the next window reads it there ` +
+      `(RD.DEVEX.WORKSPACE.189).` }];
   }
 
   // THE SECOND HALF FIRST, because it is the one that costs a window. A reply that tells somebody to
@@ -900,7 +935,6 @@ export function checkHandover(reply: string, root: string, mine: Set<string>): W
   }
 
   const labels = HANDOVER_LABELS.map((label) => `${label}:`).join(" · ");
-  const shaped = fencesOf(reply).filter((fence) => fence.info !== "diff" && looksLikeHandover(fence.body));
   const block = shaped.find((fence) => !quotesTemplate(fence));
   if (!block && shaped.length)
     return [{ check: "handover", message: `the handover block still holds \`{{…}}\` placeholders. Fill in every one — ${labels} — and write the same block into the arc's log.` }];
@@ -1446,6 +1480,26 @@ export function checkWelcome(firstTurn: string): Warning[] {
     `place the developer sees it. Say it in full at the top of your next reply.` }];
 }
 
+// ---------------------------------------------------------------------------- what is said now, and what is held
+
+// THE CHECKS WHOSE FINDING IS ABOUT THE REPLY ITSELF: a card it raised or a decision it put, a handover
+// block, and the welcome of a first reply. The developer is reading that reply, so the finding cannot wait.
+const ABOUT_THE_REPLY = new Set(["needs-you", "reply-shape", "handover", "welcome"]);
+
+/**
+ * The findings a turn end says now, and the ones it holds (RD.DEVEX.WORKSPACE.244). While a row of this
+ * window's arcs is in progress, only a finding about the reply sends the agent back. Every other one
+ * is held, and the hook then leaves its baseline's marks where they were, so the checks find it again
+ * at the first turn end where no row is in progress.
+ *
+ * @param running  whether a row of this window's arcs is in progress (`workRuns`)
+ */
+export function splitFindings(found: Warning[], running: boolean): { said: Warning[]; held: Warning[] } {
+  if (!running) return { said: found, held: [] };
+  return { said: found.filter((warning) => ABOUT_THE_REPLY.has(warning.check)),
+           held: found.filter((warning) => !ABOUT_THE_REPLY.has(warning.check)) };
+}
+
 // ---------------------------------------------------------------------------- the hook
 
 // MATCHES THE BUNDLED NAME TOO, BY EXACT BASENAME. This hook ships built as `dist/events/stop.mjs`,
@@ -1497,9 +1551,16 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
   // A VISITED WORKSTREAM IS READ FOR ONE THING: the notes rule on an arc this window itself changed there.
   const visits = visitedWorkstreams(root, session);
   const wroteAnywhere = new Set([...touched].filter((arc) => mine.has(workstreamOf(arc)) || visits.has(workstreamOf(arc))));
+  // WHETHER WORK STILL RUNS, read once: it tells a progress reply from a reply that waits, and it
+  // decides which findings are said now (RD.DEVEX.WORKSPACE.189 and .244).
+  const running = workRuns(root, mine);
+  // A WHOLE HANDOVER BLOCK IS OWED ONCE. The baseline holds the step rows as they read when this window
+  // wrote one, and while they read the same no second block is asked for.
+  const rowsNow = stepsMark(root, mine);
+  const given = baseline?.handover !== undefined && baseline.handover === rowsNow;
   const found = [
     ...span({ group: "stop", action: "reply-shape" }, () => checkReplyShape(reply, waiting,
-      baseline?.cards ? waiting.filter((card) => !baseline.cards!.includes(card)) : [], where, workRuns(root, mine))),
+      baseline?.cards ? waiting.filter((card) => !baseline.cards!.includes(card)) : [], where, running)),
     ...span({ group: "stop", action: "notes" }, () => checkNotesLanded(root, baseline?.arcs, wroteAnywhere, mine, visits)),
     ...span({ group: "stop", action: "arc-to-page" }, () => checkArcToPage(root, mine)),
     ...span({ group: "stop", action: "page-stale" }, () => checkPageCurrent(wrote)),
@@ -1507,23 +1568,32 @@ if (argv1Base === "stop.ts" || argv1Base === "stop.mjs") {
     ...span({ group: "stop", action: "arc-landed" }, () => checkArcLanded(root, baseline?.arcs, wrote)),
     ...span({ group: "stop", action: "runnable" }, () => checkRunnable(root, baseline?.at ?? 0, baseline?.steps ?? {}, wrote, mine)),
     ...span({ group: "stop", action: "hold" }, () => checkHold(root, mine)),
-    ...span({ group: "stop", action: "handover" }, () => checkHandover(reply, root, mine)),
+    ...span({ group: "stop", action: "handover" }, () => checkHandover(reply, root, mine, given)),
     ...span({ group: "stop", action: "welcome" }, () => checkWelcome(firstTurn)),
     ...span({ group: "stop", action: "corpus" }, () => checkCorpus(root, reposWritten(root, session))),
   ];
-  const warnings = found.filter((warning) => !spoken.has(warning.check));
+  // WHILE A ROW IS IN PROGRESS, ONLY A FINDING ABOUT THE REPLY IS SAID (RD.DEVEX.WORKSPACE.244).
+  const { said, held } = splitFindings(found.filter((warning) => !spoken.has(warning.check)), running);
   // A page is named once in a session, so the pages named now join the ones named before.
   const ownCopyTold = [...new Set([...(baseline?.ownCopy ?? []),
-    ...(warnings.some((warning) => warning.check === "own-copy") ? ownCopyPages(root, mine) : [])])];
+    ...(said.some((warning) => warning.check === "own-copy") ? ownCopyPages(root, mine) : [])])];
   end();
+  // A HELD FINDING IS NOT STORED AS TEXT. A turn end that holds one leaves the baseline's marks where
+  // they were, so the next turn end finds again what is still true. An arc new since then takes its
+  // marks from now.
+  const kept = held.length && baseline ? baseline : null;
   // AFTER the checks, never before: they compare against this and would compare against now. `fired`
   // keeps what spoke earlier in this turn beside what spoke now, so a third reply is not judged by
   // the first reply's check either.
-  writeBaseline(root, session, { at: Date.now(), steps: currentSteps(root),
-                                 fired: [...new Set([...spoken, ...warnings.map((warning) => warning.check)])],
-                                 cards: waiting, arcs: arcMarks(root), ownCopy: ownCopyTold });
-  if (warnings.length) {
-    console.error(warnings.map((w) => `[${w.check}] ${w.message}`).join("\n\n"));
+  writeBaseline(root, session, { at: kept ? kept.at : Date.now(),
+                                 steps: kept ? { ...currentSteps(root), ...kept.steps } : currentSteps(root),
+                                 fired: [...new Set([...spoken, ...said.map((warning) => warning.check)])],
+                                 cards: waiting,
+                                 arcs: kept ? { ...arcMarks(root), ...(kept.arcs ?? {}) } : arcMarks(root),
+                                 ownCopy: ownCopyTold,
+                                 handover: givesHandover(reply) ? rowsNow : given ? baseline?.handover : undefined });
+  if (said.length) {
+    console.error(said.map((w) => `[${w.check}] ${w.message}`).join("\n\n"));
     process.exit(2);   // a Stop hook's non-zero is how the message reaches the turn
   }
   process.exit(0);

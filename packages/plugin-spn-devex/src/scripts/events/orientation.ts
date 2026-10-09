@@ -29,7 +29,8 @@
 //      offer to carry that one on. Two offers is not a menu; three would be.
 //
 // `systemMessage`, the developer's pane, carries parts 1 and 2. `additionalContext`, what the agent
-// reads, carries all three and the note that says how to use them.
+// reads, carries all three, the note that says how to use them, and the short rules a reply must
+// follow (RD.DEVEX.AGENT.089), each with the reference that holds it whole.
 //
 // A workstream carries its state in its parent folder, so the three are read and shown together:
 // `open/` is available now, `backlog/` is parked, and `closed/` is the receipt. The number in the
@@ -505,6 +506,39 @@ export function welcome(who: string | null, firstVisit: boolean): string[] {
   ];
 }
 
+/**
+ * The rules a reply must follow, in short form (RD.DEVEX.AGENT.089). They go into what the agent reads
+ * and never into the developer's pane.
+ *
+ * A REFERENCE IS READ WHEN A SKILL NAMES IT, and a reply in the middle of an arc calls no skill. So a
+ * rule held only in a reference does not reach that reply. These lines are what carries it there.
+ *
+ * EACH LINE IS A POINTER, NEVER A SECOND COPY. It says what to do in one or two sentences and ends with
+ * `→`, the path of its reference from the plugin's root, `§`, and the heading that holds the rule whole.
+ * The test opens every file and looks for every heading, so a renamed section fails there.
+ *
+ * NOTHING HERE READS THE PROMPT. Whether a prompt opens a discussion about a shape is the agent's to
+ * judge, and the last line says so.
+ */
+export const SHORT_RULES_HEADING = "## The short rules — they hold in every reply, and each line names the reference that holds its rule whole";
+
+export const SHORT_RULES: string[] = [
+  "Your lenses take part in a discussion about a shape, each as a named view. Such a discussion decides what a thing is before it is built. It can open at any moment of a workstream, also in the middle of a run. → `refs/devex/agent/agent.md` § One agent, and the lenses take part as views",
+  "Three signs say how many views speak: the choice crosses a repository, it changes what a partner builds on, or it sets a pattern others will follow. → `refs/devex/agent/lenses.md` § Which views speak, and how many",
+  "No sign: the one view that owns the question, in one sentence. One sign: the architect's view and the owning view. Two signs or more: the starting group with product and partner, each view a fresh agent, and a second pass after the developer's answer. → `refs/devex/agent/lenses.md` § How a view is made",
+  "Show each view in its own voice: its name, then one or two plain sentences, as a person at the table would say them. Never sum up what \"the views\" thought. → `refs/devex/agent/lenses.md` § A view is shown in its own voice",
+  "A decision that sets a shape, a name, a member, a check or the direction of a dependency is put to the developer before it is built. Decide it alone only where you can name the rule that settles it. → `refs/devex/agent/agent.md` § Every prompt is read before anything moves",
+  "Structure comes before content: design the units, their names and their grouping, and show them, before you fill them. → `refs/devex/function/ideate.md` § Structure comes before content, and outside knowledge is marked",
+  "**Needs you** opens a reply in two cases only. A reply that raises a card holds it there in full, once. A reply that ends the work or stops it names each open card in one line. A progress reply has no such part. → `refs/devex/workspace/workstream.md` § The reply while work runs shows what needs you, then what moved",
+  "The arcs of a workstream are yours to manage: open, split, order, pause and close them, and say what you did in one line. A new workstream is always the developer's decision. → `refs/devex/workspace/workstream.md` § A new subject: another arc, or a workstream of its own",
+  "No script tells you that a prompt opens a discussion about a shape. You read each prompt and decide. → `refs/devex/agent/agent.md` § The rules of a reply reach you at session start, in short form",
+];
+
+/** The short rules as the block the agent reads: the heading, then one list line for each rule. */
+export function shortRules(): string {
+  return [SHORT_RULES_HEADING, "", ...SHORT_RULES.map((rule) => `- ${rule}`)].join("\n") + "\n";
+}
+
 type Status = { repos: number; open: Workstream[]; backlog: number; others: number;
                 unwired: number; stale: string | null; behind: string | null; rung: string | null };
 
@@ -710,7 +744,7 @@ export function orient(root: string, cwd: string): [message: string, context: st
         : "Act 0 is the door above: ask, and run nothing until they answer. A no is a real " +
           "answer and this folder stays empty. On a yes, act 1 mints the workspace and act 2 " +
           "opens the workstream that holds the answers, before the first question is asked.\n");
-    return [message, message + note];
+    return [message, message + note + "\n" + shortRules()];
   }
 
   const settings = readJson(join(root, ".claude", "settings.json")) ?? {};
@@ -791,7 +825,7 @@ export function orient(root: string, cwd: string): [message: string, context: st
     "under that question appears only when exactly one workstream is open and no other " +
     "session is live here — so where you cannot see one, do not propose resuming " +
     "anything.\n";
-  return [message, message + "\n\n" + clean(lines) + note];
+  return [message, message + "\n\n" + clean(lines) + note + "\n" + shortRules()];
 }
 
 if (runAlone("orientation.ts")) {
