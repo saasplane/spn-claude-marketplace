@@ -239,6 +239,59 @@ await guard(async () => {
   ok("an instance with no rule is a problem: it stays, and the version it stands on is not removed", noRule.problems.length === 2 && noRule.removed === 1 && unmoved.set.children.length === 3, JSON.stringify([noRule.problems, noRule.removed]));
 });
 
+// ---- bundle.mjs ----------------------------------------------------------------------------------
+
+console.log("\n=== bundle.mjs — one call out of one script and several fillings of its inputs");
+await guard(async () => {
+  const folder = join(scratch, "bundle");
+  mkdirSync(folder, { recursive: true });
+  // as in Figma: a call starts on the file's first page, and a switch is counted
+  const fileOf = (made) => {
+    const figma = figmaFile([made.page]);
+    figma.currentPage = { id: "0:9" };
+    figma.setCurrentPageAsync = async (page) => { figma.switches += 1; figma.currentPage = page; };
+    return figma;
+  };
+  const sendBundle = (path, figma) => new AsyncFunction("figma", readFileSync(path, "utf8"))(figma);
+  writeFileSync(join(folder, "dry.json"), JSON.stringify([{ spec }, { spec, steps: ["header"] }]));
+  const built = runNode("bundle.mjs", ["--script", "apply-spec.js", "--inputs", join(folder, "dry.json"), "--out", join(folder, "dry")]);
+  ok("it writes one file and says its runs and its length", built.exit === 0 && /dry\.js: runs 0 to 1, \d+ characters/.test(built.said), built.said);
+  const dryPage = specPage();
+  const dryFigma = fileOf(dryPage);
+  const dry = await sendBundle(join(folder, "dry.js"), dryFigma);
+  const alone = await run("apply-spec.js", { spec }, figmaFile([specPage().page]));
+  same("each run answers as the script alone answers, in the order of the list", [dry.script, dry.runs, dry.of, dry.stopped, dry.answers[0], dry.answers[1].removed], ["apply-spec.js", 2, 2, null, alone, 0]);
+  same("the page is switched to once for the whole call, and a dry bundle changes nothing", [dryFigma.switches, dryPage.set.children.length], [1, 4]);
+  ok("no line of comment is sent, and the script's own text is", !/^\s*\/\//m.test(readFileSync(join(folder, "dry.js"), "utf8")) && readFileSync(join(folder, "dry.js"), "utf8").includes("const cellsOf = (name) =>"));
+  writeFileSync(join(folder, "real.json"), JSON.stringify([{ spec, dryRun: false }]));
+  runNode("bundle.mjs", ["--script", "apply-spec.js", "--inputs", join(folder, "real.json"), "--out", join(folder, "real")]);
+  const realPage = specPage();
+  const real = await sendBundle(join(folder, "real.js"), fileOf(realPage));
+  same("a real run in a bundle changes the file as the script alone does", [real.answers[0].removed, realPage.set.children.map((one) => one.name), realPage.header.characters], [2, ["size=SM", "size=MD"], "DSBtn — rows: size=SM (default), MD · behaviour: loading"]);
+  const small = runNode("bundle.mjs", ["--script", "apply-spec.js", "--inputs", join(folder, "dry.json"), "--out", join(folder, "cut"), "--max", String(readFileSync(join(folder, "real.js"), "utf8").length + 40)]);
+  ok("inputs that do not fit the limit are cut into files to send in order", small.exit === 0 && /cut-1\.js: runs 0 to 0/.test(small.said) && /cut-2\.js: runs 1 to 1/.test(small.said), small.said);
+  // a second run on another page must not switch again
+  const other = specPage();
+  other.page.id = "2:9";
+  const twoPages = fileOf(dryPage);
+  const first = twoPages.getNodeByIdAsync.bind(twoPages);
+  let asked = 0;
+  twoPages.getNodeByIdAsync = async (id) => { if (id === "9:1") { asked += 1; return asked > 1 ? other.set : dryPage.set; } return first(id); };
+  const crossed = await sendBundle(join(folder, "dry.js"), twoPages);
+  ok("a run that asks for another page than the first ends the call, and is named", crossed.runs === 2 && /a bundle works on one page/.test(crossed.answers[1].threw ?? "") && crossed.stopped?.next === 1 && twoPages.switches === 1, JSON.stringify([crossed.stopped, crossed.answers[1]]));
+  writeFileSync(join(folder, "bad.json"), JSON.stringify({ spec }));
+  same("inputs that are no list of objects are refused, exit 2", runNode("bundle.mjs", ["--script", "apply-spec.js", "--inputs", join(folder, "bad.json"), "--out", join(folder, "bad")]).exit, 2);
+  same("with no arguments it says how it is used and exits 2", runNode("bundle.mjs", []).exit, 2);
+});
+for (const script of ["apply-spec.js", "layout.js", "labels.js", "cases.js"]) {
+  const folder = join(scratch, "bundle");
+  writeFileSync(join(folder, "one.json"), JSON.stringify([{}]));
+  const built = runNode("bundle.mjs", ["--script", script, "--inputs", join(folder, "one.json"), "--out", join(folder, `one-${script}`)]);
+  let parses = false;
+  try { new AsyncFunction("figma", readFileSync(join(folder, `one-${script}.js`), "utf8")); parses = true; } catch { parses = false; }
+  ok(`${script} makes a bundle that is a whole script, under the connector's limit`, built.exit === 0 && parses && readFileSync(join(folder, `one-${script}.js`), "utf8").length < 50000, built.said);
+}
+
 // ---- check-specs.mjs -----------------------------------------------------------------------------
 
 console.log("\n=== check-specs.mjs — the specs against the readings");
