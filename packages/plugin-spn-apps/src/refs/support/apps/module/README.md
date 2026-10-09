@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/03-module/",
-      "seen": "bee1b146"
+      "seen": "b2ce0f02"
     }
   ]
 }
@@ -182,7 +182,7 @@ Follow one grammar for every API route you add — `/{module}/{entity}[/{sub-ent
 
 **The API entry also serves a module's contract services to the other services of the platform, on the remote route.** It is the HTTP API and not a fourth entry. The module's manager lists its contract services (name, methods as data, what implements it), boot registers each, and the entry mounts one route for all of them, which reads the module, the service and the method from the request: `POST /remote` with the passport header and the calling service's credential header. The order **MUST** hold: check the calling service first, before the body is read; find the contract service among those registered; find the method among those the methods data lists; validate the command; build the execution context from the passport (a passport that cannot be read or is refused ends the call as unauthenticated, and no passport runs with no caller); run the method; validate the result. The route listens on a port of its own (`{CODE}_API_REMOTE_PORT`; no port, no listener), keeps no list of who may call what (authorization stays on the service method), answers as the public API does, and keeps the passport and the service credential out of logged headers. A contract may hold methods that have no controller, such as one that returns an opened secret to another module, so no public call can reach them. A person's address is counted from the right of the forwarded-address header, by the number of proxies in front of each listener (`{CODE}_API_TRUSTED_PROXIES`, `{CODE}_API_REMOTE_TRUSTED_PROXIES`), and a route's rate limit is counted in the service's shared cache, so it is one limit however many instances serve the route.
 
-A queue listener you write consumes a message, parses it into the contract Event, rehydrates the recorded actor into a fresh execution context, then hands the work to a service — never business logic of its own. Make handling idempotent through the event's request key, and run it under a real principal — the originating actor or an explicit system actor, never context-free. Subscribe only to declared topics.
+A queue listener you write consumes a message, parses it into the contract Event, rehydrates the recorded actor into a fresh execution context, then hands the work to a service — never business logic of its own. Make handling idempotent through the event's request key, and run it under a real principal — the originating actor or an explicit system actor, never context-free. Subscribe only to topics your module's migrations made.
 
 A CLI controller declares one command per contract service method, its flags derived from the Command contract. Keep the run one-shot: it executes once, and the outcome becomes the process exit code.
 

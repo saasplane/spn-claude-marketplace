@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/06-service.md",
-      "seen": "9d42d907"
+      "seen": "69c31d3e"
     }
   ]
 }
@@ -69,7 +69,7 @@
 
 **The proxy has one function for each method the contract lists**, and no other. Each parses the command with the method's validator, posts `{ module, service, method, command }` to `API_REMOTE_ROUTE_PATH`, and parses the reply with the result's validator; a refusal is turned back into the standard error and thrown. A call that gets no answer fails after `{CODE}_REMOTE_TIMEOUT_MS` (ten seconds unless set), with no second try, as `DOWNSTREAM_ERROR` (`ERROR.STD.504`) naming the module.
 
-**A line of a service's module list pairs a config with a manager**, typed by `SPServiceAppRuntimeBootModule` and `SPServiceAppRemoteBootModule`: `{ config: { code: 'DOC', entry: { api: { basePath: '/doc' } }, topics: [...] }, moduleManager: new DOCRuntimeModuleManager() }` for a mounted module, and `{ config: { code: 'IAM' }, moduleManager: new IAMRemoteModuleManager() }` (imported from `…/remote`) for a held one. A caller writes the same line either way (`iamModule.services.contract.principalService…`), and one check of `moduleType` (`SPAppModuleType.RUNTIME` or `REMOTE`) tells the compiler whether `services.impl` exists.
+**A line of a service's module list pairs a config with a manager**, typed by `SPServiceAppRuntimeBootModule` and `SPServiceAppRemoteBootModule`: `{ config: { code: 'DOC', entry: { api: { basePath: '/doc' } } }, moduleManager: new DOCRuntimeModuleManager() }` for a mounted module, and `{ config: { code: 'IAM' }, moduleManager: new IAMRemoteModuleManager() }` (imported from `…/remote`) for a held one. A caller writes the same line either way (`iamModule.services.contract.principalService…`), and one check of `moduleType` (`SPAppModuleType.RUNTIME` or `REMOTE`) tells the compiler whether `services.impl` exists.
 
 ## Controllers stay thin
 
