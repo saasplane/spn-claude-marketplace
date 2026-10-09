@@ -31,6 +31,12 @@ async function guard(body) {
 function node(id, name, type, fields = {}, children = []) {
   const made = { id, name, type, children, ...fields };
   for (const child of children) child.parent = made;
+  made.findAll = (test) => {
+    const found = [];
+    const walk = (parent) => { for (const child of parent.children) { if (test(child)) found.push(child); walk(child); } };
+    walk(made);
+    return found;
+  };
   made.findAllWithCriteria = ({ types }) => {
     const found = [];
     const walk = (parent) => { for (const child of parent.children) { if (types.includes(child.type)) found.push(child); walk(child); } };
@@ -863,7 +869,7 @@ await guard(async () => {
   const unknownMode = await run("cases.js", { spec: oneCase({ modes: { Hue: "PURPLE" } }), dryRun: false }, newCasesPage().figma);
   ok("a mode the collection does not hold is a problem naming the modes it holds, and the case is not made", /holds no mode "PURPLE" \(it holds DEFAULT, SUCCESS\)/.test(unknownMode.problems[0] ?? "") && unknownMode.made.length === 0, JSON.stringify(unknownMode));
   const unknownCollection = await run("cases.js", { spec: oneCase({ modes: { Tone: "left" } }), dryRun: false }, newCasesPage().figma);
-  ok("a collection that no instance carries is a problem, and the case is not made", /carries the collection "Tone"/.test(unknownCollection.problems[0] ?? "") && unknownCollection.made.length === 0, JSON.stringify(unknownCollection));
+  ok("a collection that no instance carries is a problem, and the case is not made", /the collection "Tone" is carried by no instance/.test(unknownCollection.problems[0] ?? "") && unknownCollection.made.length === 0, JSON.stringify(unknownCollection));
 });
 await guard(async () => {
   const made = newCasesPage();
@@ -930,6 +936,45 @@ await guard(async () => {
   const modeAnswer = await run("cases.js", { spec: oneCase({ modes: { Hue: "SUCCESS" } }) }, modeRight.figma);
   const modeOther = await run("cases.js", { spec: oneCase({ modes: { Hue: "DEFAULT" } }) }, modeRight.figma);
   same("a component is right only when its instance carries every wanted mode", [modeAnswer.stoodDifferent, modeOther.stoodDifferent.length, carried.name], [[], 1, "DSBtn"]);
+});
+
+await guard(async () => {
+  // a page whose instances carry no mode: the collection is reached only through the unit's own bound variables
+  const bound = (changes = {}) => {
+    const made = newCasesPage();
+    made.figma.root.children[0].children[0].children = made.figma.root.children[0].children[0].children.filter((child) => child.id !== "6:1");
+    const layer = node("5:9", "body", "FRAME", { boundVariables: { fills: [{ type: "VARIABLE_ALIAS", id: "VariableID:direct" }] } });
+    layer.parent = made.set.children[0]; made.set.children[0].children.push(layer);
+    const hue = { id: "VariableCollectionId:hue/1:1", name: "Hue", modes: [{ name: "DEFAULT", modeId: "8:2" }, { name: "SUCCESS", modeId: "8:5" }] };
+    const roles = { id: "VariableCollectionId:roles/1:2", name: "Roles", modes: [{ name: "Light", modeId: "9:1" }] };
+    const variables = {
+      "VariableID:direct": { variableCollectionId: roles.id, valuesByMode: { "9:1": { type: "VARIABLE_ALIAS", id: "VariableID:further" } } },
+      "VariableID:further": { variableCollectionId: hue.id, valuesByMode: { "8:2": { r: 0, g: 0, b: 0 } } },
+      ...changes.variables,
+    };
+    made.figma.variables = {
+      getVariableByIdAsync: async (id) => variables[id] ?? null,
+      getVariableCollectionByIdAsync: async (id) => ({ [hue.id]: hue, [roles.id]: roles }[id] ?? null),
+    };
+    return made;
+  };
+  const through = bound();
+  const dry = await run("cases.js", { spec: oneCase({ modes: { Roles: "Light" } }) }, through.figma);
+  const real = await run("cases.js", { spec: oneCase({ modes: { Roles: "Light" } }), dryRun: false }, through.figma);
+  same("a collection found only through a variable that a layer of the unit is bound to: dry has no problem, real sets the mode", [dry.problems, real.problems, through.instances[0].modes], [[], [], [["Roles", "9:1"]]]);
+  const further = bound();
+  const furtherReal = await run("cases.js", { spec: oneCase({ modes: { Hue: "SUCCESS" } }), dryRun: false }, further.figma);
+  same("a collection found only through an alias one step further", [furtherReal.problems, further.instances[0].modes], [[], [["Hue", "8:5"]]]);
+  const neither = bound();
+  const lost = await run("cases.js", { spec: oneCase({ modes: { Tone: "left" } }), dryRun: false }, neither.figma);
+  ok("a collection that neither way finds is the problem, worded for both, and the case is not made", /carried by no instance of this page and bound to no layer of the unit/.test(lost.problems[0] ?? "") && lost.made.length === 0, JSON.stringify(lost));
+  const instanceWins = bound();
+  let asked = 0;
+  const original = instanceWins.figma.variables.getVariableByIdAsync;
+  instanceWins.figma.variables.getVariableByIdAsync = async (id) => { asked += 1; return original(id); };
+  const plain = newCasesPage();
+  const wins = await run("cases.js", { spec: oneCase({ modes: { Hue: "SUCCESS" } }), dryRun: false }, plain.figma);
+  same("the search among placed instances still wins when it finds the collection: no variable is read", [wins.problems, plain.instances[0].modes, asked], [[], [["Hue", "8:5"]], 0]);
 });
 
 // ---- bundle.mjs with the new scripts -------------------------------------------------------------

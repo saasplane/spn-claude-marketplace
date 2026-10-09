@@ -17,8 +17,10 @@
 //           optionally:
 //           text      { "<property>": "<text>" }: text properties of the set, set by name
 //           modes     { "<collection's name>": "<mode's name>" }: a variable mode set on the instance. The
-//                     collection is found by its name among the collections that instances of this page
-//                     already carry (the unit's section first), and the mode by its name in it
+//                     collection is found by its name: first among the collections that instances of this page
+//                     already carry (the unit's section first), then, for a name still missing, through the
+//                     variables that the unit's own layers are bound to (at most 400 layers), following a
+//                     variable's alias values up to three steps further; the mode is found by its name in it
 //           replaces  the exact name of a component that stands on the sheet. That component is kept (its
 //                     id and key stay, so nothing placed on it breaks), its children are removed, it takes
 //                     the case's `name`, and the new instance goes into it, at the place it had. A component
@@ -77,8 +79,8 @@ if (!sheet && wanted.length > 0) {
   return done;
 }
 
-// The collections that variable modes are set from. A collection of a library is reached by the id an instance
-// already carries for it, so the names are found among the instances of the unit's section, then of the page.
+// The collections that variable modes are set from. A collection of a library is reached by an id. First by
+// the ids that instances already carry for it, among the instances of the unit's section, then of the page.
 const collections = new Map();
 const neededNames = new Set(wanted.flatMap((one) => Object.keys(one.modes || {})));
 if (neededNames.size > 0) {
@@ -95,6 +97,41 @@ if (neededNames.size > 0) {
         if (collection && neededNames.has(collection.name) && !collections.has(collection.name)) collections.set(collection.name, collection);
       }
       if ([...neededNames].every((name) => collections.has(name))) break;
+    }
+  }
+  // A name still missing is looked for through the unit's own layers: each layer bound to a variable leads to
+  // that variable's collection, and a variable's values that are aliases lead further, three steps at most.
+  const missing = () => [...neededNames].some((name) => !collections.has(name));
+  if (missing()) {
+    const aliasesIn = (value, found) => {
+      if (!value || typeof value !== "object") return;
+      if (Array.isArray(value)) { for (const one of value) aliasesIn(one, found); return; }
+      if (value.type === "VARIABLE_ALIAS" && value.id) found.add(value.id);
+      for (const inner of Object.values(value)) aliasesIn(inner, found);
+    };
+    const first = new Set();
+    let layers = [target];
+    try { layers = [target, ...target.findAll(() => true)].slice(0, 400); } catch (error) { layers = [target]; }
+    for (const layer of layers) {
+      try { aliasesIn(layer.boundVariables, first); } catch (error) { continue; }
+    }
+    const resolved = new Set();
+    let step = [...first];
+    for (let depth = 0; depth < 4 && step.length > 0 && missing(); depth += 1) {
+      const next = new Set();
+      for (const id of step.slice(0, 150)) {
+        if (resolved.has(id)) continue;
+        resolved.add(id);
+        const variable = await figma.variables.getVariableByIdAsync(id);
+        if (!variable) continue;
+        if (!seenIds.has(variable.variableCollectionId)) {
+          seenIds.add(variable.variableCollectionId);
+          const collection = await figma.variables.getVariableCollectionByIdAsync(variable.variableCollectionId);
+          if (collection && neededNames.has(collection.name) && !collections.has(collection.name)) collections.set(collection.name, collection);
+        }
+        aliasesIn(variable.valuesByMode, next);
+      }
+      step = [...next].filter((id) => !resolved.has(id));
     }
   }
 }
@@ -142,7 +179,7 @@ for (const one of wanted) {
   }
   for (const [collectionName, modeName] of Object.entries(unknown ? {} : one.modes || {})) {
     const collection = collections.get(collectionName);
-    if (!collection) { unknown = `no instance of this page carries the collection "${collectionName}", so it cannot be reached`; break; }
+    if (!collection) { unknown = `the collection "${collectionName}" is carried by no instance of this page and bound to no layer of the unit, so it cannot be reached`; break; }
     const mode = collection.modes.find((candidate) => candidate.name === modeName);
     if (!mode) { unknown = `the collection "${collectionName}" holds no mode "${modeName}" (it holds ${collection.modes.map((candidate) => candidate.name).join(", ")})`; break; }
     modes.push({ collection, modeId: mode.modeId });
