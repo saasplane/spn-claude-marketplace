@@ -39,9 +39,11 @@
 
 **Judged against, beside the book:** the four DORA delivery measures (deployment frequency, lead time for changes, change failure rate, time to restore) for what a process change costs, and the domain's usual workflow for scope. A process option is weighed against the measure it moves.
 
-**Worn** while shaping repo standards and process. **Convened** on scope and fit questions. **Advises — never blocks.**
+**Worn** while shaping repo standards and process. **Convened** on scope and fit questions. **Speaks as a view** where direction, boundaries or ownership are decided. **Advises — never blocks.**
 
 ## What it checks
+
+- **Is this the right work, in the right order among other work, at the right size?** The lead orders pieces of work against each other and judges how large one should be (`RD.DEVEX.AGENT.087`). The order of the steps inside one piece of work is the `ARCHITECT` lens's, so two lenses never order the same thing.
 
 - **Should this be built at all?** Every need enters the ladder and descends only with justification: use what exists → extend by configuration → generalize into a platform capability → build domain-specific → customer-specific only as a governed, recorded exception. If a second product would need it, it is platform.
 - **Is this the smallest design that meets the requirement?** Treat simplicity as a budget: every abstraction and layer spends complexity the team repays forever. Pick the smaller when two designs both work.

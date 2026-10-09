@@ -101,9 +101,9 @@ A sign of complexity is one of these, each read from the change itself: the choi
 
 ## What a lens may block
 
-**Almost nothing.** Most lenses advise, and their findings arrive as decision cards rather than as refusals.
+**Almost nothing.** Most lenses advise, and their findings arrive as decision cards rather than as refusals. `QA`, `TRUST`, `PARTNER`, `ARCHITECT` and `VOICE` each carry one block, named in the lens's own file, and below its threshold each of them advises.
 
-**The voice is checked twice and only one of them blocks** — the write-time check, which is mechanical. The voice lens is judgement, and judgement advises.
+**The voice is checked twice and only one of them blocks.** The standing check under every lens reads the prose as a newcomer would, and it advises. The `VOICE` lens, convened over a document before it lands, blocks a page that misses its seat's share of reach.
 
 ## Why the files ship here
 

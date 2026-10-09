@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/02-constructs/01-devex/01-function/03-ideate.md",
-      "seen": "9bcedab1"
+      "seen": "cc127ea7"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/01-devex/04-workspace/04-docs/05-artifacts.md",
@@ -53,7 +53,7 @@ Pick the mode from the argument — `shape` · `design` · `decision`. Where non
 
 1. **Restate the requirement** in one paragraph, in the asker's own words.
 2. **Classify it**: new capability · additive change to an existing contract · **breaking** change · pure fix. **A breaking change stops here** — reroute through the versioning path and record it in `decision` mode. A breaking change never rides in as a plan row.
-3. **Locate ownership** — which module owns the capability. Where none does, this is a scaffolding conversation first, and the ladder is *use → configure → generalize into the platform → build domain-specific*; descend only with a reason. Then propose **the construct the ask needs, and no more** (`RD.DEVEX.WORKSPACE.194`): its patterns, correct on their own. What it makes possible later is one line, *later, not now*, never a row or an option. Until an arc row owns the subject, put what you need decided as a suggestion in chat, `S<n>`, as a whole card: what, why, lettered options and the one you recommend (`RD.DEVEX.WORKSPACE.199`).
+3. **Locate ownership** — which module owns the capability. Where none does, this is a scaffolding conversation first, and the ladder is *use → configure → generalize into the platform → build domain-specific*; descend only with a reason. Then propose **the construct the ask needs, and no more** (`RD.DEVEX.WORKSPACE.194`): its patterns, correct on their own. What it makes possible later is one line, *later, not now*, never a row or an option. Until an arc row owns the subject, put what you need decided as a suggestion in chat, `S<n>`, as a whole card: what, why, lettered options, the views that spoke and the one you recommend (`RD.DEVEX.WORKSPACE.199`).
 4. **Write the rows**, into the repository's own docs tree, under the domain the module belongs to. **The seats, what each holds and the row grammar are `refs/devex/workspace/docs/doc-sets.md`** — read it there rather than from a copy. Where the node is in a declared stack, that stack's own planning notes are `providers/{stack}/skills/ideate/plan.md` in the domain plugin, and the stack comes from the nearest `sprepo.json`.
 
 ### Mode: decision — one register row
@@ -138,16 +138,39 @@ Every unanswered question is a card with **real options and a recommendation**. 
   Plain means everyday words, one idea a sentence, no numbers, no slogan, no figure of speech, and no book word the same sentence does not explain. The argument starts in the first section: for an approach page that is `Why`, then `What`, `How`, `Open` and `Deferred`, with no `Terms` section. **Write the Title and the Subtitle yourself, from the kind's row and its approved example, and keep them current as the page grows** (`RD.DEVEX.WORKSPACE.205`); do not ask the developer to approve one. The foundation hub's Title and Subtitle are the one exemption, fixed by `RD.DEVEX.WORKSPACE.143`.
 - A question deliberately not answered is **deferred with a trigger** — what would bring it back.
 
-## The lenses you convene
+## The views that take part
 
-Ideation is where having the wrong people in the room costs most: a boundary drawn without the business is renegotiated commercially later.
+**Which views speak, and how many, is one rule, and this skill keeps no list of its own** (`RD.DEVEX.AGENT.085`). Read it in [`refs/devex/agent/lenses.md`](../../refs/devex/agent/lenses.md) § *Which views speak, and how many*. It holds in every discussion about a shape, at any moment of a workstream: when it is opened, while a preview is read, and in the middle of a run. A decision made while an arc runs is built on just as a concept is.
 
-| Section | Convene |
-| --- | --- |
-| Boundary · Why | `BUSINESS` · `PRODUCT` · `LEAD` |
-| Who · What they can do | `PRODUCT` |
-| Domains · Surfaces · The shape | `ARCHITECT` |
-| Open | whichever lens the question belongs to |
+**Pick the views from what the developer said and what the workstream is about**, starting from that section's map. A concept's boundary, and why the thing exists, is a decision about direction, so `BUSINESS` joins that group: a boundary drawn without the business is renegotiated commercially later.
+
+**Count the signs to know how many, and how each view is made** (`RD.DEVEX.AGENT.086`). A sign is read from the change itself: the choice crosses a repository, it changes what a partner builds on, or it sets a pattern others will follow.
+
+| The choice shows | The views | How each is made |
+| --- | --- | --- |
+| no sign | the one view that owns the question, in one sentence | you speak from its lens file |
+| one sign | the architect's view and the owning view | you speak from each lens file |
+| two signs or more | the starting group, with product and partner, and a second pass after the developer's answer | each view is a fresh `spn-panel`, handed the proposal's own words and the developer's |
+
+- **More views, or more passes, need the developer's word.** The limit keeps a small choice from costing a wait and a long reply.
+- **A view whose word is to count as a review that can block a gate is a fresh `spn-panel`, at any number of signs.** You wrote the proposal, so a lens file you read yourself gives advice and blocks nothing.
+- **Name each point by its view**, such as *Architect:* or *Partner:*, and say where two views disagree instead of blending them. The developer can then answer one view.
+- **Say in one line which views you brought, why those, and which way each was made.** Without it the developer cannot tell an independent objection from your own. On a card that line is its *Views* part.
+- **A view does not replace the review.** Once a draft exists, the convened lens still reads it.
+
+## Structure first, and what other platforms do
+
+**Design the structure before you produce content, and show it to the developer** (`RD.DEVEX.AGENT.088`). Content is what fills a structure: screens, modules, pages. The structure is the units, their names, their grouping and the pattern each one follows. Content made first fixes a structure nobody designed, and moving it later moves everything put into it.
+
+**Say how known platforms solve the same problem, without being asked, in the words of the platform's own domain.** Mark each such statement: *verified* when you read the source in this session and name it, *not verified* when you state it from what you know. A statement with no mark reads as a fact nobody is known to have checked.
+
+## What you put to the developer, and what is yours
+
+- **A decision that sets a shape, a name, a member, a check or the direction of a dependency goes to the developer before it is built** (`RD.DEVEX.WORKSPACE.239`). Put it with what was weighed and the views that spoke. Decide it alone only where you can name the rule that settles it, because other work is built on a decision of this kind and a correction undoes that work too.
+- **The arcs inside a workstream are yours to manage, and a new workstream is always the developer's decision** (`RD.DEVEX.WORKSPACE.243`). Open, split, order, pause or close an arc and say so in one line; the developer may guide you at any moment. Suggest a workstream with the trigger you saw, and ask.
+- **Needs you opens a reply in two cases only** (`RD.DEVEX.WORKSPACE.189`): the reply raises a card, shown there in full once, or the work is done or blocked and you now wait. A progress reply carries none, because a heading that opens every reply is one the developer stops reading.
+
+The full text of all three is in [`refs/devex/workspace/workstream.md`](../../refs/devex/workspace/workstream.md).
 
 ## The file itself
 

@@ -17,11 +17,13 @@ line. When a design question does reach the developer, each option's trade-off i
 book and against the named source of the lens that owns the question — so the card cites a practice
 by name rather than an opinion.
 
-## Two different acts
+## Three different acts
 
 **Wearing a lens while writing makes the work better, and is never a review.** The context that drafted something already agrees with its own reasoning, so a lens that is only ever worn has reviewed nothing.
 
 **Convening one opens a fresh reviewer** — that is the whole of why it exists: it reads the work without having written it.
+
+**Every lens also speaks as a view in a discussion about a shape**, before anything is built (`RD.DEVEX.AGENT.084`). The same file is read, and each point is named by its view. `refs/devex/agent/lenses.md` says which views speak, how many, and when a view is the one agent reading the file and when it is a fresh agent. A view the one agent makes is a worn lens, so it is advice whatever the file says it blocks.
 
 ## What a panel may and may not do
 
@@ -29,7 +31,7 @@ by name rather than an opinion.
 
 **A panel never invents a rule.** A finding with no owning chapter behind it is a suggestion, and it is reported as one.
 
-**Almost nothing blocks.** Most findings arrive as decision cards rather than refusals. The voice is checked twice and only the mechanical half blocks — judgement advises.
+**Almost nothing blocks.** Most findings arrive as decision cards rather than refusals, and a lens blocks only where its own file says so. The voice is checked twice and only one of them blocks: the standing check under every lens advises, and the convened `VOICE` lens blocks a page that misses its seat's share of reach.
 
 ## Why they are filed by role
 

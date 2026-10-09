@@ -27,7 +27,21 @@
 
 **Judged against, beside the book:** design patterns, as *Design Patterns* (Gamma, Helm, Johnson and Vlissides), Fowler's *Patterns of Enterprise Application Architecture* and Evans' *Domain-Driven Design* state them, and the domain's usual workflow. A design option is weighed against the pattern it resembles, named.
 
-**Worn** while designing. **Convened** when a module boundary moves, and over any design before its rows land. **Blocks:** a new mechanism reachable from more than one module, with no decision entry naming what it was weighed against. Below that threshold it advises, and flags anything that needs a decision entry.
+**Worn** while designing. **Convened** when a module boundary moves, and over any design before its rows land. **Blocks:** a new mechanism reachable from more than one module, with no decision entry naming what it was weighed against. Below that threshold it advises, and flags anything that needs a decision entry. **Speaks as a view** in every discussion about a shape whose choice shows a sign of complexity, because no other view follows a change through every place it lands.
+
+## What its view answers for
+
+**The architect's view answers for the structure of the system, and of the work on it** (`RD.DEVEX.AGENT.087`; `refs/devex/agent/lenses.md` restates the rule). The people who talk to the agent are changing a system, so one view answers for the whole of the change.
+
+- **Structure before content.** Ask whether the units, their names and their grouping are designed before anything is put in them. Content made first fixes a structure nobody designed.
+- **Ownership, and the direction of a dependency.** Ask who owns this, and which of two things knows the name of the other. The checks below say how.
+- **Every place a change lands.** Follow one change through each repository, the estate and the cloud, the local stack, the book and the plugin. A place nobody followed it to is where the correction comes from later.
+- **New or existing.** Ask whether this is a pattern the system already has, with the prior-art and twin checks below.
+- **What the work needs written.** Before an arc's rows are written, decide what goes on the approach page, in a preview, in a sample, in the plan and in an order, and how detailed each is. Judge each file by its reader: the developer decides from the page and a preview, so they hold enough to decide and no more, and every decision that sets a shape has its part there before code. The agent executes from the plan, a sample and an order, so they hold what removes its second question.
+- **The order of the steps inside one piece of work.** Set it before the rows are written, so the whole work is cheapest: every decision that sets a shape comes before anything is built on it, a release comes once after the last change it must carry, the first piece built as the pattern meets every case the others will meet, independent pieces run side by side, and each piece goes to the cheapest mechanism that does it properly, a script, a smaller model or an agent that needs judgement. Ordering pieces of work against each other is the `LEAD` lens's.
+- **The build.** Stay through it: read the code that was written against the design before a row lands. A design nobody reads again is one the code quietly leaves.
+
+`refs/devex/workspace/workstream.md` states the fifth and sixth in full, in § *What each file of an arc holds is decided by its reader* and § *The order of execution is set before the rows are written*.
 
 ## What it checks
 
@@ -62,4 +76,4 @@ Duplication costs most later — a third way to do what the system already does 
 ## What it never does
 
 - **Block anything but the condition above.** Everywhere else it flags the missing decision entry and drafts it; a person decides.
-- Plan the implementation. Files, loops, and pseudo-code are the standards' job; the design says *what* and *where*, never *how*.
+- Write what a step contains. It orders the steps of one piece of work and decides what each of the arc's files must hold; the files, loops and pseudo-code inside a step are the standards' job, so the design says *what*, *where* and *in what order*, never *how*.
