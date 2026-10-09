@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/06-service.md",
-      "seen": "5f0d171e"
+      "seen": "9d42d907"
     }
   ]
 }
@@ -61,7 +61,7 @@
 
 ### The three managers
 
-`support-server-service-ts` has three manager classes, each in its own file under `src/app/module/`. `SPServiceAppModuleManager<TModule>` is the base boot starts and stops (`initModule`, `shutdownModule`). `SPServiceAppRuntimeModuleManager<TModule>` is for a module mounted in this service, and its abstract methods are the nine above bar `shutdownModule`. `SPServiceAppRemoteModuleManager<TModule>` is for a module that lives in another service: it writes `getModuleCode` and `getRemoteServices`, and its `initModule` and `shutdownModule` are written once in the class. Boot asks the runtime questions only of a runtime manager, and tells the kinds apart by one type guard.
+`support-server-service-ts` has three manager classes, each in its own file under `src/app/module/`. `SPServiceAppModuleManager<TModule>` is the base boot starts and stops (`initModule`, `shutdownModule`). `SPServiceAppRuntimeModuleManager<TModule>` is for a module mounted in this service, and its abstract methods are the nine above bar `shutdownModule`. `SPServiceAppRemoteModuleManager<TModule>` is for a module that lives in another service: it writes `getRemoteServices` alone, and its `initModule` and `shutdownModule` are written once in the class. It states no code: the module's code is the one its line in the start file gives, and each proxy sends that code. Boot asks the runtime questions only of a runtime manager, and tells the kinds apart by one type guard.
 
 **The runtime manager lists the module's contract services** in `getAPIRemoteServices`, whether or not the service opens a remote listener. Each entry is `{ name, methods, impl }` — the service's name, its interface as data (`I<MOD><Entity>ServiceMethods`, produced) and what implements it — written `satisfies SPAPIRemoteService<I<MOD><Entity>Service>`, so a registration does not compile when the implementation does not fit the interface or the methods object misses or adds a method.
 

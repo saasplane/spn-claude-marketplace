@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/11-generation.md",
-      "seen": "c4c09ba2"
+      "seen": "5637e547"
     }
   ]
 }
@@ -34,4 +34,4 @@
 
 **The stack is never typed on an `apps` command.** The node's own manifest declares it, and a flag that repeats a declaration is a second source for it.
 
-**The API client is the one generation somebody types**, because it needs the service running to read its published surface. Everything else is derived from files already on disk.
+**The API client is the one generation somebody types**, because it needs the service running to read its published surface. Each client names the service it is the client of: the command loads the node's own `openapi-ts.config.ts` and fetches the address its `input` names, or the one passed after the target as `--url <address>`. It names no service, port or variable of its own, so a client with neither is refused. Everything else is derived from files already on disk.

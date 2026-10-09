@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/05-app/",
-      "seen": "26a272d7"
+      "seen": "47f00159"
     }
   ]
 }
@@ -140,14 +140,13 @@ What a runtime manager also answers:
 | `getQueueListeners` | queue consumers | queue entry start |
 | `getContractSchemas` | validator namespaces published as named OpenAPI schemas | before HTTP entry start |
 
-What a remote manager also answers:
+What a remote manager also answers, which is one thing:
 
 | Method | Returns | When it runs |
 | --- | --- | --- |
-| `getModuleCode` | the module's code, as its runtime manager is mounted under | boot phase 2 |
 | `getRemoteServices` | each contract service of the module, with its methods as data | boot phase 2, to build one proxy for each |
 
-A remote manager is written by hand and is small, because its base does the work: it names every contract service the module has, no fewer and no more, and the base reads where the module lives from the module's own settings and builds the proxies.
+A remote manager is written by hand and is small, because its base does the work: it names every contract service the module has, no fewer and no more, it states no code because the module's line in the module list gives it, and the base reads where the module lives from the module's own settings and builds the proxies.
 
 The split of ignorance is the point: the boot manager never knows business domains, only the providers it built; the app manager never knows modules, only app-wide concerns; a module manager never knows other modules, only its own slice. Adding a domain costs one folder plus one line; deleting it is the reverse.
 

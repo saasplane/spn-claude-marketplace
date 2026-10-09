@@ -3,7 +3,7 @@
   "docs": [
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/12-toolchain.md",
-      "seen": "37e53cd1"
+      "seen": "81fad89e"
     }
   ]
 }
@@ -20,7 +20,7 @@
 
 **The per-tier targets are inferred, never declared** — a package gains a tier by having that tier's folder, not by writing a target for it.
 
-**A `MODULE_SERVER` package has a second door, and the toolchain builds and publishes it with no setting in the package.** The rollup factory returns a second configuration when `src/remote/index.ts` exists, writing `dist/remote/index.esm.js`, `dist/remote/index.cjs` and `dist/remote/index.d.ts` beside the main output; the package's `rollup.config.js` stays one line. `spn-postbuild` writes `exports['./remote']` beside `exports['.']`, with `types` first, and refuses a manifest that names a file the build did not make. The check holds that `src/contract/` and `src/remote/` import nothing from the rest of the module. The source manifest carries no `exports` map, so inside the repository the door is a small folder, `remote/package.json`, whose entry is `../src/remote/index.ts`, and `@saasplane/module-server-iam-ts/remote` resolves there in development and through the `exports` map once published.
+**A `MODULE_SERVER` package has a second door, and the toolchain builds and publishes it with no setting in the package.** The rollup factory returns a second configuration when `src/remote/index.ts` exists, writing `dist/remote/index.esm.js`, `dist/remote/index.cjs` and `dist/remote/index.d.ts` beside the main output; the package's `rollup.config.js` stays one line. `spn-postbuild` writes `exports['./remote']` beside `exports['.']`, with `types` first, and refuses a manifest that names a file the build did not make. The check holds that `src/contract/` and `src/remote/` import nothing from the rest of the module. A door has one form in both manifests, a subpath of `exports`: the source manifest names `.`, `./remote` and `./package.json`, each pointing at source, and `spn-postbuild` replaces them with the built files and refuses a module that has `src/remote/index.ts` and does not name it. A service run from source loads its modules as ES modules and resolves `@saasplane/module-server-iam-ts/remote` from the manifest, reading no folder. The small folder `remote/package.json`, whose entry is `../src/remote/index.ts`, stays for the type checker of the server kinds, which resolves a subpath by folder.
 
 **A package declares one script per command it answers, and nothing else.** An identical script list in every package was the older rule and it is replaced: a script for a tier the package does not have is a command that can only fail.
 
