@@ -33,7 +33,7 @@
 
 **Why** — *a refusal that travels through stdout can be lost on the way*. Redirecting output, swapping arguments and parsing the last line gives a refusal several places to disappear, and it disappeared in all of them.
 **What** — each check is a function returning `{ deny?, note? } | null`. The dispatcher calls it and reads the object. A file can still be run on its own, and then `emit` prints the same JSON to the same stream.
-**How** — `emit` sets `permissionDecision` and `permissionDecisionReason` for a refusal and `additionalContext` for a note, because a message put only in the developer's pane is invisible to the agent. `packages/plugin-spn-devex/src/scripts/lib/payload.ts`.
+**How** — `emit` sets `permissionDecision` and `permissionDecisionReason` for a refusal and `additionalContext` for a note. A note is advice the agent acts on, so it goes to the agent alone, and `systemMessage`, the developer's pane, carries a refusal and nothing else (the book's RD.DEVEX.AGENT.092). Proven in `packages/plugin-spn-devex/tests/unit/scripts/events/t-pretooluse.mjs`. `packages/plugin-spn-devex/src/scripts/lib/payload.ts`.
 
 ### Exit zero, always, and a throwing check is skipped
 

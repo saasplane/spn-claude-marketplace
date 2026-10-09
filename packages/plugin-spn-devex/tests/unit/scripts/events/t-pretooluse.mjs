@@ -90,6 +90,31 @@ one("generated build output is refused too",
   "deny", { says: "generated build output" });
 
 {
+  // WHO A LINE IS FOR (RD.DEVEX.AGENT.092). `systemMessage` is the developer's pane: advice never
+  // reaches it, and a refusal does.
+  const shown = (payload) => {
+    const out = execFileSync("node", [`${HOOKS}/src/scripts/events/pretooluse.ts`],
+      { input: JSON.stringify(payload), encoding: "utf8", cwd: `${WORKSPACE}` }).trim();
+    const parsed = JSON.parse(out.split("\n").filter(Boolean).at(-1));
+    return [parsed.systemMessage, parsed.hookSpecificOutput?.additionalContext];
+  };
+  const [adviceShown, adviceRead] = shown({ tool_name: "Write", tool_input: {
+    file_path: join(capabilitiesDir(docsOf(PROBE_REPO)), "01-devex", "04-workspace", "04-docs", "probe.md"),
+    content: "# A chapter\n\nYou will find five decisions here. You read each one and you move on.\n" } });
+  const [refusalShown] = shown({ tool_name: "Write",
+    tool_input: { file_path: join(PROBE_REPO, "dist", "generated", "thing.ts"), content: "x" } });
+  for (const [label, ok] of [
+    ["advice reaches the agent", Boolean(adviceRead)],
+    ["advice is not shown to the developer", adviceShown === undefined],
+    ["a refusal is shown to the developer", Boolean(refusalShown)],
+  ]) {
+    n += 1;
+    if (!ok) failed += 1;
+    console.log(`  ${ok ? "PASS" : "FAIL"}  ${label}`);
+  }
+}
+
+{
   // split-plan's close gate, through the chain.
   const root = workspace("dispatch-close", {
     [join(DEVEX_WORKSTREAMS, "open", "001-a-subject", "a-subject-approach.html")]:

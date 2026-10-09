@@ -111,20 +111,21 @@ export function readPayload(): Payload {
 /**
  * Print one verdict in the shape the harness reads.
  *
- * `additionalContext` is what the agent reads and `systemMessage` is the developer's pane — a
- * PreToolUse hook emitting only the latter is silent to the agent, which is how a gate comes to
- * fire all day and change nothing.
+ * `additionalContext` is what the agent reads and `systemMessage` is the developer's pane. A note is
+ * advice the agent acts on, so it goes to the agent alone; a refusal stops the developer's work, so
+ * it is the one thing their pane shows (RD.DEVEX.AGENT.092).
  */
 export function emit(verdict: Verdict): void {
   if (!verdict) return;
   const specific: Record<string, unknown> = { hookEventName: "PreToolUse" };
-  const message = verdict.note ?? verdict.deny ?? "";
   if (verdict.note) specific.additionalContext = verdict.note;
   if (verdict.deny) {
     specific.permissionDecision = "deny";
     specific.permissionDecisionReason = verdict.deny;
   }
-  console.log(JSON.stringify({ systemMessage: message, hookSpecificOutput: specific }));
+  const output: Record<string, unknown> = { hookSpecificOutput: specific };
+  if (verdict.deny) output.systemMessage = verdict.deny;
+  console.log(JSON.stringify(output));
 }
 
 /**

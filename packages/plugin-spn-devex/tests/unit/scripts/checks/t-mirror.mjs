@@ -56,7 +56,7 @@ function said(root, path, session) {
   const out = execFileSync(process.execPath, [`${HOOKS}/src/scripts/checks/mirror.ts`],
     { input: payload, encoding: "utf8", cwd: root }).trim();
   if (!out) return "";
-  try { return JSON.parse(out).systemMessage ?? ""; } catch { return out; }
+  try { return JSON.parse(out).hookSpecificOutput?.additionalContext ?? ""; } catch { return out; }
 }
 
 let n = 0, failed = 0;
