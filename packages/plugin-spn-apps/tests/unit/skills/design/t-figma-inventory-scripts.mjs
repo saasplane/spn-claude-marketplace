@@ -327,11 +327,12 @@ await guard(async () => {
 // ---- the one equality that matters: the tool's helper, on the same file -------------------------------
 
 console.log("\n=== the three scripts give what the tool's helper gives, from the same file");
-// `fixtures/raw-fixture.json` is a cut of the real raw files of 2026-10-06 (two sets of DS 4-Containers, and
-// DSPopover, DSKbdKey and DSTable.HCell of DS 2-Components, with a few real variables and styles of DS 1-Core).
-// `inventory-depth2.expected.json` and `inventory-depth3.expected.json` were written from it by `reduceRawToInventory`
-// of spn-support-ts (`apps/utility-ts/tests/helpers/surface-inventory-reducer.ts`, commit 533bc04c), depth 2, and
-// depth 3 with every unit asked for. A file is built here from the same raw fixture, layer by layer.
+// `fixtures/raw-fixture.json` records a cut of the design library as read on 2026-10-06, page by page, set by set and
+// layer by layer (two sets of DS 4-Containers, and DSPopover, DSKbdKey and DSTable.HCell of DS 2-Components, with a few
+// real variables and styles of DS 1-Core). `inventory-depth2.expected.json` and `inventory-depth3.expected.json` were
+// written from it by the reducer helper of spn-support-ts (`apps/utility-ts/tests/helpers/surface-inventory-reducer.ts`),
+// depth 2, and depth 3 with every unit asked for. A stand-in Figma file is built here from the same fixture, layer by
+// layer, and the three scripts read it as they read Figma.
 const raw = JSON.parse(readFileSync(resolve(FIXTURES, "raw-fixture.json"), "utf8"));
 const NUMBER_FIELDS = ["strokeTopWeight", "strokeBottomWeight", "strokeLeftWeight", "strokeRightWeight", "topLeftRadius", "topRightRadius", "bottomLeftRadius", "bottomRightRadius", "paddingTop", "paddingBottom", "paddingLeft", "paddingRight", "itemSpacing", "minHeight", "maxHeight"];
 const rawPaints = (paints) => paints.map((paint) => ({ type: paint.type, boundVariables: paint.variable ? { color: alias(paint.variable) } : {} }));

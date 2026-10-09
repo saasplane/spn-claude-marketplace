@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/13-providers/",
-      "seen": "1225e9bb"
+      "seen": "b1285d7e"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/13-providers/ts/01-design-system.md",
@@ -58,7 +58,7 @@ The tokens sit in tiers, and a component sees only the roles and the scale: Tier
 
 `@saasplane/support-web-ds-ts` 2.1.0 builds the container, the context that carries a frame (`DSScope`), the theme's six choices, the inset of the main area, the page's fill, the layout's own measures, and how the navigation behaves.
 
-`web-ds-storybook-ts` is the `ts` provider's showcase, built with Storybook. The outline in `delivery-showcase.md` leaves one measure to the stack, the width under which a page is narrow: in this showcase a page is narrow below 768 px.
+`web-ds-showcase-ts` is the `ts` provider's showcase, built with Storybook. The outline in `delivery-showcase.md` leaves one measure to the stack, the width under which a page is narrow: in this showcase a page is narrow below 768 px.
 
 ## No file under `_shadcn/` is edited by hand
 
