@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/04-architecture-names/",
-      "seen": "f8f20c4e"
+      "seen": "f70db3b6"
     }
   ]
 }

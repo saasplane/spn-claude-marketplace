@@ -135,7 +135,7 @@ const SCAN_PARTS = ["scan-labels.js", "scan-placement.js", "scan-properties.js",
 const FINDING_ORDER = ["emptyReading", "usagesNamingNoUnit", "versionsOutside", "versionPairsMeeting", "topLevelPairsMeeting", "strays", "defaultNamedProperties", "unreadableSets", "setsOverLimit", "emptyVersions", "emptyCases",
   "badCaseNames", "duplicateCaseNames", "labelsUnitElsewhere", "labelLayerNames", "labelsFormCannotSay", "defaultNotLabels",
   "topLevelNotSection", "meetingInSection", "sectionOutOfOrder", "unitsWithoutHeader", "outsideUnitSection",
-  "childOutsideSection", "unitsWithoutCases", "unitsWithoutUsage", "propertyNotDrawn", "propertyClearedByNameAlone", "behaviourNamesHeldProperty", "versionNotWired", "versionDiffersFromDefault", "versionSlotIsFrame", "versionTiedToAnotherProperty", "propertyTiedToNothing", "usagesWithoutCaption", "partSectionTooWide"];
+  "childOutsideSection", "unitsWithoutCases", "unitsWithoutUsage", "propertyNotDrawn", "propertyClearedByNameAlone", "behaviourNamesHeldProperty", "versionNotWired", "versionDiffersFromDefault", "versionSlotIsFrame", "versionTiedToAnotherProperty", "propertyTiedToNothing", "crossedBeyondTheRule", "usagesWithoutCaption", "partSectionTooWide"];
 const NOT_BLOCKING_ORDER = ["emptyVersions", "emptyCases", "unitsWithoutCases", "behaviourNamesHeldProperty", "usagesWithoutCaption", "partSectionTooWide", "propertyClearedByNameAlone", "versionSlotIsFrame", "versionDiffersFromDefault"];
 async function runScan(inputs, figma) {
   const answers = [];
@@ -1444,6 +1444,38 @@ await guard(async () => {
   const scan = await scanSections([labelled]);
   same("a label inside a sheet is no case: no bad name, no empty case, no duplicate", [scan.findings.badCaseNames.count, scan.findings.emptyCases.count, scan.findings.duplicateCaseNames.count], [0, 0, 0]);
 });
+
+console.log("\n=== page.js — a set crossed beyond the rule");
+{
+  const crossing = async (names, definitions = {}) => {
+    const versions = names.map((name, at) => version(`X:${at}`, name, 20, at * 60));
+    return (await scanOf([componentSet("X:set", "DSThing", [0, 0, 300, 600], versions, { definitions }), buttonHeader()]));
+  };
+  await guard(async () => {
+    const scan = await crossing(["size=SM, tone=a", "size=SM, tone=b", "size=SM, tone=c", "size=MD, tone=a", "size=MD, tone=b", "size=MD, tone=c"]);
+    same("a property outside the rule that has a value other than the default held by two versions is named, with the values that multiply it, and blocks",
+      [scan.findings.crossedBeyondTheRule.items.map((item) => [item.set, item.setName, item.property, item.default, item.multiplying]), scan.notBlocking.includes("crossedBeyondTheRule"), scan.clean],
+      [[["X:set", "DSThing", "tone", "a", ["b x2", "c x2"]]], false, false]);
+  });
+  await guard(async () => {
+    const drawnOnce = await crossing(["size=SM, tone=a", "size=SM, tone=b", "size=MD, tone=a", "size=MD, tone=c"]);
+    same("a property whose every other value is held by one version is drawn once and passes", drawnOnce.findings.crossedBeyondTheRule.count, 0);
+    const allowed = await crossing(["size=SM, variant=A, state=rest", "size=SM, variant=A, state=hover", "size=MD, variant=A, state=rest", "size=MD, variant=A, state=hover", "size=SM, variant=B, state=rest", "size=SM, variant=B, state=hover"]);
+    same("size, the shared variant and a state cross as they like", allowed.findings.crossedBeyondTheRule.count, 0);
+    const named = await crossing(["tone=a", "tone=b", "tone=b"], { tone: { type: "VARIANT", defaultValue: "b", variantOptions: ["a", "b"] } });
+    same("the default is the set's own: the value that is the default is not counted, wherever it sits", named.findings.crossedBeyondTheRule.count, 0);
+  });
+  await guard(async () => {
+    const names = ["size=SM, orientation=H", "size=SM, orientation=V", "size=SM, orientation=D", "size=MD, orientation=H", "size=MD, orientation=V", "size=MD, orientation=D"];
+    const partOf = async (versionNames) => (await runFile("scan-sets.js", { pageId: "2:1" }, file([page("2:1", "Actions", [componentSet("X:set", "DSThing", [0, 0, 300, 600], versionNames.map((name, at) => version(`X:${at}`, name, 20, at * 60))), buttonHeader()])]))).scan;
+    const excused = await partOf(names);
+    same("a property of the list of known exceptions is not named, and the set that passes only by it is counted", [excused.findings.crossedBeyondTheRule.count, excused.passedByException], [0, 1]);
+    const caught = await partOf(["size=SM, tone=a", "size=SM, tone=b", "size=SM, tone=c"]);
+    same("a set that is named is not counted as passed by exception, and a clean set counts none", [caught.passedByException, (await partOf(["size=SM", "size=MD"])).passedByException], [0, 0]);
+    const book = await partOf(["size=SM, bordered=false", "size=SM, bordered=true", "size=SM, bordered=maybe", "size=MD, bordered=false", "size=MD, bordered=true", "size=MD, bordered=maybe"].map((name) => name.replace("bordered", "caller")));
+    same("a caller's choice that is in neither list is named", book.findings.crossedBeyondTheRule.items.map((item) => item.property), ["caller"]);
+  });
+}
 
 // ---- the texts ----------------------------------------------------------------------------------
 

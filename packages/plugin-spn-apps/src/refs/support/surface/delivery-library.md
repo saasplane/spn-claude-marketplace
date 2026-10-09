@@ -7,7 +7,7 @@
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/11-delivery-library/",
-      "seen": "2e30ff33"
+      "seen": "84fd06dc"
     }
   ]
 }
@@ -61,11 +61,11 @@ The organisation of a library file that the book states holds for any library, t
 
 ## Color is a mode, and the rest are properties
 
-In the design library, `color` is a variable mode. `variant`, `size` and the state are properties. `color` stays a prop on every stack, and a design read back turns the mode into the prop. A hue is a mode of the `Hue` collection, read by its name in the same call that sets it, and the colour of a picture never chooses it.
+In the design library, `color` is a variable mode. `variant`, `size` and the state are properties. Which other properties of a unit are properties of its set, and which are drawn as cases, "Which property is a variant and which is a case" states. `color` stays a prop on every stack, and a design read back turns the mode into the prop. A hue is a mode of the `Hue` collection, read by its name in the same call that sets it, and the colour of a picture never chooses it.
 
 ## What stays in words
 
-The library holds the pictures, the properties and the variables. It draws every case a person can see in the showcase, and a line in a description never stands in for a drawing. The book states what no person sees: keyboard use and where focus goes; the overlay seam, and translation; a data shape as a whole; the rule that decides a refusal by the permission gate, whose denied state is drawn. A block with a behaviour and little or no look is stated by its behaviour and its feedback: `DSAuthz`, `DSSticky`, `DSAnchor` and `DSAnchorContainer` have a small sheet of states each, the five formatters share one sheet of formats, `DSAspectRatio` has one sheet of ratios, `DSElementObserver` has an entry with its description and no states, and `DSPortal`, a block of the web alone, has no entry. A description in the library carries one line and a link to the chapter that states the behavior.
+The library holds the pictures, the properties and the variables. It draws every state and every tab of Cases that a person can see in the showcase, and a line in a description never stands in for a drawing. The book states what no person sees: keyboard use and where focus goes; the overlay seam, and translation; a data shape as a whole; the rule that decides a refusal by the permission gate, whose denied state is drawn. A block with a behaviour and little or no look is stated by its behaviour and its feedback: `DSAuthz`, `DSSticky`, `DSAnchor` and `DSAnchorContainer` have a small sheet of states each, the five formatters share one sheet of formats, `DSAspectRatio` has one sheet of ratios, `DSElementObserver` has an entry with its description and no states, and `DSPortal`, a block of the web alone, has no entry. A description in the library carries one line and a link to the chapter that states the behavior.
 
 ## A value held worked out
 
@@ -392,7 +392,7 @@ A person who opens a page reads it as a tree: the page, then one section for eac
 - **A page that is no group of the showcase MUST NOT be kept.** What it holds goes to the page of the unit it serves, and what serves no unit is removed.
 - **A page MUST hold one section for each unit of its group, named exactly as the unit, such as `DSInput`, and nothing else at its top level.** No level stands between a page and its units. A label or a usage that stood loose on the page would be parted from its unit the next time the unit moves, so every thing a unit owns sits inside the unit's section.
 - **The sections MUST stand in the showcase's order of the group's units, in one column down the page.** A person who knows the showcase then finds a unit where the showcase lists it. A unit that the showcase lists and the page has no node for gets no section, and the agent reports it.
-- **A unit's section MUST hold these, from the top down, in this order: the header, the set with its row and column labels, the usage, the cases and the parts.** A person sees what a unit is for before every switch on it, as the page of the unit in the showcase opens with its Usage. A band the unit has nothing for is left out with its label, and a top-level unit always has its Usage. A unit whose versions draw everything it can show owes no sheet of cases. A top-level unit owes a usage of its primary use whatever else it draws, as "What a library file owes of a unit" states.
+- **A unit's section MUST hold these, from the top down, in this order: the header, the set with its row and column labels, the usage, the cases and the parts.** A person sees what a unit is for before every switch on it, as the page of the unit in the showcase opens with its Usage. A band the unit has nothing for is left out with its label, and a top-level unit always has its Usage. A unit whose page in the showcase has no Cases section and no section of its own owes no sheet of cases. A top-level unit owes a usage of its primary use whatever else it draws, as "What a library file owes of a unit" states.
 
 | Piece | What it is |
 | --- | --- |
@@ -422,7 +422,7 @@ The distances are fixed, so that every section reads the same. They are in pixel
 The section is as large as its content and its padding, and it holds each of them: a section neither clips nor resizes what is in it by itself.
 
 - **Moving a set into a section, or to another page, MUST change nothing of the unit.** Its key, its versions' keys, its name, its size, its default and its properties stay as they were, and an instance keeps its main component. An agent reads them before the move and after it, and reports both, as it does for a default.
-- **Size stays a property of a unit, and a set keeps a version for each value of the web.** A value that is only a colour, a corner, a height, a padding or a text size is carried by a variable and never by a version.
+- **Size stays a property of a unit, and a set keeps a version for each value of the size of the web.** A value that is only a colour, a corner, a height, a padding or a text size is carried by a variable and never by a version. Which other properties of the unit are properties of its set, and which are drawn as cases, "Which property is a variant and which is a case" states.
 - **A unit that the showcase lists and that is drawn only as a sheet of cases MUST have a section with its header and its sheet.** It has no set of versions. Its header's layout clause reads `no set of versions, shown as cases`. The sheet's label stands above the sheet in the band of cases, its layer named `label · ` and its text, and it is never the unit's header.
 - **A thing MUST be given room for what it draws, and "nothing meets" and "inside its section" MUST be judged by what a thing draws as well as by its box.** An open select in a usage draws a popup outside its box, and a shadow reaches past its box. Each of them stays clear of its neighbours and inside its section.
 - **The layers panel MUST read from the top in the page's order, and inside a section in the order of its pieces.** A person who reads the panel reads the page.
@@ -460,10 +460,10 @@ These three rules and the layout rules above do not conflict, because they cover
 ### Versions that are added are laid out
 
 - **Whatever adds versions to a set MUST place them in the grid as the label's order gives, and MUST prove that no version is outside the set and no two versions meet.** A copy of a version lands on top of the one it was made from, and a set with stacked or outside versions reads as one case. The connector's facts state that combined versions sit on one another.
-- **Before a property or a value is added to a set, work out how many versions the set will hold after it, and say so.** A property multiplies the versions of a set, and one more property multiplies them again, so the product is not seen until it is worked out.
+- **Before a property or a value is added to a set, work out how many versions the set will hold after it, and say so.** A property multiplies the versions of a set, and one more property multiplies them again, so the product is not seen until it is worked out. A property that is not the size, a state or the shared `variant` is not added to the set at all, because it is drawn as a case, as "Which property is a variant and which is a case" states.
 - **The default value of a property that is added MUST draw what the set draws now.** The versions that stand are then the look of the default, only the other values are new drawings, and no instance already placed changes.
 - **A set MUST NOT be grown past 1,000 versions.** A set of thousands of versions cannot be laid out or read. One change that added three properties to one unit made 2,040 versions at once, and nobody saw the product until the work had run for 87 minutes.
-- **Where a property would multiply a set and the stack shows each of its values as one look, draw the values as cases on the unit's sheet, and not as a property of the unit.** The sheet holds one component for each case, so the set stays small, and the case is the unit with its prop values set and is not a unit of its own.
+- **A property of the web unit that is not the size, a state, the shared `variant` or a look drawn once is drawn as a case on the unit's sheet, and not as a property of the unit.** The sheet holds one component for each case, so the set stays small, and the case is the unit with its prop values set and is not a unit of its own.
 
 ### A label
 
@@ -489,11 +489,11 @@ The layer of a row label and of a column label is named `label · ` followed by 
 - **The default is marked ` (default)`, written once after the one value of each property that the stack's default version carries.** That value comes first in its list, because the version at the top left carries the default.
 - **A row label and a column label name values and no property.** The header names the property, and the label is read against it. `SOLID (default) · SM (default)` is the row of the default variant at the default size.
 
-Two headers follow, written in this form: the one for `DSList` and the one for `DSProgress`.
+Two headers follow, written in this form: the one for `DSDataUnit` and the one for `DSList.Item`. Each set crosses its size with its states and nothing else, as "Which property is a variant and which is a case" states.
 
 ```text
-header · DSList — the list of items · rows: bulleted=false (default), bulleted=true · columns: flush=false (default), flush=true · its slot holds three DSList.Item at MD, with divided off
-header · DSProgress — the progress bar · rows: size=SM (default), XS, MD, LG, XL · columns: showValue=false (default), true, indeterminate=true · withLabel is off
+header · DSDataUnit — a label and its value · rows: size=SM (default), XS, MD, LG, XL · columns: state=filled (default), empty
+header · DSList.Item — one row of a list · rows: size=SM (default), XS, MD, LG, XL · columns: state=rest (default), hover, disabled=true · divided is off
 ```
 
 ### A sheet of cases, and a case
@@ -514,14 +514,49 @@ How the library keeps to the last rule is stated as far as the book can state it
 A showcase is the running catalogue that a stack proves its realization with, and a showcase is proven against the library. The Usage band is the part of the library that the showcase's own Usage is proven against: both draw the one use of the unit that an app would really have. A usage is drawn from the showcase's source for its props, labels and values, and checked against a picture of the running showcase. Where a reading of the source and the picture differ, the picture is right. A property that a unit has, and that nothing on its page draws, leaves nothing to prove the showcase against. A person who opens the file cannot see what the web supports, and a stack cannot show that it built it. So the page draws what a person sees of each unit.
 
 - **A top-level unit MUST have a usage of its primary use.** A top-level unit is a unit the showcase lists on its own. A part owes no usage, because it serves another unit and the usage of that unit shows it. The usage stands in the band of Usage and takes the name that "A usage" states.
-- **A property that changes what is visibly there MUST be drawn.** An icon, a heading, a footer, a clear button and an open menu are such properties. Each is drawn by a version of the set, or by a case named `<property>=<value>` on the version where the property draws. A property whose default is on is drawn by its off case. A property that draws only on one version is drawn by a case on that version, and not by a case on the default.
+- **A property that changes what is visibly there MUST be drawn.** An icon, a heading, a footer, a clear button and an open menu are such properties. "Which property is a variant and which is a case" places each of them. A version of the set draws a property only where the property is the size, a state, the shared `variant` or a look drawn once, and a case named `<property>=<value>` on the version where the property draws it in every other kind. A property whose default is on is drawn by its off case. A property that draws only on one version is drawn by a case on that version, and not by a case on the default.
 - **The test is what a person can see, at rest or in any state the unit can be in, and a state a unit can be in MUST be drawn.** A state is a visible change: open (a select's popup, a menu, a dialog), hover, focus, pressed, selected, checked, filled, invalid with its message, disabled, loading and empty. The library chapter already requires a drawing for every state that changes what a person sees, and makes the state a property of the set, `state=…`, with a shown state drawn as a picture and no prop. This rule includes both and restates neither.
 - **A property of behaviour changes nothing a person can see in any state, so it has nothing to draw, and the unit's header MUST name it.** It decides when or how something happens, and not what is there. A late-loading image (`lazy`), a callback, the delay before a tooltip shows, whether a menu closes when an item is chosen, the step of a number, the limit on a value and the `name` of a field are such properties. The header names each one in the clause `behaviour: ` that "The form of a label" states, so a script tells a property of behaviour from a property that nothing draws.
 - **A property that lets a unit reach a state is drawn by that state.** `collapsible` lets a panel be shut, and the shut panel is a state, so it is drawn. `sticky` holds a header in place while a page scrolls, and a case draws one scroll place, as "A unit with no look of its own" states for a still picture of behaviour. A property is named in the `behaviour:` clause only when no state it leads to looks different.
 - **Example, `DSSelect`.** `open` is drawn, because the popup is there to see. `disabled` is drawn, and so is a start icon. Whether the popup closes when a choice is made is behaviour, and the header names it.
-- **A property whose value is a token MUST be shown as a mode, by one case with the mode set on the instance.** A hue and a density are such properties. A variable carries each of their values, as the rule on size states, so a version for each value would draw the same unit again and again.
+- **A property whose value is a token MUST be shown as a mode, by one case with the mode set on the instance.** A hue, light or dark, a border, a radius and a shadow are such properties. A variable carries each of their values, so a version for each value would draw the same unit again and again. Size is the one property of this kind that stays a version, as the rule on size states.
 - **A unit that the library draws as cases alone, having no look of its own, MUST say why in the label of its sheet.** A person who reads the sheet then learns that the unit has no set because the unit has no look, and not because a set is missing.
 - **The duty MUST run one way: a showcase may show more than the library, and a library MUST NOT lack a primary case.** A library that lacks a primary case of a unit is at fault, and the showcase is not.
+
+### Which property is a variant and which is a case
+
+A set holds one version for each pair of values that its writer crossed, so each property that is crossed multiplies the set. `DSInput` crossed eight properties and held 850 versions, and a person who opens it cannot find the version they want. A case costs one component for one property, whether the set is crossed or not. So this part states which properties a set crosses and which are drawn as cases, and it takes the answer from the page of the unit in the showcase, where a developer already looks for each of them (RD.SUPPORT.SURFACE.038). The showcase names its section of choices a caller makes with a prop Cases, and the library's sheet of cases carries the same word (RD.SUPPORT.SURFACE.039).
+
+- **The library MUST follow the sections of the unit's page in the showcase.** Each property is drawn where the showcase shows it, and the table below says what the library holds for each section.
+- **A set MUST cross its size, its states and the shared `variant`, and no other property.** A designer who picks a unit picks a size, a state and a look. The showcase's Sizes tabs show every variant at each size, so the set crosses the shared `variant` with the size and the states. A property that a designer does not pick together with these only multiplies the versions that hold nothing new.
+- **`disabled` MUST stay a property of its own and MUST NOT be a value of `state`.** A caller sets `disabled`, and a person or the system puts the unit in a state.
+- **Each tab of Cases, and of a section of the unit's own, MUST be one case on the unit's sheet of cases.** The Cases section holds each icon or place of the unit and every choice that a caller makes with a prop. A section of the unit's own, such as the looks and the pinned parts of `DSTable`, is read the same way.
+- **Colors MUST be a mode, shown by one case.** The case sets the mode on the instance, and the instance shows every variant, as the showcase's Colors tabs do.
+- **A look that no property can produce MUST be a version drawn once, crossed with nothing, and its case MUST be an instance of that version.** `type` of `DSSkeleton` has six values and each is a look that no other property can draw, so the set holds six versions and a version for each pair with the size would draw the same look again.
+- **A pair of values that the web cannot be in MUST be left out, and a pair MUST keep a version only where it draws something that neither value draws alone.** A disabled row of a list is not under the pointer, so `DSList.Item` has no hover version for it. A checked radio that is disabled shows a mark in the disabled look, so `DSRadio` keeps that pair.
+- **Usage MUST stay the usage, and Props MUST draw nothing.**
+- **An agent MUST place each property by the section of the showcase that shows it, and MUST answer from the web's source and the running showcase, never from the property's name.** A first list that sorted the properties of 93 sets by name alone left 32 names that only a reading of the source could place.
+
+| Section of the unit's page | What the library holds | Example |
+| --- | --- | --- |
+| Usage | the usage, in the band of Usage | the usage of `DSBadge`, in its band |
+| Sizes | `size` of the set, one version for each size, crossed with the states and the shared `variant` | `size` of `DSButton`, XS to XL, crossed with its five variants |
+| States | the states of the set, crossed with `size`, with each pair left out or kept as the rule above says | `state` of `DSDataUnit`, filled and empty, at each size |
+| Colors | a mode on the instance, shown by one case | `Hue=WARNING` of `DSBadge`, which shows all five variants |
+| Cases | one case on the sheet for each tab | `fullWidth=true` of `DSButton`, and `fullScreen=true` of `DSDialog`, the instance of a version drawn once |
+| A section of the unit's own | one case on the sheet for each tab | `horizontalScroll=true, stickyLeftColumns=2` of `DSTable`, in its pinned parts |
+| Props | nothing | the props table of `DSButton` |
+
+The section places a property, and a short list of questions then decides only how its case is carried. A question is asked of a property that is drawn as a case, in this order, and the first yes decides.
+
+| Question | The case is carried by | Example |
+| --- | --- | --- |
+| Is its value a token, such as a hue, light or dark, a border, a radius or a shadow? | a mode on the instance | `Hue=WARNING` of `DSBadge`, and `mode=DARK` of `DSCodeBlockView` |
+| Does it show or hide one part? | a yes-or-no property | `withClose=true` of `DSBadge` |
+| Is it words, a number that is shown, a picture or a nested node? | a text property, or a swap of the node | `title=AL` of `DSAvatar`, and `startIcon=BELL` of `DSBadge` |
+| Is it a free number? | the property on the instance, set to one value | `maxHeight=160` of `DSCodeBlockView` |
+
+A property that changes nothing a person can see in any state is drawn by no case, and the unit's header names it in the clause `behaviour: `.
 
 ### A unit with no look of its own
 

@@ -3,11 +3,11 @@
   "docs": [
     {
       "path": "spn-foundation/docs/02-constructs/02-support/03-surface/12-delivery-showcase.md",
-      "seen": "6658fcc8"
+      "seen": "500a1a14"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/03-surface/12-delivery-showcase/",
-      "seen": "c3cc46ff"
+      "seen": "9f1ba212"
     }
   ]
 }
@@ -44,7 +44,7 @@ Read this before you add a unit to a showcase, or before you judge whether one i
 | Main page | the first page of a unit: the opening, then its sections |
 | Playground | the page of a unit where every prop is a control |
 | Scenario page | a page of its own for one use of a unit that needs the whole width or the whole screen |
-| Section | one named part of a page, drawn as one container. The sections of a main page are Usage, Sizes, Colors, Content, States and Props |
+| Section | one named part of a page, drawn as one container. The sections of a main page are Usage, Sizes, Colors, Cases, States and Props |
 | Card | the content of a section's container, in the container's frame, which holds the section's tabs, its preview and its code |
 | Tab | one example of a section |
 | Tag | one fact a unit declares about itself, from which its page is derived |
@@ -177,7 +177,7 @@ What a unit has is read from its own props.
 | colours | it takes `color` | the section Colors |
 | variants | it takes `variant` | no section: every tab of Sizes and of Colors shows each variant |
 | states | the caller sets a state on it, such as disabled or working | the section States |
-| content | it holds an icon, or a place that takes any block, or it has a choice under another prop's name | the section Content |
+| content | it holds an icon, or a place that takes any block, or it has a choice under another prop's name | the section Cases |
 | value | it writes a value | no section: every card shows the live value beside the unit |
 | opener | something opens it, or it opens something | no section: the Usage example holds the thing that opens it |
 | data | it is drawn from a list, a record or a config | no section: the Usage example holds real records |
@@ -193,19 +193,19 @@ A main page holds its sections in one order. Usage is first and Props is last. A
 | Usage | always | one example: the richest real use of the unit, one that an app would really have. The library draws the same use in the Usage band of the unit's section, and that band is what this Usage is proven against |
 | Sizes | sizes | one tab for each size, `XS` to `XL`. Each tab shows every variant together, and not as a grid |
 | Colors | colours | one tab for each colour. Each tab shows every variant together, laid out as the tab of Sizes is |
-| Content | content | one tab for each icon or place the unit holds, and one tab for each choice of the unit that has no section of its own, such as a full width button |
+| Cases | content | one tab for each icon or place the unit holds, and one tab for each choice of the unit that has no section of its own, such as a full width button |
 | States | states | each state the unit is in, and nothing else: as the cells of one grid, with the name of each state at the top of its cell, when the showcase layout is Inline; otherwise one tab for each state, and a tab that holds several states shows them as the cells of one grid too. The grid is the rule of this section alone. A unit that is loading shows the state *Working* |
 | Props | always | the props table and the unit's config objects. Its footer holds the link to the Playground |
 
-**A choice that a unit has under another prop's name is a tab of Content.** Such a choice is not a size, a colour or a state. It is a kind of what the unit shows or holds, or a place where it stands: the type of a row of tabs, the shape of a skeleton, the placement of a drawer, or the number of digits of a code field. A unit with such a choice has content, and each value of the choice is one tab of the section Content. The choice never gets a section of its own under the name of its prop, and never a page.
+**A choice that a unit has under another prop's name is a tab of Cases.** Such a choice is not a size, a colour or a state. It is a kind of what the unit shows or holds, or a place where it stands: the type of a row of tabs, the shape of a skeleton, the placement of a drawer, or the number of digits of a code field. A unit with such a choice declares content, which gets the section named Cases, and each value of the choice is one tab of the section Cases. The choice never gets a section of its own under the name of its prop, and never a page.
 
-**The States section holds states only. A choice made with a prop is a tab of Content.** A state is what a unit is in: default, disabled, working, error, empty, read only, open, checked, selected or no permission. Full width, a placement, an orientation, a type, a count, and an option that keeps a menu open are choices that a caller makes with a prop, so each is a tab of Content.
+**The States section holds states only. A choice made with a prop is a tab of Cases.** A state is what a unit is in: default, disabled, working, error, empty, read only, open, checked, selected or no permission. Full width, a placement, an orientation, a type, a count, and an option that keeps a menu open are choices that a caller makes with a prop, so each is a tab of Cases.
 
 **A unit may add a section of its own after the sections its tags give.** A unit does so when it has a whole set of choices that none of the six sections names. Examples are the looks and the pinned parts of a table, the display of a code view, and the type of an address form. A section of its own is built as every other section is: a container with a title, one line, and one card of tabs. It stands after the sections that the tags give, which end with States, and before Props. A unit with several of them lists them in the order it wants them read.
 
-**A formatter shows its types as one table, in a section of its own named Formats.** The table has one row for each member of the unit's format type, with none left out. Its columns are *Type*, the member as a developer writes it, and *Sample value*, the unit itself drawn live with one fixed input that is the same in every row. The section's line states that input once. The table is the design system's own table in the section's container, and it draws no border and no heading of its own. A second choice that changes the output, such as a time zone, stays fixed and is stated in the section's line. A formatter whose type is two types, such as the date and the time of `DSFormatDateTime`, has the members of both in one table, and each row changes one of them. A case that shows what the table does not, such as the size of a value or a format that comes from the app, stays as a tab of Content.
+**A formatter shows its types as one table, in a section of its own named Formats.** The table has one row for each member of the unit's format type, with none left out. Its columns are *Type*, the member as a developer writes it, and *Sample value*, the unit itself drawn live with one fixed input that is the same in every row. The section's line states that input once. The table is the design system's own table in the section's container, and it draws no border and no heading of its own. A second choice that changes the output, such as a time zone, stays fixed and is stated in the section's line. A formatter whose type is two types, such as the date and the time of `DSFormatDateTime`, has the members of both in one table, and each row changes one of them. A case that shows what the table does not, such as the size of a value or a format that comes from the app, stays as a tab of Cases.
 
-**Usage is one example, and it keeps one case where it shows one use.** Several cases stand in Usage only when they are one use told in parts. A case that shows a choice of the unit is a tab under its own name, in Content. The folded trail of a breadcrumb is a choice of the unit, so it is a tab of Content.
+**Usage is one example, and it keeps one case where it shows one use.** Several cases stand in Usage only when they are one use told in parts. A case that shows a choice of the unit is a tab under its own name, in Cases. The folded trail of a breadcrumb is a choice of the unit, so it is a tab of Cases.
 
 A section opens on the tab its unit names. Where the unit names none, Sizes opens at `SM`, Colors at the primary colour, and any other section at its first tab. A section with one example has no row of tabs, unless that example carries a name of its own.
 
@@ -250,7 +250,7 @@ An example sets no alignment and no width to place its unit. A unit that stands 
 
 **A unit whose output is only text is a Content unit, so its cases stand one under the other.** The unit is `DSText`, and the five formatters: `DSFormatCurrency`, `DSFormatDate`, `DSFormatDateTime`, `DSFormatNumber` and `DSFormatTime`. `DSKbd` is a key cap and `DSLink` is an action drawn as text, so each keeps its own showcase layout.
 
-**Several cases in one preview stand in one grid of cells of equal width in the States section, and in no other section.** The States section may show its cases in a tab or with no tabs, and the rule is the same. In every other section (Usage, Sizes, Colors, Content, and a section of the unit's own) there is no grid, and a case shows no name, because the code beside the preview names each case in a comment: the cases of an Inline unit stand in one row that wraps, in the centre of the preview both ways, each as wide as its own content, and the cases of a Content unit stand one under the other, as wide as the preview, in the middle of its height. Each cell holds the title of its case at the top, and under the title the unit, placed by the table above. The title is aligned as its unit is: centred above a unit that stands in the centre, and at the start of the cell above any other unit. The space between cells is a token of the core.
+**Several cases in one preview stand in one grid of cells of equal width in the States section, and in no other section.** The States section may show its cases in a tab or with no tabs, and the rule is the same. In every other section (Usage, Sizes, Colors, Cases, and a section of the unit's own) there is no grid, and a case shows no name, because the code beside the preview names each case in a comment: the cases of an Inline unit stand in one row that wraps, in the centre of the preview both ways, each as wide as its own content, and the cases of a Content unit stand one under the other, as wide as the preview, in the middle of its height. Each cell holds the title of its case at the top, and under the title the unit, placed by the table above. The title is aligned as its unit is: centred above a unit that stands in the centre, and at the start of the cell above any other unit. The space between cells is a token of the core.
 
 | How many cells stand in a row | A preview of an Inline unit | A preview of a Content unit |
 | --- | --- | --- |

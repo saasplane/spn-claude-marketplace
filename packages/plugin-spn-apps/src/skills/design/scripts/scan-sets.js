@@ -13,9 +13,16 @@
 //   (The connector refuses a returned value over 20,480 bytes: `answerBytes` stays 18000 or under. The lists give up
 //   items, down to 3 and then to counts alone, the counts always whole; `shortened` says what was left out.)
 //
-// Holds: versionsOutside, versionPairsMeeting, emptyVersions, defaultNamedProperties, unreadableSets, setsOverLimit, emptyCases, badCaseNames, duplicateCaseNames, versionNotWired, versionDiffersFromDefault, versionSlotIsFrame, versionTiedToAnotherProperty, propertyTiedToNothing.
+// Holds: versionsOutside, versionPairsMeeting, emptyVersions, defaultNamedProperties, unreadableSets, setsOverLimit, emptyCases, badCaseNames, duplicateCaseNames, versionNotWired, versionDiffersFromDefault, versionSlotIsFrame, versionTiedToAnotherProperty, propertyTiedToNothing, crossedBeyondTheRule.
 //          These do not block: emptyVersions, emptyCases, versionSlotIsFrame, versionDiffersFromDefault. This part reads sets and lone components only, so it
 //          carries no label form.
+//
+// `crossedBeyondTheRule` blocks: a set crosses its `size`, the shared `variant` and its states (the list `STATE_PROPERTIES`), and
+// every other property is a case on the unit's sheet. A set is named, with the property, its default and the values that
+// multiply it, when it holds a variant property outside that rule and some value of it other than the default is held by more than
+// one version. A property whose every other value is held by exactly one version is drawn once and passes. A property in
+// `PROPERTIES_A_SPEC_KEEPS_CROSSED` is a known exception, awaiting the developer's ruling: it is not named, and the answer's
+// `passedByException` counts the sets that pass only because of that list.
 //
 // `versionNotWired` blocks: in a set of more than one version, a layer path that holds a `componentPropertyReferences` entry
 // (`characters`, `visible`, `mainComponent`, `slotContentId`) in any version, on a node of one type, is wired for that kind; a
@@ -54,8 +61,26 @@ const INPUTS = {
 
 const PART = "sets";
 const NOT_BLOCKING = ["emptyVersions", "emptyCases", "versionSlotIsFrame", "versionDiffersFromDefault"];
+// The book's rule for what a set crosses: its `size`, the shared `variant` and its states; every other property is a case
+// on the unit's sheet. A property outside the rule that is "drawn once" (every value but the default is held by one
+// version) multiplies nothing and passes.
+const SIZE_PROPERTY = "size";
+const SHARED_VARIANT_PROPERTY = "variant";
+// A state is what a unit is in, as the showcase's States section states it (default, disabled, working, error, empty, read
+// only, open, checked, selected, no permission). A choice that a caller makes with a prop is a case, never a state.
+const STATE_PROPERTIES = [
+  "checked", "current", "disabled", "empty", "expanded", "filled", "indeterminate", "pressed", "selected", "state", "validationType",
+];
+// Properties that a recorded spec of the library update keeps crossed, each a KNOWN EXCEPTION to the rule. Every name in this
+// list is to be ruled on by the developer: it either leaves the list (its unit draws it as a case on the sheet) or is
+// admitted to the rule. The scan therefore does NOT catch these names yet; `passedByException` counts the sets that pass only
+// because of this list, so the gap is visible in every scan.
+const PROPERTIES_A_SPEC_KEEPS_CROSSED = [
+  "badge", "bordered", "dataSources", "extent", "fill", "iconSize", "layout", "mode", "mtype", "nested", "orientation",
+  "percent", "placement", "shape", "type", "valueType",
+];
 const EDITOR_DEFAULT_PROPERTY = /^Property \d+$/;
-const SCAN_FACTS = {};
+const SCAN_FACTS = { passedByException: 0 };
 const LABEL_PREFIX = "label · ";
 const SHEET_SUFFIX = " cases";
 const CASE_NAME = /^[^=,]+=[^=,]+(, [^=,]+=[^=,]+)*$/;
@@ -323,6 +348,35 @@ async function wiringOf(read) {
   return out;
 }
 
+// For one set: each variant property that is not `size`, the shared `variant` or a state, and that multiplies the set, meaning
+// some value of it other than the default is held by more than one version. A value held by one version only is drawn once.
+function crossedBeyondTheRuleOf(read) {
+  const held = new Map();
+  const names = read.versions.map((version) => parseVersionName(version.name));
+  for (const cells of names) {
+    for (const [property, value] of Object.entries(cells)) {
+      if (!held.has(property)) held.set(property, new Map());
+      held.get(property).set(value, (held.get(property).get(value) ?? 0) + 1);
+    }
+  }
+  const fallback = parseVersionName(read.defaultVersion ?? read.topLeftVersion ?? "");
+  const items = [];
+  let excused = false;
+  for (const [property, counts] of held) {
+    if (property === SIZE_PROPERTY || property === SHARED_VARIANT_PROPERTY || STATE_PROPERTIES.includes(property)) continue;
+    const defaultValue = read.props[property]?.default !== undefined ? String(read.props[property].default) : fallback[property];
+    const multiplying = [...counts].filter(([value, count]) => value !== defaultValue && count > 1);
+    if (multiplying.length === 0) continue;
+    if (PROPERTIES_A_SPEC_KEEPS_CROSSED.includes(property)) { excused = true; continue; }
+    items.push({
+      set: read.set.id, setName: read.set.name.slice(0, 80), property: property.slice(0, 80), default: String(defaultValue).slice(0, 40),
+      multiplying: multiplying.slice(0, 5).map(([value, count]) => `${value} x${count}`.slice(0, 40)),
+    });
+  }
+  if (items.length === 0 && excused) SCAN_FACTS.passedByException += 1;
+  return items;
+}
+
 async function scanFindings() {
   const versionsOutside = [];
   const versionPairs = [];
@@ -358,8 +412,10 @@ async function scanFindings() {
   const versionSlotIsFrame = [];
   const versionTiedToAnotherProperty = [];
   const propertyTiedToNothing = [];
+  const crossedBeyondTheRule = [];
   for (const node of unitEntries) {
     const lone = node.type === "COMPONENT";
+    if (!lone) crossedBeyondTheRule.push(...crossedBeyondTheRuleOf(readSet(node)));
     const wiring = await wiringOf(lone ? { set: node, versions: [node], definitions: definitionsOf(node) } : readSet(node));
     versionNotWired.push(...wiring.lacking);
     versionDiffersFromDefault.push(...wiring.differs);
@@ -384,7 +440,7 @@ async function scanFindings() {
     }
   }
 
-  return { versionsOutside, versionPairsMeeting: versionPairs, emptyVersions, defaultNamedProperties, unreadableSets, setsOverLimit, emptyCases, badCaseNames, duplicateCaseNames, versionNotWired, versionDiffersFromDefault, versionSlotIsFrame, versionTiedToAnotherProperty, propertyTiedToNothing };
+  return { versionsOutside, versionPairsMeeting: versionPairs, emptyVersions, defaultNamedProperties, unreadableSets, setsOverLimit, emptyCases, badCaseNames, duplicateCaseNames, versionNotWired, versionDiffersFromDefault, versionSlotIsFrame, versionTiedToAnotherProperty, propertyTiedToNothing, crossedBeyondTheRule };
 }
 
 const allFindings = await scanFindings();
