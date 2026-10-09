@@ -15,15 +15,23 @@
 // room it had to the right and below; `layout.js` lays the set out afterwards. A copy whose name already
 // stands in the set is `stood` and is not made again, so the script is safe to send twice.
 // A twin may be a copy planned earlier in the same list: a later `from` is matched against it, and in the real
-// send its node is the clone made before. Dry and real give the same names. The slot check reads the version
-// that stands at the head of the chain.
+// send its node is the clone made before. Dry and real give the same names. Slots are read on the version that
+// stands at the head of the chain.
 // A clone loses its property ties (connector rule 10). After cloning, each layer of the twin that is tied
 // to a property is compared with the layer at the same path in the copy (the path is the layer names from
 // the version down, a repeated name counted in order), and the tie is made again where it differs.
 //
 // Before anything changes it refuses, changing nothing, when a `from` finds no version or more than one,
-// when a `to` names a property the twin does not hold, when two copies would have one name, or when a
-// twin holds a slot, which a clone turns into a plain frame.
+// when a `to` names a property the twin does not hold, or when two copies would have one name.
+//
+// A twin that holds a slot: nobody has seen whether a clone inside a set keeps a slot, so the script finds out
+// before it copies. Dry plans the copies as usual and answers `slotProbe: "owed"` with the slots' paths in
+// `slots` (at most 8). Real, before any copy, clones the first such twin once as a probe, appends it to the
+// set, reads whether each slot's path still holds a SLOT, and removes the probe in a `finally`. All kept:
+// `slotProbe: "kept"` and the copies are made; after each copy its slots are read the same way, and a copy
+// that lost one is removed, named in `problems`, and no further copy is made. A probe that lost a slot:
+// `slotProbe: "lost"`, the unit is refused and nothing stays changed. A slot layer's ties are compared and
+// made again like any other layer's.
 
 const INPUTS = {
   setId: "",
@@ -95,9 +103,15 @@ for (const [at, one] of (INPUTS.copies || []).entries()) {
   plannedNames.add(name);
   pool.push({ node: null, cells, name, root: twin.root, plan });
 }
+// The slots of the versions at the head of the chains. Whether a clone keeps a slot is tried in the real send,
+// with one probe, before any copy is made.
+const slotsOf = (root) => [...pathsOf(root).entries()].filter(([path, layer]) => layer.type === "SLOT").map(([path]) => path);
+const slotRoots = [];
 for (const plan of plans) {
-  const slots = [...pathsOf(plan.root).entries()].filter(([path, layer]) => layer.type === "SLOT").map(([path]) => path);
-  if (slots.length > 0) problems.push(`[${plan.root.name}] holds a slot (${slots[0]}), which a copy would lose`);
+  if (!slotRoots.some((one) => one.root === plan.root)) {
+    const slots = slotsOf(plan.root);
+    if (slots.length > 0) slotRoots.push({ root: plan.root, slots });
+  }
 }
 const toMake = plans;
 
@@ -122,12 +136,35 @@ const setBoxAfter = toMake.length > 0 ? [set.x, set.y, Math.max(set.width, rowRi
 
 const done = {
   unit: set.name, dryRun: INPUTS.dryRun, problems, made: [], stood, tiedAgain: null,
-  setBoxBefore, setBoxAfter,
+  setBoxBefore, setBoxAfter, slotProbe: null, slots: [...new Set(slotRoots.flatMap((one) => one.slots))].slice(0, 8),
 };
 if (problems.length > 0) return { ...done, refused: "nothing was changed: see problems" };
-if (INPUTS.dryRun) return { ...done, made: toMake.map((plan) => [plan.name, null, plan.twin.name]) };
+if (INPUTS.dryRun) return { ...done, slotProbe: slotRoots.length > 0 ? "owed" : null, made: toMake.map((plan) => [plan.name, null, plan.twin.name]) };
+
+// One probe before any copy: clone the first twin that holds a slot, append it as a copy would be, read the
+// slots in the clone, and remove it again whatever happens.
+if (slotRoots.length > 0) {
+  const probe = slotRoots[0].root.clone();
+  let lost = null;
+  try {
+    set.appendChild(probe);
+    const layers = pathsOf(probe);
+    for (const path of slotRoots[0].slots) {
+      const found = layers.get(path);
+      if (!found || found.type !== "SLOT") { lost = `a clone turns the slot at ${path} into a ${found ? found.type : "missing layer"}`; break; }
+    }
+  } finally {
+    probe.remove();
+  }
+  if (lost) {
+    problems.push(`[${slotRoots[0].root.name}]: ${lost}`);
+    return { ...done, slotProbe: "lost", refused: `${lost}; nothing was changed` };
+  }
+  done.slotProbe = "kept";
+}
 
 let tiedAgain = 0;
+const madePlans = [];
 for (const plan of toMake) {
   const copy = (plan.twin.node || plan.twin.plan.node).clone();
   plan.node = copy;
@@ -136,6 +173,13 @@ for (const plan of toMake) {
   copy.x = plan.x;
   copy.y = plan.y;
   const copyLayers = pathsOf(copy);
+  const lostSlot = slotsOf(plan.root).find((path) => !copyLayers.get(path) || copyLayers.get(path).type !== "SLOT");
+  if (lostSlot) {
+    copy.remove();
+    problems.push(`[${plan.name}] lost the slot at ${lostSlot}: the copy was removed and no further copy is made`);
+    break;
+  }
+  madePlans.push(plan);
   for (const [path, layer] of pathsOf(plan.root)) {
     const references = referencesOf(layer);
     if (Object.keys(references).length === 0) continue;
@@ -150,5 +194,9 @@ for (const plan of toMake) {
   }
   done.made.push([plan.name, copy.id, plan.twin.name]);
 }
-if (toMake.length > 0) set.resize(setBoxAfter[2], setBoxAfter[3]);
+if (madePlans.length > 0) {
+  const right = Math.max(...madePlans.map((plan) => plan.x + plan.root.width));
+  const bottom = Math.max(...madePlans.map((plan) => plan.y + plan.root.height));
+  set.resize(Math.max(set.width, right + roomRight), Math.max(set.height, bottom + roomBelow));
+}
 return { ...done, tiedAgain, setBoxAfter: [set.x, set.y, set.width, set.height] };

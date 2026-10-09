@@ -520,11 +520,13 @@ const plantTree = (made) => {
   return made;
 };
 // as in Figma: a clone is a copy of the layers, and it loses the ties of its layers to the set's properties
+let cloneRound = 0;
+const slotLoss = { when: () => false };
 const cloneOf = (source) => {
   cloneCount += 1;
-  const copy = node(`clone${cloneCount}`, source.name, source.type, { key: `ckey${cloneCount}`, x: source.x, y: source.y, width: source.width, height: source.height, componentPropertyReferences: {} }, (source.children ?? []).map(cloneOf));
+  const copy = node(`clone${cloneCount}`, source.name, source.type === "SLOT" && slotLoss.when(cloneRound) ? "FRAME" : source.type, { key: `ckey${cloneCount}`, x: source.x, y: source.y, width: source.width, height: source.height, componentPropertyReferences: {} }, (source.children ?? []).map(cloneOf));
   copy.parent = null;
-  copy.clone = () => cloneOf(copy);
+  copy.clone = () => { cloneRound += 1; return cloneOf(copy); };
   return plantTree(copy);
 };
 const layer = (id, name, type, references = {}, children = []) => plantTree(node(id, name, type, { componentPropertyReferences: references, getStyledTextSegments: () => [{ fontName: { family: "Inter", style: "Regular" } }], characters: type === "TEXT" ? "Hello" : undefined }, children));
@@ -532,7 +534,7 @@ const treeVersion = (id, name, key, x, y, children) => {
   const made = plantTree(version(id, name, key, 100, 40));
   made.x = x; made.y = y;
   for (const child of children) { child.parent = made; made.children.push(child); }
-  made.clone = () => cloneOf(made);
+  made.clone = () => { cloneRound += 1; return cloneOf(made); };
   return made;
 };
 const treeSet = (versions, definitions = {}) => {
@@ -601,8 +603,6 @@ await guard(async () => {
   ok("a `to` that names a property the twin does not hold refuses the unit", /holds no property tone/.test(unheld.answer.problems[0] ?? ""), JSON.stringify(unheld.answer));
   const clash = await check([{ from: { size: "MD" }, to: { size: "XS" } }, { from: { size: "SM" }, to: { size: "XS", state: "rest" } }, { from: { size: "MD" }, to: { size: "XS" } }]);
   ok("two copies with one name refuse the unit, and not even the good copy is made", /two copies would be named/.test(clash.answer.problems.join(" ")) && clash.made.set.children.length === 2, JSON.stringify(clash.answer.problems));
-  const slotted = await check(copyOne, (made) => { made.versions[1].children[0].children.push(layer("l9", "body", "SLOT")); });
-  ok("a twin that holds a slot refuses the unit, because a clone turns a slot into a frame", /holds a slot/.test(slotted.answer.problems[0] ?? "") && slotted.made.set.children.length === 2, JSON.stringify(slotted.answer));
   const wrong = await run("copy.js", { setId: "9:1", unit: "DSOther", copies: copyOne }, figmaFile([copyPage().page]));
   ok("a set that is not the unit is refused", /is not the set DSOther/.test(wrong.refused ?? ""), JSON.stringify(wrong));
 });
@@ -619,8 +619,37 @@ await guard(async () => {
   same("sent twice: both stand, the second `from` finds the standing first copy", [again.problems, again.stood, made.set.children.length], [[], ["size=XS, state=rest", "size=XS, state=error"], 4]);
   const slotted = copyPage();
   slotted.versions[1].children[0].children.push(layer("l9", "body", "SLOT"));
+  { const start = cloneRound; slotLoss.when = (round) => round === start + 1; }
   const refused = await run("copy.js", { setId: "9:1", unit: "DSBtn", copies: chain, dryRun: false }, figmaFile([slotted.page]));
-  ok("the slot is read on the version at the head of the chain", /\[size=MD, state=rest\] holds a slot/.test(refused.problems[0] ?? "") && slotted.set.children.length === 2, JSON.stringify(refused));
+  slotLoss.when = () => false;
+  ok("the slot is read on the version at the head of the chain, and a probe that loses it refuses the unit", refused.slotProbe === "lost" && /a clone turns the slot at \/frame#1\/body#1 into a FRAME/.test(refused.refused ?? "") && slotted.set.children.length === 2, JSON.stringify(refused));
+});
+
+await guard(async () => {
+  const slotPage = () => {
+    const made = copyPage();
+    made.versions[1].children[0].children.push(layer("l9", "body", "SLOT", { visible: "show#1:1" }));
+    return made;
+  };
+  const two = [{ from: { size: "MD" }, to: { size: "XS" } }, { from: { size: "MD" }, to: { size: "LG" } }];
+  const dryPage = slotPage();
+  const roundBefore = cloneRound;
+  const dry = await run("copy.js", { setId: "9:1", unit: "DSBtn", copies: two }, figmaFile([dryPage.page]));
+  same("dry with a slot twin: the copies are planned, the slot is owed to the probe, nothing is made and no probe is cloned", [dry.problems, dry.made.length, dry.slotProbe, dry.slots, dryPage.set.children.length, cloneRound], [[], 2, "owed", ["/frame#1/body#1"], 2, roundBefore]);
+  const kept = slotPage();
+  slotLoss.when = () => false;
+  const keptAnswer = await run("copy.js", { setId: "9:1", unit: "DSBtn", copies: two, dryRun: false }, figmaFile([kept.page]));
+  same("real where the clone keeps the slot: kept, both copies made, no probe left in the set, the slot's tie made again", [keptAnswer.slotProbe, keptAnswer.problems, kept.set.children.length, kept.set.children.map((one) => one.name), kept.set.children[2].children[0].children[1].componentPropertyReferences], ["kept", [], 4, ["size=SM, state=rest", "size=MD, state=rest", "size=XS, state=rest", "size=LG, state=rest"], { visible: "show#1:1" }]);
+  const lost = slotPage();
+  { const start = cloneRound; slotLoss.when = (round) => round >= start + 1; }
+  const lostAnswer = await run("copy.js", { setId: "9:1", unit: "DSBtn", copies: two, dryRun: false }, figmaFile([lost.page]));
+  slotLoss.when = () => false;
+  same("real where the clone loses the slot: lost, refused, the set's children exactly as before and no probe stays", [lostAnswer.slotProbe, /a clone turns the slot at \/frame#1\/body#1 into a FRAME/.test(lostAnswer.refused ?? ""), lost.set.children.map((one) => one.name), lostAnswer.made], ["lost", true, ["size=SM, state=rest", "size=MD, state=rest"], []]);
+  const later = slotPage();
+  { const start = cloneRound; slotLoss.when = (round) => round === start + 4; }
+  const laterAnswer = await run("copy.js", { setId: "9:1", unit: "DSBtn", copies: [...two, { from: { size: "MD" }, to: { size: "SM" , state: "hover" } }], dryRun: false }, figmaFile([later.page]));
+  slotLoss.when = () => false;
+  same("a later copy that loses a slot though the probe kept it is removed and named; the earlier ones stay", [laterAnswer.slotProbe, laterAnswer.made.map((one) => one[0]), later.set.children.map((one) => one.name), /lost the slot/.test(laterAnswer.problems[0] ?? "")], ["kept", ["size=XS, state=rest", "size=LG, state=rest"], ["size=SM, state=rest", "size=MD, state=rest", "size=XS, state=rest", "size=LG, state=rest"], true]);
 });
 
 // ---- property.js ---------------------------------------------------------------------------------
