@@ -32,7 +32,7 @@
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/06-tests/README.md",
       "section": "The selective loop — what runs while work is under way",
-      "seen": "7e4c5549"
+      "seen": "0a400292"
     },
     {
       "path": "spn-foundation/docs/04-capabilities/02-support/01-apps/10-providers/ts/13-tests.md",
@@ -64,7 +64,7 @@
     {
       "repo": "spn-foundation",
       "row": "RD.DEVEX.WORKSPACE.207",
-      "seen": "eb1784c0"
+      "seen": "c4c45c16"
     },
     {
       "repo": "spn-foundation",
