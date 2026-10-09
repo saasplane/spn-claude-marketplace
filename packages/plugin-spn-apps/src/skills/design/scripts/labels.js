@@ -94,7 +94,10 @@ const plan = { set: set.name, dryRun: INPUTS.dryRun, removed: [...oldRows, ...ol
 if (problems.length > 0 || INPUTS.dryRun) return plan;
 
 const write = async (template, text) => {
+  // A copy of a text lands on the page's top level, not beside the text it copies: it goes into the
+  // unit's section first, so the place set after it is a place in the section.
   const label = template.clone();
+  home.appendChild(label);
   for (const segment of label.getStyledTextSegments(["fontName"])) await figma.loadFontAsync(segment.fontName);
   label.characters = text;
   label.name = "label · " + text;
@@ -114,4 +117,4 @@ for (const one of columns) {
   made.push(label.id);
 }
 for (const text of [...oldRows, ...oldColumns]) text.remove();
-return { ...plan, made };
+return { ...plan, made, home: home.id };

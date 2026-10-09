@@ -338,6 +338,7 @@ await guard(async () => {
 // ---- labels.js -----------------------------------------------------------------------------------
 
 console.log("\n=== labels.js — the row and column labels written again from the grid");
+let copies = 0;
 const labelsPage = () => {
   const cells = [["SM", "rest", 20, 20], ["SM", "hover", 140, 20], ["MD", "rest", 20, 100], ["MD", "hover", 140, 100]];
   const versions = cells.map(([size, state, x, y], at) => version(`5:${at}`, `size=${size}, state=${state}`, `k${at}`, 100, 40));
@@ -345,11 +346,13 @@ const labelsPage = () => {
   const set = componentSet("9:1", "DSBtn", "kset", versions);
   set.x = 200; set.y = 100; set.width = 300; set.height = 200;
   const home = node("3:1", "Section", "SECTION", {}, []);
+  home.appendChild = (child) => { child.parent = home; home.children.push(child); };
   const text = (id, name, characters, x, y) => {
     const made = node(id, name, "TEXT", { characters, x, y, width: 80, height: 20 });
     made.getStyledTextSegments = () => [{ fontName: { family: "Inter", style: "Regular" } }];
     made.remove = () => { home.children = home.children.filter((child) => child !== made); };
-    made.clone = () => { const copy = text(`${id}c${home.children.length}`, made.name, made.characters, made.x, made.y); home.children.push(copy); copy.parent = home; return copy; };
+    // as in Figma, a copy of a text lands on the page and not in the section of the text it copies
+    made.clone = () => { copies += 1; const copy = text(`${id}c${copies}`, made.name, made.characters, made.x, made.y); copy.parent = null; return copy; };
     return made;
   };
   // the header's layer is named as a label, as older headers are
